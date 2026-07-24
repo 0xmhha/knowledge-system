@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp
 
 GO ?= go
 
@@ -41,6 +41,16 @@ boundaries:
 
 tidy:
 	$(GO) mod tidy
+
+# build-mcp: build the three MCP server binaries. Deployments can stamp a
+# tool-namespace root at build time, e.g.:
+#   make build-mcp NAMESPACE=stablenet_knowledge
+NAMESPACE ?=
+NS_LDFLAGS = $(if $(NAMESPACE),-ldflags "-X github.com/0xmhha/knowledge-system/pkg/mcp.BuildRoot=$(NAMESPACE)",)
+build-mcp:
+	$(GO) build $(NS_LDFLAGS) -o bin/graph-mcp ./cmd/graph-mcp
+	$(GO) build $(NS_LDFLAGS) -o bin/vector-mcp ./cmd/vector-mcp
+	$(GO) build $(NS_LDFLAGS) -o bin/system-mcp ./cmd/system-mcp
 
 # vuln: scan for known vulnerabilities reachable from this module's code.
 # Note: the Go vulnerability DB covers Go-level advisories; CVEs in C code
