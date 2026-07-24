@@ -118,8 +118,17 @@ func localMove(g *adjList, parts []int, gamma float64, r *rand.Rand) bool {
 			toComm[cj] += w
 		}
 		bestC, bestGain := cur, 0.0
-		for c, w := range toComm {
-			gain := w - gamma*g.weight[i]*commWeight[c]/twoM
+		// Iterate candidate communities in sorted order: Go map iteration
+		// order would otherwise leak into equal-gain tie-breaking and defeat
+		// the seeded RNG's run-to-run reproducibility. With ascending order
+		// and a strict >, ties resolve to the smallest community ID.
+		cands := make([]int, 0, len(toComm))
+		for c := range toComm {
+			cands = append(cands, c)
+		}
+		sort.Ints(cands)
+		for _, c := range cands {
+			gain := toComm[c] - gamma*g.weight[i]*commWeight[c]/twoM
 			if gain > bestGain {
 				bestGain, bestC = gain, c
 			}
@@ -162,6 +171,9 @@ func aggregate(g *adjList, parts []int) ([]int, *adjList) {
 	for k := range out.edgeWts {
 		out.neigh[k[0]] = appendUnique(out.neigh[k[0]], k[1])
 		out.neigh[k[1]] = appendUnique(out.neigh[k[1]], k[0])
+	}
+	for i := range out.neigh {
+		sort.Ints(out.neigh[i]) // mirror buildAdj: deterministic adjacency order
 	}
 	parts2 := make([]int, n)
 	for i := range parts2 {

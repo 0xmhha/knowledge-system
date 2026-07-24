@@ -29,3 +29,25 @@ func distinct(p []int) int {
 	}
 	return len(m)
 }
+
+// TestRunLeiden_Deterministic locks the run-to-run reproducibility of the
+// seeded clustering: Go map iteration order must not leak into tie-breaking.
+// The fixture is deliberately tie-heavy — two symmetric triangles bridged by
+// one edge — so equal-gain candidates occur and order-sensitive tie-breaks
+// would diverge across repetitions.
+func TestRunLeiden_Deterministic(t *testing.T) {
+	edges := [][2]int{
+		{0, 1}, {1, 2}, {2, 0}, // triangle A
+		{3, 4}, {4, 5}, {5, 3}, // triangle B (symmetric twin)
+		{2, 3}, // bridge
+	}
+	first := cluster.RunLeiden(6, edges, cluster.LeidenOpts{Resolution: 1.0, Seed: 42, MaxIters: 50})
+	for i := 0; i < 50; i++ {
+		got := cluster.RunLeiden(6, edges, cluster.LeidenOpts{Resolution: 1.0, Seed: 42, MaxIters: 50})
+		for j := range got {
+			if got[j] != first[j] {
+				t.Fatalf("run %d diverged at node %d: %v vs %v", i, j, got, first)
+			}
+		}
+	}
+}

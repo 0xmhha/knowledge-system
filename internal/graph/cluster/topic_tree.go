@@ -157,7 +157,16 @@ func splitProblemCommunities(groups map[int][]int, edges [][2]int,
 	nextID := maxCommunityID(groups) + 1
 
 	out := make(map[int][]int, len(groups))
-	for cid, members := range groups {
+	// Iterate communities in sorted-ID order: fresh IDs are handed out
+	// sequentially below, so map-iteration order would otherwise make the
+	// ID assignment differ run to run.
+	cids := make([]int, 0, len(groups))
+	for c := range groups {
+		cids = append(cids, c)
+	}
+	sort.Ints(cids)
+	for _, cid := range cids {
+		members := groups[cid]
 		oversized := len(members) > maxAllowedSize
 		diffuse := len(members) >= diffuseMinSize && cohesionOfMembers(members, edges) < diffuseCohesion
 		if !oversized && !diffuse {
@@ -227,9 +236,16 @@ func reLeidenSubgraph(members []int, edges [][2]int,
 	for i, c := range parts {
 		subgroups[c] = append(subgroups[c], members[i])
 	}
+	// Return subgroups in sorted community-label order so the caller's
+	// "first split keeps the original ID" rule binds to a stable subgroup.
+	labels := make([]int, 0, len(subgroups))
+	for c := range subgroups {
+		labels = append(labels, c)
+	}
+	sort.Ints(labels)
 	out := make([][]int, 0, len(subgroups))
-	for _, ms := range subgroups {
-		out = append(out, ms)
+	for _, c := range labels {
+		out = append(out, subgroups[c])
 	}
 	return out
 }
