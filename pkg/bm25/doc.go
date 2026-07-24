@@ -1,3 +1,7 @@
+// Package bm25 is the shared Okapi BM25 core used by both the graph
+// engine (evidence/smartctx/persist) and the vector engine (candidate-set
+// rerank overlay in vector/internal/query/bm25).
+//
 // Package bm25 provides Okapi BM25 ranking for code-aware corpora.
 //
 // # Stability
@@ -12,14 +16,14 @@
 //   - The Scorer interface will not gain methods in a minor release;
 //     a breaking change to Scorer requires a new major version.
 //
-// External consumers (ckv, cks) should depend on the [Scorer]
+// External consumers (ckv, stablenet-knowledge) should depend on the [Scorer]
 // interface and construct via [NewOkapi]. Direct field access on
 // [Okapi] (K1, B) is stable for tuning but the unexported fields
 // are not part of the contract.
 //
 // # Typical usage (external consumer)
 //
-//	import "github.com/0xmhha/knowledge-system/graph/pkg/bm25"
+//	import "github.com/0xmhha/knowledge-system/pkg/bm25"
 //
 //	scorer := bm25.NewOkapi()
 //	scorer.Index([]bm25.Document{

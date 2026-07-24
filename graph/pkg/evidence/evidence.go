@@ -36,7 +36,7 @@ import (
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/graph/internal/persist"
-	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/pkg/bm25"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 

@@ -3,11 +3,11 @@ package bm25_test
 import (
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/pkg/bm25"
 )
 
 // TestExternalConsumer_IndexAndQuery exercises the public API from an
-// external package — the same import path ckv/cks will use. If this
+// external package — the same import path ckv/stablenet-knowledge will use. If this
 // file stops compiling, the external contract is broken.
 func TestExternalConsumer_IndexAndQuery(t *testing.T) {
 	var scorer bm25.Scorer = bm25.NewOkapi()

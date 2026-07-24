@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/vector/internal/query/bm25"
+	"github.com/0xmhha/knowledge-system/pkg/bm25"
 	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 

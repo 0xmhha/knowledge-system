@@ -1,6 +1,14 @@
+// Package bm25 provides candidate-set BM25 rerank + RRF fusion for the
+// vector engine's query path. The Okapi scorer and code-aware tokenizer come
+// from the shared core package (root pkg/bm25); this package layers the
+// CKV-specific candidate-set Rerank on top. CKV remains dense-only at the
+// schema layer; this is a candidate-rerank overlay measured for impact
+// alongside the vector-only baseline.
 package bm25
 
 import (
+	core "github.com/0xmhha/knowledge-system/pkg/bm25"
+
 	"fmt"
 	"sort"
 
@@ -75,7 +83,7 @@ func Rerank(candidates []Candidate, intent string) ([]Result, Stats) {
 		}
 		return out, stats
 	}
-	queryTokens := Tokenize(intent)
+	queryTokens := core.Tokenize(intent)
 	if len(queryTokens) == 0 {
 		stats.BM25Disabled = true
 		stats.Top1ChunkID = firstChunkIDPrefix(out[0].Hit)
@@ -86,12 +94,12 @@ func Rerank(candidates []Candidate, intent string) ([]Result, Stats) {
 	// the candidate's position so we can map back unambiguously when the
 	// caller's Corpus strings collide (which they shouldn't for distinct
 	// chunks, but defending the contract is cheap).
-	docs := make([]Document, n)
+	docs := make([]core.Document, n)
 	docIDOf := func(i int) string { return fmt.Sprintf("c%d", i) }
 	for i, c := range candidates {
-		docs[i] = Document{ID: docIDOf(i), Tokens: Tokenize(c.Corpus)}
+		docs[i] = core.Document{ID: docIDOf(i), Tokens: core.Tokenize(c.Corpus)}
 	}
-	scorer := NewOkapi()
+	scorer := core.NewOkapi()
 	scorer.Index(docs)
 
 	// Score each candidate. We need both the score (for BM25Score field
