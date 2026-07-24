@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Build
+        run: make build
+      - name: Lint (gofmt drift, vet, engine boundaries)
+        run: make lint
+      - name: Test
+        run: make test
+
+  vuln-scan:
+    runs-on: ubuntu-latest
+    # Advisory-only: the vulnerability DB moves independently of this repo,
+    # so new findings should not block unrelated changes.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: govulncheck
+        run: make vuln
