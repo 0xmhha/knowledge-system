@@ -1,0 +1,25 @@
+id: R07-search-text-three-token-and
+description: |
+  Three-token AND: "service Vault Deposit" pins the exact Go method.
+  Every token must appear in the hit's FTS-indexed columns; only
+  service.Vault.Deposit's qualified_name carries all three. Locks the
+  AND post-filter's behaviour at higher token counts (R05 covers two).
+probe:
+  tool: search_text
+  args:
+    query: "service Vault Deposit"
+    mode: "and"
+    language: "go"
+    top_k: 20
+expected:
+  # Symbol-only after the X-NodeKinds default. Both Method qnames
+  # ("service.Vault.Deposit", "service.SafeVault.SafeDeposit")
+  # carry all three tokens via their package + receiver + name
+  # segments; their statement children no longer surface.
+  symbols:
+    - service.Vault.Deposit
+    - service.SafeVault
+    - service.SafeVault.SafeDeposit
+scoring:
+  recall_min: 1.0
+  precision_min: 1.0

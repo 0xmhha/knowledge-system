@@ -1,0 +1,52 @@
+id: R06-search-text-vault-or-deposit-go
+description: |
+  Multi-keyword OR mode (explicit) in language=go: "Vault deposit"
+  returns every Go node carrying either token in any FTS-indexed column.
+  Locks the OR-broadening contract that mode=or (and the zero-value
+  default) share — callers that want maximum recall over a topic rely
+  on this behaviour. Pairs with R05 to surface the AND ↔ OR delta.
+
+  Precision target is intentionally loose (0.5) because OR mode is a
+  recall-first surface; the BM25 + PageRank + usage rerank pushes the
+  most relevant hits to the top, but every "vault" or "deposit" token
+  bearer is a valid candidate.
+probe:
+  tool: search_text
+  args:
+    query: "Vault deposit"
+    mode: "or"
+    language: "go"
+    top_k: 20
+expected:
+  # Symbol-only after the X-NodeKinds default (statement-level
+  # children and the hunk meta-node no longer surface — those were
+  # FTS noise driven by qname/path-prefix matching).
+  symbols:
+    - service.Vault.Deposit
+    - service.Vault
+    - api.Handler.vault
+    - domain.DepositRequest
+    - domain.DepositRequest.Amount
+    - domain.DepositRequest.From
+    - service.Vault.wallets
+    # B1 concurrent.go additions
+    - service.SafeVault
+    - service.SafeVault.vault
+    - service.SafeVault.SafeDeposit
+    - service.NewSafeVault
+    # File node — the path "go-backend/service/vault.go" carries
+    # the "vault" token; File is still a symbol-level NodeType so
+    # this entry passes the default whitelist.
+    - service/go-backend/service/vault.go
+    # Schema 1.13 camelCase search_tokens: "vault" sub-token now
+    # surfaces these additional nodes.
+    - api.Handler.HandleDeposit
+    - service.SafeVault.mu
+    - service.SafeVault.mu#mutex
+scoring:
+  recall_min: 1.0
+  # OR mode is recall-first (see description): every "vault"/"deposit" token
+  # bearer is a valid candidate, e.g. service.New (`func New() *Vault` — the
+  # FTS-indexed signature carries "vault"). Match the documented loose target
+  # instead of demanding an exhaustive expected list.
+  precision_min: 0.5

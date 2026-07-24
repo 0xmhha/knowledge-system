@@ -1,0 +1,133 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,  arch: amd64, goos: linux }
+          - { os: macos-latest,   arch: arm64, goos: darwin }
+          # macos-13 (Intel/amd64) dropped: GitHub-hosted runner pool is
+          # effectively retired — jobs sit in `queued` indefinitely.
+          # amd64 coverage is provided by ubuntu-latest; arm64 darwin
+          # by macos-latest. Re-add macos-13-large (paid) if Intel macOS
+          # runtime testing becomes required.
+          # Windows support is dropped for now: cli-wrapper (used by
+          # internal/eval) calls syscall.Socketpair without a build
+          # constraint, which is unix-only. Re-evaluate once cli-wrapper
+          # has a Windows-compatible transport or eval is gated off.
+    runs-on: ${{ matrix.os }}
+    env:
+      GOOS:   ${{ matrix.goos }}
+      GOARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version: '1.25.12' }
+      - run: go vet ./...
+      - run: go test -race ./...
+      - uses: actions/setup-node@v7
+        with: { node-version: '20' }
+      - run: cd web/viewer-next && npm ci && npm run build
+      - shell: bash
+        run: |
+          rm -rf internal/server/web_assets
+          mkdir -p internal/server/web_assets
+          cp -R web/viewer-next/out/. internal/server/web_assets/
+      - run: go build -o bin/ckg ./cmd/ckg
+
+  lint:
+    # ESLint (viewer) + go vet. Parallel with test/audit so it never
+    # blocks fast feedback. The viewer-side rule that earns this job
+    # its keep is react-hooks/rules-of-hooks: a useCallback below an
+    # early return slipped into main once and crashed the viewer on
+    # first node click (commit 50ee9f7). Enforcing it at PR time means
+    # the same class of regression cannot reach a user again.
+    #
+    # All `run:` steps below are static commands with no untrusted
+    # github.event.* interpolation, so workflow-injection guidance
+    # does not apply here.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version: '1.25.12' }
+      - uses: actions/setup-node@v7
+        with: { node-version: '20' }
+      - run: cd web/viewer-next && npm ci
+      - run: make lint
+
+  audit:
+    # Dependency-tree vulnerability scan over both languages. Runs in
+    # parallel with `test` so it never blocks fast feedback on code
+    # changes, but a failure here still fails the PR (no
+    # continue-on-error) — vulnerabilities should not be allowed to
+    # accumulate between releases.
+    #
+    # Single ubuntu runner is sufficient: advisory data is identical
+    # across OS/arch, so a matrix would only multiply the cost without
+    # adding signal.
+    #
+    # All `run:` steps below are static commands with no untrusted
+    # github.event.* interpolation, so workflow-injection guidance
+    # (https://github.blog/security/vulnerability-research/how-to-catch-github-actions-workflow-injections-before-attackers-do/)
+    # does not apply here.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version: '1.25.12' }
+      - uses: actions/setup-node@v7
+        with: { node-version: '20' }
+      - run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      # `npm ci` (not `npm install`) so the audit reflects the exact
+      # locked tree, not the latest semver-resolved one.
+      - run: cd web/viewer-next && npm ci
+      - run: make audit
+
+  smoke:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version: '1.25.12' }
+      - uses: actions/setup-node@v7
+        with: { node-version: '20' }
+      - run: cd web/viewer-next && npm ci && npx playwright install --with-deps chromium && npm run build
+      - run: |
+          rm -rf internal/server/web_assets
+          mkdir -p internal/server/web_assets
+          cp -R web/viewer-next/out/. internal/server/web_assets/
+          go build -o bin/ckg ./cmd/ckg
+          ./bin/ckg build --src=testdata/synthetic --out=/tmp/ckg-smoke
+          ./bin/ckg serve --graph=/tmp/ckg-smoke --port=8787 &
+          sleep 3
+          cd web/viewer-next && npx playwright test
+
+  eval:
+    # P3 #9 eval regression gate. Runs the LLM-free half of the eval
+    # surface — `make eval` produces retrieval / validate / benchmark
+    # / bench-mcp JSON under eval/results/latest/, then cmd/eval-gate
+    # compares against the committed snapshot in eval/baseline/.
+    # Aggregate recall/precision/f1 must stay within 0.02 of baseline;
+    # validate issue count must not increase.
+    #
+    # Why no LLM here: the Stage B eval (γ/δ multi-turn baselines)
+    # costs API quota and runs in minutes per task. That belongs in a
+    # nightly job or a manually-triggered workflow, not a PR gate. The
+    # offline retrieval / validate / benchmark / bench-mcp probes run
+    # end-to-end in ~2 minutes with no external dependencies and
+    # catch the regressions blueprint §4.2 P3 #9 actually cares about.
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version: '1.25.12' }
+      - run: make eval
+      - run: go run ./cmd/eval-gate

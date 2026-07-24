@@ -1,0 +1,19 @@
+id: R01-find-callers-vault-deposit
+description: |
+  find_callers reverse traversal: service.Vault.Deposit is called by
+  api.Handler.HandleDeposit (the only caller in the synthetic Go corpus).
+  Locks the CKG-5 default depth=2 behavior — at depth=1 a single hop
+  reaches HandleDeposit already, but the test stays deterministic
+  whichever default ships.
+probe:
+  tool: find_callers
+  args:
+    qname: "service.Vault.Deposit"
+    depth: 2
+expected:
+  symbols:
+    - "api.Handler.HandleDeposit"
+    - "service.SafeVault.SafeDeposit"  # B1 lock wrapper added by R11/R12 work
+scoring:
+  recall_min: 1.0
+  precision_min: 1.0

@@ -1,0 +1,31 @@
+id: R05-search-text-vault-deposit-and-go
+description: |
+  Multi-keyword AND mode in language=go: "Vault deposit" must return
+  service.Vault.Deposit alone — every Go node whose FTS-indexed columns
+  (name + qualified_name + signature + doc_comment) carry both tokens.
+  Locks the X-1 AND post-filter against silent OR fallback (which would
+  also surface api.Handler.HandleDeposit and DepositRequest because
+  rewriteFTSQuery joins multi-token input with FTS5 OR).
+
+  Replaces the original R05-search-text-deposit (single-token "Deposit"
+  with precision_min=0.0) — that fixture's intent moved to R10, which
+  ratchets precision to 1.0 now that the single-keyword path has a
+  language pushdown filter to lean on.
+probe:
+  tool: search_text
+  args:
+    query: "Vault deposit"
+    mode: "and"
+    language: "go"
+    top_k: 20
+expected:
+  # Symbol-only after the X-NodeKinds default (statement-level
+  # IfStmt/ReturnStmt children no longer surface; their qname
+  # prefix matches were noise driven by FTS column indexing).
+  symbols:
+    - service.Vault.Deposit                       # the Method node itself
+    - service.SafeVault                           # B1 lock wrapper struct (vault + deposit-via-SafeDeposit)
+    - service.SafeVault.SafeDeposit               # B1 lock wrapper method
+scoring:
+  recall_min: 1.0
+  precision_min: 1.0

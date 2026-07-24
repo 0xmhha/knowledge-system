@@ -1,0 +1,1874 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  /* overflow: auto (was hidden): when the user's actual viewport is
+     smaller than what the 4-column grid can compress to, we want the
+     browser to show scrollbars rather than silently clip the right
+     edge / bottom bar off-screen. The grid still tries to fit by
+     clamping panel width down to its 240px floor and letting the 1fr
+     canvas shrink — body scroll only kicks in when even that minimum
+     exceeds the viewport. */
+  overflow: auto;
+  font-family: -apple-system, system-ui, sans-serif;
+  background: #15171c;
+  color: #e6e7e9;
+}
+
+#app {
+  display: grid;
+  /* Row 1 (auto) is reserved for the optional stale-banner. When the banner
+     is absent the row collapses to 0px (no children). Without this row the
+     banner shoves TopBar into the 1fr canvas row, breaking the layout. */
+  /* minmax(0, 1fr) is critical: the default `1fr` resolves to
+     `minmax(auto, 1fr)`, where the auto floor takes the implicit
+     min-content of whatever lives in the row. On a 13" viewport the
+     canvas-host content (force-graph wrapper + canvas + CanvasLegend)
+     comes in around 600px of min-content, which pushes the 1fr row
+     past viewport height and shoves the bottombar (row 4) off-screen.
+     Floor at 0 so the row shrinks to fit; the canvas-host then needs
+     its own overflow rule below to clip its larger child. */
+  grid-template-rows: auto 32px minmax(0, 1fr) 28px;
+  height: 100%;
+  width: 100%;
+  /* min-width: the smallest the 4-column grid can compress to —
+     nav(52 collapsed) + callflow(0 hidden) + canvas(0 via minmax) +
+     panel(240 floor) = 292. Force at least that so the grid never
+     compresses below a usable layout; below this width, body's
+     overflow:auto kicks in and the browser scrolls horizontally.
+     min-height likewise covers the row-3 minmax(0,1fr) flooring at 0
+     — without a vertical floor a really short viewport hides the
+     canvas + panel altogether. */
+  min-width: 292px;
+  min-height: 400px;
+  /* Three-column layout (#4 Call Flow):
+       col 1: optional CallFlow side panel (260–320px). Hidden when no
+              anchor is set; the column collapses to 0px so the canvas
+              reclaims the space without re-flowing other items.
+       col 2: canvas. minmax(0, 1fr) — see note below.
+       col 3: detail panel (240–360px clamp).
+
+     minmax(0, 1fr): the spec default `1fr` is `minmax(auto, 1fr)`, whose
+     `auto` minimum follows the min-content size of the cell's contents.
+     react-force-graph-2d sizes its <canvas> from the initial parent
+     width (~1200px on first paint), and that becomes the 1fr track's
+     min-content. Without `minmax(0, ...)` grid honours that min and
+     encroaches on the fixed panel track when viewport < 1fr_min + panel,
+     visibly crushing the panel to <360px on narrow windows.
+
+     clamp(240px, 32vw, 360px): keep 360px on ≥1125px viewports (where
+     32vw ≥ 360), scale down to 32vw on mid widths so the canvas keeps a
+     usable share, never below 240px (legibility floor for NodeList +
+     EdgeFilters labels). At 720px viewport: panel ≈ 240px, canvas ≈
+     480px — both visible. */
+  /* 4-column layout — each side surface takes a real grid column so the
+     canvas-host cell shrinks to the unoccluded middle band. The canvas's
+     own geometric centre then naturally lines up with the visible centre,
+     so force-graph's centering forces and zoomToFit framing don't bias
+     into the area the user can't see.
+       col 1: SideNav (52px, always present)
+       col 2: CallFlow (clamp 220–300, or 0 when no anchor)
+       col 3: canvas-host (minmax(0, 1fr) — see note below)
+       col 4: detail Panel (panelWidth via inline style, or 0 when hidden)
+
+     CSS holds the SSR-safe default (all side columns 0 except SideNav).
+     App.tsx mounts and applies the live inline grid-template-columns from
+     state — `mounted` gate keeps SSR HTML and first client render
+     identical (React #418 safe).
+
+     minmax(0, 1fr) for the canvas column (not bare `1fr`) is necessary
+     because `1fr` resolves to `minmax(auto, 1fr)`, whose auto floor
+     follows min-content of children. The canvas's intrinsic min-content
+     on narrow viewports otherwise pushes the column past viewport width,
+     body overflow:auto kicks in, a horizontal scrollbar steals 15px from
+     #app, and the panel column flickers as it loses width. Floor at 0
+     so the canvas-host shrinks to whatever the grid hands it. */
+  grid-template-columns: 52px 0 minmax(0, 1fr) 0;
+  position: relative;
+  /* No grid-template-columns transition. Animating a layout property
+     while the canvas re-runs its force simulation produced a visible
+     panel flash on selection changes — the panel briefly slid as the
+     column width interpolated and the canvas resized mid-animation.
+     Snap-toggle is jarring once but never flashes. */
+}
+
+/* Detail toggle — the prominent button users actually find. The plain
+   ⇆ glyph used to live with the rest of the topbar buttons, easily
+   missed. Pulled out into its own class with a colored border and an
+   open/closed text label so the affordance is obvious at first paint. */
+.topbar-detail-toggle {
+  background: #232529;
+  color: #cfd0d3;
+  border: 1px solid #3a3c40;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  min-height: 24px;
+}
+.topbar-detail-toggle.is-open { border-color: #44aaff; color: #7ab8ff; }
+.topbar-detail-toggle:hover { background: #2a2c30; }
+
+/* Test ON/OFF toggle — surfaced in TopBar so users can include/exclude
+   test code from the view without opening the filter panel. Default is
+   OFF (production-only). When ON, the button picks up a warning-amber
+   accent because including tests roughly doubles the node count
+   (84K test nodes on the go-stablenet target) and force layout slows. */
+.topbar-test-toggle {
+  background: #232529;
+  color: #cfd0d3;
+  border: 1px solid #3a3c40;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  min-height: 24px;
+  font-family: ui-monospace, monospace;
+}
+.topbar-test-toggle.is-on { border-color: #ff9800; color: #ffcc66; }
+.topbar-test-toggle:hover { background: #2a2c30; }
+.topbar-test-toggle.is-on:hover { background: #3a2a00; }
+
+/* Node-limit selector — small inline select that lets users choose
+   how many nodes the boot seed loads. The wrapping <label> keeps the
+   icon and the native <select> aligned and clickable as one unit. */
+.topbar-node-limit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #232529;
+  color: #cfd0d3;
+  border: 1px solid #3a3c40;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  min-height: 24px;
+  cursor: pointer;
+}
+.topbar-node-limit:hover { background: #2a2c30; }
+.topbar-node-limit select {
+  background: transparent;
+  color: inherit;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+/* Re-style the dropdown options in a dark colour (native popup is
+   styled per-OS but most modern browsers honour the option element's
+   bg/colour for the dropdown). */
+.topbar-node-limit select option { background: #232529; color: #cfd0d3; }
+
+.topbar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+  z-index: 20;
+  padding: 4px 8px;
+  background: #1a1c1f;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+}
+.topbar strong { font-size: 12px; }
+.topbar .search-wrap {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  min-width: 0;
+}
+.topbar input.search {
+  flex: 1;
+  padding: 3px 22px 3px 6px;
+  background: #0d0e10;
+  color: #e6e7e9;
+  border: 1px solid #2a2c30;
+  font-size: 11px;
+  min-width: 0;
+}
+.topbar .search-clear {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 4px 8px;
+  min-width: 24px;
+  min-height: 24px;
+  font-size: 11px;
+  line-height: 1;
+}
+.topbar .search-clear:hover { color: #e6e7e9; background: transparent; }
+.topbar button, .bottombar button {
+  background: #232529;
+  color: #e6e7e9;
+  border: 1px solid #2a2c30;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.topbar button:hover, .bottombar button:hover { background: #2a2c30; }
+.topbar button.topbar-home {
+  border-color: #44aaff;
+  color: #44aaff;
+  font-weight: 600;
+  padding: 4px 12px;
+  min-height: 24px;
+  white-space: nowrap;
+}
+.topbar button.topbar-home:hover { background: #1d2a3a; color: #7ab8ff; }
+.topbar .src-info {
+  font-size: 11px;
+  color: #888;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* canvas-host hosts the force-graph wrapper. `isolation: isolate`
+   confines its stacking context so the wrapper's transforms/filters
+   (added by react-force-graph internally) cannot escape and overpaint
+   the panel column — without it, on some browser/GPU stacks the
+   canvas got promoted above the panel siblings even though grid put
+   them in adjacent columns. z-index:0 keeps it below the explicit
+   z-index:1 on .panel below. */
+.canvas-host {
+  grid-column: 3;
+  grid-row: 3;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  /* ForceGraph's canvas can briefly be larger than this column (e.g.
+     between the prop-update and the simulation re-layout, or when the
+     library's default 800×600 falls back into play). Clip overflow so
+     a too-large canvas can't push the grid sideways or overflow into
+     the panel/bottombar. */
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+  /* Purple/navy radial gradient base. ForceGraph's own canvas paints
+     transparent on top via backgroundColor="rgba(0,0,0,0)", so this
+     bleeds through and gives the otherwise-flat dark canvas a sense
+     of depth — D2 decision (2026-05-21). The ellipse is offset
+     slightly up-left of centre so the focused subgraph (typically
+     near the centre after centerOnNode) sits in the brightest band
+     without the gradient masking node hue. */
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 45% 38%,
+      rgba(80, 70, 140, 0.32) 0%,
+      rgba(40, 50, 90, 0.18) 45%,
+      rgba(20, 22, 30, 0) 80%
+    ),
+    #15171c;
+}
+.canvas-host > div { width: 100%; height: 100%; min-width: 0; }
+/* H: hidden until ForceGraph's first onEngineStop fires; .viewer-ready
+   gets added by App.tsx and triggers a 250ms opacity ramp so the
+   initial zoom-to-fit and any settling motion happen off-screen. */
+.canvas-host { opacity: 0; transition: opacity 250ms ease-out; }
+.canvas-host.viewer-ready { opacity: 1; }
+
+/* Panel — deliberately stronger visual treatment because the canvas
+   (#0d0e10) and the previous panel bg (#1a1c1f) sat ~6% lightness
+   apart, and the 1px #2a2c30 left border was nearly invisible against
+   either. Users read the panel as "absent" even when its DOM column
+   was correctly sized. The 2px blue border is the primary affordance;
+   the lifted bg (#1f2329) and inset shadow are reinforcement so the
+   panel reads as a physically distinct surface from the canvas.
+
+   position:relative + z-index:1 forces the panel into its own
+   stacking context above .canvas-host. Default static positioning
+   relied on DOM order alone, which broke when the force-graph wrapper
+   formed a stacking context (transforms, will-change) and locally
+   raised the canvas above sibling grid cells in some browsers. */
+/* Panel resize handle — sits on the panel's left edge as a 6px
+   transparent strip; on hover it paints a faint cyan vertical line
+   matching the panel border-left so users see the affordance. The
+   actual drag logic lives in App.tsx (onResizeStart). */
+.panel-resizer {
+  position: absolute;
+  left: -3px;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 5;
+  background: transparent;
+  transition: background 100ms ease;
+}
+.panel-resizer:hover,
+.panel-resizer:active {
+  background: rgba(68, 170, 255, 0.45);
+}
+
+.panel {
+  /* Panel takes col 4 of #app's grid. Width is controlled by the
+     parent's grid-template-columns (set inline from App.tsx state).
+     When the user closes the panel, App.tsx renders #app with a 0px
+     col 4 — the panel element stays mounted (so React state on its
+     children survives the toggle) but visually collapses. */
+  grid-column: 4;
+  grid-row: 3;
+  position: relative;
+  z-index: 15;
+  background: #1f2329;
+  border-left: 2px solid #44aaff;
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.4) inset;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  /* R1.5-b + J: always show a scrollbar (overflow-y: scroll, not auto)
+     so the affordance is permanent regardless of content height —
+     users were missing the auto-hiding bar and reading "no scroll" as
+     "panel cut off". scrollbar-width: thin is the Firefox-side
+     equivalent of the ::-webkit-scrollbar rules below. */
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #44aaff #1a1c1f;
+}
+/* F (visible scroll): users were missing the panel's overflow because
+   the default WebKit scrollbar (3-5px, dark grey on dark background)
+   blended into the panel. Widen and tint the thumb so "there is more
+   below" reads as an affordance, not a quirk. */
+/* -webkit-appearance: none is the critical bit on macOS: without it
+   Safari/Chrome use the native auto-hiding overlay scrollbar (visible
+   only while scrolling) regardless of how we style ::-webkit-scrollbar.
+   Setting appearance: none switches the browser to the classic
+   permanently-visible scrollbar slot, which our styles then customise. */
+.panel::-webkit-scrollbar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+}
+.panel::-webkit-scrollbar-track { background: #1a1c1f; }
+.panel::-webkit-scrollbar-thumb {
+  background: #44aaff;
+  border-radius: 6px;
+  border: 2px solid #1f2329;
+  min-height: 40px;
+}
+.panel::-webkit-scrollbar-thumb:hover { background: #7ab8ff; }
+
+.node-list {
+  /* M: vh-relative cap so the eight panel children sum to ≤ panel column
+     height regardless of viewport. Targets: list 18vh + detail 20vh +
+     legend 10vh + trace 6vh + node-types 10vh + edge-filters 12vh +
+     tickets 8vh + recovery 8vh = 92vh, leaving room for the column's
+     32px topbar / 28px bottombar offset. Each child gets its own
+     overflow-y so its own content scrolls inside instead of pushing
+     siblings out of the viewport. */
+  flex: 0 0 auto;
+  max-height: 18vh;
+  overflow-y: auto;
+  border-bottom: 1px solid #2a2c30;
+  padding: 4px;
+  min-height: 0;
+}
+.node-list .item {
+  padding: 4px 5px;
+  border-bottom: 1px solid #22242a;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+}
+.node-list .item:hover { background: #232529; }
+.node-list .item.selected { background: #2a3140; }
+.node-list .item .head { color: #cfd0d3; }
+.node-list .item .head .type { color: #7ab8ff; }
+.node-list .item .qname { color: #888; font-size: 10px; word-break: break-all; }
+.node-list .item .file { color: #5a6068; font-size: 9.5px; }
+.node-list .listmeta {
+  padding: 6px 8px;
+  border-bottom: 1px solid #3a3c40;
+  position: sticky;
+  top: 0;
+  background: #1a1c1f;
+  z-index: 1;
+}
+.node-list .listmeta .title { font-size: 11.5px; color: #cfd0d3; font-weight: 600; }
+.node-list .listmeta:hover { background: #1f2329; }
+.node-list .section-arrow {
+  display: inline-block;
+  width: 10px;
+  font-size: 9px;
+  color: #888;
+  margin-right: 2px;
+}
+.node-list .listmeta .count { color: #7ab8ff; }
+.node-list .listmeta .ctx {
+  font-size: 10px;
+  color: #7a808a;
+  margin-top: 2px;
+  font-family: ui-monospace, monospace;
+  word-break: break-all;
+}
+
+.node-detail {
+  flex: 0 0 auto;
+  max-height: 20vh;
+  overflow-y: auto;
+  padding: 8px 10px;
+  font-size: 12px;
+  min-height: 0;
+}
+.node-detail h3 { font-size: 13px; margin: 0 0 6px 0; }
+.node-detail h4 { font-size: 11px; margin: 8px 0 3px 0; }
+.node-detail pre { font-size: 10.5px; max-height: 200px; }
+
+/* Empty state — shown when no node is selected. Centered flex column with
+   a large glyph so the panel never reads as blank on first paint. The
+   glyph is text (no external image) so it survives offline mode and the
+   embedded-binary build with zero asset plumbing. */
+.node-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: #cfd0d3;
+  /* Take the full vertical slice of the .node-detail flex item so the
+     empty state visually fills the section instead of hugging the top. */
+  min-height: 180px;
+}
+.node-detail-empty-glyph {
+  font-size: 36px;
+  line-height: 1;
+  opacity: 0.85;
+}
+.node-detail .node-detail-empty-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7ab8ff;
+  margin: 0;
+}
+.node-detail-empty-hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #888;
+  max-width: 280px;
+}
+
+/* Impact panel — surfaces /api/impact result inline so users don't need
+   to leave the canvas to see who depends on the selected node. */
+.node-detail .impact-actions { margin-top: 8px; }
+.node-detail .impact-btn {
+  background: #232529;
+  color: #e6e7e9;
+  border: 1px solid #2a2c30;
+  padding: 3px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-family: ui-monospace, monospace;
+}
+.node-detail .impact-btn:hover:not(:disabled) {
+  background: #1d2a3a;
+  border-color: #7ab8ff;
+  color: #7ab8ff;
+}
+.node-detail .impact-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.node-detail .impact-error {
+  margin-top: 6px;
+  padding: 4px 6px;
+  background: #3a2520;
+  color: #f8b9a8;
+  border: 1px solid #5a3a30;
+  border-radius: 3px;
+  font-size: 10.5px;
+}
+
+.node-detail .impact-panel {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: #0d0e10;
+  border: 1px solid #2a2c30;
+  border-radius: 3px;
+}
+.node-detail .impact-panel h4 {
+  margin: 0 0 4px 0;
+  color: #7ab8ff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.node-detail .impact-empty { color: #888; font-size: 11px; }
+.node-detail .impact-totals {
+  font-size: 10px;
+  color: #888;
+  font-family: ui-monospace, monospace;
+  margin-bottom: 4px;
+}
+.node-detail .impact-group { margin-top: 6px; }
+.node-detail .impact-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #cfd0d3;
+  font-weight: 600;
+  padding: 2px 0;
+  border-bottom: 1px solid #2a2c30;
+}
+.node-detail .impact-group-count {
+  color: #7ab8ff;
+  font-family: ui-monospace, monospace;
+}
+.node-detail .impact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.node-detail .impact-item {
+  padding: 3px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #1a1c1f;
+  font-family: ui-monospace, monospace;
+}
+.node-detail .impact-item:hover { background: #1d2a3a; }
+.node-detail .impact-item-head { font-size: 10.5px; color: #cfd0d3; }
+.node-detail .impact-item-name { color: #e6e7e9; }
+.node-detail .impact-item-type { color: #888; font-size: 10px; }
+.node-detail .impact-item-cite {
+  color: #7a808a;
+  font-size: 9.5px;
+  word-break: break-all;
+}
+.node-detail .impact-more {
+  color: #888;
+  font-size: 9.5px;
+  padding: 2px 4px;
+  font-style: italic;
+}
+.node-detail .impact-warnings {
+  margin-top: 6px;
+  padding: 4px 6px;
+  background: #2a2520;
+  border: 1px solid #3a3025;
+  border-radius: 3px;
+}
+.node-detail .impact-warnings-title {
+  font-size: 10.5px;
+  color: #f0c060;
+  margin-bottom: 2px;
+}
+.node-detail .impact-warning-row {
+  font-size: 9.5px;
+  color: #aaa;
+  font-family: ui-monospace, monospace;
+  word-break: break-all;
+}
+.node-detail .impact-warning-code {
+  color: #f0c060;
+  margin-right: 4px;
+}
+
+.legend {
+  flex: 0 0 auto;
+  max-height: 10vh;
+  overflow-y: auto;
+  border-top: 1px solid #2a2c30;
+  padding: 6px 8px;
+  font-size: 11px;
+  min-height: 0;
+}
+.legend h4 { font-size: 11px; margin: 0 0 4px 0; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+.legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  cursor: pointer;
+  font-size: 11px;
+}
+.legend .legend-item:hover { background: #2a2c30; padding-left: 4px; }
+.legend .legend-item.dimmed { opacity: 0.35; }
+.legend .legend-item.isolated { background: #2a3140; }
+.legend .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend .label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.legend .count { color: #666; font-size: 10px; }
+
+.edge-filters {
+  padding: 6px 8px;
+  border-top: 1px solid #2a2c30;
+  font-size: 11px;
+  max-height: 12vh;
+  overflow-y: auto;
+  flex: 0 0 auto;
+}
+.edge-filters h4 { font-size: 11px; margin: 0 0 4px 0; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Header row hosts the section heading + the Solo-mode toggle so they
+   share one line on the 360px panel without forcing a second row. */
+.edge-filters .edge-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.edge-filters .graph-mode-toggle {
+  background: #232529;
+  color: #cfd0d3;
+  border: 1px solid #2a2c30;
+  padding: 2px 7px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+  border-radius: 3px;
+  line-height: 1.4;
+}
+.edge-filters .graph-mode-toggle:hover { background: #2a2c30; }
+.edge-filters .graph-mode-toggle.on {
+  background: #1d2a3a;
+  border-color: #7ab8ff;
+  color: #7ab8ff;
+}
+.edge-filters label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+}
+
+/* ── 6-graph pill strip (V2-2): always-visible group toggles ────────── */
+.edge-filters .graph-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 8px 0;
+}
+.edge-filters .graph-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border: 1px solid #2a2c30;
+  border-radius: 999px;
+  background: #1a1c1f;
+  color: #cfd0d3;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  transition: opacity 100ms ease, background 100ms ease;
+}
+.edge-filters .graph-pill:hover { background: #232529; }
+.edge-filters .graph-pill.pill-on { opacity: 1; }
+.edge-filters .graph-pill.pill-partial { opacity: 0.65; }
+/* pill-off was 0.35 which became illegible on the lifted panel bg;
+   0.55 keeps the "off" state distinguishable from "on" while remaining
+   visibly present. Border lifted to #3a3c40 because the prior #2a2c30
+   inherited from .graph-pill blends into the new panel surface. */
+.edge-filters .graph-pill.pill-off {
+  opacity: 0.55;
+  border-color: #3a3c40;
+}
+/* In Solo mode the active group's pill gets a stronger ring so the
+   user always sees which axis is isolated even at a glance. */
+.edge-filters .graph-pill.pill-active {
+  background: #1d2a3a;
+  box-shadow: 0 0 0 1px #7ab8ff inset;
+}
+.edge-filters .graph-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.edge-filters .graph-pill-id { color: #7ab8ff; font-weight: 600; }
+.edge-filters .graph-pill-label { color: #cfd0d3; }
+.edge-filters .graph-pill-count {
+  margin-left: 4px;
+  padding: 0 4px;
+  background: #2a2c30;
+  color: #aaa;
+  border-radius: 999px;
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+}
+/* Empty-axis warning state — rendered on pills whose group has zero
+   edges in the current graph. The ⚠ + amber tint communicates "this
+   axis exists in spec but isn't represented in the data" without
+   blocking the user from clicking (they can still toggle for parity). */
+.edge-filters .graph-pill.g-empty {
+  opacity: 0.5;
+  font-style: italic;
+}
+.edge-filters .graph-pill.g-empty .graph-pill-count {
+  background: #3a3025;
+  color: #f0c060;
+  font-style: normal;
+}
+
+/* ── 6-graph group filter UI (E5) ────────────────────────────────────── */
+.edge-filters .graph-group {
+  border-bottom: 1px solid #2a2c30;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+.edge-filters .graph-group:last-child { border-bottom: none; }
+.edge-filters .graph-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+}
+.edge-filters .graph-group-header:hover { background: #2a2c30; }
+.edge-filters .graph-group-arrow { font-size: 9px; color: #888; width: 10px; text-align: center; }
+.edge-filters .graph-group-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.edge-filters .graph-group-label { flex: 1; color: #cfd0d3; font-weight: 500; }
+.edge-filters .graph-group-count { color: #7ab8ff; font-size: 10px; font-family: ui-monospace, monospace; }
+.edge-filters .graph-group-toggle {
+  background: #232529; color: #e6e7e9; border: 1px solid #2a2c30;
+  padding: 1px 5px; cursor: pointer; font-size: 10px;
+  border-radius: 2px; min-width: 36px; text-align: center;
+}
+.edge-filters .graph-group-toggle:hover { background: #2a2c30; }
+.edge-filters .graph-group-toggle.partial { color: #ffaa00; }
+.edge-filters .graph-group-toggle.all-on  { color: #66cc77; }
+.edge-filters .graph-group-toggle.all-off { color: #aaa; }
+.edge-filters .graph-group-edges { padding-left: 14px; padding-top: 2px; }
+
+/* ── NodeTypeFilters (#6) ──────────────────────────────────────────────
+   Mirrors .edge-filters look-and-feel. Five collapsible groups (Symbols,
+   Members, Containers, Statements, Concurrency / VCS) each contain the
+   per-type checkbox list. UPPERCASE heading "NODE TYPES" matches the
+   "EDGE TYPES" parity called out in the user request. */
+.node-type-filters {
+  padding: 6px 8px;
+  border-top: 1px solid #2a2c30;
+  font-size: 11px;
+  max-height: 10vh;
+  overflow-y: auto;
+  flex: 0 0 auto;
+}
+.node-type-filters h4 {
+  font-size: 11px;
+  margin: 0 0 4px 0;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.node-type-filters .node-type-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.node-type-filters label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+}
+.node-type-filters .node-type-group {
+  border-bottom: 1px solid #2a2c30;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+.node-type-filters .node-type-group:last-child { border-bottom: none; }
+.node-type-filters .node-type-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+}
+.node-type-filters .node-type-group-header:hover { background: #2a2c30; }
+.node-type-filters .node-type-group-arrow {
+  font-size: 9px;
+  color: #888;
+  width: 10px;
+  text-align: center;
+}
+.node-type-filters .node-type-group-label {
+  flex: 1;
+  color: #cfd0d3;
+  font-weight: 500;
+}
+.node-type-filters .node-type-group-count {
+  color: #7ab8ff;
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+}
+.node-type-filters .node-type-group-toggle {
+  background: #232529;
+  color: #e6e7e9;
+  border: 1px solid #2a2c30;
+  padding: 1px 5px;
+  cursor: pointer;
+  font-size: 10px;
+  border-radius: 2px;
+  min-width: 36px;
+  text-align: center;
+}
+.node-type-filters .node-type-group-toggle:hover { background: #2a2c30; }
+.node-type-filters .node-type-group-toggle.partial { color: #ffaa00; }
+.node-type-filters .node-type-group-toggle.all-on  { color: #66cc77; }
+.node-type-filters .node-type-group-toggle.all-off { color: #aaa; }
+.node-type-filters .node-type-group-types {
+  padding-left: 14px;
+  padding-top: 2px;
+}
+
+/* ── Back button (#10) ────────────────────────────────────────────────
+   Sits between SearchBox and Home. Amber accent so users distinguish
+   it from the blue Home button — Home resets EVERYTHING, Back unwinds
+   the most recent navigation. Disabled state keeps the button visible
+   (so users always see the affordance) but clearly inert. */
+.topbar button.topbar-back {
+  border-color: #ff9800;
+  color: #ff9800;
+  font-weight: 600;
+  padding: 4px 12px;
+  min-height: 24px;
+  white-space: nowrap;
+}
+.topbar button.topbar-back:hover:not(:disabled) {
+  background: #3a2a00;
+  color: #ffcc66;
+}
+.topbar button.topbar-back:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #3a3c40;
+  color: #888;
+}
+
+/* ── Packages section in NodeList (#7) ────────────────────────────────
+   Compact list pinned above the main visible-nodes list. Distinct
+   📦 glyph + amber type accent so users read "package picker" rather
+   than thinking it's a duplicate of the Visible Nodes list below. */
+.node-list .pkg-section {
+  border-bottom: 1px solid #3a3c40;
+  background: #1a1c1f;
+}
+.node-list .pkg-section-header {
+  padding: 4px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #cfd0d3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.node-list .pkg-section-header .pkg-section-count {
+  color: #7ab8ff;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+}
+.node-list .pkg-item {
+  padding: 3px 8px;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  color: #cfd0d3;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  border-bottom: 1px solid #22242a;
+}
+.node-list .pkg-item:hover { background: #232529; }
+.node-list .pkg-item.selected { background: #2a3140; }
+.node-list .pkg-item .pkg-glyph {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+.node-list .pkg-item .pkg-name {
+  flex: 1;
+  color: #ffb060;
+  word-break: break-all;
+}
+.node-list .pkg-item .pkg-qname {
+  color: #888;
+  font-size: 9.5px;
+  word-break: break-all;
+}
+.node-list .pkg-section-more {
+  padding: 4px 8px;
+  font-size: 10px;
+  color: #7ab8ff;
+  cursor: pointer;
+  font-style: italic;
+  border-bottom: 1px solid #22242a;
+}
+.node-list .pkg-section-more:hover {
+  background: #232529;
+  color: #aad4ff;
+}
+.node-list .pkg-section-empty {
+  padding: 4px 8px;
+  font-size: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.trace-controls {
+  padding: 6px 8px;
+  border-top: 1px solid #2a2c30;
+  font-size: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  max-height: 8vh;
+  overflow-y: auto;
+  flex: 0 0 auto;
+}
+.trace-controls h4 {
+  font-size: 11px;
+  margin: 0 6px 0 0;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* When no anchor is active the heading carries the "click a node
+     first" hint; allow it to wrap rather than overflow the panel. */
+  flex: 1 1 100%;
+  min-width: 0;
+}
+/* Disabled state: anchor-less trace controls. Buttons are still
+   present (so the user sees what they will do once anchored) but
+   visibly inert + native disabled to block clicks. */
+.trace-controls.is-disabled button[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.trace-controls.is-disabled h4 {
+  color: #888;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.trace-controls .trace-count {
+  margin-left: auto;
+  color: #7ab8ff;
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+}
+.trace-controls button {
+  background: #232529;
+  color: #e6e7e9;
+  border: 1px solid #2a2c30;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.trace-controls button.active { background: #2a3140; border-color: #7ab8ff; }
+
+.bottombar {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  position: relative;
+  z-index: 20;
+  background: #1a1c1f;
+  padding: 3px 8px;
+  font-size: 11px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+/* Stale-banner sits in grid row 1 (auto). When the graph isn't stale
+   the banner doesn't render and row 1 collapses to 0 — but the other
+   grid items must still know their explicit row, otherwise auto-
+   placement pulls topbar into row 1 and shifts every subsequent item
+   one row up, leaving canvas+panel in the 32px topbar slot and
+   bottombar in the 1fr canvas slot. Hence the explicit grid-row on
+   .topbar/.canvas-host/.panel/.bottombar above. */
+.stale-banner {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  background: #5a4a00;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+/* ── HelpOverlay ─────────────────────────────────────────────────────────── */
+.help-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-overlay-panel {
+  background: #1a1c1f;
+  border: 1px solid #2a2c30;
+  border-radius: 6px;
+  padding: 16px 20px;
+  min-width: 300px;
+  max-width: 420px;
+  color: #e6e7e9;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  outline: none;
+}
+
+.ho-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ho-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cfd0d3;
+}
+
+.ho-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.ho-close:hover { color: #e6e7e9; }
+
+.ho-section {
+  margin-bottom: 12px;
+}
+.ho-section:last-child { margin-bottom: 0; }
+
+.ho-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7ab8ff;
+  margin-bottom: 6px;
+}
+
+.ho-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.ho-key {
+  display: inline-block;
+  min-width: 52px;
+  background: #232529;
+  border: 1px solid #2a2c30;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  color: #cfd0d3;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ho-desc {
+  color: #9aa;
+  font-size: 11px;
+}
+
+/* ── FirstTimeOverlay (V3-3) ─────────────────────────────────────────── */
+.first-time-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.first-time-card {
+  background: #1a1c1f;
+  border: 1px solid #2a2c30;
+  border-radius: 8px;
+  padding: 22px 26px;
+  min-width: 320px;
+  max-width: 460px;
+  color: #e6e7e9;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+.first-time-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7ab8ff;
+  margin-bottom: 6px;
+}
+.first-time-subtitle {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+.first-time-list {
+  list-style: none;
+  margin: 0 0 14px 0;
+  padding: 0;
+}
+.first-time-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid #232529;
+}
+.first-time-item:last-child { border-bottom: none; }
+.first-time-key {
+  display: inline-block;
+  min-width: 56px;
+  color: #7ab8ff;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+.first-time-desc {
+  color: #cfd0d3;
+  font-size: 12px;
+}
+.first-time-dismiss {
+  text-align: center;
+  color: #888;
+  font-size: 10.5px;
+  font-style: italic;
+}
+
+/* ── CanvasLegend (#3c) ─────────────────────────────────────────────────
+   Floating legend overlay rendered as position:absolute INSIDE
+   .canvas-host so it follows canvas resizes without participating in
+   the grid. Top-right corner — the bottom-right is taken by force-
+   graph's hidden tooltip area; top-left covers nodes near the anchor
+   when an exploration is active.
+
+   Two collapsible sections (Node Shapes, Edge Styles). Toggle persists
+   via localStorage (ckg.canvasLegend.open). Section-level open state is
+   not persisted — opening the legend always shows both sections so
+   users see all the symbols at a glance. */
+/* 계층(흐름) 레이아웃 축 라벨 — canvas-host 하단 중앙 오버레이.
+   "이 뷰는 무슨 질문에 답하는가"(호출 방향)를 화면에 명시한다.
+
+   셀렉터를 `.canvas-host > .dag-axis-hint` 로 쓴 이유(중요): 위쪽의
+   `.canvas-host > div { width:100%; height:100% }` (force-graph 래퍼용)
+   가 특이도 (0,1,1) 로 이 오버레이에도 적용돼, 작은 필이 캔버스 전체를
+   덮는 78% 어둠 베일이 됐었다(user 가 "블러 레이어"로 관찰 — 하단
+   border 라인 아래 scene-nav-info 영역만 정상으로 보이던 원인).
+   (0,2,0) 특이도 + 명시적 크기로 그 강제 규칙을 무효화한다. */
+.canvas-host > .dag-axis-hint {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  width: max-content;
+  height: max-content;
+  z-index: 5;
+  pointer-events: none;
+  font-size: 12px;
+  color: #cfd0d3;
+  background: rgba(15, 17, 20, 0.78);
+  border: 1px solid #2a2c30;
+  border-radius: 6px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+.dag-axis-hint .dag-axis-sub { color: #8a8d93; font-size: 11px; }
+
+/* Bottom-right tip box. width/height come from inline style (state) so
+   the user-driven resize wins over the rule. The corner resizer is at
+   the top-left because the box anchors at the bottom-right — dragging
+   the grip toward the canvas centre is the natural growth direction.
+   pointer-events:auto needed because the wrapper canvas-host has none
+   of its children-related defaults that would block clicks. */
+.canvas-legend {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(31, 35, 41, 0.96);
+  border: 1px solid #44aaff;
+  border-radius: 4px;
+  color: #cfd0d3;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+.canvas-legend-resizer {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  z-index: 2;
+  background: transparent;
+}
+.canvas-legend-resizer::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #44aaff;
+  border-left: 2px solid #44aaff;
+  border-radius: 2px;
+}
+.canvas-legend-resizer:hover::after,
+.canvas-legend-resizer:active::after {
+  border-color: #7ab8ff;
+}
+.canvas-legend-trigger {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(31, 35, 41, 0.92);
+  color: #7ab8ff;
+  border: 1px solid #44aaff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 10.5px;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.canvas-legend-trigger:hover { background: #1d2a3a; color: #cfd0d3; }
+.canvas-legend .canvas-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 8px;
+  border-bottom: 1px solid #2a2c30;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7ab8ff;
+  flex-shrink: 0;
+}
+.canvas-legend .canvas-legend-title {
+  user-select: none;
+}
+.canvas-legend .canvas-legend-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+  line-height: 1;
+}
+.canvas-legend .canvas-legend-close:hover { color: #e6e7e9; }
+.canvas-legend .canvas-legend-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px 8px 8px 8px;
+  min-height: 0;
+}
+.canvas-legend h5 {
+  font-size: 10px;
+  margin: 8px 0 3px 0;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.canvas-legend h5:first-of-type { margin-top: 4px; }
+.canvas-legend .legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+  font-size: 10px;
+}
+.canvas-legend .legend-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.canvas-legend .legend-label {
+  flex: 1;
+  color: #cfd0d3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.canvas-legend .legend-tag {
+  color: #7ab8ff;
+  font-size: 9.5px;
+  flex-shrink: 0;
+}
+
+/* ── CallFlow side panel (#4) ───────────────────────────────────────────
+   Mirrors the right-panel look (.panel) but with the cyan accent on the
+   right edge instead of the left. Hidden via display:none when the
+   anchor is null (component renders the wrapper but the parent grid
+   collapses col 1 to 0px in that case — the explicit display:none is
+   defensive in case the column gets a non-zero default). */
+.call-flow {
+  /* CallFlow takes col 2 of #app's grid. Visibility is driven by the
+     parent's grid-template-columns — col 2 width is 0 when there's
+     no anchor, and clamp(220px, 22vw, 300px) when an anchor is set.
+     Border-right gives the cyan accent next to the canvas. */
+  grid-column: 2;
+  grid-row: 3;
+  position: relative;
+  z-index: 14;
+  background: #1f2329;
+  border-right: 2px solid #44aaff;
+  box-shadow: 8px 0 16px rgba(0, 0, 0, 0.4) inset;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.call-flow.hidden { display: none; }
+.call-flow .cf-header {
+  padding: 6px 8px;
+  border-bottom: 1px solid #2a2c30;
+  background: #1a1c1f;
+  font-size: 11px;
+  color: #cfd0d3;
+}
+.call-flow .cf-header-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7ab8ff;
+  margin-bottom: 2px;
+}
+.call-flow .cf-header-anchor {
+  font-family: ui-monospace, monospace;
+  color: #e6e7e9;
+  font-size: 11px;
+  word-break: break-all;
+}
+.call-flow .cf-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px 0;
+  min-height: 0;
+}
+.call-flow .cf-row {
+  padding: 2px 6px;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  border-bottom: 1px solid #22242a;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.call-flow .cf-row:hover { background: #232529; }
+.call-flow .cf-row.selected { background: #2a3140; }
+.call-flow .cf-connector {
+  color: #555;
+  font-size: 10px;
+  white-space: pre;
+  flex-shrink: 0;
+}
+.call-flow .cf-content {
+  flex: 1;
+  min-width: 0;
+}
+.call-flow .cf-name { color: #cfd0d3; }
+.call-flow .cf-name .cf-type { color: #7ab8ff; }
+.call-flow .cf-sig {
+  color: #888;
+  font-size: 9.5px;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.call-flow .cf-file {
+  color: #5a6068;
+  font-size: 9.5px;
+}
+.call-flow .cf-empty {
+  padding: 12px;
+  color: #888;
+  font-size: 11px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* RecoveryPanel — §11.3 unreachable-history surface. Amber/red accent
+   so the operator immediately knows this is rolled-back code, distinct
+   from the EXTRACTED data the rest of the panel shows. */
+.recovery-panel {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid #6b3a2c;
+  background: rgba(120, 60, 40, 0.08);
+  border-radius: 6px;
+  font-size: 11px;
+  max-height: 8vh;
+  overflow-y: auto;
+  flex: 0 0 auto;
+}
+.recovery-header {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: #d4945c;
+  border: none;
+  padding: 2px 0;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.recovery-header:hover { color: #ffb86b; }
+.recovery-arrow { width: 10px; }
+.recovery-title { flex: 1; }
+.recovery-meta { color: #886; font-weight: 400; font-size: 10px; }
+.recovery-disclaimer {
+  margin: 6px 0 4px;
+  padding: 4px 6px;
+  background: rgba(120, 60, 40, 0.12);
+  border-left: 2px solid #d4945c;
+  color: #c4a89c;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.recovery-loading, .recovery-error {
+  padding: 4px 0;
+  color: #888;
+  font-style: italic;
+}
+.recovery-error { color: #c66; }
+.recovery-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.recovery-commit { border-top: 1px solid rgba(150, 90, 60, 0.3); }
+.recovery-commit:first-child { border-top: none; }
+.recovery-commit-row {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 11px;
+}
+.recovery-commit-row:hover { color: #fff; }
+.recovery-sha {
+  font-family: ui-monospace, Menlo, monospace;
+  color: #d4945c;
+  flex-shrink: 0;
+}
+.recovery-subject {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recovery-hunk-count {
+  color: #886;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.recovery-hunks {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 4px 14px;
+}
+.recovery-hunk { padding: 1px 0; }
+.recovery-hunk-row {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 1px 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 10px;
+}
+.recovery-hunk-row:hover { color: #fff; }
+.recovery-file {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.recovery-line {
+  color: #886;
+  flex-shrink: 0;
+}
+.recovery-blob {
+  margin: 4px 0;
+  padding: 6px;
+  background: #1a1310;
+  color: #c4a89c;
+  border-radius: 3px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 10px;
+  white-space: pre;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.recovery-empty { color: #886; font-style: italic; padding: 2px 0; }
+
+/* TicketIndex — H4 issue-id rollup. Distinct purple/blue accent so it
+   reads as "navigate by tickets" surface, separate from the amber
+   Recovery (unreachable history) panel. */
+.ticket-index {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid #3a4f7a;
+  background: rgba(60, 90, 140, 0.08);
+  border-radius: 6px;
+  font-size: 11px;
+  max-height: 8vh;
+  overflow-y: auto;
+  flex: 0 0 auto;
+}
+.ticket-header {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: #7aa9d4;
+  border: none;
+  padding: 2px 0;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ticket-header:hover { color: #aacef0; }
+.ticket-arrow { width: 10px; }
+.ticket-title { flex: 1; }
+.ticket-meta { color: #678; font-weight: 400; font-size: 10px; }
+.ticket-loading, .ticket-error {
+  padding: 4px 0;
+  color: #888;
+  font-style: italic;
+}
+.ticket-error { color: #c66; }
+.ticket-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.ticket-row { border-top: 1px solid rgba(80, 110, 160, 0.3); }
+.ticket-row:first-child { border-top: none; }
+.ticket-row-button {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 11px;
+}
+.ticket-row-button:hover { color: #fff; }
+.ticket-id {
+  font-family: ui-monospace, Menlo, monospace;
+  color: #7aa9d4;
+  flex: 1;
+}
+.ticket-counts {
+  color: #678;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.ticket-commits {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 4px 14px;
+}
+.ticket-commit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 1px 0;
+  font-size: 10px;
+  color: #aaa;
+}
+.ticket-commit-line {
+  display: flex;
+  gap: 6px;
+}
+.ticket-commit-files {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-left: 14px; /* aligns under subject, indented past the SHA column */
+}
+.ticket-file-pill {
+  background: rgba(70, 100, 140, 0.20);
+  color: #8ab4d8;
+  border: 1px solid rgba(70, 100, 140, 0.35);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 9px;
+  font-family: ui-monospace, Menlo, monospace;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ticket-sha {
+  font-family: ui-monospace, Menlo, monospace;
+  color: #678;
+  flex-shrink: 0;
+}
+.ticket-subject {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ticket -> Patches surface (H4 → H3 EvidencePack) */
+.ticket-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 6px 0;
+}
+.ticket-patches-button {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid rgba(120, 160, 220, 0.4);
+  border-radius: 3px;
+  color: #8ab4d8;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  margin-left: 14px;
+  padding: 2px 8px;
+}
+.ticket-patches-button:hover {
+  background: rgba(120, 160, 220, 0.12);
+  color: #cfe;
+}
+.ticket-patches-loading,
+.ticket-patches-empty {
+  color: #678;
+  font-size: 10px;
+  font-style: italic;
+  padding: 2px 0 2px 14px;
+}
+.ticket-patches-error {
+  color: #c66;
+  font-size: 10px;
+  padding: 2px 0 2px 14px;
+}
+.ticket-patches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 14px;
+  padding: 4px 6px;
+  background: rgba(20, 30, 50, 0.4);
+  border-radius: 3px;
+  border-left: 2px solid rgba(120, 160, 220, 0.5);
+}
+.ticket-patches-commit-header {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  color: #cfe;
+  font-weight: 500;
+  padding-bottom: 2px;
+}
+.ticket-patches-hunk {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0 4px 0;
+  border-top: 1px dashed rgba(80, 110, 160, 0.25);
+}
+.ticket-patches-hunk:first-of-type { border-top: none; }
+.ticket-patches-hunk-header {
+  display: flex;
+  gap: 6px;
+  font-size: 9px;
+  color: #678;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.ticket-patches-file { color: #8ab4d8; }
+.ticket-patches-lines { color: #555; }
+.ticket-patches-pre {
+  margin: 0;
+  padding: 4px 6px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  white-space: pre;
+  overflow-x: auto;
+  max-height: 320px;
+  overflow-y: auto;
+}
+/* Unified-diff line colouring rendered by EvidenceView. The classes
+   wrap inline <span>s inside <pre> so the file's monospaced layout +
+   copy-paste fidelity stay intact. */
+.diff-add { color: #8ce99a; }
+.diff-del { color: #ff8787; }
+.diff-hunk-header { color: #74c0fc; }
+.diff-context { color: #ccc; }
+
+/* ── SideNav (R2) ─────────────────────────────────────────────────────
+   Leftmost column hosting placeholder navigation items. Icon-only,
+   fixed 52px width — the expand mode was removed because the sidebar
+   is reserved real estate for future navigation, not a primary
+   surface. Item labels surface as a floating tooltip on hover. */
+.side-nav {
+  /* SideNav takes col 1 of #app's grid (fixed 52px). Width comes from
+     #app's grid-template-columns; the element itself stretches to fill
+     its track via the default `align-self: stretch`. */
+  grid-column: 1;
+  grid-row: 3;
+  position: relative;
+  z-index: 16;
+  background: #16181c;
+  border-right: 1px solid #2a2c30;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+  /* overflow: visible so the hover tooltip can float past the right
+     edge of the column. .side-nav-items also stays overflow:visible
+     for the same reason; if ITEMS grows past the column height the
+     individual tooltips would need to switch to position:fixed. */
+  overflow: visible;
+}
+
+.side-nav-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* overflow-y: visible so the tooltip on the rightmost item can
+     escape the list bounds. If ITEMS grows past the column height
+     later, switch to auto and pair with `overflow-x: visible` (which
+     CSS doesn't let you mix per-axis without a transform/clip hack;
+     simplest is to wrap each tooltip in a position:fixed element at
+     that point). */
+  overflow: visible;
+  min-height: 0;
+}
+.side-nav-item {
+  position: relative;
+}
+.side-nav-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #cfd0d3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.2;
+}
+.side-nav-btn:hover { background: #232529; color: #7ab8ff; }
+.side-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.side-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  width: 24px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Tooltip — sibling of the button so absolute positioning anchors on
+   .side-nav-item and the tooltip can float past .side-nav's overflow
+   clip via position: fixed-like behaviour through z-index isolation
+   above. Default invisible; opacity transitions on item hover so the
+   tooltip fades in without layout shift. */
+.side-nav-tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 6px;
+  background: #1f2329;
+  color: #e6e7e9;
+  border: 1px solid #44aaff;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.side-nav-item:hover .side-nav-tooltip { opacity: 1; }
+

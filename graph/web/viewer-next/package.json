@@ -1,0 +1,38 @@
+{
+  "name": "ckg-viewer-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "playwright test"
+  },
+  "dependencies": {
+    "next": "^16.2.10",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-force-graph-2d": "^1.27.0",
+    "react-force-graph-3d": "^1.26.0",
+    "three": "^0.185.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.185.1",
+    "@typescript-eslint/parser": "^8.64.0",
+    "eslint": "^10.7.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.64.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.12"
+  }
+}

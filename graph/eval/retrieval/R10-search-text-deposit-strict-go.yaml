@@ -1,0 +1,24 @@
+id: R10-search-text-deposit-strict-go
+description: |
+  Single-keyword precision target: "Deposit" with language=go must
+  return all Go symbol nodes whose name/qname or search_tokens
+  contain the token "deposit". Since schema 1.13 the search_tokens
+  column carries camelCase-split tokens, so HandleDeposit and
+  SafeDeposit now match via the "deposit" sub-token.
+probe:
+  tool: search_text
+  args:
+    query: "Deposit"
+    language: "go"
+    top_k: 20
+expected:
+  symbols:
+    - service.Vault.Deposit
+    - domain.DepositRequest
+    - domain.DepositRequest.Amount
+    - domain.DepositRequest.From
+    - api.Handler.HandleDeposit            # matched via search_tokens camelCase split (schema 1.13)
+    - service.SafeVault.SafeDeposit        # matched via search_tokens camelCase split
+scoring:
+  recall_min: 1.0
+  precision_min: 1.0
