@@ -424,7 +424,7 @@ func ManifestUsable(old *persist.Manifest, ckgVersion string) bool {
 	if old.SchemaVersion != SchemaVersion {
 		return false
 	}
-	if old.CKGVersion == "" || old.CKGVersion != ckgVersion {
+	if bv := old.EffectiveBuilderVersion(); bv == "" || bv != ckgVersion {
 		return false
 	}
 	if len(old.Files) == 0 {

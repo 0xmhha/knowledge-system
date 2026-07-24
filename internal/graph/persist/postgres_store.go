@@ -1368,6 +1368,7 @@ func (s *pgStore) ExportChunked(outDir string, nodeChunkSize, edgeChunkSize int)
 	if err != nil {
 		return err
 	}
+	m = m.WithGraphBuilderIdentity()
 	if err := writeJSONFile(filepath.Join(outDir, "manifest.json"), m); err != nil {
 		return err
 	}

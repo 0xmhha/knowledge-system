@@ -38,6 +38,7 @@ func (s *sqliteStore) ExportChunked(outDir string, nodeChunkSize, edgeChunkSize 
 	if err != nil {
 		return err
 	}
+	m = m.WithGraphBuilderIdentity()
 	if err := writeJSONFile(filepath.Join(outDir, "manifest.json"), m); err != nil {
 		return err
 	}

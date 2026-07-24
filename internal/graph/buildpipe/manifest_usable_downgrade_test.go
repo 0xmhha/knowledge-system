@@ -105,6 +105,26 @@ func TestManifestUsable_DowngradeGuard(t *testing.T) {
 			},
 			want: false,
 		},
+		{
+			// Neutral manifest after the legacy ckg_version key is dropped:
+			// only builder_version present. EffectiveBuilderVersion must read it.
+			name: "matching BuilderVersion (no legacy CKGVersion) is usable",
+			man: &persist.Manifest{
+				SchemaVersion:  buildpipe.SchemaVersion,
+				BuilderVersion: ckg,
+				Files:          files,
+			},
+			want: true,
+		},
+		{
+			name: "drifted BuilderVersion (no legacy CKGVersion) is not usable",
+			man: &persist.Manifest{
+				SchemaVersion:  buildpipe.SchemaVersion,
+				BuilderVersion: "0.0.1",
+				Files:          files,
+			},
+			want: false,
+		},
 	}
 
 	for _, tc := range cases {

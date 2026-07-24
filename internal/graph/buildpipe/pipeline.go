@@ -695,6 +695,7 @@ func extractBlobs(root string, nodes []types.Node) map[string][]byte {
 
 // writeManifestJSON pretty-prints the manifest to path for human inspection.
 func writeManifestJSON(path string, m persist.Manifest) error {
+	m = m.WithGraphBuilderIdentity()
 	buf, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshal manifest: %w", err)

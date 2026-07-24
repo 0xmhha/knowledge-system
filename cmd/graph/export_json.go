@@ -31,6 +31,8 @@ import (
 // dropped — it's only useful for incremental cache decisions).
 type jsonGraphHeader struct {
 	SchemaVersion  string         `json:"schema_version"`
+	Engine         string         `json:"engine,omitempty"`
+	BuilderVersion string         `json:"builder_version,omitempty"`
 	CKGVersion     string         `json:"ckg_version"`
 	SrcRoot        string         `json:"src_root"`
 	SrcCommit      string         `json:"src_commit,omitempty"`
@@ -185,6 +187,8 @@ func writeGraphJSON(w *bufio.Writer, m persist.Manifest,
 	nodes []types.Node, edges []types.Edge, pretty, minimal bool) error {
 	hdr := jsonGraphHeader{
 		SchemaVersion:  m.SchemaVersion,
+		Engine:         "graph",
+		BuilderVersion: m.EffectiveBuilderVersion(),
 		CKGVersion:     m.CKGVersion,
 		SrcRoot:        m.SrcRoot,
 		SrcCommit:      m.SrcCommit,

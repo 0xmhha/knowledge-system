@@ -18,7 +18,19 @@ import (
 // urge to over-bump; spurious bumps force unnecessary rebuilds across all
 // existing graph DBs.
 type Manifest struct {
-	SchemaVersion       string         `json:"schema_version"`
+	SchemaVersion string `json:"schema_version"`
+	// Engine identifies which index this manifest describes ("graph" here).
+	// Added with the shared manifest layout so a consolidated build can tell
+	// the graph and vector manifests apart by field instead of by a
+	// per-engine version key name. Additive + omitempty — old readers ignore it.
+	Engine string `json:"engine,omitempty"`
+	// BuilderVersion is the neutral-named builder version stamp. It carries the
+	// SAME value as the legacy CKGVersion (ckg_version); both keys are written
+	// (dual-write) so existing snapshots keep loading and new snapshots expose
+	// the neutral key. Readers should use EffectiveBuilderVersion().
+	BuilderVersion string `json:"builder_version,omitempty"`
+	// CKGVersion is the legacy per-engine version key (ckg_version). Retained
+	// for back-compat read/write; superseded by BuilderVersion.
 	CKGVersion          string         `json:"ckg_version"`
 	BuildTimestamp      string         `json:"build_timestamp"`
 	SrcRoot             string         `json:"src_root"`
@@ -51,9 +63,11 @@ type Manifest struct {
 }
 
 // FileEntry records the cache fingerprint and produced node/edge IDs for one
-// source file. CacheKey covers content + ckg_version + parser_version +
-// schema_version (see internal/buildpipe/cache.go ComputeCacheKey) so any
-// upstream change correctly invalidates the entry.
+// source file. CacheKey covers content + builder version + parser_version +
+// schema_version (see internal/graph/buildpipe/cache.go ComputeCacheKey) so
+// any upstream change correctly invalidates the entry. The builder version
+// value is unchanged by the ckg_version → builder_version key rename, so that
+// rename alone does not invalidate existing caches.
 type FileEntry struct {
 	Path          string   `json:"path"`           // srcRoot-relative slash form
 	Language      string   `json:"language"`       // "go" | "ts" | "sol"
@@ -65,8 +79,33 @@ type FileEntry struct {
 	ParserVersion string   `json:"parser_version"` // see ComputeCacheKey
 }
 
+// EffectiveBuilderVersion returns the builder version stamp, preferring the
+// neutral BuilderVersion and falling back to the legacy CKGVersion. Callers
+// that gate cache reuse / staleness on the version must use this so both
+// legacy (ckg_version only) and neutral (builder_version) manifests compare
+// correctly.
+func (m Manifest) EffectiveBuilderVersion() string {
+	if m.BuilderVersion != "" {
+		return m.BuilderVersion
+	}
+	return m.CKGVersion
+}
+
+// WithGraphBuilderIdentity fills the neutral Engine/BuilderVersion fields from
+// the legacy value before a write, so both keys are emitted with the same
+// value (dual-write). Value is preserved verbatim — the cache key hashes the
+// version value, so keeping it unchanged avoids a spurious cold rebuild.
+func (m Manifest) WithGraphBuilderIdentity() Manifest {
+	m.Engine = "graph"
+	if m.BuilderVersion == "" {
+		m.BuilderVersion = m.CKGVersion
+	}
+	return m
+}
+
 // SetManifest replaces existing manifest rows with fields from m.
 func (s *sqliteStore) SetManifest(m Manifest) error {
+	m = m.WithGraphBuilderIdentity()
 	tx, err := s.db.Begin()
 	if err != nil {
 		return err
@@ -77,6 +116,8 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 	}
 	rows := []struct{ k, v string }{
 		{"schema_version", m.SchemaVersion},
+		{"engine", m.Engine},
+		{"builder_version", m.BuilderVersion},
 		{"ckg_version", m.CKGVersion},
 		{"build_timestamp", m.BuildTimestamp},
 		{"src_root", m.SrcRoot},
@@ -148,6 +189,8 @@ func (s *sqliteStore) GetManifest() (Manifest, error) {
 	}
 	m := Manifest{
 		SchemaVersion:    kv["schema_version"],
+		Engine:           kv["engine"],
+		BuilderVersion:   kv["builder_version"],
 		CKGVersion:       kv["ckg_version"],
 		BuildTimestamp:   kv["build_timestamp"],
 		SrcRoot:          kv["src_root"],
@@ -156,6 +199,15 @@ func (s *sqliteStore) GetManifest() (Manifest, error) {
 		StalenessMethod:  kv["staleness_method"],
 		ClusteringStatus: kv["clustering_status"],
 		GraphDigest:      kv["graph_digest"],
+	}
+	// Back-compat both directions: a legacy manifest has only ckg_version, a
+	// future post-removal one only builder_version. Mirror whichever is set so
+	// callers reading either field (and EffectiveBuilderVersion) stay correct.
+	if m.BuilderVersion == "" {
+		m.BuilderVersion = m.CKGVersion
+	}
+	if m.CKGVersion == "" {
+		m.CKGVersion = m.BuilderVersion
 	}
 	for _, j := range []struct {
 		k   string
