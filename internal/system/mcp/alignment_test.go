@@ -38,6 +38,37 @@ func TestComputeAlignment_OK(t *testing.T) {
 			t.Errorf("unexpected warning: %s", w)
 		}
 	}
+	// Nested descriptive view + single top-level commit when aligned.
+	if rep.SrcCommit != "abc123" {
+		t.Errorf("SrcCommit = %q, want abc123 (engines agree)", rep.SrcCommit)
+	}
+	if rep.Sources == nil || rep.Sources.Graph.SrcCommit != "abc123" || rep.Sources.Vector.SrcCommit != "abc123" {
+		t.Errorf("Sources = %+v, want graph/vector src_commit abc123", rep.Sources)
+	}
+	if rep.Sources.Graph.SchemaVersion != "1.23" {
+		t.Errorf("Sources.Graph.SchemaVersion = %q, want 1.23", rep.Sources.Graph.SchemaVersion)
+	}
+	// Deprecated suffix keys stay populated (dual-write, one release).
+	if rep.SrcCommitCKG != "abc123" || rep.SrcCommitCKV != "abc123" {
+		t.Errorf("deprecated keys not dual-written: ckg=%q ckv=%q", rep.SrcCommitCKG, rep.SrcCommitCKV)
+	}
+}
+
+func TestComputeAlignment_Mismatch_NoTopLevelCommit(t *testing.T) {
+	t.Parallel()
+	rep := ComputeAlignment(AlignmentInputs{
+		CKGSrcCommit: "abc123",
+		CKGSchema:    "1.23",
+		CKVManifest:  manifestJSON("def456", "/src", "", ""),
+	})
+	// On divergence the single top-level commit is withheld; the per-engine
+	// values still expose both sides.
+	if rep.SrcCommit != "" {
+		t.Errorf("SrcCommit = %q, want empty on mismatch", rep.SrcCommit)
+	}
+	if rep.Sources == nil || rep.Sources.Graph.SrcCommit != "abc123" || rep.Sources.Vector.SrcCommit != "def456" {
+		t.Errorf("Sources = %+v, want graph=abc123 vector=def456", rep.Sources)
+	}
 }
 
 func TestComputeAlignment_CommitMismatch_IsError(t *testing.T) {

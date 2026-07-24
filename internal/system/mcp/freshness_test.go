@@ -61,7 +61,7 @@ func TestHandleFreshness_DummyEmitsInstruction(t *testing.T) {
 	if len(out.Instructions) != 1 {
 		t.Fatalf("Instructions = %d, want 1", len(out.Instructions))
 	}
-	if out.Instructions[0].Operation != "Freshness" || out.Instructions[0].Backend != "ckv" {
+	if out.Instructions[0].Operation != "Freshness" || out.Instructions[0].Backend != "vector" {
 		t.Errorf("instruction = %+v", out.Instructions[0])
 	}
 }

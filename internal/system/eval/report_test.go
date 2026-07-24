@@ -11,9 +11,9 @@ import (
 func TestReport_WriteJSON_Schema(t *testing.T) {
 	t.Parallel()
 	rep := Report{
-		SchemaVersion: 1,
-		CKSVersion:    "cks-eval/test",
-		StartedAt:     time.Date(2026, 5, 18, 12, 0, 0, 0, time.UTC),
+		SchemaVersion:  1,
+		BuilderVersion: "eval/test",
+		StartedAt:      time.Date(2026, 5, 18, 12, 0, 0, 0, time.UTC),
 		Results: []ScenarioResult{
 			{
 				Name:      "s1",
@@ -39,7 +39,7 @@ func TestReport_WriteJSON_Schema(t *testing.T) {
 	// Sanity-check key fields are present with expected JSON names.
 	for _, want := range []string{
 		`"schema_version": 1`,
-		`"cks_version": "cks-eval/test"`,
+		`"builder_version": "eval/test"`,
 		`"started_at"`,
 		`"results"`,
 		`"file_precision": 1`,
@@ -209,9 +209,9 @@ func approxEqReport(a, b float64) bool {
 func TestReport_WriteJSON_Deterministic(t *testing.T) {
 	t.Parallel()
 	rep := Report{
-		SchemaVersion: 1,
-		CKSVersion:    "v",
-		StartedAt:     time.Date(2026, 5, 18, 12, 0, 0, 0, time.UTC),
+		SchemaVersion:  1,
+		BuilderVersion: "v",
+		StartedAt:      time.Date(2026, 5, 18, 12, 0, 0, 0, time.UTC),
 		Results: []ScenarioResult{
 			{Name: "a", Runs: 1, MatchMode: "overlap"},
 			{Name: "b", Runs: 1, MatchMode: "overlap"},

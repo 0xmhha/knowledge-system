@@ -2,13 +2,13 @@ package contract
 
 // HitSource identifies which backend produced (or, after fusion, dominated)
 // a Hit. The composer attaches this so downstream consumers (evaluation
-// metrics, audit log) can attribute results back to ckg vs ckv vs the
+// metrics, audit log) can attribute results back to graph vs vector vs the
 // fused output.
 type HitSource string
 
 const (
-	HitSourceCKG   HitSource = "ckg"
-	HitSourceCKV   HitSource = "ckv"
+	HitSourceCKG   HitSource = "graph"
+	HitSourceCKV   HitSource = "vector"
 	HitSourceFused HitSource = "fused"
 )
 
@@ -18,7 +18,7 @@ const (
 // originating backend's list when Source is not "fused"). Score is the
 // composer's fused score — for RRF fusion this is the sum of reciprocal
 // ranks, not directly comparable to backend-native scores (BM25, cosine).
-// For backend-attributed hits (Source = ckg or ckv) Score is the
+// For backend-attributed hits (Source = graph or vector) Score is the
 // backend's native score passed through unchanged.
 //
 // Hits do not carry the matched code body; that lives in EvidencePack.Bodies

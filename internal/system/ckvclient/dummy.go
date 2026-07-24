@@ -99,7 +99,7 @@ func (d *Dummy) SemanticSearch(ctx context.Context, query string, opts SearchOpt
 	)
 	if c := contract.CollectorFrom(ctx); c != nil {
 		c.Add(contract.DummyInstruction{
-			Backend:    "ckv",
+			Backend:    "vector",
 			Operation:  "SemanticSearch",
 			SkillPath:  d.skill(),
 			SourcePath: d.source(),
@@ -123,7 +123,7 @@ func (d *Dummy) Freshness(ctx context.Context) (FreshnessReport, error) {
 	)
 	if c := contract.CollectorFrom(ctx); c != nil {
 		c.Add(contract.DummyInstruction{
-			Backend:    "ckv",
+			Backend:    "vector",
 			Operation:  "Freshness",
 			SkillPath:  d.skill(),
 			SourcePath: d.source(),

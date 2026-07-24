@@ -80,7 +80,7 @@ func TestHandleFindSymbol_DummyEmitsInstructions(t *testing.T) {
 	if len(out.Instructions) != 1 {
 		t.Fatalf("Instructions: got %d, want 1", len(out.Instructions))
 	}
-	if out.Instructions[0].Operation != "FindSymbol" || out.Instructions[0].Backend != "ckg" {
+	if out.Instructions[0].Operation != "FindSymbol" || out.Instructions[0].Backend != "graph" {
 		t.Errorf("instruction = %+v", out.Instructions[0])
 	}
 }

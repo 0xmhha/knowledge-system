@@ -34,7 +34,7 @@ type AlignmentReport struct {
 	RecordedDigest string          `json:"recorded_digest,omitempty"`
 	CurrentDigest  string          `json:"current_digest,omitempty"`
 	SchemaVersion  string          `json:"schema_version,omitempty"`
-	CKGPath        string          `json:"ckg_path,omitempty"`
+	CKGPath        string          `json:"graph_path,omitempty"`
 	Reason         string          `json:"reason,omitempty"`
 	Warnings       []string        `json:"warnings,omitempty"`
 }

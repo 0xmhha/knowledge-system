@@ -101,8 +101,8 @@ func TestCompose_DummyBackendsPopulateInstructions(t *testing.T) {
 
 	// stage1 always calls ckv.SemanticSearch; with a dummy that's the
 	// minimum we expect on this pipeline.
-	if !seenBackends["ckv"] {
-		t.Errorf("no ckv backend recorded; backends seen: %v", seenBackends)
+	if !seenBackends["vector"] {
+		t.Errorf("no vector backend recorded; backends seen: %v", seenBackends)
 	}
 
 	// EvidencePack integrity hash should still verify even with

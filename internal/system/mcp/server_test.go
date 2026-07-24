@@ -171,14 +171,14 @@ func TestHandleHealth_AllReachable_ReturnsOK(t *testing.T) {
 	if !ok {
 		t.Fatalf("backends not an object: %T %v", got["backends"], got["backends"])
 	}
-	ckg, _ := backends["ckg"].(map[string]any)
+	ckg, _ := backends["graph"].(map[string]any)
 	if ckg["reachable"] != true {
 		t.Errorf("backends.ckg.reachable = %v, want true", ckg["reachable"])
 	}
 	if ckg["schema_version"] != "v1" {
 		t.Errorf("backends.ckg.schema_version = %v, want v1", ckg["schema_version"])
 	}
-	ckv, _ := backends["ckv"].(map[string]any)
+	ckv, _ := backends["vector"].(map[string]any)
 	if ckv["reachable"] != true {
 		t.Errorf("backends.ckv.reachable = %v, want true", ckv["reachable"])
 	}
@@ -205,7 +205,7 @@ func TestHandleHealth_CKGDown_ReturnsDown(t *testing.T) {
 		t.Errorf("status = %v, want \"down\" (ckg is required)", got["status"])
 	}
 	backends, _ := got["backends"].(map[string]any)
-	ckg, _ := backends["ckg"].(map[string]any)
+	ckg, _ := backends["graph"].(map[string]any)
 	if ckg["reachable"] != false {
 		t.Errorf("backends.ckg.reachable = %v, want false", ckg["reachable"])
 	}

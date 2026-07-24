@@ -45,16 +45,16 @@ type healthResponse struct {
 // reports a last-index time. The pointer form encodes nil as missing.
 type backendStat struct {
 	Reachable      bool       `json:"reachable"`
-	ModelReachable bool       `json:"model_reachable,omitempty"` // ckv only
-	SchemaVersion  string     `json:"schema_version,omitempty"`  // ckg only
-	GraphDigest    string     `json:"graph_digest,omitempty"`    // ckg only (Q1 logical digest)
+	ModelReachable bool       `json:"model_reachable,omitempty"` // vector only
+	SchemaVersion  string     `json:"schema_version,omitempty"`  // graph only
+	GraphDigest    string     `json:"graph_digest,omitempty"`    // graph only (Q1 logical digest)
 	IndexedHead    string     `json:"indexed_head,omitempty"`    // indexed source commit
-	StatsHash      string     `json:"stats_hash,omitempty"`      // ckv only
-	LastIndexAt    *time.Time `json:"last_index_at,omitempty"`   // ckv only
-	Provider       string     `json:"provider,omitempty"`        // ckv embedding provider
-	Model          string     `json:"model,omitempty"`           // ckv embedding model
-	Dim            int        `json:"dim,omitempty"`             // ckv embedding dimension
-	Endpoint       string     `json:"endpoint,omitempty"`        // ckv model endpoint
+	StatsHash      string     `json:"stats_hash,omitempty"`      // vector only
+	LastIndexAt    *time.Time `json:"last_index_at,omitempty"`   // vector only
+	Provider       string     `json:"provider,omitempty"`        // vector embedding provider
+	Model          string     `json:"model,omitempty"`           // vector embedding model
+	Dim            int        `json:"dim,omitempty"`             // vector embedding dimension
+	Endpoint       string     `json:"endpoint,omitempty"`        // vector model endpoint
 	DataPath       string     `json:"data_path,omitempty"`       // backend DB path
 	Reason         string     `json:"reason,omitempty"`          // why not serviceable
 	Error          string     `json:"error,omitempty"`
@@ -117,8 +117,8 @@ func handleHealth(ctx context.Context, d Deps, _ mcpgo.CallToolRequest) (*mcpgo.
 		SourceRoot:     d.Index.SourceRoot,
 		Alignment:      d.Alignment,
 		Backends: map[string]backendStat{
-			"ckg": ckg,
-			"ckv": ckv,
+			"graph":  ckg,
+			"vector": ckv,
 		},
 	}
 	return mcpgo.NewToolResultStructured(out, "health"), nil

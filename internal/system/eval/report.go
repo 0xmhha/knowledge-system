@@ -20,12 +20,12 @@ const reportSchemaVersion = 1
 // before serialization so downstream consumers don't have to re-group
 // the per-scenario rows.
 type Report struct {
-	SchemaVersion int              `json:"schema_version"`
-	CKSVersion    string           `json:"cks_version,omitempty"`
-	StartedAt     time.Time        `json:"started_at"`
-	FinishedAt    time.Time        `json:"finished_at,omitempty"`
-	Results       []ScenarioResult `json:"results"`
-	IntentSummary []IntentSummary  `json:"intent_summary,omitempty"`
+	SchemaVersion  int              `json:"schema_version"`
+	BuilderVersion string           `json:"builder_version,omitempty"`
+	StartedAt      time.Time        `json:"started_at"`
+	FinishedAt     time.Time        `json:"finished_at,omitempty"`
+	Results        []ScenarioResult `json:"results"`
+	IntentSummary  []IntentSummary  `json:"intent_summary,omitempty"`
 }
 
 // IntentSummary is the per-intent rollup across all scenarios that
@@ -99,11 +99,11 @@ func SummarizeByIntent(results []ScenarioResult) []IntentSummary {
 }
 
 // NewReport returns a Report with the schema version pre-set.
-func NewReport(cksVersion string) Report {
+func NewReport(builderVersion string) Report {
 	return Report{
-		SchemaVersion: reportSchemaVersion,
-		CKSVersion:    cksVersion,
-		StartedAt:     time.Now().UTC(),
+		SchemaVersion:  reportSchemaVersion,
+		BuilderVersion: builderVersion,
+		StartedAt:      time.Now().UTC(),
 	}
 }
 

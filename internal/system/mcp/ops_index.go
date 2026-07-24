@@ -61,8 +61,8 @@ type indexSubResult struct {
 
 type opsIndexResponse struct {
 	Mode string         `json:"mode"`
-	CKV  indexSubResult `json:"ckv"`
-	CKG  indexSubResult `json:"ckg"`
+	CKV  indexSubResult `json:"vector"`
+	CKG  indexSubResult `json:"graph"`
 }
 
 // registerOpsIndex wires cks.ops.index (G8/S2).
@@ -159,7 +159,7 @@ func handleOpsIndex(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mc
 	// needed. A single rolled-up error string keeps the text fallback useful.
 	text := "index refresh result"
 	if (ic.CKVBinary != "" && !resp.CKV.OK) || (ic.CKGBinary != "" && !resp.CKG.OK) {
-		text = fmt.Sprintf("index refresh FAILED (ckv ok=%v, ckg ok=%v)", resp.CKV.OK, resp.CKG.OK)
+		text = fmt.Sprintf("index refresh FAILED (vector ok=%v, graph ok=%v)", resp.CKV.OK, resp.CKG.OK)
 	}
 	return mcpgo.NewToolResultStructured(resp, text), nil
 }

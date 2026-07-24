@@ -16,7 +16,7 @@ import (
 // and EvidencePack.Instructions stays empty.
 type DummyInstruction struct {
 	// Backend identifies which backend would have served this call.
-	// Values: "ckv", "ckg".
+	// Values: "vector", "graph".
 	Backend string `json:"backend"`
 	// Operation names the interface method that was invoked.
 	// Examples: "SemanticSearch", "BM25Search", "FindSymbol",

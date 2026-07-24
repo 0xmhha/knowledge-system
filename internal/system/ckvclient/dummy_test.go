@@ -32,7 +32,7 @@ func TestDummy_SemanticSearch_RecordsInstruction(t *testing.T) {
 		t.Fatalf("collector: got %d instructions, want 1", len(got))
 	}
 	inst := got[0]
-	if inst.Backend != "ckv" {
+	if inst.Backend != "vector" {
 		t.Errorf("Backend: got %q, want ckv", inst.Backend)
 	}
 	if inst.Operation != "SemanticSearch" {

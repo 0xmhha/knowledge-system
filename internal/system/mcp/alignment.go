@@ -27,6 +27,22 @@ import (
 	"strings"
 )
 
+// AlignmentSource is one engine's coordinates in the alignment report. The
+// two engines are named descriptively (graph / vector) on this external
+// surface; the values stay per-engine because a divergence is the drift
+// signal the report exists to expose.
+type AlignmentSource struct {
+	SrcCommit     string `json:"src_commit,omitempty"`
+	SchemaVersion string `json:"schema_version,omitempty"` // graph only currently
+	GraphDigest   string `json:"graph_digest,omitempty"`   // graph: its own; vector: the one it aligned to
+}
+
+// AlignmentSources groups the per-engine coordinates.
+type AlignmentSources struct {
+	Graph  AlignmentSource `json:"graph"`
+	Vector AlignmentSource `json:"vector"`
+}
+
 // AlignmentReport is the health-facing verdict of the startup assert. OK=false
 // makes the instance non-serviceable (fail-loud, 2026-06-15 policy).
 type AlignmentReport struct {
@@ -35,12 +51,20 @@ type AlignmentReport struct {
 	// instance resolved at startup (the "@<ver>" segment when the versioned
 	// blue-green layout is in use; empty for legacy flat layouts).
 	DatasetVersion string `json:"dataset_version,omitempty"`
-	// Coordinates from each backend's manifest, for operator diagnosis.
+	// SrcCommit is the single source commit, populated ONLY when both engines
+	// agree. On a mismatch it is empty and OK=false; read Sources for the two
+	// diverging values.
+	SrcCommit string `json:"src_commit,omitempty"`
+	// Sources carries each engine's coordinates for operator diagnosis, keyed
+	// by descriptive engine name (graph / vector).
+	Sources *AlignmentSources `json:"sources,omitempty"`
+	// Deprecated: the suffix-tagged keys below are kept one release for
+	// back-compat; new consumers should read SrcCommit / Sources instead.
 	SrcCommitCKG  string `json:"src_commit_ckg,omitempty"`
 	SrcCommitCKV  string `json:"src_commit_ckv,omitempty"`
 	SchemaVersion string `json:"schema_version_ckg,omitempty"`
-	// GraphDigest* compare CKG's logical digest against the one CKV recorded
-	// at align time (sources.ckg.graph_digest). Empty until both sides ship.
+	// GraphDigest* compare the graph engine's logical digest against the one
+	// the vector engine recorded at align time. Empty until both sides ship.
 	GraphDigestActual   string `json:"graph_digest_actual,omitempty"`
 	GraphDigestExpected string `json:"graph_digest_expected,omitempty"`
 	// SourceRootOK is false when the configured source_root path differs from
@@ -150,6 +174,18 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 		rep.Warnings = append(rep.Warnings, fmt.Sprintf(
 			"source_root HEAD %.9s != indexed commit %.9s — stale tree (freshness reports details)",
 			in.SourceHead, indexed))
+	}
+
+	// Descriptive nested view (preferred) built from the same values as the
+	// deprecated suffix keys above. The top-level SrcCommit is exposed only
+	// when the two engines agree — a mismatch leaves it empty (Sources shows
+	// the divergence and the ERROR tier already flagged it).
+	rep.Sources = &AlignmentSources{
+		Graph:  AlignmentSource{SrcCommit: in.CKGSrcCommit, SchemaVersion: in.CKGSchema, GraphDigest: in.CKGDigest},
+		Vector: AlignmentSource{SrcCommit: ckvCommit, GraphDigest: rep.GraphDigestExpected},
+	}
+	if in.CKGSrcCommit != "" && in.CKGSrcCommit == ckvCommit {
+		rep.SrcCommit = in.CKGSrcCommit
 	}
 
 	if len(errs) > 0 {

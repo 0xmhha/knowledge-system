@@ -52,7 +52,7 @@ func TestDummy_AllOperationsRecordInstructions(t *testing.T) {
 		if got[i].Operation != op {
 			t.Errorf("op[%d]: got %q, want %q", i, got[i].Operation, op)
 		}
-		if got[i].Backend != "ckg" {
+		if got[i].Backend != "graph" {
 			t.Errorf("op[%d].Backend: got %q, want ckg", i, got[i].Backend)
 		}
 		if got[i].SkillPath == "" {

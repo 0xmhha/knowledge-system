@@ -76,7 +76,7 @@ func (d *Dummy) BM25Search(ctx context.Context, query string, opts SearchOpts) (
 		d.skill(), d.source(), query,
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "BM25Search",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -103,7 +103,7 @@ func (d *Dummy) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([
 		d.skill(), name, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "FindSymbol",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -136,7 +136,7 @@ func (d *Dummy) Neighbors(ctx context.Context, src contract.Citation, opts Neigh
 		d.skill(), src.String(), d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "Neighbors",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -163,7 +163,7 @@ func (d *Dummy) ImpactOfChange(ctx context.Context, seedQname string, opts Impac
 		d.skill(), seedQname, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "ImpactOfChange",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -190,7 +190,7 @@ func (d *Dummy) ConcurrencyImpact(ctx context.Context, symbol string, opts Concu
 		d.skill(), symbol, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "ConcurrencyImpact",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -216,7 +216,7 @@ func (d *Dummy) EvidenceForIntent(ctx context.Context, intent string, opts Evide
 		d.skill(), intent, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "EvidenceForIntent",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -240,7 +240,7 @@ func (d *Dummy) GetNodePRs(ctx context.Context, qname string, opts PRRefOpts) ([
 		d.skill(), qname, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "GetNodePRs",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
@@ -266,7 +266,7 @@ func (d *Dummy) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts
 		d.skill(), qname, d.source(),
 	)
 	d.record(ctx, contract.DummyInstruction{
-		Backend:    "ckg",
+		Backend:    "graph",
 		Operation:  "GetSubgraph",
 		SkillPath:  d.skill(),
 		SourcePath: d.source(),
