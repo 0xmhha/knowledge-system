@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln
 
 GO ?= go
 
@@ -36,6 +36,13 @@ lint: fmt-check vet
 
 tidy:
 	$(GO) mod tidy
+
+# vuln: scan for known vulnerabilities reachable from this module's code.
+# Note: the Go vulnerability DB covers Go-level advisories; CVEs in C code
+# embedded by cgo dependencies (e.g. bundled sqlite amalgamations) are not
+# visible to this scan and need separate tracking.
+vuln:
+	$(GO) run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 clean:
 	rm -rf graph/bin vector/bin system/bin
