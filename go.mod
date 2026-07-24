@@ -10,12 +10,12 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/mark3labs/mcp-go v0.56.0
-	github.com/mattn/go-sqlite3 v1.14.48
+	github.com/mattn/go-sqlite3 v1.14.44
 	github.com/spf13/cobra v1.10.2
 	github.com/tree-sitter/go-tree-sitter v0.25.0
 	github.com/tree-sitter/tree-sitter-javascript v0.25.0
 	github.com/tree-sitter/tree-sitter-typescript v0.23.2
-	github.com/yalue/onnxruntime_go v1.31.0
+	github.com/yalue/onnxruntime_go v1.30.1
 	go.uber.org/zap v1.28.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/tools v0.48.0
@@ -42,7 +42,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/text v0.39.0 // indirect
 	modernc.org/libc v1.74.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
