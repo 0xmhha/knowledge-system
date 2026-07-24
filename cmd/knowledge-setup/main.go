@@ -28,6 +28,7 @@ import (
 
 func main() {
 	var o setup.Options
+	config := flag.String("config", "", "setup config file (e.g. projects/<name>/setup.yaml); explicit flags override its values")
 	flag.StringVar(&o.Src, "src", "", "source tree to index (required)")
 	flag.StringVar(&o.Out, "out", "", "dataset root; graph index in <out>/graph, vector index in <out>/vector (required)")
 	flag.StringVar(&o.GraphBin, "graph-bin", "", "graph engine CLI (default: ckg on PATH)")
@@ -42,6 +43,38 @@ func main() {
 	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	flag.Parse()
+
+	if *config != "" {
+		base, err := setup.LoadConfig(*config)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+			os.Exit(2)
+		}
+		// Explicit flags win; unset flags take the config value.
+		set := map[string]bool{}
+		flag.Visit(func(f *flag.Flag) { set[f.Name] = true })
+		merge := func(name string, dst *string, v string) {
+			if !set[name] {
+				*dst = v
+			}
+		}
+		merge("src", &o.Src, base.Src)
+		merge("out", &o.Out, base.Out)
+		merge("graph-bin", &o.GraphBin, base.GraphBin)
+		merge("vector-bin", &o.VectorBin, base.VectorBin)
+		merge("policy-file", &o.PolicyFile, base.PolicyFile)
+		merge("security-pattern-file", &o.SecurityPatternFile, base.SecurityPatternFile)
+		merge("embedder", &o.Embedder, base.Embedder)
+		merge("model-name", &o.ModelName, base.ModelName)
+		merge("ollama-url", &o.OllamaURL, base.OllamaURL)
+		merge("vector-policy", &o.VectorPolicy, base.VectorPolicy)
+		if !set["embed-dim"] {
+			o.EmbedDim = base.EmbedDim
+		}
+		if !set["skip-vector"] {
+			o.SkipVector = base.SkipVector
+		}
+	}
 
 	emit, err := progressSink(*progress)
 	if err != nil {

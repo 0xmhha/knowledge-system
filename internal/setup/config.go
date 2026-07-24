@@ -1,0 +1,62 @@
+package setup
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"gopkg.in/yaml.v3"
+)
+
+// fileConfig is the YAML shape of a setup config file (typically a project
+// pack's setup.yaml). Field names mirror Options; relative paths resolve
+// against the config file's directory so a pack can reference its own data
+// portably.
+type fileConfig struct {
+	Src                 string `yaml:"src"`
+	Out                 string `yaml:"out"`
+	GraphBin            string `yaml:"graph_bin"`
+	VectorBin           string `yaml:"vector_bin"`
+	PolicyFile          string `yaml:"policy_file"`
+	SecurityPatternFile string `yaml:"security_pattern_file"`
+	Embedder            string `yaml:"embedder"`
+	ModelName           string `yaml:"model_name"`
+	EmbedDim            int    `yaml:"embed_dim"`
+	OllamaURL           string `yaml:"ollama_url"`
+	VectorPolicy        string `yaml:"vector_policy"`
+	SkipVector          bool   `yaml:"skip_vector"`
+}
+
+// LoadConfig reads a setup config file into Options. Path-valued fields that
+// are relative are resolved against the config file's directory.
+func LoadConfig(path string) (Options, error) {
+	buf, err := os.ReadFile(path)
+	if err != nil {
+		return Options{}, err
+	}
+	var fc fileConfig
+	if err := yaml.Unmarshal(buf, &fc); err != nil {
+		return Options{}, fmt.Errorf("%s: %w", path, err)
+	}
+	base := filepath.Dir(path)
+	rel := func(p string) string {
+		if p == "" || filepath.IsAbs(p) {
+			return p
+		}
+		return filepath.Join(base, p)
+	}
+	return Options{
+		Src:                 rel(fc.Src),
+		Out:                 rel(fc.Out),
+		GraphBin:            fc.GraphBin,
+		VectorBin:           fc.VectorBin,
+		PolicyFile:          rel(fc.PolicyFile),
+		SecurityPatternFile: rel(fc.SecurityPatternFile),
+		Embedder:            fc.Embedder,
+		ModelName:           fc.ModelName,
+		EmbedDim:            fc.EmbedDim,
+		OllamaURL:           fc.OllamaURL,
+		VectorPolicy:        rel(fc.VectorPolicy),
+		SkipVector:          fc.SkipVector,
+	}, nil
+}

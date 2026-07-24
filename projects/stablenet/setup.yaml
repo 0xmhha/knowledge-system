@@ -1,0 +1,11 @@
+# Dataset build parameters for the stablenet project pack.
+#
+#   knowledge-setup --config projects/stablenet/setup.yaml \
+#       --src <go-stablenet checkout> --out <dataset dir>
+#
+# Relative paths resolve against this file's directory. Flags given on the
+# command line override these values.
+policy_file: policies/graph.yaml
+vector_policy: policies/vector.yaml
+embedder: ollama
+model_name: bge-m3
