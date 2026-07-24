@@ -85,6 +85,10 @@ type Deps struct {
 	// indexers manually. Not used by the query path.
 	Index IndexConfig
 
+	// Setup configures the asynchronous knowledge-setup surface
+	// (ops.setup / ops.setup_status). Zero value disables it.
+	Setup SetupConfig
+
 	// Alignment is the startup ckg↔ckv coordinate assert (reindex-migration
 	// design Q4). Nil skips the gate (tests, partial wiring); a report with
 	// OK=false makes the instance non-serviceable (fail-loud) while still
@@ -122,6 +126,8 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerSearchText(s, d)
 	registerFreshness(s, d)
 	registerOpsIndex(s, d)
+	registerOpsSetup(s, d)
+	registerOpsSetupStatus(s, d)
 	// Phase D flow-aware direct-call tools (D-4). Backend bodies are stubbed
 	// until CKV ships pkg/ckv.Engine flow methods (coordination §9.2-R).
 	registerGetFlow(s, d)

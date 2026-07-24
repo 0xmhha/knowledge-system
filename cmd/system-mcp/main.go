@@ -43,6 +43,7 @@ import (
 
 	ckvtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
 
+	"github.com/0xmhha/knowledge-system/internal/setup"
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
@@ -176,6 +177,12 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 			CKGPolicyFile:    cfg.Backends.CKG.PolicyFile,
 			DomainProjectDir: cfg.Domain.ProjectDir,
 			DomainCorpusDir:  cfg.Domain.CorpusDir,
+		},
+		Setup: cksmcp.SetupConfig{
+			GraphBinary:  cfg.Backends.CKG.BinaryPath,
+			VectorBinary: cfg.Backends.CKV.BinaryPath,
+			OllamaURL:    cfg.Backends.CKV.OllamaURL,
+			Jobs:         setup.NewJobs(nil),
 		},
 	}
 	if cfg.Listen.ResolvedTransport() == "http" {

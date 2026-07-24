@@ -3,14 +3,16 @@ package mcp
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
+	"strings"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/system/domainexport"
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
 )
 
 var ToolNameOpsIndex = toolName("ops.index")
@@ -43,12 +45,21 @@ func (c IndexConfig) enabled() bool { return c.CKVBinary != "" || c.CKGBinary !=
 // so the orchestration (both sub-actions, failure handling) is exercised
 // without real ckv/ckg binaries.
 var indexRunner = func(ctx context.Context, name string, args, env []string) error {
-	cmd := exec.CommandContext(ctx, name, args...)
-	if len(env) > 0 {
-		cmd.Env = env
-	}
-	if out, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("%s %v: %w (%s)", name, args, err, truncOneLineIdx(string(out), 500))
+	// Shares the setup pipeline's subprocess machinery (streamed output,
+	// context-kill cancellation) instead of a parallel exec path. The last
+	// output lines are folded into the error for operator diagnosis.
+	var tail []string
+	step := setup.Step{ID: "index", Cmd: append([]string{name}, args...), Env: env}
+	err := setup.SubprocessRunner{}.Run(ctx, step, func(e setup.Event) {
+		if e.Type == "output" {
+			tail = append(tail, e.Message)
+			if len(tail) > 5 {
+				tail = tail[1:]
+			}
+		}
+	})
+	if err != nil {
+		return fmt.Errorf("%s %v: %w (%s)", name, args, err, truncOneLineIdx(strings.Join(tail, " | "), 500))
 	}
 	return nil
 }
