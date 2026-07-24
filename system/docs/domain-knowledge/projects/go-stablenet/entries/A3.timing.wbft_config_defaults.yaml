@@ -1,0 +1,100 @@
+id: A3.timing.wbft_config_defaults
+subsystem: A3
+knowledge_type: B7
+title: "WBFT timing and config defaults: RequestTimeout, BlockPeriod, EpochLength"
+
+summary: |
+  WBFT consensus timing is parameterised by RequestTimeoutSeconds (per-
+  round timeout before bumping rounds), BlockPeriodSeconds (target
+  inter-block interval enforced by the proposer), and EpochLength
+  (blocks per epoch, after which the validator set transitions). The
+  Anzeon default config (params/config_wbft.go DefaultAnzeonConfig) sets
+  these to 2 / 1 / 10 respectively; chains may override per-network.
+  CheckValidity enforces ranges at genesis load time.
+
+  TWO LAYERS (the unit trap): the chain-config field RequestTimeoutSeconds
+  is in SECONDS despite its struct comment saying "milliseconds"
+  (config_wbft.go:187 comment is misleading). The runtime engine config
+  (consensus/wbft/config.go) holds RequestTimeout in MILLISECONDS, and
+  GetConfig bridges chain-config -> engine by multiplying x1000
+  (config.go:167: RequestTimeout = RequestTimeoutSeconds * 1000). So the
+  Anzeon 2 (seconds) becomes 2000ms at the engine. Separately, the engine
+  struct DefaultConfig.RequestTimeout = 1000 (ms) is a fallback used when
+  no chain-config transition supplies the value -- do NOT read the two
+  defaults as one number.
+
+code_anchors:
+  - file: params/config_wbft.go
+    symbol: WBFTConfig
+    line: 186
+    reason: "chain-config struct; RequestTimeoutSeconds is seconds despite the line-187 'milliseconds' comment"
+  - file: params/config_wbft.go
+    symbol: DefaultAnzeonConfig
+    line: 210
+    reason: "Anzeon defaults RequestTimeoutSeconds=2 / BlockPeriodSeconds=1 / EpochLength=10"
+  - file: consensus/wbft/config.go
+    symbol: DefaultConfig
+    line: 116
+    reason: "engine-layer default RequestTimeout=1000 (milliseconds) -- a separate fallback default"
+  - file: consensus/wbft/config.go
+    symbol: "Config.GetConfig"
+    line: 161
+    reason: "sec->ms bridge: RequestTimeout = RequestTimeoutSeconds * 1000"
+
+constants:
+  - name: RequestTimeoutSeconds
+    value: 2
+    unit: "seconds"
+    source_file: params/config_wbft.go
+  - name: BlockPeriodSeconds
+    value: 1
+    unit: "seconds"
+    source_file: params/config_wbft.go
+  - name: EpochLength
+    value: 10
+    unit: "blocks"
+    source_file: params/config_wbft.go
+
+code_keywords:
+  - WBFTConfig
+  - RequestTimeoutSeconds
+  - BlockPeriodSeconds
+  - EpochLength
+  - MaxRequestTimeoutSeconds
+  - ProposerPolicy
+  - DefaultAnzeonConfig
+  - CheckValidity
+
+korean_aliases:
+  - "라운드 타임아웃"
+  - "블록 주기"
+  - "에폭 길이"
+  - "합의 타이밍"
+  - "WBFT 기본 설정"
+
+english_aliases:
+  - "WBFT timing parameters"
+  - "consensus timeouts"
+  - "epoch length"
+  - "block period"
+
+related_concepts:
+  - A1.wbft_core.round_change_protocol
+  - A3.validator_set.epoch_transition
+
+invariants:
+  - "RequestTimeoutSeconds and BlockPeriodSeconds are strictly positive; EpochLength is at least 2."
+  - "Validator set transitions occur at block heights that are multiples of EpochLength."
+  - "chain-config RequestTimeoutSeconds is SECONDS (not ms, despite the field comment); the engine value is ms after a x1000 bridge in GetConfig."
+
+pitfalls:
+  - "Reading RequestTimeoutSeconds as milliseconds (its struct comment says so, but GetConfig multiplies by 1000) -> 1000x wrong timeout."
+  - "Conflating the engine DefaultConfig.RequestTimeout=1000ms with the Anzeon RequestTimeoutSeconds=2 (=2000ms after bridge); they are two different defaults in two files."
+
+risk_level: medium
+source_of_truth: code
+status: verified
+priority: P1
+
+last_verified_at: "2026-06-09"
+verified_by: "domain-curation @code_commit 9978930ba (anchors: config_wbft.go:187,212; consensus/wbft/config.go:117,167)"

@@ -1,0 +1,62 @@
+# Binaries
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# Coverage
+*.coverprofile
+coverage.html
+
+# Build cache
+.go-cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Local state
+.agent-forge-state/
+
+# Runtime logs (footprint + audit). See `make log-clear` / `make log-tail`.
+/logs/
+
+# Eval reports (kept locally, not committed)
+eval/reports/
+
+# Generated docs (kept locally)
+docs/_generated/
+
+# Dogfood eval artifacts (cks indexing cks itself)
+/.ckg-data/
+/.ckv-data/
+/cks-dogfood.yaml
+/logs/
+
+# Generated domain-knowledge embedding corpus (channel ②; rebuilt by cks-domain-export)
+/generated/
+
+.claude/settings.local.json
+
+# go-stablenet dataset artifacts (large build outputs + machine-specific generated
+# config). Rebuilt by scripts/build-stablenet-dataset.sh / gen-cks-config.sh.
+/data/
+/ckv-stablenet/
+/cks-stablenet.yaml
+/cks.env
+
+# cks-mcp http server runtime (serve-cks-http.sh): per-instance pidfiles/logs
+/run/*.pid
+/run/*.log

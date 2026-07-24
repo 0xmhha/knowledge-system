@@ -1,0 +1,53 @@
+id: go-stablenet
+name: "go-stablenet"
+description: "geth fork — WBFT BFT consensus, native stablecoin (WKRC), governance system contracts"
+
+# Machine-independent. The working-tree path varies per machine, so it is NOT
+# committed here: it is supplied at runtime via env. Resolution order (load.go):
+#   1. $CKS_CODE_ROOT (per-machine override), else
+#   2. ${GO_STABLENET_ROOT} expanded below.
+# Set GO_STABLENET_ROOT (or CKS_CODE_ROOT) to your go-stablenet checkout.
+code_root: ${GO_STABLENET_ROOT}
+skill_root: ${GO_STABLENET_ROOT}/.claude
+
+# Verification baseline (machine-independent, reproducible anywhere): the
+# go-stablenet commit the entries' code_anchors were confirmed against.
+code_commit: ec6a4e96b   # dev — anchor re-verification baseline, 2026-06-09
+
+primary_language: go
+secondary_languages:
+  - solidity
+
+domain: blockchain
+domain_tags:
+  - ethereum-fork
+  - bft-consensus
+  - stablecoin
+  - evm
+  - geth-derived
+
+schema_version: 1
+
+indexing:
+  ckv_index_path: ".ckv-data/go-stablenet"
+  ckg_index_path: ".ckg-data/go-stablenet"
+  glossary_path: "glossary.yaml"
+
+# Authoritative documentation already maintained inside the project.
+# Inventory entries should cross-reference these wherever the same
+# topic is covered, rather than duplicating their content.
+authoritative_docs:
+  - file: CLAUDE.md
+    role: "project overview, unique-code map"
+  - file: .claude/docs/wbft-consensus.md
+    role: "WBFT consensus engine, block-extra format, RPC, istanbul P2P (§13-16)"
+  - file: .claude/docs/stablenet-features.md
+    role: "system contracts, hardfork, blacklist, fee delegation, gas, account extra (§8-12,17-18)"
+  - file: .claude/docs/system-contract-flow.md
+    role: "system contract deploy/upgrade architecture"
+  - file: .claude/docs/build-source-files.md
+    role: "build-participating files (160 packages, 781 Go files)"
+  - file: .claude/docs/review-guide.md
+    role: "code review patterns, unique-file map"
+  - file: .claude/docs/code-convention.md
+    role: "Go/Solidity/commit conventions"
