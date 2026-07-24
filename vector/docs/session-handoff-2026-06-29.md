@@ -1,0 +1,288 @@
+# Session Handoff — 2026-06-29
+
+> **갱신 2026-07-19.** 이 문서는 **서사·배경 진입점**이다. *작업 상태의 단일 SoT는
+> [`remaining.md`](./remaining.md)* (코드검증본, 2026-07-12: CKV 소관 실질 완료, 잔여는
+> 데이터/CKS 블록 4건). 아래 서사 중 작업-상태 서술이 `remaining.md`와 어긋나면
+> `remaining.md`가 우선한다.
+
+이 문서는 다른 머신·다른 세션에서 작업을 이어받기 위한 **서사 진입점**이다.
+직전 핸드오프 [`archive/session-handoff-2026-06-15.md`](./archive/session-handoff-2026-06-15.md)는
+PR #1~#6까지만 다뤄, 그 이후 머지된 #7~#15와 **CKG/CKV/CKS/coding-agent 4세션 협의
+수렴**을 반영하지 못한다 → **archive로 이동**. 새 세션은 이 문서부터 읽는다.
+
+> **요약:** (1) 2026-06-15 이후 견고화·기능 PR 9건(#7~#15) 머지. (2) CKV 남은 작업
+> 다수가 CKG/CKS/coding-agent와 경계를 공유 → 4세션 협의로 **핵심 결정 7건 합의 완료**
+> (커밋 핀, schema 게이트, parity 분리, flow Phase 2, 차원=실측후결정, 비전 가드레일).
+> 상세 협의 기록은 [`coordination-prompts-2026-06-29.md`](./coordination-prompts-2026-06-29.md).
+>
+> **갱신 2026-07-10:** 크로스레포 reindex/마이그레이션 **P1 3자 완료** — CKV(sources 원장 +
+> alignment 감지) · CKS(서빙 assert+resolve) · CKG(graph_digest 공표 + 버전 원자성). digest
+> end-to-end 실증(협의 doc §10.9) + **서빙 데이터셋 재빌드**(§10.10, `pr-77-2/ckv`,
+> bge-m3 15,909청크, canonical 94.63%, CheckAlignment=ok). 남은 CKV 작업은 §4.0 참조.
+
+---
+
+## 0. 환경 (2026-06-29)
+
+| 항목 | 값 |
+|------|-----|
+| CKV repo | `/Users/wm-it-25_0220/Work/github/code-knowledge-vector` |
+| Go module | `github.com/0xmhha/code-knowledge-vector` |
+| CKV branch / HEAD | `main` / `0dbf1bd` |
+| 빌드 | `make build/test/lint/fmt` (직접 go 명령 지양) |
+| 자매 repo | code-knowledge-graph(CKG), code-knowledge-system(CKS), coding-agent |
+
+`make test`의 `internal/embed/coreml` 1건 실패는 **환경적 baseline**(libtokenizers 부재).
+CI는 명시적으로 제외(`abb5ae2`). 코드 회귀 아님. (개선 후보: Makefile도 CI처럼 coreml 제외.)
+
+---
+
+## 1. 2026-06-15 이후 머지 (PR #7~#15, 코드로 검증됨)
+
+| PR | 커밋 | 내용 |
+|----|------|------|
+| #7 | `ac34a22` | ollama embed 요청 타임아웃(default 60s) + 응답 count 검증 |
+| #8 | `460a718` | 모델 다운로드 네트워크 단계 타임아웃 바운드 |
+| #9 | `c554cc5` | **CKG canonical_id 청크 상속(Phase 2)** — build-stable join key |
+| #10 | `2d60405` | docs/corpus citation을 manifest DocsRoots로 해소(드롭 버그 fix) |
+| #11 | `b99cd60` | stale 핸드오프 archive + docs index 갱신 |
+| #12 | `485b644` | **임베딩 공간 identity 강제** — open 시 공간 불일치 거부 |
+| #13 | `f15be9c` | **MaxInputTokens를 모델 레지스트리에서 도출** |
+| #14 | `cd3f167` | manifest를 빌드 커밋 마커화(부분빌드 방지) |
+| #15 | `44cc9e0` | 빌드 버전 기록 + model-cache 경로 단일화 |
+
+> #12·#13은 임베딩 모델 교체(bge-m3 → Qwen3)를 **안전하게 만드는 사전 인프라**다
+> (공간 혼용 차단 + 모델별 컨텍스트 윈도우 자동 반영).
+
+---
+
+## 2. 현재 CKV 노출 면 (코드 검증, 2026-06-29)
+
+- **MCP 도구 15개** (`pkg/mcp/server.go`): semantic_search / keyword_search /
+  vector_search / narrow_candidates / expand_in_file / find_invariants /
+  get_conventions / explain_match / embed / rerank / related_changes / health /
+  get_freshness / warmup / index. 모든 응답 `schema_version` 포함.
+- **청크 종류 9** (`pkg/types/chunk.go`): symbol, function_split, file_header, doc,
+  pr_background, pr_solution, commit_message, invariant, convention.
+- **SQLite 마이그레이션 4** (`000_baseline`~`003_add_convention_stats`).
+- **CLI**: build / query / reindex / eval / mcp / migrate / model(fetch·list·convert) /
+  freshness / glossary.
+- **파서 언어**: go / solidity / typescript / javascript / markdown (**proto 미파싱**).
+- **임베더**: mock / ollama(`pkg/embed/ollama`) / bgeonnx / coreml.
+
+---
+
+## 3. 4세션 협의 수렴 (2026-06-29) — 핵심
+
+> 전체 프롬프트·회신·결정은 [`coordination-prompts-2026-06-29.md`](./coordination-prompts-2026-06-29.md).
+> CKG=§1-R/§1-R2, CKS=§2-R/§2-R2, coding-agent=§3-R, CKV=§3-R-CKV/§3-R-CKV-2, 비전=§5.
+
+### 3.1 합의된 결정 7건
+
+1. **재인덱싱 커밋 핀 = `0bf2f4d1b`** (PR-77 버그-부모, go-stablenet·test/pr-77 양쪽 존재).
+   CKG가 `make eval-build-dbs LANG=auto`로 만든 **정본 graph.db**를 CKV/CKS가 가리킨다
+   (각자 독자 빌드 안 함). 모델 축은 2회: **reindex-A(bge-m3 baseline)** + **reindex-B(Qwen3 A/B)**.
+2. **schema ≥1.19 게이트** — canonical_id 값은 cache SchemaVersion ≥1.19(현 1.22)에서만 채워짐.
+   CKV는 ckgalign 게이트를 *PRAGMA 컬럼-존재*에서 **manifest `schema_version >= 1.19`** 로 교체.
+3. **B7 join key = canonical_id** (CKG ADR-0001 소유, CKV PR #9 상속, CKS `FindByCanonicalID`
+   보유). 별도 정규화 규칙 불필요. 비심볼 노드는 node ID 폴백.
+4. **parity 분리** — ① recall/rerank = cks proxy 불요(cks RRF 소유, ADR-003) ② flow/invariant
+   = cks 표면 노출 필요(미구현, **CKS 소관**).
+5. **flow/invariant 노출 = Phase 2 deliverable 확정** (defer 금지) → coding-agent H-가드레일 해금.
+6. **임베딩 차원 = 실측 후 결정** — cks "1024 유지 선호(편의)" 철회. reindex-B에서
+   1024-truncate vs full-dim 정밀도 실측, 이득 대비 비용으로 결정(**CKV 주관**). 측정 전 확정 금지.
+7. **fail-loud** — 호환 불가 graph/모델 불일치는 silent degrade 금지, `ops.health.serviceable=false`.
+   CKV는 PR #12로 이미 정합(공간 불일치 시 open 거부).
+
+### 3.2 비전 정렬 (§5)
+
+북극성 = "모호한 자연어 → 정확한 수정 위치를 토큰 효율적으로 → **옳은 수정까지 총비용 최소화**".
+협의에서 *쉬운 합의*가 비전을 밀어내지 않도록 두 가드레일을 세웠고, **둘 다 합의로 닫힘**:
+- **R1**: 차원을 편의로 1024 확정 금지 → 실측 후 결정 (결정 6).
+- **R2**: flow/invariant 노출은 옵션이 아니라 *비전 구현 경로* → Phase 2 못 박음 (결정 5).
+
+### 3.3 잔여 (측정 세부 2건)
+
+- coding-agent "~23% recall" 측정 출처 지목 대기 (D-5 — CKG가 올바른 레버에 매핑하기 위함).
+- CKG↔CKV 매칭률 **분모 정의** 3자 확인 — proto 제외 공유언어 스코프
+  (CKV 제안: 분자=공유언어 CKV청크 중 CKG노드 정렬 수 / 분모=공유언어 CKV청크 총수).
+
+---
+
+## 3.5 DB 생성 일관성 + 사람-워딩 브리지 (2026-06-29 갭 분석)
+
+> **문제 제기(사용자)**: ckv vector DB는 Jira 등 *사람이 쓴 워딩*을 이해하고 그것을
+> *정확한 코드 키워드*에 연결해야 한다. 그런데 DB 생성에 **일관된 규칙이 미흡**하다.
+
+**데이터 대조 (동일 커밋 `0bf2f4d1b`)**: 정본 `knowledge-data/pr-77/ckv` vs 세션 bare 빌드.
+
+| 브리지 레이어 | pr-77 | 세션(bare) | 의미 |
+|---|---|---|---|
+| canonical_id/ckg_node_id (정밀 코드 심볼 키) | ✅ 13,549/15,303 | ❌ 0 | `--ckg` 누락 |
+| 사람 도메인 문서(`.claude/docs`: wbft-consensus 등) | ❌ 0 | ✅ 256 | pr-77이 `--docs` 누락 |
+| flow corpus(사람 인과 "현상→원인") | ❌ | ❌ | 양쪽 다 `--flow-corpus` 미적용 |
+
+→ **두 DB 모두 불완전**. 사람-워딩→코드 브리지는 *모든 레이어*가 필요한데 ad-hoc 플래그로
+빌드돼 매번 빠진다.
+
+**검증된 정본 레시피 (= 일관된 규칙)** — analysis-test-3(go-stablenet@`0bf2f4d1b`)에서 실증:
+```
+ckv build --src <go-stablenet> --out <data> \
+  --ckg <graph.db dir>            # canonical_id (정밀 심볼 키)   ← knowledge-data/pr-77/ckg
+  --files-from gstable-files.json # 빌드소스 allowlist(130)       ← knowledge-data/pr-77/
+  --docs <src>/.claude/docs       # 사람 도메인 문서              ← analysis-test-3/.claude/docs
+  --flow-corpus corpus.jsonl      # 사람 인과 흐름(Phase B)       ← go-stablenet/.claude.backup*/docs/corpus
+  --embedder ollama --model-name bge-m3   # (실측은 실모델 필요)
+```
+결과: 15,909 청크 = 심볼 14,273 + canonical_id 13,549 + 사람문서 222 + flow 112. **pr-77의 정밀
+키 + pr-77이 빠뜨린 사람문서 + flow 인과**를 모두 가진 상위집합.
+
+**누락 자료 위치 (github/ 하위)**:
+- CKG 그래프(canonical_id): `knowledge-data/pr-77/ckg/graph.db` (schema 1.22)
+- allowlist: `knowledge-data/pr-77/gstable-files.json`
+- 사람 도메인 문서: `test/analysis-test-3/.claude/docs/*.md`
+- flow corpus: `go-stablenet/.claude.backup.20260625_180533/docs/corpus/corpus.jsonl` (+SCHEMA.md)
+- glossary 생성기: `code-knowledge-system/cmd/cks-glossary-gen` (**CKS 소유** — CKV `internal/glossary`는 미배선 standalone)
+
+**조치**: 이 레시피를 **flow-ingest Phase E(build-profiles.yaml + scripts/build-knowledge.sh)** 로
+코드화해 "한 스크립트 = 모든 레이어"를 보장(= 사용자가 요구한 일관된 알고리즘 규칙). glossary
+배선은 CKS 소유라 3자 협의 항목.
+
+---
+
+## 4. 남은 작업 리스트 (협의 반영, 우선순위별)
+
+### 4.0 reindex/마이그레이션 P1 이후 남은 CKV 작업 (2026-07-10 갱신)
+
+설계 = [`reindex-migration-design-2026-07-10.md`](./reindex-migration-design-2026-07-10.md).
+**P1은 3자 완료·실증됨** (아래 [x]). 남은 것은 우선순위 순:
+
+- [x] **P1 CKV — sources 원장** (commit `8816915`) — manifest.sources = code/ckg{src_commit,
+  schema_version, graph_digest, path}/prs/docs/flow/policy. 층별 knowledge-cutoff 원장.
+- [x] **P1 CKV — alignment 감지** (commit `e49c19b`) — `Engine.CheckAlignment()` (ok/degraded/
+  mismatch/not_aligned, 권위 키=src_commit+graph_digest) → `cks.ops.health`에 alignment+serviceable 노출.
+- [x] **graph_digest end-to-end 실증** (2026-07-10, 협의 doc §10.9) — CKG 정본 그래프
+  (digest `4be26516…`)로 (a) sources 자동기록 (b) CheckAlignment=ok (c) digest 변조→mismatch 실측.
+- [x] **서빙 데이터셋 재빌드** (2026-07-10, 협의 doc §10.10) — `knowledge-data/pr-77-2/ckv`
+  신규 생성(bge-m3 15,909청크, canonical 13,507/14,273=94.63%, flow/curated 112). sources 원장 +
+  graph_digest 물림 → CKS ledger-absent 경고 소거 + digest assert 서빙 실동작. CheckAlignment(bge-m3)=ok.
+- [ ] **CKS 재기동 결과 수신** — §10.10 프롬프트 전달됨. 재기동 후 `cks.ops.health` alignment 블록
+  공유받아 양측(CKV CheckAlignment / CKS assert) 동일 digest ok 교차확인.
+- [ ] **P2 — reindex 재정렬 편입** (CKV 단독) — `ckv reindex`에 ckgalign 재정렬을 편입해
+  감지된 mismatch를 자동 해소(현재는 감지만). 설계 §3.
+- [ ] **P3 — 증분 PR 인제스트** (CKV 단독) — `sources.prs.last_pr_number` cutoff로 이후 PR만
+  fetch·인덱스(중복 방지). 현 서빙본 `sources.prs=none`(PR 미인제스트). 설계 §2.
+- [ ] **P4 — ChunkCount 재조정** (CKV 단독, 소규모) — reindex의 `ChunkCount += Total-(삭제+수정)`
+  파일수 근사 드리프트를 실제 `COUNT(*)`로 교정. 설계 §5.
+- [ ] **버전 디렉터리(blue-green) 스켈레톤** — `<dataset>@<commit>-<digest[:8]>/{graph-db,vector-db}`
+  + `current` symlink + 원자 promote. 오케스트레이션 주관=CKS, CKV는 버전본 생산·소비. 설계 §4/§6.
+
+### A. 즉시 착수 가능 (의존성 없음)
+- [x] **ckgalign 게이트 ≥1.19** (결정 2) — 완료 (commits `5ee66f8` population probe, `35326e5`
+  manifest schema_version 게이트). ckg in-db `manifest` 테이블의 schema_version을 읽어
+  major.minor 정수비교(1.9<1.19), 구버전은 population fallback.
+- [ ] **B10** parser fuzz/property 테스트.
+
+### B. 측정 (정본 그래프 정렬)
+- [x] **CKG↔CKV 매칭률 실측 완료** (2026-06-30) — CKG 정본 그래프
+  `/tmp/ckg-eval/stablenet-0bf2f4d1bfeb/graph.db`(commit `0bf2f4d1b`, schema **1.23**,
+  sha256 `16ee6fb7…`)에 ckgalign 정렬(독자 재빌드 안 함). **canonical_id 매칭률 = 13,472/14,273
+  심볼청크 = 94.4%** (≥90% 충족). ckg_node_id(file:line) 정렬률 99.3%. proto(CKV 미파싱)·
+  promoted(canonical 없음) 제외. 갭 ~6% = 패키지레벨 var/const 블록(CKV가 ckg 노드와 다르게 청크).
+  통합 fixture CKV 半 = `internal/ckgalign/integration_test.go`(verbatim 상속 + `@<line>` caveat).
+- [x] **reindex-A 산출 완료** (2026-06-30) — 새 ckg 정본 그래프 `knowledge-data/pr-77-2`
+  (schema 1.23, test포함 go+sol 필터)에 정렬, **bge-m3@1024** 빌드(~20분). 산출물
+  `knowledge-data/pr-77-2/ckv/vector.db` (sha256 `1c3d9073…`, 15,575청크). ckg와 동일
+  필터(`stablenet-files-with-tests.json`, 1010파일)로 스코프 일치. **canonical_id 상속률 94.6%**
+  재확인. 협의 doc §8-R 공표.
+- [x] **bge-m3 사람-워딩 의미검증 완료** (2026-06-30) — 완전 인덱스(코드+docs+flow, sha
+  `c0e448f2…`, 15,909청크)에서 패러프레이즈 한국어 Jira식 질의 **10/10** 기대 코드 파일 회수.
+  코드-only 8/10 → flow corpus로 2건 회복(사람-워딩 레이어 가치 입증). 재현 = `scripts/build-knowledge.sh`.
+- [ ] **PR-77 통합 bench** (coding-agent 주관, CKV recall 상보 cross-ref).
+
+### A2. 빌드 일관성 (Phase E 코드화 완료)
+- [x] **`scripts/build-knowledge.sh`** (2026-06-30, commit `5cb9123`) — 정본 레시피
+  (`--ckg + --files-from + --docs + --flow-corpus`, bge-m3)를 한 스크립트로 코드화 + 매칭률
+  + 사람-워딩 의미검증(`scripts/semantic-validation-queries.json`) + sha 공표. env로 경로
+  override(다른 dataset 재사용), `--skip-build`/`--build-only` 모드. = §3.5 "일관된 규칙" 해소.
+
+### C. 임베딩 모델 교체 (reindex-B)
+- [ ] **Qwen3 A/B PoC** — `testdata/queries.yaml`·`why-queries.yaml`. 1024-truncate vs full-dim
+  정밀도 실측 → 차원 결정(결정 6, CKV 주관).
+- [ ] Qwen3 어댑터: query-prefix("Instruct:") 흡수 + MRL truncate 경로 + `knownDims` 합의.
+
+### D. Flow-corpus (`plan-2026-06-16-flow-ingest.md`)
+- [x] **Phase A 완료** (2026-06-29, commit `7158572`) — flow_step/flow_spine chunk kinds +
+  FlowStepMeta/FlowSpineMeta/Branch/EnforcePoint 타입 + Chunk 필드(omitempty) +
+  마이그레이션 004(flow_meta/enforced_at/provenance). go-stablenet@`0bf2f4d1b`
+  (test/analysis-test-3)에서 신규 빌드(000–004, 19,605청크) + pr-77 인덱스 003→004
+  업그레이드(백업·15,575행 보존·멱등) 양방향 검증.
+- [x] **Phase B 완료** (2026-06-29, commits `72ef76f` 파서, `db6789a` 빌드통합) —
+  `internal/flowcorpus` 파서(corpus.jsonl → flow_step/flow_spine/curated-invariant,
+  edge는 graph-only skip, 형식이탈 warn+skip) + `--flow-corpus` 플래그 + store 컬럼
+  배선(flow_meta/enforced_at/provenance, insert+양 scan 경로). step은 실코드 file:line,
+  flow/invariant은 corpus.jsonl cite(corpus dir를 manifest DocsRoots에 추가 → citation 해소).
+  실 corpus(255레코드) 검증: 18 spine + 78 step + 16 inv(step 1건 line누락 warn+skip),
+  메타 round-trip·citation 해소 확인. **의미 검색 품질은 bge-m3 실모델 필요(mock은 구조만).**
+- [x] **Phase D CKV-side 완료** (2026-06-30, commit `5c35aed`) — flow-aware 4도구
+  (get_flow/expand_flow/find_branches/get_invariant_enforcement): store 조회 +
+  in-memory flow 모델(call-order topo, cycle-safe) + `pkg/ckv` 재노출(in-process cks 소비용) +
+  `cks.context.*` MCP 도구(15→**19**). 계약 = 협의 doc §9.1. 실 pr-77-2 인덱스 라이브검증
+  (get_flow ep-cli-init 5steps@chaincmd.go:191, INV-CONSENSUS-01 4사이트, 한국어 증상→
+  commit.go:96 분기). **남은 것 = CKS 표면 노출**(§9.2 프롬프트 전달됨, 결정 5/D-4).
+- [ ] Phase C(file:line 정렬 강화) → E(빌드 오케스트레이션, `build-knowledge.sh`로 일부 해소) → F(평가).
+
+### E. 코드 미구현 (기존 backlog)
+- [ ] **#7(D.2)** LLM contextual prefix — throughput buffer 후 재구현.
+- [ ] **A3** linux CI matrix / **A4** bge-code-v1 Qwen2 adapter.
+- [ ] **PRR-1** full PR regression — throughput 보류.
+
+### F. ADR 승격 (합의 후)
+- [ ] canonical_id join / 임베딩 모델·차원(측정 후) / flow 시그니처. R1/R2 가드레일은
+  Consequences에 측정 근거와 함께 명시.
+
+---
+
+## 5. 문서 드리프트 정리 (이 핸드오프로 갱신)
+
+| 항목 | 정정 |
+|------|------|
+| A2 `ckv model fetch` | backlog "stub" 기재 → **구현됨**(PR #8/#15). 종결 처리. |
+| ADR-006 | 핸드오프 §3-A "Proposed" → 실제 **Rejected**(2026-05-26). ADR-003 supersede 보류 항목 해소. |
+| mcp-tools.md | 6월 빌드 플래그(`--docs/--files-from/--ckg`) 누락 — 보강 필요. |
+| coreml 테스트 | Makefile도 CI처럼 제외하는 개선 후보(미해결). |
+
+---
+
+## 6. 권장 다음 세션 시작 순서
+
+```bash
+cd /Users/wm-it-25_0220/Work/github/code-knowledge-vector
+git pull && make build && make test   # coreml 1건 FAIL은 정상
+
+# 우선순위:
+# 1. (이 세션) 핸드오프 통합 — 완료
+# 2. ckgalign 게이트 ≥1.19 (즉시 착수, 의존성 없음)
+# 3. CKG 정본 graph.db(0bf2f4d1b, LANG=auto) sha 수신 → 매칭률 실측
+# 4. Qwen3 A/B PoC → 차원 결정 (reindex-B)
+# 5. flow-ingest Phase A 착수 (스키마부터)
+```
+
+---
+
+## 7. 핵심 파일 인덱스
+
+- `pkg/types/chunk.go` — Chunk + 메타(`ckg_node_id`, `canonical_id`)
+- `pkg/types/embed.go` — EmbeddingIdentity + Checksum (#12)
+- `pkg/embed/ollama/adapter.go` — in-process ollama, MaxInputTokens 레지스트리 도출(#13)
+- `internal/ckgalign/aligner.go` — canonical_id 상속(#9). **게이트 ≥1.19 수정 대상**
+- `internal/build/builder.go` / `manifest/manifest.go` — manifest 커밋 마커(#14)
+- `internal/store/sqlitevec/` — store + migrations 000~003
+- `pkg/mcp/server.go` — MCP 15도구
+- `pkg/ckv/ckv.go` — public Go API (Freshness 포함)
+- `docs/coordination-prompts-2026-06-29.md` — 4세션 협의 SoT
+- `docs/archive/embedding-model-recommendation-2026-06-22.md` — Qwen3 추천
+
+---
+
+이 문서는 작업 진행 시 갱신한다. 큰 작업 진행 시 새 핸드오프를 만들고 이 파일은 archive.

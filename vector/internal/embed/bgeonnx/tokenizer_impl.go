@@ -1,0 +1,130 @@
+//go:build bgeonnx
+
+// hfTokenizer wraps daulet/tokenizers (a CGO binding around the
+// HuggingFace Rust `tokenizers` crate). Reading the model's
+// `tokenizer.json` directly keeps us bit-exact with the upstream HF
+// reference — drift here would silently change the embedding
+// distribution.
+//
+// This file builds only with `-tags bgeonnx` so the default build
+// avoids the libtokenizers system dependency. See docs/d1-installation-guide.md.
+
+package bgeonnx
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/daulet/tokenizers"
+)
+
+type hfTokenizer struct {
+	tk *tokenizers.Tokenizer
+}
+
+func newHFTokenizer(modelDir string, cfg ModelConfig) (*hfTokenizer, error) {
+	path := filepath.Join(modelDir, cfg.TokenizerFile)
+	if _, err := os.Stat(path); err != nil {
+		return nil, fmt.Errorf("%s missing at %s: %w", cfg.TokenizerFile, path, err)
+	}
+	tk, err := tokenizers.FromFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("load %s: %w", cfg.TokenizerFile, err)
+	}
+	return &hfTokenizer{tk: tk}, nil
+}
+
+// Tokenize encodes batch into uniform-length int64 tensors padded to
+// the longest sequence in the batch (truncated to maxLen first). Two
+// passes is intentional: pass 1 finds the actual max so we don't pad
+// to MaxInput when the batch is mostly short snippets — fixed-max
+// padding would 10x the inference cost on small batches.
+//
+// CKV_STATIC_SHAPES=1 switches to fixed maxLen padding for every
+// batch, regardless of observed length. The session-side
+// RequireStaticInputShapes=1 needs this to actually hit a single
+// shape; without it the EP still sees per-batch shape variation and
+// recompiles. Pad cost grows linearly with maxLen and is only worth
+// it when compile cost dominates inference (CoreML cold path).
+//
+// TokenTypeIDs is left nil here regardless of model. If the ONNX
+// graph requires it (e.g. BERT-family), Session.Run synthesizes a
+// zeros tensor via ModelConfig.ExtraInputs.
+func (t *hfTokenizer) Tokenize(ctx context.Context, batch []string, maxLen int) (TokenizedBatch, error) {
+	if t == nil || t.tk == nil {
+		return TokenizedBatch{}, fmt.Errorf("bgeonnx: tokenizer closed")
+	}
+	if err := ctx.Err(); err != nil {
+		return TokenizedBatch{}, err
+	}
+	if len(batch) == 0 {
+		return TokenizedBatch{}, nil
+	}
+
+	encs := make([]tokenizers.Encoding, len(batch))
+	maxObserved := 0
+	for i, s := range batch {
+		enc, err := t.tk.EncodeWithOptionsErr(s, true, tokenizers.WithReturnAttentionMask())
+		if err != nil {
+			return TokenizedBatch{}, fmt.Errorf("encode[%d]: %w", i, err)
+		}
+		// Tail truncation: bge models' learned attention treats the
+		// [CLS] prefix as a positional anchor, so keeping the head and
+		// dropping the tail is the convention. Leading-token retention
+		// also matches HF's default truncation_side="right".
+		if len(enc.IDs) > maxLen {
+			enc.IDs = enc.IDs[:maxLen]
+			enc.AttentionMask = enc.AttentionMask[:maxLen]
+		}
+		encs[i] = enc
+		if len(enc.IDs) > maxObserved {
+			maxObserved = len(enc.IDs)
+		}
+	}
+	if maxObserved == 0 {
+		return TokenizedBatch{}, fmt.Errorf("bgeonnx: every input produced zero tokens — tokenizer.json likely invalid")
+	}
+
+	padLen := maxObserved
+	if envBool("CKV_STATIC_SHAPES") {
+		padLen = maxLen
+	}
+
+	out := TokenizedBatch{
+		InputIDs:      make([][]int64, len(batch)),
+		AttentionMask: make([][]int64, len(batch)),
+	}
+	for i, enc := range encs {
+		ids := make([]int64, padLen)
+		mask := make([]int64, padLen)
+		for j, id := range enc.IDs {
+			if j >= padLen {
+				break
+			}
+			ids[j] = int64(id)
+		}
+		for j, m := range enc.AttentionMask {
+			if j >= padLen {
+				break
+			}
+			mask[j] = int64(m)
+		}
+		out.InputIDs[i] = ids
+		out.AttentionMask[i] = mask
+	}
+	return out, nil
+}
+
+// Close releases the underlying Rust tokenizer. Adapter.Close() invokes
+// this via the io.Closer type assertion so the stub variant (which has
+// no Close) doesn't need to implement it.
+func (t *hfTokenizer) Close() error {
+	if t == nil || t.tk == nil {
+		return nil
+	}
+	err := t.tk.Close()
+	t.tk = nil
+	return err
+}
