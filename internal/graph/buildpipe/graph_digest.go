@@ -32,6 +32,14 @@ import (
 //     modifies) — they depend on --temporal-depth + git state, orthogonal to the
 //     code graph CKV/CKS pin. A temporal-only rebuild leaves this digest
 //     unchanged, which is the point.
+//   - Enrichment nodes/edges (Policy/SecurityPattern + governed_by/
+//     has_security_pattern) — knowledge injected from operator-supplied YAML,
+//     not derived from the source. The vector engine aligns on code symbol
+//     identity, so enrichment must not invalidate the coordinate pin; it is
+//     tracked separately in manifest.EnrichDigest (ComputeEnrichDigest).
+//     NOTE: graphs built WITH enrichment before this split carry a digest
+//     that included those rows — their next rebuild changes graph_digest
+//     once and triggers one vector realignment.
 //
 // Because every retained field is deterministic for a pinned source under
 // ADR-0002 and the lines are sorted, the digest is identical across cold and
@@ -41,6 +49,9 @@ func ComputeGraphDigest(nodes []types.Node, edges []types.Edge) string {
 	for _, n := range nodes {
 		if isMetaNodeType(n.Type) {
 			continue // temporal (Commit/Hunk) excluded
+		}
+		if isEnrichmentNodeType(n.Type) {
+			continue // operator-injected enrichment excluded (see EnrichDigest)
 		}
 		nodeLines = append(nodeLines, strings.Join([]string{
 			n.ID,
@@ -58,6 +69,9 @@ func ComputeGraphDigest(nodes []types.Node, edges []types.Edge) string {
 	for _, e := range edges {
 		if isTemporalEdgeType(e.Type) {
 			continue // temporal edges excluded
+		}
+		if isEnrichmentEdgeType(e.Type) {
+			continue // enrichment edges excluded (see EnrichDigest)
 		}
 		edgeSet[strings.Join([]string{
 			string(e.Type),
@@ -89,4 +103,77 @@ func isTemporalEdgeType(t types.EdgeType) bool {
 	default:
 		return false
 	}
+}
+
+// isEnrichmentNodeType reports whether t belongs to the operator-injected
+// enrichment family (policy / security-pattern YAML), excluded from the code
+// digest and hashed into EnrichDigest instead.
+func isEnrichmentNodeType(t types.NodeType) bool {
+	switch t {
+	case types.NodePolicy, types.NodeSecurityPattern:
+		return true
+	default:
+		return false
+	}
+}
+
+// isEnrichmentEdgeType mirrors isEnrichmentNodeType for edges.
+func isEnrichmentEdgeType(t types.EdgeType) bool {
+	switch t {
+	case types.EdgeGovernedBy, types.EdgeHasSecurityPattern:
+		return true
+	default:
+		return false
+	}
+}
+
+// ComputeEnrichDigest returns a deterministic hex hash over ONLY the
+// enrichment nodes/edges (same line format as ComputeGraphDigest), or ""
+// when the graph carries no enrichment. It changes when the injected
+// policy / security knowledge changes and is deliberately NOT part of the
+// coordinate pin: consumers use it to detect "the enrichment overlay moved"
+// without forcing a vector realignment.
+func ComputeEnrichDigest(nodes []types.Node, edges []types.Edge) string {
+	nodeLines := make([]string, 0, 8)
+	for _, n := range nodes {
+		if !isEnrichmentNodeType(n.Type) {
+			continue
+		}
+		nodeLines = append(nodeLines, strings.Join([]string{
+			n.ID,
+			n.CanonicalID,
+			string(n.Type),
+			n.QualifiedName,
+			n.FilePath,
+			strconv.Itoa(n.StartLine),
+			strconv.Itoa(n.EndLine),
+		}, "\t"))
+	}
+	edgeSet := make(map[string]struct{}, 8)
+	for _, e := range edges {
+		if !isEnrichmentEdgeType(e.Type) {
+			continue
+		}
+		edgeSet[strings.Join([]string{
+			string(e.Type),
+			e.Src,
+			e.Dst,
+			strconv.Itoa(e.Line),
+		}, "\t")] = struct{}{}
+	}
+	if len(nodeLines) == 0 && len(edgeSet) == 0 {
+		return ""
+	}
+	sort.Strings(nodeLines)
+	edgeLines := make([]string, 0, len(edgeSet))
+	for l := range edgeSet {
+		edgeLines = append(edgeLines, l)
+	}
+	sort.Strings(edgeLines)
+
+	h := sha256.New()
+	h.Write([]byte(strings.Join(nodeLines, "\n")))
+	h.Write([]byte("\n--edges--\n"))
+	h.Write([]byte(strings.Join(edgeLines, "\n")))
+	return hex.EncodeToString(h.Sum(nil))
 }

@@ -83,3 +83,39 @@ func TestComputeGraphDigest_SensitiveToIdentity(t *testing.T) {
 		t.Error("digest did not change when canonical_id changed")
 	}
 }
+
+// TestGraphDigest_EnrichmentExcluded locks the code/enrichment digest split:
+// injecting policy / security-pattern rows must NOT move the coordinate pin
+// (graph_digest); it must move only EnrichDigest.
+func TestGraphDigest_EnrichmentExcluded(t *testing.T) {
+	base := []types.Node{
+		{ID: "n1", Type: types.NodeFunction, QualifiedName: "pkg.F", FilePath: "a.go", StartLine: 1, EndLine: 2},
+	}
+	baseEdges := []types.Edge{
+		{Type: types.EdgeCalls, Src: "n1", Dst: "n1", Line: 1},
+	}
+	enrichedNodes := append(append([]types.Node{}, base...),
+		types.Node{ID: "p1", Type: types.NodePolicy, QualifiedName: "policy.Rule", FilePath: "policy.yaml", StartLine: 1, EndLine: 1},
+		types.Node{ID: "s1", Type: types.NodeSecurityPattern, QualifiedName: "sec.Pat", FilePath: "sec.yaml", StartLine: 1, EndLine: 1},
+	)
+	enrichedEdges := append(append([]types.Edge{}, baseEdges...),
+		types.Edge{Type: types.EdgeGovernedBy, Src: "n1", Dst: "p1", Line: 1},
+		types.Edge{Type: types.EdgeHasSecurityPattern, Src: "n1", Dst: "s1", Line: 1},
+	)
+
+	if got, want := ComputeGraphDigest(enrichedNodes, enrichedEdges), ComputeGraphDigest(base, baseEdges); got != want {
+		t.Errorf("code digest moved with enrichment: %s != %s", got, want)
+	}
+	if got := ComputeEnrichDigest(base, baseEdges); got != "" {
+		t.Errorf("EnrichDigest without enrichment = %q, want empty", got)
+	}
+	d1 := ComputeEnrichDigest(enrichedNodes, enrichedEdges)
+	if d1 == "" {
+		t.Fatal("EnrichDigest with enrichment is empty")
+	}
+	// Changing the enrichment changes the enrich digest.
+	enrichedEdges[len(enrichedEdges)-1].Line = 2
+	if d2 := ComputeEnrichDigest(enrichedNodes, enrichedEdges); d2 == d1 {
+		t.Error("EnrichDigest did not change when enrichment changed")
+	}
+}

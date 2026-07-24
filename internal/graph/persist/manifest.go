@@ -54,6 +54,12 @@ type Manifest struct {
 	// builds and machines (ADR-0002). Additive + omitempty: pre-digest manifests
 	// decode it as "" and old readers ignore it — no SchemaVersion bump.
 	GraphDigest string `json:"graph_digest,omitempty"`
+	// EnrichDigest hashes ONLY the operator-injected enrichment overlay
+	// (Policy/SecurityPattern nodes + governed_by/has_security_pattern edges).
+	// "" when no enrichment. Deliberately NOT part of the coordinate pin —
+	// consumers watch it to detect "the enrichment moved" without a vector
+	// realignment. Additive + omitempty (no SchemaVersion bump).
+	EnrichDigest string `json:"enrich_digest,omitempty"`
 	// Files is the per-file incremental-cache record (A3 Phase 1, schema 1.2).
 	// Each entry tracks the SHA256 + cache key of one source file plus the
 	// node/edge IDs it produced, enabling subsequent builds to skip parsing
@@ -131,6 +137,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		// schema_version / src_commit. Empty string when a pre-digest build
 		// produced this graph.
 		{"graph_digest", m.GraphDigest},
+		{"enrich_digest", m.EnrichDigest},
 	}
 	for _, r := range rows {
 		if _, err := tx.Exec(`INSERT INTO manifest (key, value) VALUES (?, ?)`, r.k, r.v); err != nil {
@@ -199,6 +206,7 @@ func (s *sqliteStore) GetManifest() (Manifest, error) {
 		StalenessMethod:  kv["staleness_method"],
 		ClusteringStatus: kv["clustering_status"],
 		GraphDigest:      kv["graph_digest"],
+		EnrichDigest:     kv["enrich_digest"],
 	}
 	// Back-compat both directions: a legacy manifest has only ckg_version, a
 	// future post-removal one only builder_version. Mirror whichever is set so

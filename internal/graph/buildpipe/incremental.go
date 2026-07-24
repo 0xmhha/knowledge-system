@@ -838,6 +838,7 @@ func buildManifestSkeleton(opt Options, goCount, tsCount, solCount, protoCount i
 			"pkg_tree_edges": len(pkgTree.Edges),
 		},
 		GraphDigest:      ComputeGraphDigest(g.Nodes, g.Edges),
+		EnrichDigest:     ComputeEnrichDigest(g.Nodes, g.Edges),
 		ParseErrorsCount: parseErrs,
 		ClusteringStatus: "ok",
 	}
