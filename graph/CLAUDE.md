@@ -11,8 +11,8 @@ CKG turns a source tree (Go / TypeScript / Solidity) into a deterministic
 projects — **CKG** (graph) · **CKV** (vector + vocab bridge) · **CKS**
 (orchestrator). CKG's job: *given exact keywords + a project graph, return
 precisely the code an agent needs.* **Keyword-retrieval accuracy is the
-first-class metric.** Full statement: **[docs/VISION.md](docs/VISION.md)** —
-read it before any design discussion. Doc index: **[docs/DOC-MAP.md](docs/DOC-MAP.md)**.
+first-class metric.** Full statement: **[../docs/graph/VISION.md](../docs/graph/VISION.md)** —
+read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](../docs/graph/DOC-MAP.md)**.
 
 ## Build / test / lint (use the Makefile)
 
@@ -47,7 +47,7 @@ CI (`.github/workflows/ci.yml`) runs `go vet ./...`, `go test -race ./...`,
   `smartctx`, `evidence`, `impact`, `policy`, `security`, …). CKV/CKS consume
   these.
 - `web/viewer-next/` — Next.js 3D force-graph viewer, embedded into the binary.
-- `docs/` — see `docs/DOC-MAP.md`. `policies/`, `eval/`, `testdata/` as named.
+- `docs/` — see `../docs/graph/DOC-MAP.md`. `policies/`, `eval/`, `testdata/` as named.
 
 ## Codebase conventions (non-obvious, easy to get wrong)
 
@@ -81,11 +81,11 @@ is done/green without having run the relevant `make` target.
 
 ## Documentation discipline (ALWAYS apply when creating/editing docs)
 
-The docs are **three tiers** (full map: `docs/DOC-MAP.md`). Before creating a
+The docs are **three tiers** (full map: `../docs/graph/DOC-MAP.md`). Before creating a
 new `.md`, decide which tier it is — and prefer updating an existing doc over
 spawning a new one.
 
-- **Tier 1 — `docs/VISION.md`** (purpose/vision): **read-only input.** Never
+- **Tier 1 — `../docs/graph/VISION.md`** (purpose/vision): **read-only input.** Never
   delete or shrink it during cleanup. If purpose/vision prose is scattered in
   other docs, **move it into VISION.md — do not drop it.** (This directly
   prevents vision being lost when status docs are pruned.)
@@ -103,7 +103,7 @@ Rules:
    (→ ADR) or a new dated status snapshot. Otherwise update in place.
 3. **Supersede, don't delete.** Move superseded design docs to `docs/archive/`
    with a one-line "superseded by X".
-4. **Update the index.** Any doc add/move/supersede → update `docs/DOC-MAP.md`
+4. **Update the index.** Any doc add/move/supersede → update `../docs/graph/DOC-MAP.md`
    (and the ADR index) in the same change.
 5. **Destructive cleanup = plan first.** Present a move/supersede/delete table
    and get approval before executing.
@@ -114,4 +114,4 @@ Rules:
 - Keep PRs small; concurrent sessions edit ckg/ckv/cks — sync at phase
   boundaries to avoid rebase churn.
 - No commit trailers — do NOT add `Co-Authored-By` (matches git history and
-  the commit convention in docs/CODE-STRUCTURE.md).
+  the commit convention in ../docs/graph/CODE-STRUCTURE.md).

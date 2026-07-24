@@ -10,7 +10,7 @@ an MCP server. The companion project
 combined by larger systems (CKS) for hybrid retrieval.
 
 > **Resuming work on a different machine or in a new session?**
-> Start with [`docs/session-handoff-2026-05-23.md`](docs/session-handoff-2026-05-23.md)
+> Start with [`docs/session-handoff-2026-05-23.md`](../docs/vector/archive/session-handoff-2026-05-23.md)
 > — it carries the prereq checklist, env-var matrix, current decision
 > state, and the next-Wave entry conditions in a single document.
 
@@ -36,7 +36,7 @@ make build
 ### CLI with `bgeonnx` (real semantic embeddings)
 
 Requires `libonnxruntime`, `libtokenizers.a`, and a downloaded model.
-See [`docs/d1-installation-guide.md`](docs/d1-installation-guide.md).
+See [`docs/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md).
 
 ```bash
 CGO_LDFLAGS="-L$HOME/lib" go build -tags bgeonnx -o ./bin/ckv ./cmd/ckv
@@ -77,7 +77,7 @@ func search() error {
 }
 ```
 
-See [`docs/embedder-integration.md`](docs/embedder-integration.md)
+See [`docs/embedder-integration.md`](../docs/vector/embedder-integration.md)
 for the production embedder path, environment overrides, and
 migration off subprocess MCP.
 
@@ -137,15 +137,15 @@ pkg/ckv     Engine wrapper around internal/query (in-process consumers)
 
 ## Documentation
 
-- [`docs/README.md`](docs/README.md) — **documentation index** (living reference vs design record vs archive). Start here.
-- [`docs/remaining.md`](docs/remaining.md) — **work status single source of truth** (code-verified).
-- [`docs/session-handoff-2026-06-29.md`](docs/session-handoff-2026-06-29.md) — narrative/background entry point (work status defers to `remaining.md`).
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/SCHEMA.md`](docs/SCHEMA.md) — module map + chunk/store schema.
-- [`docs/mcp-tools.md`](docs/mcp-tools.md) — MCP tool I/O specs (19 tools).
-- [`docs/embedder-integration.md`](docs/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
-- [`docs/d1-installation-guide.md`](docs/d1-installation-guide.md) — building the optional `bgeonnx`/ONNX path (default runtime is ollama/bge-m3).
-- [`docs/eval-metrics.md`](docs/eval-metrics.md) — `ckv eval` metrics.
-- [`docs/adr/`](docs/adr/) — architecture decision records (001–010).
+- [`docs/README.md`](../docs/vector/README.md) — **documentation index** (living reference vs design record vs archive). Start here.
+- [`docs/remaining.md`](../docs/vector/remaining.md) — **work status single source of truth** (code-verified).
+- [`docs/session-handoff-2026-06-29.md`](../docs/vector/session-handoff-2026-06-29.md) — narrative/background entry point (work status defers to `remaining.md`).
+- [`docs/ARCHITECTURE.md`](../docs/vector/ARCHITECTURE.md), [`docs/SCHEMA.md`](../docs/vector/SCHEMA.md) — module map + chunk/store schema.
+- [`docs/mcp-tools.md`](../docs/vector/mcp-tools.md) — MCP tool I/O specs (19 tools).
+- [`docs/embedder-integration.md`](../docs/vector/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
+- [`docs/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md) — building the optional `bgeonnx`/ONNX path (default runtime is ollama/bge-m3).
+- [`docs/eval-metrics.md`](../docs/vector/eval-metrics.md) — `ckv eval` metrics.
+- [`docs/adr/`](../docs/vector/adr/) — architecture decision records (001–010).
 
 "What is true now" = code + git.
 
