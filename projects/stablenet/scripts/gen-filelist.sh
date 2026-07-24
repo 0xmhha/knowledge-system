@@ -12,7 +12,7 @@
 #   <out>/files-from.json   {"include":[...]} consumable by ckg/ckv --files-from
 #
 # Usage:
-#   ./scripts/gen-stablenet-filelist.sh [GO_STABLENET_ROOT] [OUT_DIR]
+#   ./projects/stablenet/scripts/gen-filelist.sh [GO_STABLENET_ROOT] [OUT_DIR]
 # Optional env:
 #   ENTRY=./cmd/gstable               build entry point (closure root)
 #   EXCLUDE_PKGS="consensus/clique consensus/ethash"   package prefixes to drop

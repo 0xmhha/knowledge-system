@@ -14,8 +14,8 @@
 // Usage:
 //
 //	cks-glossary-gen \
-//	    -project docs/domain-knowledge/projects/go-stablenet \
-//	    -out    docs/domain-knowledge/projects/go-stablenet/glossary.yaml \
+//	    -project projects/stablenet/domain-knowledge \
+//	    -out    projects/stablenet/domain-knowledge/glossary.yaml \
 //	    -status verified
 package main
 

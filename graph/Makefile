@@ -176,10 +176,10 @@ eval-ckv-mirror: build-no-viewer
 # to that commit. Example:
 #   make eval-stablenet-keyword GRAPH=/path/to/knowledge-data/pr-77-2
 eval-stablenet-keyword: build-no-viewer
-	@[ -n "$(GRAPH)" ] || { echo "ERROR: set GRAPH=<go-stablenet graph dir> (pinned to 0bf2f4d1b, tests-included). See eval/stablenet-keyword/README.md"; exit 1; }
+	@[ -n "$(GRAPH)" ] || { echo "ERROR: set GRAPH=<go-stablenet graph dir> (pinned to 0bf2f4d1b, tests-included). See ../projects/stablenet/eval/graph-keyword/README.md"; exit 1; }
 	@[ -f "$(GRAPH)/graph.db" ] || { echo "ERROR: $(GRAPH)/graph.db not found"; exit 1; }
-	./bin/ckg eval-retrieval --graph=$(GRAPH) --fixtures=eval/stablenet-keyword/fixtures \
-	    --output=eval/stablenet-keyword/results.json
+	./bin/ckg eval-retrieval --graph=$(GRAPH) --fixtures=../projects/stablenet/eval/graph-keyword/fixtures \
+	    --output=../projects/stablenet/eval/graph-keyword/results.json
 
 # Machine-local paths — override via environment or .env.local:
 #   STABLENET_SRC  path to go-stablenet checkout
@@ -258,7 +258,7 @@ eval-stage-b: build-no-viewer
 	echo "" && \
 	echo "=== Stage B: eval 30 tasks × $(STAGE_B_BASELINES) ===" && \
 	STABLENET_SRC=$(STABLENET_SRC) ./bin/ckg eval \
-	    --tasks='eval/stablenet/tasks/T*.yaml' \
+	    --tasks='../projects/stablenet/eval/graph/tasks/T*.yaml' \
 	    --graph=$$GRAPH_DIR \
 	    --baselines=$(STAGE_B_BASELINES) \
 	    --llm-backend=$(LLM_BACKEND) \

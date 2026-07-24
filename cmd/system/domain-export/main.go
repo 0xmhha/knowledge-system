@@ -5,7 +5,7 @@
 //
 // Usage:
 //
-//	cks-domain-export -project docs/domain-knowledge/projects/go-stablenet \
+//	cks-domain-export -project projects/stablenet/domain-knowledge \
 //	  -out generated/domain-corpus/go-stablenet
 //
 // code_root for authoritative_docs resolves via CKS_CODE_ROOT or the

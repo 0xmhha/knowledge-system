@@ -33,11 +33,15 @@ import (
 )
 
 func main() {
-	entriesDir := flag.String("entries", "docs/domain-knowledge/projects/go-stablenet", "project dir holding entries/*.yaml")
+	entriesDir := flag.String("entries", "", "project dir holding entries/*.yaml (e.g. projects/<name>/domain-knowledge)")
 	ckvOut := flag.String("ckv-out", "", "write the ckv stablenet.yaml view here (default: stdout)")
 	ckgOut := flag.String("ckg-out", "", "write the ckg policy.yaml view here (default: stdout)")
 	flag.Parse()
 
+	if *entriesDir == "" {
+		fmt.Fprintln(os.Stderr, "cks-domain-sync: -entries is required (e.g. projects/<name>/domain-knowledge)")
+		os.Exit(2)
+	}
 	if err := run(*entriesDir, *ckvOut, *ckgOut); err != nil {
 		fmt.Fprintln(os.Stderr, "cks-domain-sync:", err)
 		os.Exit(1)

@@ -21,7 +21,7 @@
 // Usage:
 //
 //	cks-entry-verify \
-//	    -project docs/domain-knowledge/projects/go-stablenet \
+//	    -project projects/stablenet/domain-knowledge \
 //	    -entry   A1.wbft_core.quorum_calc \
 //	    -by      mhha
 //

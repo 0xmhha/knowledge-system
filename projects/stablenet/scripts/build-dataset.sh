@@ -9,9 +9,9 @@
 # Run from the code-knowledge-system repo root.
 #
 # Usage:
-#   ./scripts/build-stablenet-dataset.sh            # full build
-#   STAGE=ckg ./scripts/build-stablenet-dataset.sh  # only the ckg stage
-#   SKIP_CKV=1 ./scripts/build-stablenet-dataset.sh # everything except the ~10h ckv embed
+#   ./projects/stablenet/scripts/build-dataset.sh            # full build
+#   STAGE=ckg ./projects/stablenet/scripts/build-dataset.sh  # only the ckg stage
+#   SKIP_CKV=1 ./projects/stablenet/scripts/build-dataset.sh # everything except the ~10h ckv embed
 #
 # Env (override as needed):
 #   GO_STABLENET_ROOT  go-stablenet checkout            (default: ../go-stablenet)
@@ -37,9 +37,10 @@ CKG_BIN="$CKG_REPO/bin/ckg"
 CKV_BIN="$CKV_REPO/bin/ckv"
 
 # Artifact layout (under cks repo root)
-PROJECT_DIR="docs/domain-knowledge/projects/go-stablenet"
-CORPUS_DIR="generated/domain-corpus/go-stablenet"
-POLICY_DIR="generated/policies"
+PACK_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="$PACK_ROOT/domain-knowledge"
+CORPUS_DIR="$PACK_ROOT/generated/domain-corpus"
+POLICY_DIR="$PACK_ROOT/generated/policies"
 CKG_POLICY="$POLICY_DIR/stablenet-ckg-policy.yaml"
 CKV_POLICY="$POLICY_DIR/stablenet-ckv.yaml"
 CKG_OUT="data/ckg-stablenet"

@@ -44,6 +44,16 @@ check cmd/vector-mcp   "graph|system"
 check cmd/system       "graph|vector"
 check cmd/system-mcp   "graph|vector"
 
+# Engines and shared code must not hardcode a specific project pack in
+# string literals — pack data reaches the engines through flags/config only.
+# (The generic "projects/" marker string is allowed; "projects/<name>" is not.)
+pack_hits=$(grep -rn --include='*.go' -E '"projects/[a-z]' cmd internal graph vector system pkg 2>/dev/null || true)
+if [ -n "$pack_hits" ]; then
+  echo "boundary violation — engine/shared code references a specific project pack:"
+  echo "$pack_hits"
+  fail=1
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "engine boundaries: OK"
 fi

@@ -20,7 +20,7 @@
 //
 // Usage:
 //
-//	cks-inventory-check -project docs/domain-knowledge/projects/go-stablenet
+//	cks-inventory-check -project projects/stablenet/domain-knowledge
 //
 // Exit codes:
 //   - 0: no errors. Warnings (if any) printed to stderr.

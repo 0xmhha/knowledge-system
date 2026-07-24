@@ -26,7 +26,7 @@
 //
 // Usage:
 //
-//	cks-promotion-worksheet -project docs/domain-knowledge/projects/go-stablenet
+//	cks-promotion-worksheet -project projects/stablenet/domain-knowledge
 //	cks-promotion-worksheet -project ... -out verification-worksheet.md
 //	cks-promotion-worksheet -project ... -status draft        # any status filter
 //	cks-promotion-worksheet -project ... -priority P0         # priority filter
@@ -472,12 +472,14 @@ func renderInlineList(items []string) string {
 }
 
 // relativeProjectPath shortens an absolute project dir to its
-// docs/domain-knowledge/... tail so the inline command is readable.
-// Falls back to the absolute path if the tail is not present.
+// projects/... (or legacy docs/domain-knowledge/...) tail so the inline
+// command is readable. Falls back to the absolute path if no marker is
+// present.
 func relativeProjectPath(abs string) string {
-	const marker = "docs/domain-knowledge/"
-	if i := strings.Index(abs, marker); i >= 0 {
-		return abs[i:]
+	for _, marker := range []string{"projects/", "docs/domain-knowledge/"} {
+		if i := strings.Index(abs, marker); i >= 0 {
+			return abs[i:]
+		}
 	}
 	return abs
 }

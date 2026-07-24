@@ -1,6 +1,13 @@
-package policy
+// Package validate holds data-validation tests for the stablenet project
+// pack: they load the pack's YAML through the engine loaders and assert the
+// content is well-formed. Projects may import engine code (one-way rule);
+// engines never reference projects.
+package validate
 
 import (
+	policy "github.com/0xmhha/knowledge-system/internal/vector/policy"
+	vtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
+
 	"path/filepath"
 	"testing"
 )
@@ -11,9 +18,9 @@ import (
 // should be deliberate — this test makes that deliberate.
 func TestStablenetYaml_ParsesAndCovers(t *testing.T) {
 	// Find the policy file from the test's working dir
-	// (internal/vector/policy/ → ../../../vector/policy/stablenet.yaml).
-	path := filepath.Join("..", "..", "..", "vector", "policy", "stablenet.yaml")
-	p, err := Load(path)
+	// (projects/stablenet/validate/ → ../policies/vector.yaml).
+	path := filepath.Join("..", "policies", "vector.yaml")
+	p, err := policy.Load(path)
 	if err != nil {
 		t.Fatalf("Load %s: %v", path, err)
 	}
@@ -24,7 +31,7 @@ func TestStablenetYaml_ParsesAndCovers(t *testing.T) {
 		"miner", "evm", "rawdb", "types", "rlp", "accounts",
 		"tracers", "cli", "docs",
 	}
-	got := map[string]CategoryRule{}
+	got := map[string]policy.CategoryRule{}
 	for _, c := range p.Categories {
 		got[c.Name] = c
 	}
@@ -54,8 +61,8 @@ func TestStablenetYaml_ParsesAndCovers(t *testing.T) {
 // If go-stablenet's layout shifts (file moves, renames), this test
 // flags the policy as out-of-date.
 func TestStablenetYaml_ClassifiesKnownFiles(t *testing.T) {
-	path := filepath.Join("..", "..", "..", "vector", "policy", "stablenet.yaml")
-	p, err := Load(path)
+	path := filepath.Join("..", "policies", "vector.yaml")
+	p, err := policy.Load(path)
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
@@ -103,8 +110,9 @@ func TestStablenetYaml_ClassifiesKnownFiles(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.file, func(t *testing.T) {
-			got, _ := p.match(tc.file)
-			if got != tc.want {
+			chunks := []vtypes.Chunk{{File: tc.file}}
+			p.Apply(chunks)
+			if got := chunks[0].Category; got != tc.want {
 				t.Errorf("classify(%s) = %q, want %q", tc.file, got, tc.want)
 			}
 		})
