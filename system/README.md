@@ -1,7 +1,7 @@
 # code-knowledge-system (cks)
 
-Composes [`code-knowledge-graph`](https://github.com/0xmhha/code-knowledge-graph) (ckg) and
-[`code-knowledge-vector`](https://github.com/0xmhha/code-knowledge-vector) (ckv) into a
+Composes [`code-knowledge-graph`](https://github.com/0xmhha/knowledge-system) (ckg) and
+[`code-knowledge-vector`](https://github.com/0xmhha/knowledge-system) (ckv) into a
 token-budgeted, sanitized `EvidencePack` and exposes it through MCP for upper layers
 (coding agent, external LLM clients).
 
@@ -96,8 +96,8 @@ the same `ckv`/`ckg` builds, forwarding `--policy-file` when `backends.ckg.polic
 
 ## Dependencies (wired)
 
-- `github.com/0xmhha/code-knowledge-graph` — graph + BM25 backend (`pkg/store`, in-process); pinned at released **v0.1.0** (no `replace`)
-- `github.com/0xmhha/code-knowledge-vector` — vector backend (`pkg/ckv`, in-process; sqlite-vec CGO); pinned at released **v0.1.0** (no `replace`)
+- `github.com/0xmhha/knowledge-system` — graph + BM25 backend (`pkg/store`, in-process); pinned at released **v0.1.0** (no `replace`)
+- `github.com/0xmhha/knowledge-system` — vector backend (`pkg/ckv`, in-process; sqlite-vec CGO); pinned at released **v0.1.0** (no `replace`)
 - `github.com/mark3labs/mcp-go` — MCP server (v0.56.0)
 
 ## Layout

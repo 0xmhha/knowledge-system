@@ -536,7 +536,7 @@ cobra root는 약 20개 subcommand를 등록한다 (`cmd/ckg/root.go:30-36`의 `
 ### Go module (`go.mod`)
 
 ```
-module github.com/0xmhha/code-knowledge-graph
+module github.com/0xmhha/knowledge-system
 go 1.25.5
 toolchain go1.25.12
 

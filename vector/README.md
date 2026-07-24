@@ -5,7 +5,7 @@ repository as embedding vectors at function / type / heading
 granularity, stores them in an embedded SQLite + `sqlite-vec`
 database, and serves retrieval over a CLI, an in-process Go API, and
 an MCP server. The companion project
-[`code-knowledge-graph`](https://github.com/0xmhha/code-knowledge-graph)
+[`code-knowledge-graph`](https://github.com/0xmhha/knowledge-system)
 (CKG) provides symbol-graph search; the two are designed to be
 combined by larger systems (CKS) for hybrid retrieval.
 
@@ -20,7 +20,7 @@ combined by larger systems (CKS) for hybrid retrieval.
 - **Embedders**: `mock` (no system dependencies, deterministic feature-hash) and `bgeonnx` (ONNX Runtime + HuggingFace tokenizers, BERT-class models).
 - **CLI**: `build`, `query`, `eval`, `freshness`, `mcp`, `model`.
 - **MCP server**: stdio JSON-RPC. Tools: `cks.context.semantic_search`, `cks.ops.health`, `cks.ops.warmup`, `cks.ops.get_freshness`. Every response carries a top-level `schema_version`.
-- **Go API**: import `github.com/0xmhha/code-knowledge-vector/pkg/ckv` for `Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` in the calling process.
+- **Go API**: import `github.com/0xmhha/knowledge-system/pkg/ckv` for `Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` in the calling process.
 - **Operational**: host memory pre-check + adaptive batching (`CKV_MEM_GUARD`), CoreML execution provider tuning on macOS (`CKV_COREML_*`), ORT thread overrides, panic-safe MCP middleware.
 
 ## Quickstart
@@ -50,7 +50,7 @@ CGO_LDFLAGS="-L$HOME/lib" go build -tags bgeonnx -o ./bin/ckv ./cmd/ckv
 import (
     "context"
 
-    "github.com/0xmhha/code-knowledge-vector/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/pkg/ckv"
 )
 
 func search() error {

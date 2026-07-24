@@ -30,7 +30,7 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 CI (`.github/workflows/ci.yml`) runs `go vet ./...`, `go test -race ./...`,
 `make lint`, `make audit`, and the eval gate. **Match CI locally before pushing.**
 
-- Go **1.25.x** (toolchain go1.25.9). Module: `github.com/0xmhha/code-knowledge-graph`.
+- Go **1.25.x** (toolchain go1.25.9). Module: `github.com/0xmhha/knowledge-system`.
 - **gofmt drift is a hard gate** (`fmt-check`). Run `make fmt` before commit;
   `make install-hooks` wires the local pre-commit hook (opt-in).
 

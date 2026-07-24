@@ -1,7 +1,7 @@
 # CKG — Code Knowledge Graph
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![CI](https://github.com/0xmhha/code-knowledge-graph/actions/workflows/ci.yml/badge.svg)](https://github.com/0xmhha/code-knowledge-graph/actions/workflows/ci.yml)
+[![CI](https://github.com/0xmhha/knowledge-system/actions/workflows/ci.yml/badge.svg)](https://github.com/0xmhha/knowledge-system/actions/workflows/ci.yml)
 
 Build a queryable **knowledge graph** from a code path. Point CKG at a
 directory and it parses the source (Go / TypeScript / Solidity / Protobuf)
@@ -19,7 +19,7 @@ an MCP-enabled LLM, or a 3D web viewer.
 ## Quick start
 
 ```bash
-git clone https://github.com/0xmhha/code-knowledge-graph
+git clone https://github.com/0xmhha/knowledge-system
 cd code-knowledge-graph
 make build-full   # viewer + binary; `make build` = binary only (no 3D viewer UI)
 
@@ -129,7 +129,7 @@ Contributions are welcome. To get started:
 
 For larger changes, please open an issue first to discuss the design.
 Report bugs and request features at
-<https://github.com/0xmhha/code-knowledge-graph/issues>.
+<https://github.com/0xmhha/knowledge-system/issues>.
 
 ## License
 

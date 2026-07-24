@@ -9,8 +9,8 @@ CKG는 stablenet-ai-agent의 **Coding Agent System** 구축에서 *Stage S0의 �
 
 | Repo | 경로 | 책임 | go.mod |
 |---|---|---|---|
-| **CKG** (본 repo) | `/Users/.../tools/code-knowledge-graph` | Layer 1 그래프 + 일부 light/medium capability | `github.com/0xmhha/code-knowledge-graph` |
-| **CKV** | `/Users/.../tools/code-knowledge-vector` | Layer 1 vector store + semantic search | `github.com/0xmhha/code-knowledge-vector` (진행 중) |
+| **CKG** (본 repo) | `/Users/.../tools/code-knowledge-graph` | Layer 1 그래프 + 일부 light/medium capability | `github.com/0xmhha/knowledge-system` |
+| **CKV** | `/Users/.../tools/code-knowledge-vector` | Layer 1 vector store + semantic search | `github.com/0xmhha/knowledge-system` (진행 중) |
 | **CKS** | `/Users/.../tools/code-knowledge-system` | Layer 2~4 (Working Memory + Orchestrator + Query API) | (미생성, S1에서 init) |
 | **Coding Agent** | `stablenet-ai-agent/` | Orchestrator, `/command`, PR 생성 | (S2에서 시작) |
 

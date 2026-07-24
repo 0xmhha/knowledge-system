@@ -152,9 +152,9 @@ Phase 3 종료 조건:
 2. **T-15** YAML → JSONL 동기화 도구로 `stablenet-ai-agent/benchmark/known-issues.jsonl` 생성 (§6.2 규약)
 3. 30 task × 4 방식 = 120 측정점 → `Report.md` 산출
 4. *동시에* S1 (CKS) 진입 준비:
-   - CKS repo (`/Users/.../code-knowledge-system`) `go mod init github.com/0xmhha/code-knowledge-system`
-   - CKG를 `require github.com/0xmhha/code-knowledge-graph` import
-   - CKV를 `require github.com/0xmhha/code-knowledge-vector` import
+   - CKS repo (`/Users/.../code-knowledge-system`) `go mod init github.com/0xmhha/knowledge-system`
+   - CKG를 `require github.com/0xmhha/knowledge-system` import
+   - CKV를 `require github.com/0xmhha/knowledge-system` import
    - T-01·T-10은 CKS의 S1 plan에 task로 등록 (HANDOFF.md에 명시된 위치 그대로)
 
 Phase 4 종료 조건:
@@ -192,7 +192,7 @@ Phase 4 종료 조건:
 
 | Repo | 경로 | 상태 |
 |---|---|---|
-| **CKG** | `<workspace>/tools/code-knowledge-graph` | go.mod = `github.com/0xmhha/code-knowledge-graph`. 진행 중 |
+| **CKG** | `<workspace>/tools/code-knowledge-graph` | go.mod = `github.com/0xmhha/knowledge-system`. 진행 중 |
 | **CKV** | `<workspace>/tools/code-knowledge-vector` | **진행 중** — go.mod, sqlite-vec 의존성, cmd/internal/pkg 구조 + bin. 활발 개발 |
 | **CKS** | `<workspace>/tools/code-knowledge-system` | **거의 빈 repo** — `.git`만 존재. S1 시작점. go.mod 미생성 |
 
@@ -280,7 +280,7 @@ Phase 4 종료 조건:
 3. CKG가 `cks-compat` 빌드 태그를 제공해 internal 일부를 internal-test로 export — 임시 방편
 
 **Acceptance criteria (T-14)**:
-- CKS의 `cmd/cks-mcp/main.go`에서 `import "github.com/0xmhha/code-knowledge-graph/pkg/mcphandlers"`로 `RegisterFindSymbol(server, store)` 같은 함수 호출 가능
+- CKS의 `cmd/cks-mcp/main.go`에서 `import "github.com/0xmhha/knowledge-system/pkg/mcphandlers"`로 `RegisterFindSymbol(server, store)` 같은 함수 호출 가능
 - 기존 `ckg-mcp` 바이너리 동작 변경 없음 (회귀 test)
 - `internal/mcp/server.go`는 `pkg/mcphandlers` 호출만 남기고 등록 로직 이전
 
@@ -298,7 +298,7 @@ Phase 4 종료 조건:
 ### 10.5 Repo 경계 위반 alarm
 
 다음 패턴이 보이면 *경계 위반* — code review에서 반려:
-- CKG에 `import "github.com/0xmhha/code-knowledge-system/..."` (역방향 의존)
+- CKG에 `import "github.com/0xmhha/knowledge-system/..."` (역방향 의존)
 - CKG에 sanitize 룰셋 또는 redact 로직 추가
 - CKG에 Working Memory (`remember_fact`, `record_decision`) 추가
 - CKG에 vector store 의존성 추가

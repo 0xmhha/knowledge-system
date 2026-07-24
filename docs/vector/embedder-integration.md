@@ -30,7 +30,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/0xmhha/code-knowledge-vector/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/pkg/ckv"
 )
 
 func main() {
@@ -129,8 +129,8 @@ adapter를 import 하면 같은 build tag가 *consumer build* 에도 전파된�
 package mycks
 
 import (
-    "github.com/0xmhha/code-knowledge-vector/internal/embed/bgeonnx"
-    "github.com/0xmhha/code-knowledge-vector/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/internal/embed/bgeonnx"
+    "github.com/0xmhha/knowledge-system/pkg/ckv"
 )
 
 func openProductionEngine(indexPath, modelDir string) (*ckv.Engine, func(), error) {
