@@ -1,0 +1,91 @@
+// knowledge-setup builds a complete knowledge dataset for a source tree in
+// one command: graph index, vector index aligned to it, and an alignment
+// verification gate. It is the typed replacement for the per-project shell
+// scripts that used to encode this sequence.
+//
+//	knowledge-setup --src /path/to/repo --out /path/to/dataset \
+//	    --embedder ollama --model-name bge-m3
+//
+// The graph build is incremental (the engine reuses its cache), so the same
+// command serves both first-time setup and refresh runs.
+//
+// --progress selects the output contract: "text" (default) prints
+// human-readable lines to stderr; "json" emits one JSON event object per
+// line on stdout — the machine-readable stream orchestrators consume.
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
+)
+
+func main() {
+	var o setup.Options
+	flag.StringVar(&o.Src, "src", "", "source tree to index (required)")
+	flag.StringVar(&o.Out, "out", "", "dataset root; graph index in <out>/graph, vector index in <out>/vector (required)")
+	flag.StringVar(&o.GraphBin, "graph-bin", "", "graph engine CLI (default: ckg on PATH)")
+	flag.StringVar(&o.VectorBin, "vector-bin", "", "vector engine CLI (default: ckv on PATH)")
+	flag.StringVar(&o.PolicyFile, "policy-file", "", "governance policy YAML for graph enrichment")
+	flag.StringVar(&o.SecurityPatternFile, "security-pattern-file", "", "security-pattern YAML for graph enrichment")
+	flag.StringVar(&o.Embedder, "embedder", "", "vector embedding backend (mock, bgeonnx, ollama)")
+	flag.StringVar(&o.ModelName, "model-name", "", "vector embedding model name")
+	flag.IntVar(&o.EmbedDim, "embed-dim", 0, "vector embedding dimension")
+	flag.StringVar(&o.OllamaURL, "ollama-url", "", "ollama endpoint (exported as CKV_OLLAMA_ENDPOINT)")
+	flag.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
+	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
+	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
+	flag.Parse()
+
+	emit, err := progressSink(*progress)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+		os.Exit(2)
+	}
+
+	plan, err := setup.BuildPlan(o)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+		os.Exit(2)
+	}
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	if err := setup.Execute(ctx, plan, setup.SubprocessRunner{}, emit); err != nil {
+		fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+		os.Exit(1)
+	}
+	fmt.Fprintln(os.Stderr, "knowledge-setup: dataset ready at", o.Out)
+}
+
+func progressSink(mode string) (func(setup.Event), error) {
+	switch mode {
+	case "text":
+		return func(e setup.Event) {
+			switch e.Type {
+			case "start":
+				fmt.Fprintf(os.Stderr, "==> [%s] %s\n", e.Step, e.Message)
+			case "output":
+				fmt.Fprintf(os.Stderr, "    %s\n", e.Message)
+			case "warning":
+				fmt.Fprintf(os.Stderr, " !  [%s] %s\n", e.Step, e.Message)
+			case "done":
+				fmt.Fprintf(os.Stderr, "<== [%s] done\n", e.Step)
+			case "error":
+				fmt.Fprintf(os.Stderr, "ERR [%s] %s\n", e.Step, e.Message)
+			}
+		}, nil
+	case "json":
+		enc := json.NewEncoder(os.Stdout)
+		return func(e setup.Event) { _ = enc.Encode(e) }, nil
+	default:
+		return nil, fmt.Errorf("unknown --progress %q (text|json)", mode)
+	}
+}
