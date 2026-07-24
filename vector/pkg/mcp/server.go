@@ -136,7 +136,7 @@ func (s *Server) ServeHTTP(addr string) error {
 func (s *Server) Underlying() *server.MCPServer { return s.mcp }
 
 func (s *Server) registerTools() {
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.semantic_search",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.semantic_search"),
 		mcpgo.WithDescription("Semantic code search over the CKV vector index. Returns ranked hits with citations (file, line range, commit_hash) and budget-adjusted snippets. READ-ONLY."),
 		mcpgo.WithString("intent",
 			mcpgo.Description("Natural-language description of what the caller is looking for."),
@@ -180,19 +180,19 @@ func (s *Server) registerTools() {
 		),
 	), s.handleSemanticSearch)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.ops.get_freshness",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("ops.get_freshness"),
 		mcpgo.WithDescription("Compare the index's indexed_head with the source tree's current git HEAD. Returns the list of changed files if stale. READ-ONLY."),
 	), s.handleGetFreshness)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.ops.health",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("ops.health"),
 		mcpgo.WithDescription("Report index identity (embedding model, dim, indexed_head, chunk count). Used as a startup probe. READ-ONLY."),
 	), s.handleHealth)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.ops.warmup",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("ops.warmup"),
 		mcpgo.WithDescription("Pre-load the embedder by running a no-op embed. bgeonnx pays ONNX session + CoreML compile cost on the first call (1-3s typical, multi-second worst case), which would otherwise surface on the first user-facing semantic_search. Call once after initialize. READ-ONLY."),
 	), s.handleWarmup)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.related_changes",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.related_changes"),
 		mcpgo.WithDescription("Look up PRs that touched a given file. Returns PR refs (number, title, merged date) sorted by recency. Use to understand recent change history around a code area. READ-ONLY."),
 		mcpgo.WithString("file",
 			mcpgo.Description("Repo-relative file path to look up (e.g. 'internal/query/engine.go')."),
@@ -200,7 +200,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleRelatedChanges)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.embed",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.embed"),
 		mcpgo.WithDescription("Convert text into an embedding vector. Returns the raw float32 vector. Use for custom retrieval pipelines where the caller controls search separately. READ-ONLY."),
 		mcpgo.WithString("text",
 			mcpgo.Description("Text to embed."),
@@ -208,7 +208,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleEmbed)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.vector_search",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.vector_search"),
 		mcpgo.WithDescription("Run approximate nearest neighbor search with a pre-computed vector. Returns raw candidate hits without reranking or filtering. Use with cks.context.embed for iterative retrieval. READ-ONLY."),
 		mcpgo.WithString("vector_json",
 			mcpgo.Description("JSON array of float32 values (the query vector)."),
@@ -222,7 +222,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleVectorSearch)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.rerank",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.rerank"),
 		mcpgo.WithDescription("Rerank candidate chunks using BM25 + RRF fusion against the given intent. Input is a list of chunk IDs from a prior vector_search. READ-ONLY."),
 		mcpgo.WithString("intent",
 			mcpgo.Description("Natural-language intent for BM25 scoring."),
@@ -234,7 +234,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleRerank)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.ops.index",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("ops.index"),
 		mcpgo.WithDescription("Trigger indexing of a source repository. mode=full rebuilds from scratch; mode=incremental updates only files changed since the last index. Returns stats on processed/created/updated/deleted chunks."),
 		mcpgo.WithString("mode",
 			mcpgo.Description("Indexing mode: full | incremental"),
@@ -246,7 +246,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleIndex)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.keyword_search",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.keyword_search"),
 		mcpgo.WithDescription("BM25 keyword search over chunk text + symbol names. Use for exact-symbol or domain-vocabulary queries (e.g. 'ValidateToken', 'BLS aggregation'). Complements semantic_search — pick keyword when the user knows the identifier, semantic when the user describes the concept. READ-ONLY."),
 		mcpgo.WithString("query",
 			mcpgo.Description("Search query (will be code-aware-tokenized: CamelCase and snake_case are split into sub-tokens automatically)."),
@@ -263,7 +263,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleKeywordSearch)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.narrow_candidates",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.narrow_candidates"),
 		mcpgo.WithDescription("Refine a previous result set by filtering chunk IDs through category / language / path constraints. Returns the subset that survives the filter, in the input order. Score fields are zero — this is a metadata refinement, not a re-rank. READ-ONLY."),
 		mcpgo.WithString("chunk_ids_json",
 			mcpgo.Description("JSON array of chunk IDs to filter."),
@@ -280,7 +280,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleNarrowCandidates)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.explain_match",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.explain_match"),
 		mcpgo.WithDescription("Explain why a chunk would have matched an intent. Returns the cosine distance to the intent vector, the BM25 score, which query tokens matched the chunk body, and the chunk's category + guidance. Useful when the agent wants to justify or debug a retrieval decision. READ-ONLY."),
 		mcpgo.WithString("chunk_id",
 			mcpgo.Description("Chunk ID returned by an earlier search."),
@@ -292,7 +292,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleExplainMatch)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.find_invariants",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.find_invariants"),
 		mcpgo.WithDescription("List invariant statements (CRITICAL / IMPORTANT / INVARIANT / CONSENSUS / panic with policy keywords) for a file or category. tier_min filters by detection confidence (1 = explicit markers, 2 = new convention markers, 3 = heuristic). Returns marker name, tier, text, and the source chunk's category/guidance. READ-ONLY."),
 		mcpgo.WithString("file",
 			mcpgo.Description("Repo-relative file path. Empty matches every file."),
@@ -305,14 +305,14 @@ func (s *Server) registerTools() {
 		),
 	), s.handleFindInvariants)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.get_conventions",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.get_conventions"),
 		mcpgo.WithDescription("Return the per-package AST convention summary plus raw stats (error patterns, logger family, naming, concurrency, table-driven idioms). Use before proposing code edits so the new code matches the package's existing idioms. READ-ONLY."),
 		mcpgo.WithString("package",
 			mcpgo.Description("Package directory prefix (e.g. 'consensus/parlia'). Empty returns every package's conventions."),
 		),
 	), s.handleGetConventions)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.expand_in_file",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.expand_in_file"),
 		mcpgo.WithDescription("Return the chunk at chunk_id plus its N neighbours in the same file, ordered by start_line. Useful for context expansion after a precise hit. READ-ONLY."),
 		mcpgo.WithString("chunk_id",
 			mcpgo.Description("Chunk ID returned by an earlier search."),
@@ -328,27 +328,27 @@ func (s *Server) registerTools() {
 
 	// --- flow-aware tools (Phase D): trace a symptom to its cause over the
 	// curated flow corpus. READ-ONLY. ---
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.get_flow",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.get_flow"),
 		mcpgo.WithDescription("Lay out a curated flow's steps in call order: each step's symbol, citation (file:line), reads/writes/emits, failure branches, and invariants. Select by exactly one of flow_id / entry_point / invariant_id. READ-ONLY."),
 		mcpgo.WithString("flow_id", mcpgo.Description("Flow id (e.g. 'ep-cli-init').")),
 		mcpgo.WithString("entry_point", mcpgo.Description("Entry-point id (e.g. 'EP-CLI-INIT').")),
 		mcpgo.WithString("invariant_id", mcpgo.Description("Invariant id; resolves to the first flow in its enforced_at.")),
 	), s.handleGetFlow)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.expand_flow",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.expand_flow"),
 		mcpgo.WithDescription("Return the steps adjacent to a step — downstream (direction=down, follows calls) or upstream (direction=up, follows callers) — up to `hops` away, plus the origin step's failure branches. READ-ONLY."),
 		mcpgo.WithString("step_id", mcpgo.Description("Step id to expand from."), mcpgo.Required()),
 		mcpgo.WithString("direction", mcpgo.Description("'down' (callees) or 'up' (callers). Default 'down'.")),
 		mcpgo.WithNumber("hops", mcpgo.Description("Traversal depth (default 1).")),
 	), s.handleExpandFlow)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.find_branches",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.find_branches"),
 		mcpgo.WithDescription("Map a symptom phrase to the failure branches (when→then@at) of the most relevant flow steps. Use for 'this error/behavior happens — where is it decided?' diagnosis. READ-ONLY."),
 		mcpgo.WithString("symptom_text", mcpgo.Description("Natural-language symptom / failure condition."), mcpgo.Required()),
 		mcpgo.WithNumber("k", mcpgo.Description("Top-K flow steps to draw branches from (default 10).")),
 	), s.handleFindBranches)
 
-	s.mcp.AddTool(mcpgo.NewTool("cks.context.get_invariant_enforcement",
+	s.mcp.AddTool(mcpgo.NewTool(nsName("context.get_invariant_enforcement"),
 		mcpgo.WithDescription("List every (flow, step, loc) where a curated invariant is enforced. Enables code-derived implementation-invariant guardrails. READ-ONLY."),
 		mcpgo.WithString("inv_id", mcpgo.Description("Curated invariant id (e.g. 'INV-CONSENSUS-01')."), mcpgo.Required()),
 	), s.handleGetInvariantEnforcement)
