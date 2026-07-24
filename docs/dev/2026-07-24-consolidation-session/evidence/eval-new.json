@@ -1,0 +1,172 @@
+{
+  "graph": "/private/tmp/claude-501/-Users-wm-it-25-0220-Work-github/1cfcad5a-78b0-47f6-a344-f49664303cef/scratchpad/eq/new-graph",
+  "fixtures_total": 8,
+  "passed": 7,
+  "failed": 1,
+  "aggregate": {
+    "recall": 1,
+    "precision": 0.7352941176470589,
+    "f1": 0.8474576271186441
+  },
+  "results": [
+    {
+      "id": "SNK01-exact-sticky-proposer",
+      "tool": "find_symbol",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "validator.stickyProposer"
+      ]
+    },
+    {
+      "id": "SNK02-exact-get-validators",
+      "tool": "find_symbol",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "backend.API.GetValidators"
+      ]
+    },
+    {
+      "id": "SNK03-suffix-get-max-minter-allowance",
+      "tool": "find_symbol",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "systemcontracts.GetMaxMinterAllowance"
+      ]
+    },
+    {
+      "id": "SNK04-and-proposer-sticky",
+      "tool": "search_text",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "validator.stickyProposer",
+        "wbft.NewStickyProposerPolicy",
+        "validator.testStickyProposer"
+      ]
+    },
+    {
+      "id": "SNK05-and-future-preprepare",
+      "tool": "search_text",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "core.Core.futurePreprepareTimer",
+        "core.Core.stopFuturePreprepareTimer"
+      ]
+    },
+    {
+      "id": "SNK06-and-mint-allowance",
+      "tool": "search_text",
+      "pass": false,
+      "pass_recall": true,
+      "pass_precision": false,
+      "score": {
+        "recall": 1,
+        "precision": 0.4,
+        "f1": 0.5714285714285715,
+        "extra": [
+          "test.EdgeCaseTestContext.InitialMinterAllowance",
+          "test.EdgeCaseTestContext.MinterAllowance",
+          "test.GovWBFT.GetMinterAllowance",
+          "test.GovWBFT.GetMockFiatTokenMinterAllowance",
+          "test.GovWBFT.MinterAllowance",
+          "test.StateChangeExpectation.MinterAllowanceDecrease",
+          "test.StateSnapshot.MinterAllowance",
+          "test.TestEdgeCase_E2_MintAllowanceBoundary",
+          "test.TestGovMasterMinter_MinterAllowanceTracking"
+        ]
+      },
+      "got": [
+        "systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE",
+        "test.StateSnapshot.MinterAllowance",
+        "test.TestEdgeCase_E2_MintAllowanceBoundary",
+        "test.StateChangeExpectation.MinterAllowanceDecrease",
+        "test.TestGovMasterMinter_MinterAllowanceTracking",
+        "test.GovWBFT.MinterAllowance",
+        "systemcontracts.DefaultMaxMinterAllowance",
+        "systemcontracts.GetMaxMinterAllowance",
+        "test.EdgeCaseTestContext.MinterAllowance",
+        "systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance",
+        "test.EdgeCaseTestContext.InitialMinterAllowance",
+        "systemcontracts.TestDefaultMaxMinterAllowance",
+        "systemcontracts.TestGetMaxMinterAllowance",
+        "test.GovWBFT.GetMinterAllowance",
+        "test.GovWBFT.GetMockFiatTokenMinterAllowance"
+      ]
+    },
+    {
+      "id": "SNK07-and-quorum-dedup",
+      "tool": "search_text",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "systemcontracts.TestQuorumAfterDeduplication"
+      ]
+    },
+    {
+      "id": "SNK08-and-effective-gasprice",
+      "tool": "search_text",
+      "pass": true,
+      "pass_recall": true,
+      "pass_precision": true,
+      "score": {
+        "recall": 1,
+        "precision": 1,
+        "f1": 1
+      },
+      "got": [
+        "types.Receipt.EffectiveGasPrice",
+        "types.receiptMarshaling.EffectiveGasPrice",
+        "types.storedReceiptRLP.EffectiveGasPrice",
+        "rawdb.storedReceiptRLP.EffectiveGasPrice",
+        "graphql.Transaction.EffectiveGasPrice",
+        "types.LegacyTx.effectiveGasPrice",
+        "types.BlobTx.effectiveGasPrice",
+        "types.AccessListTx.effectiveGasPrice",
+        "types.SetCodeTx.effectiveGasPrice",
+        "types.DynamicFeeTx.effectiveGasPrice",
+        "types.FeeDelegateDynamicFeeTx.effectiveGasPrice",
+        "ethapi.effectiveGasPrice"
+      ]
+    }
+  ]
+}
