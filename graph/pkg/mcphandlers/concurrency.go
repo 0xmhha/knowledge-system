@@ -18,7 +18,7 @@ import (
 // dev-only ckg server, 00 §7), mirroring RegisterImpactOfChange.
 func RegisterConcurrencyImpact(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
-	tool := mcp.NewTool("concurrency_impact",
+	tool := nsTool("concurrency_impact",
 		mcp.WithDescription(
 			"Concurrency blast radius for a symbol: modules that affect or are affected by it via "+
 				"goroutine/channel/lock edges (spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock). "+

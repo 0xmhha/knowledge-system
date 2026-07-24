@@ -41,7 +41,7 @@ func NewBenchHandlers(store persist.StoreReader) (*server.MCPServer, map[string]
 	mcphandlers.RegisterAll(s, store)
 	handlers := make(map[string]server.ToolHandlerFunc, len(BenchToolNames))
 	for _, name := range BenchToolNames {
-		t := s.GetTool(name)
+		t := s.GetTool(mcphandlers.ToolName(name))
 		if t == nil || t.Handler == nil {
 			continue
 		}

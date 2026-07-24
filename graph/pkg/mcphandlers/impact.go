@@ -22,7 +22,7 @@ import (
 // MCP request envelope only.
 func RegisterImpactOfChange(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
-	tool := mcp.NewTool("impact_of_change",
+	tool := nsTool("impact_of_change",
 		mcp.WithDescription(
 			"Reverse-dependency closure for a symbol or file. Returns nodes/edges grouped by impact category "+
 				"(callers, interface_impact, type_users, distributed, concurrent, other_refs). "+

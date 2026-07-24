@@ -23,7 +23,7 @@ import (
 // it change, what depends on it?" in a single tool call.
 func RegisterGetContextForTask(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
-	tool := mcp.NewTool("get_context_for_task",
+	tool := nsTool("get_context_for_task",
 		mcp.WithDescription("Smart 1-shot retrieval: BM25 -> 1-hop expand -> score -> diversify -> pack. "+
 			"Optionally folds PR breadcrumbs (include_recent_prs) and reverse-dep impact "+
 			"(include_impact) into the same response so coding agents avoid extra round-trips."),
