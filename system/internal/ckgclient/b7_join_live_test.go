@@ -30,9 +30,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/internal/embedder"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/embedder"
 )
 
 func b7env(key, dflt string) string {

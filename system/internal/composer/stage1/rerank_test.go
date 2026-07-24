@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // rerankFake gives the test deterministic per-keyword BM25 hits without

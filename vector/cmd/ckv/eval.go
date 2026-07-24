@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/eval"
-	"github.com/0xmhha/code-knowledge-vector/internal/eval/prregress"
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/eval"
+	"github.com/0xmhha/knowledge-system/vector/internal/eval/prregress"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 type evalOpts struct {

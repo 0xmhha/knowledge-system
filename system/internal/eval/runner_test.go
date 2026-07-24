@@ -7,7 +7,7 @@ import (
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // --- mockMCPClient ---

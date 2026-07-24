@@ -10,7 +10,7 @@
 //
 //   - Fake (this package, B.1):   in-memory canned responses for unit tests.
 //   - Real (Phase C.1):            adapter over
-//     github.com/0xmhha/code-knowledge-graph
+//     github.com/0xmhha/knowledge-system/graph
 //     pkg/store.Reader.
 //
 // Stability: the interface here is the contract cks code depends on. Real
@@ -21,7 +21,7 @@ package ckgclient
 import (
 	"context"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Client is the cks-internal interface to a ckg backend.

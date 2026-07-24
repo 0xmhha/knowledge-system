@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // TestSearchFTS_ScoreContract pins the external Reader.SearchFTS Score /

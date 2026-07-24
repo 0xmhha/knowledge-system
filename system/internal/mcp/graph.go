@@ -7,8 +7,8 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Tool names — exported so callers and tests can reference them

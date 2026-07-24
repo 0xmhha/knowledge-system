@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	tsp "github.com/0xmhha/code-knowledge-graph/internal/parse/typescript"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	tsp "github.com/0xmhha/knowledge-system/graph/internal/parse/typescript"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestTSDistributed_FixtureMatrix is the W1 acceptance check (schema 1.9 spec

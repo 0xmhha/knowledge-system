@@ -6,8 +6,8 @@ import (
 	gotypes "go/types"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // distributed.go implements E3 (CKS deep-dive § 4.1, "Graph 5: Distributed

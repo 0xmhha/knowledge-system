@@ -21,8 +21,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // jsonGraphHeader is the top-level envelope written before the streaming

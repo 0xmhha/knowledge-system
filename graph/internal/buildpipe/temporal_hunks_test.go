@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/temporal"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/temporal"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestBuildHunkNodes_StableIDs locks down the (sha, file, idx) → node ID

@@ -12,7 +12,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	solang "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity/binding"
+	solang "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity/binding"
 )
 
 // TestDetectorQueriesCompile compiles every tree-sitter query string in the

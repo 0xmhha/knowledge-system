@@ -15,9 +15,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
 )
 
 func newFixtureStore(t *testing.T) persist.Store {

@@ -3,7 +3,7 @@ package solidity
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 func TestParseExtractsContractMembers(t *testing.T) {

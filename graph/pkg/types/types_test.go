@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 func TestAllNodeTypes_Count(t *testing.T) {

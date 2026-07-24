@@ -3,7 +3,7 @@ package query
 import (
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // charsPerToken approximates a sub-word tokenizer for budget math.

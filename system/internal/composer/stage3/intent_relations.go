@@ -1,6 +1,6 @@
 package stage3
 
-import "github.com/0xmhha/code-knowledge-system/pkg/contract"
+import "github.com/0xmhha/knowledge-system/system/pkg/contract"
 
 // intentToRelations returns the graph relations Stage 3 should traverse
 // for the given Intent.

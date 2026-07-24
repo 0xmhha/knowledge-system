@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Dummy is a Client that, instead of calling a real ckv backend, records

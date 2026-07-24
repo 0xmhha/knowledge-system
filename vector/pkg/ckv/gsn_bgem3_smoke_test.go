@@ -23,8 +23,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/ckv"
-	"github.com/0xmhha/code-knowledge-vector/pkg/embed/ollama"
+	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
+	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
 )
 
 func TestGoStablenetBgeM3Smoke(t *testing.T) {

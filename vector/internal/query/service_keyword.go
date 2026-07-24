@@ -3,9 +3,9 @@ package query
 import (
 	"context"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query/bm25"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/query/bm25"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // KeywordIndex is a lazily-built in-memory BM25 index over every chunk

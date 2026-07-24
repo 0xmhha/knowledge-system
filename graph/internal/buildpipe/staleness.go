@@ -13,8 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // setStaleness records the staleness fingerprint on the manifest. Prefers a

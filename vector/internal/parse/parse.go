@@ -10,7 +10,7 @@
 // produces Chunks (with optional long-function splits) from those spans.
 package parse
 
-import "github.com/0xmhha/code-knowledge-vector/pkg/types"
+import "github.com/0xmhha/knowledge-system/vector/pkg/types"
 
 // SymbolSpan is one indexable region of a source file. Line numbers
 // are 1-based and inclusive on both ends.

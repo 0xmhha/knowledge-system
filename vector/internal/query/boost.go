@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // BoostOptions controls score boosting after vector + BM25 ranking.

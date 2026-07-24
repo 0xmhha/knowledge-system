@@ -10,8 +10,8 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // newConcurrencyStore builds the channel/goroutine fixture used to exercise

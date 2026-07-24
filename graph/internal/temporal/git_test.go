@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/temporal"
+	"github.com/0xmhha/knowledge-system/graph/internal/temporal"
 )
 
 // TestLoadHistory_BasicThreeFiles initialises a tiny repo with three files

@@ -9,10 +9,10 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
-	"github.com/0xmhha/code-knowledge-graph/pkg/mcphandlers"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/pkg/mcphandlers"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // TestRegisterAll_LocksEightTools is the external-import smoke test

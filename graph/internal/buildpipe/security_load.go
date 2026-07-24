@@ -3,8 +3,8 @@ package buildpipe
 import (
 	"log/slog"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/security"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/security"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // loadSecurityPatterns is the cold-path glue between pkg/security and

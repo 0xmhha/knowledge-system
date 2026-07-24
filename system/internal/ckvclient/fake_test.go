@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 func goodHit(file string, rank int, score float64) contract.Hit {

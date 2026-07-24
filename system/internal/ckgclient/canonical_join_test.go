@@ -19,7 +19,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 func canonNode(canonID, qname, file string, start, end int) types.Node {

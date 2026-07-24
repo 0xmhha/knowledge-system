@@ -22,8 +22,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/registry"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // DefaultEndpoint is the default Ollama API base URL.

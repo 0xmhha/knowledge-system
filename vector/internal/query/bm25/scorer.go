@@ -1,7 +1,7 @@
 // Package bm25 provides candidate-set BM25 rerank for CKV's query path.
 //
 // The Okapi implementation + code-aware tokenizer are adapted from the
-// sibling repo github.com/0xmhha/code-knowledge-graph at pkg/bm25 (2026-05-26
+// sibling repo github.com/0xmhha/knowledge-system/graph at pkg/bm25 (2026-05-26
 // snapshot). Per that package's header note, the algorithm is hand-written
 // from the BM25 description (Robertson, Walker 1994) and is not derivative
 // of any third-party library; we copy rather than depend across repos so the

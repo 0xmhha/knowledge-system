@@ -6,8 +6,8 @@ import (
 
 	mcp "github.com/mark3labs/mcp-go/mcp"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // interfaceMethodSeeds returns extra find_callers seeds for the interface-dispatch

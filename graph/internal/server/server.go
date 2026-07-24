@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
 )
 
 // Server bundles a read-only Store, a routed mux, and a logger. Construct

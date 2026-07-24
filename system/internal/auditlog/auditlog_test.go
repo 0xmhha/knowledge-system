@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/internal/envelope"
+	"github.com/0xmhha/knowledge-system/system/internal/envelope"
 )
 
 func decodeOne(t *testing.T, line string) Record {

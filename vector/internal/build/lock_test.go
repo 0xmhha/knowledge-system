@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
 )
 
 // TestAcquireDatasetLock_ExclusiveAndRelease verifies the advisory lock is

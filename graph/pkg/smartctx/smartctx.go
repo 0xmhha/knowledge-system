@@ -20,10 +20,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/bm25"
-	"github.com/0xmhha/code-knowledge-graph/pkg/impact"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // Options bundles the tunable knobs of BuildContext. Zero values are

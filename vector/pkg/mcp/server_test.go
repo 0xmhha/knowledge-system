@@ -10,9 +10,9 @@ import (
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 // buildSample mirrors the helper in internal/query: it indexes

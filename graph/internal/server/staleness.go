@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // computeStaleness compares the manifest's recorded SrcCommit against a live

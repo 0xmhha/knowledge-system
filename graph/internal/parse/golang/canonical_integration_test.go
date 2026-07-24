@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
 )
 
 // TestCanonicalID_IntegrationContract_DeterministicAndAlignable locks the CKG↔CKV

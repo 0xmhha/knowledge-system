@@ -3,7 +3,7 @@ package bm25_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
 )
 
 // TestExternalConsumer_IndexAndQuery exercises the public API from an

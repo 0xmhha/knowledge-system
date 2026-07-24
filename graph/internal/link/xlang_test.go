@@ -3,8 +3,8 @@ package link_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/link"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/link"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 func TestLinkBindsToContract(t *testing.T) {

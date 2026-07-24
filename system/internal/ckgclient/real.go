@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/concurrency"
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
-	"github.com/0xmhha/code-knowledge-graph/pkg/impact"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/concurrency"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // DefaultSearchLimit is the limit passed to ckg's SearchFTS when SearchOpts.K

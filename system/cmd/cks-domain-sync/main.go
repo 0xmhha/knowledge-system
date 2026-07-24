@@ -29,7 +29,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
 )
 
 func main() {

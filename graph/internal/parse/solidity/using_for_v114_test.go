@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	sol "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	sol "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W-C W6 V1.14 — cross-file struct validation for the V1.10-V1.13

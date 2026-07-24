@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/filterlist"
+	"github.com/0xmhha/knowledge-system/vector/internal/filterlist"
 )
 
 // DefaultMaxBytes caps individual file size to avoid OOM on accidental

@@ -30,11 +30,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/internal/footprint"
-	"github.com/0xmhha/code-knowledge-system/internal/vocab"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/footprint"
+	"github.com/0xmhha/knowledge-system/system/internal/vocab"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Default tuning values. Phase E tuning revisits with real-prompt data.

@@ -1,7 +1,7 @@
 package eval
 
 import (
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 // PerQuery is the scoring result for one fixture entry.

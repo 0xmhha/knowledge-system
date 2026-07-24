@@ -3,8 +3,8 @@ package mcphandlers
 import (
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // RegisterAll wires every ckg tool to s in one call. Equivalent to

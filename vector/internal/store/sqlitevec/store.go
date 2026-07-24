@@ -21,8 +21,8 @@ import (
 	sqlitevec "github.com/asg017/sqlite-vec-go-bindings/cgo"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
 
-	"github.com/0xmhha/code-knowledge-vector/internal/policy"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/policy"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // SchemaVersion is stamped into the manifest table on first init. Bump

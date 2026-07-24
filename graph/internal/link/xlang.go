@@ -3,7 +3,7 @@
 package link
 
 import (
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // ABISig mirrors solidity.ABISig to avoid coupling link → parse/solidity.

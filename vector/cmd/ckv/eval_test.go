@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/eval/prregress"
+	"github.com/0xmhha/knowledge-system/vector/internal/eval/prregress"
 )
 
 func TestMeanStd_Empty(t *testing.T) {

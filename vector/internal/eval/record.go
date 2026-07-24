@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 // RecordOptions controls one interactive record session.

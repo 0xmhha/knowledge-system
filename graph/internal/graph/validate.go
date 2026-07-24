@@ -3,7 +3,7 @@ package graph
 import (
 	"fmt"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // DanglingEdge captures an edge whose Src or Dst (or both) does not reference

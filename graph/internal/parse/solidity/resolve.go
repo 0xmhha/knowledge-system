@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W6 V1.0/V1.1/V1.3/V1.10 binding-map types. The per-contract using-for

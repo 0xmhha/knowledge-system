@@ -12,7 +12,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/0xmhha/code-knowledge-system/internal/envelope"
+	"github.com/0xmhha/knowledge-system/system/internal/envelope"
 )
 
 func newTestLogger(t *testing.T, level Level) (*Logger, *bytes.Buffer) {

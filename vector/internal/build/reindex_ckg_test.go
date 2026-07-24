@@ -12,10 +12,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/prdoc"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/prdoc"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
 )
 
 // writeCKGWithNode writes a minimal ckg graph.db carrying one alignment node

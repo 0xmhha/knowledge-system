@@ -15,7 +15,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
 )
 
 // newWatchCmd wires `ckg watch` — P3 #11. Runs an initial build, then

@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/glossary"
+	"github.com/0xmhha/knowledge-system/vector/internal/glossary"
 )
 
 type glossaryOpts struct {

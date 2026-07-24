@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/convert"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/model"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/registry"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/convert"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/model"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
 )
 
 func newModelCmd() *cobra.Command {

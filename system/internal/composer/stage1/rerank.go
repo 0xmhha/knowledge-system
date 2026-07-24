@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
 )
 
 // scoredKeyword captures one BM25 rerank result.

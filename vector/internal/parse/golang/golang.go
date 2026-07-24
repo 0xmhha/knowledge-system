@@ -10,8 +10,8 @@ import (
 	"go/parser"
 	"go/token"
 
-	cparse "github.com/0xmhha/code-knowledge-vector/internal/parse"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	cparse "github.com/0xmhha/knowledge-system/vector/internal/parse"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // Parser is the Go-language SymbolSpan extractor.

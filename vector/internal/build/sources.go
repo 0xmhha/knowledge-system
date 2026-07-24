@@ -9,9 +9,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/ckgalign"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/prdoc"
+	"github.com/0xmhha/knowledge-system/vector/internal/ckgalign"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/prdoc"
 )
 
 // prCutoff derives the PR-corpus cutoff (newest PR indexed) from the fetched

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/ckgalign"
+	"github.com/0xmhha/knowledge-system/vector/internal/ckgalign"
 )
 
 // CKG↔CKV alignment detection (reindex-migration design §3.1). Compares the

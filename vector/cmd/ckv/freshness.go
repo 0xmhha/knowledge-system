@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/freshness"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
 )
 
 type freshnessOpts struct {

@@ -3,7 +3,7 @@ package solidity_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W-C W9 V11 — deep struct packing audit. Inner is a 2-slot

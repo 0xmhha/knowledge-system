@@ -13,8 +13,8 @@
 package javascript
 
 import (
-	cparse "github.com/0xmhha/code-knowledge-vector/internal/parse"
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/typescript"
+	cparse "github.com/0xmhha/knowledge-system/vector/internal/parse"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/typescript"
 )
 
 // Parser implements parse.Parser for JavaScript family extensions.

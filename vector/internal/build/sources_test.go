@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/prdoc"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/prdoc"
 )
 
 func TestPRCutoff(t *testing.T) {

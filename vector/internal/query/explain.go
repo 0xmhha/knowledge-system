@@ -5,8 +5,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query/bm25"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/query/bm25"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // ExplanationVectorScore is the vector-side of explain_match.

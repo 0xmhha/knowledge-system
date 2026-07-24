@@ -4,7 +4,7 @@ import (
 	"go/ast"
 	gotypes "go/types"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // context_paths.go implements P2 of the dogfood plan (CKS deep-dive § 4.1

@@ -19,8 +19,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/pkg/ckv"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
 )
 
 // git runs a git command in dir, failing the test on error.

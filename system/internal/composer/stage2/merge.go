@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // ScoredCitation is one citation accompanied by its accumulated evidence.

@@ -15,7 +15,7 @@ package persist
 import (
 	"encoding/json"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // nodeAttrs mirrors every types.Node field that doesn't have its

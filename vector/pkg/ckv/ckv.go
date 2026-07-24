@@ -26,11 +26,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/internal/freshness"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // Each error sentinel documents its raise condition and caller-handling

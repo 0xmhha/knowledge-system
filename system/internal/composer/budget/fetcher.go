@@ -22,7 +22,7 @@ package budget
 import (
 	"context"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // BodyFetcher returns the source text for a Citation. Implementations:

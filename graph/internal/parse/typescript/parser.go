@@ -10,7 +10,7 @@ import (
 	tsjs "github.com/tree-sitter/tree-sitter-javascript/bindings/go"
 	tsts "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
 )
 
 // Parser implements parse.Parser for TypeScript / JavaScript source.

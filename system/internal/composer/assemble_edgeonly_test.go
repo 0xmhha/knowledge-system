@@ -3,10 +3,10 @@ package composer
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/composer/budget"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/sanitize"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage3"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/budget"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/sanitize"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage3"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 func edgeCit(file string) contract.Citation {

@@ -5,7 +5,7 @@ import (
 	"maps"
 	"sync"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // cachedManifestStore wraps a persist.StoreReader so build-time-fixed

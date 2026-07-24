@@ -1,7 +1,7 @@
 package persist
 
 import (
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // SearchFTSOptions configures filter push-down for StoreReader.SearchFTS.

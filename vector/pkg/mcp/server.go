@@ -27,12 +27,12 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/internal/filter"
-	"github.com/0xmhha/code-knowledge-vector/internal/footprint"
-	"github.com/0xmhha/code-knowledge-vector/internal/freshness"
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/internal/filter"
+	"github.com/0xmhha/knowledge-system/vector/internal/footprint"
+	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // ServerName / ServerVersion are surfaced to MCP clients on init.

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
 )
 
 func TestHandleFindInvariants_HappyPath(t *testing.T) {

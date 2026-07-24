@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // ConcurrencyEdgeTypes is the contract's five concurrency edge types

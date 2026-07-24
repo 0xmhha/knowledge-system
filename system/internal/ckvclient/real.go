@@ -7,10 +7,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/ckv"
-	ckvtypes "github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
+	ckvtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // DefaultK is the SemanticSearch limit when SearchOpts.K is zero.

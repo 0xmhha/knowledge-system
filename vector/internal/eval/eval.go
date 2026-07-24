@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 // DefaultK is the top-K used by Run when Options.K is zero.

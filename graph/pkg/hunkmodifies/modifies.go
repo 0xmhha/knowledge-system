@@ -16,7 +16,7 @@
 // [StartLine, EndLine] intervals overlap.
 package hunkmodifies
 
-import "github.com/0xmhha/code-knowledge-graph/pkg/types"
+import "github.com/0xmhha/knowledge-system/graph/pkg/types"
 
 // NodeWhitelist is the H2 §4.2 "FunctionLike + TypeLike + Field-
 // ish" set: only nodes of these kinds receive `modifies` edges

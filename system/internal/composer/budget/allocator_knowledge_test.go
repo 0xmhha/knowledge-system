@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage2"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage2"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // knowledgeSeed is a seed whose hit came from the kind-scoped knowledge

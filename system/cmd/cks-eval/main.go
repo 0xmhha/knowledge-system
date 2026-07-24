@@ -36,7 +36,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/internal/eval"
+	"github.com/0xmhha/knowledge-system/system/internal/eval"
 )
 
 var builderVersion = "cks-eval/0.0.1-dev"

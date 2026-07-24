@@ -7,7 +7,7 @@ import (
 	"sort"
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
 )
 
 type golden struct {

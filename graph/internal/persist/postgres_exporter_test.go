@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // mockStoreReader is a test double for StoreReader. It returns a fixed set

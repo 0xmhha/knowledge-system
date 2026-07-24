@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // promoted.go (defect C): materialises Go *promoted* methods as method nodes.

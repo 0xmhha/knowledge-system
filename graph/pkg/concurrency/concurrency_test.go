@@ -3,9 +3,9 @@ package concurrency_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/concurrency"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/concurrency"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // fakeReader implements store.Reader by embedding the interface (nil) and

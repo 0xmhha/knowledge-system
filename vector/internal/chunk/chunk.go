@@ -17,8 +17,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/parse"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // DefaultFileHeaderLines is the number of leading lines of each file

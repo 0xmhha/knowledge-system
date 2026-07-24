@@ -3,9 +3,9 @@ package cluster_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/cluster"
-	"github.com/0xmhha/code-knowledge-graph/internal/graph"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/cluster"
+	"github.com/0xmhha/knowledge-system/graph/internal/graph"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // minimalGraph returns a graph with a single package node and no structural edges.

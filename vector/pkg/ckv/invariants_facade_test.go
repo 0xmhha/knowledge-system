@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/ckv"
+	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
 )
 
 // FindInvariants / GetConventions are thin facades over internal/query.

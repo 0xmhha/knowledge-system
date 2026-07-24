@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 func TestParse_fullPR(t *testing.T) {

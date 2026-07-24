@@ -6,8 +6,8 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // uses_type.go (Track C P0): emits `uses_type` edges from a Function /

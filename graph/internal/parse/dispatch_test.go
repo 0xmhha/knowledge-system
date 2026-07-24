@@ -3,7 +3,7 @@ package parse_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
 )
 
 type fakeParser struct{ exts []string }

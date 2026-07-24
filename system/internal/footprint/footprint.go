@@ -28,7 +28,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/0xmhha/code-knowledge-system/internal/envelope"
+	"github.com/0xmhha/knowledge-system/system/internal/envelope"
 )
 
 // Mode controls encoder/timestamp/caller configuration for the underlying zap

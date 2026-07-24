@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // initPRRepo materialises a temp directory with two commits whose

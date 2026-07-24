@@ -7,7 +7,7 @@ import (
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
-	"github.com/0xmhha/code-knowledge-system/internal/composer"
+	"github.com/0xmhha/knowledge-system/system/internal/composer"
 )
 
 // handleGetForTask is the standalone handler for cks.context.get_for_task.

@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
 )
 
 func newBuildCmd() *cobra.Command {

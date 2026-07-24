@@ -4,7 +4,7 @@ import (
 	"hash/fnv"
 	"sync"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // defaultTopicResolution chooses which Leiden resolution to surface to

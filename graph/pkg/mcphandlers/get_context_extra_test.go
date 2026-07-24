@@ -3,7 +3,7 @@ package mcphandlers
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/smartctx"
+	"github.com/0xmhha/knowledge-system/graph/pkg/smartctx"
 )
 
 // ---------------------------------------------------------------------------

@@ -19,7 +19,7 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
 )
 
 // Tool names — exported so callers and tests can reference them without drift.

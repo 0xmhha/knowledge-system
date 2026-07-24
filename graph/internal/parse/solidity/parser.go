@@ -14,8 +14,8 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	solang "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity/binding"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	solang "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity/binding"
 )
 
 // Parser implements parse.Parser for Solidity source.

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	sol "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	sol "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // updateGolden, when true, rewrites the golden file from the live parser

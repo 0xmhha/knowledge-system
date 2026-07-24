@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // stalenessCache debounces computeStaleness calls so /api/manifest's

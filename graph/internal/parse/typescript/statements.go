@@ -35,8 +35,8 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // stmtKind maps a tree-sitter node Kind() to the (CKG NodeType, SubKind)

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // extractKeywords builds the candidate keyword list for ckg BM25 rerank.

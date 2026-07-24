@@ -48,7 +48,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // Severity levels. Mirror the conventional ranking used by Slither,

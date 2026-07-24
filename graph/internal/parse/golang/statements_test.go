@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 type stmtGolden struct {

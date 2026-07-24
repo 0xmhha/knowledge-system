@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // mkHit builds a minimal Hit for tests — symbol name + first-line text +

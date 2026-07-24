@@ -44,7 +44,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
 )
 
 func main() {

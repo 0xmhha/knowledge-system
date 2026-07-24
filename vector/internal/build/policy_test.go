@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
 )
 
 // TestRunWithPolicy_PersistsCategoryAndGuidance is the end-to-end

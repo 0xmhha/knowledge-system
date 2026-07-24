@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	mcppkg "github.com/0xmhha/code-knowledge-graph/internal/mcp"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	mcppkg "github.com/0xmhha/knowledge-system/graph/internal/mcp"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 func TestMCPServerConstructs(t *testing.T) {

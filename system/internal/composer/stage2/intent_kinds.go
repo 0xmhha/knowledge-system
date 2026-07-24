@@ -1,6 +1,6 @@
 package stage2
 
-import "github.com/0xmhha/code-knowledge-system/pkg/contract"
+import "github.com/0xmhha/knowledge-system/system/pkg/contract"
 
 // intentToKinds returns the SymbolKinds filter for ckg.FindSymbol given
 // the user's Intent. Empty result means "any kind" — the safe default

@@ -35,8 +35,8 @@ import (
 	"strings"
 	"unicode"
 
-	cparse "github.com/0xmhha/code-knowledge-vector/internal/parse"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	cparse "github.com/0xmhha/knowledge-system/vector/internal/parse"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // Parser implements parse.Parser for *.md / *.markdown.

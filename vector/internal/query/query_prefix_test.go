@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // recordingQE wraps an Embedder and records whether EmbedQuery was taken.

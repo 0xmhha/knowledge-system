@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W-C W7.4 V25 — explicit-list modifier override lockdown.

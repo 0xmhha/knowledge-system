@@ -3,7 +3,7 @@ package golang
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/fuzzcheck"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/fuzzcheck"
 )
 
 func FuzzParse(f *testing.F) {

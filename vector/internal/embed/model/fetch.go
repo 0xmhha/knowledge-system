@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/registry"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
 )
 
 // downloadClient bounds the network phases of a model download without

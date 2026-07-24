@@ -4,7 +4,7 @@ import (
 	"go/ast"
 	gotypes "go/types"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // concurrency_underlock.go — B1 Phase 4 (WORK-PLAN G8). Emits

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/chunk"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/chunk"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // stubPrefixer returns a fixed prefix for chunks whose Text is in want, and ""

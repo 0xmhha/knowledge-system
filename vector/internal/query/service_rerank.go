@@ -3,8 +3,8 @@ package query
 import (
 	"context"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query/bm25"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/query/bm25"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // RerankService reorders candidate hits using BM25 + RRF fusion.

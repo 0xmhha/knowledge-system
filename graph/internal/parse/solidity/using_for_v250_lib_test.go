@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W-C W6 V2.5 — file-level operator-form using directive with

@@ -3,7 +3,7 @@ package bgeonnx
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/registry"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
 )
 
 func TestRegistry_DefaultModelExists(t *testing.T) {

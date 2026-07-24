@@ -4,7 +4,7 @@
 // should import internal/embed/registry directly.
 package bgeonnx
 
-import "github.com/0xmhha/code-knowledge-vector/internal/embed/registry"
+import "github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
 
 // Type aliases for backward compatibility within the bgeonnx package.
 type ModelConfig = registry.ModelConfig

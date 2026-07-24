@@ -10,8 +10,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/0xmhha/code-knowledge-system/internal/auditlog"
-	"github.com/0xmhha/code-knowledge-system/internal/footprint"
+	"github.com/0xmhha/knowledge-system/system/internal/auditlog"
+	"github.com/0xmhha/knowledge-system/system/internal/footprint"
 )
 
 func newFP(t *testing.T) (*footprint.Logger, *bytes.Buffer) {

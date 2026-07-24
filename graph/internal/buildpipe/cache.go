@@ -17,7 +17,7 @@ import (
 	"runtime/debug"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // SchemaVersion is the cache-key contributor for the extraction schema. Bumped

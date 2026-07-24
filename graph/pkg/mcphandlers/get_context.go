@@ -6,8 +6,8 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/smartctx"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/smartctx"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // RegisterGetContextForTask wires the smart 1-shot retrieval tool:

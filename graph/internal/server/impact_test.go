@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/server"
+	"github.com/0xmhha/knowledge-system/graph/internal/server"
 )
 
 // TestHandleImpact_FunctionCallers builds the resolve fixture, queries

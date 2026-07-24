@@ -19,7 +19,7 @@ package score
 import (
 	"math/rand"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // ApproxBetweenness returns per-node betweenness centrality using

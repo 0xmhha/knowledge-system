@@ -6,8 +6,8 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/impact"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // RegisterImpactOfChange wires the impact_of_change tool. Either

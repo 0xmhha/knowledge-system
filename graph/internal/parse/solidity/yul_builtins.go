@@ -5,7 +5,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
 )
 
 // Sol W-C W10 V1.1 (2026-05-18) — Yul EVM builtin detection.

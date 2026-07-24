@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	sol "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	"github.com/0xmhha/code-knowledge-graph/internal/temporal"
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
-	"github.com/0xmhha/code-knowledge-graph/pkg/hunkmodifies"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	sol "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	"github.com/0xmhha/knowledge-system/graph/internal/temporal"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/pkg/hunkmodifies"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 const walletV0 = `// SPDX-License-Identifier: MIT

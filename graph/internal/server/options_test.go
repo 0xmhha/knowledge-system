@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/server"
+	"github.com/0xmhha/knowledge-system/graph/internal/server"
 )
 
 // TestOptions_NoViewer verifies that --no-viewer wiring drops the static

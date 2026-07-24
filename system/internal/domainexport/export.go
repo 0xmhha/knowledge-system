@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
 )
 
 // RenderEntry turns one entry into a markdown document for embedding. The

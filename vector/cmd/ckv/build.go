@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/bgeonnx"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/bgeonnx"
 )
 
 type buildOpts struct {

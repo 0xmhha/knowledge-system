@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
 )
 
 // PromoteVersion atomically points <dataset>/current at the built index in

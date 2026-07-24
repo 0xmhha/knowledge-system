@@ -16,7 +16,7 @@ package eval
 import (
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // MatchMode controls how an expected citation is matched against an

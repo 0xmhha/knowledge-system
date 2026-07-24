@@ -29,7 +29,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/0xmhha/code-knowledge-system/internal/vocab"
+	"github.com/0xmhha/knowledge-system/system/internal/vocab"
 )
 
 // entryFile is the subset of every entry YAML the generator cares about.

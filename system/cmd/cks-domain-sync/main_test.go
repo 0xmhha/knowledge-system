@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
 )
 
 func TestDeriveViews_EmptyInput(t *testing.T) {

@@ -11,7 +11,7 @@
 //   - Fake (this package, B.1):   in-memory canned responses for unit
 //     tests of composer modules.
 //   - Real (Phase C.2):            adapter over
-//     github.com/0xmhha/code-knowledge-vector
+//     github.com/0xmhha/knowledge-system/vector
 //     pkg/types.VectorStore.
 //
 // Stability: the interface here is the contract cks code depends on. Real
@@ -23,7 +23,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Client is the cks-internal interface to a ckv backend.

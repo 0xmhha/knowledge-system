@@ -12,8 +12,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/cluster"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/cluster"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // pgStore is the PostgreSQL implementation of Store / StoreReader / StoreWriter.

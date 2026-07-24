@@ -8,17 +8,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/budget"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/intent"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/sanitize"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage1"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage2"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage3"
-	"github.com/0xmhha/code-knowledge-system/internal/config"
-	"github.com/0xmhha/code-knowledge-system/internal/footprint"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/budget"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/intent"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/sanitize"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage1"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage2"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage3"
+	"github.com/0xmhha/knowledge-system/system/internal/config"
+	"github.com/0xmhha/knowledge-system/system/internal/footprint"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // --- test wiring helper ---

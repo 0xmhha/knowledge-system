@@ -3,7 +3,7 @@ package solidity_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // W-C W7.1 V0 — low-level call dispatch.

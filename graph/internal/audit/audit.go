@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
 )
 
 // store is the read surface audit needs from persist.

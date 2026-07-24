@@ -12,8 +12,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/eval/retrieval"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/eval/retrieval"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 func newEvalRetrievalCmd() *cobra.Command {

@@ -3,7 +3,7 @@ package chunk
 import (
 	"fmt"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // BuildEmbedText returns the embedder input for c with a rule-based

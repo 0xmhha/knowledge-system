@@ -31,9 +31,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 func main() {

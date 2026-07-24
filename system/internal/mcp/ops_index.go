@@ -9,8 +9,8 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-system/internal/domainexport"
-	"github.com/0xmhha/code-knowledge-system/internal/inventory"
+	"github.com/0xmhha/knowledge-system/system/internal/domainexport"
+	"github.com/0xmhha/knowledge-system/system/internal/inventory"
 )
 
 const ToolNameOpsIndex = "cks.ops.index"

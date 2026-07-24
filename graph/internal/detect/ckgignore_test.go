@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
 )
 
 func TestCKGIgnoreMatch(t *testing.T) {

@@ -3,7 +3,7 @@ package buildpipe
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestLineQualifyDuplicateCanonicalIDs guards B3: canonical_ids shared by more

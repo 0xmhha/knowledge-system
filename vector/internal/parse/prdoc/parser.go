@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // PRMeta is the input from the gh CLI. Mirrors the subset of

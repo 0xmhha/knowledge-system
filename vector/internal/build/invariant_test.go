@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
 )
 
 // TestRun_InvariantExtraction_EndToEnd builds a tiny corpus containing

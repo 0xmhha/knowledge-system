@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/internal/vocab"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/vocab"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // TestExtract_NoVocab_VerbatimQuery confirms that without a resolver the

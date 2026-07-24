@@ -9,8 +9,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
 )
 
 // mkCKGFixture writes a minimal ckg graph.db (empty nodes + a manifest table

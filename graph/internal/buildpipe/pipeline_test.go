@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // TestPipelineRunsOnGoFixture exercises the full Pass 1..4 pipeline on the

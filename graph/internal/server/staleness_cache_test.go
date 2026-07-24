@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // TestStalenessCache_HitWithinTTL locks in the debounce contract:

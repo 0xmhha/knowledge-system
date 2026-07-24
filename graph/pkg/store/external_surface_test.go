@@ -6,12 +6,12 @@ package store_test
 // drift between ckg and its consumers. It executes nothing.
 
 import (
-	"github.com/0xmhha/code-knowledge-graph/pkg/bm25"
-	"github.com/0xmhha/code-knowledge-graph/pkg/concurrency"
-	"github.com/0xmhha/code-knowledge-graph/pkg/evidence"
-	"github.com/0xmhha/code-knowledge-graph/pkg/impact"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/graph/pkg/concurrency"
+	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // Package-level functions cks calls.

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestDistributed_HTTP_Endpoints asserts that http.HandleFunc / Handle and

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/footprint"
+	"github.com/0xmhha/knowledge-system/vector/internal/footprint"
 )
 
 // newFootprint creates the per-command logger. It writes JSONL to

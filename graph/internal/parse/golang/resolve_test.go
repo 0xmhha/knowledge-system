@@ -3,8 +3,8 @@ package golang_test
 import (
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestCanonicalID_DistinguishesSameNameAcrossPackages guards Phase 1 of the

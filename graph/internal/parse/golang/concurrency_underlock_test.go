@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestConcurrency_AccessedUnderLock_Basic asserts G8 (B1 Phase 4) emits at

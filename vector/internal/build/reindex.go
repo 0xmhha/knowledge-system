@@ -13,17 +13,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/chunk"
-	"github.com/0xmhha/code-knowledge-vector/internal/ckgalign"
-	"github.com/0xmhha/code-knowledge-vector/internal/discover"
-	"github.com/0xmhha/code-knowledge-vector/internal/flowcorpus"
-	"github.com/0xmhha/code-knowledge-vector/internal/footprint"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/prdoc"
-	"github.com/0xmhha/code-knowledge-vector/internal/policy"
-	"github.com/0xmhha/code-knowledge-vector/internal/projectcfg"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/chunk"
+	"github.com/0xmhha/knowledge-system/vector/internal/ckgalign"
+	"github.com/0xmhha/knowledge-system/vector/internal/discover"
+	"github.com/0xmhha/knowledge-system/vector/internal/flowcorpus"
+	"github.com/0xmhha/knowledge-system/vector/internal/footprint"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/prdoc"
+	"github.com/0xmhha/knowledge-system/vector/internal/policy"
+	"github.com/0xmhha/knowledge-system/vector/internal/projectcfg"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // ErrNoManifest signals that ReindexOptions.OutDir has no prior index.

@@ -15,7 +15,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
 )
 
 // Parser implements parse.Parser for Go source.

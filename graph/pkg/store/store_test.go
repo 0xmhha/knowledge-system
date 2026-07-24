@@ -3,8 +3,8 @@ package store_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // Compile-time guard: a nil store.Reader must satisfy the alias. If someone

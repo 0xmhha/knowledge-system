@@ -12,16 +12,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/cluster"
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
-	"github.com/0xmhha/code-knowledge-graph/internal/filterlist"
-	"github.com/0xmhha/code-knowledge-graph/internal/graph"
-	"github.com/0xmhha/code-knowledge-graph/internal/link"
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	solp "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/internal/score"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/cluster"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/filterlist"
+	"github.com/0xmhha/knowledge-system/graph/internal/graph"
+	"github.com/0xmhha/knowledge-system/graph/internal/link"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	solp "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/score"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // emitDerivedPasses runs the post-graph.Build derived passes against g IN

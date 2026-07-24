@@ -14,15 +14,15 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
-	"github.com/0xmhha/code-knowledge-graph/internal/link"
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	protop "github.com/0xmhha/code-knowledge-graph/internal/parse/proto"
-	solp "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	tsp "github.com/0xmhha/code-knowledge-graph/internal/parse/typescript"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/link"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	protop "github.com/0xmhha/knowledge-system/graph/internal/parse/proto"
+	solp "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	tsp "github.com/0xmhha/knowledge-system/graph/internal/parse/typescript"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // parseWorkers caps the parallel parser goroutine count. Capped at 8 to keep

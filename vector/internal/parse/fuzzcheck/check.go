@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/parse"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse"
 )
 
 // CheckSpans verifies structural invariants on parser output.

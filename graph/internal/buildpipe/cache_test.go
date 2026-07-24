@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // makeMiniGoModule writes a 3-file Go module to dir and returns the file

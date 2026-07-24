@@ -5,8 +5,8 @@ package ollama_test
 // This file lives in `package ollama_test` — an EXTERNAL test package — and
 // imports BOTH public surfaces a downstream module (cks, doc 03) needs:
 //
-//	github.com/0xmhha/code-knowledge-vector/pkg/embed/ollama  (the promoted embedder)
-//	github.com/0xmhha/code-knowledge-vector/pkg/ckv           (the engine)
+//	github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama  (the promoted embedder)
+//	github.com/0xmhha/knowledge-system/vector/pkg/ckv           (the engine)
 //
 // If `pkg/embed/ollama` were still under the module's internal/ tree, this
 // file would not compile — so the G1 move is what makes the test buildable at
@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/build"
-	"github.com/0xmhha/code-knowledge-vector/pkg/ckv"
-	"github.com/0xmhha/code-knowledge-vector/pkg/embed/ollama"
+	"github.com/0xmhha/knowledge-system/vector/internal/build"
+	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
+	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
 )
 
 // fixedDimEmbedServer stands up an Ollama-compatible /api/embed endpoint that

@@ -31,17 +31,17 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/cluster"
-	"github.com/0xmhha/code-knowledge-graph/internal/detect"
-	"github.com/0xmhha/code-knowledge-graph/internal/filterlist"
-	"github.com/0xmhha/code-knowledge-graph/internal/graph"
-	"github.com/0xmhha/code-knowledge-graph/internal/parse"
-	gop "github.com/0xmhha/code-knowledge-graph/internal/parse/golang"
-	protop "github.com/0xmhha/code-knowledge-graph/internal/parse/proto"
-	solp "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	tsp "github.com/0xmhha/code-knowledge-graph/internal/parse/typescript"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/cluster"
+	"github.com/0xmhha/knowledge-system/graph/internal/detect"
+	"github.com/0xmhha/knowledge-system/graph/internal/filterlist"
+	"github.com/0xmhha/knowledge-system/graph/internal/graph"
+	"github.com/0xmhha/knowledge-system/graph/internal/parse"
+	gop "github.com/0xmhha/knowledge-system/graph/internal/parse/golang"
+	protop "github.com/0xmhha/knowledge-system/graph/internal/parse/proto"
+	solp "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	tsp "github.com/0xmhha/knowledge-system/graph/internal/parse/typescript"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // discoveryAll returns every discovered file in slash form with language tag.

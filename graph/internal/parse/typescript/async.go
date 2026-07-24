@@ -5,7 +5,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TS W-B W2 — async/await detection (schema 1.10 slots NodeAwaitPoint,

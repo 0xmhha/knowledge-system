@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/bm25"
+	"github.com/0xmhha/knowledge-system/graph/pkg/bm25"
 )
 
 // Migrate creates tables if they don't already exist, then applies any

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // DefaultRRFK is the canonical RRF k constant (Cormack, Clarke, Buettcher

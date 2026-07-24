@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/parse/prdoc"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/parse/prdoc"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // PRFetchOptions controls which PRs to fetch for corpus indexing.

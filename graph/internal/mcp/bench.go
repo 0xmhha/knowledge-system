@@ -13,8 +13,8 @@ package mcp
 import (
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
-	"github.com/0xmhha/code-knowledge-graph/pkg/mcphandlers"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/pkg/mcphandlers"
 )
 
 // BenchToolNames is the canonical ordering of the eight tools, used

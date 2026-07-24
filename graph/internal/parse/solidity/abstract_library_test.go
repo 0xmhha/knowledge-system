@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	sol "github.com/0xmhha/code-knowledge-graph/internal/parse/solidity"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	sol "github.com/0xmhha/knowledge-system/graph/internal/parse/solidity"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestSolSubKind_AbstractLibrary covers Sol W4 — the SubKind field on

@@ -31,10 +31,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/composer/stage2"
-	"github.com/0xmhha/code-knowledge-system/internal/footprint"
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/composer/stage2"
+	"github.com/0xmhha/knowledge-system/system/internal/footprint"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // Default tuning. Phase E revisits with real-prompt data.

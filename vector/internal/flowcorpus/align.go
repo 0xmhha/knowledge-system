@@ -1,6 +1,6 @@
 package flowcorpus
 
-import "github.com/0xmhha/code-knowledge-vector/pkg/types"
+import "github.com/0xmhha/knowledge-system/vector/pkg/types"
 
 // CodeSpan is a code chunk's line range and ID — the alignment target for a
 // flow step. Built from the source chunks of one index (symbol / function-split

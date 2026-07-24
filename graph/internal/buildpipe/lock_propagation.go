@@ -20,8 +20,8 @@ package buildpipe
 import (
 	"log/slog"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/graph"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/internal/graph"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // lockPropagationMaxDepth caps the DFS depth from any lock-holding function.

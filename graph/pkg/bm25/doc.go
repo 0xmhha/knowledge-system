@@ -3,7 +3,7 @@
 // # Stability
 //
 // This package is part of the public import surface of
-// github.com/0xmhha/code-knowledge-graph. The exported API —
+// github.com/0xmhha/knowledge-system/graph. The exported API —
 // [Scorer], [Okapi], [NewOkapi], [Document], [ScoredDoc], [Tokenize],
 // and the two default constants — follows semantic versioning:
 //
@@ -19,7 +19,7 @@
 //
 // # Typical usage (external consumer)
 //
-//	import "github.com/0xmhha/code-knowledge-graph/pkg/bm25"
+//	import "github.com/0xmhha/knowledge-system/graph/pkg/bm25"
 //
 //	scorer := bm25.NewOkapi()
 //	scorer.Index([]bm25.Document{

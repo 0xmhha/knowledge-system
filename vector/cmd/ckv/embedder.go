@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/bgeonnx"
-	"github.com/0xmhha/code-knowledge-vector/internal/embed/mock"
-	"github.com/0xmhha/code-knowledge-vector/pkg/embed/ollama"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/bgeonnx"
+	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
+	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // resolveEmbedder picks the embedder backend for build/query/mcp/eval

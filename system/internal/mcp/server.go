@@ -26,11 +26,11 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-system/internal/ckgclient"
-	"github.com/0xmhha/code-knowledge-system/internal/ckvclient"
-	"github.com/0xmhha/code-knowledge-system/internal/composer"
-	"github.com/0xmhha/code-knowledge-system/internal/embedder"
-	"github.com/0xmhha/code-knowledge-system/internal/vocab"
+	"github.com/0xmhha/knowledge-system/system/internal/ckgclient"
+	"github.com/0xmhha/knowledge-system/system/internal/ckvclient"
+	"github.com/0xmhha/knowledge-system/system/internal/composer"
+	"github.com/0xmhha/knowledge-system/system/internal/embedder"
+	"github.com/0xmhha/knowledge-system/system/internal/vocab"
 )
 
 // ToolNameGetForTask is the wire name of the get_for_task tool. Exported

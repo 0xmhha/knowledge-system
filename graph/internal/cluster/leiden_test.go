@@ -3,7 +3,7 @@ package cluster_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/cluster"
+	"github.com/0xmhha/knowledge-system/graph/internal/cluster"
 )
 
 // Two cliques connected by a single bridge edge — Leiden should detect

@@ -20,11 +20,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/footprint"
-	"github.com/0xmhha/code-knowledge-vector/internal/freshness"
-	"github.com/0xmhha/code-knowledge-vector/internal/manifest"
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
-	"github.com/0xmhha/code-knowledge-vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/vector/internal/footprint"
+	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
+	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 
 // DefaultThreshold drops hits whose normalized score is below this

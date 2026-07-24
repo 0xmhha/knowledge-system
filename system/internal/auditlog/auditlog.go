@@ -34,7 +34,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xmhha/code-knowledge-system/internal/envelope"
+	"github.com/0xmhha/knowledge-system/system/internal/envelope"
 )
 
 // Decision categorizes the disposition of an audited action.

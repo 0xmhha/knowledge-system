@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/vector/internal/store/sqlitevec"
 )
 
 type migrateOpts struct {

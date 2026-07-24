@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	tsp "github.com/0xmhha/code-knowledge-graph/internal/parse/typescript"
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	tsp "github.com/0xmhha/knowledge-system/graph/internal/parse/typescript"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // TestTSGRPCClient_DetectsKnownPatterns asserts the W3c gRPC-client

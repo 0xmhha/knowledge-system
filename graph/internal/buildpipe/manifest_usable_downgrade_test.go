@@ -3,8 +3,8 @@ package buildpipe_test
 import (
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-graph/internal/buildpipe"
-	"github.com/0xmhha/code-knowledge-graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
+	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 )
 
 // W-C W11 V13 — schema version downgrade guard audit.

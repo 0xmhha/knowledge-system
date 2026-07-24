@@ -6,8 +6,8 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/code-knowledge-graph/pkg/concurrency"
-	"github.com/0xmhha/code-knowledge-graph/pkg/store"
+	"github.com/0xmhha/knowledge-system/graph/pkg/concurrency"
+	"github.com/0xmhha/knowledge-system/graph/pkg/store"
 )
 
 // RegisterConcurrencyImpact wires the concurrency_impact tool — the

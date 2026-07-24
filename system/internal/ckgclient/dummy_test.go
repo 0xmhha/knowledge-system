@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/code-knowledge-system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 func TestDummy_AllOperationsRecordInstructions(t *testing.T) {

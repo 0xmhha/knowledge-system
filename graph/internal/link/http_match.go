@@ -38,7 +38,7 @@
 package link
 
 import (
-	"github.com/0xmhha/code-knowledge-graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 )
 
 // HTTPMatchResult captures aggregate counts so callers can log the matching

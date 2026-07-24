@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/0xmhha/code-knowledge-vector/internal/query"
+	"github.com/0xmhha/knowledge-system/vector/internal/query"
 )
 
 // PlanAgent turns a problem description (PR Background) + ckv search
