@@ -12,13 +12,15 @@ import (
 	mcpgotransport "github.com/mark3labs/mcp-go/client/transport"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
+	sysmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
 // toolGetForTask is the cks-mcp tool the runner invokes. Matches the
 // const in internal/mcp/server.go — duplicated here to avoid a
 // dependency on internal/mcp from the eval package.
-const toolGetForTask = "cks.context.get_for_task"
+// toolGetForTask mirrors the fused server's namespaced wire name.
+var toolGetForTask = sysmcp.ToolNameGetForTask
 
 // mcpClient is the seam over the upstream mcp-go *client.Client.
 // Production code injects mcpgoclient.NewClient; tests inject a mock

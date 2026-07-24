@@ -10,9 +10,9 @@ import (
 	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
-const (
-	ToolNameImpactAnalysis = "cks.context.impact_analysis"
-	ToolNameChangeHistory  = "cks.context.change_history"
+var (
+	ToolNameImpactAnalysis = toolName("context.impact_analysis")
+	ToolNameChangeHistory  = toolName("context.change_history")
 )
 
 // impactAnalysisResponse is the wire shape for impact_analysis.

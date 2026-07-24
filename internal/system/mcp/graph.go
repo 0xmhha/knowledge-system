@@ -13,11 +13,11 @@ import (
 
 // Tool names — exported so callers and tests can reference them
 // without string drift.
-const (
-	ToolNameFindSymbol  = "cks.context.find_symbol"
-	ToolNameFindCallers = "cks.context.find_callers"
-	ToolNameFindCallees = "cks.context.find_callees"
-	ToolNameGetSubgraph = "cks.context.get_subgraph"
+var (
+	ToolNameFindSymbol  = toolName("context.find_symbol")
+	ToolNameFindCallers = toolName("context.find_callers")
+	ToolNameFindCallees = toolName("context.find_callees")
+	ToolNameGetSubgraph = toolName("context.get_subgraph")
 )
 
 // findSymbolResponse wraps the CKG citations + any dummy directives the

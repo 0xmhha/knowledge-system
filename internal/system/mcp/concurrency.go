@@ -10,7 +10,7 @@ import (
 	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
-const ToolNameConcurrencyImpact = "cks.context.concurrency_impact"
+var ToolNameConcurrencyImpact = toolName("context.concurrency_impact")
 
 // concurrencyImpactResponse is the wire shape for concurrency_impact.
 type concurrencyImpactResponse struct {

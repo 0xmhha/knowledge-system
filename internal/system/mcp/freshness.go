@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/system/pkg/contract"
 )
 
-const ToolNameFreshness = "cks.ops.freshness"
+var ToolNameFreshness = toolName("ops.freshness")
 
 // freshnessResponse is the wire shape for cks.ops.freshness. It mirrors
 // ckvclient.FreshnessReport but lives in the mcp package so the wire

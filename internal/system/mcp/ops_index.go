@@ -13,7 +13,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
 )
 
-const ToolNameOpsIndex = "cks.ops.index"
+var ToolNameOpsIndex = toolName("ops.index")
 
 // IndexConfig carries the paths the cks.ops.index tool shells out to. The
 // query path is fully in-process (G1), but the index/reindex maintenance op

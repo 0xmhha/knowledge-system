@@ -35,10 +35,10 @@ import (
 
 // ToolNameGetForTask is the wire name of the get_for_task tool. Exported
 // so callers (and other tests) can reference it without string drift.
-const ToolNameGetForTask = "cks.context.get_for_task"
+var ToolNameGetForTask = toolName("context.get_for_task")
 
 // ToolNameHealth is the wire name of the health tool.
-const ToolNameHealth = "cks.ops.health"
+var ToolNameHealth = toolName("ops.health")
 
 // Deps bundles everything an MCP handler needs. Keep this struct small:
 // the slim C.5 surface deliberately resists envelope sprawl (HLD §7.5

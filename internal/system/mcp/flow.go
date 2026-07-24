@@ -23,13 +23,13 @@ import (
 )
 
 // Tool names — exported so callers and tests can reference them without drift.
-const (
-	ToolNameGetFlow                 = "cks.context.get_flow"
-	ToolNameExpandFlow              = "cks.context.expand_flow"
-	ToolNameFindBranches            = "cks.context.find_branches"
-	ToolNameGetInvariantEnforcement = "cks.context.get_invariant_enforcement"
-	ToolNameFindInvariants          = "cks.context.find_invariants"
-	ToolNameGetConventions          = "cks.context.get_conventions"
+var (
+	ToolNameGetFlow                 = toolName("context.get_flow")
+	ToolNameExpandFlow              = toolName("context.expand_flow")
+	ToolNameFindBranches            = toolName("context.find_branches")
+	ToolNameGetInvariantEnforcement = toolName("context.get_invariant_enforcement")
+	ToolNameFindInvariants          = toolName("context.find_invariants")
+	ToolNameGetConventions          = toolName("context.get_conventions")
 )
 
 // flowClient extracts the optional flow surface from Deps.CKV, or returns a

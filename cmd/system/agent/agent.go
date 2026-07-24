@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 
+	sysmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	mcpgoclient "github.com/mark3labs/mcp-go/client"
 	mcpgotransport "github.com/mark3labs/mcp-go/client/transport"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -17,7 +18,8 @@ import (
 // needs this one tool from cks's surface for Phase-D Slim (prompt
 // builder). Future agent capabilities can register additional tool
 // names here.
-const toolGetForTask = "cks.context.get_for_task"
+// toolGetForTask mirrors the fused server's namespaced wire name.
+var toolGetForTask = sysmcp.ToolNameGetForTask
 
 // mcpClient is the seam over the upstream mcp-go *client.Client.
 // Production code uses mcpgoclient.Client; tests inject a mock so the

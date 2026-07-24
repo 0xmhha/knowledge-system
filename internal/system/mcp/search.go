@@ -41,9 +41,9 @@ func ftsOrQuery(query string) string {
 	return strings.Join(quoted, " OR ")
 }
 
-const (
-	ToolNameSemanticSearch = "cks.context.semantic_search"
-	ToolNameSearchText     = "cks.context.search_text"
+var (
+	ToolNameSemanticSearch = toolName("context.semantic_search")
+	ToolNameSearchText     = toolName("context.search_text")
 )
 
 // searchResponse is the shared wire shape for both search tools. Source
