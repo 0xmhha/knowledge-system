@@ -34,6 +34,7 @@ Tier 1 wins.
 | [ARCHITECTURE-DETAILED.md](ARCHITECTURE-DETAILED.md) | Full architecture: pipeline, cache routing, storage abstraction, CLI |
 | [SCHEMA.md](SCHEMA.md) | **Authoritative** node/edge enumeration + schema version history |
 | [CODE-STRUCTURE.md](CODE-STRUCTURE.md) | Visual index: package structure, pipeline, six-graph axis, cache routing |
+| [TRAVERSAL-DEPTH.md](TRAVERSAL-DEPTH.md) | Why the call-graph tools (`find_callers`/`find_callees`/`impact_of_change`) default to `depth=2` — latency/recall rationale |
 | [INCREMENTAL.md](INCREMENTAL.md) | Incremental build cache: cache key, manifest v2, invalidation rules |
 | [EVAL.md](EVAL.md) | Eval CLI: 4 baselines (α/β/γ/δ), backends, output schema |
 | [design/hunk-graph.md](design/hunk-graph.md) | Temporal hunk-graph design (H1–H4) |

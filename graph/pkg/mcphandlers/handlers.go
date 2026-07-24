@@ -43,12 +43,11 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 // RegisterFindCallers walks the reverse call graph from the seed.
 // Filters to calls/invokes edges so the BFS only follows real
 // invocation links (see callEdgeTypes for the rationale). Default
-// depth=2 — see docs/ckg5-depth-sweep-report-2026-05-20.md for the
-// latency justification.
+// depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the // latency/recall justification.
 func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
 	tool := mcp.NewTool("find_callers",
-		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"core.NewBlockChain\") or a bare short name (\"NewBlockChain\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Filters to calls/invokes edges only. Default depth=2 — see docs/ckg5-depth-sweep-report-2026-05-20.md for the latency justification."),
+		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"core.NewBlockChain\") or a bare short name (\"NewBlockChain\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Filters to calls/invokes edges only. Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
@@ -84,7 +83,7 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
 	tool := mcp.NewTool("find_callees",
-		mcp.WithDescription("Functions called by the symbol (forward call graph). qname may be a full qualified_name or a bare short name (resolved by suffix; an ambiguous bare name returns candidate qnames instead of an empty result). Filters to calls/invokes edges only. Default depth=2 — see docs/ckg5-depth-sweep-report-2026-05-20.md for the latency justification."),
+		mcp.WithDescription("Functions called by the symbol (forward call graph). qname may be a full qualified_name or a bare short name (resolved by suffix; an ambiguous bare name returns candidate qnames instead of an empty result). Filters to calls/invokes edges only. Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
