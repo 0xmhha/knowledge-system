@@ -2,41 +2,46 @@ package discover
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-// findRepoRoot walks upward until it finds a go.mod, returning that
-// directory. Used to anchor `go list` in the repo that owns this test.
+// findRepoRoot walks upward until it finds the ckv project root — the
+// directory containing both cmd/ckv and internal/projectcfg — and returns
+// it. Used to anchor `go list` in the repo that owns this test.
+//
+// This is deliberately NOT "nearest go.mod": since the code-knowledge-*
+// consolidation, go.mod lives at the outer monorepo root (two levels above
+// this package), while cmd/ckv still lives under vector/. Anchoring on
+// go.mod would resolve ./cmd/ckv against the wrong directory.
 func findRepoRoot(t *testing.T) string {
 	t.Helper()
 	cwd, err := filepath.Abs(".")
 	if err != nil {
 		t.Fatal(err)
 	}
+	if _, err := exec.LookPath("go"); err != nil {
+		t.Skipf("`go` not in PATH — skipping golist test")
+	}
 	dir := cwd
 	for {
-		if _, err := exec.LookPath("go"); err != nil {
-			t.Skipf("`go` not in PATH — skipping golist test")
-		}
-		// Walk up until go.mod is visible.
-		_, err := filepath.Glob(filepath.Join(dir, "go.mod"))
-		_ = err
-		if _, err := exec.Command("test", "-f", filepath.Join(dir, "go.mod")).Output(); err == nil {
-			return dir
-		}
-		// Fallback: try os.Stat.
-		if _, err := exec.Command("ls", filepath.Join(dir, "go.mod")).Output(); err == nil {
+		if isDir(filepath.Join(dir, "cmd", "ckv")) && isDir(filepath.Join(dir, "internal", "projectcfg")) {
 			return dir
 		}
 		parent := filepath.Dir(dir)
 		if parent == dir {
-			t.Fatalf("could not find go.mod above %s", cwd)
+			t.Fatalf("could not find ckv project root (cmd/ckv + internal/projectcfg) above %s", cwd)
 		}
 		dir = parent
 	}
+}
+
+func isDir(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
 }
 
 func TestResolveGoBuildRoots_SelfTest_CmdCkv(t *testing.T) {
