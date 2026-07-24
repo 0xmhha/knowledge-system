@@ -201,9 +201,9 @@ func TestRenderEntry_LocAnchorRendersPerKind(t *testing.T) {
 	}
 	md := RenderEntry(e, &inventory.Project{Subsystems: map[string]inventory.Subsystem{}})
 	for _, want := range []string{
-		"vm.EVM.Call:100",                       // def: symbol at def line, no "(loc)"
-		"in core.applyMessage:250 (loc)",        // loc: enclosing symbol + flag
-		"Berlin gate",                           // reason preserved
+		"vm.EVM.Call:100",                // def: symbol at def line, no "(loc)"
+		"in core.applyMessage:250 (loc)", // loc: enclosing symbol + flag
+		"Berlin gate",                    // reason preserved
 	} {
 		if !strings.Contains(md, want) {
 			t.Errorf("rendered markdown missing %q\n---\n%s", want, md)

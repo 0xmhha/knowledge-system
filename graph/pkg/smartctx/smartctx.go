@@ -21,9 +21,9 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/graph/internal/persist"
-	"github.com/0xmhha/knowledge-system/pkg/bm25"
 	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/bm25"
 )
 
 // Options bundles the tunable knobs of BuildContext. Zero values are

@@ -56,9 +56,9 @@ type AlignmentReport struct {
 // (cmd/cks-mcp) gathers them at startup.
 type AlignmentInputs struct {
 	// CKG coordinates (from ckgclient.Health / the graph manifest).
-	CKGSrcCommit  string
-	CKGSchema     string
-	CKGDigest     string // logical graph digest; "" until CKG ships it
+	CKGSrcCommit string
+	CKGSchema    string
+	CKGDigest    string // logical graph digest; "" until CKG ships it
 	// CKV manifest (raw bytes of <ckv-data>/manifest.json; nil when missing).
 	CKVManifest []byte
 	// Config + environment.

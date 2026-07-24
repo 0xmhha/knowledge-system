@@ -156,9 +156,9 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 	}
 
 	deps := cksmcp.Deps{
-		Composer:       c,
-		CKG:            be.ckg,
-		CKV:            be.ckv,
+		Composer:            c,
+		CKG:                 be.ckg,
+		CKV:                 be.ckv,
 		Vocab:               vocabResolver,
 		BuilderVersion:      builderVersion,
 		Alignment:           alignment,
