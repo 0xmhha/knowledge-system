@@ -10,8 +10,8 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // newConcurrencyStore builds the channel/goroutine fixture used to exercise
@@ -20,7 +20,7 @@ func newConcurrencyStore(t *testing.T) persist.Store {
 	t.Helper()
 	out := t.TempDir()
 	if _, err := buildpipe.Run(buildpipe.Options{
-		SrcRoot:    "../../internal/parse/golang/testdata/concurrency",
+		SrcRoot:    "../../../internal/graph/parse/golang/testdata/concurrency",
 		OutDir:     out,
 		Languages:  []string{"auto"},
 		CKGVersion: "test",
@@ -63,7 +63,7 @@ func newImplementsStore(t *testing.T) persist.Store {
 	t.Helper()
 	out := t.TempDir()
 	if _, err := buildpipe.Run(buildpipe.Options{
-		SrcRoot:    "../../internal/parse/golang/testdata/implements",
+		SrcRoot:    "../../../internal/graph/parse/golang/testdata/implements",
 		OutDir:     out,
 		Languages:  []string{"auto"},
 		CKGVersion: "test",

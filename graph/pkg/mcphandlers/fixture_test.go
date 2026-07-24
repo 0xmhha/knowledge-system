@@ -15,16 +15,16 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/buildpipe"
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
+	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 func newFixtureStore(t *testing.T) persist.Store {
 	t.Helper()
 	out := t.TempDir()
 	if _, err := buildpipe.Run(buildpipe.Options{
-		SrcRoot:    "../../internal/parse/golang/testdata/resolve",
+		SrcRoot:    "../../../internal/graph/parse/golang/testdata/resolve",
 		OutDir:     out,
 		Languages:  []string{"auto"},
 		CKGVersion: "test",

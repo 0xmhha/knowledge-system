@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/bm25"
 )
 

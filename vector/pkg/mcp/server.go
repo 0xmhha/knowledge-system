@@ -27,11 +27,11 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/knowledge-system/vector/internal/build"
-	"github.com/0xmhha/knowledge-system/vector/internal/filter"
-	"github.com/0xmhha/knowledge-system/vector/internal/footprint"
-	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
-	"github.com/0xmhha/knowledge-system/vector/internal/query"
+	"github.com/0xmhha/knowledge-system/internal/vector/build"
+	"github.com/0xmhha/knowledge-system/internal/vector/filter"
+	"github.com/0xmhha/knowledge-system/internal/vector/footprint"
+	"github.com/0xmhha/knowledge-system/internal/vector/freshness"
+	"github.com/0xmhha/knowledge-system/internal/vector/query"
 	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 

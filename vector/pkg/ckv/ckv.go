@@ -26,10 +26,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/0xmhha/knowledge-system/vector/internal/embed/mock"
-	"github.com/0xmhha/knowledge-system/vector/internal/freshness"
-	"github.com/0xmhha/knowledge-system/vector/internal/manifest"
-	"github.com/0xmhha/knowledge-system/vector/internal/query"
+	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
+	"github.com/0xmhha/knowledge-system/internal/vector/freshness"
+	"github.com/0xmhha/knowledge-system/internal/vector/manifest"
+	"github.com/0xmhha/knowledge-system/internal/vector/query"
 	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 

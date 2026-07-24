@@ -28,7 +28,7 @@ endif
 all: build ## Default: build the ckv binary
 
 build: ## Build bin/ckv
-	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/ckv ./cmd/ckv
+	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/ckv ../cmd/vector
 
 # The combined CKG+CKV binary (cks-mcp) lives in the CKS repository, not
 # here. CKV stays as a pure Vector-layer library; CKS imports it (and CKG)
@@ -69,7 +69,7 @@ audit: ## govulncheck (call-graph reachable vulns)
 # ---- bgeonnx targets (require -tags bgeonnx + model files) ----
 
 model-fetch: ## Download bge-large-en-v1.5 ONNX model (~1.34GB)
-	$(GO) run ./cmd/ckv model fetch bge-large-en-v1.5
+	$(GO) run ../cmd/vector model fetch bge-large-en-v1.5
 
 # PR-regression eval (LLM plan-gen + LLM judge) was excised from the binary
 # (00 §2.2: binary = deterministic). It now runs from the agent/session layer,
@@ -80,10 +80,10 @@ model-fetch: ## Download bge-large-en-v1.5 ONNX model (~1.34GB)
 eval-ab: ## A/B measurement: bgeonnx BM25 OFF vs ON (testdata/sample)
 	@echo "=== BM25 OFF ===" && \
 	TMP=$$(mktemp -d) && \
-	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ./cmd/ckv build --src ./testdata/sample --out "$$TMP" --embedder=bgeonnx && \
-	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ./cmd/ckv eval --fixture ./testdata/queries.yaml --out "$$TMP" --src ./testdata/sample --embedder=bgeonnx --json && \
+	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ../cmd/vector build --src ./testdata/sample --out "$$TMP" --embedder=bgeonnx && \
+	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ../cmd/vector eval --fixture ./testdata/queries.yaml --out "$$TMP" --src ./testdata/sample --embedder=bgeonnx --json && \
 	echo "=== BM25 ON ===" && \
-	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ./cmd/ckv eval --fixture ./testdata/queries.yaml --out "$$TMP" --src ./testdata/sample --embedder=bgeonnx --bm25-rerank --json && \
+	CKV_MEM_GUARD=off CKV_DISABLE_COREML=1 $(GO) run -tags bgeonnx ../cmd/vector eval --fixture ./testdata/queries.yaml --out "$$TMP" --src ./testdata/sample --embedder=bgeonnx --bm25-rerank --json && \
 	rm -rf "$$TMP"
 
 # ---- bge-m3 go-stablenet index (operator-gated, requires Ollama) ----
@@ -97,7 +97,7 @@ GSN_OUT ?= ./ckv-stablenet
 rebuild-stablenet: ## Build the bge-m3 go-stablenet index (needs `ollama serve` + `ollama pull bge-m3`; ~10h for ~26k chunks). Set GSN_SRC.
 	@[ -n "$(GSN_SRC)" ] || { echo "set GSN_SRC=/path/to/go-stablenet (see build-profiles.env.example)"; exit 1; }
 	@command -v ollama >/dev/null 2>&1 || { echo "ollama not found — install + 'ollama pull bge-m3' first"; exit 1; }
-	$(GO) run ./cmd/ckv build --embedder=ollama --model-name=bge-m3 --src "$(GSN_SRC)" --out "$(GSN_OUT)"
+	$(GO) run ../cmd/vector build --embedder=ollama --model-name=bge-m3 --src "$(GSN_SRC)" --out "$(GSN_OUT)"
 
 gsn-smoke: ## Validate a built bge-m3 go-stablenet index (M2.b/c). Uses GSN_OUT; needs Ollama up.
 	CKV_GSN_INDEX="$(GSN_OUT)" $(GO) test ./pkg/ckv/ -run TestGoStablenetBgeM3Smoke -v -count=1

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // TestFilterLLMSafe_DropsAmbiguousMeta covers the §11.3 boundary: only

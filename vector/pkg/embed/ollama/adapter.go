@@ -22,7 +22,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/vector/internal/embed/registry"
+	"github.com/0xmhha/knowledge-system/internal/vector/embed/registry"
 	"github.com/0xmhha/knowledge-system/vector/pkg/types"
 )
 

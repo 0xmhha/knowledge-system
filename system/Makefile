@@ -83,13 +83,13 @@ build:
 
 build-bins:
 	@mkdir -p $(BIN_DIR)
-	$(GO) build -ldflags "$(CKS_LDFLAGS)" -o $(BIN_DIR)/cks-mcp ./cmd/cks-mcp
-	$(GO) build -o $(BIN_DIR)/cks-agent           ./cmd/cks-agent
-	$(GO) build -o $(BIN_DIR)/cks-eval            ./cmd/cks-eval
-	$(GO) build -o $(BIN_DIR)/cks-glossary-gen    ./cmd/cks-glossary-gen
-	$(GO) build -o $(BIN_DIR)/cks-inventory-check ./cmd/cks-inventory-check
-	$(GO) build -o $(BIN_DIR)/cks-entry-verify    ./cmd/cks-entry-verify
-	$(GO) build -o $(BIN_DIR)/cks-anchor-refresh  ./cmd/cks-anchor-refresh
+	$(GO) build -ldflags "$(CKS_LDFLAGS)" -o $(BIN_DIR)/cks-mcp ../cmd/system-mcp
+	$(GO) build -o $(BIN_DIR)/cks-agent           ../cmd/system/agent
+	$(GO) build -o $(BIN_DIR)/cks-eval            ../cmd/system/eval
+	$(GO) build -o $(BIN_DIR)/cks-glossary-gen    ../cmd/system/glossary-gen
+	$(GO) build -o $(BIN_DIR)/cks-inventory-check ../cmd/system/inventory-check
+	$(GO) build -o $(BIN_DIR)/cks-entry-verify    ../cmd/system/entry-verify
+	$(GO) build -o $(BIN_DIR)/cks-anchor-refresh  ../cmd/system/anchor-refresh
 
 test:
 	$(GO) test -race ./...

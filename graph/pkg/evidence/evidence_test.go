@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // fakeStore is a minimal persist.StoreReader stub for evidence tests.

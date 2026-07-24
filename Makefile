@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries
 
 GO ?= go
 
@@ -32,7 +32,12 @@ fmt-check:
 	    exit 1; \
 	fi
 
-lint: fmt-check vet
+lint: fmt-check vet boundaries
+
+# boundaries: cross-engine isolation is convention now that internals live at
+# internal/<engine> (see scripts/check-boundaries.sh for the rules).
+boundaries:
+	@./scripts/check-boundaries.sh
 
 tidy:
 	$(GO) mod tidy

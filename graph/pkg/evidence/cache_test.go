@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // countingStore wraps fakeStore with atomic counters so tests can

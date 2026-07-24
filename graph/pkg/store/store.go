@@ -36,8 +36,8 @@
 package store
 
 import (
-	"github.com/0xmhha/knowledge-system/graph/internal/persist"
 	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // Reader is the read-only graph surface — the canonical entry point for

@@ -69,8 +69,8 @@ if run_stage bins; then
   ( cd "$CKG_REPO" && make build-no-viewer )
   ( cd "$CKV_REPO" && make build )
   make build-bins
-  go build -o bin/cks-domain-export ./cmd/cks-domain-export
-  go build -o bin/cks-domain-sync   ./cmd/cks-domain-sync
+  go build -o bin/cks-domain-export ../cmd/system/domain-export
+  go build -o bin/cks-domain-sync   ../cmd/system/domain-sync
 fi
 [ -x "$CKG_BIN" ] || die "ckg binary missing: $CKG_BIN (run STAGE=bins)"
 [ -x "$CKV_BIN" ] || die "ckv binary missing: $CKV_BIN (run STAGE=bins)"
