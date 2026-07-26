@@ -46,7 +46,7 @@ CI (`.github/workflows/ci.yml`) runs `go vet ./...`, `go test -race ./...`,
 - `pkg/` — **public API / stable contract** (`types`, `store`, `bm25`,
   `smartctx`, `evidence`, `impact`, `policy`, `security`, …). CKV/CKS consume
   these.
-- `web/viewer-next/` — Next.js 3D force-graph viewer, embedded into the binary.
+- `../tools/viewer/` — Next.js 3D force-graph viewer, embedded into the binary.
 - `docs/` — see `../docs/graph/DOC-MAP.md`. `policies/`, `eval/`, `testdata/` as named.
 
 ## Codebase conventions (non-obvious, easy to get wrong)

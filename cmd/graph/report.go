@@ -277,7 +277,7 @@ func axisDistribution(edges []types.Edge) map[string]int {
 }
 
 // edgeToAxis maps backend EdgeType → CKS graph axis (G1..G6). Source of
-// truth for the report's axis breakdown; mirrors viewer-next/src/lib/
+// truth for the report's axis breakdown; mirrors tools/viewer/src/lib/
 // edges.ts GRAPH_GROUPS.
 func edgeToAxis(t types.EdgeType) string {
 	switch t {

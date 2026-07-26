@@ -17,7 +17,7 @@ export default function AppNav() {
   const pathname = usePathname() ?? '/';
   return (
     <nav className={styles.nav} aria-label="viewer switch">
-      <span className={styles.brand}>Knowledge</span>
+      <span className={styles.brand}>Knowledge System</span>
       {TABS.map((t) => (
         <Link
           key={t.href}

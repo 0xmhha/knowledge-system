@@ -187,7 +187,7 @@ code-knowledge-graph/
 │   ├── audit/              ← parity check
 │   └── e2e/                ← end-to-end tests
 │
-├── web/viewer-next/        ← Next.js 3D force-graph viewer (embedded)
+├── tools/viewer/        ← Next.js 3D force-graph viewer (embedded)
 ├── eval/                   ← YAML eval scenarios / corpora
 ├── testdata/               ← synthetic fixtures
 └── docs/                   ← DOC-MAP.md가 index (본 문서 포함)
@@ -364,7 +364,7 @@ authoritative 등록 목록: `pkg/mcphandlers/registerall.go` `RegisterAll` (내
 └──────────────────────────────────────────────────────────────────────────────┘
                                        │
                                        ▼
-        ┌──────────── Next.js viewer (web/viewer-next) ─────────────┐
+        ┌──────────── Next.js viewer (tools/viewer) ─────────────┐
         │ react-force-graph-3d + zustand                            │
         │ 6-axis filter UI (G1~G6 group toggle, localStorage 영속)  │
         │ EdgeTypeFilters (collapsible, 3-state)                    │
@@ -567,7 +567,7 @@ require (
 ### Build artifacts (gitignored)
 
 - `bin/ckg` — `make build`
-- `web/viewer-next/{out,.next,node_modules}/`
+- `tools/viewer/{out,.next,node_modules}/`
 - `internal/server/web_assets/_next/`, `404/`, `404.html`, `index.txt`
   (tracked stub `index.html`만 commit)
 

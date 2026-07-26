@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import AppNav from '@/components/AppNav';
 
 export const metadata: Metadata = {
-  title: 'Knowledge Viewer',
-  description: 'Code knowledge graph + vector atlas viewer',
+  title: 'Knowledge System Dashboard',
+  description: 'Code knowledge graph + vector atlas dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
