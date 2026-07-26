@@ -4,8 +4,9 @@ GO ?= go
 
 all: build
 
-# Default viewer build: Next.js (web/viewer-next/). Static export
-# (`output: 'export'`) writes to out/, which we mirror into
+# Default viewer build: the unified Next.js dashboard (../tools/viewer/, the
+# knowledge-system-dashboard app hosting both the graph and vector viewers).
+# Static export (`output: 'export'`) writes to out/, which we mirror into
 # ../internal/graph/server/web_assets/ so the go:embed directive in viewer.go
 # picks it up at compile time.
 #
@@ -13,10 +14,10 @@ all: build
 # previous viewer build (the old esbuild output's assets/viewer.js
 # would otherwise hang around). Bounded to ../internal/graph/server/web_assets/.
 viewer:
-	cd web/viewer-next && npm install && npm run build
+	cd ../tools/viewer && npm install && npm run build
 	rm -rf ../internal/graph/server/web_assets
 	mkdir -p ../internal/graph/server/web_assets
-	cp -R web/viewer-next/out/. ../internal/graph/server/web_assets/
+	cp -R ../tools/viewer/out/. ../internal/graph/server/web_assets/
 
 # build: Go binary only. The viewer UI is embedded at compile time via
 # go:embed (internal/server/viewer.go), so a binary from this target
@@ -366,17 +367,17 @@ eval-llm-smoke: build-no-viewer
 	@echo ""
 	@echo "=== Done. Hallucination detail above (T-04 V1). ==="
 
-# lint-viewer: ESLint over web/viewer-next/. The primary concern is
+# lint-viewer: ESLint over ../tools/viewer/. The primary concern is
 # react-hooks/rules-of-hooks — viewer once shipped a regression where a
 # useCallback was placed below an early return, producing React error
 # #310 ("Rendered fewer hooks than expected") on the first node click
 # (commit 50ee9f7). Enforcing the hooks rule in lint catches the same
 # class of bug at PR time instead of at runtime in the user's browser.
 #
-# Requires `npm install` to have been run in web/viewer-next once;
+# Requires `npm install` to have been run in ../tools/viewer once;
 # the rule depends on eslint-plugin-react-hooks being present.
 lint-viewer:
-	cd web/viewer-next && npm run lint
+	cd ../tools/viewer && npm run lint
 
 # audit: dependency-tree vulnerability scan for both languages.
 #
@@ -384,7 +385,7 @@ lint-viewer:
 #     golang.org/x/vuln/cmd/govulncheck. Reports only call-graph-reachable
 #     vulns by default — false-positive rate is much lower than naive
 #     fingerprint scans.
-#   - npm audit (web/viewer-next): tree-fingerprint scan against npm's
+#   - npm audit (../tools/viewer): tree-fingerprint scan against npm's
 #     advisory DB. Gated at --audit-level=high so transitive low/moderate
 #     warnings (npm's stretch use of moderate) don't fail CI.
 #
@@ -401,9 +402,9 @@ audit:
 	    exit 1; \
 	fi
 	@echo ""
-	@echo "=== npm dependencies (web/viewer-next) ==="
-	cd web/viewer-next && npm audit --audit-level=high
+	@echo "=== npm dependencies (../tools/viewer) ==="
+	cd ../tools/viewer && npm audit --audit-level=high
 
 clean:
 	rm -rf bin/ /tmp/ckg-* coverage.out \
-	       web/viewer-next/.next/ web/viewer-next/out/
+	       ../tools/viewer/.next/ ../tools/viewer/out/

@@ -47,7 +47,7 @@ const [collapsed, setCollapsed] = usePersistedBool(STORAGE_KEY, /* default */ tr
 - `usePersistedNumber(key, default: number)`
 - `usePersistedJSON<T>(key, default: T, validate?)`
 
-위치: `web/viewer-next/src/lib/usePersistedState.ts`
+위치: `tools/viewer/src/lib/usePersistedState.ts`
 
 ### 2.2 store — `hydrateFromStorage` action
 
@@ -122,5 +122,5 @@ flash 가 시각적으로 거슬리는 surface (예: 전체 화면 modal) 는 �
 
 - React #418 메시지 의미: https://react.dev/errors/418
 - 관련 commit: `fa59535` "fix(viewer): eliminate React #418 hydration mismatch"
-- 훅 구현: `web/viewer-next/src/lib/usePersistedState.ts`
-- store 패턴: `web/viewer-next/src/store/store.ts::hydrateFromStorage`
+- 훅 구현: `tools/viewer/src/lib/usePersistedState.ts`
+- store 패턴: `tools/viewer/src/store/store.ts::hydrateFromStorage`

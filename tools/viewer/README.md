@@ -1,4 +1,4 @@
-# CKG Viewer (web/viewer-next)
+# Knowledge System Dashboard (tools/viewer)
 
 Next.js 15 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그래프 viewer.
 `output: 'export'`로 만들어진 정적 자산이 `ckg` Go 바이너리에 `go:embed`로 박혀,
@@ -51,11 +51,11 @@ viewer 변경분을 확인할 수 있다.
 
 ```bash
 # 한 번만
-cd web/viewer-next && npm install
+cd tools/viewer && npm install
 
 # 매 수정 사이클
-cd web/viewer-next && npm run build       # 약 3~5s
-CKG_DEV_VIEWER_DIR=$(pwd)/web/viewer-next/out \
+cd tools/viewer && npm run build       # 약 3~5s
+CKG_DEV_VIEWER_DIR=$(pwd)/tools/viewer/out \
   ./bin/ckg serve --graph=/path/to/graph-out --open
 ```
 
@@ -74,7 +74,7 @@ Next dev 서버의 hot reload를 쓰고 싶을 때. `npm run dev`로 :3001을 �
 ./bin/ckg serve --graph=/path/to/graph-out --no-viewer --port=8080
 
 # Term 2
-cd web/viewer-next && npm run dev   # :3001
+cd tools/viewer && npm run dev   # :3001
 ```
 
 **알려진 함정**:
@@ -122,7 +122,7 @@ cd web/viewer-next && npm run dev   # :3001
 ## 6. 빌드 / 검증 스크립트
 
 ```bash
-cd web/viewer-next
+cd tools/viewer
 npm run typecheck     # tsc --noEmit
 npm run lint          # eslint .
 npm run build         # 정적 export → out/

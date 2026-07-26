@@ -12,7 +12,7 @@ detect → parse → link → graph → cluster → score → persist   (7-pass 
 - **Cluster**: package-tree (deterministic) + Leiden topic overlay (3 resolutions)
 - **Storage**: `modernc.org/sqlite` (CGO-free), embedded schema, blobs in DB
   (PostgreSQL export deprecated — see `docs/adr/0003-deprecate-postgres-backend.md`)
-- **Viewer**: Next.js 3D force-graph (`web/viewer-next`), embedded via `embed.FS`
+- **Viewer**: Next.js 3D force-graph (`tools/viewer`), embedded via `embed.FS`
 - **MCP**: stdio, **ten** tools (`pkg/mcphandlers/registerall.go`), in-process Store reads
 - **Eval**: keyword-retrieval fixtures + LLM baselines (α/β/γ/δ) → CSV + report.md
 
