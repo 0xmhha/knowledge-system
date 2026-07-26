@@ -269,7 +269,73 @@ func runIncremental(opt Options, log *slog.Logger,
 		return persist.Manifest{}, fmt.Errorf("persist pending_refs: %w", err)
 	}
 
+	// (6b) Re-apply the enrichment overlay. The DB drops in step (1) and the
+	// dirty-file node deletes CASCADE away any governed_by / has_security_pattern
+	// edge whose governed symbol lived in a reparsed file, and the manifest
+	// EnrichDigest would otherwise be recomputed from the code-only graph. Both
+	// erode enrichment across refreshes. Rebuild the overlay from the current
+	// policy/security YAML against the merged graph (g.Nodes is the full node
+	// set), mirroring the cold path (pipeline.go). Edges are cleared by type
+	// (path-independent); nodes by their policy/security file path. Enrichment
+	// stays out of g, so Stats / per-file entries / graph_digest are unchanged.
+	var enrichNodes []types.Node
+	var enrichEdges []types.Edge
+	if opt.PolicyFile != "" {
+		if err := store.DeleteEdgesByType(string(types.EdgeGovernedBy)); err != nil {
+			return persist.Manifest{}, fmt.Errorf("clear stale governed_by edges: %w", err)
+		}
+		if err := store.DeleteNodesByFilePath(opt.PolicyFile); err != nil {
+			return persist.Manifest{}, fmt.Errorf("clear stale policy nodes: %w", err)
+		}
+		if policyNodes, policyEdges, perr := loadPolicy(opt.PolicyFile, g.Nodes, log); perr != nil {
+			log.Warn("policy enrichment failed on incremental; overlay left cleared",
+				"file", opt.PolicyFile, "err", perr)
+		} else if len(policyNodes) > 0 {
+			if err := store.InsertNodes(policyNodes); err != nil {
+				return persist.Manifest{}, fmt.Errorf("persist policy nodes: %w", err)
+			}
+			if len(policyEdges) > 0 {
+				if err := store.InsertEdges(policyEdges); err != nil {
+					return persist.Manifest{}, fmt.Errorf("persist policy edges: %w", err)
+				}
+			}
+			enrichNodes = append(enrichNodes, policyNodes...)
+			enrichEdges = append(enrichEdges, policyEdges...)
+			log.Info("policy enrichment re-applied (incremental)",
+				"policy_nodes", len(policyNodes), "governed_by_edges", len(policyEdges))
+		}
+	}
+	if opt.SecurityPatternFile != "" {
+		if err := store.DeleteEdgesByType(string(types.EdgeHasSecurityPattern)); err != nil {
+			return persist.Manifest{}, fmt.Errorf("clear stale has_security_pattern edges: %w", err)
+		}
+		if err := store.DeleteNodesByFilePath(opt.SecurityPatternFile); err != nil {
+			return persist.Manifest{}, fmt.Errorf("clear stale security nodes: %w", err)
+		}
+		if secNodes, secEdges, serr := loadSecurityPatterns(opt.SecurityPatternFile, g.Nodes, log); serr != nil {
+			log.Warn("security enrichment failed on incremental; overlay left cleared",
+				"file", opt.SecurityPatternFile, "err", serr)
+		} else if len(secNodes) > 0 {
+			if err := store.InsertNodes(secNodes); err != nil {
+				return persist.Manifest{}, fmt.Errorf("persist security nodes: %w", err)
+			}
+			if len(secEdges) > 0 {
+				if err := store.InsertEdges(secEdges); err != nil {
+					return persist.Manifest{}, fmt.Errorf("persist security edges: %w", err)
+				}
+			}
+			enrichNodes = append(enrichNodes, secNodes...)
+			enrichEdges = append(enrichEdges, secEdges...)
+			log.Info("security enrichment re-applied (incremental)",
+				"security_nodes", len(secNodes), "has_security_pattern_edges", len(secEdges))
+		}
+	}
+
 	m := buildManifestSkeleton(opt, goCount, tsCount, solCount, protoCount, g, pkgTree, parseErrs)
+	// buildManifestSkeleton computes EnrichDigest from the code-only g (always
+	// ""); recompute it from the overlay re-applied above so the manifest pin
+	// tracks the enrichment (empty when none is configured). Mirrors pipeline.go.
+	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
 	m.Files = buildFileEntries(decisions, g.Nodes, g.Edges)
 	setStaleness(&m, log)
 	if err := store.SetManifest(m); err != nil {
