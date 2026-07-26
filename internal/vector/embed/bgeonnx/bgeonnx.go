@@ -21,7 +21,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // ErrNotImplemented is returned by stub Tokenizer / Session when

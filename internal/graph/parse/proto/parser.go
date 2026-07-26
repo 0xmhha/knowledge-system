@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // languageTag is the value stamped into Node.Language for every proto node.

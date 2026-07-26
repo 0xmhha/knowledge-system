@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // currentGitHead returns `git rev-parse HEAD` for srcRoot, or empty

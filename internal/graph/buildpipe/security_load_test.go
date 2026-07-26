@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestLoadSecurityPatterns_EmptyPath confirms the no-op default —

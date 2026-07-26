@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // instantiates.go (Track C P1c): emits `instantiates` edges from a

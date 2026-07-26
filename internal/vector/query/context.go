@@ -1,6 +1,6 @@
 package query
 
-import "github.com/0xmhha/knowledge-system/vector/pkg/types"
+import "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
 // SearchContext carries the evolving state through the search pipeline.
 // Each service reads its input fields, does its work, and writes its

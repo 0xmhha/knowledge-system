@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 type fakeEmbedder struct {

@@ -26,7 +26,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // MaxTier3PerFile caps heuristic invariants per file. Bounded to

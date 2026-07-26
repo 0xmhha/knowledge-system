@@ -3,8 +3,8 @@ package cluster
 import (
 	"sort"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Community is one labeled group within a single resolution.

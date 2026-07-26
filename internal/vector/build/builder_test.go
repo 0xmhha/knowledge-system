@@ -13,7 +13,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/manifest"
 	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // failEmbedder wraps a working embedder but errors on Embed, simulating a

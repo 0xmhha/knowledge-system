@@ -3,7 +3,7 @@ package solidity_test
 import (
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // W-C W6 V13 — `using SelfLib for uint256;` declared inside the

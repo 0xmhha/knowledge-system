@@ -9,7 +9,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // sanitizeRulesetVersion is the only supported sanitization_rules.yaml

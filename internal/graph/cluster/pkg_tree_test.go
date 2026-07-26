@@ -3,9 +3,9 @@ package cluster_test
 import (
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 func TestPkgTreeLevels(t *testing.T) {

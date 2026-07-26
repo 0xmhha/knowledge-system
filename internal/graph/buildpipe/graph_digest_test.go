@@ -3,7 +3,7 @@ package buildpipe
 import (
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 func codeNodes() []types.Node {

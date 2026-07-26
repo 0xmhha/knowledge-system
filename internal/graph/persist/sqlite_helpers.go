@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // nodeColumns is the explicit column list used by every SELECT that feeds

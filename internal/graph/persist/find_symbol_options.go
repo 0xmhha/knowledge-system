@@ -1,6 +1,6 @@
 package persist
 
-import "github.com/0xmhha/knowledge-system/graph/pkg/types"
+import "github.com/0xmhha/knowledge-system/pkg/graph/types"
 
 // FindSymbolOptions configures filter push-down for StoreReader.FindSymbol.
 // Zero value means "no filter" — every match on the name (and exactness mode)

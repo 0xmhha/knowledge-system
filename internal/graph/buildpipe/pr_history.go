@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // ScanPRHistory walks the git log under srcRoot, isolates commits whose

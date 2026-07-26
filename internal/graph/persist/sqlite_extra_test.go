@@ -7,8 +7,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // newFixtureStore creates an in-process SQLite store populated with:

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 const validRulesetYAML = `

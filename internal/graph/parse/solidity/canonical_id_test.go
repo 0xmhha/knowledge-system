@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	sol "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestCanonicalID_SolidityOverloads guards symbol-identity Phase 1 (ADR-0001)

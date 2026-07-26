@@ -6,9 +6,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestTSHeritage_FixtureMatrix — W-B W1 acceptance check (schema 1.10 §4.1,

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // updateGolden, when true, rewrites the golden file from the live parser

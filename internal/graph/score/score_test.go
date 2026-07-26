@@ -4,9 +4,9 @@ import (
 	"math"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/score"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Triangle graph: A -> B -> C -> A

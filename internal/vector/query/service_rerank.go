@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/query/bm25"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // RerankService reorders candidate hits using BM25 + RRF fusion.

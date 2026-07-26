@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // openSeededStore stands up a fresh on-disk SQLite store, migrates the

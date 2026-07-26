@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // EmbedService converts text into a vector using the configured embedder.

@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Edge between parent and child in a hierarchy.

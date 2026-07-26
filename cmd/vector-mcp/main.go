@@ -20,9 +20,9 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
 	kmcp "github.com/0xmhha/knowledge-system/pkg/mcp"
-	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
-	ckvmcp "github.com/0xmhha/knowledge-system/vector/pkg/mcp"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
+	ckvmcp "github.com/0xmhha/knowledge-system/pkg/vector/mcp"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 func main() {

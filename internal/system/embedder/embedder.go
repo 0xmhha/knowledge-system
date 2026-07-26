@@ -11,8 +11,8 @@ package embedder
 import (
 	"fmt"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
-	ckvtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
+	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // DefaultProvider is used when CKVConfig.Provider is empty.

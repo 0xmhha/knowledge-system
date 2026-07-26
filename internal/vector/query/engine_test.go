@@ -13,7 +13,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/footprint"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // buildSample is the shared fixture for query E2E tests: it builds an

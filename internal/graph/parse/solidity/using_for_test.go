@@ -6,9 +6,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	sol "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // usingForWant captures one EdgeUsesFor assertion as (contract.qname,

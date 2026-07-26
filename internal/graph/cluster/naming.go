@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // LabelCommunity computes a human-readable label using the 3-tuple heuristic

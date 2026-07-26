@@ -5,7 +5,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 	"github.com/0xmhha/knowledge-system/pkg/bm25"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // KeywordIndex is a lazily-built in-memory BM25 index over every chunk

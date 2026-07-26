@@ -20,7 +20,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 const (

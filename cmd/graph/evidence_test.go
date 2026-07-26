@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
+	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
 )
 
 // TestRenderEvidenceText covers the text-format formatter independently

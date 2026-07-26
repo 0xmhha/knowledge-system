@@ -18,7 +18,7 @@ import (
 	"encoding/hex"
 	"sync"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // DefaultSize is the cache capacity when the caller does not specify.

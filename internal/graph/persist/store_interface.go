@@ -18,8 +18,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // ErrInvalidMetric is returned by StoreReader.TopNodes when the metric

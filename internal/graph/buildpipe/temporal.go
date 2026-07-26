@@ -22,10 +22,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // temporalDepthDefault bounds per-file commit count when callers don't pass

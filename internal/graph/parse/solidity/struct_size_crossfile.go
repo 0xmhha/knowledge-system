@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Sol W-C W9 V6 (2026-05-19) — cross-file struct size correction

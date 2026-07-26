@@ -15,7 +15,7 @@ import (
 	"math"
 	"unsafe"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // Open loads a CoreML model (.mlpackage or .mlmodelc) and its

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // W-C W11 V11 — attrs compression decision lock.

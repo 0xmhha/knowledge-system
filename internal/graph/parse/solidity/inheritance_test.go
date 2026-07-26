@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	sol "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // inheritWant is the (child, edge, parent) tuple used by both single-file

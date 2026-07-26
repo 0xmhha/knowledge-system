@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // ComputeGraphDigest returns a deterministic, build-invariant hex hash of the

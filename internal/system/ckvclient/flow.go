@@ -29,10 +29,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/ckv"
-	ckvtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
+	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // ErrFlowUnsupported is returned by a Client whose backend does not expose the

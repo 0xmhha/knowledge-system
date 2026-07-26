@@ -26,7 +26,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/policy"
 	"github.com/0xmhha/knowledge-system/internal/vector/projectcfg"
 	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // Options carry the CLI/programmatic configuration. SrcRoot and OutDir

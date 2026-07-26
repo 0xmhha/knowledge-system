@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 func TestChunkSymbolAndFileHeader(t *testing.T) {

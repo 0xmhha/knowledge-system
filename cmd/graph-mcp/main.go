@@ -16,8 +16,8 @@ import (
 
 	server "github.com/mark3labs/mcp-go/server"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/mcphandlers"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
 	kmcp "github.com/0xmhha/knowledge-system/pkg/mcp"
 )
 

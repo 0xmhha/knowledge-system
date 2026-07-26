@@ -10,7 +10,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // ftsOrQuery turns a free-text query into an explicit FTS5 OR expression for

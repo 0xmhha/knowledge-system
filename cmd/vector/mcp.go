@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
-	ckvmcp "github.com/0xmhha/knowledge-system/vector/pkg/mcp"
+	ckvmcp "github.com/0xmhha/knowledge-system/pkg/vector/mcp"
 )
 
 type mcpOpts struct {

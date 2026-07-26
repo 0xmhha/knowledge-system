@@ -3,8 +3,8 @@ package mcp
 import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
-	"github.com/0xmhha/knowledge-system/system/pkg/testpath"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // excludeTestsArg reads the optional exclude_tests boolean. When true the

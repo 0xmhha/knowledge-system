@@ -3,8 +3,8 @@ package proto
 import (
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // visitor drives the recursive-descent parse. One visitor per file. Mirrors

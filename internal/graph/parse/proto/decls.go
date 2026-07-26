@@ -9,8 +9,8 @@ package proto
 import (
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // parseService emits an Interface node + Method nodes per rpc.

@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
-	"github.com/0xmhha/knowledge-system/graph/pkg/impact"
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
+	"github.com/0xmhha/knowledge-system/pkg/graph/impact"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // writeJSON sets Content-Type and emits v as a single JSON document. Errors

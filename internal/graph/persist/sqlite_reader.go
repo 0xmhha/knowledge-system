@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // HierarchyRow is the wire shape returned by LoadHierarchy. ParentID may be

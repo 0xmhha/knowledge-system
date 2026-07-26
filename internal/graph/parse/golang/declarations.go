@@ -8,8 +8,8 @@ import (
 	gotypes "go/types"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // declVisitor walks the AST and emits Pass 1 nodes and edges.

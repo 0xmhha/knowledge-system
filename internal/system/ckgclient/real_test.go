@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/concurrency"
-	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
-	"github.com/0xmhha/knowledge-system/graph/pkg/store"
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/concurrency"
+	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // --- mockStoreReader ---

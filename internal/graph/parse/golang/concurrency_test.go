@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestConcurrency_Mutex_FieldAndLocal asserts that struct-field and local

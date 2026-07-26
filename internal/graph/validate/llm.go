@@ -4,9 +4,9 @@ import (
 	"context"
 	"sort"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // LLMValidator is the LLM-as-judge stage. It surfaces findings that the

@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
@@ -22,6 +21,7 @@ import (
 	solp "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/score"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // emitDerivedPasses runs the post-graph.Build derived passes against g IN

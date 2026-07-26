@@ -6,8 +6,8 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
-	"github.com/0xmhha/knowledge-system/vector/pkg/embed/ollama"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // resolveEmbedder picks the embedder backend for build/query/mcp/eval

@@ -14,7 +14,6 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/link"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
@@ -23,6 +22,7 @@ import (
 	solp "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // parseWorkers caps the parallel parser goroutine count. Capped at 8 to keep
