@@ -13,10 +13,19 @@ const nextConfig = {
   // trailingSlash for static export folder structure; this only disables
   // the dev-time auto-redirect for paths that don't match the convention.
   skipTrailingSlashRedirect: true,
-  // Dev-only: proxy /api/* to local Go server. Ignored by static export build.
+  // Dev-only proxies (ignored by the static-export build; a production host
+  // serves the static files and proxies these paths itself):
+  //   /api/*                     → the graph backend (ckg serve, :8080)
+  //   /query, /config, /data/*   → the Atlas backend (vector serve.py, :8098)
+  // The Atlas endpoints keep the paths the ported viewer already uses; they
+  // don't collide with the graph app, which only calls /api/*.
   async rewrites() {
+    const atlas = process.env.ATLAS_BACKEND || 'http://localhost:8098';
     return [
       { source: '/api/:path*', destination: 'http://localhost:8080/api/:path*' },
+      { source: '/query', destination: `${atlas}/query` },
+      { source: '/config', destination: `${atlas}/config` },
+      { source: '/data/:path*', destination: `${atlas}/data/:path*` },
     ];
   },
 };

@@ -1,0 +1,160 @@
+/* ckv Atlas — Google "Embedding Projector" 풍 라이트 테마.
+   index.html <style> 의 포팅. 원본은 전역 셀렉터였으나 컴포넌트로
+   임베드하기 위해 루트 .atlas 아래로 스코프한다. CSS 변수는 .atlas 에
+   선언되어 후손(및 dangerouslySetInnerHTML / 인라인 style 의 var())에서
+   참조된다. */
+
+.atlas {
+  --ink: #202124;
+  --sub: #5f6368;
+  --line: #dadce0;
+  --panel: #ffffff;
+  --bg: #fafafa;
+  --accent: #1a73e8;
+  --hl: #d93025;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Apple SD Gothic Neo", Pretendard, Roboto, -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.atlas *,
+.atlas *::before,
+.atlas *::after { box-sizing: border-box; }
+
+/* 헤더 */
+.header {
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.header h1 { font-size: 15px; margin: 0 8px 0 0; font-weight: 700; color: var(--ink); }
+.header h1 b { color: var(--accent); }
+.q {
+  flex: 1;
+  min-width: 260px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 6px;
+  font-size: 14px;
+}
+.q:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26, 115, 232, .15); }
+.atlas select,
+.atlas button,
+.atlas input[type=range] { font: inherit; color: var(--ink); }
+.atlas select { padding: 7px 8px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+
+.status {
+  padding: 5px 16px;
+  color: var(--sub);
+  font-size: 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.err { color: var(--hl); }
+.wrap { display: flex; flex: 1; min-height: 0; }
+
+/* 좌측 설정 패널 */
+.side {
+  width: 232px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  padding: 12px 14px;
+  flex: none;
+}
+.side h3 { font-size: 11px; letter-spacing: .08em; color: var(--sub); margin: 14px 0 6px; font-weight: 700; }
+.side h3:first-child { margin-top: 0; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0; }
+.row label { color: var(--ink); }
+.row select { flex: 1; min-width: 0; }
+.kv { color: var(--sub); font-size: 12px; line-height: 1.7; }
+.kv b { color: var(--ink); font-weight: 600; }
+.btn { padding: 6px 10px; background: #fff; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.btn:hover { background: #f1f3f4; }
+.btn.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.legend { margin-top: 6px; font-size: 12px; line-height: 1.9; color: var(--ink); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.detail {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f8f9fa;
+  font-size: 12px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* 캔버스 */
+.center { flex: 1; position: relative; background: #fff; min-width: 0; }
+.cv { display: block; width: 100%; height: 100%; cursor: grab; }
+.tip {
+  position: absolute;
+  pointer-events: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+  color: var(--ink);
+  font-size: 12px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  display: none;
+  max-width: 340px;
+  z-index: 5;
+  line-height: 1.5;
+}
+.hint {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 11px;
+  color: var(--sub);
+  background: rgba(255, 255, 255, .85);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+.cvLegend {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+/* 우측 결과 패널 */
+.right { width: 360px; flex: none; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--line); }
+.hit { padding: 8px 14px; border-bottom: 1px solid #f1f3f4; cursor: pointer; }
+.hit:hover,
+.hit.sel { background: #e8f0fe; }
+.top { display: flex; gap: 8px; align-items: center; }
+.rank { color: var(--sub); font-size: 12px; width: 20px; }
+.sym { font-weight: 700; }
+.score { margin-left: auto; color: var(--hl); font-size: 12px; font-variant-numeric: tabular-nums; }
+.file { color: var(--sub); font-size: 12px; margin: 2px 0 0 28px; }
+.hit pre {
+  margin: 5px 0 0 28px;
+  padding: 5px 8px;
+  background: #f8f9fa;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 11px;
+  color: #3c4043;
+  overflow: auto;
+  max-height: 76px;
+}
+.empty { padding: 14px; color: var(--sub); }
