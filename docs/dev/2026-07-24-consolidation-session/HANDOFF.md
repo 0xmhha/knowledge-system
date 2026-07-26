@@ -17,7 +17,7 @@
 - **운영 모델 (§8.8 #4 확정)**: 두 리포는 목적이 다르므로 각각 유지.
   upstream 정리가 완료되고 **3-repo 버전과 동등한 동작이 검증되면**,
   upstream → downstream **코드 이식**으로 동기화한다. 이식 절차 =
-  `docs/downstream-sync.md` (DRAFT — 아래 순차 대기 참조).
+  `docs/downstream-sync.md` (finalized 2026-07-27 — §4 UPDATE 참조).
 - 이식을 기계적으로 만드는 3장치: **L1 주입**(툴 네임스페이스/바이너리명
   — `pkg/mcp`, `make build-mcp NAMESPACE=...`), **projects/ 팩**(프로젝트
   데이터 분리, 경계는 `scripts/check-boundaries.sh`가 강제), **동등성 검증
@@ -105,6 +105,13 @@ $K/bin/vector-new build --src <SRC> --out <OUT-new> --ckg <같은 graph-dir>
 이번 세션에서 확인됨. 도구 문제 아님).
 
 ## 4. 순차 대기 (다음 할 일, 순서대로)
+
+> **UPDATE 2026-07-27 — 1~4 전부 완료.** `go-stablenet@0bf2f4d1b`로 D 재생성·
+> 검수(graph_digest `65d74ed7…` 재현), C fused 스모크 + 구 cks-mcp 응답 형태
+> 대조 통과, E 런북 DRAFT 해제, §8.16 동등성 종결. 진행 중 발견한
+> `enrich_digest` 미표면화 버그 수정(reproduce-first, `pipeline.go` +
+> `enrich_digest_surface_test.go`). 상세는 리뷰 문서 §8.16 "종결 재검증
+> (2026-07-27)". 남은 것은 이식 시점 결정(§6)뿐.
 
 1. **D 완료 검수** (위 체크 절차) 
 2. **C — fused 서버 스모크**: cks-refactor-1 데이터셋으로 system-mcp 기동

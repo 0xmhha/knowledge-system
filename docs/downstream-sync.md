@@ -6,7 +6,9 @@ repos serve different purposes on purpose — upstream generalizes and grows
 features; a downstream specializes for one project — so the sync is a
 **deliberate, verified port**, not a git merge (the histories are unrelated).
 
-Status: DRAFT — finalize after the vector-engine equivalence run completes.
+Status: finalized (2026-07-27). Graph, vector, retrieval, and fused-server
+equivalence to the pre-consolidation 3-repo tools is verified end to end —
+see the review doc §8.16 for the evidence.
 
 ## What makes the port mechanical
 
@@ -81,3 +83,15 @@ in the port.
 - Datasets built before the enrichment/digest split carry a combined
   digest; the first rebuild after porting changes `graph_digest` once
   when policy/security enrichment is in use (one vector realignment).
+- Vector embeddings must be built one at a time when comparing against a
+  reference: running several `vector build`s against the same Ollama daemon
+  concurrently introduces batching jitter (~1% of vectors differ bit-for-bit)
+  even though the inputs are identical. Input equality is provable from the
+  `chunks` table hash; serve the equivalence run sequentially for a 100%
+  vector match.
+- `enrich_digest` was absent from the graph manifest before the 2026-07-27
+  fix (enrichment rows were persisted to the store but not folded into the
+  digest input, so it hashed to `""` and `omitempty` dropped the key).
+  Datasets built before that fix show no `enrich_digest` even when policy /
+  security enrichment was applied — rebuild to surface it. `graph_digest` is
+  unaffected either way (enrichment is excluded from the coordinate pin).

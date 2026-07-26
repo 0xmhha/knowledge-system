@@ -430,6 +430,14 @@ func runCold(opt Options, log *slog.Logger,
 	// Failure here is logged but non-fatal — policy enrichment is
 	// strictly additive; a malformed YAML must not break the cold
 	// build. Empty PolicyFile → skipped silently.
+	// enrichNodes/enrichEdges accumulate the operator-injected overlay so the
+	// manifest can carry its EnrichDigest. The rows are persisted to the store
+	// but deliberately NOT appended to g: keeping g code-only leaves Stats,
+	// per-file entries, and graph_digest (the coordinate pin) untouched, while
+	// EnrichDigest below hashes the overlay separately (digest-split contract,
+	// see graph_digest.go).
+	var enrichNodes []types.Node
+	var enrichEdges []types.Edge
 	if policyNodes, policyEdges, perr := loadPolicy(opt.PolicyFile, g.Nodes, log); perr != nil {
 		log.Warn("policy enrichment failed; policy nodes/edges left empty",
 			"file", opt.PolicyFile, "err", perr)
@@ -442,6 +450,8 @@ func runCold(opt Options, log *slog.Logger,
 				return persist.Manifest{}, fmt.Errorf("persist policy edges: %w", err)
 			}
 		}
+		enrichNodes = append(enrichNodes, policyNodes...)
+		enrichEdges = append(enrichEdges, policyEdges...)
 		log.Info("policy enrichment emitted",
 			"policy_nodes", len(policyNodes), "governed_by_edges", len(policyEdges))
 	}
@@ -464,6 +474,8 @@ func runCold(opt Options, log *slog.Logger,
 				return persist.Manifest{}, fmt.Errorf("persist security edges: %w", err)
 			}
 		}
+		enrichNodes = append(enrichNodes, secNodes...)
+		enrichEdges = append(enrichEdges, secEdges...)
 		log.Info("security enrichment emitted",
 			"security_nodes", len(secNodes), "has_security_pattern_edges", len(secEdges))
 	}
@@ -471,6 +483,10 @@ func runCold(opt Options, log *slog.Logger,
 
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
+	// buildManifestSkeleton computes EnrichDigest from g, which is code-only, so
+	// it is always "" here. Recompute it over the overlay actually injected into
+	// the store so the manifest pins the enrichment (empty when none was applied).
+	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
 	// Files: every discovered file becomes an entry. This is the cache
 	// fingerprint that subsequent builds will diff against. We computed
 	// SHAs / cache_keys lazily here — once per cold build, so the cost
