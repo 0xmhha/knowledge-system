@@ -6,8 +6,8 @@ import (
 	"go/token"
 	gotypes "go/types"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // emitFunctionBodyPos walks a function/method body and emits Pass-1 logic

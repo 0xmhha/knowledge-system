@@ -4,8 +4,8 @@
 package score
 
 import (
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Compute populates InDegree, OutDegree, PageRank, and UsageScore for each node.

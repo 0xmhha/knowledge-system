@@ -18,7 +18,7 @@ import (
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // DefaultFileHeaderLines is the number of leading lines of each file

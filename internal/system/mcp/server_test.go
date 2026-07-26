@@ -20,7 +20,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
 	"github.com/0xmhha/knowledge-system/internal/system/config"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // fixture wires a composer with shared ckg/ckv fakes so tests can both

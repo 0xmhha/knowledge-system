@@ -6,7 +6,7 @@ package validate
 
 import (
 	policy "github.com/0xmhha/knowledge-system/internal/vector/policy"
-	vtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
+	vtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
 	"path/filepath"
 	"testing"

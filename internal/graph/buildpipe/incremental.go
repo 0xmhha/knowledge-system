@@ -31,7 +31,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
@@ -42,6 +41,7 @@ import (
 	solp "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // discoveryAll returns every discovered file in slash form with language tag.

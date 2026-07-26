@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // DefaultUnknownThreshold is the cosine-similarity cutoff below which

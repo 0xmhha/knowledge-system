@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestH3H4_EvidencePackOnRealGitFixture wires the full H1+H2+H3+H4

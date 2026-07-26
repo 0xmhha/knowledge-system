@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // Fake is an in-memory Client returning canned responses. Symmetric to

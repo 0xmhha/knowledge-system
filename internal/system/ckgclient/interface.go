@@ -21,7 +21,7 @@ package ckgclient
 import (
 	"context"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // Client is the cks-internal interface to a ckg backend.

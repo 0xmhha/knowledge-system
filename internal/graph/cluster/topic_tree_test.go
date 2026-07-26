@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 func TestTopicTreeMultiResolution(t *testing.T) {

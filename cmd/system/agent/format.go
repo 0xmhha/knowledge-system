@@ -9,7 +9,7 @@ import (
 // --- Wire mirrors of cks's contract.EvidencePack ---
 //
 // These structs intentionally duplicate the shape of
-// github.com/0xmhha/knowledge-system/system/pkg/contract.EvidencePack
+// github.com/0xmhha/knowledge-system/pkg/system/contract.EvidencePack
 // rather than importing it. cks-agent talks to cks-mcp only over MCP
 // stdio; keeping its own wire structs means the binary can be lifted
 // out of this repo and dropped into a sibling agent project that

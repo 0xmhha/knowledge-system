@@ -3,8 +3,8 @@ package buildpipe
 import (
 	"log/slog"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/policy"
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/policy"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // loadPolicy is the cold-path glue between pkg/policy and the build

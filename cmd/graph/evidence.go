@@ -26,8 +26,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/evidence"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
 )
 
 func newEvidenceCmd() *cobra.Command {

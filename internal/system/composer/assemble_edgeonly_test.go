@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer/budget"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 func edgeCit(file string) contract.Citation {

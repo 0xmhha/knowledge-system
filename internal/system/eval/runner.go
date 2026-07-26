@@ -13,7 +13,7 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
 	sysmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // toolGetForTask is the cks-mcp tool the runner invokes. Matches the

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestTSAsync_FixtureMatrix — W-B W2 acceptance check (schema 1.10,

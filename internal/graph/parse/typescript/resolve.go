@@ -1,8 +1,8 @@
 package typescript
 
 import (
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // Resolve unions per-file results and emits cross-file edges from

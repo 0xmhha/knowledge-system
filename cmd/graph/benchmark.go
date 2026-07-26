@@ -31,8 +31,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // charsPerToken is the standard rule-of-thumb for English/code tokenisers

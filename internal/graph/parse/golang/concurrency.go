@@ -6,7 +6,7 @@ import (
 	"go/token"
 	gotypes "go/types"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // concurrency.go implements B1 Stage 1 (spec §2): emit Mutex nodes for

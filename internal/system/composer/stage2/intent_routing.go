@@ -1,6 +1,6 @@
 package stage2
 
-import "github.com/0xmhha/knowledge-system/system/pkg/contract"
+import "github.com/0xmhha/knowledge-system/pkg/system/contract"
 
 // intentPathGlob returns a path glob for an intent-driven supplemental
 // BM25 search, or "" when the intent has no such routing.

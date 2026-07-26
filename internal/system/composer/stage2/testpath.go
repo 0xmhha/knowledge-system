@@ -1,6 +1,6 @@
 package stage2
 
-import "github.com/0xmhha/knowledge-system/system/pkg/testpath"
+import "github.com/0xmhha/knowledge-system/pkg/system/testpath"
 
 // testDemotionFactor is the multiplier applied to a test-file citation's
 // final RRF score when the active intent is not test-oriented. A value of

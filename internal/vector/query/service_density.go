@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // DensityService adjusts snippet length to fit within a token budget.

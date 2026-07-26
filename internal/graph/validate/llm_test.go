@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // inferredEdge is a small helper for tests that need many INFERRED

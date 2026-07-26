@@ -8,8 +8,8 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // W-A minor 4 — unit-level tests for Parser.FuncFieldTouches(). The

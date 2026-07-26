@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestTSHTTPClient_DetectsKnownPatterns asserts the W2 client detector emits

@@ -20,9 +20,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/score"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 func newReportCmd() *cobra.Command {

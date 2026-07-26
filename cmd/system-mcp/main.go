@@ -41,7 +41,7 @@ import (
 	"strings"
 	"syscall"
 
-	ckvtypes "github.com/0xmhha/knowledge-system/vector/pkg/types"
+	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"

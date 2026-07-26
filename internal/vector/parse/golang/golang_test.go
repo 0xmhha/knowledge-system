@@ -3,7 +3,7 @@ package golang
 import (
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 func TestParseExtractsFuncMethodAndType(t *testing.T) {

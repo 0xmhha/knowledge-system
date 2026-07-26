@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // W-C W10 V1.1 — Yul EVM builtin detection inside assembly blocks.

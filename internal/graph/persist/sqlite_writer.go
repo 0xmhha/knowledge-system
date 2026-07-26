@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // ClusterEdge mirrors cluster.Edge to avoid making persist's exported surface

@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 func cit(file string, start, end int) contract.Citation {

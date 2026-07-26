@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // fixtureStoreWithPRs stands up a fresh on-disk SQLite store with a

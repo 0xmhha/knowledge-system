@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 func TestHandleGetFlow_HappyPath(t *testing.T) {

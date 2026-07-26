@@ -6,7 +6,7 @@ import (
 	gotypes "go/types"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // grpc.go implements W3b (schema 1.9, CKS G5 Distributed): Go gRPC

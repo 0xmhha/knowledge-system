@@ -3,8 +3,8 @@ package typescript
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TS W-B W1 — heritage detection (extends / implements).

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // knowledgeSeed is a seed whose hit came from the kind-scoped knowledge

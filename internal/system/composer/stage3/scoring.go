@@ -3,7 +3,7 @@ package stage3
 import (
 	"sort"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // neighborAggregator collects ScoredNeighbors keyed by Target Citation.

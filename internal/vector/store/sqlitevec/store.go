@@ -22,7 +22,7 @@ import (
 	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
 
 	"github.com/0xmhha/knowledge-system/internal/vector/policy"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // SchemaVersion is stamped into the manifest table on first init. Bump

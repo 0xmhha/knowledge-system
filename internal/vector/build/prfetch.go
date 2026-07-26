@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse/prdoc"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // PRFetchOptions controls which PRs to fetch for corpus indexing.

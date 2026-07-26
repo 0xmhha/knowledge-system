@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"github.com/0xmhha/knowledge-system/graph/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // PendingRef is an unresolved cross-file reference produced in Pass 1

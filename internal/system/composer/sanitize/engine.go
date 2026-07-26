@@ -32,7 +32,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // DefaultMaskToken is the placeholder substituted for masked matches.

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 func goodCitation(file string) contract.Citation {

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
-	"github.com/0xmhha/knowledge-system/system/pkg/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // --- find_symbol ---

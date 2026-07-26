@@ -1,6 +1,6 @@
 package intent
 
-import "github.com/0xmhha/knowledge-system/system/pkg/contract"
+import "github.com/0xmhha/knowledge-system/pkg/system/contract"
 
 // defaultAnchors lists representative prompt examples for each Intent.
 //

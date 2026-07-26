@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // Flow-aware retrieval (flow-ingest Phase D). These operate over the curated

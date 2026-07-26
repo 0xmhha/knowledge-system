@@ -17,7 +17,7 @@ import (
 	tsbind "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 
 	cparse "github.com/0xmhha/knowledge-system/internal/vector/parse"
-	"github.com/0xmhha/knowledge-system/vector/pkg/types"
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // Parser implements parse.Parser for .ts and .tsx.
