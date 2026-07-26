@@ -1,9 +1,14 @@
-# ckv Atlas viewer
+# ckv Atlas — data pipeline + search backend
 
 ckv 인덱스(vector.db)의 지식 분포를 3D 로 보여주고, 검색을 **실제 ckv 엔진**
 (`ckv query --json` = MCP `semantic_search` 와 동일한 `engine.Search` 경로:
 bge-m3 임베딩 → sqlite-vec KNN → threshold → citation 검증)으로 수행해
-히트를 공간에서 붉게 하이라이트하는 뷰어.
+히트를 공간에서 붉게 하이라이트한다.
+
+**프런트엔드(뷰어 UI)는 통합 Next 앱 `graph/web/viewer-next` 의 `/atlas`
+라우트로 이동**했다(구 standalone `index.html` 은 그 React 컴포넌트로 대체·삭제).
+이 디렉토리는 이제 그 앱의 **Atlas 백엔드** — 투영 데이터 생성(`export_projection.py`)
++ 검색/설정/데이터 서빙(`serve.py`) — 만 담당한다.
 
 Embedding Projector 의 UX(3D 축·회전·타이핑 즉시 하이라이트)를 따르되,
 매칭이 *메타데이터 문자열*이 아니라 **의미(bge-m3)** 라는 점이 다르다.
@@ -25,15 +30,19 @@ export CKV_BIN=/path/to/repo/bin/ckv        # 또는 "go run ./cmd/ckv"
 # 1) 투영 데이터 생성 (인덱스 바뀔 때마다 1회; numpy 필요)
 python3 export_projection.py
 
-# 2) 서버
-python3 serve.py                            # → http://localhost:8098
+# 2) 백엔드 기동 (데이터 + 검색)
+python3 serve.py                            # → :8098
+
+# 3) 프런트엔드: 통합 Next 앱의 /atlas 라우트
+cd ../../../graph/web/viewer-next && npm run dev   # → http://localhost:3001/atlas
+#   (dev 프록시가 /query·/config·/data/* 를 위 :8098 백엔드로 전달)
 ```
 
 ## 구성
 - `export_projection.py` — vector.db shadow 테이블 → PCA top-3 → `data/points.json`
   (좌표+메타) + `data/projection.json` (질의 투영용 mean/components/scale)
-- `serve.py` — 정적 서빙 + `/query`(진짜 ckv 실행 + 질의 임베딩 투영)
-- `index.html` — 의존성 없는 canvas 3D 산점도 + 검색 + 랭킹 패널
+- `serve.py` — 데이터 서빙(`/data/*`, `/config`) + `/query`(진짜 ckv 실행 + 질의 임베딩 투영)
+- 프런트엔드: `graph/web/viewer-next/src/components/Atlas.tsx` (`/atlas` 라우트)
 
-## 조작
+## 조작 (`/atlas` 페이지)
 드래그=회전 · 휠=줌 · 타이핑=350ms 디바운스 실검색 · 패널 hover=해당 점 강조

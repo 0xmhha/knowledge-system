@@ -4,7 +4,9 @@ serve.py — ckv Atlas viewer 백엔드.
 
 역할
 ----
-1. 정적 서빙: index.html + data/(points.json, projection.json)
+1. 정적 서빙: data/(points.json, projection.json). 프런트엔드는 통합 Next
+   앱(graph/web/viewer-next)의 /atlas 라우트가 대신하며, 이 서버는 그 앱의
+   Atlas 백엔드(데이터 + 검색)로만 쓰인다.
 2. /query: 검색을 100% '진짜 ckv' 로 수행 — `ckv query --json` 호출
    (MCP semantic_search 와 동일한 engine.Search 경로: bge-m3 임베딩 →
    sqlite-vec KNN → threshold → citation 검증). 결과 chunk_id 들이
@@ -160,9 +162,6 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self):
         u = urllib.parse.urlparse(self.path)
-        if u.path in ("/", "/index.html"):
-            with open(os.path.join(HERE, "index.html"), "rb") as f:
-                return self._send(200, f.read(), "text/html; charset=utf-8")
         if u.path.startswith("/data/"):
             p = os.path.normpath(os.path.join(HERE, u.path.lstrip("/")))
             if p.startswith(DATA) and os.path.exists(p):
@@ -211,7 +210,7 @@ def main():
     CFG.update(db=args.db, ckv_bin=args.ckv_bin, repo=args.repo, model=args.model)
     load_projection()
 
-    print(f"ckv Atlas  →  http://localhost:{args.port}")
+    print(f"ckv Atlas backend  →  http://localhost:{args.port}  (frontend: Next /atlas)")
     print(f"  db={args.db}\n  ckv-bin={args.ckv_bin} (model={args.model})")
     print(f"  projection={'OK' if PROJ['loaded'] else '없음 — export_projection.py 먼저 실행'}")
     print("  전제: ollama serve + ollama pull bge-m3\n")
