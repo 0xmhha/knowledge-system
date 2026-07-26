@@ -36,31 +36,39 @@ CI (`.github/workflows/ci.yml`) runs `go vet ./...`, `go test -race ./...`,
 
 ## Code structure
 
-- `cmd/ckg/` — cobra root + subcommands. **Five production surfaces:** `build`,
-  `serve`, `mcp`, `eval`, `audit`. The rest are utilities.
-- `cmd/eval-gate/` — eval regression gate (CI).
-- `internal/` — implementation. **Private**: external repos must not import it.
-  Key: `buildpipe` (7-pass pipeline + cache), `parse/{golang,typescript,solidity}`,
-  `persist` (SQLite/Postgres store, schema, migrations), `graph`, `link`,
-  `temporal`, `score`, `cluster`, `server`, `mcp`, `eval`, `audit`, `detect`.
-- `pkg/` — **public API / stable contract** (`types`, `store`, `bm25`,
-  `smartctx`, `evidence`, `impact`, `policy`, `security`, …). CKV/CKS consume
-  these.
-- `../tools/viewer/` — Next.js 3D force-graph viewer, embedded into the binary.
-- `docs/` — see `../docs/graph/DOC-MAP.md`. `policies/`, `eval/`, `testdata/` as named.
+Paths are for the consolidated module (the three engines share one repo; the
+graph engine's code moved from a standalone `cmd/`+`internal/`+`pkg/` into the
+root under an engine-scoped prefix).
+
+- `../cmd/graph/` — cobra root + subcommands. **Five production surfaces:**
+  `build`, `serve`, `mcp`, `eval`, `audit`. The rest are utilities.
+  (`../cmd/graph-mcp/` builds the MCP server binary.)
+- `../cmd/eval-gate/` — eval regression gate (CI).
+- `../internal/graph/` — implementation. **Private**: other engines must not
+  import it. Key: `buildpipe` (7-pass pipeline + cache),
+  `parse/{golang,typescript,solidity}`, `persist` (SQLite/Postgres store,
+  schema, migrations), `graph`, `link`, `temporal`, `score`, `cluster`,
+  `server`, `mcp`, `eval`, `audit`, `detect`.
+- `../pkg/graph/` — **public API / stable contract** (`types`, `store`,
+  `smartctx`, `evidence`, `impact`, `policy`, `security`, `mcphandlers`, …);
+  `../pkg/bm25` is the shared BM25 core. CKV/CKS consume these.
+- `../tools/viewer/` — Next.js dashboard (graph + vector viewers), embedded
+  into the graph binary via `make -C graph build-full`.
+- `graph/`-local: `docs/` (see `../docs/graph/DOC-MAP.md`), `policies/`,
+  `eval/`, `testdata/`, `scripts/`, `Makefile`.
 
 ## Codebase conventions (non-obvious, easy to get wrong)
 
 - **Public boundary:** never make CKV/CKS reach into `internal/`. New
   cross-repo API goes under `pkg/` and is a **contract change** — treat it as
   such (back-compat, review).
-- **SchemaVersion bumps are for BREAKING changes only** (`internal/persist/manifest.go`
+- **SchemaVersion bumps are for BREAKING changes only** (`internal/graph/persist/manifest.go`
   policy comment). Additive optional fields with `omitempty` do **NOT** bump it
   — old readers ignore unknown JSON and decode unset fields as zero. Spurious
   bumps force a full rebuild of every existing graph DB.
 - **Two distinct version-ish constants — don't confuse them:**
-  - `internal/persist/manifest.go` `SchemaVersion` (manifest/back-compat policy), and
-  - `internal/buildpipe/cache.go` `SchemaVersion` (the **cache-key** contributor;
+  - `internal/graph/persist/manifest.go` `SchemaVersion` (manifest/back-compat policy), and
+  - `internal/graph/buildpipe/cache.go` `SchemaVersion` (the **cache-key** contributor;
     bumping it invalidates the build cache and forces a reindex). A change that
     must repopulate node columns on rebuild needs the **cache.go** bump.
 - **Additive node/edge fields:** prefer additive + `omitempty`; round-trip
