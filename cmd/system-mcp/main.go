@@ -78,6 +78,17 @@ func main() {
 		return
 	}
 
+	// daemon subcommand: supervise HTTP instances of this binary
+	// (start/stop/restart/status/list) — the Go port of serve-cks-http.sh's
+	// process supervision.
+	if len(os.Args) > 1 && os.Args[1] == "daemon" {
+		if err := runDaemon(os.Args[2:], os.Stdout); err != nil {
+			log.Printf("cks-mcp daemon: %v", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	configPath := flag.String("config", "", "path to cks.yaml (optional; falls back to defaults)")
 	nameOverride := flag.String("name", "", "override config name (MCP instance name) — for running several instances")
 	httpAddrOverride := flag.String("http-addr", "", "override config listen.http_addr (host:port) — for running several instances on different ports")

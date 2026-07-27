@@ -71,6 +71,11 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
    assertion (a coverage regression vs `reindex-dataset.sh` gate 2). [LANDED]
 8. **multi-instance MCP daemon management** — start/stop/list several
    `system-mcp` HTTP instances. (retires `cks-mcpd.sh` / `serve-cks-http.sh`)
+   [LANDED (supervisor core): `system-mcp daemon start|stop|restart|status|list`
+   (internal/system/daemon) supervises named instances via pidfiles. MCP-client
+   registration, LAN-IP autodetect, `--advertise`, and auto-port picking stay
+   as shell/plugin glue; serving-restart is P5. So `cks-mcpd.sh` /
+   `serve-cks-http.sh` are kept (still used by the ops runbooks).]
 9. **semantic-validation harness** — reconcile `build-knowledge.sh`'s
    paraphrase→expected-file check with `ckv eval` (fixture format differs).
    [LANDED — `ckv eval --fixture <semantic.json>` accepts the JSON set
