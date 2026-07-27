@@ -599,6 +599,8 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		EmbeddingNormalize: embID.Normalize,
 		EmbeddingChecksum:  embChecksum,
 		ChunkCount:         totalStats.Total,
+		SymbolCount:        totalStats.Symbol,
+		CanonicalCount:     totalStats.CanonicalID,
 		Languages:          languageCounts,
 		CKVIgnore:          o.CKVIgnore,
 		DocsRoots:          absRoots(manifestDocsRoots),

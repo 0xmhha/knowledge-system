@@ -43,6 +43,13 @@ type Manifest struct {
 	ChunkCount int            `json:"chunk_count"`
 	Languages  map[string]int `json:"languages,omitempty"` // language → chunk count
 
+	// SymbolCount / CanonicalCount record how many chunks are code symbols and
+	// how many of those carry a ckg-aligned canonical_id. Their ratio is the
+	// alignment coverage a reindex gate checks (ADR-007). Additive — old
+	// readers see 0.
+	SymbolCount    int `json:"symbol_count,omitempty"`
+	CanonicalCount int `json:"canonical_count,omitempty"`
+
 	// DBSHA256 is the SHA-256 of vector.db after the build checkpointed the
 	// WAL into it (publish integrity fingerprint). Additive — old readers see
 	// "". Empty when the build did not run the publish step.
