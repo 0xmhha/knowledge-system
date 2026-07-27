@@ -81,8 +81,9 @@ type BackendsConfig struct {
 // SourceRoot points at the working tree the ckg index was built
 // against. Used by composer.Stage4's FilesystemFetcher to resolve
 // Citation.File paths (which are stored as repo-relative strings).
-// Empty SourceRoot makes the fetcher resolve against cwd — the
-// common case when cks-mcp runs from the indexed repo's root.
+// Optional: when empty, the server derives it from the graph manifest's
+// src_root (the dataset is the single source of truth), so the config need
+// not duplicate it. Set it only to override the manifest.
 type CKGConfig struct {
 	Path       string `yaml:"path"`
 	SourceRoot string `yaml:"source_root"`
