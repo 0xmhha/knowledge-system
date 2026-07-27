@@ -206,6 +206,9 @@ func accumulateStats(total *chunk.Stats, chunks []types.Chunk) {
 	total.PRDoc += s.PRDoc
 	total.Invariant += s.Invariant
 	total.Truncated += s.Truncated
+	total.FlowStep += s.FlowStep
+	total.FlowSpine += s.FlowSpine
+	total.CanonicalID += s.CanonicalID
 }
 
 // emitConventionChunks materializes one ChunkConvention per package

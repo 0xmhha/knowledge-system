@@ -49,9 +49,9 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
 2. **vector build preflight** — ollama reachability + model existence; ckg
    `schema_version >= 1.19` gate before aligning. (part of `build-knowledge.sh`) [LANDED: ollama reachability + model existence — internal/setup preflight]
 3. **vector build verify** — surface `canonical_id` match-rate and flow/doc
-   chunk counts in the build summary. (part of `build-knowledge.sh`)
+   chunk counts in the build summary. (part of `build-knowledge.sh`) [LANDED]
 4. **dataset publish** — `wal_checkpoint(TRUNCATE)` + sha256 manifest as a
-   `knowledge-setup`/`ckv` step. (part of `build-knowledge.sh`)
+   `knowledge-setup`/`ckv` step. (part of `build-knowledge.sh`) [LANDED]
 5. **fused-server config generation** — a Go generator for the `system-mcp`
    config + env (today only `config.Load` exists). (retires `gen-cks-config.sh`)
 6. **reindex orchestration** — wire `ckg validate` / manifest-align /

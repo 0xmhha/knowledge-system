@@ -6,6 +6,8 @@ package build
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -120,6 +122,9 @@ type Result struct {
 	IndexedHead  string
 	BuiltAt      string
 	DBPath       string
+	// DBSHA256 is the SHA-256 of vector.db after the WAL was checkpointed in
+	// (publish integrity fingerprint); also recorded in manifest.json.
+	DBSHA256 string
 }
 
 const defaultBatch = 32
@@ -599,6 +604,24 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		DocsRoots:          absRoots(manifestDocsRoots),
 	}
 	man.Sources = buildSourcesLedger(o, commit, builtAt, prSource)
+
+	// Publish finalize: checkpoint the WAL into vector.db so the file is
+	// self-contained (no -wal/-shm needed to read it), close the store, then
+	// fingerprint the on-disk db. The hash is recorded in manifest.json only
+	// (not the in-db manifest table — that would be self-referential), so it
+	// is computed after the last db write. The deferred Close is idempotent.
+	if err := store.Checkpoint(); err != nil {
+		return nil, fmt.Errorf("checkpoint vector.db: %w", err)
+	}
+	if err := store.Close(); err != nil {
+		return nil, fmt.Errorf("close store: %w", err)
+	}
+	dbSHA, err := fileSHA256(dbPath)
+	if err != nil {
+		return nil, fmt.Errorf("hash vector.db: %w", err)
+	}
+	man.DBSHA256 = dbSHA
+
 	if err := manifest.Save(o.OutDir, man); err != nil {
 		return nil, fmt.Errorf("save manifest.json: %w", err)
 	}
@@ -607,6 +630,9 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		"files_indexed", indexedFiles,
 		"chunks_total", totalStats.Total,
 		"chunks_symbol", totalStats.Symbol,
+		"chunks_canonical_id", totalStats.CanonicalID,
+		"chunks_flow_step", totalStats.FlowStep,
+		"chunks_flow_spine", totalStats.FlowSpine,
 		"chunks_file_header", totalStats.FileHeader,
 		"chunks_doc", totalStats.Doc,
 		"chunks_truncated", totalStats.Truncated,
@@ -614,6 +640,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		"languages", languageCounts,
 		"policy_loaded", o.PolicyPath != "",
 		"category_counts", categoryCounts,
+		"db_sha256", dbSHA,
 	)
 
 	return &Result{
@@ -622,7 +649,22 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		IndexedHead:  commit,
 		BuiltAt:      builtAt,
 		DBPath:       dbPath,
+		DBSHA256:     dbSHA,
 	}, nil
+}
+
+// fileSHA256 returns the hex SHA-256 of a file's contents.
+func fileSHA256(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = f.Close() }()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 // embedAndUpsert batches the chunks through the embedder and upserts

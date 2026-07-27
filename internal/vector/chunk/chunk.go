@@ -324,6 +324,13 @@ type Stats struct {
 	PRDoc         int
 	Invariant     int
 	Truncated     int
+	// FlowStep / FlowSpine count the flow-corpus chunks (the bridge layer).
+	FlowStep  int
+	FlowSpine int
+	// CanonicalID counts chunks carrying a non-empty canonical_id — the
+	// ckg-aligned join key. Its ratio to Symbol is the alignment coverage;
+	// a build against a stale/absent ckg leaves most of these empty.
+	CanonicalID int
 }
 
 // Summarize counts chunk kinds. Cheap O(n) pass over the slice.
@@ -344,6 +351,13 @@ func Summarize(chunks []types.Chunk) Stats {
 			s.PRDoc++
 		case types.ChunkInvariant:
 			s.Invariant++
+		case types.ChunkFlowStep:
+			s.FlowStep++
+		case types.ChunkFlowSpine:
+			s.FlowSpine++
+		}
+		if c.CanonicalID != "" {
+			s.CanonicalID++
 		}
 		if strings.Contains(c.Text, "[CKV-TRUNCATED]") {
 			s.Truncated++

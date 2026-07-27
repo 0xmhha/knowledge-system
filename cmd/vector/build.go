@@ -132,7 +132,13 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 	}
 	fmt.Printf("ckv: indexed %d files → %d chunks (%d symbol, %d doc, %d header, %d truncated)\n",
 		res.FilesIndexed, res.Chunks.Total, res.Chunks.Symbol, res.Chunks.Doc, res.Chunks.FileHeader, res.Chunks.Truncated)
-	fmt.Printf("ckv: indexed_head=%s built_at=%s db=%s\n", res.IndexedHead, res.BuiltAt, res.DBPath)
+	fmt.Printf("ckv: canonical_id %d/%d symbols aligned · flow %d step / %d spine\n",
+		res.Chunks.CanonicalID, res.Chunks.Symbol, res.Chunks.FlowStep, res.Chunks.FlowSpine)
+	if res.DBSHA256 != "" {
+		fmt.Printf("ckv: indexed_head=%s built_at=%s db=%s sha256=%s\n", res.IndexedHead, res.BuiltAt, res.DBPath, res.DBSHA256)
+	} else {
+		fmt.Printf("ckv: indexed_head=%s built_at=%s db=%s\n", res.IndexedHead, res.BuiltAt, res.DBPath)
+	}
 	return nil
 }
 

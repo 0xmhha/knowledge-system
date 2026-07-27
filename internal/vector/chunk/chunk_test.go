@@ -323,3 +323,24 @@ func TestMarkdownSkipsFileHeader(t *testing.T) {
 		}
 	}
 }
+
+// TestSummarize_CanonicalAndFlow covers the added counters: canonical_id
+// coverage and the flow-corpus chunk kinds.
+func TestSummarize_CanonicalAndFlow(t *testing.T) {
+	chunks := []types.Chunk{
+		{ChunkKind: types.ChunkSymbol, CanonicalID: "pkg.A"},
+		{ChunkKind: types.ChunkSymbol}, // unaligned: no canonical_id
+		{ChunkKind: types.ChunkFlowStep, CanonicalID: "pkg.B"},
+		{ChunkKind: types.ChunkFlowSpine},
+	}
+	s := Summarize(chunks)
+	if s.CanonicalID != 2 {
+		t.Errorf("CanonicalID = %d, want 2", s.CanonicalID)
+	}
+	if s.FlowStep != 1 || s.FlowSpine != 1 {
+		t.Errorf("flow counts = step %d / spine %d, want 1 / 1", s.FlowStep, s.FlowSpine)
+	}
+	if s.Symbol != 2 || s.Total != 4 {
+		t.Errorf("symbol=%d total=%d, want 2 / 4", s.Symbol, s.Total)
+	}
+}
