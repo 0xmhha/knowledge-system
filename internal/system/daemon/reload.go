@@ -121,6 +121,14 @@ func (s *Supervisor) tempAddr(override, target string) (string, error) {
 	return net.JoinHostPort(host, strconv.Itoa(p)), nil
 }
 
+// WaitReady polls addr's /healthz until it reports serviceable (2xx) or timeout
+// elapses, returning whether it became ready. A wildcard bind host is normalized
+// to loopback for the probe. Used by `daemon up --wait` so a caller does not
+// hand out a URL before the instance has finished loading its dataset.
+func WaitReady(addr string, timeout, interval time.Duration) bool {
+	return waitHealthy(HTTPHealth, probeAddr(addr), timeout, interval)
+}
+
 // waitHealthy polls probe(addr) until it returns true or timeout elapses.
 func waitHealthy(probe func(string) bool, addr string, timeout, interval time.Duration) bool {
 	deadline := time.Now().Add(timeout)

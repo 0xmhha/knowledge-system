@@ -29,11 +29,13 @@ type RegistryEntry struct {
 // It lets one `daemon up` bring up several datasets as separate MCP servers,
 // each on its own port, so one host can serve multiple projects to agents.
 type Registry struct {
-	PortBase    int             `yaml:"port_base"`    // first auto-assigned port (default 8801)
-	Bind        string          `yaml:"bind"`         // bind host (default 127.0.0.1; 0.0.0.0 to reach remote agents)
-	AllowRemote bool            `yaml:"allow_remote"` // opt-in propagated to generated configs
-	OllamaURL   string          `yaml:"ollama_url"`   // embedding endpoint for generated configs
-	Instances   []RegistryEntry `yaml:"instances"`
+	PortBase     int             `yaml:"port_base"`     // first auto-assigned port (default 8801)
+	Bind         string          `yaml:"bind"`          // bind host (default 127.0.0.1; 0.0.0.0 to reach remote agents)
+	AllowRemote  bool            `yaml:"allow_remote"`  // opt-in propagated to generated configs
+	OllamaURL    string          `yaml:"ollama_url"`    // embedding endpoint for generated configs
+	GraphBinary  string          `yaml:"graph_binary"`  // ckg binary written into generated configs (enables ops.reindex/ops.index)
+	VectorBinary string          `yaml:"vector_binary"` // ckv binary written into generated configs
+	Instances    []RegistryEntry `yaml:"instances"`
 }
 
 // LoadRegistry reads and validates a registry YAML file.
@@ -140,11 +142,13 @@ func (s *Supervisor) configFor(r *Registry, e RegistryEntry, addr string) (strin
 		return e.Config, nil
 	}
 	cfg := config.Generate(config.GenerateOptions{
-		Name:        e.Name,
-		DatasetDir:  e.Dataset,
-		HTTPAddr:    addr, // a non-loopback bind derives AllowRemote in Generate
-		AllowRemote: r.AllowRemote,
-		OllamaURL:   r.OllamaURL,
+		Name:         e.Name,
+		DatasetDir:   e.Dataset,
+		HTTPAddr:     addr, // a non-loopback bind derives AllowRemote in Generate
+		AllowRemote:  r.AllowRemote,
+		OllamaURL:    r.OllamaURL,
+		GraphBinary:  r.GraphBinary, // so ops.reindex/ops.index can run the engines
+		VectorBinary: r.VectorBinary,
 	})
 	if err := os.MkdirAll(s.RunDir, 0o755); err != nil {
 		return "", err

@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
@@ -31,6 +32,27 @@ instances:
 	}
 	if r.Instances[1].Port != 9200 || r.Instances[1].Config != "/etc/beta.yaml" {
 		t.Errorf("beta entry mismatch: %+v", r.Instances[1])
+	}
+}
+
+func TestLoadRegistryEngineBinaries(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "instances.yaml")
+	if err := os.WriteFile(path, []byte(`
+graph_binary: /opt/ckg
+vector_binary: /opt/ckv
+instances:
+  - name: a
+    dataset: /data/a
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	r, err := LoadRegistry(path)
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	if r.GraphBinary != "/opt/ckg" || r.VectorBinary != "/opt/ckv" {
+		t.Errorf("engine binaries not parsed: %+v", r)
 	}
 }
 
@@ -90,6 +112,31 @@ func TestResolveAddrs(t *testing.T) {
 	for name, w := range want {
 		if addrs[name] != w {
 			t.Errorf("addr[%s] = %q, want %q", name, addrs[name], w)
+		}
+	}
+}
+
+func TestUpWritesEngineBinariesIntoGeneratedConfig(t *testing.T) {
+	s := newTestSupervisor(t)
+	r := &Registry{
+		PortBase:     9500,
+		GraphBinary:  "/opt/ckg",
+		VectorBinary: "/opt/ckv",
+		Instances:    []RegistryEntry{{Name: "eng", Dataset: "/data/eng"}},
+	}
+	t.Cleanup(func() { _ = s.Down(r) })
+	if _, err := s.Up(r, func(int) bool { return true }); err != nil {
+		t.Fatalf("up: %v", err)
+	}
+	// The generated config must carry the engine binary paths so ops.reindex /
+	// ops.index can run without ckg/ckv being on PATH.
+	buf, err := os.ReadFile(filepath.Join(s.RunDir, "eng.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"/opt/ckg", "/opt/ckv"} {
+		if !bytes.Contains(buf, []byte(want)) {
+			t.Errorf("generated config missing binary path %q:\n%s", want, buf)
 		}
 	}
 }
