@@ -85,6 +85,12 @@ type AlignmentInputs struct {
 	CKGDigest    string // logical graph digest; "" until CKG ships it
 	// CKV manifest (raw bytes of <ckv-data>/manifest.json; nil when missing).
 	CKVManifest []byte
+	// CKVConfigured is true when a ckv index is part of this deployment
+	// (config.Backends.CKV.Path set). When it is, a missing/coordinate-less
+	// manifest is an ERROR (the canonical_id join cannot be verified), not a
+	// warning — otherwise a mis-aligned index would report serviceable. A
+	// ckg-only deployment leaves this false and skips the check.
+	CKVConfigured bool
 	// Config + environment.
 	ConfigSourceRoot string
 	SourceHead       string // git HEAD of ConfigSourceRoot; "" when unknown
@@ -148,6 +154,14 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	rep.GraphDigestActual = in.CKGDigest
 
 	// --- ERROR tier -------------------------------------------------------
+	// Fail closed when ckv is expected but provides no verifiable coordinates:
+	// two individually-reachable backends whose join cannot be checked are
+	// confidently-wrong, not ok. A pre-P1 index still has a top-level src_commit
+	// (ckvCommit non-empty), so only a truly missing/unparsable manifest trips.
+	if in.CKVConfigured && ckvCommit == "" {
+		errs = append(errs, "ckv index configured but its manifest is missing or has no commit — "+
+			"alignment coordinates unavailable, cannot verify the canonical_id join")
+	}
 	if in.CKGSrcCommit != "" && ckvCommit != "" && in.CKGSrcCommit != ckvCommit {
 		errs = append(errs, fmt.Sprintf(
 			"ckg/ckv built from different commits (ckg %.9s, ckv %.9s)", in.CKGSrcCommit, ckvCommit))
