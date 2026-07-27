@@ -129,6 +129,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerFreshness(s, d)
 	registerOpsIndex(s, d)
 	registerOpsSetup(s, d)
+	registerOpsReindex(s, d)
 	registerOpsSetupStatus(s, d)
 	// Phase D flow-aware direct-call tools (D-4). Backend bodies are stubbed
 	// until CKV ships pkg/ckv.Engine flow methods (coordination §9.2-R).

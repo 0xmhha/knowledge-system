@@ -91,6 +91,17 @@ func main() {
 		return
 	}
 
+	// print-mcp-config subcommand: emit a ready-to-paste MCP client config entry
+	// for a --config'd instance, so an agent can register it without hand-building
+	// the URL/command.
+	if len(os.Args) > 1 && os.Args[1] == "print-mcp-config" {
+		if err := runPrintMCPConfig(os.Args[2:], os.Stdout); err != nil {
+			log.Printf("cks-mcp print-mcp-config: %v", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	configPath := flag.String("config", "", "path to cks.yaml (optional; falls back to defaults)")
 	nameOverride := flag.String("name", "", "override config name (MCP instance name) — for running several instances")
 	httpAddrOverride := flag.String("http-addr", "", "override config listen.http_addr (host:port) — for running several instances on different ports")

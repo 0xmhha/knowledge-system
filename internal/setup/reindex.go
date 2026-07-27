@@ -24,6 +24,13 @@ import (
 // new version) is the instance-level blue-green step (design P5), out of scope
 // here.
 
+// NewVersion returns a fresh, sortable version label for a reindex when the
+// caller does not pin one: "v<unix-seconds>". Monotonic across reindexes of a
+// dataset, so version directories order chronologically.
+func NewVersion() string {
+	return fmt.Sprintf("v%d", time.Now().UTC().Unix())
+}
+
 // reindexLock is a dataset-level advisory lock serializing coordinated
 // reindexes (design §5.3). Reads (serving) are unaffected — they go through the
 // atomic `current` swap, not the lock.
