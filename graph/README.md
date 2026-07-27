@@ -1,5 +1,9 @@
 # CKG — Code Knowledge Graph
 
+> The three engines (ckg · ckv · cks) now live in one module — the
+> [`knowledge-system`](https://github.com/0xmhha/knowledge-system) monorepo.
+> "CKG" names the graph engine, not a separate repository.
+
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![CI](https://github.com/0xmhha/knowledge-system/actions/workflows/ci.yml/badge.svg)](https://github.com/0xmhha/knowledge-system/actions/workflows/ci.yml)
 

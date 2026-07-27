@@ -1,13 +1,16 @@
 # Code Knowledge Vector (CKV)
 
+> The three engines (ckg · ckv · cks) now live in one module — the
+> [`knowledge-system`](https://github.com/0xmhha/knowledge-system) monorepo.
+> "CKV"/"CKG"/"CKS" name the engines, not separate repositories.
+
 Semantic code search over a local vector index. CKV indexes a source
 repository as embedding vectors at function / type / heading
 granularity, stores them in an embedded SQLite + `sqlite-vec`
 database, and serves retrieval over a CLI, an in-process Go API, and
-an MCP server. The companion project
-[`code-knowledge-graph`](https://github.com/0xmhha/knowledge-system)
-(CKG) provides symbol-graph search; the two are designed to be
-combined by larger systems (CKS) for hybrid retrieval.
+an MCP server. The in-repo graph engine (CKG) provides symbol-graph
+search; the two are combined by the system engine (CKS) for hybrid
+retrieval.
 
 > **Resuming work on a different machine or in a new session?**
 > Start with [`docs/session-handoff-2026-05-23.md`](../docs/vector/archive/session-handoff-2026-05-23.md)
