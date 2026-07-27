@@ -129,6 +129,10 @@ func WaitReady(addr string, timeout, interval time.Duration) bool {
 	return waitHealthy(HTTPHealth, probeAddr(addr), timeout, interval)
 }
 
+// Serviceable does a single /healthz probe of addr (normalizing a wildcard bind
+// host to loopback), reporting whether the instance is currently serviceable.
+func Serviceable(addr string) bool { return HTTPHealth(probeAddr(addr)) }
+
 // waitHealthy polls probe(addr) until it returns true or timeout elapses.
 func waitHealthy(probe func(string) bool, addr string, timeout, interval time.Duration) bool {
 	deadline := time.Now().Add(timeout)

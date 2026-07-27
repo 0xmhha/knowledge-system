@@ -1,8 +1,10 @@
 package daemon
 
 import (
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -104,6 +106,41 @@ func TestWaitReady(t *testing.T) {
 	ready.Store(true)
 	if !WaitReady(addr, time.Second, 30*time.Millisecond) {
 		t.Error("WaitReady should become true once /healthz returns 200")
+	}
+}
+
+func TestServiceable(t *testing.T) {
+	ok := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ok.Close()
+	addr := strings.TrimPrefix(ok.URL, "http://") // 127.0.0.1:PORT
+	if !Serviceable(addr) {
+		t.Error("Serviceable on a 200 /healthz should be true")
+	}
+	// A wildcard bind host is normalized to loopback, hitting the same server.
+	_, port, _ := net.SplitHostPort(addr)
+	if !Serviceable(net.JoinHostPort("0.0.0.0", port)) {
+		t.Error("Serviceable should normalize 0.0.0.0 to loopback and reach the server")
+	}
+	if Serviceable("127.0.0.1:1") {
+		t.Error("Serviceable on an unreachable addr should be false")
+	}
+}
+
+func TestPortFreeOn(t *testing.T) {
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, portStr, _ := net.SplitHostPort(l.Addr().String())
+	port, _ := strconv.Atoi(portStr)
+	if portFreeOn("127.0.0.1", port) {
+		t.Errorf("port %d is bound, portFreeOn should be false", port)
+	}
+	_ = l.Close()
+	if !portFreeOn("127.0.0.1", port) {
+		t.Errorf("port %d is free after close, portFreeOn should be true", port)
 	}
 }
 
