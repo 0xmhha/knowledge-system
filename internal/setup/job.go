@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 )
@@ -14,6 +15,13 @@ const (
 	JobFailed  = "failed"
 )
 
+// Retention bounds keep a long-lived server's memory flat: cap the events
+// stored per job and the number of finished jobs kept for status polling.
+const (
+	maxJobEvents    = 1000
+	maxRetainedJobs = 64
+)
+
 // job is the mutable record behind one asynchronous run.
 type job struct {
 	id       string
@@ -23,6 +31,7 @@ type job struct {
 	errMsg   string
 	started  time.Time
 	finished time.Time
+	cancel   context.CancelFunc // cancels this job's context (idempotent)
 }
 
 // JobSnapshot is the read-only view returned to status callers.
@@ -45,6 +54,10 @@ type Jobs struct {
 	seq    int
 	byID   map[string]*job
 	runner Runner
+	// baseCtx is the parent of every job's context; cancelling it (Shutdown)
+	// stops all in-flight jobs so a server exit does not orphan build subprocesses.
+	baseCtx    context.Context
+	baseCancel context.CancelFunc
 }
 
 // NewJobs returns a registry executing plans with r (nil → SubprocessRunner).
@@ -52,7 +65,8 @@ func NewJobs(r Runner) *Jobs {
 	if r == nil {
 		r = SubprocessRunner{}
 	}
-	return &Jobs{byID: map[string]*job{}, runner: r}
+	ctx, cancel := context.WithCancel(context.Background())
+	return &Jobs{byID: map[string]*job{}, runner: r, baseCtx: ctx, baseCancel: cancel}
 }
 
 // StartFunc launches an arbitrary long-running operation in the background and
@@ -61,20 +75,27 @@ func NewJobs(r Runner) *Jobs {
 // returns an error on failure. The job detaches from the caller's context — an
 // MCP request finishing must not kill work it started.
 func (js *Jobs) StartFunc(kind string, fn func(ctx context.Context, emit func(Event)) error) string {
+	jobCtx, cancel := context.WithCancel(js.baseCtx)
 	js.mu.Lock()
 	js.seq++
 	j := &job{
 		id:      fmt.Sprintf("%s-%d-%d", kind, js.seq, time.Now().UTC().Unix()),
 		state:   JobRunning,
 		started: time.Now().UTC(),
+		cancel:  cancel,
 	}
 	js.byID[j.id] = j
+	js.evictLocked()
 	js.mu.Unlock()
 
 	go func() {
-		err := fn(context.Background(), func(e Event) {
+		defer cancel()
+		err := fn(jobCtx, func(e Event) {
 			j.mu.Lock()
 			j.events = append(j.events, e)
+			if len(j.events) > maxJobEvents { // retain only the most recent tail
+				j.events = j.events[len(j.events)-maxJobEvents:]
+			}
 			j.mu.Unlock()
 		})
 		j.mu.Lock()
@@ -88,6 +109,46 @@ func (js *Jobs) StartFunc(kind string, fn func(ctx context.Context, emit func(Ev
 		}
 	}()
 	return j.id
+}
+
+// evictLocked drops the oldest terminal (done/failed) jobs so at most
+// maxRetainedJobs finished jobs are kept; running jobs are never evicted.
+// The caller holds js.mu.
+func (js *Jobs) evictLocked() {
+	var terminal []*job
+	for _, j := range js.byID {
+		j.mu.Lock()
+		done := j.state != JobRunning
+		j.mu.Unlock()
+		if done {
+			terminal = append(terminal, j)
+		}
+	}
+	if len(terminal) <= maxRetainedJobs {
+		return
+	}
+	// started is set once at creation and never mutated, so it is safe to read.
+	sort.Slice(terminal, func(a, b int) bool { return terminal[a].started.Before(terminal[b].started) })
+	for _, j := range terminal[:len(terminal)-maxRetainedJobs] {
+		delete(js.byID, j.id)
+	}
+}
+
+// Shutdown cancels every in-flight job so build subprocesses do not outlive the
+// server. Safe to call more than once.
+func (js *Jobs) Shutdown() { js.baseCancel() }
+
+// Cancel stops one running job by id, returning whether it was found. The job's
+// function observes the cancelled context and finishes in the failed state.
+func (js *Jobs) Cancel(id string) bool {
+	js.mu.Lock()
+	j, ok := js.byID[id]
+	js.mu.Unlock()
+	if !ok {
+		return false
+	}
+	j.cancel()
+	return true
 }
 
 // Start launches plan execution in the background and returns the job ID.

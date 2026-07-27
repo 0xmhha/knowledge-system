@@ -247,6 +247,68 @@ func TestStartFunc_GenericJob(t *testing.T) {
 	}
 }
 
+// TestJobs_EventsCapped bounds per-job event retention so a chatty build does
+// not grow memory without limit.
+func TestJobs_EventsCapped(t *testing.T) {
+	js := NewJobs(SubprocessRunner{})
+	id := js.StartFunc("probe", func(ctx context.Context, emit func(Event)) error {
+		for i := 0; i < maxJobEvents+50; i++ {
+			emit(Event{Type: "output", Message: fmt.Sprintf("line-%d", i)})
+		}
+		return nil
+	})
+	snap := waitJob(t, js, id)
+	if len(snap.Events) != maxJobEvents {
+		t.Errorf("retained %d events, want the cap %d", len(snap.Events), maxJobEvents)
+	}
+	// The most recent event is kept (the tail, not the head).
+	if last := snap.Events[len(snap.Events)-1].Message; last != fmt.Sprintf("line-%d", maxJobEvents+49) {
+		t.Errorf("last event = %q, want the newest", last)
+	}
+}
+
+// TestJobs_TerminalEviction bounds how many finished jobs are retained.
+func TestJobs_TerminalEviction(t *testing.T) {
+	js := NewJobs(SubprocessRunner{})
+	for i := 0; i < maxRetainedJobs+20; i++ {
+		id := js.StartFunc("probe", func(ctx context.Context, emit func(Event)) error { return nil })
+		waitJob(t, js, id)
+	}
+	// One more triggers a final eviction pass.
+	waitJob(t, js, js.StartFunc("probe", func(ctx context.Context, emit func(Event)) error { return nil }))
+	js.mu.Lock()
+	n := len(js.byID)
+	js.mu.Unlock()
+	if n > maxRetainedJobs+1 {
+		t.Errorf("registry retained %d jobs, want <= %d", n, maxRetainedJobs+1)
+	}
+}
+
+// TestJobs_CancelAndShutdown covers cooperative cancellation: a blocked job
+// finishes failed when its context is cancelled, via Cancel(id) or Shutdown.
+func TestJobs_CancelAndShutdown(t *testing.T) {
+	block := func(ctx context.Context, emit func(Event)) error { <-ctx.Done(); return ctx.Err() }
+
+	js := NewJobs(SubprocessRunner{})
+	id := js.StartFunc("probe", block)
+	if !js.Cancel(id) {
+		t.Fatal("Cancel returned false for a live job")
+	}
+	if snap := waitJob(t, js, id); snap.State != JobFailed {
+		t.Errorf("cancelled job state = %s, want failed", snap.State)
+	}
+	if js.Cancel("nope") {
+		t.Error("Cancel on unknown id should be false")
+	}
+
+	js2 := NewJobs(SubprocessRunner{})
+	id2 := js2.StartFunc("probe", block)
+	js2.Shutdown()
+	if snap := waitJob(t, js2, id2); snap.State != JobFailed {
+		t.Errorf("job after Shutdown state = %s, want failed", snap.State)
+	}
+}
+
 // TestValidateVersion guards the reindex version label against values that
 // would escape the dataset root or build through the live `current` symlink.
 func TestValidateVersion(t *testing.T) {
