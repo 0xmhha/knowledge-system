@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"strings"
+
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
 )
 
@@ -84,9 +86,15 @@ func Score(q Query, resp *query.Response, k int, srcRoot string) PerQuery {
 	return out
 }
 
-// hitMatches reports whether hit.citation references the expected
-// file and the line range overlaps expected.LineRange.
+// hitMatches reports whether a hit satisfies the expected target. When
+// Expected.Substring is set (MatchSubstring fixtures), a hit is correct
+// when its citation.file CONTAINS that substring — no line range is used.
+// Otherwise the default semantics apply: citation.file must equal
+// expected.File and the line range must overlap expected.LineRange.
 func hitMatches(h query.Hit, exp Expected) bool {
+	if exp.Substring != "" {
+		return strings.Contains(h.Citation.File, exp.Substring)
+	}
 	if h.Citation.File != exp.File {
 		return false
 	}

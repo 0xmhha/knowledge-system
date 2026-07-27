@@ -23,6 +23,7 @@ type evalOpts struct {
 	k           int
 	threshold   float64
 	minRecall5  float64 // exit non-zero if recall@5 < this
+	minPassRate float64 // exit non-zero if semantic pass-rate < this (JSON semantic fixtures only)
 	maxHalluc   float64 // exit non-zero if hallucination_rate > this
 	jsonOut     bool
 
@@ -45,6 +46,17 @@ intent through ckv query, and reports recall@k, MRR, and citation
 accuracy. Exit code is non-zero when recall@5 falls below --min-recall5
 so CI can gate on retrieval regressions.
 
+--fixture also accepts the JSON semantic-validation format used by
+vector/scripts/build-knowledge.sh (detected by a .json extension or a
+leading '{'):
+
+    {"k": 10, "queries": [{"query": "...", "expect": "<path substring>", "note": "..."}]}
+
+In that mode a query PASSes when any of the top-k cited files' paths
+CONTAIN the expect substring (k comes from the fixture), and the tool
+reports a per-query PASS/MISS table plus an overall pass-rate. Gate with
+--min-pass-rate.
+
 Default fixture path: ./testdata/queries.yaml`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runEval(cmd.Context(), opts)
@@ -56,6 +68,7 @@ Default fixture path: ./testdata/queries.yaml`,
 	f.IntVarP(&opts.k, "top", "k", eval.DefaultK, "top-K used for recall counting")
 	f.Float64Var(&opts.threshold, "threshold", -1, "query threshold (default -1: disabled for eval)")
 	f.Float64Var(&opts.minRecall5, "min-recall5", 0.0, "fail with exit 1 if recall@5 < this")
+	f.Float64Var(&opts.minPassRate, "min-pass-rate", 0.0, "fail with exit 1 if the JSON semantic-fixture pass-rate < this (substring-in-top-k fixtures only)")
 	f.StringVar(&opts.src, "src", "", "source root for hallucination verification (when empty, verification is skipped and hallucination metrics are omitted)")
 	f.Float64Var(&opts.maxHalluc, "max-halluc", 1.0, "fail with exit 1 if hallucination_rate > this (1.0 = disabled; only meaningful when --src is set)")
 	f.BoolVar(&opts.jsonOut, "json", false, "machine-readable output")
@@ -100,8 +113,15 @@ func runEval(ctx context.Context, opts *evalOpts) error {
 	}
 	defer eng.Close()
 
+	// The JSON semantic fixture carries its own k (matching the shell
+	// script it replaces); honor it so substring-in-top-k is measured at
+	// the fixture's K rather than the --top default.
+	k := opts.k
+	if fx.MatchMode == eval.MatchSubstring && fx.K > 0 {
+		k = fx.K
+	}
 	evalOpts := eval.Options{
-		K:                opts.k,
+		K:                k,
 		Threshold:        opts.threshold,
 		SrcRoot:          opts.src,
 		EnableBM25Rerank: opts.bm25Rerank,
@@ -111,6 +131,44 @@ func runEval(ctx context.Context, opts *evalOpts) error {
 		return err
 	}
 	res.Fixture = opts.fixturePath
+
+	// JSON semantic fixtures use substring-in-top-k semantics: report a
+	// PASS/MISS table + pass-rate and gate on --min-pass-rate, leaving the
+	// recall@k YAML path below untouched.
+	if fx.MatchMode == eval.MatchSubstring {
+		passRate := 0.0
+		if res.Aggregate.Total > 0 {
+			passRate = float64(res.Aggregate.Found) / float64(res.Aggregate.Total)
+		}
+		if opts.jsonOut {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			if err := enc.Encode(struct {
+				Fixture  string          `json:"fixture"`
+				K        int             `json:"k"`
+				Pass     int             `json:"pass"`
+				Total    int             `json:"total"`
+				PassRate float64         `json:"pass_rate"`
+				PerQuery []eval.PerQuery `json:"per_query"`
+			}{
+				Fixture:  res.Fixture,
+				K:        res.K,
+				Pass:     res.Aggregate.Found,
+				Total:    res.Aggregate.Total,
+				PassRate: passRate,
+				PerQuery: res.PerQuery,
+			}); err != nil {
+				return err
+			}
+		} else {
+			renderSemanticHuman(res, passRate)
+		}
+		if passRate < opts.minPassRate {
+			return fmt.Errorf("ckv eval: pass_rate=%.3f < --min-pass-rate=%.3f",
+				passRate, opts.minPassRate)
+		}
+		return nil
+	}
 
 	if opts.jsonOut {
 		enc := json.NewEncoder(os.Stdout)
@@ -162,6 +220,27 @@ func renderEvalHuman(res *eval.Result) {
 	if a.TotalHits > 0 {
 		fmt.Printf("  halluc_rate %.3f  (%d / %d hits)\n", a.HallucinationRate, a.HallucinationHits, a.TotalHits)
 	}
+}
+
+// renderSemanticHuman prints the PASS/MISS table + pass-rate for a JSON
+// semantic-validation fixture (substring-in-top-k). It mirrors the
+// build-knowledge.sh validate step: PASS shows the rank at which the
+// expected substring first appeared among the top-k cited files.
+func renderSemanticHuman(res *eval.Result, passRate float64) {
+	fmt.Printf("ckv eval (semantic) — fixture=%s k=%d\n\n", res.Fixture, res.K)
+	fmt.Println("Per-query:")
+	for _, p := range res.PerQuery {
+		status := "MISS"
+		rank := "—"
+		if p.FoundRank > 0 {
+			status = "PASS"
+			rank = fmt.Sprintf("%d", p.FoundRank)
+		}
+		fmt.Printf("  %-6s %s [rank %s]  top=%s  query=%q\n",
+			p.QueryID, status, rank, p.TopHitFile, truncOneLine(p.Intent, 60))
+	}
+	fmt.Println()
+	fmt.Printf("pass rate: %d / %d (%.3f)\n", res.Aggregate.Found, res.Aggregate.Total, passRate)
 }
 
 func truncOneLine(s string, n int) string {
