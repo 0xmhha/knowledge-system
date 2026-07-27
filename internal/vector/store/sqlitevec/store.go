@@ -1076,6 +1076,20 @@ func (s *Store) Validate(ctx context.Context) (Validation, error) {
 	return v, nil
 }
 
+// Checkpoint merges the write-ahead log into the main database file and
+// truncates the WAL (PRAGMA wal_checkpoint(TRUNCATE)). After it returns,
+// vector.db is self-contained — safe to hash or copy without the -wal/-shm
+// sidecars. Call it once, after the last write, before Close.
+func (s *Store) Checkpoint() error {
+	if s.db == nil {
+		return nil
+	}
+	if _, err := s.db.Exec(`PRAGMA wal_checkpoint(TRUNCATE)`); err != nil {
+		return fmt.Errorf("wal_checkpoint: %w", err)
+	}
+	return nil
+}
+
 // Close releases the underlying *sql.DB handle. Idempotent.
 func (s *Store) Close() error {
 	if s.db == nil {

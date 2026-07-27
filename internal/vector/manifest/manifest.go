@@ -43,6 +43,11 @@ type Manifest struct {
 	ChunkCount int            `json:"chunk_count"`
 	Languages  map[string]int `json:"languages,omitempty"` // language → chunk count
 
+	// DBSHA256 is the SHA-256 of vector.db after the build checkpointed the
+	// WAL into it (publish integrity fingerprint). Additive — old readers see
+	// "". Empty when the build did not run the publish step.
+	DBSHA256 string `json:"db_sha256,omitempty"`
+
 	// Ignore patterns surfaced for transparency
 	CKVIgnore []string `json:"ckvignore,omitempty"`
 

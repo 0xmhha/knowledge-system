@@ -416,3 +416,39 @@ func TestRunIsIdempotent(t *testing.T) {
 		t.Errorf("chunk count drift across rebuilds: %d → %d", a.Chunks.Total, b.Chunks.Total)
 	}
 }
+
+// TestRun_PublishesDBSHA256 covers the publish finalize: the build checkpoints
+// the WAL into vector.db (leaving it self-contained) and fingerprints it, with
+// the hash surfaced on the Result and recorded in manifest.json.
+func TestRun_PublishesDBSHA256(t *testing.T) {
+	src := resolveTestdataSample(t)
+	out := t.TempDir()
+	res, err := Run(context.Background(), Options{
+		SrcRoot: src, OutDir: out, Embedder: mock.Default(),
+		Now: func() time.Time { return time.Unix(0, 0).UTC() },
+	})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	if res.DBSHA256 == "" {
+		t.Fatal("Result.DBSHA256 is empty")
+	}
+	got, err := fileSHA256(filepath.Join(out, "vector.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != res.DBSHA256 {
+		t.Errorf("DBSHA256 mismatch: result %s, on-disk %s", res.DBSHA256, got)
+	}
+	m, err := manifest.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.DBSHA256 != res.DBSHA256 {
+		t.Errorf("manifest db_sha256 = %q, want %q", m.DBSHA256, res.DBSHA256)
+	}
+	// checkpoint(TRUNCATE) should leave the WAL empty (db is self-contained).
+	if fi, err := os.Stat(filepath.Join(out, "vector.db-wal")); err == nil && fi.Size() > 0 {
+		t.Errorf("vector.db-wal is %d bytes; checkpoint(TRUNCATE) should empty it", fi.Size())
+	}
+}
