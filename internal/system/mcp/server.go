@@ -17,6 +17,7 @@ package mcp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -205,7 +206,10 @@ func RunHTTP(ctx context.Context, d Deps, addr string, policy HTTPPolicy) error 
 		return err
 	}
 	mcpHandler := mcpserver.NewStreamableHTTPServer(s)
-	srv := &http.Server{Addr: addr, Handler: aclMiddleware(mcpHandler, allow)}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/healthz", healthzHandler(d))
+	mux.Handle("/", mcpHandler)
+	srv := &http.Server{Addr: addr, Handler: aclMiddleware(mux, allow)}
 
 	errCh := make(chan error, 1)
 	go func() { errCh <- srv.ListenAndServe() }()
@@ -220,6 +224,35 @@ func RunHTTP(ctx context.Context, d Deps, addr string, policy HTTPPolicy) error 
 			return fmt.Errorf("mcp: serve http on %q: %w", addr, err)
 		}
 		return nil
+	}
+}
+
+// healthzHandler serves GET /healthz: a cheap liveness+readiness probe that
+// mirrors the serviceability gate of cks.ops.health without an MCP handshake.
+// It returns 200 when the instance is serviceable (both backends up and the
+// ckg↔ckv alignment holds) and 503 otherwise, with a small JSON body carrying
+// the instance name and, when unavailable, the reason. It exists so a daemon
+// (blue-green reload), load balancer, or human can confirm a server is ready to
+// serve a given dataset version before directing traffic to it.
+func healthzHandler(d Deps) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+		defer cancel()
+		ok, reason := serviceable(ctx, d)
+		body := map[string]any{
+			"status":      "ok",
+			"serviceable": ok,
+			"name":        d.InstanceName,
+		}
+		code := http.StatusOK
+		if !ok {
+			body["status"] = "unavailable"
+			body["reason"] = reason
+			code = http.StatusServiceUnavailable
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		_ = json.NewEncoder(w).Encode(body)
 	}
 }
 
