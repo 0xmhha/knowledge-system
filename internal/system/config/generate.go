@@ -88,6 +88,13 @@ func Generate(o GenerateOptions) *Config {
 	if httpAddr == "" {
 		httpAddr = "127.0.0.1:8080"
 	}
+	// Default to the baseline ruleset so a generated config is safe by default:
+	// an empty rules_path would load a NOOP ruleset (no redaction) and be
+	// rejected by Validate outside dev mode.
+	sanitizeRules := o.SanitizeRulesPath
+	if sanitizeRules == "" {
+		sanitizeRules = DefaultSanitizeRulesPath
+	}
 	// allow_remote is derived from the address (mirroring the shell script):
 	// a non-loopback bind requires the opt-in, so force it true there to keep
 	// the config valid. An explicit AllowRemote is always honored.
@@ -125,7 +132,7 @@ func Generate(o GenerateOptions) *Config {
 			AuditDir:     o.AuditDir,
 		},
 		Sanitize: SanitizeConfig{
-			RulesPath:               o.SanitizeRulesPath,
+			RulesPath:               sanitizeRules,
 			DefaultAction:           contract.RedactionDrop,
 			FailClosedOnUnknownRule: true,
 		},

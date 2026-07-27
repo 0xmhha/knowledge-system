@@ -70,6 +70,14 @@ func TestConfig_Validate_Rejects(t *testing.T) {
 		"public ip host":     func(c *Config) { c.Listen.HTTPAddr = "203.0.113.1:8080" },
 		"malformed addr":     func(c *Config) { c.Listen.HTTPAddr = "not-a-host-port" },
 		"bad default_action": func(c *Config) { c.Sanitize.DefaultAction = contract.RedactionAction("redact") },
+		"empty rules in prod": func(c *Config) {
+			c.Logging.Mode = "prod"
+			c.Sanitize.RulesPath = ""
+		},
+		"empty rules unset mode": func(c *Config) {
+			c.Logging.Mode = ""
+			c.Sanitize.RulesPath = ""
+		},
 	}
 	for name, mut := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -80,6 +88,16 @@ func TestConfig_Validate_Rejects(t *testing.T) {
 				t.Fatalf("expected error for %s", name)
 			}
 		})
+	}
+}
+
+func TestConfig_Validate_EmptyRulesAllowedInDev(t *testing.T) {
+	t.Parallel()
+	c := Default()
+	c.Logging.Mode = "dev"
+	c.Sanitize.RulesPath = ""
+	if err := c.Validate(); err != nil {
+		t.Errorf("dev mode should allow an empty rules_path (NOOP redaction): %v", err)
 	}
 }
 

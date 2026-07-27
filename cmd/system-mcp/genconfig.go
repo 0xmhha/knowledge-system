@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
@@ -47,6 +48,17 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		return fmt.Errorf("-out is required")
 	}
 
+	// A written config is used from an arbitrary working directory, so resolve
+	// the sanitize ruleset to an absolute path (defaulting to the in-repo
+	// baseline) rather than emitting a cwd-relative one that would fail to load.
+	sanitizePath := *sanitizeRules
+	if sanitizePath == "" {
+		sanitizePath = config.DefaultSanitizeRulesPath
+	}
+	if abs, err := filepath.Abs(sanitizePath); err == nil {
+		sanitizePath = abs
+	}
+
 	// --lan resolves this host's LAN IP into the bind address so a remote agent
 	// has a routable URL; the port is taken from --http-addr (default 8080).
 	addr := *httpAddr
@@ -70,7 +82,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		OllamaURL:         *ollamaURL,
 		HTTPAddr:          addr,
 		AllowRemote:       *allowRemote,
-		SanitizeRulesPath: *sanitizeRules,
+		SanitizeRulesPath: sanitizePath,
 		DomainProjectDir:  *domainProjectDir,
 		DomainCorpusDir:   *domainCorpusDir,
 		GlossaryPath:      *glossaryPath,

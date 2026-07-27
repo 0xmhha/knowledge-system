@@ -54,6 +54,38 @@ func TestComputeAlignment_OK(t *testing.T) {
 	}
 }
 
+func TestComputeAlignment_CKVConfiguredButManifestMissing_IsError(t *testing.T) {
+	t.Parallel()
+	// ckv is part of the deployment but its manifest is missing → coordinates
+	// unverifiable → must fail closed (OK=false), not degrade to a warning.
+	rep := ComputeAlignment(AlignmentInputs{
+		CKGSrcCommit:  "abc123",
+		CKGSchema:     "1.23",
+		CKVConfigured: true,
+		CKVManifest:   nil,
+	})
+	if rep.OK {
+		t.Fatalf("ckv configured with a missing manifest must be error-tier (OK=false)")
+	}
+	if !strings.Contains(rep.Reason, "manifest is missing") {
+		t.Errorf("reason = %q, want it to mention the missing manifest", rep.Reason)
+	}
+}
+
+func TestComputeAlignment_CKVNotConfigured_MissingManifestIsWarning(t *testing.T) {
+	t.Parallel()
+	// ckg-only deployment (no ckv) → a missing ckv manifest is not an error.
+	rep := ComputeAlignment(AlignmentInputs{
+		CKGSrcCommit:  "abc123",
+		CKGSchema:     "1.23",
+		CKVConfigured: false,
+		CKVManifest:   nil,
+	})
+	if !rep.OK {
+		t.Fatalf("ckg-only deployment must not fail on a missing ckv manifest: %q", rep.Reason)
+	}
+}
+
 func TestComputeAlignment_Mismatch_NoTopLevelCommit(t *testing.T) {
 	t.Parallel()
 	rep := ComputeAlignment(AlignmentInputs{

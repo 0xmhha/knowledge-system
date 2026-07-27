@@ -23,6 +23,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
+// DefaultSanitizeRulesPath is the baseline sanitize ruleset used when a config
+// does not pin one — the ruleset shipped in-repo. It must be non-empty so a
+// production instance never runs with LLM-boundary redaction silently disabled
+// (see Config.Validate). It is repo-root relative; callers that write a config
+// for use from another directory should resolve it to an absolute path (as the
+// gen-config command does).
+const DefaultSanitizeRulesPath = "system/policies/sanitization_rules.yaml"
+
 // configVersion is the only supported top-level version. Bumping requires a
 // migration path documented in the changelog.
 const configVersion = 1
@@ -214,7 +222,7 @@ func Default() *Config {
 			AuditDir:     "./logs/audit",
 		},
 		Sanitize: SanitizeConfig{
-			RulesPath:               "./policies/sanitization_rules.yaml",
+			RulesPath:               DefaultSanitizeRulesPath,
 			DefaultAction:           contract.RedactionDrop,
 			FailClosedOnUnknownRule: true,
 		},
@@ -298,6 +306,13 @@ func (c *Config) Validate() error {
 	case "", contract.RedactionMask, contract.RedactionDrop, contract.RedactionFailClosed:
 	default:
 		return fmt.Errorf("config: sanitize.default_action=%q invalid", c.Sanitize.DefaultAction)
+	}
+	// Fail closed on LLM-boundary redaction: an empty rules_path loads a NOOP
+	// ruleset that redacts nothing, so it is only permitted in dev mode. A prod
+	// (or unset-mode) instance must point at a real ruleset.
+	if c.Sanitize.RulesPath == "" && strings.ToLower(c.Logging.Mode) != "dev" {
+		return fmt.Errorf("config: sanitize.rules_path is required unless logging.mode=dev " +
+			"(an empty path disables secret redaction at the LLM boundary)")
 	}
 
 	if (c.Domain.ProjectDir == "") != (c.Domain.CorpusDir == "") {

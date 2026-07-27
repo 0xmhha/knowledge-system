@@ -51,6 +51,9 @@ func TestGenerate_Defaults(t *testing.T) {
 	if !c.Sanitize.FailClosedOnUnknownRule {
 		t.Error("FailClosedOnUnknownRule should default true")
 	}
+	if c.Sanitize.RulesPath != DefaultSanitizeRulesPath {
+		t.Errorf("RulesPath = %q, want the baseline %q (safe-by-default redaction)", c.Sanitize.RulesPath, DefaultSanitizeRulesPath)
+	}
 	if err := c.Validate(); err != nil {
 		t.Fatalf("generated default config did not validate: %v", err)
 	}
