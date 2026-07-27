@@ -30,6 +30,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -124,6 +125,15 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 	// (the `current` pointer may move underneath; we never re-resolve). The
 	// resolved paths are what health reports — identity stays provable.
 	datasetVersion := resolveDatasetPaths(cfg)
+
+	// Single source of truth for the indexed tree: when the config leaves
+	// source_root empty, derive it from the graph manifest's src_root (baked in
+	// at build time). This removes the config↔dataset duplication that would
+	// otherwise need a consistency assertion; staleness (tree moved past the
+	// indexed commit) is still surfaced by the startup alignment check.
+	if derived := deriveSourceRoot(cfg); derived != "" {
+		log.Printf("cks-mcp: source_root derived from graph manifest: %s", derived)
+	}
 
 	ruleset, err := loadRuleset(cfg.Sanitize.RulesPath)
 	if err != nil {
@@ -542,6 +552,31 @@ func resolveDatasetPaths(cfg *config.Config) string {
 		}
 	}
 	return version
+}
+
+// deriveSourceRoot fills cfg.Backends.CKG.SourceRoot from the graph manifest's
+// src_root when the config leaves it empty, making the dataset (built against a
+// known tree, recorded in its manifest) the single source of truth. The config
+// then need not duplicate source_root — which is what would otherwise require a
+// config↔dataset consistency check. Returns the value it set, or "" when
+// source_root was already configured or the manifest could not be read.
+// Call after resolveDatasetPaths so the graph path is the resolved concrete one.
+func deriveSourceRoot(cfg *config.Config) string {
+	if cfg.Backends.CKG.SourceRoot != "" || cfg.Backends.CKG.Path == "" {
+		return ""
+	}
+	buf, err := os.ReadFile(filepath.Join(filepath.Dir(cfg.Backends.CKG.Path), "manifest.json"))
+	if err != nil {
+		return ""
+	}
+	var m struct {
+		SrcRoot string `json:"src_root"`
+	}
+	if err := json.Unmarshal(buf, &m); err != nil || m.SrcRoot == "" {
+		return ""
+	}
+	cfg.Backends.CKG.SourceRoot = m.SrcRoot
+	return m.SrcRoot
 }
 
 // computeStartupAlignment gathers the ckg/ckv coordinates and evaluates the
