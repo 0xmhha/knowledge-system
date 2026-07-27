@@ -210,6 +210,11 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 		return fmt.Errorf("build composer: %w", err)
 	}
 
+	// Own the async job registry so its in-flight builds are cancelled on
+	// shutdown rather than orphaned as detached subprocesses.
+	jobs := setup.NewJobs(nil)
+	defer jobs.Shutdown()
+
 	deps := cksmcp.Deps{
 		Composer:            c,
 		CKG:                 be.ckg,
@@ -236,7 +241,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 			GraphBinary:  cfg.Backends.CKG.BinaryPath,
 			VectorBinary: cfg.Backends.CKV.BinaryPath,
 			OllamaURL:    cfg.Backends.CKV.OllamaURL,
-			Jobs:         setup.NewJobs(nil),
+			Jobs:         jobs,
 		},
 	}
 	if cfg.Listen.ResolvedTransport() == "http" {
