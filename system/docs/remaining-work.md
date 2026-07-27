@@ -102,6 +102,27 @@ Surfaced by the 2026-07-19 docs review — genuinely open, not in the E/M lineag
 
 (F-1 from the dogfood doc is now closed — `real.go:202-243` consumes real ckg Score verbatim; F-2/F-3/F-6/F-7 unverified.)
 
+## MCP-server hardening (2026-07-27) — done
+
+The fused server's operate + integrate mission (serve knowledge over MCP to
+local and **remote** agents, with easy setup) drove a hardening sequence. All of
+it is merged to `main`; the one remaining step is the downstream port (see
+[`../../docs/downstream-sync.md`](../../docs/downstream-sync.md)).
+
+| Item | What landed | PR |
+|---|---|---|
+| source_root single source of truth | the server derives `source_root` from the graph manifest when config leaves it empty, so the dataset is authoritative and the config↔dataset assertion is eliminated by design | #14 |
+| LAN-reachable serving + registry | `netutil` advertised-host resolution; serve logs the reachable URL; `gen-config --lan`; `daemon up`/`down` over an `instances.yaml` registry with auto-assigned ports (one server per dataset) | #15 |
+| blue-green reload | `/healthz` readiness probe; `daemon reload` starts a green instance on a temp port, gates on `/healthz`, then swaps — a bad rebuild never takes the running server down | #16 |
+| namespace-aligned identity | the instance name defaults to the deployment namespace root (`KNOWLEDGE_MCP_NAMESPACE` / `-ldflags`) instead of the literal "cks" | #17 |
+| async long ops + connection snippet | `Jobs.StartFunc` generalizes the async job pattern; `ops.reindex` MCP tool (build → gate → promote `current`, polled via `ops.setup_status`); `print-mcp-config` emits a ready-to-paste client config | #18 |
+
+This supersedes the shell serving/reindex path in
+[`ops-blue-green-reindex.md`](./ops-blue-green-reindex.md) (see its "Go 경로"
+section); the legacy scripts still function. Per-script retirement status is in
+the coverage audit
+([`../../docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md`](../../docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md)).
+
 ## Evidence pointers (re-verify before acting)
 
 - M6 (done): `grep -rn CKGNodeID --include='*.go'` → prose comment only (hit.go:33);
