@@ -28,6 +28,22 @@
 
 ---
 
+## Remaining work (2026-07-28)
+
+The MCP-server hardening + review-driven improvements (#14–#29) and the
+code-level backlog are done. What is left splits into one in-repo item and two
+that belong elsewhere:
+
+| # | Item | Where |
+|---|---|---|
+| 1 | **Downstream port** — mirror this tree into `../stablenet-knowledge-mcp` and verify equivalence (build/test/lint, `graph_digest` byte-equal, full-DB table-hash, retrieval eval). The final step. | this repo → downstream; runbook [`../../docs/downstream-sync.md`](../../docs/downstream-sync.md) |
+| 2 | **KR-deploy Task 2** — restart the remote MCP on the new binary and re-capture the live doc-kind rescue. Not a code task (Task 1 is merged); a **remote operator action**. | remote deployment + `pr-77-gstable` index |
+| 3 | **M2-multi (§5.1d)** — run the A/B/C total-cost benchmark end to end to judge the cks value thesis. Not a knowledge-system task; the harness is in `../coding-agent`. Large, explicit opt-in. | coding-agent context + chainbench |
+
+Everything else below is closed or historical; see the tables for evidence.
+
+---
+
 ## ckg_node_id retirement — code done, data-side still open
 
 The retirement landed in code via **PR #33 (squash-merged to main, 2026-07-12)**:
@@ -96,9 +112,10 @@ Surfaced by the 2026-07-19 docs review — genuinely open, not in the E/M lineag
 
 | ID | Task | Severity | Status | Source |
 |---|---|---|---|---|
-| **F-4** | Enforce the `path_glob` filter the graph tools advertise. | [권장] | **Closed (2026-07-28).** `PathGlob` is now applied client-side in `SearchFTS` and `FindSymbol` (`internal/system/ckgclient/real.go`, `filepath.Match` on `FilePath`). `CommitHash` is intentionally left unenforced — no tool exposes it and a single-commit index has no subset semantics. | `followups-from-dogfood-2026-05-19.md` F-4 |
-| **KR-deploy** | Knowledge-reserve doc-kind rescue: deploy + live re-capture. | [권장] | **Open — operator action.** Task 1 code shipped (PR #43, `budget/allocator.go`); the running MCP still serves the old binary, so the fix is not yet live. | `fix-knowledge-reserve-doc-kind.md` §Task 2 |
-| **M2-multi** | Multi-cycle total-cost judgment (the coding-agent bug-cycle-cost thesis). | [권장] | **Open (soft).** M2 delivered a single-turn N=30 Q&A run, which M2 itself concedes ≠ the multi-cycle cost thesis. Either run it or explicitly drop it. | `HANDOFF-cks-evaluation-remaining.md` §5.1(d) |
+| **F-4** | Enforce the `path_glob` filter the graph tools advertise. | [권장] | **Closed (2026-07-28, #28).** `PathGlob` is applied client-side in `SearchFTS` and `FindSymbol` (`internal/system/ckgclient/real.go`, `filepath.Match` on `FilePath`). `CommitHash` is intentionally left unenforced — no tool exposes it and a single-commit index has no subset semantics. | `followups-from-dogfood-2026-05-19.md` F-4 |
+| **composer-trace** | Report the exact ckg call count in the composer trace (was hardcoded 0). | [권장] | **Fixed — PR #29 (in review).** Stage 2 counts its actual `BM25Search`+`FindSymbol` (+glob pass) calls into `Stage2Output.CKGCalls`; the trace surfaces it. Stage 3 expansion runs after the trace and is out of scope. | `composer.go` TODO(trace) |
+| **KR-deploy** | Knowledge-reserve doc-kind rescue: deploy + live re-capture. | [권장] | **Not a code task — remote operator action.** Task 1 code is in `main` (`budget/allocator.go` doc-kind reserve). Task 2 requires restarting the **remote** MCP on the new binary and re-running the live capture against the `pr-77-gstable` domain index. Verified 2026-07-28: a local proxy on `go-stablenet@0bf2f4d1b` serves the KR GasTip query correctly (relevant code bodies returned), but the exact re-capture needs the remote host + that specific domain index (different domain organization locally). | `fix-knowledge-reserve-doc-kind.md` §Task 2 |
+| **M2-multi** | Multi-cycle total-cost judgment (the coding-agent bug-cycle-cost thesis). | [권장] | **Not a knowledge-system task — separate bench run.** The harness is complete but lives in `../coding-agent` (`plugin/skills/bench-orchestration`, `bench/compare.py`), targets go-stablenet, and needs chainbench plus many full agent-pipeline runs. Execute it from the coding-agent context; it is a large, explicit opt-in, not runnable from this repo. | `HANDOFF-cks-evaluation-remaining.md` §5.1(d) |
 
 (F-1 from the dogfood doc is now closed — `real.go:202-243` consumes real ckg Score verbatim; F-2/F-3/F-6/F-7 unverified.)
 
