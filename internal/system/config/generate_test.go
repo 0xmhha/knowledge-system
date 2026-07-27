@@ -56,6 +56,26 @@ func TestGenerate_Defaults(t *testing.T) {
 	}
 }
 
+func TestGenerate_NameFromNamespace(t *testing.T) {
+	// Not parallel: mutates KNOWLEDGE_MCP_NAMESPACE via t.Setenv.
+
+	// Upstream: no namespace injected → the historical "cks" default.
+	t.Setenv("KNOWLEDGE_MCP_NAMESPACE", "")
+	if got := Generate(GenerateOptions{DatasetDir: "/d"}).Name; got != "cks" {
+		t.Errorf("default name = %q, want cks", got)
+	}
+	// Branded deployment: the generated instance name follows the namespace,
+	// matching the tool namespace instead of the literal "cks".
+	t.Setenv("KNOWLEDGE_MCP_NAMESPACE", "stablenet_knowledge")
+	if got := Generate(GenerateOptions{DatasetDir: "/d"}).Name; got != "stablenet_knowledge" {
+		t.Errorf("name with namespace = %q, want stablenet_knowledge", got)
+	}
+	// An explicit name always wins over the namespace default.
+	if got := Generate(GenerateOptions{DatasetDir: "/d", Name: "custom"}).Name; got != "custom" {
+		t.Errorf("explicit name = %q, want custom", got)
+	}
+}
+
 func TestGenerate_AllowRemoteDerivedFromLANAddr(t *testing.T) {
 	t.Parallel()
 	// A non-loopback address must yield allow_remote=true so the produced

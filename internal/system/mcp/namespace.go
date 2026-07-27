@@ -11,3 +11,9 @@ var namespaceRoot = kmcp.Root("", "cks")
 // toolName returns the client-visible tool name for a base name like
 // "context.get_for_task" under the current namespace root.
 func toolName(base string) string { return kmcp.Name(namespaceRoot, base) }
+
+// DefaultInstanceName is the fallback instance identity when a config leaves
+// name empty. It resolves to the deployment namespace root (the same value the
+// tool names use), so a branded deployment reports a consistent identity
+// instead of the literal "cks".
+func DefaultInstanceName() string { return namespaceRoot }

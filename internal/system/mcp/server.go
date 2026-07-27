@@ -62,7 +62,8 @@ type Deps struct {
 	// InstanceName is this server's identity (MCP handshake name + echoed in
 	// cks.ops.health). When several cks-mcp instances run on different ports
 	// (one per dataset), it tells a caller connecting by ip:port which one it
-	// reached. Empty defaults to "cks".
+	// reached. Empty defaults to the deployment namespace root (see
+	// DefaultInstanceName).
 	InstanceName string
 	// InstanceDescription is optional human-facing metadata surfaced in
 	// cks.ops.health alongside InstanceName.
@@ -140,10 +141,10 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	return nil
 }
 
-// build constructs an MCP server (name from InstanceName, default "cks";
-// version v from BuilderVersion or a fallback) with all tools registered.
-// Shared by the stdio (Run) and Streamable-HTTP (RunHTTP) entry points so the
-// registered surface is identical across transports.
+// build constructs an MCP server (name from InstanceName, defaulting to the
+// deployment namespace root; version v from BuilderVersion or a fallback) with
+// all tools registered. Shared by the stdio (Run) and Streamable-HTTP (RunHTTP)
+// entry points so the registered surface is identical across transports.
 func build(d Deps) (*mcpserver.MCPServer, error) {
 	v := d.BuilderVersion
 	if v == "" {
@@ -151,7 +152,7 @@ func build(d Deps) (*mcpserver.MCPServer, error) {
 	}
 	name := d.InstanceName
 	if name == "" {
-		name = "cks"
+		name = DefaultInstanceName()
 	}
 	s := mcpserver.NewMCPServer(name, v)
 	if err := Register(s, d); err != nil {
