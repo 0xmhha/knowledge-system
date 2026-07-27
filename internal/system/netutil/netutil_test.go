@@ -39,6 +39,18 @@ func TestAdvertiseHost(t *testing.T) {
 	}
 }
 
+func TestDefaultRouteIP(t *testing.T) {
+	// Environment-dependent: skip when the host has no default route (offline CI).
+	ip := defaultRouteIP()
+	if ip == "" {
+		t.Skip("no default route in this environment")
+	}
+	parsed := net.ParseIP(ip)
+	if parsed == nil || parsed.To4() == nil || parsed.IsLoopback() {
+		t.Errorf("defaultRouteIP = %q, want a non-loopback IPv4", ip)
+	}
+}
+
 func TestAdvertiseHostPort(t *testing.T) {
 	if got := AdvertiseHostPort("example.internal:8080"); got != "example.internal:8080" {
 		t.Errorf("concrete host:port: got %q", got)
