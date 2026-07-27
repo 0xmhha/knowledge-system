@@ -1,9 +1,9 @@
 // Package daemon supervises long-running fused-server (system-mcp) HTTP
 // instances on one host: start/stop/restart/status/list, keyed by name via a
-// pidfile per instance. It ports the process-supervision core of
-// serve-cks-http.sh / cks-mcpd.sh. Claude Code MCP registration, LAN-IP
-// autodetect, and --advertise/--bind stay out — those are plugin/machine glue,
-// not engine logic.
+// pidfile per instance, plus registry-driven multi-instance up/down (one port
+// per dataset). It ports the process-supervision core of serve-cks-http.sh /
+// cks-mcpd.sh. LAN-IP autodetect for the advertised address lives in the sibling
+// netutil package; the caller pins the bind address it passes here.
 package daemon
 
 import (
