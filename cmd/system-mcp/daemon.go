@@ -5,19 +5,23 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/internal/system/daemon"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
 )
 
-// runDaemon dispatches `system-mcp daemon <up|down|start|stop|restart|status|list>`.
+// runDaemon dispatches `system-mcp daemon <up|down|reload|start|stop|restart|status|list>`.
 // It supervises HTTP instances of this same binary; each managed instance is a
 // child `system-mcp --config <cfg> --name <name> [--http-addr <addr>]` process.
 // `up`/`down` bring a whole registry (instances.yaml) of datasets up or down,
 // one port per dataset, and print a LAN-reachable connection URL per instance.
+// `reload` health-gates a blue-green swap (start green on a temp port, verify
+// /healthz, then restart on the real port), so a broken new dataset version
+// never takes the running instance down.
 func runDaemon(args []string, stdout io.Writer) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: daemon <up|down|start|stop|restart|status|list> [flags]")
+		return fmt.Errorf("usage: daemon <up|down|reload|start|stop|restart|status|list> [flags]")
 	}
 	sub := args[0]
 
@@ -70,6 +74,12 @@ func runDaemon(args []string, stdout io.Writer) error {
 		}
 		fmt.Fprintf(stdout, "stopped %d instance(s) from %s\n", len(reg.Instances), *registry)
 		return nil
+	case "reload":
+		reg, err := daemon.LoadRegistry(*registry)
+		if err != nil {
+			return err
+		}
+		return runReload(sup, reg, *name, *runDir, stdout)
 	case "start", "restart":
 		if err := needName(); err != nil {
 			return err
@@ -122,8 +132,52 @@ func printInstance(w io.Writer, i daemon.Instance) {
 	state := "stopped"
 	if i.Running {
 		state = fmt.Sprintf("running (pid %d)", i.PID)
+		if i.Addr != "" {
+			state += fmt.Sprintf(" — http://%s/mcp", netutil.AdvertiseHostPort(i.Addr))
+		}
 	}
 	fmt.Fprintf(w, "[%s] %s\n", i.Name, state)
+}
+
+// runReload health-gated blue-green reloads registry instances (all, or the one
+// named by nameFilter), reusing each running instance's recorded address and its
+// config (explicit, or the one generated under runDir). It reports per instance
+// and returns an error if any reload did not come up healthy.
+func runReload(sup *daemon.Supervisor, reg *daemon.Registry, nameFilter, runDir string, stdout io.Writer) error {
+	var firstErr error
+	matched := false
+	for _, e := range reg.Instances {
+		if nameFilter != "" && e.Name != nameFilter {
+			continue
+		}
+		matched = true
+		cur := sup.Status(e.Name)
+		if !cur.Running || cur.Addr == "" {
+			fmt.Fprintf(stdout, "[%s] not running — start it with `daemon up`\n", e.Name)
+			if firstErr == nil {
+				firstErr = fmt.Errorf("daemon reload: %s is not running", e.Name)
+			}
+			continue
+		}
+		cfg := e.Config
+		if cfg == "" {
+			cfg = filepath.Join(runDir, e.Name+".yaml")
+		}
+		inst, err := sup.Reload(e.Name, cfg, cur.Addr, daemon.ReloadOptions{})
+		if err != nil {
+			fmt.Fprintf(stdout, "[%s] %v\n", e.Name, err)
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		fmt.Fprintf(stdout, "[%s] reloaded (pid %d) — http://%s/mcp\n",
+			inst.Name, inst.PID, netutil.AdvertiseHostPort(cur.Addr))
+	}
+	if nameFilter != "" && !matched {
+		return fmt.Errorf("daemon reload: no instance named %q in the registry", nameFilter)
+	}
+	return firstErr
 }
 
 func envOr(key, def string) string {

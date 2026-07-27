@@ -32,15 +32,28 @@ type Supervisor struct {
 	StartGrace time.Duration
 }
 
-// Instance is one managed server's status.
+// Instance is one managed server's status. Addr is the bind address recorded at
+// start (empty when none was given), so status/list can show where an instance
+// listens and reload can probe the running instance.
 type Instance struct {
 	Name    string `json:"name"`
 	PID     int    `json:"pid"`
 	Running bool   `json:"running"`
+	Addr    string `json:"addr,omitempty"`
 }
 
-func (s *Supervisor) pidfile(name string) string { return filepath.Join(s.RunDir, name+".pid") }
-func (s *Supervisor) logfile(name string) string { return filepath.Join(s.RunDir, name+".log") }
+func (s *Supervisor) pidfile(name string) string  { return filepath.Join(s.RunDir, name+".pid") }
+func (s *Supervisor) logfile(name string) string  { return filepath.Join(s.RunDir, name+".log") }
+func (s *Supervisor) addrfile(name string) string { return filepath.Join(s.RunDir, name+".addr") }
+
+// readAddr returns the recorded bind address for name, or "" when unknown.
+func (s *Supervisor) readAddr(name string) string {
+	b, err := os.ReadFile(s.addrfile(name))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(b))
+}
 
 func (s *Supervisor) argv(name, config, addr string) []string {
 	if s.Args != nil {
@@ -81,7 +94,7 @@ func (s *Supervisor) running(name string) (int, bool) {
 // stderr go to the per-instance log. Returns the instance status.
 func (s *Supervisor) Start(name, config, addr string) (Instance, error) {
 	if pid, up := s.running(name); up {
-		return Instance{Name: name, PID: pid, Running: true}, nil
+		return Instance{Name: name, PID: pid, Running: true, Addr: s.readAddr(name)}, nil
 	}
 	if err := os.MkdirAll(s.RunDir, 0o755); err != nil {
 		return Instance{}, fmt.Errorf("daemon: prepare run dir: %w", err)
@@ -107,6 +120,9 @@ func (s *Supervisor) Start(name, config, addr string) (Instance, error) {
 	if err := os.WriteFile(s.pidfile(name), []byte(strconv.Itoa(pid)), 0o644); err != nil {
 		return Instance{}, fmt.Errorf("daemon: write pidfile: %w", err)
 	}
+	if addr != "" {
+		_ = os.WriteFile(s.addrfile(name), []byte(addr), 0o644)
+	}
 
 	grace := s.StartGrace
 	if grace == 0 {
@@ -115,9 +131,10 @@ func (s *Supervisor) Start(name, config, addr string) (Instance, error) {
 	time.Sleep(grace)
 	if !alive(pid) {
 		_ = os.Remove(s.pidfile(name))
+		_ = os.Remove(s.addrfile(name))
 		return Instance{Name: name}, fmt.Errorf("daemon: %s exited during startup — see %s", name, s.logfile(name))
 	}
-	return Instance{Name: name, PID: pid, Running: true}, nil
+	return Instance{Name: name, PID: pid, Running: true, Addr: addr}, nil
 }
 
 // Stop signals the instance (SIGTERM, then SIGKILL after a grace period) and
@@ -126,6 +143,7 @@ func (s *Supervisor) Stop(name string) error {
 	pid, up := s.running(name)
 	if !up {
 		_ = os.Remove(s.pidfile(name))
+		_ = os.Remove(s.addrfile(name))
 		return nil
 	}
 	_ = syscall.Kill(pid, syscall.SIGTERM)
@@ -139,6 +157,7 @@ func (s *Supervisor) Stop(name string) error {
 		_ = syscall.Kill(pid, syscall.SIGKILL)
 	}
 	_ = os.Remove(s.pidfile(name))
+	_ = os.Remove(s.addrfile(name))
 	return nil
 }
 
@@ -153,7 +172,7 @@ func (s *Supervisor) Restart(name, config, addr string) (Instance, error) {
 // Status returns one named instance's state.
 func (s *Supervisor) Status(name string) Instance {
 	pid, up := s.running(name)
-	return Instance{Name: name, PID: pid, Running: up}
+	return Instance{Name: name, PID: pid, Running: up, Addr: s.readAddr(name)}
 }
 
 // List returns every instance with a pidfile under RunDir, sorted by name.

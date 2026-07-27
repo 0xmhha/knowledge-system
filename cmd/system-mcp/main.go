@@ -118,7 +118,11 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 		cfg.Name = nameOverride
 	}
 	if httpAddrOverride != "" {
+		// Asking to serve on an address implies HTTP transport: the daemon and
+		// multi-instance callers pass --http-addr to run a stdio-defaulted config
+		// as a reachable HTTP server without editing the file.
 		cfg.Listen.HTTPAddr = httpAddrOverride
+		cfg.Listen.Transport = "http"
 	}
 
 	// P1 (reindex-migration design): resolve dataset symlinks ONCE at startup
