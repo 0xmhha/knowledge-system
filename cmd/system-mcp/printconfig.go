@@ -23,6 +23,7 @@ func runPrintMCPConfig(args []string, stdout io.Writer) error {
 	fs.SetOutput(stdout)
 	configPath := fs.String("config", "", "cks config to describe (required)")
 	nameOverride := fs.String("name", "", "override the server key in the emitted config")
+	httpAddrOverride := fs.String("http-addr", "", "override the config's listen address in the emitted URL (match a --http-addr'd instance)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -42,11 +43,18 @@ func runPrintMCPConfig(args []string, stdout io.Writer) error {
 		name = cksmcp.DefaultInstanceName()
 	}
 
+	// A single config file backs several instances via --http-addr overrides, so
+	// honor the same override here to emit the URL of the instance actually run.
+	bindAddr := cfg.Listen.HTTPAddr
+	if *httpAddrOverride != "" {
+		bindAddr = *httpAddrOverride
+	}
+
 	var entry map[string]any
-	if cfg.Listen.ResolvedTransport() == "http" {
+	if *httpAddrOverride != "" || cfg.Listen.ResolvedTransport() == "http" {
 		entry = map[string]any{
 			"type": "http",
-			"url":  "http://" + netutil.AdvertiseHostPort(cfg.Listen.HTTPAddr) + "/mcp",
+			"url":  "http://" + netutil.AdvertiseHostPort(bindAddr) + "/mcp",
 		}
 	} else {
 		self, err := os.Executable()

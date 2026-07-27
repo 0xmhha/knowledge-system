@@ -35,6 +35,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 	registry := fs.String("registry", envOr("CKS_REGISTRY", "instances.yaml"), "instance registry file (up/down)")
 	wait := fs.Bool("wait", false, "up: poll each instance's /healthz until it is serviceable before returning")
 	waitTimeout := fs.Duration("wait-timeout", 60*time.Second, "up --wait: max time to wait per instance for readiness")
+	ready := fs.Bool("ready", false, "status/list: also probe /healthz and show whether each instance is serviceable")
 	runDir := fs.String("run-dir", envOr("CKS_RUN_DIR", "run"), "directory holding per-instance pidfiles + logs")
 	ollamaURL := fs.String("ollama-url", os.Getenv("CKV_OLLAMA_ENDPOINT"), "ollama endpoint exported to the instance")
 	if err := fs.Parse(args[1:]); err != nil {
@@ -119,7 +120,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 		fmt.Fprintf(stdout, "[%s] stopped\n", *name)
 	case "status":
 		if *name != "" {
-			printInstance(stdout, sup.Status(*name))
+			printInstance(stdout, sup.Status(*name), *ready)
 			return nil
 		}
 		fallthrough
@@ -133,7 +134,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 			return nil
 		}
 		for _, inst := range list {
-			printInstance(stdout, inst)
+			printInstance(stdout, inst, *ready)
 		}
 	default:
 		return fmt.Errorf("daemon: unknown subcommand %q (want start|stop|restart|status|list)", sub)
@@ -141,12 +142,19 @@ func runDaemon(args []string, stdout io.Writer) error {
 	return nil
 }
 
-func printInstance(w io.Writer, i daemon.Instance) {
+func printInstance(w io.Writer, i daemon.Instance, probeReady bool) {
 	state := "stopped"
 	if i.Running {
 		state = fmt.Sprintf("running (pid %d)", i.PID)
 		if i.Addr != "" {
 			state += fmt.Sprintf(" — http://%s/mcp", netutil.AdvertiseHostPort(i.Addr))
+			if probeReady {
+				if daemon.Serviceable(i.Addr) {
+					state += " [serviceable]"
+				} else {
+					state += " [not serviceable]"
+				}
+			}
 		}
 	}
 	fmt.Fprintf(w, "[%s] %s\n", i.Name, state)

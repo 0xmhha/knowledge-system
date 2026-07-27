@@ -89,8 +89,16 @@ func (r *Registry) bindHost() string {
 }
 
 // PortFree reports whether a TCP port can currently be bound on loopback.
-func PortFree(port int) bool {
-	l, err := net.Listen("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
+func PortFree(port int) bool { return portFreeOn("127.0.0.1", port) }
+
+// portFreeOn reports whether port can be bound on host — the actual bind host,
+// so a port held by a process bound to a specific interface is not reported free
+// just because loopback is idle.
+func portFreeOn(host string, port int) bool {
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	l, err := net.Listen("tcp", net.JoinHostPort(host, strconv.Itoa(port)))
 	if err != nil {
 		return false
 	}
@@ -180,7 +188,9 @@ type Started struct {
 // PortFree). On the first failure it returns the instances started so far.
 func (s *Supervisor) Up(r *Registry, free func(int) bool) ([]Started, error) {
 	if free == nil {
-		free = PortFree
+		// Probe on the instances' actual bind host, not loopback, so auto-port
+		// selection reflects what the child will really try to bind.
+		free = func(p int) bool { return portFreeOn(r.bindHost(), p) }
 	}
 	addrs, err := r.resolveAddrs(free)
 	if err != nil {

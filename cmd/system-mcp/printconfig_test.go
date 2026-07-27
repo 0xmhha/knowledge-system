@@ -88,6 +88,27 @@ func TestPrintMCPConfig_NameOverride(t *testing.T) {
 	}
 }
 
+func TestPrintMCPConfig_HTTPAddrOverride(t *testing.T) {
+	// A stdio config + --http-addr override should emit an http URL on the
+	// overridden port (the instance was launched with --http-addr).
+	path := writeCfg(t, "o", config.GenerateOptions{Name: "proj", DatasetDir: "/d"})
+	cfg, err := config.Load(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg.Listen.Transport = "stdio"
+	if err := config.Save(path, cfg); err != nil {
+		t.Fatal(err)
+	}
+	entry := runPrint(t, "--config", path, "--http-addr", "127.0.0.1:9911")
+	if entry["type"] != "http" {
+		t.Errorf("override should force an http entry, got %v", entry["type"])
+	}
+	if url, _ := entry["url"].(string); !strings.HasSuffix(url, ":9911/mcp") {
+		t.Errorf("url = %q, want the overridden :9911/mcp", url)
+	}
+}
+
 func TestPrintMCPConfig_RequiresConfig(t *testing.T) {
 	var buf bytes.Buffer
 	if err := runPrintMCPConfig(nil, &buf); err == nil {
