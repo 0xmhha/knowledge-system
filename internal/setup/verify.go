@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -52,6 +54,17 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 		return fmt.Errorf("verify: vector manifest: %w", err)
 	}
 
+	// Canonical_id — the vector<->graph join key (ADR-007) — exists only from
+	// graph schema 1.19. Aligning a vector index against an older graph is
+	// unsound even if the digest happens to match, so fail loud. An
+	// unparseable/absent version (very old or hand-written manifest) can't be
+	// judged and degrades to a warning.
+	if maj, min, ok := parseSchemaVersion(gm.SchemaVersion); !ok {
+		warn(fmt.Sprintf("graph schema_version %q unparseable — canonical_id (>=1.19) support not verifiable", gm.SchemaVersion))
+	} else if maj < 1 || (maj == 1 && min < 19) {
+		return fmt.Errorf("verify: graph schema %s < 1.19 — canonical_id (ADR-007) unavailable, vector join unreliable", gm.SchemaVersion)
+	}
+
 	vecCommit := vm.SrcCommit
 	var vecPin string
 	if vm.Sources != nil && vm.Sources.CKG != nil {
@@ -81,6 +94,22 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 			gm.GraphDigest, vecPin)
 	}
 	return nil
+}
+
+// parseSchemaVersion splits a "major.minor[.patch]" schema string into its
+// numeric major/minor. ok is false when either component is missing or
+// non-numeric. Numeric (not lexical) so "1.9" < "1.19".
+func parseSchemaVersion(s string) (maj, min int, ok bool) {
+	parts := strings.SplitN(s, ".", 3)
+	if len(parts) < 2 {
+		return 0, 0, false
+	}
+	a, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+	b, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+	if err1 != nil || err2 != nil {
+		return 0, 0, false
+	}
+	return a, b, true
 }
 
 func readJSON(path string, v any) error {

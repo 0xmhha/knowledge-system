@@ -40,21 +40,25 @@ func TestBuildPlan_Shape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(p.Steps) != 3 {
-		t.Fatalf("steps = %d, want 3", len(p.Steps))
+	// ollama backend inserts a preflight step: graph, preflight, vector, verify.
+	if len(p.Steps) != 4 {
+		t.Fatalf("steps = %d, want 4", len(p.Steps))
 	}
 	g := strings.Join(p.Steps[0].Cmd, " ")
 	if !strings.Contains(g, "ckg build --src /s --out /o/graph") || !strings.Contains(g, "--policy-file pol.yaml") {
 		t.Errorf("graph cmd = %q", g)
 	}
-	v := strings.Join(p.Steps[1].Cmd, " ")
+	if p.Steps[1].ID != "vector-preflight" || p.Steps[1].Verify == nil {
+		t.Errorf("step[1] should be the ollama preflight, got id=%q verify=%v", p.Steps[1].ID, p.Steps[1].Verify != nil)
+	}
+	v := strings.Join(p.Steps[2].Cmd, " ")
 	if !strings.Contains(v, "--ckg /o/graph") || !strings.Contains(v, "--embedder=ollama") {
 		t.Errorf("vector cmd = %q", v)
 	}
-	if len(p.Steps[1].Env) != 1 || p.Steps[1].Env[0] != "CKV_OLLAMA_ENDPOINT=http://x" {
-		t.Errorf("vector env = %v", p.Steps[1].Env)
+	if len(p.Steps[2].Env) != 1 || p.Steps[2].Env[0] != "CKV_OLLAMA_ENDPOINT=http://x" {
+		t.Errorf("vector env = %v", p.Steps[2].Env)
 	}
-	if p.Steps[2].Verify == nil {
+	if p.Steps[3].Verify == nil {
 		t.Error("verify step has no Verify func")
 	}
 
@@ -190,5 +194,40 @@ func TestJobs_AsyncLifecycle(t *testing.T) {
 
 	if _, found := js.Get("nope", 0); found {
 		t.Error("unknown job id reported found")
+	}
+}
+
+// TestVerifyAlignment_SchemaGate pins the ADR-007 canonical_id floor: the
+// vector<->graph join exists only from graph schema 1.19, so alignment against
+// an older graph must fail loud (not silently pass on a matching digest). An
+// unparseable/absent version degrades to a warning.
+func TestVerifyAlignment_SchemaGate(t *testing.T) {
+	mk := func(t *testing.T, schema string) (string, string) {
+		root := t.TempDir()
+		g := filepath.Join(root, "graph")
+		v := filepath.Join(root, "vector")
+		writeManifest(t, g, map[string]any{"src_commit": "abc", "graph_digest": "d1", "schema_version": schema})
+		writeManifest(t, v, map[string]any{"src_commit": "abc", "sources": map[string]any{"ckg": map[string]any{"graph_digest": "d1", "src_commit": "abc"}}})
+		return g, v
+	}
+	for _, s := range []string{"1.18", "1.9"} { // below floor (1.9 also guards lexical-vs-numeric)
+		g, v := mk(t, s)
+		if err := VerifyAlignment(g, v, nil); err == nil || !strings.Contains(err.Error(), "schema") {
+			t.Errorf("schema %s: want schema-gate error, got %v", s, err)
+		}
+	}
+	for _, s := range []string{"1.19", "1.23", "2.0"} { // at/above floor
+		g, v := mk(t, s)
+		if err := VerifyAlignment(g, v, nil); err != nil {
+			t.Errorf("schema %s: want ok, got %v", s, err)
+		}
+	}
+	g, v := mk(t, "") // unparseable → warn, not error
+	var warns []Event
+	if err := VerifyAlignment(g, v, func(e Event) { warns = append(warns, e) }); err != nil {
+		t.Errorf("empty schema: want ok+warn, got err %v", err)
+	}
+	if len(warns) == 0 {
+		t.Error("empty schema: expected a warning")
 	}
 }
