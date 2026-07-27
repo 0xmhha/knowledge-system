@@ -122,6 +122,11 @@ type Stage2Output struct {
 	// Coverage is the fraction of input keywords that produced at least
 	// one ckg hit. 1.0 = every keyword is grounded; 0 = none are.
 	Coverage float64
+
+	// CKGCalls is the exact number of ckg backend calls this stage made
+	// (BM25Search + FindSymbol per keyword, plus one BM25Search per keyword
+	// for the intent path-glob pass). Surfaced in the composer trace.
+	CKGCalls int
 }
 
 // Searcher runs Stage 2 of the composer pipeline.
@@ -192,11 +197,13 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 	hitCount := 0
 	bm25Errors := 0
 	symbolErrors := 0
+	ckgCalls := 0
 
 	for _, kw := range keywords {
 		anyHit := false
 
 		bm25Hits, bm25Err := s.ckg.BM25Search(ctx, kw, ckgclient.SearchOpts{K: s.config.BM25K})
+		ckgCalls++
 		if bm25Err != nil {
 			bm25Errors++
 		} else if len(bm25Hits) > 0 {
@@ -206,6 +213,7 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 		}
 
 		symbolCits, symErr := s.ckg.FindSymbol(ctx, kw, ckgclient.SymbolOpts{Kinds: kinds})
+		ckgCalls++
 		if symErr != nil {
 			symbolErrors++
 		} else if len(symbolCits) > 0 {
@@ -233,6 +241,7 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 				K:      s.config.BM25K,
 				Filter: ckgclient.SearchFilter{PathGlob: pathGlob},
 			})
+			ckgCalls++
 			if extraErr != nil {
 				bm25Errors++
 				continue
@@ -257,6 +266,7 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 	if len(keywords) > 0 {
 		out.Coverage = float64(hitCount) / float64(len(keywords))
 	}
+	out.CKGCalls = ckgCalls
 
 	s.emitFootprint(ctx, intent, keywords, out, bm25Errors, symbolErrors, pathGlob)
 	return out, nil

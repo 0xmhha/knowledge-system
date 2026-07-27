@@ -87,12 +87,17 @@ func TestSearch_IntentTestAddTriggersSupplementalGlobPass(t *testing.T) {
 		BM25Hits: []contract.Hit{bm25Hit("a.go", 1, 5, 0.9)},
 	}
 	s, _ := New(ckg)
-	_, err := s.Search(context.Background(), []string{"Foo"}, nil, contract.IntentTestAdd)
+	out, err := s.Search(context.Background(), []string{"Foo"}, nil, contract.IntentTestAdd)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got := len(ckg.Calls.BM25Search); got != 2 {
 		t.Fatalf("BM25Search calls = %d, want 2 (1 unfiltered + 1 *_test.go pass)", got)
+	}
+	// CKGCalls counts every ckg call: for keyword "Foo" that is 1 BM25 + 1
+	// FindSymbol + 1 supplemental glob BM25 = 3.
+	if out.CKGCalls != 3 {
+		t.Errorf("CKGCalls = %d, want 3 (BM25 + FindSymbol + glob BM25)", out.CKGCalls)
 	}
 	// First call: unfiltered.
 	if pg := ckg.Calls.BM25Search[0].Opts.Filter.PathGlob; pg != "" {
