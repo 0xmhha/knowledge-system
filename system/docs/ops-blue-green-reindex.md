@@ -3,6 +3,35 @@
 > 2026-07-10. 3자 합의(reindex-migration-design + consensus §10.6) 구현의 운영 절차.
 > 도구: `scripts/reindex-dataset.sh`(오케스트레이터) + `scripts/serve-cks-http.sh`(인스턴스)
 > + cks-mcp 기동 alignment assert.
+>
+> **2026-07-27 갱신**: 아래 shell 절차는 이제 Go 도구로 대체되었다(권장 경로는 바로
+> 다음 섹션). shell 스크립트는 여전히 동작하지만, 신규 운영은 Go 경로를 사용한다.
+
+## Go 경로 (권장, 2026-07-27)
+
+레이아웃/게이트/불변식은 그대로이며(아래 섹션 유지), 오케스트레이션·서빙·전환이
+`knowledge-setup`·`system-mcp`로 흡수되었다. shell 단계 → Go 대응:
+
+| 작업 | shell (legacy) | Go (권장) |
+|---|---|---|
+| 재인덱싱(빌드→게이트→promote) | `reindex-dataset.sh run` | `knowledge-setup --version <ver>` (CLI) 또는 MCP 도구 `ops.reindex`(job_id 반환, `ops.setup_status`로 폴링) |
+| 롤백 | `reindex-dataset.sh promote`(옛 ver) | `knowledge-setup --rollback <prev-ver>` |
+| config 생성 | `gen-cks-config.sh` | `system-mcp gen-config`(원격 도달용은 `--lan`으로 LAN IP 바인드) |
+| 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `system-mcp daemon up`/`down`(`instances.yaml` 레지스트리, 데이터셋별 포트 자동 배정) |
+| 무중단 전환(blue-green) | 수동 green 기동→health→소비자 전환→blue 정지 | `system-mcp daemon reload` — green을 임시 포트에 기동→`/healthz` 게이트 통과 시에만 real 포트로 교체(불건전 시 기존 인스턴스 무손상) |
+| identity/serviceable 확인 | `cks.ops.health` | `GET /healthz`(200=serviceable, 503+reason) 또는 `cks.ops.health` |
+| 클라이언트 등록 스니펫 | 수동 | `system-mcp print-mcp-config --config <cfg>`(HTTP URL 또는 stdio command) |
+
+게이트 스위트(§5.1의 5단계)는 `internal/setup`의 Reindex 게이트로 이식되었다:
+ckg validate / manifest-align(commit·digest·schema≥1.19) / chunk_count>0 /
+canonical 비율(B7 라이브 대신) / soft ckg audit. `current` 심볼릭 원자 교체 1회가
+graph+vector를 함께 덮으므로 별도 graph promote는 없다.
+
+`ops-blue-green-reindex` 세부 배경은
+[remaining-work.md](./remaining-work.md) "MCP-server hardening (2026-07-27)" 및
+커버리지 감사
+[legacy-ops-go-coverage-audit.md](../../docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md)
+참조.
 
 ## 레이아웃 (합의 확정)
 
