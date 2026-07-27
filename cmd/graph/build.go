@@ -10,11 +10,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
+	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 )
 
 func newBuildCmd() *cobra.Command {
 	var src, out, outTag, atCommit, dbDsn, filesFrom, policyFile, securityPatternFile string
-	var langs []string
+	var langs, filesFromMain, solInclude, excludes []string
 	var noCache, force, rebuildMetrics, strictValidate, lockPropagation, failOnParseErrors bool
 	var temporalDepth int
 	cmd := &cobra.Command{
@@ -49,6 +50,24 @@ func newBuildCmd() *cobra.Command {
 				return nil
 			}
 
+			// --files-from-main generates the include/exclude filter in-memory
+			// from a Go main-package closure (go list -deps), replacing the
+			// former graph/scripts/index-project.sh shell logic. It is mutually
+			// exclusive with --files-from (an explicit filter file).
+			var generatedFilter *filterlist.FilterList
+			if len(filesFromMain) > 0 {
+				if filesFrom != "" {
+					return fmt.Errorf("--files-from and --files-from-main are mutually exclusive")
+				}
+				fl, err := filterlist.GenerateFromMain(cmd.Context(), effectiveSrc, filesFromMain, solInclude, excludes)
+				if err != nil {
+					return err
+				}
+				generatedFilter = fl
+				_, _ = fmt.Fprintf(os.Stderr, "ckg: files-from-main: %d include / %d exclude patterns from %v\n",
+					len(fl.Include), len(fl.Exclude), filesFromMain)
+			}
+
 			m, err := buildpipe.Run(buildpipe.Options{
 				SrcRoot:             effectiveSrc,
 				OutDir:              effectiveOut,
@@ -60,6 +79,7 @@ func newBuildCmd() *cobra.Command {
 				DBDSN:               dbDsn,
 				StrictValidate:      strictValidate,
 				FilesFromPath:       filesFrom,
+				Filter:              generatedFilter,
 				LockPropagation:     lockPropagation,
 				PolicyFile:          policyFile,
 				SecurityPatternFile: securityPatternFile,
@@ -104,6 +124,12 @@ func newBuildCmd() *cobra.Command {
 		"abort on first dangling edge (legacy v0.x behaviour); default lenient drops them with a warning")
 	cmd.Flags().StringVar(&filesFrom, "files-from", "",
 		"path to JSON file with {include, exclude} glob patterns; restricts which files reach the parsers")
+	cmd.Flags().StringSliceVar(&filesFromMain, "files-from-main", nil,
+		"Go main package(s) (e.g. ./cmd/gstable; repeatable or comma-separated); generates the include/exclude filter in-memory from `go list -deps` of the module-local closure. Mutually exclusive with --files-from")
+	cmd.Flags().StringSliceVar(&solInclude, "sol-include", nil,
+		"Solidity include glob(s) appended to a --files-from-main filter (repeatable or comma-separated), e.g. contracts/**/*.sol")
+	cmd.Flags().StringSliceVar(&excludes, "exclude", nil,
+		"exclude glob(s) applied on top of a --files-from-main filter (repeatable or comma-separated); exclude trumps include")
 	cmd.Flags().BoolVar(&lockPropagation, "lock-propagation", false,
 		"enable Go cross-function lock propagation (W-A, D1 Stage B DFS depth=5); requires --no-cache to take full effect")
 	cmd.Flags().StringVar(&policyFile, "policy-file", "",

@@ -137,6 +137,13 @@ type Options struct {
 	// (see internal/filterlist). When set, only files matching the filter
 	// reach the parsers. Empty means "use heuristic discovery as before".
 	FilesFromPath string
+	// Filter is an optional pre-built include/exclude filter. When non-nil it
+	// takes precedence over FilesFromPath and is applied exactly as a loaded
+	// --files-from JSON would be. This is the in-memory entry point for
+	// generated filters (e.g. filterlist.GenerateFromMain for --files-from-main)
+	// that never touch disk. Callers must not set both a non-nil Filter and a
+	// non-empty FilesFromPath.
+	Filter *filterlist.FilterList
 	// LockPropagation enables D1 Stage B cross-function lock propagation
 	// (W-A, Within-language semantics Phase 5). When true, the cold build
 	// path walks the Go call graph from every lock-holding function up to
@@ -176,6 +183,16 @@ type Options struct {
 	// in Commit/Hunk nodes, changed_in edges, and graph size; node_prs symbol
 	// history is independent of this cap (see pr_history.go).
 	TemporalDepth int
+}
+
+// resolveFilter returns the effective include/exclude filter for the build:
+// the pre-built Filter when set, otherwise the one loaded from FilesFromPath
+// (nil when neither is configured — "no filter").
+func (opt Options) resolveFilter() (*filterlist.FilterList, error) {
+	if opt.Filter != nil {
+		return opt.Filter, nil
+	}
+	return filterlist.Load(opt.FilesFromPath)
 }
 
 // validateAndSanitize runs the lenient/strict validation gate against g and
@@ -228,7 +245,7 @@ func Run(opt Options) (persist.Manifest, error) {
 	// go/packages.Load (detect.GoFiles) to honor build constraints. See
 	// pipeline_test.go for the 41-file drift this eliminates.
 	log.Debug("discovery.start", "src", opt.SrcRoot)
-	filter, err := filterlist.Load(opt.FilesFromPath)
+	filter, err := opt.resolveFilter()
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -278,7 +295,7 @@ func runCold(opt Options, log *slog.Logger,
 		return persist.Manifest{}, fmt.Errorf("detect go: %w", err)
 	}
 	// --files-from filter: trim every per-language list before parsing.
-	filter, err := filterlist.Load(opt.FilesFromPath)
+	filter, err := opt.resolveFilter()
 	if err != nil {
 		return persist.Manifest{}, err
 	}

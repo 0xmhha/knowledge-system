@@ -62,6 +62,23 @@ func TestGraphExists_False(t *testing.T) {
 	}
 }
 
+func TestBuild_FilesFromAndFilesFromMainMutuallyExclusive(t *testing.T) {
+	cmd := newBuildCmd()
+	cmd.SetArgs([]string{
+		"--src", t.TempDir(),
+		"--out", filepath.Join(t.TempDir(), "out"),
+		"--files-from", "filter.json",
+		"--files-from-main", "./cmd/app",
+	})
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected error when both --files-from and --files-from-main are set")
+	}
+	if !strings.Contains(err.Error(), "mutually exclusive") {
+		t.Errorf("error = %q, want it to mention mutual exclusivity", err.Error())
+	}
+}
+
 func TestCheckoutWorktree_NonGitDir(t *testing.T) {
 	_, _, err := checkoutWorktree(t.TempDir(), "HEAD")
 	if err == nil {

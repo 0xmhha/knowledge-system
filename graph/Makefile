@@ -173,7 +173,7 @@ eval-ckv-mirror: build-no-viewer
 # the corpus is external and huge, so this cannot vendor it: it runs the
 # committed fixtures against a pre-built go-stablenet graph. Point GRAPH at a
 # graph dir built from analysis-test-3 @ 0bf2f4d1b with the tests-included
-# filter (see docs + scripts/index-project.sh); the expected qnames are pinned
+# filter (see docs + `ckg build --files-from-main`); the expected qnames are pinned
 # to that commit. Example:
 #   make eval-stablenet-keyword GRAPH=/path/to/knowledge-data/pr-77-2
 eval-stablenet-keyword: build-no-viewer

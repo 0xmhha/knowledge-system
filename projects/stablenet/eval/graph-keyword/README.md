@@ -10,7 +10,7 @@ The go-stablenet corpus is external and large, so it cannot be vendored into thi
 repo (unlike the mirror). The fixtures here are committed; **running them needs a
 pre-built go-stablenet graph**. Expected qnames are **pinned to commit
 `0bf2f4d1b`** built with the tests-included filter
-(`eval/stablenet/stablenet-files-with-tests.json`, or `scripts/index-project.sh`)
+(`eval/stablenet/stablenet-files-with-tests.json`, or ``ckg build --files-from-main``)
 — a different commit/filter can shift qnames and the fixtures will (correctly)
 flag the drift.
 
