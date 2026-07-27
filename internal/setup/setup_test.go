@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -194,6 +195,70 @@ func TestJobs_AsyncLifecycle(t *testing.T) {
 
 	if _, found := js.Get("nope", 0); found {
 		t.Error("unknown job id reported found")
+	}
+}
+
+// waitJob polls until the job leaves the running state or the deadline passes.
+func waitJob(t *testing.T, js *Jobs, id string) JobSnapshot {
+	t.Helper()
+	deadline := time.Now().Add(10 * time.Second)
+	for {
+		snap, found := js.Get(id, 0)
+		if !found {
+			t.Fatalf("job %s not found", id)
+		}
+		if snap.State != JobRunning {
+			return snap
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("job %s did not finish", id)
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+}
+
+// TestStartFunc_GenericJob covers the generalized async core: an arbitrary
+// function runs in the background, its kind labels the id, emitted events are
+// captured, and a returned error becomes the failed state.
+func TestStartFunc_GenericJob(t *testing.T) {
+	js := NewJobs(SubprocessRunner{})
+
+	okID := js.StartFunc("probe", func(ctx context.Context, emit func(Event)) error {
+		emit(Event{Step: "s", Type: "output", Message: "hello"})
+		return nil
+	})
+	if !strings.HasPrefix(okID, "probe-") {
+		t.Errorf("job id %q should carry the kind prefix", okID)
+	}
+	snap := waitJob(t, js, okID)
+	if snap.State != JobDone {
+		t.Errorf("state = %s, want done", snap.State)
+	}
+	if len(snap.Events) != 1 || snap.Events[0].Message != "hello" {
+		t.Errorf("events = %+v, want the emitted one captured", snap.Events)
+	}
+
+	failID := js.StartFunc("probe", func(ctx context.Context, emit func(Event)) error {
+		return errors.New("boom")
+	})
+	fs := waitJob(t, js, failID)
+	if fs.State != JobFailed || fs.Error != "boom" {
+		t.Errorf("failed job = state %s err %q, want failed/boom", fs.State, fs.Error)
+	}
+}
+
+// TestStartReindex_MissingVersion exercises the reindex job wrapper: it runs
+// Reindex through the shared registry and surfaces its error as a failed job
+// (empty version is rejected by Reindex).
+func TestStartReindex_MissingVersion(t *testing.T) {
+	js := NewJobs(SubprocessRunner{})
+	id := js.StartReindex(Options{Src: t.TempDir(), Out: t.TempDir()}, "", GateOptions{})
+	if !strings.HasPrefix(id, "reindex-") {
+		t.Errorf("job id %q should carry the reindex prefix", id)
+	}
+	snap := waitJob(t, js, id)
+	if snap.State != JobFailed || snap.Error == "" {
+		t.Errorf("empty-version reindex = state %s err %q, want failed", snap.State, snap.Error)
 	}
 }
 

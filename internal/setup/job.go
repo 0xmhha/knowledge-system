@@ -55,14 +55,16 @@ func NewJobs(r Runner) *Jobs {
 	return &Jobs{byID: map[string]*job{}, runner: r}
 }
 
-// Start launches plan execution in the background and returns the job ID.
-// The job detaches from the caller's context: an MCP request finishing must
-// not kill an index build it started.
-func (js *Jobs) Start(p Plan) string {
+// StartFunc launches an arbitrary long-running operation in the background and
+// returns the job ID. It is the generic core behind every async ops tool: kind
+// labels the job in its ID, fn streams progress via the emit callback and
+// returns an error on failure. The job detaches from the caller's context — an
+// MCP request finishing must not kill work it started.
+func (js *Jobs) StartFunc(kind string, fn func(ctx context.Context, emit func(Event)) error) string {
 	js.mu.Lock()
 	js.seq++
 	j := &job{
-		id:      fmt.Sprintf("setup-%d-%d", js.seq, time.Now().UTC().Unix()),
+		id:      fmt.Sprintf("%s-%d-%d", kind, js.seq, time.Now().UTC().Unix()),
 		state:   JobRunning,
 		started: time.Now().UTC(),
 	}
@@ -70,7 +72,7 @@ func (js *Jobs) Start(p Plan) string {
 	js.mu.Unlock()
 
 	go func() {
-		err := Execute(context.Background(), p, js.runner, func(e Event) {
+		err := fn(context.Background(), func(e Event) {
 			j.mu.Lock()
 			j.events = append(j.events, e)
 			j.mu.Unlock()
@@ -86,6 +88,22 @@ func (js *Jobs) Start(p Plan) string {
 		}
 	}()
 	return j.id
+}
+
+// Start launches plan execution in the background and returns the job ID.
+func (js *Jobs) Start(p Plan) string {
+	return js.StartFunc("setup", func(ctx context.Context, emit func(Event)) error {
+		return Execute(ctx, p, js.runner, emit)
+	})
+}
+
+// StartReindex launches a blue-green Reindex (build o.Out/<version> → gate →
+// promote current) as an async job and returns the job ID. current is left
+// unchanged when the gate fails, so a bad rebuild never breaks the live dataset.
+func (js *Jobs) StartReindex(o Options, version string, gopt GateOptions) string {
+	return js.StartFunc("reindex", func(ctx context.Context, emit func(Event)) error {
+		return Reindex(ctx, o, version, gopt, js.runner, emit)
+	})
 }
 
 // Get returns a snapshot of the job, with at most tail trailing events

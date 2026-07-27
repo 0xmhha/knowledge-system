@@ -76,7 +76,7 @@ func registerOpsSetup(s *mcpserver.MCPServer, d Deps) {
 // registerOpsSetupStatus wires the poll side of the async pair.
 func registerOpsSetupStatus(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsSetupStatus,
-		mcpgo.WithDescription("Progress of an asynchronous knowledge-setup job started by ops.setup: state (running|done|failed), error if any, and the tail of the progress-event stream."),
+		mcpgo.WithDescription("Progress of an asynchronous ops job (ops.setup or ops.reindex): state (running|done|failed), error if any, and the tail of the progress-event stream."),
 		mcpgo.WithString("job_id", mcpgo.Required()),
 		mcpgo.WithNumber("tail", mcpgo.DefaultNumber(20), mcpgo.Description("max trailing events to return")),
 	)
