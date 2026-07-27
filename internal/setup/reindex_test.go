@@ -69,6 +69,20 @@ func TestReindexLock(t *testing.T) {
 	}
 }
 
+func TestReindexLock_StealsStaleLock(t *testing.T) {
+	ds := t.TempDir()
+	// A lock left behind by a dead owner: an unreachable PID and an ancient
+	// acquire time. A crash-abandoned lock must not wedge future reindexes.
+	if err := os.WriteFile(filepath.Join(ds, ".reindex.lock"), []byte("2147483000\n1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	l, err := acquireReindexLock(ds)
+	if err != nil {
+		t.Fatalf("a dead-owner lock should be reclaimed, got %v", err)
+	}
+	l.release()
+}
+
 // gateRunner passes ckg validate/audit unless a step ID/cmd is in fail.
 type gateRunner struct{ failValidate bool }
 
@@ -117,6 +131,20 @@ func TestGate(t *testing.T) {
 	// ckg validate failure (hard)
 	if err := Gate(context.Background(), mk(t, nil), "v1", opt, gateRunner{failValidate: true}, nil); err == nil || !strings.Contains(err.Error(), "validate") {
 		t.Errorf("validate failure should fail the gate, got %v", err)
+	}
+	// canonical gate disabled (ratio 0): passes, but emits a visible warning so
+	// the operator does not assume coverage was checked.
+	var warned bool
+	off := GateOptions{GraphBin: "ckg", Src: "/src", MinCanonicalRatio: 0}
+	if err := Gate(context.Background(), mk(t, nil), "v1", off, gateRunner{}, func(e Event) {
+		if e.Type == "warning" && strings.Contains(e.Message, "canonical") {
+			warned = true
+		}
+	}); err != nil {
+		t.Errorf("ratio=0 gate should pass, got %v", err)
+	}
+	if !warned {
+		t.Error("disabled canonical gate should emit a warning")
 	}
 }
 

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -56,20 +58,71 @@ func NewVersion() string {
 // atomic `current` swap, not the lock.
 type reindexLock struct{ path string }
 
+// reindexLockStaleAfter is the age past which a held lock is treated as
+// abandoned even if its owner PID still exists (guards against PID reuse). A
+// real reindex completes in minutes, so this ceiling never steals a live build.
+const reindexLockStaleAfter = 6 * time.Hour
+
 func acquireReindexLock(dataset string) (*reindexLock, error) {
 	if err := os.MkdirAll(dataset, 0o755); err != nil {
 		return nil, fmt.Errorf("reindex: prepare dataset dir: %w", err)
 	}
 	p := filepath.Join(dataset, ".reindex.lock")
-	f, err := os.OpenFile(p, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
-	if err != nil {
-		if os.IsExist(err) {
-			return nil, fmt.Errorf("reindex: another reindex holds %s — wait for it, or remove the file if stale", p)
-		}
+	if l, err := createReindexLock(p); err == nil {
+		return l, nil
+	} else if !os.IsExist(err) {
 		return nil, fmt.Errorf("reindex: acquire lock: %w", err)
 	}
+	// The lock exists. Reclaim it only if the previous holder crashed (its PID is
+	// gone) or it is older than the staleness ceiling; otherwise a reindex is
+	// genuinely in progress and we refuse.
+	reason, stale := reindexLockStale(p)
+	if !stale {
+		return nil, fmt.Errorf("reindex: another reindex is in progress (holds %s) — wait for it to finish", p)
+	}
+	_ = os.Remove(p)
+	l, err := createReindexLock(p)
+	if err != nil {
+		return nil, fmt.Errorf("reindex: reclaimed a stale lock (%s) but could not re-acquire %s: %w", reason, p, err)
+	}
+	return l, nil
+}
+
+// createReindexLock creates the lock file exclusively, stamping the owner PID
+// and acquire time so a later contender can judge staleness.
+func createReindexLock(p string) (*reindexLock, error) {
+	f, err := os.OpenFile(p, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Fprintf(f, "%d\n%d\n", os.Getpid(), time.Now().UTC().Unix())
 	_ = f.Close()
 	return &reindexLock{path: p}, nil
+}
+
+// reindexLockStale reports whether the lock at p is abandoned: unreadable or
+// malformed, its owner PID no longer alive, or held past reindexLockStaleAfter.
+func reindexLockStale(p string) (reason string, stale bool) {
+	buf, err := os.ReadFile(p)
+	if err != nil {
+		return "lock unreadable", true
+	}
+	lines := strings.SplitN(strings.TrimSpace(string(buf)), "\n", 2)
+	pid, _ := strconv.Atoi(strings.TrimSpace(lines[0]))
+	if pid <= 0 {
+		return "lock malformed", true
+	}
+	if syscall.Kill(pid, 0) != nil {
+		return fmt.Sprintf("owner pid %d is gone", pid), true
+	}
+	if len(lines) > 1 {
+		if ts, perr := strconv.ParseInt(strings.TrimSpace(lines[1]), 10, 64); perr == nil {
+			if age := time.Duration(time.Now().UTC().Unix()-ts) * time.Second; age > reindexLockStaleAfter {
+				return fmt.Sprintf("held %s (exceeds %s)", age, reindexLockStaleAfter), true
+			}
+		}
+	}
+	return "", false
 }
 
 func (l *reindexLock) release() {
@@ -180,6 +233,11 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 			return fmt.Errorf("gate: canonical_id coverage %.1f%% (%d/%d) < %.1f%% — vector<->graph join too sparse",
 				ratio*100, vm.CanonicalCount, vm.SymbolCount, o.MinCanonicalRatio*100)
 		}
+	} else if emit != nil {
+		// The gate is advertised but disabled at ratio 0; surface that so an
+		// operator does not assume canonical coverage was checked.
+		emit(Event{Step: "reindex-gate", Type: "warning",
+			Message: "canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified"})
 	}
 
 	// 5. File-set audit (soft): a mismatch is surfaced, not fatal.
