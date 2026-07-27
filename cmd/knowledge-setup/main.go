@@ -42,6 +42,11 @@ func main() {
 	flag.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
 	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
+	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
+	// root holding version dirs + a `current` symlink.
+	version := flag.String("version", "", "blue-green: build into <out>/<version>, gate it, then atomically promote <out>/current")
+	rollback := flag.String("rollback", "", "blue-green: repoint <out>/current at an existing version and exit (no build)")
+	gateMinCanonical := flag.Float64("gate-min-canonical", 0, "reindex gate: minimum canonical_id coverage (canonical/symbol chunks); 0 disables the check")
 	flag.Parse()
 
 	if *config != "" {
@@ -82,20 +87,37 @@ func main() {
 		os.Exit(2)
 	}
 
-	plan, err := setup.BuildPlan(o)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
-		os.Exit(2)
-	}
-
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := setup.Execute(ctx, plan, setup.SubprocessRunner{}, emit); err != nil {
-		fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
-		os.Exit(1)
+	switch {
+	case *rollback != "":
+		// Repoint current at an existing version — no build.
+		if err := setup.Rollback(o.Out, *rollback); err != nil {
+			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "knowledge-setup: rolled back %s/current to %s\n", o.Out, *rollback)
+	case *version != "":
+		// Blue-green: build a new version, gate it, promote current on success.
+		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical}
+		if err := setup.Reindex(ctx, o, *version, gopt, setup.SubprocessRunner{}, emit); err != nil {
+			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "knowledge-setup: promoted %s/%s to current\n", o.Out, *version)
+	default:
+		plan, err := setup.BuildPlan(o)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+			os.Exit(2)
+		}
+		if err := setup.Execute(ctx, plan, setup.SubprocessRunner{}, emit); err != nil {
+			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+			os.Exit(1)
+		}
+		fmt.Fprintln(os.Stderr, "knowledge-setup: dataset ready at", o.Out)
 	}
-	fmt.Fprintln(os.Stderr, "knowledge-setup: dataset ready at", o.Out)
 }
 
 func progressSink(mode string) (func(setup.Event), error) {

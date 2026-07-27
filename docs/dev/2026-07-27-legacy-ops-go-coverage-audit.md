@@ -59,6 +59,13 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
    digest-named version dirs, atomic `current` promote for **both** engines
    (graph promote is missing; `ckv promote` is vector-only), a per-family build
    lock, rollback, and serving restart. (retires `reindex-dataset.sh`)
+   [LANDED (orchestration): `knowledge-setup --version/--rollback` in
+   internal/setup/reindex.go — versioned build → gate suite (ckg validate,
+   verify-align commit+digest+schema, vector chunk_count>0, canonical-ratio in
+   place of the B7 live test, soft ckg audit) → **dataset-level** atomic
+   `current` swap (one flip covers graph+vector, so no separate graph promote)
+   → advisory lock → rollback. **serving restart is deferred to P5/#8d**
+   (instance-level blue-green), so `reindex-dataset.sh` is kept.]
 7. **verify-align schema gate** — `internal/setup/verify.go` reads
    `SchemaVersion` but never asserts `>= 1.19` / ADR-007 canonical_id; add the
    assertion (a coverage regression vs `reindex-dataset.sh` gate 2). [LANDED]
