@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -80,6 +81,29 @@ func TestHTTPHealth(t *testing.T) {
 	}
 	if HTTPHealth("127.0.0.1:1") {
 		t.Error("HTTPHealth on an unreachable addr should be false")
+	}
+}
+
+func TestWaitReady(t *testing.T) {
+	var ready atomic.Bool
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if ready.Load() {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	}))
+	defer srv.Close()
+	addr := strings.TrimPrefix(srv.URL, "http://")
+
+	// Not serviceable yet → WaitReady times out and reports false.
+	if WaitReady(addr, 150*time.Millisecond, 30*time.Millisecond) {
+		t.Error("WaitReady should be false while /healthz returns 503")
+	}
+	// Flip to serviceable → WaitReady observes it and reports true.
+	ready.Store(true)
+	if !WaitReady(addr, time.Second, 30*time.Millisecond) {
+		t.Error("WaitReady should become true once /healthz returns 200")
 	}
 }
 

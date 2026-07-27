@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/system/daemon"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
@@ -15,7 +16,9 @@ import (
 // It supervises HTTP instances of this same binary; each managed instance is a
 // child `system-mcp --config <cfg> --name <name> [--http-addr <addr>]` process.
 // `up`/`down` bring a whole registry (instances.yaml) of datasets up or down,
-// one port per dataset, and print a LAN-reachable connection URL per instance.
+// one port per dataset, and print a LAN-reachable connection URL per instance;
+// `up --wait` polls each instance's /healthz until it is serviceable before
+// returning, so a caller never gets a URL that is not yet ready.
 // `reload` health-gates a blue-green swap (start green on a temp port, verify
 // /healthz, then restart on the real port), so a broken new dataset version
 // never takes the running instance down.
@@ -30,6 +33,8 @@ func runDaemon(args []string, stdout io.Writer) error {
 	config := fs.String("config", "", "cks config passed to the instance (start/restart)")
 	addr := fs.String("http-addr", "", "override listen http_addr for the instance")
 	registry := fs.String("registry", envOr("CKS_REGISTRY", "instances.yaml"), "instance registry file (up/down)")
+	wait := fs.Bool("wait", false, "up: poll each instance's /healthz until it is serviceable before returning")
+	waitTimeout := fs.Duration("wait-timeout", 60*time.Second, "up --wait: max time to wait per instance for readiness")
 	runDir := fs.String("run-dir", envOr("CKS_RUN_DIR", "run"), "directory holding per-instance pidfiles + logs")
 	ollamaURL := fs.String("ollama-url", os.Getenv("CKV_OLLAMA_ENDPOINT"), "ollama endpoint exported to the instance")
 	if err := fs.Parse(args[1:]); err != nil {
@@ -60,8 +65,16 @@ func runDaemon(args []string, stdout io.Writer) error {
 		}
 		started, err := sup.Up(reg, nil)
 		for _, st := range started {
-			fmt.Fprintf(stdout, "[%s] running (pid %d) — http://%s/mcp\n",
-				st.Name, st.PID, netutil.AdvertiseHostPort(st.Addr))
+			url := netutil.AdvertiseHostPort(st.Addr)
+			state := "running"
+			if *wait && st.Running {
+				if daemon.WaitReady(st.Addr, *waitTimeout, 500*time.Millisecond) {
+					state = "ready"
+				} else {
+					state = fmt.Sprintf("running but NOT serviceable after %s", *waitTimeout)
+				}
+			}
+			fmt.Fprintf(stdout, "[%s] %s (pid %d) — http://%s/mcp\n", st.Name, state, st.PID, url)
 		}
 		return err
 	case "down":
