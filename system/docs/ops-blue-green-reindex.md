@@ -16,19 +16,26 @@
 |---|---|---|
 | 재인덱싱(빌드→게이트→promote) | `reindex-dataset.sh run` | `knowledge-setup --version <ver>` (CLI) 또는 MCP 도구 `ops.reindex`(job_id 반환, `ops.setup_status`로 폴링) |
 | 롤백 | `reindex-dataset.sh promote`(옛 ver) | `knowledge-setup --rollback <prev-ver>` |
-| config 생성 | `gen-cks-config.sh` | `system-mcp gen-config`(원격 도달용은 `--lan`으로 LAN IP 바인드) |
-| 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `system-mcp daemon up`/`down`(`instances.yaml` 레지스트리, 데이터셋별 포트 자동 배정) |
+| config 생성 | `gen-cks-config.sh` | `system-mcp gen-config`(원격 도달용은 `--lan`; sanitize `rules_path`는 baseline 절대경로로 자동 채움) |
+| 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `system-mcp daemon up`/`down`(`instances.yaml` 레지스트리, 포트 자동 배정, `graph_binary`/`vector_binary`로 ops.reindex 활성). `up --wait`로 `/healthz` serviceable까지 대기 |
+| 상태/준비 확인 | `serve-cks-http.sh status` | `system-mcp daemon status`/`list`(`--ready`로 각 인스턴스 serviceability 프로브) |
 | 무중단 전환(blue-green) | 수동 green 기동→health→소비자 전환→blue 정지 | `system-mcp daemon reload` — green을 임시 포트에 기동→`/healthz` 게이트 통과 시에만 real 포트로 교체(불건전 시 기존 인스턴스 무손상) |
-| identity/serviceable 확인 | `cks.ops.health` | `GET /healthz`(200=serviceable, 503+reason) 또는 `cks.ops.health` |
-| 클라이언트 등록 스니펫 | 수동 | `system-mcp print-mcp-config --config <cfg>`(HTTP URL 또는 stdio command) |
+| identity/serviceable 확인 | `cks.ops.health` | `GET /healthz`(200=serviceable, 503+reason; reason은 loopback에만) 또는 `cks.ops.health` |
+| 클라이언트 등록 스니펫 | 수동 | `system-mcp print-mcp-config --config <cfg>`(HTTP URL 또는 stdio command; `--http-addr`로 런타임 포트 override) |
 
 게이트 스위트(§5.1의 5단계)는 `internal/setup`의 Reindex 게이트로 이식되었다:
 ckg validate / manifest-align(commit·digest·schema≥1.19) / chunk_count>0 /
-canonical 비율(B7 라이브 대신) / soft ckg audit. `current` 심볼릭 원자 교체 1회가
-graph+vector를 함께 덮으므로 별도 graph promote는 없다.
+canonical 비율(B7 라이브 대신; `min_canonical_ratio=0`이면 게이트 비활성 warning 방출) /
+soft ckg audit. `current` 심볼릭 원자 교체 1회가 graph+vector를 함께 덮으므로 별도
+graph promote는 없다. reindex lock은 소유자 PID/시각을 기록해 크래시 후 stale lock을
+자동 회복한다.
+
+**주의(보안, #23):** prod 설정은 sanitize `rules_path`가 비어 있으면(NOOP redaction)
+로드가 거부된다. `gen-config`가 baseline 절대경로로 자동 채우므로 정상 경로는 영향
+없지만, 손수 작성한 prod 설정은 `rules_path`를 지정해야 한다(`logging.mode: dev`는 예외).
 
 `ops-blue-green-reindex` 세부 배경은
-[remaining-work.md](./remaining-work.md) "MCP-server hardening (2026-07-27)" 및
+[remaining-work.md](./remaining-work.md) "MCP-server hardening + review-driven improvements" 및
 커버리지 감사
 [legacy-ops-go-coverage-audit.md](../../docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md)
 참조.
