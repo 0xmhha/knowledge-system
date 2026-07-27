@@ -7,6 +7,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	kmcp "github.com/0xmhha/knowledge-system/pkg/mcp"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -18,7 +19,8 @@ import (
 type GenerateOptions struct {
 	// Name / Description are the instance identity echoed by cks.ops.health so
 	// callers can tell which dataset/index they reached. Empty Name defaults to
-	// "cks".
+	// the deployment namespace root (KNOWLEDGE_MCP_NAMESPACE / ldflag, "cks"
+	// upstream).
 	Name        string
 	Description string
 
@@ -69,7 +71,10 @@ type GenerateOptions struct {
 func Generate(o GenerateOptions) *Config {
 	name := o.Name
 	if name == "" {
-		name = "cks"
+		// Default the instance identity to the deployment namespace root
+		// (KNOWLEDGE_MCP_NAMESPACE / -ldflags BuildRoot), so a branded pack's
+		// generated config matches its tool namespace instead of literal "cks".
+		name = kmcp.Root("", "cks")
 	}
 	embedModel := o.EmbedModel
 	if embedModel == "" {

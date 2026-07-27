@@ -33,7 +33,8 @@ type Config struct {
 	// Name identifies this cks-mcp instance. It becomes the MCP server name in
 	// the handshake and is echoed in cks.ops.health, so a caller connecting by
 	// ip:port can tell WHICH instance it reached when several run side by side
-	// (one per dataset/index) on different ports. Empty defaults to "cks".
+	// (one per dataset/index) on different ports. Empty defaults to the
+	// deployment namespace root (KNOWLEDGE_MCP_NAMESPACE / ldflag, "cks" upstream).
 	Name string `yaml:"name"`
 	// Description is optional human-facing metadata (e.g. "go-stablenet pr-77-2
 	// flow index") surfaced in cks.ops.health alongside Name.

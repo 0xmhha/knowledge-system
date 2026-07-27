@@ -225,7 +225,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 	if cfg.Listen.ResolvedTransport() == "http" {
 		name := cfg.Name
 		if name == "" {
-			name = "cks"
+			name = cksmcp.DefaultInstanceName()
 		}
 		log.Printf("cks-mcp[%s]: serving Streamable HTTP on %s (allow_remote=%v, allowed_cidrs=%v)",
 			name, cfg.Listen.HTTPAddr, cfg.Listen.AllowRemote, cfg.Listen.AllowedCIDRs)
