@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -23,6 +24,25 @@ import (
 // old or the new target, never a missing one — serving restart (adopting the
 // new version) is the instance-level blue-green step (design P5), out of scope
 // here.
+
+// validateVersion rejects version labels that are not a single, safe directory
+// name. The label becomes both a build subdirectory (dataset/<version>) and a
+// promote symlink target, so a value like "current", "..", or "a/b" would
+// escape the dataset root or build straight through the live `current` symlink,
+// corrupting the served index before the gate runs.
+func validateVersion(version string) error {
+	switch {
+	case version == "":
+		return fmt.Errorf("reindex: version is required")
+	case version == "current":
+		return fmt.Errorf("reindex: version %q is reserved (it is the live pointer)", version)
+	case version != filepath.Base(version) || strings.ContainsRune(version, filepath.Separator):
+		return fmt.Errorf("reindex: version %q must be a single path element", version)
+	case strings.HasPrefix(version, "."):
+		return fmt.Errorf("reindex: version %q must not start with a dot", version)
+	}
+	return nil
+}
 
 // NewVersion returns a fresh, sortable version label for a reindex when the
 // caller does not pin one: "v<unix-seconds>". Monotonic across reindexes of a
@@ -179,8 +199,8 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 // o.Out is the dataset root; the new build lands in o.Out/<version>. On gate
 // failure the version dir is kept for diagnosis and `current` is left untouched.
 func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r Runner, emit func(Event)) error {
-	if version == "" {
-		return fmt.Errorf("reindex: version is required")
+	if err := validateVersion(version); err != nil {
+		return err
 	}
 	dataset := o.Out
 	lock, err := acquireReindexLock(dataset)

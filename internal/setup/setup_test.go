@@ -247,6 +247,23 @@ func TestStartFunc_GenericJob(t *testing.T) {
 	}
 }
 
+// TestValidateVersion guards the reindex version label against values that
+// would escape the dataset root or build through the live `current` symlink.
+func TestValidateVersion(t *testing.T) {
+	bad := []string{"", "current", "..", ".", ".hidden", "a/b", "/abs", "../evil"}
+	for _, v := range bad {
+		if err := validateVersion(v); err == nil {
+			t.Errorf("validateVersion(%q) = nil, want an error", v)
+		}
+	}
+	good := []string{"v1785162032", "0bf2f4d1b-a1b2c3d4", "pr-77-2"}
+	for _, v := range good {
+		if err := validateVersion(v); err != nil {
+			t.Errorf("validateVersion(%q) = %v, want nil", v, err)
+		}
+	}
+}
+
 // TestStartReindex_MissingVersion exercises the reindex job wrapper: it runs
 // Reindex through the shared registry and surfaces its error as a failed job
 // (empty version is rejected by Reindex).

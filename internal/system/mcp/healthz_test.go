@@ -50,6 +50,7 @@ func TestHealthzHandler(t *testing.T) {
 
 			rec := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+			req.RemoteAddr = "127.0.0.1:5000" // loopback → detailed reason allowed
 			healthzHandler(f.deps)(rec, req)
 
 			if rec.Code != tc.wantCode {
@@ -71,5 +72,34 @@ func TestHealthzHandler(t *testing.T) {
 				t.Errorf("expected a reason when unavailable")
 			}
 		})
+	}
+}
+
+// TestHealthzHidesReasonFromNonLoopback checks the detailed reason (which can
+// carry dataset paths/commits) is withheld from a non-loopback client while the
+// loopback daemon/operator still sees it.
+func TestHealthzHidesReasonFromNonLoopback(t *testing.T) {
+	t.Parallel()
+	f := newFixture(t, func(f *fixture) {
+		f.ckg.HealthVal = ckgclient.Health{Reachable: false} // force non-serviceable
+	})
+	decode := func(remote string) string {
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+		req.RemoteAddr = remote
+		healthzHandler(f.deps)(rec, req)
+		var body struct {
+			Reason string `json:"reason"`
+		}
+		if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+			t.Fatalf("decode: %v", err)
+		}
+		return body.Reason
+	}
+	if got := decode("203.0.113.5:4000"); got != "not serviceable" {
+		t.Errorf("non-loopback reason = %q, want generic \"not serviceable\"", got)
+	}
+	if got := decode("127.0.0.1:4000"); got == "not serviceable" || got == "" {
+		t.Errorf("loopback reason = %q, want the detailed reason", got)
 	}
 }

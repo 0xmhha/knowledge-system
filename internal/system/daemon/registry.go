@@ -59,6 +59,7 @@ func (r *Registry) validate() error {
 		return fmt.Errorf("registry: no instances declared")
 	}
 	seen := map[string]bool{}
+	seenPort := map[int]string{}
 	for _, e := range r.Instances {
 		if e.Name == "" {
 			return fmt.Errorf("registry: an instance is missing a name")
@@ -69,6 +70,12 @@ func (r *Registry) validate() error {
 		seen[e.Name] = true
 		if e.Dataset == "" && e.Config == "" {
 			return fmt.Errorf("registry: instance %q needs a dataset or config", e.Name)
+		}
+		if e.Port != 0 {
+			if other, dup := seenPort[e.Port]; dup {
+				return fmt.Errorf("registry: instances %q and %q both pin port %d", other, e.Name, e.Port)
+			}
+			seenPort[e.Port] = e.Name
 		}
 	}
 	return nil

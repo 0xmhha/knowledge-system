@@ -249,13 +249,31 @@ func healthzHandler(d Deps) http.HandlerFunc {
 		code := http.StatusOK
 		if !ok {
 			body["status"] = "unavailable"
-			body["reason"] = reason
+			// The detailed reason can carry backend error strings with absolute
+			// dataset paths and commit identity. /healthz is only network-ACL'd
+			// (the LAN under allow_remote), so expose the raw reason to loopback
+			// callers (the local daemon/operator) and a generic one to the rest.
+			if isLoopbackRequest(r) {
+				body["reason"] = reason
+			} else {
+				body["reason"] = "not serviceable"
+			}
 			code = http.StatusServiceUnavailable
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
 		_ = json.NewEncoder(w).Encode(body)
 	}
+}
+
+// isLoopbackRequest reports whether the request's direct TCP peer is loopback.
+func isLoopbackRequest(r *http.Request) bool {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // clientACL compiles policy into a predicate over client IPs. Loopback is
