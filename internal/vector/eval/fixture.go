@@ -43,10 +43,32 @@ import (
 // majors and warn on newer minors.
 const FixtureSchemaVersion = "1"
 
+// Match modes select how Score decides a query "passed".
+const (
+	// MatchExact is the default YAML-fixture semantics: a hit is correct
+	// when its citation.file equals expected.file AND the citation's line
+	// range overlaps expected.line_range.
+	MatchExact = ""
+	// MatchSubstring is the JSON semantic-validation semantics (see
+	// vector/scripts/build-knowledge.sh): a hit is correct when its
+	// citation.file CONTAINS expected.substring. No line range is used.
+	MatchSubstring = "substring"
+)
+
 // Fixture is the parsed top-level document.
 type Fixture struct {
 	SchemaVersion string  `yaml:"schema_version"`
 	Queries       []Query `yaml:"queries"`
+
+	// MatchMode selects the scoring semantics for the whole fixture.
+	// Empty (MatchExact) for YAML fixtures; MatchSubstring for the JSON
+	// semantic-validation format. Not serialized in YAML — it is set by
+	// the loader based on the fixture's format.
+	MatchMode string `yaml:"-"`
+	// K is the top-K carried by the fixture itself (the JSON semantic
+	// format's top-level "k"). Zero for YAML fixtures, where the CLI's
+	// --top flag supplies K instead.
+	K int `yaml:"-"`
 }
 
 // Query is one ground-truth entry.
@@ -75,6 +97,10 @@ type Expected struct {
 	Symbol    string           `yaml:"symbol,omitempty"`
 	Kind      types.SymbolKind `yaml:"kind,omitempty"`
 	LineRange [2]int           `yaml:"line_range"`
+	// Substring is the expected path substring for MatchSubstring
+	// fixtures. When non-empty the scorer treats a hit as correct when
+	// its citation.file CONTAINS this value, ignoring File and LineRange.
+	Substring string `yaml:"-"`
 	// Section is an optional human-readable anchor inside File (e.g. a
 	// markdown heading like "§4 Vector store — decision matrix") used by
 	// why-queries fixtures. Purely informational — Score() does not match
@@ -93,6 +119,13 @@ func LoadFixture(path string) (*Fixture, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read fixture: %w", err)
+	}
+	// The JSON semantic-validation format is detected by a .json
+	// extension or by a leading '{' (a YAML fixture always begins with
+	// "schema_version:", never a brace). It is loaded and validated by a
+	// dedicated path, leaving the YAML flow below untouched.
+	if isSemanticJSON(path, data) {
+		return loadSemanticFixture(data)
 	}
 	var f Fixture
 	if err := yaml.Unmarshal(data, &f); err != nil {

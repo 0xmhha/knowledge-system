@@ -67,6 +67,17 @@ import (
 var builderVersion = "cks-mcp/0.0.1-dev"
 
 func main() {
+	// gen-config subcommand: emit a runtime config YAML (the Go replacement for
+	// system/scripts/gen-cks-config.sh) instead of serving. Dispatched before
+	// flag.Parse so its own flag set owns the remaining args.
+	if len(os.Args) > 1 && os.Args[1] == "gen-config" {
+		if err := runGenConfig(os.Args[2:], os.Stdout); err != nil {
+			log.Printf("cks-mcp gen-config: %v", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	configPath := flag.String("config", "", "path to cks.yaml (optional; falls back to defaults)")
 	nameOverride := flag.String("name", "", "override config name (MCP instance name) — for running several instances")
 	httpAddrOverride := flag.String("http-addr", "", "override config listen.http_addr (host:port) — for running several instances on different ports")
