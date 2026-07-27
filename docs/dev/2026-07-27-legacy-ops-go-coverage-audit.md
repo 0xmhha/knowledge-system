@@ -47,7 +47,7 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
    builds the include/exclude list from a binary's package closure
    (`go list -deps`), matching `index-project.sh`. (retires `index-project.sh`)
 2. **vector build preflight** — ollama reachability + model existence; ckg
-   `schema_version >= 1.19` gate before aligning. (part of `build-knowledge.sh`)
+   `schema_version >= 1.19` gate before aligning. (part of `build-knowledge.sh`) [LANDED: ollama reachability + model existence — internal/setup preflight]
 3. **vector build verify** — surface `canonical_id` match-rate and flow/doc
    chunk counts in the build summary. (part of `build-knowledge.sh`)
 4. **dataset publish** — `wal_checkpoint(TRUNCATE)` + sha256 manifest as a
@@ -61,7 +61,7 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
    lock, rollback, and serving restart. (retires `reindex-dataset.sh`)
 7. **verify-align schema gate** — `internal/setup/verify.go` reads
    `SchemaVersion` but never asserts `>= 1.19` / ADR-007 canonical_id; add the
-   assertion (a coverage regression vs `reindex-dataset.sh` gate 2).
+   assertion (a coverage regression vs `reindex-dataset.sh` gate 2). [LANDED]
 8. **multi-instance MCP daemon management** — start/stop/list several
    `system-mcp` HTTP instances. (retires `cks-mcpd.sh` / `serve-cks-http.sh`)
 9. **semantic-validation harness** — reconcile `build-knowledge.sh`'s

@@ -128,6 +128,17 @@ func BuildPlan(o Options) (Plan, error) {
 		if o.OllamaURL != "" {
 			env = append(env, "CKV_OLLAMA_ENDPOINT="+o.OllamaURL)
 		}
+		// Fail fast on an unusable Ollama backend before the long build.
+		if o.Embedder == "ollama" {
+			url, model := o.OllamaURL, o.ModelName
+			steps = append(steps, Step{
+				ID:    "vector-preflight",
+				Title: "Preflight the Ollama embedder",
+				Verify: func(emit func(Event)) error {
+					return PreflightOllama(url, model, emit)
+				},
+			})
+		}
 		steps = append(steps,
 			Step{
 				ID:    "vector-build",
