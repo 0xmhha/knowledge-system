@@ -102,12 +102,15 @@ Surfaced by the 2026-07-19 docs review — genuinely open, not in the E/M lineag
 
 (F-1 from the dogfood doc is now closed — `real.go:202-243` consumes real ckg Score verbatim; F-2/F-3/F-6/F-7 unverified.)
 
-## MCP-server hardening (2026-07-27) — done
+## MCP-server hardening + review-driven improvements (2026-07-27–28) — done
 
 The fused server's operate + integrate mission (serve knowledge over MCP to
-local and **remote** agents, with easy setup) drove a hardening sequence. All of
-it is merged to `main`; the one remaining step is the downstream port (see
-[`../../docs/downstream-sync.md`](../../docs/downstream-sync.md)).
+local and **remote** agents, with easy setup) drove a hardening sequence, then a
+pre-port review round that fixed several fail-open cases and operability gaps.
+All of it is merged to `main`; the one remaining step is the downstream port
+(see [`../../docs/downstream-sync.md`](../../docs/downstream-sync.md)).
+
+Hardening sequence (#14–#18):
 
 | Item | What landed | PR |
 |---|---|---|
@@ -116,6 +119,25 @@ it is merged to `main`; the one remaining step is the downstream port (see
 | blue-green reload | `/healthz` readiness probe; `daemon reload` starts a green instance on a temp port, gates on `/healthz`, then swaps — a bad rebuild never takes the running server down | #16 |
 | namespace-aligned identity | the instance name defaults to the deployment namespace root (`KNOWLEDGE_MCP_NAMESPACE` / `-ldflags`) instead of the literal "cks" | #17 |
 | async long ops + connection snippet | `Jobs.StartFunc` generalizes the async job pattern; `ops.reindex` MCP tool (build → gate → promote `current`, polled via `ops.setup_status`); `print-mcp-config` emits a ready-to-paste client config | #18 |
+
+Review-driven improvements (#20–#26), from a three-lens code review of the
+serving, setup, and config/identity layers plus end-to-end validation:
+
+| Item | What landed | PR |
+|---|---|---|
+| route-default LAN IP | the advertised IP is resolved from the default route, not `net.InterfaceAddrs` enumeration order (correct on a multi-homed host) | #21 |
+| registry engine binaries + readiness wait | `graph_binary`/`vector_binary` in the registry (so `ops.reindex`/`ops.index` work on a registry-launched instance); `daemon up --wait` polls `/healthz` until serviceable before returning a URL | #20 |
+| fail-loud startup + safe reindex versions | daemon startup-crash detection by reap (not a zombie-blind signal-0 probe); reindex version validation (rejects `current`/`..`/`a/b`); `/healthz` reason withheld from non-loopback clients; empty instance name → namespace; duplicate fixed ports rejected | #22 |
+| **security fail-closed** | prod requires a sanitize `rules_path` — an empty path (NOOP redaction) is rejected unless `logging.mode=dev`, and `gen-config` defaults an absolute in-repo baseline; alignment fails closed when a configured ckv index has no verifiable manifest (was a warning) | #23 |
+| async job lifecycle | bounded per-job event + finished-job retention (memory flat under many builds); a registry base context whose `Shutdown` cancels in-flight builds on server exit; `Cancel(id)` | #24 |
+| reindex robustness | stale-lock recovery (owner-PID/age based) so a crash no longer wedges reindex; a warning when the canonical-coverage gate is disabled (`min_canonical_ratio=0`) | #25 |
+| daemon/CLI operability | `daemon status`/`list --ready` shows serviceability; `print-mcp-config --http-addr` overrides the emitted URL; auto-port probes the actual bind host | #26 |
+
+> **Operator note (security, #23):** a production config now requires a
+> non-empty `sanitize.rules_path`. `gen-config` fills it with an absolute path to
+> the shipped baseline automatically; a hand-written prod config that leaves it
+> empty is rejected at load. Use `logging.mode: dev` only for local, non-serving
+> use where NOOP redaction is acceptable.
 
 This supersedes the shell serving/reindex path in
 [`ops-blue-green-reindex.md`](./ops-blue-green-reindex.md) (see its "Go 경로"
