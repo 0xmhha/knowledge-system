@@ -276,7 +276,10 @@ func matchesFilter(n types.Node, f SearchFilter) bool {
 // take a kind filter. The mapping is lowercase cks kind to ckg NodeType
 // (e.g. "function" -> "Function", "method" -> "Method").
 //
-// opts.PathGlob and opts.CommitHash are not yet enforced; follow-up.
+// opts.PathGlob is enforced client-side (filepath.Match on FilePath).
+// opts.CommitHash is not exposed by the find_symbol tool and, against a
+// single-commit index, has no subset semantics, so it is intentionally not
+// enforced.
 // resolveFlexibleNodes resolves a possibly over-qualified dotted symbol name
 // against ckg's qualified-name index, which stores Go symbols in the
 // package-leaf form "pkgleaf.Type.Method" (e.g. "validator.defaultSet.QuorumSize")
@@ -325,6 +328,14 @@ func (r *Real) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]
 	for _, nd := range nodes {
 		if !nodeMatchesKinds(nd, opts.Kinds) {
 			continue
+		}
+		// PathGlob is a client-side filter (filepath.Match on FilePath), the same
+		// semantics SearchFTS applies — the find_symbol tool advertises path_glob,
+		// so a resolved symbol outside the glob must be dropped, not returned.
+		if opts.PathGlob != "" {
+			if ok, _ := filepath.Match(opts.PathGlob, nd.FilePath); !ok {
+				continue
+			}
 		}
 		out = append(out, nodeToCitation(nd, commit))
 	}

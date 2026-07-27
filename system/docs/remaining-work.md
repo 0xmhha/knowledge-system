@@ -96,7 +96,7 @@ Surfaced by the 2026-07-19 docs review — genuinely open, not in the E/M lineag
 
 | ID | Task | Severity | Status | Source |
 |---|---|---|---|---|
-| **F-4** | Wire `Filter.CommitHash` (and `PathGlob`) through Stage 2 / Stage 3. | [권장] | **Open — code.** `internal/ckgclient/real.go:197` ("opts.Filter.CommitHash is currently ignored") and `:279` ("not yet enforced; follow-up"). | `followups-from-dogfood-2026-05-19.md` F-4 |
+| **F-4** | Enforce the `path_glob` filter the graph tools advertise. | [권장] | **Closed (2026-07-28).** `PathGlob` is now applied client-side in `SearchFTS` and `FindSymbol` (`internal/system/ckgclient/real.go`, `filepath.Match` on `FilePath`). `CommitHash` is intentionally left unenforced — no tool exposes it and a single-commit index has no subset semantics. | `followups-from-dogfood-2026-05-19.md` F-4 |
 | **KR-deploy** | Knowledge-reserve doc-kind rescue: deploy + live re-capture. | [권장] | **Open — operator action.** Task 1 code shipped (PR #43, `budget/allocator.go`); the running MCP still serves the old binary, so the fix is not yet live. | `fix-knowledge-reserve-doc-kind.md` §Task 2 |
 | **M2-multi** | Multi-cycle total-cost judgment (the coding-agent bug-cycle-cost thesis). | [권장] | **Open (soft).** M2 delivered a single-turn N=30 Q&A run, which M2 itself concedes ≠ the multi-cycle cost thesis. Either run it or explicitly drop it. | `HANDOFF-cks-evaluation-remaining.md` §5.1(d) |
 

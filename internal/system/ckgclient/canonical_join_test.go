@@ -59,6 +59,33 @@ func TestFindSymbol_ResolvesCanonicalID(t *testing.T) {
 	}
 }
 
+func TestFindSymbol_PathGlobFilter(t *testing.T) {
+	t.Parallel()
+	m := &mockStoreReader{
+		symbolByName: map[string][]types.Node{
+			"Foo": {
+				canonNode("", "pkg.Foo", "consensus/a.go", 10, 20),
+				canonNode("", "pkg.Foo", "vm/b.go", 30, 40),
+			},
+		},
+	}
+	r := newRealWithStore(m)
+
+	// No glob resolves both same-named symbols.
+	all, err := r.FindSymbol(context.Background(), "Foo", SymbolOpts{})
+	if err != nil || len(all) != 2 {
+		t.Fatalf("no-glob = %d citations err=%v, want 2", len(all), err)
+	}
+	// path_glob (advertised by the find_symbol tool) drops symbols outside it.
+	got, err := r.FindSymbol(context.Background(), "Foo", SymbolOpts{PathGlob: "consensus/*.go"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0].File != "consensus/a.go" {
+		t.Errorf("PathGlob filter = %+v, want only consensus/a.go", got)
+	}
+}
+
 func TestFindSymbol_ResolvesLineQualifiedDuplicate(t *testing.T) {
 	t.Parallel()
 	// Same-file duplicate canonical ids carry an "@<line>" suffix (B3); each
