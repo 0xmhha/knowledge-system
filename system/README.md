@@ -1,8 +1,11 @@
 # code-knowledge-system (cks)
 
-Composes [`code-knowledge-graph`](https://github.com/0xmhha/knowledge-system) (ckg) and
-[`code-knowledge-vector`](https://github.com/0xmhha/knowledge-system) (ckv) into a
-token-budgeted, sanitized `EvidencePack` and exposes it through MCP for upper layers
+> The three engines (ckg · ckv · cks) now live in one module — the
+> [`knowledge-system`](https://github.com/0xmhha/knowledge-system) monorepo.
+> "ckg"/"ckv"/"cks" name the engines, not separate repositories.
+
+Composes the graph (ckg) and vector (ckv) engines into a token-budgeted,
+sanitized `EvidencePack` and exposes it through MCP for upper layers
 (coding agent, external LLM clients).
 
 ## Status
