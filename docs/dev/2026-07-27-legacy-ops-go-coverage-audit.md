@@ -45,7 +45,7 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
 
 1. **graph `--files-from` generation** — a `ckg`/`knowledge-setup` mode that
    builds the include/exclude list from a binary's package closure
-   (`go list -deps`), matching `index-project.sh`. (retires `index-project.sh`)
+   (`go list -deps`), matching `index-project.sh`. (retires `index-project.sh`) [LANDED — graph build --files-from-main; index-project.sh retired]
 2. **vector build preflight** — ollama reachability + model existence; ckg
    `schema_version >= 1.19` gate before aligning. (part of `build-knowledge.sh`) [LANDED: ollama reachability + model existence — internal/setup preflight]
 3. **vector build verify** — surface `canonical_id` match-rate and flow/doc
@@ -53,7 +53,7 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
 4. **dataset publish** — `wal_checkpoint(TRUNCATE)` + sha256 manifest as a
    `knowledge-setup`/`ckv` step. (part of `build-knowledge.sh`) [LANDED]
 5. **fused-server config generation** — a Go generator for the `system-mcp`
-   config + env (today only `config.Load` exists). (retires `gen-cks-config.sh`)
+   config + env (today only `config.Load` exists). (retires `gen-cks-config.sh`) [LANDED (config YAML: system-mcp gen-config); cks.env / LAN autodetect / manifest-consistency assertion NOT yet ported, so gen-cks-config.sh is kept]
 6. **reindex orchestration** — wire `ckg validate` / manifest-align /
    chunk-count / B7 / `ckg audit` into a coordinated blue-green pipeline with
    digest-named version dirs, atomic `current` promote for **both** engines
@@ -66,6 +66,8 @@ dataset prep), `vector/scripts/pr-retrieval-eval.sh` (a specific eval harness;
    `system-mcp` HTTP instances. (retires `cks-mcpd.sh` / `serve-cks-http.sh`)
 9. **semantic-validation harness** — reconcile `build-knowledge.sh`'s
    paraphrase→expected-file check with `ckv eval` (fixture format differs).
+   [LANDED — `ckv eval --fixture <semantic.json>` accepts the JSON set
+   (substring-in-top-k) with a `--min-pass-rate` gate]
 
 Out of Go scope (stay shell / move to the coding-agent plugin, not archived
 here): `activate.sh`, `apply-cc-settings.sh`, `coding-agent.sh`,
