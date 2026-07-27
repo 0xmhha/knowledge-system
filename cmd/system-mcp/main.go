@@ -58,6 +58,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	cksmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
+	"github.com/0xmhha/knowledge-system/internal/system/netutil"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
 )
 
@@ -224,6 +225,9 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 		}
 		log.Printf("cks-mcp[%s]: serving Streamable HTTP on %s (allow_remote=%v, allowed_cidrs=%v)",
 			name, cfg.Listen.HTTPAddr, cfg.Listen.AllowRemote, cfg.Listen.AllowedCIDRs)
+		// Advertise a client-reachable URL: when bound to a wildcard address,
+		// resolve this host's LAN IP so a remote agent knows where to connect.
+		log.Printf("cks-mcp[%s]: reachable at http://%s/mcp", name, netutil.AdvertiseHostPort(cfg.Listen.HTTPAddr))
 		return cksmcp.RunHTTP(ctx, deps, cfg.Listen.HTTPAddr, cksmcp.HTTPPolicy{
 			AllowRemote:  cfg.Listen.AllowRemote,
 			AllowedCIDRs: cfg.Listen.AllowedCIDRs,
