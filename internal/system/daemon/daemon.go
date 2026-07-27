@@ -115,8 +115,6 @@ func (s *Supervisor) Start(name, config, addr string) (Instance, error) {
 		return Instance{}, fmt.Errorf("daemon: start %s: %w", name, err)
 	}
 	pid := cmd.Process.Pid
-	// Release the child so it is not reaped as a zombie when it outlives us.
-	_ = cmd.Process.Release()
 	if err := os.WriteFile(s.pidfile(name), []byte(strconv.Itoa(pid)), 0o644); err != nil {
 		return Instance{}, fmt.Errorf("daemon: write pidfile: %w", err)
 	}
@@ -129,12 +127,27 @@ func (s *Supervisor) Start(name, config, addr string) (Instance, error) {
 		grace = time.Second
 	}
 	time.Sleep(grace)
-	if !alive(pid) {
+	// Detect a startup crash (bad config, port already bound) by non-blocking
+	// reap. The child is still ours here, so a signal-0 probe cannot tell a live
+	// process from an exited-but-unreaped zombie — Wait4 can.
+	if crashedDuringStartup(pid) {
 		_ = os.Remove(s.pidfile(name))
 		_ = os.Remove(s.addrfile(name))
 		return Instance{Name: name}, fmt.Errorf("daemon: %s exited during startup — see %s", name, s.logfile(name))
 	}
+	// Survived the grace: release the handle so the child, which outlives this
+	// process, reparents cleanly to init instead of lingering as our zombie.
+	_ = cmd.Process.Release()
 	return Instance{Name: name, PID: pid, Running: true, Addr: addr}, nil
+}
+
+// crashedDuringStartup non-blockingly reaps pid and reports whether the child
+// has already exited. Wait4(WNOHANG) returns the pid (reaping the zombie) when
+// it is dead and 0 while it still runs.
+func crashedDuringStartup(pid int) bool {
+	var ws syscall.WaitStatus
+	wpid, err := syscall.Wait4(pid, &ws, syscall.WNOHANG, nil)
+	return err == nil && wpid == pid
 }
 
 // Stop signals the instance (SIGTERM, then SIGKILL after a grace period) and

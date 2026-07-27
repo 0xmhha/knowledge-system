@@ -1,10 +1,35 @@
 package daemon
 
 import (
+	"os"
 	"os/exec"
 	"testing"
 	"time"
 )
+
+// TestStartDetectsStartupCrash covers the reap-based crash check: a child that
+// exits during the grace window (bad config, port already bound) must surface as
+// a startup error, not a false "running" — a signal-0 probe can't tell a live
+// process from an exited-but-unreaped zombie.
+func TestStartDetectsStartupCrash(t *testing.T) {
+	falsebin, err := exec.LookPath("false")
+	if err != nil {
+		t.Skip("false not available")
+	}
+	s := &Supervisor{
+		RunDir:     t.TempDir(),
+		Binary:     falsebin, // exits 1 immediately
+		Args:       func(name, config, addr string) []string { return nil },
+		StartGrace: 150 * time.Millisecond,
+	}
+	inst, err := s.Start("crash", "cfg", "127.0.0.1:9999")
+	if err == nil || inst.Running {
+		t.Fatalf("expected a startup-crash error, got inst=%+v err=%v", inst, err)
+	}
+	if _, statErr := os.Stat(s.pidfile("crash")); !os.IsNotExist(statErr) {
+		t.Errorf("pidfile should be removed after a startup crash")
+	}
+}
 
 // newTestSupervisor supervises a real but throwaway process (`sleep`) so the
 // pidfile/start/stop/status logic is exercised without a system-mcp instance.

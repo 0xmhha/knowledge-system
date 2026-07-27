@@ -128,6 +128,12 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 	if nameOverride != "" {
 		cfg.Name = nameOverride
 	}
+	// An empty name defaults to the deployment namespace root, so the instance
+	// reports a stable identity (in cks.ops.health, /healthz, and the log) instead
+	// of a blank name — matching the documented default and the tool namespace.
+	if cfg.Name == "" {
+		cfg.Name = cksmcp.DefaultInstanceName()
+	}
 	if httpAddrOverride != "" {
 		// Asking to serve on an address implies HTTP transport: the daemon and
 		// multi-instance callers pass --http-addr to run a stdio-defaulted config
@@ -234,10 +240,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 		},
 	}
 	if cfg.Listen.ResolvedTransport() == "http" {
-		name := cfg.Name
-		if name == "" {
-			name = cksmcp.DefaultInstanceName()
-		}
+		name := cfg.Name // already defaulted to the namespace root above
 		log.Printf("cks-mcp[%s]: serving Streamable HTTP on %s (allow_remote=%v, allowed_cidrs=%v)",
 			name, cfg.Listen.HTTPAddr, cfg.Listen.AllowRemote, cfg.Listen.AllowedCIDRs)
 		// Advertise a client-reachable URL: when bound to a wildcard address,

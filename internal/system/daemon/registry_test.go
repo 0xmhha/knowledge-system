@@ -63,6 +63,7 @@ func TestLoadRegistryRejectsBadInput(t *testing.T) {
 		"missing name": "instances:\n  - dataset: /data/x\n",
 		"no source":    "instances:\n  - name: x\n",
 		"duplicate":    "instances:\n  - name: x\n    dataset: /a\n  - name: x\n    dataset: /b\n",
+		"dup port":     "instances:\n  - name: a\n    dataset: /a\n    port: 9000\n  - name: b\n    dataset: /b\n    port: 9000\n",
 	}
 	for name, body := range cases {
 		t.Run(name, func(t *testing.T) {
