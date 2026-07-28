@@ -262,7 +262,7 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 	// tests, so demotion is skipped (current double-count boost
 	// stays intact).
 	demoteTests := intent != contract.IntentTestAdd
-	out.Citations = agg.results(s.config.MaxCitations, demoteTests)
+	out.Citations = agg.results(s.config.MaxCitations, demoteTests, demoteDocsFor(intent))
 	if len(keywords) > 0 {
 		out.Coverage = float64(hitCount) / float64(len(keywords))
 	}

@@ -134,10 +134,19 @@ func (a *aggregator) entry(c contract.Citation) *ScoredCitation {
 // (as classified by isTestPath) has its Score multiplied by
 // testDemotionFactor before sorting. This ensures production code ranks
 // above test files when the active intent is not test-oriented, while
-// keeping test files available lower in the evidence pack. Demotion is
-// applied to the returned copy — the aggregator's internal map is not
-// mutated, so results() can be called multiple times with different flags.
-func (a *aggregator) results(cap int, demoteTests bool) []ScoredCitation {
+// keeping test files available lower in the evidence pack.
+//
+// When demoteDocs is true, documentation citations (isDocCitation) are
+// likewise multiplied by docDemotionFactor so code-seeking intents rank
+// code above markdown. Independently of both flags, citations under an
+// archive/ path are multiplied by archiveDemotionFactor — superseded
+// material is never the current answer (factors do not stack: archive
+// classification wins over the doc factor).
+//
+// Demotion is applied to the returned copy — the aggregator's internal
+// map is not mutated, so results() can be called multiple times with
+// different flags.
+func (a *aggregator) results(cap int, demoteTests, demoteDocs bool) []ScoredCitation {
 	if len(a.byCitation) == 0 {
 		return nil
 	}
@@ -147,6 +156,12 @@ func (a *aggregator) results(cap int, demoteTests bool) []ScoredCitation {
 		entry := *sc
 		if demoteTests && isTestPath(entry.Citation.File) {
 			entry.Score *= testDemotionFactor
+		}
+		switch {
+		case isArchivePath(entry.Citation.File):
+			entry.Score *= archiveDemotionFactor
+		case demoteDocs && isDocCitation(entry.ChunkKind, entry.Citation.File):
+			entry.Score *= docDemotionFactor
 		}
 		out = append(out, entry)
 	}
