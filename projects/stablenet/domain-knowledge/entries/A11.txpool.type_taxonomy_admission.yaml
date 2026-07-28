@@ -21,10 +21,11 @@ summary: |
   state work.
 
   After the common gas/fee/sender checks, fee-delegated txs get an extra
-  admission gate: the tx must carry a FeePayer address, and the fee-payer
-  signature is recovered via types.FeePayer(NewFeeDelegateSigner(chainID),
-  tx); if recovery fails or the recovered address does not equal the
-  declared FeePayer, the tx is rejected with ErrInvalidFeePayer. This is
+  admission gate: types.RecoverFeePayer(chainID, tx) requires a declared
+  FeePayer (else types.ErrFeePayerNotSet), recovers the fee-payer signer
+  via FeePayer(NewFeeDelegateSigner(chainID), tx), and rejects with
+  types.ErrInvalidFeePayer when recovery fails or the recovered address
+  does not equal the declared FeePayer. This is
   the stateless half; the stateful fee-payer balance check lives later in
   ValidateTransactionWithState (ErrFeePayerInsufficientFunds).
 code_anchors:
@@ -38,7 +39,7 @@ code_anchors:
     reason: "StableNet-only fee-delegated tx struct: wraps DynamicFeeTx and adds FeePayer + FV/FR/FS feePayer signature"
   - file: core/types/tx_fee_delegation.go
     symbol: types.FeeDelegateDynamicFeeTx.txType
-    line: 116
+    line: 117
     reason: "binds the FeeDelegateDynamicFeeTx struct to type byte 0x16"
   - file: core/types/tx_setcode.go
     symbol: types.SetCodeTx.txType
@@ -78,13 +79,13 @@ code_anchors:
     line: 133
     kind: loc
     reason: "fee-payer recovery: fee-delegated tx must declare a FeePayer and the recovered fee-payer signer must equal it, else ErrInvalidFeePayer"
-  - file: core/txpool/errors.go
+  - file: core/types/transaction_signing.go
     symbol: ErrInvalidFeePayer
-    line: 69
-    reason: "the error returned when the fee-payer is nil or the recovered fee-payer signature does not match the declared FeePayer"
+    line: 35
+    reason: "the error returned when the recovered fee-payer signature does not match the declared FeePayer (moved from core/txpool/errors.go in the fee-delegation signing refactor; nil fee-payer now yields ErrFeePayerNotSet)"
   - file: core/types/transaction_signing.go
     symbol: FeePayer
-    line: 161
+    line: 167
     reason: "recovers the fee-payer address from the FV/FR/FS signature; used by the pool admission fee-payer check"
   - file: params/config.go
     symbol: params.ChainConfig.IsApplepie
@@ -140,5 +141,7 @@ existing_doc_ref:
   - file: .claude/docs/stablenet-features.md
 risk_level: medium
 source_of_truth: code
-status: needs_verification
+status: verified
+last_verified_at: "2026-07-28"
+verified_by: "code audit @go-stablenet 54a5cbd59 (fee-delegation signing refactor #114 reflected; anchors resolved against dev graph)"
 priority: P0
