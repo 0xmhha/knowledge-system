@@ -6,3 +6,14 @@ bin/
 
 # Editor/session local state
 *.log
+
+# Accidentally-built binaries at the repo root (cmd names). NOTE: /graph and
+# /vector are NOT listed — those patterns would also ignore the engine
+# directories; build with -o bin/ instead.
+/knowledge-setup
+/system-mcp
+/graph-mcp
+/vector-mcp
+
+# Derived pack outputs (domain-export corpus, generated filelists)
+projects/*/generated/
