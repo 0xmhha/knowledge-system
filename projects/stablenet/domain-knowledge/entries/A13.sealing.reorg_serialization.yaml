@@ -46,14 +46,14 @@ summary: 'The legacy txpool runs a single goroutine — `pool.loop()` (started a
 code_anchors:
   - file: core/txpool/legacypool/legacypool.go
     symbol: LegacyPool.loop
-    line: 373
+    line: 375
     reason: The single serializer goroutine that owns txpool maps
   - file: core/txpool/legacypool/legacypool.go
     line: 366
     reason: '`go pool.loop()` — sole owner of txpool mutation'
   - file: core/txpool/legacypool/legacypool.go
     symbol: queueTxEvent
-    line: 1284
+    line: 1340
     reason: 'Correct enqueue path: requests reorg-run to apply the mutation'
 code_keywords:
   - LegacyPool

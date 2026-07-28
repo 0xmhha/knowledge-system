@@ -25,20 +25,24 @@ code_anchors:
     line: 41
     reason: "protocol name literal — \"istanbul\""
   - file: eth/quorum_protocol.go
-    symbol: quorumConsensusProtocolLengths
+    enclosing_symbol: "Ethereum.quorumConsensusProtocols"
     line: 54
+    kind: loc
     reason: "22 messages on Istanbul100"
   - file: eth/handler_istanbul.go
-    symbol: EthPeerRegistered
+    enclosing_symbol: "handler.makeQuorumConsensusProtocol"
     line: 82
+    kind: loc
     reason: "eth-peer-ready signal — istanbul reuses eth peers, never creates its own"
   - file: eth/handler_istanbul.go
-    symbol: protocolMaxMsgSize
+    enclosing_symbol: "handler.handleConsensus"
     line: 138
+    kind: loc
     reason: "message size gate — rejection happens before consensus parsing"
   - file: eth/handler_istanbul.go
-    symbol: "wbft.ErrStoppedEngine"
+    enclosing_symbol: "handler.handleConsensusLoop"
     line: 120
+    kind: loc
     reason: "sync-time error path — debug log only, not warn/error"
   - file: consensus/wbft/backend/handler.go
     reason: "HandleMsg implementation that bridges P2P to consensus Core"

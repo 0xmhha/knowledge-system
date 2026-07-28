@@ -31,15 +31,16 @@ code_anchors:
     reason: "F = (N-1)/3 fault bound used by QuorumSize; defines the safety margin a change must not violate (step 3)"
   - file: consensus/wbft/backend/api.go
     symbol: "API.Status"
-    line: 169
+    line: 165
     reason: "istanbul RPC Status method returning RoundStats.RoundDistribution / TotalRounds and sealer activity — used to assert round-0 finalization rate and no-stall after a change (step 3)"
   - file: consensus/wbft/backend/api.go
     symbol: "API.GetValidators"
-    line: 136
+    line: 132
     reason: "istanbul RPC GetValidators — used with QuorumSize to confirm the active validator set and quorum during health assertion (step 3)"
   - file: consensus/wbft/backend/engine.go
-    symbol: "Namespace: \"istanbul\""
+    enclosing_symbol: "Backend.APIs"
     line: 234
+    kind: loc
     reason: "registers the istanbul RPC namespace exposing Status/GetValidators; this is the namespace reached for health assertion over RPC (step 3)"
 procedure_steps:
   - "Step 1 — Unit tests: run the Go unit tests for every package you touched, e.g. `go test ./consensus/wbft/core/...`, `./consensus/wbft/backend/...`, `./consensus/wbft/validator/...`. justification_test.go (TestJustifyTrue/False) is the representative core consensus suite covering round-change justification."
