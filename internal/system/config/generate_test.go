@@ -26,6 +26,24 @@ func TestGenerate_ConsolidatedPaths(t *testing.T) {
 	}
 }
 
+func TestGenerate_ExplicitBackendPathOverrides(t *testing.T) {
+	t.Parallel()
+	// Pre-consolidation dataset layouts (dataset-toolkit: graph-db/ +
+	// vector-db/) override the DatasetDir derivation with explicit paths.
+	o := GenerateOptions{
+		DatasetDir: "/abs/knowledge-data/pr-14",
+		GraphPath:  "/abs/knowledge-data/pr-14/graph-db/graph.db",
+		VectorPath: "/abs/knowledge-data/pr-14/vector-db",
+	}
+	c := Generate(o)
+	if c.Backends.CKG.Path != o.GraphPath {
+		t.Errorf("CKG.Path = %q, want override %q", c.Backends.CKG.Path, o.GraphPath)
+	}
+	if c.Backends.CKV.Path != o.VectorPath {
+		t.Errorf("CKV.Path = %q, want override %q", c.Backends.CKV.Path, o.VectorPath)
+	}
+}
+
 func TestGenerate_Defaults(t *testing.T) {
 	t.Parallel()
 	c := Generate(GenerateOptions{DatasetDir: "/d"})

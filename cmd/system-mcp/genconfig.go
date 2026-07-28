@@ -25,6 +25,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	name := fs.String("name", "", "instance name (MCP server name); empty defaults to \"cks\"")
 	description := fs.String("description", "", "human-facing instance description")
 	datasetDir := fs.String("dataset-dir", "", "consolidated dataset dir (holds graph/graph.db and vector/)")
+	graphPath := fs.String("graph-path", "", "explicit graph.db FILE path — overrides the --dataset-dir derivation (pre-consolidation layouts, e.g. <dataset>/graph-db/graph.db)")
+	vectorPath := fs.String("vector-path", "", "explicit vector index DIRECTORY — overrides the --dataset-dir derivation (e.g. <dataset>/vector-db)")
 	sourceRoot := fs.String("source-root", "", "working tree the index was built against")
 	graphBinary := fs.String("graph-binary", "", "ckg binary path (cks.ops.index)")
 	vectorBinary := fs.String("vector-binary", "", "ckv binary path (cks.ops.index)")
@@ -74,6 +76,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		Name:              *name,
 		Description:       *description,
 		DatasetDir:        *datasetDir,
+		GraphPath:         *graphPath,
+		VectorPath:        *vectorPath,
 		SourceRoot:        *sourceRoot,
 		GraphBinary:       *graphBinary,
 		VectorBinary:      *vectorBinary,
