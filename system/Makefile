@@ -288,15 +288,16 @@ dogfood-eval-summary:
 		print('='*70); \
 		print('cks-eval baseline (%d scenarios, schema v%d)' % (len(d['results']), d['schema_version'])); \
 		print('='*70); \
-		print('%-34s %-22s %5s %5s %5s' % ('scenario', 'intent', 'P', 'R', 'F1')); \
+		print('%-34s %-22s %5s %5s %5s %5s' % ('scenario', 'intent', 'P', 'R', 'F1', 'MRR')); \
 		print('-'*70); \
-		[print('%-34s %-22s %5.2f %5.2f %5.2f' % (r['name'], r.get('intent','-'), r['metrics']['file_precision'], r['metrics']['file_recall'], r['metrics']['file_f1'])) for r in d['results']]; \
+		[print('%-34s %-22s %5.2f %5.2f %5.2f %5.2f' % (r['name'], r.get('intent','-'), r['metrics']['file_precision'], r['metrics']['file_recall'], r['metrics']['file_f1'], r['metrics'].get('file_mrr',0))) for r in d['results']]; \
 		ok = [r for r in d['results'] if not r.get('error')]; \
 		avg_r = sum(r['metrics']['file_recall'] for r in ok)/len(ok) if ok else 0; \
+		avg_m = sum(r['metrics'].get('file_mrr',0) for r in ok)/len(ok) if ok else 0; \
 		print('-'*70); \
-		print('avg recall (errored runs excluded): %.3f over %d scenarios' % (avg_r, len(ok))); \
+		print('avg recall %.3f / avg MRR %.3f (errored runs excluded, %d scenarios)' % (avg_r, avg_m, len(ok))); \
 		print(); \
 		print('per-intent rollup:'); \
-		[print('  %-22s n=%d R=%.2f lat=%dms' % (s['intent'], s['count'], s['avg_recall'], s['avg_latency_ms'])) for s in d.get('intent_summary', [])]"
+		[print('  %-22s n=%d R=%.2f MRR=%.2f lat=%dms' % (s['intent'], s['count'], s['avg_recall'], s.get('avg_mrr',0), s['avg_latency_ms'])) for s in d.get('intent_summary', [])]"
 
 

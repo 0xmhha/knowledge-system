@@ -83,6 +83,19 @@ stage2 집계기의 기존 `demoteTests` 패턴을 미러링해 두 강등을 �
 상위(0.5 factor가 관대) — 과적합 튜닝은 보류, 랭크-민감 지표(MRR/nDCG류)
 도입이 선행돼야 factor 조정을 측정 기반으로 할 수 있다.
 
+## MRR 지표 도입 + 베이스라인 (2026-07-28, 후속 R6)
+
+`cks-eval`에 `file_mrr`(기대 인용의 팩-순서 첫 매칭 랭크의 평균 역수,
+match_mode 공유) 추가 — P/R/F1은 순서-무감이라 강등/부스트 튜닝을 측정할 수
+없던 공백을 메움. per-run 계산·median 집계·intent 롤업(`avg_mrr`)·summary
+출력까지 배선.
+
+**베이스라인 (doc/archive 강등 포함 상태, 동일 인덱스): avg MRR 0.389**
+(avg recall 0.722 재확인). 랭크 신호가 드러낸 것: ckg-bm25-translation
+R=0.50/MRR=0.08(정답이 리스트 하부), qa-review R=1.00/MRR=0.25(rank 4),
+composer-pipeline-flow R=1.00/MRR=0.32 — **"찾긴 하는데 상위에 못 올린다"가
+현 병목**임을 정량화. 이후 랭킹 변경은 이 0.389 대비로 판정한다.
+
 주의(배포): `--ckg` 정렬 빌드에서 const/var 청크는 canonical_id가 대부분
 비게 된다 — ckg는 ValueSpec **per-spec** 노드, ckv는 **블록** 청크라
 granularity 불일치. canonical ratio 게이트(`gate-min-canonical`) 분모 희석에

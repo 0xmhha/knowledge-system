@@ -265,3 +265,36 @@ func TestPercentile_ClampsP(t *testing.T) {
 		t.Errorf("p=1.5 = %v, want 30 (max)", got)
 	}
 }
+
+func TestMRR(t *testing.T) {
+	t.Parallel()
+	c := func(f string, s, e int) contract.Citation {
+		return contract.Citation{File: f, StartLine: s, EndLine: e}
+	}
+	exp := []contract.Citation{c("a.go", 10, 20), c("b.go", 5, 8)}
+
+	// a.go matched at rank 2, b.go at rank 1 → (1/2 + 1/1) / 2 = 0.75.
+	actual := []contract.Citation{c("b.go", 6, 6), c("a.go", 15, 30), c("z.go", 1, 2)}
+	if got := mrr(exp, actual, MatchOverlap); got != 0.75 {
+		t.Errorf("mrr = %v, want 0.75", got)
+	}
+
+	// Duplicates collapse before ranks are assigned: the repeated z.go
+	// must not push a.go's first match to rank 4.
+	dup := []contract.Citation{c("z.go", 1, 2), c("z.go", 1, 2), c("a.go", 15, 30)}
+	if got := mrr(exp[:1], dup, MatchOverlap); got != 0.5 {
+		t.Errorf("mrr with dup = %v, want 0.5 (rank 2 after dedup)", got)
+	}
+
+	// Never matched → 0 contribution.
+	if got := mrr(exp, []contract.Citation{c("z.go", 1, 2)}, MatchOverlap); got != 0 {
+		t.Errorf("mrr no-match = %v, want 0", got)
+	}
+	// Edge cases mirror precisionRecall.
+	if got := mrr(exp, nil, MatchOverlap); got != 0 {
+		t.Errorf("mrr empty actual = %v, want 0", got)
+	}
+	if got := mrr(nil, actual, MatchOverlap); got != 1.0 {
+		t.Errorf("mrr empty expected = %v, want 1.0", got)
+	}
+}

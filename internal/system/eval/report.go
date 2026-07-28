@@ -37,6 +37,7 @@ type IntentSummary struct {
 	Intent       string  `json:"intent"`
 	Count        int     `json:"count"`
 	AvgPrecision float64 `json:"avg_precision"`
+	AvgMRR       float64 `json:"avg_mrr"`
 	AvgRecall    float64 `json:"avg_recall"`
 	AvgF1        float64 `json:"avg_f1"`
 	AvgLatencyMS int64   `json:"avg_latency_ms"`
@@ -51,8 +52,8 @@ func SummarizeByIntent(results []ScenarioResult) []IntentSummary {
 	}
 	const unspecified = "(unspecified)"
 	type acc struct {
-		count                    int
-		sumP, sumR, sumF, sumLat float64
+		count                          int
+		sumP, sumM, sumR, sumF, sumLat float64
 	}
 	buckets := make(map[string]*acc)
 	for _, r := range results {
@@ -70,6 +71,7 @@ func SummarizeByIntent(results []ScenarioResult) []IntentSummary {
 		}
 		a.count++
 		a.sumP += r.Metrics.FilePrecision
+		a.sumM += r.Metrics.FileMRR
 		a.sumR += r.Metrics.FileRecall
 		a.sumF += r.Metrics.FileF1
 		a.sumLat += float64(r.Metrics.LatencyMS)
@@ -90,6 +92,7 @@ func SummarizeByIntent(results []ScenarioResult) []IntentSummary {
 			Intent:       k,
 			Count:        a.count,
 			AvgPrecision: a.sumP / n,
+			AvgMRR:       a.sumM / n,
 			AvgRecall:    a.sumR / n,
 			AvgF1:        a.sumF / n,
 			AvgLatencyMS: int64(a.sumLat / n),
