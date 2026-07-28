@@ -1,0 +1,46 @@
+# Fused-server config template for the stablenet pack (EXAMPLE — the
+# instantiated copy is never committed).
+#
+# This file carries the project-owned parts of the server configuration:
+# instance identity, embedding model, and the domain/vocab/sanitize wiring
+# into this pack. The <angle-bracket> values are deployment-local — dataset
+# location, indexed checkout, engine binaries, listen address, endpoints.
+# Endpoints (ip:port) are treated as sensitive and stay out of git: the
+# instantiated mcp.yaml is gitignored (projects/*/mcp.yaml), so either
+# location below is safe.
+#
+#   cp projects/stablenet/mcp.yaml.example projects/stablenet/mcp.yaml   # in-repo (ignored)
+#   # or: cp ... <dataset-root>/../my-dataset-mcp.yaml                   # next to the dataset
+#   $EDITOR ...            # fill the <deployment> values
+#   bin/system-mcp -config <that file>
+#
+# Note the backend path shapes: ckg.path is the graph.db FILE; ckv.path is
+# the vector data DIRECTORY (see docs/downstream-sync.md, Known caveats).
+version: 1
+name: cks-stablenet
+description: go-stablenet knowledge dataset (bge-m3, files-with-tests filelist)
+
+backends:
+  ckg:
+    path: <dataset>/graph/graph.db
+    source_root: <indexed go-stablenet checkout>
+    binary_path: <repo>/bin/graph
+  ckv:
+    path: <dataset>/vector
+    binary_path: <repo>/bin/vector
+    embed_model: bge-m3
+    ollama_url: <ollama endpoint, e.g. http://localhost:11434>
+
+domain:
+  project_dir: <repo>/projects/stablenet/domain-knowledge
+  corpus_dir: <repo>/projects/stablenet/generated/domain-corpus
+
+vocab:
+  glossary_path: <repo>/projects/stablenet/domain-knowledge/glossary.yaml
+
+sanitize:
+  rules_path: <repo>/system/policies/sanitization_rules.yaml
+
+listen:
+  transport: http
+  http_addr: <listen ip:port, e.g. 127.0.0.1:8930 for loopback-only>
