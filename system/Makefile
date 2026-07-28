@@ -18,11 +18,17 @@ CKS_LDFLAGS := -X main.builderVersion=$(CKS_VERSION)
 # target repo for cross-repo eval runs.
 CKG            ?= ckg
 CKG_DATA       ?= .ckg-data
-CKG_SRC        ?= .
+# Dogfood source = the consolidated module root. system/ itself holds no Go
+# files since the consolidation, so "." would index an empty corpus. The graph
+# side narrows to the system engine via the main-package closure (CKG_MAINS);
+# the vector side has no closure flag, so it indexes the module root — dogfood
+# is wire-up verification, not a gate, so the wider corpus is acceptable.
+CKG_SRC        ?= ..
+CKG_MAINS      ?= ./cmd/system-mcp,./cmd/system/agent,./cmd/system/eval
 CKG_LANG       ?= go
 CKV            ?= ckv
 CKV_DATA       ?= .ckv-data
-CKV_SRC        ?= .
+CKV_SRC        ?= ..
 CKV_EMBEDDER   ?= mock
 # USE_CKV controls whether dogfood-eval wires ckv as a real backend.
 # Default 0 because:
@@ -169,7 +175,8 @@ ckg-index:
 		echo "ckg binary not found on PATH; set CKG=/path/to/ckg"; exit 1; }
 	@rm -rf $(CKG_DATA)
 	@mkdir -p $(CKG_DATA)
-	$(CKG) build --src $(CKG_SRC) --out $(CKG_DATA) --lang $(CKG_LANG)
+	$(CKG) build --src $(CKG_SRC) --files-from-main $(CKG_MAINS) \
+	    --out $(CKG_DATA) --lang $(CKG_LANG)
 	@echo "ckg index built: $(CKG_DATA)/graph.db"
 
 ckg-index-clean:

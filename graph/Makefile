@@ -1,4 +1,4 @@
-.PHONY: all build build-full build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check install-hooks audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
+.PHONY: all build build-full build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
 
 GO ?= go
 
@@ -67,10 +67,10 @@ lint: lint-viewer fmt-check
 # behaviour-preserving, so 'make fmt' followed by 'make test' is
 # a no-op for everything except whitespace.
 #
-# Scope: every .go file under the repo except web/viewer-next/node_modules,
-# which contains vendored .go files we must not touch.
+# Scope: .go files under graph/ (eval corpora / testdata fixtures only since
+# the consolidation). Engine-wide formatting is the root Makefile's job.
 fmt:
-	@find . -name '*.go' -not -path './web/viewer-next/node_modules/*' -print0 | xargs -0 gofmt -w
+	@find . -name '*.go' -print0 | xargs -0 gofmt -w
 
 # fmt-check: fail loudly when any tracked .go file diverges from
 # gofmt's canonical form. Added as a `lint` dependency so the same
@@ -83,21 +83,17 @@ fmt:
 # before commit. The check is fast (<1s on this tree) so it is fine
 # to run on every PR.
 fmt-check:
-	@drift=$$(find . -name '*.go' -not -path './web/viewer-next/node_modules/*' -print0 | xargs -0 gofmt -l); \
+	@drift=$$(find . -name '*.go' -print0 | xargs -0 gofmt -l); \
 	if [ -n "$$drift" ]; then \
 	    echo "gofmt drift detected — run 'make fmt' before commit:"; \
 	    echo "$$drift"; \
 	    exit 1; \
 	fi
 
-# install-hooks: opt-in helper that points git at .githooks/ so the
-# pre-commit script runs locally. Idempotent — re-running is safe.
-# We don't auto-install on `make build` because hooks are a per-clone
-# config (some operators use IDE-side commit flows that already cover
-# formatting).
-install-hooks:
-	@git config core.hooksPath .githooks
-	@echo "git hooks path set to .githooks (pre-commit will run fmt-check)"
+# install-hooks moved to the root Makefile (`make -C .. install-hooks`):
+# .githooks/ lives at the repo root since the consolidation, so the old
+# graph-local target pointed git at a nonexistent directory, silently
+# disabling all hooks.
 
 # eval: LLM-free regression baseline measurement (CKG-EV1 Phase 1).
 #

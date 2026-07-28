@@ -12,9 +12,9 @@ intent: concurrency_safety
 match_mode: overlap
 runs: 5
 expected_citations:
-  - file: internal/ckgclient/real.go
+  - file: internal/system/ckgclient/real.go
     start_line: 80
     end_line: 96        # Real struct + Concurrency doc
-  - file: internal/ckvclient/real.go
+  - file: internal/system/ckvclient/real.go
     start_line: 62
     end_line: 79        # Real struct + Concurrency doc
