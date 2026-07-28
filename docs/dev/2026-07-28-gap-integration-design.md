@@ -338,6 +338,14 @@ composer retrieval fix가 ckv-미구성 시 fail-closed라 이미 동작 불가,
 복구) 밖이므로 **후속 백로그**로 남긴다. 두 블로커 모두 이번 변경으로 새로
 생긴 것이 아니라 빈-코퍼스 상태에 가려져 있던 선재 결함이다.
 
+**후속 완료 (2026-07-28, gap-followups)**: 배관 분리 landed —
+`CKV_EMBEDDER`(빌드 백엔드)/`CKV_MODEL`(임베딩 모델) 분리 + fail-fast 가드
+(`ckv-backend-guard`) + `USE_CKV` 주석 현실화. 실모델 스모크
+(ollama bge-m3, `CKV_SRC=../internal/system`으로 한정): **9/9 시나리오
+무에러 완주**(이전 0/9), avg recall 0.296 — bug_fix 1.00 /
+composer-pipeline-flow 1.00 / stamp-integrity 0.67. 잔여 R=0 시나리오는
+한정 ckv 코퍼스·검색 품질 요인(wiring 아님) — 전체 코퍼스 임베딩 시 재측정.
+
 ---
 
 ## 2. G1 — CI eval 회귀 게이트 복원

@@ -29,15 +29,25 @@ CKG_LANG       ?= go
 CKV            ?= ckv
 CKV_DATA       ?= .ckv-data
 CKV_SRC        ?= ..
+# CKV_EMBEDDER is the ckv build backend (mock | bgeonnx | ollama).
+# CKV_MODEL is the embedding MODEL NAME — required when the backend is
+# ollama, and written into the fused-server config's embed_model (the
+# cks-side ckv adapter embeds queries through ollama with that model).
+# The two used to share one variable, which made the ollama path
+# unconstructable: the backend name leaked into embed_model and the
+# server's connectivity check asked ollama for a model named "mock".
 CKV_EMBEDDER   ?= mock
+CKV_MODEL      ?=
+CKV_CFG_MODEL   = $(if $(CKV_MODEL),$(CKV_MODEL),$(CKV_EMBEDDER))
 # USE_CKV controls whether dogfood-eval wires ckv as a real backend.
-# Default 0 because:
-#   - ckv with --embedder=mock gives no semantic uplift over the in-memory
-#     Fake (hash-based embeddings, not semantic), but doubles latency
-#     (~120ms -> ~250ms per scenario) and occasionally trips a
-#     "transport closed" error in the cks-mcp -> ckv subprocess link.
-#     Opt-in keeps the default fast and stable; flip to USE_CKV=1 once
-#     bgeonnx is configured and task #39 (subprocess restart) lands.
+# Default 0 — but NOTE: since the composer retrieval fix, get_for_task
+# fails closed without a ready ckv leg, so USE_CKV=0 runs only exercise
+# the wire-up of the non-semantic tools; every get_for_task scenario
+# reports "service unavailable". For meaningful recall numbers run:
+#   make dogfood-eval USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=bge-m3 \
+#        CKG=/path/to/ckg CKV=/path/to/ckv
+# (needs `ollama serve` + the model pulled; embedding CKV_SRC takes
+# minutes-to-hours depending on corpus size — narrow CKV_SRC to bound it).
 USE_CKV        ?= 0
 DOGFOOD_CONFIG ?= cks-dogfood.yaml
 EVAL_SCENARIOS ?= eval/scenarios
@@ -182,13 +192,30 @@ ckg-index:
 ckg-index-clean:
 	rm -rf $(CKG_DATA)
 
-ckv-index:
+ckv-index: ckv-backend-guard
 	@command -v $(CKV) >/dev/null 2>&1 || { \
 		echo "ckv binary not found on PATH; set CKV=/path/to/ckv"; exit 1; }
 	@rm -rf $(CKV_DATA)
 	@mkdir -p $(CKV_DATA)
-	$(CKV) --embedder=$(CKV_EMBEDDER) build --src $(CKV_SRC) --out $(CKV_DATA)
+	$(CKV) --embedder=$(CKV_EMBEDDER) build --src $(CKV_SRC) --out $(CKV_DATA) \
+		$(if $(CKV_MODEL),--model-name=$(CKV_MODEL),)
 	@echo "ckv index built: $(CKV_DATA)/vector.db"
+
+# USE_CKV=1 with a non-ollama backend cannot work end-to-end: the fused
+# server's ckv adapter embeds queries via ollama and its connectivity
+# check 404s on a model named after the mock/bgeonnx backend. Fail fast
+# before an index is built or a config with a bogus embed_model is written.
+.PHONY: ckv-backend-guard
+ckv-backend-guard:
+	@if [ "$(USE_CKV)" = "1" ] && [ "$(CKV_EMBEDDER)" != "ollama" ]; then \
+		echo "ERROR: USE_CKV=1 requires CKV_EMBEDDER=ollama CKV_MODEL=<model>"; \
+		echo "  (the fused server embeds queries via ollama; '$(CKV_EMBEDDER)' cannot pass its connectivity check)"; \
+		exit 1; \
+	fi
+	@if [ "$(CKV_EMBEDDER)" = "ollama" ] && [ -z "$(CKV_MODEL)" ]; then \
+		echo "ERROR: CKV_EMBEDDER=ollama requires CKV_MODEL=<model> (e.g. bge-m3)"; \
+		exit 1; \
+	fi
 
 ckv-index-clean:
 	rm -rf $(CKV_DATA)
@@ -199,7 +226,7 @@ ckv-index-clean:
 # because the ckv subprocess link is currently unstable (see USE_CKV
 # doc above). With USE_CKV=0 the cks-mcp ckv adapter stays on the
 # in-memory Fake.
-dogfood-config:
+dogfood-config: ckv-backend-guard
 	@if [ -f $(DOGFOOD_CONFIG) ]; then \
 		echo "$(DOGFOOD_CONFIG) already exists (delete to regenerate)"; \
 	else \
@@ -217,7 +244,7 @@ dogfood-config:
 			'  ckv:' \
 			"    path: \"$$ckv_path\"" \
 			"    binary_path: \"$$ckv_bin\"" \
-			"    embed_model: $(CKV_EMBEDDER)" \
+			"    embed_model: $(CKV_CFG_MODEL)" \
 			'    timeout_ms: 3000' \
 			'listen:' \
 			'  http_addr: "127.0.0.1:8080"' \
