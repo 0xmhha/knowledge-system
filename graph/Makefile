@@ -45,14 +45,22 @@ build-full: viewer
 # Back-compat alias (older docs/scripts): identical to `build`.
 build-no-viewer: build
 
+# Engine-scoped package set. graph/ itself holds no Go packages since the
+# consolidation (engine source lives at ../internal/graph etc.), so ./... here
+# silently matches nothing — these targets must name the engine's packages
+# explicitly to keep their pre-consolidation meaning. pkg/bm25 is the shared
+# BM25 core; graph is a consumer, so it tests it too.
+GRAPH_PKGS = ../cmd/graph/... ../cmd/graph-mcp/... ../cmd/eval-gate/... \
+             ../internal/graph/... ../pkg/graph/... ../pkg/bm25/...
+
 test:
-	$(GO) test ./...
+	$(GO) test $(GRAPH_PKGS)
 
 test-race:
-	$(GO) test -race -coverprofile=coverage.out ./...
+	$(GO) test -race -coverprofile=coverage.out $(GRAPH_PKGS)
 
 lint: lint-viewer fmt-check
-	$(GO) vet ./...
+	$(GO) vet $(GRAPH_PKGS)
 
 # fmt: rewrite every Go file in place with gofmt's canonical
 # formatting. Safe to run any time — gofmt is deterministic and
@@ -93,8 +101,10 @@ install-hooks:
 
 # eval: LLM-free regression baseline measurement (CKG-EV1 Phase 1).
 #
-# Self-indexes this repo (Go only) and runs three deterministic probes
-# against the resulting graph:
+# Self-indexes the graph engine (Go only) and runs three deterministic probes
+# against the resulting graph. "Self" = the module-local package closure of
+# the graph binaries (--files-from-main), which keeps the pre-consolidation
+# gate semantics: vector/system changes do not perturb this corpus.
 #
 #   1. validate  — schema invariants, dangling edges. PASS = exit 0 +
 #                  zero Issues across registered validators.
@@ -113,7 +123,14 @@ install-hooks:
 eval: build-no-viewer
 	@mkdir -p eval/results/latest
 	@echo "=== ckg eval: step 1/5 — self-index (corpus baselining) ==="
-	./bin/ckg build --src=. --out=eval/.ckg-data --lang=go
+	@# rm -rf: cold build + defeats the graphExists rebuild-skip (a second run
+	@# would otherwise validate a stale graph) — same convention as ckg-index /
+	@# eval-ckv-mirror / eval-llm-smoke. --fail-on-parse-errors: a partial
+	@# graph must not pass the gate as "healthy".
+	@rm -rf eval/.ckg-data
+	./bin/ckg build --src=.. \
+	    --files-from-main ./cmd/graph,./cmd/graph-mcp,./cmd/eval-gate \
+	    --out=eval/.ckg-data --lang=go --fail-on-parse-errors
 	@echo
 	@echo "=== ckg eval: step 2/5 — validate (schema integrity) ==="
 	./bin/ckg validate --graph=eval/.ckg-data --format=json > eval/results/latest/validate.json

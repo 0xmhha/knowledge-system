@@ -91,25 +91,36 @@ build-bins:
 	$(GO) build -o $(BIN_DIR)/cks-entry-verify    ../cmd/system/entry-verify
 	$(GO) build -o $(BIN_DIR)/cks-anchor-refresh  ../cmd/system/anchor-refresh
 
+# Engine-scoped package set. system/ itself holds no Go packages since the
+# consolidation (engine source lives at ../internal/system etc.), so ./...
+# here would silently match nothing. internal/setup is boundaries-wise its
+# own layer but is knowledge-setup's implementation, so it belongs to this
+# engine's test scope.
+SYSTEM_PKGS = ../cmd/system/... ../cmd/system-mcp/... ../cmd/knowledge-setup/... \
+              ../internal/system/... ../internal/setup/... ../pkg/system/...
+# The same set as directories, for tools that take dirs, not package patterns.
+SYSTEM_DIRS = ../cmd/system ../cmd/system-mcp ../cmd/knowledge-setup \
+              ../internal/system ../internal/setup ../pkg/system
+
 test:
-	$(GO) test -race ./...
+	$(GO) test -race $(SYSTEM_PKGS)
 
 test-short:
-	$(GO) test -short ./...
+	$(GO) test -short $(SYSTEM_PKGS)
 
 race: test
 
 vet:
-	$(GO) vet ./...
+	$(GO) vet $(SYSTEM_PKGS)
 
 lint:
-	$(GOLANGCI_LINT) run
+	$(GOLANGCI_LINT) run $(SYSTEM_PKGS)
 
 fmt:
-	gofmt -s -w .
+	gofmt -s -w $(SYSTEM_DIRS)
 
 fmt-check:
-	@diff=$$(gofmt -s -l .); \
+	@diff=$$(gofmt -s -l $(SYSTEM_DIRS)); \
 	if [ -n "$$diff" ]; then \
 		echo "gofmt needs to format:"; echo "$$diff"; exit 1; \
 	fi

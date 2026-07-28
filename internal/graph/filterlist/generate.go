@@ -149,13 +149,16 @@ func pkgGlob(rootAbs, dir string) (string, bool) {
 }
 
 // resolveDir returns the symlink-evaluated absolute form of dir, falling back
-// to the absolute path (then dir itself) when resolution fails.
+// to the un-evaluated absolute path (then dir itself) when resolution fails.
+// Abs runs first: EvalSymlinks keeps relative inputs relative, and a relative
+// root breaks the filepath.Rel calls in inModule/pkgGlob against go list's
+// absolute Dir values (e.g. `ckg build --src=.. --files-from-main ...`).
 func resolveDir(dir string) string {
+	if abs, err := filepath.Abs(dir); err == nil {
+		dir = abs
+	}
 	if resolved, err := filepath.EvalSymlinks(dir); err == nil {
 		return resolved
-	}
-	if abs, err := filepath.Abs(dir); err == nil {
-		return abs
 	}
 	return dir
 }

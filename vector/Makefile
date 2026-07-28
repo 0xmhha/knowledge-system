@@ -2,7 +2,14 @@
 
 GO ?= go
 BIN_DIR := bin
-PKG_LIST := ./...
+# Engine-scoped package set. vector/ itself holds no Go packages since the
+# consolidation (engine source lives at ../internal/vector etc.), so ./...
+# here would silently match nothing. pkg/bm25 is the shared core; vector is
+# a consumer, so it tests it too.
+PKG_LIST := ../cmd/vector/... ../cmd/vector-mcp/... \
+            ../internal/vector/... ../pkg/vector/... ../pkg/bm25/...
+# Engine source directories for tools that take dirs, not package patterns.
+PKG_DIRS := ../cmd/vector ../cmd/vector-mcp ../internal/vector ../pkg/vector
 
 # Version is derived from the git tag (falls back to "dev" outside a checkout)
 # and injected into cmd/ckv.Version via -ldflags. `ckv --version` and the build
@@ -43,7 +50,7 @@ test-race: ## Run tests with race detector + coverage
 lint: ## go vet (golangci-lint optional)
 	$(GO) vet $(PKG_LIST)
 	@if command -v golangci-lint >/dev/null 2>&1; then \
-	    golangci-lint run; \
+	    golangci-lint run $(PKG_LIST); \
 	else \
 	    echo "golangci-lint not installed (skipping). install: brew install golangci-lint"; \
 	fi
@@ -51,7 +58,7 @@ lint: ## go vet (golangci-lint optional)
 fmt: ## Format Go sources
 	$(GO) fmt $(PKG_LIST)
 	@if command -v goimports >/dev/null 2>&1; then \
-	    goimports -w .; \
+	    goimports -w $(PKG_DIRS); \
 	fi
 
 tidy: ## go mod tidy

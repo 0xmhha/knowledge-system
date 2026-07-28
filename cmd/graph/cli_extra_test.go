@@ -7,10 +7,28 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
+
+// reapGraphDir absorbs the SQLite WAL-checkpoint race on serve's error path:
+// the store's close can recreate graph.db-shm/-wal while t.TempDir's RemoveAll
+// is iterating, failing cleanup with "directory not empty". Registered via
+// t.Cleanup it runs BEFORE TempDir's own cleanup (LIFO), retrying until the
+// straggler files stop reappearing.
+func reapGraphDir(t *testing.T, dir string) {
+	t.Helper()
+	t.Cleanup(func() {
+		for i := 0; i < 10; i++ {
+			if err := os.RemoveAll(dir); err == nil {
+				return
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+	})
+}
 
 // absFixture returns the absolute path of the Go fixture directory used
 // across the test suite.  cmd/ckg tests run with cwd = cmd/ckg/, so the
@@ -221,6 +239,7 @@ func TestExportStaticCmd_BadGraphPath(t *testing.T) {
 // including the ListenAndServe call.
 func TestServeCmd_PortInUse(t *testing.T) {
 	graphDir := t.TempDir()
+	reapGraphDir(t, graphDir)
 	buildGraph(t, graphDir)
 
 	// Pre-bind the test port so the serve command fails immediately when
@@ -257,6 +276,7 @@ func TestServeCmd_PortInUseWithOpen(t *testing.T) {
 	// buildGraph runs first so go/packages can locate the `go` toolchain on
 	// PATH; the openBrowser goroutine that needs PATH="" comes after.
 	graphDir := t.TempDir()
+	reapGraphDir(t, graphDir)
 	buildGraph(t, graphDir)
 
 	t.Setenv("PATH", "")
