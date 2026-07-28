@@ -89,6 +89,12 @@ in the port.
   even though the inputs are identical. Input equality is provable from the
   `chunks` table hash; serve the equivalence run sequentially for a 100%
   vector match.
+- Fused-server config path shapes differ per backend: `backends.ckg.path`
+  must point at the `graph.db` FILE (the store opens the SQLite file
+  directly; handing it the directory fails with SQLITE_CANTOPEN), while
+  `backends.ckv.path` is the vector data DIRECTORY (holding `vector.db` +
+  `manifest.json`). With the setup pipeline's dataset layout that means
+  `<out>/graph/graph.db` and `<out>/vector` respectively.
 - `enrich_digest` was absent from the graph manifest before the 2026-07-27
   fix (enrichment rows were persisted to the store but not folded into the
   digest input, so it hashed to `""` and `omitempty` dropped the key).
