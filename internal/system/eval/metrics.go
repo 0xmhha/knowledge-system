@@ -147,6 +147,52 @@ func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (prec
 	return precision, recall, f1
 }
 
+// mrr computes the mean reciprocal rank of the expected citations
+// against the ORDERED actual list: for each expected citation, find the
+// rank (1-based, after dedup) of the first actual that matches it under
+// mode, credit 1/rank (0 when never matched), and average over expected.
+//
+// Why this exists: precision/recall are order-blind, so a ranking change
+// that lifts the right code from rank 15 to rank 1 is invisible to them
+// (observed with the stage2 doc/archive demotion — composition improved,
+// file_precision did not move). MRR is the rank-sensitive counterpart:
+// demotion/boost tuning must move it or the tuning is noise.
+//
+// Edge cases mirror precisionRecall: empty actual → 0; empty expected →
+// 1.0 (nothing to disprove). Duplicate actuals are collapsed by
+// Citation.Key() before ranks are assigned so a backend repeating one
+// location cannot shift later ranks.
+func mrr(expected, actual []contract.Citation, mode MatchMode) float64 {
+	seen := make(map[string]struct{}, len(actual))
+	dedup := make([]contract.Citation, 0, len(actual))
+	for _, c := range actual {
+		k := c.Key()
+		if _, ok := seen[k]; ok {
+			continue
+		}
+		seen[k] = struct{}{}
+		dedup = append(dedup, c)
+	}
+	if len(dedup) == 0 {
+		return 0
+	}
+	if len(expected) == 0 {
+		return 1.0
+	}
+
+	m := matcher(mode)
+	sum := 0.0
+	for _, e := range expected {
+		for i, a := range dedup {
+			if m(e, a) {
+				sum += 1.0 / float64(i+1)
+				break
+			}
+		}
+	}
+	return sum / float64(len(expected))
+}
+
 // median returns the median of xs without mutating the input.
 // Returns 0 for an empty slice (callers treat 0 as "no data" and
 // surface that distinctly).

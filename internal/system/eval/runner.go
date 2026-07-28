@@ -43,9 +43,13 @@ var _ mcpClient = (*mcpgoclient.Client)(nil)
 // at Runs >= 5 and Runs >= 2 respectively; smaller N degrades
 // gracefully (P95 of 1 sample == that sample).
 type Metrics struct {
-	FilePrecision    float64 `json:"file_precision"`
-	FileRecall       float64 `json:"file_recall"`
-	FileF1           float64 `json:"file_f1"`
+	FilePrecision float64 `json:"file_precision"`
+	FileRecall    float64 `json:"file_recall"`
+	FileF1        float64 `json:"file_f1"`
+	// FileMRR is the mean reciprocal rank of the expected citations in the
+	// pack's citation order — the rank-sensitive counterpart to P/R/F1
+	// (order-blind), added so demotion/boost tuning is measurable.
+	FileMRR          float64 `json:"file_mrr"`
 	TokenUtilization float64 `json:"token_utilization"`
 	CitationCount    int     `json:"citation_count"`
 	BodyCount        int     `json:"body_count"`
@@ -196,6 +200,7 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, error) 
 		FilePrecision:    p,
 		FileRecall:       rec,
 		FileF1:           f,
+		FileMRR:          mrr(s.ExpectedCitations, pack.Citations, s.MatchMode),
 		TokenUtilization: pack.Metadata.UtilizationRatio,
 		CitationCount:    len(pack.Citations),
 		BodyCount:        len(pack.Bodies),
@@ -218,6 +223,7 @@ func medianMetrics(ms []Metrics) Metrics {
 		return Metrics{}
 	}
 	prec := make([]float64, len(ms))
+	mrrs := make([]float64, len(ms))
 	rec := make([]float64, len(ms))
 	f1 := make([]float64, len(ms))
 	tok := make([]float64, len(ms))
@@ -227,6 +233,7 @@ func medianMetrics(ms []Metrics) Metrics {
 	lat := make([]float64, len(ms))
 	for i, m := range ms {
 		prec[i] = m.FilePrecision
+		mrrs[i] = m.FileMRR
 		rec[i] = m.FileRecall
 		f1[i] = m.FileF1
 		tok[i] = m.TokenUtilization
@@ -238,6 +245,7 @@ func medianMetrics(ms []Metrics) Metrics {
 	p50 := int64(percentile(lat, 0.5))
 	return Metrics{
 		FilePrecision:    median(prec),
+		FileMRR:          median(mrrs),
 		FileRecall:       median(rec),
 		FileF1:           median(f1),
 		TokenUtilization: median(tok),
