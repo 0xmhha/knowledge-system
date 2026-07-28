@@ -1,5 +1,11 @@
 # go-stablenet 코드-지식 데이터셋 구축 메뉴얼
 
+> **2026-07-28 갱신**: 본문이 참조하는 셸 스크립트 일부는 통합 후 Go
+> 파이프라인으로 대체되었다 — `gen-cks-config.sh` → `system-mcp gen-config`,
+> `cks-health.sh` → `cks.ops.health` 툴/`GET /healthz`, 데이터셋 빌드 →
+> `projects/stablenet/scripts/build-dataset.sh`(=`knowledge-setup` 래퍼).
+> 해당 언급은 이 대체 경로로 읽을 것.
+
 > **목적**: `go-stablenet` 소스 코드와 도메인 지식을 기반으로
 > **cks / ckv / ckg** 코드-지식 데이터셋을 **반복 가능하게** 구축한다.
 > 결과물은 코딩 에이전트가 MCP로 소비하는 *EvidencePack* 의 검색 기반(grounding)이 된다.
