@@ -62,6 +62,27 @@ doc comment 포함(`parser.ParseComments` 활성화 — func/type 스팬은 `Pos
 정밀도 영역 — P가 전반적으로 낮은 것(0.05~0.21)과 doc/archive 청크의 코드
 질의 혼입이 다음 신호.
 
+## doc/archive 강등 (2026-07-28, 후속 R4/R5)
+
+stage2 집계기의 기존 `demoteTests` 패턴을 미러링해 두 강등을 추가:
+
+- **doc 강등** (`docDemotionFactor=0.5`): 코드-지향 intent에서 doc 청크
+  (ckv `chunk_kind=doc`, `.md` 폴백) 강등. DocsUpdate/ArchExplain/Unknown은
+  제외(ADR·설계 문서가 정당한 답인 intent — intentToKinds 철학 미러).
+- **archive 강등** (`archiveDemotionFactor=0.2`, **모든 intent**): `archive/`
+  경로는 supersede된 문서 — 현행 답이 될 수 없다는 문서 규율의 랭킹 반영.
+  doc factor와 비중첩(아카이브 판정 우선).
+
+재측정(동일 인덱스): **avg recall 0.722 유지(무회귀), 9/9 nonzero 유지**.
+`file_precision`은 0.12 수준 무변화 — 인용 12~22개 대비 기대 1~2개인 지표
+구조상 순위 개선을 반영하지 못함(강등은 제거가 아니라 재순위). 질적 효과는
+직접 질의로 확인: ErrFailClosed 질의에서 **정확한 var 청크(55-58)가 rank 2로
+부상**(이전 부재), bm25-translation 질의 top-K에서 **archive 문서 소멸**.
+
+잔여 신호: coordination-*/eval-fixture 계열 md가 일부 intent에서 여전히
+상위(0.5 factor가 관대) — 과적합 튜닝은 보류, 랭크-민감 지표(MRR/nDCG류)
+도입이 선행돼야 factor 조정을 측정 기반으로 할 수 있다.
+
 주의(배포): `--ckg` 정렬 빌드에서 const/var 청크는 canonical_id가 대부분
 비게 된다 — ckg는 ValueSpec **per-spec** 노드, ckv는 **블록** 청크라
 granularity 불일치. canonical ratio 게이트(`gate-min-canonical`) 분모 희석에

@@ -306,7 +306,7 @@ func TestAggregator_TiesBrokenByFileThenStartLine(t *testing.T) {
 	a.addBM25List("k2", []contract.Hit{bm25Hit("a.go", 1, 10, 5.0)})
 	a.addBM25List("k3", []contract.Hit{bm25Hit("b.go", 1, 10, 5.0)})
 
-	out := a.results(0, false)
+	out := a.results(0, false, false)
 	want := []contract.Citation{
 		cit("a.go", 1, 10),
 		cit("b.go", 1, 10),
@@ -583,7 +583,7 @@ func TestAggregator_DedupsByCitationKey(t *testing.T) {
 	a.addBM25List("k2", []contract.Hit{bm25Hit("x.go", 1, 10, 4.0)})
 	a.addSymbolList("k3", []contract.Citation{cit("x.go", 1, 10)})
 
-	out := a.results(0, false)
+	out := a.results(0, false, false)
 	if len(out) != 1 {
 		t.Fatalf("len = %d, want 1 (dedup)", len(out))
 	}
@@ -606,7 +606,7 @@ func TestAggregator_RankAffectsContribution(t *testing.T) {
 		bm25Hit("b.go", 1, 1, 0.9), // rank 2
 		bm25Hit("c.go", 1, 1, 0.5), // rank 3
 	})
-	out := a.results(0, false)
+	out := a.results(0, false, false)
 	if len(out) != 3 {
 		t.Fatalf("len = %d, want 3", len(out))
 	}
@@ -626,7 +626,7 @@ func TestAggregator_RankAffectsContribution(t *testing.T) {
 func TestAggregator_EmptyResultsNil(t *testing.T) {
 	t.Parallel()
 	a := newAggregator(DefaultRRFK, DefaultBMWeight, DefaultSymbolWeight, DefaultCkvWeight)
-	if got := a.results(10, false); got != nil {
+	if got := a.results(10, false, false); got != nil {
 		t.Errorf("results on empty aggregator = %v, want nil", got)
 	}
 }
@@ -646,7 +646,7 @@ func TestSearch_NonTestIntentDemotesTestFiles(t *testing.T) {
 	a.addBM25List("kw", []contract.Hit{bm25Hit("handler.go", 1, 10, 1.0)})
 	a.addBM25List("kw2", []contract.Hit{bm25Hit("handler_test.go", 1, 10, 1.0)})
 
-	out := a.results(0, true /* demoteTests */)
+	out := a.results(0, true /* demoteTests */, false)
 	if len(out) != 2 {
 		t.Fatalf("results count = %d, want 2", len(out))
 	}
@@ -706,9 +706,9 @@ func TestAggregator_DemotionIsDeterministic(t *testing.T) {
 		})
 		return a
 	}
-	first := build().results(0, true)
+	first := build().results(0, true, false)
 	for i := 0; i < 10; i++ {
-		got := build().results(0, true)
+		got := build().results(0, true, false)
 		for j := range got {
 			if got[j].Citation.File != first[j].Citation.File {
 				t.Fatalf("iteration %d: position %d = %q, want %q (non-deterministic)", i, j, got[j].Citation.File, first[j].Citation.File)
