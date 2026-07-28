@@ -17,8 +17,55 @@ jobs:
         run: make build
       - name: Lint (gofmt drift, vet, engine boundaries)
         run: make lint
-      - name: Test
-        run: make test
+      - name: Test (race)
+        run: make test-race
+
+  # Successor of code-knowledge-vector's eval-gate job: recall regression
+  # gate over the vendored sample corpus with the deterministic mock
+  # embedder — no network, no model downloads.
+  eval-gate-vector:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Build index + eval (mock embedder, recall@5 >= 0.5)
+        run: |
+          TMP_OUT=$(mktemp -d)
+          go run ./cmd/vector build --embedder=mock --src ./vector/testdata/sample --out "$TMP_OUT"
+          go run ./cmd/vector eval  --embedder=mock --fixture ./vector/testdata/queries.yaml \
+            --out "$TMP_OUT" --src ./vector/testdata/sample \
+            --min-recall5 0.5 --json
+          rm -rf "$TMP_OUT"
+
+  # Successor of code-knowledge-graph's eval job: `make -C graph eval`
+  # self-indexes the graph engine and cmd/eval-gate compares the four probe
+  # outputs against the committed baseline (retrieval drift <= 0.02,
+  # validate issue count must not rise). Runs in parallel with
+  # build-and-test — the two are independent signals.
+  eval-gate-graph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # The temporal pass (G6) walks git history; the committed baseline
+          # was built from a full-history clone, so a shallow CI clone would
+          # index a different corpus.
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: make eval (self-index + 4 probes)
+        run: make -C graph eval
+      - name: eval-gate (compare against committed baseline)
+        run: go run ./cmd/eval-gate -baseline graph/eval/baseline -latest graph/eval/results/latest
+      - name: Upload results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-latest
+          path: graph/eval/results/latest/
 
   vuln-scan:
     runs-on: ubuntu-latest
