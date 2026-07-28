@@ -346,6 +346,15 @@ composer retrieval fix가 ckv-미구성 시 fail-closed라 이미 동작 불가,
 composer-pipeline-flow 1.00 / stamp-integrity 0.67. 잔여 R=0 시나리오는
 한정 ckv 코퍼스·검색 품질 요인(wiring 아님) — 전체 코퍼스 임베딩 시 재측정.
 
+**전체-코퍼스 재측정 (2026-07-28, 후속 F1)**: 모듈 루트 전체(1,399파일,
+docs 포함) bge-m3 임베딩(~15분) 후 재실행 — **avg recall 0.444, 9개 중
+5개 시나리오 nonzero** (bug_fix 1.00 · composer-pipeline-flow 1.00 ·
+mcp-tool-handlers 0.67[한정 코퍼스에서 0] · stamp-integrity 0.67 ·
+test-add 0.67[〃 0]). 잔여 0인 4개(ckg-bm25-translation /
+composer-err-fail-closed / concurrency-safety / qa-review)는 코퍼스
+커버리지가 아닌 **검색 품질** 이슈로 확정 — 별도 retrieval-품질 트랙
+(기지의 그래프 추론 갭 계열)의 소재이며 이 설계의 갭 범위 밖. G6 종결.
+
 ---
 
 ## 2. G1 — CI eval 회귀 게이트 복원

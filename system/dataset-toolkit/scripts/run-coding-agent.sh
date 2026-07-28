@@ -14,6 +14,8 @@
 # Generalized from knowledge-data/pr-14/run-coding-agent-pr14.sh.
 #
 # Usage:
+# ENV_FILE is hand-maintained since the env-file generation was retired —
+# derive the URL from the config:  system-mcp print-mcp-config --config <yaml>
 #   CODE=/abs/path/to/source/repo ENV_FILE=/abs/dataset/cks-<name>.env \
 #     ./run-coding-agent.sh
 #   ... ./run-coding-agent.sh /coding-agent:analyze "..."   # pass a slash command through

@@ -19,7 +19,7 @@ project-agnostic versions of that pipeline.
   ckv/                  ckv vector index + manifest.json
   logs/{footprint,audit}/
   cks-<name>.yaml       generated cks config (gen-dataset-config.sh)
-  cks-<name>.env        generated shell exports
+  cks-<name>.env        hand-maintained shell exports (generation retired; derive from `system-mcp print-mcp-config`)
 ```
 
 ## Scope: index only build-participating code

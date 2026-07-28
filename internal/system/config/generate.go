@@ -29,6 +29,14 @@ type GenerateOptions struct {
 	// Backends.CKV.Path = <DatasetDir>/vector from it.
 	DatasetDir string
 
+	// GraphPath / VectorPath override the DatasetDir derivation for datasets
+	// that predate the knowledge-setup layout (e.g. the dataset-toolkit's
+	// graph-db/ + vector-db/ dirs). GraphPath is the graph.db FILE; VectorPath
+	// is the vector index DIRECTORY (holding vector.db + manifest.json). Empty
+	// falls back to the DatasetDir-derived path.
+	GraphPath  string
+	VectorPath string
+
 	// SourceRoot is the working tree the index was built against (ckg citation
 	// resolution). GraphBinary / VectorBinary are the ckg/ckv binaries used by
 	// the cks.ops.index maintenance tool. PolicyFile is the ckg governance
@@ -100,20 +108,29 @@ func Generate(o GenerateOptions) *Config {
 	// the config valid. An explicit AllowRemote is always honored.
 	allowRemote := o.AllowRemote || !isLoopbackAddr(httpAddr)
 
+	graphPath := o.GraphPath
+	if graphPath == "" {
+		graphPath = filepath.Join(o.DatasetDir, "graph", "graph.db")
+	}
+	vectorPath := o.VectorPath
+	if vectorPath == "" {
+		vectorPath = filepath.Join(o.DatasetDir, "vector")
+	}
+
 	return &Config{
 		Version:     configVersion,
 		Name:        name,
 		Description: o.Description,
 		Backends: BackendsConfig{
 			CKG: CKGConfig{
-				Path:       filepath.Join(o.DatasetDir, "graph", "graph.db"),
+				Path:       graphPath,
 				SourceRoot: o.SourceRoot,
 				BinaryPath: o.GraphBinary,
 				PolicyFile: o.PolicyFile,
 				TimeoutMS:  5000,
 			},
 			CKV: CKVConfig{
-				Path:       filepath.Join(o.DatasetDir, "vector"),
+				Path:       vectorPath,
 				BinaryPath: o.VectorBinary,
 				EmbedModel: embedModel,
 				OllamaURL:  ollamaURL,
