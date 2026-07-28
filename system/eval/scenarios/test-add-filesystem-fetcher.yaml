@@ -12,12 +12,12 @@ intent: test_add
 match_mode: overlap
 runs: 5
 expected_citations:
-  - file: internal/composer/budget/filesystem_test.go
+  - file: internal/system/composer/budget/filesystem_test.go
     start_line: 25
     end_line: 42        # TestFilesystemFetcher_ReturnsCitedLineRange
-  - file: internal/composer/budget/filesystem_test.go
+  - file: internal/system/composer/budget/filesystem_test.go
     start_line: 76
     end_line: 107       # TestFilesystemFetcher_OutOfRangeReturnsEmpty
-  - file: internal/composer/budget/filesystem_test.go
+  - file: internal/system/composer/budget/filesystem_test.go
     start_line: 126
     end_line: 149       # TestFilesystemFetcher_RejectsPathEscape

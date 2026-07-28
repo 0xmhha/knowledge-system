@@ -8,14 +8,15 @@
 # flow-corpus), producing inconsistent search quality. This pins every input so
 # the same dataset in -> the same vector.db out, no re-derivation.
 #
-# Single source of truth (after the corpus consolidation):
+# Single source of truth (after the repo consolidation):
 #   - Flow corpus (steps/invariants/edges) lives ONLY at:
-#       code-knowledge-system/docs/domain-knowledge/projects/go-stablenet/flow-corpus/
-#     (the old study/.../corpus copy is deprecated — see its _DEPRECATED.md.)
+#       projects/stablenet/domain-knowledge/flow-corpus/
 #   - Domain corpus markdown is a REGENERATED artifact of the tracked YAML
-#     (docs/domain-knowledge/projects/go-stablenet/entries/*.yaml) via
-#     cks-domain-export; we embed the generated/ cache. Regenerate it first if
-#     the YAML changed.
+#     (projects/stablenet/domain-knowledge/entries/*.yaml) via
+#     `system domain-export`; we embed the generated/ cache (gitignored under
+#     projects/*/generated/). Regenerate first if the YAML changed:
+#       bin/system-domain-export -project projects/stablenet/domain-knowledge \
+#         -out projects/stablenet/generated/domain-corpus
 #
 # Usage:
 #   scripts/build-vector-stablenet.sh            # build
@@ -28,18 +29,19 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"                 # code-knowledge-vector
-WORKSPACE="${WORKSPACE:-$(cd "$REPO_ROOT/.." && pwd)}"     # auto-coding (sibling repos live here)
+KS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"                 # knowledge-system module root
+WORKSPACE="${WORKSPACE:-$(cd "$KS_ROOT/.." && pwd)}"       # sibling checkouts live here
 
-CKV_BIN="${CKV_BIN:-$REPO_ROOT/bin/ckv}"
+CKV_BIN="${CKV_BIN:-$KS_ROOT/bin/ckv}"                     # go build -o bin/ckv ./cmd/vector
 SRC="${SRC:-$WORKSPACE/go-stablenet/pr/pr-77-problem}"
 DATASET="${DATASET:-$WORKSPACE/knowledge-data/pr-77-gstable}"   # holds graph-db/, vector-db/, files.json
-POLICY="${POLICY:-$REPO_ROOT/policy/stablenet.yaml}"
+POLICY="${POLICY:-$KS_ROOT/projects/stablenet/policies/vector.yaml}"
 
-# Bridge-layer sources (single tracked home + regenerable domain cache).
-FLOW_DOCS="${FLOW_DOCS:-$WORKSPACE/code-knowledge-system/docs/domain-knowledge/projects/go-stablenet/flow-corpus}"
+# Bridge-layer sources (single tracked home + regenerable domain cache),
+# all inside the stablenet project pack since the consolidation.
+FLOW_DOCS="${FLOW_DOCS:-$KS_ROOT/projects/stablenet/domain-knowledge/flow-corpus}"
 FLOW_CORPUS="${FLOW_CORPUS:-$FLOW_DOCS/corpus.jsonl}"
-DOMAIN_DOCS="${DOMAIN_DOCS:-$WORKSPACE/code-knowledge-system/generated/domain-corpus/go-stablenet/entries}"
+DOMAIN_DOCS="${DOMAIN_DOCS:-$KS_ROOT/projects/stablenet/generated/domain-corpus/entries}"
 
 LANGS="${LANGS:-go,solidity}"
 EMBEDDER="${EMBEDDER:-ollama}"

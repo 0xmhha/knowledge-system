@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp install-hooks
 
 GO ?= go
 
@@ -22,10 +22,10 @@ vet:
 	$(GO) vet ./...
 
 fmt:
-	@find . -name '*.go' -not -path '*/web/*/node_modules/*' -print0 | xargs -0 gofmt -w
+	@find . -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -w
 
 fmt-check:
-	@drift=$$(find . -name '*.go' -not -path '*/web/*/node_modules/*' -print0 | xargs -0 gofmt -l); \
+	@drift=$$(find . -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -l); \
 	if [ -n "$$drift" ]; then \
 	    echo "gofmt drift detected — run 'make fmt' before commit:"; \
 	    echo "$$drift"; \
@@ -41,6 +41,15 @@ boundaries:
 
 tidy:
 	$(GO) mod tidy
+
+# install-hooks: opt-in helper that points git at .githooks/ so the
+# pre-commit script (gofmt drift gate, delegates to `make fmt-check`)
+# runs locally. Idempotent — re-running is safe. Not auto-installed:
+# hooks are per-clone config and some operators use IDE-side commit
+# flows that already cover formatting.
+install-hooks:
+	@git config core.hooksPath .githooks
+	@echo "git hooks path set to .githooks (pre-commit will run fmt-check)"
 
 # build-mcp: build the three MCP server binaries. Deployments can stamp a
 # tool-namespace root at build time, e.g.:

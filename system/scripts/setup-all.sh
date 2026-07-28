@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
-# setup-all.sh — one-click setup of the go-stablenet code-knowledge stack on a
-# fresh machine: prereqs → Ollama+bge-m3 → all binaries → dataset → config/env →
+# setup-all.sh — one-click setup of the go-stablenet knowledge stack on a
+# fresh machine: prereqs → Ollama+bge-m3 → binaries → dataset → config →
 # jira-gateway → activation instructions.
 #
-# Assumes the six repos are cloned as SIBLINGS under one parent:
-#   <parent>/code-knowledge-system   (this repo — run the script from here)
-#   <parent>/code-knowledge-vector
-#   <parent>/code-knowledge-graph
+# The three former engine repos are consolidated into this single module;
+# only these SIBLINGS of knowledge-system are still expected:
+#   <parent>/knowledge-system        (this repo — script lives in system/scripts/)
 #   <parent>/go-stablenet
 #   <parent>/coding-agent
 #   <parent>/chainbench              (optional)
 #
 # Usage:
-#   ./scripts/setup-all.sh                 # full (includes the long ckv embed)
-#   SKIP_CKV=1 ./scripts/setup-all.sh      # everything except the multi-hour ckv embed
-#   SKIP_OLLAMA=1 ./scripts/setup-all.sh   # assume Ollama+bge-m3 already present
+#   ./system/scripts/setup-all.sh               # full (includes the long ckv embed)
+#   SKIP_CKV=1 ./system/scripts/setup-all.sh    # everything except the multi-hour ckv embed
+#   SKIP_OLLAMA=1 ./system/scripts/setup-all.sh # assume Ollama+bge-m3 already present
 #
 # Idempotent: re-running rebuilds/refreshes each artifact. Safe to interrupt and resume.
 set -euo pipefail
 
-CKS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$CKS_ROOT"
-PARENT="$(cd "$CKS_ROOT/.." && pwd)"
+CKS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # system/
+KS_ROOT="$(cd "$CKS_ROOT/.." && pwd)"                          # module root
+cd "$KS_ROOT"
+PARENT="$(cd "$KS_ROOT/.." && pwd)"
 
-CKG_REPO="${CKG_REPO:-$PARENT/code-knowledge-graph}"
-CKV_REPO="${CKV_REPO:-$PARENT/code-knowledge-vector}"
 CODING_AGENT="${CODING_AGENT:-$PARENT/coding-agent}"
 GO_STABLENET_ROOT="${GO_STABLENET_ROOT:-$PARENT/go-stablenet}"
+DATASET_OUT="${CKS_DATASET_DIR:-$PARENT/knowledge-data/stablenet}"
+KS_CONFIG="${KS_CONFIG:-$KS_ROOT/run/cks.yaml}"
 EMBED_MODEL="${EMBED_MODEL:-bge-m3}"
 OLLAMA_URL="${CKV_OLLAMA_ENDPOINT:-http://localhost:11434}"
 SKIP_CKV="${SKIP_CKV:-0}"
@@ -40,7 +40,7 @@ log "0. prerequisites"
 command -v go    >/dev/null || die "Go not found (need 1.23+). https://go.dev/dl/"
 command -v cc    >/dev/null || warn "C toolchain (cc) not found — cks links sqlite-vec (CGO). Install Xcode CLT."
 command -v git   >/dev/null || die "git not found"
-for d in "$CKG_REPO" "$CKV_REPO" "$GO_STABLENET_ROOT"; do [ -d "$d" ] || die "missing sibling repo: $d"; done
+[ -d "$GO_STABLENET_ROOT" ] || die "missing sibling repo: $GO_STABLENET_ROOT"
 echo "go: $(go version)"
 
 # ── 1. Ollama (app cask, NOT brew formula) + bge-m3 ─────────────────────────
@@ -61,11 +61,26 @@ else
   log "1. Ollama — SKIPPED (SKIP_OLLAMA=1)"
 fi
 
-# ── 2-4. binaries + dataset + config/env (delegates to build-stablenet-dataset.sh) ──
-log "2-4. binaries + dataset + config (build-stablenet-dataset.sh)"
-GO_STABLENET_ROOT="$GO_STABLENET_ROOT" CKG_REPO="$CKG_REPO" CKV_REPO="$CKV_REPO" \
-  EMBED_MODEL="$EMBED_MODEL" CKV_OLLAMA_ENDPOINT="$OLLAMA_URL" SKIP_CKV="$SKIP_CKV" \
-  "$CKS_ROOT/scripts/build-stablenet-dataset.sh"
+# ── 2. binaries (single consolidated module) ────────────────────────────────
+log "2. binaries (go build + make build-mcp)"
+go build -o bin/ckg  ./cmd/graph
+go build -o bin/ckv  ./cmd/vector
+go build -o bin/knowledge-setup ./cmd/knowledge-setup
+make build-mcp
+
+# ── 3. dataset (Go pipeline via the stablenet pack wrapper) ─────────────────
+log "3. dataset → $DATASET_OUT (knowledge-setup)"
+GSN_SRC="$GO_STABLENET_ROOT" OUT="$DATASET_OUT" SKIP_CKV="$SKIP_CKV" \
+  "$KS_ROOT/projects/stablenet/scripts/build-dataset.sh"
+
+# ── 4. config (system-mcp gen-config; replaces the retired gen-cks-config.sh) ──
+log "4. config → $KS_CONFIG (system-mcp gen-config)"
+mkdir -p "$(dirname "$KS_CONFIG")"
+"$KS_ROOT/bin/system-mcp" gen-config --out "$KS_CONFIG" \
+  --dataset-dir "$DATASET_OUT" --source-root "$GO_STABLENET_ROOT" \
+  --graph-binary "$KS_ROOT/bin/ckg" --vector-binary "$KS_ROOT/bin/ckv" \
+  --embed-model "$EMBED_MODEL" --ollama-url "$OLLAMA_URL"
+"$KS_ROOT/bin/system-mcp" print-mcp-config --config "$KS_CONFIG"
 
 # ── 5. jira-gateway (coding-agent in-tree MCP) ──────────────────────────────
 if [ -d "$CODING_AGENT/tools/jira-gateway-mcp" ]; then
@@ -113,7 +128,8 @@ cat <<EOF
        "$CKS_ROOT/scripts/coding-agent.sh"                      # interactive
        "$CKS_ROOT/scripts/coding-agent.sh" /coding-agent:work STABLE-1234
      (MCP env is already global via ~/.claude/settings.json — no per-launch source.)
-  3) Verify cks health any time:
-       "$CKS_ROOT/scripts/cks-health.sh"        # expect status: ok
-  4) (optional) Jira token: edit $JENV, then re-run scripts/apply-cc-settings.sh
+  3) Verify cks health any time (cks-health.sh is retired):
+       - MCP tool: cks.ops.health           # via any connected client
+       - HTTP:     GET <CKS_MCP_URL%/mcp>/healthz   # liveness probe
+  4) (optional) Jira token: edit $JENV, then re-run system/scripts/apply-cc-settings.sh
 EOF

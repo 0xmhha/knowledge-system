@@ -173,8 +173,8 @@ cd <CODE> && claude     # 이 디렉토리에서 띄우면 자동으로 <proj> D
 > CKV_OLLAMA_ENDPOINT=http://localhost:11434 \
 >   .../code-knowledge-vector/bin/ckv query "검색어" --out <DATA>/ckv \
 >   --embedder=ollama --model-name=bge-m3 --top 5
-> # cks 통합 헬스 (cks repo에서)
-> .../code-knowledge-system/scripts/cks-health.sh <DATA>/cks-<proj>.yaml
+> # cks 통합 헬스 (cks-health.sh는 은퇴 — MCP 툴 또는 HTTP로)
+> #   cks.ops.health 툴 호출, 또는 GET http://<addr>/healthz
 > ```
 
 ---

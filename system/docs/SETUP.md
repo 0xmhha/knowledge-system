@@ -1,5 +1,13 @@
 # SETUP — go-stablenet 코드-지식 스택 (새 머신 one-click)
 
+> **2026-07-28 갱신**: 3-repo 통합으로 셸 스크립트 계층 일부가 Go 파이프라인으로
+> 대체되었다 — `gen-cks-config.sh`/`cks.env` → `system-mcp gen-config` +
+> `print-mcp-config`(run/cks.yaml이 진실원), `cks-health.sh` → `cks.ops.health`
+> 툴/`GET /healthz`, `serve-cks-http.sh`/`cks-mcpd.sh` → `system-mcp daemon`,
+> `reindex-dataset.sh` → `knowledge-setup --version/--rollback`. 본문의 해당
+> 스크립트 언급은 이 대체 경로로 읽을 것. 진입점은 `system/scripts/setup-all.sh`
+> (경로는 통합 레이아웃 기준으로 갱신됨).
+
 이 문서는 **빈 머신에서** cks/ckv/ckg + go-stablenet 데이터셋 + coding-agent 플러그인을
 재현 가능하게 셋업하는 단일 가이드다. 모든 단계는 스크립트화되어 있고 멱등(idempotent)이다.
 

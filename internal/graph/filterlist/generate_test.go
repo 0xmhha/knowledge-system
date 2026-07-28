@@ -108,6 +108,37 @@ func TestGenerateFromMain_ClosureGlobs(t *testing.T) {
 	}
 }
 
+// TestGenerateFromMain_RelativeModuleRoot is the regression test for the
+// relative --src case (`ckg build --src=.. --files-from-main ...`): a
+// relative moduleRoot used to stay relative through resolveDir, breaking
+// every filepath.Rel against go list's absolute Dir values and yielding
+// "no in-module packages".
+func TestGenerateFromMain_RelativeModuleRoot(t *testing.T) {
+	requireGo(t)
+	root := t.TempDir()
+	writeModule(t, root)
+
+	// Run from a subdirectory of the module and pass ".." as the root,
+	// mirroring the graph/Makefile eval invocation.
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(cwd) })
+	if err := os.Chdir(filepath.Join(root, "cmd")); err != nil {
+		t.Fatal(err)
+	}
+
+	fl, err := GenerateFromMain(context.Background(), "..", []string{"./cmd/app"}, nil, nil)
+	if err != nil {
+		t.Fatalf("GenerateFromMain with relative root: %v", err)
+	}
+	want := []string{"cmd/app/*.go", "internal/sub/*.go"}
+	if !reflect.DeepEqual(fl.Include, want) {
+		t.Errorf("Include = %v, want %v", fl.Include, want)
+	}
+}
+
 // TestGenerateFromMain_RootPackage covers the module-root special case: a main
 // package that lives at the module root maps to the bare "*.go" glob.
 func TestGenerateFromMain_RootPackage(t *testing.T) {

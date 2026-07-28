@@ -23,16 +23,19 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 | Test | `make test` (= `go test ./...`) | |
 | Test + race + coverage | `make test-race` | what to run before claiming concurrency-safe |
 | Lint | `make lint` | = `go vet ./...` + `fmt-check` + viewer eslint |
-| Format | `make fmt` | gofmt -w over all `.go` except `web/viewer-next/node_modules` |
+| Format | `make fmt` | gofmt -w over `.go` under graph/ (fixtures); engine-wide = root `make fmt` |
 | Audit (parity) | `make audit` | `go/packages.Load` vs DB parity; exits 0/1/2 for CI |
 | Eval | `make eval` | retrieval / validate / benchmark; gated by `cmd/eval-gate` |
 
-CI (`.github/workflows/ci.yml`) runs `go vet ./...`, `go test -race ./...`,
-`make lint`, `make audit`, and the eval gate. **Match CI locally before pushing.**
+CI (root `.github/workflows/ci.yml`) runs `make build`, `make lint`,
+`make test-race` (whole module) plus two eval gates: `eval-gate-graph`
+(`make -C graph eval` + `cmd/eval-gate` vs the committed baseline) and
+`eval-gate-vector` (mock-embedder recall gate). The viewer pipeline and
+`make audit` are local-only (not in CI). **Match CI locally before pushing.**
 
 - Go **1.25.x** (toolchain go1.25.9). Module: `github.com/0xmhha/knowledge-system`.
 - **gofmt drift is a hard gate** (`fmt-check`). Run `make fmt` before commit;
-  `make install-hooks` wires the local pre-commit hook (opt-in).
+  `make -C .. install-hooks` (root Makefile) wires the local pre-commit hook (opt-in).
 
 ## Code structure
 

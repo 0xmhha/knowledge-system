@@ -1,4 +1,4 @@
-.PHONY: all build build-full build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check install-hooks audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
+.PHONY: all build build-full build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
 
 GO ?= go
 
@@ -45,24 +45,32 @@ build-full: viewer
 # Back-compat alias (older docs/scripts): identical to `build`.
 build-no-viewer: build
 
+# Engine-scoped package set. graph/ itself holds no Go packages since the
+# consolidation (engine source lives at ../internal/graph etc.), so ./... here
+# silently matches nothing — these targets must name the engine's packages
+# explicitly to keep their pre-consolidation meaning. pkg/bm25 is the shared
+# BM25 core; graph is a consumer, so it tests it too.
+GRAPH_PKGS = ../cmd/graph/... ../cmd/graph-mcp/... ../cmd/eval-gate/... \
+             ../internal/graph/... ../pkg/graph/... ../pkg/bm25/...
+
 test:
-	$(GO) test ./...
+	$(GO) test $(GRAPH_PKGS)
 
 test-race:
-	$(GO) test -race -coverprofile=coverage.out ./...
+	$(GO) test -race -coverprofile=coverage.out $(GRAPH_PKGS)
 
 lint: lint-viewer fmt-check
-	$(GO) vet ./...
+	$(GO) vet $(GRAPH_PKGS)
 
 # fmt: rewrite every Go file in place with gofmt's canonical
 # formatting. Safe to run any time — gofmt is deterministic and
 # behaviour-preserving, so 'make fmt' followed by 'make test' is
 # a no-op for everything except whitespace.
 #
-# Scope: every .go file under the repo except web/viewer-next/node_modules,
-# which contains vendored .go files we must not touch.
+# Scope: .go files under graph/ (eval corpora / testdata fixtures only since
+# the consolidation). Engine-wide formatting is the root Makefile's job.
 fmt:
-	@find . -name '*.go' -not -path './web/viewer-next/node_modules/*' -print0 | xargs -0 gofmt -w
+	@find . -name '*.go' -print0 | xargs -0 gofmt -w
 
 # fmt-check: fail loudly when any tracked .go file diverges from
 # gofmt's canonical form. Added as a `lint` dependency so the same
@@ -75,26 +83,24 @@ fmt:
 # before commit. The check is fast (<1s on this tree) so it is fine
 # to run on every PR.
 fmt-check:
-	@drift=$$(find . -name '*.go' -not -path './web/viewer-next/node_modules/*' -print0 | xargs -0 gofmt -l); \
+	@drift=$$(find . -name '*.go' -print0 | xargs -0 gofmt -l); \
 	if [ -n "$$drift" ]; then \
 	    echo "gofmt drift detected — run 'make fmt' before commit:"; \
 	    echo "$$drift"; \
 	    exit 1; \
 	fi
 
-# install-hooks: opt-in helper that points git at .githooks/ so the
-# pre-commit script runs locally. Idempotent — re-running is safe.
-# We don't auto-install on `make build` because hooks are a per-clone
-# config (some operators use IDE-side commit flows that already cover
-# formatting).
-install-hooks:
-	@git config core.hooksPath .githooks
-	@echo "git hooks path set to .githooks (pre-commit will run fmt-check)"
+# install-hooks moved to the root Makefile (`make -C .. install-hooks`):
+# .githooks/ lives at the repo root since the consolidation, so the old
+# graph-local target pointed git at a nonexistent directory, silently
+# disabling all hooks.
 
 # eval: LLM-free regression baseline measurement (CKG-EV1 Phase 1).
 #
-# Self-indexes this repo (Go only) and runs three deterministic probes
-# against the resulting graph:
+# Self-indexes the graph engine (Go only) and runs three deterministic probes
+# against the resulting graph. "Self" = the module-local package closure of
+# the graph binaries (--files-from-main), which keeps the pre-consolidation
+# gate semantics: vector/system changes do not perturb this corpus.
 #
 #   1. validate  — schema invariants, dangling edges. PASS = exit 0 +
 #                  zero Issues across registered validators.
@@ -113,7 +119,14 @@ install-hooks:
 eval: build-no-viewer
 	@mkdir -p eval/results/latest
 	@echo "=== ckg eval: step 1/5 — self-index (corpus baselining) ==="
-	./bin/ckg build --src=. --out=eval/.ckg-data --lang=go
+	@# rm -rf: cold build + defeats the graphExists rebuild-skip (a second run
+	@# would otherwise validate a stale graph) — same convention as ckg-index /
+	@# eval-ckv-mirror / eval-llm-smoke. --fail-on-parse-errors: a partial
+	@# graph must not pass the gate as "healthy".
+	@rm -rf eval/.ckg-data
+	./bin/ckg build --src=.. \
+	    --files-from-main ./cmd/graph,./cmd/graph-mcp,./cmd/eval-gate \
+	    --out=eval/.ckg-data --lang=go --fail-on-parse-errors
 	@echo
 	@echo "=== ckg eval: step 2/5 — validate (schema integrity) ==="
 	./bin/ckg validate --graph=eval/.ckg-data --format=json > eval/results/latest/validate.json
