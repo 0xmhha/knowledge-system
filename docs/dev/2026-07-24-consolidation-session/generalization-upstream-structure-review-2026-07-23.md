@@ -571,7 +571,7 @@ vector Makefile GSN 타깃, dataset-toolkit — 기본값/타깃 수준이라 �
 ② downstream 이식 절차 수립(정규화-diff를 검증 도구로), ③ 구 3-repo 아카이브
 시점 결정. 미결: §8.8 #3(system cmd 통폐합), §8.13의 엔진 CLI --progress=json.
 
-### 8.16 동등성 검증 기록 (2026-07-24 입증; 2026-07-27 종결)
+### 8.16 동등성 검증 기록 (2026-07-24, 진행 중)
 
 대상: `cks-seminar/test/cks-refactor-1` (clean, `0bf2f4d1b` — 참조 데이터셋
 `knowledge-data/devtest-cks-5@0bf2f4d1-65d74ed7`과 동일 커밋).
@@ -641,49 +641,34 @@ ollama였음). 결과:
 기능(retrieval eval 심층 일치) ✓ · vector(청킹·정렬·canonical_id·모델
 identity) ✓ · topic_tree 결정화로 잔여 비교 불가 항목 해소 ✓.
 
-**종결 재검증 (2026-07-27) — `go-stablenet@0bf2f4d1b`, 신 도구 단독**:
+### 8.17 downstream 이식 실행 완료 (2026-07-28)
 
-- **데이터셋 재생성**: `knowledge-setup --config projects/stablenet/setup.yaml`
-  로 graph(정책 enrichment) + vector(ollama bge-m3) 빌드
-  (`knowledge-data/go-stablenet@0bf2f4d1b/`). graph_digest **`65d74ed7…`
-  재현**, vector chunk_count **19,343**(코드 전용 — setup.yaml docs_roots
-  미지원), `sources.ckg` 핀 일치. 참조 수치와 일치.
-- **Fused 레이어(C) — 응답 형태 대조 통과**: 신 `system-mcp`(신 데이터셋) ↔
-  구 `code-knowledge-system/bin/cks-mcp`(`test-data/go-stablenet`,
-  `d7cff3df`) 동일 prompt. tools/list·ops.health·get_for_task 구조가
-  **의도된 리네임 1건(backends `ckg/ckv`→`graph/vector`, P2) + additive
-  필드/툴(`ops.setup`/`setup_status`, health `name`/`description`,
-  `graph_digest`, alignment `sources`/`dataset_version`, pack
-  `graph_neighbors`)**을 제외하고 동일 — 미설명 드리프트 없음. alignment.ok=
-  true, `graph_digest_actual==expected`. (구 데이터셋은 커밋·docs 코퍼스가
-  달라 값이 아닌 **형태** 대조 — 값 동등성은 graph_digest로 별도 증명됨.)
-- **`enrich_digest` 잠재 버그 발견·수정**: cold build에서 enrichment 노드/
-  엣지가 store에만 주입되고 in-memory 그래프엔 미반영되어
-  `ComputeEnrichDigest(g...)`가 항상 `""` → manifest `omitempty`로 키 누락.
-  **위 590행이 `enrich_digest`를 "additive 신규 키"로 적었으나 실제로는 이
-  버그로 부재였음**(참조·3-repo 빌드도 동일 코드라 마찬가지 — "설계상 존재
-  의도, 구현상 미표면화"). 수정: `internal/graph/buildpipe/pipeline.go`가
-  skeleton 직후 주입된 overlay로 `EnrichDigest` 재계산(g 미변형 →
-  Stats/Files/graph_digest 불변). 재빌드로 실증: `enrich_digest`
-  `82a44b15…` non-empty, `graph_digest` `65d74ed7…` 불변, stats 불변.
-  회귀 테스트 `enrich_digest_surface_test.go` 추가. **좌표 핀(graph_digest)
-  동등성에는 영향 없음** — enrichment는 code digest에서 제외되므로 이 버그는
-  overlay 관측 핀에만 국한.
-- **incremental enrichment 침식 — 확정·수정**: incremental 경로가
-  `loadPolicy`/`loadSecurityPatterns`를 재실행하지 않아, governed 심볼이 담긴
-  파일을 수정하면 그 governed_by 엣지가 dirty-node 삭제의 FK CASCADE로 사라진
-  뒤 재생성되지 않고, manifest enrich_digest도 "" 로 리셋됨(재현 테스트로
-  cold governed_by=1→incremental=0 관측). 3-repo와 동일 설계 계보의 **선입
-  버그**(upstream 회귀 아님). 수정: `incremental.go`가 persist 이후 overlay를
-  edge-by-type + node-by-file로 정리하고 현재 policy/security YAML로 재적용,
-  EnrichDigest 재계산(cold 미러, g 미변형). 회귀 테스트
-  `enrich_incremental_test.go` 추가 — 수정 후 파일 수정에도 governed_by·
-  enrich_digest 보존 확인.
-- **잔여(비차단)**: 신 데이터셋은 docs 코퍼스 미포함(§ setup.yaml docs_roots
-  백로그) — get_for_task가 도메인 flow 문서를 인용하지 못함.
+§8.8 #4 마일스톤 실행. `docs/downstream-sync.md` 런북 절차대로,
+`stablenet-knowledge-mcp` 브랜치 **`refactor/upstream-port`** 에 커밋 2개:
 
-**이식 착수 가능 상태**: graph·기능·vector·fused 4개 레이어 동등성 확인,
-좌표 핀 바이트 재현. `docs/downstream-sync.md`(DRAFT 해제) 절차로 이식 가능.
+- `02cb150` **이식**: upstream `4bd6d00`(사전 정리: 실수 커밋된 4MB 바이너리
+  제거 포함)의 추적 트리 전체를 verbatim 이식. 모듈 경로만
+  `stable-net/stablenet-knowledge-mcp`로 재작성(잔존 참조 0). **소스
+  리브랜딩 없음**(구 통합의 실패 교훈 반영). `.claude` 보존, upstream
+  세션 아카이브(docs/dev)는 이식 제외.
+- `798cc50` **정체성**: Makefile `NAMESPACE ?= stablenet_knowledge` 기본화 +
+  README를 배포판 선언으로.
+
+**런북 검증표 결과** (이식 트리 기준):
+| 항목 | 결과 |
+|---|---|
+| build / test / lint(boundaries) | ✓ (known-flaky 1건 단독 통과) |
+| 툴명 (`tools/list`) | ✓ 기본 빌드가 `stablenet_knowledge.context.*` — 구 downstream wire 컨벤션을 코드 수정 0으로 재현 |
+| graph digest (upstream vs 이식 바이너리, cks-refactor-1) | ✓ `65d74ed74f57a940…` 바이트 일치 (역대 참조와도 동일) |
+| stats / enrich_digest | ✓ 동일 |
+| topic_tree 해시 | ✓ `0e4d5028…` 일치 — 4일 전 결정화 증명값과도 동일(시간축 결정성) |
+
+구 downstream이 전면 네이밍 치환으로 만들던 것을 **이식 커밋 1개 + 빌드
+기본값 1줄**로 대체. 이후 동기화는 같은 절차의 반복. push/PR은 사용자 직접.
+
+잔여: downstream의 pack(projects/stablenet)은 upstream 사본과 동일 —
+downstream 고유 데이터가 생기면 그쪽에서만 진화시키고 upstream과의
+정규화-diff로 드리프트 감사(런북 §Normalized-diff).
 
 ## 다음 단계 후보
 
