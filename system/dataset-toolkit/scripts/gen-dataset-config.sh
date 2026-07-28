@@ -14,11 +14,17 @@
 # Usage:
 #   DATASET=/abs/knowledge-data/pr-14 NAME=pr14 ./gen-dataset-config.sh
 #
+# NOTE (2026-07-28): this generator predates the retirement of the cks.env
+# chain — the engines now live in the consolidated knowledge-system module and
+# the canonical config generator is `system-mcp gen-config` (+
+# `print-mcp-config` for client registration). This script is kept for the
+# dataset-toolkit's self-contained per-dataset layout; paths below are updated
+# to the consolidated repo. Follow-up: delegate the YAML half to
+# `system-mcp gen-config` and drop the env file.
+#
 # Optional overrides:
 #   SRC_ROOT       source_root for ckg (default: $DATASET/_src)
-#   CKS_ROOT       code-knowledge-system checkout (default: 2 levels up via repo layout)
-#   CKG_REPO       code-knowledge-graph checkout
-#   CKV_REPO       code-knowledge-vector checkout
+#   KS_ROOT        knowledge-system checkout (default: via this script's location)
 #   EMBED_MODEL    embedding model name (default: bge-m3)
 #   CKV_OLLAMA_ENDPOINT  ollama url (default: http://localhost:11434)
 #   DOMAIN_PROJECT_DIR / DOMAIN_CORPUS_DIR / GLOSSARY_PATH
@@ -32,14 +38,15 @@ DATASET="$(abs "${DATASET:?set DATASET=/abs/path/to/dataset/dir}")"
 NAME="${NAME:?set NAME=short dataset name (used in filenames, e.g. pr14)}"
 SRC_ROOT="$(abs "${SRC_ROOT:-$DATASET/_src}")"
 
-# Default repo layout: code-knowledge-{system,graph,vector} as siblings.
-CKS_ROOT="$(abs "${CKS_ROOT:-$DATASET/../../code-knowledge-system}")"
-CKG_REPO="$(abs "${CKG_REPO:-$CKS_ROOT/../code-knowledge-graph}")"
-CKV_REPO="$(abs "${CKV_REPO:-$CKS_ROOT/../code-knowledge-vector}")"
+# Consolidated layout: one module holds all three engines; binaries in bin/.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+KS_ROOT="$(abs "${KS_ROOT:-$SCRIPT_DIR/../../..}")"
 OLLAMA_URL="${CKV_OLLAMA_ENDPOINT:-http://localhost:11434}"
 EMBED_MODEL="${EMBED_MODEL:-bge-m3}"
 
-CKS_MCP_BIN="$CKS_ROOT/bin/cks-mcp"
+CKS_MCP_BIN="$KS_ROOT/bin/system-mcp"
+CKG_BIN="$KS_ROOT/bin/ckg"
+CKV_BIN="$KS_ROOT/bin/ckv"
 CONFIG="$DATASET/cks-$NAME.yaml"
 ENVFILE="$DATASET/cks-$NAME.env"
 mkdir -p "$DATASET/logs/footprint" "$DATASET/logs/audit"
@@ -56,14 +63,14 @@ backends:
   ckg:
     path: "$DATASET/graph-db/graph.db"
     source_root: "$SRC_ROOT"
-    binary_path: "$CKG_REPO/bin/ckg"
+    binary_path: "$CKG_BIN"
     timeout_ms: 5000
   ckv:
     path: "$DATASET/vector-db"
     timeout_ms: 3000
     embed_model: "$EMBED_MODEL"
     ollama_url: "$OLLAMA_URL"
-    binary_path: "$CKV_REPO/bin/ckv"
+    binary_path: "$CKV_BIN"
 
 listen:
   http_addr: "127.0.0.1:8080"
@@ -76,7 +83,7 @@ logging:
   audit_dir: "$DATASET/logs/audit"
 
 sanitize:
-  rules_path: "$CKS_ROOT/policies/sanitization_rules.yaml"
+  rules_path: "$KS_ROOT/system/policies/sanitization_rules.yaml"
   default_action: "drop"
   fail_closed_on_unknown_rule: true
 YAML
@@ -108,8 +115,8 @@ ENV
 echo "generated:"
 echo "  $CONFIG"
 echo "  $ENVFILE"
-[ -x "$CKS_MCP_BIN" ]      || echo "  WARN: cks-mcp not built ($CKS_MCP_BIN)"
-[ -x "$CKG_REPO/bin/ckg" ] || echo "  WARN: ckg not built ($CKG_REPO/bin/ckg)"
-[ -x "$CKV_REPO/bin/ckv" ] || echo "  WARN: ckv not built ($CKV_REPO/bin/ckv)"
+[ -x "$CKS_MCP_BIN" ] || echo "  WARN: system-mcp not built ($CKS_MCP_BIN) — make build-mcp"
+[ -x "$CKG_BIN" ]     || echo "  WARN: ckg not built ($CKG_BIN) — go build -o bin/ckg ./cmd/graph"
+[ -x "$CKV_BIN" ]     || echo "  WARN: ckv not built ($CKV_BIN) — go build -o bin/ckv ./cmd/vector"
 echo ""
 echo "serve:  source \"$ENVFILE\"  &&  \"$CKS_MCP_BIN\" -config \"$CONFIG\""

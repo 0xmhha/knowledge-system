@@ -8,7 +8,7 @@
 # export its instance URL in the shell *before* launching, AFTER any activate.sh
 # (so our override is last-write-wins). The dataset's ENV_FILE must export
 # CKS_MCP_URL=http://<ip>:<port>/mcp for a cks-mcp instance already serving that
-# dataset (start one with code-knowledge-system/scripts/serve-cks-http.sh; verify
+# dataset (start one with `system-mcp daemon up` or `system-mcp -config <cfg>`; verify
 # which index it serves via cks.ops.health name/indexed_head).
 #
 # Generalized from knowledge-data/pr-14/run-coding-agent-pr14.sh.
@@ -19,7 +19,7 @@
 #   ... ./run-coding-agent.sh /coding-agent:analyze "..."   # pass a slash command through
 #
 # Optional:
-#   CKS_ROOT   code-knowledge-system checkout (for activate.sh); default: repo layout
+#   CKS_ROOT   system/ dir of the knowledge-system checkout (for activate.sh); default: repo layout
 set -euo pipefail
 
 abs() { ( cd "$1" 2>/dev/null && pwd ); }
