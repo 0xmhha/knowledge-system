@@ -15,14 +15,21 @@ import (
 type SymbolKind string
 
 const (
-	KindFunction   SymbolKind = "Function"
-	KindMethod     SymbolKind = "Method"
-	KindType       SymbolKind = "Type"
-	KindStruct     SymbolKind = "Struct"
-	KindInterface  SymbolKind = "Interface"
-	KindContract   SymbolKind = "Contract" // Solidity
-	KindEvent      SymbolKind = "Event"    // Solidity (TBD)
-	KindModifier   SymbolKind = "Modifier" // Solidity (TBD)
+	KindFunction  SymbolKind = "Function"
+	KindMethod    SymbolKind = "Method"
+	KindType      SymbolKind = "Type"
+	KindStruct    SymbolKind = "Struct"
+	KindInterface SymbolKind = "Interface"
+	KindContract  SymbolKind = "Contract" // Solidity
+	KindEvent     SymbolKind = "Event"    // Solidity (TBD)
+	KindModifier  SymbolKind = "Modifier" // Solidity (TBD)
+	// KindConst / KindVar cover top-level const/var declaration BLOCKS (one
+	// span per GenDecl, doc comment included). Added 2026-07-28: these used
+	// to be left to the file_header fallback (first 50 lines), which made
+	// declarations past line 50 — e.g. a long const enum block — invisible
+	// to retrieval entirely.
+	KindConst      SymbolKind = "Const"
+	KindVar        SymbolKind = "Var"
 	KindFileHeader SymbolKind = "FileHeader"
 	// Markdown indexing kinds.
 	// Each heading-bounded section in a *.md / *.markdown file becomes one

@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
@@ -56,6 +57,73 @@ type Handler interface {
 		if s.Text == "" {
 			t.Errorf("%s: empty Text", s.Name)
 		}
+	}
+}
+
+func TestParseExtractsConstAndVarBlocks(t *testing.T) {
+	// Regression for the "invisible const" gap: top-level const/var used to
+	// be left to the chunker's 50-line file_header fallback, so any
+	// declaration past line 50 (long enum blocks, late sentinels) could not
+	// be retrieved at all.
+	src := []byte(`package x
+
+// Intent enumerates retrieval intents.
+const (
+	// IntentBugFix — "fix this bug".
+	IntentBugFix = "bug_fix"
+	// IntentQAReview — "review this PR".
+	IntentQAReview = "qa_review"
+)
+
+// ErrFailClosed is returned when a fail_closed rule matched.
+var ErrFailClosed = errNew("fail closed")
+
+func errNew(s string) error { return nil }
+`)
+	p := New()
+	spans, err := p.Parse("x.go", src)
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+
+	var constSpan, varSpan *struct {
+		start, end int
+		text       string
+	}
+	for _, s := range spans {
+		switch {
+		case s.Kind == types.KindConst && s.Name == "IntentBugFix":
+			constSpan = &struct {
+				start, end int
+				text       string
+			}{s.StartLine, s.EndLine, s.Text}
+		case s.Kind == types.KindVar && s.Name == "ErrFailClosed":
+			varSpan = &struct {
+				start, end int
+				text       string
+			}{s.StartLine, s.EndLine, s.Text}
+		}
+	}
+	if constSpan == nil {
+		t.Fatalf("no Const span named after the first ident; spans=%+v", spans)
+	}
+	// Block doc comment included: span starts at "// Intent enumerates" (line 3).
+	if constSpan.start != 3 || constSpan.end != 9 {
+		t.Errorf("const block span = %d-%d, want 3-9", constSpan.start, constSpan.end)
+	}
+	for _, needle := range []string{"Intent enumerates", "IntentQAReview", "review this PR"} {
+		if !strings.Contains(constSpan.text, needle) {
+			t.Errorf("const block text missing %q", needle)
+		}
+	}
+	if varSpan == nil {
+		t.Fatalf("no Var span named ErrFailClosed; spans=%+v", spans)
+	}
+	if varSpan.start != 11 || varSpan.end != 12 {
+		t.Errorf("var span = %d-%d, want 11-12", varSpan.start, varSpan.end)
+	}
+	if !strings.Contains(varSpan.text, "fail_closed rule matched") {
+		t.Errorf("var text missing its doc comment: %q", varSpan.text)
 	}
 }
 

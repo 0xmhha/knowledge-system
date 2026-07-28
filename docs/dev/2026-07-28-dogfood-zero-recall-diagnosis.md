@@ -41,6 +41,33 @@ get_for_task가 기대 파일을 실제로 인용하고 있었다**(stdio 직접
 것이 관찰 사실. archive/설계 문서가 코드 심볼 질의에 다수 인용되는 것도
 같은 트랙의 랭킹 이슈.
 
+## 모드 B 해소 (2026-07-28, 후속 R2/R3)
+
+가설이 아니라 **청킹 공백**이 진짜 원인이었다. ckv 인덱스 직접 질의 + chunks
+테이블 조회로 확정: Go 파서(`internal/vector/parse/golang`)가 top-level
+`const`/`var` GenDecl을 스팬으로 방출하지 않았다 — "file_header(첫 50줄)
+폴백이 커버한다"는 설계 가정이 50줄 밖의 선언(`ErrFailClosed` 55-58,
+`IntentQAReview` 129-141)에서 붕괴. 해당 코드는 **검색 자체가 불가능**했고,
+FileHeader(1-50) 인용은 "그 파일에 존재하는 유일한 관련 청크"였기 때문.
+
+수정: const/var 블록당 1 스팬(첫 식별자 이름, `KindConst`/`KindVar`), 블록
+doc comment 포함(`parser.ParseComments` 활성화 — func/type 스팬은 `Pos()`
+기준이라 불변). 재빌드(청크 +329: Const 175/Var 154) 후 재측정:
+
+- **avg recall 0.556 → 0.722, nonzero 7/9 → 9/9**
+- qa-review-intent 0 → **1.00**, composer-err-fail-closed 0 → **0.50**
+
+전체 궤적: 0.296(한정 코퍼스) → 0.444(전체 코퍼스) → 0.556(스팬 재앵커) →
+**0.722(const/var 청킹)**. 잔여 개선 여지(0.5~0.67대 시나리오)는 진짜 랭킹/
+정밀도 영역 — P가 전반적으로 낮은 것(0.05~0.21)과 doc/archive 청크의 코드
+질의 혼입이 다음 신호.
+
+주의(배포): `--ckg` 정렬 빌드에서 const/var 청크는 canonical_id가 대부분
+비게 된다 — ckg는 ValueSpec **per-spec** 노드, ckv는 **블록** 청크라
+granularity 불일치. canonical ratio 게이트(`gate-min-canonical`) 분모 희석에
+유의. 후속 옵션: (a) ratio 분모에서 Const/Var 제외, (b) ckgalign에 블록↔
+spec 매칭 추가.
+
 ## 재현
 
 ```sh

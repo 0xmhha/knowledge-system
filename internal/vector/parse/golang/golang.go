@@ -29,7 +29,10 @@ func (p *Parser) Language() string { return "go" }
 // retrieval (a closure rarely makes sense on its own).
 func (p *Parser) Parse(file string, src []byte) ([]cparse.SymbolSpan, error) {
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, file, src, parser.SkipObjectResolution)
+	// ParseComments so const/var block doc comments are attached (gen.Doc)
+	// and can anchor the span start. Func/type spans are unaffected: they
+	// slice from decl.Pos(), which never includes the doc comment.
+	f, err := parser.ParseFile(fset, file, src, parser.SkipObjectResolution|parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("parse %s: %w", file, err)
 	}
@@ -67,35 +70,76 @@ func (p *Parser) funcSpan(fset *token.FileSet, src []byte, fn *ast.FuncDecl) cpa
 }
 
 func (p *Parser) genSpans(fset *token.FileSet, src []byte, gen *ast.GenDecl) []cparse.SymbolSpan {
-	// We only emit spans for TypeSpec. Imports/constants/vars are
-	// covered later by the file_header fallback (chunker), not here.
-	if gen.Tok != token.TYPE {
+	switch gen.Tok {
+	case token.TYPE:
+		var out []cparse.SymbolSpan
+		for _, sp := range gen.Specs {
+			ts, ok := sp.(*ast.TypeSpec)
+			if !ok {
+				continue
+			}
+			kind := types.KindType
+			switch ts.Type.(type) {
+			case *ast.StructType:
+				kind = types.KindStruct
+			case *ast.InterfaceType:
+				kind = types.KindInterface
+			}
+			startPos := fset.Position(ts.Pos())
+			endPos := fset.Position(ts.End())
+			out = append(out, cparse.SymbolSpan{
+				Name:      ts.Name.Name,
+				Kind:      kind,
+				StartLine: startPos.Line,
+				EndLine:   endPos.Line,
+				Text:      sliceText(src, ts.Pos(), ts.End(), fset),
+			})
+		}
+		return out
+	case token.CONST, token.VAR:
+		// One span per declaration BLOCK, doc comment included. These used
+		// to be left to the chunker's file_header fallback (first 50 lines),
+		// which made any const/var past line 50 — e.g. a long const enum
+		// block with per-value doc comments — unreachable by retrieval.
+		// Block granularity keeps grouped enums (iota ladders, intent
+		// catalogs) as one coherent embedding; per-spec docs inside the
+		// block ride along in the sliced text.
+		return []cparse.SymbolSpan{p.valueBlockSpan(fset, src, gen)}
+	default:
+		// Imports stay uncovered on purpose — the file_header chunk has them.
 		return nil
 	}
-	var out []cparse.SymbolSpan
-	for _, sp := range gen.Specs {
-		ts, ok := sp.(*ast.TypeSpec)
-		if !ok {
-			continue
-		}
-		kind := types.KindType
-		switch ts.Type.(type) {
-		case *ast.StructType:
-			kind = types.KindStruct
-		case *ast.InterfaceType:
-			kind = types.KindInterface
-		}
-		startPos := fset.Position(ts.Pos())
-		endPos := fset.Position(ts.End())
-		out = append(out, cparse.SymbolSpan{
-			Name:      ts.Name.Name,
-			Kind:      kind,
-			StartLine: startPos.Line,
-			EndLine:   endPos.Line,
-			Text:      sliceText(src, ts.Pos(), ts.End(), fset),
-		})
+}
+
+// valueBlockSpan turns one const/var GenDecl into a single SymbolSpan named
+// after its first declared identifier. The span starts at the block's doc
+// comment when present so the natural-language signal ("ErrFailClosed is
+// returned when ...") is part of the embedded text.
+func (p *Parser) valueBlockSpan(fset *token.FileSet, src []byte, gen *ast.GenDecl) cparse.SymbolSpan {
+	kind := types.KindConst
+	if gen.Tok == token.VAR {
+		kind = types.KindVar
 	}
-	return out
+	name := ""
+	for _, sp := range gen.Specs {
+		if vs, ok := sp.(*ast.ValueSpec); ok && len(vs.Names) > 0 {
+			name = vs.Names[0].Name
+			break
+		}
+	}
+	start := gen.Pos()
+	if gen.Doc != nil {
+		start = gen.Doc.Pos()
+	}
+	startPos := fset.Position(start)
+	endPos := fset.Position(gen.End())
+	return cparse.SymbolSpan{
+		Name:      name,
+		Kind:      kind,
+		StartLine: startPos.Line,
+		EndLine:   endPos.Line,
+		Text:      sliceText(src, start, gen.End(), fset),
+	}
 }
 
 // receiverTypeName turns the recv list of a method into the bare type

@@ -90,8 +90,9 @@ func (c *Chunker) Chunk(in Input) []types.Chunk {
 	// Skip the file_header chunk for markdown inputs: every heading
 	// section is already its own chunk, so the leading-N-lines slice
 	// would duplicate the first section. Source-code languages keep
-	// the header because their span coverage is sparse (no chunks for
-	// imports/consts) — markdown's is dense.
+	// the header for package-level orientation (package doc + imports;
+	// Go const/var blocks have their own spans since 2026-07-28) —
+	// markdown's coverage is dense.
 	if c.opts.IncludeFileHeader && in.Language != "markdown" {
 		if hdr := c.fileHeaderChunk(in); hdr != nil {
 			out = append(out, *hdr)
