@@ -327,6 +327,17 @@ grep -rh 'file: ' system/eval/scenarios/*.yaml | awk '{print $NF}' | sort -u \
 지정)이 시나리오 대다수에서 0이 아닌 recall을 내고, `MISSING:` 검증이 0줄.
 CI에는 넣지 않는다(구 repo에서도 수동 플로우 — 승계 범위 유지).
 
+**구현 결과 (2026-07-28)**: 좌표계 복구는 완료·검증 — MISSING 0줄, 코퍼스
+315 Go 파일/50 패키지 인덱싱, get_for_task가 composer까지 도달. 단 recall>0
+은 **선재 블로커**로 미달성: (a) `USE_CKV=0` 기본 경로는 통합 전 landed된
+composer retrieval fix가 ckv-미구성 시 fail-closed라 이미 동작 불가,
+(b) `USE_CKV=1` 경로는 `CKV_EMBEDDER` 변수가 ckv build의 백엔드명과 config
+`embed_model`(ollama 모델명)을 겸용해 ollama+bge-m3 실경로를 구성할 수 없음
+(mock은 cks 쪽 ollama connectivity check에서 404). 수정하려면 dogfood 배관
+분리(CKV_MODEL 신설) + 실모델 임베딩(수 시간)이 필요 — 이 설계의 범위(좌표
+복구) 밖이므로 **후속 백로그**로 남긴다. 두 블로커 모두 이번 변경으로 새로
+생긴 것이 아니라 빈-코퍼스 상태에 가려져 있던 선재 결함이다.
+
 ---
 
 ## 2. G1 — CI eval 회귀 게이트 복원

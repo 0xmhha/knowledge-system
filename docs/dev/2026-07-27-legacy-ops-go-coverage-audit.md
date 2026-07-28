@@ -101,11 +101,20 @@ here): `activate.sh`, `apply-cc-settings.sh`, `coding-agent.sh`,
 
 ## Disposition
 
-- **Ready to retire (Go equivalent landed):** `serve-cks-http.sh`, `cks-mcpd.sh`,
-  `reindex-dataset.sh`, and `index-project.sh` (already removed). The MCP-server
-  hardening sequence (#14–#18, 2026-07-27) closed backlog items 5/6/8; only the
-  `cks.env` half of `gen-cks-config.sh` and the plugin-glue scripts still lack a
-  Go path.
-- Retire each remaining script in the same change that lands its backlog item above.
-- The 3-repo path staleness is tracked separately and is lower priority than
-  the coverage gaps.
+- **Retired (2026-07-28, gap-integration — see
+  `docs/dev/2026-07-28-gap-integration-design.md` §4):** `serve-cks-http.sh`,
+  `cks-mcpd.sh`, `reindex-dataset.sh`, `gen-cks-config.sh`, `cks-health.sh`,
+  and `projects/stablenet/scripts/gen-filelist.sh` (superseded by
+  `ckg build --files-from-main`). The "cks.env half" judgment above is
+  **re-adjudicated as covered**: the env file's consumers are served by
+  `system-mcp print-mcp-config` (URL/registration JSON) + the config YAML as
+  single source of truth — `activate.sh` now derives its exports from those
+  instead of sourcing cks.env, so no env-file generator is needed (and none
+  should be added — it would duplicate the namespace-based structure).
+- `setup-all.sh` / `build-dataset.sh` were re-pathed to the consolidated
+  layout (in-repo builds + `knowledge-setup` delegation) — no longer
+  sibling-repo-dependent. `activate.sh` / `apply-cc-settings.sh` remain
+  plugin glue (candidates to migrate to the coding-agent repo).
+- Still shell, still kept: `coding-agent.sh`, `enable-autopilot.sh` (plugin
+  glue), `system/dataset-toolkit/scripts/*` and
+  `vector/scripts/build-vector-stablenet.sh` (path refresh deferred).
