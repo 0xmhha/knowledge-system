@@ -137,11 +137,12 @@ func (a *aggregator) entry(c contract.Citation) *ScoredCitation {
 // keeping test files available lower in the evidence pack.
 //
 // When demoteDocs is true, documentation citations (isDocCitation) are
-// likewise multiplied by docDemotionFactor so code-seeking intents rank
-// code above markdown. Independently of both flags, citations under an
-// archive/ path are multiplied by archiveDemotionFactor — superseded
-// material is never the current answer (factors do not stack: archive
-// classification wins over the doc factor).
+// likewise multiplied by docDemotionFactor and file_header chunks by
+// headerDemotionFactor, so code-seeking intents rank symbol chunks
+// above markdown and above package-orientation headers. Independently
+// of both flags, citations under an archive/ path are multiplied by
+// archiveDemotionFactor — superseded material is never the current
+// answer (factors do not stack: archive > doc > header precedence).
 //
 // Demotion is applied to the returned copy — the aggregator's internal
 // map is not mutated, so results() can be called multiple times with
@@ -162,6 +163,8 @@ func (a *aggregator) results(cap int, demoteTests, demoteDocs bool) []ScoredCita
 			entry.Score *= archiveDemotionFactor
 		case demoteDocs && isDocCitation(entry.ChunkKind, entry.Citation.File):
 			entry.Score *= docDemotionFactor
+		case demoteDocs && isHeaderChunk(entry.ChunkKind):
+			entry.Score *= headerDemotionFactor
 		}
 		out = append(out, entry)
 	}

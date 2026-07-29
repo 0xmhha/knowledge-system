@@ -96,6 +96,29 @@ R=0.50/MRR=0.08(정답이 리스트 하부), qa-review R=1.00/MRR=0.25(rank 4),
 composer-pipeline-flow R=1.00/MRR=0.32 — **"찾긴 하는데 상위에 못 올린다"가
 현 병목**임을 정량화. 이후 랭킹 변경은 이 0.389 대비로 판정한다.
 
+## intent 관통 + 헤더 강등 (2026-07-29, 후속 R7)
+
+**선행 발견 — intent-조건 로직이 대부분 꺼진 채 평가되고 있었다**: 러너는
+prompt만 전송하고 서버 분류기는 대부분의 시나리오에서 빈/Unknown을 반환
+(footprint 실측: 9개 중 test_add만 분류 성공). 즉 stage2 kind 필터, path
+glob, #40의 doc 강등 모두 8/9 시나리오에서 비활성이었다 — R7의 첫 시도
+(헤더 강등 단독)가 MRR 완전 무변화였던 이유.
+
+수정 2건(한 PR):
+1. **intent 인자 관통**(additive): `get_for_task`에 선택적 `intent` 인자
+   (`ParseIntent` 검증, 무효값 fail-loud) → `ComposeWithIntent`가 분류기
+   우회. 평가 러너는 시나리오 선언 intent를 전달. intent를 아는 프로덕션
+   호출자(파이프라인 단계)에게도 동일하게 유효.
+2. **file_header 강등**(`headerDemotionFactor=0.5`, doc 강등과 같은 스위치):
+   const/var 청킹 이후 헤더는 "오리엔테이션"이지 답이 아니다.
+
+**재측정(동일 인덱스): avg MRR 0.389 → 0.438, avg recall 0.722 → 0.778**.
+composer-err-fail-closed MRR 0.25→0.55·R 0.50→**1.00**, pipeline-flow
+0.32→0.57, qa-review 0.25→0.50. 유일 회귀 concurrency-safety MRR
+0.50→0.10(R 불변): 이전 첫 매칭이 **우연히 헤더 청크**(1-50이 기대 42-55와
+겹침)였던 케이스 — 대리 매칭의 소멸이며, 근본 해법은 TypeSpec 스팬에 doc
+comment을 포함해 type 심볼 청크 자체가 랭크되게 하는 것(후속).
+
 주의(배포): `--ckg` 정렬 빌드에서 const/var 청크는 canonical_id가 대부분
 비게 된다 — ckg는 ValueSpec **per-spec** 노드, ckv는 **블록** 청크라
 granularity 불일치. canonical ratio 게이트(`gate-min-canonical`) 분모 희석에

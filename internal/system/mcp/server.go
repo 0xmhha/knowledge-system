@@ -344,6 +344,8 @@ func registerGetForTask(s *mcpserver.MCPServer, d Deps) {
 		),
 		mcpgo.WithString("prompt", mcpgo.Required(),
 			mcpgo.Description("Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".")),
+		mcpgo.WithString("intent",
+			mcpgo.Description("Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.")),
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
 		return handleGetForTask(ctx, d, req)
