@@ -435,6 +435,13 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 		if !srcOK || !dstOK {
 			continue
 		}
+		// Drop edges anchored on structural pseudo nodes (file → import:*,
+		// file → top-level symbol): they are file plumbing, not the symbol
+		// relations a neighbor list is for, and they crowd out calls edges
+		// under the MaxTotal cap.
+		if isStructuralQname(srcN.QualifiedName) || isStructuralQname(dstN.QualifiedName) {
+			continue
+		}
 		if opts.MaxTotal > 0 && len(out) >= opts.MaxTotal {
 			break
 		}
@@ -896,15 +903,16 @@ func nodeToCitation(n types.Node, commit string) contract.Citation {
 // citation's line range. Exact start+end match wins; otherwise the
 // first candidate fully containing the citation's range is used.
 func matchQname(cands []types.Node, src contract.Citation) string {
-	// Pseudo nodes (file:/hunk:/import: qnames) span whole files, so any
-	// containment tier below would swallow every citation and resolve it
-	// to a node with no call/implements edges — observed as stage3
-	// expanding 10 seeds into ZERO neighbors with zero errors. Same
-	// exclusion ckgalign applies at load time.
+	// Structural pseudo nodes span whole files, so any containment tier
+	// below would swallow every citation and resolve it to a node whose
+	// edges are file plumbing (imports/defines), not symbol semantics —
+	// observed twice: stage3 expanding 10 seeds into ZERO neighbors, and
+	// after the first fix, file_header seeds resolving to the FILE node
+	// and flooding the neighbor top-50 with file→import:* edges (9 of 18
+	// pack neighbors were imports, 1 was calls).
 	real := cands[:0:0]
 	for _, n := range cands {
-		q := n.QualifiedName
-		if strings.HasPrefix(q, "file:") || strings.HasPrefix(q, "hunk:") || strings.HasPrefix(q, "import:") {
+		if isStructuralQname(n.QualifiedName) {
 			continue
 		}
 		real = append(real, n)
@@ -950,6 +958,19 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 		return real[bestIdx].QualifiedName
 	}
 	return ""
+}
+
+// isStructuralQname reports whether q names a structural pseudo node
+// rather than a language symbol: the file:/hunk:/import: prefix families
+// AND path-shaped file nodes ("composer/internal/.../composer.go" — ckg
+// keys file nodes by their path, and real Go symbol qnames never contain
+// a slash). These nodes anchor file plumbing edges (file imports X, file
+// defines Y) that read as noise in a symbol-centric neighbor list.
+func isStructuralQname(q string) bool {
+	return strings.HasPrefix(q, "file:") ||
+		strings.HasPrefix(q, "hunk:") ||
+		strings.HasPrefix(q, "import:") ||
+		strings.Contains(q, "/")
 }
 
 // nodeMatchesKinds reports whether n.Type matches any of the lowercase

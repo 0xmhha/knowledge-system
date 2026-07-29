@@ -894,3 +894,25 @@ func TestMatchQname_DocShiftedAndPseudo(t *testing.T) {
 		t.Errorf("pseudo-only = %q, want empty", got)
 	}
 }
+
+// TestIsStructuralQname pins the pseudo-node classifier, including the
+// path-shaped file nodes ("pkg/internal/x/a.go") that slipped past the
+// original prefix-only filter and flooded neighbor lists with
+// file→import:* plumbing edges.
+func TestIsStructuralQname(t *testing.T) {
+	structural := []string{
+		"file:pkg/a.go", "hunk:abc123", "import:context",
+		"composer/internal/system/composer/composer.go",
+	}
+	for _, q := range structural {
+		if !isStructuralQname(q) {
+			t.Errorf("isStructuralQname(%q) = false, want true", q)
+		}
+	}
+	symbols := []string{"composer.Composer", "composer.Composer.ComposeTracedWithIntent", "pkg.helper"}
+	for _, q := range symbols {
+		if isStructuralQname(q) {
+			t.Errorf("isStructuralQname(%q) = true, want false", q)
+		}
+	}
+}
