@@ -42,6 +42,13 @@ func main() {
 	flag.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
 	flag.StringVar(&o.FilelistConfig, "filelist", "", "filelist-gen config; derives <out>/files-from.json and scopes both engine builds")
 	flag.StringVar(&o.FilelistBin, "filelist-bin", "", "filelist-gen CLI (default: filelist-gen on PATH)")
+	flag.StringVar(&o.DomainKnowledge, "domain-knowledge", "", "project domain-knowledge dir; re-derives the corpus, governance policy and glossary before the builds")
+	flag.StringVar(&o.DerivedDir, "derived-dir", "", "where the derived domain artifacts land (default: generated/ beside domain-knowledge)")
+	flag.StringVar(&o.CodeRoot, "code-root", "", "working tree the project's authoritative_docs resolve against")
+	flag.StringVar(&o.FlowCorpus, "flow-corpus", "", "curated flow-corpus JSONL embedded with the vector index")
+	flag.StringVar(&o.DomainExportBin, "domain-export-bin", "", "cks-domain-export CLI (default: on PATH)")
+	flag.StringVar(&o.DomainSyncBin, "domain-sync-bin", "", "cks-domain-sync CLI (default: on PATH)")
+	flag.StringVar(&o.GlossaryGenBin, "glossary-gen-bin", "", "cks-glossary-gen CLI (default: on PATH)")
 	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
@@ -77,6 +84,13 @@ func main() {
 		merge("vector-policy", &o.VectorPolicy, base.VectorPolicy)
 		merge("filelist", &o.FilelistConfig, base.FilelistConfig)
 		merge("filelist-bin", &o.FilelistBin, base.FilelistBin)
+		merge("domain-knowledge", &o.DomainKnowledge, base.DomainKnowledge)
+		merge("derived-dir", &o.DerivedDir, base.DerivedDir)
+		merge("code-root", &o.CodeRoot, base.CodeRoot)
+		merge("flow-corpus", &o.FlowCorpus, base.FlowCorpus)
+		merge("domain-export-bin", &o.DomainExportBin, base.DomainExportBin)
+		merge("domain-sync-bin", &o.DomainSyncBin, base.DomainSyncBin)
+		merge("glossary-gen-bin", &o.GlossaryGenBin, base.GlossaryGenBin)
 		if !set["embed-dim"] {
 			o.EmbedDim = base.EmbedDim
 		}

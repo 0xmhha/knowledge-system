@@ -394,3 +394,127 @@ func TestVerifyAlignment_SchemaGate(t *testing.T) {
 		t.Error("empty schema: expected a warning")
 	}
 }
+
+// TestBuildPlan_DomainArtifacts covers the three derivation steps and the two
+// places their output is consumed. The regression this guards: the derivation
+// used to live in a shell script that a refactor replaced with a thinner
+// wrapper, dropping the corpus and the policy sync without any test noticing.
+func TestBuildPlan_DomainArtifacts(t *testing.T) {
+	p, err := BuildPlan(Options{
+		Src: "/s", Out: "/o",
+		DomainKnowledge: "/pack/domain-knowledge",
+		CodeRoot:        "/checkout",
+		FlowCorpus:      "/pack/domain-knowledge/flow-corpus/corpus.jsonl",
+		PolicyFile:      "/pack/policies/graph.yaml",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ids := make([]string, len(p.Steps))
+	for i, s := range p.Steps {
+		ids[i] = s.ID
+	}
+	want := []string{"domain-export", "domain-sync", "glossary-gen", "graph-build", "vector-build", "verify-align", "verify-content"}
+	if strings.Join(ids, ",") != strings.Join(want, ",") {
+		t.Fatalf("step ids = %v, want %v", ids, want)
+	}
+
+	// The derived artifacts default to generated/ beside the pack.
+	if e := strings.Join(p.Steps[0].Cmd, " "); !strings.Contains(e, "-out /pack/generated/domain-corpus") ||
+		!strings.Contains(e, "-code-root /checkout") {
+		t.Errorf("export cmd = %q", e)
+	}
+	if s := strings.Join(p.Steps[1].Cmd, " "); !strings.Contains(s, "-ckg-out /pack/generated/policies/graph.yaml") {
+		t.Errorf("sync cmd = %q", s)
+	}
+	if g := strings.Join(p.Steps[2].Cmd, " "); !strings.Contains(g, "-out /pack/generated/glossary.yaml") {
+		t.Errorf("glossary cmd = %q", g)
+	}
+
+	// The graph build must consume the freshly derived policy, not the
+	// configured one — a committed copy is a snapshot of an older derivation.
+	graph := strings.Join(p.Steps[3].Cmd, " ")
+	if !strings.Contains(graph, "--policy-file /pack/generated/policies/graph.yaml") {
+		t.Errorf("graph cmd should use the derived policy, got %q", graph)
+	}
+	if strings.Contains(graph, "/pack/policies/graph.yaml") {
+		t.Errorf("graph cmd still references the configured policy: %q", graph)
+	}
+
+	vec := strings.Join(p.Steps[4].Cmd, " ")
+	if !strings.Contains(vec, "--docs /pack/generated/domain-corpus") {
+		t.Errorf("vector cmd missing --docs: %q", vec)
+	}
+	if !strings.Contains(vec, "--flow-corpus /pack/domain-knowledge/flow-corpus/corpus.jsonl") {
+		t.Errorf("vector cmd missing --flow-corpus: %q", vec)
+	}
+
+	// Without domain knowledge the plan is unchanged and the content gate
+	// stays out of the way.
+	p2, err := BuildPlan(Options{Src: "/s", Out: "/o", PolicyFile: "/pack/policies/graph.yaml"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range p2.Steps {
+		if s.ID == "verify-content" || s.ID == "domain-export" {
+			t.Errorf("unexpected step %q when DomainKnowledge is unset", s.ID)
+		}
+	}
+	if g := strings.Join(p2.Steps[0].Cmd, " "); !strings.Contains(g, "--policy-file /pack/policies/graph.yaml") {
+		t.Errorf("configured policy should still be used when there is nothing to derive from: %q", g)
+	}
+}
+
+// TestVerifyContent covers the gate that would have caught a corpus flag that
+// was never passed, and an authoritative doc that silently failed to resolve.
+func TestVerifyContent(t *testing.T) {
+	newDataset := func(t *testing.T, manifest any) Options {
+		t.Helper()
+		dir := t.TempDir()
+		writeManifest(t, filepath.Join(dir, "vector"), manifest)
+		return Options{Out: dir, DomainKnowledge: filepath.Join(dir, "pack", "domain-knowledge")}
+	}
+
+	t.Run("corpus reached the index", func(t *testing.T) {
+		o := newDataset(t, map[string]any{"languages": map[string]int{"markdown": 421}})
+		o.DerivedDir = filepath.Join(t.TempDir(), "generated")
+		writeManifest(t, filepath.Join(o.Out, "vector"), map[string]any{
+			"docs_roots": []string{o.DomainCorpusDir()},
+			"languages":  map[string]int{"markdown": 421},
+		})
+		if err := VerifyContent(o, nil); err != nil {
+			t.Errorf("want pass, got %v", err)
+		}
+	})
+
+	t.Run("corpus declared but never passed", func(t *testing.T) {
+		o := newDataset(t, map[string]any{"docs_roots": []string{}, "languages": map[string]int{"go": 100}})
+		err := VerifyContent(o, nil)
+		if err == nil {
+			t.Fatal("a corpus that never reached the index must fail the build")
+		}
+		if !strings.Contains(err.Error(), "docs roots") {
+			t.Errorf("error should name the missing corpus, got %v", err)
+		}
+	})
+
+	t.Run("corpus passed but empty", func(t *testing.T) {
+		o := newDataset(t, nil)
+		writeManifest(t, filepath.Join(o.Out, "vector"), map[string]any{
+			"docs_roots": []string{o.DomainCorpusDir()},
+			"languages":  map[string]int{"go": 100},
+		})
+		if err := VerifyContent(o, nil); err == nil {
+			t.Error("an empty corpus directory must fail the build")
+		}
+	})
+
+	t.Run("flow corpus declared but never passed", func(t *testing.T) {
+		dir := t.TempDir()
+		writeManifest(t, filepath.Join(dir, "vector"), map[string]any{"docs_roots": []string{}})
+		o := Options{Out: dir, FlowCorpus: filepath.Join(dir, "flow", "corpus.jsonl")}
+		if err := VerifyContent(o, nil); err == nil {
+			t.Error("a flow corpus that never reached the index must fail the build")
+		}
+	})
+}

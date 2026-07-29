@@ -27,6 +27,13 @@ type fileConfig struct {
 	SkipVector          bool   `yaml:"skip_vector"`
 	Filelist            string `yaml:"filelist"`
 	FilelistBin         string `yaml:"filelist_bin"`
+	DomainKnowledge     string `yaml:"domain_knowledge"`
+	DerivedDir          string `yaml:"derived_dir"`
+	CodeRoot            string `yaml:"code_root"`
+	FlowCorpus          string `yaml:"flow_corpus"`
+	DomainExportBin     string `yaml:"domain_export_bin"`
+	DomainSyncBin       string `yaml:"domain_sync_bin"`
+	GlossaryGenBin      string `yaml:"glossary_gen_bin"`
 }
 
 // LoadConfig reads a setup config file into Options. Path-valued fields that
@@ -62,5 +69,14 @@ func LoadConfig(path string) (Options, error) {
 		SkipVector:          fc.SkipVector,
 		FilelistConfig:      rel(fc.Filelist),
 		FilelistBin:         fc.FilelistBin,
+		DomainKnowledge:     rel(fc.DomainKnowledge),
+		DerivedDir:          rel(fc.DerivedDir),
+		// CodeRoot points at a checkout outside the pack, so ${VAR} forms
+		// are expanded rather than resolved against the config directory.
+		CodeRoot:        os.ExpandEnv(fc.CodeRoot),
+		FlowCorpus:      rel(fc.FlowCorpus),
+		DomainExportBin: fc.DomainExportBin,
+		DomainSyncBin:   fc.DomainSyncBin,
+		GlossaryGenBin:  fc.GlossaryGenBin,
 	}, nil
 }
