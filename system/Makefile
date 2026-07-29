@@ -87,8 +87,9 @@ help:
 	@echo "  ckv-index           build a fresh ckv index from \$$(CKV_SRC) into \$$(CKV_DATA)"
 	@echo "  ckv-index-clean     remove \$$(CKV_DATA)"
 	@echo "  dogfood-config      generate \$$(DOGFOOD_CONFIG) (cks.yaml; ckv block iff USE_CKV=1)"
-	@echo "  dogfood-eval        ckg-only pipeline (default — stable, ~10s)"
-	@echo "  dogfood-eval        USE_CKV=1 pipeline (real ckv subprocess — ~2 min, less stable)"
+	@echo "  dogfood-eval        ckg-only WIRE-UP smoke (default; get_for_task scenarios"
+	@echo "                      all error — composer requires ckv). Recall/MRR numbers:"
+	@echo "  dogfood-eval        USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=<model> (real embed)"
 	@echo "  dogfood-eval-summary  print one-line metric summary from \$$(EVAL_REPORT)"
 	@echo "                  overrides: CKG=/path/to/ckg, CKV=/path/to/ckv, CKV_EMBEDDER, ..."
 	@echo ""
@@ -269,6 +270,13 @@ DOGFOOD_DEPS += ckv-index
 endif
 
 dogfood-eval: $(DOGFOOD_DEPS)
+	@if [ "$(USE_CKV)" != "1" ]; then \
+		echo "!! USE_CKV=0: every get_for_task scenario will ERROR (the composer"; \
+		echo "!! fails closed without a ready ckv leg since the retrieval fix) —"; \
+		echo "!! this run only smoke-tests the non-semantic tool wire-up."; \
+		echo "!! For recall/MRR numbers run:"; \
+		echo "!!   make dogfood-eval USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=bge-m3 CKG=... CKV=..."; \
+	fi
 	@mkdir -p $$(dirname $(EVAL_REPORT))
 	./$(BIN_DIR)/cks-eval \
 		-scenarios $(EVAL_SCENARIOS) \
