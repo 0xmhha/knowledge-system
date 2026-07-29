@@ -1,0 +1,14 @@
+version: 1
+name: parse-intent-validation
+description: |
+  Wiring a new caller of the intent argument: find ParseIntent, the
+  validated string-to-Intent parser callers must use.
+prompt: "ParseIntent function that validates an intent string into the Intent type"
+intent: feature_add
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: pkg/system/contract/intent.go
+    start_line: 168
+    end_line: 177
+    anchor: "func ParseIntent("

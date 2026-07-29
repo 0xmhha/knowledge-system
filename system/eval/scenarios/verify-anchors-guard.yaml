@@ -1,0 +1,14 @@
+version: 1
+name: verify-anchors-guard
+description: |
+  Extending the eval harness: find VerifyAnchors, the span-drift guard
+  that checks every expected citation's anchor before measurement.
+prompt: "VerifyAnchors method that checks expected citation anchors against source spans"
+intent: test_add
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: internal/system/eval/anchors.go
+    start_line: 9
+    end_line: 47
+    anchor: "func (s *Scenario) VerifyAnchors("

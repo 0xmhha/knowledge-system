@@ -1,0 +1,14 @@
+version: 1
+name: bm25-rerank-option
+description: |
+  Enabling the rerank from a new call site: find the EnableBM25Rerank
+  option field on the vector query Options and its contract.
+prompt: "EnableBM25Rerank query option that fuses BM25 with vector ranks"
+intent: feature_add
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: internal/vector/query/engine.go
+    start_line: 112
+    end_line: 123
+    anchor: "EnableBM25Rerank"
