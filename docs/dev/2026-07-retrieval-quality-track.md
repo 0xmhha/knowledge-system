@@ -6,9 +6,10 @@ Status: 트랙 요약(지속 참조용). 사이클별 상세는
 
 ## 결과 한 줄
 
-dogfood 9-시나리오 기준 **avg recall 0.296 → 0.963** (8/9 시나리오 R=1.00),
-MRR 계측 도입(최종 0.425), **드리프트 가드 3종** 완비. knowledge-system PR
-15건(#37~#38, #40~#46, #48~#52, #54) + coding-agent PR 1건(#63).
+**15-시나리오 확장 스위트 기준 avg recall 0.978 / MRR 0.555 (14/15 시나리오
+R=1.00, fresh 인덱스 — 2026-07-29 R15 기준선).** 시작점은 구 9-시나리오
+스위트의 recall 0.296. **드리프트 가드 3종** 완비. knowledge-system PR
+18건(#37~#38, #40~#46, #48~#52, #54~#57) + coding-agent PR 1건(#63).
 
 ## 수치 궤적 (정직 측정 기준)
 
@@ -66,6 +67,14 @@ ckgalign(#48 tier 2b), matchQname(#52), pack source-anchor(#52). 교훈:
 - stale 인덱스로 수동 측정 → 신선도 가드(#46)의 동기.
 
 ## 열린 백로그
+
+(R15 fresh 재기준선, 2026-07-29: 전 코퍼스 1,470파일 재임베딩 후 15-스위트
+**recall 0.978 / MRR 0.555, 14/15 R=1.00**. structural-qname-filter
+0→1.00 — stale-인덱스 예측의 실증. defines(struct→field) 8개는 프로브 결과
+Composer 필드들(=스테이지 구성 요소)로 아키텍처 신호가 실재 — **유지 판정**,
+백로그 3 종결. 잔여는 mcp-tool-handlers 0.67 단 하나: Register가 파생
+키워드(형태소)라 verbatim 게이트 부스트 대상이 아님 — 설계 일관적 미해결로
+기록.)
 
 (#57에서 해소: 필드-수준 조회 갭 — kind 어휘 교정("type"/"const"는 실존하지
 않는 노드 타입이라 죽은 필터였음) + value kinds(field/constant/variable)
