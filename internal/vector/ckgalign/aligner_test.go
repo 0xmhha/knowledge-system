@@ -99,6 +99,21 @@ func TestLookup_RangeOverlap_ChunkOverlapsNode(t *testing.T) {
 	}
 }
 
+// TestLookup_DocShiftedChunkStart pins the 2026-07-29 chunker change:
+// ckv spans now start at the DOC COMMENT line while ckg nodes start at
+// the declaration, so exact start-line matching (step 1) misses and the
+// chunk must still resolve to its node via overlap (step 3). Chunk
+// [96, 110] models HelperFn with a 4-line doc block above the ckg node
+// [100, 110].
+func TestLookup_DocShiftedChunkStart(t *testing.T) {
+	dir := makeFixtureDB(t)
+	ix, _ := Load(dir)
+	got := ix.Lookup("a/file.go", 96, 110)
+	if got != "n_func" {
+		t.Errorf("Lookup(a/file.go, 96, 110) = %q, want n_func (doc-shifted start must still align)", got)
+	}
+}
+
 // TestLookup_BoundaryOverlap_FallsThroughToNearest pins the ChainConfig.*
 // production regression: a Go method-body chunk's closing line equals
 // the next function's signature start line, producing a 1-line overlap

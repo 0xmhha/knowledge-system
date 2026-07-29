@@ -163,3 +163,60 @@ func busted( {
 		t.Fatal("expected parse error for malformed file")
 	}
 }
+
+// TestParseIncludesDocCommentsInFuncAndTypeSpans pins the doc-comment
+// inclusion added 2026-07-29: the leading comment is where the
+// natural-language signal lives, so it belongs to the span (text and
+// line range both).
+func TestParseIncludesDocCommentsInFuncAndTypeSpans(t *testing.T) {
+	src := []byte(`package x
+
+// Real is the in-process adapter.
+// Concurrency: safe for reads.
+type Real struct {
+	v int
+}
+
+// Serve runs the loop until ctx is done.
+func (r *Real) Serve() error {
+	return nil
+}
+`)
+	p := New()
+	spans, err := p.Parse("x.go", src)
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	byName := map[string]struct {
+		start int
+		text  string
+	}{}
+	for _, s := range spans {
+		byName[s.Name] = struct {
+			start int
+			text  string
+		}{s.StartLine, s.Text}
+	}
+
+	real, ok := byName["Real"]
+	if !ok {
+		t.Fatalf("no Real span: %+v", spans)
+	}
+	if real.start != 3 {
+		t.Errorf("Real span start = %d, want 3 (doc comment line)", real.start)
+	}
+	if !strings.Contains(real.text, "Concurrency: safe for reads") {
+		t.Errorf("Real span text missing doc comment: %q", real.text)
+	}
+
+	serve, ok := byName["Real.Serve"]
+	if !ok {
+		t.Fatalf("no Real.Serve span: %+v", spans)
+	}
+	if serve.start != 9 {
+		t.Errorf("Serve span start = %d, want 9 (doc comment line)", serve.start)
+	}
+	if !strings.Contains(serve.text, "runs the loop until ctx is done") {
+		t.Errorf("Serve span text missing doc comment: %q", serve.text)
+	}
+}
