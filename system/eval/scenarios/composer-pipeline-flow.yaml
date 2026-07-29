@@ -13,8 +13,10 @@ match_mode: overlap
 runs: 5
 expected_citations:
   - file: internal/system/composer/composer.go
-    start_line: 135
-    end_line: 202       # (*Composer).Compose
+    start_line: 134
+    end_line: 260       # Compose entry family + pipeline body (re-anchored 2026-07-29)
+    anchor: "func (c *Composer) Compose("
   - file: internal/system/composer/composer.go
-    start_line: 207
-    end_line: 275       # assemblePack
+    start_line: 348
+    end_line: 420       # assemblePack (re-anchored 2026-07-29)
+    anchor: "func assemblePack("

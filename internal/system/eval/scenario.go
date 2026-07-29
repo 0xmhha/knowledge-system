@@ -40,8 +40,16 @@ type Scenario struct {
 	Prompt            string
 	Intent            contract.Intent
 	ExpectedCitations []contract.Citation
-	MatchMode         MatchMode
-	Runs              int
+	// Anchors runs parallel to ExpectedCitations: an optional substring
+	// that must occur INSIDE the citation's line span in the source tree.
+	// Guards against expected-span drift — the chronic failure where code
+	// moves and a scenario silently scores 0 against stale line numbers
+	// (see docs/dev/2026-07-28-dogfood-zero-recall-diagnosis.md, three
+	// separate re-anchoring rounds). Verified by VerifyAnchors when the
+	// runner is given a source root; empty string = no anchor declared.
+	Anchors   []string
+	MatchMode MatchMode
+	Runs      int
 }
 
 // scenarioWire is the YAML-tagged wire mirror. We don't tag
@@ -64,6 +72,10 @@ type scenarioCitationWire struct {
 	StartLine  int    `yaml:"start_line"`
 	EndLine    int    `yaml:"end_line"`
 	CommitHash string `yaml:"commit_hash,omitempty"`
+	// Anchor is a substring that must appear within [start_line, end_line]
+	// of File — typically the symbol declaration the span is about
+	// (e.g. "func Register("). See Scenario.Anchors.
+	Anchor string `yaml:"anchor,omitempty"`
 }
 
 // ParseScenario loads YAML bytes into a validated Scenario, applying
@@ -86,6 +98,7 @@ func ParseScenario(data []byte) (*Scenario, error) {
 	}
 	if len(w.ExpectedCitations) > 0 {
 		s.ExpectedCitations = make([]contract.Citation, len(w.ExpectedCitations))
+		s.Anchors = make([]string, len(w.ExpectedCitations))
 		for i, c := range w.ExpectedCitations {
 			s.ExpectedCitations[i] = contract.Citation{
 				File:       c.File,
@@ -93,6 +106,7 @@ func ParseScenario(data []byte) (*Scenario, error) {
 				EndLine:    c.EndLine,
 				CommitHash: c.CommitHash,
 			}
+			s.Anchors[i] = c.Anchor
 		}
 	}
 	applyDefaults(s)

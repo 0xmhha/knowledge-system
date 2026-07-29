@@ -12,11 +12,14 @@ match_mode: overlap
 runs: 5
 expected_citations:
   - file: internal/system/mcp/server.go
-    start_line: 60
-    end_line: 78        # Register
+    start_line: 100
+    end_line: 143       # Register (re-anchored 2026-07-29)
+    anchor: "func Register("
   - file: internal/system/mcp/get_for_task.go
-    start_line: 21
-    end_line: 43        # handleGetForTask
+    start_line: 13
+    end_line: 60        # handleGetForTask (re-anchored 2026-07-29)
+    anchor: "func handleGetForTask("
   - file: internal/system/mcp/health.go
-    start_line: 38
-    end_line: 82        # handleHealth
+    start_line: 63
+    end_line: 125       # handleHealth (re-anchored 2026-07-29)
+    anchor: "func handleHealth("

@@ -46,6 +46,7 @@ func main() {
 	mcpBinary := flag.String("cks-mcp", "", "path to cks-mcp binary (empty = look up cks-mcp on $PATH)")
 	mcpConfig := flag.String("config", "", "path to cks.yaml forwarded to cks-mcp")
 	output := flag.String("output", "", "write report to this file (empty = stdout)")
+	verifyAnchors := flag.String("verify-anchors", "", "source root for anchor verification: fail before running when any scenario's expected span no longer contains its declared anchor (guards against line drift)")
 	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
 
@@ -61,19 +62,39 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	if err := run(ctx, *scenarios, *mcpBinary, *mcpConfig, *output); err != nil {
+	if err := run(ctx, *scenarios, *mcpBinary, *mcpConfig, *output, *verifyAnchors); err != nil {
 		log.Printf("cks-eval: %v", err)
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath string) error {
+func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, anchorRoot string) error {
 	paths, err := collectScenarioPaths(scenariosPath)
 	if err != nil {
 		return fmt.Errorf("collect scenarios: %w", err)
 	}
 	if len(paths) == 0 {
 		return fmt.Errorf("no scenarios found at %q", scenariosPath)
+	}
+
+	// Anchor verification runs BEFORE any MCP work: a drifted scenario is
+	// a measurement bug, not a retrieval result, so fail fast with every
+	// violation listed rather than emitting misleading zeros.
+	if anchorRoot != "" {
+		var violations []error
+		for _, p := range paths {
+			s, err := eval.LoadScenario(p)
+			if err != nil {
+				return fmt.Errorf("load %q: %w", p, err)
+			}
+			violations = append(violations, s.VerifyAnchors(anchorRoot)...)
+		}
+		if len(violations) > 0 {
+			for _, v := range violations {
+				log.Printf("cks-eval: anchor drift: %v", v)
+			}
+			return fmt.Errorf("%d anchor violation(s) — re-anchor the scenarios before measuring", len(violations))
+		}
 	}
 
 	runner, err := eval.NewRunner(ctx, eval.RunnerOpts{
