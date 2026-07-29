@@ -43,6 +43,8 @@ check cmd/vector       "graph|system"
 check cmd/vector-mcp   "graph|system"
 check cmd/system       "graph|vector"
 check cmd/system-mcp   "graph|vector"
+# filelist-gen is engine-free by design (R8): go list/git subprocesses only.
+check cmd/filelist-gen "graph|vector|system"
 
 # Engines and shared code must not hardcode a specific project pack in
 # string literals — pack data reaches the engines through flags/config only.
