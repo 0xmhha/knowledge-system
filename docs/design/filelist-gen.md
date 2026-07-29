@@ -1,9 +1,12 @@
 # filelist-gen — derived build-scope file lists for knowledge indexing
 
-Status: DESIGN v2 (2026-07-29) — review round 1 applied (build-context
+Status: IMPLEMENTED (2026-07-29) — v2 design (review round 1: build-context
 pinning, source-state discipline, scope-transition semantics, check
-semantics, integration keys). Implementation follows on this branch.
-Tier 2 design doc.
+semantics, integration keys) implemented as `cmd/filelist-gen` with the
+setup-pipeline `filelist:` key. §9 decisions confirmed: build_roots =
+`./cmd/gstable` + `./cmd/genesis_generator`; build_context =
+linux/amd64/cgo-on/no-tags. Spot-check vs go-stablenet `0bf2f4d1b`: see
+§8.1. Tier 2 design doc.
 
 ## 1. Problem
 
@@ -323,6 +326,9 @@ config now states explicitly.
 1. `cmd/filelist-gen` (+ unit tests, fixture module under its testdata).
 2. `projects/stablenet/filelist.yaml` (§4.2 values) + pack README row.
 3. Sweep references to `gen-filelist.sh`, then delete it (superseded).
+   [Already satisfied: the script was deleted earlier by the safety-net
+   restore (#33); the sweep found no live references — only historical
+   session records, left as-is.]
 4. New domain entry `A4.system_contracts.build_deploy_pipeline` (validate
    anchor forms first — M3) + `entry-verify` promotion + inventory refresh.
 5. Boundary script: add `cmd/filelist-gen` (forbid all engine internals).
@@ -330,6 +336,30 @@ config now states explicitly.
 7. Downstream sync PR after upstream merge; corpus regen + reindex ride the
    next propagation pass; first derived-scope dataset starts the new
    lineage per §5.
+
+### 8.1 Implementation spot-check (2026-07-29, go-stablenet @ `0bf2f4d1b`)
+
+Derivation with the confirmed pack config: **1,044 files** (build 671,
+tests 322, extra_packages 29, extra_globs 22; roots: `./cmd/gstable` 989 +
+`./cmd/genesis_generator` 4). Reconciliation against the historical curated
+list (segment-boundary glob resolution, 1,016 go + 22 sol):
+
+- **shared core = 989 go files** — exactly the §3 parity measurement;
+- **+33 designed additions**: `systemcontracts/test` (25),
+  `systemcontracts/compile` (4), `cmd/genesis_generator` (4) — R3/R4;
+- **−27 build-constraint variants** dropped by the linux/amd64/cgo-on pin
+  (windows/bsd/darwin files, `*_nocgo`, js/wasm stubs, and two
+  `integrationtests`-tagged `cmd/gstable` test files) — the R9 caveat
+  materialized; the curated globs were platform-neutral, the derived scope
+  is the shipped build's;
+- `.sol` set identical (22).
+
+Known scope choice surfaced by the check: **test-helper packages imported
+only by tests** (e.g. `consensus/wbft/testutils`, `internal/testlog`,
+`tests/`) are outside `go list -deps` (which does not follow test imports)
+and are not in the derived scope. They were also outside the historical
+988-file core, so this is parity, not regression; individual helpers can be
+opted in via `extra_packages` if retrieval gaps show up.
 
 ## 9. Non-goals / open items
 
