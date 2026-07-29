@@ -106,9 +106,15 @@ func (a *aggregator) addBM25List(keyword string, hits []contract.Hit) {
 // addSymbolList credits every citation in a ranked FindSymbol result
 // list. rank is 1-based by list position. Empty lists are a no-op.
 func (a *aggregator) addSymbolList(keyword string, cits []contract.Citation) {
+	a.addSymbolListWeighted(keyword, cits, a.symbolWeight)
+}
+
+// addSymbolListWeighted is addSymbolList with an explicit RRF weight —
+// used for the prompt-verbatim boost (see DefaultPromptExactBoost).
+func (a *aggregator) addSymbolListWeighted(keyword string, cits []contract.Citation, weight float64) {
 	for i, c := range cits {
 		rank := i + 1
-		contribution := a.symbolWeight / float64(a.rrfK+rank)
+		contribution := weight / float64(a.rrfK+rank)
 		sc := a.entry(c)
 		sc.Score += contribution
 		sc.Sources = append(sc.Sources,

@@ -149,3 +149,24 @@ func TestResults_DemotesHeaderChunksForCodeIntents(t *testing.T) {
 		t.Errorf("without demotion scores should tie: %v vs %v", off[0].Score, off[1].Score)
 	}
 }
+
+func TestPromptMentionsVerbatim(t *testing.T) {
+	t.Parallel()
+	prompt := "EnableBM25Rerank query option that fuses BM25 with vector ranks"
+	cases := []struct {
+		kw   string
+		want bool
+	}{
+		{"EnableBM25Rerank", true},
+		{"BM25", true},
+		{"vector", true},
+		{"enableBM25Rerank", false}, // case-sensitive: derived camel variant
+		{"Rerank", false},           // substring inside an identifier, not standalone
+		{"rank", false},
+	}
+	for _, c := range cases {
+		if got := promptMentionsVerbatim(prompt, c.kw); got != c.want {
+			t.Errorf("promptMentionsVerbatim(%q) = %v, want %v", c.kw, got, c.want)
+		}
+	}
+}

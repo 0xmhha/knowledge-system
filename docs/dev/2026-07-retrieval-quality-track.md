@@ -67,6 +67,13 @@ ckgalign(#48 tier 2b), matchQname(#52), pack source-anchor(#52). 교훈:
 
 ## 열린 백로그
 
+(#57에서 해소: 필드-수준 조회 갭 — kind 어휘 교정("type"/"const"는 실존하지
+않는 노드 타입이라 죽은 필터였음) + value kinds(field/constant/variable)
+추가 + **프롬프트-원문·무모호 게이트 부스트**(SymbolWeight×2.0, 결과 1건일
+때만). 15-스위트: recall 0.844→**0.911**, MRR 0.488 유지.
+bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유해
+실측 — 게이트가 본질.)
+
 1. **SymbolWeight 스윕** — mcp-tool-handlers(마지막 R 0.67)의 확정 원인:
    FindSymbol 정확 매칭(Register)의 RRF 기여(1.5/(60+r)≈0.025)가 ckv 상위
    기여(5.0/(60+r)≈0.08)에 밀려 최종 컷 탈락. **선행**: 정확-심볼 질의
