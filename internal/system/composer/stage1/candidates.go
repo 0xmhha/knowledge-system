@@ -73,6 +73,18 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 		add(c)
 	}
 
+	// Morphological candidates: prompts name symbols by their noun form
+	// ("tool registration", "input validation") while the code declares
+	// the verb ("Register", "Validate"). Neither BM25 (ckg's FTS does not
+	// stem) nor FindSymbol (exact/simple-name equality) bridges that gap,
+	// so derive verb-form candidates from common derivational suffixes.
+	// Wrong derivations ("registrate") are zero-scored by the rerank and
+	// dropped, same as compound over-generation; the case-fold dedup
+	// keeps the Pascal/camel pair from double-charging the cap.
+	for _, m := range morphCandidates(promptIDs) {
+		add(m)
+	}
+
 	for _, id := range promptIDs {
 		add(id)
 	}
@@ -98,6 +110,45 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 	}
 
 	_ = intent // see doc: Stage 1 is intent-agnostic by design
+	return out
+}
+
+// morphSuffixes maps derivational noun suffixes to their verb-stem
+// replacements, ordered longest-first so "istration" wins over "ation".
+// Curated from the noun forms code prompts actually use; each entry
+// reconstructs the verb Go code declares:
+//
+//	registration → register     (istration → ister)
+//	initialization → initialize (ization → ize)
+//	verification → verify       (ification → ify)
+//	configuration → configure   (uration → ure)
+//	validation → validate       (ation → ate)
+var morphSuffixes = []struct{ suffix, repl string }{
+	{"istration", "ister"},
+	{"ization", "ize"},
+	{"ification", "ify"},
+	{"uration", "ure"},
+	{"ation", "ate"},
+}
+
+// morphCandidates derives verb-form identifier candidates from noun-form
+// prompt tokens via morphSuffixes. Each derivation is emitted in both
+// PascalCase and camelCase (Go's exported/unexported split — the prompt
+// doesn't say which the target is; the rerank's case-fold dedup keeps
+// the pair to one cap slot). Tokens that match no suffix produce nothing.
+func morphCandidates(ids []string) []string {
+	var out []string
+	for _, id := range ids {
+		lower := strings.ToLower(id)
+		for _, m := range morphSuffixes {
+			if !strings.HasSuffix(lower, m.suffix) || len(lower) <= len(m.suffix)+2 {
+				continue
+			}
+			stem := lower[:len(lower)-len(m.suffix)] + m.repl
+			out = append(out, strings.ToUpper(stem[:1])+stem[1:], stem)
+			break // longest-first order: first hit is the best rule
+		}
+	}
 	return out
 }
 

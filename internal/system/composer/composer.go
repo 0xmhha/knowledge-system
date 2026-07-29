@@ -407,10 +407,28 @@ func assemblePack(
 	for _, c := range s4Out.Skipped {
 		skippedKeys[c.Key()] = struct{}{}
 	}
+	// Span-overlap anchor index: a neighbor's Edge.Source carries the ckg
+	// NODE span while the pack's citations carry ckv CHUNK spans, and the
+	// two never share an exact Key since chunks start at the doc comment
+	// (2026-07-29) — the old exact-Key gate silently dropped EVERY
+	// neighbor (stage3 collected 50, the pack shipped 0). Anchor an edge
+	// when any same-file citation overlaps its source span instead.
+	spansByFile := make(map[string][][2]int, len(citations))
+	for _, c := range citations {
+		spansByFile[c.File] = append(spansByFile[c.File], [2]int{c.StartLine, c.EndLine})
+	}
+	anchored := func(src contract.Citation) bool {
+		for _, sp := range spansByFile[src.File] {
+			if src.StartLine <= sp[1] && sp[0] <= src.EndLine {
+				return true
+			}
+		}
+		return false
+	}
 	validNeighbors := make([]contract.Neighbor, 0, len(s3Out.Neighbors))
 	edgeOnlyAdded := 0
 	for _, sn := range s3Out.Neighbors {
-		if _, ok := citationKeys[sn.Edge.Source.Key()]; !ok {
+		if !anchored(sn.Edge.Source) {
 			// Source seed lost its body slot — skip; an edge with no
 			// body-backed anchor gives the LLM nothing to attach it to.
 			continue

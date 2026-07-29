@@ -896,15 +896,58 @@ func nodeToCitation(n types.Node, commit string) contract.Citation {
 // citation's line range. Exact start+end match wins; otherwise the
 // first candidate fully containing the citation's range is used.
 func matchQname(cands []types.Node, src contract.Citation) string {
+	// Pseudo nodes (file:/hunk:/import: qnames) span whole files, so any
+	// containment tier below would swallow every citation and resolve it
+	// to a node with no call/implements edges — observed as stage3
+	// expanding 10 seeds into ZERO neighbors with zero errors. Same
+	// exclusion ckgalign applies at load time.
+	real := cands[:0:0]
 	for _, n := range cands {
+		q := n.QualifiedName
+		if strings.HasPrefix(q, "file:") || strings.HasPrefix(q, "hunk:") || strings.HasPrefix(q, "import:") {
+			continue
+		}
+		real = append(real, n)
+	}
+
+	// 1. Exact span.
+	for _, n := range real {
 		if n.StartLine == src.StartLine && n.EndLine == src.EndLine {
 			return n.QualifiedName
 		}
 	}
-	for _, n := range cands {
-		if n.StartLine <= src.StartLine && n.EndLine >= src.EndLine {
-			return n.QualifiedName
+	// 2. Citation contains node — ckv chunks start at the DOC COMMENT
+	// since 2026-07-29 while ckg nodes start at the declaration, so the
+	// chunk range strictly contains its own node. Prefer the node
+	// closest to the chunk start (the declaration right under the doc),
+	// then the largest range so a method body chunk resolves to the
+	// method, not a one-line local. Mirrors ckgalign's tier 2b.
+	bestIdx, bestDist, bestSize := -1, -1, -1
+	for i, n := range real {
+		if src.StartLine <= n.StartLine && n.EndLine <= src.EndLine {
+			dist := n.StartLine - src.StartLine
+			size := n.EndLine - n.StartLine
+			if bestIdx == -1 || dist < bestDist || (dist == bestDist && size > bestSize) {
+				bestIdx, bestDist, bestSize = i, dist, size
+			}
 		}
+	}
+	if bestIdx != -1 {
+		return real[bestIdx].QualifiedName
+	}
+	// 3. Node contains citation — smallest containing range, so an inner
+	// symbol beats an enclosing type (first-found order was arbitrary).
+	bestIdx, bestSize = -1, -1
+	for i, n := range real {
+		if n.StartLine <= src.StartLine && n.EndLine >= src.EndLine {
+			size := n.EndLine - n.StartLine
+			if bestIdx == -1 || size < bestSize {
+				bestIdx, bestSize = i, size
+			}
+		}
+	}
+	if bestIdx != -1 {
+		return real[bestIdx].QualifiedName
 	}
 	return ""
 }

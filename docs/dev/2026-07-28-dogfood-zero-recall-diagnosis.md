@@ -206,3 +206,28 @@ cd system && ./bin/cks-eval -scenarios eval/scenarios \
 직접 질의 스크립트(stdio JSON-RPC, structuredContent 파싱)는 세션
 스크래치에서 사용 — 요지: initialize → `cks.context.get_for_task`
 `{"prompt": ...}` → `structuredContent.citations[].{file,start_line,end_line}`.
+
+## graph_neighbors 기능 복구 + 형태소 후보 (2026-07-29, 후속 R12)
+
+잔여 2개 레버(Register 형태소, assemblePack 승격)를 파던 중 **더 큰 침묵
+고장**을 발견: doc-시프트 스팬(R8)이 좌표 정확-일치에 의존하던 두 지점을
+조용히 죽여 놓았다 —
+
+1. **`matchQname`(Neighbors 시드 해석)**: exact-스팬 실패 후 "노드가 청크
+   포함" tier가 **file: 의사노드**(전체 파일 스팬)에 걸려 모든 시드가
+   무-엣지 노드로 해석 → stage3가 10시드에서 이웃 0(에러 0). 수정: 의사노드
+   제외 + "청크가 노드 포함"(시작-근접 우선) tier 신설 + 포함-tier
+   최소범위화 — ckgalign tier 2b의 미러. **stage3 이웃 0 → 50 회복.**
+2. **pack 조립의 source-anchor 게이트**: 이웃 Edge.Source(ckg 노드 스팬)와
+   인용(ckv 청크 스팬)의 Key 정확-일치 요구 → 50개 전원 탈락, pack
+   graph_neighbors 0. 수정: 동일-파일 스팬 겹침 앵커. **pack 이웃 0 → 18.**
+3. **형태소 후보**(`morphCandidates`): 명사형 프롬프트 어휘→선언 동사형
+   (registration→Register — istration→ister 등 5규칙; 오생성은 rerank
+   zero-score가 제거). 실증: mcp 프롬프트 캡에 `Register` 진입.
+
+dogfood 지표는 불변(0.422/0.907) — graph_neighbors는 시나리오 채점 대상이
+아니고, Register는 FindSymbol RRF 기여(≈0.025)가 ckv 상위 기여에 밀려 최종
+컷 밖, assemblePack은 stage3의 calls 수집이 1개뿐인 이상 신호로 미도달.
+**후속 기록**: ① SymbolWeight 재조정은 MRR 근거 축적 후, ② arch_explain
+calls 수집 희소(1/50) 원인 — hops/방향/시드스코어 지배(imports·defines가
+슬롯 선점) 분석.
