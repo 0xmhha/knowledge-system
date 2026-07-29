@@ -858,3 +858,39 @@ func TestResolveByCanonicalIDAndAmbiguity(t *testing.T) {
 		}
 	})
 }
+
+// TestMatchQname_DocShiftedAndPseudo pins the 2026-07-29 resolution fix:
+// ckv chunks start at the doc comment while ckg nodes start at the
+// declaration, so exact-span matching missed and the old containment
+// tier resolved EVERY citation to the whole-file pseudo node — stage3
+// then expanded 10 seeds into zero neighbors with zero errors.
+func TestMatchQname_DocShiftedAndPseudo(t *testing.T) {
+	cands := []types.Node{
+		{QualifiedName: "file:pkg/a.go", StartLine: 1, EndLine: 500},
+		{QualifiedName: "pkg.Composer", StartLine: 60, EndLine: 70},
+		{QualifiedName: "pkg.Compose", StartLine: 167, EndLine: 271},
+		{QualifiedName: "pkg.helper", StartLine: 275, EndLine: 280},
+	}
+	cit := func(s, e int) contract.Citation {
+		return contract.Citation{File: "pkg/a.go", StartLine: s, EndLine: e}
+	}
+
+	// Doc-shifted chunk [160, 271] contains pkg.Compose (167-271):
+	// citation-contains-node must win over the file pseudo node.
+	if got := matchQname(cands, cit(160, 271)); got != "pkg.Compose" {
+		t.Errorf("doc-shifted = %q, want pkg.Compose", got)
+	}
+	// Exact span still wins outright.
+	if got := matchQname(cands, cit(60, 70)); got != "pkg.Composer" {
+		t.Errorf("exact = %q, want pkg.Composer", got)
+	}
+	// Node-contains-citation picks the SMALLEST real container, not the
+	// pseudo file node and not first-found order.
+	if got := matchQname(cands, cit(277, 278)); got != "pkg.helper" {
+		t.Errorf("contained = %q, want pkg.helper", got)
+	}
+	// Nothing but the pseudo node → no resolution (better none than file:).
+	if got := matchQname(cands, cit(400, 410)); got != "" {
+		t.Errorf("pseudo-only = %q, want empty", got)
+	}
+}
