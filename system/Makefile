@@ -272,6 +272,7 @@ dogfood-eval: $(DOGFOOD_DEPS)
 	@mkdir -p $$(dirname $(EVAL_REPORT))
 	./$(BIN_DIR)/cks-eval \
 		-scenarios $(EVAL_SCENARIOS) \
+		-verify-anchors .. \
 		-cks-mcp ./$(BIN_DIR)/cks-mcp \
 		-config $(DOGFOOD_CONFIG) \
 		-output $(EVAL_REPORT)

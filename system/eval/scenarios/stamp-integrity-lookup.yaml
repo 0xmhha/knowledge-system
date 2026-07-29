@@ -12,11 +12,14 @@ match_mode: overlap
 runs: 5
 expected_citations:
   - file: pkg/system/contract/pack.go
-    start_line: 252
-    end_line: 261       # ComputeIntegrityHash
+    start_line: 258
+    end_line: 275       # ComputeIntegrityHash (re-anchored 2026-07-29)
+    anchor: "func ComputeIntegrityHash("
   - file: pkg/system/contract/pack.go
-    start_line: 266
-    end_line: 277       # StampIntegrity
+    start_line: 277
+    end_line: 292       # StampIntegrity (re-anchored 2026-07-29)
+    anchor: "func StampIntegrity("
   - file: pkg/system/contract/pack.go
-    start_line: 283
-    end_line: 299       # VerifyIntegrity
+    start_line: 294
+    end_line: 312       # VerifyIntegrity (re-anchored 2026-07-29)
+    anchor: "func VerifyIntegrity("

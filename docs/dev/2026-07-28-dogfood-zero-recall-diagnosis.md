@@ -139,7 +139,25 @@ BM25를 세워 RRF 융합)가 stage1 경로에서 꺼져 있었다. `ckvclient.S
 식별자를 상시 포함 — "ErrFailClosed", "BM25Search").
 
 **재측정(동일 인덱스, 쿼리타임 변경만): avg MRR 0.497 → 0.525, recall
-0.926 유지**. composer-pipeline-flow MRR 0.20→**1.00**(R8 재임베딩 순서
+0.926 유지**.
+
+## anchor 가드 + 정직 재앵커링 (2026-07-29, 후속 R10)
+
+스팬 드리프트가 세 라운드째 재발(이번엔 mcp-tool-handlers의 Register
+60-78→실제 104, test-add의 테스트 3종 ~32줄 시프트)해 **구조적 가드**를
+도입: expected citation에 선택적 `anchor`(스팬 안에 존재해야 하는 심볼
+문자열) + `cks-eval -verify-anchors <root>`(위반 시 측정 전 fail-loud).
+dogfood Makefile에 상시 배선, 9개 시나리오 15개 인용 전부에 anchor 부여.
+
+**정직 재앵커링의 효과 — 측정 교정(검색 무변경)**:
+- test-add R 0.67→**1.00**, stamp-integrity MRR 0.46→0.53 (진짜 개선)
+- composer-err-fail-closed R 1.00→0.50, pipeline-flow R 1.00→0.50 — 기존
+  1.00이 **stale 스팬의 우연 겹침 인플레이션**이었음이 드러남. 정직한
+  스팬(fail_closed wrap 249-254, assemblePack 348-420)은 실제로 인용되지
+  않는다 → **대형 함수 내부 영역의 function_split 청크 인용 커버리지**가
+  다음 진짜 신호.
+- 정직 집계: **avg MRR 0.461, avg recall 0.852** — 이후 비교의 새 기준선.
+  (표면상 하락은 인플레이션 제거분; anchor 가드가 재발을 차단한다.) composer-pipeline-flow MRR 0.20→**1.00**(R8 재임베딩 순서
 요동의 안정화 — 의도한 효과), mcp-tool-handlers 0.15→0.22. 하락 2건
 (bug-fix 1.00→0.50, stamp-integrity 0.58→0.46)은 rank 1→2 수준 재배열 —
 순효과 양.

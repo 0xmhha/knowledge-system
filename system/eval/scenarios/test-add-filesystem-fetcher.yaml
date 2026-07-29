@@ -14,10 +14,13 @@ runs: 5
 expected_citations:
   - file: internal/system/composer/budget/filesystem_test.go
     start_line: 25
-    end_line: 42        # TestFilesystemFetcher_ReturnsCitedLineRange
+    end_line: 45        # TestFilesystemFetcher_ReturnsCitedLineRange (re-anchored 2026-07-29)
+    anchor: "func TestFilesystemFetcher_ReturnsCitedLineRange("
   - file: internal/system/composer/budget/filesystem_test.go
-    start_line: 76
-    end_line: 107       # TestFilesystemFetcher_OutOfRangeReturnsEmpty
+    start_line: 108
+    end_line: 138       # TestFilesystemFetcher_OutOfRangeReturnsEmpty (re-anchored 2026-07-29)
+    anchor: "func TestFilesystemFetcher_OutOfRangeReturnsEmpty("
   - file: internal/system/composer/budget/filesystem_test.go
-    start_line: 126
-    end_line: 149       # TestFilesystemFetcher_RejectsPathEscape
+    start_line: 158
+    end_line: 181       # TestFilesystemFetcher_RejectsPathEscape (re-anchored 2026-07-29)
+    anchor: "func TestFilesystemFetcher_RejectsPathEscape("
