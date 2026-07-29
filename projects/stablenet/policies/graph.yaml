@@ -146,8 +146,46 @@ policies:
         still fires; missing one creates a route by which a blacklisted
         account can move value.
       governs:
-        - core.StateTransition.TransitionDb
         - vm.EVM.Call
+    - id: A11.txpool.type_taxonomy_admission
+      name: Transaction type taxonomy and txpool admission fork gates
+      category: A11
+      description: |
+        StableNet inherits geth's typed-transaction envelope and adds one
+        proprietary type. The full taxonomy (core/types/transaction.go) is:
+        LegacyTxType 0x00, AccessListTxType 0x01, DynamicFeeTxType 0x02,
+        BlobTxType 0x03, SetCodeTxType 0x04, and StableNet's
+        FeeDelegateDynamicFeeTxType 0x16 (decimal 22) for fee-delegated txs.
+
+        Pool admission runs through txpool.ValidateTransaction (core/txpool/
+        validation.go). After a per-pool capability check (opts.Accept bitmask)
+        and a size check, each non-legacy type is gated behind a fork
+        activation, in this source order: any non-legacy type requires Berlin;
+        DynamicFee additionally requires London; FeeDelegateDynamicFee requires
+        Applepie (StableNet's fee-delegation fork); Blob requires Cancun;
+        SetCode requires Anzeon (checked via AnzeonEnabled(), a global enable
+        rather than a block-number gate). A type whose fork is not yet active
+        is rejected with core.ErrTxTypeNotSupported before any signature or
+        state work.
+
+        After the common gas/fee/sender checks, fee-delegated txs get an extra
+        admission gate: types.RecoverFeePayer(chainID, tx) requires a declared
+        FeePayer (else types.ErrFeePayerNotSet), recovers the fee-payer signer
+        via FeePayer(NewFeeDelegateSigner(chainID), tx), and rejects with
+        types.ErrInvalidFeePayer when recovery fails or the recovered address
+        does not equal the declared FeePayer. This is
+        the stateless half; the stateful fee-payer balance check lives later in
+        ValidateTransactionWithState (ErrFeePayerInsufficientFunds).
+      governs:
+        - params.ChainConfig.AnzeonEnabled
+        - params.ChainConfig.IsApplepie
+        - txpool.ValidateTransaction
+        - types.ErrInvalidFeePayer
+        - types.FeeDelegateDynamicFeeTx
+        - types.FeeDelegateDynamicFeeTx.txType
+        - types.FeePayer
+        - types.LegacyTxType
+        - types.SetCodeTx.txType
     - id: A12.seals.bls_seal_scheme
       name: WBFT BLS seal scheme — 96-byte aggregate + SealerSet bitpack
       category: A12
@@ -237,7 +275,7 @@ policies:
         finalization, because StableNet's economic model treats validators
         as the operational counterparty rather than burning the native
         stablecoin (WKRC) supply away. The redistribution happens in the WBFT
-        engine's Finalize path: consensus/wbft/backend/engine.go:174
+        engine's Finalize path: consensus/wbft/backend/engine.go:180
         Backend.Finalize delegates to the underlying Engine().Finalize(),
         which performs the per-validator base-fee crediting (see also A3
         validator-set + A6 fee-delegation for the tip path).
@@ -274,8 +312,6 @@ policies:
         spots. Any new logic that is StableNet-specific must live in a
         StableNet-owned file; only minimal hook points (interface
         satisfaction, dispatch glue) belong in geth files.
-      governs:
-        - docs.StableNet 고유 코드 식별
     - id: A14.foundations.equal_power
       name: Equal-power validators — every validator has voting power = 1
       category: A14
@@ -530,10 +566,76 @@ policies:
         epoch's set in parallel so cross-epoch block verification can match
         signers against the correct validator set.
       governs:
-        - backend.Backend.GetValidators
         - backend.Backend.GetValidatorsForVerifying
-        - params.WBFTConfig.Epoch
+        - engine.Engine.GetValidators
+        - params.WBFTConfig.EpochLength
         - types.EpochInfo
+    - id: A3.validator_set.set_construction
+      name: WBFT validator set construction and proposer selection
+      category: A3
+      description: |
+        An in-memory WBFT validator set is built by the validator package:
+        New(addr, blsKey) wraps one validator (defaultValidator) and
+        NewSet(addrs, blsKeys, policy) / NewSetByValidators(validators, policy)
+        build a defaultSet. newDefaultSet seeds the set's validators slice in
+        the order the caller supplied — there is no internal sort — and picks
+        the proposer selector based on policy.Id: roundRobinProposer for the
+        RoundRobin policy (advances by seed = lastProposerIndex + round + 1)
+        and stickyProposer for the Sticky policy (same seed minus the +1, so
+        the proposer stays put across rounds with the same lastProposer).
+        defaultSet protects mutations of validators with validatorMu (RWMutex);
+        CalcProposer recomputes the active proposer via the selected selector,
+        and QuorumSize returns ceil(N - (N-1)/3) — the WBFT 2N/3 quorum over
+        equal-power validators. The deterministic order that callers feed in
+        is the ordering that all selectors then index into.
+      governs:
+        - validator.NewSet
+        - validator.NewSetByValidators
+        - validator.defaultSet.CalcProposer
+        - validator.defaultSet.QuorumSize
+        - validator.newDefaultSet
+        - validator.roundRobinProposer
+        - validator.stickyProposer
+    - id: A4.gov_minter.mint_proposal_allowance
+      name: Coin mint proposals, MintProof, and minter allowance management (GovMinter + GovMasterMinter)
+      category: A4
+      description: |
+        Native-coin issuance is gated by two contracts: GovMasterMinter (0x1002) holds
+        the registry of authorised minters and the per-minter maxMinterAllowance ceiling;
+        GovMinter (0x1003) holds per-proposal reservations and the off-chain deposit proof.
+        MintProof carries the (beneficiary, amount, timestamp, depositId, bankReference,
+        memo) tuple bridging an off-chain deposit to an on-chain mint; GovMinter tracks
+        usedProofHashes (replay protection), reservedMintAmount (running ceiling) and
+        mintProposalAmounts (per-proposal reservation read back by GetMintProposalAmount).
+        GovMasterMinter tracks fiatToken, maxMinterAllowance (default DefaultMaxMinterAllowance
+        = 10B * 10^18), the isMinter mapping and the minterList; IsMinter, GetMinterCount,
+        GetMinterAt and GetMaxMinterAllowance expose those slots. Per-minter remaining
+        allowance is held on FiatToken, not GovMasterMinter.
+      governs:
+        - systemcontracts.GetMaxMinterAllowance
+        - systemcontracts.GetMintProposalAmount
+        - systemcontracts.IsMinter
+        - systemcontracts.MintProof
+        - systemcontracts.initializeMasterMinter
+    - id: A4.gov_validator.genesis_initialization
+      name: GovValidator genesis initialization (initializeValidator)
+      category: A4
+      description: |
+        initializeValidator is the Go-side seeder that writes the GovValidator
+        (0x1001) contract storage at genesis from systemContracts.govValidator.params.
+        It runs initializeBase to seed inherited GovBase fields, writes the blsPoP
+        precompile address and the gasTip (supplied value or params.InitialGasTip),
+        then — when the validators/blsPublicKeys params are supplied — cross-validates
+        len(members) == len(validators) == len(blsPublicKeys) and walks the validator
+        list, emitting StateParam writes for the __validators EnumerableSet (length +
+        array element + index mapping), the validatorToOperator / operatorToValidator
+        inverse mappings, the validatorToBlsKey bytes mapping, and the
+        blsKeyToValidator mapping keyed by raw BLS bytes. Duplicate addresses are
+        skipped; the length write fires only if at least one validator was seeded.
+      governs:
+        - systemcontracts.CalculateMappingSlot
+        - systemcontracts.MakeMultipleParam
+        - systemcontracts.initializeValidator
     - id: A4.system_contracts.addresses
       name: System contract canonical addresses (Anzeon)
       category: A4
@@ -553,6 +655,35 @@ policies:
         - params.DefaultGovValidatorAddress
         - params.DefaultNativeCoinAdapterAddress
         - params.NativeCoinManagerAddress
+    - id: A4.system_contracts.build_deploy_pipeline
+      name: 'System contract lifecycle: Solidity source to genesis state and e2e tests'
+      category: A4
+      description: |
+        System contracts travel a five-stage pipeline. (1) Solidity sources live
+        under systemcontracts/solidity/ (v1/, v2/, plus abstracts/, interfaces/,
+        libraries/, openzeppelin/ shared code and test/ contracts). (2) The Go
+        tool systemcontracts/compile invokes pinned solc 0.8.14 on them.
+        (3) Compiled bytecode lands in systemcontracts/artifacts/{v1,v2}/ as
+        hex-encoded files — codegen output, never hand-edited. (4) Native Go
+        loads the artifacts at process start: go:embed directives in
+        contracts.go populate SystemContractCodes; at genesis,
+        core.InjectContracts -> GetSystemContractsTransition turns them into
+        CodeParam/state entries so the chain database is initialized with the
+        contracts' code and storage. (5) systemcontracts/test/ exercises the
+        whole chain end to end (native + governance flows against a simulated
+        backend). Consequence for indexing/search: the shipped binary depends on
+        .sol sources through the embedded artifacts even though `go list` never
+        sees them — a build-graph-only view misses stages 1-3 and 5
+        (systemcontracts/test is outside the dependency graph, and the compile
+        tool is its own main). The knowledge dataset scope therefore adds them
+        explicitly (projects/stablenet/filelist.yaml: extra_packages
+        systemcontracts/test + systemcontracts/compile/..., extra_globs
+        systemcontracts/**/*.sol).
+      governs:
+        - compiler.solcVersion
+        - core.InjectContracts
+        - systemcontracts.GetSystemContractsTransition
+        - systemcontracts.SystemContractCodes
     - id: A4.system_contracts.gov_minter
       name: 'GovMinter (0x1003): native coin minting authority with v1/v2 versions'
       category: A4
@@ -571,6 +702,25 @@ policies:
         - systemcontracts.GovMinterContractV1
         - systemcontracts.GovMinterContractV2
         - systemcontracts.initializeMinter
+    - id: A4.system_contracts.storage_slot_layout
+      name: System contract storage slot layout helpers (CalculateMappingSlot / CalculateDynamicSlot / EncodeBytesToSlots)
+      category: A4
+      description: |
+        All Go-side genesis seeders for the 0x100x governance contracts follow the
+        EVM/Solidity storage-slot rules through a toolbox in systemcontracts/stateutil.go:
+        CalculateMappingSlot(baseSlot, key) = keccak256(leftPad32(key) || baseSlot) for
+        mapping fields; CalculateDynamicSlot(baseSlot, i) = keccak256(leftPad32(baseSlot)) + i
+        for the i-th element of dynamic arrays / spilled bytes chunks; IncrementHash(baseSlot, n)
+        = baseSlot + n to pair an EnumerableSet value slot with its companion index slot;
+        VarLenBytesToMultipleHash / EncodeBytesToSlots implement Solidity short/long bytes
+        packing (<=31B packed in the base slot, >31B spills 32B chunks); GetBytes reverses it
+        for reads; EnumerableSet (NewEnumerableSet / NewAddressSet) bundles the value+index
+        slot pair used by ValidatorList and minterList. Every storage write a Go initializer
+        emits is a params.StateParam with Key = a slot hash derived above and a 32-byte Value.
+      governs:
+        - systemcontracts.CalculateDynamicSlot
+        - systemcontracts.CalculateMappingSlot
+        - systemcontracts.EnumerableSet
     - id: A5.account_extra.bit_layout
       name: StateAccount.Extra bit layout and immutability invariants
       category: A5
@@ -736,12 +886,8 @@ policies:
         expected and downgraded to debug-level logging — the engine starts
         consuming messages only after sync completes.
       governs:
-        - eth.EthPeerRegistered
         - eth.Istanbul100
-        - eth.protocolMaxMsgSize
-        - eth.quorumConsensusProtocolLengths
         - eth.quorumConsensusProtocolName
-        - eth.wbft.ErrStoppedEngine
     - id: A9.istanbul_rpc.api_reference
       name: WBFT custom RPC API (istanbul namespace) — method reference
       category: A9
