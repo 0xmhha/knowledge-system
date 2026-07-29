@@ -73,6 +73,11 @@ type SearchOpts struct {
 	K int
 	// Filter narrows the search domain.
 	Filter SearchFilter
+	// BM25Rerank enables ckv's candidate-set BM25 rerank pass (RRF
+	// fusion of vector + BM25 ranks over the vector hits). Lifts chunks
+	// containing the query's exact identifiers ("ErrFailClosed",
+	// "BM25Search") that pure embedding similarity ranks mid-list.
+	BM25Rerank bool
 }
 
 // SearchFilter restricts SemanticSearch to a subset of indexed content.
