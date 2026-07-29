@@ -123,3 +123,32 @@ func mustExtractor(t *testing.T, ckg ckgclient.Client) *Extractor {
 	}
 	return e
 }
+
+// TestRerank_DedupesCaseVariants pins the case-fold dedup: ckg's BM25
+// tokenization case-folds, so the Pascal/camel pair compoundCandidates
+// emits scores identically and used to burn TWO MaxKeywords slots per
+// concept (production repro: CksMCP/cksMCP/MCPServer/mCPServer filling
+// the cap and evicting real prompt terms).
+func TestRerank_DedupesCaseVariants(t *testing.T) {
+	t.Parallel()
+	fake := &rerankFake{
+		hitsByKW: map[string][]contract.Hit{
+			"CksMCP":    {hitScore(0.9)},
+			"cksMCP":    {hitScore(0.9)},
+			"MCPServer": {hitScore(0.8)},
+			"mCPServer": {hitScore(0.8)},
+			"health":    {hitScore(0.5)},
+		},
+	}
+	e := mustExtractor(t, fake)
+	out, _ := e.rerank(context.Background(), []string{"CksMCP", "cksMCP", "MCPServer", "mCPServer", "health"})
+	want := []string{"CksMCP", "MCPServer", "health"}
+	if len(out) != len(want) {
+		t.Fatalf("reranked = %v, want %v (case variants must collapse)", out, want)
+	}
+	for i, w := range want {
+		if out[i] != w {
+			t.Errorf("reranked[%d] = %q, want %q (full: %v)", i, out[i], w, out)
+		}
+	}
+}
