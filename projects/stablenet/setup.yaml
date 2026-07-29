@@ -5,10 +5,29 @@
 #
 # Relative paths resolve against this file's directory. Flags given on the
 # command line override these values.
+# policy_file is the committed copy of the derived governance policy. With
+# domain_knowledge set below the plan re-derives it per run and the build uses
+# the fresh one; this entry stays so a build without the entries (or an older
+# knowledge-setup) still finds a policy.
 policy_file: policies/graph.yaml
+# vector_policy is NOT derived — it categorizes chunks by code path, a
+# different taxonomy from the entries' subsystems, and is maintained by hand
+# (see validate/vector_policy_test.go).
 vector_policy: policies/vector.yaml
 embedder: ollama
 model_name: bge-m3
+
+# Domain knowledge. The entries are the source; the embedding corpus, the
+# governance policy and the alias glossary are re-derived from them into
+# generated/ on every run, so they cannot drift behind an entry that was added
+# or promoted since the last hand-run of the generators.
+domain_knowledge: domain-knowledge
+# The flow corpus is hand-authored, so it is consumed straight from the pack.
+flow_corpus: domain-knowledge/flow-corpus/corpus.jsonl
+# project.yaml's authoritative_docs live in the source checkout, not the pack.
+# A build that cannot resolve them fails rather than shipping a corpus without
+# the project's own documentation.
+code_root: ${GO_STABLENET_ROOT}
 # Derived build scope (cmd/filelist-gen): the setup plan derives
 # <out>/files-from.json from this config first and passes it to both engine
 # builds. Datasets built this way start the derived-scope lineage

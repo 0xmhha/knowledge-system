@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp install-hooks
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp install-hooks build-dataset-bins sync-domain-artifacts check-domain-artifacts
 
 GO ?= go
 
@@ -83,3 +83,41 @@ clean:
 # Paths inside those Makefiles are relative to their own directory and remain
 # valid after the consolidation.
 # ---------------------------------------------------------------------------
+
+# build-dataset-bins: every binary the project-pack dataset build shells out
+# to, in one place. The pack script names them explicitly rather than relying
+# on PATH, so a stale copy elsewhere cannot be picked up silently.
+build-dataset-bins:
+	@mkdir -p bin
+	$(GO) build -o bin/ckg ./cmd/graph
+	$(GO) build -o bin/ckv ./cmd/vector
+	$(GO) build -o bin/knowledge-setup ./cmd/knowledge-setup
+	$(GO) build -o bin/filelist-gen ./cmd/filelist-gen
+	$(GO) build -o bin/cks-domain-export ./cmd/system/domain-export
+	$(GO) build -o bin/cks-domain-sync ./cmd/system/domain-sync
+	$(GO) build -o bin/cks-glossary-gen ./cmd/system/glossary-gen
+
+# sync-domain-artifacts: refresh the committed renderings of the domain
+# entries. The dataset build derives these per run and uses the fresh copy;
+# the committed ones exist so governance and vocabulary changes show up as a
+# reviewable diff when an entry changes. Run after editing entries/.
+DOMAIN_PACK ?= projects/stablenet
+sync-domain-artifacts: build-dataset-bins
+	./bin/cks-domain-sync -entries $(DOMAIN_PACK)/domain-knowledge \
+	    -ckg-out $(DOMAIN_PACK)/policies/graph.yaml \
+	    -ckv-out /dev/null
+	./bin/cks-glossary-gen -project $(DOMAIN_PACK)/domain-knowledge \
+	    -out $(DOMAIN_PACK)/domain-knowledge/glossary.yaml
+
+# check-domain-artifacts: fail when the committed renderings no longer match
+# the entries they come from. Both files went months out of date because
+# nothing regenerated them and nothing noticed.
+check-domain-artifacts: sync-domain-artifacts
+	@if ! git diff --quiet -- $(DOMAIN_PACK)/policies/graph.yaml \
+	    $(DOMAIN_PACK)/domain-knowledge/glossary.yaml; then \
+	    echo "domain artifacts are stale — run 'make sync-domain-artifacts' and commit:" >&2; \
+	    git --no-pager diff --stat -- $(DOMAIN_PACK)/policies/graph.yaml \
+	        $(DOMAIN_PACK)/domain-knowledge/glossary.yaml >&2; \
+	    exit 1; \
+	fi
+	@echo "domain artifacts match their entries"
