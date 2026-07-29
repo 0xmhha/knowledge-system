@@ -117,3 +117,35 @@ func TestResults_ArchiveDemotedRegardlessOfFlags(t *testing.T) {
 		t.Errorf("live doc score (%v) should exceed archived score (%v)", out[0].Score, out[1].Score)
 	}
 }
+
+// TestResults_DemotesHeaderChunksForCodeIntents pins the file_header
+// demotion: with equal raw contributions, a symbol chunk must outrank
+// the same file's header chunk when demoteDocs is on.
+func TestResults_DemotesHeaderChunksForCodeIntents(t *testing.T) {
+	t.Parallel()
+	a := newAggregator(DefaultRRFK, DefaultBMWeight, DefaultSymbolWeight, DefaultCkvWeight)
+	header := contract.Hit{Citation: cit("pkg/system/contract/intent.go", 1, 50), Source: contract.HitSourceCKV, ChunkKind: "file_header"}
+	symbol := contract.Hit{Citation: cit("pkg/system/contract/intent.go", 35, 157), Source: contract.HitSourceCKV, ChunkKind: "symbol"}
+	a.addCkvList([]contract.Hit{header})
+	a.addCkvList([]contract.Hit{symbol})
+
+	out := a.results(0, false, true /* demoteDocs */)
+	if len(out) != 2 {
+		t.Fatalf("results count = %d, want 2", len(out))
+	}
+	if out[0].ChunkKind != "symbol" {
+		t.Errorf("rank-1 chunk kind = %q, want symbol above file_header", out[0].ChunkKind)
+	}
+	if out[0].Score <= out[1].Score {
+		t.Errorf("symbol score (%v) should exceed demoted header score (%v)", out[0].Score, out[1].Score)
+	}
+
+	// Flag off: tie preserved.
+	b := newAggregator(DefaultRRFK, DefaultBMWeight, DefaultSymbolWeight, DefaultCkvWeight)
+	b.addCkvList([]contract.Hit{header})
+	b.addCkvList([]contract.Hit{symbol})
+	off := b.results(0, false, false)
+	if off[0].Score != off[1].Score {
+		t.Errorf("without demotion scores should tie: %v vs %v", off[0].Score, off[1].Score)
+	}
+}

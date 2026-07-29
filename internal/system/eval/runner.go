@@ -178,7 +178,15 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolGetForTask
-	req.Params.Arguments = map[string]any{"prompt": s.Prompt}
+	// Pass the scenario's declared intent so the run scores the
+	// intent-conditioned pipeline the scenario was written against —
+	// server-side classification degrades to Unknown on most eval
+	// prompts, silently disabling kind filters and demotions.
+	args := map[string]any{"prompt": s.Prompt}
+	if s.Intent != "" {
+		args["intent"] = string(s.Intent)
+	}
+	req.Params.Arguments = args
 
 	t0 := time.Now()
 	res, err := r.client.CallTool(ctx, req)

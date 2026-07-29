@@ -141,11 +141,30 @@ func (c *Composer) Compose(ctx context.Context, prompt string) (contract.Evidenc
 	return pack, err
 }
 
+// ComposeWithIntent is Compose with a caller-supplied Intent that BYPASSES
+// the internal classifier. Callers that know their task's intent (the eval
+// harness scoring declared scenarios; pipeline stages whose intent is fixed
+// by construction) should prefer this: the internal classifier degrades to
+// IntentUnknown on unrecognized prompts, which silently disables every
+// intent-conditioned stage (kind filters, path globs, doc/header demotion).
+// An IntentUnknown or empty value falls back to classification.
+func (c *Composer) ComposeWithIntent(ctx context.Context, prompt string, callerIntent contract.Intent) (contract.EvidencePack, error) {
+	pack, _, err := c.ComposeTracedWithIntent(ctx, prompt, callerIntent)
+	return pack, err
+}
+
 // ComposeTraced is Compose plus a RetrievalTrace describing the ckv→ckg funnel
 // that produced the pack (Producer="composer"). The trace shares its shape
 // with the LLM agent's trace so the two retrieval algorithms can be scored
 // against each other. On any error the returned trace is the zero value.
 func (c *Composer) ComposeTraced(ctx context.Context, prompt string) (contract.EvidencePack, contract.RetrievalTrace, error) {
+	return c.ComposeTracedWithIntent(ctx, prompt, contract.IntentUnknown)
+}
+
+// ComposeTracedWithIntent is ComposeTraced with a caller-supplied Intent
+// (see ComposeWithIntent for the contract; IntentUnknown/empty falls back
+// to the internal classifier).
+func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, callerIntent contract.Intent) (contract.EvidencePack, contract.RetrievalTrace, error) {
 	if prompt == "" {
 		return contract.EvidencePack{}, contract.RetrievalTrace{}, errors.New("composer: empty prompt")
 	}
@@ -167,13 +186,21 @@ func (c *Composer) ComposeTraced(ctx context.Context, prompt string) (contract.E
 	mark := time.Now()
 	next := func(d *time.Duration) { now := time.Now(); *d = now.Sub(mark); mark = now }
 
-	cls, err := c.intent.Classify(ctx, prompt)
-	if err != nil {
-		// Don't return: composer with IntentUnknown still produces a
-		// usable pack (broader fan-out, default sanitize policy).
-		cls = intent.Classification{Intent: contract.IntentUnknown}
+	var intentVal contract.Intent
+	if callerIntent != "" && callerIntent != contract.IntentUnknown && callerIntent.IsValid() {
+		// Caller knows the task's intent — trust it over the heuristic
+		// classifier (which degrades to Unknown on unrecognized prompts,
+		// turning off every intent-conditioned stage downstream).
+		intentVal = callerIntent
+	} else {
+		cls, err := c.intent.Classify(ctx, prompt)
+		if err != nil {
+			// Don't return: composer with IntentUnknown still produces a
+			// usable pack (broader fan-out, default sanitize policy).
+			cls = intent.Classification{Intent: contract.IntentUnknown}
+		}
+		intentVal = cls.Intent
 	}
-	intentVal := cls.Intent
 	next(&tm.intent)
 
 	// 2. Stage 1 — keyword extraction.

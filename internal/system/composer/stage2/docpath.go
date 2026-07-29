@@ -39,6 +39,23 @@ func isDocCitation(chunkKind, file string) bool {
 	return strings.HasSuffix(lower, ".md") || strings.HasSuffix(lower, ".markdown")
 }
 
+// headerDemotionFactor is the multiplier applied to file_header chunk
+// citations when the active intent seeks code (same demoteDocs switch).
+// A file_header is the first ~50 lines — package doc + imports — useful
+// for orientation ("what package owns X") but almost never the ANSWER
+// to a symbol-seeking query. Since const/var blocks gained their own
+// spans (2026-07-28) the header no longer stands in for late
+// declarations, so it can safely rank below real symbol chunks. Same
+// value as docDemotionFactor: background, not buried.
+const headerDemotionFactor = 0.5
+
+// isHeaderChunk reports whether a scored citation came from a
+// file_header chunk (ckv chunk-strategy label; ckg citations never
+// carry one).
+func isHeaderChunk(chunkKind string) bool {
+	return chunkKind == "file_header"
+}
+
 // isArchivePath reports whether file lives under an archive/ path
 // segment (any depth) — the home of superseded documents per the
 // documentation discipline.
