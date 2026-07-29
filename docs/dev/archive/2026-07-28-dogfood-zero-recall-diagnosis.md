@@ -1,6 +1,7 @@
 # dogfood zero-recall 시나리오 진단 (2026-07-28)
 
-Status: Tier-3 진단 기록. 전체-코퍼스 dogfood 재측정
+Status: **Superseded by `../2026-07-retrieval-quality-track.md`** (트랙 요약,
+2026-07-29) — 본 문서는 사이클별 시계열 로그로 archive 보존. Tier-3 진단 기록. 전체-코퍼스 dogfood 재측정
 (`2026-07-28-gap-integration-design.md` §1.3 후속 F1)에서 recall 0이었던
 4개 시나리오의 원인 분석과 처분.
 
