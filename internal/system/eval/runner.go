@@ -20,7 +20,10 @@ import (
 // const in internal/mcp/server.go — duplicated here to avoid a
 // dependency on internal/mcp from the eval package.
 // toolGetForTask mirrors the fused server's namespaced wire name.
-var toolGetForTask = sysmcp.ToolNameGetForTask
+var (
+	toolGetForTask = sysmcp.ToolNameGetForTask
+	toolFreshness  = sysmcp.ToolNameFreshness
+)
 
 // mcpClient is the seam over the upstream mcp-go *client.Client.
 // Production code injects mcpgoclient.NewClient; tests inject a mock
@@ -172,6 +175,38 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		out.Error = strings.Join(errMsgs, "; ")
 	}
 	return out, nil
+}
+
+// IndexedHead asks the running cks-mcp for the ckv index's indexed_head
+// commit via cks.ops.freshness. Empty string (with nil error) means the
+// backend did not report one. Used by the harness's index-freshness
+// warning: measuring current-tree line spans against an index built from
+// an older tree produces stale-coordinate mismatches that look like
+// retrieval misses (observed 2026-07-29 — a third drift class alongside
+// scenario-span and classifier drift).
+func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
+	req := mcpgo.CallToolRequest{}
+	req.Params.Name = toolFreshness
+	res, err := r.client.CallTool(ctx, req)
+	if err != nil {
+		return "", fmt.Errorf("CallTool(%s): %w", toolFreshness, err)
+	}
+	if res == nil || res.IsError {
+		return "", fmt.Errorf("%s: %s", toolFreshness, concatText(res))
+	}
+	var body struct {
+		IndexedHead string `json:"indexed_head"`
+	}
+	if res.StructuredContent != nil {
+		raw, err := json.Marshal(res.StructuredContent)
+		if err == nil {
+			_ = json.Unmarshal(raw, &body)
+		}
+	}
+	if body.IndexedHead == "" {
+		_ = json.Unmarshal([]byte(concatText(res)), &body)
+	}
+	return body.IndexedHead, nil
 }
 
 // executeOnce performs one tool call + metric computation.

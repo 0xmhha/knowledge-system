@@ -30,6 +30,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strings"
@@ -105,6 +106,26 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 		return fmt.Errorf("start runner: %w", err)
 	}
 	defer func() { _ = runner.Close() }()
+
+	// Index-freshness warning: expected spans are anchored to the tree at
+	// anchorRoot, but the index may have been built from an older commit —
+	// then returned chunk coordinates cannot line up with current-tree
+	// spans and misses are measurement artifacts, not retrieval results.
+	// Warn loud instead of failing: measuring a deliberately pinned older
+	// snapshot is a legitimate workflow.
+	if anchorRoot != "" {
+		if head, ferr := runner.IndexedHead(ctx); ferr == nil && head != "" {
+			if out, gerr := exec.Command("git", "-C", anchorRoot, "rev-parse", "HEAD").Output(); gerr == nil {
+				treeHead := strings.TrimSpace(string(out))
+				if treeHead != "" && treeHead != head {
+					log.Printf("cks-eval: WARNING: index indexed_head %.12s != tree HEAD %.12s at %s — "+
+						"chunk line coordinates come from the indexed commit; span misses may be stale-index artifacts. "+
+						"Rebuild the index (make dogfood-eval rebuilds it) or measure against the indexed commit.",
+						head, treeHead, anchorRoot)
+				}
+			}
+		}
+	}
 
 	report := eval.NewReport(builderVersion)
 	for _, p := range paths {
