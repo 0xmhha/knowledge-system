@@ -1,0 +1,15 @@
+version: 1
+name: rrfk-constant-lookup
+description: |
+  A developer tuning fusion asks where the RRF k constant lives and
+  why 60. Exact-symbol lookup: the DefaultRRFK const with its doc
+  comment is the single source of truth.
+prompt: "DefaultRRFK RRF tuning constant definition and why 60"
+intent: arch_explain
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: internal/system/composer/stage2/merge.go
+    start_line: 42
+    end_line: 46
+    anchor: "DefaultRRFK"

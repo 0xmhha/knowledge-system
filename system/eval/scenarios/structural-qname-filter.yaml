@@ -1,0 +1,15 @@
+version: 1
+name: structural-qname-filter
+description: |
+  Debugging neighbor noise: locate isStructuralQname, the classifier
+  that keeps file/hunk/import pseudo nodes out of citation resolution
+  and neighbor lists.
+prompt: "isStructuralQname pseudo node classifier for file hunk import qnames"
+intent: bug_fix
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: internal/system/ckgclient/real.go
+    start_line: 962
+    end_line: 974
+    anchor: "func isStructuralQname("

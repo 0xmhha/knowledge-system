@@ -1,0 +1,14 @@
+version: 1
+name: wal-reap-test-helper
+description: |
+  Writing a serve-adjacent test: find reapGraphDir, the cleanup helper
+  that absorbs the SQLite WAL checkpoint race in TempDir teardown.
+prompt: "reapGraphDir test cleanup helper absorbing the sqlite WAL checkpoint race"
+intent: test_add
+match_mode: overlap
+runs: 5
+expected_citations:
+  - file: cmd/graph/cli_extra_test.go
+    start_line: 15
+    end_line: 31
+    anchor: "func reapGraphDir("
