@@ -157,7 +157,27 @@ dogfood Makefile에 상시 배선, 9개 시나리오 15개 인용 전부에 anch
   않는다 → **대형 함수 내부 영역의 function_split 청크 인용 커버리지**가
   다음 진짜 신호.
 - 정직 집계: **avg MRR 0.461, avg recall 0.852** — 이후 비교의 새 기준선.
-  (표면상 하락은 인플레이션 제거분; anchor 가드가 재발을 차단한다.) composer-pipeline-flow MRR 0.20→**1.00**(R8 재임베딩 순서
+  (표면상 하락은 인플레이션 제거분; anchor 가드가 재발을 차단한다.)
+
+## 인덱스 신선도 드리프트 (2026-07-29, 후속 P1)
+
+R10이 "function_split 커버리지"로 지목했던 신호의 실체는 **세 번째 드리프트
+종류 — 인덱스-코드 신선도**였다: dogfood 인덱스가 #42 머지 전 트리에서
+빌드되어 청크 좌표가 구버전(ComposeTraced 144-244)이었고, 현행-트리 기준의
+정직 스팬(wrap 249-254)과 구조적으로 겹칠 수 없었다. `make dogfood-eval`은
+매회 재빌드라 안전하지만 수동 측정이 stale 인덱스를 재사용한 것.
+
+재발 방지: `cks-eval`이 `cks.ops.freshness`의 indexed_head를 조회해
+`-verify-anchors` 트리의 git HEAD와 대조, 불일치 시 **명시 WARNING**(과거
+커밋을 고의 측정하는 워크플로는 정당하므로 fail 아님).
+
+fresh 재빌드 후 재측정: **avg recall 0.852 → 0.907** —
+composer-err-fail-closed R 0.50→**1.00**(아티팩트 해소 실증). 잔여 진짜
+신호 1건: composer-pipeline-flow의 `assemblePack`(348-429)은 fresh
+좌표에서도 미인용 — "pipeline flow" 프롬프트의 시맨틱 매칭에서 헬퍼가
+Compose 계열 청크에 밀린다(R 0.50 고정, avg MRR 0.436 — 재임베딩 순서
+변동 포함). 드리프트 3종(시나리오 스팬·intent 분류·인덱스 신선도)이 모두
+가드를 갖춘 상태가 되었다. composer-pipeline-flow MRR 0.20→**1.00**(R8 재임베딩 순서
 요동의 안정화 — 의도한 효과), mcp-tool-handlers 0.15→0.22. 하락 2건
 (bug-fix 1.00→0.50, stamp-integrity 0.58→0.46)은 rank 1→2 수준 재배열 —
 순효과 양.
