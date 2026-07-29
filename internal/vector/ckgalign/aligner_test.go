@@ -114,6 +114,57 @@ func TestLookup_DocShiftedChunkStart(t *testing.T) {
 	}
 }
 
+// TestLookup_ContainedSingleLineNodes pins tier 2b (2026-07-29): per-spec
+// const/var nodes are ONE line each, so the MinOverlapLines=2 floor made
+// them unmatchable — and step 4 then bound the chunk to a WRONG neighbor
+// (a var chunk inheriting the preceding const's canonical id in the
+// production repro). Containment bypasses the floor: a chunk fully
+// containing a node claims it, preferring the node closest to the chunk
+// start (the block's name-giving first member).
+func TestLookup_ContainedSingleLineNodes(t *testing.T) {
+	dir := makeValueFixtureDB(t)
+	ix, _ := Load(dir)
+
+	// Const block chunk [3, 9] contains IntentAlpha(6) and IntentBeta(8):
+	// closest-to-start wins.
+	if got := ix.Lookup("v/lib.go", 3, 9); got != "n_alpha" {
+		t.Errorf("const block chunk = %q, want n_alpha", got)
+	}
+	// Var chunk [11, 12] contains only ErrSentinel(12) — before tier 2b
+	// this bound to n_beta via nearest (the production misalignment).
+	if got := ix.Lookup("v/lib.go", 11, 12); got != "n_sentinel" {
+		t.Errorf("var chunk = %q, want n_sentinel", got)
+	}
+}
+
+// makeValueFixtureDB mirrors the p2 production repro: single-line
+// per-spec value nodes inside a block chunk's range.
+func makeValueFixtureDB(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	db, err := sql.Open("sqlite3", filepath.Join(dir, "graph.db"))
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer db.Close()
+	if _, err := db.Exec(`
+CREATE TABLE nodes (
+  id TEXT PRIMARY KEY,
+  qualified_name TEXT NOT NULL,
+  file_path TEXT NOT NULL,
+  start_line INTEGER NOT NULL,
+  end_line INTEGER NOT NULL
+);
+INSERT INTO nodes VALUES
+  ('n_alpha',    'v.IntentAlpha', 'v/lib.go',  6,  6),
+  ('n_beta',     'v.IntentBeta',  'v/lib.go',  8,  8),
+  ('n_sentinel', 'v.ErrSentinel', 'v/lib.go', 12, 12);
+`); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+	return dir
+}
+
 // TestLookup_BoundaryOverlap_FallsThroughToNearest pins the ChainConfig.*
 // production regression: a Go method-body chunk's closing line equals
 // the next function's signature start line, producing a 1-line overlap

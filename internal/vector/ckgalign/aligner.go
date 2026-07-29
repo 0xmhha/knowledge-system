@@ -333,6 +333,35 @@ func (ix *Index) LookupEntry(filePath string, startLine, endLine int) *Entry {
 		return &entries[bestContain]
 	}
 
+	// 2b. Chunk contains node — the node's full [s, e] lies inside the
+	// chunk range. Containment is never the accidental boundary-touch
+	// the MinOverlapLines floor below exists to reject, so it bypasses
+	// that floor. This is the only tier that can match SINGLE-LINE
+	// nodes (per-spec const/var entries are one line each): a block
+	// chunk like `const ( IntentAlpha; IntentBeta )` fully contains
+	// its member nodes but shares only one line with each, which step
+	// 3 rejects — and step 4 then binds the chunk to a WRONG neighbor
+	// (observed: a var chunk inheriting the preceding const's
+	// canonical id). Tiebreak: the node closest to the chunk start
+	// (the block's name-giving first member), then smallest range.
+	bestIn := -1
+	bestDist := -1
+	bestSize = -1
+	for i, e := range entries {
+		if startLine <= e.StartLine && e.EndLine <= endLine {
+			dist := e.StartLine - startLine
+			size := e.EndLine - e.StartLine
+			if bestIn == -1 || dist < bestDist || (dist == bestDist && size < bestSize) {
+				bestIn = i
+				bestDist = dist
+				bestSize = size
+			}
+		}
+	}
+	if bestIn != -1 {
+		return &entries[bestIn]
+	}
+
 	// 3. Range overlap — chunk [startLine, endLine] and node [s, e]
 	// share at least MinOverlapLines lines (substantial, not boundary).
 	// A single shared line is usually the chunk's closing brace meeting
