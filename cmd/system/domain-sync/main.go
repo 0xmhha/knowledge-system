@@ -239,6 +239,13 @@ func emit(label string, v any, path string) error {
 		fmt.Printf("# --- %s ---\n%s\n", label, raw)
 		return nil
 	}
+	// The caller may be writing into a derived tree that does not exist yet
+	// (the setup plan points both views at a generated/ directory it sweeps).
+	if dir := filepath.Dir(path); dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return fmt.Errorf("write %s to %s: %w", label, path, err)
+		}
+	}
 	if err := os.WriteFile(path, raw, 0o644); err != nil {
 		return fmt.Errorf("write %s to %s: %w", label, path, err)
 	}
