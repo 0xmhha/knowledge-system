@@ -1,7 +1,9 @@
 # filelist-gen — derived build-scope file lists for knowledge indexing
 
-Status: DESIGN (2026-07-29) — review pending, implementation follows on this
-branch. Tier 2 design doc.
+Status: DESIGN v2 (2026-07-29) — review round 1 applied (build-context
+pinning, source-state discipline, scope-transition semantics, check
+semantics, integration keys). Implementation follows on this branch.
+Tier 2 design doc.
 
 ## 1. Problem
 
@@ -30,12 +32,14 @@ artifact, not a derivation, so it needs a human to notice.
 |---|---|---|
 | R1 | Generator is a **Go binary** (like `domain-export`), not a shell script | operator request |
 | R2 | Include the **tests of every package in the build closure** (`*_test.go`), not just the shipped files | operator request; a build-only closure misses all 321 test files |
-| R3 | Include **Solidity system-contract sources and their tests**, and test-only Go packages that exercise them | operator request; see §5 lifecycle |
+| R3 | Include **Solidity system-contract sources and their tests**, and test-only Go packages that exercise them | operator request; see §6 lifecycle |
 | R4 | **Multiple build roots** (e.g. `./cmd/gstable`, `./cmd/genesis_generator`) with union semantics | operator request |
 | R5 | The list is **derived, not curated**: re-running the tool at a new commit reflects code changes with no manual edits | delta-tracking discussion |
-| R6 | Output carries **provenance** (commit, config, per-root contribution) so a dataset records exactly how its scope was computed | reproducibility discipline |
+| R6 | Output carries **provenance** (commit, config, build context, per-root contribution) so a dataset records exactly how its scope was computed | reproducibility discipline |
 | R7 | **Fail closed**: an unresolvable root or package is an error, never a silent omission | audit lesson |
 | R8 | The tool imports **no engine internals**; `go list` is invoked as a subprocess (the CLI is the contract), keeping it clean under `scripts/check-boundaries.sh` | repo boundary rules |
+| R9 | The derivation is computed under a **pinned build context** (GOOS/GOARCH/CGO/tags from config, recorded in provenance) — `go list` file sets are build-constraint-sensitive, and a platform-dependent scope would break cross-machine reproducibility | review C1 |
+| R10 | **Source-state discipline**: the derivation refuses a dirty tracked tree by default and resolves every file against the **git-tracked** state, so the emitted list always corresponds to the recorded `src_commit` | review C2; the 2026-07-28 dataset-pollution incident |
 
 ## 3. Empirical grounding (go-stablenet, measured)
 
@@ -49,7 +53,13 @@ datasets (pr-77-2 graph, digest `4be26516…`) were built with.
 | + `TestGoFiles`+`XTestGoFiles` of the same closure | +321 → **989** | **matches the canonical list (988) exactly** (+1 was a test file added by a work branch) — the derivation reproduces the curated scope |
 | `systemcontracts/**/*.sol` | 22 | matches canonical; includes `solidity/test` contracts |
 | `systemcontracts/test/*.go` (test-only package) | missing from both | outside the dep graph **and** outside the canonical glob — R3 improves on the historical baseline |
-| `go:embed` artifacts (`contracts.go:37-52` embeds `artifacts/{v1,v2}`) | n/a | compiled bytecode IS part of the binary via embed; see §5 step 3 |
+| `go:embed` artifacts (`contracts.go:37-52` embeds `artifacts/{v1,v2}`) | n/a | compiled bytecode IS part of the binary via embed; see §6 step 3 |
+
+Caveat on the 989 match (motivates R9): curated globs are
+platform-neutral, but `go list` file sets honor build constraints. The
+exact match indicates this scope currently has no platform-split files —
+that is a property of today's tree, not of the method. R9 pins the context
+so the derivation cannot silently vary by the machine that ran it.
 
 Per-root union cost (single `go list` invocation, go dedups packages):
 
@@ -71,22 +81,45 @@ rather than a silent gap.
 - Standalone Go binary. Imports **no** engine packages (R8): it shells out to
   `go list -deps -json <roots...>` (one invocation regardless of root count)
   and to `go list -json <extra_packages...>` for test-only packages, then
-  resolves `extra_globs` against the source tree.
+  resolves `extra_globs` against the git-tracked tree.
+- Assumptions (validated, fail closed): `-src` is the root of a **single Go
+  module** and of a **git repository**. Multi-module trees and non-git
+  sources are out of scope for v1 and rejected with a clear error.
+- The `go list` subprocess runs with the environment derived from the
+  config's `build_context` (R9): `GOOS`, `GOARCH`, `CGO_ENABLED`, and
+  `-tags` are set explicitly, never inherited silently from the invoking
+  machine.
 - Flags:
 
 ```
 filelist-gen -src <project root> -config <filelist.yaml> -out <files-from.json>
-             [-check]          # verify the existing output matches; exit 1 on drift
+             [-check]        # compare a fresh derivation against the existing
+                             # -out content; exit 1 on any difference
+             [-allow-dirty]  # permit a dirty tracked tree (recorded in provenance)
+             [-strict]       # zero-match extra_globs become errors
 ```
 
-- `-check` makes it a CI/update-verb gate: "does the committed/stored list
-  still equal the derivation at this commit?"
+- `-check` semantics (two supported uses, same flag):
+  - **dataset check**: point `-out` at the list copied into a built dataset
+    → "does this dataset's scope still equal the derivation at HEAD?" This
+    is the hook for the setup `update` verb and freshness reporting.
+  - **self check**: point `-out` at `generated/filelist/files-from.json`
+    → CI-style "derivation is current" gate (generate, then `-check`).
+  - Comparison covers the `include` list only, but the tool refuses to
+    compare outputs produced under a **different `build_context`** (the
+    provenance block records it) — cross-context comparison is a config
+    error, not a drift signal.
 
 ### 4.2 Config: `projects/<pack>/filelist.yaml` (tracked, per pack)
 
 ```yaml
 # Scope derivation for knowledge indexing. The ground truth of "in the
 # build" is `go list -deps` over build_roots; everything else is explicit.
+build_context:                     # R9 — pinned, never inherited from the
+  goos: linux                      #      invoking machine. Pin to the
+  goarch: amd64                    #      deployment target of the indexed
+  cgo: true                        #      project. Recorded in provenance.
+  tags: []
 build_roots:                       # R4 — union, deduped, single go list call
   - ./cmd/gstable
   - ./cmd/genesis_generator
@@ -94,8 +127,11 @@ include_package_tests: true        # R2 — TestGoFiles+XTestGoFiles of the clos
 include_embed_files: false         # go:embed assets (e.g. compiled contract
                                    # artifacts). They ARE part of the binary,
                                    # but bytecode is retrieval noise — excluded
-                                   # by default, switch exists to be honest
-                                   # about the build fact (§5 step 3).
+                                   # by default. WARNING: enabling this feeds
+                                   # non-source files to the engine parsers;
+                                   # consumers must tolerate them (M2). The
+                                   # switch exists to be honest about the
+                                   # build fact (§6 step 3).
 extra_packages:                    # R3 — packages OUTSIDE the dep graph that
   - ./systemcontracts/test         #      belong to the workflow: test-only
   - ./systemcontracts/compile/...  #      integration packages and the solc
@@ -107,13 +143,19 @@ exclude_globs: []                  # escape hatch; empty by default
 
 Field semantics:
 
+- `build_context`: required. The stablenet pack pins the gstable deployment
+  target (linux/amd64, cgo on). Cross-derivation on a darwin operator
+  machine is fine — `go list` honors the env for file-set resolution.
 - `build_roots`: explicit package paths recommended (auditable); go-style
   patterns (`./cmd/...`) are accepted but discouraged in packs.
 - `extra_packages`: resolved via `go list` (files, incl. their tests when
   `include_package_tests`), so they stay glob-free and fail closed. `/...`
   suffix expands subpackages.
-- `extra_globs`: for non-Go files only. Doublestar matching, evaluated
-  against the git-tracked tree.
+- `extra_globs`: for non-Go files only. Matched against the output of
+  `git ls-files` (R10 — tracked files only, so an untracked stray can never
+  enter the scope). Doublestar semantics: `**` crosses directory
+  separators; matching is by `bmatcuk/doublestar`-style rules, documented
+  in the tool's help text.
 - Precedence: (union of roots ∪ package tests ∪ extra packages ∪ extra
   globs) − exclude_globs, emitted as a sorted, deduplicated explicit list.
 
@@ -127,6 +169,8 @@ Same consumer format the engines already accept (`--files-from`, an
   "_provenance": {
     "tool": "filelist-gen <version>",
     "src_commit": "<HEAD of -src>",
+    "dirty": false,
+    "build_context": {"goos": "linux", "goarch": "amd64", "cgo": true, "tags": []},
     "config_sha256": "<hash of filelist.yaml>",
     "roots": {"./cmd/gstable": 988, "./cmd/genesis_generator": 4},
     "counts": {"build": 672, "tests": 321, "extra_packages": 9, "extra_globs": 22}
@@ -136,33 +180,71 @@ Same consumer format the engines already accept (`--files-from`, an
 ```
 
 - Consumers ignore unknown keys (`include` is all they read) — verified
-  against the graph/vector `--files-from` loaders before shipping.
+  against the graph/vector `--files-from` loaders before shipping (§7).
+- `dirty` appears only when `-allow-dirty` was used; a clean derivation
+  omits it.
 - Datasets keep their current practice of copying the used list next to the
-  built DBs; the provenance block makes that copy self-describing.
+  built DBs; the provenance block makes that copy self-describing —
+  including **which scope generation** (config hash) produced it (§5).
 
-### 4.4 Failure semantics (R7)
+### 4.4 Failure semantics (R7, R10)
 
+- `-src` not a git repo, or not a single-module root → error.
+- **Dirty tracked files** (modified/staged/deleted; untracked files are
+  ignorable noise) → error unless `-allow-dirty`, which records
+  `dirty: true` in provenance. Default is fail-closed: the
+  2026-07-28 incident (a reindex silently embedding a work branch) is the
+  class of bug this kills.
 - Any root or extra package that `go list` cannot resolve → non-zero exit,
   no output written.
 - An extra glob that matches zero files → warning (legitimate during
   refactors) unless `-strict` is set.
-- `-check` compares the freshly derived list against `-out`'s existing
-  content (ignoring provenance) and exits 1 on any difference — the delta
-  hook for CI and the setup `update` verb.
+- `-check` against an output produced under a different `build_context` or
+  tool major version → error (not drift).
 
 ### 4.5 Integration
 
-- **setup pipeline**: `knowledge-setup` (and later the `update` verb) gains
-  an optional derivation step before the graph build: run filelist-gen, feed
-  the fresh list to both engine builds. The dataset then always matches the
-  indexed commit's build scope.
+- **setup pipeline**: `setup.yaml` gains an optional key
+  `filelist: <path to filelist.yaml>` (M4). When present, the plan inserts
+  a `filelist-derive` step before the graph build: run filelist-gen, feed
+  the fresh list to both engine builds via `--files-from`. The dataset then
+  always matches the indexed commit's build scope, and the `update` verb
+  gets scope-following for free.
 - **script retirement**: `projects/stablenet/scripts/gen-filelist.sh` is
-  deleted once the parity test (§6) passes.
+  deleted once the parity test (§7) passes. Before deletion, sweep for
+  references to the script (docs, other scripts, HANDOFF notes) and update
+  them.
 - The curated glob list under `eval/graph/` is retained untouched — it is
   the *historical* fixture that reproduces past datasets (digest
-  `4be26516…`); new datasets use the derivation.
+  `4be26516…`); new datasets use the derivation. See §5.
 
-## 5. System-contract lifecycle → domain knowledge
+## 5. Scope transition (one-time baseline shift)
+
+The graph digest is a deterministic function of **(commit, scope)**. The
+derivation changes the scope definition once (adds `systemcontracts/test`,
+the compile tooling, and future files the globs would have missed), so:
+
+- **At the same commit**, a dataset built with the derived scope carries a
+  **different `graph_digest`** than the historical `4be26516…` lineage.
+  This is a one-time lineage break, not a recurring cost: after adoption,
+  same commit + same config ⇒ same digest, exactly as before. Per-commit
+  digest changes remain what they always were — the code changed.
+- **Reproducing the old lineage stays possible forever**: the historical
+  fixture list is retained (§4.5), so a byte-identical `4be26516…` dataset
+  can be rebuilt on demand (e.g. to re-run past experiments under identical
+  conditions).
+- **Eval baselines are regenerated once** on adoption: retrieval fixtures
+  and stored results that assume the old scope (e.g. precision cases
+  sensitive to `test.*` symbols) get one refresh against the first
+  derived-scope dataset, and are tagged with the scope generation.
+- **Scope generation is self-recording**: the provenance `config_sha256`
+  plus the dataset's `@<commit8>-<digest8>` naming already distinguish
+  lineages; no extra naming scheme is needed.
+- Rollout rule: do not mix lineages inside one comparison table. Existing
+  datasets stay valid for their own lineage; new experiments start on the
+  derived scope.
+
+## 6. System-contract lifecycle → domain knowledge
 
 The system-contract change workflow (operator-provided, verified against the
 tree) is load-bearing context for both this design and future agent tasks:
@@ -190,14 +272,18 @@ Design consequences:
 - `knowledge_type`: procedure (uses the existing `procedure_steps` field —
   precedent: `A14.foundations.cherry_pick_principle`).
 - `procedure_steps`: the five steps above.
-- `code_anchors` (measured):
+- `code_anchors` (measured; anchor forms to be validated against
+  `ValidateEntry` before authoring — M3):
   - `systemcontracts/compile/main.go` + `compile/compiler/compiler.go`
     (`solcVersion`) — step 2
-  - `systemcontracts/artifacts/{v1,v2}` — step 3 (kind: loc, path anchor)
-  - `systemcontracts/contracts.go:37` — the `go:embed` of artifacts (step 4)
+  - step 3 is anchored through the **embed site**
+    `systemcontracts/contracts.go:37` (a directory path is likely not a
+    valid mechanical anchor; if `ValidateEntry` accepts loc-style path
+    anchors, add `artifacts/v1` as a secondary, else the embed line plus
+    the entry prose carry it)
   - `systemcontracts/systemcontracts.go` — load/DB-store/initialization
     (step 4)
-  - `systemcontracts/test/` — step 5 scope
+  - `systemcontracts/test/` — step 5 scope (same anchor-form caveat)
 - Cross-references: `A10.codegen.contract_regen_procedure` (how to
   regenerate — mechanics) and `A4.system_contracts.*` (addresses,
   governance). The new entry owns the *why-shaped-this-way* lifecycle view;
@@ -210,32 +296,42 @@ This also resolves an audit classification: the A10 anchors into
 they are intentional knowledge targets of this workflow, which the pack
 config now states explicitly.
 
-## 6. Testing
+## 7. Testing
 
-- **Parity test** (locks R2/R3): against the vendored synthetic corpus or a
-  minimal fixture module, assert the derivation = build + closure tests +
-  extra packages + globs, deterministic ordering, dedup.
+- **Parity test** (locks R2/R3): against a minimal fixture module vendored
+  under the tool's testdata, assert the derivation = build + closure tests
+  + extra packages + globs, deterministic ordering, dedup. The fixture
+  imports **stdlib only** so `go list` needs no network or module cache
+  (M5) — CI-safe.
+- **Build-context test** (locks R9): a fixture file guarded by a build tag
+  or GOOS constraint appears/disappears exactly per the configured context,
+  and provenance records the context.
+- **Source-state tests** (lock R10): dirty tracked file → error;
+  `-allow-dirty` → succeeds with `dirty: true`; an untracked file matching
+  an extra glob is NOT included (git-tracked resolution).
 - **Real-tree spot check** (documented, not CI): gstable root reproduces the
-  canonical 988-file scope (+ the deltas R3 adds intentionally:
-  `systemcontracts/test/*.go`).
+  canonical 988-file scope (+ the deltas R3 adds intentionally).
 - **Fail-closed tests**: unknown root, unknown extra package, zero-match
-  glob with `-strict`.
-- **`-check` drift test**: derive, mutate a file list entry, `-check` exits 1.
+  glob with `-strict`, non-git `-src`, cross-context `-check`.
+- **`-check` drift test**: derive, mutate a list entry, `-check` exits 1.
 - **Consumer compatibility**: graph and vector `--files-from` loaders accept
-  the provenance-bearing output (unknown-key tolerance).
+  the provenance-bearing output (unknown-key tolerance), verified by an
+  integration test that runs both loaders on a generated file.
 
-## 7. Implementation plan
+## 8. Implementation plan
 
 1. `cmd/filelist-gen` (+ unit tests, fixture module under its testdata).
 2. `projects/stablenet/filelist.yaml` (§4.2 values) + pack README row.
-3. Delete `projects/stablenet/scripts/gen-filelist.sh` (superseded).
-4. New domain entry `A4.system_contracts.build_deploy_pipeline` +
-   `entry-verify` promotion + inventory refresh.
+3. Sweep references to `gen-filelist.sh`, then delete it (superseded).
+4. New domain entry `A4.system_contracts.build_deploy_pipeline` (validate
+   anchor forms first — M3) + `entry-verify` promotion + inventory refresh.
 5. Boundary script: add `cmd/filelist-gen` (forbid all engine internals).
-6. Downstream sync PR after upstream merge; corpus regen + reindex ride the
-   next propagation pass.
+6. setup.yaml `filelist:` key + plan step (can land with or after 1–5).
+7. Downstream sync PR after upstream merge; corpus regen + reindex ride the
+   next propagation pass; first derived-scope dataset starts the new
+   lineage per §5.
 
-## 8. Non-goals / open items
+## 9. Non-goals / open items
 
 - **Per-file root attribution** in provenance (needs one `go list` per
   root): v1 records per-root union counts only.
@@ -245,7 +341,10 @@ config now states explicitly.
   discussion): anchored-file deltas are a first-pass filter; indirect
   behavior changes still warrant the cheap periodic full audit
   (`anchor-refresh -check`).
+- **Multi-module trees**: out of scope for v1 (§4.1); revisit if a target
+  project needs it.
 - **Decision pending (operator)**: final `build_roots` set — proposal is
   `gstable` + `genesis_generator`; `bootnode`/`db_migrator` (+1 each) if
   operationally relevant; `evm`/`devp2p`-class developer tools excluded by
-  default (+29–48 files of retrieval noise).
+  default (+29–48 files of retrieval noise). Also confirm the pinned
+  `build_context` for the stablenet pack (proposal: linux/amd64, cgo on).
