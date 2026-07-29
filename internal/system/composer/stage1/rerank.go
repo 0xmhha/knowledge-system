@@ -3,6 +3,7 @@ package stage1
 import (
 	"context"
 	"sort"
+	"strings"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 )
@@ -67,6 +68,31 @@ func (e *Extractor) rerank(ctx context.Context, candidates []string) ([]string, 
 	}
 
 	sort.SliceStable(scored, func(i, j int) bool { return scored[i].Score > scored[j].Score })
+
+	// Case-insensitive dedup AFTER scoring, BEFORE the MaxKeywords cap.
+	// compoundCandidates deliberately emits both PascalCase and camelCase
+	// of every join ("CksMCP" + "cksMCP") because the prompt doesn't say
+	// which symbol exists — but ckg's BM25 tokenization case-folds, so
+	// BOTH variants score identically and BOTH survive into the cap,
+	// burning two of the eight slots per concept. Observed in production:
+	// the mcp-tool-handlers prompt's cap filled with
+	// CksMCP/cksMCP/MCPServer/mCPServer, evicting "registration",
+	// "get_for_task", and "health" entirely. Keep the highest-scored
+	// spelling per folded form (stable sort ⇒ first wins). Trade-off:
+	// if BOTH spellings exist as distinct Go symbols and both matter,
+	// the dropped one loses its exact FindSymbol shot — rare, and BM25
+	// still surfaces that code by keyword; cap pollution hurt far more.
+	seenFold := make(map[string]struct{}, len(scored))
+	deduped := scored[:0]
+	for _, s := range scored {
+		fold := strings.ToLower(s.Keyword)
+		if _, ok := seenFold[fold]; ok {
+			continue
+		}
+		seenFold[fold] = struct{}{}
+		deduped = append(deduped, s)
+	}
+	scored = deduped
 
 	out := make([]string, 0, len(scored))
 	for _, s := range scored {
