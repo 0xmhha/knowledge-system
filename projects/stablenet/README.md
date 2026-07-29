@@ -18,6 +18,7 @@ readmes) — nothing in a project pack may be non-publishable.
 | `validate/` | Go tests that load this pack's data through the engine loaders | `go test ./projects/...` |
 | `scripts/` | dataset build helpers carrying stablenet parameters | operators |
 | `setup.yaml` | dataset build parameters for `knowledge-setup --config` | `cmd/knowledge-setup` |
+| `filelist.yaml` | build-scope derivation config (build roots, pinned build context, extra packages/globs) | `cmd/filelist-gen` → `--files-from` list |
 | `mcp.yaml.example` | fused-server config template — copy to `mcp.yaml` (gitignored; endpoints stay out of git) and fill deployment values | `cmd/system-mcp -config` |
 | `generated/` (untracked) | derived outputs (domain corpus, engine policy views) — rebuild with the domain tools | build outputs |
 

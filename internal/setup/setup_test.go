@@ -75,6 +75,25 @@ func TestBuildPlan_Shape(t *testing.T) {
 	if _, err := BuildPlan(Options{Out: "/o"}); err == nil {
 		t.Error("missing Src not rejected")
 	}
+
+	// FilelistConfig prepends the derivation step and scopes both builds.
+	p3, err := BuildPlan(Options{Src: "/s", Out: "/o", FilelistConfig: "/p/filelist.yaml"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p3.Steps[0].ID != "filelist-derive" {
+		t.Fatalf("step[0] = %q, want filelist-derive", p3.Steps[0].ID)
+	}
+	d := strings.Join(p3.Steps[0].Cmd, " ")
+	if !strings.Contains(d, "filelist-gen -src /s -config /p/filelist.yaml -out /o/files-from.json") {
+		t.Errorf("derive cmd = %q", d)
+	}
+	for _, i := range []int{1, 2} { // graph-build, vector-build
+		c := strings.Join(p3.Steps[i].Cmd, " ")
+		if !strings.Contains(c, "--files-from /o/files-from.json") {
+			t.Errorf("step %s missing --files-from: %q", p3.Steps[i].ID, c)
+		}
+	}
 }
 
 func TestExecute_SubprocessOrderOutputAndFailure(t *testing.T) {

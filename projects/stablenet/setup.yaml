@@ -9,3 +9,9 @@ policy_file: policies/graph.yaml
 vector_policy: policies/vector.yaml
 embedder: ollama
 model_name: bge-m3
+# Derived build scope (cmd/filelist-gen): the setup plan derives
+# <out>/files-from.json from this config first and passes it to both engine
+# builds. Datasets built this way start the derived-scope lineage
+# (docs/design/filelist-gen.md §5) — their digests are not comparable to
+# curated-scope datasets.
+filelist: filelist.yaml

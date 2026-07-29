@@ -1,0 +1,45 @@
+# Build-scope derivation config for the stablenet knowledge dataset.
+# Consumed by cmd/filelist-gen (design: docs/design/filelist-gen.md):
+#
+#   filelist-gen -src <go-stablenet checkout> \
+#     -config projects/stablenet/filelist.yaml -out <dataset>/files-from.json
+#
+# The derived list = dependency closure of build_roots (+ their tests)
+# + extra packages/globs below, resolved against the git-tracked tree
+# under the pinned build context. Changing anything here changes the
+# dataset scope — datasets record config_sha256 in provenance.
+
+# Deployment target context (R9). go list file sets are build-constraint
+# sensitive; the scope is what ships: linux/amd64, cgo on.
+build_context:
+  goos: linux
+  goarch: amd64
+  cgo: true
+  tags: []
+
+# Shipped binaries whose dependency closures define the core scope (R4).
+build_roots:
+  - ./cmd/gstable
+  - ./cmd/genesis_generator
+
+# Tests of every package in the closure (R2).
+include_package_tests: true
+
+# go:embed files of closure packages (compiled contract artifacts).
+# Off: the .sol sources below are the readable representation; the
+# artifacts are derived binaries.
+include_embed_files: false
+
+# Out-of-graph packages that belong to the scope (R3): the system-contract
+# end-to-end tests and the solc compile tooling. Resolved via go list —
+# unresolvable patterns fail the derivation.
+extra_packages:
+  - ./systemcontracts/test
+  - ./systemcontracts/compile/...
+
+# Non-Go sources in scope (R3): Solidity system-contract sources,
+# including their test contracts. Matched against git-tracked files only.
+extra_globs:
+  - "systemcontracts/**/*.sol"
+
+exclude_globs: []

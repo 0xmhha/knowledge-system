@@ -25,6 +25,8 @@ type fileConfig struct {
 	OllamaURL           string `yaml:"ollama_url"`
 	VectorPolicy        string `yaml:"vector_policy"`
 	SkipVector          bool   `yaml:"skip_vector"`
+	Filelist            string `yaml:"filelist"`
+	FilelistBin         string `yaml:"filelist_bin"`
 }
 
 // LoadConfig reads a setup config file into Options. Path-valued fields that
@@ -58,5 +60,7 @@ func LoadConfig(path string) (Options, error) {
 		OllamaURL:           fc.OllamaURL,
 		VectorPolicy:        rel(fc.VectorPolicy),
 		SkipVector:          fc.SkipVector,
+		FilelistConfig:      rel(fc.Filelist),
+		FilelistBin:         fc.FilelistBin,
 	}, nil
 }

@@ -47,11 +47,26 @@ type Options struct {
 	// SkipVector builds only the graph index (and skips alignment
 	// verification, which needs both).
 	SkipVector bool
+
+	// FilelistConfig is an optional filelist-gen config (a pack's
+	// filelist.yaml). When set, the plan first derives the build-scope file
+	// list into Out/files-from.json and passes it to both engine builds via
+	// --files-from, so the dataset scope is computed — not curated — and its
+	// provenance ships with the dataset.
+	FilelistConfig string
+	// FilelistBin is the filelist-gen CLI. Empty falls back to
+	// "filelist-gen" resolved on PATH.
+	FilelistBin string
 }
 
 // GraphDir / VectorDir are the per-engine data directories under Out.
 func (o Options) GraphDir() string  { return filepath.Join(o.Out, "graph") }
 func (o Options) VectorDir() string { return filepath.Join(o.Out, "vector") }
+
+// FilesFromPath is where a derived build-scope list lands (and is read from)
+// when FilelistConfig is set — inside the dataset, next to the indexes, so
+// the scope provenance travels with the data.
+func (o Options) FilesFromPath() string { return filepath.Join(o.Out, "files-from.json") }
 
 // Step is one unit of the plan: either a subprocess (Cmd non-empty) or an
 // internal verification (Verify non-nil).
@@ -97,21 +112,43 @@ func BuildPlan(o Options) (Plan, error) {
 		vectorBin = "ckv"
 	}
 
+	var steps []Step
+	if o.FilelistConfig != "" {
+		filelistBin := o.FilelistBin
+		if filelistBin == "" {
+			filelistBin = "filelist-gen"
+		}
+		steps = append(steps, Step{
+			ID:    "filelist-derive",
+			Title: "Derive the build-scope file list",
+			Cmd: []string{filelistBin,
+				"-src", o.Src,
+				"-config", o.FilelistConfig,
+				"-out", o.FilesFromPath()},
+		})
+	}
+
 	graphCmd := []string{graphBin, "build", "--src", o.Src, "--out", o.GraphDir()}
+	if o.FilelistConfig != "" {
+		graphCmd = append(graphCmd, "--files-from", o.FilesFromPath())
+	}
 	if o.PolicyFile != "" {
 		graphCmd = append(graphCmd, "--policy-file", o.PolicyFile)
 	}
 	if o.SecurityPatternFile != "" {
 		graphCmd = append(graphCmd, "--security-pattern-file", o.SecurityPatternFile)
 	}
-	steps := []Step{{
+	steps = append(steps, Step{
 		ID:    "graph-build",
 		Title: "Build the graph index",
 		Cmd:   graphCmd,
-	}}
+	})
 
 	if !o.SkipVector {
 		vectorCmd := []string{vectorBin, "build", "--src", o.Src, "--out", o.VectorDir(), "--ckg", o.GraphDir()}
+		if o.FilelistConfig != "" {
+			vectorCmd = append(vectorCmd, "--files-from", o.FilesFromPath())
+		}
 		if o.Embedder != "" {
 			vectorCmd = append(vectorCmd, "--embedder="+o.Embedder)
 		}
