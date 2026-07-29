@@ -44,7 +44,7 @@ type Scenario struct {
 	// that must occur INSIDE the citation's line span in the source tree.
 	// Guards against expected-span drift — the chronic failure where code
 	// moves and a scenario silently scores 0 against stale line numbers
-	// (see docs/dev/2026-07-28-dogfood-zero-recall-diagnosis.md, three
+	// (see docs/dev/archive/2026-07-28-dogfood-zero-recall-diagnosis.md, three
 	// separate re-anchoring rounds). Verified by VerifyAnchors when the
 	// runner is given a source root; empty string = no anchor declared.
 	Anchors   []string
