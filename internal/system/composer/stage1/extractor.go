@@ -208,7 +208,10 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	for round := 1; round <= e.config.MaxRounds; round++ {
 		// Recall: broad ckv semantic search with the current (possibly
 		// augmented) query.
-		hits, err := e.ckv.SemanticSearch(ctx, currentQuery, ckvclient.SearchOpts{K: e.config.InitialK})
+		// BM25Rerank: prompts routinely quote exact identifiers; the
+		// candidate-set BM25 pass lifts those chunks above look-alike
+		// neighbors that pure embedding similarity ranks mid-list.
+		hits, err := e.ckv.SemanticSearch(ctx, currentQuery, ckvclient.SearchOpts{K: e.config.InitialK, BM25Rerank: true})
 		if err != nil {
 			// First-round ckv failure aborts; later-round failures stop
 			// iteration but return what we already have.

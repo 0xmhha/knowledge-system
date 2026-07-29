@@ -113,7 +113,7 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 	for _, ck := range opts.Filter.ChunkKinds {
 		filter.ChunkKinds = append(filter.ChunkKinds, ckvtypes.ChunkKind(ck))
 	}
-	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter})
+	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter, EnableBM25Rerank: opts.BM25Rerank})
 	if err != nil {
 		// A query failure means the engine could not embed the query —
 		// almost always the model endpoint is unreachable. Trip the flag so

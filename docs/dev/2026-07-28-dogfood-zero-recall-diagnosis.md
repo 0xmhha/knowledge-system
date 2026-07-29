@@ -130,6 +130,19 @@ R 0.50→**1.00**·MRR 0.12→0.42, stamp-integrity R 0.67→**1.00**. MRR 하�
 재임베딩에 따른 상위권 순서 변동 — 순효과 명백히 양.
 
 **트랙 누적**: recall 0.296 → **0.926**, MRR(도입 후) 0.389 → **0.497**.
+
+## stage1 BM25 rerank 활성화 (2026-07-29, 후속 R9)
+
+ckv 엔진의 candidate-set BM25 rerank(`EnableBM25Rerank` — vector 히트 위에
+BM25를 세워 RRF 융합)가 stage1 경로에서 꺼져 있었다. `ckvclient.SearchOpts`
+에 `BM25Rerank` 배선 → stage1 본 라운드에서 활성화(프롬프트는 정확
+식별자를 상시 포함 — "ErrFailClosed", "BM25Search").
+
+**재측정(동일 인덱스, 쿼리타임 변경만): avg MRR 0.497 → 0.525, recall
+0.926 유지**. composer-pipeline-flow MRR 0.20→**1.00**(R8 재임베딩 순서
+요동의 안정화 — 의도한 효과), mcp-tool-handlers 0.15→0.22. 하락 2건
+(bug-fix 1.00→0.50, stamp-integrity 0.58→0.46)은 rank 1→2 수준 재배열 —
+순효과 양.
 잔여: mcp-tool-handlers·test-add(R 0.67), MRR 상위권 안정화(재임베딩마다
 순서 요동) — 후자는 정확-식별자 BM25 rerank(stage1 ckv 경로) 후보.
 composer-err-fail-closed MRR 0.25→0.55·R 0.50→**1.00**, pipeline-flow
