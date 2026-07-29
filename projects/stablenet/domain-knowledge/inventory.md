@@ -9,7 +9,7 @@ Verification baseline: go-stablenet `@9978930ba` (dev — WBFT justification fix
 
 | Status | Count |
 |---|---|
-| verified | 40 |
+| verified | 41 |
 | needs_verification | 3 |
 | draft | 0 |
 | needs_author | 0 |
@@ -21,7 +21,7 @@ Verification baseline: go-stablenet `@9978930ba` (dev — WBFT justification fix
 | A1 | WBFT Consensus Core | 5 / 6 |
 | A2 | WBFT Block Encoding & Seal | 2 / 2 |
 | A3 | WBFT Validator Set & Epoch | 3 / 3 |
-| A4 | System Contracts (Governance × 5) | 5 / 6 |
+| A4 | System Contracts (Governance × 5) | 6 / 7 |
 | A5 | Native Coin & Account Extra | 2 / 2 |
 | A6 | Fee Delegation & Anzeon Gas | 2 / 2 |
 | A7 | Hardfork & Chain Config | 1 / 1 |
@@ -39,7 +39,7 @@ Verification baseline: go-stablenet `@9978930ba` (dev — WBFT justification fix
 |---|---|---|
 | B1 | Architecture | 8 |
 | B2 | Data Structure | 5 |
-| B3 | Algorithm / Flow | 10 |
+| B3 | Algorithm / Flow | 11 |
 | B4 | Invariant / Constraint | 9 |
 | B5 | Pitfall / Anti-pattern | 3 |
 | B6 | Procedure / Checklist | 5 |
@@ -105,6 +105,7 @@ Remaining candidates worth adding once the current backlog is verified:
 | A4.gov_validator.genesis_initialization | A4 | B2 | GovValidator genesis initialization (initializeValidator) | verified | P0 |
 | A4.gov_validator.storage_and_governance | A4 | B2 | GovValidator (0x1001): storage layout and validator-set governance | needs_verification | P0 |
 | A4.system_contracts.addresses | A4 | B7 | System contract canonical addresses (Anzeon) | verified | P0 |
+| A4.system_contracts.build_deploy_pipeline | A4 | B3 | System contract lifecycle: Solidity source to genesis state and e2e tests | verified | P1 |
 | A4.system_contracts.gov_minter | A4 | B1 | GovMinter (0x1003): native coin minting authority with v1/v2 versions | verified | P1 |
 | A4.system_contracts.storage_slot_layout | A4 | B2 | System contract storage slot layout helpers (CalculateMappingSlot / CalculateDynamicSlot / EncodeBytesToSlots) | verified | P0 |
 | A5.account_extra.bit_layout | A5 | B4 | StateAccount.Extra bit layout and immutability invariants | verified | P0 |

@@ -24,10 +24,10 @@ SKIP_CKV="${SKIP_CKV:-0}"
 
 # knowledge-setup defaults --graph-bin/--vector-bin to "ckg"/"ckv" on PATH;
 # pass the in-repo builds explicitly so no PATH setup is needed.
-for b in knowledge-setup ckg ckv; do
+for b in knowledge-setup ckg ckv filelist-gen; do
   [ -x "$KS_ROOT/bin/$b" ] || {
     echo "ERROR: $KS_ROOT/bin/$b not built — run:" >&2
-    echo "  (cd \"$KS_ROOT\" && go build -o bin/ckg ./cmd/graph && go build -o bin/ckv ./cmd/vector && go build -o bin/knowledge-setup ./cmd/knowledge-setup)" >&2
+    echo "  (cd \"$KS_ROOT\" && go build -o bin/ckg ./cmd/graph && go build -o bin/ckv ./cmd/vector && go build -o bin/knowledge-setup ./cmd/knowledge-setup && go build -o bin/filelist-gen ./cmd/filelist-gen)" >&2
     exit 1
   }
 done
@@ -39,4 +39,5 @@ exec "$KS_ROOT/bin/knowledge-setup" \
   --config "$KS_ROOT/projects/stablenet/setup.yaml" \
   --src "$GSN_SRC" --out "$OUT" \
   --graph-bin "$KS_ROOT/bin/ckg" --vector-bin "$KS_ROOT/bin/ckv" \
+  --filelist-bin "$KS_ROOT/bin/filelist-gen" \
   "${extra[@]}" "$@"

@@ -40,6 +40,8 @@ func main() {
 	flag.IntVar(&o.EmbedDim, "embed-dim", 0, "vector embedding dimension")
 	flag.StringVar(&o.OllamaURL, "ollama-url", "", "ollama endpoint (exported as CKV_OLLAMA_ENDPOINT)")
 	flag.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
+	flag.StringVar(&o.FilelistConfig, "filelist", "", "filelist-gen config; derives <out>/files-from.json and scopes both engine builds")
+	flag.StringVar(&o.FilelistBin, "filelist-bin", "", "filelist-gen CLI (default: filelist-gen on PATH)")
 	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
@@ -73,6 +75,8 @@ func main() {
 		merge("model-name", &o.ModelName, base.ModelName)
 		merge("ollama-url", &o.OllamaURL, base.OllamaURL)
 		merge("vector-policy", &o.VectorPolicy, base.VectorPolicy)
+		merge("filelist", &o.FilelistConfig, base.FilelistConfig)
+		merge("filelist-bin", &o.FilelistBin, base.FilelistBin)
 		if !set["embed-dim"] {
 			o.EmbedDim = base.EmbedDim
 		}

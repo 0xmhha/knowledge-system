@@ -210,6 +210,30 @@ func TestLoad_JSONFile(t *testing.T) {
 	}
 }
 
+// TestLoad_FilelistGenOutput locks consumer compatibility with
+// cmd/filelist-gen: its output carries a _provenance block (ignored here)
+// and exact file paths (which match themselves as literal patterns).
+func TestLoad_FilelistGenOutput(t *testing.T) {
+	raw := []byte(`{
+	  "_provenance": {"tool": "filelist-gen 0.1.0", "src_commit": "abc"},
+	  "include": ["core/txpool/legacypool/legacypool.go", "systemcontracts/solidity/v1/GovValidator.sol"]
+	}`)
+	tmp := filepath.Join(t.TempDir(), "files-from.json")
+	if err := os.WriteFile(tmp, raw, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	f, err := Load(tmp)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !f.Allow("core/txpool/legacypool/legacypool.go") || !f.Allow("systemcontracts/solidity/v1/GovValidator.sol") {
+		t.Error("listed literal paths must be allowed")
+	}
+	if f.Allow("core/txpool/legacypool/list.go") {
+		t.Error("unlisted path must be rejected (exact-path list, no globbing)")
+	}
+}
+
 // TestFilterPaths verifies batch filtering.
 func TestFilterPaths(t *testing.T) {
 	f := &FilterList{
