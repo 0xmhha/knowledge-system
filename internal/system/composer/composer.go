@@ -211,7 +211,7 @@ func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, c
 	next(&tm.stage1)
 
 	// 3. Stage 2 — ckg citation search.
-	s2Out, err := c.stage2.Search(ctx, s1Out.Keywords, s1Out.Hits, intentVal)
+	s2Out, err := c.stage2.Search(ctx, prompt, s1Out.Keywords, s1Out.Hits, intentVal)
 	if err != nil {
 		return contract.EvidencePack{}, contract.RetrievalTrace{}, fmt.Errorf("composer: stage2: %w", err)
 	}

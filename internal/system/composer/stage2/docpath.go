@@ -77,3 +77,28 @@ func demoteDocsFor(intent contract.Intent) bool {
 	}
 	return true
 }
+
+// promptMentionsVerbatim reports whether kw occurs in prompt as a
+// standalone identifier token (case-sensitive, non-identifier chars on
+// both sides). Gate for the prompt-exact FindSymbol boost: only the
+// user's literal references qualify, never derived candidates.
+func promptMentionsVerbatim(prompt, kw string) bool {
+	for start := 0; ; {
+		i := strings.Index(prompt[start:], kw)
+		if i < 0 {
+			return false
+		}
+		i += start
+		before := i == 0 || !isIdentChar(prompt[i-1])
+		afterIdx := i + len(kw)
+		after := afterIdx >= len(prompt) || !isIdentChar(prompt[afterIdx])
+		if before && after {
+			return true
+		}
+		start = i + 1
+	}
+}
+
+func isIdentChar(b byte) bool {
+	return b == '_' || (b >= '0' && b <= '9') || (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
+}

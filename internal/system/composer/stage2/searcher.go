@@ -47,6 +47,17 @@ const (
 	// the magnitude blow-up the old SymbolBonus = 5.0 produced under the
 	// raw score-sum aggregator.
 	DefaultSymbolWeight = 1.5
+	// DefaultPromptExactBoost multiplies SymbolWeight for FindSymbol
+	// lists whose keyword appears VERBATIM in the user's prompt. A
+	// literal identifier in the prompt ("EnableBM25Rerank") is the
+	// user's explicit reference — its definition site must survive the
+	// budget cut even against multi-hit ckv chunks. Derived keywords
+	// (compounds, morphs, hit-mined symbols) keep plain SymbolWeight:
+	// the global-raise alternative was swept 1.5→5.0 and measured
+	// harmful (recall 0.844→0.733 — name-matched-but-wrong symbols
+	// crowd out semantic hits), so the boost is gated on explicit
+	// prompt evidence instead.
+	DefaultPromptExactBoost = 2.0
 	// DefaultCkvWeight is the RRF weight applied to the single ckv
 	// semantic-search ranked list. Set well above both ckg list weights
 	// because, on natural-language prompts, embedding recall measurably
@@ -172,7 +183,7 @@ func New(ckg ckgclient.Client, opts ...Option) (*Searcher, error) {
 //
 // Empty keyword input returns an empty (but non-error) Stage2Output:
 // composer can decide what to do with a Stage 1 that produced nothing.
-func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []contract.Hit, intent contract.Intent) (Stage2Output, error) {
+func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string, ckvHits []contract.Hit, intent contract.Intent) (Stage2Output, error) {
 	out := Stage2Output{
 		Symbols: make(map[string][]contract.Citation),
 	}
@@ -219,7 +230,17 @@ func (s *Searcher) Search(ctx context.Context, keywords []string, ckvHits []cont
 		} else if len(symbolCits) > 0 {
 			anyHit = true
 			out.Symbols[kw] = symbolCits
-			agg.addSymbolList(kw, symbolCits)
+			weight := s.config.SymbolWeight
+			// Boost gate: verbatim prompt mention AND an unambiguous
+			// resolution. Ambiguous names (eight same-named methods, or
+			// case-folded commons like "intent" hitting type Intent)
+			// would have the boost amplify noise — measured: ungated
+			// 3.0 boost sank recall 0.844→0.778 while fixing only the
+			// one field scenario.
+			if len(symbolCits) == 1 && promptMentionsVerbatim(prompt, kw) {
+				weight *= DefaultPromptExactBoost
+			}
+			agg.addSymbolListWeighted(kw, symbolCits, weight)
 		}
 
 		if !anyHit {
