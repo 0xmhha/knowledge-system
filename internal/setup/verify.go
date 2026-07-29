@@ -122,3 +122,61 @@ func readJSON(path string, v any) error {
 	}
 	return nil
 }
+
+// contentManifest projects the vector manifest fields that record which
+// non-code inputs an index actually absorbed.
+type contentManifest struct {
+	DocsRoots []string       `json:"docs_roots"`
+	Languages map[string]int `json:"languages"`
+}
+
+// VerifyContent asserts that inputs the caller declared are present in the
+// finished index. It exists because every one of these inputs used to fail
+// open: a corpus flag that was never passed, an authoritative doc that could
+// not be resolved, and a policy that had drifted from its entries all produced
+// a build that exited zero and an index that was quietly smaller. The only
+// symptom was a chunk count nobody compared against anything.
+//
+// The checks read the vector manifest rather than the database so this stays
+// on the CLI-contract side of the engine boundary.
+func VerifyContent(o Options, emit func(Event)) error {
+	var cm contentManifest
+	if err := readJSON(filepath.Join(o.VectorDir(), "manifest.json"), &cm); err != nil {
+		return fmt.Errorf("verify: vector manifest: %w", err)
+	}
+	rooted := func(dir string) bool {
+		want, err := filepath.Abs(dir)
+		if err != nil {
+			want = dir
+		}
+		for _, got := range cm.DocsRoots {
+			if abs, err := filepath.Abs(got); err == nil {
+				got = abs
+			}
+			if got == want {
+				return true
+			}
+		}
+		return false
+	}
+
+	var missing []string
+	if o.DomainKnowledge != "" {
+		if !rooted(o.DomainCorpusDir()) {
+			missing = append(missing, fmt.Sprintf("the domain corpus %s is not among the index's docs roots", o.DomainCorpusDir()))
+		} else if cm.Languages["markdown"] == 0 {
+			missing = append(missing, "the domain corpus was passed but produced no markdown chunks (an empty corpus directory)")
+		}
+	}
+	if o.FlowCorpus != "" && !rooted(filepath.Dir(o.FlowCorpus)) {
+		missing = append(missing, fmt.Sprintf("the flow corpus %s is not among the index's docs roots", o.FlowCorpus))
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("verify: declared inputs did not reach the index:\n  - %s", strings.Join(missing, "\n  - "))
+	}
+	if emit != nil {
+		emit(Event{Time: time.Now().UTC(), Step: "verify-content", Type: "output",
+			Message: fmt.Sprintf("docs roots %d, markdown chunks %d", len(cm.DocsRoots), cm.Languages["markdown"])})
+	}
+	return nil
+}

@@ -160,6 +160,33 @@ entries:
         - msg.From
         - msg.To
     - aliases:
+        - 트랜잭션 타입 분류
+        - txpool 진입 검증
+        - 타입별 포크 게이트
+        - 수수료 위임 트랜잭션 검증
+        - feePayer 서명 검증
+        - transaction type taxonomy
+        - txpool admission gates
+        - per-type fork gating
+        - fee delegate tx validation
+        - fee payer signature recovery
+      canonical: A11.txpool.type_taxonomy_admission
+      code_keywords:
+        - ValidateTransaction
+        - ErrTxTypeNotSupported
+        - ErrInvalidFeePayer
+        - FeeDelegateDynamicFeeTxType
+        - SetCodeTxType
+        - BlobTxType
+        - DynamicFeeTxType
+        - IsBerlin
+        - IsLondon
+        - IsApplepie
+        - IsCancun
+        - AnzeonEnabled
+        - NewFeeDelegateSigner
+        - opts.Accept
+    - aliases:
         - BLS 서명
         - 집계 서명
         - 씰러셋
@@ -540,6 +567,24 @@ entries:
         - DefaultGovCouncilAddress
         - NativeCoinManager
         - AccountManager
+    - aliases:
+        - 시스템 컨트랙트 라이프사이클
+        - 컨트랙트 빌드 배포 파이프라인
+        - 제네시스 컨트랙트 주입
+        - system contract lifecycle
+        - contract build deploy pipeline
+        - genesis contract injection
+        - solidity to genesis pipeline
+      canonical: A4.system_contracts.build_deploy_pipeline
+      code_keywords:
+        - InjectContracts
+        - GetSystemContractsTransition
+        - SystemContractCodes
+        - StateTransition
+        - CodeParam
+        - solcVersion
+        - go:embed
+        - artifacts
     - aliases:
         - 거브 민터
         - 민터 컨트랙트

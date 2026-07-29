@@ -19,6 +19,8 @@ jobs:
         run: make lint
       - name: Test (race)
         run: make test-race
+      - name: Domain artifacts match their entries
+        run: make check-domain-artifacts
 
   # Successor of code-knowledge-vector's eval-gate job: recall regression
   # gate over the vendored sample corpus with the deterministic mock
