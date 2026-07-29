@@ -113,6 +113,25 @@ glob, #40의 doc 강등 모두 8/9 시나리오에서 비활성이었다 — R7�
    const/var 청킹 이후 헤더는 "오리엔테이션"이지 답이 아니다.
 
 **재측정(동일 인덱스): avg MRR 0.389 → 0.438, avg recall 0.722 → 0.778**.
+
+## doc comment 스팬 포함 (2026-07-29, 후속 R8)
+
+func/type 스팬이 doc comment 라인에서 시작하도록 확장(const/var는 R3에서
+기수행; grouped type 블록은 per-spec doc만, 단일-spec은 GenDecl doc 폴백).
+자연어 신호("// Real is the in-process adapter...")가 임베딩 텍스트에
+포함되고 스팬 라인도 리뷰어 직관과 일치. ckgalign은 exact-start 대신
+overlap tier로 정렬 유지(회귀 테스트 고정).
+
+**재측정(전체 재임베딩): avg MRR 0.438 → 0.497, avg recall 0.778 → 0.926**.
+concurrency-safety MRR 0.10→0.75·R 0.50→**1.00**(R7 회귀의 예측된 근본
+해소 — type Real 청크가 doc 포함 42-53으로 직접 매칭), ckg-bm25-translation
+R 0.50→**1.00**·MRR 0.12→0.42, stamp-integrity R 0.67→**1.00**. MRR 하락
+2건(pipeline-flow 0.57→0.20, qa-review 0.50→0.12)은 R=1.00 유지 상태에서
+재임베딩에 따른 상위권 순서 변동 — 순효과 명백히 양.
+
+**트랙 누적**: recall 0.296 → **0.926**, MRR(도입 후) 0.389 → **0.497**.
+잔여: mcp-tool-handlers·test-add(R 0.67), MRR 상위권 안정화(재임베딩마다
+순서 요동) — 후자는 정확-식별자 BM25 rerank(stage1 ckv 경로) 후보.
 composer-err-fail-closed MRR 0.25→0.55·R 0.50→**1.00**, pipeline-flow
 0.32→0.57, qa-review 0.25→0.50. 유일 회귀 concurrency-safety MRR
 0.50→0.10(R 불변): 이전 첫 매칭이 **우연히 헤더 청크**(1-50이 기대 42-55와

@@ -58,14 +58,23 @@ func (p *Parser) funcSpan(fset *token.FileSet, src []byte, fn *ast.FuncDecl) cpa
 			name = recvName + "." + fn.Name.Name
 		}
 	}
-	startPos := fset.Position(fn.Pos())
+	// Start at the doc comment when present: the leading comment carries
+	// the natural-language description a semantic query actually matches
+	// ("// Greet returns a greeting."), and reviewers count those lines
+	// as part of the symbol. ckgalign still resolves the canonical id via
+	// its overlap tier (ckg nodes start at the declaration line).
+	start := fn.Pos()
+	if fn.Doc != nil {
+		start = fn.Doc.Pos()
+	}
+	startPos := fset.Position(start)
 	endPos := fset.Position(fn.End())
 	return cparse.SymbolSpan{
 		Name:      name,
 		Kind:      kind,
 		StartLine: startPos.Line,
 		EndLine:   endPos.Line,
-		Text:      sliceText(src, fn.Pos(), fn.End(), fset),
+		Text:      sliceText(src, start, fn.End(), fset),
 	}
 }
 
@@ -85,14 +94,26 @@ func (p *Parser) genSpans(fset *token.FileSet, src []byte, gen *ast.GenDecl) []c
 			case *ast.InterfaceType:
 				kind = types.KindInterface
 			}
-			startPos := fset.Position(ts.Pos())
+			// Include the doc comment (same rationale as funcSpan). For the
+			// common non-parenthesized `type X ...` the doc hangs on the
+			// GenDecl, not the spec — take it only for single-spec decls so
+			// a grouped block's header comment is not attributed to every
+			// member.
+			start := ts.Pos()
+			switch {
+			case ts.Doc != nil:
+				start = ts.Doc.Pos()
+			case gen.Doc != nil && len(gen.Specs) == 1:
+				start = gen.Doc.Pos()
+			}
+			startPos := fset.Position(start)
 			endPos := fset.Position(ts.End())
 			out = append(out, cparse.SymbolSpan{
 				Name:      ts.Name.Name,
 				Kind:      kind,
 				StartLine: startPos.Line,
 				EndLine:   endPos.Line,
-				Text:      sliceText(src, ts.Pos(), ts.End(), fset),
+				Text:      sliceText(src, start, ts.End(), fset),
 			})
 		}
 		return out
