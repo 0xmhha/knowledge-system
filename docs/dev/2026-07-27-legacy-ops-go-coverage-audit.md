@@ -1,7 +1,8 @@
 # Legacy operational scripts — Go-coverage audit (2026-07-27)
 
-Status: Tier-3 (dated backlog / status). Disposable once the backlog below is
-worked off and the scripts are retired.
+Status: Tier-3 (dated backlog / status). **백로그 9개 항목 전부 LANDED
+(2026-07-30 확인)** — 이 문서가 계속 살아 있는 이유는 아래 **"잔여"** 2건과
+처분 기록(Disposition) 때문이다. 그 2건이 닫히면 폐기 가능.
 
 ## Why this exists
 
@@ -99,10 +100,25 @@ Out of Go scope (stay shell / move to the coding-agent plugin, not archived
 here): `activate.sh`, `apply-cc-settings.sh`, `coding-agent.sh`,
 `enable-autopilot.sh`.
 
+## 잔여 (이 문서의 유일한 열린 항목)
+
+3-repo 통합 설계
+([`archive/2026-07-28-gap-integration-design.md`](./archive/2026-07-28-gap-integration-design.md))가
+2026-07-30에 구현 완료로 닫히면서, 그 §7이 열린 결정으로 남긴 항목이 아래
+2건으로 수렴했다. 둘 다 명시적 후속이며 통합 자체를 막지 않는다.
+
+1. **`activate.sh` / `apply-cc-settings.sh`의 coding-agent repo 이관** —
+   플러그인 `.mcp.json`이 아직 `${VAR}` 플레이스홀더를 요구하는 동안은
+   `activate.sh`가 config에서 파생·export한다. 플러그인이 config를 직접
+   소비하도록 바뀌는 시점에 export를 제거하고 두 스크립트를 이관한다.
+2. **`system/dataset-toolkit/scripts/*` · `vector/scripts/build-vector-stablenet.sh`
+   경로 갱신** — 구 3-repo 레이아웃 경로가 남아 있다. 통합 설계에서 명시적
+   범위 밖으로 두고 보류한 항목.
+
 ## Disposition
 
 - **Retired (2026-07-28, gap-integration — see
-  `docs/dev/2026-07-28-gap-integration-design.md` §4):** `serve-cks-http.sh`,
+  `docs/dev/archive/2026-07-28-gap-integration-design.md` §4):** `serve-cks-http.sh`,
   `cks-mcpd.sh`, `reindex-dataset.sh`, `gen-cks-config.sh`, `cks-health.sh`,
   and `projects/stablenet/scripts/gen-filelist.sh` (superseded by
   `ckg build --files-from-main`). The "cks.env half" judgment above is

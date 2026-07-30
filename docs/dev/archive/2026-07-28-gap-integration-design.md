@@ -1,15 +1,37 @@
 # 3-repo 통합 잔여 갭 반영 설계 (2026-07-28, rev.5 — 수렴)
 
+> **CLOSED (2026-07-30) — 구현 완료, archive 보존.** §6 수용 기준이 모두
+> 성립함을 확인했다. 설계 의도를 다시 볼 때만 참조한다.
+>
+> | 기준 | 확인 방법 | 결과 |
+> |---|---|---|
+> | G0 flaky serve (§1.0) | `cmd/graph/cli_extra_test.go`의 retry-RemoveAll cleanup | 반영됨 |
+> | A 루트 게이트 | CI `build-and-test` (main) | green |
+> | B graph eval 정합 (§1) | CI `eval-gate-graph`; `graph/Makefile eval`이 `--files-from-main ./cmd/graph,./cmd/graph-mcp,./cmd/eval-gate` 사용 | green |
+> | C vector recall (§2.1) | CI `eval-gate-vector` | green |
+> | D 훅 (§3) | 루트 `Makefile`의 `install-hooks` + `.githooks/pre-commit` | 존재 |
+> | E 스크립트 (§4) | `bash -n` 통과, `code-knowledge-{graph,vector,system}` 잔존 0건, `.gitignore`에 `run/`, `activate.sh`가 cks.env 대신 `print-mcp-config` 파생 | 충족 |
+> | F CI (§2.2) | main 최근 run = `build-and-test` / `eval-gate-vector` / `eval-gate-graph` / `vuln-scan` 전부 success, 뷰어 job 부재 | 충족 |
+> | G6 dogfood 정합 (§1.3) | `system/Makefile`의 `CKG_SRC ?= ..`(구 `?= .`은 Go 파일 0개), 시나리오의 구 레이아웃 경로(`internal/composer/`) 0건 | 해소 |
+> | §1.2 패키지 목록화 | `GRAPH_PKGS`(graph) / `PKG_LIST`(vector) / `SYSTEM_PKGS`(system) | 반영됨 |
+>
+> **잔여 2건은 이 문서가 아니라
+> [`../2026-07-27-legacy-ops-go-coverage-audit.md`](../2026-07-27-legacy-ops-go-coverage-audit.md)의
+> "잔여" 절이 계속 보유한다** (§7이 열린 결정으로 남겨둔 것과 동일 항목):
+> `activate.sh`/`apply-cc-settings.sh`의 coding-agent repo 이관,
+> `system/dataset-toolkit/scripts/*`·`vector/scripts/build-vector-stablenet.sh`
+> 경로 갱신.
+
 변경이력(rev.4 → rev.5) — 수렴 라운드, 실결함 2건만 교정: §1.3 sed에 `pkg/`
 치환 누락(인용 경로 실측 internal/ 15 + pkg/ 4 — 누락 시 자체 수용 기준
 위배), §1.0 수도 코드 주석의 전략 혼재(TempDir-밖-이동 서술 제거, retry 단일
 전략). 그 외 전 항목 재검증 통과 — 검토·기각한 변경은 문서 말미 §8에 기록.
 
 
-Status: Tier-3 설계 문서 (구현 전 리뷰용). rev.2 — 자체 비판 리뷰 반영.
-rev.3 — 목적 부합성 재검토 반영. rev.4 — rev.3 비판 재검토 반영(신규 갭 G6
-발견 포함). 구현 완료 후 결과 기록으로 갱신하거나
-`docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md`의 disposition에 병합한다.
+Status: Tier-3 설계 문서 — **구현 완료(2026-07-30), archive 보존**. 위 CLOSED
+배너가 수용 기준별 확인 결과이고, 잔여 2건의 소재를 가리킨다. rev.2 — 자체
+비판 리뷰 반영. rev.3 — 목적 부합성 재검토 반영. rev.4 — rev.3 비판 재검토
+반영(신규 갭 G6 발견 포함).
 
 변경이력(rev.3 → rev.4) — rev.3 산출물에 대한 비판 재검토 결과:
 
