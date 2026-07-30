@@ -1,9 +1,11 @@
 package setup
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -177,6 +179,52 @@ func VerifyContent(o Options, emit func(Event)) error {
 	if emit != nil {
 		emit(Event{Time: time.Now().UTC(), Step: "verify-content", Type: "output",
 			Message: fmt.Sprintf("docs roots %d, markdown chunks %d", len(cm.DocsRoots), cm.Languages["markdown"])})
+	}
+	return nil
+}
+
+// VerifyDerivedFresh regenerates a committed artifact into a temporary file
+// and fails when it differs from the copy in the tree.
+//
+// Some artifacts are rendered from a project's domain-knowledge entries but
+// stay committed, because a change to an entry should show up as a reviewable
+// diff rather than only inside a rebuilt index. That only works if something
+// notices when the two fall apart. Nothing did, and both the governance policy
+// and the alias glossary of one pack sat months behind their entries — the
+// policy silently building graphs with a quarter fewer governance edges than
+// the entries called for.
+//
+// Checking instead of deriving keeps one copy of each artifact. Writing a
+// second one into a build directory would remove the staleness but leave two
+// files to reason about, and the build would quietly stop agreeing with what
+// reviewers had approved.
+func VerifyDerivedFresh(step, label string, argv []string, committed string, emit func(Event)) error {
+	dir, err := os.MkdirTemp("", "knowledge-setup-fresh-")
+	if err != nil {
+		return fmt.Errorf("verify: %s: %w", label, err)
+	}
+	defer os.RemoveAll(dir)
+
+	fresh := filepath.Join(dir, filepath.Base(committed))
+	cmd := exec.Command(argv[0], append(append([]string{}, argv[1:]...), fresh)...)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("verify: %s: regenerating to compare failed: %w\n%s", label, err, out)
+	}
+	want, err := os.ReadFile(fresh)
+	if err != nil {
+		return fmt.Errorf("verify: %s: %w", label, err)
+	}
+	got, err := os.ReadFile(committed)
+	if err != nil {
+		return fmt.Errorf("verify: %s: reading the committed copy: %w", label, err)
+	}
+	if !bytes.Equal(got, want) {
+		return fmt.Errorf("verify: %s is stale: %s no longer matches the domain entries "+
+			"it is rendered from. Run 'make sync-domain-artifacts' and commit the result", label, committed)
+	}
+	if emit != nil {
+		emit(Event{Time: time.Now().UTC(), Step: step, Type: "output",
+			Message: fmt.Sprintf("%s matches its entries", label)})
 	}
 	return nil
 }

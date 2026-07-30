@@ -132,7 +132,7 @@ func TestEnrichDigest_HashesKnowledgeNotLocation(t *testing.T) {
 			QualifiedName: "A1.rule", Name: "Lock discipline",
 			SubKind: "A1", Signature: "category=A1 governs=2",
 			DocComment: "Every accessor must hold the mutex.",
-			FilePath:   "projects/pack/policies/graph.yaml",
+			FilePath:   "some/committed/policies/graph.yaml",
 			StartLine:  1,
 		}
 		if mut != nil {
@@ -145,7 +145,7 @@ func TestEnrichDigest_HashesKnowledgeNotLocation(t *testing.T) {
 
 	t.Run("the same policy loaded from elsewhere is the same policy", func(t *testing.T) {
 		moved := policy(func(n *types.Node) {
-			n.FilePath = "/abs/machine/local/generated/policies/graph.yaml"
+			n.FilePath = "/abs/machine/local/derived/policies/graph.yaml"
 		})
 		if got := ComputeEnrichDigest(moved, edges); got != base {
 			t.Errorf("digest moved with the file path; a build's location is not knowledge")

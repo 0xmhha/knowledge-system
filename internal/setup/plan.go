@@ -13,6 +13,7 @@ package setup
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 )
 
@@ -76,6 +77,11 @@ type Options struct {
 	// against. Unset is only viable for a project that declares none — the
 	// export step fails rather than shipping a corpus without them.
 	CodeRoot string
+	// GlossaryFile is the committed alias glossary rendered from the same
+	// entries. The fused server reads it at query time to bridge a user's
+	// wording to the identifiers in the code, so the build does not consume
+	// it — it only checks that it still matches the entries.
+	GlossaryFile string
 	// FlowCorpus is a curated flow-corpus JSONL embedded alongside the code
 	// chunks. Unlike the three derived artifacts this one is hand-authored,
 	// so it is consumed straight from the pack.
@@ -108,15 +114,10 @@ func (o Options) derivedRoot() string {
 	return filepath.Join(filepath.Dir(o.DomainKnowledge), "generated")
 }
 
-// DomainCorpusDir / DerivedPolicyPath / DerivedGlossaryPath are the three
-// artifacts re-derived from the domain-knowledge entries on every run.
+// DomainCorpusDir is the rendered embedding corpus. It is the only domain
+// artifact written here; the policy and the glossary are committed and merely
+// checked against their entries (VerifyDerivedFresh).
 func (o Options) DomainCorpusDir() string { return filepath.Join(o.derivedRoot(), "domain-corpus") }
-func (o Options) DerivedPolicyPath() string {
-	return filepath.Join(o.derivedRoot(), "policies", "graph.yaml")
-}
-func (o Options) DerivedGlossaryPath() string {
-	return filepath.Join(o.derivedRoot(), "glossary.yaml")
-}
 
 // Step is one unit of the plan: either a subprocess (Cmd non-empty) or an
 // internal verification (Verify non-nil).
@@ -178,28 +179,35 @@ func BuildPlan(o Options) (Plan, error) {
 		if o.CodeRoot != "" {
 			exportCmd = append(exportCmd, "-code-root", o.CodeRoot)
 		}
-		steps = append(steps,
-			Step{
-				ID:    "domain-export",
-				Title: "Render the domain-knowledge embedding corpus",
-				Cmd:   exportCmd,
-			},
-			Step{
-				ID:    "domain-sync",
-				Title: "Derive the governance policy from the domain entries",
-				// The ckv view is derived too but written aside: packs
-				// categorize vector chunks by code path, which is a
-				// different taxonomy from the entries' subsystems.
-				Cmd: []string{syncBin, "-entries", o.DomainKnowledge,
-					"-ckg-out", o.DerivedPolicyPath(),
-					"-ckv-out", filepath.Join(o.derivedRoot(), "policies", "vector-from-entries.yaml")},
-			},
-			Step{
-				ID:    "glossary-gen",
-				Title: "Build the alias glossary from the domain entries",
-				Cmd:   []string{glossaryBin, "-project", o.DomainKnowledge, "-out", o.DerivedGlossaryPath()},
-			},
-		)
+		// The corpus is the one artifact that is genuinely derived here: it
+		// is large, nobody reads it by hand, and the vector build consumes it
+		// directly. The policy and the glossary stay committed and are only
+		// checked — see VerifyDerivedFresh for why.
+		steps = append(steps, Step{
+			ID:    "domain-export",
+			Title: "Render the domain-knowledge embedding corpus",
+			Cmd:   exportCmd,
+		})
+		if o.PolicyFile != "" {
+			argv := []string{syncBin, "-entries", o.DomainKnowledge, "-ckv-out", os.DevNull, "-ckg-out"}
+			steps = append(steps, Step{
+				ID:    "policy-fresh",
+				Title: "Check the governance policy against the domain entries",
+				Verify: func(emit func(Event)) error {
+					return VerifyDerivedFresh("policy-fresh", "the governance policy", argv, o.PolicyFile, emit)
+				},
+			})
+		}
+		if o.GlossaryFile != "" {
+			argv := []string{glossaryBin, "-project", o.DomainKnowledge, "-out"}
+			steps = append(steps, Step{
+				ID:    "glossary-fresh",
+				Title: "Check the alias glossary against the domain entries",
+				Verify: func(emit func(Event)) error {
+					return VerifyDerivedFresh("glossary-fresh", "the alias glossary", argv, o.GlossaryFile, emit)
+				},
+			})
+		}
 	}
 	if o.FilelistConfig != "" {
 		filelistBin := o.FilelistBin
@@ -220,13 +228,7 @@ func BuildPlan(o Options) (Plan, error) {
 	if o.FilelistConfig != "" {
 		graphCmd = append(graphCmd, "--files-from", o.FilesFromPath())
 	}
-	// A derived policy wins over a configured one: when the entries are
-	// present they are the source of truth, and the configured path is at
-	// best a copy of an earlier derivation.
-	switch {
-	case o.DomainKnowledge != "":
-		graphCmd = append(graphCmd, "--policy-file", o.DerivedPolicyPath())
-	case o.PolicyFile != "":
+	if o.PolicyFile != "" {
 		graphCmd = append(graphCmd, "--policy-file", o.PolicyFile)
 	}
 	if o.SecurityPatternFile != "" {
