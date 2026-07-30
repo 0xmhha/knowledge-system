@@ -406,6 +406,7 @@ func TestBuildPlan_DomainArtifacts(t *testing.T) {
 		CodeRoot:        "/checkout",
 		FlowCorpus:      "/pack/domain-knowledge/flow-corpus/corpus.jsonl",
 		PolicyFile:      "/pack/policies/graph.yaml",
+		GlossaryFile:    "/pack/domain-knowledge/glossary.yaml",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -414,31 +415,31 @@ func TestBuildPlan_DomainArtifacts(t *testing.T) {
 	for i, s := range p.Steps {
 		ids[i] = s.ID
 	}
-	want := []string{"domain-export", "domain-sync", "glossary-gen", "graph-build", "vector-build", "verify-align", "verify-content"}
+	want := []string{"domain-export", "policy-fresh", "glossary-fresh", "graph-build", "vector-build", "verify-align", "verify-content"}
 	if strings.Join(ids, ",") != strings.Join(want, ",") {
 		t.Fatalf("step ids = %v, want %v", ids, want)
 	}
 
-	// The derived artifacts default to generated/ beside the pack.
+	// The corpus is the only artifact written; it defaults beside the pack.
 	if e := strings.Join(p.Steps[0].Cmd, " "); !strings.Contains(e, "-out /pack/generated/domain-corpus") ||
 		!strings.Contains(e, "-code-root /checkout") {
 		t.Errorf("export cmd = %q", e)
 	}
-	if s := strings.Join(p.Steps[1].Cmd, " "); !strings.Contains(s, "-ckg-out /pack/generated/policies/graph.yaml") {
-		t.Errorf("sync cmd = %q", s)
-	}
-	if g := strings.Join(p.Steps[2].Cmd, " "); !strings.Contains(g, "-out /pack/generated/glossary.yaml") {
-		t.Errorf("glossary cmd = %q", g)
+	// The policy and glossary checks are in-process; nothing is written for
+	// them, so a second copy of either cannot drift from the committed one.
+	for _, i := range []int{1, 2} {
+		if p.Steps[i].Verify == nil || p.Steps[i].Cmd != nil {
+			t.Errorf("step %q should be an in-process check, got cmd=%v", p.Steps[i].ID, p.Steps[i].Cmd)
+		}
 	}
 
-	// The graph build must consume the freshly derived policy, not the
-	// configured one — a committed copy is a snapshot of an older derivation.
+	// The graph build consumes the committed policy — the one reviewers see.
 	graph := strings.Join(p.Steps[3].Cmd, " ")
-	if !strings.Contains(graph, "--policy-file /pack/generated/policies/graph.yaml") {
-		t.Errorf("graph cmd should use the derived policy, got %q", graph)
+	if !strings.Contains(graph, "--policy-file /pack/policies/graph.yaml") {
+		t.Errorf("graph cmd should use the committed policy, got %q", graph)
 	}
-	if strings.Contains(graph, "/pack/policies/graph.yaml") {
-		t.Errorf("graph cmd still references the configured policy: %q", graph)
+	if strings.Contains(graph, "generated") {
+		t.Errorf("graph cmd should not reference a derived policy: %q", graph)
 	}
 
 	vec := strings.Join(p.Steps[4].Cmd, " ")
@@ -449,19 +450,45 @@ func TestBuildPlan_DomainArtifacts(t *testing.T) {
 		t.Errorf("vector cmd missing --flow-corpus: %q", vec)
 	}
 
-	// Without domain knowledge the plan is unchanged and the content gate
-	// stays out of the way.
+	// Without domain knowledge the plan is unchanged.
 	p2, err := BuildPlan(Options{Src: "/s", Out: "/o", PolicyFile: "/pack/policies/graph.yaml"})
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, s := range p2.Steps {
-		if s.ID == "verify-content" || s.ID == "domain-export" {
+		if s.ID == "verify-content" || s.ID == "domain-export" || s.ID == "policy-fresh" {
 			t.Errorf("unexpected step %q when DomainKnowledge is unset", s.ID)
 		}
 	}
 	if g := strings.Join(p2.Steps[0].Cmd, " "); !strings.Contains(g, "--policy-file /pack/policies/graph.yaml") {
-		t.Errorf("configured policy should still be used when there is nothing to derive from: %q", g)
+		t.Errorf("configured policy should still be used: %q", g)
+	}
+}
+
+// TestVerifyDerivedFresh covers the check that replaced writing a second copy
+// of a committed artifact: a stale file must stop the build, and the error has
+// to say which file and how to fix it.
+func TestVerifyDerivedFresh(t *testing.T) {
+	dir := t.TempDir()
+	committed := filepath.Join(dir, "graph.yaml")
+	gen := writeScript(t, dir, "gen.sh", `printf 'policies: [a, b]\n' > "$2"`+"\n")
+
+	if err := os.WriteFile(committed, []byte("policies: [a, b]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyDerivedFresh("s", "the policy", []string{gen, "-out"}, committed, nil); err != nil {
+		t.Errorf("matching copy should pass, got %v", err)
+	}
+
+	if err := os.WriteFile(committed, []byte("policies: [a]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	err := VerifyDerivedFresh("s", "the policy", []string{gen, "-out"}, committed, nil)
+	if err == nil {
+		t.Fatal("a stale committed copy must fail the build")
+	}
+	if !strings.Contains(err.Error(), committed) || !strings.Contains(err.Error(), "sync-domain-artifacts") {
+		t.Errorf("error should name the file and the fix, got %v", err)
 	}
 }
 
