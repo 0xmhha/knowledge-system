@@ -128,11 +128,24 @@ func isEnrichmentEdgeType(t types.EdgeType) bool {
 }
 
 // ComputeEnrichDigest returns a deterministic hex hash over ONLY the
-// enrichment nodes/edges (same line format as ComputeGraphDigest), or ""
-// when the graph carries no enrichment. It changes when the injected
-// policy / security knowledge changes and is deliberately NOT part of the
-// coordinate pin: consumers use it to detect "the enrichment overlay moved"
-// without forcing a vector realignment.
+// enrichment nodes/edges, or "" when the graph carries no enrichment. It
+// changes when the injected policy / security knowledge changes and is
+// deliberately NOT part of the coordinate pin: consumers use it to detect
+// "the enrichment overlay moved" without forcing a vector realignment.
+//
+// The hashed fields are the ones that carry the knowledge — the entry's
+// name, category, description, and the summary line that counts its
+// governs/matches targets — plus the identity and the edge set. This is
+// unlike ComputeGraphDigest, which hashes locations because a parsed
+// symbol's position IS part of what it says.
+//
+// FilePath is deliberately excluded. It records which YAML the entry was
+// loaded from, which is provenance, not knowledge: the same policy
+// injected from a different path is the same policy, and hashing the
+// path made the digest depend on where the build ran. It previously
+// dominated the hash — for a policy node every other hashed field was
+// either constant or derived from the ID, so the digest moved when a
+// file was relocated and stood still when an entry's description changed.
 func ComputeEnrichDigest(nodes []types.Node, edges []types.Edge) string {
 	nodeLines := make([]string, 0, 8)
 	for _, n := range nodes {
@@ -144,9 +157,10 @@ func ComputeEnrichDigest(nodes []types.Node, edges []types.Edge) string {
 			n.CanonicalID,
 			string(n.Type),
 			n.QualifiedName,
-			n.FilePath,
-			strconv.Itoa(n.StartLine),
-			strconv.Itoa(n.EndLine),
+			n.Name,
+			n.SubKind,
+			n.Signature,
+			n.DocComment,
 		}, "\t"))
 	}
 	edgeSet := make(map[string]struct{}, 8)

@@ -119,3 +119,54 @@ func TestGraphDigest_EnrichmentExcluded(t *testing.T) {
 		t.Error("EnrichDigest did not change when enrichment changed")
 	}
 }
+
+// TestEnrichDigest_HashesKnowledgeNotLocation pins what the enrich digest is
+// for. Before this, the only field that varied between two policy nodes was
+// FilePath: everything else hashed was either a constant or derived from the
+// entry ID. That inverted the intent — relocating the YAML moved the digest,
+// while rewording an entry left it untouched.
+func TestEnrichDigest_HashesKnowledgeNotLocation(t *testing.T) {
+	policy := func(mut func(*types.Node)) []types.Node {
+		n := types.Node{
+			ID: "policy:A1.rule", Type: types.NodePolicy,
+			QualifiedName: "A1.rule", Name: "Lock discipline",
+			SubKind: "A1", Signature: "category=A1 governs=2",
+			DocComment: "Every accessor must hold the mutex.",
+			FilePath:   "projects/pack/policies/graph.yaml",
+			StartLine:  1,
+		}
+		if mut != nil {
+			mut(&n)
+		}
+		return []types.Node{n}
+	}
+	edges := []types.Edge{{Type: types.EdgeGovernedBy, Src: "n1", Dst: "policy:A1.rule"}}
+	base := ComputeEnrichDigest(policy(nil), edges)
+
+	t.Run("the same policy loaded from elsewhere is the same policy", func(t *testing.T) {
+		moved := policy(func(n *types.Node) {
+			n.FilePath = "/abs/machine/local/generated/policies/graph.yaml"
+		})
+		if got := ComputeEnrichDigest(moved, edges); got != base {
+			t.Errorf("digest moved with the file path; a build's location is not knowledge")
+		}
+	})
+
+	// Each of these is a real edit to what the entry says, and each used to
+	// leave the digest untouched.
+	for _, tc := range []struct {
+		field string
+		mut   func(*types.Node)
+	}{
+		{"description", func(n *types.Node) { n.DocComment = "Rewritten guidance." }},
+		{"name", func(n *types.Node) { n.Name = "Lock discipline (revised)" }},
+		{"category", func(n *types.Node) { n.SubKind = "A2" }},
+		{"signature", func(n *types.Node) { n.Signature = "category=A1 governs=3" }},
+	} {
+		t.Run("editing the "+tc.field+" moves the digest", func(t *testing.T) {
+			if got := ComputeEnrichDigest(policy(tc.mut), edges); got == base {
+				t.Errorf("digest unchanged after editing %s", tc.field)
+			}
+		})
+	}
+}
