@@ -46,6 +46,15 @@ type Hit struct {
 	// budget allocator's knowledge quota) without a second query. Empty
 	// for ckg-sourced hits.
 	ChunkKind string `json:"chunk_kind,omitempty"`
+	// Text is the chunk's indexed content, carried through from ckv's
+	// Snippet. Most citations resolve to file lines and do not need it,
+	// but synthesized chunks have no file to read: a `convention` chunk
+	// is a derived package summary living at <dir>/<convention> lines
+	// 0-0, so the budget allocator's filesystem fetch returns empty and
+	// the candidate is dropped. Carrying the text the search already
+	// returned is what lets those reach the pack. Empty for ckg-sourced
+	// hits and for chunks whose body the fetcher can read itself.
+	Text string `json:"text,omitempty"`
 }
 
 // IsValid reports whether h carries a valid Citation and a sane Rank.

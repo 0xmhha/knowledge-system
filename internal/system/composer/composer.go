@@ -255,7 +255,7 @@ func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, c
 	// 7. Assemble EvidencePack — drop sanitized-out items, filter
 	// neighbors whose endpoints are missing from the final citation
 	// set (required for EvidencePack.IsValid).
-	pack := assemblePack(prompt, intentVal, s3Out, s4Out, s5Out, c.builderVersion)
+	pack := assemblePack(prompt, intentVal, s3Out, s4Out, s5Out, c.builderVersion, s2Out.Knowledge)
 
 	// Attach any dummy-backend instructions accumulated during the run
 	// (empty when the wired backends are real).
@@ -352,6 +352,7 @@ func assemblePack(
 	s4Out budget.Stage4Output,
 	s5Out sanitize.Stage5Output,
 	builderVersion string,
+	knowledge []contract.KnowledgeChunk,
 ) contract.EvidencePack {
 	// Build the (citations, bodies) pair from sanitized non-dropped
 	// items. Maintain a citation key set so neighbor filtering can
@@ -462,6 +463,7 @@ func assemblePack(
 		Citations:      citations,
 		Bodies:         bodies,
 		GraphNeighbors: validNeighbors,
+		Knowledge:      knowledge,
 		SanitizeReport: s5Out.Redactions,
 		Metadata: contract.PackMetadata{
 			BudgetTokens:     s4Out.BudgetTokens,

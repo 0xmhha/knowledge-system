@@ -136,6 +136,7 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 		// fine (omitempty on the wire); they only mean the ckv chunk lacked
 		// the metadata (e.g. doc/header chunks).
 		out = append(out, contract.Hit{
+			Text: h.Snippet,
 			Citation: contract.Citation{
 				File:       h.Citation.File,
 				StartLine:  h.Citation.StartLine,
