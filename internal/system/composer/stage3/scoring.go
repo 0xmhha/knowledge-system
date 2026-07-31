@@ -52,8 +52,25 @@ func (a *neighborAggregator) add(n contract.Neighbor, score float64, source stri
 }
 
 // results returns the accumulated neighbors sorted by descending Score,
-// with file/start-line tiebreaker for deterministic output. cap > 0
-// truncates to that length.
+// then by descending target span, with file/start-line last for
+// deterministic output. cap > 0 truncates to that length.
+//
+// Why span is a tiebreaker and not just decoration: every edge of one
+// relation leaving one seed scores identically — seed.Score times the
+// relation weight over 1+distance carries nothing about the target. A
+// seed with nine callees therefore hands the whole ordering to whatever
+// came next in the comparator, which was the file path. Measured on
+// composer-pipeline-flow (2026-07-31): Compose's calls edges all tied,
+// so allocator.go sorted ahead of composer.go and assemblePack — the
+// 127-line function that is half the expected answer — landed behind
+// four allocator spans and a 6-line token helper, at citation 15.
+//
+// Span size is the one signal available here that says anything about
+// the target. A larger body is more likely to be the substance the
+// prompt asked for than a 6-line helper reached by the same edge; it is
+// a weak signal, but it is a signal, and it replaces alphabetical order,
+// which is none. Ties beyond that keep the old file/line ordering so
+// output stays deterministic.
 func (a *neighborAggregator) results(cap int) []ScoredNeighbor {
 	if len(a.byTarget) == 0 {
 		return nil
@@ -62,9 +79,15 @@ func (a *neighborAggregator) results(cap int) []ScoredNeighbor {
 	for _, sn := range a.byTarget {
 		out = append(out, *sn)
 	}
+	span := func(sn ScoredNeighbor) int {
+		return sn.Edge.Target.EndLine - sn.Edge.Target.StartLine
+	}
 	sort.SliceStable(out, func(i, j int) bool {
 		if out[i].Score != out[j].Score {
 			return out[i].Score > out[j].Score
+		}
+		if si, sj := span(out[i]), span(out[j]); si != sj {
+			return si > sj
 		}
 		if out[i].Edge.Target.File != out[j].Edge.Target.File {
 			return out[i].Edge.Target.File < out[j].Edge.Target.File
