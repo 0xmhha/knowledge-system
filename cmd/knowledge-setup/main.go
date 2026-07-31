@@ -16,11 +16,16 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
@@ -31,6 +36,62 @@ import (
 // visible to it until restart. Printing this here turns an operational
 // tribal-knowledge trap into an explicit instruction at the moment it matters.
 const restartNote = "note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current"
+
+// resolveAutoVersion names a blue-green version from pre-build identity:
+// <src-HEAD commit8>, plus -<sha256(filelist config)8> when a filelist config
+// is in play. Both halves are known before the build, so the version
+// directory needs no post-build rename; the graph digest stays in the
+// manifest as the verification value (a rebuild of the same version name is
+// expected to reproduce it — a mismatch means the builder changed).
+//
+// Fail-closed rules: the source tree must be a git checkout with a clean
+// tracked state (a dirty tree would make commit8 lie about what was
+// indexed), and the resolved version directory must not already exist —
+// intentional replacement means deleting it first or naming the version
+// explicitly.
+func resolveAutoVersion(out, src, filelistConfig string) (string, error) {
+	if src == "" {
+		return "", fmt.Errorf("--version auto: --src is required to resolve the source commit")
+	}
+	head, err := gitOutput(src, "rev-parse", "HEAD")
+	if err != nil {
+		return "", fmt.Errorf("--version auto: resolve HEAD of %s: %v", src, err)
+	}
+	status, err := gitOutput(src, "status", "--porcelain")
+	if err != nil {
+		return "", fmt.Errorf("--version auto: git status of %s: %v", src, err)
+	}
+	for _, l := range strings.Split(status, "\n") {
+		if l != "" && !strings.HasPrefix(l, "??") {
+			return "", fmt.Errorf("--version auto: tracked working tree at %s is dirty — the version name would not match the indexed state; commit/stash first", src)
+		}
+	}
+	name := head[:8]
+	if filelistConfig != "" {
+		buf, err := os.ReadFile(filelistConfig)
+		if err != nil {
+			return "", fmt.Errorf("--version auto: read filelist config: %v", err)
+		}
+		sum := sha256.Sum256(buf)
+		name += "-" + hex.EncodeToString(sum[:])[:8]
+	}
+	if out != "" {
+		if _, err := os.Stat(filepath.Join(out, name)); err == nil {
+			return "", fmt.Errorf("--version auto: version %s already exists under %s — delete it to rebuild, or pass an explicit --version name to keep both", name, out)
+		}
+	}
+	return name, nil
+}
+
+func gitOutput(dir string, args ...string) (string, error) {
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	outBuf, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("git %s: %v", strings.Join(args, " "), err)
+	}
+	return strings.TrimSpace(string(outBuf)), nil
+}
 
 func main() {
 	var o setup.Options
@@ -60,7 +121,7 @@ func main() {
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
 	// root holding version dirs + a `current` symlink.
-	version := flag.String("version", "", "blue-green: build into <out>/<version>, gate it, then atomically promote <out>/current")
+	version := flag.String("version", "", "blue-green: build into <out>/<version>, gate it, then atomically promote <out>/current; \"auto\" (reserved) names the version <src-commit8>[-<filelist-config-sha8>]")
 	rollback := flag.String("rollback", "", "blue-green: repoint <out>/current at an existing version and exit (no build)")
 	gateMinCanonical := flag.Float64("gate-min-canonical", 0, "reindex gate: minimum canonical_id coverage (canonical/symbol chunks); 0 disables the check")
 	flag.Parse()
@@ -127,12 +188,22 @@ func main() {
 		fmt.Fprintln(os.Stderr, restartNote)
 	case *version != "":
 		// Blue-green: build a new version, gate it, promote current on success.
+		ver := *version
+		if ver == "auto" {
+			resolved, err := resolveAutoVersion(o.Out, o.Src, o.FilelistConfig)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
+				os.Exit(2)
+			}
+			ver = resolved
+			fmt.Fprintf(os.Stderr, "knowledge-setup: --version auto resolved to %s\n", ver)
+		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical}
-		if err := setup.Reindex(ctx, o, *version, gopt, setup.SubprocessRunner{}, emit); err != nil {
+		if err := setup.Reindex(ctx, o, ver, gopt, setup.SubprocessRunner{}, emit); err != nil {
 			fmt.Fprintln(os.Stderr, "knowledge-setup:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintf(os.Stderr, "knowledge-setup: promoted %s/%s to current\n", o.Out, *version)
+		fmt.Fprintf(os.Stderr, "knowledge-setup: promoted %s/%s to current\n", o.Out, ver)
 		fmt.Fprintln(os.Stderr, restartNote)
 	default:
 		plan, err := setup.BuildPlan(o)
