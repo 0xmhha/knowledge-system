@@ -435,3 +435,56 @@ func TestAggregator_EmptyResultsNil(t *testing.T) {
 		t.Errorf("empty results = %v, want nil", got)
 	}
 }
+
+// TestAggregator_TiedScoresPreferLargerSpan pins the tiebreaker that
+// replaced alphabetical ordering. Every calls edge leaving one seed
+// scores identically, so before this the comparator fell through to the
+// file path: on composer-pipeline-flow (2026-07-31) allocator.go sorted
+// ahead of composer.go and assemblePack, half the expected answer at 127
+// lines, landed behind four allocator spans and a 6-line helper.
+func TestAggregator_TiedScoresPreferLargerSpan(t *testing.T) {
+	t.Parallel()
+	mk := func(file string, start, end int) contract.Neighbor {
+		return contract.Neighbor{
+			Source:   cit("seed.go", 1, 10),
+			Target:   cit(file, start, end),
+			Relation: contract.RelationCalls,
+			Distance: 1,
+		}
+	}
+	a := newNeighborAggregator()
+	// Alphabetically first but tiny; alphabetically last but substantial.
+	a.add(mk("allocator.go", 345, 351), 1.0, "s") // 6 lines
+	a.add(mk("tokens.go", 27, 32), 1.0, "s")      // 5 lines
+	a.add(mk("composer.go", 348, 474), 1.0, "s")  // 126 lines
+
+	out := a.results(0)
+	if len(out) != 3 {
+		t.Fatalf("len = %d, want 3", len(out))
+	}
+	if got := out[0].Edge.Target.File; got != "composer.go" {
+		t.Errorf("first = %s, want composer.go (largest span wins the tie, not the alphabet)", got)
+	}
+}
+
+// TestAggregator_TiedScoresAndSpansStayDeterministic keeps the old
+// file/line ordering as the last resort so output does not shuffle.
+func TestAggregator_TiedScoresAndSpansStayDeterministic(t *testing.T) {
+	t.Parallel()
+	mk := func(file string, start, end int) contract.Neighbor {
+		return contract.Neighbor{
+			Source:   cit("seed.go", 1, 10),
+			Target:   cit(file, start, end),
+			Relation: contract.RelationCalls,
+			Distance: 1,
+		}
+	}
+	a := newNeighborAggregator()
+	a.add(mk("b.go", 10, 20), 1.0, "s")
+	a.add(mk("a.go", 10, 20), 1.0, "s")
+
+	out := a.results(0)
+	if out[0].Edge.Target.File != "a.go" {
+		t.Errorf("first = %s, want a.go (equal spans fall back to path order)", out[0].Edge.Target.File)
+	}
+}
