@@ -1,4 +1,4 @@
-# retrieval 품질 트랙 요약 (2026-07-28 ~ 07-29)
+# retrieval 품질 트랙 요약 (2026-07-28 ~ 07-31)
 
 Status: 트랙 요약(지속 참조용). 사이클별 상세는
 `archive/2026-07-28-dogfood-zero-recall-diagnosis.md`(supersede된 시계열
@@ -7,9 +7,46 @@ Status: 트랙 요약(지속 참조용). 사이클별 상세는
 ## 결과 한 줄
 
 **15-시나리오 확장 스위트 기준 avg recall 0.978 / MRR 0.555 (14/15 시나리오
-R=1.00, fresh 인덱스 — 2026-07-29 R15 기준선).** 시작점은 구 9-시나리오
-스위트의 recall 0.296. **드리프트 가드 3종** 완비. knowledge-system PR
-18건(#37~#38, #40~#46, #48~#52, #54~#57) + coding-agent PR 1건(#63).
+R=1.00, fresh 인덱스 — 2026-07-29 R15 기준선, 2026-07-31 R16에서 재현).**
+시작점은 구 9-시나리오 스위트의 recall 0.296. **드리프트 가드 3종** 완비.
+knowledge-system PR 18건(#37~#38, #40~#46, #48~#52, #54~#57) + coding-agent
+PR 1건(#63).
+
+## R16 재측정 · 결정성 (2026-07-31, `a65defc`)
+
+백로그 2의 선행조건("R15 기준 재측정")을 처리하려고 **동일 트리에서 fresh
+재임베딩 + 평가를 2회 독립 실행**했다(각 1,419파일, 회당 약 20분).
+
+- **집계는 R15와 동일**: avg recall 0.978 / MRR 0.555, 14/15 R=1.00,
+  mcp-tool-handlers R 0.67. R15(`#59` 시점 트리, 1,470파일)와
+  R16(`a65defc`, 1,419파일) 사이에 코퍼스가 51파일 줄었는데도 지표는
+  움직이지 않았다.
+- **재임베딩 노이즈는 관측되지 않았다.** run1과 run2의 리포트를 시나리오별로
+  대조하면 **지연시간을 제외한 전 품질 지표가 완전히 일치**한다(precision /
+  recall / f1 / MRR / token_utilization / citation_count / body_count,
+  15/15 시나리오, MRR 최대 변동 0.0000). 시나리오당 내부 반복은 이미
+  `runs: 5`로 돌고 있다.
+- **따라서 백로그 2의 "runs>1 중앙값" 선행조건은 불필요**하다. 측정 반복이
+  아니라 랭킹 자체가 남은 문제다. 단 이 결정성은 *동일 코퍼스·동일 모델*
+  전제이며, 코퍼스가 바뀌면 다시 확인해야 한다.
+
+시나리오별 MRR(R16, 오름차순 — 개선 대상 판단 근거):
+
+| 시나리오 | intent | R | MRR |
+|---|---|---|---|
+| qa-review-intent | qa_review | 1.00 | **0.14** |
+| composer-pipeline-flow | arch_explain | 1.00 | **0.15** |
+| mcp-tool-handlers | arch_explain | 0.67 | **0.22** |
+| ckg-bm25-translation | refactor | 1.00 | 0.42 |
+| stamp-integrity-lookup | arch_explain | 1.00 | 0.44 |
+| bm25-rerank-option / bug-fix-rerank-drop / verify-anchors-guard / wal-reap-test-helper | — | 1.00 | 0.50 |
+| composer-err-fail-closed | security | 1.00 | 0.58 |
+| test-add-filesystem-fetcher | test_add | 1.00 | 0.61 |
+| concurrency-safety-real-adapters | concurrency_safety | 1.00 | 0.75 |
+| parse-intent-validation / rrfk-constant-lookup / structural-qname-filter | — | 1.00 | 1.00 |
+
+intent 롤업에서 **`arch_explain`이 최하위**(n=4, R 0.92 / MRR 0.45)다 — 4개 중
+3개가 하위권에 몰려 있다.
 
 ## 수치 궤적 (정직 측정 기준)
 
@@ -88,10 +125,20 @@ bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유
 
 ### 열린 항목
 
-2. low-MRR 시나리오 — 상위권 배치 개선. **선행: R15 기준 재측정.** 종전에
-   적혀 있던 수치(qa-review 0.14, ckg-bm25 0.42)는 R15 이전 값이고, R15는
-   MRR 0.555 / 14-15 R=1.00이므로 개선 대상부터 다시 정해야 한다. 재임베딩
-   노이즈와 구분하려면 runs>1 중앙값 + 표본 확충과 함께.
+2. low-MRR 시나리오 — 상위권 배치 개선. **선행조건 해소(R16, 위 절 참조).**
+   종전 기재는 이 수치가 R15 이전 값이라 대상을 다시 정해야 한다고 봤으나,
+   R16이 **qa-review 0.14 / ckg-bm25 0.42를 그대로 재현**했다 — 낡은 값이
+   아니었다. "runs>1 중앙값"도 불필요(재임베딩 2회 간 품질 지표 변동 0).
+   확정 대상은 **R 만점인데 순위가 바닥인 3건**이다(찾아오지만 묻는다 =
+   이 항목이 정의한 문제 그 자체):
+   - `qa-review-intent` MRR 0.14
+   - `composer-pipeline-flow` MRR 0.15 — #54로 R 1.00에 도달했으나 순위는
+     최하위권. 종전 목록에 없던 신규 대상.
+   - `stamp-integrity-lookup` MRR 0.44 — 역시 신규.
+   `ckg-bm25-translation`(0.42)은 유지. `mcp-tool-handlers`(0.22)는 R<1.00
+   이라 성격이 달라 항목 5가 계속 보유한다.
+   `arch_explain` intent가 롤업 최하위(R 0.92 / MRR 0.45)이고 위 3건 중
+   2건이 여기 속하므로, **intent 단위 진단이 시나리오별 땜질보다 앞선다**.
 4. `#CallSite@`/`#ReturnStmt@` 문장-수준 서브노드의 이웃/해석 노출 여부
    점검(현재 관측상 문제 없음 — contains 미순회라 격리).
 5. mcp-tool-handlers R 0.67 — 15-스위트 유일 잔여. `Register`가 형태소 파생
@@ -114,7 +161,11 @@ bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유
 ## 재현 절차
 
 ```sh
-# 인덱스+측정 일체(항상 fresh): ollama + bge-m3 필요
+# 0) ckg/ckv 바이너리 준비 — 아래 CKG=/CKV=가 가리키는 대상.
+#    루트 `make build`는 컴파일 체크(go build ./...)일 뿐 bin/을 만들지 않는다.
+make build-dataset-bins
+# 인덱스+측정 일체(항상 fresh): ollama + bge-m3 필요. 전 코퍼스 재임베딩이라
+# 회당 약 20분(1,419파일 기준).
 make -C system dogfood-eval USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=bge-m3 \
      CKG=$PWD/bin/ckg CKV=$PWD/bin/ckv
 # 수동 측정 시(인덱스 재사용): 신선도 WARNING을 반드시 확인
