@@ -72,14 +72,26 @@ calls  167-271  ->  searcher.go:186-294, expander.go:164-251, ...
 않는다.** 정보가 같은 팩 한 섹션 옆에 있는데 순서에 쓰이지 않는다. "흐름을
 설명하라"류 다중-스팬 시나리오의 MRR 손실 대부분이 여기서 난다.
 
-### 원인 2 — `field` kind가 단일 라인 인용을 양산
+### 원인 2 — 필드 인용의 출처 (2026-07-31 정정)
 
-`intentToKinds(ArchExplain)`이 `"field"`를 포함해서 FindSymbol이 struct
-필드 노드를 반환하고, 각 필드가 **한 줄짜리 인용 한 건**이 된다. 실측:
-`Composer` struct의 필드 8개가 `composer.go:62-62 … 69-69`로 **rank 9~16을
-연속 점유**한다. `stamp-integrity-lookup`도 동형 — rank 1이 이름만 비슷한
-`cmd/system/agent/format.go`의 `evidencePack` struct고, 그 필드 5개가
-rank 11~15를 먹는다.
+**최초 기재는 `intentToKinds(ArchExplain)`의 `"field"`를 원인으로 지목했으나,
+그 8건의 실제 출처는 stage3의 `defines` relation이었다.** body 유무를 대조해
+확인했다:
+
+- 팩의 인용 25건 중 **body-backed 10건 + edge-only 15건**. `assemblePack`은
+  edge-only 뒤꼬리(rank 19)에 있었다 — 낮게 랭크된 stage2 인용이 아니라
+  **`assemblePack()`이 이웃 타깃을 인용 목록 끝에 덧붙인 것**이다.
+- 필드 8건(`62-62 … 69-69`)은 전부 이웃 덤프의 `defines 61-70 -> …`와 일치.
+  stage3는 `seedKeys`로 **시드인 타깃을 건너뛰므로**(expander.go), 이들이
+  이웃으로 나왔다는 것 자체가 stage2 인용이 아니었다는 증거다.
+- `intentToKinds`의 `field`가 실제로 낳은 것은 **rank 1의
+  `composer.go:342-342`**(`stageTimings`의 필드 줄) 한 건이다. 이건 시드다.
+
+따라서 반증 실험(`bug_fix`)이 필드를 없앤 것도 kind 때문이 아니라
+`intentToRelations(BugFix)`에 `defines`가 없기 때문이다. **"stage3 relation
+차이는 neighbors에만 작용한다"는 최초 서술이 틀렸다** — edge-only 경로로
+인용까지 흘러든다. 그 결과 원인 2와 3의 분리 주장도 성립하지 않는다(둘 다
+`bug_fix` 대조에 섞여 있었다).
 
 ### 원인 3 — header 강등이 doc 강등에 묶여 함께 꺼진다
 
@@ -111,11 +123,47 @@ neighbors에만 작용) — 따라서 이 대조는 원인 2·3의 합산 효과
 **원인 2·3을 다 제거해도 0.151 → 0.198**에 그친다. 나머지는 원인 1이 쥐고
 있다 — 착수 순서를 여기에 맞춰야 한다.
 
-### 후속 (착수 순서)
+### 후속 1 착수 결과 — relation 가중치 (2026-07-31, 실측)
 
-1. **stage2 랭킹에 stage3 calls-엣지 반영** — 상위 시드의 calls 대상이
-   인용 후보에 있으면 부스트. 원인 1 대응이자 유일하게 유의미한 개선.
-   `graph_neighbors`가 이미 계산돼 있으므로 추가 그래프 질의는 불필요.
+원인 1의 실제 기전을 특정했다: 이웃 점수가
+`seed.Score / (1+distance)`로 **relation을 전혀 안 본다**(expander.go). 그래서
+`Composer` struct 시드(인용 rank 2)의 `defines`→필드 8건이, 사용자가 물은
+`Compose` 본문 시드(rank 4)의 `calls`→`assemblePack`보다 위로 왔다.
+
+`relationWeight(intent, relation)`을 도입해 arch_explain에서만
+defines 0.5 / imports 0.7 / calls·implements·embeds 1.0으로 스케일했다
+(다른 intent는 전부 1.0 — 기존 동작 그대로).
+
+**동작은 의도대로, 지표는 거의 안 움직였다:**
+
+| | before | after |
+|---|---|---|
+| 이웃 상위 | `defines`→필드 8건 | `calls` 대상들 |
+| `assemblePack` 인용 순위 | 19 | **15** |
+| composer-pipeline-flow MRR | 0.15 | **0.16** (+0.007) |
+| 15-스위트 avg recall / MRR | 0.978 / 0.555 | **0.978 / 0.555** (불변) |
+
+나머지 14개 시나리오는 ΔMRR 0.000. 회귀 없음.
+
+**천장이 드러났다 — 남은 두 벽:**
+
+1. **body 슬롯이 답에 도달하기 전에 소진된다.** 인용 1~10위는 전부
+   body-backed고 `assemblePack`은 body를 못 받는다. 가중치를 고쳐도
+   edge-only 뒤꼬리 안에서만 움직이므로 rank 11 위로는 구조적으로 못 올라간다.
+   before의 필드 2건(rank 9,10)이 after에는 `allocator.go` 2건으로 바뀌었을
+   뿐, 슬롯은 여전히 답이 아닌 것에 간다.
+2. **동점 calls 엣지의 정렬이 알파벳순이다.** 한 시드에서 나온 calls 엣지는
+   전부 `seed.Score * 1.0 / (1+distance)`로 **점수가 같고**, 그러면
+   `results()`의 타이브레이커(파일 경로 사전순 → 시작 줄)가 순서를 정한다.
+   `allocator.go` < `composer.go`라서 `assemblePack`이 알파벳으로 밀렸다.
+   즉 지금 순위의 상당 부분이 **의미가 아니라 파일명**이다.
+
+다음 착수는 2번(동점 타이브레이커를 의미 있는 신호로 — 타깃의 ckv/BM25 점수나
+시드와의 동일-파일 근접성)이 1번보다 싸고 효과 범위가 넓어 보인다. 단
+그것도 body 슬롯 벽(1번)에 막히므로, 실질 개선은 **budget 배분이 edge-only
+타깃을 승격시킬 수 있게 하는 것**까지 가야 한다.
+
+### 후속 (남은 순서)
 2. **`field`를 `intentToKinds(ArchExplain)`에서 제외** — 단 "option 필드는
    아키텍처 표면"이라는 원 근거가 있으니, 필드를 *인용*에서 빼되
    *neighbors*에는 남기는 분리가 맞을 수 있다. 백로그 3의 유지 판정은
