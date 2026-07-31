@@ -237,7 +237,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 			// Closer paths get higher scores. Distance is 1-based per
 			// ckgclient doc; the +1 guard avoids divide-by-zero if a
 			// backend ever returns distance 0.
-			score := seed.Score / float64(1+n.Distance)
+			score := seed.Score * relationWeight(intent, n.Relation) / float64(1+n.Distance)
 			source := fmt.Sprintf("seed:%s:%s:dist=%d",
 				seed.Citation.File, n.Relation, n.Distance)
 			agg.add(n, score, source)
