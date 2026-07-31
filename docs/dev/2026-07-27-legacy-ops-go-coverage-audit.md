@@ -105,15 +105,22 @@ here): `activate.sh`, `apply-cc-settings.sh`, `coding-agent.sh`,
 3-repo 통합 설계
 ([`archive/2026-07-28-gap-integration-design.md`](./archive/2026-07-28-gap-integration-design.md))가
 2026-07-30에 구현 완료로 닫히면서, 그 §7이 열린 결정으로 남긴 항목이 아래
-2건으로 수렴했다. 둘 다 명시적 후속이며 통합 자체를 막지 않는다.
+2건으로 수렴했다. 그중 1건은 2026-07-31에 닫혔다.
 
-1. **`activate.sh` / `apply-cc-settings.sh`의 coding-agent repo 이관** —
+1. **`activate.sh` / `apply-cc-settings.sh`의 coding-agent repo 이관** — 열림.
    플러그인 `.mcp.json`이 아직 `${VAR}` 플레이스홀더를 요구하는 동안은
    `activate.sh`가 config에서 파생·export한다. 플러그인이 config를 직접
    소비하도록 바뀌는 시점에 export를 제거하고 두 스크립트를 이관한다.
-2. **`system/dataset-toolkit/scripts/*` · `vector/scripts/build-vector-stablenet.sh`
-   경로 갱신** — 구 3-repo 레이아웃 경로가 남아 있다. 통합 설계에서 명시적
-   범위 밖으로 두고 보류한 항목.
+2. ~~`system/dataset-toolkit/scripts/*` · `vector/scripts/build-vector-stablenet.sh`
+   경로 갱신~~ — **종결(2026-07-31).** 전수 검증 결과 **구 3-repo 경로는 이미
+   남아 있지 않았다**: 내부 파생은 `gen-dataset-config.sh`의 `KS_ROOT`(repo
+   루트), `run-coding-agent.sh`의 `CKS_ROOT`(`system/`, `activate.sh` 실재),
+   `build-vector-stablenet.sh`의 `KS_ROOT`(repo 루트)로 모두 정상 해석되고,
+   스크립트가 인용하는 repo-상대 경로도 전부 실재한다. 나머지 경로는 호출자가
+   env로 주는 값(`SRC`/`OUT`/`DATASET`)이라 레이아웃 문제가 아니다.
+   실제로 남아 있던 결함은 경로가 아니라 **`build-vector-stablenet.sh` 헤더의
+   재생성 안내 1건**이었고(존재하지 않는 `bin/system-domain-export`, 그리고
+   `-code-root` 누락으로 지시대로 실행하면 exit 1), 이번에 교정했다.
 
 ## Disposition
 
@@ -133,4 +140,5 @@ here): `activate.sh`, `apply-cc-settings.sh`, `coding-agent.sh`,
   plugin glue (candidates to migrate to the coding-agent repo).
 - Still shell, still kept: `coding-agent.sh`, `enable-autopilot.sh` (plugin
   glue), `system/dataset-toolkit/scripts/*` and
-  `vector/scripts/build-vector-stablenet.sh` (path refresh deferred).
+  `vector/scripts/build-vector-stablenet.sh` (경로 검증 완료 2026-07-31 —
+  위 `잔여` 2 참조).
