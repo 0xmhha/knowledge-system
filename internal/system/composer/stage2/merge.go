@@ -106,20 +106,65 @@ func (a *aggregator) addBM25List(keyword string, hits []contract.Hit) {
 // addSymbolList credits every citation in a ranked FindSymbol result
 // list. rank is 1-based by list position. Empty lists are a no-op.
 func (a *aggregator) addSymbolList(keyword string, cits []contract.Citation) {
-	a.addSymbolListWeighted(keyword, cits, a.symbolWeight)
+	a.addSymbolListWeighted(keyword, cits, a.symbolWeight, false)
 }
+
+// SourceExactSymbolPrefix marks a citation that came from a
+// prompt-verbatim, unambiguously resolved FindSymbol hit — the gate in
+// searcher.go. The budget allocator reserves a slot for these, so the
+// provenance has to survive as more than a score contribution.
+const SourceExactSymbolPrefix = "symbol_exact:"
 
 // addSymbolListWeighted is addSymbolList with an explicit RRF weight —
 // used for the prompt-verbatim boost (see DefaultPromptExactBoost).
-func (a *aggregator) addSymbolListWeighted(keyword string, cits []contract.Citation, weight float64) {
+// exact tags the provenance so downstream stages can tell a boosted hit
+// from an ordinary symbol hit; the score alone does not say which gate
+// fired.
+func (a *aggregator) addSymbolListWeighted(keyword string, cits []contract.Citation, weight float64, exact bool) {
+	prefix := "symbol:"
+	if exact {
+		prefix = SourceExactSymbolPrefix
+	}
 	for i, c := range cits {
 		rank := i + 1
 		contribution := weight / float64(a.rrfK+rank)
 		sc := a.entry(c)
 		sc.Score += contribution
 		sc.Sources = append(sc.Sources,
-			fmt.Sprintf("symbol:%s@rank=%d(+%.5f)", keyword, rank, contribution))
+			fmt.Sprintf("%s%s@rank=%d(+%.5f)", prefix, keyword, rank, contribution))
 	}
+}
+
+// HasExactSymbolSource reports whether any of sources came from the
+// prompt-verbatim symbol gate.
+//
+// Written without strings.HasPrefix on purpose: adding an import to this
+// file shifts every line below it, and the rrfk-constant-lookup scenario
+// anchors on DefaultRRFK's span near the top. Keeping the import block
+// untouched keeps eval coordinates stable.
+func HasExactSymbolSource(sources []string) bool {
+	return ExactSymbolKeyword(sources) != ""
+}
+
+// ExactSymbolKeyword returns the keyword behind the first exact-symbol
+// source, or "" when there is none. The budget allocator reserves per
+// distinct keyword: two different symbols named verbatim in one prompt
+// are two answers, not one competing for a single slot.
+func ExactSymbolKeyword(sources []string) string {
+	p := SourceExactSymbolPrefix
+	for _, s := range sources {
+		if len(s) < len(p) || s[:len(p)] != p {
+			continue
+		}
+		kw := s[len(p):]
+		for i := 0; i < len(kw); i++ {
+			if kw[i] == '@' {
+				return kw[:i]
+			}
+		}
+		return kw
+	}
+	return ""
 }
 
 func (a *aggregator) entry(c contract.Citation) *ScoredCitation {

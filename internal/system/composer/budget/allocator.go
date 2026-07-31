@@ -57,6 +57,17 @@ const (
 	// "empty block = same state root" existed only as an invariant
 	// chunk), yet never outscore code seeds. 0 disables the reserve.
 	DefaultKnowledgeReserve = 2
+
+	// DefaultExactSymbolReserve is how many selections are guaranteed to
+	// citations that came from the prompt-verbatim, unambiguous symbol
+	// gate (stage2.SourceExactSymbolPrefix). Same starvation shape as
+	// the knowledge reserve: the declaration of a symbol the user named
+	// by hand is a single small span, so it loses the greedy pass to
+	// larger name-similar bodies. Measured 2026-07-31 on
+	// bm25-rerank-option — EnableBM25Rerank resolved to exactly one node
+	// and the boost fired, but the citation still fell outside the body
+	// cap and the scenario scored R 0.00. 0 disables the reserve.
+	DefaultExactSymbolReserve = 2
 )
 
 // Config tunes the allocator's budget and reserve.
@@ -84,17 +95,22 @@ type Config struct {
 	// KnowledgeReserve guarantees this many selections to knowledge-kind
 	// candidates. See DefaultKnowledgeReserve.
 	KnowledgeReserve int
+
+	// ExactSymbolReserve guarantees this many selections to
+	// prompt-verbatim symbol citations. See DefaultExactSymbolReserve.
+	ExactSymbolReserve int
 }
 
 // DefaultConfig returns the Phase-0 tuning baseline.
 func DefaultConfig() Config {
 	return Config{
-		MaxTokens:        DefaultMaxTokens,
-		OverheadReserve:  DefaultOverheadReserve,
-		MaxCitations:     DefaultMaxCitations,
-		NeighborReserve:  DefaultNeighborReserve,
-		SnippetLines:     DefaultSnippetLines,
-		KnowledgeReserve: DefaultKnowledgeReserve,
+		MaxTokens:          DefaultMaxTokens,
+		OverheadReserve:    DefaultOverheadReserve,
+		MaxCitations:       DefaultMaxCitations,
+		NeighborReserve:    DefaultNeighborReserve,
+		SnippetLines:       DefaultSnippetLines,
+		KnowledgeReserve:   DefaultKnowledgeReserve,
+		ExactSymbolReserve: DefaultExactSymbolReserve,
 	}
 }
 
@@ -237,6 +253,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	}
 	seedSelected := 0
 	knowledgeSelected := 0
+	exactSymbolRescued := map[string]bool{}
 
 	used := 0
 	processed := 0
@@ -251,13 +268,25 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// markdown (READMEs) carries a real commit hash and is unaffected.
 		isKnowledge := c.ChunkKind == "invariant" || c.ChunkKind == "convention" ||
 			(c.ChunkKind == "doc" && c.Citation.CommitHash == "")
+		// A prompt-verbatim, unambiguously resolved symbol gets the same
+		// protection as knowledge for the same reason: it is one small
+		// declaration span competing against whole bodies that merely
+		// share its name, so the greedy pass drops it.
+		exactKeyword := stage2.ExactSymbolKeyword(c.Sources)
+		isExactSymbol := exactKeyword != ""
+		// A slot is held per distinct verbatim symbol, not one overall:
+		// measured 2026-07-31, a prompt naming both EnableBM25Rerank and
+		// BM25 had the second symbol's declaration evicted because the
+		// first had already spent the single reserve.
+		exactUnrescued := isExactSymbol && !exactSymbolRescued[exactKeyword] &&
+			len(exactSymbolRescued) < a.config.ExactSymbolReserve
 		if c.Origin == OriginSeed && seedCap > 0 && seedSelected >= seedCap {
 			// Seed slots exhausted; leave room for neighbor-origin
 			// candidates. Not a Skip: the candidate lost to the quota,
 			// not to budget or fetch. Knowledge-kind candidates are
 			// exempt while their reserve is unfilled — domain rules must
 			// not lose their slot to yet another code body.
-			if !(isKnowledge && knowledgeSelected < a.config.KnowledgeReserve) {
+			if !(isKnowledge && knowledgeSelected < a.config.KnowledgeReserve) && !exactUnrescued {
 				continue
 			}
 		}
@@ -268,8 +297,18 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// kind-scoped retrieval and rank below the code seeds, so a plain
 		// greedy pass never selects one (the same starvation shape as the
 		// neighbor reserve, one level up).
-		if !isKnowledge && a.config.MaxCitations > 0 && a.config.KnowledgeReserve > 0 {
-			reserveLeft := a.config.KnowledgeReserve - knowledgeSelected
+		if !isKnowledge && !isExactSymbol && a.config.MaxCitations > 0 {
+			reserveLeft := 0
+			if a.config.KnowledgeReserve > 0 {
+				if left := a.config.KnowledgeReserve - knowledgeSelected; left > 0 {
+					reserveLeft += left
+				}
+			}
+			if a.config.ExactSymbolReserve > 0 {
+				if left := a.config.ExactSymbolReserve - len(exactSymbolRescued); left > 0 {
+					reserveLeft += left
+				}
+			}
 			if reserveLeft > 0 && len(out.Selected) >= a.config.MaxCitations-reserveLeft {
 				continue
 			}
@@ -318,6 +357,9 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		}
 		if isKnowledge {
 			knowledgeSelected++
+		}
+		if isExactSymbol {
+			exactSymbolRescued[exactKeyword] = true
 		}
 
 		// Citation cap: stop once we've selected MaxCitations bodies, even

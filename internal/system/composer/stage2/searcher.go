@@ -237,10 +237,11 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 			// would have the boost amplify noise — measured: ungated
 			// 3.0 boost sank recall 0.844→0.778 while fixing only the
 			// one field scenario.
-			if len(symbolCits) == 1 && promptMentionsVerbatim(prompt, kw) {
+			exact := len(symbolCits) == 1 && promptMentionsVerbatim(prompt, kw)
+			if exact {
 				weight *= DefaultPromptExactBoost
 			}
-			agg.addSymbolListWeighted(kw, symbolCits, weight)
+			agg.addSymbolListWeighted(kw, symbolCits, weight, exact)
 		}
 
 		if !anyHit {
