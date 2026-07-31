@@ -48,6 +48,84 @@ PR 1건(#63).
 intent 롤업에서 **`arch_explain`이 최하위**(n=4, R 0.92 / MRR 0.45)다 — 4개 중
 3개가 하위권에 몰려 있다.
 
+## arch_explain 랭킹 진단 (2026-07-31, `afede78`)
+
+방법: fresh 인덱스에 **MCP stdio 직접 질의**(`cks.context.get_for_task`)로
+반환 순위를 그대로 관찰하고, 동일 프롬프트를 다른 intent로 던지는 **반증
+실험**으로 원인을 분리했다. 재구성한 순위로 계산한 MRR이 리포트 값과
+일치(0.151 vs 0.15)하므로 관찰이 채점과 같은 것을 보고 있다.
+
+원인은 셋이고, **기여도 순서가 직관과 반대**다.
+
+### 원인 1 — 랭킹이 그래프를 안 본다 (지배적)
+
+`composer-pipeline-flow`의 기대 스팬 둘 중 `Compose`(134-260)는 rank 4인데
+`assemblePack`(348-420)이 **rank 19**다. 그런데 같은 팩의
+`graph_neighbors`에는 이 엣지가 **이미 들어 있다**:
+
+```
+calls  167-271  ->  composer.go:348-474      # Compose -> assemblePack
+calls  167-271  ->  searcher.go:186-294, expander.go:164-251, ...
+```
+
+즉 **stage3는 정답 형제를 정확히 짚어내는데 stage2 랭킹이 그걸 참조하지
+않는다.** 정보가 같은 팩 한 섹션 옆에 있는데 순서에 쓰이지 않는다. "흐름을
+설명하라"류 다중-스팬 시나리오의 MRR 손실 대부분이 여기서 난다.
+
+### 원인 2 — `field` kind가 단일 라인 인용을 양산
+
+`intentToKinds(ArchExplain)`이 `"field"`를 포함해서 FindSymbol이 struct
+필드 노드를 반환하고, 각 필드가 **한 줄짜리 인용 한 건**이 된다. 실측:
+`Composer` struct의 필드 8개가 `composer.go:62-62 … 69-69`로 **rank 9~16을
+연속 점유**한다. `stamp-integrity-lookup`도 동형 — rank 1이 이름만 비슷한
+`cmd/system/agent/format.go`의 `evidencePack` struct고, 그 필드 5개가
+rank 11~15를 먹는다.
+
+### 원인 3 — header 강등이 doc 강등에 묶여 함께 꺼진다
+
+`demoteDocsFor(ArchExplain) = false`가 `merge.go`에서 **두 개를 동시에**
+끈다 — doc 강등과 `file_header` 강등. 그 결과 `composer.go:1-50`(파일 헤더)이
+rank 3, `mcp/server.go:1-50`이 rank 8을 차지한다. 면제의 근거는 주석대로
+"ArchExplain은 ADR·설계 문서를 정당하게 참조한다"인데, **file_header는 ADR이
+아니다** — #42가 header를 강등 대상에 넣은 이유(심볼 스팬이 생긴 이상 헤더는
+답이 아니라 방향 안내)는 intent와 무관하다. 부수효과로 보인다.
+
+참고로 이 셋 중 **문서(.md)가 상위권을 먹는 현상은 관측되지 않았다** — 세
+프롬프트 모두 상위권이 전부 코드였다. doc 면제 자체는 이 시나리오들에서
+무해했다.
+
+### 정량
+
+동일 프롬프트를 `bug_fix`(callable-only kind + doc/header 강등 켜짐)로 던지면
+원인 2·3이 사라진다 — 단일 라인 8건과 header가 목록에서 없어진다. 두 intent가
+**인용**에서 갈리는 지점은 정확히 이 둘뿐이다(확인: `intentPathGlob`은
+TestAdd만 비어있지 않고, `demoteTests`는 둘 다 true, stage3 relation 차이는
+neighbors에만 작용) — 따라서 이 대조는 원인 2·3의 합산 효과를 깨끗하게
+분리한다. 다만 2와 3 각각의 기여는 이 실험으로 나뉘지 않는다:
+
+| intent | Compose 순위 | assemblePack 순위 | MRR |
+|---|---|---|---|
+| `arch_explain` | 4 | 19 | 0.151 |
+| `bug_fix`(반증) | 3 | 16 | 0.198 |
+
+**원인 2·3을 다 제거해도 0.151 → 0.198**에 그친다. 나머지는 원인 1이 쥐고
+있다 — 착수 순서를 여기에 맞춰야 한다.
+
+### 후속 (착수 순서)
+
+1. **stage2 랭킹에 stage3 calls-엣지 반영** — 상위 시드의 calls 대상이
+   인용 후보에 있으면 부스트. 원인 1 대응이자 유일하게 유의미한 개선.
+   `graph_neighbors`가 이미 계산돼 있으므로 추가 그래프 질의는 불필요.
+2. **`field`를 `intentToKinds(ArchExplain)`에서 제외** — 단 "option 필드는
+   아키텍처 표면"이라는 원 근거가 있으니, 필드를 *인용*에서 빼되
+   *neighbors*에는 남기는 분리가 맞을 수 있다. 백로그 3의 유지 판정은
+   neighbors 기준이었다.
+3. **header 강등을 doc 강등에서 분리** — `demoteHeadersFor(intent)`를 따로
+   두고 arch_explain에서도 켠다. 가장 작고 독립적인 변경.
+
+`mcp-tool-handlers`의 R 0.67은 별개다 — `Register`(server.go:100-143)가
+목록에 아예 없다(server.go는 331-353, 355-368, 1-50만 등장). 항목 5 소관.
+
 ## 수치 궤적 (정직 측정 기준)
 
 | 단계 | 변경 | recall | MRR |
@@ -139,6 +217,10 @@ bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유
    이라 성격이 달라 항목 5가 계속 보유한다.
    `arch_explain` intent가 롤업 최하위(R 0.92 / MRR 0.45)이고 위 3건 중
    2건이 여기 속하므로, **intent 단위 진단이 시나리오별 땜질보다 앞선다**.
+   → **진단 완료(2026-07-31, 위 "arch_explain 랭킹 진단" 절).** 원인 3개 중
+   지배적인 것은 *랭킹이 stage3 calls-엣지를 안 본다*는 것이고, 나머지 둘
+   (`field` kind의 단일 라인 인용, header 강등이 doc 강등에 묶임)은 다 고쳐도
+   0.151→0.198에 그친다. 착수 순서는 그 절의 "후속" 참조.
 4. `#CallSite@`/`#ReturnStmt@` 문장-수준 서브노드의 이웃/해석 노출 여부
    점검(현재 관측상 문제 없음 — contains 미순회라 격리).
 5. mcp-tool-handlers R 0.67 — 15-스위트 유일 잔여. `Register`가 형태소 파생
