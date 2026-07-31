@@ -26,6 +26,12 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/setup"
 )
 
+// restartNote follows every current-symlink swap: a running MCP server holds
+// open handles into the dataset it resolved at startup, so the swap is not
+// visible to it until restart. Printing this here turns an operational
+// tribal-knowledge trap into an explicit instruction at the moment it matters.
+const restartNote = "note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current"
+
 func main() {
 	var o setup.Options
 	config := flag.String("config", "", "setup config file (e.g. projects/<name>/setup.yaml); explicit flags override its values")
@@ -118,6 +124,7 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Fprintf(os.Stderr, "knowledge-setup: rolled back %s/current to %s\n", o.Out, *rollback)
+		fmt.Fprintln(os.Stderr, restartNote)
 	case *version != "":
 		// Blue-green: build a new version, gate it, promote current on success.
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical}
@@ -126,6 +133,7 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Fprintf(os.Stderr, "knowledge-setup: promoted %s/%s to current\n", o.Out, *version)
+		fmt.Fprintln(os.Stderr, restartNote)
 	default:
 		plan, err := setup.BuildPlan(o)
 		if err != nil {
