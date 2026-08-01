@@ -25,7 +25,7 @@ func TestAssemblePack_EdgeOnlyTargetIncluded(t *testing.T) {
 	s4 := budget.Stage4Output{BudgetTokens: 100}
 	s5 := sanitize.Stage5Output{Items: []sanitize.SanitizedItem{{Citation: seed, Body: "body"}}}
 
-	pack := assemblePack("q", contract.IntentUnknown, s3, s4, s5, "test")
+	pack := assemblePack("q", contract.IntentUnknown, s3, s4, s5, "test", nil)
 	if !pack.IsValid() {
 		t.Fatalf("pack invalid: %+v", pack)
 	}
@@ -59,7 +59,7 @@ func TestAssemblePack_SkippedTargetExcluded(t *testing.T) {
 	s4 := budget.Stage4Output{BudgetTokens: 100, Skipped: []contract.Citation{orphan}}
 	s5 := sanitize.Stage5Output{Items: []sanitize.SanitizedItem{{Citation: seed, Body: "body"}}}
 
-	pack := assemblePack("q", contract.IntentUnknown, s3, s4, s5, "test")
+	pack := assemblePack("q", contract.IntentUnknown, s3, s4, s5, "test", nil)
 	if len(pack.GraphNeighbors) != 0 {
 		t.Fatalf("rejected target's edge leaked: %+v", pack.GraphNeighbors)
 	}

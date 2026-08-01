@@ -121,6 +121,14 @@ type Stage2Output struct {
 	// use directly for precision/recall (use Citations instead).
 	Hits []contract.Hit
 
+	// Knowledge carries the ckv hits that have no citable location — the
+	// synthesized per-package convention summaries. They are kept out of
+	// Citations on purpose: Citation.IsValid requires a real line range,
+	// and until 2026-07-31 these flowed in as 0-0 citations, failed the
+	// allocator's filesystem fetch, and were dropped as empty bodies
+	// while the knowledge reserve held a slot for them.
+	Knowledge []contract.KnowledgeChunk
+
 	// Symbols records the FindSymbol results per keyword. Useful for
 	// footprint debugging ("which keyword resolved to which symbol?").
 	Symbols map[string][]contract.Citation
@@ -203,7 +211,21 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// directly instead of only seeding keywords.
 	if len(ckvHits) > 0 {
 		out.Hits = append(out.Hits, ckvHits...)
-		agg.addCkvList(ckvHits)
+		// Split off the hits that cannot become citations before fusing:
+		// a synthesized chunk has no line range, so letting it into the
+		// aggregator produces a 0-0 citation the contract rejects and the
+		// body fetcher cannot serve.
+		citable := make([]contract.Hit, 0, len(ckvHits))
+		for _, h := range ckvHits {
+			if !isSyntheticLocation(h.Citation) {
+				citable = append(citable, h)
+				continue
+			}
+			if k, ok := knowledgeFromHit(h); ok {
+				out.Knowledge = append(out.Knowledge, k)
+			}
+		}
+		agg.addCkvList(citable)
 	}
 	hitCount := 0
 	bm25Errors := 0

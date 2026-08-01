@@ -173,12 +173,15 @@ type PackMetadata struct {
 // is present in the contract from P0.3.1 so the type does not change shape
 // when B.5 ships.
 type EvidencePack struct {
-	Intent         Intent      `json:"intent,omitempty"`
-	Query          string      `json:"query"`
-	Citations      []Citation  `json:"citations"`
-	Bodies         []Body      `json:"bodies,omitempty"`
-	GraphNeighbors []Neighbor  `json:"graph_neighbors,omitempty"`
-	SanitizeReport []Redaction `json:"sanitize_report,omitempty"`
+	Intent         Intent     `json:"intent,omitempty"`
+	Query          string     `json:"query"`
+	Citations      []Citation `json:"citations"`
+	Bodies         []Body     `json:"bodies,omitempty"`
+	GraphNeighbors []Neighbor `json:"graph_neighbors,omitempty"`
+	// Knowledge is indexed evidence with no citable location — see
+	// KnowledgeChunk. Separate from Citations on purpose.
+	Knowledge      []KnowledgeChunk `json:"knowledge,omitempty"`
+	SanitizeReport []Redaction      `json:"sanitize_report,omitempty"`
 	// Instructions is populated by Compose runs that used dummy ckv/ckg
 	// backends in place of real ones. Each entry directs the upstream
 	// LLM (coding-agent) to execute a skill against go-stablenet source
@@ -210,6 +213,12 @@ func (p EvidencePack) IsValid() bool {
 	}
 	if !p.Intent.IsValid() {
 		return false
+	}
+
+	for _, k := range p.Knowledge {
+		if !k.IsValid() {
+			return false
+		}
 	}
 
 	citationKeys := make(map[string]struct{}, len(p.Citations))
