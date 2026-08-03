@@ -148,7 +148,27 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 	}
 	defer func() { _ = closer() }()
 
-	return eval.WriteJSON(out, report)
+	if err := eval.WriteJSON(out, report); err != nil {
+		return err
+	}
+
+	// Knowledge guard, mirroring the anchor guard above: the report is
+	// written first so the numbers survive, then a missing expected
+	// knowledge scope fails the run. Recall and MRR are citation-based
+	// and cannot see the pack's knowledge section, so without this a
+	// break there is silent — the same blind spot that hid convention
+	// chunks from every pack until #72.
+	missing := 0
+	for _, r := range report.Results {
+		for _, scope := range r.KnowledgeMissing {
+			log.Printf("cks-eval: knowledge missing: %s: expected scope %q absent from pack.knowledge", r.Name, scope)
+			missing++
+		}
+	}
+	if missing > 0 {
+		return fmt.Errorf("%d expected knowledge scope(s) not delivered", missing)
+	}
+	return nil
 }
 
 // collectScenarioPaths accepts either a single YAML file or a
