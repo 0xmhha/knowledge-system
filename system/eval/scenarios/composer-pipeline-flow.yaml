@@ -7,6 +7,15 @@ description: |
   citation/body/neighbor shaping. These two functions are the spine
   of every cks evidence pack; missing either signals a serious
   retrieval failure.
+
+  Note (2026-08-03): assemblePack is reachable only through the graph for
+  this prompt. Its chunk is about assembling the pack, not about chaining
+  stages, so ckv legitimately ranks it outside the top ten — adding "and
+  assemble the final pack" to the query brings it to ckv rank 9, which is
+  what proves the wording is the reason. The calls edge from Compose is
+  what bridges the gap, and the pack does deliver it. So this scenario's
+  low MRR measures the cost of graph-bridged evidence, not a retrieval
+  defect; do not read it as something to fix in search.
 prompt: "how does composer Compose chain the stages end to end"
 intent: arch_explain
 match_mode: overlap
