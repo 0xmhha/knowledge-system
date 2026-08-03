@@ -97,10 +97,18 @@ func TestAllocate_KnowledgeReserveExemptsSeedCap(t *testing.T) {
 
 func TestAllocate_NoKnowledgeCandidatesLeavesReserveUnused(t *testing.T) {
 	t.Parallel()
-	// Holdback holds a slot only while knowledge candidates could still
-	// appear; with none in the list the reserve simply goes unfilled and
-	// selection stops one short of the cap (same semantics as the
-	// neighbor reserve with no neighbors).
+	// The holdback is unconditional: it does not look ahead to see
+	// whether a knowledge candidate is still coming, so with none in the
+	// list the reserve goes unfilled and selection stops one short of the
+	// cap — the same semantics as the neighbor reserve with no neighbors.
+	//
+	// The prose here used to open by claiming the opposite ("only while
+	// knowledge candidates could still appear") while asserting this, so
+	// it was measured both ways on 2026-08-03. Adding the lookahead, and
+	// separately dropping KnowledgeReserve to 0, both recover the slot
+	// and both cost composer-pipeline-flow the identical 0.0038 MRR,
+	// because the extra body pushes an edge-only citation down. Recall
+	// does not move either way. The unconditional form is what ships.
 	seeds := []stage2.ScoredCitation{
 		seed("a.go", 9.0),
 		seed("b.go", 8.0),
