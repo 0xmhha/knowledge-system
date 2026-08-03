@@ -640,9 +640,35 @@ bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유
    ② 문장 노드에 ckv 청크를 만들 때.
    그때 방어 지점은 `isStructuralQname`(#54) — `#CallSite@` 류 패턴은 실제
    심볼 qname에 나올 수 없으므로 그 분류기가 자연스러운 자리다.
-5. mcp-tool-handlers R 0.67 — 15-스위트 유일 잔여. `Register`가 형태소 파생
-   키워드라 #57의 verbatim 게이트 부스트 대상이 아닌 **설계 일관적 한계**.
-   과제로 열어둘지 수용으로 닫을지 판단 대기.
+5. ~~mcp-tool-handlers R 0.67~~ — **수용으로 종결 (2026-08-03).**
+   기존 기록("`Register`가 형태소 파생이라 게이트 대상 아님")은 **맞지만
+   절반만 맞다.** 실측하니 경로가 셋 다 막혀 있고, 각각 독립적인 이유다.
+
+   인덱싱은 정상이다: ckv 청크 `101-143 symbol Register`, ckg 노드
+   `Function mcp.Register 104-143`. 그런데도 팩에 안 들어온다.
+
+   1. **의미검색**: ckv 상위 10에 없다. 프롬프트의 변별어 `get_for_task`·
+      `health`는 **툴 정의 블록**(`server.go:331-353`, `355-368`)에 있고
+      Register 본문에는 없다 — 그 두 블록이 실제로 rank 1·4를 차지한다.
+      Register의 doc comment는 "attaches both tools … refuses to start
+      half-wired"로 nil 검사 서술이 지배적이다.
+   2. **심볼 게이트**: 두 겹으로 닫힌다. 프롬프트가 "registration"이라
+      `Register`가 **축자로 없고**(기존 기록의 사유), 게다가 ckg에 `Register`가
+      **2개**다(`mcp.Register`, `parse.Registry.Register`) — #57의 **무모호
+      조건도 실패**한다. 형태소만 해결해도 열리지 않는다.
+   3. **그래프**: `Register`와 두 handler 사이에 **직접 엣지가 없다.**
+      Register는 래퍼(`registerGetForTask`/`registerHealth`)를 호출할 뿐이고,
+      handler에서 Register로 가려면 `called_by`가 필요한데 arch_explain의
+      관계집합에 없다. 있어도 2홉이라 이 시나리오는 못 고친다.
+
+   실증: 프롬프트에 `Register`를 명시하면 **rank 3**으로 들어온다. 빼면 없다.
+   A-15(`assemblePack`)와 같은 구조 — 정답이 프롬프트가 묘사하지 않는 심볼을
+   요구한다. 차이는 A-15는 그래프가 이어줬고 여기는 그래프도 못 잇는 것뿐이다.
+
+   **고칠 방법이 없다**: `called_by` 추가는 2홉이라 무효 + 관계집합 변경 위험,
+   무모호 게이트 완화는 #57이 이미 recall 0.844→0.778로 유해 실측, 형태소 부스트
+   허용은 모호성 때문에 여전히 안 열린다. R 0.67은 정답 3개 중 2개를 찾은
+   것이지 실패가 아니다.
 
 ### 종결 (근거 기록)
 
