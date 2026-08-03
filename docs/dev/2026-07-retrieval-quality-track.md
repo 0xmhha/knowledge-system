@@ -435,6 +435,24 @@ A/B/C를 합치면 결론은 이렇다:
 우연한 균형이므로, 예약을 손대려면 그 전에 `invariant`/`doc` 후보가 실제로
 어떤 질의에서 body 슬롯을 필요로 하는지부터 표본을 잡아야 한다.
 
+### knowledge 회귀 가드 (2026-08-03, A-14)
+
+#72가 `convention`을 `pack.knowledge`로 옮겼는데, **eval의 recall/MRR은 인용
+기반이라 그 섹션을 볼 수 없다.** 시나리오가 1.00을 받으면서 지식은 하나도
+안 실릴 수 있다 — `bm25-rerank-option`이 무너진 것과 정확히 같은 사각지대다.
+
+시나리오에 선택 필드 `expected_knowledge`(scope 목록)를 추가하고,
+`cks-eval`이 앵커 가드와 같은 방식으로 **결손 시 loud fail**하도록 했다.
+`composer-pipeline-flow`에 composer 패키지 scope 2개를 걸었다.
+
+- **지표 영향 0**: recall 0.9778 / MRR 0.5301 불변, 15개 시나리오 변동 없음.
+  프로덕션 코드는 한 줄도 안 건드렸다(eval 하네스 + 시나리오 YAML만).
+- **양방향 검증**: 정상 시 exit 0, 없는 scope를 넣으면
+  `knowledge missing: composer-pipeline-flow: expected scope ... absent`
+  로그와 함께 **exit 1**. 리포트 JSON은 실패해도 먼저 기록된다(수치 보존).
+- 점수가 아니라 **가드**로 설계했다 — Metrics에 넣으면 지식 결손이 인용
+  품질과 상쇄되어 묻힌다.
+
 ### 다음에 이 영역을 열 때
 
 `selected_count 9`는 **여전히 사실**이고 낭비도 실재한다. 다만 현재 지표

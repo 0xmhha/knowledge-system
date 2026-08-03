@@ -76,6 +76,11 @@ type ScenarioResult struct {
 	// summary string; metric fields are best-effort over the
 	// surviving runs (zero when all runs failed).
 	Error string `json:"error,omitempty"`
+	// KnowledgeMissing lists the scenario's ExpectedKnowledge scopes the
+	// pack did not deliver. Kept out of Metrics on purpose: it is a
+	// pass/fail guard, not a score, and folding it into recall would let
+	// a knowledge break trade against citation quality.
+	KnowledgeMissing []string `json:"knowledge_missing,omitempty"`
 }
 
 // Runner owns one cks-mcp connection and executes scenarios against
@@ -153,12 +158,23 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 
 	perRun := make([]Metrics, 0, s.Runs)
 	errMsgs := make([]string, 0)
+	// Union across runs: a scope missing in any run is a miss. Knowledge
+	// delivery should be deterministic, so a partial miss is itself worth
+	// surfacing.
+	var knowledgeMissing []string
+	missingSeen := map[string]bool{}
 
 	for i := 0; i < s.Runs; i++ {
-		m, runErr := r.executeOnce(ctx, s)
+		m, missing, runErr := r.executeOnce(ctx, s)
 		if runErr != nil {
 			errMsgs = append(errMsgs, fmt.Sprintf("run %d: %v", i+1, runErr))
 			continue
+		}
+		for _, scope := range missing {
+			if !missingSeen[scope] {
+				missingSeen[scope] = true
+				knowledgeMissing = append(knowledgeMissing, scope)
+			}
 		}
 		perRun = append(perRun, m)
 	}
@@ -170,6 +186,8 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		Runs:      s.Runs,
 		MatchMode: string(s.MatchMode),
 		Metrics:   medianMetrics(perRun),
+
+		KnowledgeMissing: knowledgeMissing,
 	}
 	if len(errMsgs) > 0 {
 		out.Error = strings.Join(errMsgs, "; ")
@@ -210,7 +228,7 @@ func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 }
 
 // executeOnce performs one tool call + metric computation.
-func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, error) {
+func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolGetForTask
 	// Pass the scenario's declared intent so the run scores the
@@ -227,17 +245,18 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, error) 
 	res, err := r.client.CallTool(ctx, req)
 	elapsed := time.Since(t0)
 	if err != nil {
-		return Metrics{}, fmt.Errorf("CallTool: %w", err)
+		return Metrics{}, nil, fmt.Errorf("CallTool: %w", err)
 	}
 	if res != nil && res.IsError {
-		return Metrics{}, fmt.Errorf("%s", concatText(res))
+		return Metrics{}, nil, fmt.Errorf("%s", concatText(res))
 	}
 
 	pack, err := decodePack(res)
 	if err != nil {
-		return Metrics{}, fmt.Errorf("decode: %w", err)
+		return Metrics{}, nil, fmt.Errorf("decode: %w", err)
 	}
 
+	missingKnowledge := missingKnowledgeScopes(s.ExpectedKnowledge, pack.Knowledge)
 	p, rec, f := precisionRecall(s.ExpectedCitations, pack.Citations, s.MatchMode)
 	return Metrics{
 		FilePrecision:    p,
@@ -249,7 +268,7 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, error) 
 		BodyCount:        len(pack.Bodies),
 		RedactionCount:   len(pack.SanitizeReport),
 		LatencyMS:        elapsed.Milliseconds(),
-	}, nil
+	}, missingKnowledge, nil
 }
 
 // medianMetrics folds per-run Metrics into one. Scalar fields and

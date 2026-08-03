@@ -40,6 +40,14 @@ type Scenario struct {
 	Prompt            string
 	Intent            contract.Intent
 	ExpectedCitations []contract.Citation
+	// ExpectedKnowledge lists scopes that must appear in the pack's
+	// knowledge section (contract.KnowledgeChunk.Scope). Recall and MRR
+	// are citation-based and cannot see that section at all, so without
+	// this a break in knowledge delivery is invisible to the suite —
+	// which is exactly how convention chunks went missing from every
+	// pack until #72 found them by accident. Optional: scenarios that
+	// leave it empty are unaffected.
+	ExpectedKnowledge []string
 	// Anchors runs parallel to ExpectedCitations: an optional substring
 	// that must occur INSIDE the citation's line span in the source tree.
 	// Guards against expected-span drift — the chronic failure where code
@@ -63,6 +71,7 @@ type scenarioWire struct {
 	Prompt            string                 `yaml:"prompt"`
 	Intent            string                 `yaml:"intent,omitempty"`
 	ExpectedCitations []scenarioCitationWire `yaml:"expected_citations,omitempty"`
+	ExpectedKnowledge []string               `yaml:"expected_knowledge,omitempty"`
 	MatchMode         MatchMode              `yaml:"match_mode,omitempty"`
 	Runs              int                    `yaml:"runs,omitempty"`
 }
@@ -95,6 +104,8 @@ func ParseScenario(data []byte) (*Scenario, error) {
 		Intent:      contract.Intent(w.Intent),
 		MatchMode:   w.MatchMode,
 		Runs:        w.Runs,
+
+		ExpectedKnowledge: w.ExpectedKnowledge,
 	}
 	if len(w.ExpectedCitations) > 0 {
 		s.ExpectedCitations = make([]contract.Citation, len(w.ExpectedCitations))

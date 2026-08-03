@@ -11,6 +11,14 @@ prompt: "how does composer Compose chain the stages end to end"
 intent: arch_explain
 match_mode: overlap
 runs: 5
+# The pack's knowledge section is invisible to recall/MRR, so it needs its
+# own guard. This prompt reliably surfaces the composer packages' synthesized
+# convention summaries; if knowledge delivery breaks the way it was broken
+# before #72, this fails loudly instead of scoring a clean 1.00.
+expected_knowledge:
+  - internal/system/composer
+  - internal/system/composer/stage2
+
 expected_citations:
   - file: internal/system/composer/composer.go
     start_line: 134
