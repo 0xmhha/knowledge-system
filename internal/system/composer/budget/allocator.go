@@ -259,14 +259,30 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	processed := 0
 	for _, c := range candidates {
 		processed++
-		// Domain-knowledge corpus chunks (invariants/conventions/flows) are
-		// indexed by ckv from out-of-tree markdown, so they arrive as
-		// chunk_kind "doc" with an empty commit hash rather than the
-		// "invariant"/"convention" kinds. Recognise those too, otherwise the
-		// knowledge reserve never fires for the real corpus and domain rules
-		// lose their slot to code seeds under the citation cap. In-tree
-		// markdown (READMEs) carries a real commit hash and is unaffected.
-		isKnowledge := c.ChunkKind == "invariant" || c.ChunkKind == "convention" ||
+		// Domain-knowledge chunks get a reserved slot because they arrive
+		// from a kind-scoped retrieval, rank below code seeds, and would
+		// never survive a plain greedy pass.
+		//
+		// "convention" is deliberately NOT listed. A convention chunk is
+		// built at line 0-0 by construction (internal/vector/build/
+		// pipeline.go: StartLine/EndLine are literal zeros), and since
+		// #72 stage 2 splits every zero-line hit out into the pack's
+		// knowledge section before the citation aggregator runs. One can
+		// therefore never reach this loop as a candidate; keeping the arm
+		// would only suggest a path that does not exist.
+		//
+		// Out-of-tree markdown arrives as chunk_kind "doc" with an empty
+		// commit hash — in-tree READMEs carry a real one and are not
+		// knowledge. That arm stays even though this corpus produces zero
+		// of them (measured 2026-08-03: 0 out-of-tree doc chunks against
+		// 3,679 in-tree), because a project pack indexing external
+		// documentation would produce them and nothing else would catch
+		// it.
+		//
+		// What actually fills the reserve here is the 44 invariant
+		// chunks: sampled across all fifteen scenarios on 2026-08-03,
+		// they took 16 body slots in 8 of them, twice each in six.
+		isKnowledge := c.ChunkKind == "invariant" ||
 			(c.ChunkKind == "doc" && c.Citation.CommitHash == "")
 		// A prompt-verbatim, unambiguously resolved symbol gets the same
 		// protection as knowledge for the same reason: it is one small

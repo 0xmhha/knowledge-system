@@ -68,10 +68,17 @@ func TestAllocate_KnowledgeReserveExemptsSeedCap(t *testing.T) {
 	// seedCap = MaxCitations - NeighborReserve = 1. The invariant seed is
 	// past the seed quota but must still enter via the reserve exemption —
 	// domain rules must not lose their slot to yet another code body.
+	//
+	// The fixture used to be a "convention" chunk. Those cannot reach the
+	// allocator since #72 (built at line 0-0, split into the pack's
+	// knowledge section before the citation aggregator), so the case is
+	// pinned with the kind that actually fills the reserve: invariant
+	// chunks took 16 body slots across the fifteen scenarios when sampled
+	// on 2026-08-03.
 	seeds := []stage2.ScoredCitation{
 		seed("a.go", 9.0),
 		seed("b.go", 8.0),
-		knowledgeSeed("rules.md", 0.5, "convention"),
+		knowledgeSeed("rules.md", 0.5, "invariant"),
 	}
 	fetcher := &FakeFetcher{Bodies: map[string]string{
 		cit("a.go", 1, 10).Key():     bodyN(10),

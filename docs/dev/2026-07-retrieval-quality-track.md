@@ -477,6 +477,48 @@ graph expansion의 존재 이유다. 실제로 팩은 rank 11로 전달한다.
 이로써 A-10~A-15가 모두 닫힌다. `assemblePack`을 상위로 올리는 길은 —
 순서(B)·슬롯(A)·위계(C)·시드화(E) 어느 쪽으로도 — 없다.
 
+### 예약의 명분 재확인 (2026-08-03, A-16) — 앞선 판단 정정
+
+시도 D에서 "표본 두 질의에서 knowledge 후보가 body 슬롯을 하나도 안 채운다"고
+적었는데, **표본 2개로 일반화한 것이 잘못이었다.** 15개 시나리오 전수로
+다시 재니 결과가 반대다.
+
+| | |
+|---|---|
+| invariant가 body 슬롯을 차지한 시나리오 | **8 / 15** |
+| 총 점유 슬롯 | **16개** |
+| 정확히 2건씩(=`KnowledgeReserve` 크기) 채운 시나리오 | 6개 |
+
+bug-fix-rerank-drop 3건, bm25-rerank-option·qa-review-intent·
+rrfk-constant-lookup·stamp-integrity-lookup·structural-qname-filter·
+wal-reap-test-helper 각 2건, parse-intent-validation 1건. 하필 시도 D에서
+고른 두 질의가 0건인 7개 쪽이었다.
+
+**따라서 "예약이 의도와 무관하게 값을 한다"는 시도 D의 진단은 틀렸다.**
+예약은 설계 목적 그대로 작동하고 있고, 건드릴 이유가 없다.
+
+#### 다만 판정 대상은 좁아졌다 — 죽은 분기 정리
+
+`isKnowledge`는 세 종류를 인정했는데 실측 결과:
+
+| 종류 | 개수 | 상태 |
+|---|---|---|
+| `invariant` | 44 | **유일하게 예약을 채우는 대상** |
+| `convention` | 145 | **도달 불가** — #72 이후 인용이 될 수 없음 |
+| `doc` (트리 밖) | **0** | 이 코퍼스엔 없음 |
+| `doc` (트리 내) | 3,679 | 판정 대상 아님(실제 commit hash 보유) |
+
+`convention` 분기는 **코드 보장으로 도달 불가**다 —
+`internal/vector/build/pipeline.go`가 convention 청크를 `StartLine/EndLine`
+리터럴 0으로 만들고, #72의 stage2 분기가 0-0 히트를 인용 집계 전에
+knowledge 섹션으로 빼낸다. 그래서 제거했다.
+
+트리 밖 `doc` 분기는 **남겼다**. 이 코퍼스에 0건일 뿐, 외부 문서를 인덱싱하는
+프로젝트 팩에서는 생길 수 있고 다른 어떤 조건도 그걸 잡지 못한다. 0건이라는
+실측을 주석에 남겨 다음 사람이 같은 의심을 반복하지 않게 했다.
+
+동작 변경 없음: 15개 시나리오 전부 불변(0.9778 / 0.5301).
+
 ### 다음에 이 영역을 열 때
 
 `selected_count 9`는 **여전히 사실**이고 낭비도 실재한다. 다만 현재 지표
@@ -579,11 +621,54 @@ bm25-rerank-option 0→R 1.00. 비게이트 3.0 부스트는 recall 0.778로 유
    지배적인 것은 *랭킹이 stage3 calls-엣지를 안 본다*는 것이고, 나머지 둘
    (`field` kind의 단일 라인 인용, header 강등이 doc 강등에 묶임)은 다 고쳐도
    0.151→0.198에 그친다. 착수 순서는 그 절의 "후속" 참조.
-4. `#CallSite@`/`#ReturnStmt@` 문장-수준 서브노드의 이웃/해석 노출 여부
-   점검(현재 관측상 문제 없음 — contains 미순회라 격리).
-5. mcp-tool-handlers R 0.67 — 15-스위트 유일 잔여. `Register`가 형태소 파생
-   키워드라 #57의 verbatim 게이트 부스트 대상이 아닌 **설계 일관적 한계**.
-   과제로 열어둘지 수용으로 닫을지 판단 대기.
+4. ~~`#CallSite@`/`#ReturnStmt@` 문장-수준 서브노드의 노출 점검~~ —
+   **조건부 종결 (2026-08-03).** 유출이 관측되지 않을 뿐 아니라, 격리가
+   우연이 아님을 확인했다:
+   - 규모는 확실히 위험하다 — 문장 노드 **24,998개** vs 실제 심볼 **2,763개**
+     (CallSite만 15,824). 새면 팩이 한 줄 인용으로 도배된다.
+   - **`contains`는 `pkg/system/contract`에 상수조차 없다.** 순회하려면 관계
+     타입을 새로 정의해야 하므로 실수로 켜지는 스위치가 아니다.
+   - **문장 노드는 ckv 청크가 없다.** 의미검색 경로로도 들어올 수 없다.
+   - kind 필터가 비는 세 intent(`refactor`/`qa_review`/`unknown`)를 의심해
+     실측했으나, `qa-review-intent` 팩의 상위는 전부 정상 심볼 스팬이었다.
+     한 줄 인용으로 보이던 `runner.go:208-208`·`229-229`는 문장 노드가 아니라
+     **ckv의 `invariant` 청크**(`fmt.Errorf` 메시지)로, 설계대로 동작한 것이다.
+   - 낮은 MRR과 kind 필터 부재의 상관은 **우연**이다.
+
+   **재개 조건**(둘 중 하나라도 생기면 이 항목을 다시 열 것):
+   ① `RelationContains`를 도입해 순회 대상에 넣을 때,
+   ② 문장 노드에 ckv 청크를 만들 때.
+   그때 방어 지점은 `isStructuralQname`(#54) — `#CallSite@` 류 패턴은 실제
+   심볼 qname에 나올 수 없으므로 그 분류기가 자연스러운 자리다.
+5. ~~mcp-tool-handlers R 0.67~~ — **수용으로 종결 (2026-08-03).**
+   기존 기록("`Register`가 형태소 파생이라 게이트 대상 아님")은 **맞지만
+   절반만 맞다.** 실측하니 경로가 셋 다 막혀 있고, 각각 독립적인 이유다.
+
+   인덱싱은 정상이다: ckv 청크 `101-143 symbol Register`, ckg 노드
+   `Function mcp.Register 104-143`. 그런데도 팩에 안 들어온다.
+
+   1. **의미검색**: ckv 상위 10에 없다. 프롬프트의 변별어 `get_for_task`·
+      `health`는 **툴 정의 블록**(`server.go:331-353`, `355-368`)에 있고
+      Register 본문에는 없다 — 그 두 블록이 실제로 rank 1·4를 차지한다.
+      Register의 doc comment는 "attaches both tools … refuses to start
+      half-wired"로 nil 검사 서술이 지배적이다.
+   2. **심볼 게이트**: 두 겹으로 닫힌다. 프롬프트가 "registration"이라
+      `Register`가 **축자로 없고**(기존 기록의 사유), 게다가 ckg에 `Register`가
+      **2개**다(`mcp.Register`, `parse.Registry.Register`) — #57의 **무모호
+      조건도 실패**한다. 형태소만 해결해도 열리지 않는다.
+   3. **그래프**: `Register`와 두 handler 사이에 **직접 엣지가 없다.**
+      Register는 래퍼(`registerGetForTask`/`registerHealth`)를 호출할 뿐이고,
+      handler에서 Register로 가려면 `called_by`가 필요한데 arch_explain의
+      관계집합에 없다. 있어도 2홉이라 이 시나리오는 못 고친다.
+
+   실증: 프롬프트에 `Register`를 명시하면 **rank 3**으로 들어온다. 빼면 없다.
+   A-15(`assemblePack`)와 같은 구조 — 정답이 프롬프트가 묘사하지 않는 심볼을
+   요구한다. 차이는 A-15는 그래프가 이어줬고 여기는 그래프도 못 잇는 것뿐이다.
+
+   **고칠 방법이 없다**: `called_by` 추가는 2홉이라 무효 + 관계집합 변경 위험,
+   무모호 게이트 완화는 #57이 이미 recall 0.844→0.778로 유해 실측, 형태소 부스트
+   허용은 모호성 때문에 여전히 안 열린다. R 0.67은 정답 3개 중 2개를 찾은
+   것이지 실패가 아니다.
 
 ### 종결 (근거 기록)
 
