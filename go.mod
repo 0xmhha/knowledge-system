@@ -1,8 +1,6 @@
 module github.com/0xmhha/knowledge-system
 
-go 1.25.5
-
-toolchain go1.25.12
+go 1.25.12
 
 require (
 	github.com/asg017/sqlite-vec-go-bindings v0.1.6

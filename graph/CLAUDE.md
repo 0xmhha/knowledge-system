@@ -33,7 +33,7 @@ CI (root `.github/workflows/ci.yml`) runs `make build`, `make lint`,
 `eval-gate-vector` (mock-embedder recall gate). The viewer pipeline and
 `make audit` are local-only (not in CI). **Match CI locally before pushing.**
 
-- Go **1.25.x** (toolchain go1.25.9). Module: `github.com/0xmhha/knowledge-system`.
+- Go **1.25.12+**. Module: `github.com/0xmhha/knowledge-system`.
 - **gofmt drift is a hard gate** (`fmt-check`). Run `make fmt` before commit;
   `make -C .. install-hooks` (root Makefile) wires the local pre-commit hook (opt-in).
 
