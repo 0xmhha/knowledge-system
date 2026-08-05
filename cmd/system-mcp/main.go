@@ -20,7 +20,7 @@
 //
 // Usage:
 //
-//	cks-mcp -config ./policies/cks.yaml.example
+//	cks-mcp --config ./policies/cks.yaml.example
 //
 // If -config is omitted, config.Default() supplies sane defaults; the
 // sanitize ruleset is still loaded from disk when SanitizeConfig.RulesPath
@@ -31,7 +31,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -60,6 +59,7 @@ import (
 	cksmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
+	flag "github.com/spf13/pflag"
 )
 
 // builderVersion is stamped into the MCP server name/version handshake and

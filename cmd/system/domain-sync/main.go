@@ -14,19 +14,19 @@
 //
 // Usage:
 //
-//	cks-domain-sync -entries <project-dir> [-ckv-out path] [-ckg-out path]
+//	cks-domain-sync --entries <project-dir> [-ckv-out path] [-ckg-out path]
 //
 // With no -*-out flags both views are written to stdout (dry run).
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
@@ -39,7 +39,7 @@ func main() {
 	flag.Parse()
 
 	if *entriesDir == "" {
-		fmt.Fprintln(os.Stderr, "cks-domain-sync: -entries is required (e.g. projects/<name>/domain-knowledge)")
+		fmt.Fprintln(os.Stderr, "cks-domain-sync: --entries is required (e.g. projects/<name>/domain-knowledge)")
 		os.Exit(2)
 	}
 	if err := run(*entriesDir, *ckvOut, *ckgOut); err != nil {

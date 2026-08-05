@@ -18,14 +18,14 @@
 #     and glossary.yaml, which `make sync-domain-artifacts` owns — so run it by
 #     hand first if the YAML changed:
 #       make build          # builds bin/cks-domain-export
-#       bin/cks-domain-export -project projects/stablenet/domain-knowledge \
-#         -out projects/stablenet/generated/domain-corpus \
-#         -code-root /abs/path/to/go-stablenet
-#     -code-root is REQUIRED: project.yaml's authoritative_docs are CLAUDE.md
+#       bin/cks-domain-export --project projects/stablenet/domain-knowledge \
+#         --out projects/stablenet/generated/domain-corpus \
+#         --code-root /abs/path/to/go-stablenet
+#     --code-root is REQUIRED: project.yaml's authoritative_docs are CLAUDE.md
 #     and .claude/docs/*.md, which live in the go-stablenet checkout, not here.
 #     Without it the tool fails closed (exit 1, "7 of 7 authoritative_docs could
 #     not be resolved") after writing the entries but no docs. Use
-#     -allow-missing-docs only when shipping a corpus without them is intended.
+#     --allow-missing-docs only when shipping a corpus without them is intended.
 #
 # Usage:
 #   scripts/build-vector-stablenet.sh            # build

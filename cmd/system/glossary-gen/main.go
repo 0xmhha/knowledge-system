@@ -14,19 +14,19 @@
 // Usage:
 //
 //	cks-glossary-gen \
-//	    -project projects/stablenet/domain-knowledge \
-//	    -out    projects/stablenet/domain-knowledge/glossary.yaml \
-//	    -status verified
+//	    --project projects/stablenet/domain-knowledge \
+//	    --out    projects/stablenet/domain-knowledge/glossary.yaml \
+//	    --status verified
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
@@ -67,7 +67,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" {
-		fmt.Fprintln(os.Stderr, "cks-glossary-gen: -project is required")
+		fmt.Fprintln(os.Stderr, "cks-glossary-gen: --project is required")
 		flag.Usage()
 		os.Exit(2)
 	}

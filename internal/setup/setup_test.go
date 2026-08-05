@@ -85,7 +85,7 @@ func TestBuildPlan_Shape(t *testing.T) {
 		t.Fatalf("step[0] = %q, want filelist-derive", p3.Steps[0].ID)
 	}
 	d := strings.Join(p3.Steps[0].Cmd, " ")
-	if !strings.Contains(d, "filelist-gen -src /s -config /p/filelist.yaml -out /o/files-from.json") {
+	if !strings.Contains(d, "filelist-gen --src /s --config /p/filelist.yaml --out /o/files-from.json") {
 		t.Errorf("derive cmd = %q", d)
 	}
 	for _, i := range []int{1, 2} { // graph-build, vector-build
@@ -421,8 +421,8 @@ func TestBuildPlan_DomainArtifacts(t *testing.T) {
 	}
 
 	// The corpus is the only artifact written; it defaults beside the pack.
-	if e := strings.Join(p.Steps[0].Cmd, " "); !strings.Contains(e, "-out /pack/generated/domain-corpus") ||
-		!strings.Contains(e, "-code-root /checkout") {
+	if e := strings.Join(p.Steps[0].Cmd, " "); !strings.Contains(e, "--out /pack/generated/domain-corpus") ||
+		!strings.Contains(e, "--code-root /checkout") {
 		t.Errorf("export cmd = %q", e)
 	}
 	// The policy and glossary checks are in-process; nothing is written for
@@ -476,14 +476,14 @@ func TestVerifyDerivedFresh(t *testing.T) {
 	if err := os.WriteFile(committed, []byte("policies: [a, b]\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := VerifyDerivedFresh("s", "the policy", []string{gen, "-out"}, committed, nil); err != nil {
+	if err := VerifyDerivedFresh("s", "the policy", []string{gen, "--out"}, committed, nil); err != nil {
 		t.Errorf("matching copy should pass, got %v", err)
 	}
 
 	if err := os.WriteFile(committed, []byte("policies: [a]\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	err := VerifyDerivedFresh("s", "the policy", []string{gen, "-out"}, committed, nil)
+	err := VerifyDerivedFresh("s", "the policy", []string{gen, "--out"}, committed, nil)
 	if err == nil {
 		t.Fatal("a stale committed copy must fail the build")
 	}

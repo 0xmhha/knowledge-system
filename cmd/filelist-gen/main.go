@@ -23,7 +23,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -32,6 +31,7 @@ import (
 	"sort"
 	"strings"
 
+	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 )
 
@@ -95,7 +95,7 @@ func main() {
 	flag.Parse()
 
 	if *src == "" || *configPath == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "filelist-gen: -src, -config, and -out are required")
+		fmt.Fprintln(os.Stderr, "filelist-gen: --src, --config, and --out are required")
 		os.Exit(2)
 	}
 	if err := run(*src, *configPath, *out, *check, *allowDirty, *strict); err != nil {
@@ -116,10 +116,10 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 	}
 	// Assumptions, fail closed (design §4.1): git repo + single-module root.
 	if _, err := os.Stat(filepath.Join(srcAbs, "go.mod")); err != nil {
-		return fmt.Errorf("-src %s is not a Go module root (no go.mod)", srcAbs)
+		return fmt.Errorf("--src %s is not a Go module root (no go.mod)", srcAbs)
 	}
 	if _, err := gitOut(srcAbs, "rev-parse", "--git-dir"); err != nil {
-		return fmt.Errorf("-src %s is not a git repository: %v", srcAbs, err)
+		return fmt.Errorf("--src %s is not a git repository: %v", srcAbs, err)
 	}
 
 	cfgBytes, err := os.ReadFile(configPath)
@@ -143,7 +143,7 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 		return err
 	}
 	if dirty && !allowDirty {
-		return fmt.Errorf("tracked working tree is dirty — the derived list would not correspond to the recorded commit; commit/stash first or pass -allow-dirty (recorded in provenance)")
+		return fmt.Errorf("tracked working tree is dirty — the derived list would not correspond to the recorded commit; commit/stash first or pass --allow-dirty (recorded in provenance)")
 	}
 	commit, err := gitOut(srcAbs, "rev-parse", "HEAD")
 	if err != nil {

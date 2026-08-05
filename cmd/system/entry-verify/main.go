@@ -21,9 +21,9 @@
 // Usage:
 //
 //	cks-entry-verify \
-//	    -project projects/stablenet/domain-knowledge \
-//	    -entry   A1.wbft_core.quorum_calc \
-//	    -by      mhha
+//	    --project projects/stablenet/domain-knowledge \
+//	    --entry   A1.wbft_core.quorum_calc \
+//	    --by      mhha
 //
 // Optional flags:
 //
@@ -37,7 +37,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"maps"
 	"os"
@@ -45,6 +44,7 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
@@ -58,7 +58,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" || *entryRef == "" || *reviewer == "" {
-		fmt.Fprintln(os.Stderr, "cks-entry-verify: -project, -entry, and -by are required")
+		fmt.Fprintln(os.Stderr, "cks-entry-verify: --project, --entry, and --by are required")
 		flag.Usage()
 		os.Exit(2)
 	}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
+	flag "github.com/spf13/pflag"
 )
 
 // runGenConfig implements the `cks-mcp gen-config` subcommand: it maps flags to
@@ -33,8 +33,9 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	policyFile := fs.String("policy-file", "", "ckg governance policy file")
 	embedModel := fs.String("embed-model", "", "Ollama embed model; empty defaults to \"bge-m3\"")
 	ollamaURL := fs.String("ollama-url", "", "Ollama endpoint; empty defaults to http://localhost:11434")
-	httpAddr := fs.String("http-addr", "", "HTTP listen host:port; empty defaults to 127.0.0.1:8080")
-	lan := fs.Bool("lan", false, "bind this host's detected LAN IP so remote agents can reach it (fills the host of --http-addr)")
+	port := fs.String("port", "", "HTTP listen port; the host is filled in automatically — 127.0.0.1, or this host's detected LAN IP with --lan")
+	httpAddr := fs.String("http-addr", "", "full HTTP listen host:port when you need to name the interface yourself; prefer --port. Empty defaults to 127.0.0.1:8080")
+	lan := fs.Bool("lan", false, "bind this host's detected LAN IP so remote agents can reach it (combine with --port)")
 	allowRemote := fs.Bool("allow-remote", false, "opt in to binding a routable address (derived true for non-loopback addrs)")
 	sanitizeRules := fs.String("sanitize-rules", "", "sanitize ruleset YAML path")
 	domainProjectDir := fs.String("domain-project-dir", "", "domain-knowledge project dir (enables channel 2)")
@@ -47,7 +48,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		return err
 	}
 	if *out == "" {
-		return fmt.Errorf("-out is required")
+		return fmt.Errorf("--out is required")
 	}
 
 	// A written config is used from an arbitrary working directory, so resolve
@@ -61,15 +62,23 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		sanitizePath = abs
 	}
 
-	// --lan resolves this host's LAN IP into the bind address so a remote agent
-	// has a routable URL; the port is taken from --http-addr (default 8080).
+	// The operator picks a port; the host is policy, not input. --port binds
+	// loopback, --lan swaps in this host's detected LAN IP so a remote agent
+	// has a routable URL, and --http-addr remains the escape hatch for naming
+	// an interface explicitly (its port wins when --lan rewrites the host).
+	if *port != "" && *httpAddr != "" {
+		return fmt.Errorf("--port and --http-addr are mutually exclusive (--http-addr already carries a port)")
+	}
 	addr := *httpAddr
+	if *port != "" {
+		addr = net.JoinHostPort("127.0.0.1", *port)
+	}
 	if *lan {
-		port := "8080"
-		if _, p, err := net.SplitHostPort(addr); err == nil && p != "" {
-			port = p
+		p := "8080"
+		if _, pp, err := net.SplitHostPort(addr); err == nil && pp != "" {
+			p = pp
 		}
-		addr = net.JoinHostPort(netutil.AdvertiseHost("0.0.0.0"), port)
+		addr = net.JoinHostPort(netutil.AdvertiseHost("0.0.0.0"), p)
 	}
 
 	cfg := config.Generate(config.GenerateOptions{

@@ -103,11 +103,11 @@ build-dataset-bins:
 # reviewable diff when an entry changes. Run after editing entries/.
 DOMAIN_PACK ?= projects/stablenet
 sync-domain-artifacts: build-dataset-bins
-	./bin/cks-domain-sync -entries $(DOMAIN_PACK)/domain-knowledge \
-	    -ckg-out $(DOMAIN_PACK)/policies/graph.yaml \
-	    -ckv-out /dev/null
-	./bin/cks-glossary-gen -project $(DOMAIN_PACK)/domain-knowledge \
-	    -out $(DOMAIN_PACK)/domain-knowledge/glossary.yaml
+	./bin/cks-domain-sync --entries $(DOMAIN_PACK)/domain-knowledge \
+	    --ckg-out $(DOMAIN_PACK)/policies/graph.yaml \
+	    --ckv-out /dev/null
+	./bin/cks-glossary-gen --project $(DOMAIN_PACK)/domain-knowledge \
+	    --out $(DOMAIN_PACK)/domain-knowledge/glossary.yaml
 
 # check-domain-artifacts: fail when the committed renderings no longer match
 # the entries they come from. Both files went months out of date because

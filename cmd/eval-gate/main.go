@@ -20,10 +20,11 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"math"
 	"os"
+
+	flag "github.com/spf13/pflag"
 )
 
 // defaultTolerance is the per-metric float64 slack the gate allows

@@ -537,8 +537,7 @@ cobra root는 약 20개 subcommand를 등록한다 (`cmd/ckg/root.go:30-36`의 `
 
 ```
 module github.com/0xmhha/knowledge-system
-go 1.25.5
-toolchain go1.25.12
+go 1.25.12
 
 require (
     github.com/fsnotify/fsnotify v1.10.1                    // watch 서브커맨드

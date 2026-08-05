@@ -8,7 +8,7 @@
 # export its instance URL in the shell *before* launching, AFTER any activate.sh
 # (so our override is last-write-wins). The dataset's ENV_FILE must export
 # CKS_MCP_URL=http://<ip>:<port>/mcp for a cks-mcp instance already serving that
-# dataset (start one with `system-mcp daemon up` or `system-mcp -config <cfg>`; verify
+# dataset (start one with `system-mcp daemon up` or `system-mcp --config <cfg>`; verify
 # which index it serves via cks.ops.health name/indexed_head).
 #
 # Generalized from knowledge-data/pr-14/run-coding-agent-pr14.sh.

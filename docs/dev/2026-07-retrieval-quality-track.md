@@ -553,7 +553,7 @@ MRR 등락은 재임베딩/키워드셋 변화의 재셔플 노이즈(±0.05)를
 
 | 드리프트 | 증상 | 가드 |
 |---|---|---|
-| 시나리오 스팬 | 코드 이동 → 조용한 recall 0 (3회 재발) | expected citation `anchor:` 필드 + `cks-eval -verify-anchors <root>` (측정 전 fail-loud) |
+| 시나리오 스팬 | 코드 이동 → 조용한 recall 0 (3회 재발) | expected citation `anchor:` 필드 + `cks-eval --verify-anchors <root>` (측정 전 fail-loud) |
 | intent 분류 | 분류기 Unknown 강등 → intent-조건 로직 전체 침묵 비활성 | `get_for_task`의 명시 `intent` 인자(무효값 fail-loud) — 파이프라인은 stage별 고정 intent 전달(coding-agent #63) |
 | 인덱스 신선도 | 구-트리 좌표 청크 ↔ 현-트리 스팬 비교 → 가짜 miss | `cks-eval`이 ops.freshness indexed_head ↔ 트리 HEAD 대조 WARNING |
 
@@ -694,6 +694,6 @@ make build-dataset-bins
 make -C system dogfood-eval USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=bge-m3 \
      CKG=$PWD/bin/ckg CKV=$PWD/bin/ckv
 # 수동 측정 시(인덱스 재사용): 신선도 WARNING을 반드시 확인
-cd system && ./bin/cks-eval -scenarios eval/scenarios -verify-anchors .. \
-     -cks-mcp ./bin/cks-mcp -config cks-dogfood.yaml -output /tmp/report.json
+cd system && ./bin/cks-eval --scenarios eval/scenarios --verify-anchors .. \
+     --cks-mcp ./bin/cks-mcp --config cks-dogfood.yaml --output /tmp/report.json
 ```

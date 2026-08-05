@@ -17,15 +17,14 @@
 //
 // Usage:
 //
-//	cks-eval -scenarios ./eval/scenarios/stablenet-pr70.yaml
-//	cks-eval -scenarios ./eval/scenarios/ -cks-mcp ./bin/cks-mcp \
-//	         -config ./policies/cks.yaml.example -output eval/reports/run.json
+//	cks-eval --scenarios ./eval/scenarios/stablenet-pr70.yaml
+//	cks-eval --scenarios ./eval/scenarios/ --cks-mcp ./bin/cks-mcp \
+//	         --config ./policies/cks.yaml.example --output eval/reports/run.json
 package main
 
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -38,6 +37,7 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/system/eval"
+	flag "github.com/spf13/pflag"
 )
 
 var builderVersion = "cks-eval/0.0.1-dev"
@@ -56,7 +56,7 @@ func main() {
 		return
 	}
 	if *scenarios == "" {
-		log.Println("cks-eval: -scenarios is required")
+		log.Println("cks-eval: --scenarios is required")
 		os.Exit(2)
 	}
 

@@ -25,23 +25,23 @@ mutation.
 
 ```bash
 go run ./cmd/cks-entry-verify \
-    -project docs/domain-knowledge/projects/go-stablenet \
-    -entry   A1.wbft_core.quorum_calc \
-    -by      mhha
+    --project docs/domain-knowledge/projects/go-stablenet \
+    --entry   A1.wbft_core.quorum_calc \
+    --by      mhha
 ```
 
-`-entry` accepts either the entry ID or a path to the entry YAML file.
+`--entry` accepts either the entry ID or a path to the entry YAML file.
 Both forms resolve to the same on-disk file.
 
 Flags:
 
 | Flag | Default | Meaning |
 |---|---|---|
-| `-project` | (required) | project directory |
-| `-entry` | (required) | entry ID or path to `<id>.yaml` |
-| `-by` | (required) | reviewer handle recorded under `verified_by` |
-| `-date` | today (UTC) | verification date, must match `YYYY-MM-DD` |
-| `-skip-inventory` | false | do not rewrite `inventory.md` afterwards |
+| `--project` | (required) | project directory |
+| `--entry` | (required) | entry ID or path to `<id>.yaml` |
+| `--by` | (required) | reviewer handle recorded under `verified_by` |
+| `--date` | today (UTC) | verification date, must match `YYYY-MM-DD` |
+| `--skip-inventory` | false | do not rewrite `inventory.md` afterwards |
 
 ## Effect
 
@@ -76,6 +76,6 @@ preserved verbatim.
 
 - After a reviewer completes the substantive checklist for one entry.
 - After `cks-inventory-check` reports zero errors against the project.
-- Not during bulk edits — `cks-inventory-check -update-inventory` is
+- Not during bulk edits — `cks-inventory-check --update-inventory` is
   the right tool when many entries change at once and you only need
   the dashboard tables refreshed.

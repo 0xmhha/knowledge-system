@@ -20,7 +20,7 @@
 //
 // Usage:
 //
-//	cks-inventory-check -project projects/stablenet/domain-knowledge
+//	cks-inventory-check --project projects/stablenet/domain-knowledge
 //
 // Exit codes:
 //   - 0: no errors. Warnings (if any) printed to stderr.
@@ -36,13 +36,13 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
@@ -54,7 +54,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" {
-		fmt.Fprintln(os.Stderr, "cks-inventory-check: -project is required")
+		fmt.Fprintln(os.Stderr, "cks-inventory-check: --project is required")
 		flag.Usage()
 		os.Exit(2)
 	}

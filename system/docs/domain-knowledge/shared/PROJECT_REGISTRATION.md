@@ -39,7 +39,6 @@ name: "<human-readable name>"
 description: "<one-line summary>"
 
 code_root: <absolute path to source tree>
-skill_root: <absolute path to .claude or equivalent>  # optional
 
 primary_language: <go|rust|typescript|...>
 secondary_languages: []                                # optional
@@ -122,7 +121,6 @@ Add the project to CKS config so CKV/CKG/glossary are wired:
 projects:
   - id: <project-id>
     code_root: <absolute path>
-    skill_root: <absolute path>
     ckv_path: .ckv-data/<project-id>
     ckg_path: .ckg-data/<project-id>
     glossary: docs/domain-knowledge/projects/<project-id>/glossary.yaml

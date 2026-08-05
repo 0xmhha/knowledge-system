@@ -9,12 +9,12 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	server "github.com/mark3labs/mcp-go/server"
+	flag "github.com/spf13/pflag"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
