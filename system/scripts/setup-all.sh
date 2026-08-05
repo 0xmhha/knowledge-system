@@ -73,14 +73,14 @@ log "3. dataset → $DATASET_OUT (knowledge-setup)"
 GSN_SRC="$GO_STABLENET_ROOT" OUT="$DATASET_OUT" SKIP_CKV="$SKIP_CKV" \
   "$KS_ROOT/projects/stablenet/scripts/build-dataset.sh"
 
-# ── 4. config (system-mcp gen-config; replaces the retired gen-cks-config.sh) ──
-log "4. config → $KS_CONFIG (system-mcp gen-config)"
+# ── 4. config (cks mcp gen-config; replaces the retired gen-cks-config.sh) ──
+log "4. config → $KS_CONFIG (cks mcp gen-config)"
 mkdir -p "$(dirname "$KS_CONFIG")"
-"$KS_ROOT/bin/system-mcp" gen-config --out "$KS_CONFIG" \
+"$KS_ROOT/bin/cks" mcp gen-config --out "$KS_CONFIG" \
   --dataset-dir "$DATASET_OUT" --source-root "$GO_STABLENET_ROOT" \
   --graph-binary "$KS_ROOT/bin/ckg" --vector-binary "$KS_ROOT/bin/ckv" \
   --embed-model "$EMBED_MODEL" --ollama-url "$OLLAMA_URL"
-"$KS_ROOT/bin/system-mcp" print-mcp-config --config "$KS_CONFIG"
+"$KS_ROOT/bin/cks" mcp client-config --config "$KS_CONFIG"
 
 # ── 5. jira-gateway (coding-agent in-tree MCP) ──────────────────────────────
 if [ -d "$CODING_AGENT/tools/jira-gateway-mcp" ]; then

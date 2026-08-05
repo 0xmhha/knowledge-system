@@ -59,7 +59,7 @@ NS_LDFLAGS = $(if $(NAMESPACE),-ldflags "-X github.com/0xmhha/knowledge-system/p
 build-mcp:
 	$(GO) build $(NS_LDFLAGS) -o bin/graph-mcp ./cmd/graph-mcp
 	$(GO) build $(NS_LDFLAGS) -o bin/vector-mcp ./cmd/vector-mcp
-	$(GO) build $(NS_LDFLAGS) -o bin/system-mcp ./cmd/system-mcp
+	$(GO) build $(NS_LDFLAGS) -o bin/cks ./cmd/cks
 
 # vuln: scan for known vulnerabilities reachable from this module's code.
 # Note: the Go vulnerability DB covers Go-level advisories; CVEs in C code
@@ -93,9 +93,7 @@ build-dataset-bins:
 	$(GO) build -o bin/ckv ./cmd/vector
 	$(GO) build -o bin/knowledge-setup ./cmd/knowledge-setup
 	$(GO) build -o bin/filelist-gen ./cmd/filelist-gen
-	$(GO) build -o bin/cks-domain-export ./cmd/system/domain-export
-	$(GO) build -o bin/cks-domain-sync ./cmd/system/domain-sync
-	$(GO) build -o bin/cks-glossary-gen ./cmd/system/glossary-gen
+	$(GO) build $(NS_LDFLAGS) -o bin/cks ./cmd/cks
 
 # sync-domain-artifacts: refresh the committed renderings of the domain
 # entries. The dataset build derives these per run and uses the fresh copy;
@@ -103,10 +101,10 @@ build-dataset-bins:
 # reviewable diff when an entry changes. Run after editing entries/.
 DOMAIN_PACK ?= projects/stablenet
 sync-domain-artifacts: build-dataset-bins
-	./bin/cks-domain-sync --entries $(DOMAIN_PACK)/domain-knowledge \
+	./bin/cks domain sync --project $(DOMAIN_PACK)/domain-knowledge \
 	    --ckg-out $(DOMAIN_PACK)/policies/graph.yaml \
 	    --ckv-out /dev/null
-	./bin/cks-glossary-gen --project $(DOMAIN_PACK)/domain-knowledge \
+	./bin/cks domain glossary-gen --project $(DOMAIN_PACK)/domain-knowledge \
 	    --out $(DOMAIN_PACK)/domain-knowledge/glossary.yaml
 
 # check-domain-artifacts: fail when the committed renderings no longer match

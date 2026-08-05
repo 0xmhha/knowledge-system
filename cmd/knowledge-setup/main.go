@@ -114,9 +114,7 @@ func main() {
 	flag.StringVar(&o.CodeRoot, "code-root", "", "working tree the project's authoritative_docs resolve against")
 	flag.StringVar(&o.GlossaryFile, "glossary-file", "", "committed alias glossary; checked against the domain entries")
 	flag.StringVar(&o.FlowCorpus, "flow-corpus", "", "curated flow-corpus JSONL embedded with the vector index")
-	flag.StringVar(&o.DomainExportBin, "domain-export-bin", "", "cks-domain-export CLI (default: on PATH)")
-	flag.StringVar(&o.DomainSyncBin, "domain-sync-bin", "", "cks-domain-sync CLI (default: on PATH)")
-	flag.StringVar(&o.GlossaryGenBin, "glossary-gen-bin", "", "cks-glossary-gen CLI (default: on PATH)")
+	flag.StringVar(&o.CksBin, "cks-bin", "", "cks CLI hosting the domain subcommands (default: cks on PATH)")
 	flag.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := flag.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
@@ -157,9 +155,7 @@ func main() {
 		merge("code-root", &o.CodeRoot, base.CodeRoot)
 		merge("glossary-file", &o.GlossaryFile, base.GlossaryFile)
 		merge("flow-corpus", &o.FlowCorpus, base.FlowCorpus)
-		merge("domain-export-bin", &o.DomainExportBin, base.DomainExportBin)
-		merge("domain-sync-bin", &o.DomainSyncBin, base.DomainSyncBin)
-		merge("glossary-gen-bin", &o.GlossaryGenBin, base.GlossaryGenBin)
+		merge("cks-bin", &o.CksBin, base.CksBin)
 		if !set["embed-dim"] {
 			o.EmbedDim = base.EmbedDim
 		}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # gen-dataset-config.sh — generate the cks runtime config (yaml) for a
-# self-contained dataset directory by DELEGATING to `system-mcp gen-config`
+# self-contained dataset directory by DELEGATING to `cks mcp gen-config`
 # (the single config generator; this script only resolves dataset-toolkit
 # paths and passes flags). Re-runnable: moving the repos just means
 # re-running this.
@@ -13,7 +13,7 @@
 #
 # The env-file half (cks-<NAME>.env) is RETIRED with the cks.env chain:
 # register a client from the config instead —
-#   system-mcp print-mcp-config --config <dataset>/cks-<NAME>.yaml
+#   cks mcp client-config --config <dataset>/cks-<NAME>.yaml
 #
 # Usage:
 #   DATASET=/abs/knowledge-data/pr-14 NAME=pr14 ./gen-dataset-config.sh
@@ -42,9 +42,9 @@ OLLAMA_URL="${CKV_OLLAMA_ENDPOINT:-http://localhost:11434}"
 EMBED_MODEL="${EMBED_MODEL:-bge-m3}"
 HTTP_ADDR="${HTTP_ADDR:-127.0.0.1:8080}"
 
-SYSTEM_MCP="$KS_ROOT/bin/system-mcp"
-[ -x "$SYSTEM_MCP" ] || {
-  echo "ERROR: system-mcp not built ($SYSTEM_MCP) — run: make -C \"$KS_ROOT\" build-mcp" >&2
+CKS_BIN="$KS_ROOT/bin/cks"
+[ -x "$CKS_BIN" ] || {
+  echo "ERROR: cks not built ($CKS_BIN) — run: make -C \"$KS_ROOT\" build-mcp" >&2
   exit 1
 }
 
@@ -60,7 +60,7 @@ if [ -n "${DOMAIN_PROJECT_DIR:-}" ] && [ -n "${DOMAIN_CORPUS_DIR:-}" ]; then
   [ -n "${GLOSSARY_PATH:-}" ] && domain_flags+=(--glossary "$GLOSSARY_PATH")
 fi
 
-"$SYSTEM_MCP" gen-config \
+"$CKS_BIN" mcp gen-config \
   --out "$CONFIG" \
   --name "$NAME" \
   --description "dataset $NAME ($EMBED_MODEL)" \
@@ -82,5 +82,5 @@ fi
 [ -f "$DATASET/graph-db/graph.db" ] || echo "  WARN: graph.db missing ($DATASET/graph-db/graph.db)"
 [ -d "$DATASET/vector-db" ]         || echo "  WARN: vector index missing ($DATASET/vector-db)"
 echo ""
-echo "serve:     \"$SYSTEM_MCP\" -config \"$CONFIG\""
-echo "register:  \"$SYSTEM_MCP\" print-mcp-config --config \"$CONFIG\"   # .mcp.json entry (env file retired)"
+echo "serve:     \"$CKS_BIN\" mcp --config \"$CONFIG\""
+echo "register:  \"$CKS_BIN\" mcp client-config --config \"$CONFIG\"   # .mcp.json entry (env file retired)"
