@@ -70,7 +70,7 @@ change **plus a full bge-m3 reindex** of the corpus, and does not subsume the
 The running MCP still serves the old binary (`builder_version cks-mcp/0.1.0-90dc885d`).
 To validate end-to-end and refresh the presentation capture:
 
-1. Build: `go build -o bin/cks-mcp ./cmd/cks-mcp` (or the project's release path).
+1. Build: `go build -o bin/cks ./cmd/cks` (or the project's release path).
 2. Restart the MCP the coding-agent connects to (`CKS_MCP_URL` / `CKS_MCP_BIN`) so
    it loads the new binary. **Remote host — operator action.**
 3. Re-run the capture:

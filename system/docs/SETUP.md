@@ -1,9 +1,9 @@
 # SETUP — go-stablenet 코드-지식 스택 (새 머신 one-click)
 
 > **2026-07-28 갱신**: 3-repo 통합으로 셸 스크립트 계층 일부가 Go 파이프라인으로
-> 대체되었다 — `gen-cks-config.sh`/`cks.env` → `system-mcp gen-config` +
+> 대체되었다 — `gen-cks-config.sh`/`cks.env` → `cks mcp gen-config` +
 > `print-mcp-config`(run/cks.yaml이 진실원), `cks-health.sh` → `cks.ops.health`
-> 툴/`GET /healthz`, `serve-cks-http.sh`/`cks-mcpd.sh` → `system-mcp daemon`,
+> 툴/`GET /healthz`, `serve-cks-http.sh`/`cks-mcpd.sh` → `cks mcp up|down|status`,
 > `reindex-dataset.sh` → `knowledge-setup --version/--rollback`. 본문의 해당
 > 스크립트 언급은 이 대체 경로로 읽을 것. 진입점은 `system/scripts/setup-all.sh`
 > (경로는 통합 레이아웃 기준으로 갱신됨).

@@ -48,7 +48,7 @@ external LLM client / coding agent
    (vector)   (graph+BM25)
 ```
 
-No LLM calls inside cks itself; LLM is invoked only by `cks-agent` and `cks-eval`.
+No LLM calls inside cks itself; LLM is invoked only by `cks agent` and `cks eval`.
 
 ## Build
 

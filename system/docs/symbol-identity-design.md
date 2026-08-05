@@ -89,7 +89,7 @@ Replace the overloaded `symbol` with an explicit kind:
 - **definition anchor** (`kind: def`) — points at a symbol's declaration.
   `{ kind: def, symbol: <canonical id, resolves to exactly one node>, file, line }`.
   Invariant: `line` == the symbol's current declaration line. Refreshable: resolve
-  `symbol` → current line (this is what `cks-anchor-refresh` does, now exact).
+  `symbol` → current line (this is what `cks domain anchors` does, now exact).
   Optional `signature_hash` detects semantic change independent of line moves.
 
 - **location/usage anchor** (`kind: loc`) — points at a statement *inside* a symbol.
@@ -120,7 +120,7 @@ Replace the overloaded `symbol` with an explicit kind:
   as an error for the traversal family (drop the `defs[0]` fallback in
   `resolveQname`/`resolveNodeID`/`resolveSeedFile`). Fix the MCP tool docs (they
   advertise a `consensus.wbft.Finalize` form ckg does not store). Adopt the two
-  anchor kinds in the entry schema; teach `cks-anchor-refresh` to enforce
+  anchor kinds in the entry schema; teach `cks domain anchors` to enforce
   `line==def` for `def` and range-containment for `loc`; give inventory validation
   a ckg handle to assert each `def` symbol resolves uniquely; render per kind in
   `domainexport`. **Composer and `contract.Citation` stay file:line — unchanged.**
@@ -154,7 +154,7 @@ Replace the overloaded `symbol` with an explicit kind:
   error, MCP doc fix, and the two-kind anchor schema (`AnchorKindDef`/`loc`, empty=def
   back-compat) are **shipped**; canonical-first `FindSymbol` resolves the join. **Remaining:
   migrate the domain entries to explicit `kind:` (2/43 done, back-compat working).**
-  Acceptance: `cks-inventory-check` enforces unique `def` resolution; anchor refresh has
+  Acceptance: `cks domain check` enforces unique `def` resolution; anchor refresh has
   zero false REVIEW for `def`, deterministic `loc` handling; composer outputs unchanged.
 
 ## 8. Non-goals / what stays the same

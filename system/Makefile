@@ -288,7 +288,7 @@ dogfood-eval-summary:
 	@python3 -c "import json; \
 		d = json.load(open('$(EVAL_REPORT)')); \
 		print('='*70); \
-		print('cks-eval baseline (%d scenarios, schema v%d)' % (len(d['results']), d['schema_version'])); \
+		print('cks eval baseline (%d scenarios, schema v%d)' % (len(d['results']), d['schema_version'])); \
 		print('='*70); \
 		print('%-34s %-22s %5s %5s %5s %5s' % ('scenario', 'intent', 'P', 'R', 'F1', 'MRR')); \
 		print('-'*70); \

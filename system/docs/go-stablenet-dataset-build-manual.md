@@ -1,7 +1,7 @@
 # go-stablenet 코드-지식 데이터셋 구축 메뉴얼
 
 > **2026-07-28 갱신**: 본문이 참조하는 셸 스크립트 일부는 통합 후 Go
-> 파이프라인으로 대체되었다 — `gen-cks-config.sh` → `system-mcp gen-config`,
+> 파이프라인으로 대체되었다 — `gen-cks-config.sh` → `cks mcp gen-config`,
 > `cks-health.sh` → `cks.ops.health` 툴/`GET /healthz`, 데이터셋 빌드 →
 > `projects/stablenet/scripts/build-dataset.sh`(=`knowledge-setup` 래퍼).
 > 해당 언급은 이 대체 경로로 읽을 것.
@@ -47,8 +47,8 @@
 | **cks** (code-knowledge-system) | ckv+ckg 합성 → EvidencePack, MCP 노출 | `cks-stablenet.yaml` (설정) | **내부 LLM 호출 없음** |
 
 **채널 ②(도메인 지식)**: `docs/domain-knowledge/projects/go-stablenet/entries/*.yaml` 43개를
-→ `cks-domain-export`로 마크다운 코퍼스로 변환 → ckv가 코드와 함께 임베딩,
-→ `cks-domain-sync`로 ckv/ckg 정책(governance) 뷰 생성.
+→ `cks domain export`로 마크다운 코퍼스로 변환 → ckv가 코드와 함께 임베딩,
+→ `cks domain sync`로 ckv/ckg 정책(governance) 뷰 생성.
 
 ---
 
