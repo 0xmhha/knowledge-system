@@ -24,7 +24,7 @@ CKG_DATA       ?= .ckg-data
 # the vector side has no closure flag, so it indexes the module root — dogfood
 # is wire-up verification, not a gate, so the wider corpus is acceptable.
 CKG_SRC        ?= ..
-CKG_MAINS      ?= ./cmd/system-mcp,./cmd/system/agent,./cmd/system/eval
+CKG_MAINS      ?= ./cmd/cks
 CKG_LANG       ?= go
 CKV            ?= ckv
 CKV_DATA       ?= .ckv-data
@@ -63,8 +63,7 @@ all: build
 help:
 	@echo "Build:"
 	@echo "  build         go build ./..."
-	@echo "  build-bins    build cks-mcp, cks-agent, cks-eval, cks-glossary-gen,"
-	@echo "                cks-inventory-check, cks-entry-verify, cks-anchor-refresh into ./bin/"
+	@echo "  build-bins    build the cks binary (mcp + domain + agent + eval subcommands)"
 	@echo ""
 	@echo "Quality:"
 	@echo "  test          go test -race ./..."
@@ -100,23 +99,17 @@ build:
 
 build-bins:
 	@mkdir -p $(BIN_DIR)
-	$(GO) build -ldflags "$(CKS_LDFLAGS)" -o $(BIN_DIR)/cks-mcp ../cmd/system-mcp
-	$(GO) build -o $(BIN_DIR)/cks-agent           ../cmd/system/agent
-	$(GO) build -o $(BIN_DIR)/cks-eval            ../cmd/system/eval
-	$(GO) build -o $(BIN_DIR)/cks-glossary-gen    ../cmd/system/glossary-gen
-	$(GO) build -o $(BIN_DIR)/cks-inventory-check ../cmd/system/inventory-check
-	$(GO) build -o $(BIN_DIR)/cks-entry-verify    ../cmd/system/entry-verify
-	$(GO) build -o $(BIN_DIR)/cks-anchor-refresh  ../cmd/system/anchor-refresh
+	$(GO) build -ldflags "$(CKS_LDFLAGS)" -o $(BIN_DIR)/cks ../cmd/cks
 
 # Engine-scoped package set. system/ itself holds no Go packages since the
 # consolidation (engine source lives at ../internal/system etc.), so ./...
 # here would silently match nothing. internal/setup is boundaries-wise its
 # own layer but is knowledge-setup's implementation, so it belongs to this
 # engine's test scope.
-SYSTEM_PKGS = ../cmd/system/... ../cmd/system-mcp/... ../cmd/knowledge-setup/... \
+SYSTEM_PKGS = ../cmd/cks/... ../cmd/knowledge-setup/... \
               ../internal/system/... ../internal/setup/... ../pkg/system/...
 # The same set as directories, for tools that take dirs, not package patterns.
-SYSTEM_DIRS = ../cmd/system ../cmd/system-mcp ../cmd/knowledge-setup \
+SYSTEM_DIRS = ../cmd/cks ../cmd/knowledge-setup \
               ../internal/system ../internal/setup ../pkg/system
 
 test:
@@ -278,10 +271,10 @@ dogfood-eval: $(DOGFOOD_DEPS)
 		echo "!!   make dogfood-eval USE_CKV=1 CKV_EMBEDDER=ollama CKV_MODEL=bge-m3 CKG=... CKV=..."; \
 	fi
 	@mkdir -p $$(dirname $(EVAL_REPORT))
-	./$(BIN_DIR)/cks-eval \
+	./$(BIN_DIR)/cks eval \
 		--scenarios $(EVAL_SCENARIOS) \
 		--verify-anchors .. \
-		--cks-mcp ./$(BIN_DIR)/cks-mcp \
+		--cks-mcp ./$(BIN_DIR)/cks \
 		--config $(DOGFOOD_CONFIG) \
 		--output $(EVAL_REPORT)
 	@echo ""

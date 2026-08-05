@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -98,14 +99,20 @@ type RunnerOpts struct {
 	Env          []string
 }
 
-// NewRunner spawns cks-mcp via stdio and performs the MCP initialize
-// handshake.
+// NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
+// performs the MCP initialize handshake. The server is this same
+// binary's mcp subcommand (self-exec) unless CKSMCPBinary points
+// elsewhere.
 func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	bin := opts.CKSMCPBinary
 	if bin == "" {
-		bin = "cks-mcp"
+		if exe, err := os.Executable(); err == nil {
+			bin = exe
+		} else {
+			bin = "cks"
+		}
 	}
-	args := make([]string, 0, 2)
+	args := []string{"mcp"}
 	if opts.CKSMCPConfig != "" {
 		args = append(args, "--config", opts.CKSMCPConfig)
 	}

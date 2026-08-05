@@ -86,11 +86,9 @@ type Options struct {
 	// chunks. Unlike the three derived artifacts this one is hand-authored,
 	// so it is consumed straight from the pack.
 	FlowCorpus string
-	// Domain tool CLIs. Empty values fall back to the names the system
-	// makefile produces, resolved on PATH.
-	DomainExportBin string
-	DomainSyncBin   string
-	GlossaryGenBin  string
+	// CksBin is the cks binary hosting the domain toolchain subcommands
+	// (`cks domain <tool>`). Empty falls back to "cks" on PATH.
+	CksBin string
 }
 
 // GraphDir / VectorDir are the per-engine data directories under Out.
@@ -165,17 +163,13 @@ func BuildPlan(o Options) (Plan, error) {
 
 	var steps []Step
 	if o.DomainKnowledge != "" {
-		exportBin, syncBin, glossaryBin := o.DomainExportBin, o.DomainSyncBin, o.GlossaryGenBin
-		if exportBin == "" {
-			exportBin = "cks-domain-export"
+		// The domain toolchain lives in the cks binary (`cks domain <tool>`);
+		// one --cks-bin flag replaces the former per-tool binary flags.
+		cksBin := o.CksBin
+		if cksBin == "" {
+			cksBin = "cks"
 		}
-		if syncBin == "" {
-			syncBin = "cks-domain-sync"
-		}
-		if glossaryBin == "" {
-			glossaryBin = "cks-glossary-gen"
-		}
-		exportCmd := []string{exportBin, "--project", o.DomainKnowledge, "--out", o.DomainCorpusDir()}
+		exportCmd := []string{cksBin, "domain", "export", "--project", o.DomainKnowledge, "--out", o.DomainCorpusDir()}
 		if o.CodeRoot != "" {
 			exportCmd = append(exportCmd, "--code-root", o.CodeRoot)
 		}
@@ -189,7 +183,7 @@ func BuildPlan(o Options) (Plan, error) {
 			Cmd:   exportCmd,
 		})
 		if o.PolicyFile != "" {
-			argv := []string{syncBin, "--entries", o.DomainKnowledge, "--ckv-out", os.DevNull, "--ckg-out"}
+			argv := []string{cksBin, "domain", "sync", "--project", o.DomainKnowledge, "--ckv-out", os.DevNull, "--ckg-out"}
 			steps = append(steps, Step{
 				ID:    "policy-fresh",
 				Title: "Check the governance policy against the domain entries",
@@ -199,7 +193,7 @@ func BuildPlan(o Options) (Plan, error) {
 			})
 		}
 		if o.GlossaryFile != "" {
-			argv := []string{glossaryBin, "--project", o.DomainKnowledge, "--out"}
+			argv := []string{cksBin, "domain", "glossary-gen", "--project", o.DomainKnowledge, "--out"}
 			steps = append(steps, Step{
 				ID:    "glossary-fresh",
 				Title: "Check the alias glossary against the domain entries",

@@ -64,9 +64,9 @@ make tidy          # go mod tidy
 ## Run as an MCP server
 
 ```
-make build-bins                                 # -> ./bin/cks-mcp  (CGO required: sqlite-vec)
+make build-bins                                 # -> ./bin/cks  (CGO required: sqlite-vec)
 cp policies/cks.yaml.example ./cks.yaml          # edit backend paths / source_root / bge-m3 / ollama_url
-./bin/cks-mcp --config ./cks.yaml                 # serves stdio; --config is the only flag
+./bin/cks mcp --config ./cks.yaml               # serves stdio by default
 ```
 
 `-config` is optional — omitted, it falls back to `config.Default()` (dummy backends, dev
@@ -76,14 +76,14 @@ ckv/ckg datasets and a live Ollama serves the `embed_model` (bge-m3, 1024-dim).
 Register it with a client:
 
 ```
-claude mcp add cks -- /abs/path/bin/cks-mcp -config /abs/path/cks.yaml
+claude mcp add cks -- /abs/path/bin/cks mcp --config /abs/path/cks.yaml
 ```
 
 or in a `.mcp.json`:
 
 ```json
-{ "mcpServers": { "cks": { "command": "/abs/path/bin/cks-mcp",
-                           "args": ["-config", "/abs/path/cks.yaml"] } } }
+{ "mcpServers": { "cks": { "command": "/abs/path/bin/cks",
+                           "args": ["mcp", "--config", "/abs/path/cks.yaml"] } } }
 ```
 
 Building the datasets the config points at:

@@ -30,7 +30,7 @@ CODE_ROOT="${CODE_ROOT:-$GSN_SRC}"
 
 # knowledge-setup defaults --graph-bin/--vector-bin to "ckg"/"ckv" on PATH;
 # pass the in-repo builds explicitly so no PATH setup is needed.
-for b in knowledge-setup ckg ckv filelist-gen cks-domain-export cks-domain-sync cks-glossary-gen; do
+for b in knowledge-setup ckg ckv filelist-gen cks; do
   [ -x "$KS_ROOT/bin/$b" ] || {
     echo "ERROR: $KS_ROOT/bin/$b not built — run:" >&2
     echo "  (cd \"$KS_ROOT\" && make build-dataset-bins)" >&2
@@ -46,8 +46,6 @@ exec "$KS_ROOT/bin/knowledge-setup" \
   --src "$GSN_SRC" --out "$OUT" \
   --graph-bin "$KS_ROOT/bin/ckg" --vector-bin "$KS_ROOT/bin/ckv" \
   --filelist-bin "$KS_ROOT/bin/filelist-gen" \
-  --domain-export-bin "$KS_ROOT/bin/cks-domain-export" \
-  --domain-sync-bin "$KS_ROOT/bin/cks-domain-sync" \
-  --glossary-gen-bin "$KS_ROOT/bin/cks-glossary-gen" \
+  --cks-bin "$KS_ROOT/bin/cks" \
   --code-root "$CODE_ROOT" \
   "${extra[@]}" "$@"

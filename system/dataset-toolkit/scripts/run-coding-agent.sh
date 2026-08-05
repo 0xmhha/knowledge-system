@@ -7,15 +7,15 @@
 # ENVIRONMENT, which WINS over settings.json. So to target a dataset reliably we
 # export its instance URL in the shell *before* launching, AFTER any activate.sh
 # (so our override is last-write-wins). The dataset's ENV_FILE must export
-# CKS_MCP_URL=http://<ip>:<port>/mcp for a cks-mcp instance already serving that
-# dataset (start one with `system-mcp daemon up` or `system-mcp --config <cfg>`; verify
+# CKS_MCP_URL=http://<ip>:<port>/mcp for a cks mcp instance already serving that
+# dataset (start one with `cks mcp up` or `cks mcp --config <cfg>`; verify
 # which index it serves via cks.ops.health name/indexed_head).
 #
 # Generalized from knowledge-data/pr-14/run-coding-agent-pr14.sh.
 #
 # Usage:
 # ENV_FILE is hand-maintained since the env-file generation was retired —
-# derive the URL from the config:  system-mcp print-mcp-config --config <yaml>
+# derive the URL from the config:  cks mcp client-config --config <yaml>
 #   CODE=/abs/path/to/source/repo ENV_FILE=/abs/dataset/cks-<name>.env \
 #     ./run-coding-agent.sh
 #   ... ./run-coding-agent.sh /coding-agent:analyze "..."   # pass a slash command through
