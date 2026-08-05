@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/daemon"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
+	flag "github.com/spf13/pflag"
 )
 
 // runDaemon dispatches `system-mcp daemon <up|down|reload|start|stop|restart|status|list>`.

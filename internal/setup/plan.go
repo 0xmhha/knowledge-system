@@ -175,9 +175,9 @@ func BuildPlan(o Options) (Plan, error) {
 		if glossaryBin == "" {
 			glossaryBin = "cks-glossary-gen"
 		}
-		exportCmd := []string{exportBin, "-project", o.DomainKnowledge, "-out", o.DomainCorpusDir()}
+		exportCmd := []string{exportBin, "--project", o.DomainKnowledge, "--out", o.DomainCorpusDir()}
 		if o.CodeRoot != "" {
-			exportCmd = append(exportCmd, "-code-root", o.CodeRoot)
+			exportCmd = append(exportCmd, "--code-root", o.CodeRoot)
 		}
 		// The corpus is the one artifact that is genuinely derived here: it
 		// is large, nobody reads it by hand, and the vector build consumes it
@@ -189,7 +189,7 @@ func BuildPlan(o Options) (Plan, error) {
 			Cmd:   exportCmd,
 		})
 		if o.PolicyFile != "" {
-			argv := []string{syncBin, "-entries", o.DomainKnowledge, "-ckv-out", os.DevNull, "-ckg-out"}
+			argv := []string{syncBin, "--entries", o.DomainKnowledge, "--ckv-out", os.DevNull, "--ckg-out"}
 			steps = append(steps, Step{
 				ID:    "policy-fresh",
 				Title: "Check the governance policy against the domain entries",
@@ -199,7 +199,7 @@ func BuildPlan(o Options) (Plan, error) {
 			})
 		}
 		if o.GlossaryFile != "" {
-			argv := []string{glossaryBin, "-project", o.DomainKnowledge, "-out"}
+			argv := []string{glossaryBin, "--project", o.DomainKnowledge, "--out"}
 			steps = append(steps, Step{
 				ID:    "glossary-fresh",
 				Title: "Check the alias glossary against the domain entries",
@@ -218,9 +218,9 @@ func BuildPlan(o Options) (Plan, error) {
 			ID:    "filelist-derive",
 			Title: "Derive the build-scope file list",
 			Cmd: []string{filelistBin,
-				"-src", o.Src,
-				"-config", o.FilelistConfig,
-				"-out", o.FilesFromPath()},
+				"--src", o.Src,
+				"--config", o.FilelistConfig,
+				"--out", o.FilesFromPath()},
 		})
 	}
 

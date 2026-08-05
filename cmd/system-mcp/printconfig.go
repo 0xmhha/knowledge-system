@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	cksmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
+	flag "github.com/spf13/pflag"
 )
 
 // runPrintMCPConfig emits a ready-to-paste MCP client config entry (the Claude
@@ -28,7 +28,7 @@ func runPrintMCPConfig(args []string, stdout io.Writer) error {
 		return err
 	}
 	if *configPath == "" {
-		return fmt.Errorf("-config is required")
+		return fmt.Errorf("--config is required")
 	}
 	cfg, err := config.Load(*configPath)
 	if err != nil {

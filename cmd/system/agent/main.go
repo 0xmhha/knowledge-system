@@ -13,7 +13,7 @@
 //	    -> cks.context.get_for_task tool call
 //	      -> contract.EvidencePack (returned over MCP)
 //	  -> markdown formatter (cmd/cks-agent/format.go)
-//	  -> stdout (or -output file)
+//	  -> stdout (or --output file)
 //
 // cks-agent talks to cks-mcp through the same MCP surface any external
 // agent would, by design: this binary is meant to extract to a sibling
@@ -22,15 +22,14 @@
 //
 // Usage:
 //
-//	cks-agent -prompt "find where Login validates input"
+//	cks-agent --prompt "find where Login validates input"
 //	echo "find Login" | cks-agent
-//	cks-agent -prompt "..." -cks-mcp /usr/local/bin/cks-mcp -config ./cks.yaml -output prompt.md
+//	cks-agent --prompt "..." --cks-mcp /usr/local/bin/cks-mcp --config ./cks.yaml --output prompt.md
 package main
 
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -38,6 +37,8 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+
+	flag "github.com/spf13/pflag"
 )
 
 // builderVersion is informational only; cks-agent does not stamp it
@@ -105,7 +106,7 @@ func resolvePrompt(flagPrompt string, stdin io.Reader) (string, error) {
 	}
 	s := strings.TrimSpace(string(buf))
 	if s == "" {
-		return "", errors.New("no prompt provided: pass -prompt or pipe into stdin")
+		return "", errors.New("no prompt provided: pass --prompt or pipe into stdin")
 	}
 	return s, nil
 }

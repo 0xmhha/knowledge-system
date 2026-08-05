@@ -19,7 +19,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -29,6 +28,7 @@ import (
 	"syscall"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
+	flag "github.com/spf13/pflag"
 )
 
 // restartNote follows every current-symlink swap: a running MCP server holds

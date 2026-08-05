@@ -66,7 +66,7 @@ make tidy          # go mod tidy
 ```
 make build-bins                                 # -> ./bin/cks-mcp  (CGO required: sqlite-vec)
 cp policies/cks.yaml.example ./cks.yaml          # edit backend paths / source_root / bge-m3 / ollama_url
-./bin/cks-mcp -config ./cks.yaml                 # serves stdio; -config is the only flag
+./bin/cks-mcp --config ./cks.yaml                 # serves stdio; --config is the only flag
 ```
 
 `-config` is optional — omitted, it falls back to `config.Default()` (dummy backends, dev

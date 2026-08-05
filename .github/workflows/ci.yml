@@ -61,7 +61,7 @@ jobs:
       - name: make eval (self-index + 4 probes)
         run: make -C graph eval
       - name: eval-gate (compare against committed baseline)
-        run: go run ./cmd/eval-gate -baseline graph/eval/baseline -latest graph/eval/results/latest
+        run: go run ./cmd/eval-gate --baseline graph/eval/baseline --latest graph/eval/results/latest
       - name: Upload results on failure
         if: failure()
         uses: actions/upload-artifact@v4

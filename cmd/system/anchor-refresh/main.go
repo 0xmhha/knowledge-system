@@ -14,7 +14,7 @@
 //
 // Usage:
 //
-//	cks-anchor-refresh -project <dir> -graph <graph.db> [-check]
+//	cks-anchor-refresh --project <dir> --graph <graph.db> [-check]
 //
 // Exit codes: 0 = clean (or fixed); 1 = drift/unresolved found (in -check mode,
 // or unresolved anchors in write mode); 2 = usage / IO error.
@@ -24,7 +24,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"flag"
 	"fmt"
 	"os"
 	"sort"
@@ -34,6 +33,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" || *graphPath == "" {
-		fmt.Fprintln(os.Stderr, "usage: cks-anchor-refresh -project <dir> -graph <graph.db> [-check] [-max-shift N]")
+		fmt.Fprintln(os.Stderr, "usage: cks-anchor-refresh --project <dir> --graph <graph.db> [--check] [--max-shift N]")
 		os.Exit(2)
 	}
 

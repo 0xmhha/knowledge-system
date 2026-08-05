@@ -83,7 +83,7 @@ after all of the following pass:
 - [ ] `risk_level` matches the alias commonness (a Korean alias like
       "처리" must be `high`; "쿼럼" can be `low`)
 
-> **Tooling**: `cks-promotion-worksheet -project <dir>` emits a
+> **Tooling**: `cks-promotion-worksheet --project <dir>` emits a
 > markdown worksheet that turns the substantive checklist above into
 > per-entry fillable sections (Q1–Q4 + decision triple). It pre-fills
 > the `Maps to:` byzantine-catalog cross-reference (best-effort

@@ -12,7 +12,6 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 
@@ -23,6 +22,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvmcp "github.com/0xmhha/knowledge-system/pkg/vector/mcp"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {

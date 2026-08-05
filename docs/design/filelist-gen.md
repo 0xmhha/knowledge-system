@@ -95,9 +95,9 @@ rather than a silent gap.
 - Flags:
 
 ```
-filelist-gen -src <project root> -config <filelist.yaml> -out <files-from.json>
+filelist-gen --src <project root> --config <filelist.yaml> --out <files-from.json>
              [-check]        # compare a fresh derivation against the existing
-                             # -out content; exit 1 on any difference
+                             # --out content; exit 1 on any difference
              [-allow-dirty]  # permit a dirty tracked tree (recorded in provenance)
              [-strict]       # zero-match extra_globs become errors
 ```
@@ -171,7 +171,7 @@ Same consumer format the engines already accept (`--files-from`, an
 {
   "_provenance": {
     "tool": "filelist-gen <version>",
-    "src_commit": "<HEAD of -src>",
+    "src_commit": "<HEAD of --src>",
     "dirty": false,
     "build_context": {"goos": "linux", "goarch": "amd64", "cgo": true, "tags": []},
     "config_sha256": "<hash of filelist.yaml>",
@@ -370,7 +370,7 @@ opted in via `extra_packages` if retrieval gaps show up.
 - **Semantic-drift limits of delta tracking** (recorded in the earlier
   discussion): anchored-file deltas are a first-pass filter; indirect
   behavior changes still warrant the cheap periodic full audit
-  (`anchor-refresh -check`).
+  (`anchor-refresh --check`).
 - **Multi-module trees**: out of scope for v1 (§4.1); revisit if a target
   project needs it.
 - **Decision pending (operator)**: final `build_roots` set — proposal is

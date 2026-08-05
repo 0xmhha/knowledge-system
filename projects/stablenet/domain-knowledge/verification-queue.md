@@ -161,7 +161,7 @@ auto-scan false-positive.
    `pitfalls` and either approves (→ `verified`) or returns to
    author with a specific concern. Anchor work is zero.
 3. **Post-promotion sync** (~10 min, operator): run
-   `cks-domain-sync` + `cks-glossary-gen -status verified` +
+   `cks-domain-sync` + `cks-glossary-gen --status verified` +
    `cks.ops.index{mode:"full"}` so ckv watch_out / ckg
    governed_by / glossary all pick up the newly verified entries.
 
@@ -179,7 +179,7 @@ Once an entry transitions to `verified`:
 - `cks-domain-sync` includes it in the next emission → `ckv` policy
   `watch_out` / `also_review` strings + `ckg` policy `governs[]`
   qname (Task #16 qualifier applies). Re-run after the session.
-- `cks-glossary-gen -status verified` adds the entry's aliases to
+- `cks-glossary-gen --status verified` adds the entry's aliases to
   `glossary.yaml` → ckv vocab resolver picks them up on next
   reindex.
 - Channel ② already embeds all 36 entries regardless of status

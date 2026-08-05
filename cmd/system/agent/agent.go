@@ -73,7 +73,7 @@ func NewAgent(ctx context.Context, opts AgentOpts) (*Agent, error) {
 	}
 	args := make([]string, 0, 2)
 	if opts.CKSMCPConfig != "" {
-		args = append(args, "-config", opts.CKSMCPConfig)
+		args = append(args, "--config", opts.CKSMCPConfig)
 	}
 	tp := mcpgotransport.NewStdio(bin, opts.Env, args...)
 	c := mcpgoclient.NewClient(tp)

@@ -26,10 +26,10 @@
 //
 // Usage:
 //
-//	cks-promotion-worksheet -project projects/stablenet/domain-knowledge
-//	cks-promotion-worksheet -project ... -out verification-worksheet.md
-//	cks-promotion-worksheet -project ... -status draft        # any status filter
-//	cks-promotion-worksheet -project ... -priority P0         # priority filter
+//	cks-promotion-worksheet --project projects/stablenet/domain-knowledge
+//	cks-promotion-worksheet --project ... --out verification-worksheet.md
+//	cks-promotion-worksheet --project ... --status draft        # any status filter
+//	cks-promotion-worksheet --project ... --priority P0         # priority filter
 //
 // Exit codes:
 //   - 0: worksheet emitted (even if 0 entries matched — that is a
@@ -38,7 +38,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -47,6 +46,7 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" {
-		fmt.Fprintln(os.Stderr, "cks-promotion-worksheet: -project is required")
+		fmt.Fprintln(os.Stderr, "cks-promotion-worksheet: --project is required")
 		flag.Usage()
 		os.Exit(2)
 	}

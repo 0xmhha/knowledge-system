@@ -5,8 +5,8 @@
 //
 // Usage:
 //
-//	cks-domain-export -project projects/stablenet/domain-knowledge \
-//	  -out generated/domain-corpus/go-stablenet
+//	cks-domain-export --project projects/stablenet/domain-knowledge \
+//	  --out generated/domain-corpus/go-stablenet
 //
 // code_root for authoritative_docs resolves via -code-root, CKS_CODE_ROOT, or
 // the project.yaml ${GO_STABLENET_ROOT} env, same as the validator.
@@ -19,12 +19,12 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
 	"github.com/0xmhha/knowledge-system/internal/system/domainexport"
 	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	flag.Parse()
 
 	if *projectDir == "" || *outDir == "" {
-		fmt.Fprintln(os.Stderr, "cks-domain-export: -project and -out are required")
+		fmt.Fprintln(os.Stderr, "cks-domain-export: --project and --out are required")
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -58,8 +58,8 @@ func main() {
 	}
 	if want := len(p.AuthoritativeDocs); want > res.DocsCopied && !*allowMissingDocs {
 		fmt.Fprintf(os.Stderr, "cks-domain-export: %d of %d authoritative_docs could not be resolved"+
-			" (code_root=%q). The corpus would ship without them; pass -code-root, or"+
-			" -allow-missing-docs to accept the gap.\n", want-res.DocsCopied, want, p.CodeRoot)
+			" (code_root=%q). The corpus would ship without them; pass --code-root, or"+
+			" --allow-missing-docs to accept the gap.\n", want-res.DocsCopied, want, p.CodeRoot)
 		os.Exit(1)
 	}
 	fmt.Printf("cks-domain-export: %d entries, %d docs -> %s\n", res.EntriesWritten, res.DocsCopied, *outDir)
