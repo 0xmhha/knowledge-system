@@ -2,7 +2,7 @@
 
 Project: `go-stablenet`
 Schema version: 1
-Code root: resolved at runtime from `$CKS_CODE_ROOT` (override) or `$GO_STABLENET_ROOT` — see `project.yaml`; no machine path is committed.
+Code root: resolved at runtime from `$CKS_CODE_ROOT` — see `project.yaml`; no machine path is committed.
 Verification baseline: go-stablenet `@9978930ba` (dev — WBFT justification fix #84).
 
 ## Status summary
