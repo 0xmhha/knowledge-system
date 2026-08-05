@@ -43,7 +43,7 @@ coding-agent 플러그인의 `plugin/.mcp.json`은 cks 서버를 다음과 같�
 기동 시점의 `CKS_CONFIG` 값으로 데이터셋이 결정된다.
 
 ```json
-"cks": { "command": "${CKS_MCP_BIN}", "args": ["-config", "${CKS_CONFIG}"] }
+"cks": { "command": "${CKS_MCP_BIN}", "args": ["mcp", "--config", "${CKS_CONFIG}"] }
 ```
 
 ---

@@ -41,8 +41,7 @@ check cmd/graph-mcp    "vector|system"
 check cmd/eval-gate    "vector|system"
 check cmd/vector       "graph|system"
 check cmd/vector-mcp   "graph|system"
-check cmd/system       "graph|vector"
-check cmd/system-mcp   "graph|vector"
+check cmd/cks          "graph|vector"
 # filelist-gen is engine-free by design (R8): go list/git subprocesses only.
 check cmd/filelist-gen "graph|vector|system"
 

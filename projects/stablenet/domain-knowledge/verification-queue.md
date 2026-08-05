@@ -31,9 +31,9 @@ judgments, not on grep-confirmable file:line lookups.
 
 The mechanical pass (§2) ran in two waves:
 - **Wave 1** (new entries, line-offset from marker seeding): 23 anchors updated across 10 entries.
-- **Wave 2** (pre-existing entries, go-stablenet refactoring drift): 9 additional anchors updated across 4 entries + verification-check logic corrected to treat `file-level reference` anchors (no line, no symbol) as intentional (matches `cks-inventory-check`'s own semantics — they were never errors, only a false-yellow in the auto-scan).
+- **Wave 2** (pre-existing entries, go-stablenet refactoring drift): 9 additional anchors updated across 4 entries + verification-check logic corrected to treat `file-level reference` anchors (no line, no symbol) as intentional (matches `cks domain check`'s own semantics — they were never errors, only a false-yellow in the auto-scan).
 
-**Net:** the entire 29-entry queue is anchor-clean. cks-inventory-check
+**Net:** the entire 29-entry queue is anchor-clean. cks domain check
 passes (36 entries / 0 errors / 0 warnings). The domain expert session
 needs **zero file:line lookups** — pure semantic review of
 `invariants` and `pitfalls`.
@@ -63,7 +63,7 @@ mostly unaffected (their anchors are in files we did not seed).
 in `anchor.file` and update `anchor.line` to the first line whose
 text contains `symbol.split('.')[-1]` AND structurally resembles the
 declaration (e.g. starts with `func `, `type `, `var `, `const ` for
-Go symbols). Run `cks-inventory-check` after the bulk update. This is
+Go symbols). Run `cks domain check` after the bulk update. This is
 a mechanical pass; no domain knowledge needed.
 
 ---
@@ -136,7 +136,7 @@ After Wave 2 of the mechanical pass:
 
 **False-yellow pattern:** the auto-scan flagged anchors that intentionally
 omit both `line:` and `symbol:` and reference a file as a whole (e.g.
-`file: systemcontracts/compile/main.go`). `cks-inventory-check` accepts
+`file: systemcontracts/compile/main.go`). `cks domain check` accepts
 these as valid; the auto-scan was over-strict. Logic corrected in Wave 2.
 
 ---
@@ -147,7 +147,7 @@ A8.genesis.bootstrap_architecture was reclassified as GREEN after the
 auto-scan logic was corrected: anchor[6]'s `DefaultStableNetMainnet
 GenesisBlock` was auto-fixed to `core/genesis.go:617`, anchor[7]'s
 directory reference (`cmd/genesis_generator/`) is accepted as a valid
-file-system anchor by `cks-inventory-check`. The 'RED' was an
+file-system anchor by `cks domain check`. The 'RED' was an
 auto-scan false-positive.
 
 ---
@@ -161,7 +161,7 @@ auto-scan false-positive.
    `pitfalls` and either approves (→ `verified`) or returns to
    author with a specific concern. Anchor work is zero.
 3. **Post-promotion sync** (~10 min, operator): run
-   `cks-domain-sync` + `cks-glossary-gen --status verified` +
+   `cks domain sync` + `cks domain glossary-gen --status verified` +
    `cks.ops.index{mode:"full"}` so ckv watch_out / ckg
    governed_by / glossary all pick up the newly verified entries.
 
@@ -176,14 +176,14 @@ judgment.
 
 Once an entry transitions to `verified`:
 
-- `cks-domain-sync` includes it in the next emission → `ckv` policy
+- `cks domain sync` includes it in the next emission → `ckv` policy
   `watch_out` / `also_review` strings + `ckg` policy `governs[]`
   qname (Task #16 qualifier applies). Re-run after the session.
-- `cks-glossary-gen --status verified` adds the entry's aliases to
+- `cks domain glossary-gen --status verified` adds the entry's aliases to
   `glossary.yaml` → ckv vocab resolver picks them up on next
   reindex.
 - Channel ② already embeds all 36 entries regardless of status
-  (`-status all` default in cks-domain-export); no action there.
+  (`--status all` default in cks domain export); no action there.
 
 Operator should run `cks.ops.index{mode:"full"}` after a batch of
 promotions to refresh ckv + ckg in lockstep.

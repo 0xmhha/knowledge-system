@@ -55,6 +55,6 @@ the resolver and would only add load with no upside.
 - An author edits a verified entry's `korean_aliases`,
   `english_aliases`, or `code_keywords`.
 
-CI integration is deferred — for now `cks-mcp` operators rerun the
+CI integration is deferred — for now `cks mcp` operators rerun the
 generator manually before restarting the server when the inventory
 changes.

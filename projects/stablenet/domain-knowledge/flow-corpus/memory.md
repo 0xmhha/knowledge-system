@@ -17,7 +17,7 @@ cks는 별도 리포 `~/Work/github/code-knowledge-system`(module `github.com/0x
 
 - **cks = Code Knowledge System**: Claude Code와 연동되는 통합 레이어. `cmd/cks-mcp`가 stdio
   JSON-RPC MCP 서버로 `cks.context.*`·`cks.ops.*`(13개 도구)를 노출. coding-agent 플러그인의
-  `.mcp.json`에 `"cks": {command: ${CKS_MCP_BIN}, args:["-config", ${CKS_CONFIG}]}`로 등록.
+  `.mcp.json`에 `"cks": {command: ${CKS_MCP_BIN}, args:["mcp", "--config", ${CKS_CONFIG}]}`로 등록.
   빌드 시 CGO 필요(sqlite-vec).
 
 - 내부에서 **두 엔진을 in-process로 조합**:
