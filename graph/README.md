@@ -25,13 +25,13 @@ an MCP-enabled LLM, or a 3D web viewer.
 ```bash
 git clone https://github.com/0xmhha/knowledge-system
 cd code-knowledge-graph
-make build-full   # viewer + binary; `make build` = binary only (no 3D viewer UI)
+make -C graph viewer && make build-bins   # dashboard assets + the three engine binaries
 
 # 1. Build a graph from any code path
 ./bin/ckg build --src=/path/to/repo --out=/tmp/ckg
 
 # 2. Query via HTTP + 3D viewer
-./bin/ckg viewer --graph=/tmp/ckg --open      # http://localhost:8080
+./bin/cks viewer --graph=/tmp/ckg --open    # http://localhost:8080 (spawns `ckg api`)
 
 # 3. Query from Claude Code via MCP
 claude mcp add ckg -- ./bin/ckg mcp --graph=/tmp/ckg
@@ -82,7 +82,7 @@ The five production surfaces:
 | Command | Purpose |
 |---|---|
 | `ckg build`           | Parse a code path into a graph database |
-| `ckg viewer`           | HTTP API + embedded 3D viewer |
+| `ckg api`              | HTTP REST API (/api/*) — `cks viewer` serves the dashboard over it |
 | `ckg mcp`             | MCP server for LLM agents (Claude Code, etc.) |
 | `ckg eval-retrieval`  | Keyword-retrieval accuracy eval against gold fixtures |
 | `ckg audit`           | `go/packages`-vs-DB parity / graph-integrity check |
@@ -101,12 +101,12 @@ Run `ckg <command> --help` for flags. `ckg --help` lists every subcommand.
 
 ## Production deployment
 
-`ckg viewer` ships an embedded viewer for local use. For shared
+`cks viewer` serves the dashboard for local use (spawning `ckg api`). For shared
 deployments, split the static viewer from the API:
 
 ```bash
 ./bin/ckg export-static --graph=/tmp/ckg --out=/srv/ckg/static
-./bin/ckg viewer --graph=/tmp/ckg --port=8080 --no-viewer
+./bin/ckg api --graph=/tmp/ckg --port=8080
 ```
 
 Front both with a reverse proxy: `/api/* → :8080`, `/* → /srv/ckg/static`.

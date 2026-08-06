@@ -91,16 +91,16 @@ markdown summary when you only need the SQLite output.`,
 				return nil
 			}
 
-			_, _ = fmt.Fprintf(os.Stderr, "ckg quickstart: starting viewer at http://localhost:%d\n", port)
-			return runServe(serveOpts{
+			_, _ = fmt.Fprintf(os.Stderr, "ckg quickstart: starting API at http://localhost:%d/api/ (dashboard: cks viewer --api-url http://localhost:%d)\n", port, port)
+			return runAPI(apiOpts{
 				GraphDir: absOut, Port: port, Log: log,
 			})
 		},
 	}
 	cmd.Flags().StringVar(&src, "src", ".", "source repository to graph")
 	cmd.Flags().StringVar(&out, "out", "./ckg-out", "output directory (graph.db + GRAPH_REPORT.md + manifest.json)")
-	cmd.Flags().IntVar(&port, "port", 8080, "viewer HTTP port")
-	cmd.Flags().BoolVar(&noServe, "no-serve", false, "skip the HTTP viewer (build + report only)")
+	cmd.Flags().IntVar(&port, "port", 8080, "API HTTP port")
+	cmd.Flags().BoolVar(&noServe, "no-serve", false, "skip the HTTP API server (build + report only)")
 	cmd.Flags().BoolVar(&noReport, "no-report", false, "skip GRAPH_REPORT.md generation")
 	return cmd
 }

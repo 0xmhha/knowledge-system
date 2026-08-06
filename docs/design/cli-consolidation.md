@@ -154,7 +154,7 @@ semantics).
 | Old | New |
 |---|---|
 | `graph-mcp --graph D` | `ckg mcp --graph D` |
-| `ckg serve --graph D --open` | `ckg viewer --graph D --open` |
+| `ckg serve --graph D --open` | `cks viewer --graph D --open` (§11) |
 | `vector-mcp ...` | `ckv mcp ...` |
 | `system-mcp --config F` | `cks mcp --config F` |
 | `system-mcp daemon up ...` | `cks mcp up ...` |
@@ -265,3 +265,40 @@ sites, and PATH-default fallbacks:
   renamed `--project` here (D8).
 - **`agent`, `eval`, `eval-gate`-style tools**: `DisableFlagParsing`
   shims around their existing arg-parsing run functions.
+
+## 11. Amendment: the viewer belongs to cks (accepted 2026-08-06)
+
+§3 placed `viewer` under ckg. Review after Phase 3 corrected this: the
+dashboard (tools/viewer) is already the unified graph+vector UI — the
+Atlas page is the vector viewer — so it is a composition artifact and
+belongs to the composition engine. A cross-engine UI embedded inside one
+engine's server was a layering error this consolidation exists to remove.
+
+Target shape:
+
+```
+cks viewer [--graph D | --api-url U] [--port] [--open]
+    serves the embedded dashboard; /api/* is reverse-proxied to a graph
+    API backend — a sibling `ckg api` subprocess spawned on a loopback
+    port when --graph is given, or an already-running server at
+    --api-url. Vector's atlas backend joins the same proxy surface when
+    it lands in Go.
+
+ckg api --graph D --port P
+    the graph REST API alone (was the data half of `ckg viewer`); no
+    embedded assets, no --open, no --no-viewer.
+```
+
+Consequences:
+- The dashboard embed (web_assets + go:embed) moves from
+  internal/graph/server to internal/system/viewer; `make -C graph
+  viewer` copies the Next build there instead. internal/graph/server
+  keeps only the REST API.
+- `ckg viewer` is retired; `ckg api` inherits its data-serving flags
+  (--graph/--db/--port). `--no-viewer` disappears (api serves no UI;
+  the UI command always serves it). quickstart wires `cks`? — no:
+  quickstart stays within the graph engine and now runs `ckg api`,
+  printing the `cks viewer` invocation instead of opening a browser.
+- Boundary rules hold: cks reaches graph data over HTTP through the
+  spawned engine CLI, exactly the subprocess contract `cks setup`
+  already uses; no internal/graph import appears in cmd/cks.

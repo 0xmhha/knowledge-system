@@ -19,7 +19,7 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 | Task | Command | Notes |
 |---|---|---|
 | Build (ckg only, default) | `make build` | Go binary only; embedded viewer stays the stub. `build-no-viewer` is a back-compat alias |
-| Build (with viewer) | `make build-full` | builds Next.js viewer + `bin/ckg`; restores tracked stub so `git status` stays clean. Required for a working `ckg viewer` |
+| Build the dashboard | `make -C graph viewer` then `make -C .. build-bins` | Next.js build lands in internal/system/viewer/web_assets; `cks viewer` serves it |
 | Test | `make test` (= `go test ./...`) | |
 | Test + race + coverage | `make test-race` | what to run before claiming concurrency-safe |
 | Lint | `make lint` | = `go vet ./...` + `fmt-check` + viewer eslint |
@@ -56,7 +56,7 @@ root under an engine-scoped prefix).
   `smartctx`, `evidence`, `impact`, `policy`, `security`, `mcphandlers`, …);
   `../pkg/bm25` is the shared BM25 core. CKV/CKS consume these.
 - `../tools/viewer/` — Next.js dashboard (graph + vector viewers), embedded
-  into the graph binary via `make -C graph build-full`.
+  into the cks binary: `make -C graph viewer` then `make build-bins` at the root.
 - `graph/`-local: `docs/` (see `../docs/graph/DOC-MAP.md`), `policies/`,
   `eval/`, `testdata/`, `scripts/`, `Makefile`.
 
