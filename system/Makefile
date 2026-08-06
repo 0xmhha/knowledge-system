@@ -78,7 +78,7 @@ help:
 	@echo "  log-clear     remove ./logs/* (footprint + audit)"
 	@echo "  log-tail      show tail of each .jsonl log, jq-prettified if available"
 	@echo "                (auditlog.Verify() is exposed as a library; a CLI flag"
-	@echo "                 lands with cks-eval in Phase E)"
+	@echo "                 lands with cks eval in Phase E)"
 	@echo ""
 	@echo "Dogfood eval (cks indexing cks itself):"
 	@echo "  ckg-index           build a fresh ckg index from \$$(CKG_SRC) into \$$(CKG_DATA)"
