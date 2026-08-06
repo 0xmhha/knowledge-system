@@ -19,7 +19,7 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 | Task | Command | Notes |
 |---|---|---|
 | Build (ckg only, default) | `make build` | Go binary only; embedded viewer stays the stub. `build-no-viewer` is a back-compat alias |
-| Build (with viewer) | `make build-full` | builds Next.js viewer + `bin/ckg`; restores tracked stub so `git status` stays clean. Required for a working `ckg serve` viewer |
+| Build (with viewer) | `make build-full` | builds Next.js viewer + `bin/ckg`; restores tracked stub so `git status` stays clean. Required for a working `ckg viewer` |
 | Test | `make test` (= `go test ./...`) | |
 | Test + race + coverage | `make test-race` | what to run before claiming concurrency-safe |
 | Lint | `make lint` | = `go vet ./...` + `fmt-check` + viewer eslint |
@@ -45,7 +45,7 @@ root under an engine-scoped prefix).
 
 - `../cmd/graph/` — cobra root + subcommands. **Five production surfaces:**
   `build`, `serve`, `mcp`, `eval`, `audit`. The rest are utilities.
-  (`../cmd/graph-mcp/` builds the MCP server binary.)
+  (`ckg mcp` serves the namespaced MCP tool set.)
 - `../cmd/eval-gate/` — eval regression gate (CI).
 - `../internal/graph/` — implementation. **Private**: other engines must not
   import it. Key: `buildpipe` (7-pass pipeline + cache),

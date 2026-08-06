@@ -1,6 +1,6 @@
 // cmd/ckg/quickstart.go — single-command path from "I have a repo" to
 // "viewer is open in my browser". Inspired by graphify's `/graphify .`
-// ergonomic; collapses the `ckg build` + `ckg serve` pair (plus an
+// ergonomic; collapses the `ckg build` + `ckg viewer` pair (plus an
 // optional `ckg report`) into one entry point so first-time users
 // don't have to learn the multi-step workflow before seeing results.
 //
@@ -12,7 +12,7 @@
 //	ckg quickstart --no-report    # skip GRAPH_REPORT.md generation
 //
 // The quickstart command is intentionally a thin orchestrator over the
-// existing build/serve/report subcommands — every option those expose
+// existing build/viewer/report subcommands — every option those expose
 // is reachable directly when the user needs finer control.
 package main
 
@@ -43,7 +43,7 @@ Equivalent to running:
 
   ckg build  --src <SRC> --out <OUT>
   ckg report --graph <OUT> --out <OUT>/GRAPH_REPORT.md
-  ckg serve  --graph <OUT> --port <PORT>
+  ckg viewer --graph <OUT> --port <PORT>
 
 Pass --no-serve to skip the HTTP server (useful for CI/scripts that
 just want graph.db + GRAPH_REPORT.md). Pass --no-report to skip the

@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-mcp install-hooks build-dataset-bins sync-domain-artifacts check-domain-artifacts
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-bins install-hooks sync-domain-artifacts check-domain-artifacts
 
 GO ?= go
 
@@ -51,14 +51,16 @@ install-hooks:
 	@git config core.hooksPath .githooks
 	@echo "git hooks path set to .githooks (pre-commit will run fmt-check)"
 
-# build-mcp: build the three MCP server binaries. Deployments can stamp a
-# tool-namespace root at build time, e.g.:
-#   make build-mcp NAMESPACE=stablenet_knowledge
+# build-bins: the three engine binaries — ckg, ckv, cks — each hosting its
+# engine-side MCP server (`ckg mcp`, `ckv mcp`, `cks mcp`). Deployments can
+# stamp a tool-namespace root at build time, e.g.:
+#   make build-bins NAMESPACE=stablenet_knowledge
 NAMESPACE ?=
 NS_LDFLAGS = $(if $(NAMESPACE),-ldflags "-X github.com/0xmhha/knowledge-system/pkg/mcp.BuildRoot=$(NAMESPACE)",)
-build-mcp:
-	$(GO) build $(NS_LDFLAGS) -o bin/graph-mcp ./cmd/graph-mcp
-	$(GO) build $(NS_LDFLAGS) -o bin/vector-mcp ./cmd/vector-mcp
+build-bins:
+	@mkdir -p bin
+	$(GO) build $(NS_LDFLAGS) -o bin/ckg ./cmd/graph
+	$(GO) build $(NS_LDFLAGS) -o bin/ckv ./cmd/vector
 	$(GO) build $(NS_LDFLAGS) -o bin/cks ./cmd/cks
 
 # vuln: scan for known vulnerabilities reachable from this module's code.
@@ -84,22 +86,12 @@ clean:
 # valid after the consolidation.
 # ---------------------------------------------------------------------------
 
-# build-dataset-bins: the three engine binaries, one per engine. cks hosts
-# the dataset orchestrator (`cks setup`) and its whole toolchain; ckg/ckv
-# are resolved beside the cks binary at run time, so building all three
-# into bin/ is the complete dataset story.
-build-dataset-bins:
-	@mkdir -p bin
-	$(GO) build -o bin/ckg ./cmd/graph
-	$(GO) build -o bin/ckv ./cmd/vector
-	$(GO) build $(NS_LDFLAGS) -o bin/cks ./cmd/cks
-
 # sync-domain-artifacts: refresh the committed renderings of the domain
 # entries. The dataset build derives these per run and uses the fresh copy;
 # the committed ones exist so governance and vocabulary changes show up as a
 # reviewable diff when an entry changes. Run after editing entries/.
 DOMAIN_PACK ?= projects/stablenet
-sync-domain-artifacts: build-dataset-bins
+sync-domain-artifacts: build-bins
 	./bin/cks domain sync --project $(DOMAIN_PACK)/domain-knowledge \
 	    --ckg-out $(DOMAIN_PACK)/policies/graph.yaml \
 	    --ckv-out /dev/null

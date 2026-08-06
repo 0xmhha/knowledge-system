@@ -17,13 +17,13 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/server"
 )
 
-func newServeCmd() *cobra.Command {
+func newViewerCmd() *cobra.Command {
 	var graph, dbDsn string
 	var port int
 	var open bool
 	var noViewer bool
 	cmd := &cobra.Command{
-		Use:   "serve",
+		Use:   "viewer",
 		Short: "Serve the embedded 3D viewer over HTTP",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			log, cleanup, err := newLogger(rootVerbose, rootLogFile)
@@ -56,7 +56,7 @@ func newServeCmd() *cobra.Command {
 	return cmd
 }
 
-// serveOpts groups the runServe parameters so newServeCmd and the
+// serveOpts groups the runServe parameters so newViewerCmd and the
 // quickstart command can share the same path without an unwieldy
 // positional signature.
 type serveOpts struct {
@@ -119,7 +119,7 @@ func runServe(o serveOpts) error {
 }
 
 // openBrowser launches the platform's default URL handler. The child process
-// is intentionally detached (no Wait) — the browser may outlive `ckg serve`,
+// is intentionally detached (no Wait) — the browser may outlive `ckg viewer`,
 // and blocking on it would defeat the goroutine.
 func openBrowser(url string) {
 	var cmd *exec.Cmd

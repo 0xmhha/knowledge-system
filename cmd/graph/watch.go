@@ -20,7 +20,7 @@ import (
 
 // newWatchCmd wires `ckg watch` — P3 #11. Runs an initial build, then
 // watches --src for filesystem events and triggers an incremental
-// rebuild on relevant changes. Pairs with `ckg serve --graph=<out>` in
+// rebuild on relevant changes. Pairs with `ckg viewer --graph=<out>` in
 // a second terminal: SQLite WAL allows the reader to keep observing
 // the same graph.db file while the writer (this command) lands
 // incremental updates in place.
@@ -44,7 +44,7 @@ and triggers an incremental rebuild on Go / TypeScript / Solidity / Proto
 file changes. Multiple events inside the debounce window collapse to a
 single rebuild so editor-save bursts don't thrash the pipeline.
 
-Pair with 'ckg serve --graph=<out>' in another terminal for a live
+Pair with 'ckg viewer --graph=<out>' in another terminal for a live
 viewer: SQLite WAL mode lets the serve reader observe in-place
 updates that this writer lands. Cold rebuilds (which truncate
 graph.db) only happen on the initial run; from then on every event

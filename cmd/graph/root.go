@@ -27,7 +27,7 @@ func newRootCmd() *cobra.Command {
 	root.PersistentFlags().StringVar(&rootLogFile, "log-file", "",
 		"write structured JSON log to <path> in addition to stderr text")
 
-	root.AddCommand(newBuildCmd(), newServeCmd(), newMCPCmd(),
+	root.AddCommand(newBuildCmd(), newViewerCmd(), newMCPCmd(),
 		newWatchCmd(),
 		newExportStaticCmd(), newExportPostgresCmd(), newExportJSONCmd(),
 		newReportCmd(), newQuickstartCmd(), newPathCmd(), newBenchmarkCmd(),

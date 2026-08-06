@@ -1,5 +1,5 @@
 // cmd/ckg/evidence.go — `ckg evidence` runs the H3 EvidencePack
-// assembler from a one-shot CLI invocation, no `ckg serve` required.
+// assembler from a one-shot CLI invocation, no `ckg viewer` required.
 // Targets shell scripts, CI pipelines, and ad-hoc inspection where
 // the long-running server would be overkill.
 //
@@ -44,7 +44,7 @@ func newEvidenceCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "evidence",
-		Short: "Run the H3 EvidencePack assembler from the CLI (no `ckg serve` needed)",
+		Short: "Run the H3 EvidencePack assembler from the CLI (no `ckg viewer` needed)",
 		Long: `Build an EvidencePack for a free-form intent and/or an issue ID,
 without spinning up the embedded server. Mirrors the /api/evidence
 query surface — intent for BM25 ranking, issue_id for ticket-scope

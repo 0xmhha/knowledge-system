@@ -62,9 +62,8 @@ else
 fi
 
 # ── 2. binaries (single consolidated module) ────────────────────────────────
-log "2. binaries (make build-dataset-bins + build-mcp)"
-make build-dataset-bins
-make build-mcp
+log "2. binaries (make build-bins)"
+make build-bins
 
 # ── 3. dataset (Go pipeline via the stablenet pack wrapper) ─────────────────
 log "3. dataset → $DATASET_OUT (cks setup)"
