@@ -198,9 +198,9 @@ func TestExportStaticCmd_Success(t *testing.T) {
 		t.Fatalf("export-static Execute: %v", err)
 	}
 
-	// The embedded viewer contributes index.html; ExportChunked writes
+	// ExportChunked writes
 	// manifest.json at the output root.
-	for _, f := range []string{"index.html", "manifest.json"} {
+	for _, f := range []string{"manifest.json"} {
 		if _, err := os.Stat(filepath.Join(out, f)); err != nil {
 			t.Errorf("expected %s in static output: %v", f, err)
 		}
@@ -232,12 +232,12 @@ func TestExportStaticCmd_BadGraphPath(t *testing.T) {
 
 // ─── serve subcommand ────────────────────────────────────────────────────────
 
-// TestServeCmd_PortInUse verifies that the serve RunE body runs through to
+// TestAPICmd_PortInUse verifies that the api RunE body runs through to
 // ListenAndServe and returns quickly when the requested port is already bound.
 // Pre-binding the port forces an immediate "address already in use" error so
 // the test doesn't hang. This covers the full RunE execution path up to and
 // including the ListenAndServe call.
-func TestServeCmd_PortInUse(t *testing.T) {
+func TestAPICmd_PortInUse(t *testing.T) {
 	graphDir := t.TempDir()
 	reapGraphDir(t, graphDir)
 	buildGraph(t, graphDir)
@@ -251,7 +251,7 @@ func TestServeCmd_PortInUse(t *testing.T) {
 	defer func() { _ = ln.Close() }()
 	port := ln.Addr().(*net.TCPAddr).Port
 
-	cmd := newViewerCmd()
+	cmd := newAPICmd()
 	cmd.SetArgs([]string{
 		"--graph=" + graphDir,
 		fmt.Sprintf("--port=%d", port),
@@ -259,46 +259,6 @@ func TestServeCmd_PortInUse(t *testing.T) {
 	cmd.SetOut(io.Discard)
 	cmd.SetErr(io.Discard)
 
-	if err := cmd.Execute(); err == nil {
-		t.Errorf("expected error when port is already in use")
-	}
-}
-
-// TestServeCmd_PortInUseWithOpen is the same as TestServeCmd_PortInUse but
-// additionally passes --open=true to exercise the goroutine branch that
-// launches the browser and cover openBrowser.
-//
-// To avoid actually launching a real browser on the developer's machine, we
-// set PATH="" so exec.Command("open"|"xdg-open"|"rundll32") fails to locate
-// the binary. openBrowser silently swallows the Start() error, so all of its
-// statements still execute (preserving coverage) but no GUI window appears.
-func TestServeCmd_PortInUseWithOpen(t *testing.T) {
-	// buildGraph runs first so go/packages can locate the `go` toolchain on
-	// PATH; the openBrowser goroutine that needs PATH="" comes after.
-	graphDir := t.TempDir()
-	reapGraphDir(t, graphDir)
-	buildGraph(t, graphDir)
-
-	t.Setenv("PATH", "")
-
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatalf("pre-bind: %v", err)
-	}
-	defer func() { _ = ln.Close() }()
-	port := ln.Addr().(*net.TCPAddr).Port
-
-	cmd := newViewerCmd()
-	cmd.SetArgs([]string{
-		"--graph=" + graphDir,
-		fmt.Sprintf("--port=%d", port),
-		"--open=true",
-	})
-	cmd.SetOut(io.Discard)
-	cmd.SetErr(io.Discard)
-
-	// Expect an error (port in use). The --open goroutine fires asynchronously;
-	// the OS-level "open" lookup fails because PATH is empty — that's fine.
 	if err := cmd.Execute(); err == nil {
 		t.Errorf("expected error when port is already in use")
 	}

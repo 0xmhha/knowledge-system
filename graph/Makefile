@@ -1,46 +1,31 @@
-.PHONY: all build build-full build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
+.PHONY: all build build-no-viewer viewer test test-race lint lint-viewer fmt fmt-check audit clean eval eval-baseline-update eval-ckv-mirror eval-stablenet-keyword
 
 GO ?= go
 
 all: build
 
-# Default viewer build: the unified Next.js dashboard (../tools/viewer/, the
-# knowledge-system-dashboard app hosting both the graph and vector viewers).
-# Static export (`output: 'export'`) writes to out/, which we mirror into
-# ../internal/graph/server/web_assets/ so the go:embed directive in viewer.go
-# picks it up at compile time.
+# viewer: build the unified Next.js dashboard (../tools/viewer/ — it hosts
+# both the graph and vector viewers) and mirror the static export into
+# ../internal/system/viewer/web_assets/, where the composition engine's
+# go:embed picks it up (`cks viewer` serves it; this engine serves /api only).
 #
 # We rm -rf the embed dir before copying to drop stale files from the
-# previous viewer build (the old esbuild output's assets/viewer.js
-# would otherwise hang around). Bounded to ../internal/graph/server/web_assets/.
+# previous build. Rebuild cks afterwards (`make -C .. build-bins`) so the
+# binary carries the fresh assets; the tracked stub is restored so
+# `git status` stays clean.
 viewer:
 	cd ../tools/viewer && npm install && npm run build
-	rm -rf ../internal/graph/server/web_assets
-	mkdir -p ../internal/graph/server/web_assets
-	cp -R ../tools/viewer/out/. ../internal/graph/server/web_assets/
+	rm -rf ../internal/system/viewer/web_assets
+	mkdir -p ../internal/system/viewer/web_assets
+	cp -R ../tools/viewer/out/. ../internal/system/viewer/web_assets/
+	@if git rev-parse --git-dir >/dev/null 2>&1; then \
+	    git checkout -- ../internal/system/viewer/web_assets/index.html 2>/dev/null || true; \
+	fi
 
-# build: Go binary only. The viewer UI is embedded at compile time via
-# go:embed (internal/server/viewer.go), so a binary from this target
-# serves whatever is currently in ../internal/graph/server/web_assets/ — the
-# tracked stub unless `make viewer` (or `make build-full`) ran before.
-# Use `make build-full` for a release-grade binary with the real viewer.
+# build: the ckg binary. The dashboard is not embedded here — it lives with
+# the composition engine (internal/system/viewer, served by `cks viewer`).
 build:
 	$(GO) build -o bin/ckg ../cmd/graph
-
-# build-full: Next.js viewer + Go binary (the old `make build`).
-build-full: viewer
-	$(GO) build -o bin/ckg ../cmd/graph
-	@# The binary already embedded the real Next.js index.html at compile
-	@# time, so restore the tracked stub so `git status` stays clean. No-op
-	@# outside a git repo (CI tarballs etc.) — the stub on disk doesn't
-	@# affect the running binary.
-	@# `git rev-parse --git-dir` instead of `[ -d .git ]` because .git is a
-	@# *file* inside `git worktree add` checkouts; the dir test would silently
-	@# skip there and bring back the churn we are eliminating.
-	@if git rev-parse --git-dir >/dev/null 2>&1; then \
-	    git checkout -- ../internal/graph/server/web_assets/index.html 2>/dev/null \
-	      || echo "warn: could not restore stub web_assets/index.html — run 'git checkout -- ../internal/graph/server/web_assets/index.html' manually"; \
-	fi
 
 # Back-compat alias (older docs/scripts): identical to `build`.
 build-no-viewer: build

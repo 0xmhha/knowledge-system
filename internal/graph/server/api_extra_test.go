@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/fs"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -335,65 +333,4 @@ func TestHandleTopNodes(t *testing.T) {
 			t.Errorf("status=%d, want 400", resp.StatusCode)
 		}
 	})
-}
-
-// TestCopyViewerAssetsTo verifies that CopyViewerAssetsTo materialises the
-// embedded viewer onto disk. index.html and assets/viewer.js must both appear.
-func TestCopyViewerAssetsTo(t *testing.T) {
-	dst := t.TempDir()
-	if err := server.CopyViewerAssetsTo(dst); err != nil {
-		t.Fatalf("CopyViewerAssetsTo: %v", err)
-	}
-
-	// Collect all files that were written.
-	var written []string
-	if err := filepath.WalkDir(dst, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !d.IsDir() {
-			rel, _ := filepath.Rel(dst, path)
-			written = append(written, rel)
-		}
-		return nil
-	}); err != nil {
-		t.Fatalf("WalkDir dst: %v", err)
-	}
-
-	if len(written) == 0 {
-		t.Fatal("CopyViewerAssetsTo wrote no files; embedded web_assets may be empty")
-	}
-	t.Logf("CopyViewerAssetsTo wrote: %v", written)
-
-	// index.html is always tracked — either as the post-`make viewer` Next.js
-	// page or the committed stub that explains how to build the viewer. Either
-	// way, missing index.html means the embed is broken.
-	indexPath := filepath.Join(dst, "index.html")
-	if _, err := os.Stat(indexPath); err != nil {
-		t.Errorf("index.html missing from dst: %v", err)
-	}
-
-	// _next/static/ is only present after `make viewer` has been run. On a
-	// fresh clone (stub-only) it's gitignored so the directory is absent —
-	// we log and skip the .js-count assertion in that case.
-	staticDir := filepath.Join(dst, "_next", "static")
-	if _, err := os.Stat(staticDir); err != nil {
-		t.Logf("_next/static/ not present in embedded assets — stub-only mode (run `make viewer` to build the full viewer)")
-		return
-	}
-	var jsCount int
-	if err := filepath.WalkDir(staticDir, func(_ string, d fs.DirEntry, walkErr error) error {
-		if walkErr != nil || d.IsDir() {
-			return walkErr
-		}
-		if filepath.Ext(d.Name()) == ".js" {
-			jsCount++
-		}
-		return nil
-	}); err != nil {
-		t.Errorf("WalkDir _next/static: %v", err)
-	}
-	if jsCount == 0 {
-		t.Error("no .js files found under _next/static/ after CopyViewerAssetsTo")
-	}
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
-	staticfs "github.com/0xmhha/knowledge-system/internal/graph/server"
 )
 
 func newExportStaticCmd() *cobra.Command {
@@ -37,14 +36,7 @@ func newExportStaticCmd() *cobra.Command {
 				return fmt.Errorf("export chunked: %w", err)
 			}
 
-			// Copy embedded viewer (index.html + assets/) alongside the JSON
-			// bundle so `out/` is a single self-contained static site — any
-			// HTTP file server rooted at `out` will serve the viewer.
-			if err := staticfs.CopyViewerAssetsTo(out); err != nil {
-				return fmt.Errorf("copy viewer assets: %w", err)
-			}
-
-			_, _ = fmt.Fprintf(os.Stderr, "ckg: exported static graph to %s\n", out)
+			_, _ = fmt.Fprintf(os.Stderr, "ckg: exported static graph data to %s (add the dashboard with: cks viewer export --out %s)\n", out, out)
 			return nil
 		},
 	}

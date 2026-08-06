@@ -154,7 +154,7 @@ dirt; Sol↔TS link rebuilt whenever any TS/Sol file is dirty.
 cmd/ckg/                 ← ~20 subcommands (root.go:30-36); production surfaces starred
   ├─ main.go, root.go    (entry point + CLI setup)
   ├─ build.go *          (ckg build)
-  ├─ viewer.go *         (ckg viewer + options)
+  ├─ api.go *            (ckg api)
   ├─ mcp.go *            (ckg mcp — thin wrapper over internal/mcp)
   ├─ eval_retrieval.go * (ckg eval-retrieval — the eval surface; there is no eval.go)
   ├─ audit.go *          (ckg audit)
@@ -429,7 +429,7 @@ Authoritative tool list: `pkg/mcphandlers/registerall.go`.
 
 ```go
 type Options struct {
-  DevViewerDir string  // env: CKG_DEV_VIEWER_DIR (disk-backed viewer for dev loop)
+  (viewer dev overlay moved to cks: env CKS_DEV_VIEWER_DIR, internal/system/viewer)
   NoViewer     bool    // flag: --no-viewer (API-only, operator's reverse-proxy pattern)
 }
 ```
@@ -437,7 +437,7 @@ type Options struct {
 **Use cases**:
 - `New(store, log)` → zero-options default (embedded viewer)
 - `--open` auto-suppress when `--no-viewer` set
-- `CKG_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets` → reload browser without recompiling
+- `CKS_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets` → reload browser without recompiling
 
 ---
 
@@ -778,7 +778,7 @@ gaps, not bugs.
 func runServe(cmd *cobra.Command, args []string) error {
   store := persist.OpenReadOnly(graphPath)
   opts := server.Options{
-    DevViewerDir: os.Getenv("CKG_DEV_VIEWER_DIR"),
+    DevViewerDir: os.Getenv("CKS_DEV_VIEWER_DIR"),
     NoViewer:     noViewerFlag,
   }
   srv := server.NewWithOptions(store, logger, opts)
@@ -926,17 +926,17 @@ store.Search(query, limit=10)
 ### 15.1 Development Loop
 
 ```bash
-make build-full
+make -C graph viewer && make build-bins
 ckg build --src=<repo> --out=/tmp/ckg
-ckg viewer --graph=/tmp/ckg --port=8080 --open
+cks viewer --graph=/tmp/ckg --port=8080 --open
 ```
 
-**Typical cycle**: edit code → `make build-full` → `ckg build` (1-2 min) → reload browser.
+**Typical cycle**: edit code → `make -C graph viewer` + `make build-bins` → `ckg build` (1-2 min) → reload browser.
 
 ### 15.2 Local Single-User
 
 ```bash
-ckg viewer --graph=/path/to/graph.db --port=8080 --open
+cks viewer --graph=/path/to/graph --port=8080 --open
 ```
 
 **Embedded viewer** at localhost:8080, API at localhost:8080/api/*.
@@ -951,7 +951,7 @@ ckg export-static --graph=/path/to/graph.db --out=/srv/ckg/static
 # serve /srv/ckg/static/* as static files
 
 # 3. Deploy API separately (autoscale, cache layer)
-ckg viewer --graph=/path/to/graph.db --port=8080 --no-viewer
+ckg api --graph=/path/to/graph --port=8080
 # front with reverse proxy:
 #   /api/* → localhost:8080
 #   /* → https://cdn.example.com/ckg/static/
@@ -989,7 +989,7 @@ claude mcp add ckg --command ./bin/ckg --args "mcp,--graph=/path/to/graph.db"
 | `--open` | — | `false` | Auto-open browser on serve |
 | `--no-cache` | — | `false` | Force full rebuild (ignore manifest) |
 | `--no-viewer` | — | `false` | Serve API only (no static mount) |
-| (dev) | `CKG_DEV_VIEWER_DIR` | (empty) | Disk path to viewer assets (dev overlay) |
+| (dev) | `CKS_DEV_VIEWER_DIR` | (empty) | Disk path to viewer assets (dev overlay) |
 
 ---
 

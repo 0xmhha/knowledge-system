@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
@@ -38,24 +37,14 @@ type Server struct {
 	stalenessCache *stalenessCache
 }
 
-// Options tunes how Server mounts the static viewer surface. The zero value
-// preserves the original behavior (embedded viewer at `/`).
-//
-//   - DevViewerDir overrides the embedded FS with a disk path. Set by
-//     `CKG_DEV_VIEWER_DIR` so a viewer dev loop (`make viewer` after each
-//     edit) doesn't require rebuilding the ckg binary. Ignored when empty.
-//   - NoViewer skips the static mount entirely, leaving only `/api/*`
-//     reachable. Used by `ckg serve --no-viewer` for operators who front
-//     the API with their own reverse proxy + separately hosted viewer
-//     (the `ckg export-static` bundle).
-type Options struct {
-	DevViewerDir string
-	NoViewer     bool
-}
+// Options tunes the Server. The dashboard UI is not served here: it moved
+// to the composition engine (`cks viewer`, internal/system/viewer), which
+// reverse-proxies /api/* to this server. This surface is API-only.
+type Options struct{}
 
-// New wires routes against store and returns a ready-to-serve Server with
-// default options (embedded viewer mounted at `/`). A nil log is replaced
-// with a stderr text logger so handlers can always log without a nil check.
+// New wires routes against store and returns a ready-to-serve API server.
+// A nil log is replaced with a stderr text logger so handlers can always
+// log without a nil check.
 func New(store persist.StoreReader, log *slog.Logger) *Server {
 	return NewWithOptions(store, log, Options{})
 }
@@ -138,31 +127,6 @@ func (s *Server) routes(opts Options) {
 	s.mux.HandleFunc("GET /api/evidence", s.handleEvidence)
 	s.mux.HandleFunc("GET /api/tickets", s.handleTickets)
 
-	if opts.NoViewer {
-		// API-only surface; operators wire their own viewer (typically the
-		// `ckg export-static` bundle behind a reverse proxy).
-		return
-	}
-
-	if opts.DevViewerDir != "" {
-		// Disk-backed viewer for dev iteration. We do NOT verify index.html
-		// exists at construction time: the loop is "edit viewer source →
-		// `make viewer` → reload browser", and the index can briefly be
-		// absent mid-build. http.FileServer will simply 404 until it's back.
-		s.log.Info("server: viewer served from disk (dev mode)", "dir", opts.DevViewerDir)
-		s.mux.Handle("/", http.FileServerFS(os.DirFS(opts.DevViewerDir)))
-		return
-	}
-
-	// Static viewer — fs.Sub strips the `web_assets/` prefix so the embedded
-	// `index.html` is served at `/`.
-	sub, err := fs.Sub(viewerFS, "web_assets")
-	if err != nil {
-		// Compile-time `go:embed all:web_assets` guarantees the directory
-		// exists; an error here is unrecoverable startup state.
-		panic("server: viewer FS missing web_assets/: " + err.Error())
-	}
-	s.mux.Handle("/", http.FileServerFS(sub))
 }
 
 // ServeHTTP makes Server satisfy http.Handler, primarily so tests can drive

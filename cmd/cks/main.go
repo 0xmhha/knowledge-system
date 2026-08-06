@@ -25,6 +25,7 @@ import (
 	"github.com/0xmhha/knowledge-system/cmd/cks/filelistcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/mcpcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/setupcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/viewercli"
 )
 
 // builderVersion is stamped into the MCP server handshake and
@@ -48,6 +49,7 @@ func main() {
 	root.AddCommand(setupcli.NewCmd())
 	root.AddCommand(filelistcli.NewCmd())
 	root.AddCommand(evalgatecli.NewCmd())
+	root.AddCommand(viewercli.NewCmd())
 
 	if err := root.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "cks: %v\n", err)

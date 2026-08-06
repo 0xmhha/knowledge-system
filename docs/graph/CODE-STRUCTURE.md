@@ -372,7 +372,7 @@ authoritative 등록 목록: `pkg/mcphandlers/registerall.go` `RegisterAll` (내
         └────────────────────────────────────────────────────────────┘
 ```
 
-> viewer는 `make build-full` 시에만 실제로 빌드됨. `make build`는 Go 바이너리만
+> viewer는 `make -C graph viewer` 시에만 실제로 빌드됨(임베드는 cks 측). `make build`는 Go 바이너리만
 > 만들고 embedded viewer는 tracked stub으로 남는다.
 
 ---
@@ -518,7 +518,7 @@ cobra root는 약 20개 subcommand를 등록한다 (`cmd/ckg/root.go:30-36`의 `
 
 | 원칙 | 구현 |
 |---|---|
-| **Single binary** | go:embed로 viewer까지 단일 실행파일 (`make build-full`) |
+| **Single binary** | 대시보드는 cks가 go:embed로 서빙 (`cks viewer`); ckg는 API 전용 |
 | **LLM-free deterministic build** | 그래프 빌드는 LLM 미사용·결정적. LLM은 eval 표면에만 |
 | **CGO-free default** | `modernc.org/sqlite` (cross-platform CI matrix) |
 | **ISP** | Store interface 3분할 — read consumers는 writer 의존 X |
@@ -578,15 +578,15 @@ require (
 cd <repo root>
 git log --oneline -10
 make test                                   # = go test ./...
-make build-full                             # Next.js viewer + ckg binary
+make -C graph viewer && make build-bins    # 대시보드 자산 + 엔진 바이너리
 ./bin/ckg build --src=testdata --out=/tmp/ckg-synth
-./bin/ckg viewer --graph=/tmp/ckg-synth --port=8080 --open
+./bin/cks viewer --graph=/tmp/ckg-synth --port=8080 --open
 ./bin/ckg audit --src=testdata --graph=/tmp/ckg-synth   # exit 0 = parity
 
 # API-only / disk viewer
-./bin/ckg viewer --graph=/tmp/ckg-synth --no-viewer --port=8788
+./bin/ckg api --graph=/tmp/ckg-synth --port=8788
 make viewer && CKG_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets \
-  ./bin/ckg viewer --graph=/tmp/ckg-synth --port=8789
+  ./bin/cks viewer --graph=/tmp/ckg-synth --port=8789
 ```
 
 ---

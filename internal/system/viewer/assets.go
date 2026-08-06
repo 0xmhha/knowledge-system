@@ -1,10 +1,10 @@
-// Package server implements the HTTP API and serves the embedded viewer.
+// Package viewer embeds the unified dashboard (tools/viewer build output)
 //
-// The viewer assets are bundled into the binary via embed.FS so a single
-// `ckg serve` binary needs no sidecar files. The build assumes
-// `make viewer` has been run so internal/server/web_assets/{index.html,
+// and hands it to the `cks viewer` command. Assets are bundled via embed.FS
+// so the binary needs no sidecar files. The build assumes
+// `make viewer` has been run so web_assets/{index.html,
 // assets/viewer.js[.map]} exist before `go build`.
-package server
+package viewer
 
 import (
 	"embed"
@@ -21,10 +21,10 @@ import (
 //go:embed all:web_assets
 var viewerFS embed.FS
 
-// CopyViewerAssetsTo materialises the embedded viewer onto disk under dst.
-// Used by `ckg export-static` (T31) so the same assets that ship with the
+// CopyAssetsTo materialises the embedded viewer onto disk under dst.
+// Used by `cks viewer export` so the same assets that ship with the
 // server can be pinned into a static export bundle.
-func CopyViewerAssetsTo(dst string) error {
+func CopyAssetsTo(dst string) error {
 	sub, err := fs.Sub(viewerFS, "web_assets")
 	if err != nil {
 		return fmt.Errorf("sub web_assets: %w", err)
