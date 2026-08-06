@@ -17,7 +17,7 @@
 #     projects/*/generated/). No make target regenerates it — unlike graph.yaml
 #     and glossary.yaml, which `make sync-domain-artifacts` owns — so run it by
 #     hand first if the YAML changed:
-#       make build-dataset-bins    # builds bin/cks (among others)
+#       make build-bins            # builds bin/ckg, bin/ckv, bin/cks
 #       bin/cks domain export --project projects/stablenet/domain-knowledge \
 #         --out projects/stablenet/generated/domain-corpus
 #     The corpus is generated entirely from the committed entries; the pack

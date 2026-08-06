@@ -8,12 +8,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
+	kmcp "github.com/0xmhha/knowledge-system/pkg/mcp"
 	ckvmcp "github.com/0xmhha/knowledge-system/pkg/vector/mcp"
 )
 
 type mcpOpts struct {
-	out      string
-	httpAddr string
+	out       string
+	httpAddr  string
+	namespace string
 }
 
 func newMCPCmd() *cobra.Command {
@@ -66,6 +68,7 @@ Run as HTTP server (multi-client):
 	f := cmd.Flags()
 	f.StringVar(&opts.out, "out", "./ckv-data", "data directory")
 	f.StringVar(&opts.httpAddr, "http", "", "HTTP listen address (e.g. :8080); empty uses stdio")
+	f.StringVar(&opts.namespace, "namespace", "", "tool-namespace root override (default: env/build-time, else \"cks\")")
 
 	return cmd
 }
@@ -89,6 +92,10 @@ func runMCP(opts *mcpOpts) error {
 	}
 	defer eng.Close()
 
+	// Client-visible tool names follow the shared namespace rule (pkg/mcp):
+	// "cks" root by default, overridden by --namespace, the
+	// KNOWLEDGE_MCP_NAMESPACE env, or the build-time -ldflags root.
+	ckvmcp.SetNamespaceRoot(kmcp.Root(opts.namespace, "cks"))
 	srv := ckvmcp.NewServer(eng, ckvmcp.WithFootprint(fp))
 
 	if opts.httpAddr != "" {

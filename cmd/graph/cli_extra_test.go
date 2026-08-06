@@ -251,7 +251,7 @@ func TestServeCmd_PortInUse(t *testing.T) {
 	defer func() { _ = ln.Close() }()
 	port := ln.Addr().(*net.TCPAddr).Port
 
-	cmd := newServeCmd()
+	cmd := newViewerCmd()
 	cmd.SetArgs([]string{
 		"--graph=" + graphDir,
 		fmt.Sprintf("--port=%d", port),
@@ -288,7 +288,7 @@ func TestServeCmd_PortInUseWithOpen(t *testing.T) {
 	defer func() { _ = ln.Close() }()
 	port := ln.Addr().(*net.TCPAddr).Port
 
-	cmd := newServeCmd()
+	cmd := newViewerCmd()
 	cmd.SetArgs([]string{
 		"--graph=" + graphDir,
 		fmt.Sprintf("--port=%d", port),

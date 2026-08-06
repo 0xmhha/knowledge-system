@@ -28,7 +28,7 @@ CODE_ROOT="${CODE_ROOT:-$GSN_SRC}"
 for b in ckg ckv cks; do
   [ -x "$KS_ROOT/bin/$b" ] || {
     echo "ERROR: $KS_ROOT/bin/$b not built — run:" >&2
-    echo "  (cd \"$KS_ROOT\" && make build-dataset-bins)" >&2
+    echo "  (cd \"$KS_ROOT\" && make build-bins)" >&2
     exit 1
   }
 done

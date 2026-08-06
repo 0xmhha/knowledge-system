@@ -154,7 +154,7 @@ dirt; Sol↔TS link rebuilt whenever any TS/Sol file is dirty.
 cmd/ckg/                 ← ~20 subcommands (root.go:30-36); production surfaces starred
   ├─ main.go, root.go    (entry point + CLI setup)
   ├─ build.go *          (ckg build)
-  ├─ serve.go *          (ckg serve + options)
+  ├─ viewer.go *         (ckg viewer + options)
   ├─ mcp.go *            (ckg mcp — thin wrapper over internal/mcp)
   ├─ eval_retrieval.go * (ckg eval-retrieval — the eval surface; there is no eval.go)
   ├─ audit.go *          (ckg audit)
@@ -815,7 +815,7 @@ func runServe(cmd *cobra.Command, args []string) error {
   └─ (other viewer assets)
 ```
 
-**Use case**: `export-static` + static hosting (S3, Cloudflare Pages) + separate `ckg serve` API behind reverse proxy.
+**Use case**: `export-static` + static hosting (S3, Cloudflare Pages) + separate `ckg viewer` API behind reverse proxy.
 
 ---
 
@@ -928,7 +928,7 @@ store.Search(query, limit=10)
 ```bash
 make build-full
 ckg build --src=<repo> --out=/tmp/ckg
-ckg serve --graph=/tmp/ckg --port=8080 --open
+ckg viewer --graph=/tmp/ckg --port=8080 --open
 ```
 
 **Typical cycle**: edit code → `make build-full` → `ckg build` (1-2 min) → reload browser.
@@ -936,7 +936,7 @@ ckg serve --graph=/tmp/ckg --port=8080 --open
 ### 15.2 Local Single-User
 
 ```bash
-ckg serve --graph=/path/to/graph.db --port=8080 --open
+ckg viewer --graph=/path/to/graph.db --port=8080 --open
 ```
 
 **Embedded viewer** at localhost:8080, API at localhost:8080/api/*.
@@ -951,7 +951,7 @@ ckg export-static --graph=/path/to/graph.db --out=/srv/ckg/static
 # serve /srv/ckg/static/* as static files
 
 # 3. Deploy API separately (autoscale, cache layer)
-ckg serve --graph=/path/to/graph.db --port=8080 --no-viewer
+ckg viewer --graph=/path/to/graph.db --port=8080 --no-viewer
 # front with reverse proxy:
 #   /api/* → localhost:8080
 #   /* → https://cdn.example.com/ckg/static/

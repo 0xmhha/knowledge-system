@@ -24,7 +24,7 @@ _CKS_BIN="$_KS_ROOT/bin/cks"
 _KS_CONFIG="${KS_CONFIG:-$_KS_ROOT/run/cks.yaml}"
 
 if [ ! -x "$_CKS_BIN" ]; then
-  echo "activate: cks not built — run: make -C \"$_KS_ROOT\" build-mcp" >&2
+  echo "activate: cks not built — run: make -C \"$_KS_ROOT\" build-bins" >&2
   return 1 2>/dev/null || exit 1
 fi
 if [ ! -f "$_KS_CONFIG" ]; then

@@ -6,10 +6,10 @@ BIN_DIR := bin
 # consolidation (engine source lives at ../internal/vector etc.), so ./...
 # here would silently match nothing. pkg/bm25 is the shared core; vector is
 # a consumer, so it tests it too.
-PKG_LIST := ../cmd/vector/... ../cmd/vector-mcp/... \
+PKG_LIST := ../cmd/vector/... \
             ../internal/vector/... ../pkg/vector/... ../pkg/bm25/...
 # Engine source directories for tools that take dirs, not package patterns.
-PKG_DIRS := ../cmd/vector ../cmd/vector-mcp ../internal/vector ../pkg/vector
+PKG_DIRS := ../cmd/vector ../internal/vector ../pkg/vector
 
 # Version is derived from the git tag (falls back to "dev" outside a checkout)
 # and injected into cmd/ckv.Version via -ldflags. `ckv --version` and the build

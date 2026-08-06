@@ -31,7 +31,7 @@ make build-full   # viewer + binary; `make build` = binary only (no 3D viewer UI
 ./bin/ckg build --src=/path/to/repo --out=/tmp/ckg
 
 # 2. Query via HTTP + 3D viewer
-./bin/ckg serve --graph=/tmp/ckg --open      # http://localhost:8080
+./bin/ckg viewer --graph=/tmp/ckg --open      # http://localhost:8080
 
 # 3. Query from Claude Code via MCP
 claude mcp add ckg -- ./bin/ckg mcp --graph=/tmp/ckg
@@ -82,7 +82,7 @@ The five production surfaces:
 | Command | Purpose |
 |---|---|
 | `ckg build`           | Parse a code path into a graph database |
-| `ckg serve`           | HTTP API + embedded 3D viewer |
+| `ckg viewer`           | HTTP API + embedded 3D viewer |
 | `ckg mcp`             | MCP server for LLM agents (Claude Code, etc.) |
 | `ckg eval-retrieval`  | Keyword-retrieval accuracy eval against gold fixtures |
 | `ckg audit`           | `go/packages`-vs-DB parity / graph-integrity check |
@@ -101,12 +101,12 @@ Run `ckg <command> --help` for flags. `ckg --help` lists every subcommand.
 
 ## Production deployment
 
-`ckg serve` ships an embedded viewer for local use. For shared
+`ckg viewer` ships an embedded viewer for local use. For shared
 deployments, split the static viewer from the API:
 
 ```bash
 ./bin/ckg export-static --graph=/tmp/ckg --out=/srv/ckg/static
-./bin/ckg serve --graph=/tmp/ckg --port=8080 --no-viewer
+./bin/ckg viewer --graph=/tmp/ckg --port=8080 --no-viewer
 ```
 
 Front both with a reverse proxy: `/api/* → :8080`, `/* → /srv/ckg/static`.

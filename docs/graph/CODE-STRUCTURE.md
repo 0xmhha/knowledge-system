@@ -580,13 +580,13 @@ git log --oneline -10
 make test                                   # = go test ./...
 make build-full                             # Next.js viewer + ckg binary
 ./bin/ckg build --src=testdata --out=/tmp/ckg-synth
-./bin/ckg serve --graph=/tmp/ckg-synth --port=8080 --open
+./bin/ckg viewer --graph=/tmp/ckg-synth --port=8080 --open
 ./bin/ckg audit --src=testdata --graph=/tmp/ckg-synth   # exit 0 = parity
 
 # API-only / disk viewer
-./bin/ckg serve --graph=/tmp/ckg-synth --no-viewer --port=8788
+./bin/ckg viewer --graph=/tmp/ckg-synth --no-viewer --port=8788
 make viewer && CKG_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets \
-  ./bin/ckg serve --graph=/tmp/ckg-synth --port=8789
+  ./bin/ckg viewer --graph=/tmp/ckg-synth --port=8789
 ```
 
 ---

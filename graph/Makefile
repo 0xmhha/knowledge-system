@@ -50,7 +50,7 @@ build-no-viewer: build
 # silently matches nothing — these targets must name the engine's packages
 # explicitly to keep their pre-consolidation meaning. pkg/bm25 is the shared
 # BM25 core; graph is a consumer, so it tests it too.
-GRAPH_PKGS = ../cmd/graph/... ../cmd/graph-mcp/... \
+GRAPH_PKGS = ../cmd/graph/... \
              ../internal/graph/... ../pkg/graph/... ../pkg/bm25/...
 
 test:
@@ -125,7 +125,7 @@ eval: build-no-viewer
 	@# graph must not pass the gate as "healthy".
 	@rm -rf eval/.ckg-data
 	./bin/ckg build --src=.. \
-	    --files-from-main ./cmd/graph,./cmd/graph-mcp \
+	    --files-from-main ./cmd/graph \
 	    --out=eval/.ckg-data --lang=go --fail-on-parse-errors
 	@echo
 	@echo "=== ckg eval: step 2/5 — validate (schema integrity) ==="

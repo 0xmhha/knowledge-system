@@ -37,9 +37,7 @@ check graph            "vector|system"
 check vector           "graph|system"
 check system           "graph|vector"
 check cmd/graph        "vector|system"
-check cmd/graph-mcp    "vector|system"
 check cmd/vector       "graph|system"
-check cmd/vector-mcp   "graph|system"
 check cmd/cks          "graph|vector"
 # The filelist derivation is engine-free by design (R8): go list/git
 # subprocesses only. It lives inside the cks tree but keeps the stronger

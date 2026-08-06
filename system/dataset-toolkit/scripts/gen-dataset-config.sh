@@ -44,7 +44,7 @@ HTTP_ADDR="${HTTP_ADDR:-127.0.0.1:8080}"
 
 CKS_BIN="$KS_ROOT/bin/cks"
 [ -x "$CKS_BIN" ] || {
-  echo "ERROR: cks not built ($CKS_BIN) — run: make -C \"$KS_ROOT\" build-mcp" >&2
+  echo "ERROR: cks not built ($CKS_BIN) — run: make -C \"$KS_ROOT\" build-bins" >&2
   exit 1
 }
 
