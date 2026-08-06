@@ -106,10 +106,10 @@ build-bins:
 # here would silently match nothing. internal/setup is boundaries-wise its
 # own layer but is knowledge-setup's implementation, so it belongs to this
 # engine's test scope.
-SYSTEM_PKGS = ../cmd/cks/... ../cmd/knowledge-setup/... \
+SYSTEM_PKGS = ../cmd/cks/... \
               ../internal/system/... ../internal/setup/... ../pkg/system/...
 # The same set as directories, for tools that take dirs, not package patterns.
-SYSTEM_DIRS = ../cmd/cks ../cmd/knowledge-setup \
+SYSTEM_DIRS = ../cmd/cks \
               ../internal/system ../internal/setup ../pkg/system
 
 test:

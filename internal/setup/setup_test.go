@@ -85,7 +85,7 @@ func TestBuildPlan_Shape(t *testing.T) {
 		t.Fatalf("step[0] = %q, want filelist-derive", p3.Steps[0].ID)
 	}
 	d := strings.Join(p3.Steps[0].Cmd, " ")
-	if !strings.Contains(d, "filelist-gen --src /s --config /p/filelist.yaml --out /o/files-from.json") {
+	if !strings.Contains(d, "cks filelist --src /s --config /p/filelist.yaml --out /o/files-from.json") {
 		t.Errorf("derive cmd = %q", d)
 	}
 	for _, i := range []int{1, 2} { // graph-build, vector-build

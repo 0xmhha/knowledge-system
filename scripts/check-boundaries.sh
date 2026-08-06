@@ -38,12 +38,14 @@ check vector           "graph|system"
 check system           "graph|vector"
 check cmd/graph        "vector|system"
 check cmd/graph-mcp    "vector|system"
-check cmd/eval-gate    "vector|system"
 check cmd/vector       "graph|system"
 check cmd/vector-mcp   "graph|system"
 check cmd/cks          "graph|vector"
-# filelist-gen is engine-free by design (R8): go list/git subprocesses only.
-check cmd/filelist-gen "graph|vector|system"
+# The filelist derivation is engine-free by design (R8): go list/git
+# subprocesses only. It lives inside the cks tree but keeps the stronger
+# guarantee; same for the eval-gate comparator, which reads JSON files.
+check cmd/cks/filelistcli "graph|vector|system"
+check cmd/cks/evalgatecli "graph|vector|system"
 
 # Engines and shared code must not hardcode a specific project pack in
 # string literals — pack data reaches the engines through flags/config only.

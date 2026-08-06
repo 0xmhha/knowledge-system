@@ -42,7 +42,7 @@ jobs:
           rm -rf "$TMP_OUT"
 
   # Successor of code-knowledge-graph's eval job: `make -C graph eval`
-  # self-indexes the graph engine and cmd/eval-gate compares the four probe
+  # self-indexes the graph engine and `cks eval-gate` compares the four probe
   # outputs against the committed baseline (retrieval drift <= 0.02,
   # validate issue count must not rise). Runs in parallel with
   # build-and-test — the two are independent signals.
@@ -61,7 +61,7 @@ jobs:
       - name: make eval (self-index + 4 probes)
         run: make -C graph eval
       - name: eval-gate (compare against committed baseline)
-        run: go run ./cmd/eval-gate --baseline graph/eval/baseline --latest graph/eval/results/latest
+        run: go run ./cmd/cks eval-gate --baseline graph/eval/baseline --latest graph/eval/results/latest
       - name: Upload results on failure
         if: failure()
         uses: actions/upload-artifact@v4

@@ -10,12 +10,12 @@
 ## Go 경로 (권장, 2026-07-27)
 
 레이아웃/게이트/불변식은 그대로이며(아래 섹션 유지), 오케스트레이션·서빙·전환이
-`knowledge-setup`·`cks mcp`로 흡수되었다. shell 단계 → Go 대응:
+`cks setup`·`cks mcp`로 흡수되었다. shell 단계 → Go 대응:
 
 | 작업 | shell (legacy) | Go (권장) |
 |---|---|---|
-| 재인덱싱(빌드→게이트→promote) | `reindex-dataset.sh run` | `knowledge-setup --version <ver>` (CLI) 또는 MCP 도구 `ops.reindex`(job_id 반환, `ops.setup_status`로 폴링) |
-| 롤백 | `reindex-dataset.sh promote`(옛 ver) | `knowledge-setup --rollback <prev-ver>` |
+| 재인덱싱(빌드→게이트→promote) | `reindex-dataset.sh run` | `cks setup --version <ver>` (CLI) 또는 MCP 도구 `ops.reindex`(job_id 반환, `ops.setup_status`로 폴링) |
+| 롤백 | `reindex-dataset.sh promote`(옛 ver) | `cks setup --rollback <prev-ver>` |
 | config 생성 | `gen-cks-config.sh` | `cks mcp gen-config`(원격 도달용은 `--lan`; sanitize `rules_path`는 baseline 절대경로로 자동 채움) |
 | 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `cks mcp up`/`down`(`instances.yaml` 레지스트리, 포트 자동 배정, `graph_binary`/`vector_binary`로 ops.reindex 활성). `up --wait`로 `/healthz` serviceable까지 대기 |
 | 상태/준비 확인 | `serve-cks-http.sh status` | `cks mcp status`/`list`(`--ready`로 각 인스턴스 serviceability 프로브) |

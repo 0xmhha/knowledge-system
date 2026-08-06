@@ -16,7 +16,7 @@
 //
 // The tool imports no engine packages; `go list` and `git` subprocesses are
 // the contract.
-package main
+package filelistcli
 
 import (
 	"bytes"
@@ -31,8 +31,9 @@ import (
 	"sort"
 	"strings"
 
-	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
+
+	"github.com/spf13/cobra"
 )
 
 const toolVersion = "filelist-gen 0.1.0"
@@ -85,23 +86,29 @@ type Output struct {
 	Include    []string   `json:"include"`
 }
 
-func main() {
-	src := flag.String("src", "", "project root (single Go module, git repository) (required)")
-	configPath := flag.String("config", "", "path to filelist.yaml (required)")
-	out := flag.String("out", "", "output files-from.json path (required)")
-	check := flag.Bool("check", false, "compare a fresh derivation against the existing -out; exit 1 on drift")
-	allowDirty := flag.Bool("allow-dirty", false, "permit a dirty tracked tree (recorded in provenance)")
-	strict := flag.Bool("strict", false, "zero-match extra_globs become errors")
-	flag.Parse()
-
-	if *src == "" || *configPath == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "filelist-gen: --src, --config, and --out are required")
-		os.Exit(2)
+// NewCmd builds the `cks filelist` command: derive the build-scope file
+// list from a pack's filelist.yaml.
+func NewCmd() *cobra.Command {
+	var src, configPath, out string
+	var check, allowDirty, strict bool
+	cmd := &cobra.Command{
+		Use:   "filelist",
+		Short: "Derive the build-scope file list from a filelist.yaml",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if src == "" || configPath == "" || out == "" {
+				return fmt.Errorf("--src, --config, and --out are required")
+			}
+			return run(src, configPath, out, check, allowDirty, strict)
+		},
 	}
-	if err := run(*src, *configPath, *out, *check, *allowDirty, *strict); err != nil {
-		fmt.Fprintln(os.Stderr, "filelist-gen:", err)
-		os.Exit(1)
-	}
+	cmd.Flags().StringVar(&src, "src", "", "project root (single Go module, git repository) (required)")
+	cmd.Flags().StringVar(&configPath, "config", "", "path to filelist.yaml (required)")
+	cmd.Flags().StringVar(&out, "out", "", "output files-from.json path (required)")
+	cmd.Flags().BoolVar(&check, "check", false, "compare a fresh derivation against the existing --out; fail on drift")
+	cmd.Flags().BoolVar(&allowDirty, "allow-dirty", false, "permit a dirty tracked tree (recorded in provenance)")
+	cmd.Flags().BoolVar(&strict, "strict", false, "zero-match extra_globs become errors")
+	return cmd
 }
 
 func run(src, configPath, outPath string, check, allowDirty, strict bool) error {
@@ -143,7 +150,7 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 		return err
 	}
 	if dirty && !allowDirty {
-		return fmt.Errorf("tracked working tree is dirty — the derived list would not correspond to the recorded commit; commit/stash first or pass --allow-dirty (recorded in provenance)")
+		return fmt.Errorf("tracked working tree is dirty — the derived list would not correspond to the recorded commit; commit/stash first or pass -allow-dirty (recorded in provenance)")
 	}
 	commit, err := gitOut(srcAbs, "rev-parse", "HEAD")
 	if err != nil {
