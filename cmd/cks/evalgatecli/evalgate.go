@@ -16,7 +16,7 @@
 //
 // Run:  go run ./cmd/eval-gate  (after `make eval` has written the
 // `eval/results/latest/` artefacts)
-package main
+package evalgatecli
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ import (
 	"math"
 	"os"
 
-	flag "github.com/spf13/pflag"
+	"github.com/spf13/cobra"
 )
 
 // defaultTolerance is the per-metric float64 slack the gate allows
@@ -64,30 +64,37 @@ func (r validateReport) IssueCount() int {
 	return n
 }
 
-func main() {
-	baselineDir := flag.String("baseline", "eval/baseline", "directory holding the committed baseline JSON files")
-	latestDir := flag.String("latest", "eval/results/latest", "directory holding the latest `make eval` JSON output")
-	tolerance := flag.Float64("tolerance", defaultTolerance, "per-metric drift tolerance (default 0.02 = 2 percentage points)")
-	flag.Parse()
-
-	var failures []string
-
-	if msgs := checkRetrieval(*baselineDir, *latestDir, *tolerance); len(msgs) > 0 {
-		failures = append(failures, msgs...)
+// NewCmd builds the `cks eval-gate` command: compare the latest eval
+// output against the committed baseline and fail on regression.
+func NewCmd() *cobra.Command {
+	var baselineDir, latestDir string
+	var tolerance float64
+	cmd := &cobra.Command{
+		Use:   "eval-gate",
+		Short: "Compare eval output against the committed baseline; fail on regression",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var failures []string
+			if msgs := checkRetrieval(baselineDir, latestDir, tolerance); len(msgs) > 0 {
+				failures = append(failures, msgs...)
+			}
+			if msgs := checkValidate(baselineDir, latestDir); len(msgs) > 0 {
+				failures = append(failures, msgs...)
+			}
+			if len(failures) == 0 {
+				fmt.Fprintln(cmd.OutOrStdout(), "eval-gate: PASS — no regressions detected")
+				return nil
+			}
+			for _, f := range failures {
+				fmt.Fprintf(cmd.ErrOrStderr(), "  - %s\n", f)
+			}
+			return fmt.Errorf("eval-gate: FAIL — %d regression(s)", len(failures))
+		},
 	}
-	if msgs := checkValidate(*baselineDir, *latestDir); len(msgs) > 0 {
-		failures = append(failures, msgs...)
-	}
-
-	if len(failures) == 0 {
-		fmt.Println("eval-gate: PASS — no regressions detected")
-		return
-	}
-	_, _ = fmt.Fprintf(os.Stderr, "eval-gate: FAIL — %d regression(s)\n", len(failures))
-	for _, f := range failures {
-		_, _ = fmt.Fprintf(os.Stderr, "  - %s\n", f)
-	}
-	os.Exit(1)
+	cmd.Flags().StringVar(&baselineDir, "baseline", "eval/baseline", "directory holding the committed baseline JSON files")
+	cmd.Flags().StringVar(&latestDir, "latest", "eval/results/latest", "directory holding the latest `make eval` JSON output")
+	cmd.Flags().Float64Var(&tolerance, "tolerance", defaultTolerance, "per-metric drift tolerance (default 0.02 = 2 percentage points)")
+	return cmd
 }
 
 func checkRetrieval(baselineDir, latestDir string, tolerance float64) []string {

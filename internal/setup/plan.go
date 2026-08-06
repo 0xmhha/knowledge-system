@@ -55,9 +55,6 @@ type Options struct {
 	// --files-from, so the dataset scope is computed — not curated — and its
 	// provenance ships with the dataset.
 	FilelistConfig string
-	// FilelistBin is the filelist-gen CLI. Empty falls back to
-	// "filelist-gen" resolved on PATH.
-	FilelistBin string
 
 	// DomainKnowledge is a project's domain-knowledge directory (project.yaml,
 	// subsystems.yaml, entries/). When set, the plan re-derives the three
@@ -204,14 +201,16 @@ func BuildPlan(o Options) (Plan, error) {
 		}
 	}
 	if o.FilelistConfig != "" {
-		filelistBin := o.FilelistBin
-		if filelistBin == "" {
-			filelistBin = "filelist-gen"
+		// The filelist derivation is a cks subcommand too, so the same
+		// binary that orchestrates the build performs it.
+		cksBin := o.CksBin
+		if cksBin == "" {
+			cksBin = "cks"
 		}
 		steps = append(steps, Step{
 			ID:    "filelist-derive",
 			Title: "Derive the build-scope file list",
-			Cmd: []string{filelistBin,
+			Cmd: []string{cksBin, "filelist",
 				"--src", o.Src,
 				"--config", o.FilelistConfig,
 				"--out", o.FilesFromPath()},

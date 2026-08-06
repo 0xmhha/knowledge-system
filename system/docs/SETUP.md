@@ -4,7 +4,7 @@
 > 대체되었다 — `gen-cks-config.sh`/`cks.env` → `cks mcp gen-config` +
 > `print-mcp-config`(run/cks.yaml이 진실원), `cks-health.sh` → `cks.ops.health`
 > 툴/`GET /healthz`, `serve-cks-http.sh`/`cks-mcpd.sh` → `cks mcp up|down|status`,
-> `reindex-dataset.sh` → `knowledge-setup --version/--rollback`. 본문의 해당
+> `reindex-dataset.sh` → `cks setup --version/--rollback`. 본문의 해당
 > 스크립트 언급은 이 대체 경로로 읽을 것. 진입점은 `system/scripts/setup-all.sh`
 > (경로는 통합 레이아웃 기준으로 갱신됨).
 

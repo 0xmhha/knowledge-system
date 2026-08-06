@@ -62,14 +62,12 @@ else
 fi
 
 # ── 2. binaries (single consolidated module) ────────────────────────────────
-log "2. binaries (go build + make build-mcp)"
-go build -o bin/ckg  ./cmd/graph
-go build -o bin/ckv  ./cmd/vector
-go build -o bin/knowledge-setup ./cmd/knowledge-setup
+log "2. binaries (make build-dataset-bins + build-mcp)"
+make build-dataset-bins
 make build-mcp
 
 # ── 3. dataset (Go pipeline via the stablenet pack wrapper) ─────────────────
-log "3. dataset → $DATASET_OUT (knowledge-setup)"
+log "3. dataset → $DATASET_OUT (cks setup)"
 GSN_SRC="$GO_STABLENET_ROOT" OUT="$DATASET_OUT" SKIP_CKV="$SKIP_CKV" \
   "$KS_ROOT/projects/stablenet/scripts/build-dataset.sh"
 

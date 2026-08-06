@@ -26,7 +26,6 @@ type fileConfig struct {
 	VectorPolicy        string `yaml:"vector_policy"`
 	SkipVector          bool   `yaml:"skip_vector"`
 	Filelist            string `yaml:"filelist"`
-	FilelistBin         string `yaml:"filelist_bin"`
 	DomainKnowledge     string `yaml:"domain_knowledge"`
 	DerivedDir          string `yaml:"derived_dir"`
 	CodeRoot            string `yaml:"code_root"`
@@ -67,7 +66,6 @@ func LoadConfig(path string) (Options, error) {
 		VectorPolicy:        rel(fc.VectorPolicy),
 		SkipVector:          fc.SkipVector,
 		FilelistConfig:      rel(fc.Filelist),
-		FilelistBin:         fc.FilelistBin,
 		DomainKnowledge:     rel(fc.DomainKnowledge),
 		DerivedDir:          rel(fc.DerivedDir),
 		// CodeRoot points at a checkout outside the pack, so ${VAR} forms

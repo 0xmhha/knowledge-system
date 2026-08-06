@@ -95,7 +95,7 @@ rather than a silent gap.
 - Flags:
 
 ```
-filelist-gen --src <project root> --config <filelist.yaml> --out <files-from.json>
+cks filelist --src <project root> --config <filelist.yaml> --out <files-from.json>
              [-check]        # compare a fresh derivation against the existing
                              # --out content; exit 1 on any difference
              [-allow-dirty]  # permit a dirty tracked tree (recorded in provenance)

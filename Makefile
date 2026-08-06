@@ -84,15 +84,14 @@ clean:
 # valid after the consolidation.
 # ---------------------------------------------------------------------------
 
-# build-dataset-bins: every binary the project-pack dataset build shells out
-# to, in one place. The pack script names them explicitly rather than relying
-# on PATH, so a stale copy elsewhere cannot be picked up silently.
+# build-dataset-bins: the three engine binaries, one per engine. cks hosts
+# the dataset orchestrator (`cks setup`) and its whole toolchain; ckg/ckv
+# are resolved beside the cks binary at run time, so building all three
+# into bin/ is the complete dataset story.
 build-dataset-bins:
 	@mkdir -p bin
 	$(GO) build -o bin/ckg ./cmd/graph
 	$(GO) build -o bin/ckv ./cmd/vector
-	$(GO) build -o bin/knowledge-setup ./cmd/knowledge-setup
-	$(GO) build -o bin/filelist-gen ./cmd/filelist-gen
 	$(GO) build $(NS_LDFLAGS) -o bin/cks ./cmd/cks
 
 # sync-domain-artifacts: refresh the committed renderings of the domain

@@ -1,4 +1,4 @@
-package main
+package setupcli
 
 import (
 	"crypto/sha256"

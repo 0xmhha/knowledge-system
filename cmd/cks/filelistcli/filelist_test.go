@@ -1,4 +1,4 @@
-package main
+package filelistcli
 
 import (
 	"encoding/json"
