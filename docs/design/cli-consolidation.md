@@ -1,6 +1,8 @@
 # CLI consolidation: 17 binaries → 3 engine commands
 
-Status: ACCEPTED — 2026-08-05 (design review complete; open questions resolved)
+Status: IMPLEMENTED — 2026-08-07 (all three phases plus the §11 viewer
+amendment landed; pre/post behavioral equivalence verified by side-by-side
+execution against the pre-refactor baselines in both distributions)
 Owner: repo operators
 Scope: upstream-first change; applied to both knowledge-system and
 stablenet-knowledge-mcp in lockstep, like the pflag migration.

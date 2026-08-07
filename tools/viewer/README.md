@@ -2,7 +2,7 @@
 
 Next.js 15 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그래프 viewer.
 `output: 'export'`로 만들어진 정적 자산이 `ckg` Go 바이너리에 `go:embed`로 박혀,
-`ckg serve`가 `:8080`에서 백엔드(`/api/*`)와 함께 한 번에 serve.
+`cks viewer`가 `:8080`에서 대시보드를 serve하고 `/api/*`는 스폰된 `ckg api`로 proxy.
 
 > **첫 방문 시 이 문서부터 읽어라.** dev/prod 경로가 헷갈리기 쉽고,
 > `next.config.mjs`의 `trailingSlash`가 dev에서 backend와 충돌하므로
@@ -12,22 +12,23 @@ Next.js 15 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그�
 
 ## 1. 정상 경로 (Prod) — 가장 흔한 사용
 
-`make build-full`은 `make viewer`를 의존성으로 가져, viewer-next를 정적 export한 결과를
-`internal/server/web_assets/`로 복사한 뒤 Go 바이너리에 embed한다.
-즉 **`make build-full` 1회면 backend + viewer가 한 바이너리**에 들어간다.
-(`make build`는 Go 바이너리만 빌드하므로 embed된 viewer는 stub이다.)
+`make -C graph viewer`는 이 앱을 정적 export해
+`internal/system/viewer/web_assets/`로 복사하고, 이어지는 `make build-bins`가
+그 결과를 **cks 바이너리**에 embed한다 (대시보드는 합성 엔진 `cks viewer`가
+서빙; ckg는 API 전용). 자산 빌드 없이 `make build-bins`만 하면 embed된
+대시보드는 stub이다.
 
 ```bash
-# 0. 한 번만: ckg + viewer 한꺼번에 빌드
-make build-full
-# → ./bin/ckg
+# 0. 한 번만: 대시보드 자산 + 엔진 바이너리 빌드
+make -C graph viewer && make build-bins
+# → ./bin/ckg ./bin/ckv ./bin/cks
 
 # 1. 분석 대상 프로젝트의 그래프 생성
 ./bin/ckg build --src=/path/to/project --out=/path/to/graph-out
 # → /path/to/graph-out/graph.db + manifest.json
 
-# 2. viewer 열기 (backend + viewer 동시 serve)
-./bin/ckg serve --graph=/path/to/graph-out --open
+# 2. 대시보드 열기 (ckg api 백엔드를 자동 스폰)
+./bin/cks viewer --graph=/path/to/graph-out --open
 # → http://localhost:8080 자동 오픈
 ```
 
@@ -37,15 +38,15 @@ make build-full
 ./bin/ckg quickstart --src=/path/to/project --out=/tmp/graph --port=8080
 ```
 
-> **viewer를 수정했다면 반드시 `make build-full` 다시 실행.** 바이너리에 embed된
-> viewer는 컴파일 시점에 고정된다. ckg 코드는 그대로고 viewer만 수정한 경우엔
-> `make viewer && make build` 조합도 같은 결과를 더 빠르게 만든다.
+> **viewer를 수정했다면 `make -C graph viewer && make build-bins` 다시 실행.**
+> embed된 대시보드는 컴파일 시점에 고정된다. 개발 루프에서는
+> `CKS_DEV_VIEWER_DIR`로 디스크 오버레이를 쓰면 재빌드 없이 리로드된다.
 
 ---
 
 ## 2. Dev — viewer만 빠르게 반복 (권장)
 
-`CKG_DEV_VIEWER_DIR` 환경변수가 set되면, ckg는 embed된 viewer 대신
+`CKS_DEV_VIEWER_DIR` 환경변수가 set되면, cks는 embed된 대시보드 대신
 그 디렉토리의 정적 파일을 serve. 즉 **`ckg` 바이너리 재컴파일 없이도**
 viewer 변경분을 확인할 수 있다.
 
@@ -55,8 +56,8 @@ cd tools/viewer && npm install
 
 # 매 수정 사이클
 cd tools/viewer && npm run build       # 약 3~5s
-CKG_DEV_VIEWER_DIR=$(pwd)/tools/viewer/out \
-  ./bin/ckg serve --graph=/path/to/graph-out --open
+CKS_DEV_VIEWER_DIR=$(pwd)/tools/viewer/out \
+  ./bin/cks viewer --graph=/path/to/graph-out --open
 ```
 
 `trailingSlash` 충돌 없음 (Next dev 서버를 거치지 않으므로). 풀 hot reload는
@@ -67,11 +68,11 @@ CKG_DEV_VIEWER_DIR=$(pwd)/tools/viewer/out \
 ## 3. Dev — Next hot reload (실험적, 비권장)
 
 Next dev 서버의 hot reload를 쓰고 싶을 때. `npm run dev`로 :3001을 띄우고,
-`/api/*`는 `:8080`의 `ckg serve --no-viewer`로 proxy.
+`/api/*`는 `:8080`의 `ckg api`로 proxy.
 
 ```bash
 # Term 1
-./bin/ckg serve --graph=/path/to/graph-out --no-viewer --port=8080
+./bin/ckg api --graph=/path/to/graph-out --port=8080
 
 # Term 2
 cd tools/viewer && npm run dev   # :3001
@@ -84,7 +85,7 @@ cd tools/viewer && npm run dev   # :3001
   충돌해 `:8080`의 Go backend가 404를 반환(`/api/manifest/` → 404,
   `/api/manifest` → 200). NODE_ENV 분기로 dev에서 끄는 시도도 redirect loop가
   남아 미해결.
-- 위 문제 풀기 전엔 §2의 `CKG_DEV_VIEWER_DIR` 경로를 권장.
+- 위 문제 풀기 전엔 §2의 `CKS_DEV_VIEWER_DIR` 경로를 권장.
 
 ---
 
@@ -97,7 +98,7 @@ cd tools/viewer && npm run dev   # :3001
 | 200 OK | `static` | `StaticAPI` — `chunks/*.json`을 fetch |
 | 그 외 | `serve` | `API` — `/api/*` REST 호출 |
 
-- **`ckg serve`** → manifest는 `/api/manifest`로만 제공 → `./manifest.json` 404 → **serve mode**
+- **`cks viewer`** → manifest는 `/api/manifest`(proxy)로만 제공 → `./manifest.json` 404 → **serve mode**
 - **`ckg export-static`** → 정적 dir 루트에 `manifest.json` 둠 → **static mode**
 
 즉 viewer 코드는 두 모드를 모두 지원하지만, 각 모드는 데이터를 다르게 fetch한다.
@@ -132,8 +133,8 @@ npm run test:smoke    # Playwright 스모크
 production 통합 검증:
 
 ```bash
-make build-full
-./bin/ckg serve --graph=/some/graph-out --open
+make -C graph viewer && make build-bins
+./bin/cks viewer --graph=/some/graph-out --open
 ```
 
 ---
@@ -142,9 +143,9 @@ make build-full
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| viewer를 고쳤는데 화면이 그대로 | embed된 viewer는 컴파일 시점에 고정 | `make build-full` 다시 / 또는 §2 `CKG_DEV_VIEWER_DIR` |
-| `npm run dev`에서 `/api/* → 500` | backend(ckg serve) 안 떠 있음 또는 trailingSlash 충돌 | §2 경로로 전환 권장 |
-| `ckg serve` 후 빈 캔버스 | `--graph` 디렉토리에 `graph.db` 없음 | `ckg build`부터 |
+| viewer를 고쳤는데 화면이 그대로 | embed된 viewer는 컴파일 시점에 고정 | `make -C graph viewer && make build-bins` 다시 / 또는 §2 `CKS_DEV_VIEWER_DIR` |
+| `npm run dev`에서 `/api/* → 500` | backend(ckg api) 안 떠 있음 또는 trailingSlash 충돌 | §2 경로로 전환 권장 |
+| `cks viewer` 후 빈 캔버스 | `--graph` 디렉토리에 `graph.db` 없음 | `ckg build`부터 |
 | "1 Issue" 좌하단 빨간 배지 | `/api/*` 호출 실패 (manifest/edges/nodes 중 하나) | 콘솔 / 서버 로그 확인 |
 | `ERR_TOO_MANY_REDIRECTS` on `/api/*` | Next dev + trailingSlash 처리 충돌 | §2로 전환 |
 | `THREE.WARNING: Multiple instances` | `react-force-graph-3d`가 자체 three.js 번들. 무시 가능 | — |
@@ -170,6 +171,6 @@ redraw 강제 필요라 별도 라운드.
 ## 9. 다음에 헷갈리지 않으려면
 
 - "viewer 안 켜져요" → §1 또는 §2.
-- "viewer 수정했는데 안 보여요" → §1 또는 §2의 `CKG_DEV_VIEWER_DIR`. 절대 §3 먼저 시도하지 말 것.
+- "viewer 수정했는데 안 보여요" → §1 또는 §2의 `CKS_DEV_VIEWER_DIR`. 절대 §3 먼저 시도하지 말 것.
 - "데이터가 안 보여요" → `ckg build`로 `graph.db`가 진짜 생겼는지 + `--graph` 경로가 맞는지부터.
 - "정적 export로 배포" → `ckg export-static --graph=X --out=Y` 후 Y를 정적 호스팅.

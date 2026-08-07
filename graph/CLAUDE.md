@@ -18,7 +18,7 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 
 | Task | Command | Notes |
 |---|---|---|
-| Build (ckg only, default) | `make build` | Go binary only; embedded viewer stays the stub. `build-no-viewer` is a back-compat alias |
+| Build (ckg only, default) | `make build` | Go binary only (API-only engine; the dashboard embed lives with cks). `build-no-viewer` is a back-compat alias |
 | Build the dashboard | `make -C graph viewer` then `make -C .. build-bins` | Next.js build lands in internal/system/viewer/web_assets; `cks viewer` serves it |
 | Test | `make test` (= `go test ./...`) | |
 | Test + race + coverage | `make test-race` | what to run before claiming concurrency-safe |
