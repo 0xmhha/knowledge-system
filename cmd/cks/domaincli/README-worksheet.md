@@ -6,7 +6,7 @@ entry, plus a shared session header and a post-session sync footer.
 
 The worksheet is the input artifact for the **substantive** half of
 the verification checklist in
-`docs/domain-knowledge/shared/STATUS_LIFECYCLE.md`. The **mechanical**
+`system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md`. The **mechanical**
 half is assumed already-passing — run `cks domain check` first and
 confirm `0 errors` before generating the worksheet.
 

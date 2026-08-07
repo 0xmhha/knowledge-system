@@ -19,7 +19,7 @@ chain *is* the answer to "what's the current decision and why".
    `Deprecated`.
 4. **Ground truth for "is it done?"** is code + git, not the ADR. The ADR
    records the *decision*, status reports (Tier 3) record *implementation state*.
-5. Register every new ADR in the index below and in `docs/DOC-MAP.md`.
+5. Register every new ADR in the index below and in `docs/graph/DOC-MAP.md`.
 
 ## Template
 

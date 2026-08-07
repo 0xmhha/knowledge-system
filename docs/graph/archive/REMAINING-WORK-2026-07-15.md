@@ -1,6 +1,6 @@
 # CKG 남은 작업 — 문서 vs 코드 대조 (2026-07-15)
 
-> **ARCHIVED 2026-07-15 — 잔여 없음.** CKG 코드 작업이 모두 완료되어(B1/B2/B3, A1/A2) 이 추적 문서의 목적이 끝났다. 남은 선택/타세션 항목(C1 canonical_id 커버리지 defer, D1 CKV 재정렬, D2 coding-agent D-5, D3 ckv/cks 은퇴)은 `docs/CONTINUITY.md`에 승계. Provenance용 보존.
+> **ARCHIVED 2026-07-15 — 잔여 없음.** CKG 코드 작업이 모두 완료되어(B1/B2/B3, A1/A2) 이 추적 문서의 목적이 끝났다. 남은 선택/타세션 항목(C1 canonical_id 커버리지 defer, D1 CKV 재정렬, D2 coding-agent D-5, D3 ckv/cks 은퇴)은 `docs/graph/CONTINUITY.md`에 승계. Provenance용 보존.
 
 > Tier 3 (dated snapshot). 상태 문서를 **코드+git에 대조**해 실제 미완료·오류만 추린
 > 목록. 근거는 `file:line`/commit으로 인용 — 다음 세션이 재검증 없이 신뢰할 수 있게.
@@ -23,8 +23,8 @@
 | # | 07-11 문서 주장 | 코드 실제 (근거) | 판정 |
 |---|---|---|---|
 | A1 | **B1** Korean/CJK graceful degradation **미테스트** (P1) | ✅ `TestSearchFTS_KoreanInput_GracefulEmpty` + `TestSearchFTS_KoreanMixed_ExtractsAsciiToken` (`internal/persist/search_mode_test.go:203,236`), 랜딩 `75aeb60` (07-11 문서보다 먼저). 통과 확인 | **완료** |
-| A2 | **B3** `internal/mcp`→`pkg/mcphandlers` shim 이전 (T-14b) 열림 | ✅ `85f6705` "remove internal/mcp handler duplication, single-source pkg/mcphandlers (T-14b)". 현재 `internal/mcp/` = `server.go`+`bench.go`만, 중복 핸들러 0 | **완료** |
-| A3 | (07-11이 이미 정정) awaits/overrides 방출 | ✅ `internal/parse/typescript/declarations.go`(awaits), `internal/parse/solidity/resolve.go`(overrides) | 완료 확인 |
+| A2 | **B3** `internal/graph/mcp`→`pkg/graph/mcphandlers` shim 이전 (T-14b) 열림 | ✅ `85f6705` "remove internal/mcp handler duplication, single-source pkg/mcphandlers (T-14b)". 현재 `internal/graph/mcp` = `server.go`+`bench.go`만, 중복 핸들러 0 | **완료** |
+| A3 | (07-11이 이미 정정) awaits/overrides 방출 | ✅ `internal/graph/parse/typescript/declarations.go`(awaits), `internal/graph/parse/solidity/resolve.go`(overrides) | 완료 확인 |
 
 ## B. 실제 미완료 (코드로 확인된 열린 항목)
 
@@ -50,8 +50,8 @@
 
 ## E. 검증된 정상 (오류 아님 — 참고)
 
-- **schema 1.23**: `internal/buildpipe/cache.go` = `docs/SCHEMA.md` 일치.
-- **graph_digest 공표**: `internal/buildpipe/graph_digest.go`; 정본 pr-77-2 digest `4be26516…`
+- **schema 1.23**: `internal/graph/buildpipe/cache.go` = `docs/graph/SCHEMA.md` 일치.
+- **graph_digest 공표**: `internal/graph/buildpipe/graph_digest.go`; 정본 pr-77-2 digest `4be26516…`
   (2회 cold 재빌드 동일). manifest json + in-db row 양쪽 기록.
 - **cold rebuild 원자성**: `graph.db.building` → `os.Rename` (`pipeline.go`).
 - **재현 빌드 표준화(#55)**: `scripts/index-project.sh` — `MAIN_PKG`로 바이너리 도달 코드만

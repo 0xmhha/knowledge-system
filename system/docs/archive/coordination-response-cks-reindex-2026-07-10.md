@@ -4,7 +4,7 @@
 
 > Tier 3 (dated snapshot). CKV의 크로스-repo 설계
 > `code-knowledge-vector/docs/reindex-migration-design-2026-07-10.md`가 CKS에 요청한
-> 4개 결정에 대한 회신. 근거 = cks 코드 현실(`internal/mcp/ops_index.go`,
+> 4개 결정에 대한 회신. 근거 = cks 코드 현실(`internal/system/mcp/ops_index.go`,
 > `scripts/{serve-cks-http.sh,build-stablenet-dataset.sh,gen-cks-config.sh}`,
 > 재시작 비용 실측, 기존 fail-loud 전례). 관련: `remaining-work-2026-07-10.md`(E1/E2).
 
@@ -88,7 +88,7 @@
 
 1. **P1 동참**: 데이터셋 버전 디렉터리 이관(=E2 해소), config/serve가 버전 경로 소비 +
    health에 resolved 버전 노출.
-2. **P2 게이트 재사용**: 기존 B7 라이브 fixture(`internal/ckgclient/b7_join_live_test.go`,
+2. **P2 게이트 재사용**: 기존 B7 라이브 fixture(`internal/system/ckgclient/b7_join_live_test.go`,
    canonical 매칭률 ≥90%)를 promote 검증 게이트로 재사용.
 3. **Q4 구현**: 기동 시 alignment assert + health `alignment` 블록.
 4. **P5(수정안)**: 인스턴스 blue-green 절차 문서화(serve-cks-http.sh 기반).

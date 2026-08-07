@@ -6,7 +6,7 @@
 > - `internal/eval/{runner,baseline,llm,llm_cli,task,score,report}.go`
 > - `eval/tasks/synthetic-T01-find-callers.yaml`, `synthetic-T02-rubric-deposit.yaml`
 >
-> **선행 문서**: `docs/EVAL.md`(사용법), `docs/analysis/MCP-QUERY-FLOW.md` § 6.2 (smart context 비대칭)
+> **선행 문서**: `docs/graph/EVAL.md`(사용법), `docs/analysis/MCP-QUERY-FLOW.md` § 6.2 (smart context 비대칭)
 > **마지막 갱신**: 2026-05-05
 
 > ⚠️ **Honest assessment**: Eval은 **V0 simplification이 다수 존재**합니다. γ baseline은 사실상 단일 LLM 호출(tool loop 없음), δ는 MCP의 진짜 smart context를 호출하지 않고 단순 SearchFTS 10건 덤프, β는 `seed=""` `depth=99`로 graph 전체를 dump합니다. 가설 H1(δ ≤ 50% α tokens) / H2(δ score ≥ α score)는 **현재 구현에서 수치적으로 의미 있는 검증을 하기 어렵습니다**. 본 문서는 이를 § 5에서 분명히 합니다.
@@ -277,7 +277,7 @@ for each rubric item:
 
 ### 5.1 가설 H1/H2의 실험 설계 문제
 
-`docs/EVAL.md`의 가설:
+`docs/graph/EVAL.md`의 가설:
 - **H1**: δ ≤ 50% of α tokens
 - **H2**: δ score ≥ α score (no regression)
 

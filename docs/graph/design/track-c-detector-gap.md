@@ -10,7 +10,7 @@
 > priority. Diagnosis only — no implementation.
 >
 > Reference snapshot: 22 distinct edge types observed; 6 edge types defined in
-> `pkg/types/enums.go` + `web/viewer-next/src/lib/edges.ts:GRAPH_GROUPS` are
+> `pkg/graph/types/enums.go` + `web/viewer-next/src/lib/edges.ts:GRAPH_GROUPS` are
 > entirely absent (`invokes`, `cancellation_path`, `rpc_calls`,
 > `handles_message`, `uses_type`, `instantiates`).
 >
@@ -122,7 +122,7 @@
 ### 2.4 `extends` (G2) — P2
 
 - **Current state**: 2 edges (interface embedding only, both in
-  `internal/persist/store_interface.go`: `Store extends StoreReader`,
+  `internal/graph/persist/store_interface.go`: `Store extends StoreReader`,
   `Store extends StoreWriter`).
 - **Detector status (Go)**: OK. `implements.go:172-198` walks
   `iface.NumEmbeddeds()` for every interface and emits the extend edge.
@@ -308,15 +308,15 @@ fixture content; no detector issue.
 - Group/style mapping: `web/viewer-next/src/lib/edges.ts:29-198`
 - Self-graph DB: `/tmp/ckg-self/graph.db` (snapshot)
 - Detector files (Go):
-  - `internal/parse/golang/declarations.go` — visitor entry
-  - `internal/parse/golang/statements.go` — body walk (calls, channels, spawns)
-  - `internal/parse/golang/concurrency.go` — Mutex nodes + lock edges
-  - `internal/parse/golang/concurrency_underlock.go` — accessed_under_lock
-  - `internal/parse/golang/distributed.go` — listens_on / handles_message / rpc_calls
-  - `internal/parse/golang/context_paths.go` — timeout_path / cancellation_path
-  - `internal/parse/golang/implements.go` — implements / extends post-pass
-- Detector files (TS): `internal/parse/typescript/queries.go`,
-  `internal/parse/typescript/declarations.go`
-- Detector files (Sol): `internal/parse/solidity/queries.go`,
-  `internal/parse/solidity/declarations.go`
-- Cross-language link: `internal/link/xlang.go`
+  - `internal/graph/parse/golang/declarations.go` — visitor entry
+  - `internal/graph/parse/golang/statements.go` — body walk (calls, channels, spawns)
+  - `internal/graph/parse/golang/concurrency.go` — Mutex nodes + lock edges
+  - `internal/graph/parse/golang/concurrency_underlock.go` — accessed_under_lock
+  - `internal/graph/parse/golang/distributed.go` — listens_on / handles_message / rpc_calls
+  - `internal/graph/parse/golang/context_paths.go` — timeout_path / cancellation_path
+  - `internal/graph/parse/golang/implements.go` — implements / extends post-pass
+- Detector files (TS): `internal/graph/parse/typescript/queries.go`,
+  `internal/graph/parse/typescript/declarations.go`
+- Detector files (Sol): `internal/graph/parse/solidity/queries.go`,
+  `internal/graph/parse/solidity/declarations.go`
+- Cross-language link: `internal/graph/link/xlang.go`

@@ -1,6 +1,6 @@
 # CKG 회신 — 재인덱싱·DB마이그레이션·무중단 설계 검토 (2026-07-10)
 
-> **ARCHIVED 2026-07-15 — 협의 종결 + 구현 완료.** Q1/Q2/Q6는 #53에서 구현(graph_digest는 `internal/buildpipe/graph_digest.go`·SCHEMA·manifest에 반영), Q3/Q4/Q5는 기충족. 3자 협의 종료. Provenance용 보존.
+> **ARCHIVED 2026-07-15 — 협의 종결 + 구현 완료.** Q1/Q2/Q6는 #53에서 구현(graph_digest는 `internal/graph/buildpipe/graph_digest.go`·SCHEMA·manifest에 반영), Q3/Q4/Q5는 기충족. 3자 협의 종료. Provenance용 보존.
 
 > Tier 3 (dated). CKV의 "재인덱싱·DB마이그레이션·무중단 설계 검토 요청"(6문항)에
 > CKG가 **코드 대조**로 회신. Ground truth = code + git. 관련: ADR-0002(결정성),
@@ -52,7 +52,7 @@
 - `validateAndSanitize`가 **cold·incremental 양 경로** 실행(`pipeline.go:59/72/85/98/369`,
   `incremental.go:229`); `StrictValidate`로 dangling edge fail-build.
 - **FK CASCADE** schema 내장(edges/blobs/pkg_tree/pending_refs).
-- **count parity**: `internal/audit` + `ckg audit` 명령이 `BuildCount vs DBCount` +
+- **count parity**: `internal/graph/audit` + `ckg audit` 명령이 `BuildCount vs DBCount` +
   `InBuildOnly`(누락=버그)/`InDBOnly` 리포트, `Report.IsParity()`(`internal/audit/audit.go:34`);
   `make audit` CI exit 0/1/2. manifest에 `parse_errors_count`/`unresolved_refs_count`도 노출.
 - 판정: 게이트 **이미 다 있음**. "노출" 표면 = `ckg audit --json` + manifest 카운트. 구현 불요,
@@ -91,8 +91,8 @@
 ## 후속 (CKG action items) — ✅ Q1·Q2·Q6 구현 완료 (2026-07-10)
 
 1. **Q6 ✅**: `incremental.go` 헤더 주석 정정(C1 랜딩 반영) + "정본 그래프=cold" 계약 명문화.
-2. **Q1 ✅**: `ComputeGraphDigest`(`internal/buildpipe/graph_digest.go`, §① 정의) →
-   `manifest.GraphDigest`(omitempty, `internal/persist/manifest.go`), `buildManifestSkeleton`에서
+2. **Q1 ✅**: `ComputeGraphDigest`(`internal/graph/buildpipe/graph_digest.go`, §① 정의) →
+   `manifest.GraphDigest`(omitempty, `internal/graph/persist/manifest.go`), `buildManifestSkeleton`에서
    산출(cold·incremental 공유). node/edge count는 `Stats`에 기존 노출. **manifest SchemaVersion
    bump 없음**(additive). 테스트: 결정성/파생-메트릭 제외/temporal 제외/identity 민감(`graph_digest_test.go`).
    실증: go-stablenet(pr-77-2 스코프) 재빌드 2회 동일 digest.
@@ -106,7 +106,7 @@
 CKV `ReadCoords`는 `graph_digest`를 **graph.db 안 manifest 테이블**에서 읽는다
 (`SELECT value FROM manifest WHERE key='graph_digest'`). 초기 구현은 struct+manifest.json만
 채웠으므로 in-db row가 없었음 → `SetManifest` row 목록 + `GetManifest` 재조립에 `graph_digest`
-추가(`internal/persist/manifest.go`), round-trip 테스트로 잠금. **CKV 정확 쿼리로 반환 확인.**
+추가(`internal/graph/persist/manifest.go`), round-trip 테스트로 잠금. **CKV 정확 쿼리로 반환 확인.**
 
 ## 정본 그래프 공표 (digest 포함, CKV end-to-end 요구 #3, 2026-07-10)
 
@@ -140,7 +140,7 @@ P1 착수 요청 + 2개 확정 질문. 아래가 CKG 확정안 — **구현은 �
 
 - **Node line** (canonical_id 보유 여부 무관, 전 노드): `id \t canonical_id \t type \t
   qualified_name \t file_path \t start_line \t end_line`. **`id` 오름차순 정렬.**
-  (`id = sha256(qname|lang|startByte)[:16]`, `internal/parse/idgen.go` — 핀 소스에서 결정적.)
+  (`id = sha256(qname|lang|startByte)[:16]`, `internal/graph/parse/idgen.go` — 핀 소스에서 결정적.)
 - **Edge line**: `type \t src_id \t dst_id \t line` — 그래프의 **정본 edge 식별자
   `(Type,Src,Dst,Line)`**(`internal/graph/builder.go:17,27` dedup 키) 사용. 정확 중복 접어서
   **튜플 사전순 정렬.**

@@ -25,7 +25,7 @@ ckg 의 현 작업 (5/11 HANDOFF + 5/19~5/23 cycle 6/7/8 + T-04 V0~V3) 은
 
 1. **PR-aware 옵션 A** — symbol-level PR breadcrumb (사용자 명시 5/22, ckv §10.5)
 2. **Stage B 평가** — ckv fixture 12 개의 ckg-side mirror (사용자 명시 "작은 단위부터 검증")
-3. **Public surface 정리** — T-14 의 `pkg/mcphandlers/` + ckg-NEW-4 의 PR accessor (cks import 차단 해소)
+3. **Public surface 정리** — T-14 의 `pkg/graph/mcphandlers` + ckg-NEW-4 의 PR accessor (cks import 차단 해소)
 4. **한국어 query 토크나이저 검증** — cycle 6 의 Hangul separator 는 *답변 파싱*용. *FTS5 / qname matching* 측은 별도 검증 필요
 5. **CKG-3 cross-snapshot 재평가** — cks fixture 12 개가 *base_sha → head_sha* 시간축을 명시적 활용. 보류 사유 (cks 시나리오 부재) 해소됨
 
@@ -68,7 +68,7 @@ cks 통합 세션 (2026-05-22) 에서 추가한 요구:
 | Hallucination 자동 측정 | T-04 V0~V3 진행 중 | 30-question 셋 측정 미실시 | **T-04 V4** (기존 진행) |
 | Cross-snapshot 검색 | CKG-3 보류 (cks 시나리오 부재) | cks fixture 12 개가 base_sha → head_sha 명시 사용 | **ckg-NEW-7** (CKG-3 재평가) |
 | Citation accuracy KPI | §11 100% 측정 ✅ | stable-net 12 fixture 측정 미실시 | **ckg-NEW-5** 와 동시 |
-| EvidencePack 표면 | `pkg/smartctx`, `pkg/evidence` | S1 (cks) 이관 결정 (EXECUTION §2) | 유지 — 이관 시 deprecate-friendly |
+| EvidencePack 표면 | `pkg/graph/smartctx`, `pkg/graph/evidence` | S1 (cks) 이관 결정 (EXECUTION §2) | 유지 — 이관 시 deprecate-friendly |
 
 ---
 
@@ -81,7 +81,7 @@ HANDOFF.md T-* 외에 다음 작업이 *cks 통합 + 사용자 R9~R13 충족*에
 | **ckg-NEW-1** | 한국어 query 토크나이저 검증 (FTS5 + qname matcher) — 깨지지 않는 graceful degradation 보장 | R9 | ~80 | 없음 | P1 |
 | **ckg-NEW-2** | `pkg/store.Node` 에 `RecentPRs []PRRef` 메타 추가 — symbol-level PR breadcrumb 데이터 | R12 (A 옵션) | ~120 | 없음 | P0 |
 | **ckg-NEW-3** | Temporal slicing — `Node.RecentPRsBefore(cutoff time.Time) []PRRef` | R12 (leakage 방지) | ~50 | NEW-2 | P0 |
-| **ckg-NEW-4** | `pkg/store` public accessor for PR breadcrumb — cks 가 wrap 할 형태 | C2/C4 (cks fusion) | ~50 | NEW-2 | P0 |
+| **ckg-NEW-4** | `pkg/graph/store` public accessor for PR breadcrumb — cks 가 wrap 할 형태 | C2/C4 (cks fusion) | ~50 | NEW-2 | P0 |
 | **ckg-NEW-5** | ckv fixture 12 개의 ckg-side mirror — Stage B 평가 task YAML | R10 | YAML 만 | T-04 V4 | P0 |
 | **ckg-NEW-6** | qname canonical helper 사용 가이드 (cks wrap 시 정확 호출 패턴 문서) | R10 | docs 만 | 없음 | P1 |
 | **ckg-NEW-7** | CKG-3 cross-snapshot 정책 재평가 (cks 시나리오 도착) | R12 (시간축) | 결정 | NEW-3 | P1 |
@@ -318,7 +318,7 @@ cks 가 Stage C 에서 사용할 ckg-side baseline:
 ## 5. T-14 (pkg/mcphandlers) 와 ckg-NEW-2~4/9 동시 진행 권장
 
 HANDOFF.md T-14 의 본질: ckg 의 MCP 핸들러 코드를 외부 (cks repo) 에서 import 가능
-하도록 `pkg/mcphandlers/` 신설. **cks S1 진입 차단 요소**.
+하도록 `pkg/graph/mcphandlers` 신설. **cks S1 진입 차단 요소**.
 
 본 세션이 추가한 작업도 같은 영역:
 - ckg-NEW-2: `pkg/types.Node` 확장 (RecentPRs 필드)
@@ -394,7 +394,7 @@ base_sha 사용 → 동일 graph snapshot 위에서 측정).
 → **권장**: 옵션 C. 단 외부 orchestration (옵션 A) 으로도 fixture eval 충분히 가능
 하므로 우선순위는 P1 로.
 
-### 7.3 viewer-next dirty 파일 (`internal/server/api.go`, `web/viewer-next/...`)
+### 7.3 viewer-next dirty 파일 (`internal/graph/server/api.go`, `web/viewer-next/...`)
 
 본 세션 이전 작업의 잔여. eval 작업과 *별개*. 사용자 결정 필요:
 - A. 그대로 commit (UI 변경 + screenshot 정리)

@@ -4,15 +4,15 @@
 
 > Tier 3 (dated snapshot). CKG 세션이 CKV의
 > `code-knowledge-vector/docs/coordination-prompts-2026-06-29.md` §1(→ CKG)에
-> 회신한 내용의 CKG 측 사본. 권위: `docs/adr/0001-canonical-symbol-id.md`(why),
-> `docs/SCHEMA.md`(현재 schema **1.22**), 코드+git(현재 사실). CKV 문서에는
+> 회신한 내용의 CKG 측 사본. 권위: `docs/graph/adr/0001-canonical-symbol-id.md`(why),
+> `docs/graph/SCHEMA.md`(현재 schema **1.22**), 코드+git(현재 사실). CKV 문서에는
 > §1-R로 동일 내용이 반영됐고, 그쪽의 `>= 1.16` 게이팅 오류도 함께 정정했다.
 
 ## 핵심 정정 (CKV가 반드시 반영해야 할 사실 오류)
 
 CKV 문서가 canonical_id population 게이트를 **`schema >= 1.16`**으로 적었으나
 **틀렸다.** 컬럼은 SQL schema 1.16에 추가되지만 *값*은 cache `SchemaVersion`
-**>= 1.19**로 재빌드한 그래프에서만 채워진다 (`internal/buildpipe/cache.go`:
+**>= 1.19**로 재빌드한 그래프에서만 채워진다 (`internal/graph/buildpipe/cache.go`:
 "pre-1.19 DBs carry it empty, so the cache-key flip forces a cold rebuild to
 repopulate canonical_id graph-wide"). CKV의 PRAGMA 컬럼-존재 probe는 1.16~1.18
 그래프를 통과시키지만 값은 NULL → 그 NULL을 join key로 쓰면 silent 실패.
@@ -20,8 +20,8 @@ repopulate canonical_id graph-wide"). CKV의 PRAGMA 컬럼-존재 probe는 1.16~
 스키마(**1.22**)로 reindex된 그래프에만 정렬. 컬럼 probe는 필요조건일 뿐.
 
 ## Q1 — 스키마 / population
-- 현재 cache `SchemaVersion` = **1.22** (`internal/buildpipe/cache.go`). canonical_id
-  컬럼 존재 ✅ (`internal/persist/schema.sql`).
+- 현재 cache `SchemaVersion` = **1.22** (`internal/graph/buildpipe/cache.go`). canonical_id
+  컬럼 존재 ✅ (`internal/graph/persist/schema.sql`).
 - **모든 노드에 채워지지 않음 — 의도된 설계.** 심볼 노드(Function/Method/Struct/
   Field/Constant/패키지레벨 const·var) = 100%. 비심볼 노드(CallSite·IfStmt·Loop·
   Return·Switch·AwaitPoint, git Commit·Hunk)는 의도적 공백(심볼 아님). "빈 비율"은
@@ -31,10 +31,10 @@ repopulate canonical_id graph-wide"). CKV의 PRAGMA 컬럼-존재 probe는 1.16~
 
 ## Q2 — 안정성
 - canonical_id는 해시도 positional도 아니다. 의미 기반: Go = `<importpath>.(*Recv).Method`
-  (go/types 유래, `internal/parse/golang/declarations.go` `goCanonicalID`), sol/ts/proto =
+  (go/types 유래, `internal/graph/parse/golang/declarations.go` `goCanonicalID`), sol/ts/proto =
   `<relpath>:<qname>` (Solidity는 오버로드용 `(paramTypes)` 추가).
 - **rebuild·라인 이동에도 불변**(유일 케이스). **예외**: 같은 파일 내 동일 id 중복 시
-  `@<line>` 접미사(refinement B3, `internal/buildpipe/language_runners.go`
+  `@<line>` 접미사(refinement B3, `internal/graph/buildpipe/language_runners.go`
   `lineQualifyDuplicateCanonicalIDs`) — 이 접미사만 위치 의존. positional인 것은 별개의
   **node ID** = `sha256(qname|lang|startByte)`.
 
@@ -46,7 +46,7 @@ repopulate canonical_id graph-wide"). CKV의 PRAGMA 컬럼-존재 probe는 1.16~
 
 ## Q4 — BM25 corpus (D4)
 - **소유권 확인 ✅.** CKG가 BM25 소유: `pkg/bm25`(Okapi+tokenizer) + FTS5 인덱스
-  (`internal/persist/sqlite_fts.go`) + evidence/hunk corpus(`pkg/evidence`). ADR-003의
+  (`internal/graph/persist/sqlite_fts.go`) + evidence/hunk corpus(`pkg/graph/evidence`). ADR-003의
   "BM25=CKG / CKV=vector-only / CKS=RRF"와 일치.
 - ⚠️ **정정(코드 확인 2026-06-29): D4 핵심 목표 이미 충족 — 코드 변경 없이 종결.** `nodes_fts`
   FTS5(`schema.sql`)가 `name, qualified_name, signature, doc_comment, search_tokens` 5컬럼 전부
@@ -70,7 +70,7 @@ repopulate canonical_id graph-wide"). CKV의 PRAGMA 컬럼-존재 probe는 1.16~
    5컬럼 인덱싱으로 키워드 corpus에 포함(PR #40 입증). 추가 작업 불요 — 위 Q4 정정 참조.
 3. integration fixture를 양측 합의로 추가(≥1.19 게이트 + `@<line>` 중복 케이스 포함).
    - **CKG 半 완료(2026-06-29):** `TestCanonicalID_IntegrationContract_DeterministicAndAlignable`
-     (`internal/parse/golang/canonical_integration_test.go`)가 join 계약의 CKG 쪽을 잠근다 —
+     (`internal/graph/parse/golang/canonical_integration_test.go`)가 join 계약의 CKG 쪽을 잠근다 —
      (a) **결정성**: 동일 소스 재빌드 시 canonical_id가 qname·(file,line) 양쪽으로 동일,
      (b) **정렬 전제조건**: canonical_id 보유 노드는 모두 ckgalign이 쓰는 (FilePath,StartLine,
      EndLine) 위치를 동반. `@<line>` 중복은 기존 `TestLineQualifyDuplicateCanonicalIDs`(buildpipe)가,

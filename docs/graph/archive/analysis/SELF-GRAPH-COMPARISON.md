@@ -54,13 +54,13 @@ server.Server.handleSearch      →  http:GET /api/search
 | `pkg/bm25/scorer.go` | ✅ | Scorer interface |
 | `pkg/bm25/tokenize.go` | ✅ | 코드 식별자 토크나이저 |
 | `pkg/bm25/scorer_test.go` | ✅ | |
-| `pkg/smartctx/smartctx.go` | ✅ | eval ↔ MCP 통일 진입점 |
-| `internal/validate/validator.go` | ✅ | Validator interface |
-| `internal/validate/schema.go` | ✅ | SchemaValidator |
-| `internal/validate/llm.go` | ✅ | LLMValidator skeleton |
-| `internal/validate/schema_test.go` | ✅ | |
-| `internal/filterlist/filterlist.go` | ✅ | --files-from JSON 파서 + glob |
-| `internal/filterlist/filterlist_test.go` | ✅ | |
+| `pkg/graph/smartctx/smartctx.go` | ✅ | eval ↔ MCP 통일 진입점 |
+| `internal/graph/validate/validator.go` | ✅ | Validator interface |
+| `internal/graph/validate/schema.go` | ✅ | SchemaValidator |
+| `internal/graph/validate/llm.go` | ✅ | LLMValidator skeleton |
+| `internal/graph/validate/schema_test.go` | ✅ | |
+| `internal/graph/filterlist/filterlist.go` | ✅ | --files-from JSON 파서 + glob |
+| `internal/graph/filterlist/filterlist_test.go` | ✅ | |
 
 ## G4 (Concurrency) — production code emit
 
@@ -84,15 +84,15 @@ T1-A의 parallel parser + single-writer channel writer 도입으로 production �
 
 | Commit | 작업 | 결과물 | 검증 |
 |---|---|---|---|
-| `b4d76b8` | graph: Inspect/Sanitize lenient API | `internal/graph/validate.go` | ValidationReport, dangling 수집 |
+| `b4d76b8` | graph: Inspect/Sanitize lenient API | `internal/graph/graph/validate.go` | ValidationReport, dangling 수집 |
 | `0f1d258` | persist: AllNodes/AllEdges | `store_interface.go`, `sqlite.go`, `postgres_store.go` | 두 backend + mock |
 | `acffad2` | T1-A parallel parser + channel writer | `language_runners.go:parseConcurrent`, Sol abiMu | -race 통과, Mutex/Channel/Goroutine emit |
 | `6487e10` | T1-C: pkg/bm25 Okapi BM25 | `pkg/bm25/` 4 files | 8 unit tests, bleve+rank_bm25 cross-check |
-| `46216e8` | P0-3+P0-4+P0-2: smartctx 통일 + real BM25 + Citation | `pkg/smartctx/`, mcp/eval rewrite | metadata.warnings, file:line on every body/summary |
-| `169301f` | T1-B: Validator interface + Schema/LLM | `internal/validate/` 4 files | 4 unit tests |
-| `431ff20` | P0-5 part 1: filterlist package | `internal/filterlist/` | 6 unit tests, doublestar matcher |
+| `46216e8` | P0-3+P0-4+P0-2: smartctx 통일 + real BM25 + Citation | `pkg/graph/smartctx`, mcp/eval rewrite | metadata.warnings, file:line on every body/summary |
+| `169301f` | T1-B: Validator interface + Schema/LLM | `internal/graph/validate` 4 files | 4 unit tests |
+| `431ff20` | P0-5 part 1: filterlist package | `internal/graph/filterlist` | 6 unit tests, doublestar matcher |
 | `1a4f9db` | buildpipe 통합: lenient + --files-from + --strict-validate | `pipeline.go`, `incremental.go`, `build.go` | 두 모드 검증, 147→4 filter 검증 |
-| `0a7859f` | P1-1: ckg validate subcommand | `cmd/ckg/validate.go` + root/main 통합 | exit 0/1/2, --llm 스켈레톤 |
+| `0a7859f` | P1-1: ckg validate subcommand | `cmd/graph/validate.go` + root/main 통합 | exit 0/1/2, --llm 스켈레톤 |
 | `17a9d76` | docs: baseline + comparison | `docs/analysis/SELF-GRAPH-*.md` | |
 | `5eb4062` | listens_on dangling fix | `parse/golang/distributed.go` qname lookup, fixture, 회귀 테스트 | 7→0 drops, strict-validate 통과 |
 

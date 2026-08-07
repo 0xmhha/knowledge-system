@@ -38,7 +38,7 @@ Alternatives considered:
 Use `sqlite-vec` (vec0 virtual tables) as the on-disk vector store,
 accessed via `github.com/asg017/sqlite-vec-go-bindings` (cgo).
 
-The store layer (`internal/store/sqlitevec/`) hides the details from
+The store layer (`internal/vector/store/sqlitevec`) hides the details from
 the rest of CKV — callers see `Upsert` / `Search` / `DeleteByFile` /
 `SetManifest` and never touch SQL or sqlite-vec syntax.
 

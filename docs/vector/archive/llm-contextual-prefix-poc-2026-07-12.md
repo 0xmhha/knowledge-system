@@ -8,7 +8,7 @@
 > 닫는다. D.1(rule-based prefix)은 이미 기본값이다 — **LLM prefix가 D.1을 이기는가**를
 > 정밀도로 판정한다.
 > **관련**: `retrieval-quality-roadmap.md`(Phase D), `qwen3-dimension-ab-2026-07-12.md`,
-> `eval-metrics.md`, `internal/chunk/prefix.go`(D.1), `internal/llmprefix/`(D.2).
+> `eval-metrics.md`, `internal/vector/chunk/prefix.go`(D.1), `internal/vector/llmprefix`(D.2).
 
 ## 1. 방법
 
@@ -77,9 +77,9 @@
 
 ## 5. 구현 노트
 
-- `internal/llmprefix/`: `Generator` 인터페이스(주입 가능) + `Prefixer` + 디스크캐시
+- `internal/vector/llmprefix`: `Generator` 인터페이스(주입 가능) + `Prefixer` + 디스크캐시
   `Cached`(sha256(본문) 키, 실패 시 "") + `OllamaGenerator`(`/api/generate`, `CKV_OLLAMA_ENDPOINT`).
-- 배선: `internal/build` `resolveEmbedTextFn(ctx, disablePrefix, prefixer)` — prefixer 설정 시
+- 배선: `internal/vector/build` `resolveEmbedTextFn(ctx, disablePrefix, prefixer)` — prefixer 설정 시
   `LLM prose\n + BuildEmbedText`, miss/실패 시 `BuildEmbedText`. CLI `--llm-prefix-model`
   (build/reindex). 캐시는 `<out>/.ckv-llmprefix-cache`.
 - 청크 ID/저장 Text 불변 — prefix는 임베드 텍스트에만 존재(D.1과 동일 불변식).

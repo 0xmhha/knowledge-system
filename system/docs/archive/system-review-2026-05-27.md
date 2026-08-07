@@ -357,7 +357,7 @@ go-stablenet에 이미 merge된 PR들을 활용한다:
 | **S-1** | Ollama embedder를 intent classifier에 연결 | FakeEmbedder → Ollama embedder 교체 | V-1 | ~30 LOC (wiring) |
 | **S-2** | go-stablenet 대상 config 작성 | CKG path, CKV path, real embedder 설정 | V-3, G-1 | YAML |
 | **S-3** | go-stablenet 대상 eval 시나리오 작성 | 실제 Jira ticket 유사 쿼리 기반 시나리오 | S-2 | YAML |
-| **S-4** | Vocabulary resolver 구현 | `internal/vocab/resolver.go` — glossary 로드 + query expansion | V-4 | ~200 LOC |
+| **S-4** | Vocabulary resolver 구현 | `internal/system/vocab/resolver.go` — glossary 로드 + query expansion | V-4 | ~200 LOC |
 | **S-5** | E2E dogfood eval (go-stablenet) | `make dogfood-eval`을 go-stablenet 대상으로 실행 | S-2, S-3 | 테스트 |
 | **S-6** | 미푸시 코드 처리 | Phase 5 실패 복귀 시, local diff를 CKS 컨텍스트에 포함하는 방법 | — | 설계 필요 |
 

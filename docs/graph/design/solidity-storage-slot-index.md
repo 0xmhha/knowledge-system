@@ -40,7 +40,7 @@
     하는가", "이 slot 이 어느 변수인가" — slot index 없이는 불가.
 
 - **어떻게**:
-  - `pkg/types/node.go` Node 에 `SlotIndex int` 필드 추가 (omitempty).
+  - `pkg/graph/types/node.go` Node 에 `SlotIndex int` 필드 추가 (omitempty).
     NodeField 외에는 zero (생략).
   - `runStateVarDecl` walker 가 each contract 안에서 state_variable_
     declaration 순서대로 0, 1, 2, ... 부여. mapping subtype 은 skip.
@@ -127,10 +127,10 @@ V0 가정:
 
 ### W9 V0 — slot index per contract (이 commit)
 
-- `pkg/types/node.go`: `SlotIndex int` (omitempty) 추가.
+- `pkg/graph/types/node.go`: `SlotIndex int` (omitempty) 추가.
 - `internal/parse/solidity/declarations.go runStateVarDecl`: contract
   단위 counter 로 slot 할당. NodeMapping 은 skip.
-- `internal/parse/solidity/storage_slot_test.go`: fixture + test
+- `internal/graph/parse/solidity/storage_slot_test.go`: fixture + test
   asserting slot indices for ERC-20-style state-vars (non-mapping
   first, then mapping which skips slot, then more vars).
 - Golden fixture refresh if existing state-vars produce non-zero

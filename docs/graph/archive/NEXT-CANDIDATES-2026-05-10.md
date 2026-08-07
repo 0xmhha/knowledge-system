@@ -21,7 +21,7 @@
 **한 줄 요약**: 큰 ticket(GH-66 = 501 hunks)이 budget cap에 걸려 1 commit만 표시되는 문제 해결.
 
 **현재 상태**
-- `groupByCommit`은 cumulative `patch_text` 길이가 `budget_tokens`(viewer 기본 12000)를 넘으면 emit 중단 (`pkg/evidence/cache.go` `groupByCommit` 함수, 약 482-501 line).
+- `groupByCommit`은 cumulative `patch_text` 길이가 `budget_tokens`(viewer 기본 12000)를 넘으면 emit 중단 (`pkg/graph/evidence/cache.go` `groupByCommit` 함수, 약 482-501 line).
 - 첫 commit은 항상 emit하므로 GH-66의 첫 번째 commit이 budget을 단독 초과해도 표시.
 - 하지만 두 번째 commit(`a857b5961c3b consensus metrics`)은 영원히 못 봄.
 - 캐시는 manifest-keyed라 사용자가 viewer에서 다시 patches 버튼을 눌러도 같은 1 commit 반환.
@@ -32,9 +32,9 @@
 - BM25 ranking이 없는 IssueID-only 모드에서는 budget 한계만이 cap이라 명시적 page 가 자연스러움.
 
 **제안 작업**
-- `pkg/evidence/evidence.go` `Options` 에 `Offset int` 추가 (`Offset >= len(commits)`이면 빈 결과).
-- `pkg/evidence/cache.go` `groupByCommit` 에서 정렬 후 `commitOrder[opt.Offset:]` 으로 시작.
-- `internal/server/api.go` `handleEvidence` 에 `offset` query 파라미터 파싱.
+- `pkg/graph/evidence/evidence.go` `Options` 에 `Offset int` 추가 (`Offset >= len(commits)`이면 빈 결과).
+- `pkg/graph/evidence/cache.go` `groupByCommit` 에서 정렬 후 `commitOrder[opt.Offset:]` 으로 시작.
+- `internal/graph/server/api.go` `handleEvidence` 에 `offset` query 파라미터 파싱.
 - `internal/mcp/evidence.go` MCP tool schema에 `offset` 추가.
 - `web/viewer-next/src/components/TicketIndex.tsx` "Load more" 버튼 — 클릭 시 `offset += loadedCommitCount` 로 다음 페이지 fetch + `pack.hits` append.
 
@@ -90,8 +90,8 @@
 **한 줄 요약**: schema가 1.9 등으로 진화할 때 H3 (EvidencePack) / H4 (issue-id 추출) 회귀를 자동 검출.
 
 **현재 상태**
-- `internal/eval/` 패키지가 있고 `go test ./internal/eval/...` 약 30s 소요 — 기존 graph 평가 시나리오 보유.
-- H3 (BuildPack) 와 H4 (ExtractIssueIDs) 는 unit test (`pkg/evidence/*_test.go`, `internal/temporal/issueid_test.go`) 만 존재.
+- `internal/graph/eval` 패키지가 있고 `go test ./internal/eval/...` 약 30s 소요 — 기존 graph 평가 시나리오 보유.
+- H3 (BuildPack) 와 H4 (ExtractIssueIDs) 는 unit test (`pkg/evidence/*_test.go`, `internal/graph/temporal/issueid_test.go`) 만 존재.
 - 통합 검증 — 실제 build pipeline → store → BuildPack 까지의 end-to-end — 없음.
 
 **문제 / 동기**
@@ -159,7 +159,7 @@
 **한 줄 요약**: 모든 MCP tool 을 같은 graph.db 에 대해 순차 호출하는 fixture 테스트 — wrapper / cache / tool간 상호작용 회귀 검출.
 
 **현재 상태**
-- `internal/mcp/` 의 각 tool 별 unit test 존재 (`evidence_test.go`, `tickets_test.go`, ...).
+- `internal/graph/mcp` 의 각 tool 별 unit test 존재 (`evidence_test.go`, `tickets_test.go`, ...).
 - 하지만 Server 레벨의 통합 (8 tools 가 같은 store + cache 를 공유) 검증 없음.
 - llmSafeStoreReader wrapper 가 새 tool 추가 시 누락되어도 unit test 로는 못 잡음.
 
@@ -169,7 +169,7 @@
 - Cache 가 tool A 호출 후 tool B 호출 시 stale 가능 — manifest-key 변경 시 invalidation 동작 검증.
 
 **제안 작업**
-- `internal/mcp/integration_test.go` 신규
+- `internal/graph/mcp/integration_test.go` 신규
   - 작은 fixture graph (testdata/) 으로 MCPServer 띄움.
   - 8 tools 모두 표준 query 로 호출.
   - 각 응답에서 AMBIGUOUS 마커 가 절대 안 나오는지 assert (read-path tools 전부).
@@ -202,7 +202,7 @@
 - eval harness (#3) 도 직접 evidence.BuildPack 을 부르는 게 더 간단하지만, CLI 가 있으면 사용자 워크플로 도 정리됨.
 
 **제안 작업**
-- `cmd/ckg/evidence.go` 신규
+- `cmd/graph/evidence.go` 신규
   - flags: `--graph PATH` `--intent STRING` `--issue STRING` `--seed-qname STRING` `-k INT` `--budget INT` `--format json|text`
   - 내부적으로 evidence.NewCache().BuildPack 직접 호출.
   - JSON 또는 사람이 읽기 좋은 text(commit subject + 첫 5줄 patch).
@@ -296,7 +296,7 @@
 **한 줄 요약**: ticket expand 시 commit subject 만 보이는데, 변경 파일 / 패키지 hint 를 함께 표시해 ticket 의 영향 범위를 미리 파악.
 
 **현재 상태**
-- backend `TicketRow` (=`pkg/evidence/cache.go` `TicketIndex` 함수) 가 `{issue_id, hunk_count, commit_count, sample_commits[3]}` 반환.
+- backend `TicketRow` (=`pkg/graph/evidence/cache.go` `TicketIndex` 함수) 가 `{issue_id, hunk_count, commit_count, sample_commits[3]}` 반환.
 - sample_commits 는 `{sha, subject, author_time}` 만 — 파일 정보 없음.
 - frontend 도 SHA + subject 한 줄 렌더 (TicketIndex.tsx).
 
@@ -305,7 +305,7 @@
 - 현재는 일단 patches 눌러 봐야 알 수 있음 — 큰 ticket 일수록 비용.
 
 **제안 작업**
-- `pkg/evidence/cache.go` `pickSampleCommits` 옆에 `topFilesForCommit(corpus, sha) []string` 추가.
+- `pkg/graph/evidence/cache.go` `pickSampleCommits` 옆에 `topFilesForCommit(corpus, sha) []string` 추가.
   - 각 commit 의 hunks → file_path 의 dirname → 빈도 top-3.
 - `TicketRow.SampleCommits[].TopFiles []string` 추가.
 - frontend: commit row 안에 작은 monospace pill 로 표시.
@@ -336,9 +336,9 @@
 - 사용자가 정확한 search 를 원할 때 fallback 없음.
 
 **제안 작업**
-- `pkg/evidence/evidence.go` `Options.Mode string` ("or"|"and", default "or").
+- `pkg/graph/evidence/evidence.go` `Options.Mode string` ("or"|"and", default "or").
 - `Cache.BuildPack`: AND 모드면 BM25 ranking 후, query token 모두 포함하지 않은 hunks 필터.
-- `internal/server/api.go` `?mode=and` 받음.
+- `internal/graph/server/api.go` `?mode=and` 받음.
 - `internal/mcp/evidence.go` mode param 노출.
 
 **대안 / Trade-offs**

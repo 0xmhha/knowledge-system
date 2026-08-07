@@ -42,7 +42,7 @@ avgDocLen) are recomputed per query — cheap on a 30-document set.
 
 ## Decision
 
-Land `internal/query/bm25/` as a candidate-rerank package with the
+Land `internal/vector/query/bm25` as a candidate-rerank package with the
 following shape:
 
 - **Algorithm**: Okapi BM25 (`K1=1.5`, `B=0.75`) — the same
@@ -75,10 +75,10 @@ The corresponding code lives in:
 
 - `internal/query/bm25/{scorer,okapi,tokenize}.go` — adapted from
   CKG's `pkg/bm25/` (attribution in each file's header).
-- `internal/query/bm25/rerank.go` — CKV-specific: candidate-set
+- `internal/vector/query/bm25/rerank.go` — CKV-specific: candidate-set
   `Rerank`, `BuildCorpusText` (D3-B canonical form), and `Stats`
   (rank_changes, top1_score_delta) for footprint summarization.
-- `internal/query/engine.go` — Step 2.5 between store.search and
+- `internal/vector/query/engine.go` — Step 2.5 between store.search and
   threshold.drop. The `query.bm25.rerank` span is the new Phase 1
   sub-event.
 
@@ -169,6 +169,6 @@ Supersede criteria (evaluation-design §6.4 Step 4): r@5 lift FAIL
 **Conclusion**: ADR-003 stays Accepted. The `--bm25-rerank` flag
 remains in-tree as opt-in measurement infrastructure but will not
 become default-on. The candidate-set BM25 code in
-`internal/query/bm25/` requires no removal — it has zero cost when
+`internal/vector/query/bm25` requires no removal — it has zero cost when
 disabled and may be useful for future corpus compositions where the
 embedder signal is weaker (e.g. mixed-language PR descriptions).

@@ -4,7 +4,7 @@
 > tracked is now closed in code (W-B `awaits` + W-C `overrides` emission,
 > Korean/CJK `search_text` test, `ckg-NEW-9` bm25 external-import test, Stage-B
 > ckv-mirror 12/12). Retained as the historical north-star → gap mapping.
-> Live status → `docs/CONTINUITY.md`.
+> Live status → `docs/graph/CONTINUITY.md`.
 
 > **Goal of this document**: map the user-articulated north star
 > (*"build a 6-axis graph DB + answer keyword queries at 100% accuracy"*)
@@ -43,9 +43,9 @@ collapses to: **(R-Build) + (R-Query) + (R-Accuracy at 100%)**.
 | `--src <path>` source root | `cmd/ckg/build.go:47` | ✅ |
 | `--out <dir>` output directory | `cmd/ckg/build.go:48` | ✅ |
 | `--lang auto\|go,ts,sol` language selection | `cmd/ckg/build.go:49` | ✅ |
-| **`--files-from <path>` JSON `{include, exclude}` glob patterns** | `cmd/ckg/build.go:58-59`; pattern format: `internal/filterlist/` package | ✅ |
+| **`--files-from <path>` JSON `{include, exclude}` glob patterns** | `cmd/ckg/build.go:58-59`; pattern format: `internal/graph/filterlist` package | ✅ |
 | 7-pass pipeline | `internal/buildpipe/pipeline.go::Run` | ✅ |
-| Incremental cache | `internal/buildpipe/cache.go`; `--no-cache` bypass | ✅ |
+| Incremental cache | `internal/graph/buildpipe/cache.go`; `--no-cache` bypass | ✅ |
 | PostgreSQL backend opt-in | `cmd/ckg/build.go:54-55` `--db postgres://...` | ✅ |
 | Strict validation gate | `cmd/ckg/build.go:56` `--strict-validate` | ✅ |
 | 6-axis edge enums | `pkg/types/enums.go:148-339` (40 EdgeTypes incl. slot-reserved) | ✅ |
@@ -72,7 +72,7 @@ collapses to: **(R-Build) + (R-Query) + (R-Accuracy at 100%)**.
 | **Concurrency** | spawns | Go GoStmt | ✅ |
 |  | sends_to / recvs_from | Go SendStmt / UnaryExpr ARROW | ✅ |
 |  | timeout_path / cancellation_path | Go P2 (context.WithTimeout/WithCancel) | ✅ |
-|  | **acquires_lock / releases_lock / accessed_under_lock** | B1 Stage 1 live: `internal/parse/golang/concurrency.go` (Mutex nodes + lock edges) + `concurrency_underlock.go` (field × mutex pairs). Self-index: 19 acquires_lock / 19 releases_lock / 40 accessed_under_lock / 5 Mutex nodes (2026-05-26 verification) | ✅ |
+|  | **acquires_lock / releases_lock / accessed_under_lock** | B1 Stage 1 live: `internal/graph/parse/golang/concurrency.go` (Mutex nodes + lock edges) + `concurrency_underlock.go` (field × mutex pairs). Self-index: 19 acquires_lock / 19 releases_lock / 40 accessed_under_lock / 5 Mutex nodes (2026-05-26 verification) | ✅ |
 | **Distributed** | listens_on | Go net/http HandleFunc/Handle, mux variants | ✅ |
 |  | handles_message | Go net/rpc handler signature match | ✅ |
 |  | rpc_calls | Go client.Call(...) | ✅ |
@@ -90,11 +90,11 @@ collapses to: **(R-Build) + (R-Query) + (R-Accuracy at 100%)**.
 
 | Gap | Impact on north star | Recommended work | Priority |
 |---|---|---|---|
-| Concurrency `acquires_lock` family — **CLOSED** (docs were drift) | The Stage 1 implementation has been in tree for some time (`internal/parse/golang/concurrency.go` + `concurrency_underlock.go`); SCHEMA.md / PROJECT-OVERVIEW were stale. Synthetic corpus had no Mutex fixture so retrieval regression cover was absent. | **R11/R12 retrieval fixtures + synthetic concurrent.go** lock the emission against future drift. SSA cross-function chain (`--lock-propagation`, W-A Stage B) remains a separate opt-in surface. | n/a (already done) |
-| W-B `awaits` (TS async/await suspension) unimplemented | TS programs without async-flow detection have broken concurrency story for the JS side of any node/express service. | W-B W2 detector — `~700 LOC` per design (`docs/design/ts-async-await-and-interface.md`) | P1 (cks Stage B may surface need) |
+| Concurrency `acquires_lock` family — **CLOSED** (docs were drift) | The Stage 1 implementation has been in tree for some time (`internal/graph/parse/golang/concurrency.go` + `concurrency_underlock.go`); SCHEMA.md / PROJECT-OVERVIEW were stale. Synthetic corpus had no Mutex fixture so retrieval regression cover was absent. | **R11/R12 retrieval fixtures + synthetic concurrent.go** lock the emission against future drift. SSA cross-function chain (`--lock-propagation`, W-A Stage B) remains a separate opt-in surface. | n/a (already done) |
+| W-B `awaits` (TS async/await suspension) unimplemented | TS programs without async-flow detection have broken concurrency story for the JS side of any node/express service. | W-B W2 detector — `~700 LOC` per design (`docs/graph/design/ts-async-await-and-interface.md`) | P1 (cks Stage B may surface need) |
 | W-C `overrides` (Sol virtual/override) unimplemented | Sol contracts with inheritance show wrong call dispatch — false negatives for any override chain. | W-C W2 detector — `~1100-1200 LOC` per design | P1 |
 | `--files-from` schema documentation | Today the format is "JSON `{include, exclude}` glob patterns" but the doc lives only in `cmd/ckg/build.go:58-59` flag string. Users compose lists wrong (e.g. expecting newline-separated paths). | Single docs entry under `docs/BUILD.md` (new) or `INCREMENTAL.md` (existing). Add a `--files-from-example` flag dumping the schema. | P2 |
-| audit subcommand parity test for `--files-from` paths | `ckg audit` currently parities `go/packages.Load` vs DB but does not validate that `--files-from` restricted builds didn't drop edges incorrectly. | Extend `internal/audit/` with a `--files-from`-aware mode. | P1 |
+| audit subcommand parity test for `--files-from` paths | `ckg audit` currently parities `go/packages.Load` vs DB but does not validate that `--files-from` restricted builds didn't drop edges incorrectly. | Extend `internal/graph/audit` with a `--files-from`-aware mode. | P1 |
 
 ## 3. R-Query: single + multiple keyword (AND/OR)
 
@@ -115,7 +115,7 @@ collapses to: **(R-Build) + (R-Query) + (R-Accuracy at 100%)**.
 | Gap | Impact | Recommended work | Priority |
 |---|---|---|---|
 | ~~MCP `search_text` does not expose AND/OR mode~~ | **✅ DONE (verified 2026-07-10).** `search_text` takes `mode="or"` (default) / `mode="and"` — `pkg/mcphandlers/handlers.go:176,185`; AND post-filter is `filterHitsByAllTokens` (`internal/persist/sqlite_fts.go:79-82`, mirrored in `postgres_store.go:1131`). | — | ~~P0~~ → done |
-| ~~`pkg/store` lacks an idiomatic AND/OR query API~~ | **✅ DONE (verified 2026-07-10).** `pkg/store` exposes `SearchFTSOptions{Mode, Language, NodeKinds}` (`pkg/store/store.go:53-55` → `persist.SearchFTSOptions`) and `Reader.SearchWithOpts(q, limit, opts)`; external consumers pass `Mode:"and"` instead of hand-building FTS5 syntax. | — | ~~P0~~ → done |
+| ~~`pkg/graph/store` lacks an idiomatic AND/OR query API~~ | **✅ DONE (verified 2026-07-10).** `pkg/graph/store` exposes `SearchFTSOptions{Mode, Language, NodeKinds}` (`pkg/store/store.go:53-55` → `persist.SearchFTSOptions`) and `Reader.SearchWithOpts(q, limit, opts)`; external consumers pass `Mode:"and"` instead of hand-building FTS5 syntax. | — | ~~P0~~ → done |
 | ~~Multi-keyword retrieval fixtures absent~~ | **✅ DONE (verified 2026-07-10).** `eval/retrieval/` carries `R06`(OR), `R07`(three-token AND), `R08`/`R09`(language filter), `R10`(strict-go AND), `R14`(statement opt-in). | — | ~~P0~~ → done |
 | Korean / CJK query graceful degradation untested | `Search()` routes non-ASCII through `SearchSubstr` LIKE-based path. Behaviour on mixed Korean + English (the real cks-via-ckv input shape) untested. ckg-NEW-1 lives here. | Add `TestFTS5Query_KoreanInput_Graceful` covering the 3 mix patterns from `CKS-INTEGRATION-2026-05-23 §3.1`. Estimate: ~80 LOC test only (no behavioural change unless a panic is found). | P1 |
 
@@ -172,7 +172,7 @@ These do not affect ckg's standalone capability but block the *step after*
 
 | ID | Work | Source doc | Status |
 |---|---|---|---|
-| T-14 | `pkg/mcphandlers/` public registration surface — currently cks cannot import the 8-tool registrations because they live in `internal/mcp/`. cks S1 entry blocker. | `eval/stablenet/HANDOFF.md` | **✅ done (2026-05-26)** — pkg/mcphandlers with 8 Register*, RegisterAll, NewLLMSafeReader, and cks-style smoke tests. internal/mcp kept as the production path; cleanup PR (T-14b) tracks the eventual shim migration. |
+| T-14 | `pkg/graph/mcphandlers` public registration surface — currently cks cannot import the 8-tool registrations because they live in `internal/graph/mcp`. cks S1 entry blocker. | `eval/stablenet/HANDOFF.md` | **✅ done (2026-05-26)** — pkg/mcphandlers with 8 Register*, RegisterAll, NewLLMSafeReader, and cks-style smoke tests. internal/mcp kept as the production path; cleanup PR (T-14b) tracks the eventual shim migration. |
 | ckg-NEW-2/3/4 | PR breadcrumb metadata on Node + temporal slicing + accessor (R12) | `eval/stablenet/CKS-INTEGRATION-2026-05-23.md §3.2` | **✅ done (2026-05-26)** — `pkg/types.PRRef`, `Node.RecentPRs`, `node_prs` table (schema 1.12), `Reader.GetNodePRs(nodeID, cutoff)`, `internal/buildpipe.ScanPRHistory` (git log scan with `(#NNN)` regex + patch line-range overlap + remote.origin.url → owner/repo derivation). |
 | ckg-NEW-9 | `pkg/bm25` external-import stability (R13 3-leg) | CKS-INTEGRATION §3.5 | P1, open |
 
@@ -197,7 +197,7 @@ benchmark.
 
 ### Lane Y — Integration-first (deliver "cks unblock")
 
-1. **T-14** — `pkg/mcphandlers/` surface
+1. **T-14** — `pkg/graph/mcphandlers` surface
 2. **ckg-NEW-2/3/4** — PR breadcrumb (one PR with T-14)
 3. **ckg-NEW-9** — bm25 external import stability
 4. **ckg-NEW-5** — 12 ckv-fixture mirror YAMLs
@@ -217,7 +217,7 @@ total. Lane Y assumes capability completeness; running it before Lane X
 risks cks integrating a ckg that still has the AND/OR + locks gap.
 
 If a single PR sequence is preferred, items X-1 / X-2 / X-3 / X-4 share
-the same files (`internal/mcp/tools.go`, `pkg/store/store.go`,
+the same files (`internal/mcp/tools.go`, `pkg/graph/store/store.go`,
 `eval/retrieval/*.yaml`, `internal/persist/sqlite.go::rewriteFTSQuery`)
 and can ship as one ~200-300 LOC change with focused tests.
 

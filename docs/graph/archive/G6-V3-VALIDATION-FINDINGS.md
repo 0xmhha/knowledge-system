@@ -69,17 +69,17 @@ make build                                  # full build incl. viewer
 
 | File | Δ | 주요 변경 |
 |---|---|---|
-| `internal/persist/schema.sql` | +19 | `pending_refs` 테이블 + `idx_pending_refs_file` (FK CASCADE on `src_id`) |
-| `internal/persist/sqlite.go` | +147 / −9 | `PendingRefRow` struct, `InsertPendingRefs` (INSERT OR IGNORE), `PendingRefsByFilePath`, `QueryEdgesForNodes` 청크화 (400 ids/chunk, Q5 fix) |
-| `internal/persist/store_interface.go` | +8 | StoreReader.PendingRefsByFilePath, StoreWriter.InsertPendingRefs |
-| `internal/persist/sqlite_extra_test.go` | +86 | 3 신규 테스트: InsertAndReload, CascadeOnNodeDelete, PrimaryKeyDeduplicates |
-| `internal/graph/builder.go` | +37 / −3 | edge dedup `(Type, Src, Dst, Line)` keep-first |
-| `internal/graph/builder_test.go` | +50 | 2 신규 테스트: KeepFirst, DifferentLineKept |
-| `internal/buildpipe/cache.go` | +9 / −4 | `SchemaVersion` 1.4 → 1.5 |
-| `internal/buildpipe/cache_test.go` | +6 / −4 | 하드코딩 "1.4" → `buildpipe.SchemaVersion` |
-| `internal/buildpipe/language_runners.go` | +35 / −6 | 모든 cold pipeline (Go/TS/Sol) → `[]PendingRefRow` 반환; `collectPendingRefs` helper |
-| `internal/buildpipe/pipeline.go` | +75 / −52 | `emitDerivedPasses` 통합 helper (xlang/temporal/cluster/score), `runCold` 분리, partial-hit → `runIncremental` 라우팅 복원 |
-| `internal/buildpipe/incremental.go` | +130 / −91 | runIncremental 재배선: `(1)` 항상 재계산되는 edge type drop → `(2)` dirty/removed file CASCADE → `(3)` Pass 1 + cached pending_refs reload → `(4)` graph.Build 입력 시 reloaded 먼저 prepend → `(5)` emitDerivedPasses → `(6)` persist + dirty pending_refs INSERT |
+| `internal/graph/persist/schema.sql` | +19 | `pending_refs` 테이블 + `idx_pending_refs_file` (FK CASCADE on `src_id`) |
+| `internal/graph/persist/sqlite.go` | +147 / −9 | `PendingRefRow` struct, `InsertPendingRefs` (INSERT OR IGNORE), `PendingRefsByFilePath`, `QueryEdgesForNodes` 청크화 (400 ids/chunk, Q5 fix) |
+| `internal/graph/persist/store_interface.go` | +8 | StoreReader.PendingRefsByFilePath, StoreWriter.InsertPendingRefs |
+| `internal/graph/persist/sqlite_extra_test.go` | +86 | 3 신규 테스트: InsertAndReload, CascadeOnNodeDelete, PrimaryKeyDeduplicates |
+| `internal/graph/graph/builder.go` | +37 / −3 | edge dedup `(Type, Src, Dst, Line)` keep-first |
+| `internal/graph/graph/builder_test.go` | +50 | 2 신규 테스트: KeepFirst, DifferentLineKept |
+| `internal/graph/buildpipe/cache.go` | +9 / −4 | `SchemaVersion` 1.4 → 1.5 |
+| `internal/graph/buildpipe/cache_test.go` | +6 / −4 | 하드코딩 "1.4" → `buildpipe.SchemaVersion` |
+| `internal/graph/buildpipe/language_runners.go` | +35 / −6 | 모든 cold pipeline (Go/TS/Sol) → `[]PendingRefRow` 반환; `collectPendingRefs` helper |
+| `internal/graph/buildpipe/pipeline.go` | +75 / −52 | `emitDerivedPasses` 통합 helper (xlang/temporal/cluster/score), `runCold` 분리, partial-hit → `runIncremental` 라우팅 복원 |
+| `internal/graph/buildpipe/incremental.go` | +130 / −91 | runIncremental 재배선: `(1)` 항상 재계산되는 edge type drop → `(2)` dirty/removed file CASCADE → `(3)` Pass 1 + cached pending_refs reload → `(4)` graph.Build 입력 시 reloaded 먼저 prepend → `(5)` emitDerivedPasses → `(6)` persist + dirty pending_refs INSERT |
 
 ### 2.2 design 대비 빠진 것
 
@@ -351,7 +351,7 @@ ResolvedGraph: Nodes + Edges 다 들어있음)가 따라옴. 이때 graph.Build 
 **작업 범위**:
 1. `pipeline.go:127` 라우팅 cold-fallback로 되돌림 (현재 `runIncremental` 호출 → "Cache: partial hit; falling back to cold rebuild for correctness" 로그로).
 2. `runIncremental` + `pending_refs` 관련 데이터 구조는 dead code로 보존 (B3 / C1 후속을 위한 자산).
-3. `docs/INCREMENTAL.md` § "Phase 1 limitations"에 "partial-cache deferred until B3 (tree-sitter Tree.Edit) or C1 (reverse-reference index) prerequisite"로 기록.
+3. `docs/graph/INCREMENTAL.md` § "Phase 1 limitations"에 "partial-cache deferred until B3 (tree-sitter Tree.Edit) or C1 (reverse-reference index) prerequisite"로 기록.
 4. `SchemaVersion` 1.5 → 1.4로 되돌리거나, 1.5는 유지하되 pending_refs는 v1의 dead column처럼 유지 (다음 시도 때 schema bump 비용 절약 — 권장).
 5. `docs/G6-INCREMENTAL-REDESIGN.md` § 8 D4 항을 "EXECUTED 2026-05-XX"로 stamp.
 
@@ -459,7 +459,7 @@ sqlite3 /tmp/g6v3/partial/graph.db "SELECT type, COUNT(*) FROM edges WHERE file_
 - `docs/G6-INCREMENTAL-REDESIGN.md` — design spec, § 4 architecture / § 7 gate / § 8 decisions
 - `docs/HANDOFF.md` — project-wide snapshot (본 세션 끝에 § 4.1 v3 진척 반영하여 갱신됨)
 - `docs/WORK-PLAN.md` — group A-G 작업 tracker
-- `docs/INCREMENTAL.md` — operator-facing partial-cache 동작 (D4 발동 시 갱신 대상)
+- `docs/graph/INCREMENTAL.md` — operator-facing partial-cache 동작 (D4 발동 시 갱신 대상)
 - 본 세션 working tree diff: `git diff` 또는 § 2.1 표
 
 ---

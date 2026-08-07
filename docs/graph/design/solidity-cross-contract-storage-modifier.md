@@ -4,7 +4,7 @@
 > repository layout at the time of writing (pre-consolidation). For the
 > current command map see docs/design/cli-consolidation.md.
 
-> Scope: extend the Solidity parser (`internal/parse/solidity/`) so the graph
+> Scope: extend the Solidity parser (`internal/graph/parse/solidity`) so the graph
 > captures three currently-invisible dimensions:
 >
 > 1. **W7.1 — low-level call dispatch**: `target.call(...)`,
@@ -28,7 +28,7 @@
 >
 > **Status**: **LANDED** (header updated 2026-07-18; the original "no
 > implementation yet" draft note is superseded). W7.1 low-level call dispatch
-> (`internal/parse/solidity/low_level_call.go` → `invokes`), W7.2 storage-location
+> (`internal/graph/parse/solidity/low_level_call.go` → `invokes`), W7.2 storage-location
 > metadata (SubKind in `declarations.go` `runStateVarDecl`), and W7.3 modifier
 > composition + `override` (`modifier_composition_test.go`, `overrides.go`) are
 > all emitted. This doc is now a historical design record. V1+ deferrals remain
@@ -278,16 +278,16 @@ joins same code by NodeType check.
 
 ### 4.1 W7 design doc — *this commit*
 
-- `docs/design/solidity-cross-contract-storage-modifier.md` (this file).
+- `docs/graph/design/solidity-cross-contract-storage-modifier.md` (this file).
 - `docs/DISPATCH-WITHIN-LANG-SEMANTICS.md` tracking row 추가.
 - 추정 ~500 LOC 문서.
 
 ### 4.2 W7.1 V0 — low-level call
 
 - Files touched:
-  - `internal/parse/solidity/low_level_call.go` (new, ~150 LOC).
-  - `internal/parse/solidity/resolve.go` (resolveLowLevelCallRef ~50 LOC).
-  - `internal/parse/solidity/declarations.go` visit() wire (1 line).
+  - `internal/graph/parse/solidity/low_level_call.go` (new, ~150 LOC).
+  - `internal/graph/parse/solidity/resolve.go` (resolveLowLevelCallRef ~50 LOC).
+  - `internal/graph/parse/solidity/declarations.go` visit() wire (1 line).
 - Tests:
   - `low_level_call_test.go` with fixtures covering call / delegatecall /
     staticcall + state-var / param / local-var receiver.
@@ -296,11 +296,11 @@ joins same code by NodeType check.
 ### 4.3 W7.2 V0 — storage location SubKind
 
 - Files touched:
-  - `internal/parse/solidity/declarations.go` runStateVarDecl extension
+  - `internal/graph/parse/solidity/declarations.go` runStateVarDecl extension
     (~50 LOC).
-  - `internal/parse/solidity/overrides.go` emitParameterMetaPending shape
+  - `internal/graph/parse/solidity/overrides.go` emitParameterMetaPending shape
     change (~80 LOC).
-  - `internal/parse/solidity/resolve.go` paramTypes consumers updated
+  - `internal/graph/parse/solidity/resolve.go` paramTypes consumers updated
     (signature widening).
 - Tests:
   - `storage_location_test.go` with fixtures covering each visibility +
@@ -310,13 +310,13 @@ joins same code by NodeType check.
 ### 4.4 W7.3 V0 — modifier composition
 
 - Files touched:
-  - `internal/parse/parser.go` PendingRef.Order field (~5 LOC).
-  - `internal/parse/solidity/declarations.go` runHasModifier extension
+  - `internal/graph/parse/parser.go` PendingRef.Order field (~5 LOC).
+  - `internal/graph/parse/solidity/declarations.go` runHasModifier extension
     (~30 LOC for Order encoding).
-  - `internal/parse/solidity/declarations.go` modifier_definition override
+  - `internal/graph/parse/solidity/declarations.go` modifier_definition override
     walk (~40 LOC).
-  - `pkg/types/edge.go` Edge.Order int field (~5 LOC).
-  - `internal/parse/solidity/resolve.go` ordered EdgeHasModifier emit
+  - `pkg/graph/types/edge.go` Edge.Order int field (~5 LOC).
+  - `internal/graph/parse/solidity/resolve.go` ordered EdgeHasModifier emit
     (~10 LOC).
 - Tests:
   - `modifier_composition_test.go` with multi-modifier function +
@@ -434,12 +434,12 @@ is genuinely sparse.
 
 ## §7. Adjacent docs / references
 
-- W-C 본 문서: `docs/design/solidity-inheritance-and-interface-dispatch.md`
+- W-C 본 문서: `docs/graph/design/solidity-inheritance-and-interface-dispatch.md`
   (W1-W6 + W6 V0-V2.18 narrative).
 - Dispatch tracking index: `docs/DISPATCH-WITHIN-LANG-SEMANTICS.md`.
 - Track-C detector gap (P0/P1 모두 closed 7b32031):
-  `docs/design/track-c-detector-gap.md`.
+  `docs/graph/design/track-c-detector-gap.md`.
 - W3 interface dispatch resolver (W7.1 의 idiom 원본):
-  `internal/parse/solidity/dispatch.go`.
+  `internal/graph/parse/solidity/dispatch.go`.
 - W6 lookupReceiverType (W7.1 receiver resolution 재사용 대상):
-  `internal/parse/solidity/resolve.go` §lookupReceiverType.
+  `internal/graph/parse/solidity/resolve.go` §lookupReceiverType.

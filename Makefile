@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries build-bins install-hooks sync-domain-artifacts check-domain-artifacts
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries docs-check build-bins install-hooks sync-domain-artifacts check-domain-artifacts
 
 GO ?= go
 
@@ -32,12 +32,18 @@ fmt-check:
 	    exit 1; \
 	fi
 
-lint: fmt-check vet boundaries
+lint: fmt-check vet boundaries docs-check
 
 # boundaries: cross-engine isolation is convention now that internals live at
 # internal/<engine> (see scripts/check-boundaries.sh for the rules).
 boundaries:
 	@./scripts/check-boundaries.sh
+
+# docs-check: the documentation must teach commands the binaries accept.
+# Ground truth is a --help walk of bin/{ckg,ckv,cks}, so the binaries have to
+# exist; build-bins is cheap when they are already current.
+docs-check: build-bins
+	@python3 ./scripts/check-docs.py
 
 tidy:
 	$(GO) mod tidy

@@ -178,7 +178,7 @@ coding-agent 설계에 이미 포함되어 있는 항목:
 | **S-2** | go-stablenet config 작성 | CKG path, CKV path, real embedder 설정 | **P0** | V-3, G-1 | 예시만 존재 |
 | **S-3** | go-stablenet eval 시나리오 작성 | 실제 Jira 유사 쿼리 기반 | P1 | S-2 | 미착수 |
 | **S-4** | E2E dogfood eval (go-stablenet) | recall/precision 실측 | P1 | S-2, S-3 | 미착수 |
-| **S-5** | Vocabulary resolver 구현 | `internal/vocab/resolver.go` — glossary + query expansion | P1 | V-4 | 미구현 |
+| **S-5** | Vocabulary resolver 구현 | `internal/system/vocab/resolver.go` — glossary + query expansion | P1 | V-4 | 미구현 |
 | **S-6** | CKS MCP tool 확장: 검색 | `semantic_search`, `search_text` 추가 | P1 | — | 미구현 |
 | **S-7** | CKS MCP tool 확장: 그래프 탐색 | `find_symbol`, `find_callers`, `find_callees`, `get_subgraph` 추가 | P1 | S-10 | 미구현 |
 | **S-8** | CKS MCP tool 확장: 분석 | `impact_analysis`, `change_history` 추가 | P1 | S-10 | 미구현 |
@@ -702,8 +702,8 @@ CKV가 코드만 임베딩하면, 자연어 쿼리와 코드 사이의 의미 �
 ### 8.6 기술적 참고: CKV의 문서 임베딩 지원 현황
 
 CKV는 이미 `.md` 파일을 파싱하여 heading 단위로 청크를 분할하고 임베딩하는 기능을 갖추고 있다:
-- `internal/parse/markdown/parser.go`: heading-section 단위 청크 분할
-- `internal/parse/prdoc/parser.go`: PR description/commit message 청크 분할
+- `internal/vector/parse/markdown/parser.go`: heading-section 단위 청크 분할
+- `internal/vector/parse/prdoc/parser.go`: PR description/commit message 청크 분할
 - Chunk types: `ChunkDoc` (DocSection), `ChunkDoc` (ADRSection), `ChunkPRBackground`, `ChunkPRSolution`, `ChunkCommitMessage`
 
 따라서 도메인 지식 문서가 go-stablenet 레포의 `.claude/docs/` 에 `.md` 파일로 추가되면,

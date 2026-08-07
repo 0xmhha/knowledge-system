@@ -185,7 +185,7 @@ control-flow 엣지를 추가하면 시퀀스 추론 일부 가능. 단 비용 �
 - 적재 매핑 스펙: `corpus/SCHEMA.md §42-61` (vector/graph/benchmark)
 - 미완 과제 명시: `corpus/SCHEMA.md §67`
 - CKV 현 markdown 적재: PR #3 `--docs` → 평면 `doc` 청크 (구조 손실)
-- CKV↔CKG 정렬 기반: `internal/ckgalign/aligner.go` (`file:line` 매칭, #4)
+- CKV↔CKG 정렬 기반: `internal/vector/ckgalign/aligner.go` (`file:line` 매칭, #4)
 - CKG 능력/한계: 노드 37·엣지 43, 호출그래프·impact 有 / dataflow·control-flow·시퀀스 無
 - corpus `symbol` 정규화 주의: `SCHEMA.md §66` (약식 `pkg.Func` 존재 → 조인 시 패키지 경로 정규화 필요, B7 정규화 이슈와 동일 선상)
 
@@ -240,7 +240,7 @@ corpus는 별도 파이프라인(go-stablenet의 `build_corpus.py`)이 생성하
 
 | 레이어 | 무엇 | 위치 | 성격 |
 |--------|------|------|------|
-| **프로젝트 설정** | 어떻게 파싱 (languages/build_roots/ignore/chunking) | `ckv.yaml`(`<src>/`, `internal/projectcfg`) | 프로젝트와 함께, 거의 불변 |
+| **프로젝트 설정** | 어떻게 파싱 (languages/build_roots/ignore/chunking) | `ckv.yaml`(`<src>/`, `internal/vector/projectcfg`) | 프로젝트와 함께, 거의 불변 |
 | **오케스트레이션 설정** | 어떤 프로젝트·입력 어디·출력 어디 | **신규 build-profile (머신 로컬)** | 머신별, 자주 변함 |
 
 머신 경로를 `ckv.yaml`(프로젝트 repo에 커밋됨)에 넣지 않는다.
@@ -277,14 +277,14 @@ scripts/build-knowledge.sh <profile>
 
 ---
 
-→ 위 결정으로 `docs/archive/plan-2026-06-16-flow-ingest.md`에서 상세 설계 진입.
+→ 위 결정으로 `docs/vector/archive/plan-2026-06-16-flow-ingest.md`에서 상세 설계 진입.
 
 ---
 
 ## 8. 참조
 
-- `docs/session-handoff-2026-06-29.md` — 현행 SoT
-- `docs/archive/plan-2026-05-29-ckv-refactor.md` — invariant/convention 추출기 (자동추출 레이어)
-- `docs/evaluation-design-2026-05-22.md` — eval 방법 + BM25/rerank 결정
+- `docs/vector/session-handoff-2026-06-29.md` — 현행 SoT
+- `docs/vector/archive/plan-2026-05-29-ckv-refactor.md` — invariant/convention 추출기 (자동추출 레이어)
+- `docs/vector/evaluation-design-2026-05-22.md` — eval 방법 + BM25/rerank 결정
 - `<go-stablenet>/.claude/docs/corpus/` — 본 제안의 입력 데이터 (1차 출처)
 - code-knowledge-graph repo — CKG 호출그래프/impact (레이어 B)

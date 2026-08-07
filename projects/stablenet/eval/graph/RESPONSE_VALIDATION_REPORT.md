@@ -153,7 +153,7 @@ LLM 답을 못 봐도 각 baseline이 *제공한 컨텍스트*가 정답 도달�
 | 지표 | 현 인프라 | gap |
 |---|---|---|
 | **위치 정확도** | **없음** | 답 텍스트에서 `path/to/file.go:NNN` 패턴 추출 → 그래프 nodes 테이블 `file_path × start_line`(±range) cross-check validator 필요 |
-| **정답률** | `internal/eval/score.go` (precision_recall / rubric) | V0 한계: file path가 정답 토큰으로 추출됨(`extractSymbols`), rubric은 substring만(semantic 동의어 불가). 시뮬레이션에서 같은 정답이 답 스타일에 따라 1.0 → 0.71 변동 확인 |
+| **정답률** | `internal/vector/eval/score.go` (precision_recall / rubric) | V0 한계: file path가 정답 토큰으로 추출됨(`extractSymbols`), rubric은 substring만(semantic 동의어 불가). 시뮬레이션에서 같은 정답이 답 스타일에 따라 1.0 → 0.71 변동 확인 |
 | **Hallucination** | **없음** | 답의 모든 qname/file 토큰 추출 → graph nodes 존재 + filesystem 존재 cross-check, 카운트 |
 | **토큰 사용량** | `Result.{InputTokens, OutputTokens, CachedTokens}` 기록 | cli backend는 system+context를 cached로 몰아 input은 한자리수만 — api backend 필수 (L1) |
 

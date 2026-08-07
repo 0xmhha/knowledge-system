@@ -36,36 +36,36 @@
 
 | 섹션 | 항목 | P? | 상태 | 실 구현 위치 / 비고 |
 |---|---|---|---|---|
-| §1.1 | 파일 디스커버리 (gitignore + .ckvignore + 메타) | P0 | ✅ | `internal/discover` |
+| §1.1 | 파일 디스커버리 (gitignore + .ckvignore + 메타) | P0 | ✅ | `internal/vector/discover` |
 | §1.2 | Go / TypeScript / Solidity parser | P0 | ✅ | `internal/parse/{golang,typescript,solidity}` |
-| §1.2 | JavaScript parser | P0 | ✅ | `internal/parse/javascript/` (commit `e4977fa`, 2026-05-21). tree-sitter-typescript binding delegation; `.js` / `.jsx` / `.mjs` / `.cjs` 인덱싱. S2 → S1 끌어옴 (TS parser 패턴 재사용 비용 작음). |
+| §1.2 | JavaScript parser | P0 | ✅ | `internal/vector/parse/javascript` (commit `e4977fa`, 2026-05-21). tree-sitter-typescript binding delegation; `.js` / `.jsx` / `.mjs` / `.cjs` 인덱싱. S2 → S1 끌어옴 (TS parser 패턴 재사용 비용 작음). |
 | §1.2 | Bash parser | P0 | ❌-S2 | 사용자 결정 2026-05-19 (S2 이관) |
-| §1.3 | Chunking — symbol + file_header | P0 | ✅ | `internal/chunk` |
+| §1.3 | Chunking — symbol + file_header | P0 | ✅ | `internal/vector/chunk` |
 | §1.3 | Chunking — 큰 함수 sliding window | P0 | ✅ 2026-05-21 | `splitLongSpan` — Function/Method 가 `MaxInputTokens * charsPerToken` 초과 시 line-window 분할. 각 split: `ChunkKind=ChunkFunctionSplit`, `SymbolName="<orig>:chunk:N"`, distinct chunk_id, 실제 file line_range. Non-function kind 와 single-line은 truncate fallback. 4 신규 unit test. |
 | §1.4 | Compiler/LSP hook | P1 | ❌-S3+ | 인터페이스 미정의 |
-| §1.5 | `ckv build` CLI | P0 | ✅ | `cmd/ckv/build.go` |
-| §1.6 | manifest 메타 저장 | P0 | ✅ | `internal/manifest` |
+| §1.5 | `ckv build` CLI | P0 | ✅ | `cmd/vector/build.go` |
+| §1.6 | manifest 메타 저장 | P0 | ✅ | `internal/vector/manifest` |
 | §2.1 | Embedder 인터페이스 | P0 | ✅ | `pkg/types/Embedder` |
 | §2.2 | 기본 로컬 모델 (**bge-large-en-v1.5**) | P0 | ✅ | D1 PoC pivot 2026-05-18 (이전: bge-code-v1) |
 | §2.3 | 배치 임베딩 | P0 | ⚠️ | 단건 처리만, D1-FU-8 open (배치 + CoreML EP) |
 | §2.4 | 임베딩 캐시 (per-text) | P1 | ❌-S2 | |
 | §2.5 | 모델 버전 변경 감지 | P1 | ✅ | manifest mismatch → `IndexUnavailable` |
 | §3.1 | VectorStore 인터페이스 | P0 | ✅ | |
-| §3.2 | sqlite-vec 기본 백엔드 | P0 | ✅ | `internal/store/sqlitevec` |
+| §3.2 | sqlite-vec 기본 백엔드 | P0 | ✅ | `internal/vector/store/sqlitevec` |
 | §3.4 | Filter (lang/path/symbol_kind) | P0 | ✅ | |
 | §3.4 | Filter — commit_hash | P0 | ✅ 2026-05-21 | `types.Filter.CommitHash` (post-filter) + CLI `--commit` + MCP `commit_hash` arg. 1 integration test. |
 | §3.5 | 영속화 (atomic rename + manifest) | P0 | ✅ | |
-| §4.1 | Semantic search | P0 | ✅ | `internal/query/engine.go` |
+| §4.1 | Semantic search | P0 | ✅ | `internal/vector/query/engine.go` |
 | §4.2 | Code-as-Query mode (UC-V4) | P1 | ❌-S2 | |
-| §4.3 | Snippet density 3-tier | P0 | ✅ 2026-05-21 | `DensityTier` (Full / Signature5 / SignatureOnly) — Hit 마다 `density` 필드 노출 + `SearchOptions.MaxDensity` cap + `SearchOptions.SignatureContextLines` (+N 튜닝). `internal/query/snippet.go` + `pkg/ckv` 재노출. |
+| §4.3 | Snippet density 3-tier | P0 | ✅ 2026-05-21 | `DensityTier` (Full / Signature5 / SignatureOnly) — Hit 마다 `density` 필드 노출 + `SearchOptions.MaxDensity` cap + `SearchOptions.SignatureContextLines` (+N 튜닝). `internal/vector/query/snippet.go` + `pkg/vector/ckv` 재노출. |
 | §4.4 | Score 정규화 (0~1) + raw distance | P0 | ✅ | `Hit.Score.Normalized` |
 | §4.5 | Query plan (intent classification) | P1 | ❌-S2 | |
 | §5.1 | 인용 강제 부착 | P0 | ✅ | |
 | §5.2 | 인용 실재성 cheap check | P0 | ✅ 2026-05-21 | file existence + line-sanity (existing) + commit_hash mismatch → `StaleCitation` 플래그 + `stale_N_citations` warning. `EnforceCitationsAt` (B4). 2 신규 unit test. |
-| §5.3 | Citation test suite | P1 | ✅ | `internal/eval` citation accuracy |
+| §5.3 | Citation test suite | P1 | ✅ | `internal/vector/eval` citation accuracy |
 | §6.1 | 변경 감지 (git diff) | P0 | ⚠️ | freshness check만, fsnotify 미구현 |
 | §6.2 | `ckv reindex` (UC-V2) | P0 | ✅ 2026-05-21 | `internal/build.Reindex` + `cmd/ckv reindex`. git diff name-status 기반 changeSet (A/M/D/R/C/T) → DeleteByFile + embed/upsert. Flags: `--since` (diff base override), `--files` (force list, bypass git). Embedder identity match 강제 — mismatch 시 `ErrEmbedderMismatch`. 7 unit test. |
-| §6.3 | `cks.ops.get_freshness` | P0 | ✅ | `internal/freshness` |
+| §6.3 | `cks.ops.get_freshness` | P0 | ✅ | `internal/vector/freshness` |
 | §6.3 | `cks.ops.request_refresh` | P0 | ❌-S2 | |
 | §6.4 | Stale 정책 (auto_refresh / warn_only / block) | P1 | ❌-S2 | |
 | §7 | Working Memory (run/cache/writeback/recall) — 전체 | P0/P1 | ❌-planned | plan §8.2 read-write MCP planned, S2 |
@@ -75,7 +75,7 @@
 | §8.1 | `cks.ops.health` (실측 추가) | — | ✅ | featurelist 누락 항목, 코드에 존재 |
 | §8.2 | Envelope/Budget 검증 (trace_id/dry_run) | P0 | ✅ 2026-05-21 | `Options.TraceID` (caller-supplied or intent-hash fallback) + `Options.DryRun` (skip embed/store/citation/density, metadata-only response). Footprint span에 trace_id 포함. CLI: `--trace-id` / `--dry-run`. MCP: `trace_id` / `dry_run` args. 2 신규 unit test. |
 | §8.3 | mTLS auth | P1 | ❌-S6 | plan §8.4 |
-| §8.4 | Error model (FreshnessStale, BudgetExceeded, CitationNotFound, SanitizeFailed, IndexUnavailable, PolicyError) | P0 | ✅ | 6 종 모두 `internal/query/errors.go` 에 sentinel + `pkg/ckv` 재노출. Raise points: IndexUnavailable (Open), BudgetExceeded (Search), CitationNotFound (Search 카타스트로픽), FreshnessStale (Engine.CheckFreshness). SanitizeFailed / PolicyError 는 sentinel만 (S2 / S6 모듈 도착 시 raise). |
+| §8.4 | Error model (FreshnessStale, BudgetExceeded, CitationNotFound, SanitizeFailed, IndexUnavailable, PolicyError) | P0 | ✅ | 6 종 모두 `internal/vector/query/errors.go` 에 sentinel + `pkg/vector/ckv` 재노출. Raise points: IndexUnavailable (Open), BudgetExceeded (Search), CitationNotFound (Search 카타스트로픽), FreshnessStale (Engine.CheckFreshness). SanitizeFailed / PolicyError 는 sentinel만 (S2 / S6 모듈 도착 시 raise). |
 | §8.5 | Health (실측) | P1 | ✅ | `cks.ops.health` |
 | §8.5 | `cks.ops.stats` | P1 | ❌-S2 | |
 | §9 | Sanitize (5 sub-section) — 전체 | P0 | ❌-S2 | plan §13 명시 |
@@ -92,11 +92,11 @@
 | §11.1 | `ckv model fetch/list` | — | ⚠️ | stub만 (D1-FU-4 open, D2 scope) |
 | §11.1 | `ckv bootstrap --report` (UC-V12) | P0 | ❌-S4 | plan M7 |
 | §11.2 | 공통 플래그 (--json, --log-level, --profile) | P0 | ✅ 2026-05-21 | `--log-level` (debug/info/warn/error, `$CKV_LOG_LEVEL` fallback) + `--profile <path>` (per-event count + p50/p95/sum ms를 profile.json 에 dump). `--json` 은 각 subcommand가 기존 적용. |
-| §11.3 | Configuration (`ckv.yaml`) | P0 | ✅ | `internal/projectcfg` (W3-T15) |
+| §11.3 | Configuration (`ckv.yaml`) | P0 | ✅ | `internal/vector/projectcfg` (W3-T15) |
 | §12 | HTTP API 전체 | P1 | ❌-S2 | |
 | §13 | Bootstrap & Systemization Report | P0/P2 | ❌-S4 | |
 | §14.1 | Structured logging (slog) | P0 | ✅ | |
-| §14.1 | **Footprint logging** (실측 추가) | — | ✅ | `internal/footprint` (W3-T14), featurelist 누락 |
+| §14.1 | **Footprint logging** (실측 추가) | — | ✅ | `internal/vector/footprint` (W3-T14), featurelist 누락 |
 | §14.2 | Prometheus metrics | P1 | ❌-S2 | |
 | §14.3 | OpenTelemetry tracing | P2 | ❌ | |
 | §15.1 | Read-only source | P0 | ✅ | |
@@ -104,7 +104,7 @@
 | §15.3 | Output audit (sanitize pass) | P0 | ❌-S2 | §9 의존 |
 | §16.1 | 단위 테스트 | P0 | ✅ | 25개 test 파일 |
 | §16.2 | 통합 테스트 | P0 | ✅ | `testdata/sample` |
-| §16.3 | Eval harness | P1 | ✅ | `internal/eval` + `internal/judge` |
+| §16.3 | Eval harness | P1 | ✅ | `internal/vector/eval` + `internal/judge` |
 | §16.4 | Fuzz/property tests | P2 | ❌ | |
 | §17.1 | Makefile (build/test/lint/fmt/tidy/clean) | P0 | ✅ | |
 | §17.1 | `make eval` | P0 | ❌-제거 | 실측 부재 (cli `ckv eval`만 사용) |
@@ -112,8 +112,8 @@
 | §17.2 | 멀티-OS 빌드 | P1 | ❌ | D1-FU-5 open |
 | §17.3 | Release (`make release` + CI matrix) | P2 | ❌ | |
 | §18.1 | README | P0 | ✅ | |
-| §18.2 | ARCHITECTURE.md | P1 | ✅ 2026-05-21 | `docs/ARCHITECTURE.md` — 4-Layer 위치, 내부 모듈 의존 그래프 (pkg/types leaf), build/query/reindex 파이프라인의 패키지 시퀀스, ADR 매핑. |
-| §18.3 | SCHEMA.md (chunk metadata only) | P1 | ✅ 2026-05-21 | `docs/SCHEMA.md` — Chunk / Citation / Manifest + sqlite-vec DDL + migration / versioning 규칙. WM entry / sanitize_report 스키마는 S2 모듈 도입 시 그 모듈 내부에서 작성 (정책 결정 2026-05-21). |
+| §18.2 | ARCHITECTURE.md | P1 | ✅ 2026-05-21 | `docs/vector/ARCHITECTURE.md` — 4-Layer 위치, 내부 모듈 의존 그래프 (pkg/types leaf), build/query/reindex 파이프라인의 패키지 시퀀스, ADR 매핑. |
+| §18.3 | SCHEMA.md (chunk metadata only) | P1 | ✅ 2026-05-21 | `docs/vector/SCHEMA.md` — Chunk / Citation / Manifest + sqlite-vec DDL + migration / versioning 규칙. WM entry / sanitize_report 스키마는 S2 모듈 도입 시 그 모듈 내부에서 작성 (정책 결정 2026-05-21). |
 | §18.4 | CKS integration guide | P2 | ❌-CKS | CKS repo 책임 |
 
 **S1 진행 요약**: P0 항목 중 ✅ = 35%, ⚠️ = 15%, ❌-S2 이관 결정 = 30%, ❌-planned/CKS = 20%. 본문 sub-section의 미구현 claim은 본 표의 "❌-..." 분류로 해석.
@@ -343,7 +343,7 @@ type VectorStore interface {
 - caller cert SAN ↔ envelope `caller` 일치 검증
 
 ### 8.4 Error Model (P0)
-6 종 모두 `internal/query/errors.go` sentinel + `pkg/ckv` 재노출 (impl 2026-05-21, B6):
+6 종 모두 `internal/vector/query/errors.go` sentinel + `pkg/vector/ckv` 재노출 (impl 2026-05-21, B6):
 
 | Sentinel | Raise point | 호출자 가이드 |
 |---|---|---|
@@ -567,12 +567,12 @@ type VectorStore interface {
 - 지원 언어, 기본 모델, 백엔드
 
 ### 18.2 ARCHITECTURE.md (P1)
-- 4-Layer 중 본 프로젝트 위치, 모듈 도식 — `docs/ARCHITECTURE.md` (impl 2026-05-21, commit `6466815`)
+- 4-Layer 중 본 프로젝트 위치, 모듈 도식 — `docs/vector/ARCHITECTURE.md` (impl 2026-05-21, commit `6466815`)
 - 내부 모듈 의존 그래프 + build / query / reindex 파이프라인의 패키지 시퀀스
 - ADR ↔ 패키지 매핑
 
 ### 18.3 SCHEMA.md (P1)
-- chunk metadata 스키마 — `docs/SCHEMA.md` (impl 2026-05-21, commit `484b171`)
+- chunk metadata 스키마 — `docs/vector/SCHEMA.md` (impl 2026-05-21, commit `484b171`)
 - 포함 범위: `Chunk` / `Citation` / `Manifest` Go struct + sqlite-vec DDL + migration 정책 + 1.0 ↔ 1.x 버저닝 규칙
 - 제외 범위 (S2 모듈 도입 시 작성): working memory entry (`cks.memory.*`), sanitize_report (UC-V13). 도입 전 spec 만 쓰는 건 drift 위험으로 보류.
 

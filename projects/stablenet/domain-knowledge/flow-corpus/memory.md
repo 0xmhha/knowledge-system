@@ -13,7 +13,7 @@
 cks는 별도 리포 `~/Work/github/code-knowledge-system`(module `github.com/0xmhha/code-knowledge-system`)에
 구현돼 있다. go-stablenet 리포 안에는 없다 — cks 구조를 찾을 땐 그 리포를 봐야 한다.
 
-**구조** (출처: 해당 리포 README + `internal/` + `pkg/contract/intent.go`):
+**구조** (출처: 해당 리포 README + `internal/` + `pkg/system/contract/intent.go`):
 
 - **cks = Code Knowledge System**: Claude Code와 연동되는 통합 레이어. `cks mcp`가 stdio
   JSON-RPC MCP 서버로 `cks.context.*`·`cks.ops.*`(13개 도구)를 노출. coding-agent 플러그인의
@@ -21,12 +21,12 @@ cks는 별도 리포 `~/Work/github/code-knowledge-system`(module `github.com/0x
   빌드 시 CGO 필요(sqlite-vec).
 
 - 내부에서 **두 엔진을 in-process로 조합**:
-  - **ckv** (`code-knowledge-vector`, `internal/ckvclient`) = 벡터/의미 검색. `SemanticSearch`.
+  - **ckv** (`code-knowledge-vector`, `internal/system/ckvclient`) = 벡터/의미 검색. `SemanticSearch`.
     데이터 `ckv-stablenet/`.
-  - **ckg** (`code-knowledge-graph`, `internal/ckgclient`) = 그래프 + BM25/키워드.
+  - **ckg** (`code-knowledge-graph`, `internal/system/ckgclient`) = 그래프 + BM25/키워드.
     `FindSymbol / GetSubgraph / ImpactOfChange / Neighbors / BM25Search`. 데이터 `data/ckg-stablenet/`.
 
-- **query 흐름 (composer) — 순차 2단계 funnel** (`pkg/contract/intent.go`가 *"Pipeline model
+- **query 흐름 (composer) — 순차 2단계 funnel** (`pkg/system/contract/intent.go`가 *"Pipeline model
   (not fan-out)"* 라고 명시):
   1. **intent 분류**
   2. **stage1**: ckv 의미검색 recall → 키워드 추출 → ckg BM25 rerank (신뢰도 미달 시 query를

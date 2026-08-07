@@ -1,6 +1,6 @@
 # CKV 대규모 리팩토링·확장 계획서
 
-> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/adr/`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
+> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/vector/adr`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
 
 문서 버전: 1.0
 작성일: 2026-05-29
@@ -71,12 +71,12 @@ CKV는 3-컴포넌트 아키텍처의 검색 primitive 노드:
 |------|------|
 | 등록된 MCP 도구 | 9개 (`semantic_search`, `get_freshness`, `health`, `warmup`, `related_changes`, `embed`, `vector_search`, `rerank`, `index`) |
 | `rerank` 현 동작 | 인자만 받고 안내 메시지 리턴 (스텁) |
-| `Chunk` 구조체 위치 | `pkg/types/chunk.go` |
+| `Chunk` 구조체 위치 | `pkg/vector/types/chunk.go` |
 | `Chunk` 필드 | 14개. Category·Guidance·Invariant 관련 없음 |
 | `ChunkKind` enum | 7개. invariant·convention 없음 |
 | `Hit` 구조체 | guidance·category 필드 없음 |
 | Facade 구조 | `query.Engine.Search`가 8단계 서비스 호출 |
-| BM25 위치 | `internal/query/bm25/`, candidate-set rerank로만 사용 |
+| BM25 위치 | `internal/vector/query/bm25`, candidate-set rerank로만 사용 |
 | 스키마 버전 | `ResponseSchemaVersion = "1"` |
 | 기존 go-stablenet 마커 | `// CRITICAL`, `// IMPORTANT`, `// WARNING`, `// Deprecated:` 만 존재 |
 
@@ -114,11 +114,11 @@ Phase A (데이터 확장)
 **Task 정의**: Go 파서가 함수/타입 청크 생성 시 invariant 문장을 함께 추출하여 `ChunkInvariant` 청크로 발행 + 원 청크의 `Invariants []InvariantRef`에 역참조.
 
 **영향 파일**:
-- 신규 `internal/invariant/extractor.go` (~250 lines)
-- 신규 `internal/invariant/extractor_test.go`
+- 신규 `internal/vector/invariant/extractor.go` (~250 lines)
+- 신규 `internal/vector/invariant/extractor_test.go`
 - 신규 `internal/invariant/heuristic.go` (Tier 3, ~80 lines)
 - 신규 `internal/invariant/testdata/*.go` (fixture 10개)
-- 수정 `pkg/types/chunk.go`: `ChunkInvariant ChunkKind = "invariant"`, `InvariantRef{ChunkID, Tier int, Marker string}`
+- 수정 `pkg/vector/types/chunk.go`: `ChunkInvariant ChunkKind = "invariant"`, `InvariantRef{ChunkID, Tier int, Marker string}`
 - 수정 `internal/chunk/chunk.go:Summarize`: Invariant 카운트
 - 수정 `internal/build/pipeline.go:processFile`: invariant pass 호출
 
@@ -159,11 +159,11 @@ Phase A (데이터 확장)
 5. 동시성 패턴 (`sync.Mutex`, `chan`, `errgroup` 빈도)
 
 **영향 파일**:
-- 신규 `internal/convention/stats.go` (~300 lines)
-- 신규 `internal/convention/stats_test.go`
+- 신규 `internal/vector/convention/stats.go` (~300 lines)
+- 신규 `internal/vector/convention/stats_test.go`
 - 신규 `internal/convention/testdata/` (sample 패키지 3개)
-- 수정 `pkg/types/chunk.go`: `ChunkConvention ChunkKind = "convention"`, `ConventionStats map[string]any`
-- 수정 `internal/build/pipeline.go`: 파일 처리 후 패키지별 누적
+- 수정 `pkg/vector/types/chunk.go`: `ChunkConvention ChunkKind = "convention"`, `ConventionStats map[string]any`
+- 수정 `internal/vector/build/pipeline.go`: 파일 처리 후 패키지별 누적
 
 **시간**: 2 dev-day
 
@@ -194,13 +194,13 @@ Phase A (데이터 확장)
 **Task 정의**: `types.Chunk`에 `Category string`, `Guidance *ModificationGuidance` 추가. 빌드 시 경로→카테고리 매핑. Hit으로 전파.
 
 **영향 파일**:
-- 수정 `pkg/types/chunk.go`: 2개 필드 + `ModificationGuidance{AlsoReview, RequiredTests, WatchOut []string}`
-- 수정 `pkg/types/chunk_test.go`: 직렬화 테스트
-- 신규 `internal/policy/loader.go` (~150 lines)
-- 신규 `internal/policy/loader_test.go`
-- 수정 `internal/build/pipeline.go`: 청크 발행 후 `policy.Apply(chunks)` 호출
+- 수정 `pkg/vector/types/chunk.go`: 2개 필드 + `ModificationGuidance{AlsoReview, RequiredTests, WatchOut []string}`
+- 수정 `pkg/vector/types/chunk_test.go`: 직렬화 테스트
+- 신규 `internal/vector/policy/loader.go` (~150 lines)
+- 신규 `internal/vector/policy/loader_test.go`
+- 수정 `internal/vector/build/pipeline.go`: 청크 발행 후 `policy.Apply(chunks)` 호출
 - 수정 `internal/query/engine.go:Hit`: `Category`, `Guidance` 필드
-- 수정 `internal/query/service_enrich.go`: chunk → hit 변환
+- 수정 `internal/vector/query/service_enrich.go`: chunk → hit 변환
 
 **시간**: 1.5 dev-day
 
@@ -284,9 +284,9 @@ categories:
 - 신규 `internal/query/keyword/index.go` (~200 lines)
 - 신규 `internal/query/keyword/search.go` (~150 lines)
 - 신규 `internal/query/keyword/*_test.go`
-- 수정 `internal/build/pipeline.go`: 빌드 종료 시 `bm25.idx` dump
-- 수정 `internal/query/engine.go`: `KeywordSearch(ctx, query, opts) ([]Hit, error)`
-- 수정 `pkg/mcp/server.go`: `cks.context.keyword_search` 등록
+- 수정 `internal/vector/build/pipeline.go`: 빌드 종료 시 `bm25.idx` dump
+- 수정 `internal/vector/query/engine.go`: `KeywordSearch(ctx, query, opts) ([]Hit, error)`
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.keyword_search` 등록
 
 **시간**: 2 dev-day
 
@@ -321,9 +321,9 @@ categories:
 - 출력: 필터 통과 chunk + metadata
 
 **영향 파일**:
-- 수정 `pkg/mcp/server.go`: `cks.context.narrow_candidates` 등록
-- 수정 `internal/query/engine.go`: `NarrowCandidates(ctx, ids, filter)`
-- 수정 `internal/store/sqlitevec/`: `LookupByIDs([]string)`
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.narrow_candidates` 등록
+- 수정 `internal/vector/query/engine.go`: `NarrowCandidates(ctx, ids, filter)`
+- 수정 `internal/vector/store/sqlitevec`: `LookupByIDs([]string)`
 
 **시간**: 0.5 dev-day
 
@@ -354,9 +354,9 @@ categories:
 - 출력: `chunks: []Chunk` (라인 순)
 
 **영향 파일**:
-- 수정 `pkg/mcp/server.go`: `cks.context.expand_in_file`
-- 수정 `internal/query/engine.go`: `ExpandInFile(ctx, chunkID, before, after)`
-- 수정 `internal/store/sqlitevec/`: `LookupByFileOrdered(file)`
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.expand_in_file`
+- 수정 `internal/vector/query/engine.go`: `ExpandInFile(ctx, chunkID, before, after)`
+- 수정 `internal/vector/store/sqlitevec`: `LookupByFileOrdered(file)`
 
 **시간**: 0.5 dev-day
 
@@ -385,9 +385,9 @@ categories:
 - 출력: `invariants: [{chunk_id, marker, tier, text, source_chunk_id, citation}]`
 
 **영향 파일**:
-- 수정 `pkg/mcp/server.go`: `cks.context.find_invariants`
-- 수정 `internal/query/engine.go`: `FindInvariants(ctx, opts)`
-- 수정 `internal/store/sqlitevec/`: ChunkKind=invariant 필터
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.find_invariants`
+- 수정 `internal/vector/query/engine.go`: `FindInvariants(ctx, opts)`
+- 수정 `internal/vector/store/sqlitevec`: ChunkKind=invariant 필터
 
 **시간**: 0.75 dev-day
 
@@ -416,8 +416,8 @@ categories:
 - 출력: `stats: map[string]any`
 
 **영향 파일**:
-- 수정 `pkg/mcp/server.go`: `cks.context.get_conventions`
-- 수정 `internal/query/engine.go`: `GetConventions(ctx, pkg)`
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.get_conventions`
+- 수정 `internal/vector/query/engine.go`: `GetConventions(ctx, pkg)`
 
 **시간**: 0.5 dev-day
 
@@ -454,10 +454,10 @@ categories:
 ```
 
 **영향 파일**:
-- 수정 `pkg/mcp/server.go`: `cks.context.explain_match`
-- 신규 `internal/query/explain.go` (~200 lines)
+- 수정 `pkg/vector/mcp/server.go`: `cks.context.explain_match`
+- 신규 `internal/vector/query/explain.go` (~200 lines)
 - 신규 `internal/query/explain_test.go`
-- 수정 `internal/query/bm25/`: 토큰 매칭 결과 노출
+- 수정 `internal/vector/query/bm25`: 토큰 매칭 결과 노출
 
 **시간**: 1.5 dev-day
 
@@ -485,8 +485,8 @@ categories:
 
 **영향 파일**:
 - 수정 `internal/query/engine.go:Hit`: 2 필드 추가
-- 수정 `internal/query/service_enrich.go`: chunk → hit 복사
-- 수정 `pkg/mcp/server.go`: schema_version "1" → "1.1" (minor bump)
+- 수정 `internal/vector/query/service_enrich.go`: chunk → hit 복사
+- 수정 `pkg/vector/mcp/server.go`: schema_version "1" → "1.1" (minor bump)
 - 수정 모든 도구 응답 직렬화 path
 
 **시간**: 0.5 dev-day
@@ -516,9 +516,9 @@ categories:
 **Task 정의**: 동일 텍스트 임베딩 재요청 시 LRU 캐시 히트.
 
 **영향 파일**:
-- 신규 `internal/embed/cache/lru.go` (~150 lines, hashicorp/golang-lru/v2)
-- 신규 `internal/embed/cache/lru_test.go`
-- 수정 `internal/embed/`: 캐시 래퍼 (`WithCache(emb, size)`)
+- 신규 `internal/vector/embed/cache/lru.go` (~150 lines, hashicorp/golang-lru/v2)
+- 신규 `internal/vector/embed/cache/lru_test.go`
+- 수정 `internal/vector/embed`: 캐시 래퍼 (`WithCache(emb, size)`)
 - 수정 `cmd/ckv/mcp/main.go`: 캐시 활성화
 
 **시간**: 0.75 dev-day
@@ -544,10 +544,10 @@ categories:
 **Task 정의**: A1·A2·A3에서 SQLite 컬럼 추가 필요. `migrations/` + `ckv migrate` CLI.
 
 **영향 파일**:
-- 신규 `internal/store/sqlitevec/migrations/001_add_category_guidance.sql`
-- 신규 `internal/store/sqlitevec/migrations/002_add_invariant_refs.sql`
-- 신규 `internal/store/sqlitevec/migrations/003_add_convention_stats.sql`
-- 신규 `internal/store/sqlitevec/migrate.go` (~200 lines)
+- 신규 `internal/vector/store/sqlitevec/migrations/001_add_category_guidance.sql`
+- 신규 `internal/vector/store/sqlitevec/migrations/002_add_invariant_refs.sql`
+- 신규 `internal/vector/store/sqlitevec/migrations/003_add_convention_stats.sql`
+- 신규 `internal/vector/store/sqlitevec/migrate.go` (~200 lines)
 - 신규 `cmd/ckv/migrate/main.go`
 - 수정 `pkg/mcp/server.go:ResponseSchemaVersion`: "1" → "1.1"
 
@@ -578,9 +578,9 @@ categories:
 **Task 정의**: A2의 convention extractor를 build pipeline 정식 단계로.
 
 **영향 파일**:
-- 수정 `internal/build/builder.go`: 파일 후처리 hook
-- 수정 `internal/build/pipeline.go`: convention.Aggregator 통합
-- 수정 `internal/build/progress.go`: convention 단계 추가
+- 수정 `internal/vector/build/builder.go`: 파일 후처리 hook
+- 수정 `internal/vector/build/pipeline.go`: convention.Aggregator 통합
+- 수정 `internal/vector/build/progress.go`: convention 단계 추가
 
 **시간**: 0.75 dev-day
 
@@ -710,14 +710,14 @@ planner의 최초 초안은 `A1 → A2 → A3 → A4 → B7 → B1 → ...` 순�
 ## 12. 산출물 체크리스트
 
 **코드**:
-- [ ] `internal/invariant/` (A1)
-- [ ] `internal/convention/` (A2)
-- [ ] `internal/policy/` (A3·A4)
+- [ ] `internal/vector/invariant` (A1)
+- [ ] `internal/vector/convention` (A2)
+- [ ] `internal/vector/policy` (A3·A4)
 - [ ] `internal/query/keyword/` (B1)
-- [ ] `internal/query/explain.go` (B6)
-- [ ] `internal/embed/cache/` (C1)
-- [ ] `internal/store/sqlitevec/migrate.go` + `migrations/*.sql` (C2)
-- [ ] `cmd/ckv/migrate/` (C2)
+- [ ] `internal/vector/query/explain.go` (B6)
+- [ ] `internal/vector/embed/cache` (C1)
+- [ ] `internal/vector/store/sqlitevec/migrate.go` + `migrations/*.sql` (C2)
+- [ ] `cmd/vector/migrate` (C2)
 
 **데이터**:
 - [ ] `policy/stablenet.yaml`
@@ -725,7 +725,7 @@ planner의 최초 초안은 `A1 → A2 → A3 → A4 → B7 → B1 → ...` 순�
 
 **문서**:
 - [ ] `docs/architecture-2026-05-refactor.md` (D1~D6 의사결정 기록)
-- [ ] `docs/mcp-tools.md` (16개 도구 목록)
+- [ ] `docs/vector/mcp-tools.md` (16개 도구 목록)
 - [ ] schema_version migration note
 
 **테스트**:
@@ -738,7 +738,7 @@ planner의 최초 초안은 `A1 → A2 → A3 → A4 → B7 → B1 → ...` 순�
 
 - 합의 토론 세션: 2026-05-29
 - 관련 문서:
-  - `docs/ARCHITECTURE.md` (현재 CKV 아키텍처)
-  - `docs/SCHEMA.md` (현재 스키마)
+  - `docs/vector/ARCHITECTURE.md` (현재 CKV 아키텍처)
+  - `docs/vector/SCHEMA.md` (현재 스키마)
   - `docs/backlog.md` (이전 작업 백로그)
   - `docs/plan-2026-05-26.md` (이전 계획서)

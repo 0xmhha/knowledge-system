@@ -7,7 +7,7 @@ and multi-line literal styles all survive — only `status`,
 `last_verified_at`, and `verified_by` change.
 
 Used at the end of the substantive verification step
-(`docs/domain-knowledge/shared/STATUS_LIFECYCLE.md`), once a reviewer
+(`system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md`), once a reviewer
 has confirmed by hand that the entry's claims hold against current code.
 
 ## Safety: pre-flight validation

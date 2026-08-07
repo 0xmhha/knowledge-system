@@ -24,7 +24,7 @@ code in their own modules; this doc grows when they do.
 
 ## 1. `Chunk` — the indexable record
 
-Source: [`pkg/types/chunk.go`](../pkg/types/chunk.go).
+Source: [`pkg/vector/types/chunk.go`](../pkg/types/chunk.go).
 
 A `Chunk` is one embeddable region: a function/method, a struct
 declaration, a markdown heading section, or the top-N-lines file
@@ -93,7 +93,7 @@ ID = sha256(file + "\n" + start_line + ":" + end_line + "\n" + content_sha256)
 ```
 
 Renaming the file changes the ID by design — rename tracking is the
-caller's responsibility. `internal/build/reindex.go` handles git
+caller's responsibility. `internal/vector/build/reindex.go` handles git
 renames by mapping them to delete-old + add-new.
 
 `content_sha256` is the SHA-256 of the raw `Text` bytes, no whitespace
@@ -167,7 +167,7 @@ without coordinating opens.
 Mismatch on Open between manifest and live `Embedder` is fatal:
 returns `ErrIndexUnavailable` (model/dim) or `ErrEmbedderMismatch`
 (reindex with different embedder) — see
-[`internal/query/errors.go`](../internal/query/errors.go).
+[`internal/vector/query/errors.go`](../internal/query/errors.go).
 
 ### CKG ↔ CKV manifest compatibility
 
@@ -255,7 +255,7 @@ Two mechanisms coexist:
    additions before the formal framework existed (`is_test`,
    `recent_prs`). Stays as-is for already-applied changes; new
    migrations should use the framework below.
-2. **Formal migration framework** (`internal/store/sqlitevec/migrate.go`)
+2. **Formal migration framework** (`internal/vector/store/sqlitevec/migrate.go`)
    — versioned `.sql` files in `migrations/` are loaded via `go:embed`
    and applied in lexical order. A `schema_migrations` table tracks
    which versions have been applied along with the SHA-256 of their
@@ -279,7 +279,7 @@ ckv migrate --out ./ckv-data --no-backup
 ```
 
 Authoring new migrations: see
-[`internal/store/sqlitevec/migrations/README.md`](../internal/store/sqlitevec/migrations/README.md).
+[`internal/vector/store/sqlitevec/migrations/README.md`](../internal/store/sqlitevec/migrations/README.md).
 
 ---
 
@@ -312,11 +312,11 @@ shim). No such bump has happened on CKV's 1.0 line.
 
 ## Cross-references
 
-- [`pkg/types/chunk.go`](../pkg/types/chunk.go) — `Chunk`, `Citation`,
+- [`pkg/vector/types/chunk.go`](../pkg/types/chunk.go) — `Chunk`, `Citation`,
   `ChunkID`, `ContentSHA256`
-- [`internal/manifest/manifest.go`](../internal/manifest/manifest.go) — `Manifest`
-- [`internal/store/sqlitevec/store.go`](../internal/store/sqlitevec/store.go) — DDL + migrations
-- [`internal/query/errors.go`](../internal/query/errors.go) — error model
+- [`internal/vector/manifest/manifest.go`](../internal/manifest/manifest.go) — `Manifest`
+- [`internal/vector/store/sqlitevec/store.go`](../internal/store/sqlitevec/store.go) — DDL + migrations
+- [`internal/vector/query/errors.go`](../internal/query/errors.go) — error model
 - [`plan-S1-ckv.md §4`](./archive/plan-S1-ckv.md) — original schema design
   notes (predates some additive changes)
 - [`ADR-001`](./adr/001-sqlite-vec-storage.md) — *why* sqlite-vec

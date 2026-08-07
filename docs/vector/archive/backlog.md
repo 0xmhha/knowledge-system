@@ -48,8 +48,8 @@
 - ~~**#6** Rule-based contextual prefix~~ — ✅ 2026-05-21 (commit `1a5289d`)
 - ~~**E3** ADR 디렉토리 + 첫 5 ADR~~ — ✅ 2026-05-21 (commit `a4cd5d9`)
 - ~~**B3** Snippet density 3-tier ladder~~ — ✅ 2026-05-21 (commit `5f8f024`)
-- ~~**E1** `docs/ARCHITECTURE.md`~~ — ✅ 2026-05-21 (commit `6466815`)
-- ~~**E2-chunk** `docs/SCHEMA.md`~~ — ✅ 2026-05-21 (commit `484b171`)
+- ~~**E1** `docs/vector/ARCHITECTURE.md`~~ — ✅ 2026-05-21 (commit `6466815`)
+- ~~**E2-chunk** `docs/vector/SCHEMA.md`~~ — ✅ 2026-05-21 (commit `484b171`)
 - ~~**B2 / B4 / B5 / B8** 잔여 B 그룹 4건~~ — ✅ 2026-05-21 (commits `209ba70` / `8fc478a` / `5efa2c1` / `0241a25`)
 - ~~**B1** sliding split (Phase A)~~ — ✅ 2026-05-21 (commit `6dc7225`)
 
@@ -59,12 +59,12 @@
 > [`docs/pending-work-2026-05-21.md`](./pending-work-2026-05-21.md) 참조.
 >
 > stable-net 대상 evaluation framework 설계 + 사용자 결정 D1/D6 답변은
-> [`docs/evaluation-design-2026-05-22.md`](./evaluation-design-2026-05-22.md)
+> [`docs/vector/evaluation-design-2026-05-22.md`](./evaluation-design-2026-05-22.md)
 > 참조. D1 = 3-leg BM25 *임시* (영구 결정은 측정 후). D6 = skills 기반.
 >
 > 2026-05-22~23 세션 진행 상태 + 잔여 Wave B/C/D + 다음 세션 진입
 > 워크플로우는
-> [`docs/archive/session-handoff-2026-05-23.md`](./archive/session-handoff-2026-05-23.md)
+> [`docs/vector/archive/session-handoff-2026-05-23.md`](./archive/session-handoff-2026-05-23.md)
 > 참조 (현행 진입점은 `session-handoff-2026-06-29.md`).
 
 ---
@@ -78,7 +78,7 @@
 | ID | 작업 | 우선순위 | 상태 | 비고 |
 |---|---|---|---|---|
 | **A1** | Phase 0b — CoreML compile I/O error 해결 | High | ✅ 2026-05-20 | Root cause: `ModelFormat=NeuralNetwork` (ORT default) 의 silent FP32 → FP16 cast 가 ANE compile 단계에서 실패. fix: `CKV_COREML_MODEL_FORMAT=MLProgram` + `CKV_STATIC_SHAPES=1` 조합. commits `66bdefc` / `9e71fa6` / `292db4a` / `9ff43e6`. throughput 회복은 부분 (0.74 c/s CPU pure; ANE 친화 모델 도입은 HF 차단으로 보류 — `embeddinggemma-300m` ModelConfig 등록만 완료, 모델 파일 미보유). |
-| **A2** | D1-FU-4 `ckv model fetch` CLI 완성 | Medium (D2) | ⏳ stub | `cmd/ckv/model.go` 현재 `"not yet implemented"` 반환. `hf` 의존 제거 위함. |
+| **A2** | D1-FU-4 `ckv model fetch` CLI 완성 | Medium (D2) | ⏳ stub | `cmd/vector/model.go` 현재 `"not yet implemented"` 반환. `hf` 의존 제거 위함. |
 | **A3** | D1-FU-5 linux/amd64+arm64 CI matrix | Low | ⏳ | cross-build with `libonnxruntime` + `libtokenizers`. macOS 외 OS 미검증. |
 | **A4** | D1-FU-6 bge-code-v1 Qwen2 adapter | Mid (D2) | ⏳ | ModelDim=1536, ModelMaxInput=32k, last-token pooling, Qwen2 ONNX export (~5GB). 모델 이미 `~/.cache/ckv/models/bge-code-v1/` 다운로드됨. code retrieval 정확도 잠재 우위. |
 | **A5** | D1-FU-7 fixture corpus 확장 (N=34 → N=50+) | Medium | ✅ 2026-05-21 | N=50 도달. 신규 sample 파일 2 개 (`validator.go` 4 Go 심볼, `client.js` 4 JS 심볼 — C10 파서 exercise) + 4 markdown 쿼리 (decisions.md) + 4 기존 파일 gap-fill. mock 임베더 baseline: recall@5=0.68, MRR=0.44, citation_acc=1.00. bge-large 실측은 별도 세션. |
@@ -91,10 +91,10 @@
 |---|---|---|---|---|
 | **B1** | §1.3 큰 함수 sliding window split | Mid | ✅ 2026-05-21 | `splitLongSpan` — Function/Method 가 cap 초과 시 line-window 분할 (avg-chars-per-line 기반 window line 수 계산). `ChunkKind=ChunkFunctionSplit`, `SymbolName="<orig>:chunk:N"`, 실제 file line_range, distinct chunk_id. Non-function 과 single-line 은 truncate fallback. 4 신규 unit test + 5-split smoke 확인. = Roadmap §12 #10 (Phase A). |
 | **B2** | §3.4 Filter — commit_hash filtering | Low | ✅ 2026-05-21 | `Filter.CommitHash` 는 이미 `Matches` 에 연결돼 있었고, CLI `--commit` + MCP `commit_hash` arg 표면만 추가. 1 integration test. |
-| **B3** | §4.3 Snippet density 3-tier ladder | Mid | ✅ 2026-05-21 | `DensityTier` (Full / Signature5 / SignatureOnly) — `internal/query/snippet.go`. Hit 마다 `Density` 필드 노출 + `Options.MaxDensity` cap + `Options.SignatureContextLines` 튜닝. `pkg/ckv` 재노출. 3 신규 unit test (per-hit reporting / cap override / ctxLines knob). |
+| **B3** | §4.3 Snippet density 3-tier ladder | Mid | ✅ 2026-05-21 | `DensityTier` (Full / Signature5 / SignatureOnly) — `internal/vector/query/snippet.go`. Hit 마다 `Density` 필드 노출 + `Options.MaxDensity` cap + `Options.SignatureContextLines` 튜닝. `pkg/vector/ckv` 재노출. 3 신규 unit test (per-hit reporting / cap override / ctxLines knob). |
 | **B4** | §5.2 인용 실재성 — commit_hash 매칭 | Low | ✅ 2026-05-21 | `EnforceCitationsAt` 신설 — chunk.commit_hash ≠ 현재 git HEAD → `StaleCitation=true` 플래그 + warning `stale_N_citations`. drop은 안 함 (file은 유효). types.Hit + query.Hit 둘 다 필드 추가. 2 unit test. |
 | **B5** | §8.2 Envelope — `trace_id`/`dry_run` | Low | ✅ 2026-05-21 | `Options.TraceID` (caller / intent-hash fallback) + `Options.DryRun` (metadata-only response). Footprint span + `Response.Metadata` echo. CLI `--trace-id` / `--dry-run` + MCP `trace_id` / `dry_run` args. 2 unit test. |
-| **B6** | §8.4 Error model 6종 중 5종 미구현 | Mid | ✅ 2026-05-21 | 6 종 sentinel `internal/query/errors.go` + `pkg/ckv` 재노출. Raise points 4 종 wired (IndexUnavailable / BudgetExceeded `MinBudgetTokens=20` / CitationNotFound 전수-drop / FreshnessStale via `Engine.CheckFreshness`). SanitizeFailed / PolicyError sentinel only (S2 / S6 도착 시 raise). 7 unit test (4 internal + 3 facade). |
+| **B6** | §8.4 Error model 6종 중 5종 미구현 | Mid | ✅ 2026-05-21 | 6 종 sentinel `internal/vector/query/errors.go` + `pkg/vector/ckv` 재노출. Raise points 4 종 wired (IndexUnavailable / BudgetExceeded `MinBudgetTokens=20` / CitationNotFound 전수-drop / FreshnessStale via `Engine.CheckFreshness`). SanitizeFailed / PolicyError sentinel only (S2 / S6 도착 시 raise). 7 unit test (4 internal + 3 facade). |
 | **B7** | §10.2 Symbol ID 호환 정규화 규칙 | Low | ⏳ | `ckg_node_id` 필드만. CKG와 join 위한 normalize 규칙 미합의. CKG 측과 협업 필요. |
 | **B8** | §11.2 공통 플래그 (`--log-level`, `--profile`) | Low | ✅ 2026-05-21 | `--log-level` (debug/info/warn/error, `$CKV_LOG_LEVEL` fallback) + `--profile <path>` (per-event count + p50/p95/sum ms를 profile.json 에 aggregate). Root PersistentFlag → footprint.Options.Level + ProfilePath. 2 신규 unit test + CLI smoke 확인. |
 | **B9** | §15.2 Secret 회피 패턴 (.env / *.pem) | High (보안) | ✅ 2026-05-21 | `internal/discover.DefaultSecretPatterns` 25개 패턴 — `.env*` env variants / `*.pem` `*.key` `*.p12` `*.pfx` `*.keystore` / SSH keys / `credentials.json` `service-account*.json` / `.npmrc` `.pypirc` `.netrc` / `.aws/credentials`. opt-out: `CKV_DISABLE_SECRET_FILTER=1`. 3개 신규 unit test (block all / allow template / opt-out). |
@@ -117,7 +117,7 @@
 | **C7** | `cks.context.get_context_for_task` | §8.1 | sanitize 의존. |
 | **C8** | UC-V4 Pattern Similarity (code-as-query) | §4.2 | input이 코드 스니펫일 때. |
 | **C9** | Embedding cache (per-text disk cache) | §2.4 | rename/이동 시 재임베딩 회피. |
-| **C10** | JavaScript parser 신설 | §1.2 | ✅ 2026-05-21 (commit `e4977fa`). `internal/parse/javascript/` 신설, tree-sitter-typescript binding delegation. `.js` / `.jsx` / `.mjs` / `.cjs` 인덱싱. S2 이관 결정에서 S1 으로 끌어옴 (TS parser 패턴 재사용 비용 작음). |
+| **C10** | JavaScript parser 신설 | §1.2 | ✅ 2026-05-21 (commit `e4977fa`). `internal/vector/parse/javascript` 신설, tree-sitter-typescript binding delegation. `.js` / `.jsx` / `.mjs` / `.cjs` 인덱싱. S2 이관 결정에서 S1 으로 끌어옴 (TS parser 패턴 재사용 비용 작음). |
 | **C11** | Prometheus metrics exporter | §14.2 | latency/cache hit/sanitize counter. |
 
 ### D. 외부 의존 (CKV scope 외, 의존성만 추적)
@@ -133,11 +133,11 @@
 
 | ID | 작업 | 우선순위 | 상태 | 비고 |
 |---|---|---|---|---|
-| **E1** | `docs/ARCHITECTURE.md` 신설 | P1 | ✅ 2026-05-21 | 4-Layer 위치 + 내부 모듈 의존 그래프 (pkg/types leaf, no cycles) + build/query/reindex 파이프라인 패키지 시퀀스 + ADR 매핑. 190줄. README / plan-S1 와 겹치는 부분은 링크로 위임. |
-| **E2-chunk** | `docs/SCHEMA.md` (chunk metadata only) | P1 | ✅ 2026-05-21 | Chunk / Citation / Manifest + sqlite-vec DDL + migration 정책 + 1.0 버저닝 규칙. 코드 기반 ground-truth. |
+| **E1** | `docs/vector/ARCHITECTURE.md` 신설 | P1 | ✅ 2026-05-21 | 4-Layer 위치 + 내부 모듈 의존 그래프 (pkg/types leaf, no cycles) + build/query/reindex 파이프라인 패키지 시퀀스 + ADR 매핑. 190줄. README / plan-S1 와 겹치는 부분은 링크로 위임. |
+| **E2-chunk** | `docs/vector/SCHEMA.md` (chunk metadata only) | P1 | ✅ 2026-05-21 | Chunk / Citation / Manifest + sqlite-vec DDL + migration 정책 + 1.0 버저닝 규칙. 코드 기반 ground-truth. |
 | **E2-WM** | working memory entry 스키마 | P1 | ⏳ S2 | `cks.memory.*` 모듈 도입 시 그 모듈 내부에서 작성. 도입 전 spec 만 쓰는 건 drift 위험. |
 | **E2-Sanitize** | sanitize_report 스키마 | P1 | ⏳ S2 | UC-V13 sanitize 모듈 도입 시 그 모듈 내부에서 작성. |
-| **E3** | ADR 디렉토리 신설 (`docs/adr/NNN-*.md`) | Mid | ✅ 2026-05-21 | `docs/adr/` 신설 + README (format / when-to-write 가이드 + index) + 5 ADR (001 sqlite-vec / 002 bge-large pivot / 003 BM25 dual-track / 004 ckv reindex S1.5 promotion / 005 CoreML MLProgram + static shapes). 모두 markdown parser 가 `KindADRSection` 으로 자동 분류해 검색 가능. |
+| **E3** | ADR 디렉토리 신설 (`docs/adr/NNN-*.md`) | Mid | ✅ 2026-05-21 | `docs/vector/adr` 신설 + README (format / when-to-write 가이드 + index) + 5 ADR (001 sqlite-vec / 002 bge-large pivot / 003 BM25 dual-track / 004 ckv reindex S1.5 promotion / 005 CoreML MLProgram + static shapes). 모두 markdown parser 가 `KindADRSection` 으로 자동 분류해 검색 가능. |
 
 ### F. cks dogfood follow-ups (모두 closed)
 
@@ -146,8 +146,8 @@
 | ID | 작업 | 상태 | 비고 |
 |---|---|---|---|
 | **CKV-1** | `cks.context.semantic_search` hang 재현 | ✅ 2026-05-20 (commit `42bb7f2`) | ckv-side 재현 불가. 8 concurrent queries 포함 모든 시나리오 정상 응답. cks-side composer / transport 측 후속 조사로 이전. 검증 스크립트: `testdata/mcp-repro/`. |
-| **CKV-2** | public Go API (`pkg/ckv`) | ✅ 2026-05-20 (commit `7aa08d9`) | `ckv.Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` + `MockEmbedder` factory. 9 unit tests. cks 측 subprocess proxy 우회 가능. |
-| **CKV-3** | consumer-oriented docs | ✅ 2026-05-20 (commit `acaff74`) | `docs/embedder-integration.md` 신설 (~300 lines, 8 sections). |
+| **CKV-2** | public Go API (`pkg/vector/ckv`) | ✅ 2026-05-20 (commit `7aa08d9`) | `ckv.Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` + `MockEmbedder` factory. 9 unit tests. cks 측 subprocess proxy 우회 가능. |
+| **CKV-3** | consumer-oriented docs | ✅ 2026-05-20 (commit `acaff74`) | `docs/vector/embedder-integration.md` 신설 (~300 lines, 8 sections). |
 | **CKV-4** | transport-closed root cause | ✅ 2026-05-20 (commit `7f2fab8`) | mcp-go `WithRecovery()` 미설치로 handler panic 시 process crash → stdio close. fix: `NewMCPServer` 호출에 `server.WithRecovery()` 추가. `TestServerRecoversFromHandlerPanic` 로 검증. |
 | **CKV-5** | embedder warm-up | ✅ 2026-05-20 (commit `9474b4e`) | `Engine.Warmup(ctx)` (internal/query, pkg/ckv) + `cks.ops.warmup` MCP tool. 응답: `{ready, duration_ms, embedder}`. |
 | **CKV-6** | health endpoint embedder status | ✅ 2026-05-20 (commit `bd8f701`) | nested `embedder: {name, dimension, status, provider, model_dir}` + `index: {chunk_count, last_built_at, indexed_head}`. status = `ready` / `stub` / `unavailable`. backward compat (flat fields 유지). |
@@ -219,15 +219,15 @@
 | ID | 작업 | 시작 가능 시점 | 추천 사유 |
 |---|---|---|---|
 | ~~**B9** Secret 회피 패턴~~ | ✅ 2026-05-21 | `internal/discover.DefaultSecretPatterns` impl |
-| ~~**B6** Error model 5 종~~ | ✅ 2026-05-21 | `internal/query/errors.go` 6 sentinel + raise points 4 종 wired |
+| ~~**B6** Error model 5 종~~ | ✅ 2026-05-21 | `internal/vector/query/errors.go` 6 sentinel + raise points 4 종 wired |
 | ~~**A5** fixture N=34 → N=50+~~ | ✅ 2026-05-21 | `validator.go` + `client.js` 신설, 16 신규 query, mock recall@5=0.68 |
 | ~~**Roadmap #8** `ckv reindex` 도입~~ | ✅ 2026-05-21 | `internal/build.Reindex` + `cmd/ckv reindex` impl + 7 unit test |
-| ~~**#6** 룰 기반 prefix~~ | ✅ 2026-05-21 | `internal/chunk/prefix.go` impl, mock N=50 r@1 +0.060 / MRR +0.053 |
-| ~~**E3** ADR 디렉토리 + 첫 5 개 ADR~~ | ✅ 2026-05-21 | `docs/adr/` + README + 5 ADR (sqlite-vec / bge-large pivot / BM25 dual-track / reindex S1.5 / CoreML MLProgram+static) |
+| ~~**#6** 룰 기반 prefix~~ | ✅ 2026-05-21 | `internal/vector/chunk/prefix.go` impl, mock N=50 r@1 +0.060 / MRR +0.053 |
+| ~~**E3** ADR 디렉토리 + 첫 5 개 ADR~~ | ✅ 2026-05-21 | `docs/vector/adr` + README + 5 ADR (sqlite-vec / bge-large pivot / BM25 dual-track / reindex S1.5 / CoreML MLProgram+static) |
 | ~~**B3** Snippet density 3-tier ladder~~ | ✅ 2026-05-21 | `DensityTier` 노출 + cap / ctxLines 옵션 |
 | **#7** LLM-generated prefix (Phase D.2) | 후속 | Anthropic 정식 패턴. throughput cost 큼 (0.2~0.4 c/s). D.1 효과 확정 후 검토. |
-| ~~**E1** `docs/ARCHITECTURE.md`~~ | ✅ 2026-05-21 | 내부 모듈 그래프 + 파이프라인 시퀀스 + ADR 매핑 |
-| ~~**E2-chunk** `docs/SCHEMA.md`~~ | ✅ 2026-05-21 | Chunk/Citation/Manifest + sqlite-vec DDL + versioning rules |
+| ~~**E1** `docs/vector/ARCHITECTURE.md`~~ | ✅ 2026-05-21 | 내부 모듈 그래프 + 파이프라인 시퀀스 + ADR 매핑 |
+| ~~**E2-chunk** `docs/vector/SCHEMA.md`~~ | ✅ 2026-05-21 | Chunk/Citation/Manifest + sqlite-vec DDL + versioning rules |
 | **E2-WM** working memory schema | S2 | `cks.memory.*` 모듈 도입 시 함께 작성 |
 | **E2-Sanitize** sanitize_report schema | S2 | UC-V13 sanitize 모듈 도입 시 함께 작성 |
 
@@ -278,20 +278,20 @@
 | D2 | (CKS multiplex) | E | plan §7.3 |
 | D3 | §8.3 ❌-S6 | — | plan §8.4 |
 | D4 | (CKG 책임) | — | CKG `pkg/bm25/scorer.go` |
-| E1 | ✅ 2026-05-21 — `docs/ARCHITECTURE.md` (모듈 그래프 + 파이프라인 + ADR 매핑) | — | — |
-| E2-chunk | ✅ 2026-05-21 — `docs/SCHEMA.md` (Chunk/Citation/Manifest + sqlite-vec DDL) | — | — |
+| E1 | ✅ 2026-05-21 — `docs/vector/ARCHITECTURE.md` (모듈 그래프 + 파이프라인 + ADR 매핑) | — | — |
+| E2-chunk | ✅ 2026-05-21 — `docs/vector/SCHEMA.md` (Chunk/Citation/Manifest + sqlite-vec DDL) | — | — |
 | E2-WM | ⏳ S2 — `cks.memory.*` 도입 시 그 모듈 내부에서 작성 | — | — |
 | E2-Sanitize | ⏳ S2 — UC-V13 sanitize 도입 시 그 모듈 내부에서 작성 | — | — |
 | E3 | ✅ 2026-05-21 — `docs/adr/{README,001..005}.md` 신설, ADRSection 자동 인덱싱 | — | — |
 | CKV-1 | (consumer 측 hang) | — | `testdata/mcp-repro/` 검증 스크립트 |
-| CKV-2 | (no public API) | — | `pkg/ckv/` 신설 |
-| CKV-3 | (no consumer docs) | — | `docs/embedder-integration.md` |
+| CKV-2 | (no public API) | — | `pkg/vector/ckv` 신설 |
+| CKV-3 | (no consumer docs) | — | `docs/vector/embedder-integration.md` |
 | CKV-4 | (mcp-go middleware) | — | `pkg/mcp/server.go::NewServer` |
 | CKV-5 | (cold start) | — | `pkg/mcp/server.go::handleWarmup` |
 | CKV-6 | (health flat only) | — | `pkg/mcp/server.go::handleHealth` |
 | CKV-7 | (no schema versioning) | — | `pkg/mcp/server.go::jsonResult` |
-| PRR-1 | (보류) | — | `internal/eval/prregress/`, throughput buffer 의존 |
-| PRR-2~5 | (PR-regression eval 개선) | — | `cmd/ckv/eval.go`, `internal/eval/prregress/{agent,score}.go`, `testdata/prs.yaml` |
+| PRR-1 | (보류) | — | `internal/vector/eval/prregress`, throughput buffer 의존 |
+| PRR-2~5 | (PR-regression eval 개선) | — | `cmd/vector/eval.go`, `internal/eval/prregress/{agent,score}.go`, `testdata/prs.yaml` |
 
 ---
 
@@ -301,5 +301,5 @@
 |---|---|---|
 | 2026-05-20 | 1.0 | 초안 — 옵션 (b) 사용자 결정 (2026-05-20) 으로 신설. 5 카테고리 33 항목 inventory + 마스터 진행 상태 추적 표 (Roadmap §12 + 본 backlog 통합) + cross-reference. retrieval-quality-roadmap.md §12 는 retrieval slice의 우선순위 view로 역할 분리. |
 | 2026-05-21 | 1.1 | 2026-05-20~21 대규모 세션 반영. **closed**: A1 (CoreML I/O — MLProgram + static shapes), C10 (JS parser), Roadmap #2 (PR-regression 모듈, follow-up G 그룹), #3 (markdown chunk_kind=doc 추가), #5 부분 (CPU 0.74 c/s 도달, ANE 친화 모델 도입은 HF 차단으로 보류). **신설 카테고리**: F (cks dogfood CKV-1~7, 모두 closed — pkg/ckv public API, MCP 5 종 확장, WithRecovery, schema_version, embedder/index nested health), G (PR-regression PRR-1~5, 4 closed + 1 보류). 인프라 신설 (메모리 가드 / CoreML 7 env / ORT 2 env / static shapes / `ckv reindex` 결정사항) 은 commit history `66bdefc..1d2c2e1` 에. **즉시 액션 가능 항목** 갱신: 이전 #2 / A1 closed 반영, 새 candidates = B9 (보안) / B6 (error model) / Roadmap #8 (`ckv reindex` architectural) / A5 (fixture 확장). |
-| 2026-05-26 | 1.2 | Wave B 의 NEW-4 closed (commit `53964b1`). `internal/eval/prregress/metrics.go` 신설: E1 IntentScore (token-F1) + E2 SymbolF1 + E3 PlanStepsScore + 선택적 IntentCosine (embedder fallback). `Score` 구조에 8 omitempty 필드. `FetchMeta` 가 `gh pr view` 한 호출로 commits 합쳐 가져오도록 확장 (E3 ground truth). 24 metric unit test + 2 integration test. 잔여 Wave B = NEW-2 (`--record`), Wave C = NEW-9 (BM25). 자세히는 [`evaluation-design §10.4` 행 NEW-4](./evaluation-design-2026-05-22.md). |
-| 2026-05-26 | 1.3 | Wave C 의 NEW-9 closed (commit `57c8821`). `internal/query/bm25/` 5 파일 (Okapi + 코드-aware tokenizer 는 ckg source attribution, candidate-set Rerank + RRF k=60 fusion 은 CKV 신규). `HitScore` 에 `BM25Score` / `HybridRank` omitempty. `Engine.Search` 에 `query.bm25.rerank` 6번째 sub-span (D2-A: store.search 직후, threshold.drop 직전). **Default OFF** — `Options.EnableBM25Rerank` opt-in via `ckv query --bm25-rerank` / `ckv eval --bm25-rerank` / MCP `bm25_rerank: true`. mock embedder N=50 baseline (off) `r@5=0.740 MRR=0.4937` 보존 — handoff §0.2 / §6.4 무변경. BM25 on 측정 (mock): `r@5=0.840 MRR=0.4983` (+0.10 r@5). ADR-006 (Proposed) 작성, ADR-003 supersede 는 **bgeonnx 실측 후** 결정 보류. 잔여 Wave D (NEW-3/6/7) 는 분리 세션 권장. |
+| 2026-05-26 | 1.2 | Wave B 의 NEW-4 closed (commit `53964b1`). `internal/vector/eval/prregress/metrics.go` 신설: E1 IntentScore (token-F1) + E2 SymbolF1 + E3 PlanStepsScore + 선택적 IntentCosine (embedder fallback). `Score` 구조에 8 omitempty 필드. `FetchMeta` 가 `gh pr view` 한 호출로 commits 합쳐 가져오도록 확장 (E3 ground truth). 24 metric unit test + 2 integration test. 잔여 Wave B = NEW-2 (`--record`), Wave C = NEW-9 (BM25). 자세히는 [`evaluation-design §10.4` 행 NEW-4](./evaluation-design-2026-05-22.md). |
+| 2026-05-26 | 1.3 | Wave C 의 NEW-9 closed (commit `57c8821`). `internal/vector/query/bm25` 5 파일 (Okapi + 코드-aware tokenizer 는 ckg source attribution, candidate-set Rerank + RRF k=60 fusion 은 CKV 신규). `HitScore` 에 `BM25Score` / `HybridRank` omitempty. `Engine.Search` 에 `query.bm25.rerank` 6번째 sub-span (D2-A: store.search 직후, threshold.drop 직전). **Default OFF** — `Options.EnableBM25Rerank` opt-in via `ckv query --bm25-rerank` / `ckv eval --bm25-rerank` / MCP `bm25_rerank: true`. mock embedder N=50 baseline (off) `r@5=0.740 MRR=0.4937` 보존 — handoff §0.2 / §6.4 무변경. BM25 on 측정 (mock): `r@5=0.840 MRR=0.4983` (+0.10 r@5). ADR-006 (Proposed) 작성, ADR-003 supersede 는 **bgeonnx 실측 후** 결정 보류. 잔여 Wave D (NEW-3/6/7) 는 분리 세션 권장. |

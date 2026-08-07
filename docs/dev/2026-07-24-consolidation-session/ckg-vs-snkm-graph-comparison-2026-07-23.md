@@ -53,12 +53,12 @@ additive 변경:
 
 | 파일 | 변경 |
 |---|---|
-| `internal/persist/manifest.go` `SetManifest` | DB 쓰기 시 dual-write |
+| `internal/graph/persist/manifest.go` `SetManifest` | DB 쓰기 시 dual-write |
 | `internal/buildpipe/cache.go:427` | 캐시 재사용 판정 `old.CKGVersion` 직접 비교 → `EffectiveBuilderVersion()` 비교 |
-| `internal/buildpipe/pipeline.go` `writeManifestJSON` | identity 주입 |
+| `internal/graph/buildpipe/pipeline.go` `writeManifestJSON` | identity 주입 |
 | `internal/persist/postgres_store.go:1371`, `chunked_export.go:41` | export 전 identity 주입 |
-| `cmd/ckg/export_json.go` | JSON 헤더에 `engine`/`builder_version` 추가 |
-| `internal/buildpipe/manifest_usable_downgrade_test.go` | builder_version-only manifest usable 판정 테스트 2개 추가 |
+| `cmd/graph/export_json.go` | JSON 헤더에 `engine`/`builder_version` 추가 |
+| `internal/graph/buildpipe/manifest_usable_downgrade_test.go` | builder_version-only manifest usable 판정 테스트 2개 추가 |
 
 평가: back-compat이 양방향으로 처리된 모범적 additive 설계. ckg 쪽에는 이 개념 자체가 없음.
 
@@ -89,11 +89,11 @@ manifest와 달리 dual-name 등록 같은 하위호환 계층 없음.
 
 - `okapi.go` / `scorer.go` / `scorer_test.go` / `tokenize.go`: **바이트 동일**
 - `doc.go` / `example_external_test.go`: "shared core used by both engines" 취지의 주석만 갱신
-- 소비처(`pkg/evidence`, `pkg/smartctx`, `pkg/store/external_surface_test.go` 등)는 import 경로만 변경
+- 소비처(`pkg/graph/evidence`, `pkg/graph/smartctx`, `pkg/graph/store/external_surface_test.go` 등)는 import 경로만 변경
 
 ## 실질 변경 4 — 문서 재편
 
-- **`docs/archive/` 31개 파일 미이관** — 의도적. `docs/DOC-MAP.md`에 "archive는 통합 리포로
+- **`system/docs/archive` 31개 파일 미이관** — 의도적. `docs/DOC-MAP.md`에 "archive는 통합 리포로
   가져오지 않았고 pre-consolidation ckg 리포의 git history에서 읽는다"고 명시. 이에 맞춰 코드
   주석 속 아카이브 문서 참조 9곳이 `... (archived; pre-consolidation git history)` 표기로 일괄
   수정 (`cache.go`, `pr_history.go`, `pipeline.go`, `pr_ref.go`, `search_hit.go`,
@@ -111,8 +111,8 @@ manifest와 달리 dual-name 등록 같은 하위호환 계층 없음.
 
 ## 실질 변경 5 — 브랜딩 리네임 (40파일, 주석만)
 
-`internal/parse/{golang,typescript,solidity}` 테스트·주석, `pkg/types/enums.go`(30줄 전부 주석),
-`internal/temporal` 등 — "CKS G5/G6", "cks 소비자" 표현을 "stablenet-knowledge …"로 변경. 코드 동일.
+`internal/parse/{golang,typescript,solidity}` 테스트·주석, `pkg/graph/types/enums.go`(30줄 전부 주석),
+`internal/graph/temporal` 등 — "CKS G5/G6", "cks 소비자" 표현을 "stablenet-knowledge …"로 변경. 코드 동일.
 
 ---
 
@@ -120,9 +120,9 @@ manifest와 달리 dual-name 등록 같은 하위호환 계층 없음.
 
 | 그룹 | 내용 |
 |---|---|
-| 빌드 아티팩트 | `web/viewer-next/.next`·`out`, `internal/server/web_assets`(~120파일), 루트 `ckg` 바이너리 — gitignore성 로컬 산물 |
+| 빌드 아티팩트 | `web/viewer-next/.next`·`out`, `internal/system/viewer/web_assets`(~120파일), 루트 `ckg` 바이너리 — gitignore성 로컬 산물 |
 | 루트로 이동 | `LICENSE`, `go.mod`/`go.sum`(단일 모듈화), `pkg/bm25`(6파일) |
-| 의도적 미이관 | `docs/archive/`(31), `eval/stablenet/func-verify/Report-A*.md`·`results-A*.json`(7), `eval/stablenet-keyword/results.json` |
+| 의도적 미이관 | `system/docs/archive`(31), `eval/stablenet/func-verify/Report-A*.md`·`results-A*.json`(7), `eval/stablenet-keyword/results.json` |
 | 리포 루트 소관 이동 | `.githooks`/`.github`/`.claude` |
 | 재빌드 산물 | `eval/.ckg-data`·`.synthetic-data`의 `graph.db`/`manifest.json` 차이 |
 

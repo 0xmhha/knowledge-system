@@ -12,7 +12,7 @@
 > | D 훅 (§3) | 루트 `Makefile`의 `install-hooks` + `.githooks/pre-commit` | 존재 |
 > | E 스크립트 (§4) | `bash -n` 통과, `code-knowledge-{graph,vector,system}` 잔존 0건, `.gitignore`에 `run/`, `activate.sh`가 cks.env 대신 `print-mcp-config` 파생 | 충족 |
 > | F CI (§2.2) | main 최근 run = `build-and-test` / `eval-gate-vector` / `eval-gate-graph` / `vuln-scan` 전부 success, 뷰어 job 부재 | 충족 |
-> | G6 dogfood 정합 (§1.3) | `system/Makefile`의 `CKG_SRC ?= ..`(구 `?= .`은 Go 파일 0개), 시나리오의 구 레이아웃 경로(`internal/composer/`) 0건 | 해소 |
+> | G6 dogfood 정합 (§1.3) | `system/Makefile`의 `CKG_SRC ?= ..`(구 `?= .`은 Go 파일 0개), 시나리오의 구 레이아웃 경로(`internal/system/composer`) 0건 | 해소 |
 > | §1.2 패키지 목록화 | `GRAPH_PKGS`(graph) / `PKG_LIST`(vector) / `SYSTEM_PKGS`(system) | 반영됨 |
 >
 > **잔여 2건은 이 문서가 아니라
@@ -303,8 +303,8 @@ itself")가 통합 후 이중으로 죽어 있다:
    파일이 **0개**(엔진 소스는 `../internal/system` 등으로 이동). `make -C
    system dogfood-eval`은 빈 그래프를 인덱싱하고 eval을 돌린다 — G2와 동근.
 2. **stale 기대 경로**: `system/eval/scenarios/*.yaml`의 `expected_citations`
-   가 구 cks 레이아웃(`internal/composer/composer.go`,
-   `internal/ckgclient/real.go`, ...)을 기대 — 현재 실경로는
+   가 구 cks 레이아웃(`internal/system/composer/composer.go`,
+   `internal/system/ckgclient/real.go`, ...)을 기대 — 현재 실경로는
    `internal/system/composer/...` 등. 코퍼스를 고쳐도 전부 miss.
    `system/eval/scenarios-stablenet*`는 대상이 go-stablenet이므로 무관 —
    **cks 자기-인덱싱 시나리오만** 해당.

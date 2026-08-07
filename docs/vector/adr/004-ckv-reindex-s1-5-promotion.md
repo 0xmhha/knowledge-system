@@ -72,4 +72,4 @@ S2 entry now depends on S1.5. Any phase that increases per-build cost
 `ckv reindex` shipped 2026-05-21 (commit `f2bb8d2`):
 `internal/build.Reindex` + `cmd/ckv reindex`, git diff `--name-status`
 based change set, embedder identity enforcement, 7 unit tests.
-See `internal/build/reindex.go`.
+See `internal/vector/build/reindex.go`.

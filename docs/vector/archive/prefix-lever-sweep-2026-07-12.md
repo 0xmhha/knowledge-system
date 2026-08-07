@@ -7,8 +7,8 @@
 > 임베드-텍스트 prefix 레버 3종을 한 번에 재측정해 **어느 레버가 실제로 이득인지**
 > 결정한다. 특히 D.2 PoC(`llm-contextual-prefix-poc-2026-07-12.md`)가 "천장이라 미측정"으로
 > 남긴 캐비엇 — *헤드룸이 생기면 D.2가 D.1을 이기는가* — 을 닫는다.
-> **관련**: `retrieval-quality-roadmap.md`(Phase D), `internal/chunk/prefix.go`(D.1),
-> `internal/llmprefix/`(D.2).
+> **관련**: `retrieval-quality-roadmap.md`(Phase D), `internal/vector/chunk/prefix.go`(D.1),
+> `internal/vector/llmprefix`(D.2).
 
 ## 1. 방법
 

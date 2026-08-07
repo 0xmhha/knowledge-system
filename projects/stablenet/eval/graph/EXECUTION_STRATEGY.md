@@ -35,8 +35,8 @@ S0/S1 사이 과도기에 CKG는 *Layer 1만이 아니라 Layer 4 capability 일
 | `get_subgraph` | Layer 4 low-level (graph_query 변형) | `internal/mcp/tools.go` | internal-only로 강등 가능 |
 | `impact_of_change` | Layer 4 medium | `internal/mcp/impact.go` | 유지 |
 | `search_text` | Layer 4 low-level (bm25_search) | `internal/mcp/tools.go` | internal-only로 강등 |
-| `get_context_for_task` | **Layer 3 Orchestrator** | `pkg/smartctx` | **CKS 이관** — Playbook + CKV fusion 들어가야 |
-| `evidence_for_intent` | Layer 3 Orchestrator | `pkg/evidence` | **CKS 이관** — sanitize Step 8.5 적용 필요 |
+| `get_context_for_task` | **Layer 3 Orchestrator** | `pkg/graph/smartctx` | **CKS 이관** — Playbook + CKV fusion 들어가야 |
+| `evidence_for_intent` | Layer 3 Orchestrator | `pkg/graph/evidence` | **CKS 이관** — sanitize Step 8.5 적용 필요 |
 
 → 즉 *상위 2개 도구*(`get_context_for_task`, `evidence_for_intent`)는 *CKG에 남으면 안 되는* 기능. S1 진입 시 CKS로 옮김.
 
@@ -68,13 +68,13 @@ S0(CKG) 영역에서 처리할 것 vs S1(CKS) 단계에서 다시 봐야 할 것
 | T-03 | 위치 정확도 validator | P0 | **★ P0** | S0 | §11 Citation accuracy의 *측정 기구* — CKG가 가장 책임 큰 KPI |
 | T-04 | Hallucination validator | P0 | **★ P0** | S0 | T-03과 동일 KPI의 반대 표현 |
 | T-02 | extractSymbols 정규화 | P0 | **P0** | S0 | Symbol lookup precision 측정 정확도. 단 LLM-judge로 대체 시 S1로 이관 가능 |
-| **T-14** | CKG public 표면 정리 (`pkg/mcphandlers/`) | — (신규) | **★ P0** | S0 | **CKS S1 진입의 차단 요소** — 핸들러를 import 가능하게. §10 |
+| **T-14** | CKG public 표면 정리 (`pkg/graph/mcphandlers`) | — (신규) | **★ P0** | S0 | **CKS S1 진입의 차단 요소** — 핸들러를 import 가능하게. §10 |
 | T-09 | FTS sigil bypass | P1 | **P1** | S0 | Layer 1 BM25 강건성 — CKG 책임 |
 | T-07 | dumpFiles _test.go | P1 | **P1** | S0 | 측정 V0 신뢰성 — *현 측정 인프라가 CKG에 있으므로* S0에서 마무리 |
 | T-08 | dumpFiles 무작위화 | P1 | **P1** | S0 | T-07과 동시 |
 | **T-15** | task ↔ known-issues JSONL 동기화 도구 | — (신규) | P1 | S0 | Q2 결정의 결과 — 양쪽 저장 규약 유지 |
 | T-01 | γ tool-loop emulation | P0 | **P2 (S1로 이관)** | **S1 (CKS)** | tool-loop은 CKS 측정 인프라가 가짐. CKG는 `runner.go:106`에 명시 코멘트만 |
-| T-10 | smartctx prose 강건성 | P2 | **★ P0 (S1에서)** | **S1 (CKS)** | `get_context_for_task`는 CKS Layer 3로 이관. CKG `pkg/smartctx`는 *deprecate-friendly stable* 유지 |
+| T-10 | smartctx prose 강건성 | P2 | **★ P0 (S1에서)** | **S1 (CKS)** | `get_context_for_task`는 CKS Layer 3로 이관. CKG `pkg/graph/smartctx`는 *deprecate-friendly stable* 유지 |
 | T-05 | LLM backend 가동 | P0 | **P0** | 환경 | **확정**: api backend (`ANTHROPIC_API_KEY`) |
 | T-06 | 27 task 추가 | P1 | **P1** | S0/S1 공용 | **확정**: YAML + JSONL 양쪽 (§6.2 규약) |
 
@@ -109,7 +109,7 @@ S0(CKG) 영역에서 처리할 것 vs S1(CKS) 단계에서 다시 봐야 할 것
 
 순서:
 1. **T-05** LLM backend 가동 (api backend, `ANTHROPIC_API_KEY` 확인 — 30분)
-2. **T-14** CKG public package 표면 정리 — `pkg/mcphandlers/` 신설, MCP 도구 핸들러 export (2~3일). **CKS S1 진입 전 차단 요소**
+2. **T-14** CKG public package 표면 정리 — `pkg/graph/mcphandlers` 신설, MCP 도구 핸들러 export (2~3일). **CKS S1 진입 전 차단 요소**
 3. **T-12** `find_callers` depth>1 회귀 test (1일)
 4. **T-13** `impact_of_change` 결정성 회귀 test (반나절)
 5. **T-03** 위치 정확도 validator (3일)
@@ -119,7 +119,7 @@ S0(CKG) 영역에서 처리할 것 vs S1(CKS) 단계에서 다시 봐야 할 것
 Phase 1 종료 조건:
 - S0 acceptance 3 항목 모두 자동 회귀 test로 보장
 - Citation accuracy / Hallucination 측정기가 임의 LLM 응답에 동작 (T-03·T-04)
-- `pkg/mcphandlers`가 CKS에서 import 가능 (T-14 dry-run: 빈 CKS repo에서 `go mod tidy` + 1 도구 register 성공)
+- `pkg/graph/mcphandlers`가 CKS에서 import 가능 (T-14 dry-run: 빈 CKS repo에서 `go mod tidy` + 1 도구 register 성공)
 - 5개 task로 1차 KPI baseline 측정 가능
 
 ### Phase 2 — KPI baseline 1차 측정 (3일)
@@ -185,7 +185,7 @@ Phase 4 종료 조건:
 | **Q1** | **api backend** (`ANTHROPIC_API_KEY`) — cli wrapper 의존 제거 | T-05 단순화. 토큰 분류 정확 — H1 가설 의미 있게 측정 가능 |
 | **Q2** | **eval/stablenet/tasks/ + benchmark/known-issues.jsonl 둘 다** | CKG 자체 검증 YAML + agent 평가 JSON 분리 보관. 동기화 규약 필요 (§6.2) |
 | **Q3** | **T-01 γ emulation → S1 (CKS) 이관**. CKG는 손대지 않음 | `runner.go:106`에 명시 코멘트만 강화. 진짜 tool-loop은 CKS에서 |
-| **Q4** | **T-10 smartctx prose → S1 (CKS) 이관**. CKG는 손대지 않음 | `pkg/smartctx`는 *import 대상으로 stable* 유지. 강건성은 CKS Layer 3 Orchestrator에서 |
+| **Q4** | **T-10 smartctx prose → S1 (CKS) 이관**. CKG는 손대지 않음 | `pkg/graph/smartctx`는 *import 대상으로 stable* 유지. 강건성은 CKS Layer 3 Orchestrator에서 |
 | **추가** | **import-based 아키텍처** — 코드 이동 X | CKS·CKV가 CKG를 `go.mod` import. CKG는 *외부 import 표면을 정돈*해야 함 (§10) |
 
 ### 6.1 CKS·CKV 프로젝트 현 상태
@@ -226,7 +226,7 @@ Phase 4 종료 조건:
 
 ### 7.2 *지금* 손대지 말 것
 
-- Layer 3 (Retrieval Orchestrator) — Playbook + token budget manager. `pkg/smartctx` 강화 금지
+- Layer 3 (Retrieval Orchestrator) — Playbook + token budget manager. `pkg/graph/smartctx` 강화 금지
 - Layer 4 sanitize Step 8.5 — CKS의 단일 진입점 원칙(§7 Architectural Rule). CKG에서 sanitize 도입 시 책임 분산
 - Working Memory (Layer 2) — `remember_fact`, `record_decision`, `recall_session`. CKS 책임
 - CKV 통합 — vector retrieval은 별도 repo
@@ -254,35 +254,35 @@ Phase 4 종료 조건:
 이는 단순한 import 그 이상의 의미:
 - CKG는 *stable public API*를 책임진다 (semver — V1+에서 breaking change 신중)
 - CKS는 CKG의 public 패키지만 사용 — `internal/*`는 import 불가 (Go 규칙)
-- CKG의 `pkg/smartctx`, `pkg/evidence`는 *CKS가 직접 import해서 호출하거나 override 가능한 형태*로 유지
+- CKG의 `pkg/graph/smartctx`, `pkg/graph/evidence`는 *CKS가 직접 import해서 호출하거나 override 가능한 형태*로 유지
 
 ### 10.2 현재 CKG의 import 가능성 분석
 
 | 패키지 | CKS 사용 의도 | 현 상태 | 조치 |
 |---|---|---|---|
-| `pkg/store` | Layer 1 그래프 접근 — *가장 핵심* | public, stable | 유지 |
-| `pkg/types` | 노드/엣지 타입 | public, stable | 유지 |
+| `pkg/graph/store` | Layer 1 그래프 접근 — *가장 핵심* | public, stable | 유지 |
+| `pkg/graph/types` | 노드/엣지 타입 | public, stable | 유지 |
 | `pkg/bm25` | Layer 1 BM25 토크나이저 | public | 유지 |
-| `pkg/impact` | Layer 4 medium capability | public | 유지 (interface 검토) |
-| `pkg/smartctx` | Layer 3에서 *대체될 임시 구현* | public | **유지하되 deprecate 표시** — CKS Orchestrator가 superset 제공 시 import만 |
-| `pkg/evidence` | Layer 3에서 *대체될 임시 구현* | public | smartctx와 동일 운명 |
-| `internal/mcp/tools.go` | CKS MCP 서버가 *동일 도구 핸들러 재사용* | **internal — import 불가** | **T-14: 일부를 `pkg/mcphandlers` 같은 곳으로 export 이전** |
-| `internal/persist` | sqlite 구현체 — Layer 1 부분 | internal | 유지 (CKS는 `pkg/store.Reader` 인터페이스만 의존) |
-| `internal/buildpipe` | 빌드 파이프라인 | internal | 유지 (CKS는 `ckg build` CLI 호출) |
+| `pkg/graph/impact` | Layer 4 medium capability | public | 유지 (interface 검토) |
+| `pkg/graph/smartctx` | Layer 3에서 *대체될 임시 구현* | public | **유지하되 deprecate 표시** — CKS Orchestrator가 superset 제공 시 import만 |
+| `pkg/graph/evidence` | Layer 3에서 *대체될 임시 구현* | public | smartctx와 동일 운명 |
+| `internal/mcp/tools.go` | CKS MCP 서버가 *동일 도구 핸들러 재사용* | **internal — import 불가** | **T-14: 일부를 `pkg/graph/mcphandlers` 같은 곳으로 export 이전** |
+| `internal/graph/persist` | sqlite 구현체 — Layer 1 부분 | internal | 유지 (CKS는 `pkg/store.Reader` 인터페이스만 의존) |
+| `internal/graph/buildpipe` | 빌드 파이프라인 | internal | 유지 (CKS는 `ckg build` CLI 호출) |
 
 ### 10.3 T-14 — CKG public package 표면 정리
 
 **문제**: 현재 MCP 도구 핸들러(`registerFindSymbol`, `registerFindCallers` 등)는 `internal/mcp/tools.go`에 있어 CKS가 import해서 자체 MCP 서버에 등록할 수 없음.
 
 **해결안 (3가지 검토)**:
-1. **(권장)** 핸들러 함수를 `pkg/mcphandlers/`로 이전 — store reader만 받는 pure function 형태로 export. CKS MCP 서버는 import해서 자기 `*server.MCPServer`에 register
+1. **(권장)** 핸들러 함수를 `pkg/graph/mcphandlers`로 이전 — store reader만 받는 pure function 형태로 export. CKS MCP 서버는 import해서 자기 `*server.MCPServer`에 register
 2. CKG의 `pkg/store.Reader` 인터페이스만 export 유지, CKS가 MCP 핸들러를 *처음부터* 다시 짬 (코드 중복)
 3. CKG가 `cks-compat` 빌드 태그를 제공해 internal 일부를 internal-test로 export — 임시 방편
 
 **Acceptance criteria (T-14)**:
-- CKS의 `cmd/cks-mcp/main.go`에서 `import "github.com/0xmhha/knowledge-system/pkg/mcphandlers"`로 `RegisterFindSymbol(server, store)` 같은 함수 호출 가능
+- CKS의 `cmd/cks/main.go`에서 `import "github.com/0xmhha/knowledge-system/pkg/mcphandlers"`로 `RegisterFindSymbol(server, store)` 같은 함수 호출 가능
 - 기존 `ckg-mcp` 바이너리 동작 변경 없음 (회귀 test)
-- `internal/mcp/server.go`는 `pkg/mcphandlers` 호출만 남기고 등록 로직 이전
+- `internal/graph/mcp/server.go`는 `pkg/graph/mcphandlers` 호출만 남기고 등록 로직 이전
 
 ### 10.4 CKS·CKV 관점에서 본 작업 분배
 

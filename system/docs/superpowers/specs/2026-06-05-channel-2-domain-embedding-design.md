@@ -49,8 +49,8 @@ code index together. This single orchestration is what keeps environment setup s
 
 ### 4.1 ckv — additive `--docs <dir>` on `ckv build`
 
-- **`cmd/ckv/build.go`**: add repeatable `--docs <dir>` flag (additional markdown root(s)).
-- **`internal/discover`**: walk each `--docs` root; classify `.md`/`.markdown` as markdown
+- **`cmd/vector/build.go`**: add repeatable `--docs <dir>` flag (additional markdown root(s)).
+- **`internal/vector/discover`**: walk each `--docs` root; classify `.md`/`.markdown` as markdown
   (existing `classifyLanguage`). No new parser/chunker — corpus files become
   `ChunkKind=ChunkDoc` / `SymbolKind=KindDocSection`, exactly like in-tree markdown today.
 - **Tagging:** chunks discovered under a `--docs` root get `Category="domain"` so callers
@@ -58,13 +58,13 @@ code index together. This single orchestration is what keeps environment setup s
   change — `Category` already exists on `Chunk`.)
 - **Citation:** `Chunk.File` = path relative to the corpus root (e.g.
   `entries/A4.system_contracts.addresses.md`), so retrieval surfaces a stable "where".
-- **`internal/manifest`**: record `docs_root(s)` alongside `src_root` so `ckv reindex`
+- **`internal/vector/manifest`**: record `docs_root(s)` alongside `src_root` so `ckv reindex`
   (which reuses the manifest) re-walks the corpus. `reindex` without a recorded docs_root
   behaves as today.
 - **Constraint:** the corpus must be embedded with the **same model** the code index uses
   (bge-m3 via Ollama, per cks config) — guaranteed because it is the same `ckv build` run.
 
-### 4.2 cks — `cks-domain-export` (new `cmd/cks-domain-export`)
+### 4.2 cks — `cks-domain-export` (new `cmd/cks`)
 
 Renders the corpus from one project. Pure, deterministic, idempotent.
 
@@ -75,14 +75,14 @@ Renders the corpus from one project. Pure, deterministic, idempotent.
   - `docs/<basename>.md` = byte copy of each `authoritative_docs[].file` resolved under
     `code_root`. (This finally gives `authoritative_docs` a consumer.)
 - **Determinism:** entries sorted by ID; stable rendering → clean diffs across rebuilds.
-- **Loader change:** `internal/inventory` — surface `AuthoritativeDocs` on `Project`
+- **Loader change:** `internal/system/inventory` — surface `AuthoritativeDocs` on `Project`
   (today `project.yaml`'s field is parsed-and-ignored). Add a typed field + loader wiring.
 
-#### Entry → markdown renderer (new package `internal/domainexport`)
+#### Entry → markdown renderer (new package `internal/system/domainexport`)
 
-Kept out of `internal/inventory/render.go` (which owns inventory-table generation) for
+Kept out of `internal/system/inventory/render.go` (which owns inventory-table generation) for
 single responsibility. `domainexport` depends on `inventory` (the `Entry`/`Project` model)
-and produces the corpus; `cmd/cks-domain-export` is a thin CLI over it.
+and produces the corpus; `cmd/cks` is a thin CLI over it.
 
 ```markdown
 # {Title}
@@ -113,7 +113,7 @@ and produces the corpus; `cmd/cks-domain-export` is a thin CLI over it.
   Korean/English + vocab recall.
 - The **Status** line (D2) makes confidence visible in every retrieved document.
 
-### 4.3 cks — `cks.ops.index` orchestration (`internal/mcp/ops_index.go`)
+### 4.3 cks — `cks.ops.index` orchestration (`internal/system/mcp/ops_index.go`)
 
 Extend the existing maintenance op so one call does, in order:
 1. `cks-domain-export` → (re)generate the corpus (in-process call to the export package,
@@ -130,12 +130,12 @@ Extend the existing maintenance op so one call does, in order:
 
 | Field/struct | Where | Change |
 |---|---|---|
-| `Project.AuthoritativeDocs` | cks `internal/inventory/types.go` + `load.go` | **new** — parse the existing yaml field |
-| entry→markdown renderer | cks new pkg `internal/domainexport` | **new** |
-| `--docs` flag + walk | ckv `cmd/ckv/build.go`, `internal/discover` | **new** (additive) |
+| `Project.AuthoritativeDocs` | cks `internal/system/inventory/types.go` + `load.go` | **new** — parse the existing yaml field |
+| entry→markdown renderer | cks new pkg `internal/system/domainexport` | **new** |
+| `--docs` flag + walk | ckv `cmd/vector/build.go`, `internal/vector/discover` | **new** (additive) |
 | `Category="domain"` on corpus chunks | ckv discover/chunk | reuse existing `Chunk.Category` |
-| `docs_root` in manifest | ckv `internal/manifest` | **new** (additive) |
-| `IndexConfig.DomainProjectDir/DomainCorpusDir` | cks `internal/mcp/ops_index.go`, `internal/config` | **new** (optional) |
+| `docs_root` in manifest | ckv `internal/vector/manifest` | **new** (additive) |
+| `IndexConfig.DomainProjectDir/DomainCorpusDir` | cks `internal/system/mcp/ops_index.go`, `internal/system/config` | **new** (optional) |
 
 No new ckv chunk kind or DB column is required; `Category` and the markdown path already
 exist on `Chunk`.

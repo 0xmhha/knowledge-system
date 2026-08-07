@@ -6,7 +6,7 @@
 
 > 다음 schema bump의 design plan. schema 1.8 (Hunk-graph H1-H4 + §11.3
 > hybrid)가 main에 안착한 시점에서 가장 큰 미커버 dimension은
-> **cross-language interop edges**. 이 문서는 `docs/design/hunk-graph.md`
+> **cross-language interop edges**. 이 문서는 `docs/graph/design/hunk-graph.md`
 > 패턴 (사용자 §11 결정 → H 시리즈 dispatch) 따라 작성된 plan이며,
 > §6의 8개 결정 항목에 사용자 답변을 받은 다음 W 시리즈 구현으로
 > 진입한다.
@@ -14,13 +14,13 @@
 > **Status** (updated 2026-07-18): **W1–W3 LANDED**, W4 PENDING.
 > - W1 (TS HTTP server, reuses `NodeEndpoint`), W2 (`http_calls` — TS+Go HTTP
 >   client), W3a/b/c (proto parser + `grpc_listens_on`/`grpc_calls`) are all
->   emitted (`internal/parse/{typescript,proto,golang}`, `internal/link/http_match.go`).
+>   emitted (`internal/parse/{typescript,proto,golang}`, `internal/graph/link/http_match.go`).
 > - The "next schema bump = 1.9" framing is **superseded** — schema is now
->   **1.23** (`internal/buildpipe/cache.go`; history in `docs/SCHEMA.md`).
+>   **1.23** (`internal/graph/buildpipe/cache.go`; history in `docs/graph/SCHEMA.md`).
 > - **W4 message-queue / pub-sub (Kafka/NATS/RabbitMQ/SQS + `Topic` node +
 >   `publishes_to`/`consumes_from` edges) is NOT implemented** — no `NodeTopic`
->   / `EdgePublishesTo` in `pkg/types/enums.go`. This is the sole remaining
->   backlog item from this spec; tracked in `docs/CONTINUITY.md`.
+>   / `EdgePublishesTo` in `pkg/graph/types/enums.go`. This is the sole remaining
+>   backlog item from this spec; tracked in `docs/graph/CONTINUITY.md`.
 
 ---
 
@@ -50,7 +50,7 @@
 
 | Edge | Source | Target | Confidence | 검출 패턴 |
 |------|--------|--------|-----------|---------|
-| `binds_to` | TS Variable/Class | Solidity Contract | INFERRED | `internal/link/xlang.go` name + ABI heuristic |
+| `binds_to` | TS Variable/Class | Solidity Contract | INFERRED | `internal/graph/link/xlang.go` name + ABI heuristic |
 | `listens_on` | Go Function/Method | Endpoint | EXTRACTED \| INFERRED | `http.HandleFunc` / `(*ServeMux).HandleFunc` + 문자열 리터럴 route |
 | `handles_message` | Go Method | MessageType | EXTRACTED | JSON-RPC `func (T) M(args A, reply *R) error` 시그니처 매칭 |
 | `rpc_calls` | Go Function | MessageType | INFERRED | `client.Call("Service.Method", ...)` 문자열 인자 |
@@ -180,9 +180,9 @@ edge types 새로 4~6개 추가.
   GET / POST / DELETE는 각각 다른 노드.
 
 **검증 fixture**:
-- TS: `internal/parse/typescript/testdata/distributed/` (Express / Fastify
+- TS: `internal/graph/parse/typescript/testdata/distributed` (Express / Fastify
   / Hono / Next.js 4종).
-- Go: `internal/parse/golang/testdata/distributed/http_handlers.go`
+- Go: `internal/graph/parse/golang/testdata/distributed/http_handlers.go`
   (legacy + Go 1.22 method-prefixed 둘 다 포함).
 
 ### 3.3 W2: HTTP client → server matching
@@ -246,17 +246,17 @@ API일 경우 placeholder Endpoint 노드 필요.
 - `.proto` Message → MessageType node (qname: `proto:pkg.Message`)
 - `defines` edge (기존 재사용): Service → Method, Message → Field
 
-**파서 위치**: `internal/parse/proto/` 신규. tree-sitter-proto 또는
+**파서 위치**: `internal/graph/parse/proto` 신규. tree-sitter-proto 또는
 구현 별도 검토 (§6 결정).
 
 **W3a status (2026-05-11 land)**: `.proto` parser shipped. Hand-rolled
-recursive-descent lexer + visitor in `internal/parse/proto/` (decls.go,
+recursive-descent lexer + visitor in `internal/graph/parse/proto` (decls.go,
 lexer.go, parser.go, visitor.go). Cross-namespace nested-type resolution
 via `byBareName` fallback (W3a review I1) is the key resolver for both
 own-pass `uses_type` edges and the W3b Go-side suffix matcher.
 
 **W3b status (2026-05-11 land)**: Go gRPC server/client detection shipped.
-`internal/parse/golang/grpc.go` runs as a sub-pass of `emitDistributedDecls`
+`internal/graph/parse/golang/grpc.go` runs as a sub-pass of `emitDistributedDecls`
 (after HTTP/JSON-RPC, before context-paths). Two detectors:
 
 - `pb.RegisterXXXServer(s, &impl{})` → for each exported method on the
@@ -285,7 +285,7 @@ V0 limitations (W3b):
 - Streaming, bidirectional, and per-message recursion are out-of-scope.
 
 **W3c status (2026-05-11 land)**: TS gRPC-web / Connect-web client
-detection shipped. `internal/parse/typescript/grpc_client.go` runs as the
+detection shipped. `internal/graph/parse/typescript/grpc_client.go` runs as the
 final sub-pass of `declVisitor.visit()` (after `runHTTPClients`). Two
 patterns:
 
@@ -378,10 +378,10 @@ locks the new order).
 
 ### 4.3 SchemaVersion bump
 
-- `internal/buildpipe/cache.go`: `SchemaVersion = "1.9"`
-- `internal/persist/sqlite.go`: 새 migration 단계 추가
+- `internal/graph/buildpipe/cache.go`: `SchemaVersion = "1.9"`
+- `internal/graph/persist/sqlite.go`: 새 migration 단계 추가
   (W1 land 후 1.8 → 1.9). 새 컬럼은 없고 enum 값만 추가되므로
-  ALTER 불필요 — `pkg/types/enums.go` append-only로 충분.
+  ALTER 불필요 — `pkg/graph/types/enums.go` append-only로 충분.
 - 모든 stage가 같은 1.9 안에 들어가도 되는가? 아니면 stage마다 bump
   (1.9 / 1.10 / 1.11 / 1.12)? → §6 decision.
 
@@ -396,17 +396,17 @@ W1~W4의 새 EdgeType은 `EdgeModifies` 뒤에 순차 append.
 
 ### 5.1 코드 변경 위치
 
-- `pkg/types/enums.go`: NodeType + EdgeType append.
-- `internal/buildpipe/cache.go`: SchemaVersion bump.
-- `internal/parse/typescript/distributed.go` 신규: W1 + W2 TS 패턴.
-- `internal/parse/golang/distributed.go` 확장: W2 Go HTTP client,
+- `pkg/graph/types/enums.go`: NodeType + EdgeType append.
+- `internal/graph/buildpipe/cache.go`: SchemaVersion bump.
+- `internal/graph/parse/typescript/distributed.go` 신규: W1 + W2 TS 패턴.
+- `internal/graph/parse/golang/distributed.go` 확장: W2 Go HTTP client,
   W3 gRPC patterns, W4 message queue.
-- `internal/parse/proto/` 신규 디렉토리: W3 `.proto` parser.
-- `internal/link/xlang.go` 확장: cross-language matching (`http_calls`
+- `internal/graph/parse/proto` 신규 디렉토리: W3 `.proto` parser.
+- `internal/graph/link/xlang.go` 확장: cross-language matching (`http_calls`
   suffix resolution 등).
-- `internal/buildpipe/pipeline.go`: language_runners.go에 proto
+- `internal/graph/buildpipe/pipeline.go`: language_runners.go에 proto
   runner 추가 (W3).
-- `internal/persist/sqlite.go`: schema migration 1.8 → 1.9 (필요시).
+- `internal/graph/persist/sqlite.go`: schema migration 1.8 → 1.9 (필요시).
 - `web/viewer-next/src/lib/edges.ts`: GRAPH_GROUPS 갱신 (새 edges는
   G5에 합류).
 - `web/viewer-next/src/components/EdgeTypeFilters.tsx`: 새 edge types
@@ -417,10 +417,10 @@ W1~W4의 새 EdgeType은 `EdgeModifies` 뒤에 순차 append.
 - W1: TS testdata 4 fixtures (Express/Fastify/Hono/Next.js).
   unit test `typescript/distributed_test.go`.
 - W2: Cross-language matching test. testdata에 Go server + TS client
-  쌍 fixtures. Integration test `internal/link/xlang_test.go` 확장.
+  쌍 fixtures. Integration test `internal/graph/link/xlang_test.go` 확장.
 - W3: `.proto` parser 회귀, gRPC fixture 양쪽.
 - W4: 각 broker별 fixture (4 patterns).
-- `pkg/evidence` H3 / H4 회귀는 영향 없음 (new edges는 retrieval
+- `pkg/graph/evidence` H3 / H4 회귀는 영향 없음 (new edges는 retrieval
   외부).
 - bench-server: edge type 수 증가로 `/api/edges/counts` payload 약간
   증가. p99 영향 nil 예상.
@@ -428,9 +428,9 @@ W1~W4의 새 EdgeType은 `EdgeModifies` 뒤에 순차 append.
 ### 5.3 문서 동기화
 
 W1 land 시:
-- `docs/SCHEMA.md`: 1.8 → 1.9, 새 node + edges 추가.
-- `docs/INCREMENTAL.md`: SchemaVersion 1.8 → 1.9.
-- `docs/design/schema-1.9-spec.md` (본 spec): "implemented" 마킹.
+- `docs/graph/SCHEMA.md`: 1.8 → 1.9, 새 node + edges 추가.
+- `docs/graph/INCREMENTAL.md`: SchemaVersion 1.8 → 1.9.
+- `docs/graph/design/schema-1.9-spec.md` (본 spec): "implemented" 마킹.
 
 ---
 
@@ -446,7 +446,7 @@ hunk-graph.md의 §11 8개 결정 패턴 따라 사용자 합의 받음. W1 시�
   invalidation을 stage마다 발생시킴.
 - **확정 (2026-05-11): (A) 1.9 한 번. 단 사용자 추가 조건 — "schema
   변경이 있으면 추가 작업"으로 인식.** 즉 W1 land 시점에 SchemaVersion
-  1.8 → 1.9 bump (`internal/buildpipe/cache.go`)는 schema-changing
+  1.8 → 1.9 bump (`internal/graph/buildpipe/cache.go`)는 schema-changing
   작업으로 다루며 cache invalidation을 명시. 이후 W2~W4 stage는 new
   edge type append만으로 1.9 유지 (enum append-only는 cache-key 변화
   없으나 *새 detection 결과가 그래프에 새 edges 등장* → 사용자 의도상
@@ -480,7 +480,7 @@ identifier가 각 protocol에서 unique key. `language` 필드는 emit한 parser
 
 **Go HTTP qname 끌어올림 (W1.5, 2026-05-11)** — 직전 W1 TS commit (`da502f4`)
 이 `http:METHOD /route` 포맷을 emit한 반면 기존 Go는 `http:/route`만 emit
-하고 method를 버렸음 (`internal/parse/golang/distributed.go`의 `_ = method`).
+하고 method를 버렸음 (`internal/graph/parse/golang/distributed.go`의 `_ = method`).
 W1.5에서 Go HTTP emit을 위 규칙에 맞춰 끌어올림 — TS·Go가 같은 (method, path)
 쌍에 대해 동일 Endpoint qname을 생성하므로 cross-language matching이
 자연스럽게 성립한다. 사용자 옵션 D 결정.
@@ -562,8 +562,8 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
      `http:* /x`). edge type은 그대로 `http_calls` 한 종류.
   3. 옵션 (B)는 specific endpoint를 무시 — 직관 위반. 옵션 (C)는
      graph noise + traversal ambiguous.
-- 구현 위치: W2 dispatch 시 client matching pass (`internal/link/xlang.go`
-  확장 또는 `internal/parse/typescript/http_client.go` 신규).
+- 구현 위치: W2 dispatch 시 client matching pass (`internal/graph/link/xlang.go`
+  확장 또는 `internal/graph/parse/typescript/http_client.go` 신규).
 
 ---
 
@@ -592,7 +592,7 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
   sqlite3 /tmp/ckg-go-after/graph.db "SELECT type, COUNT(*) FROM edges GROUP BY type" > /tmp/after.txt
   diff /tmp/baseline.txt /tmp/after.txt   # 의도된 변화만 (W1은 0)
   ```
-- [ ] `internal/parse/golang/distributed_test.go` (E3 Go HTTP/JSON-RPC
+- [ ] `internal/graph/parse/golang/distributed_test.go` (E3 Go HTTP/JSON-RPC
   핸들러 검증)가 변경 없이 PASS — TS 작업이 Go distributed pass의
   공유 헬퍼 (Endpoint dedup, messageNodeIDs 등)를 수정해야 한다면
   명시적 diff 표기.
@@ -613,8 +613,8 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
 - [ ] CKG self-graph (Next.js viewer 포함) build 후 `/api/edges/counts`
   G5 카운트가 W1 land 전 대비 비례 증가.
 - [ ] go test ./internal/parse/typescript/... PASS.
-- [ ] `pkg/types/enums.go` 변경 없음 (§6.2 (B) — `listens_on` 재사용).
-- [ ] `internal/buildpipe/cache.go` SchemaVersion `"1.8"` → `"1.9"`
+- [ ] `pkg/graph/types/enums.go` 변경 없음 (§6.2 (B) — `listens_on` 재사용).
+- [ ] `internal/graph/buildpipe/cache.go` SchemaVersion `"1.8"` → `"1.9"`
   bump (§6.1 schema-changing 작업 인식).
 - [ ] `internal/persist/sqlite.go::Migrate` 갱신 (1.8 → 1.9 stub —
   새 column 없으나 version 인식만 추가).
@@ -669,13 +669,13 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
 
 ## §9. References
 
-- 직전 schema spec: `docs/design/hunk-graph.md` (§11 패턴 원본).
+- 직전 schema spec: `docs/graph/design/hunk-graph.md` (§11 패턴 원본).
 - 직전 hand-off: `docs/SESSION-HANDOFF-2026-05-10.md` §10.A
   ("schema 1.9 design 권장 시작점").
-- 현재 G5 구현: `internal/parse/golang/distributed.go` (Go HTTP/JSON-RPC).
-- 현재 cross-lang: `internal/link/xlang.go` (Sol↔TS binds_to).
-- Schema 변경 패턴: `docs/SCHEMA.md` §"Schema bumps history".
-- Append-only enum 패턴: `pkg/types/enums.go` 주석
+- 현재 G5 구현: `internal/graph/parse/golang/distributed.go` (Go HTTP/JSON-RPC).
+- 현재 cross-lang: `internal/graph/link/xlang.go` (Sol↔TS binds_to).
+- Schema 변경 패턴: `docs/graph/SCHEMA.md` §"Schema bumps history".
+- Append-only enum 패턴: `pkg/graph/types/enums.go` 주석
   (`TestAllNodeTypes_Stable` 보장).
 
 ---
@@ -702,33 +702,33 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
    wildcard fallback. §3.3 exact-match path matching 결정 land. §7.0 Go
    regression guard 통과 (synthetic baseline: 8 edge types, 동일 count;
    `http_calls`는 새 edge type append).
-   - `pkg/types/enums.go`: `EdgeHTTPCalls` 추가 (35 → 36).
-   - `internal/parse/golang/distributed.go`: HTTP client detection
+   - `pkg/graph/types/enums.go`: `EdgeHTTPCalls` 추가 (35 → 36).
+   - `internal/graph/parse/golang/distributed.go`: HTTP client detection
      (`http.Get/Post/PostForm/Head`, `(*http.Client).Get/Post/...`,
      `http.NewRequest{,WithContext}`) — string-literal URL만, dynamic 스킵.
-   - `internal/parse/typescript/http_client.go` (신규): `fetch`,
+   - `internal/graph/parse/typescript/http_client.go` (신규): `fetch`,
      `axios.METHOD`, `axios({method, url})`, `axios.request`, `useSWR`,
      `useQuery({url})` 검출 + axios* 식별자 W1 false-positive 가드.
-   - `internal/link/http_match.go` (신규): §6.9 2-stage cascade matching
+   - `internal/graph/link/http_match.go` (신규): §6.9 2-stage cascade matching
      + AMBIGUOUS placeholder retention + 매칭 시 placeholder drop.
    - `internal/buildpipe/pipeline.go::emitDerivedPasses`: `MatchHTTPClients`
      pass wire — xlang 이후, temporal 이전.
-   - testdata: `internal/parse/golang/testdata/distributed/http_clients.go`
-     + `internal/parse/typescript/testdata/distributed/clients.ts` (TS→TS
+   - testdata: `internal/graph/parse/golang/testdata/distributed/http_clients.go`
+     + `internal/graph/parse/typescript/testdata/distributed/clients.ts` (TS→TS
      자체 매칭으로 4 permutation 중 2개 cover; TS→Go·Go→TS는 link unit
      test로 cover).
    - **Viewer 통합은 별도 step에서 land** — 새 edge type은 자동 G5에
-     합산되어 viewer 코드 변경 없음 (`internal/server/web_assets/`
+     합산되어 viewer 코드 변경 없음 (`internal/system/viewer/web_assets`
      edge-counts 자동 반영).
 7. **W2 viewer 통합** — 별도 step. 사용자 audit UX (`EdgeTypeFilters`,
    "External APIs" 패널 가능) 미land.
 8. ~~**W3a `.proto` parser dispatch**~~ → **land 2026-05-11** — hand-rolled
-   recursive-descent parser in `internal/parse/proto/`. Service / message /
+   recursive-descent parser in `internal/graph/parse/proto`. Service / message /
    field / enum / oneof / map detection. Review fixes I1 (cross-namespace
    nested type resolve via `byBareName` fallback) + I2 (proto2 group
    handling) + I3 (label preservation) land.
 9. ~~**W3b Go gRPC server/client dispatch**~~ → **land 2026-05-11** —
-   `internal/parse/golang/grpc.go` + fixtures in
+   `internal/graph/parse/golang/grpc.go` + fixtures in
    `testdata/distributed/grpc_{server,client}.go` + `grpc.proto` + a
    hand-rolled `grpcstubs/` package so typesInfo path resolves under
    `packages.Load`. Two new edge types appended (36 → 38):
@@ -740,7 +740,7 @@ graph에 공존할 때 client `fetch('/api/users')` (method=GET default) 또는
    server↔client resolution to real Endpoint deferred to a future
    linker pass.
 10. ~~**W3c TS gRPC-web client dispatch**~~ → **land 2026-05-11** —
-    `internal/parse/typescript/grpc_client.go` + fixtures in
+    `internal/graph/parse/typescript/grpc_client.go` + fixtures in
     `testdata/distributed/grpc/{grpcweb,connectweb}_client.ts`. No new
     edge types (reuses `grpc_calls` from W3b). Per §6.5 (c) all TS gRPC
     edges are INFERRED (typesInfo unavailable in tree-sitter). Per

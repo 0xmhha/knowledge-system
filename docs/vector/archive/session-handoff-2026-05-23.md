@@ -4,10 +4,10 @@
 한 문서에 정리. 본 문서는 *상태 스냅샷* 이며, 영구 spec / decision
 은 다음 문서를 참조한다.
 
-- **결정 + 5 Phase 전체 spec**: [`docs/evaluation-design-2026-05-22.md`](./evaluation-design-2026-05-22.md)
+- **결정 + 5 Phase 전체 spec**: [`docs/vector/evaluation-design-2026-05-22.md`](./evaluation-design-2026-05-22.md)
 - **잔여 작업 inventory (Single source of truth)**: [`docs/backlog.md`](./backlog.md)
-- **아키텍처 그래프**: [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md)
-- **스키마 contracts**: [`docs/SCHEMA.md`](./SCHEMA.md)
+- **아키텍처 그래프**: [`docs/vector/ARCHITECTURE.md`](./ARCHITECTURE.md)
+- **스키마 contracts**: [`docs/vector/SCHEMA.md`](./SCHEMA.md)
 
 > **다른 머신에서 시작하는 경우 §0 부터 진행.**
 > 동일 머신에서 이어가는 경우 §6 으로 점프.
@@ -145,7 +145,7 @@ CoreML EP 관련 env vars (macOS 한정):
 | `CKV_STATIC_SHAPES` | `1` 이면 ANE cache 안정화 — bge-large 권장 | unset |
 | `CKV_COREML_CACHE_DIR` | CoreML 컴파일 캐시 경로 override | `~/.cache/ckv/coreml/<model>` |
 
-자세한 trade-off 는 [`docs/adr/005-coreml-mlprogram-static-shapes.md`](./adr/005-coreml-mlprogram-static-shapes.md) 참조.
+자세한 trade-off 는 [`docs/vector/adr/005-coreml-mlprogram-static-shapes.md`](./adr/005-coreml-mlprogram-static-shapes.md) 참조.
 
 ### 0.5 환경 변수 reference
 
@@ -240,7 +240,7 @@ SCHEMA, ADR, hallucination 도입 등) — backlog.md 변경 이력 참조.
 | **D4 — Footprint sub-event 구조** | 5 sub-span (NEW-9 시 6번째 query.bm25.rerank 추가) | ✅ 적용됨 | Phase 1 (`2f6f215`) |
 | **D5 — Hallucination 검증** | D5-A + D5-B + D5-D (D5-D 는 Phase 4 함께) | A/B 적용됨, D 잔여 | Phase 3 (`69e148a`) |
 
-> **D1 임시 정책**: NEW-9 가 `internal/query/bm25/` 를 *임시* 로 도입.
+> **D1 임시 정책**: NEW-9 가 `internal/vector/query/bm25` 를 *임시* 로 도입.
 > ADR-003 (vector-only) 의 supersede 는 측정 결과 후 ADR-006 으로 봉인.
 > 코드 주석 + ADR-006 draft 에 "임시" 명시 필요.
 
@@ -261,15 +261,15 @@ query.search                  -- top-level
   └─ query.density.adjust     -- budget_tokens, tier_full/sig5/sig_only
 ```
 
-**부수 fix**: `internal/footprint` profile aggregator 가 `.done` suffix
+**부수 fix**: `internal/vector/footprint` profile aggregator 가 `.done` suffix
 기반 필터링 (이전엔 `latency_ms > 0`) — sub-ms 연산도 count 집계.
 
 ### Phase 3 — Hallucination 검증 framework (`69e148a`)
 
-- `internal/query/hallucination.go` — `VerifyHit`, `VerifyResponse`
+- `internal/vector/query/hallucination.go` — `VerifyHit`, `VerifyResponse`
 - 3 failure modes: `file_missing` / `out_of_range` / `snippet_not_found`
 - Whitespace 정규화 (tab/space cosmetics false-positive 회피)
-- `internal/eval/score.go` — `PerQuery.HallucinationCount/Reason` +
+- `internal/vector/eval/score.go` — `PerQuery.HallucinationCount/Reason` +
   `Aggregate.HallucinationRate/Hits/TotalHits`
 - `Score(q, resp, k, srcRoot)` 시그니처 (srcRoot 추가)
 - CLI: `ckv eval --src <path>` 로 활성, `--max-halluc <rate>` CI gate
@@ -296,7 +296,7 @@ category: gas_policy | consensus_wbft | genesis_governance | ...
 
 ### NEW-1 — `--alias` vocabulary bridge (`ba5ba96`)
 
-신규 `internal/query/expand.go`:
+신규 `internal/vector/query/expand.go`:
 - `type AliasMap map[string][]string`
 - `LoadAliasMap(path) (AliasMap, error)` — `aliases:` 키 YAML 파싱
 - `ExpandQuery(intent, AliasMap) string` — deterministic sort 후 brackets-tagged 추가
@@ -317,7 +317,7 @@ MCP: `cks.context.semantic_search` 의 `alias_path` arg
 
 ### NEW-8 — Glossary loader (`3f4483c`)
 
-신규 `internal/glossary/` 패키지:
+신규 `internal/vector/glossary` 패키지:
 - `Extract(root)` — `.md` / `.markdown` 트리 walker
 - `ExtractLine(line, accum)` — 라인 단위 (테스트 친화적)
 - `WriteYAML(w, aliases)` — sorted output (diff-friendly)
@@ -448,7 +448,7 @@ query.density.adjust  budget_tokens, tier_full/sig5/sig_only, tokens_used
 
 #### NEW-4 — Multi-stage E1/E2/E3 메트릭 ✅ 2026-05-26 (commit `53964b1`)
 
-**위치**: `internal/eval/prregress/metrics.go` 신설 + `score.go` / `runner.go` / `fetcher.go` / `types.go` 통합 변경
+**위치**: `internal/vector/eval/prregress/metrics.go` 신설 + `score.go` / `runner.go` / `fetcher.go` / `types.go` 통합 변경
 
 **산출** (실제 구현):
 ```go
@@ -479,7 +479,7 @@ func ExtractPlanSymbols(markdown string) []string                    // helper
 
 #### NEW-2 — `--record` interactive fixture 모드 (`~150 LOC`)
 
-**위치**: `cmd/ckv/eval.go` 에 새 mode
+**위치**: `cmd/vector/eval.go` 에 새 mode
 
 **산출**:
 ```bash
@@ -507,7 +507,7 @@ ckv:
 
 #### NEW-9 — chunk-aware BM25 임시 ✅ 2026-05-26 (commit `57c8821`)
 
-**위치**: `internal/query/bm25/` 5 파일 신설 + `pkg/types/search.go` / `internal/query/engine.go` / `cmd/ckv/{query,eval}.go` / `pkg/mcp/server.go` / `internal/eval/eval.go` 통합 변경
+**위치**: `internal/vector/query/bm25` 5 파일 신설 + `pkg/vector/types/search.go` / `internal/vector/query/engine.go` / `cmd/ckv/{query,eval}.go` / `pkg/vector/mcp/server.go` / `internal/vector/eval/eval.go` 통합 변경
 
 **구현된 결정**:
 - ckg `pkg/bm25` 의 Okapi BM25 + 코드-aware tokenizer 를 *복사 + attribution* 으로 in-tree 화 (CKV 빌드가 ckg checkout 의존 안 함). 알고리즘 자체는 ckg 가 이미 hand-written / no-third-party 명시.
@@ -536,7 +536,7 @@ candidates_in / candidates_out / rank_changes / top1_score_delta / top1_chunk_id
 
 Mock embedder 의 약한 vector signal 환경에서 BM25 가 +0.10 r@5 보강. **bgeonnx 실측은 별도 세션** — semantic baseline 이 다르므로 mock 의 delta 가 예측력 없음.
 
-**ADR-006 (Proposed)** — `docs/adr/006-bm25-temporary-rerank.md`. ADR-003 (Accepted, vector-only) 의 supersede 는 *측정 후 결정*. 본 commit 은 measurement infrastructure 만 land.
+**ADR-006 (Proposed)** — `docs/vector/adr/006-bm25-temporary-rerank.md`. ADR-003 (Accepted, vector-only) 의 supersede 는 *측정 후 결정*. 본 commit 은 measurement infrastructure 만 land.
 
 **테스트**: 18 신규 unit test (Okapi regression / tokenizer contract / Rerank 시나리오 / RRF 수학 / Hit mutation isolation / BuildCorpusText / Stats fingerprint). 24 packages 전체 `ok`.
 
@@ -546,11 +546,11 @@ Mock embedder 의 약한 vector signal 환경에서 BM25 가 +0.10 r@5 보강. *
 
 #### NEW-3 — PR corpus indexing (`~400 LOC`)
 
-**위치**: `internal/parse/prdoc/` 신설
+**위치**: `internal/vector/parse/prdoc` 신설
 
 **산출**:
 - 새 `ChunkKind`: `ChunkPRBackground` / `ChunkPRSolution` / `ChunkCommitMessage`
-- `internal/parse/prdoc/parser.go` — PR description 섹션 분할
+- `internal/vector/parse/prdoc/parser.go` — PR description 섹션 분할
 - `ckv build --include-pr-history --pr-since YYYY-MM-DD` flag
 - prregress `fetcher.go` 의 gh CLI 호출 코드 재사용
 
@@ -593,7 +593,7 @@ type PRRef struct {
 
 #### NEW-7 — `cks.context.related_changes` MCP tool (`~150 LOC`)
 
-**위치**: `pkg/mcp/server.go` 에 새 handler
+**위치**: `pkg/vector/mcp/server.go` 에 새 handler
 
 **산출**:
 ```
@@ -678,10 +678,10 @@ TMP_OUT=$(mktemp -d) && \
 | 한계 | 위치 | 후속 |
 |---|---|---|
 | Glossary v1 leading-determiner 캡쳐 (`본 시스템에서 검증인`) | `internal/glossary/extract.go::lastKoreanPhrase` | 사용자 review 후 trim. v2 에서 determiner 화이트리스트 가능 |
-| Mock embedder 의 sub-ms latency → profile 0ms aggregation | `internal/footprint/footprint.go` | bgeonnx 실측 시 자연 해소. 코드 변경 불필요 |
+| Mock embedder 의 sub-ms latency → profile 0ms aggregation | `internal/vector/footprint/footprint.go` | bgeonnx 실측 시 자연 해소. 코드 변경 불필요 |
 | Hallucination check 가 whitespace 정규화로 너무 관대 | `internal/query/hallucination.go::stripBlanks` | 측정에서 false-negative 발견 시 strict mode 추가 |
 | 12 entries fixture 중 `pr67` `pr56` 의 `changed_symbols` 는 descriptive (실제 Go symbol 아님) | `testdata/prs.yaml` | NEW-4 의 Symbol F1 metric 시 normalization 필요 |
-| ADR-003 supersede 보류 — BM25 임시 도입 시점에 ADR-006 draft 필요 | `docs/adr/` | NEW-9 작업과 함께 |
+| ADR-003 supersede 보류 — BM25 임시 도입 시점에 ADR-006 draft 필요 | `docs/vector/adr` | NEW-9 작업과 함께 |
 
 ---
 
@@ -704,4 +704,4 @@ TMP_OUT=$(mktemp -d) && \
 | 2026-05-23 (2차) | §0 Onboarding 신설 — 다른 머신에서 시작 가능한 prereq / clone / stable-net access / bgeonnx 모델 / env vars 정리. `testdata/prs.yaml` 의 hard-coded `/Users/...` 절대경로 → `${CKV_STABLENET_PATH}` placeholder 로 변경 + `os.ExpandEnv` 통한 LoadFixture 자동 resolve. §6 Step 2/4 의 명령들도 repo-relative + `$TMP_OUT` 패턴으로 portable 화. |
 | 2026-05-23 (3차) | 발견성 + 검증 강화. (a) README.md 최상단에 본 핸드오프 cross-link callout + Documentation 섹션에 "start here" 항목 추가 — 다른 머신이 clone 후 즉시 본 문서 발견 가능. (b) §0.3 의 base SHA reachability 검증을 1 SHA spot-check 에서 12 SHA 전체 loop 로 강화 — 부분 fail 사전 발견. |
 | 2026-05-26 | Wave B / NEW-4 closed (commit `53964b1`). §5 Wave B 의 NEW-4 행을 실제 구현으로 갱신 (E1 IntentScore + 선택적 IntentCosine / E2 SymbolF1 / E3 PlanStepsScore + helpers). Score 구조에 8 omitempty 필드 — legacy 4 entries JSON 무변경. `Meta.CommitMessages` 신설 + `FetchMeta` 가 `gh pr view` JSON 의 `commits` 필드 추가 수집. 24 metric unit test + 2 integration test. 다음 진입 권장 = Wave C (NEW-9 BM25) — 본 commit 으로 stage 분해 측정 가능. |
-| 2026-05-26 (2차) | Wave C / NEW-9 closed (commit `57c8821`). `internal/query/bm25/` 5 파일 (Okapi + tokenize 는 ckg attribution, candidate-set Rerank + RRF k=60 은 CKV 신규). `HitScore` 에 `BM25Score` / `HybridRank` omitempty. `Engine.Search` 의 6번째 sub-span `query.bm25.rerank` (D2-A 위치). **Default OFF** (`Options.EnableBM25Rerank` opt-in) — handoff §0.2 / §6.4 mock baseline `r@5=0.740 MRR=0.4937` **완전 보존**. BM25 ON 측정 (mock embedder N=50): `r@5=0.840 MRR=0.4983` (+0.10 r@5). ADR-006 (Proposed) 작성; ADR-003 supersede 는 bgeonnx 실측 후. 18 신규 unit test. 다음 권장 = bgeonnx 실측 (별도 세션) 또는 Wave D (NEW-3 PR corpus). |
+| 2026-05-26 (2차) | Wave C / NEW-9 closed (commit `57c8821`). `internal/vector/query/bm25` 5 파일 (Okapi + tokenize 는 ckg attribution, candidate-set Rerank + RRF k=60 은 CKV 신규). `HitScore` 에 `BM25Score` / `HybridRank` omitempty. `Engine.Search` 의 6번째 sub-span `query.bm25.rerank` (D2-A 위치). **Default OFF** (`Options.EnableBM25Rerank` opt-in) — handoff §0.2 / §6.4 mock baseline `r@5=0.740 MRR=0.4937` **완전 보존**. BM25 ON 측정 (mock embedder N=50): `r@5=0.840 MRR=0.4983` (+0.10 r@5). ADR-006 (Proposed) 작성; ADR-003 supersede 는 bgeonnx 실측 후. 18 신규 unit test. 다음 권장 = bgeonnx 실측 (별도 세션) 또는 Wave D (NEW-3 PR corpus). |

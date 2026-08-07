@@ -9,7 +9,7 @@
 
 > **Self-contained resume doc.** Read only this to understand the full state and
 > continue on another machine. Tier 3 (dated snapshot). Authoritative "why" =
-> `docs/adr/0001-canonical-symbol-id.md`; live item status =
+> `docs/graph/adr/0001-canonical-symbol-id.md`; live item status =
 > `docs/symbol-identity-remaining-work.md`; ground truth for "what is true now" =
 > code + git in each repo.
 
@@ -41,12 +41,12 @@ Verification used two more local repos (NOT part of the system):
 
 **ckg** (cache `SchemaVersion` was **1.21** at this handoff; now **1.22** —
 PR #31's `simple_name` suffix-lookup column bumped it, unrelated to canonical_id —
-in `internal/buildpipe/cache.go`):
+in `internal/graph/buildpipe/cache.go`):
 - Phase 1: `canonical_id` for all parsers — Go (all node kinds), Solidity
   (`<relpath>:<Contract>.<func>(<paramTypes>)`, param sig separates overloads),
   TypeScript/proto (`<relpath>:<qname>`). PRs #21,#23,#24.
 - `Reader.FindByCanonicalID` (sqlite; Postgres is a documented not-found stub).
-- Resolution: `pkg/mcphandlers` resolves a canonical-id seed; multi-match bare
+- Resolution: `pkg/graph/mcphandlers` resolves a canonical-id seed; multi-match bare
   name = ambiguous (never silent pick — that guard predated this via PR #23-era).
 - Refinements B1–B4 (PR #25, #26): skip `_`; package-level-only const/var; proto
   double-`proto:` strip; line-qualify same-file duplicate ids (`@<line>`).
@@ -54,13 +54,13 @@ in `internal/buildpipe/cache.go`):
 - `LANG ?= go` Makefile var so `make eval-build-dbs LANG=auto` indexes sol/proto.
 
 **ckv** (PR #9 merged):
-- `internal/ckgalign` copies ckg's `canonical_id` (column-probed for old graphs)
+- `internal/vector/ckgalign` copies ckg's `canonical_id` (column-probed for old graphs)
   onto `pkg/types.Chunk` + `internal/query.Hit`, persisted in the sqlitevec store.
 - Embed text unchanged → **no re-embed**. Key is *inherited* from ckg's graph.db,
   not recomputed (this is why it's compatible by construction).
 
 **cks** (PRs #21,#22,#23,#24 merged):
-- `internal/ckgclient`: bumped ckg dep; `FindByCanonicalID` adapter;
+- `internal/system/ckgclient`: bumped ckg dep; `FindByCanonicalID` adapter;
   `resolveQname/resolveNodeID/resolveSeedFile` resolve canonical-first and return
   *unresolved* on multi-match (dropped silent `defs[0]`); MCP tool-doc fix.
 - Anchor `kind: def|loc` (schema + struct + `cks-anchor-refresh` never repoints
@@ -104,7 +104,7 @@ storage-slot formula + genesis-init + order together on-chain.
      question), or fix the symbol form.
 2. **ckv — `feat/ckv-invariants-pkg`** branch (pushed to origin, NOT merged):
    another session's in-progress work exposing `FindInvariants`/`GetConventions`
-   via `pkg/ckv`. **Intentionally excluded** from the PR sweep; the owning session
+   via `pkg/vector/ckv`. **Intentionally excluded** from the PR sweep; the owning session
    finishes it. Do not merge without their review.
 3. **ckg — Tier C / item 7**: Postgres `canonical_id` parity *or* an ADR to
    deprecate the Postgres backend (sqlite is the de-facto only target; pg is

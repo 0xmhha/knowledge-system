@@ -2,8 +2,8 @@
 
 > **대상**: `ckg build --src=<go-project> --out=<dir>`
 > **흐름**: CLI 진입 → Detection → Pass 1 (Parse) → Pass 2 (Resolve) → Pass 4 (Graph.Build) → Pass 5/6 (Derived) → Pass 7 (Cluster/Score) → Persist
-> **참조 파일**: `cmd/ckg/build.go`, `internal/buildpipe/pipeline.go`, `internal/buildpipe/language_runners.go`, `internal/detect/golang.go`, `internal/parse/golang/{parser,resolve,declarations,concurrency,distributed,statements}.go`, `internal/graph/builder.go`, `internal/persist/sqlite.go`
-> **선행 문서**: `docs/CODE-STRUCTURE.md` §3~5 (전체 아키텍처) / `docs/ARCHITECTURE-DETAILED.md` §10 (cold-build walk-through)
+> **참조 파일**: `cmd/graph/build.go`, `internal/graph/buildpipe/pipeline.go`, `internal/graph/buildpipe/language_runners.go`, `internal/graph/detect/golang.go`, `internal/parse/golang/{parser,resolve,declarations,concurrency,distributed,statements}.go`, `internal/graph/graph/builder.go`, `internal/graph/persist/sqlite.go`
+> **선행 문서**: `docs/graph/CODE-STRUCTURE.md` §3~5 (전체 아키텍처) / `docs/graph/ARCHITECTURE-DETAILED.md` §10 (cold-build walk-through)
 > **마지막 갱신**: 2026-05-05
 
 ---
@@ -28,7 +28,7 @@
 
 ## 0. 진입 (CLI Entry)
 
-**`cmd/ckg/build.go`**:
+**`cmd/graph/build.go`**:
 
 ```go
 buildpipe.Run(buildpipe.Options{

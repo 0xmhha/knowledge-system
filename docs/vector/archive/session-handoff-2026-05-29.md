@@ -120,7 +120,7 @@ cbeb842 docs: add CKV refactor plan with Schema-First order                     
 
 스키마 버전 `1.1` (additive, 1.0 파서와 호환).
 
-**청크 종류 9 (`pkg/types/chunk.go`):**
+**청크 종류 9 (`pkg/vector/types/chunk.go`):**
 
 기존 7 (`symbol`, `function_split`, `file_header`, `doc`, `pr_background`, `pr_solution`, `commit_message`) + 신규 2 (`invariant`, `convention`).
 
@@ -312,7 +312,7 @@ type Client interface {
 
 **Task CKS-2: CKS MCP에 신규 도구 노출** (CKS repo 작업)
 
-CKS의 `internal/mcp/`에 새 핸들러 추가. 이름: `cks.context.keyword_search`, `cks.context.narrow_candidates`, ...
+CKS의 `internal/system/mcp`에 새 핸들러 추가. 이름: `cks.context.keyword_search`, `cks.context.narrow_candidates`, ...
 
 **Task CKS-3: composer pipeline 활용 결정** (설계)
 
@@ -427,15 +427,15 @@ cat docs/integrated-workplan-2026-05-27.md  # CKS의 실제 계획서
 
 코드 (CKV repo):
 
-- `pkg/types/chunk.go` — Chunk + 메타데이터 타입
-- `internal/policy/loader.go` — yaml 로더 + glob 매처
-- `internal/invariant/extractor.go` — 3-tier 추출기
-- `internal/convention/stats.go` — AST 통계
-- `internal/embed/cache/lru.go` — LRU 캐시
-- `internal/query/explain.go` — explain_match 로직
-- `internal/query/service_keyword.go` — BM25 in-memory 인덱스
-- `internal/store/sqlitevec/migrate.go` — 마이그레이션 러너
-- `pkg/mcp/server.go` — MCP 도구 등록 (15개)
+- `pkg/vector/types/chunk.go` — Chunk + 메타데이터 타입
+- `internal/vector/policy/loader.go` — yaml 로더 + glob 매처
+- `internal/vector/invariant/extractor.go` — 3-tier 추출기
+- `internal/vector/convention/stats.go` — AST 통계
+- `internal/vector/embed/cache/lru.go` — LRU 캐시
+- `internal/vector/query/explain.go` — explain_match 로직
+- `internal/vector/query/service_keyword.go` — BM25 in-memory 인덱스
+- `internal/vector/store/sqlitevec/migrate.go` — 마이그레이션 러너
+- `pkg/vector/mcp/server.go` — MCP 도구 등록 (15개)
 
 데이터/설정:
 
@@ -445,24 +445,24 @@ cat docs/integrated-workplan-2026-05-27.md  # CKS의 실제 계획서
 문서:
 
 - `docs/plan-2026-05-29-ckv-refactor.md` — Schema-First 계획서
-- `docs/mcp-tools.md` — 15 MCP 도구 스키마
-- `docs/SCHEMA.md` — DB 스키마 + 마이그레이션 정책
+- `docs/vector/mcp-tools.md` — 15 MCP 도구 스키마
+- `docs/vector/SCHEMA.md` — DB 스키마 + 마이그레이션 정책
 - `docs/cks-design-2026-05-29.md` — **hypothetical** (정정 필요, §2.4 참조)
 - `docs/session-handoff-2026-05-29.md` — **이 파일**
 
 코드 (CKS repo):
 
-- `internal/ckvclient/interface.go` — CKV 클라이언트 인터페이스 (확장 대상)
+- `internal/system/ckvclient/interface.go` — CKV 클라이언트 인터페이스 (확장 대상)
 - `internal/mcp/*.go` — MCP 핸들러
-- `internal/composer/` — Stage 1/2 파이프라인
-- `internal/vocab/`, `internal/inventory/` — 도메인 지식
+- `internal/system/composer` — Stage 1/2 파이프라인
+- `internal/system/vocab`, `internal/system/inventory` — 도메인 지식
 
 ---
 
 ## 10. 참조 / 컨텍스트 외부
 
 - 이전 세션 종료: `f69afe8 docs: planning snapshot for 2026-05-26 session end`
-- CKV ADR 디렉토리: `docs/adr/`
+- CKV ADR 디렉토리: `docs/vector/adr`
 - CKS 가장 최근 핵심 문서: `code-knowledge-system/docs/integrated-workplan-2026-05-27.md`
 - D3 아키텍처 분리 합의: 이번 세션 초반 토론 (CKV semantic+keyword / CKG graph / CKS orchestrate)
 

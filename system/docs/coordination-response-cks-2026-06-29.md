@@ -6,15 +6,15 @@
 
 > Tier 3 (dated snapshot). CKS 세션이 CKV의
 > `code-knowledge-vector/docs/coordination-prompts-2026-06-29.md` §2(→ CKS)에
-> 회신한 내용의 CKS 측 사본. 권위: 코드+git(현재 사실) — `internal/ckvclient/`,
-> `internal/composer/stage2/`, `internal/embedder/`, `internal/mcp/`, `internal/ckgclient/`.
+> 회신한 내용의 CKS 측 사본. 권위: 코드+git(현재 사실) — `internal/system/ckvclient`,
+> `internal/system/composer/stage2`, `internal/system/embedder`, `internal/system/mcp`, `internal/system/ckgclient`.
 > CKV 문서에는 §2-R로 동일 내용이 반영됐다. (CKG 회신과 동일 패턴.)
 
 ## 핵심 정정 (CKV가 반영해야 할 아키텍처 불일치)
 
 §2 Q2가 "**ckvclient에 신규 6도구(embed/vector_search/rerank/related_changes/index/
 explain_match) 노출 + composer 활용(CKS-1/2/3)**"을 cks의 남은 작업으로 적었으나,
-**현 cks 아키텍처와 다르다.** `internal/ckvclient/interface.go`의 `Client`는
+**현 cks 아키텍처와 다르다.** `internal/system/ckvclient/interface.go`의 `Client`는
 `SemanticSearch / Health / Freshness / Close` **4개만** 노출한다. cks는 ckv의 확장
 도구(rerank/vector_search/related_changes/explain_match)를 **proxy하지 않는다**:
 
@@ -30,12 +30,12 @@ ckv가 그 도구들을 라이브러리 API로 제공하면 cks가 *필요할 �
 
 ## Q1 — subprocess MCP proxy → in-process pkg/ckv 마이그레이션
 
-- **✅ 완료.** `internal/ckvclient/real.go`가 `github.com/0xmhha/code-knowledge-vector/pkg/ckv`
+- **✅ 완료.** `internal/system/ckvclient/real.go`가 `github.com/0xmhha/code-knowledge-vector/pkg/ckv`
   를 직접 import하고 `ckv.Open(DataPath, {Embedder})`로 in-process 엔진을 연다. 주석:
   "The old subprocess fields (BinaryPath/Env/CallTimeout) are gone … No subprocess,
   no MCP transport: the 543-LOC proxy this replaced spawned the ckv binary and proxied
   every query over stdio, which hung 2/9 dogfood …".
-- 임베더도 in-process: `internal/embedder/embedder.go` → `pkg/embed/ollama.Open`. PR #1(R1′)
+- 임베더도 in-process: `internal/system/embedder/embedder.go` → `pkg/embed/ollama.Open`. PR #1(R1′)
   의 ollama embedder 승격 + Freshness 노출을 그대로 소비한다.
 - 결론: **R1′ + in-process 전환 모두 소비 완료.** CKV가 더 할 것 없음.
 
@@ -46,7 +46,7 @@ ckv가 그 도구들을 라이브러리 API로 제공하면 cks가 *필요할 �
 
 ## Q3 — D1 RRF fusion + cks-mcp 통합 binary
 
-- **✅ 완료.** RRF는 `internal/composer/stage2/merge.go`에 구현: `Score = Σ weight_i /
+- **✅ 완료.** RRF는 `internal/system/composer/stage2/merge.go`에 구현: `Score = Σ weight_i /
   (RRFK + rank_i)`, `DefaultRRFK = 60`(Cormack 2009). `addCkvList`가 ckv semantic 랭크
   리스트를 ckg BM25/symbol과 **동일 RRF**에 합류시킨다. 가중치: `BMWeight`, `SymbolWeight`,
   `CkvWeight`(기본 **5.0** — 자연어 프롬프트에서 ckv recall이 BM25를 상회하므로 BM25보다 높게).
@@ -69,14 +69,14 @@ ckv가 그 도구들을 라이브러리 API로 제공하면 cks가 *필요할 �
 ## 협의 — 임베딩 모델 업그레이드 (bge-m3 → Qwen3-Embedding)
 
 **현 cks 상태**: `cks-stablenet.yaml` `embed_model: "bge-m3"`, `ollama_url`. cks가
-config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다(`internal/config/config.go`
-`EmbedModel`/`OllamaURL`, `internal/embedder/embedder.go`). dim assert = `knownDims =
+config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다(`internal/system/config/config.go`
+`EmbedModel`/`OllamaURL`, `internal/system/embedder/embedder.go`). dim assert = `knownDims =
 {"bge-m3": 1024}`. PR #12(공간 identity)·PR #13(MaxInputTokens 레지스트리)은 ckv.Open /
 어댑터가 흡수하므로 cks는 그대로 탄다.
 
 **교체 시 cks가 해야 할 것**:
 1. config `embed_model`을 신모델로 변경.
-2. `internal/embedder/embedder.go` `knownDims`에 `<신모델>: <dim>` 한 줄 추가(없으면 dim
+2. `internal/system/embedder/embedder.go` `knownDims`에 `<신모델>: <dim>` 한 줄 추가(없으면 dim
    assert를 skip하므로 필수는 아니나 권장).
 3. PR #12 때문에 **cks가 가리키는 ckv 인덱스를 동일 모델로 reindex**(공간 혼용 금지).
    cks는 자체 DB가 없으므로 "cks-managed index" = ckv/ckg 데이터셋. reindex 주체는 ckv.
@@ -114,7 +114,7 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
 1. **임베딩 교체 + 전면 reindex**: 위 참조. cks는 config+knownDims+세션재시작으로 대응,
    차원 1024 유지 선호, query prefix는 ckv 어댑터 흡수 선호.
 2. **canonical_id / Symbol ID 정규화(B7)**: **CKG 안 수용.** cks는 이미
-   `internal/ckgclient/real.go`에 `FindByCanonicalID`(resolution: 정확 canonical_id →
+   `internal/system/ckgclient/real.go`에 `FindByCanonicalID`(resolution: 정확 canonical_id →
    정확/유일 qname)를 보유 → canonical_id를 그대로 join key로 쓸 준비 완료. cks 데이터셋
    빌드 시 ckg를 **cache SchemaVersion ≥ 1.19(현 1.22)** 로 보장해야 함(`>= 1.16` 게이트는
    오류 — 컬럼만 존재, 값은 1.19+). integration fixture 합의에 cks도 참여.
@@ -137,7 +137,7 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
   reindex-B(Qwen3 A/B). CKS는 각 인덱스 경로/sha로 config swap.
 
 **D-2 — schema ≥1.19 게이트: ✅ 확인**
-- CKS는 `internal/ckgclient/real.go` `FindByCanonicalID` 보유 → canonical_id join 준비 완료.
+- CKS는 `internal/system/ckgclient/real.go` `FindByCanonicalID` 보유 → canonical_id join 준비 완료.
 - CKG가 공표하는 manifest `schema_version`(1.22) + `graph.db` sha를 **배선 전 단언**한다(≥1.19
   아니면 join NULL 위험). cks 데이터셋 config가 가리키는 graph가 그 sha와 일치하는지 점검.
 
@@ -232,7 +232,7 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
 - 이 2건 반영 시 §9.1 확정 동의.
 
 **Q2 — 표면 노출 방식: ✅ in-process `ckvclient` 4메서드 (ckv MCP proxy 아님)**
-- CKS는 §2-R에서 subprocess/MCP proxy(543-LOC)를 제거하고 in-process `pkg/ckv`로 이행함 → 일관성·
+- CKS는 §2-R에서 subprocess/MCP proxy(543-LOC)를 제거하고 in-process `pkg/vector/ckv`로 이행함 → 일관성·
   성능상 **`ckvclient.Client` 인터페이스에 4메서드 추가(`GetFlow`/`ExpandFlow`/`FindBranches`/
   `GetInvariantEnforcement`) → `pkg/ckv.Engine` 직접 호출**. ckv MCP proxy 안 함. (D-3 확장분
   `find_invariants`/`get_conventions`도 동일 in-process 방식.)
@@ -249,7 +249,7 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
 - **CKS 병렬 착수 가능(지금, CKV 출시 불필요)**:
   1. `ckvclient.Client` 인터페이스에 4(+2)메서드 시그니처 + 입출력 타입 추가, `Fake`/`Dummy` 스텁 구현
      (컴파일 가능).
-  2. `internal/mcp/flow.go`에 도구 등록 + 입출력 스키마 + 핸들러 골격.
+  2. `internal/system/mcp/flow.go`에 도구 등록 + 입출력 스키마 + 핸들러 골격.
   3. 계약·표면 테스트 선작성.
 - **CKV 출시 후**: go.mod bump → `ckvclient` Real 본체에 `pkg/ckv.Engine` 호출 연결 → 표면 활성.
 - **Phase 2 인과 오케스트레이션**(expand_flow 다중홉 produce→store→consume 조립)은 그 다음 단계.
@@ -259,7 +259,7 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
 **즉시 착수(CKV 출시 불필요)**
 - T1: `ckvclient.Client` 인터페이스 확장 — `GetFlow/ExpandFlow/FindBranches/GetInvariantEnforcement`
   (+`FindInvariants/GetConventions`) 시그니처 + 입출력 타입(§9.1 + 조정①②). `Fake`/`Dummy` 스텁.
-- T2: `internal/mcp/flow.go` — `cks.context.*` 도구 6종 등록 + 스키마 + 핸들러 골격.
+- T2: `internal/system/mcp/flow.go` — `cks.context.*` 도구 6종 등록 + 스키마 + 핸들러 골격.
 - T3: 계약/표면 테스트(스텁 기반) 선작성.
 
 **CKV 출시 후(gated)**
@@ -287,16 +287,16 @@ config에서 모델을 읽어 **in-process**로 ollama 임베더를 구성한다
 - 필드 형상: `Reads/Writes/Emits`는 단일 `string`(목록 아님), `ExpandResult`는 `Direction`+`OriginBranches` 보유 → cks 타입 정렬.
 
 **구현 상태 (실제 코드):**
-- ✅ T1 `ckvclient.FlowClient`(인터페이스+cks 타입+Fake/Dummy) — `internal/ckvclient/flow.go`.
-- ✅ T2 MCP 도구 4종 등록 — `internal/mcp/flow.go` (`get_flow`/`expand_flow`/`find_branches`/
+- ✅ T1 `ckvclient.FlowClient`(인터페이스+cks 타입+Fake/Dummy) — `internal/system/ckvclient/flow.go`.
+- ✅ T2 MCP 도구 4종 등록 — `internal/system/mcp/flow.go` (`get_flow`/`expand_flow`/`find_branches`/
   `get_invariant_enforcement`), `server.go` 배선, 골든 픽스처 갱신(13→17 cks.* 도구).
-- ✅ T3 테스트 — `internal/ckvclient/flow_test.go`, `internal/mcp/flow_test.go` (Fake 해피패스·캡·
+- ✅ T3 테스트 — `internal/system/ckvclient/flow_test.go`, `internal/system/mcp/flow_test.go` (Fake 해피패스·캡·
   미지원 백엔드 폴백). 전체 test/vet 클린.
 - ✅ **T4 Real 배선** — `Real.{GetFlow,ExpandFlow,FindBranches,GetInvariantEnforcement}`가
   `r.eng.*` 호출 + ckv타입→cks타입 변환 + cks-side 캡. (백엔드 누출 방지, SemanticSearch와 동일 패턴.)
 - ⚠️ **정정**: 위 T1 목록의 `(+FindInvariants/GetConventions)` 2종은 T2의 flow-4종과 **동시 출시가
-  아니었다** — 당시 ckv `pkg/ckv`에 미노출(gated)이라 flow-4종만 랜딩(골든 13→17). 두 지식조회
-  도구는 **2026-07-12에 별도 출시**(M5): ckv facade PR #35(`pkg/ckv`에 `FindInvariants`/
+  아니었다** — 당시 ckv `pkg/vector/ckv`에 미노출(gated)이라 flow-4종만 랜딩(골든 13→17). 두 지식조회
+  도구는 **2026-07-12에 별도 출시**(M5): ckv facade PR #35(`pkg/vector/ckv`에 `FindInvariants`/
   `GetConventions` 노출) + cks PR #34(`FlowClient` 배선 + `cks.context.find_invariants`/
   `get_conventions` 등록, 골든 17→19). 이제 T1의 6종이 모두 cks 표면에 노출됨.
 

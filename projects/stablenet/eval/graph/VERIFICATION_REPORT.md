@@ -85,7 +85,7 @@ SQL logic error: fts5: syntax error near "." (1)
 
 재현: `tools/call` `get_context_for_task` with `{"task_description":"... validated."}`.
 
-**위치**: `pkg/smartctx/smartctx.go` BuildContext의 토크나이저 단계.
+**위치**: `pkg/graph/smartctx/smartctx.go` BuildContext의 토크나이저 단계.
 **영향**: 자연어 task description(보통 마침표로 끝남)에 그대로 호출하면 100% 실패. δ baseline도 동일 영향.
 **워크어라운드**: description 끝의 punctuation 제거. 영구 해결은 토크나이저에서 non-alnum 제거.
 
@@ -189,7 +189,7 @@ SQL logic error: fts5: syntax error near "." (1)
 
 | 버그 | 변경 파일 | 변경 내용 |
 |---|---|---|
-| B1 | `internal/persist/sqlite.go` | `trimFTSToken()` 추가. `rewriteFTSQuery`가 각 토큰의 leading/trailing non-alnum을 제거한 뒤 `*` prefix 부여. 주석에 "Reported 2026-05-11 in go-stablenet VERIFICATION_REPORT §3.1 B1" 명시 |
+| B1 | `internal/graph/persist/sqlite.go` | `trimFTSToken()` 추가. `rewriteFTSQuery`가 각 토큰의 leading/trailing non-alnum을 제거한 뒤 `*` prefix 부여. 주석에 "Reported 2026-05-11 in go-stablenet VERIFICATION_REPORT §3.1 B1" 명시 |
 | B2 | `internal/mcp/tools.go` | `find_symbol` description을 "by qualified_name. With exact=true (default), the input must match qualified_name exactly … With exact=false, the input is treated as a suffix"로 재작성. 주석에 "Description rewritten 2026-05-11 (VERIFICATION_REPORT §3.1 B2)" 명시 |
 
 ### 7.2 회귀 결과

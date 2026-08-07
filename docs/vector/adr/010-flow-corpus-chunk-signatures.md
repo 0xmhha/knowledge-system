@@ -30,7 +30,7 @@ appropriate ID schemes, embed a per-kind text tuned for symptom retrieval, and
 replace the whole flow layer on a corpus content-hash change.** `edge` records
 are skipped (graph-only relations are CKG's job — ADR-003).
 
-**Record → kind + ID** (`internal/flowcorpus/parser.go`):
+**Record → kind + ID** (`internal/vector/flowcorpus/parser.go`):
 
 | record | chunk kind | ID scheme | citation |
 |---|---|---|---|
@@ -94,13 +94,13 @@ for removals (a record deleted from the corpus leaves no orphan chunk).
 
 ## Realization
 
-- Parser + signatures: `internal/flowcorpus/parser.go`
+- Parser + signatures: `internal/vector/flowcorpus/parser.go`
   (`flowChunk`/`stepChunk`/`invariantChunk`), tests in `parser_test.go`.
-- Wholesale reindex (P3b-flow): `internal/build/reindex.go` +
+- Wholesale reindex (P3b-flow): `internal/vector/build/reindex.go` +
   `store.DeleteFlowChunks` (`flow_step`/`flow_spine`/curated `invariant`);
   test `TestReindex_ReindexesFlowOnContentChange`.
 - Fileless citation resolution: corpus dir appended to `manifest.DocsRoots`
-  (`internal/build/builder.go`).
+  (`internal/vector/build/builder.go`).
 - Relationship: ADR-003 (CKV is vector-only; BM25/graph on CKS) is why `edge`
   records are skipped. ADR-007 (canonical_id join): flow chunks are not stamped
   today, but steps carry a real `file:line`, so extending alignment to them is a

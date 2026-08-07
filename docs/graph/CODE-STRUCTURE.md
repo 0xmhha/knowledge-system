@@ -567,7 +567,7 @@ require (
 
 - `bin/ckg` — `make build`
 - `tools/viewer/{out,.next,node_modules}/`
-- `internal/system/viewer/web_assets/_next/`, `404/`, `404.html`, `index.txt`
+- `internal/system/viewer/web_assets/`, `404/`, `404.html`, `index.txt`
   (tracked stub `index.html`만 commit)
 
 ---

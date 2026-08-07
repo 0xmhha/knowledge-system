@@ -80,7 +80,7 @@
 ### 1-R. CKG 세션 회신 (2026-06-29, 코드 대조 확인)
 
 > CKG 트리/git 기준으로 위 §1을 회신한다. 권위: `docs/adr/0001-canonical-symbol-id.md`,
-> `docs/SCHEMA.md`(현재 schema **1.22**), `internal/buildpipe/cache.go`. CKG 측
+> `docs/vector/SCHEMA.md`(현재 schema **1.22**), `internal/graph/buildpipe/cache.go`. CKG 측
 > 사본: `docs/coordination-response-ckg-2026-06-29.md`.
 
 **Q1 — 스키마 / population**
@@ -110,7 +110,7 @@
 
 **Q4 — BM25 corpus (D4)**
 - **소유권 확인 ✅.** CKG가 BM25 소유: `pkg/bm25`(Okapi+tokenizer) + FTS5 인덱스
-  (`internal/persist/sqlite_fts.go`) + evidence/hunk corpus(`pkg/evidence`). ADR-003의
+  (`internal/graph/persist/sqlite_fts.go`) + evidence/hunk corpus(`pkg/graph/evidence`). ADR-003의
   "BM25=CKG / CKV=vector-only / CKS=RRF"와 현실 일치.
 - ⚠️ **정정(코드 확인): D4 핵심 목표는 이미 충족됨 — 추가 corpus 작업 불요.** `nodes_fts`
   FTS5 테이블(`schema.sql`)이 `name, qualified_name, signature, doc_comment, search_tokens`
@@ -279,28 +279,28 @@ fusion + MCP 노출 + composer를 담당하는 상위 레이어다. 우리 쪽 �
 
 ### 2-R. CKS 세션 회신 (2026-06-29, 코드 대조 확인)
 
-> CKS 트리/git 기준으로 위 §2를 회신한다. 권위: `internal/ckvclient/`,
-> `internal/composer/stage2/`, `internal/embedder/`, `internal/mcp/`,
-> `internal/ckgclient/`. CKS 측 사본: `code-knowledge-system/docs/coordination-response-cks-2026-06-29.md`.
+> CKS 트리/git 기준으로 위 §2를 회신한다. 권위: `internal/system/ckvclient`,
+> `internal/system/composer/stage2`, `internal/system/embedder`, `internal/system/mcp`,
+> `internal/system/ckgclient`. CKS 측 사본: `code-knowledge-system/docs/coordination-response-cks-2026-06-29.md`.
 
 **핵심 정정 (CKV가 반드시 반영해야 할 아키텍처 불일치)**
 - §2 Q2의 "**ckvclient에 6도구(embed/vector_search/rerank/related_changes/index/
   explain_match) 노출 + composer 활용(CKS-1/2/3)**"은 **현 cks 아키텍처와 다르다.**
-  `internal/ckvclient/interface.go`의 `Client`는 `SemanticSearch/Health/Freshness/Close`
+  `internal/system/ckvclient/interface.go`의 `Client`는 `SemanticSearch/Health/Freshness/Close`
   **4개만** 노출. cks는 ckv 확장 도구를 proxy하지 않는다 → ckv = **벡터 recall 한 표면**으로만
   소비, **rerank/fusion은 cks composer가 자체 소유**, graph성 도구는 ckg 기반으로 cks가 직접
   제공. ADR-003("BM25=CKG / CKV=vector-only / CKS=RRF")와 일치. "6도구 노출" 작업은 **불요**.
 
 **Q1 — in-process 마이그레이션**
-- **✅ 완료.** `internal/ckvclient/real.go`가 `pkg/ckv`를 직접 import, `ckv.Open(DataPath,
+- **✅ 완료.** `internal/system/ckvclient/real.go`가 `pkg/vector/ckv`를 직접 import, `ckv.Open(DataPath,
   {Embedder})`로 in-process 엔진 open. 543-LOC stdio proxy 제거(주석 명시). 임베더도
-  in-process(`internal/embedder` → `pkg/embed/ollama.Open`). **R1′(PR #1) + 전환 모두 소비 완료.**
+  in-process(`internal/system/embedder` → `pkg/embed/ollama.Open`). **R1′(PR #1) + 전환 모두 소비 완료.**
 
 **Q2 — ckvclient 6도구 + composer**
 - 위 "핵심 정정" 참조. cks 설계상 불요(단일 SemanticSearch 표면만 소비, fusion은 cks 소유).
 
 **Q3 — D1 RRF fusion + 통합 binary**
-- **✅ 완료.** RRF = `internal/composer/stage2/merge.go`(`Score = Σ weight_i/(RRFK+rank_i)`,
+- **✅ 완료.** RRF = `internal/system/composer/stage2/merge.go`(`Score = Σ weight_i/(RRFK+rank_i)`,
   `DefaultRRFK=60`). `addCkvList`가 ckv semantic을 ckg BM25/symbol과 동일 RRF에 합류
   (`CkvWeight` 기본 5.0 — 자연어에서 ckv recall이 BM25 상회). cks-mcp 단일 바이너리가 ckv
   in-process open.
@@ -332,7 +332,7 @@ fusion + MCP 노출 + composer를 담당하는 상위 레이어다. 우리 쪽 �
 
 **§0 공통 결정 — cks 입장**
 1. 임베딩 교체+reindex: 위. (1024 유지·prefix는 ckv 흡수 선호.)
-2. **B7 canonical_id: CKG 안 수용.** cks는 `internal/ckgclient/real.go`에 `FindByCanonicalID`
+2. **B7 canonical_id: CKG 안 수용.** cks는 `internal/system/ckgclient/real.go`에 `FindByCanonicalID`
    (canonical_id → 유일 qname) 보유 → join key 그대로 사용 준비 완료. 데이터셋은 ckg cache
    SchemaVersion **≥ 1.19(현 1.22)** 보장 필요(`>= 1.16` 게이트 오류). fixture 합의 참여.
 3. Flow 분담: Phase 1=ckv 단독 / Phase 2=cks 오케스트레이션 동의.
@@ -689,7 +689,7 @@ CKG가 정본 측정 그래프를 산출·공표했다(이 문서 §1-R4). 너�
    (분모=공유언어 go/sol/ts 심볼청크, proto는 CKV 미파싱이라 0, promoted는 canonical 없음).
    ckg_node_id(file:line) 정렬률 99.3%. 갭 ~6% = 패키지레벨 var/const 블록(CKV가 ckg 노드와
    다르게 청크) — 설명되는 안정 갭, 회귀 아님.
-4. **통합 fixture CKV 半 ✅** — `internal/ckgalign/integration_test.go`. 청크가 동일 (file,line)의
+4. **통합 fixture CKV 半 ✅** — `internal/vector/ckgalign/integration_test.go`. 청크가 동일 (file,line)의
    CKG 노드 canonical_id를 **verbatim 상속** 단언 + `@<line>` 중복 caveat + schema 게이트.
    라이브 검증(실 그래프 5노드): 심볼 청크 존재 시 4/4 verbatim 일치, 1건은 패키지레벨 var(청크 없음).
 
@@ -810,7 +810,7 @@ flow_meta / enforced_at 컬럼(Phase B 영속) 위에서 동작. 모두 bounded(
   `get_invariant_enforcement`(+`find_invariants`/`get_conventions`)를 get_for_task 합성과 별개
   표면으로. coding-agent analyzer/diagnose 직접 호출.
 - **Q4 일정: CKS 병렬 착수 가능(지금)** — ① `ckvclient` 인터페이스+타입+Fake/Dummy 스텁 ②
-  `internal/mcp/flow.go` 도구 등록 골격 ③ 계약 테스트. **선행조건** = CKV가 §9.1(조정 반영)
+  `internal/system/mcp/flow.go` 도구 등록 골격 ③ 계약 테스트. **선행조건** = CKV가 §9.1(조정 반영)
   `pkg/ckv.Engine` 메서드 출시+태그(현재 미구현 확인). 출시 후 go.mod bump → Real 본체 연결 →
   표면 활성. 같은 Phase 2에 맞춤.
 
@@ -824,7 +824,7 @@ flow_meta / enforced_at 컬럼(Phase B 영속) 위에서 동작. 모두 bounded(
   - `ExpandFlow(ctx, stepID, direction "up"|"down", hops int) (*ExpandResult, error)`
   - `FindBranches(ctx, symptom string, k int) ([]BranchMatch, error)` (실 embedder 필요)
   - `GetInvariantEnforcement(ctx, invID string) (*InvariantEnforcement, error)`
-  - 타입도 `pkg/ckv`에서 재노출(FlowView/FlowStepView/ExpandResult/FlowNeighbor/BranchMatch/
+  - 타입도 `pkg/vector/ckv`에서 재노출(FlowView/FlowStepView/ExpandResult/FlowNeighbor/BranchMatch/
     InvariantEnforcement) — internal/query import 불필요.
 - **MCP**: `cks.context.{get_flow,expand_flow,find_branches,get_invariant_enforcement}` 등록
   (CKV MCP 표면 15→19). proxy 방식이면 그대로 노출 가능.

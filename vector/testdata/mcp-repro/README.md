@@ -1,6 +1,6 @@
 # CKV-1 reproduction scripts
 
-`docs/followups-from-cks-dogfood-2026-05-19.md` CKV-1 항목의 검증 절차에서 사용한 stdio
+`system/docs/followups-from-dogfood-2026-05-19.md` CKV-1 항목의 검증 절차에서 사용한 stdio
 JSON-RPC 재현 스크립트. ckv MCP server가 두 "failing query"에 대해 정말로 hang하는지
 직접 확인하기 위한 도구.
 

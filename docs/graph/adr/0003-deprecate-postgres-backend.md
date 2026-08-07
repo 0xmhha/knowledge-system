@@ -12,7 +12,7 @@
 
 CKG has two storage backends behind the `Store` interface: the default local
 **SQLite** `graph.db`, and an **opt-in PostgreSQL** backend selected by passing a
-`--db <DSN>` flag (`cmd/ckg/build.go`, `serve.go`, `validate.go`) or via the
+`--db <DSN>` flag (`cmd/graph/build.go`, `serve.go`, `validate.go`) or via the
 dedicated `ckg export-postgres` command. The intended use case was a shared,
 server-hosted graph DB for multi-client `serve` instead of a local file.
 
@@ -25,11 +25,11 @@ In practice:
 - **It already lags the SQLite schema.** `pgStoreSchema` carries neither
   `canonical_id` (schema 1.19, ADR-0001) nor `simple_name` (schema 1.22);
   `pgStore.FindByCanonicalID` is a documented not-found stub
-  (`internal/persist/postgres_store.go`). Keeping it at parity is a standing tax
+  (`internal/graph/persist/postgres_store.go`). Keeping it at parity is a standing tax
   on every additive schema change for a backend nobody runs.
 
 This is the open decision tracked as item 7 / Tier C ("C1") in
-`docs/archive/symbol-identity-remaining-work.md`: implement Postgres `canonical_id`
+`docs/graph/archive/symbol-identity-remaining-work.md`: implement Postgres `canonical_id`
 parity, or stop treating Postgres as a parity target.
 
 ## Decision
@@ -56,7 +56,7 @@ storage backend.
 ## Consequences
 
 - The last open symbol-identity item (item 7 / C1) is resolved: no Postgres
-  `canonical_id` work. Update `docs/archive/symbol-identity-remaining-work.md` to point
+  `canonical_id` work. Update `docs/graph/archive/symbol-identity-remaining-work.md` to point
   item 7 / Tier C at this ADR.
 - Future additive-schema changes only round-trip through the SQLite
   reader/writer; reviewers should not request Postgres mirroring.

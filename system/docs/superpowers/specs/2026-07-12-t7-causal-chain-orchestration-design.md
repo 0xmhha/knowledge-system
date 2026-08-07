@@ -113,7 +113,7 @@ A resolve miss (unknown seed) → empty chain + a `reason` on the wire, not an e
   `value` (optional), `direction` (optional), `max_hops` (optional).
 - handler mirrors `registerGetInvariantEnforcement`: `flowClient(d, name)` →
   `causal.Assemble(...)` → `NewToolResultStructured(chain)`.
-- registered in `internal/mcp/server.go`; added to the golden SSoT fixture
+- registered in `internal/system/mcp/server.go`; added to the golden SSoT fixture
   (cks 19 → 20 tools) and the coding-agent C1 schema + analyzer grant
   (coding-agent side, its own PR).
 
@@ -130,7 +130,7 @@ A resolve miss (unknown seed) → empty chain + a `reason` on the wire, not an e
 ## 7. Boundaries & isolation
 
 - `internal/composer/causal` depends only on `ckvclient.FlowClient` +
-  `pkg/contract` — testable with the existing `ckvclient.Fake`, no live backend.
+  `pkg/system/contract` — testable with the existing `ckvclient.Fake`, no live backend.
 - The MCP handler and the composer stage are thin adapters over `Assemble`.
 - Value-matching is string containment over the corpus's Reads/Writes/Emits;
   this is documented as best-effort. No new dataflow computation.
