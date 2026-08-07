@@ -1,7 +1,7 @@
 # 설계: EvidencePack 본문 출처 보장 (snapshot-first BodyFetcher)
 
 작성: 2026-07-10 · 상태: 구현 대기 · 대상 리포: code-knowledge-system(주) + code-knowledge-vector(보조)
-전제 브랜치(이력): `docs/retire-ckg-node-id` (cks `3e7c22d8`, ckv `8c0426f` 이후) — 이 마이그레이션은 이후 병합됨(cks PR #33, commit `54680a3`). 본 설계는 그 위에서 여전히 유효한 미구현 설계다.
+전제 브랜치(이력): `system/docs/retire-ckg-node-id` (cks `3e7c22d8`, ckv `8c0426f` 이후) — 이 마이그레이션은 이후 병합됨(cks PR #33, commit `54680a3`). 본 설계는 그 위에서 여전히 유효한 미구현 설계다.
 관련 사건 기록: `cks-seminar/REPORT-bench-a2-postfix.md` run#4 절
 
 ---
@@ -15,11 +15,11 @@
 
 ## 1. 배경 — 실측된 사고 (왜 이 작업인가)
 
-- cks-mcp 설정(`cks-stablenet.yaml`)의 `backends.ckg.source_root`가 실개발 리포
+- `cks mcp` 설정(`cks-stablenet.yaml`)의 `backends.ckg.source_root`가 실개발 리포
   (`~/Work/github/go-stablenet`, HEAD 44d75d17)를 가리킨 채 서버가 기동됐다. 인덱스(pr-77-2)는
   0bf2f4d1b 기준. 실개발 리포에는 벤치 대상 버그의 수정(fix #77, 98f05c2a0)이 이미 반영돼 있었다.
 - 오염 경로 2개가 동시에 열렸다:
-  1. **BodyFetcher**: `cmd/cks-mcp/main.go` `budget.FilesystemFetcher{Root: cfg.Backends.CKG.SourceRoot}`
+  1. **BodyFetcher**: `cmd/cks/main.go` `budget.FilesystemFetcher{Root: cfg.Backends.CKG.SourceRoot}`
      — 팩 body가 수정된 트리의 파일에서 읽혔다 (라인 시프트 포함).
   2. **health 광고**: `cks.ops.health` 응답의 `source_root` 필드가 이 경로를 광고 → 에이전트들이
      "소스 트리"로 오인하고 그 경로를 Read → **수정된 코드를 타깃 코드로 오인해 진짜 근본 원인
@@ -28,7 +28,7 @@
 - 참고: ckv/ckg **매니페스트**의 src_root는 각각 `cks-seminar/test/vector-db-5`,
   `Work/github/test/analysis-test-3`로 둘 다 0bf2f4d1b 클린이었다. 오염원은 인덱스가 아니라
   **config 값과 그것을 신뢰한 소비 경로**다.
-- 기존 방어선의 상태: `internal/mcp/alignment.go`에 config-vs-manifest 불일치(142행)와
+- 기존 방어선의 상태: `internal/system/mcp/alignment.go`에 config-vs-manifest 불일치(142행)와
   source_root HEAD 드리프트(151행) **경고 코드가 이미 있으나**, WARNING(서빙 계속) 수준이고
   사고 당시 health 응답에서 에이전트가 소비하지 않았다. 경고로는 부족하다 — 구조로 막는다.
 
@@ -48,7 +48,7 @@
 ckv DB의 `chunks` 테이블에는 인덱스 시점 본문이 이미 있다(`text` 컬럼, `start_line`/`end_line`
 좌표 포함). 임의 라인 스팬 인용에 본문을 주는 조회를 추가한다.
 
-**(a) store 레이어** — `internal/store/sqlitevec/store.go`에 추가:
+**(a) store 레이어** — `internal/vector/store/sqlitevec/store.go`에 추가:
 
 ```go
 // BodyByRange returns the indexed-snapshot text covering [startLine, endLine]
@@ -73,7 +73,7 @@ func (s *Store) BodyByRange(ctx context.Context, file string, startLine, endLine
 - 청크 종류 무관(symbol/file_header/doc/invariant 모두 대상). doc/invariant 청크(파일 밖
   코퍼스)도 file 경로가 맞으면 그대로 서빙 — DocsRoots 파일 읽기를 대체한다.
 
-**(b) engine/공개 API** — `internal/query/engine.go` + `pkg/ckv/ckv.go`에 위임 메서드 추가:
+**(b) engine/공개 API** — `internal/vector/query/engine.go` + `pkg/vector/ckv/ckv.go`에 위임 메서드 추가:
 
 ```go
 // internal/query/engine.go
@@ -90,7 +90,7 @@ func (e *Engine) BodyByRange(ctx context.Context, file string, startLine, endLin
 
 ### 3.2 cks — SnapshotFetcher (BodyFetcher의 새 기본 구현)
 
-**(a) ckvclient 인터페이스 확장** — `internal/ckvclient/interface.go`:
+**(a) ckvclient 인터페이스 확장** — `internal/system/ckvclient/interface.go`:
 
 ```go
 // FetchBody returns the indexed-snapshot text for a citation span.
@@ -153,7 +153,7 @@ func (f *SnapshotFetcher) Fetch(ctx context.Context, c contract.Citation) (strin
 
 ### 3.3 main.go 배선 교체
 
-`cmd/cks-mcp/main.go` (현재 ~146행):
+`cmd/cks/main.go` (현재 ~146행):
 
 ```go
 // 현재
@@ -173,7 +173,7 @@ fetcher := &budget.SnapshotFetcher{
 
 ### 3.4 기동 게이트 — source_root HEAD 검증 (폴백 보호)
 
-이미 있는 부품을 승격한다: `internal/mcp/alignment.go`
+이미 있는 부품을 승격한다: `internal/system/mcp/alignment.go`
 - `AlignmentInputs.SourceHead`(66행)와 151행의 드리프트 WARNING("source_root HEAD != indexed
   commit — stale tree")이 존재한다. `computeStartupAlignment`(main.go 118행에서 호출)가
   SourceHead를 채우는지 확인하고, 비어 있으면 `git -C <source_root> rev-parse HEAD`로 채울 것
@@ -186,7 +186,7 @@ fetcher := &budget.SnapshotFetcher{
 
 ### 3.5 health 광고 교체 (INV-BODY-2)
 
-`internal/mcp/health.go`:
+`internal/system/mcp/health.go`:
 - `SourceRoot` 필드(30행, 115행)는 **유지하되 의미를 재정의**하지 말고, 새 필드를 추가한다:
 
 ```go
@@ -203,7 +203,7 @@ BodyProvenance string `json:"body_provenance"` // "index-snapshot(+verified-fs-f
 
 ### 3.6 절차 보조 (코드 밖, 선택)
 
-- `scripts/gen-cks-config.sh` 사용 절차: 벤치 리셋 시 `--src <이번 워크스페이스>`로 재생성+재시작.
+- `cks mcp gen-config` 사용 절차: 벤치 리셋 시 `--src <이번 워크스페이스>`로 재생성+재시작.
   단 본 설계 적용 후에는 잘못돼도 팩이 오염되지 않고 폴백만 잠긴다(안전한 실패).
 
 ## 4. 구현 순서 (의존성 순)

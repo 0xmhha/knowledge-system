@@ -23,7 +23,7 @@
 ### CKG-1 세부 — `SearchFTS` 점수 반환 ✅ `2f89b17`
 
 **구현 요약:**
-- `internal/persist/search_hit.go` — `SearchHit{Node, Score, RawScore}` 타입 + `normalizeSearchHits` 헬퍼
+- `internal/graph/persist/search_hit.go` — `SearchHit{Node, Score, RawScore}` 타입 + `normalizeSearchHits` 헬퍼
 - `StoreReader.SearchFTS` 시그니처 `[]SearchHit` 로 변경
 - SQLite: `-bm25(nodes_fts)` (sign-flip), `ORDER BY raw_score DESC`
 - PG: `ts_rank(search_vector, plainto_tsquery)`, `ORDER BY raw_score DESC`
@@ -36,14 +36,14 @@
 ### CKG-2 세부 — native filter pushdown ✅ `570e5ec`
 
 **구현 요약:**
-- `SearchFTSOptions{Language string}` 추가 (`internal/persist/search_hit.go`)
+- `SearchFTSOptions{Language string}` 추가 (`internal/graph/persist/search_hit.go`)
 - `StoreReader.SearchFTS(q, limit, opts)` 시그니처 확장
 - SQLite/PostgreSQL 모두 동적 SQL — `opts.Language != ""` 일 때만 WHERE 추가
 - `Search()` 어댑터는 `SearchFTSOptions{}` 전달, 기존 호출자 7곳 무영향
 - path glob은 client-side 유지 (CKG-2 follow-up 문서 권장)
 - 회귀 테스트 3종: LanguagePushdown / LanguageEmptyMatchesAll / LanguageNoMatch
 
-**다운스트림 액션 (E2 후속):** cks `internal/ckgclient/real.go`의 `FilterOverfetchRatio=3` over-fetch + client-side language filter 제거 가능. path glob은 그대로 유지.
+**다운스트림 액션 (E2 후속):** cks `internal/system/ckgclient/real.go`의 `FilterOverfetchRatio=3` over-fetch + client-side language filter 제거 가능. path glob은 그대로 유지.
 
 
 ### CKG-4 세부 — multi-kind symbol lookup ✅ `d34a2eb`
@@ -96,10 +96,10 @@ ckg 단독 결정 불가 — cks가 cross-commit 검색을 정말 필요로 하�
 
 **다운스트림 액션 (E2 후속):** cks 다음 dogfood에서 `mcp-tool-handlers` / `stamp-integrity-lookup` recall 변동 확인. recall ceiling 0.67이 회복되면 ckg 측 default 변경 정당화됨.
 
-### CKG-6 세부 — `pkg/store` 공식 surface 확장 ✅ `78edfc5`
+### CKG-6 세부 — `pkg/graph/store` 공식 surface 확장 ✅ `78edfc5`
 
 **구현 요약:**
-- `pkg/store`에 `SearchHit`, `SearchFTSOptions`, `FindSymbolOptions`, `ErrInvalidMetric` alias 추가
+- `pkg/graph/store`에 `SearchHit`, `SearchFTSOptions`, `FindSymbolOptions`, `ErrInvalidMetric` alias 추가
 - 패키지 doc 강화 — 외부 사용자 가이드, "self-shim 금지" 명시
 - 컴파일 가드 + `TestPublicSurface_CanConstructOptions` — 외부 사용자 관점에서 옵션 구성 가능성 검증
 - `Manifest`는 의도적 제외 — CKG-7에서 *축소 mirror struct*로 별도 노출
@@ -138,7 +138,7 @@ ckg 단독 결정 불가 — cks가 cross-commit 검색을 정말 필요로 하�
   - `internal/ckgclient/real.go:149-155` 가짜 점수 (`1-i/(N+1)`) → `SearchHit.Score` 사용
   - `FilterOverfetchRatio=3` over-fetch + client-side language filter → `SearchFTSOptions{Language}` 푸시다운
   - `arch_explain` intent N round-trips → `FindSymbolOptions{Kinds: [...]}` 1 query
-  - CKG-6/7 결과: self-shim `persist.StoreReader` alias 제거 → `pkg/store` 직접 import + `store.GetManifest()` 헬퍼 사용
+  - CKG-6/7 결과: self-shim `persist.StoreReader` alias 제거 → `pkg/graph/store` 직접 import + `store.GetManifest()` 헬퍼 사용
 
 ## F. 보안 / 평가 인프라 (2026-05-20 사용자 신규 지시)
 
@@ -150,7 +150,7 @@ ckg 단독 결정 불가 — cks가 cross-commit 검색을 정말 필요로 하�
   - benchmark: 132.75× reduction (avg 4,432 tok/query vs 588,365 tok corpus)
   - bench-mcp: 8 probes errors=0, p99 ceiling 130 ms (impact_of_change_d2)
 
-- [x] **EV1 Phase 2** Gold-set retrieval accuracy ✅ `7679410` — `internal/eval/retrieval/` 패키지 + `ckg eval-retrieval` CLI + `eval/retrieval/*.yaml` 5 fixture (find_callers x2 / find_callees x1 / find_symbol x1 / search_text x1). Synthetic-index 사용 (코드 변경 시 expected 안정성). `make eval` step 5/5에 통합. 첫 baseline: 5/5 passed, aggregate R=1.00 P=0.60 F1=0.75.
+- [x] **EV1 Phase 2** Gold-set retrieval accuracy ✅ `7679410` — `internal/graph/eval/retrieval` 패키지 + `ckg eval-retrieval` CLI + `eval/retrieval/*.yaml` 5 fixture (find_callers x2 / find_callees x1 / find_symbol x1 / search_text x1). Synthetic-index 사용 (코드 변경 시 expected 안정성). `make eval` step 5/5에 통합. 첫 baseline: 5/5 passed, aggregate R=1.00 P=0.60 F1=0.75.
 
   **lockdown 발견:** R04 fixture 작성 중 SQLite LIKE의 ASCII case-insensitive 매치 동작 발견 → `api.Handler.vault` (소문자 field) 가 `Vault` 검색에 매치됨. 의도된 동작이라 fixture에 명시적 expected로 포함, 향후 case-sensitive 회귀 시 fail.
 
@@ -327,7 +327,7 @@ ckg 단독 결정 불가 — cks가 cross-commit 검색을 정말 필요로 하�
   - V18 (`5548dd5`): 3-node diamond MRO dedup
   - V20 (`48291cb`): 5-node deeper diamond MRO transitive dedup + slot model 명시
 
-- [x] **C12 — walker symmetry matrix** ✅ `dc05899` `internal/parse/solidity/WALKER_SYMMETRY.md`. V18/V22 + V10/V23 drift 패턴 + 6-question checklist + drift catalogue.
+- [x] **C12 — walker symmetry matrix** ✅ `dc05899` `internal/graph/parse/solidity/WALKER_SYMMETRY.md`. V18/V22 + V10/V23 drift 패턴 + 6-question checklist + drift catalogue.
 
 - [x] **Meta — stale `.git/index.lock` 분석** ✅ `9a22242` `docs/stale-git-lock-analysis-2026-05-21.md`. 10+회 발생 패턴 진단, 4가지 가설(gitstatusd race 가장 유력), 6가지 해결책 옵션(B git-safe wrapper 권장, C 셸 탭 정리 free), 추적 테이블. ckg source 무영향, 사용자 환경 문제.
 
@@ -375,7 +375,7 @@ ckg 단독 결정 불가 — cks가 cross-commit 검색을 정말 필요로 하�
   - V5 `tryComputeStructBytes`가 bytes/string/dynamic-array에 fallthrough (0, false). Struct가 structSizes에 등록 안 됨.
   - **PrimitiveOnly struct (V11 fixture와 동일 구조)도 *내 fixture에서 1 slot fallback*** — multi-contract namespace 또는 fixed-point ordering 이슈. V11은 single-contract라 cover. 실 codebase는 multi-contract이므로 *광범위 fallback 가능성*.
 
-- [x] **C18 — 방향 전환: T-04 Hallucination validator prototype** ✅ 사용자 질문(*"evaluation 부재로 불명확성 누적"*)에 응답 — W-C lockdown 시리즈에서 *evaluation infrastructure 강화*로 axis 전환. 발견: `internal/eval/`에 *LLM 인프라(LLMClient, APIClient, CLIClient) + 4-baseline 평가 시스템*이 이미 완비. 진짜 미충족은 *반복 사용 + bug discovery cycle*. HANDOFF.md T-04 P0 spec 구현: `internal/eval/hallucination_check.go::ValidateMentions(output, store)` — Found/QnameDiverged/Hallucinated 3-bucket 분류. 6 unit tests PASS. Walker 0줄 변경.
+- [x] **C18 — 방향 전환: T-04 Hallucination validator prototype** ✅ 사용자 질문(*"evaluation 부재로 불명확성 누적"*)에 응답 — W-C lockdown 시리즈에서 *evaluation infrastructure 강화*로 axis 전환. 발견: `internal/graph/eval`에 *LLM 인프라(LLMClient, APIClient, CLIClient) + 4-baseline 평가 시스템*이 이미 완비. 진짜 미충족은 *반복 사용 + bug discovery cycle*. HANDOFF.md T-04 P0 spec 구현: `internal/eval/hallucination_check.go::ValidateMentions(output, store)` — Found/QnameDiverged/Hallucinated 3-bucket 분류. 6 unit tests PASS. Walker 0줄 변경.
 
   **V0 미해결 (V1+):**
   - ckg eval CLI에 통합 (runner.go::runOne에 호출 wiring)

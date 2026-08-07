@@ -4,7 +4,7 @@
 > repository layout at the time of writing (pre-consolidation). For the
 > current command map see docs/design/cli-consolidation.md.
 
-> Scope: extend the existing B1 lock detector (`internal/parse/golang/concurrency.go`
+> Scope: extend the existing B1 lock detector (`internal/graph/parse/golang/concurrency.go`
 > + `concurrency_underlock.go`) so that `accessed_under_lock` edges are also
 > emitted for fields touched by **callee** functions when their callers hold a
 > mutex. Currently the detector is intra-function only; this is the
@@ -12,13 +12,13 @@
 > `concurrency_underlock.go:24`.
 >
 > **Status**: W1 LANDED 2026-05-11 (Stage B DFS, opt-in `--lock-propagation`).
-> Implementation at `internal/buildpipe/lock_propagation.go` (+ Go-parser
-> field-touch side-channel at `internal/parse/golang/concurrency_underlock.go`
+> Implementation at `internal/graph/buildpipe/lock_propagation.go` (+ Go-parser
+> field-touch side-channel at `internal/graph/parse/golang/concurrency_underlock.go`
 > `recordFuncFieldTouches`). KPI in §4.1 below.
 > **Out of scope**: cross-language locks (no equivalent semantic in TS/Sol),
 > happens-before race detection (Go race detector territory), runtime trace
 > ingestion (schema 1.9 W series).
-> **Adjacent docs**: `docs/design/track-c-detector-gap.md` §2.9 (the
+> **Adjacent docs**: `docs/graph/design/track-c-detector-gap.md` §2.9 (the
 > goroutine-body lock-walk bug; already fixed in current code) and §2.10
 > (`accessed_under_lock` limited-by-design note).
 
@@ -87,7 +87,7 @@
 
 > **§5.0 Q2 통일 (2026-05-11)**: 아래 원안의 EXTRACTED/INFERRED/AMBIGUOUS
 > 3단 분기는 사용자 결정으로 **단일 INFERRED**로 합쳐졌다. W-A 구현
-> (`internal/buildpipe/lock_propagation.go`)은 모든 cross-fn 엣지를
+> (`internal/graph/buildpipe/lock_propagation.go`)은 모든 cross-fn 엣지를
 > `ConfInferred`로 emit하며, 본 §2.2 표는 *원안 설계 추적용 read-only*.
 > AMBIGUOUS는 lock-ordering bug surface 가치가 노이즈 비용을 못 넘는다고
 > 결정 — Recovery 패널 hybrid 패턴(schema 1.8 §11.3)은 W-A 영역에서
@@ -102,7 +102,7 @@
 
 ### 2.3 새 엣지 타입은 없다
 
-`accessed_under_lock` 한 종류만 확장. `pkg/types/enums.go` 변경 없음. 따라서
+`accessed_under_lock` 한 종류만 확장. `pkg/graph/types/enums.go` 변경 없음. 따라서
 schema bump 도 없음 (1.8 유지). 단 새 엣지가 다수 추가되면 viewer 의 노이즈
 임계점에 영향 — §3.3 노이즈 컨트롤 참조.
 
@@ -197,7 +197,7 @@ propagateLockedFieldAccessDFS(g, maxDepth=5):
 | nodes | 24760 | 24760 | 0 |
 | edges total | 122702 | 122737 | +35 |
 
-#### W-A fixture (`internal/buildpipe/testdata/lock_propagation`)
+#### W-A fixture (`internal/graph/buildpipe/testdata/lock_propagation`)
 
 | metric | flag OFF | flag ON | delta |
 |--------|---------|---------|-------|
@@ -220,9 +220,9 @@ Negative guards (verified by tests):
 #### Regression baselines
 
 - `testdata/synthetic` (no Go locks) — flag OFF: same edge counts pre/post W-A.
-- `internal/parse/golang/testdata/concurrency` — flag OFF: 5 `accessed_under_lock`
+- `internal/graph/parse/golang/testdata/concurrency` — flag OFF: 5 `accessed_under_lock`
   unchanged; flag ON: 5 (no cross-fn pattern in fixture).
-- `internal/parse/golang/concurrency_test.go` — all PASS (24/24 unchanged).
+- `internal/graph/parse/golang/concurrency_test.go` — all PASS (24/24 unchanged).
 
 ### 4.2 W1 — Stage B DFS 구현 (LANDED 2026-05-11)
 
@@ -230,31 +230,31 @@ Negative guards (verified by tests):
 (depth=5, visited set) is the baseline.
 
 Land artifacts:
-1. `internal/buildpipe/lock_propagation.go` (new, ~200 LOC) — DFS propagator.
+1. `internal/graph/buildpipe/lock_propagation.go` (new, ~200 LOC) — DFS propagator.
    - `propagateLockedFieldAccess(g, funcFields, log)` is the public entry.
    - `buildCalleeAdjacency` merges `calls` + `invokes` (Q3).
    - `buildLockHolders` derives held-mutex set per func from existing
      `acquires_lock` edges.
    - DFS loop with visited-set + depth cap (`lockPropagationMaxDepth = 5`).
    - Dedup against existing edges via `edgePairKey` (Q6).
-2. `internal/parse/golang/concurrency_underlock.go` — added
+2. `internal/graph/parse/golang/concurrency_underlock.go` — added
    `recordFuncFieldTouches(funcID, body)`: per-function field-access map,
    independent of lock state. Stashed on `declVisitor.funcFieldTouches`.
-3. `internal/parse/golang/parser.go` — added thread-safe parser-wide
+3. `internal/graph/parse/golang/parser.go` — added thread-safe parser-wide
    `funcFieldTouches` aggregator (`mergeFuncFieldTouches` under
    `funcFieldTouchesMu`) and `FuncFieldTouches()` accessor.
-4. `internal/buildpipe/language_runners.go` — `runGoPipeline` now returns
+4. `internal/graph/buildpipe/language_runners.go` — `runGoPipeline` now returns
    the per-Function field-touch map alongside the resolved graph.
-5. `internal/buildpipe/pipeline.go` — `Options.LockPropagation bool`,
+5. `internal/graph/buildpipe/pipeline.go` — `Options.LockPropagation bool`,
    wire into `emitDerivedPasses`, post-emit `validateAndSanitize` gate
    (W2 fold-in, see §4.3).
-6. `internal/buildpipe/incremental.go` — incremental path passes nil +
+6. `internal/graph/buildpipe/incremental.go` — incremental path passes nil +
    false (W-A skipped on cache hits; warn log when flag is set).
-7. `cmd/ckg/build.go` — `--lock-propagation` CLI flag (default false).
-8. `internal/buildpipe/testdata/lock_propagation/` — 6 fixture files
+7. `cmd/graph/build.go` — `--lock-propagation` CLI flag (default false).
+8. `internal/graph/buildpipe/testdata/lock_propagation` — 6 fixture files
    (single_hop, stdlib_skip, no_lock_no_edge, goroutine_body, deep_chain,
     cycle) + own `go.mod` (Q7 — isolated from B1 testdata).
-9. `internal/buildpipe/lock_propagation_test.go` — 6 test cases
+9. `internal/graph/buildpipe/lock_propagation_test.go` — 6 test cases
    (DefaultOff_NoEmit + per-fixture positive/negative assertions).
 
 ### 4.3 W2 — validateAndSanitize 게이트 (folded into W1)
@@ -375,7 +375,7 @@ Stage A 가 emit 하는 엣지 중 일부는 (a) 케이스로도 이미 emit 됐
 
 ### Q7. Test fixture 위치
 
-`internal/parse/golang/testdata/concurrency/` 에 cross-fn 케이스 추가? 아니면
+`internal/graph/parse/golang/testdata/concurrency` 에 cross-fn 케이스 추가? 아니면
 별도 `testdata/lock_propagation/` ?
 
 - (a) 기존 디렉토리 — 발견성 ↑
@@ -432,13 +432,13 @@ B1 의 기존 accessed_under_lock 카운트가 *증가* 만 하고 감소하지 
 ## §7. 참조
 
 - 기존 구현:
-  - `internal/parse/golang/concurrency.go` (B1 Phase 1~3)
-  - `internal/parse/golang/concurrency_underlock.go` (B1 Phase 4)
+  - `internal/graph/parse/golang/concurrency.go` (B1 Phase 1~3)
+  - `internal/graph/parse/golang/concurrency_underlock.go` (B1 Phase 4)
   - `internal/parse/golang/statements.go:84` (lock-walk 버그 수정 후 상태)
 - 관련 design doc:
-  - `docs/design/track-c-detector-gap.md` §2.9, §2.10
-  - `docs/archive/spec-ckg-v0.2.md` §2 R2.x (concurrency invariants)
-- 운영 통계: `docs/archive/STATUS-REPORT-2026-05-04.md` line 29
+  - `docs/graph/design/track-c-detector-gap.md` §2.9, §2.10
+  - `docs/graph/archive/spec-ckg-v0.2.md` §2 R2.x (concurrency invariants)
+- 운영 통계: `docs/graph/archive/STATUS-REPORT-2026-05-04.md` line 29
 - Schema enum (수정 대상 아님): `pkg/types/enums.go:142-145` (lock edge types)
 - 향후 SSA 도입 시 참고: `golang.org/x/tools/go/ssa`,
   `golang.org/x/tools/go/callgraph`

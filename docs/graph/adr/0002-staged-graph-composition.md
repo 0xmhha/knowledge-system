@@ -13,7 +13,7 @@
 CKG must produce a **deterministic** graph: the same source tree at the same
 commit must yield the same graph on any machine. This is foundational — the
 CKG↔CKV match-rate and the coding-agent PR-77 A/B (see
-`docs/archive/coordination-response-ckg-2026-06-29.md`) are only valid if the measured
+`docs/graph/archive/coordination-response-ckg-2026-06-29.md`) are only valid if the measured
 graph is reproducible.
 
 The Go loader sets `Tests:true` in `packages.Load`
@@ -24,7 +24,7 @@ production APIs are actually called). That intent is correct and is retained.
 But `Tests:true` makes `packages.Load` return, for a package `P`, **both** the
 primary build package `P` and a **test-variant** package `P [P.test]` whose
 `CompiledGoFiles` re-includes every production file of `P` (plus its `_test.go`
-files). `buildFileIndex` (`internal/parse/golang/parser.go`) flattened all
+files). `buildFileIndex` (`internal/graph/parse/golang/parser.go`) flattened all
 packages into one `path → typedFile` map with **first-seen-wins** dedup, on the
 assumption that the test-variant's `TypesInfo` is equivalent for shared
 production files.
@@ -42,7 +42,7 @@ analysis).
 
 Scope note (to prevent a recurring misdiagnosis): this is **not** the cause of
 the ~90% `canonical_id` population on Go `Method` nodes. That is by design —
-`EmitPromotedMethods` (`internal/parse/golang/promoted.go`) materialises synthetic
+`EmitPromotedMethods` (`internal/graph/parse/golang/promoted.go`) materialises synthetic
 nodes for embedded-field method promotion and intentionally leaves their
 `canonical_id` empty (the *declaring* method carries the id). The test-variant
 package shares the primary's import path, so `canonical_id` values are identical
@@ -79,7 +79,7 @@ files no primary package compiled (i.e. the `_test.go` files).
 
 Because this changes how production symbols are resolved (and makes a previously
 order-dependent result deterministic), a rebuild must repopulate the affected
-columns: **bump the cache-key `SchemaVersion`** in `internal/buildpipe/cache.go`
+columns: **bump the cache-key `SchemaVersion`** in `internal/graph/buildpipe/cache.go`
 (not the manifest one) — see CLAUDE.md "two SchemaVersion constants".
 
 ## Consequences
@@ -91,8 +91,8 @@ columns: **bump the cache-key `SchemaVersion`** in `internal/buildpipe/cache.go`
   is lost; it is simply prevented from shadowing the production core.
 - Existing cached graphs are invalidated by the cache-key bump and rebuild
   deterministically. Live status / measurement numbers: Tier 3
-  `docs/archive/coordination-response-ckg-2026-06-29.md` and
-  `docs/archive/symbol-identity-remaining-work.md`.
+  `docs/graph/archive/coordination-response-ckg-2026-06-29.md` and
+  `docs/graph/archive/symbol-identity-remaining-work.md`.
 - Stage 2's explicit test-scope semantics are deferred; Stage 1 already stops the
   pollution by giving primary packages ownership.
 

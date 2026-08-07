@@ -9,7 +9,7 @@
 > **Audience**: the next subagent or session that picks up G6. Read end-to-end
 > before writing any code.
 >
-> **Scope**: re-enable the partial-cache routing in `internal/buildpipe/pipeline.go`
+> **Scope**: re-enable the partial-cache routing in `internal/graph/buildpipe/pipeline.go`
 > Run() (currently falls back to cold rebuild for any non-full-hit case) so
 > partial-hit builds reuse cached parse work and approach short-circuit speed.
 >
@@ -191,7 +191,7 @@ would start changing under upstream renames. The incremental cache would
 become unsound silently.
 
 **Action for v3.** Add `TestNodeIDStability_CrossFileRename` to
-`internal/parse/golang`: write file `a.go` defining `type Foo struct{}`,
+`internal/graph/parse/golang`: write file `a.go` defining `type Foo struct{}`,
 file `b.go` defining `func (f Foo) Bar()`. Hash B's nodes. Rename `a.go`'s
 type to `Bar`. Re-parse. Assert B's node IDs are identical OR document the
 expected drift. This test guards against the silent fragility above.
@@ -489,7 +489,7 @@ that partial would help is dominated in practice by `go test ./pkg/...`
 not full graph rebuilds. Keeping a 10-30s partial path in the codebase
 costs maintenance attention without proportional user value.
 
-**On exit (D4 path).** Update `docs/INCREMENTAL.md` § "Phase 1 limitations"
+**On exit (D4 path).** Update `docs/graph/INCREMENTAL.md` § "Phase 1 limitations"
 to mark partial-cache as deferred-until-prerequisite. Keep the `runIncremental`
 dead code in tree (the v3 attempt is the most informed pass yet — preserved
 for whoever picks up B3 or C1).

@@ -408,5 +408,5 @@ code-knowledge-system/
 ## 참조
 
 - `docs/plan-2026-05-29-ckv-refactor.md` — CKV Schema-First 계획
-- `docs/mcp-tools.md` — CKV 15개 MCP 도구
+- `docs/vector/mcp-tools.md` — CKV 15개 MCP 도구
 - D3 합의 (세션 노트): CKV/CKG/CKS 책임 분리

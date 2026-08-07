@@ -1,6 +1,6 @@
 # CKV Flow-Corpus 적재 + 빌드 오케스트레이션 — 구현 계획서
 
-> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/adr/`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
+> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/vector/adr`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
 
 문서 버전: 1.0
 작성일: 2026-06-16
@@ -38,14 +38,14 @@ F. 평가 + 문서
 **Task:** 신규 chunk kind 2종 + 기존 invariant 확장.
 
 **영향 파일:**
-- 수정 `pkg/types/chunk.go`:
+- 수정 `pkg/vector/types/chunk.go`:
   - `ChunkFlowStep ChunkKind = "flow_step"`
   - `ChunkFlowSpine ChunkKind = "flow_spine"`
   - 신규 타입 `FlowStepMeta{FlowID, StepID, Symbol, Kind, Calls []string, Reads, Writes, Emits string, Branches []Branch, Invariants []string}`
   - 신규 타입 `Branch{When, Then, At string}`
   - 신규 타입 `FlowSpineMeta{FlowID, EntryPoint, Trigger, RootSymbol, Links []string, CalledBy []string}`
   - 기존 invariant 경로 확장: `Provenance string` (auto|curated) + `EnforcedAt []EnforcePoint{Flow, Step, Loc}`
-- 수정 `pkg/types/chunk_test.go`: 직렬화 round-trip 테스트
+- 수정 `pkg/vector/types/chunk_test.go`: 직렬화 round-trip 테스트
 
 **DoD:** 새 타입 JSON round-trip; 기존 청크 직렬화 무회귀(omitempty).
 
@@ -56,7 +56,7 @@ F. 평가 + 문서
 **Task:** 신규 메타 컬럼 1개 마이그레이션 (`004_add_flow_meta.sql`).
 
 **영향 파일:**
-- 신규 `internal/store/sqlitevec/migrations/004_add_flow_meta.sql`:
+- 신규 `internal/vector/store/sqlitevec/migrations/004_add_flow_meta.sql`:
   `ALTER TABLE chunks ADD COLUMN flow_meta TEXT; ADD COLUMN enforced_at TEXT; ADD COLUMN provenance TEXT;`
 - 마이그레이션 러너 **코드 변경 불필요 (검증 완료)**: `migrate.go`가 `//go:embed migrations/*.sql`로
   신규 파일을 자동 컴파일하고 `NNN_description.sql` 정규식으로 검증함. `004_*.sql` drop만으로 동작.
@@ -74,10 +74,10 @@ F. 평가 + 문서
 **Task:** `corpus.jsonl`을 읽어 레코드별 청크로 변환. 스키마는 `corpus/SCHEMA.md` 계약.
 
 **영향 파일:**
-- 신규 `internal/flowcorpus/parser.go` (~200 lines): JSONL 라인별 디코드, `type` 분기
+- 신규 `internal/vector/flowcorpus/parser.go` (~200 lines): JSONL 라인별 디코드, `type` 분기
   (flow/step/invariant/edge). edge는 step.calls로 이미 표현되므로 검증용으로만 사용(중복).
-- 신규 `internal/flowcorpus/parser_test.go`: testdata에 축소 corpus.jsonl fixture
-- 신규 `internal/flowcorpus/testdata/mini-corpus.jsonl` (~10 레코드: 1 flow + 3 step + 1 invariant + edge)
+- 신규 `internal/vector/flowcorpus/parser_test.go`: testdata에 축소 corpus.jsonl fixture
+- 신규 `internal/vector/flowcorpus/testdata/mini-corpus.jsonl` (~10 레코드: 1 flow + 3 step + 1 invariant + edge)
 - 신규 타입 → 청크 변환:
   - `step` → `ChunkFlowStep`: 임베딩 텍스트 = `prose` + " " + `symbol` + " " + branches[].when 조인
     (실패조건도 semantic_search에 걸리도록). 메타 = FlowStepMeta. Citation = {file, line→start_line=end_line=line}.
@@ -96,9 +96,9 @@ F. 평가 + 문서
 **Task:** `ckv build`에 corpus 적재 단계 추가.
 
 **영향 파일:**
-- 수정 `cmd/ckv/build.go`: `f.StringVar(&opts.flowCorpus, "flow-corpus", "", "path to flow corpus JSONL (schema: <go-stablenet>/.claude/docs/corpus/SCHEMA.md)")`
-- 수정 `internal/build/builder.go` (또는 pipeline.go): flowCorpus 지정 시 `flowcorpus.Load` → 청크 임베딩·upsert. `--docs`(PR #3) 적재 직후 동일 패턴.
-- 수정 `internal/build` 진행 표시: flow corpus 단계 로그
+- 수정 `cmd/vector/build.go`: `f.StringVar(&opts.flowCorpus, "flow-corpus", "", "path to flow corpus JSONL (schema: <go-stablenet>/.claude/docs/corpus/SCHEMA.md)")`
+- 수정 `internal/vector/build/builder.go` (또는 pipeline.go): flowCorpus 지정 시 `flowcorpus.Load` → 청크 임베딩·upsert. `--docs`(PR #3) 적재 직후 동일 패턴.
+- 수정 `internal/vector/build` 진행 표시: flow corpus 단계 로그
 
 **DoD:** `ckv build --src X --flow-corpus mini-corpus.jsonl --out Y` → vector.db에 flow_step/flow_spine/curated-invariant 청크 존재; `--flow-corpus` 미지정 시 무변경(무회귀).
 
@@ -114,7 +114,7 @@ F. 평가 + 문서
 step → 실제 구현 코드"로 이동 가능.
 
 **영향 파일:**
-- 신규 또는 수정 `internal/flowcorpus/align.go`: `ckgalign`(#4)의 file:line 매칭 로직 재사용
+- 신규 또는 수정 `internal/vector/flowcorpus/align.go`: `ckgalign`(#4)의 file:line 매칭 로직 재사용
   또는 동등 구현. step.line이 어느 코드 청크의 [start,end]에 들어가는지 해소.
 - 수정 청크 메타: flow_step에 `aligned_chunk_id` (해당 코드 청크 ID, omitempty)
 
@@ -130,7 +130,7 @@ step → 실제 구현 코드"로 이동 가능.
 **Task:** flow_step 서빙 시 인용 file:line 유효성 검사 (B4 `EnforceCitationsAt` 재사용).
 
 **영향 파일:**
-- 수정 `internal/query/` citation 검사 경로: flow_step 청크도 EnforceCitationsAt 대상에 포함.
+- 수정 `internal/vector/query` citation 검사 경로: flow_step 청크도 EnforceCitationsAt 대상에 포함.
   파일 없음/라인 범위 벗어남 → `StaleCitation=true` + warning.
 
 **DoD:** corpus가 코드보다 뒤처진 fixture에서 stale 플래그 정상 발생.
@@ -147,7 +147,7 @@ step → 실제 구현 코드"로 이동 가능.
 
 **입력:** `flow_id` | `entry_point` | `invariant` (셋 중 하나)
 **출력:** 해당 flow의 step들을 **시퀀스 순서**(calls 체인 topological)로. 각 step의 symbol/citation/branches/invariants 포함.
-**영향:** `pkg/mcp/server.go` 핸들러 + `internal/query/engine.go` `GetFlow(...)`.
+**영향:** `pkg/vector/mcp/server.go` 핸들러 + `internal/vector/query/engine.go` `GetFlow(...)`.
 
 ### D2. `expand_flow`
 
@@ -213,8 +213,8 @@ step → 실제 구현 코드"로 이동 가능.
 
 ### F2. 문서
 
-- 수정 `docs/mcp-tools.md`: 신규 4 도구 + `--flow-corpus` 플래그
-- 수정 `docs/SCHEMA.md`: flow_step/flow_spine chunk + flow_meta 컬럼
+- 수정 `docs/vector/mcp-tools.md`: 신규 4 도구 + `--flow-corpus` 플래그
+- 수정 `docs/vector/SCHEMA.md`: flow_step/flow_spine chunk + flow_meta 컬럼
 - 신규 ADR: "flow corpus를 1급 입력으로 적재" 결정 기록
 
 ---
@@ -278,5 +278,5 @@ step → 실제 구현 코드"로 이동 가능.
 - [`flow-knowledge-design-2026-06-16.md`](./flow-knowledge-design-2026-06-16.md) — 방향·스코프 결정
 - `<go-stablenet>/.claude/docs/corpus/SCHEMA.md` — corpus 스키마 (입력 계약)
 - [`plan-2026-05-29-ckv-refactor.md`](./plan-2026-05-29-ckv-refactor.md) — invariant/convention/마이그레이션 프레임워크 (재사용)
-- `internal/ckgalign/aligner.go` — file:line 정렬 (#4, 재사용)
+- `internal/vector/ckgalign/aligner.go` — file:line 정렬 (#4, 재사용)
 - [`session-handoff-2026-06-29.md`](./session-handoff-2026-06-29.md) — 현행 SoT

@@ -10,7 +10,7 @@
 > 조율돼야** 한다.
 > **근거**: CKG(`code-knowledge-graph`)·CKV(`code-knowledge-vector`) 빌드/증분 코드 전수 리뷰
 > (2026-07-10). 관련: `coordination-prompts-2026-06-29.md`, `pr-retrieval-eval-2026-07-08.md`,
-> ckv `docs/adr/007-canonical-id-join-key.md`, ckg `docs/adr/0001·0002`, `docs/INCREMENTAL.md`.
+> ckv `docs/vector/adr/007-canonical-id-join-key.md`, ckg `docs/adr/0001·0002`, `docs/INCREMENTAL.md`.
 
 ---
 

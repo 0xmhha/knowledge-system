@@ -1,7 +1,7 @@
 # CKV 잔여 작업 (통합 목록 · 단일 SoT)
 
 > **역할**: CKV의 *실행 가능한 잔여 작업*을 코드검증본으로 모은 단일 진입점.
-> **작성**: 2026-07-11 (코드 대조: 브랜치 `docs/retire-ckg-node-id`, HEAD `d546d95`)
+> **작성**: 2026-07-11 (코드 대조: 브랜치 `system/docs/retire-ckg-node-id`, HEAD `d546d95`)
 > **갱신**: 2026-07-12 (PR #17~#47 반영, main HEAD `f595d83`) — **CKV 소관 작업 실질 완료**, 잔여는 아래 "현재 상태"의 블록 4건.
 > **재검증**: 2026-07-13 (main HEAD `adf4417`, PR #48까지) — 완료 항목([x]) 코드 실재 재확인
 > (`RealignCanonical`/`acquireDatasetLock`/`FilesResumed`/`PromoteVersion`/`ResolvedVersion`/`FetchMergedPRs`/

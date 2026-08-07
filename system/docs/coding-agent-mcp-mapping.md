@@ -13,7 +13,7 @@ coding-agent  ─stdio MCP─▶  cks mcp  ─Go import─▶  ckvclient ─pkg/
                                        ─Go import─▶  ckgclient ─pkg/store (in-process)─▶  ckg
 ```
 
-Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/graph/mcp/*.go`, pinned against `internal/graph/mcp/testdata/agent-mcp.schema.json` by `internal/graph/mcp/schema_golden_test.go`.
+Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/graph/mcp/*.go`, pinned against `internal/system/mcp/testdata/agent-mcp.schema.json` by `internal/system/mcp/schema_golden_test.go`.
 
 ## 2. Live tool catalog (19 tools)
 
@@ -131,7 +131,7 @@ Mapping notes:
 - `depth` → `depth` (same).
 - `max_nodes` → `max_total` (rename).
 - `include_history`: orthogonal — fetch via `cks.context.change_history` and join on node ids client-side.
-- `include_concurrency`: **now shipped as a dedicated tool** — `cks.context.concurrency_impact{symbol,depth,max_total}` (`internal/mcp/concurrency.go`) returns the goroutine/channel/lock blast radius. Call it separately instead of setting a flag on `ckg_query`.
+- `include_concurrency`: **now shipped as a dedicated tool** — `cks.context.concurrency_impact{symbol,depth,max_total}` (`internal/system/mcp/concurrency.go`) returns the goroutine/channel/lock blast radius. Call it separately instead of setting a flag on `ckg_query`.
 
 ### 3.4 phase4 (CKG): `ckg_impact`
 
@@ -165,7 +165,7 @@ Now folded into `cks.ops.index` (see §3.2): a single tool refreshes both ckv an
 
 ### 3.6 Flow / knowledge family (no HLD antecedent)
 
-These six tools have no virtual signature in the phase3/phase4 HLDs — they were added after the HLDs were written, surfacing the curated flow corpus and domain-invariant/convention knowledge. Source: `internal/mcp/flow.go`. Use them on the diagnose/plan path.
+These six tools have no virtual signature in the phase3/phase4 HLDs — they were added after the HLDs were written, surfacing the curated flow corpus and domain-invariant/convention knowledge. Source: `internal/system/mcp/flow.go`. Use them on the diagnose/plan path.
 
 | Live tool | When the coding-agent reaches for it |
 |---|---|
@@ -242,10 +242,10 @@ A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-age
 
 ## 7. Cross-references
 
-- Live tool source: `internal/graph/mcp/server.go`, `internal/mcp/graph.go`, `internal/mcp/search.go`, `internal/mcp/analysis.go`, `internal/mcp/freshness.go`, `internal/mcp/health.go`, `internal/mcp/get_for_task.go`.
+- Live tool source: `internal/graph/mcp/server.go`, `internal/system/mcp/graph.go`, `internal/system/mcp/search.go`, `internal/system/mcp/analysis.go`, `internal/system/mcp/freshness.go`, `internal/system/mcp/health.go`, `internal/system/mcp/get_for_task.go`.
 - coding-agent HLDs (separate repo): `docs/superpowers/specs/phase3-cks-mcp-ckv.md`, `docs/superpowers/specs/phase4-cks-mcp-ckg.md`.
-- Composer pipeline (the engine behind `get_for_task`): `internal/composer/` and `docs/composer/`.
-- Smart Dummy backends (returned when no real ckv/ckg path is configured): `internal/ckvclient/dummy.go`, `internal/ckgclient/dummy.go`.
+- Composer pipeline (the engine behind `get_for_task`): `internal/system/composer` and `system/docs/composer`.
+- Smart Dummy backends (returned when no real ckv/ckg path is configured): `internal/system/ckvclient/dummy.go`, `internal/system/ckgclient/dummy.go`.
 
 ## 8. Maintaining this doc
 

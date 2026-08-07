@@ -28,7 +28,7 @@
 | T-11 | Incremental index time KPI 측정 | P1 | CKG core | S0 (CKG) | — |
 | T-12 | find_callers depth>1 회귀 test | **P0** | CKG core | S0 (CKG) | — |
 | T-13 | impact_of_change 결정성 회귀 test | **P0** | CKG core | S0 (CKG) | — |
-| **T-14** | CKG public 표면 정리 (`pkg/mcphandlers/`) | **P0** | CKG core | S0 (CKG) | — |
+| **T-14** | CKG public 표면 정리 (`pkg/graph/mcphandlers`) | **P0** | CKG core | S0 (CKG) | — |
 | **T-15** | task YAML ↔ known-issues JSONL 동기화 도구 | P1 | 검증 자료 | S0 (CKG) | — |
 
 P0 = 30-question 측정 시작 전 필수
@@ -72,7 +72,7 @@ mcp-go의 client 인터페이스 (`server.AddTool` 반대 방향) 사용 가능 
 - 측정 결과 `num_tool_calls` 컬럼이 0이 아닌 실제 호출 수 반영
 
 ### 관련 자료
-- `internal/eval/runner.go` (현 emulation 한계)
+- `internal/system/eval/runner.go` (현 emulation 한계)
 - `internal/eval/baseline.go::AllowedTools` (γ 허용 도구 목록)
 - 본 세션 시뮬레이션 결과: `results/sim/score-simulation.json` (γ minimal=1.0 / verbose=0.71)
 
@@ -141,7 +141,7 @@ if strings.Contains(tok, ".") && !strings.HasPrefix(tok, ".") && !strings.HasSuf
 - 30-question 골든셋에서 baseline 별로 file:line 인용 정밀도 보고
 
 ### 관련 자료
-- `pkg/store` Reader 인터페이스 (`GetNodesByFile`, `ListNodesByFile` 등 추가 필요할 수 있음)
+- `pkg/graph/store` Reader 인터페이스 (`GetNodesByFile`, `ListNodesByFile` 등 추가 필요할 수 있음)
 - 본 보고서 §C1
 
 ---
@@ -383,7 +383,7 @@ SQL logic error: fts5: syntax error near "does" (1)
 - T01 δ context pack에 `core.NewBlockChain` 노드 + 직접 callers 노드 포함
 - 회귀 test: `pkg/smartctx/buildcontext_test.go`에 prose query 케이스
 
-> **2026-05-11 결정 반영**: T-10은 **S1 (CKS) 이관**. CKG에서는 손대지 않음. `pkg/smartctx`는 *stable* 유지하고, prose-query 강건성은 CKS Layer 3 Orchestrator(Playbook + CKV fusion)에서 해결.
+> **2026-05-11 결정 반영**: T-10은 **S1 (CKS) 이관**. CKG에서는 손대지 않음. `pkg/graph/smartctx`는 *stable* 유지하고, prose-query 강건성은 CKS Layer 3 Orchestrator(Playbook + CKV fusion)에서 해결.
 
 ---
 
@@ -396,7 +396,7 @@ SQL logic error: fts5: syntax error near "does" (1)
 없음. `--no-cache` 풀빌드 시간만 측정 가능.
 
 ### 해결 위치
-신규 — `internal/buildpipe/incremental_bench.go` 또는 `cmd/ckg/bench_index.go`.
+신규 — `internal/buildpipe/incremental_bench.go` 또는 `cmd/graph/bench_index.go`.
 
 ### 권장 접근
 1. 그래프 상태 A 생성 → 1 파일 수정 → 그래프 상태 B 빌드 (캐시 활용)
@@ -468,12 +468,12 @@ SQL 기반이라 deterministic으로 추정. 자동 회귀 test 부재.
 MCP 도구 핸들러가 `internal/mcp/tools.go`에 있음. Go 규칙상 *external repo가 internal/* 패키지를 import 불가. CKS가 CKG MCP 핸들러를 재사용하려면 export 이전 필요.
 
 ### 해결 위치
-신규 패키지 — `pkg/mcphandlers/`.
+신규 패키지 — `pkg/graph/mcphandlers`.
 
 ### 권장 접근
-1. `internal/mcp/tools.go` `registerFindSymbol` 등 8개 도구 등록 함수를 `pkg/mcphandlers/`로 이전
+1. `internal/mcp/tools.go` `registerFindSymbol` 등 8개 도구 등록 함수를 `pkg/graph/mcphandlers`로 이전
 2. 시그니처: `func RegisterFindSymbol(s *server.MCPServer, store persist.StoreReader)` 등
-3. `internal/mcp/server.go::Run`은 `pkg/mcphandlers`의 Register* 함수만 호출
+3. `internal/mcp/server.go::Run`은 `pkg/graph/mcphandlers`의 Register* 함수만 호출
 4. CKS S1에서 다음 형태로 사용 가능:
 ```go
 import (
@@ -498,7 +498,7 @@ mcphandlers.RegisterImpactOfChange(s, store, mcphandlers.WithSanitize(...))
   go mod tidy  # replace directive로 로컬 경로 지정
   # 5줄짜리 main.go로 RegisterFindSymbol 호출 → build 성공
   ```
-- `internal/mcp/server.go` 코드 ≤30 lines (Run + helper)
+- `internal/graph/mcp/server.go` 코드 ≤30 lines (Run + helper)
 
 ### 관련 자료
 - `EXECUTION_STRATEGY.md §10` import-based 아키텍처 분석
@@ -655,8 +655,8 @@ $CKG eval --llm-backend=api --llm=claude-sonnet-4-6 \
 | `eval/stablenet/README.md` | 디렉토리 구조 + 재현 명령 |
 | `eval/stablenet/results/eval-v1/` | v1 측정 결과 (점수만, raw 부재) |
 | `eval/stablenet/results/sim/score-simulation.json` | 채점기 표기 민감도 실증 8 cases |
-| `internal/eval/runner.go` | runOne, dumpFiles, writeCSV |
-| `internal/eval/score.go` | extractSymbols, RubricCheck, PrecisionRecall |
+| `internal/system/eval/runner.go` | runOne, dumpFiles, writeCSV |
+| `internal/vector/eval/score.go` | extractSymbols, RubricCheck, PrecisionRecall |
 | `internal/eval/baseline.go` | α/β/γ/δ AllowedTools + SystemPrompt |
-| `pkg/smartctx/smartctx.go` | BuildContext (δ baseline 핵심) |
-| `internal/persist/sqlite.go` | rewriteFTSQuery, trimFTSToken |
+| `pkg/graph/smartctx/smartctx.go` | BuildContext (δ baseline 핵심) |
+| `internal/graph/persist/sqlite.go` | rewriteFTSQuery, trimFTSToken |

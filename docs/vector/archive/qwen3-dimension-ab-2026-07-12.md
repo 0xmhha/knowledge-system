@@ -13,7 +13,7 @@
 ## 1. 방법
 
 - **모델**: `qwen3-embedding:4b` (Ollama, native dim **2560**, l2, last-token pooling).
-- **MRL truncate**: `pkg/embed/ollama` — `Options.TargetDim` → 임베딩을 앞 N차원으로
+- **MRL truncate**: `pkg/vector/embed/ollama` — `Options.TargetDim` → 임베딩을 앞 N차원으로
   절단 후 L2 재정규화(`truncateNormalize`). CLI `--embed-dim N`. probe는 절단 전(native)
   으로 실행해 유효성 검증에 native dim을 쓴다.
 - **코퍼스**: `testdata/sample` (7파일, 50청크). **fixture**: `testdata/queries.yaml` (N=50).

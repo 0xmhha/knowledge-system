@@ -4,7 +4,7 @@
 
 > 이 문서 하나로 다른 세션이 컨텍스트 손실 없이 이어갈 수 있도록: **완료된 것 / 남은 것 /
 > 이 세션에서 알게 된 사실(문서에 없던 것)** 을 기록한다. 작업 브랜치:
-> `docs/retire-ckg-node-id`. 관련: [`remaining-work-2026-07-10.md`](./remaining-work-2026-07-10.md)(감사),
+> `system/docs/retire-ckg-node-id`. 관련: [`remaining-work-2026-07-10.md`](./remaining-work-2026-07-10.md)(감사),
 > [`coordination-response-cks-reindex-2026-07-10.md`](./coordination-response-cks-reindex-2026-07-10.md)(협의),
 > [`ops-blue-green-reindex.md`](./ops-blue-green-reindex.md)(운영 절차).
 
@@ -19,7 +19,7 @@
 | `d03bfde` | CKV reindex 설계 4결정 회신(재시작 전환·인스턴스 blue-green·CLI 오케스트레이터·기동 assert) |
 | `1a9ccde` | CKV P1 랜딩 동기화 기록(sources 원장 `8816915` + 상호 alignment `e49c19b`) |
 | `593c656` | **reindex P1-1/P1-2**: 기동 시 데이터셋 symlink 1회 resolve + ckg↔ckv alignment assert(2단계 심각도) + health `alignment` 블록 + serviceable 게이트 (+단위테스트 8케이스) |
-| `d3f24ec` | **reindex P1-3/P1-4**: `scripts/reindex-dataset.sh`(lock→빌드→버전디렉터리→5단계 게이트→원자 promote) + `docs/ops-blue-green-reindex.md` |
+| `d3f24ec` | **reindex P1-3/P1-4**: `scripts/reindex-dataset.sh`(lock→빌드→버전디렉터리→5단계 게이트→원자 promote) + `system/docs/ops-blue-green-reindex.md` |
 
 **라이브 검증 완료**: alignment assert가 실결함(E1)을 기동 시 포착 → source_root 정정 →
 `alignment.ok=true`. 오케스트레이터 gate 5단계를 pr-77-2 실산출물로 전부 통과

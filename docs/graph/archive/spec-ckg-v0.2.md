@@ -3,12 +3,12 @@
 > **ARCHIVED 2026-07-18 — superseded.** This May foundation spec mixes shipped
 > work (parser migration, concurrency Stage 1, incremental cache Phase 1) with
 > superseded plans and still-pending items:
-> - **PostgreSQL roadmap → superseded by `docs/adr/0003-deprecate-postgres-backend.md`.**
-> - **Schema 1.0/1.1 references → now 1.23** (`internal/buildpipe/cache.go`; history in `docs/SCHEMA.md`).
+> - **PostgreSQL roadmap → superseded by `docs/graph/adr/0003-deprecate-postgres-backend.md`.**
+> - **Schema 1.0/1.1 references → now 1.23** (`internal/graph/buildpipe/cache.go`; history in `docs/graph/SCHEMA.md`).
 > - **Still-pending:** concurrency Stage 2 (SSA `--deep` / `is_potential_race`) and
->   incremental cache Phase 2 (reverse-reference index) — carried in `docs/CONTINUITY.md`.
+>   incremental cache Phase 2 (reverse-reference index) — carried in `docs/graph/CONTINUITY.md`.
 >
-> Authoritative now: `docs/SCHEMA.md`, `docs/INCREMENTAL.md`, `docs/ARCHITECTURE-DETAILED.md`.
+> Authoritative now: `docs/graph/SCHEMA.md`, `docs/graph/INCREMENTAL.md`, `docs/graph/ARCHITECTURE-DETAILED.md`.
 
 > 적용 범위: smacker → upstream tree-sitter 마이그레이션, Go 동시성 분석,
 > PostgreSQL 스토리지 백엔드, 파일 단위 incremental 캐시.
@@ -53,13 +53,13 @@ Item 5 (cache)              : Item 1/2의 schema_version 변경 시 캐시 무�
 ### Motivation
 - 현 의존성: `github.com/smacker/go-tree-sitter v0.0.0-20240827...` (pseudo-version, 사실상 정체).
 - 영향 면적: TS/JS/Solidity 3개 grammar 기반 파서 = grammar 파서 100%.
-- Solidity는 이미 `internal/parse/solidity/binding/binding.go`에서 자체 binding 우회로를 가짐 (smacker가 solidity 서브패키지를 안 줌). upstream 전환 시 정리 기회.
+- Solidity는 이미 `internal/graph/parse/solidity/binding/binding.go`에서 자체 binding 우회로를 가짐 (smacker가 solidity 서브패키지를 안 줌). upstream 전환 시 정리 기회.
 - 공식 `github.com/tree-sitter/go-tree-sitter`는 0.25 ABI, ABI 검증·incremental parsing(`Tree.Edit()`)·`LookaheadIterator`·progress callback·Windows 지원을 제공.
 
 ### Design
 
 #### Phase 1a: TypeScript/JavaScript 마이그레이션
-- 파일: `internal/parse/typescript/parser.go`, `internal/parse/typescript/declarations.go`, `internal/parse/typescript/queries.go`
+- 파일: `internal/graph/parse/typescript/parser.go`, `internal/graph/parse/typescript/declarations.go`, `internal/graph/parse/typescript/queries.go`
 - 변경:
   - import 경로 교체:
     - `github.com/smacker/go-tree-sitter` → `github.com/tree-sitter/go-tree-sitter`
@@ -71,7 +71,7 @@ Item 5 (cache)              : Item 1/2의 schema_version 변경 시 캐시 무�
 - 검증: `internal/parse/typescript/*_test.go` 전수 통과 + 기존 testdata 그래프와 노드/엣지 1:1 매칭.
 
 #### Phase 1b: Solidity 마이그레이션 + binding 정리
-- 파일: `internal/parse/solidity/parser.go`, `internal/parse/solidity/binding/binding.go`
+- 파일: `internal/graph/parse/solidity/parser.go`, `internal/graph/parse/solidity/binding/binding.go`
 - 결정 포인트: `tree-sitter-solidity` grammar는 third-party (JoranHonig/tree-sitter-solidity 등). 다음 옵션 비교:
   1. **자체 binding 유지**: 현 패턴 그대로, import만 upstream으로 교체. 가장 안전.
   2. **third-party binding으로 위임**: 외부 패키지가 Go binding을 제공하면 그걸로 교체. 의존성 1개 추가, 유지보수 위임.
@@ -113,13 +113,13 @@ internal/parse/solidity/*_test.go            (테스트)
 
 ### Motivation
 - 현 CKG는 Go 코드의 *제어 흐름은 무시*. 그러나 Go 프로젝트에서 goroutine/채널/뮤텍스는 데이터 흐름과 동작 제어의 핵심.
-- 이미 `pkg/types/`에 `Goroutine`, `Channel` 노드 + `spawns/sends_to/recvs_from` 엣지가 정의돼 있어 *추출 로직만 추가*하면 됨.
+- 이미 `pkg/graph/types`에 `Goroutine`, `Channel` 노드 + `spawns/sends_to/recvs_from` 엣지가 정의돼 있어 *추출 로직만 추가*하면 됨.
 - 차별화 포인트: graphify(tree-sitter only)는 채널 방향성·뮤텍스 페어링을 추출 못 함. CKG가 `go/types` + `go/ssa`로 풀면 압도적 우위.
 
 ### Design
 
 #### Stage 1: AST 휴리스틱 (Phase 1 default-on)
-신규 파일: `internal/parse/golang/concurrency.go`
+신규 파일: `internal/graph/parse/golang/concurrency.go`
 
 | 패스 | 입력 AST | 추출 결과 | 신뢰도 |
 |------|----------|-----------|--------|
@@ -146,7 +146,7 @@ internal/parse/solidity/*_test.go            (테스트)
   - lock 없이 접근되는 공유 변수 자동 플래깅 (`is_potential_race: true` 노드 속성)
 - 비용: 대형 모노레포에서 빌드 시간 2~5배. 따라서 default off.
 
-### Schema 추가 (`pkg/types/`)
+### Schema 추가 (`pkg/graph/types`)
 
 신규 노드 타입 (또는 속성 압축):
 ```go
@@ -254,9 +254,9 @@ type Store interface {
     SchemaVersion() string
 }
 ```
-- 기존 `internal/persist/sqlite.go`는 `Store` 구현체로 정리.
+- 기존 `internal/graph/persist/sqlite.go`는 `Store` 구현체로 정리.
 - 신규 `internal/persist/postgres.go`가 PostgreSQL 구현체.
-- 기존 호출부(`internal/server/`, `internal/mcp/`, `internal/buildpipe/`)는 `Store` 인터페이스만 의존하도록 리팩터링.
+- 기존 호출부(`internal/graph/server`, `internal/graph/mcp`, `internal/graph/buildpipe`)는 `Store` 인터페이스만 의존하도록 리팩터링.
 
 #### Phase 1: `ckg export-postgres`
 - 진입: `ckg export-postgres --dsn postgres://user:pass@host/db --source ./graph.db`
@@ -460,7 +460,7 @@ docs/INCREMENTAL.md                       (신규: 캐시 동작 설명)
 
 ### Cross-Cutting Tasks
 - 빌드 호환성: 각 phase가 독립 PR로 머지 가능, downstream 호환 유지.
-- 문서: `docs/SCHEMA.md`, `docs/STORAGE.md`, `docs/INCREMENTAL.md` 동기화.
+- 문서: `docs/graph/SCHEMA.md`, `docs/STORAGE.md`, `docs/graph/INCREMENTAL.md` 동기화.
 - 평가: `ckg eval` 베이스라인이 새 동시성 엣지를 인지하는지 검증 (rubric 갱신).
 
 ---
@@ -471,7 +471,7 @@ docs/INCREMENTAL.md                       (신규: 캐시 동작 설명)
 |----|------|------|------------|
 | D1 | smacker → upstream 마이그레이션 | pseudo-version 의존 위험, ABI 검증, incremental API | smacker 유지 (정체된 의존성 누적) |
 | D2 | tree-sitter는 fork하지 않고 upstream 그대로 사용 | thin core, fat extensions 원칙. fork는 장기 유지비 폭증 | go-tree-sitter fork에 동시성 분석 추가 (잘못된 레이어) |
-| D3 | 동시성 분석은 `internal/parse/golang/concurrency.go`로 분리 | Go 코드는 `go/types` 의존이라 tree-sitter와 무관, 책임 분리 | tree-sitter 패스에 통합 (타입 정보 부재로 정확도 저하) |
+| D3 | 동시성 분석은 `internal/graph/parse/golang/concurrency.go`로 분리 | Go 코드는 `go/types` 의존이라 tree-sitter와 무관, 책임 분리 | tree-sitter 패스에 통합 (타입 정보 부재로 정확도 저하) |
 | D4 | Stage 1은 AST + types.Info, Stage 2는 SSA opt-in | 90%는 휴리스틱이 잡고, SSA는 비용이 큼 | 처음부터 SSA only (default-on은 빌드 시간 부담) |
 | D5 | PostgreSQL은 *옵션 백엔드*, default는 SQLite | 단일 바이너리 정체성 유지 | PG primary 강제 (배포 복잡도 증가) |
 | D6 | Neo4j는 채택하지 않음, Apache AGE로 Cypher 호환 | Neo4j Enterprise 비용, 운영 부담 | Neo4j 직접 채택 (라이선스/운영) |
@@ -488,16 +488,16 @@ docs/INCREMENTAL.md                       (신규: 캐시 동작 설명)
 2. **Mutex Node 표현**: 신규 NodeType vs Variable 속성 압축? Stage 1 구현 시 fixture로 양쪽 시각화 비교 후 결정.
 3. **임베딩 모델**: pgvector 도입 시 어떤 임베딩 모델? (OpenAI text-embedding-3-small vs sentence-transformers vs Voyage AI). v0.3 spec에서 별도 결정.
 4. **PG 마이그레이션 전략**: SQLite ↔ PG 양방향 마이그레이션? 또는 PG는 항상 export 결과만? v0.2.2 Phase 2 진입 시 결정.
-5. **schema_version 정책**: semantic versioning(1.0 → 1.1)? 또는 단조 증가 정수? `internal/persist/schema.sql` 헤더에 명시 필요.
+5. **schema_version 정책**: semantic versioning(1.0 → 1.1)? 또는 단조 증가 정수? `internal/graph/persist/schema.sql` 헤더에 명시 필요.
 
 ---
 
 ## References
-- `docs/ARCHITECTURE.md` — 아키텍처 개요
-- `docs/SCHEMA.md` — 노드/엣지 스키마 (v0.2.0에서 1.1로 bump 예정)
-- `pkg/types/node.go`, `pkg/types/edge.go` — 타입 정의
-- `internal/parse/golang/parser.go` — Go 파서 (concurrency pass 추가 대상)
-- `internal/persist/sqlite.go` — 현 스토리지 (Store interface로 추상화 대상)
+- `docs/graph/ARCHITECTURE.md` — 아키텍처 개요
+- `docs/graph/SCHEMA.md` — 노드/엣지 스키마 (v0.2.0에서 1.1로 bump 예정)
+- `pkg/graph/types/node.go`, `pkg/graph/types/edge.go` — 타입 정의
+- `internal/graph/parse/golang/parser.go` — Go 파서 (concurrency pass 추가 대상)
+- `internal/graph/persist/sqlite.go` — 현 스토리지 (Store interface로 추상화 대상)
 - 외부:
   - tree-sitter/go-tree-sitter (upstream)
   - jackc/pgx/v5 (PostgreSQL driver)

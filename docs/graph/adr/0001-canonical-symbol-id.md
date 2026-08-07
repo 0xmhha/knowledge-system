@@ -11,7 +11,7 @@
 ## Context
 
 CKG's job is to return *precisely* the code an agent asks for (see
-`docs/VISION.md`). The pre-existing node identity, `qualified_name`, is the
+`docs/graph/VISION.md`). The pre-existing node identity, `qualified_name`, is the
 short, suffix-searchable **display** form (e.g. `core.Size`) and is **not
 globally unique**: the same short name recurs across packages/contracts (e.g. a
 `Size` method in `core/types` vs `consensus/wbft/core`). When a lookup matched
@@ -22,7 +22,7 @@ the *wrong* definition. That directly undermines the first-class metric
 The design contract was decided cross-repo and merged in CKS
 (`code-knowledge-system docs/symbol-identity-design.md`, PR #16). This ADR
 records the **CKG-side decision**; live implementation status lives in the Tier 3
-doc `docs/archive/symbol-identity-remaining-work.md`, not here.
+doc `docs/graph/archive/symbol-identity-remaining-work.md`, not here.
 
 ## Decision
 
@@ -48,7 +48,7 @@ doc `docs/archive/symbol-identity-remaining-work.md`, not here.
    `qualified_name`, and all existing consumers stay unchanged. CKV alignment is
    positional, so **no re-embed** is required downstream.
 5. **A reindex must repopulate `canonical_id`**, which means bumping the
-   **cache-key** `SchemaVersion` in `internal/buildpipe/cache.go` (not the
+   **cache-key** `SchemaVersion` in `internal/graph/buildpipe/cache.go` (not the
    manifest back-compat one) — see CLAUDE.md "two SchemaVersion constants".
 
 ## Consequences
@@ -59,7 +59,7 @@ doc `docs/archive/symbol-identity-remaining-work.md`, not here.
 - Rollout is phased and cross-repo: Phase 1 (ckg identity + resolution), Phase 2
   (ckv additive field, no re-embed), Phase 3 (cks exact resolution + anchor
   kinds + data migration). Live per-phase status: see
-  `docs/archive/symbol-identity-remaining-work.md`.
+  `docs/graph/archive/symbol-identity-remaining-work.md`.
 - Because the field is additive + `omitempty`, the **manifest** `SchemaVersion`
   is intentionally **not** bumped; only the **cache** key changes so rebuilds
   repopulate the column.

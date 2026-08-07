@@ -116,16 +116,16 @@ Phase 1 이후 판단.
 
 ### 6.1 확인된 코드 사실 (결정의 근거)
 
-- **MCP 툴 프리픽스는 컴파일 상수**: upstream `internal/mcp/flow.go` 등에
+- **MCP 툴 프리픽스는 컴파일 상수**: upstream `internal/system/mcp/flow.go` 등에
   `const ToolNameGetFlow = "cks.context.get_flow"`, downstream은 같은 자리를
   `stablenet_knowledge.context.*`로 치환. → 외부 정체성이 코드에 하드코딩됨.
-- **인터페이스 seam은 이미 존재**: `internal/ckgclient/interface.go`,
-  `internal/ckvclient/interface.go`의 `type Client interface` + Dummy/Real 구현,
-  공유 데이터 타입은 `pkg/contract`.
-- **서버 표시명은 이미 config로 외부화**: `internal/config/config.go`의 `Name`
+- **인터페이스 seam은 이미 존재**: `internal/system/ckgclient/interface.go`,
+  `internal/system/ckvclient/interface.go`의 `type Client interface` + Dummy/Real 구현,
+  공유 데이터 타입은 `pkg/system/contract`.
+- **서버 표시명은 이미 config로 외부화**: `internal/system/config/config.go`의 `Name`
   (MCP 핸드셰이크 이름 + ops.health에 echo). 툴 프리픽스만 외부화가 안 됨.
 - **내부 백엔드 키는 downstream이 이미 중립화**: health `backendStat` 주석 키와
-  `pkg/contract/hit.go`의 `HitSource`가 cks/ckg/ckv → 서술적 `graph`/`vector`로 변경.
+  `pkg/system/contract/hit.go`의 `HitSource`가 cks/ckg/ckv → 서술적 `graph`/`vector`로 변경.
   → "외부는 배포별, 내부는 중립 통일"이라는 방향을 downstream이 이미 부분 실천 중.
 
 ### 6.2 결정 — 이름 레이어 3분할
@@ -147,7 +147,7 @@ Phase 1 이후 판단.
 커스텀 영역을 두 종류로 구분해 과설계를 피한다.
 
 - **코드 인터페이스가 필요한 커스텀** (진짜 seam): 엔진 교체·구현 차이.
-  → 이미 있는 `ckgclient.Client` / `ckvclient.Client` + `pkg/contract`를
+  → 이미 있는 `ckgclient.Client` / `ckvclient.Client` + `pkg/system/contract`를
   **`internal/` → `pkg/`로 승격**해 공식 확장점으로 만든다. (Go의 internal 규칙상
   외부 소비를 하려면 필수) L1 주입도 이 경계에서 받는다.
 - **데이터/설정 커스텀** (인터페이스 불필요): domain corpus(43파일), dataset 스크립트,

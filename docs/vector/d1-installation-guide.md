@@ -170,7 +170,7 @@ CGO_LDFLAGS="-L$HOME/lib" \
 > **주의**: 아래 수치는 당시 기본 임베더였던 bge-large-en-v1.5 (bgeonnx) 기준의
 > 역사적 기록이다. 현재 기본 런타임은 ollama / bge-m3 (권장 Qwen3, ADR-008)이므로
 > 이 숫자는 bgeonnx 경로가 올바르게 배선됐는지 확인하는 sanity check 용도로만
-> 참고한다. 최신 eval 수치는 git history / `docs/eval-metrics.md` 를 정본으로 본다.
+> 참고한다. 최신 eval 수치는 git history / `docs/vector/eval-metrics.md` 를 정본으로 본다.
 
 - `recall@5`: 1.000 ✅ (가설 1.0)
 - `recall@3`: 0.900, `recall@1`: 0.600

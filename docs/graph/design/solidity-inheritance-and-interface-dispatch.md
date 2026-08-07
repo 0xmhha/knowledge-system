@@ -4,7 +4,7 @@
 > repository layout at the time of writing (pre-consolidation). For the
 > current command map see docs/design/cli-consolidation.md.
 
-> Scope: extend the Solidity parser (`internal/parse/solidity/`) so the graph
+> Scope: extend the Solidity parser (`internal/graph/parse/solidity`) so the graph
 > captures (a) contract / interface inheritance via the `is`-clause,
 > (b) `super` calls + `virtual` / `override` modifier semantics,
 > (c) interface-typed dynamic dispatch (`IERC20(addr).transfer(...)`) — the
@@ -13,7 +13,7 @@
 >
 > **Status**: design draft 2026-05-11. W4 (abstract/library SubKind)
 > ✅ landed 2026-05-11 (commit `f7a8515`). Schema 1.10 slot for
-> `EdgeOverrides` reserved 2026-05-11 (appended to `pkg/types/enums.go`;
+> `EdgeOverrides` reserved 2026-05-11 (appended to `pkg/graph/types/enums.go`;
 > see `docs/DISPATCH-WITHIN-LANG-SEMANTICS.md` §2 Phase 4 Status block).
 > W1 / W2 / W3 ✅ LANDED 2026-05-11. W6 V0 (using For binding) ✅
 > **LANDED 2026-05-12** — EdgeUsesFor (Contract → Library) first-class
@@ -299,7 +299,7 @@
 > mid-cycle. Original plan: extend queryUsingFor with a `using_alias`
 > arm to fix operator-form (the "highest-leverage" V2.16
 > recommendation). Empirical AST dump on the vendored grammar
-> (v1.2.11, `internal/parse/solidity/binding/`) 2026-05-17 invalidated
+> (v1.2.11, `internal/graph/parse/solidity/binding`) 2026-05-17 invalidated
 > the premise:
 >   (a) `using_alias` is NOT a valid node type in the vendored grammar.
 >       Tree-sitter rejects any query referencing it with "Invalid node
@@ -333,7 +333,7 @@
 >   C. **Out of scope** (intentional — separate spec or deprecated)
 >
 > Survey rows (status as of vendored tree-sitter-solidity v1.2.11
-> / v1.2.13 — `internal/parse/solidity/binding/`):
+> / v1.2.13 — `internal/graph/parse/solidity/binding`):
 >
 > | # | Item | Category | Evidence | Action |
 > |---|------|----------|----------|--------|
@@ -387,8 +387,8 @@
 > **Out of scope**: cross-contract security analysis (reentrancy, access
 > control — that's senior-secops territory), assembly blocks, EVM-level
 > opcodes, low-level `call` / `delegatecall` / `staticcall` (separate spec).
-> **Adjacent docs**: `docs/design/track-c-detector-gap.md` §2.4 (Sol `extends`
-> already flagged P2 — "no query for is-clause"), `docs/design/schema-1.9-spec.md`
+> **Adjacent docs**: `docs/graph/design/track-c-detector-gap.md` §2.4 (Sol `extends`
+> already flagged P2 — "no query for is-clause"), `docs/graph/design/schema-1.9-spec.md`
 > (cross-language — Sol↔TS already partially covered via `binds_to`).
 
 ---
@@ -421,7 +421,7 @@
 
 ### 1.1 Sol 파서가 *capture 하는* tree-sitter 노드
 
-`internal/parse/solidity/queries.go` 전체:
+`internal/graph/parse/solidity/queries.go` 전체:
 
 | Query | 매칭 |
 |-------|------|
@@ -437,7 +437,7 @@
 
 ### 1.2 *capture 안 하는* 것 — Sol grammar 가 노출하는데 미사용
 
-`internal/parse/solidity/binding/parser.c` 의 symbol 테이블 확인 결과:
+`internal/graph/parse/solidity/binding/parser.c` 의 symbol 테이블 확인 결과:
 
 | Tree-sitter symbol | 의미 | 현재 |
 |---|---|---|
@@ -511,7 +511,7 @@
 
 ### 2.3 schema 영향
 
-- 신규 엣지 1종 → `pkg/types/enums.go` 의 `AllEdgeTypes()` append.
+- 신규 엣지 1종 → `pkg/graph/types/enums.go` 의 `AllEdgeTypes()` append.
 - 신규 NodeType 없음 → `AllNodeTypes()` 변경 없음.
 - 기존 `SubKind` 컬럼 활용 — 마이그레이션 없음.
 - bump: schema 1.8 → 1.10 (1.9 cross-language 와 동시 진행 시 1.11 가능).
@@ -670,20 +670,20 @@ WHERE e.type = 'implements' AND e.dst = (
 추정 사이즈: 250~350 LOC + 4 fixture.
 
 **Status — 2026-05-11**: ✅ **LANDED**. 실제 변경:
-- `internal/parse/solidity/inheritance.go` (신규, ~100 LOC) — `is`-clause
+- `internal/graph/parse/solidity/inheritance.go` (신규, ~100 LOC) — `is`-clause
   detector + PendingRef emit. 모든 parent reference 를 Pass 1 에서
   provisional `EdgeExtends` 로 큐잉하고 Pass 2 에서 reclassify.
-- `internal/parse/solidity/inheritance_test.go` (신규, ~200 LOC) — 3 test
+- `internal/graph/parse/solidity/inheritance_test.go` (신규, ~200 LOC) — 3 test
   function (single-file table-driven, cross-file, interface emit
   regression). 7 subtest PASS.
-- `internal/parse/solidity/queries.go` — `queryInterface` +
+- `internal/graph/parse/solidity/queries.go` — `queryInterface` +
   `queryInheritance` alt-branch query (contract_declaration /
   interface_declaration 양쪽 매치).
-- `internal/parse/solidity/abstract_library.go` — `runInterfaceDecl()`
+- `internal/graph/parse/solidity/abstract_library.go` — `runInterfaceDecl()`
   추가 (NodeInterface emit, SubKind="interface"). 기존 emit 헬퍼 재사용.
-- `internal/parse/solidity/declarations.go` — `visit()` 에
+- `internal/graph/parse/solidity/declarations.go` — `visit()` 에
   `runInterfaceDecl()` + `runInheritance()` 호출 wire.
-- `internal/parse/solidity/resolve.go` — Pass 2 에 `resolveInheritanceRef`
+- `internal/graph/parse/solidity/resolve.go` — Pass 2 에 `resolveInheritanceRef`
   추가. Contract/Interface 양쪽 by-name index 사용, (childType,
   parentType) 조합으로 edge type 결정. Interface 우선 lookup 으로 solc
   네임스페이스 의미 모방.
@@ -713,7 +713,7 @@ WHERE e.type = 'implements' AND e.dst = (
 ### 4.2 W2 — Virtual / Override / Super
 
 1. function definition 시 virtual/override modifier 캡처 → SubKind
-2. `EdgeOverrides` enum 추가 → `pkg/types/enums.go` append
+2. `EdgeOverrides` enum 추가 → `pkg/graph/types/enums.go` append
 3. `super.foo()` body walk
 4. resolve.go 에 inheritance-aware lookup 추가
 5. 단위 테스트:
@@ -724,26 +724,26 @@ WHERE e.type = 'implements' AND e.dst = (
 추정 사이즈: 200~300 LOC + 3 fixture. enums.go 변경.
 
 **Status — 2026-05-11**: ✅ **LANDED**. 실제 변경:
-- `internal/parse/solidity/overrides.go` (신규, ~230 LOC) — virtual /
+- `internal/graph/parse/solidity/overrides.go` (신규, ~230 LOC) — virtual /
   override modifier scan, function SubKind 라벨링
   (`function`/`virtual`/`override`/`virtual_override`), EdgeOverrides
   PendingRef 큐잉. 두 dispatch kind (bare `override` → resolver 가
   parents walk; `override(A,B)` → 명시적 parent 별 직접 lookup).
-- `internal/parse/solidity/overrides_test.go` (신규, ~250 LOC) — 3 test
+- `internal/graph/parse/solidity/overrides_test.go` (신규, ~250 LOC) — 3 test
   function (SingleFile / CrossFile / W1Regression). 11 subtest PASS.
-- `internal/parse/solidity/declarations.go` — `runDecl(queryFunction,
+- `internal/graph/parse/solidity/declarations.go` — `runDecl(queryFunction,
   NodeFunction)` 을 `runFunctionDecl()` (SubKind-aware) 로 교체. 다른
   decl 경로는 그대로.
-- `internal/parse/solidity/resolve.go` — Pass 2 를 2a (W1 inheritance) /
+- `internal/graph/parse/solidity/resolve.go` — Pass 2 를 2a (W1 inheritance) /
   2b (W2 overrides + 기존 emits/has_modifier/writes_mapping) 로 분리.
   W2 bare-override 처리는 W1 의 EdgeExtends/EdgeImplements 인접 리스트를
   토대로 부모 walk; 동일 contract/function 이름이 여러 파일에 존재할 때
   file-scoped 매칭으로 동명이접 (homonym) 해소.
-- `internal/parse/solidity/testdata/overrides/` 6 fixture:
+- `internal/graph/parse/solidity/testdata/overrides` 6 fixture:
   `simple_override.sol` / `super_call.sol` / `virtual_no_override.sol` /
   `multiple_inheritance_override.sol` + `cross_file_parent.sol` +
   `cross_file_child.sol`.
-- `internal/parse/solidity/testdata/sol_contract_golden.json` — Function
+- `internal/graph/parse/solidity/testdata/sol_contract_golden.json` — Function
   노드 sub_kind="function" 추가 (`-update` 자동 갱신, 노드/엣지 카운트
   무변경).
 
@@ -787,25 +787,25 @@ super_call.sol 은 declaration-time override 체인만 검증한다.
 추정 사이즈: 300~400 LOC + 2 fixture + (선택) viewer.
 
 **Status — 2026-05-11**: ✅ **LANDED**. 실제 변경:
-- `internal/parse/solidity/dispatch.go` (신규, ~155 LOC) — `member_expression`
+- `internal/graph/parse/solidity/dispatch.go` (신규, ~155 LOC) — `member_expression`
   AST 형태 매칭으로 `Type(args).method` 패턴을 감지하고 EdgeInvokes
   PendingRef 큐잉. tree-sitter S-expression 으로 표현 불가능한 중첩
   predicate (object 가 call_expression 이면서 그 function 이 identifier)
   은 Go 후처리로 분리. `unwrapExpression` 헬퍼로 grammar 가 끼우는
   `expression` wrapper 한 겹씩 벗기며 매칭.
-- `internal/parse/solidity/dispatch_test.go` (신규, ~230 LOC) — 4 test
+- `internal/graph/parse/solidity/dispatch_test.go` (신규, ~230 LOC) — 4 test
   function (SingleFile / CrossFile / NoFalsePositive / W1W2Regression).
   9 subtest PASS. 음성 케이스 `address(this)` / `super.foo()` / unknown
   type 모두 명시적 검증.
-- `internal/parse/solidity/declarations.go` — `visit()` 에 `runDispatch()`
+- `internal/graph/parse/solidity/declarations.go` — `visit()` 에 `runDispatch()`
   호출 wire. 위치는 `runInheritance()` 다음, `collectABI()` 앞 (Pass 1
   body-walk 검출은 declaration emit 이후가 자연 순서).
-- `internal/parse/solidity/resolve.go` — Pass 2b 에 W3 분기 + 신규
+- `internal/graph/parse/solidity/resolve.go` — Pass 2b 에 W3 분기 + 신규
   `resolveInterfaceDispatchRef()`. TargetQName 을 "TypeName.MethodName"
   로 split, Interface byName 인덱스로 1차 필터 (모르는 식별자 drop) +
   funcByQName 으로 2차 lookup. 동명 candidate 가 여러 파일에 있으면
   source 파일 우선 (W2 와 동일 idiom).
-- `internal/parse/solidity/testdata/dispatch/` 4 fixture:
+- `internal/graph/parse/solidity/testdata/dispatch` 4 fixture:
   `simple_dispatch.sol` / `chained_dispatch.sol` + `cross_file_iface.sol`
   + `cross_file_caller.sol`.
 
@@ -847,14 +847,14 @@ super_call.sol 은 declaration-time override 체인만 검증한다.
 **Status — 2026-05-11**: ✅ **구현 완료**. SubKind 값 확정: plain `contract`도
 명시적으로 `SubKind="contract"` 발행 (기존 빈 문자열 → "contract" 로 승격,
 W1 의 interface 검출과 같은 라벨 idiom 유지). 변경 파일:
-- `internal/parse/solidity/abstract_library.go` (신규, ~170 LOC)
-- `internal/parse/solidity/abstract_library_test.go` (신규)
-- `internal/parse/solidity/queries.go` (`queryLibrary` 추가)
-- `internal/parse/solidity/declarations.go` (`runContractDecl` /
+- `internal/graph/parse/solidity/abstract_library.go` (신규, ~170 LOC)
+- `internal/graph/parse/solidity/abstract_library_test.go` (신규)
+- `internal/graph/parse/solidity/queries.go` (`queryLibrary` 추가)
+- `internal/graph/parse/solidity/declarations.go` (`runContractDecl` /
   `runLibraryDecl` 진입, `nearestContractName` 가 library_declaration /
   interface_declaration 까지 walk)
 - `internal/parse/solidity/testdata/subkind/{abstract,library,plain}.sol`
-- `internal/parse/solidity/testdata/sol_contract_golden.json` (sub_kind
+- `internal/graph/parse/solidity/testdata/sol_contract_golden.json` (sub_kind
   필드만 추가, 노드/엣지 카운트 무변경)
 
 검증: 9 test PASS (`go test ./internal/parse/solidity/... -count 1`),
@@ -1021,7 +1021,7 @@ internal/parse/solidity/using_for_test.go
 
 #### LANDED 2026-05-12 (W-C W6 V0)
 
-- 구현: `internal/parse/solidity/using_for.go` (~100 LOC) + queries.go
+- 구현: `internal/graph/parse/solidity/using_for.go` (~100 LOC) + queries.go
   `queryUsingFor` (tree-sitter-solidity v1.2.13 `using_directive` →
   `type_alias` → `identifier` 경로). contract / library / interface
   body 모두 capture.
@@ -1044,7 +1044,7 @@ internal/parse/solidity/using_for_test.go
     2 distinct edges sharing Dst (contract-scoped 의미 검증)
   - `TestUsingFor_NegativeNoBinding` — directive 없으면 0 edge (false-
     positive 가드)
-- Schema: `pkg/types/enums.go` EdgeUsesFor 추가 (Commit A `19c99da`,
+- Schema: `pkg/graph/types/enums.go` EdgeUsesFor 추가 (Commit A `19c99da`,
   schema 1.10 index 40 append).
 - 회귀: 25/25 PASS, vet clean. §7.0 Go regression: TS/Go 영향 0.
 - Viewer: `web/viewer-next/src/lib/edges.ts` G2 카테고리에 amber dashed
@@ -1063,18 +1063,18 @@ V0 carry-over (V1 follow-up)
 #### LANDED 2026-05-12 (W-C W6 V1.0 — state-variable receiver dispatch)
 
 - 구현 추가:
-  - `internal/parse/solidity/using_for.go`: `runUsingForCalls` detector
+  - `internal/graph/parse/solidity/using_for.go`: `runUsingForCalls` detector
     (member_expression 의 `<identifier>.<identifier>(...)` shape 인식)
     + `matchStateVarMethodCall` predicate + 두 신규 dispatch kind
     (`using_for_typebind`, `using_for_call`).
-  - `internal/parse/solidity/queries.go`: queryUsingFor 에 `@type`
+  - `internal/graph/parse/solidity/queries.go`: queryUsingFor 에 `@type`
     capture 추가 (specific binding 의 type_name + wildcard 의
     any_source_type 양쪽 처리).
   - `internal/parse/solidity/declarations.go::runStateVarDecl`:
     NodeField QualifiedName 을 `<Container>.<varName>` 으로 qualify
     (runFunctionDecl 와 동일 idiom). NodeField.Signature 에 typeName
     저장 (extractTypeNameText helper 추가). golden snapshot 갱신.
-  - `internal/parse/solidity/resolve.go`: Pass 1.5 에 stateVarTypes
+  - `internal/graph/parse/solidity/resolve.go`: Pass 1.5 에 stateVarTypes
     인덱스 구축 (qname prefix 기반). Pass 2 에 typebind 분기 (binding
     map 채움, edge emit 안 함) + using_for_call 분기 (`resolveUsingForCallRef`
     helper 호출).
@@ -1119,7 +1119,7 @@ V1.0 carry-over (V1.1+ follow-up)
     순회, `parameter.name` + `parameter.type` 추출 후 dispatchKindUsingForParamType
     PendingRef emit (SrcID=funcID, TargetQName=`<paramName>|<typeName>`).
     Anonymous parameters (name field 부재) 는 skip.
-  - `internal/parse/solidity/resolve.go`:
+  - `internal/graph/parse/solidity/resolve.go`:
     - 신규 `paramTypeMap` 타입 (funcID → paramName → typeName).
     - Pass 2 사전 빌드 loop 에 `using_for_param_type` 분기 추가
       (bindings 와 함께 같은 sweep). switch 로 정리.
@@ -1160,7 +1160,7 @@ V1.1 carry-over (V1.2+ follow-up)
 #### LANDED 2026-05-12 (W-C W6 V1.2 — inherited using directive)
 
 - 구현 추가:
-  - `internal/parse/solidity/resolve.go`: Pass 2 binding 사전 빌드
+  - `internal/graph/parse/solidity/resolve.go`: Pass 2 binding 사전 빌드
     loop 직후, 모든 container 에 대해 inheritance graph 의 ancestors
     를 BFS 로 순회하면서 각 ancestor 의 bindings 를 descendant 에
     merge. child-scope 의 typeName entry 는 보존 (Solidity scoping
@@ -1228,12 +1228,12 @@ chaining** 으로 재설정.
     `return_type` field (`return_type_definition`) 의 첫 `parameter`
     child 에서 type field 추출 → `dispatchKindUsingForFnReturn`
     PendingRef emit. multi-return tuple 은 첫 슬롯만 (V0).
-  - `internal/parse/solidity/using_for.go`: `matchChainedMethodCall`
+  - `internal/graph/parse/solidity/using_for.go`: `matchChainedMethodCall`
     predicate 신규 — `<identifier>(...).<method>(...)` shape 매칭.
     inner identifier 가 plain function name 인 경우만 (Type cast
     `IFoo(addr).bar()` 는 W3 의 책임 — 그쪽이 먼저 매칭). 새
     `dispatchKindUsingForChainCall` 상수 + runUsingForCalls 분기.
-  - `internal/parse/solidity/resolve.go`:
+  - `internal/graph/parse/solidity/resolve.go`:
     - 신규 `funcReturnTypeMap` 타입 (funcID → first-return typeName).
     - Pass 2 사전 빌드 loop 의 switch 에 `using_for_fn_return` case
       추가 — funcReturnTypes 채움.
@@ -1512,14 +1512,14 @@ ORDER BY dispatch_count DESC LIMIT 20;
 ## §7. 참조
 
 - 현재 Sol 파서:
-  - `internal/parse/solidity/parser.go` (entry)
-  - `internal/parse/solidity/declarations.go` (visitor)
-  - `internal/parse/solidity/queries.go` (현재 queries)
-  - `internal/parse/solidity/resolve.go` (Pass 2)
-  - `internal/parse/solidity/binding/parser.c` (grammar — symbol id 참조)
-- track-c 갭 진단: `docs/design/track-c-detector-gap.md` §2.4 (Sol extends)
-- Cross-language link 기존: `internal/link/xlang.go` (Sol↔TS `binds_to`)
-- Go 의 implements 참고 구현: `internal/parse/golang/implements.go`
+  - `internal/graph/parse/solidity/parser.go` (entry)
+  - `internal/graph/parse/solidity/declarations.go` (visitor)
+  - `internal/graph/parse/solidity/queries.go` (현재 queries)
+  - `internal/graph/parse/solidity/resolve.go` (Pass 2)
+  - `internal/graph/parse/solidity/binding/parser.c` (grammar — symbol id 참조)
+- track-c 갭 진단: `docs/graph/design/track-c-detector-gap.md` §2.4 (Sol extends)
+- Cross-language link 기존: `internal/graph/link/xlang.go` (Sol↔TS `binds_to`)
+- Go 의 implements 참고 구현: `internal/graph/parse/golang/implements.go`
 - Sol grammar: `JoranHonig/tree-sitter-solidity` (vendored v1.2.11)
 
 ---

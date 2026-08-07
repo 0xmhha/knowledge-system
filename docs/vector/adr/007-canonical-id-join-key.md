@@ -13,7 +13,7 @@ CKV chunks need a stable key to join against CKG nodes so that CKS can
 fuse vector hits (CKV) with structural/graph facts (CKG) for the same
 symbol. Two candidate keys existed in the code:
 
-- **file:line alignment** (`internal/ckgalign`, PR #4) — positional, but
+- **file:line alignment** (`internal/vector/ckgalign`, PR #4) — positional, but
   drifts the moment code moves.
 - **CKG node ID** = `sha256(qname|lang|startByte)` — stable per build but
   **positional** (changes when the symbol moves in the file).
@@ -52,7 +52,7 @@ canonical_id by design, fall back to the positional node ID.
 CKV must stop trusting the PRAGMA column-existence probe alone (which
 passes 1.16–1.18 graphs whose canonical_id is empty). Two gate points:
 
-- **In `internal/ckgalign` (per build)**: probe for actual *population* —
+- **In `internal/vector/ckgalign` (per build)**: probe for actual *population* —
   the column exists AND at least one non-empty canonical_id value is
   present. `ckgalign` only opens `graph.db`, so population detection is
   the self-contained, robust proxy for "a ≥ 1.19 cache". When unpopulated,
@@ -96,9 +96,9 @@ CKG node carry the same canonical_id, with both caveats (≥1.19 gate,
 
 - PR #9 (`c554cc5`): canonical_id inheritance onto chunks + `FindByCanonicalID`
   readiness.
-- 2026-06-29: `internal/ckgalign` now gates on canonical_id *population*
+- 2026-06-29: `internal/vector/ckgalign` now gates on canonical_id *population*
   (`canonicalHasValue` probe + `Index.CanonicalAvailable()`), and
-  `internal/build` emits a warning + `ckg_align.canonical_unavailable`
+  `internal/vector/build` emits a warning + `ckg_align.canonical_unavailable`
   footprint when a graph has no populated canonical_id. Tests:
   `TestCanonicalAvailable_ColumnPresentButEmpty`, `_ColumnAbsent`.
 - Pending wiring follow-up: assert CKG's published manifest
@@ -110,8 +110,8 @@ CKG node carry the same canonical_id, with both caveats (≥1.19 gate,
   was a dead field on `chunks` — never read as a lookup key by any of the
   three repos. Removed from the shared surface: `types.Chunk.CKGNodeID`,
   the `chunks.ckg_node_id` column + `idx_chunks_ckg_node` index, the query
-  result field, and the builder stamp (`internal/build` now copies only
-  `e.CanonicalID` from the aligned node). The `internal/ckgalign` matching
+  result field, and the builder stamp (`internal/vector/build` now copies only
+  `e.CanonicalID` from the aligned node). The `internal/vector/ckgalign` matching
   ladder is unchanged — it still returns the matched node (`Entry.ID`) as
   the internal mechanism that *discovers* the node whose canonical_id is
   copied; only the persisted `ckg_node_id` is gone. Migration: removed from

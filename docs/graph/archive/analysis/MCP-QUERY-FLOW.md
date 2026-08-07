@@ -2,11 +2,11 @@
 
 > **대상**: `ckg mcp --graph=<dir>` stdio 서버 — LLM 클라이언트(Claude Code 등)가 코드베이스 컨텍스트를 조회하는 6 도구의 동작 흐름
 > **참조 파일**:
-> - `cmd/ckg/mcp.go`
+> - `cmd/graph/mcp.go`
 > - `internal/mcp/{server,tools,get_context}.go`
-> - `internal/persist/sqlite.go` (Search, NeighborhoodByQname, SubgraphByQname, GetBlob 등)
+> - `internal/graph/persist/sqlite.go` (Search, NeighborhoodByQname, SubgraphByQname, GetBlob 등)
 >
-> **선행 문서**: `docs/CODE-STRUCTURE.md` §8 (요약), `docs/ARCHITECTURE-DETAILED.md` §5
+> **선행 문서**: `docs/graph/CODE-STRUCTURE.md` §8 (요약), `docs/graph/ARCHITECTURE-DETAILED.md` §5
 > **마지막 갱신**: 2026-05-05
 
 > ⚠️ **Honest assessment**: MCP 도구 표면은 6개로 구성되어 있으나, **smart 도구(`get_context_for_task`)의 BM25 점수는 진짜 BM25가 아니라 rank reciprocal로 근사**되어 있고, `eval`에서 사용하는 δ 경로는 **실제 MCP 도구와 다른 simplification(SearchFTS만 호출)**을 사용합니다. 본 문서는 이 차이를 § 4와 § 6에서 분명히 합니다.
@@ -40,13 +40,13 @@ mcp.Run(ctx, store)
 - store는 `persist.StoreReader` 인터페이스 (서명상 write 메서드 보이지 않음)
 - `mcp.Run` 종료 조건: stdin EOF (= LLM client 종료)
 
-PostgreSQL backend는 현재 `serve`/`build`에서만 옵트인. **mcp 서브커맨드는 아직 `--db` 플래그 미노출** (확인 필요시 `cmd/ckg/mcp.go` 직접 점검).
+PostgreSQL backend는 현재 `serve`/`build`에서만 옵트인. **mcp 서브커맨드는 아직 `--db` 플래그 미노출** (확인 필요시 `cmd/graph/mcp.go` 직접 점검).
 
 ---
 
 ## 2. Server 구조
 
-`internal/mcp/server.go`:
+`internal/graph/mcp/server.go`:
 
 ```go
 func Run(ctx context.Context, store persist.StoreReader) error {
@@ -272,7 +272,7 @@ vs MCP의 `buildContext` (50+ lines: retrieve → expand → score-fuse → dive
 
 - `--graph` 디렉토리 안에 `graph.db`가 없으면 `OpenReadOnly` 단계에서 에러 → mcp.Run 진입 전 종료
 - 하지만 `--db postgres://...` 옵션이 mcp 서브커맨드에 노출되지 않음 → PG backend로 build한 후 mcp는 사용 불가
-  - 대응: `cmd/ckg/mcp.go` 확장 필요 (현재 SQLite path만 받음)
+  - 대응: `cmd/graph/mcp.go` 확장 필요 (현재 SQLite path만 받음)
 
 ---
 
@@ -341,7 +341,7 @@ sqlite3 graph.db "SELECT name, qualified_name FROM nodes_fts(?) LIMIT 30" "<quer
 대응: V1+ 영역. 단기적으론 결과 비교 시 인지하고 해석.
 
 ### R8. **PG backend로 build한 graph에 mcp 사용 불가**
-원인: `cmd/ckg/mcp.go`가 `--graph=<dir>/graph.db`만 받음. PG DSN 옵션 미노출.
+원인: `cmd/graph/mcp.go`가 `--graph=<dir>/graph.db`만 받음. PG DSN 옵션 미노출.
 검증: `ckg mcp --help` → `--db` 플래그 없으면 확정.
 대응: 코드 변경 필요 (B2/C2 활성화 후속).
 

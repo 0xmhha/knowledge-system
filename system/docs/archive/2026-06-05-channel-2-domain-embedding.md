@@ -1,6 +1,6 @@
 # Channel ② Domain-Knowledge Embedding Implementation Plan
 
-> **ARCHIVED 2026-07-19.** Plan executed (`internal/domainexport`, `config.DomainConfig` + `cks.ops.index`, `budget.DocsRoots`, `cmd/cks-domain-export`). Design record: [`../../superpowers/specs/2026-06-05-channel-2-domain-embedding-design.md`](../../superpowers/specs/2026-06-05-channel-2-domain-embedding-design.md).
+> **ARCHIVED 2026-07-19.** Plan executed (`internal/system/domainexport`, `config.DomainConfig` + `cks.ops.index`, `budget.DocsRoots`, `cmd/cks`). Design record: [`../../superpowers/specs/2026-06-05-channel-2-domain-embedding-design.md`](../../superpowers/specs/2026-06-05-channel-2-domain-embedding-design.md).
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -19,20 +19,20 @@
 ## File Structure
 
 **ckv (`code-knowledge-vector`)**
-- Modify `internal/manifest/manifest.go` — add `DocsRoots []string` (additive, same schema version).
-- Modify `internal/build/builder.go` — add `Options.DocsRoots`, index docs roots tagged `Category="domain"`, record DocsRoots in manifest.
-- Modify `cmd/ckv/build.go` — add the `--docs` repeatable flag, thread to `build.Options`.
-- Test: `internal/manifest/manifest_test.go`, `internal/build/builder_test.go`, `cmd/ckv/build_test.go`.
+- Modify `internal/vector/manifest/manifest.go` — add `DocsRoots []string` (additive, same schema version).
+- Modify `internal/vector/build/builder.go` — add `Options.DocsRoots`, index docs roots tagged `Category="domain"`, record DocsRoots in manifest.
+- Modify `cmd/vector/build.go` — add the `--docs` repeatable flag, thread to `build.Options`.
+- Test: `internal/vector/manifest/manifest_test.go`, `internal/vector/build/builder_test.go`, `cmd/vector/build_test.go`.
 
 **cks (`code-knowledge-system`)**
-- Modify `internal/inventory/types.go` — add `AuthoritativeDoc` + `Project.AuthoritativeDocs`.
-- Modify `internal/inventory/load.go` — parse `authoritative_docs` into the project.
-- Create `internal/domainexport/export.go` — `RenderEntry` + `Export` (single responsibility: turn a Project into the corpus).
-- Create `cmd/cks-domain-export/main.go` — thin CLI over `domainexport.Export`.
-- Modify `internal/mcp/ops_index.go` — `IndexConfig.DomainProjectDir/DomainCorpusDir`, run export before ckv, pass `--docs` on full builds.
-- Modify `internal/config/config.go` + `cmd/cks-mcp/main.go` — config block + wiring into `IndexConfig`.
+- Modify `internal/system/inventory/types.go` — add `AuthoritativeDoc` + `Project.AuthoritativeDocs`.
+- Modify `internal/system/inventory/load.go` — parse `authoritative_docs` into the project.
+- Create `internal/system/domainexport/export.go` — `RenderEntry` + `Export` (single responsibility: turn a Project into the corpus).
+- Create `cmd/cks/main.go` — thin CLI over `domainexport.Export`.
+- Modify `internal/system/mcp/ops_index.go` — `IndexConfig.DomainProjectDir/DomainCorpusDir`, run export before ckv, pass `--docs` on full builds.
+- Modify `internal/system/config/config.go` + `cmd/cks/main.go` — config block + wiring into `IndexConfig`.
 - Modify `.gitignore` — ignore the generated corpus.
-- Test: `internal/inventory/load_authdocs_test.go`, `internal/domainexport/export_test.go`, `internal/mcp/ops_index_test.go`.
+- Test: `internal/system/inventory/load_authdocs_test.go`, `internal/system/domainexport/export_test.go`, `internal/system/mcp/ops_index_test.go`.
 
 ---
 
@@ -50,11 +50,11 @@ git checkout -b feat-build-docs-flag
 
 **Files:**
 - Modify: `internal/manifest/manifest.go:47` (after the `CKVIgnore` field)
-- Test: `internal/manifest/manifest_test.go`
+- Test: `internal/vector/manifest/manifest_test.go`
 
 - [ ] **Step 1: Write the failing test**
 
-Add to `internal/manifest/manifest_test.go`:
+Add to `internal/vector/manifest/manifest_test.go`:
 
 ```go
 func TestSaveLoad_DocsRootsRoundTrip(t *testing.T) {
@@ -85,7 +85,7 @@ Expected: FAIL — `Manifest` has no field `DocsRoots`.
 
 - [ ] **Step 3: Add the field**
 
-In `internal/manifest/manifest.go`, after the `CKVIgnore` field (line 47):
+In `internal/vector/manifest/manifest.go`, after the `CKVIgnore` field (line 47):
 
 ```go
 	// Ignore patterns surfaced for transparency
@@ -114,11 +114,11 @@ git commit -m "Add DocsRoots to the manifest"
 
 **Files:**
 - Modify: `internal/build/builder.go:62` (Options), `:314` (after convention chunks, before `builtAt`), `:342` (manifest population), and a helper near `absOrEmpty`.
-- Test: `internal/build/builder_test.go`
+- Test: `internal/vector/build/builder_test.go`
 
 - [ ] **Step 1: Write the failing test**
 
-Add to `internal/build/builder_test.go`:
+Add to `internal/vector/build/builder_test.go`:
 
 ```go
 func TestRunIndexesDocsRoots(t *testing.T) {
@@ -183,7 +183,7 @@ Expected: FAIL — `Options` has no field `DocsRoots`.
 
 - [ ] **Step 3: Add the Options field**
 
-In `internal/build/builder.go`, inside `Options` after `PolicyPath` (line 62):
+In `internal/vector/build/builder.go`, inside `Options` after `PolicyPath` (line 62):
 
 ```go
 	PolicyPath string
@@ -199,7 +199,7 @@ In `internal/build/builder.go`, inside `Options` after `PolicyPath` (line 62):
 
 - [ ] **Step 4: Index the docs roots**
 
-In `internal/build/builder.go`, after the convention-chunks block (the `if convChunks := ...` block ending near line 314) and before `builtAt := o.Now().UTC()...`:
+In `internal/vector/build/builder.go`, after the convention-chunks block (the `if convChunks := ...` block ending near line 314) and before `builtAt := o.Now().UTC()...`:
 
 ```go
 	// --docs: index additional markdown corpora living outside SrcRoot.
@@ -238,7 +238,7 @@ In `internal/build/builder.go`, after the convention-chunks block (the `if convC
 
 - [ ] **Step 5: Record DocsRoots in the manifest + add the helper**
 
-In `internal/build/builder.go`, in the `manifest.Manifest{...}` literal after `CKVIgnore: o.CKVIgnore,` (line 342):
+In `internal/vector/build/builder.go`, in the `manifest.Manifest{...}` literal after `CKVIgnore: o.CKVIgnore,` (line 342):
 
 ```go
 		CKVIgnore:          o.CKVIgnore,
@@ -283,11 +283,11 @@ git commit -m "Index --docs corpus roots as domain-tagged markdown"
 
 **Files:**
 - Modify: `cmd/ckv/build.go:29` (buildOpts), `:58` (flags), `:95` (build.Options)
-- Test: `cmd/ckv/build_test.go`
+- Test: `cmd/vector/build_test.go`
 
 - [ ] **Step 1: Write the failing test**
 
-Create or append `cmd/ckv/build_test.go`:
+Create or append `cmd/vector/build_test.go`:
 
 ```go
 package main
@@ -313,7 +313,7 @@ Expected: FAIL — flag `docs` not found.
 
 - [ ] **Step 3: Add the flag and thread it**
 
-In `cmd/ckv/build.go`, add to `buildOpts` (after `policy string`, line 23):
+In `cmd/vector/build.go`, add to `buildOpts` (after `policy string`, line 23):
 
 ```go
 	policy    string
@@ -376,11 +376,11 @@ git status   # expect: on branch p0b-channel2-domain-embedding
 **Files:**
 - Modify: `internal/inventory/types.go:130` (after `DocRef`), `:55` (Project)
 - Modify: `internal/inventory/load.go:21` (projectFile), `:83` (Project literal)
-- Test: `internal/inventory/load_authdocs_test.go`
+- Test: `internal/system/inventory/load_authdocs_test.go`
 
 - [ ] **Step 1: Write the failing test**
 
-Create `internal/inventory/load_authdocs_test.go`:
+Create `internal/system/inventory/load_authdocs_test.go`:
 
 ```go
 package inventory
@@ -429,7 +429,7 @@ Expected: FAIL — `Project` has no field `AuthoritativeDocs`.
 
 - [ ] **Step 3: Add the type and Project field**
 
-In `internal/inventory/types.go`, after the `DocRef` struct (line 130):
+In `internal/system/inventory/types.go`, after the `DocRef` struct (line 130):
 
 ```go
 // AuthoritativeDoc is one entry in project.yaml's authoritative_docs:
@@ -454,7 +454,7 @@ In the `Project` struct, after the `Entries` field (line 54):
 
 - [ ] **Step 4: Parse it in the loader**
 
-In `internal/inventory/load.go`, extend `projectFile` (after `SchemaVersion`, line 20):
+In `internal/system/inventory/load.go`, extend `projectFile` (after `SchemaVersion`, line 20):
 
 ```go
 	CodeRoot      string `yaml:"code_root"`
@@ -489,12 +489,12 @@ git commit -m "Parse authoritative_docs into the loaded project"
 ### Task B2: render one entry to markdown
 
 **Files:**
-- Create: `internal/domainexport/export.go`
-- Test: `internal/domainexport/export_test.go`
+- Create: `internal/system/domainexport/export.go`
+- Test: `internal/system/domainexport/export_test.go`
 
 - [ ] **Step 1: Write the failing test**
 
-Create `internal/domainexport/export_test.go`:
+Create `internal/system/domainexport/export_test.go`:
 
 ```go
 package domainexport
@@ -569,7 +569,7 @@ Expected: FAIL — package does not exist.
 
 - [ ] **Step 3: Write the renderer**
 
-Create `internal/domainexport/export.go`:
+Create `internal/system/domainexport/export.go`:
 
 ```go
 // Package domainexport renders a domain-knowledge Project into a markdown
@@ -664,12 +664,12 @@ git commit -m "Render a domain entry to markdown"
 ### Task B3: export the corpus (gating + authoritative-doc copy)
 
 **Files:**
-- Modify: `internal/domainexport/export.go` (append `Export`, `Result`, `embeddableStatuses`)
-- Test: `internal/domainexport/export_test.go` (append)
+- Modify: `internal/system/domainexport/export.go` (append `Export`, `Result`, `embeddableStatuses`)
+- Test: `internal/system/domainexport/export_test.go` (append)
 
 - [ ] **Step 1: Write the failing test**
 
-Append to `internal/domainexport/export_test.go`:
+Append to `internal/system/domainexport/export_test.go`:
 
 ```go
 import (
@@ -757,7 +757,7 @@ Expected: FAIL — `Export` / `Result` undefined.
 
 - [ ] **Step 3: Implement Export**
 
-Append to `internal/domainexport/export.go` (and add `os`, `path/filepath` to the import block):
+Append to `internal/system/domainexport/export.go` (and add `os`, `path/filepath` to the import block):
 
 ```go
 // embeddableStatuses gates which entries are rendered. Per channel-② D2:
@@ -842,12 +842,12 @@ git commit -m "Export the domain corpus with status gating and authoritative-doc
 ### Task B4: `cks-domain-export` CLI
 
 **Files:**
-- Create: `cmd/cks-domain-export/main.go`
+- Create: `cmd/cks/main.go`
 - Test: manual smoke (no unit test — thin CLI over tested `Export`)
 
 - [ ] **Step 1: Write the command**
 
-Create `cmd/cks-domain-export/main.go`:
+Create `cmd/cks/main.go`:
 
 ```go
 // Command cks-domain-export renders a project's domain-knowledge entries
@@ -926,8 +926,8 @@ git commit -m "Add the cks-domain-export command"
 **Files:**
 - Modify: `.gitignore`
 - Modify: `internal/mcp/ops_index.go:29` (IndexConfig), `:96` (handleOpsIndex), `:142` (ckvIndexArgs)
-- Modify: `internal/config/config.go` (a `domain` config block) + `cmd/cks-mcp/main.go` (wire into IndexConfig)
-- Test: `internal/mcp/ops_index_test.go`
+- Modify: `internal/system/config/config.go` (a `domain` config block) + `cmd/cks/main.go` (wire into IndexConfig)
+- Test: `internal/system/mcp/ops_index_test.go`
 
 - [ ] **Step 1: Ignore the generated corpus**
 
@@ -940,7 +940,7 @@ Append to `.gitignore`:
 
 - [ ] **Step 2: Write the failing test**
 
-Create `internal/mcp/ops_index_test.go`:
+Create `internal/system/mcp/ops_index_test.go`:
 
 ```go
 package mcp
@@ -980,7 +980,7 @@ Expected: FAIL — `IndexConfig` has no `DomainCorpusDir`.
 
 - [ ] **Step 4: Extend IndexConfig and ckvIndexArgs**
 
-In `internal/mcp/ops_index.go`, add to `IndexConfig` (after `CKGPolicyFile`, line 28):
+In `internal/system/mcp/ops_index.go`, add to `IndexConfig` (after `CKGPolicyFile`, line 28):
 
 ```go
 	CKGPolicyFile string // ckg --policy-file (governed_by edges); "" omits the flag
@@ -1011,7 +1011,7 @@ Expected: PASS
 
 - [ ] **Step 6: Run the export before the ckv build**
 
-In `internal/mcp/ops_index.go`, add the import:
+In `internal/system/mcp/ops_index.go`, add the import:
 
 ```go
 import (
@@ -1048,7 +1048,7 @@ In `handleOpsIndex`, immediately before `if ic.CKVBinary != "" {` (line 96):
 
 - [ ] **Step 7: Wire config → IndexConfig**
 
-In `internal/config/config.go`, add a config block (after the `VocabConfig` type) and a field on `Config`:
+In `internal/system/config/config.go`, add a config block (after the `VocabConfig` type) and a field on `Config`:
 
 ```go
 // DomainConfig configures channel ② (domain-knowledge embedding). Empty
@@ -1070,7 +1070,7 @@ Add to the `Config` struct (after `Vocab VocabConfig`):
 	Domain DomainConfig `yaml:"domain"`
 ```
 
-In `cmd/cks-mcp/main.go`, where the `IndexConfig{...}` is constructed for `Deps.Index` (search for `IndexConfig{`), add:
+In `cmd/cks/main.go`, where the `IndexConfig{...}` is constructed for `Deps.Index` (search for `IndexConfig{`), add:
 
 ```go
 		DomainProjectDir: cfg.Domain.ProjectDir,

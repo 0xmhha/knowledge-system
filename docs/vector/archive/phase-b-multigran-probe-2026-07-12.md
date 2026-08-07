@@ -11,7 +11,7 @@
 
 ## 1. 방법
 
-- **프로토타입**: `internal/chunk`에 opt-in coarse 청크 `file_full`(파일 전체) 추가
+- **프로토타입**: `internal/vector/chunk`에 opt-in coarse 청크 `file_full`(파일 전체) 추가
   (`Options.IncludeFileFull`, env `CKV_EXPERIMENTAL_FILE_FULL=1`, 기본 off). 파일당 fine
   심볼 청크 + file_header + **file_full**(coarse)이 함께 검색에 경쟁. 우리 코퍼스는 파일이
   작고 대체로 단일-타입이라 whole-file이 2차(class/struct)+3차(file)의 합리적 프록시.

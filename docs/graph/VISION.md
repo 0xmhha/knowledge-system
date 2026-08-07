@@ -76,8 +76,8 @@ Structural · Semantic · Execution · Concurrency · Distributed · Temporal.
 ## The public boundary (stable contract)
 
 External consumers (cks, ckv) **must NOT** reach into `internal/`. The stable
-public API is everything under `pkg/` (`pkg/graph/types`, `pkg/store`, `pkg/bm25`,
-`pkg/smartctx`, `pkg/graph/evidence`, `pkg/impact`, …). Treat `pkg/` changes as
+public API is everything under `pkg/` (`pkg/graph/types`, `pkg/graph/store`, `pkg/bm25`,
+`pkg/graph/smartctx`, `pkg/graph/evidence`, `pkg/graph/impact`, …). Treat `pkg/` changes as
 contract changes.
 
 ---

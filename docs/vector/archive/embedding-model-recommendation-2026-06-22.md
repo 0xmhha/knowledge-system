@@ -89,7 +89,7 @@ ckv는 현재 두 임베딩 경로를 운용한다:
 2. **차원 처리**
    - 0.6B: 1024 그대로 (스키마 무변경).
    - 4B/8B: MRL로 1024 truncate(스키마 유지, **권장**) 하거나, 2560/4096으로 올리며
-     sqlite-vec 인덱스 차원 + `ModelConfig` 레지스트리(`internal/embed/bgeonnx/model_config.go`)
+     sqlite-vec 인덱스 차원 + `ModelConfig` 레지스트리(`internal/vector/embed/bgeonnx/model_config.go`)
      갱신.
 3. **instruction-aware 비대칭 인코딩** — Qwen3는 쿼리에 `Instruct: ...` 프리픽스를
    붙이는 방식(문서/쿼리 인코딩이 다름). bge-m3보다 이 부분이 품질에 민감하므로

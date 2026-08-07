@@ -146,7 +146,7 @@ Raw: `/tmp/ckg-bench/mcp-stdio.json`, `/tmp/ckg-bench/mcp-fresh.json`.
 1. ✅ **Manifest caching** — landed (commit 473f839).
 2. ✅ **TicketIndex pre-warm** — landed (commit 473f839).
 3. ✅ **`computeStaleness` debounce** — landed in the same session.
-   `internal/server/staleness_cache.go` debounces the per-request
+   `internal/graph/server/staleness_cache.go` debounces the per-request
    `git rev-parse HEAD` (or path-aware `git log -1 -- relPath`)
    spawn behind a 5s TTL keyed on (SrcCommit, SrcRoot). p50 drops
    from 64ms → 26ms (−59% of the residual; −89% of baseline).
@@ -172,7 +172,7 @@ Raw: `/tmp/ckg-bench/mcp-stdio.json`, `/tmp/ckg-bench/mcp-fresh.json`.
    bench-mcp evidence p50 172ms → 8.76ms (−95%); bench-server held
    steady at ~4ms (already fast).
 7. ✅ **bench-mcp-stdio** — landed in the same session.
-   `cmd/ckg/bench_mcp_stdio.go` spawns a `ckg mcp` subprocess and
+   `cmd/graph/bench_mcp_stdio.go` spawns a `ckg mcp` subprocess and
    drives each tool through the NDJSON JSON-RPC pipe. Stdio framing
    overhead measured at 0.03–0.44ms across the four tools tested,
    well under a millisecond. The pre-session hypothesis "MCP

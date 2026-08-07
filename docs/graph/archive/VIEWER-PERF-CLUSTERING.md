@@ -3,8 +3,8 @@
 작성일: 2026-04-27
 대상: `web/viewer-next/` (마이그레이션 완료) — 이전 `web/viewer/` 는 `make viewer-old` 로 폴백 가능, 검증 후 제거 예정
 상태: **Phase 0~3 shipped + Next.js migration shipped (2026-04-27)** — 아래 Status 섹션 참조
-참조: `docs/ARCHITECTURE.md`,
-`internal/cluster/leiden.go`, `internal/persist/sqlite.go`(topic_tree)
+참조: `docs/graph/ARCHITECTURE.md`,
+`internal/graph/cluster/leiden.go`, `internal/graph/persist/sqlite.go`(topic_tree)
 
 ---
 
@@ -61,10 +61,10 @@
 
 | 위치 | 내용 |
 |------|------|
-| `internal/cluster/leiden.go` | Leiden community detection 구현(modularity 기반) |
+| `internal/graph/cluster/leiden.go` | Leiden community detection 구현(modularity 기반) |
 | `internal/persist/sqlite.go:117` | `TopicTreeInput` — 해상도별 community 트리 |
 | `internal/persist/sqlite.go:255` `LoadHierarchy("topic")` | `topic_tree` 를 (parent_id, child_id, resolution, topic_label) 평면 슬라이스로 반환 |
-| `internal/server/api.go` `/api/hierarchy?kind=topic` | HTTP 노출 |
+| `internal/graph/server/api.go` `/api/hierarchy?kind=topic` | HTTP 노출 |
 | `internal/persist/chunked_export.go:49` | static export 시 `hierarchy/topic_tree.json` 작성 |
 
 **그러나 뷰어는 이걸 한 번도 부르지 않는다.** 뷰어가 부르는
@@ -237,7 +237,7 @@ store.commit = (graph) => {
 
 | 안 | 위치 | 비용 | 비고 |
 |----|------|------|------|
-| **A. 백엔드 응답에 합류** | `internal/server/api.go` `handleNodes` 가 `topic_tree` 에서 노드 id → community_id 조회 후 응답에 추가 | 서버 메모리 캐시 1번이면 O(1) 룩업 | 권장 |
+| **A. 백엔드 응답에 합류** | `internal/graph/server/api.go` `handleNodes` 가 `topic_tree` 에서 노드 id → community_id 조회 후 응답에 추가 | 서버 메모리 캐시 1번이면 O(1) 룩업 | 권장 |
 | **B. 클라이언트 합류** | 부트 시 `/api/hierarchy?kind=topic` 받아 클라에서 join | 서버 변경 0 | 중복 메모리, 처음 fetch 비용 |
 | **C. 노드 테이블에 컬럼 추가** | persist 레이어 변경 | 가장 깨끗 | 마이그레이션 필요 |
 

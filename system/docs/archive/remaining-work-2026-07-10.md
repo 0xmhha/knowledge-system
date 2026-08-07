@@ -111,7 +111,7 @@
   JSON 계약 변경 명시 + symbol-identity-design.md 반영.
 
 ### M7. Phase 3 anchor 마이그레이션 (경미, 진행 중)
-- two-kind 스키마는 구현됨(`internal/inventory` `AnchorKindDef`, 빈값=def back-compat).
+- two-kind 스키마는 구현됨(`internal/system/inventory` `AnchorKindDef`, 빈값=def back-compat).
 - 39 entries 중 **2개에 `kind:` 부여 시작**(2026-07-10) — 나머지 37개 잔여. back-compat로
   동작 중이므로 기능 문제는 없음.
 

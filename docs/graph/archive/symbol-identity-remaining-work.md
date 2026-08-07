@@ -9,7 +9,7 @@
 # Symbol Identity — implementation status & remaining work (ckg)
 
 Companion to the design contract in **code-knowledge-system
-`docs/symbol-identity-design.md`** (merged, PR #16). This file tracks the ckg
+`system/docs/symbol-identity-design.md`** (merged, PR #16). This file tracks the ckg
 implementation and the work still to do across ckg / ckv / cks.
 
 > **Decision vs status:** the *decision* (what canonical_id is, identity format,
@@ -28,24 +28,24 @@ implementation and the work still to do across ckg / ckv / cks.
 **Phase 0 — design:** done (merged in cks).
 
 **Phase 1 — ckg canonical id: FOUNDATION done** (merged to `main`, PR #21).
-Implemented and tested (build + `internal/persist` + `internal/parse/...` green):
+Implemented and tested (build + `internal/graph/persist` + `internal/parse/...` green):
 
-- `pkg/types/node.go` — added `Node.CanonicalID` (json `canonical_id,omitempty`):
+- `pkg/graph/types/node.go` — added `Node.CanonicalID` (json `canonical_id,omitempty`):
   the globally-unique, import-path-qualified identity (e.g.
   `github.com/ethereum/go-ethereum/core/vm.(*EVM).Call`). `QualifiedName` stays the
   short, suffix-searchable display form.
-- `internal/parse/golang/declarations.go` — `goCanonicalID(obj go/types.Object)`
+- `internal/graph/parse/golang/declarations.go` — `goCanonicalID(obj go/types.Object)`
   builds the id for **Go functions and methods** (receiver-pointer aware); wired
   into `visitFuncDecl` (set only when `typesInfo != nil`).
-- `internal/persist/schema.sql` — `nodes.canonical_id TEXT` column (marked
+- `internal/graph/persist/schema.sql` — `nodes.canonical_id TEXT` column (marked
   "schema 1.16" **in the SQL comment only** — the cache-gating
   `buildpipe/cache.go SchemaVersion` constant is still `"1.15"`; see Phase 1
   item 4, which is therefore a prerequisite for item 5, not just a signal).
-- `internal/persist/sqlite_migrate.go` — `ensureCanonicalIDColumn` (idempotent
+- `internal/graph/persist/sqlite_migrate.go` — `ensureCanonicalIDColumn` (idempotent
   ALTER, mirrors attrs/search_tokens) wired into `Migrate()`.
-- `internal/persist/sqlite_writer.go` / `sqlite_reader.go` — `canonical_id`
+- `internal/graph/persist/sqlite_writer.go` / `sqlite_reader.go` — `canonical_id`
   round-trips through `InsertNodes` and `GetNode`.
-- `internal/parse/golang/resolve_test.go` —
+- `internal/graph/parse/golang/resolve_test.go` —
   `TestCanonicalID_DistinguishesSameNameAcrossPackages` proves two same-named
   methods in different packages get distinct ids.
 
@@ -159,7 +159,7 @@ Execution: **B1 ✅ → A2 ✅ → A1 core ✅ → A1-3 tooling ✅ → B2/B3/B4
 3. ✅ **Canonical resolution** — done for ckg. `FindByCanonicalID` added to
    `StoreReader` + sqlite (+ Postgres stub). The traversal family
    (find_callers/find_callees/get_subgraph/change_history) now resolves a
-   canonical-id seed exactly via `resolveSeed` step 0 (`pkg/mcphandlers/helpers.go`),
+   canonical-id seed exactly via `resolveSeed` step 0 (`pkg/graph/mcphandlers/helpers.go`),
    and `canonical_id` is surfaced in tool output so agents can feed it back.
    The multi-match=**error** guard was already in place from PR #23 (`resolveSeed`
    returns `ambiguous`+candidates, never a silent pick — verified by
@@ -169,7 +169,7 @@ Execution: **B1 ✅ → A2 ✅ → A1 core ✅ → A1-3 tooling ✅ → B2/B3/B4
    *Optional future refinement:* traverse by node ID (not resolved qname) for
    absolute precision when several nodes share one qualified_name.
 4. ✅ **Schema version bump** — done. `const SchemaVersion` in
-   `internal/buildpipe/cache.go` bumped **1.18 → 1.19** (the cache-key
+   `internal/graph/buildpipe/cache.go` bumped **1.18 → 1.19** (the cache-key
    contributor; invalidates the build cache so a reindex repopulates
    `canonical_id`). Prerequisite for item 5, now satisfied.
 5. ✅ **Reindex go-stablenet** — done & validated (2026-06-19). Built via
@@ -246,14 +246,14 @@ defect):**
 ### Phase 2 (ckv = `../code-knowledge-vector`, separate repo) — additive canonical field (no re-embed)
 > ✅ **Done** — branch `feat/canonical-id-alignment` (`ebc3f31`). See the Tier A
 > "Next" entry above for the implementation summary. Note: the working approach
-> was the `ckgalign` Load column-probe + verbatim copy (not a `cmd/ckv/migrate.go`
+> was the `ckgalign` Load column-probe + verbatim copy (not a `cmd/vector/migrate.go`
 > runner — the in-place ALTER + next aligned build covers population).
 
 - Add an additive `canonical_id` to `pkg/types.Chunk` and the search `Hit`
   (omitempty), populated from the aligned ckg node. Alignment is already
-  **positional** (`internal/ckgalign`), so it is name-agnostic — do NOT change the
+  **positional** (`internal/vector/ckgalign`), so it is name-agnostic — do NOT change the
   embed-text prefix, so **no re-embed** is needed. Migrate in place
-  (`cmd/ckv/migrate.go` runner + reparse). Tests: every aligned chunk carries the
+  (`cmd/vector/migrate.go` runner + reparse). Tests: every aligned chunk carries the
   ckg canonical id; vectors byte-identical.
 
 ### Phase 3 (cks = `../code-knowledge-system`, separate repo) — exact resolution + two anchor kinds + data migration
@@ -261,19 +261,19 @@ defect):**
 > resolution + MCP-doc items below are complete. **A1-3 remaining**: the anchor
 > `kind: def|loc` schema + skills + domainexport + data migration.
 
-- ✅ `internal/ckgclient/real.go`: resolve by canonical id; drop the `defs[0]`
+- ✅ `internal/system/ckgclient/real.go`: resolve by canonical id; drop the `defs[0]`
   fallback in `resolveQname`/`resolveNodeID`/`resolveSeedFile` (multi-match now
   returns unresolved, not a silent pick).
-- ✅ MCP tool docs (`internal/mcp/graph.go`) advertised a
+- ✅ MCP tool docs (`internal/system/mcp/graph.go`) advertised a
   `consensus.wbft.Finalize` form ckg does not store — fixed to real
   qualified_name / bare-name / canonical_id examples.
-- Domain-knowledge anchor schema (`docs/domain-knowledge/shared/entry.schema.yaml`):
+- Domain-knowledge anchor schema (`system/docs/domain-knowledge/shared/entry.schema.yaml`):
   add `kind: def | loc`. `def` requires a uniquely-resolvable symbol and
   `line == definition line`; `loc` carries `enclosing_symbol` + arbitrary `line`
   (no def-line rule). Teach `cks-anchor-refresh` (line==def for `def`,
   range-containment for `loc`, never repoint), give `cks-inventory-check` a ckg
   handle to assert each `def` symbol resolves uniquely, and update
-  `internal/domainexport` rendering per kind.
+  `internal/system/domainexport` rendering per kind.
 - **Data migration:** the go-stablenet entries (146+ symbol+line anchors, growing —
   another session added validator-set / gov / storage-slot / minter entries).
   ~1 in 6 are `loc`/`enclosing_symbol`; descriptive symbol strings (e.g.

@@ -4,9 +4,9 @@
 > **참조 파일**:
 > - `internal/parse/typescript/{parser,queries,declarations,resolve}.go`
 > - `internal/parse/solidity/{parser,queries,declarations,resolve,abi}.go`
-> - `internal/link/xlang.go`
-> - `internal/buildpipe/language_runners.go` (`runTSPipeline`, `runSolPipeline`)
-> - `internal/parse/solidity/binding/` (벤더링된 grammar)
+> - `internal/graph/link/xlang.go`
+> - `internal/graph/buildpipe/language_runners.go` (`runTSPipeline`, `runSolPipeline`)
+> - `internal/graph/parse/solidity/binding` (벤더링된 grammar)
 >
 > **선행 문서**: `docs/analysis/GO-PROJECT-BUILD-FLOW.md`
 > **마지막 갱신**: 2026-05-05
@@ -312,7 +312,7 @@ SolToTS(nodes, abi):
 ### R7. **`testdata/`/`vendor/` 등 의도하지 않은 파일이 그래프에 들어왔다**
 원인: `detect.Walk` skip 목록은 vendor/, node_modules/, .git/, testdata/. 그 외 디렉토리(`out/`, `dist/`, `.next/`, `build/`)는 walk됨.
 검증: `sqlite3 graph.db "SELECT DISTINCT file_path FROM nodes WHERE file_path LIKE 'dist/%'"`
-대응: `.ckgignore` 작성 (gitignore-style — `internal/detect/ckgignore.go`).
+대응: `.ckgignore` 작성 (gitignore-style — `internal/graph/detect/ckgignore.go`).
 
 ### R8. **TS 파서가 .vue/.svelte/.astro 등을 무시한다**
 원인: Extensions 목록은 `.ts/.tsx/.js/.jsx/.mjs/.cjs`만. 다른 frontend 프레임워크는 미지원.

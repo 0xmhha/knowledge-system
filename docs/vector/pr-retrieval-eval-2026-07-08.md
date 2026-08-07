@@ -4,7 +4,7 @@
 > **목적**: 앞서 `build-knowledge.sh`의 "사람-워딩 의미검증 10/10"이 **자가 출제 편향**
 > (질의·정답 모두 저자가 작성)일 수 있다는 우려를, **객관적 정답으로 재측정**해 확인한다.
 > **방법론 출처**: [`evaluation-design-2026-05-22.md`](./evaluation-design-2026-05-22.md) (R8),
-> 구현 `internal/eval/prregress/`, fixture `testdata/prs.yaml`.
+> 구현 `internal/vector/eval/prregress`, fixture `testdata/prs.yaml`.
 
 ## 1. 왜 이 측정인가
 

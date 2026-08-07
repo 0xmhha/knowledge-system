@@ -4,7 +4,7 @@ GOLANGCI_LINT ?= golangci-lint
 BIN_DIR := bin
 LOG_DIR := logs
 
-# cks-mcp build stamp — injected into main.builderVersion and surfaced via
+# cks build stamp — injected into main.builderVersion and surfaced via
 # cks_ops_health.builder_version, so a running MCP can be matched to the source
 # it was built from. Derived from the git tag: on a tagged commit this is the
 # tag (e.g. v0.1.0); off-tag it appends -<n>-g<sha>; "-dirty" flags an

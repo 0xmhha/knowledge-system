@@ -5,7 +5,7 @@
 
 ## Context
 
-The retrieval-quality roadmap (`docs/archive/retrieval-quality-roadmap.md`) proposed
+The retrieval-quality roadmap (`docs/vector/archive/retrieval-quality-roadmap.md`) proposed
 several embed-text levers to raise recall, drawn from industry best practice:
 
 - **Phase D — contextual prefix** (Anthropic Contextual Retrieval): prepend a
@@ -23,17 +23,17 @@ throughput), and the default `queries.yaml` fixture was at the retrieval ceiling
 (bge-m3 recall@5 0.98), so it could not discriminate.
 
 A hard discrimination fixture reopened a measurable band
-(`docs/archive/eval-hard-fixture-2026-07-12.md`, N=24: bge-m3 recall@1 0.58, MRR 0.669),
+(`docs/vector/archive/eval-hard-fixture-2026-07-12.md`, N=24: bge-m3 recall@1 0.58, MRR 0.669),
 and three measurements then settled the levers:
 
-- **Prefix sweep** (`docs/archive/prefix-lever-sweep-2026-07-12.md`): raw vs D.1 vs D.2,
+- **Prefix sweep** (`docs/vector/archive/prefix-lever-sweep-2026-07-12.md`): raw vs D.1 vs D.2,
   both fixtures. D.1 wins everywhere — +0.16 recall@1 over raw (easy and hard
   alike). D.2 does **not** beat D.1 even off the ceiling (hard recall@1 0.54 <
   0.58, MRR 0.665 ≈ 0.669): the LLM prose dilutes the rule-based prefix's exact
   symbol/file tokens.
-- **D.2 PoC** (`docs/archive/llm-contextual-prefix-poc-2026-07-12.md`): confirmed the
+- **D.2 PoC** (`docs/vector/archive/llm-contextual-prefix-poc-2026-07-12.md`): confirmed the
   same on the easy fixture at 19× build cost.
-- **Phase B probe** (`docs/archive/phase-b-multigran-probe-2026-07-12.md`): an opt-in
+- **Phase B probe** (`docs/vector/archive/phase-b-multigran-probe-2026-07-12.md`): an opt-in
   whole-file coarse chunk **hurt** — on a coarse-query probe recall@3 dropped
   1.00 → 0.88 (the coarse chunk displaces the file's finer chunks); on the hard
   symbol fixture recall@5 dropped 0.88 → 0.79. The baseline already answered
@@ -81,10 +81,10 @@ Do not build the full Phase B feature.**
 
 ## Realization
 
-- D.1: `internal/chunk/prefix.go` `BuildEmbedText` (default). Toggle raw via
+- D.1: `internal/vector/chunk/prefix.go` `BuildEmbedText` (default). Toggle raw via
   `CKV_DISABLE_CONTEXTUAL_PREFIX=1`.
-- D.2: `internal/llmprefix/` + `--llm-prefix-model` (build/reindex), PR #36.
-- Phase B probe: `internal/chunk` `ChunkFileFull` / `Options.IncludeFileFull`,
+- D.2: `internal/vector/llmprefix` + `--llm-prefix-model` (build/reindex), PR #36.
+- Phase B probe: `internal/vector/chunk` `ChunkFileFull` / `Options.IncludeFileFull`,
   gated by `CKV_EXPERIMENTAL_FILE_FULL`, PR #40.
 - Fixtures: `testdata/queries-hard.yaml` (PR #38), `testdata/queries-coarse.yaml`
   (PR #40); the easy `queries.yaml` stays the CI regression gate.

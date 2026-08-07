@@ -7,7 +7,7 @@
 > sync with the current tree. Kept for provenance.
 >
 > For current state use **code + git** (ground truth); for the doc map see
-> `docs/DOC-MAP.md`; for live verification steps see `docs/SELF-VERIFICATION.md`.
+> `docs/graph/DOC-MAP.md`; for live verification steps see `docs/SELF-VERIFICATION.md`.
 
 | File | Snapshot of |
 |---|---|

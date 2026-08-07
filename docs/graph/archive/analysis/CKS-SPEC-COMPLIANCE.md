@@ -5,7 +5,7 @@
 >
 > **참조**:
 > - spec: `/Users/0xtopaz/work/github/onlyhyde/study/projects/stablenet-ai-agent/claudedocs/04-cks-deep-dive.md`
-> - 구현: `docs/CODE-STRUCTURE.md`, `docs/analysis/{GO-PROJECT-BUILD-FLOW,TS-SOL-BUILD-FLOW,MCP-QUERY-FLOW,EVAL-FLOW}.md`
+> - 구현: `docs/graph/CODE-STRUCTURE.md`, `docs/analysis/{GO-PROJECT-BUILD-FLOW,TS-SOL-BUILD-FLOW,MCP-QUERY-FLOW,EVAL-FLOW}.md`
 >
 > **마지막 갱신**: 2026-05-05
 > **결론 한 줄**: CKG는 CKS spec의 약 **25%** 수준만 구현. spec이 가장 강조한 **Layer 3 Retrieval Orchestrator(Pager)**와 **Layer 2 Working Memory**가 통째로 빠져있어 사용자 핵심 의도가 실현되지 않음.
@@ -56,7 +56,7 @@ Layer 1: Storage Backends    (Graph 6axis + Vector + BM25 + AST + File 5종)
 
 ### 1.1 6 Graph Axis 노드/엣지 spec 충실도
 
-CKG의 `pkg/types/enums.go` (33 nodes × 30 edges)를 spec과 1:1 비교:
+CKG의 `pkg/graph/types/enums.go` (33 nodes × 30 edges)를 spec과 1:1 비교:
 
 | Graph | spec edges | CKG 구현 | 누락된 edge |
 |---|---|---|---|

@@ -18,7 +18,7 @@ CKG (Code Knowledge Graph)의 **viewer-next 대대적 UX 개편 + Track C(detect
 - **HEAD**: `5f2b16b` `fix(viewer): legend → bottom-right tip box with drag resize`
 - **Untracked**: 없음 (clean)
 - **Schema 버전**: **1.7** (dispatch_kind 컬럼; Track C에서 bump)
-- **Schema 1.8 예약**: Track F (Hunk graph) 구현 시점에 사용 (`docs/design/hunk-graph.md` §2.6)
+- **Schema 1.8 예약**: Track F (Hunk graph) 구현 시점에 사용 (`docs/graph/design/hunk-graph.md` §2.6)
 
 ### 사이드 repo
 - `/Users/wm-it-22-00661/Work/github/tools/code-knowledge-vector` — CKV repo (별도 git, S1 plan만 작성됨)
@@ -133,8 +133,8 @@ CKG (Code Knowledge Graph)의 **viewer-next 대대적 UX 개편 + Track C(detect
 
 | 파일 | 내용 | 상태 |
 |---|---|---|
-| `docs/design/track-c-detector-gap.md` (318 lines) | Track C 진단: 0건/희소 edge type 분석 + 우선순위 | ✅ 구현 완료 |
-| `docs/design/hunk-graph.md` (1165 lines, 14 sections) | Hunk graph H1~H4 설계 + 7 open decisions | 🟡 plan only, 구현 대기 |
+| `docs/graph/design/track-c-detector-gap.md` (318 lines) | Track C 진단: 0건/희소 edge type 분석 + 우선순위 | ✅ 구현 완료 |
+| `docs/graph/design/hunk-graph.md` (1165 lines, 14 sections) | Hunk graph H1~H4 설계 + 7 open decisions | 🟡 plan only, 구현 대기 |
 | `/Users/wm-it-22-00661/Work/github/tools/code-knowledge-vector/docs/plan-S1-ckv.md` (637 lines, 16 sections) | CKV S1 vertical-slice plan | 🟡 plan only, 외부 repo |
 | `web/viewer-next/tests/diag-7-complaints.spec.js` | viewer 7 호소 regression spec | ✅ 사용 가능 |
 
@@ -148,7 +148,7 @@ CKG (Code Knowledge Graph)의 **viewer-next 대대적 UX 개편 + Track C(detect
 - 사용자 명시: P3은 후순위, 진행 전 재확인 필요.
 
 ### 🟡 #35 Hunk H1 — Hunk graph 첫 단계 구현
-- Plan: `docs/design/hunk-graph.md` (이미 작성됨, 1165 lines).
+- Plan: `docs/graph/design/hunk-graph.md` (이미 작성됨, 1165 lines).
 - 7 open decisions가 사용자 결정 대기 중:
   1. Patch encoding (gzip vs zstd vs raw) — 추천 gzip
   2. Hunk dedup 처리 — 추천 H1에서는 안 함
@@ -235,23 +235,23 @@ CKG (Code Knowledge Graph)의 **viewer-next 대대적 UX 개편 + Track C(detect
 
 ### Backend (Go)
 - `cmd/ckg/serve.go` — serve CLI (default port 8080)
-- `cmd/ckg/build.go` — build CLI
-- `internal/server/api.go` — HTTP handlers (`handleTopNodes`, `handleEdgeCounts`, `handleEdges`, `handleImpact`)
-- `internal/server/server.go` — route registry
-- `internal/persist/store_interface.go` — StoreReader/StoreWriter/Store ISP
-- `internal/persist/sqlite.go` — SQLite impl + Migrate (1.6→1.7 dispatch_kind)
-- `internal/persist/postgres_store.go` — Postgres impl
-- `internal/persist/schema.sql` — schema 1.7
-- `internal/buildpipe/cache.go` — SchemaVersion = "1.7"
-- `internal/buildpipe/language_runners.go` — concurrent fan-out
+- `cmd/graph/build.go` — build CLI
+- `internal/graph/server/api.go` — HTTP handlers (`handleTopNodes`, `handleEdgeCounts`, `handleEdges`, `handleImpact`)
+- `internal/graph/server/server.go` — route registry
+- `internal/graph/persist/store_interface.go` — StoreReader/StoreWriter/Store ISP
+- `internal/graph/persist/sqlite.go` — SQLite impl + Migrate (1.6→1.7 dispatch_kind)
+- `internal/graph/persist/postgres_store.go` — Postgres impl
+- `internal/graph/persist/schema.sql` — schema 1.7
+- `internal/graph/buildpipe/cache.go` — SchemaVersion = "1.7"
+- `internal/graph/buildpipe/language_runners.go` — concurrent fan-out
 - `internal/parse/golang/{uses_type,instantiates,implements,context_paths,concurrency,statements,resolve}.go` — Go detectors
-- `internal/parse/typescript/` — TS parser
-- `internal/parse/solidity/` — Solidity parser
-- `internal/temporal/git.go` — Git history collector (Hunk H1 확장 예정)
+- `internal/graph/parse/typescript` — TS parser
+- `internal/graph/parse/solidity` — Solidity parser
+- `internal/graph/temporal/git.go` — Git history collector (Hunk H1 확장 예정)
 - `pkg/types/{node,edge}.go` — public types (Edge.DispatchKind 추가)
-- `pkg/store/store.go` — Reader 공개 API
+- `pkg/graph/store/store.go` — Reader 공개 API
 - `pkg/bm25/scorer.go` — Okapi BM25
-- `pkg/impact/impact.go` — impact analysis
+- `pkg/graph/impact/impact.go` — impact analysis
 
 ### Frontend (TypeScript)
 - `web/viewer-next/src/components/App.tsx` — root, history stack, panel resize
@@ -262,17 +262,17 @@ CKG (Code Knowledge Graph)의 **viewer-next 대대적 UX 개편 + Track C(detect
 - `web/viewer-next/app/globals.css` — 모든 viewer 스타일
 
 ### Tests
-- `internal/parse/golang/uses_type_test.go`
-- `internal/parse/golang/concurrency_test.go`
-- `internal/persist/sqlite_extra_test.go`
+- `internal/graph/parse/golang/uses_type_test.go`
+- `internal/graph/parse/golang/concurrency_test.go`
+- `internal/graph/persist/sqlite_extra_test.go`
 - `web/viewer-next/tests/diag-7-complaints.spec.js`
 
 ### Docs
-- `docs/design/track-c-detector-gap.md`
-- `docs/design/hunk-graph.md`
+- `docs/graph/design/track-c-detector-gap.md`
+- `docs/graph/design/hunk-graph.md`
 - `docs/SESSION-HANDOFF-2026-05-08.md` (이 문서)
-- `docs/SCHEMA.md` (외부 — schema 1.7 반영 필요할 수 있음)
-- `docs/ARCHITECTURE.md`
+- `docs/graph/SCHEMA.md` (외부 — schema 1.7 반영 필요할 수 있음)
+- `docs/graph/ARCHITECTURE.md`
 
 ---
 

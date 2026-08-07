@@ -44,20 +44,20 @@ make test    # ⚠️ internal/embed/coreml 1건만 FAIL — 환경적 baseline 
 | #1 | `c46bf8a` | 6/2 | **R1′ 리팩토링** | 아래 분해 |
 | #2 | `23b22f7` | 6/2 | bge-m3 go-stablenet smoke 테스트 커밋 + excision으로 깨진 Makefile 타깃 복구 | `make rebuild-stablenet`/`gsn-smoke` 존재 |
 | #3 | `8886ee4` | 6/5 | `ckv build --docs` — out-of-tree markdown corpora 인덱싱 | — |
-| #4 | `2c87393` | 6/8 | **ckgalign** — `chunks.ckg_node_id` 실제 연결 | `internal/ckgalign/` 존재 ✅ |
+| #4 | `2c87393` | 6/8 | **ckgalign** — `chunks.ckg_node_id` 실제 연결 | `internal/vector/ckgalign` 존재 ✅ |
 | #5 | `ea1175b` | 6/8 | stablenet.yaml을 36 verified cks entries로 재생성 | **revert됨** ⤵ |
-| #6 | `a43364e` | 6/10 | `ckv build --files-from` allowlist | `internal/filterlist/` 존재 ✅ |
+| #6 | `a43364e` | 6/10 | `ckv build --files-from` allowlist | `internal/vector/filterlist` 존재 ✅ |
 | revert | `0c8a28c` | 6/10 | **#5 되돌림** (아래 §1.2) | classifier 복원 |
 
 ### 1.1 PR #1 (R1′) 분해
 
-- **G1 — ollama embedder 승격**: `internal/embed/ollama` → `pkg/embed/ollama`.
+- **G1 — ollama embedder 승격**: `internal/embed/ollama` → `pkg/vector/embed/ollama`.
   외부 모듈(cks)이 CGO·서브프로세스 없이 in-process로 real Embedder를 구성할 수 있게 함.
-  `pkg/embed/ollama/external_smoke_test.go`가 M2.a 외부-import 게이트.
+  `pkg/vector/embed/ollama/external_smoke_test.go`가 M2.a 외부-import 게이트.
 - **S-11 — 구조화된 Freshness**: `pkg/ckv.Engine.Freshness()`가 `freshness.Report`
   (IndexedHead/CurrentHead/ChangedFiles/Stale/Fresh/Warnings) 반환.
   `CheckFreshness() error`는 back-compat로 유지. `cks.ops.freshness`용.
-- **governance-test invariant 인덱싱**: `internal/build/invariant_paths.go` 신설.
+- **governance-test invariant 인덱싱**: `internal/vector/build/invariant_paths.go` 신설.
   `systemcontracts/test/` 경로 한정으로 Tier-3 휴리스틱을 `_test.go`에서도 ON
   (TOCTOU 순서, burn atomicity, equal-power quorum 등 load-bearing 속성 캡처).
 - **LLM 전면 제거 (excision)**: `internal/judge/` 패키지 삭제 확인 ✅.
@@ -79,7 +79,7 @@ resolve되지 않고 policy coverage 테스트 실패. semantic path classifier 
 
 ## 2. 현재 CKV 노출 면 (2026-06-15 코드 기준)
 
-**MCP 도구 15개** (`pkg/mcp/server.go` 등록 확인):
+**MCP 도구 15개** (`pkg/vector/mcp/server.go` 등록 확인):
 
 ```
 검색  semantic_search  keyword_search  vector_search
@@ -89,7 +89,7 @@ resolve되지 않고 policy coverage 테스트 실패. semantic path classifier 
 운영  health  get_freshness  warmup  index
 ```
 
-**청크 종류 9** (`pkg/types/chunk.go`): symbol, function_split, file_header, doc,
+**청크 종류 9** (`pkg/vector/types/chunk.go`): symbol, function_split, file_header, doc,
 pr_background, pr_solution, commit_message, invariant, convention.
 
 **SQLite 마이그레이션 4개**: 000_baseline / 001_category_guidance /
@@ -134,7 +134,7 @@ embedding disk cache, Prometheus exporter. (backlog §C 참조.)
 ### D. CKS 통합 (별도 repo)
 
 이전 핸드오프 §5.1의 CKS-1/2/3(ckvclient에 신규 6도구 추가, MCP 노출, composer 활용)은
-**CKS repo 작업**. R1′의 `pkg/embed/ollama`·`Freshness()` 노출이 그 사전작업.
+**CKS repo 작업**. R1′의 `pkg/vector/embed/ollama`·`Freshness()` 노출이 그 사전작업.
 
 ### E. 정책 데이터 재생성 (revert로 미해결)
 
@@ -178,7 +178,7 @@ make build && make test   # coreml 1건 FAIL은 정상 (§7.1)
 
 ### 7.1 `make test`의 coreml 실패는 환경적 baseline
 
-`internal/embed/coreml`는 `libtokenizers`(HuggingFace Rust)를 요구한다. 이 라이브러리가
+`internal/vector/embed/coreml`는 `libtokenizers`(HuggingFace Rust)를 요구한다. 이 라이브러리가
 없는 머신(현재 포함)에서 test 빌드가 실패한다. **CI는 이 패키지를 명시적으로 제외**
 (`.github/workflows/ci.yml`, `go list ./... | grep -v '/internal/embed/coreml'`,
 commit `abb5ae2`). 그러나 로컬 `make test`(`go test ./...`)는 제외하지 않아 항상 이
@@ -203,18 +203,18 @@ R1′ 이후 CKV 바이너리에 LLM 호출 경로 없음. judge/planner는 agen
 
 ## 8. 핵심 파일 인덱스 (6월 신규 포함)
 
-- `pkg/types/chunk.go` — Chunk + 메타데이터 (`ckg_node_id` 포함)
-- `pkg/embed/ollama/` — in-process ollama embedder (G1, 승격됨)
-- `internal/ckgalign/aligner.go` — ckg_node_id 4-step Lookup (#4)
-- `internal/filterlist/filterlist.go` — `--files-from` allowlist (#6)
-- `internal/build/invariant_paths.go` — governance-test invariant 경로 (R1′)
-- `internal/policy/loader.go` + `policy/stablenet.yaml` — semantic path classifier
-- `internal/invariant/extractor.go` — 3-tier invariant
-- `internal/convention/stats.go` — AST 통계
-- `internal/query/bm25/` — BM25 rerank (NEW-9, default off)
-- `internal/store/sqlitevec/migrate.go` + `migrations/*.sql`
-- `pkg/mcp/server.go` — MCP 15도구 등록
-- `pkg/ckv/` — public Go API (Freshness 포함)
+- `pkg/vector/types/chunk.go` — Chunk + 메타데이터 (`ckg_node_id` 포함)
+- `pkg/vector/embed/ollama` — in-process ollama embedder (G1, 승격됨)
+- `internal/vector/ckgalign/aligner.go` — ckg_node_id 4-step Lookup (#4)
+- `internal/vector/filterlist/filterlist.go` — `--files-from` allowlist (#6)
+- `internal/vector/build/invariant_paths.go` — governance-test invariant 경로 (R1′)
+- `internal/vector/policy/loader.go` + `policy/stablenet.yaml` — semantic path classifier
+- `internal/vector/invariant/extractor.go` — 3-tier invariant
+- `internal/vector/convention/stats.go` — AST 통계
+- `internal/vector/query/bm25` — BM25 rerank (NEW-9, default off)
+- `internal/vector/store/sqlitevec/migrate.go` + `migrations/*.sql`
+- `pkg/vector/mcp/server.go` — MCP 15도구 등록
+- `pkg/vector/ckv` — public Go API (Freshness 포함)
 
 ---
 

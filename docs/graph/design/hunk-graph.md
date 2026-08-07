@@ -6,11 +6,11 @@
 
 Status: design / plan only. No implementation in this document.
 Audience: contributors landing the H1..H4 stages.
-Cross-references: `internal/temporal/git.go`, `internal/buildpipe/temporal.go`,
-`internal/buildpipe/cache.go` (`SchemaVersion`), `pkg/types/enums.go`,
-`internal/persist/schema.sql`, `internal/persist/sqlite.go`,
-`web/viewer-next/src/lib/edges.ts`, `internal/server/api.go`,
-`internal/mcp/server.go`, `pkg/smartctx/smartctx.go`, `pkg/bm25/scorer.go`.
+Cross-references: `internal/graph/temporal/git.go`, `internal/graph/buildpipe/temporal.go`,
+`internal/graph/buildpipe/cache.go` (`SchemaVersion`), `pkg/graph/types/enums.go`,
+`internal/graph/persist/schema.sql`, `internal/graph/persist/sqlite.go`,
+`web/viewer-next/src/lib/edges.ts`, `internal/graph/server/api.go`,
+`internal/graph/mcp/server.go`, `pkg/graph/smartctx/smartctx.go`, `pkg/bm25/scorer.go`.
 
 This document specifies the graph-level extension that turns CKG's existing
 G6 Temporal axis into a usable few-shot retrieval surface for a Coding
@@ -30,7 +30,7 @@ A Coding Agent's typical retrieval path against CKG today is:
 
 1. Receive a task intent ("fix panel visibility regression").
 2. Call `search_text` (`internal/mcp/tools.go:121` `registerSearchText`)
-   or the smart context tool (`pkg/smartctx/smartctx.go` `BuildContext`).
+   or the smart context tool (`pkg/graph/smartctx/smartctx.go` `BuildContext`).
 3. Get back ranked CodeNodes (Function/Method/Type/Field) with bodies
    pulled from `blobs.source`.
 4. Optionally look up callers/callees via the existing graph.
@@ -154,9 +154,9 @@ code context + historical changes) into one prompt frame.
 
 ### 2.1 Constraint: extend, do not break
 
-The existing schema (`internal/persist/schema.sql`) is tightly coupled
+The existing schema (`internal/graph/persist/schema.sql`) is tightly coupled
 to ID composition (`parse.MakeID`), edge type enumeration
-(`pkg/types/enums.go`), and the file-level cache key
+(`pkg/graph/types/enums.go`), and the file-level cache key
 (`internal/buildpipe/cache.go SchemaVersion`). The Hunk extension MUST:
 
 - not change `nodes(id)` or `edges(id)` PK shape;
@@ -219,7 +219,7 @@ reconstruct line numbers without re-parsing.
 ### 2.4 New edge types (G6 Temporal extension)
 
 Three new `EdgeType` literals are appended to `AllEdgeTypes()` in
-`pkg/types/enums.go` after `EdgeCancellationPath` (preserving positional
+`pkg/graph/types/enums.go` after `EdgeCancellationPath` (preserving positional
 stability):
 
 | EdgeType | direction | semantics |
@@ -272,7 +272,7 @@ cold rebuild on first run. `MigrateTo17` is therefore **not a SQL
 migration function** — it is a no-op / placeholder that exists only so
 the manifest version field gets the right value. (Implementation note,
 not a doc requirement: a one-line addition to whatever wires the
-manifest's `SchemaVersion` field. The `internal/persist/manifest.go`
+manifest's `SchemaVersion` field. The `internal/graph/persist/manifest.go`
 shape already supports it without code changes.)
 
 ### 2.7 Read-side compatibility
@@ -293,7 +293,7 @@ non-git checkouts (`internal/buildpipe/temporal.go:54-65`).
 
 ### 3.1 Where the new code lives
 
-The new collector belongs in `internal/temporal/` next to `git.go`, in a
+The new collector belongs in `internal/graph/temporal` next to `git.go`, in a
 new file `hunks.go`. It exposes one function:
 
 ```go
@@ -470,7 +470,7 @@ repo: ~1 minute (dominated by `git diff` invocations). Acceptable.
 
 ## 4. AST overlap detection (H2)
 
-> **Status (2026-05-10)**: Landed. `internal/buildpipe/temporal_hunks.go`
+> **Status (2026-05-10)**: Landed. `internal/graph/buildpipe/temporal_hunks.go`
 > `emitModifiesEdges` runs after both EXTRACTED and AMBIGUOUS hunks are
 > in place; confidence on each `modifies` edge follows its source hunk.
 > Self-graph eval (go-stablenet, 8967 EXTRACTED + 40 AMBIGUOUS hunks):
@@ -552,10 +552,10 @@ gate runs unchanged.
 
 ## 5. EvidencePack assembler (H3)
 
-> **Status (2026-05-10)**: Landed. `pkg/evidence/evidence.go` `BuildPack`
+> **Status (2026-05-10)**: Landed. `pkg/graph/evidence/evidence.go` `BuildPack`
 > implements the §5.2 ranking algorithm; `internal/mcp/evidence.go`
 > registers `evidence_for_intent` as the 8th MCP tool;
-> `internal/server/api.go` `handleEvidence` exposes the same assembler
+> `internal/graph/server/api.go` `handleEvidence` exposes the same assembler
 > via `GET /api/evidence`. §11.3 retrieval boundary enforced two ways
 > — the MCP wrapper filters the storeReader, and `indexCorpus` itself
 > drops AMBIGUOUS Hunk/Commit rows + AMBIGUOUS edges as defense in
@@ -632,7 +632,7 @@ Scoring pass:
 Three reasons:
 
 1. **No new infra dependency.** The S0 acceptance constraint
-   (`docs/archive/STATUS-REPORT-2026-05-04.md` and similar) requires
+   (`docs/graph/archive/STATUS-REPORT-2026-05-04.md` and similar) requires
    determinism: same DB, same query, same output. BM25 is deterministic;
    any embedding-based ranker introduces a model-version dependency.
 2. **Quality is good enough at this scale.** The Agent's queries are
@@ -802,7 +802,7 @@ noise of normal build variance.
 10 K-commit repo × ~10 hunks/commit ≈ 100 K hunks → ~100 MB blobs +
 ~24 MB edges = **~125 MB added**. Manageable, but worth a knob:
 `Options.HunkDepth` (mirroring `Options.TemporalDepth` —
-`internal/buildpipe/pipeline.go` Options block). Default = unlimited
+`internal/graph/buildpipe/pipeline.go` Options block). Default = unlimited
 for the first cut; a single env var (`CKG_HUNK_DEPTH=500`) caps to
 the 500 most-recent commits when storage matters.
 
@@ -873,16 +873,16 @@ The blob rows fall away via the existing `ON DELETE CASCADE` on
 
 ### 9.5 Documentation
 
-- `docs/SCHEMA.md`: add "Node types (34)" entry for `Hunk`, "Edge types
+- `docs/graph/SCHEMA.md`: add "Node types (34)" entry for `Hunk`, "Edge types
   (35)" entries for `has_hunk` / `modifies` / `adjacent`, and bump the
   schema-version header from 1.7 to 1.8.
 - `internal/persist/SCHEMA.md`: same bump.
-- `docs/archive/G6-INCREMENTAL-REDESIGN.md` (archived 2026-05-11):
+- `docs/graph/archive/G6-INCREMENTAL-REDESIGN.md` (archived 2026-05-11):
   no further follow-up needed — G6 v4 + C1 have landed; partial-cache
   routing is stable and the design history is preserved for reference.
 - `docs/SESSION-HANDOFF-2026-05-10.md` (current hand-off): mentions the
   Hunk graph stages and MCP `evidence_for_intent` tool. Older
-  `docs/archive/HANDOFF-2026-05-04.md` is preserved for context only.
+  `docs/graph/archive/HANDOFF-2026-05-04.md` is preserved for context only.
 
 ---
 
@@ -916,7 +916,7 @@ Expected: 5 rows, each with positive blob size; manually decompress the
 first row's blob and verify it parses as a valid unified-diff hunk
 (starts with `@@ -…,+… @@`).
 
-Test (`internal/temporal/hunks_test.go`): a small fixture repo (5 known
+Test (`internal/graph/temporal/hunks_test.go`): a small fixture repo (5 known
 commits, 3 known files) → assert the produced HunkInfo slice matches a
 golden snapshot.
 
@@ -947,7 +947,7 @@ sqlite3 data/graph.db "
 Expected to include `…pipeline.go:Run` (or whatever symbol the commit
 actually touched).
 
-Unit test (`internal/buildpipe/temporal_test.go`): build a fixture
+Unit test (`internal/graph/buildpipe/temporal_test.go`): build a fixture
 graph with 2 functions at lines [10,30] and [40,60], emit a hunk at
 [25,35] → expect both `modifies` edges; emit a hunk at [32,38] → expect
 zero `modifies` edges.
@@ -962,7 +962,7 @@ those three commits in recency order.
 Determinism: invoke the tool twice with identical input; the JSON
 output is byte-identical (S0 acceptance — same shape as the existing
 `get_context_for_task` determinism contract in
-`pkg/smartctx/smartctx.go`).
+`pkg/graph/smartctx/smartctx.go`).
 
 Token-budget honoured: when `budget_tokens=500` and the third commit's
 hunk would push the cumulative size over 500, only the first two
@@ -970,12 +970,12 @@ commits are returned.
 
 ### 10.4 H4 (issue-id extraction)
 
-> **Status (2026-05-10)**: Landed. `internal/temporal/issueid.go` carries
+> **Status (2026-05-10)**: Landed. `internal/graph/temporal/issueid.go` carries
 > the four regex patterns (`ExtractIssueIDs` + `EncodeIssueIDs` /
-> `DecodeIssueIDs`); `internal/buildpipe/temporal_hunks.go` wires the
+> `DecodeIssueIDs`); `internal/graph/buildpipe/temporal_hunks.go` wires the
 > extraction into `buildHunkNodes` so every Hunk's `doc_comment`
 > column ends up with `issues:GH-123;ABC-456` whenever its parent
-> commit's subject matches a pattern. `pkg/evidence/evidence.go`
+> commit's subject matches a pattern. `pkg/graph/evidence/evidence.go`
 > aggregates the per-Hunk encoding into `CommitInfo.IssueIDs` so the
 > EvidencePack JSON surfaces tickets per-commit. The viewer's
 > `NodeDetail` panel renders amber pills for each issue ID.
@@ -988,7 +988,7 @@ commits are returned.
 > false-positive guards, encode/decode round-trips, and prefix
 > distinction from plain doc_comment.
 
-Patterns the parser recognises (regex in `internal/temporal/issueid.go`):
+Patterns the parser recognises (regex in `internal/graph/temporal/issueid.go`):
 
 | pattern | example | issue_ids field |
 |---|---|---|
@@ -1086,8 +1086,8 @@ We need three layers, partitioned across schema-1.8 H1 and a follow-up PR:
   pass enumerates unreachable SHAs (force-pushed-away branches, hard
   resets) and inserts their hunks with `confidence='AMBIGUOUS'`. The
   follow-up PR is independently reviewable — H1 stays scoped.
-  **Landed**: see `internal/temporal/unreachable.go` +
-  `emitUnreachableHunkGraph` in `internal/buildpipe/temporal_hunks.go`.
+  **Landed**: see `internal/graph/temporal/unreachable.go` +
+  `emitUnreachableHunkGraph` in `internal/graph/buildpipe/temporal_hunks.go`.
   Self-graph eval (go-stablenet, 2026-05-09): 14 AMBIGUOUS Commit
   nodes + 40 AMBIGUOUS Hunk nodes captured from reflog ∪ fsck-
   unreachable, disjoint from the 6402-EXTRACTED HEAD-reachable set.
@@ -1153,7 +1153,7 @@ with a > 64 KB hunk to exercise the truncation path.
 
 ### 11.7 PageRank / community computation on the new node type
 
-`score.Compute(g)` (`internal/score/`) and the cluster builders
+`score.Compute(g)` (`internal/graph/score`) and the cluster builders
 (`cluster.BuildPkgTree` / `cluster.BuildTopicTree` —
 `internal/buildpipe/pipeline.go:58-59`) walk the full node set. After
 H1, ~700 extra nodes pass through them. This is fine for self-graph
@@ -1169,7 +1169,7 @@ a type whitelist in those functions; no schema change.
 
 ### 11.8 Manifest size
 
-`persist.Manifest` (`internal/persist/manifest.go`) currently records
+`persist.Manifest` (`internal/graph/persist/manifest.go`) currently records
 per-file `NodeIDs` / `EdgeIDs`. Hunk node IDs are not file-owned (a
 hunk's file_path matches a source file, but the hunk itself isn't
 owned by that file in the cache sense — it's owned by its commit). If
@@ -1182,7 +1182,7 @@ on each build that calls `emitTemporalEdges`. Same idiom as Commit
 nodes today.
 
 **Decision 2026-05-09: accepted.** Implemented as the shared
-`isMetaNodeType` helper in `internal/buildpipe/temporal_hunks.go` —
+`isMetaNodeType` helper in `internal/graph/buildpipe/temporal_hunks.go` —
 both `computeColdFileEntries` (cold rebuild) and `buildFileEntries`
 (incremental rebuild) call it to skip Commit + Hunk before populating
 `FileEntry.NodeIDs`. `extractBlobs` uses the same helper to skip meta
@@ -1197,12 +1197,12 @@ returned by `emitTemporalEdges`, not from a file slice).
 
 | package | what | sample |
 |---|---|---|
-| `internal/temporal` | `parseUnifiedDiff` handles standard hunks, renames, binary, mode-only changes, multi-hunk files | golden tests in `testdata/diffs/` |
-| `internal/temporal` | `LoadHunks` against a small fixture repo (`testdata/repo/`) — 3 commits, 2 files, 5 hunks total → expected HunkInfo slice | snapshot test |
-| `internal/buildpipe` | `buildHunkNodes` emits stable IDs (sort-by-id assertion) | unit test |
-| `internal/buildpipe` | `buildModifiesEdges` interval-overlap correctness: 5 cases (fully inside, fully containing, left-overlap, right-overlap, disjoint) | table test |
-| `pkg/types` | new `NodeHunk` literal at index 33 in `AllNodeTypes()`, new edge literals at correct indices in `AllEdgeTypes()` | extends `TestAllNodeTypes_Stable` (`pkg/types/types_test.go:65`) |
-| `internal/mcp` | `evidence_for_intent` shape conformance and determinism | integration test using `testdata/repo` |
+| `internal/graph/temporal` | `parseUnifiedDiff` handles standard hunks, renames, binary, mode-only changes, multi-hunk files | golden tests in `testdata/diffs/` |
+| `internal/graph/temporal` | `LoadHunks` against a small fixture repo (`testdata/repo/`) — 3 commits, 2 files, 5 hunks total → expected HunkInfo slice | snapshot test |
+| `internal/graph/buildpipe` | `buildHunkNodes` emits stable IDs (sort-by-id assertion) | unit test |
+| `internal/graph/buildpipe` | `buildModifiesEdges` interval-overlap correctness: 5 cases (fully inside, fully containing, left-overlap, right-overlap, disjoint) | table test |
+| `pkg/graph/types` | new `NodeHunk` literal at index 33 in `AllNodeTypes()`, new edge literals at correct indices in `AllEdgeTypes()` | extends `TestAllNodeTypes_Stable` (`pkg/types/types_test.go:65`) |
+| `internal/graph/mcp` | `evidence_for_intent` shape conformance and determinism | integration test using `testdata/repo` |
 
 ### 12.2 Integration tests
 
@@ -1245,10 +1245,10 @@ SHAs in top-3) on the self-graph baseline.
 
 For the engineer who lands this:
 
-1. **PR 1 (H1, schema 1.7).** New `internal/temporal/hunks.go` collector;
-   wire into `emitTemporalEdges`; `pkg/types/enums.go` `NodeHunk` +
+1. **PR 1 (H1, schema 1.7).** New `internal/graph/temporal/hunks.go` collector;
+   wire into `emitTemporalEdges`; `pkg/graph/types/enums.go` `NodeHunk` +
    `EdgeHasHunk` + `EdgeAdjacent`; `web/viewer-next/src/lib/edges.ts`
-   `EDGE_STYLE` + `GRAPH_GROUPS.G6` updates; `internal/buildpipe/cache.go`
+   `EDGE_STYLE` + `GRAPH_GROUPS.G6` updates; `internal/graph/buildpipe/cache.go`
    `SchemaVersion = "1.8"`; unit + golden tests. NOT yet emitting
    `modifies`.
 
@@ -1257,11 +1257,11 @@ For the engineer who lands this:
    overlap. Viewer's NodeDetail "Modified in" panel ships in this PR.
 
 3. **PR 3 (H3).** `internal/mcp/evidence.go` (new file) registering
-   `evidence_for_intent`; `internal/server/api.go` `/api/evidence` +
+   `evidence_for_intent`; `internal/graph/server/api.go` `/api/evidence` +
    `/api/hunks` + `/api/hunks/by-node` handlers; `excludeTypes` query
    param on `/api/nodes/top`; commit timeline viewer view; eval task.
 
-4. **PR 4 (H4).** `internal/temporal/issueid.go` parser; HunkInfo
+4. **PR 4 (H4).** `internal/graph/temporal/issueid.go` parser; HunkInfo
    carries `issue_ids`; encode into `doc_comment` as `issues:…`;
    EvidencePack output includes the field; viewer badges.
 

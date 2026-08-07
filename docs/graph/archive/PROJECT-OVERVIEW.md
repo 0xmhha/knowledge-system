@@ -1,7 +1,7 @@
 # CKG Project Overview — 2026-05-25
 
-> **ARCHIVED 2026-07-18.** Superseded by `docs/VISION.md` (purpose) +
-> `docs/CONTINUITY.md` (live status). Dated facts here are stale (schema was
+> **ARCHIVED 2026-07-18.** Superseded by `docs/graph/VISION.md` (purpose) +
+> `docs/graph/CONTINUITY.md` (live status). Dated facts here are stale (schema was
 > 1.15, now 1.23; "9 tools", now 10; "T-14 pending", now shipped;
 > awaits/overrides "slot-only", now emitted). Kept for provenance only —
 > ground truth = code + git.
@@ -49,11 +49,11 @@ production surfaces; the rest are utilities (`bench-*`, `validate`,
 
 | Surface | What it does | Backend module |
 |---|---|---|
-| `build` | 7-pass pipeline: detect → parse → resolve → graph → xlang → temporal → cluster → score → persist. Incremental cache. `--files-from` restricts to a user-supplied file list. | `internal/buildpipe` |
-| `serve` | HTTP API + embedded Next.js viewer (3D force-graph). 13+ `/api/*` routes. | `internal/server` |
-| `mcp` | stdio MCP server. **9 tools**: find_symbol, find_callers, find_callees, get_subgraph, search_text, get_context_for_task, impact_of_change, concurrency_impact, evidence_for_intent. | `internal/mcp` |
-| `eval` | 4-baseline LLM comparison (α raw / β whole-graph / γ tools / δ smartContext). Hallucination validator. Retrieval gold-set. | `internal/eval`, `internal/eval/retrieval` |
-| `audit` | `go/packages.Load` vs DB parity check; exit 0/1/2 for CI gating. | `internal/audit` |
+| `build` | 7-pass pipeline: detect → parse → resolve → graph → xlang → temporal → cluster → score → persist. Incremental cache. `--files-from` restricts to a user-supplied file list. | `internal/graph/buildpipe` |
+| `serve` | HTTP API + embedded Next.js viewer (3D force-graph). 13+ `/api/*` routes. | `internal/graph/server` |
+| `mcp` | stdio MCP server. **9 tools**: find_symbol, find_callers, find_callees, get_subgraph, search_text, get_context_for_task, impact_of_change, concurrency_impact, evidence_for_intent. | `internal/graph/mcp` |
+| `eval` | 4-baseline LLM comparison (α raw / β whole-graph / γ tools / δ smartContext). Hallucination validator. Retrieval gold-set. | `internal/graph/eval`, `internal/graph/eval/retrieval` |
+| `audit` | `go/packages.Load` vs DB parity check; exit 0/1/2 for CI gating. | `internal/graph/audit` |
 
 ## 3. Six-graph axis
 
@@ -87,7 +87,7 @@ Confidence triple on every edge: `EXTRACTED` (direct AST/types.Info) /
 `INFERRED` (heuristic dispatch) / `AMBIGUOUS` (unreachable history hidden
 from LLM consumers via `llmSafeStoreReader` wrapper).
 
-Source of truth: `docs/SCHEMA.md`.
+Source of truth: `docs/graph/SCHEMA.md`.
 
 ## 4. Public package surface
 
@@ -96,16 +96,16 @@ public packages, all under `pkg/`:
 
 | Package | Stable surface | Consumer note |
 |---|---|---|
-| `pkg/types` | NodeType, EdgeType, Confidence, Node, Edge | Append-only enums; reordering = ID hash breakage |
-| `pkg/store` | `Reader` (alias of persist.StoreReader), `SearchHit`, `SearchFTSOptions`, `FindSymbolOptions`, `Manifest`, `OpenReadOnly`, `GetManifest` | CKG-1/2/4/6/7 closed. **No `mcphandlers` Register* surface yet — T-14 pending** |
+| `pkg/graph/types` | NodeType, EdgeType, Confidence, Node, Edge | Append-only enums; reordering = ID hash breakage |
+| `pkg/graph/store` | `Reader` (alias of persist.StoreReader), `SearchHit`, `SearchFTSOptions`, `FindSymbolOptions`, `Manifest`, `OpenReadOnly`, `GetManifest` | CKG-1/2/4/6/7 closed. **No `mcphandlers` Register* surface yet — T-14 pending** |
 | `pkg/bm25` | BM25 scorer | ckv R13 plan: import for 3-leg BM25 measurement. **External-import stability not formally tested yet (ckg-NEW-9)** |
-| `pkg/smartctx` | `BuildContext` (δ baseline's tool-free retriever) | Stable. Prose-query robustness (T-10) deferred to cks Layer 3 |
-| `pkg/evidence` | `BuildPack` (H3 EvidencePack assembler, supports `Mode: "and"`) | S1 (cks) migration decided; keep stable until then |
-| `pkg/hunkmodifies` | hunk → CodeNode interval overlap | Stable (H2, schema 1.8) |
-| `pkg/impact` | `impact_of_change` MCP backend | Stable |
+| `pkg/graph/smartctx` | `BuildContext` (δ baseline's tool-free retriever) | Stable. Prose-query robustness (T-10) deferred to cks Layer 3 |
+| `pkg/graph/evidence` | `BuildPack` (H3 EvidencePack assembler, supports `Mode: "and"`) | S1 (cks) migration decided; keep stable until then |
+| `pkg/graph/hunkmodifies` | hunk → CodeNode interval overlap | Stable (H2, schema 1.8) |
+| `pkg/graph/impact` | `impact_of_change` MCP backend | Stable |
 
-**Key gap**: MCP tools (`internal/mcp/`) are not yet exposed under
-`pkg/mcphandlers/` — cks cannot reuse the 9-tool registration code. This
+**Key gap**: MCP tools (`internal/graph/mcp`) are not yet exposed under
+`pkg/graph/mcphandlers` — cks cannot reuse the 9-tool registration code. This
 is the *load-bearing T-14 P0 blocker* for cks S1 entry.
 
 ## 5. Active streams (where work flows)
@@ -129,7 +129,7 @@ hit a production-grade noise floor (β/δ halu rate 0.000, H2 +0.429).
 (T02-T30 fixture expansion). All informational improvements — gated by
 whether Stream C wants the measurements they produce.
 
-Source: `docs/eval-trajectory.md`, `docs/CONTINUITY.md`, `docs/todo-cks-dogfood-followups-2026-05-20.md`.
+Source: `docs/eval-trajectory.md`, `docs/graph/CONTINUITY.md`, `docs/todo-cks-dogfood-followups-2026-05-20.md`.
 
 ### 5.2 Stream B — Within-language semantics (design ready, implementation paused)
 
@@ -142,7 +142,7 @@ the AwaitPoint node + awaits/overrides edges. Detectors not yet implemented.
 | W-B | TypeScript async/await + heritage (interface/extends/implements) | ~700 LOC | Slot reserved, detector pending |
 | W-C | Solidity inheritance + interface dispatch + `using For` | ~1100-1200 LOC | Slot reserved, detector pending |
 
-Source: `docs/archive/NEXT-CANDIDATES-WITHIN-LANG-SEMANTICS.md`, `docs/design/*.md`.
+Source: `docs/graph/archive/NEXT-CANDIDATES-WITHIN-LANG-SEMANTICS.md`, `docs/design/*.md`.
 
 ### 5.3 Stream C — cks/ckv/ckg cross-repo integration (current north star)
 
@@ -155,7 +155,7 @@ with the cks orchestrator pattern.
 
 | ID | Work | LOC |
 |---|---|---|
-| T-14 | `pkg/mcphandlers/` surface (cks needs to import the 9-tool registrations) | ~moderate (move + thin wrapper) |
+| T-14 | `pkg/graph/mcphandlers` surface (cks needs to import the 9-tool registrations) | ~moderate (move + thin wrapper) |
 | ckg-NEW-2 | `pkg/types.Node.RecentPRs` + `PRRef` (R12 PR-aware retrieval) | ~120 |
 | ckg-NEW-3 | Temporal slicing (`RecentPRsBefore(cutoff)`) — leakage prevention | ~50 |
 | ckg-NEW-4 | `pkg/store.Reader.GetNodePRs` accessor | ~50 |
@@ -201,21 +201,21 @@ goal into concrete gaps.
 
 | Topic | Doc |
 |---|---|
-| Architecture (1 page) | `docs/ARCHITECTURE.md` |
-| Architecture (deep, 994 lines) | `docs/ARCHITECTURE-DETAILED.md` |
-| Schema (node/edge types, version history) | `docs/SCHEMA.md` |
-| Code structure (visual index, doc map) | `docs/CODE-STRUCTURE.md` |
+| Architecture (1 page) | `docs/graph/ARCHITECTURE.md` |
+| Architecture (deep, 994 lines) | `docs/graph/ARCHITECTURE-DETAILED.md` |
+| Schema (node/edge types, version history) | `docs/graph/SCHEMA.md` |
+| Code structure (visual index, doc map) | `docs/graph/CODE-STRUCTURE.md` |
 | Foundation spec (v0.2 parser/cache/PG) | `docs/spec-ckg-v0.2.md` |
-| Eval CLI usage + baselines | `docs/EVAL.md` |
+| Eval CLI usage + baselines | `docs/graph/EVAL.md` |
 | Eval 11-cycle trajectory (C18-C37) | `docs/eval-trajectory.md` |
-| Cross-session entry / current snapshot | `docs/CONTINUITY.md` |
-| Stream B (within-lang) | `docs/archive/NEXT-CANDIDATES-WITHIN-LANG-SEMANTICS.md` + `docs/design/*` |
+| Cross-session entry / current snapshot | `docs/graph/CONTINUITY.md` |
+| Stream B (within-lang) | `docs/graph/archive/NEXT-CANDIDATES-WITHIN-LANG-SEMANTICS.md` + `docs/design/*` |
 | Stream C P0 task tracker | `eval/stablenet/HANDOFF.md` |
 | Stream C cks integration plan | `eval/stablenet/CKS-INTEGRATION-2026-05-23.md` |
 | Stream C todo (cks dogfood follow-ups) | `docs/todo-cks-dogfood-followups-2026-05-20.md` |
-| Hunk-graph design (H1-H4, §11 decisions) | `docs/design/hunk-graph.md` |
-| Walker symmetry matrix (parse-sol W10) | `internal/parse/solidity/WALKER_SYMMETRY.md` |
-| Verification checklist (PR-ready 4-axis surface) | `docs/VERIFICATION-CHECKLIST.md` |
+| Hunk-graph design (H1-H4, §11 decisions) | `docs/graph/design/hunk-graph.md` |
+| Walker symmetry matrix (parse-sol W10) | `internal/graph/parse/solidity/WALKER_SYMMETRY.md` |
+| Verification checklist (PR-ready 4-axis surface) | `docs/graph/VERIFICATION-CHECKLIST.md` |
 | Capability audit (the gap → work mapping) | `docs/CAPABILITY-AUDIT.md` |
 
 ## 8. What was decided in this overview session

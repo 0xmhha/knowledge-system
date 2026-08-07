@@ -14,13 +14,13 @@
 
 2. **Smart Dummy 백엔드 확정**: `ckvclient.NewDummy()` / `ckgclient.NewDummy()` 가 실제 backend 부재 시 *fake data 가 아니라 LLM-actionable instruction* 을 반환. 호출 사용자 (코드 분석 LLM) 가 `/Users/wm-it-22-00661/Work/github/stable-net/go-stablenet-latest/.claude` 스킬을 직접 실행해 응답 생성.
 
-3. **RRF Stage 2 + Vocabulary Stage 1**: score-sum fusion 을 *Reciprocal Rank Fusion (Cormack 2009, k=60)* 으로 교체. 한국어/모호 prompt 를 한 단계 앞에서 코드 키워드로 확장하는 `internal/vocab` 패키지 추가, `cks.yaml` 의 `vocab.glossary_path` 로 opt-in.
+3. **RRF Stage 2 + Vocabulary Stage 1**: score-sum fusion 을 *Reciprocal Rank Fusion (Cormack 2009, k=60)* 으로 교체. 한국어/모호 prompt 를 한 단계 앞에서 코드 키워드로 확장하는 `internal/system/vocab` 패키지 추가, `cks.yaml` 의 `vocab.glossary_path` 로 opt-in.
 
 4. **D-1 도메인 인벤토리 23 entries 작성**: `docs/domain-knowledge/projects/go-stablenet/` 아래 schema + 23 yaml entries (P0 9 / P1 11 / P2 3), 11 subsystem · B1–B7 knowledge type 모두 커버. **모두 `status: needs_verification`**. 검증 단계 시작 전.
 
-5. **검증·도구 트리오 완성**: `cmd/cks-glossary-gen` (entries → glossary.yaml), `cmd/cks-inventory-check` (mechanical validator), `cmd/cks-entry-verify` (verified 전이 + inventory.md auto-sync). 사용자 검증 워크플로우 가속을 위한 P0 도구.
+5. **검증·도구 트리오 완성**: `cmd/cks` (entries → glossary.yaml), `cmd/cks` (mechanical validator), `cmd/cks` (verified 전이 + inventory.md auto-sync). 사용자 검증 워크플로우 가속을 위한 P0 도구.
 
-6. **현재 uncommitted**: `docs/coding-agent-mcp-mapping.md` (235 lines) — coding-agent ↔ CKS 11 tool 매핑 문서. 본 handoff 와 같이 commit + push 권장.
+6. **현재 uncommitted**: `system/docs/coding-agent-mcp-mapping.md` (235 lines) — coding-agent ↔ CKS 11 tool 매핑 문서. 본 handoff 와 같이 commit + push 권장.
 
 7. **다음 작업 후보**: ① 사용자 검증 시작 (verify 도구 사용), ② D1 합본 (`cks.ops.health` vocab status + Makefile inventory-check target + cks-glossary-gen 리팩토링), ③ CKS eval 시나리오 11 tool 확장, ④ A4 GovCouncil/MasterMinter + A11 tx taxonomy entries 추가.
 
@@ -32,17 +32,17 @@
 |---|---|---|
 | `b6fdf04 docs(planning): system review, technical analysis, and integrated workplan for coding-agent integration` | 05-28 | 3 문서 (system-review / technical-analysis / integrated-workplan) — coding-agent 통합 관점에서 cks 의 격차 + 해소 작업 분해 |
 | `fde046d feat(client): extend ckgclient and ckvclient interfaces for upcoming CKS MCP tools` | 05-28 | 9 신규 method (ImpactOfChange, EvidenceForIntent, GetNodePRs, GetSubgraph, Freshness, ...). fake/real/dummy 3 adapter 동시 확장 |
-| `d4027bc feat(dummy): smart-dummy ckv/ckg backends emit LLM instructions in place of real calls` | 05-28 | `pkg/contract/instruction.go` 의 `InstructionCollector` + ctx-bound 패턴. EvidencePack.Instructions 필드 추가 |
+| `d4027bc feat(dummy): smart-dummy ckv/ckg backends emit LLM instructions in place of real calls` | 05-28 | `pkg/system/contract/instruction.go` 의 `InstructionCollector` + ctx-bound 패턴. EvidencePack.Instructions 필드 추가 |
 | `9781118 feat(mcp): expand CKS MCP surface from 2 to 11 tools for coding-agent` | 05-28 | `internal/mcp/{graph,search,analysis,freshness}.go` 신규. wire name 명명 규칙 `cks.context.*` / `cks.ops.*` |
 | `9f90178 refactor(stage2): replace score-sum fusion with formal RRF over BM25 and FindSymbol lists` | 05-28 | Stage 2 aggregator 재작성. `Config.RRFK=60`, `BMWeight`, `SymbolWeight`. 두 기존 테스트 RRF semantics 로 재작성 |
-| `0f5afba feat(vocab): glossary loader + query expansion for Korean and ambiguous prompts` | 05-28 | `internal/vocab` 패키지 + Glossary YAML 로더 + case-insensitive substring matching |
-| `e0386b2 docs(d1): bootstrap domain-knowledge inventory — shared schema + go-stablenet project skeleton + 6 sample entries` | 05-29 | `docs/domain-knowledge/shared/` schema + `projects/go-stablenet/` skeleton + 6 P0 entries |
+| `0f5afba feat(vocab): glossary loader + query expansion for Korean and ambiguous prompts` | 05-28 | `internal/system/vocab` 패키지 + Glossary YAML 로더 + case-insensitive substring matching |
+| `e0386b2 docs(d1): bootstrap domain-knowledge inventory — shared schema + go-stablenet project skeleton + 6 sample entries` | 05-29 | `system/docs/domain-knowledge/shared` schema + `projects/go-stablenet/` skeleton + 6 P0 entries |
 | `9ed11c4 docs(d1): expand go-stablenet inventory to 15 entries — full subsystem and knowledge-type coverage` | 05-29 | 9 entries 추가 → A1–A11 모두 1 entry 이상, B1–B7 모두 exercise |
 | `864817a feat(stage1): wire vocab.Resolver into composer Stage 1 prompt expansion` | 05-29 | `stage1.WithVocab(*vocab.Resolver) Option`, Stage1Output.VocabExpanded/Keywords 필드. cks-mcp 가 `cfg.Vocab.GlossaryPath` 에 따라 opt-in |
 | `2845e25 feat(cks-glossary-gen): CLI to derive a project's glossary.yaml from inventory entries` | 05-29 | status-gated (default verified) entries → glossary.yaml. round-trip 검증 |
-| `74baacc feat(inventory): cks-inventory-check + cks-entry-verify CLIs with shared internal/inventory package` | 05-29 | `internal/inventory` 패키지 (types/load/validate/render/verify) + 2 CLI + 4 unit test 통과 |
+| `74baacc feat(inventory): cks-inventory-check + cks-entry-verify CLIs with shared internal/inventory package` | 05-29 | `internal/system/inventory` 패키지 (types/load/validate/render/verify) + 2 CLI + 4 unit test 통과 |
 | `b2c2e75 docs(d1): add 8 P1 entries (round-change, handlers, ...)` | 05-29 | 인벤토리 15 → **23 entries**. 동시에 A8 anchor + subsystems.yaml 의 깨진 경로 `core/stablenet_genesis.go` → `core/genesis.go::DefaultStableNetMainnetGenesisBlock` 정정 |
-| *uncommitted* `docs/coding-agent-mcp-mapping.md` | 05-29 | coding-agent HLD 의 가상 `ckv_search` / `ckg_query` / `ckg_impact` ↔ 11 live tool 매핑 + composition example + 7 가지 구조적 차이 표 |
+| *uncommitted* `system/docs/coding-agent-mcp-mapping.md` | 05-29 | coding-agent HLD 의 가상 `ckv_search` / `ckg_query` / `ckg_impact` ↔ 11 live tool 매핑 + composition example + 7 가지 구조적 차이 표 |
 
 ## 2. 산출물 상세
 
@@ -50,18 +50,18 @@
 
 | 경로 | 역할 |
 |---|---|
-| `internal/vocab/` | Glossary YAML loader + `Resolver.Resolve(prompt)` → `ResolveResult{Expanded, MatchedKeywords}` |
-| `internal/inventory/` | Project / Entry / Subsystem 도메인 타입, schema + cross-ref validator, inventory.md 카운트 in-place 갱신, yaml.Node 기반 `MarkVerified` (주석·순서 보존) |
+| `internal/system/vocab` | Glossary YAML loader + `Resolver.Resolve(prompt)` → `ResolveResult{Expanded, MatchedKeywords}` |
+| `internal/system/inventory` | Project / Entry / Subsystem 도메인 타입, schema + cross-ref validator, inventory.md 카운트 in-place 갱신, yaml.Node 기반 `MarkVerified` (주석·순서 보존) |
 | `internal/mcp/{graph,search,analysis,freshness}.go` | 9 신규 MCP tool 핸들러 |
-| `pkg/contract/instruction.go` | `DummyInstruction` + ctx-bound `InstructionCollector` (Smart Dummy 의 응답 통로) |
+| `pkg/system/contract/instruction.go` | `DummyInstruction` + ctx-bound `InstructionCollector` (Smart Dummy 의 응답 통로) |
 
 ### 2.2 코드 — CLI 추가
 
 | 경로 | 용도 |
 |---|---|
-| `cmd/cks-glossary-gen/` | entries → glossary.yaml. `-status verified` 게이트. `vocab.New` round-trip 검증 |
-| `cmd/cks-inventory-check/` | mechanical validator. `-update-inventory` 로 inventory.md 갱신 (errors 있으면 skip) |
-| `cmd/cks-entry-verify/` | 단일 entry verified 전이. pre-flight `ValidateEntry` 통과 시에만 파일 write |
+| `cmd/cks` | entries → glossary.yaml. `-status verified` 게이트. `vocab.New` round-trip 검증 |
+| `cmd/cks` | mechanical validator. `-update-inventory` 로 inventory.md 갱신 (errors 있으면 skip) |
+| `cmd/cks` | 단일 entry verified 전이. pre-flight `ValidateEntry` 통과 시에만 파일 write |
 
 Makefile `build-bins` 타겟이 6 binary 모두 빌드 (mcp/agent/eval/glossary-gen/inventory-check/entry-verify).
 
@@ -114,9 +114,9 @@ docs/domain-knowledge/
 | 경로 | 역할 |
 |---|---|
 | `docs/system-review-2026-05-27.md` | 통합 시점에서 cks 격차 정성 분석 |
-| `docs/technical-analysis-2026-05-27.md` | 격차 기술 분해 |
+| `system/docs/technical-analysis-2026-05-27.md` | 격차 기술 분해 |
 | `docs/integrated-workplan-2026-05-27.md` | C/D/G/I/P/S/V 트랙 작업 계획 |
-| `docs/coding-agent-mcp-mapping.md` *(uncommitted)* | 본 세션 최종 산출. coding-agent ↔ CKS MCP 매핑 |
+| `system/docs/coding-agent-mcp-mapping.md` *(uncommitted)* | 본 세션 최종 산출. coding-agent ↔ CKS MCP 매핑 |
 
 ## 3. 결정 / 발견
 
@@ -181,7 +181,7 @@ go run ./cmd/cks-inventory-check \
 
 1. **본 문서 §0–§3** — 누적 결정 / 산출물.
 2. **`docs/research/session-handoff-2026-05-23.md`** — 3-repo 통합 점검 (ckv/ckg/Atlassian/Ollama 외부 의존 상황). 본 문서는 이 위에 *cks 단독 진척* 만 얹은 것.
-3. **`docs/coding-agent-mcp-mapping.md`** — coding-agent 작업자가 cks 와 어떻게 대화하는지. 다른 세션 (coding-agent repo) 작업자도 이 문서 1 부 받아가야 함.
+3. **`system/docs/coding-agent-mcp-mapping.md`** — coding-agent 작업자가 cks 와 어떻게 대화하는지. 다른 세션 (coding-agent repo) 작업자도 이 문서 1 부 받아가야 함.
 4. **`docs/integrated-workplan-2026-05-27.md`** — C/D/G/I/P/S/V 트랙 작업 분해. 본 문서 §6 의 "다음 후보" 가 이 분해 안에 매핑됨.
 5. **`docs/domain-knowledge/projects/go-stablenet/inventory.md`** — 인벤토리 현황 대시보드.
 
@@ -189,9 +189,9 @@ go run ./cmd/cks-inventory-check \
 
 | 다음 작업 | 정독 + 시작점 |
 |---|---|
-| 사용자 검증 (verify 도구 사용) | `docs/domain-knowledge/shared/STATUS_LIFECYCLE.md` §3 substantive checklist + `cmd/cks-entry-verify/README.md` |
+| 사용자 검증 (verify 도구 사용) | `system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md` §3 substantive checklist + `cmd/cks-entry-verify/README.md` |
 | C-시리즈 LLM 단독 작업 | 본 문서 §6 + `docs/integrated-workplan-2026-05-27.md` |
-| coding-agent ↔ cks 통합 (다른 repo) | `docs/coding-agent-mcp-mapping.md` 만 읽으면 충분 |
+| coding-agent ↔ cks 통합 (다른 repo) | `system/docs/coding-agent-mcp-mapping.md` 만 읽으면 충분 |
 | ckv / ckg 작업 (다른 repo) | `docs/research/session-handoff-2026-05-23.md` §6 + 해당 repo 자체 문서 |
 
 ## 6. 미완료 작업 / 다음 후보
@@ -216,7 +216,7 @@ go run ./cmd/cks-inventory-check \
 
 | ID | 작업 | 규모 | 우선 |
 |---|---|---|---|
-| D1 | `cks.ops.health` 에 vocab status 노출 + Makefile `inventory-check` target + cks-glossary-gen 을 `internal/inventory` 위로 리팩토링 | XS+XS+S | 사용자 검증 가속 |
+| D1 | `cks.ops.health` 에 vocab status 노출 + Makefile `inventory-check` target + cks-glossary-gen 을 `internal/system/inventory` 위로 리팩토링 | XS+XS+S | 사용자 검증 가속 |
 | D2 | A4 GovCouncil / GovMasterMinter + A11 tx taxonomy / mempool ordering / fee-delegation 0x16 entries 추가 | M | 인벤토리 폭 |
 | D3 | CKS eval 시나리오 11 MCP tool 회귀 (현재 9 개는 `get_for_task` 중심) | M | 회귀 방지 |
 | D4 | vocab footprint 분석 도구 (`composer.stage1_extracted` 이벤트의 vocab_expanded / vocab_keywords 분포 집계) | S | verified glossary 있어야 의미 |
@@ -256,9 +256,9 @@ go run ./cmd/cks-inventory-check -project docs/domain-knowledge/projects/go-stab
 - 이전 handoff: `docs/research/session-handoff-2026-05-23.md` (3-repo 통합 점검)
 - 통합 워크플랜: `docs/integrated-workplan-2026-05-27.md`
 - 시스템 리뷰: `docs/system-review-2026-05-27.md`
-- 기술 분석: `docs/technical-analysis-2026-05-27.md`
-- coding-agent 매핑: `docs/coding-agent-mcp-mapping.md` *(본 세션 마지막 산출)*
-- 도메인 인벤토리: `docs/domain-knowledge/`
+- 기술 분석: `system/docs/technical-analysis-2026-05-27.md`
+- coding-agent 매핑: `system/docs/coding-agent-mcp-mapping.md` *(본 세션 마지막 산출)*
+- 도메인 인벤토리: `system/docs/domain-knowledge`
 - CLI 사용법: `cmd/cks-glossary-gen/README.md`, `cmd/cks-inventory-check/README.md`, `cmd/cks-entry-verify/README.md`
 
 ## 9. 변경 이력

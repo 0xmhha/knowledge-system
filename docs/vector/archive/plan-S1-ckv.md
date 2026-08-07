@@ -1,6 +1,6 @@
 # Plan S1 — CKV (Code Knowledge Vector)
 
-> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/adr/`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
+> **ARCHIVED 2026-07-19.** Plan executed; decisions live in the ADRs (`docs/vector/adr`) and live status in [`remaining.md`](../remaining.md). Kept for provenance.
 
 > **문서 버전**: 0.1 (초안)
 > **작성일**: 2026-05-08
@@ -121,7 +121,7 @@ type Embedder interface {
 "in-process (chromem-go 또는 sqlite-vec). 규모 커지면 외부로 마이그레이션."
 
 ### CKG와의 정합
-- CKG는 SQLite (`internal/persist/sqlite.go`) 사용, schema 1.7로 진화 중.
+- CKG는 SQLite (`internal/graph/persist/sqlite.go`) 사용, schema 1.7로 진화 중.
 - **`sqlite-vec`이 자연스러운 선택** — CKV가 별도 SQLite DB를 가지고 CKG의 SQLite와 file system 상에서 같은 디렉토리에 위치, ID join은 application 레이어.
   - 옵션 1: **분리 DB** (default) — CKV `vector.db` + CKG `graph.db` 공존, manifest로 동기화 메타 공유.
   - 옵션 2: **공유 DB** — CKV가 CKG의 `graph.db`에 vector 테이블 추가 (ATTACH DATABASE 또는 schema 확장).
@@ -575,7 +575,7 @@ featurelist §21의 q1~q5 + 추가:
 ## 12. Rollout (W1~W4)
 
 ### W1 — Skeleton + scaffolding (M0)
-- `cmd/ckv/main.go` Cobra CLI shell.
+- `cmd/vector/main.go` Cobra CLI shell.
 - Makefile (build/test/lint/tidy/fmt).
 - `go.mod` — **CKG는 import하지 않는다** (정정 2026-05-12). CKS가 양쪽을 import.
 - README quickstart.
@@ -583,19 +583,19 @@ featurelist §21의 q1~q5 + 추가:
 
 ### W2 — Indexer + embedding (M1+M2)  ✅ 완료
 - `internal/parse/<lang>/` go walker (TS/Sol은 W3-T9/T10).
-- `internal/chunk/` chunking 로직.
-- `internal/embed/` Embedder 인터페이스 + mock + bgeonnx 스텁.
-- `internal/store/sqlitevec/` VectorStore 구현.
+- `internal/vector/chunk` chunking 로직.
+- `internal/vector/embed` Embedder 인터페이스 + mock + bgeonnx 스텁.
+- `internal/vector/store/sqlitevec` VectorStore 구현.
 - `ckv build` 명령 동작.
 - Tests: 작은 sample repo → chunk 수, manifest 검증.
 
 ### W3 — MCP + query (M3+M5, CKV 단독) — **정정**
-- `pkg/mcp/server.go` — `cks.context.*`, `cks.ops.*` (read-only). ✅
+- `pkg/vector/mcp/server.go` — `cks.context.*`, `cks.ops.*` (read-only). ✅
 - `ckv query`, `ckv mcp`, `ckv freshness` 동작. ✅
 - TS / Solidity tree-sitter parser (W3-T9, W3-T10) — *진행 예정*
 - **Footprint logging** (W3-T14, neu): slog + JSONL sink, 모든 build/query/mcp 경로에 latency·hit count·citation drop 계측 — *진행 예정*
 - **Skill extension hook** (W3-T15, neu): `<src>/.claude/` 또는 `ckv.yaml`로 per-project chunking/필터 커스터마이즈 — *진행 예정*
-- **삭제**: `cmd/cks-mcp` / `internal/fusion/rrf.go` — CKS의 책임으로 이관.
+- **삭제**: `cmd/cks` / `internal/fusion/rrf.go` — CKS의 책임으로 이관.
 - Tests: known query → expected file:line, footprint event schema 검증.
 
 ### W4 — Eval & acceptance (M7 부분, CKV 단독) — **정정**
@@ -636,9 +636,9 @@ S1 진입 전 CKG 측에서 완료되어야 할 것:
 | schema 1.6+ (manifest, FTS5, blobs) | ✅ 완료 |
 | Go indexing 정상 | ✅ 완료 |
 | `pkg/bm25/scorer.go` Okapi 구현 | ✅ 완료 |
-| `pkg/types/node.go` Node 구조 | ✅ 완료 (id 16-char, qname, file_path, signature) |
-| `pkg/store/store.go` Reader 공개 API | ✅ 완료 (StoreReader 인터페이스) |
-| `internal/mcp/server.go` (mark3labs/mcp-go) | ✅ 완료 |
+| `pkg/graph/types/node.go` Node 구조 | ✅ 완료 (id 16-char, qname, file_path, signature) |
+| `pkg/graph/store/store.go` Reader 공개 API | ✅ 완료 (StoreReader 인터페이스) |
+| `internal/system/mcp/server.go` (mark3labs/mcp-go) | ✅ 완료 |
 | `find_symbol`, `find_callers`, `impact_of_change` MCP 노출 | ✅ 완료 |
 | TS / Solidity 파서 활성 (ed0359f) | ✅ 완료 |
 | 8080 loopback bind | ⚠️ 현재 8787, S0 spec 정합 검토 필요 (별도 trivia) |

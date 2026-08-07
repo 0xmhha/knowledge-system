@@ -4,19 +4,19 @@
 > repository layout at the time of writing (pre-consolidation). For the
 > current command map see docs/design/cli-consolidation.md.
 
-> Scope: extend the TS parser (`internal/parse/typescript/`) so the graph
+> Scope: extend the TS parser (`internal/graph/parse/typescript`) so the graph
 > captures (a) async/await semantics — Promise creation, await suspension
 > points, async function chains — and (b) interface / class heritage —
 > `implements`, `extends`, `declaration merging` — neither of which is
 > currently emitted.
 >
 > **Status**: design draft 2026-05-11. Schema 1.10 slot reserved
-> 2026-05-11 (NodeAwaitPoint, EdgeAwaits appended to `pkg/types/enums.go`;
+> 2026-05-11 (NodeAwaitPoint, EdgeAwaits appended to `pkg/graph/types/enums.go`;
 > see `docs/DISPATCH-WITHIN-LANG-SEMANTICS.md` §2 Phase 4 Status block).
-> **W1 heritage** ✅ **LANDED 2026-05-11** — `internal/parse/typescript/heritage.go`
+> **W1 heritage** ✅ **LANDED 2026-05-11** — `internal/graph/parse/typescript/heritage.go`
 > + 5 fixtures + 4 test functions covering same-file / cross-file / unresolved
 > drop / edge-direction.
-> **W2 async/await** ✅ **LANDED 2026-05-11** — `internal/parse/typescript/async.go`
+> **W2 async/await** ✅ **LANDED 2026-05-11** — `internal/graph/parse/typescript/async.go`
 > + 5 fixtures + 3 test functions. Function/Method SubKind="async", NodeAwaitPoint
 > + EdgeAwaits emit at every `await_expression` inside a Function/Method interval
 > (top-level await dropped per V0 scope). Schema 1.10 slots NodeAwaitPoint / EdgeAwaits
@@ -29,8 +29,8 @@
 > **Out of scope**: cross-language async (Go ↔ TS HTTP — that's schema 1.9
 > W series), JSX render graph, React-specific hooks dependency graph,
 > TypeScript decorators (already partially captured via `queryDecorator`).
-> **Adjacent docs**: `docs/design/track-c-detector-gap.md` §2.4–§2.5
-> (TS `extends` / `implements` already flagged P2), `docs/design/schema-1.9-spec.md`
+> **Adjacent docs**: `docs/graph/design/track-c-detector-gap.md` §2.4–§2.5
+> (TS `extends` / `implements` already flagged P2), `docs/graph/design/schema-1.9-spec.md`
 > (cross-language interop — disjoint dimension).
 
 ---
@@ -60,7 +60,7 @@
 
 ### 1.1 TS 파서가 *capture 하는* tree-sitter 노드
 
-`internal/parse/typescript/queries.go` 전체:
+`internal/graph/parse/typescript/queries.go` 전체:
 
 | Query | 매칭 |
 |-------|------|
@@ -73,7 +73,7 @@
 | `type_alias_declaration` | TypeAlias 노드 |
 | `enum_declaration` | Enum 노드 |
 | `call_expression` (P3) | calls pending refs |
-| (statement) IfStmt / LoopStmt / SwitchStmt / ReturnStmt / CallSite | `internal/parse/typescript/statements.go` |
+| (statement) IfStmt / LoopStmt / SwitchStmt / ReturnStmt / CallSite | `internal/graph/parse/typescript/statements.go` |
 
 ### 1.2 *capture 안 하는* 것
 
@@ -122,7 +122,7 @@
 | `EdgeAwaits` (신규) | Edge | Function/Method → AwaitPoint | EXTRACTED |
 | `EdgeAsyncCall` (신규 옵션) | Edge | AwaitPoint → CallSite | EXTRACTED |
 
-신규 노드 1종 + 신규 엣지 2종 + 기존 엣지 2종 활성화. `pkg/types/enums.go`
+신규 노드 1종 + 신규 엣지 2종 + 기존 엣지 2종 활성화. `pkg/graph/types/enums.go`
 의 `NodeType` / `EdgeType` 슬라이스에 append-only.
 
 ### 2.2 신뢰도 정책
@@ -138,7 +138,7 @@
 
 ### 2.3 schema 영향
 
-- `NodeAwaitPoint` 추가 → `pkg/types/enums.go` 의 `AllNodeTypes()` 끝에
+- `NodeAwaitPoint` 추가 → `pkg/graph/types/enums.go` 의 `AllNodeTypes()` 끝에
   append. positional indices 보존 (test `TestAllNodeTypes_Stable` 통과
   유지).
 - `EdgeAwaits`, `EdgeAsyncCall` 추가 → 동일.
@@ -159,7 +159,7 @@ Phase 5 (W2) 진입 시까지 0 — `internal/parse/typescript/*` 변경 없음.
 
 ### 3.1 (B) heritage — tree-sitter query 확장
 
-`internal/parse/typescript/queries.go` 에 추가:
+`internal/graph/parse/typescript/queries.go` 에 추가:
 
 ```scheme
 ; class C extends B
@@ -248,7 +248,7 @@ track-c §2.2 의 Go `instantiates` 와 평행하게 TS 도 같은 엣지 emit.
 
 #### LANDED 2026-05-11 (W-B W1)
 
-- 구현: `internal/parse/typescript/heritage.go` (284 LOC). Hand-rolled
+- 구현: `internal/graph/parse/typescript/heritage.go` (284 LOC). Hand-rolled
   walker over `class_declaration` + `interface_declaration` subtrees
   (tree-sitter query 우회 — 사유: pair-of-clauses 구조 분해는 query
   capture로 표현 어색).
@@ -277,11 +277,11 @@ track-c §2.2 의 Go `instantiates` 와 평행하게 TS 도 같은 엣지 emit.
 ### 4.2 W2 — async/await (A)
 
 1. `statements.go` 에 `await_expression` visitor 추가
-2. `pkg/types/enums.go` 에 `NodeAwaitPoint` / `EdgeAwaits` / `EdgeAsyncCall`
+2. `pkg/graph/types/enums.go` 에 `NodeAwaitPoint` / `EdgeAwaits` / `EdgeAsyncCall`
    append
 3. `Signature` 필드에 async prefix 합성 (declarations.go function visitor)
 4. 단위 테스트: `async_test.go`
-5. `internal/graph/validate.go` 가 새 NodeType / EdgeType 자동 통과 확인
+5. `internal/graph/graph/validate.go` 가 새 NodeType / EdgeType 자동 통과 확인
    (`AllNodeTypes()` / `AllEdgeTypes()` 갱신 후)
 
 추정 사이즈: 300~400 LOC + 5 fixture. enums.go 변경으로 prompt cache 영향
@@ -289,7 +289,7 @@ track-c §2.2 의 Go `instantiates` 와 평행하게 TS 도 같은 엣지 emit.
 
 #### LANDED 2026-05-11 (W-B W2)
 
-- 구현: `internal/parse/typescript/async.go` (~180 LOC). Hand-rolled
+- 구현: `internal/graph/parse/typescript/async.go` (~180 LOC). Hand-rolled
   walker over the parse tree — visits every `await_expression` and
   anchors it on the smallest enclosing Function/Method interval via
   `findEnclosingFn` (reused from body_walk.go).
@@ -577,15 +577,15 @@ sqlite3 /tmp/ckg-ts-self/graph.db "
 ## §7. 참조
 
 - 현재 TS 파서:
-  - `internal/parse/typescript/parser.go` (entry)
-  - `internal/parse/typescript/declarations.go` (visitor)
-  - `internal/parse/typescript/queries.go` (tree-sitter query 정의)
-  - `internal/parse/typescript/statements.go` (body walker)
-- track-c 갭 진단: `docs/design/track-c-detector-gap.md` §2.4–§2.5
+  - `internal/graph/parse/typescript/parser.go` (entry)
+  - `internal/graph/parse/typescript/declarations.go` (visitor)
+  - `internal/graph/parse/typescript/queries.go` (tree-sitter query 정의)
+  - `internal/graph/parse/typescript/statements.go` (body walker)
+- track-c 갭 진단: `docs/graph/design/track-c-detector-gap.md` §2.4–§2.5
 - TS grammar 노드 참조: `tree-sitter-typescript` upstream `node-types.json`
   (vendored 안에 없음 — 외부 grammar repo)
 - Edge style: `web/viewer-next/src/lib/edges.ts`
-- Go `extends`/`implements` 참고 구현: `internal/parse/golang/implements.go`
+- Go `extends`/`implements` 참고 구현: `internal/graph/parse/golang/implements.go`
   (`EmitImplementsEdges`)
 
 ---

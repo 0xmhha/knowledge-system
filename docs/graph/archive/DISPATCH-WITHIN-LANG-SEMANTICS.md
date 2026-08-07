@@ -32,7 +32,7 @@
 
 | ID | 언어 | 주제 | 사이즈 | 우선순위 | 상태 |
 |----|------|------|--------|----------|------|
-| **W-D** | (cross) | `pkg/types/enums.go` stale comment 정정 | XS (~30 LOC) | P2 (but first) | 코드는 land 됨, commit 만 pending |
+| **W-D** | (cross) | `pkg/graph/types/enums.go` stale comment 정정 | XS (~30 LOC) | P2 (but first) | 코드는 land 됨, commit 만 pending |
 | **W-A** | Go | Cross-function lock propagation (D1) | M (~300-400 LOC) | P1 | ✅ **LANDED 2026-05-11** (Stage B DFS depth=5, opt-in `--lock-propagation`) |
 | **W-B** | TS | async/await + heritage (extends/implements) | M (~700 LOC) | **P0** | Spec 합의 완료, 구현 미시작 |
 | **W-C** | Sol | Inheritance + interface dispatch + using For | L (~1100-1200 LOC) | **P0** | W4 (abstract/library SubKind) ✅ 2026-05-11 land; W1 (inheritance / is-clause) ✅ 2026-05-11 land; W2 (virtual/override) ✅ 2026-05-11 land; W3 (interface dispatch AMBIGUOUS) ✅ 2026-05-11 land; W6 미시작 |
@@ -40,11 +40,11 @@
 ### 1.1 참조 문서 경로
 
 - 인덱스: `docs/NEXT-CANDIDATES-WITHIN-LANG-SEMANTICS.md`
-- W-A spec: `docs/design/go-cross-function-lock-propagation.md`
-- W-B spec: `docs/design/ts-async-await-and-interface.md`
-- W-C spec: `docs/design/solidity-inheritance-and-interface-dispatch.md`
-- 결정 합의 원본 패턴 참조: `docs/design/hunk-graph.md` §11 (8 결정)
-- 진행 중 충돌 영역 확인용: `docs/design/schema-1.9-spec.md`
+- W-A spec: `docs/graph/design/go-cross-function-lock-propagation.md`
+- W-B spec: `docs/graph/design/ts-async-await-and-interface.md`
+- W-C spec: `docs/graph/design/solidity-inheritance-and-interface-dispatch.md`
+- 결정 합의 원본 패턴 참조: `docs/graph/design/hunk-graph.md` §11 (8 결정)
+- 진행 중 충돌 영역 확인용: `docs/graph/design/schema-1.9-spec.md`
 
 ---
 
@@ -54,7 +54,7 @@
 모든 §5.0 박제 완료. 추가 합의 불필요.
 
 ### Phase 2 — W-D land (docs-only PR, 가장 작음)
-- `pkg/types/enums.go` 의 `NodeMutex` (lines ~35) + lock edge types
+- `pkg/graph/types/enums.go` 의 `NodeMutex` (lines ~35) + lock edge types
   (`acquires_lock` / `releases_lock` / `accessed_under_lock`, lines ~138)
   주석이 "B1 Wave 5 will emit; the parser does not produce yet" 로 잘못
   표기되어 있던 부분이 이미 정정됨 (이전 세션에서 적용).
@@ -71,7 +71,7 @@
 `SubKind="contract"` 으로 라벨 (빈 문자열 → "contract" 로 승격, W1 의
 interface SubKind 와 idiom 일치). 변경 라인 합 ~390 (코드 215 + 테스트
 117 + fixture 38 + golden patch 2줄). Go regression diff = 0. 상세 변경
-은 `docs/design/solidity-inheritance-and-interface-dispatch.md` §4.4 의
+은 `docs/graph/design/solidity-inheritance-and-interface-dispatch.md` §4.4 의
 Status 블록 참조.
 
 ### Phase 4 — schema 1.10 bump (TS + Sol 합쳐 단일 PR)
@@ -84,13 +84,13 @@ Status 블록 참조.
   - `NodeContract.SubKind`: `{"contract","interface","abstract","library"}`
   - `NodeFunction.SubKind`: `{"function","async","virtual","override",
     "virtual_override","fallback","receive"}`
-- `docs/SCHEMA.md` 갱신: 노드 34 → 35, 엣지 38 → 40 (schema 1.9 W2/W3b
+- `docs/graph/SCHEMA.md` 갱신: 노드 34 → 35, 엣지 38 → 40 (schema 1.9 W2/W3b
   까지 흡수한 카운트 기준).
 - detector 변경 없음 (slot 만 예약). 회귀: `TestAllNodeTypes_Stable` +
   `TestAllEdgeTypes_Stable` + `pkg/types/...` 전체.
 
 **Status — 2026-05-11**: ✅ **LANDED**. Schema `1.9` → `1.10` bump in
-`internal/buildpipe/cache.go`. enum slots:
+`internal/graph/buildpipe/cache.go`. enum slots:
 - `NodeAwaitPoint` → AllNodeTypes() index 34 (W-B)
 - `EdgeAwaits` → AllEdgeTypes() index 38 (W-B)
 - `EdgeOverrides` → AllEdgeTypes() index 39 (W-C)
@@ -117,15 +117,15 @@ regression `--no-cache` diff vs schema 1.9: edges + nodes counts identical
 | W-C W2 (Sol virtual/override) | W-C W1 완료 | ✅ **LANDED 2026-05-11** |
 | W-C W3 (Sol interface dispatch) | W-C W1 완료 | ✅ **LANDED 2026-05-11** |
 | W-C carry-over (V1 batch) | W-C W11 완료 | ✅ **LANDED 2026-05-18** (W6 V2.19 free-function 4-entry partial-recovery lock; W8 V1 HasLowLevelCall + HasValueTransfer markers complementing W7.1 edge emission; W9 V1 inheritance offset on SlotIndex via DFS over parents adjacency; W10 V1.1 YulBuiltins []string enumerating security-critical EVM opcodes inside assembly blocks. Five items deferred with documented rationale: W6 V2.x operator-form recovery (grammar-blocked, fragile shape per V2.17), W8 V2 function-pointer dispatch (function-type tracking infrastructure absent), W9 V2 bit-packing (Sol §11.1 layout complex; primitive-only version wrong for arrays/structs), W9 V3 mapping slot derivation (keccak runtime computation), W10 V2 Yul receiver resolution (fragile yul_path → Sol identifier mapping), W11 V1 real parser→persist→BuildPack integration (substantial fixture cost)). |
-| W-C W11 (H3 evidence regression safety) | W-C W10 완료 | ✅ **LANDED 2026-05-18** (V0 H3 BuildPack regression test `TestBuildPack_SolGraphRegression` in pkg/evidence/sol_integration_test.go. Sol-shaped fakeStore staging all new W-C fields (Node.SubKind, SlotIndex, HasAssembly; Edge.DispatchKind, Order) plus mixed EXTRACTED/AMBIGUOUS commits and hunks. Locks four invariants: (1) BuildPack survives the new field shapes without panic, (2) §11.3 AMBIGUOUS-leak boundary holds, (3) Sol commit subjects flow into Pack so H4 issue-ID extraction can find them, (4) timestamp DESC ordering survives. Catches the most likely upstream regression — silent serialization or assembly failure — without standing up a real graph.db fixture (deferred to V1+). H4 ExtractIssueIDs corpus precision/recall test already exists in `internal/temporal/issueid_test.go`, so V0 focuses on the closer gap). |
+| W-C W11 (H3 evidence regression safety) | W-C W10 완료 | ✅ **LANDED 2026-05-18** (V0 H3 BuildPack regression test `TestBuildPack_SolGraphRegression` in pkg/evidence/sol_integration_test.go. Sol-shaped fakeStore staging all new W-C fields (Node.SubKind, SlotIndex, HasAssembly; Edge.DispatchKind, Order) plus mixed EXTRACTED/AMBIGUOUS commits and hunks. Locks four invariants: (1) BuildPack survives the new field shapes without panic, (2) §11.3 AMBIGUOUS-leak boundary holds, (3) Sol commit subjects flow into Pack so H4 issue-ID extraction can find them, (4) timestamp DESC ordering survives. Catches the most likely upstream regression — silent serialization or assembly failure — without standing up a real graph.db fixture (deferred to V1+). H4 ExtractIssueIDs corpus precision/recall test already exists in `internal/graph/temporal/issueid_test.go`, so V0 focuses on the closer gap). |
 | W-C W10 (Sol inline assembly marker) | W-C W9 완료 | ✅ **LANDED 2026-05-18** (V0 HasAssembly presence flag: `Node.HasAssembly bool` (omitempty). New `runAssemblyMarker` walker queries every `assembly_statement` node, resolves to the enclosing callable via `nearestFunctionQnameAndStart` (handles function / modifier / constructor / fallback), and sets HasAssembly=true on matching NodeFunction / NodeModifier rows via post-Pass-1 in-place mutation. V0 detects presence only — Yul-internal op detection (delegatecall, sstore, sload, selfdestruct) and receiver resolution deferred to V1+. Grammar v1.2.11 exposes `assembly_statement` as a top-level kind so query is shape-stable). |
-| W-C W9 (Sol storage slot index) | W-C W7 완료 | ✅ **LANDED 2026-05-18** (V0 per-contract slot index: `Node.SlotIndex int` (omitempty); `runStateVarDecl` maintains a `slotPerContract` counter keyed on `nearestContractName`, incremented for non-mapping NodeField emits only. Mapping state-vars (NodeMapping) skip the counter — their slot is derived dynamically at runtime per Sol spec §11.1. V0 ignores bit-packing (uint8 counts as one full slot) and inheritance offsets (each contract restarts at slot 0); V1+ adds both. Design doc: `docs/design/solidity-storage-slot-index.md`. Golden fixture unaffected — slot 0 omitted from JSON keeps existing emits stable). |
+| W-C W9 (Sol storage slot index) | W-C W7 완료 | ✅ **LANDED 2026-05-18** (V0 per-contract slot index: `Node.SlotIndex int` (omitempty); `runStateVarDecl` maintains a `slotPerContract` counter keyed on `nearestContractName`, incremented for non-mapping NodeField emits only. Mapping state-vars (NodeMapping) skip the counter — their slot is derived dynamically at runtime per Sol spec §11.1. V0 ignores bit-packing (uint8 counts as one full slot) and inheritance offsets (each contract restarts at slot 0); V1+ adds both. Design doc: `docs/graph/design/solidity-storage-slot-index.md`. Golden fixture unaffected — slot 0 omitted from JSON keeps existing emits stable). |
 | W-C W8 (Sol contract-type cast dispatch) | W-C W7 완료 | ✅ **LANDED 2026-05-18** (V0 contract-type cast: `runContractCastDispatch` walker re-uses W3's `matchInterfaceDispatch` predicate for the same `TypeName(args).method` AST shape, `resolveContractCastRef` looks up `byName[NodeContract]` instead of `NodeInterface`. Disjoint from W3 — same name can't be both Contract and Interface in a project, so no double-emit. EdgeInvokes ConfAmbiguous + DispatchKind="contract_cast". Closes the dispatch trio: W3 interface / W7.1 low-level / W8 contract-type). |
 | W-C W7 (Sol cross-contract / storage / modifier) | W-C W6 완료 | ✅ **LANDED — W7.1 2026-05-17 + W7.2 2026-05-18 + W7.3 2026-05-18** (W7.1 V0 low-level call: `runLowLevelCalls` + `resolveLowLevelCallRef`, EdgeInvokes ConfAmbiguous + DispatchKind="low_level_call". W7.2 V0 storage location: NodeField.SubKind = visibility + immutable; `constant` keyword and parameter location deferred to V1+ since grammar v1.2.11 drops them from the AST. W7.3 V0 modifier composition: `runHasModifier` extended to compute source-order index via sibling enumeration → Edge.Order field (new, omitempty); `runModifierOverride` walker detects `modifier m() override {}` and emits EdgeOverrides via existing W2 resolver path (NodeModifier qnames added to funcByQName alongside NodeFunction for parent-lookup symmetry). PendingRef.Order field also new. Golden fixture stable — Order=0 omitted from JSON keeps single-modifier emit unchanged). |
 | W-C W6 (Sol using For) | W-C W1 완료 | ✅ **LANDED 2026-05-12 (V0-V2.4) / 2026-05-13 (V2.5+)** (V0 binding + V1.0-V1.13 14-tier dispatch + V1.14-V1.21 family validations + V1.22-V1.24 callable kinds + V1.25-V1.27 lightweight guards + V1.28-V1.29 import alias + V1.30 block-shadow V0 + V2.0 line-range scope-aware + V2.1 interface receiver + V2.2 multi-binding + V2.3 library-body guard + V2.4 cross-file multi-binding + V2.5 operator-form limitation lock + V2.6 free-function form rediscovery + V2.7 contract-scope operator-form lock + V2.8 file-level free-function form lock + V2.9 bare free-function alias lock + V2.10 mixed bare/aliased multi-import fix + V2.11 bare path-only import guard + V2.12 UDVT + using-for guard + **V2.13 diamond inheritance multi-parent binding fix** (V1.2 BFS 의 "if !exists" guard 가 first-ancestor-wins 로 후속 ancestor binding 을 drop → local-snapshot + ancestor-union 으로 수정) + **V2.14 interface-body using-for variants lock** (3-variant probe inside `interface { }` body — IBare/IFree → 1 EdgeUsesFor each (V0/V2.6 shape match), IOp → 0 edges (V2.7-style operator-form AST mismatch); interface-scope phantom edges flagged as known graph artifact since interfaces have no state to bind methods on) + **V2.15 same-line shadow byte-precision fix** (V2.0 line-only filter admits both decls when outer + inner-block shadow + both use sites all sit on one line; strict-`>` declLine tiebreak left first-appended outer winning, dropping the inner use site → resurfaces V1.30 V0 false-negative on one line. Fix: PendingRef gains ByteOffset; localDecl gains declStartByte/scopeEndByte; selectLocalDecl switches to byte containment + max declStartByte tiebreak when bytes are uniformly populated, falls back to V2.0 line-only otherwise. RED→GREEN, no regression in 45+ using-for tests or cross-parser) + **V2.16 grammar-blocked items survey** (doc-only — consolidates V1.2/V1.8/V2.5/V2.6/V2.7 scattered claims into one 7-row classification table. Findings: 1 grammar-block remaining (file-level `using ... global;`), 1 query gap remaining (operator-form using_alias), 1 carry-over claim invalidated (free-function form, V2.6 rediscovered), 2 out-of-scope (Yul / pre-0.5.0 `var`), 2 already-complete (tuple destructuring, imports); operator-form query extension flagged as highest-leverage V2.17+ candidate) + **V2.17 operator-form grammar-block lock + V2.16 row 2 reclassification** (V2.16 highest-leverage recommendation invalidated by empirical AST dump on vendored grammar v1.2.11 — `using_alias` is NOT a valid node type, operator-form `using {f as +} for T;` parses with NO `using_directive` node (entire braced body misclassified as state_variable_declaration wrapped in ERROR nodes), free-function form `using {Math.add}` is also degraded but with fortuitous `type_alias` partial recovery that V0 query incidentally captures. Reclassified row 2 from B (query gap) → A (grammar reject), reclassified row 3 from "Not a gap" → "A-partial". V2.17 locks library-scope operator-form at 0 edges (new cell complementing V2.5 file / V2.7 contract / V2.14 IOp interface). No query change — grammar bump or ERROR-tolerant walker required) + **V2.18 file-level using directive ERROR-tolerant walker** (V2.16 row 1 closure. V2.18 AST probe confirms `source_file > ERROR "using ..."` shape is recoverable: library name + bound type extractable from named children. `runFileLevelUsingFor` in using_for.go walks ERROR children, filters by `strings.HasPrefix(text, "using ")`, fans out PendingRef pair (dispatchKindUsingFor + dispatchKindUsingForTypeBind) per contract/interface in v.nodes (library subkinds excluded to avoid self-binding phantom edges). Two fixtures: single-contract `using ... global;` + multi-contract `using ...;` both pass with correct EdgeUsesFor + EdgeCalls dispatch wiring. Shares all infrastructure with runUsingFor — purely additive. Row 1 status flipped: A still blocked → A-recovered. Operator-form (row 2) deferred — V2.18 probe confirmed no recoverable shape, requires grammar bump); W7+ shift V2.19+) |
 
 **Status — 2026-05-11**: W-A (Go cross-function lock propagation) ✅ landed.
-`internal/buildpipe/lock_propagation.go` (Stage B DFS depth=5, visited-set
+`internal/graph/buildpipe/lock_propagation.go` (Stage B DFS depth=5, visited-set
 cycle defence, `calls`+`invokes` traversal) + Go-parser field-touch
 side-channel + 6 fixture + 6 test. Self-graph KPI: 33 → 68
 `accessed_under_lock` edges (+106%). Opt-in via `--lock-propagation`
@@ -134,15 +134,15 @@ side-channel + 6 fixture + 6 test. Self-graph KPI: 33 → 68
 강제 / Q5 opt-in / Q6 dedup / Q7 별도 testdata / Q8 enums comment).
 
 W-C W1 (Sol inheritance `is`-clause) ✅ landed.
-`internal/parse/solidity/inheritance.go` + 5 fixture + resolver 확장.
+`internal/graph/parse/solidity/inheritance.go` + 5 fixture + resolver 확장.
 같은 빌드에서 EdgeExtends 8 / EdgeImplements 5 emit (cross-file 2건은
 INFERRED, 나머지 EXTRACTED). 상세는
-`docs/design/solidity-inheritance-and-interface-dispatch.md` §4.1 Status
+`docs/graph/design/solidity-inheritance-and-interface-dispatch.md` §4.1 Status
 블록 참조. W-C W2 (virtual/override) 진입 unblock.
 
 W-C W2 (Sol virtual/override modifier → EdgeOverrides) ✅ landed.
-`internal/parse/solidity/overrides.go` (~230 LOC) +
-`internal/parse/solidity/overrides_test.go` (~250 LOC) + 6 fixture +
+`internal/graph/parse/solidity/overrides.go` (~230 LOC) +
+`internal/graph/parse/solidity/overrides_test.go` (~250 LOC) + 6 fixture +
 resolver 2-pass split (Pass 2a W1 inheritance, Pass 2b W2 overrides).
 같은 빌드 (testdata/overrides) 에서 EdgeOverrides 6 emit
 (simple=1 / super_call=2 / multi_explicit=2 / cross_file=1; 5 EXTRACTED
@@ -153,8 +153,8 @@ dispatch AMBIGUOUS) 진입 unblock.
 
 W-C W3 (Sol interface dispatch `IFoo(addr).bar()` → EdgeInvokes
 AMBIGUOUS) ✅ landed.
-`internal/parse/solidity/dispatch.go` (~155 LOC) +
-`internal/parse/solidity/dispatch_test.go` (~230 LOC) + 4 fixture
+`internal/graph/parse/solidity/dispatch.go` (~155 LOC) +
+`internal/graph/parse/solidity/dispatch_test.go` (~230 LOC) + 4 fixture
 (simple / chained / cross-file pair) + resolver Pass 2b 분기
 (`resolveInterfaceDispatchRef`). 같은 빌드 (testdata/dispatch) 에서
 EdgeInvokes 6 emit (모두 AMBIGUOUS, §5.0 Q5 결정 — 파일 경계와 무관하게
@@ -167,7 +167,7 @@ testdata/overrides: extends 6 / overrides 6 보존). §7.0 Go regression
 `--lang=go` diff = 0. W-C W6 (using For) 진입 unblock.
 
 W-C W6 V0 (Sol `using For` library binding → EdgeUsesFor) ✅ landed
-2026-05-12. `internal/parse/solidity/using_for.go` (~100 LOC) +
+2026-05-12. `internal/graph/parse/solidity/using_for.go` (~100 LOC) +
 queries.go `queryUsingFor` (tree-sitter-solidity v1.2.13 `using_directive`
 → `type_alias` → `identifier` 경로) + resolve.go `resolveUsingForRef`
 (same-file ConfExtracted / cross-file ConfInferred / 미해결 drop) +
@@ -370,7 +370,7 @@ return-value chaining, free-function form, file-level (grammar
 업그레이드 후).
 
 W-B W1 (TS heritage `extends`/`implements`) ✅ landed.
-`internal/parse/typescript/heritage.go` (284 LOC) + 6 fixture +
+`internal/graph/parse/typescript/heritage.go` (284 LOC) + 6 fixture +
 `heritage_test.go` 4 test (FixtureMatrix / CrossFile / UnresolvedDropped /
 EdgeDirection). Class/Interface 전용 인덱스 `heritageByName` 로 동명
 Function/Method 부모-후보 오염 차단. same-file=ConfExtracted, cross-file=
@@ -378,7 +378,7 @@ ConfInferred, 미해결=drop. self-graph 측정: EdgeExtends 6 / EdgeImplements
 7 emit. §7.0 Go regression diff=0. Commit `6f78427`.
 
 W-B W2 (TS async/await — NodeAwaitPoint + EdgeAwaits) ✅ landed.
-`internal/parse/typescript/async.go` (~180 LOC) + 5 fixture +
+`internal/graph/parse/typescript/async.go` (~180 LOC) + 5 fixture +
 `async_test.go` 3 test (FixtureMatrix / SchemaInvariants / TopLevelDropped).
 `declarations.go::runQuery` 가 NodeFunction/NodeMethod 의 name capture
 parent chain 을 거슬러 `async` 키워드 검출 → SubKind="async" 부여.
@@ -411,7 +411,7 @@ self-graph (CKG 본 레포 TS subset, 82 files) 빌드 후 KPI 측정:
 밀도: AwaitPoint / async callable = 245 / 166 = 1.48. Heritage edge /
 (Class+Interface) = 13 / 69 = 18.8%. 보조 W series: listens_on 22 /
 http_calls 9 / grpc_calls 7. 상세는
-`docs/design/ts-async-await-and-interface.md` §4.4 LANDED 블록 참조.
+`docs/graph/design/ts-async-await-and-interface.md` §4.4 LANDED 블록 참조.
 go-stablenet TS fixture 빌드는 W5+ 후속으로 보류 (self-graph 측정으로
 schema 1.10 slot 활성화 + pair invariant 검증 만족).
 
@@ -454,35 +454,35 @@ schema 1.10 slot 활성화 + pair invariant 검증 만족).
 - 다른 세션 충돌 회피 + 본 spec 의 결정 격리 목적.
 - 권장 위치:
   - Go lock 전파: `internal/parse/golang/lock_propagation.go` 또는
-    `internal/buildpipe/lock_propagation.go` (score.Compute 직전 진입점)
-  - TS heritage: `internal/parse/typescript/heritage.go` (declarations.go
+    `internal/graph/buildpipe/lock_propagation.go` (score.Compute 직전 진입점)
+  - TS heritage: `internal/graph/parse/typescript/heritage.go` (declarations.go
     분기 추가 + 신규 파일)
-  - TS async: `internal/parse/typescript/async.go`
-  - Sol inheritance: `internal/parse/solidity/inheritance.go`
-  - Sol dispatch: `internal/parse/solidity/dispatch.go`
-  - Sol using For: `internal/parse/solidity/using_for.go`
+  - TS async: `internal/graph/parse/typescript/async.go`
+  - Sol inheritance: `internal/graph/parse/solidity/inheritance.go`
+  - Sol dispatch: `internal/graph/parse/solidity/dispatch.go`
+  - Sol using For: `internal/graph/parse/solidity/using_for.go`
 
 ### 4.3 test fixture 위치
 
 | W | 위치 |
 |---|------|
 | W-A | `internal/parse/golang/testdata/lock_propagation/` (별도, 기존 concurrency/ 와 분리 — Q7 결정) |
-| W-B heritage | `internal/parse/typescript/testdata/heritage/` |
-| W-B async | `internal/parse/typescript/testdata/async/` |
-| W-C inheritance | `internal/parse/solidity/testdata/inheritance/` |
-| W-C dispatch | `internal/parse/solidity/testdata/dispatch/` |
-| W-C using For | `internal/parse/solidity/testdata/using_for/` |
-| W-C W4 (abstract/library) | `internal/parse/solidity/testdata/subkind/` 또는 기존 synthetic 확장 |
+| W-B heritage | `internal/graph/parse/typescript/testdata/heritage` |
+| W-B async | `internal/graph/parse/typescript/testdata/async` |
+| W-C inheritance | `internal/graph/parse/solidity/testdata/inheritance` |
+| W-C dispatch | `internal/graph/parse/solidity/testdata/dispatch` |
+| W-C using For | `internal/graph/parse/solidity/testdata/using_for` |
+| W-C W4 (abstract/library) | `internal/graph/parse/solidity/testdata/subkind` 또는 기존 synthetic 확장 |
 
 ### 4.4 PendingRef 라우팅 (cross-file resolution 필요 시)
 
 새 엣지가 cross-file 인 경우 (W-B heritage, W-C inheritance, W-C dispatch)
 는 Pass 1 에서 `PendingRef` 로 두고 Pass 2 `Resolve` 에서 매핑.
 참고 구현:
-- `internal/parse/golang/resolve.go` — pending → edge resolution 패턴
+- `internal/graph/parse/golang/resolve.go` — pending → edge resolution 패턴
 - `internal/parse/golang/implements.go:EmitImplementsEdges` — typed
   post-pass 패턴
-- `internal/parse/typescript/resolve.go` — TS 측 매핑 위치
+- `internal/graph/parse/typescript/resolve.go` — TS 측 매핑 위치
 
 ### 4.5 confidence 라벨
 
@@ -599,8 +599,8 @@ divergent 2건만 §5 강조 참조 (Go Q1 Stage B 직행, Sol Q9 using For 포�
 ## §8. 참조 (외부 컨텍스트가 필요할 때)
 
 - 직전 핸드오프: `docs/SESSION-HANDOFF-2026-05-10.md`
-- 진행 중 schema 1.9: `docs/design/schema-1.9-spec.md`
-- 진단 baseline: `docs/design/track-c-detector-gap.md` (W-B / W-C 의 일부
+- 진행 중 schema 1.9: `docs/graph/design/schema-1.9-spec.md`
+- 진단 baseline: `docs/graph/design/track-c-detector-gap.md` (W-B / W-C 의 일부
   항목은 여기서 P2 진단으로 시작됨)
 - spec V0.2: `docs/spec-ckg-v0.2.md` (concurrency / interface 정의의 ground
   truth)

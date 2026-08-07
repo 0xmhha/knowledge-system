@@ -8,8 +8,8 @@ specifics lifted out into env vars.
 
 Use this when you need to stand up a *new* dataset (a different repo, a PR
 snapshot, a pruned build scope) and point coding-agent's cks MCP at it. For the
-production go-stablenet dataset, keep using `scripts/build-stablenet-dataset.sh`
-and `scripts/gen-cks-config.sh` at the repo root — this toolkit is the reusable
+production go-stablenet dataset, keep using `projects/stablenet/scripts/build-dataset.sh`
+and `cks mcp gen-config` at the repo root — this toolkit is the reusable
 generalization of those.
 
 ## Contents
@@ -50,7 +50,7 @@ ckg build --src $DATASET/_src --out $DATASET/ckg --lang go
 CKV_OLLAMA_ENDPOINT=http://localhost:11434 \
   ckv build --embedder=ollama --model-name=bge-m3 --src $DATASET/_src --out $DATASET/ckv --lang go
 
-# 6    (only if you used --docs) make those docs retrievable
+# 6    (only if you used --docs) materialize those docs so citations resolve
 # SRC=$DATASET/_src DOCS_DIRS=/abs/corpus:/abs/readme dataset-toolkit/scripts/materialize-domain-into-src.sh
 
 # 7    config + env
@@ -60,4 +60,4 @@ DATASET=$DATASET NAME=myproj dataset-toolkit/scripts/gen-dataset-config.sh
 CODE=$REPO ENV_FILE=$DATASET/cks-myproj.env dataset-toolkit/scripts/run-coding-agent.sh
 ```
 
-See `docs/dataset-pipeline.md` for the full table and the citation-trick rationale.
+See `system/dataset-toolkit/docs/dataset-pipeline.md` for the full table and the citation-trick rationale.

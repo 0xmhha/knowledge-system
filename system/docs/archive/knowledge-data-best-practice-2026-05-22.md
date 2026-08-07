@@ -1,6 +1,6 @@
 # Knowledge Data Best Practice & 권장 기술 스택
 
-> **ARCHIVED 2026-07-19.** Research report; its decisions shipped (`internal/vocab`, Stage-2 RRF, glossary tooling). Kept for provenance.
+> **ARCHIVED 2026-07-19.** Research report; its decisions shipped (`internal/system/vocab`, Stage-2 RRF, glossary tooling). Kept for provenance.
 
 > 작성: 2026-05-22
 > 대상: go-stablenet 코드 이해/수정 지원을 위한 cks/ckg/ckv 통합 평가
@@ -174,7 +174,7 @@ Tier 1 (1주) → 평가 N=30 한국어 query 측정 → 결정:
 | 옵션 | 동작 | 작업 위치 | 비용 | 권장도 |
 |---|---|---|---|---|
 | C1 Shared qname (canonical name) | 동일 베이스 코드에서 같은 symbol에 같은 qname. 양쪽 `commit_hash` 일치 강제 | ckv `Chunk.CKGNodeID` 활용 + cks가 검증 | 작음 | ★★★★★ |
-| C2 Shared manifest (sibling indexes) | ckg manifest와 ckv manifest를 sibling으로 두고 cks가 dual-mount | cks `internal/manifest` 모듈 추가 | 작음 | ★★★★ |
+| C2 Shared manifest (sibling indexes) | ckg manifest와 ckv manifest를 sibling으로 두고 cks가 dual-mount | cks `internal/vector/manifest` 모듈 추가 | 작음 | ★★★★ |
 | C3 Symbol Resolution Service | 별도 mini-service — surface name → canonical qname | cks 신규 모듈 | 중간 | ★★★ |
 | C4 Glossary file (committed) | `docs/CODE_GLOSSARY.yaml` — 도메인 어휘 + canonical mapping. 양쪽이 학습 | go-stablenet repo 또는 cks repo | 작음 | ★★★★★ |
 | C5 Cross-tool query orchestration | cks가 모호 query → ckv vocab expand → expanded keywords로 ckg → fusion | cks core 변경 | 중간 | ★★★★ |
@@ -201,8 +201,8 @@ R-C 권장 조합 적용 시 cks에 필요한 신규 기능:
 
 | # | 모듈 | 위치 | 역할 | 효과 |
 |---|---|---|---|---|
-| D1 | `internal/glossary/` | cks 신규 | .claude/docs → YAML 추출 + loader | T1.B/C 기반 |
-| D2 | `internal/vocab/resolver.go` | cks 신규 | 모호 query → canonical keywords (glossary + fuzzy match) | T1.C |
+| D1 | `internal/vector/glossary` | cks 신규 | .claude/docs → YAML 추출 + loader | T1.B/C 기반 |
+| D2 | `internal/system/vocab/resolver.go` | cks 신규 | 모호 query → canonical keywords (glossary + fuzzy match) | T1.C |
 | D3 | `internal/manifest/dual.go` | cks 신규 | ckg + ckv manifest 정합 검증 (commit_hash 일치) | C2 |
 | D4 | `internal/fusion/rrf.go` | cks 신규 (또는 기존 stage2 확장) | RRF fusion across (ckv vector / ckv-BM25 / ckg-BM25 / ckg-graph) | T1.A 완성 |
 | D5 | `internal/bm25/local.go` | cks 임시 | cks 측 BM25 — 평가 비교용 (사용자 결정 "3-leg BM25"). ckg `pkg/bm25.Scorer` 재사용 | 평가 |
@@ -297,7 +297,7 @@ CLAUDE.md
 
 | 위치 | 임시 BM25 형태 | 측정 대상 |
 |---|---|---|
-| **ckv** | `internal/query/bm25/` 신설 — chunk-aware tokenizer + ckg `pkg/bm25.Scorer` 재사용 | vector vs vector+BM25 (ckv 단독) |
+| **ckv** | `internal/vector/query/bm25` 신설 — chunk-aware tokenizer + ckg `pkg/bm25.Scorer` 재사용 | vector vs vector+BM25 (ckv 단독) |
 | **ckg** | 이미 `pkg/bm25/scorer.go` 존재 (qname+signature+doc) | graph-only vs graph+BM25 |
 | **cks** | `internal/bm25/local.go` 신설 — chunk-level RRF 시 사용 | ckv-BM25 vs cks-BM25 vs ckg-BM25 어디서 효과 큰가 |
 

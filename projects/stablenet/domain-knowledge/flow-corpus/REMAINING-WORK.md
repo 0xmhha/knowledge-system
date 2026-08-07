@@ -56,7 +56,7 @@ A(LLM)도 같은 shape로 내보내게 만들면 비교가 성립한다.
 ### 2.2 RetrievalTrace (cks 리포 — 사용자가 cks에서 처리)
 - 위치: `~/Work/github/code-knowledge-system`, 브랜치 **`feature/retrieval-trace`**, 커밋 2개,
   **아직 push/PR 안 함**.
-- `pkg/contract/retrievaltrace.go` — `RetrievalTrace`/`RetrievalStep`/`RetrievalStepKind`(enum:
+- `pkg/system/contract/retrievaltrace.go` — `RetrievalTrace`/`RetrievalStep`/`RetrievalStepKind`(enum:
   `ckv.recall`, `ckg.bm25`, `ckg.find_symbol`, `ckg.subgraph`, `ckg.impact`) + `IsValid`. `Producer`
   필드로 A(`agent`)/B(`composer`) 구분. `Steps`는 시퀀스라 A의 반복 tool-call도 B의 ckv 라운드도 같은 shape.
 - `Composer.Compose` → 신규 `ComposeTraced(ctx, prompt) (EvidencePack, RetrievalTrace, error)`에
@@ -87,7 +87,7 @@ A(LLM)도 같은 shape로 내보내게 만들면 비교가 성립한다.
 | **A2** | **방식 A의 trace 생성** | planner(LLM)가 호출하는 cks tool-call들을 같은 `RetrievalTrace`(Producer=`agent`)로 기록. **없으면 A vs B 비교 자체가 불가** (임계 경로). | coding-agent 플러그인 |
 | **A3** | **ckg-bench 연결** | 골든셋 30문항으로 M3(A) vs M4(B) 실행, 양쪽 trace 수집, 채점(위치정확도·정답률·hallucination·정보량 + seed품질·step수·라운드·호출수). (임계 경로). | `go-stablenet/.coding-agent/bench/ckg-bench` |
 | **A4** | **`CKGCalls` 정확 계측** | `ckgclient`/`ckvclient`에 호출 카운터 추가 → trace의 비용 지표 완성. *비용 결론* 전 필요. 단 *구조 비교*(seed/step/round)는 그 전에도 가능. | cks |
-| **A5** | (선택) **MCP 표면에 trace 노출** | bench가 in-process가 아니라 **MCP로** 소비할 때만 필요. `get_for_task`가 EvidencePack과 함께 trace 반환. | cks `cmd/cks-mcp` |
+| **A5** | (선택) **MCP 표면에 trace 노출** | bench가 in-process가 아니라 **MCP로** 소비할 때만 필요. `get_for_task`가 EvidencePack과 함께 trace 반환. | cks `cmd/cks` |
 | **A6** | **분석·레포트** | A vs B 우열 + 원 티켓의 4-way(M1 파일원문 / M2 그래프전체 / M3 LLM점진 / M4 자동선별) 비교 분석 산출. | bench |
 
 **Track A 순서 권장**: A1 → (A2 + A3 묶어 "한 프롬프트로 A·B trace 나란히" 최소 실험) → A4(비용) → A6(레포트). A5는 필요 시.

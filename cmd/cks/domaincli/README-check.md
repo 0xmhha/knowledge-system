@@ -1,7 +1,7 @@
 # cks domain check
 
 Runs the script-checkable half of the verification checklist from
-`docs/domain-knowledge/shared/STATUS_LIFECYCLE.md` against one project's
+`system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md` against one project's
 domain-knowledge inventory.
 
 The verification checklist has two halves:

@@ -61,7 +61,7 @@ schema 변경 없는 small wins 먼저:
 
 ### Phase 4 — schema 1.10 bump
 - W-B + W-C 의 schema 1.10 bump 합병 PR (Sol Q8 결정: 합쳐서 1.10)
-- `pkg/types/enums.go` 단일 수정: NodeAwaitPoint + EdgeAwaits + EdgeOverrides 등
+- `pkg/graph/types/enums.go` 단일 수정: NodeAwaitPoint + EdgeAwaits + EdgeOverrides 등
 - `AllNodeTypes()` / `AllEdgeTypes()` 모두 append-only
 - prompt cache 무효화 비용 — 1회 batch 로 최소화
 
@@ -82,11 +82,11 @@ schema 변경 없는 small wins 먼저:
 
 | 파일 | 충돌 가능 작업 |
 |------|---------------|
-| `docs/design/schema-1.9-spec.md` | cross-language interop |
-| `docs/design/hunk-graph.md` | hunk-graph H 시리즈 |
+| `docs/graph/design/schema-1.9-spec.md` | cross-language interop |
+| `docs/graph/design/hunk-graph.md` | hunk-graph H 시리즈 |
 | `docs/SESSION-HANDOFF-2026-05-10.md` | 이전 세션 핸드오프 (frozen) |
 | `docs/NEXT-CANDIDATES-2026-05-10.md` | 이전 후보 (frozen) |
-| `pkg/types/enums.go` | (TS/Sol spec 의 schema bump 시 신중 — 동일 위치 동시 수정 위험) |
+| `pkg/graph/types/enums.go` | (TS/Sol spec 의 schema bump 시 신중 — 동일 위치 동시 수정 위험) |
 
 본 인덱스 + 3개 design doc 은 모두 **신규 파일** — 진행중인 작업과 직교.
 
@@ -123,7 +123,7 @@ cat docs/design/<선택한-spec>.md
 
 ## §6. 참조
 
-- 기반 진단: `docs/design/track-c-detector-gap.md`
+- 기반 진단: `docs/graph/design/track-c-detector-gap.md`
 - 이전 핸드오프: `docs/SESSION-HANDOFF-2026-05-10.md`
-- schema 정의: `pkg/types/enums.go`
+- schema 정의: `pkg/graph/types/enums.go`
 - Spec V0.2: `docs/spec-ckg-v0.2.md`

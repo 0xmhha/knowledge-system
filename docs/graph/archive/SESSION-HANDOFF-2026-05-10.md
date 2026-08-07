@@ -58,7 +58,7 @@ make build                                       # bin/ckg 갱신 (viewer 변경
 | `1d175a8` | feat(cmd): bench-server — /api/* p50/p95/p99 baseline harness | `ckg bench-server` 신규 (in-process httptest, 12 probes). `docs/PERF-BASELINE-2026-05-10.md` 첫 측정 결과 (manifest 235ms hottest slow / search 0.6ms hottest fast / tickets p99 5.7s = cold start). 4 unit + 라이브 |
 | `1dbe2e0` | chore(evidence,viewer): cleanup x3 — null hits / mode coverage / pill tooltip | (1) BuildPack nil → `[]Hit{}` (외부 client JSON 호환) (2) AND+SeedQname / issue-only ignores mode 단위 (3) MCP evidence_for_intent in-process mode propagation 검증 (4) pill `title` tooltip. 5 tests / 라이브 OK |
 | `51cd1c7` | feat(evidence): top_files hint per sample commit in TicketIndex | `CommitInfo.TopFiles` (omitempty) + `topFilesForCommit` count-desc/name-asc top-3 directory rollup. viewer ticket panel pill 렌더 + (root) 폴백. HTTP + Playwright 라이브 검증, GH-66 → ["crypto/secp256k1/...", "consensus/qbft/core", ...] |
-| `f1e2609` | docs: verification checklist + viewer hydration pattern guide | `docs/VERIFICATION-CHECKLIST.md` (4축 surface / 조합 매트릭스 / negative path / PR-ready checklist) + `docs/HYDRATION-PATTERN.md` (React #418 anti-pattern + `usePersistedState` 사용법 + 1-frame flash 트레이드오프) |
+| `f1e2609` | docs: verification checklist + viewer hydration pattern guide | `docs/graph/VERIFICATION-CHECKLIST.md` (4축 surface / 조합 매트릭스 / negative path / PR-ready checklist) + `docs/graph/HYDRATION-PATTERN.md` (React #418 anti-pattern + `usePersistedState` 사용법 + 1-frame flash 트레이드오프) |
 | `85af082` | test(evidence,server): close mode=and verification gaps | AND+IssueID 조합 단위 + HTTP `/api/evidence?mode=and\|invalid\|empty` 3종 wiring 테스트. 라이브 재검증 HTTP AND=0 / OR=5 / invalid=400 |
 | `2982864` | feat(evidence): mode=and toggle for precise term-match queries | `Options.Mode` ("or" default / "and") + BM25 후 `containsAll` 후처리. /api/evidence + MCP + CLI `--mode` 모두 wired. 단위 테스트 2 + 라이브 OR/AND 차이 확인 |
 | `5df3ed8` | test(mcp): lock §11.3 boundary across all 8 MCP tools | 12 wrapper 메서드 AMBIGUOUS leak guard (table-driven) + Run() 8 register* 정적 scan. fakeStore 10 method 확장. negative case 검증 |
@@ -198,11 +198,11 @@ H4/H3 cross-panel loop:
 | 순위 | 항목 | 비고 |
 |------|------|------|
 | ✅ | ~~#4 EvidenceView 컴포넌트 분리~~ | 완료 (`da4af1d`) — diff coloring 동봉 |
-| ✅ | ~~#3 eval harness H3+H4 시나리오~~ | 완료 (`72ea194`) — 위치는 `internal/buildpipe/` + `internal/temporal/`, eval/은 LLM benchmark 전용이라 schema 불일치 |
+| ✅ | ~~#3 eval harness H3+H4 시나리오~~ | 완료 (`72ea194`) — 위치는 `internal/graph/buildpipe` + `internal/graph/temporal`, eval/은 LLM benchmark 전용이라 schema 불일치 |
 | ✅ | ~~#6 `ckg evidence` CLI subcommand~~ | 완료 (`5f2cf21`) — 9 시나리오 라이브 검증 |
 | ✅ | ~~#5 MCP 8 tools 통합 테스트~~ | 완료 (`5df3ed8`) — 12-method wrapper boundary + 8-tool register static scan |
 | ✅ | ~~#10 OR/AND mode~~ | 완료 (`2982864` + `85af082`) — Options.Mode + BM25 post-filter, AND+IssueID 조합까지 lock-in |
-| ✅ | ~~검증 체크리스트 + hydration 패턴 docs~~ | 완료 (`f1e2609`) — `docs/VERIFICATION-CHECKLIST.md` + `docs/HYDRATION-PATTERN.md` |
+| ✅ | ~~검증 체크리스트 + hydration 패턴 docs~~ | 완료 (`f1e2609`) — `docs/graph/VERIFICATION-CHECKLIST.md` + `docs/graph/HYDRATION-PATTERN.md` |
 | ✅ | ~~#9 sample_commits top-files 메타~~ | 완료 (`51cd1c7`) — TopFiles + viewer pill, VERIFICATION-CHECKLIST §1 첫 적용 사례 |
 | ✅ | ~~그룹 A cleanup × 3~~ | 완료 (`1dbe2e0`) — hits=null cleanup + mode 남은 3 검증 + pill tooltip 모두 한 commit |
 | ✅ | ~~#7 성능 baseline~~ | 완료 (`1d175a8`) — `ckg bench-server` + `docs/PERF-BASELINE-2026-05-10.md` 첫 측정 |
@@ -251,15 +251,15 @@ cd web/viewer-next && npx tsc --noEmit
 
 - 직전 핸드오프: `docs/SESSION-HANDOFF-2026-05-08.md` (직전 세션 시작점)
 - 다음 후보 상세: `docs/NEXT-CANDIDATES-2026-05-10.md`
-- 설계 문서: `docs/design/hunk-graph.md` (H1-H4, §11 결정 원본)
-- 스키마: `docs/SCHEMA.md` (schema 1.8 정의)
+- 설계 문서: `docs/graph/design/hunk-graph.md` (H1-H4, §11 결정 원본)
+- 스키마: `docs/graph/SCHEMA.md` (schema 1.8 정의)
 - 새 hydration 패턴: `web/viewer-next/src/lib/usePersistedState.ts` (`usePersistedBool/Number/JSON`)
-- H3+H4 회귀 안전망: `internal/buildpipe/h3h4_integration_test.go` + `internal/temporal/issueid_test.go::TestExtractIssueIDs_CorpusPrecisionRecall`
-- evidence CLI: `cmd/ckg/evidence.go` (사용 예: `ckg evidence --graph /tmp/ckg-h4 --issue GH-66 -k 5 --budget 1000000 --format text`, `--mode and` 정밀 검색)
+- H3+H4 회귀 안전망: `internal/graph/buildpipe/h3h4_integration_test.go` + `internal/temporal/issueid_test.go::TestExtractIssueIDs_CorpusPrecisionRecall`
+- evidence CLI: `cmd/graph/evidence.go` (사용 예: `ckg evidence --graph /tmp/ckg-h4 --issue GH-66 -k 5 --budget 1000000 --format text`, `--mode and` 정밀 검색)
 - MCP boundary 회귀 안전망: `internal/mcp/h3_filter_test.go::TestLLMSafeStoreReader_AllReadMethods_DropAmbiguousMeta` + `internal/mcp/server_test.go::TestRunRegistersAllEightTools`
-- 검증 체크리스트: `docs/VERIFICATION-CHECKLIST.md` (PR-ready 워크플로 + 5종 누락 패턴 카탈로그)
-- viewer hydration 패턴: `docs/HYDRATION-PATTERN.md` (React #418 anti-pattern + 8 마이그레이션 사례)
-- 성능 baseline: `cmd/ckg/bench_server.go` + `cmd/ckg/bench_mcp.go` + `cmd/ckg/bench_mcp_stdio.go` + `docs/PERF-BASELINE-2026-05-10.md` (사용 예: `ckg bench-server` / `ckg bench-mcp` / `ckg bench-mcp-stdio --graph /tmp/ckg-h4 --iterations 50`)
+- 검증 체크리스트: `docs/graph/VERIFICATION-CHECKLIST.md` (PR-ready 워크플로 + 5종 누락 패턴 카탈로그)
+- viewer hydration 패턴: `docs/graph/HYDRATION-PATTERN.md` (React #418 anti-pattern + 8 마이그레이션 사례)
+- 성능 baseline: `cmd/graph/bench_server.go` + `cmd/graph/bench_mcp.go` + `cmd/graph/bench_mcp_stdio.go` + `docs/PERF-BASELINE-2026-05-10.md` (사용 예: `ckg bench-server` / `ckg bench-mcp` / `ckg bench-mcp-stdio --graph /tmp/ckg-h4 --iterations 50`)
 - MCP in-process bench: `internal/mcp/bench.go::NewBenchHandlers` (8 tools handler map exposed for cmd/ckg)
 
 ---
@@ -276,7 +276,7 @@ cd web/viewer-next && npx tsc --noEmit
 2. **Configuration / Build-system edges** — `go.mod`, `package.json`, `*.proto`, helm charts 등. 정적 그래프 dimension.
 3. **Runtime / Telemetry edges** — observed call graph from production traces. 현재는 static analysis only.
 
-**시작 권장**: `docs/design/schema-1.9-spec.md` 신규 → 사용자와 디자인 결정 (`§11` 8 결정처럼) 합의 → H 시리즈 follow-up plan.
+**시작 권장**: `docs/graph/design/schema-1.9-spec.md` 신규 → 사용자와 디자인 결정 (`§11` 8 결정처럼) 합의 → H 시리즈 follow-up plan.
 
 ### 후보 B — small cleanup (별도 작업으로 1-2시간)
 이번 세션 미해결 잔여 항목:
@@ -301,7 +301,7 @@ cd web/viewer-next && npx tsc --noEmit
 ## §11. 학습된 워크플로 패턴 (이번 세션 keytakeaways)
 
 ### 11.1 VERIFICATION-CHECKLIST 적용
-새 feature commit 전 4축 surface fan-out (Options/HTTP/MCP/CLI) + 조합 매트릭스 + negative path 점검. 첫 적용 사례 `51cd1c7` (top_files), 이후 모든 perf commit에 적용됨. `docs/VERIFICATION-CHECKLIST.md` 참조.
+새 feature commit 전 4축 surface fan-out (Options/HTTP/MCP/CLI) + 조합 매트릭스 + negative path 점검. 첫 적용 사례 `51cd1c7` (top_files), 이후 모든 perf commit에 적용됨. `docs/graph/VERIFICATION-CHECKLIST.md` 참조.
 
 ### 11.2 Perf trace 패턴
 1. **측정** (`bench-*` 명령으로 baseline 기록)

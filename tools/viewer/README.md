@@ -116,7 +116,7 @@ cd tools/viewer && npm run dev   # :3001
 | `src/store/store.ts` | zustand 전역 상태 (visibleIds, focusDistance, anchor, history…) |
 | `src/lib/api.ts` | `IAPI`, `API`, `StaticAPI`, `detectMode` |
 | `src/lib/{edges,encoding,depth,trace}.ts` | 색·엣지 그룹·BFS·trace 유틸 |
-| `out/` (`.gitignore`) | `npm run build` 결과. `make viewer`가 `internal/server/web_assets/`로 복사 |
+| `out/` (`.gitignore`) | `npm run build` 결과. `make viewer`가 `internal/system/viewer/web_assets`로 복사 |
 
 ---
 

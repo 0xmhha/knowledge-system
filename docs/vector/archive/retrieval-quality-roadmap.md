@@ -86,7 +86,7 @@ CKV의 retrieval 품질을 향상시킬 5가지 패턴이 산업계에 존재한
 
 ```
 [prefix] 이 chunk는 `package server`의 `Server` struct의 `Listen` method이다.
-        같은 파일에 `New`, `Close`가 있고, `internal/net` 패키지를 import한다.
+        같은 파일에 `New`, `Close`가 있고, `internal/system/net` 패키지를 import한다.
 
 func (s *Server) Listen(addr string) error {
   ...
@@ -459,7 +459,7 @@ Phase B/C/D 적용 + throughput 0.2~0.4 c/s
 | Phase 0a (fixture N=34 + markdown corpus) — mock | 2026-05-19 | queries.yaml N=34 | 0.294 | 0.735 | 0.485 | instant | — | mock embedder; markdown chunks 4개가 noise로 작용 |
 | **Phase 0a (fixture N=34 + markdown corpus) — bgeonnx** | **2026-05-19** | **queries.yaml N=34** | **0.529** | **0.971** | **0.725** | **~1.0 c/s** | ✅ baseline | bge-large-en-v1.5 + **CPU-only** (CoreML compile I/O error → CKV_DISABLE_COREML=1). 1 miss = q5 "retrieve value by key" → top=handler.ts (cache.go 못 찾음). ceiling 해소 — recall@1·MRR 측정 공간 확보 |
 | Phase 0b (batch+CoreML 정상화) | TBD | queries.yaml N=34 | 0.529 (동일) | 0.971 (동일) | 0.725 (동일) | TBD (50× 기대) | — | CoreML EP I/O error 원인 분석 + 해결 후 throughput 재측정 |
-| Phase A (sliding split) — impl only | 2026-05-21 | queries.yaml N=50 | 0.360 (동일) | 1.000 | 0.494 (동일) | instant | — | `splitLongSpan` (`internal/chunk/chunk.go`), threshold = `MaxInputTokens * charsPerToken`. testdata/sample 함수가 모두 짧아 split 미발동 → metrics 동일. bge-large 실측 + 큰 함수 corpus 필요. commit `6dc7225`. |
+| Phase A (sliding split) — impl only | 2026-05-21 | queries.yaml N=50 | 0.360 (동일) | 1.000 | 0.494 (동일) | instant | — | `splitLongSpan` (`internal/vector/chunk/chunk.go`), threshold = `MaxInputTokens * charsPerToken`. testdata/sample 함수가 모두 짧아 split 미발동 → metrics 동일. bge-large 실측 + 큰 함수 corpus 필요. commit `6dc7225`. |
 | Phase B | TBD | 동일 | TBD | TBD | TBD | TBD | TBD | multi-granularity |
 | Phase C | TBD | + why-queries.yaml | TBD | TBD | TBD | TBD | TBD | PR/commit corpus |
 | Phase D.1 (rule-based prefix) — mock | 2026-05-21 | queries.yaml N=50 | 0.360 | 1.000 | 0.494 | instant | — | mock baseline N=50 r@1=0.300 → 0.360 (+0.060), r@5 0.680 → 0.740 (+0.060), MRR 0.4403 → 0.4937 (+0.053). prefix format: "language: X. file: Y. symbol: Z (Kind)." 한 줄. impl commit `1a5289d`. |
@@ -474,7 +474,7 @@ Phase B/C/D 적용 + throughput 0.2~0.4 c/s
 **Fact** (None — 추론 아닌 사실, 출처 명시):
 - Anthropic Contextual Retrieval 공식 측정 (2024-09-19, 5 dataset 248 query, 코드 retrieval 포함): vector-only 대비 contextual embeddings **−35% failure**, + contextual BM25 **−49%**, + Cohere rerank-3 **−67%**. [출처](https://www.anthropic.com/news/contextual-retrieval)
 - CKV 2026-05-18 baseline: N=10, recall@5=1.000 (ceiling), recall@1=0.600, MRR=0.770, citation@1=1.000, build 1.6 chunks/s, query p95 43ms
-- CKV chunking은 단층 (function-level only) + file_header 50줄. multi-granularity / contextual prefix 모두 미적용. (`internal/chunk/chunk.go`)
+- CKV chunking은 단층 (function-level only) + file_header 50줄. multi-granularity / contextual prefix 모두 미적용. (`internal/vector/chunk/chunk.go`)
 - `ckv reindex` (incremental) 는 S2 이관 결정 (`plan §13`, `featurelist §0.1`)
 
 **Your Opinion**:
@@ -503,7 +503,7 @@ Phase B/C/D 적용 + throughput 0.2~0.4 c/s
 | # | 작업 | 차원 | 출처 | 의존성 | 예상 LOC | 측정 메트릭 |
 |---|---|---|---|---|---|---|
 | **1** | **fixture 50+ + why-queries 확장** | 측정 인프라 | Roadmap Phase 0a (D1-FU-7) | 없음 | ~100 (YAML + 일부 helper) | (모든 측정의 baseline) |
-| **2** | **PR #70 회귀 테스트 모듈** (`internal/eval/prregress/`) | 평가 (eval) | Challenge 3, Appendix C | #1 후 (`testdata/prs.yaml` 신설) | ~800 | plan↔diff LLM-judge primary + F1 secondary |
+| **2** | **PR #70 회귀 테스트 모듈** (`internal/vector/eval/prregress`) | 평가 (eval) | Challenge 3, Appendix C | #1 후 (`testdata/prs.yaml` 신설) | ~800 | plan↔diff LLM-judge primary + F1 secondary |
 | **3** | **docs corpus 확장** (`*.md`/ADR 인덱싱) | corpus (코드 외 결정사항) | Challenge 2, Appendix B | 없음 (병렬 가능) | ~150 | recall@k on doc-query fixture |
 | **4** | **Phase C — PR/commit history corpus** | corpus (코드의 why) | Roadmap §8 Phase C | #2의 git/gh fetch 모듈 재사용 | ~400 (재사용 후) | LLM-judge on why-queries.yaml |
 | **5** | **D1-FU-8 batch + CoreML EP** | 인프라 (throughput) | Roadmap §8 Phase 0b | 없음. #6~#9 적용 전 권장 | ~250 | build chunks/s |
@@ -543,8 +543,8 @@ Group δ (인프라 + retrieval 마무리):
 
 **Group α 병렬 시작** 권고 (모두 의존성 없음 + 다른 작업의 전제조건):
 - **#1 fixture 확장** — YAML 작성 + git log fixture 일부. 1-2일.
-- **#3 docs corpus 확장** — `internal/parse/markdown/` 신설 + walker 패턴 추가. 1일.
-- **#5 D1-FU-8 throughput** — `internal/embed/bgeonnx/` batching + CoreML EP. 2-3일.
+- **#3 docs corpus 확장** — `internal/vector/parse/markdown` 신설 + walker 패턴 추가. 1일.
+- **#5 D1-FU-8 throughput** — `internal/vector/embed/bgeonnx` batching + CoreML EP. 2-3일.
 
 진행 시점은 사용자 결정. 각 작업 완료 시 §10 측정 결과 기록 표에 row 추가.
 
@@ -574,14 +574,14 @@ Group δ (인프라 + retrieval 마무리):
 |---|---|---|---|---|---|
 | 1 | ✅ | 2026-05-19 | 2026-05-19 | Phase 0a N=34 row | commit `f1a8ac9` (fixture) + `ad804be` (measurement). N=10 → N=34 + why-queries.yaml 12개 |
 | 2 | 🔄 | — | — | — | **다른 세션 진행 중** (사용자 명시 2026-05-19). 본 세션 dispatch 금지 |
-| 3 | ✅ | 2026-05-19 | 2026-05-19 | Phase 0a N=34 row (markdown corpus 포함) | commit `4a5dc3a`. `internal/parse/markdown/` 신설 + heading-level split |
+| 3 | ✅ | 2026-05-19 | 2026-05-19 | Phase 0a N=34 row (markdown corpus 포함) | commit `4a5dc3a`. `internal/vector/parse/markdown` 신설 + heading-level split |
 | 4 | ⏳ | — | — | — | #2 후 (git/gh fetch 모듈 재사용) |
 | 5 | ⚠️ 부분 | 사용자 별도 세션 | 2026-05-19 부분 | Phase 0a N=34 throughput 1.0 c/s | main `555b0c4`로 CoreML 코드 적용 완료. but N=34 측정 시 **CoreML compile I/O error** → CKV_DISABLE_COREML=1 fallback. Phase 0b 잔여 = backlog **A1** |
-| 6 | ✅ | 2026-05-21 | 2026-05-21 | Phase D.1 row | rule-based prefix (`internal/chunk/prefix.go`) — mock N=50 r@1 +0.060, MRR +0.053. opt-out: `CKV_DISABLE_CONTEXTUAL_PREFIX=1`. |
+| 6 | ✅ | 2026-05-21 | 2026-05-21 | Phase D.1 row | rule-based prefix (`internal/vector/chunk/prefix.go`) — mock N=50 r@1 +0.060, MRR +0.053. opt-out: `CKV_DISABLE_CONTEXTUAL_PREFIX=1`. |
 | 7 | ⏳ | — | — | — | A1 (CoreML 정상화) 후 (throughput buffer 확보) |
 | 8 | 📝 | — | — | — | **S1.5 승격 결정만 완료** (commit `c0689d7`). 코드 미진행. backlog **C1** |
 | 9 | ⏳ | — | — | — | #8 후 |
-| 10 | ✅ impl | 2026-05-21 | 2026-05-21 | Phase A row | `splitLongSpan` (`internal/chunk/chunk.go`). testdata/sample 짧은 함수 → split 미발동, metrics 동일. bge-large + 큰 함수 corpus 실측 별도 세션 필요. backlog **B1**. |
+| 10 | ✅ impl | 2026-05-21 | 2026-05-21 | Phase A row | `splitLongSpan` (`internal/vector/chunk/chunk.go`). testdata/sample 짧은 함수 → split 미발동, metrics 동일. bge-large + 큰 함수 corpus 실측 별도 세션 필요. backlog **B1**. |
 
 > 범례: ⏳ 대기 · 🔄 진행 중 · 📌 다음 작업 예정 · ✅ 완료 · ⚠️ 부분 · 📝 결정만 · ⛔ 차단
 

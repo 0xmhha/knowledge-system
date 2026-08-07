@@ -32,7 +32,7 @@ PR #1~#6까지만 다뤄, 그 이후 머지된 #7~#15와 **CKG/CKV/CKS/coding-ag
 | 빌드 | `make build/test/lint/fmt` (직접 go 명령 지양) |
 | 자매 repo | code-knowledge-graph(CKG), code-knowledge-system(CKS), coding-agent |
 
-`make test`의 `internal/embed/coreml` 1건 실패는 **환경적 baseline**(libtokenizers 부재).
+`make test`의 `internal/vector/embed/coreml` 1건 실패는 **환경적 baseline**(libtokenizers 부재).
 CI는 명시적으로 제외(`abb5ae2`). 코드 회귀 아님. (개선 후보: Makefile도 CI처럼 coreml 제외.)
 
 ---
@@ -58,17 +58,17 @@ CI는 명시적으로 제외(`abb5ae2`). 코드 회귀 아님. (개선 후보: M
 
 ## 2. 현재 CKV 노출 면 (코드 검증, 2026-06-29)
 
-- **MCP 도구 15개** (`pkg/mcp/server.go`): semantic_search / keyword_search /
+- **MCP 도구 15개** (`pkg/vector/mcp/server.go`): semantic_search / keyword_search /
   vector_search / narrow_candidates / expand_in_file / find_invariants /
   get_conventions / explain_match / embed / rerank / related_changes / health /
   get_freshness / warmup / index. 모든 응답 `schema_version` 포함.
-- **청크 종류 9** (`pkg/types/chunk.go`): symbol, function_split, file_header, doc,
+- **청크 종류 9** (`pkg/vector/types/chunk.go`): symbol, function_split, file_header, doc,
   pr_background, pr_solution, commit_message, invariant, convention.
 - **SQLite 마이그레이션 4** (`000_baseline`~`003_add_convention_stats`).
 - **CLI**: build / query / reindex / eval / mcp / migrate / model(fetch·list·convert) /
   freshness / glossary.
 - **파서 언어**: go / solidity / typescript / javascript / markdown (**proto 미파싱**).
-- **임베더**: mock / ollama(`pkg/embed/ollama`) / bgeonnx / coreml.
+- **임베더**: mock / ollama(`pkg/vector/embed/ollama`) / bgeonnx / coreml.
 
 ---
 
@@ -142,7 +142,7 @@ ckv build --src <go-stablenet> --out <data> \
 - allowlist: `knowledge-data/pr-77/gstable-files.json`
 - 사람 도메인 문서: `test/analysis-test-3/.claude/docs/*.md`
 - flow corpus: `go-stablenet/.claude.backup.20260625_180533/docs/corpus/corpus.jsonl` (+SCHEMA.md)
-- glossary 생성기: `code-knowledge-system/cmd/cks-glossary-gen` (**CKS 소유** — CKV `internal/glossary`는 미배선 standalone)
+- glossary 생성기: `code-knowledge-system/cmd/cks-glossary-gen` (**CKS 소유** — CKV `internal/vector/glossary`는 미배선 standalone)
 
 **조치**: 이 레시피를 **flow-ingest Phase E(build-profiles.yaml + scripts/build-knowledge.sh)** 로
 코드화해 "한 스크립트 = 모든 레이어"를 보장(= 사용자가 요구한 일관된 알고리즘 규칙). glossary
@@ -189,7 +189,7 @@ ckv build --src <go-stablenet> --out <data> \
   sha256 `16ee6fb7…`)에 ckgalign 정렬(독자 재빌드 안 함). **canonical_id 매칭률 = 13,472/14,273
   심볼청크 = 94.4%** (≥90% 충족). ckg_node_id(file:line) 정렬률 99.3%. proto(CKV 미파싱)·
   promoted(canonical 없음) 제외. 갭 ~6% = 패키지레벨 var/const 블록(CKV가 ckg 노드와 다르게 청크).
-  통합 fixture CKV 半 = `internal/ckgalign/integration_test.go`(verbatim 상속 + `@<line>` caveat).
+  통합 fixture CKV 半 = `internal/vector/ckgalign/integration_test.go`(verbatim 상속 + `@<line>` caveat).
 - [x] **reindex-A 산출 완료** (2026-06-30) — 새 ckg 정본 그래프 `knowledge-data/pr-77-2`
   (schema 1.23, test포함 go+sol 필터)에 정렬, **bge-m3@1024** 빌드(~20분). 산출물
   `knowledge-data/pr-77-2/ckv/vector.db` (sha256 `1c3d9073…`, 15,575청크). ckg와 동일
@@ -218,7 +218,7 @@ ckv build --src <go-stablenet> --out <data> \
   (test/analysis-test-3)에서 신규 빌드(000–004, 19,605청크) + pr-77 인덱스 003→004
   업그레이드(백업·15,575행 보존·멱등) 양방향 검증.
 - [x] **Phase B 완료** (2026-06-29, commits `72ef76f` 파서, `db6789a` 빌드통합) —
-  `internal/flowcorpus` 파서(corpus.jsonl → flow_step/flow_spine/curated-invariant,
+  `internal/vector/flowcorpus` 파서(corpus.jsonl → flow_step/flow_spine/curated-invariant,
   edge는 graph-only skip, 형식이탈 warn+skip) + `--flow-corpus` 플래그 + store 컬럼
   배선(flow_meta/enforced_at/provenance, insert+양 scan 경로). step은 실코드 file:line,
   flow/invariant은 corpus.jsonl cite(corpus dir를 manifest DocsRoots에 추가 → citation 해소).
@@ -226,7 +226,7 @@ ckv build --src <go-stablenet> --out <data> \
   메타 round-trip·citation 해소 확인. **의미 검색 품질은 bge-m3 실모델 필요(mock은 구조만).**
 - [x] **Phase D CKV-side 완료** (2026-06-30, commit `5c35aed`) — flow-aware 4도구
   (get_flow/expand_flow/find_branches/get_invariant_enforcement): store 조회 +
-  in-memory flow 모델(call-order topo, cycle-safe) + `pkg/ckv` 재노출(in-process cks 소비용) +
+  in-memory flow 모델(call-order topo, cycle-safe) + `pkg/vector/ckv` 재노출(in-process cks 소비용) +
   `cks.context.*` MCP 도구(15→**19**). 계약 = 협의 doc §9.1. 실 pr-77-2 인덱스 라이브검증
   (get_flow ep-cli-init 5steps@chaincmd.go:191, INV-CONSENSUS-01 4사이트, 한국어 증상→
   commit.go:96 분기). **남은 것 = CKS 표면 노출**(§9.2 프롬프트 전달됨, 결정 5/D-4).
@@ -272,16 +272,16 @@ git pull && make build && make test   # coreml 1건 FAIL은 정상
 
 ## 7. 핵심 파일 인덱스
 
-- `pkg/types/chunk.go` — Chunk + 메타(`ckg_node_id`, `canonical_id`)
-- `pkg/types/embed.go` — EmbeddingIdentity + Checksum (#12)
-- `pkg/embed/ollama/adapter.go` — in-process ollama, MaxInputTokens 레지스트리 도출(#13)
-- `internal/ckgalign/aligner.go` — canonical_id 상속(#9). **게이트 ≥1.19 수정 대상**
-- `internal/build/builder.go` / `manifest/manifest.go` — manifest 커밋 마커(#14)
-- `internal/store/sqlitevec/` — store + migrations 000~003
-- `pkg/mcp/server.go` — MCP 15도구
-- `pkg/ckv/ckv.go` — public Go API (Freshness 포함)
-- `docs/coordination-prompts-2026-06-29.md` — 4세션 협의 SoT
-- `docs/archive/embedding-model-recommendation-2026-06-22.md` — Qwen3 추천
+- `pkg/vector/types/chunk.go` — Chunk + 메타(`ckg_node_id`, `canonical_id`)
+- `pkg/vector/types/embed.go` — EmbeddingIdentity + Checksum (#12)
+- `pkg/vector/embed/ollama/adapter.go` — in-process ollama, MaxInputTokens 레지스트리 도출(#13)
+- `internal/vector/ckgalign/aligner.go` — canonical_id 상속(#9). **게이트 ≥1.19 수정 대상**
+- `internal/vector/build/builder.go` / `manifest/manifest.go` — manifest 커밋 마커(#14)
+- `internal/vector/store/sqlitevec` — store + migrations 000~003
+- `pkg/vector/mcp/server.go` — MCP 15도구
+- `pkg/vector/ckv/ckv.go` — public Go API (Freshness 포함)
+- `docs/vector/coordination-prompts-2026-06-29.md` — 4세션 협의 SoT
+- `docs/vector/archive/embedding-model-recommendation-2026-06-22.md` — Qwen3 추천
 
 ---
 

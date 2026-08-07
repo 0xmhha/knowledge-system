@@ -14,7 +14,7 @@ CKG는 stablenet-ai-agent의 **Coding Agent System** 구축에서 *Stage S0의 �
 | **CKS** | `/Users/.../tools/code-knowledge-system` | Layer 2~4 (Working Memory + Orchestrator + Query API) | (미생성, S1에서 init) |
 | **Coding Agent** | `stablenet-ai-agent/` | Orchestrator, `/command`, PR 생성 | (S2에서 시작) |
 
-**핵심 원칙 (2026-05-11 결정)**: CKS·CKV는 CKG 코드를 *옮기지 않고 go.mod import로 사용*. CKG는 stable public API(`pkg/*`)를 책임. S1 진입 차단 요소는 `pkg/mcphandlers/` 신설 (T-14).
+**핵심 원칙 (2026-05-11 결정)**: CKS·CKV는 CKG 코드를 *옮기지 않고 go.mod import로 사용*. CKG는 stable public API(`pkg/*`)를 책임. S1 진입 차단 요소는 `pkg/graph/mcphandlers` 신설 (T-14).
 
 ## 디렉토리 구조
 
@@ -118,5 +118,5 @@ YAML(`tasks/*.yaml`)의 `corpus_path: ${STABLENET_SRC}/...`는 CKG eval runner�
 - **`HANDOFF.md`** — 미해결 결함 10건의 task별 상세 (acceptance, 코드 위치, 권장 접근)
 - `VERIFICATION_REPORT.md` — 본 검증의 전체 결과·발견·결론
 - `RESPONSE_VALIDATION_REPORT.md` — MCP 응답 정확도 + LLM 코드 이해도 + 30-question 인프라 gap 분석
-- `docs/EVAL.md` (레포 상위) — CKG eval 인프라 일반 문서
+- `docs/graph/EVAL.md` (레포 상위) — CKG eval 인프라 일반 문서
 - `internal/eval/baseline.go` — α/β/γ/δ 시스템 프롬프트 + AllowedTools

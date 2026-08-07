@@ -58,7 +58,7 @@ When the CoreML EP is enabled (`CKV_DISABLE_COREML != "1"`):
    `~/.cache/ckv/coreml/<model>`. Lets ops separate cache lifetime
    from index lifetime.
 
-The defaults live in `internal/embed/bgeonnx/session_impl.go` (env
+The defaults live in `internal/vector/embed/bgeonnx/session_impl.go` (env
 var wiring) and `tokenizer_impl.go` (`CKV_STATIC_SHAPES` honored when
 padding inputs).
 
@@ -93,7 +93,7 @@ based on measured throughput, not on "ANE = faster" intuition.
 
 ## Related
 
-- A1 in `docs/archive/backlog.md` (closed 2026-05-20) tracked the
+- A1 in `docs/vector/archive/backlog.md` (closed 2026-05-20) tracked the
   resolution.
 - [ADR-002](002-bge-large-pivot.md) — the embedder choice this ADR
   builds on. Different embedder shape (Qwen2 last-token-pooling)

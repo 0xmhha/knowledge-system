@@ -25,7 +25,7 @@
 
 4. **다음 세션 시나리오**: ckv prregress 작업자 / ckg 작업자 / cks 통합 작업자 *3 갈래로 병렬 진행 가능*. 각자 자기 repo 의 문서 §0~§3 정독 후 Day 1 작업 시작.
 
-5. **핵심 발견**: ckv `internal/eval/prregress/` 가 *사용자 명세 multi-stage evaluation 의 80% 이미 구현* (1710 LOC, base_sha checkout → plan generation → diff 비교). 신규 작업이라고 생각했던 게 *측정 분해 + fixture 확장* 으로 좁혀짐.
+5. **핵심 발견**: ckv `internal/vector/eval/prregress` 가 *사용자 명세 multi-stage evaluation 의 80% 이미 구현* (1710 LOC, base_sha checkout → plan generation → diff 비교). 신규 작업이라고 생각했던 게 *측정 분해 + fixture 확장* 으로 좁혀짐.
 
 ---
 
@@ -37,7 +37,7 @@
 | 2 | ADR-003 ↔ R4 (BM25 in MCP flow) 충돌 발견 | D1 (BM25 위치) 결정 요청 |
 | 3 | 사용자 "ckv/ckg/cks 모두에 BM25 임시 + best practice 알고싶다" | R-A/B/C/D 보고서 작성 → cks repo |
 | 4 | 사용자: vocabulary bridge 본질 명세 + 점진 학습 + ADR 결재는 본인 + 장애 재현 dev 브랜치 활용 | ckv §10 추가 작성 |
-| 5 | 발견: ckv `internal/eval/prregress/` 1710 LOC, 이미 multi-stage 패턴 구현. backlog 의 "다른 세션 진행 중" 마킹이 *해당 세션 산출물* 이라고 판명 | fixture 12 개 자동 매핑 명세 (PR 단위) |
+| 5 | 발견: ckv `internal/vector/eval/prregress` 1710 LOC, 이미 multi-stage 패턴 구현. backlog 의 "다른 세션 진행 중" 마킹이 *해당 세션 산출물* 이라고 판명 | fixture 12 개 자동 매핑 명세 (PR 단위) |
 | 6 | 사용자: ckv 만이 아니라 ckg 도 동일 수준 정리 요청 | ckg `eval/stablenet/CKS-INTEGRATION-2026-05-23.md` 작성 |
 | 7 | 사용자: "여기까지 정리작업을 모두 문서로 정리" | 본 문서 (마스터 핸드오프) |
 
@@ -77,9 +77,9 @@
 이전 메모 (2026-05-12): "MCP stub, fake adapter 로 병행".
 실제 (2026-05-22 검증): MCP 4 tool 완전 구현, `pkg/ckv.Engine` in-process API, bge-large-en-v1.5 + ONNX, sliding split + contextual prefix Phase D.1, citation stale check, `ckv reindex` S1.5.
 
-→ **fake → real 전환은 지금 가능**. cks `internal/ckvclient/real.go` 이미 존재.
+→ **fake → real 전환은 지금 가능**. cks `internal/system/ckvclient/real.go` 이미 존재.
 
-### 3.2 ckv `internal/eval/prregress/` 가 사용자 명세 80% 이미 구현
+### 3.2 ckv `internal/vector/eval/prregress` 가 사용자 명세 80% 이미 구현
 
 `testdata/prs.yaml` 헤더 주석에 명시된 6 단계:
 ```
@@ -208,8 +208,8 @@ R-D 에서 정의된 cks 측 신규 모듈. Stage C (통합 평가) 단계에서
 
 | ID | 모듈 | 위치 | 역할 | LOC |
 |---|---|---|---|---|
-| D1 | `internal/glossary/` | cks 신규 | .claude/docs → YAML 추출 + loader | ~150 |
-| D2 | `internal/vocab/resolver.go` | cks 신규 | 모호 query → canonical keywords | ~200 |
+| D1 | `internal/vector/glossary` | cks 신규 | .claude/docs → YAML 추출 + loader | ~150 |
+| D2 | `internal/system/vocab/resolver.go` | cks 신규 | 모호 query → canonical keywords | ~200 |
 | D3 | `internal/manifest/dual.go` | cks 신규 | ckg + ckv manifest 정합 | ~80 |
 | D4 | `internal/fusion/rrf.go` | cks 신규 (또는 stage2 확장) | RRF fusion | ~100 |
 | D5 | `internal/bm25/local.go` | cks 임시 | cks 측 BM25 (3-leg) | ~50 |
