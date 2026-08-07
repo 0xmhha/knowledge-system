@@ -1,5 +1,9 @@
 # 교차 세션 협의 프롬프트 — CKG / CKS / coding-agent
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > **시점**: 2026-06-29 (스냅샷).
 > **목적**: CKV의 남은 작업 다수가 **CKG · CKS · coding-agent** 와 경계를 공유한다.
 > 각 세션(별도 진행 중)에 그대로 붙여넣어 현황 확인 + 협의를 시작하기 위한 프롬프트 모음.

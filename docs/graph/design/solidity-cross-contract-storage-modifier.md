@@ -1,5 +1,9 @@
 # Solidity Cross-Contract / Storage / Modifier Composition — Design Spec (W-C W7)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Scope: extend the Solidity parser (`internal/parse/solidity/`) so the graph
 > captures three currently-invisible dimensions:
 >

@@ -1,5 +1,9 @@
 # Hunk Graph — Track F follow-up design
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 Status: design / plan only. No implementation in this document.
 Audience: contributors landing the H1..H4 stages.
 Cross-references: `internal/temporal/git.go`, `internal/buildpipe/temporal.go`,

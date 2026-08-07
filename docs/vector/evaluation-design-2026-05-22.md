@@ -1,5 +1,9 @@
 # Evaluation Method Research — Target: go-stablenet (2026-05-22)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 이 문서는 사용자 요구 (2026-05-22) 에 대한 **방법 연구** 결과다. 구현
 산출물이 아니며, 사용자 결정 후 구체 task 로 분해된다.
 

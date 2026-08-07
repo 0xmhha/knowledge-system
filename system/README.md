@@ -37,6 +37,27 @@ subcommand.
 | `cks domain anchors` | Re-stamp entry code anchors against current HEAD |
 | `cks domain worksheet` | Draft/needs_verification → verified promotion worksheet |
 
+### Quick invocations
+
+```bash
+# domain toolchain — --project is shared by the whole group
+cks domain sync         --project projects/stablenet/domain-knowledge --ckg-out /tmp/policy.yaml --ckv-out /dev/null
+cks domain glossary-gen --project projects/stablenet/domain-knowledge --out /tmp/glossary.yaml
+cks domain export       --project projects/stablenet/domain-knowledge --out /tmp/corpus
+cks domain check        --project projects/stablenet/domain-knowledge
+cks domain worksheet    --project projects/stablenet/domain-knowledge
+cks domain anchors      --project projects/stablenet/domain-knowledge --graph <dataset>/graph/graph.db --check
+cks domain verify       --project projects/stablenet/domain-knowledge --entry <id> --by <reviewer>
+
+# agent + eval
+cks agent --prompt "find where Login validates input" --config cks.yaml
+cks eval  --scenarios system/eval/scenarios/ --config cks.yaml --output /tmp/report.json
+cks eval-gate --baseline graph/eval/baseline --latest graph/eval/results/latest
+
+# client registration entry for a running server
+cks mcp client-config --config cks.yaml
+```
+
 ## Architecture
 
 ```

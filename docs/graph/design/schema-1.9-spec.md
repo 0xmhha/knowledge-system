@@ -1,5 +1,9 @@
 # CKG Schema 1.9 — Design Spec (cross-language interop expansion)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > 다음 schema bump의 design plan. schema 1.8 (Hunk-graph H1-H4 + §11.3
 > hybrid)가 main에 안착한 시점에서 가장 큰 미커버 dimension은
 > **cross-language interop edges**. 이 문서는 `docs/design/hunk-graph.md`

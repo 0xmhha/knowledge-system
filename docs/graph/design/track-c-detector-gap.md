@@ -1,5 +1,9 @@
 # Track C — CKS 6-Graph Detector Gap Diagnosis
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Scope: G2 / G3 / G4 / G5 axes. Identify why each 0-count or sparse edge type
 > is missing in the self-graph snapshot at `/tmp/ckg-self/graph.db`, classify
 > root cause (no-detector / detector-bug / no-codebase-pattern), and recommend

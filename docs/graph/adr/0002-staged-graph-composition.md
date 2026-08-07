@@ -1,5 +1,9 @@
 # ADR-0002: Staged graph composition — deterministic production core + test overlay
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 - **Status:** Accepted
 - **Date:** 2026-06-29
 - **Supersedes:** —

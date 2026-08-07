@@ -93,9 +93,21 @@ Supporting commands:
 |---|---|
 | `ckg benchmark`       | Compare graph-context vs raw-file context on LLM tasks |
 | `ckg validate`        | Schema + (optional) LLM validation of a graph |
-| `ckg export-static`   | Export viewer + chunked JSON for static hosting |
+| `ckg export-static`   | Export chunked JSON for static hosting (`cks viewer export` adds the dashboard) |
+| `ckg export-json`     | Export the graph as plain JSON |
 | `ckg export-postgres` | Migrate a SQLite graph to PostgreSQL (deprecated, ADR-0003) |
 | `ckg watch`           | Rebuild the graph incrementally on file changes |
+| `ckg query <question>` | One-shot natural-language query against a graph |
+| `ckg path <from> <to>` | Shortest call path between two symbols |
+| `ckg evidence`        | Run the EvidencePack assembler from the CLI |
+| `ckg quickstart`      | One command: build + report + API server |
+
+```bash
+# a few one-liners
+./bin/ckg quickstart --src=. --out=/tmp/ckg-out          # build + report + API
+./bin/ckg query --graph=/tmp/ckg-out "who calls VerifyBlockProposal"
+./bin/ckg watch --src=. --out=/tmp/ckg-out                # incremental rebuild loop
+```
 
 Run `ckg <command> --help` for flags. `ckg --help` lists every subcommand.
 
