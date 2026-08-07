@@ -3,9 +3,9 @@
 Schema version: **1.23**.
 
 > **Authoritative source of truth (single source).** The machine-readable
-> node/edge type lists and their exact counts live in `pkg/types/enums.go`
+> node/edge type lists and their exact counts live in `pkg/graph/types/enums.go`
 > (`AllNodeTypes()` / `AllEdgeTypes()`); the live build's version constant is
-> `internal/buildpipe/cache.go` `const SchemaVersion` (also written into each
+> `internal/graph/buildpipe/cache.go` `const SchemaVersion` (also written into each
 > graph's manifest `schema_version`). This doc *describes* them — **when they
 > disagree, code wins.** Other docs must link here (and to `enums.go`) instead
 > of restating counts, so a schema bump updates exactly one place.
@@ -28,10 +28,10 @@ HTTP client call sites), W3b appended `grpc_listens_on` + `grpc_calls`
 (1.9 → 1.10) appended `NodeAwaitPoint` + edges `awaits` (W-B) and
 `overrides` (W-C) as slot reservations ahead of the Phase 5 detectors;
 W-C W11 V7 (1.10 → 1.11) added the `nodes.attrs` JSON-blob column
-(`internal/persist/node_attrs.go`) carrying per-node markers; 1.11 → 1.13
+(`internal/graph/persist/node_attrs.go`) carrying per-node markers; 1.11 → 1.13
 internal bumps; P1 #4 (1.13 → 1.14) added `NodePolicy` + edge `governed_by`
-(`pkg/policy`, opt-in `--policy-file`); P1 #5 (1.14 → 1.15) added
-`NodeSecurityPattern` + edge `has_security_pattern` (`pkg/security`, opt-in
+(`pkg/graph/policy`, opt-in `--policy-file`); P1 #5 (1.14 → 1.15) added
+`NodeSecurityPattern` + edge `has_security_pattern` (`pkg/graph/security`, opt-in
 `--security-pattern-file`). `using_for` (Solidity using-for, W-C) is also
 present in the current edge set. PR #23 (1.15 → 1.18) added full Go
 signatures + qualified call resolution (1.16), promoted-method nodes (1.17),
@@ -48,11 +48,11 @@ suffix lookups use an indexed equi-join instead of a leading-wildcard LIKE.
 ADR-0002 (1.22 → 1.23) gives primary (non-test-variant) Go packages deterministic
 ownership of production files in `buildFileIndex` (was order-dependent first-seen-wins;
 ~17.5% of production files landed on a test variant), making the graph reproducible.
-Full per-bump rationale: `internal/buildpipe/cache.go`.
+Full per-bump rationale: `internal/graph/buildpipe/cache.go`.
 
 ## Node types (37)
 
-*(Authoritative list: `pkg/types/enums.go` `AllNodeTypes()`. Count below is
+*(Authoritative list: `pkg/graph/types/enums.go` `AllNodeTypes()`. Count below is
 kept in sync with that function — if you add a NodeType, update both.)*
 
 `Package, File, Struct, Interface, Class, TypeAlias, Enum, Contract,
@@ -66,14 +66,14 @@ AwaitPoint, Policy, SecurityPattern`
 LoopStmt uses `sub_kind ∈ {for, while, range, for_in, for_of}`.
 
 `Mutex` is the B1 Stage 1 concurrency-analysis node, emitted by the Go
-parser (`internal/parse/golang/concurrency.go`) for `sync.Mutex` /
+parser (`internal/graph/parse/golang/concurrency.go`) for `sync.Mutex` /
 `sync.RWMutex` declarations (struct fields, package-level vars,
 function-body locals, embedded mutexes). `sub_kind ∈ {mutex, rwmutex}`.
 `qualified_name` is `pkg.Type.field#mutex` for struct fields (the
 `#mutex` suffix disambiguates from the same-position Field node) or
 `pkg.func.localVar` for locals. Confidence is `EXTRACTED` with
 typesInfo, `INFERRED` in AST-only mode. See `archive/spec-ckg-v0.2.md` § 2 and
-`internal/parse/golang/concurrency_test.go`.
+`internal/graph/parse/golang/concurrency_test.go`.
 
 `Endpoint` (E3): an HTTP/RPC route entry point. `qualified_name`
 encodes the protocol prefix (e.g. `http:/users`, `rpc:Foo.Bar`); `name`
@@ -95,7 +95,7 @@ are skipped (a runtime trace is the right hammer for those).
 per-language file-set diff clean), `file_path` = the build root's
 repo-relative path (stable across builds inside the same repo),
 `start_line`/`end_line` = 1 (commits have no source range). Emitted
-by the post-Build temporal pass (`internal/buildpipe/temporal.go`)
+by the post-Build temporal pass (`internal/graph/buildpipe/temporal.go`)
 from a single `git log --raw --no-renames` invocation per build.
 Capped at 10 most-recent commits per file by default. Subject text is
 mined post-commit by the H4 issue-id pass (`temporal/issueid.go`): the
@@ -127,21 +127,21 @@ explicitly.
 answer "where does control yield, and to which AsyncCallSite?". The
 schema-1.10 bump reserved the enum slot; the Phase 5 detector has since
 **shipped** — the TS parser emits one `NodeAwaitPoint` per
-`await_expression` (`internal/parse/typescript/async.go:56,98,114`),
+`await_expression` (`internal/graph/parse/typescript/async.go:56,98,114`),
 paired 1:1 with an inbound `awaits` edge. See
-`docs/design/ts-async-await-and-interface.md §2.1 + §3.2`.
+`docs/graph/design/ts-async-await-and-interface.md §2.1 + §3.2`.
 
 `Policy` (P1 #4, schema 1.14): a governance/policy node loaded from an
-opt-in `--policy-file` YAML (`pkg/policy`), linked to governed symbols via
+opt-in `--policy-file` YAML (`pkg/graph/policy`), linked to governed symbols via
 `governed_by`. Empty policy file is the no-op default.
 
 `SecurityPattern` (P1 #5, schema 1.15): a security-pattern node loaded from
-an opt-in `--security-pattern-file` YAML (`pkg/security`), linked to matched
+an opt-in `--security-pattern-file` YAML (`pkg/graph/security`), linked to matched
 symbols via `has_security_pattern`. Additive, cold-only re-ingest.
 
 ## Edge types (43)
 
-*(Authoritative list: `pkg/types/enums.go` `AllEdgeTypes()`. Count below is
+*(Authoritative list: `pkg/graph/types/enums.go` `AllEdgeTypes()`. Count below is
 kept in sync with that function — if you add an EdgeType, update both.)*
 
 `contains, defines, calls, invokes, uses_type, instantiates, references,
@@ -167,7 +167,7 @@ the destination Mutex's `sub_kind`, not the edge type.
 
 `accessed_under_lock` (B1 Stage 1): `Field` → `Mutex` for struct-field
 identifiers accessed inside a Lock/Unlock pair in the same function
-body (`internal/parse/golang/concurrency_underlock.go`). The (field,
+body (`internal/graph/parse/golang/concurrency_underlock.go`). The (field,
 mutex) pair is the edge key — repeated accesses inside the same
 critical section collapse to one edge so multi-mutation methods don't
 inflate the edge count. The viewer registers styling for all three
@@ -224,7 +224,7 @@ Method / Struct / Interface / Field / etc.) when the hunk's
 inside the same file. Whitelisted to FunctionLike + TypeLike + Field-ish
 (13 node types) so noise-level statement nodes (CallSite / IfStmt / …)
 don't blow up the edge count without retrieval signal. See
-`docs/design/hunk-graph.md §4` for the whitelist rationale.
+`docs/graph/design/hunk-graph.md §4` for the whitelist rationale.
 
 `http_calls` (schema 1.9 W2): caller `Function`/`Method` → `Endpoint`
 when the function invokes an HTTP client (TS: `fetch`, `axios`, `useSWR`,
@@ -252,10 +252,10 @@ unresolved stub type → `AMBIGUOUS` placeholder.
 
 `awaits` (W-B, schema 1.10): edge for TypeScript async-suspension flow,
 `Function`/`Method` → `AwaitPoint`. **Emitted** by the Phase 5 detector
-(`internal/parse/typescript/async.go:120`), one per `AwaitPoint` (pair
+(`internal/graph/parse/typescript/async.go:120`), one per `AwaitPoint` (pair
 invariant: `#AwaitPoint == #awaits`). Direction encodes "this function
 suspends here". See
-`docs/design/ts-async-await-and-interface.md §2.1 + §3.2`.
+`docs/graph/design/ts-async-await-and-interface.md §2.1 + §3.2`.
 
 `overrides` (W-C, schema 1.10): edge for Solidity virtual/override
 semantics. `Method` → `Method` between a child contract's method that
@@ -264,9 +264,9 @@ overridden modifiers). Direction = child → parent (Q4 decision in
 solidity-inheritance spec §5.0). Distinct from `implements` (interface
 satisfaction) because `overrides` is concrete-to-concrete virtual
 dispatch resolution. **Emitted** by the Phase 5 detector
-(`internal/parse/solidity/overrides.go`, PendingRefs from
+(`internal/graph/parse/solidity/overrides.go`, PendingRefs from
 `declarations.go`). See
-`docs/design/solidity-inheritance-and-interface-dispatch.md §2.1 + §3.3`.
+`docs/graph/design/solidity-inheritance-and-interface-dispatch.md §2.1 + §3.3`.
 
 ## Edge metadata: `dispatch_kind` (schema 1.7)
 

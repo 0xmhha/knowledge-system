@@ -12,10 +12,10 @@
 
 | 축 | 위치 | 체크 |
 |----|------|------|
-| **Options struct** | `pkg/evidence/evidence.go::Options` (또는 동등) | 필드 추가 + godoc 한 줄 |
-| **HTTP** | `internal/server/api.go::handle*` | query param 파싱 + 입력 검증 + 400 negative |
-| **MCP** | `pkg/mcphandlers/<tool>.go::Register*` (public surface; `internal/mcp/server.go` calls `RegisterAll`) | `mcp.WithString/Number(...)` schema + handler 매핑 |
-| **CLI** | `cmd/ckg/<cmd>.go` | `cmd.Flags().*Var()` + allow-list guard + `--help` 텍스트 |
+| **Options struct** | `pkg/graph/evidence/evidence.go::Options` (또는 동등) | 필드 추가 + godoc 한 줄 |
+| **HTTP** | `internal/graph/server/api.go::handle*` | query param 파싱 + 입력 검증 + 400 negative |
+| **MCP** | `pkg/graph/mcphandlers/<tool>.go::Register*` (public surface; `internal/graph/mcp/server.go` calls `RegisterAll`) | `mcp.WithString/Number(...)` schema + handler 매핑 |
+| **CLI** | `cmd/graph/<cmd>.go` | `cmd.Flags().*Var()` + allow-list guard + `--help` 텍스트 |
 
 **실패 사례**: `2982864` (mode=and) — Options/HTTP/MCP/CLI 4축 모두 wired했지만 라이브는 CLI 1축만 검증. 후속 `85af082` 보강.
 
@@ -106,5 +106,5 @@
 
 ## 7. 참조
 
-- 이번 세션 사례별 회고: `docs/SESSION-HANDOFF-2026-05-10.md` §1
-- 평가 fixture / 회귀 안전망: `internal/buildpipe/h3h4_integration_test.go`, `internal/temporal/issueid_test.go::TestExtractIssueIDs_CorpusPrecisionRecall`, `pkg/mcphandlers/safety_test.go` (`llmSafeStoreReader` AMBIGUOUS-drop coverage)
+- 이번 세션 사례별 회고: `docs/graph/archive/SESSION-HANDOFF-2026-05-10.md` §1
+- 평가 fixture / 회귀 안전망: `internal/graph/buildpipe/h3h4_integration_test.go`, `internal/graph/temporal/issueid_test.go::TestExtractIssueIDs_CorpusPrecisionRecall`, `pkg/graph/mcphandlers/safety_test.go` (`llmSafeStoreReader` AMBIGUOUS-drop coverage)

@@ -17,18 +17,25 @@ With no datasets configured it boots in a non-crashing degraded mode (Smart Dumm
 
 ## Components
 
-| Binary | Purpose | Phase |
-|---|---|---|
-| `cmd/cks-mcp`  | MCP server (stdio JSON-RPC) — exposes `cks.context.*`, `cks.ops.*` | C.5 |
-| `cmd/cks-agent` | Coding agent CLI — vibe prompt → PR plan + diffs + tests | D |
-| `cmd/cks-eval` | Evaluation harness — headless Claude via `cli-wrapper`, metric collection | E |
-| `cmd/cks-glossary-gen` | Build the alias glossary that feeds the vocab resolver | domain |
-| `cmd/cks-domain-sync` | Derive ckv/ckg policy views from verified domain entries | domain |
-| `cmd/cks-domain-export` | Render verified entries → markdown corpus for `ckv build --docs` | domain |
-| `cmd/cks-entry-verify` | Validate domain entries against schema + anchors | domain |
-| `cmd/cks-inventory-check` | Cross-check domain-entry inventory vs coverage | domain |
-| `cmd/cks-anchor-refresh` | Re-stamp entry code anchors against current HEAD | domain |
-| `cmd/cks-promotion-worksheet` | Draft/needs_verification → verified promotion worksheet | domain |
+Everything ships in the single `cks` binary (`cmd/cks`); each row is a
+subcommand.
+
+| Subcommand | Purpose |
+|---|---|
+| `cks mcp` | MCP server (stdio or HTTP) — exposes `cks.context.*`, `cks.ops.*` |
+| `cks agent` | Coding agent CLI — vibe prompt → LLM-ready evidence markdown |
+| `cks eval` | Evaluation harness — scenario runs, metric collection |
+| `cks eval-gate` | Baseline drift gate (CI) |
+| `cks setup` | Dataset build orchestrator (graph → vector → verify) |
+| `cks filelist` | Build-scope file-list derivation |
+| `cks viewer` | Unified graph+vector dashboard (spawns `ckg api`) |
+| `cks domain glossary-gen` | Build the alias glossary that feeds the vocab resolver |
+| `cks domain sync` | Derive ckv/ckg policy views from verified domain entries |
+| `cks domain export` | Render verified entries → markdown corpus for `ckv build --docs` |
+| `cks domain verify` | Promote one entry to verified (schema + anchor checks) |
+| `cks domain check` | Cross-check domain-entry inventory vs coverage |
+| `cks domain anchors` | Re-stamp entry code anchors against current HEAD |
+| `cks domain worksheet` | Draft/needs_verification → verified promotion worksheet |
 
 ## Architecture
 
@@ -89,7 +96,7 @@ or in a `.mcp.json`:
 Building the datasets the config points at:
 
 ```
-cks-domain-sync …                                # derive ckv/ckg policy views from verified entries
+cks domain sync …                                # derive ckv/ckg policy views from verified entries
 ckv build --src <go-stablenet> --out <ckv-data> --embedder=ollama --model-name=bge-m3
 ckg build --src <go-stablenet> --out <ckg-data> --policy-file policies/policy.yaml
 ```
@@ -99,8 +106,8 @@ the same `ckv`/`ckg` builds, forwarding `--policy-file` when `backends.ckg.polic
 
 ## Dependencies (wired)
 
-- `github.com/0xmhha/knowledge-system` — graph + BM25 backend (`pkg/store`, in-process); pinned at released **v0.1.0** (no `replace`)
-- `github.com/0xmhha/knowledge-system` — vector backend (`pkg/ckv`, in-process; sqlite-vec CGO); pinned at released **v0.1.0** (no `replace`)
+- `github.com/0xmhha/knowledge-system` — graph + BM25 backend (in-process, same module)
+- `github.com/0xmhha/knowledge-system` — vector backend (`pkg/vector/ckv`, in-process; sqlite-vec CGO — same module)
 - `github.com/mark3labs/mcp-go` — MCP server (v0.56.0)
 
 ## Layout

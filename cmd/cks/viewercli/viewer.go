@@ -45,7 +45,7 @@ func NewCmd() *cobra.Command {
 			return runViewer(ctx, graph, apiURL, port, open, cmd.ErrOrStderr())
 		},
 	}
-	cmd.Flags().StringVar(&graph, "graph", "", "graph directory containing graph.db — spawns a sibling `ckg api` backend")
+	cmd.Flags().StringVar(&graph, "graph", "", "graph directory containing graph.db — spawns a sibling 'ckg api' backend")
 	cmd.Flags().StringVar(&apiURL, "api-url", "", "already-running graph API base URL (e.g. http://127.0.0.1:8081) — no backend is spawned")
 	cmd.Flags().IntVar(&port, "port", 8080, "dashboard HTTP port")
 	cmd.Flags().BoolVar(&open, "open", false, "open browser on start")
@@ -122,7 +122,7 @@ func newExportCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&out, "out", "", "static export directory (a `ckg export-static` bundle)")
+	cmd.Flags().StringVar(&out, "out", "", "static export directory (a 'ckg export-static' bundle)")
 	return cmd
 }
 

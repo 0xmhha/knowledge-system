@@ -10,7 +10,7 @@ ckv는 두 가지 통합 형태를 제공한다:
 
 | 형태 | 어떻게 | 언제 |
 |---|---|---|
-| **in-process (pkg/ckv)** | Go import로 `Engine`을 직접 생성 | 같은 process 안에서 검색 — cks composer 같은 *직접 통합*. 추천. |
+| **in-process (pkg/vector/ckv)** | Go import로 `Engine`을 직접 생성 | 같은 process 안에서 검색 — cks composer 같은 *직접 통합*. 추천. |
 | **subprocess (`ckv mcp`)** | binary 를 stdio MCP server로 spawn | 언어가 다르거나 process 격리가 필요한 케이스 |
 
 이번 가이드는 두 형태 모두 다루되 **in-process를 우선**으로 설명한다.
@@ -30,12 +30,12 @@ import (
     "fmt"
     "log"
 
-    "github.com/0xmhha/knowledge-system/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 )
 
 func main() {
     // 1) index를 미리 build: `ckv build --src=. --out=.ckv-data --embedder=mock`
-    //    (또는 build를 in-process로 — internal/build.Run 사용)
+    //    (또는 build를 in-process로 — internal/vector/build.Run 사용)
 
     // 2) Open + query
     engine, err := ckv.Open(".ckv-data", ckv.OpenOptions{
@@ -81,7 +81,7 @@ func main() {
 
 ## 2. Production embedder — ollama (default) / bgeonnx (optional ONNX)
 
-CKV의 임베더 백엔드는 세 가지 (`cmd/ckv/embedder.go`):
+CKV의 임베더 백엔드는 세 가지 (`cmd/vector/embedder.go`):
 
 | `--embedder` | 백엔드 | 언제 |
 |---|---|---|
@@ -89,7 +89,7 @@ CKV의 임베더 백엔드는 세 가지 (`cmd/ckv/embedder.go`):
 | `bgeonnx` | in-process ONNX runtime + BERT ONNX 모델 | 시스템 의존성(libonnxruntime + libtokenizers)을 감수하고 subprocess 없는 in-process 추론을 원할 때. `-tags bgeonnx` 필요 (§2.3) |
 | `mock` | hash 기반 (의미 신호 없음) | §1 흐름 검증 전용 |
 
-> `--embedder` 기본값은 `ollama` 다 (`cmd/ckv/root.go`). 예전 기본이던
+> `--embedder` 기본값은 `ollama` 다 (`cmd/vector/root.go`). 예전 기본이던
 > bge-large-en-v1.5 (bgeonnx) 는 **선택 경로**로 강등됐다. 권장 임베딩 모델은
 > Qwen3-Embedding (ADR-008), 아래 §2.1–2.4 는 그 대안인 bgeonnx/ONNX 경로의
 > 배선 방법이다.
@@ -129,8 +129,8 @@ adapter를 import 하면 같은 build tag가 *consumer build* 에도 전파된�
 package mycks
 
 import (
-    "github.com/0xmhha/knowledge-system/internal/embed/bgeonnx"
-    "github.com/0xmhha/knowledge-system/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
+    "github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 )
 
 func openProductionEngine(indexPath, modelDir string) (*ckv.Engine, func(), error) {
@@ -151,9 +151,9 @@ func openProductionEngine(indexPath, modelDir string) (*ckv.Engine, func(), erro
 }
 ```
 
-> **참고**: `bgeonnx` 패키지는 `internal/embed/bgeonnx`. Go internal 규칙상
+> **참고**: `bgeonnx` 패키지는 `internal/vector/embed/bgeonnx`. Go internal 규칙상
 > 동일 module 안에서만 import 가능. 외부 module이 bgeonnx를 직접 쓰려면
-> ckv module을 vendor 하거나, bgeonnx-wrapped factory를 pkg/ckv 에 추가해야
+> ckv module을 vendor 하거나, bgeonnx-wrapped factory를 pkg/vector/ckv 에 추가해야
 > 한다 (현재는 미제공 — bgeonnx의 system dependency를 pkg API 표면에서
 > 분리하기 위함).
 
@@ -163,7 +163,7 @@ func openProductionEngine(indexPath, modelDir string) (*ckv.Engine, func(), erro
 CGO_LDFLAGS="-L$HOME/lib" go build -tags bgeonnx ./...
 ```
 
-> **참고 — coreml 직접 백엔드**: 별도의 `internal/embed/coreml` 백엔드는 이제
+> **참고 — coreml 직접 백엔드**: 별도의 `internal/vector/embed/coreml` 백엔드는 이제
 > `tokenizers` 빌드 태그 뒤로 게이트된다 (PR #47). macOS에서만 활성화되며
 > (`//go:build darwin && tokenizers`), libtokenizers가 없는 환경(예: CI)에서는
 > 자동으로 no-op 스텁으로 빌드된다. 기본 빌드에는 영향 없음.
@@ -179,7 +179,7 @@ ckv mcp --out=.ckv-data --embedder=bgeonnx
 ```
 
 stdio 위에서 MCP JSON-RPC. 노출되는 도구는 현재 **19개** (검색 / 정제 / 메타 /
-흐름 / 보조 / 운영). 전체 입출력 스키마·사용 시나리오는 **`docs/mcp-tools.md`**
+흐름 / 보조 / 운영). 전체 입출력 스키마·사용 시나리오는 **`docs/vector/mcp-tools.md`**
 를 정본으로 본다. 대표 도구:
 - `cks.context.semantic_search` — `intent` 필수, 옵션 (`k`, `language`,
   `path`, `symbol_kind`, `budget_tokens`, `threshold`, `bm25_rerank`, `examples_k` 등)
@@ -188,16 +188,16 @@ stdio 위에서 MCP JSON-RPC. 노출되는 도구는 현재 **19개** (검색 / 
   initialize 직후 1회 호출 권장. 응답 `{ready, duration_ms, embedder}`
 
 **Schema versioning**: 모든 tool response 의 top-level 에
-`schema_version` 문자열이 들어간다 (현재 `"1.1"` — `pkg/mcp/server.go`
+`schema_version` 문자열이 들어간다 (현재 `"1.1"` — `pkg/vector/mcp/server.go`
 `ResponseSchemaVersion`). 정책 — minor (1 → 1.1)
 = additive (필드 추가, 새 tool), major (1 → 2) = breaking (필드 제거 / 타입
 변경 / 의미 변경). 안정적 consumer 는 major 만 비교하고 mismatch 시 last-known-good
 parser 로 fallback 하면 된다. ckv 가 새 tool 을 추가해도 schema_version 누락은
-`pkg/mcp/server.go::jsonResult` 차원에서 구조적으로 보장된다.
+`pkg/vector/mcp/server.go::jsonResult` 차원에서 구조적으로 보장된다.
 
 검증 스크립트는 `testdata/mcp-repro/` (serial + concurrent).
 
-**한 줄 권고**: 동일 module 안에서 ckv를 쓸 수 있으면 pkg/ckv가 stdio buffer /
+**한 줄 권고**: 동일 module 안에서 ckv를 쓸 수 있으면 pkg/vector/ckv가 stdio buffer /
 subprocess lifecycle / restart 로직을 모두 없앤다. 2026-05-20 측정 기준
 in-process는 stdio MCP 대비 10× 이상 빠른 wall-time.
 
@@ -279,7 +279,7 @@ D1-FU-8 target 30 chunks/s 는 ANE-친화 모델 (EmbeddingGemma-300M 등) 필�
 ## 6. Migration — subprocess MCP → in-process
 
 cks 등 기존 subprocess proxy 사용자는 다음 한 줄로 마이그레이션 가능 (cks
-`internal/ckvclient/real.go` 영역):
+`internal/system/ckvclient/real.go` 영역):
 
 **Before**:
 ```go
@@ -315,7 +315,7 @@ resp, err := engine.SemanticSearch(ctx, query, ckv.SearchOptions{K: 10})
 - **HF 다운로드 차단 환경**: 회사 정책 등으로 `huggingface.co` 접근이 막힌
   경우, 모델 파일을 다른 환경에서 받아 옮겨야 한다. PyPI는 일반적으로
   접근 가능하므로 `onnxconverter-common` 같은 변환 도구는 사용 가능.
-- **EmbeddingGemma 등 ANE-친화 모델**: `pkg/types/...` 의 ModelConfig
+- **EmbeddingGemma 등 ANE-친화 모델**: `pkg/vector/types/` 의 ModelConfig
   registry에 `embeddinggemma-300m` 사전 등록은 있으나 (`bgeonnx/model_config.go`)
   모델 파일은 별도 확보 필요.
 - **Linux ANE 부재**: CoreML EP는 macOS 전용. Linux는 자동으로 CPU EP만

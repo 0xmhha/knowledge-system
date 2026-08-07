@@ -59,8 +59,8 @@ the plugin's agents. The point of the datasets is to make that reasoning
 - **Queries (via cks):** find_symbol, find_callers (reverse BFS), find_callees
   (forward), get_subgraph, impact_analysis (6 reverse buckets, depth≤5,
   deterministic sorted output), change_history (commit/hunk, file-level).
-- **Key files:** `pkg/types/{node,edge,enums}.go`, `internal/persist/schema.sql`,
-  `internal/buildpipe/pipeline.go`, `internal/parse/golang/resolve.go`, `pkg/impact/impact.go`.
+- **Key files:** `pkg/graph/types/{node,edge,enums}.go`, `internal/graph/persist/schema.sql`,
+  `internal/graph/buildpipe/pipeline.go`, `internal/graph/parse/golang/resolve.go`, `internal/graph/server (impact surface)`.
 - **Accuracy / gaps:** two-pass call resolution; **recently fixed** to qualify call
   targets by package+receiver type (forward-edge name collisions removed — PR #17).
   Still **V0**: unresolved cross-pkg/dynamic calls dropped (reverse-edge
@@ -76,8 +76,8 @@ the plugin's agents. The point of the datasets is to make that reasoning
   doc sections, the rendered domain-knowledge corpus, optional PR/commit history;
   Anthropic contextual-prefix on chunks. Policy `policy/stablenet.yaml` attaches
   category + `also_review`/`required_tests`/`watch_out` guidance to every hit.
-- **Key files:** `cmd/ckv/build.go`, `internal/store/sqlitevec/store.go`,
-  `internal/chunk/prefix.go`, `internal/embed/registry/registry.go`, `policy/stablenet.yaml`.
+- **Key files:** `cmd/vector/build.go`, `internal/vector/store/sqlitevec/store.go`,
+  `internal/vector/chunk/prefix.go`, `internal/vector/embed/registry/registry.go`, `policy/stablenet.yaml`.
 - **Cost / gaps:** full bge-m3 embed ≈ **10 hours** (re-index is expensive and coupled
   to one Ollama model; vector dimension baked into the DDL). Eval fixture is tiny
   (N=10). 6 newer ckv tools not yet wired into cks; rerank is a stub.
@@ -85,7 +85,7 @@ the plugin's agents. The point of the datasets is to make that reasoning
 ### 2.3 cks — code-knowledge-system (composer / MCP hub)
 - **Role:** fuses ckg + ckv + domain knowledge into a token-budgeted, sanitized,
   SHA-256-stamped **EvidencePack**, exposed over MCP. Calls no LLM itself.
-- **`get_for_task` pipeline** (`internal/composer/composer.go`): intent classify
+- **`get_for_task` pipeline** (`internal/system/composer/composer.go`): intent classify
   (ckv embed + cosine anchors) → Stage 1 keyword extract (glossary vocab + ckv
   recall → ckg BM25 rerank) → Stage 2 citation search (ckg BM25 + FindSymbol + ckv
   list, fused by **RRF**, CkvWeight 5.0 > Symbol 1.5 > BM25 1.0) → Stage 3 graph
@@ -96,9 +96,9 @@ the plugin's agents. The point of the datasets is to make that reasoning
   change_history, concurrency_impact, get_flow, expand_flow, find_branches,
   get_invariant_enforcement, find_invariants, get_conventions; `cks.ops.*` —
   health, freshness, index.
-- **Domain-knowledge subsystem:** `docs/domain-knowledge/` (schema
+- **Domain-knowledge subsystem:** `system/docs/domain-knowledge/` (schema
   `shared/entry.schema.yaml`, lifecycle `shared/STATUS_LIFECYCLE.md`). `cks-domain-sync`
-  derives ckv/ckg policy views from **verified** entries; `internal/domainexport`
+  derives ckv/ckg policy views from **verified** entries; `internal/system/domainexport`
   renders entries → markdown corpus for `ckv build --docs`; `cks-glossary-gen` builds
   the alias glossary feeding the vocab resolver.
 - **Gaps (from the 4-way eval, `eval/ckg-4way/`):** `get_for_task` (δ) has the best
@@ -117,8 +117,8 @@ the plugin's agents. The point of the datasets is to make that reasoning
   equal-power quorum, instant finality / inert reorg, base-fee redistribution).
 - **Consumption:** planner uses `cks_ops_health/freshness/index` + `get_for_task` +
   relational tools; evaluator drives chainbench at Stage 4; jira-gateway scrubs inbound
-  Jira. Tool surface frozen in `internal/mcp/testdata/agent-mcp.schema.json`
-  (enforced by `internal/mcp/schema_golden_test.go`).
+  Jira. Tool surface frozen in `internal/system/mcp/testdata/agent-mcp.schema.json`
+  (enforced by `internal/system/mcp/schema_golden_test.go`).
 - **Status note:** HANDOFF lists "domain KB empty / 0 verified" as P0 — **this is
   stale**; the corpus is now 43 entries / 40 verified (§5). Real remaining items: a full
   end-to-end `/work`→`/merge` run has not been executed; retrieval silently degrades

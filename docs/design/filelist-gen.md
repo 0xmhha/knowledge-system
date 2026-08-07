@@ -1,6 +1,10 @@
 # filelist-gen — derived build-scope file lists for knowledge indexing
 
 Status: IMPLEMENTED (2026-07-29) — v2 design (review round 1: build-context
+
+> 2026-08-06: the tool has since moved into the cks command tree — it is
+> `cks filelist` (cmd/cks/filelistcli). Path and script mentions below
+> reflect the layout at implementation time.
 pinning, source-state discipline, scope-transition semantics, check
 semantics, integration keys) implemented as `cmd/filelist-gen` with the
 setup-pipeline `filelist:` key. §9 decisions confirmed: build_roots =

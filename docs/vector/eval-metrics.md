@@ -54,7 +54,7 @@ ckv eval \
 | `--threshold` | cosine 유사도 최소 임계값. `-1`은 임계값 미적용 (모든 결과 검사) |
 | `--embedder` | 쿼리 벡터화에 쓸 임베더. **vector DB 빌드 시와 같아야** (차원 일치). default `ollama` (bge-m3) |
 
-### 추가 플래그 / 모드 (`cmd/ckv/eval.go`)
+### 추가 플래그 / 모드 (`cmd/vector/eval.go`)
 
 | 플래그 | 역할 |
 |---|---|
@@ -89,7 +89,7 @@ queries:
 ## 3. 지표별 정의 + 의미 + 해석
 
 > **어떤 지표가 `ckv eval`이 실제로 내보내는가**: `ckv eval`의 `Aggregate`
-> (`internal/eval/score.go`)는 **recall@1/3/5, MRR, citation@1** 만 산출한다
+> (`internal/vector/eval/score.go`)는 **recall@1/3/5, MRR, citation@1** 만 산출한다
 > (`--src` 지정 시 hallucination_rate 추가). **§3.3 p95 latency 와 §3.5 build
 > throughput 은 `ckv eval` 출력이 아니다** — 각각 쿼리 벤치 / `ckv build`
 > 실행에서 별도로 측정하는 운영 지표이며, 여기서는 retriever 품질과 함께
@@ -301,7 +301,7 @@ throughput = total_chunks / build_duration_seconds
    - throughput ↓ → 더 큰 모델로 갔거나 배치 비효율
 ```
 
-**baseline 저장**: `ckv eval --json` (이미 제공, `cmd/ckv/eval.go`) 로 machine-readable
+**baseline 저장**: `ckv eval --json` (이미 제공, `cmd/vector/eval.go`) 로 machine-readable
 결과를 얻어 매 PR마다 비교 가능.
 
 ---
@@ -310,7 +310,7 @@ throughput = total_chunks / build_duration_seconds
 
 > **주의 — 이 수치는 역사적 baseline이다.** 당시 기본 임베더였던 bge-large-en-v1.5
 > (bgeonnx) 기준이며, 현재 기본 런타임은 **ollama / bge-m3** 로 바뀌었다
-> (`--embedder` 기본값 = `ollama`, `cmd/ckv/root.go`). 권장 임베더는 Qwen3-Embedding
+> (`--embedder` 기본값 = `ollama`, `cmd/vector/root.go`). 권장 임베더는 Qwen3-Embedding
 > (ADR-008), 기본 prefix 전략은 rule-based (ADR-009) 이다. 또한 아래 수치는
 > `testdata/queries.yaml` (쉬운 fixture) 기준으로, 이후 난이도 높은
 > `testdata/queries-hard.yaml` fixture가 추가되어 회귀 신호가 강화됐다. 최신

@@ -8,15 +8,15 @@ detect → parse → link → graph → cluster → score → persist   (7-pass 
 ```
 
 - **Parsers**: `golang.org/x/tools/go/packages` (Go), tree-sitter (TypeScript,
-  Solidity), hand-rolled Proto parser (`internal/parse/proto`) — four languages.
+  Solidity), hand-rolled Proto parser (`internal/graph/parse/proto`) — four languages.
 - **Cluster**: package-tree (deterministic) + Leiden topic overlay (3 resolutions)
 - **Storage**: `modernc.org/sqlite` (CGO-free), embedded schema, blobs in DB
-  (PostgreSQL export deprecated — see `docs/adr/0003-deprecate-postgres-backend.md`)
+  (PostgreSQL export deprecated — see `docs/graph/adr/0003-deprecate-postgres-backend.md`)
 - **Viewer**: Next.js 3D force-graph (`tools/viewer`), embedded via `embed.FS`
-- **MCP**: stdio, **ten** tools (`pkg/mcphandlers/registerall.go`), in-process Store reads
+- **MCP**: stdio, **ten** tools (`pkg/graph/mcphandlers/registerall.go`), in-process Store reads
 - **Eval**: keyword-retrieval fixtures + LLM baselines (α/β/γ/δ) → CSV + report.md
 
-Authoritative detail: `docs/ARCHITECTURE-DETAILED.md`, `docs/CODE-STRUCTURE.md`,
-`docs/SCHEMA.md`. "What is true now" = code + git.
+Authoritative detail: `docs/graph/ARCHITECTURE-DETAILED.md`, `docs/graph/CODE-STRUCTURE.md`,
+`docs/graph/SCHEMA.md`. "What is true now" = code + git.
 
 

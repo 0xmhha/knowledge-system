@@ -26,7 +26,7 @@ happens at Layer 2 — see [ADR-003](./adr/003-bm25-dual-track.md).
 
 ```
 code-knowledge-vector/
-├── cmd/ckv/           CLI entry — only place that touches os.Args / stdout
+├── cmd/vector/           CLI entry — only place that touches os.Args / stdout
 ├── pkg/               Public surface, semver-stable
 │   ├── types/         Shared data contracts (Chunk, Hit, Filter, Embedder, VectorStore)
 │   ├── ckv/           In-process Go API (Open, SemanticSearch, Warmup, ...)
@@ -38,7 +38,7 @@ code-knowledge-vector/
     ├── chunk/         Span → Chunk, file-header chunk, contextual prefix builder
     ├── embed/         Non-default embedder backends: mock (in-tree), bgeonnx
     │                  (ONNX Runtime), coreml (CoreML), plus convert/registry/
-    │                  model/cache helpers. The DEFAULT backend is pkg/embed/ollama
+    │                  model/cache helpers. The DEFAULT backend is pkg/vector/embed/ollama
     ├── llmprefix/     Optional Anthropic-style contextual-prefix builder (off by default, ADR-009)
     ├── flowcorpus/    Curated flow corpus (corpus.jsonl) → flow chunks (ADR-010)
     ├── ckgalign/      In-memory index over a CKG SQLite store → canonical_id (ADR-007)
@@ -59,9 +59,9 @@ code-knowledge-vector/
                        eval/prregress/ is the PR-regression LLM-judge mode
 ```
 
-`pkg/types` has **no internal dependencies** by design — anything that
+`pkg/vector/types` has **no internal dependencies** by design — anything that
 imports it stays portable to future CKS code. The dependency arrow
-always points `internal/*` → `pkg/types`, never the reverse.
+always points `internal/*` → `pkg/vector/types`, never the reverse.
 
 ## Internal dependency graph
 
@@ -72,30 +72,30 @@ Inferred from `import` lines in the source tree:
                                  │
             ┌───────────────┬────┴────┬──────────────┬──────────────┐
             ▼               ▼         ▼              ▼              ▼
-       internal/build  internal/query  pkg/mcp   internal/eval  eval/prregress
+       internal/vector/build  internal/vector/query  pkg/mcp   internal/vector/eval  eval/prregress
             │               │           │
    ┌────────┼────────┐      │           │
    ▼        ▼        ▼      ▼           ▼
-discover  parse   chunk  freshness   pkg/ckv
+discover  parse   chunk  freshness   pkg/vector/ckv
    │        │        │      │           │
    └────────┴───┬────┴──────┴─────┐     │
                 ▼                 ▼     ▼
-         internal/store/sqlitevec  internal/manifest
+         internal/vector/store/sqlitevec  internal/vector/manifest
                             │
                             ▼
-                       pkg/types
+                       pkg/vector/types
 ```
 
 Key invariants:
 
-- **`pkg/types` is a leaf.** No package it imports lives in this repo.
-- **`internal/build` and `internal/query` are siblings**, not parent/
+- **`pkg/vector/types` is a leaf.** No package it imports lives in this repo.
+- **`internal/vector/build` and `internal/vector/query` are siblings**, not parent/
   child. Build owns the write path; query owns the read path; they
-  share `pkg/types`, `internal/store/sqlitevec`, and `internal/manifest`.
-- **`pkg/ckv` is the in-process facade** that re-exports `internal/query`
+  share `pkg/vector/types`, `internal/vector/store/sqlitevec`, and `internal/vector/manifest`.
+- **`pkg/vector/ckv` is the in-process facade** that re-exports `internal/vector/query`
   types via Go type aliases (`SearchOptions = query.Options` etc.).
-  External consumers import `pkg/ckv`, never `internal/query`.
-- **`pkg/mcp` wraps `internal/query`** the same way but speaks
+  External consumers import `pkg/vector/ckv`, never `internal/vector/query`.
+- **`pkg/mcp` wraps `internal/vector/query`** the same way but speaks
   JSON-RPC instead of Go function calls. Both surfaces share the
   same Engine.
 - **No cycles.** `go build ./...` enforces this — the layout above is
@@ -106,31 +106,31 @@ Key invariants:
 ### Build pipeline (write path)
 
 ```
-cmd/ckv/build.go::runBuild
-  └─ internal/build/builder.go::Run
-       ├─ internal/projectcfg     load ckv.yaml (optional)
-       ├─ internal/discover       walk srcRoot → []File
+cmd/vector/build.go::runBuild
+  └─ internal/vector/build/builder.go::Run
+       ├─ internal/vector/projectcfg     load ckv.yaml (optional)
+       ├─ internal/vector/discover       walk srcRoot → []File
        │     └─ DefaultIgnore + .ckvignore + DefaultSecretPatterns  (B9)
        ├─ for each file:
-       │   ├─ internal/parse/<lang>   src → []SymbolSpan
-       │   ├─ internal/chunk         []SymbolSpan → []Chunk
+       │   ├─ internal/vector/parse/<lang>   src → []SymbolSpan
+       │   ├─ internal/vector/chunk         []SymbolSpan → []Chunk
        │   │     ├─ file_header chunk (50 lines by default)
        │   │     ├─ symbol chunks
        │   │     └─ BuildEmbedText (Phase D.1 prefix)             (#6)
        │   ├─ Embedder.Embed         []text → [][]float32
        │   └─ store.Upsert           atomic chunks + vectors
-       └─ internal/manifest::Save    manifest.json + DB-side mirror
+       └─ internal/vector/manifest::Save    manifest.json + DB-side mirror
 ```
 
-Memory pre-check + adaptive batching live in `internal/build/memory*.go`
+Memory pre-check + adaptive batching live in `internal/vector/build/memory*.go`
 (refuses to start when free RAM is below the embedder's documented
 headroom; halves the embed batch when free RAM drops mid-build).
 
 ### Query pipeline (read path)
 
 ```
-cmd/ckv/query.go / pkg/mcp/server.go / pkg/ckv (any of the three)
-  └─ internal/query/engine.go::Engine.Search
+cmd/vector/query.go / pkg/vector/mcp/server.go / pkg/vector/ckv (any of the three)
+  └─ internal/vector/query/engine.go::Engine.Search
        ├─ Embedder.Embed(intent)             1 vector
        ├─ store.Search                        ANN top-K' (k * overfetchFactor)
        ├─ threshold drop                      below normalized cutoff → out
@@ -142,14 +142,14 @@ cmd/ckv/query.go / pkg/mcp/server.go / pkg/ckv (any of the three)
 ```
 
 The same Engine instance backs all three callers — CLI, MCP server,
-and the in-process `pkg/ckv.Engine`. Concurrency-safe because the
+and the in-process `pkg/vector/ckv.Engine`. Concurrency-safe because the
 store is read-only after Open.
 
 ### Reindex pipeline (incremental write path)
 
 ```
-cmd/ckv/reindex.go::runReindex
-  └─ internal/build/reindex.go::Reindex                            (#8)
+cmd/vector/reindex.go::runReindex
+  └─ internal/vector/build/reindex.go::Reindex                            (#8)
        ├─ manifest.Load                       prev_head, embedder identity
        ├─ resolveChangeSet
        │     ├─ if Options.Files set         use it verbatim
@@ -171,23 +171,23 @@ store silently breaks retrieval.
 
 | Decision | ADR | Impact on package layout |
 |----------|-----|--------------------------|
-| sqlite-vec for storage | [001](./adr/001-sqlite-vec-storage.md) | `internal/store/sqlitevec/` is the only store; one file on disk |
-| bge-large ONNX pivot | [002](./adr/002-bge-large-pivot.md) | `internal/embed/bgeonnx/` (BERT + CLS); superseded as the default by ollama/bge-m3 (see 008) |
-| BM25 stays on CKS side | [003](./adr/003-bm25-dual-track.md) | No `internal/bm25/` package; `pkg/mcp.Server.Underlying()` is the integration point |
-| `ckv reindex` promoted to S1.5 | [004](./adr/004-ckv-reindex-s1-5-promotion.md) | `internal/build/reindex.go` ships in S1; not blocked behind S2 |
-| CoreML MLProgram + static shapes | [005](./adr/005-coreml-mlprogram-static-shapes.md) | `internal/embed/coreml/` + `internal/embed/bgeonnx/` session knobs |
+| sqlite-vec for storage | [001](./adr/001-sqlite-vec-storage.md) | `internal/vector/store/sqlitevec/` is the only store; one file on disk |
+| bge-large ONNX pivot | [002](./adr/002-bge-large-pivot.md) | `internal/vector/embed/bgeonnx/` (BERT + CLS); superseded as the default by ollama/bge-m3 (see 008) |
+| BM25 stays on CKS side | [003](./adr/003-bm25-dual-track.md) | No vector-side BM25 package (shared core lives at `pkg/bm25`); `pkg/mcp.Server.Underlying()` is the integration point |
+| `ckv reindex` promoted to S1.5 | [004](./adr/004-ckv-reindex-s1-5-promotion.md) | `internal/vector/build/reindex.go` ships in S1; not blocked behind S2 |
+| CoreML MLProgram + static shapes | [005](./adr/005-coreml-mlprogram-static-shapes.md) | `internal/vector/embed/coreml/` + `internal/vector/embed/bgeonnx/` session knobs |
 | BM25 candidate-set rerank (temporary) | [006](./adr/006-bm25-temporary-rerank.md) | eval-only measurement infra; no new store package |
-| `canonical_id` is the CKG↔CKV join key | [007](./adr/007-canonical-id-join-key.md) | `chunks.canonical_id` via `internal/ckgalign/`; positional `ckg_node_id` retired |
-| Qwen3-Embedding @ 1024 dims (MRL) recommended | [008](./adr/008-qwen3-embedding-1024-dim.md) | `pkg/embed/ollama` `TargetDim` / `--embed-dim`; 1024 default (MRL 256·512·1024), 4b native 2560 |
-| Rule-based prefix is the default | [009](./adr/009-rule-based-prefix-default.md) | `internal/llmprefix/` gated off by default; LLM prefix deferred |
-| Flow-corpus chunk signatures | [010](./adr/010-flow-corpus-chunk-signatures.md) | `internal/flowcorpus/`; `ChunkFlowStep` / `ChunkFlowSpine` |
+| `canonical_id` is the CKG↔CKV join key | [007](./adr/007-canonical-id-join-key.md) | `chunks.canonical_id` via `internal/vector/ckgalign/`; positional `ckg_node_id` retired |
+| Qwen3-Embedding @ 1024 dims (MRL) recommended | [008](./adr/008-qwen3-embedding-1024-dim.md) | `pkg/vector/embed/ollama` `TargetDim` / `--embed-dim`; 1024 default (MRL 256·512·1024), 4b native 2560 |
+| Rule-based prefix is the default | [009](./adr/009-rule-based-prefix-default.md) | `internal/vector/llmprefix/` gated off by default; LLM prefix deferred |
+| Flow-corpus chunk signatures | [010](./adr/010-flow-corpus-chunk-signatures.md) | `internal/vector/flowcorpus/`; `ChunkFlowStep` / `ChunkFlowSpine` |
 
-The default embedder is **ollama/bge-m3 (dim 1024)** (`cmd/ckv/embedder.go`;
-`internal/embed/registry/registry.go` `DefaultModelName = "bge-m3"`). The
+The default embedder is **ollama/bge-m3 (dim 1024)** (`cmd/vector/embedder.go`;
+`internal/vector/embed/registry/registry.go` `DefaultModelName = "bge-m3"`). The
 `bgeonnx` (ONNX Runtime) and `coreml` backends remain available via
 `--embedder`; `mock` backs the eval baseline. The default surface command set is
 `build`, `reindex`, `promote`, `query`, `mcp`, `freshness`, `model`, `eval`,
-`glossary`, `migrate` (`cmd/ckv/root.go`).
+`glossary`, `migrate` (`cmd/vector/root.go`).
 
 ## Cross-tool integration
 
@@ -197,7 +197,7 @@ without forking. The relationship is documented in
 [`plan-S1-ckv.md §7`](./archive/plan-S1-ckv.md) — CKV is "vector retrieval over
 a code repo," nothing more.
 
-`pkg/ckv` is the alternative integration path for callers that want
+`pkg/vector/ckv` is the alternative integration path for callers that want
 in-process Go API access (single binary, no subprocess hop). See
 [`embedder-integration.md`](./embedder-integration.md) for the
 consumer guide.
@@ -205,7 +205,7 @@ consumer guide.
 ## Out of scope
 
 - **Working memory** (`cks.memory.*`): planned for S2; lives in CKS.
-- **Sanitize** (`internal/sanitize/`): planned for S2; UC-V13.
+- **Sanitize** (now `internal/system/composer/sanitize`): landed at the system layer; UC-V13.
 - **mTLS / policy enforcement**: planned for S6.
 - **HTTP API** (`ckv serve`): planned for S2.
 
