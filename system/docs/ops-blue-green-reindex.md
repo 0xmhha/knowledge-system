@@ -19,9 +19,9 @@
 | config 생성 | `gen-cks-config.sh` | `cks mcp gen-config`(원격 도달용은 `--lan`; sanitize `rules_path`는 baseline 절대경로로 자동 채움) |
 | 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `cks mcp up`/`down`(`instances.yaml` 레지스트리, 포트 자동 배정, `graph_binary`/`vector_binary`로 ops.reindex 활성). `up --wait`로 `/healthz` serviceable까지 대기 |
 | 상태/준비 확인 | `serve-cks-http.sh status` | `cks mcp status`/`list`(`--ready`로 각 인스턴스 serviceability 프로브) |
-| 무중단 전환(blue-green) | 수동 green 기동→health→소비자 전환→blue 정지 | `system-mcp daemon reload` — green을 임시 포트에 기동→`/healthz` 게이트 통과 시에만 real 포트로 교체(불건전 시 기존 인스턴스 무손상) |
+| 무중단 전환(blue-green) | 수동 green 기동→health→소비자 전환→blue 정지 | `cks mcp reload` — green을 임시 포트에 기동→`/healthz` 게이트 통과 시에만 real 포트로 교체(불건전 시 기존 인스턴스 무손상) |
 | identity/serviceable 확인 | `cks.ops.health` | `GET /healthz`(200=serviceable, 503+reason; reason은 loopback에만) 또는 `cks.ops.health` |
-| 클라이언트 등록 스니펫 | 수동 | `system-mcp print-mcp-config --config <cfg>`(HTTP URL 또는 stdio command; `--http-addr`로 런타임 포트 override) |
+| 클라이언트 등록 스니펫 | 수동 | `cks mcp client-config --config <cfg>`(HTTP URL 또는 stdio command; `--http-addr`로 런타임 포트 override) |
 
 게이트 스위트(§5.1의 5단계)는 `internal/setup`의 Reindex 게이트로 이식되었다:
 ckg validate / manifest-align(commit·digest·schema≥1.19) / chunk_count>0 /
@@ -82,7 +82,7 @@ FAMILY=pr-77-2 SRC=/abs/indexed-checkout \
 
 ## 서빙 전환
 
-cks-mcp는 **기동 시 1회** 심볼릭을 resolve해 구체 버전에 고정(수명 내 재해석 없음,
+`cks mcp`는 **기동 시 1회** 심볼릭을 resolve해 구체 버전에 고정(수명 내 재해석 없음,
 health가 resolved 경로·`alignment` 블록으로 identity 증명). 전환 방법 2가지:
 
 ### (a) 재시작 전환 (기본 — 세션/벤치 경계에서)

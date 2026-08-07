@@ -19,7 +19,7 @@ project-agnostic versions of that pipeline.
   ckv/                  ckv vector index + manifest.json
   logs/{footprint,audit}/
   cks-<name>.yaml       generated cks config (gen-dataset-config.sh)
-  cks-<name>.env        hand-maintained shell exports (generation retired; derive from `system-mcp print-mcp-config`)
+  cks-<name>.env        hand-maintained shell exports (generation retired; derive from `cks mcp client-config`)
 ```
 
 ## Scope: index only build-participating code
@@ -43,7 +43,7 @@ go list -deps ./cmd/<binary> | grep '^<module>'
 | 1 | `SRC=<repo> OUT=<DATASET>/_src MODULE=<mod> BUILD_TARGETS=./cmd/<bin> scripts/build-pruned-src.sh` | pruned `_src/` (build-participating pkgs) |
 | 2 | `SRC=<repo> OUT=<DATASET>/_src scripts/copy-embeds.sh` | embed assets in `_src/`; validates `go list ./...` |
 | 3 | `ckg build --src <DATASET>/_src --out <DATASET>/ckg --lang go` | `ckg/` graph |
-| 4 | *(optional)* `cks-domain-export` + stage README/docs into a corpus dir | doc dirs for `--docs` |
+| 4 | *(optional)* `cks domain export` + stage README/docs into a corpus dir | doc dirs for `--docs` |
 | 5 | `ckv build --embedder=ollama --model-name=bge-m3 --src <DATASET>/_src --out <DATASET>/ckv --lang go [--docs DIR ...]` | `ckv/` vector (code [+ docs]) |
 | 6 | *(if you used `--docs`)* `SRC=<DATASET>/_src DOCS_DIRS=DIR1:DIR2 scripts/materialize-domain-into-src.sh` | docs placed under `_src/` so citations resolve |
 | 7 | `DATASET=<DATASET> NAME=<name> scripts/gen-dataset-config.sh` | `cks-<name>.yaml`, `cks-<name>.env` |

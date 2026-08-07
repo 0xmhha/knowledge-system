@@ -104,7 +104,7 @@ build-bins:
 # Engine-scoped package set. system/ itself holds no Go packages since the
 # consolidation (engine source lives at ../internal/system etc.), so ./...
 # here would silently match nothing. internal/setup is boundaries-wise its
-# own layer but is knowledge-setup's implementation, so it belongs to this
+# own layer but is `cks setup`'s implementation, so it belongs to this
 # engine's test scope.
 SYSTEM_PKGS = ../cmd/cks/... \
               ../internal/system/... ../internal/setup/... ../pkg/system/...
@@ -162,8 +162,8 @@ log-tail:
 	if [ $$found -eq 0 ]; then echo "no logs found in $(LOG_DIR)/"; fi
 
 # ---------------------------------------------------------------------
-# Dogfood eval — cks-mcp runs against a ckg index built from cks itself,
-# then cks-eval scores the corpus and writes a JSON report.
+# Dogfood eval — `cks mcp` runs against a ckg index built from cks itself,
+# then `cks eval` scores the corpus and writes a JSON report.
 #
 # The whole flow is wire-up only — every artifact is rebuilt every time
 # so the resulting baseline always reflects the current working tree.
@@ -218,7 +218,7 @@ ckv-index-clean:
 # indexes. Skips overwrite if the file already exists; delete it first
 # to regenerate. The ckv block fires only when USE_CKV=1 (default 0)
 # because the ckv subprocess link is currently unstable (see USE_CKV
-# doc above). With USE_CKV=0 the cks-mcp ckv adapter stays on the
+# doc above). With USE_CKV=0 the `cks mcp` ckv adapter stays on the
 # in-memory Fake.
 dogfood-config: ckv-backend-guard
 	@if [ -f $(DOGFOOD_CONFIG) ]; then \

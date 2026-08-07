@@ -97,9 +97,9 @@ the plugin's agents. The point of the datasets is to make that reasoning
   get_invariant_enforcement, find_invariants, get_conventions; `cks.ops.*` —
   health, freshness, index.
 - **Domain-knowledge subsystem:** `system/docs/domain-knowledge/` (schema
-  `shared/entry.schema.yaml`, lifecycle `shared/STATUS_LIFECYCLE.md`). `cks-domain-sync`
+  `shared/entry.schema.yaml`, lifecycle `shared/STATUS_LIFECYCLE.md`). `cks domain sync`
   derives ckv/ckg policy views from **verified** entries; `internal/system/domainexport`
-  renders entries → markdown corpus for `ckv build --docs`; `cks-glossary-gen` builds
+  renders entries → markdown corpus for `ckv build --docs`; `cks domain glossary-gen` builds
   the alias glossary feeding the vocab resolver.
 - **Gaps (from the 4-way eval, `eval/ckg-4way/`):** `get_for_task` (δ) has the best
   answer pass-rate but the **most fabricated line-range citations** (≈1 per 3
@@ -262,6 +262,6 @@ invariants/pitfalls, aliases) and must reach `verified` before it ships to the i
 **P2 — security depth**
 - Reorg-griefing, replay across fee-delegation, blacklist-bypass surface, gas/balance overflow.
 
-> Activation: new/updated entries → `cks-domain-sync` (ckv/ckg policy views) →
+> Activation: new/updated entries → `cks domain sync` (ckv/ckg policy views) →
 > `domainexport` corpus → ckv re-embed (batched, ~10h) + ckg policy refresh.
 </content>
