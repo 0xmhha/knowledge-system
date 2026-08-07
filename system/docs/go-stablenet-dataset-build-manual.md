@@ -1,10 +1,20 @@
 # go-stablenet 코드-지식 데이터셋 구축 메뉴얼
 
-> **2026-07-28 갱신**: 본문이 참조하는 셸 스크립트 일부는 통합 후 Go
-> 파이프라인으로 대체되었다 — `gen-cks-config.sh` → `cks mcp gen-config`,
-> `cks-health.sh` → `cks.ops.health` 툴/`GET /healthz`, 데이터셋 빌드 →
-> `projects/stablenet/scripts/build-dataset.sh`(=`knowledge-setup` 래퍼).
-> 해당 언급은 이 대체 경로로 읽을 것.
+> **역사 문서 (2026-08-07 갱신)**: 아래 절차는 세 저장소(code-knowledge-graph
+> /-vector/-system)와 개별 바이너리(`cks-domain-export`, `cks-domain-sync`,
+> `cks-mcp` …)가 있던 시절에 작성됐다. 지금은 저장소가 하나이고 명령은
+> `ckg`·`ckv`·`cks` 셋뿐이므로, **본문의 명령을 그대로 실행하지 말 것.**
+>
+> 현재 경로:
+>
+> - 데이터셋 빌드: 루트 `README.md`의 Quick start 또는
+>   `projects/stablenet/scripts/build-dataset.sh`(= `cks setup` 래퍼)
+> - 도메인 코퍼스/정책/글로서리: `cks domain export|sync|glossary-gen`
+> - 서버 설정·기동: `cks mcp gen-config` → `cks mcp --config`
+> - 헬스 확인: `cks.ops.health` 툴 또는 `GET /healthz`
+>
+> 남겨두는 이유는 각 단계가 *왜* 그 순서인지, 채널 ①/②가 무엇을 싣는지에
+> 대한 설명이 아직 유효하기 때문이다.
 
 > **목적**: `go-stablenet` 소스 코드와 도메인 지식을 기반으로
 > **cks / ckv / ckg** 코드-지식 데이터셋을 **반복 가능하게** 구축한다.

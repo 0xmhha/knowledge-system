@@ -37,9 +37,9 @@ all: build ## Default: build the ckv binary
 build: ## Build bin/ckv
 	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/ckv ../cmd/vector
 
-# The combined CKG+CKV binary (cks-mcp) lives in the CKS repository, not
-# here. CKV stays as a pure Vector-layer library; CKS imports it (and CKG)
-# and produces the multiplexed MCP binary. See docs/archive/plan-S1-ckv.md §7.
+# The fused server lives in the system engine (`cks mcp`, cmd/cks): it
+# imports this engine in-process. This target builds the vector engine's
+# own binary; `ckv mcp` serves the vector tool set on its own.
 
 test: ## Run unit tests
 	$(GO) test $(PKG_LIST)

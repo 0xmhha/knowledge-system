@@ -59,7 +59,7 @@ Run these against the ported tree; all of them exist in-repo:
 | Full-DB audit (optional, stronger) | sorted-dump hash per table (`nodes`, `edges` minus rowid, `blobs`, `node_prs`, `pending_refs`, `pkg_tree`, FTS content) | all hashes equal (`topic_tree` requires the deterministic-clustering fix; manifest differs only in additive identity keys) |
 | Retrieval behavior | `eval-retrieval --fixtures projects/<name>/eval/graph-keyword/fixtures` on both binaries against their own builds | output JSON deep-equal (excluding the graph path field) |
 | Tool names | start each MCP server with the downstream namespace; `tools/list` | names are `<root>.context.*` / `<root>.ops.*` with the intended root |
-| Alignment gate | `knowledge-setup --config projects/<name>/setup.yaml ...` | verify-align step passes |
+| Alignment gate | `cks setup --config projects/<name>/setup.yaml ...` | verify-align step passes |
 
 ## Normalized-diff spot check
 

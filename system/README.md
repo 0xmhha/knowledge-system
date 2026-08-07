@@ -134,17 +134,18 @@ the same `ckv`/`ckg` builds, forwarding `--policy-file` when `backends.ckg.polic
 ## Layout
 
 ```
-cmd/
-├── cks-mcp/                  MCP server (stdio) — the main binary
-├── cks-agent/               coding-agent CLI (vibe prompt → plan/diffs/tests)
-├── cks-eval/                retrieval-quality eval harness
-├── cks-glossary-gen/        build the alias glossary for the vocab resolver
-├── cks-domain-sync/         derive ckv/ckg policy views from verified entries
-├── cks-domain-export/       render verified entries → markdown corpus (ckv --docs)
-├── cks-entry-verify/        validate domain entries vs schema + anchors
-├── cks-inventory-check/     cross-check domain inventory vs coverage
-├── cks-anchor-refresh/      re-stamp entry code anchors against current HEAD
-└── cks-promotion-worksheet/ draft/needs_verification → verified worksheet
+cmd/cks/                     the single system-engine binary
+├── main.go                  cobra root: mcp / domain / setup / filelist /
+│                            viewer / agent / eval / eval-gate
+├── mcpcli/                  MCP server + daemon verbs + gen-config/client-config
+├── domaincli/               domain toolchain (export, sync, glossary-gen,
+│                            verify, check, anchors, worksheet)
+├── setupcli/                dataset build orchestrator
+├── filelistcli/             build-scope derivation
+├── evalgatecli/             baseline drift gate
+├── evalcli/                 retrieval-quality eval harness
+├── agentcli/                coding-agent CLI (vibe prompt → evidence markdown)
+└── viewercli/               unified dashboard (proxies to a spawned ckg api)
 pkg/                         public contract (consumed by upper layers)
 ├── contract/                public types: Citation, EvidencePack, Hit, Neighbor
 └── testpath/                test / test-only path classification

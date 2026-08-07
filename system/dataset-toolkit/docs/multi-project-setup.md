@@ -20,7 +20,7 @@
 |---|---|---|
 | **ckg** | 빌드 시 `graph.db`를 만드는 CLI + cks가 **in-process로 읽는 DB 파일** | DB 파일 경로만 바꾸면 됨 (재시작 불필요) |
 | **ckv** | 빌드 시 `vector.db`를 만드는 CLI + cks가 in-process로 읽음 (임베딩만 ollama 호출) | 동일 |
-| **cks** | `cks-mcp` 서버. **기동 시 `CKS_CONFIG`를 1회 읽고 고정** | config 교체 + **MCP 서버 재기동(=세션 재시작)** |
+| **cks** | `cks mcp` 서버. **기동 시 `CKS_CONFIG`를 1회 읽고 고정** | config 교체 + **MCP 서버 재기동(=세션 재시작)** |
 | **coding-agent** | Claude Code 플러그인(파이프라인). cks를 MCP로 호출, 코드는 **실행 디렉토리(git repo)** 에서 편집 | 해당 repo에서 Claude 실행 |
 
 따라서 프로젝트 전환 시 실제로 신경 쓸 것은 **두 개의 바인딩**뿐이다.
@@ -122,7 +122,7 @@ sanitize:
 ```json
 {
   "env": {
-    "CKS_MCP_BIN": "/Users/wm-it-25_0220/Work/github/code-knowledge-system/bin/cks-mcp",
+    "CKS_MCP_BIN": "/abs/path/to/knowledge-system/bin/cks",
     "CKS_CONFIG":  "/Users/wm-it-25_0220/Work/github/knowledge-data/<proj>/cks-<proj>.yaml"
   }
 }
@@ -141,7 +141,7 @@ cd <CODE> && claude     # 이 디렉토리에서 띄우면 자동으로 <proj> D
 ```jsonc
 // ~/.claude/settings.json
 "env": {
-  "CKS_MCP_BIN": "/Users/wm-it-25_0220/Work/github/code-knowledge-system/bin/cks-mcp",
+  "CKS_MCP_BIN": "/abs/path/to/knowledge-system/bin/cks",
   "CKS_CONFIG":  "/Users/wm-it-25_0220/Work/github/knowledge-data/<proj>/cks-<proj>.yaml",
   ...
 }
@@ -182,7 +182,7 @@ cd <CODE> && claude     # 이 디렉토리에서 띄우면 자동으로 <proj> D
 ## 5. 주의사항 / 함정
 
 - **MCP는 기동 시 1회만 env를 읽는다.** config를 바꿨으면 반드시 세션 재시작.
-- **동시에 떠 있는 다른 세션의 cks-mcp는 각자 자기 config로 독립 동작한다.**
+- **동시에 떠 있는 다른 세션의 `cks mcp`는 각자 자기 config로 독립 동작한다.**
   `settings.json`을 바꿔도 이미 떠 있는 세션엔 영향이 없다(= 새 세션부터 적용).
 - **전역 `~/.claude/settings.json`의 `env`는 모든 세션 공통.** 동시 멀티 테스트는 방식 A 필수.
 - **코드 경로와 DB의 `source_root`가 불일치하면** retrieval 결과의 파일/라인이 편집 대상과

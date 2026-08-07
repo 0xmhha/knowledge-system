@@ -6,10 +6,10 @@
 
 ## 1. Architecture in one paragraph
 
-The coding-agent never talks to CKV or CKG directly. It opens a single MCP stdio session against `cks-mcp`. `cks-mcp` exposes 19 tools (table below); under the hood, those tools route to `internal/ckvclient` and `internal/ckgclient`, which open the real ckv/ckg backends **in-process** (no subprocess) or fall back to a Smart Dummy that returns LLM-actionable instructions instead of fake data. From the coding-agent's point of view there is exactly one MCP server to install.
+The coding-agent never talks to CKV or CKG directly. It opens a single MCP stdio session against `cks mcp`. `cks mcp` exposes 19 tools (table below); under the hood, those tools route to `internal/system/ckvclient` and `internal/system/ckgclient`, which open the real ckv/ckg backends **in-process** (no subprocess) or fall back to a Smart Dummy that returns LLM-actionable instructions instead of fake data. From the coding-agent's point of view there is exactly one MCP server to install.
 
 ```
-coding-agent  ─stdio MCP─▶  cks-mcp  ─Go import─▶  ckvclient ─pkg/ckv (in-process)──▶  ckv
+coding-agent  ─stdio MCP─▶  cks mcp  ─Go import─▶  ckvclient ─pkg/ckv (in-process)──▶  ckv
                                        ─Go import─▶  ckgclient ─pkg/store (in-process)─▶  ckg
 ```
 
@@ -255,4 +255,4 @@ This file should be re-checked whenever any of the following changes:
 2. The coding-agent HLD evolves a virtual signature (phase3 §7.x or phase4 §7.x). Add a new mapping row in §3 or amend the existing one.
 3. A roadmap item from §5 lands ("rerank" toggle, `include_concurrency`, etc.). Move the row out of §5 and into §3.
 
-When uncertain, run `cks-mcp` against the tools/list MCP method and compare the names there with §2. The wire names are the contract.
+When uncertain, run `cks mcp` against the tools/list MCP method and compare the names there with §2. The wire names are the contract.
