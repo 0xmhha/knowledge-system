@@ -430,13 +430,12 @@ Authoritative tool list: `pkg/mcphandlers/registerall.go`.
 ```go
 type Options struct {
   (viewer dev overlay moved to cks: env CKS_DEV_VIEWER_DIR, internal/system/viewer)
-  NoViewer     bool    // flag: --no-viewer (API-only, operator's reverse-proxy pattern)
+  (server is API-only since the dashboard moved to cks — no viewer knobs)
 }
 ```
 
 **Use cases**:
 - `New(store, log)` → zero-options default (embedded viewer)
-- `--open` auto-suppress when `--no-viewer` set
 - `CKS_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets` → reload browser without recompiling
 
 ---
@@ -988,7 +987,6 @@ claude mcp add ckg --command ./bin/ckg --args "mcp,--graph=/path/to/graph.db"
 | `--port` | — | `8080` | HTTP server port |
 | `--open` | — | `false` | Auto-open browser on serve |
 | `--no-cache` | — | `false` | Force full rebuild (ignore manifest) |
-| `--no-viewer` | — | `false` | Serve API only (no static mount) |
 | (dev) | `CKS_DEV_VIEWER_DIR` | (empty) | Disk path to viewer assets (dev overlay) |
 
 ---

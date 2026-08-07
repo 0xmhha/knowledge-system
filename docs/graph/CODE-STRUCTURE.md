@@ -349,8 +349,8 @@ authoritative 등록 목록: `pkg/mcphandlers/registerall.go` `RegisterAll` (내
 ┌─────────────────── server.NewWithOptions(store, log, opts) ────────────────┐
 │                                                                              │
 │  Options{ DevViewerDir, NoViewer }                                          │
-│   ├─ CKG_DEV_VIEWER_DIR env  → disk-backed (dev hot reload)                │
-│   └─ --no-viewer flag         → API-only (production-split)                │
+│   └─ (대시보드 서빙·dev 오버레이는 cks 측: internal/system/viewer,        │
+│      CKS_DEV_VIEWER_DIR — 이 서버는 API 전용)                              │
 │                                                                              │
 │  Routes:                                                                     │
 │   GET  /api/manifest        → graph stats + freshness banner                │
@@ -585,7 +585,7 @@ make -C graph viewer && make build-bins    # 대시보드 자산 + 엔진 바이
 
 # API-only / disk viewer
 ./bin/ckg api --graph=/tmp/ckg-synth --port=8788
-make viewer && CKG_DEV_VIEWER_DIR=$(pwd)/internal/server/web_assets \
+make -C graph viewer && CKS_DEV_VIEWER_DIR=$(pwd)/tools/viewer/out \
   ./bin/cks viewer --graph=/tmp/ckg-synth --port=8789
 ```
 

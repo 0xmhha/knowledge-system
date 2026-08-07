@@ -24,7 +24,7 @@ an MCP-enabled LLM, or a 3D web viewer.
 
 ```bash
 git clone https://github.com/0xmhha/knowledge-system
-cd code-knowledge-graph
+cd knowledge-system
 make -C graph viewer && make build-bins   # dashboard assets + the three engine binaries
 
 # 1. Build a graph from any code path
