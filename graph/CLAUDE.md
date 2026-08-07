@@ -25,11 +25,11 @@ read it before any design discussion. Doc index: **[../docs/graph/DOC-MAP.md](..
 | Lint | `make lint` | = `go vet ./...` + `fmt-check` + viewer eslint |
 | Format | `make fmt` | gofmt -w over `.go` under graph/ (fixtures); engine-wide = root `make fmt` |
 | Audit (parity) | `make audit` | `go/packages.Load` vs DB parity; exits 0/1/2 for CI |
-| Eval | `make eval` | retrieval / validate / benchmark; gated by `cmd/eval-gate` |
+| Eval | `make eval` | retrieval / validate / benchmark; gated by `cks eval-gate` |
 
 CI (root `.github/workflows/ci.yml`) runs `make build`, `make lint`,
 `make test-race` (whole module) plus two eval gates: `eval-gate-graph`
-(`make -C graph eval` + `cmd/eval-gate` vs the committed baseline) and
+(`make -C graph eval` + `cks eval-gate` vs the committed baseline) and
 `eval-gate-vector` (mock-embedder recall gate). The viewer pipeline and
 `make audit` are local-only (not in CI). **Match CI locally before pushing.**
 
@@ -46,7 +46,7 @@ root under an engine-scoped prefix).
 - `../cmd/graph/` — cobra root + subcommands. **Five production surfaces:**
   `build`, `serve`, `mcp`, `eval`, `audit`. The rest are utilities.
   (`ckg mcp` serves the namespaced MCP tool set.)
-- `../cmd/eval-gate/` — eval regression gate (CI).
+- `../cks eval-gate/` — eval regression gate (CI).
 - `../internal/graph/` — implementation. **Private**: other engines must not
   import it. Key: `buildpipe` (7-pass pipeline + cache),
   `parse/{golang,typescript,solidity}`, `persist` (SQLite/Postgres store,
@@ -100,7 +100,7 @@ spawning a new one.
   delete or shrink it during cleanup. If purpose/vision prose is scattered in
   other docs, **move it into VISION.md — do not drop it.** (This directly
   prevents vision being lost when status docs are pruned.)
-- **Tier 2 — design/specs incl. `docs/adr/`**: a decision = one ADR file. To
+- **Tier 2 — design/specs incl. `docs/graph/adr/`**: a decision = one ADR file. To
   change a decision, **add a new ADR and mark the old one `Superseded by …` —
   never delete it.** This is what stops repeated "which design is right?"
   re-litigation: the supersession chain is the answer.
@@ -112,7 +112,7 @@ Rules:
    VISION for "what we aim at".
 2. **Don't proliferate docs.** New `.md` only when it's genuinely a new decision
    (→ ADR) or a new dated status snapshot. Otherwise update in place.
-3. **Supersede, don't delete.** Move superseded design docs to `docs/archive/`
+3. **Supersede, don't delete.** Move superseded design docs to `docs/graph/archive/`
    with a one-line "superseded by X".
 4. **Update the index.** Any doc add/move/supersede → update `../docs/graph/DOC-MAP.md`
    (and the ADR index) in the same change.

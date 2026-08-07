@@ -2,43 +2,43 @@
 
 > Updated 2026-07-15. *Single entry point* for a new session or new machine
 > picking up the ckg work. Deliberately short — every section links to the
-> authoritative source. **For project purpose read `docs/VISION.md`; for the
-> doc map read `docs/DOC-MAP.md`; "what is true now" = code + git.**
+> authoritative source. **For project purpose read `docs/graph/VISION.md`; for the
+> doc map read `docs/graph/DOC-MAP.md`; "what is true now" = code + git.**
 
 ## 1. Snapshot (where the project is)
 
 - **Branch**: `main`
-- **Doc governance**: 3-tier model live — VISION (Tier 1), ADR (`docs/adr/`,
-  Tier 2), status (Tier 3); `docs/DOC-MAP.md` is the index.
+- **Doc governance**: 3-tier model live — VISION (Tier 1), ADR (`docs/graph/adr/`,
+  Tier 2), status (Tier 3); `docs/graph/DOC-MAP.md` is the index.
 - **Symbol identity — COMPLETE.** The `canonical_id` chain (ckg→ckv→cks) is
   merged. Decisions: ADR-0001 (identity), ADR-0002 (deterministic graph
   composition — primary packages own production files), ADR-0003 (deprecate the
   Postgres backend, closing the old "item 7"). The status/handoff docs are
-  archived (`docs/archive/symbol-identity-*`, `docs/archive/HANDOFF-2026-06-19-*`).
+  archived (`docs/graph/archive/symbol-identity-*`, `docs/graph/archive/HANDOFF-2026-06-19-*`).
 - **Build determinism (ADR-0002)**: `buildFileIndex` gives primary (non-test-variant)
   packages deterministic ownership of production files; test variants only add
   `_test.go`. Same source+commit+binary → same graph.
 - **Canonical corpus build**: `--files-from` filters under `eval/stablenet/`
   (`stablenet-files.json` = no tests; `stablenet-files-with-tests.json` = binary
   scope + tests). See README "Building a graph".
-- **graph_digest pin anchor + atomic cold rebuild (#53)**: `internal/buildpipe/graph_digest.go`
+- **graph_digest pin anchor + atomic cold rebuild (#53)**: `internal/graph/buildpipe/graph_digest.go`
   publishes a deterministic code-graph digest to the manifest (json + in-db row);
   cold rebuild is atomic via `graph.db.building` → `os.Rename`. Canonical pr-77-2
   graph digest = `4be26516…`.
 - **Keyword-retrieval eval (#57)**: LLM-free `eval-retrieval` fixtures —
   `eval/ckv-mirror` (CKV fixture mirror, `make eval-ckv-mirror`, 12/12) and
   `eval/stablenet-keyword` (real corpus, `make eval-stablenet-keyword GRAPH=<dir>`, 8/8).
-- **Eval framework (LLM-driven)**: production-ready. Metrics: `docs/archive/eval-trajectory.md`.
-- **Schema**: 1.23 (authoritative: `docs/SCHEMA.md` → `internal/buildpipe/cache.go`).
+- **Eval framework (LLM-driven)**: production-ready. Metrics: `docs/graph/archive/eval-trajectory.md`.
+- **Schema**: 1.23 (authoritative: `docs/graph/SCHEMA.md` → `internal/graph/buildpipe/cache.go`).
 
 ## 1b. Remaining work — **no open CKG code items** (2026-07-15)
 
 The reindex/graph_digest coordination and the ckg_node_id retirement closed; the
-status/coordination docs are archived under `docs/archive/` (see the archive
+status/coordination docs are archived under `docs/graph/archive/` (see the archive
 notes there). What's left is not CKG code work:
 
 - **C1 (optional, deferred)**: widen `goCanonicalID` coverage
-  (`internal/parse/golang/declarations.go`). Deferred by design — empty
+  (`internal/graph/parse/golang/declarations.go`). Deferred by design — empty
   `canonical_id` is mostly by-design (promoted/synthetic methods, function-local
   var/const), and changing it bumps the schema and re-digests the published graph
   (CKV/coding-agent ripple) for ~zero gain.
@@ -51,11 +51,11 @@ notes there). What's left is not CKG code work:
 These are the only genuinely-unimplemented features left in the design specs; both
 were consciously deferred, not dropped:
 
-- **W4 message-queue / pub-sub** (`docs/design/schema-1.9-spec.md` §W4): Kafka /
+- **W4 message-queue / pub-sub** (`docs/graph/design/schema-1.9-spec.md` §W4): Kafka /
   NATS / RabbitMQ / SQS detection → a `Topic` node + `publishes_to` / `consumes_from`
-  edges. No `NodeTopic` / `EdgePublishesTo` exists in `pkg/types/enums.go`. W1–W3
+  edges. No `NodeTopic` / `EdgePublishesTo` exists in `pkg/graph/types/enums.go`. W1–W3
   (HTTP/gRPC interop) shipped; W4 is the sole remaining stage of that spec.
-- **Concurrency Stage 2** (`docs/archive/spec-ckg-v0.2.md` §2 Stage 2): SSA-based
+- **Concurrency Stage 2** (`docs/graph/archive/spec-ckg-v0.2.md` §2 Stage 2): SSA-based
   `--deep` dataflow + `is_potential_race` candidate detection. Stage 1 (Mutex +
   acquires/releases/accessed_under_lock) shipped; Stage 2 is spec-only.
 
@@ -63,12 +63,12 @@ were consciously deferred, not dropped:
 
 | If you want to … | Read |
 |---|---|
-| Understand the eval-framework series (11 cycles, metrics) | `docs/archive/eval-trajectory.md` |
+| Understand the eval-framework series (11 cycles, metrics) | `docs/graph/archive/eval-trajectory.md` |
 | Cross-project cks integration plan (R9-R13, ckg-NEW-1..9) | `eval/stablenet/CKS-INTEGRATION-2026-05-23.md` |
 | Current P0 task status (closed + open) | `eval/stablenet/HANDOFF.md` |
-| Phase-by-phase dogfood follow-up tracker (archived) | `docs/archive/todo-cks-dogfood-followups-2026-05-20.md` |
-| Walker symmetry matrix (parse-sol lockdown work) | `internal/parse/solidity/WALKER_SYMMETRY.md` |
-| Why the FTS5 bug was important | `internal/persist/sqlite.go::rewriteFTSQuery` + commit `2a4db90`/`8e8bf9b` |
+| Phase-by-phase dogfood follow-up tracker (archived) | `docs/graph/archive/todo-cks-dogfood-followups-2026-05-20.md` |
+| Walker symmetry matrix (parse-sol lockdown work) | `internal/graph/parse/solidity/WALKER_SYMMETRY.md` |
+| Why the FTS5 bug was important | `internal/graph/persist/sqlite.go::rewriteFTSQuery` + commit `2a4db90`/`8e8bf9b` |
 
 ## 3. Environment setup (new machine)
 
@@ -108,7 +108,7 @@ Expected outcome (cycle 9 baseline): α score ~0.4, β ~0.75, γ ~0.69, δ ~0.83
 node_prs, search_text AND/OR + precision, Korean/CJK test, T-14b shim, awaits/
 overrides emission, graph_digest + atomic rebuild #53, keyword-retrieval eval
 #57). What remains is C1 (deferred) and other-session items (D1–D3), listed in
-§1b. Their archived evidence: `docs/archive/REMAINING-WORK-2026-07-15.md`.
+§1b. Their archived evidence: `docs/graph/archive/REMAINING-WORK-2026-07-15.md`.
 
 ## 6. What was just found (B-Phase 1 cks audit, 2026-05-23)
 
@@ -134,14 +134,14 @@ finding lived only in the conversation context until this commit.
 ## 7. Conventions in this repo
 
 - See `CLAUDE.md` for the working agreement (build/test/lint, conventions,
-  doc discipline) and `docs/DOC-MAP.md` for the documentation tier map.
+  doc discipline) and `docs/graph/DOC-MAP.md` for the documentation tier map.
 - Commit messages reference cycle IDs (C18-C37) for the eval series and
   W-C V## for the parse-sol lockdown series. Both numbering systems are
   chronological, not topic-organised.
 - `docs/` carries the living docs (tier map, VISION, ADRs, status); dated
-  snapshots and superseded designs live in `docs/archive/`.
+  snapshots and superseded designs live in `docs/graph/archive/`.
   `eval/stablenet/` carries the HANDOFF and the cross-machine integration
-  doc. `internal/parse/solidity/WALKER_SYMMETRY.md` carries the parse-sol
+  doc. `internal/graph/parse/solidity/WALKER_SYMMETRY.md` carries the parse-sol
   lockdown matrix.
 - Test files use the `_test.go` suffix; package-internal tests use
   `package eval` (not `eval_test`) for access to unexported helpers.

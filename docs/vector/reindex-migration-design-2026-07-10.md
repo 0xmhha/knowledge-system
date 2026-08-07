@@ -1,5 +1,9 @@
 # 재인덱싱 · DB 마이그레이션 · 무중단 전환 — 크로스-repo 설계 (CKG · CKV · CKS)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > **시점**: 2026-07-10 (설계 제안, 구현 전).
 > **범위**: **CKG(그래프) · CKV(벡터) 두 DB의 갱신 + 그 DB를 서빙하는 CKS**. 어느 한 repo만의
 > 문제가 아니라, CKG가 만든 canonical_id를 CKV가 소비하므로 **두 DB의 재인덱싱·마이그레이션이

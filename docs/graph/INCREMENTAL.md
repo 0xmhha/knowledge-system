@@ -3,8 +3,8 @@
 > Operator-facing guide to the A3 file-level incremental cache. Covers the cold
 > / short-circuit / partial (`runIncremental`) routing. The partial path is live
 > and includes C1 reverse-reference invalidation — see "Partial-cache" below.
-> Schema version + cache-key contract: authoritative in `internal/buildpipe/cache.go`
-> (mirrored in `docs/SCHEMA.md`).
+> Schema version + cache-key contract: authoritative in `internal/graph/buildpipe/cache.go`
+> (mirrored in `docs/graph/SCHEMA.md`).
 
 ## What it does
 
@@ -33,9 +33,9 @@ Any change in any contributor invalidates the cache for that file:
 | Contributor | Source | When it changes |
 |---|---|---|
 | `file_content` | the file bytes | every edit |
-| `ckg_version` | `cmd/ckg/root.go: ckgVersion` | every CKG release |
+| `ckg_version` | `cmd/graph/root.go: ckgVersion` | every CKG release |
 | `parser_version` | `runtime.Version()` for Go; tree-sitter module version for TS/Sol | toolchain or grammar bump |
-| `schema_version` | `internal/buildpipe/cache.go: SchemaVersion` (authoritative value lives there — see `docs/SCHEMA.md`; do not hardcode it here) | extraction schema bump |
+| `schema_version` | `internal/graph/buildpipe/cache.go: SchemaVersion` (authoritative value lives there — see `docs/graph/SCHEMA.md`; do not hardcode it here) | extraction schema bump |
 
 The schema_version is global — bumping it forces a full rebuild for every
 file (silent corruption defense; see decision D9 in `archive/spec-ckg-v0.2.md`).
@@ -56,13 +56,13 @@ Routing inside `buildpipe.Run`:
 | All discovered files match cache, no removals | **short-circuit** — refresh manifest timestamp only (`runShortCircuit`) |
 | Mixed dirty/cached/removed | **partial (incremental)** — `runIncremental`: parse dirty only, reverse-ref invalidation |
 
-Routing lives in `internal/buildpipe/pipeline.go` (the all-cached branch calls
+Routing lives in `internal/graph/buildpipe/pipeline.go` (the all-cached branch calls
 `runShortCircuit`; the mixed branch calls `runIncremental` at `pipeline.go:260`).
 
 ### Partial-cache (`runIncremental`, G6 v4 + C1) — LIVE
 
 The mixed dirty/cached/removed case is served by `runIncremental`
-(`internal/buildpipe/incremental.go:154`): parse only the dirty files, reload
+(`internal/graph/buildpipe/incremental.go:154`): parse only the dirty files, reload
 cached node sets from the DB, then rerun Pass 2 / cluster / score across the
 merged graph. This path is **live**, not a cold fallback.
 
@@ -75,7 +75,7 @@ aren't re-emitted). Two fixes closed that class:
    dirty/removed file get their refs re-resolved; unaffected files keep their DB
    edges (`incremental.go:8`).
 2. **H3 phantom-edge fix.** `NodesByFilePath` now returns nodes in
-   `ORDER BY start_line` (`internal/persist/sqlite_reader.go:592`) so the qIndex
+   `ORDER BY start_line` (`internal/graph/persist/sqlite_reader.go:592`) so the qIndex
    winner for ambiguous simple names matches the cold path — no +phantom edges.
 
 **Determinism caveat (ADR-0002):** incremental aims for the same logical graph
@@ -159,8 +159,8 @@ and force `--no-cache` on first build to migrate.
 | Touch a file (mtime changes, content unchanged) | slow path, then cache hit |
 | Delete a file | that file → removed |
 | Add a new file | that file → dirty (treated as cache miss) |
-| Bump `cmd/ckg/root.go: ckgVersion` | every file → dirty (cache discarded) |
-| Bump `internal/buildpipe/cache.go: SchemaVersion` | every file → dirty (cache discarded) |
+| Bump `cmd/graph/root.go: ckgVersion` | every file → dirty (cache discarded) |
+| Bump `internal/graph/buildpipe/cache.go: SchemaVersion` | every file → dirty (cache discarded) |
 | Bump Go toolchain (e.g. 1.25 → 1.26) | every Go file → dirty |
 | Bump tree-sitter module pseudo-version | every TS/Sol file → dirty |
 

@@ -1,5 +1,9 @@
 # Solidity Storage Slot Index — Design Spec (W-C W9)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Scope: extend the Solidity parser so each `NodeField` (state variable
 > emitted by `runStateVarDecl`) carries the slot index it occupies in
 > EVM storage. Enables storage-collision detection, upgrade-safety

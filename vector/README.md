@@ -13,7 +13,7 @@ search; the two are combined by the system engine (CKS) for hybrid
 retrieval.
 
 > **Resuming work on a different machine or in a new session?**
-> Start with [`docs/session-handoff-2026-05-23.md`](../docs/vector/archive/session-handoff-2026-05-23.md)
+> Start with [`docs/vector/archive/session-handoff-2026-05-23.md`](../docs/vector/archive/session-handoff-2026-05-23.md)
 > — it carries the prereq checklist, env-var matrix, current decision
 > state, and the next-Wave entry conditions in a single document.
 
@@ -23,7 +23,7 @@ retrieval.
 - **Embedders**: `mock` (no system dependencies, deterministic feature-hash) and `bgeonnx` (ONNX Runtime + HuggingFace tokenizers, BERT-class models).
 - **CLI**: `build`, `query`, `eval`, `freshness`, `mcp`, `model`.
 - **MCP server**: stdio JSON-RPC. Tools: `cks.context.semantic_search`, `cks.ops.health`, `cks.ops.warmup`, `cks.ops.get_freshness`. Every response carries a top-level `schema_version`.
-- **Go API**: import `github.com/0xmhha/knowledge-system/pkg/ckv` for `Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` in the calling process.
+- **Go API**: import `github.com/0xmhha/knowledge-system/pkg/vector/ckv` for `Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` in the calling process.
 - **Operational**: host memory pre-check + adaptive batching (`CKV_MEM_GUARD`), CoreML execution provider tuning on macOS (`CKV_COREML_*`), ORT thread overrides, panic-safe MCP middleware.
 
 ## Quickstart
@@ -39,7 +39,7 @@ make build
 ### CLI with `bgeonnx` (real semantic embeddings)
 
 Requires `libonnxruntime`, `libtokenizers.a`, and a downloaded model.
-See [`docs/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md).
+See [`docs/vector/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md).
 
 ```bash
 CGO_LDFLAGS="-L$HOME/lib" go build -tags bgeonnx -o ./bin/ckv ./cmd/ckv
@@ -53,7 +53,7 @@ CGO_LDFLAGS="-L$HOME/lib" go build -tags bgeonnx -o ./bin/ckv ./cmd/ckv
 import (
     "context"
 
-    "github.com/0xmhha/knowledge-system/pkg/ckv"
+    "github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 )
 
 func search() error {
@@ -80,7 +80,7 @@ func search() error {
 }
 ```
 
-See [`docs/embedder-integration.md`](../docs/vector/embedder-integration.md)
+See [`docs/vector/embedder-integration.md`](../docs/vector/embedder-integration.md)
 for the production embedder path, environment overrides, and
 migration off subprocess MCP.
 
@@ -127,7 +127,7 @@ ckv build   discover ── parse ── chunk ── embed ── sqlite-vec
                                                     └─ manifest.json
 ckv query   embed(intent) ── store.Search ── citation enforce ── snippet ── top-K
 ckv mcp     JSON-RPC stdio ── cks.context.* / cks.ops.*
-pkg/ckv     Engine wrapper around internal/query (in-process consumers)
+pkg/vector/ckv     Engine wrapper around internal/vector/query (in-process consumers)
 ```
 
 ## Build requirements
@@ -140,15 +140,15 @@ pkg/ckv     Engine wrapper around internal/query (in-process consumers)
 
 ## Documentation
 
-- [`docs/README.md`](../docs/vector/README.md) — **documentation index** (living reference vs design record vs archive). Start here.
-- [`docs/remaining.md`](../docs/vector/remaining.md) — **work status single source of truth** (code-verified).
-- [`docs/session-handoff-2026-06-29.md`](../docs/vector/session-handoff-2026-06-29.md) — narrative/background entry point (work status defers to `remaining.md`).
-- [`docs/ARCHITECTURE.md`](../docs/vector/ARCHITECTURE.md), [`docs/SCHEMA.md`](../docs/vector/SCHEMA.md) — module map + chunk/store schema.
-- [`docs/mcp-tools.md`](../docs/vector/mcp-tools.md) — MCP tool I/O specs (19 tools).
-- [`docs/embedder-integration.md`](../docs/vector/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
-- [`docs/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md) — building the optional `bgeonnx`/ONNX path (default runtime is ollama/bge-m3).
-- [`docs/eval-metrics.md`](../docs/vector/eval-metrics.md) — `ckv eval` metrics.
-- [`docs/adr/`](../docs/vector/adr/) — architecture decision records (001–010).
+- [`docs/vector/README.md`](../docs/vector/README.md) — **documentation index** (living reference vs design record vs archive). Start here.
+- [`docs/vector/remaining.md`](../docs/vector/remaining.md) — **work status single source of truth** (code-verified).
+- [`docs/vector/session-handoff-2026-06-29.md`](../docs/vector/session-handoff-2026-06-29.md) — narrative/background entry point (work status defers to `remaining.md`).
+- [`docs/vector/ARCHITECTURE.md`](../docs/vector/ARCHITECTURE.md), [`docs/vector/SCHEMA.md`](../docs/vector/SCHEMA.md) — module map + chunk/store schema.
+- [`docs/vector/mcp-tools.md`](../docs/vector/mcp-tools.md) — MCP tool I/O specs (19 tools).
+- [`docs/vector/embedder-integration.md`](../docs/vector/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
+- [`docs/vector/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md) — building the optional `bgeonnx`/ONNX path (default runtime is ollama/bge-m3).
+- [`docs/vector/eval-metrics.md`](../docs/vector/eval-metrics.md) — `ckv eval` metrics.
+- [`docs/vector/adr/`](../docs/vector/adr/) — architecture decision records (001–010).
 
 "What is true now" = code + git.
 

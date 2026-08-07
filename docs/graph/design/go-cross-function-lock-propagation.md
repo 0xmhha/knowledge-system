@@ -1,5 +1,9 @@
 # Go Cross-Function Lock Propagation — Design Spec (D1 SSA Stage 2)
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Scope: extend the existing B1 lock detector (`internal/parse/golang/concurrency.go`
 > + `concurrency_underlock.go`) so that `accessed_under_lock` edges are also
 > emitted for fields touched by **callee** functions when their callers hold a

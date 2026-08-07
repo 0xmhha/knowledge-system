@@ -92,7 +92,7 @@ func NewCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&baselineDir, "baseline", "eval/baseline", "directory holding the committed baseline JSON files")
-	cmd.Flags().StringVar(&latestDir, "latest", "eval/results/latest", "directory holding the latest `make eval` JSON output")
+	cmd.Flags().StringVar(&latestDir, "latest", "eval/results/latest", "directory holding the latest 'make eval' JSON output")
 	cmd.Flags().Float64Var(&tolerance, "tolerance", defaultTolerance, "per-metric drift tolerance (default 0.02 = 2 percentage points)")
 	return cmd
 }

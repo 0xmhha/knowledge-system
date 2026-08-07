@@ -266,7 +266,7 @@ CKV의 MCP 서버(`ckv mcp`)가 노출하는 19개 도구의 입출력 스키마
 > 큐레이션된 flow corpus(`ckv build --flow-corpus corpus.jsonl`로 적재된 flow_step /
 > flow_spine / curated-invariant 청크)를 기반으로 "현상 → 원인" 인과를 추적한다. corpus가
 > 없는 인덱스에서는 빈 결과를 반환한다. 모두 READ-ONLY, bounded(단일 flow / 단일 lookup).
-> in-process 소비자(cks ckvclient)는 `pkg/ckv.Engine`의 동명 메서드를 직접 호출 가능.
+> in-process 소비자(cks ckvclient)는 `pkg/vector/ckv.Engine`의 동명 메서드를 직접 호출 가능.
 
 ### `cks.context.get_flow`
 
@@ -371,8 +371,8 @@ agent가 jira ticket을 받았을 때 권장 호출 순서:
 
 ## 참조
 
-- `pkg/mcp/server.go` (도구 등록 + 핸들러)
-- `internal/query/engine.go` (Hit 스키마)
-- `pkg/types/chunk.go` (Chunk 메타데이터)
-- `docs/SCHEMA.md` (저장 스키마)
-- `docs/archive/plan-2026-05-29-ckv-refactor.md` (도구 설계 결정 기록)
+- `pkg/vector/mcp/server.go` (도구 등록 + 핸들러)
+- `internal/vector/query/engine.go` (Hit 스키마)
+- `pkg/vector/types/chunk.go` (Chunk 메타데이터)
+- `docs/vector/SCHEMA.md` (저장 스키마)
+- `docs/vector/archive/plan-2026-05-29-ckv-refactor.md` (도구 설계 결정 기록)

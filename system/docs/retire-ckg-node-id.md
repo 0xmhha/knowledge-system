@@ -4,7 +4,7 @@
   build·test 클린). 잔여는 cks-seminar 자료 동기화(별 repo)와 데이터셋 리빌드(schema 범프)뿐.
 - 작성일: 2026-07-08 · 상태 갱신: 2026-07-12
 - 범위: code-knowledge-graph (ckg) · code-knowledge-vector (ckv) · code-knowledge-system (cks)
-- 관련: ckg `docs/adr/0001-canonical-symbol-id.md` · ckv `docs/adr/007-canonical-id-join-key.md` · cks `docs/symbol-identity-design.md`
+- 관련: ckg `docs/graph/adr/0001-canonical-symbol-id.md` · ckv `docs/adr/007-canonical-id-join-key.md` · cks `docs/symbol-identity-design.md`
 - **Cross-repo 상태(2026-07-10)**: 전수조사 확인 — `ckg_node_id`/`CKGNodeID`는 ckg 코드 0건(외부
   이름), ckv 24건·cks 18건(비-테스트)이 통합 대상. ckg는 변경 없음으로 마감, 실제 코드 단일화는
   ckv(생산자)·cks(소비자) 세션이 아래 체크리스트대로 수행 중. 각 repo 체크박스는 해당 세션이 체크.
@@ -25,8 +25,8 @@ ckv 청크와 cks Hit이 지금 **두 개**의 심볼 식별자를 실어 나른
 
 | 식별자 | 값 스킴 | 안정성 | 소유 |
 |---|---|---|---|
-| `ckg_node_id` | `sha256(qualified_name \| lang \| start_byte)[:16]` (`ckg/internal/parse/idgen.go:12`) | **빌드 종속** — 코드가 이동(라인 변화)하면 값이 바뀜 | ckg 내부 PK `nodes.id` |
-| `canonical_id` | `<importpath>.(<*Recv>).<Method>` / 타입·const·var는 `<importpath>.<Name>`, 비-Go는 `<relpath>:<qname>` (`ckg/internal/parse/golang/declarations.go:376`) | **빌드 불변** — 이동·재빌드에도 유지 | ADR-0001, ckv/cks가 정렬 시 상속 |
+| `ckg_node_id` | `sha256(qualified_name \| lang \| start_byte)[:16]` (`ckg/internal/graph/parse/idgen.go:12`) | **빌드 종속** — 코드가 이동(라인 변화)하면 값이 바뀜 | ckg 내부 PK `nodes.id` |
+| `canonical_id` | `<importpath>.(<*Recv>).<Method>` / 타입·const·var는 `<importpath>.<Name>`, 비-Go는 `<relpath>:<qname>` (`ckg/internal/graph/parse/golang/declarations.go:376`) | **빌드 불변** — 이동·재빌드에도 유지 | ADR-0001, ckv/cks가 정렬 시 상속 |
 
 정렬(`ckv build --ckg`) 시 aligner가 `(file_path, start_line)`로 청크를 ckg 노드에 매칭하고 **두 값을 그대로 복사**한다 (`ckv/internal/build/builder.go:346`). 그래서 `chunks`에 두 컬럼이 공존한다 (`ckv/internal/store/sqlitevec/store.go:146-147`).
 
@@ -119,8 +119,8 @@ ckv 청크와 cks Hit이 지금 **두 개**의 심볼 식별자를 실어 나른
 
 ## 부록 — 근거 파일:라인
 
-- ckg id 스킴: `ckg/internal/parse/idgen.go:12` `MakeID`
-- canonical id 스킴: `ckg/internal/parse/golang/declarations.go:376` `goCanonicalID`
+- ckg id 스킴: `ckg/internal/graph/parse/idgen.go:12` `MakeID`
+- canonical id 스킴: `ckg/internal/graph/parse/golang/declarations.go:376` `goCanonicalID`
 - canonical-first 조인: `cks/internal/ckgclient/real.go:283-289` `FindByCanonicalID`
 - ckg 입력 API(node id 미수용): `ckg/internal/mcp/graph.go:106,126`
 - ckv 정렬 스탬프: `ckv/internal/build/builder.go:340-348` · `ckv/internal/ckgalign/aligner.go`

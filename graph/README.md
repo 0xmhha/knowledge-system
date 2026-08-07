@@ -59,7 +59,7 @@ Common patterns:
 ```
 
 The build is **deterministic**: the same source tree + commit + ckg binary
-yields the same graph (see [`docs/adr/0002-staged-graph-composition.md`](../docs/graph/adr/0002-staged-graph-composition.md)).
+yields the same graph (see [`docs/graph/adr/0002-staged-graph-composition.md`](../docs/graph/adr/0002-staged-graph-composition.md)).
 
 **Filtering (`--files-from`).** A JSON `{ "include": [...], "exclude": [...] }`
 of globs (`**` spans any path depth). Without it, ckg indexes the whole tree
@@ -93,9 +93,21 @@ Supporting commands:
 |---|---|
 | `ckg benchmark`       | Compare graph-context vs raw-file context on LLM tasks |
 | `ckg validate`        | Schema + (optional) LLM validation of a graph |
-| `ckg export-static`   | Export viewer + chunked JSON for static hosting |
+| `ckg export-static`   | Export chunked JSON for static hosting (`cks viewer export` adds the dashboard) |
+| `ckg export-json`     | Export the graph as plain JSON |
 | `ckg export-postgres` | Migrate a SQLite graph to PostgreSQL (deprecated, ADR-0003) |
 | `ckg watch`           | Rebuild the graph incrementally on file changes |
+| `ckg query <question>` | One-shot natural-language query against a graph |
+| `ckg path <from> <to>` | Shortest call path between two symbols |
+| `ckg evidence`        | Run the EvidencePack assembler from the CLI |
+| `ckg quickstart`      | One command: build + report + API server |
+
+```bash
+# a few one-liners
+./bin/ckg quickstart --src=. --out=/tmp/ckg-out          # build + report + API
+./bin/ckg query --graph=/tmp/ckg-out "who calls VerifyBlockProposal"
+./bin/ckg watch --src=. --out=/tmp/ckg-out                # incremental rebuild loop
+```
 
 Run `ckg <command> --help` for flags. `ckg --help` lists every subcommand.
 
@@ -113,14 +125,14 @@ Front both with a reverse proxy: `/api/* → :8080`, `/* → /srv/ckg/static`.
 
 ## Documentation
 
-- [`docs/VISION.md`](../docs/graph/VISION.md) — **start here**: purpose, the CKG/CKV/CKS triangle, retrieval-accuracy north star
-- [`docs/DOC-MAP.md`](../docs/graph/DOC-MAP.md) — documentation index + tier map (which doc is authoritative)
-- [`docs/ARCHITECTURE.md`](../docs/graph/ARCHITECTURE.md) — 1-page architecture; [`ARCHITECTURE-DETAILED.md`](../docs/graph/ARCHITECTURE-DETAILED.md) for the full pipeline
-- [`docs/SCHEMA.md`](../docs/graph/SCHEMA.md) — authoritative node/edge enumeration + schema version history
-- [`docs/EVAL.md`](../docs/graph/EVAL.md) — eval harness and scoring
-- [`docs/STUDY-GUIDE.md`](../docs/graph/STUDY-GUIDE.md) — background on Leiden, MCP, tree-sitter, 3D layout
+- [`docs/graph/VISION.md`](../docs/graph/VISION.md) — **start here**: purpose, the CKG/CKV/CKS triangle, retrieval-accuracy north star
+- [`docs/graph/DOC-MAP.md`](../docs/graph/DOC-MAP.md) — documentation index + tier map (which doc is authoritative)
+- [`docs/graph/ARCHITECTURE.md`](../docs/graph/ARCHITECTURE.md) — 1-page architecture; [`ARCHITECTURE-DETAILED.md`](../docs/graph/ARCHITECTURE-DETAILED.md) for the full pipeline
+- [`docs/graph/SCHEMA.md`](../docs/graph/SCHEMA.md) — authoritative node/edge enumeration + schema version history
+- [`docs/graph/EVAL.md`](../docs/graph/EVAL.md) — eval harness and scoring
+- [`docs/graph/STUDY-GUIDE.md`](../docs/graph/STUDY-GUIDE.md) — background on Leiden, MCP, tree-sitter, 3D layout
 
-"What is true now" = code + git. For decisions, see [`docs/adr/`](../docs/graph/adr/).
+"What is true now" = code + git. For decisions, see [`docs/graph/adr/`](../docs/graph/adr/).
 
 ## Contributing
 

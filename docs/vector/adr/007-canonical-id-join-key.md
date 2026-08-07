@@ -1,5 +1,9 @@
 # ADR-007: canonical_id is the CKG↔CKV join key
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 **Status**: Accepted
 **Date**: 2026-06-29
 

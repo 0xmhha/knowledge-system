@@ -2,7 +2,7 @@
 
 > This document is the contract between the coding-agent plugin (separate repo) and the CKS MCP server it talks to. It exists because the coding-agent HLD (`docs/superpowers/specs/phase3-cks-mcp-ckv.md` and `phase4-cks-mcp-ckg.md`) was written before CKS was implemented; the HLD describes virtual tool signatures (`ckv_search`, `ckg_query`, etc.) that do not match the actual tool names CKS now exposes. Anyone wiring the coding-agent to CKS should read the mapping here first — guessing the names by analogy will yield "tool not found" errors.
 
-**Authoritative source**: `internal/mcp/*.go` in this repo. When wire names or schemas diverge between this doc and the code, the code wins.
+**Authoritative source**: `internal/graph/mcp/*.go` in this repo. When wire names or schemas diverge between this doc and the code, the code wins.
 
 ## 1. Architecture in one paragraph
 
@@ -13,11 +13,11 @@ coding-agent  ─stdio MCP─▶  cks-mcp  ─Go import─▶  ckvclient ─pkg/
                                        ─Go import─▶  ckgclient ─pkg/store (in-process)─▶  ckg
 ```
 
-Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/mcp/*.go`, pinned against `internal/mcp/testdata/agent-mcp.schema.json` by `internal/mcp/schema_golden_test.go`.
+Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/graph/mcp/*.go`, pinned against `internal/graph/mcp/testdata/agent-mcp.schema.json` by `internal/graph/mcp/schema_golden_test.go`.
 
 ## 2. Live tool catalog (19 tools)
 
-Wire names are the strings the MCP client sends; constants live in `internal/mcp/*.go`.
+Wire names are the strings the MCP client sends; constants live in `internal/graph/mcp/*.go`.
 
 | Wire name | Constant | Required input | Optional input | Purpose |
 |---|---|---|---|---|
@@ -242,7 +242,7 @@ A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-age
 
 ## 7. Cross-references
 
-- Live tool source: `internal/mcp/server.go`, `internal/mcp/graph.go`, `internal/mcp/search.go`, `internal/mcp/analysis.go`, `internal/mcp/freshness.go`, `internal/mcp/health.go`, `internal/mcp/get_for_task.go`.
+- Live tool source: `internal/graph/mcp/server.go`, `internal/mcp/graph.go`, `internal/mcp/search.go`, `internal/mcp/analysis.go`, `internal/mcp/freshness.go`, `internal/mcp/health.go`, `internal/mcp/get_for_task.go`.
 - coding-agent HLDs (separate repo): `docs/superpowers/specs/phase3-cks-mcp-ckv.md`, `docs/superpowers/specs/phase4-cks-mcp-ckg.md`.
 - Composer pipeline (the engine behind `get_for_task`): `internal/composer/` and `docs/composer/`.
 - Smart Dummy backends (returned when no real ckv/ckg path is configured): `internal/ckvclient/dummy.go`, `internal/ckgclient/dummy.go`.
@@ -251,7 +251,7 @@ A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-age
 
 This file should be re-checked whenever any of the following changes:
 
-1. `internal/mcp/*.go` adds, renames, or changes a tool's schema. The matching row in §2 and any §3 mapping line updates here.
+1. `internal/graph/mcp/*.go` adds, renames, or changes a tool's schema. The matching row in §2 and any §3 mapping line updates here.
 2. The coding-agent HLD evolves a virtual signature (phase3 §7.x or phase4 §7.x). Add a new mapping row in §3 or amend the existing one.
 3. A roadmap item from §5 lands ("rerank" toggle, `include_concurrency`, etc.). Move the row out of §5 and into §3.
 

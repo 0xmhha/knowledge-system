@@ -1,5 +1,9 @@
 # CKS → CKV 협의 회신 — in-process / RRF / 임베딩 모델 · 2026-06-29
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Tier 3 (dated snapshot). CKS 세션이 CKV의
 > `code-knowledge-vector/docs/coordination-prompts-2026-06-29.md` §2(→ CKS)에
 > 회신한 내용의 CKS 측 사본. 권위: 코드+git(현재 사실) — `internal/ckvclient/`,

@@ -195,7 +195,7 @@ BodyProvenance string `json:"body_provenance"` // "index-snapshot(+verified-fs-f
 
 - 값: FallbackVerified=true → `"index-snapshot(+verified-fs-fallback)"`,
   false → `"index-snapshot(edge-only-on-miss)"`.
-- **설명 필드 개보수**: 도구 설명(`internal/mcp/server.go`의 health 설명)에 한 줄 추가 —
+- **설명 필드 개보수**: 도구 설명(`internal/graph/mcp/server.go`의 health 설명)에 한 줄 추가 —
   "source_root is the operator's index-build path, NOT a tree to read; bodies come from the
   index snapshot (see body_provenance)". 에이전트가 source_root를 읽기 대상으로 오인하는 것을
   설명 수준에서도 차단(사고의 오염 경로 2 대응).

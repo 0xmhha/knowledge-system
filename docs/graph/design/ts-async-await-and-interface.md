@@ -1,5 +1,9 @@
 # TypeScript Async/Await + Interface Graph — Design Spec
 
+> Historical design record — file paths and command names reflect the
+> repository layout at the time of writing (pre-consolidation). For the
+> current command map see docs/design/cli-consolidation.md.
+
 > Scope: extend the TS parser (`internal/parse/typescript/`) so the graph
 > captures (a) async/await semantics — Promise creation, await suspension
 > points, async function chains — and (b) interface / class heritage —

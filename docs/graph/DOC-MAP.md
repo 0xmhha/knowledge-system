@@ -11,10 +11,10 @@
   pruned. Input to cleanups, never a target.
 - **Tier 2 — DESIGN/specs**: how something was decided or specified. Superseded,
   not deleted (move to `archive/` with a "superseded by …" note). New decisions
-  go in `docs/adr/`.
+  go in `docs/graph/adr/`.
 - **Tier 3 — STATE/status**: point-in-time snapshots, remaining-work, handoffs.
   Dated, disposable, regenerable from code + git.
-- **ARCHIVE**: historical / superseded snapshots under `docs/archive/`.
+- **ARCHIVE**: historical / superseded snapshots under `docs/graph/archive/`.
 
 **Ground-truth rule:** for "what is true *now*", code + git win over any doc.
 For "why we decided X", the ADR / Tier 2 doc wins. For "what we're aiming at",
@@ -66,7 +66,7 @@ Tier 1 wins.
 
 ## Archive
 
-`docs/archive/` — historical/superseded snapshots and handoffs (dated). Kept for
+`docs/graph/archive/` — historical/superseded snapshots and handoffs (dated). Kept for
 provenance; never the authoritative answer. Archived in the 2026-06-15 cleanup:
 
 - `REMAINING-WORK.md` — superseded by CONTINUITY + CAPABILITY-AUDIT (work landed PR #12–#22)

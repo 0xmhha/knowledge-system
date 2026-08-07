@@ -43,12 +43,12 @@ Concretely, for a keyword (e.g. `"GovStaking deposit"`) CKG returns:
 > metric.** The standing north star is: **6-axis graph build + keyword-query
 > retrieval at high accuracy**, measured by the `eval` surface against a gold
 > set. (The *current* score is a Tier 3 status fact, tracked in
-> `docs/archive/eval-trajectory.md` and `eval/baseline/`, not here.)
+> `docs/graph/archive/eval-trajectory.md` and `eval/baseline/`, not here.)
 
 ## Core values
 
 Three user-articulated values shape every design trade-off (moved here from
-`docs/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` §1.2 so they are not lost in cleanups):
+`docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` §1.2 so they are not lost in cleanups):
 
 1. **Accuracy** — return precisely the right code; wrong-answer is worse than
    no-answer (this is why retrieval accuracy is the first-class metric).
@@ -71,18 +71,18 @@ so the LLM is called **less often and with more accurate context**.
 
 The graph emits edges across six axes (every axis has live emitters):
 Structural · Semantic · Execution · Concurrency · Distributed · Temporal.
-(The authoritative node/edge enumeration lives in `docs/SCHEMA.md` — Tier 2.)
+(The authoritative node/edge enumeration lives in `docs/graph/SCHEMA.md` — Tier 2.)
 
 ## The public boundary (stable contract)
 
 External consumers (cks, ckv) **must NOT** reach into `internal/`. The stable
-public API is everything under `pkg/` (`pkg/types`, `pkg/store`, `pkg/bm25`,
-`pkg/smartctx`, `pkg/evidence`, `pkg/impact`, …). Treat `pkg/` changes as
+public API is everything under `pkg/` (`pkg/graph/types`, `pkg/store`, `pkg/bm25`,
+`pkg/smartctx`, `pkg/graph/evidence`, `pkg/impact`, …). Treat `pkg/` changes as
 contract changes.
 
 ---
 
-*Source basis: `docs/archive/PROJECT-OVERVIEW.md`,
-`docs/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` (both archived 2026-07-18),
-`docs/ARCHITECTURE.md`. This file is the distilled, timeless statement of
-intent; the fuller status references it drew from are now in `docs/archive/`.*
+*Source basis: `docs/graph/archive/PROJECT-OVERVIEW.md`,
+`docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` (both archived 2026-07-18),
+`docs/graph/ARCHITECTURE.md`. This file is the distilled, timeless statement of
+intent; the fuller status references it drew from are now in `docs/graph/archive/`.*
