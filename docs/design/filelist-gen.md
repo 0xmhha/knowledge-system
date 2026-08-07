@@ -89,7 +89,7 @@ rather than a silent gap.
   `go list -deps -json <roots...>` (one invocation regardless of root count)
   and to `go list -json <extra_packages...>` for test-only packages, then
   resolves `extra_globs` against the git-tracked tree.
-- Assumptions (validated, fail closed): `-src` is the root of a **single Go
+- Assumptions (validated, fail closed): `--src` is the root of a **single Go
   module** and of a **git repository**. Multi-module trees and non-git
   sources are out of scope for v1 and rejected with a clear error.
 - The `go list` subprocess runs with the environment derived from the
@@ -106,12 +106,12 @@ cks filelist --src <project root> --config <filelist.yaml> --out <files-from.jso
              [-strict]       # zero-match extra_globs become errors
 ```
 
-- `-check` semantics (two supported uses, same flag):
-  - **dataset check**: point `-out` at the list copied into a built dataset
+- `--check` semantics (two supported uses, same flag):
+  - **dataset check**: point `--out` at the list copied into a built dataset
     → "does this dataset's scope still equal the derivation at HEAD?" This
     is the hook for the setup `update` verb and freshness reporting.
-  - **self check**: point `-out` at `generated/filelist/files-from.json`
-    → CI-style "derivation is current" gate (generate, then `-check`).
+  - **self check**: point `--out` at `generated/filelist/files-from.json`
+    → CI-style "derivation is current" gate (generate, then `--check`).
   - Comparison covers the `include` list only, but the tool refuses to
     compare outputs produced under a **different `build_context`** (the
     provenance block records it) — cross-context comparison is a config
@@ -188,7 +188,7 @@ Same consumer format the engines already accept (`--files-from`, an
 
 - Consumers ignore unknown keys (`include` is all they read) — verified
   against the graph/vector `--files-from` loaders before shipping (§7).
-- `dirty` appears only when `-allow-dirty` was used; a clean derivation
+- `dirty` appears only when `--allow-dirty` was used; a clean derivation
   omits it.
 - Datasets keep their current practice of copying the used list next to the
   built DBs; the provenance block makes that copy self-describing —
@@ -196,17 +196,17 @@ Same consumer format the engines already accept (`--files-from`, an
 
 ### 4.4 Failure semantics (R7, R10)
 
-- `-src` not a git repo, or not a single-module root → error.
+- `--src` not a git repo, or not a single-module root → error.
 - **Dirty tracked files** (modified/staged/deleted; untracked files are
-  ignorable noise) → error unless `-allow-dirty`, which records
+  ignorable noise) → error unless `--allow-dirty`, which records
   `dirty: true` in provenance. Default is fail-closed: the
   2026-07-28 incident (a reindex silently embedding a work branch) is the
   class of bug this kills.
 - Any root or extra package that `go list` cannot resolve → non-zero exit,
   no output written.
 - An extra glob that matches zero files → warning (legitimate during
-  refactors) unless `-strict` is set.
-- `-check` against an output produced under a different `build_context` or
+  refactors) unless `--strict` is set.
+- `--check` against an output produced under a different `build_context` or
   tool major version → error (not drift).
 
 ### 4.5 Integration
@@ -314,13 +314,13 @@ config now states explicitly.
   or GOOS constraint appears/disappears exactly per the configured context,
   and provenance records the context.
 - **Source-state tests** (lock R10): dirty tracked file → error;
-  `-allow-dirty` → succeeds with `dirty: true`; an untracked file matching
+  `--allow-dirty` → succeeds with `dirty: true`; an untracked file matching
   an extra glob is NOT included (git-tracked resolution).
 - **Real-tree spot check** (documented, not CI): gstable root reproduces the
   canonical 988-file scope (+ the deltas R3 adds intentionally).
 - **Fail-closed tests**: unknown root, unknown extra package, zero-match
-  glob with `-strict`, non-git `-src`, cross-context `-check`.
-- **`-check` drift test**: derive, mutate a list entry, `-check` exits 1.
+  glob with `--strict`, non-git `--src`, cross-context `--check`.
+- **`--check` drift test**: derive, mutate a list entry, `--check` exits 1.
 - **Consumer compatibility**: graph and vector `--files-from` loaders accept
   the provenance-bearing output (unknown-key tolerance), verified by an
   integration test that runs both loaders on a generated file.
