@@ -145,9 +145,14 @@ rejected.
 
 `gen-config` binds loopback by default; `--lan` binds this host's
 auto-detected LAN IP instead (the generated config then carries the
-`allow_remote` opt-in). MCP tool names are bare `cks.context.*` /
-`cks.ops.*` by default; a distribution can stamp its own namespace root at
-build time with `make build-bins NAMESPACE=<root>`.
+`allow_remote` opt-in). `--port` works the same way at every step:
+`gen-config` writes it into the config, `cks mcp --port` moves a running
+server (keeping the configured host, so a `--lan` deployment stays
+reachable), and `cks mcp up --port` does the same for a supervised
+instance; `--http-addr host:port` remains the escape hatch for naming an
+interface yourself and is mutually exclusive with `--port`. MCP tool names
+are bare `cks.context.*` / `cks.ops.*` by default; a distribution can stamp
+its own namespace root at build time with `make build-bins NAMESPACE=<root>`.
 
 ## Building a dataset
 

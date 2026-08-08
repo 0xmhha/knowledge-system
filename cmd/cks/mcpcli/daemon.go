@@ -31,7 +31,8 @@ func runDaemon(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("daemon "+sub, flag.ContinueOnError)
 	name := fs.String("name", "", "instance name (pidfile/log key)")
 	config := fs.String("config", "", "cks config passed to the instance (start/restart)")
-	addr := fs.String("http-addr", "", "override listen http_addr for the instance")
+	port := fs.String("port", "", "run the instance on this port; the host comes from its config (or 127.0.0.1)")
+	addr := fs.String("http-addr", "", "full host:port override for the instance; prefer --port")
 	registry := fs.String("registry", envOr("CKS_REGISTRY", "instances.yaml"), "instance registry file (up/down)")
 	wait := fs.Bool("wait", false, "up: poll each instance's /healthz until it is serviceable before returning")
 	waitTimeout := fs.Duration("wait-timeout", 60*time.Second, "up --wait: max time to wait per instance for readiness")
@@ -41,6 +42,9 @@ func runDaemon(args []string, stdout io.Writer) error {
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
+	if *port != "" && *addr != "" {
+		return fmt.Errorf("--port and --http-addr are mutually exclusive (--http-addr already carries a port)")
+	}
 
 	self, err := os.Executable()
 	if err != nil {
@@ -48,10 +52,17 @@ func runDaemon(args []string, stdout io.Writer) error {
 	}
 	// This binary's server is the `mcp` subcommand, so supervised instances
 	// are spawned as `cks mcp --config ... --name ...`.
+	// The supervised instance is this binary's `mcp` subcommand. A --port given
+	// here rides along to the child, which keeps the configured host and only
+	// moves the port; --http-addr (or the registry's own address) still names a
+	// full host:port.
+	portArg := *port
 	sup := &daemon.Supervisor{RunDir: *runDir, Binary: self, Args: func(name, config, addr string) []string {
 		a := []string{"mcp", "--config", config, "--name", name}
 		if addr != "" {
 			a = append(a, "--http-addr", addr)
+		} else if portArg != "" {
+			a = append(a, "--port", portArg)
 		}
 		return a
 	}}
