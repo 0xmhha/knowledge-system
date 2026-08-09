@@ -31,6 +31,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
@@ -91,7 +92,7 @@ func isMetaNodeType(t types.NodeType) bool {
 //     either dropped it (e.g. malformed header) or filtered it out
 //     because it touched no in-srcRoot files.
 func emitHunkGraph(g *graph.Graph, srcRel string, commitIDByteSHA map[string]string,
-	repoRoot string) (map[string][]byte, error) {
+	repoRoot string, filter *filterlist.FilterList) (map[string][]byte, error) {
 	hunks, err := temporal.LoadHunks(repoRoot, 0)
 	if err != nil {
 		return nil, fmt.Errorf("temporal LoadHunks: %w", err)
@@ -100,6 +101,7 @@ func emitHunkGraph(g *graph.Graph, srcRel string, commitIDByteSHA map[string]str
 		return nil, nil
 	}
 	relHunks, prefix := remapHunksToSrcRel(hunks, srcRel)
+	relHunks = scopeHunksToFilter(relHunks, filter)
 	if len(relHunks) == 0 {
 		return nil, nil
 	}
@@ -152,7 +154,7 @@ func commitSubjectMapFromGraph(g *graph.Graph) map[string]string {
 //
 // Returns the gzipped patch blobs map; caller merges into InsertBlobs.
 func emitUnreachableHunkGraph(g *graph.Graph, srcRel, repoRoot string,
-	existingCommitIDs map[string]string) (map[string][]byte, error) {
+	existingCommitIDs map[string]string, filter *filterlist.FilterList) (map[string][]byte, error) {
 	commits, hunks, err := temporal.LoadUnreachableHunks(repoRoot, 0)
 	if err != nil {
 		return nil, fmt.Errorf("LoadUnreachableHunks: %w", err)
@@ -189,6 +191,7 @@ func emitUnreachableHunkGraph(g *graph.Graph, srcRel, repoRoot string,
 	// already have repo-rooted file paths since git show emits the
 	// same shape git log -p does.
 	relHunks, prefix := remapHunksToSrcRel(hunks, srcRel)
+	relHunks = scopeHunksToFilter(relHunks, filter)
 	if len(relHunks) == 0 {
 		return nil, nil
 	}
@@ -202,6 +205,23 @@ func emitUnreachableHunkGraph(g *graph.Graph, srcRel, repoRoot string,
 	g.Edges = append(g.Edges, hasHunkEdges...)
 	g.Edges = append(g.Edges, adjacentEdges...)
 	return blobs, nil
+}
+
+// scopeHunksToFilter drops hunks for files the build scope excludes. Paths
+// are already srcRoot-relative here (remapHunksToSrcRel ran first), which is
+// the form the filter's globs are written against. A nil filter keeps every
+// hunk.
+func scopeHunksToFilter(hunks []temporal.HunkInfo, filter *filterlist.FilterList) []temporal.HunkInfo {
+	if filter == nil {
+		return hunks
+	}
+	out := make([]temporal.HunkInfo, 0, len(hunks))
+	for _, h := range hunks {
+		if filter.Allow(h.FilePath) {
+			out = append(out, h)
+		}
+	}
+	return out
 }
 
 // remapHunksToSrcRel filters hunks whose FilePath falls outside srcRoot's

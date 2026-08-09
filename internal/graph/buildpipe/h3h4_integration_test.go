@@ -51,7 +51,7 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 		"[INGEST-9] add password to login")
 
 	g := buildSyntheticGraph(relPath)
-	blobs, err := emitTemporalEdges(g, repo, discardLog(), 10)
+	blobs, err := emitTemporalEdges(g, repo, discardLog(), 10, nil)
 	if err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}

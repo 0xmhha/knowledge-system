@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -81,6 +82,7 @@ func NewCmd(version string) *cobra.Command {
 		configPath       string
 		nameOverride     string
 		httpAddrOverride string
+		portOverride     string
 	)
 	mcpCmd := &cobra.Command{
 		Use:   "mcp",
@@ -89,12 +91,16 @@ func NewCmd(version string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
-			return run(ctx, configPath, nameOverride, httpAddrOverride)
+			if portOverride != "" && httpAddrOverride != "" {
+				return fmt.Errorf("--port and --http-addr are mutually exclusive (--http-addr already carries a port)")
+			}
+			return run(ctx, configPath, nameOverride, httpAddrOverride, portOverride)
 		},
 	}
 	mcpCmd.Flags().StringVar(&configPath, "config", "", "path to cks.yaml (optional; falls back to defaults)")
 	mcpCmd.Flags().StringVar(&nameOverride, "name", "", "override config name (MCP instance name) — for running several instances")
-	mcpCmd.Flags().StringVar(&httpAddrOverride, "http-addr", "", "override config listen.http_addr (host:port) — for running several instances on different ports")
+	mcpCmd.Flags().StringVar(&portOverride, "port", "", "serve on this port instead of the configured one; the host is kept (or 127.0.0.1 when the config names none)")
+	mcpCmd.Flags().StringVar(&httpAddrOverride, "http-addr", "", "full host:port override when you need to name the interface yourself; prefer --port")
 
 	// The daemon verbs (supervised HTTP instances of this same binary) and the
 	// config helpers keep their existing pflag-based run functions and tests;
@@ -129,7 +135,7 @@ func NewCmd(version string) *cobra.Command {
 	return mcpCmd
 }
 
-func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string) error {
+func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOverride string) error {
 	cfg, err := loadConfig(configPath)
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
@@ -147,13 +153,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride string)
 	if cfg.Name == "" {
 		cfg.Name = cksmcp.DefaultInstanceName()
 	}
-	if httpAddrOverride != "" {
-		// Asking to serve on an address implies HTTP transport: the daemon and
-		// multi-instance callers pass --http-addr to run a stdio-defaulted config
-		// as a reachable HTTP server without editing the file.
-		cfg.Listen.HTTPAddr = httpAddrOverride
-		cfg.Listen.Transport = "http"
-	}
+	overrideListen(cfg, portOverride, httpAddrOverride)
 
 	// P1 (reindex-migration design): resolve dataset symlinks ONCE at startup
 	// so the instance pins a concrete immutable version for its whole lifetime
@@ -431,6 +431,28 @@ func (a intentEmbedderAdapter) Embed(ctx context.Context, text string) ([]float3
 		return nil, fmt.Errorf("ckv embedder returned empty vector for intent text")
 	}
 	return vecs[0], nil
+}
+
+// overrideListen applies the launch-time address overrides. Asking to serve
+// somewhere implies HTTP transport: multi-instance callers move a
+// stdio-defaulted config onto a reachable port without editing the file.
+//
+// --port keeps the configured host and moves only the port, so a config bound
+// to a LAN address stays reachable there; --http-addr names the whole
+// host:port. A config with no address at all lands on loopback.
+func overrideListen(cfg *config.Config, port, httpAddr string) {
+	if port != "" {
+		host := "127.0.0.1"
+		if h, _, err := net.SplitHostPort(cfg.Listen.HTTPAddr); err == nil && h != "" {
+			host = h
+		}
+		cfg.Listen.HTTPAddr = net.JoinHostPort(host, port)
+		cfg.Listen.Transport = "http"
+	}
+	if httpAddr != "" {
+		cfg.Listen.HTTPAddr = httpAddr
+		cfg.Listen.Transport = "http"
+	}
 }
 
 func loadConfig(path string) (*config.Config, error) {

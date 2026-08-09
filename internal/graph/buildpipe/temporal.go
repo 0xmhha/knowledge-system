@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
@@ -40,6 +41,15 @@ const temporalDepthDefault = 10
 // hunk patch blobs keyed by Hunk node ID — caller merges them into the
 // InsertBlobs map alongside CodeNode source slices.
 //
+// The filter is the build-scope list the discovery pass applied. git history
+// is enumerated independently of that pass, so without it the temporal axis
+// would carry commits and hunks for files the dataset deliberately excludes —
+// citations an agent cannot follow, because no symbol, body or convention for
+// that file exists anywhere else in the graph. A nil filter keeps every file
+// (the unscoped build). Note the trade-off it encodes: the include list is
+// derived from the current tree, so history for a file that has since been
+// deleted is dropped along with the out-of-scope files.
+//
 // Behavior:
 //   - srcRoot not in a git checkout → no-op, log debug, return (nil, nil).
 //   - git history empty for srcRoot subtree → no-op, log debug, return (nil, nil).
@@ -50,7 +60,8 @@ const temporalDepthDefault = 10
 // blame pass; pass 0 to use the E4 default (10). The hunk pass uses its
 // own commit cap (temporal.LoadHunks default) since hunks are bounded by
 // total commits walked, not per-file.
-func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerFile int) (map[string][]byte, error) {
+func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerFile int,
+	filter *filterlist.FilterList) (map[string][]byte, error) {
 	if maxPerFile <= 0 {
 		maxPerFile = temporalDepthDefault
 	}
@@ -72,7 +83,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// parsers stamp Node.FilePath using filepath.Rel(srcRoot, file) which
 	// is the OS separator on disk; we normalise to forward slashes so the
 	// match is portable across darwin/linux/windows.
-	relHist := remapToSrcRel(hist.Files, srcRel)
+	relHist := scopeToFilter(remapToSrcRel(hist.Files, srcRel), filter)
 	if len(relHist) == 0 {
 		log.Debug("temporal: no overlap between srcRoot subtree and git history",
 			"repo", repoRoot, "rel", srcRel)
@@ -92,7 +103,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// the gzip-compressed patch blobs. Hunks reuse the same commitIDByteSHA
 	// map so they anchor on the commits we just emitted (and only those —
 	// hunks for commits the file-overlap test dropped are skipped).
-	hunkBlobs, err := emitHunkGraph(g, srcRel, commitIDByteSHA, repoRoot)
+	hunkBlobs, err := emitHunkGraph(g, srcRel, commitIDByteSHA, repoRoot, filter)
 	if err != nil {
 		return nil, fmt.Errorf("temporal hunk graph: %w", err)
 	}
@@ -103,7 +114,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// layer (H3, future) must filter out — but a human "Recovery"
 	// workflow can browse them in the viewer when an agent has
 	// overwritten code that needs to come back.
-	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRel, repoRoot, commitIDByteSHA)
+	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRel, repoRoot, commitIDByteSHA, filter)
 	if err != nil {
 		return nil, fmt.Errorf("temporal unreachable hunk graph: %w", err)
 	}
@@ -146,6 +157,21 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 // Example: srcRel = "tools/cks", path = "tools/cks/internal/foo.go" →
 // "internal/foo.go". A path outside srcRoot's subtree (e.g. "docs/bar.md"
 // when srcRel = "tools/cks") is dropped.
+// scopeToFilter drops history for files the build scope excludes. A nil
+// filter (no --files-from) keeps everything.
+func scopeToFilter(files map[string][]string, filter *filterlist.FilterList) map[string][]string {
+	if filter == nil {
+		return files
+	}
+	out := make(map[string][]string, len(files))
+	for path, shas := range files {
+		if filter.Allow(path) {
+			out[path] = shas
+		}
+	}
+	return out
+}
+
 func remapToSrcRel(files map[string][]string, srcRel string) map[string][]string {
 	out := make(map[string][]string, len(files))
 	prefix := ""

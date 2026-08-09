@@ -50,7 +50,7 @@ import (
 func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	log *slog.Logger, strict bool,
 	goFuncFieldTouches map[string]map[string]struct{}, lockPropagation bool,
-	temporalDepth int,
+	temporalDepth int, filter *filterlist.FilterList,
 ) (*cluster.PkgTree, *cluster.TopicTree, map[string][]byte, error) {
 	if solParser != nil {
 		abi := convertABI(solParser.ABI())
@@ -78,7 +78,7 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 		"wildcard_hits", httpResult.WildcardHits,
 		"ambiguous_retained", httpResult.AmbiguousRetained,
 		"placeholders_dropped", httpResult.PlaceholdersDropped)
-	hunkBlobs, err := emitTemporalEdges(g, srcRoot, log, temporalDepth)
+	hunkBlobs, err := emitTemporalEdges(g, srcRoot, log, temporalDepth, filter)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("temporal: %w", err)
 	}
@@ -394,7 +394,7 @@ func runCold(opt Options, log *slog.Logger,
 	// by temporal living only in cold; the helper makes that recurrence
 	// structurally impossible.
 	log.Debug("metrics.start")
-	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, goFuncFieldTouches, opt.LockPropagation, opt.TemporalDepth)
+	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, goFuncFieldTouches, opt.LockPropagation, opt.TemporalDepth, filter)
 	if err != nil {
 		return persist.Manifest{}, err
 	}

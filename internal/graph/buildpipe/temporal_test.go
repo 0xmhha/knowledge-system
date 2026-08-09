@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -30,7 +31,7 @@ func TestEmitTemporalEdges_BasicGitRepo(t *testing.T) {
 	originalNodes := len(g.Nodes)
 	originalEdges := len(g.Edges)
 
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 10); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, nil); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
 
@@ -104,7 +105,7 @@ func TestEmitTemporalEdges_NotAGitRepo(t *testing.T) {
 	g := buildSyntheticGraph("main.go")
 	beforeNodes := len(g.Nodes)
 	beforeEdges := len(g.Edges)
-	if _, err := emitTemporalEdges(g, dir, discardLog(), 10); err != nil {
+	if _, err := emitTemporalEdges(g, dir, discardLog(), 10, nil); err != nil {
 		t.Fatalf("expected nil err on non-git src, got %v", err)
 	}
 	if len(g.Nodes) != beforeNodes || len(g.Edges) != beforeEdges {
@@ -125,7 +126,7 @@ func TestEmitTemporalEdges_MultipleCommitsAndBlameOrder(t *testing.T) {
 	c2 := commitFileToRepo(t, repo, relPath, "package x\n\n// edit\n", "second")
 
 	g := buildSyntheticGraph(relPath)
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 10); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, nil); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
 	commits := nodesByType(g.Nodes, types.NodeCommit)
@@ -160,7 +161,7 @@ func TestEmitTemporalEdges_PerFileCap(t *testing.T) {
 		commitFileToRepo(t, repo, rel, "package y\n//"+strings.Repeat("edit ", i+1)+"\n", "edit")
 	}
 	g := buildSyntheticGraph(rel)
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 2); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), 2, nil); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
 	commits := nodesByType(g.Nodes, types.NodeCommit)
@@ -279,5 +280,44 @@ func runCmd(t *testing.T, dir, name string, args ...string) {
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("%s %v: %v\n%s", name, args, err, out)
+	}
+}
+
+// TestEmitTemporalEdges_FilterScopesHunks pins the build-scope contract on
+// the temporal axis. git history is enumerated independently of the
+// discovery pass, so without the filter the graph collects Hunk nodes for
+// files the dataset excludes — nodes no symbol, body or convention backs,
+// which a retrieval surface can still cite. The leak was silent because
+// only hunks carry the out-of-scope path; changed_in and blame resolve
+// through the graph's own nodes and cannot reach outside.
+func TestEmitTemporalEdges_FilterScopesHunks(t *testing.T) {
+	repo := initGitRepo(t)
+	commitFileToRepo(t, repo, "in_scope.go", "package main\n\nfunc Hello() {}\n", "in scope")
+	commitFileToRepo(t, repo, "out_of_scope.go", "package main\n\nfunc Bye() {}\n", "out of scope")
+
+	hunkPaths := func(filter *filterlist.FilterList) map[string]int {
+		g := buildSyntheticGraph("in_scope.go")
+		if _, err := emitTemporalEdges(g, repo, discardLog(), 10, filter); err != nil {
+			t.Fatalf("emitTemporalEdges: %v", err)
+		}
+		out := map[string]int{}
+		for _, n := range nodesByType(g.Nodes, types.NodeHunk) {
+			out[n.FilePath]++
+		}
+		return out
+	}
+
+	unfiltered := hunkPaths(nil)
+	if unfiltered["out_of_scope.go"] == 0 {
+		t.Fatalf("fixture is not exercising the leak: no out-of-scope hunks without a filter (%v)", unfiltered)
+	}
+
+	scoped := hunkPaths(&filterlist.FilterList{Include: []string{"in_scope.go"}})
+	if n := scoped["out_of_scope.go"]; n != 0 {
+		t.Errorf("out-of-scope hunks survived the filter: %d", n)
+	}
+	if scoped["in_scope.go"] != unfiltered["in_scope.go"] {
+		t.Errorf("in-scope hunks = %d, want %d (the filter must not drop them)",
+			scoped["in_scope.go"], unfiltered["in_scope.go"])
 	}
 }
