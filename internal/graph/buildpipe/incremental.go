@@ -252,7 +252,13 @@ func runIncremental(opt Options, log *slog.Logger,
 	// callees). Operators wanting the W-A KPI must run with --no-cache.
 	// Passing nil + false makes emitDerivedPasses' propagation call a no-op
 	// regardless of opt.LockPropagation.
-	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, nil, false, opt.TemporalDepth)
+	// The temporal pass re-enumerates from git, so it needs the same
+	// build-scope filter the discovery pass applied — see emitTemporalEdges.
+	incFilter, err := opt.resolveFilter()
+	if err != nil {
+		return persist.Manifest{}, err
+	}
+	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, nil, false, opt.TemporalDepth, incFilter)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
