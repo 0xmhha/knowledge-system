@@ -143,16 +143,28 @@ Every binary here takes GNU-style `--flag` options — consistently, across
 all commands and subcommands. Single-dash long flags (`-config`) are
 rejected.
 
-`gen-config` binds loopback by default; `--lan` binds this host's
-auto-detected LAN IP instead (the generated config then carries the
-`allow_remote` opt-in). `--port` works the same way at every step:
+Everything binds loopback until you say otherwise, and nothing quietly
+narrows a binding you already chose. `gen-config --lan` binds this host's
+auto-detected LAN IP; `cks mcp up --lan` binds every interface, which is the
+form that survives the host's address changing. Either way the generated
+config carries the `allow_remote` opt-in, without which the server refuses
+non-local clients even when the socket is reachable.
+
+`--port` names the port at every step and never moves the host with it:
 `gen-config` writes it into the config, `cks mcp --port` moves a running
-server (keeping the configured host, so a `--lan` deployment stays
-reachable), and `cks mcp up --port` does the same for a supervised
-instance; `--http-addr host:port` remains the escape hatch for naming an
-interface yourself and is mutually exclusive with `--port`. MCP tool names
-are bare `cks.context.*` / `cks.ops.*` by default; a distribution can stamp
-its own namespace root at build time with `make build-bins NAMESPACE=<root>`.
+server (keeping the configured host, so a LAN or wildcard deployment stays
+reachable), and `cks mcp up --port` pins the port of a single-instance
+registry. A registry declaring several instances assigns their ports itself,
+so `--port` is refused there rather than silently applied to one of them.
+`--http-addr host:port` remains the escape hatch for naming an interface
+yourself, is mutually exclusive with `--port`, and does not apply to `up`.
+
+An instance that ends up on loopback says so in the `up` output, because a
+supervised deployment usually exists to serve agents on other machines.
+
+MCP tool names are bare `cks.context.*` / `cks.ops.*` by default; a
+distribution can stamp its own namespace root at build time with
+`make build-bins NAMESPACE=<root>`.
 
 ## Building a dataset
 
