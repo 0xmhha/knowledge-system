@@ -511,8 +511,11 @@ func (r *Real) ImpactOfChange(ctx context.Context, seedQname string, opts Impact
 		return contract.ImpactResult{}, errors.New("ckgclient: empty seed qname")
 	}
 	// Suffix-resolve a partial seed; impact.Compute requires an exact qname.
-	if resolved := r.resolveQname(seedQname); resolved != "" {
-		seedQname = resolved
+	// An unresolved seed is an error, not an empty closure — see
+	// ErrSeedUnresolved.
+	seedQname, err := r.resolveSeedOrErr(seedQname)
+	if err != nil {
+		return contract.ImpactResult{}, err
 	}
 	seedFile := r.resolveSeedFile(seedQname)
 	raw, err := r.s.ImpactCompute(seedQname, seedFile, opts.Depth, false)
@@ -625,17 +628,38 @@ func (r *Real) resolveSeedFile(qname string) string {
 	return ""
 }
 
+// resolveSeedOrErr resolves a caller-supplied seed to an exact ckg qualified
+// name, or reports why it could not. Wraps ErrSeedUnresolved and names which
+// of the two failures happened, because the caller's next move differs: a
+// misspelling needs a different name, an ambiguous one needs a canonical_id
+// (find_symbol returns one).
+//
+// Every seeded traversal goes through this rather than through resolveQname
+// directly: passing an unresolved name on to an exact-match backend yields an
+// empty result the caller cannot distinguish from a real "nothing here".
+func (r *Real) resolveSeedOrErr(name string) (string, error) {
+	if resolved := r.resolveQname(name); resolved != "" {
+		return resolved, nil
+	}
+	defs, err := r.resolveFlexibleNodes(name)
+	switch {
+	case err != nil:
+		return "", fmt.Errorf("%w: %q: %w", ErrSeedUnresolved, name, err)
+	case len(defs) == 0:
+		return "", fmt.Errorf("%w: %q matches no indexed symbol", ErrSeedUnresolved, name)
+	default:
+		return "", fmt.Errorf("%w: %q is ambiguous across %d definitions; pass the canonical_id find_symbol reports",
+			ErrSeedUnresolved, name, len(defs))
+	}
+}
+
 // resolveQname normalizes a possibly-partial symbol name to a stored
 // fully-qualified name. Resolution order: exact canonical_id → exact/unique
-// qname. Returns "" when the name does not resolve OR is ambiguous, in which
-// case callers pass the original name through unchanged so the downstream
-// exact-match traversal behaves as before.
+// qname. Returns "" when the name does not resolve OR is ambiguous.
 //
-// This closes the seed-resolution gap between the find_symbol/find_callers
-// family (which suffix-match) and the graph-traversal family (GetSubgraph,
-// ImpactOfChange, ConcurrencyImpact) whose ckg backends require an exact
-// qualified_name and otherwise return empty silently — while never binding an
-// ambiguous bare name to an arbitrary candidate.
+// Seeded traversals call resolveSeedOrErr instead, which turns that "" into a
+// named error; this stays the plain lookup for callers that have a meaningful
+// fallback of their own.
 func (r *Real) resolveQname(name string) string {
 	if n, found, _ := r.s.FindByCanonicalID(name); found {
 		return n.QualifiedName
@@ -735,9 +759,12 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		depth = 1
 	}
 	// Suffix-resolve a partial seed (e.g. "Engine.Finalize") to its stored
-	// fully-qualified name; SubgraphByQname matches qualified_name exactly.
-	if resolved := r.resolveQname(qname); resolved != "" {
-		qname = resolved
+	// fully-qualified name; SubgraphByQname matches qualified_name exactly, so
+	// an unresolved seed would come back as an empty neighborhood rather than
+	// as the lookup failure it is — see ErrSeedUnresolved.
+	qname, err := r.resolveSeedOrErr(qname)
+	if err != nil {
+		return nil, nil, err
 	}
 	nodes, edges, err := r.s.SubgraphByQname(qname, depth)
 	if err != nil {
@@ -817,9 +844,12 @@ func (r *Real) ConcurrencyImpact(ctx context.Context, symbol string, opts Concur
 	if depth <= 0 {
 		depth = 3
 	}
-	// Suffix-resolve a partial seed; concurrency.Analyze requires an exact qname.
-	if resolved := r.resolveQname(symbol); resolved != "" {
-		symbol = resolved
+	// Suffix-resolve a partial seed; concurrency.Analyze requires an exact
+	// qname. An unresolved seed is an error, not an empty blast radius — see
+	// ErrSeedUnresolved.
+	symbol, err := r.resolveSeedOrErr(symbol)
+	if err != nil {
+		return contract.ConcurrencyResult{}, err
 	}
 	res, err := r.s.ConcurrencyAnalyze(symbol, depth, opts.MaxTotal)
 	if err != nil {

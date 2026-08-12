@@ -673,10 +673,15 @@ func TestReal_ImpactOfChange_TranslatesGroups(t *testing.T) {
 	}
 }
 
+// TestReal_ImpactOfChange_NotFoundReturnsEmpty covers the seed that resolves
+// but that the impact index does not cover. That stays an empty closure — it
+// is a real answer. Only an unresolvable seed is an error (see
+// TestReal_SeedResolutionFailureIsAnError).
 func TestReal_ImpactOfChange_NotFoundReturnsEmpty(t *testing.T) {
 	t.Parallel()
 	m := &mockStoreReader{
 		manifest:  ManifestSnapshot{SrcCommit: "c"},
+		symbolOut: []types.Node{node("missing", "pkg.Missing", "missing.go", 1, 9, types.NodeFunction, "go")},
 		impactOut: map[string]any{"not_found": true, "depth": 1},
 	}
 	r := newRealWithStore(m)
@@ -756,7 +761,8 @@ func TestReal_GetNodePRs_ResolvesAndTranslates(t *testing.T) {
 func TestReal_ConcurrencyImpact_TranslatesModules(t *testing.T) {
 	t.Parallel()
 	m := &mockStoreReader{
-		manifest: ManifestSnapshot{SrcCommit: "c9"},
+		manifest:  ManifestSnapshot{SrcCommit: "c9"},
+		symbolOut: []types.Node{node("fin", "wbft.Finalize", "consensus/wbft/engine.go", 1, 9, types.NodeFunction, "go")},
 		concurrencyOut: concurrency.Result{
 			Seed:  "wbft.Finalize",
 			Depth: 3,
@@ -797,6 +803,53 @@ func TestReal_ConcurrencyImpact_EmptySymbolErrors(t *testing.T) {
 	r := newRealWithStore(&mockStoreReader{})
 	if _, err := r.ConcurrencyImpact(context.Background(), "", ConcurrencyOpts{}); err == nil {
 		t.Fatal("expected error for empty symbol")
+	}
+}
+
+// TestReal_SeedResolutionFailureIsAnError pins the distinction every
+// symbol-seeded traversal has to make. Their backends match qualified_name
+// exactly and yield nothing for anything else, so a seed that does not
+// resolve used to come back as an empty result — indistinguishable from
+// "nothing is connected to this", which is the opposite of the truth.
+//
+// All three surfaces are covered together on purpose: the failure this guards
+// against is one of them drifting back to the silent form while the others
+// report, which is how the surfaces disagreed in the first place.
+func TestReal_SeedResolutionFailureIsAnError(t *testing.T) {
+	t.Parallel()
+	ambiguous := []types.Node{
+		node("a", "pkga.Finalize", "a.go", 1, 9, types.NodeFunction, "go"),
+		node("b", "pkgb.Finalize", "b.go", 1, 9, types.NodeFunction, "go"),
+	}
+	cases := []struct {
+		name    string
+		symbols []types.Node
+		seed    string
+	}{
+		{name: "unknown name", symbols: nil, seed: "pkg.NoSuchThing"},
+		{name: "ambiguous name", symbols: ambiguous, seed: "Finalize"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			m := &mockStoreReader{
+				manifest:       ManifestSnapshot{SrcCommit: "c"},
+				symbolOut:      tc.symbols,
+				impactOut:      map[string]any{"depth": 1},
+				concurrencyOut: concurrency.Result{Seed: tc.seed},
+			}
+			r := newRealWithStore(m)
+
+			if _, err := r.ImpactOfChange(context.Background(), tc.seed, ImpactOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("ImpactOfChange error = %v, want ErrSeedUnresolved", err)
+			}
+			if _, err := r.ConcurrencyImpact(context.Background(), tc.seed, ConcurrencyOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("ConcurrencyImpact error = %v, want ErrSeedUnresolved", err)
+			}
+			if _, _, err := r.GetSubgraph(context.Background(), tc.seed, SubgraphOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("GetSubgraph error = %v, want ErrSeedUnresolved", err)
+			}
+		})
 	}
 }
 

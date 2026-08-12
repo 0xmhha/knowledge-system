@@ -20,9 +20,21 @@ package ckgclient
 
 import (
 	"context"
+	"errors"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
+
+// ErrSeedUnresolved reports that a seed symbol did not resolve to exactly one
+// indexed symbol — it matched nothing, or it matched several and the client
+// refuses to pick one silently.
+//
+// It exists because the traversals seeded by a symbol (subgraph, impact,
+// concurrency) take an exact qualified name and return an empty result for
+// anything else. Empty reads as "nothing is connected to this", which is the
+// opposite of the truth when the real answer is "I could not find what you
+// named". Callers that surface results to a human must tell those two apart.
+var ErrSeedUnresolved = errors.New("ckgclient: seed symbol unresolved")
 
 // Client is the cks-internal interface to a ckg backend.
 type Client interface {
