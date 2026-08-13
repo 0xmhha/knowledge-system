@@ -171,6 +171,33 @@ func TestFindBranches_ReturnsBranches(t *testing.T) {
 	}
 }
 
+// TestFindBranches_KCapsResultsNotCandidatePool pins what k means. It used to
+// size the retrieval pool: the search fetched exactly k flow chunks and then
+// kept whichever were steps with branches. Only some flow chunks are steps, so
+// a small k could come back empty while the branches it should have found sat
+// one rank lower — and find_branches is the natural-language way into the flow
+// corpus, so an empty result reads as "no such failure mode exists".
+//
+// The fixture has three single-branch steps, so asking for k branches must
+// yield min(k, 3) of them, and asking for fewer must never yield none.
+func TestFindBranches_KCapsResultsNotCandidatePool(t *testing.T) {
+	eng := openFlowEngine(t)
+	const totalBranches = 3
+	for _, k := range []int{1, 2, 3, 4, 10} {
+		want := k
+		if want > totalBranches {
+			want = totalBranches
+		}
+		matches, err := eng.FindBranches(context.Background(), "서명 불일치로 거부됨", k)
+		if err != nil {
+			t.Fatalf("FindBranches(k=%d): %v", k, err)
+		}
+		if len(matches) != want {
+			t.Errorf("k=%d returned %d branches, want %d", k, len(matches), want)
+		}
+	}
+}
+
 func TestTopoSortSteps_CycleSafe(t *testing.T) {
 	mk := func(id string, calls ...string) types.Chunk {
 		return types.Chunk{FlowStep: &types.FlowStepMeta{StepID: id, Calls: calls}}

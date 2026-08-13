@@ -17,6 +17,20 @@ import (
 // an invariant is checked. All are bounded (single flow / single lookup); the
 // corpus is small so the call-order model is built in-memory per request.
 
+// branchPoolFactor over-fetches the flow-chunk candidate pool relative to the
+// caller's k. Matching nearestFlows, which uses the same factor for the same
+// reason: the ranking is over flow chunks, but the result is drawn from the
+// subset of them that are steps carrying branches.
+const branchPoolFactor = 4
+
+// minBranchPool floors that pool. A factor alone still starves the small k a
+// caller uses to ask a focused question: k=1 scans four chunks, and the flow
+// corpus mixes spines and invariants in with the steps, so all four can be
+// branchless while the answer sits at rank five. Measured on the go-stablenet
+// corpus, k=1 returned nothing until the floor was added. The corpus is small
+// enough that scanning this many costs nothing.
+const minBranchPool = 20
+
 // FlowSelector picks a flow by exactly one of its keys.
 type FlowSelector struct {
 	FlowID      string
@@ -409,6 +423,12 @@ func (e *Engine) ExpandFlow(ctx context.Context, stepID, direction string, hops 
 // FindBranches maps a symptom phrase to the failure branches of the flow steps
 // most relevant to it (semantic search over flow chunks, whose embed text
 // already includes each branch's "when"). Requires a real embedder.
+//
+// k caps the branches returned, so the candidate pool is over-fetched the way
+// nearestFlows does: only some flow chunks are steps, and only some steps carry
+// branches, so a pool of exactly k yields nothing whenever the top k chunks
+// happen to be branchless — the caller reads that as "no such failure mode"
+// rather than "look further down the ranking".
 func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]BranchMatch, error) {
 	if e == nil || e.store == nil {
 		return nil, fmt.Errorf("find_branches: engine not ready")
@@ -417,7 +437,7 @@ func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]Bra
 		k = DefaultK
 	}
 	resp, err := e.Search(ctx, symptom, Options{
-		K:         k,
+		K:         max(k*branchPoolFactor, minBranchPool),
 		Filter:    types.Filter{Language: "flow"},
 		Threshold: -1,
 	})
@@ -438,7 +458,7 @@ func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]Bra
 	for _, c := range chunks {
 		byID[c.ID] = c
 	}
-	var out []BranchMatch
+	out := make([]BranchMatch, 0, k)
 	for _, id := range ids { // preserve hit rank
 		c, ok := byID[id]
 		if !ok || c.FlowStep == nil {
@@ -455,6 +475,11 @@ func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]Bra
 				Citation: c.Citation(),
 				Score:    score[id],
 			})
+		}
+		// Cap between steps, not inside one: a step's branches are the
+		// alternatives at a single decision point and only make sense together.
+		if len(out) >= k {
+			break
 		}
 	}
 	return out, nil
