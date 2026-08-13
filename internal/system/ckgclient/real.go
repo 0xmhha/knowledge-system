@@ -16,6 +16,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // DefaultSearchLimit is the limit passed to ckg's SearchFTS when SearchOpts.K
@@ -217,7 +218,7 @@ func (r *Real) BM25Search(ctx context.Context, query string, opts SearchOpts) ([
 	// Over-fetch when a filter is set so the post-filter has rows to
 	// pick from. Otherwise pull exactly K rows.
 	fetchLimit := limit
-	hasFilter := opts.Filter.Language != "" || opts.Filter.PathGlob != ""
+	hasFilter := opts.Filter.Language != "" || opts.Filter.PathGlob != "" || opts.Filter.ExcludeTests
 	if hasFilter {
 		fetchLimit = limit * FilterOverfetchRatio
 	}
@@ -256,6 +257,9 @@ func (r *Real) BM25Search(ctx context.Context, query string, opts SearchOpts) ([
 // single-star, no "**" expansion — matched against n.FilePath.
 func matchesFilter(n types.Node, f SearchFilter) bool {
 	if f.Language != "" && f.Language != n.Language {
+		return false
+	}
+	if f.ExcludeTests && testpath.IsTest(n.FilePath) {
 		return false
 	}
 	if f.PathGlob != "" {
@@ -441,6 +445,23 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 		// under the MaxTotal cap.
 		if isStructuralQname(srcN.QualifiedName) || isStructuralQname(dstN.QualifiedName) {
 			continue
+		}
+		// Exclude the neighbour, never the seed. Edge orientation is the
+		// graph's, not the walk's — a calls edge runs caller → callee whichever
+		// way we traversed it, and the direction is carried in the relation
+		// instead. So the endpoint the caller does not already have is srcN on
+		// a reverse (callers) walk and dstN on a forward one. Testing dstN
+		// unconditionally checks the seed when reversed, which makes
+		// exclude_tests a no-op for a production seed and drops every
+		// neighbour when the seed itself lives in a test.
+		if opts.ExcludeTests {
+			neighbour := dstN
+			if reverse {
+				neighbour = srcN
+			}
+			if testpath.IsTest(neighbour.FilePath) {
+				continue
+			}
 		}
 		if opts.MaxTotal > 0 && len(out) >= opts.MaxTotal {
 			break
@@ -628,6 +649,13 @@ func (r *Real) resolveSeedFile(qname string) string {
 	return ""
 }
 
+// resolveQname normalizes a possibly-partial symbol name to a stored
+// fully-qualified name. Resolution order: exact canonical_id → exact/unique
+// qname. Returns "" when the name does not resolve OR is ambiguous.
+//
+// Seeded traversals call resolveSeedOrErr instead, which turns that "" into a
+// named error; this stays the plain lookup for callers that have a meaningful
+// fallback of their own.
 // resolveSeedOrErr resolves a caller-supplied seed to an exact ckg qualified
 // name, or reports why it could not. Wraps ErrSeedUnresolved and names which
 // of the two failures happened, because the caller's next move differs: a
@@ -653,13 +681,6 @@ func (r *Real) resolveSeedOrErr(name string) (string, error) {
 	}
 }
 
-// resolveQname normalizes a possibly-partial symbol name to a stored
-// fully-qualified name. Resolution order: exact canonical_id → exact/unique
-// qname. Returns "" when the name does not resolve OR is ambiguous.
-//
-// Seeded traversals call resolveSeedOrErr instead, which turns that "" into a
-// named error; this stays the plain lookup for callers that have a meaningful
-// fallback of their own.
 func (r *Real) resolveQname(name string) string {
 	if n, found, _ := r.s.FindByCanonicalID(name); found {
 		return n.QualifiedName
@@ -809,6 +830,9 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		srcN, srcOK := byID[e.Src]
 		dstN, dstOK := byID[e.Dst]
 		if !srcOK || !dstOK {
+			continue
+		}
+		if opts.ExcludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath)) {
 			continue
 		}
 		neighbors = append(neighbors, contract.Neighbor{
