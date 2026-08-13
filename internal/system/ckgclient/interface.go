@@ -99,6 +99,11 @@ type SearchFilter struct {
 	Language   string // e.g. "go"
 	PathGlob   string // e.g. "internal/**"
 	CommitHash string // snapshot pin; empty = latest indexed
+	// ExcludeTests drops test files and test-only support code. Set here
+	// rather than applied to the result so it counts as a filter for the
+	// over-fetch: discarding tests from an already-truncated K returns
+	// fewer than K, and none at all when the tests outrank everything else.
+	ExcludeTests bool
 }
 
 // SymbolOpts shapes a single FindSymbol call.
@@ -123,6 +128,10 @@ type NeighborsOpts struct {
 	// Hops is the maximum traversal depth. Zero is treated as 1
 	// (direct neighbors only). Negative values are rejected.
 	Hops int
+	// ExcludeTests drops neighbours whose target is test code. Applied while
+	// the cap is being filled, not to the capped result, so MaxTotal buys
+	// MaxTotal usable neighbours.
+	ExcludeTests bool
 	// MaxTotal caps the total number of neighbors returned across all
 	// relations. Zero means no cap (the backend may still apply its own).
 	MaxTotal int
@@ -149,6 +158,10 @@ type PRRefOpts struct {
 type SubgraphOpts struct {
 	Depth    int // max traversal depth; zero means 1
 	MaxTotal int // cap on total nodes; zero means no cap
+	// ExcludeTests skips edges that touch test code while the cap is being
+	// filled. Dropping them afterwards both shrinks the result below the cap
+	// and strands edges whose endpoints were removed.
+	ExcludeTests bool
 }
 
 // ConcurrencyOpts shapes a single ConcurrencyImpact call.

@@ -93,6 +93,10 @@ func handleSemanticSearch(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 		Filter: ckvclient.SearchFilter{
 			Language: req.GetString("language", ""),
 			PathGlob: req.GetString("path_glob", ""),
+			// Pushed into the query rather than applied to the result: the
+			// store over-fetches when a filter is set, so k stays k usable
+			// hits instead of k minus whatever tests outranked them.
+			ExcludeTests: excludeTestsArg(req),
 		},
 	}
 	if kinds := req.GetString("kinds", ""); kinds != "" {
@@ -105,9 +109,6 @@ func handleSemanticSearch(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 	hits, err := d.CKV.SemanticSearch(ctx, maybeExpand(d, req, query), opts)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("%s: %v", ToolNameSemanticSearch, err), nil
-	}
-	if excludeTestsArg(req) {
-		hits = filterHitsTests(hits)
 	}
 	return mcpgo.NewToolResultStructured(searchResponse{
 		Query:        query,
@@ -152,6 +153,9 @@ func handleSearchText(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*
 		Filter: ckgclient.SearchFilter{
 			Language: req.GetString("language", ""),
 			PathGlob: req.GetString("path_glob", ""),
+			// Pushed into the query for the same reason as semantic_search:
+			// the adapter over-fetches when a filter is set.
+			ExcludeTests: excludeTestsArg(req),
 		},
 	}
 
@@ -161,9 +165,6 @@ func handleSearchText(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*
 	hits, err := d.CKG.BM25Search(ctx, ftsOrQuery(maybeExpand(d, req, query)), opts)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("%s: %v", ToolNameSearchText, err), nil
-	}
-	if excludeTestsArg(req) {
-		hits = filterHitsTests(hits)
 	}
 	return mcpgo.NewToolResultStructured(searchResponse{
 		Query:        query,

@@ -103,9 +103,10 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 		k = DefaultK
 	}
 	filter := ckvtypes.Filter{
-		Language:   opts.Filter.Language,
-		PathGlob:   opts.Filter.PathGlob,
-		CommitHash: opts.Filter.CommitHash,
+		Language:     opts.Filter.Language,
+		PathGlob:     opts.Filter.PathGlob,
+		CommitHash:   opts.Filter.CommitHash,
+		ExcludeTests: opts.Filter.ExcludeTests,
 	}
 	for _, sk := range opts.Filter.SymbolKinds {
 		filter.SymbolKinds = append(filter.SymbolKinds, ckvtypes.SymbolKind(sk))
