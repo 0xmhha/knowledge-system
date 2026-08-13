@@ -28,6 +28,8 @@ import (
 	"compress/gzip"
 	"fmt"
 	"maps"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -153,7 +155,7 @@ func commitSubjectMapFromGraph(g *graph.Graph) map[string]string {
 // NodeCommit doesn't need a parallel "unreachable commit" path.
 //
 // Returns the gzipped patch blobs map; caller merges into InsertBlobs.
-func emitUnreachableHunkGraph(g *graph.Graph, srcRel, repoRoot string,
+func emitUnreachableHunkGraph(g *graph.Graph, srcRoot, srcRel, repoRoot string,
 	existingCommitIDs map[string]string, filter *filterlist.FilterList) (map[string][]byte, error) {
 	commits, hunks, err := temporal.LoadUnreachableHunks(repoRoot, 0)
 	if err != nil {
@@ -191,7 +193,7 @@ func emitUnreachableHunkGraph(g *graph.Graph, srcRel, repoRoot string,
 	// already have repo-rooted file paths since git show emits the
 	// same shape git log -p does.
 	relHunks, prefix := remapHunksToSrcRel(hunks, srcRel)
-	relHunks = scopeHunksToFilter(relHunks, filter)
+	relHunks = scopeRecoveryHunksToFilter(relHunks, filter, srcRoot)
 	if len(relHunks) == 0 {
 		return nil, nil
 	}
@@ -222,6 +224,49 @@ func scopeHunksToFilter(hunks []temporal.HunkInfo, filter *filterlist.FilterList
 		}
 	}
 	return out
+}
+
+// scopeRecoveryHunksToFilter is the recovery-track counterpart of
+// scopeHunksToFilter, for the unreachable (force-pushed-away) hunks.
+//
+// It additionally keeps a hunk the build scope excludes when the file is gone
+// from the current tree. The include list is derived from the current tree, so
+// a file an agent deleted can never appear in it — scoping on the list alone
+// would drop exactly the history the recovery workflow exists to bring back.
+// Files that still exist and are merely out of the build scope stay filtered,
+// which is the storage win the scoping was introduced for.
+func scopeRecoveryHunksToFilter(hunks []temporal.HunkInfo, filter *filterlist.FilterList,
+	srcRoot string) []temporal.HunkInfo {
+	if filter == nil {
+		return hunks
+	}
+	out := make([]temporal.HunkInfo, 0, len(hunks))
+	// One stat per distinct path: a single file usually carries many hunks.
+	inTree := make(map[string]bool, len(hunks))
+	for _, h := range hunks {
+		if filter.Allow(h.FilePath) {
+			out = append(out, h)
+			continue
+		}
+		present, seen := inTree[h.FilePath]
+		if !seen {
+			present = existsUnderSrcRoot(srcRoot, h.FilePath)
+			inTree[h.FilePath] = present
+		}
+		if !present {
+			out = append(out, h)
+		}
+	}
+	return out
+}
+
+// existsUnderSrcRoot reports whether relPath (srcRoot-relative, slash form) is
+// still on disk. A stat error of any kind counts as absent: the recovery track
+// keeps the hunk, which is the safe direction — a retained hunk costs storage,
+// a dropped one is unrecoverable.
+func existsUnderSrcRoot(srcRoot, relPath string) bool {
+	_, err := os.Stat(filepath.Join(srcRoot, filepath.FromSlash(relPath)))
+	return err == nil
 }
 
 // remapHunksToSrcRel filters hunks whose FilePath falls outside srcRoot's

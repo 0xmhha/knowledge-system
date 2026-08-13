@@ -3,8 +3,11 @@ package mcpcli
 import (
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/system/daemon"
@@ -31,8 +34,9 @@ func runDaemon(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("daemon "+sub, flag.ContinueOnError)
 	name := fs.String("name", "", "instance name (pidfile/log key)")
 	config := fs.String("config", "", "cks config passed to the instance (start/restart)")
-	port := fs.String("port", "", "run the instance on this port; the host comes from its config (or 127.0.0.1)")
+	port := fs.String("port", "", "run the instance on this port; the host comes from its config or the registry bind")
 	addr := fs.String("http-addr", "", "full host:port override for the instance; prefer --port")
+	lan := fs.Bool("lan", false, "up: bind every interface so machines on this subnet can reach the instances")
 	registry := fs.String("registry", envOr("CKS_REGISTRY", "instances.yaml"), "instance registry file (up/down)")
 	wait := fs.Bool("wait", false, "up: poll each instance's /healthz until it is serviceable before returning")
 	waitTimeout := fs.Duration("wait-timeout", 60*time.Second, "up --wait: max time to wait per instance for readiness")
@@ -50,19 +54,14 @@ func runDaemon(args []string, stdout io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("resolve own binary: %w", err)
 	}
-	// This binary's server is the `mcp` subcommand, so supervised instances
-	// are spawned as `cks mcp --config ... --name ...`.
-	// The supervised instance is this binary's `mcp` subcommand. A --port given
-	// here rides along to the child, which keeps the configured host and only
-	// moves the port; --http-addr (or the registry's own address) still names a
-	// full host:port.
-	portArg := *port
+	// The supervised instance is this binary's `mcp` subcommand. Whatever
+	// address this level resolved is handed down whole, so the address the
+	// supervisor records — the one `status`, `reload` and the printed URL all
+	// use — is provably the address the child binds.
 	sup := &daemon.Supervisor{RunDir: *runDir, Binary: self, Args: func(name, config, addr string) []string {
 		a := []string{"mcp", "--config", config, "--name", name}
 		if addr != "" {
 			a = append(a, "--http-addr", addr)
-		} else if portArg != "" {
-			a = append(a, "--port", portArg)
 		}
 		return a
 	}}
@@ -83,6 +82,9 @@ func runDaemon(args []string, stdout io.Writer) error {
 		if err != nil {
 			return err
 		}
+		if err := applyUpOverrides(reg, *port, *addr, *lan); err != nil {
+			return err
+		}
 		started, err := sup.Up(reg, nil)
 		for _, st := range started {
 			url := netutil.AdvertiseHostPort(st.Addr)
@@ -95,6 +97,9 @@ func runDaemon(args []string, stdout io.Writer) error {
 				}
 			}
 			fmt.Fprintf(stdout, "[%s] %s (pid %d) — http://%s/mcp\n", st.Name, state, st.PID, url)
+			if notice := loopbackNotice(st.Addr, *registry); notice != "" {
+				fmt.Fprintf(stdout, "    %s\n", notice)
+			}
 		}
 		return err
 	case "down":
@@ -124,11 +129,21 @@ func runDaemon(args []string, stdout io.Writer) error {
 		if sub == "restart" {
 			fn = sup.Restart
 		}
-		inst, err := fn(*name, *config, *addr)
+		bind := *addr
+		if *port != "" {
+			cfg, err := loadConfig(*config)
+			if err != nil {
+				return fmt.Errorf("daemon %s: --port: load config: %w", sub, err)
+			}
+			if bind, err = addrForPort(cfg.Listen.HTTPAddr, *port); err != nil {
+				return fmt.Errorf("daemon %s: %w", sub, err)
+			}
+		}
+		inst, err := fn(*name, *config, bind)
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(stdout, "[%s] running (pid %d)\n", inst.Name, inst.PID)
+		printInstance(stdout, inst, false)
 	case "stop":
 		if err := needName(); err != nil {
 			return err
@@ -159,6 +174,87 @@ func runDaemon(args []string, stdout io.Writer) error {
 		return fmt.Errorf("daemon: unknown subcommand %q (want start|stop|restart|status|list)", sub)
 	}
 	return nil
+}
+
+// wildcardBind is the bind host that reaches every interface. `up --lan` uses
+// it rather than pinning this host's current LAN IP: a pinned address stops
+// resolving the moment DHCP hands out a different one, and the instance then
+// fails to bind at all. The printed URL still shows a routable address —
+// netutil.AdvertiseHostPort resolves the wildcard for display.
+const wildcardBind = "0.0.0.0"
+
+// addrForPort combines a configured address with a --port override: the host
+// is kept, only the port moves. It is the same rule overrideListen applies
+// inside the server, used here so the address the supervisor records is the
+// one the child will bind, rather than two derivations that can disagree.
+func addrForPort(configuredAddr, port string) (string, error) {
+	host, err := hostForPortOverride(configuredAddr)
+	if err != nil {
+		return "", err
+	}
+	return net.JoinHostPort(host, port), nil
+}
+
+// applyUpOverrides folds the command-line reachability flags into the registry
+// before it is resolved into addresses.
+//
+// --port previously did nothing here at all: the registry always produces an
+// address, that address became --http-addr, and the flag was dropped without a
+// word — so an operator who asked for a port got the registry's auto-assigned
+// one on the registry's default bind, which is loopback. Silently serving
+// somewhere other than where the operator asked is the failure this whole flag
+// pair exists to avoid.
+func applyUpOverrides(reg *daemon.Registry, port, httpAddr string, lan bool) error {
+	if httpAddr != "" {
+		return fmt.Errorf("daemon up: --http-addr does not apply to a registry (it assigns one address per instance); " +
+			"use --lan and --port for a single instance, or set bind/port in the registry")
+	}
+	if lan {
+		reg.Bind = wildcardBind
+	}
+	if port == "" {
+		return nil
+	}
+	p, err := strconv.Atoi(port)
+	if err != nil || p <= 0 || p > 65535 {
+		return fmt.Errorf("daemon up: --port %q is not a valid port", port)
+	}
+	if len(reg.Instances) != 1 {
+		return fmt.Errorf("daemon up: --port names one instance's port, but the registry declares %d; "+
+			"pin each instance's port in the registry instead", len(reg.Instances))
+	}
+	reg.Instances[0].Port = p
+	return nil
+}
+
+// loopbackNotice returns the warning to print for an instance bound to
+// loopback, or "" when the address is reachable from elsewhere.
+//
+// Loopback stays the registry default because widening it is a security
+// decision an operator must make deliberately. Saying nothing about it is a
+// different matter: this deployment exists to serve agents on other machines,
+// and a loopback bind means they get connection-refused with nothing in the
+// output that explains why.
+func loopbackNotice(addr, registryPath string) string {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil || !isLoopbackHost(host) {
+		return ""
+	}
+	return fmt.Sprintf("loopback only — other machines on this subnet cannot reach it. "+
+		"Pass --lan, or set `bind: %s` in %s.", wildcardBind, registryPath)
+}
+
+// isLoopbackHost reports whether a bind host answers only on this machine. An
+// empty host is the wildcard form (every interface), not loopback.
+func isLoopbackHost(host string) bool {
+	if host == "" {
+		return false
+	}
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 func printInstance(w io.Writer, i daemon.Instance, probeReady bool) {

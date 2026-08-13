@@ -83,7 +83,7 @@ func (e *Engine) BodyByRange(ctx context.Context, file string, startLine, endLin
 // pkg/ckv/ckv.go — 같은 시그니처로 위임 (기존 위임 패턴: SemanticSearch 184행 참조)
 ```
 
-**(c) 테스트** — `internal/store/sqlitevec/body_by_range_test.go` 신규:
+**(c) 테스트** — `internal/vector/store/sqlitevec/body_by_range_test.go` 신규:
 - 정확 스팬 일치(청크 전체) / 부분 스팬(청크 내부 슬라이스) / 덮지 못하는 스팬(found=false) /
   여러 청크가 덮을 때 가장 작은 청크 선택 / 라인 경계(첫 줄·마지막 줄) 케이스.
 - 기존 테스트 픽스처 `mkChunk`(store_test.go:15) 재사용. text에 개행 포함 다줄 본문을 넣을 것.
@@ -104,7 +104,7 @@ FetchBody(ctx context.Context, file string, startLine, endLine int) (text string
   `Calls.FetchBody` 기록 + `FetchBodyErr`. 기존 Fake 패턴(SearchHits/SearchErr) 그대로.
 - Dummy/Degraded 구현체가 있으면 `("", false, nil)` 반환.
 
-**(b) SnapshotFetcher** — `internal/composer/budget/snapshot.go` 신규:
+**(b) SnapshotFetcher** — `internal/system/composer/budget/snapshot.go` 신규:
 
 ```go
 // SnapshotFetcher serves citation bodies from the ckv indexed snapshot
@@ -143,7 +143,7 @@ func (f *SnapshotFetcher) Fetch(ctx context.Context, c contract.Citation) (strin
   스냅샷 미스 시 **검증 없이 읽어도 오염 위험이 낮으나**, 일관성을 위해 동일 규칙 적용
   (FallbackVerified 게이트)을 권장 — 코퍼스도 바뀔 수 있다.
 
-**(c) 테스트** — `internal/composer/budget/snapshot_test.go` 신규:
+**(c) 테스트** — `internal/system/composer/budget/snapshot_test.go` 신규:
 - 스냅샷 히트 → 그대로 반환, 폴백 미호출(Fake.Calls로 단언).
 - 스냅샷 미스 + FallbackVerified=true → 폴백 반환.
 - 스냅샷 미스 + FallbackVerified=false → ("", nil) (폴백 존재해도 미호출).

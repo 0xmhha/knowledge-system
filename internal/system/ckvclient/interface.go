@@ -93,6 +93,10 @@ type SearchFilter struct {
 	// CommitHash pins the search to a specific snapshot. Empty means the
 	// backend's latest indexed snapshot.
 	CommitHash string
+	// ExcludeTests drops test files and test-only support code at query
+	// time, so the k the caller asked for is k usable rows rather than k
+	// rows minus however many tests happened to rank highest.
+	ExcludeTests bool
 	// ChunkKinds restricts to ckv chunking strategies (e.g. "invariant",
 	// "convention", "doc"). Empty means any kind. Powers the composer's
 	// knowledge pass — invariants never outrank 14k code chunks in a

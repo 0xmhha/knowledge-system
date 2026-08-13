@@ -42,7 +42,7 @@ func registerImpactAnalysis(s *mcpserver.MCPServer, d Deps) {
 				"of a shared dependency before editing it.",
 		),
 		mcpgo.WithString("symbol", mcpgo.Required(),
-			mcpgo.Description("Fully-qualified symbol name to seed the impact analysis.")),
+			mcpgo.Description("Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.")),
 		mcpgo.WithNumber("depth",
 			mcpgo.Description("Maximum traversal depth (default: backend default, typically 2).")),
 		mcpgo.WithNumber("max_total",

@@ -1,6 +1,10 @@
 package types
 
-import "slices"
+import (
+	"slices"
+
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
+)
 
 // Filter narrows a vector search by metadata. All fields are optional; an
 // empty field is treated as "any". Filters are AND-combined.
@@ -20,12 +24,22 @@ type Filter struct {
 	// caller retrieve knowledge chunks directly instead of hoping they
 	// outrank 14k code chunks in a generic query.
 	ChunkKinds []ChunkKind `json:"chunk_kinds,omitempty"`
+	// ExcludeTests drops test files and test-only support code.
+	//
+	// It belongs on the filter rather than being applied to the result,
+	// because the store over-fetches whenever a filter is set. Dropping test
+	// hits from an already-truncated k rows returns fewer than k, and for a
+	// query whose nearest neighbours are all tests it returns none — the
+	// caller reads "no such code" from what is really "your k was spent on
+	// rows I then threw away".
+	ExcludeTests bool `json:"exclude_tests,omitempty"`
 }
 
 // IsZero reports whether the filter would match every chunk. Used by store
 // implementations to skip the post-filter step entirely on the hot path.
 func (f Filter) IsZero() bool {
-	return f.Language == "" && f.PathGlob == "" && len(f.SymbolKinds) == 0 && f.CommitHash == "" && len(f.ChunkKinds) == 0
+	return f.Language == "" && f.PathGlob == "" && len(f.SymbolKinds) == 0 && f.CommitHash == "" &&
+		len(f.ChunkKinds) == 0 && !f.ExcludeTests
 }
 
 // Matches reports whether c satisfies every set field of f. Implemented
@@ -52,7 +66,21 @@ func (f Filter) Matches(c Chunk) bool {
 	if len(f.ChunkKinds) > 0 && !slices.Contains(f.ChunkKinds, c.ChunkKind) {
 		return false
 	}
+	if f.ExcludeTests && isTestChunk(c) {
+		return false
+	}
 	return true
+}
+
+// isTestChunk unions what the indexer stamped with what the path says.
+// Chunk.IsTest comes from IsTestPath, which is per-language and deliberately
+// narrow (Go: "*_test.go"). testpath.IsTest additionally covers test-only
+// support code — testutil*.go, testdata/, test/ — which compiles into the
+// package but exists solely to serve tests. A caller asking for "no tests"
+// means both, and the shared predicate keeps that judgement identical to the
+// one the graph side applies to its own citations.
+func isTestChunk(c Chunk) bool {
+	return c.IsTest || testpath.IsTest(c.File)
 }
 
 // Hit is a single search result. Score values are normalized so callers

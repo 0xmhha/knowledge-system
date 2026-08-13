@@ -204,6 +204,14 @@ func handleGetInvariantEnforcement(ctx context.Context, d Deps, req mcpgo.CallTo
 	return mcpgo.NewToolResultStructured(enf, "get_invariant_enforcement result"), nil
 }
 
+// findInvariantsResponse is the wire shape for find_invariants. The hits are
+// wrapped in an object because MCP requires structuredContent to be a JSON
+// object: handing mcp-go a bare slice serialises to an array, which a
+// spec-conforming client rejects before the caller ever sees the payload.
+type findInvariantsResponse struct {
+	Invariants []ckvclient.InvariantHit `json:"invariants"`
+}
+
 // registerFindInvariants wires cks.context.find_invariants.
 func registerFindInvariants(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindInvariants,
@@ -231,7 +239,13 @@ func handleFindInvariants(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 	if err != nil {
 		return flowErrResult(ToolNameFindInvariants, err), nil
 	}
-	return mcpgo.NewToolResultStructured(hits, "find_invariants result"), nil
+	return mcpgo.NewToolResultStructured(findInvariantsResponse{Invariants: hits}, "find_invariants result"), nil
+}
+
+// getConventionsResponse is the wire shape for get_conventions. Wrapped in an
+// object for the same reason as findInvariantsResponse.
+type getConventionsResponse struct {
+	Conventions []ckvclient.ConventionHit `json:"conventions"`
 }
 
 // registerGetConventions wires cks.context.get_conventions.
@@ -258,5 +272,5 @@ func handleGetConventions(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 	if err != nil {
 		return flowErrResult(ToolNameGetConventions, err), nil
 	}
-	return mcpgo.NewToolResultStructured(hits, "get_conventions result"), nil
+	return mcpgo.NewToolResultStructured(getConventionsResponse{Conventions: hits}, "get_conventions result"), nil
 }

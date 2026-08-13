@@ -153,7 +153,8 @@ func readOldManifestFromDB(dbPath, dbDsn string) *persist.Manifest {
 //     are inserted last (cached refs survived FK CASCADE — no re-insert).
 func runIncremental(opt Options, log *slog.Logger,
 	decisions CacheDecisions,
-	goCount, tsCount, solCount, protoCount int) (persist.Manifest, error) {
+	goCount, tsCount, solCount, protoCount int,
+	filter *filterlist.FilterList) (persist.Manifest, error) {
 	log.Info(decisions.FormatLogLine())
 	store, err := openStore(opt.OutDir, opt.DBDSN)
 	if err != nil {
@@ -254,11 +255,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// regardless of opt.LockPropagation.
 	// The temporal pass re-enumerates from git, so it needs the same
 	// build-scope filter the discovery pass applied — see emitTemporalEdges.
-	incFilter, err := opt.resolveFilter()
-	if err != nil {
-		return persist.Manifest{}, err
-	}
-	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, nil, false, opt.TemporalDepth, incFilter)
+	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, nil, false, opt.TemporalDepth, filter)
 	if err != nil {
 		return persist.Manifest{}, err
 	}

@@ -37,18 +37,6 @@ func maybeExpand(d Deps, req mcpgo.CallToolRequest, query string) string {
 	return d.Vocab.Resolve(query).Expanded
 }
 
-// filterHitsTests returns hits whose citation is not a test path.
-func filterHitsTests(hits []contract.Hit) []contract.Hit {
-	out := make([]contract.Hit, 0, len(hits))
-	for _, h := range hits {
-		if testpath.IsTest(h.Citation.File) {
-			continue
-		}
-		out = append(out, h)
-	}
-	return out
-}
-
 // filterCitationsTests returns citations that are not test paths.
 func filterCitationsTests(cits []contract.Citation) []contract.Citation {
 	out := make([]contract.Citation, 0, len(cits))
@@ -57,33 +45,6 @@ func filterCitationsTests(cits []contract.Citation) []contract.Citation {
 			continue
 		}
 		out = append(out, c)
-	}
-	return out
-}
-
-// filterNeighborsByTarget drops neighbours whose target is a test path. The
-// seed itself is left to the caller; this keeps the call graph rooted while
-// pruning edges that lead into test code.
-func filterNeighborsByTarget(ns []contract.Neighbor) []contract.Neighbor {
-	out := make([]contract.Neighbor, 0, len(ns))
-	for _, n := range ns {
-		if testpath.IsTest(n.Target.File) {
-			continue
-		}
-		out = append(out, n)
-	}
-	return out
-}
-
-// filterEdgesTests drops edges touching a test path on either endpoint, so
-// no dangling reference to a removed node survives in a subgraph.
-func filterEdgesTests(ns []contract.Neighbor) []contract.Neighbor {
-	out := make([]contract.Neighbor, 0, len(ns))
-	for _, n := range ns {
-		if testpath.IsTest(n.Source.File) || testpath.IsTest(n.Target.File) {
-			continue
-		}
-		out = append(out, n)
 	}
 	return out
 }

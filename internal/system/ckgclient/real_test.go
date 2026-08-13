@@ -13,6 +13,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // --- mockStoreReader ---
@@ -475,6 +476,104 @@ func TestReal_Neighbors_TranslatesEdgesToCksRelations(t *testing.T) {
 	}
 }
 
+// TestReal_Neighbors_ExcludeTestsDropsTheNeighbourNotTheSeed pins which
+// endpoint exclude_tests judges. Edge orientation is the graph's, not the
+// walk's, so a reverse walk returns edges whose dst is the seed — filtering
+// dst there checks the seed instead of the caller, which makes the flag a
+// no-op for a production seed and empties the result for a test seed.
+func TestReal_Neighbors_ExcludeTestsDropsTheNeighbourNotTheSeed(t *testing.T) {
+	t.Parallel()
+	prod := node("P", "pkg.Prod", "prod.go", 10, 30, types.NodeFunction, "go")
+	testCaller := node("T", "pkg.TestProd", "prod_test.go", 1, 5, types.NodeFunction, "go")
+	otherProd := node("O", "pkg.Other", "other.go", 1, 5, types.NodeFunction, "go")
+
+	cases := []struct {
+		name      string
+		relations []contract.Relation
+		// A calls edge always runs caller → callee, whichever way we walk.
+		edges     []types.Edge
+		wantFiles []string
+	}{
+		{
+			name:      "callers: the test caller is dropped, the production one stays",
+			relations: []contract.Relation{contract.RelationCalledBy},
+			edges: []types.Edge{
+				edge("T", "P", types.EdgeCalls), // test  → seed
+				edge("O", "P", types.EdgeCalls), // prod  → seed
+			},
+			wantFiles: []string{"other.go"},
+		},
+		{
+			name:      "callees: unchanged, the neighbour is already the dst",
+			relations: []contract.Relation{contract.RelationCalls},
+			edges: []types.Edge{
+				edge("P", "T", types.EdgeCalls), // seed → test
+				edge("P", "O", types.EdgeCalls), // seed → prod
+			},
+			wantFiles: []string{"other.go"},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			m := &mockStoreReader{
+				manifest:   ManifestSnapshot{SrcCommit: "abc"},
+				pathNodes:  []types.Node{prod},
+				neighOut:   []types.Node{prod, testCaller, otherProd},
+				neighEdges: tc.edges,
+			}
+			r := newRealWithStore(m)
+			out, err := r.Neighbors(context.Background(),
+				contract.Citation{File: "prod.go", StartLine: 10, EndLine: 30, CommitHash: "abc"},
+				NeighborsOpts{Hops: 1, Relations: tc.relations, ExcludeTests: true})
+			if err != nil {
+				t.Fatal(err)
+			}
+			var got []string
+			for _, n := range out {
+				if tc.relations[0] == contract.RelationCalledBy {
+					got = append(got, n.Source.File) // the caller is the neighbour
+				} else {
+					got = append(got, n.Target.File)
+				}
+			}
+			if len(got) != len(tc.wantFiles) {
+				t.Fatalf("neighbours = %v, want %v", got, tc.wantFiles)
+			}
+			for i := range got {
+				if got[i] != tc.wantFiles[i] {
+					t.Errorf("neighbour[%d] = %q, want %q", i, got[i], tc.wantFiles[i])
+				}
+			}
+		})
+	}
+}
+
+// TestReal_Neighbors_ExcludeTestsKeepsCallersOfATestSeed covers the other half
+// of the same defect: when the seed lives in a test file, judging the seed
+// drops every edge and the tool answers "nothing calls this".
+func TestReal_Neighbors_ExcludeTestsKeepsCallersOfATestSeed(t *testing.T) {
+	t.Parallel()
+	seed := node("S", "pkg.Helper", "helper_test.go", 10, 30, types.NodeFunction, "go")
+	caller := node("O", "pkg.Other", "other.go", 1, 5, types.NodeFunction, "go")
+	m := &mockStoreReader{
+		manifest:   ManifestSnapshot{SrcCommit: "abc"},
+		pathNodes:  []types.Node{seed},
+		neighOut:   []types.Node{seed, caller},
+		neighEdges: []types.Edge{edge("O", "S", types.EdgeCalls)},
+	}
+	r := newRealWithStore(m)
+	out, err := r.Neighbors(context.Background(),
+		contract.Citation{File: "helper_test.go", StartLine: 10, EndLine: 30, CommitHash: "abc"},
+		NeighborsOpts{Hops: 1, Relations: []contract.Relation{contract.RelationCalledBy}, ExcludeTests: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out) != 1 || out[0].Source.File != "other.go" {
+		t.Fatalf("neighbours = %+v, want the production caller other.go", out)
+	}
+}
+
 func TestReal_Neighbors_DropsUntranslatableEdges(t *testing.T) {
 	t.Parallel()
 	// ckg has many edge types that cks's RelationXxx vocabulary does not
@@ -673,10 +772,15 @@ func TestReal_ImpactOfChange_TranslatesGroups(t *testing.T) {
 	}
 }
 
+// TestReal_ImpactOfChange_NotFoundReturnsEmpty covers the seed that resolves
+// but that the impact index does not cover. That stays an empty closure — it
+// is a real answer. Only an unresolvable seed is an error (see
+// TestReal_SeedResolutionFailureIsAnError).
 func TestReal_ImpactOfChange_NotFoundReturnsEmpty(t *testing.T) {
 	t.Parallel()
 	m := &mockStoreReader{
 		manifest:  ManifestSnapshot{SrcCommit: "c"},
+		symbolOut: []types.Node{node("missing", "pkg.Missing", "missing.go", 1, 9, types.NodeFunction, "go")},
 		impactOut: map[string]any{"not_found": true, "depth": 1},
 	}
 	r := newRealWithStore(m)
@@ -756,7 +860,8 @@ func TestReal_GetNodePRs_ResolvesAndTranslates(t *testing.T) {
 func TestReal_ConcurrencyImpact_TranslatesModules(t *testing.T) {
 	t.Parallel()
 	m := &mockStoreReader{
-		manifest: ManifestSnapshot{SrcCommit: "c9"},
+		manifest:  ManifestSnapshot{SrcCommit: "c9"},
+		symbolOut: []types.Node{node("fin", "wbft.Finalize", "consensus/wbft/engine.go", 1, 9, types.NodeFunction, "go")},
 		concurrencyOut: concurrency.Result{
 			Seed:  "wbft.Finalize",
 			Depth: 3,
@@ -797,6 +902,53 @@ func TestReal_ConcurrencyImpact_EmptySymbolErrors(t *testing.T) {
 	r := newRealWithStore(&mockStoreReader{})
 	if _, err := r.ConcurrencyImpact(context.Background(), "", ConcurrencyOpts{}); err == nil {
 		t.Fatal("expected error for empty symbol")
+	}
+}
+
+// TestReal_SeedResolutionFailureIsAnError pins the distinction every
+// symbol-seeded traversal has to make. Their backends match qualified_name
+// exactly and yield nothing for anything else, so a seed that does not
+// resolve used to come back as an empty result — indistinguishable from
+// "nothing is connected to this", which is the opposite of the truth.
+//
+// All three surfaces are covered together on purpose: the failure this guards
+// against is one of them drifting back to the silent form while the others
+// report, which is how the surfaces disagreed in the first place.
+func TestReal_SeedResolutionFailureIsAnError(t *testing.T) {
+	t.Parallel()
+	ambiguous := []types.Node{
+		node("a", "pkga.Finalize", "a.go", 1, 9, types.NodeFunction, "go"),
+		node("b", "pkgb.Finalize", "b.go", 1, 9, types.NodeFunction, "go"),
+	}
+	cases := []struct {
+		name    string
+		symbols []types.Node
+		seed    string
+	}{
+		{name: "unknown name", symbols: nil, seed: "pkg.NoSuchThing"},
+		{name: "ambiguous name", symbols: ambiguous, seed: "Finalize"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			m := &mockStoreReader{
+				manifest:       ManifestSnapshot{SrcCommit: "c"},
+				symbolOut:      tc.symbols,
+				impactOut:      map[string]any{"depth": 1},
+				concurrencyOut: concurrency.Result{Seed: tc.seed},
+			}
+			r := newRealWithStore(m)
+
+			if _, err := r.ImpactOfChange(context.Background(), tc.seed, ImpactOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("ImpactOfChange error = %v, want ErrSeedUnresolved", err)
+			}
+			if _, err := r.ConcurrencyImpact(context.Background(), tc.seed, ConcurrencyOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("ConcurrencyImpact error = %v, want ErrSeedUnresolved", err)
+			}
+			if _, _, err := r.GetSubgraph(context.Background(), tc.seed, SubgraphOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("GetSubgraph error = %v, want ErrSeedUnresolved", err)
+			}
+		})
 	}
 }
 
@@ -913,6 +1065,46 @@ func TestIsStructuralQname(t *testing.T) {
 	for _, q := range symbols {
 		if isStructuralQname(q) {
 			t.Errorf("isStructuralQname(%q) = true, want false", q)
+		}
+	}
+}
+
+// TestReal_BM25Search_ExcludeTestsFillsK pins the reason exclude_tests belongs
+// on the filter rather than on the result. Tests routinely outrank production
+// code for a concept query — they name it repeatedly — so dropping them from
+// an already-truncated K returns fewer than K, and none at all when the whole
+// top-K is tests. Counting it as a filter earns the over-fetch, and K comes
+// back full of the rows the caller actually asked for.
+func TestReal_BM25Search_ExcludeTestsFillsK(t *testing.T) {
+	t.Parallel()
+	m := &mockStoreReader{
+		manifest: ManifestSnapshot{SrcCommit: "h"},
+		searchOut: []store.SearchHit{
+			// The whole head of the ranking is test code.
+			shit(node("n1", "TestQuorum", "gov_test.go", 10, 20, types.NodeFunction, "go"), 0.99),
+			shit(node("n2", "TestQuorumEdge", "gov_test.go", 30, 40, types.NodeFunction, "go"), 0.98),
+			shit(node("n3", "newHarness", "testutil_gov.go", 1, 9, types.NodeFunction, "go"), 0.97),
+			shit(node("n4", "fixture", "testdata/gen.go", 1, 9, types.NodeFunction, "go"), 0.96),
+			// The answers are below it.
+			shit(node("n5", "Quorum", "gov.go", 1, 5, types.NodeFunction, "go"), 0.95),
+			shit(node("n6", "SetQuorum", "gov.go", 7, 12, types.NodeFunction, "go"), 0.94),
+		},
+	}
+	r := newRealWithStore(m)
+	hits, err := r.BM25Search(context.Background(), "quorum",
+		SearchOpts{K: 2, Filter: SearchFilter{ExcludeTests: true}})
+	if err != nil {
+		t.Fatalf("BM25Search: %v", err)
+	}
+	if got := m.searchCh[0].limit; got != 2*FilterOverfetchRatio {
+		t.Errorf("backend limit = %d, want %d — exclude_tests must count as a filter", got, 2*FilterOverfetchRatio)
+	}
+	if len(hits) != 2 {
+		t.Fatalf("got %d hits, want 2: the filter must not eat the caller's K", len(hits))
+	}
+	for _, h := range hits {
+		if testpath.IsTest(h.Citation.File) {
+			t.Errorf("test file leaked through: %s", h.Citation.File)
 		}
 	}
 }

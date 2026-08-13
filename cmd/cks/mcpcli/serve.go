@@ -153,7 +153,9 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if cfg.Name == "" {
 		cfg.Name = cksmcp.DefaultInstanceName()
 	}
-	overrideListen(cfg, portOverride, httpAddrOverride)
+	if err := overrideListen(cfg, portOverride, httpAddrOverride); err != nil {
+		return err
+	}
 
 	// P1 (reindex-migration design): resolve dataset symlinks ONCE at startup
 	// so the instance pins a concrete immutable version for its whole lifetime
@@ -439,12 +441,18 @@ func (a intentEmbedderAdapter) Embed(ctx context.Context, text string) ([]float3
 //
 // --port keeps the configured host and moves only the port, so a config bound
 // to a LAN address stays reachable there; --http-addr names the whole
-// host:port. A config with no address at all lands on loopback.
-func overrideListen(cfg *config.Config, port, httpAddr string) {
+// host:port. Only a config with no address at all falls back to loopback.
+//
+// The one thing this must never do is quietly serve somewhere other than
+// where the operator said. An empty host is the wildcard form (":8930", every
+// interface) and is preserved as-is; an address that does not parse is
+// reported, because guessing at it is how a LAN deployment comes back up
+// answering only itself.
+func overrideListen(cfg *config.Config, port, httpAddr string) error {
 	if port != "" {
-		host := "127.0.0.1"
-		if h, _, err := net.SplitHostPort(cfg.Listen.HTTPAddr); err == nil && h != "" {
-			host = h
+		host, err := hostForPortOverride(cfg.Listen.HTTPAddr)
+		if err != nil {
+			return err
 		}
 		cfg.Listen.HTTPAddr = net.JoinHostPort(host, port)
 		cfg.Listen.Transport = "http"
@@ -453,6 +461,22 @@ func overrideListen(cfg *config.Config, port, httpAddr string) {
 		cfg.Listen.HTTPAddr = httpAddr
 		cfg.Listen.Transport = "http"
 	}
+	return nil
+}
+
+// hostForPortOverride returns the host --port must keep. An unset address
+// means the config named no interface, so loopback is the safe default; a
+// set-but-unparseable one is an error rather than a silent relocation.
+func hostForPortOverride(configured string) (string, error) {
+	if configured == "" {
+		return "127.0.0.1", nil
+	}
+	host, _, err := net.SplitHostPort(configured)
+	if err != nil {
+		return "", fmt.Errorf("--port: cannot keep the host of listen.http_addr %q: %w "+
+			"(use --http-addr to name the whole address)", configured, err)
+	}
+	return host, nil // "" here is the wildcard form, preserved as-is
 }
 
 func loadConfig(path string) (*config.Config, error) {

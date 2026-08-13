@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Rendered by system/scripts/install-launchd.sh — do not install this file
+  directly; the __PLACEHOLDERS__ are substituted at install time.
+
+  KeepAlive on the server agent covers a process that died. This agent covers
+  the failure it cannot see: a process that is up while /healthz reports it
+  cannot serve. It runs on a timer, so KeepAlive is deliberately absent.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>__LABEL__.watchdog</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__WATCHDOG_SH__</string>
+        <string>--label</string>
+        <string>__LABEL__</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__WORKDIR__</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StartInterval</key>
+    <integer>__INTERVAL__</integer>
+
+    <key>StandardOutPath</key>
+    <string>__LOG_DIR__/__LABEL__.watchdog.log</string>
+    <key>StandardErrorPath</key>
+    <string>__LOG_DIR__/__LABEL__.watchdog.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>__PATH__</string>
+    </dict>
+</dict>
+</plist>

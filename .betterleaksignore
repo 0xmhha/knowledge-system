@@ -1,0 +1,16 @@
+# Findings adjudicated as false positives, one fingerprint per line
+# (fingerprint = commit:path:rule-id:line — it carries no secret material).
+#
+# internal/config/sanitize_test.go — now internal/system/config/sanitize_test.go
+# TestRepoBaseline_RulesMatchKnownSecrets asserts that every rule in the
+# shipped sanitization baseline still matches a representative example of the
+# secret it claims to catch, so a typo in a regex fails the build instead of
+# silently disabling redaction. A test for a secret detector has to contain
+# secret-shaped strings; these are fabricated for that purpose and were
+# confirmed (2026-08-13) never to have been usable credentials.
+#
+# Scoped to these two findings on purpose. A path-wide allowlist would also
+# hide a real secret later added to the same file, which is the file where
+# that mistake would be hardest to notice.
+97f06de4269b4fcfd8c5a800f44333b4fa84480f:internal/config/sanitize_test.go:gcp-api-key:199
+97f06de4269b4fcfd8c5a800f44333b4fa84480f:internal/config/sanitize_test.go:jwt:195

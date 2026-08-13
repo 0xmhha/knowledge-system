@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Rendered by system/scripts/install-launchd.sh — do not install this file
+  directly; the __PLACEHOLDERS__ are substituted at install time.
+
+  The server runs under caffeinate so the host holds power assertions for as
+  long as the server lives:
+    -s  no system sleep   (honoured on AC power only — see the ops doc)
+    -i  no idle sleep
+    -m  no disk idle sleep
+  KeepAlive restarts the job whenever it exits, crash or clean; the watchdog
+  agent covers the other failure mode, a process that is up but unserviceable.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>__LABEL__</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/caffeinate</string>
+        <string>-s</string>
+        <string>-i</string>
+        <string>-m</string>
+        <string>__CKS_BIN__</string>
+        <string>mcp</string>
+        <string>--config</string>
+        <string>__CONFIG__</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__WORKDIR__</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <!-- Do not respawn faster than this after an exit, so a config error
+         becomes a slow loop in the log instead of a busy one. -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+    <!-- Interactive exempts the job from App Nap / background throttling,
+         which would otherwise stretch a background server's timers. -->
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <key>StandardOutPath</key>
+    <string>__LOG_DIR__/__LABEL__.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>__LOG_DIR__/__LABEL__.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>__PATH__</string>
+        <key>CKV_OLLAMA_ENDPOINT</key>
+        <string>__OLLAMA_ENDPOINT__</string>
+    </dict>
+</dict>
+</plist>

@@ -176,13 +176,12 @@ func handleFindRelatives(
 		Relations: relations,
 		Hops:      intArg(req, "depth", 1),
 		MaxTotal:  intArg(req, "max_total", 0),
+		// Pushed down so max_total buys max_total usable neighbours.
+		ExcludeTests: excludeTestsArg(req),
 	}
 	neighbors, err := d.CKG.Neighbors(ctx, cits[0], opts)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("%s: %v", toolName, err), nil
-	}
-	if excludeTestsArg(req) {
-		neighbors = filterNeighborsByTarget(neighbors)
 	}
 	return mcpgo.NewToolResultStructured(graphNeighborsResponse{
 		Seed:         cits[0],
@@ -202,7 +201,7 @@ func registerGetSubgraph(s *mcpserver.MCPServer, d Deps) {
 				"Cost grows fast with depth; prefer depth 1-2.",
 		),
 		mcpgo.WithString("symbol", mcpgo.Required(),
-			mcpgo.Description("Fully-qualified symbol name to seed the traversal.")),
+			mcpgo.Description("Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.")),
 		mcpgo.WithNumber("depth",
 			mcpgo.Description("Maximum traversal depth (default 1).")),
 		mcpgo.WithNumber("max_total",
@@ -222,6 +221,9 @@ func handleGetSubgraph(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (
 	opts := ckgclient.SubgraphOpts{
 		Depth:    intArg(req, "depth", 1),
 		MaxTotal: intArg(req, "max_total", 0),
+		// Pushed down: filtering afterwards both shrinks the result below the
+		// cap and leaves edges pointing at nodes that were removed.
+		ExcludeTests: excludeTestsArg(req),
 	}
 
 	collector := contract.NewInstructionCollector()
@@ -230,10 +232,6 @@ func handleGetSubgraph(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (
 	nodes, edges, err := d.CKG.GetSubgraph(ctx, symbol, opts)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("%s: %v", ToolNameGetSubgraph, err), nil
-	}
-	if excludeTestsArg(req) {
-		nodes = filterCitationsTests(nodes)
-		edges = filterEdgesTests(edges)
 	}
 	return mcpgo.NewToolResultStructured(subgraphResponse{
 		Seed:         symbol,

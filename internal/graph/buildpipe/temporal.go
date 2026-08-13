@@ -83,10 +83,19 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// parsers stamp Node.FilePath using filepath.Rel(srcRoot, file) which
 	// is the OS separator on disk; we normalise to forward slashes so the
 	// match is portable across darwin/linux/windows.
-	relHist := scopeToFilter(remapToSrcRel(hist.Files, srcRel), filter)
+	inSubtree := remapToSrcRel(hist.Files, srcRel)
+	relHist := scopeToFilter(inSubtree, filter)
 	if len(relHist) == 0 {
-		log.Debug("temporal: no overlap between srcRoot subtree and git history",
-			"repo", repoRoot, "rel", srcRel)
+		// Separate the two ways this lands empty. An over-narrow --files-from
+		// list reads as a git or srcRoot problem otherwise, and the operator
+		// goes looking in the wrong place.
+		if len(inSubtree) > 0 {
+			log.Debug("temporal: build-scope filter excluded every file with git history",
+				"repo", repoRoot, "rel", srcRel, "in_subtree", len(inSubtree))
+		} else {
+			log.Debug("temporal: no overlap between srcRoot subtree and git history",
+				"repo", repoRoot, "rel", srcRel)
+		}
 		return nil, nil
 	}
 
@@ -114,7 +123,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// layer (H3, future) must filter out — but a human "Recovery"
 	// workflow can browse them in the viewer when an agent has
 	// overwritten code that needs to come back.
-	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRel, repoRoot, commitIDByteSHA, filter)
+	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRoot, srcRel, repoRoot, commitIDByteSHA, filter)
 	if err != nil {
 		return nil, fmt.Errorf("temporal unreachable hunk graph: %w", err)
 	}
@@ -150,13 +159,6 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	return hunkBlobs, nil
 }
 
-// remapToSrcRel filters out files outside srcRoot's subtree and rewrites
-// their paths to be relative to srcRoot (slash form). srcRel is the
-// repoRoot-relative slash path of srcRoot (or "." when srcRoot == repoRoot).
-//
-// Example: srcRel = "tools/cks", path = "tools/cks/internal/foo.go" →
-// "internal/foo.go". A path outside srcRoot's subtree (e.g. "docs/bar.md"
-// when srcRel = "tools/cks") is dropped.
 // scopeToFilter drops history for files the build scope excludes. A nil
 // filter (no --files-from) keeps everything.
 func scopeToFilter(files map[string][]string, filter *filterlist.FilterList) map[string][]string {
@@ -172,6 +174,13 @@ func scopeToFilter(files map[string][]string, filter *filterlist.FilterList) map
 	return out
 }
 
+// remapToSrcRel filters out files outside srcRoot's subtree and rewrites
+// their paths to be relative to srcRoot (slash form). srcRel is the
+// repoRoot-relative slash path of srcRoot (or "." when srcRoot == repoRoot).
+//
+// Example: srcRel = "tools/cks", path = "tools/cks/internal/foo.go" →
+// "internal/foo.go". A path outside srcRoot's subtree (e.g. "docs/bar.md"
+// when srcRel = "tools/cks") is dropped.
 func remapToSrcRel(files map[string][]string, srcRel string) map[string][]string {
 	out := make(map[string][]string, len(files))
 	prefix := ""

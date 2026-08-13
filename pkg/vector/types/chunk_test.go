@@ -62,6 +62,7 @@ func TestFilterMatches(t *testing.T) {
 		// Use a path that the simple matcher can hit.
 		{"path single-star match", Filter{PathGlob: "internal/store/sqlitevec/*.go"}, true},
 		{"path mismatch", Filter{PathGlob: "cmd/*"}, false},
+		{"exclude_tests keeps production code", Filter{ExcludeTests: true}, true},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -228,5 +229,49 @@ func TestFlowSpineAndCuratedInvariant_RoundTrip(t *testing.T) {
 	}
 	if len(out2.EnforcedAt) != 1 || out2.EnforcedAt[0].Loc != "finalize.go:42" {
 		t.Errorf("EnforcedAt=%+v", out2.EnforcedAt)
+	}
+}
+
+// TestFilterExcludeTests covers both halves of the predicate. The stored
+// IsTest flag comes from IsTestPath, which is per-language and narrow; the
+// path rule additionally catches test-only support code that compiles into
+// the package. A caller asking for "no tests" means both, and a filter that
+// caught only one half would quietly leak the other.
+func TestFilterExcludeTests(t *testing.T) {
+	cases := []struct {
+		name  string
+		chunk Chunk
+		want  bool // survives ExcludeTests
+	}{
+		{"production code", Chunk{File: "core/blockchain.go", Language: "go"}, true},
+		{"indexed as a test", Chunk{File: "core/blockchain_test.go", Language: "go", IsTest: true}, false},
+		// The indexer stamped these false — IsTestPath does not know about
+		// test-only support code — so only the path rule catches them.
+		{"testutil helper", Chunk{File: "core/testutil_chain.go", Language: "go"}, false},
+		{"under testdata", Chunk{File: "core/testdata/fixture.go", Language: "go"}, false},
+		{"under a test dir", Chunk{File: "systemcontracts/test/gov.sol", Language: "solidity"}, false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := (Filter{ExcludeTests: true}).Matches(tc.chunk); got != tc.want {
+				t.Errorf("Matches(%q) = %v, want %v", tc.chunk.File, got, tc.want)
+			}
+			// Without the flag every chunk survives; the filter must not
+			// start dropping tests for callers that never asked.
+			if !(Filter{}).Matches(tc.chunk) {
+				t.Errorf("empty filter dropped %q", tc.chunk.File)
+			}
+		})
+	}
+}
+
+// A filter that only excludes tests still has to count as "set", or the
+// store skips the over-fetch it needs to fill k after the drops.
+func TestFilterIsZeroCountsExcludeTests(t *testing.T) {
+	if (Filter{}).IsZero() != true {
+		t.Error("empty filter should be zero")
+	}
+	if (Filter{ExcludeTests: true}).IsZero() {
+		t.Error("ExcludeTests must make the filter non-zero so the store over-fetches")
 	}
 }

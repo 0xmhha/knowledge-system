@@ -20,9 +20,21 @@ package ckgclient
 
 import (
 	"context"
+	"errors"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
+
+// ErrSeedUnresolved reports that a seed symbol did not resolve to exactly one
+// indexed symbol — it matched nothing, or it matched several and the client
+// refuses to pick one silently.
+//
+// It exists because the traversals seeded by a symbol (subgraph, impact,
+// concurrency) take an exact qualified name and return an empty result for
+// anything else. Empty reads as "nothing is connected to this", which is the
+// opposite of the truth when the real answer is "I could not find what you
+// named". Callers that surface results to a human must tell those two apart.
+var ErrSeedUnresolved = errors.New("ckgclient: seed symbol unresolved")
 
 // Client is the cks-internal interface to a ckg backend.
 type Client interface {
@@ -87,6 +99,11 @@ type SearchFilter struct {
 	Language   string // e.g. "go"
 	PathGlob   string // e.g. "internal/**"
 	CommitHash string // snapshot pin; empty = latest indexed
+	// ExcludeTests drops test files and test-only support code. Set here
+	// rather than applied to the result so it counts as a filter for the
+	// over-fetch: discarding tests from an already-truncated K returns
+	// fewer than K, and none at all when the tests outrank everything else.
+	ExcludeTests bool
 }
 
 // SymbolOpts shapes a single FindSymbol call.
@@ -111,6 +128,10 @@ type NeighborsOpts struct {
 	// Hops is the maximum traversal depth. Zero is treated as 1
 	// (direct neighbors only). Negative values are rejected.
 	Hops int
+	// ExcludeTests drops neighbours whose target is test code. Applied while
+	// the cap is being filled, not to the capped result, so MaxTotal buys
+	// MaxTotal usable neighbours.
+	ExcludeTests bool
 	// MaxTotal caps the total number of neighbors returned across all
 	// relations. Zero means no cap (the backend may still apply its own).
 	MaxTotal int
@@ -137,6 +158,10 @@ type PRRefOpts struct {
 type SubgraphOpts struct {
 	Depth    int // max traversal depth; zero means 1
 	MaxTotal int // cap on total nodes; zero means no cap
+	// ExcludeTests skips edges that touch test code while the cap is being
+	// filled. Dropping them afterwards both shrinks the result below the cap
+	// and strands edges whose endpoints were removed.
+	ExcludeTests bool
 }
 
 // ConcurrencyOpts shapes a single ConcurrencyImpact call.

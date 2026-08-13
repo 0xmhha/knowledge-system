@@ -29,7 +29,7 @@ func registerConcurrencyImpact(s *mcpserver.MCPServer, d Deps) {
 				"before assuming a data race is or is not possible.",
 		),
 		mcpgo.WithString("symbol", mcpgo.Required(),
-			mcpgo.Description("Fully-qualified symbol name to seed the concurrency analysis.")),
+			mcpgo.Description("Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.")),
 		mcpgo.WithNumber("depth",
 			mcpgo.Description("Maximum traversal depth over concurrency edges (default: 3).")),
 		mcpgo.WithNumber("max_total",

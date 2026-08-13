@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -391,6 +392,13 @@ func unpackResult(t *testing.T, res *mcpgo.CallToolResult) map[string]any {
 // decodeStructured unmarshals res.StructuredContent into target. mcp-go
 // stores arbitrary structured payloads as `any`, so we marshal-then-unmarshal
 // to get target-typed fields in the test.
+//
+// It also enforces the MCP wire contract every structured tool result shares:
+// structuredContent must be a JSON object. A handler that hands mcp-go a bare
+// slice serialises to an array, which a spec-conforming client rejects before
+// the caller sees the payload — the tool is dead on the wire while a test that
+// only unmarshals into a slice still passes. Checking it here holds the line
+// for every tool at once, since all of them decode through this helper.
 func decodeStructured(res *mcpgo.CallToolResult, target any) error {
 	if res == nil {
 		return errors.New("nil result")
@@ -401,6 +409,9 @@ func decodeStructured(res *mcpgo.CallToolResult, target any) error {
 	raw, err := json.Marshal(res.StructuredContent)
 	if err != nil {
 		return err
+	}
+	if len(raw) == 0 || raw[0] != '{' {
+		return fmt.Errorf("structuredContent must be a JSON object, got %.60s", raw)
 	}
 	return json.Unmarshal(raw, target)
 }
