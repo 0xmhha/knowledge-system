@@ -188,6 +188,11 @@ type Options struct {
 // resolveFilter returns the effective include/exclude filter for the build:
 // the pre-built Filter when set, otherwise the one loaded from FilesFromPath
 // (nil when neither is configured — "no filter").
+//
+// Build resolves it once and hands the result to whichever run path it picks.
+// Every pass that scopes by it — discovery, and the temporal pass that
+// re-enumerates from git — must see the same list, so it is passed down rather
+// than re-read per path.
 func (opt Options) resolveFilter() (*filterlist.FilterList, error) {
 	if opt.Filter != nil {
 		return opt.Filter, nil
@@ -274,18 +279,18 @@ func Run(opt Options) (persist.Manifest, error) {
 		if decisions.IsAllCached() {
 			return runShortCircuit(opt, log, decisions, old, goCount, tsCount, solCount, protoCount)
 		}
-		return runIncremental(opt, log, decisions, goCount, tsCount, solCount, protoCount)
+		return runIncremental(opt, log, decisions, goCount, tsCount, solCount, protoCount, filter)
 	}
 	if opt.NoCache {
 		log.Info("Cache: bypassed (--no-cache); full rebuild")
 	}
-	return runCold(opt, log, discovery)
+	return runCold(opt, log, discovery, filter)
 }
 
 // runCold is the V0-equivalent full-rebuild path: wipe DB, parse every file,
 // rebuild every artifact. Always emits a fresh manifest (with Files block).
 func runCold(opt Options, log *slog.Logger,
-	discovery []DiscoveredFile) (persist.Manifest, error) {
+	discovery []DiscoveredFile, filter *filterlist.FilterList) (persist.Manifest, error) {
 	files, err := detect.Walk(opt.SrcRoot)
 	if err != nil {
 		return persist.Manifest{}, fmt.Errorf("detect: %w", err)
@@ -295,10 +300,6 @@ func runCold(opt Options, log *slog.Logger,
 		return persist.Manifest{}, fmt.Errorf("detect go: %w", err)
 	}
 	// --files-from filter: trim every per-language list before parsing.
-	filter, err := opt.resolveFilter()
-	if err != nil {
-		return persist.Manifest{}, err
-	}
 	if filter != nil {
 		preGo, preTS, preSol, preProto := len(goFiles), len(files.TS), len(files.Sol), len(files.Proto)
 		goFiles = filter.FilterPaths(goFiles)

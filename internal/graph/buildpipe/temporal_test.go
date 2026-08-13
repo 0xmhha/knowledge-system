@@ -321,3 +321,43 @@ func TestEmitTemporalEdges_FilterScopesHunks(t *testing.T) {
 			scoped["in_scope.go"], unfiltered["in_scope.go"])
 	}
 }
+
+// TestEmitTemporalEdges_FilterKeepsRecoveryForDeletedFiles pins the carve-out
+// the build-scope filter needs on the recovery track. Unreachable hunks exist
+// so a human can bring back code an agent overwrote (temporal §11.3). The
+// include list is derived from the CURRENT tree, so a file that was deleted
+// can never appear on it — scoping the recovery track on the list alone drops
+// exactly the history the track exists for. A file that is merely out of
+// scope but still on disk stays filtered, which is the storage win scoping
+// was introduced for.
+func TestEmitTemporalEdges_FilterKeepsRecoveryForDeletedFiles(t *testing.T) {
+	repo := initGitRepo(t)
+	commitFileToRepo(t, repo, "in_scope.go", "package main\n\nfunc Hello() {}\n", "base")
+
+	// Two commits that get abandoned: one touches a file that comes back into
+	// the tree, the other a file that stays deleted.
+	commitFileToRepo(t, repo, "present.go", "package main\n\nfunc Present() {}\n", "abandoned present")
+	commitFileToRepo(t, repo, "deleted.go", "package main\n\nfunc Gone() {}\n", "abandoned deleted")
+	runCmd(t, repo, "git", "reset", "--hard", "-q", "HEAD~2")
+	// present.go is back on disk (and in history); deleted.go is not.
+	commitFileToRepo(t, repo, "present.go", "package main\n\nfunc Present() {}\n", "restored")
+
+	g := buildSyntheticGraph("in_scope.go")
+	filter := &filterlist.FilterList{Include: []string{"in_scope.go"}}
+	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, filter); err != nil {
+		t.Fatalf("emitTemporalEdges: %v", err)
+	}
+	recovery := map[string]int{}
+	for _, n := range nodesByType(g.Nodes, types.NodeHunk) {
+		if n.Confidence == types.ConfAmbiguous {
+			recovery[n.FilePath]++
+		}
+	}
+
+	if recovery["deleted.go"] == 0 {
+		t.Errorf("recovery hunks for the deleted file were dropped: %v", recovery)
+	}
+	if n := recovery["present.go"]; n != 0 {
+		t.Errorf("out-of-scope file still in the tree kept %d recovery hunks; only deleted files earn the carve-out", n)
+	}
+}
