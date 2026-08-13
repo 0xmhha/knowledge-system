@@ -157,3 +157,53 @@ The four fix commits are on a local branch and **not pushed**, which is why
 the comparison had to be made against a local HEAD. Nothing downstream can
 take from upstream — steps 3 and 4 both depend on it — until that branch is
 pushed and merged. That is this side's move, not a decision to make jointly.
+
+## 8. Addendum — `exclude_tests` filters the wrong node in the callers direction
+
+Added after the reply above, while downstream was debugging a suspected fault
+reading neighbors. This is a lead, not a diagnosis of whatever they are
+holding: verify it against their reproduction before acting.
+
+`Neighbors` emits `Source: srcN, Target: dstN` and never swaps them —
+`relationFromEdgeType` encodes the direction in the relation
+(`calls` / `called_by`) instead. Edge orientation stays natural, so for a
+`calls` edge src is the caller and dst is the callee, whichever way the walk
+ran. That makes the neighbour the caller does not already know:
+
+| Direction | Seed | The neighbour asked for |
+|---|---|---|
+| `find_callees` (forward) | `srcN` | `dstN` |
+| `find_callers` (reverse) | `dstN` | `srcN` |
+
+Both implementations filter on `dstN`: upstream post-filters
+`n.Target.File` (`filterNeighborsByTarget`), and #43's push-down checks
+`testpath.IsTest(dstN.FilePath)`. Correct for callees; for callers it tests
+the seed.
+
+Two symptoms follow, and they are opposite. A production seed makes the check
+never fire, so test callers come back despite `exclude_tests: true`. A seed
+that lives in a test file makes it fire on every edge, so the result is empty
+whatever the callers are.
+
+Observed on the live instance, whose binary predates #43:
+
+```
+find_callers(internal/era.(*Builder).Finalize, exclude_tests: true)
+  → cmd/utils/cmd.go          (production, expected)
+  → internal/era/era_test.go  (a test, and the flag was supposed to drop it)
+```
+
+**So this is not a #43 regression.** #43 carried the existing behaviour down
+into the query faithfully; the defect predates it. That matters for whoever is
+bisecting.
+
+The fix is to filter the node that is not the seed — `srcN` when the walk is
+reversed, `dstN` otherwise. `GetSubgraph` already avoids the trap by checking
+both endpoints, which is why only neighbors is affected. It belongs in the
+push-down downstream now owns, so it should land there and arrive upstream
+with #43 rather than being patched separately here.
+
+Worth noting where this sits: it is the same class as findings A, #41's silent
+empty and #42 — a surface returning a result the caller cannot tell from a
+correct one. Here both failure modes are silent, which is why it survived a
+post-filter and a rewrite of that filter.
