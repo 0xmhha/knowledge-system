@@ -128,9 +128,12 @@ type NeighborsOpts struct {
 	// Hops is the maximum traversal depth. Zero is treated as 1
 	// (direct neighbors only). Negative values are rejected.
 	Hops int
-	// ExcludeTests drops neighbours whose target is test code. Applied while
-	// the cap is being filled, not to the capped result, so MaxTotal buys
-	// MaxTotal usable neighbours.
+	// ExcludeTests drops neighbours that are test code. The neighbour is the
+	// endpoint the caller does not already have — the edge's source on a
+	// callers walk, its target on a callees walk — because edge orientation
+	// stays the graph's and only the relation flips. Applied while the cap is
+	// being filled, not to the capped result, so MaxTotal buys MaxTotal
+	// usable neighbours.
 	ExcludeTests bool
 	// MaxTotal caps the total number of neighbors returned across all
 	// relations. Zero means no cap (the backend may still apply its own).
