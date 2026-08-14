@@ -186,3 +186,42 @@ func TestRenderRejectsIncompleteSpecs(t *testing.T) {
 		})
 	}
 }
+
+// TestDeploymentLabelPrefixOverride pins the escape hatch the default needs.
+// Changing a label orphans whatever launchd already has loaded under the old
+// one, so a deployment with agents installed must be able to name its prefix
+// instead of being migrated.
+func TestDeploymentLabelPrefixOverride(t *testing.T) {
+	t.Parallel()
+	base := Deployment{Instance: "example-project", HomeDir: "/Users/op"}
+	cases := []struct {
+		name, prefix, wantServer, wantPlist string
+	}{
+		{
+			name:   "unset uses the engine's own name",
+			prefix: "", wantServer: "knowledge-system.example-project",
+			wantPlist: "/Users/op/Library/LaunchAgents/knowledge-system.example-project.plist",
+		},
+		{
+			name:   "a deployment that already has agents keeps its prefix",
+			prefix: "com.example.distribution", wantServer: "com.example.distribution.example-project",
+			wantPlist: "/Users/op/Library/LaunchAgents/com.example.distribution.example-project.plist",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			d := base
+			d.LabelPrefix = tc.prefix
+			if got := d.ServerLabel(); got != tc.wantServer {
+				t.Errorf("ServerLabel() = %q, want %q", got, tc.wantServer)
+			}
+			if got := d.WatchdogLabel(); got != tc.wantServer+".watchdog" {
+				t.Errorf("WatchdogLabel() = %q, want %q", got, tc.wantServer+".watchdog")
+			}
+			if got := d.PlistPath(d.ServerLabel()); got != tc.wantPlist {
+				t.Errorf("PlistPath() = %q, want %q", got, tc.wantPlist)
+			}
+		})
+	}
+}

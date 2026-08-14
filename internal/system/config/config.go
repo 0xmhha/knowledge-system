@@ -53,6 +53,26 @@ type Config struct {
 	Sanitize    SanitizeConfig `yaml:"sanitize"`
 	Vocab       VocabConfig    `yaml:"vocab"`
 	Domain      DomainConfig   `yaml:"domain"`
+	Service     ServiceConfig  `yaml:"service"`
+}
+
+// ServiceConfig carries the launchd deployment's host-level properties — the
+// ones that belong to where this instance runs rather than to what it serves.
+type ServiceConfig struct {
+	// LabelPrefix overrides the launchd label prefix the agents are installed
+	// under. Empty uses the engine's own name, which is right for almost
+	// everyone: the label identifies the software, and which project an
+	// instance serves is already carried by the instance name it ends with.
+	//
+	// It exists for two cases. A host running two distributions of this
+	// software needs them apart. And a deployment whose agents are already
+	// installed under another prefix can name it here instead of unloading
+	// and reinstalling them — the label is how launchd finds a job, so
+	// changing it silently orphans what is running.
+	//
+	// It lands in a filename as well as a label, so it must be
+	// filesystem-safe.
+	LabelPrefix string `yaml:"label_prefix"`
 }
 
 // DomainConfig configures channel ② (domain-knowledge embedding). Empty
