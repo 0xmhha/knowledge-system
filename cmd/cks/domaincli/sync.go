@@ -39,10 +39,12 @@ func runSync(entriesDir, ckvOut, ckgOut string) error {
 	entries := verifiedEntries(proj)
 	ckv, ckg := deriveViews(entries)
 
-	if err := emit("ckv (stablenet.yaml)", ckv, ckvOut); err != nil {
+	// The labels name the view, not the file it lands in: the filename is the
+	// pack's to choose, and emit prints the path alongside.
+	if err := emit("ckv categories view", ckv, ckvOut); err != nil {
 		return err
 	}
-	if err := emit("ckg (policy.yaml)", ckg, ckgOut); err != nil {
+	if err := emit("ckg policy view", ckg, ckgOut); err != nil {
 		return err
 	}
 	fmt.Fprintf(os.Stderr, "cks-domain-sync: %d verified entries → %d ckv categories, %d ckg policies\n",

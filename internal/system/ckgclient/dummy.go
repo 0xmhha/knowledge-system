@@ -15,7 +15,7 @@ import (
 // minimal placeholder data so the Composer pipeline keeps flowing. The
 // collected instructions surface in EvidencePack.Instructions so the
 // upstream LLM (coding-agent) can execute the corresponding skill against
-// the go-stablenet source tree and provide the response the real ckg
+// the indexed source tree and provide the response the real ckg
 // would have returned.
 //
 // Once ckg is ready, callers swap Dummy out for Real. The Composer and
@@ -24,7 +24,7 @@ type Dummy struct {
 	// SkillPath is the skill directory the upstream LLM will consult. When
 	// empty it defaults to <SourcePath>/.claude (see skill).
 	SkillPath string
-	// SourcePath is the go-stablenet source tree. When empty it defaults to
+	// SourcePath is the indexed source tree. When empty it defaults to
 	// the current working directory (see source).
 	SourcePath string
 }
@@ -70,7 +70,7 @@ func (d *Dummy) BM25Search(ctx context.Context, query string, opts SearchOpts) (
 		"commit":   opts.Filter.CommitHash,
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to run a BM25 keyword search over go-stablenet source at %s "+
+		"Use the skills under %s to run a BM25 keyword search over the indexed source tree at %s "+
 			"for the query %q. Respect filters in Args. Respond with a JSON array of contract.Hit, "+
 			"each containing Citation{File, StartLine, EndLine}, Rank (1-based), Score, and Source=\"ckg\".",
 		d.skill(), d.source(), query,
@@ -97,7 +97,7 @@ func (d *Dummy) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([
 		"commit": opts.CommitHash,
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to resolve the symbol %q against go-stablenet source at %s. "+
+		"Use the skills under %s to resolve the symbol %q against the indexed source tree at %s. "+
 			"Respect kind/path filters in Args. Respond with a JSON array of contract.Citation, "+
 			"one per definition site, each containing File, StartLine, EndLine, CommitHash.",
 		d.skill(), name, d.source(),
@@ -130,7 +130,7 @@ func (d *Dummy) Neighbors(ctx context.Context, src contract.Citation, opts Neigh
 		"src":       src.String(),
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to walk the call/relationship graph around %s in go-stablenet "+
+		"Use the skills under %s to walk the call/relationship graph around %s in the indexed "+
 			"source at %s. Respect relations + hop limits in Args. Respond with a JSON array of "+
 			"contract.Neighbor entries, each containing Source/Target citations, Relation, and Distance.",
 		d.skill(), src.String(), d.source(),
@@ -156,7 +156,7 @@ func (d *Dummy) ImpactOfChange(ctx context.Context, seedQname string, opts Impac
 		"max_total": fmt.Sprintf("%d", opts.MaxTotal),
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to compute the reverse-dependency closure of %q in go-stablenet "+
+		"Use the skills under %s to compute the reverse-dependency closure of %q in the indexed "+
 			"source at %s. Group hits by coupling category (callers, interface, type_users, "+
 			"distributed, concurrent, other). Respond with a JSON contract.ImpactResult "+
 			"{Seed, Groups[{Category, Hits[Citation]}]}.",
@@ -183,7 +183,7 @@ func (d *Dummy) ConcurrencyImpact(ctx context.Context, symbol string, opts Concu
 		"max_total": fmt.Sprintf("%d", opts.MaxTotal),
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to compute the concurrency blast radius of %q in go-stablenet "+
+		"Use the skills under %s to compute the concurrency blast radius of %q in the indexed "+
 			"source at %s — goroutines/channels/locks it spawns, sends to, or acquires, and modules "+
 			"reached over concurrency edges. Respond with a JSON contract.ConcurrencyResult "+
 			"{Seed, Depth, Modules[{Citation, Qname, Name, Kind, Direction}]}.",
@@ -211,7 +211,7 @@ func (d *Dummy) EvidenceForIntent(ctx context.Context, intent string, opts Evide
 	}
 	directive := fmt.Sprintf(
 		"Use the skills under %s to surface git history hunks relevant to the intent %q in "+
-			"go-stablenet source at %s. Rank by BM25 against the intent text. Respond with a "+
+			"the indexed source tree at %s. Rank by BM25 against the intent text. Respond with a "+
 			"JSON contract.ChangeHistoryResult {Seed, PRs, Hunks[{File, StartLine, EndLine, Patch, Score}]}.",
 		d.skill(), intent, d.source(),
 	)
@@ -234,7 +234,7 @@ func (d *Dummy) GetNodePRs(ctx context.Context, qname string, opts PRRefOpts) ([
 		"max_count": fmt.Sprintf("%d", opts.MaxCount),
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to enumerate merge-commits that touched %q in go-stablenet "+
+		"Use the skills under %s to enumerate merge-commits that touched %q in the indexed "+
 			"source at %s. Respond with a JSON array of contract.PRRef "+
 			"{Number, Title, Summary, BaseSHA, HeadSHA, MergedAt, Repo}, newest first.",
 		d.skill(), qname, d.source(),
@@ -260,7 +260,7 @@ func (d *Dummy) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts
 		"max_total": fmt.Sprintf("%d", opts.MaxTotal),
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to walk every relation type around %q in go-stablenet source "+
+		"Use the skills under %s to walk every relation type around %q in the indexed source tree "+
 			"at %s up to the requested depth. Respond with two JSON arrays: contract.Citation[] "+
 			"(node set) and contract.Neighbor[] (edge set).",
 		d.skill(), qname, d.source(),
