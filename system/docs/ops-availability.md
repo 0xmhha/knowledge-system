@@ -24,15 +24,27 @@ and dataset all come from one place.
 bin/cks mcp service install --config cks.yaml
 ```
 
-This writes two user agents to `~/Library/LaunchAgents` and loads them:
+This writes three user agents to `~/Library/LaunchAgents` and loads them:
 
-- `knowledge-system.<instance>` — the server, run as
+- `<prefix>.<instance>` — the server, run as
   `caffeinate -s -i bin/cks mcp --config <config>`, with `KeepAlive` and
   `RunAtLoad`. caffeinate is the parent process, so the no-sleep assertion
   exists exactly as long as the server does and is released the moment it
   stops.
-- `knowledge-system.<instance>.watchdog` — a timer job running
+- `<prefix>.<instance>.watchdog` — a timer job running
   `cks mcp service recover` every minute (`--watchdog-interval` changes it).
+- `<prefix>.<instance>.network` — a timer job running
+  `cks mcp service watch-network --once`, which republishes the URL when the
+  host moves to a different network (`--interval` changes it).
+
+`<prefix>` defaults to `knowledge-system`, the engine's name: one build serves
+any pack, and which one an instance serves is already carried by the instance
+name the label ends with. `service.label_prefix` in the config overrides it,
+for the two cases that need it — a host running two distributions of this
+software, and a deployment whose agents are already installed under another
+prefix. The second is a real constraint rather than a preference: a label is
+how launchd finds a job, so changing it does not rename what is running, it
+loses the handle on it.
 
 A port already served by a process the agent does not own is refused, because
 two servers on one port turns into a launchd restart loop against a bind error.
