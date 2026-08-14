@@ -27,7 +27,7 @@ the source checkout is whatever tree the pack you build indexes.
 
 ### Go
 
-`go.mod` declares `go 1.25.12`, and Go manages the rest: whatever release
+`go.mod` declares `go 1.25.13`, and Go manages the rest: whatever release
 you install, `GOTOOLCHAIN=auto` (the default) downloads and uses the
 declared toolchain on the first build. Installing the latest release is
 enough:
@@ -37,9 +37,9 @@ brew install go       # or download from https://go.dev/dl/
 go version
 ```
 
-If a build fails with `go.mod requires go >= 1.25.12` the machine has
+If a build fails with `go.mod requires go >= 1.25.13` the machine has
 `GOTOOLCHAIN` pinned (usually `local`, common on machines that forbid
-toolchain downloads). Either install go1.25.12+ directly, or allow the
+toolchain downloads). Either install go1.25.13+ directly, or allow the
 download for that one command: `GOTOOLCHAIN=auto make build`.
 
 ### C toolchain
