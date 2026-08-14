@@ -16,7 +16,7 @@ import (
 // a single placeholder Hit so the Composer pipeline keeps flowing. The
 // collected instructions surface in EvidencePack.Instructions so the
 // upstream LLM (coding-agent) can execute the corresponding skill against
-// the go-stablenet source tree and provide the response the real ckv
+// the indexed source tree and provide the response the real ckv
 // would have returned.
 //
 // Once ckv is ready, callers swap Dummy out for Real. The Composer and
@@ -25,7 +25,7 @@ type Dummy struct {
 	// SkillPath is the skill directory the upstream LLM will consult. When
 	// empty it defaults to <SourcePath>/.claude (see skill).
 	SkillPath string
-	// SourcePath is the go-stablenet source tree. When empty it defaults to
+	// SourcePath is the indexed source tree. When empty it defaults to
 	// the current working directory (see source).
 	SourcePath string
 
@@ -90,7 +90,7 @@ func (d *Dummy) SemanticSearch(ctx context.Context, query string, opts SearchOpt
 		"commit":   opts.Filter.CommitHash,
 	}
 	directive := fmt.Sprintf(
-		"Use the skills under %s to read go-stablenet source at %s and return up to %d code chunks "+
+		"Use the skills under %s to read the indexed source tree at %s and return up to %d code chunks "+
 			"that are semantically related to the query %q. Treat the search as a vector-similarity "+
 			"retrieval (ckv.SemanticSearch). Respect filters in Args (language, path glob, kinds, commit). "+
 			"Respond with a JSON array of contract.Hit, each containing Citation{File, StartLine, EndLine}, "+
@@ -116,7 +116,7 @@ func (d *Dummy) SemanticSearch(ctx context.Context, query string, opts SearchOpt
 // FreshnessReport that claims the index is fresh.
 func (d *Dummy) Freshness(ctx context.Context) (FreshnessReport, error) {
 	directive := fmt.Sprintf(
-		"Use the skills under %s to report whether the go-stablenet source at %s is fresh "+
+		"Use the skills under %s to report whether the indexed source tree at %s is fresh "+
 			"relative to the last indexed commit. Respond with a JSON object matching "+
 			"ckvclient.FreshnessReport {Fresh, IndexedHead, CurrentHead, ChangedFiles}.",
 		d.skill(), d.source(),

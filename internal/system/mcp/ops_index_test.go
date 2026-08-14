@@ -3,6 +3,9 @@ package mcp
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -183,5 +186,155 @@ func TestHandleOpsIndex_BackendFailureSurfacesNotError(t *testing.T) {
 	}
 	if res == nil {
 		t.Fatal("nil result")
+	}
+}
+
+// writeManifests lays out the two manifests the alignment gate reads, at the
+// paths a deployment's IndexConfig points at.
+func writeManifests(t *testing.T, graphDir, vectorDir, graphCommit, graphDigest, vecCommit, vecPin string) {
+	t.Helper()
+	for _, d := range []string{graphDir, vectorDir} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	graph := fmt.Sprintf(`{"src_commit":%q,"schema_version":"1.23","graph_digest":%q}`, graphCommit, graphDigest)
+	if err := os.WriteFile(filepath.Join(graphDir, "manifest.json"), []byte(graph), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	vec := fmt.Sprintf(`{"src_commit":%q,"sources":{"ckg":{"graph_digest":%q}}}`, vecCommit, vecPin)
+	if err := os.WriteFile(filepath.Join(vectorDir, "manifest.json"), []byte(vec), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestHandleOpsIndex_RefusesAMisalignedPair reproduces the incident this gate
+// was added for: both engines exit 0, but the vector index was rebuilt against
+// a graph that moved, so the pair cannot be served. Without the gate the tool
+// reports a successful refresh and the failure surfaces at the next restart as
+// serviceable=false — every tool down at once, hours after the call.
+func TestHandleOpsIndex_RefusesAMisalignedPair(t *testing.T) {
+	withStubRunner(t, "")
+	root := t.TempDir()
+	graphDir, vectorDir := filepath.Join(root, "graph"), filepath.Join(root, "vector")
+
+	cases := []struct {
+		name                     string
+		graphCommit, graphDigest string
+		vecCommit, vecPin        string
+		wantAligned              bool
+		wantTextContains         string
+	}{
+		{
+			name:        "the pair agrees",
+			graphCommit: "abc123", graphDigest: "d1",
+			vecCommit: "abc123", vecPin: "d1",
+			wantAligned: true, wantTextContains: "index refresh result",
+		},
+		{
+			name:        "vector rebuilt alone, against a graph that moved",
+			graphCommit: "abc123", graphDigest: "d1",
+			vecCommit: "abc123", vecPin: "d0-stale",
+			wantAligned: false, wantTextContains: "not servable",
+		},
+		{
+			name:        "the two indexed different commits",
+			graphCommit: "abc123", graphDigest: "d1",
+			vecCommit: "def456", vecPin: "d1",
+			wantAligned: false, wantTextContains: "not servable",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			writeManifests(t, graphDir, vectorDir, tc.graphCommit, tc.graphDigest, tc.vecCommit, tc.vecPin)
+			d := Deps{Index: IndexConfig{
+				CKVBinary: "echo", CKGBinary: "echo",
+				CKGDataPath: filepath.Join(graphDir, "graph.db"),
+				CKVDataPath: vectorDir,
+				SourceRoot:  "/src",
+			}}
+			res, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "full"}))
+			if err != nil {
+				t.Fatalf("handler returned transport error: %v", err)
+			}
+			var resp opsIndexResponse
+			if decErr := decodeStructured(res, &resp); decErr != nil {
+				t.Fatalf("decode structured response: %v", decErr)
+			}
+			if !resp.CKV.OK || !resp.CKG.OK {
+				t.Fatalf("both builds should have exited 0: %+v", resp)
+			}
+			if resp.Alignment.OK != tc.wantAligned {
+				t.Errorf("Alignment.OK = %v, want %v (error %q)",
+					resp.Alignment.OK, tc.wantAligned, resp.Alignment.Error)
+			}
+			if got := resultText(res); !strings.Contains(got, tc.wantTextContains) {
+				t.Errorf("text = %q, want it to contain %q", got, tc.wantTextContains)
+			}
+		})
+	}
+}
+
+// TestHandleOpsIndex_GraphOnlyRefreshIsStillChecked is the incident as it
+// actually happened. The dataset that broke had its vector index built at
+// 12:55 and its graph rebuilt at 13:00 — the graph moved and the vector's pin
+// to it went stale. Nothing rebuilt the vector "alone"; its file mtime moved
+// later only because the process reopened it.
+//
+// So the case that matters is a refresh that touches ONE engine while the
+// other half of the pair already exists. Gating the check on "this deployment
+// builds both" would skip exactly this.
+func TestHandleOpsIndex_GraphOnlyRefreshIsStillChecked(t *testing.T) {
+	withStubRunner(t, "")
+	root := t.TempDir()
+	graphDir, vectorDir := filepath.Join(root, "graph"), filepath.Join(root, "vector")
+	// The graph rebuilt to a new digest; the vector still pins the old one.
+	writeManifests(t, graphDir, vectorDir, "abc123", "digest-new", "abc123", "digest-old")
+
+	d := Deps{Index: IndexConfig{
+		CKGBinary:   "echo", // vector binary unset: this refresh rebuilds the graph only
+		CKGDataPath: filepath.Join(graphDir, "graph.db"),
+		CKVDataPath: vectorDir,
+		SourceRoot:  "/src",
+	}}
+	res, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "full"}))
+	if err != nil {
+		t.Fatalf("handler returned transport error: %v", err)
+	}
+	var resp opsIndexResponse
+	if decErr := decodeStructured(res, &resp); decErr != nil {
+		t.Fatalf("decode structured response: %v", decErr)
+	}
+	if !resp.CKG.OK {
+		t.Fatalf("the graph build should have exited 0: %+v", resp)
+	}
+	if resp.Alignment.OK {
+		t.Errorf("Alignment.OK = true, want false: the vector pins a digest the graph no longer has")
+	}
+	if got := resultText(res); !strings.Contains(got, "not servable") {
+		t.Errorf("text = %q, want it to report the pair is not servable", got)
+	}
+}
+
+// TestHandleOpsIndex_NoVectorInThisDeployment keeps the gate from inventing a
+// failure where there is no pair to check.
+func TestHandleOpsIndex_NoVectorInThisDeployment(t *testing.T) {
+	withStubRunner(t, "")
+	root := t.TempDir()
+	graphDir := filepath.Join(root, "graph")
+	if err := os.MkdirAll(graphDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	d := Deps{Index: IndexConfig{
+		CKGBinary:   "echo",
+		CKGDataPath: filepath.Join(graphDir, "graph.db"),
+		SourceRoot:  "/src",
+	}}
+	res, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "full"}))
+	if err != nil {
+		t.Fatalf("handler returned transport error: %v", err)
+	}
+	if got := resultText(res); strings.Contains(got, "FAILED") {
+		t.Errorf("text = %q, want no failure for a deployment with no vector index", got)
 	}
 }

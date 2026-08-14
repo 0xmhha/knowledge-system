@@ -124,6 +124,9 @@ func NewCmd(version string) *cobra.Command {
 			return runGenConfig(args, cmd.OutOrStdout())
 		},
 	})
+	// service: this instance as a launchd agent (macOS), its watchdog, and the
+	// recovery routine both the watchdog and a remote operator call.
+	mcpCmd.AddCommand(newServiceCmd())
 	mcpCmd.AddCommand(&cobra.Command{
 		Use:                "client-config",
 		Short:              "Print a ready-to-paste MCP client entry for a --config'd instance",

@@ -55,6 +55,44 @@ if [ -n "$pack_hits" ]; then
   fail=1
 fi
 
+# A pack's NAME must not reach a string a user can see either. The rule above
+# catches its path; this catches the name itself in production string literals
+# — a launchd label, a flag's example, an instruction sent to an agent. Those
+# make a generalized build claim to be one project's tool, and they are how
+# branding leaked in before: a distribution's label prefix compiled and linted
+# clean while saying the wrong thing at runtime.
+#
+# Scoped deliberately:
+#   - string literals only. Doc comments may cite the reference pack as an
+#     example, which the README sanctions.
+#   - non-test files only. Fixtures naming a pack are noise, not a claim.
+#   - the pack list comes from projects/, so it grows with the packs.
+#
+# Exceptions are listed rather than silenced, each with the reason it is not
+# simply a leak:
+#   pkg/mcp/namespace.go   documents the branding mechanism itself; the example
+#                          has to name some distribution to be an example.
+#   cmd/cks/domaincli/worksheet.go
+#                          its promotion catalog is pack-level domain knowledge
+#                          living in engine code — a real violation, but one
+#                          that needs the catalog extracted into the pack
+#                          rather than the name filed off. See
+#                          docs/dev/2026-08-14-pack-knowledge-in-engine-code.md.
+name_exempt='pkg/mcp/namespace.go|cmd/cks/domaincli/worksheet.go'
+for pack in $(ls -1 projects 2>/dev/null); do
+  [ -d "projects/$pack" ] || continue
+  # A quoted example inside a comment is still a comment, so drop lines whose
+  # content begins with //; only code carries a string a user can see.
+  name_hits=$(grep -rn --include='*.go' -iE "\"[^\"]*${pack}[^\"]*\"" cmd internal graph vector system pkg 2>/dev/null \
+    | grep -v '_test\.go:' | grep -vE "^[^:]+:[0-9]+:[[:space:]]*//" \
+    | grep -vE "^($name_exempt):" || true)
+  if [ -n "$name_hits" ]; then
+    echo "boundary violation — a user-visible string in engine/shared code names the '$pack' pack:"
+    echo "$name_hits"
+    fail=1
+  fi
+done
+
 if [ "$fail" -eq 0 ]; then
   echo "engine boundaries: OK"
 fi

@@ -13,9 +13,9 @@ func TestRunGenConfig_WritesLoadableConfig(t *testing.T) {
 	out := filepath.Join(t.TempDir(), "cks.yaml")
 	args := []string{
 		"--out", out,
-		"--name", "cks-stablenet",
+		"--name", "cks-example",
 		"--dataset-dir", "/data/pr-77",
-		"--source-root", "/src/go-stablenet",
+		"--source-root", "/src/example-project",
 		"--sanitize-rules", "/policies/sanitization_rules.yaml",
 	}
 	if err := runGenConfig(args, io.Discard); err != nil {
@@ -26,8 +26,8 @@ func TestRunGenConfig_WritesLoadableConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load generated config: %v", err)
 	}
-	if cfg.Name != "cks-stablenet" {
-		t.Errorf("Name = %q, want cks-stablenet", cfg.Name)
+	if cfg.Name != "cks-example" {
+		t.Errorf("Name = %q, want cks-example", cfg.Name)
 	}
 	wantCKG := filepath.Join("/data/pr-77", "graph", "graph.db")
 	if cfg.Backends.CKG.Path != wantCKG {

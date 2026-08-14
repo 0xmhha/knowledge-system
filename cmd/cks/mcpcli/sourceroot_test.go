@@ -15,17 +15,17 @@ func TestDeriveSourceRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(graphDir, "manifest.json"),
-		[]byte(`{"src_root":"/repo/go-stablenet","src_commit":"abc"}`), 0o644); err != nil {
+		[]byte(`{"src_root":"/repo/example-project","src_commit":"abc"}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
 	// empty source_root → derived from the manifest.
 	cfg := &config.Config{}
 	cfg.Backends.CKG.Path = filepath.Join(graphDir, "graph.db")
-	if got := deriveSourceRoot(cfg); got != "/repo/go-stablenet" {
-		t.Errorf("derived = %q, want /repo/go-stablenet", got)
+	if got := deriveSourceRoot(cfg); got != "/repo/example-project" {
+		t.Errorf("derived = %q, want /repo/example-project", got)
 	}
-	if cfg.Backends.CKG.SourceRoot != "/repo/go-stablenet" {
+	if cfg.Backends.CKG.SourceRoot != "/repo/example-project" {
 		t.Errorf("cfg.SourceRoot = %q, want it set from the manifest", cfg.Backends.CKG.SourceRoot)
 	}
 

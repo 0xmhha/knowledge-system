@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -74,6 +75,11 @@ type opsIndexResponse struct {
 	Mode string         `json:"mode"`
 	CKV  indexSubResult `json:"vector"`
 	CKG  indexSubResult `json:"graph"`
+	// Alignment is the verdict on the pair the two builds just wrote. Two
+	// clean exits do not make a servable dataset: the engines run as
+	// independent subprocesses, so a vector index rebuilt beside an untouched
+	// graph exits zero twice and cannot be served.
+	Alignment indexSubResult `json:"alignment"`
 }
 
 // registerOpsIndex wires cks.ops.index (G8/S2).
@@ -165,14 +171,64 @@ func handleOpsIndex(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mc
 		}
 	}
 
+	// This tool writes the live dataset in place, so the caller is the last
+	// chance to notice a bad pair: there is no version directory to leave
+	// unpromoted and nothing to roll back to. Check what was written before
+	// reporting success — otherwise a mismatch surfaces at the next restart,
+	// as serviceable=false taking every tool down at once, hours later and
+	// nowhere near the call that caused it.
+	verifyIndexAlignment(ic, &resp)
+
 	// Per-backend OK/Error fields convey partial failure; the agent reads
 	// resp.CKV.OK / resp.CKG.OK to decide whether a retry or manual run is
 	// needed. A single rolled-up error string keeps the text fallback useful.
 	text := "index refresh result"
-	if (ic.CKVBinary != "" && !resp.CKV.OK) || (ic.CKGBinary != "" && !resp.CKG.OK) {
+	switch {
+	case (ic.CKVBinary != "" && !resp.CKV.OK) || (ic.CKGBinary != "" && !resp.CKG.OK):
 		text = fmt.Sprintf("index refresh FAILED (vector ok=%v, graph ok=%v)", resp.CKV.OK, resp.CKG.OK)
+	case !resp.Alignment.OK && resp.Alignment.Error != "":
+		text = "index refresh FAILED (both engines exited 0, but the dataset they wrote is not servable): " +
+			resp.Alignment.Error
 	}
 	return mcpgo.NewToolResultStructured(resp, text), nil
+}
+
+// verifyIndexAlignment runs the gate `cks setup` runs, against the dataset
+// this refresh just wrote.
+//
+// It is the same check in a second place rather than a new one: the graph and
+// vector manifests have to agree on the source commit and the graph digest for
+// the canonical_id join to hold, and setup.VerifyAlignment is where that
+// judgement already lives.
+//
+// What decides whether the gate applies is what the deployment HAS, not what
+// this refresh rebuilt. Rebuilding one index is exactly how the pair goes out
+// of alignment: the graph moves and the vector's pin to it goes stale, or the
+// reverse. So a refresh that touched only one engine is the case that most
+// needs checking, not one to skip.
+//
+// It is skipped when there is nothing to compare — no vector in this
+// deployment, or an index not built yet — and when a build already failed,
+// since replacing a precise error with a vaguer one helps nobody.
+func verifyIndexAlignment(ic IndexConfig, resp *opsIndexResponse) {
+	if ic.CKGDataPath == "" || ic.CKVDataPath == "" {
+		return
+	}
+	if (ic.CKVBinary != "" && !resp.CKV.OK) || (ic.CKGBinary != "" && !resp.CKG.OK) {
+		return
+	}
+	// CKGDataPath is the graph.db file; the manifest sits beside it.
+	graphDir := filepath.Dir(ic.CKGDataPath)
+	for _, m := range []string{filepath.Join(graphDir, "manifest.json"), filepath.Join(ic.CKVDataPath, "manifest.json")} {
+		if _, err := os.Stat(m); err != nil {
+			return // one half has never been built; there is no pair yet
+		}
+	}
+	if err := setup.VerifyAlignment(graphDir, ic.CKVDataPath, nil); err != nil {
+		resp.Alignment.Error = err.Error()
+		return
+	}
+	resp.Alignment.OK = true
 }
 
 // ckvIndexArgs builds the ckv subcommand. Reindex reuses the manifest's
