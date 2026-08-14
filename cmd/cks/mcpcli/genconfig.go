@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
-	"github.com/0xmhha/knowledge-system/internal/system/netutil"
 	flag "github.com/spf13/pflag"
 )
 
@@ -15,8 +14,8 @@ import (
 // config.GenerateOptions, builds and validates the config, and writes it to
 // --out as YAML. It is the Go replacement for system/scripts/gen-cks-config.sh
 // (the config half; the cks.env half stays in the shell wrappers). Filesystem
-// resolution is the caller's job — pass absolute paths. LAN-IP detection is
-// opt-in via --lan (for a remote-agent-reachable bind address).
+// resolution is the caller's job — pass absolute paths. Binding beyond
+// loopback is opt-in via --lan.
 func runGenConfig(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("gen-config", flag.ContinueOnError)
 	fs.SetOutput(stdout)
@@ -33,9 +32,9 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	policyFile := fs.String("policy-file", "", "ckg governance policy file")
 	embedModel := fs.String("embed-model", "", "Ollama embed model; empty defaults to \"bge-m3\"")
 	ollamaURL := fs.String("ollama-url", "", "Ollama endpoint; empty defaults to http://localhost:11434")
-	port := fs.String("port", "", "HTTP listen port; the host is filled in automatically — 127.0.0.1, or this host's detected LAN IP with --lan")
+	port := fs.String("port", "", "HTTP listen port; the host is filled in automatically — 127.0.0.1, or every interface with --lan")
 	httpAddr := fs.String("http-addr", "", "full HTTP listen host:port when you need to name the interface yourself; prefer --port. Empty defaults to 127.0.0.1:8080")
-	lan := fs.Bool("lan", false, "bind this host's detected LAN IP so remote agents can reach it (combine with --port)")
+	lan := fs.Bool("lan", false, "bind every interface so machines on this subnet can reach it (combine with --port); the printed URL uses this host's routable address")
 	allowRemote := fs.Bool("allow-remote", false, "opt in to binding a routable address (derived true for non-loopback addrs)")
 	sanitizeRules := fs.String("sanitize-rules", "", "sanitize ruleset YAML path")
 	domainProjectDir := fs.String("domain-project-dir", "", "domain-knowledge project dir (enables channel 2)")
@@ -63,9 +62,9 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	}
 
 	// The operator picks a port; the host is policy, not input. --port binds
-	// loopback, --lan swaps in this host's detected LAN IP so a remote agent
-	// has a routable URL, and --http-addr remains the escape hatch for naming
-	// an interface explicitly (its port wins when --lan rewrites the host).
+	// loopback, --lan widens that to every interface so a remote agent can
+	// reach it, and --http-addr remains the escape hatch for naming an
+	// interface explicitly (its port wins when --lan rewrites the host).
 	if *port != "" && *httpAddr != "" {
 		return fmt.Errorf("--port and --http-addr are mutually exclusive (--http-addr already carries a port)")
 	}
@@ -78,7 +77,12 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		if _, pp, err := net.SplitHostPort(addr); err == nil && pp != "" {
 			p = pp
 		}
-		addr = net.JoinHostPort(netutil.AdvertiseHost("0.0.0.0"), p)
+		// Bind every interface rather than the address detected right now.
+		// A pinned address stops existing when DHCP moves it — the server
+		// then cannot bind at all — and it stops answering on loopback, which
+		// every local health probe uses. The wildcard survives both, and
+		// AdvertiseHost still resolves it to a routable URL for the operator.
+		addr = net.JoinHostPort(wildcardBind, p)
 	}
 
 	cfg := config.Generate(config.GenerateOptions{
