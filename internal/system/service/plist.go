@@ -19,8 +19,8 @@ const (
 	// It is a constant rather than something injected per distribution because
 	// the alternative axis does not exist: one build serves several packs, so
 	// a build-time stamp could not distinguish them anyway. A deployment that
-	// genuinely needs its own prefix — two distributions of this software on
-	// one host — sets Deployment.LabelPrefix from its config.
+	// needs its own prefix sets service.label_prefix in its config, which
+	// reaches this through Deployment.LabelPrefix.
 	DefaultLabelPrefix = "knowledge-system"
 
 	// caffeinatePath wraps the server so the process itself holds a no-sleep
@@ -73,10 +73,15 @@ type AgentSpec struct {
 type Deployment struct {
 	// Instance is the MCP instance name; it also suffixes the launchd labels.
 	Instance string
-	// LabelPrefix overrides DefaultLabelPrefix. Empty uses the default, which
-	// is the case every deployment should be in; set it only when one host
-	// runs two distributions of this software and their instance names could
-	// collide. It lands in a filename, so it must be filesystem-safe.
+	// LabelPrefix overrides DefaultLabelPrefix; it comes from the config's
+	// service.label_prefix. Empty uses the default, which is where a new
+	// deployment should stay.
+	//
+	// Two cases need it: one host running two distributions of this software,
+	// and a deployment whose agents are already installed under another
+	// prefix — the label is how launchd finds a job, so changing it orphans
+	// what is running rather than renaming it. It lands in a filename too, so
+	// it must be filesystem-safe.
 	LabelPrefix string
 	// Binary, Config, WorkDir, LogDir and HomeDir are absolute paths. launchd
 	// jobs inherit no shell, so a relative path here would resolve against "/".

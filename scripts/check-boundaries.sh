@@ -83,8 +83,13 @@ for pack in $(ls -1 projects 2>/dev/null); do
   [ -d "projects/$pack" ] || continue
   # A quoted example inside a comment is still a comment, so drop lines whose
   # content begins with //; only code carries a string a user can see.
+  #
+  # Import paths are dropped too. A distribution may carry the pack's name in
+  # its own module path, which would make every import of its own packages a
+  # match — the repository naming itself is not the leak this looks for.
   name_hits=$(grep -rn --include='*.go' -iE "\"[^\"]*${pack}[^\"]*\"" cmd internal graph vector system pkg 2>/dev/null \
     | grep -v '_test\.go:' | grep -vE "^[^:]+:[0-9]+:[[:space:]]*//" \
+    | grep -vF "\"$MOD/" | grep -vE "^[^:]+:[0-9]+:[[:space:]]*[a-z_]* ?\"$MOD\"$" \
     | grep -vE "^($name_exempt):" || true)
   if [ -n "$name_hits" ]; then
     echo "boundary violation — a user-visible string in engine/shared code names the '$pack' pack:"

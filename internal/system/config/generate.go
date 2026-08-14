@@ -70,6 +70,12 @@ type GenerateOptions struct {
 	// FootprintDir / AuditDir are the logging output directories.
 	FootprintDir string
 	AuditDir     string
+
+	// ServiceLabelPrefix overrides the launchd label prefix. Empty leaves it
+	// unset, which is the normal case; a deployment whose agents are already
+	// installed under another prefix names it here so regenerating its config
+	// does not silently orphan them.
+	ServiceLabelPrefix string
 }
 
 // Generate builds a *Config from o, applying defaults for empty fields. The
@@ -157,6 +163,7 @@ func Generate(o GenerateOptions) *Config {
 			ProjectDir: o.DomainProjectDir,
 			CorpusDir:  o.DomainCorpusDir,
 		},
+		Service: ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
 		Vocab: VocabConfig{
 			GlossaryPath: o.GlossaryPath,
 		},

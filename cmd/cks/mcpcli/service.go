@@ -257,6 +257,7 @@ func (f *serviceFlags) deployment() (service.Deployment, string, error) {
 		LogDir:           logDir,
 		HomeDir:          home,
 		Env:              env,
+		LabelPrefix:      cfg.Service.LabelPrefix,
 		WatchdogInterval: f.watchdogInterval,
 		LinkInterval:     f.linkInterval,
 	}, addr, nil

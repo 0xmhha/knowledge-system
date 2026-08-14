@@ -42,6 +42,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	glossaryPath := fs.String("glossary", "", "vocab glossary YAML path")
 	footprintDir := fs.String("footprint-dir", "", "footprint log output dir")
 	auditDir := fs.String("audit-dir", "", "audit log output dir")
+	labelPrefix := fs.String("service-label-prefix", "", "launchd label prefix for `cks mcp service`; empty uses the engine's own name (set it only when agents are already installed under another prefix, or two distributions share a host)")
 
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -86,25 +87,26 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	}
 
 	cfg := config.Generate(config.GenerateOptions{
-		Name:              *name,
-		Description:       *description,
-		DatasetDir:        *datasetDir,
-		GraphPath:         *graphPath,
-		VectorPath:        *vectorPath,
-		SourceRoot:        *sourceRoot,
-		GraphBinary:       *graphBinary,
-		VectorBinary:      *vectorBinary,
-		PolicyFile:        *policyFile,
-		EmbedModel:        *embedModel,
-		OllamaURL:         *ollamaURL,
-		HTTPAddr:          addr,
-		AllowRemote:       *allowRemote,
-		SanitizeRulesPath: sanitizePath,
-		DomainProjectDir:  *domainProjectDir,
-		DomainCorpusDir:   *domainCorpusDir,
-		GlossaryPath:      *glossaryPath,
-		FootprintDir:      *footprintDir,
-		AuditDir:          *auditDir,
+		Name:               *name,
+		Description:        *description,
+		DatasetDir:         *datasetDir,
+		GraphPath:          *graphPath,
+		VectorPath:         *vectorPath,
+		SourceRoot:         *sourceRoot,
+		GraphBinary:        *graphBinary,
+		VectorBinary:       *vectorBinary,
+		PolicyFile:         *policyFile,
+		EmbedModel:         *embedModel,
+		OllamaURL:          *ollamaURL,
+		HTTPAddr:           addr,
+		AllowRemote:        *allowRemote,
+		SanitizeRulesPath:  sanitizePath,
+		DomainProjectDir:   *domainProjectDir,
+		DomainCorpusDir:    *domainCorpusDir,
+		GlossaryPath:       *glossaryPath,
+		FootprintDir:       *footprintDir,
+		AuditDir:           *auditDir,
+		ServiceLabelPrefix: *labelPrefix,
 	})
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("generated config invalid: %w", err)
