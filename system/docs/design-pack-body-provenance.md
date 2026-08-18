@@ -215,7 +215,7 @@ BodyProvenance string `json:"body_provenance"` // "index-snapshot(+verified-fs-f
 5. 기동 게이트(`sourceRootVerified`) — alignment.go/main.go
 6. health `body_provenance` + 도구 설명 한 줄
 7. main.go 배선 교체 → `go build ./... && go test ./...` (전체)
-8. `make build-bins`(버전 스탬프) → 서버 재시작(포트 172.20.82.90:8080, 앵커 워밍업 수 분,
+8. `make build-bins`(버전 스탬프) → 서버 재시작(포트 <office-host>:8080, 앵커 워밍업 수 분,
    `nc -z`로 폴링) → §5 검증
 
 ## 5. 검증 (수용 기준)

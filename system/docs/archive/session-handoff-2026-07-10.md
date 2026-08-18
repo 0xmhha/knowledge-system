@@ -28,7 +28,7 @@ promote·롤백·sentinel 거부·status는 scratchpad KD에서 검증.
 
 ## 2. 현재 라이브 상태 (이 세션 종료 시점)
 
-- **서빙**: `cks-stablenet` 인스턴스, 172.20.82.90:8080, **alignment 코드 포함 바이너리**.
+- **서빙**: `cks-stablenet` 인스턴스, <office-host>:8080, **alignment 코드 포함 바이너리**.
   health: `serviceable=true`, `alignment.ok=true`, 경고는 `sources.ckg ledger absent`
   1건뿐(pre-P1 ckv 인덱스 — 재빌드 시 자동 소거, 합의됨).
 - **데이터셋**: 레거시 flat 레이아웃 `knowledge-data/pr-77-2/{graph.db, ckv/}` (@0bf2f4d1b,
