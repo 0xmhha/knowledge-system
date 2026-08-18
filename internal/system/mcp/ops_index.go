@@ -85,6 +85,7 @@ type opsIndexResponse struct {
 // registerOpsIndex wires cks.ops.index (G8/S2).
 func registerOpsIndex(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsIndex,
+		mcpgo.WithOutputSchema[opsIndexResponse](),
 		mcpgo.WithDescription(
 			"Refresh the ckv (vector) and ckg (graph) indexes for the configured source "+
 				"tree. Use ONLY after cks.ops.freshness reports stale. mode=incremental "+

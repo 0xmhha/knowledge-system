@@ -22,6 +22,7 @@ type concurrencyImpactResponse struct {
 // registerConcurrencyImpact wires cks.context.concurrency_impact (G7/S1).
 func registerConcurrencyImpact(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameConcurrencyImpact,
+		mcpgo.WithOutputSchema[concurrencyImpactResponse](),
 		mcpgo.WithDescription(
 			"Concurrency blast radius of a symbol: goroutines it spawns, channels it "+
 				"sends to/receives from, locks it acquires, plus modules reached over "+

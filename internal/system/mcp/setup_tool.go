@@ -20,6 +20,19 @@ var (
 	ToolNameOpsSetupStatus = toolName("ops.setup_status")
 )
 
+// jobStartedResponse is the wire shape both async starters return: the job
+// ID to poll with ops.setup_status, and the state it starts in. It replaces a
+// bare map so the tools can declare an output schema — a map generates none,
+// which is how a caller ends up guessing at the field names.
+//
+// Version is set by ops.reindex, which builds into a named version directory;
+// ops.setup omits it.
+type jobStartedResponse struct {
+	JobID   string `json:"job_id"`
+	State   string `json:"state"`
+	Version string `json:"version,omitempty"`
+}
+
 // SetupConfig carries what the setup tools need from server configuration.
 type SetupConfig struct {
 	// GraphBinary / VectorBinary are the engine CLIs (empty → PATH lookup).
@@ -37,6 +50,7 @@ func (c SetupConfig) enabled() bool { return c.Jobs != nil }
 // registerOpsSetup wires the asynchronous dataset-build tool.
 func registerOpsSetup(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsSetup,
+		mcpgo.WithOutputSchema[jobStartedResponse](),
 		mcpgo.WithDescription(
 			"Start an asynchronous knowledge-dataset build for a source tree: graph index, "+
 				"vector index aligned to it, and an alignment verification gate. Returns a job_id "+
@@ -68,7 +82,7 @@ func registerOpsSetup(s *mcpserver.MCPServer, d Deps) {
 			return mcpgo.NewToolResultErrorf("%s: %v", ToolNameOpsSetup, err), nil
 		}
 		id := sc.Jobs.Start(plan)
-		return mcpgo.NewToolResultStructured(map[string]string{"job_id": id, "state": setup.JobRunning},
+		return mcpgo.NewToolResultStructured(jobStartedResponse{JobID: id, State: setup.JobRunning},
 			fmt.Sprintf("setup started: job_id=%s (poll %s)", id, ToolNameOpsSetupStatus)), nil
 	})
 }
@@ -76,6 +90,7 @@ func registerOpsSetup(s *mcpserver.MCPServer, d Deps) {
 // registerOpsSetupStatus wires the poll side of the async pair.
 func registerOpsSetupStatus(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsSetupStatus,
+		mcpgo.WithOutputSchema[setup.JobSnapshot](),
 		mcpgo.WithDescription("Progress of an asynchronous ops job (ops.setup or ops.reindex): state (running|done|failed), error if any, and the tail of the progress-event stream."),
 		mcpgo.WithString("job_id", mcpgo.Required()),
 		mcpgo.WithNumber("tail", mcpgo.DefaultNumber(20), mcpgo.Description("max trailing events to return")),

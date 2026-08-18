@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
@@ -126,25 +127,66 @@ func TestHandleFindCallers_HappyPath(t *testing.T) {
 	}
 }
 
-func TestHandleFindCallers_SymbolNotFound_ReturnsEmpty(t *testing.T) {
+// TestHandleFindRelatives_UnresolvedSeedIsRefused replaces a test that asserted
+// the opposite: that an unknown symbol comes back as an ordinary result with an
+// empty neighbour list. That is the behaviour to prevent, not to pin — "no such
+// symbol" and "nothing calls this symbol" are different answers, and the caller
+// cannot tell them apart once both arrive as an empty list. The old assertion
+// is why the gap survived the fixes around it.
+func TestHandleFindRelatives_UnresolvedSeedIsRefused(t *testing.T) {
 	t.Parallel()
-	f := newFixture(t, func(f *fixture) {
-		f.ckg.SymbolCitations = nil // no resolution
-	})
-	req := callToolReq(map[string]any{"symbol": "missing.Symbol"})
-	res, err := handleFindRelatives(context.Background(), f.deps, req, ToolNameFindCallers, "callers", []contract.Relation{contract.RelationCalledBy})
-	if err != nil {
-		t.Fatalf("handleFindRelatives: %v", err)
+	cases := []struct {
+		name    string
+		cits    []contract.Citation
+		symbol  string
+		wantMsg string
+	}{
+		{
+			name: "unknown symbol", cits: nil, symbol: "missing.Symbol",
+			wantMsg: "matches no indexed symbol",
+		},
+		{
+			name: "ambiguous symbol",
+			cits: []contract.Citation{
+				cit("consensus/wbft/backend/engine.go", 174, 176),
+				cit("crypto/bn256/cloudflare/bn256.go", 383, 387),
+			},
+			symbol: "Finalize", wantMsg: "is ambiguous across 2 definitions",
+		},
 	}
-	if res.IsError {
-		t.Fatalf("unexpected IsError: %s", resultText(res))
-	}
-	var out graphNeighborsResponse
-	if err := decodeStructured(res, &out); err != nil {
-		t.Fatalf("decode: %v", err)
-	}
-	if len(out.Neighbors) != 0 {
-		t.Errorf("Neighbors should be empty, got %+v", out.Neighbors)
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			for _, tool := range []struct {
+				name string
+				rel  contract.Relation
+				dir  string
+			}{
+				{ToolNameFindCallers, contract.RelationCalledBy, "callers"},
+				{ToolNameFindCallees, contract.RelationCalls, "callees"},
+			} {
+				f := newFixture(t, func(f *fixture) { f.ckg.SymbolCitations = tc.cits })
+				req := callToolReq(map[string]any{"symbol": tc.symbol})
+				res, err := handleFindRelatives(context.Background(), f.deps, req, tool.name, tool.dir,
+					[]contract.Relation{tool.rel})
+				if err != nil {
+					t.Fatalf("%s: handleFindRelatives: %v", tool.name, err)
+				}
+				if !res.IsError {
+					t.Fatalf("%s: want a refusal, got a result: %s", tool.name, resultText(res))
+				}
+				if got := resultText(res); !strings.Contains(got, tc.wantMsg) {
+					t.Errorf("%s: message %q does not say %q", tool.name, got, tc.wantMsg)
+				}
+				// The traversal must not have run: answering about whichever
+				// definition came back first is the failure being prevented.
+				if len(f.ckg.Calls.Neighbors) != 0 {
+					t.Errorf("%s: Neighbors was called with an unresolved seed: %+v",
+						tool.name, f.ckg.Calls.Neighbors)
+				}
+			}
+		})
 	}
 }
 

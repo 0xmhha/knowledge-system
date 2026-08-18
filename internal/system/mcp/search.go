@@ -57,6 +57,7 @@ type searchResponse struct {
 // registerSemanticSearch wires cks.context.semantic_search.
 func registerSemanticSearch(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameSemanticSearch,
+		mcpgo.WithOutputSchema[searchResponse](),
 		mcpgo.WithDescription(
 			"Vector-similarity search over the ckv index (bge-m3). Use for "+
 				"natural-language symptoms or intent ('restore proposal stuck pending') where "+
@@ -120,6 +121,7 @@ func handleSemanticSearch(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 // registerSearchText wires cks.context.search_text.
 func registerSearchText(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameSearchText,
+		mcpgo.WithOutputSchema[searchResponse](),
 		mcpgo.WithDescription(
 			"BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use "+
 				"when terms must match exactly: function names, identifiers, error strings. "+

@@ -35,6 +35,7 @@ type changeHistoryResponse struct {
 // registerImpactAnalysis wires cks.context.impact_analysis.
 func registerImpactAnalysis(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameImpactAnalysis,
+		mcpgo.WithOutputSchema[impactAnalysisResponse](),
 		mcpgo.WithDescription(
 			"Reverse-dependency closure of a symbol, grouped by coupling category "+
 				"(callers, interface, type_users, distributed, concurrent). Use during "+
@@ -85,6 +86,7 @@ func handleImpactAnalysis(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 // corresponding call.
 func registerChangeHistory(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameChangeHistory,
+		mcpgo.WithOutputSchema[changeHistoryResponse](),
 		mcpgo.WithDescription(
 			"Modification history for a symbol or intent: PR refs (provenance) and "+
 				"BM25-ranked diff hunks. Use AFTER traversal or reproduction has implicated a "+
@@ -133,6 +135,13 @@ func handleChangeHistory(ctx context.Context, d Deps, req mcpgo.CallToolRequest)
 	}
 
 	if symbol != "" {
+		// GetNodePRs is an exact-match lookup, so an unresolved seed comes
+		// back as "no PRs touched this" rather than "there is no such
+		// symbol" — and an ambiguous one reports another symbol's history.
+		// Resolving first makes both say so.
+		if _, errRes := seedCitation(ctx, d, ToolNameChangeHistory, symbol); errRes != nil {
+			return errRes, nil
+		}
 		prOpts := ckgclient.PRRefOpts{
 			MaxCount: intArg(req, "max_count", 0),
 		}
