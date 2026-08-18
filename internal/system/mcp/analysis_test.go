@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -125,6 +126,9 @@ func TestHandleChangeHistory_IntentOnly(t *testing.T) {
 func TestHandleChangeHistory_SymbolOnly(t *testing.T) {
 	t.Parallel()
 	f := newFixture(t, func(f *fixture) {
+		// The seed has to resolve: change_history refuses an unresolved one
+		// rather than reporting "no PRs touched this".
+		f.ckg.SymbolCitations = []contract.Citation{cit("ncp/validator.go", 10, 40)}
 		f.ckg.PRRefs = []contract.PRRef{
 			{Number: 7, Title: "rename Validator to NCP"},
 			{Number: 5, Title: "initial NCP scaffold"},
@@ -165,6 +169,7 @@ func TestHandleChangeHistory_BothInputs_MergesResults(t *testing.T) {
 			PRs:   []contract.PRRef{{Number: 1, Title: "from-evidence"}},
 		}
 		f.ckg.PRRefs = []contract.PRRef{{Number: 2, Title: "from-getnodeprs"}}
+		f.ckg.SymbolCitations = []contract.Citation{cit("pkg/foo.go", 1, 9)}
 	})
 	req := callToolReq(map[string]any{
 		"intent": "anything",
@@ -183,5 +188,49 @@ func TestHandleChangeHistory_BothInputs_MergesResults(t *testing.T) {
 	}
 	if len(out.PRs) != 2 {
 		t.Errorf("PRs = %d, want 2 (1 from evidence + 1 from GetNodePRs)", len(out.PRs))
+	}
+}
+
+// TestHandleChangeHistory_UnresolvedSeedIsRefused covers the seed half of
+// change_history. GetNodePRs is an exact-match lookup, so an unresolved symbol
+// used to come back as "no PRs touched this" — the same shape as a symbol with
+// a genuinely empty history, and the same shape a misspelling produces.
+func TestHandleChangeHistory_UnresolvedSeedIsRefused(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name    string
+		cits    []contract.Citation
+		wantMsg string
+	}{
+		{"unknown symbol", nil, "matches no indexed symbol"},
+		{
+			"ambiguous symbol",
+			[]contract.Citation{cit("a/one.go", 1, 4), cit("b/two.go", 7, 9)},
+			"is ambiguous across 2 definitions",
+		},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			f := newFixture(t, func(f *fixture) {
+				f.ckg.SymbolCitations = tc.cits
+				f.ckg.PRRefs = []contract.PRRef{{Number: 1, Title: "must not be reported"}}
+			})
+			req := callToolReq(map[string]any{"symbol": "pkg.Whatever"})
+			res, err := handleChangeHistory(context.Background(), f.deps, req)
+			if err != nil {
+				t.Fatalf("handleChangeHistory: %v", err)
+			}
+			if !res.IsError {
+				t.Fatalf("want a refusal, got a result: %s", resultText(res))
+			}
+			if got := resultText(res); !strings.Contains(got, tc.wantMsg) {
+				t.Errorf("message %q does not say %q", got, tc.wantMsg)
+			}
+			if len(f.ckg.Calls.GetNodePRs) != 0 {
+				t.Errorf("GetNodePRs ran with an unresolved seed: %+v", f.ckg.Calls.GetNodePRs)
+			}
+		})
 	}
 }

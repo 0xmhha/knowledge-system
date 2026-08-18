@@ -61,6 +61,10 @@ type mockStoreReader struct {
 	prsErr      error
 	prsCh       []prsCall
 
+	// subgraphCh records the seeds SubgraphByQname was asked for, so a test
+	// can assert the interface bridge probed the interface method too.
+	subgraphCh []string
+
 	concurrencyOut concurrency.Result
 	concurrencyErr error
 	concurrencyCh  []concurrencyCall
@@ -158,6 +162,7 @@ func (m *mockStoreReader) NodesByFilePath(path string) ([]types.Node, error) {
 	return m.pathNodes, m.pathErr
 }
 func (m *mockStoreReader) SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error) {
+	m.subgraphCh = append(m.subgraphCh, qname)
 	return m.neighOut, m.neighEdges, m.neighErr
 }
 func (m *mockStoreReader) Close() error {
@@ -1105,6 +1110,109 @@ func TestReal_BM25Search_ExcludeTestsFillsK(t *testing.T) {
 	for _, h := range hits {
 		if testpath.IsTest(h.Citation.File) {
 			t.Errorf("test file leaked through: %s", h.Citation.File)
+		}
+	}
+}
+
+// --- interface-dispatch bridge on the reverse-reachability traversals ---
+
+// bridgeStore is a concrete method pkg.Thing.Hash whose receiver implements
+// pkg.Hasher, which is the shape the bridge exists for: callers that reach
+// Hash through the interface are edges to pkg.Hasher.Hash, so a walk that
+// starts only at pkg.Thing.Hash finds none of them.
+func bridgeStore() *mockStoreReader {
+	iface := node("ifaceID", "pkg.Hasher", "h.go", 1, 3, types.NodeInterface, "go")
+	thing := node("thingID", "pkg.Thing.Hash", "thing.go", 10, 20, types.NodeFunction, "go")
+	return &mockStoreReader{
+		symbolByName: map[string][]types.Node{"pkg.Thing.Hash": {thing}},
+		neighOut:     []types.Node{iface, thing},
+		neighEdges:   []types.Edge{{Src: "thingID", Dst: "ifaceID", Type: types.EdgeImplements}},
+	}
+}
+
+// TestReal_ImpactOfChange_BridgesInterfaceDispatch pins that impact asks about
+// the interface method as well. Without it a concrete method reached only
+// through an interface reports no dependents — "nothing breaks if you change
+// this" for a method the whole path runs through.
+func TestReal_ImpactOfChange_BridgesInterfaceDispatch(t *testing.T) {
+	t.Parallel()
+	m := bridgeStore()
+	m.impactOut = map[string]any{"impact": map[string]any{
+		"callers": []map[string]any{{"file": "caller.go", "line": 7}},
+	}}
+	r := newRealWithStore(m)
+
+	if _, err := r.ImpactOfChange(context.Background(), "pkg.Thing.Hash", ImpactOpts{}); err != nil {
+		t.Fatalf("ImpactOfChange: %v", err)
+	}
+	var seeds []string
+	for _, c := range m.impactCh {
+		seeds = append(seeds, c.seedQname)
+	}
+	if !containsString(seeds, "pkg.Thing.Hash") {
+		t.Errorf("the concrete seed was not queried: %v", seeds)
+	}
+	if !containsString(seeds, "pkg.Hasher.Hash") {
+		t.Errorf("the interface method was not queried, so interface-dispatched "+
+			"dependents stay invisible: %v", seeds)
+	}
+}
+
+// TestReal_GetSubgraph_BridgesInterfaceDispatch is the same guarantee for the
+// bidirectional neighbourhood.
+func TestReal_GetSubgraph_BridgesInterfaceDispatch(t *testing.T) {
+	t.Parallel()
+	m := bridgeStore()
+	r := newRealWithStore(m)
+
+	if _, _, err := r.GetSubgraph(context.Background(), "pkg.Thing.Hash", SubgraphOpts{}); err != nil {
+		t.Fatalf("GetSubgraph: %v", err)
+	}
+	if !containsString(m.subgraphCh, "pkg.Thing.Hash") {
+		t.Errorf("the concrete seed was not queried: %v", m.subgraphCh)
+	}
+	if !containsString(m.subgraphCh, "pkg.Hasher.Hash") {
+		t.Errorf("the interface method was not queried: %v", m.subgraphCh)
+	}
+}
+
+func containsString(hay []string, want string) bool {
+	for _, h := range hay {
+		if h == want {
+			return true
+		}
+	}
+	return false
+}
+
+// TestMergeImpactMaps covers what the union must and must not do: entries are
+// deduplicated by where they point, and a bridged seed that is absent from the
+// graph must not erase what the concrete seed already contributed.
+func TestMergeImpactMaps(t *testing.T) {
+	t.Parallel()
+	group := func(entries ...map[string]any) map[string]any {
+		return map[string]any{"impact": map[string]any{"callers": entries}}
+	}
+	hit := func(f string, l int) map[string]any { return map[string]any{"file": f, "line": l} }
+
+	acc := mergeImpactMaps(nil, group(hit("a.go", 1), hit("b.go", 2)))
+	acc = mergeImpactMaps(acc, group(hit("b.go", 2), hit("c.go", 3))) // b.go:2 duplicated
+	acc = mergeImpactMaps(acc, map[string]any{"not_found": true})     // must not erase
+
+	impact, _ := acc["impact"].(map[string]any)
+	entries, _ := impact["callers"].([]map[string]any)
+	if len(entries) != 3 {
+		t.Fatalf("callers = %d, want 3 (b.go:2 deduplicated, not_found ignored): %v", len(entries), entries)
+	}
+	for _, want := range []string{"a.go:1", "b.go:2", "c.go:3"} {
+		found := false
+		for _, e := range entries {
+			if impactEntryKey(e) == want {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("merged set is missing %s", want)
 		}
 	}
 }

@@ -44,9 +44,22 @@ type subgraphResponse struct {
 	Instructions []contract.DummyInstruction `json:"instructions,omitempty"`
 }
 
+// defaultTraversalDepth is the hop count the call-graph traversals use when
+// the caller does not say. Two, not one: a 1-hop walk returns only direct
+// neighbours and silently drops the helper-chain case
+//
+//	f -> lockedHelper -> reallyTouchesField
+//
+// which is the caller a question about f usually means. docs/graph/
+// TRAVERSAL-DEPTH.md is the standing reference for the value and carries the
+// recall and latency measurements behind it; TestTraversalDepthDefault pins
+// the two together.
+const defaultTraversalDepth = 2
+
 // registerFindSymbol wires cks.context.find_symbol.
 func registerFindSymbol(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindSymbol,
+		mcpgo.WithOutputSchema[findSymbolResponse](),
 		mcpgo.WithDescription(
 			"Resolve a symbol name to its definition citation(s) via ckg's qualified-name "+
 				"index. Suffix match by default; pass the fully-qualified name for an exact "+
@@ -99,6 +112,7 @@ func handleFindSymbol(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*
 // registerFindCallers wires cks.context.find_callers.
 func registerFindCallers(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindCallers,
+		mcpgo.WithOutputSchema[graphNeighborsResponse](),
 		mcpgo.WithDescription(
 			"Reverse call-graph traversal: who calls the given symbol (calls/invokes "+
 				"edges, interface-dispatch bridged). The core cause-finding move for a stale "+
@@ -108,7 +122,7 @@ func registerFindCallers(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithString("symbol", mcpgo.Required(),
 			mcpgo.Description("Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").")),
 		mcpgo.WithNumber("depth",
-			mcpgo.Description("Maximum traversal depth (default 1).")),
+			mcpgo.Description("Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).")),
 		mcpgo.WithNumber("max_total",
 			mcpgo.Description("Cap on total neighbours (0 = no cap).")),
 		withExcludeTests(),
@@ -121,6 +135,7 @@ func registerFindCallers(s *mcpserver.MCPServer, d Deps) {
 // registerFindCallees wires cks.context.find_callees.
 func registerFindCallees(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindCallees,
+		mcpgo.WithOutputSchema[graphNeighborsResponse](),
 		mcpgo.WithDescription(
 			"Forward call-graph traversal: what the given symbol calls. Use to unpack "+
 				"what a suspicious function actually reaches downstream (which "+
@@ -130,7 +145,7 @@ func registerFindCallees(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithString("symbol", mcpgo.Required(),
 			mcpgo.Description("Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").")),
 		mcpgo.WithNumber("depth",
-			mcpgo.Description("Maximum traversal depth (default 1).")),
+			mcpgo.Description("Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).")),
 		mcpgo.WithNumber("max_total",
 			mcpgo.Description("Cap on total neighbours (0 = no cap).")),
 		withExcludeTests(),
@@ -158,33 +173,29 @@ func handleFindRelatives(
 	collector := contract.NewInstructionCollector()
 	ctx = contract.WithCollector(ctx, collector)
 
-	// First, resolve the symbol to a citation. ckg.Neighbors takes a
-	// Citation, not a qname, so we trampoline through FindSymbol.
-	cits, err := d.CKG.FindSymbol(ctx, symbol, ckgclient.SymbolOpts{})
-	if err != nil {
-		return mcpgo.NewToolResultErrorf("%s: resolve symbol: %v", toolName, err), nil
-	}
-	if len(cits) == 0 {
-		return mcpgo.NewToolResultStructured(graphNeighborsResponse{
-			Seed:         contract.Citation{File: symbol},
-			Direction:    direction,
-			Instructions: collector.All(),
-		}, toolName+" result"), nil
+	// ckg.Neighbors takes a Citation, not a qname, so the seed is resolved
+	// here rather than inside the client. It must still refuse what the
+	// client would refuse: an unknown seed reported as an empty neighbour
+	// list is indistinguishable from "nothing calls this", and an ambiguous
+	// one silently answered about whichever definition came back first.
+	seed, errRes := seedCitation(ctx, d, toolName, symbol)
+	if errRes != nil {
+		return errRes, nil
 	}
 
 	opts := ckgclient.NeighborsOpts{
 		Relations: relations,
-		Hops:      intArg(req, "depth", 1),
+		Hops:      intArg(req, "depth", defaultTraversalDepth),
 		MaxTotal:  intArg(req, "max_total", 0),
 		// Pushed down so max_total buys max_total usable neighbours.
 		ExcludeTests: excludeTestsArg(req),
 	}
-	neighbors, err := d.CKG.Neighbors(ctx, cits[0], opts)
+	neighbors, err := d.CKG.Neighbors(ctx, seed, opts)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("%s: %v", toolName, err), nil
 	}
 	return mcpgo.NewToolResultStructured(graphNeighborsResponse{
-		Seed:         cits[0],
+		Seed:         seed,
 		Direction:    direction,
 		Neighbors:    neighbors,
 		Instructions: collector.All(),
@@ -194,6 +205,7 @@ func handleFindRelatives(
 // registerGetSubgraph wires cks.context.get_subgraph.
 func registerGetSubgraph(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameGetSubgraph,
+		mcpgo.WithOutputSchema[subgraphResponse](),
 		mcpgo.WithDescription(
 			"Neighborhood traversal across ALL edge types (calls, implements, imports, "+
 				"tested_by, ...) within depth hops of the seed symbol. Use when caller/callee "+
@@ -203,7 +215,7 @@ func registerGetSubgraph(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithString("symbol", mcpgo.Required(),
 			mcpgo.Description("Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.")),
 		mcpgo.WithNumber("depth",
-			mcpgo.Description("Maximum traversal depth (default 1).")),
+			mcpgo.Description("Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).")),
 		mcpgo.WithNumber("max_total",
 			mcpgo.Description("Cap on total nodes (0 = no cap).")),
 		withExcludeTests(),
@@ -219,7 +231,7 @@ func handleGetSubgraph(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (
 		return mcpgo.NewToolResultError(ToolNameGetSubgraph + ": missing required argument \"symbol\""), nil
 	}
 	opts := ckgclient.SubgraphOpts{
-		Depth:    intArg(req, "depth", 1),
+		Depth:    intArg(req, "depth", defaultTraversalDepth),
 		MaxTotal: intArg(req, "max_total", 0),
 		// Pushed down: filtering afterwards both shrinks the result below the
 		// cap and leaves edges pointing at nodes that were removed.

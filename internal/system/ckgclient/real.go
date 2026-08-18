@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -478,6 +479,18 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	return out, nil
 }
 
+// reverseSeeds returns the seeds a reverse-reachability question must start
+// from: the symbol itself plus, when it is a concrete method, the same-named
+// method on every interface its receiver satisfies.
+//
+// Reverse traversals need this and forward ones do not. A call through an
+// interface is recorded as an edge to the interface method, so walking
+// backwards from the concrete method finds nobody — while walking forwards
+// from it finds exactly what its body calls, interface or not.
+func (r *Real) reverseSeeds(qname string) []string {
+	return append([]string{qname}, r.interfaceMethodSeeds(qname)...)
+}
+
 // interfaceMethodSeeds returns extra find_callers seeds for the
 // interface-dispatch bridge. When methodQname is a concrete method `pkg.T.M`,
 // callers that reach it through an interface are recorded as `invokes` edges to
@@ -538,10 +551,22 @@ func (r *Real) ImpactOfChange(ctx context.Context, seedQname string, opts Impact
 	if err != nil {
 		return contract.ImpactResult{}, err
 	}
-	seedFile := r.resolveSeedFile(seedQname)
-	raw, err := r.s.ImpactCompute(seedQname, seedFile, opts.Depth, false)
-	if err != nil {
-		return contract.ImpactResult{}, fmt.Errorf("ckgclient: impact: %w", err)
+	// Impact is a reverse-dependency question, so it takes the interface
+	// bridge too. Without it a concrete method reached only through an
+	// interface reports no dependents at all — "nothing breaks if you change
+	// this" for a method the whole path runs through.
+	var raw map[string]any
+	for _, sd := range r.reverseSeeds(seedQname) {
+		part, err := r.s.ImpactCompute(sd, r.resolveSeedFile(sd), opts.Depth, false)
+		if err != nil {
+			// Only the seed itself is required to resolve; a bridged interface
+			// method may not be indexed, and losing it must not lose the seed.
+			if sd == seedQname {
+				return contract.ImpactResult{}, fmt.Errorf("ckgclient: impact: %w", err)
+			}
+			continue
+		}
+		raw = mergeImpactMaps(raw, part)
 	}
 	commit, _ := r.commit()
 	return impactResultFromMap(seedQname, raw, commit, opts.MaxTotal), nil
@@ -730,6 +755,61 @@ var impactGroupOrder = []struct {
 // into a typed contract.ImpactResult. Each per-bucket entry carries "file"
 // (string) + "line" (int = StartLine); end line isn't in the impact entry so
 // EndLine mirrors StartLine. maxTotal caps citations across all groups.
+// mergeImpactMaps unions one seed's impact map into the accumulator, keeping
+// each category's entries deduplicated by file and line.
+//
+// not_found is only honoured while nothing has been found: a bridged interface
+// method that is absent from the graph must not erase what the concrete seed
+// already contributed.
+func mergeImpactMaps(acc, part map[string]any) map[string]any {
+	if part == nil {
+		return acc
+	}
+	if nf, _ := part["not_found"].(bool); nf {
+		return acc
+	}
+	partImpact, _ := part["impact"].(map[string]any)
+	if partImpact == nil {
+		return acc
+	}
+	if acc == nil {
+		acc = map[string]any{"impact": map[string]any{}}
+	}
+	accImpact, _ := acc["impact"].(map[string]any)
+	if accImpact == nil {
+		accImpact = map[string]any{}
+		acc["impact"] = accImpact
+	}
+	for key, v := range partImpact {
+		entries, _ := v.([]map[string]any)
+		if len(entries) == 0 {
+			continue
+		}
+		existing, _ := accImpact[key].([]map[string]any)
+		seen := make(map[string]struct{}, len(existing)+len(entries))
+		for _, e := range existing {
+			seen[impactEntryKey(e)] = struct{}{}
+		}
+		for _, e := range entries {
+			k := impactEntryKey(e)
+			if _, dup := seen[k]; dup {
+				continue
+			}
+			seen[k] = struct{}{}
+			existing = append(existing, e)
+		}
+		accImpact[key] = existing
+	}
+	return acc
+}
+
+// impactEntryKey identifies one impact entry by where it points.
+func impactEntryKey(e map[string]any) string {
+	file, _ := e["file"].(string)
+	line, _ := e["line"].(int)
+	return file + ":" + strconv.Itoa(line)
+}
+
 func impactResultFromMap(seed string, raw map[string]any, commit string, maxTotal int) contract.ImpactResult {
 	out := contract.ImpactResult{Seed: seed}
 	if raw == nil {
@@ -787,9 +867,39 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	if err != nil {
 		return nil, nil, err
 	}
-	nodes, edges, err := r.s.SubgraphByQname(qname, depth)
-	if err != nil {
-		return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
+	// get_subgraph is bidirectional, so it carries the interface bridge for
+	// the same reason a reverse walk does: a concrete method's inbound edges
+	// land on the interface method, and a neighbourhood that omits them is
+	// missing precisely the callers the question is usually about.
+	var nodes []types.Node
+	var edges []types.Edge
+	nodeSeen := make(map[string]struct{})
+	edgeSeen := make(map[string]struct{})
+	for _, sd := range r.reverseSeeds(qname) {
+		ns, es, err := r.s.SubgraphByQname(sd, depth)
+		if err != nil {
+			// As in ImpactOfChange: the seed must resolve, a bridged
+			// interface method need not be present.
+			if sd == qname {
+				return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
+			}
+			continue
+		}
+		for _, n := range ns {
+			if _, dup := nodeSeen[n.ID]; dup {
+				continue
+			}
+			nodeSeen[n.ID] = struct{}{}
+			nodes = append(nodes, n)
+		}
+		for _, e := range es {
+			k := e.Src + "|" + e.Dst + "|" + string(e.Type)
+			if _, dup := edgeSeen[k]; dup {
+				continue
+			}
+			edgeSeen[k] = struct{}{}
+			edges = append(edges, e)
+		}
 	}
 	commit, _ := r.commit()
 

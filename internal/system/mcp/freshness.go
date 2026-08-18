@@ -25,6 +25,7 @@ type freshnessResponse struct {
 // registerFreshness wires cks.ops.freshness.
 func registerFreshness(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFreshness,
+		mcpgo.WithOutputSchema[freshnessResponse](),
 		mcpgo.WithDescription(
 			"Compare the index snapshot against the source repository: indexed commit vs "+
 				"HEAD and the changed-file list. Call at session start and after "+

@@ -20,6 +20,7 @@ var ToolNameOpsReindex = toolName("ops.reindex")
 // registry and engine binaries with the setup surface.
 func registerOpsReindex(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsReindex,
+		mcpgo.WithOutputSchema[jobStartedResponse](),
 		mcpgo.WithDescription(
 			"Start an asynchronous blue-green reindex of a dataset to a new version: build <out>/<version>, "+
 				"run the alignment+quality gate, then atomically promote it to current. current is left unchanged "+
@@ -53,7 +54,7 @@ func registerOpsReindex(s *mcpserver.MCPServer, d Deps) {
 		gopt := setup.GateOptions{MinCanonicalRatio: req.GetFloat("min_canonical_ratio", 0)}
 		id := sc.Jobs.StartReindex(o, version, gopt)
 		return mcpgo.NewToolResultStructured(
-			map[string]string{"job_id": id, "version": version, "state": setup.JobRunning},
+			jobStartedResponse{JobID: id, Version: version, State: setup.JobRunning},
 			fmt.Sprintf("reindex started: job_id=%s version=%s (poll %s)", id, version, ToolNameOpsSetupStatus)), nil
 	})
 }

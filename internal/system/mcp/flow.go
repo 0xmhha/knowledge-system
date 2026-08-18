@@ -54,6 +54,7 @@ func flowErrResult(toolName string, err error) *mcpgo.CallToolResult {
 // registerGetFlow wires cks.context.get_flow.
 func registerGetFlow(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameGetFlow,
+		mcpgo.WithOutputSchema[ckvclient.Flow](),
 		mcpgo.WithDescription(
 			"Return a curated flow as a topological step sequence (cycle-safe): symbol, "+
 				"citation, calls/reads/writes/emits, branches, invariants per step. Select by "+
@@ -95,6 +96,7 @@ func handleGetFlow(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcp
 // registerExpandFlow wires cks.context.expand_flow.
 func registerExpandFlow(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameExpandFlow,
+		mcpgo.WithOutputSchema[ckvclient.FlowExpansion](),
 		mcpgo.WithDescription(
 			"Steps adjacent to a flow step: direction 'up' traverses producers, 'down' "+
 				"traverses consumers. Use to trace a value's produce->store->consume "+
@@ -143,6 +145,7 @@ type findBranchesResponse struct {
 // registerFindBranches wires cks.context.find_branches.
 func registerFindBranches(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindBranches,
+		mcpgo.WithOutputSchema[findBranchesResponse](),
 		mcpgo.WithDescription(
 			"Map a free-text symptom to ranked when->then@at failure-condition candidates "+
 				"from the flow corpus. This is the natural-language ENTRY POINT into flows -- "+
@@ -175,6 +178,7 @@ func handleFindBranches(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 // registerGetInvariantEnforcement wires cks.context.get_invariant_enforcement.
 func registerGetInvariantEnforcement(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameGetInvariantEnforcement,
+		mcpgo.WithOutputSchema[ckvclient.InvariantEnforcement](),
 		mcpgo.WithDescription(
 			"Enumerate every site that enforces a curated invariant. Use to check a "+
 				"planned change against domain rules (the 'empty block implies same state "+
@@ -215,6 +219,7 @@ type findInvariantsResponse struct {
 // registerFindInvariants wires cks.context.find_invariants.
 func registerFindInvariants(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindInvariants,
+		mcpgo.WithOutputSchema[findInvariantsResponse](),
 		mcpgo.WithDescription(
 			"List curated invariants (domain rules) matching a filter. Scope by "+
 				"file, policy category, or minimum confidence tier. Use on the "+
@@ -251,6 +256,7 @@ type getConventionsResponse struct {
 // registerGetConventions wires cks.context.get_conventions.
 func registerGetConventions(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameGetConventions,
+		mcpgo.WithOutputSchema[getConventionsResponse](),
 		mcpgo.WithDescription(
 			"Return per-package AST-convention summaries (the codebase's idioms: "+
 				"error handling, locking, naming) under a package prefix. Use to "+

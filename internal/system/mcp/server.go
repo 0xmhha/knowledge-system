@@ -32,6 +32,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
 // ToolNameGetForTask is the wire name of the get_for_task tool. Exported
@@ -333,6 +334,7 @@ func aclMiddleware(next http.Handler, allow func(net.IP) bool) http.Handler {
 // later phase.
 func registerGetForTask(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameGetForTask,
+		mcpgo.WithOutputSchema[contract.EvidencePack](),
 		mcpgo.WithDescription(
 			"START HERE for any analysis/design/bugfix task. One call composes an "+
 				"EvidencePack: intent-ranked citations, code bodies, and graph_neighbors "+
@@ -355,6 +357,7 @@ func registerGetForTask(s *mcpserver.MCPServer, d Deps) {
 // registerHealth wires the cks.ops.health tool.
 func registerHealth(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameHealth,
+		mcpgo.WithOutputSchema[healthResponse](),
 		mcpgo.WithDescription(
 			"Aggregate cks backend health: ok | degraded | down from ckg/ckv "+
 				"reachability. Call once at session start. degraded means ckv (semantic "+
