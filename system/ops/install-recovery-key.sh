@@ -13,7 +13,7 @@
 #   system/ops/install-recovery-key.sh <path-to-public-key> [--from <cidr>]
 #
 #   --from  additionally restrict which addresses may use the key, e.g.
-#           --from 172.20.0.0/16 for the office LAN. Recommended.
+#           --from 10.0.0.0/8 for an office LAN. Recommended.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

@@ -105,7 +105,7 @@ On the serving host, once:
 
 ```sh
 sudo systemsetup -setremotelogin on
-system/ops/install-recovery-key.sh ~/ops-operator.pub --from 172.20.0.0/16
+system/ops/install-recovery-key.sh ~/ops-operator.pub --from 10.0.0.0/8
 ```
 
 `--from` restricts which addresses may use the key and is worth setting; the
