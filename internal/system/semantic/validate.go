@@ -143,6 +143,8 @@ func (p Projection) Validate() error {
 		concepts[concept.ID] = concept
 	}
 	usedSpecEvidence := map[string]bool{}
+	criteria := map[string]AcceptanceCriterion{}
+	criterionRequirement := map[string]Requirement{}
 	for _, requirement := range p.Requirements {
 		if err := claimID(requirement.ID); err != nil {
 			return err
@@ -185,6 +187,8 @@ func (p Projection) Validate() error {
 				return fmt.Errorf("criterion %q needs source evidence inside requirement %q", criterion.ID, requirement.ID)
 			}
 			usedSpecEvidence[criterion.EvidenceID] = true
+			criteria[criterion.ID] = criterion
+			criterionRequirement[criterion.ID] = requirement
 		}
 	}
 	for _, e := range p.Evidence {
@@ -311,6 +315,20 @@ func (p Projection) Validate() error {
 			if assertion.Status == StatusVerified && concept.Status != StatusVerified {
 				return fmt.Errorf("verified assertion %q refers to unverified concept", assertion.ID)
 			}
+		case PredicateTestedBy:
+			if !hasCanonicalEvidence(seenEvidence, evidence, assertion.SubjectID, SourceCode) ||
+				!hasCanonicalEvidence(seenEvidence, evidence, assertion.ObjectID, SourceTest) {
+				return fmt.Errorf("assertion %q TESTED_BY needs code and test CKG anchors", assertion.ID)
+			}
+		case PredicateAcceptedBy:
+			criterion, ok := criteria[assertion.SubjectID]
+			if !ok || !seenEvidence[criterion.EvidenceID] ||
+				!hasCanonicalEvidence(seenEvidence, evidence, assertion.ObjectID, SourceTest) {
+				return fmt.Errorf("assertion %q ACCEPTED_BY needs criterion and test sources", assertion.ID)
+			}
+			if assertion.Status == StatusVerified && criterionRequirement[criterion.ID].Status != StatusVerified {
+				return fmt.Errorf("verified assertion %q refers to unapproved requirement", assertion.ID)
+			}
 		default:
 			return fmt.Errorf("assertion %q has invalid predicate %q", assertion.ID, assertion.Predicate)
 		}
@@ -330,6 +348,19 @@ func (p Projection) Validate() error {
 func hasAnyEvidence(in map[string]bool, ids []string) bool {
 	for _, id := range ids {
 		if in[id] {
+			return true
+		}
+	}
+	return false
+}
+
+func hasCanonicalEvidence(in map[string]bool, evidence map[string]EvidenceSpan, canonicalID string, kind SourceKind) bool {
+	if canonicalID == "" {
+		return false
+	}
+	for id := range in {
+		e := evidence[id]
+		if e.CanonicalID == canonicalID && e.Kind == kind {
 			return true
 		}
 	}

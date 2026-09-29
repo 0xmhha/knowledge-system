@@ -29,6 +29,7 @@ func NewCmd() *cobra.Command {
 	cmd.AddCommand(review)
 	cmd.AddCommand(newBuildCmd())
 	cmd.AddCommand(newPromoteCmd())
+	cmd.AddCommand(newTraceCmd())
 	return cmd
 }
 

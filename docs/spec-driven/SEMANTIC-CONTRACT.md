@@ -55,3 +55,7 @@ CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호�
 ## 요구사항과 수용 기준 입력
 
 `cks semantic build --spec docs/spec-driven/spec-pilot.yaml`은 같은 프로젝트의 커밋된 YAML에서 `Requirement`와 Given/When/Then `AcceptanceCriterion`을 읽는다. 각 항목은 안정 ID, 요구사항 버전, 원본 파일·줄 범위·SHA-256 근거를 가진다. `proposed`는 초안, `verified`는 사람이 **명세 내용을 승인**했다는 뜻이며 구현 또는 테스트 통과를 뜻하지 않는다. `verified`/`rejected`에는 YAML 원본의 `reviewed_by`가 필요하다. JSON 투영의 문구만 바꾸면 원본 재파싱에서 거부된다. `concept_ids`는 같은 투영의 개념을 참조하며 선택 사항이므로 코드가 전혀 없는 초기 명세도 저장할 수 있다. `cks semantic review`는 제안 요구사항의 출처와 수용 기준을 검토 대기 목록으로 출력한다. 구현·테스트 상태는 이후 검증된 연결 근거로 별도 계산할 예정이다.
+
+`TESTED_BY`는 CKG 코드 심볼에서 CKG 테스트 심볼로 향하며 두 코드 근거를 요구한다. `ACCEPTED_BY`는 수용 기준에서 CKG 테스트 심볼로 향하며 명세 근거와 테스트 근거를 요구한다. `verified ACCEPTED_BY`는 해당 요구사항이 원본 YAML에서 승인된 경우에만 허용한다. 두 관계 모두 검토자가 필요하고, 실제 CKG 노드·커밋·파일·AST 범위를 승격 단계에서 검사한다.
+
+`cks semantic trace --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db>`는 활성 데이터셋을 다시 대조한 뒤 요구사항별 상태와 근거 경로를 JSON으로 출력한다. `linked`는 검토된 Requirement→Concept→Code→Test 및 AcceptanceCriterion→Test **연결의 존재**만 뜻한다. 테스트가 실제 실행되어 통과했다는 뜻은 아니다. 누락된 개념·구현·테스트·수용 테스트와 검토된 상충 주장 관계를 별도로 표시한다. 인덱스가 오래되거나 원문과 어긋나면 추적 경로를 출력하지 않고 실패한다. 실제 테스트 결과 수집 및 실패 패치 미승격은 후속 W4.4 작업이다.

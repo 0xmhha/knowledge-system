@@ -123,6 +123,21 @@ requirements:
 	if err != nil || current.Snapshot.DatasetID != "cut-1" {
 		t.Fatalf("active projection = %+v, %v", current.Snapshot, err)
 	}
+	trace := NewCmd()
+	var traceOut bytes.Buffer
+	trace.SetOut(&traceOut)
+	trace.SetArgs([]string{"trace", "--project-id", "example", "--repo", repo,
+		"--graph", graph, "--vector", vector, "--store", storePath})
+	if err := trace.Execute(); err != nil {
+		t.Fatalf("trace active dataset: %v", err)
+	}
+	var traceReport semantic.TraceReport
+	if err := json.Unmarshal(traceOut.Bytes(), &traceReport); err != nil {
+		t.Fatal(err)
+	}
+	if len(traceReport.Requirements) != 1 || traceReport.Requirements[0].State != semantic.TraceSpecUnapproved {
+		t.Fatalf("proposed spec was treated as implemented: %+v", traceReport)
+	}
 	extract := NewCmd()
 	extract.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-2",
 		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
