@@ -138,6 +138,27 @@ PY
 "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" > "$scratch/semantic-reviewed-trace.json"
+"$repo_root/bin/cks" semantic plan --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" > "$scratch/semantic-reviewed-plan.json"
+"$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --criterion-id ac-alpha \
+  --out "$scratch/test-pass.json" -- go test ./...
+if "$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --criterion-id ac-alpha \
+  --out "$scratch/test-fail.json" -- go invalid-command > "$scratch/test-fail.log" 2>&1; then
+  echo "failed test command reported success" >&2
+  exit 1
+fi
+if "$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --criterion-id missing-criterion \
+  --out "$scratch/test-unlinked.json" -- go test ./... > "$scratch/test-unlinked.log" 2>&1; then
+  echo "unlinked criterion was executed" >&2
+  exit 1
+fi
 "$repo_root/bin/cks" mcp gen-config --dataset-dir "$dataset/current" \
   --name ks-fixture --source-root "$src" --out "$config"
 python3 - "$config" <<'PY'
@@ -155,7 +176,7 @@ PY
   --config "$config" --verify-anchors "$src" --output "$scratch/find-alpha-report.json"
 "$repo_root/bin/cks" eval --scenarios "$repo_root/testdata/wbs-smoke/absent-api.yaml" \
   --config "$config" --output "$scratch/absent-api-report.json"
-python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" <<'PY'
+python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" <<'PY'
 import json
 import sqlite3
 import sys
@@ -177,5 +198,13 @@ trace = json.load(open(sys.argv[8], encoding='utf-8'))
 assert trace['requirements'][0]['state'] == 'spec_unapproved', trace
 reviewed = json.load(open(sys.argv[9], encoding='utf-8'))
 assert reviewed['requirements'][0]['state'] == 'linked' and len(reviewed['requirements'][0]['paths']) == 1, reviewed
+plan = json.load(open(sys.argv[10], encoding='utf-8'))
+assert plan['steps'][0]['action'] == 'execute_acceptance_test' and plan['steps'][0]['unconfirmed'] is True, plan
+passed = json.load(open(sys.argv[11], encoding='utf-8'))
+failed = json.load(open(sys.argv[12], encoding='utf-8'))
+assert passed['command_passed'] is True and passed['snapshot_consistent'] is True and passed['criterion_id'] == 'ac-alpha', passed
+assert failed['command_passed'] is False and failed['snapshot_consistent'] is True and failed['exit_code'] != 0, failed
+from pathlib import Path
+assert not Path(sys.argv[13]).exists(), 'unlinked criterion wrote a result'
 PY
 printf 'Structural smoke reports: %s\n' "$scratch"

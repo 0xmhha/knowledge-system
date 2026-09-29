@@ -59,3 +59,7 @@ CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호�
 `TESTED_BY`는 CKG 코드 심볼에서 CKG 테스트 심볼로 향하며 두 코드 근거를 요구한다. `ACCEPTED_BY`는 수용 기준에서 CKG 테스트 심볼로 향하며 명세 근거와 테스트 근거를 요구한다. `verified ACCEPTED_BY`는 해당 요구사항이 원본 YAML에서 승인된 경우에만 허용한다. 두 관계 모두 검토자가 필요하고, 실제 CKG 노드·커밋·파일·AST 범위를 승격 단계에서 검사한다.
 
 `cks semantic trace --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db>`는 활성 데이터셋을 다시 대조한 뒤 요구사항별 상태와 근거 경로를 JSON으로 출력한다. `linked`는 검토된 Requirement→Concept→Code→Test 및 AcceptanceCriterion→Test **연결의 존재**만 뜻한다. 테스트가 실제 실행되어 통과했다는 뜻은 아니다. 누락된 개념·구현·테스트·수용 테스트와 검토된 상충 주장 관계를 별도로 표시한다. 인덱스가 오래되거나 원문과 어긋나면 추적 경로를 출력하지 않고 실패한다. 실제 테스트 결과 수집 및 실패 패치 미승격은 후속 W4.4 작업이다.
+
+`cks semantic plan`은 동일한 정렬 검증 뒤 각 요구사항에 필요한 다음 조치를 읽기 전용 JSON으로 제시한다. 근거 ID, 이미 알려진 코드·테스트 심볼 ID, 누락 관계, 충돌 관계 ID를 유지하며 모든 단계에 `unconfirmed=true`를 단다. 연결이 완성되어도 계획은 수용 테스트 실행을 요구한다. 이 계획은 코드 변경이나 승인 결정을 생성하지 않는다.
+
+`cks semantic test --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --criterion-id <id> --out <new-report.json> -- go test ./...`는 **검토된 연결이 있는 수용 기준**에서만 명령을 실행한다. 실행 전 소스 HEAD가 투영 커밋과 같고 추적·미추적·인덱싱 가능한 Git 무시 파일의 변경이 없어야 한다. 실행 후에도 같은 검사를 수행한다. 보고서는 명령 인자와 출력의 SHA-256, 출력 길이, 종료 코드, OS/아키텍처/Go 런타임, 소요 시간 및 스냅샷 일치 여부를 기록하되 원문 출력은 저장하지 않고 기존 파일을 덮어쓰지 않는다. 실패 명령은 비정상 종료와 함께 실패 보고서를 남긴다. 명령이 성공해도 그 명령이 해당 Given/When/Then을 검증했는지 자동 판정할 수 없으므로 요구사항이나 관계의 상태를 승격하지 않는다. 외부 패치 식별·실패 패치 미승격·재색인 연결은 후속 구현이다.

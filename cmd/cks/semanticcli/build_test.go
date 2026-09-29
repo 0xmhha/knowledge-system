@@ -138,6 +138,21 @@ requirements:
 	if len(traceReport.Requirements) != 1 || traceReport.Requirements[0].State != semantic.TraceSpecUnapproved {
 		t.Fatalf("proposed spec was treated as implemented: %+v", traceReport)
 	}
+	planCmd := NewCmd()
+	var planOut bytes.Buffer
+	planCmd.SetOut(&planOut)
+	planCmd.SetArgs([]string{"plan", "--project-id", "example", "--repo", repo,
+		"--graph", graph, "--vector", vector, "--store", storePath})
+	if err := planCmd.Execute(); err != nil {
+		t.Fatalf("plan active dataset: %v", err)
+	}
+	var changePlan semantic.ChangePlan
+	if err := json.Unmarshal(planOut.Bytes(), &changePlan); err != nil {
+		t.Fatal(err)
+	}
+	if len(changePlan.Steps) != 1 || changePlan.Steps[0].Action != semantic.PlanReviewSpec || !changePlan.Steps[0].Unconfirmed {
+		t.Fatalf("proposed spec plan was auto-approved: %+v", changePlan)
+	}
 	extract := NewCmd()
 	extract.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-2",
 		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,

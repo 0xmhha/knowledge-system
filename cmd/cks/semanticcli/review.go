@@ -30,6 +30,8 @@ func NewCmd() *cobra.Command {
 	cmd.AddCommand(newBuildCmd())
 	cmd.AddCommand(newPromoteCmd())
 	cmd.AddCommand(newTraceCmd())
+	cmd.AddCommand(newPlanCmd())
+	cmd.AddCommand(newTestCmd())
 	return cmd
 }
 

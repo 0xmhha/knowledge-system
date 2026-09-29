@@ -6,8 +6,13 @@ import (
 )
 
 func traceFixture(t *testing.T) Projection {
+	p, _ := traceFixtureWithRepo(t)
+	return p
+}
+
+func traceFixtureWithRepo(t *testing.T) (Projection, string) {
 	t.Helper()
-	p, _ := fixture(t)
+	p, root := fixture(t)
 	proof := func(id string, kind SourceKind, path string, start, end int, canonical, extractor string) EvidenceSpan {
 		return EvidenceSpan{ID: id, Snapshot: p.Snapshot, Kind: kind, Path: path,
 			StartLine: start, EndLine: end, CanonicalID: canonical, Extractor: extractor,
@@ -37,7 +42,7 @@ func traceFixture(t *testing.T) Projection {
 	if err := p.Validate(); err != nil {
 		t.Fatal(err)
 	}
-	return p
+	return p, root
 }
 
 func TestTraceRequiresReviewedSpecCodeTestAndCriterionLinks(t *testing.T) {
