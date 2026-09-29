@@ -7,12 +7,13 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 scratch="${KS_PACKAGE_SMOKE_DIR:-$(mktemp -d)}"
 mkdir -p "$scratch"
-args=()
 if [[ "${KS_PACKAGE_ALLOW_DIRTY:-0}" == 1 ]]; then
-  args+=(--allow-dirty)
+  python3 "$repo_root/scripts/package-host.py" --out-dir "$scratch/dist" --allow-dirty \
+    > "$scratch/package.json"
+else
+  python3 "$repo_root/scripts/package-host.py" --out-dir "$scratch/dist" \
+    > "$scratch/package.json"
 fi
-python3 "$repo_root/scripts/package-host.py" --out-dir "$scratch/dist" "${args[@]}" \
-  > "$scratch/package.json"
 stage="$(python3 - "$scratch/package.json" "$scratch/unpacked" <<'PY'
 import hashlib
 import json
