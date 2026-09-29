@@ -100,3 +100,12 @@ func TestExecuteLinkedTestRequiresExactReviewedTargetWhenAmbiguous(t *testing.T)
 		t.Fatalf("selected reviewed test: %+v, %v", selected, err)
 	}
 }
+
+func TestExecuteLinkedTestDetectsSourceMutation(t *testing.T) {
+	p, repo := traceFixtureWithRepo(t)
+	a := ActiveProjection{projection: p}
+	report, err := a.ExecuteLinkedTest(context.Background(), repo, "ac-alpha", []string{"sh", "-c", "printf 'changed\\n' > new.md"})
+	if err != nil || !report.CommandPassed || report.SnapshotConsistent {
+		t.Fatalf("source mutation was accepted: %+v, %v", report, err)
+	}
+}
