@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"sort"
+	"strings"
 )
 
 // ReviewItem contains everything needed to inspect one proposed claim in
@@ -21,6 +22,19 @@ type AssertionReviewItem struct {
 	SubjectID   string         `json:"subject_id"`
 	ObjectID    string         `json:"object_id"`
 	Evidence    []EvidenceSpan `json:"evidence"`
+}
+
+type ConceptReviewItem struct {
+	Concept  Concept      `json:"concept"`
+	Evidence EvidenceSpan `json:"evidence"`
+}
+
+// AmbiguousTerm names one surface form shared by multiple concepts. It is a
+// reviewer warning, not an automatic equivalence or a validation error.
+type AmbiguousTerm struct {
+	Lang       string   `json:"lang"`
+	Normalized string   `json:"normalized"`
+	ConceptIDs []string `json:"concept_ids"`
 }
 
 // ReviewReport separates the measured precision of adjudicated claims from
@@ -41,6 +55,13 @@ type ReviewReport struct {
 	AssertionRejected  int                   `json:"assertion_rejected"`
 	AssertionPrecision *float64              `json:"assertion_reviewed_precision"`
 	AssertionSample    []AssertionReviewItem `json:"assertion_sample"`
+	ConceptTotal       int                   `json:"concept_total"`
+	ConceptProposed    int                   `json:"concept_proposed"`
+	ConceptVerified    int                   `json:"concept_verified"`
+	ConceptRejected    int                   `json:"concept_rejected"`
+	ConceptPrecision   *float64              `json:"concept_reviewed_precision"`
+	ConceptSample      []ConceptReviewItem   `json:"concept_sample"`
+	AmbiguousTerms     []AmbiguousTerm       `json:"ambiguous_terms"`
 }
 
 // Review produces a deterministic sample of proposed claims. Salt permits
@@ -55,8 +76,9 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 		limit = 0
 	}
 	r := ReviewReport{ProjectID: p.Snapshot.ProjectID, DatasetID: p.Snapshot.DatasetID,
-		Total: len(p.Claims), AssertionTotal: len(p.Assertions),
-		Sample: []ReviewItem{}, AssertionSample: []AssertionReviewItem{}}
+		Total: len(p.Claims), AssertionTotal: len(p.Assertions), ConceptTotal: len(p.Concepts),
+		Sample: []ReviewItem{}, AssertionSample: []AssertionReviewItem{},
+		ConceptSample: []ConceptReviewItem{}, AmbiguousTerms: []AmbiguousTerm{}}
 	sections := make(map[string]DocumentSection, len(p.Sections))
 	for _, section := range p.Sections {
 		sections[section.ID] = section
@@ -96,10 +118,11 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 		}
 		return candidates[i].key < candidates[j].key
 	})
-	if limit > len(candidates) {
-		limit = len(candidates)
+	claimLimit := limit
+	if claimLimit > len(candidates) {
+		claimLimit = len(candidates)
 	}
-	for _, candidate := range candidates[:limit] {
+	for _, candidate := range candidates[:claimLimit] {
 		r.Sample = append(r.Sample, candidate.item)
 	}
 	type rankedAssertion struct {
@@ -141,5 +164,63 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	for _, candidate := range assertionCandidates[:assertionLimit] {
 		r.AssertionSample = append(r.AssertionSample, candidate.item)
 	}
+	type rankedConcept struct {
+		key  string
+		item ConceptReviewItem
+	}
+	var conceptCandidates []rankedConcept
+	for _, concept := range p.Concepts {
+		switch concept.Status {
+		case StatusVerified:
+			r.ConceptVerified++
+		case StatusRejected:
+			r.ConceptRejected++
+		case StatusProposed:
+			r.ConceptProposed++
+			keyBytes := sha256.Sum256([]byte(salt + "\x00" + p.Snapshot.DatasetID + "\x00" + concept.ID))
+			conceptCandidates = append(conceptCandidates, rankedConcept{key: hex.EncodeToString(keyBytes[:]),
+				item: ConceptReviewItem{Concept: concept, Evidence: evidence[concept.EvidenceID]}})
+		}
+	}
+	if reviewed := r.ConceptVerified + r.ConceptRejected; reviewed > 0 {
+		precision := float64(r.ConceptVerified) / float64(reviewed)
+		r.ConceptPrecision = &precision
+	}
+	sort.Slice(conceptCandidates, func(i, j int) bool {
+		if conceptCandidates[i].key == conceptCandidates[j].key {
+			return conceptCandidates[i].item.Concept.ID < conceptCandidates[j].item.Concept.ID
+		}
+		return conceptCandidates[i].key < conceptCandidates[j].key
+	})
+	conceptLimit := limit
+	if conceptLimit > len(conceptCandidates) {
+		conceptLimit = len(conceptCandidates)
+	}
+	for _, candidate := range conceptCandidates[:conceptLimit] {
+		r.ConceptSample = append(r.ConceptSample, candidate.item)
+	}
+	terms := map[string][]string{}
+	for _, concept := range p.Concepts {
+		for _, term := range concept.Terms {
+			key := term.Lang + "\x00" + strings.ToLower(strings.TrimSpace(term.Value))
+			terms[key] = append(terms[key], concept.ID)
+		}
+	}
+	for key, ids := range terms {
+		if len(ids) < 2 {
+			continue
+		}
+		sort.Strings(ids)
+		parts := strings.SplitN(key, "\x00", 2)
+		r.AmbiguousTerms = append(r.AmbiguousTerms, AmbiguousTerm{
+			Lang: parts[0], Normalized: parts[1], ConceptIDs: ids,
+		})
+	}
+	sort.Slice(r.AmbiguousTerms, func(i, j int) bool {
+		if r.AmbiguousTerms[i].Lang == r.AmbiguousTerms[j].Lang {
+			return r.AmbiguousTerms[i].Normalized < r.AmbiguousTerms[j].Normalized
+		}
+		return r.AmbiguousTerms[i].Lang < r.AmbiguousTerms[j].Lang
+	})
 	return r, nil
 }

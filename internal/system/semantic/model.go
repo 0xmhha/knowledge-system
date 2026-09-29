@@ -54,6 +54,27 @@ type DocumentSection struct {
 	EvidenceID  string   `json:"evidence_id"`
 }
 
+// Concept is reviewed vocabulary over CKV and CKG, not an AST node. Terms
+// preserve natural-language alternatives while one preferred term per
+// language makes display deterministic.
+type Concept struct {
+	ID         string   `json:"id" yaml:"id"`
+	Kind       string   `json:"kind" yaml:"kind"`
+	Definition string   `json:"definition" yaml:"definition"`
+	Includes   []string `json:"includes" yaml:"includes"`
+	Excludes   []string `json:"excludes" yaml:"excludes"`
+	Terms      []Term   `json:"terms" yaml:"terms"`
+	EvidenceID string   `json:"evidence_id" yaml:"-"`
+	Status     Status   `json:"status" yaml:"status"`
+	ReviewedBy string   `json:"reviewed_by,omitempty" yaml:"reviewed_by"`
+}
+
+type Term struct {
+	Lang      string `json:"lang" yaml:"lang"`
+	Value     string `json:"value" yaml:"value"`
+	Preferred bool   `json:"preferred" yaml:"preferred"`
+}
+
 // Claim is a human-readable assertion extracted from a section. Extraction
 // starts proposed; verification requires an explicit reviewer and live proof.
 type Claim struct {
@@ -89,6 +110,7 @@ type Projection struct {
 	Snapshot      Snapshot          `json:"snapshot"`
 	Evidence      []EvidenceSpan    `json:"evidence"`
 	Sections      []DocumentSection `json:"sections"`
+	Concepts      []Concept         `json:"concepts,omitempty"`
 	Claims        []Claim           `json:"claims"`
 	Assertions    []Assertion       `json:"assertions,omitempty"`
 }

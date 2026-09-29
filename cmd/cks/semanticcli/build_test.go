@@ -33,7 +33,23 @@ func TestBuildCommandUsesCommittedMarkdownAndAlignedDatasets(t *testing.T) {
 	if err := os.WriteFile(file, []byte("# Expected\nThe committed behavior.\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	testGit(t, repo, "add", "spec.md")
+	ontology := []byte(`version: 1
+project_id: example
+domain: fixture
+competency_questions: ['What is the source?']
+concepts:
+  - id: source
+    kind: artifact
+    definition: A committed source.
+    includes: [Code]
+    excludes: [Uncommitted edits]
+    terms: [{lang: en, value: source, preferred: true}]
+    status: proposed
+`)
+	if err := os.WriteFile(filepath.Join(repo, "ontology.yaml"), ontology, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	testGit(t, repo, "add", "spec.md", "ontology.yaml")
 	testGit(t, repo, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "spec")
 	commit := testGit(t, repo, "rev-parse", "HEAD")
 	// Building while a developer has local edits must still use the recorded
@@ -52,18 +68,20 @@ func TestBuildCommandUsesCommittedMarkdownAndAlignedDatasets(t *testing.T) {
 	var stdout bytes.Buffer
 	cmd.SetOut(&stdout)
 	cmd.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-1",
-		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output, "--docs", "spec.md", "--activate"})
+		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
+		"--docs", "spec.md", "--ontology", "ontology.yaml", "--activate"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatal(err)
 	}
 	var result struct {
 		Sections  int  `json:"sections"`
+		Concepts  int  `json:"concepts"`
 		Activated bool `json:"activated"`
 	}
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatal(err)
 	}
-	if result.Sections == 0 || !result.Activated {
+	if result.Sections == 0 || result.Concepts != 1 || !result.Activated {
 		t.Fatalf("build result %+v", result)
 	}
 	buf, err := os.ReadFile(output)
@@ -74,7 +92,7 @@ func TestBuildCommandUsesCommittedMarkdownAndAlignedDatasets(t *testing.T) {
 	if err := json.Unmarshal(buf, &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" {
+	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" || p.Concepts[0].ID != "source" {
 		t.Fatalf("projection followed dirty working tree: %+v", p)
 	}
 	store, err := semantic.OpenStore(storePath)

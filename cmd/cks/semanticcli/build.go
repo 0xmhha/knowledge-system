@@ -16,7 +16,7 @@ import (
 )
 
 func newBuildCmd() *cobra.Command {
-	var repo, project, dataset, graph, vector, storePath, output string
+	var repo, project, dataset, graph, vector, storePath, output, ontology string
 	var docs []string
 	var activate bool
 	var minimumCoverage float64
@@ -26,7 +26,8 @@ func newBuildCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runBuild(cmd.Context(), cmd, buildOptions{
 				repo: repo, project: project, dataset: dataset, graph: graph, vector: vector,
-				store: storePath, output: output, docs: docs, activate: activate, minimumCoverage: minimumCoverage,
+				store: storePath, output: output, docs: docs, ontology: ontology,
+				activate: activate, minimumCoverage: minimumCoverage,
 			})
 		},
 	}
@@ -38,6 +39,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&storePath, "store", "", "CKS semantic SQLite path")
 	cmd.Flags().StringVar(&output, "out", "", "reviewable projection JSON output")
 	cmd.Flags().StringSliceVar(&docs, "docs", nil, "repository-relative committed Markdown paths (repeatable)")
+	cmd.Flags().StringVar(&ontology, "ontology", "", "repository-relative committed ontology YAML path")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
 	for _, flag := range []string{"repo", "project-id", "dataset-id", "graph", "vector", "store", "out"} {
@@ -47,15 +49,15 @@ func newBuildCmd() *cobra.Command {
 }
 
 type buildOptions struct {
-	repo, project, dataset, graph, vector, store, output string
-	docs                                                 []string
-	activate                                             bool
-	minimumCoverage                                      float64
+	repo, project, dataset, graph, vector, store, output, ontology string
+	docs                                                           []string
+	activate                                                       bool
+	minimumCoverage                                                float64
 }
 
 func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
-	if len(o.docs) == 0 {
-		return fmt.Errorf("at least one --docs path is required")
+	if len(o.docs) == 0 && o.ontology == "" {
+		return fmt.Errorf("at least one --docs or --ontology path is required")
 	}
 	if err := semantic.ValidateCanonicalCoverage(o.vector, o.minimumCoverage); err != nil {
 		return err
@@ -72,8 +74,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	p := semantic.Projection{SchemaVersion: semantic.SchemaVersion, Snapshot: snapshot}
 	seen := map[string]bool{}
 	for _, file := range o.docs {
-		if file == "" || strings.Contains(file, "\\") || path.Clean(file) != file ||
-			file == "." || file == ".." || strings.HasPrefix(file, "../") || strings.HasPrefix(file, "/") {
+		if !safeInputPath(file) {
 			return fmt.Errorf("unsafe document path %q", file)
 		}
 		if seen[file] {
@@ -90,6 +91,21 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		}
 		p.Evidence = append(p.Evidence, part.Evidence...)
 		p.Sections = append(p.Sections, part.Sections...)
+	}
+	if o.ontology != "" {
+		if !safeInputPath(o.ontology) || seen[o.ontology] {
+			return fmt.Errorf("unsafe or duplicate ontology path %q", o.ontology)
+		}
+		content, err := exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+o.ontology).Output()
+		if err != nil {
+			return fmt.Errorf("read committed ontology %q: %w", o.ontology, err)
+		}
+		part, _, err := semantic.ExtractOntology(snapshot, o.ontology, content)
+		if err != nil {
+			return err
+		}
+		p.Evidence = append(p.Evidence, part.Evidence...)
+		p.Concepts = append(p.Concepts, part.Concepts...)
 	}
 	store, err := semantic.OpenStore(o.store)
 	if err != nil {
@@ -114,8 +130,14 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	}
 	return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{
 		"project_id": o.project, "dataset_id": o.dataset, "commit": snapshot.Commit,
-		"sections": len(p.Sections), "evidence": len(p.Evidence), "activated": o.activate,
+		"sections": len(p.Sections), "concepts": len(p.Concepts),
+		"evidence": len(p.Evidence), "activated": o.activate,
 	})
+}
+
+func safeInputPath(file string) bool {
+	return file != "" && !strings.Contains(file, "\\") && path.Clean(file) == file &&
+		file != "." && file != ".." && !strings.HasPrefix(file, "../") && !strings.HasPrefix(file, "/")
 }
 
 func writeProjection(output string, content []byte) error {

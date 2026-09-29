@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"os/exec"
 	"path"
+	"reflect"
 	"regexp"
 	"strings"
 )
 
 var fullCommit = regexp.MustCompile(`^[0-9a-f]{40}$`)
 var digestPattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
+var conceptIDPattern = regexp.MustCompile(`^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$`)
+var languageTagPattern = regexp.MustCompile(`^[a-z]{2,3}(?:-[A-Za-z0-9]+)*$`)
 
 func (s Snapshot) validate() error {
 	if strings.TrimSpace(s.ProjectID) == "" || strings.TrimSpace(s.DatasetID) == "" {
@@ -76,6 +79,63 @@ func (p Projection) Validate() error {
 			return fmt.Errorf("section %q needs document evidence", section.ID)
 		}
 		sections[section.ID] = section
+	}
+	for _, concept := range p.Concepts {
+		if err := claimID(concept.ID); err != nil {
+			return err
+		}
+		if !conceptIDPattern.MatchString(concept.ID) {
+			return fmt.Errorf("concept %q has invalid stable id", concept.ID)
+		}
+		switch concept.Kind {
+		case "entity", "artifact", "process", "rule":
+		default:
+			return fmt.Errorf("concept %q has invalid kind %q", concept.ID, concept.Kind)
+		}
+		if strings.TrimSpace(concept.Definition) == "" || len(concept.Includes) == 0 || len(concept.Excludes) == 0 {
+			return fmt.Errorf("concept %q needs a definition and explicit included/excluded scope", concept.ID)
+		}
+		for _, scope := range append(append([]string{}, concept.Includes...), concept.Excludes...) {
+			if strings.TrimSpace(scope) == "" {
+				return fmt.Errorf("concept %q has empty scope item", concept.ID)
+			}
+		}
+		if len(concept.Terms) == 0 {
+			return fmt.Errorf("concept %q needs language terms", concept.ID)
+		}
+		seenTerms := map[string]bool{}
+		preferredByLang := map[string]int{}
+		for _, term := range concept.Terms {
+			if !languageTagPattern.MatchString(term.Lang) || strings.TrimSpace(term.Value) == "" {
+				return fmt.Errorf("concept %q has invalid language term", concept.ID)
+			}
+			key := term.Lang + "\x00" + strings.ToLower(strings.TrimSpace(term.Value))
+			if seenTerms[key] {
+				return fmt.Errorf("concept %q repeats term %q", concept.ID, term.Value)
+			}
+			seenTerms[key] = true
+			if term.Preferred {
+				preferredByLang[term.Lang]++
+			}
+		}
+		for _, term := range concept.Terms {
+			if preferredByLang[term.Lang] != 1 {
+				return fmt.Errorf("concept %q needs exactly one preferred term in %s", concept.ID, term.Lang)
+			}
+		}
+		e, ok := evidence[concept.EvidenceID]
+		if !ok || e.Kind != SourceDocument || e.Extractor != "ontology-yaml-v1" {
+			return fmt.Errorf("concept %q needs document evidence", concept.ID)
+		}
+		switch concept.Status {
+		case StatusProposed:
+		case StatusVerified, StatusRejected:
+			if strings.TrimSpace(concept.ReviewedBy) == "" {
+				return fmt.Errorf("reviewed concept %q needs reviewed_by", concept.ID)
+			}
+		default:
+			return fmt.Errorf("concept %q has invalid status %q", concept.ID, concept.Status)
+		}
 	}
 	claims := make(map[string]Claim, len(p.Claims))
 	for _, claim := range p.Claims {
@@ -203,9 +263,21 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 	if err := p.Validate(); err != nil {
 		return err
 	}
-	for _, e := range p.Evidence {
-		cmd := exec.CommandContext(ctx, "git", "-C", repoRoot, "show", p.Snapshot.Commit+":"+e.Path)
+	contents := map[string][]byte{}
+	load := func(file string) ([]byte, error) {
+		if content, ok := contents[file]; ok {
+			return content, nil
+		}
+		cmd := exec.CommandContext(ctx, "git", "-C", repoRoot, "show", p.Snapshot.Commit+":"+file)
 		content, err := cmd.Output()
+		if err != nil {
+			return nil, err
+		}
+		contents[file] = content
+		return content, nil
+	}
+	for _, e := range p.Evidence {
+		content, err := load(e.Path)
 		if err != nil {
 			return fmt.Errorf("evidence %q source unavailable at commit: %w", e.ID, err)
 		}
@@ -220,6 +292,36 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 		digest := sha256.Sum256([]byte(span))
 		if hex.EncodeToString(digest[:]) != e.ContentSHA256 {
 			return fmt.Errorf("evidence %q source digest mismatch", e.ID)
+		}
+	}
+	// A source hash proves that the cited YAML bytes exist, but by itself it
+	// does not prove that the projected definition and terms still say what
+	// those bytes say. Reparse each ontology source and compare the full set.
+	byPath := map[string]map[string]Concept{}
+	evidenceByID := map[string]EvidenceSpan{}
+	for _, e := range p.Evidence {
+		evidenceByID[e.ID] = e
+	}
+	for _, concept := range p.Concepts {
+		file := evidenceByID[concept.EvidenceID].Path
+		if byPath[file] == nil {
+			byPath[file] = map[string]Concept{}
+		}
+		byPath[file][concept.ID] = concept
+	}
+	for file, want := range byPath {
+		extracted, _, err := ExtractOntology(p.Snapshot, file, contents[file])
+		if err != nil {
+			return fmt.Errorf("ontology %q source parse: %w", file, err)
+		}
+		if len(extracted.Concepts) != len(want) {
+			return fmt.Errorf("ontology %q concept set differs from source", file)
+		}
+		for _, original := range extracted.Concepts {
+			current, ok := want[original.ID]
+			if !ok || !reflect.DeepEqual(current, original) {
+				return fmt.Errorf("ontology concept %q differs from source", original.ID)
+			}
 		}
 	}
 	return nil

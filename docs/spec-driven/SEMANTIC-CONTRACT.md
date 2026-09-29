@@ -18,6 +18,12 @@
 
 코드 근거를 붙일 때는 CKG 공개 읽기 API에서 `canonical_id`를 정확 조회하고, CKG의 소스 커밋·파일·AST 노드 줄 범위가 근거와 일치하는지 검사한다. 이 검사는 원문 SHA-256 검사와 별개이며 `verified`로 자동 승격하지 않는다.
 
+## 온톨로지 시범 팩
+
+[`ontology-pilot.yaml`](./ontology-pilot.yaml)은 knowledge-system 자체를 대상으로 한 **제안 상태**의 18개 개념과 6개 능력 질문이다. 각 개념은 안정 ID, `entity/artifact/process/rule` 중 한 종류, 문장형 정의, 포함·제외 범위, 언어별 선호·대체 용어, 검토 상태를 가진다. `ExtractOntology`는 YAML의 각 개념 블록을 정확한 Git 원문 줄·SHA-256 근거로 만든다. `ValidateSources`는 원문 해시뿐 아니라 정의·용어·상태를 YAML에서 다시 읽어 투영과 비교하므로 JSON 투영만 수정해 정의를 바꿀 수 없다. `verified`/`rejected`에는 검토자 이름과 원본 YAML 변경이 필요하다.
+
+`cks semantic build`의 `--ontology`에 저장소 상대 YAML 경로를 주면 Markdown 섹션과 함께 동일한 프로젝트/데이터셋/커밋 투영에 저장한다. `cks semantic review`는 개념 표본·검토된 정밀도·여러 개념이 공유하는 동일 언어 용어를 별도 항목으로 출력한다. 동음이의어는 자동으로 같은 개념이라고 병합하지 않는다. 현재 시범 팩에는 전문가 리뷰가 없으므로 18개 모두 `proposed`다.
+
 ## SQLite 투영과 롤백
 
 `semantic_projections`는 `(project_id,dataset_id)`별 JSON 문서와 SHA-256을 불변으로 저장한다. 같은 내용의 재시도는 허용하고 같은 ID의 다른 내용은 거부한다. `semantic_current`는 프로젝트마다 활성 데이터셋 ID를 가리킨다. `Activate`는 기존 버전 사이를 원자적으로 전환하므로 이전 버전으로 다시 지정하면 롤백된다. 읽을 때 문서 해시와 구조를 다시 확인한다. 현재 DB 스키마는 `PRAGMA user_version=1`이며 더 높은 버전은 구버전 바이너리에서 거부한다.
@@ -32,7 +38,9 @@ CKG·CKV와 함께 쓰는 승격 경로는 `PutAligned`와 `ActivateAligned`다.
 cks semantic build --repo /path/to/repo --project-id sample --dataset-id cut-001 \
   --graph /path/to/dataset/graph --vector /path/to/dataset/vector \
   --store /path/to/semantic.db --out /path/to/projection.json \
-  --docs README.md --docs docs/spec.md --min-canonical-ratio 0.94 --activate
+  --docs README.md --docs docs/spec.md \
+  --ontology docs/spec-driven/ontology-pilot.yaml \
+  --min-canonical-ratio 0.94 --activate
 cks semantic review --input /path/to/projection.json --repo /path/to/repo --sample 20
 ```
 
