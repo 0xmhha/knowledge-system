@@ -104,10 +104,10 @@ func (p Projection) Validate() error {
 			return fmt.Errorf("claim %q omits its source section evidence", claim.ID)
 		}
 		switch claim.Status {
-		case StatusProposed, StatusRejected:
-		case StatusVerified:
+		case StatusProposed:
+		case StatusVerified, StatusRejected:
 			if strings.TrimSpace(claim.ReviewedBy) == "" {
-				return fmt.Errorf("verified claim %q needs reviewed_by", claim.ID)
+				return fmt.Errorf("reviewed claim %q needs reviewed_by", claim.ID)
 			}
 		default:
 			return fmt.Errorf("claim %q has invalid status %q", claim.ID, claim.Status)

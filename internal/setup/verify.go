@@ -18,11 +18,13 @@ import (
 // internals) keeps this package on the CLI-contract side of the boundary.
 type graphManifest struct {
 	SchemaVersion string `json:"schema_version"`
+	SrcRoot       string `json:"src_root"`
 	SrcCommit     string `json:"src_commit"`
 	GraphDigest   string `json:"graph_digest"`
 }
 
 type vectorManifest struct {
+	SrcRoot   string `json:"src_root"`
 	SrcCommit string `json:"src_commit"`
 	Sources   *struct {
 		CKG *struct {
@@ -54,6 +56,25 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	var vm vectorManifest
 	if err := readJSON(filepath.Join(vectorDir, "manifest.json"), &vm); err != nil {
 		return fmt.Errorf("verify: vector manifest: %w", err)
+	}
+	// A commit and logical graph digest identify content, but not which source
+	// tree the two builders read. In particular, two checkouts at the same HEAD
+	// can contain different uncommitted files. This check narrows that hole for
+	// setup builds; the working-tree snapshot contract will cover the bytes.
+	if gm.SrcRoot != "" && vm.SrcRoot != "" {
+		graphRoot, err := comparableRoot(gm.SrcRoot)
+		if err != nil {
+			return fmt.Errorf("verify: graph src_root: %w", err)
+		}
+		vectorRoot, err := comparableRoot(vm.SrcRoot)
+		if err != nil {
+			return fmt.Errorf("verify: vector src_root: %w", err)
+		}
+		if graphRoot != vectorRoot {
+			return fmt.Errorf("verify: graph and vector use different source roots (%q, %q)", gm.SrcRoot, vm.SrcRoot)
+		}
+	} else {
+		warn("source root missing on one side — source-tree alignment not verifiable")
 	}
 
 	// Canonical_id — the vector<->graph join key (ADR-007) — exists only from
@@ -96,6 +117,19 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 			gm.GraphDigest, vecPin)
 	}
 	return nil
+}
+
+func comparableRoot(root string) (string, error) {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	// Resolve aliases when the original tree is still present. A copied index
+	// remains comparable through the recorded absolute paths if it is not.
+	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
+		return filepath.Clean(resolved), nil
+	}
+	return filepath.Clean(abs), nil
 }
 
 // parseSchemaVersion splits a "major.minor[.patch]" schema string into its

@@ -1,0 +1,90 @@
+package semantic
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"sort"
+)
+
+// ReviewItem contains everything needed to inspect one proposed claim in
+// its original source. It is a review queue item, not a verified assertion.
+type ReviewItem struct {
+	ClaimID   string         `json:"claim_id"`
+	Statement string         `json:"statement"`
+	Heading   string         `json:"heading"`
+	Evidence  []EvidenceSpan `json:"evidence"`
+}
+
+// ReviewReport separates the measured precision of adjudicated claims from
+// coverage. A nil precision means nobody reviewed a claim yet; reporting 0
+// or 1 there would give a false quality signal.
+type ReviewReport struct {
+	ProjectID string       `json:"project_id"`
+	DatasetID string       `json:"dataset_id"`
+	Total     int          `json:"total"`
+	Proposed  int          `json:"proposed"`
+	Verified  int          `json:"verified"`
+	Rejected  int          `json:"rejected"`
+	Precision *float64     `json:"reviewed_precision"`
+	Sample    []ReviewItem `json:"sample"`
+}
+
+// Review produces a deterministic sample of proposed claims. Salt permits
+// repeatable independent samples; ordering by hash avoids favoring the first
+// document in the extraction order. Only human-adjudicated claims count in
+// precision. Call ValidateSources before using the report for a gate.
+func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
+	if err := p.Validate(); err != nil {
+		return ReviewReport{}, err
+	}
+	if limit < 0 {
+		limit = 0
+	}
+	r := ReviewReport{ProjectID: p.Snapshot.ProjectID, DatasetID: p.Snapshot.DatasetID, Total: len(p.Claims), Sample: []ReviewItem{}}
+	sections := make(map[string]DocumentSection, len(p.Sections))
+	for _, section := range p.Sections {
+		sections[section.ID] = section
+	}
+	evidence := make(map[string]EvidenceSpan, len(p.Evidence))
+	for _, e := range p.Evidence {
+		evidence[e.ID] = e
+	}
+	type ranked struct {
+		key  string
+		item ReviewItem
+	}
+	var candidates []ranked
+	for _, claim := range p.Claims {
+		switch claim.Status {
+		case StatusVerified:
+			r.Verified++
+		case StatusRejected:
+			r.Rejected++
+		case StatusProposed:
+			r.Proposed++
+			item := ReviewItem{ClaimID: claim.ID, Statement: claim.Statement, Heading: sections[claim.SectionID].Heading}
+			for _, id := range claim.EvidenceIDs {
+				item.Evidence = append(item.Evidence, evidence[id])
+			}
+			keyBytes := sha256.Sum256([]byte(salt + "\x00" + p.Snapshot.DatasetID + "\x00" + claim.ID))
+			candidates = append(candidates, ranked{key: hex.EncodeToString(keyBytes[:]), item: item})
+		}
+	}
+	if reviewed := r.Verified + r.Rejected; reviewed > 0 {
+		precision := float64(r.Verified) / float64(reviewed)
+		r.Precision = &precision
+	}
+	sort.Slice(candidates, func(i, j int) bool {
+		if candidates[i].key == candidates[j].key {
+			return candidates[i].item.ClaimID < candidates[j].item.ClaimID
+		}
+		return candidates[i].key < candidates[j].key
+	})
+	if limit > len(candidates) {
+		limit = len(candidates)
+	}
+	for _, candidate := range candidates[:limit] {
+		r.Sample = append(r.Sample, candidate.item)
+	}
+	return r, nil
+}

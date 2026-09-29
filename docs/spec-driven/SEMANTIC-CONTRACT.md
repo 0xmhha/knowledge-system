@@ -12,6 +12,8 @@
 
 `DocumentSection`은 CKV와 동일한 Markdown 제목 파서의 줄 경계를 사용한다. 섹션 추출은 `Claim`을 만들어 사실이라고 주장하지 않는다. `Claim`은 최소한 원천 섹션과 그 섹션의 `EvidenceSpan`을 참조해야 한다. 추출·제안된 주장은 `proposed`로 시작한다. `verified`에는 명시적 `reviewed_by`가 필요하며 승격 전 `ValidateSources`를 통과해야 한다. 검토자가 있더라도 스냅샷이 다르거나 원문 해시가 맞지 않으면 저장할 수 없다. `rejected`는 삭제 대신 검토 이력에 남길 상태다.
 
+`cks semantic review --input projection.json --repo <git-root> --sample 20 --salt <audit-id>`는 JSON 투영의 모든 근거를 기록된 커밋에서 재검증한 뒤 검토 대기 주장 샘플과 집계 JSON을 출력한다. 표본은 데이터셋 ID·주장 ID·salt의 해시로 결정되므로 같은 입력은 같은 목록을 만든다. `verified`와 `rejected` 모두 검토자 ID가 있어야 한다. 정밀도는 **검토된 주장 중 verified 비율**이며 검토 건수가 0이면 `null`이다. 이 수치는 실제로 검토된 표본의 품질만 설명한다. 대표 표본의 외부 검토가 없으면 추출기 전체의 정밀도나 관계 정확도로 해석하지 않는다. 현재 자동 관계 추출과 관계 평가셋은 없다.
+
 코드 근거를 붙일 때는 CKG 공개 읽기 API에서 `canonical_id`를 정확 조회하고, CKG의 소스 커밋·파일·AST 노드 줄 범위가 근거와 일치하는지 검사한다. 이 검사는 원문 SHA-256 검사와 별개이며 `verified`로 자동 승격하지 않는다.
 
 ## SQLite 투영과 롤백

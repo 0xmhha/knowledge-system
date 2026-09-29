@@ -24,6 +24,7 @@ import (
 	"github.com/0xmhha/knowledge-system/cmd/cks/evalgatecli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/filelistcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/mcpcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/semanticcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/setupcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/viewercli"
 )
@@ -47,6 +48,7 @@ func main() {
 	root.AddCommand(agentcli.NewCmd())
 	root.AddCommand(evalcli.NewCmd())
 	root.AddCommand(setupcli.NewCmd())
+	root.AddCommand(semanticcli.NewCmd())
 	root.AddCommand(filelistcli.NewCmd())
 	root.AddCommand(evalgatecli.NewCmd())
 	root.AddCommand(viewercli.NewCmd())
