@@ -44,6 +44,9 @@ type Options struct {
 	OllamaURL string
 	// VectorPolicy is the vector chunk-categorization policy YAML.
 	VectorPolicy string
+	// SemanticCorpus is a separately rendered, reviewed Markdown corpus.
+	// Its manifest is checked against the graph build before CKV consumes it.
+	SemanticCorpus string
 
 	// SkipVector builds only the graph index (and skips alignment
 	// verification, which needs both).
@@ -149,6 +152,9 @@ func BuildPlan(o Options) (Plan, error) {
 	if o.Out == "" {
 		return Plan{}, fmt.Errorf("setup: Out is required")
 	}
+	if o.SemanticCorpus != "" && o.SkipVector {
+		return Plan{}, fmt.Errorf("setup: semantic corpus requires vector build")
+	}
 	graphBin := o.GraphBin
 	if graphBin == "" {
 		graphBin = "ckg"
@@ -232,6 +238,10 @@ func BuildPlan(o Options) (Plan, error) {
 		Title: "Build the graph index",
 		Cmd:   graphCmd,
 	})
+	if o.SemanticCorpus != "" {
+		steps = append(steps, Step{ID: "semantic-corpus-verify", Title: "Verify reviewed text corpus against the graph snapshot",
+			Verify: func(emit func(Event)) error { return VerifyTextCorpus(o.SemanticCorpus, o.GraphDir()) }})
+	}
 
 	if !o.SkipVector {
 		vectorCmd := []string{vectorBin, "build", "--src", o.Src, "--out", o.VectorDir(), "--ckg", o.GraphDir()}
@@ -252,6 +262,9 @@ func BuildPlan(o Options) (Plan, error) {
 		}
 		if o.DomainKnowledge != "" {
 			vectorCmd = append(vectorCmd, "--docs", o.DomainCorpusDir())
+		}
+		if o.SemanticCorpus != "" {
+			vectorCmd = append(vectorCmd, "--docs", o.SemanticCorpus)
 		}
 		if o.FlowCorpus != "" {
 			vectorCmd = append(vectorCmd, "--flow-corpus", o.FlowCorpus)

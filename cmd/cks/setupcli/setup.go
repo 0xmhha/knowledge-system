@@ -50,7 +50,7 @@ const restartNote = "note: running MCP servers still serve the previously opened
 // indexed), and the resolved version directory must not already exist —
 // intentional replacement means deleting it first or naming the version
 // explicitly.
-func resolveAutoVersion(out, src, filelistConfig string) (string, error) {
+func resolveAutoVersion(out, src, filelistConfig, semanticCorpus string) (string, error) {
 	if src == "" {
 		return "", fmt.Errorf("--version auto: --src is required to resolve the source commit")
 	}
@@ -83,6 +83,14 @@ func resolveAutoVersion(out, src, filelistConfig string) (string, error) {
 		}
 		sum := sha256.Sum256(buf)
 		name += "-" + hex.EncodeToString(sum[:])[:8]
+	}
+	if semanticCorpus != "" {
+		buf, err := os.ReadFile(filepath.Join(semanticCorpus, "manifest.json"))
+		if err != nil {
+			return "", fmt.Errorf("--version auto: read semantic corpus manifest: %w", err)
+		}
+		sum := sha256.Sum256(buf)
+		name += "-s" + hex.EncodeToString(sum[:])[:8]
 	}
 	if out != "" {
 		if _, err := os.Stat(filepath.Join(out, name)); err == nil {
@@ -155,6 +163,7 @@ func runSetup(args []string) error {
 	fs.IntVar(&o.EmbedDim, "embed-dim", 0, "vector embedding dimension")
 	fs.StringVar(&o.OllamaURL, "ollama-url", "", "ollama endpoint (exported as CKV_OLLAMA_ENDPOINT)")
 	fs.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
+	fs.StringVar(&o.SemanticCorpus, "semantic-corpus", "", "reviewed semantic Markdown corpus directory from cks semantic export-text")
 	fs.StringVar(&o.FilelistConfig, "filelist", "", "filelist config; derives <out>/files-from.json and scopes both engine builds")
 	fs.StringVar(&o.DomainKnowledge, "domain-knowledge", "", "project domain-knowledge dir; re-derives the corpus, governance policy and glossary before the builds")
 	fs.StringVar(&o.DerivedDir, "derived-dir", "", "where the derived domain artifacts land (default: generated/ beside domain-knowledge)")
@@ -198,6 +207,7 @@ func runSetup(args []string) error {
 		merge("model-name", &o.ModelName, base.ModelName)
 		merge("ollama-url", &o.OllamaURL, base.OllamaURL)
 		merge("vector-policy", &o.VectorPolicy, base.VectorPolicy)
+		merge("semantic-corpus", &o.SemanticCorpus, base.SemanticCorpus)
 		merge("filelist", &o.FilelistConfig, base.FilelistConfig)
 		merge("domain-knowledge", &o.DomainKnowledge, base.DomainKnowledge)
 		merge("derived-dir", &o.DerivedDir, base.DerivedDir)
@@ -245,7 +255,7 @@ func runSetup(args []string) error {
 		// Blue-green: build a new version, gate it, promote current on success.
 		ver := *version
 		if ver == "auto" {
-			resolved, err := resolveAutoVersion(o.Out, o.Src, o.FilelistConfig)
+			resolved, err := resolveAutoVersion(o.Out, o.Src, o.FilelistConfig, o.SemanticCorpus)
 			if err != nil {
 				return err
 			}

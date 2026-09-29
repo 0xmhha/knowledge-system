@@ -50,7 +50,9 @@ cks semantic review --input /path/to/projection.json --repo /path/to/repo --samp
 
 `--min-canonical-ratio`는 프로젝트 실측 기준으로 선택한다. 0이면 게이트를 끄며, 양수이면 CKV 매니페스트의 `canonical_count / symbol_count`가 기준보다 낮거나 카운터가 없을 때 승격을 막는다. 예시의 0.94는 이 프로젝트의 구조 기준선(약 94.28%)에 맞춘 값이지 다른 저장소의 기본값이 아니다. 실제 임베딩 검색 품질과는 별도 지표다.
 
-CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호출자는 `Store.CurrentAligned`로 활성 투영을 다시 검증해 전달할 수 있다. 질의의 선호·대체 용어를 복수 개념 후보로 해석하고, `verified` 개념과 `verified IMPLEMENTED_BY` 관계가 CKV 결과의 canonical ID·커밋·파일·줄과 일치할 때만 기존 상위 K 인용의 점수를 최대 20% 올린다. 동점 의미를 합치거나 결과를 새로 추가하지 않는다. 오류가 나면 기존 검색 결과를 유지한다. 현재 CKS CLI/MCP에서는 이 옵션을 전달하지 않아 기본 검색은 기존 CKV+CKG 경로 그대로다. CKV 텍스트 투영과 실제 임베딩 모델의 A/B 품질·지연 평가가 남아 있으므로 운영 기본 활성화는 보류한다.
+CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호출자는 `Store.CurrentAligned`로 활성 투영을 다시 검증해 전달할 수 있다. 질의의 선호·대체 용어를 복수 개념 후보로 해석하고, `verified` 개념과 `verified IMPLEMENTED_BY` 관계가 CKV 결과의 canonical ID·커밋·파일·줄과 일치할 때만 기존 상위 K 인용의 점수를 최대 20% 올린다. 동점 의미를 합치거나 결과를 새로 추가하지 않는다. 오류가 나면 기존 검색 결과를 유지한다. 현재 CKS CLI/MCP에서는 이 옵션을 전달하지 않아 기본 검색은 기존 CKV+CKG 경로 그대로다. 실제 임베딩 모델의 A/B 품질·지연 평가가 남아 있으므로 운영 기본 활성화는 보류한다.
+
+검토된 의미 텍스트는 `cks semantic export-text --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --out <new-corpus-dir>`로 별도 디렉터리에 출력할 수 있다. 출력은 `verified` 개념·요구사항만 포함하고 ID 순서에 따라 결정적인 Markdown 파일명·내용을 생성한다. `manifest.json`은 원본 저장소, 커밋, 의미 투영 SHA-256과 모든 Markdown 바이트의 SHA-256을 기록한다. 제안·거부 상태의 항목은 제외된다. `cks setup --src <repo> --out <dataset> --version <new-version> --semantic-corpus <new-corpus-dir> ...`는 그래프 빌드 후 코퍼스의 저장소·커밋·파일 목록·해시를 검증한 다음 CKV의 추가 문서 루트로 전달한다. 바이트 변경, 다른 프로젝트, 추가 Markdown은 벡터 빌드 전 실패하며 활성 데이터셋은 유지된다. 현재 스모크는 mock 임베더의 구조 검색만 검증한다. 자연어 품질이 입증될 때까지 온톨로지 재순위 기본값은 그대로 꺼져 있다.
 
 ## 요구사항과 수용 기준 입력
 

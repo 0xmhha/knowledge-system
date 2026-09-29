@@ -33,6 +33,7 @@ func NewCmd() *cobra.Command {
 	cmd.AddCommand(newPlanCmd())
 	cmd.AddCommand(newTestCmd())
 	cmd.AddCommand(newAnnotatePackCmd())
+	cmd.AddCommand(newExportTextCmd())
 	return cmd
 }
 

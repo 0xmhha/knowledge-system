@@ -173,6 +173,35 @@ PY
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" --input "$scratch/base-pack.json" \
   --out "$scratch/annotated-pack.json"
+"$repo_root/bin/cks" semantic export-text --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --out "$scratch/semantic-corpus" \
+  > "$scratch/semantic-corpus-export.json"
+"$repo_root/bin/cks" setup --src "$src" --out "$dataset" --embedder mock \
+  --version smoke-semantic --semantic-corpus "$scratch/semantic-corpus" \
+  --gate-min-canonical 0.4 --progress text > "$scratch/semantic-corpus-reindex.log" 2>&1
+"$repo_root/bin/ckv" --embedder mock query "Alpha behavior" \
+  --out "$dataset/current/vector" --lang markdown --threshold -1 --json \
+  > "$scratch/semantic-corpus-query.json" 2> "$scratch/semantic-corpus-query.log"
+python3 - "$scratch/semantic-corpus-export.json" "$scratch/semantic-corpus-query.json" "$dataset/current/vector/manifest.json" <<'PY'
+import json, sys
+export = json.load(open(sys.argv[1], encoding='utf-8'))
+query = json.load(open(sys.argv[2], encoding='utf-8'))
+vector = json.load(open(sys.argv[3], encoding='utf-8'))
+assert len(export['files']) == 2 and export['snapshot']['dataset_id'] == 'smoke-reviewed', export
+assert vector['docs_roots'] and query['hits'], (vector, query)
+assert any('concept-' in hit['citation']['file'] for hit in query['hits']), query
+PY
+cp -R "$scratch/semantic-corpus" "$scratch/semantic-corpus-tampered"
+printf '\nUnreviewed edit.\n' >> "$(find "$scratch/semantic-corpus-tampered" -name 'concept-*.md' -print -quit)"
+if "$repo_root/bin/cks" setup --src "$src" --out "$dataset" --embedder mock \
+  --version smoke-semantic-tampered --semantic-corpus "$scratch/semantic-corpus-tampered" \
+  --gate-min-canonical 0.4 --progress text > "$scratch/semantic-corpus-tampered.log" 2>&1; then
+  echo "tampered semantic corpus was indexed" >&2
+  exit 1
+fi
+test "$(readlink "$dataset/current")" = smoke-semantic
+"$repo_root/bin/cks" setup --out "$dataset" --rollback smoke > "$scratch/semantic-corpus-rollback.log" 2>&1
 "$repo_root/bin/cks" mcp gen-config --dataset-dir "$dataset/current" \
   --name ks-fixture --source-root "$src" --out "$config"
 python3 - "$config" <<'PY'

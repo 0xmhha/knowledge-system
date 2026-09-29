@@ -24,6 +24,7 @@ type fileConfig struct {
 	EmbedDim            int    `yaml:"embed_dim"`
 	OllamaURL           string `yaml:"ollama_url"`
 	VectorPolicy        string `yaml:"vector_policy"`
+	SemanticCorpus      string `yaml:"semantic_corpus"`
 	SkipVector          bool   `yaml:"skip_vector"`
 	Filelist            string `yaml:"filelist"`
 	DomainKnowledge     string `yaml:"domain_knowledge"`
@@ -64,6 +65,7 @@ func LoadConfig(path string) (Options, error) {
 		EmbedDim:            fc.EmbedDim,
 		OllamaURL:           fc.OllamaURL,
 		VectorPolicy:        rel(fc.VectorPolicy),
+		SemanticCorpus:      rel(fc.SemanticCorpus),
 		SkipVector:          fc.SkipVector,
 		FilelistConfig:      rel(fc.Filelist),
 		DomainKnowledge:     rel(fc.DomainKnowledge),
