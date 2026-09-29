@@ -48,7 +48,11 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
     dirty = bool(run("git", "status", "--porcelain"))
     if dirty and not allow_dirty:
         raise RuntimeError("working tree is dirty; commit changes before packaging or pass --allow-dirty for a preview")
-    subprocess.run(["make", "build-bins"], cwd=ROOT, check=True)
+    # Keep stdout a single JSON object for callers that automate packaging.
+    # The build transcript is shown on failure without corrupting that contract.
+    build = subprocess.run(["make", "build-bins"], cwd=ROOT, text=True, capture_output=True)
+    if build.returncode != 0:
+        raise RuntimeError(f"build-bins failed:\n{build.stdout}{build.stderr}")
     commit = run("git", "rev-parse", "HEAD")
     system = platform.system().lower()
     machine = platform.machine().lower()

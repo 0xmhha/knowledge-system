@@ -12,6 +12,8 @@ python3 scripts/package-host.py --out-dir /tmp/knowledge-system-dist
 
 출력 JSON의 `sha256`으로 압축 파일을 확인하고 해제한다. 압축 파일에는 `ckg`, `ckv`, `cks`, `LICENSE`, `INSTALLATION.md`, 소독 규칙, `modules.txt`, `manifest.json`이 들어 있다. `manifest.json`에는 바이너리별 SHA-256·크기, 빌드 커밋, 호스트, Go 버전, 감지한 네이티브 의존성이 기록된다. 작업 트리가 더러울 때 프리뷰가 필요하면 `--allow-dirty`를 명시하며, 매니페스트가 `dirty: true`로 표시된다. 배포 가능 판정은 아니다.
 
+현재 호스트에서 압축 파일 자체를 확인하려면 `scripts/wbs-package-smoke.sh`를 실행한다. 아카이브와 내부 바이너리의 해시를 검증하고, 압축 해제한 바이너리·소독 규칙만 사용해 아래 세 유형의 독립 프로젝트에서 설치와 CKS MCP 질의를 실행한다. 이 스모크에도 현재 호스트의 Go·Git 도구와 mock 임베더가 필요하며 OS/CPU 호환성 판정은 아니다.
+
 ## 2. 프로젝트별 초기화
 
 압축을 푼 디렉터리에서 **다른 Git 저장소**에도 동일한 절차를 적용한다. 데이터셋은 소스 트리 밖에 둔다.

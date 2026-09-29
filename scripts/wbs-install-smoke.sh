@@ -4,6 +4,8 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bin_dir="${KS_BIN_DIR:-$repo_root/bin}"
+sanitize_rules="${KS_SANITIZE_RULES:-$repo_root/system/policies/sanitization_rules.yaml}"
 scratch="${KS_INSTALL_SMOKE_DIR:-$(mktemp -d)}"
 for kind in empty-go typescript unsupported-python; do
   src="$scratch/$kind/src"
@@ -25,18 +27,19 @@ for kind in empty-go typescript unsupported-python; do
   git -C "$src" add .
   git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
     -c user.email=codex@example.com commit -qm fixture
-  "$repo_root/bin/cks" init --src "$src" --dataset "$dataset" \
+  "$bin_dir/cks" init --src "$src" --dataset "$dataset" \
     --config-out "$config" --embedder mock > "$scratch/$kind/init.json"
-  "$repo_root/bin/cks" setup --config "$config" --version auto \
+  "$bin_dir/cks" setup --config "$config" --version auto \
     --progress text > "$scratch/$kind/setup.log" 2>&1
-  "$repo_root/bin/cks" doctor --src "$src" --dataset "$dataset" \
+  "$bin_dir/cks" doctor --src "$src" --dataset "$dataset" \
     > "$scratch/$kind/doctor.json"
-  "$repo_root/bin/ckv" --embedder mock query "committed guide" \
+  "$bin_dir/ckv" --embedder mock query "committed guide" \
     --out "$dataset/current/vector" --threshold -1 --json \
     > "$scratch/$kind/query.json" 2> "$scratch/$kind/query.log"
   mcp_config="$scratch/$kind/mcp.yaml"
-  "$repo_root/bin/cks" mcp gen-config --dataset-dir "$dataset/current" \
-    --name "ks-$kind" --source-root "$src" --out "$mcp_config" \
+  "$bin_dir/cks" mcp gen-config --dataset-dir "$dataset/current" \
+    --name "ks-$kind" --source-root "$src" --sanitize-rules "$sanitize_rules" \
+    --out "$mcp_config" \
     > "$scratch/$kind/mcp-config.log"
   python3 - "$mcp_config" <<'PY'
 from pathlib import Path
@@ -53,14 +56,14 @@ for before, after in (
     s = s.replace(before, after)
 p.write_text(s)
 PY
-  python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" \
+  python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$bin_dir/cks" \
     "$mcp_config" --once "Where is the committed guide for $kind?" \
     > "$scratch/$kind/mcp.json"
-  python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" \
+  python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$bin_dir/cks" \
     "$mcp_config" --once "Where is the committed guide for $kind?" \
     > "$scratch/$kind/mcp-restarted.json"
   if [[ "$kind" == typescript ]]; then
-    python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" \
+    python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$bin_dir/cks" \
       "$mcp_config" --once "Where is greet function implemented?" \
       > "$scratch/$kind/mcp-code.json"
   fi
