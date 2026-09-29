@@ -107,6 +107,65 @@ func TestChunkIDsDeterministic(t *testing.T) {
 	}
 }
 
+func TestLongMarkdownSectionKeepsTailAndLineCitations(t *testing.T) {
+	text := "# Decision\n\n" + strings.Repeat("A short opening paragraph.\n", 8) +
+		"\nThe final requirement is QUORUM_TAIL.\n"
+	in := Input{
+		File: "docs/decision.md", Language: "markdown", CommitHash: "abc",
+		Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "decision", Kind: types.KindDocSection,
+			StartLine: 1, EndLine: strings.Count(text, "\n"), Text: text,
+			HeadingPath: []string{"Architecture", "Decision"}}},
+	}
+	chunks := New(Options{MaxInputTokens: 20}).Chunk(in)
+	if len(chunks) < 2 {
+		t.Fatalf("long section was not split: %d chunks", len(chunks))
+	}
+	var combined strings.Builder
+	parentID := chunks[0].ParentID
+	for i, ch := range chunks {
+		if ch.ChunkKind != types.ChunkDoc {
+			t.Fatalf("unexpected kind: %s", ch.ChunkKind)
+		}
+		if len(ch.Text) > 20*charsPerToken {
+			t.Fatalf("child too long: %d", len(ch.Text))
+		}
+		if parentID == "" || ch.ParentID != parentID || ch.ParentStartLine != 1 || ch.ParentEndLine != in.Spans[0].EndLine || ch.PartOrdinal != i+1 {
+			t.Fatalf("invalid parent/ordinal metadata: %+v", ch)
+		}
+		if len(ch.HeadingPath) != 2 || ch.HeadingPath[1] != "Decision" {
+			t.Fatalf("heading path lost: %+v", ch.HeadingPath)
+		}
+		combined.WriteString(ch.Text)
+	}
+	if combined.String() != text {
+		t.Fatalf("section content changed or lost")
+	}
+	last := chunks[len(chunks)-1]
+	if !strings.Contains(last.Text, "QUORUM_TAIL") || last.EndLine != in.Spans[0].EndLine {
+		t.Fatalf("tail missing or cited at wrong line: %+v", last)
+	}
+}
+
+func TestLongSingleMarkdownLineHasDistinctChildIDs(t *testing.T) {
+	text := "# Heading\n" + strings.Repeat("A", 160) + "\n"
+	in := Input{File: "long.md", Language: "markdown", CommitHash: "abc", Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "heading", Kind: types.KindDocSection, StartLine: 1, EndLine: 2, Text: text}}}
+	chunks := New(Options{MaxInputTokens: 20}).Chunk(in)
+	seen := map[string]bool{}
+	var joined strings.Builder
+	for _, ch := range chunks {
+		if seen[ch.ID] {
+			t.Fatalf("duplicate ID for repeated fragment: %s", ch.ID)
+		}
+		seen[ch.ID] = true
+		joined.WriteString(ch.Text)
+	}
+	if joined.String() != text {
+		t.Fatalf("single-line split lost source text")
+	}
+}
+
 func TestTruncationKeepsHeadAndMarker(t *testing.T) {
 	long := strings.Repeat("a", 1000)
 	in := Input{

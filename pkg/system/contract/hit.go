@@ -35,12 +35,16 @@ const (
 // Both are omitempty for backward compatibility with hits that pre-date the
 // alignment work.
 type Hit struct {
-	Citation    Citation  `json:"citation"`
-	Rank        int       `json:"rank"`
-	Score       float64   `json:"score"`
-	Source      HitSource `json:"source,omitempty"`
-	Symbol      string    `json:"symbol,omitempty"`
-	CanonicalID string    `json:"canonical_id,omitempty"`
+	Citation Citation `json:"citation"`
+	// ParentCitation is the source section containing a split document hit.
+	// Its lines are not covered by Citation and require their own citation.
+	ParentCitation *Citation `json:"parent_citation,omitempty"`
+	HeadingPath    string    `json:"heading_path,omitempty"`
+	Rank           int       `json:"rank"`
+	Score          float64   `json:"score"`
+	Source         HitSource `json:"source,omitempty"`
+	Symbol         string    `json:"symbol,omitempty"`
+	CanonicalID    string    `json:"canonical_id,omitempty"`
 	// ChunkKind is ckv's chunking-strategy label (symbol, doc, invariant,
 	// convention, …). Lets downstream stages route knowledge chunks (the
 	// budget allocator's knowledge quota) without a second query. Empty

@@ -145,10 +145,9 @@ func findModuleDirs(absRoot string) ([]string, error) {
 // in the build cache OUTSIDE srcRoot — callers must filter those by relpath
 // when projecting back to source-tree paths.
 //
-// Per-package errors (pkg.Errors) are intentionally NOT propagated: a single
-// package failing to type-check should not abort discovery of every other
-// module. This mirrors `go list ./...` tolerance and matches audit's prior
-// behavior.
+// Type-check errors in packages with discoverable files are tolerated. A
+// fileless package with a go-list error is different: a broken toolchain or
+// cache can otherwise turn a Go repository into a successful empty index.
 func loadModule(modDir string, mode GoPackagesLoadMode) ([]*packages.Package, error) {
 	cfg := &packages.Config{
 		Mode:  loadModeBits(mode),
@@ -159,7 +158,24 @@ func loadModule(modDir string, mode GoPackagesLoadMode) ([]*packages.Package, er
 	if err != nil {
 		return nil, fmt.Errorf("packages.Load in %s: %w", modDir, err)
 	}
+	if err := validateLoadedPackages(modDir, pkgs); err != nil {
+		return nil, err
+	}
 	return pkgs, nil
+}
+
+func validateLoadedPackages(modDir string, pkgs []*packages.Package) error {
+	for _, pkg := range pkgs {
+		if len(pkg.GoFiles) != 0 {
+			continue
+		}
+		for _, pkgErr := range pkg.Errors {
+			if pkgErr.Kind == packages.ListError {
+				return fmt.Errorf("go package list in %s (%s): %s", modDir, pkg.ID, pkgErr.Msg)
+			}
+		}
+	}
+	return nil
 }
 
 // loadModeBits maps the public GoPackagesLoadMode to packages.LoadMode bits.

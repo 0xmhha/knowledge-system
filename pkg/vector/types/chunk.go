@@ -199,17 +199,25 @@ type ModificationGuidance struct {
 // produced by parse → chunk; the embedder turns Text into a vector and
 // the store persists everything except Text-derived caches.
 type Chunk struct {
-	ID              string                `json:"id"` // see ChunkID
-	File            string                `json:"file"`
-	StartLine       int                   `json:"start_line"`
-	EndLine         int                   `json:"end_line"`
-	Language        string                `json:"language"`          // "go" | "typescript" | "solidity" | "markdown"
-	IsTest          bool                  `json:"is_test,omitempty"` // _test.go, *.test.ts, *.spec.ts, *.t.sol, test/... — populated by IsTestPath
-	SymbolName      string                `json:"symbol_name,omitempty"`
-	SymbolKind      SymbolKind            `json:"symbol_kind,omitempty"`
-	ChunkKind       ChunkKind             `json:"chunk_kind"`
-	CommitHash      string                `json:"commit_hash"`
-	ContentSHA256   string                `json:"content_sha256"`
+	ID            string     `json:"id"` // see ChunkID
+	File          string     `json:"file"`
+	StartLine     int        `json:"start_line"`
+	EndLine       int        `json:"end_line"`
+	Language      string     `json:"language"`          // "go" | "typescript" | "solidity" | "markdown"
+	IsTest        bool       `json:"is_test,omitempty"` // _test.go, *.test.ts, *.spec.ts, *.t.sol, test/... — populated by IsTestPath
+	SymbolName    string     `json:"symbol_name,omitempty"`
+	SymbolKind    SymbolKind `json:"symbol_kind,omitempty"`
+	ChunkKind     ChunkKind  `json:"chunk_kind"`
+	CommitHash    string     `json:"commit_hash"`
+	ContentSHA256 string     `json:"content_sha256"`
+	// Long Markdown sections are searched as child chunks. ParentID names
+	// the complete heading-bounded source span (which is not embedded when
+	// over the model cap); line bounds allow source-backed expansion.
+	ParentID        string                `json:"parent_id,omitempty"`
+	ParentStartLine int                   `json:"parent_start_line,omitempty"`
+	ParentEndLine   int                   `json:"parent_end_line,omitempty"`
+	PartOrdinal     int                   `json:"part_ordinal,omitempty"`
+	HeadingPath     []string              `json:"heading_path,omitempty"`
 	CanonicalID     string                `json:"canonical_id,omitempty"`     // ckg's import-path-qualified symbol id (ADR-0001), copied verbatim from the aligned ckg node; the stable key cks uses to FindByCanonicalID against ckg
 	RecentPRs       []PRRef               `json:"recent_prs,omitempty"`       // PRs that touched this chunk's file
 	Category        string                `json:"category,omitempty"`         // policy category: consensus|state|crypto|p2p|... (empty = unclassified)
@@ -244,6 +252,15 @@ func (c Chunk) Citation() Citation {
 func ChunkID(file string, startLine, endLine int, contentSHA256 string) string {
 	h := sha256.New()
 	fmt.Fprintf(h, "%s\n%d:%d\n%s", file, startLine, endLine, contentSHA256)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// ChunkFragmentID adds a byte offset for multiple pieces of one oversized
+// source line. Plain ChunkID would collide when two pieces have identical
+// text and therefore the same file, line range, and content hash.
+func ChunkFragmentID(file string, startLine, endLine, startByte int, contentSHA256 string) string {
+	h := sha256.New()
+	fmt.Fprintf(h, "fragment\n%s\n%d:%d:%d\n%s", file, startLine, endLine, startByte, contentSHA256)
 	return hex.EncodeToString(h.Sum(nil))
 }
 

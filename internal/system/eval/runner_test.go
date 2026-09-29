@@ -127,6 +127,30 @@ func TestRunner_Execute_HappyPath_ComputesMetrics(t *testing.T) {
 	}
 }
 
+func TestRunner_Execute_CitationAbstention(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		citations []contract.Citation
+		want      bool
+	}{
+		{name: "none", want: true},
+		{name: "unrelated", citations: []contract.Citation{cit("unrelated.go", 1, 2)}, want: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pack := contract.EvidencePack{Query: "missing API", Citations: tc.citations}
+			r := &Runner{client: &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{toolGetForTask: packResult(pack)}}}
+			s := &Scenario{Version: 1, Name: "missing-api", Prompt: "missing API", MatchMode: MatchOverlap, Runs: 1, ExpectNoCitations: true}
+			got, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.CitationAbstentionPassed == nil || *got.CitationAbstentionPassed != tc.want {
+				t.Fatalf("citation abstention=%v, want %v", got.CitationAbstentionPassed, tc.want)
+			}
+		})
+	}
+}
+
 func TestRunner_Execute_TakesMedianAcrossRuns(t *testing.T) {
 	t.Parallel()
 	// Runs=3 → three identical calls. Backend returns the same pack

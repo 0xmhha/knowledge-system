@@ -68,6 +68,17 @@ prompt: anything
 	}
 }
 
+func TestParseScenario_NoCitationContract(t *testing.T) {
+	s, err := ParseScenario([]byte("version: 1\nname: absent\nprompt: nonexistent API\nexpect_no_citations: true\n"))
+	if err != nil || !s.ExpectNoCitations {
+		t.Fatalf("no-citation scenario: scenario=%+v err=%v", s, err)
+	}
+	_, err = ParseScenario([]byte("version: 1\nname: conflict\nprompt: contradictory\nexpect_no_citations: true\nexpected_citations:\n  - file: a.go\n    start_line: 1\n    end_line: 1\n"))
+	if err == nil {
+		t.Fatal("expected no-citation/expected-citation conflict")
+	}
+}
+
 func TestParseScenario_RejectsWrongVersion(t *testing.T) {
 	t.Parallel()
 	yaml := `version: 2

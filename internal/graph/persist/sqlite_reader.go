@@ -72,18 +72,15 @@ func (s *sqliteStore) FindByCanonicalID(canonicalID string) (types.Node, bool, e
 	return n, true, nil
 }
 
-// DistinctFilePaths returns the unique file_path values recorded on nodes
-// for the given language. Used by `ckg audit` to compare the DB's actual
-// file inclusion set against an authoritative reference (e.g. the Go build
-// system's go/packages.Load output). Empty slice when no rows match.
+// DistinctFilePaths returns the paths of current File nodes for a language.
+// Historical Hunk nodes retain the language of the changed file, so using
+// every node would make `ckg audit` count deleted files as current files.
+// Empty slice when no File nodes match.
 //
-// The `file_path != ”` predicate is defensive — currently every node-emitting
-// site populates FilePath unconditionally — but kept so that introducing a
-// new node type (e.g. cross-file aggregator) without a file_path won't
-// silently inflate the audit set with empty-string paths.
+// The non-empty path predicate remains defensive for malformed File nodes.
 func (s *sqliteStore) DistinctFilePaths(language string) ([]string, error) {
 	rows, err := s.db.Query(
-		`SELECT DISTINCT file_path FROM nodes WHERE language = ? AND file_path != ''`,
+		`SELECT DISTINCT file_path FROM nodes WHERE language = ? AND type = 'File' AND file_path != ''`,
 		language)
 	if err != nil {
 		return nil, fmt.Errorf("distinct file_path (lang=%q): %w", language, err)

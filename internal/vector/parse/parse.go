@@ -20,6 +20,9 @@ type SymbolSpan struct {
 	StartLine int
 	EndLine   int
 	Text      string // raw source for this span (signature + body)
+	// HeadingPath is populated for Markdown sections, from outermost to
+	// innermost heading. Source-code parsers leave it empty.
+	HeadingPath []string
 }
 
 // Parser is the contract every per-language parser fulfills.

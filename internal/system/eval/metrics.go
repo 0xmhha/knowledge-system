@@ -111,9 +111,10 @@ func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (prec
 		return 0, 0, 0
 	}
 	if len(expected) == 0 {
-		// No ground truth: nothing we returned can be disproved.
-		// Recall is trivially 1.0 (zero misses); precision likewise.
-		return 1.0, 1.0, 1.0
+		// With no expected citation, an actual citation cannot be counted
+		// as correct. Recall has no misses, but precision and F1 are zero.
+		// Explicit abstention is evaluated separately by the scenario guard.
+		return 0, 1.0, 0
 	}
 
 	m := matcher(mode)

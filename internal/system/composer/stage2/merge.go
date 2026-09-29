@@ -30,9 +30,10 @@ import (
 // audit log and Phase E evaluation can answer "why did this citation
 // score this high" without rerunning the search.
 type ScoredCitation struct {
-	Citation contract.Citation
-	Score    float64
-	Sources  []string
+	Citation       contract.Citation
+	ParentCitation *contract.Citation
+	Score          float64
+	Sources        []string
 	// ChunkKind is ckv's chunk-strategy label, carried from the hit that
 	// first introduced this citation (empty for ckg-only citations).
 	// The budget allocator's knowledge quota routes on it.
@@ -81,6 +82,14 @@ func (a *aggregator) addCkvList(hits []contract.Hit) {
 		rank := i + 1
 		contribution := a.ckvWeight / float64(a.rrfK+rank)
 		sc := a.entry(h.Citation)
+		if sc.ParentCitation == nil && h.ParentCitation != nil &&
+			h.ParentCitation.File == h.Citation.File &&
+			h.ParentCitation.CommitHash == h.Citation.CommitHash &&
+			h.ParentCitation.StartLine <= h.Citation.StartLine &&
+			h.ParentCitation.EndLine >= h.Citation.EndLine {
+			parent := *h.ParentCitation
+			sc.ParentCitation = &parent
+		}
 		if sc.ChunkKind == "" {
 			sc.ChunkKind = h.ChunkKind
 		}

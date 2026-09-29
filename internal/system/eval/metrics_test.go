@@ -118,15 +118,12 @@ func TestPrecisionRecall_EmptyActualZerosBoth(t *testing.T) {
 	}
 }
 
-func TestPrecisionRecall_EmptyExpectedYieldsPrecisionRecallSemantic(t *testing.T) {
+func TestPrecisionRecall_EmptyExpectedDoesNotRewardUnrelatedCitation(t *testing.T) {
 	t.Parallel()
-	// No ground truth: precision is undefined (we picked 1.0 as
-	// "trivially correct" since no false-positive can be proven),
-	// recall is 1.0 (no missed citations), f1 follows.
 	actual := []contract.Citation{cit("a.go", 1, 10)}
-	p, r, _ := precisionRecall(nil, actual, MatchOverlap)
-	if !approxEq(p, 1.0) || !approxEq(r, 1.0) {
-		t.Errorf("empty expected: P=%.2f R=%.2f, want 1/1", p, r)
+	p, r, f := precisionRecall(nil, actual, MatchOverlap)
+	if p != 0 || r != 1 || f != 0 {
+		t.Errorf("empty expected: P/R/F=%.2f/%.2f/%.2f, want 0/1/0", p, r, f)
 	}
 }
 

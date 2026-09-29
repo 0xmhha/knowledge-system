@@ -254,11 +254,15 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	seedSelected := 0
 	knowledgeSelected := 0
 	exactSymbolRescued := map[string]bool{}
+	selectedKeys := map[string]bool{}
 
 	used := 0
 	processed := 0
 	for _, c := range candidates {
 		processed++
+		if c.ParentOf != "" && !selectedKeys[c.ParentOf] {
+			continue
+		}
 		// Domain-knowledge chunks get a reserved slot because they arrive
 		// from a kind-scoped retrieval, rank below code seeds, and would
 		// never survive a plain greedy pass.
@@ -367,6 +371,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 			ChunkKind:     c.ChunkKind,
 			Sources:       c.Sources,
 		})
+		selectedKeys[c.Citation.Key()] = true
 		used += tokens
 		if c.Origin == OriginSeed {
 			seedSelected++
@@ -450,6 +455,9 @@ type candidate struct {
 	Citation contract.Citation
 	Score    float64
 	Origin   string
+	// ParentOf is set for a nearby document context span. It may enter the
+	// pack only when its matched child was selected first.
+	ParentOf string
 	// ChunkKind is ckv's chunk label (invariant/convention/…); empty for
 	// code chunks and neighbors. Drives the knowledge reserve.
 	ChunkKind string
@@ -462,7 +470,7 @@ type candidate struct {
 // defensive backstop — if a future Stage 3 change breaks the guard,
 // the allocator still produces sensible output.
 func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNeighbor) []candidate {
-	out := make([]candidate, 0, len(seeds)+len(neighbors))
+	out := make([]candidate, 0, len(seeds)*3+len(neighbors))
 	for _, s := range seeds {
 		out = append(out, candidate{
 			Citation:  s.Citation,
@@ -471,6 +479,25 @@ func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNei
 			ChunkKind: s.ChunkKind,
 			Sources:   s.Sources,
 		})
+		// A split Markdown child is the cited match. Fetch only a bounded
+		// window on either side, each with its own source-line citation.
+		// This avoids relabeling parent text as if the child citation covered it.
+		if s.ChunkKind == "doc" && s.ParentCitation != nil &&
+			s.ParentCitation.File == s.Citation.File &&
+			s.ParentCitation.CommitHash == s.Citation.CommitHash &&
+			s.ParentCitation.StartLine <= s.Citation.StartLine &&
+			s.ParentCitation.EndLine >= s.Citation.EndLine {
+			parent := s.ParentCitation
+			const contextLines = 6
+			if s.Citation.StartLine > parent.StartLine {
+				start := max(parent.StartLine, s.Citation.StartLine-contextLines)
+				out = append(out, candidate{Citation: contract.Citation{File: s.Citation.File, StartLine: start, EndLine: s.Citation.StartLine - 1, CommitHash: s.Citation.CommitHash}, Score: s.Score * 0.999, Origin: OriginSeed, ParentOf: s.Citation.Key(), ChunkKind: "doc_context", Sources: []string{"ckv:parent-before"}})
+			}
+			if s.Citation.EndLine < parent.EndLine {
+				end := min(parent.EndLine, s.Citation.EndLine+contextLines)
+				out = append(out, candidate{Citation: contract.Citation{File: s.Citation.File, StartLine: s.Citation.EndLine + 1, EndLine: end, CommitHash: s.Citation.CommitHash}, Score: s.Score * 0.998, Origin: OriginSeed, ParentOf: s.Citation.Key(), ChunkKind: "doc_context", Sources: []string{"ckv:parent-after"}})
+			}
+		}
 	}
 	for _, n := range neighbors {
 		out = append(out, candidate{

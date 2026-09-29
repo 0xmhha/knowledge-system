@@ -138,7 +138,11 @@ type Options struct {
 type Hit struct {
 	ChunkID  string         `json:"chunk_id"`
 	Citation types.Citation `json:"citation"`
-	Snippet  string         `json:"snippet"`
+	// ParentCitation bounds the source section of a split Markdown child.
+	// Callers may fetch nearby lines, but must cite those lines separately.
+	ParentCitation *types.Citation `json:"parent_citation,omitempty"`
+	HeadingPath    string          `json:"heading_path,omitempty"`
+	Snippet        string          `json:"snippet"`
 	// Density names which 3-tier ladder rung this Snippet was rendered
 	// at (DensityFull / DensitySignature5 / DensitySignatureOnly).
 	// Useful for downstream UIs that want to badge compressed hits or

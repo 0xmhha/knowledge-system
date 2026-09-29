@@ -2,6 +2,8 @@ package sqlitevec
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -92,6 +94,143 @@ func TestStoreFilterByLanguage(t *testing.T) {
 	}
 	if len(got) != 1 || got[0].Chunk.ID != "b" {
 		t.Fatalf("expected only ts chunk 'b', got %+v", got)
+	}
+}
+
+func TestStorePreservesDocumentParentMetadata(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "docs.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx := context.Background()
+	doc := mkChunk("doc-child", "README.md", "tail paragraph", 40, 42, "markdown", types.KindDocSection)
+	doc.ChunkKind = types.ChunkDoc
+	doc.ParentID, doc.ParentStartLine, doc.ParentEndLine = "parent-id", 10, 50
+	doc.PartOrdinal = 3
+	doc.HeadingPath = []string{"System", "Search"}
+	if err := s.Upsert(ctx, []types.Chunk{doc}, [][]float32{{1, 0, 0, 0}}); err != nil {
+		t.Fatal(err)
+	}
+	got, err := s.LookupByIDs(ctx, []string{doc.ID})
+	if err != nil || len(got) != 1 {
+		t.Fatalf("lookup: chunks=%d err=%v", len(got), err)
+	}
+	if got[0].ParentID != doc.ParentID || got[0].ParentStartLine != 10 || got[0].ParentEndLine != 50 || got[0].PartOrdinal != 3 || len(got[0].HeadingPath) != 2 {
+		t.Fatalf("parent metadata not persisted: %+v", got[0])
+	}
+	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 1, types.Filter{})
+	if err != nil || len(hits) != 1 || hits[0].Chunk.ParentID != doc.ParentID {
+		t.Fatalf("search lost parent metadata: hits=%+v err=%v", hits, err)
+	}
+}
+
+func TestStoreMigratesOlderChunkTableWithoutParentColumns(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "old.db")
+	initial, err := Open(path, testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := initial.Close(); err != nil {
+		t.Fatal(err)
+	}
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = db.Exec(`ALTER TABLE chunks DROP COLUMN parent_id;
+		ALTER TABLE chunks DROP COLUMN parent_start_line;
+		ALTER TABLE chunks DROP COLUMN parent_end_line;
+		ALTER TABLE chunks DROP COLUMN part_ordinal;
+		ALTER TABLE chunks DROP COLUMN heading_path;
+		INSERT INTO chunks (id, file, start_line, end_line, language, chunk_kind, commit_hash, content_sha256, text)
+		VALUES ('legacy', 'README.md', 1, 2, 'markdown', 'doc', 'abc', 'sha', 'old text');
+		UPDATE chunks SET symbol_name='', symbol_kind='', canonical_id='', recent_prs='', category='',
+			guidance='', invariants='', convention_stats='', flow_meta='', enforced_at='', provenance=''
+		WHERE id='legacy';`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		store, err := Open(path, testDim)
+		if err != nil {
+			t.Fatalf("open %d after additive migration: %v", i, err)
+		}
+		got, err := store.LookupByIDs(context.Background(), []string{"legacy"})
+		if err != nil || len(got) != 1 || got[0].Text != "old text" || got[0].ParentID != "" {
+			t.Fatalf("legacy row after migration: chunks=%+v err=%v", got, err)
+		}
+		if err := store.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "selective.db")
+	s, err := Open(dbPath, testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx := context.Background()
+	var chunks []types.Chunk
+	var embs [][]float32
+	for i := 0; i < 12; i++ {
+		chunks = append(chunks, mkChunk(string(rune('a'+i)), "near.go", "near", i+1, i+1, "go", types.KindFunction))
+		embs = append(embs, []float32{1, 0, 0, 0})
+	}
+	chunks = append(chunks,
+		mkChunk("target-one", "target.ts", "one", 1, 1, "typescript", types.KindFunction),
+		mkChunk("target-two", "target.ts", "two", 2, 2, "typescript", types.KindFunction),
+	)
+	embs = append(embs, []float32{0, 1, 0, 0}, []float32{0, 0.8, 0.2, 0})
+	if err := s.Upsert(ctx, chunks, embs); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 2, types.Filter{Language: "typescript"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(hits) != 2 {
+		t.Fatalf("filtered KNN returned %d hits, want 2", len(hits))
+	}
+	seen := map[string]bool{}
+	for _, h := range hits {
+		seen[h.Chunk.ID] = true
+	}
+	if !seen["target-one"] || !seen["target-two"] {
+		t.Fatalf("wrong filtered hits: %+v", hits)
+	}
+}
+
+func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "large-filter.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx := context.Background()
+	chunks := make([]types.Chunk, 0, 2050)
+	embs := make([][]float32, 0, 2050)
+	for i := 0; i < 2049; i++ {
+		chunks = append(chunks, mkChunk(fmt.Sprintf("near-%d", i), "near/a.go", "near", i+1, i+1, "go", types.KindFunction))
+		embs = append(embs, []float32{1, 0, 0, 0})
+	}
+	chunks = append(chunks, mkChunk("target", "target/b.go", "target", 1, 1, "go", types.KindFunction))
+	embs = append(embs, []float32{0, 1, 0, 0})
+	if err := s.Upsert(ctx, chunks, embs); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 1, types.Filter{PathGlob: "target/*.go"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(hits) != 1 || hits[0].Chunk.ID != "target" {
+		t.Fatalf("large-set fallback missed target: %+v", hits)
 	}
 }
 

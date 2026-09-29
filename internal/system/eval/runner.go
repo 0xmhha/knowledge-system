@@ -82,6 +82,10 @@ type ScenarioResult struct {
 	// pass/fail guard, not a score, and folding it into recall would let
 	// a knowledge break trade against citation quality.
 	KnowledgeMissing []string `json:"knowledge_missing,omitempty"`
+	// CitationAbstentionPassed is present only for scenarios explicitly
+	// marked expect_no_citations. It judges evidence retrieval, not any
+	// natural-language answer produced by a downstream model.
+	CitationAbstentionPassed *bool `json:"citation_abstention_passed,omitempty"`
 }
 
 // Runner owns one cks-mcp connection and executes scenarios against
@@ -195,6 +199,15 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		Metrics:   medianMetrics(perRun),
 
 		KnowledgeMissing: knowledgeMissing,
+	}
+	if s.ExpectNoCitations {
+		passed := len(perRun) == s.Runs
+		for _, m := range perRun {
+			if m.CitationCount != 0 {
+				passed = false
+			}
+		}
+		out.CitationAbstentionPassed = &passed
 	}
 	if len(errMsgs) > 0 {
 		out.Error = strings.Join(errMsgs, "; ")

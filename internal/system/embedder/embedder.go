@@ -11,6 +11,7 @@ package embedder
 import (
 	"fmt"
 
+	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
@@ -46,6 +47,17 @@ func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, erro
 	cap := Capability{Provider: provider, Model: model, Endpoint: endpoint}
 
 	switch provider {
+	case "mock":
+		// Deterministic local backend for structural end-to-end tests. Its
+		// feature hashes are not a semantic-search quality benchmark.
+		adapter := ckv.MockEmbedder()
+		if model != "" && model != adapter.Name() {
+			return nil, cap, fmt.Errorf("mock embedder model %q != %q", model, adapter.Name())
+		}
+		cap.Model = adapter.Name()
+		cap.Endpoint = ""
+		cap.Dim = adapter.Dimension()
+		return adapter, cap, nil
 	case "ollama":
 		if model == "" {
 			model = "bge-m3"
@@ -63,6 +75,6 @@ func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, erro
 		cap.Dim = dim
 		return adapter, cap, nil
 	default:
-		return nil, cap, fmt.Errorf("unknown embedder provider %q (supported: ollama)", provider)
+		return nil, cap, fmt.Errorf("unknown embedder provider %q (supported: ollama, mock)", provider)
 	}
 }

@@ -195,6 +195,21 @@ func TestGoFiles_ErrorOnMissingSrc(t *testing.T) {
 	}
 }
 
+func TestGoFiles_RejectsBrokenGoToolchainInsteadOfEmptyIndex(t *testing.T) {
+	root := t.TempDir()
+	writeGoMod(t, root, "", "example.test/broken-cache")
+	writeFile(t, root, "main.go", "package broken\nfunc Present() {}\n")
+	cacheDir := filepath.Join(t.TempDir(), "read-only-cache")
+	if err := os.Mkdir(cacheDir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(cacheDir, 0o755) })
+	t.Setenv("GOCACHE", cacheDir)
+	if _, err := detect.GoFiles(root); err == nil {
+		t.Fatal("invalid Go build cache produced a successful empty file set")
+	}
+}
+
 // TestGoFiles_GoWorkspace verifies that a srcRoot with a go.work pointing
 // to two member modules surfaces files from BOTH members. Closes WORK-PLAN
 // G5 (E2 review follow-up) — workspace handling was previously unverified.

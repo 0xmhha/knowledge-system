@@ -4,9 +4,9 @@
 // Strategy:
 //  1. Each symbol span (function/method/type/...) becomes one chunk.
 //  2. Spans whose Text exceeds MaxInputTokens are split into
-//     sub-chunks (function bodies) or truncated at the head so the
-//     signature stays intact. Note that the mock embedder has infinite
-//     max input, so this only triggers with the real ONNX embedder.
+//     sub-chunks (function bodies and Markdown sections) or truncated
+//     at the head for other kinds. The mock embedder has no input cap,
+//     so long-span splitting needs a capped fixture to exercise it.
 //  3. A file_header chunk captures the first N lines of the file —
 //     package decl + imports + top-level const/var. This lets queries
 //     like "what package owns the metrics client" hit the right file
@@ -109,10 +109,13 @@ func (c *Chunker) Chunk(in Input) []types.Chunk {
 	}
 
 	for _, sp := range in.Spans {
-		// When a function body exceeds the embedder's
-		// input cap, split it into multiple sub-chunks instead of
-		// head-truncating. Long doc sections / file headers stay on
-		// the truncate path — splitting prose loses structure.
+		// Long Markdown sections are split at source-line boundaries so
+		// their tail remains searchable with accurate citations.
+		if c.shouldSplitDoc(sp) {
+			out = append(out, c.splitLongDocSpan(in, sp)...)
+			continue
+		}
+		// Long functions use their existing source-window strategy.
 		if c.shouldSplit(sp) {
 			out = append(out, c.splitLongSpan(in, sp)...)
 			continue
@@ -120,6 +123,104 @@ func (c *Chunker) Chunk(in Input) []types.Chunk {
 		text := c.maybeTruncate(sp.Text)
 		out = append(out, c.symbolChunk(in, sp, text))
 	}
+	return out
+}
+
+func (c *Chunker) shouldSplitDoc(sp parse.SymbolSpan) bool {
+	if c.opts.MaxInputTokens <= 0 {
+		return false
+	}
+	if sp.Kind != types.KindDocSection && sp.Kind != types.KindADRSection {
+		return false
+	}
+	return len(sp.Text) > c.opts.MaxInputTokens*charsPerToken
+}
+
+// splitLongDocSpan keeps every source line and prefers paragraph boundaries.
+// A line longer than the embedding cap is split at UTF-8 boundaries; its
+// fragments retain the original line citation. All parts remain ChunkDoc so
+// existing documentation filters and result consumers continue to work.
+func (c *Chunker) splitLongDocSpan(in Input, sp parse.SymbolSpan) []types.Chunk {
+	maxChars := c.opts.MaxInputTokens * charsPerToken
+	parentID := types.ChunkID(in.File, sp.StartLine, sp.EndLine, types.ContentSHA256(sp.Text))
+	lines := strings.SplitAfter(sp.Text, "\n")
+	var out []types.Chunk
+	var pending []string
+	startLine := sp.StartLine
+	lineNo := sp.StartLine
+	emit := func(parts []string, start int) {
+		if len(parts) == 0 {
+			return
+		}
+		text := strings.Join(parts, "")
+		end := start + len(parts) - 1
+		child := sp
+		child.StartLine, child.EndLine = start, end
+		part := c.symbolChunk(in, child, text)
+		part.ParentID, part.ParentStartLine, part.ParentEndLine = parentID, sp.StartLine, sp.EndLine
+		part.PartOrdinal = len(out) + 1
+		out = append(out, part)
+	}
+	length := func(parts []string) int {
+		n := 0
+		for _, p := range parts {
+			n += len(p)
+		}
+		return n
+	}
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		if len(line) > maxChars {
+			emit(pending, startLine)
+			pending = nil
+			offset := 0
+			for len(line) > 0 {
+				end := min(maxChars, len(line))
+				for end > 0 && end < len(line) && line[end]&0xc0 == 0x80 {
+					end--
+				}
+				if end == 0 { // a multibyte rune wider than a tiny cap
+					end = min(len(line), maxChars)
+				}
+				child := sp
+				child.StartLine, child.EndLine = lineNo, lineNo
+				part := c.symbolChunk(in, child, line[:end])
+				part.ID = types.ChunkFragmentID(in.File, lineNo, lineNo, offset, part.ContentSHA256)
+				part.ParentID, part.ParentStartLine, part.ParentEndLine = parentID, sp.StartLine, sp.EndLine
+				part.PartOrdinal = len(out) + 1
+				out = append(out, part)
+				offset += end
+				line = line[end:]
+			}
+			lineNo++
+			startLine = lineNo
+			continue
+		}
+		if length(pending)+len(line) > maxChars {
+			// Retain a complete paragraph when a blank line occurs inside
+			// the buffered window; otherwise fall back to a line boundary.
+			cut := len(pending)
+			for i := len(pending) - 1; i > 0; i-- {
+				if strings.TrimSpace(pending[i]) == "" {
+					cut = i + 1
+					break
+				}
+			}
+			emit(pending[:cut], startLine)
+			startLine += cut
+			pending = append([]string(nil), pending[cut:]...)
+			if length(pending)+len(line) > maxChars {
+				emit(pending, startLine)
+				startLine += len(pending)
+				pending = nil
+			}
+		}
+		pending = append(pending, line)
+		lineNo++
+	}
+	emit(pending, startLine)
 	return out
 }
 
@@ -290,6 +391,7 @@ func (c *Chunker) symbolChunk(in Input, sp parse.SymbolSpan, text string) types.
 		SymbolName:    sp.Name,
 		SymbolKind:    sp.Kind,
 		ChunkKind:     kind,
+		HeadingPath:   append([]string(nil), sp.HeadingPath...),
 		CommitHash:    in.CommitHash,
 		ContentSHA256: contentHash,
 		Text:          text,

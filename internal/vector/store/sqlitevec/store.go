@@ -147,6 +147,11 @@ func (s *Store) initSchema(dim int) error {
 		commit_hash     TEXT NOT NULL,
 		content_sha256  TEXT NOT NULL,
 		canonical_id    TEXT,
+		parent_id       TEXT NOT NULL DEFAULT '',
+		parent_start_line INTEGER NOT NULL DEFAULT 0,
+		parent_end_line INTEGER NOT NULL DEFAULT 0,
+		part_ordinal    INTEGER NOT NULL DEFAULT 0,
+		heading_path    TEXT NOT NULL DEFAULT '',
 		text            TEXT NOT NULL
 	)`); err != nil {
 		return fmt.Errorf("create chunks: %w", err)
@@ -167,6 +172,17 @@ func (s *Store) initSchema(dim int) error {
 	// empty via ALTER and re-populate on the next --ckg-aligned build.
 	if err := s.ensureColumn("chunks", "canonical_id", `ALTER TABLE chunks ADD COLUMN canonical_id TEXT DEFAULT ''`); err != nil {
 		return fmt.Errorf("migrate chunks.canonical_id: %w", err)
+	}
+	for _, col := range []struct{ name, ddl string }{
+		{"parent_id", `ALTER TABLE chunks ADD COLUMN parent_id TEXT NOT NULL DEFAULT ''`},
+		{"parent_start_line", `ALTER TABLE chunks ADD COLUMN parent_start_line INTEGER NOT NULL DEFAULT 0`},
+		{"parent_end_line", `ALTER TABLE chunks ADD COLUMN parent_end_line INTEGER NOT NULL DEFAULT 0`},
+		{"part_ordinal", `ALTER TABLE chunks ADD COLUMN part_ordinal INTEGER NOT NULL DEFAULT 0`},
+		{"heading_path", `ALTER TABLE chunks ADD COLUMN heading_path TEXT NOT NULL DEFAULT ''`},
+	} {
+		if err := s.ensureColumn("chunks", col.name, col.ddl); err != nil {
+			return fmt.Errorf("migrate chunks.%s: %w", col.name, err)
+		}
 	}
 
 	for _, idx := range []string{
@@ -302,8 +318,9 @@ func (s *Store) Upsert(ctx context.Context, chunks []types.Chunk, embeddings [][
 		symbol_name, symbol_kind, chunk_kind,
 		commit_hash, content_sha256, canonical_id, recent_prs,
 		category, guidance, invariants, convention_stats, text,
-		flow_meta, enforced_at, provenance
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		flow_meta, enforced_at, provenance,
+		parent_id, parent_start_line, parent_end_line, part_ordinal, heading_path
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(id) DO UPDATE SET
 		file = excluded.file,
 		start_line = excluded.start_line,
@@ -324,7 +341,12 @@ func (s *Store) Upsert(ctx context.Context, chunks []types.Chunk, embeddings [][
 		text = excluded.text,
 		flow_meta = excluded.flow_meta,
 		enforced_at = excluded.enforced_at,
-		provenance = excluded.provenance`)
+		provenance = excluded.provenance,
+		parent_id = excluded.parent_id,
+		parent_start_line = excluded.parent_start_line,
+		parent_end_line = excluded.parent_end_line,
+		part_ordinal = excluded.part_ordinal,
+		heading_path = excluded.heading_path`)
 	if err != nil {
 		return fmt.Errorf("prepare chunk insert: %w", err)
 	}
@@ -355,12 +377,17 @@ func (s *Store) Upsert(ctx context.Context, chunks []types.Chunk, embeddings [][
 		convJSON := marshalConventionStats(c.ConventionStats)
 		flowJSON := marshalFlowMeta(c)
 		enforcedJSON := marshalEnforcePoints(c.EnforcedAt)
+		headingJSON, err := json.Marshal(c.HeadingPath)
+		if err != nil {
+			return fmt.Errorf("marshal heading path for %s: %w", c.ID, err)
+		}
 		if _, err := insChunk.ExecContext(ctx,
 			c.ID, c.File, c.StartLine, c.EndLine, c.Language, boolToInt(c.IsTest),
 			c.SymbolName, string(c.SymbolKind), string(c.ChunkKind),
 			c.CommitHash, c.ContentSHA256, c.CanonicalID, prJSON,
 			c.Category, guideJSON, invJSON, convJSON, c.Text,
 			flowJSON, enforcedJSON, c.Provenance,
+			c.ParentID, c.ParentStartLine, c.ParentEndLine, c.PartOrdinal, string(headingJSON),
 		); err != nil {
 			return fmt.Errorf("insert chunk %s: %w", c.ID, err)
 		}
@@ -515,9 +542,9 @@ func (s *Store) DocsChunks(ctx context.Context) ([]types.Chunk, error) {
 	return out, rows.Err()
 }
 
-// Search runs a vec0 KNN over query, then JOINs to chunks for metadata
-// and applies the Filter as a post-step. We over-fetch by 3x when a
-// filter is set so the post-filter has enough candidates to satisfy k.
+// Search uses an exact scan for small filtered candidate sets. Larger sets
+// use vec0 KNN with post-filtering; if the initial candidates do not fill k,
+// an exact scan completes the result rather than silently dropping matches.
 func (s *Store) Search(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
 	if got := len(query); got != s.dim {
 		return nil, fmt.Errorf("sqlitevec: query dim %d != store dim %d", got, s.dim)
@@ -525,13 +552,14 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 	if k <= 0 {
 		return nil, nil
 	}
-	// Kind-scoped search means "search WITHIN these kinds", not "hope the
-	// kinds appear near the top of a global KNN". Knowledge kinds
-	// (invariant/convention) are ~1% of the index, so KNN + post-filter
-	// returns zero for them essentially always. Rows of the named kinds
-	// are few enough to score exactly.
-	if len(filter.ChunkKinds) > 0 {
-		return s.searchWithinKinds(ctx, query, k, filter)
+	if !filter.IsZero() {
+		count, err := s.candidateCount(ctx, filter)
+		if err != nil {
+			return nil, err
+		}
+		if count <= 2048 {
+			return s.searchExact(ctx, query, k, filter)
+		}
 	}
 	fetch := k
 	if !filter.IsZero() {
@@ -550,6 +578,7 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 			c.commit_hash, c.content_sha256, c.canonical_id, c.recent_prs,
 			c.category, c.guidance, c.invariants, c.convention_stats, c.text,
 			c.flow_meta, c.enforced_at, c.provenance,
+			c.parent_id, c.parent_start_line, c.parent_end_line, c.part_ordinal, c.heading_path,
 			v.distance
 		FROM chunk_vec v
 		JOIN chunks c ON c.id = v.chunk_id
@@ -565,20 +594,23 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 	rank := 0
 	for rows.Next() {
 		var (
-			c         types.Chunk
-			isTest    int
-			symKind   sql.NullString
-			chKind    string
-			canonID   sql.NullString
-			prJSON    sql.NullString
-			catCol    sql.NullString
-			guideJSON sql.NullString
-			invJSON   sql.NullString
-			convJSON  sql.NullString
-			flowJSON  sql.NullString
-			enfJSON   sql.NullString
-			provCol   sql.NullString
-			distance  float64
+			c                                   types.Chunk
+			isTest                              int
+			symKind                             sql.NullString
+			chKind                              string
+			canonID                             sql.NullString
+			prJSON                              sql.NullString
+			catCol                              sql.NullString
+			guideJSON                           sql.NullString
+			invJSON                             sql.NullString
+			convJSON                            sql.NullString
+			flowJSON                            sql.NullString
+			enfJSON                             sql.NullString
+			provCol                             sql.NullString
+			parentID                            string
+			parentStart, parentEnd, partOrdinal int
+			headingJSON                         string
+			distance                            float64
 		)
 		if err := rows.Scan(
 			&c.ID, &c.File, &c.StartLine, &c.EndLine, &c.Language, &isTest,
@@ -586,6 +618,7 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 			&c.CommitHash, &c.ContentSHA256, &canonID, &prJSON,
 			&catCol, &guideJSON, &invJSON, &convJSON, &c.Text,
 			&flowJSON, &enfJSON, &provCol,
+			&parentID, &parentStart, &parentEnd, &partOrdinal, &headingJSON,
 			&distance,
 		); err != nil {
 			return nil, fmt.Errorf("scan hit: %w", err)
@@ -606,6 +639,12 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 		applyFlowMeta(&c, flowJSON.String)
 		c.EnforcedAt = unmarshalEnforcePoints(enfJSON.String)
 		c.Provenance = provCol.String
+		c.ParentID, c.ParentStartLine, c.ParentEndLine, c.PartOrdinal = parentID, parentStart, parentEnd, partOrdinal
+		if headingJSON != "" {
+			if err := json.Unmarshal([]byte(headingJSON), &c.HeadingPath); err != nil {
+				return nil, fmt.Errorf("scan heading path for %s: %w", c.ID, err)
+			}
+		}
 
 		if !filter.Matches(c) {
 			continue
@@ -626,27 +665,68 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+	if !filter.IsZero() && len(out) < k {
+		if err := rows.Close(); err != nil {
+			return nil, err
+		}
+		return s.searchExact(ctx, query, k, filter)
+	}
 	return out, nil
 }
 
-// searchWithinKinds is the exact-scan variant of Search for kind-scoped
-// filters: select every chunk of the named kinds, apply the remaining
-// filter fields, score each against the query vector with the same
-// metric vec0 uses (Euclidean over unit vectors, range [0,2]), and keep
-// the top k. Point-reads each embedding from chunk_vec; the named kinds
-// are assumed rare (the caller's contract for ChunkKinds).
-func (s *Store) searchWithinKinds(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
-	placeholders := make([]string, len(filter.ChunkKinds))
-	args := make([]any, len(filter.ChunkKinds))
-	for i, kind := range filter.ChunkKinds {
-		placeholders[i] = "?"
-		args[i] = string(kind)
+// candidateWhere pushes filters with exact SQL equivalents into the metadata
+// scan. PathGlob and the test-support path rule are still checked by Matches.
+func candidateWhere(filter types.Filter) (string, []any) {
+	clauses := []string{"1=1"}
+	var args []any
+	if filter.Language != "" {
+		clauses = append(clauses, "c.language = ?")
+		args = append(args, filter.Language)
 	}
-	stmt := `SELECT ` + chunkSelectCols + ` FROM chunks c WHERE c.chunk_kind IN (` +
-		strings.Join(placeholders, ",") + `)`
+	if filter.CommitHash != "" {
+		clauses = append(clauses, "c.commit_hash = ?")
+		args = append(args, filter.CommitHash)
+	}
+	if filter.ExcludeTests {
+		clauses = append(clauses, "c.is_test = 0")
+	}
+	if len(filter.ChunkKinds) > 0 {
+		ph := make([]string, len(filter.ChunkKinds))
+		for i, kind := range filter.ChunkKinds {
+			ph[i] = "?"
+			args = append(args, string(kind))
+		}
+		clauses = append(clauses, "c.chunk_kind IN ("+strings.Join(ph, ",")+")")
+	}
+	if len(filter.SymbolKinds) > 0 {
+		ph := make([]string, len(filter.SymbolKinds))
+		for i, kind := range filter.SymbolKinds {
+			ph[i] = "?"
+			args = append(args, string(kind))
+		}
+		clauses = append(clauses, "COALESCE(c.symbol_kind, '') IN ("+strings.Join(ph, ",")+")")
+	}
+	return strings.Join(clauses, " AND "), args
+}
+
+func (s *Store) candidateCount(ctx context.Context, filter types.Filter) (int, error) {
+	where, args := candidateWhere(filter)
+	var count int
+	if err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM chunks c WHERE "+where, args...).Scan(&count); err != nil {
+		return 0, fmt.Errorf("count filtered candidates: %w", err)
+	}
+	return count, nil
+}
+
+// searchExact scores every eligible vector with vec0's Euclidean metric and
+// retains the nearest k. The SQL predicate narrows the scan before the full
+// filter is applied, including PathGlob and test-support path rules.
+func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
+	where, args := candidateWhere(filter)
+	stmt := `SELECT ` + chunkSelectCols + ` FROM chunks c WHERE ` + where
 	rows, err := s.db.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, fmt.Errorf("kind scan: %w", err)
+		return nil, fmt.Errorf("filtered scan: %w", err)
 	}
 	var chunks []types.Chunk
 	for rows.Next() {
@@ -674,14 +754,14 @@ func (s *Store) searchWithinKinds(ctx context.Context, query []float32, k int, f
 			continue // chunk without a vector cannot be scored
 		}
 		if err != nil {
-			return nil, fmt.Errorf("kind scan embedding %s: %w", c.ID, err)
+			return nil, fmt.Errorf("filtered scan embedding %s: %w", c.ID, err)
 		}
 		vec, err := deserializeFloat32(blob)
 		if err != nil {
-			return nil, fmt.Errorf("kind scan embedding %s: %w", c.ID, err)
+			return nil, fmt.Errorf("filtered scan embedding %s: %w", c.ID, err)
 		}
 		if len(vec) != len(query) {
-			return nil, fmt.Errorf("kind scan: embedding dim %d != query dim %d for %s", len(vec), len(query), c.ID)
+			return nil, fmt.Errorf("filtered scan: embedding dim %d != query dim %d for %s", len(vec), len(query), c.ID)
 		}
 		scored = append(scored, types.Hit{
 			Chunk: c,
@@ -689,7 +769,10 @@ func (s *Store) searchWithinKinds(ctx context.Context, query []float32, k int, f
 		})
 	}
 	sort.Slice(scored, func(i, j int) bool {
-		return scored[i].Score.VectorDistance < scored[j].Score.VectorDistance
+		if scored[i].Score.VectorDistance != scored[j].Score.VectorDistance {
+			return scored[i].Score.VectorDistance < scored[j].Score.VectorDistance
+		}
+		return scored[i].Chunk.ID < scored[j].Chunk.ID
 	})
 	if len(scored) > k {
 		scored = scored[:k]
@@ -730,7 +813,8 @@ const chunkSelectCols = `c.id, c.file, c.start_line, c.end_line, c.language, c.i
 	c.symbol_name, c.symbol_kind, c.chunk_kind,
 	c.commit_hash, c.content_sha256, c.canonical_id, c.recent_prs,
 	c.category, c.guidance, c.invariants, c.convention_stats, c.text,
-	c.flow_meta, c.enforced_at, c.provenance`
+	c.flow_meta, c.enforced_at, c.provenance,
+	c.parent_id, c.parent_start_line, c.parent_end_line, c.part_ordinal, c.heading_path`
 
 // scanChunk reads one chunks row using the chunkSelectCols column
 // order. Used by Search (with an extra distance column) and by the
@@ -739,19 +823,22 @@ func scanChunk(rs interface {
 	Scan(dest ...any) error
 }) (types.Chunk, error) {
 	var (
-		c         types.Chunk
-		isTest    int
-		symKind   sql.NullString
-		chKind    string
-		canonID   sql.NullString
-		prJSON    sql.NullString
-		catCol    sql.NullString
-		guideJSON sql.NullString
-		invJSON   sql.NullString
-		convJSON  sql.NullString
-		flowJSON  sql.NullString
-		enfJSON   sql.NullString
-		provCol   sql.NullString
+		c                                   types.Chunk
+		isTest                              int
+		symKind                             sql.NullString
+		chKind                              string
+		canonID                             sql.NullString
+		prJSON                              sql.NullString
+		catCol                              sql.NullString
+		guideJSON                           sql.NullString
+		invJSON                             sql.NullString
+		convJSON                            sql.NullString
+		flowJSON                            sql.NullString
+		enfJSON                             sql.NullString
+		provCol                             sql.NullString
+		parentID                            string
+		parentStart, parentEnd, partOrdinal int
+		headingJSON                         string
 	)
 	if err := rs.Scan(
 		&c.ID, &c.File, &c.StartLine, &c.EndLine, &c.Language, &isTest,
@@ -759,6 +846,7 @@ func scanChunk(rs interface {
 		&c.CommitHash, &c.ContentSHA256, &canonID, &prJSON,
 		&catCol, &guideJSON, &invJSON, &convJSON, &c.Text,
 		&flowJSON, &enfJSON, &provCol,
+		&parentID, &parentStart, &parentEnd, &partOrdinal, &headingJSON,
 	); err != nil {
 		return types.Chunk{}, err
 	}
@@ -778,6 +866,12 @@ func scanChunk(rs interface {
 	applyFlowMeta(&c, flowJSON.String)
 	c.EnforcedAt = unmarshalEnforcePoints(enfJSON.String)
 	c.Provenance = provCol.String
+	c.ParentID, c.ParentStartLine, c.ParentEndLine, c.PartOrdinal = parentID, parentStart, parentEnd, partOrdinal
+	if headingJSON != "" {
+		if err := json.Unmarshal([]byte(headingJSON), &c.HeadingPath); err != nil {
+			return types.Chunk{}, fmt.Errorf("scan heading path for %s: %w", c.ID, err)
+		}
+	}
 	return c, nil
 }
 

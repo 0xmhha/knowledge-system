@@ -62,8 +62,11 @@ func (p *Parser) Parse(file string, src []byte) ([]cparse.SymbolSpan, error) {
 	// First pass: identify ATX heading line indices, skipping anything
 	// inside a fenced code block.
 	type heading struct {
-		line int // 0-based index into lines
-		name string
+		line  int // 0-based index into lines
+		name  string
+		level int
+		raw   string
+		path  []string
 	}
 	var headings []heading
 	inFence := false
@@ -86,7 +89,23 @@ func (p *Parser) Parse(file string, src []byte) ([]cparse.SymbolSpan, error) {
 				// distinct and don't collide on the empty-name key.
 				slug = "section"
 			}
-			headings = append(headings, heading{line: i, name: slug})
+			level := len(l) - len(strings.TrimLeft(l, " "))
+			trimmed := l[level:]
+			level = len(trimmed) - len(strings.TrimLeft(trimmed, "#"))
+			headings = append(headings, heading{line: i, name: slug, level: level, raw: raw})
+		}
+	}
+	var levels [6]string
+	for i := range headings {
+		h := &headings[i]
+		levels[h.level-1] = h.raw
+		for j := h.level; j < len(levels); j++ {
+			levels[j] = ""
+		}
+		for j := 0; j < h.level; j++ {
+			if levels[j] != "" {
+				h.path = append(h.path, levels[j])
+			}
 		}
 	}
 
@@ -124,11 +143,12 @@ func (p *Parser) Parse(file string, src []byte) ([]cparse.SymbolSpan, error) {
 		}
 		text := joinLines(lines[h.line:endLine])
 		spans = append(spans, cparse.SymbolSpan{
-			Name:      h.name,
-			Kind:      kind,
-			StartLine: h.line + 1, // convert 0-based to 1-based
-			EndLine:   endLine,    // 0-based exclusive == 1-based inclusive of previous line
-			Text:      text,
+			Name:        h.name,
+			Kind:        kind,
+			StartLine:   h.line + 1, // convert 0-based to 1-based
+			EndLine:     endLine,    // 0-based exclusive == 1-based inclusive of previous line
+			Text:        text,
+			HeadingPath: h.path,
 		})
 	}
 	return spans, nil

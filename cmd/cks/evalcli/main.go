@@ -164,6 +164,16 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 	if missing > 0 {
 		return fmt.Errorf("%d expected knowledge scope(s) not delivered", missing)
 	}
+	failedAbstentions := 0
+	for _, r := range report.Results {
+		if r.CitationAbstentionPassed != nil && !*r.CitationAbstentionPassed {
+			log.Printf("cks-eval: citation abstention failed: %s returned %d citations", r.Name, r.Metrics.CitationCount)
+			failedAbstentions++
+		}
+	}
+	if failedAbstentions > 0 {
+		return fmt.Errorf("%d citation abstention scenario(s) failed", failedAbstentions)
+	}
 	return nil
 }
 
