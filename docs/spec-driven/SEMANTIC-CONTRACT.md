@@ -14,10 +14,30 @@
 
 `cks semantic review --input projection.json --repo <git-root> --sample 20 --salt <audit-id>`는 JSON 투영의 모든 근거를 기록된 커밋에서 재검증한 뒤 검토 대기 주장 샘플과 집계 JSON을 출력한다. 표본은 데이터셋 ID·주장 ID·salt의 해시로 결정되므로 같은 입력은 같은 목록을 만든다. `verified`와 `rejected` 모두 검토자 ID가 있어야 한다. 정밀도는 **검토된 주장 중 verified 비율**이며 검토 건수가 0이면 `null`이다. 이 수치는 실제로 검토된 표본의 품질만 설명한다. 대표 표본의 외부 검토가 없으면 추출기 전체의 정밀도나 관계 정확도로 해석하지 않는다. 현재 자동 관계 추출과 관계 평가셋은 없다.
 
+관계 후보 `Assertion`은 자체 근거·상태·검토자를 가진다. 현재 허용한 좁은 타입은 `DocumentSection SUPPORTS Claim`과 `Claim CONTRADICTS Claim`뿐이다. 관계 근거가 실제 섹션·양쪽 주장에 닿아야 하며, `verified` 관계는 연결된 주장도 검토 완료 상태여야 한다. 방향 오류, 고아 참조, 무근거, 무검토 승격은 거부한다. 검토 도구는 주장과 관계의 정밀도를 따로 출력한다. `RELATED_TO` 같은 막연한 관계나 코드 구현 관계는 아직 확정 타입으로 사용하지 않는다.
+
 코드 근거를 붙일 때는 CKG 공개 읽기 API에서 `canonical_id`를 정확 조회하고, CKG의 소스 커밋·파일·AST 노드 줄 범위가 근거와 일치하는지 검사한다. 이 검사는 원문 SHA-256 검사와 별개이며 `verified`로 자동 승격하지 않는다.
 
 ## SQLite 투영과 롤백
 
 `semantic_projections`는 `(project_id,dataset_id)`별 JSON 문서와 SHA-256을 불변으로 저장한다. 같은 내용의 재시도는 허용하고 같은 ID의 다른 내용은 거부한다. `semantic_current`는 프로젝트마다 활성 데이터셋 ID를 가리킨다. `Activate`는 기존 버전 사이를 원자적으로 전환하므로 이전 버전으로 다시 지정하면 롤백된다. 읽을 때 문서 해시와 구조를 다시 확인한다. 현재 DB 스키마는 `PRAGMA user_version=1`이며 더 높은 버전은 구버전 바이너리에서 거부한다.
+
+CKG·CKV와 함께 쓰는 승격 경로는 `PutAligned`와 `ActivateAligned`다. 두 호출 모두 그래프·벡터 매니페스트의 소스 커밋, 기록된 CKG 다이제스트 핀, 소스 루트와 투영의 커밋을 비교한다. 값이 빠진 구버전 인덱스는 의미 투영 승격에서 거부한다. 활성화 시점에도 다시 검사하므로 오래 전에 저장한 후보를 최신 인덱스에 잘못 연결하지 않는다. `Put`/`Activate`는 엔진이 없는 의미 투영 준비·롤백용 저수준 호출이다. 현재 원본 파일이 커밋과 동일한지는 `ValidateSources`가 검사하지만, 같은 HEAD의 서로 다른 작업 트리 바이트를 구별하는 다이제스트는 아직 구현되지 않았다.
+
+코드 앵커 조인을 위한 그래프 스키마는 `canonical_id`가 있는 1.19 이상이어야 한다. 이 게이트는 매니페스트 좌표의 일치를 검사하며 인덱스 파일 자체의 암호학적 무결성 검증이나 휴대 가능한 프로젝트 ID는 후속 작업이다.
+
+작은 데이터셋의 실제 입력 경로는 다음과 같다. `--docs`는 저장소 상대 경로이며 여러 번 지정할 수 있다. 명령은 Git HEAD의 파일 내용을 읽고 섹션만 만든다. 주장과 관계를 자동 생성하지 않는다.
+
+```sh
+cks semantic build --repo /path/to/repo --project-id sample --dataset-id cut-001 \
+  --graph /path/to/dataset/graph --vector /path/to/dataset/vector \
+  --store /path/to/semantic.db --out /path/to/projection.json \
+  --docs README.md --docs docs/spec.md --min-canonical-ratio 0.94 --activate
+cks semantic review --input /path/to/projection.json --repo /path/to/repo --sample 20
+```
+
+`--activate`를 생략하면 검증된 후보 데이터셋만 저장한다. JSON은 원문 범위와 해시를 사람이 검토할 수 있도록 출력한다. 실제 CKV·CKG 빌드 후 `scripts/wbs-smoke.sh`에서 위 빌드와 검토 명령을 실행한다.
+
+`--min-canonical-ratio`는 프로젝트 실측 기준으로 선택한다. 0이면 게이트를 끄며, 양수이면 CKV 매니페스트의 `canonical_count / symbol_count`가 기준보다 낮거나 카운터가 없을 때 승격을 막는다. 예시의 0.94는 이 프로젝트의 구조 기준선(약 94.28%)에 맞춘 값이지 다른 저장소의 기본값이 아니다. 실제 임베딩 검색 품질과는 별도 지표다.
 
 이 저장소는 아직 CKS Composer의 질의 경로에 연결되지 않았다. 의미 관계의 타입 제약, CKV 텍스트 투영, 근거 충돌, 프로젝트별 A/B 품질 측정이 통과한 후 기능 플래그로 연결한다. 기본 검색은 기존 CKV+CKG 경로를 유지한다.

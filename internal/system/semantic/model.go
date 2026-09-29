@@ -65,6 +65,23 @@ type Claim struct {
 	ReviewedBy  string   `json:"reviewed_by,omitempty"`
 }
 
+// Assertion is a reviewed semantic edge. It has its own evidence and status;
+// the existence of its endpoints does not prove the relationship.
+type Assertion struct {
+	ID          string   `json:"id"`
+	Predicate   string   `json:"predicate"`
+	SubjectID   string   `json:"subject_id"`
+	ObjectID    string   `json:"object_id"`
+	EvidenceIDs []string `json:"evidence_ids"`
+	Status      Status   `json:"status"`
+	ReviewedBy  string   `json:"reviewed_by,omitempty"`
+}
+
+const (
+	PredicateSupports    = "SUPPORTS"    // DocumentSection -> Claim
+	PredicateContradicts = "CONTRADICTS" // Claim -> Claim
+)
+
 // Projection is one versioned semantic graph view for one source snapshot.
 // Empty Claims is valid: extracting sections must not invent facts.
 type Projection struct {
@@ -73,4 +90,5 @@ type Projection struct {
 	Evidence      []EvidenceSpan    `json:"evidence"`
 	Sections      []DocumentSection `json:"sections"`
 	Claims        []Claim           `json:"claims"`
+	Assertions    []Assertion       `json:"assertions,omitempty"`
 }

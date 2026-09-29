@@ -77,6 +77,7 @@ func (p Projection) Validate() error {
 		}
 		sections[section.ID] = section
 	}
+	claims := make(map[string]Claim, len(p.Claims))
 	for _, claim := range p.Claims {
 		if err := claimID(claim.ID); err != nil {
 			return err
@@ -112,8 +113,79 @@ func (p Projection) Validate() error {
 		default:
 			return fmt.Errorf("claim %q has invalid status %q", claim.ID, claim.Status)
 		}
+		claims[claim.ID] = claim
+	}
+	for _, assertion := range p.Assertions {
+		if err := claimID(assertion.ID); err != nil {
+			return err
+		}
+		if assertion.SubjectID == assertion.ObjectID {
+			return fmt.Errorf("assertion %q has identical endpoints", assertion.ID)
+		}
+		if len(assertion.EvidenceIDs) == 0 {
+			return fmt.Errorf("assertion %q has no evidence", assertion.ID)
+		}
+		seenEvidence := map[string]bool{}
+		for _, id := range assertion.EvidenceIDs {
+			if _, ok := evidence[id]; !ok {
+				return fmt.Errorf("assertion %q refers to missing evidence %q", assertion.ID, id)
+			}
+			if seenEvidence[id] {
+				return fmt.Errorf("assertion %q repeats evidence %q", assertion.ID, id)
+			}
+			seenEvidence[id] = true
+		}
+		switch assertion.Predicate {
+		case PredicateSupports:
+			section, ok := sections[assertion.SubjectID]
+			if !ok {
+				return fmt.Errorf("assertion %q SUPPORTS subject must be a document section", assertion.ID)
+			}
+			claim, ok := claims[assertion.ObjectID]
+			if !ok {
+				return fmt.Errorf("assertion %q SUPPORTS object must be a claim", assertion.ID)
+			}
+			if claim.SectionID != section.ID || !seenEvidence[section.EvidenceID] {
+				return fmt.Errorf("assertion %q SUPPORTS must cite its claim's source section", assertion.ID)
+			}
+			if assertion.Status == StatusVerified && claim.Status != StatusVerified {
+				return fmt.Errorf("verified assertion %q refers to unverified claim", assertion.ID)
+			}
+		case PredicateContradicts:
+			left, leftOK := claims[assertion.SubjectID]
+			right, rightOK := claims[assertion.ObjectID]
+			if !leftOK || !rightOK {
+				return fmt.Errorf("assertion %q CONTRADICTS endpoints must be claims", assertion.ID)
+			}
+			if !hasAnyEvidence(seenEvidence, left.EvidenceIDs) || !hasAnyEvidence(seenEvidence, right.EvidenceIDs) {
+				return fmt.Errorf("assertion %q CONTRADICTS must cite both claims", assertion.ID)
+			}
+			if assertion.Status == StatusVerified && (left.Status != StatusVerified || right.Status != StatusVerified) {
+				return fmt.Errorf("verified assertion %q refers to unverified claim", assertion.ID)
+			}
+		default:
+			return fmt.Errorf("assertion %q has invalid predicate %q", assertion.ID, assertion.Predicate)
+		}
+		switch assertion.Status {
+		case StatusProposed:
+		case StatusVerified, StatusRejected:
+			if strings.TrimSpace(assertion.ReviewedBy) == "" {
+				return fmt.Errorf("reviewed assertion %q needs reviewed_by", assertion.ID)
+			}
+		default:
+			return fmt.Errorf("assertion %q has invalid status %q", assertion.ID, assertion.Status)
+		}
 	}
 	return nil
+}
+
+func hasAnyEvidence(in map[string]bool, ids []string) bool {
+	for _, id := range ids {
+		if in[id] {
+			return true
+		}
+	}
+	return false
 }
 
 func safeRelativePath(file string) bool {

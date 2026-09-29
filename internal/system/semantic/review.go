@@ -15,18 +15,32 @@ type ReviewItem struct {
 	Evidence  []EvidenceSpan `json:"evidence"`
 }
 
+type AssertionReviewItem struct {
+	AssertionID string         `json:"assertion_id"`
+	Predicate   string         `json:"predicate"`
+	SubjectID   string         `json:"subject_id"`
+	ObjectID    string         `json:"object_id"`
+	Evidence    []EvidenceSpan `json:"evidence"`
+}
+
 // ReviewReport separates the measured precision of adjudicated claims from
 // coverage. A nil precision means nobody reviewed a claim yet; reporting 0
 // or 1 there would give a false quality signal.
 type ReviewReport struct {
-	ProjectID string       `json:"project_id"`
-	DatasetID string       `json:"dataset_id"`
-	Total     int          `json:"total"`
-	Proposed  int          `json:"proposed"`
-	Verified  int          `json:"verified"`
-	Rejected  int          `json:"rejected"`
-	Precision *float64     `json:"reviewed_precision"`
-	Sample    []ReviewItem `json:"sample"`
+	ProjectID          string                `json:"project_id"`
+	DatasetID          string                `json:"dataset_id"`
+	Total              int                   `json:"total"`
+	Proposed           int                   `json:"proposed"`
+	Verified           int                   `json:"verified"`
+	Rejected           int                   `json:"rejected"`
+	Precision          *float64              `json:"reviewed_precision"`
+	Sample             []ReviewItem          `json:"sample"`
+	AssertionTotal     int                   `json:"assertion_total"`
+	AssertionProposed  int                   `json:"assertion_proposed"`
+	AssertionVerified  int                   `json:"assertion_verified"`
+	AssertionRejected  int                   `json:"assertion_rejected"`
+	AssertionPrecision *float64              `json:"assertion_reviewed_precision"`
+	AssertionSample    []AssertionReviewItem `json:"assertion_sample"`
 }
 
 // Review produces a deterministic sample of proposed claims. Salt permits
@@ -40,7 +54,9 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	if limit < 0 {
 		limit = 0
 	}
-	r := ReviewReport{ProjectID: p.Snapshot.ProjectID, DatasetID: p.Snapshot.DatasetID, Total: len(p.Claims), Sample: []ReviewItem{}}
+	r := ReviewReport{ProjectID: p.Snapshot.ProjectID, DatasetID: p.Snapshot.DatasetID,
+		Total: len(p.Claims), AssertionTotal: len(p.Assertions),
+		Sample: []ReviewItem{}, AssertionSample: []AssertionReviewItem{}}
 	sections := make(map[string]DocumentSection, len(p.Sections))
 	for _, section := range p.Sections {
 		sections[section.ID] = section
@@ -85,6 +101,45 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	}
 	for _, candidate := range candidates[:limit] {
 		r.Sample = append(r.Sample, candidate.item)
+	}
+	type rankedAssertion struct {
+		key  string
+		item AssertionReviewItem
+	}
+	var assertionCandidates []rankedAssertion
+	for _, assertion := range p.Assertions {
+		switch assertion.Status {
+		case StatusVerified:
+			r.AssertionVerified++
+		case StatusRejected:
+			r.AssertionRejected++
+		case StatusProposed:
+			r.AssertionProposed++
+			item := AssertionReviewItem{AssertionID: assertion.ID, Predicate: assertion.Predicate,
+				SubjectID: assertion.SubjectID, ObjectID: assertion.ObjectID}
+			for _, id := range assertion.EvidenceIDs {
+				item.Evidence = append(item.Evidence, evidence[id])
+			}
+			keyBytes := sha256.Sum256([]byte(salt + "\x00" + p.Snapshot.DatasetID + "\x00" + assertion.ID))
+			assertionCandidates = append(assertionCandidates, rankedAssertion{key: hex.EncodeToString(keyBytes[:]), item: item})
+		}
+	}
+	if reviewed := r.AssertionVerified + r.AssertionRejected; reviewed > 0 {
+		precision := float64(r.AssertionVerified) / float64(reviewed)
+		r.AssertionPrecision = &precision
+	}
+	sort.Slice(assertionCandidates, func(i, j int) bool {
+		if assertionCandidates[i].key == assertionCandidates[j].key {
+			return assertionCandidates[i].item.AssertionID < assertionCandidates[j].item.AssertionID
+		}
+		return assertionCandidates[i].key < assertionCandidates[j].key
+	})
+	assertionLimit := limit
+	if assertionLimit > len(assertionCandidates) {
+		assertionLimit = len(assertionCandidates)
+	}
+	for _, candidate := range assertionCandidates[:assertionLimit] {
+		r.AssertionSample = append(r.AssertionSample, candidate.item)
 	}
 	return r, nil
 }

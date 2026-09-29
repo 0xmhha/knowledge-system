@@ -1,0 +1,160 @@
+package semantic
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+)
+
+type graphCoordinates struct {
+	SchemaVersion string `json:"schema_version"`
+	SrcRoot       string `json:"src_root"`
+	SrcCommit     string `json:"src_commit"`
+	GraphDigest   string `json:"graph_digest"`
+}
+
+type vectorCoordinates struct {
+	SrcRoot        string `json:"src_root"`
+	SrcCommit      string `json:"src_commit"`
+	SymbolCount    int    `json:"symbol_count"`
+	CanonicalCount int    `json:"canonical_count"`
+	Sources        struct {
+		CKG struct {
+			GraphDigest string `json:"graph_digest"`
+			SrcCommit   string `json:"src_commit"`
+		} `json:"ckg"`
+	} `json:"sources"`
+}
+
+// ValidateCanonicalCoverage applies a project-specific promotion floor to
+// CKV's code-symbol alignment. Zero disables this optional gate.
+func ValidateCanonicalCoverage(vectorDir string, minimum float64) error {
+	if minimum < 0 || minimum > 1 {
+		return fmt.Errorf("canonical coverage minimum must be between 0 and 1")
+	}
+	if minimum == 0 {
+		return nil
+	}
+	var vector vectorCoordinates
+	if err := readCoordinates(filepath.Join(vectorDir, "manifest.json"), &vector); err != nil {
+		return fmt.Errorf("semantic vector manifest: %w", err)
+	}
+	if vector.SymbolCount <= 0 || vector.CanonicalCount < 0 || vector.CanonicalCount > vector.SymbolCount {
+		return fmt.Errorf("semantic canonical coverage counters missing or invalid")
+	}
+	ratio := float64(vector.CanonicalCount) / float64(vector.SymbolCount)
+	if ratio < minimum {
+		return fmt.Errorf("semantic canonical coverage %.4f below project minimum %.4f", ratio, minimum)
+	}
+	return nil
+}
+
+// ValidateDatasetAlignment requires all three layers to share an exact source
+// commit, graph coordinate pin, and source tree. Unlike legacy setup alignment
+// (which warns on old indexes), semantic promotion refuses missing coordinates.
+func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	var graph graphCoordinates
+	if err := readCoordinates(filepath.Join(graphDir, "manifest.json"), &graph); err != nil {
+		return fmt.Errorf("semantic graph manifest: %w", err)
+	}
+	var vector vectorCoordinates
+	if err := readCoordinates(filepath.Join(vectorDir, "manifest.json"), &vector); err != nil {
+		return fmt.Errorf("semantic vector manifest: %w", err)
+	}
+	parts := strings.SplitN(graph.SchemaVersion, ".", 3)
+	if len(parts) < 2 {
+		return fmt.Errorf("semantic graph schema version missing or invalid")
+	}
+	major, majorErr := strconv.Atoi(parts[0])
+	minor, minorErr := strconv.Atoi(parts[1])
+	if majorErr != nil || minorErr != nil || major < 1 || (major == 1 && minor < 19) {
+		return fmt.Errorf("semantic graph schema %q lacks canonical_id support", graph.SchemaVersion)
+	}
+	if graph.SrcCommit == "" || vector.SrcCommit == "" || vector.Sources.CKG.SrcCommit == "" ||
+		graph.SrcCommit != p.Snapshot.Commit || vector.SrcCommit != p.Snapshot.Commit ||
+		vector.Sources.CKG.SrcCommit != p.Snapshot.Commit {
+		return fmt.Errorf("semantic source commit is missing or differs across graph, vector and projection")
+	}
+	if !digestPattern.MatchString(graph.GraphDigest) || graph.GraphDigest != vector.Sources.CKG.GraphDigest {
+		return fmt.Errorf("semantic graph digest pin is missing or mismatched")
+	}
+	if graph.SrcRoot == "" || vector.SrcRoot == "" {
+		return fmt.Errorf("semantic source root missing from graph or vector manifest")
+	}
+	repo, err := normalizedRoot(repoRoot)
+	if err != nil {
+		return err
+	}
+	graphRoot, err := normalizedRoot(graph.SrcRoot)
+	if err != nil {
+		return err
+	}
+	vectorRoot, err := normalizedRoot(vector.SrcRoot)
+	if err != nil {
+		return err
+	}
+	if repo != graphRoot || repo != vectorRoot {
+		return fmt.Errorf("semantic source root differs across graph, vector and projection repository")
+	}
+	return nil
+}
+
+func normalizedRoot(root string) (string, error) {
+	if root == "" {
+		return "", fmt.Errorf("empty source root")
+	}
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
+		return filepath.Clean(resolved), nil
+	}
+	return filepath.Clean(abs), nil
+}
+
+func readCoordinates(path string, out any) error {
+	buf, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(buf, out); err != nil {
+		return err
+	}
+	return nil
+}
+
+// PutAligned is the promotion entry point for projections attached to built
+// CKV/CKG datasets. It verifies engine coordinates and source bytes before
+// the immutable projection is persisted. Put remains available for preparing
+// an unpromoted projection without engine indexes.
+func (s *Store) PutAligned(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir string) error {
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	return s.Put(ctx, p, repoRoot)
+}
+
+// ActivateAligned rechecks current engine coordinates immediately before
+// selecting a projection. It keeps an older stored candidate from becoming
+// live after the graph/vector indexes have moved to another snapshot.
+func (s *Store) ActivateAligned(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir string) error {
+	p, err := s.Load(ctx, projectID, datasetID)
+	if err != nil {
+		return err
+	}
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	if err := p.ValidateSources(ctx, repoRoot); err != nil {
+		return err
+	}
+	return s.Activate(ctx, projectID, datasetID)
+}

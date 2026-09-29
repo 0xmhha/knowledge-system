@@ -32,6 +32,7 @@ func NewCmd() *cobra.Command {
 	_ = review.MarkFlagRequired("input")
 	_ = review.MarkFlagRequired("repo")
 	cmd.AddCommand(review)
+	cmd.AddCommand(newBuildCmd())
 	return cmd
 }
 
