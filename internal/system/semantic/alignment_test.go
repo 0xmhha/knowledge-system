@@ -48,6 +48,10 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 	if err := store.ActivateAligned(ctx, p.Snapshot.ProjectID, p.Snapshot.DatasetID, repo, graphDir, vectorDir); err != nil {
 		t.Fatal(err)
 	}
+	active, err := store.CurrentAligned(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir)
+	if err != nil || active.Snapshot() != p.Snapshot {
+		t.Fatalf("aligned active projection: %+v, %v", active.Snapshot(), err)
+	}
 	// A different project may use the same short symbol names, but its
 	// projection cannot join with this dataset's source root.
 	cases := []struct {
@@ -69,6 +73,9 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 			defer func() { graph, vector = beforeGraph, beforeVector }()
 			tc.edit()
 			write()
+			if _, err := store.CurrentAligned(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("stale read expected %q, got %v", tc.want, err)
+			}
 			other := p
 			other.Snapshot.DatasetID = "other-" + strings.ReplaceAll(tc.name, " ", "-")
 			other.Evidence = append([]EvidenceSpan(nil), p.Evidence...)

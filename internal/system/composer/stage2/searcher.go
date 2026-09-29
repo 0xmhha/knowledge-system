@@ -27,11 +27,13 @@ package stage2
 import (
 	"context"
 	"errors"
+	"math"
 
 	"go.uber.org/zap"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -110,6 +112,10 @@ func DefaultConfig() Config {
 // keywords. Precision/recall computation should use Citations; Hits
 // exists for "why did Stage 2 land on this citation set" debugging.
 type Stage2Output struct {
+	// ConceptCandidates are interpretations of the raw query. They never
+	// remove a CKV/CKG hit; only verified implementation links can boost an
+	// already retrieved citation when the optional resolver is enabled.
+	ConceptCandidates []semantic.ConceptCandidate
 	// Citations is the deduped, score-sorted list of citation candidates
 	// the graph expander should explore. Cap-bounded by Config.MaxCitations.
 	// Use this for evaluation metrics (precision/recall vs human baselines).
@@ -150,9 +156,11 @@ type Stage2Output struct {
 
 // Searcher runs Stage 2 of the composer pipeline.
 type Searcher struct {
-	ckg    ckgclient.Client
-	fp     *footprint.Logger
-	config Config
+	ckg           ckgclient.Client
+	fp            *footprint.Logger
+	config        Config
+	ontology      OntologyResolver
+	ontologyBoost float64
 }
 
 // Option configures a Searcher.
@@ -169,6 +177,13 @@ func WithConfig(cfg Config) Option {
 	return func(s *Searcher) { s.config = cfg }
 }
 
+// WithOntologyResolver enables a bounded soft rerank. The caller must pass
+// a semantic.ActiveProjection obtained through Store.CurrentAligned. Zero
+// boost or nil resolver leaves the historical retrieval path unchanged.
+func WithOntologyResolver(r OntologyResolver, boost float64) Option {
+	return func(s *Searcher) { s.ontology, s.ontologyBoost = r, boost }
+}
+
 // New constructs a Searcher. Returns an error if ckg is nil.
 func New(ckg ckgclient.Client, opts ...Option) (*Searcher, error) {
 	if ckg == nil {
@@ -180,6 +195,9 @@ func New(ckg ckgclient.Client, opts ...Option) (*Searcher, error) {
 	}
 	for _, opt := range opts {
 		opt(s)
+	}
+	if math.IsNaN(s.ontologyBoost) || math.IsInf(s.ontologyBoost, 0) || s.ontologyBoost < 0 || s.ontologyBoost > 0.2 {
+		return nil, errors.New("stage2: ontology boost must be between 0 and 0.2")
 	}
 	return s, nil
 }
@@ -306,7 +324,18 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// tests, so demotion is skipped (current double-count boost
 	// stays intact).
 	demoteTests := intent != contract.IntentTestAdd
-	out.Citations = agg.results(s.config.MaxCitations, demoteTests, demoteDocsFor(intent))
+	demoteDocs := demoteDocsFor(intent)
+	if s.ontology != nil && s.ontologyBoost > 0 {
+		// Freeze the baseline top-K set before changing scores. Ontology may
+		// reorder these citations but cannot admit a new one or displace a
+		// CKV/CKG candidate at the configured output cap.
+		allowed := make(map[string]bool)
+		for _, c := range agg.results(s.config.MaxCitations, demoteTests, demoteDocs) {
+			allowed[c.Citation.Key()] = true
+		}
+		out.ConceptCandidates = applyOntologyBoost(agg, s.ontology, prompt, ckvHits, s.ontologyBoost, allowed)
+	}
+	out.Citations = agg.results(s.config.MaxCitations, demoteTests, demoteDocs)
 	if len(keywords) > 0 {
 		out.Coverage = float64(hitCount) / float64(len(keywords))
 	}

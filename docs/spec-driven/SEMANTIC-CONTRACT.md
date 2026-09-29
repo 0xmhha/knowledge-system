@@ -50,4 +50,4 @@ cks semantic review --input /path/to/projection.json --repo /path/to/repo --samp
 
 `--min-canonical-ratio`는 프로젝트 실측 기준으로 선택한다. 0이면 게이트를 끄며, 양수이면 CKV 매니페스트의 `canonical_count / symbol_count`가 기준보다 낮거나 카운터가 없을 때 승격을 막는다. 예시의 0.94는 이 프로젝트의 구조 기준선(약 94.28%)에 맞춘 값이지 다른 저장소의 기본값이 아니다. 실제 임베딩 검색 품질과는 별도 지표다.
 
-이 저장소는 아직 CKS Composer의 질의 경로에 연결되지 않았다. 의미 관계의 타입 제약, CKV 텍스트 투영, 근거 충돌, 프로젝트별 A/B 품질 측정이 통과한 후 기능 플래그로 연결한다. 기본 검색은 기존 CKV+CKG 경로를 유지한다.
+CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호출자는 `Store.CurrentAligned`로 활성 투영을 다시 검증해 전달할 수 있다. 질의의 선호·대체 용어를 복수 개념 후보로 해석하고, `verified` 개념과 `verified IMPLEMENTED_BY` 관계가 CKV 결과의 canonical ID·커밋·파일·줄과 일치할 때만 기존 상위 K 인용의 점수를 최대 20% 올린다. 동점 의미를 합치거나 결과를 새로 추가하지 않는다. 오류가 나면 기존 검색 결과를 유지한다. 현재 CKS CLI/MCP에서는 이 옵션을 전달하지 않아 기본 검색은 기존 CKV+CKG 경로 그대로다. CKV 텍스트 투영과 실제 임베딩 모델의 A/B 품질·지연 평가가 남아 있으므로 운영 기본 활성화는 보류한다.
