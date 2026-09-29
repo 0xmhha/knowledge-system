@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/cmd/cks/agentcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/doctorcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/domaincli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/evalcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/evalgatecli"
@@ -49,6 +50,8 @@ func main() {
 	root.AddCommand(evalcli.NewCmd())
 	root.AddCommand(setupcli.NewCmd())
 	root.AddCommand(semanticcli.NewCmd())
+	root.AddCommand(doctorcli.NewCmd())
+	root.AddCommand(doctorcli.NewInitCmd())
 	root.AddCommand(filelistcli.NewCmd())
 	root.AddCommand(evalgatecli.NewCmd())
 	root.AddCommand(viewercli.NewCmd())

@@ -75,12 +75,13 @@ func TestResolveAutoVersion(t *testing.T) {
 		t.Errorf("existing version dir not refused: %v", err)
 	}
 
-	// A dirty tracked tree is refused; an untracked file is not dirt.
-	if err := os.WriteFile(filepath.Join(src, "untracked.txt"), []byte("u\n"), 0o644); err != nil {
+	// CKV indexes eligible untracked files, so commit-named versions must
+	// reject them rather than aliasing different bytes at the same HEAD.
+	if err := os.WriteFile(filepath.Join(src, "untracked.go"), []byte("package fixture\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := resolveAutoVersion("", src, ""); err != nil {
-		t.Errorf("untracked file must not count as dirty: %v", err)
+	if _, err := resolveAutoVersion("", src, ""); err == nil || !strings.Contains(err.Error(), "tracked or untracked") {
+		t.Errorf("untracked indexable source was accepted: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(src, "a.txt"), []byte("changed\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -95,5 +96,30 @@ func TestResolveAutoVersion(t *testing.T) {
 	}
 	if _, err := resolveAutoVersion("", "", ""); err == nil {
 		t.Error("empty src not refused")
+	}
+}
+
+func TestResolveAutoVersionRejectsGitIgnoredIndexableSource(t *testing.T) {
+	src, _ := gitRepo(t)
+	if err := os.WriteFile(filepath.Join(src, ".gitignore"), []byte("*.go\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command("git", "-C", src, "add", ".gitignore")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git add: %v: %s", err, out)
+	}
+	cmd = exec.Command("git", "-C", src, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "commit", "-qm", "ignore")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git commit: %v: %s", err, out)
+	}
+	if err := os.WriteFile(filepath.Join(src, "ignored.go"), []byte("package fixture\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	status, err := gitOutput(src, "status", "--porcelain")
+	if err != nil || status != "" {
+		t.Fatalf("ignored fixture not clean in Git: %q, %v", status, err)
+	}
+	if _, err := resolveAutoVersion("", src, ""); err == nil || !strings.Contains(err.Error(), "Git-ignored") {
+		t.Fatalf("Git-ignored Go source accepted under commit version: %v", err)
 	}
 }

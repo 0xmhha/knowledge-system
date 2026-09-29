@@ -62,10 +62,18 @@ func resolveAutoVersion(out, src, filelistConfig string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("--version auto: git status of %s: %v", src, err)
 	}
-	for _, l := range strings.Split(status, "\n") {
-		if l != "" && !strings.HasPrefix(l, "??") {
-			return "", fmt.Errorf("--version auto: tracked working tree at %s is dirty — the version name would not match the indexed state; commit/stash first", src)
-		}
+	if status != "" {
+		// CKV discovers source files from the filesystem, including eligible
+		// untracked files. A commit-only version name would otherwise alias
+		// two different index contents at the same HEAD.
+		return "", fmt.Errorf("--version auto: working tree at %s is dirty (tracked or untracked changes) — the commit-based version would not identify indexed bytes; commit/stash or ignore them first", src)
+	}
+	ignored, err := setup.CountIgnoredIndexable(src)
+	if err != nil {
+		return "", fmt.Errorf("--version auto: %w", err)
+	}
+	if ignored > 0 {
+		return "", fmt.Errorf("--version auto: %d Git-ignored source files may still be indexed by CKV; configure .ckvignore or use an explicit working-tree version", ignored)
 	}
 	name := head[:8]
 	if filelistConfig != "" {
