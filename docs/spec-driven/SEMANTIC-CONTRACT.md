@@ -62,4 +62,6 @@ CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호�
 
 `cks semantic plan`은 동일한 정렬 검증 뒤 각 요구사항에 필요한 다음 조치를 읽기 전용 JSON으로 제시한다. 근거 ID, 이미 알려진 코드·테스트 심볼 ID, 누락 관계, 충돌 관계 ID를 유지하며 모든 단계에 `unconfirmed=true`를 단다. 연결이 완성되어도 계획은 수용 테스트 실행을 요구한다. 이 계획은 코드 변경이나 승인 결정을 생성하지 않는다.
 
+`cks semantic annotate-pack --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --input <base-pack.json> --out <new-pack.json>`은 기존 EvidencePack의 무결성을 확인한 뒤, **이미 포함된 인용의 커밋·파일·줄 범위**와 겹치는 검토된 추적 경로 ID만 `semantic` 선택 필드에 추가한다. 기존 인용·본문을 늘리거나 원문을 복사하지 않는다. 의미 필드는 별도 SHA-256 다이제스트로 검증하고, 기본 팩 해시는 기존 소비자가 새 필드를 무시한 채 검증할 수 있도록 동일하게 유지한다. 이로 인해 기본 팩 해시는 의미 필드를 보호하지 않으므로 새 소비자는 `semantic.digest`도 반드시 검사해야 한다. 모든 링크는 `unconfirmed=true`이며 테스트 통과를 뜻하지 않는다. 동일 커밋의 일치하는 인용이 없으면 의미 필드는 생략된다.
+
 `cks semantic test --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --criterion-id <id> --out <new-report.json> -- go test ./...`는 **검토된 연결이 있는 수용 기준**에서만 명령을 실행한다. 실행 전 소스 HEAD가 투영 커밋과 같고 추적·미추적·인덱싱 가능한 Git 무시 파일의 변경이 없어야 한다. 실행 후에도 같은 검사를 수행한다. 보고서는 명령 인자와 출력의 SHA-256, 출력 길이, 종료 코드, OS/아키텍처/Go 런타임, 소요 시간 및 스냅샷 일치 여부를 기록하되 원문 출력은 저장하지 않고 기존 파일을 덮어쓰지 않는다. 실패 명령은 비정상 종료와 함께 실패 보고서를 남긴다. 명령이 성공해도 그 명령이 해당 Given/When/Then을 검증했는지 자동 판정할 수 없으므로 요구사항이나 관계의 상태를 승격하지 않는다. 외부 패치 식별·실패 패치 미승격·재색인 연결은 후속 구현이다.

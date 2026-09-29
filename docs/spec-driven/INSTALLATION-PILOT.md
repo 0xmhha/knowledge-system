@@ -28,6 +28,8 @@ python3 scripts/package-host.py --out-dir /tmp/knowledge-system-dist
 
 `init`은 기존 설정을 덮어쓰지 않는다. 실제 임베더를 명시해야 하며 Ollama 모델은 별도로 준비해야 한다. `doctor`는 Go, TypeScript, JavaScript, Solidity, Markdown 파일 수와 graph-only Proto 수를 미리 보고한다. 심볼릭 링크와 의심스러운 비밀 경로를 개수로만 보고하며 내용을 읽거나 출력하지 않는다. 이 진단은 프로젝트의 `.ckvignore`와 파일 목록 정책이 제대로 적용됐는지 대체하지 않는다.
 
+Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown만 있는 저장소에서도 문서 검색은 가능하지만 코드 AST 그래프와 CKV 코드 심볼의 조인은 없다. `doctor`는 `shared_code_files=0`, `status=degraded`로 이 범위를 표시한다. TypeScript 저장소는 `shared_code_files`를 양수로 보고한다. 세 유형의 독립 저장소에서 `init → setup → doctor → ckv query`를 실행하는 구조 스모크는 `scripts/wbs-install-smoke.sh`에 있다. 이 테스트는 mock 임베더와 현재 macOS 호스트만 다룬다.
+
 `--version auto`는 커밋 기반 버전 이름을 사용한다. 추적·미추적 파일이 남아 있거나 Git이 무시하지만 CKV/CKG가 읽을 수 있는 소스 파일이 있으면 같은 HEAD의 서로 다른 바이트가 같은 버전 이름을 갖지 않도록 거부한다. 작업 트리 스냅샷 모드는 아직 구현 중이다. 설정 파일을 소스 저장소 안에 만들었다면 커밋하거나 무시 정책을 정한 뒤 빌드한다.
 
 ## 3. 서비스와 롤백
@@ -48,4 +50,4 @@ python3 scripts/package-host.py --out-dir /tmp/knowledge-system-dist
 ./cks setup --config /path/to/project-setup.yaml --rollback PREVIOUS_VERSION
 ```
 
-이 절차는 프로젝트별 수동 스모크의 출발점이다. Windows/Linux 빌드·실행, 깨끗한 호스트의 네이티브 의존성, 실제 임베딩 모델의 품질·지연, 여러 프로젝트의 격리, 작업 트리 스냅샷, 재시작 후 인용 동일성은 Gate 5에 남아 있다.
+이 절차는 프로젝트별 수동 스모크의 출발점이다. Windows/Linux 빌드·실행, 깨끗한 호스트의 네이티브 의존성, 실제 임베딩 모델의 품질·지연, 작업 트리 스냅샷, 재시작 후 인용 동일성은 Gate 5에 남아 있다. 현재 호스트의 구조 스모크는 세 프로젝트를 독립 데이터셋으로 설치해 각 인용의 커밋을 검사했고, 별도 스모크는 재색인 게이트 실패 시 `current`가 유지되고 롤백 시 이전 의미 추적이 복구되는 것을 확인했다.

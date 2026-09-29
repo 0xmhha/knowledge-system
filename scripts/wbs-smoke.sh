@@ -159,6 +159,20 @@ if "$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
   echo "unlinked criterion was executed" >&2
   exit 1
 fi
+read -r code_file code_start code_end code_commit < <(python3 - "$scratch/projection-reviewed.json" <<'PY'
+import json, sys
+p = json.load(open(sys.argv[1], encoding='utf-8'))
+e = next(e for e in p['evidence'] if e['id'] == 'code:alpha')
+print(e['path'], e['start_line'], e['end_line'], p['snapshot']['commit'])
+PY
+)
+(cd "$repo_root" && go build -o "$scratch/make-pack" ./testdata/wbs-smoke/make-pack/main.go)
+"$scratch/make-pack" "$code_file" "$code_start" "$code_end" \
+  "$code_commit" "$scratch/base-pack.json"
+"$repo_root/bin/cks" semantic annotate-pack --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --input "$scratch/base-pack.json" \
+  --out "$scratch/annotated-pack.json"
 "$repo_root/bin/cks" mcp gen-config --dataset-dir "$dataset/current" \
   --name ks-fixture --source-root "$src" --out "$config"
 python3 - "$config" <<'PY'
@@ -176,7 +190,7 @@ PY
   --config "$config" --verify-anchors "$src" --output "$scratch/find-alpha-report.json"
 "$repo_root/bin/cks" eval --scenarios "$repo_root/testdata/wbs-smoke/absent-api.yaml" \
   --config "$config" --output "$scratch/absent-api-report.json"
-python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" <<'PY'
+python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" "$scratch/base-pack.json" "$scratch/annotated-pack.json" <<'PY'
 import json
 import sqlite3
 import sys
@@ -206,5 +220,40 @@ assert passed['command_passed'] is True and passed['snapshot_consistent'] is Tru
 assert failed['command_passed'] is False and failed['snapshot_consistent'] is True and failed['exit_code'] != 0, failed
 from pathlib import Path
 assert not Path(sys.argv[13]).exists(), 'unlinked criterion wrote a result'
+base = json.load(open(sys.argv[14], encoding='utf-8'))
+annotated = json.load(open(sys.argv[15], encoding='utf-8'))
+assert base['metadata']['integrity_hash'] == annotated['metadata']['integrity_hash'], annotated
+assert annotated['semantic']['links'][0]['requirement_id'] == 'req-alpha' and annotated['semantic']['links'][0]['unconfirmed'] is True, annotated
+PY
+printf '\nA second committed snapshot.\n' >> "$src/README.md"
+git -C "$src" add README.md
+git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
+  -c user.email=codex@example.com commit -qm next-snapshot
+"$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
+  --embedder mock --version smoke-next --gate-min-canonical 0.4 --progress text \
+  > "$scratch/reindex-next.log" 2>&1
+test "$(readlink "$dataset/current")" = smoke-next
+if "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" > "$scratch/stale-trace.log" 2>&1; then
+  echo "semantic trace accepted a different graph/vector snapshot" >&2
+  exit 1
+fi
+if "$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
+  --embedder mock --version smoke-rejected --gate-min-canonical 1.0 --progress text \
+  > "$scratch/reindex-rejected.log" 2>&1; then
+  echo "low-coverage candidate was promoted" >&2
+  exit 1
+fi
+test "$(readlink "$dataset/current")" = smoke-next
+"$repo_root/bin/cks" setup --out "$dataset" --rollback smoke > "$scratch/rollback.log" 2>&1
+test "$(readlink "$dataset/current")" = smoke
+"$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" > "$scratch/rollback-trace.json"
+python3 - "$scratch/rollback-trace.json" <<'PY'
+import json, sys
+report = json.load(open(sys.argv[1], encoding='utf-8'))
+assert report['requirements'][0]['state'] == 'linked', report
 PY
 printf 'Structural smoke reports: %s\n' "$scratch"

@@ -22,6 +22,7 @@ type Report struct {
 	Commit           string         `json:"commit"`
 	Dirty            bool           `json:"dirty"`
 	Languages        map[string]int `json:"languages"`
+	SharedCodeFiles  int            `json:"shared_code_files"`
 	GraphOnlyProto   int            `json:"graph_only_proto"`
 	SymlinksSkipped  int            `json:"symlinks_skipped"`
 	UnreadableFiles  int            `json:"unreadable_files"`
@@ -178,6 +179,14 @@ func Inspect(src, dataset string) (Report, error) {
 	}
 	if len(report.Languages) == 0 {
 		report.Issues = append(report.Issues, "no CKV-supported source or Markdown files detected; graph-only proto files may still be available")
+	}
+	for language, count := range report.Languages {
+		if language != "markdown" {
+			report.SharedCodeFiles += count
+		}
+	}
+	if report.SharedCodeFiles == 0 {
+		report.Issues = append(report.Issues, "no code files supported by both graph and vector engines; indexing is document-only or graph-only")
 	}
 	if dataset != "" {
 		inspectDataset(&report, dataset)

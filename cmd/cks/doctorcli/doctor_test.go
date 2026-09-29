@@ -109,6 +109,22 @@ func TestLanguageCapabilityPreview(t *testing.T) {
 	}
 }
 
+func TestDoctorLabelsDocumentOnlyRepositoryAsDegraded(t *testing.T) {
+	root := t.TempDir()
+	doctorGit(t, root, "init", "-q")
+	for name, contents := range map[string]string{"README.md": "# Sample\n", "main.py": "print('sample')\n"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(contents), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	doctorGit(t, root, "add", ".")
+	doctorGit(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+	report, err := Inspect(root, "")
+	if err != nil || report.Status != "degraded" || report.SharedCodeFiles != 0 || report.Languages["markdown"] != 1 {
+		t.Fatalf("unsupported code capacity overstated: %+v, %v", report, err)
+	}
+}
+
 func TestDoctorFlagsGitIgnoredIndexableFiles(t *testing.T) {
 	root, _ := doctorRepo(t)
 	if err := os.WriteFile(filepath.Join(root, ".gitignore"), []byte("ignored.md\n"), 0o644); err != nil {
