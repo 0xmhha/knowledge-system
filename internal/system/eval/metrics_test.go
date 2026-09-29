@@ -2,6 +2,7 @@ package eval
 
 import (
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -66,6 +67,28 @@ func TestMatchStrict_ExactOnly(t *testing.T) {
 	}
 	if matchStrict(c, cit("a.go", 10, 29)) {
 		t.Error("off-by-one end fails strict")
+	}
+}
+
+func TestCitationMatch_RespectsExpectedCommitWhenPresent(t *testing.T) {
+	current := strings.Repeat("a", 40)
+	stale := strings.Repeat("b", 40)
+	expected := contract.Citation{File: "a.go", StartLine: 10, EndLine: 30, CommitHash: current}
+	actual := contract.Citation{File: "a.go", StartLine: 10, EndLine: 30, CommitHash: stale}
+	if matchOverlap(expected, actual) || matchStrict(expected, actual) {
+		t.Fatal("same location at a different commit matched")
+	}
+	if p, r, _ := precisionRecall([]contract.Citation{expected}, []contract.Citation{actual}, MatchOverlap); p != 0 || r != 0 {
+		t.Fatalf("wrong-commit P/R = %v/%v", p, r)
+	}
+	actual.CommitHash = current
+	if !matchOverlap(expected, actual) || !matchStrict(expected, actual) {
+		t.Fatal("same location at the expected commit did not match")
+	}
+	staleFirst := contract.Citation{File: "a.go", StartLine: 10, EndLine: 30, CommitHash: stale}
+	p, r, _ := precisionRecall([]contract.Citation{expected}, []contract.Citation{staleFirst, actual}, MatchOverlap)
+	if p != 0.5 || r != 1 || mrr([]contract.Citation{expected}, []contract.Citation{staleFirst, actual}, MatchOverlap) != 0.5 {
+		t.Fatalf("cross-commit location was deduplicated: P/R=%v/%v", p, r)
 	}
 }
 

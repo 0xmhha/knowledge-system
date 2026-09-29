@@ -3,6 +3,7 @@ package eval
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -151,6 +152,66 @@ func TestRunner_Execute_CitationAbstention(t *testing.T) {
 	}
 }
 
+func TestRunner_Execute_SeparatesRetrievalEvidenceAbstentionAndSnapshot(t *testing.T) {
+	current := strings.Repeat("a", 40)
+	stale := strings.Repeat("b", 40)
+	for _, tc := range []struct {
+		name           string
+		pack           contract.EvidencePack
+		head           string
+		expected       []contract.Citation
+		knowledge      []string
+		noCitations    bool
+		wantRetrieval  string
+		wantEvidence   string
+		wantAbstention string
+		wantSnapshot   string
+	}{
+		{
+			name: "stale citation with matching file and lines",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "a.go", StartLine: 1, EndLine: 3, CommitHash: stale}}},
+			head: current, expected: []contract.Citation{cit("a.go", 1, 3)},
+			wantRetrieval: "miss", wantEvidence: "not_evaluated", wantAbstention: "not_applicable", wantSnapshot: "conflict",
+		},
+		{
+			name: "missing knowledge",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "a.go", StartLine: 1, EndLine: 3, CommitHash: current}}},
+			head: current, expected: []contract.Citation{cit("a.go", 1, 3)}, knowledge: []string{"policy"},
+			wantRetrieval: "pass", wantEvidence: "missing", wantAbstention: "not_applicable", wantSnapshot: "current",
+		},
+		{
+			name: "no citation with stale head",
+			pack: contract.EvidencePack{}, head: stale, noCitations: true,
+			wantRetrieval: "not_evaluated", wantEvidence: "not_evaluated", wantAbstention: "pass", wantSnapshot: "conflict",
+		},
+		{
+			name: "unrelated citation violates abstention",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "other.go", StartLine: 1, EndLine: 2, CommitHash: current}}},
+			head: current, noCitations: true,
+			wantRetrieval: "not_evaluated", wantEvidence: "not_evaluated", wantAbstention: "fail", wantSnapshot: "current",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m := &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{
+				toolGetForTask: packResult(tc.pack),
+				toolFreshness:  mcpgo.NewToolResultStructured(map[string]string{"indexed_head": tc.head}, "freshness"),
+			}}
+			r := &Runner{client: m}
+			s := &Scenario{Version: 1, Name: "pinned", Prompt: "find handler", MatchMode: MatchOverlap, Runs: 1, ExpectedCommit: current, ExpectedCitations: tc.expected, ExpectedKnowledge: tc.knowledge, ExpectNoCitations: tc.noCitations}
+			got, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.RetrievalState != tc.wantRetrieval || got.EvidenceState != tc.wantEvidence || got.AbstentionState != tc.wantAbstention || got.SnapshotState != tc.wantSnapshot {
+				t.Fatalf("states = %+v", got)
+			}
+			if tc.name == "stale citation with matching file and lines" && got.Metrics.FileRecall != 0 {
+				t.Fatalf("stale citation inflated recall: %v", got.Metrics.FileRecall)
+			}
+		})
+	}
+}
+
 func TestRunner_Execute_TakesMedianAcrossRuns(t *testing.T) {
 	t.Parallel()
 	// Runs=3 → three identical calls. Backend returns the same pack
@@ -210,6 +271,9 @@ func TestRunner_Execute_ToolErrorRecordedAsError(t *testing.T) {
 	}
 	if result.Error == "" {
 		t.Error("Result.Error should carry the tool error text")
+	}
+	if result.RetrievalState != "error" {
+		t.Errorf("retrieval state = %q, want error", result.RetrievalState)
 	}
 }
 

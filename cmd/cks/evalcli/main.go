@@ -174,6 +174,16 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 	if failedAbstentions > 0 {
 		return fmt.Errorf("%d citation abstention scenario(s) failed", failedAbstentions)
 	}
+	badSnapshots := 0
+	for _, r := range report.Results {
+		if r.SnapshotState == "conflict" || r.SnapshotState == "unverified" {
+			log.Printf("cks-eval: snapshot %s: %s: %s", r.SnapshotState, r.Name, r.SnapshotReason)
+			badSnapshots++
+		}
+	}
+	if badSnapshots > 0 {
+		return fmt.Errorf("%d scenario snapshot(s) conflicted or could not be verified", badSnapshots)
+	}
 	return nil
 }
 

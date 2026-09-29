@@ -225,11 +225,24 @@ s = s.replace('mcp_stdio: false', 'mcp_stdio: true')
 s = s.replace('transport: http', 'transport: stdio')
 p.write_text(s)
 PY
-"$repo_root/bin/cks" eval --scenarios "$repo_root/testdata/wbs-smoke/find-alpha.yaml" \
+fixture_commit="$(git -C "$src" rev-parse HEAD)"
+cp "$repo_root/testdata/wbs-smoke/find-alpha.yaml" "$scratch/find-alpha-pinned.yaml"
+cp "$repo_root/testdata/wbs-smoke/absent-api.yaml" "$scratch/absent-api-pinned.yaml"
+printf '\nexpected_commit: %s\n' "$fixture_commit" >> "$scratch/find-alpha-pinned.yaml"
+printf '\nexpected_commit: %s\n' "$fixture_commit" >> "$scratch/absent-api-pinned.yaml"
+"$repo_root/bin/cks" eval --scenarios "$scratch/find-alpha-pinned.yaml" \
   --config "$config" --verify-anchors "$src" --output "$scratch/find-alpha-report.json"
-"$repo_root/bin/cks" eval --scenarios "$repo_root/testdata/wbs-smoke/absent-api.yaml" \
+"$repo_root/bin/cks" eval --scenarios "$scratch/absent-api-pinned.yaml" \
   --config "$config" --output "$scratch/absent-api-report.json"
-python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" "$scratch/base-pack.json" "$scratch/annotated-pack.json" <<'PY'
+cp "$repo_root/testdata/wbs-smoke/find-alpha.yaml" "$scratch/find-alpha-stale.yaml"
+printf '\nexpected_commit: %040d\n' 0 >> "$scratch/find-alpha-stale.yaml"
+if "$repo_root/bin/cks" eval --scenarios "$scratch/find-alpha-stale.yaml" \
+  --config "$config" --output "$scratch/find-alpha-stale-report.json" \
+  > "$scratch/find-alpha-stale.log" 2>&1; then
+  echo "eval accepted a conflicting indexed commit" >&2
+  exit 1
+fi
+python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" "$scratch/base-pack.json" "$scratch/annotated-pack.json" "$scratch/find-alpha-stale-report.json" <<'PY'
 import json
 import sqlite3
 import sys
@@ -237,6 +250,10 @@ found = json.load(open(sys.argv[1], encoding='utf-8'))['results'][0]
 absent = json.load(open(sys.argv[2], encoding='utf-8'))['results'][0]
 assert found['metrics']['file_recall'] == 1 and found['metrics']['citation_count'] > 0, found
 assert absent['citation_abstention_passed'] is True, absent
+assert found['retrieval_state'] == 'pass' and found['snapshot_state'] == 'current', found
+assert absent['abstention_state'] == 'pass' and absent['snapshot_state'] == 'current', absent
+stale = json.load(open(sys.argv[16], encoding='utf-8'))['results'][0]
+assert stale['snapshot_state'] == 'conflict' and stale['retrieval_state'] == 'miss', stale
 semantic = json.load(open(sys.argv[3], encoding='utf-8'))
 review = json.load(open(sys.argv[4], encoding='utf-8'))
 assert semantic['activated'] is True and semantic['sections'] > 0 and semantic['chunk_linked_sections'] == semantic['sections'] and semantic['concepts'] == 2 and semantic['requirements'] == 1 and semantic['evidence'] > 0, semantic

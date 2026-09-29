@@ -86,6 +86,14 @@ type ScenarioResult struct {
 	// marked expect_no_citations. It judges evidence retrieval, not any
 	// natural-language answer produced by a downstream model.
 	CitationAbstentionPassed *bool `json:"citation_abstention_passed,omitempty"`
+	// These independent verdicts distinguish a retrieval miss, missing
+	// knowledge, unsafe no-citation behavior, and stale/unverified snapshots.
+	// They describe EvidencePack retrieval only, not a generated answer.
+	RetrievalState  string `json:"retrieval_state"`
+	EvidenceState   string `json:"evidence_state"`
+	AbstentionState string `json:"abstention_state"`
+	SnapshotState   string `json:"snapshot_state"`
+	SnapshotReason  string `json:"snapshot_reason,omitempty"`
 }
 
 // Runner owns one cks-mcp connection and executes scenarios against
@@ -174,9 +182,28 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 	// surfacing.
 	var knowledgeMissing []string
 	missingSeen := map[string]bool{}
+	retrievalMiss := false
+	snapshotState := "unpinned"
+	snapshotReason := ""
+	if s.ExpectedCommit != "" {
+		head, err := r.IndexedHead(ctx)
+		switch {
+		case err != nil:
+			snapshotState = "unverified"
+			snapshotReason = err.Error()
+		case head == "":
+			snapshotState = "unverified"
+			snapshotReason = "indexed head is empty"
+		case head != s.ExpectedCommit:
+			snapshotState = "conflict"
+			snapshotReason = fmt.Sprintf("indexed head %s differs from expected %s", head, s.ExpectedCommit)
+		default:
+			snapshotState = "current"
+		}
+	}
 
 	for i := 0; i < s.Runs; i++ {
-		m, missing, runErr := r.executeOnce(ctx, s)
+		m, missing, citationConflict, runErr := r.executeOnce(ctx, s)
 		if runErr != nil {
 			errMsgs = append(errMsgs, fmt.Sprintf("run %d: %v", i+1, runErr))
 			continue
@@ -188,6 +215,13 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 			}
 		}
 		perRun = append(perRun, m)
+		if len(s.ExpectedCitations) > 0 && m.FileRecall < 1 {
+			retrievalMiss = true
+		}
+		if citationConflict {
+			snapshotState = "conflict"
+			snapshotReason = "one or more citations have an empty or different commit"
+		}
 	}
 
 	out := &ScenarioResult{
@@ -199,6 +233,27 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		Metrics:   medianMetrics(perRun),
 
 		KnowledgeMissing: knowledgeMissing,
+		SnapshotState:    snapshotState,
+		SnapshotReason:   snapshotReason,
+		RetrievalState:   "not_evaluated",
+		EvidenceState:    "not_evaluated",
+		AbstentionState:  "not_applicable",
+	}
+	if len(perRun) != s.Runs {
+		out.RetrievalState = "error"
+	} else if len(s.ExpectedCitations) > 0 {
+		out.RetrievalState = "pass"
+		if retrievalMiss {
+			out.RetrievalState = "miss"
+		}
+	}
+	if len(s.ExpectedKnowledge) > 0 {
+		out.EvidenceState = "pass"
+		if len(perRun) != s.Runs {
+			out.EvidenceState = "error"
+		} else if len(knowledgeMissing) > 0 {
+			out.EvidenceState = "missing"
+		}
 	}
 	if s.ExpectNoCitations {
 		passed := len(perRun) == s.Runs
@@ -208,6 +263,12 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 			}
 		}
 		out.CitationAbstentionPassed = &passed
+		out.AbstentionState = "pass"
+		if len(perRun) != s.Runs {
+			out.AbstentionState = "error"
+		} else if !passed {
+			out.AbstentionState = "fail"
+		}
 	}
 	if len(errMsgs) > 0 {
 		out.Error = strings.Join(errMsgs, "; ")
@@ -248,7 +309,7 @@ func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 }
 
 // executeOnce performs one tool call + metric computation.
-func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, error) {
+func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, bool, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolGetForTask
 	// Pass the scenario's declared intent so the run scores the
@@ -265,30 +326,42 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []strin
 	res, err := r.client.CallTool(ctx, req)
 	elapsed := time.Since(t0)
 	if err != nil {
-		return Metrics{}, nil, fmt.Errorf("CallTool: %w", err)
+		return Metrics{}, nil, false, fmt.Errorf("CallTool: %w", err)
 	}
 	if res != nil && res.IsError {
-		return Metrics{}, nil, fmt.Errorf("%s", concatText(res))
+		return Metrics{}, nil, false, fmt.Errorf("%s", concatText(res))
 	}
 
 	pack, err := decodePack(res)
 	if err != nil {
-		return Metrics{}, nil, fmt.Errorf("decode: %w", err)
+		return Metrics{}, nil, false, fmt.Errorf("decode: %w", err)
 	}
 
 	missingKnowledge := missingKnowledgeScopes(s.ExpectedKnowledge, pack.Knowledge)
-	p, rec, f := precisionRecall(s.ExpectedCitations, pack.Citations, s.MatchMode)
+	metricCitations := pack.Citations
+	citationConflict := false
+	if s.ExpectedCommit != "" {
+		metricCitations = nil
+		for _, citation := range pack.Citations {
+			if citation.CommitHash != s.ExpectedCommit {
+				citationConflict = true
+				continue
+			}
+			metricCitations = append(metricCitations, citation)
+		}
+	}
+	p, rec, f := precisionRecall(s.ExpectedCitations, metricCitations, s.MatchMode)
 	return Metrics{
 		FilePrecision:    p,
 		FileRecall:       rec,
 		FileF1:           f,
-		FileMRR:          mrr(s.ExpectedCitations, pack.Citations, s.MatchMode),
+		FileMRR:          mrr(s.ExpectedCitations, metricCitations, s.MatchMode),
 		TokenUtilization: pack.Metadata.UtilizationRatio,
 		CitationCount:    len(pack.Citations),
 		BodyCount:        len(pack.Bodies),
 		RedactionCount:   len(pack.SanitizeReport),
 		LatencyMS:        elapsed.Milliseconds(),
-	}, missingKnowledge, nil
+	}, missingKnowledge, citationConflict, nil
 }
 
 // medianMetrics folds per-run Metrics into one. Scalar fields and
