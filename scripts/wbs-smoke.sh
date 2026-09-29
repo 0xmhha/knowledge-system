@@ -10,7 +10,8 @@ dataset="$scratch/dataset"
 config="$scratch/cks.yaml"
 mkdir -p "$src"
 cp "$repo_root/testdata/wbs-smoke/go.mod" "$repo_root/testdata/wbs-smoke/main.go" \
-  "$repo_root/testdata/wbs-smoke/README.md" "$repo_root/testdata/wbs-smoke/ontology.yaml" "$src/"
+  "$repo_root/testdata/wbs-smoke/README.md" "$repo_root/testdata/wbs-smoke/ontology.yaml" \
+  "$repo_root/testdata/wbs-smoke/spec.yaml" "$src/"
 git -C "$src" init -q
 git -C "$src" add .
 git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
@@ -22,7 +23,7 @@ git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
 "$repo_root/bin/cks" semantic build --repo "$src" --project-id ks-fixture \
   --dataset-id smoke --graph "$dataset/current/graph" \
   --vector "$dataset/current/vector" --store "$scratch/semantic.db" \
-  --out "$scratch/projection.json" --docs README.md --ontology ontology.yaml \
+  --out "$scratch/projection.json" --docs README.md --ontology ontology.yaml --spec spec.yaml \
   --min-canonical-ratio 0.4 --activate \
   > "$scratch/semantic-build.json"
 "$repo_root/bin/cks" semantic review --input "$scratch/projection.json" \
@@ -30,7 +31,7 @@ git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
 "$repo_root/bin/cks" semantic build --repo "$src" --project-id ks-fixture \
   --dataset-id smoke-code --graph "$dataset/current/graph" \
   --vector "$dataset/current/vector" --store "$scratch/semantic.db" \
-  --out "$scratch/projection-code.json" --docs README.md --ontology ontology.yaml \
+  --out "$scratch/projection-code.json" --docs README.md --ontology ontology.yaml --spec spec.yaml \
   --min-canonical-ratio 0.4 --extract-only > "$scratch/semantic-extract.json"
 python3 - "$scratch/projection-code.json" "$dataset/current/graph/graph.db" "$src" <<'PY'
 import hashlib
@@ -109,8 +110,8 @@ assert found['metrics']['file_recall'] == 1 and found['metrics']['citation_count
 assert absent['citation_abstention_passed'] is True, absent
 semantic = json.load(open(sys.argv[3], encoding='utf-8'))
 review = json.load(open(sys.argv[4], encoding='utf-8'))
-assert semantic['activated'] is True and semantic['sections'] > 0 and semantic['concepts'] == 2 and semantic['evidence'] > 0, semantic
-assert review['project_id'] == 'ks-fixture' and review['reviewed_precision'] is None and review['concept_proposed'] == 2 and len(review['concept_sample']) == 2, review
+assert semantic['activated'] is True and semantic['sections'] > 0 and semantic['concepts'] == 2 and semantic['requirements'] == 1 and semantic['evidence'] > 0, semantic
+assert review['project_id'] == 'ks-fixture' and review['reviewed_precision'] is None and review['concept_proposed'] == 2 and len(review['concept_sample']) == 2 and review['requirement_proposed'] == 1, review
 promotion = json.load(open(sys.argv[5], encoding='utf-8'))
 code_review = json.load(open(sys.argv[6], encoding='utf-8'))
 assert promotion['activated'] is True and promotion['assertions'] == 1, promotion

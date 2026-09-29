@@ -4,7 +4,7 @@
 package semantic
 
 // SchemaVersion is the file/DB projection contract version.
-const SchemaVersion = 1
+const SchemaVersion = 2
 
 type Status string
 
@@ -75,6 +75,30 @@ type Term struct {
 	Preferred bool   `json:"preferred" yaml:"preferred"`
 }
 
+// Requirement is an approved or proposed specification, not a statement
+// that code exists. Implementation is determined later from reviewed edges.
+type Requirement struct {
+	ID                 string                `json:"id" yaml:"id"`
+	Version            int                   `json:"version" yaml:"version"`
+	Title              string                `json:"title" yaml:"title"`
+	Statement          string                `json:"statement" yaml:"statement"`
+	Status             Status                `json:"status" yaml:"status"`
+	ReviewedBy         string                `json:"reviewed_by,omitempty" yaml:"reviewed_by"`
+	EvidenceID         string                `json:"evidence_id" yaml:"-"`
+	ConceptIDs         []string              `json:"concept_ids,omitempty" yaml:"concept_ids"`
+	AcceptanceCriteria []AcceptanceCriterion `json:"acceptance_criteria" yaml:"acceptance_criteria"`
+}
+
+// AcceptanceCriterion describes observable behavior without claiming a test
+// already passes. Its evidence points to the exact committed specification.
+type AcceptanceCriterion struct {
+	ID         string `json:"id" yaml:"id"`
+	Given      string `json:"given" yaml:"given"`
+	When       string `json:"when" yaml:"when"`
+	Then       string `json:"then" yaml:"then"`
+	EvidenceID string `json:"evidence_id" yaml:"-"`
+}
+
 // Claim is a human-readable assertion extracted from a section. Extraction
 // starts proposed; verification requires an explicit reviewer and live proof.
 type Claim struct {
@@ -113,6 +137,7 @@ type Projection struct {
 	Evidence      []EvidenceSpan    `json:"evidence"`
 	Sections      []DocumentSection `json:"sections"`
 	Concepts      []Concept         `json:"concepts,omitempty"`
+	Requirements  []Requirement     `json:"requirements,omitempty"`
 	Claims        []Claim           `json:"claims"`
 	Assertions    []Assertion       `json:"assertions,omitempty"`
 }

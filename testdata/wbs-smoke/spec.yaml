@@ -1,0 +1,14 @@
+version: 1
+project_id: ks-fixture
+requirements:
+  - id: req-alpha
+    version: 1
+    title: Source backed Alpha
+    statement: Alpha is located through a committed source citation.
+    status: proposed
+    concept_ids: [alpha-function]
+    acceptance_criteria:
+      - id: ac-alpha
+        given: A repository containing Alpha
+        when: The user asks for Alpha
+        then: The answer cites the committed main.go lines

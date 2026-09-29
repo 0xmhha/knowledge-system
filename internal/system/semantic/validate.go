@@ -30,8 +30,11 @@ func (s Snapshot) validate() error {
 // Validate checks schema shape, local references, and snapshot isolation.
 // It does not prove source bytes; call ValidateSources before promotion.
 func (p Projection) Validate() error {
-	if p.SchemaVersion != SchemaVersion {
-		return fmt.Errorf("semantic schema version %d, want %d", p.SchemaVersion, SchemaVersion)
+	if p.SchemaVersion != 1 && p.SchemaVersion != SchemaVersion {
+		return fmt.Errorf("semantic schema version %d is unsupported", p.SchemaVersion)
+	}
+	if p.SchemaVersion == 1 && len(p.Requirements) != 0 {
+		return fmt.Errorf("semantic schema version 1 cannot contain requirements")
 	}
 	if err := p.Snapshot.validate(); err != nil {
 		return err
@@ -138,6 +141,56 @@ func (p Projection) Validate() error {
 			return fmt.Errorf("concept %q has invalid status %q", concept.ID, concept.Status)
 		}
 		concepts[concept.ID] = concept
+	}
+	usedSpecEvidence := map[string]bool{}
+	for _, requirement := range p.Requirements {
+		if err := claimID(requirement.ID); err != nil {
+			return err
+		}
+		if requirement.Version < 1 || strings.TrimSpace(requirement.Title) == "" || strings.TrimSpace(requirement.Statement) == "" {
+			return fmt.Errorf("requirement %q needs a positive version, title, and statement", requirement.ID)
+		}
+		e, ok := evidence[requirement.EvidenceID]
+		if !ok || e.Kind != SourceDocument || e.Extractor != "spec-yaml-v1" {
+			return fmt.Errorf("requirement %q needs specification source evidence", requirement.ID)
+		}
+		usedSpecEvidence[requirement.EvidenceID] = true
+		switch requirement.Status {
+		case StatusProposed:
+		case StatusVerified, StatusRejected:
+			if strings.TrimSpace(requirement.ReviewedBy) == "" {
+				return fmt.Errorf("reviewed requirement %q needs reviewed_by", requirement.ID)
+			}
+		default:
+			return fmt.Errorf("requirement %q has invalid status %q", requirement.ID, requirement.Status)
+		}
+		for _, conceptID := range requirement.ConceptIDs {
+			if _, ok := concepts[conceptID]; !ok {
+				return fmt.Errorf("requirement %q refers to missing concept %q", requirement.ID, conceptID)
+			}
+		}
+		if len(requirement.AcceptanceCriteria) == 0 {
+			return fmt.Errorf("requirement %q needs at least one acceptance criterion", requirement.ID)
+		}
+		for _, criterion := range requirement.AcceptanceCriteria {
+			if err := claimID(criterion.ID); err != nil {
+				return err
+			}
+			if strings.TrimSpace(criterion.Given) == "" || strings.TrimSpace(criterion.When) == "" || strings.TrimSpace(criterion.Then) == "" {
+				return fmt.Errorf("criterion %q needs given, when, and then", criterion.ID)
+			}
+			ce, ok := evidence[criterion.EvidenceID]
+			if !ok || ce.Kind != SourceDocument || ce.Extractor != "spec-yaml-v1" || ce.Path != e.Path ||
+				ce.StartLine < e.StartLine || ce.EndLine > e.EndLine {
+				return fmt.Errorf("criterion %q needs source evidence inside requirement %q", criterion.ID, requirement.ID)
+			}
+			usedSpecEvidence[criterion.EvidenceID] = true
+		}
+	}
+	for _, e := range p.Evidence {
+		if e.Extractor == "spec-yaml-v1" && !usedSpecEvidence[e.ID] {
+			return fmt.Errorf("orphan specification evidence %q", e.ID)
+		}
 	}
 	claims := make(map[string]Claim, len(p.Claims))
 	for _, claim := range p.Claims {
@@ -356,6 +409,29 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 			current, ok := want[original.ID]
 			if !ok || !reflect.DeepEqual(current, original) {
 				return fmt.Errorf("ontology concept %q differs from source", original.ID)
+			}
+		}
+	}
+	specByPath := map[string]map[string]Requirement{}
+	for _, requirement := range p.Requirements {
+		file := evidenceByID[requirement.EvidenceID].Path
+		if specByPath[file] == nil {
+			specByPath[file] = map[string]Requirement{}
+		}
+		specByPath[file][requirement.ID] = requirement
+	}
+	for file, want := range specByPath {
+		extracted, _, err := ExtractSpec(p.Snapshot, file, contents[file])
+		if err != nil {
+			return fmt.Errorf("spec %q source parse: %w", file, err)
+		}
+		if len(extracted.Requirements) != len(want) {
+			return fmt.Errorf("spec %q requirement set differs from source", file)
+		}
+		for _, original := range extracted.Requirements {
+			current, ok := want[original.ID]
+			if !ok || !reflect.DeepEqual(current, original) {
+				return fmt.Errorf("spec requirement %q differs from source", original.ID)
 			}
 		}
 	}

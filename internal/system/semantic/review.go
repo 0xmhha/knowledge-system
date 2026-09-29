@@ -29,6 +29,11 @@ type ConceptReviewItem struct {
 	Evidence EvidenceSpan `json:"evidence"`
 }
 
+type RequirementReviewItem struct {
+	Requirement Requirement  `json:"requirement"`
+	Evidence    EvidenceSpan `json:"evidence"`
+}
+
 // AmbiguousTerm names one surface form shared by multiple concepts. It is a
 // reviewer warning, not an automatic equivalence or a validation error.
 type AmbiguousTerm struct {
@@ -41,27 +46,32 @@ type AmbiguousTerm struct {
 // coverage. A nil precision means nobody reviewed a claim yet; reporting 0
 // or 1 there would give a false quality signal.
 type ReviewReport struct {
-	ProjectID          string                `json:"project_id"`
-	DatasetID          string                `json:"dataset_id"`
-	Total              int                   `json:"total"`
-	Proposed           int                   `json:"proposed"`
-	Verified           int                   `json:"verified"`
-	Rejected           int                   `json:"rejected"`
-	Precision          *float64              `json:"reviewed_precision"`
-	Sample             []ReviewItem          `json:"sample"`
-	AssertionTotal     int                   `json:"assertion_total"`
-	AssertionProposed  int                   `json:"assertion_proposed"`
-	AssertionVerified  int                   `json:"assertion_verified"`
-	AssertionRejected  int                   `json:"assertion_rejected"`
-	AssertionPrecision *float64              `json:"assertion_reviewed_precision"`
-	AssertionSample    []AssertionReviewItem `json:"assertion_sample"`
-	ConceptTotal       int                   `json:"concept_total"`
-	ConceptProposed    int                   `json:"concept_proposed"`
-	ConceptVerified    int                   `json:"concept_verified"`
-	ConceptRejected    int                   `json:"concept_rejected"`
-	ConceptPrecision   *float64              `json:"concept_reviewed_precision"`
-	ConceptSample      []ConceptReviewItem   `json:"concept_sample"`
-	AmbiguousTerms     []AmbiguousTerm       `json:"ambiguous_terms"`
+	ProjectID           string                  `json:"project_id"`
+	DatasetID           string                  `json:"dataset_id"`
+	Total               int                     `json:"total"`
+	Proposed            int                     `json:"proposed"`
+	Verified            int                     `json:"verified"`
+	Rejected            int                     `json:"rejected"`
+	Precision           *float64                `json:"reviewed_precision"`
+	Sample              []ReviewItem            `json:"sample"`
+	AssertionTotal      int                     `json:"assertion_total"`
+	AssertionProposed   int                     `json:"assertion_proposed"`
+	AssertionVerified   int                     `json:"assertion_verified"`
+	AssertionRejected   int                     `json:"assertion_rejected"`
+	AssertionPrecision  *float64                `json:"assertion_reviewed_precision"`
+	AssertionSample     []AssertionReviewItem   `json:"assertion_sample"`
+	ConceptTotal        int                     `json:"concept_total"`
+	ConceptProposed     int                     `json:"concept_proposed"`
+	ConceptVerified     int                     `json:"concept_verified"`
+	ConceptRejected     int                     `json:"concept_rejected"`
+	ConceptPrecision    *float64                `json:"concept_reviewed_precision"`
+	ConceptSample       []ConceptReviewItem     `json:"concept_sample"`
+	AmbiguousTerms      []AmbiguousTerm         `json:"ambiguous_terms"`
+	RequirementTotal    int                     `json:"requirement_total"`
+	RequirementProposed int                     `json:"requirement_proposed"`
+	RequirementVerified int                     `json:"requirement_verified"`
+	RequirementRejected int                     `json:"requirement_rejected"`
+	RequirementSample   []RequirementReviewItem `json:"requirement_sample"`
 }
 
 // Review produces a deterministic sample of proposed claims. Salt permits
@@ -76,9 +86,9 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 		limit = 0
 	}
 	r := ReviewReport{ProjectID: p.Snapshot.ProjectID, DatasetID: p.Snapshot.DatasetID,
-		Total: len(p.Claims), AssertionTotal: len(p.Assertions), ConceptTotal: len(p.Concepts),
+		Total: len(p.Claims), AssertionTotal: len(p.Assertions), ConceptTotal: len(p.Concepts), RequirementTotal: len(p.Requirements),
 		Sample: []ReviewItem{}, AssertionSample: []AssertionReviewItem{},
-		ConceptSample: []ConceptReviewItem{}, AmbiguousTerms: []AmbiguousTerm{}}
+		ConceptSample: []ConceptReviewItem{}, AmbiguousTerms: []AmbiguousTerm{}, RequirementSample: []RequirementReviewItem{}}
 	sections := make(map[string]DocumentSection, len(p.Sections))
 	for _, section := range p.Sections {
 		sections[section.ID] = section
@@ -198,6 +208,37 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	}
 	for _, candidate := range conceptCandidates[:conceptLimit] {
 		r.ConceptSample = append(r.ConceptSample, candidate.item)
+	}
+	type rankedRequirement struct {
+		key  string
+		item RequirementReviewItem
+	}
+	var requirementCandidates []rankedRequirement
+	for _, requirement := range p.Requirements {
+		switch requirement.Status {
+		case StatusVerified:
+			r.RequirementVerified++
+		case StatusRejected:
+			r.RequirementRejected++
+		case StatusProposed:
+			r.RequirementProposed++
+			keyBytes := sha256.Sum256([]byte(salt + "\x00" + p.Snapshot.DatasetID + "\x00" + requirement.ID))
+			requirementCandidates = append(requirementCandidates, rankedRequirement{key: hex.EncodeToString(keyBytes[:]),
+				item: RequirementReviewItem{Requirement: requirement, Evidence: evidence[requirement.EvidenceID]}})
+		}
+	}
+	sort.Slice(requirementCandidates, func(i, j int) bool {
+		if requirementCandidates[i].key == requirementCandidates[j].key {
+			return requirementCandidates[i].item.Requirement.ID < requirementCandidates[j].item.Requirement.ID
+		}
+		return requirementCandidates[i].key < requirementCandidates[j].key
+	})
+	requirementLimit := limit
+	if requirementLimit > len(requirementCandidates) {
+		requirementLimit = len(requirementCandidates)
+	}
+	for _, candidate := range requirementCandidates[:requirementLimit] {
+		r.RequirementSample = append(r.RequirementSample, candidate.item)
 	}
 	terms := map[string][]string{}
 	for _, concept := range p.Concepts {

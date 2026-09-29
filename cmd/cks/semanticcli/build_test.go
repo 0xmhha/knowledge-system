@@ -49,7 +49,25 @@ concepts:
 	if err := os.WriteFile(filepath.Join(repo, "ontology.yaml"), ontology, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	testGit(t, repo, "add", "spec.md", "ontology.yaml")
+	spec := []byte(`version: 1
+project_id: example
+requirements:
+  - id: req-source
+    version: 1
+    title: Source citation
+    statement: Answers cite committed source lines.
+    status: proposed
+    concept_ids: [source]
+    acceptance_criteria:
+      - id: ac-source
+        given: A committed document
+        when: Its content is retrieved
+        then: The original lines are cited
+`)
+	if err := os.WriteFile(filepath.Join(repo, "requirements.yaml"), spec, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	testGit(t, repo, "add", "spec.md", "ontology.yaml", "requirements.yaml")
 	testGit(t, repo, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "spec")
 	commit := testGit(t, repo, "rev-parse", "HEAD")
 	// Building while a developer has local edits must still use the recorded
@@ -69,19 +87,20 @@ concepts:
 	cmd.SetOut(&stdout)
 	cmd.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-1",
 		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
-		"--docs", "spec.md", "--ontology", "ontology.yaml", "--activate"})
+		"--docs", "spec.md", "--ontology", "ontology.yaml", "--spec", "requirements.yaml", "--activate"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatal(err)
 	}
 	var result struct {
-		Sections  int  `json:"sections"`
-		Concepts  int  `json:"concepts"`
-		Activated bool `json:"activated"`
+		Sections     int  `json:"sections"`
+		Concepts     int  `json:"concepts"`
+		Requirements int  `json:"requirements"`
+		Activated    bool `json:"activated"`
 	}
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatal(err)
 	}
-	if result.Sections == 0 || result.Concepts != 1 || !result.Activated {
+	if result.Sections == 0 || result.Concepts != 1 || result.Requirements != 1 || !result.Activated {
 		t.Fatalf("build result %+v", result)
 	}
 	buf, err := os.ReadFile(output)
@@ -92,7 +111,7 @@ concepts:
 	if err := json.Unmarshal(buf, &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" || p.Concepts[0].ID != "source" {
+	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" || p.Concepts[0].ID != "source" || p.Requirements[0].ID != "req-source" {
 		t.Fatalf("projection followed dirty working tree: %+v", p)
 	}
 	store, err := semantic.OpenStore(storePath)
@@ -107,7 +126,7 @@ concepts:
 	extract := NewCmd()
 	extract.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-2",
 		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
-		"--docs", "spec.md", "--ontology", "ontology.yaml", "--extract-only"})
+		"--docs", "spec.md", "--ontology", "ontology.yaml", "--spec", "requirements.yaml", "--extract-only"})
 	if err := extract.Execute(); err != nil {
 		t.Fatalf("extract-only: %v", err)
 	}

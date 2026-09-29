@@ -57,9 +57,17 @@ func OpenStore(path string) (*Store, error) {
 			project_id TEXT PRIMARY KEY, dataset_id TEXT NOT NULL,
 			FOREIGN KEY(project_id, dataset_id) REFERENCES semantic_projections(project_id, dataset_id)
 		);
-		PRAGMA user_version=1;`); err != nil {
+		PRAGMA user_version=2;`); err != nil {
 			db.Close()
 			return nil, fmt.Errorf("initialize semantic schema: %w", err)
+		}
+	}
+	if version == 1 {
+		// v2 adds optional source-backed requirements inside the existing
+		// immutable JSON document. No stored v1 document is rewritten.
+		if _, err := db.Exec("PRAGMA user_version=2"); err != nil {
+			db.Close()
+			return nil, fmt.Errorf("migrate semantic schema: %w", err)
 		}
 	}
 	return &Store{db: db}, nil

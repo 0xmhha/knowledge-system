@@ -1,0 +1,33 @@
+version: 1
+project_id: knowledge-system
+requirements:
+  - id: req-filtered-recall
+    version: 1
+    title: Filtered CKV recall
+    statement: CKV returns eligible nearest chunks under sparse metadata filters.
+    status: proposed
+    acceptance_criteria:
+      - id: ac-filtered-recall
+        given: At least K eligible chunks and many closer excluded chunks
+        when: A filtered query requests K results
+        then: The response contains K eligible chunks in exact distance order
+  - id: req-source-evidence
+    version: 1
+    title: Source-backed meaning
+    statement: Reviewed semantic relationships remain tied to one committed source snapshot.
+    status: proposed
+    acceptance_criteria:
+      - id: ac-source-evidence
+        given: A relation with a code anchor from another snapshot
+        when: The semantic dataset is promoted
+        then: Promotion fails and the active dataset remains unchanged
+  - id: req-ontology-fallback
+    version: 1
+    title: Safe ontology interpretation
+    statement: Optional concept matching preserves the existing hybrid retrieval candidates.
+    status: proposed
+    acceptance_criteria:
+      - id: ac-ontology-fallback
+        given: An ambiguous term or an unverified concept relationship
+        when: A user asks a natural-language question
+        then: The baseline CKV and CKG citation set is preserved

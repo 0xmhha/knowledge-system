@@ -4,7 +4,7 @@
 
 ## 원본과 신원
 
-하나의 `Projection`은 `project_id`, `dataset_id`, 40자리 Git 커밋과 스키마 버전 1에 고정된다. 의미 데이터는 CKG/CKV 원본을 대체하지 않는다. `EvidenceSpan`은 문서·코드·테스트 종류, 저장소 상대 경로, 1부터 시작하는 포함 줄 범위, 그 범위의 원문 SHA-256, 추출기 이름을 가진다. `canonical_id`와 `chunk_id`는 선택적인 조인 키이며 원문 증명을 대신하지 않는다.
+하나의 `Projection`은 `project_id`, `dataset_id`, 40자리 Git 커밋과 스키마 버전에 고정된다. 현재 쓰기 버전은 2이며 과거 버전 1 투영은 읽기와 롤백이 가능하다. 의미 데이터는 CKG/CKV 원본을 대체하지 않는다. `EvidenceSpan`은 문서·코드·테스트 종류, 저장소 상대 경로, 1부터 시작하는 포함 줄 범위, 그 범위의 원문 SHA-256, 추출기 이름을 가진다. `canonical_id`와 `chunk_id`는 선택적인 조인 키이며 원문 증명을 대신하지 않는다.
 
 `Validate`는 ID 중복, 고아 참조, 경로 탈출, 잘못된 상태, 프로젝트/데이터셋/커밋 혼합을 거부한다. `ValidateSources`는 **기록된 커밋의 Git 객체**를 읽어 줄 범위와 원문 해시를 다시 계산한다. 현재 작업 트리의 수정 사항으로 과거 근거를 덮어쓰지 않는다. 현재 구현의 근거 검증 대상은 같은 Git 저장소에 커밋된 파일이다. 외부 문서와 작업 트리 스냅샷은 별도 계약이 필요하다.
 
@@ -26,7 +26,7 @@
 
 ## SQLite 투영과 롤백
 
-`semantic_projections`는 `(project_id,dataset_id)`별 JSON 문서와 SHA-256을 불변으로 저장한다. 같은 내용의 재시도는 허용하고 같은 ID의 다른 내용은 거부한다. `semantic_current`는 프로젝트마다 활성 데이터셋 ID를 가리킨다. `Activate`는 기존 버전 사이를 원자적으로 전환하므로 이전 버전으로 다시 지정하면 롤백된다. 읽을 때 문서 해시와 구조를 다시 확인한다. 현재 DB 스키마는 `PRAGMA user_version=1`이며 더 높은 버전은 구버전 바이너리에서 거부한다.
+`semantic_projections`는 `(project_id,dataset_id)`별 JSON 문서와 SHA-256을 불변으로 저장한다. 같은 내용의 재시도는 허용하고 같은 ID의 다른 내용은 거부한다. `semantic_current`는 프로젝트마다 활성 데이터셋 ID를 가리킨다. `Activate`는 기존 버전 사이를 원자적으로 전환하므로 이전 버전으로 다시 지정하면 롤백된다. 읽을 때 문서 해시와 구조를 다시 확인한다. 현재 DB 스키마는 `PRAGMA user_version=2`이며 v1 DB는 기존 투영 JSON을 수정하지 않고 v2로 마이그레이션한다. 더 높은 버전은 구버전 바이너리에서 거부한다.
 
 CKG·CKV와 함께 쓰는 승격 경로는 `PutAligned`와 `ActivateAligned`다. 두 호출 모두 그래프·벡터 매니페스트의 소스 커밋, 기록된 CKG 다이제스트 핀, 소스 루트와 투영의 커밋을 비교한다. 값이 빠진 구버전 인덱스는 의미 투영 승격에서 거부한다. 활성화 시점에도 다시 검사하므로 오래 전에 저장한 후보를 최신 인덱스에 잘못 연결하지 않는다. `Put`/`Activate`는 엔진이 없는 의미 투영 준비·롤백용 저수준 호출이다. 현재 원본 파일이 커밋과 동일한지는 `ValidateSources`가 검사하지만, 같은 HEAD의 서로 다른 작업 트리 바이트를 구별하는 다이제스트는 아직 구현되지 않았다.
 
@@ -51,3 +51,7 @@ cks semantic review --input /path/to/projection.json --repo /path/to/repo --samp
 `--min-canonical-ratio`는 프로젝트 실측 기준으로 선택한다. 0이면 게이트를 끄며, 양수이면 CKV 매니페스트의 `canonical_count / symbol_count`가 기준보다 낮거나 카운터가 없을 때 승격을 막는다. 예시의 0.94는 이 프로젝트의 구조 기준선(약 94.28%)에 맞춘 값이지 다른 저장소의 기본값이 아니다. 실제 임베딩 검색 품질과는 별도 지표다.
 
 CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호출자는 `Store.CurrentAligned`로 활성 투영을 다시 검증해 전달할 수 있다. 질의의 선호·대체 용어를 복수 개념 후보로 해석하고, `verified` 개념과 `verified IMPLEMENTED_BY` 관계가 CKV 결과의 canonical ID·커밋·파일·줄과 일치할 때만 기존 상위 K 인용의 점수를 최대 20% 올린다. 동점 의미를 합치거나 결과를 새로 추가하지 않는다. 오류가 나면 기존 검색 결과를 유지한다. 현재 CKS CLI/MCP에서는 이 옵션을 전달하지 않아 기본 검색은 기존 CKV+CKG 경로 그대로다. CKV 텍스트 투영과 실제 임베딩 모델의 A/B 품질·지연 평가가 남아 있으므로 운영 기본 활성화는 보류한다.
+
+## 요구사항과 수용 기준 입력
+
+`cks semantic build --spec docs/spec-driven/spec-pilot.yaml`은 같은 프로젝트의 커밋된 YAML에서 `Requirement`와 Given/When/Then `AcceptanceCriterion`을 읽는다. 각 항목은 안정 ID, 요구사항 버전, 원본 파일·줄 범위·SHA-256 근거를 가진다. `proposed`는 초안, `verified`는 사람이 **명세 내용을 승인**했다는 뜻이며 구현 또는 테스트 통과를 뜻하지 않는다. `verified`/`rejected`에는 YAML 원본의 `reviewed_by`가 필요하다. JSON 투영의 문구만 바꾸면 원본 재파싱에서 거부된다. `concept_ids`는 같은 투영의 개념을 참조하며 선택 사항이므로 코드가 전혀 없는 초기 명세도 저장할 수 있다. `cks semantic review`는 제안 요구사항의 출처와 수용 기준을 검토 대기 목록으로 출력한다. 구현·테스트 상태는 이후 검증된 연결 근거로 별도 계산할 예정이다.

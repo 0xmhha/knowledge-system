@@ -86,11 +86,49 @@ func TestStoreDetectsDocumentCorruptionAndFutureSchema(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := db.Exec("PRAGMA user_version=2"); err != nil {
+	if _, err := db.Exec("PRAGMA user_version=3"); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
 	if _, err := OpenStore(path); err == nil || !strings.Contains(err.Error(), "newer") {
 		t.Fatalf("future semantic schema accepted: %v", err)
+	}
+}
+
+func TestStoreMigratesV1WithoutRewritingHistoricalProjection(t *testing.T) {
+	p, root := fixture(t)
+	p.SchemaVersion = 1
+	path := filepath.Join(t.TempDir(), "semantic.db")
+	store, err := OpenStore(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Put(context.Background(), p, root); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.db.Exec("PRAGMA user_version=1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Close(); err != nil {
+		t.Fatal(err)
+	}
+	store, err = OpenStore(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	var version int
+	if err := store.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != SchemaVersion {
+		t.Fatalf("migrated version %d: %v", version, err)
+	}
+	loaded, err := store.Load(context.Background(), p.Snapshot.ProjectID, p.Snapshot.DatasetID)
+	if err != nil || loaded.SchemaVersion != 1 || len(loaded.Requirements) != 0 {
+		t.Fatalf("historical projection changed: %+v, %v", loaded, err)
+	}
+	p.SchemaVersion = SchemaVersion
+	p.Snapshot.DatasetID = "v2"
+	p.Evidence[0].Snapshot = p.Snapshot
+	if err := store.Put(context.Background(), p, root); err != nil {
+		t.Fatal(err)
 	}
 }

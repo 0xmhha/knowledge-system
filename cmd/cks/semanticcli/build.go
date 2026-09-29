@@ -16,7 +16,7 @@ import (
 )
 
 func newBuildCmd() *cobra.Command {
-	var repo, project, dataset, graph, vector, storePath, output, ontology string
+	var repo, project, dataset, graph, vector, storePath, output, ontology, spec string
 	var docs []string
 	var activate, extractOnly bool
 	var minimumCoverage float64
@@ -26,7 +26,7 @@ func newBuildCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runBuild(cmd.Context(), cmd, buildOptions{
 				repo: repo, project: project, dataset: dataset, graph: graph, vector: vector,
-				store: storePath, output: output, docs: docs, ontology: ontology,
+				store: storePath, output: output, docs: docs, ontology: ontology, spec: spec,
 				activate: activate, extractOnly: extractOnly, minimumCoverage: minimumCoverage,
 			})
 		},
@@ -40,6 +40,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&output, "out", "", "reviewable projection JSON output")
 	cmd.Flags().StringSliceVar(&docs, "docs", nil, "repository-relative committed Markdown paths (repeatable)")
 	cmd.Flags().StringVar(&ontology, "ontology", "", "repository-relative committed ontology YAML path")
+	cmd.Flags().StringVar(&spec, "spec", "", "repository-relative committed specification YAML path")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
 	cmd.Flags().BoolVar(&extractOnly, "extract-only", false, "write a reviewable projection without storing or activating it")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
@@ -50,19 +51,19 @@ func newBuildCmd() *cobra.Command {
 }
 
 type buildOptions struct {
-	repo, project, dataset, graph, vector, store, output, ontology string
-	docs                                                           []string
-	activate                                                       bool
-	extractOnly                                                    bool
-	minimumCoverage                                                float64
+	repo, project, dataset, graph, vector, store, output, ontology, spec string
+	docs                                                                 []string
+	activate                                                             bool
+	extractOnly                                                          bool
+	minimumCoverage                                                      float64
 }
 
 func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	if o.extractOnly && o.activate {
 		return fmt.Errorf("--extract-only cannot be combined with --activate")
 	}
-	if len(o.docs) == 0 && o.ontology == "" {
-		return fmt.Errorf("at least one --docs or --ontology path is required")
+	if len(o.docs) == 0 && o.ontology == "" && o.spec == "" {
+		return fmt.Errorf("at least one --docs, --ontology, or --spec path is required")
 	}
 	if err := semantic.ValidateCanonicalCoverage(o.vector, o.minimumCoverage); err != nil {
 		return err
@@ -111,6 +112,22 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		}
 		p.Evidence = append(p.Evidence, part.Evidence...)
 		p.Concepts = append(p.Concepts, part.Concepts...)
+		seen[o.ontology] = true
+	}
+	if o.spec != "" {
+		if !safeInputPath(o.spec) || seen[o.spec] {
+			return fmt.Errorf("unsafe or duplicate specification path %q", o.spec)
+		}
+		content, err := exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+o.spec).Output()
+		if err != nil {
+			return fmt.Errorf("read committed specification %q: %w", o.spec, err)
+		}
+		part, _, err := semantic.ExtractSpec(snapshot, o.spec, content)
+		if err != nil {
+			return err
+		}
+		p.Evidence = append(p.Evidence, part.Evidence...)
+		p.Requirements = append(p.Requirements, part.Requirements...)
 	}
 	var store *semantic.Store
 	if o.extractOnly {
@@ -145,7 +162,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	}
 	return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{
 		"project_id": o.project, "dataset_id": o.dataset, "commit": snapshot.Commit,
-		"sections": len(p.Sections), "concepts": len(p.Concepts),
+		"sections": len(p.Sections), "concepts": len(p.Concepts), "requirements": len(p.Requirements),
 		"evidence": len(p.Evidence), "stored": !o.extractOnly, "activated": o.activate,
 	})
 }
