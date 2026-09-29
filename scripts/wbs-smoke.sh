@@ -240,12 +240,34 @@ if "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
   exit 1
 fi
 if "$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
+  --embedder mock --version smoke-test-rejected --gate-min-canonical 0.4 \
+  --gate-test-bin go --gate-test-arg invalid-command --progress text \
+  > "$scratch/reindex-test-rejected.log" 2>&1; then
+  echo "failed candidate test was promoted" >&2
+  exit 1
+fi
+test "$(readlink "$dataset/current")" = smoke-next
+"$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
+  --embedder mock --version smoke-tested --gate-min-canonical 0.4 \
+  --gate-test-bin go --gate-test-arg test --gate-test-arg ./... --progress text \
+  > "$scratch/reindex-tested.log" 2>&1
+test "$(readlink "$dataset/current")" = smoke-tested
+python3 - "$dataset" "$src" <<'PY'
+import json, pathlib, subprocess, sys
+root = pathlib.Path(sys.argv[1])
+commit = subprocess.check_output(['git', '-C', sys.argv[2], 'rev-parse', 'HEAD'], text=True).strip()
+failed = json.loads((root / 'smoke-test-rejected' / 'test-gate.json').read_text())
+passed = json.loads((root / 'smoke-tested' / 'test-gate.json').read_text())
+assert failed['source_commit'] == commit and failed['command_passed'] is False, failed
+assert passed['source_commit'] == commit and passed['command_passed'] is True and passed['snapshot_consistent'] is True, passed
+PY
+if "$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
   --embedder mock --version smoke-rejected --gate-min-canonical 1.0 --progress text \
   > "$scratch/reindex-rejected.log" 2>&1; then
   echo "low-coverage candidate was promoted" >&2
   exit 1
 fi
-test "$(readlink "$dataset/current")" = smoke-next
+test "$(readlink "$dataset/current")" = smoke-tested
 "$repo_root/bin/cks" setup --out "$dataset" --rollback smoke > "$scratch/rollback.log" 2>&1
 test "$(readlink "$dataset/current")" = smoke
 "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \

@@ -169,6 +169,8 @@ func runSetup(args []string) error {
 	version := fs.String("version", "", "blue-green: build into <out>/<version>, gate it, then atomically promote <out>/current; \"auto\" (reserved) names the version <src-commit8>[-<filelist-config-sha8>]")
 	rollback := fs.String("rollback", "", "blue-green: repoint <out>/current at an existing version and exit (no build)")
 	gateMinCanonical := fs.Float64("gate-min-canonical", 0, "reindex gate: minimum canonical_id coverage (canonical/symbol chunks); 0 disables the check")
+	gateTestBin := fs.String("gate-test-bin", "", "optional test executable; candidate promotes only if it exits 0 on the pinned clean source")
+	gateTestArgs := fs.StringArray("gate-test-arg", nil, "one argument for --gate-test-bin (repeatable, no shell expansion)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -250,7 +252,13 @@ func runSetup(args []string) error {
 			ver = resolved
 			fmt.Fprintf(os.Stderr, "setup: --version auto resolved to %s\n", ver)
 		}
+		if *gateTestBin == "" && len(*gateTestArgs) > 0 {
+			return fmt.Errorf("--gate-test-arg requires --gate-test-bin")
+		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical}
+		if *gateTestBin != "" {
+			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
+		}
 		if err := setup.Reindex(ctx, o, ver, gopt, setup.SubprocessRunner{}, emit); err != nil {
 			return err
 		}

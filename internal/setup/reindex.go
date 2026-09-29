@@ -173,6 +173,9 @@ type GateOptions struct {
 	// MinCanonicalRatio is the floor for canonical_id coverage
 	// (CanonicalCount/SymbolCount). Zero disables the check.
 	MinCanonicalRatio float64
+	// TestCommand is an optional argv run against the pinned, clean source
+	// after the candidate indexes pass structural gates and before promotion.
+	TestCommand []string
 }
 
 // gateVecManifest is the read-only projection of the vector manifest the gate
@@ -247,6 +250,11 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 			Cmd: []string{graphBin, "audit", "--src", o.Src, "--graph", graphDir},
 		}, emit); err != nil {
 			warn(fmt.Sprintf("ckg audit reported issues (soft gate, not blocking promote): %v", err))
+		}
+	}
+	if len(o.TestCommand) > 0 {
+		if err := runTestGate(ctx, vdir, o.Src, o.TestCommand); err != nil {
+			return fmt.Errorf("gate: test command failed: %w", err)
 		}
 	}
 	return nil

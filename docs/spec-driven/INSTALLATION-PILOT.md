@@ -46,6 +46,8 @@ Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown�
 
 롤백은 이전에 검증된 버전으로 `current`를 되돌린다. 실행 중인 MCP 프로세스는 이미 연 데이터셋 핸들을 유지하므로 롤백·승격 후 재시작해야 한다.
 
+커밋된 패치에 대해 승격 전 테스트 게이트를 걸려면 `setup --version <new-version> --gate-test-bin go --gate-test-arg test --gate-test-arg ./...`처럼 실행한다. 인자는 각각 전달하며 셸을 거치지 않는다. 빌드한 후보의 `test-gate.json`에는 커밋, 그래프 다이제스트, 명령·출력 해시, 종료 코드와 실행 환경이 남는다. 테스트 실패 또는 실행 전후 소스 변경은 `current`를 바꾸지 않는다. 이는 선택한 **명령의 성공**을 확인하는 게이트이며, 개별 수용 기준의 의미적 충족은 검토자가 판정해야 한다.
+
 ```sh
 ./cks setup --config /path/to/project-setup.yaml --rollback PREVIOUS_VERSION
 ```
