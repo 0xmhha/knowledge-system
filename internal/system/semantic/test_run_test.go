@@ -43,6 +43,12 @@ func TestExactGoTestCommandResolvesCommittedASTAnchor(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(repo, "pilot_test.go"), []byte(source), 0600); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.MkdirAll(filepath.Join(repo, "nested"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "nested", "nested_test.go"), []byte("package nested\nimport \"testing\"\nfunc TestNested(t *testing.T) {}\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
 	gitOutput(t, repo, "add", ".")
 	gitOutput(t, repo, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
 	commit := gitOutput(t, repo, "rev-parse", "HEAD")
@@ -54,6 +60,11 @@ func TestExactGoTestCommandResolvesCommittedASTAnchor(t *testing.T) {
 	a.projection.Evidence[0].StartLine = 4
 	if _, _, err := a.exactGoTestCommand(repo, commit, "example.test/pilot.TestAlpha"); err == nil {
 		t.Fatal("wrong source span resolved a different test")
+	}
+	a.projection.Evidence[0] = EvidenceSpan{Kind: SourceTest, Path: "nested/nested_test.go", StartLine: 3, EndLine: 3, CanonicalID: "example.test/pilot/nested.TestNested"}
+	argv, name, err = a.exactGoTestCommand(repo, commit, "example.test/pilot/nested.TestNested")
+	if err != nil || name != "TestNested" || strings.Join(argv, " ") != "go test -json -count=1 -run ^TestNested$ ./nested" {
+		t.Fatalf("nested command=%v name=%q err=%v", argv, name, err)
 	}
 }
 
