@@ -225,6 +225,17 @@ annotated = json.load(open(sys.argv[15], encoding='utf-8'))
 assert base['metadata']['integrity_hash'] == annotated['metadata']['integrity_hash'], annotated
 assert annotated['semantic']['links'][0]['requirement_id'] == 'req-alpha' and annotated['semantic']['links'][0]['unconfirmed'] is True, annotated
 PY
+pin_dir="$scratch/pinned-server"
+python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" "$config" "$pin_dir" \
+  > "$scratch/pinned-server.log" 2>&1 &
+pin_pid=$!
+trap 'kill "$pin_pid" 2>/dev/null || true' EXIT
+for attempt in $(seq 1 100); do
+  test -f "$pin_dir/ready.json" && break
+  kill -0 "$pin_pid" 2>/dev/null || { cat "$scratch/pinned-server.log" >&2; exit 1; }
+  sleep 0.1
+done
+test -f "$pin_dir/ready.json"
 printf '\nA second committed snapshot.\n' >> "$src/README.md"
 git -C "$src" add README.md
 git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
@@ -252,6 +263,26 @@ test "$(readlink "$dataset/current")" = smoke-next
   --gate-test-bin go --gate-test-arg test --gate-test-arg ./... --progress text \
   > "$scratch/reindex-tested.log" 2>&1
 test "$(readlink "$dataset/current")" = smoke-tested
+touch "$pin_dir/next"
+wait "$pin_pid"
+trap - EXIT
+fresh_dir="$scratch/fresh-server"
+mkdir -p "$fresh_dir"
+touch "$fresh_dir/next"
+python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" "$config" "$fresh_dir"
+python3 - "$pin_dir" "$fresh_dir" "$src" <<'PY'
+import json, pathlib, subprocess, sys
+pinned, fresh = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+old_before = json.loads((pinned / 'ready.json').read_text())
+old_after = json.loads((pinned / 'after.json').read_text())
+new = json.loads((fresh / 'ready.json').read_text())
+head = subprocess.check_output(['git', '-C', sys.argv[3], 'rev-parse', 'HEAD'], text=True).strip()
+assert old_before['serviceable'] and old_after['serviceable'] and new['serviceable']
+assert old_before['commit'] == old_after['commit'] != head, (old_before, old_after)
+assert old_before['citation_commits'] == old_after['citation_commits'] == [old_before['commit']]
+assert new['commit'] == head and new['citation_commits'] == [head], new
+assert 'main.go' in new['citation_files'], new
+PY
 python3 - "$dataset" "$src" <<'PY'
 import json, pathlib, subprocess, sys
 root = pathlib.Path(sys.argv[1])
@@ -270,6 +301,16 @@ fi
 test "$(readlink "$dataset/current")" = smoke-tested
 "$repo_root/bin/cks" setup --out "$dataset" --rollback smoke > "$scratch/rollback.log" 2>&1
 test "$(readlink "$dataset/current")" = smoke
+rolled_dir="$scratch/rolled-server"
+mkdir -p "$rolled_dir"
+touch "$rolled_dir/next"
+python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" "$config" "$rolled_dir"
+python3 - "$pin_dir" "$rolled_dir" <<'PY'
+import json, pathlib, sys
+old = json.loads((pathlib.Path(sys.argv[1]) / 'ready.json').read_text())
+rolled = json.loads((pathlib.Path(sys.argv[2]) / 'ready.json').read_text())
+assert rolled['commit'] == old['commit'] and rolled['citation_commits'] == old['citation_commits'], rolled
+PY
 "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" > "$scratch/rollback-trace.json"
