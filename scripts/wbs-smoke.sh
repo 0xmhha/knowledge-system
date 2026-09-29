@@ -246,6 +246,8 @@ assert plan['steps'][0]['action'] == 'execute_acceptance_test' and plan['steps']
 passed = json.load(open(sys.argv[11], encoding='utf-8'))
 failed = json.load(open(sys.argv[12], encoding='utf-8'))
 assert passed['command_passed'] is True and passed['snapshot_consistent'] is True and passed['criterion_id'] == 'ac-alpha', passed
+assert passed['test_canonical_id'] == reviewed['requirements'][0]['paths'][0]['test_canonical_id'], passed
+assert passed['tested_by_assertions'] == ['reviewed:tested'] and passed['accepted_by_assertions'] == ['reviewed:accepted'], passed
 assert failed['command_passed'] is False and failed['snapshot_consistent'] is True and failed['exit_code'] != 0, failed
 from pathlib import Path
 assert not Path(sys.argv[13]).exists(), 'unlinked criterion wrote a result'

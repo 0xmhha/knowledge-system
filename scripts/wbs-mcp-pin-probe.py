@@ -43,10 +43,10 @@ def tool(proc, request_id, name, arguments):
     return result.get("structuredContent") or result.get("structured_content") or result
 
 
-def snapshot(proc, health_id, pack_id):
+def snapshot(proc, health_id, pack_id, prompt="Where is the Alpha function implemented?"):
     health = tool(proc, health_id, "cks.ops.health", {})
     pack = tool(proc, pack_id, "cks.context.get_for_task",
-                {"prompt": "Where is the Alpha function implemented?"})
+                {"prompt": prompt})
     return {
         "commit": health["alignment"]["src_commit"],
         "serviceable": health["serviceable"],
@@ -56,10 +56,17 @@ def snapshot(proc, health_id, pack_id):
 
 
 def main():
-    binary, config, control = sys.argv[1:4]
-    control = pathlib.Path(control)
-    control.mkdir(parents=True, exist_ok=True)
-    with (control / "server.log").open("w") as log:
+    binary, config = sys.argv[1:3]
+    once = len(sys.argv) == 5 and sys.argv[3] == "--once"
+    if once:
+        prompt = sys.argv[4]
+        control = None
+        log_path = pathlib.Path(config).with_suffix(".mcp.log")
+    else:
+        control = pathlib.Path(sys.argv[3])
+        control.mkdir(parents=True, exist_ok=True)
+        log_path = control / "server.log"
+    with log_path.open("w") as log:
         proc = subprocess.Popen(
             [binary, "mcp", "--config", config],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log,
@@ -71,6 +78,9 @@ def main():
                                       "clientInfo": {"name": "wbs-probe", "version": "1"}}}, 1)
             proc.stdin.write('{"jsonrpc":"2.0","method":"notifications/initialized"}\n')
             proc.stdin.flush()
+            if once:
+                print(json.dumps(snapshot(proc, 2, 3, prompt)))
+                return
             (control / "ready.json").write_text(json.dumps(snapshot(proc, 2, 3)))
             deadline = time.monotonic() + 60
             while not (control / "next").exists():

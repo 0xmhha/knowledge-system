@@ -176,6 +176,9 @@ type GateOptions struct {
 	// TestCommand is an optional argv run against the pinned, clean source
 	// after the candidate indexes pass structural gates and before promotion.
 	TestCommand []string
+	// ExpectedSourceCommit, when set, enforces committed mode at promotion.
+	// A dirty or moved source tree, or an index from another commit, fails.
+	ExpectedSourceCommit string
 }
 
 // gateVecManifest is the read-only projection of the vector manifest the gate
@@ -255,6 +258,22 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 	if len(o.TestCommand) > 0 {
 		if err := runTestGate(ctx, vdir, o.Src, o.TestCommand); err != nil {
 			return fmt.Errorf("gate: test command failed: %w", err)
+		}
+	}
+	if o.ExpectedSourceCommit != "" {
+		var graph graphManifest
+		if err := readJSON(filepath.Join(graphDir, "manifest.json"), &graph); err != nil {
+			return fmt.Errorf("gate: read committed source coordinate: %w", err)
+		}
+		if graph.SrcCommit != o.ExpectedSourceCommit {
+			return fmt.Errorf("gate: candidate source commit differs from the pre-build commit")
+		}
+		clean, err := testGateSourceClean(o.Src, o.ExpectedSourceCommit)
+		if err != nil {
+			return fmt.Errorf("gate: verify committed source: %w", err)
+		}
+		if !clean {
+			return fmt.Errorf("gate: source changed during build; current left unchanged")
 		}
 	}
 	return nil

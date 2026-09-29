@@ -10,7 +10,7 @@ import (
 )
 
 func newTestCmd() *cobra.Command {
-	var project, repo, graph, vector, storePath, criterion, output string
+	var project, repo, graph, vector, storePath, criterion, testCanonicalID, output string
 	cmd := &cobra.Command{
 		Use:   "test --project-id ID --repo DIR --graph DIR --vector DIR --store DB --criterion-id ID --out FILE -- COMMAND [ARGS...]",
 		Short: "Execute a command against a reviewed trace and record its result",
@@ -25,7 +25,7 @@ func newTestCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			report, err := active.ExecuteLinkedTest(cmd.Context(), repo, criterion, argv)
+			report, err := active.ExecuteLinkedTestFor(cmd.Context(), repo, criterion, testCanonicalID, argv)
 			if err != nil {
 				return err
 			}
@@ -64,10 +64,13 @@ func newTestCmd() *cobra.Command {
 		{"vector", &vector, "CKV data directory"},
 		{"store", &storePath, "CKS semantic SQLite path"},
 		{"criterion-id", &criterion, "reviewed acceptance criterion ID"},
+		{"test-canonical-id", &testCanonicalID, "reviewed CKG test symbol; required when a criterion links multiple tests"},
 		{"out", &output, "new JSON report path; existing files are never overwritten"},
 	} {
 		cmd.Flags().StringVar(flag.target, flag.name, "", flag.usage)
-		_ = cmd.MarkFlagRequired(flag.name)
+		if flag.name != "test-canonical-id" {
+			_ = cmd.MarkFlagRequired(flag.name)
+		}
 	}
 	return cmd
 }

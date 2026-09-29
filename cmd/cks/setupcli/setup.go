@@ -54,26 +54,9 @@ func resolveAutoVersion(out, src, filelistConfig, semanticCorpus string) (string
 	if src == "" {
 		return "", fmt.Errorf("--version auto: --src is required to resolve the source commit")
 	}
-	head, err := gitOutput(src, "rev-parse", "HEAD")
-	if err != nil {
-		return "", fmt.Errorf("--version auto: resolve HEAD of %s: %v", src, err)
-	}
-	status, err := gitOutput(src, "status", "--porcelain")
-	if err != nil {
-		return "", fmt.Errorf("--version auto: git status of %s: %v", src, err)
-	}
-	if status != "" {
-		// CKV discovers source files from the filesystem, including eligible
-		// untracked files. A commit-only version name would otherwise alias
-		// two different index contents at the same HEAD.
-		return "", fmt.Errorf("--version auto: working tree at %s is dirty (tracked or untracked changes) — the commit-based version would not identify indexed bytes; commit/stash or ignore them first", src)
-	}
-	ignored, err := setup.CountIgnoredIndexable(src)
+	head, err := committedSourceCommit(src)
 	if err != nil {
 		return "", fmt.Errorf("--version auto: %w", err)
-	}
-	if ignored > 0 {
-		return "", fmt.Errorf("--version auto: %d Git-ignored source files may still be indexed by CKV; configure .ckvignore or use an explicit working-tree version", ignored)
 	}
 	name := head[:8]
 	if filelistConfig != "" {
@@ -98,6 +81,34 @@ func resolveAutoVersion(out, src, filelistConfig, semanticCorpus string) (string
 		}
 	}
 	return name, nil
+}
+
+// committedSourceCommit is the only source mode currently supported by the
+// setup CLI. CKV can index untracked and Git-ignored eligible files, so both
+// must be ruled out before stamping a Git commit onto citations.
+func committedSourceCommit(src string) (string, error) {
+	if src == "" {
+		return "", fmt.Errorf("committed source requires --src")
+	}
+	head, err := gitOutput(src, "rev-parse", "HEAD")
+	if err != nil || len(head) != 40 {
+		return "", fmt.Errorf("resolve committed source HEAD at %s: %v", src, err)
+	}
+	status, err := gitOutput(src, "status", "--porcelain")
+	if err != nil {
+		return "", fmt.Errorf("inspect committed source at %s: %w", src, err)
+	}
+	if status != "" {
+		return "", fmt.Errorf("working tree at %s is dirty (tracked or untracked changes); commit or stash before a commit-identified build", src)
+	}
+	ignored, err := setup.CountIgnoredIndexable(src)
+	if err != nil {
+		return "", err
+	}
+	if ignored > 0 {
+		return "", fmt.Errorf("%d Git-ignored source files may still be indexed by CKV; configure .ckvignore before a commit-identified build", ignored)
+	}
+	return head, nil
 }
 
 func gitOutput(dir string, args ...string) (string, error) {
@@ -242,6 +253,13 @@ func runSetup(args []string) error {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	var preBuildCommit string
+	if *rollback == "" {
+		preBuildCommit, err = committedSourceCommit(o.Src)
+		if err != nil {
+			return err
+		}
+	}
 
 	switch {
 	case *rollback != "":
@@ -265,7 +283,8 @@ func runSetup(args []string) error {
 		if *gateTestBin == "" && len(*gateTestArgs) > 0 {
 			return fmt.Errorf("--gate-test-arg requires --gate-test-bin")
 		}
-		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical}
+		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
+			ExpectedSourceCommit: preBuildCommit}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
 		}
@@ -281,6 +300,20 @@ func runSetup(args []string) error {
 		}
 		if err := setup.Execute(ctx, plan, setup.SubprocessRunner{}, emit); err != nil {
 			return err
+		}
+		var graph struct {
+			SrcCommit string `json:"src_commit"`
+		}
+		manifestBytes, err := os.ReadFile(filepath.Join(o.Out, "graph", "manifest.json"))
+		if err != nil {
+			return fmt.Errorf("read built graph source coordinate: %w", err)
+		}
+		if err := json.Unmarshal(manifestBytes, &graph); err != nil || graph.SrcCommit != preBuildCommit {
+			return fmt.Errorf("built graph source commit differs from the pre-build commit: %v", err)
+		}
+		postBuildCommit, err := committedSourceCommit(o.Src)
+		if err != nil || postBuildCommit != preBuildCommit {
+			return fmt.Errorf("source changed during build; dataset cannot be treated as a committed snapshot: %v", err)
 		}
 		fmt.Fprintln(os.Stderr, "setup: dataset ready at", o.Out)
 	}

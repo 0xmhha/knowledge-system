@@ -92,6 +92,12 @@ func TestResolveAutoVersion(t *testing.T) {
 	if _, err := resolveAutoVersion("", src, "", ""); err == nil || !strings.Contains(err.Error(), "tracked or untracked") {
 		t.Errorf("untracked indexable source was accepted: %v", err)
 	}
+	if err := runSetup([]string{"--src", src, "--out", t.TempDir(), "--version", "named"}); err == nil || !strings.Contains(err.Error(), "dirty") {
+		t.Errorf("explicit version indexed an untracked source: %v", err)
+	}
+	if err := runSetup([]string{"--src", src, "--out", t.TempDir()}); err == nil || !strings.Contains(err.Error(), "dirty") {
+		t.Errorf("unversioned setup indexed an untracked source: %v", err)
+	}
 	if err := os.WriteFile(filepath.Join(src, "a.txt"), []byte("changed\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
