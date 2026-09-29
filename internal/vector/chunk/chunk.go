@@ -199,15 +199,9 @@ func (c *Chunker) splitLongDocSpan(in Input, sp parse.SymbolSpan) []types.Chunk 
 			continue
 		}
 		if length(pending)+len(line) > maxChars {
-			// Retain a complete paragraph when a blank line occurs inside
-			// the buffered window; otherwise fall back to a line boundary.
-			cut := len(pending)
-			for i := len(pending) - 1; i > 0; i-- {
-				if strings.TrimSpace(pending[i]) == "" {
-					cut = i + 1
-					break
-				}
-			}
+			// Prefer a paragraph, closed code fence, or list item boundary.
+			// A blank line inside a fence is content, not a paragraph break.
+			cut := docBoundaryCut(pending)
 			emit(pending[:cut], startLine)
 			startLine += cut
 			pending = append([]string(nil), pending[cut:]...)
@@ -222,6 +216,56 @@ func (c *Chunker) splitLongDocSpan(in Input, sp parse.SymbolSpan) []types.Chunk 
 	}
 	emit(pending, startLine)
 	return out
+}
+
+func docBoundaryCut(lines []string) int {
+	lastBlank, lastFenceClose, lastListItem := 0, 0, 0
+	fence := ""
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "```") || strings.HasPrefix(trimmed, "~~~") {
+			marker := trimmed[:3]
+			if fence == "" {
+				fence = marker
+			} else if marker == fence {
+				fence = ""
+				if i+1 < len(lines) {
+					lastFenceClose = i + 1
+				}
+			}
+			continue
+		}
+		if fence != "" {
+			continue
+		}
+		if trimmed == "" && i+1 < len(lines) {
+			lastBlank = i + 1
+		}
+		if i > 0 && isMarkdownListItem(trimmed) {
+			lastListItem = i
+		}
+	}
+	switch {
+	case lastBlank > 0:
+		return lastBlank
+	case lastFenceClose > 0:
+		return lastFenceClose
+	case lastListItem > 0:
+		return lastListItem
+	default:
+		return len(lines)
+	}
+}
+
+func isMarkdownListItem(line string) bool {
+	if len(line) >= 2 && (line[0] == '-' || line[0] == '*' || line[0] == '+') && line[1] == ' ' {
+		return true
+	}
+	i := 0
+	for i < len(line) && line[i] >= '0' && line[i] <= '9' {
+		i++
+	}
+	return i > 0 && i+1 < len(line) && (line[i] == '.' || line[i] == ')') && line[i+1] == ' '
 }
 
 // fileFullChunk returns a coarse chunk spanning the entire file (Phase B).

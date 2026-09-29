@@ -674,8 +674,9 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 	return out, nil
 }
 
-// candidateWhere pushes filters with exact SQL equivalents into the metadata
-// scan. PathGlob and the test-support path rule are still checked by Matches.
+// candidateWhere pushes exact metadata predicates and a safe literal prefix
+// of PathGlob into the metadata scan. The full glob and the test-support path
+// rule are still checked by Matches; the prefix is only a superset filter.
 func candidateWhere(filter types.Filter) (string, []any) {
 	clauses := []string{"1=1"}
 	var args []any
@@ -686,6 +687,10 @@ func candidateWhere(filter types.Filter) (string, []any) {
 	if filter.CommitHash != "" {
 		clauses = append(clauses, "c.commit_hash = ?")
 		args = append(args, filter.CommitHash)
+	}
+	if prefix := literalGlobPrefix(filter.PathGlob); prefix != "" {
+		clauses = append(clauses, "c.file GLOB ?")
+		args = append(args, prefix+"*")
 	}
 	if filter.ExcludeTests {
 		clauses = append(clauses, "c.is_test = 0")
@@ -707,6 +712,17 @@ func candidateWhere(filter types.Filter) (string, []any) {
 		clauses = append(clauses, "COALESCE(c.symbol_kind, '') IN ("+strings.Join(ph, ",")+")")
 	}
 	return strings.Join(clauses, " AND "), args
+}
+
+// literalGlobPrefix stops before any filepath.Match metacharacter or escape.
+// It never narrows away a valid match; the full matcher remains authoritative.
+func literalGlobPrefix(pattern string) string {
+	for i, r := range pattern {
+		if r == '*' || r == '?' || r == '[' || r == '\\' {
+			return pattern[:i]
+		}
+	}
+	return pattern
 }
 
 func (s *Store) candidateCount(ctx context.Context, filter types.Filter) (int, error) {

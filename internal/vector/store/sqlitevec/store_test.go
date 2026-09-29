@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
@@ -94,6 +95,91 @@ func TestStoreFilterByLanguage(t *testing.T) {
 	}
 	if len(got) != 1 || got[0].Chunk.ID != "b" {
 		t.Fatalf("expected only ts chunk 'b', got %+v", got)
+	}
+}
+
+func TestStoreFilterPathPrefixKeepsExactGlobSemantics(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "path.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	chunks := []types.Chunk{
+		mkChunk("near-excluded", "internal/vector/other.go", "near", 1, 1, "go", types.KindFunction),
+		mkChunk("target", "internal/vector/store/sqlitevec/store.go", "target", 1, 1, "go", types.KindFunction),
+		mkChunk("nested-excluded", "internal/vector/store/sqlitevec/nested/store.go", "nested", 1, 1, "go", types.KindFunction),
+	}
+	if err := s.Upsert(context.Background(), chunks, [][]float32{{1, 0, 0, 0}, {0, 1, 0, 0}, {0.9, 0.1, 0, 0}}); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := s.Search(context.Background(), []float32{1, 0, 0, 0}, 1,
+		types.Filter{PathGlob: "internal/vector/store/sqlitevec/*.go"})
+	if err != nil || len(hits) != 1 || hits[0].Chunk.ID != "target" {
+		t.Fatalf("path filter lost target or admitted nested path: hits=%+v err=%v", hits, err)
+	}
+	if literalGlobPrefix("internal/vector/[ab]/*.go") != "internal/vector/" || literalGlobPrefix("internal/vector/\\*.go") != "internal/vector/" {
+		t.Fatal("glob prefix scanner narrowed an escaped or bracket pattern")
+	}
+}
+
+func TestStoreCombinedFilterMatchesExactOracle(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "combined.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	var chunks []types.Chunk
+	var vectors [][]float32
+	for i := 0; i < 60; i++ {
+		file := fmt.Sprintf("src/f%02d.go", i)
+		if i%7 == 0 {
+			file = fmt.Sprintf("src/f%02d_test.go", i)
+		}
+		kind := types.KindFunction
+		if i%5 == 0 {
+			kind = types.KindMethod
+		}
+		lang := "go"
+		if i%3 == 0 {
+			lang = "typescript"
+		}
+		chunk := mkChunk(fmt.Sprintf("id-%02d", i), file, "body", i+1, i+1, lang, kind)
+		chunk.IsTest = i%7 == 0
+		if i%11 == 0 {
+			chunk.CommitHash = "other"
+		}
+		chunks = append(chunks, chunk)
+		vectors = append(vectors, []float32{float32(i) / 60, 0, 0, 0})
+	}
+	if err := s.Upsert(context.Background(), chunks, vectors); err != nil {
+		t.Fatal(err)
+	}
+	filter := types.Filter{Language: "go", PathGlob: "src/*.go", SymbolKinds: []types.SymbolKind{types.KindFunction},
+		ChunkKinds: []types.ChunkKind{types.ChunkSymbol}, CommitHash: "deadbeef", ExcludeTests: true}
+	var eligible []types.Chunk
+	for _, chunk := range chunks {
+		if filter.Matches(chunk) {
+			eligible = append(eligible, chunk)
+		}
+	}
+	sort.Slice(eligible, func(i, j int) bool { return eligible[i].StartLine > eligible[j].StartLine })
+	const k = 5
+	if len(eligible) < k {
+		t.Fatalf("fixture has only %d eligible chunks", len(eligible))
+	}
+	hits, err := s.Search(context.Background(), []float32{1, 0, 0, 0}, k, filter)
+	if err != nil || len(hits) != k {
+		t.Fatalf("filtered search: hits=%d err=%v", len(hits), err)
+	}
+	for i, hit := range hits {
+		if hit.Chunk.ID != eligible[i].ID {
+			t.Errorf("rank %d = %s, exact oracle = %s", i+1, hit.Chunk.ID, eligible[i].ID)
+		}
+	}
+	filter.Language = "solidity"
+	hits, err = s.Search(context.Background(), []float32{1, 0, 0, 0}, k, filter)
+	if err != nil || len(hits) != 0 {
+		t.Fatalf("contradictory filter returned hits=%d err=%v", len(hits), err)
 	}
 }
 

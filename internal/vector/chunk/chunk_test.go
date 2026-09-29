@@ -166,6 +166,34 @@ func TestLongSingleMarkdownLineHasDistinctChildIDs(t *testing.T) {
 	}
 }
 
+func TestLongMarkdownSplitPrefersFenceAndListBoundaries(t *testing.T) {
+	if got := docBoundaryCut([]string{"```go\n", "alpha\n", "\n", "beta\n", "```\n", "tail\n"}); got != 5 {
+		t.Fatalf("split inside fenced code block at %d", got)
+	}
+	if got := docBoundaryCut([]string{"- first\n", "  continuation\n", "- second\n"}); got != 2 {
+		t.Fatalf("split inside list item at %d", got)
+	}
+	text := "# Guide\n" + "```go\n" + strings.Repeat("fmt.Println(1)\n", 5) + "```\n" +
+		"- first item\n" + "  continuation\n" + "- second item\n" + strings.Repeat("tail line\n", 8)
+	in := Input{File: "guide.md", Language: "markdown", CommitHash: "abc", Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "guide", Kind: types.KindDocSection, StartLine: 1,
+			EndLine: strings.Count(text, "\n"), Text: text}}}
+	chunks := New(Options{MaxInputTokens: 30}).Chunk(in)
+	if len(chunks) < 2 {
+		t.Fatalf("expected split, got %d", len(chunks))
+	}
+	var combined strings.Builder
+	for _, part := range chunks {
+		if len(part.Text) > 30*charsPerToken {
+			t.Fatalf("child exceeds embedding cap: %d bytes", len(part.Text))
+		}
+		combined.WriteString(part.Text)
+	}
+	if combined.String() != text {
+		t.Fatal("split did not preserve fenced/list source bytes")
+	}
+}
+
 func TestTruncationKeepsHeadAndMarker(t *testing.T) {
 	long := strings.Repeat("a", 1000)
 	in := Input{

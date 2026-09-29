@@ -80,11 +80,9 @@ func matcher(mode MatchMode) func(a, b contract.Citation) bool {
 //
 // Semantics for edge cases:
 //   - Empty actual: precision = recall = f1 = 0 (no retrieval attempt).
-//   - Empty expected: precision = recall = 1.0 — there is no
-//     ground-truth to disprove. F1 follows. This is the "trivially
-//     correct" interpretation; scenarios without expected citations
-//     are not useful for retrieval scoring and the runner can flag
-//     them separately.
+//   - Empty expected with non-empty actual: precision = F1 = 0,
+//     recall = 1.0. The actual citations have no declared support.
+//     Explicit no-answer cases use a separate abstention guard.
 //   - Duplicate actuals: collapsed by Citation.Key() so a backend that
 //     returns the same code location twice cannot inflate metrics.
 //
