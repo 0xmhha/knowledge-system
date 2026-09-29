@@ -204,6 +204,34 @@ func TestRunIndexesSample(t *testing.T) {
 	}
 }
 
+func TestRunManifestCoverageMatchesStoredCodeSymbols(t *testing.T) {
+	out := t.TempDir()
+	_, err := Run(context.Background(), Options{
+		SrcRoot: resolveTestdataSample(t), OutDir: out,
+		Embedder: mock.Default(), CKGPath: writeCKGWithNode(t),
+		Now: func() time.Time { return time.Unix(0, 0).UTC() },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	man, err := manifest.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	store, err := sqlitevec.Open(filepath.Join(out, "vector.db"), mock.Default().Dimension())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	val, err := store.Validate(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if man.SymbolCount != val.SymbolChunks || man.CanonicalCount != val.CanonicalChunks || man.ChunkCount != val.Chunks {
+		t.Fatalf("manifest counts (%d,%d,%d) != stored counts (%d,%d,%d)", man.ChunkCount, man.SymbolCount, man.CanonicalCount, val.Chunks, val.SymbolChunks, val.CanonicalChunks)
+	}
+}
+
 func TestRunIndexesMarkdownSections(t *testing.T) {
 	src := resolveTestdataSample(t)
 	out := t.TempDir()

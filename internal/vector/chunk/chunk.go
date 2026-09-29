@@ -430,9 +430,9 @@ type Stats struct {
 	// FlowStep / FlowSpine count the flow-corpus chunks (the bridge layer).
 	FlowStep  int
 	FlowSpine int
-	// CanonicalID counts chunks carrying a non-empty canonical_id — the
-	// ckg-aligned join key. Its ratio to Symbol is the alignment coverage;
-	// a build against a stale/absent ckg leaves most of these empty.
+	// CanonicalID counts alignable code-symbol chunks carrying a non-empty
+	// canonical_id. Headers, invariants and other kinds may carry a join key
+	// too, but they must not inflate the Symbol denominator's coverage.
 	CanonicalID int
 }
 
@@ -449,6 +449,7 @@ func Summarize(chunks []types.Chunk) Stats {
 		case types.ChunkDoc:
 			s.Doc++
 		case types.ChunkFunctionSplit:
+			s.Symbol++
 			s.FunctionSplit++
 		case types.ChunkPRBackground, types.ChunkPRSolution, types.ChunkCommitMessage:
 			s.PRDoc++
@@ -459,7 +460,7 @@ func Summarize(chunks []types.Chunk) Stats {
 		case types.ChunkFlowSpine:
 			s.FlowSpine++
 		}
-		if c.CanonicalID != "" {
+		if c.CanonicalID != "" && (c.ChunkKind == types.ChunkSymbol || c.ChunkKind == types.ChunkFunctionSplit) && c.StartLine > 0 {
 			s.CanonicalID++
 		}
 		if strings.Contains(c.Text, "[CKV-TRUNCATED]") {

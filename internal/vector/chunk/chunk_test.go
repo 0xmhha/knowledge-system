@@ -387,10 +387,12 @@ func TestMarkdownSkipsFileHeader(t *testing.T) {
 // coverage and the flow-corpus chunk kinds.
 func TestSummarize_CanonicalAndFlow(t *testing.T) {
 	chunks := []types.Chunk{
-		{ChunkKind: types.ChunkSymbol, CanonicalID: "pkg.A"},
+		{ChunkKind: types.ChunkSymbol, CanonicalID: "pkg.A", StartLine: 1},
 		{ChunkKind: types.ChunkSymbol}, // unaligned: no canonical_id
 		{ChunkKind: types.ChunkFlowStep, CanonicalID: "pkg.B"},
 		{ChunkKind: types.ChunkFlowSpine},
+		{ChunkKind: types.ChunkFileHeader, CanonicalID: "pkg.C"},
+		{ChunkKind: types.ChunkFunctionSplit, CanonicalID: "pkg.D", StartLine: 2},
 	}
 	s := Summarize(chunks)
 	if s.CanonicalID != 2 {
@@ -399,7 +401,7 @@ func TestSummarize_CanonicalAndFlow(t *testing.T) {
 	if s.FlowStep != 1 || s.FlowSpine != 1 {
 		t.Errorf("flow counts = step %d / spine %d, want 1 / 1", s.FlowStep, s.FlowSpine)
 	}
-	if s.Symbol != 2 || s.Total != 4 {
-		t.Errorf("symbol=%d total=%d, want 2 / 4", s.Symbol, s.Total)
+	if s.Symbol != 3 || s.Total != 6 {
+		t.Errorf("symbol=%d total=%d, want 3 / 6", s.Symbol, s.Total)
 	}
 }

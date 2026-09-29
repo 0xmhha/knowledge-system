@@ -541,6 +541,8 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 			val.OrphanChunks, val.OrphanVectors)
 	}
 	man.ChunkCount = val.Chunks
+	man.SymbolCount = val.SymbolChunks
+	man.CanonicalCount = val.CanonicalChunks
 	result.Validation = val
 	fp.Emit("reindex.validated",
 		"chunks", val.Chunks, "vectors", val.Vectors,

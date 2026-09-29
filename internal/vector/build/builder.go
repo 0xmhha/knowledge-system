@@ -561,6 +561,20 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		}
 	}
 
+	// The on-disk store is authoritative. In particular, non-symbol chunks
+	// can carry canonical IDs too; counting all of them against SymbolCount
+	// silently inflates the coverage used by the setup promotion gate.
+	validation, err := store.Validate(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("validate built index: %w", err)
+	}
+	if !validation.OK() {
+		return nil, fmt.Errorf("built index has %d orphan chunks and %d orphan vectors", validation.OrphanChunks, validation.OrphanVectors)
+	}
+	totalStats.Total = validation.Chunks
+	totalStats.Symbol = validation.SymbolChunks
+	totalStats.CanonicalID = validation.CanonicalChunks
+
 	builtAt := o.Now().UTC().Format(time.RFC3339)
 
 	// Embedding-space identity is derived from the embedder (which sources
