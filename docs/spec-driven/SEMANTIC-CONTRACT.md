@@ -54,6 +54,8 @@ cks semantic review --input /path/to/projection.json --repo /path/to/repo --samp
 
 CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호출자는 `Store.CurrentAligned`로 활성 투영을 다시 검증해 전달할 수 있다. 질의의 선호·대체 용어를 복수 개념 후보로 해석하고, `verified` 개념과 `verified IMPLEMENTED_BY` 관계가 CKV 결과의 canonical ID·커밋·파일·줄과 일치할 때만 기존 상위 K 인용의 점수를 최대 20% 올린다. 동점 의미를 합치거나 결과를 새로 추가하지 않는다. 오류가 나면 기존 검색 결과를 유지한다. 현재 CKS CLI/MCP에서는 이 옵션을 전달하지 않아 기본 검색은 기존 CKV+CKG 경로 그대로다. 실제 임베딩 모델의 A/B 품질·지연 평가가 남아 있으므로 운영 기본 활성화는 보류한다.
 
+정확한 용어의 중복 의미를 검토할 때는 `cks semantic lookup-term --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --lang ko --term <용어>`를 사용한다. 활성 CKG·CKV·원문 스냅샷을 재검증한 뒤 SQLite의 프로젝트·데이터셋·언어·정규화 용어 색인에서 후보를 찾는다. 대소문자를 접어 비교하며 같은 용어의 복수 개념을 모두 반환한다. 거부된 개념은 후보에서 제외하고 제안 개념은 낮은 점수로 표시한다. 이 명령은 질의 문장을 재작성하지 않으며, 색인 행이 빠졌거나 저장 문서와 맞지 않으면 실패한다. SQLite 스키마 v3으로 옮길 때 과거 v1/v2 JSON 문서는 다시 쓰지 않는다.
+
 검토된 의미 텍스트는 `cks semantic export-text --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --out <new-corpus-dir>`로 별도 디렉터리에 출력할 수 있다. 출력은 `verified` 개념·요구사항만 포함하고 ID 순서에 따라 결정적인 Markdown 파일명·내용을 생성한다. `manifest.json`은 원본 저장소, 커밋, 의미 투영 SHA-256과 모든 Markdown 바이트의 SHA-256을 기록한다. 제안·거부 상태의 항목은 제외된다. `cks setup --src <repo> --out <dataset> --version <new-version> --semantic-corpus <new-corpus-dir> ...`는 그래프 빌드 후 코퍼스의 저장소·커밋·파일 목록·해시를 검증한 다음 CKV의 추가 문서 루트로 전달한다. 바이트 변경, 다른 프로젝트, 추가 Markdown은 벡터 빌드 전 실패하며 활성 데이터셋은 유지된다. 현재 스모크는 mock 임베더의 구조 검색만 검증한다. 자연어 품질이 입증될 때까지 온톨로지 재순위 기본값은 그대로 꺼져 있다.
 
 ## 요구사항과 수용 기준 입력

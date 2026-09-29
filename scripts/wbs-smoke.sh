@@ -138,6 +138,16 @@ PY
 "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" > "$scratch/semantic-reviewed-trace.json"
+"$repo_root/bin/cks" semantic lookup-term --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --lang en --term 'ALPHA FUNCTION' \
+  > "$scratch/semantic-term.json"
+python3 - "$scratch/semantic-term.json" <<'PY'
+import json, sys
+lookup = json.load(open(sys.argv[1], encoding='utf-8'))
+assert lookup['candidates'] == [{'concept_id': 'alpha-function', 'term': 'Alpha function',
+                                 'status': 'verified', 'score': 1}], lookup
+PY
 "$repo_root/bin/cks" semantic plan --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" > "$scratch/semantic-reviewed-plan.json"

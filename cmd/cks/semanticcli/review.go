@@ -34,6 +34,7 @@ func NewCmd() *cobra.Command {
 	cmd.AddCommand(newTestCmd())
 	cmd.AddCommand(newAnnotatePackCmd())
 	cmd.AddCommand(newExportTextCmd())
+	cmd.AddCommand(newLookupTermCmd())
 	return cmd
 }
 
