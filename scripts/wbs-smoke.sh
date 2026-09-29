@@ -155,6 +155,10 @@ PY
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" --criterion-id ac-alpha \
   --out "$scratch/test-pass.json" -- go test ./...
+"$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
+  --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" --criterion-id ac-alpha \
+  --out "$scratch/test-exact.json" --go-test-exact
 if "$repo_root/bin/cks" semantic test --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" --criterion-id ac-alpha \
@@ -242,7 +246,7 @@ if "$repo_root/bin/cks" eval --scenarios "$scratch/find-alpha-stale.yaml" \
   echo "eval accepted a conflicting indexed commit" >&2
   exit 1
 fi
-python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" "$scratch/base-pack.json" "$scratch/annotated-pack.json" "$scratch/find-alpha-stale-report.json" <<'PY'
+python3 - "$scratch/find-alpha-report.json" "$scratch/absent-api-report.json" "$scratch/semantic-build.json" "$scratch/semantic-review.json" "$scratch/semantic-promote.json" "$scratch/semantic-code-review.json" "$scratch/semantic.db" "$scratch/semantic-trace.json" "$scratch/semantic-reviewed-trace.json" "$scratch/semantic-reviewed-plan.json" "$scratch/test-pass.json" "$scratch/test-fail.json" "$scratch/test-unlinked.json" "$scratch/base-pack.json" "$scratch/annotated-pack.json" "$scratch/find-alpha-stale-report.json" "$scratch/test-exact.json" <<'PY'
 import json
 import sqlite3
 import sys
@@ -275,6 +279,9 @@ failed = json.load(open(sys.argv[12], encoding='utf-8'))
 assert passed['command_passed'] is True and passed['snapshot_consistent'] is True and passed['criterion_id'] == 'ac-alpha', passed
 assert passed['test_canonical_id'] == reviewed['requirements'][0]['paths'][0]['test_canonical_id'], passed
 assert passed['tested_by_assertions'] == ['reviewed:tested'] and passed['accepted_by_assertions'] == ['reviewed:accepted'], passed
+exact = json.load(open(sys.argv[17], encoding='utf-8'))
+assert exact['framework'] == 'go-test-json' and exact['test_name'] == 'TestAlpha' and exact['test_observed'] is True and exact['test_passed'] is True, exact
+assert exact['test_canonical_id'] == passed['test_canonical_id'] and exact['snapshot'] == passed['snapshot'], exact
 assert failed['command_passed'] is False and failed['snapshot_consistent'] is True and failed['exit_code'] != 0, failed
 from pathlib import Path
 assert not Path(sys.argv[13]).exists(), 'unlinked criterion wrote a result'

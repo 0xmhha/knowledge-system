@@ -11,11 +11,18 @@ import (
 
 func newTestCmd() *cobra.Command {
 	var project, repo, graph, vector, storePath, criterion, testCanonicalID, output string
+	var goTestExact bool
 	cmd := &cobra.Command{
-		Use:   "test --project-id ID --repo DIR --graph DIR --vector DIR --store DB --criterion-id ID --out FILE -- COMMAND [ARGS...]",
+		Use:   "test --project-id ID --repo DIR --graph DIR --vector DIR --store DB --criterion-id ID --out FILE [--go-test-exact | -- COMMAND [ARGS...]]",
 		Short: "Execute a command against a reviewed trace and record its result",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, argv []string) error {
+			if goTestExact && len(argv) != 0 {
+				return fmt.Errorf("--go-test-exact derives its command from the reviewed Go test; do not pass COMMAND")
+			}
+			if !goTestExact && len(argv) == 0 {
+				return fmt.Errorf("a command after -- or --go-test-exact is required")
+			}
 			store, err := semantic.OpenStore(storePath)
 			if err != nil {
 				return err
@@ -25,7 +32,12 @@ func newTestCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			report, err := active.ExecuteLinkedTestFor(cmd.Context(), repo, criterion, testCanonicalID, argv)
+			var report semantic.TestRun
+			if goTestExact {
+				report, err = active.ExecuteLinkedGoTestFor(cmd.Context(), repo, criterion, testCanonicalID)
+			} else {
+				report, err = active.ExecuteLinkedTestFor(cmd.Context(), repo, criterion, testCanonicalID, argv)
+			}
 			if err != nil {
 				return err
 			}
@@ -47,12 +59,13 @@ func newTestCmd() *cobra.Command {
 			if _, err = fmt.Fprintln(cmd.OutOrStdout(), output); err != nil {
 				return err
 			}
-			if !report.CommandPassed || !report.SnapshotConsistent {
+			if !report.CommandPassed || !report.SnapshotConsistent || goTestExact && !report.TestPassed {
 				return fmt.Errorf("test run failed or source changed; report: %s", output)
 			}
 			return nil
 		},
 	}
+	cmd.Flags().BoolVar(&goTestExact, "go-test-exact", false, "derive one Go test from the reviewed CKG anchor and require its go test -json run/pass events")
 	for _, flag := range []struct {
 		name   string
 		target *string

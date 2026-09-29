@@ -7,11 +7,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"hash"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -40,6 +44,10 @@ type TestRun struct {
 	OutputSHA256       string    `json:"output_sha256"`
 	OutputBytes        int64     `json:"output_bytes"`
 	RunError           string    `json:"run_error,omitempty"`
+	Framework          string    `json:"framework,omitempty"`
+	TestName           string    `json:"test_name,omitempty"`
+	TestObserved       bool      `json:"test_observed,omitempty"`
+	TestPassed         bool      `json:"test_passed,omitempty"`
 }
 
 type hashOutput struct {
@@ -67,7 +75,19 @@ func (a ActiveProjection) ExecuteLinkedTest(ctx context.Context, repoRoot, crite
 // An omitted symbol is accepted only when the criterion has exactly one
 // reviewed test target. The command's success still is not criterion proof.
 func (a ActiveProjection) ExecuteLinkedTestFor(ctx context.Context, repoRoot, criterionID, testCanonicalID string, argv []string) (TestRun, error) {
-	if len(argv) == 0 || argv[0] == "" {
+	return a.executeLinkedTestFor(ctx, repoRoot, criterionID, testCanonicalID, argv, false)
+}
+
+// ExecuteLinkedGoTestFor resolves the reviewed CKG test anchor to one Go
+// function and requires go test's JSON stream to show that exact test ran
+// and passed. This is test execution proof, not a semantic Given/When/Then
+// judgment.
+func (a ActiveProjection) ExecuteLinkedGoTestFor(ctx context.Context, repoRoot, criterionID, testCanonicalID string) (TestRun, error) {
+	return a.executeLinkedTestFor(ctx, repoRoot, criterionID, testCanonicalID, nil, true)
+}
+
+func (a ActiveProjection) executeLinkedTestFor(ctx context.Context, repoRoot, criterionID, testCanonicalID string, argv []string, exactGo bool) (TestRun, error) {
+	if !exactGo && (len(argv) == 0 || argv[0] == "") {
 		return TestRun{}, fmt.Errorf("test run needs a command after --")
 	}
 	trace, err := a.Trace()
@@ -121,6 +141,13 @@ func (a ActiveProjection) ExecuteLinkedTestFor(ctx context.Context, repoRoot, cr
 	if len(acceptedBy) == 0 {
 		return TestRun{}, fmt.Errorf("criterion %q has no reviewed acceptance assertion for test %q", criterionID, testCanonicalID)
 	}
+	var testName string
+	if exactGo {
+		argv, testName, err = a.exactGoTestCommand(repoRoot, trace.Snapshot.Commit, testCanonicalID)
+		if err != nil {
+			return TestRun{}, err
+		}
+	}
 	clean, err := committedTreeClean(repoRoot, trace.Snapshot.Commit)
 	if err != nil {
 		return TestRun{}, err
@@ -139,9 +166,18 @@ func (a ActiveProjection) ExecuteLinkedTestFor(ctx context.Context, repoRoot, cr
 		Executable: filepath.Base(argv[0]), CommandSHA256: hex.EncodeToString(commandHash[:]),
 		StartedAt: time.Now().UTC(), GOOS: runtime.GOOS, GOARCH: runtime.GOARCH,
 		GoRuntime: runtime.Version(), ExitCode: -1}
+	if exactGo {
+		report.Framework, report.TestName = "go-test-json", testName
+	}
 	output := &hashOutput{hash: sha256.New()}
 	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
-	cmd.Dir, cmd.Stdout, cmd.Stderr = root, output, output
+	var observer *goTestObserver
+	if exactGo {
+		observer = &goTestObserver{output: output, testName: testName}
+		cmd.Dir, cmd.Stdout, cmd.Stderr = root, observer, observer
+	} else {
+		cmd.Dir, cmd.Stdout, cmd.Stderr = root, output, output
+	}
 	start := time.Now()
 	runErr := cmd.Run()
 	report.DurationMillis = time.Since(start).Milliseconds()
@@ -155,12 +191,110 @@ func (a ActiveProjection) ExecuteLinkedTestFor(ctx context.Context, repoRoot, cr
 		}
 		report.RunError = runErr.Error()
 	}
+	if exactGo {
+		report.TestObserved, report.TestPassed = observer.run, observer.run && observer.pass && report.CommandPassed
+		if report.CommandPassed && !report.TestPassed {
+			report.RunError = "go test exited successfully without a pass event for the reviewed test"
+		}
+	}
 	report.SnapshotConsistent, err = committedTreeClean(repoRoot, trace.Snapshot.Commit)
 	if err != nil {
 		report.RunError = fmt.Sprintf("post-run source check: %v", err)
 		report.SnapshotConsistent = false
 	}
 	return report, nil
+}
+
+func (a ActiveProjection) exactGoTestCommand(repoRoot, commit, canonicalID string) ([]string, string, error) {
+	var evidence *EvidenceSpan
+	for i := range a.projection.Evidence {
+		e := &a.projection.Evidence[i]
+		if e.Kind == SourceTest && e.CanonicalID == canonicalID {
+			if evidence != nil && (e.Path != evidence.Path || e.StartLine != evidence.StartLine || e.EndLine != evidence.EndLine) {
+				return nil, "", fmt.Errorf("test %q has ambiguous source anchors", canonicalID)
+			}
+			evidence = e
+		}
+	}
+	if evidence == nil || !strings.HasSuffix(evidence.Path, "_test.go") {
+		return nil, "", fmt.Errorf("test %q has no Go test source anchor", canonicalID)
+	}
+	source, err := exec.Command("git", "-C", repoRoot, "show", commit+":"+evidence.Path).Output()
+	if err != nil {
+		return nil, "", fmt.Errorf("read reviewed Go test source: %w", err)
+	}
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, evidence.Path, source, 0)
+	if err != nil {
+		return nil, "", fmt.Errorf("parse reviewed Go test source: %w", err)
+	}
+	var testName string
+	for _, decl := range file.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Recv != nil || !goTestName(fn.Name.Name) ||
+			fset.Position(fn.Pos()).Line < evidence.StartLine || fset.Position(fn.End()).Line > evidence.EndLine ||
+			!strings.HasSuffix(canonicalID, "."+fn.Name.Name) {
+			continue
+		}
+		if testName != "" {
+			return nil, "", fmt.Errorf("test %q source anchor contains multiple Go tests", canonicalID)
+		}
+		testName = fn.Name.Name
+	}
+	if testName == "" {
+		return nil, "", fmt.Errorf("test %q source anchor does not contain the reviewed Go test function", canonicalID)
+	}
+	packagePath := "."
+	if dir := filepath.Dir(evidence.Path); dir != "." {
+		packagePath = "./" + filepath.ToSlash(dir)
+	}
+	return []string{"go", "test", "-json", "-count=1", "-run", "^" + testName + "$", packagePath}, testName, nil
+}
+
+func goTestName(name string) bool {
+	if !strings.HasPrefix(name, "Test") || len(name) <= 4 {
+		return false
+	}
+	c := name[4]
+	return c < 'a' || c > 'z'
+}
+
+// goTestObserver hashes all output but retains only one bounded JSON line.
+// A green package exit without the selected test's run/pass events is not
+// accepted as exact-test execution proof (e.g. "no tests to run").
+type goTestObserver struct {
+	mu       sync.Mutex
+	output   *hashOutput
+	testName string
+	pending  []byte
+	run      bool
+	pass     bool
+}
+
+func (o *goTestObserver) Write(p []byte) (int, error) {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	n, err := o.output.Write(p)
+	for _, b := range p[:n] {
+		if b == '\n' {
+			var event struct {
+				Action string `json:"Action"`
+				Test   string `json:"Test"`
+			}
+			if json.Unmarshal(o.pending, &event) == nil && event.Test == o.testName {
+				if event.Action == "run" {
+					o.run = true
+				}
+				if event.Action == "pass" {
+					o.pass = true
+				}
+			}
+			o.pending = o.pending[:0]
+		} else if len(o.pending) < 1<<20 {
+			o.pending = append(o.pending, b)
+		}
+	}
+	return n, err
 }
 
 func committedTreeClean(repoRoot, expectedCommit string) (bool, error) {
