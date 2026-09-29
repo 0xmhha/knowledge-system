@@ -12,6 +12,8 @@
 
 `DocumentSection`은 CKV와 동일한 Markdown 제목 파서의 줄 경계를 사용한다. 섹션 추출은 `Claim`을 만들어 사실이라고 주장하지 않는다. `Claim`은 최소한 원천 섹션과 그 섹션의 `EvidenceSpan`을 참조해야 한다. 추출·제안된 주장은 `proposed`로 시작한다. `verified`에는 명시적 `reviewed_by`가 필요하며 승격 전 `ValidateSources`를 통과해야 한다. 검토자가 있더라도 스냅샷이 다르거나 원문 해시가 맞지 않으면 저장할 수 없다. `rejected`는 삭제 대신 검토 이력에 남길 상태다.
 
+`cks semantic build`는 문서 섹션의 원문 파일·커밋·줄 범위와 겹치는 실제 CKV Markdown `doc` 청크를 조회해 `DocumentSection.chunk_ids`에 안정 ID를 기록하고, 연결된 섹션 수를 출력한다. 청크가 없는 섹션은 비어 있는 목록으로 남아 있어 연결률을 확인할 수 있다. 승격·활성화·활성 조회는 **기록된 청크 ID가 현재 CKV DB의 동일 파일·커밋·줄 위치를 여전히 가리키는지** 다시 검사한다. 삭제되거나 다른 위치에 재사용된 ID는 의미 경로를 반환하지 않는다. 원문 `EvidenceSpan` 해시 검증과 CKV 청크 조인은 별도 검사다.
+
 `cks semantic review --input projection.json --repo <git-root> --sample 20 --salt <audit-id>`는 JSON 투영의 모든 근거를 기록된 커밋에서 재검증한 뒤 검토 대기 주장 샘플과 집계 JSON을 출력한다. 표본은 데이터셋 ID·주장 ID·salt의 해시로 결정되므로 같은 입력은 같은 목록을 만든다. `verified`와 `rejected` 모두 검토자 ID가 있어야 한다. 정밀도는 **검토된 주장 중 verified 비율**이며 검토 건수가 0이면 `null`이다. 이 수치는 실제로 검토된 표본의 품질만 설명한다. 대표 표본의 외부 검토가 없으면 추출기 전체의 정밀도나 관계 정확도로 해석하지 않는다. 현재 자동 관계 추출과 관계 평가셋은 없다.
 
 관계 후보 `Assertion`은 자체 근거·상태·검토자를 가진다. 허용 타입은 `DocumentSection SUPPORTS Claim`, `Claim CONTRADICTS Claim`, `Claim ABOUT Concept`, `Concept IMPLEMENTED_BY CodeSymbol`이다. 관계마다 양쪽 원천 근거를 요구하며 `verified` 관계는 연결된 주장·개념도 검토 완료 상태여야 한다. 코드 구현 관계는 코드 근거의 `canonical_id`가 객체 ID와 같아야 하고, 승격 단계에서 실제 CKG의 동일 커밋 AST 심볼·파일·줄 범위를 검사한다. 방향 오류, 고아 참조, 무근거, 무검토 승격은 거부한다. 검토 도구는 주장·관계·개념의 정밀도를 따로 출력한다. `RELATED_TO` 같은 막연한 관계는 확정 타입으로 사용하지 않는다.

@@ -52,6 +52,7 @@ type DocumentSection struct {
 	Heading     string   `json:"heading"`
 	HeadingPath []string `json:"heading_path,omitempty"`
 	EvidenceID  string   `json:"evidence_id"`
+	ChunkIDs    []string `json:"chunk_ids,omitempty"`
 }
 
 // Concept is reviewed vocabulary over CKV and CKG, not an AST node. Terms

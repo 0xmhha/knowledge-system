@@ -81,6 +81,13 @@ func (p Projection) Validate() error {
 		if !ok || e.Kind != SourceDocument {
 			return fmt.Errorf("section %q needs document evidence", section.ID)
 		}
+		chunkIDs := map[string]bool{}
+		for _, id := range section.ChunkIDs {
+			if !digestPattern.MatchString(id) || chunkIDs[id] {
+				return fmt.Errorf("section %q has invalid or duplicate CKV chunk ID", section.ID)
+			}
+			chunkIDs[id] = true
+		}
 		sections[section.ID] = section
 	}
 	concepts := make(map[string]Concept, len(p.Concepts))

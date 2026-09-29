@@ -21,6 +21,9 @@ func (s *Store) CurrentAligned(ctx context.Context, projectID, repoRoot, graphDi
 	if err := ValidateCodeAnchors(p, graphDir); err != nil {
 		return ActiveProjection{}, err
 	}
+	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
+		return ActiveProjection{}, err
+	}
 	if err := p.ValidateSources(ctx, repoRoot); err != nil {
 		return ActiveProjection{}, err
 	}

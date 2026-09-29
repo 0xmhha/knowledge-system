@@ -229,7 +229,7 @@ assert found['metrics']['file_recall'] == 1 and found['metrics']['citation_count
 assert absent['citation_abstention_passed'] is True, absent
 semantic = json.load(open(sys.argv[3], encoding='utf-8'))
 review = json.load(open(sys.argv[4], encoding='utf-8'))
-assert semantic['activated'] is True and semantic['sections'] > 0 and semantic['concepts'] == 2 and semantic['requirements'] == 1 and semantic['evidence'] > 0, semantic
+assert semantic['activated'] is True and semantic['sections'] > 0 and semantic['chunk_linked_sections'] == semantic['sections'] and semantic['concepts'] == 2 and semantic['requirements'] == 1 and semantic['evidence'] > 0, semantic
 assert review['project_id'] == 'ks-fixture' and review['reviewed_precision'] is None and review['concept_proposed'] == 2 and len(review['concept_sample']) == 2 and review['requirement_proposed'] == 1, review
 promotion = json.load(open(sys.argv[5], encoding='utf-8'))
 code_review = json.load(open(sys.argv[6], encoding='utf-8'))

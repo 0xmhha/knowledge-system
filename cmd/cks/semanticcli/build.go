@@ -129,6 +129,10 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		p.Evidence = append(p.Evidence, part.Evidence...)
 		p.Requirements = append(p.Requirements, part.Requirements...)
 	}
+	linkedSections, err := semantic.AttachCKVChunks(ctx, &p, o.vector)
+	if err != nil {
+		return err
+	}
 	var store *semantic.Store
 	if o.extractOnly {
 		if err := semantic.ValidateDatasetAlignment(p, repo, o.graph, o.vector); err != nil {
@@ -162,7 +166,8 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	}
 	return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{
 		"project_id": o.project, "dataset_id": o.dataset, "commit": snapshot.Commit,
-		"sections": len(p.Sections), "concepts": len(p.Concepts), "requirements": len(p.Requirements),
+		"sections": len(p.Sections), "chunk_linked_sections": linkedSections,
+		"concepts": len(p.Concepts), "requirements": len(p.Requirements),
 		"evidence": len(p.Evidence), "stored": !o.extractOnly, "activated": o.activate,
 	})
 }

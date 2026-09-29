@@ -3,6 +3,7 @@ package semanticcli
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func writeTestManifest(t *testing.T, dir string, v any) {
@@ -81,6 +83,19 @@ requirements:
 	writeTestManifest(t, graph, map[string]any{"schema_version": "1.23", "src_root": repo, "src_commit": commit, "graph_digest": digest})
 	writeTestManifest(t, vector, map[string]any{"src_root": repo, "src_commit": commit,
 		"sources": map[string]any{"ckg": map[string]any{"src_commit": commit, "graph_digest": digest}}})
+	vectorDB, err := sql.Open("sqlite3", filepath.Join(vector, "vector.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := vectorDB.Exec(`CREATE TABLE chunks(id TEXT, file TEXT, start_line INTEGER, end_line INTEGER, commit_hash TEXT, language TEXT, chunk_kind TEXT)`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := vectorDB.Exec(`INSERT INTO chunks VALUES(?, 'spec.md', 1, 2, ?, 'markdown', 'doc')`, strings.Repeat("b", 64), commit); err != nil {
+		t.Fatal(err)
+	}
+	if err := vectorDB.Close(); err != nil {
+		t.Fatal(err)
+	}
 	storePath, output := filepath.Join(data, "semantic.db"), filepath.Join(data, "projection.json")
 	cmd := NewCmd()
 	var stdout bytes.Buffer
@@ -111,7 +126,7 @@ requirements:
 	if err := json.Unmarshal(buf, &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" || p.Concepts[0].ID != "source" || p.Requirements[0].ID != "req-source" {
+	if p.Snapshot.Commit != commit || p.Sections[0].Heading != "Expected" || len(p.Sections[0].ChunkIDs) != 1 || p.Concepts[0].ID != "source" || p.Requirements[0].ID != "req-source" {
 		t.Fatalf("projection followed dirty working tree: %+v", p)
 	}
 	store, err := semantic.OpenStore(storePath)
@@ -172,6 +187,19 @@ requirements:
 	current, err = store.Current(context.Background(), "example")
 	if err != nil || current.Snapshot.DatasetID != "cut-2" {
 		t.Fatalf("promoted projection = %+v, %v", current.Snapshot, err)
+	}
+	vectorDB, err = sql.Open("sqlite3", filepath.Join(vector, "vector.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := vectorDB.Exec(`DELETE FROM chunks`); err != nil {
+		t.Fatal(err)
+	}
+	if err := vectorDB.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.CurrentAligned(context.Background(), "example", repo, graph, vector); err == nil || !strings.Contains(err.Error(), "stale or foreign CKV chunk") {
+		t.Fatalf("stale CKV document join accepted: %v", err)
 	}
 	bad := NewCmd()
 	bad.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-3",
