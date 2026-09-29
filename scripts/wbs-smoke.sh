@@ -285,6 +285,18 @@ git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
   --embedder mock --version smoke-next --gate-min-canonical 0.4 --progress text \
   > "$scratch/reindex-next.log" 2>&1
 test "$(readlink "$dataset/current")" = smoke-next
+if "$repo_root/bin/cks" semantic trace --diagnose-stale --project-id ks-fixture \
+  --repo "$src" --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
+  --store "$scratch/semantic.db" > "$scratch/stale-trace.json" 2> "$scratch/stale-trace-diagnostic.log"; then
+  echo "stale semantic trace returned success" >&2
+  exit 1
+fi
+python3 - "$scratch/stale-trace.json" <<'PY'
+import json, sys
+report = json.load(open(sys.argv[1], encoding='utf-8'))
+assert report['state'] == 'stale' and report['requirements'] == [], report
+assert 'source commit' in report['reason'], report
+PY
 if "$repo_root/bin/cks" semantic trace --project-id ks-fixture --repo "$src" \
   --graph "$dataset/current/graph" --vector "$dataset/current/vector" \
   --store "$scratch/semantic.db" > "$scratch/stale-trace.log" 2>&1; then

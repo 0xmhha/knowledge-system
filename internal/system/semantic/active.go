@@ -15,19 +15,26 @@ func (s *Store) CurrentAligned(ctx context.Context, projectID, repoRoot, graphDi
 	if err != nil {
 		return ActiveProjection{}, err
 	}
-	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
-		return ActiveProjection{}, err
-	}
-	if err := ValidateCodeAnchors(p, graphDir); err != nil {
-		return ActiveProjection{}, err
-	}
-	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
-		return ActiveProjection{}, err
-	}
-	if err := p.ValidateSources(ctx, repoRoot); err != nil {
+	if err := validateActiveProjection(ctx, p, repoRoot, graphDir, vectorDir); err != nil {
 		return ActiveProjection{}, err
 	}
 	return ActiveProjection{projection: p}, nil
+}
+
+func validateActiveProjection(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir string) error {
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
+		return err
+	}
+	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
+		return err
+	}
+	if err := p.ValidateSources(ctx, repoRoot); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a ActiveProjection) Snapshot() Snapshot { return a.projection.Snapshot }

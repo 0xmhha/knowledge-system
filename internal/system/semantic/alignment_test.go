@@ -52,6 +52,9 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 	if err != nil || active.Snapshot() != p.Snapshot {
 		t.Fatalf("aligned active projection: %+v, %v", active.Snapshot(), err)
 	}
+	if status, err := store.TraceStatus(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir); err != nil || status.State != "current" || status.Snapshot != p.Snapshot {
+		t.Fatalf("current trace diagnostic: %+v, %v", status, err)
+	}
 	// A different project may use the same short symbol names, but its
 	// projection cannot join with this dataset's source root.
 	cases := []struct {
@@ -75,6 +78,10 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 			write()
 			if _, err := store.CurrentAligned(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), tc.want) {
 				t.Fatalf("stale read expected %q, got %v", tc.want, err)
+			}
+			status, err := store.TraceStatus(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir)
+			if err != nil || status.State != "stale" || !strings.Contains(status.Reason, tc.want) || status.Snapshot != p.Snapshot || len(status.Requirements) != 0 {
+				t.Fatalf("stale trace leaked paths or missed diagnostic: %+v, %v", status, err)
 			}
 			other := p
 			other.Snapshot.DatasetID = "other-" + strings.ReplaceAll(tc.name, " ", "-")

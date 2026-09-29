@@ -66,6 +66,8 @@ CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호�
 
 `cks semantic trace --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db>`는 활성 데이터셋을 다시 대조한 뒤 요구사항별 상태와 근거 경로를 JSON으로 출력한다. `linked`는 검토된 Requirement→Concept→Code→Test 및 AcceptanceCriterion→Test **연결의 존재**만 뜻한다. 테스트가 실제 실행되어 통과했다는 뜻은 아니다. 누락된 개념·구현·테스트·수용 테스트와 검토된 상충 주장 관계를 별도로 표시한다. 인덱스가 오래되거나 원문과 어긋나면 추적 경로를 출력하지 않고 실패한다. 실제 테스트 결과 수집 및 실패 패치 미승격은 후속 W4.4 작업이다.
 
+기계 판독형 오류 진단이 필요하면 `trace --diagnose-stale`을 사용한다. 활성 의미 투영은 저장되어 있지만 소스·CKG·CKV 근거가 어긋나면 `state=stale`, 스냅샷, 이유 및 빈 `requirements`를 JSON으로 출력한 뒤 비정상 종료한다. 이전 검토 경로를 최신 경로처럼 재출력하지 않는다. 정렬이 유효하면 `state=current`와 일반 추적 결과를 출력한다. 활성 투영 자체가 없거나 손상된 경우는 별도의 읽기 오류로 처리한다.
+
 `cks semantic plan`은 동일한 정렬 검증 뒤 각 요구사항에 필요한 다음 조치를 읽기 전용 JSON으로 제시한다. 근거 ID, 이미 알려진 코드·테스트 심볼 ID, 누락 관계, 충돌 관계 ID를 유지하며 모든 단계에 `unconfirmed=true`를 단다. 연결이 완성되어도 계획은 수용 테스트 실행을 요구한다. 이 계획은 코드 변경이나 승인 결정을 생성하지 않는다.
 
 `cks semantic annotate-pack --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --input <base-pack.json> --out <new-pack.json>`은 기존 EvidencePack의 무결성을 확인한 뒤, **이미 포함된 인용의 커밋·파일·줄 범위**와 겹치는 검토된 추적 경로 ID만 `semantic` 선택 필드에 추가한다. 기존 인용·본문을 늘리거나 원문을 복사하지 않는다. 의미 필드는 별도 SHA-256 다이제스트로 검증하고, 기본 팩 해시는 기존 소비자가 새 필드를 무시한 채 검증할 수 있도록 동일하게 유지한다. 이로 인해 기본 팩 해시는 의미 필드를 보호하지 않으므로 새 소비자는 `semantic.digest`도 반드시 검사해야 한다. 모든 링크는 `unconfirmed=true`이며 테스트 통과를 뜻하지 않는다. 동일 커밋의 일치하는 인용이 없으면 의미 필드는 생략된다.

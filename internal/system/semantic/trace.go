@@ -43,6 +43,32 @@ type TraceReport struct {
 	Requirements []RequirementTrace `json:"requirements"`
 }
 
+// TraceDiagnosticReport separates a valid reviewed trace from a stored
+// projection whose live graph, vector, or source proof is stale. A stale
+// report never contains requirement paths that might be mistaken for current.
+type TraceDiagnosticReport struct {
+	Snapshot     Snapshot           `json:"snapshot"`
+	State        string             `json:"state"`
+	Reason       string             `json:"reason,omitempty"`
+	Requirements []RequirementTrace `json:"requirements"`
+}
+
+func (s *Store) TraceStatus(ctx context.Context, projectID, repoRoot, graphDir, vectorDir string) (TraceDiagnosticReport, error) {
+	p, err := s.Current(ctx, projectID)
+	if err != nil {
+		return TraceDiagnosticReport{}, err
+	}
+	if err := validateActiveProjection(ctx, p, repoRoot, graphDir, vectorDir); err != nil {
+		return TraceDiagnosticReport{Snapshot: p.Snapshot, State: "stale", Reason: err.Error(),
+			Requirements: []RequirementTrace{}}, nil
+	}
+	trace, err := (ActiveProjection{projection: p}).Trace()
+	if err != nil {
+		return TraceDiagnosticReport{}, err
+	}
+	return TraceDiagnosticReport{Snapshot: trace.Snapshot, State: "current", Requirements: trace.Requirements}, nil
+}
+
 // TraceAligned refuses to report across stale graph/vector/source snapshots.
 func (s *Store) TraceAligned(ctx context.Context, projectID, repoRoot, graphDir, vectorDir string) (TraceReport, error) {
 	active, err := s.CurrentAligned(ctx, projectID, repoRoot, graphDir, vectorDir)
