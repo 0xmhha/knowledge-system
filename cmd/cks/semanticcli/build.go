@@ -18,7 +18,7 @@ import (
 func newBuildCmd() *cobra.Command {
 	var repo, project, dataset, graph, vector, storePath, output, ontology string
 	var docs []string
-	var activate bool
+	var activate, extractOnly bool
 	var minimumCoverage float64
 	cmd := &cobra.Command{
 		Use: "build", Short: "Extract committed Markdown sections into an aligned semantic dataset",
@@ -27,7 +27,7 @@ func newBuildCmd() *cobra.Command {
 			return runBuild(cmd.Context(), cmd, buildOptions{
 				repo: repo, project: project, dataset: dataset, graph: graph, vector: vector,
 				store: storePath, output: output, docs: docs, ontology: ontology,
-				activate: activate, minimumCoverage: minimumCoverage,
+				activate: activate, extractOnly: extractOnly, minimumCoverage: minimumCoverage,
 			})
 		},
 	}
@@ -41,6 +41,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringSliceVar(&docs, "docs", nil, "repository-relative committed Markdown paths (repeatable)")
 	cmd.Flags().StringVar(&ontology, "ontology", "", "repository-relative committed ontology YAML path")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
+	cmd.Flags().BoolVar(&extractOnly, "extract-only", false, "write a reviewable projection without storing or activating it")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
 	for _, flag := range []string{"repo", "project-id", "dataset-id", "graph", "vector", "store", "out"} {
 		_ = cmd.MarkFlagRequired(flag)
@@ -52,10 +53,14 @@ type buildOptions struct {
 	repo, project, dataset, graph, vector, store, output, ontology string
 	docs                                                           []string
 	activate                                                       bool
+	extractOnly                                                    bool
 	minimumCoverage                                                float64
 }
 
 func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
+	if o.extractOnly && o.activate {
+		return fmt.Errorf("--extract-only cannot be combined with --activate")
+	}
 	if len(o.docs) == 0 && o.ontology == "" {
 		return fmt.Errorf("at least one --docs or --ontology path is required")
 	}
@@ -107,13 +112,23 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		p.Evidence = append(p.Evidence, part.Evidence...)
 		p.Concepts = append(p.Concepts, part.Concepts...)
 	}
-	store, err := semantic.OpenStore(o.store)
-	if err != nil {
-		return err
-	}
-	defer store.Close()
-	if err := store.PutAligned(ctx, p, repo, o.graph, o.vector); err != nil {
-		return err
+	var store *semantic.Store
+	if o.extractOnly {
+		if err := semantic.ValidateDatasetAlignment(p, repo, o.graph, o.vector); err != nil {
+			return err
+		}
+		if err := p.ValidateSources(ctx, repo); err != nil {
+			return err
+		}
+	} else {
+		store, err = semantic.OpenStore(o.store)
+		if err != nil {
+			return err
+		}
+		defer store.Close()
+		if err := store.PutAligned(ctx, p, repo, o.graph, o.vector); err != nil {
+			return err
+		}
 	}
 	buf, err := json.MarshalIndent(p, "", "  ")
 	if err != nil {
@@ -131,7 +146,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{
 		"project_id": o.project, "dataset_id": o.dataset, "commit": snapshot.Commit,
 		"sections": len(p.Sections), "concepts": len(p.Concepts),
-		"evidence": len(p.Evidence), "activated": o.activate,
+		"evidence": len(p.Evidence), "stored": !o.extractOnly, "activated": o.activate,
 	})
 }
 

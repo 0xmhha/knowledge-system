@@ -80,6 +80,7 @@ func (p Projection) Validate() error {
 		}
 		sections[section.ID] = section
 	}
+	concepts := make(map[string]Concept, len(p.Concepts))
 	for _, concept := range p.Concepts {
 		if err := claimID(concept.ID); err != nil {
 			return err
@@ -136,6 +137,7 @@ func (p Projection) Validate() error {
 		default:
 			return fmt.Errorf("concept %q has invalid status %q", concept.ID, concept.Status)
 		}
+		concepts[concept.ID] = concept
 	}
 	claims := make(map[string]Claim, len(p.Claims))
 	for _, claim := range p.Claims {
@@ -222,6 +224,39 @@ func (p Projection) Validate() error {
 			}
 			if assertion.Status == StatusVerified && (left.Status != StatusVerified || right.Status != StatusVerified) {
 				return fmt.Errorf("verified assertion %q refers to unverified claim", assertion.ID)
+			}
+		case PredicateAbout:
+			claim, claimOK := claims[assertion.SubjectID]
+			concept, conceptOK := concepts[assertion.ObjectID]
+			if !claimOK || !conceptOK {
+				return fmt.Errorf("assertion %q ABOUT must connect claim to concept", assertion.ID)
+			}
+			if !hasAnyEvidence(seenEvidence, claim.EvidenceIDs) || !seenEvidence[concept.EvidenceID] {
+				return fmt.Errorf("assertion %q ABOUT must cite claim and concept sources", assertion.ID)
+			}
+			if assertion.Status == StatusVerified && (claim.Status != StatusVerified || concept.Status != StatusVerified) {
+				return fmt.Errorf("verified assertion %q refers to unverified claim or concept", assertion.ID)
+			}
+		case PredicateImplementedBy:
+			concept, ok := concepts[assertion.SubjectID]
+			if !ok {
+				return fmt.Errorf("assertion %q IMPLEMENTED_BY subject must be a concept", assertion.ID)
+			}
+			if !seenEvidence[concept.EvidenceID] {
+				return fmt.Errorf("assertion %q IMPLEMENTED_BY must cite concept source", assertion.ID)
+			}
+			codeProof := false
+			for _, id := range assertion.EvidenceIDs {
+				e := evidence[id]
+				if (e.Kind == SourceCode || e.Kind == SourceTest) && e.CanonicalID == assertion.ObjectID && e.CanonicalID != "" {
+					codeProof = true
+				}
+			}
+			if !codeProof {
+				return fmt.Errorf("assertion %q IMPLEMENTED_BY needs a matching CKG code anchor", assertion.ID)
+			}
+			if assertion.Status == StatusVerified && concept.Status != StatusVerified {
+				return fmt.Errorf("verified assertion %q refers to unverified concept", assertion.ID)
 			}
 		default:
 			return fmt.Errorf("assertion %q has invalid predicate %q", assertion.ID, assertion.Predicate)

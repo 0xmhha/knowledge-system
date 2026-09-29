@@ -104,8 +104,28 @@ concepts:
 	if err != nil || current.Snapshot.DatasetID != "cut-1" {
 		t.Fatalf("active projection = %+v, %v", current.Snapshot, err)
 	}
+	extract := NewCmd()
+	extract.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-2",
+		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
+		"--docs", "spec.md", "--ontology", "ontology.yaml", "--extract-only"})
+	if err := extract.Execute(); err != nil {
+		t.Fatalf("extract-only: %v", err)
+	}
+	if _, err := store.Load(context.Background(), "example", "cut-2"); err == nil {
+		t.Fatal("extract-only stored a dataset")
+	}
+	promote := NewCmd()
+	promote.SetArgs([]string{"promote", "--input", output, "--repo", repo,
+		"--graph", graph, "--vector", vector, "--store", storePath, "--activate"})
+	if err := promote.Execute(); err != nil {
+		t.Fatalf("promote extracted projection: %v", err)
+	}
+	current, err = store.Current(context.Background(), "example")
+	if err != nil || current.Snapshot.DatasetID != "cut-2" {
+		t.Fatalf("promoted projection = %+v, %v", current.Snapshot, err)
+	}
 	bad := NewCmd()
-	bad.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-2",
+	bad.SetArgs([]string{"build", "--repo", repo, "--project-id", "example", "--dataset-id", "cut-3",
 		"--graph", graph, "--vector", vector, "--store", storePath, "--out", output,
 		"--docs", "../secret.md", "--activate"})
 	if err := bad.Execute(); err == nil || !strings.Contains(err.Error(), "unsafe document path") {

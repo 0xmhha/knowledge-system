@@ -139,6 +139,9 @@ func (s *Store) PutAligned(ctx context.Context, p Projection, repoRoot, graphDir
 	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
 		return err
 	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
+		return err
+	}
 	return s.Put(ctx, p, repoRoot)
 }
 
@@ -151,6 +154,9 @@ func (s *Store) ActivateAligned(ctx context.Context, projectID, datasetID, repoR
 		return err
 	}
 	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
 		return err
 	}
 	if err := p.ValidateSources(ctx, repoRoot); err != nil {

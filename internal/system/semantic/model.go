@@ -99,8 +99,10 @@ type Assertion struct {
 }
 
 const (
-	PredicateSupports    = "SUPPORTS"    // DocumentSection -> Claim
-	PredicateContradicts = "CONTRADICTS" // Claim -> Claim
+	PredicateSupports      = "SUPPORTS"       // DocumentSection -> Claim
+	PredicateContradicts   = "CONTRADICTS"    // Claim -> Claim
+	PredicateAbout         = "ABOUT"          // Claim -> Concept
+	PredicateImplementedBy = "IMPLEMENTED_BY" // Concept -> CKG canonical CodeSymbol
 )
 
 // Projection is one versioned semantic graph view for one source snapshot.

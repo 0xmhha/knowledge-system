@@ -2,10 +2,50 @@ package semantic
 
 import (
 	"fmt"
+	"path/filepath"
 
 	graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
 	graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
+
+// ValidateCodeAnchors checks every canonical code/test evidence against the
+// actual graph DB before an aligned semantic projection becomes active.
+func ValidateCodeAnchors(p Projection, graphDir string) error {
+	count := 0
+	for _, e := range p.Evidence {
+		if e.CanonicalID != "" {
+			count++
+		}
+	}
+	if count == 0 {
+		return nil
+	}
+	graph, err := graphstore.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
+	if err != nil {
+		return fmt.Errorf("semantic: open graph for code anchors: %w", err)
+	}
+	defer graph.Close()
+	manifest, err := graphstore.GetManifest(graph)
+	if err != nil {
+		return fmt.Errorf("semantic: read CKG manifest: %w", err)
+	}
+	for _, e := range p.Evidence {
+		if e.CanonicalID == "" {
+			continue
+		}
+		node, found, err := graph.FindByCanonicalID(e.CanonicalID)
+		if err != nil {
+			return fmt.Errorf("semantic: resolve CKG canonical_id %q: %w", e.CanonicalID, err)
+		}
+		if !found {
+			return fmt.Errorf("semantic: CKG canonical_id %q not found", e.CanonicalID)
+		}
+		if err := checkCodeAnchor(p.Snapshot, manifest, node, e); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // AttachCodeEvidence accepts a code/test span only when CKG resolves its
 // canonical symbol in the same committed snapshot and the span lies inside

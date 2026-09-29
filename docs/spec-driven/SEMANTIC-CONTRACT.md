@@ -14,7 +14,7 @@
 
 `cks semantic review --input projection.json --repo <git-root> --sample 20 --salt <audit-id>`는 JSON 투영의 모든 근거를 기록된 커밋에서 재검증한 뒤 검토 대기 주장 샘플과 집계 JSON을 출력한다. 표본은 데이터셋 ID·주장 ID·salt의 해시로 결정되므로 같은 입력은 같은 목록을 만든다. `verified`와 `rejected` 모두 검토자 ID가 있어야 한다. 정밀도는 **검토된 주장 중 verified 비율**이며 검토 건수가 0이면 `null`이다. 이 수치는 실제로 검토된 표본의 품질만 설명한다. 대표 표본의 외부 검토가 없으면 추출기 전체의 정밀도나 관계 정확도로 해석하지 않는다. 현재 자동 관계 추출과 관계 평가셋은 없다.
 
-관계 후보 `Assertion`은 자체 근거·상태·검토자를 가진다. 현재 허용한 좁은 타입은 `DocumentSection SUPPORTS Claim`과 `Claim CONTRADICTS Claim`뿐이다. 관계 근거가 실제 섹션·양쪽 주장에 닿아야 하며, `verified` 관계는 연결된 주장도 검토 완료 상태여야 한다. 방향 오류, 고아 참조, 무근거, 무검토 승격은 거부한다. 검토 도구는 주장과 관계의 정밀도를 따로 출력한다. `RELATED_TO` 같은 막연한 관계나 코드 구현 관계는 아직 확정 타입으로 사용하지 않는다.
+관계 후보 `Assertion`은 자체 근거·상태·검토자를 가진다. 허용 타입은 `DocumentSection SUPPORTS Claim`, `Claim CONTRADICTS Claim`, `Claim ABOUT Concept`, `Concept IMPLEMENTED_BY CodeSymbol`이다. 관계마다 양쪽 원천 근거를 요구하며 `verified` 관계는 연결된 주장·개념도 검토 완료 상태여야 한다. 코드 구현 관계는 코드 근거의 `canonical_id`가 객체 ID와 같아야 하고, 승격 단계에서 실제 CKG의 동일 커밋 AST 심볼·파일·줄 범위를 검사한다. 방향 오류, 고아 참조, 무근거, 무검토 승격은 거부한다. 검토 도구는 주장·관계·개념의 정밀도를 따로 출력한다. `RELATED_TO` 같은 막연한 관계는 확정 타입으로 사용하지 않는다.
 
 코드 근거를 붙일 때는 CKG 공개 읽기 API에서 `canonical_id`를 정확 조회하고, CKG의 소스 커밋·파일·AST 노드 줄 범위가 근거와 일치하는지 검사한다. 이 검사는 원문 SHA-256 검사와 별개이며 `verified`로 자동 승격하지 않는다.
 
@@ -45,6 +45,8 @@ cks semantic review --input /path/to/projection.json --repo /path/to/repo --samp
 ```
 
 `--activate`를 생략하면 검증된 후보 데이터셋만 저장한다. JSON은 원문 범위와 해시를 사람이 검토할 수 있도록 출력한다. 실제 CKV·CKG 빌드 후 `scripts/wbs-smoke.sh`에서 위 빌드와 검토 명령을 실행한다.
+
+검토자가 코드 근거와 관계를 추가하는 흐름에서는 새 `dataset_id`로 `build --extract-only`를 실행하고 JSON의 `evidence`/`assertions`를 작성한 뒤 `semantic promote --input <json> --repo ... --graph ... --vector ... --store ... --activate`를 실행한다. 추출 전용 단계는 SQLite에 저장하지 않는다. 승격은 원문·관계 타입·CKG 코드 앵커·CKV 정렬률을 다시 검사한다. 같은 데이터셋 ID의 다른 내용은 불변 저장소가 거부하므로 검토 수정마다 새 데이터셋 ID를 사용한다. 작은 스모크는 실제 `Alpha` AST 심볼을 `IMPLEMENTED_BY`로 연결해 승격한 뒤 존재하지 않는 `canonical_id`의 승격이 실패하고 이전 활성 버전이 유지됨을 확인한다.
 
 `--min-canonical-ratio`는 프로젝트 실측 기준으로 선택한다. 0이면 게이트를 끄며, 양수이면 CKV 매니페스트의 `canonical_count / symbol_count`가 기준보다 낮거나 카운터가 없을 때 승격을 막는다. 예시의 0.94는 이 프로젝트의 구조 기준선(약 94.28%)에 맞춘 값이지 다른 저장소의 기본값이 아니다. 실제 임베딩 검색 품질과는 별도 지표다.
 
