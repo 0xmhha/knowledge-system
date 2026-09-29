@@ -13,7 +13,12 @@ for kind in empty-go typescript unsupported-python; do
   printf '# Guide\nA committed guide for %s.\n' "$kind" > "$src/README.md"
   case "$kind" in
     empty-go) printf 'module example.com/empty\n\ngo 1.25\n' > "$src/go.mod" ;;
-    typescript) printf 'export function greet(): string { return "hello"; }\n' > "$src/main.ts" ;;
+    typescript)
+      printf 'export function greet(): string { return "hello"; }\n' > "$src/main.ts"
+      printf 'node_modules/\n' > "$src/.gitignore"
+      mkdir -p "$src/web/node_modules"
+      printf 'export const stale = "must never be indexed";\n' > "$src/web/node_modules/noise.ts"
+      ;;
     unsupported-python) printf 'def greet():\n    return "hello"\n' > "$src/main.py" ;;
   esac
   git -C "$src" init -q
@@ -82,6 +87,7 @@ for kind in ('empty-go', 'typescript', 'unsupported-python'):
     if kind == 'typescript':
         assert doctor['shared_code_files'] == 1 and doctor['status'] == 'ready', doctor
         assert any(hit['citation']['file'] == 'main.ts' for hit in query['hits']), query
+        assert all('node_modules' not in hit['citation']['file'] for hit in query['hits']), query
         code = json.loads((base / 'mcp-code.json').read_text())
         assert code['commit'] == doctor['commit'] and code['citation_commits'] == [doctor['commit']], code
         assert 'main.ts' in code['citation_files'], code

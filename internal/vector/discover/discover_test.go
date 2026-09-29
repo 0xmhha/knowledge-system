@@ -66,10 +66,13 @@ func TestDefaultIgnoreSkipsNodeModulesAndVendor(t *testing.T) {
 	mkfile(t, dir, "main.go", "package main")
 	mkfile(t, dir, "node_modules/foo/index.ts", "x")
 	mkfile(t, dir, "vendor/bar/lib.go", "x")
+	mkfile(t, dir, "web/viewer/node_modules/foo.ts", "x")
+	mkfile(t, dir, "tools/vendor/lib.go", "x")
+	mkfile(t, dir, "web/node_modulesx/kept.ts", "x")
 
 	files, _, _ := Walk(dir, Options{})
 	got := relPaths(files)
-	if !slices.Equal(got, []string{"main.go"}) {
+	if !slices.Equal(got, []string{"main.go", "web/node_modulesx/kept.ts"}) {
 		t.Errorf("DefaultIgnore not honored: got %v", got)
 	}
 }

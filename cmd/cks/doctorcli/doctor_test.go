@@ -140,3 +140,23 @@ func TestDoctorFlagsGitIgnoredIndexableFiles(t *testing.T) {
 		t.Fatalf("ignored source risk missed: %+v, %v", r, err)
 	}
 }
+
+func TestDoctorSkipsNestedGeneratedDependencyTrees(t *testing.T) {
+	root, _ := doctorRepo(t)
+	if err := os.WriteFile(filepath.Join(root, ".gitignore"), []byte("node_modules/\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	doctorGit(t, root, "add", ".gitignore")
+	doctorGit(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "ignore")
+	path := filepath.Join(root, "web", "node_modules", "noise.ts")
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte("export const noise = true;\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	report, err := Inspect(root, "")
+	if err != nil || report.Status != "ready" || report.SharedCodeFiles != 1 || report.Languages["typescript"] != 0 || report.IgnoredIndexable != 0 {
+		t.Fatalf("nested generated source counted as capacity: %+v, %v", report, err)
+	}
+}

@@ -11,7 +11,8 @@ import (
 // CountIgnoredIndexable is a conservative guard for commit-named datasets.
 // CKV has its own .ckvignore rules rather than adopting .gitignore, so a Git
 // ignored source can still be indexed while the Git status looks clean. This
-// preview excludes only the directory classes both engines skip by default.
+// guard excludes only directory classes both engines skip by default, at any
+// depth. This must stay aligned with their discovery defaults.
 func CountIgnoredIndexable(root string) (int, error) {
 	cmd := exec.Command("git", "-C", root, "ls-files", "--others", "--ignored", "--exclude-standard", "-z")
 	out, err := cmd.Output()
@@ -36,10 +37,18 @@ func CountIgnoredIndexable(root string) (int, error) {
 }
 
 func defaultIgnoredDir(path string) bool {
-	part := strings.SplitN(path, "/", 2)[0]
-	switch part {
-	case ".git", "node_modules", "vendor", ".next", "out", "dist", "build", "target", ".venv", "__pycache__":
-		return true
+	ext := strings.ToLower(filepath.Ext(path))
+	for _, part := range strings.Split(path, "/") {
+		switch part {
+		case ".git", "node_modules", "vendor":
+			return true
+		case ".next", "out", "dist", "build", "target", ".venv", "__pycache__":
+			// CKG's Go package loader bypasses its walker and only skips
+			// vendor/node_modules/.git. Other languages use the walker.
+			if ext != ".go" {
+				return true
+			}
+		}
 	}
 	return false
 }

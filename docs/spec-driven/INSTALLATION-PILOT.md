@@ -28,9 +28,9 @@ python3 scripts/package-host.py --out-dir /tmp/knowledge-system-dist
 
 `init`은 기존 설정을 덮어쓰지 않는다. 실제 임베더를 명시해야 하며 Ollama 모델은 별도로 준비해야 한다. `doctor`는 Go, TypeScript, JavaScript, Solidity, Markdown 파일 수와 graph-only Proto 수를 미리 보고한다. 심볼릭 링크와 의심스러운 비밀 경로를 개수로만 보고하며 내용을 읽거나 출력하지 않는다. 이 진단은 프로젝트의 `.ckvignore`와 파일 목록 정책이 제대로 적용됐는지 대체하지 않는다.
 
-Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown만 있는 저장소에서도 문서 검색은 가능하지만 코드 AST 그래프와 CKV 코드 심볼의 조인은 없다. `doctor`는 `shared_code_files=0`, `status=degraded`로 이 범위를 표시한다. TypeScript 저장소는 `shared_code_files`를 양수로 보고한다. 세 유형의 독립 저장소에서 `init → setup → doctor → ckv query`를 실행하는 구조 스모크는 `scripts/wbs-install-smoke.sh`에 있다. 이 테스트는 mock 임베더와 현재 macOS 호스트만 다룬다.
+Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown만 있는 저장소에서도 문서 검색은 가능하지만 코드 AST 그래프와 CKV 코드 심볼의 조인은 없다. `doctor`는 `shared_code_files=0`, `status=degraded`로 이 범위를 표시한다. TypeScript 저장소는 `shared_code_files`를 양수로 보고한다. 세 유형의 독립 저장소에서 `init → setup → doctor → ckv query → CKS MCP context.get_for_task`를 실행하는 구조 스모크는 `scripts/wbs-install-smoke.sh`에 있다. 각 프로젝트의 MCP 서버를 새로 띄워 다시 조회했을 때도 인용 커밋이 그대로였고, TypeScript 코드 질문은 `main.ts`를 인용했다. 이 테스트는 mock 임베더와 현재 macOS 호스트만 다룬다.
 
-`--version auto`는 커밋 기반 버전 이름을 사용한다. 추적·미추적 파일이 남아 있거나 Git이 무시하지만 CKV/CKG가 읽을 수 있는 소스 파일이 있으면 같은 HEAD의 서로 다른 바이트가 같은 버전 이름을 갖지 않도록 거부한다. 작업 트리 스냅샷 모드는 아직 구현 중이다. 설정 파일을 소스 저장소 안에 만들었다면 커밋하거나 무시 정책을 정한 뒤 빌드한다.
+`--version auto`는 커밋 기반 버전 이름을 사용한다. 현재 모든 `setup` 빌드는 추적·미추적 파일이 남아 있거나 Git이 무시하지만 CKV/CKG가 읽을 수 있는 소스 파일이 있으면 거부한다. 명시적 버전 이름을 줘도 예외가 아니다. 버전 후보는 활성화 직전에 빌드 결과의 커밋과 소스 청결성을 다시 검사한다. 작업 트리 스냅샷 모드는 아직 구현 중이다. 설정 파일을 소스 저장소 안에 만들었다면 커밋하거나 무시 정책을 정한 뒤 빌드한다.
 
 검토 완료된 CKS 온톨로지·명세를 CKV 자연어 코퍼스에도 넣으려면 먼저 활성 의미 투영을 `cks semantic export-text ... --out /path/to/new-corpus`로 내보내고, 다음 재색인에 `--semantic-corpus /path/to/new-corpus`를 지정한다. 출력 디렉터리는 소스 저장소 밖에 둔다. 후보 그래프와 코퍼스의 저장소·커밋·파일 해시가 맞아야 CKV가 이를 임베딩한다. `--version auto`는 이 코퍼스 매니페스트 해시도 버전 이름에 반영한다. 코퍼스 출처가 달라지면 같은 소스 커밋이라도 새 데이터셋으로 만든다.
 

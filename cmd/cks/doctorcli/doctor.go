@@ -128,11 +128,9 @@ func Inspect(src, dataset string) (Report, error) {
 			return nil
 		}
 		if entry.IsDir() {
-			if rel == entry.Name() {
-				switch entry.Name() {
-				case ".git", "node_modules", "vendor", ".next", "dist", "build", "out", ".venv", "target", "__pycache__":
-					return filepath.SkipDir
-				}
+			switch entry.Name() {
+			case ".git", "node_modules", "vendor", ".next", "dist", "build", "out", ".venv", "target", "__pycache__":
+				return filepath.SkipDir
 			}
 			return nil
 		}

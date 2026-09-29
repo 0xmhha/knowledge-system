@@ -245,8 +245,7 @@ func IsProbablyBinary(path string) bool {
 }
 
 // isIgnored matches rel against patterns. Directory patterns end in '/'
-// and match any path whose first segment(s) equal the pattern (without
-// trailing slash). Non-directory patterns use filepath.Match against
+// and match a complete path segment at any depth. Non-directory patterns use filepath.Match against
 // both the full relative path and the basename.
 func isIgnored(rel string, patterns []string) bool {
 	base := filepath.Base(strings.TrimSuffix(rel, "/"))
@@ -256,9 +255,10 @@ func isIgnored(rel string, patterns []string) bool {
 			continue
 		}
 		if strings.HasSuffix(p, "/") {
-			// Directory pattern: matches when rel begins with that dir.
+			// Directory pattern: match a full segment, including nested dirs.
 			dir := strings.TrimSuffix(p, "/")
-			if rel == dir+"/" || strings.HasPrefix(rel, dir+"/") || rel == dir {
+			if rel == dir+"/" || strings.HasPrefix(rel, dir+"/") || rel == dir ||
+				strings.Contains(rel, "/"+dir+"/") || strings.HasSuffix(strings.TrimSuffix(rel, "/"), "/"+dir) {
 				return true
 			}
 			continue
