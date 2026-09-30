@@ -46,7 +46,27 @@ func TestCoreOnlyKnowledgeInitLockAndDrift(t *testing.T) {
 	if out, err := execute(t, append(args, "validate")...); err != nil || !strings.Contains(out, `"status":"locked"`) {
 		t.Fatalf("locked validate: %s, %v", out, err)
 	}
-	policy := filepath.Join(root, ".cks", "knowledge", "policies", "BR-17.yaml")
+	if out, err := execute(t, append(args, "review")...); err != nil || !strings.Contains(out, `"items":[]`) {
+		t.Fatalf("core-only review queue: %s, %v", out, err)
+	}
+	packDir:=filepath.Join(root,"vendor","sample-pack")
+	if err:=os.MkdirAll(packDir,0o700); err!=nil { t.Fatal(err) }
+	pack:=`pack_schema_version: 1
+pack_id: engineering.decisions
+version: 1.0.0
+owner: project
+scope: fixture
+requires: []
+concepts: [{id: business-policy, kind: rule, definition: A project rule.}]
+relation_types: []
+constraints: []
+competency_questions: ["Which rule applies?"]
+`
+	if err:=os.WriteFile(filepath.Join(packDir,"pack.yaml"),[]byte(pack),0o600); err!=nil { t.Fatal(err) }
+	if out,err:=execute(t,append(args,"digest","--source","vendor/sample-pack")...); err!=nil || !strings.Contains(out,`"pack_id":"engineering.decisions"`) || !strings.Contains(out,`"sha256":`) {
+		t.Fatalf("registered pack digest: %s, %v",out,err)
+	}
+	policy := filepath.Join(root, ".cks", "knowledge", "domain", "fixture.yaml")
 	if err := os.WriteFile(policy, []byte("status: proposed\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}

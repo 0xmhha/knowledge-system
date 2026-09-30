@@ -63,7 +63,7 @@ func TestLockPinsPackAndOverlayBytes(t *testing.T) {
 	root := t.TempDir()
 	overlay := filepath.Join(root, ".cks", "knowledge")
 	packRoot := filepath.Join(root, "vendor", "engineering-decisions")
-	for _, dir := range []string{overlay, packRoot, filepath.Join(overlay, "policies")} {
+	for _, dir := range []string{overlay, packRoot, filepath.Join(overlay, "domain")} {
 		if err := os.MkdirAll(dir, 0o700); err != nil {
 			t.Fatal(err)
 		}
@@ -101,7 +101,7 @@ overlay_root: .cks/knowledge
 	if err := os.WriteFile(filepath.Join(overlay, "manifest.yaml"), []byte(manifest), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(overlay, "policies", "BR-17.yaml"), []byte("status: proposed\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(overlay, "domain", "fixture.yaml"), []byte("status: proposed\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	lock, err := BuildLock(root)
@@ -118,7 +118,7 @@ overlay_root: .cks/knowledge
 	if _, err := VerifyLock(root); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(overlay, "policies", "BR-17.yaml"), []byte("status: verified\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(overlay, "domain", "fixture.yaml"), []byte("status: verified\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := VerifyLock(root); err == nil || !strings.Contains(err.Error(), "pack_lock_mismatch") {

@@ -73,8 +73,14 @@ func NewCmd() *cobra.Command {
 			} else if !os.IsNotExist(err) {
 				return err
 			}
+			instances, err := knowledgepack.LoadProjectInstances(root)
+			if err != nil {
+				return err
+			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"status": status, "project_id": lock.ProjectID,
-				"pack_count": len(lock.Packs), "lock_digest": lock.LockDigest})
+				"pack_count": len(lock.Packs), "lock_digest": lock.LockDigest,
+				"policy_count": len(instances.Policies), "decision_count": len(instances.Decisions),
+				"conflict_count": len(instances.Conflicts)})
 		}}
 	lockCmd := &cobra.Command{Use: "lock", Short: "Write the exact local pack and overlay byte lock", Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
@@ -113,6 +119,59 @@ func NewCmd() *cobra.Command {
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"status": "locked", "project_id": lock.ProjectID,
 				"pack_count": len(lock.Packs), "lock_digest": lock.LockDigest, "path": path})
 		}}
-	cmd.AddCommand(initCmd, validateCmd, lockCmd)
+	var source string
+	digestCmd := &cobra.Command{Use:"digest",Short:"Calculate one registered local pack's exact file digest",Args:cobra.NoArgs,
+		RunE:func(c *cobra.Command,_ []string) error {
+			if err:=requireRoot(); err!=nil { return err }
+			if source=="" { return fmt.Errorf("--source is required") }
+			loaded,err:=knowledgepack.LoadRegisteredPack(root,source)
+			if err!=nil { return err }
+			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"pack_id":loaded.Pack.PackID,
+				"version":loaded.Pack.Version,"sha256":loaded.Digest})
+		}}
+	digestCmd.Flags().StringVar(&source,"source","","project-relative pack directory")
+	reviewCmd := &cobra.Command{Use: "review", Short: "List source-backed policy and ADR records for human review", Args: cobra.NoArgs,
+		RunE: func(c *cobra.Command, _ []string) error {
+			if err := requireRoot(); err != nil {
+				return err
+			}
+			lock, err := knowledgepack.BuildLock(root)
+			if err != nil {
+				return err
+			}
+			instances, err := knowledgepack.LoadProjectInstances(root)
+			if err != nil {
+				return err
+			}
+			type item struct {
+				Kind       string                  `json:"kind"`
+				ID         string                  `json:"id"`
+				Status     string                  `json:"status"`
+				SourceRef  knowledgepack.SourceRef `json:"source_ref"`
+				ReviewedBy string                  `json:"reviewed_by,omitempty"`
+				HoldReason string                  `json:"hold_reason,omitempty"`
+			}
+			queue := []item{}
+			for _, p := range instances.Policies {
+				reason := ""
+				if p.Status == "proposed" {
+					reason = "awaiting_human_review"
+				} else if p.Status == "rejected" {
+					reason = "rejected_by_reviewer"
+				}
+				queue = append(queue, item{"policy", p.ID, p.Status, p.SourceRef, p.ReviewedBy, reason})
+			}
+			for _, d := range instances.Decisions {
+				reason := ""
+				if d.Status == "proposed" {
+					reason = "awaiting_human_review"
+				} else if d.Status == "rejected" {
+					reason = "rejected_by_reviewer"
+				}
+				queue = append(queue, item{"decision", d.ID, d.Status, d.SourceRef, d.ReviewedBy, reason})
+			}
+			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"project_id": lock.ProjectID, "items": queue, "conflicts": instances.Conflicts})
+		}}
+	cmd.AddCommand(initCmd, validateCmd, lockCmd, digestCmd, reviewCmd)
 	return cmd
 }

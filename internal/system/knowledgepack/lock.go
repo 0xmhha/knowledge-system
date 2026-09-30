@@ -112,6 +112,9 @@ func BuildLock(projectRoot string) (Lock, error) {
 	if err != nil {
 		return Lock{}, err
 	}
+	if _, err := LoadInstances(root, ordered); err != nil {
+		return Lock{}, err
+	}
 	lock := Lock{ProjectID: m.ProjectID, PackSchemaVersion: 1, Packs: []LockedPack{}, OverlayDigest: overlayDigest}
 	for _, pack := range ordered {
 		deps := append([]Dependency(nil), pack.Pack.Requires...)
@@ -166,6 +169,47 @@ func VerifyLock(projectRoot string) (Lock, error) {
 		return Lock{}, fmt.Errorf("pack_lock_mismatch: saved lock differs from current registered bytes")
 	}
 	return want, nil
+}
+
+// LoadProjectInstances is read-only and returns validated project-authored
+// policies and ADRs. It never upgrades proposed records automatically.
+func LoadProjectInstances(projectRoot string) (Instances, error) {
+	m, err := ReadManifest(projectRoot)
+	if err != nil {
+		return Instances{}, err
+	}
+	overlay, err := registeredDir(projectRoot, m.OverlayRoot)
+	if err != nil {
+		return Instances{}, err
+	}
+	var packs []LoadedPack
+	for _, selected := range m.SelectedPacks {
+		root, err := registeredDir(projectRoot, selected.Source)
+		if err != nil {
+			return Instances{}, err
+		}
+		pack, err := Load(root)
+		if err != nil {
+			return Instances{}, err
+		}
+		if pack.Pack.PackID != selected.PackID || pack.Pack.Version != selected.Version || pack.Digest != selected.SHA256 {
+			return Instances{}, fmt.Errorf("pack_lock_mismatch: selected pack bytes changed")
+		}
+		packs = append(packs, pack)
+	}
+	ordered, err := Resolve(packs)
+	if err != nil {
+		return Instances{}, err
+	}
+	return LoadInstances(overlay, ordered)
+}
+
+// LoadRegisteredPack permits a CLI to calculate the exact local pack digest
+// before adding it to manifest.yaml, using the same path checks as locking.
+func LoadRegisteredPack(projectRoot, source string) (LoadedPack, error) {
+	root, err := registeredDir(projectRoot,source)
+	if err != nil { return LoadedPack{},err }
+	return Load(root)
 }
 
 func mustJSON(value any) []byte { data, _ := json.Marshal(value); return data }
