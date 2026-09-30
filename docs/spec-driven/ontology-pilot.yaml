@@ -1,6 +1,6 @@
 # W3.1 pilot vocabulary for the knowledge-system architecture.
-# All entries remain proposed until a domain reviewer checks definitions,
-# ambiguous terms, competency questions, and source-backed relationships.
+# D1 approved the vocabulary design; individual source-backed concepts and
+# relationships remain proposed until their projection is reviewed.
 version: 1
 project_id: knowledge-system
 domain: source-code knowledge systems
@@ -137,4 +137,18 @@ concepts:
     includes: [Citations, redaction report]
     excludes: [Unreviewed semantic assertion treated as verified]
     terms: [{lang: en, value: evidence pack, preferred: true}, {lang: ko, value: 근거 묶음, preferred: true}]
+    status: proposed
+  - id: patch-attempt
+    kind: process
+    definition: An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.
+    includes: [Changed-file digests, base and result snapshots, check reports]
+    excludes: [An unexecuted change plan, promotion of the active dataset]
+    terms: [{lang: en, value: patch attempt, preferred: true}, {lang: ko, value: 변경 시도, preferred: true}]
+    status: proposed
+  - id: criterion-decision
+    kind: process
+    definition: A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.
+    includes: [Approval, rejection, needs-review decision, reviewer and reason]
+    excludes: [A passing test alone, existence of a test link]
+    terms: [{lang: en, value: criterion decision, preferred: true}, {lang: ko, value: 수용 기준 판정, preferred: true}]
     status: proposed

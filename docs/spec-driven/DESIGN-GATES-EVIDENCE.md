@@ -4,12 +4,12 @@
 
 | 게이트 | 판정 | 근거와 남은 결정 |
 |---|---|---|
-| D1 도메인 모델 | **사용자 결정 대기** | 18개 개념의 경계와 6개 능력 질문, 3개 요구사항·4개 기준을 코드/문서와 대조했다. 사용자가 최종 결정하고 에이전트가 검토를 돕는다. 결정 전 전부 `proposed`다. [`D1-DECISION-REVIEW.md`](./D1-DECISION-REVIEW.md)에 선택지와 권고를 둔다. |
+| D1 도메인 모델 | **사용자 설계 승인** | 20개 개념의 경계와 6개 능력 질문의 구조 답, 3개 요구사항·4개 기준의 파일럿 지위를 승인했다. 개별 원천 검토 전 파일 값은 `proposed`다. [`D1-DECISION-REVIEW.md`](./D1-DECISION-REVIEW.md)에 결정, [`ONTOLOGY-20-USAGE.md`](./ONTOLOGY-20-USAGE.md)에 용도를 둔다. |
 | D2 캡처·신원 | **사용자 설계 승인** | Go/TypeScript Git worktree와 비Git AST/CKV 실험, 두 staging 경로의 결정성, 독립 blob 읽기를 수행했다. 발견한 정렬·임시 경로·Go 모듈 오류의 수정 계약을 고정했다. 실제 v2 통합·실패 주입은 A4 게이트다. |
 | D3 공개 계약 | **사용자 설계 승인** | 실제 v1 MCP 입력 fixture의 `task`/`prompt` 불일치를 수정하고 필드/필수 목록 회귀 시험을 추가했다. v1/v2 DTO, 인용/해시/오류/롤백의 버전 경계를 `PUBLIC-CONTRACT-V2.md`에 고정했다. v2 실행 골든과 외부 소비자 재생은 A7.1/A8 게이트다. |
 | D4 단계 간 정합성 | **사용자 설계 승인** | A5.1이 A4의 원문 보관에 의존하도록 WBS를 고쳤고, 비Git 패치의 신원을 커밋 대신 전후 스냅샷으로 고쳤다. 아래 입력·출력·실패 행렬을 구현의 기준으로 삼는다. |
 
-**승인 기록 (2026-09-30):** 프로젝트 사용자가 D2, D3, D4의 *설계 결정*을 승인했다. D1은 사용자가 직접 결정하고 에이전트의 검토 지원을 받기로 했다. 이 승인은 A 단계의 구현 시험이나 B/C 실모델 품질 게이트 통과를 뜻하지 않는다. D1의 정의·관계·파일럿 기준은 아직 승인되지 않았다.
+**승인 기록 (2026-09-30):** 프로젝트 사용자가 D2, D3, D4에 이어 D1-01–05의 *설계 결정*을 승인했다. D1-02는 D3 공개 관계명에 대한 승인된 개정이다. 이 승인은 A 단계의 구현 시험이나 B/C 실모델 품질 게이트 통과를 뜻하지 않는다. 파일럿 원천의 개별 `verified` 판정은 별도다.
 
 ## D1. 도메인 모델과 질문 검토
 
@@ -28,7 +28,7 @@
 
 | 파일럿 개념과 정의 줄 | 현재 코드 또는 목표 계약 |
 |---|---|
-| `project` (`ontology-pilot.yaml:15–21`) | `internal/system/semantic/model.go:27`의 `ProjectID`; v2 안정 ID는 종단 간 설계 2.1절 |
+| `project` (`ontology-pilot.yaml`) | `internal/system/semantic/model.go`의 `ProjectID`; v2 안정 ID는 종단 간 설계 2.1절 |
 | `dataset` (`:22–28`) | `internal/setup/reindex.go:16`의 버전 디렉터리/`current`; v2 단일 후보는 종단 간 설계 3절 |
 | `source-snapshot` (`:29–35`) | `internal/system/semantic/model.go:27`은 현재 커밋형; v2 캡처 ID는 종단 간 설계 2.1–2.2절 |
 | `source-file` (`:36–42`) | CKG `internal/graph/persist/manifest.go:36`와 CKV 매니페스트; v2 origin별 파일 레코드는 2.1절 |
@@ -47,20 +47,20 @@
 | `policy` (`:127–133`) | `system/policies/sanitization_rules.yaml`과 종단 간 설계 2.1·8절의 입력/정화 정책 |
 | `evidence-pack` (`:134–140`) | `pkg/system/contract/pack.go:176`의 응답 |
 
-관계 어휘는 최소한 `DocumentSection SUPPORTS Claim`, `Claim CONTRADICTS Claim`, `Claim ABOUT Concept`, `Concept IMPLEMENTED_BY CodeSymbol`, `CodeSymbol TESTED_BY TestCase`, `AcceptanceCriterion ACCEPTED_BY TestCase`다. 방향을 뒤집지 않는다. `ACCEPTED_BY`는 **검토된 테스트 연결**이라는 기존 이름을 유지하지만 사람의 수용 판정은 별도 `CriterionDecision`만 기록한다. 모든 verified 관계에는 양쪽 원천·현재 스냅샷·검토자가 필요하다. 요구사항→개념→코드→테스트의 경로는 MDD/SDD/지식 데이터 개발의 연결을 보여 주지만, 테스트 통과와 의미 승인이 없으면 완료 상태로 승격하지 않는다.
+관계 어휘는 최소한 `DocumentSection SUPPORTS Claim`, `Claim CONTRADICTS Claim`, `Claim ABOUT Concept`, `Concept IMPLEMENTED_BY CodeSymbol`, `CodeSymbol TESTED_BY TestCase`, `AcceptanceCriterion CHECKED_BY TestCase`다. 방향을 뒤집지 않는다. 현행 의미 DB의 `ACCEPTED_BY`는 **검토된 테스트 연결**이라는 뜻으로만 읽고 차기 통합 데이터셋에는 `CHECKED_BY`를 쓴다. 사람의 수용 판정은 별도 `CriterionDecision`만 기록한다. 모든 verified 관계에는 양쪽 원천·현재 스냅샷·검토자가 필요하다. 요구사항→개념→코드→테스트의 경로는 MDD/SDD/지식 데이터 개발의 연결을 보여 주지만, 테스트 통과와 의미 승인이 없으면 완료 상태로 승격하지 않는다.
 
 | 능력 질문 | 기대되는 구조 답과 금지되는 해석 |
 |---|---|
 | 인용과 CKV 청크의 생성 스냅샷은? | 동일 `project_id/dataset_id/snapshot_id/origin_id`와 보관 원문 해시를 반환. 현재 커밋만으로 작업 트리 인용을 답하지 않음. |
-| 어떤 심볼이 요구를 구현하고 어떤 테스트가 검증하나? | 검토된 `IMPLEMENTED_BY/TESTED_BY/ACCEPTED_BY` 경로와 별도 실행 상태를 반환. 연결만으로 테스트 통과/수용을 주장하지 않음. |
+| 어떤 심볼이 요구를 구현하고 어떤 테스트가 검증하나? | 검토된 `IMPLEMENTED_BY/TESTED_BY/CHECKED_BY` 경로와 별도 실행 상태를 반환. 연결만으로 테스트 통과/수용을 주장하지 않음. |
 | 주장과 회수 코드가 같은 스냅샷인가? | 두 EvidenceSpan과 코드 앵커의 좌표를 비교. 경로·줄만 같은 다른 버전은 불일치. |
 | 어떤 검토된 두 주장이 상충하나? | `CONTRADICTS`와 양쪽 원문을 제시. 모델의 단독 추측은 확정 관계가 아님. |
 | 구현 관계 검증에 빠진 증거는? | 개념 승인, 양쪽 원문, CKG canonical ID, 현재 스냅샷, 검토자 중 결손을 각각 출력. |
 | 모호한 한영 표현은 어떤 개념을 가리키나? | 모든 일치 후보와 상태를 제시. 자동 병합/단일 확정/원문 질의 삭제 금지. |
 
-수정한 파일럿은 18개 개념을 유지하고 `source-snapshot`을 Git 커밋뿐 아니라 캡처한 작업 트리·비Git 원본으로 정의한다. `source-file`, `evidence-span`, `test-run`도 스냅샷 좌표에 맞췄다. `spec-pilot.yaml`의 희소 필터 기준은 작은 정확 검색의 거리 순서와 큰 검색의 상한/취소 `incomplete`를 분리했다. 소스 근거 기준도 커밋 전용 문구에서 캡처 스냅샷으로 바꿨다. 세 요구사항은 전체 FR/INV/NFR를 대체하지 않는 파일럿이다.
+수정한 파일럿은 기존 18개에 `patch-attempt`와 `criterion-decision`을 더한 20개다. `source-snapshot`은 Git 커밋뿐 아니라 캡처한 작업 트리·비Git 원본으로 정의한다. `source-file`, `evidence-span`, `test-run`도 스냅샷 좌표에 맞췄다. `spec-pilot.yaml`의 희소 필터 기준은 작은 정확 검색의 거리 순서와 큰 검색의 상한/취소 `incomplete`를 분리했다. 소스 근거 기준도 커밋 전용 문구에서 캡처 스냅샷으로 바꿨다. 세 요구사항은 전체 FR/INV/NFR를 대체하지 않는 파일럿이다.
 
-**사용자에게 남긴 결정:** 18개 개념의 정의·제외 범위와 두 사건 개념 추가 여부, `ACCEPTED_BY` 명칭의 업무상 오해 가능성, 한영 별칭의 다의어와 누락 개념, 여섯 질문의 허용 답, 세 파일럿 요구사항과 네 기준의 의미를 승인/수정/반려해야 한다. 각 결정에는 원천 커밋·줄, 날짜, 이유를 남긴다. 현 시점에 사용자 승인을 추정하거나 질문별 정답을 만들어 내지 않는다. 따라서 D1만 열려 있다.
+**남은 실행 검증:** 개별 개념/관계/요구사항의 원천 스냅샷별 검토·승격, B0의 질문별 정답 파일/줄과 B1의 실모델 품질 측정은 별개다. 사용자의 D1 설계 승인을 실제 코드 경로의 `verified`로 오인하지 않는다.
 
 ## D2. 기술 실험과 설계 결정
 
@@ -76,7 +76,7 @@
 
 | 단계 | 입력 → 출력 | 책임/거부 조건 |
 |---|---|---|
-| D1–D4 → A0 | 승인된 파일럿 범위, 캡처/공개 계약, 추적표 → 고정 fixture | CKS 설계 책임. 미승인 도메인 범위를 verified로 쓰지 않음. |
+| D1–D4 → A0 | 승인된 20개 파일럿 범위, 캡처/공개 계약, 추적표 → 고정 fixture | CKS 설계 책임. 개별 원천 검토 전 항목을 verified로 쓰지 않음. |
 | A0 → A1/A2/A3 | v1 골든·구현 기준선 → 검색 상태/모델 신원/좌표 | CKV와 CKS 공통 오류. `incomplete`·모델 drift·ID 혼합을 성공 취급하지 않음. |
 | A3 → A4 | 프로젝트/스냅샷/데이터셋 ID → 불변 staging·원문 blob | CKS 캡처 책임. CKG/CKV는 동일 파일 목록만 읽고 빌드 경로를 공개하지 않음. |
 | A4 → A5.1/A5.2/A5.3 | 보관 원문·공통 ID → 의미 투영·검토·패치 기록 | CKS 의미 책임. Git HEAD만으로 작업 트리/비Git 근거를 검증하지 않음. |

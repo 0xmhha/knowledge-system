@@ -5,6 +5,7 @@ requirements:
     version: 1
     title: Filtered CKV recall
     statement: CKV returns eligible nearest chunks under sparse metadata filters.
+    concept_ids: [vector-chunk, policy]
     status: proposed
     acceptance_criteria:
       - id: ac-filtered-recall
@@ -19,6 +20,7 @@ requirements:
     version: 1
     title: Source-backed meaning
     statement: Reviewed semantic relationships remain tied to one captured source snapshot.
+    concept_ids: [source-snapshot, evidence-span, semantic-assertion]
     status: proposed
     acceptance_criteria:
       - id: ac-source-evidence
@@ -29,6 +31,7 @@ requirements:
     version: 1
     title: Safe ontology interpretation
     statement: Optional concept matching preserves the existing hybrid retrieval candidates.
+    concept_ids: [concept, term, evidence-pack]
     status: proposed
     acceptance_criteria:
       - id: ac-ontology-fallback

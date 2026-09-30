@@ -18,14 +18,21 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(repo, "ontology.yaml"), source, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	gitOutput(t, repo, "add", "ontology.yaml")
+	specSource, err := os.ReadFile(filepath.Join("..", "..", "..", "docs", "spec-driven", "spec-pilot.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "spec.yaml"), specSource, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitOutput(t, repo, "add", "ontology.yaml", "spec.yaml")
 	gitOutput(t, repo, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "ontology")
 	snapshot := Snapshot{ProjectID: "knowledge-system", DatasetID: "pilot-v1", Commit: gitOutput(t, repo, "rev-parse", "HEAD")}
 	p, pack, err := ExtractOntology(snapshot, "ontology.yaml", source)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(p.Concepts) != 18 || len(p.Evidence) != 18 || len(pack.CompetencyQuestions) < 5 {
+	if len(p.Concepts) != 20 || len(p.Evidence) != 20 || len(pack.CompetencyQuestions) < 5 {
 		t.Fatalf("pilot shape: %d concepts, %d spans, %d questions", len(p.Concepts), len(p.Evidence), len(pack.CompetencyQuestions))
 	}
 	for _, concept := range p.Concepts {
@@ -36,6 +43,18 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 	if err := p.ValidateSources(context.Background(), repo); err != nil {
 		t.Fatalf("source-backed pilot: %v", err)
 	}
+	spec, _, err := ExtractSpec(snapshot, "spec.yaml", specSource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.Evidence = append(p.Evidence, spec.Evidence...)
+	p.Requirements = spec.Requirements
+	if err := p.Validate(); err != nil {
+		t.Fatalf("pilot ontology/spec concept links: %v", err)
+	}
+	if err := p.ValidateSources(context.Background(), repo); err != nil {
+		t.Fatalf("source-backed pilot ontology/spec: %v", err)
+	}
 	tampered := p
 	tampered.Concepts = append([]Concept(nil), p.Concepts...)
 	tampered.Concepts[0].Definition = "A different definition with the same evidence ID."
@@ -43,7 +62,7 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 		t.Fatalf("rewritten concept passed source verification: %v", err)
 	}
 	review, err := p.Review(5, "domain-audit")
-	if err != nil || review.ConceptProposed != 18 || review.ConceptPrecision != nil || len(review.ConceptSample) != 5 {
+	if err != nil || review.ConceptProposed != 20 || review.ConceptPrecision != nil || len(review.ConceptSample) != 5 {
 		t.Fatalf("pilot review queue: %+v, err=%v", review, err)
 	}
 	if len(review.AmbiguousTerms) != 0 {

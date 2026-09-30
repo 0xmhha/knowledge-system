@@ -22,9 +22,9 @@
 
 ## 온톨로지 시범 팩
 
-[`ontology-pilot.yaml`](./ontology-pilot.yaml)은 knowledge-system 자체를 대상으로 한 **제안 상태**의 18개 개념과 6개 능력 질문이다. 각 개념은 안정 ID, `entity/artifact/process/rule` 중 한 종류, 문장형 정의, 포함·제외 범위, 언어별 선호·대체 용어, 검토 상태를 가진다. `ExtractOntology`는 YAML의 각 개념 블록을 정확한 Git 원문 줄·SHA-256 근거로 만든다. `ValidateSources`는 원문 해시뿐 아니라 정의·용어·상태를 YAML에서 다시 읽어 투영과 비교하므로 JSON 투영만 수정해 정의를 바꿀 수 없다. `verified`/`rejected`에는 검토자 이름과 원본 YAML 변경이 필요하다.
+[`ontology-pilot.yaml`](./ontology-pilot.yaml)은 knowledge-system 자체를 대상으로 한 **D1 설계 승인·개별 원천 검토 대기** 상태의 20개 개념과 6개 능력 질문이다. 20개의 주 소유 위치와 쓰임은 [`ONTOLOGY-20-USAGE.md`](./ONTOLOGY-20-USAGE.md)에 있다. 각 개념은 안정 ID, `entity/artifact/process/rule` 중 한 종류, 문장형 정의, 포함·제외 범위, 언어별 선호·대체 용어, 검토 상태를 가진다. `ExtractOntology`는 YAML의 각 개념 블록을 정확한 Git 원문 줄·SHA-256 근거로 만든다. `ValidateSources`는 원문 해시뿐 아니라 정의·용어·상태를 YAML에서 다시 읽어 투영과 비교하므로 JSON 투영만 수정해 정의를 바꿀 수 없다. `verified`/`rejected`에는 검토자 이름과 원본 YAML 변경이 필요하다.
 
-`cks semantic build`의 `--ontology`에 저장소 상대 YAML 경로를 주면 Markdown 섹션과 함께 동일한 프로젝트/데이터셋/커밋 투영에 저장한다. `cks semantic review`는 개념 표본·검토된 정밀도·여러 개념이 공유하는 동일 언어 용어를 별도 항목으로 출력한다. 동음이의어는 자동으로 같은 개념이라고 병합하지 않는다. 현재 시범 팩에는 전문가 리뷰가 없으므로 18개 모두 `proposed`다.
+`cks semantic build`의 `--ontology`에 저장소 상대 YAML 경로를 주면 Markdown 섹션과 함께 동일한 프로젝트/데이터셋/커밋 투영에 저장한다. `cks semantic review`는 개념 표본·검토된 정밀도·여러 개념이 공유하는 동일 언어 용어를 별도 항목으로 출력한다. 동음이의어는 자동으로 같은 개념이라고 병합하지 않는다. D1의 타입 설계 승인은 원천별 상태 승격과 구별하므로 20개 모두 `proposed`다.
 
 ## SQLite 투영과 롤백
 
@@ -62,7 +62,7 @@ CKS Stage 2에는 **선택형 Go API**인 `WithOntologyResolver`가 있다. 호�
 
 `cks semantic build --spec docs/spec-driven/spec-pilot.yaml`은 같은 프로젝트의 커밋된 YAML에서 `Requirement`와 Given/When/Then `AcceptanceCriterion`을 읽는다. 각 항목은 안정 ID, 요구사항 버전, 원본 파일·줄 범위·SHA-256 근거를 가진다. `proposed`는 초안, `verified`는 사람이 **명세 내용을 승인**했다는 뜻이며 구현 또는 테스트 통과를 뜻하지 않는다. `verified`/`rejected`에는 YAML 원본의 `reviewed_by`가 필요하다. JSON 투영의 문구만 바꾸면 원본 재파싱에서 거부된다. `concept_ids`는 같은 투영의 개념을 참조하며 선택 사항이므로 코드가 전혀 없는 초기 명세도 저장할 수 있다. `cks semantic review`는 제안 요구사항의 출처와 수용 기준을 검토 대기 목록으로 출력한다. 구현·테스트 상태는 이후 검증된 연결 근거로 별도 계산할 예정이다.
 
-`TESTED_BY`는 CKG 코드 심볼에서 CKG 테스트 심볼로 향하며 두 코드 근거를 요구한다. `ACCEPTED_BY`는 수용 기준에서 CKG 테스트 심볼로 향하며 명세 근거와 테스트 근거를 요구한다. `verified ACCEPTED_BY`는 해당 요구사항이 원본 YAML에서 승인된 경우에만 허용한다. 두 관계 모두 검토자가 필요하고, 실제 CKG 노드·커밋·파일·AST 범위를 승격 단계에서 검사한다.
+`TESTED_BY`는 CKG 코드 심볼에서 CKG 테스트 심볼로 향하며 두 코드 근거를 요구한다. **현행 구현**의 `ACCEPTED_BY`는 수용 기준에서 CKG 테스트 심볼로 향하는 연결이며 명세 근거와 테스트 근거를 요구한다. `verified ACCEPTED_BY`는 해당 요구사항이 원본 YAML에서 승인된 경우에만 허용한다. 두 관계 모두 검토자가 필요하고, 실제 CKG 노드·커밋·파일·AST 범위를 승격 단계에서 검사한다. **D1 승인 목표 계약**에서는 이 연결의 정식 이름을 `CHECKED_BY`로 바꾸며 사람의 수용 판정은 `CriterionDecision.approved`로만 표현한다. A5.1에서 기존 의미 DB의 `ACCEPTED_BY` 읽기 호환과 새 술어 쓰기/검증을 구현하기 전에는 현행 명령이 `CHECKED_BY`를 지원한다고 주장하지 않는다.
 
 `cks semantic trace --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db>`는 활성 데이터셋을 다시 대조한 뒤 요구사항별 상태와 근거 경로를 JSON으로 출력한다. `linked`는 검토된 Requirement→Concept→Code→Test 및 AcceptanceCriterion→Test **연결의 존재**만 뜻한다. 테스트가 실제 실행되어 통과했다는 뜻은 아니다. 누락된 개념·구현·테스트·수용 테스트와 검토된 상충 주장 관계를 별도로 표시한다. 인덱스가 오래되거나 원문과 어긋나면 추적 경로를 출력하지 않고 실패한다. 실제 테스트 결과 수집 및 실패 패치 미승격은 후속 W4.4 작업이다.
 

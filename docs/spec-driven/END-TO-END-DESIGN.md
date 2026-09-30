@@ -102,7 +102,7 @@ CKS 질의는 한 고정 `dataset_id`를 열고 **raw query**를 CKV/CKG/BM25에
 
 원본은 해당 스냅샷에 캡처된 YAML/Markdown이며 CKS 의미 SQLite는 해당 데이터셋의 **파생 투영**이다. Git 프로젝트에서는 커밋 원본과 작업 트리 캡처본을 구별하고, 외부 문서는 별도 origin을 가진다. 최소 객체는 `Concept`, `Term`, `DocumentSection`, `Claim`, `Requirement`, `AcceptanceCriterion`, `Assertion`, `EvidenceSpan`, `PolicyRef`, `PatchAttempt`, `TestExecution`, `CriterionDecision`이다. 각 객체/관계는 타입·방향·원천·프로젝트/스냅샷·검토 상태를 가진다. `proposed`는 탐색 후보, `verified`는 원문과 검토자가 확인한 관계, `rejected`는 삭제되지 않는 판정 기록이다. 하나의 verified 관계가 오래된 소스/코드 심볼에 닿으면 새 데이터셋에서는 `stale`로 계산하고 자동 이전하지 않는다.
 
-`Concept IMPLEMENTED_BY CodeSymbol`, `CodeSymbol TESTED_BY TestCase`, `AcceptanceCriterion ACCEPTED_BY TestCase`는 **연결의 존재**를 나타낸다. `TestExecution.pass`는 지정 테스트가 해당 스냅샷에서 실행돼 성공했다는 뜻이다. `CriterionDecision.approved`는 사람이 Given/When/Then의 의미 충족을 확인했다는 별도 사건이다. 이 네 상태를 합산해 자동으로 요구사항 완료라 하지 않는다. 요구사항 상태는 `missing|proposed|linked|tested|accepted|conflict|stale`로 계산하며 각 전이에 원천 ID와 이유를 남긴다.
+`Concept IMPLEMENTED_BY CodeSymbol`, `CodeSymbol TESTED_BY TestCase`, `AcceptanceCriterion CHECKED_BY TestCase`는 **연결의 존재**를 나타낸다. 현행 의미 DB의 `ACCEPTED_BY`는 구 연결의 읽기 호환 이름이다. `TestExecution.pass`는 지정 테스트가 해당 스냅샷에서 실행돼 성공했다는 뜻이다. `CriterionDecision.approved`는 사람이 Given/When/Then의 의미 충족을 확인했다는 별도 사건이다. 이 네 상태를 합산해 자동으로 요구사항 완료라 하지 않는다. 요구사항 상태는 `missing|proposed|linked|tested|accepted|conflict|stale`로 계산하며 각 전이에 원천 ID와 이유를 남긴다. 승인된 20개 타입의 주 소유 위치는 [`ONTOLOGY-20-USAGE.md`](./ONTOLOGY-20-USAGE.md)에 있다.
 
 외부 패치는 `patch_id`, `base_snapshot_id`, 변경 파일·해시, 결과 스냅샷/커밋, 실행 보고서, 검토자·판정, 새 `dataset_id`를 불변 기록으로 가진다. 같은 ID의 다른 바이트는 오류다. 실패 테스트, 소스 변경, 거부/미검토 기준 또는 충돌 관계가 있으면 후보를 활성화하지 않는다. 이전에 승인한 개념/스펙은 새로운 소스에 대해 재검증되며 별도 새 데이터셋의 근거가 필요하다. CKS는 변경 계획과 증거를 제공하되 코드를 자율 수정하지 않는다.
 
@@ -175,7 +175,7 @@ B 결과의 실패를 `회수 실패/잘못된 순위/문맥 경계/근거 부�
 | D3: 공개 계약·이전 호환성 | v1 실제 입력/출력 회귀와 v2 DTO·해시·오류·버전 선택·롤백 골든 **명세**. v2 실행 소비자 재생은 A7.1/A8 수용 시험 | 필드·버전·오류·이전 순서를 확정해 공개 계약 개정 |
 | D4: 교차 단계 계약 정합성 | A0–A8/B0–B1/C0–C1의 입력·출력·상태·실패·책임자를 같은 추적표로 점검하고 남은 미정 결정이 없음을 기록 | WBS 선후관계와 공통 계약을 수정 |
 
-D2–D4의 설계 판정과 발견한 결함은 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md)에 기록했고 사용자가 세 설계 결정을 승인했다. D1은 사용자가 [`D1-DECISION-REVIEW.md`](./D1-DECISION-REVIEW.md)의 개념 범위·관계·질문/수용 기준을 결정한다. 그때까지 생산 파일은 `proposed`다. 실모델 품질 측정과 수치에 따른 재리팩토링은 사용자의 결정대로 B/C에 남겨 둔다. 플랫폼별 네이티브 빌드·배포 스모크는 구현 수용 게이트다. 각 게이트의 결과가 구조 불변식을 바꾸면 ADR과 WBS를 먼저 갱신한다.
+D1–D4의 설계 판정과 발견한 결함은 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md)에 기록했고 사용자가 네 설계 결정을 승인했다. D1의 20개 범위·관계·질문/수용 기준은 [`D1-DECISION-REVIEW.md`](./D1-DECISION-REVIEW.md)에 있다. D1-02는 D3의 공개 술어를 `CHECKED_BY`로 개정한다. 생산 파일의 개별 원천 상태는 검토 전 `proposed`다. 실모델 품질 측정과 수치에 따른 재리팩토링은 사용자의 결정대로 B/C에 남겨 둔다. 플랫폼별 네이티브 빌드·배포 스모크는 구현 수용 게이트다. 각 게이트의 결과가 구조 불변식을 바꾸면 ADR과 WBS를 먼저 갱신한다.
 
 구현은 D1–D4의 설계 폐쇄 결과를 반영한 뒤 기초 공통 좌표/원문 보관·공개 인용부터, 엔진과 런타임의 모든 우회 경로, 의미/스펙, 설치를 잇는 순서로 진행한다. 각 기능의 설계를 해당 구현 단계에서 처음 시작하는 뜻은 아니다. 실모델 수치는 B에서 채우며 결과 기반 알고리즘 조정은 C에서 수행한다.
 
