@@ -26,14 +26,15 @@ const FileName = "manifest.json"
 // Manifest is the structured index metadata. Field names are shared with
 // CKG so CKS Orchestrator can compare CKG and CKV manifests by raw key.
 type Manifest struct {
-	SchemaVersion      string `json:"schema_version"`
-	ProjectID          string `json:"project_id,omitempty"`
-	SnapshotID         string `json:"snapshot_id,omitempty"`
-	DatasetID          string `json:"dataset_id,omitempty"`
-	FileManifestDigest string `json:"file_manifest_digest,omitempty"`
-	SourceMode         string `json:"source_mode,omitempty"`
-	CKVVersion         string `json:"ckv_version"`
-	BuiltAt            string `json:"built_at"` // RFC3339
+	SchemaVersion       string `json:"schema_version"`
+	ProjectID           string `json:"project_id,omitempty"`
+	SnapshotID          string `json:"snapshot_id,omitempty"`
+	DatasetID           string `json:"dataset_id,omitempty"`
+	FileManifestDigest  string `json:"file_manifest_digest,omitempty"`
+	CapturePolicyDigest string `json:"capture_policy_digest,omitempty"`
+	SourceMode          string `json:"source_mode,omitempty"`
+	CKVVersion          string `json:"ckv_version"`
+	BuiltAt             string `json:"built_at"` // RFC3339
 
 	// Source / git
 	SrcRoot     string `json:"src_root"`

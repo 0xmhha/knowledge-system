@@ -2,9 +2,11 @@ package setup
 
 import (
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -18,16 +20,59 @@ import (
 // absolute path. The format is versioned so a future selection policy cannot
 // silently reuse an old snapshot ID.
 type SourceIdentity struct {
-	ProjectID          string `json:"project_id"`
-	SourceMode         string `json:"source_mode"`
-	SourceCommit       string `json:"source_commit"`
-	FileManifestDigest string `json:"file_manifest_digest"`
-	SnapshotID         string `json:"snapshot_id"`
+	ProjectID           string `json:"project_id"`
+	SourceMode          string `json:"source_mode"`
+	SourceCommit        string `json:"source_commit"`
+	FileManifestDigest  string `json:"file_manifest_digest"`
+	CapturePolicyDigest string `json:"capture_policy_digest"`
+	SnapshotID          string `json:"snapshot_id"`
 }
 
 type sourceFile struct {
-	Path   string `json:"path"`
-	SHA256 string `json:"sha256"`
+	OriginID string `json:"origin_id"`
+	Path     string `json:"path"`
+	Kind     string `json:"kind"`
+	Size     int64  `json:"size"`
+	SHA256   string `json:"sha256"`
+}
+
+// identityHashFields uses domain separation plus an 8-byte big-endian length
+// for each UTF-8 field. Delimiters and JSON key ordering cannot introduce
+// tuple collisions. File records are fed in sorted (origin_id,path) order.
+func identityHashFields(domain string, fields ...string) string {
+	h := sha256.New()
+	_, _ = h.Write([]byte(domain + "\x00"))
+	var size [8]byte
+	for _, field := range fields {
+		binary.BigEndian.PutUint64(size[:], uint64(len(field)))
+		_, _ = h.Write(size[:])
+		_, _ = h.Write([]byte(field))
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func fileManifestDigest(files []sourceFile) string {
+	fields := make([]string, 0, len(files)*5)
+	for _, f := range files {
+		fields = append(fields, f.OriginID, f.Path, f.Kind, fmt.Sprintf("%d", f.Size), f.SHA256)
+	}
+	return identityHashFields("cks.file-manifest.v2", fields...)
+}
+
+func capturePolicyDigest(mode string) string {
+	// Selection rules are deliberately part of source identity. A change to
+	// this value requires a new capture-policy version and reindex.
+	selection := "walk-skip-generated-directories"
+	if mode == "committed" {
+		selection = "git-tracked-all"
+	}
+	return identityHashFields("cks.capture-policy.v2", "capture-policy-2026-10-01.1", mode,
+		"regular-only", "reject-sensitive", "reject-symlinks", selection)
+}
+
+func sourceSnapshotID(s SourceIdentity) string {
+	return identityHashFields("cks.snapshot.v2", s.ProjectID, s.SourceMode,
+		s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest)
 }
 
 func identityHash(domain string, value any) (string, error) {
@@ -47,44 +92,32 @@ func CommittedSourceIdentity(root, projectID, commit string) (SourceIdentity, er
 	if projectID == "" || strings.ContainsRune(projectID, 0) || len(commit) != 40 {
 		return SourceIdentity{}, fmt.Errorf("source identity requires a project ID and full source commit")
 	}
-	cmd := exec.Command("git", "ls-files", "-z", "--cached")
-	cmd.Dir = root
-	listed, err := cmd.Output()
+	paths, err := captureModePaths(root, "committed")
 	if err != nil {
-		return SourceIdentity{}, fmt.Errorf("list tracked source files: %w", err)
+		return SourceIdentity{}, err
 	}
-	paths := strings.Split(strings.TrimSuffix(string(listed), "\x00"), "\x00")
-	if len(listed) == 0 {
-		paths = nil
+	opened, err := os.OpenRoot(root)
+	if err != nil {
+		return SourceIdentity{}, err
 	}
-	sort.Strings(paths)
+	defer opened.Close()
 	files := make([]sourceFile, 0, len(paths))
 	for _, path := range paths {
 		if path == "" || filepath.IsAbs(path) || path == ".." || strings.HasPrefix(path, "../") || !utf8.ValidString(path) || strings.ContainsRune(path, '\\') {
 			return SourceIdentity{}, fmt.Errorf("unsafe tracked source path %q", path)
 		}
-		full := filepath.Join(root, filepath.FromSlash(path))
-		info, err := os.Lstat(full)
-		if err != nil {
-			return SourceIdentity{}, fmt.Errorf("tracked source %q: %w", path, err)
-		}
-		if !info.Mode().IsRegular() {
-			return SourceIdentity{}, fmt.Errorf("tracked source %q is not a regular file", path)
-		}
-		buf, err := os.ReadFile(full)
+		buf, err := readCapturedRegular(opened, path, 1<<62)
 		if err != nil {
 			return SourceIdentity{}, fmt.Errorf("read tracked source %q: %w", path, err)
 		}
 		sum := sha256.Sum256(buf)
-		files = append(files, sourceFile{Path: filepath.ToSlash(path), SHA256: hex.EncodeToString(sum[:])})
+		files = append(files, sourceFile{OriginID: "repo", Path: filepath.ToSlash(path), Kind: "regular",
+			Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
 	}
-	manifest, err := identityHash("cks.file-manifest.v2", files)
-	if err != nil {
-		return SourceIdentity{}, err
-	}
-	result := SourceIdentity{ProjectID: projectID, SourceMode: "committed", SourceCommit: commit, FileManifestDigest: manifest}
-	result.SnapshotID, err = identityHash("cks.snapshot.v2", result)
-	return result, err
+	result := SourceIdentity{ProjectID: projectID, SourceMode: "committed", SourceCommit: commit,
+		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest("committed")}
+	result.SnapshotID = sourceSnapshotID(result)
+	return result, nil
 }
 
 // DatasetIdentity holds build inputs only. Engine output hashes belong in the
@@ -113,8 +146,9 @@ func NewDatasetIdentity(source SourceIdentity, embedding json.RawMessage, inputD
 		return DatasetIdentity{}, err
 	}
 	result := DatasetIdentity{Source: source, EmbeddingIdentity: canonical, InputDigest: inputDigest}
-	result.DatasetID, err = identityHash("cks.dataset.v2", result)
-	return result, err
+	recipe := identityHashFields("cks.build-recipe.v2", "schema-contract-2026-10-01.1", string(canonical), inputDigest)
+	result.DatasetID = identityHashFields("cks.dataset.v2", source.SnapshotID, recipe)
+	return result, nil
 }
 
 type inputFile struct {
@@ -184,6 +218,37 @@ func ConfiguredInputDigest(o Options) (string, error) {
 			return "", fmt.Errorf("hash %s input: %w", in.role, err)
 		}
 	}
+	for _, bin := range []struct{ role, path string }{
+		{"engine-ckg", o.GraphBin}, {"engine-ckv", o.VectorBin}, {"orchestrator-cks", o.CksBin},
+	} {
+		if bin.path == "" {
+			continue
+		}
+		path := bin.path
+		if !strings.ContainsRune(path, filepath.Separator) {
+			resolved, err := exec.LookPath(path)
+			if err != nil {
+				return "", fmt.Errorf("resolve %s binary: %w", bin.role, err)
+			}
+			path = resolved
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return "", fmt.Errorf("hash %s binary: %w", bin.role, err)
+		}
+		info, err := file.Stat()
+		if err != nil || !info.Mode().IsRegular() {
+			file.Close()
+			return "", fmt.Errorf("%s binary is not a regular file: %v", bin.role, err)
+		}
+		h := sha256.New()
+		_, err = io.Copy(h, file)
+		closeErr := file.Close()
+		if err != nil || closeErr != nil {
+			return "", fmt.Errorf("hash %s binary: %v %v", bin.role, err, closeErr)
+		}
+		entries = append(entries, inputFile{Role: bin.role, SHA256: hex.EncodeToString(h.Sum(nil))})
+	}
 	sort.Slice(entries, func(i, j int) bool {
 		if entries[i].Role == entries[j].Role {
 			return entries[i].Path < entries[j].Path
@@ -229,7 +294,8 @@ func PublishCandidateIdentity(versionDir string, source SourceIdentity, inputDig
 		for key, value := range map[string]string{
 			"project_id": source.ProjectID, "snapshot_id": source.SnapshotID,
 			"dataset_id": identity.DatasetID, "source_mode": source.SourceMode,
-			"file_manifest_digest": source.FileManifestDigest,
+			"file_manifest_digest":  source.FileManifestDigest,
+			"capture_policy_digest": source.CapturePolicyDigest,
 		} {
 			if raw := manifest[key]; len(raw) > 0 {
 				var native string
@@ -317,22 +383,29 @@ func VerifyCandidateIdentity(versionDir string, expected SourceIdentity, inputDi
 	if identity.Source != expected || identity.InputDigest != inputDigest {
 		return fmt.Errorf("candidate project/snapshot/input identity differs from build start")
 	}
+	if expected.CapturePolicyDigest != "" &&
+		(expected.CapturePolicyDigest != capturePolicyDigest(expected.SourceMode) ||
+			expected.SnapshotID != sourceSnapshotID(expected)) {
+		return fmt.Errorf("candidate source snapshot or capture policy digest invalid")
+	}
 	recomputed, err := NewDatasetIdentity(identity.Source, identity.EmbeddingIdentity, identity.InputDigest)
 	if err != nil || recomputed.DatasetID != identity.DatasetID {
 		return fmt.Errorf("candidate dataset identity digest invalid: %v", err)
 	}
 	for _, engine := range []string{"graph", "vector"} {
 		var fields struct {
-			ProjectID          string `json:"project_id"`
-			SnapshotID         string `json:"snapshot_id"`
-			DatasetID          string `json:"dataset_id"`
-			FileManifestDigest string `json:"file_manifest_digest"`
+			ProjectID           string `json:"project_id"`
+			SnapshotID          string `json:"snapshot_id"`
+			DatasetID           string `json:"dataset_id"`
+			FileManifestDigest  string `json:"file_manifest_digest"`
+			CapturePolicyDigest string `json:"capture_policy_digest"`
 		}
 		if err := readJSON(filepath.Join(versionDir, engine, "manifest.json"), &fields); err != nil {
 			return err
 		}
 		if fields.ProjectID != expected.ProjectID || fields.SnapshotID != expected.SnapshotID ||
-			fields.DatasetID != identity.DatasetID || fields.FileManifestDigest != expected.FileManifestDigest {
+			fields.DatasetID != identity.DatasetID || fields.FileManifestDigest != expected.FileManifestDigest ||
+			fields.CapturePolicyDigest != expected.CapturePolicyDigest {
 			return fmt.Errorf("%s candidate identity differs from dataset", engine)
 		}
 	}

@@ -288,6 +288,7 @@ func runSetup(args []string) error {
 				o.SnapshotID = preBuildSnapshot.SnapshotID
 				o.DatasetID = preBuildDatasetID
 				o.FileManifestDigest = preBuildSnapshot.FileManifestDigest
+				o.CapturePolicyDigest = preBuildSnapshot.CapturePolicyDigest
 				o.SourceMode = preBuildSnapshot.SourceMode
 			}
 		}

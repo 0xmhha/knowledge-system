@@ -10,6 +10,25 @@ import (
 	"testing"
 )
 
+func TestSourceIdentityLengthPrefixedGolden(t *testing.T) {
+	files := []sourceFile{{OriginID: "repo", Path: "main.go", Kind: "regular", Size: 4, SHA256: "abcd"}}
+	if got, want := fileManifestDigest(files), "9eafe104dae0f651f4e29172fea55ae754cce24a25a019cbf2af6028bdc5f35c"; got != want {
+		t.Fatalf("file manifest serialization changed: %s, want %s", got, want)
+	}
+	policy := capturePolicyDigest("committed")
+	if want := "ae9ed9f9ab1e07ccf95888fcd84a48da247b060dc865015d94909fc596ea9ebe"; policy != want {
+		t.Fatalf("capture policy serialization changed: %s, want %s", policy, want)
+	}
+	s := SourceIdentity{ProjectID: "project-one", SourceMode: "committed", SourceCommit: strings.Repeat("a", 40),
+		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: policy}
+	if got, want := sourceSnapshotID(s), "033fdd9f2eaaaa031b749858a95775c1f6e1dd9ce3551fbe083fea53b799ce92"; got != want {
+		t.Fatalf("snapshot serialization changed: %s, want %s", got, want)
+	}
+	if identityHashFields("tuple", "ab", "c") == identityHashFields("tuple", "a", "bc") {
+		t.Fatal("length-prefixed tuples collided")
+	}
+}
+
 func identityGit(t *testing.T, root string, args ...string) string {
 	t.Helper()
 	cmd := exec.Command("git", args...)
@@ -89,11 +108,11 @@ func TestVerifyAlignmentRejectsPartialAndCrossProjectIdentity(t *testing.T) {
 		writeManifest(t, graph, map[string]any{
 			"src_commit": "abc", "graph_digest": "d1", "schema_version": "1.23",
 			"project_id": graphProject, "snapshot_id": "s1", "dataset_id": "d1",
-			"file_manifest_digest": "files", "source_mode": "committed",
+			"file_manifest_digest": "files", "capture_policy_digest": "policy", "source_mode": "committed",
 		})
 		writeManifest(t, vector, map[string]any{
 			"src_commit": "abc", "project_id": vectorProject, "snapshot_id": "s1", "dataset_id": "d1",
-			"file_manifest_digest": "files", "source_mode": "committed",
+			"file_manifest_digest": "files", "capture_policy_digest": "policy", "source_mode": "committed",
 			"sources": map[string]any{"ckg": map[string]any{"graph_digest": "d1", "src_commit": "abc"}},
 		})
 	}
@@ -179,6 +198,25 @@ func TestConfiguredInputDigestDetectsPolicyAndPackChanges(t *testing.T) {
 	}
 }
 
+func TestConfiguredInputDigestPinsBuilderBytes(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "ckg")
+	if err := os.WriteFile(path, []byte("builder-one"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	o := Options{GraphBin: path}
+	first, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte("builder-two"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	second, err := ConfiguredInputDigest(o)
+	if err != nil || first == second {
+		t.Fatalf("changed engine executable reused dataset recipe digest: %q %q %v", first, second, err)
+	}
+}
+
 func TestPromoteRejectsCrossProjectAndTamperedRollback(t *testing.T) {
 	dataset := t.TempDir()
 	build := func(version, project string) {
@@ -193,7 +231,8 @@ func TestPromoteRejectsCrossProjectAndTamperedRollback(t *testing.T) {
 			},
 		})
 		source := SourceIdentity{ProjectID: project, SourceMode: "committed", SourceCommit: "abc",
-			FileManifestDigest: strings.Repeat("a", 64), SnapshotID: strings.Repeat("b", 64)}
+			FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
+		source.SnapshotID = sourceSnapshotID(source)
 		if _, err := PublishCandidateIdentity(root, source, "inputs"); err != nil {
 			t.Fatal(err)
 		}
@@ -232,7 +271,8 @@ func TestGateRejectsEmbeddingSpaceChangedAfterPrebuildIdentity(t *testing.T) {
 		"sources": map[string]any{"ckg": map[string]any{"src_commit": "abc", "graph_digest": "g"}},
 	})
 	source := SourceIdentity{ProjectID: "p", SourceMode: "committed", SourceCommit: "abc",
-		FileManifestDigest: strings.Repeat("a", 64), SnapshotID: strings.Repeat("b", 64)}
+		FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
+	source.SnapshotID = sourceSnapshotID(source)
 	if _, err := PublishCandidateIdentity(version, source, "inputs"); err != nil {
 		t.Fatal(err)
 	}

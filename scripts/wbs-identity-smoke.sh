@@ -68,6 +68,7 @@ for engine in ('graph', 'vector'):
         ('snapshot_id', identity['source']['snapshot_id']),
         ('dataset_id', identity['dataset_id']),
         ('file_manifest_digest', identity['source']['file_manifest_digest']),
+        ('capture_policy_digest', identity['source']['capture_policy_digest']),
     ):
         assert manifest[key] == native[key] == want, (engine, key, manifest.get(key), native.get(key), want)
 PY

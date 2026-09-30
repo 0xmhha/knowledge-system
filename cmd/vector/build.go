@@ -14,20 +14,20 @@ import (
 )
 
 type buildOpts struct {
-	projectID, snapshotID, datasetID, fileManifestDigest, sourceMode string
-	src                                                              string
-	logicalSrcRoot                                                   string
-	out                                                              string
-	ckgPath                                                          string
-	languages                                                        []string
-	exclude                                                          []string
-	filesFrom                                                        string
-	configPth                                                        string
-	policy                                                           string
-	docs                                                             []string
-	flowCorpus                                                       string
-	batchSize                                                        int
-	jsonOut                                                          bool
+	projectID, snapshotID, datasetID, fileManifestDigest, capturePolicyDigest, sourceMode string
+	src                                                                                   string
+	logicalSrcRoot                                                                        string
+	out                                                                                   string
+	ckgPath                                                                               string
+	languages                                                                             []string
+	exclude                                                                               []string
+	filesFrom                                                                             string
+	configPth                                                                             string
+	policy                                                                                string
+	docs                                                                                  []string
+	flowCorpus                                                                            string
+	batchSize                                                                             int
+	jsonOut                                                                               bool
 
 	llmPrefixModel string
 
@@ -58,6 +58,7 @@ Re-running on a populated --out updates chunks in place (Upsert).`,
 	f.StringVar(&opts.snapshotID, "snapshot-id", "", "captured source snapshot ID")
 	f.StringVar(&opts.datasetID, "dataset-id", "", "pre-build dataset ID")
 	f.StringVar(&opts.fileManifestDigest, "file-manifest-digest", "", "source file manifest digest")
+	f.StringVar(&opts.capturePolicyDigest, "capture-policy-digest", "", "versioned source capture policy digest")
 	f.StringVar(&opts.sourceMode, "source-mode", "", "committed source mode for pinned builds")
 	f.StringVar(&opts.logicalSrcRoot, "logical-src-root", "", "public project root when --src is a retained build tree")
 	f.StringVar(&opts.out, "out", "./ckv-data", "output data directory (vector.db, manifest.json)")
@@ -104,7 +105,7 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 
 	buildOpts := build.Options{
 		ProjectID: opts.projectID, SnapshotID: opts.snapshotID, DatasetID: opts.datasetID,
-		FileManifestDigest: opts.fileManifestDigest, SourceMode: opts.sourceMode,
+		FileManifestDigest: opts.fileManifestDigest, CapturePolicyDigest: opts.capturePolicyDigest, SourceMode: opts.sourceMode,
 		SrcRoot:                 opts.src,
 		LogicalSrcRoot:          opts.logicalSrcRoot,
 		OutDir:                  opts.out,

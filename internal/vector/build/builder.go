@@ -34,17 +34,18 @@ import (
 // Options carry the CLI/programmatic configuration. SrcRoot and OutDir
 // are required; everything else has a documented default.
 type Options struct {
-	ProjectID          string
-	SnapshotID         string
-	DatasetID          string
-	FileManifestDigest string
-	SourceMode         string
-	SrcRoot            string
-	LogicalSrcRoot     string // public project path when SrcRoot is an immutable build tree
-	OutDir             string
-	Embedder           types.Embedder // required
-	CKVIgnore          []string       // extra ignore patterns from --ckvignore CLI flag
-	BatchSize          int            // embedding batch size; 0 → 32
+	ProjectID           string
+	SnapshotID          string
+	DatasetID           string
+	FileManifestDigest  string
+	CapturePolicyDigest string
+	SourceMode          string
+	SrcRoot             string
+	LogicalSrcRoot      string // public project path when SrcRoot is an immutable build tree
+	OutDir              string
+	Embedder            types.Embedder // required
+	CKVIgnore           []string       // extra ignore patterns from --ckvignore CLI flag
+	BatchSize           int            // embedding batch size; 0 → 32
 	// Version is the ckv build version recorded in the manifest. The CLI sets
 	// it from the ldflags-injected cmd/ckv.Version; empty falls back to "dev".
 	Version   string
@@ -144,8 +145,8 @@ const defaultBatch = 32
 //  3. For each Go file: parse → chunk → embed → upsert.
 //  4. Write manifest.json + DB-side manifest table.
 func Run(ctx context.Context, o Options) (*Result, error) {
-	if o.ProjectID != "" || o.SnapshotID != "" || o.DatasetID != "" || o.FileManifestDigest != "" || o.SourceMode != "" {
-		if o.ProjectID == "" || o.SnapshotID == "" || o.DatasetID == "" || o.FileManifestDigest == "" || o.SourceMode != "committed" {
+	if o.ProjectID != "" || o.SnapshotID != "" || o.DatasetID != "" || o.FileManifestDigest != "" || o.CapturePolicyDigest != "" || o.SourceMode != "" {
+		if o.ProjectID == "" || o.SnapshotID == "" || o.DatasetID == "" || o.FileManifestDigest == "" || o.CapturePolicyDigest == "" || o.SourceMode != "committed" {
 			return nil, fmt.Errorf("incomplete or unsupported pinned vector source identity")
 		}
 	}
@@ -616,6 +617,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		"snapshot_id":                o.SnapshotID,
 		"dataset_id":                 o.DatasetID,
 		"file_manifest_digest":       o.FileManifestDigest,
+		"capture_policy_digest":      o.CapturePolicyDigest,
 		"source_mode":                o.SourceMode,
 		"embedding_model":            o.Embedder.Name(),
 		"embedding_dim":              fmt.Sprintf("%d", o.Embedder.Dimension()),
@@ -635,7 +637,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	}
 	man := &manifest.Manifest{
 		ProjectID: o.ProjectID, SnapshotID: o.SnapshotID, DatasetID: o.DatasetID,
-		FileManifestDigest: o.FileManifestDigest, SourceMode: o.SourceMode,
+		FileManifestDigest: o.FileManifestDigest, CapturePolicyDigest: o.CapturePolicyDigest, SourceMode: o.SourceMode,
 		SchemaVersion:       manifest.SchemaVersionCurrent,
 		CKVVersion:          ckvVersion,
 		BuiltAt:             builtAt,

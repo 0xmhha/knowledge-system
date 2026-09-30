@@ -18,12 +18,13 @@ import (
 // urge to over-bump; spurious bumps force unnecessary rebuilds across all
 // existing graph DBs.
 type Manifest struct {
-	SchemaVersion      string `json:"schema_version"`
-	ProjectID          string `json:"project_id,omitempty"`
-	SnapshotID         string `json:"snapshot_id,omitempty"`
-	DatasetID          string `json:"dataset_id,omitempty"`
-	FileManifestDigest string `json:"file_manifest_digest,omitempty"`
-	SourceMode         string `json:"source_mode,omitempty"`
+	SchemaVersion       string `json:"schema_version"`
+	ProjectID           string `json:"project_id,omitempty"`
+	SnapshotID          string `json:"snapshot_id,omitempty"`
+	DatasetID           string `json:"dataset_id,omitempty"`
+	FileManifestDigest  string `json:"file_manifest_digest,omitempty"`
+	CapturePolicyDigest string `json:"capture_policy_digest,omitempty"`
+	SourceMode          string `json:"source_mode,omitempty"`
 	// Engine identifies which index this manifest describes ("graph" here).
 	// Added with the shared manifest layout so a consolidated build can tell
 	// the graph and vector manifests apart by field instead of by a
@@ -131,6 +132,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"snapshot_id", m.SnapshotID},
 		{"dataset_id", m.DatasetID},
 		{"file_manifest_digest", m.FileManifestDigest},
+		{"capture_policy_digest", m.CapturePolicyDigest},
 		{"source_mode", m.SourceMode},
 		{"engine", m.Engine},
 		{"builder_version", m.BuilderVersion},
@@ -205,23 +207,24 @@ func (s *sqliteStore) GetManifest() (Manifest, error) {
 		return Manifest{}, err
 	}
 	m := Manifest{
-		SchemaVersion:      kv["schema_version"],
-		ProjectID:          kv["project_id"],
-		SnapshotID:         kv["snapshot_id"],
-		DatasetID:          kv["dataset_id"],
-		FileManifestDigest: kv["file_manifest_digest"],
-		SourceMode:         kv["source_mode"],
-		Engine:             kv["engine"],
-		BuilderVersion:     kv["builder_version"],
-		CKGVersion:         kv["ckg_version"],
-		BuildTimestamp:     kv["build_timestamp"],
-		SrcRoot:            kv["src_root"],
-		SrcRelPath:         kv["src_rel_path"],
-		SrcCommit:          kv["src_commit"],
-		StalenessMethod:    kv["staleness_method"],
-		ClusteringStatus:   kv["clustering_status"],
-		GraphDigest:        kv["graph_digest"],
-		EnrichDigest:       kv["enrich_digest"],
+		SchemaVersion:       kv["schema_version"],
+		ProjectID:           kv["project_id"],
+		SnapshotID:          kv["snapshot_id"],
+		DatasetID:           kv["dataset_id"],
+		FileManifestDigest:  kv["file_manifest_digest"],
+		CapturePolicyDigest: kv["capture_policy_digest"],
+		SourceMode:          kv["source_mode"],
+		Engine:              kv["engine"],
+		BuilderVersion:      kv["builder_version"],
+		CKGVersion:          kv["ckg_version"],
+		BuildTimestamp:      kv["build_timestamp"],
+		SrcRoot:             kv["src_root"],
+		SrcRelPath:          kv["src_rel_path"],
+		SrcCommit:           kv["src_commit"],
+		StalenessMethod:     kv["staleness_method"],
+		ClusteringStatus:    kv["clustering_status"],
+		GraphDigest:         kv["graph_digest"],
+		EnrichDigest:        kv["enrich_digest"],
 	}
 	// Back-compat both directions: a legacy manifest has only ckg_version, a
 	// future post-removal one only builder_version. Mirror whichever is set so

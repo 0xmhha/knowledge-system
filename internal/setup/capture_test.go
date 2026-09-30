@@ -78,6 +78,19 @@ func TestCaptureRefusesLinksSecretsAndRecursiveOutput(t *testing.T) {
 	}
 }
 
+func TestCaptureRejectsNonPortableNamesAndCaseCollisions(t *testing.T) {
+	for _, paths := range [][]string{
+		{"A.go", "a.go"},
+		{"e\u0301.go"},
+		{"nested/../main.go"},
+		{"../escape.go"},
+	} {
+		if err := validateCapturedPaths(paths); err == nil {
+			t.Fatalf("non-portable source paths accepted: %q", paths)
+		}
+	}
+}
+
 func TestWorkingTreeCaptureMaterializesModifiedAndNewBytesWithBaseHistory(t *testing.T) {
 	root := t.TempDir()
 	identityGit(t, root, "init", "-q")

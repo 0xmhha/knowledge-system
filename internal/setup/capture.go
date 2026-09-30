@@ -13,15 +13,20 @@ import (
 	"sort"
 	"strings"
 	"unicode/utf8"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/unicode/norm"
 )
 
 // CapturedFile is one immutable source byte sequence. Paths are source-root
 // relative POSIX paths. Blobs are stored by digest independently of a Git
 // checkout so old citations do not need a live working tree.
 type CapturedFile struct {
-	Path   string `json:"path"`
-	SHA256 string `json:"sha256"`
-	Size   int64  `json:"size"`
+	OriginID string `json:"origin_id"`
+	Path     string `json:"path"`
+	Kind     string `json:"kind"`
+	SHA256   string `json:"sha256"`
+	Size     int64  `json:"size"`
 }
 
 type CaptureOptions struct {
@@ -114,7 +119,8 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 		if err := writeCapturedBlob(blob, buf); err != nil {
 			return CapturedSource{}, err
 		}
-		result.Files = append(result.Files, CapturedFile{Path: rel, SHA256: digest, Size: int64(len(buf))})
+		result.Files = append(result.Files, CapturedFile{OriginID: "repo", Path: rel,
+			Kind: "regular", SHA256: digest, Size: int64(len(buf))})
 		total += int64(len(buf))
 	}
 	if err := result.VerifyAgainst(root); err != nil {
@@ -127,18 +133,14 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	}
 	files := make([]sourceFile, 0, len(result.Files))
 	for _, f := range result.Files {
-		files = append(files, sourceFile{Path: f.Path, SHA256: f.SHA256})
+		files = append(files, sourceFile{OriginID: f.OriginID, Path: f.Path,
+			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
 	}
-	manifest, err := identityHash("cks.file-manifest.v2", files)
-	if err != nil {
-		return CapturedSource{}, err
-	}
+	manifest := fileManifestDigest(files)
 	result.Identity = SourceIdentity{ProjectID: o.ProjectID, SourceMode: o.SourceMode,
-		SourceCommit: o.SourceCommit, FileManifestDigest: manifest}
-	result.Identity.SnapshotID, err = identityHash("cks.snapshot.v2", result.Identity)
-	if err != nil {
-		return CapturedSource{}, err
-	}
+		SourceCommit: o.SourceCommit, FileManifestDigest: manifest,
+		CapturePolicyDigest: capturePolicyDigest(o.SourceMode)}
+	result.Identity.SnapshotID = sourceSnapshotID(result.Identity)
 	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), result); err != nil {
 		return CapturedSource{}, err
 	}
@@ -164,7 +166,7 @@ func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, err
 			continue
 		}
 		if !info.Mode().IsRegular() {
-			return nil, fmt.Errorf("capture refused non-regular source %q", rel)
+			return nil, fmt.Errorf("capture refused non-regular source %q: not a regular file", rel)
 		}
 		if info.Size() > maxBytes {
 			return nil, fmt.Errorf("capture file byte limit exceeded at %q", rel)
@@ -217,7 +219,29 @@ func captureModePaths(root, mode string) ([]string, error) {
 		}
 	}
 	sort.Strings(paths)
+	if err := validateCapturedPaths(paths); err != nil {
+		return nil, err
+	}
 	return paths, nil
+}
+
+func validateCapturedPaths(paths []string) error {
+	seen := make(map[string]string, len(paths))
+	fold := cases.Fold()
+	for _, path := range paths {
+		if path == "" || !utf8.ValidString(path) || !norm.NFC.IsNormalString(path) ||
+			filepath.IsAbs(path) || filepath.ToSlash(filepath.Clean(path)) != path ||
+			path == ".." || strings.HasPrefix(path, "../") ||
+			strings.ContainsRune(path, '\\') || strings.ContainsRune(path, 0) {
+			return fmt.Errorf("capture path is not portable: %q", path)
+		}
+		key := fold.String(path)
+		if old, ok := seen[key]; ok {
+			return fmt.Errorf("capture refused case-colliding paths %q and %q", old, path)
+		}
+		seen[key] = path
+	}
+	return nil
 }
 
 // MaterializeBuildTree creates a disposable copy from retained blobs. A Git
@@ -323,6 +347,9 @@ func capturePaths(root string) ([]string, error) {
 		return nil, err
 	}
 	sort.Strings(paths)
+	if err := validateCapturedPaths(paths); err != nil {
+		return nil, err
+	}
 	return paths, nil
 }
 
@@ -398,18 +425,25 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 		return fmt.Errorf("snapshot_mismatch: retained source identity differs from candidate")
 	}
 	entries := make([]sourceFile, 0, len(captured.Files))
+	paths := make([]string, 0, len(captured.Files))
 	prev := ""
 	for _, f := range captured.Files {
-		if f.Path == "" || filepath.IsAbs(f.Path) || f.Path == ".." ||
+		if f.OriginID != "repo" || f.Kind != "regular" || f.Path == "" || filepath.IsAbs(f.Path) || f.Path == ".." ||
 			strings.HasPrefix(f.Path, "../") || strings.ContainsRune(f.Path, '\\') ||
 			!utf8.ValidString(f.Path) || f.Path <= prev || f.Size < 0 {
 			return fmt.Errorf("snapshot_mismatch: invalid retained source path")
 		}
 		prev = f.Path
-		entries = append(entries, sourceFile{Path: f.Path, SHA256: f.SHA256})
+		paths = append(paths, f.Path)
+		entries = append(entries, sourceFile{OriginID: f.OriginID, Path: f.Path,
+			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
 	}
-	digest, err := identityHash("cks.file-manifest.v2", entries)
-	if err != nil || digest != expected.FileManifestDigest {
+	if err := validateCapturedPaths(paths); err != nil {
+		return fmt.Errorf("snapshot_mismatch: %w", err)
+	}
+	digest := fileManifestDigest(entries)
+	if digest != expected.FileManifestDigest || sourceSnapshotID(expected) != expected.SnapshotID ||
+		expected.CapturePolicyDigest != capturePolicyDigest(expected.SourceMode) {
 		return fmt.Errorf("snapshot_mismatch: retained file inventory differs from candidate")
 	}
 	blobs := filepath.Join(sources, "blobs")
