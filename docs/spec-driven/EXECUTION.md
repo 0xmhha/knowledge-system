@@ -6,13 +6,15 @@ Current assessment (2026-09-30): **The user approved D1–D4 design decisions; t
 
 Update (2026-10-01): A0, A1 and A2 have passed their model-independent structural gates. A3–A8 and B/C remain open. The 2026-09-30 assessment above is a historical snapshot.
 
+Design update (2026-10-01): the user approved D5-02–07 exactly as proposed in `D5-DECISION-REVIEW.md`, including the `knowledge-system` policy/ADR pilot, `.cks/knowledge` plus registered local roots, and one project-owner reviewer by default. D1–D5 design gates are closed. The older D5 proposal and A0 baseline paragraphs below record their earlier review state; they do not override this approval. No domain pack runtime, policy-instance verification, real Ollama quality result, or release claim follows from design approval. A3 is the next implementation gate.
+
 ## Design gate D1 closure evidence (2026-09-30)
 
 The user approved D1-01–05 as proposed. The pilot ontology now has 20 vocabulary entries; the three pilot requirements name their related concept IDs. The ontology test extracts both YAML files from one committed fixture, checks every concept/source span and validates the combined projection's references. `go test ./internal/system/semantic`, `go test ./...`, and `make docs-check` passed (91 live documents). These checks establish parser/reference compatibility and documentation integrity, not runtime `CHECKED_BY` migration, actual patch/decision storage, or model quality; those remain A5.1/A5.3 and B/C work.
 
 ## D5 domain extension design (2026-09-30)
 
-The user kept the D1 twenty concepts fixed and endorsed a separation between the common model and organization-specific models. `DOMAIN-PACK-CONTRACT-V1.md` now specifies local pack locks, typed relation validation, policy/ADR provenance, scope and time, access filtering, v2 coding context, legacy reading, and failure oracles. `DELIVERY-PLAN-V2.md` adds R2-09–11 and A5.4/A5.5. D5-02–07 remain a reviewable detailed design proposal; the executable has not gained pack loading or new commands. The product owner may revise the proposed pilot/input/approval defaults before implementation.
+The user kept the D1 twenty concepts fixed and endorsed a separation between the common model and organization-specific models. `DOMAIN-PACK-CONTRACT-V1.md` now specifies local pack locks, typed relation validation, policy/ADR provenance, scope and time, access filtering, v2 coding context, legacy reading, and failure oracles. `DELIVERY-PLAN-V2.md` adds R2-09–11 and A5.4/A5.5. At this 2026-09-30 snapshot D5-02–07 remained a reviewable detailed design proposal; the 2026-10-01 design update above records their later approval. The executable has not gained pack loading or new commands.
 
 ## A0 trace and structural baseline (2026-09-30)
 
