@@ -26,6 +26,7 @@ type Options struct {
 	DatasetID          string
 	FileManifestDigest string
 	SourceMode         string
+	LogicalSrcRoot     string
 	// Src is the source tree to index. Required.
 	Src string
 	// Out is the dataset root; the graph index lands in Out/graph and the
@@ -232,6 +233,9 @@ func BuildPlan(o Options) (Plan, error) {
 	}
 
 	graphCmd := []string{graphBin, "build", "--src", o.Src, "--out", o.GraphDir()}
+	if o.LogicalSrcRoot != "" {
+		graphCmd = append(graphCmd, "--logical-src-root", o.LogicalSrcRoot)
+	}
 	if o.DatasetID != "" {
 		if o.ProjectID == "" || o.SnapshotID == "" || o.FileManifestDigest == "" || o.SourceMode == "" {
 			return Plan{}, fmt.Errorf("setup: incomplete pinned dataset coordinates")
@@ -261,6 +265,9 @@ func BuildPlan(o Options) (Plan, error) {
 
 	if !o.SkipVector {
 		vectorCmd := []string{vectorBin, "build", "--src", o.Src, "--out", o.VectorDir(), "--ckg", o.GraphDir()}
+		if o.LogicalSrcRoot != "" {
+			vectorCmd = append(vectorCmd, "--logical-src-root", o.LogicalSrcRoot)
+		}
 		if o.DatasetID != "" {
 			vectorCmd = append(vectorCmd, "--project-id", o.ProjectID, "--snapshot-id", o.SnapshotID,
 				"--dataset-id", o.DatasetID, "--file-manifest-digest", o.FileManifestDigest,

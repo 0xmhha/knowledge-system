@@ -337,6 +337,12 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	vo := o
 	vo.Out = filepath.Join(dataset, version)
 	var captured CapturedSource
+	var buildCleanup func() error
+	defer func() {
+		if buildCleanup != nil {
+			_ = buildCleanup()
+		}
+	}()
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		if _, err := os.Lstat(vo.Out); err == nil {
 			return fmt.Errorf("reindex: pinned version %q already exists; choose a new version", version)
@@ -351,6 +357,16 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if captured.Identity != gopt.ExpectedSourceSnapshot {
 			return fmt.Errorf("reindex: captured source differs from pre-build identity")
 		}
+		buildRoot := filepath.Join(vo.Out, ".build-source")
+		buildCleanup, err = captured.MaterializeBuildTree(buildRoot)
+		if err != nil {
+			return fmt.Errorf("reindex: materialize captured source: %w", err)
+		}
+		if err := captured.VerifyAgainst(buildRoot); err != nil {
+			return fmt.Errorf("reindex: staged source differs from capture: %w", err)
+		}
+		vo.Src = buildRoot
+		vo.LogicalSrcRoot = o.Src
 	}
 	plan, err := BuildPlan(vo)
 	if err != nil {
@@ -362,6 +378,9 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	if captured.Identity.SnapshotID != "" {
 		if err := captured.VerifyBlobs(); err != nil {
 			return fmt.Errorf("reindex: %w", err)
+		}
+		if err := captured.VerifyAgainst(vo.Src); err != nil {
+			return fmt.Errorf("reindex: staged source changed during build: %w", err)
 		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
@@ -395,12 +414,21 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if err := captured.VerifyBlobs(); err != nil {
 			return fmt.Errorf("reindex: %w (current left unchanged)", err)
 		}
+		if err := captured.VerifyAgainst(vo.Src); err != nil {
+			return fmt.Errorf("reindex: staged source changed before promotion: %w", err)
+		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		inputs, err := ConfiguredInputDigest(o)
 		if err != nil || inputs != gopt.ExpectedInputDigest {
 			return fmt.Errorf("reindex: build inputs changed before promotion; current left unchanged: %v", err)
 		}
+	}
+	if buildCleanup != nil {
+		if err := buildCleanup(); err != nil {
+			return fmt.Errorf("reindex: remove temporary build tree: %w", err)
+		}
+		buildCleanup = nil
 	}
 
 	prev, err := Promote(dataset, version)

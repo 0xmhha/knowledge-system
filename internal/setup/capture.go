@@ -238,7 +238,7 @@ func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) 
 		return nil, err
 	}
 	cleanup := func() error { return os.RemoveAll(path) }
-	if c.Identity.SourceMode == "working-tree" {
+	if c.Identity.SourceMode == "working-tree" || c.Identity.SourceMode == "committed" {
 		if head, err := captureHead(c.Root); err != nil || head != c.Identity.SourceCommit {
 			return nil, fmt.Errorf("working-tree base commit changed before materialization: %v", err)
 		}

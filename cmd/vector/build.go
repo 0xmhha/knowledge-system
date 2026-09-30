@@ -16,6 +16,7 @@ import (
 type buildOpts struct {
 	projectID, snapshotID, datasetID, fileManifestDigest, sourceMode string
 	src                                                              string
+	logicalSrcRoot                                                   string
 	out                                                              string
 	ckgPath                                                          string
 	languages                                                        []string
@@ -58,6 +59,7 @@ Re-running on a populated --out updates chunks in place (Upsert).`,
 	f.StringVar(&opts.datasetID, "dataset-id", "", "pre-build dataset ID")
 	f.StringVar(&opts.fileManifestDigest, "file-manifest-digest", "", "source file manifest digest")
 	f.StringVar(&opts.sourceMode, "source-mode", "", "committed source mode for pinned builds")
+	f.StringVar(&opts.logicalSrcRoot, "logical-src-root", "", "public project root when --src is a retained build tree")
 	f.StringVar(&opts.out, "out", "./ckv-data", "output data directory (vector.db, manifest.json)")
 	f.StringVar(&opts.ckgPath, "ckg", "", "CKG data directory for symbol alignment (optional)")
 	f.StringSliceVar(&opts.languages, "lang", nil, "languages to index (default: auto-detect; supported: go, typescript, javascript, solidity, markdown)")
@@ -104,6 +106,7 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 		ProjectID: opts.projectID, SnapshotID: opts.snapshotID, DatasetID: opts.datasetID,
 		FileManifestDigest: opts.fileManifestDigest, SourceMode: opts.sourceMode,
 		SrcRoot:                 opts.src,
+		LogicalSrcRoot:          opts.logicalSrcRoot,
 		OutDir:                  opts.out,
 		Embedder:                emb,
 		Version:                 Version,

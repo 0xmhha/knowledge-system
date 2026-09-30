@@ -34,12 +34,14 @@ source "$scratch/identity.env"
   --out "$scratch/projection.json" --docs README.md --extract-only \
   > "$scratch/semantic.json"
 "$repo_root/bin/cks" doctor --src "$src" --dataset "$dataset" > "$scratch/doctor.json"
-python3 - "$dataset/current/dataset-identity.json" "$scratch/projection.json" "$dataset/current" "$scratch/doctor.json" <<'PY'
+python3 - "$dataset/current/dataset-identity.json" "$scratch/projection.json" "$dataset/current" "$scratch/doctor.json" "$src" <<'PY'
 import hashlib, json, pathlib, sqlite3, sys
 identity = json.loads(pathlib.Path(sys.argv[1]).read_text())
 projection = json.loads(pathlib.Path(sys.argv[2]).read_text())
 root = pathlib.Path(sys.argv[3])
 doctor = json.loads(pathlib.Path(sys.argv[4]).read_text())
+logical_source = str(pathlib.Path(sys.argv[5]).resolve())
+assert not (root / '.build-source').exists()
 captured = json.loads((root / 'sources' / 'manifest.json').read_text())
 assert captured['identity'] == identity['source']
 assert captured['files']
@@ -55,10 +57,13 @@ assert projection['snapshot']['dataset_id'] == identity['dataset_id']
 assert projection['snapshot']['snapshot_id'] == identity['source']['snapshot_id']
 for engine in ('graph', 'vector'):
     manifest = json.loads((root / engine / 'manifest.json').read_text())
+    assert manifest['src_root'] == logical_source
+    assert '.build-source' not in json.dumps(manifest)
     db_name = 'graph.db' if engine == 'graph' else 'vector.db'
     with sqlite3.connect(root / engine / db_name) as db:
         native = dict(db.execute('SELECT key, value FROM manifest'))
     for key, want in (
+        ('src_root', logical_source),
         ('project_id', identity['source']['project_id']),
         ('snapshot_id', identity['source']['snapshot_id']),
         ('dataset_id', identity['dataset_id']),

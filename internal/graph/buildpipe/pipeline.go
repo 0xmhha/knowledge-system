@@ -114,6 +114,7 @@ type Options struct {
 	FileManifestDigest string
 	SourceMode         string
 	SrcRoot            string
+	LogicalSrcRoot     string // public project path when SrcRoot is an immutable build tree
 	OutDir             string
 	Languages          []string // {"auto"} | subset of {"go","ts","sol"}
 	Logger             *slog.Logger
@@ -521,6 +522,9 @@ func runCold(opt Options, log *slog.Logger,
 	// is amortised against the parse pass.
 	m.Files = computeColdFileEntries(opt.SrcRoot, opt.CKGVersion, discovery, g.Nodes, g.Edges)
 	setStaleness(&m, log)
+	if opt.LogicalSrcRoot != "" {
+		m.SrcRoot = opt.LogicalSrcRoot
+	}
 	if err := store.SetManifest(m); err != nil {
 		return persist.Manifest{}, err
 	}

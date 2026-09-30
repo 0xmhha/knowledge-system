@@ -341,6 +341,9 @@ func runIncremental(opt Options, log *slog.Logger,
 	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
 	m.Files = buildFileEntries(decisions, g.Nodes, g.Edges)
 	setStaleness(&m, log)
+	if opt.LogicalSrcRoot != "" {
+		m.SrcRoot = opt.LogicalSrcRoot
+	}
 	if err := store.SetManifest(m); err != nil {
 		return persist.Manifest{}, err
 	}

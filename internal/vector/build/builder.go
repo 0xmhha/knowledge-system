@@ -40,6 +40,7 @@ type Options struct {
 	FileManifestDigest string
 	SourceMode         string
 	SrcRoot            string
+	LogicalSrcRoot     string // public project path when SrcRoot is an immutable build tree
 	OutDir             string
 	Embedder           types.Embedder // required
 	CKVIgnore          []string       // extra ignore patterns from --ckvignore CLI flag
@@ -184,6 +185,10 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	defer lock.release()
 
 	commit, _ := detectCommit(o.SrcRoot) // empty string when not a git repo; acceptable
+	publicRoot := o.SrcRoot
+	if o.LogicalSrcRoot != "" {
+		publicRoot = o.LogicalSrcRoot
+	}
 
 	// Load per-project hook (<src>/ckv.yaml). Absence is OK — Load
 	// returns a zero-value Config that the rest of the pipeline
@@ -606,6 +611,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	// Persist identity into both the JSON sidecar and the DB manifest
 	// table so /freshness can read either without coordinating opens.
 	if err := store.SetManifest(ctx, map[string]string{
+		"src_root":                   absOrEmpty(publicRoot),
 		"project_id":                 o.ProjectID,
 		"snapshot_id":                o.SnapshotID,
 		"dataset_id":                 o.DatasetID,
@@ -633,7 +639,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		SchemaVersion:       manifest.SchemaVersionCurrent,
 		CKVVersion:          ckvVersion,
 		BuiltAt:             builtAt,
-		SrcRoot:             absOrEmpty(o.SrcRoot),
+		SrcRoot:             absOrEmpty(publicRoot),
 		SrcCommit:           commit,
 		IndexedHead:         commit,
 		EmbeddingModel:      o.Embedder.Name(),
