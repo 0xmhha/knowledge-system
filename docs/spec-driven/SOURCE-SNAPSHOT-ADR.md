@@ -16,7 +16,7 @@
 | `snapshot_id` | `project_id`, `source_mode`, `source_commit`, `file_manifest_digest`를 도메인 분리된 정규 형식으로 해시 | 같은 HEAD의 다른 바이트가 같은 ID가 될 수 없다. |
 | `dataset_id` | `snapshot_id`, 빌드 전 고정한 그래프/벡터/의미 입력 파일·정책 다이제스트 및 스키마, 임베딩 정체성을 해시. 출력 다이제스트는 제외 | 같은 원천의 다른 모델/정책/스키마는 다른 데이터셋. 순환 신원 없이 빌드 전에 계산되며 사용자 버전 별칭과 다르다. |
 
-`committed`, `working-tree`, 비Git `snapshot-only`는 서로 다른 `source_mode`를 갖는다. 청결한 HEAD를 작업 트리 모드로 캡처해도 원문 파일 집합은 같지만 모드는 다른 신원이며, 검색 결과의 내용과 줄은 일치해야 한다. V1 인용의 `commit_hash` 필드는 계속 유지하고 새 v2 인용은 `snapshot_id`, `content_digest`, `project_id`, `dataset_id`, `origin_id`를 필수로 가진다. **working-tree와 snapshot-only 인용의 `commit_hash`는 빈 문자열**이고 Git이 있을 때만 `base_commit`을 별도 필드로 기록한다. 구 소비자가 HEAD 원문으로 오해하지 않게 기존 MCP 인용 도구는 두 모드에서 `requires_v2`를 반환하고 새 v2 도구만 본문을 제공한다.
+`committed`, `working-tree`, 비Git `snapshot-only`는 서로 다른 `source_mode`를 갖는다. 청결한 HEAD를 작업 트리 모드로 캡처해도 원문 파일 집합은 같지만 모드는 다른 신원이며, 검색 결과의 내용과 줄은 일치해야 한다. V1 인용의 `commit_hash` 필드는 계속 유지하고 새 v2 인용은 `snapshot_id`, `file_sha256`, `content_sha256`, `project_id`, `dataset_id`, `origin_id`를 필수로 가진다. **working-tree와 snapshot-only 인용의 `commit_hash`는 빈 문자열**이고 Git이 있을 때만 `base_commit`을 별도 필드로 기록한다. 구 소비자가 HEAD 원문으로 오해하지 않게 기존 MCP 인용 도구는 두 모드에서 `requires_v2`를 반환하고 새 v2 도구만 본문을 제공한다.
 
 ## 캡처와 승격 절차
 
