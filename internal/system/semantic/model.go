@@ -4,7 +4,7 @@
 package semantic
 
 // SchemaVersion is the file/DB projection contract version.
-const SchemaVersion = 2
+const SchemaVersion = 3
 
 type Status string
 
@@ -130,7 +130,8 @@ const (
 	PredicateAbout         = "ABOUT"          // Claim -> Concept
 	PredicateImplementedBy = "IMPLEMENTED_BY" // Concept -> CKG canonical CodeSymbol
 	PredicateTestedBy      = "TESTED_BY"      // CKG CodeSymbol -> CKG TestSymbol
-	PredicateAcceptedBy    = "ACCEPTED_BY"    // AcceptanceCriterion -> CKG TestSymbol
+	PredicateAcceptedBy    = "ACCEPTED_BY"    // legacy v1/v2 read-only criterion -> test link
+	PredicateCheckedBy     = "CHECKED_BY"     // v3 AcceptanceCriterion -> CKG TestSymbol; link only
 )
 
 // Projection is one versioned semantic graph view for one source snapshot.

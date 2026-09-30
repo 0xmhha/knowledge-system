@@ -56,7 +56,7 @@ v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start
 
 새 통합 데이터셋의 정식 술어는 `AcceptanceCriterion CHECKED_BY TestCase`다. 이것은 **검토된 테스트 연결**만 뜻한다. 사람의 의미 수용은 `CriterionDecision.approved` 사건에서만 나온다. 현재 실행 중인 의미 투영 스키마 v2는 `ACCEPTED_BY`를 저장하므로, A5.1에서 새 내부 스키마 버전을 도입할 때 기존 v1/v2 투영을 **읽을 때만** 이 연결로 해석하고 새 데이터셋에는 `CHECKED_BY`만 기록한다. 구 투영의 `ACCEPTED_BY`를 사람 승인으로 바꾸거나 기존 바이트/해시를 제자리 수정하지 않는다. 구버전 소비자는 기존 DTO/술어를 계속 읽고, v2 소비자는 정식 이름과 `link_only` 상태를 받는다. 정식 술어가 아닌 `ACCEPTED_BY`의 새 쓰기는 거부한다. 양쪽 방향·원천·검토자 조건은 동일하게 유지한다.
 
-마이그레이션 골든은 구 투영 읽기, 새 투영 쓰기, 구 술어 새 쓰기 거부, 사람 판정 부재 시 `accepted` 오판정 금지, v1 응답/해시 불변을 포함한다. 실행 전에는 기존 `ACCEPTED_BY`만 지원하며 `CHECKED_BY`를 공개 지원한다고 표시하지 않는다.
+마이그레이션 골든은 구 투영 읽기, 새 투영 쓰기, 구 술어 새 쓰기 거부, 사람 판정 부재 시 `accepted` 오판정 금지, v1 응답/해시 불변을 포함한다. 2026-10-01 구현 체크포인트에서 의미 투영 v3의 `CHECKED_BY` 쓰기, v1/v2의 `ACCEPTED_BY` 읽기, 새 쓰기 거부, v3 추적 필드 분리를 검증했다. 사람의 기준별 결정과 공개 v2 EvidencePack 계약이 완료되기 전까지 A5.1 완료로 표시하지 않는다.
 
 MCP 도구 실패는 `IsError=true`와 `code=<고정 코드>` 텍스트로 전달한다. v2 도구는 같은 코드를 기계 판독형 오류 데이터에도 기록한다. CLI 실패는 비정상 종료와 `{ "code": "...", "message": "...", "dataset_id": "..." }` 한 객체를 내보낸다. `dataset_id`를 알 수 없으면 생략한다. `requires_v2`, `reindex_required`, `snapshot_mismatch`, `source_missing`은 서로 바꾸어 쓰지 않는다. 오류 메시지에는 원문 본문·비밀·임시 staging 경로를 넣지 않는다.
 

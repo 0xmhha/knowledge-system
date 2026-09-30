@@ -26,7 +26,15 @@ type TracePath struct {
 	TestCanonicalID         string   `json:"test_canonical_id"`
 	ImplementationAssertion string   `json:"implementation_assertion"`
 	TestedByAssertion       string   `json:"tested_by_assertion"`
-	AcceptedCriterionIDs    []string `json:"accepted_criterion_ids"`
+	AcceptedCriterionIDs    []string `json:"accepted_criterion_ids,omitempty"` // v1/v2 compatibility only
+	CheckedCriterionIDs     []string `json:"checked_criterion_ids,omitempty"`  // v3 reviewed test links, not approval
+}
+
+func (p TracePath) CriterionIDs() []string {
+	if len(p.CheckedCriterionIDs) > 0 {
+		return p.CheckedCriterionIDs
+	}
+	return p.AcceptedCriterionIDs
 }
 
 type RequirementTrace struct {
@@ -91,7 +99,7 @@ func (a ActiveProjection) Trace() (TraceReport, error) {
 		concepts[c.ID] = c
 	}
 	tested := map[string][]Assertion{}
-	accepted := map[string]map[string]bool{}
+	checked := map[string]map[string]bool{}
 	claimConcepts := map[string]map[string]bool{}
 	for _, edge := range p.Assertions {
 		if edge.Status != StatusVerified {
@@ -100,11 +108,11 @@ func (a ActiveProjection) Trace() (TraceReport, error) {
 		switch edge.Predicate {
 		case PredicateTestedBy:
 			tested[edge.SubjectID] = append(tested[edge.SubjectID], edge)
-		case PredicateAcceptedBy:
-			if accepted[edge.ObjectID] == nil {
-				accepted[edge.ObjectID] = map[string]bool{}
+		case PredicateAcceptedBy, PredicateCheckedBy:
+			if checked[edge.ObjectID] == nil {
+				checked[edge.ObjectID] = map[string]bool{}
 			}
-			accepted[edge.ObjectID][edge.SubjectID] = true
+			checked[edge.ObjectID][edge.SubjectID] = true
 		case PredicateAbout:
 			if claimConcepts[edge.SubjectID] == nil {
 				claimConcepts[edge.SubjectID] = map[string]bool{}
@@ -157,10 +165,14 @@ func (a ActiveProjection) Trace() (TraceReport, error) {
 					conceptHasTest = true
 					path := TracePath{ConceptID: conceptID, CodeCanonicalID: impl.CanonicalID,
 						TestCanonicalID: edge.ObjectID, ImplementationAssertion: impl.AssertionID,
-						TestedByAssertion: edge.ID, AcceptedCriterionIDs: []string{}}
+						TestedByAssertion: edge.ID}
 					for _, criterion := range requirement.AcceptanceCriteria {
-						if accepted[edge.ObjectID][criterion.ID] {
-							path.AcceptedCriterionIDs = append(path.AcceptedCriterionIDs, criterion.ID)
+						if checked[edge.ObjectID][criterion.ID] {
+							if p.SchemaVersion >= 3 {
+								path.CheckedCriterionIDs = append(path.CheckedCriterionIDs, criterion.ID)
+							} else {
+								path.AcceptedCriterionIDs = append(path.AcceptedCriterionIDs, criterion.ID)
+							}
 							coveredCriteria[criterion.ID] = true
 						}
 					}

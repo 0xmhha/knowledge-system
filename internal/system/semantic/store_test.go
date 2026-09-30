@@ -1,6 +1,7 @@
 package semantic
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"os"
@@ -248,5 +249,35 @@ func TestStoreMigratesV1WithoutRewritingHistoricalProjection(t *testing.T) {
 	p.Evidence[0].Snapshot = p.Snapshot
 	if err := store.Put(context.Background(), p, root); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestStoreReadsV2ProjectionWithoutRewritingItsDocument(t *testing.T) {
+	p, root := fixture(t)
+	p.SchemaVersion = 2
+	store, err := OpenStore(filepath.Join(t.TempDir(), "semantic.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	if err := store.Put(context.Background(), p, root); err != nil {
+		t.Fatal(err)
+	}
+	var before []byte
+	if err := store.db.QueryRow(`SELECT document FROM semantic_projections WHERE project_id=? AND dataset_id=?`,
+		p.Snapshot.ProjectID, p.Snapshot.DatasetID).Scan(&before); err != nil {
+		t.Fatal(err)
+	}
+	loaded, err := store.Load(context.Background(), p.Snapshot.ProjectID, p.Snapshot.DatasetID)
+	if err != nil || loaded.SchemaVersion != 2 {
+		t.Fatalf("v2 projection unavailable: %+v %v", loaded, err)
+	}
+	var after []byte
+	if err := store.db.QueryRow(`SELECT document FROM semantic_projections WHERE project_id=? AND dataset_id=?`,
+		p.Snapshot.ProjectID, p.Snapshot.DatasetID).Scan(&after); err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(before, after) {
+		t.Fatal("v2 projection bytes were rewritten during read")
 	}
 }

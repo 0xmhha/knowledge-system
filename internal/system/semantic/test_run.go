@@ -30,7 +30,8 @@ type TestRun struct {
 	CriterionID        string    `json:"criterion_id"`
 	TestCanonicalID    string    `json:"test_canonical_id"`
 	TestedByAssertions []string  `json:"tested_by_assertions"`
-	AcceptedAssertions []string  `json:"accepted_by_assertions"`
+	AcceptedAssertions []string  `json:"accepted_by_assertions,omitempty"` // v1/v2 compatibility
+	CheckedAssertions  []string  `json:"checked_by_assertions,omitempty"`  // v3 link only
 	Executable         string    `json:"executable"`
 	CommandSHA256      string    `json:"command_sha256"`
 	StartedAt          time.Time `json:"started_at"`
@@ -100,7 +101,7 @@ func (a ActiveProjection) executeLinkedTestFor(ctx context.Context, repoRoot, cr
 			continue
 		}
 		for _, path := range requirement.Paths {
-			for _, id := range path.AcceptedCriterionIDs {
+			for _, id := range path.CriterionIDs() {
 				if id == criterionID {
 					if linkedTests[path.TestCanonicalID] == nil {
 						linkedTests[path.TestCanonicalID] = map[string]bool{}
@@ -130,16 +131,16 @@ func (a ActiveProjection) executeLinkedTestFor(ctx context.Context, repoRoot, cr
 		testedBy = append(testedBy, id)
 	}
 	sort.Strings(testedBy)
-	var acceptedBy []string
+	var linkedBy []string
 	for _, edge := range a.projection.Assertions {
-		if edge.Status == StatusVerified && edge.Predicate == PredicateAcceptedBy &&
+		if edge.Status == StatusVerified && (edge.Predicate == PredicateAcceptedBy || edge.Predicate == PredicateCheckedBy) &&
 			edge.SubjectID == criterionID && edge.ObjectID == testCanonicalID {
-			acceptedBy = append(acceptedBy, edge.ID)
+			linkedBy = append(linkedBy, edge.ID)
 		}
 	}
-	sort.Strings(acceptedBy)
-	if len(acceptedBy) == 0 {
-		return TestRun{}, fmt.Errorf("criterion %q has no reviewed acceptance assertion for test %q", criterionID, testCanonicalID)
+	sort.Strings(linkedBy)
+	if len(linkedBy) == 0 {
+		return TestRun{}, fmt.Errorf("criterion %q has no reviewed test link for %q", criterionID, testCanonicalID)
 	}
 	var testName string
 	if exactGo {
@@ -162,10 +163,15 @@ func (a ActiveProjection) executeLinkedTestFor(ctx context.Context, repoRoot, cr
 	commandBytes, _ := json.Marshal(argv)
 	commandHash := sha256.Sum256(commandBytes)
 	report := TestRun{Snapshot: trace.Snapshot, CriterionID: criterionID,
-		TestCanonicalID: testCanonicalID, TestedByAssertions: testedBy, AcceptedAssertions: acceptedBy,
+		TestCanonicalID: testCanonicalID, TestedByAssertions: testedBy,
 		Executable: filepath.Base(argv[0]), CommandSHA256: hex.EncodeToString(commandHash[:]),
 		StartedAt: time.Now().UTC(), GOOS: runtime.GOOS, GOARCH: runtime.GOARCH,
 		GoRuntime: runtime.Version(), ExitCode: -1}
+	if a.projection.SchemaVersion >= 3 {
+		report.CheckedAssertions = linkedBy
+	} else {
+		report.AcceptedAssertions = linkedBy
+	}
 	if exactGo {
 		report.Framework, report.TestName = "go-test-json", testName
 	}

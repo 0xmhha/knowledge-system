@@ -36,7 +36,7 @@ func traceFixtureWithRepo(t *testing.T) (Projection, string) {
 			EvidenceIDs: []string{"ontology", "code"}, Status: StatusVerified, ReviewedBy: "reviewer"},
 		{ID: "tested", Predicate: PredicateTestedBy, SubjectID: "pkg.Alpha", ObjectID: "pkg.TestAlpha",
 			EvidenceIDs: []string{"code", "test"}, Status: StatusVerified, ReviewedBy: "reviewer"},
-		{ID: "accepted", Predicate: PredicateAcceptedBy, SubjectID: "ac-alpha", ObjectID: "pkg.TestAlpha",
+		{ID: "accepted", Predicate: PredicateCheckedBy, SubjectID: "ac-alpha", ObjectID: "pkg.TestAlpha",
 			EvidenceIDs: []string{"criterion", "test"}, Status: StatusVerified, ReviewedBy: "reviewer"},
 	}
 	if err := p.Validate(); err != nil {
@@ -55,7 +55,7 @@ func TestTraceRequiresReviewedSpecCodeTestAndCriterionLinks(t *testing.T) {
 		}
 	}
 	check(p, TraceLinked)
-	if got := (func() RequirementTrace { r, _ := (ActiveProjection{projection: p}).Trace(); return r.Requirements[0] })(); len(got.Paths) != 1 || len(got.Paths[0].AcceptedCriterionIDs) != 1 {
+	if got := (func() RequirementTrace { r, _ := (ActiveProjection{projection: p}).Trace(); return r.Requirements[0] })(); len(got.Paths) != 1 || len(got.Paths[0].CheckedCriterionIDs) != 1 || len(got.Paths[0].AcceptedCriterionIDs) != 0 {
 		t.Fatalf("missing exact path: %+v", got)
 	}
 
@@ -78,6 +78,29 @@ func TestTraceRequiresReviewedSpecCodeTestAndCriterionLinks(t *testing.T) {
 	check(without, TraceMissingConcept)
 }
 
+func TestCheckedByMigrationReadsLegacyButRejectsNewAcceptedByWrites(t *testing.T) {
+	legacy := traceFixture(t)
+	legacy.SchemaVersion = 2
+	legacy.Assertions[2].Predicate = PredicateAcceptedBy
+	if err := legacy.Validate(); err != nil {
+		t.Fatalf("legacy v2 projection rejected: %v", err)
+	}
+	trace, err := (ActiveProjection{projection: legacy}).Trace()
+	if err != nil || len(trace.Requirements[0].Paths[0].AcceptedCriterionIDs) != 1 ||
+		len(trace.Requirements[0].Paths[0].CheckedCriterionIDs) != 0 {
+		t.Fatalf("legacy trace was rewritten or mistaken for v3: %+v %v", trace, err)
+	}
+	legacy.SchemaVersion = 3
+	if err := legacy.Validate(); err == nil || !strings.Contains(err.Error(), "read-only") {
+		t.Fatalf("new ACCEPTED_BY write accepted: %v", err)
+	}
+	legacy.SchemaVersion = 2
+	legacy.Assertions[2].Predicate = PredicateCheckedBy
+	if err := legacy.Validate(); err == nil || !strings.Contains(err.Error(), "requires schema 3") {
+		t.Fatalf("CHECKED_BY back-written into old projection: %v", err)
+	}
+}
+
 func TestTraceRejectsFalseTestLinksAndReportsConflict(t *testing.T) {
 	p := traceFixture(t)
 	p.Assertions[1].EvidenceIDs = []string{"code", "criterion"}
@@ -86,7 +109,7 @@ func TestTraceRejectsFalseTestLinksAndReportsConflict(t *testing.T) {
 	}
 	p = traceFixture(t)
 	p.Assertions[2].EvidenceIDs = []string{"requirement", "test"}
-	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "ACCEPTED_BY") {
+	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "CHECKED_BY") {
 		t.Fatalf("criterion omission accepted: %v", err)
 	}
 	p = traceFixture(t)

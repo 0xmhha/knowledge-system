@@ -59,7 +59,7 @@ func OpenStore(path string) (*Store, error) {
 	}
 	if version > StoreSchemaVersion {
 		db.Close()
-		return nil, fmt.Errorf("semantic store schema %d is newer than supported %d", version, SchemaVersion)
+		return nil, fmt.Errorf("semantic store schema %d is newer than supported %d", version, StoreSchemaVersion)
 	}
 	if version == 0 {
 		if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS semantic_projections (

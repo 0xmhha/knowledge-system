@@ -33,7 +33,7 @@ func (s Snapshot) validate() error {
 // Validate checks schema shape, local references, and snapshot isolation.
 // It does not prove source bytes; call ValidateSources before promotion.
 func (p Projection) Validate() error {
-	if p.SchemaVersion != 1 && p.SchemaVersion != SchemaVersion {
+	if p.SchemaVersion != 1 && p.SchemaVersion != 2 && p.SchemaVersion != SchemaVersion {
 		return fmt.Errorf("semantic schema version %d is unsupported", p.SchemaVersion)
 	}
 	if p.SchemaVersion == 1 && len(p.Requirements) != 0 {
@@ -330,11 +330,17 @@ func (p Projection) Validate() error {
 				!hasCanonicalEvidence(seenEvidence, evidence, assertion.ObjectID, SourceTest) {
 				return fmt.Errorf("assertion %q TESTED_BY needs code and test CKG anchors", assertion.ID)
 			}
-		case PredicateAcceptedBy:
+		case PredicateAcceptedBy, PredicateCheckedBy:
+			if assertion.Predicate == PredicateAcceptedBy && p.SchemaVersion >= 3 {
+				return fmt.Errorf("assertion %q ACCEPTED_BY is read-only in schema 3; write CHECKED_BY", assertion.ID)
+			}
+			if assertion.Predicate == PredicateCheckedBy && p.SchemaVersion < 3 {
+				return fmt.Errorf("assertion %q CHECKED_BY requires schema 3", assertion.ID)
+			}
 			criterion, ok := criteria[assertion.SubjectID]
 			if !ok || !seenEvidence[criterion.EvidenceID] ||
 				!hasCanonicalEvidence(seenEvidence, evidence, assertion.ObjectID, SourceTest) {
-				return fmt.Errorf("assertion %q ACCEPTED_BY needs criterion and test sources", assertion.ID)
+				return fmt.Errorf("assertion %q %s needs criterion and test sources", assertion.ID, assertion.Predicate)
 			}
 			if assertion.Status == StatusVerified && criterionRequirement[criterion.ID].Status != StatusVerified {
 				return fmt.Errorf("verified assertion %q refers to unapproved requirement", assertion.ID)

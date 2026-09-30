@@ -44,7 +44,7 @@ func (a ActiveProjection) AnnotatePack(pack *contract.EvidencePack) error {
 		for _, path := range requirement.Paths {
 			code, okCode := assertionAnchor(assertions[path.ImplementationAssertion], evidence, path.CodeCanonicalID, SourceCode)
 			test, okTest := assertionAnchor(assertions[path.TestedByAssertion], evidence, path.TestCanonicalID, SourceTest)
-			if !okCode || !okTest || len(path.AcceptedCriterionIDs) == 0 {
+			if !okCode || !okTest || len(path.CriterionIDs()) == 0 {
 				continue
 			}
 			for _, citation := range pack.Citations {
@@ -53,7 +53,7 @@ func (a ActiveProjection) AnnotatePack(pack *contract.EvidencePack) error {
 					continue
 				}
 				overlay.Links = append(overlay.Links, contract.SemanticLink{
-					RequirementID: requirement.RequirementID, CriterionIDs: append([]string(nil), path.AcceptedCriterionIDs...),
+					RequirementID: requirement.RequirementID, CriterionIDs: append([]string(nil), path.CriterionIDs()...),
 					ConceptID: path.ConceptID, CodeSymbolID: path.CodeCanonicalID,
 					TestSymbolID:   path.TestCanonicalID,
 					AssertionIDs:   []string{path.ImplementationAssertion, path.TestedByAssertion},

@@ -125,7 +125,7 @@ p['assertions'] = [
     {'id': 'reviewed:tested', 'predicate': 'TESTED_BY', 'subject_id': anchors['Alpha'],
      'object_id': anchors['TestAlpha'], 'evidence_ids': ['code:alpha', 'test:alpha'],
      'status': 'verified', 'reviewed_by': 'fixture-reviewer'},
-    {'id': 'reviewed:accepted', 'predicate': 'ACCEPTED_BY', 'subject_id': criterion['id'],
+    {'id': 'reviewed:checked', 'predicate': 'CHECKED_BY', 'subject_id': criterion['id'],
      'object_id': anchors['TestAlpha'], 'evidence_ids': [criterion['evidence_id'], 'test:alpha'],
      'status': 'verified', 'reviewed_by': 'fixture-reviewer'},
 ]
@@ -278,7 +278,8 @@ passed = json.load(open(sys.argv[11], encoding='utf-8'))
 failed = json.load(open(sys.argv[12], encoding='utf-8'))
 assert passed['command_passed'] is True and passed['snapshot_consistent'] is True and passed['criterion_id'] == 'ac-alpha', passed
 assert passed['test_canonical_id'] == reviewed['requirements'][0]['paths'][0]['test_canonical_id'], passed
-assert passed['tested_by_assertions'] == ['reviewed:tested'] and passed['accepted_by_assertions'] == ['reviewed:accepted'], passed
+assert passed['tested_by_assertions'] == ['reviewed:tested'] and passed['checked_by_assertions'] == ['reviewed:checked'], passed
+assert 'accepted_by_assertions' not in passed, passed
 exact = json.load(open(sys.argv[17], encoding='utf-8'))
 assert exact['framework'] == 'go-test-json' and exact['test_name'] == 'TestAlpha' and exact['test_observed'] is True and exact['test_passed'] is True, exact
 assert exact['test_canonical_id'] == passed['test_canonical_id'] and exact['snapshot'] == passed['snapshot'], exact
@@ -370,9 +371,9 @@ assert failed['source_commit'] == commit and failed['command_passed'] is False, 
 assert passed['source_commit'] == commit and passed['command_passed'] is True and passed['snapshot_consistent'] is True, passed
 PY
 if "$repo_root/bin/cks" setup --src "$src" --out "$dataset" \
-  --embedder mock --version smoke-rejected --gate-min-canonical 1.0 --progress text \
+  --embedder mock --version smoke-rejected --gate-min-canonical 1.01 --progress text \
   > "$scratch/reindex-rejected.log" 2>&1; then
-  echo "low-coverage candidate was promoted" >&2
+  echo "candidate below the requested canonical coverage was promoted" >&2
   exit 1
 fi
 test "$(readlink "$dataset/current")" = smoke-tested
