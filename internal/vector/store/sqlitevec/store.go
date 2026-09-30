@@ -29,6 +29,10 @@ import (
 // when the SQL schema changes in a way old binaries cannot read.
 const SchemaVersion = "1.0"
 
+// ErrIncompleteIndex means a metadata row cannot be scored because its vector
+// is absent. Returning fewer hits as a successful search would hide corruption.
+var ErrIncompleteIndex = errors.New("sqlitevec: incomplete index")
+
 // Store implements types.VectorStore over SQLite + vec0.
 type Store struct {
 	db  *sql.DB
@@ -546,6 +550,9 @@ func (s *Store) DocsChunks(ctx context.Context) ([]types.Chunk, error) {
 // use vec0 KNN with post-filtering; if the initial candidates do not fill k,
 // an exact scan completes the result rather than silently dropping matches.
 func (s *Store) Search(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if got := len(query); got != s.dim {
 		return nil, fmt.Errorf("sqlitevec: query dim %d != store dim %d", got, s.dim)
 	}
@@ -662,6 +669,9 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 			break
 		}
 	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -763,11 +773,14 @@ func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter 
 
 	scored := make([]types.Hit, 0, len(chunks))
 	for _, c := range chunks {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		var blob []byte
 		err := s.db.QueryRowContext(ctx,
 			`SELECT embedding FROM chunk_vec WHERE chunk_id = ?`, c.ID).Scan(&blob)
 		if errors.Is(err, sql.ErrNoRows) {
-			continue // chunk without a vector cannot be scored
+			return nil, fmt.Errorf("%w: missing embedding for chunk %s", ErrIncompleteIndex, c.ID)
 		}
 		if err != nil {
 			return nil, fmt.Errorf("filtered scan embedding %s: %w", c.ID, err)
@@ -796,6 +809,9 @@ func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter 
 	for i := range scored {
 		scored[i].Score.VectorRank = i + 1
 		scored[i].Score.Normalized = normalize(scored[i].Score.VectorDistance)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
 	return scored, nil
 }

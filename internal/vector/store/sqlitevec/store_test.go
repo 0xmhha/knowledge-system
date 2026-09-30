@@ -3,6 +3,7 @@ package sqlitevec
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -95,6 +96,45 @@ func TestStoreFilterByLanguage(t *testing.T) {
 	}
 	if len(got) != 1 || got[0].Chunk.ID != "b" {
 		t.Fatalf("expected only ts chunk 'b', got %+v", got)
+	}
+}
+
+func TestFilteredSearchRejectsMissingEmbeddingInsteadOfReturningShortSuccess(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "missing-vector.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx := context.Background()
+	chunks := []types.Chunk{
+		mkChunk("a", "a.go", "a", 1, 1, "go", types.KindFunction),
+		mkChunk("b", "b.go", "b", 1, 1, "go", types.KindFunction),
+	}
+	if err := s.Upsert(ctx, chunks, [][]float32{{1, 0, 0, 0}, {0, 1, 0, 0}}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.ExecContext(ctx, "DELETE FROM chunk_vec WHERE chunk_id = ?", "b"); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 2, types.Filter{Language: "go"})
+	if !errors.Is(err, ErrIncompleteIndex) || hits != nil {
+		t.Fatalf("missing vector must fail closed, hits=%v err=%v", hits, err)
+	}
+}
+
+func TestSearchRejectsCancelledContextEvenForEmptyResult(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "cancelled.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	for _, filter := range []types.Filter{{}, {Language: "go"}} {
+		hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 0, filter)
+		if !errors.Is(err, context.Canceled) || hits != nil {
+			t.Fatalf("cancelled search must not look complete, filter=%+v hits=%v err=%v", filter, hits, err)
+		}
 	}
 }
 

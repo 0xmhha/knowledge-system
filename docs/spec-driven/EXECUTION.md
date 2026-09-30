@@ -18,6 +18,12 @@ The user kept the D1 twenty concepts fixed and endorsed a separation between the
 
 At `7596bb6`, `go test ./...`, `go vet ./...`, `make boundaries`, and `make docs-check` all exited 0 with writable Go caches. Docs check covered 93 live documents before the new A0 file. macOS CGo emitted sqlite-vec SDK deprecation warnings. A0 trace/baseline is complete; A1–A8 implementation and B/C quality gates remain open.
 
+## A1 CKV search correctness (in progress)
+
+An exact filtered search counted a chunk whose `chunk_vec` row was missing, then skipped it and returned a shorter **successful** hit list. `TestFilteredSearchRejectsMissingEmbeddingInsteadOfReturningShortSuccess` deletes one vector after indexing and requires an `ErrIncompleteIndex` failure with no hits. A cancelled request with `k=0` previously succeeded without checking its context; `TestSearchRejectsCancelledContextEvenForEmptyResult` requires `context.Canceled` for filtered and unfiltered calls. Both focused tests pass after the store fix. A1 is still open: bounded candidate work, public `incomplete`/`cancelled` status, S-01/02/04 end-to-end oracles and prior consumer regression remain.
+
+The whole-module `go test ./...`, `go vet ./...`, `make boundaries`, and `make docs-check` passed after this change; docs check covered 94 live documents. The first full-test attempt was blocked by this task sandbox's local `127.0.0.1:0` bind restriction in HTTP fixture packages; rerunning the identical command with loopback permission passed. The failure was environmental, not an A1 test pass or code defect.
+
 ## Gate 0: baseline and correctness
 
 | WBS | Status | Evidence | Remaining gate work |
