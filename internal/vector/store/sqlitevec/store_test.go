@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
@@ -135,6 +136,96 @@ func TestSearchRejectsCancelledContextEvenForEmptyResult(t *testing.T) {
 		if !errors.Is(err, context.Canceled) || hits != nil {
 			t.Fatalf("cancelled search must not look complete, filter=%+v hits=%v err=%v", filter, hits, err)
 		}
+	}
+}
+
+func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "limited.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	chunks := []types.Chunk{
+		mkChunk("a", "a.go", "a", 1, 1, "go", types.KindFunction),
+		mkChunk("b", "b.go", "b", 1, 1, "go", types.KindFunction),
+		mkChunk("c", "c.go", "c", 1, 1, "go", types.KindFunction),
+	}
+	if err := s.Upsert(context.Background(), chunks, [][]float32{{1, 0, 0, 0}, {0.9, 0.1, 0, 0}, {0, 1, 0, 0}}); err != nil {
+		t.Fatal(err)
+	}
+	result, err := s.SearchDetailed(context.Background(), []float32{1, 0, 0, 0}, 2,
+		types.Filter{Language: "go"}, SearchOptions{MaxExactCandidates: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Status != SearchIncomplete || result.Reason != "candidate_limit" || len(result.Hits) != 0 {
+		t.Fatalf("candidate limit must be explicit: %+v", result)
+	}
+	if result.CandidateCount != 3 || result.SearchedCount != 0 {
+		t.Fatalf("candidate accounting wrong: %+v", result)
+	}
+	result, err = s.SearchDetailed(context.Background(), []float32{1, 0, 0, 0}, 2,
+		types.Filter{Language: "go"}, SearchOptions{MaxExactCandidates: 3})
+	if err != nil || result.Status != SearchComplete || len(result.Hits) != 2 || result.Hits[0].Chunk.ID != "a" {
+		t.Fatalf("exact search at limit must complete: result=%+v err=%v", result, err)
+	}
+	if result.EligibleCount == nil || *result.EligibleCount != 3 || result.SearchedCount != 3 {
+		t.Fatalf("exact search accounting wrong: %+v", result)
+	}
+}
+
+func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "cancel-status.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	result, err := s.SearchDetailed(ctx, []float32{1, 0, 0, 0}, 2, types.Filter{}, SearchOptions{})
+	if err != nil || result.Status != SearchCancelled || result.Reason != "context_cancelled" || len(result.Hits) != 0 {
+		t.Fatalf("cancelled search looked complete: result=%+v err=%v", result, err)
+	}
+	deadlineCtx, stop := context.WithDeadline(context.Background(), time.Unix(0, 0))
+	defer stop()
+	result, err = s.SearchDetailed(deadlineCtx, []float32{1, 0, 0, 0}, 2, types.Filter{}, SearchOptions{})
+	if err != nil || result.Status != SearchIncomplete || result.Reason != "deadline_exceeded" || len(result.Hits) != 0 {
+		t.Fatalf("expired search looked complete: result=%+v err=%v", result, err)
+	}
+}
+
+func TestSearchDetailedEmptyAndContradictoryFiltersAreComplete(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "empty-filter.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	query := []float32{1, 0, 0, 0}
+	for _, filter := range []types.Filter{{}, {Language: "typescript", CommitHash: "missing"}} {
+		result, err := s.SearchDetailed(context.Background(), query, 5, filter, SearchOptions{})
+		if err != nil || result.Status != SearchComplete || len(result.Hits) != 0 {
+			t.Fatalf("empty eligible set must complete: filter=%+v result=%+v err=%v", filter, result, err)
+		}
+		if result.EligibleCount == nil || *result.EligibleCount != 0 {
+			t.Fatalf("eligible count must be zero: filter=%+v result=%+v", filter, result)
+		}
+	}
+}
+
+func TestSearchDetailedRejectsOversizedKBeforeAllocation(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "oversized-k.db"), testDim)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	result, err := s.SearchDetailed(context.Background(), []float32{1, 0, 0, 0},
+		DefaultMaxSearchK+1, types.Filter{}, SearchOptions{})
+	if err != nil || result.Status != SearchIncomplete || result.Reason != "requested_k_exceeds_limit" || len(result.Hits) != 0 {
+		t.Fatalf("oversized K looked complete: result=%+v err=%v", result, err)
+	}
+	if hits, err := s.Search(context.Background(), []float32{1, 0, 0, 0},
+		DefaultMaxSearchK+1, types.Filter{}); !errors.Is(err, ErrSearchIncomplete) || hits != nil {
+		t.Fatalf("legacy search must fail closed: hits=%v err=%v", hits, err)
 	}
 }
 
@@ -346,12 +437,21 @@ func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T) {
 		chunks = append(chunks, mkChunk(fmt.Sprintf("near-%d", i), "near/a.go", "near", i+1, i+1, "go", types.KindFunction))
 		embs = append(embs, []float32{1, 0, 0, 0})
 	}
-	chunks = append(chunks, mkChunk("target", "target/b.go", "target", 1, 1, "go", types.KindFunction))
+	chunks = append(chunks, mkChunk("target", "target.go", "target", 1, 1, "go", types.KindFunction))
 	embs = append(embs, []float32{0, 1, 0, 0})
 	if err := s.Upsert(ctx, chunks, embs); err != nil {
 		t.Fatal(err)
 	}
-	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 1, types.Filter{PathGlob: "target/*.go"})
+	// The bracket glob has no pushdown prefix. All 2,050 metadata rows are
+	// candidates, but the first vec0 neighbors are all rejected by Matches.
+	filter := types.Filter{PathGlob: "[t]*.go"}
+	limited, err := s.SearchDetailed(ctx, []float32{1, 0, 0, 0}, 1, filter,
+		SearchOptions{MaxExactCandidates: 2048})
+	if err != nil || limited.Status != SearchIncomplete || limited.Reason != "candidate_limit" ||
+		limited.CandidateCount != 2050 || len(limited.Hits) != 0 {
+		t.Fatalf("bounded fallback must disclose incomplete search: result=%+v err=%v", limited, err)
+	}
+	hits, err := s.Search(ctx, []float32{1, 0, 0, 0}, 1, filter)
 	if err != nil {
 		t.Fatal(err)
 	}

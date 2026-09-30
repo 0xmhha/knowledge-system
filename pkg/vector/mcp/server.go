@@ -21,7 +21,9 @@ package mcp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -32,6 +34,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/footprint"
 	"github.com/0xmhha/knowledge-system/internal/vector/freshness"
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
+	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -369,9 +372,15 @@ func (s *Server) handleSemanticSearch(ctx context.Context, req mcpgo.CallToolReq
 
 	opts := query.Options{}
 	if v, ok := args["k"].(float64); ok && v > 0 {
+		if math.IsNaN(v) || v > float64(sqlitevec.DefaultMaxSearchK/3) {
+			return searchErrorResult("semantic_search", sqlitevec.ErrSearchIncomplete), nil
+		}
 		opts.K = int(v)
 	}
 	if v, ok := args["examples_k"].(float64); ok && v > 0 {
+		if math.IsNaN(v) || v > float64(sqlitevec.DefaultMaxSearchK) {
+			return searchErrorResult("semantic_search", sqlitevec.ErrSearchIncomplete), nil
+		}
 		opts.ExamplesK = int(v)
 	}
 	if v, ok := args["budget_tokens"].(float64); ok && v > 0 {
@@ -411,7 +420,7 @@ func (s *Server) handleSemanticSearch(ctx context.Context, req mcpgo.CallToolReq
 
 	res, err := s.engine.Search(ctx, intent, opts)
 	if err != nil {
-		return mcpgo.NewToolResultError(fmt.Sprintf("semantic_search: %v", err)), nil
+		return searchErrorResult("semantic_search", err), nil
 	}
 	return jsonResult(res)
 }
@@ -584,6 +593,9 @@ func (s *Server) handleVectorSearch(ctx context.Context, req mcpgo.CallToolReque
 
 	k := 10
 	if v, ok := args["k"].(float64); ok && v > 0 {
+		if math.IsNaN(v) || v > float64(sqlitevec.DefaultMaxSearchK) {
+			return searchErrorResult("search", sqlitevec.ErrSearchIncomplete), nil
+		}
 		k = int(v)
 	}
 	var f types.Filter
@@ -593,7 +605,7 @@ func (s *Server) handleVectorSearch(ctx context.Context, req mcpgo.CallToolReque
 
 	hits, err := s.engine.VectorSearch(ctx, vec, k, f)
 	if err != nil {
-		return mcpgo.NewToolResultError(fmt.Sprintf("search: %v", err)), nil
+		return searchErrorResult("search", err), nil
 	}
 
 	// Filter each hit's text content
@@ -613,6 +625,21 @@ func (s *Server) handleVectorSearch(ctx context.Context, req mcpgo.CallToolReque
 		"hits":  filtered,
 		"count": len(filtered),
 	})
+}
+
+// Legacy MCP tools have a hit-only success body. Keep that shape intact and
+// return a stable code in an IsError result when retrieval did not complete.
+func searchErrorResult(op string, err error) *mcpgo.CallToolResult {
+	code := "search_failed"
+	switch {
+	case errors.Is(err, context.Canceled):
+		code = "cancelled"
+	case errors.Is(err, context.DeadlineExceeded),
+		errors.Is(err, sqlitevec.ErrSearchIncomplete),
+		errors.Is(err, sqlitevec.ErrIncompleteIndex):
+		code = "incomplete"
+	}
+	return mcpgo.NewToolResultError(fmt.Sprintf("code=%s %s: %v", code, op, err))
 }
 
 func (s *Server) handleRerank(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {

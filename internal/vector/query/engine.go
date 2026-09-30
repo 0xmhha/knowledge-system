@@ -700,6 +700,9 @@ func (e *Engine) Search(ctx context.Context, intent string, opts Options) (*Resp
 	if intent == "" {
 		return nil, errors.New("query: empty intent")
 	}
+	if opts.K > sqlitevec.DefaultMaxSearchK/overfetchFactor {
+		return nil, fmt.Errorf("%w: reason=requested_k_exceeds_limit", sqlitevec.ErrSearchIncomplete)
+	}
 
 	traceID := opts.TraceID
 	if traceID == "" {

@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
+	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 )
 
 // buildSample mirrors the helper in internal/query: it indexes
@@ -109,6 +111,62 @@ func TestSemanticSearchHandlerRequiresIntent(t *testing.T) {
 	}
 	if !res.IsError {
 		t.Errorf("expected IsError=true for missing intent")
+	}
+}
+
+func TestLegacySearchErrorsHaveStableCompletionCodes(t *testing.T) {
+	for _, tc := range []struct {
+		name, code string
+		err        error
+	}{
+		{"candidate limit", "incomplete", fmt.Errorf("store search: %w", sqlitevec.ErrSearchIncomplete)},
+		{"missing vector", "incomplete", fmt.Errorf("store search: %w", sqlitevec.ErrIncompleteIndex)},
+		{"timeout", "incomplete", context.DeadlineExceeded},
+		{"cancel", "cancelled", context.Canceled},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			res := searchErrorResult("semantic_search", tc.err)
+			if !res.IsError || !strings.HasPrefix(textContent(t, res), "code="+tc.code+" ") {
+				t.Fatalf("legacy consumer could mistake failure for success: %+v", res)
+			}
+		})
+	}
+}
+
+func TestVectorSearchHandlerRejectsCancelledRequest(t *testing.T) {
+	eng := buildSample(t)
+	s := NewServer(eng)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	res, err := s.handleVectorSearch(ctx,
+		callRequest("cks.context.vector_search", map[string]any{"vector_json": "[1,0,0,0]"}))
+	if err != nil || !res.IsError || !strings.HasPrefix(textContent(t, res), "code=cancelled ") {
+		t.Fatalf("cancelled MCP search looked complete: result=%+v err=%v", res, err)
+	}
+}
+
+func TestSearchHandlersRejectOversizedKInsteadOfUsingDefault(t *testing.T) {
+	eng := buildSample(t)
+	s := NewServer(eng)
+	for _, tc := range []struct {
+		name string
+		call func() (*mcpgo.CallToolResult, error)
+	}{
+		{"semantic", func() (*mcpgo.CallToolResult, error) {
+			return s.handleSemanticSearch(context.Background(), callRequest("cks.context.semantic_search",
+				map[string]any{"intent": "alpha", "k": float64(1e100)}))
+		}},
+		{"vector", func() (*mcpgo.CallToolResult, error) {
+			return s.handleVectorSearch(context.Background(), callRequest("cks.context.vector_search",
+				map[string]any{"vector_json": "[1,0,0,0]", "k": float64(1e100)}))
+		}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			res, err := tc.call()
+			if err != nil || !res.IsError || !strings.HasPrefix(textContent(t, res), "code=incomplete ") {
+				t.Fatalf("oversized K became normal search: result=%+v err=%v", res, err)
+			}
+		})
 	}
 }
 

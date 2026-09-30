@@ -17,6 +17,9 @@ type StoreSearchService struct {
 
 // Run performs vector search and returns raw candidate hits.
 func (s *StoreSearchService) Run(ctx context.Context, queryVec []float32, k int, filter types.Filter) ([]types.Hit, error) {
+	if k > sqlitevec.DefaultMaxSearchK/overfetchFactor {
+		return nil, fmt.Errorf("%w: reason=requested_k_exceeds_limit", sqlitevec.ErrSearchIncomplete)
+	}
 	overfetch := k * overfetchFactor
 	hits, err := s.store.Search(ctx, queryVec, overfetch, filter)
 	if err != nil {

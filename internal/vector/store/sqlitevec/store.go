@@ -33,6 +33,45 @@ const SchemaVersion = "1.0"
 // is absent. Returning fewer hits as a successful search would hide corruption.
 var ErrIncompleteIndex = errors.New("sqlitevec: incomplete index")
 
+// ErrSearchIncomplete is returned by the legacy hit-only API when a bounded
+// search cannot prove a complete result. Callers must not present its hits as
+// a successful top-K answer.
+var ErrSearchIncomplete = errors.New("sqlitevec: search incomplete")
+
+// DefaultMaxExactCandidates bounds the fallback scan after filtered vec0
+// search. A caller may lower this limit for a tighter query budget.
+const DefaultMaxExactCandidates = 16384
+
+// DefaultMaxSearchK bounds vec0 result allocation. Pipeline callers that
+// over-fetch must check their multiplier before invoking Search.
+const DefaultMaxSearchK = 16384
+
+type SearchStatus string
+
+const (
+	SearchComplete   SearchStatus = "complete"
+	SearchIncomplete SearchStatus = "incomplete"
+	SearchCancelled  SearchStatus = "cancelled"
+)
+
+type SearchOptions struct {
+	MaxExactCandidates int // zero uses DefaultMaxExactCandidates
+}
+
+// SearchResult distinguishes a complete top-K set from bounded or cancelled
+// work. CandidateCount is the SQL prefilter superset, not necessarily the
+// number accepted by Filter.Matches. EligibleCount is known after an exact
+// scan; nil means it was not exhaustively counted. SearchedCount counts rows
+// scored or examined by the selected search path.
+type SearchResult struct {
+	Hits           []types.Hit
+	CandidateCount int
+	EligibleCount  *int
+	SearchedCount  int
+	Status         SearchStatus
+	Reason         string
+}
+
 // Store implements types.VectorStore over SQLite + vec0.
 type Store struct {
 	db  *sql.DB
@@ -546,35 +585,86 @@ func (s *Store) DocsChunks(ctx context.Context) ([]types.Chunk, error) {
 	return out, rows.Err()
 }
 
-// Search uses an exact scan for small filtered candidate sets. Larger sets
-// use vec0 KNN with post-filtering; if the initial candidates do not fill k,
-// an exact scan completes the result rather than silently dropping matches.
+// Search is the legacy hit-only API. It fails closed if SearchDetailed cannot
+// prove a complete result, so existing CKV callers never see partial hits as
+// a successful response.
 func (s *Store) Search(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
-	if err := ctx.Err(); err != nil {
+	result, err := s.SearchDetailed(ctx, query, k, filter, SearchOptions{})
+	if err != nil {
 		return nil, err
 	}
+	switch result.Status {
+	case SearchComplete:
+		return result.Hits, nil
+	case SearchCancelled:
+		return nil, context.Canceled
+	default:
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: reason=%s candidates=%d searched=%d",
+			ErrSearchIncomplete, result.Reason, result.CandidateCount, result.SearchedCount)
+	}
+}
+
+// SearchDetailed uses exact scan for small filtered sets and bounded vec0
+// search for larger sets. A short ANN result is completed by exact scan only
+// when the SQL candidate superset fits MaxExactCandidates.
+func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error) {
+	if err := ctx.Err(); err != nil {
+		return interruptedSearch(err), nil
+	}
 	if got := len(query); got != s.dim {
-		return nil, fmt.Errorf("sqlitevec: query dim %d != store dim %d", got, s.dim)
+		return SearchResult{}, fmt.Errorf("sqlitevec: query dim %d != store dim %d", got, s.dim)
 	}
 	if k <= 0 {
-		return nil, nil
+		return SearchResult{Status: SearchComplete}, nil
 	}
+	if k > DefaultMaxSearchK {
+		return SearchResult{Status: SearchIncomplete, Reason: "requested_k_exceeds_limit"}, nil
+	}
+	maxExact := opts.MaxExactCandidates
+	if maxExact <= 0 {
+		maxExact = DefaultMaxExactCandidates
+	}
+	result := SearchResult{Status: SearchComplete}
 	if !filter.IsZero() {
 		count, err := s.candidateCount(ctx, filter)
 		if err != nil {
-			return nil, err
+			if ctx.Err() != nil {
+				return interruptedSearch(ctx.Err()), nil
+			}
+			return SearchResult{}, err
 		}
+		result.CandidateCount = count
 		if count <= 2048 {
-			return s.searchExact(ctx, query, k, filter)
+			if count > maxExact {
+				result.Status, result.Reason = SearchIncomplete, "candidate_limit"
+				return result, nil
+			}
+			var eligible int
+			hits, err := s.searchExact(ctx, query, k, filter, &eligible)
+			if err != nil {
+				if ctx.Err() != nil {
+					return interruptedSearch(ctx.Err()), nil
+				}
+				return SearchResult{}, err
+			}
+			result.Hits, result.EligibleCount, result.SearchedCount = hits, &eligible, eligible
+			return result, nil
 		}
 	}
 	fetch := k
 	if !filter.IsZero() {
+		if k > int(^uint(0)>>1)/3 {
+			result.Status, result.Reason = SearchIncomplete, "requested_k_exceeds_limit"
+			return result, nil
+		}
 		fetch = k * 3
 	}
 	blob, err := sqlitevec.SerializeFloat32(query)
 	if err != nil {
-		return nil, fmt.Errorf("serialize query: %w", err)
+		return SearchResult{}, fmt.Errorf("serialize query: %w", err)
 	}
 
 	// vec0 KNN: WHERE embedding MATCH ? AND k = N. The result includes
@@ -593,13 +683,17 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 		ORDER BY v.distance`
 	rows, err := s.db.QueryContext(ctx, stmt, blob, fetch)
 	if err != nil {
-		return nil, fmt.Errorf("vec0 search: %w", err)
+		if ctx.Err() != nil {
+			return interruptedSearch(ctx.Err()), nil
+		}
+		return SearchResult{}, fmt.Errorf("vec0 search: %w", err)
 	}
 	defer rows.Close()
 
 	out := make([]types.Hit, 0, k)
 	rank := 0
 	for rows.Next() {
+		result.SearchedCount++
 		var (
 			c                                   types.Chunk
 			isTest                              int
@@ -628,7 +722,7 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 			&parentID, &parentStart, &parentEnd, &partOrdinal, &headingJSON,
 			&distance,
 		); err != nil {
-			return nil, fmt.Errorf("scan hit: %w", err)
+			return SearchResult{}, fmt.Errorf("scan hit: %w", err)
 		}
 		c.IsTest = isTest != 0
 		c.SymbolKind = types.SymbolKind(strings.TrimSpace(symKind.String))
@@ -638,7 +732,7 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 		c.Category = catCol.String
 		guide, err := policy.GuidanceFromJSON(guideJSON.String)
 		if err != nil {
-			return nil, fmt.Errorf("scan guidance for %s: %w", c.ID, err)
+			return SearchResult{}, fmt.Errorf("scan guidance for %s: %w", c.ID, err)
 		}
 		c.Guidance = guide
 		c.Invariants = unmarshalInvariantRefs(invJSON.String)
@@ -649,7 +743,7 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 		c.ParentID, c.ParentStartLine, c.ParentEndLine, c.PartOrdinal = parentID, parentStart, parentEnd, partOrdinal
 		if headingJSON != "" {
 			if err := json.Unmarshal([]byte(headingJSON), &c.HeadingPath); err != nil {
-				return nil, fmt.Errorf("scan heading path for %s: %w", c.ID, err)
+				return SearchResult{}, fmt.Errorf("scan heading path for %s: %w", c.ID, err)
 			}
 		}
 
@@ -670,18 +764,59 @@ func (s *Store) Search(ctx context.Context, query []float32, k int, filter types
 		}
 	}
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		interrupted := interruptedSearch(err)
+		result.Hits, result.Status, result.Reason = out, interrupted.Status, interrupted.Reason
+		return result, nil
 	}
 	if err := rows.Err(); err != nil {
-		return nil, err
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			interrupted := interruptedSearch(err)
+			result.Hits, result.Status, result.Reason = out, interrupted.Status, interrupted.Reason
+			return result, nil
+		}
+		return SearchResult{}, err
 	}
 	if !filter.IsZero() && len(out) < k {
 		if err := rows.Close(); err != nil {
-			return nil, err
+			return SearchResult{}, err
 		}
-		return s.searchExact(ctx, query, k, filter)
+		if result.CandidateCount > maxExact {
+			result.Hits, result.Status, result.Reason = out, SearchIncomplete, "candidate_limit"
+			return result, nil
+		}
+		var eligible int
+		hits, err := s.searchExact(ctx, query, k, filter, &eligible)
+		if err != nil {
+			if ctx.Err() != nil {
+				return interruptedSearch(ctx.Err()), nil
+			}
+			return SearchResult{}, err
+		}
+		result.Hits, result.EligibleCount, result.SearchedCount = hits, &eligible, eligible
+		return result, nil
 	}
-	return out, nil
+	result.Hits = out
+	if filter.IsZero() && len(out) < k {
+		count, err := s.candidateCount(ctx, filter)
+		if err != nil {
+			if ctx.Err() != nil {
+				return interruptedSearch(ctx.Err()), nil
+			}
+			return SearchResult{}, err
+		}
+		result.CandidateCount, result.EligibleCount = count, &count
+		if count > len(out) {
+			result.Status, result.Reason = SearchIncomplete, "index_underfilled"
+		}
+	}
+	return result, nil
+}
+
+func interruptedSearch(err error) SearchResult {
+	if errors.Is(err, context.DeadlineExceeded) {
+		return SearchResult{Status: SearchIncomplete, Reason: "deadline_exceeded"}
+	}
+	return SearchResult{Status: SearchCancelled, Reason: "context_cancelled"}
 }
 
 // candidateWhere pushes exact metadata predicates and a safe literal prefix
@@ -747,7 +882,7 @@ func (s *Store) candidateCount(ctx context.Context, filter types.Filter) (int, e
 // searchExact scores every eligible vector with vec0's Euclidean metric and
 // retains the nearest k. The SQL predicate narrows the scan before the full
 // filter is applied, including PathGlob and test-support path rules.
-func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter types.Filter) ([]types.Hit, error) {
+func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter types.Filter, eligible *int) ([]types.Hit, error) {
 	where, args := candidateWhere(filter)
 	stmt := `SELECT ` + chunkSelectCols + ` FROM chunks c WHERE ` + where
 	rows, err := s.db.QueryContext(ctx, stmt, args...)
@@ -770,6 +905,7 @@ func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+	*eligible = len(chunks)
 
 	scored := make([]types.Hit, 0, len(chunks))
 	for _, c := range chunks {
