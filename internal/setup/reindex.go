@@ -382,6 +382,9 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if err := captured.VerifyAgainst(vo.Src); err != nil {
 			return fmt.Errorf("reindex: staged source changed during build: %w", err)
 		}
+		if err := VerifyEngineInputs(vo.Out, captured); err != nil {
+			return fmt.Errorf("reindex: %w", err)
+		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		current, err := CommittedSourceIdentity(o.Src, o.ProjectID, gopt.ExpectedSourceSnapshot.SourceCommit)
