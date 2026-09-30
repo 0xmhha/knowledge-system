@@ -171,7 +171,7 @@ func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, err
 		if info.Size() > maxBytes {
 			return nil, fmt.Errorf("capture file byte limit exceeded at %q", rel)
 		}
-		file, err := root.Open(filepath.FromSlash(rel))
+		file, err := openCapturedNoFollow(root.Name(), rel)
 		if err != nil {
 			return nil, fmt.Errorf("open captured source %q: %w", rel, err)
 		}

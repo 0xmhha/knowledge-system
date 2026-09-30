@@ -35,6 +35,15 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 	if len(p.Concepts) != 20 || len(p.Evidence) != 20 || len(pack.CompetencyQuestions) < 5 {
 		t.Fatalf("pilot shape: %d concepts, %d spans, %d questions", len(p.Concepts), len(p.Evidence), len(pack.CompetencyQuestions))
 	}
+	if err := ValidateCoreOntology(p); err != nil {
+		t.Fatalf("approved D1 core vocabulary: %v", err)
+	}
+	changedKind := p
+	changedKind.Concepts = append([]Concept(nil), p.Concepts...)
+	changedKind.Concepts[0].Kind = "artifact"
+	if err := ValidateCoreOntology(changedKind); err == nil {
+		t.Fatal("D1 core type redefinition accepted")
+	}
 	for _, concept := range p.Concepts {
 		if concept.Status != StatusProposed || concept.ReviewedBy != "" {
 			t.Fatalf("pilot concept prematurely promoted: %+v", concept)
@@ -64,6 +73,22 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 	review, err := p.Review(5, "domain-audit")
 	if err != nil || review.ConceptProposed != 20 || review.ConceptPrecision != nil || len(review.ConceptSample) != 5 {
 		t.Fatalf("pilot review queue: %+v, err=%v", review, err)
+	}
+	if len(review.ReviewQueue) != 23 { // 20 concepts + 3 pilot requirements
+		t.Fatalf("full review queue must include every proposal, got %d", len(review.ReviewQueue))
+	}
+	var queuedConcepts int
+	for _, item := range review.ReviewQueue {
+		if item.Status != StatusProposed || item.HoldReason != "awaiting_human_review" ||
+			item.ReviewedBy != "" || len(item.Evidence) == 0 {
+			t.Fatalf("unreviewed item lacks source or hold reason: %+v", item)
+		}
+		if item.Kind == "concept" {
+			queuedConcepts++
+		}
+	}
+	if queuedConcepts != 20 {
+		t.Fatalf("pilot 20 concept queue incomplete: %d", queuedConcepts)
 	}
 	if len(review.AmbiguousTerms) != 0 {
 		t.Fatalf("unexpected ambiguous pilot terms: %+v", review.AmbiguousTerms)

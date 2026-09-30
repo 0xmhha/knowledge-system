@@ -72,12 +72,21 @@ type Manifest struct {
 	// domain-knowledge corpus). Recorded so callers can see every source
 	// the index covers. Additive — old readers see nil.
 	DocsRoots []string `json:"docs_roots,omitempty"`
+	// InputFiles records in-tree files that actually produced chunks. Pinned
+	// builds reconcile these byte hashes with the retained source inventory.
+	InputFiles []InputFile `json:"input_files,omitempty"`
 
 	// Sources is the per-layer knowledge-cutoff ledger (reindex-migration
 	// design §2.2): what each layer was built from, so a reindex knows what
 	// is stale and CKS can detect a CKG↔CKV mismatch. Additive — old readers
 	// see nil; each sub-block is omitted when that layer was not built.
 	Sources *Sources `json:"sources,omitempty"`
+}
+
+type InputFile struct {
+	OriginID string `json:"origin_id"`
+	Path     string `json:"path"`
+	SHA256   string `json:"sha256"`
 }
 
 // Sources records the origin + cutoff of each knowledge layer in the index.

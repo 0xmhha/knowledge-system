@@ -37,9 +37,24 @@ func TestEngineInputReconciliationRejectsUnknownAndAlteredSources(t *testing.T) 
 		}
 	}
 	write("main.go", "correct")
+	vectorManifest := filepath.Join(vectorDir, "manifest.json")
+	writeVector := func(sha string) {
+		t.Helper()
+		if err := writeJSONAtomic(vectorManifest, map[string]any{"input_files": []map[string]string{
+			{"origin_id": "repo", "path": "main.go", "sha256": sha},
+		}}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	writeVector("correct")
 	if err := VerifyEngineInputs(version, captured); err != nil {
 		t.Fatal(err)
 	}
+	writeVector("different")
+	if err := VerifyEngineInputs(version, captured); err == nil {
+		t.Fatal("changed CKV input hash accepted")
+	}
+	writeVector("correct")
 	write("main.go", "different")
 	if err := VerifyEngineInputs(version, captured); err == nil {
 		t.Fatal("changed CKG input hash accepted")

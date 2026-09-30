@@ -37,6 +37,24 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 			return fmt.Errorf("reconcile graph input %q differs from retained source", f.Path)
 		}
 	}
+	var vector struct {
+		InputFiles []struct {
+			OriginID string `json:"origin_id"`
+			Path     string `json:"path"`
+			SHA256   string `json:"sha256"`
+		} `json:"input_files"`
+	}
+	if err := readJSON(filepath.Join(versionDir, "vector", "manifest.json"), &vector); err != nil {
+		return fmt.Errorf("reconcile vector manifest: %w", err)
+	}
+	vectorFiles := make(map[string]string, len(vector.InputFiles))
+	for _, f := range vector.InputFiles {
+		if f.OriginID != "repo" || f.Path == "" || files[f.Path] == "" ||
+			files[f.Path] != f.SHA256 || vectorFiles[f.Path] != "" {
+			return fmt.Errorf("reconcile vector input %q differs from retained source", f.Path)
+		}
+		vectorFiles[f.Path] = f.SHA256
+	}
 	dbPath := filepath.Join(versionDir, "vector", "vector.db")
 	db, err := sql.Open("sqlite3", "file:"+dbPath+"?mode=ro")
 	if err != nil {
@@ -56,7 +74,7 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 			return err
 		}
 		if path == "" || filepath.IsAbs(path) || filepath.ToSlash(filepath.Clean(path)) != path ||
-			path == ".." || strings.HasPrefix(path, "../") || files[path] == "" {
+			path == ".." || strings.HasPrefix(path, "../") || vectorFiles[path] == "" {
 			return fmt.Errorf("reconcile vector input %q is absent from retained source", path)
 		}
 	}

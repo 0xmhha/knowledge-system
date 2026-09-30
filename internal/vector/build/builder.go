@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -294,6 +295,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	totalStats := chunk.Stats{}
 	languageCounts := make(map[string]int)
 	indexedFiles := 0
+	var inputFiles []manifest.InputFile
 	chunker := newChunker(o.Embedder, cfg)
 	embedTextFn := resolveEmbedTextFn(ctx, o.DisableContextualPrefix, resolveLLMPrefixer(o.LLMPrefixModel, o.OutDir))
 
@@ -372,6 +374,14 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 			}
 			if len(chunks) == 0 {
 				return
+			}
+			if o.DatasetID != "" {
+				digest, hashErr := fileSHA256(f.AbsPath)
+				if hashErr != nil {
+					perFileErr = fmt.Errorf("hash vector source %s: %w", f.RelPath, hashErr)
+					return
+				}
+				inputFiles = append(inputFiles, manifest.InputFile{OriginID: "repo", Path: f.RelPath, SHA256: digest})
 			}
 			// CKG alignment: stamp each chunk's CanonicalID by matching
 			// (file_path, start_line) into the in-memory ckg index.
@@ -633,6 +643,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	}
 
 	ckvVersion := o.Version
+	sort.Slice(inputFiles, func(i, j int) bool { return inputFiles[i].Path < inputFiles[j].Path })
 	if ckvVersion == "" {
 		ckvVersion = "dev"
 	}
@@ -656,6 +667,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		Languages:           languageCounts,
 		CKVIgnore:           o.CKVIgnore,
 		DocsRoots:           absRoots(manifestDocsRoots),
+		InputFiles:          inputFiles,
 	}
 	man.Sources = buildSourcesLedger(o, commit, builtAt, prSource)
 

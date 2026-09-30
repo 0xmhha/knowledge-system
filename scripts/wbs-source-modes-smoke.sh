@@ -64,6 +64,7 @@ for version in ('clean', 'modified', 'added', 'remodified'):
     assert identity['dataset_id']
     inventory = json.loads((root / 'sources' / 'manifest.json').read_text())
     assert inventory['identity'] == identity['source']
+    captured = {item['path']: item['sha256'] for item in inventory['files']}
     for item in inventory['files']:
         blob = (root / 'sources' / 'blobs' / item['sha256']).read_bytes()
         assert hashlib.sha256(blob).hexdigest() == item['sha256']
@@ -71,6 +72,11 @@ for version in ('clean', 'modified', 'added', 'remodified'):
         manifest = json.loads((root / side / 'manifest.json').read_text())
         assert manifest['src_root'] == str(source)
         assert manifest['snapshot_id'] == identity['source']['snapshot_id']
+        if side == 'vector':
+            assert manifest['input_files']
+            for item in manifest['input_files']:
+                assert item['origin_id'] == 'repo'
+                assert captured[item['path']] == item['sha256']
         with sqlite3.connect(root / side / filename) as db:
             native = dict(db.execute('SELECT key, value FROM manifest'))
         assert native['snapshot_id'] == manifest['snapshot_id']

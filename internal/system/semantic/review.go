@@ -34,6 +34,17 @@ type RequirementReviewItem struct {
 	Evidence    EvidenceSpan `json:"evidence"`
 }
 
+// ReviewQueueItem makes every semantic proposal auditable even when the
+// randomized precision sample is smaller than the complete proposal set.
+type ReviewQueueItem struct {
+	Kind       string         `json:"kind"`
+	ID         string         `json:"id"`
+	Status     Status         `json:"status"`
+	Evidence   []EvidenceSpan `json:"evidence"`
+	ReviewedBy string         `json:"reviewed_by,omitempty"`
+	HoldReason string         `json:"hold_reason,omitempty"`
+}
+
 // AmbiguousTerm names one surface form shared by multiple concepts. It is a
 // reviewer warning, not an automatic equivalence or a validation error.
 type AmbiguousTerm struct {
@@ -72,6 +83,7 @@ type ReviewReport struct {
 	RequirementVerified int                     `json:"requirement_verified"`
 	RequirementRejected int                     `json:"requirement_rejected"`
 	RequirementSample   []RequirementReviewItem `json:"requirement_sample"`
+	ReviewQueue         []ReviewQueueItem       `json:"review_queue"`
 }
 
 // Review produces a deterministic sample of proposed claims. Salt permits
@@ -89,6 +101,7 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 		Total: len(p.Claims), AssertionTotal: len(p.Assertions), ConceptTotal: len(p.Concepts), RequirementTotal: len(p.Requirements),
 		Sample: []ReviewItem{}, AssertionSample: []AssertionReviewItem{},
 		ConceptSample: []ConceptReviewItem{}, AmbiguousTerms: []AmbiguousTerm{}, RequirementSample: []RequirementReviewItem{}}
+	r.ReviewQueue = []ReviewQueueItem{}
 	sections := make(map[string]DocumentSection, len(p.Sections))
 	for _, section := range p.Sections {
 		sections[section.ID] = section
@@ -97,12 +110,26 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	for _, e := range p.Evidence {
 		evidence[e.ID] = e
 	}
+	queue := func(kind, id string, status Status, reviewer string, ids ...string) {
+		item := ReviewQueueItem{Kind: kind, ID: id, Status: status, ReviewedBy: reviewer,
+			Evidence: make([]EvidenceSpan, 0, len(ids))}
+		if status == StatusProposed {
+			item.HoldReason = "awaiting_human_review"
+		} else if status == StatusRejected {
+			item.HoldReason = "rejected_by_reviewer"
+		}
+		for _, evidenceID := range ids {
+			item.Evidence = append(item.Evidence, evidence[evidenceID])
+		}
+		r.ReviewQueue = append(r.ReviewQueue, item)
+	}
 	type ranked struct {
 		key  string
 		item ReviewItem
 	}
 	var candidates []ranked
 	for _, claim := range p.Claims {
+		queue("claim", claim.ID, claim.Status, claim.ReviewedBy, claim.EvidenceIDs...)
 		switch claim.Status {
 		case StatusVerified:
 			r.Verified++
@@ -141,6 +168,7 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	}
 	var assertionCandidates []rankedAssertion
 	for _, assertion := range p.Assertions {
+		queue("assertion", assertion.ID, assertion.Status, assertion.ReviewedBy, assertion.EvidenceIDs...)
 		switch assertion.Status {
 		case StatusVerified:
 			r.AssertionVerified++
@@ -180,6 +208,7 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	}
 	var conceptCandidates []rankedConcept
 	for _, concept := range p.Concepts {
+		queue("concept", concept.ID, concept.Status, concept.ReviewedBy, concept.EvidenceID)
 		switch concept.Status {
 		case StatusVerified:
 			r.ConceptVerified++
@@ -215,6 +244,7 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	}
 	var requirementCandidates []rankedRequirement
 	for _, requirement := range p.Requirements {
+		queue("requirement", requirement.ID, requirement.Status, requirement.ReviewedBy, requirement.EvidenceID)
 		switch requirement.Status {
 		case StatusVerified:
 			r.RequirementVerified++
@@ -257,6 +287,12 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 			Lang: parts[0], Normalized: parts[1], ConceptIDs: ids,
 		})
 	}
+	sort.Slice(r.ReviewQueue, func(i, j int) bool {
+		if r.ReviewQueue[i].Kind == r.ReviewQueue[j].Kind {
+			return r.ReviewQueue[i].ID < r.ReviewQueue[j].ID
+		}
+		return r.ReviewQueue[i].Kind < r.ReviewQueue[j].Kind
+	})
 	sort.Slice(r.AmbiguousTerms, func(i, j int) bool {
 		if r.AmbiguousTerms[i].Lang == r.AmbiguousTerms[j].Lang {
 			return r.AmbiguousTerms[i].Normalized < r.AmbiguousTerms[j].Normalized
