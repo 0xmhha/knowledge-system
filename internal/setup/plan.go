@@ -19,6 +19,9 @@ import (
 
 // Options parameterizes one knowledge-setup plan.
 type Options struct {
+	// ProjectID is assigned once by cks init. Legacy configs may omit it;
+	// those builds remain unpinned until explicitly reinitialized.
+	ProjectID string
 	// Src is the source tree to index. Required.
 	Src string
 	// Out is the dataset root; the graph index lands in Out/graph and the

@@ -17,6 +17,9 @@ import (
 // check needs. Reading the JSON files directly (instead of importing engine
 // internals) keeps this package on the CLI-contract side of the boundary.
 type graphManifest struct {
+	ProjectID     string `json:"project_id"`
+	SnapshotID    string `json:"snapshot_id"`
+	DatasetID     string `json:"dataset_id"`
 	SchemaVersion string `json:"schema_version"`
 	SrcRoot       string `json:"src_root"`
 	SrcCommit     string `json:"src_commit"`
@@ -24,9 +27,12 @@ type graphManifest struct {
 }
 
 type vectorManifest struct {
-	SrcRoot   string `json:"src_root"`
-	SrcCommit string `json:"src_commit"`
-	Sources   *struct {
+	ProjectID  string `json:"project_id"`
+	SnapshotID string `json:"snapshot_id"`
+	DatasetID  string `json:"dataset_id"`
+	SrcRoot    string `json:"src_root"`
+	SrcCommit  string `json:"src_commit"`
+	Sources    *struct {
 		CKG *struct {
 			GraphDigest string `json:"graph_digest"`
 			SrcCommit   string `json:"src_commit"`
@@ -56,6 +62,17 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	var vm vectorManifest
 	if err := readJSON(filepath.Join(vectorDir, "manifest.json"), &vm); err != nil {
 		return fmt.Errorf("verify: vector manifest: %w", err)
+	}
+	// Legacy manifests lack all three fields. A partially upgraded build is
+	// unsafe: do not silently downgrade it to commit-only alignment.
+	graphPinned := gm.ProjectID != "" || gm.SnapshotID != "" || gm.DatasetID != ""
+	vectorPinned := vm.ProjectID != "" || vm.SnapshotID != "" || vm.DatasetID != ""
+	if graphPinned || vectorPinned {
+		if gm.ProjectID == "" || gm.SnapshotID == "" || gm.DatasetID == "" ||
+			vm.ProjectID == "" || vm.SnapshotID == "" || vm.DatasetID == "" ||
+			gm.ProjectID != vm.ProjectID || gm.SnapshotID != vm.SnapshotID || gm.DatasetID != vm.DatasetID {
+			return fmt.Errorf("verify: project/snapshot/dataset identity missing or mismatched across graph and vector")
+		}
 	}
 	// A commit and logical graph digest identify content, but not which source
 	// tree the two builders read. In particular, two checkouts at the same HEAD

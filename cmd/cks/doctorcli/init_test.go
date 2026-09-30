@@ -19,8 +19,19 @@ func TestInitWritesLoadableProjectConfigWithoutOverwrite(t *testing.T) {
 		t.Fatalf("init: %+v, %v", result, err)
 	}
 	loaded, err := setup.LoadConfig(configPath)
-	if err != nil || loaded.Src != result.SourceRoot || loaded.Out != result.Dataset || loaded.Embedder != "mock" {
+	if err != nil || loaded.Src != result.SourceRoot || loaded.Out != result.Dataset || loaded.Embedder != "mock" || loaded.ProjectID != result.ProjectID || !strings.HasPrefix(result.ProjectID, "p-") {
 		t.Fatalf("setup config not loadable: %+v, %v", loaded, err)
+	}
+	second, err := Init(root, filepath.Join(other, "datasets", "project-b"), filepath.Join(other, "configs", "second.yaml"), "mock", "")
+	if err != nil || second.ProjectID == result.ProjectID {
+		t.Fatalf("same source name reused project ID: %+v, %v", second, err)
+	}
+	explicit, err := InitWithProjectID(root, filepath.Join(other, "datasets", "project-c"), filepath.Join(other, "configs", "explicit.yaml"), "mock", "", "team.alpha")
+	if err != nil || explicit.ProjectID != "team.alpha" {
+		t.Fatalf("explicit project ID: %+v, %v", explicit, err)
+	}
+	if _, err := InitWithProjectID(root, dataset, filepath.Join(other, "invalid-id.yaml"), "mock", "", "../escape"); err == nil {
+		t.Fatal("unsafe project ID accepted")
 	}
 	if _, err := Init(root, dataset, configPath, "mock", ""); err == nil || !strings.Contains(err.Error(), "without replacing") {
 		t.Fatalf("existing config overwritten: %v", err)

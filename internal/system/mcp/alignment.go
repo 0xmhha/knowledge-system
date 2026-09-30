@@ -46,7 +46,10 @@ type AlignmentSources struct {
 // AlignmentReport is the health-facing verdict of the startup assert. OK=false
 // makes the instance non-serviceable (fail-loud, 2026-06-15 policy).
 type AlignmentReport struct {
-	OK bool `json:"ok"`
+	OK         bool   `json:"ok"`
+	ProjectID  string `json:"project_id,omitempty"`
+	SnapshotID string `json:"snapshot_id,omitempty"`
+	DatasetID  string `json:"dataset_id,omitempty"`
 	// DatasetVersion is the version label of the dataset directory the
 	// instance resolved at startup (the "@<ver>" segment when the versioned
 	// blue-green layout is in use; empty for legacy flat layouts).
@@ -79,6 +82,7 @@ type AlignmentReport struct {
 // AlignmentInputs carries everything ComputeAlignment needs; the caller
 // (cmd/cks-mcp) gathers them at startup.
 type AlignmentInputs struct {
+	CKGManifest []byte
 	// CKG coordinates (from ckgclient.Health / the graph manifest).
 	CKGSrcCommit string
 	CKGSchema    string
@@ -102,6 +106,9 @@ type AlignmentInputs struct {
 // indexes, in which case top-level src_commit/src_root are the fallback
 // coordinates.
 type ckvManifest struct {
+	ProjectID   string `json:"project_id"`
+	SnapshotID  string `json:"snapshot_id"`
+	DatasetID   string `json:"dataset_id"`
 	SrcCommit   string `json:"src_commit"`
 	IndexedHead string `json:"indexed_head"`
 	SrcRoot     string `json:"src_root"`
@@ -174,6 +181,27 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 		errs = append(errs, fmt.Sprintf(
 			"graph digest mismatch (ckg %.12s, ckv aligned to %.12s) — ckv canonical_id stale",
 			in.CKGDigest, rep.GraphDigestExpected))
+	}
+	var graph struct {
+		ProjectID  string `json:"project_id"`
+		SnapshotID string `json:"snapshot_id"`
+		DatasetID  string `json:"dataset_id"`
+	}
+	if len(in.CKGManifest) > 0 {
+		if err := json.Unmarshal(in.CKGManifest, &graph); err != nil {
+			errs = append(errs, "ckg identity manifest unparsable")
+		}
+	}
+	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
+	vectorPinned := m.ProjectID != "" || m.SnapshotID != "" || m.DatasetID != ""
+	if graphPinned || vectorPinned {
+		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" ||
+			m.ProjectID == "" || m.SnapshotID == "" || m.DatasetID == "" ||
+			graph.ProjectID != m.ProjectID || graph.SnapshotID != m.SnapshotID || graph.DatasetID != m.DatasetID {
+			errs = append(errs, "ckg/ckv project, snapshot or dataset identity mismatched")
+		} else {
+			rep.ProjectID, rep.SnapshotID, rep.DatasetID = graph.ProjectID, graph.SnapshotID, graph.DatasetID
+		}
 	}
 
 	// --- WARNING tier -----------------------------------------------------

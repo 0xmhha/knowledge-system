@@ -1,10 +1,12 @@
 package doctorcli
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -12,6 +14,7 @@ import (
 )
 
 type InitResult struct {
+	ProjectID  string `json:"project_id"`
 	ConfigPath string `json:"config_path"`
 	SourceRoot string `json:"source_root"`
 	Dataset    string `json:"dataset"`
@@ -19,11 +22,11 @@ type InitResult struct {
 }
 
 func NewInitCmd() *cobra.Command {
-	var src, dataset, configPath, embedder, model string
+	var src, dataset, configPath, embedder, model, projectID string
 	cmd := &cobra.Command{Use: "init", Short: "Write a project-specific setup config without indexing",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			result, err := Init(src, dataset, configPath, embedder, model)
+			result, err := InitWithProjectID(src, dataset, configPath, embedder, model, projectID)
 			if err != nil {
 				return err
 			}
@@ -35,6 +38,7 @@ func NewInitCmd() *cobra.Command {
 	cmd.Flags().StringVar(&configPath, "config-out", "", "new setup YAML path; existing files are never overwritten")
 	cmd.Flags().StringVar(&embedder, "embedder", "", "embedding backend: ollama, bgeonnx, or mock (test only)")
 	cmd.Flags().StringVar(&model, "model-name", "", "embedding model name (required for real backends)")
+	cmd.Flags().StringVar(&projectID, "project-id", "", "stable project ID; generated once when omitted")
 	for _, flag := range []string{"src", "dataset", "config-out", "embedder"} {
 		_ = cmd.MarkFlagRequired(flag)
 	}
@@ -44,11 +48,30 @@ func NewInitCmd() *cobra.Command {
 // Init writes only the setup config. The user chooses a model explicitly;
 // a mock backend is accepted solely when selected by name for structural tests.
 func Init(src, dataset, configPath, embedder, model string) (InitResult, error) {
+	return InitWithProjectID(src, dataset, configPath, embedder, model, "")
+}
+
+var projectIDPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$`)
+
+// InitWithProjectID preserves a caller-supplied project identity or generates
+// one from cryptographic randomness. It never derives identity from a path,
+// repository name, or remote URL, which can change or collide.
+func InitWithProjectID(src, dataset, configPath, embedder, model, projectID string) (InitResult, error) {
 	if embedder != "ollama" && embedder != "bgeonnx" && embedder != "mock" {
 		return InitResult{}, fmt.Errorf("init: unknown embedder %q", embedder)
 	}
 	if embedder != "mock" && model == "" {
 		return InitResult{}, fmt.Errorf("init: --model-name is required for %s", embedder)
+	}
+	if projectID == "" {
+		var entropy [16]byte
+		if _, err := rand.Read(entropy[:]); err != nil {
+			return InitResult{}, fmt.Errorf("init: create project ID: %w", err)
+		}
+		projectID = fmt.Sprintf("p-%x", entropy)
+	}
+	if !projectIDPattern.MatchString(projectID) {
+		return InitResult{}, fmt.Errorf("init: invalid project ID %q", projectID)
 	}
 	report, err := Inspect(src, "")
 	if err != nil {
@@ -67,11 +90,12 @@ func Init(src, dataset, configPath, embedder, model string) (InitResult, error) 
 		return InitResult{}, err
 	}
 	config := struct {
+		ProjectID string `yaml:"project_id"`
 		Src       string `yaml:"src"`
 		Out       string `yaml:"out"`
 		Embedder  string `yaml:"embedder"`
 		ModelName string `yaml:"model_name,omitempty"`
-	}{Src: report.SourceRoot, Out: dataset, Embedder: embedder, ModelName: model}
+	}{ProjectID: projectID, Src: report.SourceRoot, Out: dataset, Embedder: embedder, ModelName: model}
 	buf, err := yaml.Marshal(config)
 	if err != nil {
 		return InitResult{}, err
@@ -92,7 +116,7 @@ func Init(src, dataset, configPath, embedder, model string) (InitResult, error) 
 		os.Remove(configPath)
 		return InitResult{}, err
 	}
-	return InitResult{ConfigPath: configPath, SourceRoot: report.SourceRoot, Dataset: dataset, Embedder: embedder}, nil
+	return InitResult{ProjectID: projectID, ConfigPath: configPath, SourceRoot: report.SourceRoot, Dataset: dataset, Embedder: embedder}, nil
 }
 
 func resolvedFuturePath(path string) (string, error) {

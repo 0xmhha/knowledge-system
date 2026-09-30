@@ -137,14 +137,33 @@ func (l *reindexLock) release() {
 // `current` pointed at before the swap ("" if none) so the caller can record a
 // rollback target. The version directory must already exist.
 func Promote(dataset, version string) (prev string, err error) {
+	if err := validateVersion(version); err != nil {
+		return "", err
+	}
 	vdir := filepath.Join(dataset, version)
 	fi, err := os.Stat(vdir)
 	if err != nil || !fi.IsDir() {
 		return "", fmt.Errorf("promote: version %q not found under %s", version, dataset)
 	}
+	targetIdentity, err := verifyVersionIdentityIfPresent(vdir)
+	if err != nil {
+		return "", fmt.Errorf("promote: target identity: %w", err)
+	}
 	current := filepath.Join(dataset, "current")
 	if t, rerr := os.Readlink(current); rerr == nil {
+		if err := validateVersion(t); err != nil {
+			return "", fmt.Errorf("promote: unsafe current target: %w", err)
+		}
 		prev = t
+		if targetIdentity != nil {
+			currentIdentity, err := verifyVersionIdentityIfPresent(filepath.Join(dataset, t))
+			if err != nil {
+				return prev, fmt.Errorf("promote: current identity: %w", err)
+			}
+			if currentIdentity != nil && currentIdentity.Source.ProjectID != targetIdentity.Source.ProjectID {
+				return prev, fmt.Errorf("promote: cannot mix project IDs in one dataset root")
+			}
+		}
 	}
 	tmp := filepath.Join(dataset, fmt.Sprintf(".current.tmp-%d", os.Getpid()))
 	_ = os.Remove(tmp)
@@ -179,6 +198,10 @@ type GateOptions struct {
 	// ExpectedSourceCommit, when set, enforces committed mode at promotion.
 	// A dirty or moved source tree, or an index from another commit, fails.
 	ExpectedSourceCommit string
+	// ExpectedSourceSnapshot pins the exact tracked bytes at build start.
+	// Empty means a legacy commit-only build.
+	ExpectedSourceSnapshot SourceIdentity
+	ExpectedInputDigest    string
 }
 
 // gateVecManifest is the read-only projection of the vector manifest the gate
@@ -220,6 +243,11 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 	// 2. Coordinate alignment (hard): same commit, matching digest pin, schema>=1.19.
 	if err := VerifyAlignment(graphDir, vectorDir, emit); err != nil {
 		return fmt.Errorf("gate: %w", err)
+	}
+	if o.ExpectedSourceSnapshot.SnapshotID != "" {
+		if err := VerifyCandidateIdentity(vdir, o.ExpectedSourceSnapshot, o.ExpectedInputDigest); err != nil {
+			return fmt.Errorf("gate: %w", err)
+		}
 	}
 
 	// 3 & 4. Vector chunk count + canonical_id coverage (hard).
@@ -276,6 +304,12 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 			return fmt.Errorf("gate: source changed during build; current left unchanged")
 		}
 	}
+	if o.ExpectedSourceSnapshot.SnapshotID != "" {
+		current, err := CommittedSourceIdentity(o.Src, o.ExpectedSourceSnapshot.ProjectID, o.ExpectedSourceSnapshot.SourceCommit)
+		if err != nil || current != o.ExpectedSourceSnapshot {
+			return fmt.Errorf("gate: source snapshot changed during build; current left unchanged: %v", err)
+		}
+	}
 	return nil
 }
 
@@ -304,6 +338,19 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	if err := Execute(ctx, plan, r, emit); err != nil {
 		return fmt.Errorf("reindex: build version %s: %w", version, err)
 	}
+	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
+		current, err := CommittedSourceIdentity(o.Src, o.ProjectID, gopt.ExpectedSourceSnapshot.SourceCommit)
+		if err != nil || current != gopt.ExpectedSourceSnapshot {
+			return fmt.Errorf("reindex: source changed during build: %v", err)
+		}
+		inputs, err := ConfiguredInputDigest(o)
+		if err != nil || inputs != gopt.ExpectedInputDigest {
+			return fmt.Errorf("reindex: build inputs changed during build: %v", err)
+		}
+		if _, err := PublishCandidateIdentity(vo.Out, current, inputs); err != nil {
+			return fmt.Errorf("reindex: publish candidate identity: %w", err)
+		}
+	}
 
 	if gopt.GraphBin == "" {
 		gopt.GraphBin = o.GraphBin
@@ -313,6 +360,12 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 	if err := Gate(ctx, dataset, version, gopt, r, emit); err != nil {
 		return fmt.Errorf("reindex: %w (current left unchanged; version %s kept for diagnosis)", err, version)
+	}
+	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
+		inputs, err := ConfiguredInputDigest(o)
+		if err != nil || inputs != gopt.ExpectedInputDigest {
+			return fmt.Errorf("reindex: build inputs changed before promotion; current left unchanged: %v", err)
+		}
 	}
 
 	prev, err := Promote(dataset, version)

@@ -163,6 +163,7 @@ func runSetup(args []string) error {
 	var o setup.Options
 	fs := flag.NewFlagSet("setup", flag.ContinueOnError)
 	config := fs.String("config", "", "setup config file (e.g. projects/<name>/setup.yaml); explicit flags override its values")
+	fs.StringVar(&o.ProjectID, "project-id", "", "stable project identity from cks init")
 	fs.StringVar(&o.Src, "src", "", "source tree to index (required)")
 	fs.StringVar(&o.Out, "out", "", "dataset root; graph index in <out>/graph, vector index in <out>/vector (required)")
 	fs.StringVar(&o.GraphBin, "graph-bin", "", "graph engine CLI (default: ckg beside this binary, else PATH)")
@@ -210,6 +211,7 @@ func runSetup(args []string) error {
 			}
 		}
 		merge("src", &o.Src, base.Src)
+		merge("project-id", &o.ProjectID, base.ProjectID)
 		merge("out", &o.Out, base.Out)
 		merge("graph-bin", &o.GraphBin, base.GraphBin)
 		merge("vector-bin", &o.VectorBin, base.VectorBin)
@@ -256,10 +258,22 @@ func runSetup(args []string) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	var preBuildCommit string
+	var preBuildSnapshot setup.SourceIdentity
+	var preBuildInputs string
 	if *rollback == "" {
 		preBuildCommit, err = committedSourceCommit(o.Src)
 		if err != nil {
 			return err
+		}
+		if o.ProjectID != "" {
+			preBuildSnapshot, err = setup.CommittedSourceIdentity(o.Src, o.ProjectID, preBuildCommit)
+			if err != nil {
+				return err
+			}
+			preBuildInputs, err = setup.ConfiguredInputDigest(o)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -286,7 +300,8 @@ func runSetup(args []string) error {
 			return fmt.Errorf("--gate-test-arg requires --gate-test-bin")
 		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
-			ExpectedSourceCommit: preBuildCommit}
+			ExpectedSourceCommit: preBuildCommit, ExpectedSourceSnapshot: preBuildSnapshot,
+			ExpectedInputDigest: preBuildInputs}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
 		}
@@ -316,6 +331,21 @@ func runSetup(args []string) error {
 		postBuildCommit, err := committedSourceCommit(o.Src)
 		if err != nil || postBuildCommit != preBuildCommit {
 			return fmt.Errorf("source changed during build; dataset cannot be treated as a committed snapshot: %v", err)
+		}
+		if preBuildSnapshot.SnapshotID != "" {
+			postBuildSnapshot, err := setup.CommittedSourceIdentity(o.Src, o.ProjectID, postBuildCommit)
+			if err != nil || postBuildSnapshot != preBuildSnapshot {
+				return fmt.Errorf("source snapshot changed during build: %v", err)
+			}
+			postBuildInputs, err := setup.ConfiguredInputDigest(o)
+			if err != nil || postBuildInputs != preBuildInputs {
+				return fmt.Errorf("build inputs changed during build: %v", err)
+			}
+			if !o.SkipVector {
+				if _, err := setup.PublishCandidateIdentity(o.Out, postBuildSnapshot, postBuildInputs); err != nil {
+					return err
+				}
+			}
 		}
 		fmt.Fprintln(os.Stderr, "setup: dataset ready at", o.Out)
 	}

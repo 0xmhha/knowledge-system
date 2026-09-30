@@ -13,6 +13,7 @@ import (
 // against the config file's directory so a pack can reference its own data
 // portably.
 type fileConfig struct {
+	ProjectID           string `yaml:"project_id"`
 	Src                 string `yaml:"src"`
 	Out                 string `yaml:"out"`
 	GraphBin            string `yaml:"graph_bin"`
@@ -55,6 +56,7 @@ func LoadConfig(path string) (Options, error) {
 		return filepath.Join(base, p)
 	}
 	return Options{
+		ProjectID:           fc.ProjectID,
 		Src:                 rel(fc.Src),
 		Out:                 rel(fc.Out),
 		GraphBin:            fc.GraphBin,

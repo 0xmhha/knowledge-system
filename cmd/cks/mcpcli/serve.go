@@ -682,6 +682,11 @@ func computeStartupAlignment(ctx context.Context, cfg *config.Config, be *backen
 		in.CKGSchema = h.SchemaVersion
 		in.CKGDigest = h.GraphDigest // empty on pre-digest graphs; assert stays commit-only
 	}
+	if cfg.Backends.CKG.Path != "" {
+		if raw, err := os.ReadFile(filepath.Join(filepath.Dir(cfg.Backends.CKG.Path), "manifest.json")); err == nil {
+			in.CKGManifest = raw
+		}
+	}
 	if cfg.Backends.CKV.Path != "" {
 		in.CKVConfigured = true
 		if raw, err := os.ReadFile(filepath.Join(cfg.Backends.CKV.Path, "manifest.json")); err == nil {
