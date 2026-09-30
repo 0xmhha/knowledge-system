@@ -29,6 +29,29 @@ func TestSourceIdentityLengthPrefixedGolden(t *testing.T) {
 	}
 }
 
+func TestKnowledgeInputsChangeDatasetRecipe(t *testing.T) {
+	root := t.TempDir()
+	file := filepath.Join(root, "policy.yaml")
+	if err := os.WriteFile(file, []byte("status: proposed\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	o := Options{KnowledgeInputs: []KnowledgeInput{{Role: "knowledge-overlay", Path: root}}}
+	first, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(file, []byte("status: verified\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	second, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first == second {
+		t.Fatal("knowledge policy bytes did not change build identity")
+	}
+}
+
 func identityGit(t *testing.T, root string, args ...string) string {
 	t.Helper()
 	cmd := exec.Command("git", args...)

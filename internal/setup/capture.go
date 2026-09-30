@@ -193,6 +193,21 @@ func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, err
 	return nil, fmt.Errorf("empty capture path")
 }
 
+// ReadSourceFileNoFollow is the shared byte reader for registered local
+// knowledge packs. It applies the same portable path and no-follow checks as
+// source capture; callers still decide which paths their policy permits.
+func ReadSourceFileNoFollow(rootPath, rel string, maxBytes int64) ([]byte, error) {
+	if err := validateCapturedPaths([]string{rel}); err != nil {
+		return nil, err
+	}
+	root, err := os.OpenRoot(rootPath)
+	if err != nil {
+		return nil, err
+	}
+	defer root.Close()
+	return readCapturedRegular(root, rel, maxBytes)
+}
+
 func captureHead(root string) (string, error) {
 	cmd := exec.Command("git", "-C", root, "rev-parse", "HEAD")
 	buf, err := cmd.Output()

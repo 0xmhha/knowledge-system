@@ -28,6 +28,7 @@ import (
 	"syscall"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/knowledgepack"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 )
@@ -257,6 +258,33 @@ func runSetup(args []string) error {
 	}
 	if o.VectorBin == "" {
 		o.VectorBin = siblingBin("ckv")
+	}
+	if *rollback == "" && o.Src != "" {
+		manifestPath := filepath.Join(o.Src, ".cks", "knowledge", "manifest.yaml")
+		if _, statErr := os.Lstat(manifestPath); statErr == nil {
+			if *version == "" || o.ProjectID == "" {
+				return fmt.Errorf("a local knowledge pack requires a pinned version and project ID")
+			}
+			lock, err := knowledgepack.VerifyLock(o.Src)
+			if err != nil {
+				return err
+			}
+			if lock.ProjectID != o.ProjectID {
+				return fmt.Errorf("pack_incompatible: project ID differs from knowledge lock")
+			}
+			manifest, err := knowledgepack.ReadManifest(o.Src)
+			if err != nil {
+				return err
+			}
+			o.KnowledgeInputs = append(o.KnowledgeInputs, setup.KnowledgeInput{
+				Role: "knowledge-overlay", Path: filepath.Join(o.Src, ".cks", "knowledge")})
+			for _, selected := range manifest.SelectedPacks {
+				o.KnowledgeInputs = append(o.KnowledgeInputs, setup.KnowledgeInput{
+					Role: "knowledge-pack:" + selected.PackID, Path: filepath.Join(o.Src, selected.Source)})
+			}
+		} else if !os.IsNotExist(statErr) {
+			return statErr
+		}
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

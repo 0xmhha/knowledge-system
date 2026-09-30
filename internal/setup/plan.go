@@ -19,6 +19,10 @@ import (
 
 // Options parameterizes one knowledge-setup plan.
 type Options struct {
+	// KnowledgeInputs are verified local D5 overlay and selected pack roots.
+	// Their bytes contribute to the build recipe and are checked again before
+	// promotion. Paths are resolved before this options struct is used.
+	KnowledgeInputs []KnowledgeInput
 	// ProjectID is assigned once by cks init. Legacy configs may omit it;
 	// those builds remain unpinned until explicitly reinitialized.
 	ProjectID           string
@@ -99,6 +103,11 @@ type Options struct {
 	// CksBin is the cks binary hosting the domain toolchain subcommands
 	// (`cks domain <tool>`). Empty falls back to "cks" on PATH.
 	CksBin string
+}
+
+type KnowledgeInput struct {
+	Role string
+	Path string
 }
 
 // GraphDir / VectorDir are the per-engine data directories under Out.

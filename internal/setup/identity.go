@@ -194,6 +194,15 @@ func ConfiguredInputDigest(o Options) (string, error) {
 		{"semantic-corpus", o.SemanticCorpus, true},
 		{"domain-knowledge", o.DomainKnowledge, true},
 	}
+	for _, knowledge := range o.KnowledgeInputs {
+		if knowledge.Role == "" || knowledge.Path == "" {
+			return "", fmt.Errorf("invalid registered knowledge input")
+		}
+		inputs = append(inputs, struct {
+			role, path string
+			folder     bool
+		}{role: knowledge.Role, path: knowledge.Path, folder: true})
+	}
 	var entries []inputFile
 	add := func(role, rel, path string) error {
 		info, err := os.Lstat(path)
