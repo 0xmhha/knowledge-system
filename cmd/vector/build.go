@@ -14,18 +14,19 @@ import (
 )
 
 type buildOpts struct {
-	src        string
-	out        string
-	ckgPath    string
-	languages  []string
-	exclude    []string
-	filesFrom  string
-	configPth  string
-	policy     string
-	docs       []string
-	flowCorpus string
-	batchSize  int
-	jsonOut    bool
+	projectID, snapshotID, datasetID, fileManifestDigest, sourceMode string
+	src                                                              string
+	out                                                              string
+	ckgPath                                                          string
+	languages                                                        []string
+	exclude                                                          []string
+	filesFrom                                                        string
+	configPth                                                        string
+	policy                                                           string
+	docs                                                             []string
+	flowCorpus                                                       string
+	batchSize                                                        int
+	jsonOut                                                          bool
 
 	llmPrefixModel string
 
@@ -52,6 +53,11 @@ Re-running on a populated --out updates chunks in place (Upsert).`,
 
 	f := cmd.Flags()
 	f.StringVar(&opts.src, "src", ".", "source repository path")
+	f.StringVar(&opts.projectID, "project-id", "", "stable project ID for a pinned dataset")
+	f.StringVar(&opts.snapshotID, "snapshot-id", "", "captured source snapshot ID")
+	f.StringVar(&opts.datasetID, "dataset-id", "", "pre-build dataset ID")
+	f.StringVar(&opts.fileManifestDigest, "file-manifest-digest", "", "source file manifest digest")
+	f.StringVar(&opts.sourceMode, "source-mode", "", "committed source mode for pinned builds")
 	f.StringVar(&opts.out, "out", "./ckv-data", "output data directory (vector.db, manifest.json)")
 	f.StringVar(&opts.ckgPath, "ckg", "", "CKG data directory for symbol alignment (optional)")
 	f.StringSliceVar(&opts.languages, "lang", nil, "languages to index (default: auto-detect; supported: go, typescript, javascript, solidity, markdown)")
@@ -95,6 +101,8 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 	defer fp.Close()
 
 	buildOpts := build.Options{
+		ProjectID: opts.projectID, SnapshotID: opts.snapshotID, DatasetID: opts.datasetID,
+		FileManifestDigest: opts.fileManifestDigest, SourceMode: opts.sourceMode,
 		SrcRoot:                 opts.src,
 		OutDir:                  opts.out,
 		Embedder:                emb,

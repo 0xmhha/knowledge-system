@@ -21,7 +21,11 @@ import (
 type Options struct {
 	// ProjectID is assigned once by cks init. Legacy configs may omit it;
 	// those builds remain unpinned until explicitly reinitialized.
-	ProjectID string
+	ProjectID          string
+	SnapshotID         string
+	DatasetID          string
+	FileManifestDigest string
+	SourceMode         string
 	// Src is the source tree to index. Required.
 	Src string
 	// Out is the dataset root; the graph index lands in Out/graph and the
@@ -228,6 +232,14 @@ func BuildPlan(o Options) (Plan, error) {
 	}
 
 	graphCmd := []string{graphBin, "build", "--src", o.Src, "--out", o.GraphDir()}
+	if o.DatasetID != "" {
+		if o.ProjectID == "" || o.SnapshotID == "" || o.FileManifestDigest == "" || o.SourceMode == "" {
+			return Plan{}, fmt.Errorf("setup: incomplete pinned dataset coordinates")
+		}
+		graphCmd = append(graphCmd, "--project-id", o.ProjectID, "--snapshot-id", o.SnapshotID,
+			"--dataset-id", o.DatasetID, "--file-manifest-digest", o.FileManifestDigest,
+			"--source-mode", o.SourceMode)
+	}
 	if o.FilelistConfig != "" {
 		graphCmd = append(graphCmd, "--files-from", o.FilesFromPath())
 	}
@@ -249,6 +261,11 @@ func BuildPlan(o Options) (Plan, error) {
 
 	if !o.SkipVector {
 		vectorCmd := []string{vectorBin, "build", "--src", o.Src, "--out", o.VectorDir(), "--ckg", o.GraphDir()}
+		if o.DatasetID != "" {
+			vectorCmd = append(vectorCmd, "--project-id", o.ProjectID, "--snapshot-id", o.SnapshotID,
+				"--dataset-id", o.DatasetID, "--file-manifest-digest", o.FileManifestDigest,
+				"--source-mode", o.SourceMode)
+		}
 		if o.FilelistConfig != "" {
 			vectorCmd = append(vectorCmd, "--files-from", o.FilesFromPath())
 		}

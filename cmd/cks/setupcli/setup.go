@@ -285,6 +285,10 @@ func runSetup(args []string) error {
 					return err
 				}
 				preBuildDatasetID = identity.DatasetID
+				o.SnapshotID = preBuildSnapshot.SnapshotID
+				o.DatasetID = preBuildDatasetID
+				o.FileManifestDigest = preBuildSnapshot.FileManifestDigest
+				o.SourceMode = preBuildSnapshot.SourceMode
 			}
 		}
 	}

@@ -66,7 +66,7 @@ func TestInspectSourceAndActiveDatasetIsolation(t *testing.T) {
 		t.Fatal(err)
 	}
 	r, err = Inspect(root, dataset)
-	if err != nil || r.Status != "ready" || r.DatasetVersion != "v1" {
+	if err != nil || r.Status != "ready" || r.DatasetVersion != "v1" || r.IdentityStatus != "legacy_unpinned" || !r.ReindexRequired {
 		t.Fatalf("aligned dataset: %+v, %v", r, err)
 	}
 	vectorManifest["src_root"] = t.TempDir()

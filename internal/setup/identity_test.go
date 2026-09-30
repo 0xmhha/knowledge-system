@@ -89,9 +89,11 @@ func TestVerifyAlignmentRejectsPartialAndCrossProjectIdentity(t *testing.T) {
 		writeManifest(t, graph, map[string]any{
 			"src_commit": "abc", "graph_digest": "d1", "schema_version": "1.23",
 			"project_id": graphProject, "snapshot_id": "s1", "dataset_id": "d1",
+			"file_manifest_digest": "files", "source_mode": "committed",
 		})
 		writeManifest(t, vector, map[string]any{
 			"src_commit": "abc", "project_id": vectorProject, "snapshot_id": "s1", "dataset_id": "d1",
+			"file_manifest_digest": "files", "source_mode": "committed",
 			"sources": map[string]any{"ckg": map[string]any{"graph_digest": "d1", "src_commit": "abc"}},
 		})
 	}

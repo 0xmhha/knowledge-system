@@ -108,11 +108,16 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 
 // Options controls one ckg build invocation.
 type Options struct {
-	SrcRoot    string
-	OutDir     string
-	Languages  []string // {"auto"} | subset of {"go","ts","sol"}
-	Logger     *slog.Logger
-	CKGVersion string
+	ProjectID          string
+	SnapshotID         string
+	DatasetID          string
+	FileManifestDigest string
+	SourceMode         string
+	SrcRoot            string
+	OutDir             string
+	Languages          []string // {"auto"} | subset of {"go","ts","sol"}
+	Logger             *slog.Logger
+	CKGVersion         string
 	// NoCache forces a full rebuild — bypasses the A3 incremental cache and
 	// wipes graph.db at start. Use when the cache is suspect, or for clean
 	// benchmark runs.
@@ -237,6 +242,11 @@ func validateAndSanitize(g *graph.Graph, log *slog.Logger, stage string, strict 
 //   - all-cached AND no removals → short-circuit (timestamp refresh only)
 //   - mixed dirty/cached → incremental (parse only dirty, reuse cached node sets)
 func Run(opt Options) (persist.Manifest, error) {
+	if opt.ProjectID != "" || opt.SnapshotID != "" || opt.DatasetID != "" || opt.FileManifestDigest != "" || opt.SourceMode != "" {
+		if opt.ProjectID == "" || opt.SnapshotID == "" || opt.DatasetID == "" || opt.FileManifestDigest == "" || opt.SourceMode != "committed" {
+			return persist.Manifest{}, fmt.Errorf("incomplete or unsupported pinned graph source identity")
+		}
+	}
 	log := opt.Logger
 	if log == nil {
 		log = slog.New(slog.NewTextHandler(os.Stderr, nil))

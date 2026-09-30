@@ -231,6 +231,12 @@ func PublishCandidateIdentity(versionDir string, source SourceIdentity, inputDig
 			"dataset_id": identity.DatasetID, "source_mode": source.SourceMode,
 			"file_manifest_digest": source.FileManifestDigest,
 		} {
+			if raw := manifest[key]; len(raw) > 0 {
+				var native string
+				if err := json.Unmarshal(raw, &native); err != nil || native != value {
+					return DatasetIdentity{}, fmt.Errorf("%s native %s differs from pre-build identity", engine, key)
+				}
+			}
 			manifest[key], _ = json.Marshal(value)
 		}
 		if err := writeJSONAtomic(path, manifest); err != nil {
@@ -367,4 +373,11 @@ func verifyVersionIdentityIfPresent(versionDir string) (*DatasetIdentity, error)
 		return nil, err
 	}
 	return &identity, nil
+}
+
+// InspectVersionIdentity classifies a version without modifying it. A nil
+// identity is a readable legacy committed dataset; pinned candidates are
+// checked against both engine manifests before details are returned.
+func InspectVersionIdentity(versionDir string) (*DatasetIdentity, error) {
+	return verifyVersionIdentityIfPresent(versionDir)
 }

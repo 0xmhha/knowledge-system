@@ -894,10 +894,15 @@ func extractBlobsForFiles(root string, nodes []types.Node, wanted []string) map[
 func buildManifestSkeleton(opt Options, goCount, tsCount, solCount, protoCount int,
 	g *graph.Graph, pkgTree *cluster.PkgTree, parseErrs int) persist.Manifest {
 	return persist.Manifest{
-		SchemaVersion:  SchemaVersion,
-		CKGVersion:     opt.CKGVersion,
-		BuildTimestamp: time.Now().UTC().Format(time.RFC3339),
-		SrcRoot:        opt.SrcRoot,
+		SchemaVersion:      SchemaVersion,
+		ProjectID:          opt.ProjectID,
+		SnapshotID:         opt.SnapshotID,
+		DatasetID:          opt.DatasetID,
+		FileManifestDigest: opt.FileManifestDigest,
+		SourceMode:         opt.SourceMode,
+		CKGVersion:         opt.CKGVersion,
+		BuildTimestamp:     time.Now().UTC().Format(time.RFC3339),
+		SrcRoot:            opt.SrcRoot,
 		Languages: map[string]int{
 			"go": goCount, "ts": tsCount, "sol": solCount, "proto": protoCount,
 		},

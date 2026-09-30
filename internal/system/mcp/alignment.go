@@ -106,13 +106,15 @@ type AlignmentInputs struct {
 // indexes, in which case top-level src_commit/src_root are the fallback
 // coordinates.
 type ckvManifest struct {
-	ProjectID   string `json:"project_id"`
-	SnapshotID  string `json:"snapshot_id"`
-	DatasetID   string `json:"dataset_id"`
-	SrcCommit   string `json:"src_commit"`
-	IndexedHead string `json:"indexed_head"`
-	SrcRoot     string `json:"src_root"`
-	Sources     struct {
+	ProjectID          string `json:"project_id"`
+	SnapshotID         string `json:"snapshot_id"`
+	DatasetID          string `json:"dataset_id"`
+	FileManifestDigest string `json:"file_manifest_digest"`
+	SourceMode         string `json:"source_mode"`
+	SrcCommit          string `json:"src_commit"`
+	IndexedHead        string `json:"indexed_head"`
+	SrcRoot            string `json:"src_root"`
+	Sources            struct {
 		CKG struct {
 			GraphDigest   string `json:"graph_digest"`
 			SrcCommit     string `json:"src_commit"`
@@ -183,9 +185,11 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 			in.CKGDigest, rep.GraphDigestExpected))
 	}
 	var graph struct {
-		ProjectID  string `json:"project_id"`
-		SnapshotID string `json:"snapshot_id"`
-		DatasetID  string `json:"dataset_id"`
+		ProjectID          string `json:"project_id"`
+		SnapshotID         string `json:"snapshot_id"`
+		DatasetID          string `json:"dataset_id"`
+		FileManifestDigest string `json:"file_manifest_digest"`
+		SourceMode         string `json:"source_mode"`
 	}
 	if len(in.CKGManifest) > 0 {
 		if err := json.Unmarshal(in.CKGManifest, &graph); err != nil {
@@ -196,8 +200,10 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	vectorPinned := m.ProjectID != "" || m.SnapshotID != "" || m.DatasetID != ""
 	if graphPinned || vectorPinned {
 		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" ||
+			graph.FileManifestDigest == "" || graph.SourceMode == "" ||
 			m.ProjectID == "" || m.SnapshotID == "" || m.DatasetID == "" ||
-			graph.ProjectID != m.ProjectID || graph.SnapshotID != m.SnapshotID || graph.DatasetID != m.DatasetID {
+			graph.ProjectID != m.ProjectID || graph.SnapshotID != m.SnapshotID || graph.DatasetID != m.DatasetID ||
+			graph.FileManifestDigest != m.FileManifestDigest || graph.SourceMode != m.SourceMode {
 			errs = append(errs, "ckg/ckv project, snapshot or dataset identity mismatched")
 		} else {
 			rep.ProjectID, rep.SnapshotID, rep.DatasetID = graph.ProjectID, graph.SnapshotID, graph.DatasetID

@@ -15,6 +15,7 @@ import (
 
 func newBuildCmd() *cobra.Command {
 	var src, out, outTag, atCommit, dbDsn, filesFrom, policyFile, securityPatternFile string
+	var projectID, snapshotID, datasetID, fileManifestDigest, sourceMode string
 	var langs, filesFromMain, solInclude, excludes []string
 	var noCache, force, rebuildMetrics, strictValidate, lockPropagation, failOnParseErrors bool
 	var temporalDepth int
@@ -69,6 +70,8 @@ func newBuildCmd() *cobra.Command {
 			}
 
 			m, err := buildpipe.Run(buildpipe.Options{
+				ProjectID: projectID, SnapshotID: snapshotID, DatasetID: datasetID,
+				FileManifestDigest: fileManifestDigest, SourceMode: sourceMode,
 				SrcRoot:             effectiveSrc,
 				OutDir:              effectiveOut,
 				Languages:           langs,
@@ -106,6 +109,11 @@ func newBuildCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&src, "src", "", "source root (required)")
+	cmd.Flags().StringVar(&projectID, "project-id", "", "stable project ID for a pinned dataset")
+	cmd.Flags().StringVar(&snapshotID, "snapshot-id", "", "captured source snapshot ID")
+	cmd.Flags().StringVar(&datasetID, "dataset-id", "", "pre-build dataset ID")
+	cmd.Flags().StringVar(&fileManifestDigest, "file-manifest-digest", "", "source file manifest digest")
+	cmd.Flags().StringVar(&sourceMode, "source-mode", "", "committed source mode for pinned builds")
 	cmd.Flags().StringVar(&out, "out", "", "output directory (required)")
 	cmd.Flags().StringVar(&outTag, "out-tag", "",
 		`suffix appended to --out directory; "auto-commit-hash" appends the source tree's path-aware HEAD commit (short SHA)`)

@@ -17,22 +17,26 @@ import (
 // check needs. Reading the JSON files directly (instead of importing engine
 // internals) keeps this package on the CLI-contract side of the boundary.
 type graphManifest struct {
-	ProjectID     string `json:"project_id"`
-	SnapshotID    string `json:"snapshot_id"`
-	DatasetID     string `json:"dataset_id"`
-	SchemaVersion string `json:"schema_version"`
-	SrcRoot       string `json:"src_root"`
-	SrcCommit     string `json:"src_commit"`
-	GraphDigest   string `json:"graph_digest"`
+	ProjectID          string `json:"project_id"`
+	SnapshotID         string `json:"snapshot_id"`
+	DatasetID          string `json:"dataset_id"`
+	FileManifestDigest string `json:"file_manifest_digest"`
+	SourceMode         string `json:"source_mode"`
+	SchemaVersion      string `json:"schema_version"`
+	SrcRoot            string `json:"src_root"`
+	SrcCommit          string `json:"src_commit"`
+	GraphDigest        string `json:"graph_digest"`
 }
 
 type vectorManifest struct {
-	ProjectID  string `json:"project_id"`
-	SnapshotID string `json:"snapshot_id"`
-	DatasetID  string `json:"dataset_id"`
-	SrcRoot    string `json:"src_root"`
-	SrcCommit  string `json:"src_commit"`
-	Sources    *struct {
+	ProjectID          string `json:"project_id"`
+	SnapshotID         string `json:"snapshot_id"`
+	DatasetID          string `json:"dataset_id"`
+	FileManifestDigest string `json:"file_manifest_digest"`
+	SourceMode         string `json:"source_mode"`
+	SrcRoot            string `json:"src_root"`
+	SrcCommit          string `json:"src_commit"`
+	Sources            *struct {
 		CKG *struct {
 			GraphDigest string `json:"graph_digest"`
 			SrcCommit   string `json:"src_commit"`
@@ -69,8 +73,10 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	vectorPinned := vm.ProjectID != "" || vm.SnapshotID != "" || vm.DatasetID != ""
 	if graphPinned || vectorPinned {
 		if gm.ProjectID == "" || gm.SnapshotID == "" || gm.DatasetID == "" ||
+			gm.FileManifestDigest == "" || gm.SourceMode == "" ||
 			vm.ProjectID == "" || vm.SnapshotID == "" || vm.DatasetID == "" ||
-			gm.ProjectID != vm.ProjectID || gm.SnapshotID != vm.SnapshotID || gm.DatasetID != vm.DatasetID {
+			gm.ProjectID != vm.ProjectID || gm.SnapshotID != vm.SnapshotID || gm.DatasetID != vm.DatasetID ||
+			gm.FileManifestDigest != vm.FileManifestDigest || gm.SourceMode != vm.SourceMode {
 			return fmt.Errorf("verify: project/snapshot/dataset identity missing or mismatched across graph and vector")
 		}
 	}

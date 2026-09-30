@@ -18,6 +18,11 @@ import (
 )
 
 type Report struct {
+	ProjectID        string         `json:"project_id,omitempty"`
+	SnapshotID       string         `json:"snapshot_id,omitempty"`
+	DatasetID        string         `json:"dataset_id,omitempty"`
+	IdentityStatus   string         `json:"identity_status,omitempty"`
+	ReindexRequired  bool           `json:"reindex_required,omitempty"`
 	SourceRoot       string         `json:"source_root"`
 	Commit           string         `json:"commit"`
 	Dirty            bool           `json:"dirty"`
@@ -222,6 +227,20 @@ func inspectDataset(report *Report, dataset string) {
 	if err := setup.VerifyAlignment(graph, vector, nil); err != nil {
 		report.Issues = append(report.Issues, "active graph/vector alignment failed: "+err.Error())
 		return
+	}
+	identity, err := setup.InspectVersionIdentity(resolved)
+	if err != nil {
+		report.Issues = append(report.Issues, "active dataset identity invalid: "+err.Error())
+		return
+	}
+	if identity == nil {
+		report.IdentityStatus = "legacy_unpinned"
+		report.ReindexRequired = true
+	} else {
+		report.IdentityStatus = "pinned"
+		report.ProjectID = identity.Source.ProjectID
+		report.SnapshotID = identity.Source.SnapshotID
+		report.DatasetID = identity.DatasetID
 	}
 	for _, path := range []string{filepath.Join(graph, "manifest.json"), filepath.Join(vector, "manifest.json")} {
 		var m struct {
