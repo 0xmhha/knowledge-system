@@ -2,7 +2,7 @@
 
 ## 결론과 확정된 범위
 
-WBS v0.1의 **상위 아키텍처, 기능 요구사항, 단계별 수용 기준은 작성됐다. 상세 설계는 아직 완결되지 않았다.** 이 문서는 남은 설계 결정을 고정하거나 검토 대상으로 분리한다. 구현·품질·배포 게이트 통과를 뜻하지 않는다. PDF 인용과 설계 동기는 `study/docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md`에, 원 요구사항과 WBS는 같은 디렉터리의 `spec-driven-requirements.md`와 `spec-driven-wbs.md`에 있다. PDF의 설명은 도메인 근거이고 아래 인터페이스는 프로젝트 설계다.
+**이력 문서:** 이 검토 시점에 WBS v0.1의 상위 아키텍처, 기능 요구사항, 단계별 수용 기준은 작성됐지만 상세 설계는 완결되지 않았다. 이후 그 빈틈을 [`END-TO-END-DESIGN.md`](./END-TO-END-DESIGN.md)에서 A/B/C 전체의 계약으로 닫았다. 아래는 당시 발견한 위험과 검토 과정의 기록이며 현재 설계 완료 판정은 종단 간 설계와 [`DELIVERY-PLAN-V2.md`](./DELIVERY-PLAN-V2.md)를 따른다. 어느 문서도 구현·품질·배포 게이트 통과를 뜻하지 않는다. PDF 인용과 설계 동기는 `study/docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md`에, 원 요구사항과 WBS는 같은 디렉터리의 `spec-driven-requirements.md`와 `spec-driven-wbs.md`에 있다. PDF의 설명은 도메인 근거이고 아래 인터페이스는 프로젝트 설계다.
 
 **2026-09-30 순서 변경:** 사용자는 실모델 평가를 개발 뒤로 미루고, 그 결과로 재리팩토링하기로 했다. 이후 실행 기준은 [`DELIVERY-PLAN-V2.md`](./DELIVERY-PLAN-V2.md)다. 기존 아래 설명에서 실모델 평가가 선행 조건으로 적힌 곳은 v2의 **A(모델 독립 개발) → B(실모델 평가) → C(평가 후 재리팩토링)** 순서로 읽는다. A의 구조 게이트는 실모델 없이 통과 가능하지만 WBS 전체 완료와 자연어 품질 승인은 B/C까지 필요하다.
 
@@ -44,7 +44,7 @@ Ollama의 [임베딩 API](https://docs.ollama.com/api/embed)는 `/api/embed`에�
 
 검토가 끝나기 전에는 대규모 용어 색인이나 mock 검색 성공을 실제 도메인 품질로 해석하지 않는다.
 
-## 4. 스냅샷과 프로젝트 신원 상세 설계가 남은 부분 (W2.4, W5.3)
+## 4. 당시 남아 있던 스냅샷과 프로젝트 신원 설계 (W2.4, W5.3)
 
 현행 `cks setup`은 안전한 `committed` 모드만 제공한다. 깨끗하지 않은 작업 트리를 거부하는 동작은 유지한다. `working-tree`는 단순히 더티 검사를 끄는 옵션으로 구현하지 않는다. 후보가 읽는 파일이 빌드 중 바뀌면 CKG와 CKV가 서로 다른 내용을 색인할 수 있기 때문이다.
 
@@ -65,4 +65,4 @@ Linux의 깨끗한 컨테이너/호스트에서 `doctor → init → setup → C
 
 ## 설계 완료 판정
 
-현재 위 항목 중 **온톨로지 내용 검토, 작업 트리 불변 사본의 Git 이력·인용 호환 검증, 외부 패치/수용 의미 판정 인터페이스, Linux 산출물의 실제 실행 및 라이선스 승인**은 A의 상세 설계·기술 검증이 남았다. `SOURCE-SNAPSHOT-ADR.md`는 작업 트리의 계약과 실패 오라클을 정리했지만 구현 방식은 아직 검증 전이다. **실모델 성능 임계치와 온톨로지 기본 활성화 판정은 B/C로 명시적으로 연기**한다. 따라서 A의 설계와 WBS 전체를 아직 “완료”로 표시하지 않는다. 다음 순서는 `DELIVERY-PLAN-V2.md`의 A0–A8 → B0–B1 → C0–C1이다. 각 기능은 `docs/spec-driven/EXECUTION.md`에 명령, 커밋, 데이터셋, 통과/실패 증거를 남긴다.
+**2026-09-30 후속 판정:** 온톨로지의 원본/검토/투영, 작업 트리의 worktree+blob 보관·v2 인용, 외부 패치/수용 판정, 플랫폼 설치·복구와 B/C 평가 정책은 `END-TO-END-DESIGN.md`에서 선택했다. 설계 기준선은 완료됐고 검증 위험은 각 A/B/C 작업에 남는다. 실모델 측정과 온톨로지 기본 활성화 판정은 B/C로 연기한다. **WBS 구현과 품질 게이트는 여전히 완료가 아니다.** 각 기능은 `docs/spec-driven/EXECUTION.md`에 명령, 커밋, 데이터셋, 통과/실패 증거를 남긴다.
