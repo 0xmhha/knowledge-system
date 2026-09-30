@@ -101,21 +101,12 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	result := CapturedSource{BlobDir: blobDir, Root: root}
 	var total int64
 	for _, rel := range paths {
-		info, err := opened.Lstat(filepath.FromSlash(rel))
-		if err != nil || !info.Mode().IsRegular() {
-			return CapturedSource{}, fmt.Errorf("source changed before capture %q: %v", rel, err)
-		}
-		if info.Size() > o.MaxFileBytes || total+info.Size() > o.MaxTotalBytes {
-			return CapturedSource{}, fmt.Errorf("capture byte limit exceeded at %q", rel)
-		}
-		file, err := opened.Open(filepath.FromSlash(rel))
+		buf, err := readCapturedRegular(opened, rel, o.MaxFileBytes)
 		if err != nil {
 			return CapturedSource{}, err
 		}
-		buf, readErr := io.ReadAll(io.LimitReader(file, o.MaxFileBytes+1))
-		closeErr := file.Close()
-		if readErr != nil || closeErr != nil || int64(len(buf)) != info.Size() {
-			return CapturedSource{}, fmt.Errorf("source changed while capturing %q", rel)
+		if total+int64(len(buf)) > o.MaxTotalBytes {
+			return CapturedSource{}, fmt.Errorf("capture total byte limit exceeded at %q", rel)
 		}
 		sum := sha256.Sum256(buf)
 		digest := hex.EncodeToString(sum[:])
@@ -152,6 +143,52 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 		return CapturedSource{}, err
 	}
 	return result, nil
+}
+
+// readCapturedRegular refuses a symlink in every path component and checks
+// that the opened file is the same inode inspected before reading. os.Root
+// confines a concurrent path replacement to the source tree; post-read path
+// checks and the final inventory pass catch ordinary swaps and byte drift.
+func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, error) {
+	parts := strings.Split(rel, "/")
+	for i := range parts {
+		prefix := filepath.FromSlash(strings.Join(parts[:i+1], "/"))
+		info, err := root.Lstat(prefix)
+		if err != nil {
+			return nil, fmt.Errorf("source changed before capture %q: %w", rel, err)
+		}
+		if i < len(parts)-1 {
+			if !info.IsDir() {
+				return nil, fmt.Errorf("capture refused non-directory or linked component in %q", rel)
+			}
+			continue
+		}
+		if !info.Mode().IsRegular() {
+			return nil, fmt.Errorf("capture refused non-regular source %q", rel)
+		}
+		if info.Size() > maxBytes {
+			return nil, fmt.Errorf("capture file byte limit exceeded at %q", rel)
+		}
+		file, err := root.Open(filepath.FromSlash(rel))
+		if err != nil {
+			return nil, fmt.Errorf("open captured source %q: %w", rel, err)
+		}
+		openedInfo, statErr := file.Stat()
+		if statErr != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(info, openedInfo) {
+			file.Close()
+			return nil, fmt.Errorf("source changed while opening %q", rel)
+		}
+		buf, readErr := io.ReadAll(io.LimitReader(file, maxBytes+1))
+		closeErr := file.Close()
+		postInfo, postErr := root.Lstat(filepath.FromSlash(rel))
+		if readErr != nil || closeErr != nil || postErr != nil ||
+			!postInfo.Mode().IsRegular() || !os.SameFile(openedInfo, postInfo) ||
+			int64(len(buf)) != info.Size() {
+			return nil, fmt.Errorf("source changed while capturing %q", rel)
+		}
+		return buf, nil
+	}
+	return nil, fmt.Errorf("empty capture path")
 }
 
 func captureHead(root string) (string, error) {
@@ -306,11 +343,7 @@ func (c CapturedSource) VerifyAgainst(root string) error {
 		if paths[i] != f.Path {
 			return fmt.Errorf("source file set changed after capture")
 		}
-		info, err := opened.Lstat(filepath.FromSlash(f.Path))
-		if err != nil || !info.Mode().IsRegular() {
-			return fmt.Errorf("source changed after capture %q: %v", f.Path, err)
-		}
-		buf, err := opened.ReadFile(filepath.FromSlash(f.Path))
+		buf, err := readCapturedRegular(opened, f.Path, f.Size)
 		if err != nil {
 			return fmt.Errorf("source changed after capture %q: %w", f.Path, err)
 		}

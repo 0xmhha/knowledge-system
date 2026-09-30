@@ -64,6 +64,42 @@ func TestLoad_FilterAndIndex(t *testing.T) {
 	}
 }
 
+func TestModernGraphAlignsOnlyCanonicalASTSymbols(t *testing.T) {
+	dir := t.TempDir()
+	db, err := sql.Open("sqlite3", filepath.Join(dir, "graph.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = db.Exec(`
+CREATE TABLE manifest (key TEXT PRIMARY KEY, value TEXT);
+INSERT INTO manifest VALUES ('schema_version', '1.23');
+CREATE TABLE nodes (id TEXT PRIMARY KEY, type TEXT, qualified_name TEXT NOT NULL,
+ file_path TEXT NOT NULL, start_line INTEGER NOT NULL, end_line INTEGER NOT NULL,
+ canonical_id TEXT);
+INSERT INTO nodes VALUES
+ ('a_hunk', 'Hunk', 'hunk:abc', 'main.go', 7, 7, ''),
+ ('b_stmt', 'CallSite', 'main.go:call', 'main.go', 7, 7, 'wrong.statement'),
+ ('c_empty', 'Function', 'main.Empty', 'main.go', 7, 9, ''),
+ ('z_symbol', 'Function', 'main.Alpha', 'main.go', 7, 9, 'module.Alpha');`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	ix, err := Load(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ix.EntryCount() != 1 {
+		t.Fatalf("modern graph admitted non-symbol or empty-ID rows: %d", ix.EntryCount())
+	}
+	e := ix.LookupEntry("main.go", 7, 9)
+	if e == nil || e.CanonicalID != "module.Alpha" {
+		t.Fatalf("same-line hunk shadowed canonical AST symbol: %+v", e)
+	}
+}
+
 func TestLookup_ExactStartLine_PrefersSmallestRange(t *testing.T) {
 	dir := makeFixtureDB(t)
 	ix, _ := Load(dir)
