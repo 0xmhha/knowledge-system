@@ -260,6 +260,7 @@ func runSetup(args []string) error {
 	var preBuildCommit string
 	var preBuildSnapshot setup.SourceIdentity
 	var preBuildInputs string
+	var preBuildDatasetID string
 	if *rollback == "" {
 		preBuildCommit, err = committedSourceCommit(o.Src)
 		if err != nil {
@@ -273,6 +274,17 @@ func runSetup(args []string) error {
 			preBuildInputs, err = setup.ConfiguredInputDigest(o)
 			if err != nil {
 				return err
+			}
+			if !o.SkipVector {
+				embedding, err := setup.ResolveEmbeddingIdentity(ctx, o)
+				if err != nil {
+					return err
+				}
+				identity, err := setup.NewDatasetIdentity(preBuildSnapshot, embedding, preBuildInputs)
+				if err != nil {
+					return err
+				}
+				preBuildDatasetID = identity.DatasetID
 			}
 		}
 	}
@@ -301,7 +313,7 @@ func runSetup(args []string) error {
 		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
 			ExpectedSourceCommit: preBuildCommit, ExpectedSourceSnapshot: preBuildSnapshot,
-			ExpectedInputDigest: preBuildInputs}
+			ExpectedInputDigest: preBuildInputs, ExpectedDatasetID: preBuildDatasetID}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
 		}
@@ -342,8 +354,12 @@ func runSetup(args []string) error {
 				return fmt.Errorf("build inputs changed during build: %v", err)
 			}
 			if !o.SkipVector {
-				if _, err := setup.PublishCandidateIdentity(o.Out, postBuildSnapshot, postBuildInputs); err != nil {
+				identity, err := setup.PublishCandidateIdentity(o.Out, postBuildSnapshot, postBuildInputs)
+				if err != nil {
 					return err
+				}
+				if identity.DatasetID != preBuildDatasetID {
+					return fmt.Errorf("embedding identity changed during build")
 				}
 			}
 		}

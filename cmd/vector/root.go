@@ -51,6 +51,7 @@ func newRootCmd() *cobra.Command {
 
 	cmd.AddCommand(
 		newBuildCmd(),
+		newIdentityCmd(),
 		newReindexCmd(),
 		newPromoteCmd(),
 		newQueryCmd(),

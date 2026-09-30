@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -214,5 +215,32 @@ func TestPromoteRejectsCrossProjectAndTamperedRollback(t *testing.T) {
 	}
 	if err := Rollback(dataset, "v1"); err == nil {
 		t.Fatal("rollback accepted a missing pinned identity")
+	}
+}
+
+func TestGateRejectsEmbeddingSpaceChangedAfterPrebuildIdentity(t *testing.T) {
+	dataset := t.TempDir()
+	version := filepath.Join(dataset, "v1")
+	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
+		"src_commit": "abc", "graph_digest": "g", "schema_version": "1.23",
+	})
+	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
+		"src_commit": "abc", "chunk_count": 1, "embedding_model": "mock",
+		"embedding_dim": 8, "embedding_checksum": "space-after",
+		"sources": map[string]any{"ckg": map[string]any{"src_commit": "abc", "graph_digest": "g"}},
+	})
+	source := SourceIdentity{ProjectID: "p", SourceMode: "committed", SourceCommit: "abc",
+		FileManifestDigest: strings.Repeat("a", 64), SnapshotID: strings.Repeat("b", 64)}
+	if _, err := PublishCandidateIdentity(version, source, "inputs"); err != nil {
+		t.Fatal(err)
+	}
+	prebuild, err := NewDatasetIdentity(source, json.RawMessage(`{"model":"mock","dim":8,"checksum":"space-before"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Gate(context.Background(), dataset, "v1", GateOptions{ExpectedSourceSnapshot: source,
+		ExpectedInputDigest: "inputs", ExpectedDatasetID: prebuild.DatasetID}, gateRunner{}, nil)
+	if err == nil || !strings.Contains(err.Error(), "pre-build identity") {
+		t.Fatalf("changed embedding space passed candidate gate: %v", err)
 	}
 }

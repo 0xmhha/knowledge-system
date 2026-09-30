@@ -202,6 +202,7 @@ type GateOptions struct {
 	// Empty means a legacy commit-only build.
 	ExpectedSourceSnapshot SourceIdentity
 	ExpectedInputDigest    string
+	ExpectedDatasetID      string
 }
 
 // gateVecManifest is the read-only projection of the vector manifest the gate
@@ -247,6 +248,10 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 	if o.ExpectedSourceSnapshot.SnapshotID != "" {
 		if err := VerifyCandidateIdentity(vdir, o.ExpectedSourceSnapshot, o.ExpectedInputDigest); err != nil {
 			return fmt.Errorf("gate: %w", err)
+		}
+		var candidate DatasetIdentity
+		if err := readJSON(filepath.Join(vdir, "dataset-identity.json"), &candidate); err != nil || candidate.DatasetID != o.ExpectedDatasetID {
+			return fmt.Errorf("gate: candidate dataset ID differs from pre-build identity: %v", err)
 		}
 	}
 
@@ -347,8 +352,12 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if err != nil || inputs != gopt.ExpectedInputDigest {
 			return fmt.Errorf("reindex: build inputs changed during build: %v", err)
 		}
-		if _, err := PublishCandidateIdentity(vo.Out, current, inputs); err != nil {
+		identity, err := PublishCandidateIdentity(vo.Out, current, inputs)
+		if err != nil {
 			return fmt.Errorf("reindex: publish candidate identity: %w", err)
+		}
+		if identity.DatasetID != gopt.ExpectedDatasetID {
+			return fmt.Errorf("reindex: embedding identity changed during build; current left unchanged")
 		}
 	}
 
