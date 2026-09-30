@@ -8,13 +8,17 @@ requirements:
     status: proposed
     acceptance_criteria:
       - id: ac-filtered-recall
-        given: At least K eligible chunks and many closer excluded chunks
+        given: A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks
         when: A filtered query requests K results
         then: The response contains K eligible chunks in exact distance order
+      - id: ac-filtered-completeness
+        given: A larger filtered candidate set contains at least K eligible chunks
+        when: A filtered query reaches a search budget or is cancelled
+        then: The response marks incomplete with a reason and never claims K-result completeness
   - id: req-source-evidence
     version: 1
     title: Source-backed meaning
-    statement: Reviewed semantic relationships remain tied to one committed source snapshot.
+    statement: Reviewed semantic relationships remain tied to one captured source snapshot.
     status: proposed
     acceptance_criteria:
       - id: ac-source-evidence

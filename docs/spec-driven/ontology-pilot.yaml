@@ -28,15 +28,15 @@ concepts:
     status: proposed
   - id: source-snapshot
     kind: artifact
-    definition: An identified state of source files to which all evidence in a dataset refers.
-    includes: [Git commit, future working-tree digest]
-    excludes: [The current editor buffer without a recorded digest]
+    definition: A captured and identified set of source bytes and policies to which all evidence in a dataset refers.
+    includes: [Committed Git source, captured working-tree source, captured non-Git source]
+    excludes: [A Git commit alone when working-tree bytes differ, an uncaptured editor buffer]
     terms: [{lang: en, value: source snapshot, preferred: true}, {lang: ko, value: 소스 스냅샷, preferred: true}]
     status: proposed
   - id: source-file
     kind: artifact
     definition: A source document or code file addressed relative to one source snapshot.
-    includes: [Committed code, committed Markdown]
+    includes: [Captured code, captured Markdown]
     excludes: [Historical hunk path counted as a current file]
     terms: [{lang: en, value: source file, preferred: true}, {lang: ko, value: 소스 파일, preferred: true}]
     status: proposed
@@ -70,7 +70,7 @@ concepts:
     status: proposed
   - id: evidence-span
     kind: artifact
-    definition: A source kind, path, line range, and content digest tied to one snapshot.
+    definition: An origin, relative path, line range, file digest, and range digest tied to one source snapshot.
     includes: [Document lines, code lines, test lines]
     excludes: [A similarity score without retrievable source]
     terms: [{lang: en, value: evidence span, preferred: true}, {lang: ko, value: 근거 범위, preferred: true}]
@@ -119,7 +119,7 @@ concepts:
     status: proposed
   - id: test-run
     kind: process
-    definition: An execution of tests with recorded command, environment, commit, and outcome.
+    definition: An execution of tests with recorded command, environment, source snapshot, and outcome.
     includes: [Execution metadata, pass or failure evidence]
     excludes: [A test file that has never been run]
     terms: [{lang: en, value: test run, preferred: true}, {lang: ko, value: 테스트 실행, preferred: true}]

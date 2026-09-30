@@ -7,18 +7,15 @@
    "description": "Compose a budgeted evidence pack for a development task (the primary planning entrypoint): runs the intent \u2192 stage1 (semantic) \u2192 stage2 (keyword/graph) \u2192 stage3 \u2192 budget \u2192 sanitize pipeline.",
    "input": {
     "properties": {
-     "task": {
+     "prompt": {
       "type": "string"
      },
-     "max_citations": {
-      "type": "number"
-     },
-     "budget_tokens": {
-      "type": "number"
+     "intent": {
+      "type": "string"
      }
     },
     "required": [
-     "task"
+     "prompt"
     ]
    }
   },

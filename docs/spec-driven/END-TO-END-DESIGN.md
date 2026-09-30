@@ -56,7 +56,7 @@ DB와 sidecar가 공유하는 `CoordinateHeader`의 필수 필드는 `format_ver
 
 `committed`는 깨끗한 HEAD만 받되, 선언한 저장소 **밖** 문서는 그 시점의 바이트를 별도 origin으로 캡처한다. 저장소 원문은 HEAD Git 객체에서 캡처해 후보의 `sources/blobs/<sha256>`에 보관한다. `working-tree`는 현재 추적 수정/삭제와 신규 일반 파일을 포함해 같은 저장소 외부의 임시 Git worktree를 HEAD에 만들고 허용된 바이트를 오버레이한다. 삭제 파일은 staged worktree에서도 삭제한다. `snapshot-only`는 Git이 없는 디렉터리를 같은 no-follow 방식으로 복사한 **일반 staging 트리**에서 AST/청크를 만들며 temporal/blame/커밋 기반 기능을 `history_unavailable`로 표시한다. 선택 파일 목록과 생성된 filelist는 원본에서 한 번 계산해 고정하고 staging에 적용한 뒤 양 엔진의 실제 입력 목록과 대조한다. 캡처는 안전하게 연 파일 핸들의 메타데이터·바이트와 원본을 재확인해 중간 변경을 실패시킨다. 빌더는 **오직 staging**을 읽는다. 캡처 완료 후 원본이 달라져도 이미 캡처한 후보는 일관된 과거 스냅샷이다. 무거운 복사에 하드링크를 쓰지 않는다. 보관본은 콘텐츠 주소와 읽을 때 SHA-256으로 검증한다.
 
-CKG의 temporal/blame은 작업 트리의 수정 줄을 커밋된 이력으로 주장해서는 안 된다. 변경 파일의 Git 이력은 `base_commit`까지의 과거로만 표시하고 새 줄의 blame/`changed_in`은 생성하지 않는다. `snapshot-only`에서는 이력 패스를 실행하지 않는다. 구조 AST는 staging 바이트에서 생성한다. 작은 Go 픽스처에서는 임시 worktree가 수정된 AST와 HEAD 이력을 동시에 빌드했지만, 현재 CKG 매니페스트에 임시 절대 경로가 남았다. 따라서 빌더에 **`build_root`와 `logical_root`/좌표를 분리**해 전달하며 공개 매니페스트·DB·인용에는 임시 경로를 저장하지 않는다.
+CKG의 temporal/blame은 작업 트리의 수정 줄을 커밋된 이력으로 주장해서는 안 된다. 변경 파일의 Git 이력은 `base_commit`까지의 과거로만 표시하고 새 줄의 blame/`changed_in`은 생성하지 않는다. `snapshot-only`에서는 이력 패스를 실행하지 않는다. 구조 AST는 staging 바이트에서 생성한다. 작은 Go·TypeScript 픽스처에서 임시 worktree는 수정된 AST와 HEAD 이력을 동시에 만들었고 같은 바이트의 서로 다른 staging 경로에서 CKG 그래프 다이제스트가 같았다. 그러나 현재 CKG/CKV 매니페스트에는 임시 절대 경로가 남고, 이력 Hunk/구문 노드가 같은 줄의 심볼보다 먼저 선택되어 CKV 심볼의 `canonical_id`가 0/2가 됐다. 따라서 빌더에 **`build_root`와 `logical_root`/좌표를 분리**해 전달하며 공개 매니페스트·DB·인용에는 임시 경로를 저장하지 않는다. CKV 정렬 인덱스는 비어 있지 않은 `canonical_id`와 허용된 AST 심볼 타입만 후보로 삼고, 동률은 타입·줄 범위·ID의 결정적 순서로 고른다. 정렬률이 게이트 아래면 후보를 실패시킨다. Go 모듈 메타데이터 조회 실패가 파서 오류 없이 빈 canonical ID를 만들 수 있으므로 모듈 신원도 별도 검사한다.
 
 원문 보관본은 활성 또는 롤백 가능한 버전이 참조하는 동안 삭제할 수 없다. 정리는 참조 수를 검사하는 별도 `cks gc --dry-run`/`cks gc` 명령으로만 한다. 런타임은 원본 저장소가 이동/삭제돼도 보관본으로 인용을 재현한다. Git 이력 탐색처럼 원본 객체 저장소가 필요한 기능은 없으면 `history_unavailable`로 낮추되 AST/벡터/인용의 신뢰성을 낮추지 않는다.
 
@@ -96,11 +96,11 @@ CKS 질의는 한 고정 `dataset_id`를 열고 **raw query**를 CKV/CKG/BM25에
 
 기본 구조 상한은 현재 Stage 2의 개념 후보 8개·점수 증가 최대 20%, Stage 3의 확장 seed 10개/이웃 50개, EvidencePack 본문 8,000 토큰/인용 12개를 유지한다. 이 값은 안전한 작업 범위이지 품질 합격 수치가 아니다. 설정에서 조정하되 실제 사용값을 팩과 B 평가에 기록하고, 상한으로 생략된 근거를 `budget_exceeded`/`incomplete`로 드러낸다.
 
-`EvidenceRef`는 `{project_id,dataset_id,snapshot_id,origin_id,path,start_line,end_line,file_sha256,content_sha256,canonical_id?,chunk_id?,status}`다. `file_sha256`은 보관된 전체 파일, `content_sha256`은 인용 줄 범위의 **정화 전 원문 바이트**를 뜻한다. 원문 조회는 보관본의 매핑 테이블에서만 수행하고 두 해시/줄을 다시 검사한다. 절대 경로, `..`, 미등록 source, 손상 blob은 인용을 조용히 건너뛰지 않고 `source_missing` 또는 `snapshot_mismatch`로 표시한다. sanitization은 검증된 본문에 적용한 뒤에만 팩을 외부로 내보낸다. 팩 해시는 정화된 출력 본문을 보호하고 원문 해시를 본문 대신 공개하지 않는다. 보관본 읽기 오류로 중요한 근거가 빠지면 팩의 `evidence_state=partial`이고 확정 답변 상태가 될 수 없다.
+`EvidenceRef`는 `{project_id,dataset_id,snapshot_id,origin_id,path,start_line,end_line,file_sha256,content_sha256,canonical_id?,chunk_id?,status}`다. `file_sha256`은 보관된 전체 파일, `content_sha256`은 인용 줄 범위의 **정화 전 원문 바이트**를 뜻한다. 줄은 원문 바이트의 LF(`0A`) 뒤에서 나누고 CRLF의 CR은 보존하며 마지막 줄의 LF 유무도 보존한다. 1부터 시작하는 포함 범위의 줄 바이트를 그대로 이어 SHA-256 한다. 원문 조회는 보관본의 매핑 테이블에서만 수행하고 두 해시/줄을 다시 검사한다. 절대 경로, `..`, 미등록 source, 손상 blob은 인용을 조용히 건너뛰지 않고 `source_missing` 또는 `snapshot_mismatch`로 표시한다. sanitization은 검증된 본문에 적용한 뒤에만 팩을 외부로 내보낸다. 팩 해시는 정화된 출력 본문을 보호하고 원문 해시를 본문 대신 공개하지 않는다. 보관본 읽기 오류로 중요한 근거가 빠지면 팩의 `evidence_state=partial`이고 확정 답변 상태가 될 수 없다.
 
 ## 6. 온톨로지·스펙·외부 패치의 의미 계약
 
-원본은 프로젝트에 커밋된 YAML/Markdown이며 CKS 의미 SQLite는 해당 데이터셋의 **파생 투영**이다. 최소 객체는 `Concept`, `Term`, `DocumentSection`, `Claim`, `Requirement`, `AcceptanceCriterion`, `Assertion`, `EvidenceSpan`, `PolicyRef`, `PatchAttempt`, `TestExecution`, `CriterionDecision`이다. 각 객체/관계는 타입·방향·원천·프로젝트/스냅샷·검토 상태를 가진다. `proposed`는 탐색 후보, `verified`는 원문과 검토자가 확인한 관계, `rejected`는 삭제되지 않는 판정 기록이다. 하나의 verified 관계가 오래된 소스/코드 심볼에 닿으면 새 데이터셋에서는 `stale`로 계산하고 자동 이전하지 않는다.
+원본은 해당 스냅샷에 캡처된 YAML/Markdown이며 CKS 의미 SQLite는 해당 데이터셋의 **파생 투영**이다. Git 프로젝트에서는 커밋 원본과 작업 트리 캡처본을 구별하고, 외부 문서는 별도 origin을 가진다. 최소 객체는 `Concept`, `Term`, `DocumentSection`, `Claim`, `Requirement`, `AcceptanceCriterion`, `Assertion`, `EvidenceSpan`, `PolicyRef`, `PatchAttempt`, `TestExecution`, `CriterionDecision`이다. 각 객체/관계는 타입·방향·원천·프로젝트/스냅샷·검토 상태를 가진다. `proposed`는 탐색 후보, `verified`는 원문과 검토자가 확인한 관계, `rejected`는 삭제되지 않는 판정 기록이다. 하나의 verified 관계가 오래된 소스/코드 심볼에 닿으면 새 데이터셋에서는 `stale`로 계산하고 자동 이전하지 않는다.
 
 `Concept IMPLEMENTED_BY CodeSymbol`, `CodeSymbol TESTED_BY TestCase`, `AcceptanceCriterion ACCEPTED_BY TestCase`는 **연결의 존재**를 나타낸다. `TestExecution.pass`는 지정 테스트가 해당 스냅샷에서 실행돼 성공했다는 뜻이다. `CriterionDecision.approved`는 사람이 Given/When/Then의 의미 충족을 확인했다는 별도 사건이다. 이 네 상태를 합산해 자동으로 요구사항 완료라 하지 않는다. 요구사항 상태는 `missing|proposed|linked|tested|accepted|conflict|stale`로 계산하며 각 전이에 원천 ID와 이유를 남긴다.
 
@@ -115,11 +115,11 @@ CKS 질의는 한 고정 `dataset_id`를 열고 **raw query**를 CKV/CKG/BM25에
 | `cks status`/`doctor` | 활성/서빙 ID, 각 기능 `ready|degraded|unavailable`, 원인·입력 수·모델 신원·재시작 필요 | 기존 진단 JSON 필드 보존 |
 | `cks serve`/`mcp` | 시작 때 후보 전체 좌표 확인 후 한 버전 고정; 표준입출력과 loopback HTTP | 구 `mcp` 유지, 부적합 v2 자료는 오류 |
 | `cks rollback`/`setup --rollback` | 완성된 대상 버전만 원자 전환; 다음 서버부터 반영 | 기존 옵션 유지, v1↔v2 이동도 대상 검증 후만 허용 |
-| 기존 `cks.context.get_for_task` | committed v1/v2의 기존 인용 형식만 제공; 작업 트리/비Git 스냅샷에서 `requires_v2` | HEAD로 오해할 수 있는 인용을 보내지 않음 |
+| 기존 `cks.context.get_for_task` | committed v1/v2에서 **v1 DTO와 v1 해시만** 제공; 작업 트리/비Git 스냅샷에서 `requires_v2` | 기존 필드·해시 바이트를 유지하고 HEAD로 오해할 수 있는 인용을 보내지 않음 |
 | 새 `cks.context.get_for_task_v2` | 좌표·원천 ID·원문 해시·검색/온톨로지 상태·통합 팩 해시 필수 | 클라이언트가 명시 선택 |
 | `ckv query`·`ckg` 검색/HTTP API·정적 export | 작업 트리/비Git 스냅샷 결과에는 동일한 v2 인용 좌표를 제공하고 형식을 지정하지 않은 구 출력은 `requires_v2` | 커밋형 구 출력은 유지. 그래프 viewer/export에도 `source_mode`를 표시 |
 
-v2 `Citation`은 기존 `file/start_line/end_line/commit_hash`에 프로젝트/데이터셋/스냅샷/원천/원문 해시를 더한다. `committed`는 `commit_hash=base_commit`, `working-tree`와 `snapshot-only`는 `commit_hash=""`를 사용한다. 작업 트리의 `base_commit`은 이력 기준이며 비Git은 빈 값이다. dedup key는 새 좌표 전체를 포함한다. v2 팩의 `integrity_hash_algo=sha256-v2`는 좌표·본문·semantic overlay까지 포함한다. 구 소비자가 모르는 알고리즘을 조용히 받아들이지 않게 기존 검증기는 실패한다. v1 팩과 v1 해시는 변경하지 않는다. HTTP 응답도 같은 v2 envelope를 사용한다.
+v2 `Citation`은 기존 `file/start_line/end_line/commit_hash`에 프로젝트/데이터셋/스냅샷/원천/원문 해시를 더한다. `committed`는 `commit_hash=base_commit`, `working-tree`와 `snapshot-only`는 `commit_hash=""`를 사용한다. 작업 트리의 `base_commit`은 이력 기준이며 비Git은 빈 값이다. dedup key는 새 좌표 전체를 포함한다. 현재 v1 `Citation.Key()`는 커밋도 무시하므로 v2에서 재사용하지 않는다. v2 팩의 `integrity_hash_algo=sha256-v2`는 좌표·본문·semantic overlay까지 포함한다. 구 소비자가 모르는 알고리즘을 조용히 받아들이지 않게 기존 검증기는 실패한다. **v2 DTO를 기존 도구에 새 필드로 직렬화하지 않는다:** 구 소비자가 모르는 필드를 버린 뒤 v1 해시를 계산하면 값이 달라질 수 있다. v1 팩과 v1 해시는 변경하지 않는다. HTTP 응답도 같은 v2 envelope를 사용한다. 상세 골든과 실패 형태는 [`PUBLIC-CONTRACT-V2.md`](./PUBLIC-CONTRACT-V2.md)에 둔다.
 
 오류 코드는 `project_conflict`, `snapshot_mismatch`, `source_missing`, `reindex_required`, `embedder_unavailable`, `model_changed`, `parse_degraded`, `incomplete`, `resource_limit`, `requires_v2`, `unreviewed`, `criterion_conflict`, `candidate_failed`로 고정한다. CLI는 비정상 종료와 기계 판독형 `code/message/dataset_id?`를 함께 반환한다. MCP는 도구 오류의 같은 `code`를 사용한다. 원문 비밀·절대 staging 경로·HTTP 응답 본문은 오류에 넣지 않는다.
 
@@ -171,11 +171,11 @@ B 결과의 실패를 `회수 실패/잘못된 순위/문맥 경계/근거 부�
 | 설계 폐쇄 게이트 | 필요한 증거 | 실패 시 조치 |
 |---|---|---|
 | D1: 파일럿 도메인 모델 | `ontology-pilot.yaml`의 개념·관계·다의어·제외 범위와 `spec-pilot.yaml`의 요구·Given/When/Then을 원천 줄, 질문별 정답, 검토자·결정 이유와 함께 검토. `proposed`를 임의로 `verified`로 승격하지 않음 | 개념 분할/합병, 관계 타입·방향, 수용 기준과 추적 계약을 고치고 스키마 영향을 재검토 |
-| D2: 캡처·신원 실현 가능성 | Go/TypeScript 및 비Git fixture에서 원본·이력·canonical ID·스테이징 경로·원문 보관·재조회가 같은 좌표를 유지하는 최소 종단 간 실험 | ID/매니페스트/캡처 경계를 ADR에서 먼저 개정 |
-| D3: 공개 계약·이전 호환성 | v1/v2 CLI·MCP·JSON 골든과 기존 소비자 재생; `committed`/`working-tree`/`snapshot-only`별 인용, 오류, rollback 경로 검증 | 필드·버전·오류·이전 순서를 확정해 공개 계약 개정 |
+| D2: 캡처·신원 실현 가능성 | Go/TypeScript 및 비Git fixture에서 AST·이력·canonical ID·스테이징 경로·원문 blob의 최소 기술 실험과 발견한 실패의 수정 계약. 완전한 통합 재조회는 A4 수용 시험 | ID/매니페스트/캡처 경계를 ADR에서 먼저 개정 |
+| D3: 공개 계약·이전 호환성 | v1 실제 입력/출력 회귀와 v2 DTO·해시·오류·버전 선택·롤백 골든 **명세**. v2 실행 소비자 재생은 A7.1/A8 수용 시험 | 필드·버전·오류·이전 순서를 확정해 공개 계약 개정 |
 | D4: 교차 단계 계약 정합성 | A0–A8/B0–B1/C0–C1의 입력·출력·상태·실패·책임자를 같은 추적표로 점검하고 남은 미정 결정이 없음을 기록 | WBS 선후관계와 공통 계약을 수정 |
 
-D1의 실제 도메인 승인은 검토자의 결정이 필요하다. D2/D3는 전체 기능 구현 전에 좁은 실험과 골든 계약으로 검증할 수 있다. 실모델 품질 측정과 수치에 따른 재리팩토링은 사용자의 결정대로 B/C에 남겨 두며, 그것만으로 A의 구조 설계가 미완이라는 뜻은 아니다. 플랫폼별 네이티브 빌드·배포 스모크는 구현 수용 게이트다. 각 게이트의 결과가 구조 불변식을 바꾸면 ADR과 WBS를 먼저 갱신한다.
+D2–D4의 설계 판정과 발견한 결함은 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md)에 기록했다. D1의 검토안도 작성했으나 실제 도메인 승인은 검토자의 결정이 필요하다. 실모델 품질 측정과 수치에 따른 재리팩토링은 사용자의 결정대로 B/C에 남겨 두며, 그것만으로 A의 구조 설계가 미완이라는 뜻은 아니다. 플랫폼별 네이티브 빌드·배포 스모크는 구현 수용 게이트다. 각 게이트의 결과가 구조 불변식을 바꾸면 ADR과 WBS를 먼저 갱신한다.
 
 구현은 D1–D4의 설계 폐쇄 결과를 반영한 뒤 기초 공통 좌표/원문 보관·공개 인용부터, 엔진과 런타임의 모든 우회 경로, 의미/스펙, 설치를 잇는 순서로 진행한다. 각 기능의 설계를 해당 구현 단계에서 처음 시작하는 뜻은 아니다. 실모델 수치는 B에서 채우며 결과 기반 알고리즘 조정은 C에서 수행한다.
 

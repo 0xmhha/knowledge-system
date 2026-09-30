@@ -44,9 +44,13 @@
 | 보관본 손상/삭제, 구버전 매니페스트 | 조용한 HEAD 재해석 금지. 명시 오류 또는 제한된 legacy 읽기. |
 | 외부로 나가는 링크/비밀 경로/권한 실패 | 경로·원문 누출 없이 거부 또는 기록된 제외. |
 
-### 2026-09-30 CKG 기술 검증 1차 결과
+### 2026-09-30 CKG/CKV 기술 검증 결과
 
 `/private/tmp/ks-snapshot-spike.O1uiWX`의 작은 Go 저장소에서 한 커밋을 만들고 `git worktree add --detach`로 분기한 뒤 함수 `Before`를 `AfterWorkingTree`로 바꿨다. 현재 `ckg build --src <staged> --lang go`는 수정된 `AfterWorkingTree` AST 노드를 만들고 동시에 원래 HEAD의 temporal 노드/엣지를 생성했다. 노드의 `file_path`는 `main.go`로 상대 경로였다. 반면 CKG 출력 매니페스트의 `src_root`는 임시 staged 절대 경로였다. **결론:** Git 이력과 수정 AST의 동시 수집은 작은 픽스처에서 가능하다. 임시 절대 경로를 정렬/매니페스트/인용에 남기지 않는 인터페이스 변경과 다른 언어·큰 저장소·worktree 제거 뒤 재조회 검증은 남아 있다. 이 결과만으로 ADR을 승인하지 않는다.
+
+같은 날 Go/TypeScript 2파일과 Markdown 1파일로 기술 실험을 확대했다. 수정된 두 파일을 임시 Git worktree에 오버레이하면 CKG는 새 함수 `AfterWorkingTree`와 `afterWorkingTreeTS`, 원래 HEAD의 Commit 1개를 함께 만들었다. 같은 바이트의 두 번째 worktree는 동일 Go 모듈 환경에서 같은 두 canonical ID와 같은 그래프 다이제스트를 냈다. 비Git 일반 디렉터리도 CKG 7노드/5엣지와 CKV 6청크를 만들고 Commit 노드 0개, 빈 `indexed_head`를 기록했다. 별도 `sources/blobs/<sha256>` 시험 보관본의 네 파일은 staging 경로 없이 해시만으로 다시 읽혔다.
+
+두 결함도 재현됐다. Git worktree 빌드에서 CKG 심볼은 두 canonical ID를 가졌지만 CKV 정렬은 **0/2**였다. CKG의 같은 줄 Hunk/구문 노드가 정렬 인덱스의 첫 후보가 되고 빈 canonical ID를 복사한 것이다. 비Git 빌드에서는 **2/2**였다. 따라서 CKV 정렬 후보는 비어 있지 않은 canonical ID의 AST 심볼 타입으로 제한하고, 동일 줄의 우선순위를 고정하며, 두 모드 모두 정렬률 게이트를 적용한다. 또한 Go 빌드 캐시가 쓰기 불가인 재실행에서는 `parse_errors_count=0`인데 Go 함수 canonical ID가 비었다. Go 패키지 신원 조회 실패를 별도 `parse_degraded` 오류로 다뤄야 한다. CKG/CKV 매니페스트 모두 현재 `src_root`에 임시 절대 경로를 기록하므로 공개 전 논리 경로 분리가 필수다. 실험은 원문 보관·재조회의 엔진 통합 구현을 대신하지 않으며 A4에서 실패 주입과 플랫폼 간 결정성을 검증한다.
 
 ## 남은 구현 검증
 
