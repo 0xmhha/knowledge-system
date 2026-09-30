@@ -24,6 +24,9 @@ func (s Snapshot) validate() error {
 	if !fullCommit.MatchString(s.Commit) {
 		return fmt.Errorf("commit must be a full 40-character lowercase Git SHA")
 	}
+	if s.SnapshotID != "" && !digestPattern.MatchString(s.SnapshotID) {
+		return fmt.Errorf("snapshot_id must be a SHA-256 digest")
+	}
 	return nil
 }
 

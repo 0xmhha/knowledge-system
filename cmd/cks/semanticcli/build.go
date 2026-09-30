@@ -77,6 +77,10 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		return fmt.Errorf("read source HEAD: %w", err)
 	}
 	snapshot := semantic.Snapshot{ProjectID: o.project, DatasetID: o.dataset, Commit: strings.TrimSpace(string(commitBytes))}
+	snapshot.SnapshotID, err = semantic.PinnedSnapshotID(o.graph, o.project, o.dataset)
+	if err != nil {
+		return err
+	}
 	p := semantic.Projection{SchemaVersion: semantic.SchemaVersion, Snapshot: snapshot}
 	seen := map[string]bool{}
 	for _, file := range o.docs {

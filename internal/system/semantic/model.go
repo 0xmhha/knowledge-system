@@ -25,9 +25,10 @@ const (
 // Snapshot is the immutable project-scoped identity shared by every semantic
 // record. A working-tree digest will be added when that source mode lands.
 type Snapshot struct {
-	ProjectID string `json:"project_id"`
-	DatasetID string `json:"dataset_id"`
-	Commit    string `json:"commit"`
+	ProjectID  string `json:"project_id"`
+	DatasetID  string `json:"dataset_id"`
+	SnapshotID string `json:"snapshot_id,omitempty"`
+	Commit     string `json:"commit"`
 }
 
 // EvidenceSpan points to exact source lines. ContentSHA256 hashes the bytes

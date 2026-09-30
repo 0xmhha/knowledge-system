@@ -106,6 +106,45 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 	}
 }
 
+func TestPinnedSemanticProjectionCannotCrossDataset(t *testing.T) {
+	p, repo := fixture(t)
+	p.Snapshot.SnapshotID = strings.Repeat("b", 64)
+	for i := range p.Evidence {
+		p.Evidence[i].Snapshot = p.Snapshot
+	}
+	root := t.TempDir()
+	graphDir, vectorDir := filepath.Join(root, "graph"), filepath.Join(root, "vector")
+	graph := graphCoordinates{ProjectID: p.Snapshot.ProjectID, SnapshotID: p.Snapshot.SnapshotID,
+		DatasetID: p.Snapshot.DatasetID, FileManifestDigest: strings.Repeat("c", 64),
+		SchemaVersion: "1.23", SrcRoot: repo, SrcCommit: p.Snapshot.Commit, GraphDigest: strings.Repeat("a", 64)}
+	vector := vectorCoordinates{ProjectID: graph.ProjectID, SnapshotID: graph.SnapshotID,
+		DatasetID: graph.DatasetID, FileManifestDigest: graph.FileManifestDigest,
+		SrcRoot: repo, SrcCommit: p.Snapshot.Commit}
+	vector.Sources.CKG.GraphDigest, vector.Sources.CKG.SrcCommit = graph.GraphDigest, p.Snapshot.Commit
+	writeCoordinates(t, graphDir, graph)
+	writeCoordinates(t, vectorDir, vector)
+	if got, err := PinnedSnapshotID(graphDir, p.Snapshot.ProjectID, p.Snapshot.DatasetID); err != nil || got != p.Snapshot.SnapshotID {
+		t.Fatalf("pinned snapshot lookup: %q %v", got, err)
+	}
+	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err != nil {
+		t.Fatalf("pinned projection rejected: %v", err)
+	}
+	vector.DatasetID = "different"
+	writeCoordinates(t, vectorDir, vector)
+	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), "identity") {
+		t.Fatalf("cross-dataset projection accepted: %v", err)
+	}
+	vector.DatasetID = graph.DatasetID
+	writeCoordinates(t, vectorDir, vector)
+	p.Snapshot.DatasetID = "different"
+	for i := range p.Evidence {
+		p.Evidence[i].Snapshot = p.Snapshot
+	}
+	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), "identity") {
+		t.Fatalf("projection from another dataset accepted: %v", err)
+	}
+}
+
 func TestValidateCanonicalCoverageUsesMeasuredProjectFloor(t *testing.T) {
 	dir := t.TempDir()
 	writeCoordinates(t, dir, map[string]any{"symbol_count": 100, "canonical_count": 94})

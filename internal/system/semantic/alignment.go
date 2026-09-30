@@ -11,18 +11,26 @@ import (
 )
 
 type graphCoordinates struct {
-	SchemaVersion string `json:"schema_version"`
-	SrcRoot       string `json:"src_root"`
-	SrcCommit     string `json:"src_commit"`
-	GraphDigest   string `json:"graph_digest"`
+	ProjectID          string `json:"project_id"`
+	SnapshotID         string `json:"snapshot_id"`
+	DatasetID          string `json:"dataset_id"`
+	FileManifestDigest string `json:"file_manifest_digest"`
+	SchemaVersion      string `json:"schema_version"`
+	SrcRoot            string `json:"src_root"`
+	SrcCommit          string `json:"src_commit"`
+	GraphDigest        string `json:"graph_digest"`
 }
 
 type vectorCoordinates struct {
-	SrcRoot        string `json:"src_root"`
-	SrcCommit      string `json:"src_commit"`
-	SymbolCount    int    `json:"symbol_count"`
-	CanonicalCount int    `json:"canonical_count"`
-	Sources        struct {
+	ProjectID          string `json:"project_id"`
+	SnapshotID         string `json:"snapshot_id"`
+	DatasetID          string `json:"dataset_id"`
+	FileManifestDigest string `json:"file_manifest_digest"`
+	SrcRoot            string `json:"src_root"`
+	SrcCommit          string `json:"src_commit"`
+	SymbolCount        int    `json:"symbol_count"`
+	CanonicalCount     int    `json:"canonical_count"`
+	Sources            struct {
 		CKG struct {
 			GraphDigest string `json:"graph_digest"`
 			SrcCommit   string `json:"src_commit"`
@@ -68,6 +76,17 @@ func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string
 	if err := readCoordinates(filepath.Join(vectorDir, "manifest.json"), &vector); err != nil {
 		return fmt.Errorf("semantic vector manifest: %w", err)
 	}
+	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
+	vectorPinned := vector.ProjectID != "" || vector.SnapshotID != "" || vector.DatasetID != ""
+	if graphPinned || vectorPinned {
+		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" || graph.FileManifestDigest == "" ||
+			vector.ProjectID != graph.ProjectID || vector.SnapshotID != graph.SnapshotID || vector.DatasetID != graph.DatasetID ||
+			vector.FileManifestDigest != graph.FileManifestDigest ||
+			p.Snapshot.ProjectID != graph.ProjectID || p.Snapshot.DatasetID != graph.DatasetID ||
+			p.Snapshot.SnapshotID != graph.SnapshotID {
+			return fmt.Errorf("semantic project/snapshot/dataset identity differs across graph, vector and projection")
+		}
+	}
 	parts := strings.SplitN(graph.SchemaVersion, ".", 3)
 	if len(parts) < 2 {
 		return fmt.Errorf("semantic graph schema version missing or invalid")
@@ -104,6 +123,22 @@ func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string
 		return fmt.Errorf("semantic source root differs across graph, vector and projection repository")
 	}
 	return nil
+}
+
+// PinnedSnapshotID returns the graph candidate's immutable snapshot ID when
+// the new contract is present. Legacy manifests return an empty string.
+func PinnedSnapshotID(graphDir, projectID, datasetID string) (string, error) {
+	var graph graphCoordinates
+	if err := readCoordinates(filepath.Join(graphDir, "manifest.json"), &graph); err != nil {
+		return "", err
+	}
+	if graph.ProjectID == "" && graph.DatasetID == "" && graph.SnapshotID == "" {
+		return "", nil
+	}
+	if graph.ProjectID != projectID || graph.DatasetID != datasetID || graph.SnapshotID == "" {
+		return "", fmt.Errorf("semantic project/dataset flags do not match pinned graph identity")
+	}
+	return graph.SnapshotID, nil
 }
 
 func normalizedRoot(root string) (string, error) {
