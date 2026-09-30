@@ -12,6 +12,12 @@ The user approved D1-01–05 as proposed. The pilot ontology now has 20 vocabula
 
 The user kept the D1 twenty concepts fixed and endorsed a separation between the common model and organization-specific models. `DOMAIN-PACK-CONTRACT-V1.md` now specifies local pack locks, typed relation validation, policy/ADR provenance, scope and time, access filtering, v2 coding context, legacy reading, and failure oracles. `DELIVERY-PLAN-V2.md` adds R2-09–11 and A5.4/A5.5. D5-02–07 remain a reviewable detailed design proposal; the executable has not gained pack loading or new commands. The product owner may revise the proposed pilot/input/approval defaults before implementation.
 
+## A0 trace and structural baseline (2026-09-30)
+
+`A0-TRACE-BASELINE.md` maps each FR-01–10, INV-01–07, NFR-01–05 and R2-01–11 to existing code, tests, missing oracles and A/B/C work. It records fixture families and separate macOS arm64, Linux arm64 and Linux amd64 support states. D5 technical review resolved a self-referential overlay-lock digest ambiguity: the overlay hashes registered knowledge inputs but excludes `knowledge.lock.json`; the lock's own digest excludes its `lock_digest` field. This is a working implementation default under the user's instruction to proceed, not a claim of product-owner approval of D5-02–07 or verified organizational policy.
+
+At `7596bb6`, `go test ./...`, `go vet ./...`, `make boundaries`, and `make docs-check` all exited 0 with writable Go caches. Docs check covered 93 live documents before the new A0 file. macOS CGo emitted sqlite-vec SDK deprecation warnings. A0 trace/baseline is complete; A1–A8 implementation and B/C quality gates remain open.
+
 ## Gate 0: baseline and correctness
 
 | WBS | Status | Evidence | Remaining gate work |

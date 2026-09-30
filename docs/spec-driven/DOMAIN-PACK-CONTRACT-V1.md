@@ -37,7 +37,9 @@ CKS는 팩을 읽고 근거 문맥을 코딩 에이전트에게 제공하지만 
 
 `cks knowledge init`은 템플릿을 만들지만 기존 파일을 덮어쓰지 않는다. `cks knowledge validate`는 읽기 전용으로 구문·타입·출처·충돌을 보고한다. `cks knowledge lock`은 명시 선택된 로컬 팩의 바이트를 해시해 재현 가능한 잠금 파일을 만든다. `cks knowledge review`는 제안 인스턴스/관계와 원천을 제시하고 사람의 검토 기록을 입력 원본에 남긴다. 실제 인덱스 빌드는 잠금 파일이 입력 바이트와 다르면 `pack_lock_mismatch`로 실패한다. 새 명령과 파일 형식은 A5.4/A5.5/A7.1 구현 과제다.
 
-잠금 파일은 `project_id`, `pack_schema_version`, 정렬된 `{pack_id, version, digest, dependencies, origin_id}`와 `overlay_digest`를 담고, 정규화된 바이트의 SHA-256으로 자체 `lock_digest`를 만든다. 자가 참조를 피하기 위해 `lock_digest` 필드는 해시 입력에서 제외한다. 외부 팩의 정확한 파일 목록과 다이제스트는 A4 원천 매니페스트에도 포함한다. `build_recipe_digest`는 `lock_digest`, resolver/renderer 버전과 관계 검증기 버전을 포함한다. 그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다. 기존 데이터셋을 제자리 수정하지 않는다.
+잠금 파일은 `project_id`, `pack_schema_version`, 정렬된 `{pack_id, version, digest, dependencies, origin_id}`와 `overlay_digest`를 담고, 정규화된 바이트의 SHA-256으로 자체 `lock_digest`를 만든다. 자가 참조를 피하기 위해 `lock_digest` 필드는 해시 입력에서 제외한다. **`overlay_digest`의 입력에서는 `knowledge.lock.json` 전체를 제외**하고, `manifest.yaml` 및 `domain/`, `policies/`, `decisions/`, `questions/`의 등록된 일반 파일을 `(origin_id,path)` 순서로 해시한다. 각 파일 레코드는 A4의 상대 경로 정규화·바이트 SHA-256 규칙을 따르며 임시/숨김/미등록 파일을 묵인하지 않는다. `manifest.yaml`의 `source`는 저장소 루트 기준 상대 경로 또는 별도 등록한 로컬 루트의 `origin_id` 참조이며, 절대 경로·심볼릭 링크·루트 탈출은 거부한다. 외부 팩의 정확한 파일 목록과 다이제스트는 A4 원천 매니페스트에도 포함한다. `build_recipe_digest`는 `lock_digest`, resolver/renderer 버전과 관계 검증기 버전을 포함한다. 그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다. 기존 데이터셋을 제자리 수정하지 않는다.
+
+잠금의 `digest`와 `overlay_digest`는 정렬된 파일 레코드의 길이 접두어 직렬화에 대해 계산한다. 파일 해시는 **원문 바이트**에 대해 계산하므로 YAML 키 순서나 Markdown 공백 변경도 새 잠금을 요구한다. `lock_digest`만 잠금 객체에서 해당 필드를 제거한 뒤 키 순서가 고정된 정규 JSON 바이트에 대해 계산한다. 이 두 해시 절차의 골든 바이트와 충돌/누락 오류 코드는 A5.4 fixture로 고정한다.
 
 ## 4. 팩 스키마와 합성
 
@@ -86,6 +88,8 @@ source_ref: {origin_id: repo, path: .cks/knowledge/policies/BR-17.yaml}
 
 상태 축은 둘로 나눈다. 저장된 검토 판정은 `proposed|verified|rejected`이고, 조회 시 계산되는 유효 상태는 `current|stale|conflict|unknown|restricted`다. `verified`가 과거 스냅샷에만 맞거나 유효 기간이 끝나면 현재 질의에서는 `stale`이다. 같은 범위·시점의 양립 불가능한 검토된 정책은 `conflict`다. 근거가 없으면 `unknown`이다. 권한으로 원문을 공개할 수 없으면 후보 ID나 본문을 노출하지 않고 `restricted`만 표시한다. 삭제 대신 새 버전/대체 관계를 남겨 과거 패치 이유를 재현한다.
 
+프로젝트 `manifest.yaml`의 `review_policy.min_approvals`는 기본 1이며, 명시적으로 1 이상의 정수만 허용한다. 각 승인은 검토자 ID, 대상 원문 해시·스냅샷, 판정, 이유, 시각을 가진다. 동일 검토자의 중복 기록은 승인 수를 늘리지 않는다. 로컬 설치형에서는 검토자 ID의 **기록·감사**를 보장하며 외부 신원 제공자 없이 신원을 암호학적으로 인증한다고 주장하지 않는다. 조직이 서명 또는 인증을 요구하면 프로젝트별 권한 어댑터를 추가하고 그 전에는 해당 조직의 검토 요건을 충족했다고 표시하지 않는다.
+
 자동 추출은 정책/결정/코드 연결의 **후보**만 만든다. `verified` 승격에는 해당 입력 스냅샷의 원문 해시 재검증, 타입/범위 검증, 사람 검토자와 이유가 필요하다. 코드 심볼 앵커는 CKG의 `canonical_id`·파일·줄을, 문서 근거는 CKV/원문 보관본의 `origin_id`·경로·줄·해시를 대조한다. 소스에서 발견한 조건문은 정책 인스턴스를 생성하거나 승인하지 않는다. 정책의 작성 주체와 검토자는 W3C [PROV-O](https://www.w3.org/TR/prov-o/)의 Entity/Activity/Agent 구분에 맞게 표현할 수 있지만, 현행 시스템의 표준 준수를 주장하지 않는다.
 
 ## 6. CKS 질의와 코딩 문맥
@@ -128,4 +132,4 @@ v1/현행 v2 소비자는 새 팩 필드를 조용히 의미 있는 사실로 �
 | 입력 위치 | 저장소 `.cks/knowledge`가 기본; 등록한 별도 **로컬** 문서/팩 루트도 1급 입력 | 외부 원천은 origin/경로/해시/권한을 캡처해 네트워크 자동 수집 금지 |
 | 검토 역할 | 첫 버전은 프로젝트 소유자 1명 이상의 명시적 검토·이유를 요구; `min_approvals`를 설정할 수 있게 설계 | 복수 승인자가 필요한 조직은 프로젝트 정책에 따라 2명 이상 지정, 미충족 시 `proposed` 유지 |
 
-이 기본값은 사용자의 D5 방향 동의를 넘어 세부 정책까지 승인받았다는 뜻이 아니다. 구현 착수 전에 제품 소유자가 이 기준선과 A/B 수용 오라클을 검토하고, 다른 산업/검토 체계를 선택하면 버전·fixture·WBS를 함께 개정한다. D1의 20개와 D2–D4 계약은 이 선택으로 자동 변경하지 않는다.
+이 기본값은 사용자의 D5 방향 동의를 넘어 세부 정책까지 승인받았다는 뜻이 아니다. 사용자의 후속 진행 요청에 따라 A0와 **가역적인 구현·시험**에서는 이 기본값을 기준선으로 쓴다. 제품 소유자가 다른 산업/검토 체계를 선택하면 버전·fixture·WBS를 함께 개정하며, 정책 인스턴스의 `verified` 승격과 B0 정답 승인은 별도 사람 판정을 기다린다. D1의 20개와 D2–D4 계약은 이 선택으로 자동 변경하지 않는다.
