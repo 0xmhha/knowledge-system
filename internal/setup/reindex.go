@@ -336,12 +336,33 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	// Build into the version directory (o.Out/<version>/{graph,vector}).
 	vo := o
 	vo.Out = filepath.Join(dataset, version)
+	var captured CapturedSource
+	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
+		if _, err := os.Lstat(vo.Out); err == nil {
+			return fmt.Errorf("reindex: pinned version %q already exists; choose a new version", version)
+		} else if !os.IsNotExist(err) {
+			return fmt.Errorf("reindex: inspect version %q: %w", version, err)
+		}
+		captured, err = CaptureSource(CaptureOptions{Root: o.Src, Out: vo.Out,
+			ProjectID: o.ProjectID, SourceMode: "committed", SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit})
+		if err != nil {
+			return fmt.Errorf("reindex: retain source bytes: %w", err)
+		}
+		if captured.Identity != gopt.ExpectedSourceSnapshot {
+			return fmt.Errorf("reindex: captured source differs from pre-build identity")
+		}
+	}
 	plan, err := BuildPlan(vo)
 	if err != nil {
 		return fmt.Errorf("reindex: plan: %w", err)
 	}
 	if err := Execute(ctx, plan, r, emit); err != nil {
 		return fmt.Errorf("reindex: build version %s: %w", version, err)
+	}
+	if captured.Identity.SnapshotID != "" {
+		if err := captured.VerifyBlobs(); err != nil {
+			return fmt.Errorf("reindex: %w", err)
+		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		current, err := CommittedSourceIdentity(o.Src, o.ProjectID, gopt.ExpectedSourceSnapshot.SourceCommit)
@@ -369,6 +390,11 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 	if err := Gate(ctx, dataset, version, gopt, r, emit); err != nil {
 		return fmt.Errorf("reindex: %w (current left unchanged; version %s kept for diagnosis)", err, version)
+	}
+	if captured.Identity.SnapshotID != "" {
+		if err := captured.VerifyBlobs(); err != nil {
+			return fmt.Errorf("reindex: %w (current left unchanged)", err)
+		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		inputs, err := ConfiguredInputDigest(o)

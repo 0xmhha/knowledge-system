@@ -122,3 +122,47 @@ func TestWorkingTreeCaptureMaterializesModifiedAndNewBytesWithBaseHistory(t *tes
 		t.Fatalf("temporary build root retained: %v", err)
 	}
 }
+
+func TestCommittedCaptureMatchesPrebuildIdentityAndRetainsBytes(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	for name, body := range map[string]string{"main.go": "package sample\n", "README.md": "# Sample\n"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	head := identityGit(t, root, "rev-parse", "HEAD")
+	want, err := CommittedSourceIdentity(root, "project-one", head)
+	if err != nil {
+		t.Fatal(err)
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"),
+		ProjectID: "project-one", SourceMode: "committed", SourceCommit: head})
+	if err != nil || captured.Identity != want || len(captured.Files) != 2 {
+		t.Fatalf("committed capture differs from pre-build identity: %+v, want %+v: %v", captured, want, err)
+	}
+	if err := captured.VerifyBlobs(); err != nil {
+		t.Fatal(err)
+	}
+	version := filepath.Dir(filepath.Dir(captured.BlobDir))
+	if err := VerifyRetainedSource(version, want); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package changed\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := captured.VerifyAgainst(root); err == nil {
+		t.Fatal("changed committed source was accepted")
+	}
+	if err := captured.VerifyBlobs(); err != nil {
+		t.Fatalf("old citation bytes lost after live source changed: %v", err)
+	}
+	if err := os.Remove(filepath.Join(captured.BlobDir, captured.Files[0].SHA256)); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(version, want); err == nil || !strings.Contains(err.Error(), "source_missing") {
+		t.Fatalf("missing retained citation bytes accepted: %v", err)
+	}
+}

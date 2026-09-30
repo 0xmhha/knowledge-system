@@ -35,11 +35,17 @@ source "$scratch/identity.env"
   > "$scratch/semantic.json"
 "$repo_root/bin/cks" doctor --src "$src" --dataset "$dataset" > "$scratch/doctor.json"
 python3 - "$dataset/current/dataset-identity.json" "$scratch/projection.json" "$dataset/current" "$scratch/doctor.json" <<'PY'
-import json, pathlib, sqlite3, sys
+import hashlib, json, pathlib, sqlite3, sys
 identity = json.loads(pathlib.Path(sys.argv[1]).read_text())
 projection = json.loads(pathlib.Path(sys.argv[2]).read_text())
 root = pathlib.Path(sys.argv[3])
 doctor = json.loads(pathlib.Path(sys.argv[4]).read_text())
+captured = json.loads((root / 'sources' / 'manifest.json').read_text())
+assert captured['identity'] == identity['source']
+assert captured['files']
+for entry in captured['files']:
+    blob = (root / 'sources' / 'blobs' / entry['sha256']).read_bytes()
+    assert len(blob) == entry['size'] and hashlib.sha256(blob).hexdigest() == entry['sha256']
 assert doctor['identity_status'] == 'pinned' and doctor.get('reindex_required', False) is False
 assert doctor['project_id'] == identity['source']['project_id']
 assert doctor['snapshot_id'] == identity['source']['snapshot_id']
@@ -60,4 +66,18 @@ for engine in ('graph', 'vector'):
     ):
         assert manifest[key] == native[key] == want, (engine, key, manifest.get(key), native.get(key), want)
 PY
+first_blob="$(find "$dataset/current/sources/blobs" -type f | LC_ALL=C sort | head -n 1)"
+chmod u+w "$first_blob"
+printf 'tampered retained source\n' > "$first_blob"
+if "$repo_root/bin/cks" setup --out "$dataset" --rollback pinned > "$scratch/tamper.log" 2>&1; then
+  echo "rollback accepted a corrupted retained source blob" >&2
+  exit 1
+fi
+if "$repo_root/bin/cks" doctor --src "$src" --dataset "$dataset" > "$scratch/tampered-doctor.json"; then
+  python3 - "$scratch/tampered-doctor.json" <<'PY'
+import json, pathlib, sys
+report = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert report['status'] == 'degraded' and any('source' in issue for issue in report['issues'])
+PY
+fi
 echo "Pinned three-layer identity smoke passed: $scratch"

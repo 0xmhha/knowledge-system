@@ -348,6 +348,9 @@ func VerifyCandidateIdentity(versionDir string, expected SourceIdentity, inputDi
 	if err != nil || fromVector.DatasetID != identity.DatasetID {
 		return fmt.Errorf("vector embedding identity differs from candidate dataset: %v", err)
 	}
+	if err := VerifyRetainedSource(versionDir, expected); err != nil {
+		return err
+	}
 	return nil
 }
 

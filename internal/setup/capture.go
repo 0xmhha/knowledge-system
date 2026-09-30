@@ -28,8 +28,8 @@ type CaptureOptions struct {
 	Root          string
 	Out           string
 	ProjectID     string
-	SourceMode    string // working-tree or snapshot-only
-	SourceCommit  string // full HEAD for working-tree, empty for non-Git
+	SourceMode    string // committed, working-tree or snapshot-only
+	SourceCommit  string // full HEAD for Git modes, empty for non-Git
 	MaxFileBytes  int64
 	MaxTotalBytes int64
 }
@@ -42,17 +42,16 @@ type CapturedSource struct {
 }
 
 // CaptureSource stores a deterministic byte snapshot without exposing it to
-// an engine. A4 will provide staging and v2 citation consumers only after
-// CKG/CKV input reconciliation and no-follow tests pass. The output root must
-// be outside the source tree so it cannot recursively capture itself.
+// an engine. The output root must be outside the source tree so it cannot
+// recursively capture itself.
 func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if o.ProjectID == "" || o.Root == "" || o.Out == "" {
 		return CapturedSource{}, fmt.Errorf("capture requires project ID, source root and output root")
 	}
-	if o.SourceMode != "working-tree" && o.SourceMode != "snapshot-only" {
+	if o.SourceMode != "committed" && o.SourceMode != "working-tree" && o.SourceMode != "snapshot-only" {
 		return CapturedSource{}, fmt.Errorf("unsupported capture source mode %q", o.SourceMode)
 	}
-	if (o.SourceMode == "working-tree" && len(o.SourceCommit) != 40) ||
+	if ((o.SourceMode == "committed" || o.SourceMode == "working-tree") && len(o.SourceCommit) != 40) ||
 		(o.SourceMode == "snapshot-only" && o.SourceCommit != "") {
 		return CapturedSource{}, fmt.Errorf("capture source commit does not match mode")
 	}
@@ -64,7 +63,7 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if err != nil {
 		return CapturedSource{}, err
 	}
-	if o.SourceMode == "working-tree" {
+	if o.SourceMode == "working-tree" || o.SourceMode == "committed" {
 		if head, err := captureHead(root); err != nil || head != o.SourceCommit {
 			return CapturedSource{}, fmt.Errorf("working-tree base commit changed before capture: %v", err)
 		}
@@ -86,7 +85,7 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if o.MaxTotalBytes <= 0 {
 		o.MaxTotalBytes = 2 << 30
 	}
-	paths, err := capturePaths(root)
+	paths, err := captureModePaths(root, o.SourceMode)
 	if err != nil {
 		return CapturedSource{}, err
 	}
@@ -130,12 +129,16 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if err := result.VerifyAgainst(root); err != nil {
 		return CapturedSource{}, err
 	}
-	if o.SourceMode == "working-tree" {
+	if o.SourceMode == "working-tree" || o.SourceMode == "committed" {
 		if head, err := captureHead(root); err != nil || head != o.SourceCommit {
 			return CapturedSource{}, fmt.Errorf("working-tree base commit changed during capture: %v", err)
 		}
 	}
-	manifest, err := identityHash("cks.file-manifest.v2", result.Files)
+	files := make([]sourceFile, 0, len(result.Files))
+	for _, f := range result.Files {
+		files = append(files, sourceFile{Path: f.Path, SHA256: f.SHA256})
+	}
+	manifest, err := identityHash("cks.file-manifest.v2", files)
 	if err != nil {
 		return CapturedSource{}, err
 	}
@@ -155,6 +158,29 @@ func captureHead(root string) (string, error) {
 	cmd := exec.Command("git", "-C", root, "rev-parse", "HEAD")
 	buf, err := cmd.Output()
 	return strings.TrimSpace(string(buf)), err
+}
+
+func captureModePaths(root, mode string) ([]string, error) {
+	if mode != "committed" {
+		return capturePaths(root)
+	}
+	cmd := exec.Command("git", "-C", root, "ls-files", "-z", "--cached")
+	listed, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("list committed paths: %w", err)
+	}
+	if len(listed) == 0 {
+		return nil, nil
+	}
+	paths := strings.Split(strings.TrimSuffix(string(listed), "\x00"), "\x00")
+	for _, path := range paths {
+		if path == "" || filepath.IsAbs(path) || path == ".." || strings.HasPrefix(path, "../") ||
+			strings.ContainsRune(path, '\\') || !utf8.ValidString(path) || sensitiveCapturePath(path) {
+			return nil, fmt.Errorf("unsafe committed source path %q", path)
+		}
+	}
+	sort.Strings(paths)
+	return paths, nil
 }
 
 // MaterializeBuildTree creates a disposable copy from retained blobs. A Git
@@ -264,7 +290,7 @@ func capturePaths(root string) ([]string, error) {
 }
 
 func (c CapturedSource) VerifyAgainst(root string) error {
-	paths, err := capturePaths(root)
+	paths, err := captureModePaths(root, c.Identity.SourceMode)
 	if err != nil {
 		return err
 	}
@@ -300,7 +326,15 @@ func (c CapturedSource) ReadBlob(digest string) ([]byte, error) {
 	if len(digest) != 64 || strings.Trim(digest, "0123456789abcdef") != "" {
 		return nil, fmt.Errorf("invalid blob digest")
 	}
-	buf, err := os.ReadFile(filepath.Join(c.BlobDir, digest))
+	path := filepath.Join(c.BlobDir, digest)
+	info, err := os.Lstat(path)
+	if err != nil {
+		return nil, fmt.Errorf("source_missing: %w", err)
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("snapshot_mismatch: retained source blob is not a regular file")
+	}
+	buf, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("source_missing: %w", err)
 	}
@@ -309,6 +343,65 @@ func (c CapturedSource) ReadBlob(digest string) ([]byte, error) {
 		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed")
 	}
 	return buf, nil
+}
+
+// VerifyRetainedSource checks a candidate's optional archive. Older pinned
+// versions created before source retention remain readable, while any archive
+// that is present must match the immutable source identity and every blob.
+func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
+	sources := filepath.Join(versionDir, "sources")
+	info, err := os.Lstat(sources)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil || !info.IsDir() {
+		return fmt.Errorf("snapshot_mismatch: source archive is not a directory: %v", err)
+	}
+	var captured CapturedSource
+	if err := readJSON(filepath.Join(sources, "manifest.json"), &captured); err != nil {
+		return fmt.Errorf("source_missing: retained source manifest: %w", err)
+	}
+	if captured.Identity != expected || len(captured.Files) == 0 {
+		return fmt.Errorf("snapshot_mismatch: retained source identity differs from candidate")
+	}
+	entries := make([]sourceFile, 0, len(captured.Files))
+	prev := ""
+	for _, f := range captured.Files {
+		if f.Path == "" || filepath.IsAbs(f.Path) || f.Path == ".." ||
+			strings.HasPrefix(f.Path, "../") || strings.ContainsRune(f.Path, '\\') ||
+			!utf8.ValidString(f.Path) || f.Path <= prev || f.Size < 0 {
+			return fmt.Errorf("snapshot_mismatch: invalid retained source path")
+		}
+		prev = f.Path
+		entries = append(entries, sourceFile{Path: f.Path, SHA256: f.SHA256})
+	}
+	digest, err := identityHash("cks.file-manifest.v2", entries)
+	if err != nil || digest != expected.FileManifestDigest {
+		return fmt.Errorf("snapshot_mismatch: retained file inventory differs from candidate")
+	}
+	blobs := filepath.Join(sources, "blobs")
+	info, err = os.Lstat(blobs)
+	if err != nil || !info.IsDir() {
+		return fmt.Errorf("source_missing: retained blobs directory: %v", err)
+	}
+	captured.BlobDir = blobs
+	return captured.VerifyBlobs()
+}
+
+// VerifyBlobs rechecks retained bytes before a candidate is promoted. A
+// manifest alone is insufficient when a blob was deleted or replaced during
+// a long graph/vector build.
+func (c CapturedSource) VerifyBlobs() error {
+	for _, f := range c.Files {
+		buf, err := c.ReadBlob(f.SHA256)
+		if err != nil {
+			return fmt.Errorf("retained source %q: %w", f.Path, err)
+		}
+		if int64(len(buf)) != f.Size {
+			return fmt.Errorf("snapshot_mismatch: retained source %q changed size", f.Path)
+		}
+	}
+	return nil
 }
 
 func writeCapturedBlob(path string, data []byte) error {
