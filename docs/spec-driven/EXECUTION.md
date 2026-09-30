@@ -8,6 +8,10 @@ Current assessment (2026-09-30): **The user approved D1–D4 design decisions; t
 
 The user approved D1-01–05 as proposed. The pilot ontology now has 20 vocabulary entries; the three pilot requirements name their related concept IDs. The ontology test extracts both YAML files from one committed fixture, checks every concept/source span and validates the combined projection's references. `go test ./internal/system/semantic`, `go test ./...`, and `make docs-check` passed (91 live documents). These checks establish parser/reference compatibility and documentation integrity, not runtime `CHECKED_BY` migration, actual patch/decision storage, or model quality; those remain A5.1/A5.3 and B/C work.
 
+## D5 domain extension design (2026-09-30)
+
+The user kept the D1 twenty concepts fixed and endorsed a separation between the common model and organization-specific models. `DOMAIN-PACK-CONTRACT-V1.md` now specifies local pack locks, typed relation validation, policy/ADR provenance, scope and time, access filtering, v2 coding context, legacy reading, and failure oracles. `DELIVERY-PLAN-V2.md` adds R2-09–11 and A5.4/A5.5. D5-02–07 remain a reviewable detailed design proposal; the executable has not gained pack loading or new commands. The product owner may revise the proposed pilot/input/approval defaults before implementation.
+
 ## Gate 0: baseline and correctness
 
 | WBS | Status | Evidence | Remaining gate work |

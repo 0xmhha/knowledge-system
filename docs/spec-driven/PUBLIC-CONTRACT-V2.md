@@ -46,6 +46,10 @@ v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start
 
 `sha256-v2`는 `metadata.integrity_hash`를 **제외**하고 `metadata.integrity_hash_algo`를 포함한 전체 v2 응답을 [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785.html)으로 정규화한 UTF-8 바이트의 SHA-256이다. 정화된 본문과 `semantic` 필드까지 포함한다. 중복 JSON 키, 유효하지 않은 UTF-8, I-JSON 밖의 수치는 거부한다. 구현은 Go 생산자와 독립 소비자의 동일 바이트·해시 골든을 갖춘다. v1의 `ComputeIntegrityHash`는 바꾸지 않는다.
 
+### D5 선택형 도메인 문맥
+
+사용자가 도메인 팩을 선택하고 검토된 프로젝트 정책/결정이 존재하면 명시 v2 응답의 `semantic.knowledge_context`에 `{state, lock_digest, applicable_policies, decisions, constraints, related_requirements, test_links, unknowns, conflicts}`를 싣는다. 각 항목은 안정 타입/ID와 상태, 적용 범위, **같은 응답의 v2 인용 좌표**로 검증할 수 있는 출처 참조만 가진다. 본문은 권한/정화 검사를 거친 `bodies`/인용 경로로만 노출한다. `state=complete`는 이 문맥의 근거 무결성을 뜻하며 업무 정답을 보증하지 않는다. `unknown|conflict|stale|restricted|budget_exceeded` 항목은 확정 이유나 정책 준수로 직렬화하지 않는다. `semantic` 전체가 위 `sha256-v2` 해시 범위에 든다. 팩 미설치 또는 기능 꺼짐은 `semantic=null`을 허용하며 기존 후보·v1 DTO/해시는 유지한다. 정확 필드/상태 규칙은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다.
+
 ## 오류와 마이그레이션
 
 ### D1-02 의미 관계명 개정
