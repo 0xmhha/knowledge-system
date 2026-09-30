@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
 )
 
 var fullCommit = regexp.MustCompile(`^[0-9a-f]{40}$`)
@@ -21,11 +23,23 @@ func (s Snapshot) validate() error {
 	if strings.TrimSpace(s.ProjectID) == "" || strings.TrimSpace(s.DatasetID) == "" {
 		return fmt.Errorf("project_id and dataset_id are required")
 	}
-	if !fullCommit.MatchString(s.Commit) {
-		return fmt.Errorf("commit must be a full 40-character lowercase Git SHA")
+	switch s.SourceMode {
+	case "", "committed", "working-tree":
+		if !fullCommit.MatchString(s.Commit) {
+			return fmt.Errorf("commit must be a full 40-character lowercase Git SHA")
+		}
+	case "snapshot-only":
+		if s.Commit != "" {
+			return fmt.Errorf("snapshot-only source cannot claim a Git commit")
+		}
+	default:
+		return fmt.Errorf("unsupported semantic source mode %q", s.SourceMode)
 	}
 	if s.SnapshotID != "" && !digestPattern.MatchString(s.SnapshotID) {
 		return fmt.Errorf("snapshot_id must be a SHA-256 digest")
+	}
+	if s.SourceMode != "" && s.SnapshotID == "" {
+		return fmt.Errorf("source-mode semantic evidence requires snapshot_id")
 	}
 	return nil
 }
@@ -395,6 +409,34 @@ func safeRelativePath(file string) bool {
 // recorded in the projection. It reads Git objects rather than the current
 // working tree, so uncommitted edits cannot masquerade as verified evidence.
 func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error {
+	if p.Snapshot.SourceMode == "working-tree" || p.Snapshot.SourceMode == "snapshot-only" {
+		return fmt.Errorf("requires_v2: non-committed semantic evidence requires retained source validation")
+	}
+	return p.validateSourceBytes(func(file string) ([]byte, error) {
+		cmd := exec.CommandContext(ctx, "git", "-C", repoRoot, "show", p.Snapshot.Commit+":"+file)
+		return cmd.Output()
+	})
+}
+
+// ValidateRetainedSources checks the immutable archive used by non-committed
+// snapshots. It also works for retained committed candidates and never opens
+// the mutable checkout or asks Git for HEAD content.
+func (p Projection) ValidateRetainedSources(versionDir string) error {
+	return p.validateSourceBytes(func(file string) ([]byte, error) {
+		buf, identity, _, err := setup.ReadRetainedFile(versionDir, "repo", file)
+		if err != nil {
+			return nil, err
+		}
+		if identity.Source.ProjectID != p.Snapshot.ProjectID || identity.DatasetID != p.Snapshot.DatasetID ||
+			identity.Source.SnapshotID != p.Snapshot.SnapshotID || identity.Source.SourceCommit != p.Snapshot.Commit ||
+			identity.Source.SourceMode != p.Snapshot.SourceMode {
+			return nil, fmt.Errorf("snapshot_mismatch: semantic source coordinates differ from archive")
+		}
+		return buf, nil
+	})
+}
+
+func (p Projection) validateSourceBytes(read func(string) ([]byte, error)) error {
 	if err := p.Validate(); err != nil {
 		return err
 	}
@@ -403,8 +445,7 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 		if content, ok := contents[file]; ok {
 			return content, nil
 		}
-		cmd := exec.CommandContext(ctx, "git", "-C", repoRoot, "show", p.Snapshot.Commit+":"+file)
-		content, err := cmd.Output()
+		content, err := read(file)
 		if err != nil {
 			return nil, err
 		}

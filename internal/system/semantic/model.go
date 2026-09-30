@@ -23,11 +23,12 @@ const (
 )
 
 // Snapshot is the immutable project-scoped identity shared by every semantic
-// record. A working-tree digest will be added when that source mode lands.
+// record. SourceMode is omitted in historical committed projections.
 type Snapshot struct {
 	ProjectID  string `json:"project_id"`
 	DatasetID  string `json:"dataset_id"`
 	SnapshotID string `json:"snapshot_id,omitempty"`
+	SourceMode string `json:"source_mode,omitempty"`
 	Commit     string `json:"commit"`
 }
 

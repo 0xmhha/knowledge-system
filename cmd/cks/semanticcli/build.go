@@ -12,26 +12,27 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/0xmhha/knowledge-system/internal/setup"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 )
 
 func newBuildCmd() *cobra.Command {
-	var repo, project, dataset, graph, vector, storePath, output, ontology, spec string
+	var repo, project, dataset, graph, vector, storePath, output, ontology, spec, versionDir string
 	var docs []string
 	var activate, extractOnly bool
 	var minimumCoverage float64
 	cmd := &cobra.Command{
-		Use: "build", Short: "Extract committed Markdown sections into an aligned semantic dataset",
+		Use: "build", Short: "Extract archived or committed Markdown sections into an aligned semantic dataset",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runBuild(cmd.Context(), cmd, buildOptions{
 				repo: repo, project: project, dataset: dataset, graph: graph, vector: vector,
-				store: storePath, output: output, docs: docs, ontology: ontology, spec: spec,
+				store: storePath, output: output, docs: docs, ontology: ontology, spec: spec, versionDir: versionDir,
 				activate: activate, extractOnly: extractOnly, minimumCoverage: minimumCoverage,
 			})
 		},
 	}
-	cmd.Flags().StringVar(&repo, "repo", "", "source Git repository")
+	cmd.Flags().StringVar(&repo, "repo", "", "logical source root (Git repository for legacy committed builds)")
 	cmd.Flags().StringVar(&project, "project-id", "", "stable project identifier")
 	cmd.Flags().StringVar(&dataset, "dataset-id", "", "immutable semantic dataset identifier")
 	cmd.Flags().StringVar(&graph, "graph", "", "CKG data directory")
@@ -41,6 +42,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringSliceVar(&docs, "docs", nil, "repository-relative committed Markdown paths (repeatable)")
 	cmd.Flags().StringVar(&ontology, "ontology", "", "repository-relative committed ontology YAML path")
 	cmd.Flags().StringVar(&spec, "spec", "", "repository-relative committed specification YAML path")
+	cmd.Flags().StringVar(&versionDir, "version-dir", "", "pinned dataset directory with retained source archive (required for working-tree and snapshot-only)")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
 	cmd.Flags().BoolVar(&extractOnly, "extract-only", false, "write a reviewable projection without storing or activating it")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
@@ -51,11 +53,11 @@ func newBuildCmd() *cobra.Command {
 }
 
 type buildOptions struct {
-	repo, project, dataset, graph, vector, store, output, ontology, spec string
-	docs                                                                 []string
-	activate                                                             bool
-	extractOnly                                                          bool
-	minimumCoverage                                                      float64
+	repo, project, dataset, graph, vector, store, output, ontology, spec, versionDir string
+	docs                                                                             []string
+	activate                                                                         bool
+	extractOnly                                                                      bool
+	minimumCoverage                                                                  float64
 }
 
 func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
@@ -72,14 +74,35 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	if err != nil {
 		return err
 	}
-	commitBytes, err := exec.CommandContext(ctx, "git", "-C", repo, "rev-parse", "HEAD").Output()
-	if err != nil {
-		return fmt.Errorf("read source HEAD: %w", err)
+	snapshot := semantic.Snapshot{ProjectID: o.project, DatasetID: o.dataset}
+	readSource := func(file string) ([]byte, error) {
+		return exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+file).Output()
 	}
-	snapshot := semantic.Snapshot{ProjectID: o.project, DatasetID: o.dataset, Commit: strings.TrimSpace(string(commitBytes))}
-	snapshot.SnapshotID, err = semantic.PinnedSnapshotID(o.graph, o.project, o.dataset)
-	if err != nil {
-		return err
+	if o.versionDir != "" {
+		identity, inspectErr := setup.InspectVersionIdentity(o.versionDir)
+		if inspectErr != nil {
+			return inspectErr
+		}
+		if identity == nil || identity.Source.ProjectID != o.project || identity.DatasetID != o.dataset {
+			return fmt.Errorf("semantic version directory has no matching pinned identity")
+		}
+		snapshot.Commit = identity.Source.SourceCommit
+		snapshot.SnapshotID = identity.Source.SnapshotID
+		snapshot.SourceMode = identity.Source.SourceMode
+		readSource = func(file string) ([]byte, error) {
+			buf, _, _, err := setup.ReadRetainedFile(o.versionDir, "repo", file)
+			return buf, err
+		}
+	} else {
+		commitBytes, commitErr := exec.CommandContext(ctx, "git", "-C", repo, "rev-parse", "HEAD").Output()
+		if commitErr != nil {
+			return fmt.Errorf("read source HEAD: %w", commitErr)
+		}
+		snapshot.Commit = strings.TrimSpace(string(commitBytes))
+		snapshot.SnapshotID, err = semantic.PinnedSnapshotID(o.graph, o.project, o.dataset)
+		if err != nil {
+			return err
+		}
 	}
 	p := semantic.Projection{SchemaVersion: semantic.SchemaVersion, Snapshot: snapshot}
 	seen := map[string]bool{}
@@ -91,9 +114,9 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 			return fmt.Errorf("duplicate document path %q", file)
 		}
 		seen[file] = true
-		content, err := exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+file).Output()
+		content, err := readSource(file)
 		if err != nil {
-			return fmt.Errorf("read committed document %q: %w", file, err)
+			return fmt.Errorf("read source document %q: %w", file, err)
 		}
 		part, err := semantic.ExtractMarkdown(snapshot, file, content)
 		if err != nil {
@@ -106,7 +129,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		if !safeInputPath(o.ontology) || seen[o.ontology] {
 			return fmt.Errorf("unsafe or duplicate ontology path %q", o.ontology)
 		}
-		content, err := exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+o.ontology).Output()
+		content, err := readSource(o.ontology)
 		if err != nil {
 			return fmt.Errorf("read committed ontology %q: %w", o.ontology, err)
 		}
@@ -122,7 +145,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		if !safeInputPath(o.spec) || seen[o.spec] {
 			return fmt.Errorf("unsafe or duplicate specification path %q", o.spec)
 		}
-		content, err := exec.CommandContext(ctx, "git", "-C", repo, "show", snapshot.Commit+":"+o.spec).Output()
+		content, err := readSource(o.spec)
 		if err != nil {
 			return fmt.Errorf("read committed specification %q: %w", o.spec, err)
 		}
@@ -142,7 +165,11 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		if err := semantic.ValidateDatasetAlignment(p, repo, o.graph, o.vector); err != nil {
 			return err
 		}
-		if err := p.ValidateSources(ctx, repo); err != nil {
+		if o.versionDir != "" {
+			if err := p.ValidateRetainedSources(o.versionDir); err != nil {
+				return err
+			}
+		} else if err := p.ValidateSources(ctx, repo); err != nil {
 			return err
 		}
 	} else {
@@ -151,7 +178,12 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 			return err
 		}
 		defer store.Close()
-		if err := store.PutAligned(ctx, p, repo, o.graph, o.vector); err != nil {
+		if o.versionDir != "" {
+			err = store.PutAlignedRetained(ctx, p, repo, o.graph, o.vector, o.versionDir)
+		} else {
+			err = store.PutAligned(ctx, p, repo, o.graph, o.vector)
+		}
+		if err != nil {
 			return err
 		}
 	}
@@ -164,7 +196,12 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		return err
 	}
 	if o.activate {
-		if err := store.ActivateAligned(ctx, o.project, o.dataset, repo, o.graph, o.vector); err != nil {
+		if o.versionDir != "" {
+			err = store.ActivateAlignedRetained(ctx, o.project, o.dataset, repo, o.graph, o.vector, o.versionDir)
+		} else {
+			err = store.ActivateAligned(ctx, o.project, o.dataset, repo, o.graph, o.vector)
+		}
+		if err != nil {
 			return err
 		}
 	}

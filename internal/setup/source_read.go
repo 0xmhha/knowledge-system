@@ -37,47 +37,9 @@ func ReadRetainedLines(versionDir, originID, path string, first, last int) (Reta
 	if originID != "repo" || first <= 0 || last < first || path == "" {
 		return RetainedEvidence{}, fmt.Errorf("invalid retained citation coordinates")
 	}
-	if err := validateCapturedPaths([]string{path}); err != nil {
-		return RetainedEvidence{}, err
-	}
-	identity, err := InspectVersionIdentity(versionDir)
+	buf, identity, fileSHA, err := ReadRetainedFile(versionDir, originID, path)
 	if err != nil {
 		return RetainedEvidence{}, err
-	}
-	if identity == nil {
-		return RetainedEvidence{}, fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
-	}
-	sources := filepath.Join(versionDir, "sources")
-	info, err := os.Lstat(sources)
-	if err != nil || !info.IsDir() {
-		return RetainedEvidence{}, fmt.Errorf("source_missing: source archive is unavailable")
-	}
-	manifestPath := filepath.Join(sources, "manifest.json")
-	info, err = os.Lstat(manifestPath)
-	if err != nil || !info.Mode().IsRegular() {
-		return RetainedEvidence{}, fmt.Errorf("source_missing: source archive manifest is unavailable")
-	}
-	var captured CapturedSource
-	if err := readJSON(manifestPath, &captured); err != nil || captured.Identity != identity.Source {
-		return RetainedEvidence{}, fmt.Errorf("snapshot_mismatch: retained source identity changed: %v", err)
-	}
-	var record *CapturedFile
-	for i := range captured.Files {
-		if captured.Files[i].OriginID == originID && captured.Files[i].Path == path {
-			record = &captured.Files[i]
-			break
-		}
-	}
-	if record == nil {
-		return RetainedEvidence{}, fmt.Errorf("source_missing: citation file is not in the retained inventory")
-	}
-	captured.BlobDir = filepath.Join(sources, "blobs")
-	buf, err := captured.ReadBlob(record.SHA256)
-	if err != nil {
-		return RetainedEvidence{}, err
-	}
-	if int64(len(buf)) != record.Size || !utf8.Valid(buf) {
-		return RetainedEvidence{}, fmt.Errorf("snapshot_mismatch: retained citation file changed or is not UTF-8")
 	}
 	span, err := sourceLineBytes(buf, first, last)
 	if err != nil {
@@ -92,7 +54,58 @@ func ReadRetainedLines(versionDir, originID, path string, first, last int) (Reta
 		SnapshotID: identity.Source.SnapshotID, SourceMode: identity.Source.SourceMode,
 		OriginID: originID, File: path, StartLine: first, EndLine: last,
 		CommitHash: commit, BaseCommit: identity.Source.SourceCommit,
-		FileSHA256: record.SHA256, ContentSHA256: hex.EncodeToString(sum[:]), Text: string(span)}, nil
+		FileSHA256: fileSHA, ContentSHA256: hex.EncodeToString(sum[:]), Text: string(span)}, nil
+}
+
+// ReadRetainedFile returns verified original bytes for semantic extraction.
+// This is an internal raw-byte API: public responses must sanitize them.
+func ReadRetainedFile(versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
+	if originID != "repo" || path == "" {
+		return nil, nil, "", fmt.Errorf("invalid retained source coordinates")
+	}
+	if err := validateCapturedPaths([]string{path}); err != nil {
+		return nil, nil, "", err
+	}
+	identity, err := InspectVersionIdentity(versionDir)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	if identity == nil {
+		return nil, nil, "", fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
+	}
+	sources := filepath.Join(versionDir, "sources")
+	info, err := os.Lstat(sources)
+	if err != nil || !info.IsDir() {
+		return nil, nil, "", fmt.Errorf("source_missing: source archive is unavailable")
+	}
+	manifestPath := filepath.Join(sources, "manifest.json")
+	info, err = os.Lstat(manifestPath)
+	if err != nil || !info.Mode().IsRegular() {
+		return nil, nil, "", fmt.Errorf("source_missing: source archive manifest is unavailable")
+	}
+	var captured CapturedSource
+	if err := readJSON(manifestPath, &captured); err != nil || captured.Identity != identity.Source {
+		return nil, nil, "", fmt.Errorf("snapshot_mismatch: retained source identity changed: %v", err)
+	}
+	var record *CapturedFile
+	for i := range captured.Files {
+		if captured.Files[i].OriginID == originID && captured.Files[i].Path == path {
+			record = &captured.Files[i]
+			break
+		}
+	}
+	if record == nil {
+		return nil, nil, "", fmt.Errorf("source_missing: citation file is not in the retained inventory")
+	}
+	captured.BlobDir = filepath.Join(sources, "blobs")
+	buf, err := captured.ReadBlob(record.SHA256)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	if int64(len(buf)) != record.Size || !utf8.Valid(buf) {
+		return nil, nil, "", fmt.Errorf("snapshot_mismatch: retained citation file changed or is not UTF-8")
+	}
+	return buf, identity, record.SHA256, nil
 }
 
 func sourceLineBytes(data []byte, first, last int) ([]byte, error) {

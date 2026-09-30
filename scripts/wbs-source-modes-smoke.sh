@@ -39,8 +39,31 @@ for before, after in (
 path.write_text(config)
 PY
 sed 's/Alpha/Zeta/g' "$repo_root/testdata/wbs-smoke/main.go" > "$plain/main.go"
+sed 's/Alpha/Zeta/g' "$repo_root/testdata/wbs-smoke/README.md" > "$plain/README.md"
 python3 "$repo_root/scripts/wbs-source-mcp-probe.py" "$repo_root/bin/cks" \
   "$scratch/plain-mcp.yaml" "$scratch/plain-mcp.log"
+python3 - "$repo_root/bin/cks" "$plain" "$scratch/plain-data/current" "$scratch" <<'PY'
+import json, pathlib, subprocess, sys
+binary, src, version, scratch = sys.argv[1:]
+root = pathlib.Path(version)
+identity = json.loads((root / 'dataset-identity.json').read_text())
+out = pathlib.Path(scratch) / 'plain-semantic.json'
+args = [binary, 'semantic', 'build', '--repo', src, '--project-id', 'plain',
+    '--dataset-id', identity['dataset_id'], '--graph', str(root / 'graph'),
+    '--vector', str(root / 'vector'), '--store', str(pathlib.Path(scratch) / 'plain-semantic.db'),
+    '--out', str(out), '--docs', 'README.md', '--version-dir', version, '--activate']
+subprocess.run(args, check=True, capture_output=True, text=True)
+projection = json.loads(out.read_text())
+assert projection['snapshot']['source_mode'] == 'snapshot-only'
+assert projection['snapshot']['commit'] == ''
+assert any(section['heading'] == 'Alpha' for section in projection['sections'])
+assert all(section['heading'] != 'Zeta' for section in projection['sections'])
+check = subprocess.run([binary, 'semantic', 'lookup-term', '--project-id', 'plain',
+    '--repo', src, '--graph', str(root / 'graph'), '--vector', str(root / 'vector'),
+    '--store', str(pathlib.Path(scratch) / 'plain-semantic.db'), '--lang', 'en',
+    '--term', 'Alpha'], check=True, capture_output=True, text=True)
+assert json.loads(check.stdout)['snapshot']['snapshot_id'] == identity['source']['snapshot_id']
+PY
 cat > "$scratch/mutate.sh" <<EOF
 #!/bin/sh
 printf 'changed during gate\n' > '$src/new.md'

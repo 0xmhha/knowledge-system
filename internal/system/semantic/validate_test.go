@@ -66,6 +66,25 @@ func TestProjectionValidatesSnapshotAndCommittedSource(t *testing.T) {
 	}
 }
 
+func TestNonCommittedSemanticEvidenceRequiresArchive(t *testing.T) {
+	p, repo := fixture(t)
+	p.Snapshot.SourceMode = "working-tree"
+	p.Snapshot.SnapshotID = strings.Repeat("a", 64)
+	p.Evidence[0].Snapshot = p.Snapshot
+	if err := p.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	if err := p.ValidateSources(context.Background(), repo); err == nil || !strings.Contains(err.Error(), "requires_v2") {
+		t.Fatalf("non-committed evidence read from Git: %v", err)
+	}
+	p.Snapshot.SourceMode = "snapshot-only"
+	p.Snapshot.Commit = ""
+	p.Evidence[0].Snapshot = p.Snapshot
+	if err := p.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
 	p, dir := fixture(t)
 	p.Evidence[0].Snapshot.DatasetID = "other"

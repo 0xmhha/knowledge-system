@@ -2,6 +2,7 @@ package semantic
 
 import (
 	"context"
+	"path/filepath"
 )
 
 // ActiveProjection can only be obtained after the current semantic dataset
@@ -31,7 +32,11 @@ func validateActiveProjection(ctx context.Context, p Projection, repoRoot, graph
 	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
 		return err
 	}
-	if err := p.ValidateSources(ctx, repoRoot); err != nil {
+	if p.Snapshot.SourceMode == "working-tree" || p.Snapshot.SourceMode == "snapshot-only" {
+		if err := p.ValidateRetainedSources(filepath.Dir(graphDir)); err != nil {
+			return err
+		}
+	} else if err := p.ValidateSources(ctx, repoRoot); err != nil {
 		return err
 	}
 	return nil

@@ -18,6 +18,7 @@ type graphCoordinates struct {
 	SchemaVersion      string `json:"schema_version"`
 	SrcRoot            string `json:"src_root"`
 	SrcCommit          string `json:"src_commit"`
+	SourceMode         string `json:"source_mode"`
 	GraphDigest        string `json:"graph_digest"`
 }
 
@@ -28,6 +29,7 @@ type vectorCoordinates struct {
 	FileManifestDigest string `json:"file_manifest_digest"`
 	SrcRoot            string `json:"src_root"`
 	SrcCommit          string `json:"src_commit"`
+	SourceMode         string `json:"source_mode"`
 	SymbolCount        int    `json:"symbol_count"`
 	CanonicalCount     int    `json:"canonical_count"`
 	Sources            struct {
@@ -96,7 +98,17 @@ func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string
 	if majorErr != nil || minorErr != nil || major < 1 || (major == 1 && minor < 19) {
 		return fmt.Errorf("semantic graph schema %q lacks canonical_id support", graph.SchemaVersion)
 	}
-	if graph.SrcCommit == "" || vector.SrcCommit == "" || vector.Sources.CKG.SrcCommit == "" ||
+	mode := p.Snapshot.SourceMode
+	if mode == "" {
+		mode = "committed"
+	}
+	if graphPinned && (graph.SourceMode != vector.SourceMode ||
+		(graph.SourceMode != "" && graph.SourceMode != mode) ||
+		(graph.SourceMode == "" && mode != "committed")) {
+		return fmt.Errorf("semantic source mode differs across graph, vector and projection")
+	}
+	if (mode != "snapshot-only" && (graph.SrcCommit == "" || vector.SrcCommit == "" || vector.Sources.CKG.SrcCommit == "")) ||
+		(mode == "snapshot-only" && p.Snapshot.Commit != "") ||
 		graph.SrcCommit != p.Snapshot.Commit || vector.SrcCommit != p.Snapshot.Commit ||
 		vector.Sources.CKG.SrcCommit != p.Snapshot.Commit {
 		return fmt.Errorf("semantic source commit is missing or differs across graph, vector and projection")
@@ -183,6 +195,24 @@ func (s *Store) PutAligned(ctx context.Context, p Projection, repoRoot, graphDir
 	return s.Put(ctx, p, repoRoot)
 }
 
+// PutAlignedRetained validates raw meaning against the immutable candidate
+// archive, including when the source has no Git history or has since changed.
+func (s *Store) PutAlignedRetained(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir, versionDir string) error {
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
+		return err
+	}
+	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
+		return err
+	}
+	if err := p.ValidateRetainedSources(versionDir); err != nil {
+		return err
+	}
+	return s.putVerified(ctx, p)
+}
+
 // ActivateAligned rechecks current engine coordinates immediately before
 // selecting a projection. It keeps an older stored candidate from becoming
 // live after the graph/vector indexes have moved to another snapshot.
@@ -201,6 +231,26 @@ func (s *Store) ActivateAligned(ctx context.Context, projectID, datasetID, repoR
 		return err
 	}
 	if err := p.ValidateSources(ctx, repoRoot); err != nil {
+		return err
+	}
+	return s.Activate(ctx, projectID, datasetID)
+}
+
+func (s *Store) ActivateAlignedRetained(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir, versionDir string) error {
+	p, err := s.Load(ctx, projectID, datasetID)
+	if err != nil {
+		return err
+	}
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return err
+	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
+		return err
+	}
+	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
+		return err
+	}
+	if err := p.ValidateRetainedSources(versionDir); err != nil {
 		return err
 	}
 	return s.Activate(ctx, projectID, datasetID)

@@ -97,6 +97,10 @@ func (s *Store) Put(ctx context.Context, p Projection, repoRoot string) error {
 	if err := p.ValidateSources(ctx, repoRoot); err != nil {
 		return err
 	}
+	return s.putVerified(ctx, p)
+}
+
+func (s *Store) putVerified(ctx context.Context, p Projection) error {
 	buf, err := json.Marshal(p)
 	if err != nil {
 		return err
