@@ -31,6 +31,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	vectorBinary := fs.String("vector-binary", "", "ckv binary path (cks.ops.index)")
 	policyFile := fs.String("policy-file", "", "ckg governance policy file")
 	embedModel := fs.String("embed-model", "", "Ollama embed model; empty defaults to \"bge-m3\"")
+	embedDim := fs.Int("embed-dim", 0, "Ollama MRL output dimension; 0 uses native dimension")
+	queryPrefixPolicy := fs.String("query-prefix-policy", "registry", "Ollama query transformation: registry | none")
 	ollamaURL := fs.String("ollama-url", "", "Ollama endpoint; empty defaults to http://localhost:11434")
 	port := fs.String("port", "", "HTTP listen port; the host is filled in automatically — 127.0.0.1, or every interface with --lan")
 	httpAddr := fs.String("http-addr", "", "full HTTP listen host:port when you need to name the interface yourself; prefer --port. Empty defaults to 127.0.0.1:8080")
@@ -97,6 +99,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		VectorBinary:       *vectorBinary,
 		PolicyFile:         *policyFile,
 		EmbedModel:         *embedModel,
+		EmbedDim:           *embedDim,
+		QueryPrefixPolicy:  *queryPrefixPolicy,
 		OllamaURL:          *ollamaURL,
 		HTTPAddr:           addr,
 		AllowRemote:        *allowRemote,

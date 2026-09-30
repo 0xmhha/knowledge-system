@@ -149,7 +149,9 @@ type CKVConfig struct {
 	TimeoutMS int `yaml:"timeout_ms"`
 	// EmbedModel is the Ollama model name (e.g. "bge-m3") used to construct
 	// the in-process embedder. Must match the model the index was built with.
-	EmbedModel string `yaml:"embed_model"`
+	EmbedModel        string `yaml:"embed_model"`
+	EmbedDim          int    `yaml:"embed_dim,omitempty"`
+	QueryPrefixPolicy string `yaml:"query_prefix_policy,omitempty"`
 	// OllamaURL is the Ollama daemon endpoint. Empty resolves to
 	// http://localhost:11434 (and the CKV_OLLAMA_ENDPOINT env override).
 	OllamaURL string `yaml:"ollama_url"`
@@ -288,6 +290,14 @@ func (c *Config) Validate() error {
 	}
 	if c.Version != configVersion {
 		return fmt.Errorf("config: version=%d, want %d", c.Version, configVersion)
+	}
+	if c.Backends.CKV.EmbedDim < 0 {
+		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
+	}
+	switch c.Backends.CKV.QueryPrefixPolicy {
+	case "", "registry", "none":
+	default:
+		return fmt.Errorf("config: backends.ckv.query_prefix_policy must be registry or none")
 	}
 
 	switch strings.ToLower(c.Logging.Level) {

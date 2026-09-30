@@ -582,17 +582,28 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	// model changes the recorded normalize/checksum automatically and a
 	// later Open with a different embedding space is rejected.
 	embID := o.Embedder.Identity()
+	if verifier, ok := o.Embedder.(types.IdentityVerifier); ok {
+		if err := verifier.VerifyIdentity(ctx); err != nil {
+			return nil, fmt.Errorf("verify embedding identity before publish: %w", err)
+		}
+	}
 	embChecksum := embID.Checksum()
+	var embIDV2 *types.EmbeddingIdentity
+	if embID.Version >= 2 {
+		embIDV2 = &embID
+	}
 
 	// Persist identity into both the JSON sidecar and the DB manifest
 	// table so /freshness can read either without coordinating opens.
 	if err := store.SetManifest(ctx, map[string]string{
-		"embedding_model":     o.Embedder.Name(),
-		"embedding_dim":       fmt.Sprintf("%d", o.Embedder.Dimension()),
-		"embedding_normalize": embID.Normalize,
-		"embedding_checksum":  embChecksum,
-		"indexed_head":        commit,
-		"built_at":            builtAt,
+		"embedding_model":            o.Embedder.Name(),
+		"embedding_dim":              fmt.Sprintf("%d", o.Embedder.Dimension()),
+		"embedding_normalize":        embID.Normalize,
+		"embedding_checksum":         embChecksum,
+		"embedding_identity_version": fmt.Sprintf("%d", embID.Version),
+		"embedding_model_digest":     embID.ModelDigest,
+		"indexed_head":               commit,
+		"built_at":                   builtAt,
 	}); err != nil {
 		return nil, fmt.Errorf("write db manifest: %w", err)
 	}
@@ -602,22 +613,23 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		ckvVersion = "dev"
 	}
 	man := &manifest.Manifest{
-		SchemaVersion:      manifest.SchemaVersionCurrent,
-		CKVVersion:         ckvVersion,
-		BuiltAt:            builtAt,
-		SrcRoot:            absOrEmpty(o.SrcRoot),
-		SrcCommit:          commit,
-		IndexedHead:        commit,
-		EmbeddingModel:     o.Embedder.Name(),
-		EmbeddingDim:       o.Embedder.Dimension(),
-		EmbeddingNormalize: embID.Normalize,
-		EmbeddingChecksum:  embChecksum,
-		ChunkCount:         totalStats.Total,
-		SymbolCount:        totalStats.Symbol,
-		CanonicalCount:     totalStats.CanonicalID,
-		Languages:          languageCounts,
-		CKVIgnore:          o.CKVIgnore,
-		DocsRoots:          absRoots(manifestDocsRoots),
+		SchemaVersion:       manifest.SchemaVersionCurrent,
+		CKVVersion:          ckvVersion,
+		BuiltAt:             builtAt,
+		SrcRoot:             absOrEmpty(o.SrcRoot),
+		SrcCommit:           commit,
+		IndexedHead:         commit,
+		EmbeddingModel:      o.Embedder.Name(),
+		EmbeddingDim:        o.Embedder.Dimension(),
+		EmbeddingNormalize:  embID.Normalize,
+		EmbeddingChecksum:   embChecksum,
+		EmbeddingIdentityV2: embIDV2,
+		ChunkCount:          totalStats.Total,
+		SymbolCount:         totalStats.Symbol,
+		CanonicalCount:      totalStats.CanonicalID,
+		Languages:           languageCounts,
+		CKVIgnore:           o.CKVIgnore,
+		DocsRoots:           absRoots(manifestDocsRoots),
 	}
 	man.Sources = buildSourcesLedger(o, commit, builtAt, prSource)
 

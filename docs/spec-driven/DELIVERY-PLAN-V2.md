@@ -26,7 +26,7 @@
 | NFR-02/04 | `doctor`, 경로 필터, 미지원 언어의 `degraded` 표시가 있다. | CKV/CKG 실제 입력 파일 목록·민감 경로·심볼릭 링크·권한·파서 오류를 데이터셋 매니페스트에서 감사한다. 미지원 AST를 추측하지 않는다. | 실제 혼합 언어 코퍼스 커버리지. |
 | NFR-01/03 | 구조 지표와 SQLite 마이그레이션/롤백 테스트가 있다. | A에서는 **정확성·결정성·자원 상한**만 구조 게이트로 사용한다. 임의의 자연어 품질 임계치를 만들지 않는다. | 승인된 질문셋으로 품질·지연·크기 한계를 수치화한다. |
 
-PDF는 설계 동기를 제공한다. 특정 데이터 구조나 성능 임계치를 PDF의 구현 지시로 취급하지 않는다. PDF 원문과 해석은 `study/docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md`에 있다.
+PDF는 설계 동기를 제공한다. 특정 데이터 구조나 성능 임계치를 PDF의 구현 지시로 취급하지 않는다. PDF 원문과 해석은 `study/docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md`에 있다. 초기 PDF 기반 개선안에서 요구사항·현행 WBS·검증까지의 대응은 [`PDF-IMPROVEMENT-TRACE.md`](./PDF-IMPROVEMENT-TRACE.md)에 기록한다.
 
 ### v2 추가 요구사항과 반증 가능한 수용 기준
 

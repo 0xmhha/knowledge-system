@@ -20,7 +20,7 @@ func TestPreflightOllama(t *testing.T) {
 				if i > 0 {
 					b.WriteString(",")
 				}
-				b.WriteString(`{"name":"` + m + `"}`)
+				b.WriteString(`{"name":"` + m + `","digest":"` + strings.Repeat("a", 64) + `"}`)
 			}
 			b.WriteString(`]}`)
 			_, _ = w.Write([]byte(b.String()))

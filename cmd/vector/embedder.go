@@ -38,7 +38,7 @@ func resolveEmbedder(name, modelDir string) (types.Embedder, func(), error) {
 		if modelName == "" {
 			modelName = "bge-m3"
 		}
-		a, err := ollama.Open(ollama.Options{ModelName: modelName, TargetDim: globalFlags.embedDim})
+		a, err := ollama.Open(ollama.Options{ModelName: modelName, TargetDim: globalFlags.embedDim, QueryPrefixPolicy: globalFlags.queryPrefixPolicy})
 		if err != nil {
 			return nil, noop, fmt.Errorf("embedder ollama: %w", err)
 		}

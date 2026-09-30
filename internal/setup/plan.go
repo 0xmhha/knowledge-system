@@ -38,10 +38,11 @@ type Options struct {
 
 	// Vector build knobs (optional). Embedder "" lets the vector CLI pick
 	// its default; OllamaURL is exported as CKV_OLLAMA_ENDPOINT.
-	Embedder  string
-	ModelName string
-	EmbedDim  int
-	OllamaURL string
+	Embedder          string
+	ModelName         string
+	EmbedDim          int
+	OllamaURL         string
+	QueryPrefixPolicy string
 	// VectorPolicy is the vector chunk-categorization policy YAML.
 	VectorPolicy string
 	// SemanticCorpus is a separately rendered, reviewed Markdown corpus.
@@ -256,6 +257,9 @@ func BuildPlan(o Options) (Plan, error) {
 		}
 		if o.EmbedDim > 0 {
 			vectorCmd = append(vectorCmd, fmt.Sprintf("--embed-dim=%d", o.EmbedDim))
+		}
+		if o.QueryPrefixPolicy != "" {
+			vectorCmd = append(vectorCmd, "--query-prefix-policy="+o.QueryPrefixPolicy)
 		}
 		if o.VectorPolicy != "" {
 			vectorCmd = append(vectorCmd, "--policy", o.VectorPolicy)

@@ -178,6 +178,9 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 		}
 		return nil, fmt.Errorf("load manifest: %w", err)
 	}
+	if o.Embedder.Identity().Provider == "ollama" && (man.EmbeddingIdentityV2 == nil || man.EmbeddingIdentityV2.Version < 2) {
+		return nil, fmt.Errorf("%w: legacy Ollama index has no model digest; run a full `ckv build` to reindex", ErrEmbedderMismatch)
+	}
 	if man.EmbeddingModel != "" && man.EmbeddingModel != o.Embedder.Name() {
 		return nil, fmt.Errorf("%w: index=%q embedder=%q",
 			ErrEmbedderMismatch, man.EmbeddingModel, o.Embedder.Name())
@@ -185,6 +188,9 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 	if man.EmbeddingDim != o.Embedder.Dimension() {
 		return nil, fmt.Errorf("%w: index_dim=%d embedder_dim=%d",
 			ErrEmbedderMismatch, man.EmbeddingDim, o.Embedder.Dimension())
+	}
+	if man.EmbeddingIdentityV2 != nil && man.EmbeddingIdentityV2.Checksum() != man.EmbeddingChecksum {
+		return nil, fmt.Errorf("%w: embedding identity manifest is inconsistent; run a full `ckv build`", ErrEmbedderMismatch)
 	}
 	// Reject a reindex whose embedder produces a different embedding space
 	// than the one that built the index, even when name+dim coincide (e.g.
@@ -552,14 +558,21 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 		fmt.Fprintf(os.Stderr, "ckv: warning: canonical_id coverage %.1f%% below 90%% after reindex (ckg-aligned)\n",
 			val.CanonicalRate()*100)
 	}
+	if verifier, ok := o.Embedder.(types.IdentityVerifier); ok {
+		if err := verifier.VerifyIdentity(ctx); err != nil {
+			return nil, fmt.Errorf("verify embedding identity before reindex publish: %w", err)
+		}
+	}
 
 	if err := store.SetManifest(ctx, map[string]string{
-		"embedding_model":     o.Embedder.Name(),
-		"embedding_dim":       fmt.Sprintf("%d", o.Embedder.Dimension()),
-		"embedding_normalize": man.EmbeddingNormalize,
-		"embedding_checksum":  man.EmbeddingChecksum,
-		"indexed_head":        newHead,
-		"built_at":            builtAt,
+		"embedding_model":            o.Embedder.Name(),
+		"embedding_dim":              fmt.Sprintf("%d", o.Embedder.Dimension()),
+		"embedding_normalize":        man.EmbeddingNormalize,
+		"embedding_checksum":         man.EmbeddingChecksum,
+		"embedding_identity_version": fmt.Sprintf("%d", o.Embedder.Identity().Version),
+		"embedding_model_digest":     o.Embedder.Identity().ModelDigest,
+		"indexed_head":               newHead,
+		"built_at":                   builtAt,
 	}); err != nil {
 		return nil, fmt.Errorf("write db manifest: %w", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -16,8 +17,8 @@ import (
 //
 // endpoint is the Ollama base URL (e.g. http://localhost:11434). model is the
 // requested embedding model (e.g. "bge-m3"); an empty model checks reachability
-// only. A tag matches the model when it is exactly the name, the name with an
-// implicit ":latest", or any explicit tag of that model.
+// only. A tag matches exactly, or as an implicit ":latest" alias. Ambiguous
+// names and absent/invalid digests are rejected before a long build starts.
 func PreflightOllama(endpoint, model string, emit func(Event)) error {
 	base := strings.TrimRight(endpoint, "/")
 	if base == "" {
@@ -35,7 +36,8 @@ func PreflightOllama(endpoint, model string, emit func(Event)) error {
 
 	var tags struct {
 		Models []struct {
-			Name string `json:"name"`
+			Name   string `json:"name"`
+			Digest string `json:"digest"`
 		} `json:"models"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&tags); err != nil {
@@ -51,17 +53,27 @@ func PreflightOllama(endpoint, model string, emit func(Event)) error {
 	}
 
 	names := make([]string, 0, len(tags.Models))
+	matches := 0
+	var selectedName, selectedDigest string
 	for _, m := range tags.Models {
 		names = append(names, m.Name)
-	}
-	for _, name := range names {
-		if name == model || name == model+":latest" || strings.HasPrefix(name, model+":") {
-			if emit != nil {
-				emit(Event{Time: time.Now().UTC(), Step: "vector-preflight", Type: "output",
-					Message: fmt.Sprintf("Ollama reachable at %s; model %q present (%s)", base, model, name)})
-			}
-			return nil
+		if m.Name == model || (!strings.Contains(model, ":") && m.Name == model+":latest") {
+			matches++
+			selectedName, selectedDigest = m.Name, m.Digest
 		}
+	}
+	if matches > 1 {
+		return fmt.Errorf("preflight: Ollama model %q is ambiguous; specify an exact tag", model)
+	}
+	if matches == 1 {
+		if !regexp.MustCompile(`^[0-9a-fA-F]{64}$`).MatchString(selectedDigest) {
+			return fmt.Errorf("preflight: Ollama model %q has no valid digest", selectedName)
+		}
+		if emit != nil {
+			emit(Event{Time: time.Now().UTC(), Step: "vector-preflight", Type: "output",
+				Message: fmt.Sprintf("Ollama reachable at %s; model %q present (%s)", base, model, selectedName)})
+		}
+		return nil
 	}
 	return fmt.Errorf("preflight: Ollama model %q not found at %s (have: %s) — run `ollama pull %s`",
 		model, base, strings.Join(names, ", "), model)

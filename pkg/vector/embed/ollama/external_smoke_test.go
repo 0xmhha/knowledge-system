@@ -23,9 +23,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
+	"github.com/0xmhha/knowledge-system/internal/vector/manifest"
 	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 )
@@ -36,6 +39,10 @@ import (
 func fixedDimEmbedServer(t *testing.T, dim int) *httptest.Server {
 	t.Helper()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/tags" {
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "bge-m3:latest", "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}})
+			return
+		}
 		if r.URL.Path != "/api/embed" {
 			http.Error(w, "unexpected path "+r.URL.Path, http.StatusNotFound)
 			return
@@ -58,11 +65,75 @@ func fixedDimEmbedServer(t *testing.T, dim int) *httptest.Server {
 			out[i] = vec
 		}
 		_ = json.NewEncoder(w).Encode(struct {
+			Model      string      `json:"model"`
 			Embeddings [][]float32 `json:"embeddings"`
-		}{Embeddings: out})
+		}{Model: "bge-m3:latest", Embeddings: out})
 	}))
 	t.Cleanup(srv.Close)
 	return srv
+}
+
+func TestOllamaIndexRejectsDigestReplacementAndLegacyManifest(t *testing.T) {
+	var changed atomic.Bool
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/tags":
+			digest := strings.Repeat("a", 64)
+			if changed.Load() {
+				digest = strings.Repeat("b", 64)
+			}
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "bge-m3:latest", "digest": digest}}})
+		case "/api/embed":
+			var req struct {
+				Input []string `json:"input"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				t.Error(err)
+			}
+			vectors := make([][]float32, len(req.Input))
+			for i := range vectors {
+				vectors[i] = []float32{1, 2, 3}
+			}
+			_ = json.NewEncoder(w).Encode(map[string]any{"model": "bge-m3:latest", "embeddings": vectors})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer srv.Close()
+	open := func() *ollama.Adapter {
+		t.Helper()
+		a, err := ollama.Open(ollama.Options{Endpoint: srv.URL, ModelName: "bge-m3"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return a
+	}
+	emb := open()
+	src := filepath.Join("..", "..", "..", "..", "vector", "testdata", "sample")
+	out := t.TempDir()
+	if _, err := build.Run(context.Background(), build.Options{SrcRoot: src, OutDir: out, Embedder: emb}); err != nil {
+		t.Fatal(err)
+	}
+	man, err := manifest.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if man.EmbeddingIdentityV2 == nil || man.EmbeddingIdentityV2.ModelDigest != strings.Repeat("a", 64) {
+		t.Fatalf("v2 identity not persisted: %+v", man.EmbeddingIdentityV2)
+	}
+	changed.Store(true)
+	newEmbedder := open()
+	if _, err := ckv.Open(out, ckv.OpenOptions{Embedder: newEmbedder}); err == nil || !strings.Contains(err.Error(), "identity mismatch") {
+		t.Fatalf("same tag and dimension with new digest must fail: %v", err)
+	}
+	changed.Store(false)
+	man.EmbeddingIdentityV2 = nil
+	if err := manifest.Save(out, man); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ckv.Open(out, ckv.OpenOptions{Embedder: open()}); err == nil || !strings.Contains(err.Error(), "legacy Ollama index") {
+		t.Fatalf("legacy manifest must require full reindex: %v", err)
+	}
 }
 
 // TestExternalImport_OllamaConstruct is the core M2.a gate: an external package
@@ -83,8 +154,8 @@ func TestExternalImport_OllamaConstruct(t *testing.T) {
 	if got := emb.MaxInputTokens(); got != 8192 {
 		t.Errorf("MaxInputTokens() = %d, want 8192 (bge-m3 window)", got)
 	}
-	if got := emb.Name(); got != "bge-m3" {
-		t.Errorf("Name() = %q, want bge-m3", got)
+	if got := emb.Name(); got != "bge-m3:latest" {
+		t.Errorf("Name() = %q, want bge-m3:latest", got)
 	}
 
 	// The adapter satisfies the public Embedder contract end-to-end.

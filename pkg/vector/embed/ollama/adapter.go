@@ -13,13 +13,17 @@ package ollama
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"math"
 	"net/http"
 	"os"
+	"regexp"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/registry"
@@ -46,7 +50,9 @@ const DefaultMaxInputTokens = 8192
 type Adapter struct {
 	endpoint      string
 	modelName     string
+	modelDigest   string
 	dim           int
+	nativeDim     int
 	targetDim     int    // >0 → truncate each embedding to this many dims (MRL)
 	queryInstruct string // non-empty → wrap queries in this Qwen3 instruct prompt
 	maxInput      int
@@ -64,10 +70,13 @@ type Options struct {
 	// by Qwen3-Embedding, which is MRL-trained, to trade a little precision for
 	// a smaller vector (storage + search cost). 0 keeps the native dimension.
 	TargetDim int
+	// QueryPrefixPolicy is "registry" (default) or "none". The legacy
+	// CKV_DISABLE_QUERY_PREFIX variable is read once only when unset.
+	QueryPrefixPolicy string
 }
 
-// Open creates an Ollama adapter and verifies connectivity by
-// embedding a test string to determine the output dimension.
+// Open pins an exact model tag and digest, then embeds a probe to determine
+// native dimension. Model identity is checked again around every batch.
 func Open(opts Options) (*Adapter, error) {
 	endpoint := opts.Endpoint
 	if endpoint == "" {
@@ -85,12 +94,22 @@ func Open(opts Options) (*Adapter, error) {
 		timeout = DefaultTimeout
 	}
 
+	policy := opts.QueryPrefixPolicy
+	if policy == "" {
+		policy = "registry"
+		if os.Getenv("CKV_DISABLE_QUERY_PREFIX") == "1" {
+			policy = "none"
+		}
+	}
+	if policy != "registry" && policy != "none" {
+		return nil, fmt.Errorf("ollama: invalid query prefix policy %q", policy)
+	}
 	queryInstruct := registry.QueryInstruct(opts.ModelName)
-	if os.Getenv("CKV_DISABLE_QUERY_PREFIX") == "1" {
+	if policy == "none" {
 		queryInstruct = "" // opt out of the asymmetric query prompt (A/B, debugging)
 	}
 	a := &Adapter{
-		endpoint:      endpoint,
+		endpoint:      strings.TrimRight(endpoint, "/"),
 		modelName:     opts.ModelName,
 		queryInstruct: queryInstruct,
 		maxInput:      resolveMaxInput(opts.ModelName),
@@ -102,6 +121,11 @@ func Open(opts Options) (*Adapter, error) {
 	// of stalling the consumer that opened the adapter.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+	canonicalName, digest, err := a.resolveModel(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("ollama: model identity: %w", err)
+	}
+	a.modelName, a.modelDigest = canonicalName, digest
 	vecs, err := a.Embed(ctx, []string{"dimension probe"})
 	if err != nil {
 		return nil, fmt.Errorf("ollama: connectivity check failed: %w", err)
@@ -111,6 +135,7 @@ func Open(opts Options) (*Adapter, error) {
 	}
 	nativeDim := len(vecs[0])
 	a.dim = nativeDim
+	a.nativeDim = nativeDim
 
 	// MRL truncation: the probe above ran with targetDim unset (native), so
 	// nativeDim is authoritative for validation. Enabling it here makes every
@@ -122,6 +147,9 @@ func Open(opts Options) (*Adapter, error) {
 	if opts.TargetDim > 0 {
 		a.targetDim = opts.TargetDim
 		a.dim = opts.TargetDim
+	}
+	if err := a.VerifyIdentity(ctx); err != nil {
+		return nil, fmt.Errorf("ollama: model changed during probe: %w", err)
 	}
 
 	return a, nil
@@ -157,16 +185,29 @@ func resolveMaxInput(modelName string) int {
 	return DefaultMaxInputTokens
 }
 
-// Identity reports the embedding space. Ollama performs tokenization and
-// pooling internally and does not expose those, so Pooling/Normalize are
-// left empty; Provider+Model+Dim still distinguish an Ollama-built index
-// from one built by another backend (e.g. ONNX) for the same model name,
-// which is the swap query.Open must reject.
+// Identity includes the Ollama digest, dimension method and query transform.
+// Ollama does not expose pooling details, so Pooling remains empty.
 func (a *Adapter) Identity() types.EmbeddingIdentity {
+	queryTransform := "raw:v1"
+	if a.queryInstruct != "" {
+		sum := sha256.Sum256([]byte(a.queryInstruct))
+		queryTransform = "qwen3-instruct:v1:sha256:" + hex.EncodeToString(sum[:])
+	}
+	method := "native:v1"
+	if a.targetDim > 0 {
+		method = "mrl-prefix-l2:v1"
+	}
 	return types.EmbeddingIdentity{
-		Provider: "ollama",
-		Model:    a.modelName,
-		Dim:      a.dim,
+		Provider:         "ollama",
+		Model:            a.modelName,
+		Dim:              a.dim,
+		Version:          2,
+		ModelDigest:      a.modelDigest,
+		NativeDim:        a.nativeDim,
+		DimensionMethod:  method,
+		PassageTransform: "raw:v1",
+		QueryTransform:   queryTransform,
+		TruncatePolicy:   "reject:v1",
 	}
 }
 func (a *Adapter) Close() error { return nil }
@@ -176,10 +217,16 @@ func (a *Adapter) Embed(ctx context.Context, batch []string) ([][]float32, error
 	if len(batch) == 0 {
 		return nil, nil
 	}
+	if a.modelDigest != "" {
+		if err := a.VerifyIdentity(ctx); err != nil {
+			return nil, err
+		}
+	}
 
 	reqBody := embedRequest{
-		Model: a.modelName,
-		Input: batch,
+		Model:    a.modelName,
+		Input:    batch,
+		Truncate: false,
 	}
 	body, err := json.Marshal(reqBody)
 	if err != nil {
@@ -200,8 +247,7 @@ func (a *Adapter) Embed(ctx context.Context, batch []string) ([][]float32, error
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("ollama: HTTP %d from %s: %s", resp.StatusCode, url, string(respBody))
+		return nil, fmt.Errorf("ollama: HTTP %d from embedding endpoint", resp.StatusCode)
 	}
 
 	var result embedResponse
@@ -216,10 +262,28 @@ func (a *Adapter) Embed(ctx context.Context, batch []string) ([][]float32, error
 		return nil, fmt.Errorf("ollama: embedding count mismatch: got %d for %d inputs from %s",
 			len(result.Embeddings), len(batch), url)
 	}
+	if a.modelDigest != "" && result.Model != a.modelName {
+		return nil, fmt.Errorf("ollama: embedding response model mismatch: expected %q, got %q", a.modelName, result.Model)
+	}
+	for i, vec := range result.Embeddings {
+		if len(vec) == 0 || (a.nativeDim > 0 && len(vec) != a.nativeDim) {
+			return nil, fmt.Errorf("ollama: embedding %d dimension mismatch: got %d, expected %d", i, len(vec), a.nativeDim)
+		}
+		for _, v := range vec {
+			if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) {
+				return nil, fmt.Errorf("ollama: embedding %d contains a non-finite value", i)
+			}
+		}
+	}
 
 	if a.targetDim > 0 {
 		for i := range result.Embeddings {
 			result.Embeddings[i] = truncateNormalize(result.Embeddings[i], a.targetDim)
+		}
+	}
+	if a.modelDigest != "" {
+		if err := a.VerifyIdentity(ctx); err != nil {
+			return nil, err
 		}
 	}
 
@@ -291,10 +355,71 @@ func truncateNormalize(v []float32, dim int) []float32 {
 }
 
 type embedRequest struct {
-	Model string   `json:"model"`
-	Input []string `json:"input"`
+	Model    string   `json:"model"`
+	Input    []string `json:"input"`
+	Truncate bool     `json:"truncate"`
 }
 
 type embedResponse struct {
+	Model      string      `json:"model"`
 	Embeddings [][]float32 `json:"embeddings"`
+}
+
+var digestPattern = regexp.MustCompile(`^[0-9a-fA-F]{64}$`)
+
+func (a *Adapter) resolveModel(ctx context.Context) (string, string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, a.endpoint+"/api/tags", nil)
+	if err != nil {
+		return "", "", err
+	}
+	resp, err := a.httpClient().Do(req)
+	if err != nil {
+		return "", "", fmt.Errorf("model list unavailable: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", "", fmt.Errorf("model list HTTP %d", resp.StatusCode)
+	}
+	var tags struct {
+		Models []struct {
+			Name   string `json:"name"`
+			Digest string `json:"digest"`
+		} `json:"models"`
+	}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 4<<20)).Decode(&tags); err != nil {
+		return "", "", fmt.Errorf("invalid model list: %w", err)
+	}
+	var name, digest string
+	for _, model := range tags.Models {
+		if model.Name != a.modelName && !(model.Name == a.modelName+":latest" && !strings.Contains(a.modelName, ":")) {
+			continue
+		}
+		if name != "" {
+			return "", "", fmt.Errorf("ambiguous model name %q", a.modelName)
+		}
+		name, digest = model.Name, model.Digest
+	}
+	if name == "" {
+		return "", "", fmt.Errorf("model %q not found", a.modelName)
+	}
+	if !digestPattern.MatchString(digest) {
+		return "", "", fmt.Errorf("model %q has no valid SHA-256 digest", name)
+	}
+	return name, strings.ToLower(digest), nil
+}
+
+// VerifyIdentity rejects model removal or tag replacement before and after
+// embedding. Ollama does not offer an atomic model pin across these calls.
+func (a *Adapter) VerifyIdentity(ctx context.Context) error {
+	if a.modelDigest == "" {
+		return fmt.Errorf("ollama: model digest is unavailable")
+	}
+	name, digest, err := a.resolveModel(ctx)
+	if err != nil {
+		return fmt.Errorf("ollama: verify model identity: %w", err)
+	}
+	if name != a.modelName || digest != a.modelDigest {
+		return fmt.Errorf("ollama: model_changed: model digest changed; reindex required")
+	}
+	return nil
 }

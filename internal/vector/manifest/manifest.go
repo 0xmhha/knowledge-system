@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // SchemaVersionCurrent is the on-disk schema version this build writes.
@@ -34,10 +36,11 @@ type Manifest struct {
 	IndexedHead string `json:"indexed_head,omitempty"` // alias for SrcCommit (back-compat)
 
 	// Embedding identity
-	EmbeddingModel     string `json:"embedding_model"`
-	EmbeddingDim       int    `json:"embedding_dim"`
-	EmbeddingChecksum  string `json:"embedding_checksum,omitempty"`
-	EmbeddingNormalize string `json:"embedding_normalize,omitempty"` // "l2" | "none"
+	EmbeddingModel      string                   `json:"embedding_model"`
+	EmbeddingDim        int                      `json:"embedding_dim"`
+	EmbeddingChecksum   string                   `json:"embedding_checksum,omitempty"`
+	EmbeddingNormalize  string                   `json:"embedding_normalize,omitempty"` // "l2" | "none"
+	EmbeddingIdentityV2 *types.EmbeddingIdentity `json:"embedding_identity_v2,omitempty"`
 
 	// Aggregate stats
 	ChunkCount int            `json:"chunk_count"`

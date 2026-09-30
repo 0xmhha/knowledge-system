@@ -41,6 +41,12 @@ var knownDims = map[string]int{"bge-m3": 1024}
 // returns a Capability populated from the requested provider/model/endpoint
 // (Dim 0) so callers can still report identity in a degraded state.
 func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, error) {
+	return OpenWithOptions(provider, model, endpoint, 0, "")
+}
+
+// OpenWithOptions carries the index's dimension and query transformation into
+// CKS. CKV Open rejects a mismatch against the persisted v2 identity.
+func OpenWithOptions(provider, model, endpoint string, targetDim int, queryPrefixPolicy string) (ckvtypes.Embedder, Capability, error) {
 	if provider == "" {
 		provider = DefaultProvider
 	}
@@ -63,12 +69,12 @@ func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, erro
 			model = "bge-m3"
 			cap.Model = model
 		}
-		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model})
+		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model, TargetDim: targetDim, QueryPrefixPolicy: queryPrefixPolicy})
 		if err != nil {
 			return nil, cap, err
 		}
 		dim := adapter.Dimension()
-		if want, ok := knownDims[model]; ok && dim != want {
+		if want, ok := knownDims[model]; ok && targetDim == 0 && dim != want {
 			_ = adapter.Close()
 			return nil, cap, fmt.Errorf("embedder %q dim=%d, want %d", model, dim, want)
 		}

@@ -48,8 +48,10 @@ type GenerateOptions struct {
 
 	// EmbedModel is the Ollama model the ckv index was built with (empty →
 	// "bge-m3"). OllamaURL is the Ollama endpoint (empty → http://localhost:11434).
-	EmbedModel string
-	OllamaURL  string
+	EmbedModel        string
+	OllamaURL         string
+	EmbedDim          int
+	QueryPrefixPolicy string
 
 	// HTTPAddr is the Streamable HTTP listen address (empty → 127.0.0.1:8080).
 	// AllowRemote is the explicit opt-in to bind a routable address; Generate
@@ -136,11 +138,13 @@ func Generate(o GenerateOptions) *Config {
 				TimeoutMS:  5000,
 			},
 			CKV: CKVConfig{
-				Path:       vectorPath,
-				BinaryPath: o.VectorBinary,
-				EmbedModel: embedModel,
-				OllamaURL:  ollamaURL,
-				TimeoutMS:  3000,
+				Path:              vectorPath,
+				BinaryPath:        o.VectorBinary,
+				EmbedModel:        embedModel,
+				OllamaURL:         ollamaURL,
+				EmbedDim:          o.EmbedDim,
+				QueryPrefixPolicy: o.QueryPrefixPolicy,
+				TimeoutMS:         3000,
 			},
 		},
 		Listen: ListenConfig{

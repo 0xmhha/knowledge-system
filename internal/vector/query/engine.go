@@ -261,9 +261,15 @@ func Open(outDir string, emb types.Embedder, opts ...OpenOption) (*Engine, error
 		return nil, fmt.Errorf("%w: dim mismatch (index=%d, embedder=%d) — run `ckv build` to reindex",
 			ErrIndexUnavailable, man.EmbeddingDim, emb.Dimension())
 	}
+	if emb.Identity().Provider == "ollama" && (man.EmbeddingIdentityV2 == nil || man.EmbeddingIdentityV2.Version < 2) {
+		return nil, fmt.Errorf("%w: legacy Ollama index has no model digest — run `ckv build` to reindex", ErrIndexUnavailable)
+	}
 	if man.EmbeddingModel != "" && man.EmbeddingModel != emb.Name() {
 		return nil, fmt.Errorf("%w: model mismatch (index=%q, embedder=%q) — run `ckv build` to reindex",
 			ErrIndexUnavailable, man.EmbeddingModel, emb.Name())
+	}
+	if man.EmbeddingIdentityV2 != nil && man.EmbeddingIdentityV2.Checksum() != man.EmbeddingChecksum {
+		return nil, fmt.Errorf("%w: embedding identity manifest is inconsistent — run `ckv build` to reindex", ErrIndexUnavailable)
 	}
 	// Full embedding-space identity: provider/pooling/normalization, not just
 	// name+dim. Catches a same-name, same-dim swap across backends (e.g.

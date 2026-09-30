@@ -2,6 +2,9 @@ package types
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 )
 
@@ -10,21 +13,33 @@ import (
 // model registry), so adding or swapping an embedding model needs no change
 // here — the identity flows from the model definition.
 type EmbeddingIdentity struct {
-	Provider  string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
-	Model     string // model name, e.g. "bge-m3"
-	Dim       int    // vector dimension
-	Pooling   string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
-	Normalize string // "l2" | "none"; "" when unknown
+	Provider         string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
+	Model            string // model name, e.g. "bge-m3"
+	Dim              int    // vector dimension
+	Pooling          string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
+	Normalize        string // "l2" | "none"; "" when unknown
+	Version          int    `json:"version,omitempty"`
+	ModelDigest      string `json:"model_digest,omitempty"`
+	NativeDim        int    `json:"native_dim,omitempty"`
+	DimensionMethod  string `json:"dimension_method,omitempty"`
+	PassageTransform string `json:"passage_transform,omitempty"`
+	QueryTransform   string `json:"query_transform,omitempty"`
+	TruncatePolicy   string `json:"truncate_policy,omitempty"`
 }
 
-// Checksum is a stable identity string for the embedding space. Two embedders
-// that produce comparable vectors yield the same Checksum; any difference
-// (provider, model, dim, pooling, normalization) yields a different one. It is
+// Checksum is a stable identity string for the embedding space. Version 1
+// preserves the original readable format; version 2 hashes all identity
+// fields, including model bytes and text transforms. It is
 // recorded in the manifest at build time and compared on Open so a
 // silently-incompatible index/embedder pair (e.g. Ollama bge-m3 vs ONNX
 // bge-m3) is rejected with a reindex hint instead of returning meaningless
 // similarity scores.
 func (id EmbeddingIdentity) Checksum() string {
+	if id.Version >= 2 {
+		payload, _ := json.Marshal(id)
+		sum := sha256.Sum256(payload)
+		return "v2:sha256:" + hex.EncodeToString(sum[:])
+	}
 	return fmt.Sprintf("provider=%s;model=%s;dim=%d;pooling=%s;normalize=%s",
 		id.Provider, id.Model, id.Dim, id.Pooling, id.Normalize)
 }
@@ -56,6 +71,11 @@ type Embedder interface {
 	Dimension() int
 	MaxInputTokens() int
 	Embed(ctx context.Context, batch []string) ([][]float32, error)
+}
+
+// IdentityVerifier rechecks an external model at publication boundaries.
+type IdentityVerifier interface {
+	VerifyIdentity(context.Context) error
 }
 
 // QueryEmbedder is an optional Embedder capability for asymmetric models —

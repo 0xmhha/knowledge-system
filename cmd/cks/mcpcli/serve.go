@@ -376,7 +376,7 @@ func buildBackends(ctx context.Context, cfg *config.Config) (*backends, error) {
 		degradedReason string
 	)
 	if cfg.Backends.CKV.Path != "" {
-		emb, c, embErr := embedder.Open(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL)
+		emb, c, embErr := embedder.OpenWithOptions(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy)
 		cap = c
 		if embErr != nil {
 			degradedReason = embErr.Error()
