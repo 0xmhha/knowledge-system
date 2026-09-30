@@ -17,7 +17,7 @@
 | D5-01 | 공통 20개와 산업/조직별 팩 분리 | 사용자 방향 동의 |
 | D5-02–07 | 팩 신원/버전, 출처/권위, 타입/관계, 코딩 문맥, 파일럿, 사용자 작성/권한 | [상세 계약](./DOMAIN-PACK-CONTRACT-V1.md)은 검토안. 파일럿·원천 위치·검토 역할과 운영 기본값을 확정한 뒤 설계 게이트를 닫는다. A3/A4의 가역적 구현은 진행 가능하며 A5.4 이전에 결정을 기록한다. |
 
-D1–D4의 근거는 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md), D5-02–07의 항목별 제안은 [`DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md`](./DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md)에 있다. 설계 승인과 구현 완료, 실제 모델 품질 승인은 서로 다른 판정이다.
+D1–D4의 근거는 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md), D5-02–07의 결정용 권고·선택·폐쇄 조건은 [`D5-DECISION-REVIEW.md`](./D5-DECISION-REVIEW.md)에 있다. 상세 구현 계약은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다. 설계 승인과 구현 완료, 실제 모델 품질 승인은 서로 다른 판정이다.
 
 1. **A: 모델 독립 리팩토링·개발.** A/B/C 전 구간의 상세 설계는 구현 전에 `END-TO-END-DESIGN.md`에서 먼저 고정한다. 결정적 mock 임베더, 가짜 Ollama HTTP 서버, 고정 Git 픽스처와 실제 CKV/CKG/CKS 실행으로 구조·정확성·안전성·호환성·설치 경로를 검증한다. 실모델 품질 수치 없이 이 단계를 완료할 수 있다.
 2. **B: 실모델 평가.** 지정된 로컬 Ollama 모델과 승인된 질문 정답을 한 코퍼스/하드웨어에서 고정한다. CKV, CKG, CKS 및 온톨로지 ablation의 품질·지연·비용을 측정한다.
