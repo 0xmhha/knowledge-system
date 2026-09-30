@@ -21,6 +21,9 @@ type Report struct {
 	ProjectID        string         `json:"project_id,omitempty"`
 	SnapshotID       string         `json:"snapshot_id,omitempty"`
 	DatasetID        string         `json:"dataset_id,omitempty"`
+	SourceMode       string         `json:"source_mode,omitempty"`
+	HistoryStatus    string         `json:"history_status,omitempty"`
+	SourceDrift      bool           `json:"source_drift,omitempty"`
 	IdentityStatus   string         `json:"identity_status,omitempty"`
 	ReindexRequired  bool           `json:"reindex_required,omitempty"`
 	SourceRoot       string         `json:"source_root"`
@@ -86,35 +89,37 @@ func Inspect(src, dataset string) (Report, error) {
 		out, err := cmd.Output()
 		return strings.TrimSpace(string(out)), err
 	}
-	gitRoot, err := git("rev-parse", "--show-toplevel")
-	if err != nil {
-		return Report{}, fmt.Errorf("doctor: source is not a Git repository: %w", err)
-	}
-	gitRoot, err = filepath.EvalSymlinks(gitRoot)
-	if err != nil {
-		return Report{}, err
-	}
-	if gitRoot != root {
-		return Report{}, fmt.Errorf("doctor: --src must name the Git root (%s)", gitRoot)
-	}
-	report.Commit, err = git("rev-parse", "HEAD")
-	if err != nil {
-		return Report{}, fmt.Errorf("doctor: read HEAD: %w", err)
-	}
-	status, err := git("status", "--porcelain")
-	if err != nil {
-		return Report{}, fmt.Errorf("doctor: read working-tree status: %w", err)
-	}
-	report.Dirty = status != ""
-	if report.Dirty {
-		report.Issues = append(report.Issues, "working tree has tracked or untracked changes; commit-based snapshot naming is unsafe")
-	}
-	report.IgnoredIndexable, err = setup.CountIgnoredIndexable(root)
-	if err != nil {
-		return Report{}, err
-	}
-	if report.IgnoredIndexable > 0 {
-		report.Issues = append(report.Issues, fmt.Sprintf("%d Git-ignored source files may still be indexed; review .ckvignore", report.IgnoredIndexable))
+	gitRoot, gitErr := git("rev-parse", "--show-toplevel")
+	if gitErr == nil {
+		gitRoot, err = filepath.EvalSymlinks(gitRoot)
+		if err != nil {
+			return Report{}, err
+		}
+		if gitRoot != root {
+			return Report{}, fmt.Errorf("doctor: --src must name the Git root (%s)", gitRoot)
+		}
+		report.Commit, err = git("rev-parse", "HEAD")
+		if err != nil {
+			return Report{}, fmt.Errorf("doctor: read HEAD: %w", err)
+		}
+		status, err := git("status", "--porcelain")
+		if err != nil {
+			return Report{}, fmt.Errorf("doctor: read working-tree status: %w", err)
+		}
+		report.Dirty = status != ""
+		if report.Dirty {
+			report.Issues = append(report.Issues, "working tree has tracked or untracked changes; commit-based snapshot naming is unsafe")
+		}
+		report.IgnoredIndexable, err = setup.CountIgnoredIndexable(root)
+		if err != nil {
+			return Report{}, err
+		}
+		if report.IgnoredIndexable > 0 {
+			report.Issues = append(report.Issues, fmt.Sprintf("%d Git-ignored source files may still be indexed; review .ckvignore", report.IgnoredIndexable))
+		}
+		report.SourceMode, report.HistoryStatus = "committed", "available"
+	} else {
+		report.SourceMode, report.HistoryStatus = "snapshot-only", "history_unavailable"
 	}
 	walkErr := filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
@@ -241,6 +246,26 @@ func inspectDataset(report *Report, dataset string) {
 		report.ProjectID = identity.Source.ProjectID
 		report.SnapshotID = identity.Source.SnapshotID
 		report.DatasetID = identity.DatasetID
+		report.SourceMode = identity.Source.SourceMode
+		if report.SourceMode == "snapshot-only" {
+			report.HistoryStatus = "history_unavailable"
+		}
+		if report.SourceMode == "working-tree" {
+			report.HistoryStatus = "base_history_only"
+		}
+		if report.SourceMode != "committed" {
+			current, currentErr := setup.SnapshotSourceIdentity(report.SourceRoot, report.ProjectID,
+				report.SourceMode, identity.Source.SourceCommit)
+			report.SourceDrift = currentErr != nil || current != identity.Source
+			if report.SourceMode == "working-tree" {
+				for i, issue := range report.Issues {
+					if strings.HasPrefix(issue, "working tree has tracked") {
+						report.Issues = append(report.Issues[:i], report.Issues[i+1:]...)
+						break
+					}
+				}
+			}
+		}
 	}
 	for _, path := range []string{filepath.Join(graph, "manifest.json"), filepath.Join(vector, "manifest.json")} {
 		var m struct {
@@ -256,7 +281,7 @@ func inspectDataset(report *Report, dataset string) {
 		if err != nil || indexedRoot != report.SourceRoot {
 			report.Issues = append(report.Issues, "active index belongs to a different source root")
 		}
-		if m.SrcCommit != report.Commit {
+		if (identity == nil || identity.Source.SourceMode == "committed") && m.SrcCommit != report.Commit {
 			report.Issues = append(report.Issues, "active index was built from a different source commit")
 		}
 	}

@@ -55,6 +55,9 @@ func registerImpactAnalysis(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleImpactAnalysis(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	symbol := req.GetString("symbol", "")
 	if symbol == "" {
 		return mcpgo.NewToolResultError(ToolNameImpactAnalysis + ": missing required argument \"symbol\""), nil
@@ -108,6 +111,9 @@ func registerChangeHistory(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleChangeHistory(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	intent := req.GetString("intent", "")
 	symbol := req.GetString("symbol", "")
 	if intent == "" && symbol == "" {

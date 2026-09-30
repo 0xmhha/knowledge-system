@@ -15,6 +15,7 @@ import (
 
 type InitResult struct {
 	ProjectID  string `json:"project_id"`
+	SourceMode string `json:"source_mode"`
 	ConfigPath string `json:"config_path"`
 	SourceRoot string `json:"source_root"`
 	Dataset    string `json:"dataset"`
@@ -90,12 +91,13 @@ func InitWithProjectID(src, dataset, configPath, embedder, model, projectID stri
 		return InitResult{}, err
 	}
 	config := struct {
-		ProjectID string `yaml:"project_id"`
-		Src       string `yaml:"src"`
-		Out       string `yaml:"out"`
-		Embedder  string `yaml:"embedder"`
-		ModelName string `yaml:"model_name,omitempty"`
-	}{ProjectID: projectID, Src: report.SourceRoot, Out: dataset, Embedder: embedder, ModelName: model}
+		ProjectID  string `yaml:"project_id"`
+		SourceMode string `yaml:"source_mode,omitempty"`
+		Src        string `yaml:"src"`
+		Out        string `yaml:"out"`
+		Embedder   string `yaml:"embedder"`
+		ModelName  string `yaml:"model_name,omitempty"`
+	}{ProjectID: projectID, SourceMode: report.SourceMode, Src: report.SourceRoot, Out: dataset, Embedder: embedder, ModelName: model}
 	buf, err := yaml.Marshal(config)
 	if err != nil {
 		return InitResult{}, err
@@ -116,7 +118,7 @@ func InitWithProjectID(src, dataset, configPath, embedder, model, projectID stri
 		os.Remove(configPath)
 		return InitResult{}, err
 	}
-	return InitResult{ProjectID: projectID, ConfigPath: configPath, SourceRoot: report.SourceRoot, Dataset: dataset, Embedder: embedder}, nil
+	return InitResult{ProjectID: projectID, SourceMode: report.SourceMode, ConfigPath: configPath, SourceRoot: report.SourceRoot, Dataset: dataset, Embedder: embedder}, nil
 }
 
 func resolvedFuturePath(path string) (string, error) {

@@ -189,6 +189,9 @@ type GateOptions struct {
 	GraphBin string
 	// Src is the source tree; when set the (soft) ckg audit gate runs.
 	Src string
+	// OriginalSrc is the mutable source captured before staging. Tests and
+	// audits use Src (the staged copy); the snapshot drift gate uses this path.
+	OriginalSrc string
 	// MinCanonicalRatio is the floor for canonical_id coverage
 	// (CanonicalCount/SymbolCount). Zero disables the check.
 	MinCanonicalRatio float64
@@ -289,7 +292,13 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 		}
 	}
 	if len(o.TestCommand) > 0 {
-		if err := runTestGate(ctx, vdir, o.Src, o.TestCommand); err != nil {
+		var testErr error
+		if o.ExpectedSourceSnapshot.SnapshotID != "" {
+			testErr = runTestGate(ctx, vdir, o.Src, o.TestCommand, o.ExpectedSourceSnapshot)
+		} else {
+			testErr = runTestGate(ctx, vdir, o.Src, o.TestCommand)
+		}
+		if err := testErr; err != nil {
 			return fmt.Errorf("gate: test command failed: %w", err)
 		}
 	}
@@ -310,9 +319,17 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 		}
 	}
 	if o.ExpectedSourceSnapshot.SnapshotID != "" {
-		current, err := CommittedSourceIdentity(o.Src, o.ExpectedSourceSnapshot.ProjectID, o.ExpectedSourceSnapshot.SourceCommit)
-		if err != nil || current != o.ExpectedSourceSnapshot {
-			return fmt.Errorf("gate: source snapshot changed during build; current left unchanged: %v", err)
+		sourceRoot := o.OriginalSrc
+		if sourceRoot == "" {
+			sourceRoot = o.Src
+		}
+		current, err := SnapshotSourceIdentity(sourceRoot, o.ExpectedSourceSnapshot.ProjectID,
+			o.ExpectedSourceSnapshot.SourceMode, o.ExpectedSourceSnapshot.SourceCommit)
+		if err != nil {
+			return fmt.Errorf("gate: verify source snapshot: %w", err)
+		}
+		if current != o.ExpectedSourceSnapshot {
+			return fmt.Errorf("gate: source snapshot changed during build; current left unchanged")
 		}
 	}
 	return nil
@@ -350,17 +367,31 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 			return fmt.Errorf("reindex: inspect version %q: %w", version, err)
 		}
 		captured, err = CaptureSource(CaptureOptions{Root: o.Src, Out: vo.Out,
-			ProjectID: o.ProjectID, SourceMode: "committed", SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit})
+			ProjectID: o.ProjectID, SourceMode: gopt.ExpectedSourceSnapshot.SourceMode,
+			SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit})
 		if err != nil {
 			return fmt.Errorf("reindex: retain source bytes: %w", err)
 		}
 		if captured.Identity != gopt.ExpectedSourceSnapshot {
 			return fmt.Errorf("reindex: captured source differs from pre-build identity")
 		}
-		buildRoot := filepath.Join(vo.Out, ".build-source")
+		stageParent, err := os.MkdirTemp("", "cks-build-source-")
+		if err != nil {
+			return fmt.Errorf("reindex: prepare isolated build source: %w", err)
+		}
+		buildRoot := filepath.Join(stageParent, "tree")
 		buildCleanup, err = captured.MaterializeBuildTree(buildRoot)
 		if err != nil {
+			_ = os.RemoveAll(stageParent)
 			return fmt.Errorf("reindex: materialize captured source: %w", err)
+		}
+		cleanupTree := buildCleanup
+		buildCleanup = func() error {
+			err := cleanupTree()
+			if cleanupErr := os.RemoveAll(stageParent); err == nil {
+				err = cleanupErr
+			}
+			return err
 		}
 		if err := captured.VerifyAgainst(buildRoot); err != nil {
 			return fmt.Errorf("reindex: staged source differs from capture: %w", err)
@@ -387,9 +418,13 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		}
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
-		current, err := CommittedSourceIdentity(o.Src, o.ProjectID, gopt.ExpectedSourceSnapshot.SourceCommit)
-		if err != nil || current != gopt.ExpectedSourceSnapshot {
-			return fmt.Errorf("reindex: source changed during build: %v", err)
+		current, err := SnapshotSourceIdentity(o.Src, o.ProjectID,
+			gopt.ExpectedSourceSnapshot.SourceMode, gopt.ExpectedSourceSnapshot.SourceCommit)
+		if err != nil {
+			return fmt.Errorf("reindex: verify source after build: %w", err)
+		}
+		if current != gopt.ExpectedSourceSnapshot {
+			return fmt.Errorf("reindex: source changed during build")
 		}
 		inputs, err := ConfiguredInputDigest(o)
 		if err != nil || inputs != gopt.ExpectedInputDigest {
@@ -407,8 +442,13 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	if gopt.GraphBin == "" {
 		gopt.GraphBin = o.GraphBin
 	}
-	if gopt.Src == "" {
+	if captured.Identity.SnapshotID != "" {
+		gopt.Src = vo.Src
+	} else if gopt.Src == "" {
 		gopt.Src = o.Src
+	}
+	if gopt.OriginalSrc == "" {
+		gopt.OriginalSrc = o.Src
 	}
 	if err := Gate(ctx, dataset, version, gopt, r, emit); err != nil {
 		return fmt.Errorf("reindex: %w (current left unchanged; version %s kept for diagnosis)", err, version)

@@ -94,6 +94,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 		ToolNameGetConventions:          {"conventions"},
 		ToolNameGetFlow:                 {"flow_id", "entry_point", "steps"},
 		ToolNameGetForTask:              {"query", "citations", "knowledge", "metadata"},
+		ToolNameGetForTaskV2:            {"format_version", "coordinates", "query", "citations", "evidence_state", "metadata"},
 		ToolNameGetInvariantEnforcement: {"inv_id", "statement", "enforced_at"},
 		ToolNameGetSubgraph:             {"seed", "nodes", "edges"},
 		ToolNameImpactAnalysis:          {"seed", "result"},

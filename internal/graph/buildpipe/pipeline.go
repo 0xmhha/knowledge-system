@@ -245,7 +245,8 @@ func validateAndSanitize(g *graph.Graph, log *slog.Logger, stage string, strict 
 //   - mixed dirty/cached → incremental (parse only dirty, reuse cached node sets)
 func Run(opt Options) (persist.Manifest, error) {
 	if opt.ProjectID != "" || opt.SnapshotID != "" || opt.DatasetID != "" || opt.FileManifestDigest != "" || opt.CapturePolicyDigest != "" || opt.SourceMode != "" {
-		if opt.ProjectID == "" || opt.SnapshotID == "" || opt.DatasetID == "" || opt.FileManifestDigest == "" || opt.CapturePolicyDigest == "" || opt.SourceMode != "committed" {
+		if opt.ProjectID == "" || opt.SnapshotID == "" || opt.DatasetID == "" || opt.FileManifestDigest == "" || opt.CapturePolicyDigest == "" ||
+			(opt.SourceMode != "committed" && opt.SourceMode != "working-tree" && opt.SourceMode != "snapshot-only") {
 			return persist.Manifest{}, fmt.Errorf("incomplete or unsupported pinned graph source identity")
 		}
 	}

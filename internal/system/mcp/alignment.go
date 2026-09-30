@@ -153,7 +153,7 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	if haveManifest {
 		// Prefer the sources ledger; fall back to the top-level fields.
 		ckvCommit = m.Sources.CKG.SrcCommit
-		if ckvCommit == "" {
+		if ckvCommit == "" && m.SourceMode != "snapshot-only" {
 			ckvCommit = firstNonEmpty(m.SrcCommit, m.IndexedHead)
 			rep.Warnings = append(rep.Warnings,
 				"ckv sources.ckg ledger absent (pre-P1 index) — using top-level src_commit")
@@ -168,10 +168,6 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	// two individually-reachable backends whose join cannot be checked are
 	// confidently-wrong, not ok. A pre-P1 index still has a top-level src_commit
 	// (ckvCommit non-empty), so only a truly missing/unparsable manifest trips.
-	if in.CKVConfigured && ckvCommit == "" {
-		errs = append(errs, "ckv index configured but its manifest is missing or has no commit — "+
-			"alignment coordinates unavailable, cannot verify the canonical_id join")
-	}
 	if in.CKGSrcCommit != "" && ckvCommit != "" && in.CKGSrcCommit != ckvCommit {
 		errs = append(errs, fmt.Sprintf(
 			"ckg/ckv built from different commits (ckg %.9s, ckv %.9s)", in.CKGSrcCommit, ckvCommit))
@@ -200,6 +196,20 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	}
 	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
 	vectorPinned := m.ProjectID != "" || m.SnapshotID != "" || m.DatasetID != ""
+	snapshotOnlyPinned := graphPinned && vectorPinned && graph.SourceMode == "snapshot-only" && m.SourceMode == "snapshot-only" &&
+		in.CKGSrcCommit == "" && ckvCommit == "" && m.SrcCommit == "" && m.IndexedHead == "" &&
+		m.Sources.CKG.SrcCommit == "" && in.CKGDigest != "" && rep.GraphDigestExpected != "" &&
+		in.CKGDigest == rep.GraphDigestExpected
+	if in.CKVConfigured && ckvCommit == "" && !snapshotOnlyPinned {
+		errs = append(errs, "ckv index configured but its manifest is missing or has no commit — "+
+			"alignment coordinates unavailable, cannot verify the canonical_id join")
+	}
+	if graphPinned && graph.SourceMode == "snapshot-only" && (in.CKGSrcCommit != "" || ckvCommit != "" || m.SrcCommit != "" || m.IndexedHead != "" || m.Sources.CKG.SrcCommit != "") {
+		errs = append(errs, "snapshot-only index unexpectedly carries a Git commit")
+	}
+	if graphPinned && graph.SourceMode != "snapshot-only" && in.CKGSrcCommit == "" {
+		errs = append(errs, "pinned Git graph has no source commit")
+	}
 	if graphPinned || vectorPinned {
 		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" ||
 			graph.FileManifestDigest == "" || graph.CapturePolicyDigest == "" || graph.SourceMode == "" ||

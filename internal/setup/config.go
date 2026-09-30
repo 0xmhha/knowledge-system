@@ -14,6 +14,7 @@ import (
 // portably.
 type fileConfig struct {
 	ProjectID           string `yaml:"project_id"`
+	SourceMode          string `yaml:"source_mode"`
 	Src                 string `yaml:"src"`
 	Out                 string `yaml:"out"`
 	GraphBin            string `yaml:"graph_bin"`
@@ -57,6 +58,7 @@ func LoadConfig(path string) (Options, error) {
 	}
 	return Options{
 		ProjectID:           fc.ProjectID,
+		SourceMode:          fc.SourceMode,
 		Src:                 rel(fc.Src),
 		Out:                 rel(fc.Out),
 		GraphBin:            fc.GraphBin,

@@ -53,6 +53,10 @@ type Options struct {
 	Threshold    float64      // min normalized score (0 → DefaultThreshold; <0 disables)
 	SrcRoot      string       // absolute path used by citation enforcement;
 	// when empty, the manifest's SrcRoot is used.
+	// RetainedSource is set only by a caller that mounted the verified
+	// content-addressed source archive and will emit v2 coordinates. It
+	// requires SrcRoot to point at that mount for non-committed datasets.
+	RetainedSource bool
 
 	// ExamplesK splits test-file hits out of the main Hits slice into a
 	// separate Examples slice in the response. Up to ExamplesK test
@@ -705,6 +709,11 @@ func (e *Engine) Search(ctx context.Context, intent string, opts Options) (*Resp
 	}
 	if intent == "" {
 		return nil, errors.New("query: empty intent")
+	}
+	if e.man.SourceMode == "working-tree" || e.man.SourceMode == "snapshot-only" {
+		if !opts.RetainedSource || opts.SrcRoot == "" {
+			return nil, ErrRequiresV2
+		}
 	}
 	if opts.K > sqlitevec.DefaultMaxSearchK/overfetchFactor {
 		return nil, fmt.Errorf("%w: reason=requested_k_exceeds_limit", sqlitevec.ErrSearchIncomplete)

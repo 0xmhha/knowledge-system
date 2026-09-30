@@ -42,6 +42,9 @@ func registerConcurrencyImpact(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleConcurrencyImpact(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	symbol := req.GetString("symbol", "")
 	if symbol == "" {
 		return mcpgo.NewToolResultError(ToolNameConcurrencyImpact + ": missing required argument \"symbol\""), nil

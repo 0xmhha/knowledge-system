@@ -146,7 +146,8 @@ const defaultBatch = 32
 //  4. Write manifest.json + DB-side manifest table.
 func Run(ctx context.Context, o Options) (*Result, error) {
 	if o.ProjectID != "" || o.SnapshotID != "" || o.DatasetID != "" || o.FileManifestDigest != "" || o.CapturePolicyDigest != "" || o.SourceMode != "" {
-		if o.ProjectID == "" || o.SnapshotID == "" || o.DatasetID == "" || o.FileManifestDigest == "" || o.CapturePolicyDigest == "" || o.SourceMode != "committed" {
+		if o.ProjectID == "" || o.SnapshotID == "" || o.DatasetID == "" || o.FileManifestDigest == "" || o.CapturePolicyDigest == "" ||
+			(o.SourceMode != "committed" && o.SourceMode != "working-tree" && o.SourceMode != "snapshot-only") {
 			return nil, fmt.Errorf("incomplete or unsupported pinned vector source identity")
 		}
 	}

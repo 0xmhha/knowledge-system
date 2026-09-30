@@ -126,8 +126,14 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	}
 
 	switch {
+	case graphPinned && gm.SourceMode == "snapshot-only" && (gm.SrcCommit != "" || vecCommit != ""):
+		return fmt.Errorf("verify: snapshot-only index unexpectedly carries a Git commit")
+	case graphPinned && gm.SourceMode != "snapshot-only" && (gm.SrcCommit == "" || vecCommit == ""):
+		return fmt.Errorf("verify: pinned Git source commit missing on one side")
 	case gm.SrcCommit == "" || vecCommit == "":
-		warn("source commit missing on one side — commit alignment not verifiable")
+		if !graphPinned {
+			warn("source commit missing on one side — commit alignment not verifiable")
+		}
 	case gm.SrcCommit != vecCommit:
 		return fmt.Errorf("verify: graph and vector built from different commits (graph %.9s, vector %.9s)",
 			gm.SrcCommit, vecCommit)

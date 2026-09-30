@@ -19,6 +19,13 @@
     ]
    }
   },
+  "cks.context.get_for_task_v2": {
+   "description": "Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity.",
+   "input": {
+    "properties": {"prompt": {"type": "string"}, "intent": {"type": "string"}},
+    "required": ["prompt"]
+   }
+  },
   "cks.context.semantic_search": {
    "description": "Vector (meaning) search over the indexed corpus. Hits carry source=ckv.",
    "input": {

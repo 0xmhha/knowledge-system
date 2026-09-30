@@ -58,3 +58,18 @@ func TestInitRejectsDatasetSymlinkIntoSource(t *testing.T) {
 		t.Fatalf("symlink into source accepted: %v", err)
 	}
 }
+
+func TestInitNonGitDefaultsToSnapshotOnly(t *testing.T) {
+	root, other := t.TempDir(), t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package sample\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	result, err := Init(root, filepath.Join(other, "dataset"), filepath.Join(other, "setup.yaml"), "mock", "")
+	if err != nil || result.SourceMode != "snapshot-only" {
+		t.Fatalf("non-Git init: %+v %v", result, err)
+	}
+	loaded, err := setup.LoadConfig(result.ConfigPath)
+	if err != nil || loaded.SourceMode != "snapshot-only" || loaded.ProjectID != result.ProjectID {
+		t.Fatalf("non-Git config lost mode: %+v %v", loaded, err)
+	}
+}

@@ -62,6 +62,18 @@ func TestRetainedCitationUsesPastBytesAndRejectsDamage(t *testing.T) {
 	if evidence.ContentSHA256 != hex.EncodeToString(sum[:]) || evidence.FileSHA256 != captured.Files[0].SHA256 {
 		t.Fatalf("v2 source hashes incorrect: %+v", evidence)
 	}
+	readTree, cleanup, err := MaterializeRetainedReadTree(version)
+	if err != nil {
+		t.Fatalf("materialize archive for retrieval: %v", err)
+	}
+	retained, err := os.ReadFile(filepath.Join(readTree, "README.md"))
+	if err != nil || string(retained) != string(old) {
+		t.Fatalf("retrieval tree used live source: %q %v", retained, err)
+	}
+	cleanup()
+	if _, err := os.Stat(readTree); !os.IsNotExist(err) {
+		t.Fatalf("retrieval tree not removed: %v", err)
+	}
 	if _, err := ReadRetainedLines(version, "repo", "../README.md", 1, 1); err == nil {
 		t.Fatal("traversal citation accepted")
 	}

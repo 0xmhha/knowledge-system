@@ -85,6 +85,9 @@ func registerSemanticSearch(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleSemanticSearch(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	query := req.GetString("query", "")
 	if query == "" {
 		return mcpgo.NewToolResultError(ToolNameSemanticSearch + ": missing required argument \"query\""), nil
@@ -146,6 +149,9 @@ func registerSearchText(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleSearchText(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	query := req.GetString("query", "")
 	if query == "" {
 		return mcpgo.NewToolResultError(ToolNameSearchText + ": missing required argument \"query\""), nil

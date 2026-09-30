@@ -1,6 +1,6 @@
 # CKS v1/v2 공개 계약과 호환 골든
 
-상태: 설계 계약. v2 도구·포맷은 아직 구현되지 않았다. 이 문서는 `END-TO-END-DESIGN.md` 7절의 직렬화와 버전 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다. 구현 수용은 실제 CLI/MCP/HTTP 소비자 재생으로 별도 판정한다.
+상태: 설계 계약과 부분 구현. 별도 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 외부 origin, 그래프/의미 오버레이, 전체 오류 봉투와 소비자 재생은 아직 수용 전이다. 이 문서는 `END-TO-END-DESIGN.md` 7절의 직렬화와 버전 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
 
 ## 버전 선택
 
@@ -11,6 +11,8 @@
 | 기존 `cks setup`/`mcp` | 기존 플래그 유지 | 같은 v2 후보 빌더 또는 v1 읽기 | 모드 미지정이면 committed만 | 모드 미지정이면 committed만 |
 | `ckv query`/CKG export 구 형식 | 기존 응답 | 기존 커밋형 응답 | `requires_v2` | `requires_v2` |
 | 명시 `--format=v2`/v2 MCP·HTTP | `reindex_required` | v2 응답 | v2 응답 | v2 응답 |
+
+구현 상태: `cks.context.get_for_task_v2`와 비커밋 데이터셋의 기존 CKS 문맥 도구 거부는 실제 MCP 스모크로 검증했다. 직접 `ckv query`는 보관본 마운트 없이 비커밋 데이터셋을 거부한다. CKG 독립 export와 일반 `--format=v2`/HTTP 표면은 아직 이 표의 설계 계약에 머무른다.
 
 기존 v1 응답은 **별도의 v1 DTO**로 직렬화한다. 기존 필드에 v2 좌표를 단순 추가하지 않는다. 현재 v1 팩의 `integrity_hash` 계산은 알지 못하는 JSON 필드를 버리고 다시 계산하는 소비자와 결합돼 있으므로, 혼합 DTO는 해시 불일치를 낳을 수 있다. v1 `Citation.Key()`는 커밋도 무시하므로 v2 중복 제거에 사용하지 않는다. 기존 도구가 돌려주는 committed v2 자료의 원문은 보관본으로 검증하지만 응답 자체는 v1 모양과 기존 SHA-256 해시를 유지한다. 호출자는 v1 응답을 다른 스냅샷과 조인하지 않는다.
 
@@ -45,6 +47,8 @@
 v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start_line,end_line,file_sha256,content_sha256)`의 순서 있는 튜플이다. 문자열 결합으로 충돌을 만들지 않도록 길이 접두어 직렬화하거나 튜플 자체로 비교한다. 서로 다른 스냅샷에서 경로와 줄이 같아도 합치지 않는다.
 
 `sha256-v2`는 `metadata.integrity_hash`를 **제외**하고 `metadata.integrity_hash_algo`를 포함한 전체 v2 응답을 [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785.html)으로 정규화한 UTF-8 바이트의 SHA-256이다. 정화된 본문과 `semantic` 필드까지 포함한다. 중복 JSON 키, 유효하지 않은 UTF-8, I-JSON 밖의 수치는 거부한다. 구현은 Go 생산자와 독립 소비자의 동일 바이트·해시 골든을 갖춘다. v1의 `ComputeIntegrityHash`는 바꾸지 않는다.
+
+현재 v2 생산자는 고정 DTO의 ASCII 속성명, 문자열, null, 배열, 안전 정수만 정규화한다. 부동소수점과 사용자 정의 오버레이 객체는 거부하며 `semantic=null`, `graph_neighbors=[]`로 출력한다. 이는 완성된 범용 JCS 구현을 뜻하지 않는다. JavaScript 소비자 골든은 현재 DTO의 정규화 바이트를 고정하며, 오버레이를 공개할 때 추가 골든이 필요하다.
 
 ### D5 선택형 도메인 문맥
 

@@ -89,10 +89,25 @@ func identityHash(domain string, value any) (string, error) {
 // outside the source. A later engine-specific file selection can narrow the
 // inventory only by introducing a new identity format version.
 func CommittedSourceIdentity(root, projectID, commit string) (SourceIdentity, error) {
-	if projectID == "" || strings.ContainsRune(projectID, 0) || len(commit) != 40 {
-		return SourceIdentity{}, fmt.Errorf("source identity requires a project ID and full source commit")
+	return SnapshotSourceIdentity(root, projectID, "committed", commit)
+}
+
+// SnapshotSourceIdentity inventories exactly the same paths and bytes as
+// CaptureSource without writing blobs. This pre-build value is compared to
+// the retained candidate and, for mutable modes, to the source at the gate.
+func SnapshotSourceIdentity(root, projectID, mode, commit string) (SourceIdentity, error) {
+	if projectID == "" || strings.ContainsRune(projectID, 0) ||
+		(mode != "committed" && mode != "working-tree" && mode != "snapshot-only") ||
+		(mode == "snapshot-only" && commit != "") ||
+		(mode != "snapshot-only" && len(commit) != 40) {
+		return SourceIdentity{}, fmt.Errorf("source identity requires a project ID and a commit matching its source mode")
 	}
-	paths, err := captureModePaths(root, "committed")
+	if mode != "snapshot-only" {
+		if head, err := captureHead(root); err != nil || head != commit {
+			return SourceIdentity{}, fmt.Errorf("source base commit changed: %v", err)
+		}
+	}
+	paths, err := captureModePaths(root, mode)
 	if err != nil {
 		return SourceIdentity{}, err
 	}
@@ -114,8 +129,13 @@ func CommittedSourceIdentity(root, projectID, commit string) (SourceIdentity, er
 		files = append(files, sourceFile{OriginID: "repo", Path: filepath.ToSlash(path), Kind: "regular",
 			Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
 	}
-	result := SourceIdentity{ProjectID: projectID, SourceMode: "committed", SourceCommit: commit,
-		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest("committed")}
+	if mode != "snapshot-only" {
+		if head, err := captureHead(root); err != nil || head != commit {
+			return SourceIdentity{}, fmt.Errorf("source base commit changed during inventory: %v", err)
+		}
+	}
+	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
+		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest(mode)}
 	result.SnapshotID = sourceSnapshotID(result)
 	return result, nil
 }

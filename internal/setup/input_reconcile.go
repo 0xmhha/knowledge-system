@@ -16,8 +16,8 @@ import (
 // External reviewed corpora carry their own input digest and are not selected
 // by the committed-source query below.
 func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
-	if captured.Identity.SourceMode != "committed" {
-		return fmt.Errorf("engine input reconciliation requires committed source mode")
+	if captured.Identity.SourceMode == "" {
+		return fmt.Errorf("engine input reconciliation requires pinned source mode")
 	}
 	files := make(map[string]string, len(captured.Files))
 	for _, f := range captured.Files {

@@ -81,6 +81,56 @@ func TestCommittedSourceIdentitySeparatesProjectsAndBytes(t *testing.T) {
 	}
 }
 
+func TestSnapshotSourceIdentitySeparatesWorkingTreeAndNonGit(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	file := filepath.Join(root, "main.go")
+	if err := os.WriteFile(file, []byte("package before\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	head := identityGit(t, root, "rev-parse", "HEAD")
+	committed, err := CommittedSourceIdentity(root, "p", head)
+	if err != nil {
+		t.Fatal(err)
+	}
+	working, err := SnapshotSourceIdentity(root, "p", "working-tree", head)
+	if err != nil || working.SnapshotID == committed.SnapshotID {
+		t.Fatalf("mode reused snapshot: %+v %v", working, err)
+	}
+	if err := os.WriteFile(file, []byte("package after\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	modified, err := SnapshotSourceIdentity(root, "p", "working-tree", head)
+	if err != nil || modified.SnapshotID == working.SnapshotID {
+		t.Fatalf("edit reused snapshot: %+v %v", modified, err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "new.md"), []byte("# New\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	added, err := SnapshotSourceIdentity(root, "p", "working-tree", head)
+	if err != nil || added.SnapshotID == modified.SnapshotID {
+		t.Fatalf("new file reused snapshot: %+v %v", added, err)
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"), ProjectID: "p", SourceMode: "working-tree", SourceCommit: head})
+	if err != nil || captured.Identity != added {
+		t.Fatalf("capture differs from prebuild identity: %+v %v", captured.Identity, err)
+	}
+	plain := t.TempDir()
+	if err := os.WriteFile(filepath.Join(plain, "main.go"), []byte("package plain\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	nonGit, err := SnapshotSourceIdentity(plain, "p", "snapshot-only", "")
+	if err != nil || nonGit.SourceCommit != "" {
+		t.Fatalf("non-Git source identity: %+v %v", nonGit, err)
+	}
+	captured, err = CaptureSource(CaptureOptions{Root: plain, Out: filepath.Join(t.TempDir(), "non-git"), ProjectID: "p", SourceMode: "snapshot-only"})
+	if err != nil || captured.Identity != nonGit {
+		t.Fatalf("non-Git capture differs: %+v %v", captured.Identity, err)
+	}
+}
+
 func TestDatasetIdentitySeparatesModelAndPolicy(t *testing.T) {
 	source := SourceIdentity{ProjectID: "p", SnapshotID: strings.Repeat("a", 64)}
 	first, err := NewDatasetIdentity(source, json.RawMessage(`{"model":"m","digest":"one"}`), "policy-one")

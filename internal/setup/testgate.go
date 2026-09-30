@@ -18,6 +18,8 @@ import (
 
 type testGateReport struct {
 	SourceCommit       string    `json:"source_commit"`
+	SourceMode         string    `json:"source_mode,omitempty"`
+	SnapshotID         string    `json:"snapshot_id,omitempty"`
 	GraphDigest        string    `json:"graph_digest"`
 	Executable         string    `json:"executable"`
 	CommandSHA256      string    `json:"command_sha256"`
@@ -50,7 +52,7 @@ func (w *gateOutputHash) Write(data []byte) (int, error) {
 
 // runTestGate records one explicit command against the candidate's committed
 // source. It has no shell, stores no output text, and cannot promote a version.
-func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []string) error {
+func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []string, pinned ...SourceIdentity) error {
 	if sourceRoot == "" || len(argv) == 0 || argv[0] == "" {
 		return fmt.Errorf("source and test executable are required")
 	}
@@ -61,15 +63,23 @@ func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []st
 	if err := readJSON(filepath.Join(candidateDir, "graph", "manifest.json"), &graph); err != nil {
 		return err
 	}
-	if len(graph.SrcCommit) != 40 {
+	if len(graph.SrcCommit) != 40 && !(len(pinned) == 1 && pinned[0].SourceMode == "snapshot-only" && graph.SrcCommit == "") {
 		return fmt.Errorf("candidate graph has no full source commit")
 	}
-	clean, err := testGateSourceClean(sourceRoot, graph.SrcCommit)
+	check := func() (bool, error) { return testGateSourceClean(sourceRoot, graph.SrcCommit) }
+	if len(pinned) == 1 && pinned[0].SourceMode != "committed" {
+		check = func() (bool, error) {
+			current, err := SnapshotSourceIdentity(sourceRoot, pinned[0].ProjectID,
+				pinned[0].SourceMode, pinned[0].SourceCommit)
+			return err == nil && current == pinned[0], err
+		}
+	}
+	clean, err := check()
 	if err != nil {
 		return err
 	}
 	if !clean {
-		return fmt.Errorf("test gate requires the candidate's clean committed source")
+		return fmt.Errorf("test gate requires the candidate's unchanged source snapshot")
 	}
 	root, err := filepath.Abs(sourceRoot)
 	if err != nil {
@@ -81,6 +91,9 @@ func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []st
 		Executable: filepath.Base(argv[0]), CommandSHA256: hex.EncodeToString(commandHash[:]),
 		StartedAt: time.Now().UTC(), GOOS: runtime.GOOS, GOARCH: runtime.GOARCH,
 		GoRuntime: runtime.Version(), ExitCode: -1}
+	if len(pinned) == 1 {
+		report.SourceMode, report.SnapshotID = pinned[0].SourceMode, pinned[0].SnapshotID
+	}
 	output := &gateOutputHash{hash: sha256.New()}
 	command := exec.CommandContext(ctx, argv[0], argv[1:]...)
 	command.Dir, command.Stdout, command.Stderr = root, output, output
@@ -96,7 +109,7 @@ func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []st
 		}
 		report.RunError = runErr.Error()
 	}
-	report.SnapshotConsistent, err = testGateSourceClean(sourceRoot, graph.SrcCommit)
+	report.SnapshotConsistent, err = check()
 	if err != nil {
 		report.SnapshotConsistent = false
 		report.RunError = fmt.Sprintf("post-run source check: %v", err)

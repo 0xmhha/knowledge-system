@@ -80,10 +80,6 @@ func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
 	if err := Register(srv, f.deps); err != nil {
 		t.Fatal(err)
 	}
-	registered := srv.GetTool(ToolNameGetForTask)
-	if registered == nil {
-		t.Fatal("primary tool is not registered")
-	}
 	raw, err := os.ReadFile(filepath.Join("testdata", "agent-mcp.schema.json"))
 	if err != nil {
 		t.Fatal(err)
@@ -99,24 +95,32 @@ func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
 	if err := json.Unmarshal(raw, &fixture); err != nil {
 		t.Fatal(err)
 	}
-	want, ok := fixture.Tools[ToolNameGetForTask]
-	if !ok {
-		t.Fatal("primary tool missing from contract fixture")
-	}
-	got := registered.Tool.InputSchema
-	if strings.Join(got.Required, ",") != strings.Join(want.Input.Required, ",") {
-		t.Errorf("required inputs: registered=%v fixture=%v", got.Required, want.Input.Required)
-	}
-	actualNames := make(map[string]struct{}, len(got.Properties))
-	for name := range got.Properties {
-		actualNames[name] = struct{}{}
-	}
-	fixtureNames := make(map[string]struct{}, len(want.Input.Properties))
-	for name := range want.Input.Properties {
-		fixtureNames[name] = struct{}{}
-	}
-	if strings.Join(sortedKeys(actualNames), ",") != strings.Join(sortedKeys(fixtureNames), ",") {
-		t.Errorf("input names: registered=%v fixture=%v", sortedKeys(actualNames), sortedKeys(fixtureNames))
+	for _, toolName := range []string{ToolNameGetForTask, ToolNameGetForTaskV2} {
+		t.Run(toolName, func(t *testing.T) {
+			registered := srv.GetTool(toolName)
+			if registered == nil {
+				t.Fatal("context tool is not registered")
+			}
+			want, ok := fixture.Tools[toolName]
+			if !ok {
+				t.Fatal("context tool missing from contract fixture")
+			}
+			got := registered.Tool.InputSchema
+			if strings.Join(got.Required, ",") != strings.Join(want.Input.Required, ",") {
+				t.Errorf("required inputs: registered=%v fixture=%v", got.Required, want.Input.Required)
+			}
+			actualNames := make(map[string]struct{}, len(got.Properties))
+			for name := range got.Properties {
+				actualNames[name] = struct{}{}
+			}
+			fixtureNames := make(map[string]struct{}, len(want.Input.Properties))
+			for name := range want.Input.Properties {
+				fixtureNames[name] = struct{}{}
+			}
+			if strings.Join(sortedKeys(actualNames), ",") != strings.Join(sortedKeys(fixtureNames), ",") {
+				t.Errorf("input names: registered=%v fixture=%v", sortedKeys(actualNames), sortedKeys(fixtureNames))
+			}
+		})
 	}
 }
 

@@ -164,6 +164,7 @@ func runSetup(args []string) error {
 	fs := flag.NewFlagSet("setup", flag.ContinueOnError)
 	config := fs.String("config", "", "setup config file (e.g. projects/<name>/setup.yaml); explicit flags override its values")
 	fs.StringVar(&o.ProjectID, "project-id", "", "stable project identity from cks init")
+	sourceMode := fs.String("source-mode", "committed", "source capture: committed | working-tree | snapshot-only (latter two require --version and --project-id)")
 	fs.StringVar(&o.Src, "src", "", "source tree to index (required)")
 	fs.StringVar(&o.Out, "out", "", "dataset root; graph index in <out>/graph, vector index in <out>/vector (required)")
 	fs.StringVar(&o.GraphBin, "graph-bin", "", "graph engine CLI (default: ckg beside this binary, else PATH)")
@@ -212,6 +213,9 @@ func runSetup(args []string) error {
 		}
 		merge("src", &o.Src, base.Src)
 		merge("project-id", &o.ProjectID, base.ProjectID)
+		if !set["source-mode"] && base.SourceMode != "" {
+			*sourceMode = base.SourceMode
+		}
 		merge("out", &o.Out, base.Out)
 		merge("graph-bin", &o.GraphBin, base.GraphBin)
 		merge("vector-bin", &o.VectorBin, base.VectorBin)
@@ -262,12 +266,29 @@ func runSetup(args []string) error {
 	var preBuildInputs string
 	var preBuildDatasetID string
 	if *rollback == "" {
-		preBuildCommit, err = committedSourceCommit(o.Src)
+		switch *sourceMode {
+		case "committed":
+			preBuildCommit, err = committedSourceCommit(o.Src)
+		case "working-tree":
+			if *version == "" || o.ProjectID == "" {
+				return fmt.Errorf("working-tree mode requires --version and --project-id")
+			}
+			preBuildCommit, err = gitOutput(o.Src, "rev-parse", "HEAD")
+			if len(preBuildCommit) != 40 {
+				return fmt.Errorf("working-tree mode requires a Git HEAD")
+			}
+		case "snapshot-only":
+			if *version == "" || o.ProjectID == "" {
+				return fmt.Errorf("snapshot-only mode requires --version and --project-id")
+			}
+		default:
+			return fmt.Errorf("unknown source mode %q", *sourceMode)
+		}
 		if err != nil {
 			return err
 		}
 		if o.ProjectID != "" {
-			preBuildSnapshot, err = setup.CommittedSourceIdentity(o.Src, o.ProjectID, preBuildCommit)
+			preBuildSnapshot, err = setup.SnapshotSourceIdentity(o.Src, o.ProjectID, *sourceMode, preBuildCommit)
 			if err != nil {
 				return err
 			}
@@ -306,18 +327,28 @@ func runSetup(args []string) error {
 		// Blue-green: build a new version, gate it, promote current on success.
 		ver := *version
 		if ver == "auto" {
-			resolved, err := resolveAutoVersion(o.Out, o.Src, o.FilelistConfig, o.SemanticCorpus)
+			if *sourceMode == "committed" {
+				ver, err = resolveAutoVersion(o.Out, o.Src, o.FilelistConfig, o.SemanticCorpus)
+			} else {
+				ver = "s" + preBuildSnapshot.SnapshotID[:12]
+				if _, statErr := os.Lstat(filepath.Join(o.Out, ver)); statErr == nil {
+					return fmt.Errorf("--version auto: %s already exists", ver)
+				}
+			}
 			if err != nil {
 				return err
 			}
-			ver = resolved
 			fmt.Fprintf(os.Stderr, "setup: --version auto resolved to %s\n", ver)
 		}
 		if *gateTestBin == "" && len(*gateTestArgs) > 0 {
 			return fmt.Errorf("--gate-test-arg requires --gate-test-bin")
 		}
+		gateCommit := preBuildCommit
+		if *sourceMode != "committed" {
+			gateCommit = ""
+		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
-			ExpectedSourceCommit: preBuildCommit, ExpectedSourceSnapshot: preBuildSnapshot,
+			ExpectedSourceCommit: gateCommit, ExpectedSourceSnapshot: preBuildSnapshot,
 			ExpectedInputDigest: preBuildInputs, ExpectedDatasetID: preBuildDatasetID}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)

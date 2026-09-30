@@ -20,6 +20,9 @@ import (
 // fail_closed) come back as an IsError CallToolResult — that's what mcp-go
 // surfaces to MCP clients as the "tool produced an error" branch.
 func handleGetForTask(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	prompt := req.GetString("prompt", "")
 	if prompt == "" {
 		return mcpgo.NewToolResultError("cks.context.get_for_task: missing required argument \"prompt\""), nil
