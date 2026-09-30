@@ -1,6 +1,6 @@
 # Knowledge System 설치 시범 절차
 
-현재 산출물은 **빌드한 호스트에서 검증하는 개발 프리뷰**다. 운영 배포 전에 대상 OS/CPU에서 네이티브 라이브러리, 모델, 라이선스와 전체 WBS Gate 5를 확인한다. `mock` 임베더는 구조 스모크 전용이며 자연어 검색 품질을 검증하지 않는다.
+현재 산출물은 **빌드한 호스트에서 검증하는 개발 프리뷰**다. 사용자가 지정한 배포 대상은 macOS arm64와 Linux이며, Linux의 필수 CPU 아키텍처는 확인 중이다. 운영 배포 전에 각 대상에서 네이티브 라이브러리, 모델, 라이선스와 전체 WBS Gate 5를 확인한다. `mock` 임베더는 구조 스모크 전용이며 자연어 검색 품질을 검증하지 않는다.
 
 ## 1. 호스트 패키지
 
@@ -13,6 +13,8 @@ python3 scripts/package-host.py --out-dir /tmp/knowledge-system-dist
 출력 JSON의 `sha256`으로 압축 파일을 확인하고 해제한다. 압축 파일에는 `ckg`, `ckv`, `cks`, `LICENSE`, `INSTALLATION.md`, 소독 규칙, `modules.txt`, `manifest.json`이 들어 있다. `manifest.json`에는 바이너리별 SHA-256·크기, 빌드 커밋, 호스트, Go 버전, 감지한 네이티브 의존성이 기록된다. 작업 트리가 더러울 때 프리뷰가 필요하면 `--allow-dirty`를 명시하며, 매니페스트가 `dirty: true`로 표시된다. 배포 가능 판정은 아니다.
 
 현재 호스트에서 압축 파일 자체를 확인하려면 `scripts/wbs-package-smoke.sh`를 실행한다. 아카이브와 내부 바이너리의 해시를 검증하고, 압축 해제한 바이너리·소독 규칙만 사용해 아래 세 유형의 독립 프로젝트에서 설치와 CKS MCP 질의를 실행한다. 이 스모크에도 현재 호스트의 Go·Git 도구와 mock 임베더가 필요하며 OS/CPU 호환성 판정은 아니다.
+
+Linux arm64의 CGO 빌드 이미지는 `scripts/Dockerfile.linux-build`로 고정한다. 기본 Go 이미지에는 `sqlite3.h`가 없어 CKV/CKS의 sqlite-vec 바인딩을 컴파일할 수 없었고, `libsqlite3-dev`를 더한 이미지에서는 세 바이너리의 빌드·기동 및 독립 프로젝트 세 곳의 설치·MCP 질의가 통과했다. 이 결과는 Linux arm64의 구조 동작 검증이며, 깨끗한 런타임 이미지에서 압축 패키지를 실행하는 릴리스 게이트와 Linux amd64 검증은 별도다.
 
 ## 2. 프로젝트별 초기화
 

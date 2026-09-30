@@ -1,0 +1,8 @@
+# Reproducible Linux/arm64 and Linux/amd64 CGO build environment for the
+# knowledge-system release gate. The three binaries use sqlite3.h through
+# sqlite-vec's CGO binding; the stock Go image alone cannot compile them.
+FROM golang:1.25.13-bookworm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
