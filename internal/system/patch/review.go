@@ -56,8 +56,8 @@ func validateRun(p semantic.Projection, criterionID string, run semantic.TestRun
 		len(run.AcceptedAssertions) != 0 || run.CommandSHA256 == "" || run.OutputSHA256 == "" {
 		return fmt.Errorf("test execution is absent, failed, stale, or not bound to a reviewed CHECKED_BY link")
 	}
-	if run.Framework == "go-test-json" && (!run.TestObserved || !run.TestPassed) {
-		return fmt.Errorf("selected Go test did not run and pass")
+	if run.Framework != "go-test-json" || !run.TestObserved || !run.TestPassed || run.TestName == "" {
+		return fmt.Errorf("criterion promotion requires an observed exact test result")
 	}
 	if _, _, err := criterionInProjection(p, criterionID); err != nil {
 		return err
