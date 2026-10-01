@@ -13,18 +13,20 @@ import (
 // model registry), so adding or swapping an embedding model needs no change
 // here — the identity flows from the model definition.
 type EmbeddingIdentity struct {
-	Provider         string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
-	Model            string // model name, e.g. "bge-m3"
-	Dim              int    // vector dimension
-	Pooling          string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
-	Normalize        string // "l2" | "none"; "" when unknown
-	Version          int    `json:"version,omitempty"`
-	ModelDigest      string `json:"model_digest,omitempty"`
-	NativeDim        int    `json:"native_dim,omitempty"`
-	DimensionMethod  string `json:"dimension_method,omitempty"`
-	PassageTransform string `json:"passage_transform,omitempty"`
-	QueryTransform   string `json:"query_transform,omitempty"`
-	TruncatePolicy   string `json:"truncate_policy,omitempty"`
+	Provider             string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
+	Model                string // model name, e.g. "bge-m3"
+	Dim                  int    // vector dimension
+	Pooling              string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
+	Normalize            string // "l2" | "none"; "" when unknown
+	Version              int    `json:"version,omitempty"`
+	ModelDigest          string `json:"model_digest,omitempty"`
+	NativeDim            int    `json:"native_dim,omitempty"`
+	DimensionMethod      string `json:"dimension_method,omitempty"`
+	PassageTransform     string `json:"passage_transform,omitempty"`
+	QueryTransform       string `json:"query_transform,omitempty"`
+	TruncatePolicy       string `json:"truncate_policy,omitempty"`
+	RuntimeContextTokens int    `json:"runtime_context_tokens,omitempty"`
+	RuntimeBatchTokens   int    `json:"runtime_batch_tokens,omitempty"`
 }
 
 // Checksum is a stable identity string for the embedding space. Version 1

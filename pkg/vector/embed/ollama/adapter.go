@@ -48,15 +48,16 @@ const DefaultMaxInputTokens = 8192
 
 // Adapter implements types.Embedder via Ollama's /api/embed endpoint.
 type Adapter struct {
-	endpoint      string
-	modelName     string
-	modelDigest   string
-	dim           int
-	nativeDim     int
-	targetDim     int    // >0 → truncate each embedding to this many dims (MRL)
-	queryInstruct string // non-empty → wrap queries in this Qwen3 instruct prompt
-	maxInput      int
-	client        *http.Client
+	endpoint       string
+	modelName      string
+	modelDigest    string
+	dim            int
+	nativeDim      int
+	targetDim      int    // >0 → truncate each embedding to this many dims (MRL)
+	queryInstruct  string // non-empty → wrap queries in this Qwen3 instruct prompt
+	maxInput       int
+	runtimeOptions *embedRuntimeOptions
+	client         *http.Client
 }
 
 // Options configures the Ollama adapter.
@@ -109,11 +110,12 @@ func Open(opts Options) (*Adapter, error) {
 		queryInstruct = "" // opt out of the asymmetric query prompt (A/B, debugging)
 	}
 	a := &Adapter{
-		endpoint:      strings.TrimRight(endpoint, "/"),
-		modelName:     opts.ModelName,
-		queryInstruct: queryInstruct,
-		maxInput:      resolveMaxInput(opts.ModelName),
-		client:        &http.Client{Timeout: timeout},
+		endpoint:       strings.TrimRight(endpoint, "/"),
+		modelName:      opts.ModelName,
+		queryInstruct:  queryInstruct,
+		maxInput:       resolveMaxInput(opts.ModelName),
+		runtimeOptions: resolveRuntimeOptions(opts.ModelName),
+		client:         &http.Client{Timeout: timeout},
 	}
 
 	// Probe: embed a short string to discover the dimension. Bound it with a
@@ -185,6 +187,17 @@ func resolveMaxInput(modelName string) int {
 	return DefaultMaxInputTokens
 }
 
+// BGE-M3 advertises an 8K context, but Ollama can load it with a smaller
+// physical batch even when num_ctx is 8192. In that case truncate:false can
+// reject valid inputs around 2048 tokens. Pin both settings for this model;
+// keep other models on their existing runtime defaults.
+func resolveRuntimeOptions(modelName string) *embedRuntimeOptions {
+	if strings.SplitN(modelName, ":", 2)[0] == "bge-m3" {
+		return &embedRuntimeOptions{NumCtx: 8192, NumBatch: 8192}
+	}
+	return nil
+}
+
 // Identity includes the Ollama digest, dimension method and query transform.
 // Ollama does not expose pooling details, so Pooling remains empty.
 func (a *Adapter) Identity() types.EmbeddingIdentity {
@@ -198,17 +211,33 @@ func (a *Adapter) Identity() types.EmbeddingIdentity {
 		method = "mrl-prefix-l2:v1"
 	}
 	return types.EmbeddingIdentity{
-		Provider:         "ollama",
-		Model:            a.modelName,
-		Dim:              a.dim,
-		Version:          2,
-		ModelDigest:      a.modelDigest,
-		NativeDim:        a.nativeDim,
-		DimensionMethod:  method,
-		PassageTransform: "raw:v1",
-		QueryTransform:   queryTransform,
-		TruncatePolicy:   "reject:v1",
+		Provider:             "ollama",
+		Model:                a.modelName,
+		Dim:                  a.dim,
+		Version:              2,
+		ModelDigest:          a.modelDigest,
+		NativeDim:            a.nativeDim,
+		DimensionMethod:      method,
+		PassageTransform:     "raw:v1",
+		QueryTransform:       queryTransform,
+		TruncatePolicy:       "reject:v1",
+		RuntimeContextTokens: a.runtimeContextTokens(),
+		RuntimeBatchTokens:   a.runtimeBatchTokens(),
 	}
+}
+
+func (a *Adapter) runtimeContextTokens() int {
+	if a.runtimeOptions != nil {
+		return a.runtimeOptions.NumCtx
+	}
+	return 0
+}
+
+func (a *Adapter) runtimeBatchTokens() int {
+	if a.runtimeOptions != nil {
+		return a.runtimeOptions.NumBatch
+	}
+	return 0
 }
 func (a *Adapter) Close() error { return nil }
 
@@ -227,6 +256,7 @@ func (a *Adapter) Embed(ctx context.Context, batch []string) ([][]float32, error
 		Model:    a.modelName,
 		Input:    batch,
 		Truncate: false,
+		Options:  a.runtimeOptions,
 	}
 	body, err := json.Marshal(reqBody)
 	if err != nil {
@@ -355,9 +385,15 @@ func truncateNormalize(v []float32, dim int) []float32 {
 }
 
 type embedRequest struct {
-	Model    string   `json:"model"`
-	Input    []string `json:"input"`
-	Truncate bool     `json:"truncate"`
+	Model    string               `json:"model"`
+	Input    []string             `json:"input"`
+	Truncate bool                 `json:"truncate"`
+	Options  *embedRuntimeOptions `json:"options,omitempty"`
+}
+
+type embedRuntimeOptions struct {
+	NumCtx   int `json:"num_ctx"`
+	NumBatch int `json:"num_batch"`
 }
 
 type embedResponse struct {

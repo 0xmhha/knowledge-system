@@ -30,3 +30,14 @@ func TestEmbeddingIdentityChecksum(t *testing.T) {
 		}
 	}
 }
+
+func TestEmbeddingIdentityChecksumRuntimeOptions(t *testing.T) {
+	base := EmbeddingIdentity{Provider: "ollama", Model: "bge-m3:latest", Dim: 1024, Version: 2}
+	ctx := base
+	ctx.RuntimeContextTokens = 8192
+	batch := ctx
+	batch.RuntimeBatchTokens = 8192
+	if base.Checksum() == ctx.Checksum() || ctx.Checksum() == batch.Checksum() {
+		t.Fatal("context and batch runtime settings must each change the vector identity")
+	}
+}

@@ -26,6 +26,64 @@ func TestResolveMaxInput_RegistryAware(t *testing.T) {
 	}
 }
 
+func TestResolveRuntimeOptions_BGEOnly(t *testing.T) {
+	for _, model := range []string{"bge-m3", "bge-m3:latest", "bge-m3:567m"} {
+		got := resolveRuntimeOptions(model)
+		if got == nil || got.NumCtx != 8192 || got.NumBatch != 8192 {
+			t.Errorf("%s: unexpected runtime options %+v", model, got)
+		}
+	}
+	for _, model := range []string{"qwen3-embedding:0.6b", "bge-large-en-v1.5", "other"} {
+		if got := resolveRuntimeOptions(model); got != nil {
+			t.Errorf("%s: unexpected runtime options %+v", model, got)
+		}
+	}
+}
+
+func TestOpen_BGERuntimeOptionsAndIdentity(t *testing.T) {
+	var embedCalls int
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/tags":
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{
+				"name": "bge-m3:latest", "digest": strings.Repeat("a", 64),
+			}}})
+		case "/api/embed":
+			var req embedRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				t.Errorf("decode: %v", err)
+			}
+			if req.Truncate || req.Options == nil || req.Options.NumCtx != 8192 || req.Options.NumBatch != 8192 {
+				t.Errorf("unsafe bge-m3 embedding request: %+v", req)
+			}
+			embedCalls++
+			_ = json.NewEncoder(w).Encode(embedResponse{Model: "bge-m3:latest", Embeddings: [][]float32{{1, 2, 3}}})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+	a, err := Open(Options{Endpoint: server.URL, ModelName: "bge-m3"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := a.Embed(context.Background(), []string{"full passage"}); err != nil {
+		t.Fatal(err)
+	}
+	if embedCalls != 2 { // startup probe and ordinary passage
+		t.Fatalf("embed calls = %d, want 2", embedCalls)
+	}
+	id := a.Identity()
+	if id.RuntimeContextTokens != 8192 || id.RuntimeBatchTokens != 8192 {
+		t.Fatalf("runtime identity not pinned: %+v", id)
+	}
+	legacy := id
+	legacy.RuntimeContextTokens, legacy.RuntimeBatchTokens = 0, 0
+	if id.Checksum() == legacy.Checksum() {
+		t.Fatal("new runtime settings must require reindex from previous Ollama bge-m3")
+	}
+}
+
 func TestMaxInputTokens_FallsBackWhenUnset(t *testing.T) {
 	// A directly-constructed adapter (e.g. in tests) has no maxInput; the
 	// accessor must still return a bounded default rather than 0.
@@ -184,6 +242,9 @@ func TestOpen_PinsDigestAndQueryPolicy(t *testing.T) {
 			}
 			if req.Truncate {
 				t.Error("truncate must be false")
+			}
+			if req.Options != nil {
+				t.Errorf("qwen3 runtime options unexpectedly changed: %+v", req.Options)
 			}
 			_ = json.NewEncoder(w).Encode(embedResponse{Model: "qwen3-embedding:0.6b", Embeddings: [][]float32{{1, 2, 3}}})
 			if changeDuringEmbed.Load() {

@@ -45,13 +45,15 @@ def main():
     parser.add_argument("--model", default="bge-m3:latest")
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     parser.add_argument("--num-ctx", type=int, default=8192)
+    parser.add_argument("--num-batch", type=int, default=0,
+                        help="physical batch tokens; 0 omits the option")
     parser.add_argument("--lengths", default="4000,5000,5500,6000,8000,12205")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     parsed = urllib.parse.urlparse(args.ollama_url)
     if parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
         raise ValueError("Ollama URL must be local HTTP loopback")
-    if args.num_ctx <= 0 or not args.model or ":" not in args.model:
+    if args.num_ctx <= 0 or args.num_batch < 0 or not args.model or ":" not in args.model:
         raise ValueError("positive num_ctx and exact tagged model required")
     lengths = [int(item) for item in args.lengths.split(",")]
     if not lengths or any(n <= 0 for n in lengths) or len(set(lengths)) != len(lengths):
@@ -70,8 +72,11 @@ def main():
     probes = []
     for length in lengths:
         sample = source[:length].decode("utf-8", errors="ignore")
+        options = {"num_ctx": args.num_ctx}
+        if args.num_batch:
+            options["num_batch"] = args.num_batch
         payload = json.dumps({"model": args.model, "input": sample, "truncate": False,
-                              "options": {"num_ctx": args.num_ctx}}).encode()
+                              "options": options}).encode()
         start = time.monotonic()
         try:
             response = read_json(endpoint + "/api/embed", payload, timeout=180)
@@ -100,6 +105,7 @@ def main():
               "source_sha256": hashlib.sha256(source).hexdigest(),
               "model": args.model, "model_digest": digest,
               "ollama_version": version, "requested_num_ctx": args.num_ctx,
+              "requested_num_batch": args.num_batch or None,
               "truncate": False, "probes": probes}
     rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:

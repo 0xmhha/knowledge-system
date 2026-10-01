@@ -1,5 +1,7 @@
 # Spec-driven WBS execution log
 
+B0 Ollama batch setting correction (2026-10-02): 고정 파일 12,205바이트는 기본 `n_batch=2048`에서 거부됐으나 `num_ctx=8192`, `num_batch=8192`, `truncate:false`로 4,267토큰 전체가 수용됐다. [`batch-probe-2026-10-02.json`](../../system/eval/b0-knowledge-system/batch-probe-2026-10-02.json)에 원자료를 보존했다. `bge-m3` Ollama 요청만 해당 옵션을 명시하고 임베딩 식별 정보 v2에 설정을 포함해 기존 색인과의 혼용을 막았다. 작은 CKS/CKV/MCP 실모델 스모크와 긴 문서 수용·실제 초과 입력 거부 스모크가 통과했다. 다른 모델에는 옵션을 적용하지 않았다. 12개 질문은 여전히 `draft`이고 B0 품질 수치는 없다.
+
 B0 strict completeness guard (2026-10-02): `CKV_REQUIRE_COMPLETE_EMBEDDINGS=1`이면 배치 분할 뒤 단일 청크 원문 임베딩 실패를 `embedding input incomplete`로 반환해 축약·건너뛰기 없이 후보를 실패시킨다. 단위 시험과 [`b0-ollama-strict-smoke.sh`](../../scripts/b0-ollama-strict-smoke.sh)의 실제 Ollama 긴 Markdown 시험은 `current`와 벡터 매니페스트 미생성을 확인했다. 이것은 불완전 품질 기준선의 **게시 방지**이고 전체 내용의 안전한 자식 청크 분할은 C0 후속 수정이다.
 
 B0 effective context diagnostic (2026-10-02): 고정 파일에 대한 실제 `bge-m3:latest` `truncate:false` 임베딩은 `num_ctx=8192`에서도 5,500바이트/2,030 토큰을 수용하고 6,000바이트를 문맥 초과로 거부했다. [`context-probe-2026-10-02.json`](../../system/eval/b0-knowledge-system/context-probe-2026-10-02.json)에 모델 다이제스트·소스 SHA·요청 길이·응답을 보존했다. Ollama 로그의 `n_batch=2048`과 경계가 일치하지만 원인은 추론으로 표시한다. [`B0-EVALUATION-PREPARATION.md`](./B0-EVALUATION-PREPARATION.md)에 자식 청크/완전성 계측 설계 게이트를 추가했다. 품질 수치는 없다.
