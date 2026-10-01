@@ -155,7 +155,8 @@ func TestAttachKnowledgeIncludesReviewedArchivedDecision(t *testing.T) {
 		t.Fatal(err)
 	}
 	k := got.Semantic.(contract.KnowledgeSemanticV2).KnowledgeContext
-	if k.State != "complete" || len(k.Decisions) != 1 || k.Decisions[0].ID != "ADR-1" ||
+	if k.State != "partial" || len(k.Decisions) != 1 || k.Decisions[0].ID != "ADR-1" ||
+		len(k.Decisions[0].RequirementIDs) != 0 || len(k.Unknowns) == 0 ||
 		len(got.Citations) != 3 || !strings.Contains(got.Bodies[2].Text, "Preserve separation of duties") {
 		t.Fatalf("reviewed archive ADR missing: %+v", got)
 	}

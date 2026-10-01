@@ -133,10 +133,17 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 			ID: p.ID, State: p.State, ReviewedBy: p.ReviewedBy,
 			EffectiveFrom: p.EffectiveFrom, EffectiveTo: p.EffectiveTo, Citation: addition.Citations[i]})
 	}
+	unverifiedLinks := false
 	for i, d := range decisions.Applicable {
 		k.Decisions = append(k.Decisions, contract.KnowledgeDecisionV2{ID: d.ID, State: d.State,
-			ReviewedBy: d.ReviewedBy, Date: d.Date, RequirementIDs: append([]string{}, d.RequirementIDs...),
+			ReviewedBy: d.ReviewedBy, Date: d.Date, RequirementIDs: []string{},
 			Citation: addition.Citations[len(selected.Applicable)+i]})
+		if len(d.RequirementIDs) > 0 {
+			// ADR front matter declares intent. Without a checked link to the
+			// pinned semantic requirement, these IDs cannot enter the coding path.
+			k.Unknowns = append(k.Unknowns, "unverified_adr_requirement_links")
+			unverifiedLinks = true
+		}
 	}
 	if selected.State == "unknown" || selected.State == "stale" {
 		if len(k.Decisions) > 0 {
@@ -145,6 +152,9 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	}
 	if k.State == "needs_citation" {
 		k.State = "complete"
+	}
+	if unverifiedLinks && k.State == "complete" {
+		k.State = "partial"
 	}
 	if base.EvidenceState == "partial" && k.State == "complete" {
 		k.State = "partial"
