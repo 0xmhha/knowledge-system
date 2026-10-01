@@ -122,6 +122,7 @@ class PreflightTest(unittest.TestCase):
             self.assertEqual((model["model"], model["digest"], model["dimension"]),
                              ("fixture:latest", "a" * 64, 3))
             self.assertEqual(model["server_version"], "fixture-1.0")
+            self.assertIsNone(model["runtime_options"])
         finally:
             server.shutdown()
             server.server_close()
@@ -130,6 +131,12 @@ class PreflightTest(unittest.TestCase):
     def test_remote_endpoint_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "local HTTP loopback"):
             PREFLIGHT.ollama_identity("https://example.com", "fixture")
+
+    def test_bge_runtime_options_match_ckv_policy(self):
+        expected = {"num_ctx": 8192, "num_batch": 8192}
+        self.assertEqual(PREFLIGHT.ollama_runtime_options("bge-m3:latest"), expected)
+        self.assertEqual(PREFLIGHT.ollama_runtime_options("bge-m3"), expected)
+        self.assertIsNone(PREFLIGHT.ollama_runtime_options("qwen3-embedding:0.6b"))
 
 
 if __name__ == "__main__":

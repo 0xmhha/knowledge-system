@@ -112,6 +112,13 @@ def validate_questions(raw):
             "anchors": anchors}
 
 
+def ollama_runtime_options(model):
+    """Mirror CKV's pinned BGE-M3 options for the B0 identity probe."""
+    if model.split(":", 1)[0] == "bge-m3":
+        return {"num_ctx": 8192, "num_batch": 8192}
+    return None
+
+
 def ollama_identity(url, model):
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
@@ -129,7 +136,11 @@ def ollama_identity(url, model):
         matches = [tag for tag in tags if tag.get("name") == exact]
         if len(matches) != 1 or not SHA64.fullmatch(matches[0].get("digest", "")):
             return None, "model_absent_or_digest_invalid"
-        payload = json.dumps({"model": exact, "input": "CKS B0 identity probe", "truncate": False}).encode()
+        runtime_options = ollama_runtime_options(exact)
+        request_body = {"model": exact, "input": "CKS B0 identity probe", "truncate": False}
+        if runtime_options is not None:
+            request_body["options"] = runtime_options
+        payload = json.dumps(request_body).encode()
         request = urllib.request.Request(url.rstrip("/") + "/api/embed", payload,
                                          {"Content-Type": "application/json"})
         with urllib.request.urlopen(request, timeout=120) as response:
@@ -145,6 +156,7 @@ def ollama_identity(url, model):
             return None, "model_digest_changed_during_probe"
         return {"provider": "ollama", "model": exact, "digest": matches[0]["digest"],
                 "dimension": len(vectors[0]), "endpoint": url,
+                "runtime_options": runtime_options,
                 "server_version": version}, None
     except (OSError, ValueError, KeyError, urllib.error.URLError, json.JSONDecodeError):
         return None, "ollama_unavailable_or_probe_failed"

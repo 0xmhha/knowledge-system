@@ -79,6 +79,12 @@ model = preflight['model']
 identity = manifest['embedding_identity_v2']
 assert model and identity['Model'] == model['model'], (model, identity)
 assert identity['model_digest'] == model['digest'] and identity['Dim'] == model['dimension'], (model, identity)
+runtime = model['runtime_options']
+if runtime is None:
+    assert 'runtime_context_tokens' not in identity and 'runtime_batch_tokens' not in identity, identity
+else:
+    assert identity['runtime_context_tokens'] == runtime['num_ctx'], (model, identity)
+    assert identity['runtime_batch_tokens'] == runtime['num_batch'], (model, identity)
 assert doctor['commit'] == commit and doctor['status'] == 'ready', doctor
 assert query['hits'] and all(hit['citation']['commit_hash'] == commit for hit in query['hits']), query
 assert mcp['serviceable'] and mcp['commit'] == commit, mcp
