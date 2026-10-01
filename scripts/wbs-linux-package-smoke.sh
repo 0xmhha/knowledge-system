@@ -28,6 +28,20 @@ from pathlib import Path
 print(Path(json.load(open(sys.argv[1]))['archive']).name)
 PY
 )"
+python3 - "$archive" <<'PY'
+import json
+from pathlib import Path
+import sys
+import tarfile
+with tarfile.open(sys.argv[1], 'r:gz') as tar:
+    manifest_member = next(member for member in tar if member.name.endswith('/manifest.json'))
+    inventory_member = next(member for member in tar if member.name.endswith('/third-party-licenses.json'))
+    manifest = json.load(tar.extractfile(manifest_member))
+    inventory = json.load(tar.extractfile(inventory_member))
+assert manifest['third_party_license_inventory']['missing_license_count'] == 0
+assert manifest['third_party_license_inventory']['module_count'] == len(inventory['modules'])
+assert all(module['license_files'] for module in inventory['modules'])
+PY
 openssl genpkey -algorithm ED25519 -out "$scratch/signature/private.pem" >/dev/null 2>&1
 openssl pkey -in "$scratch/signature/private.pem" -pubout -out "$scratch/signature/public.pem" >/dev/null 2>&1
 python3 "$repo_root/scripts/release-sidecar.py" --archive "$archive" \

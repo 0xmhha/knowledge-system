@@ -41,6 +41,8 @@ for name in ('LICENSE', 'INSTALLATION.md', 'modules.txt', 'policies/sanitization
     assert (stage / name).is_file(), name
 inventory = json.loads((stage / 'third-party-licenses.json').read_text())
 assert inventory['modules'] and manifest['third_party_license_inventory']['module_count'] == len(inventory['modules'])
+assert manifest['third_party_license_inventory']['missing_license_count'] == 0
+assert all(module['license_files'] for module in inventory['modules'])
 print(stage)
 PY
 )"
