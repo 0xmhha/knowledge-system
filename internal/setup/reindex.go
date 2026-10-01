@@ -11,6 +11,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 // Blue-green reindex orchestration (reindex-migration-design §4/§5).
@@ -146,6 +148,32 @@ func Promote(dataset, version string) (prev string, err error) {
 // checked criterion decisions and the candidate's test report. Ordinary
 // promote/rollback refuse a held candidate.
 func PromoteReviewedCandidate(dataset, version, patchID, decisionsSHA256 string) (prev string, err error) {
+	return promoteReviewedCandidate(dataset, version, "", patchID, decisionsSHA256)
+}
+
+// PromoteReviewedCandidateIfBase performs the final active-base check while
+// holding the same lock used by every current-pointer swap. An earlier check
+// in the review workflow cannot protect against another concurrent promotion.
+func PromoteReviewedCandidateIfBase(dataset, version, expectedBase, patchID, decisionsSHA256 string) (prev string, err error) {
+	if err := validateVersion(expectedBase); err != nil {
+		return "", err
+	}
+	return promoteReviewedCandidate(dataset, version, expectedBase, patchID, decisionsSHA256)
+}
+
+func promoteReviewedCandidate(dataset, version, expectedBase, patchID, decisionsSHA256 string) (prev string, err error) {
+	return withPromotionLock(dataset, func() (string, error) {
+		if expectedBase != "" {
+			current, err := os.Readlink(filepath.Join(dataset, "current"))
+			if err != nil || current != expectedBase {
+				return "", fmt.Errorf("patch base is no longer current")
+			}
+		}
+		return promoteReviewedCandidateLocked(dataset, version, patchID, decisionsSHA256)
+	})
+}
+
+func promoteReviewedCandidateLocked(dataset, version, patchID, decisionsSHA256 string) (prev string, err error) {
 	if patchID == "" || len(decisionsSHA256) != 64 {
 		return "", fmt.Errorf("reviewed promote needs patch and decision digest")
 	}
@@ -168,12 +196,36 @@ func PromoteReviewedCandidate(dataset, version, patchID, decisionsSHA256 string)
 	if hold.ProjectID != identity.Source.ProjectID || hold.DatasetID != identity.DatasetID || hold.SnapshotID != identity.Source.SnapshotID {
 		return "", fmt.Errorf("review hold differs from candidate")
 	}
-	if err := writeReviewRelease(filepath.Join(vdir, "review-release.json"), map[string]string{
+	releasePath := filepath.Join(vdir, "review-release.json")
+	release := map[string]string{
 		"project_id": hold.ProjectID, "dataset_id": hold.DatasetID, "snapshot_id": hold.SnapshotID,
-		"patch_id": patchID, "decisions_sha256": decisionsSHA256}); err != nil {
+		"patch_id": patchID, "decisions_sha256": decisionsSHA256}
+	if err := validateExistingReviewRelease(releasePath, release); err != nil {
 		return "", err
 	}
-	return promote(dataset, version, true)
+	prev, err = promoteLocked(dataset, version, true)
+	if err != nil {
+		return prev, err
+	}
+	// Publish the reusable rollback marker only after this reviewed candidate
+	// has actually become current. A failed swap cannot leave a bypass marker.
+	return prev, writeReviewRelease(releasePath, release)
+}
+
+func validateExistingReviewRelease(path string, value map[string]string) error {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return err
+	}
+	data = append(data, '\n')
+	old, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil || !bytes.Equal(old, data) {
+		return fmt.Errorf("review release marker already exists with different bytes")
+	}
+	return nil
 }
 
 func writeReviewRelease(path string, value map[string]string) error {
@@ -213,6 +265,29 @@ func versionPathForReview(dataset, version string) (string, error) {
 }
 
 func promote(dataset, version string, reviewed bool) (prev string, err error) {
+	return withPromotionLock(dataset, func() (string, error) {
+		return promoteLocked(dataset, version, reviewed)
+	})
+}
+
+func withPromotionLock(dataset string, action func() (string, error)) (string, error) {
+	fd, err := unix.Open(filepath.Join(dataset, ".promotion.lock"), unix.O_CREAT|unix.O_RDWR|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0o600)
+	if err != nil {
+		return "", fmt.Errorf("promote: open promotion lock: %w", err)
+	}
+	defer unix.Close(fd)
+	var stat unix.Stat_t
+	if err := unix.Fstat(fd, &stat); err != nil || stat.Mode&unix.S_IFMT != unix.S_IFREG {
+		return "", fmt.Errorf("promote: invalid promotion lock")
+	}
+	if err := unix.Flock(fd, unix.LOCK_EX|unix.LOCK_NB); err != nil {
+		return "", fmt.Errorf("promote: another promotion is in progress")
+	}
+	defer unix.Flock(fd, unix.LOCK_UN)
+	return action()
+}
+
+func promoteLocked(dataset, version string, reviewed bool) (prev string, err error) {
 	if err := validateVersion(version); err != nil {
 		return "", err
 	}
@@ -232,7 +307,7 @@ func promote(dataset, version string, reviewed bool) (prev string, err error) {
 	if err != nil {
 		return "", fmt.Errorf("promote: target identity: %w", err)
 	}
-	if _, err := os.Lstat(filepath.Join(vdir, "review-hold.json")); err == nil {
+	if _, err := os.Lstat(filepath.Join(vdir, "review-hold.json")); err == nil && !reviewed {
 		var release struct {
 			ProjectID       string `json:"project_id"`
 			DatasetID       string `json:"dataset_id"`

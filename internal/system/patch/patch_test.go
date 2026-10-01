@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
@@ -83,5 +84,35 @@ func TestPatchRegisterPinsChangedFilesAndRefusesReusedID(t *testing.T) {
 	}
 	if _, err := Register(dataset, "other", "change-1"); err == nil {
 		t.Fatal("same patch ID accepted different changed bytes")
+	}
+}
+
+func TestReviewedPromotionRechecksActiveBaseAtSwap(t *testing.T) {
+	source, dataset := t.TempDir(), t.TempDir()
+	if err := os.WriteFile(filepath.Join(source, "README.md"), []byte("source\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	patchVersion(t, source, dataset, "base")
+	patchVersion(t, source, dataset, "other")
+	candidate := patchVersion(t, source, dataset, "candidate")
+	if _, err := setup.Promote(dataset, "base"); err != nil {
+		t.Fatal(err)
+	}
+	h := hold{ProjectID: "pilot", DatasetID: candidate.DatasetID, SnapshotID: candidate.Source.SnapshotID, BaseVersion: "base"}
+	data, _ := json.Marshal(h)
+	if err := os.WriteFile(filepath.Join(dataset, "candidate", "review-hold.json"), data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := setup.Promote(dataset, "other"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := setup.PromoteReviewedCandidateIfBase(dataset, "candidate", "base", "patch-1", strings.Repeat("a", 64)); err == nil {
+		t.Fatal("stale base promoted a reviewed candidate")
+	}
+	if current, _ := os.Readlink(filepath.Join(dataset, "current")); current != "other" {
+		t.Fatalf("stale review changed current to %q", current)
+	}
+	if _, err := os.Lstat(filepath.Join(dataset, "candidate", "review-release.json")); !os.IsNotExist(err) {
+		t.Fatalf("stale review wrote release marker: %v", err)
 	}
 }

@@ -278,5 +278,5 @@ func Promote(ctx context.Context, dataset, patchID, storePath string) (string, e
 		return "", err
 	}
 	sum := sha256.Sum256(data)
-	return setup.PromoteReviewedCandidate(dataset, a.ResultVersion, patchID, hex.EncodeToString(sum[:]))
+	return setup.PromoteReviewedCandidateIfBase(dataset, a.ResultVersion, a.BaseVersion, patchID, hex.EncodeToString(sum[:]))
 }

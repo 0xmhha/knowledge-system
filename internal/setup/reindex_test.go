@@ -52,6 +52,44 @@ func TestPromoteAndRollback(t *testing.T) {
 	}
 }
 
+func TestPromotionLockRejectsConcurrentSwapAndLinkedLock(t *testing.T) {
+	ds := t.TempDir()
+	if err := os.Mkdir(filepath.Join(ds, "v1"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	entered := make(chan struct{})
+	release := make(chan struct{})
+	done := make(chan error, 1)
+	go func() {
+		_, err := withPromotionLock(ds, func() (string, error) {
+			close(entered)
+			<-release
+			return "", nil
+		})
+		done <- err
+	}()
+	<-entered
+	if _, err := Promote(ds, "v1"); err == nil || !strings.Contains(err.Error(), "another promotion") {
+		t.Fatalf("concurrent promotion was accepted: %v", err)
+	}
+	close(release)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Promote(ds, "v1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(filepath.Join(ds, ".promotion.lock")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(filepath.Join(ds, "current"), filepath.Join(ds, ".promotion.lock")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Promote(ds, "v1"); err == nil {
+		t.Fatal("promotion followed a linked lock file")
+	}
+}
+
 func TestReindexLock(t *testing.T) {
 	ds := t.TempDir()
 	l, err := acquireReindexLock(ds)
