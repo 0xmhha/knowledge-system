@@ -1,6 +1,6 @@
 # A8 구조 통합 게이트 기록
 
-상태: **진행 중, A 단계 전체 미완료** (2026-10-01). 이 문서는 `DELIVERY-PLAN-V2.md`의 A0–A8 수용 조건과 실행 증거를 분리한다. 테스트 성공은 실모델 검색 품질이나 실제 프로젝트 정책의 진실성을 뜻하지 않는다. B/C의 로컬 Ollama 평가는 사용자 결정에 따라 뒤로 미뤘다.
+상태: **A0–A8 구조 개발 게이트 통과** (2026-10-01, 코드 커밋 `ee6b5e5`). 이 문서는 `DELIVERY-PLAN-V2.md`의 A0–A8 수용 조건과 실행 증거를 분리한다. 테스트 성공은 실모델 검색 품질이나 실제 프로젝트 정책의 진실성을 뜻하지 않는다. B/C의 로컬 Ollama 평가는 사용자 결정에 따라 뒤로 미뤘다.
 
 ## 이번 통합 실행
 
@@ -9,19 +9,19 @@
 | 게이트 | 결과 | 판정 범위 |
 |---|---|---|
 | `go test ./...` | 통과 | 현재 변경 포함 전체 Go 단위·통합 테스트 |
-| `go test -race ./internal/setup ./internal/system/evidencev2 ./internal/system/semantic ./internal/system/knowledgepack ./cmd/cks/knowledgecli` | 통과 | 캡처·의미 투영·v2 인용·팩·동시 검토 기록 범위. 다른 패키지의 이전 race 결과는 별도 실행 기록 |
+| `go test -race ./internal/setup ./internal/system/evidencev2 ./internal/system/semantic ./internal/system/knowledgepack ./internal/system/mcp ./cmd/cks/knowledgecli ./cmd/cks/setupcli` | 통과 | 캡처·의미 투영·v2 인용·팩·MCP·CLI·동시 검토 기록 범위. 다른 패키지의 이전 race 결과는 별도 실행 기록 |
 | `go vet ./...`, `make boundaries`, `make docs-check` | 통과 | 정적 검사, 엔진 경계, 103개 살아있는 문서의 CLI 계약 |
 | `scripts/wbs-identity-smoke.sh` | 통과 | 실제 CKG/CKV/CKS 세 계층 신원. 손상 시 공개 상태 계약을 `identity_status=invalid`, `reindex_required=true`로 점검하도록 스모크 갱신 |
 | `scripts/wbs-source-modes-smoke.sh` | 통과 | 새 캡처 정책에서 Git 작업 트리·비Git 캡처, 빌드 중 변경 거부 |
 | `scripts/wbs-smoke.sh` | 통과 | 세 엔진 구성, CKV 청크·CKG 심볼·CKS 추적/테스트 |
 | `scripts/wbs-knowledge-lock-smoke.sh`, `scripts/wbs-patch-smoke.sh` | 통과 | 새 캡처 정책에서 잠금, v4 팩 타입, 관계 후보, ADR 검토 기록, 패치 승인·승격·롤백. 실제 MCP v2에서 충돌 정책과 정렬되지 않은 의미 저장소의 기본 인용 보존 |
-| `scripts/wbs-legacy-migration-smoke.py` | 통과 | 고정 main 기준선의 세 바이너리와 가짜 Ollama로 v1 응답을 재생하고, 새 `doctor`의 `legacy_unpinned` 및 새 v2 MCP의 `reindex_required` 확인 |
-| `scripts/wbs-release-sign-smoke.sh`, `scripts/wbs-package-smoke.sh` | 통과 | 현재 macOS arm64 시험 서명/별도 검증과 추출 바이너리의 세 프로젝트 설치 |
-| `scripts/wbs-linux-package-smoke.sh arm64`, `amd64` | 통과 | 각 Linux 아키텍처의 별도 fixture 빌드·시험 서명·검증·추출, Go 없는 Debian 런타임에서 세 프로젝트 질의 |
+| `python3 scripts/wbs-legacy-migration-smoke.py` | 통과 | 고정 main 기준선의 세 바이너리와 가짜 Ollama로 v1 응답을 재생하고, 새 `doctor`의 `legacy_unpinned` 및 새 v2 MCP의 `reindex_required` 확인 |
+| `scripts/wbs-release-sign-smoke.sh`, `scripts/wbs-package-smoke.sh` | 통과 | 깨끗한 `ee6b5e5`에서 macOS arm64 시험 서명/별도 검증과 추출 바이너리의 세 프로젝트 설치 |
+| `scripts/wbs-linux-package-smoke.sh arm64`, `amd64` | 통과 | 깨끗한 `ee6b5e5`에서 각 Linux 아키텍처의 별도 빌드·시험 서명·검증·추출, Go 없는 Debian 런타임에서 세 프로젝트 질의·두 버전 전환·롤백 |
 
 스모크는 결정적 mock 임베딩을 사용했다. Linux 패키지는 시험 키와 `test-signed-preview` 범위만 사용했다. 추출 런타임에 Go 컴파일러가 없던 fixture는 실제 Go 소스가 없는 Go 모듈, TypeScript, 미지원 Python+Markdown이었다. 실제 Go 소스 AST 색인에는 현재 Go 도구 체인이 필요하다.
 
-Linux 스모크를 이번 호스트의 Bash 3.2에서 다시 실행하며 빈 `cache_args` 배열의 `set -u` 확장 오류를 발견했다. 빈 배열의 이식 가능한 확장으로 고친 뒤 arm64와 amd64를 각각 재실행해 통과했다. 두 Linux 패키지는 현재 작업 파일을 별도 합성 Git 커밋으로 묶은 구조 시험물이다. 원 저장소의 운영 릴리스 서명이나 의존 라이선스 승인이 아니다.
+Linux 스모크를 이번 호스트의 Bash 3.2에서 다시 실행하며 빈 `cache_args` 배열의 `set -u` 확장 오류를 발견했다. 빈 배열의 이식 가능한 확장으로 고친 뒤 arm64와 amd64를 각각 재실행해 통과했다. 최종 세 플랫폼 패키지는 깨끗한 `ee6b5e5` 코드 커밋에서 생성한 구조 시험물이다. 원 저장소의 운영 릴리스 서명이나 의존 라이선스 승인이 아니다.
 
 ## 이전 호환과 데이터 마이그레이션
 
@@ -34,30 +34,31 @@ Linux 스모크를 이번 호스트의 Bash 3.2에서 다시 실행하며 빈 `c
 7. 고정 main 커밋 `1ded9b3e`에서 구 CKG/CKV/CKS를 별도로 빌드했다. 가짜 Ollama의 고정 벡터로 만든 실제 v1 데이터셋에 대해 구 MCP v1은 같은 커밋의 README와 Go 소스를 인용했고, 새 `doctor`는 `legacy_unpinned`, `reindex_required=true`를 냈다. 새 v2 MCP는 백엔드 모델 상태에 앞서 `reindex_required`를 반환한다. 이 호환 재생은 실모델 성능 평가가 아니다.
 8. 구 바이너리가 새 pinned v2 벡터 DB를 여는 역방향 읽기는 지원 계약이 아니다. 구 CKV가 새 임베딩 신원 포맷을 해석하지 못해 `embedding identity mismatch`로 거부하는 것을 확인했다. 구 데이터셋은 구 도구로 읽고, 새 데이터셋에는 새 바이너리를 사용한다.
 
-## 남은 수용 조건과 알려진 제한
+## A0–A8 판정과 알려진 제한
 
-| WBS | 현재 남은 조건 | 현재 동작/위험 억제 |
+| WBS | 구조 게이트 판정 | 증거와 남은 범위 |
 |---|---|---|
-| A4 | 운영 규모 저장소의 비용·오류 계약 | macOS/Linux의 openat O_NOFOLLOW, inode 재검사를 사용한다. Lstat/Open 경계에서 부모 링크·파일 링크·동일 바이트 다른 inode 교체를 결정적으로 주입해 모두 거부했다. 캡처와 신원 사전 계산은 기본 파일 10만 개·단일 32 MiB·총 4 GiB 상한을 공유한다. 500개 소스와 외부 문서의 합산 제한·보관본 유지는 통과했다. 10만 파일 운영 비용과 용량 사전 진단은 남았다. |
-| A5.3 | Go 이외 테스트 프레임워크의 기준별 정확 실행과 검토자의 인증·권한 정책 | 실패/미승인 패치는 승격되지 않는다. 현재 승격 가능한 exact runner는 Go 테스트다. 사용자 지정 명령 성공은 기준 승인 근거가 아니다. 검토 기록은 임시 파일을 완전히 쓴 뒤 같은 고정 디렉터리에서 원자적 하드 링크로 공개하며 동시 작성 race 시험이 통과했다. 로컬 검토자 문자열은 인증된 신원이 아니다. |
-| A5.5 | 여러 정책/ADR·외부 앵커 조합의 추가 종단 시험과 검토 권한 정책 | 잠금된 `trace-links` 검토 기록, ADR 선언, 정렬된 의미 투영, CKG 코드·테스트 앵커, 동일 데이터셋의 보관 줄 해시를 모두 맞춘 경로만 v2에 인용한다. 한 경로의 정상/미래 ADR/타 데이터셋과 정책 충돌·비공개 우선·만료·보관본 손상 시험이 통과했다. 충돌 정책은 인용하되 코딩 `required_behavior`로 승격하지 않는다. 로컬 검토자 ID는 인증 신원이 아니다. |
-| A6 | 다의어·권한·의미 저장소 오류의 MCP 도구 전체 경로 fixture | 기본 CKV+CKG 후보를 유지하고 선택형 의미 저장소에서 최대 두 경로만 탐색한다. 인용과 해시가 일치할 때만 `trace_links`/`implemented_behavior`를 내보낸다. 정책 충돌·비공개·만료·보관본 손상·12개 정책의 인용 예산 초과에서 기본 후보 보존이 종단 계층 시험을 통과했다. MCP 도구 핸들러의 모든 오류 주입은 남았다. |
-| A7.1/A7.5 | 전체 CLI 설정 이행 행렬과 최종 MCP 변경 뒤 세 플랫폼 재실행 | 고정 main 바이너리의 v1 응답을 새 버전의 레거시 상태·v2 오류와 비교했고, 추가 v2 추적 필드를 구 소비자 구조체가 읽고 원 v2 JSON을 재검증했다. `mcp gen-config`는 기존 파일·심볼릭 링크를 덮어쓰지 않고, 세 독립 프로젝트는 두 번째 커밋으로 재색인한 뒤 이전 데이터셋으로 롤백해 과거 인용을 조회했다. 세 플랫폼 시험 패키지는 통과했지만 최종 MCP 변경을 담은 재실행이 필요하다. 운영 라이선스 적합성의 사람 판정은 별도다. |
-| A8 | 위 항목이 채워진 후 모든 수용 fixture와 마이그레이션·known limits 재실행 | 현재 통합 검사는 녹색이지만 선행 기능 게이트가 남아 있어 A8은 통과로 표시하지 않는다. |
+| A0–A3 | 통과 | 요구·코드·시험 추적과 CKV 정확 필터/상한/취소, 가짜 Ollama 신원 변경, CKG·CKV·CKS의 빌드 전 공유 ID 및 구버전 분류가 통과했다. 실모델 품질은 B다. |
+| A4 | 통과 | 작업 트리·비Git 캡처, 세 ID, CKV 입력 해시, 과거 보관본 인용, 링크·비밀·빌드 중 변경 거부를 구조 시험했다. macOS/Linux의 `openat(O_NOFOLLOW)`와 inode 재검사를 사용한다. 기본 파일 10만 개·단일 32 MiB·총 4 GiB 상한을 공유하고 500개 파일·외부 문서의 합산을 시험했다. 10만 파일 운영 비용과 사전 용량 추정은 측정하지 않았다. |
+| A5.1–A5.4 | 통과 | 보관본 좌표와 v1–v4 의미 투영 읽기, `CHECKED_BY` 쓰기, 20개 코어의 근거/보류 보고, 외부 패치와 기준별 승인 분리, 팩 타입·잠금·DAG·네임스페이스 실패를 시험했다. 승격 가능한 exact runner는 현재 Go 테스트이며 사용자 지정 명령 성공을 기준 승인으로 오인하지 않는다. 로컬 검토자 ID는 인증된 신원이 아니다. |
+| A5.5 | 통과 | 잠금된 `trace-links`의 별도 검토 기록, ADR 선언, 정렬된 의미 투영, CKG 코드·테스트 앵커, 동일 데이터셋의 보관 줄 해시를 모두 맞춘 경로만 v2에 인용한다. 정상/미래 ADR/타 데이터셋과 정책 충돌·비공개 우선·만료·보관본 손상을 시험했다. 충돌 정책을 `required_behavior`로 승격하지 않는다. 조직 인증·실제 정책 사실 판정은 범위 밖이다. |
+| A6 | 통과 | 선택형 v2 경로의 기본 CKV+CKG 후보 유지, 모호/미등록 표현 기권, 권한·저장소 오류·예산 초과 폴백, 인용·해시 검증을 시험했다. 실제 MCP에서는 충돌 정책과 불일치 의미 저장소가 기본 인용을 보존했다. 모든 운영 오류 조합을 열거한 것은 아니다. 기본 플래그는 꺼져 있다. |
+| A7.1–A7.5 | 통과 | 구 main 바이너리의 v1 조회를 재생하고 새 바이너리의 재색인 오류를 확인했다. `mcp gen-config`는 사용자 파일을 덮어쓰지 않는다. 세 독립 프로젝트는 두 버전 전환·롤백·과거 인용을 확인했다. macOS arm64와 Linux arm64/amd64의 추출 패키지는 시험 서명과 라이선스 파일 목록을 검증했다. 운영 서명 키와 법적 승인은 C1이다. |
+| A8 | 통과 | 전체 Go 테스트, 관련 race, vet, boundaries, docs-check, 세 엔진/캡처/지식/패치/구버전/세 플랫폼 스모크를 최종 코드에서 재실행했다. 이 문서에 기능별 known limits를 공개했다. |
 
-품질/지연/정답률은 **unmeasured**다. A 전체 완료, B/C 완료, 운영 릴리스 적합성을 선언하지 않는다.
+품질/지연/정답률은 **unmeasured**다. A의 구조 개발 게이트만 완료했다. B/C와 운영 릴리스 적합성은 완료로 선언하지 않는다.
 
 배포 의존성 확인: 이전 `sqlite-vec-go-bindings v0.1.6`과 후속 `v0.1.7-alpha.2` 태그 아카이브에는 라이선스 파일이 없었다. [상위 저장소의 누락 이슈](https://github.com/asg017/sqlite-vec-go-bindings/issues/11)와 별도로, MIT·Apache 파일이 실제 Go 모듈 아카이브에 포함된 [커밋 `b64d0e563e61`](https://github.com/asg017/sqlite-vec-go-bindings/tree/b64d0e563e615c99c19df431909a5970963d8fc0)을 의존성으로 고정했다. 해당 커밋의 C 확장은 `v0.1.7-alpha.2`이며 종전 `v0.1.6`과 바이트가 다르다. CKV 저장/색인/조회 대상 테스트와 전체 Go 테스트·vet·문서·경계 검사가 통과했다. macOS arm64와 Linux arm64/amd64 시험 서명 패키지에서 연결된 Go 모듈 35개의 원천 라이선스 파일 누락 0건을 자동 검사했고, sqlite-vec의 `LICENSE-MIT`/`LICENSE-APACHE` 두 파일도 포함됐다. 이는 원천 파일 수집 확인이며 운영 배포의 법적 적합성 판정은 아니다. 시험 서명 패키지를 운영 배포물로 선언하지 않는다.
 
 후속 변경: `cks` 최상위 실패 출력은 한 줄의 JSON `{code,message}`와 비정상 종료로 정규화했다. 알려진 오류 접두사를 안정 코드로 매핑하고, 중첩 오류의 원문·비밀·임시 경로를 공개 메시지에 복사하지 않는다. `cmd/cks` 단위 테스트와 지식 잠금/패치 스모크가 통과했다. 이 변경은 MCP v2의 구조화 오류 데이터와 모든 구 소비자 재생을 완료했다는 뜻이 아니다.
 
-추가로 `cks.context.get_for_task_v2`의 실패 결과는 `IsError=true`, `code=<고정 코드>` 텍스트와 동일한 `{code,message}` 구조화 데이터를 함께 반환한다. 원문 오류에 `requires_v2`, `reindex_required`, `snapshot_mismatch`, `source_missing`이 있으면 그 코드를 보존하되 경로·원문·비밀은 복사하지 않는다. 관련 MCP 단위 테스트가 통과했다. 전체 MCP 도구의 오류 정규화와 구 소비자 재생은 여전히 A7.1/A8의 남은 검증이다.
+추가로 `cks.context.get_for_task_v2`의 실패 결과는 `IsError=true`, `code=<고정 코드>` 텍스트와 동일한 `{code,message}` 구조화 데이터를 함께 반환한다. 원문 오류에 `requires_v2`, `reindex_required`, `snapshot_mismatch`, `source_missing`이 있으면 그 코드를 보존하되 경로·원문·비밀은 복사하지 않는다. 관련 MCP 단위 테스트와 구 v1 소비자의 실제 조회 재생이 통과했다. 다른 MCP 도구의 모든 오류를 동일한 v2 형식으로 바꾸는 작업은 이 게이트의 계약에 포함되지 않는다.
 
 외부 추적 경로 추가: `.cks/knowledge/trace-links/*.yaml`에 ADR→요구/수용 기준→CKG 코드→CKG 테스트의 선언을 보관하고, 별도 원문 해시·스냅샷 결합 검토 기록으로 사람 검토를 받는다. `semantic.store_path`가 설정된 선택형 v2 조회는 `LoadAlignedRetained`로 같은 데이터셋의 CKG/CKV/원문 좌표를 재검증한 다음, 의미 투영의 단일 `linked` 경로와 모든 ID·보관 줄 해시를 맞춘다. 인용 한도 12개와 본문 32 KB를 지키며, 구현 사실은 검증된 경로의 코드 인용으로만 표시한다. 정상 경로, 아직 유효하지 않은 ADR, 다른 데이터셋, 이전 응답 불변성, v2 JSON 왕복 테스트가 통과했다. 설정 저장소가 없거나 정렬되지 않으면 기존 정책/ADR 문맥과 기본 후보를 보존하고 구현 연결은 미검증으로 남긴다. 이 결과는 테스트의 실제 실행 성공이나 수용 기준의 사람 승인을 뜻하지 않는다.
 
 선택형 v2 `coding_context`를 추가해 검토된 정책을 required behavior, 검토된 ADR을 rationale로 분리했다. 검증된 구현 앵커가 없으므로 implemented behavior는 비우고 불확실 사유를 넣는다. 새 필드가 들어간 응답과 필드가 없는 이전 v2 응답을 각각 JSON 왕복 후 무결성 재검증했다. 외부 앵커가 생기기 전까지 이것은 완전한 코딩 경로가 아니다.
 
-동시 승격 회귀: `Promote`, `Rollback`, 검토 승격의 `current` 교체에 같은 비차단 파일 잠금을 적용했다. 패치 승격은 그 잠금 안에서 `base_version`이 여전히 활성인지 재확인하며, 성공적인 교체 뒤에만 재사용 가능한 `review-release.json`을 쓴다. 잠금 경합·링크된 잠금 파일·오래된 기준 버전 시험을 추가했다. 검토 기록 작성의 동시성, 외부 수동 파일 변경, 마커 기록 실패 뒤 복구는 별도 게이트로 남는다.
+동시 승격 회귀: `Promote`, `Rollback`, 검토 승격의 `current` 교체에 같은 비차단 파일 잠금을 적용했다. 패치 승격은 그 잠금 안에서 `base_version`이 여전히 활성인지 재확인하며, 성공적인 교체 뒤에만 재사용 가능한 `review-release.json`을 쓴다. 잠금 경합·링크된 잠금 파일·오래된 기준 버전과 24개 동시 검토 기록 작성의 race 시험이 통과했다. 외부 수동 파일 변경과 마커 기록 실패 뒤 자동 복구는 운영 범위의 알려진 제한이다.
 
 기준별 검사 게이트 보강: 임의 명령의 종료 코드 0은 특정 테스트가 실행되었다는 증거가 아니다. `patch record-run`과 승인 단계는 이제 Go JSON 스트림에서 연결된 정확한 테스트 이름의 실행·통과가 관찰된 보고서만 받는다. 다른 언어의 exact runner가 추가되기 전까지 그 명령 결과는 일반 실행 증거로만 사용한다.
 

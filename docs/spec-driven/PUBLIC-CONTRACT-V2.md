@@ -64,9 +64,9 @@ v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start
 
 ### D1-02 의미 관계명 개정
 
-새 통합 데이터셋의 정식 술어는 `AcceptanceCriterion CHECKED_BY TestCase`다. 이것은 **검토된 테스트 연결**만 뜻한다. 사람의 의미 수용은 `CriterionDecision.approved` 사건에서만 나온다. 현재 실행 중인 의미 투영 스키마 v2는 `ACCEPTED_BY`를 저장하므로, A5.1에서 새 내부 스키마 버전을 도입할 때 기존 v1/v2 투영을 **읽을 때만** 이 연결로 해석하고 새 데이터셋에는 `CHECKED_BY`만 기록한다. 구 투영의 `ACCEPTED_BY`를 사람 승인으로 바꾸거나 기존 바이트/해시를 제자리 수정하지 않는다. 구버전 소비자는 기존 DTO/술어를 계속 읽고, v2 소비자는 정식 이름과 `link_only` 상태를 받는다. 정식 술어가 아닌 `ACCEPTED_BY`의 새 쓰기는 거부한다. 양쪽 방향·원천·검토자 조건은 동일하게 유지한다.
+새 통합 데이터셋의 정식 술어는 `AcceptanceCriterion CHECKED_BY TestCase`다. 이것은 **검토된 테스트 연결**만 뜻한다. 사람의 의미 수용은 `CriterionDecision.approved` 사건에서만 나온다. 현재 새 의미 투영 스키마 v3는 `CHECKED_BY`를 기록하고 기존 v1/v2 투영의 `ACCEPTED_BY`는 **읽을 때만** 연결로 해석한다. 구 투영의 `ACCEPTED_BY`를 사람 승인으로 바꾸거나 기존 바이트/해시를 제자리 수정하지 않는다. 구버전 소비자는 기존 DTO/술어를 계속 읽고, v2 소비자는 정식 이름과 `link_only` 상태를 받는다. 정식 술어가 아닌 `ACCEPTED_BY`의 새 쓰기는 거부한다. 양쪽 방향·원천·검토자 조건은 동일하게 유지한다.
 
-마이그레이션 골든은 구 투영 읽기, 새 투영 쓰기, 구 술어 새 쓰기 거부, 사람 판정 부재 시 `accepted` 오판정 금지, v1 응답/해시 불변을 포함한다. 2026-10-01 구현 체크포인트에서 의미 투영 v3의 `CHECKED_BY` 쓰기, v1/v2의 `ACCEPTED_BY` 읽기, 새 쓰기 거부, v3 추적 필드 분리를 검증했다. 사람의 기준별 결정과 공개 v2 EvidencePack 계약이 완료되기 전까지 A5.1 완료로 표시하지 않는다.
+마이그레이션 골든은 구 투영 읽기, 새 투영 쓰기, 구 술어 새 쓰기 거부, 사람 판정 부재 시 `accepted` 오판정 금지, v1 응답/해시 불변을 포함한다. 의미 투영 v3의 `CHECKED_BY` 쓰기, v1/v2의 `ACCEPTED_BY` 읽기, 새 쓰기 거부, v3 추적 필드 분리, 별도의 사람 기준 결정과 공개 v2 EvidencePack을 구조 시험했다. 실무 기준의 진실성과 검사 품질은 B 평가에서 검토한다.
 
 MCP 도구 실패는 `IsError=true`와 `code=<고정 코드>` 텍스트로 전달한다. v2 도구는 같은 코드를 기계 판독형 오류 데이터에도 기록한다. CLI 실패는 비정상 종료와 `{ "code": "...", "message": "...", "dataset_id": "..." }` 한 객체를 내보낸다. `dataset_id`를 알 수 없으면 생략한다. `requires_v2`, `reindex_required`, `snapshot_mismatch`, `source_missing`은 서로 바꾸어 쓰지 않는다. 오류 메시지에는 원문 본문·비밀·임시 staging 경로를 넣지 않는다.
 
@@ -79,4 +79,4 @@ v1 데이터는 커밋형 읽기 전용 `legacy_unpinned`이며 좌표를 추측
 3. 세 source mode의 v2 인용·오류·정규화 해시를 별도 골든으로 고정한다. 좌표/본문/semantic 어느 한 바이트를 바꾸어도 검증에 실패한다.
 4. v1→v2 재색인, 실패 후보, 롤백, 기존 프로세스와 새 프로세스의 서빙 ID를 재생한다. 빈 좌표의 v1과 v2 근거를 같은 팩에 섞지 않는다.
 
-현재 코드의 `internal/system/mcp/testdata/agent-mcp.schema.json`은 과거 `task` 입력을 적고 있었지만 등록 도구는 `prompt`를 받았다. 설계 점검에서 fixture를 실제 입력으로 고치고 그 필드 이름/필수 집합을 검사하는 회귀 시험을 추가했다. 나머지 v2 골든은 v2 DTO 구현과 함께 채운다.
+과거 `internal/system/mcp/testdata/agent-mcp.schema.json`은 `task` 입력을 적고 있었지만 등록 도구는 `prompt`를 받았다. fixture와 회귀 시험을 실제 입력에 맞췄다. v2 DTO의 좌표·본문·선택형 의미 필드와 정규화 해시를 변조/왕복 시험했다.
