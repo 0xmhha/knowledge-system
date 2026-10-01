@@ -24,10 +24,15 @@ type Selection struct {
 }
 
 type Manifest struct {
-	SchemaVersion int         `yaml:"schema_version" json:"schema_version"`
-	ProjectID     string      `yaml:"project_id" json:"project_id"`
-	SelectedPacks []Selection `yaml:"selected_packs" json:"selected_packs"`
-	OverlayRoot   string      `yaml:"overlay_root" json:"overlay_root"`
+	SchemaVersion int           `yaml:"schema_version" json:"schema_version"`
+	ProjectID     string        `yaml:"project_id" json:"project_id"`
+	SelectedPacks []Selection   `yaml:"selected_packs" json:"selected_packs"`
+	OverlayRoot   string        `yaml:"overlay_root" json:"overlay_root"`
+	ReviewPolicy  *ReviewPolicy `yaml:"review_policy" json:"review_policy,omitempty"`
+}
+
+type ReviewPolicy struct {
+	MinApprovals int `yaml:"min_approvals" json:"min_approvals"`
 }
 
 type LockedPack struct {
@@ -67,6 +72,12 @@ func ReadManifest(projectRoot string) (Manifest, error) {
 	}
 	if m.SchemaVersion != 1 || strings.TrimSpace(m.ProjectID) == "" || m.OverlayRoot != ".cks/knowledge" {
 		return Manifest{}, fmt.Errorf("pack_incompatible: invalid knowledge manifest header")
+	}
+	if m.ReviewPolicy == nil {
+		m.ReviewPolicy = &ReviewPolicy{MinApprovals: 1}
+	}
+	if m.ReviewPolicy.MinApprovals < 1 {
+		return Manifest{}, fmt.Errorf("pack_incompatible: review_policy.min_approvals must be positive")
 	}
 	return m, nil
 }
@@ -112,7 +123,11 @@ func BuildLock(projectRoot string) (Lock, error) {
 	if err != nil {
 		return Lock{}, err
 	}
-	if _, err := LoadInstances(root, ordered); err != nil {
+	instances, err := LoadInstances(root, ordered)
+	if err != nil {
+		return Lock{}, err
+	}
+	if err := enforceReviewPolicy(m, instances); err != nil {
 		return Lock{}, err
 	}
 	lock := Lock{ProjectID: m.ProjectID, PackSchemaVersion: 1, Packs: []LockedPack{}, OverlayDigest: overlayDigest}
@@ -201,14 +216,40 @@ func LoadProjectInstances(projectRoot string) (Instances, error) {
 	if err != nil {
 		return Instances{}, err
 	}
-	return LoadInstances(overlay, ordered)
+	instances, err := LoadInstances(overlay, ordered)
+	if err != nil {
+		return Instances{}, err
+	}
+	if err := enforceReviewPolicy(m, instances); err != nil {
+		return Instances{}, err
+	}
+	return instances, nil
+}
+
+func enforceReviewPolicy(m Manifest, instances Instances) error {
+	if m.ReviewPolicy == nil || m.ReviewPolicy.MinApprovals <= 1 {
+		return nil
+	}
+	for _, p := range instances.Policies {
+		if p.Status != "proposed" {
+			return fmt.Errorf("evidence_unverified: policy %q has fewer than %d independent approvals", p.ID, m.ReviewPolicy.MinApprovals)
+		}
+	}
+	for _, d := range instances.Decisions {
+		if d.Status != "proposed" {
+			return fmt.Errorf("evidence_unverified: decision %q has fewer than %d independent approvals", d.ID, m.ReviewPolicy.MinApprovals)
+		}
+	}
+	return nil
 }
 
 // LoadRegisteredPack permits a CLI to calculate the exact local pack digest
 // before adding it to manifest.yaml, using the same path checks as locking.
 func LoadRegisteredPack(projectRoot, source string) (LoadedPack, error) {
-	root, err := registeredDir(projectRoot,source)
-	if err != nil { return LoadedPack{},err }
+	root, err := registeredDir(projectRoot, source)
+	if err != nil {
+		return LoadedPack{}, err
+	}
 	return Load(root)
 }
 

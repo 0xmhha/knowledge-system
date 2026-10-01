@@ -43,7 +43,7 @@ func NewCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("knowledge manifest already exists or cannot be created: %w", err)
 			}
-			content := fmt.Sprintf("schema_version: 1\nproject_id: %q\nselected_packs: []\noverlay_root: .cks/knowledge\n", projectID)
+			content := fmt.Sprintf("schema_version: 1\nproject_id: %q\nselected_packs: []\noverlay_root: .cks/knowledge\nreview_policy:\n  min_approvals: 1\n", projectID)
 			if _, err := file.WriteString(content); err != nil {
 				file.Close()
 				os.Remove(path)

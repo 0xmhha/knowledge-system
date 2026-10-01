@@ -59,6 +59,14 @@ func TestResolveRejectsCoreRedefinitionMissingAndCycle(t *testing.T) {
 	}
 }
 
+func TestMultipleApprovalPolicyDoesNotTreatInlineReviewerAsQuorum(t *testing.T) {
+	m := Manifest{ReviewPolicy: &ReviewPolicy{MinApprovals: 2}}
+	instances := Instances{Policies: []Policy{{ID: "BR-1", Status: "verified", ReviewedBy: "one-reviewer"}}}
+	if err := enforceReviewPolicy(m, instances); err == nil || !strings.Contains(err.Error(), "fewer than 2") {
+		t.Fatalf("one reviewer passed two-person quorum: %v", err)
+	}
+}
+
 func TestLockPinsPackAndOverlayBytes(t *testing.T) {
 	root := t.TempDir()
 	overlay := filepath.Join(root, ".cks", "knowledge")

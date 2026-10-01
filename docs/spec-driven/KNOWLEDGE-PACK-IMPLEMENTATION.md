@@ -21,6 +21,8 @@ cks setup --src /path/to/project --out /path/to/data \
 
 `init`은 `.cks/knowledge/manifest.yaml`과 빈 `domain/`, `policies/`, `decisions/`, `questions/` 디렉터리를 만들며 기존 매니페스트를 덮어쓰지 않는다. `digest`는 팩을 매니페스트에 등록하기 전에 로컬 파일 다이제스트를 계산한다. `validate`는 선택 팩의 스키마·원천 파일·정확 버전/해시·의존 DAG·타입 참조를 확인한다. 잠금 파일이 없으면 `unlocked`, 저장된 잠금이 맞으면 `locked`를 보고한다. `lock`은 원문 바이트를 해시한 `knowledge.lock.json`을 원자 교체한다. `review`는 정책과 ADR의 상태·원천·검토자·보류 사유를 읽기 전용으로 보여준다. 프로젝트에 매니페스트가 있으면 `cks setup`은 잠금을 검증하고, 오버레이와 선택 팩 파일을 데이터셋 입력 다이제스트에 포함한다. 빌드 중 입력이 바뀌면 승격하지 않는다.
 
+새 매니페스트는 `review_policy.min_approvals: 1`을 명시한다. 생략한 기존 매니페스트도 1로 읽고, 명시한 0이나 음수는 거부한다. 현재 정책/ADR의 인라인 `reviewed_by`는 한 명만 기록할 수 있다. `min_approvals`를 2 이상으로 설정했을 때 이 한 명을 승인 정족수로 오판하지 않도록 검토된 인스턴스의 잠금·빌드를 거부한다. 복수 검토 기록과 원문 해시·스냅샷 결합 입력은 아직 구현 전이다.
+
 선택 팩은 현재 프로젝트 루트 아래의 상대 경로만 받는다. `pack.yaml`의 `pack_schema_version: 1`, `pack_id`, `version`, `owner`, `scope`, `requires`, `concepts`, `relation_types`, `constraints`, `competency_questions`를 엄격하게 파싱한다. 참조 키는 `(pack_id, local_id)` 튜플이다. 서로 다른 팩에 같은 로컬 ID가 있어도 자동 병합하지 않는다. `core` 네임스페이스의 타입 참조는 고정된 20개에서만 찾는다. 누락·해시 불일치·중복·순환 의존, 잘못된 관계 끝점과 상속 순환은 오류다. 파일 인벤토리는 링크/비정규 파일/대소문자 충돌/숨김 파일을 거부하고 macOS·Linux에서는 경로 성분을 no-follow로 연다.
 
 ## 검증과 남은 범위
