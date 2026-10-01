@@ -1,6 +1,6 @@
 # 로컬 지식 팩 구현 체크포인트
 
-상태: **A5.4 부분 구현** (2026-10-01). 설계 기준은 [D5 도메인 팩 계약](./DOMAIN-PACK-CONTRACT-V1.md)이다. 공통 20개 타입은 [D1 어휘](./ONTOLOGY-20-USAGE.md)에 그대로 둔다. 이 문서는 현재 실행되는 부분과 남은 계약을 구분한다.
+상태: **A5.4/A5.5/A6 부분 구현** (2026-10-01). 설계 기준은 [D5 도메인 팩 계약](./DOMAIN-PACK-CONTRACT-V1.md)이다. 공통 20개 타입은 [D1 어휘](./ONTOLOGY-20-USAGE.md)에 그대로 둔다. 이 문서는 현재 실행되는 부분과 남은 계약을 구분한다.
 
 ## 현재 명령
 
@@ -10,6 +10,7 @@ cks knowledge digest --project-root /path/to/project --source vendor/my-pack
 cks knowledge validate --project-root /path/to/project
 cks knowledge lock --project-root /path/to/project
 cks knowledge review --project-root /path/to/project
+cks knowledge review --version-dir /path/to/data/v1
 cks setup --src /path/to/project --out /path/to/data \
   --project-id my-project --source-mode snapshot-only --version v1 --embedder mock
 ```
@@ -24,4 +25,6 @@ cks setup --src /path/to/project --out /path/to/data \
 
 정책 YAML과 ADR Markdown의 필드·타입·원천 경로·검토자/이유·유효 날짜를 검증한다. 같은 범위·시점에 서로 `conflicts_with`로 지정한 검토된 정책은 충돌로 보고한다. 내부 `SelectPolicies`는 범위·시점·제한 여부를 계산하지만 공개 근거 인용이 없으면 상태를 `needs_citation`으로 남긴다. 이 기록의 `verified`는 YAML에 적힌 로컬 검토 이력이며 외부 신원 인증을 뜻하지 않는다.
 
-아직 **외부 프로젝트 경로의 `knowledge:<pack_id>` 보관본, v4 의미 투영/읽기 어댑터, 팩 관계 인스턴스, 검토 명령의 판정 쓰기, 권한 어댑터와 코드 앵커, 선택형 v2 문맥과 플랫폼 릴리스**는 구현되지 않았다. 팩을 설치하거나 잠근 사실은 정책의 `verified` 판정이 아니다. A5.4/A5.5/A6/A7은 이 남은 계약을 통과하기 전 완료로 표시하지 않는다.
+선택 팩 원문은 `knowledge:<pack_id>` 출처로 후보의 content-addressed archive에 보관한다. 저장소와 팩이 같은 상대 경로를 써도 다른 원천이다. `review --version-dir`는 보관본만으로 팩과 정책을 재구성하고 잠금을 검증한다. 라이브 파일 편집 뒤에도 과거 결과가 같고 blob 손상은 거부한다. `cks.context.get_for_task_v2`는 `include_knowledge=true`와 명시 날짜·서브시스템을 받으면 검토된 공개 정책만 선택한다. 정책은 v2 인용·정화된 본문에 연결되고 의미 객체까지 `sha256-v2` 해시에 포함된다. 비공개 정책은 ID와 본문을 숨기고 `restricted` 상태만 남긴다. 지식 레이어 오류와 예산 초과 시 기본 코드 근거를 유지하고 불확실 상태를 출력한다.
+
+아직 **v4 의미 투영/읽기 어댑터, 팩 관계 인스턴스, 검토 명령의 판정 쓰기, 조직별 권한 어댑터와 코드 앵커, ADR/요구/테스트 의미 경로, 플랫폼 릴리스**는 구현되지 않았다. 현재 선택형 v2 문맥은 정책만 다룬다. 팩을 설치하거나 잠근 사실은 정책의 `verified` 판정이 아니다. A5.4/A5.5/A6/A7은 이 남은 계약을 통과하기 전 완료로 표시하지 않는다.

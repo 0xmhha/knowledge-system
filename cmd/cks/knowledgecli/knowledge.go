@@ -120,26 +120,39 @@ func NewCmd() *cobra.Command {
 				"pack_count": len(lock.Packs), "lock_digest": lock.LockDigest, "path": path})
 		}}
 	var source string
-	digestCmd := &cobra.Command{Use:"digest",Short:"Calculate one registered local pack's exact file digest",Args:cobra.NoArgs,
-		RunE:func(c *cobra.Command,_ []string) error {
-			if err:=requireRoot(); err!=nil { return err }
-			if source=="" { return fmt.Errorf("--source is required") }
-			loaded,err:=knowledgepack.LoadRegisteredPack(root,source)
-			if err!=nil { return err }
-			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"pack_id":loaded.Pack.PackID,
-				"version":loaded.Pack.Version,"sha256":loaded.Digest})
-		}}
-	digestCmd.Flags().StringVar(&source,"source","","project-relative pack directory")
-	reviewCmd := &cobra.Command{Use: "review", Short: "List source-backed policy and ADR records for human review", Args: cobra.NoArgs,
+	digestCmd := &cobra.Command{Use: "digest", Short: "Calculate one registered local pack's exact file digest", Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
 			if err := requireRoot(); err != nil {
 				return err
 			}
-			lock, err := knowledgepack.BuildLock(root)
+			if source == "" {
+				return fmt.Errorf("--source is required")
+			}
+			loaded, err := knowledgepack.LoadRegisteredPack(root, source)
 			if err != nil {
 				return err
 			}
-			instances, err := knowledgepack.LoadProjectInstances(root)
+			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"pack_id": loaded.Pack.PackID,
+				"version": loaded.Pack.Version, "sha256": loaded.Digest})
+		}}
+	digestCmd.Flags().StringVar(&source, "source", "", "project-relative pack directory")
+	var reviewVersionDir string
+	reviewCmd := &cobra.Command{Use: "review", Short: "List source-backed policy and ADR records for human review", Args: cobra.NoArgs,
+		RunE: func(c *cobra.Command, _ []string) error {
+			var lock knowledgepack.Lock
+			var instances knowledgepack.Instances
+			var err error
+			if reviewVersionDir != "" {
+				instances, lock, err = knowledgepack.LoadRetainedProjectInstances(reviewVersionDir)
+			} else {
+				if err := requireRoot(); err != nil {
+					return err
+				}
+				lock, err = knowledgepack.BuildLock(root)
+				if err == nil {
+					instances, err = knowledgepack.LoadProjectInstances(root)
+				}
+			}
 			if err != nil {
 				return err
 			}
@@ -172,6 +185,7 @@ func NewCmd() *cobra.Command {
 			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"project_id": lock.ProjectID, "items": queue, "conflicts": instances.Conflicts})
 		}}
+	reviewCmd.Flags().StringVar(&reviewVersionDir, "version-dir", "", "read policy and ADR records from a pinned retained dataset")
 	cmd.AddCommand(initCmd, validateCmd, lockCmd, digestCmd, reviewCmd)
 	return cmd
 }

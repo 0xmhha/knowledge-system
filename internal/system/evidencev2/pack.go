@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"unicode/utf8"
@@ -22,6 +23,21 @@ import (
 // Build resolves every citation from a retained source archive. The caller's
 // sanitizer is mandatory: no raw archived bytes can cross the public path.
 func Build(ctx context.Context, versionDir, query string, refs []contract.Citation, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
+	requested := make([]Ref, 0, len(refs))
+	for _, ref := range refs {
+		requested = append(requested, Ref{OriginID: "repo", Citation: ref})
+	}
+	return BuildFromRefs(ctx, versionDir, query, requested, cleaner)
+}
+
+type Ref struct {
+	OriginID string
+	Citation contract.Citation
+}
+
+// BuildFromRefs admits explicitly registered non-repository origins while
+// retaining the v1 Build signature and its default repository-only behavior.
+func BuildFromRefs(ctx context.Context, versionDir, query string, refs []Ref, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
 	if cleaner == nil || query == "" || len(refs) > 12 {
 		return contract.EvidencePackV2{}, fmt.Errorf("v2 evidence requires a query, sanitizer and at most 12 citations")
 	}
@@ -31,8 +47,12 @@ func Build(ctx context.Context, versionDir, query string, refs []contract.Citati
 	seen := make(map[contract.CitationKeyV2]bool)
 	var raw []sanitize.Sanitizable
 	var totalBytes int
-	for _, ref := range refs {
-		e, err := setup.ReadRetainedLines(versionDir, "repo", ref.File, ref.StartLine, ref.EndLine)
+	for _, requested := range refs {
+		ref := requested.Citation
+		if !validV2Origin(requested.OriginID) {
+			return contract.EvidencePackV2{}, fmt.Errorf("invalid v2 citation origin")
+		}
+		e, err := setup.ReadRetainedLines(versionDir, requested.OriginID, ref.File, ref.StartLine, ref.EndLine)
 		if err != nil {
 			return contract.EvidencePackV2{}, err
 		}
@@ -107,7 +127,7 @@ func Stamp(pack *contract.EvidencePackV2) error {
 	if pack == nil || pack.FormatVersion != 2 || pack.Metadata.IntegrityHashAlgo != "sha256-v2" {
 		return fmt.Errorf("invalid v2 evidence metadata")
 	}
-	if pack.Semantic != nil || len(pack.GraphNeighbors) != 0 {
+	if len(pack.GraphNeighbors) != 0 {
 		return fmt.Errorf("v2 semantic and graph overlays require coordinate validation before release")
 	}
 	if err := validatePack(*pack); err != nil {
@@ -139,7 +159,7 @@ func validatePack(pack contract.EvidencePackV2) error {
 	full := make(map[contract.CitationV2]bool)
 	for _, citation := range pack.Citations {
 		if citation.ProjectID != c.ProjectID || citation.DatasetID != c.DatasetID || citation.SnapshotID != c.SnapshotID ||
-			citation.SourceMode != c.SourceMode || citation.BaseCommit != c.BaseCommit || citation.OriginID != "repo" ||
+			citation.SourceMode != c.SourceMode || citation.BaseCommit != c.BaseCommit || !validV2Origin(citation.OriginID) ||
 			citation.File == "" || citation.StartLine <= 0 || citation.EndLine < citation.StartLine ||
 			!hexDigest(citation.FileSHA256) || !hexDigest(citation.ContentSHA256) {
 			return fmt.Errorf("invalid v2 citation coordinate")
@@ -165,7 +185,16 @@ func validatePack(pack contract.EvidencePackV2) error {
 	if pack.EvidenceState == "complete" && len(pack.Bodies) != len(pack.Citations) {
 		return fmt.Errorf("v2 evidence claims completeness without all bodies")
 	}
+	if err := validateKnowledgeSemantic(pack.Semantic, full); err != nil {
+		return err
+	}
 	return nil
+}
+
+var knowledgeOrigin = regexp.MustCompile(`^knowledge:[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)+$`)
+
+func validV2Origin(origin string) bool {
+	return origin == "repo" || knowledgeOrigin.MatchString(origin)
 }
 
 func hexDigest(value string) bool {

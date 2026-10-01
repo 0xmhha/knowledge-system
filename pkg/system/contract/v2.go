@@ -43,6 +43,46 @@ type BodyV2 struct {
 	Text     string     `json:"text"`
 }
 
+// KnowledgeContextV2 is the optional, explicitly requested domain overlay.
+// It records reviewed source references and uncertainty; source text stays in
+// the separately sanitized Bodies collection.
+type KnowledgeContextV2 struct {
+	State               string                `json:"state"`
+	LockDigest          string                `json:"lock_digest"`
+	ApplicablePolicies  []KnowledgePolicyV2   `json:"applicable_policies"`
+	Decisions           []KnowledgeDecisionV2 `json:"decisions"`
+	Constraints         []string              `json:"constraints"`
+	RelatedRequirements []string              `json:"related_requirements"`
+	TestLinks           []string              `json:"test_links"`
+	Unknowns            []string              `json:"unknowns"`
+	Conflicts           []KnowledgeConflictV2 `json:"conflicts"`
+}
+
+type KnowledgeSemanticV2 struct {
+	KnowledgeContext KnowledgeContextV2 `json:"knowledge_context"`
+}
+
+type KnowledgePolicyV2 struct {
+	ID            string     `json:"id"`
+	State         string     `json:"state"`
+	ReviewedBy    string     `json:"reviewed_by"`
+	EffectiveFrom string     `json:"effective_from"`
+	EffectiveTo   string     `json:"effective_to,omitempty"`
+	Citation      CitationV2 `json:"citation"`
+}
+
+type KnowledgeDecisionV2 struct {
+	ID       string     `json:"id"`
+	State    string     `json:"state"`
+	Citation CitationV2 `json:"citation"`
+}
+
+type KnowledgeConflictV2 struct {
+	LeftID  string `json:"left_id"`
+	RightID string `json:"right_id"`
+	Reason  string `json:"reason"`
+}
+
 type EvidencePackV2 struct {
 	FormatVersion  int           `json:"format_version"`
 	Coordinates    V2Coordinates `json:"coordinates"`

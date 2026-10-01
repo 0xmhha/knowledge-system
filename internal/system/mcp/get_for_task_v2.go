@@ -16,7 +16,10 @@ func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithOutputSchema[contract.EvidencePackV2](),
 		mcpgo.WithDescription("Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity."),
 		mcpgo.WithString("prompt", mcpgo.Required(), mcpgo.Description("Natural-language development task.")),
-		mcpgo.WithString("intent", mcpgo.Description("Optional task intent override.")))
+		mcpgo.WithString("intent", mcpgo.Description("Optional task intent override.")),
+		mcpgo.WithBoolean("include_knowledge", mcpgo.DefaultBool(false), mcpgo.Description("Add reviewed local policy context from this retained dataset.")),
+		mcpgo.WithString("knowledge_as_of", mcpgo.Description("Policy date (YYYY-MM-DD) when include_knowledge is true.")),
+		mcpgo.WithString("knowledge_subsystem", mcpgo.Description("Explicit subsystem scope when include_knowledge is true.")))
 	s.AddTool(tool, func(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
 		return handleGetForTaskV2(ctx, d, req)
 	})
@@ -48,6 +51,16 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	pack, err := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, legacy.Citations, d.EvidenceSanitizer)
 	if err != nil {
 		return mcpgo.NewToolResultErrorf("v2_evidence_failed: %v", err), nil
+	}
+	if req.GetBool("include_knowledge", false) {
+		asOf, subsystem := req.GetString("knowledge_as_of", ""), req.GetString("knowledge_subsystem", "")
+		if asOf == "" || subsystem == "" {
+			return mcpgo.NewToolResultError("invalid_knowledge_scope: knowledge_as_of and knowledge_subsystem are required"), nil
+		}
+		pack, err = evidencev2.AttachKnowledge(ctx, pack, d.EvidenceVersionDir, asOf, subsystem, d.EvidenceSanitizer)
+		if err != nil {
+			return mcpgo.NewToolResultErrorf("knowledge_context_failed: %v", err), nil
+		}
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil
 }

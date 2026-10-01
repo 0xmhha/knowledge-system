@@ -96,6 +96,9 @@ MD
 "$repo_root/bin/cks" knowledge review --project-root "$src" > "$scratch/review-3.json"
 "$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
   --source-mode snapshot-only --version third --embedder mock > "$scratch/third.log" 2>&1
+"$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-archived.json"
+printf 'status: proposed\n' > "$src/.cks/knowledge/policies/BR-17.yaml"
+"$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-after-edit.json"
 python3 - "$data" "$scratch" <<'PY'
 import json, pathlib, sys
 data, scratch = map(pathlib.Path, sys.argv[1:])
@@ -116,8 +119,22 @@ assert json.loads((scratch/'lock-1.json').read_text())['lock_digest'] != json.lo
 assert 'pack_lock_mismatch' in (scratch/'stale.log').read_text()
 assert json.loads((scratch/'validate-3.json').read_text())['conflict_count'] == 1
 review = json.loads((scratch/'review-3.json').read_text())
+assert review == json.loads((scratch/'review-archived.json').read_text())
+assert review == json.loads((scratch/'review-after-edit.json').read_text())
 assert len(review['items']) == 3
 assert len(review['conflicts']) == 1
 assert any(item['id'] == 'ADR-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
 PY
+python3 - "$data/third" <<'PY'
+import json, pathlib, sys
+version = pathlib.Path(sys.argv[1])
+manifest = json.loads((version/'sources'/'manifest.json').read_text())
+policy = next(f for f in manifest['files'] if f['origin_id'] == 'repo' and f['path'].endswith('BR-17.yaml'))
+blob = version/'sources'/'blobs'/policy['sha256']
+blob.chmod(0o600)
+blob.write_bytes(b'tampered\n')
+PY
+if "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-corrupt.json" 2>&1; then
+  echo "corrupt retained policy was accepted" >&2; exit 1
+fi
 echo "Knowledge lock and candidate identity smoke passed: $scratch"
