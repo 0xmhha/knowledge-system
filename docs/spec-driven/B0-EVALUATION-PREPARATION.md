@@ -52,3 +52,7 @@ python3 scripts/b0-export-scenarios.py --out-dir /tmp/ks-b0-scenarios
 `python3 -m unittest discover -s scripts -p test_b0_preflight.py -v`의 6개 시험은 잘못된 앵커/줄 범위, 승인 전 시나리오 내보내기, 원격 엔드포인트, 프로브 중 모델 다이제스트 변경을 거부하고, 안정 모델의 차원·서버 버전 기록과 합성 승인 fixture의 정답 문장 없는 내보내기를 확인했다. 합성 승인 fixture는 실제 질문 승인 기록이 아니다.
 
 [`b0-ollama-smoke.sh`](../../scripts/b0-ollama-smoke.sh)를 작은 **별도 임시 Git 프로젝트**에 실행했다. 같은 로컬 모델로 CKG 1개 Go 파일, CKV 2개 파일/4개 청크를 색인하고, CKV 질의 4개 히트와 CKS MCP의 `README.md`/`main.go` 인용을 확인했다. 모든 인용 커밋은 임시 프로젝트의 커밋과 같고, CKV 매니페스트의 모델 태그·다이제스트·차원도 실행 직전 사전 점검과 일치했다. 이 결과는 실 API 통합 스모크이며 파일럿 `knowledge-system`의 검색 품질, 질문 정답, 지연 기준선이 아니다. 원시 로그와 데이터셋은 `/tmp/ks-b0-ollama-smoke-20261001c`에 있다.
+
+고정 코퍼스의 별도 깨끗한 체크아웃 `/tmp/ks-b0-pinned-corpus`에서도 **임시 전체 색인**을 시도했다. CKG는 102,155 노드/414,667 엣지를 생성했다. CKV는 1,569개 대상 파일 중 40개를 처리한 시점에 자원 점검을 위해 중단했다. 처음 42초의 파일별 처리율은 입력 크기에 따라 크게 변했으므로 이 구간의 ETA를 전체 색인 시간으로 단정하지 않는다. 중단 당시 호스트 잔여 디스크가 약 4.5 GiB였고, 실패 후보 데이터셋은 제거해 약 6.7 GiB를 회복했다. 원시 로그는 `/tmp/ks-b0-pilot-setup.log`에 보존했다. 완성된 파일럿 벡터 DB나 품질 기준선은 아직 없다.
+
+이 시도에서 `cmd/cks/knowledgecli/knowledge.go`의 한 청크는 Ollama가 12,205바이트 원문 임베딩을 거부해 CKV의 복구 경로가 4,000바이트로 줄여 임베딩했다. [`embedResilient`](../../internal/vector/build/builder.go)은 저장된 청크 본문을 유지하면서 벡터만 짧은 입력에서 생성한다. 이는 API 요청의 `truncate:false`와 별개인 **애플리케이션 복구 동작**이다. 긴 문서 끝부분의 검색 누락 가능성과 축약 건수의 미계측을 B0의 관측 위험으로 등록한다. 완전한 기준선에서는 축약·건너뛴 청크 수를 수집해 보고하고, F-02 긴 문서 끝 사례로 회수 영향과 C0의 분할/표시 개선을 판단한다. 이 한 건만으로 전체 검색 품질을 단정하지 않는다.

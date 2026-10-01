@@ -1,5 +1,7 @@
 # Spec-driven WBS execution log
 
+B0 pilot build observation (2026-10-01): 고정 코퍼스의 임시 전체 색인에서 CKG는 102,155 노드/414,667 엣지를 만들었으나 CKV는 1,569 파일 중 40개 처리 뒤 디스크 여유를 위해 중단했다. 한 청크의 12,205→4,000바이트 임베딩 복구 축약이 관측됐다. 실패 후보 데이터셋은 제거했고 원시 로그는 `/tmp/ks-b0-pilot-setup.log`에 남겼다. [`B0-EVALUATION-PREPARATION.md`](./B0-EVALUATION-PREPARATION.md)에 위험과 후속 측정을 기록했다. 품질 수치는 없다.
+
 B0 local model preparation (2026-10-01): 임시 로컬 Ollama 0.34.4에서 `bge-m3:latest`를 내려받아 실제 임베딩 프로브를 통과했다. [`preflight-2026-10-01.json`](../../system/eval/b0-knowledge-system/preflight-2026-10-01.json)은 다이제스트·1024차원·고정 코퍼스 앵커를 기록한다. [`b0-ollama-smoke.sh`](../../scripts/b0-ollama-smoke.sh)의 별도 작은 프로젝트 색인과 CKV 질의·CKS MCP 인용도 통과했다. 모델은 **임시 후보**이며 12개 정답은 모두 `draft`라 결과는 `pending`, `metrics=null`이다. [`B0-DYNAMIC-FIXTURES.md`](./B0-DYNAMIC-FIXTURES.md)에 6개 상태 변화형 평가 절차를 초안으로 정리했다. 파일럿 실모델 평가와 사람 승인 전에는 B0/B1 완료가 아니다.
 
 B0 initial preparation (2026-10-01; model availability updated above): [`B0-EVALUATION-PREPARATION.md`](./B0-EVALUATION-PREPARATION.md)에 A 완료 커밋 `71cb71c`의 고정 코퍼스, 12개 질문 초안, 로컬 Ollama 다이제스트/차원·하드웨어·근거 앵커 사전 검사와 승인 경계를 기록했다. 질문은 전부 `draft`이고 당시 모델 API가 응답하지 않아 품질 결과는 `pending`, `metrics=null`이었다. 승인 전 평가 시나리오 내보내기를 거부한다. 이 준비는 B0 완료 또는 B1 시작이 아니다.
