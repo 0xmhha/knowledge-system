@@ -164,6 +164,28 @@ fi
 "$repo_root/bin/cks" knowledge review --version-dir "$data/fourth" > "$scratch/review-fourth.json"
 printf 'status: proposed\n' > "$src/.cks/knowledge/policies/BR-17.yaml"
 "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-after-edit.json"
+"$repo_root/bin/cks" mcp gen-config --dataset-dir "$data/current" \
+  --name knowledge-fixture --source-root "$src" \
+  --sanitize-rules "$repo_root/system/policies/sanitization_rules.yaml" \
+  --semantic-store "$scratch/semantic.db" --out "$scratch/mcp.yaml" > "$scratch/mcp-config.log"
+python3 - "$scratch/mcp.yaml" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+s = p.read_text()
+for before, after in (
+    ('provider: ""', 'provider: mock'),
+    ('embed_model: bge-m3', 'embed_model: mock-feature-hash-v1'),
+    ('mcp_stdio: false', 'mcp_stdio: true'),
+    ('transport: http', 'transport: stdio'),
+):
+    assert before in s, (before, p)
+    s = s.replace(before, after)
+p.write_text(s)
+PY
+python3 "$repo_root/scripts/wbs-mcp-pin-probe.py" "$repo_root/bin/cks" \
+  "$scratch/mcp.yaml" --v2-once "Where is transfer approval handled?" \
+  2026-06-01 transfers > "$scratch/mcp-v2-conflict.json"
 python3 - "$data" "$scratch" <<'PY'
 import json, pathlib, sys
 data, scratch = map(pathlib.Path, sys.argv[1:])
@@ -178,6 +200,11 @@ assert first['dataset_id'] != second['dataset_id']
 assert first['source']['snapshot_id'] != second['source']['snapshot_id']
 assert second['dataset_id'] != third['dataset_id']
 assert (data/'current').resolve() == (data/'fourth').resolve()
+v2 = json.loads((scratch/'mcp-v2-conflict.json').read_text())
+assert v2['base_citation_count'] > 0 and v2['knowledge_citation_count'] >= v2['base_citation_count'], v2
+assert v2['base_coordinates'] == v2['knowledge_coordinates'], v2
+assert v2['knowledge_state'] == 'conflict' and v2['conflict_count'] == 1, v2
+assert v2['trace_link_count'] == 0 and v2['required_behavior_count'] == 0, v2
 assert json.loads((data/'held'/'review-hold.json').read_text())['base_version'] == 'third'
 patch = json.loads((scratch/'patch.json').read_text())
 assert patch['state'] == 'unconfirmed' and any(f['path'] == 'README.md' for f in patch['changed_files'])

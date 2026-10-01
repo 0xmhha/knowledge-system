@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/0xmhha/knowledge-system/internal/setup"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
@@ -44,6 +45,10 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 			return v2ToolError("invalid_request"), nil
 		}
 		callerIntent = parsed
+	}
+	identity, identityErr := setup.InspectVersionIdentity(d.EvidenceVersionDir)
+	if identityErr != nil || identity == nil {
+		return v2ToolError("reindex_required"), nil
 	}
 	if ok, _ := serviceable(ctx, d); !ok {
 		return v2ToolError("service_unavailable"), nil

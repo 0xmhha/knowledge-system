@@ -141,17 +141,26 @@ func NewCmd() *cobra.Command {
 // NewRollbackCmd exposes the existing checked pointer transition as a direct
 // operator command. It shares the setup parser and its project/dataset guards.
 func NewRollbackCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:                "rollback VERSION",
 		Short:              "Switch current to a previously verified dataset version",
 		DisableFlagParsing: true,
-		RunE: func(_ *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 1 && (args[0] == "--help" || args[0] == "-h") {
+				return cmd.Help()
+			}
 			if len(args) == 0 || strings.HasPrefix(args[0], "-") {
 				return fmt.Errorf("rollback requires VERSION before setup flags")
 			}
 			return runSetup(append(args[1:], "--rollback", args[0]))
 		},
 	}
+	// DisableFlagParsing forwards these arguments to the shared setup parser.
+	// Declare them here as well so --help and documentation checks describe
+	// the accepted operator surface accurately.
+	cmd.Flags().String("config", "", "setup config containing the dataset root")
+	cmd.Flags().String("out", "", "dataset root when no setup config is used")
+	return cmd
 }
 
 // selfExecPath is the running cks binary — the domain and filelist steps

@@ -55,10 +55,38 @@ def snapshot(proc, health_id, pack_id, prompt="Where is the Alpha function imple
     }
 
 
+def v2_snapshot(proc, prompt, as_of, subsystem):
+    base = tool(proc, 2, "cks.context.get_for_task_v2", {"prompt": prompt})
+    knowledge = tool(proc, 3, "cks.context.get_for_task_v2", {
+        "prompt": prompt, "include_knowledge": True,
+        "knowledge_as_of": as_of, "knowledge_subsystem": subsystem,
+    })
+    assert base.get("format_version") == 2, base
+    assert knowledge.get("format_version") == 2, knowledge
+    base_citations = base.get("citations", [])
+    knowledge_citations = knowledge.get("citations", [])
+    assert knowledge_citations[:len(base_citations)] == base_citations
+    semantic = knowledge.get("semantic") or {}
+    context = semantic.get("knowledge_context") or {}
+    coding = semantic.get("coding_context") or {}
+    return {
+        "base_citation_count": len(base_citations),
+        "knowledge_citation_count": len(knowledge_citations),
+        "base_coordinates": base.get("coordinates"),
+        "knowledge_coordinates": knowledge.get("coordinates"),
+        "knowledge_state": context.get("state"),
+        "conflict_count": len(context.get("conflicts", [])),
+        "trace_link_count": len(context.get("trace_links", [])),
+        "required_behavior_count": len(coding.get("required_behavior", [])),
+    }
+
+
 def main():
     binary, config = sys.argv[1:3]
     once = len(sys.argv) == 5 and sys.argv[3] == "--once"
-    if once:
+    v2_once = len(sys.argv) == 7 and sys.argv[3] == "--v2-once"
+    v2_error_once = len(sys.argv) == 6 and sys.argv[3] == "--v2-error-once"
+    if once or v2_once or v2_error_once:
         prompt = sys.argv[4]
         control = None
         log_path = pathlib.Path(config).with_suffix(".mcp.log")
@@ -80,6 +108,14 @@ def main():
             proc.stdin.flush()
             if once:
                 print(json.dumps(snapshot(proc, 2, 3, prompt)))
+                return
+            if v2_once:
+                print(json.dumps(v2_snapshot(proc, prompt, sys.argv[5], sys.argv[6])))
+                return
+            if v2_error_once:
+                result = tool(proc, 2, "cks.context.get_for_task_v2", {"prompt": prompt})
+                assert result.get("code") == sys.argv[5], result
+                print(json.dumps(result))
                 return
             (control / "ready.json").write_text(json.dumps(snapshot(proc, 2, 3)))
             deadline = time.monotonic() + 60

@@ -1,6 +1,7 @@
 package setupcli
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"os"
@@ -9,6 +10,19 @@ import (
 	"strings"
 	"testing"
 )
+
+func TestRollbackHelpShowsForwardedSetupFlags(t *testing.T) {
+	cmd := NewRollbackCmd()
+	var output bytes.Buffer
+	cmd.SetOut(&output)
+	cmd.SetArgs([]string{"--help"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), "--config") || !strings.Contains(output.String(), "--out") {
+		t.Fatalf("rollback help omitted accepted flags: %s", output.String())
+	}
+}
 
 // gitRepo creates a committed single-file git repository and returns its
 // path and HEAD commit hash.
