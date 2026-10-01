@@ -66,7 +66,7 @@ func capturePolicyDigest(mode string) string {
 	if mode == "committed" {
 		selection = "git-tracked-all"
 	}
-	return identityHashFields("cks.capture-policy.v2", "capture-policy-2026-10-01.1", mode,
+	return identityHashFields("cks.capture-policy.v2", "capture-policy-2026-10-01.2", mode,
 		"regular-only", "reject-sensitive", "reject-symlinks", selection)
 }
 

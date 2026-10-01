@@ -16,12 +16,12 @@ func TestSourceIdentityLengthPrefixedGolden(t *testing.T) {
 		t.Fatalf("file manifest serialization changed: %s, want %s", got, want)
 	}
 	policy := capturePolicyDigest("committed")
-	if want := "ae9ed9f9ab1e07ccf95888fcd84a48da247b060dc865015d94909fc596ea9ebe"; policy != want {
+	if want := "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74"; policy != want {
 		t.Fatalf("capture policy serialization changed: %s, want %s", policy, want)
 	}
 	s := SourceIdentity{ProjectID: "project-one", SourceMode: "committed", SourceCommit: strings.Repeat("a", 40),
 		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: policy}
-	if got, want := sourceSnapshotID(s), "033fdd9f2eaaaa031b749858a95775c1f6e1dd9ce3551fbe083fea53b799ce92"; got != want {
+	if got, want := sourceSnapshotID(s), "9a6ed3f303e25cc976763af300b2b544907e4bd20a7e2fa6d8c4ccb432c19389"; got != want {
 		t.Fatalf("snapshot serialization changed: %s, want %s", got, want)
 	}
 	if identityHashFields("tuple", "ab", "c") == identityHashFields("tuple", "a", "bc") {

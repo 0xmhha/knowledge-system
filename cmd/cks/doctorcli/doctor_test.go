@@ -125,6 +125,51 @@ func TestDoctorAndCaptureAgreeOnNestedSensitivePath(t *testing.T) {
 	}
 }
 
+func TestDoctorMarksInvalidPinnedIdentityForReindex(t *testing.T) {
+	root, dataset := t.TempDir(), t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package sample\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	version := filepath.Join(dataset, "v1")
+	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: version, ProjectID: "pilot", SourceMode: "snapshot-only"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	identity, err := setup.NewDatasetIdentity(captured.Identity, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	shared := map[string]any{"src_root": root, "project_id": "pilot", "snapshot_id": captured.Identity.SnapshotID,
+		"dataset_id": identity.DatasetID, "source_mode": "snapshot-only",
+		"file_manifest_digest": captured.Identity.FileManifestDigest, "capture_policy_digest": captured.Identity.CapturePolicyDigest}
+	graph := map[string]any{}
+	for key, value := range shared {
+		graph[key] = value
+	}
+	graph["schema_version"], graph["graph_digest"] = "1.23", strings.Repeat("a", 64)
+	vector := map[string]any{}
+	for key, value := range shared {
+		vector[key] = value
+	}
+	vector["embedding_model"], vector["embedding_dim"], vector["embedding_checksum"] = "mock", 8, "mock-space"
+	vector["sources"] = map[string]any{"ckg": map[string]any{"graph_digest": strings.Repeat("a", 64)}}
+	writeDoctorManifest(t, filepath.Join(version, "graph", "manifest.json"), graph)
+	writeDoctorManifest(t, filepath.Join(version, "vector", "manifest.json"), vector)
+	if _, err := setup.PublishCandidateIdentity(version, captured.Identity, "inputs"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink("v1", filepath.Join(dataset, "current")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(version, "dataset-identity.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	report, err := Inspect(root, dataset)
+	if err != nil || report.IdentityStatus != "invalid" || !report.ReindexRequired || report.Status != "degraded" {
+		t.Fatalf("invalid pinned dataset lacks reindex status: %+v %v", report, err)
+	}
+}
+
 func TestLanguageCapabilityPreview(t *testing.T) {
 	for file, want := range map[string]string{"a.go": "go", "x.tsx": "typescript", "x.jsx": "javascript", "x.sol": "solidity", "x.md": "markdown", "x.proto": "proto", "x.py": ""} {
 		if got := languageOf(file); got != want {

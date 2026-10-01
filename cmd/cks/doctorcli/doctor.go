@@ -235,7 +235,9 @@ func inspectDataset(report *Report, dataset string) {
 	}
 	identity, err := setup.InspectVersionIdentity(resolved)
 	if err != nil {
-		report.Issues = append(report.Issues, "active dataset identity invalid: "+err.Error())
+		report.IdentityStatus = "invalid"
+		report.ReindexRequired = true
+		report.Issues = append(report.Issues, "active dataset identity invalid; reindex required")
 		return
 	}
 	if identity == nil {
