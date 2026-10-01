@@ -163,40 +163,52 @@ func NewCmd() *cobra.Command {
 				return err
 			}
 			type item struct {
-				Kind       string                  `json:"kind"`
-				ID         string                  `json:"id"`
-				Status     string                  `json:"status"`
-				SourceRef  knowledgepack.SourceRef `json:"source_ref"`
-				ReviewedBy string                  `json:"reviewed_by,omitempty"`
-				HoldReason string                  `json:"hold_reason,omitempty"`
+				Kind        string                  `json:"kind"`
+				ID          string                  `json:"id"`
+				Status      string                  `json:"status"`
+				SourceRef   knowledgepack.SourceRef `json:"source_ref"`
+				ReviewedBy  string                  `json:"reviewed_by,omitempty"`
+				ReviewCount int                     `json:"review_count"`
+				HoldReason  string                  `json:"hold_reason,omitempty"`
 			}
 			queue := []item{}
-			for _, p := range instances.Policies {
-				reason := ""
-				if p.Status == "proposed" {
-					reason = "awaiting_human_review"
-				} else if p.Status == "rejected" {
-					reason = "rejected_by_reviewer"
+			reviewState := func(kind, id, status string) (string, int) {
+				votes := map[string]string{}
+				for _, record := range instances.Reviews {
+					if record.TargetKind == kind && record.TargetID == id {
+						votes[record.Reviewer] = record.Decision
+					}
 				}
-				queue = append(queue, item{"policy", p.ID, p.Status, p.SourceRef, p.ReviewedBy, reason})
+				if status == "rejected" {
+					return "rejected_by_reviewer", len(votes)
+				}
+				if status != "proposed" {
+					return "", len(votes)
+				}
+				if len(votes) == 0 {
+					return "awaiting_human_review", 0
+				}
+				verified, rejected := false, false
+				for _, vote := range votes {
+					verified = verified || vote == "verified"
+					rejected = rejected || vote == "rejected"
+				}
+				if verified && rejected {
+					return "conflicting_reviews", len(votes)
+				}
+				return "approval_quorum_pending", len(votes)
+			}
+			for _, p := range instances.Policies {
+				reason, count := reviewState("policy", p.ID, p.Status)
+				queue = append(queue, item{"policy", p.ID, p.Status, p.SourceRef, p.ReviewedBy, count, reason})
 			}
 			for _, d := range instances.Decisions {
-				reason := ""
-				if d.Status == "proposed" {
-					reason = "awaiting_human_review"
-				} else if d.Status == "rejected" {
-					reason = "rejected_by_reviewer"
-				}
-				queue = append(queue, item{"decision", d.ID, d.Status, d.SourceRef, d.ReviewedBy, reason})
+				reason, count := reviewState("decision", d.ID, d.Status)
+				queue = append(queue, item{"decision", d.ID, d.Status, d.SourceRef, d.ReviewedBy, count, reason})
 			}
 			for _, relation := range instances.Relations {
-				reason := ""
-				if relation.Status == "proposed" {
-					reason = "awaiting_human_review"
-				} else if relation.Status == "rejected" {
-					reason = "rejected_by_reviewer"
-				}
-				queue = append(queue, item{"relation", relation.ID, relation.Status, relation.SourceRef, relation.ReviewedBy, reason})
+				reason, count := reviewState("relation", relation.ID, relation.Status)
+				queue = append(queue, item{"relation", relation.ID, relation.Status, relation.SourceRef, relation.ReviewedBy, count, reason})
 			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"project_id": lock.ProjectID, "items": queue, "conflicts": instances.Conflicts})
 		}}

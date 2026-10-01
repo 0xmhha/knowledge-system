@@ -194,7 +194,7 @@ assert len(review['conflicts']) == 1
 assert any(item['id'] == 'ADR-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
 assert any(item['id'] == 'REL-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
 fourth = json.loads((scratch/'review-fourth.json').read_text())
-assert any(item['id'] == 'ADR-1' and item['status'] == 'verified' and item['reviewed_by'] == 'fixture-reviewer' for item in fourth['items'])
+assert any(item['id'] == 'ADR-1' and item['status'] == 'verified' and item['reviewed_by'] == 'fixture-reviewer' and item['review_count'] == 1 for item in fourth['items'])
 assert json.loads((scratch/'review-record.json').read_text())['needs_relock'] is True
 assert json.loads((scratch/'lock-4.json').read_text())['lock_digest'] != json.loads((scratch/'lock-3.json').read_text())['lock_digest']
 PY
