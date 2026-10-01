@@ -51,6 +51,7 @@ type KnowledgeContextV2 struct {
 	LockDigest          string                `json:"lock_digest"`
 	ApplicablePolicies  []KnowledgePolicyV2   `json:"applicable_policies"`
 	Decisions           []KnowledgeDecisionV2 `json:"decisions"`
+	Relations           []KnowledgeRelationV2 `json:"relations"`
 	Constraints         []string              `json:"constraints"`
 	RelatedRequirements []string              `json:"related_requirements"`
 	TestLinks           []string              `json:"test_links"`
@@ -78,6 +79,16 @@ type KnowledgeDecisionV2 struct {
 	Date           string     `json:"date"`
 	RequirementIDs []string   `json:"requirement_ids"`
 	Citation       CitationV2 `json:"citation"`
+}
+
+type KnowledgeRelationV2 struct {
+	ID         string     `json:"id"`
+	PackID     string     `json:"pack_id"`
+	Predicate  string     `json:"predicate"`
+	SubjectID  string     `json:"subject_id"`
+	ObjectID   string     `json:"object_id"`
+	ReviewedBy string     `json:"reviewed_by"`
+	Citation   CitationV2 `json:"citation"`
 }
 
 type KnowledgeConflictV2 struct {

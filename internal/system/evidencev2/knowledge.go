@@ -58,10 +58,26 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 		}
 		return base, nil
 	}
-	if len(base.Citations)+len(selected.Applicable)+len(decisions.Applicable) > 12 {
+	selectedIDs := map[string]bool{}
+	for _, p := range selected.Applicable {
+		selectedIDs[p.ID] = true
+	}
+	for _, d := range decisions.Applicable {
+		selectedIDs[d.ID] = true
+	}
+	localRelations := []knowledgepack.RelationInstance{}
+	if selected.State != "conflict" {
+		for _, relation := range instances.Relations {
+			if relation.Status == "verified" && relation.Visibility == "public" &&
+				selectedIDs[relation.Subject.ID] && selectedIDs[relation.Object.ID] {
+				localRelations = append(localRelations, relation)
+			}
+		}
+	}
+	if len(base.Citations)+len(selected.Applicable)+len(decisions.Applicable)+len(localRelations) > 12 {
 		return knowledgeUnavailable(base, "knowledge_citation_budget", lock.LockDigest)
 	}
-	refs := make([]Ref, 0, len(selected.Applicable)+len(decisions.Applicable))
+	refs := make([]Ref, 0, len(selected.Applicable)+len(decisions.Applicable)+len(localRelations))
 	appendRef := func(source knowledgepack.SourceRef) error {
 		if source.OriginID != "repo" {
 			return fmt.Errorf("unsupported knowledge origin")
@@ -88,6 +104,11 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	}
 	for _, d := range decisions.Applicable {
 		if err := appendRef(d.SourceRef); err != nil {
+			return knowledgeUnavailable(base, "knowledge_source_unavailable", lock.LockDigest)
+		}
+	}
+	for _, relation := range localRelations {
+		if err := appendRef(relation.SourceRef); err != nil {
 			return knowledgeUnavailable(base, "knowledge_source_unavailable", lock.LockDigest)
 		}
 	}
@@ -145,6 +166,14 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 			unverifiedLinks = true
 		}
 	}
+	for i, relation := range localRelations {
+		k.Relations = append(k.Relations, contract.KnowledgeRelationV2{
+			ID: relation.ID, PackID: relation.Type.PackID, Predicate: relation.Type.LocalID,
+			SubjectID: relation.Subject.ID, ObjectID: relation.Object.ID,
+			ReviewedBy: relation.ReviewedBy,
+			Citation:   addition.Citations[len(selected.Applicable)+len(decisions.Applicable)+i],
+		})
+	}
 	if selected.State == "unknown" || selected.State == "stale" {
 		if len(k.Decisions) > 0 {
 			k.State = "partial"
@@ -169,6 +198,7 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 func emptyKnowledgeContext(state, lockDigest string) contract.KnowledgeContextV2 {
 	return contract.KnowledgeContextV2{State: state, LockDigest: lockDigest,
 		ApplicablePolicies: []contract.KnowledgePolicyV2{}, Decisions: []contract.KnowledgeDecisionV2{},
+		Relations:   []contract.KnowledgeRelationV2{},
 		Constraints: []string{}, RelatedRequirements: []string{}, TestLinks: []string{},
 		Unknowns: []string{}, Conflicts: []contract.KnowledgeConflictV2{}}
 }
@@ -205,7 +235,7 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 		return fmt.Errorf("v2 knowledge lock digest is invalid")
 	}
 	if k.State == "restricted" || k.State == "unavailable" {
-		if len(k.ApplicablePolicies) != 0 || len(k.Decisions) != 0 || len(k.Conflicts) != 0 {
+		if len(k.ApplicablePolicies) != 0 || len(k.Decisions) != 0 || len(k.Relations) != 0 || len(k.Conflicts) != 0 {
 			return fmt.Errorf("v2 restricted or unavailable context exposes knowledge identifiers")
 		}
 	}
@@ -224,12 +254,21 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 		}
 		ids[d.ID] = true
 	}
+	for _, relation := range k.Relations {
+		if relation.ID == "" || ids[relation.ID] || relation.PackID == "" || relation.Predicate == "" ||
+			relation.ReviewedBy == "" || !ids[relation.SubjectID] || !ids[relation.ObjectID] ||
+			!citations[relation.Citation] || relation.Citation.OriginID != "repo" {
+			return fmt.Errorf("v2 knowledge relation lacks reviewed endpoints and archive citation")
+		}
+		ids[relation.ID] = true
+	}
 	for _, conflict := range k.Conflicts {
 		if conflict.LeftID == conflict.RightID || !ids[conflict.LeftID] || !ids[conflict.RightID] || conflict.Reason == "" {
 			return fmt.Errorf("v2 knowledge conflict has missing policy endpoints")
 		}
 	}
-	if k.State == "conflict" && len(k.Conflicts) == 0 || k.State == "complete" && len(k.ApplicablePolicies) == 0 && len(k.Decisions) == 0 {
+	if k.State == "conflict" && (len(k.Conflicts) == 0 || len(k.Relations) != 0) ||
+		k.State == "complete" && len(k.ApplicablePolicies) == 0 && len(k.Decisions) == 0 {
 		return fmt.Errorf("v2 knowledge state has no supporting records")
 	}
 	return nil

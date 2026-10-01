@@ -14,11 +14,15 @@ import (
 )
 
 func knowledgeVersion(t *testing.T, visibility, statement string, decisionVisibility ...string) (string, string) {
+	return buildKnowledgeVersion(t, visibility, statement, false, decisionVisibility...)
+}
+
+func buildKnowledgeVersion(t *testing.T, visibility, statement string, withRelation bool, decisionVisibility ...string) (string, string) {
 	t.Helper()
 	root, version := t.TempDir(), t.TempDir()
 	packRoot := filepath.Join(root, "vendor", "decisions")
 	overlay := filepath.Join(root, ".cks", "knowledge")
-	for _, dir := range []string{packRoot, filepath.Join(overlay, "policies"), filepath.Join(overlay, "decisions")} {
+	for _, dir := range []string{packRoot, filepath.Join(overlay, "policies"), filepath.Join(overlay, "decisions"), filepath.Join(overlay, "relations")} {
 		if err := os.MkdirAll(dir, 0o700); err != nil {
 			t.Fatal(err)
 		}
@@ -34,6 +38,16 @@ relation_types: []
 constraints: []
 competency_questions: ["Which policy applies?"]
 `
+	if withRelation {
+		packYAML = strings.Replace(packYAML, "relation_types: []", `relation_types:
+  - predicate: motivates
+    subject_type: {pack_id: engineering.decisions, local_id: business-policy}
+    object_type: {pack_id: engineering.decisions, local_id: design-decision}
+    direction: forward
+    cardinality: many-to-many
+    required_evidence: true
+    review_rule: human`, 1)
+	}
 	if err := os.WriteFile(filepath.Join(packRoot, "pack.yaml"), []byte(packYAML), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -91,6 +105,24 @@ source_ref: {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
 Independent approval was selected.
 `
 		if err := os.WriteFile(filepath.Join(overlay, "decisions", "ADR-1.md"), []byte(decision), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if withRelation {
+		relation := `id: REL-1
+type: {pack_id: engineering.decisions, local_id: motivates}
+subject: {id: BR-1, type: {pack_id: engineering.decisions, local_id: business-policy}}
+object: {id: ADR-1, type: {pack_id: engineering.decisions, local_id: design-decision}}
+status: verified
+reviewed_by: reviewer
+review_reason: Compared with both source files.
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/relations/REL-1.yaml}
+evidence_refs:
+  - {origin_id: repo, path: .cks/knowledge/policies/BR-1.yaml}
+  - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
+`
+		if err := os.WriteFile(filepath.Join(overlay, "relations", "REL-1.yaml"), []byte(relation), 0o600); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -162,6 +194,36 @@ func TestAttachKnowledgeIncludesReviewedArchivedDecision(t *testing.T) {
 	}
 	if err := Verify(got); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestAttachKnowledgeCitesReviewedLocalRelationWithoutInventingExternalLinks(t *testing.T) {
+	_, version := buildKnowledgeVersion(t, "public", "Separate approval is required.", true, "public")
+	base, err := Build(context.Background(), version, "why", []contract.Citation{{File: "README.md", StartLine: 1, EndLine: 1}}, testCleaner(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := AttachKnowledge(context.Background(), base, version, "2026-06-01", "transfers", testCleaner(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	k := got.Semantic.(contract.KnowledgeSemanticV2).KnowledgeContext
+	if k.State != "partial" || len(k.Relations) != 1 || k.Relations[0].Predicate != "motivates" ||
+		k.Relations[0].SubjectID != "BR-1" || k.Relations[0].ObjectID != "ADR-1" ||
+		len(k.RelatedRequirements) != 0 || len(k.TestLinks) != 0 || len(got.Citations) != 4 ||
+		k.Relations[0].Citation.File != ".cks/knowledge/relations/REL-1.yaml" {
+		t.Fatalf("reviewed relation/citation missing or external link invented: %+v", k)
+	}
+	if err := Verify(got); err != nil {
+		t.Fatal(err)
+	}
+	tampered := got
+	modified := k
+	modified.Relations = append([]contract.KnowledgeRelationV2(nil), k.Relations...)
+	modified.Relations[0].Predicate = "forged"
+	tampered.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: modified}
+	if err := Verify(tampered); err == nil {
+		t.Fatal("modified relation kept the v2 integrity hash")
 	}
 }
 

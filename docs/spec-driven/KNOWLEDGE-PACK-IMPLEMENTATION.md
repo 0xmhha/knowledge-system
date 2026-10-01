@@ -31,7 +31,7 @@ cks setup --src /path/to/project --out /path/to/data \
 
 정책 YAML과 ADR Markdown의 필드·타입·원천 경로·검토자/이유·유효 날짜를 검증한다. 같은 범위·시점에 서로 `conflicts_with`로 지정한 검토된 정책은 충돌로 보고한다. 내부 `SelectPolicies`는 범위·시점·제한 여부를 계산하지만 공개 근거 인용이 없으면 상태를 `needs_citation`으로 남긴다. 이 기록의 `verified`는 YAML에 적힌 로컬 검토 이력이며 외부 신원 인증을 뜻하지 않는다.
 
-`relations/*.yaml`은 팩의 `relation_types` 술어를 `(pack_id, local_id)`로 참조하고, 주체·객체 ID와 타입, `status`, 검토자·이유, 공개 범위, 자기 원천과 `evidence_refs`를 기록한다. 로더는 술어 방향·끝점 타입·중복 ID를 확인한다. `verified` 관계는 양쪽 끝점이 이 오버레이의 검토된 정책/ADR이고 두 원천이 근거 목록에 들어있을 때만 받는다. 요구사항·CKG 코드 심볼·테스트 등 외부 끝점의 관계는 앵커 검증이 연결되기 전까지 `proposed`만 허용한다. 등록된 관계 원문은 잠금과 보관 후보에 포함되지만 아직 v2 코딩 문맥의 `related_requirements`나 `test_links`로 출력하지 않는다.
+`relations/*.yaml`은 팩의 `relation_types` 술어를 `(pack_id, local_id)`로 참조하고, 주체·객체 ID와 타입, `status`, 검토자·이유, 공개 범위, 자기 원천과 `evidence_refs`를 기록한다. 로더는 술어 방향·끝점 타입·중복 ID를 확인한다. `verified` 관계는 양쪽 끝점이 이 오버레이의 검토된 정책/ADR이고 두 원천이 근거 목록에 들어있을 때만 받는다. 요구사항·CKG 코드 심볼·테스트 등 외부 끝점의 관계는 앵커 검증이 연결되기 전까지 `proposed`만 허용한다. 등록된 관계 원문은 잠금과 보관 후보에 포함된다. v2 문맥은 충돌 없는 현재 범위의 공개 검토 관계만 별도 정화된 원문 인용과 함께 `relations`에 싣고, 아직 `related_requirements`나 `test_links`로 출력하지 않는다.
 
 선택 팩 원문은 `knowledge:<pack_id>` 출처로 후보의 content-addressed archive에 보관한다. 저장소와 팩이 같은 상대 경로를 써도 다른 원천이다. `review --version-dir`는 보관본만으로 팩과 정책을 재구성하고 잠금을 검증한다. 라이브 파일 편집 뒤에도 과거 결과가 같고 blob 손상은 거부한다. `cks.context.get_for_task_v2`는 `include_knowledge=true`와 명시 날짜·서브시스템을 받으면 검토된 공개 정책과 ADR만 선택한다. ADR은 선택 날짜 이전, 서브시스템 범위 일치, 대체 관계와 공개 권한 검사를 통과해야 한다. 정책은 v2 인용·정화된 본문에 연결되고 의미 객체까지 `sha256-v2` 해시에 포함된다. 비공개 정책 또는 ADR은 ID와 본문을 숨기고 `restricted` 상태만 남긴다. 지식 레이어 오류와 예산 초과 시 기본 코드 근거를 유지하고 불확실 상태를 출력한다.
 
