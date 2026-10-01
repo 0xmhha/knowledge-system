@@ -117,17 +117,28 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 	}
 	defer opened.Close()
 	files := make([]sourceFile, 0, len(paths))
+	var totalBytes int64
+	addFile := func(originID, path string, buf []byte) error {
+		if len(files) >= defaultCaptureMaxFiles || int64(len(buf)) > defaultCaptureMaxTotalBytes-totalBytes {
+			return fmt.Errorf("source identity resource limit exceeded: files=%d bytes=%d", len(files)+1, totalBytes+int64(len(buf)))
+		}
+		sum := sha256.Sum256(buf)
+		files = append(files, sourceFile{OriginID: originID, Path: filepath.ToSlash(path), Kind: "regular",
+			Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
+		totalBytes += int64(len(buf))
+		return nil
+	}
 	for _, path := range paths {
 		if path == "" || filepath.IsAbs(path) || path == ".." || strings.HasPrefix(path, "../") || !utf8.ValidString(path) || strings.ContainsRune(path, '\\') {
 			return SourceIdentity{}, fmt.Errorf("unsafe tracked source path %q", path)
 		}
-		buf, err := readCapturedRegular(opened, path, 1<<62)
+		buf, err := readCapturedRegular(opened, path, defaultCaptureMaxFileBytes)
 		if err != nil {
 			return SourceIdentity{}, fmt.Errorf("read tracked source %q: %w", path, err)
 		}
-		sum := sha256.Sum256(buf)
-		files = append(files, sourceFile{OriginID: "repo", Path: filepath.ToSlash(path), Kind: "regular",
-			Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
+		if err := addFile("repo", path, buf); err != nil {
+			return SourceIdentity{}, err
+		}
 	}
 	origins, err := prepareCaptureOrigins(externalOrigins, "")
 	if err != nil {
@@ -143,13 +154,15 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 			return SourceIdentity{}, err
 		}
 		for _, path := range externalPaths {
-			buf, readErr := readCapturedRegular(external, path, 1<<62)
+			buf, readErr := readCapturedRegular(external, path, defaultCaptureMaxFileBytes)
 			if readErr != nil {
 				external.Close()
 				return SourceIdentity{}, readErr
 			}
-			sum := sha256.Sum256(buf)
-			files = append(files, sourceFile{OriginID: origin.ID, Path: path, Kind: "regular", Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
+			if err := addFile(origin.ID, path, buf); err != nil {
+				external.Close()
+				return SourceIdentity{}, err
+			}
 		}
 		external.Close()
 	}

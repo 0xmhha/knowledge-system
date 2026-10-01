@@ -28,6 +28,7 @@ type Report struct {
 	ReindexRequired  bool           `json:"reindex_required,omitempty"`
 	SourceRoot       string         `json:"source_root"`
 	Commit           string         `json:"commit"`
+	IndexedCommit    string         `json:"indexed_commit,omitempty"`
 	Dirty            bool           `json:"dirty"`
 	Languages        map[string]int `json:"languages"`
 	SharedCodeFiles  int            `json:"shared_code_files"`
@@ -248,6 +249,7 @@ func inspectDataset(report *Report, dataset string) {
 		report.ProjectID = identity.Source.ProjectID
 		report.SnapshotID = identity.Source.SnapshotID
 		report.DatasetID = identity.DatasetID
+		report.IndexedCommit = identity.Source.SourceCommit
 		report.SourceMode = identity.Source.SourceMode
 		if report.SourceMode == "snapshot-only" {
 			report.HistoryStatus = "history_unavailable"

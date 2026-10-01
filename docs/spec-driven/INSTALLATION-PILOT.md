@@ -44,9 +44,9 @@ python3 scripts/verify-release.py \
 ./cks doctor --src /path/to/project --dataset /path/to/project-dataset --strict
 ```
 
-`init`은 기존 설정을 덮어쓰지 않는다. 실제 임베더를 명시해야 하며 Ollama 모델은 별도로 준비해야 한다. `doctor`는 Go, TypeScript, JavaScript, Solidity, Markdown 파일 수와 graph-only Proto 수를 미리 보고한다. 심볼릭 링크와 의심스러운 비밀 경로를 개수로만 보고하며 내용을 읽거나 출력하지 않는다. 이 진단은 프로젝트의 `.ckvignore`와 파일 목록 정책이 제대로 적용됐는지 대체하지 않는다.
+`init`과 `mcp gen-config`는 기존 사용자 설정을 덮어쓰지 않는다. 새 경로를 지정하거나 기존 파일을 명시적으로 이동한 뒤 다시 생성한다. 실제 임베더를 명시해야 하며 Ollama 모델은 별도로 준비해야 한다. `doctor`는 Go, TypeScript, JavaScript, Solidity, Markdown 파일 수와 graph-only Proto 수를 미리 보고한다. 심볼릭 링크와 의심스러운 비밀 경로를 개수로만 보고하며 내용을 읽거나 출력하지 않는다. 이 진단은 프로젝트의 `.ckvignore`와 파일 목록 정책이 제대로 적용됐는지 대체하지 않는다.
 
-Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown만 있는 저장소에서도 문서 검색은 가능하지만 코드 AST 그래프와 CKV 코드 심볼의 조인은 없다. `doctor`는 `shared_code_files=0`, `status=degraded`로 이 범위를 표시한다. TypeScript 저장소는 `shared_code_files`를 양수로 보고한다. 세 유형의 독립 저장소에서 `init → setup → doctor → ckv query → CKS MCP context.get_for_task`를 실행하는 구조 스모크는 `scripts/wbs-install-smoke.sh`에 있다. 각 프로젝트의 MCP 서버를 새로 띄워 다시 조회했을 때도 인용 커밋이 그대로였고, TypeScript 코드 질문은 `main.ts`를 인용했다. macOS arm64 및 Linux arm64/amd64의 압축 배포물에서 동일한 스모크를 실행한다. 검색 품질은 mock 임베더이므로 측정하지 않는다.
+Go 소스가 없는 모듈이나 지원하지 않는 Python 코드와 Markdown만 있는 저장소에서도 문서 검색은 가능하지만 코드 AST 그래프와 CKV 코드 심볼의 조인은 없다. `doctor`는 `shared_code_files=0`, `status=degraded`로 이 범위를 표시한다. TypeScript 저장소는 `shared_code_files`를 양수로 보고한다. 세 유형의 독립 저장소에서 `init → setup → doctor → ckv query → CKS MCP context.get_for_task → 새 버전 setup → rollback → query`를 실행하는 구조 스모크는 `scripts/wbs-install-smoke.sh`에 있다. `doctor.commit`은 현재 작업 트리의 HEAD이고 `doctor.indexed_commit`은 활성 pinned 데이터셋의 기반 커밋이다. 롤백 후 작업 트리가 새 커밋이면 둘이 다른 것이 정상이며 과거 데이터셋 인용은 `indexed_commit`에 맞아야 한다. 각 프로젝트의 MCP 서버를 새로 띄워 다시 조회했을 때도 인용 커밋이 그대로였고, TypeScript 코드 질문은 `main.ts`를 인용했다. macOS arm64 및 Linux arm64/amd64의 압축 배포물에서 동일한 스모크를 실행한다. 검색 품질은 mock 임베더이므로 측정하지 않는다.
 
 `--version auto`는 커밋 기반 버전 이름을 사용한다. `committed` 모드의 모든 `setup` 빌드는 추적·미추적 파일이 남아 있거나 Git이 무시하지만 CKV/CKG가 읽을 수 있는 소스 파일이 있으면 거부한다. 명시적 버전 이름을 줘도 예외가 아니다. 버전 후보는 활성화 직전에 빌드 결과의 커밋과 소스 청결성을 다시 검사한다. `--source-mode working-tree`와 `snapshot-only`는 명시적 버전·프로젝트 ID와 보관 원문 캡처를 요구한다. 제한·검증 현황은 `SOURCE-SNAPSHOT-ADR.md`와 `EXECUTION.md`를 따른다. 설정 파일을 소스 저장소 안에 만들었다면 커밋하거나 무시 정책을 정한 뒤 빌드한다.
 

@@ -189,6 +189,39 @@ func Save(path string, c *Config) error {
 	return nil
 }
 
+// SaveNew publishes a complete generated user config without replacing an
+// existing file. The hard link fails if the destination already exists,
+// including a symlink.
+func SaveNew(path string, c *Config) error {
+	data, err := yaml.Marshal(c)
+	if err != nil {
+		return fmt.Errorf("config: marshal: %w", err)
+	}
+	file, err := os.CreateTemp(filepath.Dir(path), ".cks-config-*")
+	if err != nil {
+		return fmt.Errorf("config: stage new %q: %w", path, err)
+	}
+	defer os.Remove(file.Name())
+	if _, err = file.Write(data); err != nil {
+		file.Close()
+		return fmt.Errorf("config: write new %q: %w", path, err)
+	}
+	if err = file.Sync(); err != nil {
+		file.Close()
+		return fmt.Errorf("config: sync new %q: %w", path, err)
+	}
+	if err = file.Close(); err != nil {
+		return fmt.Errorf("config: close new %q: %w", path, err)
+	}
+	if err = os.Chmod(file.Name(), 0o644); err != nil {
+		return fmt.Errorf("config: chmod new %q: %w", path, err)
+	}
+	if err = os.Link(file.Name(), path); err != nil {
+		return fmt.Errorf("config: publish new %q: %w", path, err)
+	}
+	return nil
+}
+
 // isLoopbackAddr reports whether addr is a loopback host:port, reusing the same
 // check Validate applies to reject non-loopback binds without AllowRemote.
 func isLoopbackAddr(addr string) bool {

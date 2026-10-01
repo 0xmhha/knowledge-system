@@ -56,7 +56,7 @@ v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start
 
 현재 실행되는 선택형 정책 경로는 MCP 입력 `include_knowledge=true`, `knowledge_as_of=YYYY-MM-DD`, `knowledge_subsystem=<명시 범위>`를 요구한다. 정책 원문은 보관본 전체 파일 범위로 인용하고 정화 후 `bodies`에 둔다. 공개 가능하고 검토된 정책만 `applicable_policies`에 넣으며 `conflict`, `restricted`, `stale`, `unknown`, `budget_exceeded`, `unavailable`을 확정 답으로 취급하지 않는다. 오류 시 기존 코드 인용을 유지한다. `decisions`에는 같은 보관본의 검토된 공개 ADR을 날짜·범위·대체 관계에 따라 인용할 수 있다. `relations`는 검토된 로컬 정책/ADR 끝점 두 개가 모두 현재 질의에 선택되고 충돌하지 않을 때만 별도 보관 원문 인용과 함께 출력한다. `related_requirements`와 `test_links`는 검증된 외부 앵커가 없으면 빈 배열이다. 조직 인증/권한 어댑터나 자연어 범위 추론이 구현됐다는 뜻은 아니다.
 
-선택형 `semantic.coding_context`는 `implemented_behavior`, `required_behavior`, `rationale`, `constraints`, `evidence`, `unknowns`를 별도 배열로 반환한다. 현재 `required_behavior`는 검토된 정책 인용, `rationale`은 검토된 ADR 인용에서만 파생한다. 검증된 코드 구현 링크가 없으므로 `implemented_behavior`와 `constraints`는 비워두고 `implementation_link_unverified`를 `unknowns`에 적는다. `evidence`는 응답 안의 v2 인용 좌표만 담는다. 이 객체도 `sha256-v2` 해시 범위에 든다. 필드가 없던 이전 v2 팩은 기존 해시/바이트를 수정하지 않고 읽는다.
+선택형 `semantic.coding_context`는 `implemented_behavior`, `required_behavior`, `rationale`, `constraints`, `evidence`, `unknowns`를 별도 배열로 반환한다. 현재 `required_behavior`는 검토된 정책 인용, `rationale`은 검토된 ADR 인용에서만 파생한다. 정책이 충돌하면 정책 원문은 `knowledge_context`의 상충 근거로 인용하되 `required_behavior`를 비우고 `conflicting_policies_require_review`를 기록한다. 검증된 코드 구현 링크가 없으면 `implemented_behavior`와 `constraints`는 비워두고 `implementation_link_unverified`를 `unknowns`에 적는다. `evidence`는 응답 안의 v2 인용 좌표만 담는다. 이 객체도 `sha256-v2` 해시 범위에 든다. 필드가 없던 이전 v2 팩은 기존 해시/바이트를 수정하지 않고 읽는다.
 
 ## 오류와 마이그레이션
 

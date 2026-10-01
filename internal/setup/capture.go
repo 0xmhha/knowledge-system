@@ -37,8 +37,15 @@ type CaptureOptions struct {
 	SourceCommit    string // full HEAD for Git modes, empty for non-Git
 	MaxFileBytes    int64
 	MaxTotalBytes   int64
+	MaxFiles        int
 	ExternalOrigins []CaptureOrigin
 }
+
+const (
+	defaultCaptureMaxFiles      = 100_000
+	defaultCaptureMaxFileBytes  = 32 << 20
+	defaultCaptureMaxTotalBytes = 4 << 30
+)
 
 type CaptureOrigin struct {
 	ID   string
@@ -96,10 +103,13 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 		return CapturedSource{}, err
 	}
 	if o.MaxFileBytes <= 0 {
-		o.MaxFileBytes = 32 << 20
+		o.MaxFileBytes = defaultCaptureMaxFileBytes
 	}
 	if o.MaxTotalBytes <= 0 {
-		o.MaxTotalBytes = 2 << 30
+		o.MaxTotalBytes = defaultCaptureMaxTotalBytes
+	}
+	if o.MaxFiles <= 0 {
+		o.MaxFiles = defaultCaptureMaxFiles
 	}
 	paths, err := captureModePaths(root, o.SourceMode)
 	if err != nil {
@@ -121,6 +131,9 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	}
 	var total int64
 	add := func(originID, rel string, buf []byte) error {
+		if len(result.Files) >= o.MaxFiles {
+			return fmt.Errorf("capture file count limit exceeded at %q: limit=%d", rel, o.MaxFiles)
+		}
 		if int64(len(buf)) > o.MaxTotalBytes-total {
 			return fmt.Errorf("capture total byte limit exceeded at %q", rel)
 		}
@@ -201,6 +214,12 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 // confines a concurrent path replacement to the source tree; post-read path
 // checks and the final inventory pass catch ordinary swaps and byte drift.
 func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, error) {
+	return readCapturedRegularWithOpenHook(root, rel, maxBytes, nil)
+}
+
+// The hook is used by tests to force a replacement at the exact Lstat/Open
+// boundary. Production capture always passes nil.
+func readCapturedRegularWithOpenHook(root *os.Root, rel string, maxBytes int64, beforeOpen func()) ([]byte, error) {
 	parts := strings.Split(rel, "/")
 	for i := range parts {
 		prefix := filepath.FromSlash(strings.Join(parts[:i+1], "/"))
@@ -219,6 +238,9 @@ func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, err
 		}
 		if info.Size() > maxBytes {
 			return nil, fmt.Errorf("capture file byte limit exceeded at %q", rel)
+		}
+		if beforeOpen != nil {
+			beforeOpen()
 		}
 		file, err := openCapturedNoFollow(root.Name(), rel)
 		if err != nil {

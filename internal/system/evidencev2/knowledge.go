@@ -228,7 +228,12 @@ func buildCodingContext(k contract.KnowledgeContextV2, citations []contract.Cita
 		Unknowns:            append([]string{}, k.Unknowns...),
 	}
 	for _, p := range k.ApplicablePolicies {
-		c.RequiredBehavior = append(c.RequiredBehavior, contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation})
+		if k.State != "conflict" {
+			c.RequiredBehavior = append(c.RequiredBehavior, contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation})
+		}
+	}
+	if k.State == "conflict" {
+		c.Unknowns = append(c.Unknowns, "conflicting_policies_require_review")
 	}
 	for _, d := range k.Decisions {
 		c.Rationale = append(c.Rationale, contract.KnowledgeReferenceV2{ID: d.ID, State: d.State, Citation: d.Citation})
@@ -339,14 +344,20 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 	if c.Evidence == nil && c.RequiredBehavior == nil && c.Rationale == nil && c.Unknowns == nil {
 		return nil // existing v2 packs predate the optional coding-context field
 	}
+	wantRequired := len(k.ApplicablePolicies)
+	if k.State == "conflict" {
+		wantRequired = 0
+	}
 	if len(c.ImplementedBehavior) != len(k.TraceLinks) || len(c.Constraints) != 0 ||
-		len(c.RequiredBehavior) != len(k.ApplicablePolicies) || len(c.Rationale) != len(k.Decisions) ||
+		len(c.RequiredBehavior) != wantRequired || len(c.Rationale) != len(k.Decisions) ||
 		len(c.Evidence) != len(citations) {
 		return fmt.Errorf("v2 coding context claims unsupported or missing evidence")
 	}
-	for i, p := range k.ApplicablePolicies {
-		if c.RequiredBehavior[i] != (contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation}) {
-			return fmt.Errorf("v2 required behavior differs from policy evidence")
+	if k.State != "conflict" {
+		for i, p := range k.ApplicablePolicies {
+			if c.RequiredBehavior[i] != (contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation}) {
+				return fmt.Errorf("v2 required behavior differs from policy evidence")
+			}
 		}
 	}
 	for i, d := range k.Decisions {

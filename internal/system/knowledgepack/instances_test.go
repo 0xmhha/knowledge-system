@@ -11,6 +11,22 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func TestRestrictedPolicyDominatesPublicConflict(t *testing.T) {
+	instances := Instances{Policies: []Policy{
+		{ID: "PUBLIC-A", Status: "verified", Visibility: "public", Scope: map[string]string{"subsystem": "payments"}, EffectiveFrom: "2026-01-01"},
+		{ID: "PUBLIC-B", Status: "verified", Visibility: "public", Scope: map[string]string{"subsystem": "payments"}, EffectiveFrom: "2026-01-01"},
+		{ID: "HIDDEN", Status: "verified", Visibility: "restricted", Scope: map[string]string{"subsystem": "payments"}, EffectiveFrom: "2026-01-01"},
+	}, Conflicts: []Conflict{{LeftID: "PUBLIC-A", RightID: "PUBLIC-B", Reason: "incompatible"}}}
+	got, err := instances.SelectPolicies("2026-06-01", map[string]string{"subsystem": "payments"}, false)
+	if err != nil || got.State != "restricted" || len(got.Applicable) != 0 || len(got.Conflicts) != 0 {
+		t.Fatalf("hidden applicable policy was displaced by public conflict: %+v %v", got, err)
+	}
+	public, err := instances.SelectPolicies("2026-06-01", map[string]string{"subsystem": "payments"}, true)
+	if err != nil || public.State != "conflict" || len(public.Applicable) != 3 || len(public.Conflicts) != 1 {
+		t.Fatalf("authorized selection lost public conflict: %+v %v", public, err)
+	}
+}
+
 func TestPolicyAndDecisionRequireReviewAndExposeExplicitConflict(t *testing.T) {
 	root := t.TempDir()
 	for _, dir := range []string{"policies", "decisions"} {

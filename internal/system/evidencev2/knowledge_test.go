@@ -3,6 +3,7 @@ package evidencev2
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +19,10 @@ func knowledgeVersion(t *testing.T, visibility, statement string, decisionVisibi
 }
 
 func buildKnowledgeVersion(t *testing.T, visibility, statement string, withRelation bool, decisionVisibility ...string) (string, string) {
+	return buildKnowledgeVersionWithMutation(t, visibility, statement, withRelation, nil, decisionVisibility...)
+}
+
+func buildKnowledgeVersionWithMutation(t *testing.T, visibility, statement string, withRelation bool, mutate func(string) error, decisionVisibility ...string) (string, string) {
 	t.Helper()
 	root, version := t.TempDir(), t.TempDir()
 	packRoot := filepath.Join(root, "vendor", "decisions")
@@ -140,6 +145,11 @@ evidence_refs:
   - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
 `
 		if err := os.WriteFile(filepath.Join(overlay, "relations", "REL-1.yaml"), []byte(relation), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if mutate != nil {
+		if err := mutate(root); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -326,5 +336,146 @@ func TestAttachKnowledgeHidesRestrictedPolicyAndPreservesBase(t *testing.T) {
 	}
 	if err := Verify(got); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure(t *testing.T) {
+	ctx := context.Background()
+	secondPolicy := `id: BR-2
+type: {pack_id: engineering.decisions, local_id: business-policy}
+statement: Only one approval is required.
+owner: team
+scope: {subsystem: transfers}
+effective_from: "2026-01-01"
+status: verified
+reviewed_by: reviewer
+review_reason: Compared with the source.
+visibility: public
+conflicts_with: [BR-1]
+source_ref: {origin_id: repo, path: .cks/knowledge/policies/BR-2.yaml}
+`
+	newBase := func(t *testing.T, version string) contract.EvidencePackV2 {
+		t.Helper()
+		base, err := Build(ctx, version, "why", []contract.Citation{{File: "README.md", StartLine: 1, EndLine: 1}}, testCleaner(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return base
+	}
+	t.Run("conflict", func(t *testing.T) {
+		_, version := buildKnowledgeVersionWithMutation(t, "public", "Two approvals are required.", false, func(root string) error {
+			return os.WriteFile(filepath.Join(root, ".cks", "knowledge", "policies", "BR-2.yaml"), []byte(secondPolicy), 0o600)
+		})
+		base := newBase(t, version)
+		got, err := AttachKnowledge(ctx, base, version, "2026-06-01", "transfers", testCleaner(t))
+		if err != nil || Verify(got) != nil {
+			t.Fatalf("conflict response invalid: %v", err)
+		}
+		semantic := got.Semantic.(contract.KnowledgeSemanticV2)
+		if semantic.KnowledgeContext.State != "conflict" || len(semantic.KnowledgeContext.Conflicts) != 1 ||
+			len(semantic.CodingContext.RequiredBehavior) != 0 || len(got.Citations) != 3 || got.Citations[0] != base.Citations[0] {
+			t.Fatalf("conflict became an authoritative coding instruction: %+v", semantic)
+		}
+	})
+	t.Run("restricted_over_conflict", func(t *testing.T) {
+		_, version := buildKnowledgeVersionWithMutation(t, "public", "Two approvals are required.", false, func(root string) error {
+			dir := filepath.Join(root, ".cks", "knowledge", "policies")
+			if err := os.WriteFile(filepath.Join(dir, "BR-2.yaml"), []byte(secondPolicy), 0o600); err != nil {
+				return err
+			}
+			hidden := strings.ReplaceAll(secondPolicy, "BR-2", "BR-3")
+			hidden = strings.Replace(hidden, "visibility: public", "visibility: restricted", 1)
+			hidden = strings.Replace(hidden, "conflicts_with: [BR-1]", "conflicts_with: []", 1)
+			return os.WriteFile(filepath.Join(dir, "BR-3.yaml"), []byte(hidden), 0o600)
+		})
+		base := newBase(t, version)
+		got, err := AttachKnowledge(ctx, base, version, "2026-06-01", "transfers", testCleaner(t))
+		if err != nil || Verify(got) != nil {
+			t.Fatalf("restricted response invalid: %v", err)
+		}
+		semantic := got.Semantic.(contract.KnowledgeSemanticV2)
+		if semantic.KnowledgeContext.State != "restricted" || len(semantic.KnowledgeContext.ApplicablePolicies) != 0 ||
+			len(semantic.KnowledgeContext.Conflicts) != 0 || len(got.Citations) != len(base.Citations) {
+			t.Fatalf("restricted record or conflict leaked: %+v", semantic)
+		}
+	})
+	t.Run("expired", func(t *testing.T) {
+		_, version := buildKnowledgeVersionWithMutation(t, "public", "Old approval rule.", false, func(root string) error {
+			path := filepath.Join(root, ".cks", "knowledge", "policies", "BR-1.yaml")
+			buf, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(path, []byte(strings.Replace(string(buf), "status: verified", "effective_to: \"2026-02-01\"\nstatus: verified", 1)), 0o600)
+		})
+		base := newBase(t, version)
+		got, err := AttachKnowledge(ctx, base, version, "2026-06-01", "transfers", testCleaner(t))
+		if err != nil || Verify(got) != nil {
+			t.Fatalf("expired response invalid: %v", err)
+		}
+		semantic := got.Semantic.(contract.KnowledgeSemanticV2)
+		if semantic.KnowledgeContext.State != "stale" || len(semantic.KnowledgeContext.ApplicablePolicies) != 0 || len(got.Citations) != len(base.Citations) {
+			t.Fatalf("expired policy became current: %+v", semantic)
+		}
+	})
+	t.Run("corrupt_archive", func(t *testing.T) {
+		_, version := knowledgeVersion(t, "public", "Archived rule.")
+		base := newBase(t, version)
+		_, _, digest, err := setup.ReadRetainedFile(version, "repo", ".cks/knowledge/policies/BR-1.yaml")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Remove(filepath.Join(version, "sources", "blobs", digest)); err != nil {
+			t.Fatal(err)
+		}
+		got, err := AttachKnowledge(ctx, base, version, "2026-06-01", "transfers", testCleaner(t))
+		if err != nil || Verify(got) != nil {
+			t.Fatalf("archive failure response invalid: %v", err)
+		}
+		semantic := got.Semantic.(contract.KnowledgeSemanticV2)
+		if semantic.KnowledgeContext.State != "unavailable" || len(got.Citations) != len(base.Citations) ||
+			len(semantic.KnowledgeContext.ApplicablePolicies) != 0 {
+			t.Fatalf("corrupt archive displaced base evidence: %+v", semantic)
+		}
+	})
+}
+
+func TestAttachKnowledgeCitationBudgetPreservesBase(t *testing.T) {
+	_, version := buildKnowledgeVersionWithMutation(t, "public", "One reviewed rule.", false, func(root string) error {
+		dir := filepath.Join(root, ".cks", "knowledge", "policies")
+		for n := 2; n <= 12; n++ {
+			id := fmt.Sprintf("BR-%d", n)
+			body := fmt.Sprintf(`id: %s
+type: {pack_id: engineering.decisions, local_id: business-policy}
+statement: Reviewed rule %d.
+owner: team
+scope: {subsystem: transfers}
+effective_from: "2026-01-01"
+status: verified
+reviewed_by: reviewer
+review_reason: Compared with the source.
+visibility: public
+conflicts_with: []
+source_ref: {origin_id: repo, path: .cks/knowledge/policies/%s.yaml}
+`, id, n, id)
+			if err := os.WriteFile(filepath.Join(dir, id+".yaml"), []byte(body), 0o600); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	ctx := context.Background()
+	base, err := Build(ctx, version, "why", []contract.Citation{{File: "README.md", StartLine: 1, EndLine: 1}}, testCleaner(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := AttachKnowledge(ctx, base, version, "2026-06-01", "transfers", testCleaner(t))
+	if err != nil || Verify(got) != nil {
+		t.Fatalf("budget response invalid: %v", err)
+	}
+	semantic := got.Semantic.(contract.KnowledgeSemanticV2)
+	if semantic.KnowledgeContext.State != "budget_exceeded" || len(semantic.KnowledgeContext.ApplicablePolicies) != 0 ||
+		len(got.Citations) != len(base.Citations) || got.Citations[0] != base.Citations[0] {
+		t.Fatalf("budget failure displaced base evidence: %+v", semantic)
 	}
 }

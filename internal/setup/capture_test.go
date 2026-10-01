@@ -227,6 +227,27 @@ func TestCaptureEnforcesFileAndTotalByteLimits(t *testing.T) {
 	}
 }
 
+func TestCaptureEnforcesCombinedFileCountAcrossOrigins(t *testing.T) {
+	base := t.TempDir()
+	repo, external := filepath.Join(base, "repo"), filepath.Join(base, "external")
+	for _, dir := range []string{repo, external} {
+		if err := os.Mkdir(dir, 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(repo, "one.go"), []byte("package one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(external, "policy.md"), []byte("reviewed\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	_, err := CaptureSource(CaptureOptions{Root: repo, Out: filepath.Join(base, "candidate"), ProjectID: "p",
+		SourceMode: "snapshot-only", MaxFiles: 1, ExternalOrigins: []CaptureOrigin{{ID: "knowledge:fixture", Root: external}}})
+	if err == nil || !strings.Contains(err.Error(), "file count limit") {
+		t.Fatalf("external source escaped combined count limit: %v", err)
+	}
+}
+
 func TestReadSourceFileNoFollowRejectsLinkedParentAndLeaf(t *testing.T) {
 	root, outside := t.TempDir(), t.TempDir()
 	if err := os.WriteFile(filepath.Join(outside, "policy.md"), []byte("outside\n"), 0o600); err != nil {
@@ -243,6 +264,58 @@ func TestReadSourceFileNoFollowRejectsLinkedParentAndLeaf(t *testing.T) {
 	}
 	if _, err := ReadSourceFileNoFollow(root, "leaf.md", 1024); err == nil {
 		t.Fatal("linked leaf escaped the source root")
+	}
+}
+
+func TestCaptureRejectsReplacementAtLstatOpenBoundary(t *testing.T) {
+	for _, replacement := range []string{"linked-leaf", "linked-parent", "same-bytes-new-inode"} {
+		t.Run(replacement, func(t *testing.T) {
+			rootPath, outside := t.TempDir(), t.TempDir()
+			if err := os.Mkdir(filepath.Join(rootPath, "nested"), 0o700); err != nil {
+				t.Fatal(err)
+			}
+			original := filepath.Join(rootPath, "nested", "policy.md")
+			if err := os.WriteFile(original, []byte("reviewed rule\n"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			external := filepath.Join(outside, "policy.md")
+			if err := os.WriteFile(external, []byte("outside rule\n"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			root, err := os.OpenRoot(rootPath)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer root.Close()
+			_, err = readCapturedRegularWithOpenHook(root, "nested/policy.md", 1024, func() {
+				switch replacement {
+				case "linked-leaf":
+					if err := os.Remove(original); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.Symlink(external, original); err != nil {
+						t.Fatal(err)
+					}
+				case "linked-parent":
+					if err := os.Rename(filepath.Join(rootPath, "nested"), filepath.Join(rootPath, "old")); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.Symlink(outside, filepath.Join(rootPath, "nested")); err != nil {
+						t.Fatal(err)
+					}
+				case "same-bytes-new-inode":
+					if err := os.Rename(original, filepath.Join(rootPath, "old-policy.md")); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.WriteFile(original, []byte("reviewed rule\n"), 0o600); err != nil {
+						t.Fatal(err)
+					}
+				}
+			})
+			if err == nil {
+				t.Fatal("replaced source was accepted across the Lstat/Open boundary")
+			}
+		})
 	}
 }
 

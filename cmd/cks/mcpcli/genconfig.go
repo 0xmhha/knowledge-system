@@ -117,7 +117,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("generated config invalid: %w", err)
 	}
-	if err := config.Save(*out, cfg); err != nil {
+	if err := config.SaveNew(*out, cfg); err != nil {
 		return err
 	}
 	fmt.Fprintf(stdout, "generated %s (name=%s, listen=%s allow_remote=%v)\n",

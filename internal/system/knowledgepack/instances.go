@@ -225,12 +225,12 @@ func (i Instances) SelectPolicies(asOf string, queryScope map[string]string, all
 		}
 	}
 	switch {
-	case len(result.Conflicts) > 0:
-		result.State = "conflict"
 	case restricted:
 		result.State = "restricted"
 		result.Applicable = nil
 		result.Conflicts = nil
+	case len(result.Conflicts) > 0:
+		result.State = "conflict"
 	case len(result.Applicable) > 0:
 		result.State = "needs_citation"
 	case stale:

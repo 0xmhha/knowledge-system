@@ -67,6 +67,26 @@ PY
       "$mcp_config" --once "Where is greet function implemented?" \
       > "$scratch/$kind/mcp-code.json"
   fi
+  old_version="$(python3 - "$scratch/$kind/doctor.json" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1]))['dataset_version'])
+PY
+)"
+  printf '\nA second committed version for %s.\n' "$kind" >> "$src/README.md"
+  git -C "$src" add README.md
+  git -C "$src" -c commit.gpgsign=false -c user.name=Codex \
+    -c user.email=codex@example.com commit -qm second-fixture
+  "$bin_dir/cks" setup --config "$config" --version auto \
+    --progress text > "$scratch/$kind/setup-second.log" 2>&1
+  "$bin_dir/cks" doctor --src "$src" --dataset "$dataset" \
+    > "$scratch/$kind/doctor-second.json"
+  "$bin_dir/cks" rollback "$old_version" --config "$config" \
+    > "$scratch/$kind/rollback.log" 2>&1
+  "$bin_dir/cks" doctor --src "$src" --dataset "$dataset" \
+    > "$scratch/$kind/doctor-rollback.json"
+  "$bin_dir/ckv" --embedder mock query "committed guide" \
+    --out "$dataset/current/vector" --threshold -1 --json \
+    > "$scratch/$kind/query-rollback.json" 2> "$scratch/$kind/query-rollback.log"
 done
 python3 - "$scratch" <<'PY'
 import json
@@ -80,6 +100,9 @@ for kind in ('empty-go', 'typescript', 'unsupported-python'):
     query = json.loads((base / 'query.json').read_text())
     mcp = json.loads((base / 'mcp.json').read_text())
     restarted = json.loads((base / 'mcp-restarted.json').read_text())
+    second = json.loads((base / 'doctor-second.json').read_text())
+    rollback = json.loads((base / 'doctor-rollback.json').read_text())
+    rollback_query = json.loads((base / 'query-rollback.json').read_text())
     assert Path(init['source_root']).resolve() == (base / 'src').resolve(), init
     assert doctor['dataset_version'] and doctor['commit'], doctor
     assert query['hits'] and all(hit['citation']['commit_hash'] == doctor['commit'] for hit in query['hits']), (kind, query)
@@ -87,6 +110,11 @@ for kind in ('empty-go', 'typescript', 'unsupported-python'):
     assert mcp['citation_commits'] == [doctor['commit']], (kind, mcp)
     assert mcp['citation_files'] and set(mcp['citation_files']) <= {'README.md', 'main.ts'}, (kind, mcp)
     assert restarted == mcp, (kind, mcp, restarted)
+    assert second['dataset_version'] != doctor['dataset_version'] and second['commit'] != doctor['commit'], (kind, second, doctor)
+    assert rollback['dataset_version'] == doctor['dataset_version'] and rollback['snapshot_id'] == doctor['snapshot_id'], (kind, rollback, doctor)
+    assert rollback['indexed_commit'] == doctor['commit'] and rollback['commit'] == second['commit'], (kind, rollback, doctor, second)
+    assert any('different source commit' in issue for issue in rollback['issues']), (kind, rollback)
+    assert rollback_query['hits'] and all(hit['citation']['commit_hash'] == doctor['commit'] for hit in rollback_query['hits']), (kind, rollback_query)
     if kind == 'typescript':
         assert doctor['shared_code_files'] == 1 and doctor['status'] == 'ready', doctor
         assert any(hit['citation']['file'] == 'main.ts' for hit in query['hits']), query
