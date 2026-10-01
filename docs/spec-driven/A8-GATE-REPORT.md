@@ -4,7 +4,7 @@
 
 ## 이번 통합 실행
 
-기준 브랜치 `feat/spec-driven-knowledge-system`. 2026-10-01 macOS arm64에서 최근 코드에 대해 아래 검사를 다시 실행했다. 패키지 매트릭스는 이 변경 이전의 구조 변경 시점에 시험했으므로 현재 변경으로 재검증할 예정이다.
+기준 브랜치 `feat/spec-driven-knowledge-system`. 2026-10-01 macOS arm64에서 최근 코드에 대해 아래 검사를 다시 실행했다. 패키지 매트릭스도 이 변경을 포함한 macOS 아카이브와 Linux fixture 빌드에서 재검증했다.
 
 | 게이트 | 결과 | 판정 범위 |
 |---|---|---|
@@ -15,10 +15,12 @@
 | `scripts/wbs-source-modes-smoke.sh` | 통과 | 새 캡처 정책에서 Git 작업 트리·비Git 캡처, 빌드 중 변경 거부 |
 | `scripts/wbs-smoke.sh` | 통과 | 세 엔진 구성, CKV 청크·CKG 심볼·CKS 추적/테스트 |
 | `scripts/wbs-knowledge-lock-smoke.sh`, `scripts/wbs-patch-smoke.sh` | 통과 | 새 캡처 정책에서 잠금, v4 팩 타입, 관계 후보, ADR 검토 기록, 패치 승인·승격·롤백 |
-| `scripts/wbs-release-sign-smoke.sh`, `scripts/wbs-package-smoke.sh` | 통과 | macOS arm64 외부 서명 검증과 추출 바이너리 세 프로젝트 설치 |
-| `scripts/wbs-linux-package-smoke.sh arm64`, `amd64` | 통과 | 각 Linux 아키텍처의 별도 서명/검증/추출, Go 없는 Debian 런타임에서 세 프로젝트 질의 |
+| `scripts/wbs-release-sign-smoke.sh`, `scripts/wbs-package-smoke.sh` | 통과 | 현재 macOS arm64 시험 서명/별도 검증과 추출 바이너리의 세 프로젝트 설치 |
+| `scripts/wbs-linux-package-smoke.sh arm64`, `amd64` | 통과 | 각 Linux 아키텍처의 별도 fixture 빌드·시험 서명·검증·추출, Go 없는 Debian 런타임에서 세 프로젝트 질의 |
 
 스모크는 결정적 mock 임베딩을 사용했다. Linux 패키지는 시험 키와 `test-signed-preview` 범위만 사용했다. 추출 런타임에 Go 컴파일러가 없던 fixture는 실제 Go 소스가 없는 Go 모듈, TypeScript, 미지원 Python+Markdown이었다. 실제 Go 소스 AST 색인에는 현재 Go 도구 체인이 필요하다.
+
+Linux 스모크를 이번 호스트의 Bash 3.2에서 다시 실행하며 빈 `cache_args` 배열의 `set -u` 확장 오류를 발견했다. 빈 배열의 이식 가능한 확장으로 고친 뒤 arm64와 amd64를 각각 재실행해 통과했다. 두 Linux 패키지는 현재 작업 파일을 별도 합성 Git 커밋으로 묶은 구조 시험물이다. 원 저장소의 운영 릴리스 서명이나 의존 라이선스 승인이 아니다.
 
 ## 이전 호환과 데이터 마이그레이션
 
