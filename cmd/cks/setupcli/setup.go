@@ -195,8 +195,12 @@ func runSetup(args []string) error {
 	gateMinCanonical := fs.Float64("gate-min-canonical", 0, "reindex gate: minimum canonical_id coverage (canonical/symbol chunks); 0 disables the check")
 	gateTestBin := fs.String("gate-test-bin", "", "optional test executable; candidate promotes only if it exits 0 on the pinned clean source")
 	gateTestArgs := fs.StringArray("gate-test-arg", nil, "one argument for --gate-test-bin (repeatable, no shell expansion)")
+	holdForReview := fs.Bool("hold-for-review", false, "gate and retain the version without changing current; use for external patch review")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *holdForReview && (*version == "" || *rollback != "") {
+		return fmt.Errorf("--hold-for-review requires a new --version build")
 	}
 
 	if *config != "" {
@@ -241,6 +245,9 @@ func runSetup(args []string) error {
 		if !set["skip-vector"] {
 			o.SkipVector = base.SkipVector
 		}
+	}
+	if *holdForReview && (o.ProjectID == "" || o.SkipVector) {
+		return fmt.Errorf("--hold-for-review requires a pinned project ID and a complete graph/vector candidate")
 	}
 
 	emit, err := progressSink(*progress)
@@ -380,15 +387,19 @@ func runSetup(args []string) error {
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
 			ExpectedSourceCommit: gateCommit, ExpectedSourceSnapshot: preBuildSnapshot,
 			ExpectedInputDigest: preBuildInputs, ExpectedDatasetID: preBuildDatasetID,
-			ExternalOrigins: o.ExternalOrigins}
+			ExternalOrigins: o.ExternalOrigins, HoldForReview: *holdForReview}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
 		}
 		if err := setup.Reindex(ctx, o, ver, gopt, setup.SubprocessRunner{}, emit); err != nil {
 			return err
 		}
-		fmt.Fprintf(os.Stderr, "setup: promoted %s/%s to current\n", o.Out, ver)
-		fmt.Fprintln(os.Stderr, restartNote)
+		if *holdForReview {
+			fmt.Fprintf(os.Stderr, "setup: validated %s/%s; held for review (current unchanged)\n", o.Out, ver)
+		} else {
+			fmt.Fprintf(os.Stderr, "setup: promoted %s/%s to current\n", o.Out, ver)
+			fmt.Fprintln(os.Stderr, restartNote)
+		}
 	default:
 		plan, err := setup.BuildPlan(o)
 		if err != nil {

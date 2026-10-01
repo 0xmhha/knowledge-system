@@ -224,3 +224,9 @@ func (a ActiveProjection) Trace() (TraceReport, error) {
 	})
 	return report, nil
 }
+
+// Trace evaluates a stored candidate before it becomes the active semantic
+// dataset. It never turns a reviewed link into a human criterion decision.
+func (p Projection) Trace() (TraceReport, error) {
+	return (ActiveProjection{projection: p}).Trace()
+}

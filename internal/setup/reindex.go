@@ -1,7 +1,9 @@
 package setup
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -137,10 +139,91 @@ func (l *reindexLock) release() {
 // `current` pointed at before the swap ("" if none) so the caller can record a
 // rollback target. The version directory must already exist.
 func Promote(dataset, version string) (prev string, err error) {
+	return promote(dataset, version, false)
+}
+
+// PromoteReviewedCandidate is called only after the patch review workflow has
+// checked criterion decisions and the candidate's test report. Ordinary
+// promote/rollback refuse a held candidate.
+func PromoteReviewedCandidate(dataset, version, patchID, decisionsSHA256 string) (prev string, err error) {
+	if patchID == "" || len(decisionsSHA256) != 64 {
+		return "", fmt.Errorf("reviewed promote needs patch and decision digest")
+	}
+	vdir, err := versionPathForReview(dataset, version)
+	if err != nil {
+		return "", err
+	}
+	identity, err := InspectVersionIdentity(vdir)
+	if err != nil || identity == nil {
+		return "", fmt.Errorf("reviewed promote needs pinned candidate: %v", err)
+	}
+	var hold struct {
+		ProjectID  string `json:"project_id"`
+		DatasetID  string `json:"dataset_id"`
+		SnapshotID string `json:"snapshot_id"`
+	}
+	if err := readJSON(filepath.Join(vdir, "review-hold.json"), &hold); err != nil {
+		return "", err
+	}
+	if hold.ProjectID != identity.Source.ProjectID || hold.DatasetID != identity.DatasetID || hold.SnapshotID != identity.Source.SnapshotID {
+		return "", fmt.Errorf("review hold differs from candidate")
+	}
+	if err := writeReviewRelease(filepath.Join(vdir, "review-release.json"), map[string]string{
+		"project_id": hold.ProjectID, "dataset_id": hold.DatasetID, "snapshot_id": hold.SnapshotID,
+		"patch_id": patchID, "decisions_sha256": decisionsSHA256}); err != nil {
+		return "", err
+	}
+	return promote(dataset, version, true)
+}
+
+func writeReviewRelease(path string, value map[string]string) error {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return err
+	}
+	data = append(data, '\n')
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if os.IsExist(err) {
+		old, readErr := os.ReadFile(path)
+		if readErr == nil && bytes.Equal(old, data) {
+			return nil
+		}
+		return fmt.Errorf("review release marker already exists with different bytes")
+	}
+	if err != nil {
+		return err
+	}
+	if _, err = f.Write(data); err != nil {
+		f.Close()
+		os.Remove(path)
+		return err
+	}
+	if err = f.Close(); err != nil {
+		os.Remove(path)
+		return err
+	}
+	return nil
+}
+
+func versionPathForReview(dataset, version string) (string, error) {
+	if err := validateVersion(version); err != nil {
+		return "", err
+	}
+	return filepath.Join(dataset, version), nil
+}
+
+func promote(dataset, version string, reviewed bool) (prev string, err error) {
 	if err := validateVersion(version); err != nil {
 		return "", err
 	}
 	vdir := filepath.Join(dataset, version)
+	if _, err := os.Lstat(filepath.Join(vdir, "review-hold.json")); err == nil && !reviewed {
+		if _, releaseErr := os.Lstat(filepath.Join(vdir, "review-release.json")); releaseErr != nil {
+			return "", fmt.Errorf("promote: version %q requires explicit patch review", version)
+		}
+	} else if err != nil && !os.IsNotExist(err) {
+		return "", err
+	}
 	fi, err := os.Stat(vdir)
 	if err != nil || !fi.IsDir() {
 		return "", fmt.Errorf("promote: version %q not found under %s", version, dataset)
@@ -148,6 +231,22 @@ func Promote(dataset, version string) (prev string, err error) {
 	targetIdentity, err := verifyVersionIdentityIfPresent(vdir)
 	if err != nil {
 		return "", fmt.Errorf("promote: target identity: %w", err)
+	}
+	if _, err := os.Lstat(filepath.Join(vdir, "review-hold.json")); err == nil {
+		var release struct {
+			ProjectID       string `json:"project_id"`
+			DatasetID       string `json:"dataset_id"`
+			SnapshotID      string `json:"snapshot_id"`
+			PatchID         string `json:"patch_id"`
+			DecisionsSHA256 string `json:"decisions_sha256"`
+		}
+		info, statErr := os.Lstat(filepath.Join(vdir, "review-release.json"))
+		if statErr != nil || !info.Mode().IsRegular() || readJSON(filepath.Join(vdir, "review-release.json"), &release) != nil ||
+			targetIdentity == nil || release.ProjectID != targetIdentity.Source.ProjectID ||
+			release.DatasetID != targetIdentity.DatasetID || release.SnapshotID != targetIdentity.Source.SnapshotID ||
+			release.PatchID == "" || len(release.DecisionsSHA256) != 64 {
+			return "", fmt.Errorf("promote: review release marker is missing or differs from candidate")
+		}
 	}
 	current := filepath.Join(dataset, "current")
 	if t, rerr := os.Readlink(current); rerr == nil {
@@ -186,6 +285,9 @@ func Rollback(dataset, version string) error {
 // GateOptions parameterizes the pre-promote gate suite.
 type GateOptions struct {
 	ExternalOrigins []CaptureOrigin
+	// HoldForReview keeps a fully gated immutable candidate off current until
+	// an explicit patch decision workflow promotes it.
+	HoldForReview bool
 	// GraphBin is the graph CLI for the validate/audit gates (default "ckg").
 	GraphBin string
 	// Src is the source tree; when set the (soft) ckg audit gate runs.
@@ -473,6 +575,24 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 			return fmt.Errorf("reindex: remove temporary build tree: %w", err)
 		}
 		buildCleanup = nil
+	}
+	if gopt.HoldForReview {
+		base := ""
+		if current, err := os.Readlink(filepath.Join(dataset, "current")); err == nil {
+			base = current
+		} else if !os.IsNotExist(err) {
+			return fmt.Errorf("reindex: inspect current before review hold: %w", err)
+		}
+		if err := writeJSONAtomic(filepath.Join(vo.Out, "review-hold.json"), map[string]string{
+			"project_id": captured.Identity.ProjectID, "dataset_id": gopt.ExpectedDatasetID,
+			"snapshot_id": captured.Identity.SnapshotID, "base_version": base}); err != nil {
+			return fmt.Errorf("reindex: record review hold: %w", err)
+		}
+		if emit != nil {
+			emit(Event{Time: time.Now().UTC(), Step: "reindex-review", Type: "done",
+				Message: fmt.Sprintf("validated %s; held for explicit review", version)})
+		}
+		return nil
 	}
 
 	prev, err := Promote(dataset, version)

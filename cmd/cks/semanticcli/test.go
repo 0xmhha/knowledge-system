@@ -10,7 +10,7 @@ import (
 )
 
 func newTestCmd() *cobra.Command {
-	var project, repo, graph, vector, storePath, criterion, testCanonicalID, output string
+	var project, repo, graph, vector, storePath, criterion, testCanonicalID, output, datasetID, versionDir string
 	var goTestExact bool
 	cmd := &cobra.Command{
 		Use:   "test --project-id ID --repo DIR --graph DIR --vector DIR --store DB --criterion-id ID --out FILE [--go-test-exact | -- COMMAND [ARGS...]]",
@@ -28,7 +28,15 @@ func newTestCmd() *cobra.Command {
 				return err
 			}
 			defer store.Close()
-			active, err := store.CurrentAligned(cmd.Context(), project, repo, graph, vector)
+			var active semantic.ActiveProjection
+			if datasetID != "" || versionDir != "" {
+				if datasetID == "" || versionDir == "" {
+					return fmt.Errorf("--dataset-id and --version-dir must be used together")
+				}
+				active, err = store.LoadAlignedRetained(cmd.Context(), project, datasetID, repo, graph, vector, versionDir)
+			} else {
+				active, err = store.CurrentAligned(cmd.Context(), project, repo, graph, vector)
+			}
 			if err != nil {
 				return err
 			}
@@ -66,6 +74,8 @@ func newTestCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&goTestExact, "go-test-exact", false, "derive one Go test from the reviewed CKG anchor and require its go test -json run/pass events")
+	cmd.Flags().StringVar(&datasetID, "dataset-id", "", "reviewed candidate dataset ID (requires --version-dir)")
+	cmd.Flags().StringVar(&versionDir, "version-dir", "", "held candidate with retained source archive")
 	for _, flag := range []struct {
 		name   string
 		target *string

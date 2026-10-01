@@ -255,3 +255,25 @@ func (s *Store) ActivateAlignedRetained(ctx context.Context, projectID, datasetI
 	}
 	return s.Activate(ctx, projectID, datasetID)
 }
+
+// LoadAlignedRetained opens a reviewed candidate without changing the active
+// semantic pointer. Patch tests run here before the dataset is promoted.
+func (s *Store) LoadAlignedRetained(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir, versionDir string) (ActiveProjection, error) {
+	p, err := s.Load(ctx, projectID, datasetID)
+	if err != nil {
+		return ActiveProjection{}, err
+	}
+	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
+		return ActiveProjection{}, err
+	}
+	if err := ValidateCodeAnchors(p, graphDir); err != nil {
+		return ActiveProjection{}, err
+	}
+	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
+		return ActiveProjection{}, err
+	}
+	if err := p.ValidateRetainedSources(versionDir); err != nil {
+		return ActiveProjection{}, err
+	}
+	return ActiveProjection{projection: p}, nil
+}

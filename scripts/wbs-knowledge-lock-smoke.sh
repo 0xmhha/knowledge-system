@@ -96,6 +96,17 @@ MD
 "$repo_root/bin/cks" knowledge review --project-root "$src" > "$scratch/review-3.json"
 "$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
   --source-mode snapshot-only --version third --embedder mock > "$scratch/third.log" 2>&1
+printf '\n# Patch candidate\n' >> "$src/README.md"
+"$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
+  --source-mode snapshot-only --version held --embedder mock --hold-for-review \
+  --gate-test-bin true > "$scratch/held.log" 2>&1
+"$repo_root/bin/cks" patch --dataset "$data" --patch-id fixture-change register --version held > "$scratch/patch.json"
+if "$repo_root/bin/cks" patch --dataset "$data" --patch-id fixture-change promote --semantic-store "$scratch/missing-semantic.db" > "$scratch/patch-premature.log" 2>&1; then
+  echo "unreviewed patch was promoted" >&2; exit 1
+fi
+if "$repo_root/bin/cks" setup --out "$data" --rollback held > "$scratch/held-rollback.log" 2>&1; then
+  echo "held candidate bypassed review through rollback" >&2; exit 1
+fi
 "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-archived.json"
 printf 'status: proposed\n' > "$src/.cks/knowledge/policies/BR-17.yaml"
 "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-after-edit.json"
@@ -113,6 +124,9 @@ assert first['dataset_id'] != second['dataset_id']
 assert first['source']['snapshot_id'] != second['source']['snapshot_id']
 assert second['dataset_id'] != third['dataset_id']
 assert (data/'current').resolve() == (data/'third').resolve()
+assert json.loads((data/'held'/'review-hold.json').read_text())['base_version'] == 'third'
+patch = json.loads((scratch/'patch.json').read_text())
+assert patch['state'] == 'unconfirmed' and any(f['path'] == 'README.md' for f in patch['changed_files'])
 assert not (data/'stale').exists()
 assert json.loads((scratch/'validate-1.json').read_text())['status'] == 'locked'
 assert json.loads((scratch/'lock-1.json').read_text())['lock_digest'] != json.loads((scratch/'lock-2.json').read_text())['lock_digest']

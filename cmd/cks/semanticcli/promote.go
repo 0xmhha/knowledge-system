@@ -14,7 +14,7 @@ import (
 )
 
 func newPromoteCmd() *cobra.Command {
-	var input, repo, graph, vector, storePath string
+	var input, repo, graph, vector, storePath, versionDir string
 	var minimumCoverage float64
 	var activate bool
 	cmd := &cobra.Command{
@@ -38,7 +38,11 @@ func newPromoteCmd() *cobra.Command {
 			if err := semantic.ValidateCodeAnchors(p, graph); err != nil {
 				return err
 			}
-			if err := p.ValidateSources(cmd.Context(), root); err != nil {
+			validateSource := func() error { return p.ValidateSources(cmd.Context(), root) }
+			if versionDir != "" {
+				validateSource = func() error { return p.ValidateRetainedSources(versionDir) }
+			}
+			if err := validateSource(); err != nil {
 				return err
 			}
 			store, err := semantic.OpenStore(storePath)
@@ -46,11 +50,23 @@ func newPromoteCmd() *cobra.Command {
 				return err
 			}
 			defer store.Close()
-			if err := store.PutAligned(cmd.Context(), p, root, graph, vector); err != nil {
+			put := func() error { return store.PutAligned(cmd.Context(), p, root, graph, vector) }
+			if versionDir != "" {
+				put = func() error { return store.PutAlignedRetained(cmd.Context(), p, root, graph, vector, versionDir) }
+			}
+			if err := put(); err != nil {
 				return err
 			}
 			if activate {
-				if err := store.ActivateAligned(cmd.Context(), p.Snapshot.ProjectID, p.Snapshot.DatasetID, root, graph, vector); err != nil {
+				activateCandidate := func() error {
+					return store.ActivateAligned(cmd.Context(), p.Snapshot.ProjectID, p.Snapshot.DatasetID, root, graph, vector)
+				}
+				if versionDir != "" {
+					activateCandidate = func() error {
+						return store.ActivateAlignedRetained(cmd.Context(), p.Snapshot.ProjectID, p.Snapshot.DatasetID, root, graph, vector, versionDir)
+					}
+				}
+				if err := activateCandidate(); err != nil {
 					return err
 				}
 			}
@@ -66,6 +82,7 @@ func newPromoteCmd() *cobra.Command {
 	cmd.Flags().StringVar(&graph, "graph", "", "CKG data directory")
 	cmd.Flags().StringVar(&vector, "vector", "", "CKV data directory")
 	cmd.Flags().StringVar(&storePath, "store", "", "CKS semantic SQLite path")
+	cmd.Flags().StringVar(&versionDir, "version-dir", "", "pinned retained source candidate for mutable or held projection review")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
 	for _, flag := range []string{"input", "repo", "graph", "vector", "store"} {
