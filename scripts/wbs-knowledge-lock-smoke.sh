@@ -155,6 +155,13 @@ if "$repo_root/bin/cks" setup --out "$data" --rollback held > "$scratch/held-rol
   echo "held candidate bypassed review through rollback" >&2; exit 1
 fi
 "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-archived.json"
+"$repo_root/bin/cks" knowledge review record --project-root "$src" --version-dir "$data/third" \
+  --kind decision --id ADR-1 --decision verified --reviewer fixture-reviewer \
+  --reason "Compared the retained ADR with the policy and alternatives." > "$scratch/review-record.json"
+"$repo_root/bin/cks" knowledge lock --project-root "$src" > "$scratch/lock-4.json"
+"$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
+  --source-mode snapshot-only --version fourth --embedder mock > "$scratch/fourth.log" 2>&1
+"$repo_root/bin/cks" knowledge review --version-dir "$data/fourth" > "$scratch/review-fourth.json"
 printf 'status: proposed\n' > "$src/.cks/knowledge/policies/BR-17.yaml"
 "$repo_root/bin/cks" knowledge review --version-dir "$data/third" > "$scratch/review-after-edit.json"
 python3 - "$data" "$scratch" <<'PY'
@@ -170,7 +177,7 @@ assert (data/'third'/'sources'/'blobs'/pack_files[0]['sha256']).read_bytes() == 
 assert first['dataset_id'] != second['dataset_id']
 assert first['source']['snapshot_id'] != second['source']['snapshot_id']
 assert second['dataset_id'] != third['dataset_id']
-assert (data/'current').resolve() == (data/'third').resolve()
+assert (data/'current').resolve() == (data/'fourth').resolve()
 assert json.loads((data/'held'/'review-hold.json').read_text())['base_version'] == 'third'
 patch = json.loads((scratch/'patch.json').read_text())
 assert patch['state'] == 'unconfirmed' and any(f['path'] == 'README.md' for f in patch['changed_files'])
@@ -186,6 +193,10 @@ assert len(review['items']) == 4
 assert len(review['conflicts']) == 1
 assert any(item['id'] == 'ADR-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
 assert any(item['id'] == 'REL-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
+fourth = json.loads((scratch/'review-fourth.json').read_text())
+assert any(item['id'] == 'ADR-1' and item['status'] == 'verified' and item['reviewed_by'] == 'fixture-reviewer' for item in fourth['items'])
+assert json.loads((scratch/'review-record.json').read_text())['needs_relock'] is True
+assert json.loads((scratch/'lock-4.json').read_text())['lock_digest'] != json.loads((scratch/'lock-3.json').read_text())['lock_digest']
 PY
 python3 - "$data/third" <<'PY'
 import json, pathlib, sys

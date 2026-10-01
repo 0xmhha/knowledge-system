@@ -123,11 +123,7 @@ func BuildLock(projectRoot string) (Lock, error) {
 	if err != nil {
 		return Lock{}, err
 	}
-	instances, err := LoadInstances(root, ordered)
-	if err != nil {
-		return Lock{}, err
-	}
-	if err := enforceReviewPolicy(m, instances); err != nil {
+	if _, err := LoadInstancesWithReviewPolicy(root, ordered, m.ReviewPolicy.MinApprovals); err != nil {
 		return Lock{}, err
 	}
 	lock := Lock{ProjectID: m.ProjectID, PackSchemaVersion: 1, Packs: []LockedPack{}, OverlayDigest: overlayDigest}
@@ -216,36 +212,11 @@ func LoadProjectInstances(projectRoot string) (Instances, error) {
 	if err != nil {
 		return Instances{}, err
 	}
-	instances, err := LoadInstances(overlay, ordered)
+	instances, err := LoadInstancesWithReviewPolicy(overlay, ordered, m.ReviewPolicy.MinApprovals)
 	if err != nil {
 		return Instances{}, err
 	}
-	if err := enforceReviewPolicy(m, instances); err != nil {
-		return Instances{}, err
-	}
 	return instances, nil
-}
-
-func enforceReviewPolicy(m Manifest, instances Instances) error {
-	if m.ReviewPolicy == nil || m.ReviewPolicy.MinApprovals <= 1 {
-		return nil
-	}
-	for _, p := range instances.Policies {
-		if p.Status == "verified" {
-			return fmt.Errorf("evidence_unverified: policy %q has fewer than %d independent approvals", p.ID, m.ReviewPolicy.MinApprovals)
-		}
-	}
-	for _, d := range instances.Decisions {
-		if d.Status == "verified" {
-			return fmt.Errorf("evidence_unverified: decision %q has fewer than %d independent approvals", d.ID, m.ReviewPolicy.MinApprovals)
-		}
-	}
-	for _, relation := range instances.Relations {
-		if relation.Status == "verified" {
-			return fmt.Errorf("evidence_unverified: relation %q has fewer than %d independent approvals", relation.ID, m.ReviewPolicy.MinApprovals)
-		}
-	}
-	return nil
 }
 
 // LoadRegisteredPack permits a CLI to calculate the exact local pack digest

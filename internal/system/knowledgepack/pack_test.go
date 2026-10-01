@@ -60,9 +60,8 @@ func TestResolveRejectsCoreRedefinitionMissingAndCycle(t *testing.T) {
 }
 
 func TestMultipleApprovalPolicyDoesNotTreatInlineReviewerAsQuorum(t *testing.T) {
-	m := Manifest{ReviewPolicy: &ReviewPolicy{MinApprovals: 2}}
 	instances := Instances{Policies: []Policy{{ID: "BR-1", Status: "verified", ReviewedBy: "one-reviewer"}}}
-	if err := enforceReviewPolicy(m, instances); err == nil || !strings.Contains(err.Error(), "fewer than 2") {
+	if err := applyReviewRecords(t.TempDir(), &instances, 2); err == nil || !strings.Contains(err.Error(), "multi-reviewer quorum") {
 		t.Fatalf("one reviewer passed two-person quorum: %v", err)
 	}
 }
