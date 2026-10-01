@@ -129,10 +129,27 @@ func gitOutput(dir string, args ...string) (string, error) {
 func NewCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:                "setup",
+		Aliases:            []string{"index"},
 		Short:              "Build a knowledge dataset (graph + vector + verification)",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSetup(args)
+		},
+	}
+}
+
+// NewRollbackCmd exposes the existing checked pointer transition as a direct
+// operator command. It shares the setup parser and its project/dataset guards.
+func NewRollbackCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:                "rollback VERSION",
+		Short:              "Switch current to a previously verified dataset version",
+		DisableFlagParsing: true,
+		RunE: func(_ *cobra.Command, args []string) error {
+			if len(args) == 0 || strings.HasPrefix(args[0], "-") {
+				return fmt.Errorf("rollback requires VERSION before setup flags")
+			}
+			return runSetup(append(args[1:], "--rollback", args[0]))
 		},
 	}
 }

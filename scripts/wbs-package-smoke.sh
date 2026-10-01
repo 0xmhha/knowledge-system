@@ -37,8 +37,10 @@ for name in ('ckg', 'ckv', 'cks'):
     binary = stage / name
     assert binary.is_file() and binary.stat().st_mode & 0o111, name
     assert hashlib.sha256(binary.read_bytes()).hexdigest() == manifest['binaries'][name]['sha256'], name
-for name in ('LICENSE', 'INSTALLATION.md', 'modules.txt', 'policies/sanitization_rules.yaml'):
+for name in ('LICENSE', 'INSTALLATION.md', 'modules.txt', 'policies/sanitization_rules.yaml', 'third-party-licenses.json'):
     assert (stage / name).is_file(), name
+inventory = json.loads((stage / 'third-party-licenses.json').read_text())
+assert inventory['modules'] and manifest['third_party_license_inventory']['module_count'] == len(inventory['modules'])
 print(stage)
 PY
 )"

@@ -13,9 +13,15 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 from pathlib import Path
+
+# Packaging must not create __pycache__ inside the source tree before its
+# clean-check, including the local license inventory helper import below.
+sys.dont_write_bytecode = True
+from license_inventory import collect as collect_licenses
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -55,7 +61,7 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
         raise RuntimeError(f"build-bins failed:\n{build.stdout}{build.stderr}")
     commit = run("git", "rev-parse", "HEAD")
     system = platform.system().lower()
-    machine = platform.machine().lower()
+    machine = {"aarch64": "arm64", "x86_64": "amd64"}.get(platform.machine().lower(), platform.machine().lower())
     name = f"knowledge-system-{system}-{machine}-{commit[:12]}"
     if dirty:
         name += "-dirty-preview"
@@ -95,6 +101,8 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
         # binary and works offline even when unused go.sum modules are absent.
         module_info = "\n".join(run("go", "version", "-m", str(stage / name)) for name in BINARIES)
         (stage / "modules.txt").write_text(module_info + "\n")
+        metadata["third_party_license_inventory"] = collect_licenses(
+            module_info, Path(run("go", "env", "GOMODCACHE")), stage)
         (stage / "manifest.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
         with archive.open("wb") as raw:
             with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as zipped:

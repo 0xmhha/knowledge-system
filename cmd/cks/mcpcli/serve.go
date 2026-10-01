@@ -85,9 +85,10 @@ func NewCmd(version string) *cobra.Command {
 		portOverride     string
 	)
 	mcpCmd := &cobra.Command{
-		Use:   "mcp",
-		Short: "Serve the fused knowledge MCP server (foreground)",
-		Args:  cobra.NoArgs,
+		Use:     "mcp",
+		Aliases: []string{"serve"},
+		Short:   "Serve the fused knowledge MCP server (foreground)",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()

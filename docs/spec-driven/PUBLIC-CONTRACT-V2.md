@@ -1,6 +1,6 @@
 # CKS v1/v2 공개 계약과 호환 골든
 
-상태: 설계 계약과 부분 구현. 별도 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 선택 팩의 외부 origin 보관·인용과 명시적으로 요청한 공개 정책 의미 오버레이도 구현했다. 그래프 오버레이, ADR/요구/테스트 관계, 전체 오류 봉투와 소비자 재생은 아직 수용 전이다. 이 문서는 `END-TO-END-DESIGN.md` 7절의 직렬화와 버전 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
+상태: 설계 계약과 부분 구현. 별도 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 선택 팩의 외부 origin 보관·인용과 명시적으로 요청한 공개 정책·ADR 의미 오버레이도 구현했다. 그래프 오버레이, ADR→요구→테스트의 검증된 관계, 전체 오류 봉투와 소비자 재생은 아직 수용 전이다. 이 문서는 `END-TO-END-DESIGN.md` 7절의 직렬화와 버전 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
 
 ## 버전 선택
 
@@ -54,7 +54,7 @@ v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start
 
 사용자가 도메인 팩을 선택하고 검토된 프로젝트 정책/결정이 존재하면 명시 v2 응답의 `semantic.knowledge_context`에 `{state, lock_digest, applicable_policies, decisions, constraints, related_requirements, test_links, unknowns, conflicts}`를 싣는다. 각 항목은 안정 타입/ID와 상태, 적용 범위, **같은 응답의 v2 인용 좌표**로 검증할 수 있는 출처 참조만 가진다. 본문은 권한/정화 검사를 거친 `bodies`/인용 경로로만 노출한다. `state=complete`는 이 문맥의 근거 무결성을 뜻하며 업무 정답을 보증하지 않는다. `unknown|conflict|stale|restricted|budget_exceeded` 항목은 확정 이유나 정책 준수로 직렬화하지 않는다. `semantic` 전체가 위 `sha256-v2` 해시 범위에 든다. 팩 미설치 또는 기능 꺼짐은 `semantic=null`을 허용하며 기존 후보·v1 DTO/해시는 유지한다. 정확 필드/상태 규칙은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다.
 
-현재 실행되는 선택형 정책 경로는 MCP 입력 `include_knowledge=true`, `knowledge_as_of=YYYY-MM-DD`, `knowledge_subsystem=<명시 범위>`를 요구한다. 정책 원문은 보관본 전체 파일 범위로 인용하고 정화 후 `bodies`에 둔다. 공개 가능하고 검토된 정책만 `applicable_policies`에 넣으며 `conflict`, `restricted`, `stale`, `unknown`, `budget_exceeded`, `unavailable`을 확정 답으로 취급하지 않는다. 오류 시 기존 코드 인용을 유지한다. `decisions`, `related_requirements`, `test_links`는 아직 빈 배열이며, 조직 인증/권한 어댑터나 자연어 범위 추론이 구현됐다는 뜻은 아니다.
+현재 실행되는 선택형 정책 경로는 MCP 입력 `include_knowledge=true`, `knowledge_as_of=YYYY-MM-DD`, `knowledge_subsystem=<명시 범위>`를 요구한다. 정책 원문은 보관본 전체 파일 범위로 인용하고 정화 후 `bodies`에 둔다. 공개 가능하고 검토된 정책만 `applicable_policies`에 넣으며 `conflict`, `restricted`, `stale`, `unknown`, `budget_exceeded`, `unavailable`을 확정 답으로 취급하지 않는다. 오류 시 기존 코드 인용을 유지한다. `decisions`에는 같은 보관본의 검토된 공개 ADR을 날짜·범위·대체 관계에 따라 인용할 수 있다. `related_requirements`와 `test_links`는 검증된 관계가 없으면 빈 배열이다. 조직 인증/권한 어댑터나 자연어 범위 추론이 구현됐다는 뜻은 아니다.
 
 ## 오류와 마이그레이션
 

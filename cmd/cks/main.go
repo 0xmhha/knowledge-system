@@ -26,6 +26,7 @@ import (
 	"github.com/0xmhha/knowledge-system/cmd/cks/filelistcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/knowledgecli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/mcpcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/packagecli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/patchcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/semanticcli"
 	"github.com/0xmhha/knowledge-system/cmd/cks/setupcli"
@@ -50,9 +51,11 @@ func main() {
 	root.AddCommand(domaincli.NewCmd())
 	root.AddCommand(knowledgecli.NewCmd())
 	root.AddCommand(patchcli.NewCmd())
+	root.AddCommand(packagecli.NewCmd())
 	root.AddCommand(agentcli.NewCmd())
 	root.AddCommand(evalcli.NewCmd())
 	root.AddCommand(setupcli.NewCmd())
+	root.AddCommand(setupcli.NewRollbackCmd())
 	root.AddCommand(semanticcli.NewCmd())
 	root.AddCommand(doctorcli.NewCmd())
 	root.AddCommand(doctorcli.NewInitCmd())

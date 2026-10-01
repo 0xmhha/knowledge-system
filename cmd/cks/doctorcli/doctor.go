@@ -44,7 +44,7 @@ type Report struct {
 func NewCmd() *cobra.Command {
 	var src, dataset string
 	var strict bool
-	cmd := &cobra.Command{Use: "doctor", Short: "Inspect a project and its active graph/vector dataset",
+	cmd := &cobra.Command{Use: "doctor", Aliases: []string{"status"}, Short: "Inspect a project and its active graph/vector dataset",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			report, err := Inspect(src, dataset)
