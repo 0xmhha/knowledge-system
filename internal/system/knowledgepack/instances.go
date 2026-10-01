@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -18,6 +19,8 @@ type SourceRef struct {
 	OriginID string `yaml:"origin_id" json:"origin_id"`
 	Path     string `yaml:"path" json:"path"`
 }
+
+var instanceIDPattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9._:-]{0,127}$`)
 
 type Policy struct {
 	ID            string            `yaml:"id" json:"id"`
@@ -81,6 +84,66 @@ type PolicyContext struct {
 	Applicable []PolicySummary `json:"applicable"`
 	Conflicts  []Conflict      `json:"conflicts"`
 	Unknowns   []string        `json:"unknowns"`
+}
+
+type DecisionSummary struct {
+	ID             string    `json:"id"`
+	State          string    `json:"state"`
+	SourceRef      SourceRef `json:"source_ref"`
+	ReviewedBy     string    `json:"reviewed_by"`
+	Date           string    `json:"date"`
+	RequirementIDs []string  `json:"requirement_ids"`
+}
+
+type DecisionContext struct {
+	State      string            `json:"state"`
+	Applicable []DecisionSummary `json:"applicable"`
+	Unknowns   []string          `json:"unknowns"`
+}
+
+// SelectDecisions exposes only reviewed, public, in-scope ADRs that existed
+// on the requested date. A reviewed successor removes its predecessor; a
+// hidden successor suppresses the whole decision context to avoid revealing
+// a stale rationale as if it were still current.
+func (i Instances) SelectDecisions(asOf string, queryScope map[string]string, allowRestricted bool) (DecisionContext, error) {
+	if !validDate(asOf) {
+		return DecisionContext{}, fmt.Errorf("invalid decision query date")
+	}
+	result := DecisionContext{State: "unknown", Applicable: []DecisionSummary{}, Unknowns: []string{}}
+	superseded := map[string]bool{}
+	restricted := false
+	for _, decision := range i.Decisions {
+		if decision.Status != "verified" || decision.Date > asOf || !policyScopeMatches(decision.Scope, queryScope) {
+			continue
+		}
+		if decision.Supersedes != "" {
+			superseded[decision.Supersedes] = true
+		}
+		if decision.Visibility == "restricted" && !allowRestricted {
+			restricted = true
+		}
+	}
+	if restricted {
+		result.State = "restricted"
+		result.Unknowns = append(result.Unknowns, "restricted_decision")
+		return result, nil
+	}
+	for _, decision := range i.Decisions {
+		if decision.Status != "verified" || decision.Date > asOf || superseded[decision.ID] ||
+			!policyScopeMatches(decision.Scope, queryScope) {
+			continue
+		}
+		result.Applicable = append(result.Applicable, DecisionSummary{ID: decision.ID, State: "current",
+			SourceRef: decision.SourceRef, ReviewedBy: decision.ReviewedBy, Date: decision.Date,
+			RequirementIDs: append([]string(nil), decision.RequirementIDs...)})
+	}
+	sort.Slice(result.Applicable, func(a, b int) bool { return result.Applicable[a].ID < result.Applicable[b].ID })
+	if len(result.Applicable) > 0 {
+		result.State = "needs_citation"
+	} else {
+		result.Unknowns = append(result.Unknowns, "no_reviewed_applicable_decision")
+	}
+	return result, nil
 }
 
 // SelectPolicies applies only reviewed, in-scope, in-time policy records.
@@ -220,6 +283,20 @@ func LoadInstances(overlayRoot string, packs []LoadedPack) (Instances, error) {
 	}); err != nil {
 		return Instances{}, err
 	}
+	decisionByID := map[string]Decision{}
+	for _, decision := range result.Decisions {
+		decisionByID[decision.ID] = decision
+	}
+	for _, decision := range result.Decisions {
+		if decision.Supersedes == "" {
+			continue
+		}
+		prior, ok := decisionByID[decision.Supersedes]
+		if !ok || prior.ID == decision.ID || decision.Date == "" || prior.Date == "" ||
+			decision.Date <= prior.Date || !scopeOverlaps(decision.Scope, prior.Scope) {
+			return Instances{}, fmt.Errorf("evidence_unverified: invalid ADR supersedes reference %q", decision.Supersedes)
+		}
+	}
 	byID := map[string]Policy{}
 	for _, p := range result.Policies {
 		byID[p.ID] = p
@@ -297,15 +374,20 @@ func validSource(ref SourceRef, path string) bool {
 }
 
 func validatePolicy(p Policy, path string, types map[TypeRef]bool) error {
-	if p.ID == "" || !types[p.Type] || strings.TrimSpace(p.Statement) == "" ||
+	if !instanceIDPattern.MatchString(p.ID) || !types[p.Type] || strings.TrimSpace(p.Statement) == "" ||
 		strings.TrimSpace(p.Owner) == "" || len(p.Scope) == 0 || !validSource(p.SourceRef, path) ||
 		!validReview(p.Status, p.ReviewedBy, p.ReviewReason) ||
 		(p.Visibility != "public" && p.Visibility != "restricted") {
 		return fmt.Errorf("evidence_unverified: invalid policy %q", path)
 	}
 	for key, value := range p.Scope {
-		if strings.TrimSpace(key) == "" || strings.TrimSpace(value) == "" {
+		if !instanceIDPattern.MatchString(key) || strings.TrimSpace(value) == "" || len(value) > 128 {
 			return fmt.Errorf("evidence_unverified: empty policy scope")
+		}
+	}
+	for _, id := range p.ConflictsWith {
+		if !instanceIDPattern.MatchString(id) {
+			return fmt.Errorf("evidence_unverified: invalid policy conflict ID")
 		}
 	}
 	if p.EffectiveFrom != "" && !validDate(p.EffectiveFrom) || p.EffectiveTo != "" && !validDate(p.EffectiveTo) ||
@@ -317,7 +399,7 @@ func validatePolicy(p Policy, path string, types map[TypeRef]bool) error {
 }
 
 func validateDecision(d Decision, path string, types map[TypeRef]bool) error {
-	if d.ID == "" || !types[d.Type] || strings.TrimSpace(d.Problem) == "" ||
+	if !instanceIDPattern.MatchString(d.ID) || !types[d.Type] || strings.TrimSpace(d.Problem) == "" ||
 		strings.TrimSpace(d.Decision) == "" || strings.TrimSpace(d.Rationale) == "" ||
 		len(d.Alternatives) == 0 || len(d.Scope) == 0 || !validSource(d.SourceRef, path) ||
 		!validReview(d.Status, d.ReviewedBy, d.ReviewReason) ||
@@ -326,6 +408,19 @@ func validateDecision(d Decision, path string, types map[TypeRef]bool) error {
 	}
 	if d.Date != "" && !validDate(d.Date) || d.Status == "verified" && d.Date == "" {
 		return fmt.Errorf("evidence_unverified: invalid decision date")
+	}
+	if d.Supersedes != "" && !instanceIDPattern.MatchString(d.Supersedes) {
+		return fmt.Errorf("evidence_unverified: invalid ADR predecessor ID")
+	}
+	for _, id := range d.RequirementIDs {
+		if !instanceIDPattern.MatchString(id) {
+			return fmt.Errorf("evidence_unverified: invalid ADR requirement ID")
+		}
+	}
+	for key, value := range d.Scope {
+		if !instanceIDPattern.MatchString(key) || strings.TrimSpace(value) == "" || len(value) > 128 {
+			return fmt.Errorf("evidence_unverified: invalid ADR scope")
+		}
 	}
 	return nil
 }

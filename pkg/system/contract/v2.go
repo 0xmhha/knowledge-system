@@ -72,9 +72,12 @@ type KnowledgePolicyV2 struct {
 }
 
 type KnowledgeDecisionV2 struct {
-	ID       string     `json:"id"`
-	State    string     `json:"state"`
-	Citation CitationV2 `json:"citation"`
+	ID             string     `json:"id"`
+	State          string     `json:"state"`
+	ReviewedBy     string     `json:"reviewed_by"`
+	Date           string     `json:"date"`
+	RequirementIDs []string   `json:"requirement_ids"`
+	Citation       CitationV2 `json:"citation"`
 }
 
 type KnowledgeConflictV2 struct {

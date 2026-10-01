@@ -12,7 +12,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// AttachKnowledge adds only explicitly scoped, reviewed policy evidence.
+// AttachKnowledge adds only explicitly scoped, reviewed policy and ADR evidence.
 // Failure in the optional layer preserves the base CKV/CKG candidates and
 // records uncertainty instead of substituting a policy-shaped answer.
 func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionDir, asOf, subsystem string, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
@@ -36,40 +36,60 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	if err != nil {
 		return contract.EvidencePackV2{}, err
 	}
+	decisions, err := instances.SelectDecisions(asOf, map[string]string{"subsystem": subsystem}, false)
+	if err != nil {
+		return contract.EvidencePackV2{}, err
+	}
 	k := emptyKnowledgeContext(selected.State, lock.LockDigest)
 	k.Unknowns = append(k.Unknowns, selected.Unknowns...)
+	k.Unknowns = append(k.Unknowns, decisions.Unknowns...)
 	for _, conflict := range selected.Conflicts {
 		k.Conflicts = append(k.Conflicts, contract.KnowledgeConflictV2{
 			LeftID: conflict.LeftID, RightID: conflict.RightID, Reason: conflict.Reason})
 	}
-	if selected.State == "restricted" || len(selected.Applicable) == 0 {
+	if decisions.State == "restricted" {
+		k.State = "restricted"
+		k.Conflicts = nil
+	}
+	if k.State == "restricted" || len(selected.Applicable)+len(decisions.Applicable) == 0 {
 		base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k}
 		if err := Stamp(&base); err != nil {
 			return contract.EvidencePackV2{}, err
 		}
 		return base, nil
 	}
-	if len(base.Citations)+len(selected.Applicable) > 12 {
+	if len(base.Citations)+len(selected.Applicable)+len(decisions.Applicable) > 12 {
 		return knowledgeUnavailable(base, "knowledge_citation_budget", lock.LockDigest)
 	}
-	refs := make([]Ref, 0, len(selected.Applicable))
-	for _, p := range selected.Applicable {
-		if p.SourceRef.OriginID != "repo" {
-			return knowledgeUnavailable(base, "unsupported_policy_origin", lock.LockDigest)
+	refs := make([]Ref, 0, len(selected.Applicable)+len(decisions.Applicable))
+	appendRef := func(source knowledgepack.SourceRef) error {
+		if source.OriginID != "repo" {
+			return fmt.Errorf("unsupported knowledge origin")
 		}
-		buf, _, _, err := setup.ReadRetainedFile(versionDir, p.SourceRef.OriginID, p.SourceRef.Path)
+		buf, _, _, err := setup.ReadRetainedFile(versionDir, source.OriginID, source.Path)
 		if err != nil {
-			return knowledgeUnavailable(base, "knowledge_source_unavailable", lock.LockDigest)
+			return err
 		}
 		lines := bytes.Count(buf, []byte{'\n'})
 		if len(buf) > 0 && buf[len(buf)-1] != '\n' {
 			lines++
 		}
 		if lines == 0 {
-			return knowledgeUnavailable(base, "knowledge_source_empty", lock.LockDigest)
+			return fmt.Errorf("empty knowledge source")
 		}
-		refs = append(refs, Ref{OriginID: p.SourceRef.OriginID,
-			Citation: contract.Citation{File: p.SourceRef.Path, StartLine: 1, EndLine: lines}})
+		refs = append(refs, Ref{OriginID: source.OriginID,
+			Citation: contract.Citation{File: source.Path, StartLine: 1, EndLine: lines}})
+		return nil
+	}
+	for _, p := range selected.Applicable {
+		if err := appendRef(p.SourceRef); err != nil {
+			return knowledgeUnavailable(base, "knowledge_source_unavailable", lock.LockDigest)
+		}
+	}
+	for _, d := range decisions.Applicable {
+		if err := appendRef(d.SourceRef); err != nil {
+			return knowledgeUnavailable(base, "knowledge_source_unavailable", lock.LockDigest)
+		}
 	}
 	addition, err := BuildFromRefs(ctx, versionDir, base.Query, refs, cleaner)
 	if err != nil {
@@ -112,6 +132,16 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 		k.ApplicablePolicies = append(k.ApplicablePolicies, contract.KnowledgePolicyV2{
 			ID: p.ID, State: p.State, ReviewedBy: p.ReviewedBy,
 			EffectiveFrom: p.EffectiveFrom, EffectiveTo: p.EffectiveTo, Citation: addition.Citations[i]})
+	}
+	for i, d := range decisions.Applicable {
+		k.Decisions = append(k.Decisions, contract.KnowledgeDecisionV2{ID: d.ID, State: d.State,
+			ReviewedBy: d.ReviewedBy, Date: d.Date, RequirementIDs: append([]string{}, d.RequirementIDs...),
+			Citation: addition.Citations[len(selected.Applicable)+i]})
+	}
+	if selected.State == "unknown" || selected.State == "stale" {
+		if len(k.Decisions) > 0 {
+			k.State = "partial"
+		}
 	}
 	if k.State == "needs_citation" {
 		k.State = "complete"
@@ -178,7 +208,8 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 		ids[p.ID] = true
 	}
 	for _, d := range k.Decisions {
-		if d.ID == "" || ids[d.ID] || d.State != "current" || !citations[d.Citation] {
+		if d.ID == "" || ids[d.ID] || d.State != "current" || d.ReviewedBy == "" || d.Date == "" ||
+			!citations[d.Citation] || d.Citation.OriginID != "repo" {
 			return fmt.Errorf("v2 knowledge decision lacks unique archive citation")
 		}
 		ids[d.ID] = true
