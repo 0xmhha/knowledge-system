@@ -120,6 +120,10 @@ def ollama_identity(url, model):
         return None, "model_not_selected"
     exact = model if ":" in model else model + ":latest"
     try:
+        with urllib.request.urlopen(url.rstrip("/") + "/api/version", timeout=3) as response:
+            version = json.load(response).get("version")
+        if not isinstance(version, str) or not version:
+            return None, "ollama_version_invalid"
         with urllib.request.urlopen(url.rstrip("/") + "/api/tags", timeout=3) as response:
             tags = json.load(response).get("models", [])
         matches = [tag for tag in tags if tag.get("name") == exact]
@@ -140,7 +144,8 @@ def ollama_identity(url, model):
                 tag.get("digest") == matches[0]["digest"]]) != 1:
             return None, "model_digest_changed_during_probe"
         return {"provider": "ollama", "model": exact, "digest": matches[0]["digest"],
-                "dimension": len(vectors[0]), "endpoint": url}, None
+                "dimension": len(vectors[0]), "endpoint": url,
+                "server_version": version}, None
     except (OSError, ValueError, KeyError, urllib.error.URLError, json.JSONDecodeError):
         return None, "ollama_unavailable_or_probe_failed"
 

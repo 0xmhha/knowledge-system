@@ -24,6 +24,9 @@ class ModelHandler(BaseHTTPRequestHandler):
     drift = True
 
     def do_GET(self):
+        if self.path == "/api/version":
+            self.respond({"version": "fixture-1.0"})
+            return
         if self.path != "/api/tags":
             self.send_error(404)
             return
@@ -118,6 +121,7 @@ class PreflightTest(unittest.TestCase):
             self.assertIsNone(reason)
             self.assertEqual((model["model"], model["digest"], model["dimension"]),
                              ("fixture:latest", "a" * 64, 3))
+            self.assertEqual(model["server_version"], "fixture-1.0")
         finally:
             server.shutdown()
             server.server_close()
