@@ -4,13 +4,13 @@
 
 ## 이번 통합 실행
 
-기준 브랜치 `feat/spec-driven-knowledge-system`, 코드 검증 시점 HEAD `b54fc9c`. 이 보고서는 검증 뒤 추가했다. macOS arm64에서 다음을 다시 실행했다.
+기준 브랜치 `feat/spec-driven-knowledge-system`, 최근 코드 검증 시점 HEAD `6121523`. 이 보고서는 검증 뒤 갱신했다. macOS arm64에서 다음을 실행했다. 패키지 매트릭스는 이 커밋 이전의 구조 변경 시점에 시험했다.
 
 | 게이트 | 결과 | 판정 범위 |
 |---|---|---|
 | `go test ./...` | 통과 | 전체 Go 단위·통합 테스트 |
-| `go test -race ./internal/system/semantic ./internal/system/evidencev2 ./internal/system/knowledgepack ./internal/system/eval` | 통과 | 의미 투영·v2 인용·팩·평가 동시성 범위 |
-| `go vet ./...`, `make boundaries`, `make docs-check` | 통과 | 정적 검사, 엔진 경계, 102개 살아있는 문서의 CLI 계약 |
+| `go test -race ./internal/system/semantic ./internal/system/evidencev2 ./internal/system/knowledgepack ./internal/system/eval` 및 `./internal/setup ./internal/system/patch ./cmd/cks/doctorcli` | 통과 | 의미 투영·v2 인용·팩·평가·캡처·승격·상태 진단 동시성 범위 |
+| `go vet ./...`, `make boundaries`, `make docs-check` | 통과 | 정적 검사, 엔진 경계, 103개 살아있는 문서의 CLI 계약 |
 | `scripts/wbs-identity-smoke.sh` | 통과 | 실제 CKG/CKV/CKS 세 계층 신원 |
 | `scripts/wbs-source-modes-smoke.sh` | 통과 | Git 작업 트리·비Git 캡처, 빌드 중 변경 거부 |
 | `scripts/wbs-smoke.sh` | 통과 | 세 엔진 구성, CKV 청크·CKG 심볼·CKS 추적/테스트 |
@@ -40,6 +40,8 @@
 | A8 | 위 항목이 채워진 후 모든 수용 fixture와 마이그레이션·known limits 재실행 | 현재 통합 검사는 녹색이지만 선행 기능 게이트가 남아 있어 A8은 통과로 표시하지 않는다. |
 
 품질/지연/정답률은 **unmeasured**다. A 전체 완료, B/C 완료, 운영 릴리스 적합성을 선언하지 않는다.
+
+배포 의존성 확인: 현재 빌드가 사용하는 `github.com/asg017/sqlite-vec-go-bindings v0.1.6`의 모듈 소스에는 라이선스 파일이 없고 [Go Packages의 해당 버전](https://pkg.go.dev/github.com/asg017/sqlite-vec-go-bindings/cgo?tab=licenses)은 라이선스를 탐지하지 못한다. [상위 저장소의 현재 상태](https://github.com/asg017/sqlite-vec-go-bindings)는 MIT/Apache 파일을 보여 주지만, [누락 이슈](https://github.com/asg017/sqlite-vec-go-bindings/issues/8)가 열려 있다. 이 차이를 해소하거나, 라이선스 근거가 포함된 대체 의존성으로 전환하기 전까지 시험 서명 패키지를 운영 배포물로 선언하지 않는다.
 
 후속 변경: `cks` 최상위 실패 출력은 한 줄의 JSON `{code,message}`와 비정상 종료로 정규화했다. 알려진 오류 접두사를 안정 코드로 매핑하고, 중첩 오류의 원문·비밀·임시 경로를 공개 메시지에 복사하지 않는다. `cmd/cks` 단위 테스트와 지식 잠금/패치 스모크가 통과했다. 이 변경은 MCP v2의 구조화 오류 데이터와 모든 구 소비자 재생을 완료했다는 뜻이 아니다.
 
