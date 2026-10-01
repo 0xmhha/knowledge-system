@@ -16,13 +16,21 @@ func patchVersion(t *testing.T, source, dataset, version string) *setup.DatasetI
 	if err != nil {
 		t.Fatal(err)
 	}
+	expected, err := setup.NewDatasetIdentity(captured.Identity, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, side := range []string{"graph", "vector"} {
 		dir := filepath.Join(vdir, side)
 		if err := os.Mkdir(dir, 0o700); err != nil {
 			t.Fatal(err)
 		}
 		manifest := map[string]any{"src_root": source, "graph_digest": "graph", "schema_version": "1.23",
-			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space"}
+			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space",
+			"project_id": captured.Identity.ProjectID, "snapshot_id": captured.Identity.SnapshotID,
+			"dataset_id": expected.DatasetID, "source_mode": captured.Identity.SourceMode,
+			"file_manifest_digest":  captured.Identity.FileManifestDigest,
+			"capture_policy_digest": captured.Identity.CapturePolicyDigest}
 		data, _ := json.Marshal(manifest)
 		if err := os.WriteFile(filepath.Join(dir, "manifest.json"), data, 0o600); err != nil {
 			t.Fatal(err)

@@ -98,6 +98,17 @@ func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Packag
 	}
 	var out []*packages.Package
 	for _, modDir := range modDirs {
+		// A go.mod without any Go source is still a useful document-only
+		// project. Avoid invoking the external Go toolchain for that case.
+		// Modules with Go source keep the normal packages.Load path and must
+		// still fail when the toolchain is unavailable.
+		hasSource, err := moduleHasGoFiles(modDir)
+		if err != nil {
+			return nil, err
+		}
+		if !hasSource {
+			continue
+		}
 		pkgs, err := loadModule(modDir, mode)
 		if err != nil {
 			return nil, err
@@ -105,6 +116,30 @@ func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Packag
 		out = append(out, pkgs...)
 	}
 	return out, nil
+}
+
+func moduleHasGoFiles(modDir string) (bool, error) {
+	var found bool
+	err := filepath.WalkDir(modDir, func(p string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			if p != modDir && (d.Name() == "vendor" || d.Name() == "node_modules" || d.Name() == ".git" || d.Name() == "testdata") {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(d.Name(), ".go") {
+			found = true
+			return filepath.SkipAll
+		}
+		return nil
+	})
+	if err != nil {
+		return false, fmt.Errorf("walk Go source in %s: %w", modDir, err)
+	}
+	return found, nil
 }
 
 // findModuleDirs walks absRoot for every go.mod, returning the directories

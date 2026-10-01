@@ -37,13 +37,21 @@ func testVersion(t *testing.T, content string) (string, string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	identity, err := setup.NewDatasetIdentity(captured.Identity, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, side := range []string{"graph", "vector"} {
 		dir := filepath.Join(version, side)
 		if err := os.Mkdir(dir, 0o755); err != nil {
 			t.Fatal(err)
 		}
 		manifest := map[string]any{"src_root": root, "graph_digest": "graph", "schema_version": "1.23",
-			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space"}
+			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space",
+			"project_id": captured.Identity.ProjectID, "snapshot_id": captured.Identity.SnapshotID,
+			"dataset_id": identity.DatasetID, "source_mode": captured.Identity.SourceMode,
+			"file_manifest_digest":  captured.Identity.FileManifestDigest,
+			"capture_policy_digest": captured.Identity.CapturePolicyDigest}
 		buf, err := json.Marshal(manifest)
 		if err != nil {
 			t.Fatal(err)

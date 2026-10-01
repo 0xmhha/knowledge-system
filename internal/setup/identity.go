@@ -356,16 +356,14 @@ func PublishCandidateIdentity(versionDir string, source SourceIdentity, inputDig
 			"file_manifest_digest":  source.FileManifestDigest,
 			"capture_policy_digest": source.CapturePolicyDigest,
 		} {
-			if raw := manifest[key]; len(raw) > 0 {
-				var native string
-				if err := json.Unmarshal(raw, &native); err != nil || native != value {
-					return DatasetIdentity{}, fmt.Errorf("%s native %s differs from pre-build identity", engine, key)
-				}
+			raw := manifest[key]
+			if len(raw) == 0 {
+				return DatasetIdentity{}, fmt.Errorf("%s native %s missing from builder manifest", engine, key)
 			}
-			manifest[key], _ = json.Marshal(value)
-		}
-		if err := writeJSONAtomic(path, manifest); err != nil {
-			return DatasetIdentity{}, err
+			var native string
+			if err := json.Unmarshal(raw, &native); err != nil || native != value {
+				return DatasetIdentity{}, fmt.Errorf("%s native %s differs from pre-build identity", engine, key)
+			}
 		}
 	}
 	if err := writeJSONAtomic(filepath.Join(versionDir, "dataset-identity.json"), identity); err != nil {

@@ -205,15 +205,29 @@ func TestVerifyAlignmentRejectsPartialAndCrossProjectIdentity(t *testing.T) {
 
 func TestCandidateIdentityRequiresBothEnginePins(t *testing.T) {
 	version := t.TempDir()
-	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
+	source := SourceIdentity{ProjectID: "p-one", SourceMode: "committed", SourceCommit: "abc",
+		FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
+	source.SnapshotID = sourceSnapshotID(source)
+	space := json.RawMessage(`{"model":"mock","dim":8,"checksum":"provider=mock;model=mock;dim=8"}`)
+	prebuild, err := NewDatasetIdentity(source, space, "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pins := map[string]any{"project_id": source.ProjectID, "snapshot_id": source.SnapshotID,
+		"dataset_id": prebuild.DatasetID, "source_mode": source.SourceMode,
+		"file_manifest_digest": source.FileManifestDigest, "capture_policy_digest": source.CapturePolicyDigest}
+	graph := map[string]any{
 		"src_commit": "abc", "graph_digest": "g", "schema_version": "1.23",
-	})
-	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
+	}
+	vectorManifest := map[string]any{
 		"src_commit": "abc", "embedding_model": "mock", "embedding_dim": 8,
 		"embedding_checksum": "provider=mock;model=mock;dim=8",
-	})
-	source := SourceIdentity{ProjectID: "p-one", SourceMode: "committed", SourceCommit: "abc",
-		FileManifestDigest: strings.Repeat("a", 64), SnapshotID: strings.Repeat("b", 64)}
+	}
+	for key, value := range pins {
+		graph[key], vectorManifest[key] = value, value
+	}
+	writeManifest(t, filepath.Join(version, "graph"), graph)
+	writeManifest(t, filepath.Join(version, "vector"), vectorManifest)
 	identity, err := PublishCandidateIdentity(version, source, "inputs")
 	if err != nil || identity.DatasetID == "" {
 		t.Fatalf("publish identity: %+v, %v", identity, err)
@@ -221,6 +235,13 @@ func TestCandidateIdentityRequiresBothEnginePins(t *testing.T) {
 	if err := VerifyCandidateIdentity(version, source, "inputs"); err != nil {
 		t.Fatalf("candidate verification: %v", err)
 	}
+	delete(graph, "dataset_id")
+	writeManifest(t, filepath.Join(version, "graph"), graph)
+	if _, err := PublishCandidateIdentity(version, source, "inputs"); err == nil || !strings.Contains(err.Error(), "native dataset_id missing") {
+		t.Fatalf("missing builder-owned pin accepted: %v", err)
+	}
+	graph["dataset_id"] = identity.DatasetID
+	writeManifest(t, filepath.Join(version, "graph"), graph)
 	if err := VerifyCandidateIdentity(version, source, "other-inputs"); err == nil {
 		t.Fatal("changed inputs accepted")
 	}
@@ -294,18 +315,27 @@ func TestPromoteRejectsCrossProjectAndTamperedRollback(t *testing.T) {
 	dataset := t.TempDir()
 	build := func(version, project string) {
 		root := filepath.Join(dataset, version)
-		writeManifest(t, filepath.Join(root, "graph"), map[string]any{
+		source := SourceIdentity{ProjectID: project, SourceMode: "committed", SourceCommit: "abc",
+			FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
+		source.SnapshotID = sourceSnapshotID(source)
+		identity, err := NewDatasetIdentity(source, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
+		if err != nil {
+			t.Fatal(err)
+		}
+		graph := map[string]any{
 			"src_commit": "abc", "graph_digest": "g", "schema_version": "1.23",
-		})
-		writeManifest(t, filepath.Join(root, "vector"), map[string]any{
+		}
+		vector := map[string]any{
 			"src_commit": "abc", "embedding_model": "mock", "embedding_dim": 8,
 			"embedding_checksum": "mock-space", "sources": map[string]any{
 				"ckg": map[string]any{"src_commit": "abc", "graph_digest": "g"},
 			},
-		})
-		source := SourceIdentity{ProjectID: project, SourceMode: "committed", SourceCommit: "abc",
-			FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
-		source.SnapshotID = sourceSnapshotID(source)
+		}
+		for _, manifest := range []map[string]any{graph, vector} {
+			addNativePins(manifest, source, identity.DatasetID)
+		}
+		writeManifest(t, filepath.Join(root, "graph"), graph)
+		writeManifest(t, filepath.Join(root, "vector"), vector)
 		if _, err := PublishCandidateIdentity(root, source, "inputs"); err != nil {
 			t.Fatal(err)
 		}
@@ -335,17 +365,26 @@ func TestPromoteRejectsCrossProjectAndTamperedRollback(t *testing.T) {
 func TestGateRejectsEmbeddingSpaceChangedAfterPrebuildIdentity(t *testing.T) {
 	dataset := t.TempDir()
 	version := filepath.Join(dataset, "v1")
-	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
-		"src_commit": "abc", "graph_digest": "g", "schema_version": "1.23",
-	})
-	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
-		"src_commit": "abc", "chunk_count": 1, "embedding_model": "mock",
-		"embedding_dim": 8, "embedding_checksum": "space-after",
-		"sources": map[string]any{"ckg": map[string]any{"src_commit": "abc", "graph_digest": "g"}},
-	})
 	source := SourceIdentity{ProjectID: "p", SourceMode: "committed", SourceCommit: "abc",
 		FileManifestDigest: strings.Repeat("a", 64), CapturePolicyDigest: capturePolicyDigest("committed")}
 	source.SnapshotID = sourceSnapshotID(source)
+	actual, err := NewDatasetIdentity(source, json.RawMessage(`{"model":"mock","dim":8,"checksum":"space-after"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph := map[string]any{
+		"src_commit": "abc", "graph_digest": "g", "schema_version": "1.23",
+	}
+	vector := map[string]any{
+		"src_commit": "abc", "chunk_count": 1, "embedding_model": "mock",
+		"embedding_dim": 8, "embedding_checksum": "space-after",
+		"sources": map[string]any{"ckg": map[string]any{"src_commit": "abc", "graph_digest": "g"}},
+	}
+	for _, manifest := range []map[string]any{graph, vector} {
+		addNativePins(manifest, source, actual.DatasetID)
+	}
+	writeManifest(t, filepath.Join(version, "graph"), graph)
+	writeManifest(t, filepath.Join(version, "vector"), vector)
 	if _, err := PublishCandidateIdentity(version, source, "inputs"); err != nil {
 		t.Fatal(err)
 	}
@@ -358,4 +397,13 @@ func TestGateRejectsEmbeddingSpaceChangedAfterPrebuildIdentity(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "pre-build identity") {
 		t.Fatalf("changed embedding space passed candidate gate: %v", err)
 	}
+}
+
+func addNativePins(manifest map[string]any, source SourceIdentity, datasetID string) {
+	manifest["project_id"] = source.ProjectID
+	manifest["snapshot_id"] = source.SnapshotID
+	manifest["dataset_id"] = datasetID
+	manifest["source_mode"] = source.SourceMode
+	manifest["file_manifest_digest"] = source.FileManifestDigest
+	manifest["capture_policy_digest"] = source.CapturePolicyDigest
 }

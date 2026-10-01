@@ -3,6 +3,7 @@ package setup
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,12 +42,7 @@ func TestRetainedCitationUsesPastBytesAndRejectsDamage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
-		"src_commit": head, "graph_digest": "g", "schema_version": "1.23", "src_root": root})
-	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
-		"src_commit": head, "src_root": root, "embedding_model": "mock", "embedding_dim": 8,
-		"embedding_checksum": "mock-space", "sources": map[string]any{
-			"ckg": map[string]any{"src_commit": head, "graph_digest": "g"}}})
+	writePinnedMockManifests(t, version, root, head, captured.Identity)
 	if _, err := PublishCandidateIdentity(version, captured.Identity, "inputs"); err != nil {
 		t.Fatal(err)
 	}
@@ -102,12 +98,7 @@ func TestRetainedKnowledgeCitationUsesOriginAndArchivedBytes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
-		"src_commit": "", "graph_digest": "g", "schema_version": "1.23", "src_root": root})
-	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
-		"src_commit": "", "src_root": root, "embedding_model": "mock", "embedding_dim": 8,
-		"embedding_checksum": "mock-space", "sources": map[string]any{
-			"ckg": map[string]any{"src_commit": "", "graph_digest": "g"}}})
+	writePinnedMockManifests(t, version, root, "", captured.Identity)
 	if _, err := PublishCandidateIdentity(version, captured.Identity, "inputs"); err != nil {
 		t.Fatal(err)
 	}
@@ -125,4 +116,21 @@ func TestRetainedKnowledgeCitationUsesOriginAndArchivedBytes(t *testing.T) {
 	if _, err := ReadRetainedLines(version, "knowledge:other", "policy.md", 1, 1); err == nil {
 		t.Fatal("unregistered external origin returned citation")
 	}
+}
+
+func writePinnedMockManifests(t *testing.T, version, root, commit string, source SourceIdentity) {
+	t.Helper()
+	identity, err := NewDatasetIdentity(source, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph := map[string]any{"src_commit": commit, "graph_digest": "g", "schema_version": "1.23", "src_root": root}
+	vector := map[string]any{"src_commit": commit, "src_root": root, "embedding_model": "mock", "embedding_dim": 8,
+		"embedding_checksum": "mock-space", "sources": map[string]any{
+			"ckg": map[string]any{"src_commit": commit, "graph_digest": "g"}}}
+	for _, manifest := range []map[string]any{graph, vector} {
+		addNativePins(manifest, source, identity.DatasetID)
+	}
+	writeManifest(t, filepath.Join(version, "graph"), graph)
+	writeManifest(t, filepath.Join(version, "vector"), vector)
 }
