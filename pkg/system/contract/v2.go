@@ -61,6 +61,25 @@ type KnowledgeContextV2 struct {
 
 type KnowledgeSemanticV2 struct {
 	KnowledgeContext KnowledgeContextV2 `json:"knowledge_context"`
+	CodingContext    CodingContextV2    `json:"coding_context"`
+}
+
+// CodingContextV2 separates cited source behavior from normative policy and
+// rationale. Empty implemented_behavior means no reviewed implementation link
+// was proved; it must not be inferred from a retrieved code chunk alone.
+type CodingContextV2 struct {
+	ImplementedBehavior []KnowledgeReferenceV2 `json:"implemented_behavior"`
+	RequiredBehavior    []KnowledgeReferenceV2 `json:"required_behavior"`
+	Rationale           []KnowledgeReferenceV2 `json:"rationale"`
+	Constraints         []KnowledgeReferenceV2 `json:"constraints"`
+	Evidence            []CitationV2           `json:"evidence"`
+	Unknowns            []string               `json:"unknowns"`
+}
+
+type KnowledgeReferenceV2 struct {
+	ID       string     `json:"id"`
+	State    string     `json:"state"`
+	Citation CitationV2 `json:"citation"`
 }
 
 type KnowledgePolicyV2 struct {

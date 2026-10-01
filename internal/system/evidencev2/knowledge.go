@@ -3,6 +3,7 @@ package evidencev2
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -52,7 +53,7 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 		k.Conflicts = nil
 	}
 	if k.State == "restricted" || len(selected.Applicable)+len(decisions.Applicable) == 0 {
-		base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k}
+		base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k, CodingContext: buildCodingContext(k, base.Citations)}
 		if err := Stamp(&base); err != nil {
 			return contract.EvidencePackV2{}, err
 		}
@@ -188,7 +189,7 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	if base.EvidenceState == "partial" && k.State == "complete" {
 		k.State = "partial"
 	}
-	base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k}
+	base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k, CodingContext: buildCodingContext(k, base.Citations)}
 	if err := Stamp(&base); err != nil {
 		return contract.EvidencePackV2{}, err
 	}
@@ -210,11 +211,30 @@ func knowledgeUnavailable(base contract.EvidencePackV2, reason, lockDigest strin
 	}
 	k := emptyKnowledgeContext(state, lockDigest)
 	k.Unknowns = append(k.Unknowns, reason)
-	base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k}
+	base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k, CodingContext: buildCodingContext(k, base.Citations)}
 	if err := Stamp(&base); err != nil {
 		return contract.EvidencePackV2{}, err
 	}
 	return base, nil
+}
+
+func buildCodingContext(k contract.KnowledgeContextV2, citations []contract.CitationV2) contract.CodingContextV2 {
+	c := contract.CodingContextV2{
+		ImplementedBehavior: []contract.KnowledgeReferenceV2{},
+		RequiredBehavior:    []contract.KnowledgeReferenceV2{},
+		Rationale:           []contract.KnowledgeReferenceV2{},
+		Constraints:         []contract.KnowledgeReferenceV2{},
+		Evidence:            append([]contract.CitationV2{}, citations...),
+		Unknowns:            append([]string{}, k.Unknowns...),
+	}
+	for _, p := range k.ApplicablePolicies {
+		c.RequiredBehavior = append(c.RequiredBehavior, contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation})
+	}
+	for _, d := range k.Decisions {
+		c.Rationale = append(c.Rationale, contract.KnowledgeReferenceV2{ID: d.ID, State: d.State, Citation: d.Citation})
+	}
+	c.Unknowns = append(c.Unknowns, "implementation_link_unverified")
+	return c
 }
 
 func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool) error {
@@ -223,7 +243,19 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 	}
 	overlay, ok := value.(contract.KnowledgeSemanticV2)
 	if !ok {
-		return fmt.Errorf("v2 semantic overlay has unsupported type")
+		if raw, mapOK := value.(map[string]any); mapOK {
+			buf, err := json.Marshal(raw)
+			if err != nil {
+				return fmt.Errorf("v2 semantic overlay cannot be decoded")
+			}
+			decoder := json.NewDecoder(bytes.NewReader(buf))
+			decoder.DisallowUnknownFields()
+			if err := decoder.Decode(&overlay); err != nil {
+				return fmt.Errorf("v2 semantic overlay has invalid fields")
+			}
+		} else {
+			return fmt.Errorf("v2 semantic overlay has unsupported type")
+		}
 	}
 	k := overlay.KnowledgeContext
 	switch k.State {
@@ -271,5 +303,41 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 		k.State == "complete" && len(k.ApplicablePolicies) == 0 && len(k.Decisions) == 0 {
 		return fmt.Errorf("v2 knowledge state has no supporting records")
 	}
+	c := overlay.CodingContext
+	if c.Evidence == nil && c.RequiredBehavior == nil && c.Rationale == nil && c.Unknowns == nil {
+		return nil // existing v2 packs predate the optional coding-context field
+	}
+	if len(c.ImplementedBehavior) != 0 || len(c.Constraints) != 0 ||
+		len(c.RequiredBehavior) != len(k.ApplicablePolicies) || len(c.Rationale) != len(k.Decisions) ||
+		len(c.Evidence) != len(citations) {
+		return fmt.Errorf("v2 coding context claims unsupported or missing evidence")
+	}
+	for i, p := range k.ApplicablePolicies {
+		if c.RequiredBehavior[i] != (contract.KnowledgeReferenceV2{ID: p.ID, State: p.State, Citation: p.Citation}) {
+			return fmt.Errorf("v2 required behavior differs from policy evidence")
+		}
+	}
+	for i, d := range k.Decisions {
+		if c.Rationale[i] != (contract.KnowledgeReferenceV2{ID: d.ID, State: d.State, Citation: d.Citation}) {
+			return fmt.Errorf("v2 rationale differs from decision evidence")
+		}
+	}
+	for _, citation := range c.Evidence {
+		if !citations[citation] {
+			return fmt.Errorf("v2 coding evidence has an unknown citation")
+		}
+	}
+	if !containsString(c.Unknowns, "implementation_link_unverified") {
+		return fmt.Errorf("v2 coding context omitted unverified implementation state")
+	}
 	return nil
+}
+
+func containsString(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }

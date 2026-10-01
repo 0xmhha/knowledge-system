@@ -38,6 +38,8 @@ cks setup --src /path/to/project --out /path/to/data \
 
 선택 팩 원문은 `knowledge:<pack_id>` 출처로 후보의 content-addressed archive에 보관한다. 저장소와 팩이 같은 상대 경로를 써도 다른 원천이다. `review --version-dir`는 보관본만으로 팩과 정책을 재구성하고 잠금을 검증한다. 라이브 파일 편집 뒤에도 과거 결과가 같고 blob 손상은 거부한다. `cks.context.get_for_task_v2`는 `include_knowledge=true`와 명시 날짜·서브시스템을 받으면 검토된 공개 정책과 ADR만 선택한다. ADR은 선택 날짜 이전, 서브시스템 범위 일치, 대체 관계와 공개 권한 검사를 통과해야 한다. 정책은 v2 인용·정화된 본문에 연결되고 의미 객체까지 `sha256-v2` 해시에 포함된다. 비공개 정책 또는 ADR은 ID와 본문을 숨기고 `restricted` 상태만 남긴다. 지식 레이어 오류와 예산 초과 시 기본 코드 근거를 유지하고 불확실 상태를 출력한다.
 
+v2 `coding_context`는 현재 인용된 정책을 `required_behavior`, ADR을 `rationale`로 나누고 모든 반환 인용을 `evidence`에 보존한다. 확인된 구현 연결이 없으므로 `implemented_behavior`와 `constraints`는 비어 있고 `implementation_link_unverified`를 명시한다. JSON으로 전송한 뒤 다시 읽어도 의미 필드와 해시 검증이 통과하며, `coding_context`가 없는 이전 v2 팩은 수정 없이 읽는다.
+
 v4 팩 투영은 보관된 `pack.yaml`에서 `(pack_id, local_id)` 타입·관계·제약을 추출한다. 잠금 다이제스트, 팩 원문 해시, 그래프/벡터 좌표를 대조하며 구 v1–v3 JSON은 수정하지 않고 읽는다. 위 명령은 `--include-packs`를 명시한 보관 후보에만 v4를 쓴다. 원천 정의를 위조한 v4 후보는 승격되지 않는다. `wbs-knowledge-lock-smoke.sh`가 실제 후보의 v4 추출·승격·위조 거부를 검증한다.
 
 아직 **외부 끝점의 관계 승격, 조직별 권한 어댑터와 코드 앵커, ADR→요구→테스트의 검증된 의미 경로, 운영 릴리스**는 구현되지 않았다. 현재 선택형 v2 문맥은 정책·ADR 원문 인용까지 다룬다. ADR에 선언된 요구사항 ID는 관계 검증 증거가 아니라 원문 메타데이터다. 따라서 v2의 `decisions[].requirement_ids`와 `related_requirements`에는 이를 승격하지 않고 `unverified_adr_requirement_links`를 `unknowns`에 기록하며 상태를 `partial`로 낮춘다. 팩을 설치하거나 잠근 사실은 정책의 `verified` 판정이 아니다. A5.4/A5.5/A6/A7은 이 남은 계약을 통과하기 전 완료로 표시하지 않는다.

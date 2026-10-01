@@ -44,3 +44,5 @@
 후속 변경: `cks` 최상위 실패 출력은 한 줄의 JSON `{code,message}`와 비정상 종료로 정규화했다. 알려진 오류 접두사를 안정 코드로 매핑하고, 중첩 오류의 원문·비밀·임시 경로를 공개 메시지에 복사하지 않는다. `cmd/cks` 단위 테스트와 지식 잠금/패치 스모크가 통과했다. 이 변경은 MCP v2의 구조화 오류 데이터와 모든 구 소비자 재생을 완료했다는 뜻이 아니다.
 
 추가로 `cks.context.get_for_task_v2`의 실패 결과는 `IsError=true`, `code=<고정 코드>` 텍스트와 동일한 `{code,message}` 구조화 데이터를 함께 반환한다. 원문 오류에 `requires_v2`, `reindex_required`, `snapshot_mismatch`, `source_missing`이 있으면 그 코드를 보존하되 경로·원문·비밀은 복사하지 않는다. 관련 MCP 단위 테스트가 통과했다. 전체 MCP 도구의 오류 정규화와 구 소비자 재생은 여전히 A7.1/A8의 남은 검증이다.
+
+선택형 v2 `coding_context`를 추가해 검토된 정책을 required behavior, 검토된 ADR을 rationale로 분리했다. 검증된 구현 앵커가 없으므로 implemented behavior는 비우고 불확실 사유를 넣는다. 새 필드가 들어간 응답과 필드가 없는 이전 v2 응답을 각각 JSON 왕복 후 무결성 재검증했다. 외부 앵커가 생기기 전까지 이것은 완전한 코딩 경로가 아니다.

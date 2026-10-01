@@ -208,20 +208,48 @@ func TestAttachKnowledgeCitesReviewedLocalRelationWithoutInventingExternalLinks(
 		t.Fatal(err)
 	}
 	k := got.Semantic.(contract.KnowledgeSemanticV2).KnowledgeContext
+	coding := got.Semantic.(contract.KnowledgeSemanticV2).CodingContext
 	if k.State != "partial" || len(k.Relations) != 1 || k.Relations[0].Predicate != "motivates" ||
 		k.Relations[0].SubjectID != "BR-1" || k.Relations[0].ObjectID != "ADR-1" ||
 		len(k.RelatedRequirements) != 0 || len(k.TestLinks) != 0 || len(got.Citations) != 4 ||
 		k.Relations[0].Citation.File != ".cks/knowledge/relations/REL-1.yaml" {
 		t.Fatalf("reviewed relation/citation missing or external link invented: %+v", k)
 	}
+	if len(coding.ImplementedBehavior) != 0 || len(coding.RequiredBehavior) != 1 ||
+		coding.RequiredBehavior[0].ID != "BR-1" || len(coding.Rationale) != 1 ||
+		coding.Rationale[0].ID != "ADR-1" || len(coding.Evidence) != len(got.Citations) ||
+		!containsString(coding.Unknowns, "implementation_link_unverified") {
+		t.Fatalf("coding context conflated source and required behavior: %+v", coding)
+	}
 	if err := Verify(got); err != nil {
 		t.Fatal(err)
+	}
+	wire, err := json.Marshal(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded contract.EvidencePackV2
+	if err := json.Unmarshal(wire, &decoded); err != nil {
+		t.Fatal(err)
+	}
+	if err := Verify(decoded); err != nil {
+		t.Fatalf("v2 wire consumer could not replay coding and knowledge evidence: %v", err)
+	}
+	legacy := decoded
+	legacySemantic := decoded.Semantic.(map[string]any)
+	delete(legacySemantic, "coding_context")
+	legacy.Semantic = legacySemantic
+	if err := Stamp(&legacy); err != nil {
+		t.Fatal(err)
+	}
+	if err := Verify(legacy); err != nil {
+		t.Fatalf("pre-coding-context v2 pack lost read compatibility: %v", err)
 	}
 	tampered := got
 	modified := k
 	modified.Relations = append([]contract.KnowledgeRelationV2(nil), k.Relations...)
 	modified.Relations[0].Predicate = "forged"
-	tampered.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: modified}
+	tampered.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: modified, CodingContext: coding}
 	if err := Verify(tampered); err == nil {
 		t.Fatal("modified relation kept the v2 integrity hash")
 	}
