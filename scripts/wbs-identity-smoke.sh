@@ -83,7 +83,9 @@ if "$repo_root/bin/cks" doctor --src "$src" --dataset "$dataset" > "$scratch/tam
   python3 - "$scratch/tampered-doctor.json" <<'PY'
 import json, pathlib, sys
 report = json.loads(pathlib.Path(sys.argv[1]).read_text())
-assert report['status'] == 'degraded' and any('source' in issue for issue in report['issues'])
+assert report['status'] == 'degraded'
+assert report['identity_status'] == 'invalid' and report['reindex_required'] is True
+assert report['issues'] and all('tampered retained source' not in issue for issue in report['issues'])
 PY
 fi
 echo "Pinned three-layer identity smoke passed: $scratch"

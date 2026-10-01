@@ -4,14 +4,14 @@
 
 ## 이번 통합 실행
 
-기준 브랜치 `feat/spec-driven-knowledge-system`, 최근 코드 검증 시점 HEAD `5cda150`. 이 보고서는 검증 뒤 갱신했다. macOS arm64에서 다음을 실행했다. 패키지 매트릭스는 이 커밋 이전의 구조 변경 시점에 시험했다.
+기준 브랜치 `feat/spec-driven-knowledge-system`. 2026-10-01 macOS arm64에서 최근 코드에 대해 아래 검사를 다시 실행했다. 패키지 매트릭스는 이 변경 이전의 구조 변경 시점에 시험했으므로 현재 변경으로 재검증할 예정이다.
 
 | 게이트 | 결과 | 판정 범위 |
 |---|---|---|
-| `go test ./...` | 통과 | 전체 Go 단위·통합 테스트 |
-| `go test -race ./internal/system/semantic ./internal/system/evidencev2 ./internal/system/knowledgepack ./internal/system/eval` 및 `./internal/setup ./internal/system/patch ./cmd/cks/doctorcli` | 통과 | 의미 투영·v2 인용·팩·평가·캡처·승격·상태 진단 동시성 범위 |
+| `go test ./...` | 통과 | 현재 변경 포함 전체 Go 단위·통합 테스트 |
+| `go test -race ./internal/setup ./internal/system/evidencev2 ./internal/system/semantic ./internal/system/knowledgepack ./cmd/cks/knowledgecli` | 통과 | 캡처·의미 투영·v2 인용·팩·동시 검토 기록 범위. 다른 패키지의 이전 race 결과는 별도 실행 기록 |
 | `go vet ./...`, `make boundaries`, `make docs-check` | 통과 | 정적 검사, 엔진 경계, 103개 살아있는 문서의 CLI 계약 |
-| `scripts/wbs-identity-smoke.sh` | 통과 | 실제 CKG/CKV/CKS 세 계층 신원 |
+| `scripts/wbs-identity-smoke.sh` | 통과 | 실제 CKG/CKV/CKS 세 계층 신원. 손상 시 공개 상태 계약을 `identity_status=invalid`, `reindex_required=true`로 점검하도록 스모크 갱신 |
 | `scripts/wbs-source-modes-smoke.sh` | 통과 | 새 캡처 정책에서 Git 작업 트리·비Git 캡처, 빌드 중 변경 거부 |
 | `scripts/wbs-smoke.sh` | 통과 | 세 엔진 구성, CKV 청크·CKG 심볼·CKS 추적/테스트 |
 | `scripts/wbs-knowledge-lock-smoke.sh`, `scripts/wbs-patch-smoke.sh` | 통과 | 새 캡처 정책에서 잠금, v4 팩 타입, 관계 후보, ADR 검토 기록, 패치 승인·승격·롤백 |
