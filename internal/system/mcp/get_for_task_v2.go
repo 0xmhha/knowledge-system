@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
@@ -27,40 +28,73 @@ func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
 
 func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
 	if d.EvidenceVersionDir == "" || d.EvidenceSanitizer == nil {
-		return mcpgo.NewToolResultError("reindex_required: v2 evidence requires a pinned, retained source dataset"), nil
+		return v2ToolError("reindex_required"), nil
 	}
 	prompt := req.GetString("prompt", "")
 	if prompt == "" {
-		return mcpgo.NewToolResultError("cks.context.get_for_task_v2: missing required argument \"prompt\""), nil
+		return v2ToolError("invalid_request"), nil
 	}
 	callerIntent := contract.IntentUnknown
 	if raw := req.GetString("intent", ""); raw != "" {
 		parsed, ok := contract.ParseIntent(raw)
 		if !ok {
-			return mcpgo.NewToolResultError(fmt.Sprintf("cks.context.get_for_task_v2: invalid intent %q", raw)), nil
+			return v2ToolError("invalid_request"), nil
 		}
 		callerIntent = parsed
 	}
-	if ok, reason := serviceable(ctx, d); !ok {
-		return mcpgo.NewToolResultError(fmt.Sprintf("service_unavailable: %s", reason)), nil
+	if ok, _ := serviceable(ctx, d); !ok {
+		return v2ToolError("service_unavailable"), nil
 	}
 	legacy, err := d.Composer.ComposeWithIntent(ctx, prompt, callerIntent)
 	if err != nil {
-		return mcpgo.NewToolResultErrorf("compose_failed: %v", err), nil
+		return v2ToolErrorFor(err, "compose_failed"), nil
 	}
 	pack, err := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, legacy.Citations, d.EvidenceSanitizer)
 	if err != nil {
-		return mcpgo.NewToolResultErrorf("v2_evidence_failed: %v", err), nil
+		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
 	if req.GetBool("include_knowledge", false) {
 		asOf, subsystem := req.GetString("knowledge_as_of", ""), req.GetString("knowledge_subsystem", "")
 		if asOf == "" || subsystem == "" {
-			return mcpgo.NewToolResultError("invalid_knowledge_scope: knowledge_as_of and knowledge_subsystem are required"), nil
+			return v2ToolError("invalid_knowledge_scope"), nil
 		}
 		pack, err = evidencev2.AttachKnowledge(ctx, pack, d.EvidenceVersionDir, asOf, subsystem, d.EvidenceSanitizer)
 		if err != nil {
-			return mcpgo.NewToolResultErrorf("knowledge_context_failed: %v", err), nil
+			return v2ToolErrorFor(err, "knowledge_context_failed"), nil
 		}
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil
+}
+
+func v2ToolErrorFor(err error, fallback string) *mcpgo.CallToolResult {
+	if err != nil {
+		for _, code := range []string{"requires_v2", "reindex_required", "snapshot_mismatch", "source_missing"} {
+			if strings.Contains(err.Error(), code) {
+				return v2ToolError(code)
+			}
+		}
+	}
+	return v2ToolError(fallback)
+}
+
+func v2ToolError(code string) *mcpgo.CallToolResult {
+	messages := map[string]string{
+		"requires_v2":              "Use the v2 interface for this source mode.",
+		"reindex_required":         "A pinned retained dataset is required.",
+		"snapshot_mismatch":        "The indexed source identity does not match.",
+		"source_missing":           "A pinned source file is missing.",
+		"invalid_request":          "The request is missing or has an invalid argument.",
+		"service_unavailable":      "The indexed service is unavailable.",
+		"compose_failed":           "The base evidence could not be composed.",
+		"v2_evidence_failed":       "Retained source evidence could not be verified.",
+		"invalid_knowledge_scope":  "A date and subsystem are required for knowledge context.",
+		"knowledge_context_failed": "The knowledge context could not be verified.",
+	}
+	message, ok := messages[code]
+	if !ok {
+		code, message = "operation_failed", "The operation failed."
+	}
+	result := mcpgo.NewToolResultError(fmt.Sprintf("code=%s: %s", code, message))
+	result.StructuredContent = map[string]string{"code": code, "message": message}
+	return result
 }
