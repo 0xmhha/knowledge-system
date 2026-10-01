@@ -29,7 +29,7 @@ func TestEngineInputReconciliationRejectsUnknownAndAlteredSources(t *testing.T) 
 		t.Fatal(err)
 	}
 	captured := CapturedSource{Identity: SourceIdentity{SourceMode: "committed", SourceCommit: commit},
-		Files: []CapturedFile{{Path: "main.go", SHA256: "correct"}}}
+		Files: []CapturedFile{{OriginID: "repo", Path: "main.go", SHA256: "correct"}}}
 	write := func(path, sha string) {
 		t.Helper()
 		if err := writeJSONAtomic(graph, map[string]any{"files": []map[string]string{{"path": path, "sha256": sha}}}); err != nil {

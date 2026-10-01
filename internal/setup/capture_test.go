@@ -52,6 +52,60 @@ func TestCaptureNonGitSourceRetainsOldBytesAndDetectsCorruption(t *testing.T) {
 	}
 }
 
+func TestCaptureExternalKnowledgeOriginKeepsSamePathDistinct(t *testing.T) {
+	base := t.TempDir()
+	repo := filepath.Join(base, "repo")
+	pack := filepath.Join(base, "pack")
+	for _, dir := range []string{repo, pack} {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for path, body := range map[string]string{
+		filepath.Join(repo, "policy.md"): "code documentation\n",
+		filepath.Join(pack, "policy.md"): "organization policy\n",
+	} {
+		if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	origin := CaptureOrigin{ID: "knowledge:engineering.decisions", Root: pack}
+	want, err := SnapshotSourceIdentity(repo, "pilot", "snapshot-only", "", origin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(base, "candidate")
+	got, err := CaptureSource(CaptureOptions{Root: repo, Out: out, ProjectID: "pilot",
+		SourceMode: "snapshot-only", ExternalOrigins: []CaptureOrigin{origin}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Identity != want || len(got.Files) != 2 {
+		t.Fatalf("identity or file count: %+v", got)
+	}
+	if got.Files[0].OriginID == got.Files[1].OriginID || got.Files[0].SHA256 == got.Files[1].SHA256 {
+		t.Fatalf("same-path origins collapsed: %+v", got.Files)
+	}
+	if err := VerifyRetainedSource(out, want); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pack, "policy.md"), []byte("changed policy\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := got.VerifyAgainst(repo); err == nil {
+		t.Fatal("changed external source accepted")
+	}
+	if err := VerifyRetainedSource(out, want); err != nil {
+		t.Fatalf("retained old bytes lost: %v", err)
+	}
+	if err := os.Symlink(filepath.Join(pack, "policy.md"), filepath.Join(pack, "linked.md")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := SnapshotSourceIdentity(repo, "pilot", "snapshot-only", "", origin); err == nil {
+		t.Fatal("linked external file accepted")
+	}
+}
+
 func TestCaptureRefusesLinksSecretsAndRecursiveOutput(t *testing.T) {
 	root := t.TempDir()
 	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("hi\n"), 0o644); err != nil {

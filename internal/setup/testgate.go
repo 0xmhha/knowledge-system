@@ -53,6 +53,10 @@ func (w *gateOutputHash) Write(data []byte) (int, error) {
 // runTestGate records one explicit command against the candidate's committed
 // source. It has no shell, stores no output text, and cannot promote a version.
 func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []string, pinned ...SourceIdentity) error {
+	return runTestGateWithOrigins(ctx, candidateDir, sourceRoot, argv, nil, pinned...)
+}
+
+func runTestGateWithOrigins(ctx context.Context, candidateDir, sourceRoot string, argv []string, externalOrigins []CaptureOrigin, pinned ...SourceIdentity) error {
 	if sourceRoot == "" || len(argv) == 0 || argv[0] == "" {
 		return fmt.Errorf("source and test executable are required")
 	}
@@ -70,7 +74,7 @@ func runTestGate(ctx context.Context, candidateDir, sourceRoot string, argv []st
 	if len(pinned) == 1 && pinned[0].SourceMode != "committed" {
 		check = func() (bool, error) {
 			current, err := SnapshotSourceIdentity(sourceRoot, pinned[0].ProjectID,
-				pinned[0].SourceMode, pinned[0].SourceCommit)
+				pinned[0].SourceMode, pinned[0].SourceCommit, externalOrigins...)
 			return err == nil && current == pinned[0], err
 		}
 	}

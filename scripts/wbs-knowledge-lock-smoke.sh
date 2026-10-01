@@ -102,6 +102,10 @@ data, scratch = map(pathlib.Path, sys.argv[1:])
 first = json.loads((data/'first'/'dataset-identity.json').read_text())
 second = json.loads((data/'second'/'dataset-identity.json').read_text())
 third = json.loads((data/'third'/'dataset-identity.json').read_text())
+archive = json.loads((data/'third'/'sources'/'manifest.json').read_text())
+pack_files = [item for item in archive['files'] if item['origin_id'] == 'knowledge:engineering.decisions']
+assert {item['path'] for item in pack_files} == {'pack.yaml'}
+assert (data/'third'/'sources'/'blobs'/pack_files[0]['sha256']).read_bytes() == (scratch/'src'/'vendor'/'engineering-decisions'/'pack.yaml').read_bytes()
 assert first['dataset_id'] != second['dataset_id']
 assert first['source']['snapshot_id'] != second['source']['snapshot_id']
 assert second['dataset_id'] != third['dataset_id']

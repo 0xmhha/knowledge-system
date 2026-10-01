@@ -185,6 +185,7 @@ func Rollback(dataset, version string) error {
 
 // GateOptions parameterizes the pre-promote gate suite.
 type GateOptions struct {
+	ExternalOrigins []CaptureOrigin
 	// GraphBin is the graph CLI for the validate/audit gates (default "ckg").
 	GraphBin string
 	// Src is the source tree; when set the (soft) ckg audit gate runs.
@@ -294,7 +295,7 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 	if len(o.TestCommand) > 0 {
 		var testErr error
 		if o.ExpectedSourceSnapshot.SnapshotID != "" {
-			testErr = runTestGate(ctx, vdir, o.Src, o.TestCommand, o.ExpectedSourceSnapshot)
+			testErr = runTestGateWithOrigins(ctx, vdir, o.Src, o.TestCommand, o.ExternalOrigins, o.ExpectedSourceSnapshot)
 		} else {
 			testErr = runTestGate(ctx, vdir, o.Src, o.TestCommand)
 		}
@@ -324,7 +325,7 @@ func Gate(ctx context.Context, dataset, version string, o GateOptions, r Runner,
 			sourceRoot = o.Src
 		}
 		current, err := SnapshotSourceIdentity(sourceRoot, o.ExpectedSourceSnapshot.ProjectID,
-			o.ExpectedSourceSnapshot.SourceMode, o.ExpectedSourceSnapshot.SourceCommit)
+			o.ExpectedSourceSnapshot.SourceMode, o.ExpectedSourceSnapshot.SourceCommit, o.ExternalOrigins...)
 		if err != nil {
 			return fmt.Errorf("gate: verify source snapshot: %w", err)
 		}
@@ -368,7 +369,7 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		}
 		captured, err = CaptureSource(CaptureOptions{Root: o.Src, Out: vo.Out,
 			ProjectID: o.ProjectID, SourceMode: gopt.ExpectedSourceSnapshot.SourceMode,
-			SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit})
+			SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit, ExternalOrigins: o.ExternalOrigins})
 		if err != nil {
 			return fmt.Errorf("reindex: retain source bytes: %w", err)
 		}
@@ -419,7 +420,7 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 	if gopt.ExpectedSourceSnapshot.SnapshotID != "" {
 		current, err := SnapshotSourceIdentity(o.Src, o.ProjectID,
-			gopt.ExpectedSourceSnapshot.SourceMode, gopt.ExpectedSourceSnapshot.SourceCommit)
+			gopt.ExpectedSourceSnapshot.SourceMode, gopt.ExpectedSourceSnapshot.SourceCommit, o.ExternalOrigins...)
 		if err != nil {
 			return fmt.Errorf("reindex: verify source after build: %w", err)
 		}

@@ -19,6 +19,9 @@ import (
 
 // Options parameterizes one knowledge-setup plan.
 type Options struct {
+	// ExternalOrigins are selected local pack roots retained under distinct
+	// origin IDs. They never enter the engine's source tree.
+	ExternalOrigins []CaptureOrigin
 	// KnowledgeInputs are verified local D5 overlay and selected pack roots.
 	// Their bytes contribute to the build recipe and are checked again before
 	// promotion. Paths are resolved before this options struct is used.

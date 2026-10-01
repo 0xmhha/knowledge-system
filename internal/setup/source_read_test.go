@@ -87,3 +87,42 @@ func TestRetainedCitationUsesPastBytesAndRejectsDamage(t *testing.T) {
 		t.Fatalf("missing historical source fell back to live file: %v", err)
 	}
 }
+
+func TestRetainedKnowledgeCitationUsesOriginAndArchivedBytes(t *testing.T) {
+	root, pack, version := t.TempDir(), t.TempDir(), t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "policy.md"), []byte("repository note\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	policy := filepath.Join(pack, "policy.md")
+	if err := os.WriteFile(policy, []byte("reviewed policy\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: version, ProjectID: "p-one",
+		SourceMode: "snapshot-only", ExternalOrigins: []CaptureOrigin{{ID: "knowledge:decisions", Root: pack}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeManifest(t, filepath.Join(version, "graph"), map[string]any{
+		"src_commit": "", "graph_digest": "g", "schema_version": "1.23", "src_root": root})
+	writeManifest(t, filepath.Join(version, "vector"), map[string]any{
+		"src_commit": "", "src_root": root, "embedding_model": "mock", "embedding_dim": 8,
+		"embedding_checksum": "mock-space", "sources": map[string]any{
+			"ckg": map[string]any{"src_commit": "", "graph_digest": "g"}}})
+	if _, err := PublishCandidateIdentity(version, captured.Identity, "inputs"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(policy, []byte("changed policy\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	evidence, err := ReadRetainedLines(version, "knowledge:decisions", "policy.md", 1, 1)
+	if err != nil || evidence.Text != "reviewed policy\n" || evidence.OriginID != "knowledge:decisions" || evidence.CommitHash != "" {
+		t.Fatalf("external citation did not use retained origin: %+v %v", evidence, err)
+	}
+	repoEvidence, err := ReadRetainedLines(version, "repo", "policy.md", 1, 1)
+	if err != nil || repoEvidence.Text != "repository note\n" {
+		t.Fatalf("repo origin crossed: %+v %v", repoEvidence, err)
+	}
+	if _, err := ReadRetainedLines(version, "knowledge:other", "policy.md", 1, 1); err == nil {
+		t.Fatal("unregistered external origin returned citation")
+	}
+}

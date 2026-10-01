@@ -33,6 +33,9 @@ func MaterializeRetainedReadTree(versionDir string) (string, func(), error) {
 	}
 	cleanup := func() { _ = os.RemoveAll(root) }
 	for _, file := range captured.Files {
+		if file.OriginID != "repo" {
+			continue
+		}
 		buf, err := captured.ReadBlob(file.SHA256)
 		if err != nil {
 			cleanup()

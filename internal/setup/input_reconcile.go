@@ -21,7 +21,9 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 	}
 	files := make(map[string]string, len(captured.Files))
 	for _, f := range captured.Files {
-		files[f.Path] = f.SHA256
+		if f.OriginID == "repo" {
+			files[f.Path] = f.SHA256
+		}
 	}
 	var graph struct {
 		Files []struct {

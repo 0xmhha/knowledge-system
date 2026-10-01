@@ -30,20 +30,27 @@ type CapturedFile struct {
 }
 
 type CaptureOptions struct {
-	Root          string
-	Out           string
-	ProjectID     string
-	SourceMode    string // committed, working-tree or snapshot-only
-	SourceCommit  string // full HEAD for Git modes, empty for non-Git
-	MaxFileBytes  int64
-	MaxTotalBytes int64
+	Root            string
+	Out             string
+	ProjectID       string
+	SourceMode      string // committed, working-tree or snapshot-only
+	SourceCommit    string // full HEAD for Git modes, empty for non-Git
+	MaxFileBytes    int64
+	MaxTotalBytes   int64
+	ExternalOrigins []CaptureOrigin
+}
+
+type CaptureOrigin struct {
+	ID   string
+	Root string
 }
 
 type CapturedSource struct {
-	Identity SourceIdentity `json:"identity"`
-	Files    []CapturedFile `json:"files"`
-	BlobDir  string         `json:"-"`
-	Root     string         `json:"-"`
+	Identity    SourceIdentity    `json:"identity"`
+	Files       []CapturedFile    `json:"files"`
+	BlobDir     string            `json:"-"`
+	Root        string            `json:"-"`
+	OriginRoots map[string]string `json:"-"`
 }
 
 // CaptureSource stores a deterministic byte snapshot without exposing it to
@@ -84,6 +91,10 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if rel, err := filepath.Rel(root, out); err != nil || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))) {
 		return CapturedSource{}, fmt.Errorf("capture output must be outside source tree")
 	}
+	origins, err := prepareCaptureOrigins(o.ExternalOrigins, out)
+	if err != nil {
+		return CapturedSource{}, err
+	}
 	if o.MaxFileBytes <= 0 {
 		o.MaxFileBytes = 32 << 20
 	}
@@ -103,26 +114,64 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	if err := os.MkdirAll(blobDir, 0o700); err != nil {
 		return CapturedSource{}, err
 	}
-	result := CapturedSource{BlobDir: blobDir, Root: root}
+	result := CapturedSource{BlobDir: blobDir, Root: root, OriginRoots: map[string]string{},
+		Identity: SourceIdentity{SourceMode: o.SourceMode}}
+	for _, origin := range origins {
+		result.OriginRoots[origin.ID] = origin.Root
+	}
 	var total int64
-	for _, rel := range paths {
-		buf, err := readCapturedRegular(opened, rel, o.MaxFileBytes)
-		if err != nil {
-			return CapturedSource{}, err
-		}
+	add := func(originID, rel string, buf []byte) error {
 		if total+int64(len(buf)) > o.MaxTotalBytes {
-			return CapturedSource{}, fmt.Errorf("capture total byte limit exceeded at %q", rel)
+			return fmt.Errorf("capture total byte limit exceeded at %q", rel)
 		}
 		sum := sha256.Sum256(buf)
 		digest := hex.EncodeToString(sum[:])
 		blob := filepath.Join(blobDir, digest)
 		if err := writeCapturedBlob(blob, buf); err != nil {
-			return CapturedSource{}, err
+			return err
 		}
-		result.Files = append(result.Files, CapturedFile{OriginID: "repo", Path: rel,
+		result.Files = append(result.Files, CapturedFile{OriginID: originID, Path: rel,
 			Kind: "regular", SHA256: digest, Size: int64(len(buf))})
 		total += int64(len(buf))
+		return nil
 	}
+	for _, rel := range paths {
+		buf, err := readCapturedRegular(opened, rel, o.MaxFileBytes)
+		if err != nil {
+			return CapturedSource{}, err
+		}
+		if err := add("repo", rel, buf); err != nil {
+			return CapturedSource{}, err
+		}
+	}
+	for _, origin := range origins {
+		externalPaths, err := captureExternalPaths(origin.Root)
+		if err != nil {
+			return CapturedSource{}, err
+		}
+		external, err := os.OpenRoot(origin.Root)
+		if err != nil {
+			return CapturedSource{}, err
+		}
+		for _, rel := range externalPaths {
+			buf, readErr := readCapturedRegular(external, rel, o.MaxFileBytes)
+			if readErr != nil {
+				external.Close()
+				return CapturedSource{}, readErr
+			}
+			if err := add(origin.ID, rel, buf); err != nil {
+				external.Close()
+				return CapturedSource{}, err
+			}
+		}
+		external.Close()
+	}
+	sort.Slice(result.Files, func(i, j int) bool {
+		if result.Files[i].OriginID == result.Files[j].OriginID {
+			return result.Files[i].Path < result.Files[j].Path
+		}
+		return result.Files[i].OriginID < result.Files[j].OriginID
+	})
 	if err := result.VerifyAgainst(root); err != nil {
 		return CapturedSource{}, err
 	}
@@ -308,6 +357,9 @@ func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) 
 		return nil, err
 	}
 	for _, f := range c.Files {
+		if f.OriginID != "repo" {
+			continue
+		}
 		buf, err := c.ReadBlob(f.SHA256)
 		if err != nil {
 			return cleanup, err
@@ -368,31 +420,158 @@ func capturePaths(root string) ([]string, error) {
 	return paths, nil
 }
 
-func (c CapturedSource) VerifyAgainst(root string) error {
-	paths, err := captureModePaths(root, c.Identity.SourceMode)
-	if err != nil {
-		return err
+func validCaptureOriginID(id string) bool {
+	if id == "ontology" || id == "spec" {
+		return true
 	}
-	if len(paths) != len(c.Files) {
-		return fmt.Errorf("source file set changed after capture")
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 || parts[1] == "" {
+		return false
 	}
-	opened, err := os.OpenRoot(root)
-	if err != nil {
-		return err
+	switch parts[0] {
+	case "knowledge", "docs", "policy", "flow":
+	default:
+		return false
 	}
-	defer opened.Close()
-	for i, f := range c.Files {
-		if paths[i] != f.Path {
-			return fmt.Errorf("source file set changed after capture")
+	for _, r := range parts[1] {
+		if r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '.' || r == '-' || r == '_' {
+			continue
 		}
-		buf, err := readCapturedRegular(opened, f.Path, f.Size)
+		return false
+	}
+	return true
+}
+
+func prepareCaptureOrigins(inputs []CaptureOrigin, out string) ([]CaptureOrigin, error) {
+	result := make([]CaptureOrigin, 0, len(inputs))
+	seen := map[string]bool{}
+	for _, input := range inputs {
+		if !validCaptureOriginID(input.ID) || input.Root == "" || seen[input.ID] {
+			return nil, fmt.Errorf("invalid or duplicate external source origin %q", input.ID)
+		}
+		seen[input.ID] = true
+		root, err := filepath.Abs(input.Root)
 		if err != nil {
-			return fmt.Errorf("source changed after capture %q: %w", f.Path, err)
+			return nil, err
 		}
-		sum := sha256.Sum256(buf)
-		if int64(len(buf)) != f.Size || hex.EncodeToString(sum[:]) != f.SHA256 {
-			return fmt.Errorf("source changed after capture %q", f.Path)
+		root, err = filepath.EvalSymlinks(root)
+		if err != nil {
+			return nil, err
 		}
+		info, err := os.Lstat(root)
+		if err != nil || !info.IsDir() {
+			return nil, fmt.Errorf("external source root %q is unavailable", input.ID)
+		}
+		if out != "" {
+			if rel, err := filepath.Rel(root, out); err != nil || rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+				return nil, fmt.Errorf("capture output must be outside external source %q", input.ID)
+			}
+		}
+		result = append(result, CaptureOrigin{ID: input.ID, Root: root})
+	}
+	sort.Slice(result, func(i, j int) bool { return result[i].ID < result[j].ID })
+	return result, nil
+}
+
+func captureExternalPaths(root string) ([]string, error) {
+	var paths []string
+	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if path == root {
+			return nil
+		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		for _, part := range strings.Split(rel, "/") {
+			if strings.HasPrefix(part, ".") {
+				return fmt.Errorf("external source has hidden path %q", rel)
+			}
+		}
+		if sensitiveCapturePath(rel) {
+			return fmt.Errorf("external source has sensitive path %q", rel)
+		}
+		if entry.Type()&os.ModeSymlink != 0 {
+			return fmt.Errorf("external source has linked path %q", rel)
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		if !entry.Type().IsRegular() {
+			return fmt.Errorf("external source has nonregular path %q", rel)
+		}
+		paths = append(paths, rel)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(paths) == 0 {
+		return nil, fmt.Errorf("external source is empty")
+	}
+	sort.Strings(paths)
+	if err := validateCapturedPaths(paths); err != nil {
+		return nil, err
+	}
+	return paths, nil
+}
+
+func (c CapturedSource) VerifyAgainst(root string) error {
+	groups := map[string][]CapturedFile{}
+	for _, f := range c.Files {
+		groups[f.OriginID] = append(groups[f.OriginID], f)
+	}
+	verify := func(originID, sourceRoot string, external bool) error {
+		var paths []string
+		var err error
+		if external {
+			paths, err = captureExternalPaths(sourceRoot)
+		} else {
+			paths, err = captureModePaths(sourceRoot, c.Identity.SourceMode)
+		}
+		if err != nil {
+			return err
+		}
+		group := groups[originID]
+		if len(paths) != len(group) {
+			return fmt.Errorf("source file set changed after capture for %q", originID)
+		}
+		opened, err := os.OpenRoot(sourceRoot)
+		if err != nil {
+			return err
+		}
+		defer opened.Close()
+		for i, f := range group {
+			if paths[i] != f.Path {
+				return fmt.Errorf("source file set changed after capture for %q", originID)
+			}
+			buf, err := readCapturedRegular(opened, f.Path, f.Size)
+			if err != nil {
+				return fmt.Errorf("source changed after capture %q:%q: %w", originID, f.Path, err)
+			}
+			sum := sha256.Sum256(buf)
+			if int64(len(buf)) != f.Size || hex.EncodeToString(sum[:]) != f.SHA256 {
+				return fmt.Errorf("source changed after capture %q:%q", originID, f.Path)
+			}
+		}
+		return nil
+	}
+	if err := verify("repo", root, false); err != nil {
+		return err
+	}
+	for id, sourceRoot := range c.OriginRoots {
+		if err := verify(id, sourceRoot, true); err != nil {
+			return err
+		}
+		delete(groups, id)
+	}
+	delete(groups, "repo")
+	if len(groups) != 0 {
+		return fmt.Errorf("retained source contains unregistered origin")
 	}
 	return nil
 }
@@ -440,21 +619,24 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 		return fmt.Errorf("snapshot_mismatch: retained source identity differs from candidate")
 	}
 	entries := make([]sourceFile, 0, len(captured.Files))
-	paths := make([]string, 0, len(captured.Files))
-	prev := ""
+	pathsByOrigin := make(map[string][]string)
+	prevOrigin, prevPath := "", ""
 	for _, f := range captured.Files {
-		if f.OriginID != "repo" || f.Kind != "regular" || f.Path == "" || filepath.IsAbs(f.Path) || f.Path == ".." ||
+		if (f.OriginID != "repo" && !validCaptureOriginID(f.OriginID)) || f.Kind != "regular" || f.Path == "" || filepath.IsAbs(f.Path) || f.Path == ".." ||
 			strings.HasPrefix(f.Path, "../") || strings.ContainsRune(f.Path, '\\') ||
-			!utf8.ValidString(f.Path) || f.Path <= prev || f.Size < 0 {
+			!utf8.ValidString(f.Path) || f.OriginID < prevOrigin ||
+			(f.OriginID == prevOrigin && f.Path <= prevPath) || f.Size < 0 {
 			return fmt.Errorf("snapshot_mismatch: invalid retained source path")
 		}
-		prev = f.Path
-		paths = append(paths, f.Path)
+		prevOrigin, prevPath = f.OriginID, f.Path
+		pathsByOrigin[f.OriginID] = append(pathsByOrigin[f.OriginID], f.Path)
 		entries = append(entries, sourceFile{OriginID: f.OriginID, Path: f.Path,
 			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
 	}
-	if err := validateCapturedPaths(paths); err != nil {
-		return fmt.Errorf("snapshot_mismatch: %w", err)
+	for _, paths := range pathsByOrigin {
+		if err := validateCapturedPaths(paths); err != nil {
+			return fmt.Errorf("snapshot_mismatch: %w", err)
+		}
 	}
 	digest := fileManifestDigest(entries)
 	if digest != expected.FileManifestDigest || sourceSnapshotID(expected) != expected.SnapshotID ||

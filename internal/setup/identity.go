@@ -95,7 +95,7 @@ func CommittedSourceIdentity(root, projectID, commit string) (SourceIdentity, er
 // SnapshotSourceIdentity inventories exactly the same paths and bytes as
 // CaptureSource without writing blobs. This pre-build value is compared to
 // the retained candidate and, for mutable modes, to the source at the gate.
-func SnapshotSourceIdentity(root, projectID, mode, commit string) (SourceIdentity, error) {
+func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigins ...CaptureOrigin) (SourceIdentity, error) {
 	if projectID == "" || strings.ContainsRune(projectID, 0) ||
 		(mode != "committed" && mode != "working-tree" && mode != "snapshot-only") ||
 		(mode == "snapshot-only" && commit != "") ||
@@ -129,6 +129,36 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string) (SourceIdentit
 		files = append(files, sourceFile{OriginID: "repo", Path: filepath.ToSlash(path), Kind: "regular",
 			Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
 	}
+	origins, err := prepareCaptureOrigins(externalOrigins, "")
+	if err != nil {
+		return SourceIdentity{}, err
+	}
+	for _, origin := range origins {
+		externalPaths, err := captureExternalPaths(origin.Root)
+		if err != nil {
+			return SourceIdentity{}, err
+		}
+		external, err := os.OpenRoot(origin.Root)
+		if err != nil {
+			return SourceIdentity{}, err
+		}
+		for _, path := range externalPaths {
+			buf, readErr := readCapturedRegular(external, path, 1<<62)
+			if readErr != nil {
+				external.Close()
+				return SourceIdentity{}, readErr
+			}
+			sum := sha256.Sum256(buf)
+			files = append(files, sourceFile{OriginID: origin.ID, Path: path, Kind: "regular", Size: int64(len(buf)), SHA256: hex.EncodeToString(sum[:])})
+		}
+		external.Close()
+	}
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].OriginID == files[j].OriginID {
+			return files[i].Path < files[j].Path
+		}
+		return files[i].OriginID < files[j].OriginID
+	})
 	if mode != "snapshot-only" {
 		if head, err := captureHead(root); err != nil || head != commit {
 			return SourceIdentity{}, fmt.Errorf("source base commit changed during inventory: %v", err)

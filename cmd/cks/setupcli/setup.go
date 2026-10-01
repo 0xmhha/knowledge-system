@@ -279,6 +279,8 @@ func runSetup(args []string) error {
 			o.KnowledgeInputs = append(o.KnowledgeInputs, setup.KnowledgeInput{
 				Role: "knowledge-overlay", Path: filepath.Join(o.Src, ".cks", "knowledge")})
 			for _, selected := range manifest.SelectedPacks {
+				o.ExternalOrigins = append(o.ExternalOrigins, setup.CaptureOrigin{
+					ID: "knowledge:" + selected.PackID, Root: filepath.Join(o.Src, selected.Source)})
 				o.KnowledgeInputs = append(o.KnowledgeInputs, setup.KnowledgeInput{
 					Role: "knowledge-pack:" + selected.PackID, Path: filepath.Join(o.Src, selected.Source)})
 			}
@@ -316,7 +318,7 @@ func runSetup(args []string) error {
 			return err
 		}
 		if o.ProjectID != "" {
-			preBuildSnapshot, err = setup.SnapshotSourceIdentity(o.Src, o.ProjectID, *sourceMode, preBuildCommit)
+			preBuildSnapshot, err = setup.SnapshotSourceIdentity(o.Src, o.ProjectID, *sourceMode, preBuildCommit, o.ExternalOrigins...)
 			if err != nil {
 				return err
 			}
@@ -377,7 +379,8 @@ func runSetup(args []string) error {
 		}
 		gopt := setup.GateOptions{GraphBin: o.GraphBin, Src: o.Src, MinCanonicalRatio: *gateMinCanonical,
 			ExpectedSourceCommit: gateCommit, ExpectedSourceSnapshot: preBuildSnapshot,
-			ExpectedInputDigest: preBuildInputs, ExpectedDatasetID: preBuildDatasetID}
+			ExpectedInputDigest: preBuildInputs, ExpectedDatasetID: preBuildDatasetID,
+			ExternalOrigins: o.ExternalOrigins}
 		if *gateTestBin != "" {
 			gopt.TestCommand = append([]string{*gateTestBin}, *gateTestArgs...)
 		}

@@ -34,7 +34,7 @@ type RetainedEvidence struct {
 // candidate tuple and all archived file hashes before returning one span;
 // long-lived servers can hold a verified archive index for batched lookups.
 func ReadRetainedLines(versionDir, originID, path string, first, last int) (RetainedEvidence, error) {
-	if originID != "repo" || first <= 0 || last < first || path == "" {
+	if (originID != "repo" && !validCaptureOriginID(originID)) || first <= 0 || last < first || path == "" {
 		return RetainedEvidence{}, fmt.Errorf("invalid retained citation coordinates")
 	}
 	buf, identity, fileSHA, err := ReadRetainedFile(versionDir, originID, path)
@@ -60,7 +60,7 @@ func ReadRetainedLines(versionDir, originID, path string, first, last int) (Reta
 // ReadRetainedFile returns verified original bytes for semantic extraction.
 // This is an internal raw-byte API: public responses must sanitize them.
 func ReadRetainedFile(versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
-	if originID != "repo" || path == "" {
+	if (originID != "repo" && !validCaptureOriginID(originID)) || path == "" {
 		return nil, nil, "", fmt.Errorf("invalid retained source coordinates")
 	}
 	if err := validateCapturedPaths([]string{path}); err != nil {
