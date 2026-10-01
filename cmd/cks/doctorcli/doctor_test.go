@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
 )
 
 func doctorGit(t *testing.T, root string, args ...string) string {
@@ -98,6 +100,28 @@ func TestDoctorReportsDirtySecretsAndSymlinksWithoutReadingTheirContents(t *test
 	}
 	if strings.Contains(out.String(), "do-not-print") {
 		t.Fatal("doctor exposed secret contents")
+	}
+}
+
+func TestDoctorAndCaptureAgreeOnNestedSensitivePath(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "app", "Secrets", "token.txt")
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte("hidden"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package sample\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	report, err := Inspect(root, "")
+	if err != nil || report.SecretPathCount != 1 || report.Status != "degraded" {
+		t.Fatalf("doctor omitted capture blocker: %+v %v", report, err)
+	}
+	if _, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"),
+		ProjectID: "pilot", SourceMode: "snapshot-only"}); err == nil || !strings.Contains(err.Error(), "sensitive") {
+		t.Fatalf("capture accepted doctor secret blocker: %v", err)
 	}
 }
 

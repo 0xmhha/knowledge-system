@@ -716,7 +716,10 @@ func skipCaptureDir(name string) bool {
 	return false
 }
 
-func sensitiveCapturePath(rel string) bool {
+// SensitiveCapturePath is the shared admission rule for source capture and
+// readiness reporting. It checks file names and secret-bearing directories,
+// never contents, so callers can report a blocked path without reading it.
+func SensitiveCapturePath(rel string) bool {
 	parts := strings.Split(strings.ToLower(filepath.ToSlash(rel)), "/")
 	for _, part := range parts[:len(parts)-1] {
 		if part == ".aws" || part == "secrets" {
@@ -724,9 +727,19 @@ func sensitiveCapturePath(rel string) bool {
 		}
 	}
 	base := parts[len(parts)-1]
-	return base == ".env" || strings.HasPrefix(base, ".env.") || base == "id_rsa" ||
-		strings.HasSuffix(base, ".pem") || strings.HasSuffix(base, ".key")
+	if base == ".env" || strings.HasPrefix(base, ".env.") || base == "credentials.json" ||
+		base == ".npmrc" || base == ".netrc" || strings.HasPrefix(base, "id_rsa") ||
+		strings.HasPrefix(base, "id_ed25519") {
+		return true
+	}
+	switch filepath.Ext(base) {
+	case ".pem", ".key", ".p12", ".pfx", ".keystore":
+		return true
+	}
+	return false
 }
+
+func sensitiveCapturePath(rel string) bool { return SensitiveCapturePath(rel) }
 
 func resolvedCapturePath(path string) (string, error) {
 	var suffix []string

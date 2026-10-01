@@ -307,15 +307,5 @@ func languageOf(path string) string {
 }
 
 func secretPath(path string) bool {
-	base := strings.ToLower(filepath.Base(path))
-	if base == ".env" || strings.HasPrefix(base, ".env.") || base == "credentials.json" ||
-		base == ".npmrc" || base == ".netrc" || strings.HasPrefix(base, "id_rsa") ||
-		strings.HasPrefix(base, "id_ed25519") {
-		return true
-	}
-	switch strings.ToLower(filepath.Ext(base)) {
-	case ".pem", ".key", ".p12", ".pfx", ".keystore":
-		return true
-	}
-	return false
+	return setup.SensitiveCapturePath(path)
 }

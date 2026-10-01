@@ -146,7 +146,7 @@ func TestCaptureRefusesLinksSecretsAndRecursiveOutput(t *testing.T) {
 }
 
 func TestCaptureSecretPathClassificationAcrossNestedCaseVariants(t *testing.T) {
-	for _, name := range []string{".env.production", "config/ID_RSA", "app/Secrets/token.txt", "App/.AWS/credentials", "nested/cert.PEM", "private/API.KEY"} {
+	for _, name := range []string{".env.production", "config/ID_RSA", "app/Secrets/token.txt", "App/.AWS/credentials", "nested/cert.PEM", "private/API.KEY", "nested/credentials.json", "config/.npmrc", "keys/id_ed25519.pub", "keys/client.P12"} {
 		if !sensitiveCapturePath(name) {
 			t.Fatalf("sensitive path was not rejected: %q", name)
 		}
