@@ -259,6 +259,8 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		Composer:            c,
 		EvidenceVersionDir:  evidenceVersionDir,
 		EvidenceSanitizer:   evidenceSanitizer,
+		SemanticStorePath:   cfg.Semantic.StorePath,
+		EvidenceSourceRoot:  cfg.Backends.CKG.SourceRoot,
 		CKG:                 be.ckg,
 		CKV:                 be.ckv,
 		Vocab:               vocabResolver,

@@ -47,16 +47,17 @@ type BodyV2 struct {
 // It records reviewed source references and uncertainty; source text stays in
 // the separately sanitized Bodies collection.
 type KnowledgeContextV2 struct {
-	State               string                `json:"state"`
-	LockDigest          string                `json:"lock_digest"`
-	ApplicablePolicies  []KnowledgePolicyV2   `json:"applicable_policies"`
-	Decisions           []KnowledgeDecisionV2 `json:"decisions"`
-	Relations           []KnowledgeRelationV2 `json:"relations"`
-	Constraints         []string              `json:"constraints"`
-	RelatedRequirements []string              `json:"related_requirements"`
-	TestLinks           []string              `json:"test_links"`
-	Unknowns            []string              `json:"unknowns"`
-	Conflicts           []KnowledgeConflictV2 `json:"conflicts"`
+	State               string                 `json:"state"`
+	LockDigest          string                 `json:"lock_digest"`
+	ApplicablePolicies  []KnowledgePolicyV2    `json:"applicable_policies"`
+	Decisions           []KnowledgeDecisionV2  `json:"decisions"`
+	Relations           []KnowledgeRelationV2  `json:"relations"`
+	TraceLinks          []KnowledgeTraceLinkV2 `json:"trace_links,omitempty"`
+	Constraints         []string               `json:"constraints"`
+	RelatedRequirements []string               `json:"related_requirements"`
+	TestLinks           []string               `json:"test_links"`
+	Unknowns            []string               `json:"unknowns"`
+	Conflicts           []KnowledgeConflictV2  `json:"conflicts"`
 }
 
 type KnowledgeSemanticV2 struct {
@@ -108,6 +109,23 @@ type KnowledgeRelationV2 struct {
 	ObjectID   string     `json:"object_id"`
 	ReviewedBy string     `json:"reviewed_by"`
 	Citation   CitationV2 `json:"citation"`
+}
+
+// KnowledgeTraceLinkV2 is a bounded, cited ADR -> requirement -> code -> test
+// path. Each source coordinate belongs to the same retained dataset.
+type KnowledgeTraceLinkV2 struct {
+	ID                  string     `json:"id"`
+	DecisionID          string     `json:"decision_id"`
+	RequirementID       string     `json:"requirement_id"`
+	CriterionID         string     `json:"criterion_id"`
+	CodeCanonicalID     string     `json:"code_canonical_id"`
+	TestCanonicalID     string     `json:"test_canonical_id"`
+	ReviewedBy          string     `json:"reviewed_by"`
+	LinkCitation        CitationV2 `json:"link_citation"`
+	RequirementCitation CitationV2 `json:"requirement_citation"`
+	CriterionCitation   CitationV2 `json:"criterion_citation"`
+	CodeCitation        CitationV2 `json:"code_citation"`
+	TestCitation        CitationV2 `json:"test_citation"`
 }
 
 type KnowledgeConflictV2 struct {

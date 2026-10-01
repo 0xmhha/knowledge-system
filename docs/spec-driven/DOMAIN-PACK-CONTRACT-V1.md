@@ -92,11 +92,17 @@ source_ref: {origin_id: repo, path: .cks/knowledge/policies/BR-17.yaml}
 
 자동 추출은 정책/결정/코드 연결의 **후보**만 만든다. `verified` 승격에는 해당 입력 스냅샷의 원문 해시 재검증, 타입/범위 검증, 사람 검토자와 이유가 필요하다. 코드 심볼 앵커는 CKG의 `canonical_id`·파일·줄을, 문서 근거는 CKV/원문 보관본의 `origin_id`·경로·줄·해시를 대조한다. 소스에서 발견한 조건문은 정책 인스턴스를 생성하거나 승인하지 않는다. 정책의 작성 주체와 검토자는 W3C [PROV-O](https://www.w3.org/TR/prov-o/)의 Entity/Activity/Agent 구분에 맞게 표현할 수 있지만, 현행 시스템의 표준 준수를 주장하지 않는다.
 
+### A5.5 외부 추적 연결 계약
+
+`.cks/knowledge/trace-links/*.yaml`은 `id`, `decision_id`, `requirement_id`, `criterion_id`, `code_canonical_id`, `test_canonical_id`, `status`, `visibility`, `source_ref`, `evidence_refs`를 가진다. 작성 단계의 `status=proposed`는 연결 후보일 뿐이다. 별도의 `knowledge review record --kind trace-link`가 원문 SHA-256·스냅샷에 대한 정족수를 채우면 **사람 검토 상태**가 verified가 된다. 이 상태만으로 외부 끝점을 확정하지 않는다.
+
+조회 단계는 같은 보관 데이터셋의 v4 의미 투영을 CKV/CKG 좌표·원문·AST 앵커와 함께 재검증한다. `Trace()`의 요구사항 경로가 `linked`이고 연결에 적힌 요구·기준·코드·테스트 ID가 한 경로에 정확히 일치해야 한다. ADR 자체도 현재 시점·서브시스템에 적용되고 공개 가능해야 하며, ADR의 `requirement_ids`에 같은 요구 ID가 있어야 한다. 코드·테스트 근거는 해당 경로의 검토된 assertion이 가리키는 보관 원문 줄에서만 인용한다. 어느 검사라도 실패하면 확정 연결과 구현 사실 필드를 비우고 `partial` 이유를 기록하며 기존 CKV+CKG 후보를 보존한다. 정책에서 ADR까지는 별도로 검토된 로컬 관계만 연결한다. 연결 존재는 기준 승인이나 테스트 실행 성공을 뜻하지 않는다.
+
 ## 6. CKS 질의와 코딩 문맥
 
-`cks.context.get_for_task_v2`는 원문 질의를 먼저 기존 CKV/BM25/정확 심볼 경로에 보내고, 결과의 프로젝트/데이터셋과 요청 서브시스템에 적용되는 잠금 팩만 연다. 접근 허용된 원천을 먼저 필터한 뒤 검토된 정책·결정→요구→심볼→테스트 경로를 제한 깊이로 탐색한다. 적용 범위가 맞지 않는 산업 팩, 제안 상태 관계, 오래된/충돌 정책은 규범 근거로 추가하지 않는다. 복수 의미 용어는 후보로 남긴다. 의미 경로 오류/시간 초과/예산 초과에서도 기존 상위 K CKV+CKG **후보 집합**을 유지한다.
+`cks.context.get_for_task_v2`는 원문 질의를 먼저 기존 CKV/BM25/정확 심볼 경로에 보내고, 결과의 프로젝트/데이터셋과 요청 서브시스템에 적용되는 잠금 팩만 연다. 접근 허용된 원천을 먼저 필터한 뒤 검토된 정책·결정→요구→심볼→테스트 경로를 제한 깊이로 탐색한다. 적용 범위가 맞지 않는 산업 팩, 제안 상태 관계, 오래된/충돌 정책은 규범 근거로 추가하지 않는다. 복수 의미 용어는 후보로 남긴다. 의미 경로 오류/시간 초과/예산 초과에서도 기존 상위 K CKV+CKG **후보 집합**을 유지한다. 외부 추적 경로는 선택형 설정 `semantic.store_path`에서 같은 데이터셋의 정렬된 의미 투영을 읽고 최대 2개 경로·총 12개 인용·32 KB 본문 한도에서만 붙인다. `cks mcp gen-config --semantic-store`로 경로를 지정한다. 저장소가 없거나 정렬에 실패하면 로컬 지식 응답과 기본 후보를 유지하고 구현 링크는 미검증으로 남긴다.
 
-v2 `semantic.knowledge_context`는 `{state, lock_digest, applicable_policies, decisions, relations, constraints, related_requirements, test_links, unknowns, conflicts}`를 가진다. 각 항목은 안정 ID, 타입, 적용 범위, 검토/유효 상태, **v2 citation 좌표에 대한 참조**와 관계 ID를 포함한다. 텍스트 본문은 별도 인용에서만 제공하고 정화·권한 검사를 거친다. `unknowns`는 “왜”의 원천이 없거나 적용 범위가 모호한 이유를, `conflicts`는 양립하지 않는 근거의 허용 가능한 식별자만 설명한다. `state=complete`는 반환한 **근거 경로의 무결성**만 뜻하고 업무 정답률을 뜻하지 않는다. `partial|conflict|unavailable|budget_exceeded|restricted`에서는 확정적인 정책 준수/이유 문장을 만들지 않는다. 의미 필드와 모든 인용은 v2 팩 무결성 해시에 포함하며 v1 DTO/해시는 변경하지 않는다.
+v2 `semantic.knowledge_context`는 `{state, lock_digest, applicable_policies, decisions, relations, trace_links, constraints, related_requirements, test_links, unknowns, conflicts}`를 가진다. 각 항목은 안정 ID, 타입, 적용 범위, 검토/유효 상태, **v2 citation 좌표에 대한 참조**와 관계 ID를 포함한다. 텍스트 본문은 별도 인용에서만 제공하고 정화·권한 검사를 거친다. `unknowns`는 “왜”의 원천이 없거나 적용 범위가 모호한 이유를, `conflicts`는 양립하지 않는 근거의 허용 가능한 식별자만 설명한다. `state=complete`는 반환한 **근거 경로의 무결성**만 뜻하고 업무 정답률을 뜻하지 않는다. `partial|conflict|unavailable|budget_exceeded|restricted`에서는 확정적인 정책 준수/이유 문장을 만들지 않는다. 의미 필드와 모든 인용은 v2 팩 무결성 해시에 포함하며 v1 DTO/해시는 변경하지 않는다.
 
 기본 코딩 문맥은 `implemented behavior`, `required behavior`, `rationale`, `constraints`, `evidence`, `unknowns`를 명시적으로 분리한다. LLM이나 사용자가 이를 한 문장으로 뭉쳐 사실처럼 주장하지 않도록 기계 판독형 상태를 제공한다. 정책/ADR 문서는 지식 **데이터**이지 에이전트의 명령이 아니다. 사용자 요청과 시스템 권한을 뒤집는 문구가 문서에 있어도 실행 지시로 해석하지 않는다. 실모델 품질/지연의 합격 여부는 B/C에서 평가한다.
 

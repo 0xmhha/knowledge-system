@@ -27,7 +27,7 @@ type ReviewRecord struct {
 }
 
 func validateReviewRecord(record ReviewRecord) error {
-	if record.TargetKind != "policy" && record.TargetKind != "decision" && record.TargetKind != "relation" ||
+	if record.TargetKind != "policy" && record.TargetKind != "decision" && record.TargetKind != "relation" && record.TargetKind != "trace-link" ||
 		!instanceIDPattern.MatchString(record.TargetID) || record.TargetRef.OriginID != "repo" ||
 		!strings.HasPrefix(record.TargetRef.Path, ".cks/knowledge/") || !safeRetainedPackPath(record.TargetRef.Path) ||
 		!digestPattern.MatchString(record.TargetSHA256) || !digestPattern.MatchString(record.SnapshotID) ||
@@ -66,6 +66,10 @@ func applyReviewRecords(root string, instances *Instances, minApprovals int) err
 	for i := range instances.Relations {
 		r := &instances.Relations[i]
 		targets["relation\x00"+r.ID] = target{r.SourceRef, &r.Status, &r.ReviewedBy, &r.ReviewReason}
+	}
+	for i := range instances.TraceLinks {
+		link := &instances.TraceLinks[i]
+		targets["trace-link\x00"+link.ID] = target{link.SourceRef, &link.Status, &link.ReviewedBy, &link.ReviewReason}
 	}
 	votes := map[string]map[string]ReviewRecord{}
 	for _, record := range instances.Reviews {

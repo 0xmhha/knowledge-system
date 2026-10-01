@@ -3,12 +3,15 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/system/evidencev2"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -61,6 +64,25 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 		pack, err = evidencev2.AttachKnowledge(ctx, pack, d.EvidenceVersionDir, asOf, subsystem, d.EvidenceSanitizer)
 		if err != nil {
 			return v2ToolErrorFor(err, "knowledge_context_failed"), nil
+		}
+		if d.SemanticStorePath != "" {
+			// The store is optional. A missing or stale projection keeps the
+			// already cited CKV/CKG and local knowledge response intact.
+			if info, statErr := os.Stat(d.SemanticStorePath); statErr == nil && info.Mode().IsRegular() {
+				store, openErr := semantic.OpenStore(d.SemanticStorePath)
+				if openErr == nil {
+					projection, loadErr := store.LoadAlignedRetained(ctx, pack.Coordinates.ProjectID,
+						pack.Coordinates.DatasetID, d.EvidenceSourceRoot,
+						filepath.Join(d.EvidenceVersionDir, "graph"), filepath.Join(d.EvidenceVersionDir, "vector"), d.EvidenceVersionDir)
+					_ = store.Close()
+					if loadErr == nil {
+						pack, err = evidencev2.AttachVerifiedTraces(ctx, pack, d.EvidenceVersionDir, asOf, subsystem, projection, d.EvidenceSanitizer)
+						if err != nil {
+							return v2ToolErrorFor(err, "knowledge_context_failed"), nil
+						}
+					}
+				}
+			}
 		}
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil

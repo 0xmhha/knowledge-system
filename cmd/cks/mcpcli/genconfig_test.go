@@ -17,6 +17,7 @@ func TestRunGenConfig_WritesLoadableConfig(t *testing.T) {
 		"--dataset-dir", "/data/pr-77",
 		"--source-root", "/src/example-project",
 		"--sanitize-rules", "/policies/sanitization_rules.yaml",
+		"--semantic-store", "/data/semantic.db",
 	}
 	if err := runGenConfig(args, io.Discard); err != nil {
 		t.Fatalf("runGenConfig: %v", err)
@@ -38,6 +39,9 @@ func TestRunGenConfig_WritesLoadableConfig(t *testing.T) {
 	}
 	if cfg.Listen.Transport != "http" {
 		t.Errorf("Transport = %q, want http", cfg.Listen.Transport)
+	}
+	if cfg.Semantic.StorePath != "/data/semantic.db" {
+		t.Errorf("Semantic.StorePath = %q", cfg.Semantic.StorePath)
 	}
 }
 

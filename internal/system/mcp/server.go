@@ -54,6 +54,10 @@ type Deps struct {
 	// version path leaves the v2 tool registered but returns reindex_required.
 	EvidenceVersionDir string
 	EvidenceSanitizer  *sanitize.Engine
+	// Optional SQLite semantic store. Each request rechecks its projection
+	// against this pinned version before publishing external trace anchors.
+	SemanticStorePath  string
+	EvidenceSourceRoot string
 
 	// CKG and CKV are reported by cks.ops.health. They are NOT used to
 	// short-circuit composer calls — the composer holds its own references

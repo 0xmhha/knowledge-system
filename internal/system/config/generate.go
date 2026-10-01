@@ -65,9 +65,10 @@ type GenerateOptions struct {
 
 	// DomainProjectDir / DomainCorpusDir wire channel ② (domain-knowledge
 	// embedding); both empty disables it. GlossaryPath enables vocab expansion.
-	DomainProjectDir string
-	DomainCorpusDir  string
-	GlossaryPath     string
+	DomainProjectDir  string
+	DomainCorpusDir   string
+	GlossaryPath      string
+	SemanticStorePath string
 
 	// FootprintDir / AuditDir are the logging output directories.
 	FootprintDir string
@@ -167,7 +168,8 @@ func Generate(o GenerateOptions) *Config {
 			ProjectDir: o.DomainProjectDir,
 			CorpusDir:  o.DomainCorpusDir,
 		},
-		Service: ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
+		Semantic: SemanticConfig{StorePath: o.SemanticStorePath},
+		Service:  ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
 		Vocab: VocabConfig{
 			GlossaryPath: o.GlossaryPath,
 		},

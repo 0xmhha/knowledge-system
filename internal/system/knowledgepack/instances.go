@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
 	"gopkg.in/yaml.v3"
@@ -74,17 +75,36 @@ type RelationInstance struct {
 	EvidenceRefs []SourceRef `yaml:"evidence_refs" json:"evidence_refs"`
 }
 
+// TraceLink is a human-reviewed claim about an ADR and one semantic trace
+// path. Its review status is not proof of the external requirement, CKG code,
+// or test endpoints; callers must validate those against an aligned projection.
+type TraceLink struct {
+	ID              string      `yaml:"id" json:"id"`
+	DecisionID      string      `yaml:"decision_id" json:"decision_id"`
+	RequirementID   string      `yaml:"requirement_id" json:"requirement_id"`
+	CriterionID     string      `yaml:"criterion_id" json:"criterion_id"`
+	CodeCanonicalID string      `yaml:"code_canonical_id" json:"code_canonical_id"`
+	TestCanonicalID string      `yaml:"test_canonical_id" json:"test_canonical_id"`
+	Status          string      `yaml:"status" json:"status"`
+	ReviewedBy      string      `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason    string      `yaml:"review_reason" json:"review_reason"`
+	Visibility      string      `yaml:"visibility" json:"visibility"`
+	SourceRef       SourceRef   `yaml:"source_ref" json:"source_ref"`
+	EvidenceRefs    []SourceRef `yaml:"evidence_refs" json:"evidence_refs"`
+}
+
 type InstanceRef struct {
 	ID   string  `yaml:"id" json:"id"`
 	Type TypeRef `yaml:"type" json:"type"`
 }
 
 type Instances struct {
-	Policies  []Policy           `json:"policies"`
-	Decisions []Decision         `json:"decisions"`
-	Relations []RelationInstance `json:"relations"`
-	Reviews   []ReviewRecord     `json:"reviews"`
-	Conflicts []Conflict         `json:"conflicts"`
+	Policies   []Policy           `json:"policies"`
+	Decisions  []Decision         `json:"decisions"`
+	Relations  []RelationInstance `json:"relations"`
+	TraceLinks []TraceLink        `json:"trace_links"`
+	Reviews    []ReviewRecord     `json:"reviews"`
+	Conflicts  []Conflict         `json:"conflicts"`
 }
 
 type Conflict struct {
@@ -239,7 +259,7 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	if minApprovals < 1 {
 		return Instances{}, fmt.Errorf("evidence_unverified: invalid review quorum")
 	}
-	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, Reviews: []ReviewRecord{}, Conflicts: []Conflict{}}
+	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, TraceLinks: []TraceLink{}, Reviews: []ReviewRecord{}, Conflicts: []Conflict{}}
 	types := map[TypeRef]bool{}
 	relationTypes := map[TypeRef]RelationType{}
 	for _, loaded := range packs {
@@ -266,6 +286,7 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 			if name == "policies" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "relations" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "reviews" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "trace-links" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "decisions" && filepath.Ext(entry.Name()) != ".md" {
 				return fmt.Errorf("evidence_unverified: unsupported %s file %q", name, entry.Name())
 			}
@@ -344,6 +365,23 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	}); err != nil {
 		return Instances{}, err
 	}
+	if err := readDir("trace-links", func(rel string, buf []byte) error {
+		var link TraceLink
+		if err := decodeYAML(buf, &link); err != nil {
+			return fmt.Errorf("evidence_unverified: trace link %q: %w", rel, err)
+		}
+		if err := validateTraceLink(link, rel); err != nil {
+			return err
+		}
+		if seen[link.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", link.ID)
+		}
+		seen[link.ID] = true
+		result.TraceLinks = append(result.TraceLinks, link)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
 	if err := readDir("reviews", func(rel string, buf []byte) error {
 		var record ReviewRecord
 		if err := decodeYAML(buf, &record); err != nil {
@@ -371,6 +409,16 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	for _, relation := range result.Relations {
 		if err := validateRelation(relation, strings.TrimPrefix(relation.SourceRef.Path, ".cks/knowledge/"), relationTypes, policyByID, decisionByID); err != nil {
 			return Instances{}, err
+		}
+	}
+	for _, link := range result.TraceLinks {
+		if err := validateTraceLink(link, strings.TrimPrefix(link.SourceRef.Path, ".cks/knowledge/")); err != nil {
+			return Instances{}, err
+		}
+		decision, ok := decisionByID[link.DecisionID]
+		if !ok || link.Status == "verified" && (decision.Status != "verified" || !containsRequirementID(decision.RequirementIDs, link.RequirementID) ||
+			!sourceRefPresent(link.EvidenceRefs, decision.SourceRef)) {
+			return Instances{}, fmt.Errorf("evidence_unverified: trace link %q lacks reviewed ADR evidence", link.ID)
 		}
 	}
 	for _, decision := range result.Decisions {
@@ -547,6 +595,48 @@ func validateRelation(edge RelationInstance, path string, relationTypes map[Type
 		return fmt.Errorf("evidence_unverified: relation %q lacks verified local endpoints and source evidence", edge.ID)
 	}
 	return nil
+}
+
+func validateTraceLink(link TraceLink, path string) error {
+	if !instanceIDPattern.MatchString(link.ID) || !instanceIDPattern.MatchString(link.DecisionID) ||
+		!instanceIDPattern.MatchString(link.RequirementID) || !instanceIDPattern.MatchString(link.CriterionID) ||
+		!validCanonicalLinkID(link.CodeCanonicalID) || !validCanonicalLinkID(link.TestCanonicalID) ||
+		!validSource(link.SourceRef, path) || !validReview(link.Status, link.ReviewedBy, link.ReviewReason) ||
+		(link.Visibility != "public" && link.Visibility != "restricted") || len(link.EvidenceRefs) == 0 {
+		return fmt.Errorf("evidence_unverified: invalid trace link %q", path)
+	}
+	seen := map[SourceRef]bool{}
+	for _, ref := range link.EvidenceRefs {
+		if ref.OriginID != "repo" || !strings.HasPrefix(ref.Path, ".cks/knowledge/") ||
+			!safeRetainedPackPath(ref.Path) || seen[ref] {
+			return fmt.Errorf("evidence_unverified: invalid trace link evidence %q", path)
+		}
+		seen[ref] = true
+	}
+	return nil
+}
+
+func validCanonicalLinkID(id string) bool {
+	return id != "" && len(id) <= 512 && utf8.ValidString(id) && strings.TrimSpace(id) == id &&
+		!strings.ContainsAny(id, "\x00\r\n\t")
+}
+
+func containsRequirementID(ids []string, id string) bool {
+	for _, item := range ids {
+		if item == id {
+			return true
+		}
+	}
+	return false
+}
+
+func sourceRefPresent(refs []SourceRef, want SourceRef) bool {
+	for _, ref := range refs {
+		if ref == want {
+			return true
+		}
+	}
+	return false
 }
 
 func scopeOverlaps(a, b map[string]string) bool {

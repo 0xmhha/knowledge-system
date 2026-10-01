@@ -22,7 +22,7 @@ func buildKnowledgeVersion(t *testing.T, visibility, statement string, withRelat
 	root, version := t.TempDir(), t.TempDir()
 	packRoot := filepath.Join(root, "vendor", "decisions")
 	overlay := filepath.Join(root, ".cks", "knowledge")
-	for _, dir := range []string{packRoot, filepath.Join(overlay, "policies"), filepath.Join(overlay, "decisions"), filepath.Join(overlay, "relations")} {
+	for _, dir := range []string{packRoot, filepath.Join(overlay, "policies"), filepath.Join(overlay, "decisions"), filepath.Join(overlay, "relations"), filepath.Join(overlay, "trace-links")} {
 		if err := os.MkdirAll(dir, 0o700); err != nil {
 			t.Fatal(err)
 		}
@@ -107,6 +107,23 @@ Independent approval was selected.
 		if err := os.WriteFile(filepath.Join(overlay, "decisions", "ADR-1.md"), []byte(decision), 0o600); err != nil {
 			t.Fatal(err)
 		}
+		link := `id: TRACE-1
+decision_id: ADR-1
+requirement_id: REQ-1
+criterion_id: AC-1
+code_canonical_id: pkg.Alpha
+test_canonical_id: pkg.TestAlpha
+status: verified
+reviewed_by: reviewer
+review_reason: Compared with the specification, code, and test.
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/trace-links/TRACE-1.yaml}
+evidence_refs:
+  - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
+`
+		if err := os.WriteFile(filepath.Join(overlay, "trace-links", "TRACE-1.yaml"), []byte(link), 0o600); err != nil {
+			t.Fatal(err)
+		}
 	}
 	if withRelation {
 		relation := `id: REL-1
@@ -140,6 +157,16 @@ evidence_refs:
 	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("code evidence\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
+	for name, body := range map[string]string{
+		"ontology.yaml": "version: 1\nproject_id: p\ndomain: transfers\ncompetency_questions: [\"How does Alpha work?\"]\nconcepts:\n  - id: alpha\n    kind: entity\n    definition: Alpha behavior\n    includes: [Alpha]\n    excludes: [Beta]\n    terms: [{lang: en, value: Alpha, preferred: true}]\n    status: verified\n    reviewed_by: reviewer\n",
+		"spec.yaml":     "version: 1\nproject_id: p\nrequirements:\n  - id: REQ-1\n    version: 1\n    title: Alpha works\n    statement: Alpha responds.\n    status: verified\n    reviewed_by: reviewer\n    concept_ids: [alpha]\n    acceptance_criteria:\n      - id: AC-1\n        given: Alpha exists\n        when: called\n        then: it responds\n",
+		"main.go":       "package p\nfunc Alpha() {}\n",
+		"main_test.go":  "package p\nfunc TestAlpha() {}\n",
+	} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
 	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: version, ProjectID: "p", SourceMode: "snapshot-only",
 		ExternalOrigins: []setup.CaptureOrigin{{ID: "knowledge:engineering.decisions", Root: packRoot}}})
 	if err != nil {
@@ -154,12 +181,13 @@ evidence_refs:
 		if err := os.Mkdir(dir, 0o700); err != nil {
 			t.Fatal(err)
 		}
-		body, err := json.Marshal(map[string]any{"src_root": root, "graph_digest": "graph", "schema_version": "1.23",
+		body, err := json.Marshal(map[string]any{"src_root": root, "graph_digest": strings.Repeat("a", 64), "schema_version": "1.23",
 			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space",
 			"project_id": captured.Identity.ProjectID, "snapshot_id": captured.Identity.SnapshotID,
 			"dataset_id": identity.DatasetID, "source_mode": captured.Identity.SourceMode,
 			"file_manifest_digest":  captured.Identity.FileManifestDigest,
-			"capture_policy_digest": captured.Identity.CapturePolicyDigest})
+			"capture_policy_digest": captured.Identity.CapturePolicyDigest,
+			"sources":               map[string]any{"ckg": map[string]any{"graph_digest": strings.Repeat("a", 64), "src_commit": ""}}})
 		if err != nil {
 			t.Fatal(err)
 		}

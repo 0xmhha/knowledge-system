@@ -210,6 +210,10 @@ func NewCmd() *cobra.Command {
 				reason, count := reviewState("relation", relation.ID, relation.Status)
 				queue = append(queue, item{"relation", relation.ID, relation.Status, relation.SourceRef, relation.ReviewedBy, count, reason})
 			}
+			for _, link := range instances.TraceLinks {
+				reason, count := reviewState("trace-link", link.ID, link.Status)
+				queue = append(queue, item{"trace-link", link.ID, link.Status, link.SourceRef, link.ReviewedBy, count, reason})
+			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"project_id": lock.ProjectID, "items": queue, "conflicts": instances.Conflicts})
 		}}
 	reviewCmd.PersistentFlags().StringVar(&reviewVersionDir, "version-dir", "", "read policy and ADR records from a pinned retained dataset")
@@ -254,6 +258,12 @@ func NewCmd() *cobra.Command {
 				for _, relation := range instances.Relations {
 					if relation.ID == reviewID {
 						source, status = relation.SourceRef, relation.Status
+					}
+				}
+			case "trace-link":
+				for _, link := range instances.TraceLinks {
+					if link.ID == reviewID {
+						source, status = link.SourceRef, link.Status
 					}
 				}
 			default:
@@ -307,7 +317,7 @@ func NewCmd() *cobra.Command {
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"status": "review_recorded", "target_id": reviewID,
 				"snapshot_id": record.SnapshotID, "target_sha256": record.TargetSHA256, "path": path, "needs_relock": true})
 		}}
-	recordCmd.Flags().StringVar(&reviewKind, "kind", "", "policy, decision or relation")
+	recordCmd.Flags().StringVar(&reviewKind, "kind", "", "policy, decision, relation or trace-link")
 	recordCmd.Flags().StringVar(&reviewID, "id", "", "knowledge instance ID")
 	recordCmd.Flags().StringVar(&reviewDecision, "decision", "", "verified or rejected")
 	recordCmd.Flags().StringVar(&reviewer, "reviewer", "", "local reviewer ID")

@@ -42,6 +42,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	domainProjectDir := fs.String("domain-project-dir", "", "domain-knowledge project dir (enables channel 2)")
 	domainCorpusDir := fs.String("domain-corpus-dir", "", "domain corpus export dir (enables channel 2)")
 	glossaryPath := fs.String("glossary", "", "vocab glossary YAML path")
+	semanticStore := fs.String("semantic-store", "", "optional SQLite semantic store for reviewed v2 trace paths")
 	footprintDir := fs.String("footprint-dir", "", "footprint log output dir")
 	auditDir := fs.String("audit-dir", "", "audit log output dir")
 	labelPrefix := fs.String("service-label-prefix", "", "launchd label prefix for `cks mcp service`; empty uses the engine's own name (set it only when agents are already installed under another prefix, or two distributions share a host)")
@@ -108,6 +109,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		DomainProjectDir:   *domainProjectDir,
 		DomainCorpusDir:    *domainCorpusDir,
 		GlossaryPath:       *glossaryPath,
+		SemanticStorePath:  *semanticStore,
 		FootprintDir:       *footprintDir,
 		AuditDir:           *auditDir,
 		ServiceLabelPrefix: *labelPrefix,

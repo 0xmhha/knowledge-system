@@ -53,7 +53,14 @@ type Config struct {
 	Sanitize    SanitizeConfig `yaml:"sanitize"`
 	Vocab       VocabConfig    `yaml:"vocab"`
 	Domain      DomainConfig   `yaml:"domain"`
+	Semantic    SemanticConfig `yaml:"semantic"`
 	Service     ServiceConfig  `yaml:"service"`
+}
+
+// SemanticConfig enables reviewed external trace paths for the optional v2
+// knowledge response. Empty StorePath preserves the earlier v2 behavior.
+type SemanticConfig struct {
+	StorePath string `yaml:"store_path"`
 }
 
 // ServiceConfig carries the launchd deployment's host-level properties — the

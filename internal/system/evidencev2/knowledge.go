@@ -294,6 +294,38 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 		}
 		ids[relation.ID] = true
 	}
+	requirements, tests := []string{}, []string{}
+	for _, link := range k.TraceLinks {
+		if link.ID == "" || ids[link.ID] || !ids[link.DecisionID] || link.RequirementID == "" ||
+			link.CriterionID == "" || link.CodeCanonicalID == "" || link.TestCanonicalID == "" || link.ReviewedBy == "" {
+			return fmt.Errorf("v2 trace link lacks reviewed endpoints")
+		}
+		for _, citation := range []contract.CitationV2{link.LinkCitation, link.RequirementCitation,
+			link.CriterionCitation, link.CodeCitation, link.TestCitation} {
+			if !citations[citation] || citation.OriginID != "repo" {
+				return fmt.Errorf("v2 trace link lacks archive citation")
+			}
+		}
+		decisionDeclares := false
+		for _, decision := range k.Decisions {
+			if decision.ID == link.DecisionID && containsString(decision.RequirementIDs, link.RequirementID) {
+				decisionDeclares = true
+			}
+		}
+		if !decisionDeclares {
+			return fmt.Errorf("v2 trace link differs from reviewed ADR")
+		}
+		ids[link.ID] = true
+		if !containsString(requirements, link.RequirementID) {
+			requirements = append(requirements, link.RequirementID)
+		}
+		if !containsString(tests, link.TestCanonicalID) {
+			tests = append(tests, link.TestCanonicalID)
+		}
+	}
+	if !slicesEqual(k.RelatedRequirements, requirements) || !slicesEqual(k.TestLinks, tests) {
+		return fmt.Errorf("v2 trace summary differs from cited paths")
+	}
 	for _, conflict := range k.Conflicts {
 		if conflict.LeftID == conflict.RightID || !ids[conflict.LeftID] || !ids[conflict.RightID] || conflict.Reason == "" {
 			return fmt.Errorf("v2 knowledge conflict has missing policy endpoints")
@@ -307,7 +339,7 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 	if c.Evidence == nil && c.RequiredBehavior == nil && c.Rationale == nil && c.Unknowns == nil {
 		return nil // existing v2 packs predate the optional coding-context field
 	}
-	if len(c.ImplementedBehavior) != 0 || len(c.Constraints) != 0 ||
+	if len(c.ImplementedBehavior) != len(k.TraceLinks) || len(c.Constraints) != 0 ||
 		len(c.RequiredBehavior) != len(k.ApplicablePolicies) || len(c.Rationale) != len(k.Decisions) ||
 		len(c.Evidence) != len(citations) {
 		return fmt.Errorf("v2 coding context claims unsupported or missing evidence")
@@ -322,15 +354,35 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 			return fmt.Errorf("v2 rationale differs from decision evidence")
 		}
 	}
+	for i, link := range k.TraceLinks {
+		if c.ImplementedBehavior[i] != (contract.KnowledgeReferenceV2{ID: link.CodeCanonicalID, State: "reviewed_trace", Citation: link.CodeCitation}) {
+			return fmt.Errorf("v2 implemented behavior differs from cited trace")
+		}
+	}
 	for _, citation := range c.Evidence {
 		if !citations[citation] {
 			return fmt.Errorf("v2 coding evidence has an unknown citation")
 		}
 	}
-	if !containsString(c.Unknowns, "implementation_link_unverified") {
+	if len(k.TraceLinks) == 0 && !containsString(c.Unknowns, "implementation_link_unverified") {
 		return fmt.Errorf("v2 coding context omitted unverified implementation state")
 	}
+	if len(k.TraceLinks) > 0 && containsString(c.Unknowns, "implementation_link_unverified") {
+		return fmt.Errorf("v2 coding context contradicts verified implementation trace")
+	}
 	return nil
+}
+
+func slicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func containsString(values []string, target string) bool {
