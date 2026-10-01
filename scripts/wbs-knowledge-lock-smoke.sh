@@ -96,6 +96,33 @@ MD
 "$repo_root/bin/cks" knowledge review --project-root "$src" > "$scratch/review-3.json"
 "$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
   --source-mode snapshot-only --version third --embedder mock > "$scratch/third.log" 2>&1
+dataset_id="$(python3 - "$data/third/dataset-identity.json" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1]))['dataset_id'])
+PY
+)"
+"$repo_root/bin/cks" semantic build --repo "$src" --project-id knowledge-fixture \
+  --dataset-id "$dataset_id" --graph "$data/third/graph" --vector "$data/third/vector" \
+  --store "$scratch/semantic.db" --out "$scratch/pack-v4.json" \
+  --docs README.md --include-packs --version-dir "$data/third" --extract-only \
+  > "$scratch/pack-v4-build.json"
+"$repo_root/bin/cks" semantic promote --input "$scratch/pack-v4.json" --repo "$src" \
+  --graph "$data/third/graph" --vector "$data/third/vector" --store "$scratch/semantic.db" \
+  --version-dir "$data/third" --activate > "$scratch/pack-v4-promote.json"
+python3 - "$scratch/pack-v4.json" "$scratch/pack-v4-tampered.json" <<'PY'
+import json, pathlib, sys
+original, tampered = map(pathlib.Path,sys.argv[1:])
+p = json.loads(original.read_text())
+assert p['schema_version'] == 4 and len(p['knowledge']['packs']) == 1
+assert {c['local_id'] for c in p['knowledge']['packs'][0]['concepts']} == {'business-policy','design-decision'}
+p['knowledge']['packs'][0]['concepts'][0]['definition'] = 'Forged definition.'
+tampered.write_text(json.dumps(p))
+PY
+if "$repo_root/bin/cks" semantic promote --input "$scratch/pack-v4-tampered.json" --repo "$src" \
+  --graph "$data/third/graph" --vector "$data/third/vector" --store "$scratch/semantic.db" \
+  --version-dir "$data/third" > "$scratch/pack-v4-tampered.log" 2>&1; then
+  echo "forged v4 pack type was promoted" >&2; exit 1
+fi
 printf '\n# Patch candidate\n' >> "$src/README.md"
 "$repo_root/bin/cks" setup --src "$src" --out "$data" --project-id knowledge-fixture \
   --source-mode snapshot-only --version held --embedder mock --hold-for-review \

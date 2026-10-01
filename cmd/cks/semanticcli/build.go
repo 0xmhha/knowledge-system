@@ -13,13 +13,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/knowledgepack"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 )
 
 func newBuildCmd() *cobra.Command {
 	var repo, project, dataset, graph, vector, storePath, output, ontology, spec, versionDir string
 	var docs []string
-	var activate, extractOnly bool
+	var activate, extractOnly, includePacks bool
 	var minimumCoverage float64
 	cmd := &cobra.Command{
 		Use: "build", Short: "Extract archived or committed Markdown sections into an aligned semantic dataset",
@@ -28,7 +29,7 @@ func newBuildCmd() *cobra.Command {
 			return runBuild(cmd.Context(), cmd, buildOptions{
 				repo: repo, project: project, dataset: dataset, graph: graph, vector: vector,
 				store: storePath, output: output, docs: docs, ontology: ontology, spec: spec, versionDir: versionDir,
-				activate: activate, extractOnly: extractOnly, minimumCoverage: minimumCoverage,
+				activate: activate, extractOnly: extractOnly, includePacks: includePacks, minimumCoverage: minimumCoverage,
 			})
 		},
 	}
@@ -45,6 +46,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&versionDir, "version-dir", "", "pinned dataset directory with retained source archive (required for working-tree and snapshot-only)")
 	cmd.Flags().BoolVar(&activate, "activate", false, "activate this dataset after validation")
 	cmd.Flags().BoolVar(&extractOnly, "extract-only", false, "write a reviewable projection without storing or activating it")
+	cmd.Flags().BoolVar(&includePacks, "include-packs", false, "derive a v4 tuple-scoped pack projection from the retained knowledge lock")
 	cmd.Flags().Float64Var(&minimumCoverage, "min-canonical-ratio", 0, "measured project minimum for CKV-to-CKG symbol alignment (0 disables)")
 	for _, flag := range []string{"repo", "project-id", "dataset-id", "graph", "vector", "store", "out"} {
 		_ = cmd.MarkFlagRequired(flag)
@@ -57,6 +59,7 @@ type buildOptions struct {
 	docs                                                                             []string
 	activate                                                                         bool
 	extractOnly                                                                      bool
+	includePacks                                                                     bool
 	minimumCoverage                                                                  float64
 }
 
@@ -64,8 +67,11 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	if o.extractOnly && o.activate {
 		return fmt.Errorf("--extract-only cannot be combined with --activate")
 	}
-	if len(o.docs) == 0 && o.ontology == "" && o.spec == "" {
-		return fmt.Errorf("at least one --docs, --ontology, or --spec path is required")
+	if len(o.docs) == 0 && o.ontology == "" && o.spec == "" && !o.includePacks {
+		return fmt.Errorf("at least one --docs, --ontology, --spec, or --include-packs is required")
+	}
+	if o.includePacks && o.versionDir == "" {
+		return fmt.Errorf("--include-packs requires --version-dir with a retained knowledge lock")
 	}
 	if err := semantic.ValidateCanonicalCoverage(o.vector, o.minimumCoverage); err != nil {
 		return err
@@ -156,6 +162,13 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		p.Evidence = append(p.Evidence, part.Evidence...)
 		p.Requirements = append(p.Requirements, part.Requirements...)
 	}
+	if o.includePacks {
+		p.Knowledge, err = knowledgepack.ProjectRetainedKnowledge(o.versionDir)
+		if err != nil {
+			return err
+		}
+		p.SchemaVersion = semantic.PackProjectionVersion
+	}
 	linkedSections, err := semantic.AttachCKVChunks(ctx, &p, o.vector)
 	if err != nil {
 		return err
@@ -208,7 +221,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 	return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{
 		"project_id": o.project, "dataset_id": o.dataset, "commit": snapshot.Commit,
 		"sections": len(p.Sections), "chunk_linked_sections": linkedSections,
-		"concepts": len(p.Concepts), "requirements": len(p.Requirements),
+		"concepts": len(p.Concepts), "requirements": len(p.Requirements), "schema_version": p.SchemaVersion,
 		"evidence": len(p.Evidence), "stored": !o.extractOnly, "activated": o.activate,
 	})
 }

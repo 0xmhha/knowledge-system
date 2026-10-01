@@ -6,6 +6,10 @@ package semantic
 // SchemaVersion is the file/DB projection contract version.
 const SchemaVersion = 3
 
+// PackProjectionVersion introduces tuple-scoped, archived pack definitions.
+// Historical v1-v3 projections remain immutable and readable.
+const PackProjectionVersion = 4
+
 type Status string
 
 const (
@@ -138,12 +142,13 @@ const (
 // Projection is one versioned semantic graph view for one source snapshot.
 // Empty Claims is valid: extracting sections must not invent facts.
 type Projection struct {
-	SchemaVersion int               `json:"schema_version"`
-	Snapshot      Snapshot          `json:"snapshot"`
-	Evidence      []EvidenceSpan    `json:"evidence"`
-	Sections      []DocumentSection `json:"sections"`
-	Concepts      []Concept         `json:"concepts,omitempty"`
-	Requirements  []Requirement     `json:"requirements,omitempty"`
-	Claims        []Claim           `json:"claims"`
-	Assertions    []Assertion       `json:"assertions,omitempty"`
+	SchemaVersion int                  `json:"schema_version"`
+	Snapshot      Snapshot             `json:"snapshot"`
+	Evidence      []EvidenceSpan       `json:"evidence"`
+	Sections      []DocumentSection    `json:"sections"`
+	Concepts      []Concept            `json:"concepts,omitempty"`
+	Requirements  []Requirement        `json:"requirements,omitempty"`
+	Claims        []Claim              `json:"claims"`
+	Assertions    []Assertion          `json:"assertions,omitempty"`
+	Knowledge     *KnowledgeProjection `json:"knowledge,omitempty"`
 }

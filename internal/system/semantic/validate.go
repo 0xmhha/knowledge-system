@@ -47,8 +47,18 @@ func (s Snapshot) validate() error {
 // Validate checks schema shape, local references, and snapshot isolation.
 // It does not prove source bytes; call ValidateSources before promotion.
 func (p Projection) Validate() error {
-	if p.SchemaVersion != 1 && p.SchemaVersion != 2 && p.SchemaVersion != SchemaVersion {
+	if p.SchemaVersion != 1 && p.SchemaVersion != 2 && p.SchemaVersion != SchemaVersion && p.SchemaVersion != PackProjectionVersion {
 		return fmt.Errorf("semantic schema version %d is unsupported", p.SchemaVersion)
+	}
+	if p.SchemaVersion == PackProjectionVersion {
+		if p.Snapshot.SnapshotID == "" || p.Snapshot.SourceMode == "" {
+			return fmt.Errorf("v4 pack projection requires pinned source coordinates")
+		}
+		if err := p.Knowledge.validate(); err != nil {
+			return err
+		}
+	} else if p.Knowledge != nil {
+		return fmt.Errorf("semantic pack projection requires schema version 4")
 	}
 	if p.SchemaVersion == 1 && len(p.Requirements) != 0 {
 		return fmt.Errorf("semantic schema version 1 cannot contain requirements")
@@ -409,6 +419,9 @@ func safeRelativePath(file string) bool {
 // recorded in the projection. It reads Git objects rather than the current
 // working tree, so uncommitted edits cannot masquerade as verified evidence.
 func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error {
+	if p.SchemaVersion == PackProjectionVersion {
+		return fmt.Errorf("requires_v2: pack projection requires retained source validation")
+	}
 	if p.Snapshot.SourceMode == "working-tree" || p.Snapshot.SourceMode == "snapshot-only" {
 		return fmt.Errorf("requires_v2: non-committed semantic evidence requires retained source validation")
 	}
@@ -422,7 +435,7 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 // snapshots. It also works for retained committed candidates and never opens
 // the mutable checkout or asks Git for HEAD content.
 func (p Projection) ValidateRetainedSources(versionDir string) error {
-	return p.validateSourceBytes(func(file string) ([]byte, error) {
+	if err := p.validateSourceBytes(func(file string) ([]byte, error) {
 		buf, identity, _, err := setup.ReadRetainedFile(versionDir, "repo", file)
 		if err != nil {
 			return nil, err
@@ -433,7 +446,13 @@ func (p Projection) ValidateRetainedSources(versionDir string) error {
 			return nil, fmt.Errorf("snapshot_mismatch: semantic source coordinates differ from archive")
 		}
 		return buf, nil
-	})
+	}); err != nil {
+		return err
+	}
+	if p.SchemaVersion == PackProjectionVersion {
+		return p.Knowledge.validateRetained(versionDir)
+	}
+	return nil
 }
 
 func (p Projection) validateSourceBytes(read func(string) ([]byte, error)) error {

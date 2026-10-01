@@ -65,6 +65,60 @@ func TestStoreImmutableVersionsActivationAndRollback(t *testing.T) {
 	}
 }
 
+func TestStoreReadsV1ThroughV4AndRollsBackWithoutRewriting(t *testing.T) {
+	base, _ := fixture(t)
+	store, err := OpenStore(filepath.Join(t.TempDir(), "semantic.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	ctx := context.Background()
+	original := map[string][]byte{}
+	for version := 1; version <= 4; version++ {
+		p := base
+		p.SchemaVersion = version
+		p.Snapshot.DatasetID = "v" + string(rune('0'+version))
+		p.Evidence = append([]EvidenceSpan(nil), base.Evidence...)
+		p.Evidence[0].Snapshot = p.Snapshot
+		if version == PackProjectionVersion {
+			p.Snapshot.SourceMode, p.Snapshot.SnapshotID = "committed", strings.Repeat("a", 64)
+			p.Evidence[0].Snapshot = p.Snapshot
+			p.Knowledge = &KnowledgeProjection{LockDigest: strings.Repeat("b", 64), Packs: []PackProjection{}}
+		}
+		if err := p.Validate(); err != nil {
+			t.Fatalf("v%d shape: %v", version, err)
+		}
+		if err := store.putVerified(ctx, p); err != nil {
+			t.Fatalf("store v%d: %v", version, err)
+		}
+		if err := store.Activate(ctx, p.Snapshot.ProjectID, p.Snapshot.DatasetID); err != nil {
+			t.Fatal(err)
+		}
+		var raw []byte
+		if err := store.db.QueryRow(`SELECT document FROM semantic_projections WHERE project_id=? AND dataset_id=?`, p.Snapshot.ProjectID, p.Snapshot.DatasetID).Scan(&raw); err != nil {
+			t.Fatal(err)
+		}
+		original[p.Snapshot.DatasetID] = raw
+	}
+	for version := 4; version >= 1; version-- {
+		id := "v" + string(rune('0'+version))
+		if err := store.Activate(ctx, base.Snapshot.ProjectID, id); err != nil {
+			t.Fatal(err)
+		}
+		loaded, err := store.Current(ctx, base.Snapshot.ProjectID)
+		if err != nil || loaded.SchemaVersion != version || loaded.Snapshot.DatasetID != id {
+			t.Fatalf("read v%d: %+v, %v", version, loaded.Snapshot, err)
+		}
+		var raw []byte
+		if err := store.db.QueryRow(`SELECT document FROM semantic_projections WHERE project_id=? AND dataset_id=?`, base.Snapshot.ProjectID, id).Scan(&raw); err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(raw, original[id]) {
+			t.Fatalf("v%d bytes rewritten", version)
+		}
+	}
+}
+
 func TestStoreIndexesTermsAndMigratesV2WithoutRewritingProjection(t *testing.T) {
 	source, err := os.ReadFile(filepath.Join("..", "..", "..", "docs", "spec-driven", "ontology-pilot.yaml"))
 	if err != nil {
