@@ -50,6 +50,19 @@ func TestCaptureNonGitSourceRetainsOldBytesAndDetectsCorruption(t *testing.T) {
 	if _, err := first.ReadBlob(first.Files[0].SHA256); err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
 		t.Fatalf("corrupt past source accepted: %v", err)
 	}
+	if err := os.Remove(blob); err != nil {
+		t.Fatal(err)
+	}
+	outside := filepath.Join(t.TempDir(), "old.go")
+	if err := os.WriteFile(outside, []byte("package first\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outside, blob); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := first.ReadBlob(first.Files[0].SHA256); err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
+		t.Fatalf("linked retained source accepted: %v", err)
+	}
 }
 
 func TestCaptureExternalKnowledgeOriginKeepsSamePathDistinct(t *testing.T) {
@@ -129,6 +142,56 @@ func TestCaptureRefusesLinksSecretsAndRecursiveOutput(t *testing.T) {
 	}
 	if _, err := CaptureSource(o); err == nil || !strings.Contains(err.Error(), "sensitive") {
 		t.Fatalf("secret file captured: %v", err)
+	}
+}
+
+func TestCaptureSecretPathClassificationAcrossNestedCaseVariants(t *testing.T) {
+	for _, name := range []string{".env.production", "config/ID_RSA", "app/Secrets/token.txt", "App/.AWS/credentials", "nested/cert.PEM", "private/API.KEY"} {
+		if !sensitiveCapturePath(name) {
+			t.Fatalf("sensitive path was not rejected: %q", name)
+		}
+	}
+	for _, name := range []string{"README.md", "app/secretary.go", "docs/keys.md"} {
+		if sensitiveCapturePath(name) {
+			t.Fatalf("ordinary path was rejected: %q", name)
+		}
+	}
+}
+
+func TestCaptureEnforcesFileAndTotalByteLimits(t *testing.T) {
+	root := t.TempDir()
+	for _, name := range []string{"a.md", "b.md"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte("12345"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	options := CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"), ProjectID: "p", SourceMode: "snapshot-only", MaxFileBytes: 4}
+	if _, err := CaptureSource(options); err == nil || !strings.Contains(err.Error(), "file byte limit") {
+		t.Fatalf("oversized file accepted: %v", err)
+	}
+	options.MaxFileBytes = 5
+	options.MaxTotalBytes = 9
+	if _, err := CaptureSource(options); err == nil || !strings.Contains(err.Error(), "total byte limit") {
+		t.Fatalf("oversized aggregate accepted: %v", err)
+	}
+}
+
+func TestReadSourceFileNoFollowRejectsLinkedParentAndLeaf(t *testing.T) {
+	root, outside := t.TempDir(), t.TempDir()
+	if err := os.WriteFile(filepath.Join(outside, "policy.md"), []byte("outside\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outside, filepath.Join(root, "linked")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ReadSourceFileNoFollow(root, "linked/policy.md", 1024); err == nil {
+		t.Fatal("linked parent escaped the source root")
+	}
+	if err := os.Symlink(filepath.Join(outside, "policy.md"), filepath.Join(root, "leaf.md")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ReadSourceFileNoFollow(root, "leaf.md", 1024); err == nil {
+		t.Fatal("linked leaf escaped the source root")
 	}
 }
 

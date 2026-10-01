@@ -121,7 +121,7 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	}
 	var total int64
 	add := func(originID, rel string, buf []byte) error {
-		if total+int64(len(buf)) > o.MaxTotalBytes {
+		if int64(len(buf)) > o.MaxTotalBytes-total {
 			return fmt.Errorf("capture total byte limit exceeded at %q", rel)
 		}
 		sum := sha256.Sum256(buf)
@@ -311,8 +311,7 @@ func validateCapturedPaths(paths []string) error {
 // MaterializeBuildTree creates a disposable copy from retained blobs. A Git
 // working-tree capture starts with a detached worktree so CKG can still read
 // the base history; snapshot-only mode has no Git metadata. This adapter is
-// not yet exposed through setup: logical roots and v2 citations must land
-// before either mode can be advertised as supported.
+// setup uses this staged tree for working-tree and snapshot-only indexing.
 func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) {
 	if c.Identity.SnapshotID == "" || c.Root == "" {
 		return nil, fmt.Errorf("materialize requires a captured source")
@@ -588,9 +587,22 @@ func (c CapturedSource) ReadBlob(digest string) ([]byte, error) {
 	if !info.Mode().IsRegular() {
 		return nil, fmt.Errorf("snapshot_mismatch: retained source blob is not a regular file")
 	}
-	buf, err := os.ReadFile(path)
+	file, err := openCapturedNoFollow(c.BlobDir, digest)
+	if err != nil {
+		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed while opening: %w", err)
+	}
+	defer file.Close()
+	openedInfo, err := file.Stat()
+	if err != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(info, openedInfo) {
+		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed while opening")
+	}
+	buf, err := io.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("source_missing: %w", err)
+	}
+	postInfo, err := os.Lstat(path)
+	if err != nil || !postInfo.Mode().IsRegular() || !os.SameFile(openedInfo, postInfo) {
+		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed while reading")
 	}
 	sum := sha256.Sum256(buf)
 	if hex.EncodeToString(sum[:]) != digest {
@@ -705,10 +717,15 @@ func skipCaptureDir(name string) bool {
 }
 
 func sensitiveCapturePath(rel string) bool {
-	base := strings.ToLower(filepath.Base(rel))
+	parts := strings.Split(strings.ToLower(filepath.ToSlash(rel)), "/")
+	for _, part := range parts[:len(parts)-1] {
+		if part == ".aws" || part == "secrets" {
+			return true
+		}
+	}
+	base := parts[len(parts)-1]
 	return base == ".env" || strings.HasPrefix(base, ".env.") || base == "id_rsa" ||
-		strings.HasSuffix(base, ".pem") || strings.HasSuffix(base, ".key") ||
-		strings.HasPrefix(rel, ".aws/") || strings.HasPrefix(rel, "secrets/")
+		strings.HasSuffix(base, ".pem") || strings.HasSuffix(base, ".key")
 }
 
 func resolvedCapturePath(path string) (string, error) {
