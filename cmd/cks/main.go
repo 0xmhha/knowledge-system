@@ -13,8 +13,10 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -64,7 +66,40 @@ func main() {
 	root.AddCommand(viewercli.NewCmd())
 
 	if err := root.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "cks: %v\n", err)
+		_ = json.NewEncoder(os.Stderr).Encode(publicCLIError(err))
 		os.Exit(1)
 	}
+}
+
+type cliError struct {
+	Code      string `json:"code"`
+	Message   string `json:"message"`
+	DatasetID string `json:"dataset_id,omitempty"`
+}
+
+var publicErrorCode = regexp.MustCompile(`(?:^|[^a-z_])(requires_v2|reindex_required|snapshot_mismatch|source_missing|pack_lock_mismatch|pack_incompatible|evidence_unverified|service_unavailable|candidate_rejected|unsupported_source)(?:[^a-z_]|$)`)
+
+// publicCLIError intentionally does not echo nested tool errors. They can
+// contain source bytes, credentials, or temporary staging paths.
+func publicCLIError(err error) cliError {
+	code := "operation_failed"
+	if err != nil {
+		if match := publicErrorCode.FindStringSubmatch(strings.ToLower(err.Error())); len(match) == 2 {
+			code = match[1]
+		}
+	}
+	messages := map[string]string{
+		"requires_v2":         "Use the v2 evidence interface for this source mode.",
+		"reindex_required":    "Reindex this dataset before using this operation.",
+		"snapshot_mismatch":   "The candidate source identity does not match.",
+		"source_missing":      "A pinned source file is missing.",
+		"pack_lock_mismatch":  "Knowledge inputs differ from the saved lock.",
+		"pack_incompatible":   "The selected knowledge pack is incompatible.",
+		"evidence_unverified": "Required evidence could not be verified.",
+		"service_unavailable": "The requested service is unavailable.",
+		"candidate_rejected":  "The candidate did not pass its promotion gates.",
+		"unsupported_source":  "This source configuration is unsupported.",
+		"operation_failed":    "The operation failed; inspect project status for details.",
+	}
+	return cliError{Code: code, Message: messages[code]}
 }
