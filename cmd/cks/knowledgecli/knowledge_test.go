@@ -2,9 +2,11 @@ package knowledgecli
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -94,5 +96,44 @@ func TestManifestRejectsExplicitZeroReviewApprovals(t *testing.T) {
 	}
 	if _, err := execute(t, "--project-root", root, "validate"); err == nil || !strings.Contains(err.Error(), "min_approvals") {
 		t.Fatalf("explicit zero approval policy accepted: %v", err)
+	}
+}
+
+func TestConcurrentReviewRecordsPublishWholeBytesWithoutOverwrite(t *testing.T) {
+	dir := t.TempDir()
+	checked, err := os.Lstat(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const count = 24
+	var wg sync.WaitGroup
+	errors := make(chan error, count)
+	for i := 0; i < count; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			body := []byte(strings.Repeat(string(rune('a'+i)), 8192))
+			name := fmt.Sprintf("record-%02d.yaml", i)
+			if err := writeReviewRecord(dir, checked, name, body); err != nil {
+				errors <- err
+				return
+			}
+			got, err := os.ReadFile(filepath.Join(dir, name))
+			if err != nil || !bytes.Equal(got, body) {
+				errors <- fmt.Errorf("record %s was partial or replaced: %v", name, err)
+			}
+		}(i)
+	}
+	wg.Wait()
+	close(errors)
+	for err := range errors {
+		t.Fatal(err)
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil || len(entries) != count {
+		t.Fatalf("temporary review file leaked: %d, %v", len(entries), err)
+	}
+	if err := writeReviewRecord(dir, checked, "record-00.yaml", []byte("replacement")); err == nil {
+		t.Fatal("immutable review was overwritten")
 	}
 }

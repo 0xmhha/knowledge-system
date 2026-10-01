@@ -1,11 +1,62 @@
 package setup
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestCaptureManyFilesAndExternalFailureKeepsOnlyPinnedBytes(t *testing.T) {
+	base := t.TempDir()
+	repo, docs, out := filepath.Join(base, "repo"), filepath.Join(base, "docs"), filepath.Join(base, "candidate")
+	for _, dir := range []string{repo, docs} {
+		if err := os.Mkdir(dir, 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for i := 0; i < 500; i++ {
+		name := filepath.Join(repo, fmt.Sprintf("source-%04d.go", i))
+		if err := os.WriteFile(name, []byte("package fixture\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	doc := filepath.Join(docs, "policy.md")
+	if err := os.WriteFile(doc, []byte("reviewed external rule\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	opts := CaptureOptions{Root: repo, Out: out, ProjectID: "many", SourceMode: "snapshot-only",
+		ExternalOrigins: []CaptureOrigin{{ID: "knowledge:fixture", Root: docs}}, MaxTotalBytes: int64(500*len("package fixture\n") + len("reviewed external rule\n"))}
+	if err := os.Symlink(doc, filepath.Join(docs, "linked.md")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := CaptureSource(opts); err == nil {
+		t.Fatal("linked external document was accepted after a large repository inventory")
+	}
+	if err := os.Remove(filepath.Join(docs, "linked.md")); err != nil {
+		t.Fatal(err)
+	}
+	opts.Out = filepath.Join(base, "too-small")
+	opts.MaxTotalBytes--
+	if _, err := CaptureSource(opts); err == nil || !strings.Contains(err.Error(), "total byte limit") {
+		t.Fatalf("external bytes escaped the shared capture budget: %v", err)
+	}
+	opts.Out, opts.MaxTotalBytes = filepath.Join(base, "valid"), opts.MaxTotalBytes+1
+	captured, err := CaptureSource(opts)
+	if err != nil || len(captured.Files) != 501 {
+		t.Fatalf("large capture failed: %d files, %v", len(captured.Files), err)
+	}
+	if err := os.WriteFile(doc, []byte("changed external rule\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := captured.VerifyAgainst(repo); err == nil {
+		t.Fatal("external document replacement did not invalidate the live source")
+	}
+	if err := VerifyRetainedSource(opts.Out, captured.Identity); err != nil {
+		t.Fatalf("old retained tree changed after external replacement: %v", err)
+	}
+}
 
 func TestCaptureNonGitSourceRetainsOldBytesAndDetectsCorruption(t *testing.T) {
 	root, out := filepath.Join(t.TempDir(), "source"), filepath.Join(t.TempDir(), "candidate")

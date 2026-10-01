@@ -112,6 +112,20 @@ func TestAttachVerifiedTracesRequiresAlignedCitedPath(t *testing.T) {
 	if err := json.Unmarshal(wire, &roundTrip); err != nil || Verify(roundTrip) != nil {
 		t.Fatalf("v2 consumer cannot replay trace response: %v", err)
 	}
+	var earlierV2Consumer struct {
+		FormatVersion int                    `json:"format_version"`
+		Coordinates   contract.V2Coordinates `json:"coordinates"`
+		Semantic      struct {
+			KnowledgeContext struct {
+				State     string                         `json:"state"`
+				Decisions []contract.KnowledgeDecisionV2 `json:"decisions"`
+			} `json:"knowledge_context"`
+		} `json:"semantic"`
+	}
+	if err := json.Unmarshal(wire, &earlierV2Consumer); err != nil || earlierV2Consumer.FormatVersion != 2 ||
+		earlierV2Consumer.Coordinates != got.Coordinates || len(earlierV2Consumer.Semantic.KnowledgeContext.Decisions) != 1 {
+		t.Fatalf("earlier v2 consumer could not read additive trace response: %+v %v", earlierV2Consumer, err)
+	}
 	value := got.Semantic.(contract.KnowledgeSemanticV2)
 	if len(value.KnowledgeContext.TraceLinks) != 1 || len(value.CodingContext.ImplementedBehavior) != 1 ||
 		value.KnowledgeContext.TraceLinks[0].CodeCitation.File != "main.go" || len(got.Citations) <= len(local.Citations) {

@@ -2,6 +2,7 @@ package knowledgecli
 
 import (
 	"bytes"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -39,7 +40,7 @@ func NewCmd() *cobra.Command {
 			if err := os.MkdirAll(dir, 0o700); err != nil {
 				return err
 			}
-			for _, name := range []string{"domain", "policies", "decisions", "relations", "reviews", "questions"} {
+			for _, name := range []string{"domain", "policies", "decisions", "relations", "trace-links", "reviews", "questions"} {
 				if err := os.MkdirAll(filepath.Join(dir, name), 0o700); err != nil {
 					return err
 				}
@@ -302,16 +303,7 @@ func NewCmd() *cobra.Command {
 			}
 			recordHash := sha256.Sum256(body)
 			path := filepath.Join(dir, hex.EncodeToString(recordHash[:])+".yaml")
-			file, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
-			if err != nil {
-				return err
-			}
-			if _, err := file.Write(body); err != nil {
-				file.Close()
-				os.Remove(path)
-				return err
-			}
-			if err := file.Close(); err != nil {
+			if err := writeReviewRecord(dir, info, filepath.Base(path), body); err != nil {
 				return err
 			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"status": "review_recorded", "target_id": reviewID,
@@ -325,4 +317,47 @@ func NewCmd() *cobra.Command {
 	reviewCmd.AddCommand(recordCmd)
 	cmd.AddCommand(initCmd, validateCmd, lockCmd, digestCmd, reviewCmd)
 	return cmd
+}
+
+// writeReviewRecord publishes complete immutable bytes through one pinned
+// directory handle. A concurrent relock can see either the old inventory or
+// the complete new record, never a partially written .yaml file.
+func writeReviewRecord(dir string, checked os.FileInfo, filename string, body []byte) error {
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	opened, err := root.Stat(".")
+	if err != nil || !os.SameFile(checked, opened) {
+		return fmt.Errorf("evidence_unverified: review directory changed before write")
+	}
+	var nonce [16]byte
+	if _, err := rand.Read(nonce[:]); err != nil {
+		return err
+	}
+	temp := ".review-" + hex.EncodeToString(nonce[:]) + ".tmp"
+	file, err := root.OpenFile(temp, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return err
+	}
+	if _, err := file.Write(body); err != nil {
+		file.Close()
+		root.Remove(temp)
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		file.Close()
+		root.Remove(temp)
+		return err
+	}
+	if err := file.Close(); err != nil {
+		root.Remove(temp)
+		return err
+	}
+	if err := root.Link(temp, filename); err != nil {
+		root.Remove(temp)
+		return err
+	}
+	return root.Remove(temp)
 }
