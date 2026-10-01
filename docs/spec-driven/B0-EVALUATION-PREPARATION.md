@@ -8,7 +8,7 @@
 |---|---|---|
 | 파일럿 | `knowledge-system` | 사용자 지정 대상 프로젝트 |
 | 코퍼스 커밋 | `71cb71cd55960833e930269e272f7a4a060be3aa` | A 완료 상태의 코드·설계 문서 바이트를 보존; 이후 B0 준비 파일은 코퍼스에 섞지 않음 |
-| 질문셋 | [`questions.json`](../../system/eval/b0-knowledge-system/questions.json) | 코드 위치 3, 설계 이유 4, 정책 충돌/권한 3, 답 없음 2. 총 12개 모두 `draft` |
+| 질문셋 | [`questions.json`](../../system/eval/b0-knowledge-system/questions.json), [검토표](./B0-GOLD-REVIEW.md) | 코드 위치 3, 설계 이유 4, 정책 충돌/권한 3, 답 없음 2. 총 12개 모두 `draft` |
 | 호스트 | macOS arm64, Apple M2, 8코어, 8 GiB | 동일 호스트 재실행 비교를 위한 최소 하드웨어 기록 |
 | 임베딩 모델 | `bge-m3:latest` **임시 후보** | 사용자의 최종 모델 선택 전 설치·프로브만 수행. 관측 다이제스트와 차원은 아래 기록 참조 |
 | 데이터셋 | **미생성** | 모델과 질문 정답이 고정된 뒤 코퍼스 커밋을 별도 깨끗한 checkout으로 색인 |
