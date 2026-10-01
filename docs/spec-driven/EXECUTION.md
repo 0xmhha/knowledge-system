@@ -1,5 +1,9 @@
 # Spec-driven WBS execution log
 
+B0 strict completeness guard (2026-10-02): `CKV_REQUIRE_COMPLETE_EMBEDDINGS=1`이면 배치 분할 뒤 단일 청크 원문 임베딩 실패를 `embedding input incomplete`로 반환해 축약·건너뛰기 없이 후보를 실패시킨다. 단위 시험과 [`b0-ollama-strict-smoke.sh`](../../scripts/b0-ollama-strict-smoke.sh)의 실제 Ollama 긴 Markdown 시험은 `current`와 벡터 매니페스트 미생성을 확인했다. 이것은 불완전 품질 기준선의 **게시 방지**이고 전체 내용의 안전한 자식 청크 분할은 C0 후속 수정이다.
+
+B0 effective context diagnostic (2026-10-02): 고정 파일에 대한 실제 `bge-m3:latest` `truncate:false` 임베딩은 `num_ctx=8192`에서도 5,500바이트/2,030 토큰을 수용하고 6,000바이트를 문맥 초과로 거부했다. [`context-probe-2026-10-02.json`](../../system/eval/b0-knowledge-system/context-probe-2026-10-02.json)에 모델 다이제스트·소스 SHA·요청 길이·응답을 보존했다. Ollama 로그의 `n_batch=2048`과 경계가 일치하지만 원인은 추론으로 표시한다. [`B0-EVALUATION-PREPARATION.md`](./B0-EVALUATION-PREPARATION.md)에 자식 청크/완전성 계측 설계 게이트를 추가했다. 품질 수치는 없다.
+
 B0 pilot build observation (2026-10-01): 고정 코퍼스의 임시 전체 색인에서 CKG는 102,155 노드/414,667 엣지를 만들었으나 CKV는 1,569 파일 중 40개 처리 뒤 디스크 여유를 위해 중단했다. 한 청크의 12,205→4,000바이트 임베딩 복구 축약이 관측됐다. 실패 후보 데이터셋은 제거했고 원시 로그는 `/tmp/ks-b0-pilot-setup.log`에 남겼다. [`B0-EVALUATION-PREPARATION.md`](./B0-EVALUATION-PREPARATION.md)에 위험과 후속 측정을 기록했다. 품질 수치는 없다.
 
 B0 local model preparation (2026-10-01): 임시 로컬 Ollama 0.34.4에서 `bge-m3:latest`를 내려받아 실제 임베딩 프로브를 통과했다. [`preflight-2026-10-01.json`](../../system/eval/b0-knowledge-system/preflight-2026-10-01.json)은 다이제스트·1024차원·고정 코퍼스 앵커를 기록한다. [`b0-ollama-smoke.sh`](../../scripts/b0-ollama-smoke.sh)의 별도 작은 프로젝트 색인과 CKV 질의·CKS MCP 인용도 통과했다. 모델은 **임시 후보**이며 12개 정답은 모두 `draft`라 결과는 `pending`, `metrics=null`이다. [`B0-DYNAMIC-FIXTURES.md`](./B0-DYNAMIC-FIXTURES.md)에 6개 상태 변화형 평가 절차를 초안으로 정리했다. 파일럿 실모델 평가와 사람 승인 전에는 B0/B1 완료가 아니다.

@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -136,6 +137,10 @@ type Result struct {
 }
 
 const defaultBatch = 32
+
+// ErrIncompleteEmbedding means a strict build refused to publish a vector
+// created from less than a chunk's complete embedding input.
+var ErrIncompleteEmbedding = errors.New("embedding input incomplete")
 
 // Run executes the full indexing pipeline once. Idempotent: re-running
 // against the same OutDir updates chunks in place (Upsert semantics).
@@ -796,6 +801,13 @@ func embedResilient(ctx context.Context, emb types.Embedder, chunks []types.Chun
 	}
 	if len(chunks) <= 1 {
 		if len(chunks) == 1 {
+			// B0 and other quality-sensitive builds can require every stored
+			// chunk to have a vector from its full input. The normal recovery
+			// path below embeds only the head or skips a rejected chunk.
+			if os.Getenv("CKV_REQUIRE_COMPLETE_EMBEDDINGS") == "1" {
+				return nil, nil, fmt.Errorf("%w: chunk %s (%s): %v",
+					ErrIncompleteEmbedding, chunks[0].ID, chunks[0].File, err)
+			}
 			// Distinguish a per-input rejection from a broken embedder: if a
 			// tiny known-good probe also fails, the embedder is down — propagate
 			// the original error rather than silently dropping every chunk to an
