@@ -31,7 +31,14 @@ requires: []
 concepts:
   - {id: business-policy, kind: rule, definition: A project business rule.}
   - {id: design-decision, kind: entity, definition: A reviewed design choice.}
-relation_types: []
+relation_types:
+  - predicate: motivates
+    subject_type: {pack_id: engineering.decisions, local_id: business-policy}
+    object_type: {pack_id: engineering.decisions, local_id: design-decision}
+    direction: forward
+    cardinality: many-to-many
+    required_evidence: true
+    review_rule: human
 constraints: []
 competency_questions: ["Which policy governs the transfer?"]
 YAML
@@ -91,6 +98,18 @@ source_ref: {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
 # Transfer approval
 The proposed decision needs a human review.
 MD
+cat > "$src/.cks/knowledge/relations/REL-1.yaml" <<'YAML'
+id: REL-1
+type: {pack_id: engineering.decisions, local_id: motivates}
+subject: {id: BR-17, type: {pack_id: engineering.decisions, local_id: business-policy}}
+object: {id: ADR-1, type: {pack_id: engineering.decisions, local_id: design-decision}}
+status: proposed
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/relations/REL-1.yaml}
+evidence_refs:
+  - {origin_id: repo, path: .cks/knowledge/policies/BR-17.yaml}
+  - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
+YAML
 "$repo_root/bin/cks" knowledge lock --project-root "$src" > "$scratch/lock-3.json"
 "$repo_root/bin/cks" knowledge validate --project-root "$src" > "$scratch/validate-3.json"
 "$repo_root/bin/cks" knowledge review --project-root "$src" > "$scratch/review-3.json"
@@ -115,6 +134,7 @@ original, tampered = map(pathlib.Path,sys.argv[1:])
 p = json.loads(original.read_text())
 assert p['schema_version'] == 4 and len(p['knowledge']['packs']) == 1
 assert {c['local_id'] for c in p['knowledge']['packs'][0]['concepts']} == {'business-policy','design-decision'}
+assert {r['predicate'] for r in p['knowledge']['packs'][0]['relations']} == {'motivates'}
 p['knowledge']['packs'][0]['concepts'][0]['definition'] = 'Forged definition.'
 tampered.write_text(json.dumps(p))
 PY
@@ -162,9 +182,10 @@ assert json.loads((scratch/'validate-3.json').read_text())['conflict_count'] == 
 review = json.loads((scratch/'review-3.json').read_text())
 assert review == json.loads((scratch/'review-archived.json').read_text())
 assert review == json.loads((scratch/'review-after-edit.json').read_text())
-assert len(review['items']) == 3
+assert len(review['items']) == 4
 assert len(review['conflicts']) == 1
 assert any(item['id'] == 'ADR-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
+assert any(item['id'] == 'REL-1' and item['hold_reason'] == 'awaiting_human_review' for item in review['items'])
 PY
 python3 - "$data/third" <<'PY'
 import json, pathlib, sys

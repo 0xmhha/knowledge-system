@@ -231,13 +231,18 @@ func enforceReviewPolicy(m Manifest, instances Instances) error {
 		return nil
 	}
 	for _, p := range instances.Policies {
-		if p.Status != "proposed" {
+		if p.Status == "verified" {
 			return fmt.Errorf("evidence_unverified: policy %q has fewer than %d independent approvals", p.ID, m.ReviewPolicy.MinApprovals)
 		}
 	}
 	for _, d := range instances.Decisions {
-		if d.Status != "proposed" {
+		if d.Status == "verified" {
 			return fmt.Errorf("evidence_unverified: decision %q has fewer than %d independent approvals", d.ID, m.ReviewPolicy.MinApprovals)
+		}
+	}
+	for _, relation := range instances.Relations {
+		if relation.Status == "verified" {
+			return fmt.Errorf("evidence_unverified: relation %q has fewer than %d independent approvals", relation.ID, m.ReviewPolicy.MinApprovals)
 		}
 	}
 	return nil

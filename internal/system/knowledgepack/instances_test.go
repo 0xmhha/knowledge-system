@@ -124,3 +124,89 @@ The team selected separate approval.
 		t.Fatalf("unbounded ADR requirement ID accepted: %v", err)
 	}
 }
+
+func TestRelationInstancesRequireTypedReviewedEndpointEvidence(t *testing.T) {
+	root := t.TempDir()
+	for _, dir := range []string{"policies", "decisions", "relations"} {
+		if err := os.Mkdir(filepath.Join(root, dir), 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	pack := validPack("engineering.decisions")
+	pack.Concepts = append(pack.Concepts, ConceptType{ID: "design-decision", Kind: "entity", Definition: "A decision."})
+	pack.RelationTypes = []RelationType{{Predicate: "motivates", SubjectType: TypeRef{PackID: pack.PackID, LocalID: "business-policy"},
+		ObjectType: TypeRef{PackID: pack.PackID, LocalID: "design-decision"}, Direction: "forward",
+		Cardinality: "many-to-many", RequiredEvidence: true, ReviewRule: "human"}}
+	loaded := []LoadedPack{{Pack: pack, Digest: strings.Repeat("a", 64)}}
+	write := func(rel, content string) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(root, rel), []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("policies/BR-1.yaml", `id: BR-1
+type: {pack_id: engineering.decisions, local_id: business-policy}
+statement: A policy.
+owner: team
+scope: {subsystem: service}
+effective_from: "2026-01-01"
+status: verified
+reviewed_by: reviewer
+review_reason: Checked source.
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/policies/BR-1.yaml}
+`)
+	write("decisions/ADR-1.md", `---
+id: ADR-1
+type: {pack_id: engineering.decisions, local_id: design-decision}
+problem: What policy applies?
+decision: Follow BR-1.
+rationale: Preserve the approved rule.
+alternatives: [Ignore the rule]
+scope: {subsystem: service}
+date: "2026-01-01"
+status: verified
+reviewed_by: reviewer
+review_reason: Checked source.
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
+---
+# Decision
+Follow the rule.
+`)
+	relation := `id: REL-1
+type: {pack_id: engineering.decisions, local_id: motivates}
+subject: {id: BR-1, type: {pack_id: engineering.decisions, local_id: business-policy}}
+object: {id: ADR-1, type: {pack_id: engineering.decisions, local_id: design-decision}}
+status: verified
+reviewed_by: reviewer
+review_reason: Both sources agree.
+visibility: public
+source_ref: {origin_id: repo, path: .cks/knowledge/relations/REL-1.yaml}
+evidence_refs:
+  - {origin_id: repo, path: .cks/knowledge/policies/BR-1.yaml}
+  - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}
+`
+	write("relations/REL-1.yaml", relation)
+	instances, err := LoadInstances(root, loaded)
+	if err != nil || len(instances.Relations) != 1 {
+		t.Fatalf("reviewed local relation: %+v, %v", instances.Relations, err)
+	}
+	write("relations/REL-1.yaml", strings.Replace(relation, "local_id: design-decision}}", "local_id: business-policy}}", 1))
+	if _, err := LoadInstances(root, loaded); err == nil {
+		t.Fatal("wrong relation endpoint type accepted")
+	}
+	write("relations/REL-1.yaml", strings.Replace(relation, "  - {origin_id: repo, path: .cks/knowledge/decisions/ADR-1.md}\n", "", 1))
+	if _, err := LoadInstances(root, loaded); err == nil {
+		t.Fatal("verified relation without both endpoint citations accepted")
+	}
+	write("relations/REL-1.yaml", strings.Replace(relation, "id: ADR-1,", "id: MISSING,", 1))
+	if _, err := LoadInstances(root, loaded); err == nil {
+		t.Fatal("verified relation to missing instance accepted")
+	}
+	write("relations/REL-1.yaml", strings.Replace(strings.Replace(relation, "id: ADR-1,", "id: MISSING,", 1),
+		"status: verified\nreviewed_by: reviewer\nreview_reason: Both sources agree.", "status: proposed", 1))
+	if _, err := LoadInstances(root, loaded); err != nil {
+		t.Fatalf("unverified external relation candidate should remain proposed: %v", err)
+	}
+}

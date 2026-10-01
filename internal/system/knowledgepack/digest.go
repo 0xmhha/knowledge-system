@@ -114,7 +114,7 @@ func inventory(root string, overlay bool) ([]FileRecord, string, error) {
 func validOverlayDir(rel string) bool {
 	first := strings.SplitN(rel, "/", 2)[0]
 	switch first {
-	case "domain", "policies", "decisions", "questions":
+	case "domain", "policies", "decisions", "relations", "questions":
 		return true
 	}
 	return false

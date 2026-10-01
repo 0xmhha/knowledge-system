@@ -58,10 +58,32 @@ type Decision struct {
 	Body           string            `yaml:"-" json:"body"`
 }
 
+// RelationInstance is a reviewed, source-backed edge between typed knowledge
+// instances. External semantic/CKG endpoints remain proposed until their
+// pinned dataset anchors can be checked by the semantic promotion gate.
+type RelationInstance struct {
+	ID           string      `yaml:"id" json:"id"`
+	Type         TypeRef     `yaml:"type" json:"type"`
+	Subject      InstanceRef `yaml:"subject" json:"subject"`
+	Object       InstanceRef `yaml:"object" json:"object"`
+	Status       string      `yaml:"status" json:"status"`
+	ReviewedBy   string      `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason string      `yaml:"review_reason" json:"review_reason"`
+	Visibility   string      `yaml:"visibility" json:"visibility"`
+	SourceRef    SourceRef   `yaml:"source_ref" json:"source_ref"`
+	EvidenceRefs []SourceRef `yaml:"evidence_refs" json:"evidence_refs"`
+}
+
+type InstanceRef struct {
+	ID   string  `yaml:"id" json:"id"`
+	Type TypeRef `yaml:"type" json:"type"`
+}
+
 type Instances struct {
-	Policies  []Policy   `json:"policies"`
-	Decisions []Decision `json:"decisions"`
-	Conflicts []Conflict `json:"conflicts"`
+	Policies  []Policy           `json:"policies"`
+	Decisions []Decision         `json:"decisions"`
+	Relations []RelationInstance `json:"relations"`
+	Conflicts []Conflict         `json:"conflicts"`
 }
 
 type Conflict struct {
@@ -209,11 +231,15 @@ func policyScopeMatches(policy, query map[string]string) bool {
 }
 
 func LoadInstances(overlayRoot string, packs []LoadedPack) (Instances, error) {
-	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Conflicts: []Conflict{}}
+	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, Conflicts: []Conflict{}}
 	types := map[TypeRef]bool{}
+	relationTypes := map[TypeRef]RelationType{}
 	for _, loaded := range packs {
 		for _, concept := range loaded.Pack.Concepts {
 			types[TypeRef{PackID: loaded.Pack.PackID, LocalID: concept.ID}] = true
+		}
+		for _, relation := range loaded.Pack.RelationTypes {
+			relationTypes[TypeRef{PackID: loaded.Pack.PackID, LocalID: relation.Predicate}] = relation
 		}
 	}
 	seen := map[string]bool{}
@@ -230,6 +256,7 @@ func LoadInstances(overlayRoot string, packs []LoadedPack) (Instances, error) {
 				return fmt.Errorf("evidence_unverified: nonregular %s entry", name)
 			}
 			if name == "policies" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "relations" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "decisions" && filepath.Ext(entry.Name()) != ".md" {
 				return fmt.Errorf("evidence_unverified: unsupported %s file %q", name, entry.Name())
 			}
@@ -283,9 +310,30 @@ func LoadInstances(overlayRoot string, packs []LoadedPack) (Instances, error) {
 	}); err != nil {
 		return Instances{}, err
 	}
+	policyByID := map[string]Policy{}
+	for _, p := range result.Policies {
+		policyByID[p.ID] = p
+	}
 	decisionByID := map[string]Decision{}
-	for _, decision := range result.Decisions {
-		decisionByID[decision.ID] = decision
+	for _, d := range result.Decisions {
+		decisionByID[d.ID] = d
+	}
+	if err := readDir("relations", func(rel string, buf []byte) error {
+		var edge RelationInstance
+		if err := decodeYAML(buf, &edge); err != nil {
+			return fmt.Errorf("evidence_unverified: relation %q: %w", rel, err)
+		}
+		if err := validateRelation(edge, rel, relationTypes, policyByID, decisionByID); err != nil {
+			return err
+		}
+		if seen[edge.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", edge.ID)
+		}
+		seen[edge.ID] = true
+		result.Relations = append(result.Relations, edge)
+		return nil
+	}); err != nil {
+		return Instances{}, err
 	}
 	for _, decision := range result.Decisions {
 		if decision.Supersedes == "" {
@@ -421,6 +469,44 @@ func validateDecision(d Decision, path string, types map[TypeRef]bool) error {
 		if !instanceIDPattern.MatchString(key) || strings.TrimSpace(value) == "" || len(value) > 128 {
 			return fmt.Errorf("evidence_unverified: invalid ADR scope")
 		}
+	}
+	return nil
+}
+
+func validateRelation(edge RelationInstance, path string, relationTypes map[TypeRef]RelationType,
+	policies map[string]Policy, decisions map[string]Decision) error {
+	relationType, ok := relationTypes[edge.Type]
+	if !ok || !instanceIDPattern.MatchString(edge.ID) ||
+		!instanceIDPattern.MatchString(edge.Subject.ID) || !instanceIDPattern.MatchString(edge.Object.ID) ||
+		edge.Subject.Type != relationType.SubjectType || edge.Object.Type != relationType.ObjectType ||
+		!validSource(edge.SourceRef, path) || !validReview(edge.Status, edge.ReviewedBy, edge.ReviewReason) ||
+		(edge.Visibility != "public" && edge.Visibility != "restricted") || len(edge.EvidenceRefs) == 0 {
+		return fmt.Errorf("evidence_unverified: invalid relation %q", path)
+	}
+	refs := map[SourceRef]bool{}
+	for _, ref := range edge.EvidenceRefs {
+		if ref.OriginID != "repo" || !strings.HasPrefix(ref.Path, ".cks/knowledge/") ||
+			!safeRetainedPackPath(ref.Path) || refs[ref] {
+			return fmt.Errorf("evidence_unverified: invalid relation evidence reference %q", path)
+		}
+		refs[ref] = true
+	}
+	if edge.Status != "verified" {
+		return nil
+	}
+	endpoint := func(ref InstanceRef) (SourceRef, bool) {
+		if p, ok := policies[ref.ID]; ok && p.Type == ref.Type && p.Status == "verified" {
+			return p.SourceRef, true
+		}
+		if d, ok := decisions[ref.ID]; ok && d.Type == ref.Type && d.Status == "verified" {
+			return d.SourceRef, true
+		}
+		return SourceRef{}, false
+	}
+	left, leftOK := endpoint(edge.Subject)
+	right, rightOK := endpoint(edge.Object)
+	if !leftOK || !rightOK || !refs[left] || !refs[right] {
+		return fmt.Errorf("evidence_unverified: relation %q lacks verified local endpoints and source evidence", edge.ID)
 	}
 	return nil
 }

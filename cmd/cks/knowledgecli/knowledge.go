@@ -33,7 +33,7 @@ func NewCmd() *cobra.Command {
 			if err := os.MkdirAll(dir, 0o700); err != nil {
 				return err
 			}
-			for _, name := range []string{"domain", "policies", "decisions", "questions"} {
+			for _, name := range []string{"domain", "policies", "decisions", "relations", "questions"} {
 				if err := os.MkdirAll(filepath.Join(dir, name), 0o700); err != nil {
 					return err
 				}
@@ -79,7 +79,7 @@ func NewCmd() *cobra.Command {
 			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"status": status, "project_id": lock.ProjectID,
 				"pack_count": len(lock.Packs), "lock_digest": lock.LockDigest,
-				"policy_count": len(instances.Policies), "decision_count": len(instances.Decisions),
+				"policy_count": len(instances.Policies), "decision_count": len(instances.Decisions), "relation_count": len(instances.Relations),
 				"conflict_count": len(instances.Conflicts)})
 		}}
 	lockCmd := &cobra.Command{Use: "lock", Short: "Write the exact local pack and overlay byte lock", Args: cobra.NoArgs,
@@ -182,6 +182,15 @@ func NewCmd() *cobra.Command {
 					reason = "rejected_by_reviewer"
 				}
 				queue = append(queue, item{"decision", d.ID, d.Status, d.SourceRef, d.ReviewedBy, reason})
+			}
+			for _, relation := range instances.Relations {
+				reason := ""
+				if relation.Status == "proposed" {
+					reason = "awaiting_human_review"
+				} else if relation.Status == "rejected" {
+					reason = "rejected_by_reviewer"
+				}
+				queue = append(queue, item{"relation", relation.ID, relation.Status, relation.SourceRef, relation.ReviewedBy, reason})
 			}
 			return json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{"project_id": lock.ProjectID, "items": queue, "conflicts": instances.Conflicts})
 		}}
