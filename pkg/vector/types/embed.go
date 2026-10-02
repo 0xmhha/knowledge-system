@@ -27,6 +27,10 @@ type EmbeddingIdentity struct {
 	TruncatePolicy       string `json:"truncate_policy,omitempty"`
 	RuntimeContextTokens int    `json:"runtime_context_tokens,omitempty"`
 	RuntimeBatchTokens   int    `json:"runtime_batch_tokens,omitempty"`
+	// ChunkBudgetBytes is the maximum raw chunk size used while building this
+	// index. It is part of v2 identity so incremental reindex cannot mix
+	// chunks produced by different input-budget policies.
+	ChunkBudgetBytes int `json:"chunk_budget_bytes,omitempty"`
 }
 
 // Checksum is a stable identity string for the embedding space. Version 1
@@ -63,8 +67,9 @@ func (id EmbeddingIdentity) Checksum() string {
 //   - Name returns a stable identifier persisted in the manifest
 //     (e.g. "bge-large-en-v1.5"). Mismatch on rebuild → IndexUnavailable.
 //   - Dimension is the vector length. Used to size the sqlite-vec column.
-//   - MaxInputTokens is the model's context limit; the chunker truncates
-//     overlong text up front (signature stays at the head).
+//   - MaxInputTokens is the model's context limit. The builder uses it as a
+//     legacy text-size estimate; v2 ChunkBudgetBytes applies a conservative
+//     lossless split when the provider needs a stricter raw-input bound.
 //   - Embed is batched. Implementations choose internal batching (CPU≈32,
 //     GPU≈256) but the caller MAY pass arbitrary-size slices.
 type Embedder interface {

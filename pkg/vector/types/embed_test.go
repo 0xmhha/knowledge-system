@@ -40,4 +40,9 @@ func TestEmbeddingIdentityChecksumRuntimeOptions(t *testing.T) {
 	if base.Checksum() == ctx.Checksum() || ctx.Checksum() == batch.Checksum() {
 		t.Fatal("context and batch runtime settings must each change the vector identity")
 	}
+	budget := batch
+	budget.ChunkBudgetBytes = 6144
+	if budget.Checksum() == batch.Checksum() {
+		t.Fatal("chunk budget must change the v2 index identity")
+	}
 }

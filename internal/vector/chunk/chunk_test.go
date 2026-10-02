@@ -3,10 +3,80 @@ package chunk
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
+
+func TestByteBudgetPreservesLongMarkdownAndOneLineFunction(t *testing.T) {
+	const budget = 6144
+	for _, tc := range []struct {
+		name, file, language string
+		kind                 types.SymbolKind
+		text                 string
+		wantKind             types.ChunkKind
+	}{
+		{"markdown", "docs/long.md", "markdown", types.KindDocSection,
+			"# Decision\n" + strings.Repeat("정책과 근거를 보존한다.\n", 1800) + "TAIL_EVIDENCE", types.ChunkDoc},
+		{"one-line function", "x.go", "go", types.KindFunction,
+			"func Huge() { /* " + strings.Repeat("계약", 2500) + " */ }", types.ChunkFunctionSplit},
+		{"long type", "x.go", "go", types.KindStruct,
+			"type Huge struct {\n" + strings.Repeat(" Field string\n", 900) + "}", types.ChunkSymbol},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sp := parse.SymbolSpan{Name: "Huge", Kind: tc.kind, StartLine: 10,
+				EndLine: 10 + strings.Count(tc.text, "\n"), Text: tc.text}
+			chunks := New(Options{MaxInputTokens: 8192, MaxTextBytes: budget}).Chunk(Input{
+				File: tc.file, Language: tc.language, Source: []byte(tc.text), Spans: []parse.SymbolSpan{sp},
+			})
+			var joined strings.Builder
+			seen := map[string]bool{}
+			count := 0
+			for _, c := range chunks {
+				if c.ParentID == "" {
+					continue // file header is supplementary
+				}
+				count++
+				if c.ChunkKind != tc.wantKind || len(c.Text) > budget || !utf8.ValidString(c.Text) {
+					t.Errorf("invalid child: kind=%s bytes=%d validUTF8=%v", c.ChunkKind, len(c.Text), utf8.ValidString(c.Text))
+				}
+				if c.StartLine < sp.StartLine || c.EndLine > sp.EndLine || c.PartOrdinal != count || seen[c.ID] {
+					t.Errorf("invalid citation/order/ID in child %d: %+v", count, c)
+				}
+				seen[c.ID] = true
+				joined.WriteString(c.Text)
+			}
+			if count < 2 || joined.String() != tc.text {
+				t.Fatalf("split failed to preserve source: children=%d, source=%d bytes, joined=%d bytes", count, len(tc.text), joined.Len())
+			}
+		})
+	}
+}
+
+func TestByteBudgetTruncatedSupplementaryChunkRemainsUTF8(t *testing.T) {
+	text := strings.Repeat("계약", 100)
+	chunker := New(Options{MaxInputTokens: 8192, MaxTextBytes: 65, IncludeFileFull: true})
+	got := chunker.maybeTruncate(text)
+	if len(got) > 65 || !utf8.ValidString(got) || !strings.HasSuffix(got, "[CKV-TRUNCATED]") {
+		t.Fatalf("invalid UTF-8 supplementary truncation: bytes=%d text=%q", len(got), got)
+	}
+	for _, c := range chunker.Chunk(Input{File: "x.go", Language: "go", Source: []byte(text)}) {
+		if c.ContentSHA256 != types.ContentSHA256(c.Text) {
+			t.Errorf("%s hash does not match stored text", c.ChunkKind)
+		}
+	}
+}
+
+func TestSummarizeDoesNotCountMarkerInsideSourceLiteral(t *testing.T) {
+	chunks := []types.Chunk{
+		{Text: `func Example() string { return "[CKV-TRUNCATED]" }`},
+		{Text: "head\n// ... [CKV-TRUNCATED]"},
+	}
+	if got := Summarize(chunks).Truncated; got != 1 {
+		t.Fatalf("truncated count = %d, want only the appended marker", got)
+	}
+}
 
 func TestChunkSymbolAndFileHeader(t *testing.T) {
 	src := []byte(`package x

@@ -1,0 +1,58 @@
+{
+  "status": "diagnostic_only",
+  "quality_metrics": null,
+  "gold_status": "12_draft_questions_not_approved",
+  "model_status": "provisional_bge_m3",
+  "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "source_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "source_checkout": "/tmp/ks-b0-isolated-corpus",
+  "source_git_object_store": "independent",
+  "dataset": "/tmp/ks-b0-isolated-dataset-20261002",
+  "dataset_version": "provisional-bge-m3-byte-budget-20261002",
+  "build_tool_head_at_start": "32a0125",
+  "build_tool_binary_sha256": {
+    "ckv": "dd3018db68ff8a24a2e133bfa0e4601a871906f4f7f97026f526ea938e404472",
+    "cks": "38ea5c0c37bb20ffeb5285f369af7fc7ee343e879772382e16eb1cd8ed6e6f4b"
+  },
+  "build_tool_note": "Diagnostic binaries included the 6144-byte chunk budget and were built before the later UTF-8/hash/accounting corrections. Rebuild from a committed revision for official B0.",
+  "strict_complete_embedding_mode": true,
+  "setup_exit_code": 0,
+  "setup_log_sha256": "0429e58aabe42866f560c2bb95fb9b5433c1cc17774bbd645dc2684dde5243e4",
+  "graph": {
+    "schema_version": "1.23",
+    "nodes": 102112,
+    "edges": 414613,
+    "graph_digest": "fa58e1e7c5ec7ff022459a773d74fee2b9ba40f36f00a3302c2bff24d832d98e"
+  },
+  "vector": {
+    "files_indexed": 1569,
+    "chunks": 13575,
+    "split_children": 169,
+    "largest_stored_chunk_bytes": 6144,
+    "appended_truncation_marker_count": 0,
+    "raw_marker_substring_count": 3,
+    "raw_marker_note": "Three source-code chunks quote [CKV-TRUNCATED]; the old substring-based counter reported these as truncations.",
+    "model": "bge-m3:latest",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "runtime_context_tokens": 8192,
+    "runtime_batch_tokens": 8192,
+    "chunk_budget_bytes": 6144,
+    "embedding_checksum": "v2:sha256:9ca4ec712ea594d72ba950d1d87e95482b5e5203fe9d72002b765760b4cc3621",
+    "db_sha256": "bc3286e8ca7528b76a8674262cc1390bbaa67f915f128179d4dbeaea1ec2fcd7"
+  },
+  "graph_vector_file_parity": "992_of_992_shared_code_files",
+  "citation_smoke": {
+    "intent": "within-language dispatch semantics",
+    "hits": 3,
+    "top_file": "docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md",
+    "top_lines": [5, 17],
+    "citation_commit_matches_source": true,
+    "quality_claim": false
+  },
+  "doctor": {
+    "status": "ready",
+    "identity_status": "legacy_unpinned",
+    "reindex_required": true
+  }
+}

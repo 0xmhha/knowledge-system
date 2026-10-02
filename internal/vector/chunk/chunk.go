@@ -3,10 +3,9 @@
 //
 // Strategy:
 //  1. Each symbol span (function/method/type/...) becomes one chunk.
-//  2. Spans whose Text exceeds MaxInputTokens are split into
-//     sub-chunks (function bodies and Markdown sections) or truncated
-//     at the head for other kinds. The mock embedder has no input cap,
-//     so long-span splitting needs a capped fixture to exercise it.
+//  2. A model-specific MaxTextBytes budget splits every oversized source
+//     span without loss. With only the legacy token estimate, long functions
+//     and Markdown sections split and other kinds are head-truncated.
 //  3. A file_header chunk captures the first N lines of the file —
 //     package decl + imports + top-level const/var. This lets queries
 //     like "what package owns the metrics client" hit the right file
@@ -16,6 +15,7 @@ package chunk
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
@@ -33,15 +33,15 @@ const DefaultFileHeaderLines = 50
 // Options.FileHeaderLines and read Chunker.opts.
 const FileHeaderLines = DefaultFileHeaderLines
 
-// charsPerToken is the approximate ratio used to convert MaxInputTokens
-// into a character cap. Real tokenizers vary (BPE for bge-code ~3.5,
-// GPT ~4); 4 is a safe upper bound that keeps us under the model limit
-// while keeping the math simple.
+// charsPerToken is a legacy estimate for MaxInputTokens. Tokenizers and
+// contextual prefixes can exceed it; model-specific MaxTextBytes is used
+// when strict input completeness is required.
 const charsPerToken = 4
 
 // Options configure chunking. Zero value uses documented defaults.
 type Options struct {
-	MaxInputTokens    int  // hard upper bound on chunk Text size; 0 → no cap
+	MaxInputTokens    int  // token-window estimate for raw text; 0 → no cap
+	MaxTextBytes      int  // conservative raw-byte cap; 0 → use token estimate only
 	IncludeFileHeader bool // emit a file_header chunk per file (default: true)
 	// FileHeaderLines overrides DefaultFileHeaderLines (50). 0 keeps
 	// the default. Sourced from project ckv.yaml.chunking.file_header_lines.
@@ -109,6 +109,19 @@ func (c *Chunker) Chunk(in Input) []types.Chunk {
 	}
 
 	for _, sp := range in.Spans {
+		// A model-specific byte budget must preserve every source byte, even
+		// for long type declarations or a function written on one line.
+		if c.opts.MaxTextBytes > 0 && len(sp.Text) > c.maxBytes() {
+			parts := c.splitLongDocSpan(in, sp)
+			if sp.Kind == types.KindFunction || sp.Kind == types.KindMethod {
+				for i := range parts {
+					parts[i].ChunkKind = types.ChunkFunctionSplit
+					parts[i].SymbolName = fmt.Sprintf("%s:chunk:%d", sp.Name, i+1)
+				}
+			}
+			out = append(out, parts...)
+			continue
+		}
 		// Long Markdown sections are split at source-line boundaries so
 		// their tail remains searchable with accurate citations.
 		if c.shouldSplitDoc(sp) {
@@ -133,15 +146,23 @@ func (c *Chunker) shouldSplitDoc(sp parse.SymbolSpan) bool {
 	if sp.Kind != types.KindDocSection && sp.Kind != types.KindADRSection {
 		return false
 	}
-	return len(sp.Text) > c.opts.MaxInputTokens*charsPerToken
+	return len(sp.Text) > c.maxBytes()
+}
+
+func (c *Chunker) maxBytes() int {
+	max := c.opts.MaxInputTokens * charsPerToken
+	if c.opts.MaxTextBytes > 0 && (max <= 0 || c.opts.MaxTextBytes < max) {
+		return c.opts.MaxTextBytes
+	}
+	return max
 }
 
 // splitLongDocSpan keeps every source line and prefers paragraph boundaries.
 // A line longer than the embedding cap is split at UTF-8 boundaries; its
-// fragments retain the original line citation. All parts remain ChunkDoc so
-// existing documentation filters and result consumers continue to work.
+// fragments retain the original line citation. The caller may also use this
+// lossless splitter for code when a model-specific byte budget is active.
 func (c *Chunker) splitLongDocSpan(in Input, sp parse.SymbolSpan) []types.Chunk {
-	maxChars := c.opts.MaxInputTokens * charsPerToken
+	maxChars := c.maxBytes()
 	parentID := types.ChunkID(in.File, sp.StartLine, sp.EndLine, types.ContentSHA256(sp.Text))
 	lines := strings.SplitAfter(sp.Text, "\n")
 	var out []types.Chunk
@@ -278,6 +299,7 @@ func (c *Chunker) fileFullChunk(in Input) *types.Chunk {
 	}
 	text := string(in.Source)
 	endLine := strings.Count(text, "\n") + 1
+	text = c.maybeTruncate(text)
 	contentHash := types.ContentSHA256(text)
 	id := types.ChunkID(in.File, 0, endLine, contentHash)
 	return &types.Chunk{
@@ -291,7 +313,7 @@ func (c *Chunker) fileFullChunk(in Input) *types.Chunk {
 		ChunkKind:     types.ChunkFileFull,
 		CommitHash:    in.CommitHash,
 		ContentSHA256: contentHash,
-		Text:          c.maybeTruncate(text),
+		Text:          text,
 	}
 }
 
@@ -304,7 +326,7 @@ func (c *Chunker) shouldSplit(sp parse.SymbolSpan) bool {
 	if c.opts.MaxInputTokens <= 0 {
 		return false
 	}
-	maxChars := c.opts.MaxInputTokens * charsPerToken
+	maxChars := c.maxBytes()
 	if len(sp.Text) <= maxChars {
 		return false
 	}
@@ -338,7 +360,7 @@ func (c *Chunker) shouldSplit(sp parse.SymbolSpan) bool {
 // evenly. No overlap — adding it is a future refinement when
 // measurement shows recall improvement.
 func (c *Chunker) splitLongSpan(in Input, sp parse.SymbolSpan) []types.Chunk {
-	maxChars := c.opts.MaxInputTokens * charsPerToken
+	maxChars := c.maxBytes()
 	lines := strings.Split(sp.Text, "\n")
 	if len(lines) <= 1 {
 		// Degenerate one-line giant — truncate as before.
@@ -401,6 +423,7 @@ func (c *Chunker) fileHeaderChunk(in Input) *types.Chunk {
 	if strings.TrimSpace(text) == "" {
 		return nil
 	}
+	text = c.maybeTruncate(text)
 	contentHash := types.ContentSHA256(text)
 	id := types.ChunkID(in.File, 1, len(lines), contentHash)
 	return &types.Chunk{
@@ -414,7 +437,7 @@ func (c *Chunker) fileHeaderChunk(in Input) *types.Chunk {
 		ChunkKind:     types.ChunkFileHeader,
 		CommitHash:    in.CommitHash,
 		ContentSHA256: contentHash,
-		Text:          c.maybeTruncate(text),
+		Text:          text,
 	}
 }
 
@@ -446,18 +469,28 @@ func (c *Chunker) symbolChunk(in Input, sp parse.SymbolSpan, text string) types.
 // the signature stays embedded. The trailing "// ..." marker makes the
 // truncation explicit in audit/eval logs without changing semantics.
 func (c *Chunker) maybeTruncate(text string) string {
-	if c.opts.MaxInputTokens <= 0 {
+	if c.opts.MaxInputTokens <= 0 && c.opts.MaxTextBytes <= 0 {
 		return text
 	}
-	max := c.opts.MaxInputTokens * charsPerToken
+	max := c.maxBytes()
 	if len(text) <= max {
 		return text
 	}
 	const marker = "\n// ... [CKV-TRUNCATED]"
 	if max <= len(marker) {
-		return text[:max]
+		return utf8Prefix(text, max)
 	}
-	return text[:max-len(marker)] + marker
+	return utf8Prefix(text, max-len(marker)) + marker
+}
+
+func utf8Prefix(text string, limit int) string {
+	if limit >= len(text) {
+		return text
+	}
+	for limit > 0 && !utf8.RuneStart(text[limit]) {
+		limit--
+	}
+	return text[:limit]
 }
 
 // Stats summarizes the output of one Chunk() call; useful for build
@@ -507,7 +540,7 @@ func Summarize(chunks []types.Chunk) Stats {
 		if c.CanonicalID != "" && (c.ChunkKind == types.ChunkSymbol || c.ChunkKind == types.ChunkFunctionSplit) && c.StartLine > 0 {
 			s.CanonicalID++
 		}
-		if strings.Contains(c.Text, "[CKV-TRUNCATED]") {
+		if strings.HasSuffix(c.Text, "\n// ... [CKV-TRUNCATED]") {
 			s.Truncated++
 		}
 	}

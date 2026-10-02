@@ -46,6 +46,11 @@ const DefaultTimeout = 60 * time.Second
 // embedders that don't advertise a larger window.
 const DefaultMaxInputTokens = 8192
 
+// bgeM3ChunkBudgetBytes leaves room for the contextual prefix and tokenizer
+// overhead within the 8192-token Ollama window. The byte bound is deliberately
+// conservative: a token cannot consume less than one UTF-8 input byte.
+const bgeM3ChunkBudgetBytes = 6144
+
 // Adapter implements types.Embedder via Ollama's /api/embed endpoint.
 type Adapter struct {
 	endpoint       string
@@ -223,7 +228,15 @@ func (a *Adapter) Identity() types.EmbeddingIdentity {
 		TruncatePolicy:       "reject:v1",
 		RuntimeContextTokens: a.runtimeContextTokens(),
 		RuntimeBatchTokens:   a.runtimeBatchTokens(),
+		ChunkBudgetBytes:     a.chunkBudgetBytes(),
 	}
+}
+
+func (a *Adapter) chunkBudgetBytes() int {
+	if strings.SplitN(a.modelName, ":", 2)[0] == "bge-m3" {
+		return bgeM3ChunkBudgetBytes
+	}
+	return 0
 }
 
 func (a *Adapter) runtimeContextTokens() int {

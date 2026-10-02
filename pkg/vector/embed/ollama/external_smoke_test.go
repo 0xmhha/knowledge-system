@@ -154,6 +154,9 @@ func TestExternalImport_OllamaConstruct(t *testing.T) {
 	if got := emb.MaxInputTokens(); got != 8192 {
 		t.Errorf("MaxInputTokens() = %d, want 8192 (bge-m3 window)", got)
 	}
+	if got := emb.Identity().ChunkBudgetBytes; got != 6144 {
+		t.Errorf("BGE-M3 chunk budget = %d, want 6144 bytes", got)
+	}
 	if got := emb.Name(); got != "bge-m3:latest" {
 		t.Errorf("Name() = %q, want bge-m3:latest", got)
 	}
