@@ -1,0 +1,12 @@
+id: conflict-a
+type: {pack_id: fixture.policy, local_id: business-policy}
+statement: Synthetic conflict-a policy for runtime integration only.
+owner: fixture-owner
+scope: {subsystem: conflict}
+effective_from: "2026-01-01"
+status: verified
+reviewed_by: fixture-reviewer
+review_reason: Synthetic branch coverage; not an operating fact approval.
+visibility: public
+conflicts_with: ["conflict-b"]
+source_ref: {origin_id: repo, path: .cks/knowledge/policies/conflict-a.yaml}

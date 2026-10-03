@@ -1,0 +1,1526 @@
+{
+  "schema_version": 1,
+  "gate": "B1-02 synthetic eight-arm pack implementation verification",
+  "state": "implementation_verified",
+  "quality_metrics": null,
+  "release": "preview",
+  "checked_at": "2026-10-03T15:20:36.665403+00:00",
+  "base_commit": "d2f8f1de9928401ab1bad7ca544a5aaa367b9c5e",
+  "working_changes": true,
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "runtime": {
+    "mock": {
+      "state": "verified",
+      "requests": 48,
+      "coordinates": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+          "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "6ec465d1c5307f8e5217f2d5f16d10d18216d2dcdfb653f89103376b6e7ad30f",
+        "dataset_id": "5d3dac277f54ca4e6f562360ba08b0b563c938f1d649c208a5b27966915d5749"
+      },
+      "embedding_identity": {
+        "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+        "dim": 64,
+        "model": "mock-feature-hash-v1"
+      },
+      "semantic_db_unchanged": true,
+      "source_files": 14,
+      "summary": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/summary.json",
+      "matrix": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/matrix-manifest.json"
+    },
+    "real": {
+      "state": "verified",
+      "requests": 48,
+      "coordinates": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+          "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "6ec465d1c5307f8e5217f2d5f16d10d18216d2dcdfb653f89103376b6e7ad30f",
+        "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743"
+      },
+      "embedding_identity": {
+        "Dim": 1024,
+        "Model": "bge-m3:latest",
+        "Normalize": "",
+        "Pooling": "",
+        "Provider": "ollama",
+        "chunk_budget_bytes": 6144,
+        "dimension_method": "native:v1",
+        "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+        "native_dim": 1024,
+        "passage_transform": "raw:v1",
+        "query_transform": "raw:v1",
+        "runtime_batch_tokens": 8192,
+        "runtime_context_tokens": 8192,
+        "truncate_policy": "reject:v1",
+        "version": 2
+      },
+      "semantic_db_unchanged": true,
+      "source_files": 14,
+      "summary": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/summary.json",
+      "matrix": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/matrix-manifest.json"
+    },
+    "compat": {
+      "state": "verified",
+      "requests": 20,
+      "coordinates": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+          "file_manifest_digest": "82e51913c98da8a8bdd1bba4e2f7eaa6f85f67dce1f66c2c6b7a66d66b6a686f",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "5141a7a2f6c5d7050d96a0ae0e130b3d6e53d081b434ffe80d4acdfa97a87fda",
+        "dataset_id": "8a53e85a20aeff2c33187ad2906cca42dcf546b97d52ce30b9f28a08da12735b"
+      },
+      "embedding_identity": {
+        "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+        "dim": 64,
+        "model": "mock-feature-hash-v1"
+      },
+      "semantic_db_unchanged": true,
+      "source_files": 5,
+      "summary": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/summary.json"
+    }
+  },
+  "checks": [
+    {
+      "id": "mock",
+      "command": "python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix --out /private/tmp/ks-b1-eightarms-locked-mock-20261004",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/summary.json"
+    },
+    {
+      "id": "real",
+      "command": "python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix --out /private/tmp/ks-b1-eightarms-final-real-20261004 --embedder ollama --model-name bge-m3:latest --ollama-url http://127.0.0.1:11434",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/summary.json"
+    },
+    {
+      "id": "compat",
+      "command": "python3 scripts/wbs-ontology-relations-smoke.py --out /private/tmp/ks-b1-eightarms-compat-mock-20261004",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/summary.json"
+    },
+    {
+      "id": "post-capture-audit",
+      "command": "python3 /private/tmp/ks-b1-eightarms-post-audit-20261004.py",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/post-capture-audit.txt"
+    },
+    {
+      "id": "docs",
+      "command": "python3 scripts/check-docs.py",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/docs.txt"
+    },
+    {
+      "id": "boundaries",
+      "command": "scripts/check-boundaries.sh",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/boundaries.txt"
+    },
+    {
+      "id": "output-reuse-rejected",
+      "command": "python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix --out /private/tmp/ks-b1-eightarms-locked-mock-20261004",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "raw_output": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/output-reuse-rejected.json"
+    }
+  ],
+  "initial_error": {
+    "kind": "verification_script_field_name",
+    "observed": "KeyError: requests_sha256 after successful baseline_off capture",
+    "correction": "read capture report request_sha256; preserve original baseline capture and checks",
+    "production_failure": false,
+    "first_harness_source_sha256": null
+  },
+  "limitations": [
+    "synthetic fixture-reviewer statuses are not human approval of operating facts",
+    "formal B0/B1/C0/C1 and input/protocol/semantic reviews remain pending",
+    "raw/text recall K20, Stage2 cap30, knowledge pass K6 are compiled source contract, not per-call telemetry; draft retrieval_k10 not applied",
+    "arm_rotation=false; single sequential captures do not establish latency or quality",
+    "current harness adds manifest state labels after final captures; archived exact capture harness is preserved",
+    "no production Go source changes; prior d2f8f1de whole-module tests/race/vet are historical evidence for unchanged runtime"
+  ],
+  "model_digest_checks": {
+    "before": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "after": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+  },
+  "source_hashes": {
+    "scripts/wbs-ontology-relations-smoke.py": "9fdf70808827681a4b77332bb9dd9f979928e1efdc41b4fe6e5258101154128b",
+    "cmd/cks/mcpcli/serve.go": "9814cb03e36e8802ade68d78d7ff73d90fd0f693d93b938c5e1de44f54e1b704",
+    "cmd/cks/mcpcli/ontology.go": "48259b3109a38a0bce3489031e5e690751f6504f4f54ab1981231adf6b6a8690",
+    "internal/system/mcp/get_for_task_v2.go": "7b862f2901320173255172a7bcd3ef928bcfcfe61e4cc4ddbc3fa64b1a156d96",
+    "internal/system/evidencev2/knowledge.go": "af8cfeaca6f0d49f69d02f1784461b03869ae70f14718e72d2514cb661b98a5d",
+    "internal/system/composer/stage1/extractor.go": "108d3a7efac9ab36b159709183d3a3f80819185ec71397b6b7a87d94869eaeca",
+    "internal/system/composer/stage2/searcher.go": "cdca1a8d0d591640c2b55a944815bcf9423f49047cbead9cf7d5064b02ae5d86",
+    "internal/system/composer/stage2/ontology_provider.go": "43ee53c541f680ecd0d0c272eb68fe5ec24cc49629ad3946cea389ed0ee79ea8"
+  },
+  "capture_harness_sha256": "99f63438a69794cadc91bca985980c7f12458a2001fbae92da7ec1afc07fb027",
+  "post_capture_reaudit": {
+    "v2_responses": 106,
+    "original_input_and_database_sha": true,
+    "forged_normative_instruction_rejected": true,
+    "output_reuse_unchanged": true
+  },
+  "artifacts": [
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/boundaries.txt",
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+      "bytes": 22
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/docs.txt",
+      "sha256": "41128d3b0081120bc5b607e91c64b66d941f3af957ae94648a6397ab90718b4e",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/output-reuse-rejected.json",
+      "sha256": "4bf84df84950020d0b69ae0cc8bb59b724b37504369fbb700ee40fc591f2152c",
+      "bytes": 692
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/post-capture-audit.py",
+      "sha256": "e20f67830c1aa2fa9466a5fe7b181eeb4036cfe37965ec8d22980d496ffea885",
+      "bytes": 2793
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/checks/post-capture-audit.txt",
+      "sha256": "993c498dfd2914a92733281860a6b48b7a465fc69364db23b1b5a480c75f40ee",
+      "bytes": 277
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/baseline.json",
+      "sha256": "46d4494a46b51b96620f5dc1341c5bb56d713406449cbf3ab06c76572bc072ac",
+      "bytes": 10537
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/baseline.yaml",
+      "sha256": "281d81e20e624b0b1717f3bc4e945bede5313e9e48fb02fb7ca3594e60b9e25d",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-combined.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-combined_missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-combined_stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-concept_text.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-text_missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/capture-text_stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/checks.json",
+      "sha256": "8bc9768529de37f36140219664f3245e305da7842e929cdaaf45efafe08b7e03",
+      "bytes": 20247
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined.json",
+      "sha256": "2cca3a17ce4f11298053cc50d7f53c632fa4d74105b806ed57fa2e8ffcf3fa69",
+      "bytes": 13097
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined.yaml",
+      "sha256": "4e80d499ece0bae55323a09faaa5273817537ec7afdbf75c228cd25efa5f74d9",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined_missing.json",
+      "sha256": "db95c0f6f88b91ca4942481656d6b36a375d27a73e9c692c1d5f632d01a0cd9c",
+      "bytes": 11205
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined_missing.yaml",
+      "sha256": "170521830eeab0d0884dee40eea7f0c1294f3b8a46484ee252c95364051d285b",
+      "bytes": 1241
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined_stale.json",
+      "sha256": "8fe8a93155685b1f1f21ec3728c231d0482bf7e440996eb21b0efe1a75298f26",
+      "bytes": 11202
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/combined_stale.yaml",
+      "sha256": "5f763e4832deba031b4779974fd2f2a9c11e3622d78798b01f0033aaa84eb7c2",
+      "bytes": 1248
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/concept_text.json",
+      "sha256": "2781438c4161ec87588636104ab63f770911730dc0b49b12d983f6ae98b68c8f",
+      "bytes": 13104
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/concept_text.yaml",
+      "sha256": "3ba7d5e620b4a16b7427166284d57884b978cbce5d3d7d7e8a8607ac716c4382",
+      "bytes": 1246
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-baseline.txt",
+      "sha256": "1c5c01511a9d925d20bca70c8ae28561e990b3ab3f96128617b6f164f7d08cbc",
+      "bytes": 127
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-combined.txt",
+      "sha256": "f221b4e83e053d6699692f444be9c3c5a317978bd4463a629c5f8a6d07895968",
+      "bytes": 127
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-combined_missing.txt",
+      "sha256": "c54e62f4576ae741ca4b7c49308cbda483c075e2c44460c1a3acd3ec7582a3ce",
+      "bytes": 135
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-combined_stale.txt",
+      "sha256": "7d5b67a39044e2f7254e51b856a6d0239df34b8955efb4f57f999ea8fe7b3eae",
+      "bytes": 133
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-concept_text.txt",
+      "sha256": "cc360cf0b9851fd16ee331277e5dd72d84daa44f67a6a83418ac6d50f28b923f",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-missing.txt",
+      "sha256": "fbb4ffd23a67a7a4c73f343bfea5f6d95fa960fdd12fab400049b49d862cbe01",
+      "bytes": 126
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-relations.txt",
+      "sha256": "3d2b4f245a363796a277b889f85ca394a7c4fc2fd82ecad1116ec770e2348281",
+      "bytes": 128
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-stale.txt",
+      "sha256": "a63bbb4cc84f09b39979ae4c6e203af181e1b4c3512361d28f1f293dfaae8b45",
+      "bytes": 124
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-text_missing.txt",
+      "sha256": "ba3986bf21f78cfe0de3eedce65242a24df700a2f9101815190aee2a365e7d26",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/config-text_stale.txt",
+      "sha256": "f848e2b8a8f8f4ddd5dc9f206bf053799c8076f54191b98d92d067641b59a748",
+      "bytes": 129
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/dataset-identity.json",
+      "sha256": "a73f560eb9d75c9729a3ef0082fcbfc784f2aa8a62f2c4a60240d11f69f362e5",
+      "bytes": 972
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-bundle-verify.txt",
+      "sha256": "7b9f2fd34fa12b68a1197a8bcd02a9a9ff4d193ef56a8d5ba6ed4279f611decb",
+      "bytes": 292
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-bundle.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/git-status-after.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/matrix-manifest.json",
+      "sha256": "8e2476fd85af02d242c425afa7149c2165cb809439f3228ac6bd1e4164ac66e4",
+      "bytes": 7546
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/missing.json",
+      "sha256": "2e98d4ca1c2368bf796815f54a9692c804cf1e45fe6156cf1b6226a7d26048fe",
+      "bytes": 11206
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/missing.yaml",
+      "sha256": "e62261d29087ba2f6d198fbe9b0a6c34185f3f15d5a7dc57a3b297647850a66d",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/projection.json",
+      "sha256": "1ac5ac2c38f301b77f8e2f5ada57f6045a70c55673eaa6048f85cb50a34e117c",
+      "bytes": 6516
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/relations.json",
+      "sha256": "3046891b33aaeac8d3b611f5b64cf7f850ac2f4b42a79fc018d368b3e60cdb9c",
+      "bytes": 11089
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/relations.yaml",
+      "sha256": "bfae6a3070207c7792155dab529b9138a63821eac4fa70aad9e630daf359d4f3",
+      "bytes": 1243
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/semantic-extract.txt",
+      "sha256": "a0d3071a4b231f7a63b3438c24cbde8e08a1d58013dae2f2eeb0c43d6735e3e1",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/semantic-promote.txt",
+      "sha256": "f417a452b02bf03b3e56e06890200a4d70a6675a24513b6c99e12360fde3907a",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/setup.txt",
+      "sha256": "5edf1b88d2da7a4d19e3f5dbfe89b6839f0e5cec8a651eabc584f157f5483efb",
+      "bytes": 3701
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/source.bundle",
+      "sha256": "502231ab4400a02dab74841b2a37bdde988bda75003b7b979ea471a5b57510ad",
+      "bytes": 1085
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/stale.json",
+      "sha256": "5f0aaec435984fe8106308eb7303dd2e6fda12c7fc801b530f23a4dab8a7ba7a",
+      "bytes": 11205
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/stale.yaml",
+      "sha256": "d5d3912ecd8504e0a58a2daf649b444f665fce72969d1f23acd6b88bab7db5a2",
+      "bytes": 1249
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/summary.json",
+      "sha256": "ab010417efeeab4282cb9e47e37de218a9fee44b4caead32536f604c0b0af5ad",
+      "bytes": 32443
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/text_missing.json",
+      "sha256": "f891f562063d67a49aacb74d6e356f0578d1b9afe661ca2e7407c629a6f07a16",
+      "bytes": 11210
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/text_missing.yaml",
+      "sha256": "3b113ce8dae1427f5b888015faddb4c3a13b9bf93aa638e4e4ae047d1c35cf55",
+      "bytes": 1245
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/text_stale.json",
+      "sha256": "b03f4f9b1f89e5e6423f3e4f11adff45ff6d300154ed540dcf0f97ba4f7aa188",
+      "bytes": 11209
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/text_stale.yaml",
+      "sha256": "3f1a8cde62f96421e6e68ba1db732304ecfc8e29b8e271c84ab758fc31b849fd",
+      "bytes": 1252
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/compat/vector-manifest.json",
+      "sha256": "cece1b835405db0d0b36e627bd539321824d8504d133e919c21a078a1a385e29",
+      "bytes": 2012
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/harness-at-final-capture.py",
+      "sha256": "99f63438a69794cadc91bca985980c7f12458a2001fbae92da7ec1afc07fb027",
+      "bytes": 25262
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/baseline_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/baseline_off.json",
+      "sha256": "49cf263a3c74eb8f39ce89fb827baa7bf4556cbb307464154ac471a2889f6130",
+      "bytes": 42124
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/baseline_off.yaml",
+      "sha256": "4d5b38a35e0bb01cd14c6350625a73ee03cb8a2bc193583cfe3e088df52e38d2",
+      "bytes": 1238
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/capture-baseline_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/checks.json",
+      "sha256": "788bee71e2e12d968a9ad6b933eae209a72ce7cf8ef1104e907c05a06a817194",
+      "bytes": 7807
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/config-baseline_off.txt",
+      "sha256": "cd4cef270e4b431ae2dbd310e2d9e993a5da1f726a49fb494dfb55d3b6f7055e",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/dataset-identity.json",
+      "sha256": "c3ca508db18c96b3e1803c5c8b9212080cc392a64fe6a1d1a9daa1c84cf33ed0",
+      "bytes": 972
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/git-bundle.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/knowledge-digest.txt",
+      "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/knowledge-init.txt",
+      "sha256": "8999d0371c711e26a549b1359b0b56f66a29873e2df70e728e6a63c625f85693",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/knowledge-lock.txt",
+      "sha256": "2e4917f4d49aec8ee9b27f818888d2cc153526af7f118571908a839dcb7a49cb",
+      "bytes": 239
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/knowledge-review.txt",
+      "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543",
+      "bytes": 1267
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/knowledge-validate.txt",
+      "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/matrix-manifest.json",
+      "sha256": "76890e105fb865325abaff1e5b4dfe6ef11ea5ab5b3d554483c0e3f6e19eaa15",
+      "bytes": 1930
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/projection.json",
+      "sha256": "48d8e61aaaaf8d50e07c6ef7fb246a5282924b6128cb706c5c989b1efb46e5fc",
+      "bytes": 7228
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/semantic-extract.txt",
+      "sha256": "d581eb77d799e71055fa9b6e96172f8b6caa26a0eaf75f916311f3cc2f74e39f",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/semantic-promote.txt",
+      "sha256": "deb351267229179f73b4c4e056f66d08adbc500281bf1b63477357f49d5a2bc1",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/setup.txt",
+      "sha256": "ed5209525b34c1b3b1032248818325bffa8ca16a915263f70e96ef29678faef3",
+      "bytes": 3695
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/manifest.yaml",
+      "sha256": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+      "bytes": 282
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/conflict-a.yaml",
+      "sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/conflict-b.yaml",
+      "sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/expired.yaml",
+      "sha256": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+      "bytes": 475
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/proposed.yaml",
+      "sha256": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+      "bytes": 348
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/public.yaml",
+      "sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+      "bytes": 443
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/.cks/knowledge/policies/restricted.yaml",
+      "sha256": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+      "bytes": 464
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source/vendor/fixture-policy/pack.yaml",
+      "sha256": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e",
+      "bytes": 291
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/source.bundle",
+      "sha256": "70b6cfdcebf9d22aa535254dc60f9d2d560119de9ac1fbce9d29794e2410d2d7",
+      "bytes": 2996
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/initial-script-error/vector-manifest.json",
+      "sha256": "0986e445d44654a61615b97d21606d4f2c1879bd125522db63dbee82be34734e",
+      "bytes": 2010
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_off.json",
+      "sha256": "58f908bf8655dbb82735070418aa8f841e2ba3ab635ab6b65817096608cfbc97",
+      "bytes": 42123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_off.yaml",
+      "sha256": "5cafc2d718621a06b7c8531ba5c8532dd9f51e4fa2367c06c27c89a0578b8d2d",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_on.json",
+      "sha256": "0ad16e64a315056c8398e3fa39dbb1c6a9304cbf31da2a53059a842d11ec5c76",
+      "bytes": 77927
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/baseline_on.yaml",
+      "sha256": "5cafc2d718621a06b7c8531ba5c8532dd9f51e4fa2367c06c27c89a0578b8d2d",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-baseline_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-baseline_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-combined_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-combined_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-concept_text_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-concept_text_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-relations_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/capture-relations_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/checks.json",
+      "sha256": "fdc049edb88667ef930db9eaa7db00b87fc390b60d1714b66cd52d673eca1e7e",
+      "bytes": 19592
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_off.json",
+      "sha256": "50fe80eeec329c4061a569e4dd811aa46202b7789b6a7e50b3e2cae7a9b069fb",
+      "bytes": 49804
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_off.yaml",
+      "sha256": "1ef53c4a170003e6445ca5bf2cbe2aaef2847ac6ffb79fd6357088dfcebc606b",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_on.json",
+      "sha256": "369c6d32d3db8810f89ccd43868a60b260df229cc2e78064769c552549c94e53",
+      "bytes": 85607
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/combined_on.yaml",
+      "sha256": "1ef53c4a170003e6445ca5bf2cbe2aaef2847ac6ffb79fd6357088dfcebc606b",
+      "bytes": 1242
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_off.json",
+      "sha256": "9aab6ca144e843db2cc1617167ccef9aa75285ce7027256c3283ff08f4ff5a9e",
+      "bytes": 49828
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_off.yaml",
+      "sha256": "5b0508027b5dc05aff1a5d7edbf69b611fbab29e7e97b63af8ea7b780be76858",
+      "bytes": 1246
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_on.json",
+      "sha256": "1bfba1dc5baef054b15d9e66006cf68b7ae29166b2e7bf68cd878d28ec094e0f",
+      "bytes": 85632
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/concept_text_on.yaml",
+      "sha256": "5b0508027b5dc05aff1a5d7edbf69b611fbab29e7e97b63af8ea7b780be76858",
+      "bytes": 1246
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-baseline_off.txt",
+      "sha256": "f02da9355772c50dae9755c771a186f23668a98c9b35da15922fcd2b54db4e24",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-baseline_on.txt",
+      "sha256": "7130a5870a31bd9f86249bb4c226764c49f14fb63e2dc8526213d0cbfda0835f",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-combined_off.txt",
+      "sha256": "046fa6b45ebf41933666a50ad2f0bfe229a0edc3f3faac39cbd18df07ceb9725",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-combined_on.txt",
+      "sha256": "809c5ea18ab10aa27689c3dc49310bb64c4e13b354807106a0b1277d03eaa685",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-concept_text_off.txt",
+      "sha256": "8ca2ee7ecc8ed6f6730191e7922c6015d43819801e724e46fe040907d86af825",
+      "bytes": 135
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-concept_text_on.txt",
+      "sha256": "411d3e5ee33e374b9a8bba3caf7026cfe289f49b913c6c59f2390b9dcc753b53",
+      "bytes": 134
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-relations_off.txt",
+      "sha256": "acbac4d4e4520c0a7b56f4c4ec714f0c05b3fb2318af28bbec3085ad45b1eef2",
+      "bytes": 132
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/config-relations_on.txt",
+      "sha256": "fcd0a4231a77935c968e0b6a0ffb47eacd292170c39ef1e1439e843fbcdf8056",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/dataset-identity.json",
+      "sha256": "c3ca508db18c96b3e1803c5c8b9212080cc392a64fe6a1d1a9daa1c84cf33ed0",
+      "bytes": 972
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-bundle-verify.txt",
+      "sha256": "00eb6534bcdc4c566fbd6081ade8af316fb34508e9ce32114c090c52ed6c383e",
+      "bytes": 292
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-bundle.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/git-status-after.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/knowledge-digest.txt",
+      "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/knowledge-init.txt",
+      "sha256": "b4a4c04f3971055486b887d97b7e366076bbf023db4cf8034e4e3c478281cfa3",
+      "bytes": 143
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/knowledge-lock.txt",
+      "sha256": "246d245742f7e5ee0f46b8252b13efb30f68f73b6a1291cf6afc8ed41a8b8820",
+      "bytes": 240
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/knowledge-review.txt",
+      "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543",
+      "bytes": 1267
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/knowledge-validate.txt",
+      "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/matrix-manifest.json",
+      "sha256": "a7a9f804a278758876d4f09bd4157e27915777181ba7d6fd0bad8f755cc3afec",
+      "bytes": 55524
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/projection.json",
+      "sha256": "48d8e61aaaaf8d50e07c6ef7fb246a5282924b6128cb706c5c989b1efb46e5fc",
+      "bytes": 7228
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_off.json",
+      "sha256": "d147cabf8c0445d51da5cb83aa1dfcaed575afc849ec20a6841e76fd233e5a74",
+      "bytes": 43780
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_off.yaml",
+      "sha256": "807f32760004d0e9f9d68ead5769fb9ea65bf815952192a87756ec1ed4e41ed1",
+      "bytes": 1243
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_on.json",
+      "sha256": "2665a52b443b4d36fcb2b8ac5b1b5c2d7e52366f8add07e494a72e38080aa2f1",
+      "bytes": 79584
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/relations_on.yaml",
+      "sha256": "807f32760004d0e9f9d68ead5769fb9ea65bf815952192a87756ec1ed4e41ed1",
+      "bytes": 1243
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/semantic-extract.txt",
+      "sha256": "d581eb77d799e71055fa9b6e96172f8b6caa26a0eaf75f916311f3cc2f74e39f",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/semantic-promote.txt",
+      "sha256": "deb351267229179f73b4c4e056f66d08adbc500281bf1b63477357f49d5a2bc1",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/setup.txt",
+      "sha256": "d0baec2e380840b344bd4b1964c051345b9721e7a0cb011dd3408eca519850a9",
+      "bytes": 3704
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/manifest.yaml",
+      "sha256": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+      "bytes": 282
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/conflict-a.yaml",
+      "sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/conflict-b.yaml",
+      "sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/expired.yaml",
+      "sha256": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+      "bytes": 475
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/proposed.yaml",
+      "sha256": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+      "bytes": 348
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/public.yaml",
+      "sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+      "bytes": 443
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/.cks/knowledge/policies/restricted.yaml",
+      "sha256": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+      "bytes": 464
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source/vendor/fixture-policy/pack.yaml",
+      "sha256": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e",
+      "bytes": 291
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/source.bundle",
+      "sha256": "70b6cfdcebf9d22aa535254dc60f9d2d560119de9ac1fbce9d29794e2410d2d7",
+      "bytes": 2996
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/summary.json",
+      "sha256": "d1df8be83695f8078fd2f94fdad5341be1b3c54e11c78add2da66815efa33122",
+      "bytes": 53516
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/mock/vector-manifest.json",
+      "sha256": "a166e792231303a3540532aeae22d0381ac332436d480b2b5696ad3a88837f31",
+      "bytes": 2012
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/ollama-tags-after.json",
+      "sha256": "45cc449ce2fc2bf261a67be29d015c559916aca52491ffec231d0d82316ca350",
+      "bytes": 1906
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/ollama-tags-before.json",
+      "sha256": "45cc449ce2fc2bf261a67be29d015c559916aca52491ffec231d0d82316ca350",
+      "bytes": 1906
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_off.json",
+      "sha256": "d46153e5adf4c4d16d315cc87ee8b8f2cae25bd4e5f0bc30217296e6346b1518",
+      "bytes": 94635
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_off.yaml",
+      "sha256": "7ad811ab5878084910ff6e52e9566e53f1a075551428396d80fb4cd6c52a4df9",
+      "bytes": 1233
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_on.json",
+      "sha256": "eaa32ccd57eb2a555d59b368fa97e46bd4691aaafa5a149dd8c8c56efb16daf2",
+      "bytes": 156263
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/baseline_on.yaml",
+      "sha256": "7ad811ab5878084910ff6e52e9566e53f1a075551428396d80fb4cd6c52a4df9",
+      "bytes": 1233
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-baseline_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-baseline_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-combined_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-combined_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-concept_text_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-concept_text_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-relations_off.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/capture-relations_on.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/checks.json",
+      "sha256": "f332b2e5c94f9d85a1d75fc82bd459095dc58b9c9268f76be0fc40001e0c1373",
+      "bytes": 19554
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_off.json",
+      "sha256": "1226c4ed6ecbfa3eb5ed8c3ff410e9b84991bd3ba43fff9493ee917cfe874e0d",
+      "bytes": 102322
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_off.yaml",
+      "sha256": "639445e1678cdd442715a11576c488aaf085ffe4afb0493427ba245bdb4b5dbe",
+      "bytes": 1233
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_on.json",
+      "sha256": "4ce41b4cc70095209004bd2d3633dd6fe52a980f9ea637e4b5c5a4410822a1c2",
+      "bytes": 163949
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/combined_on.yaml",
+      "sha256": "639445e1678cdd442715a11576c488aaf085ffe4afb0493427ba245bdb4b5dbe",
+      "bytes": 1233
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_off.json",
+      "sha256": "c40f65bbdeb00197aeb5acfa842e039a1f63da0e3bf466d0e10503421197ca3a",
+      "bytes": 102346
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_off.yaml",
+      "sha256": "3650f67617e0783565f7ce3116fd2f8cf79c4deac54e2f3ff4ad624990d70f5d",
+      "bytes": 1237
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_on.json",
+      "sha256": "7cbde83bb2731bbebfd5fd32471382ffab662153c9239daf7c0781e0f2901a47",
+      "bytes": 163973
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/concept_text_on.yaml",
+      "sha256": "3650f67617e0783565f7ce3116fd2f8cf79c4deac54e2f3ff4ad624990d70f5d",
+      "bytes": 1237
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-baseline_off.txt",
+      "sha256": "e89c627a2db8bae7aaabe4fac7cdbedc07623af9e72ce943b0dfa4bd8d2749b6",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-baseline_on.txt",
+      "sha256": "5032bb0c1ccdc2afd7c4b1ae816648bf0bb6bed47c04f9a49205844de225ef4c",
+      "bytes": 129
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-combined_off.txt",
+      "sha256": "406eb6626957a5b764ed7eb9edfb2ee8f4d1f5add8dfb0a66d9b0ce5cb166f40",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-combined_on.txt",
+      "sha256": "453740f7c557d99932fb3c3c70c8b2d7a161492a102934707bf823e981a95cca",
+      "bytes": 129
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-concept_text_off.txt",
+      "sha256": "044c72b9b4857fb892739113f1454fe1926df7b0d90bf5944fb034fd07e11438",
+      "bytes": 134
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-concept_text_on.txt",
+      "sha256": "9415e3d7263096596353ee2fe034dd500541ee741e900fd22aea2905ced2cfc5",
+      "bytes": 133
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-relations_off.txt",
+      "sha256": "1d34989ac6b7ec2ff6281c81a83bafc8095d000fabe75c328ffeaad117d37a74",
+      "bytes": 131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/config-relations_on.txt",
+      "sha256": "211d7ea6bce9fa85f93d766e74595154a3084874656f1e2534c5c557fca4dde0",
+      "bytes": 130
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/dataset-identity.json",
+      "sha256": "e3d4dc46a66214ba8c62c668d8efeb82079f35d0f4b3864100c2ca25f4bb6459",
+      "bytes": 1317
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-bundle-verify.txt",
+      "sha256": "d1175ea829709224f79d4fa3b927b58f2ab0beedffcbdd79aafff3d26b6066bf",
+      "bytes": 291
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-bundle.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/git-status-after.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/knowledge-digest.txt",
+      "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/knowledge-init.txt",
+      "sha256": "32fe4a198ed4cefa5784a3c74aecf24025423647d6721e6869f6f7c35caa94e8",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/knowledge-lock.txt",
+      "sha256": "caa323c1e410382328d412cc9d6473666ab7645b5a95d37c33b36061801b2ccb",
+      "bytes": 239
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/knowledge-review.txt",
+      "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543",
+      "bytes": 1267
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/knowledge-validate.txt",
+      "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/matrix-manifest.json",
+      "sha256": "2676b044dc2ef79e606aa39c5c0840a3cfa6f2f7df29c1fce0b13b06862a481b",
+      "bytes": 56363
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/projection.json",
+      "sha256": "2e273aced09df63a44491adb67a28221a6220729841b3f80db71e8fd40cdb421",
+      "bytes": 7228
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_off-requests.json",
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "bytes": 1734
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_off.json",
+      "sha256": "72ff4d8a217a0aa3d875f720d8da0a99ebc62572d6505e0631982eba710c6303",
+      "bytes": 96298
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_off.yaml",
+      "sha256": "509cea82a528c5e8dfe9f4dce2c77e0e6181ab9d77019d49cab78cf834a4b469",
+      "bytes": 1234
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_on-requests.json",
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "bytes": 1728
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_on.json",
+      "sha256": "c67b89ba90076f5ba154a42b7e42fc36aa410a7e1dc67386979fce14a160e8dc",
+      "bytes": 157924
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/relations_on.yaml",
+      "sha256": "509cea82a528c5e8dfe9f4dce2c77e0e6181ab9d77019d49cab78cf834a4b469",
+      "bytes": 1234
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/semantic-extract.txt",
+      "sha256": "3e3e8a05e96826e1135344b4d9ce4d648fb146f68842152f39345f1c1679f848",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/semantic-promote.txt",
+      "sha256": "050eb8bc31bdd1375794f95d35f914226b79fe7ab9693ccf4830ee8a65773061",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/setup.txt",
+      "sha256": "c8ece2f5be51349f4c04a1c8df3dfadaf55a325c0f5d2fff29e57b0aca988583",
+      "bytes": 3859
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/manifest.yaml",
+      "sha256": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+      "bytes": 282
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/conflict-a.yaml",
+      "sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/conflict-b.yaml",
+      "sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+      "bytes": 470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/expired.yaml",
+      "sha256": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+      "bytes": 475
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/proposed.yaml",
+      "sha256": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+      "bytes": 348
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/public.yaml",
+      "sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+      "bytes": 443
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/.cks/knowledge/policies/restricted.yaml",
+      "sha256": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+      "bytes": 464
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source/vendor/fixture-policy/pack.yaml",
+      "sha256": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e",
+      "bytes": 291
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/source.bundle",
+      "sha256": "70b6cfdcebf9d22aa535254dc60f9d2d560119de9ac1fbce9d29794e2410d2d7",
+      "bytes": 2996
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/summary.json",
+      "sha256": "1c1daa9d65b6e649fddda8bfb0fb4c92993f6965f528562d22f1ccd19a1d9ec3",
+      "bytes": 54233
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04/real/vector-manifest.json",
+      "sha256": "25068fd1f122f3d21c75582adb0af11e2a2a66c052ea563fa366a9ca94ab4e31",
+      "bytes": 2498
+    }
+  ],
+  "artifact_bytes": 2228475,
+  "artifact_count": 260
+}

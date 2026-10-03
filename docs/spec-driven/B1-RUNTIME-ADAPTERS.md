@@ -1,6 +1,6 @@
 # B1 비교 실행 경로
 
-2026-10-03 · B1-01 구현 검증 완료. 기본·개념 텍스트·관계·결합의 네 경로가 실제 MCP에 연결됐다. 팩 축과 공식 paired 비교는 남아 있다. 온톨로지 기본 활성 또는 품질 통과를 선언하지 않는다.
+2026-10-04 · B1-01 네 경로와 B1-02 팩 off/on의 8개 경로를 합성 입력에서 구현 검증했다. 공식 paired 비교와 실제 팩 사실의 사람 검토는 남아 있다. 온톨로지 기본 활성 또는 품질 통과를 선언하지 않는다.
 
 ## 현재 실행 계약
 
@@ -56,6 +56,33 @@ mock과 실제 BGE-M3에서 각각 정상 경로 4개와 오류 경로 6개의 v
 
 [관계 실행 원장](../../system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03.json)과 [네 경로 실행 원장](../../system/eval/b0-knowledge-system/b1-text-runtime-m2max-2026-10-03.json)에 명령·코드/원자료 SHA와 한계를 연결한다. 이 실행은 합성 입력의 진단이며 공식 B1 품질/지연 표본이 아니다. 공식 gold 또는 미검토 운영 관계를 verified로 승격하지 않았다.
 
+## 팩 off/on의 8개 경로
+
+`--pack-matrix`는 같은 보관 소스·CKV/CKG·의미 DB·잠긴 팩을 유지하고 v2 요청의 `include_knowledge`만 바꾼다. 팩 off에서도 물리적 팩을 지우거나 색인을 다시 만들지 않는다. 같은 mode의 off/on 설정 SHA는 같으며 전체 설정은 `ontology_mode` 외에 같다. 기존 v1은 이 팩 축을 지원하지 않으므로 이 행렬은 v2로 실행한다. 기존 기본 스모크의 v1/v2 검사는 별도로 유지한다.
+
+| 온톨로지 mode | 팩 off | 팩 on |
+|---|---|---|
+| baseline | 원문 후보 | 원문 후보 + 적용 가능한 검토 정책 |
+| concept_text | 후보 안의 개념 텍스트 신호 | 같은 텍스트 신호 + 검토 정책 |
+| relations | 후보 안의 검토 관계 신호 | 같은 관계 신호 + 검토 정책 |
+| combined | 후보 안의 상한 적용 결합 | 같은 결합 + 검토 정책 |
+
+```bash
+python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix \
+  --out /private/tmp/b1-eight-arms-mock
+python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix \
+  --out /private/tmp/b1-eight-arms-ollama --embedder ollama \
+  --model-name bge-m3:latest --ollama-url http://127.0.0.1:11434
+```
+
+스크립트는 strict embedding을 요구하고 기존 출력 디렉터리를 거부한다. 합성 `fixture-reviewer` 상태로 공개·proposed·만료·restricted·충돌 정책과 범위 밖 요청을 검사한다. 운영 정책의 승인이나 B0 개발 의미 제안의 승인을 만들지 않는다. source Git commit과 snapshot은 mock/BGE-M3 간 같고, 모델별 dataset ID는 다르다. 각 실행의 8개 경로는 같은 dataset ID와 팩 lock digest를 사용한다. `semantic_current`는 비어 있고 읽기 전후 소스·의미/벡터/그래프 DB SHA가 같다.
+
+mock/BGE-M3 각각 8경로 × 6상태의 48요청을 검증했다. 공개 정책은 on에서만 요구 동작 1개와 자체 출처 인용 1개를 추가했다. 충돌 정책 2개는 출처와 충돌 정보만 제공하고 요구 동작은 비워 둔다. proposed·범위 밖은 unknown, 만료는 stale, 접근 제한은 restricted이며 정책 ID와 요구 동작을 내보내지 않는다. 제한 정책 원문이 기본 인용에 들어가지 않는지도 검사한다. 온톨로지 mode 간 최종 인용/본문 집합은 같은 팩 축 안에서 유지된다. on은 off의 기본 인용/본문을 모두 보존한다. 모든 v2 본문·줄 범위·소스 SHA·좌표·무결성을 원문 및 독립 JSON 정규화로 검사했다.
+
+`matrix-manifest.json`은 8개 경로의 순서, 설정/질의/바이너리/원응답 SHA, 좌표·모델 신원, 입력·DB·본문·응답 JSON 크기와 원시 시간을 기록한다. K는 **현재 컴파일 기본값 계약**인 raw/text recall 20, Stage 2 후보 상한 30, 별도 knowledge pass 6을 출처 코드 SHA와 함께 기록한다. 이는 호출별 backend telemetry가 아니다. 초안 프로토콜의 retrieval_k=10과 같다고 표시하지 않는다. 원시 단일 캡처 시간은 지연 점수로 집계하지 않고, 현재 행렬의 `arm_rotation=false`를 명시한다. 순서 회전과 전체 backend 호출 수 원장은 B0-06/B1-03에서 완성한다.
+
+[8개 경로 원자료 원장](../../system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04.json)에 입력 bundle·잠금·원응답·검증 명령과 최초 스크립트 오류를 보존한다. 공식 품질 지표는 null이다.
+
 ## 남은 공식 비교 작업
 
-네 어댑터의 구현 검증은 완료됐다. 공식 프로토콜에서 입력·glossary·모델·K·필터·intent를 잠그고 모든 arms의 실제 조건을 감사해야 한다. B1-02 팩 off/on의 8 arms, 입력 잠금과 순서 회전, 공식 원자료·주장별 사람 판정은 이후 단계다. 전체 상태는 [실행 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.
+네 어댑터와 합성 팩 축의 구현 검증은 완료됐다. 공식 프로토콜에서 입력·glossary·모델·K·필터·intent를 잠그고 모든 arms의 실제 조건을 감사해야 한다. 실제 팩 사실의 사람 판정, 승인된 K 적용, 순서 회전·전체 호출 수 원장, 공식 원자료·주장별 사람 판정은 남아 있다. 전체 상태는 [실행 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.

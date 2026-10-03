@@ -1,0 +1,258 @@
+[
+  {
+    "id": "knowledge-init",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "init",
+      "--project-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--project-id",
+      "ks-fixture"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-init.txt",
+    "sha256": "8999d0371c711e26a549b1359b0b56f66a29873e2df70e728e6a63c625f85693"
+  },
+  {
+    "id": "knowledge-digest",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "digest",
+      "--project-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--source",
+      "vendor/fixture-policy"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-digest.txt",
+    "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2"
+  },
+  {
+    "id": "knowledge-lock",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "lock",
+      "--project-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-lock.txt",
+    "sha256": "2e4917f4d49aec8ee9b27f818888d2cc153526af7f118571908a839dcb7a49cb"
+  },
+  {
+    "id": "knowledge-validate",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "validate",
+      "--project-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-validate.txt",
+    "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a"
+  },
+  {
+    "id": "knowledge-review",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "review",
+      "--project-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-review.txt",
+    "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543"
+  },
+  {
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-init.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "raw_output": "git-add.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "synthetic relations input"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-commit.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-bundle",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "bundle",
+      "create",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/source.bundle",
+      "--all"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-bundle.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "setup",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--out",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset",
+      "--project-id",
+      "ks-fixture",
+      "--source-mode",
+      "committed",
+      "--version",
+      "smoke",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "raw_output": "setup.txt",
+    "sha256": "ed5209525b34c1b3b1032248818325bffa8ca16a915263f70e96ef29678faef3"
+  },
+  {
+    "id": "semantic-extract",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "semantic",
+      "build",
+      "--repo",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--project-id",
+      "ks-fixture",
+      "--dataset-id",
+      "5d3dac277f54ca4e6f562360ba08b0b563c938f1d649c208a5b27966915d5749",
+      "--graph",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke/graph",
+      "--vector",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke/vector",
+      "--version-dir",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke",
+      "--store",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/projection.json",
+      "--docs",
+      "README.md",
+      "--ontology",
+      "ontology-reviewed.yaml",
+      "--extract-only",
+      "--include-packs"
+    ],
+    "exit_code": 0,
+    "raw_output": "semantic-extract.txt",
+    "sha256": "d581eb77d799e71055fa9b6e96172f8b6caa26a0eaf75f916311f3cc2f74e39f"
+  },
+  {
+    "id": "semantic-promote",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "semantic",
+      "promote",
+      "--input",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/projection.json",
+      "--repo",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--graph",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke/graph",
+      "--vector",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke/vector",
+      "--version-dir",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke",
+      "--store",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/semantic.db"
+    ],
+    "exit_code": 0,
+    "raw_output": "semantic-promote.txt",
+    "sha256": "deb351267229179f73b4c4e056f66d08adbc500281bf1b63477357f49d5a2bc1"
+  },
+  {
+    "id": "config-baseline_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/baseline_off.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-baseline_off.txt",
+    "sha256": "cd4cef270e4b431ae2dbd310e2d9e993a5da1f726a49fb494dfb55d3b6f7055e"
+  },
+  {
+    "id": "capture-baseline_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/baseline_off-requests.json",
+      "--config",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/baseline_off.yaml",
+      "--output",
+      "/private/tmp/ks-b1-eightarms-first-mock-20261004/baseline_off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-baseline_off.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "6ec465d1c5307f8e5217f2d5f16d10d18216d2dcdfb653f89103376b6e7ad30f",
+    "dataset_id": "5d3dac277f54ca4e6f562360ba08b0b563c938f1d649c208a5b27966915d5749"
+  },
+  "embedding_identity": {
+    "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+    "dim": 64,
+    "model": "mock-feature-hash-v1"
+  },
+  "settings": {
+    "raw_recall_k": 20,
+    "stage2_candidate_cap": 30,
+    "knowledge_pass_k": 6,
+    "raw_search_filter": {},
+    "bm25_rerank": true,
+    "ontology_budget_ms": 5000
+  },
+  "pack_axis": "same retained pack and index; only include_knowledge changes",
+  "order": [
+    "baseline_off",
+    "concept_text_on",
+    "relations_off",
+    "combined_on",
+    "baseline_on",
+    "concept_text_off",
+    "relations_on",
+    "combined_off"
+  ],
+  "arm_rotation": false,
+  "latency_gate": "not measured; sequential structural single captures",
+  "arms": []
+}

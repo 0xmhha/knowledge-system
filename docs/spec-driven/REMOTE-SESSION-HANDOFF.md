@@ -2,9 +2,11 @@
 
 작성일: 2026-10-03. 이 문서는 다른 머신의 Codex 세션에 그대로 전달할 작업 프롬프트다. 실행 전 원격 브랜치와 문서의 최신 상태를 확인하고, 이후 변경 사항이 있으면 이 문서보다 최신 커밋과 WBS를 우선한다.
 
-## 2026-10-03 실행 재개 안내
+## 2026-10-04 실행 재개 안내
 
 현재 작업의 우선순위, 완료 항목 재검증, 남은 B0/B1/C0/C1 단계는 [EXECUTION-WORKLIST.md](./EXECUTION-WORKLIST.md)를 먼저 확인한다. 정적 gold와 BGE-M3는 승인됐지만 동적 사례·측정 프로토콜은 사람 검토 대기다. 공식 품질과 운영 출시는 완료하지 않았다. 아래 내용은 이전 인계 시점의 기록이다.
+
+최신 후속 검증: [B1 팩 축](./B1-RUNTIME-ADAPTERS.md)의 `--pack-matrix`로 같은 dataset/lock에서 8개 v2 경로를 실행했고 mock/BGE-M3 각 48요청의 6정책 상태·원문/인용/본문·무결성·소스/DB 무변경을 확인했다. 합성 `fixture-reviewer`는 운영 사실 승인 기록이 아니다. [원장](../../system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04.json)의 현재 K는 raw/text20·Stage2 cap30·knowledge pass6이며, 초안 K10의 공식 평가가 아니다. B1-02 구현 검증은 완료됐고 다음 독립 작업은 B0-06의 arm 순서 회전·호출별 실제 K·knowledge pass/Stage3 포함 전체 backend 호출 수 원장이다. 아래의 “다음은 B1-02 팩 축”은 이전 체크포인트다. 공식 B0/B1/C0/C1과 사람 판정은 남아 있다.
 
 
 후속 도구/수정: [B0-MEASUREMENT-TOOLS.md](./B0-MEASUREMENT-TOOLS.md)의 v1/v2 응답 수집·CKV exact/budget 프로브가 구현됐고 실모델 진단을 통과했다. CKV EOF 개행의 가상 인용 줄과 SQLite `?`/`#` 파일명 처리 오류를 재현 후 수정했다. 기존 전체 진단 데이터는 수정 전 빌더이므로 공식 B0-07에서 새 데이터셋으로 범위 감사를 수행한다. B0-06 전체 원장/계측은 남아 있다. [B1 네 실행 경로](./B1-RUNTIME-ADAPTERS.md)의 baseline/개념 텍스트/관계/결합은 실제 MCP에서 mock/BGE-M3 각 20요청·출처/후보 보존/오류 폴백 검증을 완료했다. B1-01 구현 검증이며 공식 품질 통과는 아니다. [B0-05 개발 결합 검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md)는 실제 앵커·보관 원문·proposed 팩/스펙으로 준비했고 사람 판정 대기다. F-03 project_id 불일치와 온톨로지+지식 요청의 stamp 순서 오류도 재현 후 수정했다. 다음은 B1-02 팩 축과 B0-06 전체 호출 수·입력 잠금·순서 원장이다. 팩 축·공식 B0/B1·C0/C1은 남아 있다.
