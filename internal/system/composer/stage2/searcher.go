@@ -33,6 +33,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
+	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -165,6 +166,9 @@ type Searcher struct {
 	ontologyBoost    float64
 	ontologyProvider OntologyProvider
 	ontologyBudget   time.Duration
+	ontologyMode     string
+	ontologyText     ckvclient.Client
+	ontologyTextK    int
 }
 
 // Option configures a Searcher.
@@ -209,6 +213,11 @@ func New(ckg ckgclient.Client, opts ...Option) (*Searcher, error) {
 	if s.ontologyProvider != nil && s.ontology != nil {
 		return nil, errors.New("stage2: select one ontology resolver or provider")
 	}
+	if s.ontologyMode == "concept_text" || s.ontologyMode == "combined" {
+		if s.ontologyProvider == nil || s.ontologyText == nil || s.ontologyTextK < 1 || s.ontologyTextK > 100 {
+			return nil, errors.New("stage2: text arm requires provider, CKV client and K between 1 and 100")
+		}
+	}
 	return s, nil
 }
 
@@ -227,7 +236,7 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// run with no keywords but non-empty ckv hits is still productive.
 	if len(keywords) == 0 && len(ckvHits) == 0 {
 		if s.ontologyProvider != nil && s.ontologyBoost > 0 {
-			out.Ontology = &contract.OntologyDiagnostic{Mode: "relations", State: "no_candidates"}
+			out.Ontology = &contract.OntologyDiagnostic{Mode: s.providedOntologyMode(), State: "no_candidates"}
 		}
 		s.emitFootprint(ctx, intent, keywords, out, 0, 0, "")
 		return out, nil

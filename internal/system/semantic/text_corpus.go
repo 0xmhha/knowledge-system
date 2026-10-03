@@ -28,6 +28,48 @@ type TextCorpusManifest struct {
 	Files            []TextCorpusFile `json:"files"`
 }
 
+// ConceptText is derived only from a reviewed, source-validated concept. It
+// carries no implementation edge: text-only retrieval must not borrow one.
+type ConceptText struct {
+	ConceptID  string
+	Text       string
+	ReviewedBy string
+	Evidence   EvidenceSpan
+}
+
+func (a ActiveProjection) VerifiedConceptText(id string) (ConceptText, bool) {
+	for _, concept := range a.projection.Concepts {
+		if concept.ID != id || concept.Status != StatusVerified || concept.ReviewedBy == "" {
+			continue
+		}
+		for _, span := range a.projection.Evidence {
+			if span.ID == concept.EvidenceID && span.Kind == SourceDocument {
+				return ConceptText{ConceptID: id, Text: renderConceptText(concept, span, a.projection.Snapshot), ReviewedBy: concept.ReviewedBy, Evidence: span}, true
+			}
+		}
+	}
+	return ConceptText{}, false
+}
+
+func renderConceptText(concept Concept, span EvidenceSpan, snapshot Snapshot) string {
+	terms := append([]Term(nil), concept.Terms...)
+	sort.Slice(terms, func(i, j int) bool {
+		if terms[i].Lang != terms[j].Lang {
+			return terms[i].Lang < terms[j].Lang
+		}
+		return terms[i].Value < terms[j].Value
+	})
+	var body strings.Builder
+	fmt.Fprintf(&body, "# Concept %s\n\n%s\n\n", concept.ID, oneLine(concept.Definition))
+	fmt.Fprintf(&body, "Kind: %s. Included: %s. Excluded: %s.\n\n", concept.Kind,
+		oneLine(strings.Join(concept.Includes, "; ")), oneLine(strings.Join(concept.Excludes, "; ")))
+	for _, term := range terms {
+		fmt.Fprintf(&body, "Term (%s): %s.\n", term.Lang, oneLine(term.Value))
+	}
+	fmt.Fprintf(&body, "\nSource: %s:%d-%d at %s. Evidence: %s.\n", span.Path, span.StartLine, span.EndLine, snapshot.Commit, span.ID)
+	return body.String()
+}
+
 // ExportTextCorpus renders only verified concepts and requirements. It never
 // treats proposed or rejected records as search-authoritative text.
 func (a ActiveProjection) ExportTextCorpus(out, repoRoot string) (TextCorpusManifest, error) {
@@ -76,22 +118,7 @@ func (a ActiveProjection) ExportTextCorpus(out, repoRoot string) (TextCorpusMani
 			continue
 		}
 		span := evidence[concept.EvidenceID]
-		terms := append([]Term(nil), concept.Terms...)
-		sort.Slice(terms, func(i, j int) bool {
-			if terms[i].Lang != terms[j].Lang {
-				return terms[i].Lang < terms[j].Lang
-			}
-			return terms[i].Value < terms[j].Value
-		})
-		var body strings.Builder
-		fmt.Fprintf(&body, "# Concept %s\n\n%s\n\n", concept.ID, oneLine(concept.Definition))
-		fmt.Fprintf(&body, "Kind: %s. Included: %s. Excluded: %s.\n\n", concept.Kind,
-			oneLine(strings.Join(concept.Includes, "; ")), oneLine(strings.Join(concept.Excludes, "; ")))
-		for _, term := range terms {
-			fmt.Fprintf(&body, "Term (%s): %s.\n", term.Lang, oneLine(term.Value))
-		}
-		fmt.Fprintf(&body, "\nSource: %s:%d-%d at %s. Evidence: %s.\n", span.Path, span.StartLine, span.EndLine, p.Snapshot.Commit, span.ID)
-		if err := writeCorpusFile(out, "concept", concept.ID, []byte(body.String()), &manifest); err != nil {
+		if err := writeCorpusFile(out, "concept", concept.ID, []byte(renderConceptText(concept, span, p.Snapshot)), &manifest); err != nil {
 			return TextCorpusManifest{}, err
 		}
 	}

@@ -1,0 +1,918 @@
+{
+  "state": "verified",
+  "quality_metrics": null,
+  "scope": "synthetic structural integration; not official B1",
+  "embedder": "ollama",
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "native:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "cfa7879b28ff9e443e88cfc2aeacfc2cd3bf3c4c",
+      "file_manifest_digest": "82e51913c98da8a8bdd1bba4e2f7eaa6f85f67dce1f66c2c6b7a66d66b6a686f",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "a1bab4f2505a3c73fdec705d916d951a5e9fa90b2e774af71e982bc95f095826"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "b52334b65ffd0f52bca8b2ef4bd07788ca327f76b5b562d1b135909ab7577456",
+    "dataset_id": "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7"
+  },
+  "semantic_db_unchanged": true,
+  "semantic_current_not_required": true,
+  "states": {
+    "baseline": {
+      "v1": null,
+      "v2": null
+    },
+    "relations": {
+      "v1": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 2
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 2
+      }
+    },
+    "concept_text": {
+      "v1": {
+        "mode": "concept_text",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 0,
+        "boosted_citations": 8,
+        "text_search_calls": 1,
+        "text_boosted_citations": 8,
+        "text_sources": [
+          {
+            "concept_id": "alpha-function",
+            "evidence_id": "ontology:5ad6a68eaa5d172af0ae4389",
+            "query_sha256": "4f2e54ce922fff152719ac2a84a81a7dd7d626b57dcf1c704ef5208f6b2fbc83",
+            "project_id": "ks-fixture",
+            "dataset_id": "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7",
+            "snapshot_id": "a1bab4f2505a3c73fdec705d916d951a5e9fa90b2e774af71e982bc95f095826",
+            "commit": "cfa7879b28ff9e443e88cfc2aeacfc2cd3bf3c4c",
+            "file": "ontology-reviewed.yaml",
+            "start_line": 7,
+            "end_line": 14,
+            "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+            "returned_hits": 9
+          }
+        ]
+      },
+      "v2": {
+        "mode": "concept_text",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 0,
+        "boosted_citations": 8,
+        "text_search_calls": 1,
+        "text_boosted_citations": 8,
+        "text_sources": [
+          {
+            "concept_id": "alpha-function",
+            "evidence_id": "ontology:5ad6a68eaa5d172af0ae4389",
+            "query_sha256": "4f2e54ce922fff152719ac2a84a81a7dd7d626b57dcf1c704ef5208f6b2fbc83",
+            "project_id": "ks-fixture",
+            "dataset_id": "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7",
+            "snapshot_id": "a1bab4f2505a3c73fdec705d916d951a5e9fa90b2e774af71e982bc95f095826",
+            "commit": "cfa7879b28ff9e443e88cfc2aeacfc2cd3bf3c4c",
+            "file": "ontology-reviewed.yaml",
+            "start_line": 7,
+            "end_line": 14,
+            "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+            "returned_hits": 9
+          }
+        ]
+      }
+    },
+    "combined": {
+      "v1": {
+        "mode": "combined",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 8,
+        "text_search_calls": 1,
+        "text_boosted_citations": 6,
+        "text_sources": [
+          {
+            "concept_id": "alpha-function",
+            "evidence_id": "ontology:5ad6a68eaa5d172af0ae4389",
+            "query_sha256": "4f2e54ce922fff152719ac2a84a81a7dd7d626b57dcf1c704ef5208f6b2fbc83",
+            "project_id": "ks-fixture",
+            "dataset_id": "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7",
+            "snapshot_id": "a1bab4f2505a3c73fdec705d916d951a5e9fa90b2e774af71e982bc95f095826",
+            "commit": "cfa7879b28ff9e443e88cfc2aeacfc2cd3bf3c4c",
+            "file": "ontology-reviewed.yaml",
+            "start_line": 7,
+            "end_line": 14,
+            "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+            "returned_hits": 9
+          }
+        ]
+      },
+      "v2": {
+        "mode": "combined",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 8,
+        "text_search_calls": 1,
+        "text_boosted_citations": 6,
+        "text_sources": [
+          {
+            "concept_id": "alpha-function",
+            "evidence_id": "ontology:5ad6a68eaa5d172af0ae4389",
+            "query_sha256": "4f2e54ce922fff152719ac2a84a81a7dd7d626b57dcf1c704ef5208f6b2fbc83",
+            "project_id": "ks-fixture",
+            "dataset_id": "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7",
+            "snapshot_id": "a1bab4f2505a3c73fdec705d916d951a5e9fa90b2e774af71e982bc95f095826",
+            "commit": "cfa7879b28ff9e443e88cfc2aeacfc2cd3bf3c4c",
+            "file": "ontology-reviewed.yaml",
+            "start_line": 7,
+            "end_line": 14,
+            "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+            "returned_hits": 9
+          }
+        ]
+      }
+    },
+    "missing": {
+      "v1": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "stale": {
+      "v1": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "text_missing": {
+      "v1": {
+        "mode": "concept_text",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "concept_text",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "text_stale": {
+      "v1": {
+        "mode": "concept_text",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "concept_text",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "combined_missing": {
+      "v1": {
+        "mode": "combined",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "combined",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "combined_stale": {
+      "v1": {
+        "mode": "combined",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "combined",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "git-init",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "init",
+        "-q"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-add",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "add",
+        "."
+      ],
+      "exit_code": 0,
+      "raw_output": "git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-commit",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-qm",
+        "synthetic relations input"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset",
+        "--project-id",
+        "ks-fixture",
+        "--source-mode",
+        "committed",
+        "--version",
+        "smoke",
+        "--embedder",
+        "ollama",
+        "--model-name",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434"
+      ],
+      "exit_code": 0,
+      "raw_output": "setup.txt",
+      "sha256": "bf5093fe54dc03633607b8ed7c1fd38a8e57e6257d1e579a730ebe2671a77e43"
+    },
+    {
+      "id": "semantic-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--project-id",
+        "ks-fixture",
+        "--dataset-id",
+        "e6960258abcc58d31ec3dc4fa313339f427e7be1ef1c8267894de5e48c841bb7",
+        "--graph",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/projection.json",
+        "--docs",
+        "README.md",
+        "--ontology",
+        "ontology-reviewed.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-extract.txt",
+      "sha256": "54c9d4a696034c9771f9a58ac7625c547b3c02889d2d64f376b9caefb7b407b2"
+    },
+    {
+      "id": "semantic-promote",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/projection.json",
+        "--repo",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--graph",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-promote.txt",
+      "sha256": "c750e6e37066b8d59037bce7b7f361d71bfc775bc00661b74566a016eef7aaef"
+    },
+    {
+      "id": "config-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/baseline.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-baseline.txt",
+      "sha256": "d7755a72dc0dbe669003384a7d0284bcab183ca0742cc932c4bb21cf55f67df7"
+    },
+    {
+      "id": "capture-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/baseline.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/baseline.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/relations.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-relations.txt",
+      "sha256": "08dfb3ae98aea51bcf818c0ad8d096e6176447ece282c21586eaadacacd72769"
+    },
+    {
+      "id": "capture-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/relations.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/relations.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-concept_text",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/concept_text.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-concept_text.txt",
+      "sha256": "e55695fff293a6381248861a9310a8d4a12f23e7d295747094ccabf95354cd3f"
+    },
+    {
+      "id": "capture-concept_text",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/concept_text.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/concept_text.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-concept_text.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-combined",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-combined.txt",
+      "sha256": "6f078dcb30976d912b75b2a42c3699cb153c5d34dff5585ba89c9f3e8959c1ee"
+    },
+    {
+      "id": "capture-combined",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-combined.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-missing.txt",
+      "sha256": "53d2e89f1cc6f73861ca35363c2a3b84614ed7044b79801a19e795afbfc97dc1"
+    },
+    {
+      "id": "capture-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale-semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-stale.txt",
+      "sha256": "eaa207b05e15a6933fa4206065e413359b24db4410f7d7cd0ea0d9fff50e1fd5"
+    },
+    {
+      "id": "capture-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-text_missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_missing.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-text_missing.txt",
+      "sha256": "9a29fe0c9d867b49f0726beb7e93253adc3e288d26a37b9143a5995e5476bd30"
+    },
+    {
+      "id": "capture-text_missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_missing.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_missing.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-text_missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-text_stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale-semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_stale.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-text_stale.txt",
+      "sha256": "c7cf6c945166e80d60d96c5e62f2b57b946ce19503e45bcdd0fe89f977209d96"
+    },
+    {
+      "id": "capture-text_stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_stale.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/text_stale.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-text_stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-combined_missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/missing.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_missing.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-combined_missing.txt",
+      "sha256": "ef05bcf72dc2681f11a4085b60ae715f67790d35ab2e0c8ca8124b2a10f85ec8"
+    },
+    {
+      "id": "capture-combined_missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_missing.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_missing.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-combined_missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-combined_stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/stale-semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_stale.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-combined_stale.txt",
+      "sha256": "128fddb3b38d093b6623ba9b99248228fcfc1e29993660a43bc40c6c8bc71fd9"
+    },
+    {
+      "id": "capture-combined_stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_stale.yaml",
+        "--output",
+        "/private/tmp/ks-b1-fourarms-final-real-20261003/combined_stale.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-combined_stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

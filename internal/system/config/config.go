@@ -306,9 +306,9 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
 	}
 	switch c.Semantic.OntologyMode {
-	case "", "off", "baseline", "relations":
+	case "", "off", "baseline", "relations", "concept_text", "combined":
 	default:
-		return fmt.Errorf("config: semantic.ontology_mode must be off, baseline or relations")
+		return fmt.Errorf("config: semantic.ontology_mode must be off, baseline, concept_text, relations or combined")
 	}
 	if c.Semantic.OntologyBudgetMS < 0 || c.Semantic.OntologyBudgetMS > 5000 {
 		return fmt.Errorf("config: semantic.ontology_budget_ms must be 0..5000 (0 selects 1000ms)")

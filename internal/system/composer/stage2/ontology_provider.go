@@ -2,10 +2,14 @@ package stage2
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
+	"fmt"
+	"math"
 	"strings"
 	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -13,6 +17,7 @@ import (
 var (
 	ErrOntologyUnavailable = errors.New("ontology unavailable")
 	ErrOntologyStale       = errors.New("ontology stale")
+	ErrOntologyTextSearch  = errors.New("ontology text search unavailable")
 )
 
 // OntologyProvider resolves the exact dataset after raw CKV/CKG retrieval.
@@ -21,7 +26,32 @@ type OntologyProvider interface {
 	Resolve(context.Context) (OntologyResolver, error)
 }
 
-// WithOntologyProvider enables the relations arm with cooperative deadlines.
+// OntologyTextResolver provides reviewed definitions, independently of edges.
+type OntologyTextResolver interface {
+	VerifiedConceptText(string) (semantic.ConceptText, bool)
+}
+
+// WithOntologyTextSearch reuses the raw-query CKV client, embedding identity
+// and recall K. Combined mode also applies reviewed relations. No new index,
+// vector space, candidate set or inferred implementation edge is introduced.
+func WithOntologyTextSearch(client ckvclient.Client, k int, combined bool) Option {
+	return func(s *Searcher) {
+		s.ontologyMode = "concept_text"
+		if combined {
+			s.ontologyMode = "combined"
+		}
+		s.ontologyText, s.ontologyTextK = client, k
+	}
+}
+
+func (s *Searcher) providedOntologyMode() string {
+	if s.ontologyMode != "" {
+		return s.ontologyMode
+	}
+	return "relations"
+}
+
+// WithOntologyProvider enables a pinned optional arm with cooperative deadlines.
 // Expired work is discarded, including partially calculated score changes.
 func WithOntologyProvider(provider OntologyProvider, boost float64, budget time.Duration) Option {
 	return func(s *Searcher) {
@@ -44,7 +74,7 @@ func (p preparedOntology) VerifiedImplementations(id string) []semantic.CodeImpl
 }
 
 func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, prompt string, hits []contract.Hit, baseline []ScoredCitation, demoteTests, demoteDocs bool) ([]ScoredCitation, []semantic.ConceptCandidate, *contract.OntologyDiagnostic) {
-	diagnostic := &contract.OntologyDiagnostic{Mode: "relations", State: "unavailable", BaselineCitations: len(baseline)}
+	diagnostic := &contract.OntologyDiagnostic{Mode: s.providedOntologyMode(), State: "unavailable", BaselineCitations: len(baseline)}
 	if s.ontologyProvider == nil {
 		return baseline, nil, diagnostic
 	}
@@ -54,12 +84,16 @@ func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, p
 		switch {
 		case queryCtx.Err() != nil || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled):
 			diagnostic.State, diagnostic.Reason = "budget_exceeded", "deadline"
+		case errors.Is(err, ErrOntologyTextSearch):
+			diagnostic.State, diagnostic.Reason = "unavailable", "text_search_failed"
 		case errors.Is(err, ErrOntologyUnavailable):
 			diagnostic.State, diagnostic.Reason = "unavailable", "store_or_dataset_missing"
 		default:
 			diagnostic.State, diagnostic.Reason = "stale", "alignment_or_evidence_invalid"
 		}
 		diagnostic.AppliedRelations = 0
+		diagnostic.BoostedCitations = 0
+		diagnostic.TextBoostedCitations = 0
 		return baseline, nil, diagnostic
 	}
 	resolver, err := s.ontologyProvider.Resolve(queryCtx)
@@ -87,6 +121,9 @@ func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, p
 	prepared := preparedOntology{snapshot: resolver.Snapshot(), candidates: candidates, implementations: map[string][]semantic.CodeImplementation{}}
 	count := 0
 	for _, candidate := range candidates {
+		if diagnostic.Mode == "concept_text" {
+			break
+		}
 		if candidate.Status != semantic.StatusVerified {
 			continue
 		}
@@ -102,10 +139,74 @@ func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, p
 		}
 	}
 	allowed := make(map[string]bool, len(baseline))
+	original := make(map[string]float64, len(baseline))
 	for _, citation := range baseline {
 		allowed[citation.Citation.Key()] = true
+		original[citation.Citation.Key()] = agg.byCitation[citation.Citation.Key()].Score
 	}
-	applyOntologyBoost(agg, prepared, prompt, hits, s.ontologyBoost, allowed)
+	// Finish all fallible text work before changing scores. Failures discard
+	// the whole optional arm, including relations in combined mode.
+	type textSignal struct {
+		fraction float64
+		proof    string
+	}
+	signals := map[string]textSignal{}
+	if s.ontologyText != nil {
+		textResolver, ok := resolver.(OntologyTextResolver)
+		if !ok {
+			return fallback(ErrOntologyUnavailable)
+		}
+		for _, candidate := range candidates {
+			if candidate.Status != semantic.StatusVerified {
+				continue
+			}
+			text, ok := textResolver.VerifiedConceptText(candidate.ConceptID)
+			e := text.Evidence
+			if !ok || text.ConceptID != candidate.ConceptID || text.ReviewedBy == "" ||
+				e.Kind != semantic.SourceDocument || e.Snapshot != resolver.Snapshot() || text.Text == "" {
+				return fallback(ErrOntologyStale)
+			}
+			if len(text.Text) > 6144 {
+				diagnostic.State, diagnostic.Reason = "budget_exceeded", "text_byte_limit"
+				return baseline, nil, diagnostic
+			}
+			sum := sha256.Sum256([]byte(text.Text))
+			diagnostic.TextSources = append(diagnostic.TextSources, contract.OntologyTextSource{
+				ConceptID: text.ConceptID, EvidenceID: e.ID, QuerySHA256: fmt.Sprintf("%x", sum),
+				ProjectID: e.Snapshot.ProjectID, DatasetID: e.Snapshot.DatasetID, SnapshotID: e.Snapshot.SnapshotID,
+				Commit: e.Snapshot.Commit, File: e.Path, StartLine: e.StartLine, EndLine: e.EndLine, ContentSHA256: e.ContentSHA256})
+			diagnostic.TextSearchCalls++
+			textHits, err := s.ontologyText.SemanticSearch(queryCtx, text.Text, ckvclient.SearchOpts{K: s.ontologyTextK, BM25Rerank: true})
+			if err != nil {
+				return fallback(ErrOntologyTextSearch)
+			}
+			if queryCtx.Err() != nil {
+				return fallback(queryCtx.Err())
+			}
+			diagnostic.TextSources[len(diagnostic.TextSources)-1].ReturnedHits = len(textHits)
+			for i, hit := range textHits {
+				key := hit.Citation.Key()
+				if !allowed[key] || hit.Citation.CommitHash != resolver.Snapshot().Commit {
+					continue
+				}
+				fraction := s.ontologyBoost / float64(i+1)
+				if fraction > signals[key].fraction {
+					signals[key] = textSignal{fraction, fmt.Sprintf("ontology_text:%s@source=%s@rank=%d", text.ConceptID, e.ID, i+1)}
+				}
+			}
+		}
+	}
+	if diagnostic.Mode != "concept_text" {
+		applyOntologyBoost(agg, prepared, prompt, hits, s.ontologyBoost, allowed)
+	}
+	for key, signal := range signals {
+		sc := agg.byCitation[key]
+		score := math.Min(original[key]*(1+s.ontologyBoost), sc.Score+original[key]*signal.fraction)
+		if score > sc.Score {
+			sc.Score = score
+			sc.Sources = append(sc.Sources, signal.proof)
+		}
+	}
 	if queryCtx.Err() != nil {
 		return fallback(queryCtx.Err())
 	}
@@ -120,14 +221,21 @@ func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, p
 	proofs := map[string]bool{}
 	for _, citation := range ranked {
 		boosted := false
+		textBoosted := false
 		for _, source := range citation.Sources {
 			if strings.HasPrefix(source, "ontology:") {
 				proofs[source] = true
 				boosted = true
 			}
+			if strings.HasPrefix(source, "ontology_text:") {
+				textBoosted, boosted = true, true
+			}
 		}
 		if boosted {
 			diagnostic.BoostedCitations++
+		}
+		if textBoosted {
+			diagnostic.TextBoostedCitations++
 		}
 	}
 	diagnostic.AppliedRelations = len(proofs)

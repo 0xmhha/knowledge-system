@@ -277,7 +277,10 @@ func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, c
 // keywords, confidence, and the union of ckv hits. A trailing ckg.bm25 step
 // records the keyword search that seeds the graph stage.
 //
-// CKVCalls is exact (one ckv.SemanticSearch per Stage-1 round). CKGCalls is the
+// CKVCalls includes Stage-1 recall rounds and optional concept-text calls.
+// The historical Stage-1 knowledge pass is not included in this counter;
+// full backend-call accounting must use a separate measurement adapter.
+// CKGCalls is the
 // exact ckg call count of the Stage-2 seed search this trace describes
 // (BM25Search + FindSymbol per keyword, plus the intent path-glob pass); the
 // Stage-3 neighbor expansion runs after this trace is assembled and is not
@@ -315,6 +318,10 @@ func buildComposerTrace(prompt string, intentVal contract.Intent, s1 stage1.Stag
 		seeds = append(seeds, sc.Citation)
 	}
 
+	ckvCalls := s1.Rounds
+	if s2.Ontology != nil {
+		ckvCalls += s2.Ontology.TextSearchCalls
+	}
 	return contract.RetrievalTrace{
 		Ontology:       s2.Ontology,
 		Producer:       "composer",
@@ -326,7 +333,7 @@ func buildComposerTrace(prompt string, intentVal contract.Intent, s1 stage1.Stag
 		FinalSeeds:     seeds,
 		FailedKeywords: s2.FailedKeywords,
 		Rounds:         s1.Rounds,
-		CKVCalls:       s1.Rounds,
+		CKVCalls:       ckvCalls,
 		CKGCalls:       s2.CKGCalls,
 	}
 }

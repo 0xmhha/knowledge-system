@@ -243,7 +243,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 
 	c, err := buildComposer(ctx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp,
 		cfg.Semantic.OntologyMode != "",
-		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot)...)
+		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot, be.ckv)...)
 	if err != nil {
 		return fmt.Errorf("build composer: %w", err)
 	}

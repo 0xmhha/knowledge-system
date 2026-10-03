@@ -28,6 +28,12 @@ func TestExportTextCorpusIsDeterministicAndReviewedOnly(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if strings.HasPrefix(file.Path, "concept-") {
+			text, ok := a.VerifiedConceptText(p.Concepts[0].ID)
+			if !ok || text.Text != string(body) || text.Evidence.ID != p.Concepts[0].EvidenceID {
+				t.Fatal("runtime text differs from reviewed export or source provenance")
+			}
+		}
 		if !strings.Contains(string(body), p.Snapshot.Commit) {
 			t.Fatal("source snapshot missing")
 		}
@@ -42,6 +48,9 @@ func TestExportTextCorpusIsDeterministicAndReviewedOnly(t *testing.T) {
 	p.Requirements[0].Status, p.Requirements[0].ReviewedBy = StatusProposed, ""
 	for i := range p.Assertions {
 		p.Assertions[i].Status, p.Assertions[i].ReviewedBy = StatusProposed, ""
+	}
+	if _, ok := (ActiveProjection{projection: p}).VerifiedConceptText(p.Concepts[0].ID); ok {
+		t.Fatal("proposed runtime text exposed")
 	}
 	m3, err := (ActiveProjection{projection: p}).ExportTextCorpus(filepath.Join(t.TempDir(), "proposed"), repo)
 	if err != nil || len(m3.Files) != 0 {

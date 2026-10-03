@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise the opt-in relations path on synthetic, explicitly scoped facts.
+"""Exercise all four opt-in ontology paths on synthetic, explicitly scoped facts.
 
 No official B0/B1 gold, claim approval or real-model quality score is produced.
 """
@@ -42,6 +42,7 @@ def main():
     run('git-add', ['git', '-C', source, 'add', '.'])
     run('git-commit', ['git', '-C', source, '-c', 'commit.gpgsign=false', '-c', 'user.name=Fixture',
                        '-c', 'user.email=fixture@example.invalid', 'commit', '-qm', 'synthetic relations input'])
+    run('git-bundle', ['git', '-C', source, 'bundle', 'create', out / 'source.bundle', '--all'])
     cks = root / 'bin/cks'
     dataset = out / 'dataset'
     setup_args = [cks, 'setup', '--src', source, '--out', dataset, '--project-id', 'ks-fixture',
@@ -92,7 +93,10 @@ def main():
     packs = {}
     states = {}
     for arm, mode, selected in [('baseline', 'baseline', store), ('relations', 'relations', store),
-                                 ('missing', 'relations', out / 'missing.db'), ('stale', 'relations', stale)]:
+                                 ('concept_text', 'concept_text', store), ('combined', 'combined', store),
+                                 ('missing', 'relations', out / 'missing.db'), ('stale', 'relations', stale),
+                                 ('text_missing', 'concept_text', out / 'missing.db'), ('text_stale', 'concept_text', stale),
+                                 ('combined_missing', 'combined', out / 'missing.db'), ('combined_stale', 'combined', stale)]:
         config = out / (arm + '.yaml')
         run('config-' + arm, [cks, 'mcp', 'gen-config', '--dataset-dir', version, '--source-root', source,
                              '--embed-model', vector_manifest['embedding_model'], '--ollama-url', args.ollama_url,
@@ -126,12 +130,24 @@ def main():
             if arm == 'baseline':
                 assert diagnostic is None
             else:
-                want = {'relations': 'active', 'missing': 'unavailable', 'stale': 'stale'}[arm]
-                assert diagnostic['mode'] == 'relations' and diagnostic['state'] == want, diagnostic
-                if arm == 'relations':
+                want = 'unavailable' if arm.endswith('missing') else 'stale' if arm.endswith('stale') else 'active'
+                assert diagnostic['mode'] == mode and diagnostic['state'] == want, diagnostic
+                if arm in ['relations', 'combined']:
                     assert diagnostic['applied_relations'] == 1 and diagnostic['boosted_citations'] >= 1, diagnostic
+                elif arm == 'concept_text':
+                    assert diagnostic['applied_relations'] == 0 and diagnostic['text_boosted_citations'] >= 1, diagnostic
                 else:
                     assert diagnostic['applied_relations'] == 0 and diagnostic['boosted_citations'] == 0, diagnostic
+            if arm in ['concept_text', 'combined']:
+                assert diagnostic['text_search_calls'] == 1, diagnostic
+                source_proof = diagnostic['text_sources'][0]
+                assert source_proof['concept_id'] == 'alpha-function'
+                assert source_proof['dataset_id'] == identity['dataset_id']
+                assert source_proof['snapshot_id'] == identity['source']['snapshot_id']
+                src = (source / source_proof['file']).read_bytes()
+                selected_lines = b''.join(src.splitlines(keepends=True)[source_proof['start_line'] - 1:source_proof['end_line']])
+                assert hashlib.sha256(selected_lines).hexdigest() == source_proof['content_sha256']
+                assert source_proof['returned_hits'] > 0
             if row['request_id'] == 'v2':
                 assert pack['coordinates']['dataset_id'] == identity['dataset_id']
                 clone = json.loads(json.dumps(pack))
@@ -139,10 +155,11 @@ def main():
                 canonical_json = json.dumps(clone, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()
                 assert hashlib.sha256(canonical_json).hexdigest() == want_hash
     for api in ['v1', 'v2']:
-        for arm in ['missing', 'stale']:
+        for arm in ['missing', 'stale', 'text_missing', 'text_stale', 'combined_missing', 'combined_stale']:
             assert packs[arm][api]['citations'] == packs['baseline'][api]['citations']
             assert packs[arm][api]['bodies'] == packs['baseline'][api]['bodies']
-        assert {json.dumps(c, sort_keys=True) for c in packs['relations'][api]['citations']} == {json.dumps(c, sort_keys=True) for c in packs['baseline'][api]['citations']}
+        for arm in ['relations', 'concept_text', 'combined']:
+            assert {json.dumps(c, sort_keys=True) for c in packs[arm][api]['citations']} == {json.dumps(c, sort_keys=True) for c in packs['baseline'][api]['citations']}
     assert hashlib.sha256(store.read_bytes()).hexdigest() == before_store
     assert not (out / 'missing.db').exists()
     summary = {'state': 'verified', 'quality_metrics': None, 'scope': 'synthetic structural integration; not official B1',
@@ -150,7 +167,7 @@ def main():
                'coordinates': identity, 'semantic_db_unchanged': True, 'semantic_current_not_required': True,
                'states': states, 'checks': records}
     (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
-    print('relations runtime smoke: verified; ' + str(out))
+    print('four-arm ontology runtime smoke: verified; ' + str(out))
 
 
 if __name__ == '__main__':

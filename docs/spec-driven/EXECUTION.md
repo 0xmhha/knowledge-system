@@ -1,5 +1,7 @@
 # Spec-driven WBS execution log
 
+B1 four runtime adapters (2026-10-03): baseline/개념 텍스트/관계/결합을 실제 MCP에 연결하고 B1-01 구현 검증을 완료했다. 텍스트-only는 검토된 개념 정의·용어를 동일 CKV에 추가 검색하며 관계를 조회하지 않는다. 결합은 기여를 구분하고 원래 인용 점수 대비 총 boost를 20%로 제한한다. 기본 Stage 2 상위 K 집합·좌표·기본 응답 형식을 보존하고 실패/상한/협력적 deadline에서는 optional 변경을 버린다. mock/BGE-M3 각 정상 4·누락/변조 6 경로×v1/v2 20요청, 실제 출처 줄 SHA·독립 v2 integrity·읽기 DB 무변경을 확인했다. 전체 Go·관련 race·vet·경계·118 문서 검사 통과. [실행 계약](./B1-RUNTIME-ADAPTERS.md)과 [원자료 원장](../../system/eval/b0-knowledge-system/b1-text-runtime-m2max-2026-10-03.json)에 범위·원응답·입력 Git bundle·해시를 남겼다. 공식 품질 지표는 null이며 B1-02 팩 축과 B0 승인/계측, 공식 B/C 판정은 남아 있다.
+
 ## 2026-10-03 실행 작업리스트·완료 재검증
 
 [EXECUTION-WORKLIST.md](./EXECUTION-WORKLIST.md)에 완료 재검증 15개와 잔여 B0/B1/C0/C1 30개를 우선순위·선행·산출물·종료 조건으로 정리했다. 정적 gold와 BGE-M3는 승인됐으며 동적 사례·프로토콜·Go 29개 입력 범위는 실제 사람 결정 대기다.
