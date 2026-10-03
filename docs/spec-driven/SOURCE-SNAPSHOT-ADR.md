@@ -12,8 +12,8 @@
 |---|---|---|
 | `project_id` | 한 번 발급하거나 명시해 설정에 보존하는 안정 ID. 이름·로컬 절대 경로와 별개 | 같은 ID를 다른 프로젝트에 재사용하면 거부. 이동/복제 뒤에도 ID 유지. |
 | `source_commit` | 캡처 시작의 전체 HEAD SHA | Git 이력의 기준점이며 작업 트리 바이트의 유일한 신원이 아니다. |
-| `file_manifest_digest` | 선별된 저장소 상대 POSIX 경로, 파일 종류, SHA-256, 제외 정책 버전을 순서대로 직렬화한 SHA-256 | 수정·신규 파일과 정책 변경으로 값이 바뀐다. 정렬/정규화/UTF-8 경로 규칙은 골든으로 고정. |
-| `snapshot_id` | `project_id`, `source_mode`, `source_commit`, `file_manifest_digest`를 도메인 분리된 정규 형식으로 해시 | 같은 HEAD의 다른 바이트가 같은 ID가 될 수 없다. |
+| `file_manifest_digest` | 선별된 저장소 상대 POSIX 경로, 파일 종류, SHA-256, 실행 비트와 제외 정책 버전을 순서대로 직렬화한 SHA-256 | 수정·신규 파일·실행 비트·정책 변경으로 값이 바뀐다. 정렬/정규화/UTF-8 경로 규칙은 골든으로 고정. 구 v2 매니페스트는 기존 해시를 유지. |
+| `snapshot_id` | `project_id`, `source_mode`, `source_commit`, `file_manifest_digest`, 캡처·Git 이력·파일 모드 정책을 버전별 도메인 분리 형식으로 해시 | 같은 HEAD의 다른 바이트·복구 이력·실행 비트가 신규 스냅샷에서 같은 ID가 될 수 없다. 구 v2–v4는 원래 계약대로 읽는다. |
 | `dataset_id` | `snapshot_id`, 빌드 전 고정한 그래프/벡터/의미 입력 파일·정책 다이제스트 및 스키마, 임베딩 정체성을 해시. 출력 다이제스트는 제외 | 같은 원천의 다른 모델/정책/스키마는 다른 데이터셋. 순환 신원 없이 빌드 전에 계산되며 사용자 버전 별칭과 다르다. |
 
 `committed`, `working-tree`, 비Git `snapshot-only`는 서로 다른 `source_mode`를 갖는다. 청결한 HEAD를 작업 트리 모드로 캡처해도 원문 파일 집합은 같지만 모드는 다른 신원이며, 검색 결과의 내용과 줄은 일치해야 한다. V1 인용의 `commit_hash` 필드는 계속 유지하고 새 v2 인용은 `snapshot_id`, `file_sha256`, `content_sha256`, `project_id`, `dataset_id`, `origin_id`를 필수로 가진다. **working-tree와 snapshot-only 인용의 `commit_hash`는 빈 문자열**이고 Git이 있을 때만 `base_commit`을 별도 필드로 기록한다. 구 소비자가 HEAD 원문으로 오해하지 않게 기존 MCP 인용 도구는 두 모드에서 `requires_v2`를 반환하고 새 v2 도구만 본문을 제공한다.
@@ -63,3 +63,7 @@ CKG는 HEAD 도달 이력에 더해 reflog/fsck에서 최대 100개의 복구 �
 신규 캡처는 `sources/history.bundle`에 기준 HEAD와 선택된 복구 커밋의 Git 객체를 저장하고, `sources/manifest.json`에 bundle SHA-256·바이트 수·정렬된 복구 SHA를 기록한다. 캡처 시에만 원본 객체를 임시 bare 저장소의 alternate로 읽는다. bundle 출력은 기본 1 GiB(설치 시 `--max-git-history-bytes`로 조정)까지 스트리밍하며 초과·객체 누락·복구 집합 변경은 후보를 실패시킨다. 빌드는 bundle을 **독립 Git 저장소**에 복원해 캡처 파일을 덮어쓴 뒤 실행한다. 복원 저장소의 reflog/fsck가 선택된 SHA만 반환하는지 확인하고 alternate는 설치하지 않는다. 승격/보관본 검증은 bundle의 크기·해시와 v4 정책을 검사한다. 원본 저장소가 삭제되거나 GC된 뒤에도 보관본만으로 같은 입력을 재생할 수 있다.
 
 CKG의 `graph_digest`는 코드 노드/엣지의 다이제스트이며 복구용 Commit/Hunk 노드·엣지는 제외한다. 따라서 B0-H 재현 시험은 `graph_digest`에 더해 AMBIGUOUS 복구 노드 ID 집합과 총 노드·엣지 수를 비교한다. 작은 Go 픽스처에서 원본 저장소 삭제 전후 CKG 빌드가 이 네 항목에서 일치했다. 큰 저장소의 아카이브 시간·크기와 macOS/Linux 간 재생 비용은 별도 측정 대상이며 실모델 품질 수치는 아니다.
+
+## 2026-10-03 파일럿 교정: 실행 비트의 신원과 재생
+
+실행 파일 30개가 있는 고정 코퍼스의 첫 v4 빌드에서 파일 바이트를 다시 쓰자 Git checkout의 실행 비트가 사라졌다. CKG/CKV 출력은 생성됐으나 승격 게이트의 Git clean 검사에서 거부됐다. 신규 캡처는 파일별 실행 비트와 `file_mode_policy=executable-bit-v1`을 기록한다. 파일 매니페스트 v3·스냅샷 v5에 이 값을 넣어 같은 바이트의 실행 비트 변경도 다른 신원으로 만든다. `committed` 빌드는 bundle에서 복원한 Git checkout을 그대로 사용해 HEAD에 포함된 모드를 유지하고, `working-tree`는 캡처한 실행 비트를 임시 파일에 재현한다. 캡처 전후 모드가 변하면 실패한다. 구 v2–v4 보관본은 기존 신원 방식으로만 읽고 재해석하지 않는다. 검증과 파일럿 수치는 [`B0-H-GATE-REPORT.md`](./B0-H-GATE-REPORT.md)에 있다.

@@ -19,15 +19,16 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// CapturedFile is one immutable source byte sequence. Paths are source-root
-// relative POSIX paths. Blobs are stored by digest independently of a Git
-// checkout so old citations do not need a live working tree.
+// CapturedFile is one immutable source byte sequence and executable bit.
+// Paths are source-root relative POSIX paths. Blobs are stored by digest
+// independently of a Git checkout so old citations do not need a live tree.
 type CapturedFile struct {
-	OriginID string `json:"origin_id"`
-	Path     string `json:"path"`
-	Kind     string `json:"kind"`
-	SHA256   string `json:"sha256"`
-	Size     int64  `json:"size"`
+	OriginID   string `json:"origin_id"`
+	Path       string `json:"path"`
+	Kind       string `json:"kind"`
+	SHA256     string `json:"sha256"`
+	Size       int64  `json:"size"`
+	Executable bool   `json:"executable,omitempty"`
 }
 
 type CaptureOptions struct {
@@ -63,7 +64,7 @@ type CapturedSource struct {
 	OriginRoots map[string]string   `json:"-"`
 }
 
-// CaptureSource stores a deterministic byte snapshot without exposing it to
+// CaptureSource stores a deterministic byte and mode snapshot without exposing it to
 // an engine. The output root must be outside the source tree so it cannot
 // recursively capture itself.
 func CaptureSource(o CaptureOptions) (CapturedSource, error) {
@@ -132,12 +133,12 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 		return CapturedSource{}, err
 	}
 	result := CapturedSource{BlobDir: blobDir, Root: root, OriginRoots: map[string]string{},
-		Identity: SourceIdentity{SourceMode: o.SourceMode}}
+		Identity: SourceIdentity{SourceMode: o.SourceMode, FileModePolicy: fileModePolicyV1}}
 	for _, origin := range origins {
 		result.OriginRoots[origin.ID] = origin.Root
 	}
 	var total int64
-	add := func(originID, rel string, buf []byte) error {
+	add := func(originID, rel string, buf []byte, executable bool) error {
 		if len(result.Files) >= o.MaxFiles {
 			return fmt.Errorf("capture file count limit exceeded at %q: limit=%d", rel, o.MaxFiles)
 		}
@@ -151,16 +152,16 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 			return err
 		}
 		result.Files = append(result.Files, CapturedFile{OriginID: originID, Path: rel,
-			Kind: "regular", SHA256: digest, Size: int64(len(buf))})
+			Kind: "regular", SHA256: digest, Size: int64(len(buf)), Executable: executable})
 		total += int64(len(buf))
 		return nil
 	}
 	for _, rel := range paths {
-		buf, err := readCapturedRegular(opened, rel, o.MaxFileBytes)
+		buf, executable, err := readCapturedRegularWithMode(opened, rel, o.MaxFileBytes, nil)
 		if err != nil {
 			return CapturedSource{}, err
 		}
-		if err := add("repo", rel, buf); err != nil {
+		if err := add("repo", rel, buf, executable); err != nil {
 			return CapturedSource{}, err
 		}
 	}
@@ -174,12 +175,12 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 			return CapturedSource{}, err
 		}
 		for _, rel := range externalPaths {
-			buf, readErr := readCapturedRegular(external, rel, o.MaxFileBytes)
+			buf, executable, readErr := readCapturedRegularWithMode(external, rel, o.MaxFileBytes, nil)
 			if readErr != nil {
 				external.Close()
 				return CapturedSource{}, readErr
 			}
-			if err := add(origin.ID, rel, buf); err != nil {
+			if err := add(origin.ID, rel, buf, executable); err != nil {
 				external.Close()
 				return CapturedSource{}, err
 			}
@@ -210,12 +211,13 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	files := make([]sourceFile, 0, len(result.Files))
 	for _, f := range result.Files {
 		files = append(files, sourceFile{OriginID: f.OriginID, Path: f.Path,
-			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
+			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256, Executable: f.Executable})
 	}
-	manifest := fileManifestDigest(files)
+	manifest := fileManifestDigestForPolicy(files, fileModePolicyV1)
 	result.Identity = SourceIdentity{ProjectID: o.ProjectID, SourceMode: o.SourceMode,
 		SourceCommit: o.SourceCommit, FileManifestDigest: manifest,
-		CapturePolicyDigest: capturePolicyDigest(o.SourceMode), GitRecoveryDigest: recoveryAfter}
+		CapturePolicyDigest: capturePolicyDigest(o.SourceMode), GitRecoveryDigest: recoveryAfter,
+		FileModePolicy: fileModePolicyV1}
 	if o.SourceMode != "snapshot-only" {
 		result.Identity.GitArchivePolicy = gitArchivePolicyV1
 		selected, err := githistory.RecoveryCommitIDs(root, 0)
@@ -253,48 +255,55 @@ func readCapturedRegular(root *os.Root, rel string, maxBytes int64) ([]byte, err
 // The hook is used by tests to force a replacement at the exact Lstat/Open
 // boundary. Production capture always passes nil.
 func readCapturedRegularWithOpenHook(root *os.Root, rel string, maxBytes int64, beforeOpen func()) ([]byte, error) {
+	buf, _, err := readCapturedRegularWithMode(root, rel, maxBytes, beforeOpen)
+	return buf, err
+}
+
+func readCapturedRegularWithMode(root *os.Root, rel string, maxBytes int64, beforeOpen func()) ([]byte, bool, error) {
 	parts := strings.Split(rel, "/")
 	for i := range parts {
 		prefix := filepath.FromSlash(strings.Join(parts[:i+1], "/"))
 		info, err := root.Lstat(prefix)
 		if err != nil {
-			return nil, fmt.Errorf("source changed before capture %q: %w", rel, err)
+			return nil, false, fmt.Errorf("source changed before capture %q: %w", rel, err)
 		}
 		if i < len(parts)-1 {
 			if !info.IsDir() {
-				return nil, fmt.Errorf("capture refused non-directory or linked component in %q", rel)
+				return nil, false, fmt.Errorf("capture refused non-directory or linked component in %q", rel)
 			}
 			continue
 		}
 		if !info.Mode().IsRegular() {
-			return nil, fmt.Errorf("capture refused non-regular source %q: not a regular file", rel)
+			return nil, false, fmt.Errorf("capture refused non-regular source %q: not a regular file", rel)
 		}
 		if info.Size() > maxBytes {
-			return nil, fmt.Errorf("capture file byte limit exceeded at %q", rel)
+			return nil, false, fmt.Errorf("capture file byte limit exceeded at %q", rel)
 		}
 		if beforeOpen != nil {
 			beforeOpen()
 		}
 		file, err := openCapturedNoFollow(root.Name(), rel)
 		if err != nil {
-			return nil, fmt.Errorf("open captured source %q: %w", rel, err)
+			return nil, false, fmt.Errorf("open captured source %q: %w", rel, err)
 		}
 		openedInfo, statErr := file.Stat()
 		if statErr != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(info, openedInfo) {
 			file.Close()
-			return nil, fmt.Errorf("source changed while opening %q", rel)
+			return nil, false, fmt.Errorf("source changed while opening %q", rel)
 		}
 		buf, readErr := io.ReadAll(io.LimitReader(file, maxBytes+1))
 		closeErr := file.Close()
 		postInfo, postErr := root.Lstat(filepath.FromSlash(rel))
 		if readErr != nil || closeErr != nil || postErr != nil ||
 			!postInfo.Mode().IsRegular() || !os.SameFile(openedInfo, postInfo) ||
-			int64(len(buf)) != info.Size() {
-			return nil, fmt.Errorf("source changed while capturing %q", rel)
+			int64(len(buf)) != info.Size() ||
+			info.Mode().Perm()&0o111 != openedInfo.Mode().Perm()&0o111 ||
+			info.Mode().Perm()&0o111 != postInfo.Mode().Perm()&0o111 {
+			return nil, false, fmt.Errorf("source changed while capturing %q", rel)
 		}
-		return buf, nil
+		return buf, info.Mode().Perm()&0o111 != 0, nil
 	}
-	return nil, fmt.Errorf("empty capture path")
+	return nil, false, fmt.Errorf("empty capture path")
 }
 
 // ReadSourceFileNoFollow is the shared byte reader for registered local
@@ -400,6 +409,14 @@ func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) 
 				return nil
 			}
 		}
+		if c.Identity.SourceMode == "committed" {
+			// HEAD already pins both bytes and Git executable bits. The caller
+			// verifies every retained byte against this independent checkout.
+			if err := c.VerifyBlobs(); err != nil {
+				return cleanup, err
+			}
+			return cleanup, nil
+		}
 		entries, err := os.ReadDir(path)
 		if err != nil {
 			return cleanup, err
@@ -427,7 +444,11 @@ func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) 
 		if err := os.MkdirAll(filepath.Dir(file), 0o700); err != nil {
 			return cleanup, err
 		}
-		if err := os.WriteFile(file, buf, 0o600); err != nil {
+		mode := os.FileMode(0o600)
+		if c.Identity.FileModePolicy == fileModePolicyV1 && f.Executable {
+			mode = 0o700
+		}
+		if err := os.WriteFile(file, buf, mode); err != nil {
 			return cleanup, err
 		}
 	}
@@ -608,13 +629,16 @@ func (c CapturedSource) VerifyAgainst(root string) error {
 			if paths[i] != f.Path {
 				return fmt.Errorf("source file set changed after capture for %q", originID)
 			}
-			buf, err := readCapturedRegular(opened, f.Path, f.Size)
+			buf, executable, err := readCapturedRegularWithMode(opened, f.Path, f.Size, nil)
 			if err != nil {
 				return fmt.Errorf("source changed after capture %q:%q: %w", originID, f.Path, err)
 			}
 			sum := sha256.Sum256(buf)
 			if int64(len(buf)) != f.Size || hex.EncodeToString(sum[:]) != f.SHA256 {
 				return fmt.Errorf("source changed after capture %q:%q", originID, f.Path)
+			}
+			if c.Identity.FileModePolicy == fileModePolicyV1 && executable != f.Executable {
+				return fmt.Errorf("source mode changed after capture %q:%q", originID, f.Path)
 			}
 		}
 		return nil
@@ -678,8 +702,8 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 	sources := filepath.Join(versionDir, "sources")
 	info, err := os.Lstat(sources)
 	if os.IsNotExist(err) {
-		if expected.GitArchivePolicy != "" {
-			return fmt.Errorf("source_missing: pinned Git history archive is required")
+		if expected.GitArchivePolicy != "" || expected.FileModePolicy != "" {
+			return fmt.Errorf("source_missing: pinned source archive is required")
 		}
 		return nil
 	}
@@ -706,14 +730,17 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 		prevOrigin, prevPath = f.OriginID, f.Path
 		pathsByOrigin[f.OriginID] = append(pathsByOrigin[f.OriginID], f.Path)
 		entries = append(entries, sourceFile{OriginID: f.OriginID, Path: f.Path,
-			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
+			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256, Executable: f.Executable})
 	}
 	for _, paths := range pathsByOrigin {
 		if err := validateCapturedPaths(paths); err != nil {
 			return fmt.Errorf("snapshot_mismatch: %w", err)
 		}
 	}
-	digest := fileManifestDigest(entries)
+	if expected.FileModePolicy != "" && expected.FileModePolicy != fileModePolicyV1 {
+		return fmt.Errorf("snapshot_mismatch: unsupported retained file mode policy")
+	}
+	digest := fileManifestDigestForPolicy(entries, expected.FileModePolicy)
 	if digest != expected.FileManifestDigest || sourceSnapshotID(expected) != expected.SnapshotID ||
 		expected.CapturePolicyDigest != capturePolicyDigest(expected.SourceMode) {
 		return fmt.Errorf("snapshot_mismatch: retained file inventory differs from candidate")

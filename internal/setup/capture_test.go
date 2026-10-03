@@ -471,9 +471,23 @@ func TestGitHistoryArchiveLimitTamperAndLegacyV3Read(t *testing.T) {
 	if err := os.WriteFile(bundle, original, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	// Versions written before bundle retention have a v3 snapshot ID and no
-	// archive metadata. Their retained source remains readable.
+	// Previously published v4 used the byte-only file manifest. It and the
+	// earlier archive-free v3 remain readable without rewriting their IDs.
 	legacy := captured
+	legacy.Identity.FileModePolicy = ""
+	legacyFiles := make([]sourceFile, 0, len(legacy.Files))
+	for _, f := range legacy.Files {
+		legacyFiles = append(legacyFiles, sourceFile{OriginID: f.OriginID, Path: f.Path,
+			Kind: f.Kind, Size: f.Size, SHA256: f.SHA256})
+	}
+	legacy.Identity.FileManifestDigest = fileManifestDigest(legacyFiles)
+	legacy.Identity.SnapshotID = sourceSnapshotID(legacy.Identity)
+	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), legacy); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, legacy.Identity); err != nil {
+		t.Fatalf("legacy v4 retained source rejected: %v", err)
+	}
 	legacy.Identity.GitArchivePolicy = ""
 	legacy.Identity.SnapshotID = sourceSnapshotID(legacy.Identity)
 	legacy.GitHistory = nil
@@ -482,6 +496,96 @@ func TestGitHistoryArchiveLimitTamperAndLegacyV3Read(t *testing.T) {
 	}
 	if err := VerifyRetainedSource(out, legacy.Identity); err != nil {
 		t.Fatalf("legacy v3 retained source rejected: %v", err)
+	}
+}
+
+func TestGitArchiveCommittedExecutableModeSurvivesRestore(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	script := filepath.Join(root, "run.sh")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	head := identityGit(t, root, "rev-parse", "HEAD")
+	out := filepath.Join(t.TempDir(), "candidate")
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: out,
+		ProjectID: "p", SourceMode: "committed", SourceCommit: head})
+	if err != nil || captured.Identity.FileModePolicy != fileModePolicyV1 || !captured.Files[0].Executable {
+		t.Fatalf("executable capture: %+v %v", captured, err)
+	}
+	if err := os.RemoveAll(root); err != nil {
+		t.Fatal(err)
+	}
+	build := filepath.Join(t.TempDir(), "build")
+	cleanup, err := captured.MaterializeBuildTree(build)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = cleanup() }()
+	info, err := os.Stat(filepath.Join(build, "run.sh"))
+	if err != nil || info.Mode().Perm()&0o111 == 0 {
+		t.Fatalf("restored script lost executable bit: %v %v", info, err)
+	}
+	if status := identityGit(t, build, "status", "--porcelain"); status != "" {
+		t.Fatalf("committed archive checkout is dirty: %q", status)
+	}
+	if clean, err := testGateSourceClean(build, head); err != nil || !clean {
+		t.Fatalf("committed promotion gate rejected restored source: %v %v", clean, err)
+	}
+	forged := captured
+	forged.Files = append([]CapturedFile(nil), captured.Files...)
+	forged.Files[0].Executable = false
+	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), forged); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, captured.Identity); err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
+		t.Fatalf("retained executable bit forgery was accepted: %v", err)
+	}
+}
+
+func TestWorkingTreeExecutableBitChangesSnapshotAndStaging(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	script := filepath.Join(root, "run.sh")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\nexit 0\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	head := identityGit(t, root, "rev-parse", "HEAD")
+	before, err := SnapshotSourceIdentity(root, "p", "working-tree", head)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(script, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	after, err := SnapshotSourceIdentity(root, "p", "working-tree", head)
+	if err != nil || before.FileManifestDigest == after.FileManifestDigest || before.SnapshotID == after.SnapshotID {
+		t.Fatalf("executable-bit change reused snapshot: before=%+v after=%+v err=%v", before, after, err)
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"),
+		ProjectID: "p", SourceMode: "working-tree", SourceCommit: head})
+	if err != nil || captured.Identity != after {
+		t.Fatalf("working-tree mode capture differs from identity: %v", err)
+	}
+	build := filepath.Join(t.TempDir(), "build")
+	cleanup, err := captured.MaterializeBuildTree(build)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = cleanup() }()
+	info, err := os.Stat(filepath.Join(build, "run.sh"))
+	if err != nil || info.Mode().Perm()&0o111 == 0 {
+		t.Fatalf("staged script lost executable bit: %v %v", info, err)
+	}
+	if err := os.Chmod(script, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := captured.VerifyAgainst(root); err == nil || !strings.Contains(err.Error(), "mode changed") {
+		t.Fatalf("source mode drift was accepted: %v", err)
 	}
 }
 

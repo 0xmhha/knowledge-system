@@ -18,8 +18,8 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/githistory"
 )
 
-// SourceIdentity is calculated from source bytes and, for Git modes, the
-// selected recovery commits; it excludes the checkout name and absolute path.
+// SourceIdentity is calculated from source bytes, executable bits and, for Git
+// modes, the selected recovery commits; it excludes the checkout name and absolute path.
 // The format is versioned so a changed input policy cannot silently reuse an
 // old snapshot ID.
 type SourceIdentity struct {
@@ -30,15 +30,17 @@ type SourceIdentity struct {
 	CapturePolicyDigest string `json:"capture_policy_digest"`
 	GitRecoveryDigest   string `json:"git_recovery_digest,omitempty"`
 	GitArchivePolicy    string `json:"git_archive_policy,omitempty"`
+	FileModePolicy      string `json:"file_mode_policy,omitempty"`
 	SnapshotID          string `json:"snapshot_id"`
 }
 
 type sourceFile struct {
-	OriginID string `json:"origin_id"`
-	Path     string `json:"path"`
-	Kind     string `json:"kind"`
-	Size     int64  `json:"size"`
-	SHA256   string `json:"sha256"`
+	OriginID   string `json:"origin_id"`
+	Path       string `json:"path"`
+	Kind       string `json:"kind"`
+	Size       int64  `json:"size"`
+	SHA256     string `json:"sha256"`
+	Executable bool   `json:"executable,omitempty"`
 }
 
 // identityHashFields uses domain separation plus an 8-byte big-endian length
@@ -64,6 +66,23 @@ func fileManifestDigest(files []sourceFile) string {
 	return identityHashFields("cks.file-manifest.v2", fields...)
 }
 
+const fileModePolicyV1 = "executable-bit-v1"
+
+func fileManifestDigestForPolicy(files []sourceFile, policy string) string {
+	if policy == "" {
+		return fileManifestDigest(files) // v2-v4 retained manifests
+	}
+	fields := make([]string, 0, len(files)*6)
+	for _, f := range files {
+		mode := "regular"
+		if f.Executable {
+			mode = "executable"
+		}
+		fields = append(fields, f.OriginID, f.Path, f.Kind, fmt.Sprintf("%d", f.Size), f.SHA256, mode)
+	}
+	return identityHashFields("cks.file-manifest.v3", fields...)
+}
+
 func capturePolicyDigest(mode string) string {
 	// Selection rules are deliberately part of source identity. A change to
 	// this value requires a new capture-policy version and reindex.
@@ -76,6 +95,11 @@ func capturePolicyDigest(mode string) string {
 }
 
 func sourceSnapshotID(s SourceIdentity) string {
+	if s.FileModePolicy != "" {
+		return identityHashFields("cks.snapshot.v5", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
+			s.GitRecoveryDigest, s.GitArchivePolicy, s.FileModePolicy)
+	}
 	if s.GitArchivePolicy != "" {
 		return identityHashFields("cks.snapshot.v4", s.ProjectID, s.SourceMode,
 			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
@@ -166,13 +190,14 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 		if path == "" || filepath.IsAbs(path) || path == ".." || strings.HasPrefix(path, "../") || !utf8.ValidString(path) || strings.ContainsRune(path, '\\') {
 			return SourceIdentity{}, fmt.Errorf("unsafe tracked source path %q", path)
 		}
-		buf, err := readCapturedRegular(opened, path, defaultCaptureMaxFileBytes)
+		buf, executable, err := readCapturedRegularWithMode(opened, path, defaultCaptureMaxFileBytes, nil)
 		if err != nil {
 			return SourceIdentity{}, fmt.Errorf("read tracked source %q: %w", path, err)
 		}
 		if err := addFile("repo", path, buf); err != nil {
 			return SourceIdentity{}, err
 		}
+		files[len(files)-1].Executable = executable
 	}
 	origins, err := prepareCaptureOrigins(externalOrigins, "")
 	if err != nil {
@@ -188,7 +213,7 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 			return SourceIdentity{}, err
 		}
 		for _, path := range externalPaths {
-			buf, readErr := readCapturedRegular(external, path, defaultCaptureMaxFileBytes)
+			buf, executable, readErr := readCapturedRegularWithMode(external, path, defaultCaptureMaxFileBytes, nil)
 			if readErr != nil {
 				external.Close()
 				return SourceIdentity{}, readErr
@@ -197,6 +222,7 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 				external.Close()
 				return SourceIdentity{}, err
 			}
+			files[len(files)-1].Executable = executable
 		}
 		external.Close()
 	}
@@ -219,7 +245,8 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 		return SourceIdentity{}, fmt.Errorf("Git recovery input changed during inventory")
 	}
 	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
-		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest(mode),
+		FileManifestDigest: fileManifestDigestForPolicy(files, fileModePolicyV1), CapturePolicyDigest: capturePolicyDigest(mode),
+		FileModePolicy:    fileModePolicyV1,
 		GitRecoveryDigest: recoveryAfter}
 	if mode != "snapshot-only" {
 		result.GitArchivePolicy = gitArchivePolicyV1
@@ -500,6 +527,7 @@ func VerifyCandidateIdentity(versionDir string, expected SourceIdentity, inputDi
 	}
 	if expected.CapturePolicyDigest != "" &&
 		(expected.CapturePolicyDigest != capturePolicyDigest(expected.SourceMode) ||
+			(expected.FileModePolicy != "" && expected.FileModePolicy != fileModePolicyV1) ||
 			expected.SnapshotID != sourceSnapshotID(expected)) {
 		return fmt.Errorf("candidate source snapshot or capture policy digest invalid")
 	}
