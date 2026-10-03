@@ -61,3 +61,5 @@
 2026-10-04 공유 K 설정 후속: `retrieval.recall_k`가 raw/concept-text에 같은 값으로 전달된다. 실모델 8경로 48요청 K10과 기본 v1/v2·폴백 20요청 K20을 호출 원장으로 확인했고 knowledge pass K6·Stage2 cap30을 유지했다. [원장](../../system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04.json). 공식 프로토콜은 여전히 사람 검토 대기이며 다음 독립 작업은 arm 순서 회전·공식 입력/하드웨어 원장이다.
 
 2026-10-04 회전 캡처 도구 후속: `cks eval matrix`가 같은 기본 설정의 8개 경로를 순차 호출하고 시작 위치를 회전한다. mock/BGE-M3 각 288응답·36 group·56개 프로세스 시작, warm/cold 분리·기존 SDK 응답 동등성·출처/integrity/정책·K/옵션·모델/입력/HEAD/실행 비트 무변경을 독립 감사했다. 실제 SDK 초기화 실패의 typed-nil cold 패닉은 수정 전 실패/후 96 오류행 보존으로 검증했다. 원자료와 verifier 가정 수정 기록은 [회전 원장](../../system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04.json). 공식 품질/사람 판정과 B1-03 공식 실행은 대기이며 다음 독립 작업은 승인 입력·전체 환경 원장 연결과 C1 검토 자료다.
+
+2026-10-04 환경 원장/Linux 후속: `cks eval matrix --environment-ledger`의 모델·하드웨어 전후 관측과 lock 원문 사본을 실제 MCP에 연결했다. macOS mock/BGE-M3 각 24응답, 이후 Linux arm64·amd64 에뮬레이션 각 3프로젝트·72응답을 검증했다. Linux ARM CPU 식별자·`/proc` process 압력·cgroup 제한 수집 실패/후 수정 증거는 [작업리스트 12절](./EXECUTION-WORKLIST.md)에 연결한다. 공식 품질은 계속 null이며 다음 독립 P1은 정적 gold/프로토콜의 개발·최종 경계를 검사하는 입력 preflight 준비다. 범위·프로토콜·동적 입력·의미 사실의 사람 승인과 Linux 실모델/네이티브 amd64·운영 출시 판정은 남아 있다.

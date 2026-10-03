@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-03T19:24:38.402894638Z",
+  "valid": false,
+  "hardware": {
+    "os": "linux",
+    "arch": "arm64",
+    "os_version": "7.0.14-linuxkit",
+    "cpu_brand": "",
+    "logical_cpus": 12,
+    "memory_bytes": 8214585344,
+    "load": "0.26 0.90 1.00 2/890 16",
+    "memory_state": "MemTotal:        8022056 kB\nMemFree:         1310384 kB\nMemAvailable:    5430996 kB\nBuffers:          316760 kB\nCached:          2967316 kB\nSwapCached:        20904 kB\nActive:          1518752 kB\nInactive:        3370212 kB\nActive(anon):     584588 kB\nInactive(anon):  1407172 kB\nActive(file):     934164 kB\nInactive(file):  1963040 kB\nUnevictable:          60 kB\nMlocked:               0 kB\nSwapTotal:       1048572 kB\nSwapFree:         910552 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               132 kB\nWriteback:             0 kB\nAnonPages:       1554876 kB\nMapped:           307380 kB\nShmem:            386736 kB\nKReclaimable:    1426376 kB\nSlab:            1643736 kB\nSReclaimable:    1426376 kB\nSUnreclaim:       217360 kB\nKernelStack:       14384 kB\nPageTables:        16548 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     5059600 kB\nCommitted_AS:    6577308 kB\nVmallocTotal:   135288315904 kB\nVmallocUsed:       24416 kB\nVmallocChunk:          0 kB\nPercpu:            11328 kB\nAnonHugePages:   1294336 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB",
+    "swap": "SwapCached:        20904 kB\nSwapTotal:       1048572 kB\nSwapFree:         910552 kB\n",
+    "process_count": 0,
+    "top_cpu_processes": [],
+    "unavailable": [
+      "cpu_brand",
+      "process_pressure",
+      "thermal"
+    ]
+  },
+  "model": {
+    "provider": "mock",
+    "model": "mock-feature-hash-v1",
+    "dimension": 64,
+    "valid": true,
+    "probe_policy": "validated legacy mock checksum declaration; no native model probe"
+  },
+  "errors": [
+    "hardware_unavailable:cpu_brand",
+    "hardware_unavailable:process_pressure"
+  ],
+  "limitations": [
+    "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+    "ps CPU percent is platform/window dependent; numeric processes are diagnostics, not resource exclusivity",
+    "model identity embed probes occur before/after capture, outside query timing and backend counters",
+    "operator note and input copies do not approve facts/protocol or certify quality"
+  ]
+}

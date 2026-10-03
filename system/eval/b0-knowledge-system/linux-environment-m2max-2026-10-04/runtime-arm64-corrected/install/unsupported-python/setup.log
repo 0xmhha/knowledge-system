@@ -1,0 +1,34 @@
+setup: --version auto resolved to 274b7291
+==> [graph-build] Build the graph index
+ !  [toolchain] toolenv: not found on this machine: go (install them, or start the server from a shell that has them)
+    resolved git=/usr/bin/git (inherited_path)
+    time=2026-10-03T19:55:57.195Z level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-03T19:55:57.195Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T19:55:57.204Z level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=2 changed_in_edges=0 blame_edges=0 hunk_edges=2 hunk_blobs=2 max_per_file=10
+    time=2026-10-03T19:55:57.230Z level=INFO msg="build complete" nodes=3 edges=2 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 3 nodes / 2 edges into /logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T19:55:57.238Z level=INFO msg=ckv event=project_config.loaded trace_id=80f0da6074e15e25 run_id=cf11ef4ec98235bc important_symbol_count=0 path=/tmp/cks-build-source-3485786481/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0
+    time=2026-10-03T19:55:57.238Z level=INFO msg=ckv event=build.start trace_id=4a846da2609a1160 run_id=cf11ef4ec98235bc src_root=/tmp/cks-build-source-3485786481/tree out_dir=/logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-03T19:55:57.251Z level=INFO msg=ckv event=ckg_align.loaded trace_id=15355eec8aa9b3af run_id=cf11ef4ec98235bc canonical_available=true ckg_path=/logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291/graph files_indexed=0 entries=0
+    ckv: 1/1 files (157.4 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-03T19:55:57.266Z level=INFO msg=ckv event=build.done trace_id=4a846da2609a1160 run_id=cf11ef4ec98235bc latency_ms=27 chunks_total=1 embedder=mock-feature-hash-v1 indexed_head=274b729140c8d1586ce071c144179f9e0c629fc4 chunks_symbol=0 out_dir=/logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291/vector chunks_canonical_id=0 chunks_flow_step=0 chunks_file_header=0 chunks_doc=1 files_indexed=1 policy_loaded=false embedder_provider="" src_root=/tmp/cks-build-source-3485786481/tree languages=map[markdown:1] db_sha256=fb45138167d8ae5af6cec5e47deb9073f1feb344bf741fe9cca19f2d2afb78da chunks_flow_spine=0 chunks_truncated=0 category_counts=map[:1]
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=274b729140c8d1586ce071c144179f9e0c629fc4 built_at=2026-10-03T19:55:57Z db=/logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291/vector/vector.db sha256=fb45138167d8ae5af6cec5e47deb9073f1feb344bf741fe9cca19f2d2afb78da
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /logs/runtime-arm64-corrected/install/unsupported-python/dataset/274b7291 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

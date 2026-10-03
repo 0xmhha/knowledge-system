@@ -149,6 +149,7 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 | FIX-07 | P1 · B0-06 재감사 | real 48요청의 BM25 오류 96회는 합성 `/<convention>` 경로에서 만든 `<convention>` 후보가 FTS 문법으로 해석되기 때문. knowledge chunk를 코드 심볼 후보로 취급하지 않도록 경계를 정하고 실패 전/후 회귀·실모델 재현을 확인한다. 기존 원자료는 보존한다. | 수정 후 재검증 완료: 수정 전 실패/후 통과, real 8경로 48응답 바이트 동일·BM25 오류 96→0·보존 입력 무변경 |
 | FIX-08 | P1 · C1-05 재감사 | host package가 로컬 Solidity grammar 두 LICENSE를 누락. 수집·소스 SHA 원장과 독립/설치 후 검증기에 고지 검사를 추가하고, 정상/이전 형식·원장 불일치 재서명 패키지를 검증한다. | 수정 후 재검증 완료: 이전 Go 검증기 수락 실패 보존, 수정 후 Python/Go 거부·이전 형식 통과; 실제 세 바이너리의 고지·시험 서명·세 독립 저장소 설치 통과. 전체 라이선스 적합성은 미판정 |
 | FIX-09 | P1 · 패키지 재감사 | 같은 코드의 두 host preview가 `modules.txt`에 임시 staging 경로를 넣어 archive SHA가 달라짐. build info의 바이너리 표시 경로를 일정하게 만들고 동일 코드/바이너리로 두 번 패키징하여 전체 파일과 archive SHA를 대조한다. | 수정 후 재검증 완료: 실제 Go build info를 상대 바이너리명으로 출력; 두 번 빌드/패키징한 52개 파일 SHA·크기·모드와 전체 archive SHA 일치; 동일 시험 sidecar로 두 archive를 Python/Go 모두 검증 |
+| FIX-10 | P1 · B0-06 Linux 환경 재검증 | ARM `/proc/cpuinfo`에 제품명 항목이 없고 최소 런타임에 `ps`가 없어 환경 preflight가 실패한다. 실제 식별자와 `/proc` 숫자 정보로 수집하고 cgroup 제한을 별도로 기록한다. | 수정 후 재검증 완료: 실제 수정 전 실패/후 환경 프로브, Linux arm64·amd64 에뮬레이션 각 3프로젝트·72 SDK 응답·설치/재시작/롤백; quota 변경·상위 그룹·경로 거부 회귀. 네이티브 amd64·Linux 실모델/운영 검증은 별도 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -176,3 +177,13 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 2026-10-04 [환경 원장](../../system/eval/b0-knowledge-system/environment-ledger-m2max-2026-10-04/summary.json): 선택형 환경·strict model 전후 프로브·세 입력 사본을 실제 회전 실행기에 연결했다. mock/BGE-M3 각 24응답·16 startup scope의 기존 SDK 응답 동등성, v2 출처/integrity·정책·실제 K/measurement ID·DB/입력/HEAD/실행 비트·사본 SHA를 확인했다. 실제 BGE-M3의 digest·1024차원·8192 context/batch·Ollama 0.35.1·residency와 M2 Max 12 CPU/64 GiB·OS/load/swap/process 압력을 기록했다. 새로운 모델 프로브는 질의 시간/카운터 밖이다.
 
 초기 mock의 기존 checksum 신원 표현을 새 프로브가 수용하지 못한 0행 실패를 보존하고 정확한 checksum 호환을 보완했다. 실제 다른 모델 설정도 조회 시작 없이 0행 partial·후속 환경 snapshot을 남긴다. 실패 주입·사본 변조·모델 변경·취소·redirect·legacy 신원 시험, 전체 Go·관련 race/vet·경계 검사를 통과했다. 비심볼 Neighbors 실패 real 192/mock 24회는 숨기지 않았다. 세 사본 중 프로토콜/동적 입력은 여전히 draft다. 제어 질의 1개의 반복이므로 공식 품질·정적/dynamic 최종 실행·사람 판정은 미완료다.
+
+## 12. Linux 최소 런타임 환경 재검증
+
+2026-10-04 FIX-10: [Linux 원장](../../system/eval/b0-knowledge-system/linux-environment-m2max-2026-10-04/summary.json). 수정 전 ARM builder에서 CPU 신원 미수집, Go·ps 없는 최소 런타임에서 CPU 신원과 프로세스 압력 미수집을 실제 실패로 확인했다. ARM 식별 필드를 추정 없이 기록하고 `/proc`의 숫자만 읽도록 보완했다. cgroup v2 self·노출된 상위 그룹과 통상 v1/v2 root 값을 별도로 기록하며 제한의 전후 변경을 거부한다. Linux CPU 수·RAM은 커널에 보이는 전체 값이고 프로세스 CPU는 lifetime 평균/PID namespace 범위다. 물리 머신 용량·자원 독점으로 해석하지 않는다.
+
+동결된 `d6477d65` 기반 작업 소스를 Go 1.25.13으로 빌드했다. 원본 Git 메타데이터 없이 빌드한 `devel` 진단 바이너리이며 소스 목록·바이너리 SHA·이미지 ID를 연결했다. Linux arm64와 amd64 에뮬레이션 각각 3개 독립 프로젝트(empty Go/TypeScript/미지원 Python), 설치·조회·MCP 재시작·새 버전·롤백을 검증했다. 프로젝트마다 8경로×retrieval/warm/cold 각 1회, 총 144 SDK 응답·96 startup scope의 환경 전후·1 CPU/512 MiB quota·입력/DB/HEAD/실행 비트·lock 사본·measurement 연결·보관 원문의 줄/본문/파일 SHA·v2 integrity를 확인했다. 의미 저장소가 없는 폴백 진단이고 품질은 null이다. 비심볼 Neighbors 실패는 플랫폼마다 72회 보존했다.
+
+초기 합성 요청에 날짜/subsystem을 누락하여 24행 중 12개 지식 요청이 오류였다. 이 요청 오류와 read-only source에 빌드 출력을 쓰려던 명령 오류, 원장 생성기의 이미지명 오타도 보존했다. 제품 수집 실패와 분리한다. 수정된 입력으로 두 플랫폼 모두 재검증했고 전체 Go·evalcli race·vet·경계·136개 문서 검사를 통과했다. 검증 원자료의 파일 권한은 실행 시점에 확인했으며 Git 보관 권한으로 비공개 출력을 보증하지 않는다.
+
+B0-06 도구의 Linux 최소 런타임 연결은 검증됐지만 공식 게이트는 계속 미완료다. 다음 P1은 승인된 정적 gold와 동결 후보 프로토콜의 개발/최종 경계를 검사하는 공식 입력 preflight 준비다. B0-01 범위, B0-02/03 프로토콜·동적 입력, B0-05 의미 사실의 사람 결정 이후 B0-07 공식 빌드를 진행한다. Linux BGE-M3·네이티브 amd64·운영 패키지/키/라이선스와 최종 품질은 C1의 남은 범위다.

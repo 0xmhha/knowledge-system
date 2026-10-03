@@ -1,0 +1,2228 @@
+{
+  "schema_version": 1,
+  "derived_from_code": "d6477d65ecf468843d61d66e1c8cdc7345d0a196",
+  "scope": "actual minimal Linux containers/mock synthetic integration; amd64 runs via emulation on arm64 Mac",
+  "status": "verified_with_limits",
+  "goal_complete": false,
+  "official_quality_metrics": null,
+  "official_protocol_approval": false,
+  "build": {
+    "go": "1.25.13",
+    "source": "provenance/frozen-source-inventory.json",
+    "original_git_metadata_present": false,
+    "binary_version": "devel",
+    "binaries": {
+      "arm64": {
+        "after-final.test": {
+          "sha256": "1ae743fadacaeb1c491f9f8814d52761ea8d158aab992d52a2881cafb52d87ad",
+          "size": 21197592
+        },
+        "ckg-after": {
+          "sha256": "dc7c990764079ce338e5b3ec5d0844b59a8ace5e7034de659f70e8bca5c116fe",
+          "size": 32661256
+        },
+        "ckv-after": {
+          "sha256": "b9b42ea5c4189a3a1d452705bd3171f553f150a2f90aee1e6f958c82d38c4c4c",
+          "size": 22325232
+        },
+        "before.test": {
+          "sha256": "e91a5b8521ea9ca6469f5752c70e05a21a96ea4bd672c261c3e9d0766b939f80",
+          "size": 21192608
+        },
+        "cks-after": {
+          "sha256": "3dc388b3747d359592b8e92ed2cce8c2ef6dcfa2632e7c29b6736ac47f9fc273",
+          "size": 27272416
+        },
+        "after.test": {
+          "sha256": "fbc6cb34402a835ed4541420b195af8a5548b1a5f18eb51795ba0993def7a63b",
+          "size": 21196464
+        }
+      },
+      "amd64": {
+        "after-final.test": {
+          "sha256": "a6bff35a184efb2aa2817d409d62359f23c51419e3f0e1ad7e353dfdfcdd1ae6",
+          "size": 22218208
+        },
+        "ckg-after": {
+          "sha256": "9aff0559c67e16703027dbdf58dd0158e01e9b1dfe92dfe5a7a8a079d51699d3",
+          "size": 34341384
+        },
+        "ckv-after": {
+          "sha256": "78b2fac517b1229e6fe9f587a6c2e7e9265b4de0c4099ba32128df073f69b671",
+          "size": 23505944
+        },
+        "cks-after": {
+          "sha256": "a27566eaf8e037bb078983cf8a8fb20658fc8200d50b1dd2648dbe2c935407a2",
+          "size": 28855728
+        }
+      }
+    },
+    "images": {
+      "knowledge-system-linux-build:go1.25.13-arm64": "sha256:4b20e84ccc0a8a6bf12fafbe4d00295f66a6407b5132f6580c3057656f1bb519",
+      "knowledge-system-runtime-smoke:bookworm-arm64": "sha256:37be188dfb763c2e20ce839df121570a64f6eb60020e2be6a7238574e4c7115d",
+      "knowledge-system-linux-build:go1.25.13-amd64": "sha256:7fbbf391b39e17e7e2eddade0577c60381efc094f19c1b4ce3ff9123f8f8f23b",
+      "knowledge-system-runtime-smoke:bookworm-amd64": "sha256:4872b83c4f38164e88421033aa343f35f532278dc32fcb46fa430f312812ac67"
+    }
+  },
+  "runtime_options": {
+    "cpus": 1,
+    "memory_bytes": 536870912,
+    "go_available": false,
+    "ps_available": false,
+    "other_host_work_excluded": false
+  },
+  "before": {
+    "arm64_builder_errors": [
+      "hardware_unavailable:cpu_brand"
+    ],
+    "arm64_minimal_runtime_errors": [
+      "hardware_unavailable:cpu_brand",
+      "hardware_unavailable:process_pressure"
+    ]
+  },
+  "corrections": [
+    {
+      "type": "product",
+      "detail": "preserve ARM CPU identifiers; collect numeric process pressure from /proc without ps; record cgroup quota snapshots and reject quota drift"
+    },
+    {
+      "type": "operator",
+      "detail": "initial make build-bins attempted output in a read-only source mount; changed output to /out"
+    },
+    {
+      "type": "diagnostic_input",
+      "detail": "initial matrix omitted required knowledge date/subsystem; retained 24 rows, including 12 IsError responses, in runtime-arm64"
+    },
+    {
+      "type": "operator",
+      "detail": "evidence archiver initially used incorrect runtime image name; corrected metadata mapping, preserved archive-initial-error.txt; no runtime outcome changed"
+    }
+  ],
+  "after": {
+    "arm64": {
+      "cases": 3,
+      "sdk_rows": 72,
+      "post_audit": "runtime-arm64-corrected/post-audit.json"
+    },
+    "amd64_emulated": {
+      "cases": 3,
+      "sdk_rows": 72,
+      "verification": "runtime-amd64/verification.json"
+    }
+  },
+  "checks": {
+    "full_go": "passed",
+    "evalcli_race": "passed",
+    "vet": "passed",
+    "boundaries": "passed",
+    "documentation": "136 live documents passed",
+    "source_document_script_diff_check": "passed; raw Go build-info retains two original trailing tabs, recorded separately"
+  },
+  "limitations": [
+    "mock verifies wiring, not BGE-M3 Linux performance or official semantic quality",
+    "no reviewed semantic store/pack; ontology arms preserve fallback evidence",
+    "CPU/RAM are kernel-visible totals; exposed cgroup values are separate raw constraints",
+    "numeric Linux process CPU uses lifetime averages and PID namespace scope",
+    "two observations do not prove exclusivity or absence of transient changes",
+    "amd64 is emulated, not native amd64 hardware",
+    "binaries are frozen working-source diagnostics, not signed release packages",
+    "official B0/B1/C0/C1 and human decisions remain pending"
+  ],
+  "artifacts": [
+    {
+      "path": "amd64-probes/after-minimal-test.txt",
+      "sha256": "a10399848f28437b4c8a2ff384e8a62d5c3203d6bc2adaf56a5b64409c8b4e18",
+      "size": 97
+    },
+    {
+      "path": "amd64-probes/after-minimal.json",
+      "sha256": "30f16af2e9823192637300c42daf3c419f30bf0b102cc4e4ff0387bb74848978",
+      "size": 3486
+    },
+    {
+      "path": "arm64-probes/after-build.txt",
+      "sha256": "22fe21d006b3652c1e1d08809889c3d607751086bc52b3d12932d299a807696f",
+      "size": 104
+    },
+    {
+      "path": "arm64-probes/after-final-build.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "arm64-probes/after-minimal-test.txt",
+      "sha256": "93a84a85b50aecb1ef8ec887558006c50494732b7921ee053ff6f773da5aa215",
+      "size": 97
+    },
+    {
+      "path": "arm64-probes/after-minimal.json",
+      "sha256": "89804d1fa5dfca57f380e7edf0adb3efb6022cef0a21b059cdc2a7e468007654",
+      "size": 3423
+    },
+    {
+      "path": "arm64-probes/before-build.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "arm64-probes/before-minimal-test.txt",
+      "sha256": "a53103ec358b7e7520d25733449babdbf453bed42805901f7229620292d3ad41",
+      "size": 240
+    },
+    {
+      "path": "arm64-probes/before-minimal.json",
+      "sha256": "ce4791897423900706c137afaa38866f7ca8ffccc9527e64e5c49080fe15c6d0",
+      "size": 2746
+    },
+    {
+      "path": "arm64-probes/before-test.txt",
+      "sha256": "8146cb416e2390b54723a08ca16e9ad5a95093b06c4f847618420d29a1b7ed88",
+      "size": 270
+    },
+    {
+      "path": "arm64-probes/before.json",
+      "sha256": "5fc719ac4068f08274ff3adeba85682c449d3fb23338d3d0acc54e17492ee304",
+      "size": 3039
+    },
+    {
+      "path": "arm64-probes/copied-file-count.txt",
+      "sha256": "61aaa7760a6e609cbdb4f6cc9359142e459df4958ea479eb761f95a0968bbf5b",
+      "size": 5
+    },
+    {
+      "path": "checks/amd64-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "checks/archive-evidence.py",
+      "sha256": "f7dc4dba70bdc94b41924039749ae462d444b38d39c4a1f1a86e1ac04016458a",
+      "size": 5816
+    },
+    {
+      "path": "checks/archive-initial-error.txt",
+      "sha256": "91aaaf8f52fa03f0180d87020a50bb67f2a8dff66d7acc7876a7bbe6f2244cd9",
+      "size": 293
+    },
+    {
+      "path": "checks/boundaries.txt",
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+      "size": 22
+    },
+    {
+      "path": "checks/docs-check.txt",
+      "sha256": "9b0fa9d08bc9584f74d1340db8c15a2e373c5e5b20c08ecd84ab9d8411cfa95c",
+      "size": 137
+    },
+    {
+      "path": "checks/docs-final.txt",
+      "sha256": "be7fbb89cdabcc86e5469196965c15add52d5e1d4d1c449d67e838dae914ad31",
+      "size": 39
+    },
+    {
+      "path": "checks/go-tests.txt",
+      "sha256": "22866efbcfa6d1112241c3fe4483ce72cb639d304e1f0cb011380e1ac5cdbcc7",
+      "size": 9364
+    },
+    {
+      "path": "checks/mac-final-tests.txt",
+      "sha256": "b78a48b6034bbe88d7a66613f565a07710dfda3d809d1aae1291a563f4a6c850",
+      "size": 63
+    },
+    {
+      "path": "checks/mac-tests.txt",
+      "sha256": "6a9fe11f3f1509ee7b0fb4bcef87df3d19dcd3a8cdb2403adca3b47f796b6218",
+      "size": 63
+    },
+    {
+      "path": "checks/race-tests.txt",
+      "sha256": "c26220a08d45201f48671f19bac3f52e8e4879a760e7a46fc23f656f974b5ad3",
+      "size": 63
+    },
+    {
+      "path": "checks/runtime-amd64.log",
+      "sha256": "caf77a88038a0dc0766055ece8fdd393432822881a339b12d0c75a0ccaef1047",
+      "size": 79
+    },
+    {
+      "path": "checks/runtime-arm64-corrected.log",
+      "sha256": "87f554ae5d35eb16702f4a7032c1aeb16e1f5ef94a4eee99f9b6e8e6baf7f712",
+      "size": 89
+    },
+    {
+      "path": "checks/runtime-arm64.log",
+      "sha256": "041e1806f64a20c93b870a36964719106d2b756f45e9bebd47db0be11b8d70c4",
+      "size": 1025
+    },
+    {
+      "path": "checks/staged-whitespace.txt",
+      "sha256": "75c28db732ba960e15e4363c6db2ff2a62fda741cc864abf5492fa273b1ba275",
+      "size": 354
+    },
+    {
+      "path": "checks/verify-evidence.py",
+      "sha256": "240593d693d5a667a90238d7bed73151cd4f4c86bf47ae97c89bfc71b43b1c0c",
+      "size": 6053
+    },
+    {
+      "path": "checks/vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "frozen-source/after/matrix_environment.go",
+      "sha256": "a4e1c32bc20607d2575219c7d45fdf9378d410f58fe501d8ed864de2d4ace3a6",
+      "size": 15773
+    },
+    {
+      "path": "frozen-source/after/matrix_environment_linux_data.go",
+      "sha256": "ee4667ec63166362fe4f4291a984a2fc75ce96b3a15180d6696ef071419d8ea7",
+      "size": 5051
+    },
+    {
+      "path": "frozen-source/after/matrix_environment_test.go",
+      "sha256": "7a9d5b9ba7a05e362e7fb9138bc1aa75eba2e930edd3f6b07249ea96a5c74dee",
+      "size": 12224
+    },
+    {
+      "path": "frozen-source/before/matrix_environment.go",
+      "sha256": "56e7a7354a91514708ae64cef59b1ac9228e9e50304d5fb14e76290048e11b76",
+      "size": 15067
+    },
+    {
+      "path": "frozen-source/before/matrix_environment_test.go",
+      "sha256": "6bb5a047e9bb7c7880529105146f853316ec0d77f9640ab2e6b60208458b1757",
+      "size": 9997
+    },
+    {
+      "path": "provenance/amd64-cks-build-info.txt",
+      "sha256": "8997c58ca8be23052f07b6df9a8e9cea92cc54593c6fbea1b3032ea7638d0246",
+      "size": 2685
+    },
+    {
+      "path": "provenance/amd64-cks-file.txt",
+      "sha256": "e96434d7b0947b2953c0e778c63d90c50ae7ab13913a0daf080a1a49a0cdedf3",
+      "size": 279
+    },
+    {
+      "path": "provenance/arm64-cks-build-info.txt",
+      "sha256": "871fdc806a538862869bbbc0a03e515dee64f3da47d09b3077c2166335a32836",
+      "size": 2681
+    },
+    {
+      "path": "provenance/arm64-cks-file.txt",
+      "sha256": "6e9445233dc48d290ba40da69a9d3d1ffaac5b7258b805d3a622199d15767add",
+      "size": 277
+    },
+    {
+      "path": "provenance/frozen-source-inventory.json",
+      "sha256": "7b720351ddb82a8c8c0208f5b88aa4ef4ee90eb4e9100d4c15cd7eec5eb60e0c",
+      "size": 812974
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/doctor-rollback.json",
+      "sha256": "8f966b70b3af05172f8df3b3bb9c1f445fcc6c4f72bdba120865b04366e66b8b",
+      "size": 1014
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/doctor-second.json",
+      "sha256": "ca267602b1e0b1c0a16fa2e6ba3c18d5ead1f0820bfc0ce642ebc5e024a591b0",
+      "size": 892
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/doctor.json",
+      "sha256": "36147cb2c39cc2286deaf6c0e6cf4fd53ad7ece33e947de96a132eefd9ea4802",
+      "size": 892
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/init.json",
+      "sha256": "33706c5f457dc0d26e064ad0cfd267ce69db0e62f15dfcf2fce810b78d914cfa",
+      "size": 274
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/live-source/README.md",
+      "sha256": "97605a59d851e444190b297d2181841e1ebb5eb7d8107d5c4ca81488c371ad81",
+      "size": 82
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/live-source/go.mod",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/mcp-config.log",
+      "sha256": "c65c0c972a71b64643fdada015c669fce627db97f58f5c2e2cc76674d8a35a13",
+      "size": 117
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/mcp-restarted.json",
+      "sha256": "1abe10bec84a0325bb962ece5d18c4d691e9e7db35dd6aec7562a8df90776a00",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/mcp.json",
+      "sha256": "1abe10bec84a0325bb962ece5d18c4d691e9e7db35dd6aec7562a8df90776a00",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/mcp.mcp.log",
+      "sha256": "876a579ba803be2fb4f927dba1c7620e6b2247894512de25d55969d396427a09",
+      "size": 2206
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/mcp.yaml",
+      "sha256": "63b63ac5132fe52fd5cb91bad0a1da2ac9e6c80dc2574e22d04e073c73a55a31",
+      "size": 1036
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/query-rollback.json",
+      "sha256": "f473b6bdde6869be8d050279d83feedb01d79d43ada2f8d1bc527db4ef5a9b78",
+      "size": 871
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/query-rollback.log",
+      "sha256": "5759e61311ad17b5369af8c8247b0465293968305d646cbbdf4b053cc4a100d0",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/query.json",
+      "sha256": "ae2f95059fa15a89b7461a780598d8cd904f82a0625f80ce41592aec226b2b6f",
+      "size": 796
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/query.log",
+      "sha256": "d47166b9d1b799d312bcaff78a577c0d308ed8159c035661e3293dda171098a4",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/requests.json",
+      "sha256": "774c004291386dbe799117a9372a8ae93a23cd41f174ea6d6832d15d2346a945",
+      "size": 231
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/retained-source/blobs/43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "sha256": "43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "size": 40
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/retained-source/blobs/f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/retained-source/manifest.json",
+      "sha256": "0e186ec1437dbc50459b911ba988b4e6bf4246cd0254e4b3b036a35deaa15595",
+      "size": 1224
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/rollback.log",
+      "sha256": "3d072910af1623fe606f0e98625f6bc3a9fce5fe794cd8bb3664e1a56a7c51ec",
+      "size": 193
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/setup-second.log",
+      "sha256": "1f841e47530d3d26a93d7207e80c11ceb94a76d8de3a6ff964ff089c74f7bb4c",
+      "size": 3549
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/setup.log",
+      "sha256": "d0cebf23a795425add30301140f5f18275f04d124acd838c4d409e37b49e7f06",
+      "size": 3549
+    },
+    {
+      "path": "runtime-amd64/install/empty-go/setup.yaml",
+      "sha256": "6727be8316d2ddfcb7ed4ae0d7af9dc0fc499744a325a3bdcf9a39c310e6189f",
+      "size": 181
+    },
+    {
+      "path": "runtime-amd64/install/typescript/diagnostic-input.json",
+      "sha256": "09a9d91c58d8abb92a68a2dc004a3770d999728c5aa6fd806034adc7769a37d6",
+      "size": 160
+    },
+    {
+      "path": "runtime-amd64/install/typescript/doctor-rollback.json",
+      "sha256": "084cd9dff59def79d13db1e76af43f02bafaaf9cdc6d8cd28a862a9bab5cea02",
+      "size": 932
+    },
+    {
+      "path": "runtime-amd64/install/typescript/doctor-second.json",
+      "sha256": "d66d70cbfe2cf347f099654fbbae20bc57554802ec9bb45b8d3108e0e815ad07",
+      "size": 805
+    },
+    {
+      "path": "runtime-amd64/install/typescript/doctor.json",
+      "sha256": "8b5f8e6f66753579ab5b60324fd757ca7584afa464f8b22ad68fe4375dfbd007",
+      "size": 805
+    },
+    {
+      "path": "runtime-amd64/install/typescript/init.json",
+      "sha256": "70490885e133f3da2a1b0acb1079dfc782c1d49d07881a7ba7c1d820d49bfad2",
+      "size": 280
+    },
+    {
+      "path": "runtime-amd64/install/typescript/live-source/.gitignore",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-amd64/install/typescript/live-source/README.md",
+      "sha256": "edccc5f49a2b109ebadd4ddc11fb57e1d412250a699229ba9cc23f5983db8fde",
+      "size": 86
+    },
+    {
+      "path": "runtime-amd64/install/typescript/live-source/main.ts",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp-code.json",
+      "sha256": "e936f94428333caa2d6d3fe13d89efb82e49624523a9c257af6692e07f8011fe",
+      "size": 173
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp-config.log",
+      "sha256": "fc9dd8692789633e6419a4d136a9e369efdafb484f4ff3dc5e3effec12cda72b",
+      "size": 121
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp-restarted.json",
+      "sha256": "bca8492daf8377088f6bc85ab38176b0f9d170666f9826d331c78ad5917f52ca",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp.json",
+      "sha256": "bca8492daf8377088f6bc85ab38176b0f9d170666f9826d331c78ad5917f52ca",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp.mcp.log",
+      "sha256": "47d6a5b1b0dec6f5eebe5468205034536f4aa5a00a169911e5b78fd7fd7d3da4",
+      "size": 2187
+    },
+    {
+      "path": "runtime-amd64/install/typescript/mcp.yaml",
+      "sha256": "508d87dcf1022409f299f728a8df265fcfa61d4b20a0a9f119c3d02da91c519b",
+      "size": 1044
+    },
+    {
+      "path": "runtime-amd64/install/typescript/query-rollback.json",
+      "sha256": "fab842a73bc0a594e6c2e3c362e96a6c010e78b6596ad1a878c19537ddaf8179",
+      "size": 2241
+    },
+    {
+      "path": "runtime-amd64/install/typescript/query-rollback.log",
+      "sha256": "12e36259e4cfedda83c5913f0ed67831be78cb89155b6d368c5ef32bda568ee3",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/typescript/query.json",
+      "sha256": "bd2bdcdf8720012e1bf9ce18cfb57c49ccc80cb2e4da5038510f419296297f9e",
+      "size": 2106
+    },
+    {
+      "path": "runtime-amd64/install/typescript/query.log",
+      "sha256": "3fdc2b6471309de90fde237335cbd7cb66d9fb743e6abac441c5bc307e91be64",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/typescript/requests.json",
+      "sha256": "ca90cf3dacc5dabb892e4c295b07c11f18a9b7cd47514a2851a6488fe86055dc",
+      "size": 235
+    },
+    {
+      "path": "runtime-amd64/install/typescript/retained-source/blobs/4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-amd64/install/typescript/retained-source/blobs/6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-amd64/install/typescript/retained-source/blobs/c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "sha256": "c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "size": 42
+    },
+    {
+      "path": "runtime-amd64/install/typescript/retained-source/manifest.json",
+      "sha256": "32f380d5f632c4d28c5c15eec13389e448b358f1475661be0e831d8492474af8",
+      "size": 1419
+    },
+    {
+      "path": "runtime-amd64/install/typescript/rollback.log",
+      "sha256": "3a39f0cee743fbe164d2bf8a9e2b4a1ac829a2cb5dbfaac14887a5d80027c513",
+      "size": 195
+    },
+    {
+      "path": "runtime-amd64/install/typescript/setup-second.log",
+      "sha256": "c7c14a94b5f2d94b0efe783a60f50b6a36dffa3b12eda5805a8bf5f9e0f2a701",
+      "size": 3575
+    },
+    {
+      "path": "runtime-amd64/install/typescript/setup.log",
+      "sha256": "71a548b0eab7311521113789e5e782a23dd553360868d722b160d1ec9a1f9d33",
+      "size": 3578
+    },
+    {
+      "path": "runtime-amd64/install/typescript/setup.yaml",
+      "sha256": "41d2fec7fa199924ad29cd594eb9d4e76dba3215ce136bc83de82a82f4943dc0",
+      "size": 185
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/diagnostic-input.json",
+      "sha256": "cb7713afd95567f3e1558fcbc3ef3f9f40833400ae10815067be7e0111be44c9",
+      "size": 168
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/doctor-rollback.json",
+      "sha256": "c757c10c876485afdf9b6306ae2ba6d74c3494b72b37b64b6c189c287e636296",
+      "size": 1024
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/doctor-second.json",
+      "sha256": "49dceeeb10b4c172ff61319d2b5ac57776a8a9ac23ff1c053cacf972c54dcae2",
+      "size": 902
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/doctor.json",
+      "sha256": "044ef8f24151dc95c71124628a0d923525e60530e448f5cb0ecbcd21bb5bb477",
+      "size": 902
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/init.json",
+      "sha256": "1f80a533f956150ffda6eb52fb9f57ef2f9c5909fe5cb2d8092979835c28508b",
+      "size": 304
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/live-source/README.md",
+      "sha256": "c8aca6c68ca4ba24e2bceec44b5f7970af68bf992faabe22b4aca9d80e103674",
+      "size": 102
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/live-source/main.py",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/mcp-config.log",
+      "sha256": "1499aa5034404fb61322f8591ccc18f84d6673b263a3adf00b26221cbc70c9aa",
+      "size": 137
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/mcp-restarted.json",
+      "sha256": "69d56b0b3ea0efe448101481ff25768baacb979c5c68892bf83042aa2cc52279",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/mcp.json",
+      "sha256": "69d56b0b3ea0efe448101481ff25768baacb979c5c68892bf83042aa2cc52279",
+      "size": 175
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/mcp.mcp.log",
+      "sha256": "82c5f4ff0de9a030b13eab77cd6983758512aec9db878d718d88fdd73bebc171",
+      "size": 2260
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/mcp.yaml",
+      "sha256": "ac61e85388aac7acba809be16e3145da9018f9676a321bdad3aade0c0361de83",
+      "size": 1076
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/query-rollback.json",
+      "sha256": "1e3b1e193e8dbc5407b4ec9363c7dd172b7a187fbb5be722e7c56f509b92b20e",
+      "size": 881
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/query-rollback.log",
+      "sha256": "83ee4ac369848cdba4372f72db5a0e2d2677252bc14c5c308bc646c792fd7849",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/query.json",
+      "sha256": "d66ebf39c15c26e63df352f9dc646242b4ae219ec424059060e8346187ee049a",
+      "size": 806
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/query.log",
+      "sha256": "f086fe9870c0901759bdc103fd725844d10cd2a9b1a0b0793e0e16e63c2fdf1c",
+      "size": 3151
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/requests.json",
+      "sha256": "0e6f49930aeea9499d4b3da0c7cb192b7bf59968752f48f1e0fa8100b10e9826",
+      "size": 251
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/retained-source/blobs/2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "sha256": "2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "size": 50
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/retained-source/blobs/ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/retained-source/manifest.json",
+      "sha256": "5d436dbf3234003e94ec0b2ba50e91d21bbae3e1913aad88d758c14b5425fb1b",
+      "size": 1225
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/rollback.log",
+      "sha256": "438f2cd308647c8071765ffe71e6ca646a01af9f6e91904fda64feed0c335912",
+      "size": 203
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/setup-second.log",
+      "sha256": "d00785d01531549bec8c657e427fa61c7a13a88c0ab7361c9117f571e6015133",
+      "size": 3606
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/setup.log",
+      "sha256": "d7875757d2884a1c2bca7f4d559662313b7e56bb222085e16300d691a96b34e4",
+      "size": 3609
+    },
+    {
+      "path": "runtime-amd64/install/unsupported-python/setup.yaml",
+      "sha256": "143f2d0cca3be0fa1c7697e3023d88fc57f1ec839783dc00f1604f83813f7e01",
+      "size": 201
+    },
+    {
+      "path": "runtime-amd64/install.log",
+      "sha256": "07300dac06cc52a6d74ffe893172fe162122f76a64b566c9fc5b640ae1b2485a",
+      "size": 67
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/base-config.yaml",
+      "sha256": "63b63ac5132fe52fd5cb91bad0a1da2ac9e6c80dc2574e22d04e073c73a55a31",
+      "size": 1036
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/baseline_off.yaml",
+      "sha256": "c14cd05a62ee1e3fb71e56ca424ed22785fef5c1bce91e699da5158b5d5aff47",
+      "size": 1153
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/baseline_on.yaml",
+      "sha256": "a9dc05ffe2abf0589ec95918edaf68e8f85ac80dd2da753584dd817171602ddd",
+      "size": 1152
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/combined_off.yaml",
+      "sha256": "cc424d1cfc542279443b75de819f6038f19f32ef8cb5b7e2111c55be7fd38cc4",
+      "size": 1153
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/combined_on.yaml",
+      "sha256": "1a222de277266cc29048ad566fbcd68ef1abad9469be4d9bf4be629b989659ee",
+      "size": 1152
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/concept_text_off.yaml",
+      "sha256": "c7d7d47980b17f03f9cf3c1aa7233d3cd9f10113a19d7a6c7b0c06fd37d9a9d2",
+      "size": 1161
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/concept_text_on.yaml",
+      "sha256": "c9e7e2cca4b3683bd0ad0dbdcd96c4ddb322b212e08ddc823c15e46d6eb4a555",
+      "size": 1160
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "48ba76fb2306aa069159d39344266bacfbf5af43b86a209ad15adc3d3ef6390b",
+      "size": 57303
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "c47d9a8f8e2c3e04a4c6be8a12cee43814133b902dfaa7b0a698ec2dc8d830b3",
+      "size": 57303
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "1b4618b30279677b59b8ae8f92d2ef7d3a9c645c971ef72558d810bddf90475c",
+      "size": 57299
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "8853d93b8aee216818787f921b6fbca26a8ca898027b6735f070034e2576d60c",
+      "size": 57306
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "6e371e41f1378c6259e30f31684cbef54c9750796700851763b8a5515cd5fec9",
+      "size": 57304
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "02d934407ad3acadc1dff53535e5e85262c8775edfe173bd647eb2e381d13658",
+      "size": 57302
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "a4cc34cb16306abfe83616d626abdaa03b8f362d97801de48c66900428f3bf0c",
+      "size": 57299
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "5559282a49929e857aa6311681e6cdd22d636925f7efb24568c6a5ecffe509e8",
+      "size": 57295
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/locked-inputs/000-diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/relations_off.yaml",
+      "sha256": "a46f9433f79f6f3e8caca5bb8ccddd2d2221a7fa88e075392cab0d336e3add89",
+      "size": 1155
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/relations_on.yaml",
+      "sha256": "ab1a905f48c9d88c1f3284d5da70a8acbf166eaf9e95c362ef81ff946b66f99d",
+      "size": 1154
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/report.json",
+      "sha256": "1cba6599ac2b39bffe623f70aea0bef9cf43fad3812520b79d4ad9cf5f641ec4",
+      "size": 17813
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/requests.json",
+      "sha256": "774c004291386dbe799117a9372a8ae93a23cd41f174ea6d6832d15d2346a945",
+      "size": 231
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go/rows.jsonl",
+      "sha256": "f151c640cfea5b289d16afa496ab816c9ee8f64f2fdef47576eed75f1cbea601",
+      "size": 60422
+    },
+    {
+      "path": "runtime-amd64/matrix-empty-go.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/base-config.yaml",
+      "sha256": "508d87dcf1022409f299f728a8df265fcfa61d4b20a0a9f119c3d02da91c519b",
+      "size": 1044
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/baseline_off.yaml",
+      "sha256": "a089162bea9b09ff48744ee6b2d00cd9d66cc8de883ac8d94fabee8f7c4b6e21",
+      "size": 1163
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/baseline_on.yaml",
+      "sha256": "90dce13844261d244cfb8a77329f81b049118c58645fff0f8302e6eb0a54d0a6",
+      "size": 1162
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/combined_off.yaml",
+      "sha256": "8599fc71c3cf93ee32b0e0f7eb256daf0e6f6ac726a911060ea871b70ac69a1c",
+      "size": 1163
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/combined_on.yaml",
+      "sha256": "5379de984f71e60bad330352223c0036023fc6765c826c87f1a9317c3d859b0c",
+      "size": 1162
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/concept_text_off.yaml",
+      "sha256": "b5e6d17b73e2f600ed04ec7a77e47778b53ce0a9292ff9eb7e8d578daf046bf4",
+      "size": 1171
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/concept_text_on.yaml",
+      "sha256": "95ffd505c7be9f2672034d676cc05dd538d677eb35d16579e861e3d057bfbb3a",
+      "size": 1170
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "879f8dada4df191dbe981e91d6702876d46e602b22aec168c47dc3c992759dbf",
+      "size": 57394
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "c55917748a436e8b6b00a7517d8e2b5acece6616adab0f777f7d9077f2b32d47",
+      "size": 57413
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "e0da5f78ac96b160e560a77ee3bc764a1d74726dc131466865bfbf92842df080",
+      "size": 57396
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "3199008d88df8ef629b3161a6d8f7d268df7825ac1c0c6c7b2f474d5bc4666b6",
+      "size": 57393
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "0d41764f7a9db78eb2d8da8ed1744ff5e646f64d6c9391272ff839530e052da8",
+      "size": 57404
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "ab87008aa3eb9acd4a5138138144312f3dda672ae455e9380e1471f311412f6a",
+      "size": 57401
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "bf9e7cd976a931866a4b0c3f596959808a5b0d8236077ebc8f98f1f5d75d7b70",
+      "size": 57409
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "752dbdda713f99e832b9e3899c2106aaa21c505df75459ffd23b429ac60eb828",
+      "size": 57412
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/locked-inputs/000-diagnostic-input.json",
+      "sha256": "09a9d91c58d8abb92a68a2dc004a3770d999728c5aa6fd806034adc7769a37d6",
+      "size": 160
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/relations_off.yaml",
+      "sha256": "998046f3fbfd6b8bb397f0db1a745fb1d662ddefd847d8301d9596b0d857d600",
+      "size": 1165
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/relations_on.yaml",
+      "sha256": "8c67776cf1109179ae2e10befcc0ec7d80fc9a7e295b7de762bd0fc70b3e876d",
+      "size": 1164
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/report.json",
+      "sha256": "9d3fe5c9ec7900424e8566bff5fd7e7d35e30d505000b387c63e3a3efb628b23",
+      "size": 18707
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/requests.json",
+      "sha256": "ca90cf3dacc5dabb892e4c295b07c11f18a9b7cd47514a2851a6488fe86055dc",
+      "size": 235
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript/rows.jsonl",
+      "sha256": "b7b387118c1e46f3a5ee8ec30895bea1aa07b26165947c652144f2d741a6206b",
+      "size": 60621
+    },
+    {
+      "path": "runtime-amd64/matrix-typescript.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/base-config.yaml",
+      "sha256": "ac61e85388aac7acba809be16e3145da9018f9676a321bdad3aade0c0361de83",
+      "size": 1076
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/baseline_off.yaml",
+      "sha256": "44535950d2a2a95f83be8875a9895721943f205d5ad7f95d3bb69068349c712a",
+      "size": 1203
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/baseline_on.yaml",
+      "sha256": "0aa3489c42999914cb40dc739abc5da5c7da6e612478b1775934983f7bd2226f",
+      "size": 1202
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/combined_off.yaml",
+      "sha256": "da678684c5f4d5b11ad42843f11843eb6918b5048ee0a537fdffd4b1cd917a66",
+      "size": 1203
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/combined_on.yaml",
+      "sha256": "3acce8e147bdd069b85b1ac1ea778a5e9f240ad24ab9958adfa2ab60b230ddbf",
+      "size": 1202
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/concept_text_off.yaml",
+      "sha256": "228fc680200ca80edd495bbc074738d9088941584dd262b2f3f57337ff867f8a",
+      "size": 1211
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/concept_text_on.yaml",
+      "sha256": "8ae73a34c940a1beba7fe208f046ce5efcb139fa810485ad2b5f2419c63c8a74",
+      "size": 1210
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "d75424ece79f57b0c7c0b8429de39a98d90368b16963f251750c23c9d5fd1c32",
+      "size": 66604
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "50836911598db0aa2df8efd0b66c988bca108e50c8be82d951f48ea22551fa32",
+      "size": 66603
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "c78fef106e87d592c9d12b0f88fc7bc30c2985c7c4d9fab1dce32e31478bbb7a",
+      "size": 66592
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "8671b15923cfc361a90e710a8ef56f48767959480b369c3288b1ca7213313068",
+      "size": 66604
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "dfdf96183b048214fb69c62f03aef373a1e793a48e99124561110bfb05ec6746",
+      "size": 66599
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "22b0dae7b229bd149fe582f1f01b5c670926a90c7010f9a287c37345b0d91440",
+      "size": 66607
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "b791f538c202f136583faed8bb6eb917975905f0d11ae8cf1d0ee958a2fa1f91",
+      "size": 66597
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "8d6b60c13daed2b40a7e4ed514b966092dec6504ae02df6eb213578395e1b2ad",
+      "size": 66597
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/locked-inputs/000-diagnostic-input.json",
+      "sha256": "cb7713afd95567f3e1558fcbc3ef3f9f40833400ae10815067be7e0111be44c9",
+      "size": 168
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/relations_off.yaml",
+      "sha256": "c2c37d51c55fe70cacb9b075f6df013ce7b3e6c8cbe06ca38e2c081497637bfb",
+      "size": 1205
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/relations_on.yaml",
+      "sha256": "d4ffa95d4d1568a472b1deac1f336dd87cb657abccd2e3c8ff86e355a2fb9950",
+      "size": 1204
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/report.json",
+      "sha256": "594ae96843e9b44124e42f5114ec4b33826447ab43eb5c19a742889a176c22ad",
+      "size": 18207
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/requests.json",
+      "sha256": "0e6f49930aeea9499d4b3da0c7cb192b7bf59968752f48f1e0fa8100b10e9826",
+      "size": 251
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python/rows.jsonl",
+      "sha256": "4d1a9518e3c84ec485765db8361cda90b3540bf18a269232989fb125b68386f8",
+      "size": 61389
+    },
+    {
+      "path": "runtime-amd64/matrix-unsupported-python.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-amd64/verification.json",
+      "sha256": "36042510933318a576f56f6c2602fb89b7924bc07b294b044abdf23a7cc56a93",
+      "size": 42674
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/doctor-rollback.json",
+      "sha256": "24dde0df2926cfc720ccdf1b4eca1a3ee765a4489b3b06a229895174c54fcbb4",
+      "size": 1014
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/doctor-second.json",
+      "sha256": "7c461450a14e15ad62b7bb4fbf260700f3dff39ba9b1bf5d875d5baa06682d49",
+      "size": 892
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/doctor.json",
+      "sha256": "49cc3f97cbd7ef8b0451316fbbc411b9f8d5878a6f0faace678b2245523fc5e4",
+      "size": 892
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/init.json",
+      "sha256": "98d6251388964019930e169953f65bb809fedb64d2be9bd43c1339fae11c7b93",
+      "size": 274
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/live-source/README.md",
+      "sha256": "97605a59d851e444190b297d2181841e1ebb5eb7d8107d5c4ca81488c371ad81",
+      "size": 82
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/live-source/go.mod",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/mcp-config.log",
+      "sha256": "2610482fa405de12bd20d57e8696d394af7fb82023c2da76518dbab9a2f659c3",
+      "size": 117
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/mcp-restarted.json",
+      "sha256": "27ba903a5890db97e4837ad136879ae71effc027cf2edaf3d4299b0017f897b1",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/mcp.json",
+      "sha256": "27ba903a5890db97e4837ad136879ae71effc027cf2edaf3d4299b0017f897b1",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/mcp.mcp.log",
+      "sha256": "c5d9865cdce8e584fc1d16271f26cae377769f7c6fd953a65c122591139effbc",
+      "size": 2210
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/mcp.yaml",
+      "sha256": "151c88bd9bdaef2be81b959114ada13cd138189b5e2d4581c28775ecde77cbfc",
+      "size": 1036
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/query-rollback.json",
+      "sha256": "4eb2ebcfd3309dfa880bfd54b18e5c68582fdeaee6d026e4f605ddd3429ac1e8",
+      "size": 871
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/query-rollback.log",
+      "sha256": "6bf8597d111655ae7f5ed7e6f652a50c7143a1944e549bb0c53d4a1ef1a2444b",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/query.json",
+      "sha256": "65e059ef01826140236e3de30f55f3f41896566d6d0104459389e3e726fa1b5c",
+      "size": 796
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/query.log",
+      "sha256": "42108cb51cd3c470303e9935acdafde64de5e9a04b09e4cac98678b81cdccdf6",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/requests.json",
+      "sha256": "fb7357f909dace5d184ff95f5508d9849b2e8e0a877d1ad3c0dc1ad4fc15d788",
+      "size": 163
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/retained-source/blobs/43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "sha256": "43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "size": 40
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/retained-source/blobs/f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/retained-source/manifest.json",
+      "sha256": "afe3a6efc3eeca0595273a09b8d254125a0b07df8fc5315a719ed94bff7edd5e",
+      "size": 1224
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/rollback.log",
+      "sha256": "f67b68e94635b169cc47de50cabc450455002618b7e08a3c0d7907ec45038bb3",
+      "size": 193
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/setup-second.log",
+      "sha256": "cc074fcab47acedb0063078a578d8fad6392e2770b71a0d04babe718403b5da0",
+      "size": 3546
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/setup.log",
+      "sha256": "789a8ae21fe05772bfd6623db5c536f947feaac9219c2e6c320b801e70704237",
+      "size": 3547
+    },
+    {
+      "path": "runtime-arm64/install/empty-go/setup.yaml",
+      "sha256": "b77958c4a83ba9bce7dad9c60d7d2d5803dc1c726936e01231687f2ba26c67d4",
+      "size": 181
+    },
+    {
+      "path": "runtime-arm64/install/typescript/doctor-rollback.json",
+      "sha256": "89ddef4a846b805bb3e72e06ca8d1ccc8ac8b7ce0322b22cb52c945c59fd35ee",
+      "size": 932
+    },
+    {
+      "path": "runtime-arm64/install/typescript/doctor-second.json",
+      "sha256": "914ed3f8fa4e0a508c45e36f14707d598426372f5e248d8506855d3d2e5cfec1",
+      "size": 805
+    },
+    {
+      "path": "runtime-arm64/install/typescript/doctor.json",
+      "sha256": "d7a7bbe4e1f0b2e71d4420ca89a86f16d0baebff011dbf6cea608da8cd726b19",
+      "size": 805
+    },
+    {
+      "path": "runtime-arm64/install/typescript/init.json",
+      "sha256": "ec839282dda97c893c3da586d7dec8e170c0f59b11e3584121f37486bcc4b88f",
+      "size": 280
+    },
+    {
+      "path": "runtime-arm64/install/typescript/live-source/.gitignore",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-arm64/install/typescript/live-source/README.md",
+      "sha256": "edccc5f49a2b109ebadd4ddc11fb57e1d412250a699229ba9cc23f5983db8fde",
+      "size": 86
+    },
+    {
+      "path": "runtime-arm64/install/typescript/live-source/main.ts",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp-code.json",
+      "sha256": "3397e48112a3bd549421ea42fe04fd5334c04f08d1a866087fbb4d1fc9331c25",
+      "size": 173
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp-config.log",
+      "sha256": "b7ed8709e38fdd1a6b49e2359686659cee56cc248034034954df4c3d25a882f8",
+      "size": 121
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp-restarted.json",
+      "sha256": "cedc0a1e2b5399b590887a381bc0be184dd590daaa14072e07187bacc14c6800",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp.json",
+      "sha256": "cedc0a1e2b5399b590887a381bc0be184dd590daaa14072e07187bacc14c6800",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp.mcp.log",
+      "sha256": "79be52d219b12423331568a781665ad583b08d9395abaaff91a77a3b24fa071f",
+      "size": 2184
+    },
+    {
+      "path": "runtime-arm64/install/typescript/mcp.yaml",
+      "sha256": "abd592ee9a84347315e0444e72a32a27c2e9250f8f438e0491f6b3fcc473ff33",
+      "size": 1044
+    },
+    {
+      "path": "runtime-arm64/install/typescript/query-rollback.json",
+      "sha256": "1a008f76212500a5011b3415734ffaf9e61c8d0960d841bf6cac0194290ca605",
+      "size": 2240
+    },
+    {
+      "path": "runtime-arm64/install/typescript/query-rollback.log",
+      "sha256": "711f27861a122764735cf022e9ae64da7677c4a71802152e3e3b2f7cf2d2510d",
+      "size": 3148
+    },
+    {
+      "path": "runtime-arm64/install/typescript/query.json",
+      "sha256": "6fdfd573097547ef9587d60910f8e29657d0a29ba8c85e4571af96c30fbf53f6",
+      "size": 2105
+    },
+    {
+      "path": "runtime-arm64/install/typescript/query.log",
+      "sha256": "4d17405fdb1e4e6623ee19a59f194b208152d977776cfea3ed501f8b9d20caed",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64/install/typescript/retained-source/blobs/4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-arm64/install/typescript/retained-source/blobs/6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-arm64/install/typescript/retained-source/blobs/c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "sha256": "c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "size": 42
+    },
+    {
+      "path": "runtime-arm64/install/typescript/retained-source/manifest.json",
+      "sha256": "6fc8b0136e4783c1e7b067b399c7f392c0e7154cc2687934b5c41da844d1a6f0",
+      "size": 1419
+    },
+    {
+      "path": "runtime-arm64/install/typescript/rollback.log",
+      "sha256": "ed3eafc8cfdb7e3bc8009870668561d939ae0bb6ad7fb7e481c52c5f060a7b88",
+      "size": 195
+    },
+    {
+      "path": "runtime-arm64/install/typescript/setup-second.log",
+      "sha256": "feccdf9fea041170ff2f3db3a1e0b73ded4b39ccb0ebb4f481b272b854cc58ab",
+      "size": 3579
+    },
+    {
+      "path": "runtime-arm64/install/typescript/setup.log",
+      "sha256": "cb42c4d442c7e89483be7a7d9e49a5b960e56f7f2c208237e74cc675f1a917f9",
+      "size": 3579
+    },
+    {
+      "path": "runtime-arm64/install/typescript/setup.yaml",
+      "sha256": "45a34ee2525274986be81e555ea9ed9cc562372896761d8e13f411fd11e85887",
+      "size": 185
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/doctor-rollback.json",
+      "sha256": "e1cfef84acf74d75f0f732ada589e4afa57c9313f9324d7ffe9f4acb9bd68c4b",
+      "size": 1024
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/doctor-second.json",
+      "sha256": "e06c0deb8b455598f7ef48d96839b632498b3f07ec01a183a07037f7e1fbc113",
+      "size": 902
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/doctor.json",
+      "sha256": "97b81111cfc9ac572c5d908e2e030a30917381737c02f38d9ab04f90398e0fae",
+      "size": 902
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/init.json",
+      "sha256": "4d1644d3fdbb644f4f6c83bbdf020cc64ea7c10f8a759125af2af6288c880fe5",
+      "size": 304
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/live-source/README.md",
+      "sha256": "c8aca6c68ca4ba24e2bceec44b5f7970af68bf992faabe22b4aca9d80e103674",
+      "size": 102
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/live-source/main.py",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/mcp-config.log",
+      "sha256": "3fdd82a5e1e6df54ac843b646e5987d4fb2eb1df99e3ed05e4e279d013deecf2",
+      "size": 137
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/mcp-restarted.json",
+      "sha256": "0401a89c3496242b16cac771428b1e051c111f0644e9400c12d1e94db9187bdf",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/mcp.json",
+      "sha256": "0401a89c3496242b16cac771428b1e051c111f0644e9400c12d1e94db9187bdf",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/mcp.mcp.log",
+      "sha256": "b03e30d8d9e54ede6f446aff5b1da3a2f7021fa6bfddbb1908aa7ad29aa18c58",
+      "size": 2260
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/mcp.yaml",
+      "sha256": "e063e0591f1d7fe5867390956cdc089f3a90a5d3922127403fc711678772d199",
+      "size": 1076
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/query-rollback.json",
+      "sha256": "a78f4627e03778918066946eef23418e9e81f35c631455ae3a61aa14267f240c",
+      "size": 881
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/query-rollback.log",
+      "sha256": "e2efa7c56c0d6ce44099e8f8cbbf5e549116b00b6499bd734741483fc1931675",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/query.json",
+      "sha256": "b259606d04ac8b1ebb7512c0e79ea269d41c53fdfc384b144874c9574096a757",
+      "size": 806
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/query.log",
+      "sha256": "5e32961dbdd1861d27001912df87e291ac61009b95beff7ad05723548a0715d1",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/retained-source/blobs/2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "sha256": "2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "size": 50
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/retained-source/blobs/ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/retained-source/manifest.json",
+      "sha256": "183bc7c8191483656cfd391386bd92bfa991e3ebaaf25900c6874dea32755daf",
+      "size": 1225
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/rollback.log",
+      "sha256": "3f175c94d7971b418a0f4ea82109377109814f092a10b26be226f6e5b838bdd7",
+      "size": 203
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/setup-second.log",
+      "sha256": "200c4947ee517cca7b702a0202e50c5ac61461aa62c6fe1c0549cc26d8159264",
+      "size": 3607
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/setup.log",
+      "sha256": "71ea3e9e014f50469af2817417aa51be626947af1d4a74770a4f002afbfe8caa",
+      "size": 3610
+    },
+    {
+      "path": "runtime-arm64/install/unsupported-python/setup.yaml",
+      "sha256": "7b35c62dba87744fc3a90068dc4bafdb73c57f204c4069f3154b7dae644317a3",
+      "size": 201
+    },
+    {
+      "path": "runtime-arm64/install.log",
+      "sha256": "f8316dd5d08d06e858f493bc82ab77a06817dd231fc65c789c6f8ae46b2fb375",
+      "size": 67
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/base-config.yaml",
+      "sha256": "151c88bd9bdaef2be81b959114ada13cd138189b5e2d4581c28775ecde77cbfc",
+      "size": 1036
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/baseline_off.yaml",
+      "sha256": "5c6b68475af4edc13ba6c3efc0e6c60c66a7f84c7b3737a5dc7044833f039d8a",
+      "size": 1153
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/baseline_on.yaml",
+      "sha256": "a3054aebb33c1819b8acc64f020cd22a2b0b5b2e8ffda43090fa95bc2d4a7e75",
+      "size": 1152
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/combined_off.yaml",
+      "sha256": "ebe21f8af1f19bba3c18ff4a2447b20ca2370e56b9743a4568ee6d45d1bad96e",
+      "size": 1153
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/combined_on.yaml",
+      "sha256": "12c4bb5dfb5493a3dd083bbe671480dd053f6fa2fc473a984ffa4d3924501a5c",
+      "size": 1152
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/concept_text_off.yaml",
+      "sha256": "b3fc7a6549a93012db98be8db2f8cc1f0733fd0ffda20dfe9ce48288207cd7a0",
+      "size": 1161
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/concept_text_on.yaml",
+      "sha256": "06fd85ad061522bc210ac77bbe3d4c03cec4be75f3388d23a857db6c4a045c51",
+      "size": 1160
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "c2704330123eef6d74f0d6145f83d2100fa0181804d377fc16215eb0f8e87475",
+      "size": 57245
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "c3c09f6d1e7970a65e080617d73d8539139cdf6ddc787268ae80e8acd84bae35",
+      "size": 57238
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "95cdc0586548b0c59a2aa5c0fdbe07222c22fd4c3c3a866936190ebafd469ef8",
+      "size": 57234
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "2c5dc5d1d784528e1f2efe42c38b63c402ef95d561e9c8614e2c04d4a9fa58f6",
+      "size": 57243
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "2e37e8b51632ad020fe979b4b62bf82e37b00a5b06114e3433f606d6561c7b27",
+      "size": 57228
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "8a3e1825a7601cdc077819f9d682bcd6574a5b4c1a45e6d05a430129f9b876fe",
+      "size": 57247
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "ffab1db4d0c72d29e1640c77cee2830990991ff10569bf4cf4fd23bb7079990a",
+      "size": 57234
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "56e383f7f6611edba9fb18a7010f1c8a0b8b16146622be4f7ae278a2dab6b70a",
+      "size": 57226
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/locked-inputs/000-diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/relations_off.yaml",
+      "sha256": "e14c839b587cde6d4cfecb615493dfaba51002cf6f66a807fdf24715b31fc693",
+      "size": 1155
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/relations_on.yaml",
+      "sha256": "752becd6267dcc973e3ba44f4a235a3b8162caf8c4be00ebf6c7be3dda282a2c",
+      "size": 1154
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/report.json",
+      "sha256": "0f8ae2b993a82623937608bf1745c8d25e909deb70fcfbffe11698ac427a8f30",
+      "size": 18763
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/requests.json",
+      "sha256": "fb7357f909dace5d184ff95f5508d9849b2e8e0a877d1ad3c0dc1ad4fc15d788",
+      "size": 163
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go/rows.jsonl",
+      "sha256": "707e4b86198cfccd396b5ddb692ed30e5133c98b51cb44551a8e52ab29f5c30e",
+      "size": 37853
+    },
+    {
+      "path": "runtime-arm64/matrix-empty-go.log",
+      "sha256": "0e096edd41ec334910afa9b393b91bb9fc545454a34c38a78cc75f32b3fae0c4",
+      "size": 98
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/doctor-rollback.json",
+      "sha256": "1a0ec3cab8f25c9bd346b6fafb6a65ed6b7863633e8f4b1c7e746da6efd04aaa",
+      "size": 1024
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/doctor-second.json",
+      "sha256": "35b34acf09e7ffc6466824c5b4be01d62bad90f66709d6f0a52c41ea7d55d950",
+      "size": 902
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/doctor.json",
+      "sha256": "a6a2aeaf547496602054df3fcbb7356cbe633408430e4020deaebe34f59c65a8",
+      "size": 902
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/init.json",
+      "sha256": "856044f594984dbdf2995be316805d4d14d2ac6f6f5d6b6fa2185262b6a094f5",
+      "size": 304
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/live-source/README.md",
+      "sha256": "97605a59d851e444190b297d2181841e1ebb5eb7d8107d5c4ca81488c371ad81",
+      "size": 82
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/live-source/go.mod",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/mcp-config.log",
+      "sha256": "5392e6f1e2c33bf2f079ea4168556a8f70764eae1da1618b289c591bc099c4b2",
+      "size": 127
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/mcp-restarted.json",
+      "sha256": "423deb1aa1e8ca4fc9036c578abd059652361e8e8533813506db29886f9c3ad6",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/mcp.json",
+      "sha256": "423deb1aa1e8ca4fc9036c578abd059652361e8e8533813506db29886f9c3ad6",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/mcp.mcp.log",
+      "sha256": "ccf88a3b46a96f2c3a42387196a3a27a088e748928a5da2c3100dc96d5e5de05",
+      "size": 2208
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/mcp.yaml",
+      "sha256": "17ed70c5f0d28c648e236b93f025f5457618a4160df8ff404f77dcff23983aa5",
+      "size": 1066
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/query-rollback.json",
+      "sha256": "50b8a678dd24e69f406d5baa43a6a81de7e232b672063f8166a6e052c07f12cc",
+      "size": 871
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/query-rollback.log",
+      "sha256": "690393dd693f61203715b298aa1962d7581d0e0748c664ef753a857c3079722a",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/query.json",
+      "sha256": "f4860464007355ad5a1f048e5e4889882dbf72a6b52c2aac921054da4e2ad523",
+      "size": 796
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/query.log",
+      "sha256": "16b0e1167741c6284de0e1bead3af3cd5c8602abb84a4b91de7f7acfaf92eeb5",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/requests.json",
+      "sha256": "774c004291386dbe799117a9372a8ae93a23cd41f174ea6d6832d15d2346a945",
+      "size": 231
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/retained-source/blobs/43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "sha256": "43f9b001b08e7b15b2b52da08b319da133fdcf07e8624d3037364b7b2b60b80f",
+      "size": 40
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/retained-source/blobs/f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "sha256": "f26770da044793fd1570fb16eb4ce5720bde547f23ea9843519062604346763d",
+      "size": 34
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/retained-source/manifest.json",
+      "sha256": "3120844c26f58106e63ec8379eee331398036e574b219e3840c8653a2942bc7f",
+      "size": 1224
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/rollback.log",
+      "sha256": "b9c25de314c432fabca174d8c43db466399b77aca36444b672f3755a604d69a9",
+      "size": 203
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/setup-second.log",
+      "sha256": "57e5d76899d683c1fd3b6d01b9d9e18c511cecd83b5b205f45619f53f7dc0ea5",
+      "size": 3607
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/setup.log",
+      "sha256": "a297b3f48f7b62e874dc7a637aaedd6e7aa86f63bdc851dcc142fab562b19d45",
+      "size": 3610
+    },
+    {
+      "path": "runtime-arm64-corrected/install/empty-go/setup.yaml",
+      "sha256": "b7e648735b9f294d7b09e5b0c0c1f48a062244fc8e98a877c3f572d3497d3e71",
+      "size": 201
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/diagnostic-input.json",
+      "sha256": "09a9d91c58d8abb92a68a2dc004a3770d999728c5aa6fd806034adc7769a37d6",
+      "size": 160
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/doctor-rollback.json",
+      "sha256": "303ca85f7c9886928c3eb14d4e43dc6bc055e6ff2b1f8f61d02bb04496ef90dc",
+      "size": 942
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/doctor-second.json",
+      "sha256": "67b23fbe2d89291feb42035ffed1acdbe95a66e84dbb39b12893399e380c12b8",
+      "size": 815
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/doctor.json",
+      "sha256": "1436f45707562598c509950ad98ce81d16c5a0c479411118433f8db037b890bc",
+      "size": 815
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/init.json",
+      "sha256": "547187aaeac7e0919021963d67ba64a51a97c925169acf17c78a42e31db972d2",
+      "size": 310
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/live-source/.gitignore",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/live-source/README.md",
+      "sha256": "edccc5f49a2b109ebadd4ddc11fb57e1d412250a699229ba9cc23f5983db8fde",
+      "size": 86
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/live-source/main.ts",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp-code.json",
+      "sha256": "1b00d0fd49c793b1897481c63785a1f3556fd87fe3f9576b911f4091a0d76eb6",
+      "size": 173
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp-config.log",
+      "sha256": "e4086a3052f7a07314b1fa87df0e30914fea29f5735ddefcb08653472e47af2f",
+      "size": 131
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp-restarted.json",
+      "sha256": "8a2b4f486a8d6563db607779e6c4320c9d379a75a3bba04d599ac657448bf865",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp.json",
+      "sha256": "8a2b4f486a8d6563db607779e6c4320c9d379a75a3bba04d599ac657448bf865",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp.mcp.log",
+      "sha256": "a77117517270ccb4bbba653db7866524d2379beb5457d65c45bcf3c9dec2a9c8",
+      "size": 2189
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/mcp.yaml",
+      "sha256": "8d9f09bdbd35cbf0b26b9bb792019eae766edb934789dff8caf3ebf86e8f1558",
+      "size": 1074
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/query-rollback.json",
+      "sha256": "447fab1288d13b4d71057fd5b0d3decda46d1eed214400e64890b97468e5df43",
+      "size": 2240
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/query-rollback.log",
+      "sha256": "109d6243c1b415ca0759923568365adb703036eae1a88484d7983e9eed7a000d",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/query.json",
+      "sha256": "6c56b66005f76e2b8664da2bf9e8835b838ed279da526c1a9e80bc5f31fa975d",
+      "size": 2105
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/query.log",
+      "sha256": "4ce57c4820eb4836ce3768b05d67ad1ff39faa199fb629bc361316de3ed2f15e",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/requests.json",
+      "sha256": "ca90cf3dacc5dabb892e4c295b07c11f18a9b7cd47514a2851a6488fe86055dc",
+      "size": 235
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/retained-source/blobs/4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+      "size": 14
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/retained-source/blobs/6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+      "size": 52
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/retained-source/blobs/c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "sha256": "c03ca4e29babfbb9a87b0e80fc53b7d5f64f2f8ab35069ecaa754d4a0484b184",
+      "size": 42
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/retained-source/manifest.json",
+      "sha256": "8b8d0a529dcfc7a0b170a461df3c14c85d6c3d1b31776809547898a2486547dc",
+      "size": 1419
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/rollback.log",
+      "sha256": "9b3258fc462b4dde259a121bf2665ebaa8d8a38d9b7eed274e9ac371b2b6103a",
+      "size": 205
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/setup-second.log",
+      "sha256": "110dd15fe8afa9fdcb0cd0f0ae37b77ee7ab750aa5dcfec29b73c25741ab4c69",
+      "size": 3639
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/setup.log",
+      "sha256": "72cfeacf195e0ba7ff925f0ef1cbe28f11a0602792c7d35eb348e9c21ce0d8d4",
+      "size": 3636
+    },
+    {
+      "path": "runtime-arm64-corrected/install/typescript/setup.yaml",
+      "sha256": "4054717cedca8771bba257bc7c180e78c05530d3ae56f54292e08893f9163af4",
+      "size": 205
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/diagnostic-input.json",
+      "sha256": "cb7713afd95567f3e1558fcbc3ef3f9f40833400ae10815067be7e0111be44c9",
+      "size": 168
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/doctor-rollback.json",
+      "sha256": "a09dd673ddd1fb3d70806fbc4bb1ec788f3b6aa2930ee7230dba6fd5ff9ee6ea",
+      "size": 1034
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/doctor-second.json",
+      "sha256": "92851ad53b546debaa151ff4743999602e8664e715f8c5047839c22f656f8ca2",
+      "size": 912
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/doctor.json",
+      "sha256": "dbf3fa1af91b7912ed6092a6af957edb4f8a07c3230d7b65daa0884ce9298b89",
+      "size": 912
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/init.json",
+      "sha256": "7aa0c3b7b234e98cc8cd9d5b16e47c0ef777dbc9c6e3605757e43d9cac28d9d2",
+      "size": 334
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/live-source/README.md",
+      "sha256": "c8aca6c68ca4ba24e2bceec44b5f7970af68bf992faabe22b4aca9d80e103674",
+      "size": 102
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/live-source/main.py",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/mcp-config.log",
+      "sha256": "65e01005382ad331b2e685b69bb0c3ed7f4bf31f99c52296167caa366da70450",
+      "size": 147
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/mcp-restarted.json",
+      "sha256": "9393bafebdd216ea919c9b2e240d6c912d0a091e36d678d37ab8e253862fa817",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/mcp.json",
+      "sha256": "9393bafebdd216ea919c9b2e240d6c912d0a091e36d678d37ab8e253862fa817",
+      "size": 175
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/mcp.mcp.log",
+      "sha256": "276812b986ca8669859b30608ff18cd7d622ad4a0956f201d1544011981c6cad",
+      "size": 2255
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/mcp.yaml",
+      "sha256": "e51221c11d31fe723a5c7ceaa9862b658541240363c5d052dfa6ee7fc23e74d3",
+      "size": 1106
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/query-rollback.json",
+      "sha256": "d1405854d6cc54bcd4fc016ee10b325e332a9da810d1fa19c8c35351b5410ab1",
+      "size": 881
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/query-rollback.log",
+      "sha256": "bcbac786207364430fba2da9b91e3711c75c6584f7a7499ac98c06e33bdda000",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/query.json",
+      "sha256": "89b20441f4da527fcbe0e2752ca03c078068352c8dcdaddae4c02bb3a83d683d",
+      "size": 806
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/query.log",
+      "sha256": "d90c768766cf317599a2507bad1baabb1e7fa9f4722124157348e267c8a311e0",
+      "size": 3135
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/requests.json",
+      "sha256": "0e6f49930aeea9499d4b3da0c7cb192b7bf59968752f48f1e0fa8100b10e9826",
+      "size": 251
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/retained-source/blobs/2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "sha256": "2de2310c392e1636081026a96b0a1493c4adec8b75a77615fa40c92ef33761d5",
+      "size": 50
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/retained-source/blobs/ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "sha256": "ed79c172092828da6c2761803c8f289b0cda161ed8ce84bfa417739eaa0b2d96",
+      "size": 32
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/retained-source/manifest.json",
+      "sha256": "e710688db87a0fe47d9716ab14c48f1c765d75f5bb548484b990c84b7e8917e8",
+      "size": 1225
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/rollback.log",
+      "sha256": "12dcf028489f69e1c0ee52d393541e2a3f31b5c86631fc0d1e004d10eee1f064",
+      "size": 213
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/setup-second.log",
+      "sha256": "9afdb9b93e5f23960cffb5c993cee858a975edc1a000862485643c3fef2cad46",
+      "size": 3670
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/setup.log",
+      "sha256": "5d979159e02bba1b52c74394e17138e1815aaaadeea94871505b59e4435f4651",
+      "size": 3670
+    },
+    {
+      "path": "runtime-arm64-corrected/install/unsupported-python/setup.yaml",
+      "sha256": "4805fb9c42fd570774aecaeaea5b5599e4ce03411c99dd5a053beaf3623a11a5",
+      "size": 221
+    },
+    {
+      "path": "runtime-arm64-corrected/install.log",
+      "sha256": "75d083bcd26df3fe04fe01ee78c5c6c91f3ebfdfc2c796b4a5ebcea12edbad96",
+      "size": 77
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/base-config.yaml",
+      "sha256": "17ed70c5f0d28c648e236b93f025f5457618a4160df8ff404f77dcff23983aa5",
+      "size": 1066
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/baseline_off.yaml",
+      "sha256": "5d72d8c94fed0e5b837462141c36c73c164744a06a9693c167d08a7bc3fbce34",
+      "size": 1193
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/baseline_on.yaml",
+      "sha256": "0183cf2a53e8f3d61a386e978a08ad154d87f27fc554b948a798f767d5a651b0",
+      "size": 1192
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/combined_off.yaml",
+      "sha256": "b17c1486a7d65ac0ad5e25e1bd0f9c5cd12906ce2209d6d10db0aba5585feed6",
+      "size": 1193
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/combined_on.yaml",
+      "sha256": "f086d05405e79a1612263bfbf0aaf3b033bd3f6afcbcf6416c3ec31c9d93359c",
+      "size": 1192
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/concept_text_off.yaml",
+      "sha256": "26819a8d726f6842cac804488c60e57db4c573762456b22eb7abf3565deb8cc5",
+      "size": 1201
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/concept_text_on.yaml",
+      "sha256": "ca3f3ec34d46bd14567f9402d1544a3c4509f5fe336764283dcd849eac278277",
+      "size": 1200
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "5d0d80fbff3fceee5e6bad0a176bb3ce031f26faf500b8bc683570c58b40a545",
+      "size": 57254
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "87f944edb17ba47250c6761c2e8a11c8fa5b356f3920cfec415844a6a3840b55",
+      "size": 57249
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "4feaeeb15af21affd858aa7133a624404cd0d48653ee699546aee93ad7bdd911",
+      "size": 57229
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "2940670c3c83b640ef3d462f93585154de9e24d31d84257d3122227e1f9d6f92",
+      "size": 57233
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "7a6665df730dad8b0bfd2a87d4300fc6179329cdae172fa01eb7954dd60ba93c",
+      "size": 57245
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "e223bd561c116e4c3e7df362d2d457b05f8ae508dea403829fc8b7e709b660b3",
+      "size": 57239
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "3c22bd8876771b18a5a82783cf885159ea05eb9f55ed7a3f663a4da5be05d098",
+      "size": 57244
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "fb016b123342ceed7dddf0afee633f73194f1c8f73f6cff3401d6d9d310df59a",
+      "size": 57242
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/locked-inputs/000-diagnostic-input.json",
+      "sha256": "20b7d679594f8592087723decff5d7c4ff2dffa71f3a7b62f399a201fc2cefd1",
+      "size": 158
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/relations_off.yaml",
+      "sha256": "fd22c9b79c01c476c1de3476bc929c46d6a3e7f202339d36c456c3380010c62b",
+      "size": 1195
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/relations_on.yaml",
+      "sha256": "a6aa86fe2605fc7b5d0d87a4572bccbad4b43754b43ef644ff3785e440caa2ab",
+      "size": 1194
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/report.json",
+      "sha256": "4c7230356d2b0433a4854e61152993fd625dc158ef485a6c1a5068c695cc2a14",
+      "size": 18338
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/requests.json",
+      "sha256": "774c004291386dbe799117a9372a8ae93a23cd41f174ea6d6832d15d2346a945",
+      "size": 231
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go/rows.jsonl",
+      "sha256": "f3aeeeefa3cd9c9aec2d6228cfd4a7a4f67045254e41a655cdce8db7a08907b8",
+      "size": 60403
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-empty-go.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/base-config.yaml",
+      "sha256": "8d9f09bdbd35cbf0b26b9bb792019eae766edb934789dff8caf3ebf86e8f1558",
+      "size": 1074
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/baseline_off.yaml",
+      "sha256": "b61230161292261b19bb6be9ecfa84b80615f8950e5ad137ddbae1ef0f40cf60",
+      "size": 1203
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/baseline_on.yaml",
+      "sha256": "95b564d7a416195e0b4ca7d2e5a4b86230081eb0c8ac344736b874deed925437",
+      "size": 1202
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/combined_off.yaml",
+      "sha256": "a46e1ed562133c3d1dbc7840bb6a585e27fc10f562de645cae74e5b35cb24e41",
+      "size": 1203
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/combined_on.yaml",
+      "sha256": "91149cf34200483cad5b74db777a06262c2eb478e7ac815122fa48bac2c943d4",
+      "size": 1202
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/concept_text_off.yaml",
+      "sha256": "4073c1f420e5c779e5e63bd2749aefb4a6fac91bff151a87b3ce2a6d978276fd",
+      "size": 1211
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/concept_text_on.yaml",
+      "sha256": "a1f04f1a2858beeadd8bd3c571da89156018984b8fccb17dc44468e44ea0a604",
+      "size": 1210
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "aeb191dec2758da07d579ac4a43056529d1688416f037b332717676960ca57e4",
+      "size": 57358
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "04beb6b1de92513806ce1077d3343be9170d7635e09b5c83fbb49263a5b4cfe4",
+      "size": 57341
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "65d244a4b09df5d904f433e988689f411321d6e1722fef7b03b9f79a5fe1bc0b",
+      "size": 57335
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "a6f3ad93feaa2d0ede7b87726dfa24099a4b196cfe5ffc6674db567df54634ae",
+      "size": 57343
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "de2ee9425e8d08f8f0a392db10b944cef1ba8b5545b61d363a3ad875bb199f5c",
+      "size": 57342
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "6aedae4d25732bdab8309d76a92158cf42d0950b5049267f049bd926212eef97",
+      "size": 57337
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "f0eac64f6bec25337835e0b7bda3fbf173b25e28aa3ce30063dc04a2ea6b7b92",
+      "size": 57340
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "0be60a71b803585feadea608c6bedf37455fd47d512a53c3932a41da117c4f7b",
+      "size": 57335
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/locked-inputs/000-diagnostic-input.json",
+      "sha256": "09a9d91c58d8abb92a68a2dc004a3770d999728c5aa6fd806034adc7769a37d6",
+      "size": 160
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/relations_off.yaml",
+      "sha256": "abb8b0f28a03da58d77775650fb4a4dd873b5aae450e22cada43d65bf878bc99",
+      "size": 1205
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/relations_on.yaml",
+      "sha256": "c074a21fb7e6cf0a064f3810af1cc995f64b7daca9f1a8209dd9a1fcc61a814a",
+      "size": 1204
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/report.json",
+      "sha256": "9f0bf646cbad3b91176416661d79d39e26d3cff5badff4178fb3622a766809ea",
+      "size": 19291
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/requests.json",
+      "sha256": "ca90cf3dacc5dabb892e4c295b07c11f18a9b7cd47514a2851a6488fe86055dc",
+      "size": 235
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript/rows.jsonl",
+      "sha256": "1c0de07268bbe7467daf823157e2f218e58ab1f8cb3260719394a5af002f0ef0",
+      "size": 60595
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-typescript.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/base-config.yaml",
+      "sha256": "e51221c11d31fe723a5c7ceaa9862b658541240363c5d052dfa6ee7fc23e74d3",
+      "size": 1106
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/baseline_off.yaml",
+      "sha256": "abaf8d4fa1094e4501a635aa5ae61204914442099f8a8260234bf8da3b8110e0",
+      "size": 1243
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/baseline_on.yaml",
+      "sha256": "6dcaa4a6858fce159dd873488a7609a6125a47e5d5c368cce0385bab6f30ced3",
+      "size": 1242
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/combined_off.yaml",
+      "sha256": "337dd8c2dd9f78b4f710b1fda57d06e96eeb57f864d37fd7a17c7c0f234f80b0",
+      "size": 1243
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/combined_on.yaml",
+      "sha256": "96c64b7c23658836c467ddaf1d5a0d9722955b5ba9ee3caf5ea51ea095e3581f",
+      "size": 1242
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/concept_text_off.yaml",
+      "sha256": "b33b3e448a01c8c51a3e678dd68a1d2dc51341375bce05ba4eb2772063abdd42",
+      "size": 1251
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/concept_text_on.yaml",
+      "sha256": "e2fceda4571209440a65aac44b89c5a4c7847962eddc2aa1edcd1e6e1334179a",
+      "size": 1250
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/baseline_off/cks-mcp.jsonl",
+      "sha256": "f4412f423a4b81df886eb802a6e2824e3b16dc42db414858c4e6b15005760bc0",
+      "size": 66511
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/baseline_on/cks-mcp.jsonl",
+      "sha256": "4cfd59da97983b47fd6714291a540abca38c49111a6a48ede7fd42ac5d2fc6d2",
+      "size": 66517
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/combined_off/cks-mcp.jsonl",
+      "sha256": "a161712357177aef11a55e19fd759e53ea9885611be89fa66466f4ff1aba1edf",
+      "size": 66506
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/combined_on/cks-mcp.jsonl",
+      "sha256": "1535d4b270ec917f2f0fd3ae4529b9201fc5ff12707462444c0d50b1483a4964",
+      "size": 66509
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/concept_text_off/cks-mcp.jsonl",
+      "sha256": "286310e9758ed56393cbc3cb1289adcead77ed00b5f2bdba648dbd9d734a84e6",
+      "size": 66522
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/concept_text_on/cks-mcp.jsonl",
+      "sha256": "8243568a8635e63ff0f75faa109575e5b36a7f7771e1ca1ebd8aaaf680283fb4",
+      "size": 66504
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/relations_off/cks-mcp.jsonl",
+      "sha256": "4c3dee14a151d7b3a6e3669fd2da368b6ef0575c0e2605e42ebddf73276e05cf",
+      "size": 66516
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/footprints/relations_on/cks-mcp.jsonl",
+      "sha256": "894089d84cee958ad3919f171d30c7b54457ebc9ce2bc3a9794171f6eb62c10c",
+      "size": 66511
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/locked-inputs/000-diagnostic-input.json",
+      "sha256": "cb7713afd95567f3e1558fcbc3ef3f9f40833400ae10815067be7e0111be44c9",
+      "size": 168
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/relations_off.yaml",
+      "sha256": "14ae6f004fefafe46ef1895a8a27498eab452825dd1072e198f055f6ac6adfe5",
+      "size": 1245
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/relations_on.yaml",
+      "sha256": "1b21a2325e547f5ecb5921f03d70b1001e2ea0638c9971224bacb14dadc0d5f8",
+      "size": 1244
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/report.json",
+      "sha256": "a55b831860ea9f12c7d86500281c3cf4e56acaba0f94d7d3807fc81eb79d99cb",
+      "size": 18732
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/requests.json",
+      "sha256": "0e6f49930aeea9499d4b3da0c7cb192b7bf59968752f48f1e0fa8100b10e9826",
+      "size": 251
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python/rows.jsonl",
+      "sha256": "94864b9871ab534fe88b27680168432155e27129250a68a916d4f3eb71d1b5db",
+      "size": 61362
+    },
+    {
+      "path": "runtime-arm64-corrected/matrix-unsupported-python.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "runtime-arm64-corrected/post-audit.json",
+      "sha256": "ef6aac9ba6d18d2ad35535cbb7da8cdc6a26157657ed4be71778ce949be89735",
+      "size": 39529
+    },
+    {
+      "path": "runtime-arm64-corrected/verification.json",
+      "sha256": "b06565cfbb7878def0191e5401ca79789e7d093a86fd57b48b87c3930591e1d0",
+      "size": 5936
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/source/scripts/wbs-linux-environment-smoke.py", line 131, in <module>
+    main()
+  File "/source/scripts/wbs-linux-environment-smoke.py", line 120, in main
+    subprocess.run([str(args.bin_dir / 'cks'), 'eval', 'matrix', '--requests', str(request),
+  File "/usr/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/bin/cks', 'eval', 'matrix', '--requests', '/logs/runtime-arm64/install/empty-go/requests.json', '--config', '/logs/runtime-arm64/install/empty-go/mcp.yaml', '--output', '/logs/runtime-arm64/matrix-empty-go', '--warmup', '0', '--retrieval-runs', '1', '--warm-runs', '1', '--cold-runs', '1', '--environment-ledger', '--environment-note', 'Linux minimal runtime/mock synthetic integration, not B0/B1 quality or release approval; competing host work not excluded', '--lock-file', '/logs/runtime-arm64/install/empty-go/diagnostic-input.json']' returned non-zero exit status 1.

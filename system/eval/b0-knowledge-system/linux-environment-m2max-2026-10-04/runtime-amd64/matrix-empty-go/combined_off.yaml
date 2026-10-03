@@ -1,0 +1,44 @@
+version: 1
+name: ks-empty-go
+description: ""
+backends:
+    ckg:
+        path: /logs/runtime-amd64/install/empty-go/dataset/current/graph/graph.db
+        source_root: /logs/runtime-amd64/install/empty-go/src
+        timeout_ms: 5000
+        binary_path: ""
+        policy_file: ""
+    ckv:
+        path: /logs/runtime-amd64/install/empty-go/dataset/current/vector
+        provider: mock
+        binary_path: ""
+        timeout_ms: 3000
+        embed_model: mock-feature-hash-v1
+        query_prefix_policy: registry
+        ollama_url: http://localhost:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: true
+    transport: stdio
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: /logs/runtime-amd64/matrix-empty-go/footprints/combined_off
+    audit_dir: ""
+    measure_backend_calls: true
+sanitize:
+    rules_path: /source/system/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: ""
+    ontology_mode: combined
+service:
+    label_prefix: ""

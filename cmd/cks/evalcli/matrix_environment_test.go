@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -15,6 +16,30 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	"github.com/0xmhha/knowledge-system/internal/system/eval"
 )
+
+// Opt-in integration probe for the actual Linux runtime; ordinary unit tests
+// never write this artifact or assert a developer host's resource state.
+func TestMatrixLinuxEnvironmentProbe(t *testing.T) {
+	out := os.Getenv("KS_MATRIX_ENV_PROBE_OUT")
+	if runtime.GOOS != "linux" || out == "" {
+		t.Skip("actual Linux artifact probe not requested")
+	}
+	cfg := config.Default()
+	cfg.Backends.CKV.Provider = "mock"
+	cfg.Backends.CKV.EmbedModel = "mock-feature-hash-v1"
+	identity := &setup.DatasetIdentity{EmbeddingIdentity: json.RawMessage(`{"dim":64,"model":"mock-feature-hash-v1","checksum":"provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2"}`)}
+	observed := observeMatrixEnvironment(context.Background(), cfg, identity)
+	raw, err := json.MarshalIndent(observed, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(out, append(raw, '\n'), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if !observed.Valid {
+		t.Fatalf("actual Linux environment incomplete: %v", observed.Errors)
+	}
+}
 
 func modelTestPin() *setup.DatasetIdentity {
 	return &setup.DatasetIdentity{EmbeddingIdentity: json.RawMessage(`{"Provider":"ollama","Model":"bge-m3:latest","Dim":3,"model_digest":"` + strings.Repeat("a", 64) + `","runtime_context_tokens":8192,"runtime_batch_tokens":8192}`)}
@@ -119,6 +144,97 @@ func TestMatrixProcessPressureParsing(t *testing.T) {
 	top, count := parseMatrixProcesses("10 1 12.4 100\n20 1 50.0 200\n30 1 NaN 5\ninvalid\n")
 	if count != 2 || len(top) != 2 || top[0].PID != 20 || top[0].RSSBytes != 204800 || top[1].CPUPercent != 12.4 {
 		t.Fatal(top, count)
+	}
+}
+
+func TestMatrixLinuxCPUAndProcessData(t *testing.T) {
+	arm := "processor: 0\nCPU implementer: 0x61\nCPU architecture: 8\nCPU part: 0x000\n\nprocessor: 1\nCPU implementer: 0x61\n"
+	if got := matrixLinuxCPUIdentity(arm); got != "CPU implementer=0x61; CPU architecture=8; CPU part=0x000" {
+		t.Fatal(got)
+	}
+	if got := matrixLinuxCPUIdentity("processor: 0\nmodel name: Actual x86 CPU\n"); got != "Actual x86 CPU" {
+		t.Fatal(got)
+	}
+	// Linux field 3 (state) onward. A command name contains spaces and ')'.
+	fields := make([]string, 22)
+	for i := range fields {
+		fields[i] = "0"
+	}
+	fields[0] = "S"
+	fields[1] = "1"
+	fields[11] = "100"
+	fields[12] = "100"
+	fields[19] = "5000"
+	fields[21] = "10"
+	raw := "42 (private ) process name) " + strings.Join(fields, " ")
+	observed, ok := matrixLinuxProcess(42, raw, 100, 100, 4096)
+	if !ok || observed.PID != 42 || observed.ParentPID != 1 || observed.RSSBytes != 40960 || observed.CPUPercent != 4 {
+		t.Fatal(observed, ok)
+	}
+	if _, ok := matrixLinuxProcess(42, raw, 50, 100, 4096); ok {
+		t.Fatal("accepted nonpositive lifetime")
+	}
+	if _, ok := matrixLinuxProcess(42, raw, 100, 0, 4096); ok {
+		t.Fatal("assumed clock resolution")
+	}
+	root := t.TempDir()
+	if err := os.Mkdir(filepath.Join(root, "42"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	reader := func(path string) string {
+		if filepath.Base(path) == "uptime" {
+			return "100 0"
+		}
+		if filepath.Base(path) == "stat" {
+			return raw
+		}
+		return ""
+	}
+	top, count := matrixLinuxProcesses(root, reader, "100", 4096)
+	if count != 1 || len(top) != 1 || top[0] != observed {
+		t.Fatal(top, count)
+	}
+	limits := matrixLinuxResourceLimits(func(path string) string {
+		if strings.HasSuffix(path, "cpu.max") {
+			return "100000 100000"
+		}
+		if strings.HasSuffix(path, "memory.max") {
+			return "536870912"
+		}
+		return ""
+	})
+	if limits["v2.cpu.max"] != "100000 100000" || limits["v2.memory.max"] != "536870912" {
+		t.Fatal(limits)
+	}
+	child := matrixLinuxResourceLimits(func(path string) string {
+		return map[string]string{
+			"/proc/self/cgroup":                 "0::/tenant/job",
+			"/sys/fs/cgroup/tenant/job/cpu.max": "max 100000",
+			"/sys/fs/cgroup/tenant/memory.max":  "536870912",
+			"/sys/fs/cgroup/cpu.max":            "200000 100000",
+		}[path]
+	})
+	if child["v2.self.cpu.max"] != "max 100000" || child["v2.ancestor1.memory.max"] != "536870912" || child["v2.ancestor2.cpu.max"] != "200000 100000" {
+		t.Fatal("lost exposed ancestor limits", child)
+	}
+	unsafeReads := []string{}
+	matrixLinuxResourceLimits(func(path string) string {
+		if path == "/proc/self/cgroup" {
+			return "0::/tenant/../../private"
+		}
+		unsafeReads = append(unsafeReads, path)
+		return ""
+	})
+	for _, path := range unsafeReads {
+		if !strings.HasPrefix(path, "/sys/fs/cgroup/") || strings.Contains(path, "private") {
+			t.Fatal("read outside conventional cgroup limits", path)
+		}
+	}
+	first := matrixEnvironment{Hardware: matrixHardware{ResourceLimits: limits}}
+	second := first
+	second.Hardware.ResourceLimits = map[string]string{"v2.cpu.max": "200000 100000", "v2.memory.max": "536870912"}
+	if sameMatrixEnvironment(first, second) {
+		t.Fatal("resource quota drift accepted")
 	}
 }
 

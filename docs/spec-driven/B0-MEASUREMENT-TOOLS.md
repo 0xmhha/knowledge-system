@@ -148,7 +148,9 @@ bin/cks eval matrix --requests /private/tmp/b0-requests.json \
 
 명령은 개발 입력의 실행 형태다. 최종 입력은 실제 사람 승인과 동결 후 사용한다. 기본 반복 수는 기존 matrix 계약을 유지한다. `--environment-ledger`를 생략하면 기존 경로를 유지하며 `--environment-note`는 이 플래그와 함께 사용한다.
 
-조회 전에 CPU 신원·보이는 논리 CPU 수·RAM·OS, load·memory/swap·thermal 상태와 숫자로만 된 process 압력을 관측한다. 프로세스의 이름·인자·환경 변수는 보관하지 않는다. query/SDK 세션 종료와 입력 감사 후 같은 정보를 다시 기록한다. macOS arm64에서 실제 실행을 검증했고 Linux 수집 경로의 실제 호스트 재검증은 남아 있다. thermal 정보는 선택형이며 필수 환경 정보를 얻지 못하면 partial로 남기고 조회를 시작하지 않는다.
+조회 전에 CPU 신원·보이는 논리 CPU 수·RAM·OS, load·memory/swap·thermal 상태와 숫자로만 된 process 압력을 관측한다. 프로세스의 이름·인자·환경 변수는 보관하지 않는다. query/SDK 세션 종료와 입력 감사 후 같은 정보를 다시 기록한다. macOS arm64와 Go·ps 없는 Linux arm64 컨테이너에서 실제 실행을 검증했다. Linux amd64는 에뮬레이션 검증과 네이티브 호스트 검증을 구분한다. thermal 정보는 선택형이며 필수 환경 정보를 얻지 못하면 partial로 남기고 조회를 시작하지 않는다.
+
+Linux ARM의 `/proc/cpuinfo`에 `model name`/`Hardware`가 없으면 실제 implementer/architecture/variant/part/revision 식별자를 기록하며 제품명을 추정하지 않는다. `ps` 대신 `/proc/<pid>/stat`의 CPU lifetime 평균·RSS와 PID namespace에서 읽을 수 있는 프로세스 수를 사용한다. clock tick은 `getconf CLK_TCK`, RSS page 크기는 OS에서 읽으며 실패하면 임의 상수를 넣지 않는다. macOS의 `ps` 수치와 측정 창이 다르다. Linux CPU/RAM은 커널에 보이는 전체 값이고, 별도 `resource_limits`는 노출된 cgroup v2 self·상위 그룹 및 통상 v1/v2 mount root 값이다. 자원 제한 값의 전후 변경은 partial이다. 이 정보는 실제 가용량이나 자원 독점을 보증하지 않는다.
 
 Ollama는 데이터셋 신원의 모델·digest·차원·runtime context/batch에 설정을 대조하고, local loopback HTTP의 version/tags·strict native embed 1회·tags 재확인으로 실제 바이트와 차원을 검증한다. 이 프로브는 전후 각 1회이며 질의 시간·backend 카운터 밖이다. metadata GET은 3초, embed는 90초 상한이고 취소 문맥을 따른다. redirect와 원격/인증/추가 경로 endpoint를 거부한다. 선택 모델의 residency와 다른 resident 모델 개수만 보관한다. mock은 데이터셋 선언을 확인하며 기존 checksum 형태도 정확히 검증한다. ONNX/CoreML의 새 환경 프로브는 구현하지 않았고 기존 기본 matrix 경로는 유지한다.
 
@@ -157,3 +159,5 @@ Ollama는 데이터셋 신원의 모델·digest·차원·runtime context/batch�
 `--lock-file` 원문을 private `locked-inputs/`에 복사하고 원본/사본의 전후 SHA를 연결한다. 파일당 8 MiB 상한이며 출력 파일 권한은 0600, 디렉터리는 0700이다. 정답·프로토콜·동적 초안의 사본은 검색 요청에 전달하지 않으며 복사가 사실/프로토콜 승인으로 해석되지 않는다.
 
 2026-10-04 [환경 원장 재검증](../../system/eval/b0-knowledge-system/environment-ledger-m2max-2026-10-04/summary.json): mock/BGE-M3 각각 개발 제어 `alpha` 1개·24 SDK 응답·16 startup scope. 48개 응답은 기존 해당 모델 응답과 같았고 출처/integrity·정책·회전·실제 K/measurement 연결·입력 사본을 감사했다. 실제 모델 불일치는 0행·startup footprint 없음·partial로 보존했다. 초기 mock 신원 표현 불일치도 원자료를 남기고 호환을 보완했다. 이 반복은 독립 질문 표본을 늘리지 않으며 품질 지표는 null이다. 비심볼 Neighbors 실패 real 192/mock 24회는 기존 best-effort 범위로 그대로 보존했다.
+
+2026-10-04 [Linux 최소 런타임 원장](../../system/eval/b0-knowledge-system/linux-environment-m2max-2026-10-04/summary.json): ARM CPU 이름 부재·`ps` 미설치로 발생한 실제 환경 preflight 실패를 보존하고 수정했다. Linux arm64와 amd64 에뮬레이션에서 각각 3프로젝트·72 SDK 응답·48 startup scope, 1 CPU/512 MiB cgroup·mock64·이전 스냅샷 롤백 인용·파일/본문/줄/integrity·입력 사본·호출 연결을 검증했다. 재현 도구는 `scripts/wbs-linux-environment-smoke.py`다. Go·ps 없는 cgroup v2 최소 컨테이너와 빌드된 세 바이너리를 필요로 하며 기존 출력 디렉터리를 거부한다. 의미 저장소 미구성의 폴백 검증이며 공식 품질·네이티브 amd64·Linux 실모델 비용을 입증하지 않는다.
