@@ -1,0 +1,2855 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T17:08:40.609541Z",
+  "finished_at": "2026-10-03T17:08:43.152208Z",
+  "request_sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+  "config_sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56",
+  "binary_sha256": "bffdf7626ad037328b6828d17e142145efd4d94e853a01623e92fe491be43152",
+  "config_sha256_after": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56",
+  "binary_sha256_after": "bffdf7626ad037328b6828d17e142145efd4d94e853a01623e92fe491be43152",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "alpha",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "0216bc9b93e14b9f27b042f55606fbf8",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "alpha",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 255393459,
+        "completed_at": "2026-10-04T02:08:42.194641+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              },
+              {
+                "file": ".cks/knowledge/policies/public.yaml",
+                "start_line": 1,
+                "end_line": 12,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+                "content_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              },
+              {
+                "citation": {
+                  "file": ".cks/knowledge/policies/public.yaml",
+                  "start_line": 1,
+                  "end_line": 12,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+                  "content_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+                },
+                "text": "id: public\ntype: {pack_id: fixture.policy, local_id: business-policy}\nstatement: Synthetic public policy for runtime integration only.\nowner: fixture-owner\nscope: {subsystem: alpha}\neffective_from: \"2026-01-01\"\nstatus: verified\nreviewed_by: fixture-reviewer\nreview_reason: Synthetic branch coverage; not an operating fact approval.\nvisibility: public\nconflicts_with: []\nsource_ref: {origin_id: repo, path: .cks/knowledge/policies/public.yaml}\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "complete",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [
+                  {
+                    "id": "public",
+                    "state": "current",
+                    "reviewed_by": "fixture-reviewer",
+                    "effective_from": "2026-01-01",
+                    "citation": {
+                      "file": ".cks/knowledge/policies/public.yaml",
+                      "start_line": 1,
+                      "end_line": 12,
+                      "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "project_id": "ks-fixture",
+                      "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                      "source_mode": "committed",
+                      "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "origin_id": "repo",
+                      "file_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+                      "content_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+                    }
+                  }
+                ],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": []
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [
+                  {
+                    "id": "public",
+                    "state": "current",
+                    "citation": {
+                      "file": ".cks/knowledge/policies/public.yaml",
+                      "start_line": 1,
+                      "end_line": 12,
+                      "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "project_id": "ks-fixture",
+                      "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                      "source_mode": "committed",
+                      "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "origin_id": "repo",
+                      "file_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+                      "content_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+                    }
+                  }
+                ],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  },
+                  {
+                    "file": ".cks/knowledge/policies/public.yaml",
+                    "start_line": 1,
+                    "end_line": 12,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+                    "content_sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+                  }
+                ],
+                "unknowns": [
+                  "no_reviewed_applicable_decision",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "733f40c525c9c6f3b787d9b5537de3aa9e880aa41717a7899b6677e3b96f8a35"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "wrong-scope",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "69ddc4c6633eb1ea262306bcc64aa4ab",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "wrong-scope",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 186953250,
+        "completed_at": "2026-10-04T02:08:42.381974+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "unknown",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_reviewed_applicable_policy",
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": []
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  }
+                ],
+                "unknowns": [
+                  "no_reviewed_applicable_policy",
+                  "no_reviewed_applicable_decision",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "99dcdd499500a0313f70d110be41ad31ac02cf3ecf5c1d399bc871702558f02f"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "proposed",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "407cd590c4df895f66ee1c36ddc407e5",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "proposed",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 198786417,
+        "completed_at": "2026-10-04T02:08:42.580987+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "unknown",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_reviewed_applicable_policy",
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": []
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  }
+                ],
+                "unknowns": [
+                  "no_reviewed_applicable_policy",
+                  "no_reviewed_applicable_decision",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "99dcdd499500a0313f70d110be41ad31ac02cf3ecf5c1d399bc871702558f02f"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "expired",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "d903d6f167723fd3a6bcc2a35e01fb21",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "expired",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 191888583,
+        "completed_at": "2026-10-04T02:08:42.773092+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "stale",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_current_policy",
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": []
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  }
+                ],
+                "unknowns": [
+                  "no_current_policy",
+                  "no_reviewed_applicable_decision",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "07a8f975829f19ca96387e9e8ae14461d60860047bd2bca61c029b97f3297aa4"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "restricted",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "15589d02b9feababedd1f0a3095c860e",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "restricted",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 159452042,
+        "completed_at": "2026-10-04T02:08:42.932763+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "restricted",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": []
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  }
+                ],
+                "unknowns": [
+                  "no_reviewed_applicable_decision",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "6f42f659ccd475ce8c5dc1079978017cc65057db9b0b158db952a15157335363"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "conflict",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "3a0a5dd1db3c45d3b99c59c12e539b41",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "conflict",
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 193189917,
+        "completed_at": "2026-10-04T02:08:43.126209+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+              "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+              "source_mode": "committed",
+              "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "main.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 5,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+              },
+              {
+                "file": "README.md",
+                "start_line": 6,
+                "end_line": 7,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+              },
+              {
+                "file": ".cks/knowledge/policies/conflict-a.yaml",
+                "start_line": 1,
+                "end_line": 12,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+                "content_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86"
+              },
+              {
+                "file": ".cks/knowledge/policies/conflict-b.yaml",
+                "start_line": 1,
+                "end_line": 12,
+                "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "project_id": "ks-fixture",
+                "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "source_mode": "committed",
+                "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "origin_id": "repo",
+                "file_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+                "content_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 5,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                },
+                "text": "func Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 5,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                },
+                "text": "package ksfixture\n\nfunc Alpha() string { return \"alpha\" }\n\nfunc Beta() string { return Alpha() }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 6,
+                  "end_line": 7,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                },
+                "text": "## Beta\nBeta calls Alpha.\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                },
+                "text": "# Fixture\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                },
+                "text": "package ksfixture\n"
+              },
+              {
+                "citation": {
+                  "file": ".cks/knowledge/policies/conflict-a.yaml",
+                  "start_line": 1,
+                  "end_line": 12,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+                  "content_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86"
+                },
+                "text": "id: conflict-a\ntype: {pack_id: fixture.policy, local_id: business-policy}\nstatement: Synthetic conflict-a policy for runtime integration only.\nowner: fixture-owner\nscope: {subsystem: conflict}\neffective_from: \"2026-01-01\"\nstatus: verified\nreviewed_by: fixture-reviewer\nreview_reason: Synthetic branch coverage; not an operating fact approval.\nvisibility: public\nconflicts_with: [\"conflict-b\"]\nsource_ref: {origin_id: repo, path: .cks/knowledge/policies/conflict-a.yaml}\n"
+              },
+              {
+                "citation": {
+                  "file": ".cks/knowledge/policies/conflict-b.yaml",
+                  "start_line": 1,
+                  "end_line": 12,
+                  "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                  "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                  "source_mode": "committed",
+                  "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                  "origin_id": "repo",
+                  "file_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+                  "content_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270"
+                },
+                "text": "id: conflict-b\ntype: {pack_id: fixture.policy, local_id: business-policy}\nstatement: Synthetic conflict-b policy for runtime integration only.\nowner: fixture-owner\nscope: {subsystem: conflict}\neffective_from: \"2026-01-01\"\nstatus: verified\nreviewed_by: fixture-reviewer\nreview_reason: Synthetic branch coverage; not an operating fact approval.\nvisibility: public\nconflicts_with: [\"conflict-a\"]\nsource_ref: {origin_id: repo, path: .cks/knowledge/policies/conflict-b.yaml}\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": {
+              "knowledge_context": {
+                "state": "conflict",
+                "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15",
+                "applicable_policies": [
+                  {
+                    "id": "conflict-a",
+                    "state": "current",
+                    "reviewed_by": "fixture-reviewer",
+                    "effective_from": "2026-01-01",
+                    "citation": {
+                      "file": ".cks/knowledge/policies/conflict-a.yaml",
+                      "start_line": 1,
+                      "end_line": 12,
+                      "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "project_id": "ks-fixture",
+                      "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                      "source_mode": "committed",
+                      "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "origin_id": "repo",
+                      "file_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+                      "content_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86"
+                    }
+                  },
+                  {
+                    "id": "conflict-b",
+                    "state": "current",
+                    "reviewed_by": "fixture-reviewer",
+                    "effective_from": "2026-01-01",
+                    "citation": {
+                      "file": ".cks/knowledge/policies/conflict-b.yaml",
+                      "start_line": 1,
+                      "end_line": 12,
+                      "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "project_id": "ks-fixture",
+                      "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                      "source_mode": "committed",
+                      "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                      "origin_id": "repo",
+                      "file_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+                      "content_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270"
+                    }
+                  }
+                ],
+                "decisions": [],
+                "relations": [],
+                "constraints": [],
+                "related_requirements": [],
+                "test_links": [],
+                "unknowns": [
+                  "no_reviewed_applicable_decision"
+                ],
+                "conflicts": [
+                  {
+                    "left_id": "conflict-a",
+                    "right_id": "conflict-b",
+                    "reason": "explicit_verified_policy_conflict"
+                  }
+                ]
+              },
+              "coding_context": {
+                "implemented_behavior": [],
+                "required_behavior": [],
+                "rationale": [],
+                "constraints": [],
+                "evidence": [
+                  {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "a810ea5a9ce4c471e87454f8c30f2d3bb5bbd67b6743946750dde5821615ddb6"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 3,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 6,
+                    "end_line": 7,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "cacb181c351b813c1db36f05a9c9dd8a269b184afd57d7699b0a5ac7ea37a8e2"
+                  },
+                  {
+                    "file": "README.md",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                    "content_sha256": "3261bb17793b7f8a4c78e22663aac9807cc8b0b08cd28aeda36dddf44a79073d"
+                  },
+                  {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                    "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                  },
+                  {
+                    "file": "main.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                    "content_sha256": "799e6d61e1ed95f3b0e0cafd02d12e43a0a562cf5b70d4d2f0ff3ba98075c1c6"
+                  },
+                  {
+                    "file": ".cks/knowledge/policies/conflict-a.yaml",
+                    "start_line": 1,
+                    "end_line": 12,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+                    "content_sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86"
+                  },
+                  {
+                    "file": ".cks/knowledge/policies/conflict-b.yaml",
+                    "start_line": 1,
+                    "end_line": 12,
+                    "commit_hash": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338",
+                    "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                    "source_mode": "committed",
+                    "base_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                    "origin_id": "repo",
+                    "file_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+                    "content_sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270"
+                  }
+                ],
+                "unknowns": [
+                  "no_reviewed_applicable_decision",
+                  "conflicting_policies_require_review",
+                  "implementation_link_unverified"
+                ]
+              }
+            },
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "fef16ca5eb858d7819110fc50fe712be9b012956574e5ee8d7d947763c010f41"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

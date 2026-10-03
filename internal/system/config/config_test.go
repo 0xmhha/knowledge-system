@@ -223,3 +223,31 @@ func TestConfig_Load_MissingFile(t *testing.T) {
 		t.Errorf("error = %v, want 'read' context", err)
 	}
 }
+
+func TestRecallKConfigBoundsAndDefault(t *testing.T) {
+	for _, k := range []int{0, 1, 10, 20, 1000} {
+		cfg := Default()
+		cfg.Retrieval.RecallK = k
+		if err := cfg.Validate(); err != nil {
+			t.Fatalf("k=%d: %v", k, err)
+		}
+		want := k
+		if want == 0 {
+			want = 20
+		}
+		if cfg.Retrieval.EffectiveRecallK() != want {
+			t.Fatal("wrong effective K")
+		}
+	}
+	for _, k := range []int{-1, 1001} {
+		cfg := Default()
+		cfg.Retrieval.RecallK = k
+		if cfg.Validate() == nil {
+			t.Fatalf("accepted k=%d", k)
+		}
+	}
+	var cfg *Config
+	if cfg.Validate() == nil {
+		t.Fatal("nil config accepted")
+	}
+}

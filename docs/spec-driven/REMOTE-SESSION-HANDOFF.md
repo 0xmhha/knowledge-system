@@ -57,3 +57,5 @@
 2026-10-04 호출 원장 독립 재감사: v2 106응답·116개 요청 scope·12개 실모델 응답 동등성 확인. 성공 응답 안의 비치명 오류도 보존했다. `<convention>` 합성 지식 경로가 BM25 후보로 전달되는 기존 FTS 문법 오류를 읽기 전용으로 재현했고, 작업리스트 FIX-07로 별도 수정한다. README/header의 그래프 노드 부재는 best-effort 확장 실패다. 계측 구현 통과를 모든 내부 호출 성공으로 판정하지 않는다.
 
 2026-10-04 FIX-07 수정 후 검증: broad recall의 invariant/convention 청크를 코드 검색어로 사용하지 않도록 수정했다. 지식 증거·별도 pass·raw K/필터를 유지했고, 같은 실모델 데이터셋의 8경로 48개 전체 SDK 응답은 수정 전과 같았다. BM25 오류 96→0, 출처/integrity·정책 상태·DB 무변경 재감사 통과. 문서/header의 비심볼 Neighbors 실패는 보존했다. [수정 원장](../../system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04.json). 공식 품질은 미판정이며 다음 작업은 arm 회전과 승인 K 적용 경로다.
+
+2026-10-04 공유 K 설정 후속: `retrieval.recall_k`가 raw/concept-text에 같은 값으로 전달된다. 실모델 8경로 48요청 K10과 기본 v1/v2·폴백 20요청 K20을 호출 원장으로 확인했고 knowledge pass K6·Stage2 cap30을 유지했다. [원장](../../system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04.json). 공식 프로토콜은 여전히 사람 검토 대기이며 다음 독립 작업은 arm 순서 회전·공식 입력/하드웨어 원장이다.

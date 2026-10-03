@@ -14,7 +14,7 @@ import (
 
 func TestOntologyOptionsAreOptInAndMissingInputFallsBack(t *testing.T) {
 	for _, mode := range []string{"", "off", "baseline"} {
-		if len(ontologyOptions(config.SemanticConfig{OntologyMode: mode}, "", "", nil)) != 0 {
+		if len(ontologyOptions(config.SemanticConfig{OntologyMode: mode}, "", "", nil, config.RetrievalConfig{}.EffectiveRecallK())) != 0 {
 			t.Fatalf("%s enabled ontology", mode)
 		}
 	}
@@ -24,7 +24,7 @@ func TestOntologyOptionsAreOptInAndMissingInputFallsBack(t *testing.T) {
 		if err := cfg.Validate(); err != nil {
 			t.Fatal(err)
 		}
-		if len(ontologyOptions(cfg.Semantic, "", "", nil)) != 2 {
+		if len(ontologyOptions(cfg.Semantic, "", "", nil, config.RetrievalConfig{}.EffectiveRecallK())) != 2 {
 			t.Fatal("text arm not connected")
 		}
 	}
@@ -32,7 +32,7 @@ func TestOntologyOptionsAreOptInAndMissingInputFallsBack(t *testing.T) {
 	if _, err := p.Resolve(context.Background()); !errors.Is(err, stage2.ErrOntologyUnavailable) {
 		t.Fatal("missing store/version must fall back")
 	}
-	if len(ontologyOptions(config.SemanticConfig{OntologyMode: "relations"}, "", "", nil)) != 1 {
+	if len(ontologyOptions(config.SemanticConfig{OntologyMode: "relations"}, "", "", nil, config.RetrievalConfig{}.EffectiveRecallK())) != 1 {
 		t.Fatal("relations not connected")
 	}
 	for _, mode := range []string{"typo"} {

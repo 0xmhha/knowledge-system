@@ -127,7 +127,11 @@ def main():
     parser.add_argument('--ollama-url', default='http://127.0.0.1:11434')
     parser.add_argument('--pack-matrix', action='store_true', help='eight v2 arms with synthetic policy safety controls')
     parser.add_argument('--measure-backends', action='store_true', help='record actual logical client calls in opt-in footprint logs')
+    parser.add_argument('--recall-k', type=int, default=0, help='shared raw/concept-text top-K; 0 preserves 20')
     args = parser.parse_args()
+    if not 0 <= args.recall_k <= 1000:
+        parser.error('--recall-k must be 0..1000')
+    recall_k = args.recall_k or 20
     root = Path(__file__).resolve().parent.parent
     # These are compiled defaults, not telemetry. Pin their source contract
     # so a changed runtime cannot silently reuse a mislabeled experiment.
@@ -135,8 +139,9 @@ def main():
     for file, pattern in [
         ('internal/system/composer/stage1/extractor.go', r'DefaultInitialK\s*=\s*20\b'),
         ('internal/system/composer/stage2/searcher.go', r'DefaultMaxCitations\s*=\s*30\b'),
-        ('cmd/cks/mcpcli/ontology.go', r'WithOntologyTextSearch\(ckv, stage1.DefaultInitialK,'),
-        ('cmd/cks/mcpcli/serve.go', r'stage1.New\(ckv, ckg, stage1Opts\.\.\.\)'),
+        ('cmd/cks/mcpcli/ontology.go', r'WithOntologyTextSearch\(ckv, recallK,'),
+        ('cmd/cks/mcpcli/serve.go', r'stage1Config.InitialK = recallK'),
+        ('internal/system/config/config.go', r'func \(c RetrievalConfig\) EffectiveRecallK\(\) int'),
     ]:
         raw = (root / file).read_bytes()
         assert re.search(pattern, raw.decode()), 'runtime settings contract changed: ' + file
@@ -242,9 +247,9 @@ def main():
     locked_sha = {str(f): hashlib.sha256(f.read_bytes()).hexdigest() for f in locked_files}
     matrix = {'schema_version': 1, 'state': 'capturing', 'diagnostic_only': True, 'quality_metrics': None,
               'binary_sha256': binary_sha, 'coordinates': identity, 'embedding_identity': identity['embedding_identity'],
-              'settings': {'raw_recall_k': 20, 'stage2_candidate_cap': 30, 'knowledge_pass_k': 6,
+              'settings': {'raw_recall_k': recall_k, 'stage2_candidate_cap': 30, 'knowledge_pass_k': 6,
                            'raw_search_filter': {}, 'bm25_rerank': True, 'ontology_budget_ms': 5000},
-              'settings_evidence': 'compiled default source contract; not per-call backend telemetry',
+              'settings_evidence': 'explicit recall config and default source contract; per-call telemetry when enabled',
               'settings_sources_sha256': settings_sources, 'input_file_sha256': input_hashes,
               'sizes': {'input_files': len(input_hashes),
                         'input_bytes': sum((source / name).stat().st_size for name in input_hashes),
@@ -276,6 +281,8 @@ def main():
                 lines.append('    measure_backend_calls: true')
             if line.lstrip().startswith('store_path:'):
                 lines.extend(['    ontology_mode: ' + mode, '    ontology_budget_ms: 5000'])
+        if args.recall_k:
+            lines.extend(['retrieval:', '    recall_k: ' + str(args.recall_k)])
         config.write_text('\n'.join(lines) + '\n')
         capture = out / (arm + '.json')
         run('capture-' + arm, [cks, 'eval', 'capture', '--requests', requests, '--config', config,
@@ -343,7 +350,7 @@ def main():
                 searches = [c for c in calls if c['method'] == 'semantic_search']
                 raw = [c for c in searches if not c['options']['Filter']['ChunkKinds']]
                 knowledge = [c for c in searches if c['options']['Filter']['ChunkKinds']]
-                assert raw and all(c['options']['K'] == 20 and c['options']['BM25Rerank'] for c in raw)
+                assert raw and all(c['options']['K'] == recall_k and c['options']['BM25Rerank'] for c in raw)
                 assert len(knowledge) == 1 and knowledge[0]['options']['K'] == 6
                 assert knowledge[0]['options']['Filter']['ChunkKinds'] == ['invariant', 'convention']
                 assert any(c['method'] == 'neighbors' for c in calls)

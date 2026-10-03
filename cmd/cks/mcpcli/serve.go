@@ -257,8 +257,8 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		composerCtx, startupScope = measurements.Begin(ctx, "", "startup.intent_anchors")
 	}
 	c, err := buildComposer(composerCtx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp,
-		cfg.Semantic.OntologyMode != "",
-		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot, be.ckv)...)
+		cfg.Semantic.OntologyMode != "", cfg.Retrieval.EffectiveRecallK(),
+		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot, be.ckv, cfg.Retrieval.EffectiveRecallK())...)
 	if startupScope != nil {
 		outcome := "returned"
 		if err != nil {
@@ -581,13 +581,16 @@ func buildComposer(
 	vocabResolver *vocab.Resolver,
 	fp *footprint.Logger,
 	rawQueryFirst bool,
+	recallK int,
 	stage2Options ...stage2.Option,
 ) (*composer.Composer, error) {
 	ic, err := intent.New(ctx, embedder, intent.WithFootprint(fp))
 	if err != nil {
 		return nil, fmt.Errorf("intent.New: %w", err)
 	}
-	stage1Opts := []stage1.Option{stage1.WithFootprint(fp)}
+	stage1Config := stage1.DefaultConfig()
+	stage1Config.InitialK = recallK
+	stage1Opts := []stage1.Option{stage1.WithFootprint(fp), stage1.WithConfig(stage1Config)}
 	if rawQueryFirst {
 		stage1Opts = append(stage1Opts, stage1.WithRawQueryFirst())
 	}

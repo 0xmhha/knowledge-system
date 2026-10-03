@@ -11,7 +11,6 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
-	"github.com/0xmhha/knowledge-system/internal/system/composer/stage1"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/config"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
@@ -23,7 +22,7 @@ type retainedOntologyProvider struct {
 	initialError                      error
 }
 
-func ontologyOptions(cfg config.SemanticConfig, versionDir, sourceRoot string, ckv ckvclient.Client) []stage2.Option {
+func ontologyOptions(cfg config.SemanticConfig, versionDir, sourceRoot string, ckv ckvclient.Client, recallK int) []stage2.Option {
 	if cfg.OntologyMode != "relations" && cfg.OntologyMode != "concept_text" && cfg.OntologyMode != "combined" {
 		return nil
 	}
@@ -42,7 +41,7 @@ func ontologyOptions(cfg config.SemanticConfig, versionDir, sourceRoot string, c
 	}
 	opts := []stage2.Option{stage2.WithOntologyProvider(p, 0.2, time.Duration(budget)*time.Millisecond)}
 	if cfg.OntologyMode == "concept_text" || cfg.OntologyMode == "combined" {
-		opts = append(opts, stage2.WithOntologyTextSearch(ckv, stage1.DefaultInitialK, cfg.OntologyMode == "combined"))
+		opts = append(opts, stage2.WithOntologyTextSearch(ckv, recallK, cfg.OntologyMode == "combined"))
 	}
 	return opts
 }

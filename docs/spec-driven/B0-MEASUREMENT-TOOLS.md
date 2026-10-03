@@ -97,3 +97,19 @@ go build -o /private/tmp/b0-vector-probe ./cmd/b0-vector-probe
 실제 pinned BGE-M3 v2 재생에서 EOF 개행을 추가 인용 줄로 센 CKV 생성기 오류를 발견했다. 수정 전 실패 시험과 `source_missing` 5응답을 보존했다. file_header/file_full에서 마지막 개행의 sentinel을 제외하도록 수정하고 동일 소스/모델로 새 데이터셋을 생성했다. 수정 후 v2 5응답, 25본문의 실제 줄·원문 SHA·좌표·sha256-v2를 검증했다. 실제 프로브도 pinned 좌표·exact 일치·DB/manifest 무변경을 확인했다. 이 실행은 Go 검사와 겹친 진단이며 공식 latency가 아니다. 기존 전체 코퍼스의 v2 인용 유효성을 대신 증명하지 않는다. 실패/후속 전체 Go·race·vet·경계·문서 및 원응답은 [measurement-tools-m2max-2026-10-03.json](../../system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03.json)에 해시로 연결했다.
 
 2026-10-04 FIX-07 수정 후 검증: broad recall의 invariant/convention 청크를 코드 검색어로 사용하지 않도록 수정했다. 지식 증거·별도 pass·raw K/필터를 유지했고, 같은 실모델 데이터셋의 8경로 48개 전체 SDK 응답은 수정 전과 같았다. BM25 오류 96→0, 출처/integrity·정책 상태·DB 무변경 재감사 통과. 문서/header의 비심볼 Neighbors 실패는 보존했다. [수정 원장](../../system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04.json). 공식 품질은 미판정이며 다음 작업은 arm 회전과 승인 K 적용 경로다.
+
+
+## 공유 recall K 설정 경로
+
+```yaml
+retrieval:
+    recall_k: 10
+```
+
+생략/0은 기존 raw/concept-text K20을 유지하고 1..1000의 요청 상한을 허용한다. 이 값은 Stage 1 각 recall과 선택형 concept_text/combined 검색에 같이 전달한다. Stage 2 union 후보 cap30, CKG keyword별 K, 별도 knowledge pass K6과는 다르다. 기본 생성 YAML에는 새 필드를 출력하지 않는다. `--recall-k`가 추가된 합성 스모크는 설정 값과 실제 호출 원장을 함께 확인한다.
+
+```sh
+python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix --measure-backends --recall-k 10 --embedder ollama --out /private/tmp/ks-recall-k10-real-20261004
+```
+
+실모델 8경로 48요청에서 raw/text K10과 knowledge K6을 확인했고, 설정 생략의 기존 v1/v2·오류 폴백 20요청은 K20을 유지했다. 설정 범위/기본 YAML, composer의 실제 raw 호출·별도 지식 예산, v2 출처/integrity·정책·보존 DB를 검사했다. [원장](../../system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04.json). 이는 연결 경로 진단이며 초안 K10/프로토콜 승인이나 공식 Recall@10·지연 통과가 아니다. 공식 실행에서 승인된 K를 선택하고 arm 순서를 회전해야 한다.

@@ -46,23 +46,38 @@ type Config struct {
 	Name string `yaml:"name"`
 	// Description is optional human-facing metadata (e.g. "go-stablenet pr-77-2
 	// flow index") surfaced in cks.ops.health alongside Name.
-	Description string         `yaml:"description"`
-	Backends    BackendsConfig `yaml:"backends"`
-	Listen      ListenConfig   `yaml:"listen"`
-	Logging     LoggingConfig  `yaml:"logging"`
-	Sanitize    SanitizeConfig `yaml:"sanitize"`
-	Vocab       VocabConfig    `yaml:"vocab"`
-	Domain      DomainConfig   `yaml:"domain"`
-	Semantic    SemanticConfig `yaml:"semantic"`
-	Service     ServiceConfig  `yaml:"service"`
+	Description string          `yaml:"description"`
+	Backends    BackendsConfig  `yaml:"backends"`
+	Listen      ListenConfig    `yaml:"listen"`
+	Logging     LoggingConfig   `yaml:"logging"`
+	Sanitize    SanitizeConfig  `yaml:"sanitize"`
+	Vocab       VocabConfig     `yaml:"vocab"`
+	Domain      DomainConfig    `yaml:"domain"`
+	Semantic    SemanticConfig  `yaml:"semantic"`
+	Service     ServiceConfig   `yaml:"service"`
+	Retrieval   RetrievalConfig `yaml:"retrieval,omitempty"`
+}
+
+// RetrievalConfig pins the shared top-K for raw recall and optional concept
+// text searches. Zero preserves the historical top-K of 20. It does not
+// change the Stage-2 union cap or the separate knowledge-pass budget.
+type RetrievalConfig struct {
+	RecallK int `yaml:"recall_k,omitempty"`
+}
+
+func (c RetrievalConfig) EffectiveRecallK() int {
+	if c.RecallK == 0 {
+		return 20
+	}
+	return c.RecallK
 }
 
 // SemanticConfig enables reviewed external trace paths for the optional v2
 // knowledge response. Empty StorePath preserves the earlier v2 behavior.
 type SemanticConfig struct {
 	StorePath string `yaml:"store_path"`
-	// OntologyMode is off by default. Only the implemented relations arm is
-	// accepted; unfinished experiment arms cannot silently run as baseline.
+	// OntologyMode is off by default. Explicit modes select baseline,
+	// concept_text, relations or combined; unknown arms are rejected.
 	OntologyMode     string `yaml:"ontology_mode,omitempty"`
 	OntologyBudgetMS int    `yaml:"ontology_budget_ms,omitempty"`
 }
@@ -300,6 +315,9 @@ func LoadBytes(data []byte) (*Config, error) {
 func (c *Config) Validate() error {
 	if c == nil {
 		return fmt.Errorf("config: nil")
+	}
+	if c.Retrieval.RecallK < 0 || c.Retrieval.RecallK > 1000 {
+		return errors.New("config: retrieval.recall_k must be 0 (default 20) or 1..1000")
 	}
 	if c.Version != configVersion {
 		return fmt.Errorf("config: version=%d, want %d", c.Version, configVersion)
