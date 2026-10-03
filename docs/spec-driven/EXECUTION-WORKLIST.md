@@ -148,7 +148,7 @@ B0-06의 응답 수집·직접 검색 오라클과 합성 8경로의 입력/설�
 |---|---|---|---|
 | FIX-07 | P1 · B0-06 재감사 | real 48요청의 BM25 오류 96회는 합성 `/<convention>` 경로에서 만든 `<convention>` 후보가 FTS 문법으로 해석되기 때문. knowledge chunk를 코드 심볼 후보로 취급하지 않도록 경계를 정하고 실패 전/후 회귀·실모델 재현을 확인한다. 기존 원자료는 보존한다. | 수정 후 재검증 완료: 수정 전 실패/후 통과, real 8경로 48응답 바이트 동일·BM25 오류 96→0·보존 입력 무변경 |
 | FIX-08 | P1 · C1-05 재감사 | host package가 로컬 Solidity grammar 두 LICENSE를 누락. 수집·소스 SHA 원장과 독립/설치 후 검증기에 고지 검사를 추가하고, 정상/이전 형식·원장 불일치 재서명 패키지를 검증한다. | 수정 후 재검증 완료: 이전 Go 검증기 수락 실패 보존, 수정 후 Python/Go 거부·이전 형식 통과; 실제 세 바이너리의 고지·시험 서명·세 독립 저장소 설치 통과. 전체 라이선스 적합성은 미판정 |
-| FIX-09 | P1 · 패키지 재감사 | 같은 코드의 두 host preview가 `modules.txt`에 임시 staging 경로를 넣어 archive SHA가 달라짐. build info의 바이너리 표시 경로를 일정하게 만들고 동일 코드/바이너리로 두 번 패키징하여 전체 파일과 archive SHA를 대조한다. | 발견·다음 수정: FIX-08 시험/설치 archive의 다른 파일 SHA는 모두 같고 `modules.txt`만 다름 |
+| FIX-09 | P1 · 패키지 재감사 | 같은 코드의 두 host preview가 `modules.txt`에 임시 staging 경로를 넣어 archive SHA가 달라짐. build info의 바이너리 표시 경로를 일정하게 만들고 동일 코드/바이너리로 두 번 패키징하여 전체 파일과 archive SHA를 대조한다. | 수정 후 재검증 완료: 실제 Go build info를 상대 바이너리명으로 출력; 두 번 빌드/패키징한 52개 파일 SHA·크기·모드와 전체 archive SHA 일치; 동일 시험 sidecar로 두 archive를 Python/Go 모두 검증 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -168,3 +168,5 @@ B0-06의 응답 수집·직접 검색 오라클과 합성 8경로의 입력/설�
 2026-10-04 C1-05 독립 준비: [출시 검토 자료](./C1-REVIEW-PREPARATION.md)의 28개 연결 모듈 원문·누락 0·해시 검증과 현재 머신 snapshot을 수집했다. native 자산의 비-root 고지·운영 서명 정책·적합성 사람 판정은 남아 있다. 운영 키/출시 상태를 바꾸지 않았고 C1-05는 진행 상태다.
 
 2026-10-04 FIX-08/C1-05 후속: [native 고지 패키지 원장](../../system/eval/b0-knowledge-system/native-license-packaging-m2max-2026-10-04/summary.json). macOS arm64 세 바이너리 연결 35개 모듈의 root 고지 41개와 로컬 Solidity grammar 2개 고지, 소스 8개 SHA를 수집·원문 대조했다. 시험 서명·정상/변조/이전 형식·설치 스모크를 재검증했다. 첫 28개 목록은 당시 `cks`만의 build info이며 새 세 바이너리 패키지 목록과 범위를 구분한다. FIX-08은 여덟 번째 구조 수정이고 공식 C0/C1 품질·운영 출시를 완료하지 않는다. 다음 독립 우선순위는 B0-06의 공식 입력/환경 원장 준비와 나머지 native 고지 범위 감사다.
+
+2026-10-04 FIX-09: [패키지 재현성 원장](../../system/eval/b0-knowledge-system/package-reproducibility-m2max-2026-10-04/summary.json). 수정 전 두 archive의 고지·바이너리·manifest 등은 같고 Go build info의 임시 경로만 달랐다. 수정 후 같은 `19fad138`+dirty 상태의 두 순차 패키지는 52개 파일과 archive SHA가 같았다. 실제 linked build info를 유지하며 출력 머리글만 `ckg`/`ckv`/`cks`로 일정하게 했다. 같은 시험 서명 sidecar를 두 archive에 적용하여 Python/Go 검증을 모두 통과했다. 서로 다른 도구 체인/플랫폼의 빌드 재현성까지 판정하지 않는다. FIX-08 설치 원장에 등재된 합성 `.log` 21개는 일반 로그 제외 규칙의 누락을 확인하여 명시적으로 Git 보존한다. 이 두 수정 뒤에도 공식 B0/B1/C0/C1은 승인·실모델 품질·운영 판정이 남아 있다.

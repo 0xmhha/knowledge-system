@@ -1,0 +1,33 @@
+setup: --version auto resolved to f2dcbdbb
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-04T03:20:28.990+09:00 level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-04T03:20:28.991+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-04T03:20:29.111+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=2 changed_in_edges=0 blame_edges=0 hunk_edges=2 hunk_blobs=2 max_per_file=10
+    time=2026-10-04T03:20:29.156+09:00 level=INFO msg="build complete" nodes=3 edges=2 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 3 nodes / 2 edges into /private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-04T03:20:29.174+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=b8fe036d3da314ac run_id=7ebbb25308d2f06e important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-326193692/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0
+    time=2026-10-04T03:20:29.174+09:00 level=INFO msg=ckv event=build.start trace_id=fd25c381789a42d1 run_id=7ebbb25308d2f06e src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-326193692/tree out_dir=/private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-04T03:20:29.191+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=e6f9ab7afb5af45e run_id=7ebbb25308d2f06e ckg_path=/private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb/graph files_indexed=0 entries=0 canonical_available=true
+    ckv: 1/1 files (479.5 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-04T03:20:29.200+09:00 level=INFO msg=ckv event=build.done trace_id=fd25c381789a42d1 run_id=7ebbb25308d2f06e latency_ms=26 chunks_flow_spine=0 chunks_doc=1 policy_loaded=false db_sha256=c04c20d4e01609998b0db2bb09cb247fea863eebe44676af907a361cdbd95d13 embedder_provider="" src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-326193692/tree files_indexed=1 chunks_total=1 category_counts=map[:1] chunks_canonical_id=0 chunks_flow_step=0 chunks_file_header=0 chunks_truncated=0 out_dir=/private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb/vector embedder=mock-feature-hash-v1 indexed_head=f2dcbdbb8f59809ea6d1a9fc4d0e79c235c5a397 languages=map[markdown:1] chunks_symbol=0
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=f2dcbdbb8f59809ea6d1a9fc4d0e79c235c5a397 built_at=2026-10-03T18:20:29Z db=/private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb/vector/vector.db sha256=c04c20d4e01609998b0db2bb09cb247fea863eebe44676af907a361cdbd95d13
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-native-license-20261004/install/installs/empty-go/dataset/f2dcbdbb to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current
