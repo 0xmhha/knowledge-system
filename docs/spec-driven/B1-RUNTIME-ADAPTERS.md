@@ -90,3 +90,5 @@ mock/BGE-M3 각각 8경로 × 6상태의 48요청을 검증했다. 공개 정책
 2026-10-04 FIX-07 수정 후 검증: broad recall의 invariant/convention 청크를 코드 검색어로 사용하지 않도록 수정했다. 지식 증거·별도 pass·raw K/필터를 유지했고, 같은 실모델 데이터셋의 8경로 48개 전체 SDK 응답은 수정 전과 같았다. BM25 오류 96→0, 출처/integrity·정책 상태·DB 무변경 재감사 통과. 문서/header의 비심볼 Neighbors 실패는 보존했다. [수정 원장](../../system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04.json). 공식 품질은 미판정이며 다음 작업은 arm 회전과 승인 K 적용 경로다.
 
 2026-10-04 공유 K 설정 후속: `retrieval.recall_k`가 raw/concept-text에 같은 값으로 전달된다. 실모델 8경로 48요청 K10과 기본 v1/v2·폴백 20요청 K20을 호출 원장으로 확인했고 knowledge pass K6·Stage2 cap30을 유지했다. [원장](../../system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04.json). 공식 프로토콜은 여전히 사람 검토 대기이며 다음 독립 작업은 arm 순서 회전·공식 입력/하드웨어 원장이다.
+
+2026-10-04 회전 캡처 도구 후속: `cks eval matrix`가 같은 기본 설정의 8개 경로를 순차 호출하고 시작 위치를 회전한다. mock/BGE-M3 각 288응답·36 group·56개 프로세스 시작, warm/cold 분리·기존 SDK 응답 동등성·출처/integrity/정책·K/옵션·모델/입력/HEAD/실행 비트 무변경을 독립 감사했다. 실제 SDK 초기화 실패의 typed-nil cold 패닉은 수정 전 실패/후 96 오류행 보존으로 검증했다. 원자료와 verifier 가정 수정 기록은 [회전 원장](../../system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04.json). 공식 품질/사람 판정과 B1-03 공식 실행은 대기이며 다음 독립 작업은 승인 입력·전체 환경 원장 연결과 C1 검토 자료다.

@@ -1,0 +1,23 @@
+--- FAIL: TestMatrixColdStartupTypedNilErrorNeverCallsSession (0.09s)
+panic: runtime error: invalid memory address or nil pointer dereference [recovered, repanicked]
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x0 pc=0x100d1b958]
+
+goroutine 24 [running]:
+testing.tRunner.func1.2({0x1012cb120, 0x1013dcc30})
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1977 +0x318
+panic({0x1012cb120?, 0x1013dcc30?})
+	/Users/kevin/.gvm/gos/go1.26.8/src/runtime/panic.go:860 +0x12c
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.(*matrixFake).Capture(0x1012d7360?, {0x6172626834a0?, 0x100e88a59?}, {{0x100ec0428, 0x1}, {0x617262282b40, 0x1b}, 0x6172626834a0})
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix_test.go:27 +0x48
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.matrixRunWithInputs({0x101346298, 0x10141b8c0}, {0x617262058480, 0x80}, {0x617262058500, 0x7c}, {0x617262058580, 0x79}, {0x617262058600, 0x79}, ...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix.go:433 +0x1c90
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.TestMatrixColdStartupTypedNilErrorNeverCallsSession(0x617262084908)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix_test.go:330 +0xb8
+testing.tRunner(0x617262084908, 0x10133e098)
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/knowledge-system/cmd/cks/evalcli	0.738s
+FAIL

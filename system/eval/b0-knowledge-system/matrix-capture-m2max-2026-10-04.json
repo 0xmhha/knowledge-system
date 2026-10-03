@@ -1,0 +1,660 @@
+{
+  "schema_version": 1,
+  "gate": "B0-06 eight-arm rotating capture implementation",
+  "state": "implementation_verified",
+  "quality_metrics": null,
+  "release": "preview",
+  "base_commit": "624efa89",
+  "working_changes": true,
+  "source_hashes": {
+    "cmd/cks/evalcli/matrix.go": "267498449b4a4823fba72b1dcffcad102843739d093550b53fa0b4f5a2a6893c",
+    "cmd/cks/evalcli/matrix_test.go": "59c4005604b89d77b9e34bf7a1120ef39e68862a17bb19423df6cb8aa0d59621",
+    "cmd/cks/evalcli/main.go": "1570a11d389a22cb4dce80179ebb3ea9ac44b001fb1d10b0243b822d02e1d705",
+    "internal/system/eval/capture.go": "47cab31f1691845a147fd606cffafb4bf5de7c0d8e3d5a3e523e8ed0defde929",
+    "internal/system/eval/runner.go": "e2a1249c6928d1588cf0eb7f4f4777908856f23ca20a5016f2e931d2433462ad",
+    "scripts/wbs-ontology-relations-smoke.py": "da58872d0a893390c2ce65e00a2ac3e4aabae616fd66158f00d8c66b6f0e52f5"
+  },
+  "commands": [
+    {
+      "label": "failure",
+      "command": [
+        "bin/cks",
+        "eval",
+        "matrix",
+        "--requests",
+        "/private/tmp/ks-matrix-requests-20261004.json",
+        "--config",
+        "/private/tmp/ks-recall-k10-real-20261004/baseline_off.yaml",
+        "--cks-mcp",
+        "/private/tmp/ks-matrix-stalled-mcp-20261004",
+        "--output",
+        "/private/tmp/ks-matrix-v2-init-failure-20261004",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "1",
+        "--call-timeout",
+        "50ms"
+      ],
+      "exit_code": 1,
+      "process_wall_seconds": 116.79085516696796,
+      "verification": "96 failure rows and unchanged inputs verified; initial whole-run <20s assertion was invalid because SDK Close has 2s graceful wait per failed process"
+    },
+    {
+      "label": "real",
+      "command": [
+        "bin/cks",
+        "eval",
+        "matrix",
+        "--requests",
+        "/private/tmp/ks-matrix-requests-20261004.json",
+        "--config",
+        "/private/tmp/ks-recall-k10-real-20261004/baseline_off.yaml",
+        "--output",
+        "/private/tmp/ks-matrix-v2-final-real-20261004",
+        "--warmup",
+        "1",
+        "--retrieval-runs",
+        "2",
+        "--warm-runs",
+        "2",
+        "--cold-runs",
+        "1"
+      ],
+      "exit_code": 0,
+      "process_wall_seconds": 162.59157462464646
+    },
+    {
+      "label": "mock",
+      "command": [
+        "bin/cks",
+        "eval",
+        "matrix",
+        "--requests",
+        "/private/tmp/ks-matrix-requests-20261004.json",
+        "--config",
+        "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off.yaml",
+        "--output",
+        "/private/tmp/ks-matrix-final-mock-20261004",
+        "--warmup",
+        "1",
+        "--retrieval-runs",
+        "2",
+        "--warm-runs",
+        "2",
+        "--cold-runs",
+        "1"
+      ],
+      "exit_code": 0,
+      "process_wall_seconds": 25.771091165952384
+    }
+  ],
+  "runtime": {
+    "real": {
+      "report": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/report.json",
+      "state": "captured",
+      "rows": 288,
+      "binary_sha256": "fef513633c384e4fa7535e0a3d9fc9ebdaea016c996c2e142ab7f65ba2b84083",
+      "rows_sha256": "95381018d309abe5c93e535ebfdd81ae8bb69f87a854bf831e8909c93ce182c4",
+      "dataset_identity": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+          "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "209316b5b3f45f6f9dbf3e05b769dae179e129d53968a82780e127579723967d",
+        "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338"
+      },
+      "input_and_config_sha_unchanged": true,
+      "groups": 36,
+      "source_integrity_policy_audit": 288
+    },
+    "mock": {
+      "report": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/report.json",
+      "state": "captured",
+      "rows": 288,
+      "binary_sha256": "fef513633c384e4fa7535e0a3d9fc9ebdaea016c996c2e142ab7f65ba2b84083",
+      "rows_sha256": "98261b5e0dd4a2d5dd682eea75f3f22333730f6e53eb035c47a66275055d31aa",
+      "dataset_identity": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+          "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "20ad5b62281448aba59e35b2ec6d86ed758cdaab24f9fbb828c6973f051ae94d",
+        "dataset_id": "7d2f7b63d8c09d82a9af2f9409e9f20f46940aaffa49594922eaa2c64081e0f3"
+      },
+      "input_and_config_sha_unchanged": true,
+      "groups": 36,
+      "source_integrity_policy_audit": 288
+    },
+    "init-failure": {
+      "report": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/report.json",
+      "state": "partial",
+      "rows": 96,
+      "binary_sha256": "93be81d539342bd01cdc6a918060416c4fa5b2f313b0cc019f02609125871716",
+      "rows_sha256": "e218de69b5b5bde2f47beb3776b06aa149cbd60339137df4442319149738979f",
+      "dataset_identity": {
+        "source": {
+          "project_id": "ks-fixture",
+          "source_mode": "committed",
+          "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+          "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "209316b5b3f45f6f9dbf3e05b769dae179e129d53968a82780e127579723967d",
+        "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338"
+      },
+      "input_and_config_sha_unchanged": true,
+      "groups": 12,
+      "source_integrity_policy_audit": null
+    }
+  },
+  "checks": [
+    {
+      "name": "all Go regression",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/go-test-all.txt"
+    },
+    {
+      "name": "eval CLI/SDK race",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/race.txt"
+    },
+    {
+      "name": "Go vet",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/vet.txt"
+    },
+    {
+      "name": "rotation/session/failure/typed-nil/output boundary tests",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/matrix-tests.txt"
+    },
+    {
+      "name": "independent 576 v2/source/integrity/policy/K/telemetry audit and 96 SDK failure rows",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/post-audit.txt"
+    },
+    {
+      "name": "documentation",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/docs.txt"
+    },
+    {
+      "name": "engine boundaries",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/boundaries.txt"
+    }
+  ],
+  "limitations": [
+    "Protocol/dynamic fixture/source coverage/semantic human review remains pending; no formal B0/B1/C0/C1 quality gate.",
+    "Synthetic six policy controls reused across phases; repetitions are not independent samples.",
+    "Counts 1 warmup/2 retrieval/2 warm/1 cold are structural diagnostics, not the unapproved draft official counts.",
+    "Models/hardware and all branches were not concurrently benchmarked; model residency is unchanged, not model-cold.",
+    "Logical client calls and nested HTTP attempts are separate; SQL/model internals are unmeasured.",
+    "Runtime records Go/OS/arch/logical CPUs; full official hardware/environment/concurrency ledger remains to be attached.",
+    "Input hashes/HEAD/modes are boundary checks and do not detect arbitrary transient external changes reverted between them.",
+    "Unresolvable non-symbol graph spans remain nonfatal and are preserved.",
+    "The first typed-nil panic and two verifier assumption corrections are retained; first-panic is a failed run, not completion."
+  ],
+  "model_digest_unchanged": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "artifact_inventory": [
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/boundaries.txt",
+      "bytes": 22,
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/commands.json",
+      "bytes": 1885,
+      "sha256": "a63117fa59f2676aef4c49acc0ad2120e1f14f0cbba28c2022d1c0599378f3c9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/docs.txt",
+      "bytes": 39,
+      "sha256": "5932c92b1d962cafa4f4e3d23f5873c23b5de5d729e1748da42137cc6bea4841"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/first-panic-stderr.txt",
+      "bytes": 1774,
+      "sha256": "65aaaa5f64fad4c353c5b0fc561a0576eae0f92bc3a4969270e6c79c4e228375"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/go-test-all.txt",
+      "bytes": 9364,
+      "sha256": "9b6c628e0da1181d8d9039b00de07e12248c9aff8bcfa2bf1202ec1ba4f86f30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/matrix-tests.txt",
+      "bytes": 63,
+      "sha256": "4515880aa387667121f75610bf752b685d5162f36aea886f01a4959f9e10d292"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/model-after.json",
+      "bytes": 1906,
+      "sha256": "45cc449ce2fc2bf261a67be29d015c559916aca52491ffec231d0d82316ca350"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/model-before.json",
+      "bytes": 1906,
+      "sha256": "45cc449ce2fc2bf261a67be29d015c559916aca52491ffec231d0d82316ca350"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/post-audit.py",
+      "bytes": 5514,
+      "sha256": "6a0f23ea5361e179cddb4afee38d058b13f3e147106a08dc385d9573fe0569db"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/post-audit.txt",
+      "bytes": 528,
+      "sha256": "a0d0201cff4db9b3ece4be5de292c1c071ec526f7036cba378fab17c8014114a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/race.txt",
+      "bytes": 133,
+      "sha256": "e180b51d64aa95f894cfeae9f854cc45aab1ea67c89183c8220e939d5fe62201"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/typednil-before.txt",
+      "bytes": 1700,
+      "sha256": "30b7c82e830fd8cdc484b17c046a616d0920e049f60df79c685db70bfd777db3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/verification-assumptions.txt",
+      "bytes": 917,
+      "sha256": "a437af64e0e0542bfb7f5e9860c76a12af817e98c49316d3d7b3f4add9eabe64"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/checks/vet.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/base-config.yaml",
+      "bytes": 1318,
+      "sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/baseline_off.yaml",
+      "bytes": 1327,
+      "sha256": "1282ed032eb1fa1b99bfa0c4ca684130ff50f980194fe0efeb0d7d697c18384e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/baseline_on.yaml",
+      "bytes": 1326,
+      "sha256": "64ac0355067a92e8b699f9345b8baacc42a44c58a43541fdb831a03efbc21d25"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/combined_off.yaml",
+      "bytes": 1327,
+      "sha256": "9a0f846f126d2911ed9d2df6bd5db51b3dd41f9e4c0b20ffaece3115a303ec37"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/combined_on.yaml",
+      "bytes": 1326,
+      "sha256": "8cb66febb8f126e06b9b37738b7a299c8476c10dce2c310c56e0a78a1c696432"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/concept_text_off.yaml",
+      "bytes": 1335,
+      "sha256": "d5d6133c00f024d44eb7e05582311b6cf6f4ba64d45a92b055379e62ccc026df"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/concept_text_on.yaml",
+      "bytes": 1334,
+      "sha256": "e3363dfa17b1393ec86b8cd16366711dd382a0bbbcffdac2a1f7dd5f5d2b68b5"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/relations_off.yaml",
+      "bytes": 1329,
+      "sha256": "90b3afb4c07df6ab9c3280dbb93782aebe2c9e0752502c278242653c93e1275b"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/relations_on.yaml",
+      "bytes": 1328,
+      "sha256": "9d9afeced0186b5a67bfe585c8758b8ad976375d3f79352cef79f07c8a2de5ac"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/report.json",
+      "bytes": 12925,
+      "sha256": "f5e1783f87343725d7cf6b0563ae037434cfbdb9b60415193a47afdfde9a2092"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/requests.json",
+      "bytes": 1518,
+      "sha256": "267e864e7726360ca91caf005186f66b924dea044b14d56af375179648e62c30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/first-panic/rows.jsonl",
+      "bytes": 9011,
+      "sha256": "5564700a9f0be9623c4377ef2c0ba3da2bb29899cddf5c5bdb53cfbbbd6fe29b"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/base-config.yaml",
+      "bytes": 1318,
+      "sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/baseline_off.yaml",
+      "bytes": 1330,
+      "sha256": "07b7b302fc69819dc55f2da01b1d67f303c87b41b0706172ba1191cb7cc4091e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/baseline_on.yaml",
+      "bytes": 1329,
+      "sha256": "5bb4e0238569c194353202265defbb3a60d7f1ac9357306812cfbb5451d9394e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/combined_off.yaml",
+      "bytes": 1330,
+      "sha256": "33217136662d6179c2e42fbb821625f522fc54f3fb975431c72ce12548002795"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/combined_on.yaml",
+      "bytes": 1329,
+      "sha256": "d728311027d987859b849a367c3254ffff3bfff782be9305d1a8118f33ed690a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/concept_text_off.yaml",
+      "bytes": 1338,
+      "sha256": "d144b4e2bc963f9b86f9b065a67483c46c6922b259f3ea12457806bf027d52c8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/concept_text_on.yaml",
+      "bytes": 1337,
+      "sha256": "2676a732b318469f09d753e5fedfe2b46f8e2a9a4ab5c9c730773993906bb034"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/relations_off.yaml",
+      "bytes": 1332,
+      "sha256": "25778c94caa514f2c82f6a8a74f688bff4d8ce131c6acc374c71e65fc6822431"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/relations_on.yaml",
+      "bytes": 1331,
+      "sha256": "012073ee566d3d4c18a96f80da5e4311d45d293fa1c09ba8f54341d1293804a6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/report.json",
+      "bytes": 31235,
+      "sha256": "02c7cf4795a22087afdd0c5c58d8df7a68be041563eaaecbe95760bf55bbd058"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/requests.json",
+      "bytes": 1518,
+      "sha256": "267e864e7726360ca91caf005186f66b924dea044b14d56af375179648e62c30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/init-failure/rows.jsonl",
+      "bytes": 22751,
+      "sha256": "e218de69b5b5bde2f47beb3776b06aa149cbd60339137df4442319149738979f"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/base-config.yaml",
+      "bytes": 1315,
+      "sha256": "0442ff98132257f8fa85f6c8a668401fc6b9229d5de615e0670c681f98a27e72"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/baseline_off.yaml",
+      "bytes": 1318,
+      "sha256": "5194c9b396d4f273dc3b9d8b1a74fc918188c0f563599ecfa8e58ddb8b63392d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/baseline_on.yaml",
+      "bytes": 1317,
+      "sha256": "03e7f4632e34167a26f00232b24aa86b11371813352b204b0516ab329638387a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/combined_off.yaml",
+      "bytes": 1318,
+      "sha256": "c077127ac68a438e80e4cb331b258883ed98d7f4e068371f33bf0733744cad20"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/combined_on.yaml",
+      "bytes": 1317,
+      "sha256": "4312a90a4867b01b3f0c8f3a385e78ac20fb5be5bb3e9a56b5cc921ab58d53ef"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/concept_text_off.yaml",
+      "bytes": 1326,
+      "sha256": "ee7887c8e2a3f053bbfee6f561c0c30f649a3e8d6eb2fda7a33e3a396ec7953f"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/concept_text_on.yaml",
+      "bytes": 1325,
+      "sha256": "8eff3f6a0efca2a107fc1d8d030a3042eefd9797331552e2f01daa56a01c9ae3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/baseline_off/cks-mcp.jsonl",
+      "bytes": 441884,
+      "sha256": "8d225c14289c3d88178ff7e32141cdc408564c4395a2989405e8316a8e9aa33d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/baseline_on/cks-mcp.jsonl",
+      "bytes": 441857,
+      "sha256": "e41a5173bb6293c3078989cd80c9cad7a1e4b13846fe8e8a03100924eec1d779"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/combined_off/cks-mcp.jsonl",
+      "bytes": 455084,
+      "sha256": "1c291611e323f09e9831158f938ead0d97481dc7d64a9e4f83e07c490e20ec03"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/combined_on/cks-mcp.jsonl",
+      "bytes": 455053,
+      "sha256": "c3612102b5bde8c44d2188e91797e42c853944fc6e1da9d0b27cab06ffd5569d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/concept_text_off/cks-mcp.jsonl",
+      "bytes": 455077,
+      "sha256": "ec746f81b37bed9819d300af8c3c342587e0985fe70e22470ab4f658217be2cd"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/concept_text_on/cks-mcp.jsonl",
+      "bytes": 455045,
+      "sha256": "27f00b6ea5eabd479b8463e5c1ee8ad5c88096a620243f31368219ca2338ade6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/relations_off/cks-mcp.jsonl",
+      "bytes": 441890,
+      "sha256": "cffda14762f1e373bba510d7f33a3a2eae0bb861bcb45dd44e347de4d91f750e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/footprints/relations_on/cks-mcp.jsonl",
+      "bytes": 441870,
+      "sha256": "a1c21152e9178ce3d23a82348acd6b69982e146d394a5b69e7d84961db67cdd7"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/relations_off.yaml",
+      "bytes": 1320,
+      "sha256": "2c35bb3646341d8f5c46f6e5132d0b74c038ca9f74841b6afbe34862bf86bc9c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/relations_on.yaml",
+      "bytes": 1319,
+      "sha256": "00ae464b8763be00e4e281541edf5a19256c13e1426126418c7f0dd90060cdab"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/report.json",
+      "bytes": 21692,
+      "sha256": "fcb704eadd8a5b689a54b5933d01ac25c4780ab27be43732318a6e765fe799c8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/requests.json",
+      "bytes": 1518,
+      "sha256": "267e864e7726360ca91caf005186f66b924dea044b14d56af375179648e62c30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/mock/rows.jsonl",
+      "bytes": 2030302,
+      "sha256": "98261b5e0dd4a2d5dd682eea75f3f22333730f6e53eb035c47a66275055d31aa"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/base-config.yaml",
+      "bytes": 1318,
+      "sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/baseline_off.yaml",
+      "bytes": 1328,
+      "sha256": "99a884f9e1e52f6db4ee47d913f934fc57c07e3ffe6fed552a9d0fbae9e014f8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/baseline_on.yaml",
+      "bytes": 1327,
+      "sha256": "73fe7b90dd6c1052ec7511ecaa3b88c0e00a9f26fdad8b9c265bbb88f4b909d9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/combined_off.yaml",
+      "bytes": 1328,
+      "sha256": "ea175da6f0e146754b56698a1832d38c826b3b98fb4d91c8ccad945f15552a53"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/combined_on.yaml",
+      "bytes": 1327,
+      "sha256": "9e64392fd2c4097849e2a431d30495ae0cbb6a0739140b814b04231b10208144"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/concept_text_off.yaml",
+      "bytes": 1336,
+      "sha256": "b64a868add10f7a9358fcfcf362c73afb56d85c337e936976c1ee55aa0c17d9c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/concept_text_on.yaml",
+      "bytes": 1335,
+      "sha256": "42d60183881979a16fe61ad9e802e0f6d339ccb439fb41a1ee5661a879084b8e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/baseline_off/cks-mcp.jsonl",
+      "bytes": 1291132,
+      "sha256": "3f4da676707d1751e870e20239db802ca9f32d6b7ecb96ff07d5dc395ccb1373"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/baseline_on/cks-mcp.jsonl",
+      "bytes": 1291112,
+      "sha256": "706a4d766e7fa6319906dc9af12a0eaf4f56bc374098efa17524c1dee123f85f"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/combined_off/cks-mcp.jsonl",
+      "bytes": 1329209,
+      "sha256": "63466416ae01cdd43579b89c7000a3319ae6ba4424f312640fd11638eab48aaa"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/combined_on/cks-mcp.jsonl",
+      "bytes": 1328518,
+      "sha256": "5362c4d36372fbbfb0846b90e9ea87a1e9cf972430f8d87589d2477f85d326d1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/concept_text_off/cks-mcp.jsonl",
+      "bytes": 1329249,
+      "sha256": "c34a0ce9c96dafb4d78f3da1f66c67f247b5b9a6239b2a2e83b7c1c376dcc16d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/concept_text_on/cks-mcp.jsonl",
+      "bytes": 1329298,
+      "sha256": "e1999653ab3dbca6c02c5d0334ee2acda901cd41addc2b6c3240850b925c7e25"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/relations_off/cks-mcp.jsonl",
+      "bytes": 1291156,
+      "sha256": "698ad1aa7f7f1c347ca14f1412e062a65ab01e4c3debb279d1880ebcbc4205e3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/footprints/relations_on/cks-mcp.jsonl",
+      "bytes": 1291155,
+      "sha256": "b02115919d91ce76f06df6c5e679ed2d88313dba624131990c9b3546298557f0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/relations_off.yaml",
+      "bytes": 1330,
+      "sha256": "f6d865ac307c064352a0717e49557d4c1e82741dc628fcb451d8519248efba44"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/relations_on.yaml",
+      "bytes": 1329,
+      "sha256": "9a3a03217262c802e8d400c17d736505641de9139f5169a96916500a75dc64d4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/report.json",
+      "bytes": 21685,
+      "sha256": "b83bbc1bcf08858a6cd4246735b9bc73234ac11a4fddfec4636d3a3d9c8444cf"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/requests.json",
+      "bytes": 1518,
+      "sha256": "267e864e7726360ca91caf005186f66b924dea044b14d56af375179648e62c30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/matrix-capture-m2max-2026-10-04/real/rows.jsonl",
+      "bytes": 4134070,
+      "sha256": "95381018d309abe5c93e535ebfdd81ae8bb69f87a854bf831e8909c93ce182c4"
+    }
+  ]
+}

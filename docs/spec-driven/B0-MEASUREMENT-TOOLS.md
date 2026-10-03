@@ -113,3 +113,24 @@ python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix --measure-backends
 ```
 
 실모델 8경로 48요청에서 raw/text K10과 knowledge K6을 확인했고, 설정 생략의 기존 v1/v2·오류 폴백 20요청은 K20을 유지했다. 설정 범위/기본 YAML, composer의 실제 raw 호출·별도 지식 예산, v2 출처/integrity·정책·보존 DB를 검사했다. [원장](../../system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04.json). 이는 연결 경로 진단이며 초안 K10/프로토콜 승인이나 공식 Recall@10·지연 통과가 아니다. 공식 실행에서 승인된 K를 선택하고 arm 순서를 회전해야 한다.
+
+## 8경로 회전 캡처
+
+```sh
+cks eval matrix --requests request-only-v2.json --config base.yaml --output new-private-directory \
+  --warmup 2 --retrieval-runs 5 --warm-runs 20 --cold-runs 3
+```
+
+요청은 기존 `capture`의 schema_version=1 형식이며 v2만 허용한다. `include_knowledge`는 입력에서 생략하고 도구가 off/on 축으로 설정한다. prompt·intent·지식 날짜/범위는 모든 경로에 그대로 전달한다. gold/expected-answer 필드·v1·중복 ID·추가 JSON은 거부한다. 잘못된 범위 요청도 오류 오라클용으로 기록할 수 있다.
+
+기본 설정 하나에서 baseline/concept_text/relations/combined × off/on 8개 프로파일을 만든다. 모드와 관측 로그 경로, 요청의 팩 boolean만 달라진다. stdio와 backend 계측을 켜며 기존 prod/info/debug 요건을 검사한다. K·필터·모델·소스·저장소·팩은 같고 원래 설정 파일은 보존한다. 출력은 새 0700 디렉터리여야 하며 고정 소스·데이터셋 안이나 그 별칭에 만들 수 없다. 프로파일·보고서·원응답은 0600으로 쓴다.
+
+warm 세션 8개를 순차 초기화하고 실제 호출은 한 번에 하나만 실행한다. 고정 경로 목록은 baseline_off/on, concept_text_off/on, relations_off/on, combined_off/on이다. warmup → retrieval → warm_latency → cold_process를 구분하고, 각 단계에서 질문별 반복 하나가 8개 경로의 한 group이다. 전체 group 번호를 8로 나눈 나머지만큼 시작 경로를 왼쪽으로 회전한다. 8 group마다 각 경로가 각 위치에 한 번 온다. group·position·sequence·질문/반복 ID를 행에 보존한다. warm 세션은 마지막에 닫고 cold는 매 행마다 새 프로세스를 생성·종료한다. cold 시간은 시작부터 첫 도구 응답까지이며 모델/데몬 미상주 시간은 아니다.
+
+`rows.jsonl`에 SDK 전체 원응답과 measurement_id·ns 시간·오류를 응답마다 직렬화·sync한다. 기록 비용은 도구 시간과 cold 시작→응답 시간에서 제외된다. 파일 기록은 다음 호출 전의 간격에 포함된다. `report.json`은 최초 running이며 종료 후 captured/partial로 갱신하고 rows SHA를 기록한다. 초기화에 실패한 경로는 `warm session unavailable` 오류 행으로 남기며 다른 경로를 계속 수집한다. 도구/전송 오류도 raw 행에 남긴다. 취소는 새 호출을 멈추고 세션을 닫는다. 강제 종료가 running 보고서를 남기면 완료로 판정하지 않는다.
+
+native v2 version layout과 정렬·보관 원문을 먼저 검증한다. 엔진 DB/manifest·dataset identity·보관 source/Git archive 전체 파일, 존재하는 선택된 live repo 파일, 의미 저장소·glossary·sanitize 설정·요청·바이너리·추가 `--lock-file`을 전후 해시한다. 원본 HEAD와 live 실행 비트, 생성 프로파일도 전후 비교한다. live 파일 부재는 missing으로 보존하므로 오래된/결손 fixture를 사용할 수 있다. 입력 읽기와 초기 해시 사이의 변경도 거부한다. 변경·초기화·도구·전송·취소 오류가 있으면 partial로 보존하고 CLI는 실패한다. 이 경계 검사로 실행 중 잠깐 변경 후 원복하는 외부 행위까지 증명하지는 않는다.
+
+보고서의 runtime은 Go·OS·arch·논리 CPU 수다. 실제 머신 모델·메모리·경쟁 작업·모델 daemon 상태 및 승인 입력/protocol 기록은 상위 공식 실행 원장이 추가해야 한다. 모델 바이트는 native embedding identity와 각 Ollama 질의의 기존 pin 검사로 고정하고, 상위 실행에서 모델 digest 전후를 별도 보관한다. `captured`는 원응답 수집 완료이며 v2 주장·출처·정답·품질·운영 출시 합격을 의미하지 않는다. 반복 수를 독립 질문 표본으로 계산하지 않는다.
+
+회전 도구의 실제 초기화 실패 시험에서 typed-nil cold 세션 처리를 회귀 시험으로 고정하고 수정했다. SDK의 `Close`는 프로세스마다 2초 graceful 대기 후 SIGTERM, 이어 3초 대기 후 kill과 추가 3초 대기를 수행한다. `--call-timeout`은 initialize/호출 deadline이며 전체 행 처리나 종료 정리 시간의 상한이 아니다. cold 초기화 실패 행의 시간은 factory가 오류·정리를 끝낼 때까지이고 첫 응답이 없으므로 정상 cold 지연 표본으로 합산하지 않는다. 50ms deadline·56개 실패 프로세스의 약 116초 전체 시간은 이 정리 정책을 포함한다. 초기 전체 20초 검증 가정은 잘못되어 수정하고 실패 가정 기록을 보존한다.

@@ -1,0 +1,79 @@
+[
+  {
+    "label": "failure",
+    "command": [
+      "bin/cks",
+      "eval",
+      "matrix",
+      "--requests",
+      "/private/tmp/ks-matrix-requests-20261004.json",
+      "--config",
+      "/private/tmp/ks-recall-k10-real-20261004/baseline_off.yaml",
+      "--cks-mcp",
+      "/private/tmp/ks-matrix-stalled-mcp-20261004",
+      "--output",
+      "/private/tmp/ks-matrix-v2-init-failure-20261004",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "1",
+      "--call-timeout",
+      "50ms"
+    ],
+    "exit_code": 1,
+    "process_wall_seconds": 116.79085516696796,
+    "verification": "96 failure rows and unchanged inputs verified; initial whole-run <20s assertion was invalid because SDK Close has 2s graceful wait per failed process"
+  },
+  {
+    "label": "real",
+    "command": [
+      "bin/cks",
+      "eval",
+      "matrix",
+      "--requests",
+      "/private/tmp/ks-matrix-requests-20261004.json",
+      "--config",
+      "/private/tmp/ks-recall-k10-real-20261004/baseline_off.yaml",
+      "--output",
+      "/private/tmp/ks-matrix-v2-final-real-20261004",
+      "--warmup",
+      "1",
+      "--retrieval-runs",
+      "2",
+      "--warm-runs",
+      "2",
+      "--cold-runs",
+      "1"
+    ],
+    "exit_code": 0,
+    "process_wall_seconds": 162.59157462464646
+  },
+  {
+    "label": "mock",
+    "command": [
+      "bin/cks",
+      "eval",
+      "matrix",
+      "--requests",
+      "/private/tmp/ks-matrix-requests-20261004.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off.yaml",
+      "--output",
+      "/private/tmp/ks-matrix-final-mock-20261004",
+      "--warmup",
+      "1",
+      "--retrieval-runs",
+      "2",
+      "--warm-runs",
+      "2",
+      "--cold-runs",
+      "1"
+    ],
+    "exit_code": 0,
+    "process_wall_seconds": 25.771091165952384
+  }
+]
