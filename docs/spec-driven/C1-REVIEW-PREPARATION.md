@@ -8,6 +8,8 @@
 
 독립 Python 검증기와 설치 후 `cks package verify`가 두 고지를 검사한다. 이전 Go 검증기가 원장과 다른 고지를 가진 재서명 패키지를 수락하는 실패를 재현했고 수정 후 거부했다. 정상 고지·이전 schema 1의 native 배열 없는 패키지는 통과한다. Python 21개 시험·관련 Go 시험/vet·경계 검사, 시험 서명 preview와 세 독립 저장소의 설치 스모크를 통과했다. 최초 Python 시험의 localhost 샌드박스 오류와 CLI 오류 원문 노출을 가정한 잘못된 assertion도 보존했고 수정 후 재실행했다.
 
+두 preview를 비교해 build info에 임시 경로가 섞이는 재현성 문제도 발견·수정했다. 같은 `19fad138`+변경 사항으로 순차 빌드한 두 패키지의 52개 파일 SHA·크기·모드와 전체 archive SHA가 같고, 동일 시험 sidecar로 두 archive를 Python/Go에서 검증했다. [재현성 원장](../../system/eval/b0-knowledge-system/package-reproducibility-m2max-2026-10-04/summary.json). 이 검증의 범위는 현재 도구 체인·macOS arm64의 같은 소스 상태다.
+
 | 결정·검증 | 현재 증거 | 완료에 필요한 항목 |
 |---|---|---|
 | Go 모듈 원문 수집 | 세 바이너리 연결 35개·root 고지 41개·누락 0·해시 확인 | 라이선스 적합성·고지 충족의 사람 검토 |

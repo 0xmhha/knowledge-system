@@ -99,7 +99,12 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
         shutil.copy2(ROOT / "system" / "policies" / "sanitization_rules.yaml", policy)
         # Built-in Go build info lists modules actually linked into each
         # binary and works offline even when unused go.sum modules are absent.
-        module_info = "\n".join(run("go", "version", "-m", str(stage / name)) for name in BINARIES)
+        # Go prints its argument as the build-info heading. A random staging
+        # directory here would make identical package bytes hash differently.
+        # Relative names preserve the actual linked build info without that path.
+        module_info = "\n".join(subprocess.check_output(
+            ["go", "version", "-m", name], cwd=stage, text=True).strip()
+            for name in BINARIES)
         (stage / "modules.txt").write_text(module_info + "\n")
         metadata["third_party_license_inventory"] = collect_licenses(
             module_info, Path(run("go", "env", "GOMODCACHE")), stage,
