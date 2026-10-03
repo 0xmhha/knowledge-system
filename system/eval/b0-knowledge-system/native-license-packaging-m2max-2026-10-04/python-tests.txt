@@ -1,0 +1,45 @@
+.......E..E.........F
+======================================================================
+ERROR: test_model_digest_change_during_probe_is_rejected (test_b0_preflight.PreflightTest.test_model_digest_change_during_probe_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 106, in test_model_digest_change_during_probe_is_rejected
+    server = HTTPServer(("127.0.0.1", 0), ModelHandler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_stable_model_identity_includes_dimension (test_b0_preflight.PreflightTest.test_stable_model_identity_includes_dimension)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 122, in test_stable_model_identity_includes_dimension
+    server = HTTPServer(("127.0.0.1", 0), ModelHandler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+FAIL: test_resigned_native_notice_tampering_is_rejected (test_release_native_licenses.NativeNoticeVerificationTests.test_resigned_native_notice_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 102, in test_resigned_native_notice_tampering_is_rejected
+    self.check_both(True, tamper=True)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 90, in check_both
+    self.assertIn("third-party license differs", result.stderr)
+AssertionError: 'third-party license differs' not found in '{"code":"operation_failed","message":"The operation failed; inspect project status for details."}\n'
+
+----------------------------------------------------------------------
+Ran 21 tests in 6.995s
+
+FAILED (failures=1, errors=2)

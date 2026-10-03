@@ -1,0 +1,15 @@
+..F
+======================================================================
+FAIL: test_resigned_native_notice_tampering_is_rejected (test_release_native_licenses.NativeNoticeVerificationTests.test_resigned_native_notice_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 102, in test_resigned_native_notice_tampering_is_rejected
+    self.check_both(True, tamper=True)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 89, in check_both
+    self.assertNotEqual(result.returncode, 0, "Go verifier accepted a correctly signed archive with an inconsistent vendored notice")
+AssertionError: 0 == 0 : Go verifier accepted a correctly signed archive with an inconsistent vendored notice
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.309s
+
+FAILED (failures=1)

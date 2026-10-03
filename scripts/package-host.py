@@ -102,7 +102,10 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
         module_info = "\n".join(run("go", "version", "-m", str(stage / name)) for name in BINARIES)
         (stage / "modules.txt").write_text(module_info + "\n")
         metadata["third_party_license_inventory"] = collect_licenses(
-            module_info, Path(run("go", "env", "GOMODCACHE")), stage)
+            module_info, Path(run("go", "env", "GOMODCACHE")), stage,
+            [(name, ROOT / name) for name in (
+                "internal/graph/parse/solidity/binding",
+                "internal/vector/parse/solidity/binding")])
         (stage / "manifest.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
         with archive.open("wb") as raw:
             with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as zipped:

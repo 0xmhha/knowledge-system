@@ -58,15 +58,18 @@ type packageManifest struct {
 	} `json:"third_party_license_inventory"`
 }
 
+type licenseInventoryEntry struct {
+	LicenseFiles []struct {
+		Path   string `json:"path"`
+		SHA256 string `json:"sha256"`
+	} `json:"license_files"`
+}
+
 type licenseInventory struct {
-	SchemaVersion int    `json:"schema_version"`
-	ReviewStatus  string `json:"review_status"`
-	Modules       []struct {
-		LicenseFiles []struct {
-			Path   string `json:"path"`
-			SHA256 string `json:"sha256"`
-		} `json:"license_files"`
-	} `json:"modules"`
+	SchemaVersion  int                     `json:"schema_version"`
+	ReviewStatus   string                  `json:"review_status"`
+	Modules        []licenseInventoryEntry `json:"modules"`
+	VendoredAssets []licenseInventoryEntry `json:"vendored_assets"`
 }
 
 func NewCmd() *cobra.Command {
@@ -291,7 +294,7 @@ func verifyRelease(publicKeyPath, releasePath, signaturePath, archivePath, targe
 	if inventory.SchemaVersion != 1 || inventory.ReviewStatus != "pending" || len(inventory.Modules) == 0 {
 		return nil, errors.New("invalid license inventory")
 	}
-	for _, module := range inventory.Modules {
+	for _, module := range append(inventory.Modules, inventory.VendoredAssets...) {
 		for _, licenseFile := range module.LicenseFiles {
 			if !strings.HasPrefix(licenseFile.Path, "third-party-licenses/") || !validHash(licenseFile.SHA256) || hashBytes(files[licenseFile.Path]) != licenseFile.SHA256 {
 				return nil, errors.New("third-party license differs from inventory")

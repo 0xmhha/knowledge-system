@@ -43,6 +43,15 @@ inventory = json.loads((stage / 'third-party-licenses.json').read_text())
 assert inventory['modules'] and manifest['third_party_license_inventory']['module_count'] == len(inventory['modules'])
 assert manifest['third_party_license_inventory']['missing_license_count'] == 0
 assert all(module['license_files'] for module in inventory['modules'])
+assets = inventory['vendored_assets']
+assert {asset['asset'] for asset in assets} == {
+    'internal/graph/parse/solidity/binding', 'internal/vector/parse/solidity/binding'}
+assert manifest['third_party_license_inventory']['vendored_asset_count'] == 2
+assert manifest['third_party_license_inventory']['missing_vendored_license_count'] == 0
+for asset in assets:
+    assert asset['license_files'] and asset['source_files']
+    for notice in asset['license_files']:
+        assert hashlib.sha256((stage / notice['path']).read_bytes()).hexdigest() == notice['sha256']
 print(stage)
 PY
 )"

@@ -140,11 +140,12 @@ def verify(public_key: Path, release_path: Path, signature_path: Path, archive: 
             member(required)
         inventory = json.loads(member("third-party-licenses.json"))
         if inventory.get("schema_version") != 1 or inventory.get("review_status") != "pending" or \
-           not isinstance(inventory.get("modules"), list):
+           not isinstance(inventory.get("modules"), list) or \
+           not isinstance(inventory.get("vendored_assets", []), list):
             raise ValueError("invalid license inventory")
         if manifest.get("third_party_license_inventory", {}).get("sha256") != release["license_inventory_sha256"]:
             raise ValueError("package license inventory digest differs")
-        for entry in inventory["modules"]:
+        for entry in inventory["modules"] + inventory.get("vendored_assets", []):
             for license_file in entry["license_files"]:
                 if sha256(member(license_file["path"])) != license_file["sha256"]:
                     raise ValueError("third-party license file differs from inventory")
