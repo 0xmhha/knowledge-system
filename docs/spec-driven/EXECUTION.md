@@ -6,9 +6,12 @@
 
 현재 머신에서 최종 전체 Go 시험, vet, 관련 race, 엔진 경계, 112개 문서 검사, 신원·캡처·팩·패치·세 엔진·구 v1 재생 스모크가 통과했다. 재검증에서 승인된 정답 파일을 초안으로 가정하던 Python 시험과 일반 저장소의 `.git` 디렉터리를 처리하지 못하던 Linux 패키지 스모크를 발견했다. 미승인 입력을 명시하는 시험과 추적 파일만 복사하는 플랫폼 fixture 도구로 수정했으며, B0 Python 12개 및 primary/worktree·수정/삭제·모드/링크·미추적 제외 시험이 통과했다. macOS preview 추출 설치·시험 서명과 수정 후 Linux arm64 검사는 통과했고 amd64 에뮬레이션 재검증도 통과했다.
 
-동적 개발 입력 6개를 독립 Git 저장소로 생성했다. 반복 생성의 커밋·트리·원문 SHA 일치, F-04 연속 커밋과 F-05 별도 프로젝트를 검사했다. 승인 상태는 바꾸지 않았고 품질 지표는 null이다. `cks eval --record-responses`는 선택적으로 freshness와 모든 v1 원응답·실패·호출 시간을 남긴다. 기본 출력은 유지하며 원응답 기록의 JSON 비용을 호출 지연에서 제외한다. 관련 단위/race/vet와 실제 mock CLI 재생이 통과했다. v2 원응답 및 CKV exact/budget 도구, 네 가지 ablation 실행 연결은 남은 작업이다.
+동적 개발 입력 6개를 독립 Git 저장소로 생성했다. 반복 생성의 커밋·트리·원문 SHA 일치, F-04 연속 커밋과 F-05 별도 프로젝트를 검사했다. 승인 상태는 바꾸지 않았고 품질 지표는 null이다. `cks eval --record-responses`는 선택적으로 freshness와 모든 v1 원응답·실패·호출 시간을 남긴다. 기본 출력은 유지하며 원응답 기록의 JSON 비용을 호출 지연에서 제외한다. 관련 단위/race/vet와 실제 mock CLI 재생이 통과했다. v2 원응답 및 CKV exact/budget 도구는 아래 후속 검증으로 구현됐다. 네 가지 ablation 실행 연결은 남은 작업이다.
 
 원자료와 출력 해시는 [execution-reaudit-m2max-2026-10-03.json](../../system/eval/b0-knowledge-system/execution-reaudit-m2max-2026-10-03.json)에 연결했다. 구조 시험 통과를 공식 B0/B1 품질 또는 C1 운영 출시로 승격하지 않는다.
+
+
+B0 측정 도구 후속 검증: `cks eval capture`는 v1/v2 전체 응답, 오류·deadline, warm/프로세스 cold 단계, 설정/바이너리 전후 SHA를 보관한다. 별도 읽기 전용 CKV 프로브는 같은 저장 벡터를 정상 필터·후보 상한·독립 전체 스캔 exact 오라클로 비교하며 미봉인 WAL, 신원/게시 SHA 불일치를 거부한다. SQLite 특수 파일명 URI 처리와 CKV EOF 가상 줄 인용 오류를 재현 후 수정했다. 실제 BGE-M3 pinned 소형 프로젝트에서 v2 5회 정상·25본문 원문 SHA/좌표/sha256-v2와 exact 일치·DB/manifest 무변경을 확인했다. 최신 전체 Go·관련 race/vet·경계·113 문서 검사가 통과했다. 기존 전체 진단은 수정 전 빌더이며 공식 품질·지연과 최종 패키지는 미완료다. [도구 설명](./B0-MEASUREMENT-TOOLS.md)과 [실행 원장](../../system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03.json)을 참조한다.
 
 B0 M2 Max preparation (2026-10-03): 새 머신의 원격/로컬 개발 HEAD `9e907b43` 일치, Apple M2 Max/12 CPU/64 GiB/약 115 GiB 디스크 여유, Ollama 0.35.1과 이전과 같은 BGE-M3 digest/1024차원을 확인했다. 독립 Git 코퍼스에서 최신 세 바이너리로 엄격 임베딩 진단을 완료했다(1,569개 선택 파일/13,575청크, 약 813초). 저장 청크/입력 해시·분할 부모 63개/자식 169개·pinned doctor를 확인했고 CKG는 이전과 같은 102,112노드/414,613엣지·그래프 digest였다. **CKV 기본 build/ 제외 규칙이 실제 Go 소스 29개를 제외하므로 CKG/CKV Go 범위는 992/963이며 범위 감사는 partial**이다. 관련 Go 8개 패키지, B0 Python 9개, 실제 작은 프로젝트·긴 원문 Ollama 스모크가 통과했다. 사용자는 12개 정답과 BGE-M3를 승인했으며 로컬 감사 ID `chat-user`와 실제 응답·시각·질문 해시를 저장했다. 동적 fixture/프로토콜에는 “검토 후 결정”이라고 답했으므로 초안과 pending을 유지한다. 승인된 정답 export와 preflight ready는 공식 품질 평가나 전체 B0 완료가 아니다. [머신별 게이트](./B0-M2MAX-GATE-REPORT.md), [근거·결정 검토 자료](./B0-M2MAX-REVIEW.md)에 원자료·제안·남은 실행을 기록했다. B0/B1 품질 지표는 null, C는 미진행이다. 기존 .claude/와 logs/는 보존했다.
 

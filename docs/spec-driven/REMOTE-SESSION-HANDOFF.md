@@ -6,6 +6,9 @@
 
 현재 작업의 우선순위, 완료 항목 재검증, 남은 B0/B1/C0/C1 단계는 [EXECUTION-WORKLIST.md](./EXECUTION-WORKLIST.md)를 먼저 확인한다. 정적 gold와 BGE-M3는 승인됐지만 동적 사례·측정 프로토콜은 사람 검토 대기다. 공식 품질과 운영 출시는 완료하지 않았다. 아래 내용은 이전 인계 시점의 기록이다.
 
+
+후속 도구/수정: [B0-MEASUREMENT-TOOLS.md](./B0-MEASUREMENT-TOOLS.md)의 v1/v2 응답 수집·CKV exact/budget 프로브가 구현됐고 실모델 진단을 통과했다. CKV EOF 개행의 가상 인용 줄과 SQLite `?`/`#` 파일명 처리 오류를 재현 후 수정했다. 기존 전체 진단 데이터는 수정 전 빌더이므로 공식 B0-07에서 새 데이터셋으로 범위 감사를 수행한다. B0-06 전체 원장/계측과 B1 네 가지 실행 어댑터는 남아 있다.
+
 ## 새 세션에 전달할 프롬프트
 
 당신은 `knowledge-system`의 스펙 기반 WBS를 이어서 수행한다. 저장소는 `https://github.com/0xmhha/knowledge-system.git`, 작업 브랜치는 `feat/spec-driven-knowledge-system`이다. 이 인계 작성 시점의 HEAD는 `021c837 fix(cks): preserve executable modes in pinned snapshots`이고 로컬 작업 트리는 깨끗했다. **`main`이 아니라 이 브랜치의 최신 원격 상태를 확인하고 시작하라.** 다른 머신에서는 경로가 다를 수 있으므로 아래의 모든 상대 경로는 저장소 루트 기준으로 해석하라. 기존 사용자 변경이 있으면 보존하라.

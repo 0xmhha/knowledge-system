@@ -155,6 +155,37 @@ func B() { fmt.Println("b") }
 	}
 }
 
+func TestFileChunksDoNotCitePhantomLineAfterFinalNewline(t *testing.T) {
+	for _, source := range []string{"package x\n\nfunc Alpha() {}\n", "package x\n\nfunc Alpha() {}", "package x\n\nfunc Alpha() {}\n\n"} {
+		in := Input{File: "main.go", Language: "go", CommitHash: "fixture", Source: []byte(source)}
+		chunks := New(Options{IncludeFileFull: true}).Chunk(in)
+		want := len(strings.Split(strings.TrimSuffix(source, "\n"), "\n"))
+		seen := 0
+		for _, chunk := range chunks {
+			if chunk.ChunkKind != types.ChunkFileFull && chunk.ChunkKind != types.ChunkFileHeader {
+				continue
+			}
+			seen++
+			if chunk.StartLine != 1 || chunk.EndLine != want {
+				t.Fatalf("%s source=%q cites %d-%d; source has %d physical lines", chunk.ChunkKind, source, chunk.StartLine, chunk.EndLine, want)
+			}
+		}
+		if seen != 2 {
+			t.Fatalf("expected full and header chunks, got %d", seen)
+		}
+	}
+}
+
+func TestFileHeaderLineLimitPreservesPhysicalSpan(t *testing.T) {
+	for _, source := range []string{"package x\nfunc A() {}\n", "package x\nfunc A() {}\nfunc B() {}\n", "package x\nfunc A() {}\nfunc B() {}"} {
+		in := Input{File: "main.go", Language: "go", Source: []byte(source)}
+		chunks := New(Options{FileHeaderLines: 2}).Chunk(in)
+		if len(chunks) != 1 || chunks[0].StartLine != 1 || chunks[0].EndLine != 2 || chunks[0].Text != "package x\nfunc A() {}" {
+			t.Fatalf("header limit source=%q: %+v", source, chunks)
+		}
+	}
+}
+
 func TestChunkIDsDeterministic(t *testing.T) {
 	in := Input{
 		File:       "x.go",

@@ -14,7 +14,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net/url"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -101,7 +103,12 @@ func Open(path string, dim int) (*Store, error) {
 	if dim <= 0 {
 		return nil, fmt.Errorf("sqlitevec: invalid dim %d", dim)
 	}
-	db, err := sql.Open("sqlite3", path)
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	uri := url.URL{Scheme: "file", Path: abs}
+	db, err := sql.Open("sqlite3", uri.String())
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite: %w", err)
 	}

@@ -298,7 +298,7 @@ func (c *Chunker) fileFullChunk(in Input) *types.Chunk {
 		return nil
 	}
 	text := string(in.Source)
-	endLine := strings.Count(text, "\n") + 1
+	endLine := sourceLineCount(text)
 	text = c.maybeTruncate(text)
 	contentHash := types.ContentSHA256(text)
 	id := types.ChunkID(in.File, 0, endLine, contentHash)
@@ -402,8 +402,20 @@ func (c *Chunker) splitLongSpan(in Input, sp parse.SymbolSpan) []types.Chunk {
 	return chunks
 }
 
+// sourceLineCount counts physical lines without inventing a line after EOF.
+func sourceLineCount(text string) int {
+	if text == "" {
+		return 0
+	}
+	lines := strings.Count(text, "\n")
+	if !strings.HasSuffix(text, "\n") {
+		lines++
+	}
+	return lines
+}
+
 // fileHeaderChunk emits the leading-lines chunk. Returns nil for empty
-// files or when the file has fewer than 2 non-blank lines (no signal).
+// or entirely blank header text.
 func (c *Chunker) fileHeaderChunk(in Input) *types.Chunk {
 	if len(in.Source) == 0 {
 		return nil
@@ -425,12 +437,15 @@ func (c *Chunker) fileHeaderChunk(in Input) *types.Chunk {
 	}
 	text = c.maybeTruncate(text)
 	contentHash := types.ContentSHA256(text)
-	id := types.ChunkID(in.File, 1, len(lines), contentHash)
+	// SplitN includes an empty sentinel after a final newline. It is not
+	// another source line; preserve the text bytes without citing that sentinel.
+	endLine := min(len(lines), sourceLineCount(string(in.Source)))
+	id := types.ChunkID(in.File, 1, endLine, contentHash)
 	return &types.Chunk{
 		ID:            id,
 		File:          in.File,
 		StartLine:     1,
-		EndLine:       len(lines),
+		EndLine:       endLine,
 		Language:      in.Language,
 		IsTest:        types.IsTestPath(in.File, in.Language),
 		SymbolKind:    types.KindFileHeader,

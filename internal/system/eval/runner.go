@@ -115,16 +115,18 @@ type RawToolCall struct {
 	Tool           string          `json:"tool"`
 	Arguments      json.RawMessage `json:"arguments,omitempty"`
 	ElapsedNS      int64           `json:"elapsed_ns"`
+	CompletedAt    *time.Time      `json:"completed_at,omitempty"`
 	Response       json.RawMessage `json:"response,omitempty"`
 	TransportError string          `json:"transport_error,omitempty"`
 }
 
 // RunnerOpts configures NewRunner.
 type RunnerOpts struct {
-	CKSMCPBinary    string
-	CKSMCPConfig    string
-	Env             []string
-	RecordResponses bool
+	CKSMCPBinary      string
+	CKSMCPConfig      string
+	Env               []string
+	RecordResponses   bool
+	InitializeTimeout time.Duration
 }
 
 // NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
@@ -149,7 +151,13 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	if err := c.Start(ctx); err != nil {
 		return nil, fmt.Errorf("eval: start cks-mcp: %w", err)
 	}
-	runner, err := newRunnerWithClient(ctx, c)
+	initializeCtx := ctx
+	if opts.InitializeTimeout > 0 {
+		var cancel context.CancelFunc
+		initializeCtx, cancel = context.WithTimeout(ctx, opts.InitializeTimeout)
+		defer cancel()
+	}
+	runner, err := newRunnerWithClient(initializeCtx, c)
 	if err != nil {
 		return nil, err
 	}
@@ -160,11 +168,12 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 func (r *Runner) callTool(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
 	start := time.Now()
 	res, callErr := r.client.CallTool(ctx, req)
-	elapsed := time.Since(start).Nanoseconds()
+	completed := time.Now()
+	elapsed := completed.Sub(start).Nanoseconds()
 	if !r.recordResponses {
 		return res, callErr
 	}
-	entry := RawToolCall{Tool: req.Params.Name, ElapsedNS: elapsed}
+	entry := RawToolCall{Tool: req.Params.Name, ElapsedNS: elapsed, CompletedAt: &completed}
 	var err error
 	entry.Arguments, err = json.Marshal(req.Params.Arguments)
 	if err != nil {

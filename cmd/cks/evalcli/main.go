@@ -64,6 +64,7 @@ func NewCmd() *cobra.Command {
 	cmd.Flags().StringVar(&output, "output", "", "write report to this file (empty = stdout)")
 	cmd.Flags().StringVar(&verifyAnchors, "verify-anchors", "", "source root for anchor verification: fail before running when any scenario's expected span no longer contains its declared anchor (guards against line drift)")
 	cmd.Flags().BoolVar(&recordResponses, "record-responses", false, "retain every MCP tool response and per-call timing in the report")
+	cmd.AddCommand(newCaptureCmd())
 	return cmd
 }
 
