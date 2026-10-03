@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "gate": "B1 relations runtime diagnostic",
+  "checked_at": "2026-10-03T13:42:57.713315+00:00",
+  "base_commit": "b0ba74ed298e05517ce3c1a8c66f1166ac50dffe",
+  "working_changes": true,
+  "quality_metrics": null,
+  "release": "preview",
+  "checks": [
+    {
+      "id": "go-all",
+      "command": "go test ./...",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "dc06aa04481b62dfb2d4e618e71e8fe0b41f758359673ed7ed26f7329c615bf2",
+        "original_bytes": 9140,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/go-all.txt",
+        "sha256": "dc06aa04481b62dfb2d4e618e71e8fe0b41f758359673ed7ed26f7329c615bf2",
+        "bytes": 9140
+      }
+    },
+    {
+      "id": "race",
+      "command": "go test -race ./internal/system/composer/stage1 ./internal/system/composer/stage2 ./internal/system/composer ./internal/system/semantic ./internal/system/evidencev2 ./internal/system/mcp ./cmd/cks/mcpcli ./internal/system/config ./pkg/system/contract (before final counters/tuple classification)",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "b898033de32ec15ecb6e738c974e54252cda96a2618e6ed7299b3feb1a15bee5",
+        "original_bytes": 642,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/race.txt",
+        "sha256": "b898033de32ec15ecb6e738c974e54252cda96a2618e6ed7299b3feb1a15bee5",
+        "bytes": 642
+      }
+    },
+    {
+      "id": "final-race",
+      "command": "go test -race ./internal/system/composer/stage2 ./cmd/cks/mcpcli",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "e242101ed7e70f958a1021b0193af61c6e59a16e12698c28840877774de23fd6",
+        "original_bytes": 141,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/final-race.txt",
+        "sha256": "e242101ed7e70f958a1021b0193af61c6e59a16e12698c28840877774de23fd6",
+        "bytes": 141
+      }
+    },
+    {
+      "id": "vet",
+      "command": "go vet ./... (before final tuple classification)",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_bytes": 0,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/vet.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "final-vet",
+      "command": "go vet ./internal/system/composer/stage2 ./cmd/cks/mcpcli ./pkg/system/contract",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_bytes": 0,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/final-vet.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "build",
+      "command": "make build-bins",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+        "original_bytes": 98,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/build.txt",
+        "sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+        "bytes": 98
+      }
+    },
+    {
+      "id": "initial-harness-failure",
+      "command": "initial mock smoke: generated bge-m3 config did not match mock-feature-hash-v1; harness fixed to read actual manifest model",
+      "exit_code": 1,
+      "raw_output": {
+        "original_sha256": "8c9111c8bafdaebf506b0c1715ecb8bd8dad76caff120e1adb1ec13c3c29eb24",
+        "original_bytes": 744,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/initial-harness-failure.txt",
+        "sha256": "8c9111c8bafdaebf506b0c1715ecb8bd8dad76caff120e1adb1ec13c3c29eb24",
+        "bytes": 744
+      }
+    },
+    {
+      "id": "real",
+      "command": "CKV_REQUIRE_COMPLETE_EMBEDDINGS=1 python3 scripts/wbs-ontology-relations-smoke.py --out /private/tmp/ks-b1-relations-final2-real-20261003 --embedder ollama",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "173d51d0f0f17faa9c186ac5725b7604cb9698a11e69db8ed072ca4d3ea72dd3",
+        "original_bytes": 85,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real.txt",
+        "sha256": "173d51d0f0f17faa9c186ac5725b7604cb9698a11e69db8ed072ca4d3ea72dd3",
+        "bytes": 85
+      }
+    },
+    {
+      "id": "mock",
+      "command": "python3 scripts/wbs-ontology-relations-smoke.py --out /private/tmp/ks-b1-relations-final2-mock-20261003",
+      "exit_code": 0,
+      "raw_output": {
+        "original_sha256": "f1dd4c787b54a9fbca178548ca46c91e5937bd701ef1f687eaab4049aca9ef2a",
+        "original_bytes": 85,
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock.txt",
+        "sha256": "f1dd4c787b54a9fbca178548ca46c91e5937bd701ef1f687eaab4049aca9ef2a",
+        "bytes": 85
+      }
+    },
+    {
+      "id": "docs",
+      "command": "python3 scripts/check-docs.py",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/docs.txt",
+        "sha256": "c93473f344b7f78468d07e357b249e0bb2bf6c0f214f6b6b29a381a79755d6d3",
+        "bytes": 39,
+        "original_sha256": "c93473f344b7f78468d07e357b249e0bb2bf6c0f214f6b6b29a381a79755d6d3",
+        "original_bytes": 39
+      }
+    },
+    {
+      "id": "boundaries",
+      "command": "scripts/check-boundaries.sh",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/boundaries.txt",
+        "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+        "bytes": 22,
+        "original_sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+        "original_bytes": 22
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "original_sha256": "dc06aa04481b62dfb2d4e618e71e8fe0b41f758359673ed7ed26f7329c615bf2",
+      "original_bytes": 9140,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/go-all.txt",
+      "sha256": "dc06aa04481b62dfb2d4e618e71e8fe0b41f758359673ed7ed26f7329c615bf2",
+      "bytes": 9140
+    },
+    {
+      "original_sha256": "b898033de32ec15ecb6e738c974e54252cda96a2618e6ed7299b3feb1a15bee5",
+      "original_bytes": 642,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/race.txt",
+      "sha256": "b898033de32ec15ecb6e738c974e54252cda96a2618e6ed7299b3feb1a15bee5",
+      "bytes": 642
+    },
+    {
+      "original_sha256": "e242101ed7e70f958a1021b0193af61c6e59a16e12698c28840877774de23fd6",
+      "original_bytes": 141,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/final-race.txt",
+      "sha256": "e242101ed7e70f958a1021b0193af61c6e59a16e12698c28840877774de23fd6",
+      "bytes": 141
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/final-vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+      "original_bytes": 98,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/build.txt",
+      "sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+      "bytes": 98
+    },
+    {
+      "original_sha256": "8c9111c8bafdaebf506b0c1715ecb8bd8dad76caff120e1adb1ec13c3c29eb24",
+      "original_bytes": 744,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/initial-harness-failure.txt",
+      "sha256": "8c9111c8bafdaebf506b0c1715ecb8bd8dad76caff120e1adb1ec13c3c29eb24",
+      "bytes": 744
+    },
+    {
+      "original_sha256": "173d51d0f0f17faa9c186ac5725b7604cb9698a11e69db8ed072ca4d3ea72dd3",
+      "original_bytes": 85,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real.txt",
+      "sha256": "173d51d0f0f17faa9c186ac5725b7604cb9698a11e69db8ed072ca4d3ea72dd3",
+      "bytes": 85
+    },
+    {
+      "original_sha256": "f1dd4c787b54a9fbca178548ca46c91e5937bd701ef1f687eaab4049aca9ef2a",
+      "original_bytes": 85,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock.txt",
+      "sha256": "f1dd4c787b54a9fbca178548ca46c91e5937bd701ef1f687eaab4049aca9ef2a",
+      "bytes": 85
+    },
+    {
+      "original_sha256": "ec61032d856f0c80dd9456d0eae48c774050c3e1e952ae866b6b0f58a943764b",
+      "original_bytes": 14222,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/summary.json",
+      "sha256": "ec61032d856f0c80dd9456d0eae48c774050c3e1e952ae866b6b0f58a943764b",
+      "bytes": 14222
+    },
+    {
+      "original_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "original_bytes": 353,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "original_sha256": "d049065c3a1d2bbca3e4f14657c5dfee032268ef9e9caf6a142cff2e99383a2c",
+      "original_bytes": 6516,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/projection.json",
+      "sha256": "d049065c3a1d2bbca3e4f14657c5dfee032268ef9e9caf6a142cff2e99383a2c",
+      "bytes": 6516
+    },
+    {
+      "original_sha256": "361cbddb6c6416392123654bb203763af53a36ee36cbbc0c64be97023155440a",
+      "original_bytes": 22186,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/baseline.json",
+      "sha256": "361cbddb6c6416392123654bb203763af53a36ee36cbbc0c64be97023155440a",
+      "bytes": 22186
+    },
+    {
+      "original_sha256": "0b65e073c76e4dc70a04c85e8879536fa721d766e1a4d1860d23305d688047fd",
+      "original_bytes": 22743,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/relations.json",
+      "sha256": "0b65e073c76e4dc70a04c85e8879536fa721d766e1a4d1860d23305d688047fd",
+      "bytes": 22743
+    },
+    {
+      "original_sha256": "7b21ae669578a33a2beb6be5f9578a71aece6cdbf9520ab7683be4f578acdcd7",
+      "original_bytes": 22858,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/missing.json",
+      "sha256": "7b21ae669578a33a2beb6be5f9578a71aece6cdbf9520ab7683be4f578acdcd7",
+      "bytes": 22858
+    },
+    {
+      "original_sha256": "1421de1a0ecd665d1cefe2337c8521016ae322fc918ab5c1c9ed5c5dc15142e0",
+      "original_bytes": 22858,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/stale.json",
+      "sha256": "1421de1a0ecd665d1cefe2337c8521016ae322fc918ab5c1c9ed5c5dc15142e0",
+      "bytes": 22858
+    },
+    {
+      "original_sha256": "3e5aea3c639176bd99b0a8be37466b6b5ca9d4d578d9ce6b70bd6a2f0cdf9331",
+      "original_bytes": 1237,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/baseline.yaml",
+      "sha256": "3e5aea3c639176bd99b0a8be37466b6b5ca9d4d578d9ce6b70bd6a2f0cdf9331",
+      "bytes": 1237
+    },
+    {
+      "original_sha256": "a65e307cc582ab51c34d8c6e9992dd7dbcbf01b88b561c618129d45a5e4f451e",
+      "original_bytes": 1238,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/relations.yaml",
+      "sha256": "a65e307cc582ab51c34d8c6e9992dd7dbcbf01b88b561c618129d45a5e4f451e",
+      "bytes": 1238
+    },
+    {
+      "original_sha256": "cf286eca01a774e0c021604d170bd470f2685d8e9af14dfb29bf8ebcfac73522",
+      "original_bytes": 1237,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/missing.yaml",
+      "sha256": "cf286eca01a774e0c021604d170bd470f2685d8e9af14dfb29bf8ebcfac73522",
+      "bytes": 1237
+    },
+    {
+      "original_sha256": "6f8ff75abf28f4c8150e1647335c8eb2131bb8c673327dd337ab163a7d1a5317",
+      "original_bytes": 1244,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/stale.yaml",
+      "sha256": "6f8ff75abf28f4c8150e1647335c8eb2131bb8c673327dd337ab163a7d1a5317",
+      "bytes": 1244
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "26828faacd5f79dd53392f52d8fd56af93b6b4ce77536003fc26f703828b3a22",
+      "original_bytes": 3862,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/setup.txt",
+      "sha256": "26828faacd5f79dd53392f52d8fd56af93b6b4ce77536003fc26f703828b3a22",
+      "bytes": 3862
+    },
+    {
+      "original_sha256": "cd445e546c614e39a90b18c79fc7a484d6ab9ffc176e8acae1c020b63c57688e",
+      "original_bytes": 294,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/semantic-extract.txt",
+      "sha256": "cd445e546c614e39a90b18c79fc7a484d6ab9ffc176e8acae1c020b63c57688e",
+      "bytes": 294
+    },
+    {
+      "original_sha256": "d4932740ddfbd6c053dd063dd383befdfb89a6d21b92aba02f5f4c51b7d7feb7",
+      "original_bytes": 165,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/semantic-promote.txt",
+      "sha256": "d4932740ddfbd6c053dd063dd383befdfb89a6d21b92aba02f5f4c51b7d7feb7",
+      "bytes": 165
+    },
+    {
+      "original_sha256": "c52cdb466dc5c5043ff313b9b528945380a630b273aa8d4948ca443f97f716c2",
+      "original_bytes": 127,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/config-baseline.txt",
+      "sha256": "c52cdb466dc5c5043ff313b9b528945380a630b273aa8d4948ca443f97f716c2",
+      "bytes": 127
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "66841ad491487e323d198463461a3edfd12f8cc80bcb7defd3140468d6fb8630",
+      "original_bytes": 128,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/config-relations.txt",
+      "sha256": "66841ad491487e323d198463461a3edfd12f8cc80bcb7defd3140468d6fb8630",
+      "bytes": 128
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "3c63f6d855a8fb54bfc4104bf23eaf303f5d35722c40d105ba6f73d0f8624dfd",
+      "original_bytes": 126,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/config-missing.txt",
+      "sha256": "3c63f6d855a8fb54bfc4104bf23eaf303f5d35722c40d105ba6f73d0f8624dfd",
+      "bytes": 126
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "2d4ad56e40771059576cca7f2f822024938289326835387f85ab8e9c97ffa95c",
+      "original_bytes": 124,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/config-stale.txt",
+      "sha256": "2d4ad56e40771059576cca7f2f822024938289326835387f85ab8e9c97ffa95c",
+      "bytes": 124
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "original_bytes": 71,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "original_sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "original_bytes": 39,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "original_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "original_bytes": 97,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "original_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "original_bytes": 142,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "original_sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "original_bytes": 631,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/real/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "original_sha256": "86c4c03381d645a1ce710137c64c2c8185fd803947993539b5f6464a81234a2d",
+      "original_bytes": 13419,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/summary.json",
+      "sha256": "86c4c03381d645a1ce710137c64c2c8185fd803947993539b5f6464a81234a2d",
+      "bytes": 13419
+    },
+    {
+      "original_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "original_bytes": 353,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/requests.json",
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "bytes": 353
+    },
+    {
+      "original_sha256": "fd4dca15751db7a08bbf00f9678c2e503db17edb9f0fc59335c305f6d0142d29",
+      "original_bytes": 6516,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/projection.json",
+      "sha256": "fd4dca15751db7a08bbf00f9678c2e503db17edb9f0fc59335c305f6d0142d29",
+      "bytes": 6516
+    },
+    {
+      "original_sha256": "c8aef15894fb3c09d09494bbb11574f9001aa5cc2ad1d73ce1501ddc870c05a7",
+      "original_bytes": 10536,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/baseline.json",
+      "sha256": "c8aef15894fb3c09d09494bbb11574f9001aa5cc2ad1d73ce1501ddc870c05a7",
+      "bytes": 10536
+    },
+    {
+      "original_sha256": "e5b7fa72ec0c92367a6b5a3b51fb893bc69583fbe3e4aa89fca04cdd539345c0",
+      "original_bytes": 11089,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/relations.json",
+      "sha256": "e5b7fa72ec0c92367a6b5a3b51fb893bc69583fbe3e4aa89fca04cdd539345c0",
+      "bytes": 11089
+    },
+    {
+      "original_sha256": "5ac093ea02d2c33c53c13c88f416bec65641ac7b5407c12d9d314cb9a86b5970",
+      "original_bytes": 11206,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/missing.json",
+      "sha256": "5ac093ea02d2c33c53c13c88f416bec65641ac7b5407c12d9d314cb9a86b5970",
+      "bytes": 11206
+    },
+    {
+      "original_sha256": "69ca39737d92ce8a75d13bb0980e9c1dfa778c0997171c3bec64c41008753f54",
+      "original_bytes": 11205,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/stale.json",
+      "sha256": "69ca39737d92ce8a75d13bb0980e9c1dfa778c0997171c3bec64c41008753f54",
+      "bytes": 11205
+    },
+    {
+      "original_sha256": "13dc9316f4430f5eca81fba43900501fb9dd369ed2ecad3c1a6028102201f6c0",
+      "original_bytes": 1242,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/baseline.yaml",
+      "sha256": "13dc9316f4430f5eca81fba43900501fb9dd369ed2ecad3c1a6028102201f6c0",
+      "bytes": 1242
+    },
+    {
+      "original_sha256": "3801700d48b02109db1073e465d6193f46b1dcae4cbf6e47d8fe8da801e5d5a5",
+      "original_bytes": 1243,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/relations.yaml",
+      "sha256": "3801700d48b02109db1073e465d6193f46b1dcae4cbf6e47d8fe8da801e5d5a5",
+      "bytes": 1243
+    },
+    {
+      "original_sha256": "bc66fb987778921e01058f673c5d0d1bac4354446ba7ac90ab3a76287f8cce1f",
+      "original_bytes": 1242,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/missing.yaml",
+      "sha256": "bc66fb987778921e01058f673c5d0d1bac4354446ba7ac90ab3a76287f8cce1f",
+      "bytes": 1242
+    },
+    {
+      "original_sha256": "df539e43129dec34cf13772d9127ee47cfcd037aba693809bbea23cdb6061263",
+      "original_bytes": 1249,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/stale.yaml",
+      "sha256": "df539e43129dec34cf13772d9127ee47cfcd037aba693809bbea23cdb6061263",
+      "bytes": 1249
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "0761a28fbff6b7c8018ac06be39271e31ac39b7e14fee89126c1a3a005576fcd",
+      "original_bytes": 3698,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/setup.txt",
+      "sha256": "0761a28fbff6b7c8018ac06be39271e31ac39b7e14fee89126c1a3a005576fcd",
+      "bytes": 3698
+    },
+    {
+      "original_sha256": "29cb035414e069bae2e5ad506b9b9dc1bef7f17bcb4441e7b1cc161ef88f8b4f",
+      "original_bytes": 294,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/semantic-extract.txt",
+      "sha256": "29cb035414e069bae2e5ad506b9b9dc1bef7f17bcb4441e7b1cc161ef88f8b4f",
+      "bytes": 294
+    },
+    {
+      "original_sha256": "dfccc26ddd892666e4de3e5811ee52e2fca98eb4b9743d77ad63b47d79de2231",
+      "original_bytes": 165,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/semantic-promote.txt",
+      "sha256": "dfccc26ddd892666e4de3e5811ee52e2fca98eb4b9743d77ad63b47d79de2231",
+      "bytes": 165
+    },
+    {
+      "original_sha256": "1407576f5b225fa5ca98271e29ca511454d1bd5cbeee9b6b76b0ce6a12e8da14",
+      "original_bytes": 127,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/config-baseline.txt",
+      "sha256": "1407576f5b225fa5ca98271e29ca511454d1bd5cbeee9b6b76b0ce6a12e8da14",
+      "bytes": 127
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "9915e13255b8d7fe668d3f2300c0a340673c53282ab51136eff790f9aa7f3bfa",
+      "original_bytes": 128,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/config-relations.txt",
+      "sha256": "9915e13255b8d7fe668d3f2300c0a340673c53282ab51136eff790f9aa7f3bfa",
+      "bytes": 128
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "690ee6e3520b5714cb35e77ef2bc438fbd5badc3d847cd035079464b04cbcec5",
+      "original_bytes": 126,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/config-missing.txt",
+      "sha256": "690ee6e3520b5714cb35e77ef2bc438fbd5badc3d847cd035079464b04cbcec5",
+      "bytes": 126
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "559f6d8d96dca51aa8223fc83d76fc572d2e75ae8ab73ba9cd7bec94e00775ad",
+      "original_bytes": 124,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/config-stale.txt",
+      "sha256": "559f6d8d96dca51aa8223fc83d76fc572d2e75ae8ab73ba9cd7bec94e00775ad",
+      "bytes": 124
+    },
+    {
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "original_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "original_bytes": 71,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/source/README.md",
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+      "bytes": 71
+    },
+    {
+      "original_sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "original_bytes": 39,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/source/go.mod",
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+      "bytes": 39
+    },
+    {
+      "original_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "original_bytes": 97,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/source/main.go",
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+      "bytes": 97
+    },
+    {
+      "original_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "original_bytes": 142,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/source/main_test.go",
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+      "bytes": 142
+    },
+    {
+      "original_sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "original_bytes": 631,
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/mock/source/ontology-reviewed.yaml",
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+      "bytes": 631
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/docs.txt",
+      "sha256": "c93473f344b7f78468d07e357b249e0bb2bf6c0f214f6b6b29a381a79755d6d3",
+      "bytes": 39,
+      "original_sha256": "c93473f344b7f78468d07e357b249e0bb2bf6c0f214f6b6b29a381a79755d6d3",
+      "original_bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/b1-relations-runtime-m2max-2026-10-03/boundaries.txt",
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+      "bytes": 22,
+      "original_sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+      "original_bytes": 22
+    }
+  ],
+  "source_sha256": {
+    "cmd/cks/mcpcli/ontology.go": "a87c8ccb11ca4153522c8ac0bbe2876d041ba76ea842f514a32342dcb1d8772d",
+    "cmd/cks/mcpcli/ontology_test.go": "c5cf9550ae79d6d83708ec5b0135f134e05328b370961140a55b38bccb77a47e",
+    "cmd/cks/mcpcli/serve.go": "44d1833bfa97ba1c6ab993a1124973de0f132d515268fef741fd8c77fa42fcbd",
+    "internal/system/composer/stage1/extractor.go": "108d3a7efac9ab36b159709183d3a3f80819185ec71397b6b7a87d94869eaeca",
+    "internal/system/composer/stage1/extractor_vocab_test.go": "72ddc005217e31f302bbd7ce40a6a92d58f812d32f55eac41b7ae980038fa810",
+    "internal/system/composer/stage2/ontology_provider.go": "6c9eb867032133d3658abd7dc68211ddc73e6c68fd53ec800f26dda1f756c3fa",
+    "internal/system/composer/stage2/ontology_provider_test.go": "4b17855299ff913d8c23033054e363f1ea77150de093931a1ea3d8c2f2b4ebd8",
+    "internal/system/composer/stage2/searcher.go": "415cbef0989cfeaf80126a9d41198787660b1ef6f9a6128c4538f7b85698ddf9",
+    "internal/system/composer/composer.go": "0953e6ac7f2ad1e7bfb0a0043f6ed6ef5d8fe6843e49afd7632d73c9657776b0",
+    "internal/system/config/config.go": "8e76e4925577021af0334b7b48eb09226444665b6558c14e34b4850d239c9eeb",
+    "internal/system/semantic/readonly.go": "62947607fc08c933964296bf8f84a28d13f75ac3837105e3d6b36e2ff12e3201",
+    "internal/system/semantic/readonly_test.go": "c7976417d29f622c553f397312b15aa51008b35711a8c2da238ec24ca6878f63",
+    "internal/system/mcp/get_for_task_v2.go": "addd12f1836a4aa8403babbf6ecf8b4104b8ba38fbac6a19f16468de4767e4a2",
+    "internal/system/evidencev2/pack_test.go": "14f3671e03df01e65c70c8fa7947b2ab544b13df635a99105c806038ec3e2380",
+    "pkg/system/contract/ontology.go": "e1be535c26868040e8ab07647ac3bf0613e79866e7d05fb43342c6bc065e29b7",
+    "pkg/system/contract/pack.go": "273af4f97dedf7e24d716030ee6f6023ce1e644754b226752d4893ca427973f1",
+    "pkg/system/contract/v2.go": "7e6af85f4cef19e3c288fa0f9eae9780324cb6a6c5dc7a58ad88f94f023c1469",
+    "pkg/system/contract/retrievaltrace.go": "5505bdc83b6a2596bb10fd5284a94df3eab7667ca6ca33411beaf99804b506fe",
+    "scripts/wbs-ontology-relations-smoke.py": "31b9f14372f5fb85c866e80ada7cfdc2b108943310346614af5326cd42952391"
+  },
+  "summary": {
+    "implemented_modes": [
+      "baseline",
+      "relations"
+    ],
+    "unfinished_modes_rejected": [
+      "concept_text",
+      "combined"
+    ],
+    "mock_requests": 8,
+    "real_requests": 8,
+    "unique_real_relations": 1,
+    "boosted_real_citations": 2,
+    "fixed_dataset_tuple": true,
+    "current_pointer_not_required": true,
+    "semantic_db_unchanged": true,
+    "missing_stale_preserve_baseline": true,
+    "v2_integrity_checked": true
+  },
+  "limitations": [
+    "Synthetic fixture-reviewer facts are not human approval of operational facts.",
+    "No official B0/B1 quality or latency; real smoke overlapped independent Go/mock checks.",
+    "Stage2 capped set preservation is not a whole-corpus final-context quality claim.",
+    "Cooperative deadlines discard expired reranks; synchronous evidence validation has no hard wall-clock guarantee.",
+    "Concept-text/combined/pack arms and official paired evaluation remain open.",
+    "Input scope/dynamic gold/protocol human decisions remain pending."
+  ]
+}

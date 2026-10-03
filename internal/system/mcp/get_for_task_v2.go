@@ -61,6 +61,7 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if err != nil {
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
+	pack.Metadata.Ontology = legacy.Metadata.Ontology
 	if req.GetBool("include_knowledge", false) {
 		asOf, subsystem := req.GetString("knowledge_as_of", ""), req.GetString("knowledge_subsystem", "")
 		if asOf == "" || subsystem == "" {
@@ -88,6 +89,11 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 					}
 				}
 			}
+		}
+	}
+	if pack.Metadata.Ontology != nil {
+		if err := evidencev2.Stamp(&pack); err != nil {
+			return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 		}
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil

@@ -61,6 +61,10 @@ type Config struct {
 // knowledge response. Empty StorePath preserves the earlier v2 behavior.
 type SemanticConfig struct {
 	StorePath string `yaml:"store_path"`
+	// OntologyMode is off by default. Only the implemented relations arm is
+	// accepted; unfinished experiment arms cannot silently run as baseline.
+	OntologyMode     string `yaml:"ontology_mode,omitempty"`
+	OntologyBudgetMS int    `yaml:"ontology_budget_ms,omitempty"`
 }
 
 // ServiceConfig carries the launchd deployment's host-level properties — the
@@ -300,6 +304,14 @@ func (c *Config) Validate() error {
 	}
 	if c.Backends.CKV.EmbedDim < 0 {
 		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
+	}
+	switch c.Semantic.OntologyMode {
+	case "", "off", "baseline", "relations":
+	default:
+		return fmt.Errorf("config: semantic.ontology_mode must be off, baseline or relations")
+	}
+	if c.Semantic.OntologyBudgetMS < 0 || c.Semantic.OntologyBudgetMS > 5000 {
+		return fmt.Errorf("config: semantic.ontology_budget_ms must be 0..5000 (0 selects 1000ms)")
 	}
 	switch c.Backends.CKV.QueryPrefixPolicy {
 	case "", "registry", "none":

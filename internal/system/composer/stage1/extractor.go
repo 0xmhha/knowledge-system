@@ -131,11 +131,12 @@ type Stage1Output struct {
 
 // Extractor runs Stage 1 of the composer pipeline.
 type Extractor struct {
-	ckv    ckvclient.Client
-	ckg    ckgclient.Client
-	vocab  *vocab.Resolver
-	fp     *footprint.Logger
-	config Config
+	ckv           ckvclient.Client
+	ckg           ckgclient.Client
+	vocab         *vocab.Resolver
+	rawQueryFirst bool
+	fp            *footprint.Logger
+	config        Config
 }
 
 // Option configures an Extractor.
@@ -161,6 +162,12 @@ func WithConfig(cfg Config) Option {
 // glossary is empty or the receiver is nil.
 func WithVocab(r *vocab.Resolver) Option {
 	return func(e *Extractor) { e.vocab = r }
+}
+
+// WithRawQueryFirst preserves the original query for the first retrieval.
+// Later rounds may still use the configured glossary augmentation.
+func WithRawQueryFirst() Option {
+	return func(e *Extractor) { e.rawQueryFirst = true }
 }
 
 // New constructs an Extractor. Returns an error if either client is nil.
@@ -202,6 +209,9 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	// resolver or empty glossary degrade to a verbatim pass-through.
 	expansion := e.vocab.Resolve(prompt)
 	currentQuery := expansion.Expanded
+	if e.rawQueryFirst {
+		currentQuery = prompt
+	}
 	out.VocabExpanded = len(expansion.MatchedKeywords) > 0
 	out.VocabKeywords = expansion.MatchedKeywords
 

@@ -145,11 +145,12 @@ const (
 // PackMetadata carries provenance, budgeting, and integrity state for an
 // EvidencePack.
 type PackMetadata struct {
-	BudgetTokens     int       `json:"budget_tokens"`
-	UsedTokens       int       `json:"used_tokens"`
-	UtilizationRatio float64   `json:"utilization_ratio,omitempty"`
-	BuiltAt          time.Time `json:"built_at"`
-	BuilderVersion   string    `json:"builder_version,omitempty"`
+	Ontology         *OntologyDiagnostic `json:"ontology,omitempty"`
+	BudgetTokens     int                 `json:"budget_tokens"`
+	UsedTokens       int                 `json:"used_tokens"`
+	UtilizationRatio float64             `json:"utilization_ratio,omitempty"`
+	BuiltAt          time.Time           `json:"built_at"`
+	BuilderVersion   string              `json:"builder_version,omitempty"`
 	// CKGSchemaVersion and CKVStatsHash are opaque pin values that an
 	// evaluation harness can compare across runs to confirm the same
 	// index snapshot was used. Empty when the backend did not supply them.

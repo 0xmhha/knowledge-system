@@ -1,0 +1,414 @@
+{
+  "state": "verified",
+  "quality_metrics": null,
+  "scope": "synthetic structural integration; not official B1",
+  "embedder": "mock",
+  "embedding_identity": {
+    "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+    "dim": 64,
+    "model": "mock-feature-hash-v1"
+  },
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "910b041ee2cfef32ae526f7bbce1bc729b8b62af",
+      "file_manifest_digest": "82e51913c98da8a8bdd1bba4e2f7eaa6f85f67dce1f66c2c6b7a66d66b6a686f",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "a498dee6f8a167094963615f31cb64bdc3d7a80710f7dcd6fc74a4a074af616b"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "cd4f3e04d148f093d6c686e0aebd68ddb9b821138a8c0c82d867cca662701ee3",
+    "dataset_id": "fcd44edb25d9b718876080931ec5fe3f00d8de82c48d2513856363cd132e61af"
+  },
+  "semantic_db_unchanged": true,
+  "semantic_current_not_required": true,
+  "states": {
+    "baseline": {
+      "v1": null,
+      "v2": null
+    },
+    "relations": {
+      "v1": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 3,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 1
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 3,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 1
+      }
+    },
+    "missing": {
+      "v1": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 3,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 3,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "stale": {
+      "v1": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 3,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 3,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "git-init",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "init",
+        "-q"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-add",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "add",
+        "."
+      ],
+      "exit_code": 0,
+      "raw_output": "git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-commit",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-qm",
+        "synthetic relations input"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset",
+        "--project-id",
+        "ks-fixture",
+        "--source-mode",
+        "committed",
+        "--version",
+        "smoke",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "setup.txt",
+      "sha256": "0761a28fbff6b7c8018ac06be39271e31ac39b7e14fee89126c1a3a005576fcd"
+    },
+    {
+      "id": "semantic-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--project-id",
+        "ks-fixture",
+        "--dataset-id",
+        "fcd44edb25d9b718876080931ec5fe3f00d8de82c48d2513856363cd132e61af",
+        "--graph",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/projection.json",
+        "--docs",
+        "README.md",
+        "--ontology",
+        "ontology-reviewed.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-extract.txt",
+      "sha256": "29cb035414e069bae2e5ad506b9b9dc1bef7f17bcb4441e7b1cc161ef88f8b4f"
+    },
+    {
+      "id": "semantic-promote",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/projection.json",
+        "--repo",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--graph",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/semantic.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-promote.txt",
+      "sha256": "dfccc26ddd892666e4de3e5811ee52e2fca98eb4b9743d77ad63b47d79de2231"
+    },
+    {
+      "id": "config-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--embed-model",
+        "mock-feature-hash-v1",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/baseline.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-baseline.txt",
+      "sha256": "1407576f5b225fa5ca98271e29ca511454d1bd5cbeee9b6b76b0ce6a12e8da14"
+    },
+    {
+      "id": "capture-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/baseline.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/baseline.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--embed-model",
+        "mock-feature-hash-v1",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/relations.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-relations.txt",
+      "sha256": "9915e13255b8d7fe668d3f2300c0a340673c53282ab51136eff790f9aa7f3bfa"
+    },
+    {
+      "id": "capture-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/relations.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/relations.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--embed-model",
+        "mock-feature-hash-v1",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/missing.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/missing.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-missing.txt",
+      "sha256": "690ee6e3520b5714cb35e77ef2bc438fbd5badc3d847cd035079464b04cbcec5"
+    },
+    {
+      "id": "capture-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/missing.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/missing.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/src",
+        "--embed-model",
+        "mock-feature-hash-v1",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/stale-semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/stale.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-stale.txt",
+      "sha256": "559f6d8d96dca51aa8223fc83d76fc572d2e75ae8ab73ba9cd7bec94e00775ad"
+    },
+    {
+      "id": "capture-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/stale.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-mock-20261003/stale.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

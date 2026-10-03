@@ -241,7 +241,9 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		return fmt.Errorf("vocab.Load: %w", err)
 	}
 
-	c, err := buildComposer(ctx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp)
+	c, err := buildComposer(ctx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp,
+		cfg.Semantic.OntologyMode != "",
+		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot)...)
 	if err != nil {
 		return fmt.Errorf("build composer: %w", err)
 	}
@@ -551,12 +553,17 @@ func buildComposer(
 	ruleset *config.SanitizeRuleset,
 	vocabResolver *vocab.Resolver,
 	fp *footprint.Logger,
+	rawQueryFirst bool,
+	stage2Options ...stage2.Option,
 ) (*composer.Composer, error) {
 	ic, err := intent.New(ctx, embedder, intent.WithFootprint(fp))
 	if err != nil {
 		return nil, fmt.Errorf("intent.New: %w", err)
 	}
 	stage1Opts := []stage1.Option{stage1.WithFootprint(fp)}
+	if rawQueryFirst {
+		stage1Opts = append(stage1Opts, stage1.WithRawQueryFirst())
+	}
 	if vocabResolver != nil {
 		stage1Opts = append(stage1Opts, stage1.WithVocab(vocabResolver))
 	}
@@ -564,7 +571,7 @@ func buildComposer(
 	if err != nil {
 		return nil, fmt.Errorf("stage1.New: %w", err)
 	}
-	s2, err := stage2.New(ckg, stage2.WithFootprint(fp))
+	s2, err := stage2.New(ckg, append([]stage2.Option{stage2.WithFootprint(fp)}, stage2Options...)...)
 	if err != nil {
 		return nil, fmt.Errorf("stage2.New: %w", err)
 	}

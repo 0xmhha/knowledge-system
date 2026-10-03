@@ -1,0 +1,32 @@
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-03T22:41:05.786+09:00 level=INFO msg="detected files" go=2 ts=0 sol=0 proto=0
+    time=2026-10-03T22:41:06.322+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T22:41:06.456+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=5 changed_in_edges=13 blame_edges=2 hunk_edges=5 hunk_blobs=5 max_per_file=10
+    time=2026-10-03T22:41:06.511+09:00 level=INFO msg="build complete" nodes=19 edges=37 pkg_tree_edges=10 topic_resolutions=3
+    ckg: built 19 nodes / 37 edges into /private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T22:41:06.535+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=65334509d64668dc run_id=4d5b946d356a217f extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-997533352/tree has_ckv_yaml=false languages_filter=[]
+    time=2026-10-03T22:41:06.535+09:00 level=INFO msg=ckv event=build.start trace_id=d6898730fe7277fb run_id=4d5b946d356a217f src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-997533352/tree out_dir=/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-03T22:41:06.547+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=cbc92eb33437fafc run_id=4d5b946d356a217f entries=3 canonical_available=true ckg_path=/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/graph files_indexed=2
+    ckv: 3/3 files (762.6 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-03T22:41:06.557+09:00 level=INFO msg=ckv event=build.done trace_id=d6898730fe7277fb run_id=4d5b946d356a217f latency_ms=21 category_counts=map[:8] db_sha256=3cb6f3f65bf3377bd5fbc69e19b9211f3ce8411797efaea894241cf873d55a10 chunks_doc=3 indexed_head=910b041ee2cfef32ae526f7bbce1bc729b8b62af chunks_total=9 policy_loaded=false src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-997533352/tree out_dir=/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/vector files_indexed=3 chunks_symbol=3 chunks_file_header=2 embedder=mock-feature-hash-v1 languages="map[go:5 markdown:3]" chunks_flow_step=0 chunks_truncated=0 embedder_provider="" chunks_canonical_id=3 chunks_flow_spine=0
+    ckv: indexed 3 files → 9 chunks (3 symbol, 3 doc, 2 header, 0 truncated)
+    ckv: canonical_id 3/3 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=910b041ee2cfef32ae526f7bbce1bc729b8b62af built_at=2026-10-03T13:41:06Z db=/private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke/vector/vector.db sha256=3cb6f3f65bf3377bd5fbc69e19b9211f3ce8411797efaea894241cf873d55a10
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 2
+      db files:    2
+      in both:     2
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-b1-relations-final2-mock-20261003/dataset/smoke to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

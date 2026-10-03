@@ -28,6 +28,7 @@ import (
 	"context"
 	"errors"
 	"math"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -112,6 +113,7 @@ func DefaultConfig() Config {
 // keywords. Precision/recall computation should use Citations; Hits
 // exists for "why did Stage 2 land on this citation set" debugging.
 type Stage2Output struct {
+	Ontology *contract.OntologyDiagnostic
 	// ConceptCandidates are interpretations of the raw query. They never
 	// remove a CKV/CKG hit; only verified implementation links can boost an
 	// already retrieved citation when the optional resolver is enabled.
@@ -156,11 +158,13 @@ type Stage2Output struct {
 
 // Searcher runs Stage 2 of the composer pipeline.
 type Searcher struct {
-	ckg           ckgclient.Client
-	fp            *footprint.Logger
-	config        Config
-	ontology      OntologyResolver
-	ontologyBoost float64
+	ckg              ckgclient.Client
+	fp               *footprint.Logger
+	config           Config
+	ontology         OntologyResolver
+	ontologyBoost    float64
+	ontologyProvider OntologyProvider
+	ontologyBudget   time.Duration
 }
 
 // Option configures a Searcher.
@@ -199,6 +203,12 @@ func New(ckg ckgclient.Client, opts ...Option) (*Searcher, error) {
 	if math.IsNaN(s.ontologyBoost) || math.IsInf(s.ontologyBoost, 0) || s.ontologyBoost < 0 || s.ontologyBoost > 0.2 {
 		return nil, errors.New("stage2: ontology boost must be between 0 and 0.2")
 	}
+	if s.ontologyProvider != nil && (s.ontologyBudget <= 0 || s.ontologyBudget > 5*time.Second) {
+		return nil, errors.New("stage2: ontology budget must be positive and at most 5 seconds")
+	}
+	if s.ontologyProvider != nil && s.ontology != nil {
+		return nil, errors.New("stage2: select one ontology resolver or provider")
+	}
 	return s, nil
 }
 
@@ -216,6 +226,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// The ckv semantic list is a retrieval source in its own right, so a
 	// run with no keywords but non-empty ckv hits is still productive.
 	if len(keywords) == 0 && len(ckvHits) == 0 {
+		if s.ontologyProvider != nil && s.ontologyBoost > 0 {
+			out.Ontology = &contract.OntologyDiagnostic{Mode: "relations", State: "no_candidates"}
+		}
 		s.emitFootprint(ctx, intent, keywords, out, 0, 0, "")
 		return out, nil
 	}
@@ -336,6 +349,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 		out.ConceptCandidates = applyOntologyBoost(agg, s.ontology, prompt, ckvHits, s.ontologyBoost, allowed)
 	}
 	out.Citations = agg.results(s.config.MaxCitations, demoteTests, demoteDocs)
+	if s.ontologyProvider != nil && s.ontologyBoost > 0 {
+		out.Citations, out.ConceptCandidates, out.Ontology = s.applyProvidedOntology(ctx, agg, prompt, ckvHits, out.Citations, demoteTests, demoteDocs)
+	}
 	if len(keywords) > 0 {
 		out.Coverage = float64(hitCount) / float64(len(keywords))
 	}

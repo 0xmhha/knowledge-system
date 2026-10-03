@@ -87,6 +87,28 @@ func TestBuildUsesRetainedBytesAndV2Tuple(t *testing.T) {
 	}
 }
 
+func TestV2IntegrityCoversOptionalOntologyFallback(t *testing.T) {
+	_, version := testVersion(t, "original\n")
+	pack, err := Build(context.Background(), version, "Alpha", nil, testCleaner(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pack.Metadata.Ontology != nil {
+		t.Fatal("default v2 enabled ontology")
+	}
+	pack.Metadata.Ontology = &contract.OntologyDiagnostic{Mode: "relations", State: "unavailable", Reason: "store_or_dataset_missing"}
+	if err := Stamp(&pack); err != nil {
+		t.Fatal(err)
+	}
+	if err := Verify(pack); err != nil {
+		t.Fatal(err)
+	}
+	pack.Metadata.Ontology.State = "active"
+	if err := Verify(pack); err == nil {
+		t.Fatal("tampered ontology state kept valid integrity")
+	}
+}
+
 func TestBuildDropsSecretAndRejectsForeignCommit(t *testing.T) {
 	_, version := testVersion(t, "SECRET=bad\n")
 	pack, err := Build(context.Background(), version, "inspect", []contract.Citation{{File: "README.md", StartLine: 1, EndLine: 1}}, testCleaner(t))

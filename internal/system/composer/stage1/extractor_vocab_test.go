@@ -11,6 +11,25 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
+func TestRawQueryFirstKeepsOriginalBeforeGlossaryAugmentation(t *testing.T) {
+	r, err := vocab.New(vocab.Glossary{Version: 1, Entries: []vocab.Entry{{Aliases: []string{"쿼럼"}, Canonical: "quorum", CodeKeywords: []string{"QuorumSize"}}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	backend := &ckvclient.Fake{}
+	e, err := New(backend, &ckgclient.Fake{}, WithVocab(r), WithRawQueryFirst())
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := e.Extract(context.Background(), "쿼럼 처리", contract.IntentBugFix)
+	if err != nil || len(backend.Calls.SemanticSearch) < 2 || backend.Calls.SemanticSearch[0].Query != "쿼럼 처리" || !out.VocabExpanded {
+		t.Fatalf("raw query not primary: %+v %v", backend.Calls, err)
+	}
+	if !strings.Contains(backend.Calls.SemanticSearch[1].Query, "QuorumSize") {
+		t.Fatal("later augmentation lost glossary")
+	}
+}
+
 // TestExtract_NoVocab_VerbatimQuery confirms that without a resolver the
 // query the ckv backend sees equals the original prompt — no surprise
 // rewriting when vocab is opt-out.

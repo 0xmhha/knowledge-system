@@ -147,6 +147,7 @@ type EvidencePackV2 struct {
 }
 
 type V2Metadata struct {
-	IntegrityHashAlgo string `json:"integrity_hash_algo"`
-	IntegrityHash     string `json:"integrity_hash,omitempty"`
+	Ontology          *OntologyDiagnostic `json:"ontology,omitempty"`
+	IntegrityHashAlgo string              `json:"integrity_hash_algo"`
+	IntegrityHash     string              `json:"integrity_hash,omitempty"`
 }

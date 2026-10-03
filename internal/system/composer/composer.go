@@ -256,6 +256,7 @@ func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, c
 	// neighbors whose endpoints are missing from the final citation
 	// set (required for EvidencePack.IsValid).
 	pack := assemblePack(prompt, intentVal, s3Out, s4Out, s5Out, c.builderVersion, s2Out.Knowledge)
+	pack.Metadata.Ontology = s2Out.Ontology
 
 	// Attach any dummy-backend instructions accumulated during the run
 	// (empty when the wired backends are real).
@@ -315,6 +316,7 @@ func buildComposerTrace(prompt string, intentVal contract.Intent, s1 stage1.Stag
 	}
 
 	return contract.RetrievalTrace{
+		Ontology:       s2.Ontology,
 		Producer:       "composer",
 		Intent:         intentVal,
 		Prompt:         prompt,
