@@ -62,6 +62,13 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
 	pack.Metadata.Ontology = legacy.Metadata.Ontology
+	// Knowledge/traces verify their input before extending it. Stamp the
+	// optional diagnostic at this boundary, not only after those layers.
+	if pack.Metadata.Ontology != nil {
+		if err := evidencev2.Stamp(&pack); err != nil {
+			return v2ToolErrorFor(err, "v2_evidence_failed"), nil
+		}
+	}
 	if req.GetBool("include_knowledge", false) {
 		asOf, subsystem := req.GetString("knowledge_as_of", ""), req.GetString("knowledge_subsystem", "")
 		if asOf == "" || subsystem == "" {
@@ -75,7 +82,7 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 			// The store is optional. A missing or stale projection keeps the
 			// already cited CKV/CKG and local knowledge response intact.
 			if info, statErr := os.Stat(d.SemanticStorePath); statErr == nil && info.Mode().IsRegular() {
-				store, openErr := semantic.OpenStore(d.SemanticStorePath)
+				store, openErr := semantic.OpenStoreReadOnly(ctx, d.SemanticStorePath)
 				if openErr == nil {
 					projection, loadErr := store.LoadAlignedRetained(ctx, pack.Coordinates.ProjectID,
 						pack.Coordinates.DatasetID, d.EvidenceSourceRoot,
@@ -89,11 +96,6 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 					}
 				}
 			}
-		}
-	}
-	if pack.Metadata.Ontology != nil {
-		if err := evidencev2.Stamp(&pack); err != nil {
-			return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 		}
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil

@@ -115,6 +115,18 @@ def split_sources(sources, prefix):
     return {"go.mod": sources["go.mod"], **{p[len(prefix) + 1:]: c for p, c in sources.items() if p.startswith(prefix + "/")}}
 
 
+def fixture_project_id(fixture, state):
+    if fixture["family"] == "F-03":
+        # The frozen vocabulary is already project-scoped. Preserve that
+        # exact identity rather than generating an incompatible alias.
+        headers = re.findall(r"^project_id:[ \t]*([A-Za-z0-9._-]+)[ \t]*$",
+                             fixture["sources"].get("ontology.yaml", ""), re.MULTILINE)
+        if len(headers) != 1:
+            raise ValueError("F-03 requires one explicit frozen ontology project_id")
+        return headers[0]
+    return fixture["id"].lower() + (f"-{state}" if fixture["family"] == "F-05" else "")
+
+
 def materialize(manifest_path, output, partition="development", allow_draft=False):
     raw = manifest_path.read_bytes()
     selected = validate(json.loads(raw), partition, allow_draft)
@@ -141,7 +153,7 @@ def materialize(manifest_path, output, partition="development", allow_draft=Fals
                     init_repo(repo)
                 content = split_sources(sources, prefix) if prefix else sources
                 info = commit(repo, content, f"{fid} frozen {name}")
-                project = fid.lower() + (f"-{name}" if family == "F-05" else "")
+                project = fixture_project_id(fixture, name)
                 record["states"].append({"name": name, "repository": relative, "project_id": project, **info})
             records.append(record)
         report = {"schema_version": 1, "gate": "B0-fixture-materialization",

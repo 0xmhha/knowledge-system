@@ -1,0 +1,717 @@
+{
+  "schema_version": 1,
+  "state": "prepared_pending_human_review",
+  "diagnostic_only": true,
+  "partition": "development",
+  "quality_metrics": null,
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "input_manifest_sha256": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+  "embedder": "mock",
+  "cases": [
+    {
+      "id": "F-03-DEV-current",
+      "fixture_id": "F-03-DEV",
+      "family": "F-03",
+      "state": "current",
+      "project_id": "b0-f03-dev",
+      "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+      "base_tree": "a82bc70536c2842594f421fe9e71a8b996d0b434",
+      "supplement_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+      "supplement_tree": "a82bc70536c2842594f421fe9e71a8b996d0b434",
+      "dataset": {
+        "source": {
+          "project_id": "b0-f03-dev",
+          "source_mode": "committed",
+          "source_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+          "file_manifest_digest": "7e72bb06ad2dbf3b83f404fc1acb81f20139279db066ff28697153b292b72e66",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "5141a7a2f6c5d7050d96a0ae0e130b3d6e53d081b434ffe80d4acdfa97a87fda",
+        "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+        "ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837"
+      },
+      "projection": "F-03-DEV-current/projection-proposed.json",
+      "projection_sha256": "288bb8cac2495f4c5444bb16ac100482920cf508f2ed5379df63bf2888675da0",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.ProjectIdentity",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-05-DEV-a",
+      "fixture_id": "F-05-DEV",
+      "family": "F-05",
+      "state": "a",
+      "project_id": "f-05-dev-a",
+      "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+      "base_tree": "a10c851e2f517680daa43aa202a2961b70945aa4",
+      "supplement_commit": "80e9f2f327a67b69bf394b2bf3145891216332c3",
+      "supplement_tree": "155cb19c5231a749ced37f1fc16b923a50d5a77d",
+      "dataset": {
+        "source": {
+          "project_id": "f-05-dev-a",
+          "source_mode": "committed",
+          "source_commit": "80e9f2f327a67b69bf394b2bf3145891216332c3",
+          "file_manifest_digest": "ac408667b086cca83df91857b361a32544eaa278d626db9231b99aeab4a1e14e",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "45260fc7b5bae8d604f41bcc383d5c403238d8526393a04a4617c48d31f88908"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "6207ec9562380b65427611e1988373e36f60ed5c730009c46925b6238452a15a",
+        "dataset_id": "e1b2b8fbd5b47463ba13b0b730bc859e12fe7d04796488bc43b1a5fb61dfc724"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "26e62bcb7c2344f580b1627372a1a22408ce9236ed4422926c1eafd75be878ee",
+        ".cks/knowledge/manifest.yaml": "6d35f4fbb8fb011ce625b05c6dc13b42ea55b820edd7ece06e064ab0618ee1b4",
+        ".cks/knowledge/policies/refund-cap.yaml": "d40b7bb235b34f33479575674861c0ce223841400c33973c4e406a16cadea6e1",
+        "docs/policy.md": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "ontology.yaml": "4c925451ded85cf0787086ff03069de0281a3cd908d2e83b6f65c1a1e2c0f644"
+      },
+      "projection": "F-05-DEV-a/projection-proposed.json",
+      "projection_sha256": "68a10d8d4713f466fb7ee971c5eaca101447c2e810e920b118b5b808e6d4c013",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-05-DEV-b",
+      "fixture_id": "F-05-DEV",
+      "family": "F-05",
+      "state": "b",
+      "project_id": "f-05-dev-b",
+      "base_commit": "45e378b9da4fe6d4c796dd84281f28859c282e20",
+      "base_tree": "3f050094c302293d53251ad9071fb26fa04eb74e",
+      "supplement_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+      "supplement_tree": "f5f9d17743206902b26dd0e6f59b8673509a6735",
+      "dataset": {
+        "source": {
+          "project_id": "f-05-dev-b",
+          "source_mode": "committed",
+          "source_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+          "file_manifest_digest": "0c42a5e32d3af02b6756098ed82edd9935df831c9fe1081ebcde0df5d2289207",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "32769d81c646a67b8c9fb5c2211f48219ff71eea164657bf7119487901e98366"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "805b1fd55deda5734278f843990d7a2d2c84e5e826ce67298e00d7bc55423cbb",
+        "dataset_id": "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "227a52bf8462c4b4279d23ad20bfef5ea75cdfd638d5bfc06dbf5e56a6a5e07a",
+        ".cks/knowledge/manifest.yaml": "6cbdf1e9f6cfa0a1e1f9b6dae885e9079b22d9e18bff65739911b7cef6540934",
+        ".cks/knowledge/policies/refund-cap.yaml": "1ed3ea8529365f53c070f233a39fe669d8658457bf14daade33baea78968b9f5",
+        "docs/policy.md": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "ontology.yaml": "e67219493f0efab406e36e03c4f2124dc6367b67654d1565489a65c9434e62c5"
+      },
+      "projection": "F-05-DEV-b/projection-proposed.json",
+      "projection_sha256": "4f38ee0eab27c302a407bc4507cdda9aab9fc7c5c857129bb7795df9585f8486",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-06-DEV-current",
+      "fixture_id": "F-06-DEV",
+      "family": "F-06",
+      "state": "current",
+      "project_id": "f-06-dev",
+      "base_commit": "288e376c91045a69346fe67f6971e9053af344f5",
+      "base_tree": "7f4fd995cd466003922d8b655edc9aa374b39271",
+      "supplement_commit": "498c625431321aa7905bd6bf2746a50ff136010a",
+      "supplement_tree": "fd3e3ac7493c14758cc29c0b4c3f76956f088dce",
+      "dataset": {
+        "source": {
+          "project_id": "f-06-dev",
+          "source_mode": "committed",
+          "source_commit": "498c625431321aa7905bd6bf2746a50ff136010a",
+          "file_manifest_digest": "52f1a2a6e0993b105377f23067fc6af75e9db67a6701d2a76dce7bf2836e4ced",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "c8f7067c3e90fdea43b4f293a98f0d70506fbc8e6da527064591ef9206caac70"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "f7a0bc329846441f01e4848bf7cbd27897608a761439e65cac88bd5413bcdc81",
+        "dataset_id": "215d38e3842a155300af98963abcb0d4727ceb19767f03f2c98887ccb2cfce29"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "ebee0fba239f80abd673e8a17a58ba7f2039e6b48ce1e62297f51e81c049bf7c",
+        ".cks/knowledge/manifest.yaml": "5f27bbad2ee9b36e01391c15c5825266071bd99dced142401e6be1dc180da653",
+        ".cks/knowledge/policies/refund-cap.yaml": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+        "ontology.yaml": "fc1db1ba329abdccfe6fc229274f2f1a00c5646f32eb14b54648582d46ea147b",
+        "spec.yaml": "6e744a4e5b2332e3b1c2d1f8c3b61551fe350b523b3acbae82572a8ff1a41d83"
+      },
+      "projection": "F-06-DEV-current/projection-proposed.json",
+      "projection_sha256": "f4d742d2a0f624f2bed67bf37dc3983d6ebadb834e7da4f2bcd1cd14829e4cf2",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.RefundLimit",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [
+        [
+          "example.com/b0dev.TestHealth",
+          "main_test.go",
+          5,
+          5,
+          "Function",
+          "TestHealth"
+        ]
+      ],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "F-03-DEV-current-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset",
+        "--project-id",
+        "b0-f03-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-setup.txt",
+      "sha256": "9abfa86b29b5fd27bdb6a3112e97a134197fe0d2a32de3ee13574e2d6573cc9b"
+    },
+    {
+      "id": "F-03-DEV-current-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--project-id",
+        "b0-f03-dev",
+        "--dataset-id",
+        "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-extract.txt",
+      "sha256": "6d2a9b51a63060f52f0d5bbf00a651eca0d286dce7d6a13dd4c5949a2fc3fd65"
+    },
+    {
+      "id": "F-03-DEV-current-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-validate-proposed.txt",
+      "sha256": "6eb17394aa538fe31614e64a779f8a8c6a255478692f5ddf1b82b9c8d6d3b2ce"
+    },
+    {
+      "id": "F-05-DEV-a-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-lock.txt",
+      "sha256": "5afdddbb3b64d08ac613b575e8b087a3cfe02fc7aea3498b58e77b2874c4e2cf"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-validate.txt",
+      "sha256": "0a5fddac907e7265f2eec6571361befed6ed540b33ef1d78f99a0f00b11184d9"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-review.txt",
+      "sha256": "50c164f3a1386570ebab4d997f172ed8ecc80642e1a7cc12188306f09c5832ba"
+    },
+    {
+      "id": "F-05-DEV-a-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset",
+        "--project-id",
+        "f-05-dev-a",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-setup.txt",
+      "sha256": "534808f8ed05bcc8ccf3ac6e23b9ce17b562fd3a10edba9893738f17a8d938a9"
+    },
+    {
+      "id": "F-05-DEV-a-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--project-id",
+        "f-05-dev-a",
+        "--dataset-id",
+        "e1b2b8fbd5b47463ba13b0b730bc859e12fe7d04796488bc43b1a5fb61dfc724",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-extract.txt",
+      "sha256": "c867574dd7a9a966841bdb32caa088a7e4c2c32d5c5fb0266a2606cbb6efdca6"
+    },
+    {
+      "id": "F-05-DEV-a-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-validate-proposed.txt",
+      "sha256": "4069a57c0ee1ad25c71c251aa9b7b060b4172552cfe07ac4bd52d0b6cb90deb7"
+    },
+    {
+      "id": "F-05-DEV-b-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-lock.txt",
+      "sha256": "ae3f07393454711824744637087d731ce0c46556336d55f2bd894fbd2402d0ee"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-validate.txt",
+      "sha256": "8b5a563a71ace6cf310583b95c51adbe490b030550aff7fe57733d7559c9fffc"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-review.txt",
+      "sha256": "72b0285092c1e9972b0f3a17cc3ed7d2c8b3e36473690e8368b81d2d6593c2ff"
+    },
+    {
+      "id": "F-05-DEV-b-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset",
+        "--project-id",
+        "f-05-dev-b",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-setup.txt",
+      "sha256": "883d3043415e374304d63a794bc0a42378d3e9d32c838fb15e584eefba42f4c3"
+    },
+    {
+      "id": "F-05-DEV-b-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--project-id",
+        "f-05-dev-b",
+        "--dataset-id",
+        "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-extract.txt",
+      "sha256": "4ea29757cd00c67e9e7ee944015959c7879164e106a5df38022239735c4a308d"
+    },
+    {
+      "id": "F-05-DEV-b-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-validate-proposed.txt",
+      "sha256": "91fb52aaf23f388e286e2caeff1438ec41b6b609a92a50d9247daf08d400fe9a"
+    },
+    {
+      "id": "F-06-DEV-current-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-lock.txt",
+      "sha256": "5fcd5d27f84fa7ccdf64c85b1385dfc3b2a295667ae8c878e98d63023d0bd76a"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-validate.txt",
+      "sha256": "1205cc4191217d9a0a476de6dca8494ead19ffa2a8e9638bef9a9168969798e2"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-review.txt",
+      "sha256": "6c3722fc1ad7ffee7f750a03aa378487ff94c51b8578381731a6ea8542541404"
+    },
+    {
+      "id": "F-06-DEV-current-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset",
+        "--project-id",
+        "f-06-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-setup.txt",
+      "sha256": "2f5e53b06d61656f3222715632afa00084ecff496a921489a338105229725632"
+    },
+    {
+      "id": "F-06-DEV-current-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--project-id",
+        "f-06-dev",
+        "--dataset-id",
+        "215d38e3842a155300af98963abcb0d4727ceb19767f03f2c98887ccb2cfce29",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--spec",
+        "spec.yaml",
+        "--docs",
+        "README.md",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-extract.txt",
+      "sha256": "c563c5802db9c69e1867c51c18bb5e451b0d1426c843cddbebd76c81f63e1bfc"
+    },
+    {
+      "id": "F-06-DEV-current-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-validate-proposed.txt",
+      "sha256": "452d339df784841b6c0dc2d1b6d856878a763fd2171b53d9faa38eca196396c4"
+    }
+  ]
+}

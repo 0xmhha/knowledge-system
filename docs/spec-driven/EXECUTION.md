@@ -1,5 +1,7 @@
 # Spec-driven WBS execution log
 
+B0 source-bound fixture preparation / ontology+knowledge correction (2026-10-03): F-03 원문 project_id와 생성 ID 불일치를 수정하고 원문 20개/SHA/커밋을 보존했다. F-05 두 프로젝트와 F-06에 proposed 온톨로지·팩·정책/스펙과 실제 CKG 코드 앵커를 별도 결정적 커밋/tuple로 연결했다. mock/BGE-M3 각 4개 데이터셋과 각 14 MCP 요청에서 무승격·기본 인용/본문·v2 integrity·의미 DB SHA를 확인했다. 이 과정에서 ontology diagnostic을 stamp하기 전에 지식 계층이 Verify하여 실패하는 오류를 실제 응답/Go 회귀로 재현하고, 계층 진입 전에 stamp하도록 수정했다. 지식 요청의 의미 DB도 읽기 전용으로 연다. 전체 Go·관련 race·vet·Python 15개 시험이 통과했다. [검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md)와 [원자료](../../system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03.json)에 제안·출처·원응답·입력 bundle을 기록한다. 모든 사실은 proposed, semantic_current는 비어 있으며 공식 품질·최종 변형·사람 판정은 남아 있다.
+
 B1 four runtime adapters (2026-10-03): baseline/개념 텍스트/관계/결합을 실제 MCP에 연결하고 B1-01 구현 검증을 완료했다. 텍스트-only는 검토된 개념 정의·용어를 동일 CKV에 추가 검색하며 관계를 조회하지 않는다. 결합은 기여를 구분하고 원래 인용 점수 대비 총 boost를 20%로 제한한다. 기본 Stage 2 상위 K 집합·좌표·기본 응답 형식을 보존하고 실패/상한/협력적 deadline에서는 optional 변경을 버린다. mock/BGE-M3 각 정상 4·누락/변조 6 경로×v1/v2 20요청, 실제 출처 줄 SHA·독립 v2 integrity·읽기 DB 무변경을 확인했다. 전체 Go·관련 race·vet·경계·118 문서 검사 통과. [실행 계약](./B1-RUNTIME-ADAPTERS.md)과 [원자료 원장](../../system/eval/b0-knowledge-system/b1-text-runtime-m2max-2026-10-03.json)에 범위·원응답·입력 Git bundle·해시를 남겼다. 공식 품질 지표는 null이며 B1-02 팩 축과 B0 승인/계측, 공식 B/C 판정은 남아 있다.
 
 ## 2026-10-03 실행 작업리스트·완료 재검증

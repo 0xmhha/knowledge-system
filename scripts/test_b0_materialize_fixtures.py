@@ -50,6 +50,10 @@ class MaterializationTests(unittest.TestCase):
                     self.assertFalse((repo / ".git/objects/info/alternates").exists())
                     tracked = set(MODULE.git(repo, "ls-tree", "-r", "--name-only", state["commit"]).splitlines())
                     self.assertEqual(tracked, set(state["source_sha256"]))
+                    if fixture["family"] == "F-03":
+                        ontology = MODULE.git(repo, "show", state["commit"] + ":ontology.yaml")
+                        self.assertIn("project_id: " + state["project_id"] + "\n", ontology)
+
                     for relative, expected in state["source_sha256"].items():
                         actual = MODULE.git(repo, "show", state["commit"] + ":" + relative, raw=True)
                         self.assertEqual(MODULE.digest(actual), expected)

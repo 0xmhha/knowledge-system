@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "project_id": "f-06-dev",
+  "domain": "synthetic B0 development fixture",
+  "competency_questions": [
+    "Does RefundLimit satisfy the documented refund cap, and does TestHealth prove acceptance?",
+    "RefundLimit 구현은 명세의 환급 상한을 지키나요? TestHealth 통과가 수용 승인을 증명하나요?"
+  ],
+  "concepts": [
+    {
+      "id": "refund-cap",
+      "kind": "process",
+      "definition": "The fixture refund limit operation, whose required cap and observed return value are separate facts.",
+      "includes": [
+        "Source-backed function identity"
+      ],
+      "excludes": [
+        "Automatic policy compliance or acceptance"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "RefundLimit",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "환급 상한",
+          "preferred": true
+        }
+      ],
+      "status": "proposed"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+[
+  {
+    "id": "F-03-DEV-current-baseline-config",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/F-03-DEV-current/dataset/review",
+      "--source-root",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/fixtures/F-03-DEV/repo",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--semantic-store",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/F-03-DEV-current/semantic-proposed.db",
+      "--out",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-baseline.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "F-03-DEV-current-baseline-config.txt",
+    "sha256": "1a975c2f232d478106ced60907492d7fcdce41f183ce20170db7dae5309f817c"
+  },
+  {
+    "id": "F-03-DEV-current-baseline-capture",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-baseline-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-baseline.yaml",
+      "--output",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-baseline.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "F-03-DEV-current-baseline-capture.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "F-03-DEV-current-combined-config",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/F-03-DEV-current/dataset/review",
+      "--source-root",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/fixtures/F-03-DEV/repo",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--semantic-store",
+      "/private/tmp/ks-b0-semantic-review-final-mock-20261003/F-03-DEV-current/semantic-proposed.db",
+      "--out",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-combined.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "F-03-DEV-current-combined-config.txt",
+    "sha256": "0d576619f043a755a4fcb6e95dd703fc5bccaa45409e3ecf8a4d93658a5ae69c"
+  },
+  {
+    "id": "F-03-DEV-current-combined-capture",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-combined-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-combined.yaml",
+      "--output",
+      "/private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-combined.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 1,
+    "raw_output": "F-03-DEV-current-combined-capture.txt",
+    "sha256": "0e096edd41ec334910afa9b393b91bb9fc545454a34c38a78cc75f32b3fae0c4"
+  }
+]
