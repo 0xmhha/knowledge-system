@@ -19,7 +19,7 @@
 | OP-05 | 교체·폐기·유출 대응 | 현재 검증기에 기간/폐기 조회 없음 | 효력 시점·구 키/서명 처리·신뢰 루트 교체·복구 담당과 실행 증거 |
 | OP-06 | 소스·고지 적합성 | 원문/SHA 수집과 지정 source 비교 완료 범위 존재; 전체 적합성 pending | 정확한 버전·source/고지 범위·적합성 판정자·예외 및 잔여 범위 |
 | OP-07 | 지원 플랫폼·실모델·비용 한계 | 아래 매트릭스의 진단 범위만 확인 | 실제 지원 대상·필수 환경·운영 비용/모델 실행·known limits |
-| OP-08 | 실패 시 이전 데이터/current/키 복구 | 소형 mock 설치의 이전 version 복구 통과; 최종 C1 운영 복구 미실행 | 최종 패키지의 원본 보존·실패 주입·이전 current/신원/인용 재생과 담당자 |
+| OP-08 | 실패 시 이전 데이터/current/키 복구 | 소형 mock 및 Linux arm64 실제 CPU BGE-M3 설치의 이전 version/인용 복구 통과; 최종 C1 운영 복구 미실행 | 최종 패키지의 원본 보존·실패 주입·이전 current/신원/인용 재생과 담당자 |
 
 각 항목은 승인/수정/보류와 판정자를 기록한다. 해당 항목의 근거 버전·해시·시각을 연결하며, 과거 승인을 다른 scope의 승인으로 확장하지 않는다. OP-04에 개인 키나 접근 비밀을 제출할 필요는 없다.
 
@@ -28,7 +28,7 @@
 | 대상 | 실제 확인 | 남은 범위 |
 |---|---|---|
 | macOS arm64/M2 Max | Go 1.26.8 preview·시험 서명/설치/복구 이력, BGE-M3 pinned 소형/전체 입력 진단, FIX-14에서 실제 세 바이너리 dependency metadata 유지 확인 | 승인된 공식 B0/B1/C0/C1 품질·통제된 비용·최종 운영 패키지/키/복구 |
-| Linux arm64/Docker VM | Go 1.25.13 source fixture의 paired package SHA 동일·시험 서명·Go 없는 Debian 런타임의 세 독립 mock 프로젝트 설치/재시작/업데이트/롤백 | 실제 Ollama/BGE-M3·운영 호스트/대규모 입력 비용·최종 공식 품질/키/복구 |
+| Linux arm64/Docker VM | Go 1.25.13 source fixture의 paired package SHA 동일·시험 서명·Go 없는 Debian 런타임의 세 독립 mock 프로젝트 및 실제 CPU BGE-M3 설치/재시작/업데이트/롤백·72 v2 응답/96 인용 | 기존 20초 v1 probe 시작 실패·별도 90초 client 성공의 제한; 운영 호스트/대규모 입력 비용·최종 공식 품질/키/복구 |
 | Linux amd64/arm64 위 에뮬레이션 | 동일 paired package/서명/mock 설치·복구 계약 | 네이티브 amd64와 실제 모델·운영 비용/최종 품질/키/복구 |
 
 Linux source commit은 동결된 추적 입력으로 만든 합성 fixture commit이다. 실제 원본 release commit에서 빌드한 운영 후보라는 주장은 하지 않는다. 서로 다른 플랫폼/Go 도구 체인의 archive SHA가 같다는 판정도 아니다. Linux 최소 런타임은 Go 분석기·개발 header가 없어도 문서/TypeScript mock 스모크를 수행하지만 Go 소스 분석은 별도 Go 도구 체인을 요구한다.
@@ -40,3 +40,5 @@ Linux source commit은 동결된 추적 입력으로 만든 합성 fixture commi
 최종 C1-06에서는 실제 후보의 이전 데이터 원본과 current/신원/팩 잠금을 보존하고, 실패 시 이전 current와 인용을 복구한 원자료를 연결한다. 운영 신뢰 루트 교체/폐기와 데이터 rollback은 각각 판정한다. C1-07은 B0 입력/프로토콜/의미 사실의 사람 결정, 공식 B0/B1/C0/C1 품질·안전·지연·소표본 판정, 위 OP 항목의 실제 기록을 함께 확인한다. 현재 출시 verdict는 pending이고 ontology 기본값 활성화 근거도 미완료다.
 
 원자료와 정확한 검증 범위는 [C1 수집·검토 자료](./C1-REVIEW-PREPARATION.md), [최신 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.
+
+2026-10-04 Linux 실모델 후속: [작업리스트 17절](./EXECUTION-WORKLIST.md)의 공식 Ollama image/승인 모델 bytes·CPU residency·read-only model store·별도 caller/model quota를 기록했다. 실제 source/SDK/rollback 검증은 통과했으나 unavailable 팩/관계 폴백의 소형 합성 진단이며 운영 지원/품질 승인이 아니다. 원래 20초 initialize 실패와 90초 진단 client 성공을 함께 읽는다. 운영 역할·키·정책·출시 OP 결정은 그대로 대기다.

@@ -74,3 +74,6 @@
 
 
 2026-10-04 FIX-14 후속: [작업리스트 16절](./EXECUTION-WORKLIST.md)의 ldd load address를 제거하고 첫 의존/정적 링크 진단을 유지했다. Linux 각 대상의 actual copy-input 4,624개 대조·같은 합성 commit의 공개 packager fresh build 두 번·106개 항목/전체 archive SHA 동일·하나의 시험 서명을 두 archive의 Python/Go에서 검증·세 프로젝트 설치/복구를 통과했다. 실제 macOS dependency metadata도 유지했다. [운영 검토표](./C1-OPERATIONS-REVIEW.md)의 OP-01–08은 미정이며 시험 scope/키로 운영 신뢰를 승인하지 않는다. B0 범위·프로토콜/동적 입력·의미 사실 결정을 다시 요청했다. 다음 독립 작업은 Linux 실제 모델 가용성/진단과 native/translated source 검토 자료이며 공식 품질·운영 판정은 남아 있다.
+
+
+2026-10-04 Linux 실제 CPU 모델 후속: [작업리스트 17절](./EXECUTION-WORKLIST.md)의 Linux arm64 Ollama 0.35.1/승인 BGE-M3 bytes와 API/DB 1024차원·CPU residency를 확인했다. 세 인공 프로젝트 설치/재시작/업데이트/rollback, 72 v2 응답/96 인용/48 startup scope·보관 SHA/integrity·실제 입력/DB/HEAD·5 저장 벡터를 검증하고 전용 서버를 정리했다. 초기 Python 추출 filter 오류, TypeScript 기존 20초 initialize 실패/90초 별도 client 성공, parser-node/전체 줄 verifier 가정 수정은 보존했다. 공식 품질은 null, C1-04는 준비 진행이며 운영 지원 승인이 아니다. 다음 독립 작업은 translated/native/transitive source 범위와 실패 복구 자료, 사람 B0 결정 이후에는 정적 v2 범위/K 동결과 공식 strict 빌드다.

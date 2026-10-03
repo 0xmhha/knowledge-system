@@ -1,0 +1,37 @@
+setup: --version auto resolved to d7e9aaf8
+==> [graph-build] Build the graph index
+ !  [toolchain] toolenv: not found on this machine: go (install them, or start the server from a shell that has them)
+    resolved git=/usr/bin/git (inherited_path)
+    time=2026-10-03T22:35:08.046Z level=INFO msg="detected files" go=0 ts=1 sol=0 proto=0
+    time=2026-10-03T22:35:08.066Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T22:35:08.074Z level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=2 changed_in_edges=3 blame_edges=1 hunk_edges=2 hunk_blobs=2 max_per_file=10
+    time=2026-10-03T22:35:08.096Z level=INFO msg="build complete" nodes=6 edges=9 pkg_tree_edges=2 topic_resolutions=3
+    ckg: built 6 nodes / 9 edges into /out/diagnostic-after/typescript/dataset/d7e9aaf8/graph
+<== [graph-build] done
+==> [vector-preflight] Preflight the Ollama embedder
+    Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+<== [vector-preflight] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T22:35:08.828Z level=INFO msg=ckv event=project_config.loaded trace_id=216e2df2442742d0 run_id=fbbce7d3863bd9ed languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/tmp/cks-build-source-2529077914/tree has_ckv_yaml=false
+    time=2026-10-03T22:35:08.828Z level=INFO msg=ckv event=build.start trace_id=c4ba3f9e542d5a70 run_id=fbbce7d3863bd9ed embedder_provider="" src_root=/tmp/cks-build-source-2529077914/tree out_dir=/out/diagnostic-after/typescript/dataset/d7e9aaf8/vector embedder=bge-m3:latest
+    time=2026-10-03T22:35:08.843Z level=INFO msg=ckv event=ckg_align.loaded trace_id=f0ef85578f7c901c run_id=fbbce7d3863bd9ed canonical_available=true ckg_path=/out/diagnostic-after/typescript/dataset/d7e9aaf8/graph files_indexed=1 entries=1
+    ckv: 2/2 files (1.5 files/s, elapsed 1s, ETA 0s)
+    time=2026-10-03T22:35:10.245Z level=INFO msg=ckv event=build.done trace_id=c4ba3f9e542d5a70 run_id=fbbce7d3863bd9ed latency_ms=1416 db_sha256=03d4b8b6b78c5ca34233640b5b2b1f440a02e7d1939e81c0c63c5042914d7228 chunks_canonical_id=1 category_counts=map[:3] chunks_flow_spine=0 indexed_head=d7e9aaf8e9a6df7518c750d82653ccd1e40374a7 files_indexed=2 chunks_file_header=1 languages="map[markdown:1 typescript:2]" chunks_total=3 out_dir=/out/diagnostic-after/typescript/dataset/d7e9aaf8/vector embedder=bge-m3:latest embedder_provider="" src_root=/tmp/cks-build-source-2529077914/tree chunks_symbol=1 chunks_flow_step=0 chunks_doc=1 chunks_truncated=0 policy_loaded=false
+    ckv: indexed 2 files → 3 chunks (1 symbol, 1 doc, 1 header, 0 truncated)
+    ckv: canonical_id 1/1 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=d7e9aaf8e9a6df7518c750d82653ccd1e40374a7 built_at=2026-10-03T22:35:10Z db=/out/diagnostic-after/typescript/dataset/d7e9aaf8/vector/vector.db sha256=03d4b8b6b78c5ca34233640b5b2b1f440a02e7d1939e81c0c63c5042914d7228
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /out/diagnostic-after/typescript/dataset/d7e9aaf8 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

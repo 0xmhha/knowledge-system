@@ -1,0 +1,122 @@
+{
+  "status": "progress",
+  "diagnostic_state": "verified",
+  "scope": "Linux ARM64 CPU BGE-M3 synthetic package/runtime and matrix wiring; not official B0/B1/C0/C1 quality/release",
+  "repo_head_at_run": "3c4a9e7492aeef8d61cc939c571ea4b51e7fec41",
+  "package_source_commit": "331ff24cc6c7ffe30107a4c70fa1c728dc0f864d",
+  "package_archive_sha256": "7c419a1d205edd9ac3edd50b4c948d0f69870a285963362db7598db6e7a3a0a7",
+  "package_scope": "test-signed-preview",
+  "platform": "linux/arm64 in Docker VM",
+  "model": "bge-m3:latest",
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "dimension": 1024,
+  "server_version": "0.35.1",
+  "size_vram": 0,
+  "runtime_options": {
+    "num_ctx": 8192,
+    "num_batch": 8192
+  },
+  "server_limits": {
+    "cpu": 2,
+    "memory_bytes": 4294967296,
+    "network": "none",
+    "model_mounts": "read-only"
+  },
+  "caller_limits": {
+    "cpu": 1,
+    "memory_bytes": 536870912,
+    "network": "owned server loopback namespace"
+  },
+  "projects": 3,
+  "sdk_rows": 72,
+  "citations_verified": 96,
+  "startup_scopes": 48,
+  "vectors_in_rolled_datasets_verified": 5,
+  "neighbors_failures_preserved": 72,
+  "official_quality_metrics": null,
+  "operational_keys_used": false,
+  "protocol_approval": false,
+  "model_store_original_sha_unchanged": true,
+  "owned_server_removed": true,
+  "initial_failures_preserved": [
+    "Python extractall filter unavailable before project creation",
+    "TypeScript MCP initialize timed out at 20s client deadline; only diagnostic client increased to 90s on retry",
+    "verifier assumed parser-node symbol text equals whole source lines; corrected byte containment/hash scope, product unchanged"
+  ],
+  "probe_timeouts_seconds": {
+    "empty_go": 20,
+    "typescript_initial_failed": 20,
+    "typescript_retry": 90,
+    "unsupported_python": 90,
+    "matrix_per_call": 90
+  },
+  "cold_definition": "fresh MCP process through first tool response; resident model/server retained",
+  "backend_call_counts": {
+    "empty-go": {
+      "query": {
+        "ckg.health": 24,
+        "ckv.health": 24,
+        "ollama_http.GET./api/tags": 240,
+        "ollama_http.POST./api/embed": 120,
+        "intent.embed": 24,
+        "ckv.semantic_search": 72,
+        "ckg.bm25_search": 432,
+        "ckg.neighbors": 24
+      },
+      "startup": {
+        "intent.embed": 1040,
+        "ollama_http.GET./api/tags": 2080,
+        "ollama_http.POST./api/embed": 1040
+      }
+    },
+    "typescript": {
+      "query": {
+        "ckg.health": 24,
+        "ckv.health": 24,
+        "ollama_http.GET./api/tags": 192,
+        "ollama_http.POST./api/embed": 96,
+        "intent.embed": 24,
+        "ckv.semantic_search": 48,
+        "ckg.bm25_search": 264,
+        "ckg.find_symbol": 24,
+        "ckg.neighbors": 48
+      },
+      "startup": {
+        "intent.embed": 1040,
+        "ollama_http.GET./api/tags": 2080,
+        "ollama_http.POST./api/embed": 1040
+      }
+    },
+    "unsupported-python": {
+      "query": {
+        "ckg.health": 24,
+        "ckv.health": 24,
+        "ollama_http.GET./api/tags": 240,
+        "ollama_http.POST./api/embed": 120,
+        "intent.embed": 24,
+        "ckv.semantic_search": 72,
+        "ckg.bm25_search": 672,
+        "ckg.neighbors": 24
+      },
+      "startup": {
+        "intent.embed": 1040,
+        "ollama_http.GET./api/tags": 2080,
+        "ollama_http.POST./api/embed": 1040
+      }
+    }
+  },
+  "remaining": [
+    "human B0 input/protocol/dynamic/semantic decisions and static v2 date/subsystem + K binding",
+    "approved strict official build and B0/B1/C0/C1 final quality/safety/latency verdicts",
+    "native amd64, Linux amd64 model diagnostic and large operating cost",
+    "transitive/native/system-header/translated source license scope and human adequacy review",
+    "operating owners, keys/trust/scope/support/recovery and release decision"
+  ],
+  "evidence_excludes": [
+    "weights/models",
+    "databases",
+    "binaries/archive",
+    "private signing or Ollama keys",
+    "unrelated user .claude and logs files"
+  ]
+}

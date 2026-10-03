@@ -99,7 +99,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-01 | P3 · C0-06 | B0/B1과 같은 조건의 최종 재평가 | 버전 차이·입력 차이·실행 원자료 명시; 독립 최종 조건 유지 | 대기 |
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
-| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 대기 |
+| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: Linux arm64 실제 CPU BGE-M3의 3프로젝트 설치/재시작/업데이트/롤백·72 SDK 응답/96 인용 검증. 20초 probe 실패와 90초 진단 재실행을 분리; native amd64·대규모 비용·최종 운영 후보/품질은 남음 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 검증 통과; 전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 대기 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
@@ -230,3 +230,16 @@ Linux arm64와 amd64 에뮬레이션 각각에서 실제 빌더의 copy-input 4,
 [C1-OPERATIONS-REVIEW](./C1-OPERATIONS-REVIEW.md)에 운영 역할·배포 scope·public key DER fingerprint/독립 신뢰 경로·개인 키 관리·교체/폐기·적합성·지원·복구의 OP-01–08 결정을 정리했다. 현재 signer/verifier는 test-signed-preview만 지원하며 기간/폐기 조회/운영 scope는 없다. 시험 키를 운영 키로 승격하지 않았고 운영 출시·사람 역할/키/정책은 미정이다. C1-05는 준비 진행 상태를 유지한다.
 
 B0-01 범위, B0-02/03 프로토콜/동적 입력, B0-05 의미 사실의 실제 사람 결정을 다시 요청했다. 기존 정적 gold/BGE-M3 승인 범위를 확장하지 않는다. 정적 v2의 날짜/subsystem과 설정 K 결합도 남아 있다. 다음 가능한 독립 작업은 Linux 실제 Ollama/BGE-M3 진단의 환경·모델 가용성 확인과 남은 native/translated source 검토 자료다. 공식 B0/B1/C0/C1·운영 키/적합성/출시 판정은 계속 미완료다.
+
+
+## 17. Linux ARM64 실제 CPU 모델과 출처 재검증
+
+2026-10-04 C1-04/B0-06 독립 준비: [원장](../../system/eval/b0-knowledge-system/linux-real-model-m2max-2026-10-04/summary.json)의 실제 Ollama 0.35.1 공식 arm64 image를 고정 digest로 실행했다. 승인 BGE-M3 manifest와 참조 blob 3개를 전후 해시로 확인했고 동일했다. 모델만 노출한 read-only mount·network none·공개 포트 없음, 서버 2 CPU/4 GiB와 Go 없는 Debian caller 1 CPU/512 MiB를 기록했다. API 한·영 2입력은 1024차원·유한값·정규화를 통과했으며 residency는 승인 digest·size_vram=0이다. VM 커널의 CPU/RAM·caller의 PID 압력을 물리 자원 독점이나 별도 모델 PID의 압력으로 해석하지 않는다.
+
+FIX-14 시험 서명 Linux arm64 패키지를 검증한 뒤 empty Go/TypeScript/미지원 Python 세 인공 프로젝트의 strict 실모델 빌드·조회·v1 MCP 재시작·두 버전·rollback을 확인했다. 프로젝트마다 8경로×retrieval/warm/cold 1회로 총 72개 v2 SDK 응답·96개 인용·48 startup scope를 독립 대조했다. 실제 K20/HTTP/measurement ID·arm 회전·모델/환경 전후·입력/설정/DB/HEAD/실행 비트·사본 SHA와 실행 시 파일 권한, 보관 원문/줄/본문 SHA·v2 integrity, 이전 indexed_commit과 현재 HEAD를 확인했다. 복구된 데이터셋의 실제 저장 벡터 5개는 청크 집합·1024차원·유한값·정규화와 같다. 내부 best-effort Neighbors 실패 72회도 보존했다. 보관 원자료 자체의 SDK/source/integrity/backend 연결 재생도 통과했다.
+
+초기 추출 helper는 Debian Python의 filter 인자 미지원으로 프로젝트 생성 전에 실패했다. 사전 서명/구조 검증된 owned archive에만 시스템 tar를 사용하는 진단 adapter로 재실행했다. TypeScript v1 initialize는 기존 probe의 20초 client deadline에서 실패했고, 제품 설정/3초 backend timeout을 유지한 별도 90초 진단 client에서 통과했다. 이를 기본 20초 지원의 통과로 세지 않는다. SQL 심볼의 parser-node text를 전체 줄과 같다고 가정한 verifier 실패도 보존했다. text SHA와 선언 줄 내 바이트 포함을 검사하고 열 단위 정확성은 보증하지 않는다. 반환 인용/본문은 전체 보관 줄 SHA를 엄격히 검사했다. 이번 제품 코드 수정은 없다.
+
+cold는 MCP process 시작 조건이고 resident model은 유지된다. warmup 0·군별 1회인 소형 unavailable 폴백 진단이며 공식 프로토콜/팩 사실/관계 품질을 대신하지 않는다. Python 분석기·Go 도구 체인 지원, native amd64·대규모 비용, 운영 키/최종 패키지/복구·출시를 완료하지 않았다. 품질은 계속 null이다. 전용 모델 서버만 종료/삭제했고 원본 모델 bytes가 같다. [운영 검토표](./C1-OPERATIONS-REVIEW.md)의 Linux ARM 범위를 갱신했다.
+
+다음 우선순위는 B0-01/02/03/05 사람 결정이 도착하면 정적 v2 날짜/subsystem·실제 K와 함께 입력을 동결하여 B0-07 공식 strict 빌드로 진행하는 것이다. 결정 대기 중 수행 가능한 독립 작업은 C1-05의 translated/native/transitive source 범위 및 C1-06 실패 복구 자료 준비다. 공식 B0/B1/C0/C1과 OP-01–08은 계속 미완료다.
