@@ -1,0 +1,966 @@
+{
+  "scope": "direct selected source header/cgo include excerpts; observation only, attribution completeness/compatibility pending",
+  "packages": [
+    {
+      "package": "runtime/cgo",
+      "source_headers": [
+        {
+          "path": "cgo.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2010 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        },
+        {
+          "path": "gcc_context.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2016 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 7,
+              "text": "#include \"libcgo.h\""
+            }
+          ]
+        },
+        {
+          "path": "gcc_darwin_arm64.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2014 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 5,
+              "text": "#include <limits.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include <pthread.h>"
+            },
+            {
+              "line": 7,
+              "text": "#include <signal.h>"
+            },
+            {
+              "line": 8,
+              "text": "#include <string.h> /* for strerror */"
+            },
+            {
+              "line": 9,
+              "text": "#include <sys/param.h>"
+            },
+            {
+              "line": 10,
+              "text": "#include <unistd.h>"
+            },
+            {
+              "line": 11,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 13,
+              "text": "#include \"libcgo.h\""
+            },
+            {
+              "line": 14,
+              "text": "#include \"libcgo_unix.h\""
+            },
+            {
+              "line": 16,
+              "text": "#include <TargetConditionals.h>"
+            },
+            {
+              "line": 19,
+              "text": "#include <CoreFoundation/CFBundle.h>"
+            },
+            {
+              "line": 20,
+              "text": "#include <CoreFoundation/CFString.h>"
+            }
+          ]
+        },
+        {
+          "path": "gcc_libinit.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2015 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 14,
+              "text": "#include <pthread.h>"
+            },
+            {
+              "line": 15,
+              "text": "#include <errno.h>"
+            },
+            {
+              "line": 16,
+              "text": "#include <stdio.h>"
+            },
+            {
+              "line": 17,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 18,
+              "text": "#include <string.h> // strerror"
+            },
+            {
+              "line": 19,
+              "text": "#include <time.h>"
+            },
+            {
+              "line": 20,
+              "text": "#include \"libcgo.h\""
+            },
+            {
+              "line": 21,
+              "text": "#include \"libcgo_unix.h\""
+            }
+          ]
+        },
+        {
+          "path": "gcc_setenv.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2011 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 7,
+              "text": "#include \"libcgo.h\""
+            },
+            {
+              "line": 9,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "gcc_stack_darwin.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2023 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 5,
+              "text": "#include <pthread.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include \"libcgo.h\""
+            }
+          ]
+        },
+        {
+          "path": "gcc_traceback.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2016 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 7,
+              "text": "#include <stdint.h>"
+            },
+            {
+              "line": 8,
+              "text": "#include \"libcgo.h\""
+            },
+            {
+              "line": 15,
+              "text": "#include <sanitizer/msan_interface.h>"
+            }
+          ]
+        },
+        {
+          "path": "gcc_util.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2009 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 5,
+              "text": "#include \"libcgo.h\""
+            },
+            {
+              "line": 30,
+              "text": "#include <string.h>"
+            }
+          ]
+        },
+        {
+          "path": "abi_arm64.h",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2021 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        },
+        {
+          "path": "abi_ppc64x.h",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2023 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        },
+        {
+          "path": "libcgo.h",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2009 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 5,
+              "text": "#include <stdint.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 7,
+              "text": "#include <stdio.h>"
+            }
+          ]
+        },
+        {
+          "path": "libcgo_unix.h",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright 2016 The Go Authors. All rights reserved."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/mattn/go-pointer",
+      "source_headers": [
+        {
+          "path": "pointer.go",
+          "notice_or_include_lines": [
+            {
+              "line": 3,
+              "text": "// #include <stdlib.h>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/tree-sitter/go-tree-sitter",
+      "source_headers": [
+        {
+          "path": "allocator.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include \"allocator.h\""
+            }
+          ]
+        },
+        {
+          "path": "dup_unix.go",
+          "notice_or_include_lines": [
+            {
+              "line": 6,
+              "text": "#include <unistd.h>"
+            }
+          ]
+        },
+        {
+          "path": "edit.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "language.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "lookahead_iterator.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "node.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "parser.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include <stdio.h>"
+            }
+          ]
+        },
+        {
+          "path": "point.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "query.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "ranges.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "tree.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "tree_cursor.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            }
+          ]
+        },
+        {
+          "path": "tree_sitter.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include <tree_sitter/api.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include \"lib.c\" // <- This is needed to build the C library from the C source code, but cannot be included in files that have other declarations."
+            }
+          ]
+        },
+        {
+          "path": "allocator.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "allocator.h",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity/binding",
+      "source_headers": [
+        {
+          "path": "binding.go",
+          "notice_or_include_lines": [
+            {
+              "line": 2,
+              "text": "// github.com/JoranHonig/tree-sitter-solidity v1.2.11, MIT-licensed) into a"
+            },
+            {
+              "line": 9,
+              "text": "// go-tree-sitter v0.25 (window 13..15). See LICENSE in this directory for the"
+            },
+            {
+              "line": 13,
+              "text": "// #include \"tree_sitter/parser.h\""
+            }
+          ]
+        },
+        {
+          "path": "parser.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "#include \"tree_sitter/parser.h\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/tree-sitter/tree-sitter-javascript/bindings/go",
+      "source_headers": [
+        {
+          "path": "binding.go",
+          "notice_or_include_lines": [
+            {
+              "line": 4,
+              "text": "// #include \"../../src/parser.c\""
+            },
+            {
+              "line": 6,
+              "text": "// #include \"../../src/scanner.c\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/tree-sitter/tree-sitter-typescript/bindings/go",
+      "source_headers": [
+        {
+          "path": "tsx.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "// #include \"../../tsx/src/parser.c\""
+            },
+            {
+              "line": 6,
+              "text": "// #include \"../../tsx/src/scanner.c\""
+            }
+          ]
+        },
+        {
+          "path": "typescript.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "// #include \"../../typescript/src/parser.c\""
+            },
+            {
+              "line": 6,
+              "text": "// #include \"../../typescript/src/scanner.c\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/mattn/go-sqlite3",
+      "source_headers": [
+        {
+          "path": "backup.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 10,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 12,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 14,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "callback.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 15,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 17,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 19,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "error.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 10,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 12,
+              "text": "#include <sqlite3.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 2,
+              "text": "// Copyright (C) 2018 G.J.R. Timmer <gjr.timmer@gmail.com>."
+            },
+            {
+              "line": 5,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 27,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 29,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 31,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 32,
+              "text": "#include <string.h>"
+            },
+            {
+              "line": 117,
+              "text": "#include <stdio.h>"
+            },
+            {
+              "line": 118,
+              "text": "#include <stdint.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_context.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 11,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 13,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 15,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_load_extension.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 13,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 15,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 17,
+              "text": "#include <stdlib.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_opt_serialize.go",
+          "notice_or_include_lines": [
+            {
+              "line": 8,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 10,
+              "text": "#include <sqlite3.h>"
+            },
+            {
+              "line": 12,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 13,
+              "text": "#include <stdint.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_opt_userauth_omit.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2018 G.J.R. Timmer <gjr.timmer@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_other.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_type.go",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2019 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 3,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 9,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 11,
+              "text": "#include <sqlite3.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3-binding.c",
+          "notice_or_include_lines": [
+            {
+              "line": 36,
+              "text": "** The author disclaims copyright to this source code.  In place of"
+            },
+            {
+              "line": 96,
+              "text": "** The author disclaims copyright to this source code.  In place of"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3_opt_unlock_notify.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "// Copyright (C) 2018 Yasuhiro Matsumoto <mattn.jp@gmail.com>."
+            },
+            {
+              "line": 4,
+              "text": "// license that can be found in the LICENSE file."
+            },
+            {
+              "line": 7,
+              "text": "#include <stdio.h>"
+            },
+            {
+              "line": 9,
+              "text": "#include \"sqlite3-binding.h\""
+            },
+            {
+              "line": 11,
+              "text": "#include <sqlite3.h>"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3-binding.h",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "** The author disclaims copyright to this source code.  In place of"
+            },
+            {
+              "line": 36,
+              "text": "#include <stdarg.h>     /* Needed for the definition of va_list */"
+            }
+          ]
+        },
+        {
+          "path": "sqlite3ext.h",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "** The author disclaims copyright to this source code.  In place of"
+            },
+            {
+              "line": 16,
+              "text": "** as extensions by SQLite should #include this file instead of "
+            },
+            {
+              "line": 21,
+              "text": "#include \"sqlite3-binding.h\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/0xmhha/knowledge-system/internal/vector/parse/solidity/binding",
+      "source_headers": [
+        {
+          "path": "binding.go",
+          "notice_or_include_lines": [
+            {
+              "line": 2,
+              "text": "// github.com/JoranHonig/tree-sitter-solidity v1.2.13, MIT-licensed \u2014"
+            },
+            {
+              "line": 3,
+              "text": "// see ./LICENSE) into a *sitter.Language for go-tree-sitter."
+            },
+            {
+              "line": 14,
+              "text": "// #include \"tree_sitter/parser.h\""
+            }
+          ]
+        },
+        {
+          "path": "parser.c",
+          "notice_or_include_lines": [
+            {
+              "line": 3,
+              "text": "#include \"tree_sitter/parser.h\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "github.com/asg017/sqlite-vec-go-bindings/cgo",
+      "source_headers": [
+        {
+          "path": "lib.go",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "// #include \"sqlite-vec.h\""
+            }
+          ]
+        },
+        {
+          "path": "sqlite-vec.c",
+          "notice_or_include_lines": [
+            {
+              "line": 1,
+              "text": "#include \"sqlite-vec.h\""
+            },
+            {
+              "line": 3,
+              "text": "#include <assert.h>"
+            },
+            {
+              "line": 4,
+              "text": "#include <errno.h>"
+            },
+            {
+              "line": 5,
+              "text": "#include <float.h>"
+            },
+            {
+              "line": 6,
+              "text": "#include <inttypes.h>"
+            },
+            {
+              "line": 7,
+              "text": "#include <limits.h>"
+            },
+            {
+              "line": 8,
+              "text": "#include <math.h>"
+            },
+            {
+              "line": 9,
+              "text": "#include <stdbool.h>"
+            },
+            {
+              "line": 10,
+              "text": "#include <stdint.h>"
+            },
+            {
+              "line": 11,
+              "text": "#include <stdlib.h>"
+            },
+            {
+              "line": 12,
+              "text": "#include <string.h>"
+            },
+            {
+              "line": 15,
+              "text": "#include <stdio.h>"
+            },
+            {
+              "line": 19,
+              "text": "#include \"sqlite3ext.h\""
+            },
+            {
+              "line": 22,
+              "text": "#include \"sqlite3.h\""
+            }
+          ]
+        },
+        {
+          "path": "sqlite-vec.h",
+          "notice_or_include_lines": [
+            {
+              "line": 5,
+              "text": "#include \"sqlite3ext.h\""
+            },
+            {
+              "line": 7,
+              "text": "#include \"sqlite3.h\""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

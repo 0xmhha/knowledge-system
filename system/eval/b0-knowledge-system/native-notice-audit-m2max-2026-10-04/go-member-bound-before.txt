@@ -1,0 +1,27 @@
+.F..F.
+======================================================================
+FAIL: test_member_bound_is_inclusive (test_release_native_licenses.NativeNoticeVerificationTests.test_member_bound_is_inclusive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 108, in test_member_bound_is_inclusive
+    self.check_both(True, member_count=256)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 101, in check_both
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : {"code":"operation_failed","message":"The operation failed; inspect project status for details."}
+
+
+======================================================================
+FAIL: test_notice_expanded_archive_is_accepted (test_release_native_licenses.NativeNoticeVerificationTests.test_notice_expanded_archive_is_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 105, in test_notice_expanded_archive_is_accepted
+    self.check_both(True, member_count=110)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_release_native_licenses.py", line 101, in check_both
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : {"code":"operation_failed","message":"The operation failed; inspect project status for details."}
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.377s
+
+FAILED (failures=2)

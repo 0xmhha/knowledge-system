@@ -65,3 +65,6 @@
 2026-10-04 환경 원장/Linux 후속: `cks eval matrix --environment-ledger`의 모델·하드웨어 전후 관측과 lock 원문 사본을 실제 MCP에 연결했다. macOS mock/BGE-M3 각 24응답, 이후 Linux arm64·amd64 에뮬레이션 각 3프로젝트·72응답을 검증했다. Linux ARM CPU 식별자·`/proc` process 압력·cgroup 제한 수집 실패/후 수정 증거는 [작업리스트 12절](./EXECUTION-WORKLIST.md)에 연결한다. 공식 품질은 계속 null이며 다음 독립 P1은 정적 gold/프로토콜의 개발·최종 경계를 검사하는 입력 preflight 준비다. 범위·프로토콜·동적 입력·의미 사실의 사람 승인과 Linux 실모델/네이티브 amd64·운영 출시 판정은 남아 있다.
 
 2026-10-04 정적 입력 경계 후속: [B0-STATIC-INPUT-PREFLIGHT.md](./B0-STATIC-INPUT-PREFLIGHT.md)의 도구가 정적 개발 4/최종 8·동적 12개·입력/검토 해시·모델·K/임계치 선언을 검사한다. 현재 프로토콜/동적 미승인으로 pending이며 개발 v1 4개만 진단 준비, 최종/ready 발행은 거부했다. 기존 질문 ID의 경로/대소문자 충돌을 다섯 실패로 재현 후 수정했고 정상 이전 export 13개 파일은 동일했다. 실제 독립 코퍼스도 재감사했다. 26개 Python 회귀 통과이며 모델/MCP/최종 질문 평가를 실행하지 않았다. 다음 독립 작업은 C1-05(P3)의 나머지 native 고지·운영/지원 검토 자료이고 공식 B0 선행 승인은 남아 있다.
+
+
+2026-10-04 C1-05/FIX-12 후속: [작업리스트 14절](./EXECUTION-WORKLIST.md)의 Tree-sitter runtime 44개·Solidity 6개를 고정 upstream과 대조했다. Unicode/runtime/Go toolchain 고지를 추가한 50고지·110항목 macOS preview가 기존 검증기 100항목 상한에 걸려 수정 전 실패/후 256통과·257거부를 검증했다. 두 서명 검증기·세 프로젝트 설치/재시작/업데이트/롤백·재서명 Unicode 변조 거부가 통과했다. 운영 키/라이선스 적합성/공식 품질은 미판정이고 다음 독립 작업은 다른 native 범위·최신 Linux recipe 재검증이다. 승인된 공식 입력 실행은 계속 선행 사람 결정 대기다.
