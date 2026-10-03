@@ -131,6 +131,29 @@ warm 세션 8개를 순차 초기화하고 실제 호출은 한 번에 하나만
 
 native v2 version layout과 정렬·보관 원문을 먼저 검증한다. 엔진 DB/manifest·dataset identity·보관 source/Git archive 전체 파일, 존재하는 선택된 live repo 파일, 의미 저장소·glossary·sanitize 설정·요청·바이너리·추가 `--lock-file`을 전후 해시한다. 원본 HEAD와 live 실행 비트, 생성 프로파일도 전후 비교한다. live 파일 부재는 missing으로 보존하므로 오래된/결손 fixture를 사용할 수 있다. 입력 읽기와 초기 해시 사이의 변경도 거부한다. 변경·초기화·도구·전송·취소 오류가 있으면 partial로 보존하고 CLI는 실패한다. 이 경계 검사로 실행 중 잠깐 변경 후 원복하는 외부 행위까지 증명하지는 않는다.
 
-보고서의 runtime은 Go·OS·arch·논리 CPU 수다. 실제 머신 모델·메모리·경쟁 작업·모델 daemon 상태 및 승인 입력/protocol 기록은 상위 공식 실행 원장이 추가해야 한다. 모델 바이트는 native embedding identity와 각 Ollama 질의의 기존 pin 검사로 고정하고, 상위 실행에서 모델 digest 전후를 별도 보관한다. `captured`는 원응답 수집 완료이며 v2 주장·출처·정답·품질·운영 출시 합격을 의미하지 않는다. 반복 수를 독립 질문 표본으로 계산하지 않는다.
+보고서의 기본 runtime은 Go·OS·arch·논리 CPU 수다. 아래 선택형 환경 원장이 머신·모델 daemon·입력 사본의 전후 기록을 연결한다. 승인 입력/protocol의 실제 판정과 공식 실행은 별도다. `captured`는 원응답 수집 완료이며 v2 주장·출처·정답·품질·운영 출시 합격을 의미하지 않는다. 반복 수를 독립 질문 표본으로 계산하지 않는다.
 
 회전 도구의 실제 초기화 실패 시험에서 typed-nil cold 세션 처리를 회귀 시험으로 고정하고 수정했다. SDK의 `Close`는 프로세스마다 2초 graceful 대기 후 SIGTERM, 이어 3초 대기 후 kill과 추가 3초 대기를 수행한다. `--call-timeout`은 initialize/호출 deadline이며 전체 행 처리나 종료 정리 시간의 상한이 아니다. cold 초기화 실패 행의 시간은 factory가 오류·정리를 끝낼 때까지이고 첫 응답이 없으므로 정상 cold 지연 표본으로 합산하지 않는다. 50ms deadline·56개 실패 프로세스의 약 116초 전체 시간은 이 정리 정책을 포함한다. 초기 전체 20초 검증 가정은 잘못되어 수정하고 실패 가정 기록을 보존한다.
+
+## 선택형 환경·입력 원장
+
+```sh
+bin/cks eval matrix --requests /private/tmp/b0-requests.json \
+  --config /private/tmp/b0-base.yaml --output /private/tmp/b0-matrix-ledger \
+  --environment-ledger --environment-note 'Development diagnostic; external competing work not excluded.' \
+  --lock-file system/eval/b0-knowledge-system/questions.json \
+  --lock-file system/eval/b0-knowledge-system/protocol-m2max-draft.json \
+  --lock-file system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json
+```
+
+명령은 개발 입력의 실행 형태다. 최종 입력은 실제 사람 승인과 동결 후 사용한다. 기본 반복 수는 기존 matrix 계약을 유지한다. `--environment-ledger`를 생략하면 기존 경로를 유지하며 `--environment-note`는 이 플래그와 함께 사용한다.
+
+조회 전에 CPU 신원·보이는 논리 CPU 수·RAM·OS, load·memory/swap·thermal 상태와 숫자로만 된 process 압력을 관측한다. 프로세스의 이름·인자·환경 변수는 보관하지 않는다. query/SDK 세션 종료와 입력 감사 후 같은 정보를 다시 기록한다. macOS arm64에서 실제 실행을 검증했고 Linux 수집 경로의 실제 호스트 재검증은 남아 있다. thermal 정보는 선택형이며 필수 환경 정보를 얻지 못하면 partial로 남기고 조회를 시작하지 않는다.
+
+Ollama는 데이터셋 신원의 모델·digest·차원·runtime context/batch에 설정을 대조하고, local loopback HTTP의 version/tags·strict native embed 1회·tags 재확인으로 실제 바이트와 차원을 검증한다. 이 프로브는 전후 각 1회이며 질의 시간·backend 카운터 밖이다. metadata GET은 3초, embed는 90초 상한이고 취소 문맥을 따른다. redirect와 원격/인증/추가 경로 endpoint를 거부한다. 선택 모델의 residency와 다른 resident 모델 개수만 보관한다. mock은 데이터셋 선언을 확인하며 기존 checksum 형태도 정확히 검증한다. ONNX/CoreML의 새 환경 프로브는 구현하지 않았고 기존 기본 matrix 경로는 유지한다.
+
+모델·환경 신원이 전후 달라지거나 필요한 후속 관측을 얻지 못하면 원응답을 보존한 partial이다. load/swap/process 압력 변화는 원시 관측으로 남긴다. 두 snapshot이 자원 독점이나 중간 변경 부재를 증명하지 않는다. `environment-note`도 검증되지 않은 작업자 설명이다.
+
+`--lock-file` 원문을 private `locked-inputs/`에 복사하고 원본/사본의 전후 SHA를 연결한다. 파일당 8 MiB 상한이며 출력 파일 권한은 0600, 디렉터리는 0700이다. 정답·프로토콜·동적 초안의 사본은 검색 요청에 전달하지 않으며 복사가 사실/프로토콜 승인으로 해석되지 않는다.
+
+2026-10-04 [환경 원장 재검증](../../system/eval/b0-knowledge-system/environment-ledger-m2max-2026-10-04/summary.json): mock/BGE-M3 각각 개발 제어 `alpha` 1개·24 SDK 응답·16 startup scope. 48개 응답은 기존 해당 모델 응답과 같았고 출처/integrity·정책·회전·실제 K/measurement 연결·입력 사본을 감사했다. 실제 모델 불일치는 0행·startup footprint 없음·partial로 보존했다. 초기 mock 신원 표현 불일치도 원자료를 남기고 호환을 보완했다. 이 반복은 독립 질문 표본을 늘리지 않으며 품질 지표는 null이다. 비심볼 Neighbors 실패 real 192/mock 24회는 기존 best-effort 범위로 그대로 보존했다.

@@ -41,33 +41,37 @@ type matrixRow struct {
 	captureRow
 }
 type matrixReport struct {
-	SchemaVersion           int                    `json:"schema_version"`
-	State                   string                 `json:"state"`
-	StartedAt               time.Time              `json:"started_at"`
-	FinishedAt              *time.Time             `json:"finished_at,omitempty"`
-	RequestSHA256           string                 `json:"request_sha256"`
-	BaseConfigSHA256        string                 `json:"base_config_sha256"`
-	BinarySHA256            string                 `json:"binary_sha256"`
-	BinarySHA256After       string                 `json:"binary_sha256_after,omitempty"`
-	WorkingDirectory        string                 `json:"working_directory"`
-	Runtime                 map[string]any         `json:"runtime"`
-	DatasetIdentity         *setup.DatasetIdentity `json:"dataset_identity"`
-	LockedFilesSHA256       map[string]string      `json:"locked_files_sha256"`
-	LockedFilesSHA256After  map[string]string      `json:"locked_files_sha256_after,omitempty"`
-	Counts                  map[string]int         `json:"counts"`
-	Arms                    []matrixArm            `json:"arms"`
-	Rows                    int                    `json:"rows"`
-	RowsSHA256              string                 `json:"rows_sha256,omitempty"`
-	CallTimeoutNS           int64                  `json:"call_timeout_ns"`
-	QualityMetrics          any                    `json:"quality_metrics"`
-	Rotation                string                 `json:"rotation"`
-	ColdDefinition          string                 `json:"cold_definition"`
-	RecordingPolicy         string                 `json:"recording_policy"`
-	Errors                  []string               `json:"errors,omitempty"`
-	SourceHEAD              string                 `json:"source_head"`
-	SourceHEADAfter         string                 `json:"source_head_after,omitempty"`
-	LiveExecutableBits      map[string]bool        `json:"live_executable_bits"`
-	LiveExecutableBitsAfter map[string]bool        `json:"live_executable_bits_after,omitempty"`
+	SchemaVersion           int                        `json:"schema_version"`
+	State                   string                     `json:"state"`
+	StartedAt               time.Time                  `json:"started_at"`
+	FinishedAt              *time.Time                 `json:"finished_at,omitempty"`
+	RequestSHA256           string                     `json:"request_sha256"`
+	BaseConfigSHA256        string                     `json:"base_config_sha256"`
+	BinarySHA256            string                     `json:"binary_sha256"`
+	BinarySHA256After       string                     `json:"binary_sha256_after,omitempty"`
+	WorkingDirectory        string                     `json:"working_directory"`
+	Runtime                 map[string]any             `json:"runtime"`
+	DatasetIdentity         *setup.DatasetIdentity     `json:"dataset_identity"`
+	LockedFilesSHA256       map[string]string          `json:"locked_files_sha256"`
+	LockedFilesSHA256After  map[string]string          `json:"locked_files_sha256_after,omitempty"`
+	Counts                  map[string]int             `json:"counts"`
+	Arms                    []matrixArm                `json:"arms"`
+	Rows                    int                        `json:"rows"`
+	RowsSHA256              string                     `json:"rows_sha256,omitempty"`
+	CallTimeoutNS           int64                      `json:"call_timeout_ns"`
+	QualityMetrics          any                        `json:"quality_metrics"`
+	Rotation                string                     `json:"rotation"`
+	ColdDefinition          string                     `json:"cold_definition"`
+	RecordingPolicy         string                     `json:"recording_policy"`
+	Errors                  []string                   `json:"errors,omitempty"`
+	SourceHEAD              string                     `json:"source_head"`
+	SourceHEADAfter         string                     `json:"source_head_after,omitempty"`
+	LiveExecutableBits      map[string]bool            `json:"live_executable_bits"`
+	LiveExecutableBitsAfter map[string]bool            `json:"live_executable_bits_after,omitempty"`
+	EnvironmentBefore       *matrixEnvironment         `json:"environment_before,omitempty"`
+	EnvironmentAfter        *matrixEnvironment         `json:"environment_after,omitempty"`
+	EnvironmentNote         string                     `json:"environment_note,omitempty"`
+	LockedInputCopies       map[string]matrixInputCopy `json:"locked_input_copies,omitempty"`
 }
 
 type matrixSession interface {
@@ -89,9 +93,17 @@ func newMatrixCmd() *cobra.Command {
 	var warmup, retrieval, warm, cold int
 	var timeout time.Duration
 	var locks []string
+	var environment bool
+	var environmentNote string
 	cmd := &cobra.Command{Use: "matrix", Short: "Capture eight sequential ablation arms with rotating order and pinned inputs", Args: cobra.NoArgs, RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 		defer cancel()
+		if environmentNote != "" && !environment {
+			return fmt.Errorf("--environment-note requires --environment-ledger")
+		}
+		if environment {
+			return matrixRunWithLedger(ctx, input, cfg, binary, out, warmup, retrieval, warm, cold, timeout, locks, startMatrixSession, matrixInputHashes, observeMatrixEnvironment, environmentNote)
+		}
 		return matrixRun(ctx, input, cfg, binary, out, warmup, retrieval, warm, cold, timeout, locks, startMatrixSession)
 	}}
 	cmd.Flags().StringVar(&input, "requests", "", "request-only v2 JSON; include_knowledge is set by the matrix")
@@ -99,6 +111,8 @@ func newMatrixCmd() *cobra.Command {
 	cmd.Flags().StringVar(&binary, "cks-mcp", "", "server binary (default: this executable)")
 	cmd.Flags().StringVar(&out, "output", "", "new private output directory; existing paths are refused")
 	cmd.Flags().StringSliceVar(&locks, "lock-file", nil, "additional immutable input files to hash before and after")
+	cmd.Flags().BoolVar(&environment, "environment-ledger", false, "record host/model before and after; privately copy --lock-file inputs (max 8 MiB each)")
+	cmd.Flags().StringVar(&environmentNote, "environment-note", "", "operator's workload note (recorded as an unverified statement)")
 	cmd.Flags().IntVar(&warmup, "warmup", 2, "warmup repetitions per request/arm")
 	cmd.Flags().IntVar(&retrieval, "retrieval-runs", 5, "retrieval repetitions per request/arm")
 	cmd.Flags().IntVar(&warm, "warm-runs", 20, "warm latency repetitions per request/arm")
@@ -233,6 +247,10 @@ func matrixRun(ctx context.Context, input, baseConfig, binary, out string, warmu
 }
 
 func matrixRunWithInputs(ctx context.Context, input, baseConfig, binary, out string, warmup, retrieval, warm, cold int, timeout time.Duration, extra []string, factory matrixFactory, readInputs matrixInputReader) (returnErr error) {
+	return matrixRunWithLedger(ctx, input, baseConfig, binary, out, warmup, retrieval, warm, cold, timeout, extra, factory, readInputs, nil, "")
+}
+
+func matrixRunWithLedger(ctx context.Context, input, baseConfig, binary, out string, warmup, retrieval, warm, cold int, timeout time.Duration, extra []string, factory matrixFactory, readInputs matrixInputReader, probe matrixEnvironmentProbe, note string) (returnErr error) {
 	if input == "" || baseConfig == "" || out == "" {
 		return fmt.Errorf("matrix requires --requests, --config and --output")
 	}
@@ -343,6 +361,10 @@ func matrixRunWithInputs(ctx context.Context, input, baseConfig, binary, out str
 	}
 	defer func() {
 		if returnErr != nil {
+			if probe != nil && report.EnvironmentBefore != nil && report.EnvironmentAfter == nil {
+				after := probe(ctx, cfg, identity)
+				report.EnvironmentAfter = &after
+			}
 			report.State = "partial"
 			report.Errors = append(report.Errors, returnErr.Error())
 			finished := time.Now().UTC()
@@ -361,6 +383,21 @@ func matrixRunWithInputs(ctx context.Context, input, baseConfig, binary, out str
 	}
 	if err := os.WriteFile(filepath.Join(out, "base-config.yaml"), baseRaw, 0600); err != nil {
 		return err
+	}
+	if probe != nil {
+		report.EnvironmentNote = note
+		report.LockedInputCopies, err = copyMatrixInputs(out, extra, locked)
+		if err != nil {
+			return err
+		}
+		before := probe(ctx, cfg, identity)
+		report.EnvironmentBefore = &before
+		if err := writeReport(); err != nil {
+			return err
+		}
+		if !before.Valid {
+			return fmt.Errorf("environment preflight incomplete; inspect preserved environment ledger")
+		}
 	}
 	stream, err := os.OpenFile(filepath.Join(out, "rows.jsonl"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
@@ -505,6 +542,21 @@ func matrixRunWithInputs(ctx context.Context, input, baseConfig, binary, out str
 		report.Arms[i].ConfigSHA256After = h
 		if e != nil || h != a.ConfigSHA256 {
 			report.Errors = append(report.Errors, "derived config changed: "+a.ID)
+		}
+	}
+	if probe != nil {
+		after := probe(ctx, cfg, identity)
+		report.EnvironmentAfter = &after
+		if !after.Valid || !sameMatrixEnvironment(*report.EnvironmentBefore, after) {
+			report.Errors = append(report.Errors, "host or model identity changed/unavailable; inspect environment ledger")
+		}
+		for original, copy := range report.LockedInputCopies {
+			h, e := shaFile(filepath.Join(out, copy.Path))
+			copy.SHA256After = h
+			report.LockedInputCopies[original] = copy
+			if e != nil || h != copy.SHA256 {
+				report.Errors = append(report.Errors, "locked input copy changed: "+original)
+			}
 		}
 	}
 	report.State = "captured"
