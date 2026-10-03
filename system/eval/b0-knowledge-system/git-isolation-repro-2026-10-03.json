@@ -1,0 +1,30 @@
+{
+  "status": "structural_reproducibility_verified",
+  "quality_metrics": null,
+  "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "source_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "preparation": "scripts/b0-isolate-corpus.py",
+  "source_checkout": "/tmp/ks-b0-isolated-corpus-verified-20261003",
+  "shared_git_common_dir": false,
+  "git_alternates": false,
+  "unreachable_commits": 0,
+  "graph_build": {
+    "command_flags": ["--force", "--no-cache", "--fail-on-parse-errors"],
+    "output": "/tmp/ks-b0-graph-repro-20261003",
+    "nodes": 102112,
+    "edges": 414613,
+    "parse_errors": 0,
+    "unresolved_refs": 0,
+    "graph_digest": "fa58e1e7c5ec7ff022459a773d74fee2b9ba40f36f00a3302c2bff24d832d98e"
+  },
+  "comparison": {
+    "reference": "full-corpus-diagnostic-2026-10-02.json",
+    "source_commit_match": true,
+    "schema_version_match": true,
+    "graph_digest_match": true,
+    "node_count_match": true,
+    "edge_count_match": true
+  },
+  "test_result": "python3 -m unittest scripts/test_b0_isolate_corpus.py -v: 2 passed",
+  "limit": "This verifies independent Git history input and CKG structure; it does not approve draft answers, select the final model, or measure retrieval quality."
+}

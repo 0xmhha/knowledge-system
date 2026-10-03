@@ -22,11 +22,15 @@
 1. 사용자 또는 지정 검토자가 각 질문의 문장, 후보 답, 예상 동작(`cite|abstain`), 근거의 **파일·줄 범위**를 검토한다. 승인 시 질문별 `review_state=approved`, `reviewer`, `reviewed_at`을 기록한다. 변경된 질문 파일의 SHA-256은 평가 실행마다 다시 기록한다. 로컬 리뷰 문자열은 인증된 신원이라는 주장이 아니다.
 2. 로컬 Ollama에서 선택한 **정확한 모델 태그**와 다이제스트를 `/api/tags`로 읽는다. `/api/version`으로 서버 버전을 기록한다. 한 번의 `/api/embed`로 차원·유한값을 검사하고 전후 다이제스트가 같은지 확인한다. 모델을 바꾸면 별도 실행군으로 취급한다.
 3. [`b0-preflight.py`](../../scripts/b0-preflight.py)는 고정 커밋의 tree ID와 각 근거 앵커의 정확한 한 번 출현을 검사하고 모델·하드웨어·승인 수를 JSON으로 남긴다. `pending`은 0점도 통과도 아니다. `--require-ready`는 어느 선행 조건이든 없으면 종료 코드 2로 멈춘다.
-4. 고정 커밋을 **독립 Git 객체 저장소**의 깨끗한 별도 checkout에서 색인한다. `git worktree`는 개발 저장소의 reflog/객체 저장소를 공유하므로 이 용도로 쓰지 않는다. 모델, 코퍼스 tree, CKS/CKV/CKG 빌드 커밋, `project_id/snapshot_id/dataset_id`, 잠금 팩, query prefix, K, 필터, 소독 규칙, 실행 하드웨어와 시각을 원자료와 함께 보존한다. 현재 작업 브랜치의 HEAD를 코퍼스 커밋과 혼동하지 않는다.
+4. 고정 커밋을 **독립 Git 객체 저장소**의 깨끗한 별도 checkout에서 색인한다. [`b0-isolate-corpus.py`](../../scripts/b0-isolate-corpus.py)는 지정 커밋의 조상만 가져와 예상 tree ID·독립 common dir·alternates 부재·도달 불가 커밋 0개를 확인한다. `git worktree`는 개발 저장소의 reflog/객체 저장소를 공유하므로 이 용도로 쓰지 않는다. 모델, 코퍼스 tree, CKS/CKV/CKG 빌드 커밋, `project_id/snapshot_id/dataset_id`, 잠금 팩, query prefix, K, 필터, 소독 규칙, 실행 하드웨어와 시각을 원자료와 함께 보존한다. 현재 작업 브랜치의 HEAD를 코퍼스 커밋과 혼동하지 않는다.
 
 ```sh
 python3 scripts/b0-preflight.py --model MODEL_NAME \
   --output /tmp/ks-b0-preflight.json --require-ready
+python3 scripts/b0-isolate-corpus.py \
+  --source /path/to/knowledge-system --out /tmp/ks-b0-clean-corpus \
+  --commit 71cb71cd55960833e930269e272f7a4a060be3aa \
+  --tree f020f8f30fd209b8de045756dedd12ff83f65cd9
 ```
 
 ## 측정 경계와 B1 연결
@@ -68,6 +72,10 @@ python3 scripts/b0-export-scenarios.py --out-dir /tmp/ks-b0-scenarios
 ### 2026-10-02 전체 코퍼스 진단과 입력 예산 보정
 
 고정 HEAD가 같아도 `git worktree`는 개발 저장소의 객체 저장소와 reflog를 공유한다. CKG의 도달 불가 커밋 탐색이 이 기록을 읽으면서 이전 임시 CKG의 hunk 노드 수가 4,699에서 4,741로 달라졌다. 코퍼스 tree는 동일했으므로 이 차이는 소스 변경이 아닌 **Git 이력 입력 누수**다. `/tmp/ks-b0-isolated-corpus`를 독립 `git init` 저장소로 만들고 고정 커밋 `71cb71cd...`만 가져왔다. tree `f020f8f...`, 깨끗한 checkout, 도달 불가 커밋 0개를 확인했다. 이후 평가의 Git 입력은 이 방식으로 고정해야 한다.
+
+2026-10-03 재현 게이트: [`b0-isolate-corpus.py`](../../scripts/b0-isolate-corpus.py)가 별도 Git common dir과 객체 저장소를 만들고 예상 commit/tree 및 도달 불가 커밋 0개를 확인한다. 단위 시험은 **같은 HEAD를 가리키지만 더 최신 커밋을 공유하는 worktree**를 입력으로 주고, 결과 저장소에서는 그 최신 커밋을 읽을 수 없음을 검증한다. 잘못된 tree와 이미 존재하는 출력 디렉터리는 기존 내용을 건드리지 않고 거부한다. 실제 고정 커밋으로 새로 만든 `/tmp/ks-b0-isolated-corpus-verified-20261003`에서 CKG를 캐시 없이 다시 빌드해 2026-10-02 진단과 **그래프 다이제스트 `fa58e1e7...`, 102,112노드, 414,613엣지, 파싱 오류 0개가 모두 일치**했다. [재현 결과 JSON](../../system/eval/b0-knowledge-system/git-isolation-repro-2026-10-03.json)은 구조 입력 검증이며 질문 정답/모델/검색 품질 승인은 아니다.
+
+적용 경계: B0의 `cks setup`에도 **독립 저장소 경로를 `--src`로 전달**해야 한다. 현재 고정 CKS 빌드는 내부에서 임시 `git worktree`를 만들기 때문에 원본 개발 저장소를 `--src`로 주면 그 저장소의 reflog·도달 불가 객체가 CKG에 보일 수 있다. 이는 소스 파일/커밋이 같은데도 그래프가 달라질 수 있는 제품 수준의 재현성 결함이다. 일반 CKS에서는 과거 작업 복구를 위해 이 객체를 활용하므로 무조건 탐색을 끄지 않고, 향후 Git 복구 입력의 범위·다이제스트를 데이터셋 신원에 반영하거나 명시적 격리 모드를 구현하는 설계와 회귀 시험이 필요하다. B0 기준선에는 위 독립 저장소 입력 계약을 적용한다.
 
 보정 전 완전 모드로 전체 1,569개 파일을 시도했을 때 155개 파일 처리 뒤 `docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md`의 긴 Markdown 구간에서 Ollama HTTP 400이 났다. 원시 로그는 `/tmp/ks-b0-pilot-20261002-setup.log`에 있다. `num_ctx=8192`와 `num_batch=8192`만으로 모든 입력을 수용한다는 가정은 틀렸다. 기존 `MaxInputTokens × 4` 근사식은 원문을 최대 32,768바이트까지 한 청크로 만들어 모델별 실제 토큰 수와 규칙 기반 문맥 접두사를 충분히 고려하지 못했다. 완전 모드가 불완전한 데이터셋의 게시를 막았으며 이 시도는 품질 기준선이 아니다.
 
