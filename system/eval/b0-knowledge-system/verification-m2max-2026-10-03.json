@@ -1,0 +1,63 @@
+{
+  "python_tests": {
+    "status": "passed",
+    "log": "test_shared_worktree_history_does_not_enter_isolated_checkout (test_b0_isolate_corpus.IsolateCorpusTest.test_shared_worktree_history_does_not_enter_isolated_checkout) ... ok\ntest_wrong_tree_and_existing_output_fail_closed (test_b0_isolate_corpus.IsolateCorpusTest.test_wrong_tree_and_existing_output_fail_closed) ... ok\ntest_bge_runtime_options_match_ckv_policy (test_b0_preflight.PreflightTest.test_bge_runtime_options_match_ckv_policy) ... ok\ntest_draft_gold_cannot_be_exported (test_b0_preflight.PreflightTest.test_draft_gold_cannot_be_exported) ... ok\ntest_model_digest_change_during_probe_is_rejected (test_b0_preflight.PreflightTest.test_model_digest_change_during_probe_is_rejected) ... ok\ntest_question_anchor_change_is_rejected_before_measurement (test_b0_preflight.PreflightTest.test_question_anchor_change_is_rejected_before_measurement) ... ok\ntest_remote_endpoint_is_rejected (test_b0_preflight.PreflightTest.test_remote_endpoint_is_rejected) ... ok\ntest_stable_model_identity_includes_dimension (test_b0_preflight.PreflightTest.test_stable_model_identity_includes_dimension) ... ok\ntest_synthetic_approved_gold_exports_without_answers (test_b0_preflight.PreflightTest.test_synthetic_approved_gold_exports_without_answers) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 2.613s\n\nOK\n",
+    "sha256": "6b37cded7ae700634ca009c524043e6b0efe0864de08b19495c7f56229eb0a86"
+  },
+  "go_tests": {
+    "status": "passed",
+    "log": "ok  \tgithub.com/0xmhha/knowledge-system/internal/setup\t17.392s\nok  \tgithub.com/0xmhha/knowledge-system/internal/vector/chunk\t1.231s\nok  \tgithub.com/0xmhha/knowledge-system/internal/vector/build\t3.049s\nok  \tgithub.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec\t0.988s\nok  \tgithub.com/0xmhha/knowledge-system/internal/system/evidencev2\t2.417s\nok  \tgithub.com/0xmhha/knowledge-system/internal/system/mcp\t2.212s\nok  \tgithub.com/0xmhha/knowledge-system/internal/system/semantic\t5.604s\nok  \tgithub.com/0xmhha/knowledge-system/cmd/graph\t44.069s\n",
+    "sha256": "1f098277f1a7328c721a89fcd6c97556af4569a36c8e5da1b8323e42f85af6cf"
+  },
+  "docs_check": {
+    "status": "passed",
+    "log": "documentation: OK (111 live documents)\n",
+    "sha256": "c29924d5695fe8c8c0983a48ef9f7cb173767dbc4d1730dc7da16cc413ca23b1"
+  },
+  "small_real_model_smoke": {
+    "status": "integration_smoke_passed",
+    "commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+    "dataset_version": "real-ollama-smoke",
+    "model": "bge-m3:latest",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "ckv_hit_count": 4,
+    "cks_citation_files": [
+      "README.md",
+      "main.go"
+    ],
+    "quality_metrics": null,
+    "artifacts": "/private/tmp/ks-b0-m2max-smoke-20261003"
+  },
+  "strict_long_passage_smoke": {
+    "status": "strict_accepted_both_long_passages",
+    "quality_metrics": null,
+    "artifacts": "/private/tmp/ks-b0-m2max-strict-20261003"
+  },
+  "quality_metrics": null,
+  "approved_export": {
+    "status": "passed",
+    "manifest": {
+      "schema_version": 1,
+      "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+      "corpus_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+      "question_set_sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+      "scenario_count": 12
+    },
+    "quality_metrics": null
+  },
+  "unapproved_export_before_human_decision": {
+    "status": "expected_refusal",
+    "message": "B0 gold answers need human approval before scenario export"
+  },
+  "fixture_proposal_validation": {
+    "status": "passed",
+    "fixture_count": 12,
+    "checks": [
+      "source_sha256",
+      "safe_relative_paths",
+      "F02_tail_line_203",
+      "development_final_partition",
+      "all_fixture_review_states_remain_draft"
+    ]
+  }
+}

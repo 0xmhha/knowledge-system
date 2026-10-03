@@ -1,0 +1,617 @@
+{
+  "status": "machine_candidate_scan_only_human_absence_review_pending",
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "tracked_files": 1937,
+  "text_files": 1937,
+  "non_text_files": [],
+  "patterns": {
+    "gas_refund": "gas.{0,40}(refund|reimburse)|가스.{0,30}(환불|환급|반환)",
+    "signing": "signing|서명.{0,10}키|private.?key|개인.?키",
+    "authority": "(gas|가스|refund|환불|환급).{0,70}(approved|reviewed_by|owner|담당|승인)|(approved|reviewed_by|owner|담당|승인).{0,70}(gas|가스|refund|환불|환급)"
+  },
+  "match_line_counts": {
+    "gas_refund": 6,
+    "signing": 185,
+    "authority": 0
+  },
+  "matches": [
+    {
+      "category": "signing",
+      "path": "cmd/cks/agentcli/format_test.go",
+      "lines": [
+        132
+      ],
+      "sha256": "e3cb911543129f149f2256adee581739a247fa239b4ddb43cd463da093d5d71b"
+    },
+    {
+      "category": "signing",
+      "path": "docs/dev/2026-07-24-consolidation-session/session-data/session-transcript.jsonl",
+      "lines": [
+        8
+      ],
+      "sha256": "afacc9f28617c634a254e3f2d658ba3487b1ddfb3f1a09671576370a26ca32dc"
+    },
+    {
+      "category": "signing",
+      "path": "docs/graph/archive/G6-INCREMENTAL-REDESIGN.md",
+      "lines": [
+        454
+      ],
+      "sha256": "85750195df97dac0268b666d2eb2d31a19962756d842d97fa4e642e8d892cf35"
+    },
+    {
+      "category": "signing",
+      "path": "docs/graph/archive/analysis/CKS-SPEC-REVIEW.md",
+      "lines": [
+        230
+      ],
+      "sha256": "02e696fa46d77bf4c7f8c381411676ade7c014f7a946684f666caab08f0161e5"
+    },
+    {
+      "category": "signing",
+      "path": "docs/spec-driven/A8-GATE-REPORT.md",
+      "lines": [
+        46,
+        51
+      ],
+      "sha256": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662"
+    },
+    {
+      "category": "signing",
+      "path": "docs/spec-driven/EXECUTION.md",
+      "lines": [
+        3,
+        172
+      ],
+      "sha256": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645"
+    },
+    {
+      "category": "signing",
+      "path": "docs/spec-driven/INSTALLATION-PILOT.md",
+      "lines": [
+        31
+      ],
+      "sha256": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4"
+    },
+    {
+      "category": "signing",
+      "path": "docs/spec-driven/PDF-IMPROVEMENT-TRACE.md",
+      "lines": [
+        13
+      ],
+      "sha256": "e458461cf5495f57551e69cccd5c57e488a1a47e9654489c8ec20bb20ba6c5e1"
+    },
+    {
+      "category": "signing",
+      "path": "internal/graph/parse/solidity/testdata/function_typed_var/try_catch_prop.sol",
+      "lines": [
+        6
+      ],
+      "sha256": "7390478e8c96004cbf8f18d25f4b30aeaa2e9813c792635567151aa3980a3349"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/composer/composer_test.go",
+      "lines": [
+        333,
+        335,
+        340
+      ],
+      "sha256": "a5436edb4e19491b1e0673960416d61e71a006e705c54082468cb91e24bc489e"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/composer/sanitize/engine.go",
+      "lines": [
+        11
+      ],
+      "sha256": "cded25353538ad6bc7ad3442d019fde5ac2523c9cde067eb40c30f2ef69c82d8"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/composer/sanitize/engine_test.go",
+      "lines": [
+        215,
+        219,
+        227,
+        228,
+        363,
+        365,
+        411,
+        413,
+        417
+      ],
+      "sha256": "afb53b7c3326a7bd1a455a1002372207be6382994ca26115ad62d893102250e9"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/config/sanitize_test.go",
+      "lines": [
+        20,
+        21,
+        22,
+        68,
+        69,
+        190,
+        225,
+        228
+      ],
+      "sha256": "c3491860a44ac5000ab5117ef02ede114961085aceacacd6756212c8ec7917e4"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/daemon/registry.go",
+      "lines": [
+        185
+      ],
+      "sha256": "f9584a81d70aa543f41e38fff22f05fc60360a6b626b0e9c96c551eb8958665d"
+    },
+    {
+      "category": "signing",
+      "path": "internal/system/mcp/server_test.go",
+      "lines": [
+        345,
+        350
+      ],
+      "sha256": "60f5e2a941e575085080747cb7dca21e73952c4643f0e604b2ebe4e3f807fa57"
+    },
+    {
+      "category": "signing",
+      "path": "internal/vector/discover/discover.go",
+      "lines": [
+        50
+      ],
+      "sha256": "cb106398418d3b7328cf0944279efe72721aa69f3ae23a897f793b97bbd53766"
+    },
+    {
+      "category": "signing",
+      "path": "internal/vector/discover/discover_test.go",
+      "lines": [
+        171,
+        190
+      ],
+      "sha256": "42a81579b76edc590fdc08ebb65ea265ad25a456f6836e52deacfe92494784b5"
+    },
+    {
+      "category": "signing",
+      "path": "internal/vector/filter/filter_test.go",
+      "lines": [
+        42,
+        45
+      ],
+      "sha256": "1d4359fe8c102f261a734fe7dd7b25a72c13881663cfcb6bfafefcb4add50d6b"
+    },
+    {
+      "category": "gas_refund",
+      "path": "internal/vector/invariant/extractor_test.go",
+      "lines": [
+        57
+      ],
+      "sha256": "3cd72bafa64cee54355fe230597eb0599c1e30be8840be66fcde3b6cdb4642e6"
+    },
+    {
+      "category": "signing",
+      "path": "pkg/graph/types/node.go",
+      "lines": [
+        115
+      ],
+      "sha256": "591e5e881cdd76e8cd551d1cbb5ad748ce8c878924bb61fa61bf2fd3f043c73f"
+    },
+    {
+      "category": "signing",
+      "path": "pkg/system/contract/pack.go",
+      "lines": [
+        47
+      ],
+      "sha256": "0e6b82be51fe84b07d4af353f18232025a86e556f2d406565ad96c96ed9e3f62"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A1.wbft_core.consensus_flow_architecture.yaml",
+      "lines": [
+        50
+      ],
+      "sha256": "d3066d5178aab08ad95f9b73b8561edbbd8b5506e8889afad37b127a6b2f23ae"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A1.wbft_core.round_change_protocol.yaml",
+      "lines": [
+        32
+      ],
+      "sha256": "d7d0901f1bd2dacbc22b4414b3017b5e14e83434ca6409fd0eabfafbfda988d3"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A11.state_transition.blacklist_check_points.yaml",
+      "lines": [
+        66
+      ],
+      "sha256": "5286f45a51a535bab4e13e472778915d0f2ba8454ffea4650225759490de4fb9"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A11.txpool.type_taxonomy_admission.yaml",
+      "lines": [
+        82,
+        85,
+        86,
+        136,
+        146
+      ],
+      "sha256": "40fb999361044c73f614d7bc3ebd38dcdd2bf676202a989dad2006beac37bf71"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A12.seals.feepayer_sighash.yaml",
+      "lines": [
+        23,
+        55
+      ],
+      "sha256": "1c0edf6441c23048c31b6d1f036bb397817cd3bfaf1d1378f284c0c16b20a601"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A14.foundations.base_fee_redistribution.yaml",
+      "lines": [
+        49
+      ],
+      "sha256": "894973ec2dfadbe313d11528551d2ff3d20ff9578068ffab261bb857c8edd098"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A14.foundations.cherry_pick_principle.yaml",
+      "lines": [
+        30
+      ],
+      "sha256": "51a1f5f344ee9f000f3742902f99c9e6a59f8903aa3219434bb428a130349f35"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A5.account_extra.bit_layout.yaml",
+      "lines": [
+        69
+      ],
+      "sha256": "c84d384ac25502fbe41e087bae116080c12199e5a2d492e4d2411c8175026ba9"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A6.anzeon_gas.tip_override.yaml",
+      "lines": [
+        56
+      ],
+      "sha256": "1847ab99332d104c4fceec80d5d5a2d62c4b6b4aed80d03434b7ae01d2f7fab0"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/entries/A6.fee_delegation.signing_model.yaml",
+      "lines": [
+        1,
+        4
+      ],
+      "sha256": "fc40d21d1f9f84218e11e40356d6c46f70af8f0ddc672eb3a1cec4fbb38fe102"
+    },
+    {
+      "category": "gas_refund",
+      "path": "projects/stablenet/domain-knowledge/flow-corpus/corpus.jsonl",
+      "lines": [
+        189
+      ],
+      "sha256": "d0ac30d5d5ee3e7ba8cc8ab9125c77629cd776101ad7b9d1311350b6bbaa6352"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md",
+      "lines": [
+        13,
+        14
+      ],
+      "sha256": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85"
+    },
+    {
+      "category": "gas_refund",
+      "path": "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md",
+      "lines": [
+        85,
+        94,
+        126
+      ],
+      "sha256": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/glossary.yaml",
+      "lines": [
+        698
+      ],
+      "sha256": "4c121723f9c045ef3a39f53507992c9c5a0755262ef30ba69738f7413bb5ff54"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/inventory.md",
+      "lines": [
+        69,
+        114
+      ],
+      "sha256": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/subsystems.yaml",
+      "lines": [
+        63,
+        127,
+        132,
+        136,
+        147,
+        151
+      ],
+      "sha256": "810a1450ba47b5300f2854884cc67a92fb8912a2da7da60f6f6f41ac0ce62b42"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/verification-queue.md",
+      "lines": [
+        133
+      ],
+      "sha256": "091c9c4fbd5a0059640e3a6130ea0d39091394da133cf1301976226f5309791d"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/domain-knowledge/verification-worksheet.md",
+      "lines": [
+        159,
+        380,
+        724,
+        997,
+        2028,
+        2030,
+        2092
+      ],
+      "sha256": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/eval/graph/stablenet-files.json",
+      "lines": [
+        335
+      ],
+      "sha256": "fb65af9f00cb41c07ae1705a4c3dc1fc79483012e758c5337211d30b869ae931"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/policies/graph.yaml",
+      "lines": [
+        235,
+        309,
+        775,
+        776
+      ],
+      "sha256": "40c38baa8e1761a9f75c92f1ef8d8262f5148e6840c60dbb98a6710096a3ddbb"
+    },
+    {
+      "category": "signing",
+      "path": "projects/stablenet/policies/vector.yaml",
+      "lines": [
+        250
+      ],
+      "sha256": "59148ebc93fdc6f8543a5e550595b99b4740ba98c538839598f6da420c9e4315"
+    },
+    {
+      "category": "signing",
+      "path": "scripts/release-sidecar.py",
+      "lines": [
+        36,
+        56,
+        60,
+        85
+      ],
+      "sha256": "3bcbd9e0be0cec0296eff1311b3a71e1ea258394cdb2fd864b1b96d661eff74c"
+    },
+    {
+      "category": "signing",
+      "path": "scripts/wbs-linux-package-smoke.sh",
+      "lines": [
+        48
+      ],
+      "sha256": "b4477e6e3b20fde734f69a7a9728f132c9261ba7874d22edb8879085faf11912"
+    },
+    {
+      "category": "signing",
+      "path": "scripts/wbs-release-sign-smoke.sh",
+      "lines": [
+        18
+      ],
+      "sha256": "788e561b934d99b776f7bc3208ff2c8a87ac360c8011e14dcf4e34e8e007f9b8"
+    },
+    {
+      "category": "signing",
+      "path": "system/docs/archive/session-handoff-2026-05-29.md",
+      "lines": [
+        97
+      ],
+      "sha256": "f74691c33111ed3ec07ae6c8b59c2b02e38ae9fd58bbc5c082abb7b81dd9271a"
+    },
+    {
+      "category": "signing",
+      "path": "system/docs/superpowers/specs/2026-06-05-channel-2-domain-embedding-design.md",
+      "lines": [
+        11
+      ],
+      "sha256": "3cbee242c2e48cf4e319f6c2da7d4aa8e64f7733b1dad495fad853245fb33096"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/dataset.yaml",
+      "lines": [
+        109,
+        225
+      ],
+      "sha256": "8a4f2ad884e14d7b612a5bb17c33e685e813e93352f222baad0fdb41a05e416b"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/impact/gt/CI10.json",
+      "lines": [
+        3,
+        7,
+        15,
+        23,
+        28,
+        92,
+        100
+      ],
+      "sha256": "7657eb09ec00961f29a4a247751977627f5b733049c717944d35f4664a0c48f4"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/impact/gt/CI11.json",
+      "lines": [
+        40,
+        44,
+        98,
+        100
+      ],
+      "sha256": "feeb28ffc000aa6f583df8b2ae25b6af29c0ce89fe0ca6609dfdea0019db72ca"
+    },
+    {
+      "category": "gas_refund",
+      "path": "system/eval/ckg-4way/impact/results_impact.json",
+      "lines": [
+        2482
+      ],
+      "sha256": "60cffc92f80100c7ad355cb39fb0f3d4fdd1bc5b01c93c51f734392c0e61126c"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/impact/results_impact.json",
+      "lines": [
+        847,
+        1849,
+        1855,
+        1891,
+        2062,
+        2255,
+        2374,
+        2428,
+        2434,
+        2482,
+        2490,
+        2499,
+        2505,
+        2511,
+        2517,
+        2637,
+        2646,
+        2652,
+        2658,
+        2712,
+        2785
+      ],
+      "sha256": "60cffc92f80100c7ad355cb39fb0f3d4fdd1bc5b01c93c51f734392c0e61126c"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/results.json",
+      "lines": [
+        2048,
+        2078,
+        2107,
+        2125,
+        2197,
+        2257,
+        2939,
+        2947,
+        2963,
+        3003,
+        3011,
+        3052,
+        3060,
+        3720,
+        3735,
+        3748,
+        3761,
+        3766,
+        3802,
+        3811,
+        3817,
+        3832,
+        3853,
+        3866,
+        4450,
+        4472
+      ],
+      "sha256": "1dfaec76166c6883e4107de416d7b755b32a563cc10d9cf9fa19f678a8d50009"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/ckg-4way/scored.json",
+      "lines": [
+        2525,
+        2555,
+        2590,
+        2614,
+        2686,
+        2752,
+        3539,
+        3547,
+        3569,
+        3615,
+        3623,
+        3670,
+        3678,
+        4446,
+        4461,
+        4482,
+        4495,
+        4500,
+        4542,
+        4551,
+        4557,
+        4572,
+        4599,
+        4612,
+        5282,
+        5304
+      ],
+      "sha256": "83a3dafb81ce4340ff9fde833650dbdfd1fe328735823a40572e8cf19eee9f6a"
+    },
+    {
+      "category": "signing",
+      "path": "system/eval/scenarios/composer-err-fail-closed.yaml",
+      "lines": [
+        7,
+        8
+      ],
+      "sha256": "dfdea61d4a78e27860211257850c3634a0a0e6d67ee8022206998fcba353badf"
+    },
+    {
+      "category": "signing",
+      "path": "system/ops/install-recovery-key.sh",
+      "lines": [
+        47,
+        82
+      ],
+      "sha256": "5617530bf0cf46a328c1db7a5cd488968d17f6ce9192da05aa944a8dfc3fd5a9"
+    },
+    {
+      "category": "signing",
+      "path": "system/policies/sanitization_rules.yaml",
+      "lines": [
+        14,
+        15,
+        16
+      ],
+      "sha256": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96"
+    },
+    {
+      "category": "signing",
+      "path": "vector/scripts/semantic-validation-queries.json",
+      "lines": [
+        9
+      ],
+      "sha256": "431a0def85d41f968e9d0ab3fc04d2bee4c7840eb205e3c31b31c92d04e365de"
+    }
+  ],
+  "note": "Lexical scan records candidates; no match is not proof of semantic absence. Gas refund technical material exists, but named organizational approval authority has not been established. Signing test keys are not approved production credentials."
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "gate": "B0",
+  "status": "ready",
+  "checked_at": "2026-10-03T10:59:36.006851+00:00",
+  "question_set_sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+  "question_set": {
+    "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+    "corpus_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+    "question_count": 12,
+    "approved_count": 12,
+    "groups": {
+      "abstention": 2,
+      "code_location": 3,
+      "policy_conflict": 3,
+      "why_design": 4
+    },
+    "anchors": [
+      {
+        "question_id": "B0-CODE-01",
+        "path": "internal/setup/verify.go",
+        "line": 57,
+        "start_line": 57,
+        "end_line": 85
+      },
+      {
+        "question_id": "B0-CODE-02",
+        "path": "internal/vector/store/sqlitevec/store.go",
+        "line": 613,
+        "start_line": 613,
+        "end_line": 654
+      },
+      {
+        "question_id": "B0-CODE-03",
+        "path": "internal/system/mcp/get_for_task_v2.go",
+        "line": 33,
+        "start_line": 33,
+        "end_line": 55
+      },
+      {
+        "question_id": "B0-WHY-01",
+        "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+        "line": 67,
+        "start_line": 67,
+        "end_line": 67
+      },
+      {
+        "question_id": "B0-WHY-02",
+        "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+        "line": 40,
+        "start_line": 40,
+        "end_line": 40
+      },
+      {
+        "question_id": "B0-WHY-03",
+        "path": "internal/system/patch/review.go",
+        "line": 205,
+        "start_line": 205,
+        "end_line": 281
+      },
+      {
+        "question_id": "B0-POLICY-01",
+        "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+        "line": 23,
+        "start_line": 23,
+        "end_line": 23
+      },
+      {
+        "question_id": "B0-POLICY-01",
+        "path": "internal/system/knowledgepack/instances.go",
+        "line": 195,
+        "start_line": 195,
+        "end_line": 242
+      },
+      {
+        "question_id": "B0-POLICY-02",
+        "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+        "line": 23,
+        "start_line": 23,
+        "end_line": 23
+      },
+      {
+        "question_id": "B0-POLICY-03",
+        "path": "internal/system/knowledgepack/instances.go",
+        "line": 214,
+        "start_line": 203,
+        "end_line": 241
+      },
+      {
+        "question_id": "B0-TRACE-01",
+        "path": "internal/system/evidencev2/knowledge_trace.go",
+        "line": 20,
+        "start_line": 20,
+        "end_line": 115
+      }
+    ]
+  },
+  "hardware": {
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu_count": 12,
+    "memory_bytes": 68719476736
+  },
+  "model": {
+    "provider": "ollama",
+    "model": "bge-m3:latest",
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "endpoint": "http://127.0.0.1:11434",
+    "runtime_options": {
+      "num_ctx": 8192,
+      "num_batch": 8192
+    },
+    "server_version": "0.35.1"
+  },
+  "pending_reasons": [],
+  "metrics": null
+}

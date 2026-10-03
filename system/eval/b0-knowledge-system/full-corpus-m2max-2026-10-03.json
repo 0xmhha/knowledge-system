@@ -1,0 +1,282 @@
+{
+  "status": "diagnostic_only",
+  "quality_metrics": null,
+  "gold_status": "12_draft_questions_not_approved",
+  "model_status": "provisional",
+  "started_at": "2026-10-03T10:41:30.625645+00:00",
+  "finished_at": "2026-10-03T10:55:04.091610+00:00",
+  "elapsed_seconds": 813.4222024157643,
+  "setup_exit_code": 0,
+  "command": [
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+    "setup",
+    "--src",
+    "/private/tmp/ks-b0-m2max-corpus-20261003",
+    "--out",
+    "/private/tmp/ks-b0-m2max-full-20261003/dataset",
+    "--project-id",
+    "b0-knowledge-system",
+    "--version",
+    "m2max-diagnostic",
+    "--embedder",
+    "ollama",
+    "--model-name",
+    "bge-m3:latest",
+    "--ollama-url",
+    "http://127.0.0.1:11434",
+    "--query-prefix-policy",
+    "registry",
+    "--progress",
+    "text"
+  ],
+  "strict_complete_embedding_mode": true,
+  "audit_status": "partial",
+  "audit_errors": [
+    {
+      "type": "missing_go_files",
+      "paths": [
+        "internal/vector/build/builder.go",
+        "internal/vector/build/builder_test.go",
+        "internal/vector/build/checkpoint.go",
+        "internal/vector/build/checkpoint_test.go",
+        "internal/vector/build/convention_test.go",
+        "internal/vector/build/embed_resilient_test.go",
+        "internal/vector/build/invariant_paths.go",
+        "internal/vector/build/invariant_paths_test.go",
+        "internal/vector/build/invariant_test.go",
+        "internal/vector/build/lock.go",
+        "internal/vector/build/lock_test.go",
+        "internal/vector/build/memory.go",
+        "internal/vector/build/memory_darwin.go",
+        "internal/vector/build/memory_test.go",
+        "internal/vector/build/pipeline.go",
+        "internal/vector/build/pipeline_test.go",
+        "internal/vector/build/policy_test.go",
+        "internal/vector/build/prfetch.go",
+        "internal/vector/build/prfetch_test.go",
+        "internal/vector/build/progress.go",
+        "internal/vector/build/progress_test.go",
+        "internal/vector/build/promote.go",
+        "internal/vector/build/promote_test.go",
+        "internal/vector/build/reindex.go",
+        "internal/vector/build/reindex_ckg_test.go",
+        "internal/vector/build/reindex_resume_test.go",
+        "internal/vector/build/reindex_test.go",
+        "internal/vector/build/sources.go",
+        "internal/vector/build/sources_test.go"
+      ]
+    }
+  ],
+  "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "source_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "source_checkout": "/private/tmp/ks-b0-m2max-corpus-20261003",
+  "source_git_object_store": "independent",
+  "dataset": "/private/tmp/ks-b0-m2max-full-20261003/dataset",
+  "dataset_version": "m2max-diagnostic",
+  "coordinates": {
+    "project_id": "b0-knowledge-system",
+    "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+    "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50"
+  },
+  "build": {
+    "checked_at": "2026-10-03T10:48:56.105703+00:00",
+    "git_head": "9e907b43b8cf038ab60bbc4d0a775c632e4defd6",
+    "remote_head": "9e907b43b8cf038ab60bbc4d0a775c632e4defd6",
+    "branch": "feat/spec-driven-knowledge-system",
+    "initial_untracked_preserved": [
+      ".claude/",
+      "logs/"
+    ],
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "cpu_count": 12,
+      "memory_bytes": 68719476736,
+      "cpu_brand": "Apple M2 Max",
+      "macos_version": "26.6.2",
+      "disk_free_bytes": 123429728256,
+      "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    12906.\nPages active:                                1052490.\nPages inactive:                               948463.\nPages speculative:                            102956.\nPages throttled:                                   0.\nPages wired down:                             377883.\nPages purgeable:                               21124.\n\"Translation faults\":                    37686761688.\nPages copy-on-write:                      4456364118.\nPages zero filled:                       15561240669.\nPages reactivated:                         579787716.\nPages purged:                               77383519.\nFile-backed pages:                            841190.\nAnonymous pages:                             1262719.\nPages stored in compressor:                  3284610.\nPages occupied by compressor:                1642474.\nDecompressions:                            384525957.\nCompressions:                              365847763.\nPageins:                                   494336372.\nPageouts:                                    3878304.\nSwapins:                                     2478324.\nSwapouts:                                    3174048.",
+      "swap_usage": "total = 3072.00M  used = 2103.38M  free = 968.62M  (encrypted)"
+    },
+    "toolchain": {
+      "go": "go version go1.26.8 darwin/arm64",
+      "git": "git version 2.55.0",
+      "python": "3.11.4"
+    },
+    "ollama_model_inventory": [
+      {
+        "name": "qwen3-embedding:4b",
+        "digest": "df5bd2e3c74cd8d069d21dc038f1b359fcdc9458fce1c99bd43c9eb1518ff907",
+        "size_bytes": 2496704041,
+        "embedding_dimension_metadata": 2560,
+        "capabilities": [
+          "tools",
+          "embedding"
+        ]
+      },
+      {
+        "name": "qwen3-embedding:0.6b",
+        "digest": "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+        "size_bytes": 639150858,
+        "embedding_dimension_metadata": 1024,
+        "capabilities": [
+          "tools",
+          "thinking",
+          "embedding"
+        ]
+      },
+      {
+        "name": "bge-m3:latest",
+        "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+        "size_bytes": 1157672605,
+        "embedding_dimension_metadata": 1024,
+        "capabilities": [
+          "embedding"
+        ]
+      },
+      {
+        "name": "llama3:latest",
+        "digest": "365c0bd3c000a25d28ddbf732fe1c6add414de7275464c4e4d1c3b5fcb5d8ad1",
+        "size_bytes": 4661224676,
+        "embedding_dimension_metadata": 4096,
+        "capabilities": [
+          "completion"
+        ]
+      }
+    ],
+    "selected_model_status": "provisional_pending_human_selection",
+    "binary_sha256": {
+      "ckg": "4b1c5cae529990ef17b38100c62f2770227d3e40034daf86698ff0c0f30c5266",
+      "ckv": "6e0b25819b2282d340594a182b957d8781381e5a10151ebd0ff349f600b8e4bc",
+      "cks": "1f1a67abc24dbecbd1f03cb96c118ba01ec8c60eb5516cadff0e01e1dae6c48d"
+    },
+    "quality_metrics": null
+  },
+  "graph": {
+    "schema_version": "1.23",
+    "stats": {
+      "edges": 414613,
+      "nodes": 102112,
+      "pkg_tree_edges": 94674
+    },
+    "graph_digest": "fa58e1e7c5ec7ff022459a773d74fee2b9ba40f36f00a3302c2bff24d832d98e",
+    "parse_errors_count": 0
+  },
+  "vector": {
+    "files_indexed": 1569,
+    "distinct_chunk_file_fields_including_generated": 1721,
+    "chunks": 13575,
+    "chunk_kinds": {
+      "convention": 152,
+      "doc": 3963,
+      "file_header": 1325,
+      "function_split": 97,
+      "invariant": 76,
+      "symbol": 7962
+    },
+    "largest_stored_chunk_bytes": 6144,
+    "appended_truncation_marker_count": 0,
+    "content_hash_mismatch_count": 0,
+    "db_sha256": "e64b9a4b9f944e7eb3466bcde1cfaf487d90fce9d6f136078181aeb8602867b2",
+    "embedding_identity_v2": {
+      "Provider": "ollama",
+      "Model": "bge-m3:latest",
+      "Dim": 1024,
+      "Pooling": "",
+      "Normalize": "",
+      "version": 2,
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "dimension_method": "native:v1",
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "truncate_policy": "reject:v1",
+      "runtime_context_tokens": 8192,
+      "runtime_batch_tokens": 8192,
+      "chunk_budget_bytes": 6144
+    },
+    "embedding_checksum": "v2:sha256:9ca4ec712ea594d72ba950d1d87e95482b5e5203fe9d72002b765760b4cc3621",
+    "parent_reassembly": {
+      "count": 63,
+      "children": 169,
+      "byte_exact_in_cited_span": 63,
+      "full_cited_line_span_equal": 20,
+      "failures": []
+    }
+  },
+  "graph_vector_go_file_parity": {
+    "graph_go_files": 992,
+    "matched": 963,
+    "missing": [
+      "internal/vector/build/builder.go",
+      "internal/vector/build/builder_test.go",
+      "internal/vector/build/checkpoint.go",
+      "internal/vector/build/checkpoint_test.go",
+      "internal/vector/build/convention_test.go",
+      "internal/vector/build/embed_resilient_test.go",
+      "internal/vector/build/invariant_paths.go",
+      "internal/vector/build/invariant_paths_test.go",
+      "internal/vector/build/invariant_test.go",
+      "internal/vector/build/lock.go",
+      "internal/vector/build/lock_test.go",
+      "internal/vector/build/memory.go",
+      "internal/vector/build/memory_darwin.go",
+      "internal/vector/build/memory_test.go",
+      "internal/vector/build/pipeline.go",
+      "internal/vector/build/pipeline_test.go",
+      "internal/vector/build/policy_test.go",
+      "internal/vector/build/prfetch.go",
+      "internal/vector/build/prfetch_test.go",
+      "internal/vector/build/progress.go",
+      "internal/vector/build/progress_test.go",
+      "internal/vector/build/promote.go",
+      "internal/vector/build/promote_test.go",
+      "internal/vector/build/reindex.go",
+      "internal/vector/build/reindex_ckg_test.go",
+      "internal/vector/build/reindex_resume_test.go",
+      "internal/vector/build/reindex_test.go",
+      "internal/vector/build/sources.go",
+      "internal/vector/build/sources_test.go"
+    ],
+    "scope_note": "CKV DefaultIgnore build/ excludes 29 Go source files under internal/vector/build/. Complete embedding mode covers selected inputs, not all retained files. CKG go build-vs-graph PARITY is not CKV/CKG file parity."
+  },
+  "doctor": {
+    "project_id": "b0-knowledge-system",
+    "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+    "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+    "source_mode": "committed",
+    "history_status": "available",
+    "identity_status": "pinned",
+    "source_root": "/private/tmp/ks-b0-m2max-corpus-20261003",
+    "commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+    "indexed_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+    "dirty": false,
+    "languages": {
+      "go": 1026,
+      "javascript": 10,
+      "markdown": 244,
+      "solidity": 228,
+      "typescript": 61
+    },
+    "shared_code_files": 1325,
+    "graph_only_proto": 5,
+    "symlinks_skipped": 0,
+    "unreadable_files": 0,
+    "secret_path_count": 0,
+    "ignored_indexable": 0,
+    "dataset_version": "m2max-diagnostic",
+    "issues": [],
+    "status": "ready"
+  },
+  "size_bytes": 384780036,
+  "git_history_bundle_bytes": 34568786,
+  "setup_log_sha256": "eca0d1dfa30fbe468f882ed96106305d266ca545f5aa502409406ff920a9d985",
+  "raw_setup_log": "system/eval/b0-knowledge-system/setup-raw-m2max-2026-10-03.txt",
+  "audit_script_sha256": "a182cb6814c7c8e12d6f3905bf655bb5c1f7cacc38694869835f6e5d028a7c2a",
+  "notes": [
+    "This index uses a provisional candidate model and draft gold; it is not the official B0 quality baseline.",
+    "Complete embedding mode rejects shortening/skipping. Source hash and parent reconstruction checks measure storage integrity, not retrieval quality.",
+    "Logical graph digest matches previous machine; physical DB hashes may differ by runtime.",
+    "Source selection has a disclosed coverage gap: 29 Go source files are excluded by the CKV default build/ rule. No coverage-complete or B0 quality pass is claimed."
+  ]
+}
