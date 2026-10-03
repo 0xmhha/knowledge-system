@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T23:39:45.480112Z",
+  "finished_at": "2026-10-03T23:39:45.581725Z",
+  "request_sha256": "784a985e28c50cd37d860dc6cd5d0696c7d2a975f91741e14e15f873fc2d7a1f",
+  "config_sha256": "925db43d46b5806aeb209c7a5f87e3cc153dc592f61989e3551f936dd0cbed45",
+  "binary_sha256": "6cd6de610251e9a79294c934912c727bc0dfa6b2a2a9d9c0e0d2dc0116f0708b",
+  "config_sha256_after": "925db43d46b5806aeb209c7a5f87e3cc153dc592f61989e3551f936dd0cbed45",
+  "binary_sha256_after": "6cd6de610251e9a79294c934912c727bc0dfa6b2a2a9d9c0e0d2dc0116f0708b",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 30000000000,
+  "rows": [
+    {
+      "request_id": "guide-v1",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "1d6e2f4308288a36510f2f7629733376",
+        "tool": "cks.context.get_for_task",
+        "arguments": {
+          "prompt": "Where is the quartz committed guide?"
+        },
+        "elapsed_ns": 25396667,
+        "completed_at": "2026-10-04T08:39:45.540745+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "intent": "qa_review",
+            "query": "Where is the quartz committed guide?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "25dc76772fe69960414ed4269f9854cb922bf584"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "25dc76772fe69960414ed4269f9854cb922bf584"
+                },
+                "text": "# Guide\nThe quartz committed guide records revision one.",
+                "token_estimate": 14
+              }
+            ],
+            "metadata": {
+              "budget_tokens": 7200,
+              "used_tokens": 14,
+              "utilization_ratio": 0.0019444444444444444,
+              "built_at": "2026-10-03T23:39:45.54046Z",
+              "builder_version": "cks-mcp/0.0.1-dev",
+              "integrity_hash": "6dd6e99a4538c89662c9d6ec8056c8e86eca504e0d5625cb7cee3afaf6d45d0a",
+              "integrity_hash_algo": "sha256"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "guide-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "0c08797318af6978567f88caee140981",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is the quartz committed guide?"
+        },
+        "elapsed_ns": 24834667,
+        "completed_at": "2026-10-04T08:39:45.565616+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-d2891f59768d517bcb7b9515aae86bd4",
+              "dataset_id": "906d6e3e74ca377da488973fb376e91dfd5595f8ae096de23793679d92f03db7",
+              "snapshot_id": "a5efa780209019ff952e129991fc2e65abab5e9568d7d9890860151684af0234",
+              "source_mode": "committed",
+              "base_commit": "25dc76772fe69960414ed4269f9854cb922bf584"
+            },
+            "query": "Where is the quartz committed guide?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 2,
+                "commit_hash": "25dc76772fe69960414ed4269f9854cb922bf584",
+                "project_id": "p-d2891f59768d517bcb7b9515aae86bd4",
+                "dataset_id": "906d6e3e74ca377da488973fb376e91dfd5595f8ae096de23793679d92f03db7",
+                "snapshot_id": "a5efa780209019ff952e129991fc2e65abab5e9568d7d9890860151684af0234",
+                "source_mode": "committed",
+                "base_commit": "25dc76772fe69960414ed4269f9854cb922bf584",
+                "origin_id": "repo",
+                "file_sha256": "a2e32e6d62a747e6daf3eea868b0e62443f97aa8b6da66fdd88b71c83095a860",
+                "content_sha256": "a2e32e6d62a747e6daf3eea868b0e62443f97aa8b6da66fdd88b71c83095a860"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 2,
+                  "commit_hash": "25dc76772fe69960414ed4269f9854cb922bf584",
+                  "project_id": "p-d2891f59768d517bcb7b9515aae86bd4",
+                  "dataset_id": "906d6e3e74ca377da488973fb376e91dfd5595f8ae096de23793679d92f03db7",
+                  "snapshot_id": "a5efa780209019ff952e129991fc2e65abab5e9568d7d9890860151684af0234",
+                  "source_mode": "committed",
+                  "base_commit": "25dc76772fe69960414ed4269f9854cb922bf584",
+                  "origin_id": "repo",
+                  "file_sha256": "a2e32e6d62a747e6daf3eea868b0e62443f97aa8b6da66fdd88b71c83095a860",
+                  "content_sha256": "a2e32e6d62a747e6daf3eea868b0e62443f97aa8b6da66fdd88b71c83095a860"
+                },
+                "text": "# Guide\nThe quartz committed guide records revision one.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b78fb333a979dbc9c5d25cfd72652479b2efbda701daf97ae71c4e947c4e1044"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

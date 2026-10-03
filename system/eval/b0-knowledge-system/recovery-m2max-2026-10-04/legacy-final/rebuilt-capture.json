@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T23:49:52.742488Z",
+  "finished_at": "2026-10-03T23:49:52.80767Z",
+  "request_sha256": "6f525a303aabcd1279225f3ef3a67c9d4351894c81f95ab465932dea4b7e1d92",
+  "config_sha256": "fe00526cc31956d4876d7897586c5faf7c409ebbb3f3deff384e69036bc0fb4c",
+  "binary_sha256": "6cd6de610251e9a79294c934912c727bc0dfa6b2a2a9d9c0e0d2dc0116f0708b",
+  "config_sha256_after": "fe00526cc31956d4876d7897586c5faf7c409ebbb3f3deff384e69036bc0fb4c",
+  "binary_sha256_after": "6cd6de610251e9a79294c934912c727bc0dfa6b2a2a9d9c0e0d2dc0116f0708b",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 30000000000,
+  "rows": [
+    {
+      "request_id": "rebuilt-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "899d92cd11cde816a4e5c27f7c74d374",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 18127000,
+        "completed_at": "2026-10-04T08:49:52.79121+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-39482b782071bd5ae9b09c77ce990597",
+              "dataset_id": "3e59039d1ff9103b958bf4b3b55c03ee4b7c41560e4b920b2f926772cd78c8ca",
+              "snapshot_id": "7eacc8ab4dc35fd48e555620930ecca41b69596a09ccf720272e6ea306ebbdc6",
+              "source_mode": "committed",
+              "base_commit": "09325f9291b217241f48bf4059c7ac0ce0805693"
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 2,
+                "end_line": 2,
+                "commit_hash": "09325f9291b217241f48bf4059c7ac0ce0805693",
+                "project_id": "p-39482b782071bd5ae9b09c77ce990597",
+                "dataset_id": "3e59039d1ff9103b958bf4b3b55c03ee4b7c41560e4b920b2f926772cd78c8ca",
+                "snapshot_id": "7eacc8ab4dc35fd48e555620930ecca41b69596a09ccf720272e6ea306ebbdc6",
+                "source_mode": "committed",
+                "base_commit": "09325f9291b217241f48bf4059c7ac0ce0805693",
+                "origin_id": "repo",
+                "file_sha256": "c361fccbe873a7aa28f7b6a4c29331e62ecca2bbc90cba2c912175c8351948eb",
+                "content_sha256": "e63e63d02e600a4c5ddf93104e09d79beb6343f7fbe918d7dc19305f95692ff5"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 2,
+                  "end_line": 2,
+                  "commit_hash": "09325f9291b217241f48bf4059c7ac0ce0805693",
+                  "project_id": "p-39482b782071bd5ae9b09c77ce990597",
+                  "dataset_id": "3e59039d1ff9103b958bf4b3b55c03ee4b7c41560e4b920b2f926772cd78c8ca",
+                  "snapshot_id": "7eacc8ab4dc35fd48e555620930ecca41b69596a09ccf720272e6ea306ebbdc6",
+                  "source_mode": "committed",
+                  "base_commit": "09325f9291b217241f48bf4059c7ac0ce0805693",
+                  "origin_id": "repo",
+                  "file_sha256": "c361fccbe873a7aa28f7b6a4c29331e62ecca2bbc90cba2c912175c8351948eb",
+                  "content_sha256": "e63e63d02e600a4c5ddf93104e09d79beb6343f7fbe918d7dc19305f95692ff5"
+                },
+                "text": "func Alpha() {}\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "fb132e92465782c414538113e0139a67d58506c009bba581b983fe7899f3b320"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 40, in <module>
+    run('init',[bins/'cks','init','--src',src,'--dataset',dataset,'--config-out',config,'--embedder','mock']);run('baseline',[bins/'cks','setup','--config',config,'--version','baseline']);old=dataset/'baseline';oldhash=snapshot(old);backup=out/'backup/baseline';shutil.copytree(old,backup);assert snapshot(backup)==oldhash;cfg=mcp_config('runtime',dataset);checks={'baseline':capture('baseline',cfg,old)};assert snapshot(old)==oldhash
+                                                                                                                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

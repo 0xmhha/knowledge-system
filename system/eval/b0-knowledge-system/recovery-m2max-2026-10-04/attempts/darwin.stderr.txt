@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 36, in <module>
+    run('init',[bins/'cks','init','--src',src,'--dataset',dataset,'--config-out',config,'--embedder','mock']);run('baseline',[bins/'cks','setup','--config',config,'--version','baseline']);old=dataset/'baseline';oldhash=snapshot(old);backup=out/'backup/baseline';shutil.copytree(old,backup);assert snapshot(backup)==oldhash;cfg=mcp_config('runtime',dataset);checks={'baseline':capture('baseline',cfg,old)};assert snapshot(old)==oldhash
+                                                                                                                                                                                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 22, in capture
+    req=out/(name+'-requests.json');req.write_text(json.dumps({'schema_version':1,'requests':[{'id':'guide-v1','tool':'cks.context.get_for_task','arguments':{'prompt':'Where is the quartz committed guide?'}},{'id':'guide-v2','tool':'cks.context.get_for_task_v2','arguments':{'prompt':'Where is the quartz committed guide?'}}]})+'\n');dest=out/(name+'-capture');run(name+'-capture',[bins/'cks','eval','capture','--requests',req,'--config',cfg,'--output',dest]);report=load(dest/'report.json');rows=[json.loads(x) for x in (dest/'rows.jsonl').read_text().splitlines()];assert report['state']=='captured' and len(rows)==2 and report['quality_metrics'] is None if 'quality_metrics' in report else report['state']=='captured' and len(rows)==2
+                                                                                                                                                                                                                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 8, in run
+    start=time.monotonic_ns();r=subprocess.run([str(a) for a in argv],capture_output=True,text=True,env=env,timeout=120);elapsed=time.monotonic_ns()-start;(out/(name+'.stdout.txt')).write_text(r.stdout);(out/(name+'.stderr.txt')).write_text(r.stderr);commands.append({'id':name,'argv':[str(a) for a in argv],'exit_code':r.returncode,'elapsed_ns_diagnostic':elapsed});(out/'commands.json').write_text(json.dumps(commands,indent=2)+'\n');assert r.returncode==expected,(name,r.returncode,r.stderr);return r
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 2109, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/cks', 'eval', 'capture', '--requests', '/private/tmp/ks-recovery-20261004/darwin/baseline-requests.json', '--config', '/private/tmp/ks-recovery-20261004/darwin/runtime.yaml', '--output', '/private/tmp/ks-recovery-20261004/darwin/baseline-capture']' timed out after 120 seconds

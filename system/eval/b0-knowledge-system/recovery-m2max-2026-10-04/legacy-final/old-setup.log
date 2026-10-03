@@ -1,0 +1,36 @@
+setup: --version auto resolved to 09325f92
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-04T08:49:49.924+09:00 level=INFO msg="detected files" go=1 ts=0 sol=0 proto=0
+    time=2026-10-04T08:49:49.974+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-04T08:49:50.081+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=3 changed_in_edges=3 blame_edges=1 hunk_edges=3 hunk_blobs=3 max_per_file=10
+    time=2026-10-04T08:49:50.121+09:00 level=INFO msg="build complete" nodes=7 edges=10 pkg_tree_edges=1 topic_resolutions=3
+    ckg: built 7 nodes / 10 edges into /private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92/graph
+<== [graph-build] done
+==> [vector-preflight] Preflight the Ollama embedder
+    Ollama reachable at http://127.0.0.1:59921; model "bge-m3" present (bge-m3:latest)
+<== [vector-preflight] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-04T08:49:50.657+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=aa4413ca12e59abd run_id=943ba77712ff8f30 path=/private/tmp/ks-recovery-20261004/legacy-strict-final/src has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0
+    time=2026-10-04T08:49:50.657+09:00 level=INFO msg=ckv event=build.start trace_id=22e3e68304e4fe4a run_id=943ba77712ff8f30 src_root=/private/tmp/ks-recovery-20261004/legacy-strict-final/src out_dir=/private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92/vector embedder=bge-m3 embedder_provider=""
+    time=2026-10-04T08:49:50.682+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=cd4e94efd84389f4 run_id=943ba77712ff8f30 ckg_path=/private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92/graph files_indexed=2 entries=4 canonical_available=true
+    ckv: 2/2 files (81.4 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-04T08:49:50.714+09:00 level=INFO msg=ckv event=build.done trace_id=22e3e68304e4fe4a run_id=943ba77712ff8f30 latency_ms=57 chunks_flow_step=0 embedder_provider="" chunks_flow_spine=0 chunks_canonical_id=1 chunks_file_header=1 out_dir=/private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92/vector languages="map[go:2 markdown:1]" chunks_doc=1 indexed_head=09325f9291b217241f48bf4059c7ac0ce0805693 files_indexed=2 chunks_truncated=0 policy_loaded=false db_sha256=658777b949320f8c2a69aae0a6a3041a4100abfae38017bd8d8b8777d8316bcd chunks_symbol=1 src_root=/private/tmp/ks-recovery-20261004/legacy-strict-final/src embedder=bge-m3 category_counts=map[:3] chunks_total=4
+    ckv: indexed 2 files → 4 chunks (1 symbol, 1 doc, 1 header, 0 truncated)
+    ckv: canonical_id 1/1 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=09325f9291b217241f48bf4059c7ac0ce0805693 built_at=2026-10-03T23:49:50Z db=/private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92/vector/vector.db sha256=658777b949320f8c2a69aae0a6a3041a4100abfae38017bd8d8b8777d8316bcd
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 1
+      db files:    1
+      in both:     1
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-recovery-20261004/legacy-strict-final/dataset/09325f92 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

@@ -48,7 +48,7 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 | 6 | P2 | B0-07–09 공식 기준선 | 선행 대기 |
 | 7 | P2 | B1-03–08 동일 조건 비교·판정 | B0 대기 |
 | 8 | P2 | C0-01–06 관측 실패의 스펙·시험·수정 | B1 대기 |
-| 9 | P3 | C1-01–07 재평가·운영·출시 결정 | C0 대기 |
+| 9 | P3 | C1-01–07 재평가·운영·출시 결정 | 공식 품질은 C0 대기; C1-04/05/06 preview 준비 진행 |
 
 ## 3. B0: 승인된 입력과 재현 가능한 실모델 기준선
 
@@ -101,7 +101,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: Linux arm64 실제 CPU BGE-M3의 3프로젝트 설치/재시작/업데이트/롤백·72 SDK 응답/96 인용 검증. 20초 probe 실패와 90초 진단 재실행을 분리; native amd64·대규모 비용·최종 운영 후보/품질은 남음 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조 완료 범위 존재; 원래 C/header·전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
-| C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 대기 |
+| C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 진행: 최신 Darwin 시험 preview의 후보 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·원본 소스 없는 재생, 구 데이터의 첫 신규 소비자 전 SHA·새 재색인·구 v1 rollback 보존 검증. [복구 문서](./C1-RECOVERY-VALIDATION.md); 최종 후보/운영 범위·OP-08 남음 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
 
 ## 7. 실행 증거 원장
@@ -154,6 +154,7 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 | FIX-12 | P1 · native 고지 확대 후 실제 패키지 검증 | Unicode/runtime/toolchain 고지를 포함한 110항목 정상 tar가 Python/Go의 기존 100항목 상한에 걸린다. 유한 상한을 맞추고 경계·변조 거부와 실제 설치를 확인한다. | 수정 후 재검증 완료: 수정 전 Python/Go 실패 보존; 상한 256개 통과·257개 거부, 고지 50개 preview의 두 서명 검증기·세 프로젝트 설치/재시작/업데이트/롤백 통과; 재서명 Unicode 변조 거부. C1 출시/적합성은 별도 |
 | FIX-13 | P1 · 최신 호스트 스모크 재검증 | 고지 자산을 두 개로 가정하던 스모크가 새 네 자산의 정상 패키지를 거부한다. 필수 자산·소스/고지 전용 범위·실제 count·중복·SHA를 검사한다. | 수정 후 재검증 완료: 실제 수정 전 assertion 실패와 후 macOS 세 프로젝트 설치/재시작/업데이트/롤백 통과. 현재 두 Linux 시험 서명·설치/복구도 통과 |
 | FIX-14 | P1 · Linux 패키지 metadata 재현성 | 같은 바이너리를 두 번 검사한 ldd 주소가 달라 package manifest의 native_dependencies가 변동한다. 라이브러리/해결 경로/오류/버전 정보를 보존하며 일시 주소를 안정화한다. | 수정 후 재검증 완료: 주소만 제거하며 첫 ldd 의존/정적 링크 진단 유지; 실제 Linux 두 대상의 각 4,624개 copy-input·두 공개 packager 빌드·전체 파일/모드/archive SHA 동일·동일 시험 서명/Python/Go 검증·세 프로젝트 설치/복구 통과. 도구 체인/대상별 제한 유지 |
+| FIX-15 | P1 · translated native 고지 감사 | modernc.org/sqlite의 별도 SQLITE-LICENSE가 root prefix scan에서 빠진 실제 패키지를 확인했다. 고정 버전 required notice를 수집하고 없으면 missing으로 표시한다. | 수정 후 재검증 완료: 실제 누락/수정 전 회귀 보존, Python 16개 시험·세 플랫폼 새 package/두 검증기/설치/SQLite 고지 단독 변조 거부, ZIP/h1 기반 선택 modernc source 대조. 전체 legal/운영 적합성은 별도 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -254,3 +255,16 @@ cold는 MCP process 시작 조건이고 resident model은 유지된다. warmup 0
 실제 도구 체인의 modernc dependency-selected 소스는 Darwin 30 package/225 file, Linux arm64 8/197, amd64 에뮬레이션 8/201이다. 네 모듈의 source·root 고지 9개는 고정 module ZIP과 바이트가 같고, ZIP h1은 go.sum/실제 build info에 연결된다. host/두 builder의 go mod verify도 통과했다. Origin metadata와 직접 Git blob 검증을 구분한다. GitLab 웹 source 읽기 실패와 초기 CLI 디렉터리명 오류도 보존했다. original C/generator·입력 system header 재생이나 전체 native/legal 적합성은 증명하지 않는다.
 
 FIX-15는 고정 버전의 누락 수집 수정 범위에서 완료다. 최신 패키지 설치는 mock이며 본 턴 실제 모델을 실행하지 않았고, 앞선 실제 모델 증거는 FIX-14 패키지 범위로 유지한다. C1-05의 원래 C/header/native 전이 범위·사람 적합성/운영 결정, C1-04/06/07 및 공식 B0/B1/C0/C1은 계속 미완료다. 다음 독립 작업은 C1-06 실패 복구/원본 보존 검증이며 B0 사람이 결정하면 정적 v2 범위/K 동결과 공식 strict 빌드를 우선한다.
+
+
+## 19. 실패 복구·구 데이터 원본 보존 재검증
+
+2026-10-04 C1-06 독립 준비: [복구 문서](./C1-RECOVERY-VALIDATION.md)와 [원장](../../system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/summary.json)을 추가했다. 최신 FIX-15 Darwin arm64 시험 preview의 추출 바이너리로 소형 TypeScript/mock 후보 테스트 실패·벡터 빌드 실패·손상 대상 거부·실행 중 MCP pin·업데이트/정상 rollback·손상 활성 버전의 직접 rollback 거부·새 루트 백업 복원·원본 소스 없이 보관 인용 재생을 실행했다. 기존 payload 12파일의 크기/SHA/실행 비트와 백업/복원 버전이 같다. 부분 후보와 손상 루트는 보존했다.
+
+구 커밋 1ded9b3e47bc2e09062dba329c2f918423746fa4의 실제 v1 바이너리를 현재 Go 도구 체인으로 빌드했다. 합성 localhost HTTP 벡터로 구 데이터를 만든 뒤, 첫 신규 소비자 전 7개 payload SHA를 기록했다. 새 소비자는 legacy_unpinned/reindex_required를 유지하고 별도 새 버전으로 재색인했다. 구버전 rollback 후 구 v1 commit·인용 파일·serviceable과 원본/백업 SHA가 같다. 새 재색인은 mock이며 원본 schema를 자동으로 pinned로 바꾸지 않았다.
+
+정리한 두 저장소 스크립트를 새 디렉터리에서 실제 재실행했다. 현재 빌드와 새 재색인에 CKV_REQUIRE_COMPLETE_EMBEDDINGS=1을 명시했다. [독립 감사](../../system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/independent-audit.json)는 보존된 SDK 11응답/11인용·v2 integrity 6개·source/본문/신원·typed 실패·pin/legacy·전후 payload 연결을 확인했다. 빈 graph/vector WAL과 SHM의 수명 변화는 전후 파일 차이·별도 snapshot 원장으로 기록하고 payload와 구분했다. 비어 있지 않은 WAL은 검증기가 거부한다. 실행 중 DB의 단순 파일 복사를 운영 백업으로 보증하지 않는다.
+
+초기 helper의 기본 반복 시간 제한·단일 JSON 출력/인용 v1 필드 가정·SQLite sidecar/읽기 전용 blob 권한·legacy 출력 경로/첫 baseline 시점 보완 및 완전 모드 미명시 실행을 보존했다. 제품 Go 코드는 변경하지 않았다. 이번 구조 진단을 최종 운영 복구/품질/지원 승인으로 합산하지 않고 C1-06을 진행으로 변경했다. OP-08과 최종 후보·실제 운영 백업/전환·대규모/플랫폼 범위는 남아 있다.
+
+최상위 P0는 B0-01/02/03/05의 실제 사람 결정이다. 결정 후 정적 v2 날짜/subsystem과 실제 K를 동결하고 B0-07 공식 strict 빌드 → B0-08/09 → B1 paired 비교/사람 판정 → C0 관측 실패 수정 → C1 최종 재평가 순으로 진행한다. OP-01–08의 역할/키/신뢰/적합성/지원/복구와 native amd64 환경을 임의로 대신하지 않는다. 공식 품질은 null이며 작업리스트 전체는 미완료다.

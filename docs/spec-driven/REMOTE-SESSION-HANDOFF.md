@@ -80,3 +80,6 @@
 
 
 2026-10-04 FIX-15 후속: [작업리스트 18절](./EXECUTION-WORKLIST.md)의 modernc SQLite 별도 SQLITE-LICENSE 누락을 재현 후 수집/누락 표시를 수정했다. 새 Darwin 51고지·Linux 두 대상 49고지의 시험 서명/세 프로젝트 mock 설치·두 검증기 재서명 고지 변조 거부와 Python 16개 회귀(Go 연동)를 통과했다. modernc 선택 source Darwin 225/Linux arm64 197/amd64 에뮬레이션 201개를 module ZIP/h1에 대조했다. 원래 C/header/native 전체 적합성·사람 운영 결정과 공식 품질은 남는다. 다음 독립 작업은 실패 복구/원본 보존 검증, B0 사람 결정 이후에는 정적 v2/K 동결과 공식 strict 빌드다.
+
+
+2026-10-04 실패 복구/legacy 후속: [작업리스트 19절](./EXECUTION-WORKLIST.md)과 [복구 문서](./C1-RECOVERY-VALIDATION.md)에 최신 Darwin 시험 preview의 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·소스 없는 보관 재생을 기록했다. 구 v1 baseline의 첫 신규 소비자 전 payload SHA·별도 재색인·구 v1 rollback도 검증했고 SDK 11응답/11인용·v2 integrity 6개를 독립 재생했다. 빈 WAL/SHM은 별도 기록이며 운영 live backup 보증이 아니다. C1-06은 진행이고 최종 운영 후보/OP-08·공식 품질은 미완료다. 최상위 P0 사람 결정 후 v2 범위/실제 K 동결과 B0-07부터 공식 실행한다.
