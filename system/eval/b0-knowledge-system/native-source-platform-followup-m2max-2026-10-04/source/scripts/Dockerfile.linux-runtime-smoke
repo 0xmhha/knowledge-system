@@ -1,0 +1,7 @@
+# Runtime-only host for the three-project installation smoke. No Go compiler,
+# sqlite development headers, source checkout, or prebuilt CKS binaries.
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bash git python3 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*

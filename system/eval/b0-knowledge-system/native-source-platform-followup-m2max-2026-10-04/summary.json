@@ -1,0 +1,90 @@
+{
+  "status": "progress",
+  "scope": "C1-05 source provenance/current platform preview diagnostics and FIX-13 host smoke assumptions",
+  "base_commit": "3c72a5b124a686fddfefe0c04156191a8d2842f9",
+  "modified_source_paths_before_build": [
+    "scripts/wbs-package-smoke.sh",
+    "docs/spec-driven/INSTALLATION-PILOT.md"
+  ],
+  "upstream_identical_files": 41,
+  "upstream_modules": 4,
+  "platforms": [
+    {
+      "target": "host-before",
+      "archive_sha256": "6c382f359bff809f669ac209952859ab598e7499ea005e1a23e9624dc3e9c7c1",
+      "archive_members": 110,
+      "linked_modules": 35,
+      "notices": 50,
+      "asset_count": 4,
+      "source_commit": "3c72a5b124a686fddfefe0c04156191a8d2842f9",
+      "go_version": "go version go1.26.8 darwin/arm64",
+      "installation_projects": 0,
+      "signature_scope": null,
+      "original_git_commit_used": true
+    },
+    {
+      "target": "host-after",
+      "archive_sha256": "065a7ffa58561d8fd3f4736b4a9cb45ca2de1280d1ca212727384615e6733a6d",
+      "archive_members": 110,
+      "linked_modules": 35,
+      "notices": 50,
+      "asset_count": 4,
+      "source_commit": "3c72a5b124a686fddfefe0c04156191a8d2842f9",
+      "go_version": "go version go1.26.8 darwin/arm64",
+      "installation_projects": 3,
+      "signature_scope": null,
+      "original_git_commit_used": true
+    },
+    {
+      "target": "linux-arm64",
+      "archive_sha256": "aad9b1c798edc53fbcac8b61c264b32f5a9f81a6e8da26c9968d3beab89278cc",
+      "archive_members": 106,
+      "linked_modules": 33,
+      "notices": 48,
+      "asset_count": 4,
+      "source_commit": "49dd54e256869ff42d74e2bf8c5ebfc712b424ee",
+      "go_version": "go version go1.25.13 linux/arm64",
+      "installation_projects": 3,
+      "signature_scope": "test-signed-preview",
+      "original_git_commit_used": false
+    },
+    {
+      "target": "linux-amd64",
+      "archive_sha256": "e08592d1974f7772a4706658a398b200ba82403b16caf303f4e87a5b2e6cbf3b",
+      "archive_members": 106,
+      "linked_modules": 33,
+      "notices": 48,
+      "asset_count": 4,
+      "source_commit": "003690539ea7a4dd4bc752aff85c364c42b03276",
+      "go_version": "go version go1.25.13 linux/amd64",
+      "installation_projects": 3,
+      "signature_scope": "test-signed-preview",
+      "original_git_commit_used": false
+    }
+  ],
+  "linux_image_ids": {
+    "arm64_build": "sha256:4b20e84ccc0a8a6bf12fafbe4d00295f66a6407b5132f6580c3057656f1bb519",
+    "amd64_build": "sha256:7fbbf391b39e17e7e2eddade0577c60381efc094f19c1b4ce3ff9123f8f8f23b",
+    "arm64_runtime": "sha256:37be188dfb763c2e20ce839df121570a64f6eb60020e2be6a7238574e4c7115d",
+    "amd64_runtime": "sha256:4872b83c4f38164e88421033aa343f35f532278dc32fcb46fa430f312812ac67"
+  },
+  "amd64_execution": "emulated on arm64 Docker host",
+  "go_available_in_linux_runtime": false,
+  "linux_modules_offline_readonly_cache": true,
+  "linux_source_metadata": "synthetic Git fixture commits, not original release commits",
+  "source_input_manifest_files": 4177,
+  "late_live_builder_source_audit": "not performed: temporary container already removed; checker failure retained; no source mismatch observed or excluded by that attempt",
+  "native_metadata_reproducibility": "FIX-14 open: same owned Linux binary yields different ldd addresses; package manifest currently retains them",
+  "structural_installation_success": true,
+  "official_quality_metrics": null,
+  "real_linux_model_evaluation": false,
+  "native_amd64_verified": false,
+  "legal_review": "pending",
+  "operational_keys_used": false,
+  "remaining": [
+    "FIX-14 Linux native dependency metadata stability",
+    "complete transitive/native/system-header/translated SQLite attribution scope and human license compatibility/adequacy",
+    "operational key/trust/support policies",
+    "approved B0 inputs/protocol/semantic facts and official B0/B1/C0/C1 final verdicts"
+  ]
+}

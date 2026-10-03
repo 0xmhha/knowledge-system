@@ -19,10 +19,17 @@ Tree-sitter runtime 원문 고지와 내부 Unicode LICENSE, Go toolchain 및 ve
 | 결정·검증 | 현재 증거 | 완료에 필요한 항목 |
 |---|---|---|
 | Go 모듈 원문 수집 | 세 바이너리 연결 35개·root 고지 41개·누락 0·해시 확인 | 라이선스 적합성·고지 충족의 사람 검토 |
-| 내장 native 자산 | 로컬 Solidity grammar 2개 고지·소스 8개 SHA·두 검증기의 변조 거부 | Tree-sitter 44개·Solidity 6개 출처 확인; SQLite/vec·JS/TS 등 나머지 native 범위와 적합성 검토 |
+| 내장 native 자산 | 로컬 Solidity grammar 2개 고지·소스 8개 SHA·두 검증기의 변조 거부 | Tree-sitter 44개·Solidity 6개·JS/TS/SQLite/vec 41개 출처 확인; 전이/native/system-header/translated SQLite 범위와 적합성 검토 |
 | 운영 서명 | 기존 signer는 test-signed-preview만 생성 | 운영 소유자·public key fingerprint·보관/회전/폐기 정책·신뢰 루트 승인 |
-| 지원 플랫폼 | 이전 macOS/Linux mock preview 재검증 기록 | 최종 코드 패키지와 실제 Linux Ollama·대규모 운영 비용 |
+| 지원 플랫폼 | 이전 macOS/Linux mock preview 재검증 기록 | 최신 세 플랫폼 mock preview 통과; FIX-14·native amd64·실제 Linux Ollama·대규모 운영 비용 |
 | 복구·마이그레이션 | 기존 A 구조 시험·문서 | 최종 C1 패키지의 이전 데이터 보존·rollback 재생 |
 | 품질·출시 | 공식 품질 지표 null | 승인 입력/프로토콜·B0/B1·C0/C1 판정과 출시 결정 |
 
 시험 개인 키·패키지/바이너리는 저장소에 넣지 않았으며 공개 시험 키는 운영 신뢰 루트가 아니다. 내장 자산 전체 고지나 적합성은 미판정이다. 이번에 대조한 6개 Solidity 파일의 출처와 나머지 native 자산의 미검증 범위를 구분한다. 첫 머신 snapshot은 진단 후 기록이며 공식 latency 실행의 전후 환경 원장이 아니다. 추가 native 감사와 운영 정책 자료를 갖춘 후 사람이 검토할 출시 후보에 연결한다.
+
+
+2026-10-04 소스·플랫폼 후속: [원장](../../system/eval/b0-knowledge-system/native-source-platform-followup-m2max-2026-10-04/summary.json)의 JS v0.25.0·TS v0.23.2·go-sqlite3 v1.14.44·sqlite-vec pseudo-version은 module cache의 고정 origin commit에서 원문 41개를 읽어 모두 바이트가 같았다. 범위는 선택 CGO Go 파일·관련 C/header 디렉터리·root 고지다. 다른 언어 binding/example 및 모든 전이 system header를 포함한 완전한 소스 감사는 아니다. SQLite 본문의 고지 줄 관측과 Linux 빌드 이미지의 SQLite 헤더 SHA·배포 copyright·설치 버전도 보존했다. 적합성은 사람 검토 대기다.
+
+고지 수집 후 호스트 스모크에 남아 있던 ‘자산 두 개’ 가정이 실제 네 자산 패키지를 거부했다. FIX-13에서 필수 소스/고지 전용 자산·중복·실제 count·원문 SHA를 각각 확인하게 수정했다. 수정 전 실패와 후 세 프로젝트 설치/재시작/업데이트/롤백을 보존했다. 최신 macOS는 35모듈·50고지, Linux arm64/amd64 에뮬레이션은 각각 33모듈·48고지다. OS와 Go 도구 체인이 모두 달라 단일 원인으로 이 차이를 해석하지 않는다. 두 Linux 고지 48개는 실제 빌드 이미지 Go 원문·읽기 전용 캐시·저장소와 같고, 두 시험 서명 검증기와 Go 없는 런타임의 세 프로젝트 설치/복구가 통과했다. native amd64·Linux 실모델은 미검증이다.
+
+추가 검증에서 같은 Linux 바이너리의 반복 `ldd` 주소가 달라짐을 확인했다. packaging이 그 주소를 manifest에 보존하므로 FIX-14로 metadata 안정성을 수정해야 한다. 현재 Linux 서명/설치 통과를 재현성 통과로 세지 않는다. 늦은 빌더 소스 대조는 임시 컨테이너 종료로 수행하지 못했으며, 동결 입력 선언과 독립 실제 대조를 구분한다. 다음 우선순위는 FIX-14, 이후 운영 신뢰·지원·복구 검토 자료다.

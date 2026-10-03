@@ -68,3 +68,6 @@
 
 
 2026-10-04 C1-05/FIX-12 후속: [작업리스트 14절](./EXECUTION-WORKLIST.md)의 Tree-sitter runtime 44개·Solidity 6개를 고정 upstream과 대조했다. Unicode/runtime/Go toolchain 고지를 추가한 50고지·110항목 macOS preview가 기존 검증기 100항목 상한에 걸려 수정 전 실패/후 256통과·257거부를 검증했다. 두 서명 검증기·세 프로젝트 설치/재시작/업데이트/롤백·재서명 Unicode 변조 거부가 통과했다. 운영 키/라이선스 적합성/공식 품질은 미판정이고 다음 독립 작업은 다른 native 범위·최신 Linux recipe 재검증이다. 승인된 공식 입력 실행은 계속 선행 사람 결정 대기다.
+
+
+2026-10-04 추가 native/플랫폼 후속: [작업리스트 15절](./EXECUTION-WORKLIST.md)에서 JS/TS·SQLite/vec의 고정 upstream 41개 원문 일치를 확인했다. 호스트 스모크의 오래된 두 자산 가정은 FIX-13으로 수정 후 세 프로젝트 재검증 통과. 최신 Linux arm64·amd64 에뮬레이션은 33모듈/48고지·두 시험 서명 검증기·Go 없는 런타임의 세 프로젝트 설치/복구 통과. native amd64/Linux 실모델/운영 판정은 미완료다. 같은 Linux 바이너리의 반복 ldd 주소가 metadata를 바꾸는 FIX-14를 재현하여 다음 P1로 등록했다. 늦은 source 대조는 임시 빌더 종료 때문에 수행되지 않았다. 서명·설치 통과를 Linux 재현성이나 공식 품질로 세지 않는다.
