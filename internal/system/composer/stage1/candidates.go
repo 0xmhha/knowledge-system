@@ -90,6 +90,12 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 	}
 
 	for _, h := range hits {
+		// Knowledge is evidence, not a code symbol. Broad recall can return
+		// these chunks too; their synthetic paths (/<convention>) are not
+		// valid raw FTS expressions, and policy titles are not graph anchors.
+		if h.ChunkKind == "invariant" || h.ChunkKind == "convention" {
+			continue
+		}
 		// Prefer the chunk's actual symbol when ckv populated it
 		// (e.g. "Finalize", "QuorumSize") — this is the only keyword
 		// that can disambiguate same-named identifiers across packages

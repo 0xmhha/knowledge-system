@@ -86,3 +86,5 @@ mock/BGE-M3 각각 8경로 × 6상태의 48요청을 검증했다. 공개 정책
 ## 남은 공식 비교 작업
 
 네 어댑터와 합성 팩 축의 구현 검증은 완료됐다. 공식 프로토콜에서 입력·glossary·모델·K·필터·intent를 잠그고 모든 arms의 실제 조건을 감사해야 한다. 실제 팩 사실의 사람 판정, 승인된 K 적용, 순서 회전·공식 고정 입력 원장, 공식 원자료·주장별 사람 판정은 남아 있다. 전체 상태는 [실행 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.
+
+2026-10-04 FIX-07 수정 후 검증: broad recall의 invariant/convention 청크를 코드 검색어로 사용하지 않도록 수정했다. 지식 증거·별도 pass·raw K/필터를 유지했고, 같은 실모델 데이터셋의 8경로 48개 전체 SDK 응답은 수정 전과 같았다. BM25 오류 96→0, 출처/integrity·정책 상태·DB 무변경 재감사 통과. 문서/header의 비심볼 Neighbors 실패는 보존했다. [수정 원장](../../system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04.json). 공식 품질은 미판정이며 다음 작업은 arm 회전과 승인 K 적용 경로다.
