@@ -14,6 +14,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/0xmhha/knowledge-system/internal/githistory"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/unicode/norm"
 )
@@ -37,6 +38,7 @@ type CaptureOptions struct {
 	SourceCommit    string // full HEAD for Git modes, empty for non-Git
 	MaxFileBytes    int64
 	MaxTotalBytes   int64
+	MaxHistoryBytes int64
 	MaxFiles        int
 	ExternalOrigins []CaptureOrigin
 }
@@ -53,11 +55,12 @@ type CaptureOrigin struct {
 }
 
 type CapturedSource struct {
-	Identity    SourceIdentity    `json:"identity"`
-	Files       []CapturedFile    `json:"files"`
-	BlobDir     string            `json:"-"`
-	Root        string            `json:"-"`
-	OriginRoots map[string]string `json:"-"`
+	Identity    SourceIdentity      `json:"identity"`
+	Files       []CapturedFile      `json:"files"`
+	GitHistory  *CapturedGitHistory `json:"git_history,omitempty"`
+	BlobDir     string              `json:"-"`
+	Root        string              `json:"-"`
+	OriginRoots map[string]string   `json:"-"`
 }
 
 // CaptureSource stores a deterministic byte snapshot without exposing it to
@@ -213,6 +216,25 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	result.Identity = SourceIdentity{ProjectID: o.ProjectID, SourceMode: o.SourceMode,
 		SourceCommit: o.SourceCommit, FileManifestDigest: manifest,
 		CapturePolicyDigest: capturePolicyDigest(o.SourceMode), GitRecoveryDigest: recoveryAfter}
+	if o.SourceMode != "snapshot-only" {
+		result.Identity.GitArchivePolicy = gitArchivePolicyV1
+		selected, err := githistory.RecoveryCommitIDs(root, 0)
+		if err != nil {
+			return CapturedSource{}, err
+		}
+		if identityHashFields("cks.git-recovery.v1", selected...) != recoveryAfter {
+			return CapturedSource{}, fmt.Errorf("Git recovery input changed before archive")
+		}
+		result.GitHistory, err = captureGitHistory(root, filepath.Join(out, "sources", "history.bundle"),
+			o.SourceCommit, selected, o.MaxHistoryBytes)
+		if err != nil {
+			return CapturedSource{}, err
+		}
+		finalRecovery, err := gitRecoveryDigest(root, o.SourceMode)
+		if err != nil || finalRecovery != recoveryAfter {
+			return CapturedSource{}, fmt.Errorf("Git recovery input changed while archiving: %v", err)
+		}
+	}
 	result.Identity.SnapshotID = sourceSnapshotID(result.Identity)
 	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), result); err != nil {
 		return CapturedSource{}, err
@@ -341,12 +363,11 @@ func validateCapturedPaths(paths []string) error {
 	return nil
 }
 
-// MaterializeBuildTree creates a disposable copy from retained blobs. A Git
-// working-tree capture starts with a detached worktree so CKG can still read
-// the base history; snapshot-only mode has no Git metadata. This adapter is
-// setup uses this staged tree for working-tree and snapshot-only indexing.
+// MaterializeBuildTree creates a disposable copy from retained blobs. New
+// Git captures restore their sealed bundle into an independent repository;
+// older v2/v3 captures retain their historical shared-worktree behavior.
 func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) {
-	if c.Identity.SnapshotID == "" || c.Root == "" {
+	if c.Identity.SnapshotID == "" || (c.Identity.GitArchivePolicy == "" && c.Root == "") {
 		return nil, fmt.Errorf("materialize requires a captured source")
 	}
 	if _, err := os.Lstat(path); err == nil {
@@ -359,19 +380,25 @@ func (c CapturedSource) MaterializeBuildTree(path string) (func() error, error) 
 	}
 	cleanup := func() error { return os.RemoveAll(path) }
 	if c.Identity.SourceMode == "working-tree" || c.Identity.SourceMode == "committed" {
-		if head, err := captureHead(c.Root); err != nil || head != c.Identity.SourceCommit {
-			return nil, fmt.Errorf("working-tree base commit changed before materialization: %v", err)
-		}
-		cmd := exec.Command("git", "-C", c.Root, "worktree", "add", "--detach", path, c.Identity.SourceCommit)
-		if out, err := cmd.CombinedOutput(); err != nil {
-			return nil, fmt.Errorf("create temporary Git worktree: %w: %s", err, out)
-		}
-		cleanup = func() error {
-			cmd := exec.Command("git", "-C", c.Root, "worktree", "remove", "--force", path)
-			if out, err := cmd.CombinedOutput(); err != nil {
-				return fmt.Errorf("remove temporary worktree: %w: %s", err, out)
+		if c.Identity.GitArchivePolicy != "" {
+			if err := c.materializeGitHistory(path); err != nil {
+				return cleanup, err
 			}
-			return nil
+		} else {
+			if head, err := captureHead(c.Root); err != nil || head != c.Identity.SourceCommit {
+				return nil, fmt.Errorf("working-tree base commit changed before materialization: %v", err)
+			}
+			cmd := exec.Command("git", "-C", c.Root, "worktree", "add", "--detach", path, c.Identity.SourceCommit)
+			if out, err := cmd.CombinedOutput(); err != nil {
+				return nil, fmt.Errorf("create temporary Git worktree: %w: %s", err, out)
+			}
+			cleanup = func() error {
+				cmd := exec.Command("git", "-C", c.Root, "worktree", "remove", "--force", path)
+				if out, err := cmd.CombinedOutput(); err != nil {
+					return fmt.Errorf("remove temporary worktree: %w: %s", err, out)
+				}
+				return nil
+			}
 		}
 		entries, err := os.ReadDir(path)
 		if err != nil {
@@ -651,6 +678,9 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 	sources := filepath.Join(versionDir, "sources")
 	info, err := os.Lstat(sources)
 	if os.IsNotExist(err) {
+		if expected.GitArchivePolicy != "" {
+			return fmt.Errorf("source_missing: pinned Git history archive is required")
+		}
 		return nil
 	}
 	if err != nil || !info.IsDir() {
@@ -701,6 +731,9 @@ func VerifyRetainedSource(versionDir string, expected SourceIdentity) error {
 // manifest alone is insufficient when a blob was deleted or replaced during
 // a long graph/vector build.
 func (c CapturedSource) VerifyBlobs() error {
+	if err := c.verifyGitHistory(); err != nil {
+		return err
+	}
 	for _, f := range c.Files {
 		buf, err := c.ReadBlob(f.SHA256)
 		if err != nil {

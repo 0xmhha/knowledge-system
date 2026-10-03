@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/0xmhha/knowledge-system/internal/githistory"
 )
 
 func TestCaptureManyFilesAndExternalFailureKeepsOnlyPinnedBytes(t *testing.T) {
@@ -418,5 +420,108 @@ func TestCommittedCaptureMatchesPrebuildIdentityAndRetainsBytes(t *testing.T) {
 	}
 	if err := VerifyRetainedSource(version, want); err == nil || !strings.Contains(err.Error(), "source_missing") {
 		t.Fatalf("missing retained citation bytes accepted: %v", err)
+	}
+}
+
+func TestGitHistoryArchiveLimitTamperAndLegacyV3Read(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package sample\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	head := identityGit(t, root, "rev-parse", "HEAD")
+	limited := filepath.Join(t.TempDir(), "limited")
+	if _, err := CaptureSource(CaptureOptions{Root: root, Out: limited, ProjectID: "p",
+		SourceMode: "committed", SourceCommit: head, MaxHistoryBytes: 1}); err == nil || !strings.Contains(err.Error(), "archive exceeds") {
+		t.Fatalf("history byte limit did not fail closed: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(limited, "sources", "manifest.json")); !os.IsNotExist(err) {
+		t.Fatalf("oversized history published source manifest: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(limited, "sources", "history.bundle")); !os.IsNotExist(err) {
+		t.Fatalf("oversized partial Git bundle retained: %v", err)
+	}
+	out := filepath.Join(t.TempDir(), "candidate")
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: out, ProjectID: "p",
+		SourceMode: "committed", SourceCommit: head})
+	if err != nil || captured.GitHistory == nil {
+		t.Fatalf("capture Git history: %+v %v", captured.GitHistory, err)
+	}
+	bundle := filepath.Join(out, "sources", "history.bundle")
+	original, err := os.ReadFile(bundle)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(bundle); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, captured.Identity); err == nil || !strings.Contains(err.Error(), "source_missing") {
+		t.Fatalf("missing Git history archive accepted: %v", err)
+	}
+	corrupt := append([]byte(nil), original...)
+	corrupt[len(corrupt)-1] ^= 1
+	if err := os.WriteFile(bundle, corrupt, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, captured.Identity); err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
+		t.Fatalf("changed Git history archive accepted: %v", err)
+	}
+	if err := os.WriteFile(bundle, original, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// Versions written before bundle retention have a v3 snapshot ID and no
+	// archive metadata. Their retained source remains readable.
+	legacy := captured
+	legacy.Identity.GitArchivePolicy = ""
+	legacy.Identity.SnapshotID = sourceSnapshotID(legacy.Identity)
+	legacy.GitHistory = nil
+	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), legacy); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, legacy.Identity); err != nil {
+		t.Fatalf("legacy v3 retained source rejected: %v", err)
+	}
+}
+
+func TestGitHistoryArchiveFromLinkedWorktree(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	file := filepath.Join(root, "main.go")
+	if err := os.WriteFile(file, []byte("package main\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	base := identityGit(t, root, "rev-parse", "HEAD")
+	if err := os.WriteFile(file, []byte("package main\nvar Lost = 1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "abandoned")
+	lost := identityGit(t, root, "rev-parse", "HEAD")
+	identityGit(t, root, "reset", "--hard", base)
+	linked := filepath.Join(t.TempDir(), "linked")
+	identityGit(t, root, "worktree", "add", "--detach", linked, base)
+	out := filepath.Join(t.TempDir(), "candidate")
+	captured, err := CaptureSource(CaptureOptions{Root: linked, Out: out,
+		ProjectID: "p", SourceMode: "committed", SourceCommit: base})
+	if err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "worktree", "remove", "--force", linked)
+	if err := os.RemoveAll(root); err != nil {
+		t.Fatal(err)
+	}
+	build := filepath.Join(t.TempDir(), "build")
+	cleanup, err := captured.MaterializeBuildTree(build)
+	if err != nil {
+		t.Fatalf("linked-worktree archive could not restore without common object store: %v", err)
+	}
+	defer func() { _ = cleanup() }()
+	selected, err := githistory.RecoveryCommitIDs(build, 0)
+	if err != nil || len(selected) != 1 || selected[0] != lost {
+		t.Fatalf("linked-worktree recovery commit missing: %v %v", selected, err)
 	}
 }

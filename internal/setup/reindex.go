@@ -546,7 +546,8 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		}
 		captured, err = CaptureSource(CaptureOptions{Root: o.Src, Out: vo.Out,
 			ProjectID: o.ProjectID, SourceMode: gopt.ExpectedSourceSnapshot.SourceMode,
-			SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit, ExternalOrigins: o.ExternalOrigins})
+			SourceCommit: gopt.ExpectedSourceSnapshot.SourceCommit, ExternalOrigins: o.ExternalOrigins,
+			MaxHistoryBytes: o.MaxGitHistoryBytes})
 		if err != nil {
 			return fmt.Errorf("reindex: retain source bytes: %w", err)
 		}

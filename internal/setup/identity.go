@@ -29,6 +29,7 @@ type SourceIdentity struct {
 	FileManifestDigest  string `json:"file_manifest_digest"`
 	CapturePolicyDigest string `json:"capture_policy_digest"`
 	GitRecoveryDigest   string `json:"git_recovery_digest,omitempty"`
+	GitArchivePolicy    string `json:"git_archive_policy,omitempty"`
 	SnapshotID          string `json:"snapshot_id"`
 }
 
@@ -75,6 +76,11 @@ func capturePolicyDigest(mode string) string {
 }
 
 func sourceSnapshotID(s SourceIdentity) string {
+	if s.GitArchivePolicy != "" {
+		return identityHashFields("cks.snapshot.v4", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
+			s.GitRecoveryDigest, s.GitArchivePolicy)
+	}
 	if s.GitRecoveryDigest != "" {
 		return identityHashFields("cks.snapshot.v3", s.ProjectID, s.SourceMode,
 			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest, s.GitRecoveryDigest)
@@ -83,6 +89,8 @@ func sourceSnapshotID(s SourceIdentity) string {
 	return identityHashFields("cks.snapshot.v2", s.ProjectID, s.SourceMode,
 		s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest)
 }
+
+const gitArchivePolicyV1 = "bundle-selected-recovery-refs-v1"
 
 // gitRecoveryDigest hashes the same capped commit selection as CKG's
 // recovery graph. A zero-commit Git repository still has a nonempty digest.
@@ -213,6 +221,9 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
 		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest(mode),
 		GitRecoveryDigest: recoveryAfter}
+	if mode != "snapshot-only" {
+		result.GitArchivePolicy = gitArchivePolicyV1
+	}
 	result.SnapshotID = sourceSnapshotID(result)
 	return result, nil
 }

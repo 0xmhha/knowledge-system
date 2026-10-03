@@ -34,6 +34,7 @@ type Options struct {
 	FileManifestDigest  string
 	CapturePolicyDigest string
 	SourceMode          string
+	MaxGitHistoryBytes  int64
 	LogicalSrcRoot      string
 	// Src is the source tree to index. Required.
 	Src string

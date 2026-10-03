@@ -193,6 +193,7 @@ func runSetup(args []string) error {
 	fs.StringVar(&o.ProjectID, "project-id", "", "stable project identity from cks init")
 	sourceMode := fs.String("source-mode", "committed", "source capture: committed | working-tree | snapshot-only (latter two require --version and --project-id)")
 	fs.StringVar(&o.Src, "src", "", "source tree to index (required)")
+	fs.Int64Var(&o.MaxGitHistoryBytes, "max-git-history-bytes", 0, "maximum retained Git history bundle bytes for pinned builds (default: 1 GiB)")
 	fs.StringVar(&o.Out, "out", "", "dataset root; graph index in <out>/graph, vector index in <out>/vector (required)")
 	fs.StringVar(&o.GraphBin, "graph-bin", "", "graph engine CLI (default: ckg beside this binary, else PATH)")
 	fs.StringVar(&o.VectorBin, "vector-bin", "", "vector engine CLI (default: ckv beside this binary, else PATH)")
@@ -274,6 +275,9 @@ func runSetup(args []string) error {
 	}
 	if *holdForReview && (o.ProjectID == "" || o.SkipVector) {
 		return fmt.Errorf("--hold-for-review requires a pinned project ID and a complete graph/vector candidate")
+	}
+	if o.MaxGitHistoryBytes < 0 {
+		return fmt.Errorf("--max-git-history-bytes must be nonnegative")
 	}
 
 	emit, err := progressSink(*progress)

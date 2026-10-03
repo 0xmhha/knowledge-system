@@ -124,6 +124,11 @@ func TestPinnedIdentityIncludesRecoveryHistoryWithSameHEADAndFiles(t *testing.T)
 	// A complete candidate may be promoted while the source input matches.
 	dataset := t.TempDir()
 	version := filepath.Join(dataset, "v1")
+	initialCapture, err := CaptureSource(CaptureOptions{Root: root, Out: version,
+		ProjectID: "p", SourceMode: "committed", SourceCommit: base})
+	if err != nil || initialCapture.Identity != before {
+		t.Fatalf("initial retained source differs from pre-build identity: %v", err)
+	}
 	buildInputs := "inputs"
 	embedding := json.RawMessage(`{"model":"mock","dim":8,"checksum":"fixture-space"}`)
 	prebuild, err := NewDatasetIdentity(before, embedding, buildInputs)
@@ -180,7 +185,8 @@ func TestPinnedIdentityIncludesRecoveryHistoryWithSameHEADAndFiles(t *testing.T)
 	if err != nil || newDataset.DatasetID == oldDataset.DatasetID {
 		t.Fatalf("changed recovery history reused dataset ID: %v", err)
 	}
-	captured, err := CaptureSource(CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"),
+	archiveRoot := filepath.Join(t.TempDir(), "candidate")
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: archiveRoot,
 		ProjectID: "p", SourceMode: "committed", SourceCommit: base})
 	if err != nil || captured.Identity != after {
 		t.Fatalf("capture differs from pre-build identity: %+v %v", captured.Identity, err)
@@ -200,6 +206,25 @@ func TestPinnedIdentityIncludesRecoveryHistoryWithSameHEADAndFiles(t *testing.T)
 	clean, err := CommittedSourceIdentity(clone, "p", base)
 	if err != nil || clean.FileManifestDigest != after.FileManifestDigest || clean.GitRecoveryDigest != before.GitRecoveryDigest {
 		t.Fatalf("independent clone did not exclude recovery history: %+v %v", clean, err)
+	}
+	if err := os.RemoveAll(root); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(archiveRoot, after); err != nil {
+		t.Fatalf("retained source failed after original Git repository was removed: %v", err)
+	}
+	replay := filepath.Join(t.TempDir(), "replay")
+	replayCleanup, err := captured.MaterializeBuildTree(replay)
+	if err != nil {
+		t.Fatalf("history archive could not replay without source Git objects: %v", err)
+	}
+	defer func() { _ = replayCleanup() }()
+	replayedIDs, err := githistory.RecoveryCommitIDs(replay, 0)
+	if err != nil || !slices.Equal(replayedIDs, ids) || identityGit(t, replay, "rev-parse", "HEAD") != base {
+		t.Fatalf("replayed Git history differs from capture: %v, want %v: %v", replayedIDs, ids, err)
+	}
+	if _, err := os.Stat(filepath.Join(replay, ".git", "objects", "info", "alternates")); !os.IsNotExist(err) {
+		t.Fatalf("replayed repository shares Git objects: %v", err)
 	}
 }
 
