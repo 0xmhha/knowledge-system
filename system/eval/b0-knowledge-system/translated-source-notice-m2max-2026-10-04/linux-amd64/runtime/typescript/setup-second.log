@@ -1,0 +1,34 @@
+setup: --version auto resolved to f97abfe7
+==> [graph-build] Build the graph index
+ !  [toolchain] toolenv: not found on this machine: go (install them, or start the server from a shell that has them)
+    resolved git=/usr/bin/git (inherited_path)
+    time=2026-10-03T23:15:47.822Z level=INFO msg="detected files" go=0 ts=1 sol=0 proto=0
+    time=2026-10-03T23:15:47.872Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T23:15:48.215Z level=INFO msg="temporal G6 emitted" commit_nodes=2 hunk_nodes=4 changed_in_edges=3 blame_edges=1 hunk_edges=4 hunk_blobs=4 max_per_file=10
+    time=2026-10-03T23:15:48.425Z level=INFO msg="build complete" nodes=9 edges=11 pkg_tree_edges=2 topic_resolutions=3
+    ckg: built 9 nodes / 11 edges into /logs/typescript/dataset/f97abfe7/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T23:15:48.518Z level=INFO msg=ckv event=project_config.loaded trace_id=c2e674acda29e0e9 run_id=ae0d2271f11f386c important_symbol_count=0 path=/tmp/cks-build-source-1867683172/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0
+    time=2026-10-03T23:15:48.524Z level=INFO msg=ckv event=build.start trace_id=a19dffccb7e74a8f run_id=ae0d2271f11f386c src_root=/tmp/cks-build-source-1867683172/tree out_dir=/logs/typescript/dataset/f97abfe7/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-03T23:15:48.587Z level=INFO msg=ckv event=ckg_align.loaded trace_id=dffa218c43a650e1 run_id=ae0d2271f11f386c ckg_path=/logs/typescript/dataset/f97abfe7/graph files_indexed=1 entries=1 canonical_available=true
+    ckv: 2/2 files (48.8 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-03T23:15:48.642Z level=INFO msg=ckv event=build.done trace_id=a19dffccb7e74a8f run_id=ae0d2271f11f386c latency_ms=118 src_root=/tmp/cks-build-source-1867683172/tree indexed_head=f97abfe7427badbc13f9b9f431cfc5ded9f3d6fe chunks_total=3 chunks_symbol=1 chunks_flow_step=0 embedder=mock-feature-hash-v1 category_counts=map[:3] chunks_file_header=1 chunks_truncated=0 embedder_provider="" languages="map[markdown:1 typescript:2]" policy_loaded=false files_indexed=2 chunks_canonical_id=1 chunks_flow_spine=0 chunks_doc=1 out_dir=/logs/typescript/dataset/f97abfe7/vector db_sha256=a41901c294315d250bd48828f5e623db6d62b0235bd0f44eed474a277fffe943
+    ckv: indexed 2 files → 3 chunks (1 symbol, 1 doc, 1 header, 0 truncated)
+    ckv: canonical_id 1/1 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=f97abfe7427badbc13f9b9f431cfc5ded9f3d6fe built_at=2026-10-03T23:15:48Z db=/logs/typescript/dataset/f97abfe7/vector/vector.db sha256=a41901c294315d250bd48828f5e623db6d62b0235bd0f44eed474a277fffe943
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /logs/typescript/dataset/f97abfe7 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

@@ -1,0 +1,144 @@
+{
+  "status": "progress",
+  "fixed_issue": "FIX-15 SQLite upstream notice collection omitted by prefix-only root scan",
+  "fix_state": "verified for pinned modernc.org/sqlite v1.54.0",
+  "repo_base_commit": "7b5d7bb896182f570ffaaef981e235e03be82d44",
+  "cases": [
+    {
+      "scope": "Darwin arm64 signed preview/mock install and resigned notice tamper; not legal/release approval",
+      "archive_sha256": "923bd83d9f0686f69f32a2b7349291f9b9a576e5aec82e0b4eb56dbe2524b57c",
+      "members": 111,
+      "modules": 35,
+      "notices": 51,
+      "sqlite_entry": {
+        "license_files": [
+          {
+            "path": "third-party-licenses/71d5827691389302/LICENSE",
+            "sha256": "c6fe05491a60ae13bcd223088d2705e36dede24e5587226231d2459ada5c4822"
+          },
+          {
+            "path": "third-party-licenses/71d5827691389302/SQLITE-LICENSE",
+            "sha256": "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0"
+          }
+        ],
+        "missing_required_notices": [],
+        "module": "modernc.org/sqlite",
+        "required_native_notice_paths": [
+          "SQLITE-LICENSE"
+        ],
+        "review_status": "collected",
+        "version": "v1.54.0"
+      },
+      "notice_bytes_match_module_source": true,
+      "both_verifiers_passed": true,
+      "both_verifiers_rejected_resigned_notice_tamper": true,
+      "installation_projects": 3,
+      "legal_review": "pending",
+      "target": "darwin",
+      "selected_modernc_packages": 30,
+      "selected_modernc_files": 225,
+      "selected_bytes": 13390778,
+      "module_zip_bytes_identical": true
+    },
+    {
+      "arch": "arm64",
+      "execution": "native arm64 in Docker VM",
+      "archive_sha256": "424c1ac566eac6b40bd7685549ae3af637c7ed2904164a4011854c5a468278fe",
+      "members": 107,
+      "modules": 33,
+      "notices": 49,
+      "sqlite_entry": {
+        "license_files": [
+          {
+            "path": "third-party-licenses/71d5827691389302/LICENSE",
+            "sha256": "c6fe05491a60ae13bcd223088d2705e36dede24e5587226231d2459ada5c4822"
+          },
+          {
+            "path": "third-party-licenses/71d5827691389302/SQLITE-LICENSE",
+            "sha256": "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0"
+          }
+        ],
+        "missing_required_notices": [],
+        "module": "modernc.org/sqlite",
+        "required_native_notice_paths": [
+          "SQLITE-LICENSE"
+        ],
+        "review_status": "collected",
+        "version": "v1.54.0"
+      },
+      "notice_bytes_match_module_source": true,
+      "both_verifiers_passed": true,
+      "both_verifiers_rejected_resigned_notice_tamper": true,
+      "installation_projects": 3,
+      "legal_review": "pending",
+      "target": "linux-arm64",
+      "selected_modernc_packages": 8,
+      "selected_modernc_files": 197,
+      "selected_bytes": 13934278,
+      "module_zip_bytes_identical": true
+    },
+    {
+      "arch": "amd64",
+      "execution": "amd64 emulation on arm64 host",
+      "archive_sha256": "2051828272f304077ac810121069d0815650cce5bab97e102831df81d16e9382",
+      "members": 107,
+      "modules": 33,
+      "notices": 49,
+      "sqlite_entry": {
+        "license_files": [
+          {
+            "path": "third-party-licenses/71d5827691389302/LICENSE",
+            "sha256": "c6fe05491a60ae13bcd223088d2705e36dede24e5587226231d2459ada5c4822"
+          },
+          {
+            "path": "third-party-licenses/71d5827691389302/SQLITE-LICENSE",
+            "sha256": "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0"
+          }
+        ],
+        "missing_required_notices": [],
+        "module": "modernc.org/sqlite",
+        "required_native_notice_paths": [
+          "SQLITE-LICENSE"
+        ],
+        "review_status": "collected",
+        "version": "v1.54.0"
+      },
+      "notice_bytes_match_module_source": true,
+      "both_verifiers_passed": true,
+      "both_verifiers_rejected_resigned_notice_tamper": true,
+      "installation_projects": 3,
+      "legal_review": "pending",
+      "target": "linux-amd64",
+      "selected_modernc_packages": 8,
+      "selected_modernc_files": 201,
+      "selected_bytes": 14668056,
+      "module_zip_bytes_identical": true
+    }
+  ],
+  "linux_source_commit": "854464d9383eb8864edab1d1ed66f1e97adafd5d",
+  "actual_each_linux_copy_inputs_verified": 5230,
+  "python_regressions": 16,
+  "python_regression_scope": "5 collection + 6 signed (current Go verifier enabled) + 1 source recipe + 4 dependencies",
+  "module_verify": "all modules verified on host and both Linux builders",
+  "notice_source_check": "selected modernc source and 9 root notices per target identical to pinned module ZIP; zip h1 equals go.sum/build info",
+  "source_origin_scope": "Go module cache Origin metadata; GitLab raw web reads failed and no direct fixed-Git upstream blob comparison claim",
+  "native_amd64": false,
+  "actual_model_run_this_turn": false,
+  "operational_keys_used": false,
+  "official_quality_metrics": null,
+  "legal_review": "pending",
+  "remaining": [
+    "original C/generator/input-header reconstruction and all system-header/native attribution scope",
+    "human license adequacy/compatibility and OP operating ownership/key/trust/support/recovery decisions",
+    "native amd64/large costs/final actual-model candidate",
+    "human B0 scope/protocol/dynamic/semantic and static v2 date/subsystem/K binding",
+    "official B0/B1/C0/C1 execution and verdicts"
+  ],
+  "evidence_excludes": [
+    "private signing keys",
+    "model files",
+    "databases",
+    "binaries/archives",
+    "unrelated user untracked .claude and logs"
+  ]
+}

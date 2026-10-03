@@ -77,3 +77,6 @@
 
 
 2026-10-04 Linux 실제 CPU 모델 후속: [작업리스트 17절](./EXECUTION-WORKLIST.md)의 Linux arm64 Ollama 0.35.1/승인 BGE-M3 bytes와 API/DB 1024차원·CPU residency를 확인했다. 세 인공 프로젝트 설치/재시작/업데이트/rollback, 72 v2 응답/96 인용/48 startup scope·보관 SHA/integrity·실제 입력/DB/HEAD·5 저장 벡터를 검증하고 전용 서버를 정리했다. 초기 Python 추출 filter 오류, TypeScript 기존 20초 initialize 실패/90초 별도 client 성공, parser-node/전체 줄 verifier 가정 수정은 보존했다. 공식 품질은 null, C1-04는 준비 진행이며 운영 지원 승인이 아니다. 다음 독립 작업은 translated/native/transitive source 범위와 실패 복구 자료, 사람 B0 결정 이후에는 정적 v2 범위/K 동결과 공식 strict 빌드다.
+
+
+2026-10-04 FIX-15 후속: [작업리스트 18절](./EXECUTION-WORKLIST.md)의 modernc SQLite 별도 SQLITE-LICENSE 누락을 재현 후 수집/누락 표시를 수정했다. 새 Darwin 51고지·Linux 두 대상 49고지의 시험 서명/세 프로젝트 mock 설치·두 검증기 재서명 고지 변조 거부와 Python 16개 회귀(Go 연동)를 통과했다. modernc 선택 source Darwin 225/Linux arm64 197/amd64 에뮬레이션 201개를 module ZIP/h1에 대조했다. 원래 C/header/native 전체 적합성·사람 운영 결정과 공식 품질은 남는다. 다음 독립 작업은 실패 복구/원본 보존 검증, B0 사람 결정 이후에는 정적 v2/K 동결과 공식 strict 빌드다.

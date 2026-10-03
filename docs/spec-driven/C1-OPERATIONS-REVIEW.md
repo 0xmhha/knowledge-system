@@ -17,7 +17,7 @@
 | OP-03 | 운영 공개 키·독립 배포 경로 | 실제 운영 키·fingerprint 없음 | 공개 키 DER SHA-256·독립 신뢰 경로·검토자·시각 |
 | OP-04 | 개인 키 보관·접근·백업 | 실제 방식·보유자 미확인. 시험 개인 키는 임시 경로에만 있음 | 선택 방식·권한자·접근/복구 증거; 개인 키 본문은 기록하지 않음 |
 | OP-05 | 교체·폐기·유출 대응 | 현재 검증기에 기간/폐기 조회 없음 | 효력 시점·구 키/서명 처리·신뢰 루트 교체·복구 담당과 실행 증거 |
-| OP-06 | 소스·고지 적합성 | 원문/SHA 수집과 지정 source 비교 완료 범위 존재; 전체 적합성 pending | 정확한 버전·source/고지 범위·적합성 판정자·예외 및 잔여 범위 |
+| OP-06 | 소스·고지 적합성 | 원문/SHA·지정 source 비교 및 FIX-15 translated SQLite 추가 고지·modernc 선택 source ZIP/h1 검증 범위 존재; original C/header/전체 적합성 pending | 정확한 버전·source/고지 범위·적합성 판정자·예외 및 잔여 범위 |
 | OP-07 | 지원 플랫폼·실모델·비용 한계 | 아래 매트릭스의 진단 범위만 확인 | 실제 지원 대상·필수 환경·운영 비용/모델 실행·known limits |
 | OP-08 | 실패 시 이전 데이터/current/키 복구 | 소형 mock 및 Linux arm64 실제 CPU BGE-M3 설치의 이전 version/인용 복구 통과; 최종 C1 운영 복구 미실행 | 최종 패키지의 원본 보존·실패 주입·이전 current/신원/인용 재생과 담당자 |
 
@@ -42,3 +42,5 @@ Linux source commit은 동결된 추적 입력으로 만든 합성 fixture commi
 원자료와 정확한 검증 범위는 [C1 수집·검토 자료](./C1-REVIEW-PREPARATION.md), [최신 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.
 
 2026-10-04 Linux 실모델 후속: [작업리스트 17절](./EXECUTION-WORKLIST.md)의 공식 Ollama image/승인 모델 bytes·CPU residency·read-only model store·별도 caller/model quota를 기록했다. 실제 source/SDK/rollback 검증은 통과했으나 unavailable 팩/관계 폴백의 소형 합성 진단이며 운영 지원/품질 승인이 아니다. 원래 20초 initialize 실패와 90초 진단 client 성공을 함께 읽는다. 운영 역할·키·정책·출시 OP 결정은 그대로 대기다.
+
+2026-10-04 FIX-15 후속: [작업리스트 18절](./EXECUTION-WORKLIST.md)의 최신 세 플랫폼 preview는 추가 SQLite 고지/두 검증기/세 프로젝트 mock 설치·재서명 고지 변조 거부를 확인했다. 실제 모델 검증을 새 패키지에 자동 확장하지 않으며, original C/header/전이 native의 적합성·OP-06과 최종 OP-07/08은 계속 대기다.

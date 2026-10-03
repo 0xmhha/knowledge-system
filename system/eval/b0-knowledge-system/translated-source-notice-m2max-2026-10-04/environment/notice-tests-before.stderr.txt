@@ -1,0 +1,13 @@
+...F.
+======================================================================
+FAIL: test_translated_sqlite_notice_is_collected_and_missing_is_visible (test_license_inventory.InventoryTests.test_translated_sqlite_notice_is_collected_and_missing_is_visible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_license_inventory.py", line 23, in test_translated_sqlite_notice_is_collected_and_missing_is_visible
+    self.assertIn(b'upstream SQLite notice\n', [p.read_bytes() for p in copied])
+AssertionError: b'upstream SQLite notice\n' not found in [b'Go wrapper notice\n']
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.032s
+
+FAILED (failures=1)

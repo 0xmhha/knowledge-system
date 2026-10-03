@@ -100,7 +100,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: Linux arm64 실제 CPU BGE-M3의 3프로젝트 설치/재시작/업데이트/롤백·72 SDK 응답/96 인용 검증. 20초 probe 실패와 90초 진단 재실행을 분리; native amd64·대규모 비용·최종 운영 후보/품질은 남음 |
-| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 검증 통과; 전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
+| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조 완료 범위 존재; 원래 C/header·전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 대기 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
 
@@ -243,3 +243,14 @@ FIX-14 시험 서명 Linux arm64 패키지를 검증한 뒤 empty Go/TypeScript/
 cold는 MCP process 시작 조건이고 resident model은 유지된다. warmup 0·군별 1회인 소형 unavailable 폴백 진단이며 공식 프로토콜/팩 사실/관계 품질을 대신하지 않는다. Python 분석기·Go 도구 체인 지원, native amd64·대규모 비용, 운영 키/최종 패키지/복구·출시를 완료하지 않았다. 품질은 계속 null이다. 전용 모델 서버만 종료/삭제했고 원본 모델 bytes가 같다. [운영 검토표](./C1-OPERATIONS-REVIEW.md)의 Linux ARM 범위를 갱신했다.
 
 다음 우선순위는 B0-01/02/03/05 사람 결정이 도착하면 정적 v2 날짜/subsystem·실제 K와 함께 입력을 동결하여 B0-07 공식 strict 빌드로 진행하는 것이다. 결정 대기 중 수행 가능한 독립 작업은 C1-05의 translated/native/transitive source 범위 및 C1-06 실패 복구 자료 준비다. 공식 B0/B1/C0/C1과 OP-01–08은 계속 미완료다.
+
+
+## 18. Translated SQLite 고지 누락과 전이 소스 재검증
+
+2026-10-04 C1-05/FIX-15: [원장](../../system/eval/b0-knowledge-system/translated-source-notice-m2max-2026-10-04/summary.json)의 기존 실제 패키지에는 modernc.org/sqlite v1.54.0 wrapper LICENSE만 있었다. 별도 SQLITE-LICENSE를 root prefix scan이 놓쳤다. 수정 전 회귀 실패/actual inventory와 source SHA를 보존하고 고정 버전의 required notice에 추가했다. 파일이 없으면 wrapper가 있어도 missing_source_license로 표시한다. 원문 수집 수정이며 적합성/출시 승인이 아니다.
+
+새 공개 packager의 macOS arm64는 35모듈/51고지/111항목, Linux arm64·amd64 에뮬레이션은 33/49/107이다. 두 Linux 빌더에서 동결 추적 입력 5,230개 bytes/실행 비트 대조 후 동일 합성 commit 854464d9383eb8864edab1d1ed66f1e97adafd5d로 빌드했다. 세 대상 모두 Python/설치 후 Go 시험 서명 검증·세 독립 mock 프로젝트 설치/재시작/업데이트/rollback, 추가 SQLite 고지만 바꾼 재서명 archive의 두 검증기 거부를 통과했다. notice 원문/SHA와 libc의 기존 third-party 고지도 확인했다. Python 16개 회귀에 현재 Go 검증기 연동을 포함했다. Go 코드 변경은 없으며 전체 Go suite를 반복하지 않았다.
+
+실제 도구 체인의 modernc dependency-selected 소스는 Darwin 30 package/225 file, Linux arm64 8/197, amd64 에뮬레이션 8/201이다. 네 모듈의 source·root 고지 9개는 고정 module ZIP과 바이트가 같고, ZIP h1은 go.sum/실제 build info에 연결된다. host/두 builder의 go mod verify도 통과했다. Origin metadata와 직접 Git blob 검증을 구분한다. GitLab 웹 source 읽기 실패와 초기 CLI 디렉터리명 오류도 보존했다. original C/generator·입력 system header 재생이나 전체 native/legal 적합성은 증명하지 않는다.
+
+FIX-15는 고정 버전의 누락 수집 수정 범위에서 완료다. 최신 패키지 설치는 mock이며 본 턴 실제 모델을 실행하지 않았고, 앞선 실제 모델 증거는 FIX-14 패키지 범위로 유지한다. C1-05의 원래 C/header/native 전이 범위·사람 적합성/운영 결정, C1-04/06/07 및 공식 B0/B1/C0/C1은 계속 미완료다. 다음 독립 작업은 C1-06 실패 복구/원본 보존 검증이며 B0 사람이 결정하면 정적 v2 범위/K 동결과 공식 strict 빌드를 우선한다.
