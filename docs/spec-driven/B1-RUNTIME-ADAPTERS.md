@@ -37,7 +37,7 @@ MCP 시작 때 해석한 고정 version/project/dataset/snapshot/commit으로 �
 
 `applied_relations`는 실제 점수에 사용한 고유 관계 출처 수, `boosted_citations`는 영향을 받은 인용 수다. 한 관계가 두 인용에 영향을 주더라도 관계 수를 두 번 세지 않는다. `baseline_citations`는 Stage 2의 상한 적용 집합 크기이며 최종 본문/인용 수가 아니다. `active`는 경로 실행 상태이며 정책 사실의 참, 구현 품질 또는 사람의 수용 판정이 아니다. 복수·proposed 후보가 남아 있어도 verified 텍스트/관계 외에는 점수를 바꾸지 않는다.
 
-폴백은 `unavailable`(저장소/고정 tuple 누락), `stale`(좌표·증거·projection 무결성 불일치), `budget_exceeded`(deadline/개념/관계 상한)로 구분하고 원래 순위·후보를 유지한다. `no_match`는 질의 개념 없음, `no_candidates`는 원문 검색 후보 없음이다. 오류 상세 파일 경로나 미검토 사실은 상태 메타데이터로 내보내지 않는다. Composer trace에도 같은 상태와 추가 텍스트 검색 시도 수를 기록한다. 기존 trace의 CKVCalls는 recall rounds에 텍스트 호출을 더한 값이며, 과거 knowledge pass는 포함하지 않는다. 전체 호출 수 원장은 B0-06의 별도 측정 어댑터로 완성해야 한다. v1 기본 무결성과 v2 `sha256-v2`는 이 선택형 메타데이터까지 보호한다. 기본 mode의 과거 골든은 그대로다.
+폴백은 `unavailable`(저장소/고정 tuple 누락), `stale`(좌표·증거·projection 무결성 불일치), `budget_exceeded`(deadline/개념/관계 상한)로 구분하고 원래 순위·후보를 유지한다. `no_match`는 질의 개념 없음, `no_candidates`는 원문 검색 후보 없음이다. 오류 상세 파일 경로나 미검토 사실은 상태 메타데이터로 내보내지 않는다. Composer trace에도 같은 상태와 추가 텍스트 검색 시도 수를 기록한다. 기존 trace의 CKVCalls는 recall rounds에 텍스트 호출을 더한 값이며, 과거 knowledge pass는 포함하지 않는다. 이 trace의 과거 의미를 바꾸지 않고 [B0 선택형 계측](./B0-MEASUREMENT-TOOLS.md)으로 실제 CKV/CKG/intent/health와 Ollama HTTP 시도를 원응답 ID에 연결한다. v1 기본 무결성과 v2 `sha256-v2`는 이 선택형 메타데이터까지 보호한다. 기본 mode의 과거 골든은 그대로다.
 
 deadline은 협력적 제한이다. SQL에는 context를 전달하고 각 단계의 종료 후 시간 초과를 확인해 만료된 재순위는 사용하지 않는다. 동기 원문/그래프 검증 자체를 강제로 중단하는 wall-clock 보장은 아니다. 전체 코퍼스 지연과 1.25배 회귀 기준은 실제 공식 비교에서 측정해야 한다.
 
@@ -79,10 +79,10 @@ python3 scripts/wbs-ontology-relations-smoke.py --pack-matrix \
 
 mock/BGE-M3 각각 8경로 × 6상태의 48요청을 검증했다. 공개 정책은 on에서만 요구 동작 1개와 자체 출처 인용 1개를 추가했다. 충돌 정책 2개는 출처와 충돌 정보만 제공하고 요구 동작은 비워 둔다. proposed·범위 밖은 unknown, 만료는 stale, 접근 제한은 restricted이며 정책 ID와 요구 동작을 내보내지 않는다. 제한 정책 원문이 기본 인용에 들어가지 않는지도 검사한다. 온톨로지 mode 간 최종 인용/본문 집합은 같은 팩 축 안에서 유지된다. on은 off의 기본 인용/본문을 모두 보존한다. 모든 v2 본문·줄 범위·소스 SHA·좌표·무결성을 원문 및 독립 JSON 정규화로 검사했다.
 
-`matrix-manifest.json`은 8개 경로의 순서, 설정/질의/바이너리/원응답 SHA, 좌표·모델 신원, 입력·DB·본문·응답 JSON 크기와 원시 시간을 기록한다. K는 **현재 컴파일 기본값 계약**인 raw/text recall 20, Stage 2 후보 상한 30, 별도 knowledge pass 6을 출처 코드 SHA와 함께 기록한다. 이는 호출별 backend telemetry가 아니다. 초안 프로토콜의 retrieval_k=10과 같다고 표시하지 않는다. 원시 단일 캡처 시간은 지연 점수로 집계하지 않고, 현재 행렬의 `arm_rotation=false`를 명시한다. 순서 회전과 전체 backend 호출 수 원장은 B0-06/B1-03에서 완성한다.
+`matrix-manifest.json`은 8개 경로의 순서, 설정/질의/바이너리/원응답 SHA, 좌표·모델 신원, 입력·DB·본문·응답 JSON 크기와 원시 시간을 기록한다. K는 **현재 컴파일 기본값 계약**인 raw/text recall 20, Stage 2 후보 상한 30, 별도 knowledge pass 6을 출처 코드 SHA와 함께 기록한다. 이는 호출별 backend telemetry가 아니다. 초안 프로토콜의 retrieval_k=10과 같다고 표시하지 않는다. 원시 단일 캡처 시간은 지연 점수로 집계하지 않고, 현재 행렬의 `arm_rotation=false`를 명시한다. 이 최초 원장에는 순서 회전과 호출별 telemetry가 없다. 후속 B0 계측 원장은 실제 K와 logical/HTTP 호출 수를 확인했고, 순서 회전은 B0-06/B1-03에 남아 있다.
 
 [8개 경로 원자료 원장](../../system/eval/b0-knowledge-system/b1-pack-matrix-m2max-2026-10-04.json)에 입력 bundle·잠금·원응답·검증 명령과 최초 스크립트 오류를 보존한다. 공식 품질 지표는 null이다.
 
 ## 남은 공식 비교 작업
 
-네 어댑터와 합성 팩 축의 구현 검증은 완료됐다. 공식 프로토콜에서 입력·glossary·모델·K·필터·intent를 잠그고 모든 arms의 실제 조건을 감사해야 한다. 실제 팩 사실의 사람 판정, 승인된 K 적용, 순서 회전·전체 호출 수 원장, 공식 원자료·주장별 사람 판정은 남아 있다. 전체 상태는 [실행 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.
+네 어댑터와 합성 팩 축의 구현 검증은 완료됐다. 공식 프로토콜에서 입력·glossary·모델·K·필터·intent를 잠그고 모든 arms의 실제 조건을 감사해야 한다. 실제 팩 사실의 사람 판정, 승인된 K 적용, 순서 회전·공식 고정 입력 원장, 공식 원자료·주장별 사람 판정은 남아 있다. 전체 상태는 [실행 작업리스트](./EXECUTION-WORKLIST.md)를 따른다.

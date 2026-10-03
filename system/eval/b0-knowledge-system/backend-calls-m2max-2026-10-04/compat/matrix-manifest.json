@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "state": "implementation_verified",
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "binary_sha256": "98beb33243e922853b289498b56afce6474ea30787510b71d956249468e74e4c",
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+      "file_manifest_digest": "82e51913c98da8a8bdd1bba4e2f7eaa6f85f67dce1f66c2c6b7a66d66b6a686f",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "b51af943b2f5121a03e931d3a208cce03ac1397ba7b577e996187c75afd0d2b4",
+    "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d"
+  },
+  "embedding_identity": {
+    "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+    "dim": 64,
+    "model": "mock-feature-hash-v1"
+  },
+  "settings": {
+    "raw_recall_k": 20,
+    "stage2_candidate_cap": 30,
+    "knowledge_pass_k": 6,
+    "raw_search_filter": {},
+    "bm25_rerank": true,
+    "ontology_budget_ms": 5000
+  },
+  "settings_evidence": "compiled default source contract; not per-call backend telemetry",
+  "settings_sources_sha256": {
+    "internal/system/composer/stage1/extractor.go": "108d3a7efac9ab36b159709183d3a3f80819185ec71397b6b7a87d94869eaeca",
+    "internal/system/composer/stage2/searcher.go": "cdca1a8d0d591640c2b55a944815bcf9423f49047cbead9cf7d5064b02ae5d86",
+    "cmd/cks/mcpcli/ontology.go": "48259b3109a38a0bce3489031e5e690751f6504f4f54ab1981231adf6b6a8690",
+    "cmd/cks/mcpcli/serve.go": "97e37c5517553ed4e29b38eb63ba54001dd045120716188b957c8f3cd3f635b2"
+  },
+  "input_file_sha256": {
+    "go.mod": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+    "ontology-reviewed.yaml": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+    "README.md": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+    "main.go": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+    "main_test.go": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a"
+  },
+  "sizes": {
+    "input_files": 5,
+    "input_bytes": 980,
+    "graph_db_bytes": 143360,
+    "vector_db_bytes": 356352,
+    "semantic_db_bytes": 32768,
+    "projection_json_bytes": 6516
+  },
+  "pack_axis": "same retained pack and index; only include_knowledge changes",
+  "order": [
+    "baseline",
+    "relations",
+    "concept_text",
+    "combined",
+    "missing",
+    "stale",
+    "text_missing",
+    "text_stale",
+    "combined_missing",
+    "combined_stale"
+  ],
+  "arm_rotation": false,
+  "latency_gate": "not measured; sequential structural single captures",
+  "arms": [
+    {
+      "id": "baseline",
+      "mode": "baseline",
+      "include_knowledge": false,
+      "config_sha256": "3a0f283780072bd483ea9a9993625968eb64a65a93aaf5ad276ad9079c3fe121",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "baseline.json",
+      "capture_sha256": "571286e29fc7356f2d92662c5fc05d7461375f8832ee947552b9194b652de4d7",
+      "observations": []
+    },
+    {
+      "id": "relations",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config_sha256": "6b0e7bbf31e2e06098cd16a7ccb799fedb9a402e816cb5b945c462b432789953",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "relations.json",
+      "capture_sha256": "0b8aa178129bfa46c0778bccc1c66f5e866e039efc7b939f42668ca7484c3ab7",
+      "observations": []
+    },
+    {
+      "id": "concept_text",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config_sha256": "b2dd83cbe65df83bfe3dd03cded757df59c4d11f13c1277e6c1f3135c065ff47",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "concept_text.json",
+      "capture_sha256": "4102622d271f08db8a4ae1086157ebcda9c29fd92a35f3bbb3b6ea9a839c34be",
+      "observations": []
+    },
+    {
+      "id": "combined",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config_sha256": "8552d1b02ccdee55318042ed496e99c1ed5aaf6ec8b4bf2f7dc7fbc6127761f4",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "combined.json",
+      "capture_sha256": "59dbea279bdc993b46d3ee2d04c91a0a2b63555752594bdb2ac8db83363b8d95",
+      "observations": []
+    },
+    {
+      "id": "missing",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config_sha256": "0c63e2f6967fc79eefb7f2c97f00831067e3a24e0b194915ff1caab36db4fe6c",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "missing.json",
+      "capture_sha256": "274d8946953f37b74e90d7d41c522b6d0a6d1582c2c3888eaf7b0730c738a518",
+      "observations": []
+    },
+    {
+      "id": "stale",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config_sha256": "1d7da6b192a045da305fad22712ac3d5b7ece53ae4ee901247e62ba7ae8af903",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "stale.json",
+      "capture_sha256": "5a47036ec4e61d7d39d1a2d4d8b05501a4d72baffb0685a89424495c831e2552",
+      "observations": []
+    },
+    {
+      "id": "text_missing",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config_sha256": "e242b0955cd949b28c127d80420dac42ae56ba035d290691a2e7aefcc3cdc55f",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "text_missing.json",
+      "capture_sha256": "e8b9852486964f53cb0162e5c5f5b2403f0fd92b0df5d76df4c542920c011183",
+      "observations": []
+    },
+    {
+      "id": "text_stale",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config_sha256": "a7e3a73c0a6fd7518685702bd50ec2788007bf596483ea8f930f4b52edc0a104",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "text_stale.json",
+      "capture_sha256": "a805bf394e330b4b7fadec1e8fed329e435e6946099c1d8d216c66fd1b964680",
+      "observations": []
+    },
+    {
+      "id": "combined_missing",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config_sha256": "5fc7ac8b20c0ad4f44740cac1f568c4bb225012721610ea52717e4db277afaee",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "combined_missing.json",
+      "capture_sha256": "81eef6dce738eac2e3b6b652060e0a9dfaef718e1b5f9a5a7cd1367d3641ecee",
+      "observations": []
+    },
+    {
+      "id": "combined_stale",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config_sha256": "43688dcbf976f41bb7d9c5c8561b582d347f56255f9d5cf4531fd4ec27c3a45f",
+      "requests_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+      "capture": "combined_stale.json",
+      "capture_sha256": "d12a98b0fc5b03d2805d9e5ac0bf8d02585baeb3bc3beac1f977586343fa89ba",
+      "observations": []
+    }
+  ]
+}

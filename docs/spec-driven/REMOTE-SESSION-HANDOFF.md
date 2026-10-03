@@ -11,6 +11,8 @@
 
 후속 도구/수정: [B0-MEASUREMENT-TOOLS.md](./B0-MEASUREMENT-TOOLS.md)의 v1/v2 응답 수집·CKV exact/budget 프로브가 구현됐고 실모델 진단을 통과했다. CKV EOF 개행의 가상 인용 줄과 SQLite `?`/`#` 파일명 처리 오류를 재현 후 수정했다. 기존 전체 진단 데이터는 수정 전 빌더이므로 공식 B0-07에서 새 데이터셋으로 범위 감사를 수행한다. B0-06 전체 원장/계측은 남아 있다. [B1 네 실행 경로](./B1-RUNTIME-ADAPTERS.md)의 baseline/개념 텍스트/관계/결합은 실제 MCP에서 mock/BGE-M3 각 20요청·출처/후보 보존/오류 폴백 검증을 완료했다. B1-01 구현 검증이며 공식 품질 통과는 아니다. [B0-05 개발 결합 검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md)는 실제 앵커·보관 원문·proposed 팩/스펙으로 준비했고 사람 판정 대기다. F-03 project_id 불일치와 온톨로지+지식 요청의 stamp 순서 오류도 재현 후 수정했다. 다음은 B1-02 팩 축과 B0-06 전체 호출 수·입력 잠금·순서 원장이다. 팩 축·공식 B0/B1·C0/C1은 남아 있다.
 
+후속 B0-06: [선택형 계측](./B0-MEASUREMENT-TOOLS.md)이 knowledge pass·Stage3·health·intent를 포함한 논리 호출과 Ollama HTTP transport 시도를 캡처 measurement_id에 연결한다. mock/BGE-M3 각 48요청과 기존 v1/v2 20요청, 실모델 비계측 12응답 동등성을 확인했다. [호출 원장](../../system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04.json)에 실제 K20/6·옵션·크기·실패·모델 digest·DB SHA를 기록한다. HTTP 수는 logical 검색 수와 분리하며 startup constructor pin/probe·SQL·모델 내부 작업은 카운터 밖이다. 다음은 arm 순서 회전과 승인 K 적용 경로이며 공식 B0/B1/C0/C1은 대기다.
+
 ## 새 세션에 전달할 프롬프트
 
 당신은 `knowledge-system`의 스펙 기반 WBS를 이어서 수행한다. 저장소는 `https://github.com/0xmhha/knowledge-system.git`, 작업 브랜치는 `feat/spec-driven-knowledge-system`이다. 이 인계 작성 시점의 HEAD는 `021c837 fix(cks): preserve executable modes in pinned snapshots`이고 로컬 작업 트리는 깨끗했다. **`main`이 아니라 이 브랜치의 최신 원격 상태를 확인하고 시작하라.** 다른 머신에서는 경로가 다를 수 있으므로 아래의 모든 상대 경로는 저장소 루트 기준으로 해석하라. 기존 사용자 변경이 있으면 보존하라.
@@ -51,3 +53,5 @@
 5. **C0/C1:** 관측된 실패를 명세·골든·재현 테스트로 먼저 고정한 다음 필요한 품질/성능 리팩토링을 한다. 기존 공개 계약, 기본 검색 상위 K, 권한·인용·원자 승격, 구 데이터 읽기를 회귀 검증한다. 같은 B0 조건으로 재평가해 온톨로지 런타임 기본값, macOS/Linux 지원 범위, 롤백과 출시 여부를 결정한다. Linux의 실모델 대용량 비용, 운영 서명 키/라이선스 적합성도 C1 판정에 포함한다. 완료 전에는 `preview`/`unmeasured` 상태를 유지한다.
 
 진행 중에는 기능별 검증과 원자료를 `docs/spec-driven/EXECUTION.md` 및 해당 게이트 보고서에 갱신하라. 큰 모델 파일·데이터셋·비밀·책 전체 OCR을 Git에 넣지 말라. 중요한 변경은 커밋/푸시하고, 막히면 정확한 선행 조건과 완료된 범위를 사용자에게 보고하라. 사용자의 승인이 필요한 실제 정답·정책 사실·출시 결정은 임의로 대신하지 말라.
+
+2026-10-04 호출 원장 독립 재감사: v2 106응답·116개 요청 scope·12개 실모델 응답 동등성 확인. 성공 응답 안의 비치명 오류도 보존했다. `<convention>` 합성 지식 경로가 BM25 후보로 전달되는 기존 FTS 문법 오류를 읽기 전용으로 재현했고, 작업리스트 FIX-07로 별도 수정한다. README/header의 그래프 노드 부재는 best-effort 확장 실패다. 계측 구현 통과를 모든 내부 호출 성공으로 판정하지 않는다.

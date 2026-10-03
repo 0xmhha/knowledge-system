@@ -46,7 +46,7 @@ func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, erro
 
 // OpenWithOptions carries the index's dimension and query transformation into
 // CKS. CKV Open rejects a mismatch against the persisted v2 identity.
-func OpenWithOptions(provider, model, endpoint string, targetDim int, queryPrefixPolicy string) (ckvtypes.Embedder, Capability, error) {
+func OpenWithOptions(provider, model, endpoint string, targetDim int, queryPrefixPolicy string, observers ...ollama.HTTPObserver) (ckvtypes.Embedder, Capability, error) {
 	if provider == "" {
 		provider = DefaultProvider
 	}
@@ -69,7 +69,11 @@ func OpenWithOptions(provider, model, endpoint string, targetDim int, queryPrefi
 			model = "bge-m3"
 			cap.Model = model
 		}
-		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model, TargetDim: targetDim, QueryPrefixPolicy: queryPrefixPolicy})
+		var observer ollama.HTTPObserver
+		if len(observers) > 0 {
+			observer = observers[0]
+		}
+		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model, TargetDim: targetDim, QueryPrefixPolicy: queryPrefixPolicy, ObserveHTTP: observer})
 		if err != nil {
 			return nil, cap, err
 		}

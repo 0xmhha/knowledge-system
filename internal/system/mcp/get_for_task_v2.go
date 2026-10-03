@@ -30,7 +30,9 @@ func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
 	})
 }
 
-func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (result *mcpgo.CallToolResult, callErr error) {
+	ctx, finish := beginBackendMeasurement(ctx, d, req)
+	defer func() { finish(result, callErr) }()
 	if d.EvidenceVersionDir == "" || d.EvidenceSanitizer == nil {
 		return v2ToolError("reindex_required"), nil
 	}

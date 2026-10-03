@@ -42,9 +42,11 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/backendmeasure"
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
@@ -61,6 +63,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/netutil"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 )
 
 // builderVersion is stamped into the MCP server name/version handshake and
@@ -241,9 +244,28 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		return fmt.Errorf("vocab.Load: %w", err)
 	}
 
-	c, err := buildComposer(ctx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp,
+	var measurements *backendmeasure.Recorder
+	composerCtx := ctx
+	var startupScope *backendmeasure.Scope
+	if cfg.Logging.MeasureBackendCalls {
+		measurements = &backendmeasure.Recorder{Emit: func(ctx context.Context, summary backendmeasure.Summary) {
+			fp.Event(ctx, "measurement.backend_calls", zap.Any("summary", summary))
+		}}
+		be.ckv = backendmeasure.WrapCKV(be.ckv)
+		be.ckg = backendmeasure.WrapCKG(be.ckg)
+		be.intentEmb = backendmeasure.WrapIntent(be.intentEmb)
+		composerCtx, startupScope = measurements.Begin(ctx, "", "startup.intent_anchors")
+	}
+	c, err := buildComposer(composerCtx, be.ckg, be.ckv, be.intentEmb, fetcher, ruleset, vocabResolver, fp,
 		cfg.Semantic.OntologyMode != "",
 		ontologyOptions(cfg.Semantic, evidenceVersionDir, cfg.Backends.CKG.SourceRoot, be.ckv)...)
+	if startupScope != nil {
+		outcome := "returned"
+		if err != nil {
+			outcome = "startup_error"
+		}
+		startupScope.Finish(outcome)
+	}
 	if err != nil {
 		return fmt.Errorf("build composer: %w", err)
 	}
@@ -258,6 +280,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	defer jobs.Shutdown()
 
 	deps := cksmcp.Deps{
+		BackendMeasurements: measurements,
 		Composer:            c,
 		EvidenceVersionDir:  evidenceVersionDir,
 		EvidenceSanitizer:   evidenceSanitizer,
@@ -408,7 +431,11 @@ func buildBackends(ctx context.Context, cfg *config.Config, sourceOverride ...st
 		degradedReason string
 	)
 	if cfg.Backends.CKV.Path != "" {
-		emb, c, embErr := embedder.OpenWithOptions(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy)
+		var observer ollama.HTTPObserver
+		if cfg.Logging.MeasureBackendCalls {
+			observer = backendmeasure.BeginHTTP
+		}
+		emb, c, embErr := embedder.OpenWithOptions(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy, observer)
 		cap = c
 		if embErr != nil {
 			degradedReason = embErr.Error()

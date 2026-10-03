@@ -112,6 +112,7 @@ type Runner struct {
 // RawToolCall preserves the decoded MCP result before metric aggregation.
 // ElapsedNS measures the tool call only; recording/encoding is outside it.
 type RawToolCall struct {
+	MeasurementID  string          `json:"measurement_id,omitempty"`
 	Tool           string          `json:"tool"`
 	Arguments      json.RawMessage `json:"arguments,omitempty"`
 	ElapsedNS      int64           `json:"elapsed_ns"`

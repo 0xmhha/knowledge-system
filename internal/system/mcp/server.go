@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/system/backendmeasure"
 	"net"
 	"net/http"
 	"time"
@@ -48,6 +49,8 @@ var ToolNameHealth = toolName("ops.health")
 // the slim C.5 surface deliberately resists envelope sprawl (HLD §7.5
 // envelope/auth fields land with Phase 3, not here).
 type Deps struct {
+	// Optional out-of-band experiment recorder; never changes a tool result.
+	BackendMeasurements *backendmeasure.Recorder
 	// Composer drives cks.context.get_for_task. Must be non-nil.
 	Composer *composer.Composer
 	// Pinned candidate and sanitizer for archive-backed v2 evidence. Empty

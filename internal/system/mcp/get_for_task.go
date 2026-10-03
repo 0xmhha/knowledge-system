@@ -19,7 +19,9 @@ import (
 // a Go error. Domain problems (missing prompt, composer failure,
 // fail_closed) come back as an IsError CallToolResult — that's what mcp-go
 // surfaces to MCP clients as the "tool produced an error" branch.
-func handleGetForTask(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+func handleGetForTask(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (result *mcpgo.CallToolResult, callErr error) {
+	ctx, finish := beginBackendMeasurement(ctx, d, req)
+	defer func() { finish(result, callErr) }()
 	if denied := legacyContextGuard(d); denied != nil {
 		return denied, nil
 	}

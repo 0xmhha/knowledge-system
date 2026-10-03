@@ -126,6 +126,7 @@ def main():
     parser.add_argument('--model-name', default='bge-m3:latest')
     parser.add_argument('--ollama-url', default='http://127.0.0.1:11434')
     parser.add_argument('--pack-matrix', action='store_true', help='eight v2 arms with synthetic policy safety controls')
+    parser.add_argument('--measure-backends', action='store_true', help='record actual logical client calls in opt-in footprint logs')
     args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     # These are compiled defaults, not telemetry. Pin their source contract
@@ -268,7 +269,11 @@ def main():
         for line in config.read_text().splitlines():
             line = line.replace('provider: ""', 'provider: ' + args.embedder).replace('provider: ollama', 'provider: ' + args.embedder)
             line = line.replace('mcp_stdio: false', 'mcp_stdio: true').replace('transport: http', 'transport: stdio')
+            if args.measure_backends and line.lstrip().startswith('footprint_dir:'):
+                line = '    footprint_dir: ' + str(out / 'telemetry' / mode)
             lines.append(line)
+            if args.measure_backends and line.lstrip().startswith('footprint_dir:'):
+                lines.append('    measure_backend_calls: true')
             if line.lstrip().startswith('store_path:'):
                 lines.extend(['    ontology_mode: ' + mode, '    ontology_budget_ms: 5000'])
         config.write_text('\n'.join(lines) + '\n')
@@ -326,6 +331,33 @@ def main():
                                      'response_json_bytes': len(json.dumps(response, ensure_ascii=False, separators=(',', ':')).encode()),
                                      'citation_count': len(pack['citations']),
                                      'body_utf8_bytes': sum(len(b['text'].encode()) for b in pack['bodies'])})
+        if args.measure_backends:
+            events = [json.loads(line) for line in (out / 'telemetry' / mode / 'cks-mcp.jsonl').read_text().splitlines()]
+            summaries = [e['summary'] for e in events if e.get('event') == 'measurement.backend_calls']
+            for row in report['rows']:
+                selected = [s for s in summaries if s['measurement_id'] == row['call']['measurement_id']]
+                assert len(selected) == 1 and selected[0]['outcome'] == 'returned' and selected[0]['pending_calls'] == 0
+                measured = selected[0]
+                calls = measured['calls']
+                assert [c['ordinal'] for c in calls] == list(range(1, len(calls) + 1))
+                searches = [c for c in calls if c['method'] == 'semantic_search']
+                raw = [c for c in searches if not c['options']['Filter']['ChunkKinds']]
+                knowledge = [c for c in searches if c['options']['Filter']['ChunkKinds']]
+                assert raw and all(c['options']['K'] == 20 and c['options']['BM25Rerank'] for c in raw)
+                assert len(knowledge) == 1 and knowledge[0]['options']['K'] == 6
+                assert knowledge[0]['options']['Filter']['ChunkKinds'] == ['invariant', 'convention']
+                assert any(c['method'] == 'neighbors' for c in calls)
+                assert any(c['backend'] == 'intent' for c in calls)
+                http = [c for c in calls if c['backend'] == 'ollama_http']
+                if args.embedder == 'ollama':
+                    assert http and any(c['method'] == 'POST' for c in http)
+                    assert all(c['outcome'] == 'returned' and c['http_status'] == 200 and c['response_body_bytes'] > 0 for c in http)
+                    assert {c['options']['path'] for c in http} == {'/api/tags', '/api/embed'}
+                    assert all(c['options']['request_body_bytes'] > 0 for c in http if c['method'] == 'POST')
+                else:
+                    assert http == []
+                if args.pack_matrix:
+                    next(o for o in observations if o['request_id'] == row['request_id'])['backend_measurement'] = measured
         matrix['arms'].append({'id': arm, 'mode': mode, 'include_knowledge': enabled,
                                'config_sha256': report['config_sha256'], 'requests_sha256': report['request_sha256'],
                                'capture': capture.name, 'capture_sha256': hashlib.sha256(capture.read_bytes()).hexdigest(),
@@ -334,7 +366,7 @@ def main():
     if args.pack_matrix:
         key = lambda c: json.dumps(c, sort_keys=True)
         configs = [(out / (a[0] + '.yaml')).read_text() for a in arms]
-        assert len({re.sub(r'ontology_mode: \w+', 'ontology_mode: BASE', c) for c in configs}) == 1
+        assert len({re.sub(r'footprint_dir: [^\n]*', 'footprint_dir: OBSERVATION', re.sub(r'ontology_mode: \w+', 'ontology_mode: BASE', c)) for c in configs}) == 1
         assert len({a['config_sha256'] for a in matrix['arms']}) == 4
         for scope in matrix_requests(False)['requests']:
             api = scope['id']

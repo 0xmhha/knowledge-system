@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/system/envelope"
 	"strings"
 	"time"
 
@@ -72,10 +73,12 @@ func (r *Runner) Capture(ctx context.Context, request CaptureRequest) (RawToolCa
 	}
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name, req.Params.Arguments = request.Tool, request.Arguments
+	measurementID := envelope.NewTraceID()
+	req.Params.Meta = &mcpgo.Meta{AdditionalFields: map[string]any{"cks.measurement_id": measurementID}}
 	start := time.Now()
 	result, callErr := r.client.CallTool(ctx, req)
 	completed := time.Now()
-	entry := RawToolCall{Tool: request.Tool, Arguments: arguments, ElapsedNS: completed.Sub(start).Nanoseconds(), CompletedAt: &completed}
+	entry := RawToolCall{MeasurementID: measurementID, Tool: request.Tool, Arguments: arguments, ElapsedNS: completed.Sub(start).Nanoseconds(), CompletedAt: &completed}
 	if result != nil {
 		entry.Response, err = json.Marshal(result)
 		if err != nil {

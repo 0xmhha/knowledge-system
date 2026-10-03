@@ -17,6 +17,26 @@ func TestDefault_PassesValidate(t *testing.T) {
 	}
 }
 
+func TestBackendMeasurementRequiresUndroppedJSONFileRecords(t *testing.T) {
+	for _, change := range []func(*Config){
+		func(c *Config) { c.Logging.FootprintDir = "" },
+		func(c *Config) { c.Logging.Mode = "dev" },
+		func(c *Config) { c.Logging.Level = "warn" },
+		func(c *Config) { c.Logging.Level = "error" },
+	} {
+		cfg := Default()
+		cfg.Logging.MeasureBackendCalls = true
+		cfg.Logging.FootprintDir = "/tmp/measurement"
+		if err := cfg.Validate(); err != nil {
+			t.Fatal(err)
+		}
+		change(cfg)
+		if err := cfg.Validate(); err == nil {
+			t.Fatal("accepted missing or suppressed measurement records")
+		}
+	}
+}
+
 func TestLoadBytes_RoundTrip(t *testing.T) {
 	t.Parallel()
 	yamlSrc := `

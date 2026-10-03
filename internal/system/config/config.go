@@ -216,6 +216,8 @@ type LoggingConfig struct {
 	Mode         string `yaml:"mode"`
 	FootprintDir string `yaml:"footprint_dir"`
 	AuditDir     string `yaml:"audit_dir"`
+	// Opt-in experiment telemetry. Default response contracts stay unchanged.
+	MeasureBackendCalls bool `yaml:"measure_backend_calls,omitempty"`
 }
 
 // SanitizeConfig points to the sanitize ruleset and sets composer-wide
@@ -328,6 +330,12 @@ func (c *Config) Validate() error {
 	case "", "prod", "dev":
 	default:
 		return fmt.Errorf("config: logging.mode=%q invalid (prod|dev)", c.Logging.Mode)
+	}
+	if c.Logging.MeasureBackendCalls {
+		mode, level := strings.ToLower(c.Logging.Mode), strings.ToLower(c.Logging.Level)
+		if c.Logging.FootprintDir == "" || mode == "dev" || (level != "" && level != "info" && level != "debug") {
+			return fmt.Errorf("config: logging.measure_backend_calls requires footprint_dir, prod mode and info/debug level")
+		}
 	}
 
 	switch strings.ToLower(c.Listen.Transport) {

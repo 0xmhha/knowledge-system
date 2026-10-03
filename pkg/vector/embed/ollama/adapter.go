@@ -67,9 +67,11 @@ type Adapter struct {
 
 // Options configures the Ollama adapter.
 type Options struct {
-	Endpoint  string        // Ollama API URL (default: http://localhost:11434)
-	ModelName string        // model name as known to Ollama (e.g. "bge-m3")
-	Timeout   time.Duration // per-request timeout (default: DefaultTimeout); <=0 uses the default
+	// ObserveHTTP is optional telemetry, excluded from embedding identity.
+	ObserveHTTP HTTPObserver
+	Endpoint    string        // Ollama API URL (default: http://localhost:11434)
+	ModelName   string        // model name as known to Ollama (e.g. "bge-m3")
+	Timeout     time.Duration // per-request timeout (default: DefaultTimeout); <=0 uses the default
 	// TargetDim, when >0 and smaller than the model's native dimension,
 	// truncates every embedding to its first TargetDim components and
 	// re-normalizes to unit length (Matryoshka Representation Learning). Used
@@ -121,6 +123,9 @@ func Open(opts Options) (*Adapter, error) {
 		maxInput:       resolveMaxInput(opts.ModelName),
 		runtimeOptions: resolveRuntimeOptions(opts.ModelName),
 		client:         &http.Client{Timeout: timeout},
+	}
+	if opts.ObserveHTTP != nil {
+		a.client.Transport = &observedTransport{base: http.DefaultTransport, observe: opts.ObserveHTTP}
 	}
 
 	// Probe: embed a short string to discover the dimension. Bound it with a

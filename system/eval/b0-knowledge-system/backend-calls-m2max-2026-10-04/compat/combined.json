@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T16:24:17.887318Z",
+  "finished_at": "2026-10-03T16:24:18.027393Z",
+  "request_sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0",
+  "config_sha256": "8552d1b02ccdee55318042ed496e99c1ed5aaf6ec8b4bf2f7dc7fbc6127761f4",
+  "binary_sha256": "98beb33243e922853b289498b56afce6474ea30787510b71d956249468e74e4c",
+  "config_sha256_after": "8552d1b02ccdee55318042ed496e99c1ed5aaf6ec8b4bf2f7dc7fbc6127761f4",
+  "binary_sha256_after": "98beb33243e922853b289498b56afce6474ea30787510b71d956249468e74e4c",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "v1",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "aa7bb0355abfd71d42d577175a1b66a0",
+        "tool": "cks.context.get_for_task",
+        "arguments": {
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 37857500,
+        "completed_at": "2026-10-04T01:24:17.962398+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+                },
+                "text": "func Alpha() string { return \"alpha\" }",
+                "token_estimate": 9
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n",
+                "token_estimate": 8
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}",
+                "token_estimate": 26
+              }
+            ],
+            "metadata": {
+              "ontology": {
+                "mode": "combined",
+                "state": "active",
+                "baseline_citations": 3,
+                "matched_concepts": 1,
+                "applied_relations": 1,
+                "boosted_citations": 3,
+                "text_search_calls": 1,
+                "text_boosted_citations": 2,
+                "text_sources": [
+                  {
+                    "concept_id": "alpha-function",
+                    "evidence_id": "ontology:d764526fff6fb90fd7fb6c5e",
+                    "query_sha256": "d5b6377eddbf1e30399d4b4d34dbff5e7fb39d96e394b00778a01ec948758d18",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                    "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                    "commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                    "file": "ontology-reviewed.yaml",
+                    "start_line": 7,
+                    "end_line": 14,
+                    "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                    "returned_hits": 5
+                  }
+                ]
+              },
+              "budget_tokens": 7200,
+              "used_tokens": 43,
+              "utilization_ratio": 0.0059722222222222225,
+              "built_at": "2026-10-03T16:24:17.961979Z",
+              "builder_version": "cks-mcp/0.0.1-dev",
+              "integrity_hash": "4bb5f6ba4464fac64d308b71894b203c87fce2e215b72194e50279a87a357337",
+              "integrity_hash_algo": "sha256"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "6de698a9daa1cc150c393f0562e21cfc",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Alpha function implementation"
+        },
+        "elapsed_ns": 43896708,
+        "completed_at": "2026-10-04T01:24:18.006352+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "ks-fixture",
+              "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+              "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+              "source_mode": "committed",
+              "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064"
+            },
+            "query": "Alpha function implementation",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "project_id": "ks-fixture",
+                "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                "source_mode": "committed",
+                "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "project_id": "ks-fixture",
+                "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                "source_mode": "committed",
+                "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              },
+              {
+                "file": "main_test.go",
+                "start_line": 5,
+                "end_line": 9,
+                "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "project_id": "ks-fixture",
+                "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                "source_mode": "committed",
+                "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                "origin_id": "repo",
+                "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                  "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                  "source_mode": "committed",
+                  "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                  "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                  "source_mode": "committed",
+                  "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "project_id": "ks-fixture",
+                  "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                  "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                  "source_mode": "committed",
+                  "base_commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                  "origin_id": "repo",
+                  "file_sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+                  "content_sha256": "7ada7096ad162bf382f63b1fe08a7318fdf824ba626babb6e1f4569fd405e291"
+                },
+                "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "ontology": {
+                "mode": "combined",
+                "state": "active",
+                "baseline_citations": 3,
+                "matched_concepts": 1,
+                "applied_relations": 1,
+                "boosted_citations": 3,
+                "text_search_calls": 1,
+                "text_boosted_citations": 2,
+                "text_sources": [
+                  {
+                    "concept_id": "alpha-function",
+                    "evidence_id": "ontology:d764526fff6fb90fd7fb6c5e",
+                    "query_sha256": "d5b6377eddbf1e30399d4b4d34dbff5e7fb39d96e394b00778a01ec948758d18",
+                    "project_id": "ks-fixture",
+                    "dataset_id": "7d7cdad38e9a4b08470ae9c8c4fcf8de9b49d5c5dc3cfb1d99f6908d8aaaf27d",
+                    "snapshot_id": "1639850fc87255a85394e54298a5d1cac3daabf997784605cc6f6d038846203c",
+                    "commit": "37b0685eac43130a9b9c16a576180eeedfd5d064",
+                    "file": "ontology-reviewed.yaml",
+                    "start_line": 7,
+                    "end_line": 14,
+                    "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                    "returned_hits": 5
+                  }
+                ]
+              },
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "70716ddb5ccb698af95401a64aa9f0f7dc2273b7cc0091948555daea4776311c"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
