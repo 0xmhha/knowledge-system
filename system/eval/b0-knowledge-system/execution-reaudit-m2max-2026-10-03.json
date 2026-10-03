@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-03T12:17:19.871339+00:00",
+  "gate": "execution-completion-reaudit",
+  "branch": "feat/spec-driven-knowledge-system",
+  "base_commit": "329becf3e001637387fc09451a927a29b0d45aed",
+  "working_changes": true,
+  "quality_metrics": null,
+  "release": "preview",
+  "checks": [
+    {
+      "id": "baseline-go-test",
+      "command": "go test ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/baseline-go-test.txt",
+      "sha256": "a7bb7b7eb6384cc21bccfe428b4f536d24a44cb84de40249a2f7256ca35e186b",
+      "bytes": 8899
+    },
+    {
+      "id": "final-go-test",
+      "command": "go test ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/final-go-test.txt",
+      "sha256": "938e81ccc51788d6894f82e51b2285040a90c84b9ca5f29f31b026e241f67c96",
+      "bytes": 9098
+    },
+    {
+      "id": "vet",
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "race",
+      "command": "go test -race ./internal/setup ./internal/system/evidencev2 ./internal/system/semantic ./internal/system/knowledgepack ./internal/system/mcp ./cmd/cks/knowledgecli ./cmd/cks/setupcli",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/race.txt",
+      "sha256": "be52cba515295e41efcf0b9a233a56afee0a6ee0d6d2a9470ed157c0befb439d",
+      "bytes": 1348
+    },
+    {
+      "id": "python",
+      "command": "python3 -m unittest discover -s scripts -p 'test_b0*.py' -v",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/python.txt",
+      "sha256": "0104e2dffe1d6e5e0a4882bb05a29196274b9953561feba4de5e709c9255afd7",
+      "bytes": 1849
+    },
+    {
+      "id": "platform-test",
+      "command": "python3 -m unittest discover -s scripts -p 'test_platform_fixture.py' -v",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/platform-test.txt",
+      "sha256": "1ab8f054c4688b12dcb903c1eb4f76a557639f0b96fb73a6448f32f0b2db439c",
+      "bytes": 264
+    },
+    {
+      "id": "identity",
+      "command": "scripts/wbs-identity-smoke.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/identity.txt",
+      "sha256": "da507fb9ba5902aea1f007bb5448f3c92451417813d4330113176726dccb58bc",
+      "bytes": 85
+    },
+    {
+      "id": "source",
+      "command": "scripts/wbs-source-modes-smoke.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/source.txt",
+      "sha256": "aceecdcba208bfd0f9080a453bc01a061a15bc658b9848482879fde57872df48",
+      "bytes": 91
+    },
+    {
+      "id": "knowledge",
+      "command": "scripts/wbs-knowledge-lock-smoke.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/knowledge.txt",
+      "sha256": "e53c3303c8e46374d465e14841def053c37a0da4c018b427bea8f1ea4bbacfb6",
+      "bytes": 116
+    },
+    {
+      "id": "patch",
+      "command": "scripts/wbs-patch-smoke.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/patch.txt",
+      "sha256": "51ae724d44a1f404db11af25dcf49485baec8aaca7f6b6ffa995f5bfd05ab14c",
+      "bytes": 81
+    },
+    {
+      "id": "wbs",
+      "command": "scripts/wbs-smoke.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/wbs.txt",
+      "sha256": "8f49aee33370268aaf49e5fb1de32190cc12c86aaa486a70fe504ba7077797ff",
+      "bytes": 4376
+    },
+    {
+      "id": "package",
+      "command": "scripts/wbs-package-smoke.sh (allow dirty preview)",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/package.txt",
+      "sha256": "05d612cdbdf85bd6aad99b3220bbcbe2b1bf2973e163e32b2915e71ff7529c42",
+      "bytes": 226
+    },
+    {
+      "id": "sign",
+      "command": "scripts/wbs-release-sign-smoke.sh (test keys)",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/sign.txt",
+      "sha256": "13ef2d9ba36ba7250ec2ce34a673d2727a08707433662f14c43366e2bfd409d6",
+      "bytes": 149
+    },
+    {
+      "id": "legacy",
+      "command": "scripts/wbs-legacy-migration-smoke.py",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/legacy.txt",
+      "sha256": "942d9e98b23ad4e6838b7afc8a4095a3c4e379a10b4616b7fd1d749edb4186de",
+      "bytes": 1137
+    },
+    {
+      "id": "raw-test",
+      "command": "go test ./internal/system/eval ./cmd/cks/evalcli",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/raw-test.txt",
+      "sha256": "db8fae941a28d228908adac8d1c4c6e9814f7087b77d93c13b9c5fc22111d468",
+      "bytes": 140
+    },
+    {
+      "id": "linux-arm64",
+      "command": "scripts/wbs-linux-package-smoke.sh arm64 (before fix)",
+      "exit_code": 1,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/linux-arm64.txt",
+      "sha256": "a98894113025773d71413f325b3038c10b0ebe30a7769638af73879f685fae0c",
+      "bytes": 33822
+    },
+    {
+      "id": "linux-amd64",
+      "command": "scripts/wbs-linux-package-smoke.sh amd64 (before fix)",
+      "exit_code": 1,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/linux-amd64.txt",
+      "sha256": "6a05855db4dcab5e069afda7530b54d2a80c3839cbe8ad71460c80847775fdcb",
+      "bytes": 34865
+    },
+    {
+      "id": "linux-arm64-retry",
+      "command": "scripts/wbs-linux-package-smoke.sh arm64 (after fix)",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/linux-arm64-retry.txt",
+      "sha256": "c352dc08e1e12d3c595965a257a695984b331c80b3d81c8913e2ae061321d34d",
+      "bytes": 2056
+    },
+    {
+      "id": "linux-amd64-retry",
+      "command": "scripts/wbs-linux-package-smoke.sh amd64 (after fix, emulated)",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/reaudit-m2max-2026-10-03/linux-amd64-retry.txt",
+      "sha256": "a58b1e9c99c490473b663b9977398c8aa721415fbd8d8fda55d519032a2ac93b",
+      "bytes": 2056
+    }
+  ],
+  "additional_checks": {
+    "raw_eval_race": "passed",
+    "raw_eval_vet": "passed",
+    "boundaries": "passed",
+    "docs_check": {
+      "state": "passed",
+      "live_documents": 112
+    },
+    "diff_check": "passed",
+    "linux_amd64_retry": "passed_emulated"
+  },
+  "discovered_defects": [
+    {
+      "id": "REAUDIT-01",
+      "description": "draft gold rejection test relied on repository gold staying unapproved",
+      "fix": "construct explicit unapproved synthetic input",
+      "state": "fixed_verified"
+    },
+    {
+      "id": "REAUDIT-02",
+      "description": "Linux package smoke assumed .git is a file and failed for primary repositories",
+      "fix": "copy only tracked current bytes into a new fixture; support primary and linked worktree",
+      "state": "fixed_verified_both_architectures"
+    }
+  ],
+  "scope_limits": [
+    "No official B0/B1 retrieval score has been run.",
+    "Dynamic gold and measurement protocol still await actual human review.",
+    "Default CKV build/ directory exclusion omits 29 Go files; input-scope decision pending.",
+    "macOS package smoke preceded optional raw-response addition; Linux source fixture includes that Go change.",
+    "Linux amd64 runs through emulation on arm64 host.",
+    "Packaging uses test signing keys; production license/signing/release decisions remain pending."
+  ],
+  "changed_source_sha256": {
+    "internal/system/eval/runner.go": "eefa9abede19385d226443df153f9a737980aa439b6c4f0059ba449306be02cb",
+    "internal/system/eval/runner_test.go": "a21ff385d37873ba6d76d058411f2c7ad4f06c9a9f4120a4453d9961674b55de",
+    "cmd/cks/evalcli/main.go": "4860b26058daea9e7438c758b8587e6d642f8f704bb6d023c0b8a6ccbb7e90d3",
+    "scripts/b0-materialize-fixtures.py": "e89d433df4282b3f9f40a6c32d5f275afd347700a8a1a847c81ee1a72a854843",
+    "scripts/test_b0_materialize_fixtures.py": "21ea4b9c8d39306bf36d69c76b474f2a449fc7e0a3cfbbdcdcb5cdbbc50f5229",
+    "scripts/test_b0_preflight.py": "c272ba8dc5d921ff3da224bf380d233edb8f4d055c363c0b882b9944160a43c7",
+    "scripts/prepare-platform-fixture.py": "cc27a3531efb58d2c660fbefdc29d79c2e6b0748e4b01915a5e15c5b710eaa54",
+    "scripts/test_platform_fixture.py": "ad8224cbc6c23715aadb16943b7747dcc3b5f85078fa2c3a534879ede1d0994b",
+    "scripts/wbs-linux-package-smoke.sh": "d77c11c255dd81f7ada20c8cb04ff388aa5b2e38a77a87eb747cdca24cf0e2e3"
+  },
+  "platform_fixture": {
+    "host_fixture_commit": "ae031fa66383aec04fdd84141deec919a0cff436",
+    "arm64_packaging": {
+      "archive": "/out/knowledge-system-linux-arm64-11ba3d3101a0.tar.gz",
+      "sha256": "5ea0200aae0c20c3dde67ae5a80aeecb25eac684b4f8a8af5eb22bf49779a849"
+    },
+    "amd64_packaging": {
+      "archive": "/out/knowledge-system-linux-amd64-afe40986b8ba.tar.gz",
+      "sha256": "691a22bff2d8d0a295cdc4ba2090e03a7733c19213b0d4f177b1e18d19a78926"
+    },
+    "scope": "test-signed-preview",
+    "amd64_emulated": true
+  }
+}

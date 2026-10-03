@@ -20,7 +20,7 @@ if [[ -n "${KS_GO_MOD_CACHE:-}" ]]; then
   module_env='export GOMODCACHE=/go/pkg/mod GOPROXY=off GOSUMDB=off;'
 fi
 docker run --rm --platform "linux/$arch" -v "$repo_root:/source:ro" -v "$scratch/dist:/out" \
-  ${cache_args[@]+"${cache_args[@]}"} "$build_image" bash -lc "set -euo pipefail; export PATH=/usr/local/go/bin:\$PATH; $module_env cp -a /source/. /worktree; cd /worktree; rm -f .git; git init -q; git config user.name Fixture; git config user.email fixture@example.invalid; git config commit.gpgsign false; git add -A; git commit -qm 'linux package fixture'; python3 scripts/package-host.py --out-dir /out" \
+  ${cache_args[@]+"${cache_args[@]}"} "$build_image" bash -lc "set -euo pipefail; export PATH=/usr/local/go/bin:\$PATH; $module_env python3 /source/scripts/prepare-platform-fixture.py --source /source --out /worktree > /tmp/fixture-copy-count; cd /worktree; git init -q; git config user.name Fixture; git config user.email fixture@example.invalid; git config commit.gpgsign false; git add -A; git commit -qm 'linux package fixture'; python3 scripts/package-host.py --out-dir /out" \
   > "$scratch/package.json"
 archive="$scratch/dist/$(python3 - "$scratch/package.json" <<'PY'
 import json, sys

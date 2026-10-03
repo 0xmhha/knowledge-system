@@ -1,5 +1,15 @@
 # Spec-driven WBS execution log
 
+## 2026-10-03 실행 작업리스트·완료 재검증
+
+[EXECUTION-WORKLIST.md](./EXECUTION-WORKLIST.md)에 완료 재검증 15개와 잔여 B0/B1/C0/C1 30개를 우선순위·선행·산출물·종료 조건으로 정리했다. 정적 gold와 BGE-M3는 승인됐으며 동적 사례·프로토콜·Go 29개 입력 범위는 실제 사람 결정 대기다.
+
+현재 머신에서 최종 전체 Go 시험, vet, 관련 race, 엔진 경계, 112개 문서 검사, 신원·캡처·팩·패치·세 엔진·구 v1 재생 스모크가 통과했다. 재검증에서 승인된 정답 파일을 초안으로 가정하던 Python 시험과 일반 저장소의 `.git` 디렉터리를 처리하지 못하던 Linux 패키지 스모크를 발견했다. 미승인 입력을 명시하는 시험과 추적 파일만 복사하는 플랫폼 fixture 도구로 수정했으며, B0 Python 12개 및 primary/worktree·수정/삭제·모드/링크·미추적 제외 시험이 통과했다. macOS preview 추출 설치·시험 서명과 수정 후 Linux arm64 검사는 통과했고 amd64 에뮬레이션 재검증도 통과했다.
+
+동적 개발 입력 6개를 독립 Git 저장소로 생성했다. 반복 생성의 커밋·트리·원문 SHA 일치, F-04 연속 커밋과 F-05 별도 프로젝트를 검사했다. 승인 상태는 바꾸지 않았고 품질 지표는 null이다. `cks eval --record-responses`는 선택적으로 freshness와 모든 v1 원응답·실패·호출 시간을 남긴다. 기본 출력은 유지하며 원응답 기록의 JSON 비용을 호출 지연에서 제외한다. 관련 단위/race/vet와 실제 mock CLI 재생이 통과했다. v2 원응답 및 CKV exact/budget 도구, 네 가지 ablation 실행 연결은 남은 작업이다.
+
+원자료와 출력 해시는 [execution-reaudit-m2max-2026-10-03.json](../../system/eval/b0-knowledge-system/execution-reaudit-m2max-2026-10-03.json)에 연결했다. 구조 시험 통과를 공식 B0/B1 품질 또는 C1 운영 출시로 승격하지 않는다.
+
 B0 M2 Max preparation (2026-10-03): 새 머신의 원격/로컬 개발 HEAD `9e907b43` 일치, Apple M2 Max/12 CPU/64 GiB/약 115 GiB 디스크 여유, Ollama 0.35.1과 이전과 같은 BGE-M3 digest/1024차원을 확인했다. 독립 Git 코퍼스에서 최신 세 바이너리로 엄격 임베딩 진단을 완료했다(1,569개 선택 파일/13,575청크, 약 813초). 저장 청크/입력 해시·분할 부모 63개/자식 169개·pinned doctor를 확인했고 CKG는 이전과 같은 102,112노드/414,613엣지·그래프 digest였다. **CKV 기본 build/ 제외 규칙이 실제 Go 소스 29개를 제외하므로 CKG/CKV Go 범위는 992/963이며 범위 감사는 partial**이다. 관련 Go 8개 패키지, B0 Python 9개, 실제 작은 프로젝트·긴 원문 Ollama 스모크가 통과했다. 사용자는 12개 정답과 BGE-M3를 승인했으며 로컬 감사 ID `chat-user`와 실제 응답·시각·질문 해시를 저장했다. 동적 fixture/프로토콜에는 “검토 후 결정”이라고 답했으므로 초안과 pending을 유지한다. 승인된 정답 export와 preflight ready는 공식 품질 평가나 전체 B0 완료가 아니다. [머신별 게이트](./B0-M2MAX-GATE-REPORT.md), [근거·결정 검토 자료](./B0-M2MAX-REVIEW.md)에 원자료·제안·남은 실행을 기록했다. B0/B1 품질 지표는 null, C는 미진행이다. 기존 .claude/와 logs/는 보존했다.
 
 B0-H pilot mode correction (2026-10-03): 독립 Git 고정 코퍼스의 첫 mock 전체 빌드는 CKG 102,112노드/414,613엣지와 CKV 1,569파일/13,469청크까지 만들었으나, 커밋에 포함된 실행 파일 30개의 실행 비트가 임시 트리에서 사라져 최종 Git clean 게이트가 승격을 거부했다. 새 v5 파일 매니페스트는 실행 비트를 신원에 포함한다. `committed`는 bundle checkout의 모드를 유지하고 `working-tree`는 캡처 모드를 재현하며 원본 모드 변경을 검출한다. v3/v4 보관본 읽기 회귀가 통과했다. 수정 후 같은 파일럿의 그래프 다이제스트 `fa58e1e7…`와 102,112노드/414,613엣지가 기존 독립 코퍼스 결과와 같았고, CKV 13,469청크와 36,550,909바이트 bundle을 게시해 `current`가 전환됐다. `cks doctor`는 `ready`/`pinned`/이력 `available`이었다. 전체 Go 테스트·vet·형식·경계·문서 검사와 Linux arm64/amd64의 최종 v5 핵심 시험 및 서명 패키지 설치 스모크가 통과했다. 이 mock 결과는 B0 품질 평가가 아니다. 상세 내용은 [`B0-H-GATE-REPORT.md`](./B0-H-GATE-REPORT.md)에 있다.

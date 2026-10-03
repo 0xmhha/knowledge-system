@@ -73,9 +73,16 @@ class PreflightTest(unittest.TestCase):
 
     def test_draft_gold_cannot_be_exported(self):
         with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "questions.json"
+            book = json.loads(PREFLIGHT.DEFAULT_QUESTIONS.read_bytes())
+            # Repository gold may become approved. Make the failed prerequisite
+            # explicit instead of depending on its current review state.
+            book["questions"][0].update(review_state="draft", reviewer=None,
+                                        reviewed_at=None)
+            source.write_text(json.dumps(book))
             out = Path(temp) / "scenarios"
             with self.assertRaisesRegex(ValueError, "need human approval"):
-                EXPORT.export(PREFLIGHT.DEFAULT_QUESTIONS, out)
+                EXPORT.export(source, out)
             self.assertFalse(out.exists())
 
     def test_synthetic_approved_gold_exports_without_answers(self):

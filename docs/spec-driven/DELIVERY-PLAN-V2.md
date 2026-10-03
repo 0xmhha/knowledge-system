@@ -2,6 +2,8 @@
 
 작성일: 2026-09-30 · 파일럿: `knowledge-system` · 임베더: 로컬 Ollama · 대상: macOS arm64, Linux arm64/amd64
 
+2026-10-03부터 실제 실행 순서·완료 재검증·잔여 항목·증거는 [실행 작업리스트](./EXECUTION-WORKLIST.md)에서 관리한다. 이 문서의 요구사항과 단계 게이트는 계속 기준선으로 사용한다.
+
 ## 1. 판정과 개발 순서
 
 기존 v0.1 요구사항(`study/docs/reviews/knowledge-system/spec-driven-requirements.md`)의 FR-01–10, INV-01–07, NFR-01–05와 S-01–09는 유지한다. 이 문서는 사용자의 새 순서에 맞춰 **완료 조건과 선행 관계를 대체**한다. v0.1 WBS는 이력 자료이며, 아래 v2가 이후 작업의 실행 기준이다. [`END-TO-END-DESIGN.md`](./END-TO-END-DESIGN.md)는 A/B/C 전 구간의 선행 설계 기준선이고 `EXECUTION.md`는 구현 증거의 원장이다.

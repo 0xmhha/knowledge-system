@@ -2,7 +2,9 @@ package eval
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -10,6 +12,86 @@ import (
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
+
+func TestRunner_RecordResponses_PreservesErrorsAndDoesNotLeakAcrossScenarios(t *testing.T) {
+	t.Parallel()
+	for _, transportFailure := range []bool{false, true} {
+		t.Run(fmt.Sprintf("transport=%t", transportFailure), func(t *testing.T) {
+			m := &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{
+				toolGetForTask: errorResult("structured tool failure"),
+			}, callErr: map[string]error{}}
+			if transportFailure {
+				m.callErr[toolGetForTask] = errors.New("transport failed")
+			}
+			r := &Runner{client: m, recordResponses: true}
+			s := &Scenario{Version: 1, Name: "raw-errors", Prompt: "raw query", Runs: 2, MatchMode: MatchOverlap}
+			out, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if out.RetrievalState != "error" || len(out.RawCalls) != 2 {
+				t.Fatalf("lost failed runs: %+v", out)
+			}
+			for _, call := range out.RawCalls {
+				if call.Tool != toolGetForTask || call.ElapsedNS < 0 {
+					t.Fatalf("bad call: %+v", call)
+				}
+				var args map[string]any
+				if err := json.Unmarshal(call.Arguments, &args); err != nil {
+					t.Fatal(err)
+				}
+				if args["prompt"] != s.Prompt || len(args) != 1 {
+					t.Fatalf("gold leaked into request: %v", args)
+				}
+				if transportFailure {
+					if call.TransportError != "transport failed" || len(call.Response) != 0 {
+						t.Fatalf("lost transport error: %+v", call)
+					}
+				} else {
+					var wire mcpgo.CallToolResult
+					if err := json.Unmarshal(call.Response, &wire); err != nil {
+						t.Fatal(err)
+					}
+					if !wire.IsError || concatText(&wire) != "structured tool failure" {
+						t.Fatalf("lost tool error: %s", call.Response)
+					}
+				}
+			}
+			delete(m.callErr, toolGetForTask)
+			response := packResult(contract.EvidencePack{Query: "second", Citations: []contract.Citation{cit("main.go", 3, 3)}})
+			m.callOut[toolGetForTask] = response
+			s.Runs = 1
+			second, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(second.RawCalls) != 1 || len(out.RawCalls) != 2 {
+				t.Fatal("raw records leaked across scenarios")
+			}
+			var restored mcpgo.CallToolResult
+			if err := json.Unmarshal(second.RawCalls[0].Response, &restored); err != nil {
+				t.Fatal(err)
+			}
+			pack, err := decodePack(&restored)
+			if err != nil || len(pack.Citations) != 1 || pack.Citations[0].File != "main.go" {
+				t.Fatalf("lost raw citations: %v %v", pack, err)
+			}
+			response.StructuredContent = nil
+			if !strings.Contains(string(second.RawCalls[0].Response), "main.go") {
+				t.Fatal("record mutated with client response")
+			}
+			r.recordResponses = false
+			third, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			encoded, err := json.Marshal(third)
+			if err != nil || strings.Contains(string(encoded), "raw_calls") {
+				t.Fatalf("default report changed: %s %v", encoded, err)
+			}
+		})
+	}
+}
 
 // --- mockMCPClient ---
 

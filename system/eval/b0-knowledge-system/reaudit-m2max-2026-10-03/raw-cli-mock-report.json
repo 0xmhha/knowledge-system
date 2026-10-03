@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-03T12:08:53.186576Z",
+  "finished_at": "2026-10-03T12:08:53.237386Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 23068667,
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "423e3199980551431b9564d458f26c19176e5a92",
+              "current_head": "0f4af4f9071fa5779c1a0f7a0e6ebf9725588fa7",
+              "changed_files": [
+                "README.md"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "Where is the Alpha function implemented?"
+          },
+          "elapsed_ns": 27273708,
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "Where is the Alpha function implemented?",
+              "citations": [
+                {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "423e3199980551431b9564d458f26c19176e5a92"
+                },
+                {
+                  "file": "main_test.go",
+                  "start_line": 5,
+                  "end_line": 9,
+                  "commit_hash": "423e3199980551431b9564d458f26c19176e5a92"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "main.go",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "commit_hash": "423e3199980551431b9564d458f26c19176e5a92"
+                  },
+                  "text": "func Alpha() string { return \"alpha\" }",
+                  "token_estimate": 9
+                },
+                {
+                  "citation": {
+                    "file": "main_test.go",
+                    "start_line": 5,
+                    "end_line": 9,
+                    "commit_hash": "423e3199980551431b9564d458f26c19176e5a92"
+                  },
+                  "text": "func TestAlpha(t *testing.T) {\n\tif got := Alpha(); got != \"alpha\" {\n\t\tt.Fatalf(\"Alpha() = %q\", got)\n\t}\n}",
+                  "token_estimate": 26
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 35,
+                "utilization_ratio": 0.004861111111111111,
+                "built_at": "2026-10-03T12:08:53.236987Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "dd1c534f2f39851a837e8d4ae9261c43def5a3b7486527d9e66d0c4c7dabd77b",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "find-alpha",
+      "prompt": "Where is the Alpha function implemented?",
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0.5,
+        "file_recall": 1,
+        "file_f1": 0.6666666666666666,
+        "file_mrr": 1,
+        "token_utilization": 0.004861111111111111,
+        "citation_count": 2,
+        "body_count": 2,
+        "redaction_count": 0,
+        "latency_ms": 27,
+        "latency_ms_p50": 27,
+        "latency_ms_p95": 27,
+        "latency_ms_max": 27
+      },
+      "retrieval_state": "pass",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "current"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0.5,
+      "avg_mrr": 1,
+      "avg_recall": 1,
+      "avg_f1": 0.6666666666666666,
+      "avg_latency_ms": 27
+    }
+  ]
+}

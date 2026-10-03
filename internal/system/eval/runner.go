@@ -66,12 +66,15 @@ type Metrics struct {
 
 // ScenarioResult is the per-scenario row in the final report.
 type ScenarioResult struct {
-	Name      string  `json:"name"`
-	Prompt    string  `json:"prompt"`
-	Intent    string  `json:"intent,omitempty"`
-	Runs      int     `json:"runs"`
-	MatchMode string  `json:"match_mode"`
-	Metrics   Metrics `json:"metrics"`
+	// RawCalls is opt-in so legacy reports retain their shape. It includes
+	// failed calls and freshness checks, not just successful scored packs.
+	RawCalls  []RawToolCall `json:"raw_calls,omitempty"`
+	Name      string        `json:"name"`
+	Prompt    string        `json:"prompt"`
+	Intent    string        `json:"intent,omitempty"`
+	Runs      int           `json:"runs"`
+	MatchMode string        `json:"match_mode"`
+	Metrics   Metrics       `json:"metrics"`
 	// Error, when non-empty, indicates the tool produced an error on
 	// at least one run. Per-run errors are aggregated into a single
 	// summary string; metric fields are best-effort over the
@@ -100,15 +103,28 @@ type ScenarioResult struct {
 // it. Not safe for concurrent Execute calls without external
 // serialization — cks-mcp processes calls sequentially.
 type Runner struct {
-	client mcpClient
-	closed bool
+	client          mcpClient
+	closed          bool
+	recordResponses bool
+	rawCalls        []RawToolCall
+}
+
+// RawToolCall preserves the decoded MCP result before metric aggregation.
+// ElapsedNS measures the tool call only; recording/encoding is outside it.
+type RawToolCall struct {
+	Tool           string          `json:"tool"`
+	Arguments      json.RawMessage `json:"arguments,omitempty"`
+	ElapsedNS      int64           `json:"elapsed_ns"`
+	Response       json.RawMessage `json:"response,omitempty"`
+	TransportError string          `json:"transport_error,omitempty"`
 }
 
 // RunnerOpts configures NewRunner.
 type RunnerOpts struct {
-	CKSMCPBinary string
-	CKSMCPConfig string
-	Env          []string
+	CKSMCPBinary    string
+	CKSMCPConfig    string
+	Env             []string
+	RecordResponses bool
 }
 
 // NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
@@ -133,7 +149,38 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	if err := c.Start(ctx); err != nil {
 		return nil, fmt.Errorf("eval: start cks-mcp: %w", err)
 	}
-	return newRunnerWithClient(ctx, c)
+	runner, err := newRunnerWithClient(ctx, c)
+	if err != nil {
+		return nil, err
+	}
+	runner.recordResponses = opts.RecordResponses
+	return runner, nil
+}
+
+func (r *Runner) callTool(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	start := time.Now()
+	res, callErr := r.client.CallTool(ctx, req)
+	elapsed := time.Since(start).Nanoseconds()
+	if !r.recordResponses {
+		return res, callErr
+	}
+	entry := RawToolCall{Tool: req.Params.Name, ElapsedNS: elapsed}
+	var err error
+	entry.Arguments, err = json.Marshal(req.Params.Arguments)
+	if err != nil {
+		return nil, fmt.Errorf("record arguments: %w", err)
+	}
+	if res != nil {
+		entry.Response, err = json.Marshal(res)
+		if err != nil {
+			return nil, fmt.Errorf("record response: %w", err)
+		}
+	}
+	if callErr != nil {
+		entry.TransportError = callErr.Error()
+	}
+	r.rawCalls = append(r.rawCalls, entry)
+	return res, callErr
 }
 
 func newRunnerWithClient(ctx context.Context, c mcpClient) (*Runner, error) {
@@ -168,6 +215,7 @@ func (r *Runner) Close() error {
 // Only structural failures (nil scenario, broken transport on every
 // run) return an error.
 func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, error) {
+	r.rawCalls = nil
 	if s == nil {
 		return nil, errors.New("eval: nil scenario")
 	}
@@ -225,6 +273,7 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 	}
 
 	out := &ScenarioResult{
+		RawCalls:  r.rawCalls,
 		Name:      s.Name,
 		Prompt:    s.Prompt,
 		Intent:    string(s.Intent),
@@ -286,7 +335,7 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolFreshness
-	res, err := r.client.CallTool(ctx, req)
+	res, err := r.callTool(ctx, req)
 	if err != nil {
 		return "", fmt.Errorf("CallTool(%s): %w", toolFreshness, err)
 	}
@@ -323,8 +372,11 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []strin
 	req.Params.Arguments = args
 
 	t0 := time.Now()
-	res, err := r.client.CallTool(ctx, req)
+	res, err := r.callTool(ctx, req)
 	elapsed := time.Since(t0)
+	if r.recordResponses && len(r.rawCalls) > 0 {
+		elapsed = time.Duration(r.rawCalls[len(r.rawCalls)-1].ElapsedNS)
+	}
 	if err != nil {
 		return Metrics{}, nil, false, fmt.Errorf("CallTool: %w", err)
 	}
