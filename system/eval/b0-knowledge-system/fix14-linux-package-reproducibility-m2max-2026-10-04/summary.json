@@ -1,0 +1,66 @@
+{
+  "status": "verified_with_limits",
+  "scope": "FIX-14 successful native dependency metadata stability and same-source/current-target Linux host-preview reproducibility; C1 preparation remains incomplete",
+  "base_commit": "7c59da3b87a4a8acad81a388224edb480f2ae396",
+  "changes_before_freeze": [
+    "scripts/package-host.py",
+    "scripts/test_package_dependencies.py"
+  ],
+  "toolchain": "Go 1.25.13 / existing Debian bookworm build/runtime images",
+  "platforms": [
+    {
+      "arch": "arm64",
+      "execution": "arm64 Linux VM",
+      "synthetic_source_commit": "331ff24cc6c7ffe30107a4c70fa1c728dc0f864d",
+      "archive_sha256": "7c419a1d205edd9ac3edd50b4c948d0f69870a285963362db7598db6e7a3a0a7",
+      "archive_bytes": 41073346,
+      "archive_members": 106,
+      "file_members": 57,
+      "linked_modules": 33,
+      "collected_notices": 48,
+      "actual_source_copy_checked": 4624,
+      "repeated_public_packager_builds": 2,
+      "python_and_go_verifier_calls": 4,
+      "one_signature_for_both_archives": true,
+      "installation_projects": 3,
+      "actual_three_binary_repeated_dependencies_match_manifest": true
+    },
+    {
+      "arch": "amd64",
+      "execution": "amd64 emulation on arm64 host",
+      "synthetic_source_commit": "360234a77ef371f43584b246d05c6c90b9eb26bb",
+      "archive_sha256": "a24fdd856cf0ea6efdd5d24d7a4a9171ed617b3e26fab04314fe4fcccbd1c0c1",
+      "archive_bytes": 43986123,
+      "archive_members": 106,
+      "file_members": 57,
+      "linked_modules": 33,
+      "collected_notices": 48,
+      "actual_source_copy_checked": 4624,
+      "repeated_public_packager_builds": 2,
+      "python_and_go_verifier_calls": 4,
+      "one_signature_for_both_archives": true,
+      "installation_projects": 3,
+      "actual_three_binary_repeated_dependencies_match_manifest": true
+    }
+  ],
+  "python_regression_tests": 15,
+  "python_test_scope": "4 new dependencies + 10 collection/signed Python + 1 source recipe; synthetic Go verification not enabled in Python unit suite this turn",
+  "actual_go_verification": "both archives on each Linux target share one test signature and pass installed Go verifier",
+  "darwin_dependency_preservation": "three actual prior packaged binaries repeat same versions/dependency identities; no new full Darwin package this turn",
+  "model_or_official_quality": null,
+  "operational_keys_used": false,
+  "legal_review": "pending",
+  "image_ids": {
+    "arm64_build": "sha256:4b20e84ccc0a8a6bf12fafbe4d00295f66a6407b5132f6580c3057656f1bb519",
+    "amd64_build": "sha256:7fbbf391b39e17e7e2eddade0577c60381efc094f19c1b4ce3ff9123f8f8f23b",
+    "arm64_runtime": "sha256:37be188dfb763c2e20ce839df121570a64f6eb60020e2be6a7238574e4c7115d",
+    "amd64_runtime": "sha256:4872b83c4f38164e88421033aa343f35f532278dc32fcb46fa430f312812ac67"
+  },
+  "remaining": [
+    "Linux actual model/large operating cost and native amd64",
+    "operational owner/key/trust/rotation/recovery/support decisions",
+    "native/transitive/system-header/translated source licensing adequacy human review",
+    "B0 scope/protocol/dynamic/semantic actual human decisions and static v2 date/subsystem binding",
+    "official B0/B1/C0/C1 execution and verdicts"
+  ]
+}

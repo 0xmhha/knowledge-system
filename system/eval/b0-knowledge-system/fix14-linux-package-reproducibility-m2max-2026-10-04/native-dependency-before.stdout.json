@@ -1,0 +1,15 @@
+{
+  "scope": "two dependency inspections of the same previously verified owned Linux binary",
+  "binary_sha256": "77585d5151a59e6b21dcb5ac9293c553a9b8a1dc35e95e3417a2351427d6c9e3",
+  "first": [
+    "\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffba130000)",
+    "\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb9f80000)",
+    "\t/lib/ld-linux-aarch64.so.1 (0x0000ffffba1e0000)"
+  ],
+  "second": [
+    "\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff842d0000)",
+    "\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff84120000)",
+    "\t/lib/ld-linux-aarch64.so.1 (0x0000ffff84380000)"
+  ],
+  "identical": false
+}

@@ -21,7 +21,7 @@ Tree-sitter runtime 원문 고지와 내부 Unicode LICENSE, Go toolchain 및 ve
 | Go 모듈 원문 수집 | 세 바이너리 연결 35개·root 고지 41개·누락 0·해시 확인 | 라이선스 적합성·고지 충족의 사람 검토 |
 | 내장 native 자산 | 로컬 Solidity grammar 2개 고지·소스 8개 SHA·두 검증기의 변조 거부 | Tree-sitter 44개·Solidity 6개·JS/TS/SQLite/vec 41개 출처 확인; 전이/native/system-header/translated SQLite 범위와 적합성 검토 |
 | 운영 서명 | 기존 signer는 test-signed-preview만 생성 | 운영 소유자·public key fingerprint·보관/회전/폐기 정책·신뢰 루트 승인 |
-| 지원 플랫폼 | 이전 macOS/Linux mock preview 재검증 기록 | 최신 세 플랫폼 mock preview 통과; FIX-14·native amd64·실제 Linux Ollama·대규모 운영 비용 |
+| 지원 플랫폼 | 이전 macOS/Linux mock preview 재검증 기록 | 최신 세 플랫폼 mock preview·FIX-14 Linux paired archive 통과; native amd64·실제 Linux Ollama·대규모 운영 비용 |
 | 복구·마이그레이션 | 기존 A 구조 시험·문서 | 최종 C1 패키지의 이전 데이터 보존·rollback 재생 |
 | 품질·출시 | 공식 품질 지표 null | 승인 입력/프로토콜·B0/B1·C0/C1 판정과 출시 결정 |
 
@@ -33,3 +33,8 @@ Tree-sitter runtime 원문 고지와 내부 Unicode LICENSE, Go toolchain 및 ve
 고지 수집 후 호스트 스모크에 남아 있던 ‘자산 두 개’ 가정이 실제 네 자산 패키지를 거부했다. FIX-13에서 필수 소스/고지 전용 자산·중복·실제 count·원문 SHA를 각각 확인하게 수정했다. 수정 전 실패와 후 세 프로젝트 설치/재시작/업데이트/롤백을 보존했다. 최신 macOS는 35모듈·50고지, Linux arm64/amd64 에뮬레이션은 각각 33모듈·48고지다. OS와 Go 도구 체인이 모두 달라 단일 원인으로 이 차이를 해석하지 않는다. 두 Linux 고지 48개는 실제 빌드 이미지 Go 원문·읽기 전용 캐시·저장소와 같고, 두 시험 서명 검증기와 Go 없는 런타임의 세 프로젝트 설치/복구가 통과했다. native amd64·Linux 실모델은 미검증이다.
 
 추가 검증에서 같은 Linux 바이너리의 반복 `ldd` 주소가 달라짐을 확인했다. packaging이 그 주소를 manifest에 보존하므로 FIX-14로 metadata 안정성을 수정해야 한다. 현재 Linux 서명/설치 통과를 재현성 통과로 세지 않는다. 늦은 빌더 소스 대조는 임시 컨테이너 종료로 수행하지 못했으며, 동결 입력 선언과 독립 실제 대조를 구분한다. 다음 우선순위는 FIX-14, 이후 운영 신뢰·지원·복구 검토 자료다.
+
+
+2026-10-04 FIX-14 수정·검증: [재현성 원장](../../system/eval/b0-knowledge-system/fix14-linux-package-reproducibility-m2max-2026-10-04/summary.json)의 Linux ldd 주소만 안정화하고 첫 의존/정적 링크 진단을 유지했다. Python 15개 시험과 실제 기존 macOS 세 바이너리의 dependency 버전/신원 유지 확인을 통과했다. Linux 각 대상의 실제 builder copy-input 4,624개를 대조한 뒤 같은 합성 source commit으로 공개 packager를 두 번 실행했다. 두 fresh 빌드의 106개 항목과 전체 archive SHA가 같고 같은 시험 sidecar를 두 archive에 적용해 Python/Go 모두 통과했다. 실제 세 Linux 바이너리의 반복 dependency metadata와 세 프로젝트 설치·재시작·업데이트·rollback도 확인했다. FIX-14는 이 도구 체인/대상 범위에서 완료다. Linux 실모델·native amd64·운영 비용/최종 후보는 별도다.
+
+운영 role·scope·키·신뢰 경로·교체/폐기·지원/복구의 실제 결정은 [C1 운영 검토표](./C1-OPERATIONS-REVIEW.md)에 분리했다. 현재 도구가 시험 scope만 검증한다는 사실과 아직 없는 운영 신뢰/효력 정책을 구분한다. public DER fingerprint와 실제 소유자/경로를 시험 키 원장에서 채우지 않는다. C1-05의 사람 적합성·운영 판정 및 C1-04/06/07 종료는 미완료다.

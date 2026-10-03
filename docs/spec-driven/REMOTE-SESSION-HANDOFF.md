@@ -71,3 +71,6 @@
 
 
 2026-10-04 추가 native/플랫폼 후속: [작업리스트 15절](./EXECUTION-WORKLIST.md)에서 JS/TS·SQLite/vec의 고정 upstream 41개 원문 일치를 확인했다. 호스트 스모크의 오래된 두 자산 가정은 FIX-13으로 수정 후 세 프로젝트 재검증 통과. 최신 Linux arm64·amd64 에뮬레이션은 33모듈/48고지·두 시험 서명 검증기·Go 없는 런타임의 세 프로젝트 설치/복구 통과. native amd64/Linux 실모델/운영 판정은 미완료다. 같은 Linux 바이너리의 반복 ldd 주소가 metadata를 바꾸는 FIX-14를 재현하여 다음 P1로 등록했다. 늦은 source 대조는 임시 빌더 종료 때문에 수행되지 않았다. 서명·설치 통과를 Linux 재현성이나 공식 품질로 세지 않는다.
+
+
+2026-10-04 FIX-14 후속: [작업리스트 16절](./EXECUTION-WORKLIST.md)의 ldd load address를 제거하고 첫 의존/정적 링크 진단을 유지했다. Linux 각 대상의 actual copy-input 4,624개 대조·같은 합성 commit의 공개 packager fresh build 두 번·106개 항목/전체 archive SHA 동일·하나의 시험 서명을 두 archive의 Python/Go에서 검증·세 프로젝트 설치/복구를 통과했다. 실제 macOS dependency metadata도 유지했다. [운영 검토표](./C1-OPERATIONS-REVIEW.md)의 OP-01–08은 미정이며 시험 scope/키로 운영 신뢰를 승인하지 않는다. B0 범위·프로토콜/동적 입력·의미 사실 결정을 다시 요청했다. 다음 독립 작업은 Linux 실제 모델 가용성/진단과 native/translated source 검토 자료이며 공식 품질·운영 판정은 남아 있다.

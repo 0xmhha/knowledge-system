@@ -100,7 +100,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 대기 |
-| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; 전이 native 범위·FIX-14·운영 정책·사람 판정 남음 |
+| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 검증 통과; 전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 대기 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
 
@@ -153,7 +153,7 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 | FIX-11 | P1 · 정적 입력 경계 재검증 | 기존 질문 ID가 경로 문자를 허용하고 export에서 소문자 파일명으로 바뀌어 경로 이탈/충돌 가능성이 있다. 안전한 ID와 대소문자 구분 없는 유일성을 요구한다. | 수정 후 재검증 완료: 원래 HEAD의 다섯 ID 실패를 모델/네트워크 없이 재현; 수정 후 26개 B0 회귀 통과; 정상 기존 export 13개 파일 바이트 동일 |
 | FIX-12 | P1 · native 고지 확대 후 실제 패키지 검증 | Unicode/runtime/toolchain 고지를 포함한 110항목 정상 tar가 Python/Go의 기존 100항목 상한에 걸린다. 유한 상한을 맞추고 경계·변조 거부와 실제 설치를 확인한다. | 수정 후 재검증 완료: 수정 전 Python/Go 실패 보존; 상한 256개 통과·257개 거부, 고지 50개 preview의 두 서명 검증기·세 프로젝트 설치/재시작/업데이트/롤백 통과; 재서명 Unicode 변조 거부. C1 출시/적합성은 별도 |
 | FIX-13 | P1 · 최신 호스트 스모크 재검증 | 고지 자산을 두 개로 가정하던 스모크가 새 네 자산의 정상 패키지를 거부한다. 필수 자산·소스/고지 전용 범위·실제 count·중복·SHA를 검사한다. | 수정 후 재검증 완료: 실제 수정 전 assertion 실패와 후 macOS 세 프로젝트 설치/재시작/업데이트/롤백 통과. 현재 두 Linux 시험 서명·설치/복구도 통과 |
-| FIX-14 | P1 · Linux 패키지 metadata 재현성 | 같은 바이너리를 두 번 검사한 ldd 주소가 달라 package manifest의 native_dependencies가 변동한다. 라이브러리/해결 경로/오류/버전 정보를 보존하며 일시 주소를 안정화한다. | 진행: 같은 실제 검증된 ARM64 바이너리의 두 검사 불일치 재현·원자료 보존. metadata 수정과 실제 패키지 재현성 검증 남음 |
+| FIX-14 | P1 · Linux 패키지 metadata 재현성 | 같은 바이너리를 두 번 검사한 ldd 주소가 달라 package manifest의 native_dependencies가 변동한다. 라이브러리/해결 경로/오류/버전 정보를 보존하며 일시 주소를 안정화한다. | 수정 후 재검증 완료: 주소만 제거하며 첫 ldd 의존/정적 링크 진단 유지; 실제 Linux 두 대상의 각 4,624개 copy-input·두 공개 packager 빌드·전체 파일/모드/archive SHA 동일·동일 시험 서명/Python/Go 검증·세 프로젝트 설치/복구 통과. 도구 체인/대상별 제한 유지 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -219,3 +219,14 @@ Unicode 내부 고지, Tree-sitter native runtime 원문 고지, Go toolchain/ve
 정상 호스트 패키지의 스모크만 오래된 두 자산 가정으로 실패했다. 실제 수정 후 macOS arm64의 세 프로젝트 설치·조회·재시작·업데이트·롤백이 통과했다. Linux arm64와 amd64 에뮬레이션은 현재 source recipe의 시험 서명 패키지로 두 서명 검증기·Go 없는 Debian 런타임의 같은 세 프로젝트 설치/복구를 통과했다. macOS는 Go 1.26.8·35모듈/50고지, Linux는 Go 1.25.13·33모듈/48고지다. 대상과 도구 체인 차이를 함께 기록했고 원문 SHA도 대조했다. Linux Git commit은 합성 source fixture로 원래 release commit이 아니다. 4,177개 동결 copy-input 해시를 보존했으나 늦은 live builder 대조는 종료된 컨테이너 때문에 수행되지 않았고 실패 원문을 별도로 보존했다.
 
 추가 독립 검사에서 같은 실제 Linux 바이너리의 두 native dependency 결과가 ASLR 주소 때문에 달랐다. FIX-14를 실제 실패로 등록했다. 다음 우선순위는 라이브러리/해결 경로/오류를 유지한 metadata 안정화와 Linux 패키지 재현성 검증이다. 이후 운영 키·신뢰 루트·지원/복구 자료를 준비한다. C1-04/05 운영 판정과 B0/B1/C0/C1 공식 품질은 여전히 미완료이며 사람의 입력·프로토콜·의미 사실·적합성 결정이 필요하다.
+
+
+## 16. Linux 패키지 재현성과 운영 결정 자료
+
+2026-10-04 FIX-14: [원장](../../system/eval/b0-knowledge-system/fix14-linux-package-reproducibility-m2max-2026-10-04/summary.json)의 실제 동일 바이너리 반복 검사 실패를 수정했다. Linux ldd의 per-process 주소 suffix만 제거한다. Linux에는 heading이 없으므로 기존의 첫 줄 삭제도 제거하여 virtual dependency·정적 링크·누락 진단을 유지했다. macOS otool heading 제거와 라이브러리 버전 정보는 그대로다. 수정 전 두 회귀 실패, 수정 후 Python 15개 시험, 실제 기존 macOS 세 바이너리의 dependency metadata 동등성을 보존했다.
+
+Linux arm64와 amd64 에뮬레이션 각각에서 실제 빌더의 copy-input 4,624개 bytes/실행 비트가 동결 입력과 같았다. 같은 합성 source commit으로 공개 package-host를 두 번 실행해 매번 세 바이너리를 빌드했고, 106개 항목의 경로·파일 SHA·크기·모드 및 archive 전체 SHA가 같았다. 대상별 하나의 시험 서명으로 두 archive를 Python/Go에서 모두 검증했다. 추출한 바이너리로 Go 없는 Debian 런타임의 세 프로젝트 설치·MCP 재시작·업데이트·rollback도 통과했다. 실제 세 Linux 바이너리의 dependency 검사를 두 번씩 반복해 manifest와 같은지도 확인했다. 원래 release commit의 운영 빌드, 서로 다른 대상/도구 체인의 동일 SHA, native amd64/실모델 품질을 입증한 것은 아니다.
+
+[C1-OPERATIONS-REVIEW](./C1-OPERATIONS-REVIEW.md)에 운영 역할·배포 scope·public key DER fingerprint/독립 신뢰 경로·개인 키 관리·교체/폐기·적합성·지원·복구의 OP-01–08 결정을 정리했다. 현재 signer/verifier는 test-signed-preview만 지원하며 기간/폐기 조회/운영 scope는 없다. 시험 키를 운영 키로 승격하지 않았고 운영 출시·사람 역할/키/정책은 미정이다. C1-05는 준비 진행 상태를 유지한다.
+
+B0-01 범위, B0-02/03 프로토콜/동적 입력, B0-05 의미 사실의 실제 사람 결정을 다시 요청했다. 기존 정적 gold/BGE-M3 승인 범위를 확장하지 않는다. 정적 v2의 날짜/subsystem과 설정 K 결합도 남아 있다. 다음 가능한 독립 작업은 Linux 실제 Ollama/BGE-M3 진단의 환경·모델 가용성 확인과 남은 native/translated source 검토 자료다. 공식 B0/B1/C0/C1·운영 키/적합성/출시 판정은 계속 미완료다.
