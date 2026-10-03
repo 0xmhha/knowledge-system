@@ -14,17 +14,21 @@ import (
 	"sort"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/0xmhha/knowledge-system/internal/githistory"
 )
 
-// SourceIdentity is calculated from source bytes, not the checkout name or
-// absolute path. The format is versioned so a future selection policy cannot
-// silently reuse an old snapshot ID.
+// SourceIdentity is calculated from source bytes and, for Git modes, the
+// selected recovery commits; it excludes the checkout name and absolute path.
+// The format is versioned so a changed input policy cannot silently reuse an
+// old snapshot ID.
 type SourceIdentity struct {
 	ProjectID           string `json:"project_id"`
 	SourceMode          string `json:"source_mode"`
 	SourceCommit        string `json:"source_commit"`
 	FileManifestDigest  string `json:"file_manifest_digest"`
 	CapturePolicyDigest string `json:"capture_policy_digest"`
+	GitRecoveryDigest   string `json:"git_recovery_digest,omitempty"`
 	SnapshotID          string `json:"snapshot_id"`
 }
 
@@ -71,8 +75,26 @@ func capturePolicyDigest(mode string) string {
 }
 
 func sourceSnapshotID(s SourceIdentity) string {
+	if s.GitRecoveryDigest != "" {
+		return identityHashFields("cks.snapshot.v3", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest, s.GitRecoveryDigest)
+	}
+	// Historical pinned versions retain their v2 identity and remain readable.
 	return identityHashFields("cks.snapshot.v2", s.ProjectID, s.SourceMode,
 		s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest)
+}
+
+// gitRecoveryDigest hashes the same capped commit selection as CKG's
+// recovery graph. A zero-commit Git repository still has a nonempty digest.
+func gitRecoveryDigest(root, mode string) (string, error) {
+	if mode == "snapshot-only" {
+		return "", nil
+	}
+	commits, err := githistory.RecoveryCommitIDs(root, 0)
+	if err != nil {
+		return "", fmt.Errorf("read Git recovery input: %w", err)
+	}
+	return identityHashFields("cks.git-recovery.v1", commits...), nil
 }
 
 func identityHash(domain string, value any) (string, error) {
@@ -106,6 +128,10 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 		if head, err := captureHead(root); err != nil || head != commit {
 			return SourceIdentity{}, fmt.Errorf("source base commit changed: %v", err)
 		}
+	}
+	recoveryBefore, err := gitRecoveryDigest(root, mode)
+	if err != nil {
+		return SourceIdentity{}, err
 	}
 	paths, err := captureModePaths(root, mode)
 	if err != nil {
@@ -177,8 +203,16 @@ func SnapshotSourceIdentity(root, projectID, mode, commit string, externalOrigin
 			return SourceIdentity{}, fmt.Errorf("source base commit changed during inventory: %v", err)
 		}
 	}
+	recoveryAfter, err := gitRecoveryDigest(root, mode)
+	if err != nil {
+		return SourceIdentity{}, err
+	}
+	if recoveryBefore != recoveryAfter {
+		return SourceIdentity{}, fmt.Errorf("Git recovery input changed during inventory")
+	}
 	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
-		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest(mode)}
+		FileManifestDigest: fileManifestDigest(files), CapturePolicyDigest: capturePolicyDigest(mode),
+		GitRecoveryDigest: recoveryAfter}
 	result.SnapshotID = sourceSnapshotID(result)
 	return result, nil
 }

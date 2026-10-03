@@ -6,8 +6,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
+
+	"github.com/0xmhha/knowledge-system/internal/githistory"
 )
 
 func TestSourceIdentityLengthPrefixedGolden(t *testing.T) {
@@ -101,6 +104,102 @@ func TestCommittedSourceIdentitySeparatesProjectsAndBytes(t *testing.T) {
 	identityGit(t, root, "add", "link.go")
 	if _, err := CommittedSourceIdentity(root, "p-first", head); err == nil || !strings.Contains(err.Error(), "regular file") {
 		t.Fatalf("tracked symlink followed: %v", err)
+	}
+}
+
+func TestPinnedIdentityIncludesRecoveryHistoryWithSameHEADAndFiles(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	file := filepath.Join(root, "main.go")
+	if err := os.WriteFile(file, []byte("package sample\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "base")
+	base := identityGit(t, root, "rev-parse", "HEAD")
+	before, err := CommittedSourceIdentity(root, "p", base)
+	if err != nil || before.GitRecoveryDigest == "" {
+		t.Fatalf("initial recovery identity: %+v %v", before, err)
+	}
+	// A complete candidate may be promoted while the source input matches.
+	dataset := t.TempDir()
+	version := filepath.Join(dataset, "v1")
+	buildInputs := "inputs"
+	embedding := json.RawMessage(`{"model":"mock","dim":8,"checksum":"fixture-space"}`)
+	prebuild, err := NewDatasetIdentity(before, embedding, buildInputs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph := map[string]any{"src_commit": base, "graph_digest": "g", "schema_version": "1.23"}
+	vector := map[string]any{"src_commit": base, "chunk_count": 1, "embedding_model": "mock",
+		"embedding_dim": 8, "embedding_checksum": "fixture-space",
+		"sources": map[string]any{"ckg": map[string]any{"src_commit": base, "graph_digest": "g"}}}
+	for _, manifest := range []map[string]any{graph, vector} {
+		addNativePins(manifest, before, prebuild.DatasetID)
+	}
+	writeManifest(t, filepath.Join(version, "graph"), graph)
+	writeManifest(t, filepath.Join(version, "vector"), vector)
+	if _, err := PublishCandidateIdentity(version, before, buildInputs); err != nil {
+		t.Fatal(err)
+	}
+	gate := GateOptions{GraphBin: "ckg", Src: root, ExpectedSourceCommit: base,
+		ExpectedSourceSnapshot: before, ExpectedInputDigest: buildInputs,
+		ExpectedDatasetID: prebuild.DatasetID}
+	if err := Gate(context.Background(), dataset, "v1", gate, gateRunner{}, nil); err != nil {
+		t.Fatalf("unchanged recovery input failed gate: %v", err)
+	}
+	if err := os.WriteFile(file, []byte("package sample\nvar Lost = 1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", "abandoned")
+	abandoned := identityGit(t, root, "rev-parse", "HEAD")
+	identityGit(t, root, "reset", "--hard", base)
+	after, err := CommittedSourceIdentity(root, "p", base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after.SourceCommit != before.SourceCommit || after.FileManifestDigest != before.FileManifestDigest ||
+		after.GitRecoveryDigest == before.GitRecoveryDigest || after.SnapshotID == before.SnapshotID {
+		t.Fatalf("same files and HEAD reused recovery identity: before=%+v after=%+v", before, after)
+	}
+	if err := Gate(context.Background(), dataset, "v1", gate, gateRunner{}, nil); err == nil ||
+		!strings.Contains(err.Error(), "source snapshot changed") {
+		t.Fatalf("changed recovery input passed promotion gate: %v", err)
+	}
+	ids, err := githistory.RecoveryCommitIDs(root, 0)
+	if err != nil || len(ids) != 1 || ids[0] != abandoned {
+		t.Fatalf("graph recovery selection: %v %v", ids, err)
+	}
+	input := strings.Repeat("i", 64)
+	oldDataset, err := NewDatasetIdentity(before, json.RawMessage(`{"model":"fixture"}`), input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newDataset, err := NewDatasetIdentity(after, json.RawMessage(`{"model":"fixture"}`), input)
+	if err != nil || newDataset.DatasetID == oldDataset.DatasetID {
+		t.Fatalf("changed recovery history reused dataset ID: %v", err)
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: filepath.Join(t.TempDir(), "candidate"),
+		ProjectID: "p", SourceMode: "committed", SourceCommit: base})
+	if err != nil || captured.Identity != after {
+		t.Fatalf("capture differs from pre-build identity: %+v %v", captured.Identity, err)
+	}
+	build := filepath.Join(t.TempDir(), "build")
+	cleanup, err := captured.MaterializeBuildTree(build)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = cleanup() }()
+	stagedIDs, err := githistory.RecoveryCommitIDs(build, 0)
+	if err != nil || !slices.Equal(stagedIDs, ids) {
+		t.Fatalf("staged CKG recovery input differs from pinned source: %v, want %v: %v", stagedIDs, ids, err)
+	}
+	clone := filepath.Join(t.TempDir(), "clean")
+	identityGit(t, root, "clone", "-q", "--no-local", root, clone)
+	clean, err := CommittedSourceIdentity(clone, "p", base)
+	if err != nil || clean.FileManifestDigest != after.FileManifestDigest || clean.GitRecoveryDigest != before.GitRecoveryDigest {
+		t.Fatalf("independent clone did not exclude recovery history: %+v %v", clean, err)
 	}
 }
 

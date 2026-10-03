@@ -87,6 +87,10 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 			return CapturedSource{}, fmt.Errorf("working-tree base commit changed before capture: %v", err)
 		}
 	}
+	recoveryBefore, err := gitRecoveryDigest(root, o.SourceMode)
+	if err != nil {
+		return CapturedSource{}, err
+	}
 	out, err := filepath.Abs(o.Out)
 	if err != nil {
 		return CapturedSource{}, err
@@ -193,6 +197,13 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 			return CapturedSource{}, fmt.Errorf("working-tree base commit changed during capture: %v", err)
 		}
 	}
+	recoveryAfter, err := gitRecoveryDigest(root, o.SourceMode)
+	if err != nil {
+		return CapturedSource{}, err
+	}
+	if recoveryBefore != recoveryAfter {
+		return CapturedSource{}, fmt.Errorf("Git recovery input changed during capture")
+	}
 	files := make([]sourceFile, 0, len(result.Files))
 	for _, f := range result.Files {
 		files = append(files, sourceFile{OriginID: f.OriginID, Path: f.Path,
@@ -201,7 +212,7 @@ func CaptureSource(o CaptureOptions) (CapturedSource, error) {
 	manifest := fileManifestDigest(files)
 	result.Identity = SourceIdentity{ProjectID: o.ProjectID, SourceMode: o.SourceMode,
 		SourceCommit: o.SourceCommit, FileManifestDigest: manifest,
-		CapturePolicyDigest: capturePolicyDigest(o.SourceMode)}
+		CapturePolicyDigest: capturePolicyDigest(o.SourceMode), GitRecoveryDigest: recoveryAfter}
 	result.Identity.SnapshotID = sourceSnapshotID(result.Identity)
 	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), result); err != nil {
 		return CapturedSource{}, err

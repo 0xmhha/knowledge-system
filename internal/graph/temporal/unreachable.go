@@ -27,14 +27,9 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-)
 
-// unreachableCommitsDefault caps the unreachable walk so a repo with
-// thousands of GC-pending commits doesn't blow up the build. 100 is
-// generous for the recovery use case (the user just needs the most
-// recent overwrite that an agent might have wiped) while staying well
-// under the worst-case fsck output size.
-const unreachableCommitsDefault = 100
+	"github.com/0xmhha/knowledge-system/internal/githistory"
+)
 
 // LoadUnreachableHunks returns commits + hunks for SHAs reachable via
 // reflog or fsck-unreachable but NOT from HEAD. maxCommits ≤ 0 uses
@@ -47,43 +42,13 @@ const unreachableCommitsDefault = 100
 // 10K+ commits. The per-SHA `git show` is ~50ms each, so a 100-commit
 // cap keeps the worst-case under 5s on commodity hardware.
 func LoadUnreachableHunks(repoRoot string, maxCommits int) ([]CommitInfo, []HunkInfo, error) {
-	if maxCommits <= 0 {
-		maxCommits = unreachableCommitsDefault
-	}
-	if !isGitCheckout(repoRoot) {
-		return nil, nil, nil
-	}
-	reachable, err := readReachableSet(repoRoot)
+	unreachable, err := githistory.RecoveryCommitIDs(repoRoot, maxCommits)
 	if err != nil {
-		return nil, nil, fmt.Errorf("rev-list HEAD: %w", err)
-	}
-	candidates := map[string]struct{}{}
-	for sha := range readReflogSHAs(repoRoot) {
-		candidates[sha] = struct{}{}
-	}
-	for sha := range readFsckUnreachable(repoRoot) {
-		candidates[sha] = struct{}{}
-	}
-	// Drop everything HEAD already reaches — that's the EXTRACTED set
-	// LoadHunks already covers.
-	var unreachable []string
-	for sha := range candidates {
-		if _, hit := reachable[sha]; hit {
-			continue
-		}
-		unreachable = append(unreachable, sha)
+		return nil, nil, err
 	}
 	if len(unreachable) == 0 {
 		return nil, nil, nil
 	}
-	if len(unreachable) > maxCommits {
-		// Stable order so cap doesn't pick a different subset on each
-		// run (reflog is naturally most-recent-first; alphabetic on
-		// the SHA string preserves determinism).
-		sortStrings(unreachable)
-		unreachable = unreachable[:maxCommits]
-	}
-
 	var commits []CommitInfo
 	var hunks []HunkInfo
 	for _, sha := range unreachable {
@@ -98,66 +63,6 @@ func LoadUnreachableHunks(repoRoot string, maxCommits int) ([]CommitInfo, []Hunk
 		hunks = append(hunks, hs...)
 	}
 	return commits, hunks, nil
-}
-
-// readReachableSet builds {sha → present} for every commit reachable
-// from HEAD. Used to subtract from the (reflog ∪ fsck) candidate set.
-func readReachableSet(repoRoot string) (map[string]struct{}, error) {
-	cmd := exec.Command("git", "-C", repoRoot, "rev-list", "HEAD", "--")
-	out, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-	set := make(map[string]struct{}, 4096)
-	for _, line := range bytes.Split(out, []byte{'\n'}) {
-		s := strings.TrimSpace(string(line))
-		if len(s) == 40 {
-			set[s] = struct{}{}
-		}
-	}
-	return set, nil
-}
-
-// readReflogSHAs enumerates commit SHAs from the local reflog. Returns
-// an empty map (not an error) for repos with no reflog — fresh
-// checkouts and bare repos commonly have none.
-func readReflogSHAs(repoRoot string) map[string]struct{} {
-	cmd := exec.Command("git", "-C", repoRoot, "reflog", "--all", "--pretty=%H")
-	out, err := cmd.Output()
-	if err != nil {
-		return map[string]struct{}{}
-	}
-	set := map[string]struct{}{}
-	for _, line := range bytes.Split(out, []byte{'\n'}) {
-		s := strings.TrimSpace(string(line))
-		if len(s) == 40 {
-			set[s] = struct{}{}
-		}
-	}
-	return set
-}
-
-// readFsckUnreachable parses `git fsck --no-reflogs --unreachable`
-// output, extracting commit SHAs from `unreachable commit <sha>` lines.
-// Skips blob/tree dangling entries — only the commit-level SHAs are
-// useful for hunk extraction. Returns empty on any error so the caller
-// keeps reflog candidates.
-func readFsckUnreachable(repoRoot string) map[string]struct{} {
-	// fsck writes its findings to stderr, not stdout. Combine streams
-	// so we capture both regardless of git version.
-	cmd := exec.Command("git", "-C", repoRoot, "fsck", "--no-reflogs", "--unreachable")
-	out, _ := cmd.CombinedOutput()
-	set := map[string]struct{}{}
-	for _, line := range bytes.Split(out, []byte{'\n'}) {
-		fields := strings.Fields(string(line))
-		// Lines look like: "unreachable commit <40-char-sha>"
-		// Older gits also emit "dangling commit <sha>" — fold both.
-		if len(fields) == 3 && (fields[0] == "unreachable" || fields[0] == "dangling") &&
-			fields[1] == "commit" && len(fields[2]) == 40 {
-			set[fields[2]] = struct{}{}
-		}
-	}
-	return set
 }
 
 // loadCommitWithHunks runs `git show <sha>` and parses the result via
@@ -201,15 +106,4 @@ func loadCommitWithHunks(repoRoot, sha string) (CommitInfo, []HunkInfo, error) {
 		info.SHA = sha
 	}
 	return info, hunks, nil
-}
-
-// sortStrings is a small std-lib-free in-place sort to avoid pulling
-// "sort" into this file's import set. Used once per build for the
-// unreachable cap; an O(n²) bubble is fine at n=100.
-func sortStrings(s []string) {
-	for i := 1; i < len(s); i++ {
-		for j := i; j > 0 && s[j-1] > s[j]; j-- {
-			s[j-1], s[j] = s[j], s[j-1]
-		}
-	}
 }
