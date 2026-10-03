@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "gate": "B0-protocol-input-definition",
+  "status": "pending",
+  "scope": "static/dynamic input bytes and partition declarations; not corpus scope, semantic-fact, runtime, quality or release readiness",
+  "partition": "development",
+  "diagnostic_only": true,
+  "official_execution_ready": false,
+  "v2_matrix_ready": false,
+  "question_set_sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+  "protocol_sha256": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+  "fixture_manifest_sha256": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+  "human_review_sha256": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "corpus_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "static_approved_count": 12,
+  "dynamic_approved_count": 0,
+  "selected_ids": [
+    "B0-CODE-01",
+    "B0-WHY-03",
+    "B0-POLICY-01",
+    "B0-TRACE-01"
+  ],
+  "withheld_ids": [
+    "B0-CODE-02",
+    "B0-CODE-03",
+    "B0-WHY-01",
+    "B0-WHY-02",
+    "B0-POLICY-02",
+    "B0-POLICY-03",
+    "B0-ABS-01",
+    "B0-ABS-02"
+  ],
+  "retrieval_k": 10,
+  "runs": {
+    "retrieval": 5,
+    "warmup": 2,
+    "warm_latency": 20,
+    "cold_process": 3
+  },
+  "model": {
+    "provider": "ollama",
+    "model": "bge-m3:latest",
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "endpoint": "http://127.0.0.1:11434",
+    "runtime_options": {
+      "num_ctx": 8192,
+      "num_batch": 8192
+    },
+    "server_version": "0.35.1"
+  },
+  "pending_reasons": [
+    "protocol_review_pending",
+    "dynamic_fixture_review_pending"
+  ],
+  "final_independent_questions_by_group": {
+    "abstention": 2,
+    "code_location": 2,
+    "policy_conflict": 2,
+    "why_design": 2
+  },
+  "subgroup_release_inference": "inconclusive: every final group has fewer than 10 independent questions",
+  "metrics": null,
+  "remaining_execution_prerequisites": [
+    "corpus source-coverage decision and fresh strict build audit",
+    "source-bound semantic fact/supplement review and locked pack/semantic identities",
+    "v2 knowledge date/subsystem request scopes and runtime config K/filter binding",
+    "actual environment/model/binary/input preflight and independent final execution"
+  ]
+}

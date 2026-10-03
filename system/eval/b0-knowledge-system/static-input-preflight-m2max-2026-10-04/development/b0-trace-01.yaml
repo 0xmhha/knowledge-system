@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "b0-trace-01",
+  "prompt": "What must match before CKS can claim an ADR requirement has a verified code and test implementation path?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "internal/system/evidencev2/knowledge_trace.go",
+      "start_line": 20,
+      "end_line": 115,
+      "anchor": "func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, versionDir, asOf, subsystem string, projection semantic.ActiveProjection, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {"
+    }
+  ]
+}

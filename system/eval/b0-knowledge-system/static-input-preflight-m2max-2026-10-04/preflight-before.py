@@ -65,10 +65,9 @@ def validate_questions(raw):
     blobs = {}
     for question in questions:
         qid = question.get("id")
-        if (not isinstance(qid, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", qid)
-                or qid.lower() in seen):
-            raise ValueError("question ID must be a safe, case-insensitively unique filename")
-        seen.add(qid.lower())
+        if not isinstance(qid, str) or not qid or qid in seen:
+            raise ValueError("question ID missing or duplicate")
+        seen.add(qid)
         if question.get("group") not in GROUPS or question.get("language") not in {"ko", "en"}:
             raise ValueError(f"{qid}: unknown group/language")
         if not question.get("prompt") or not question.get("candidate_answer"):
