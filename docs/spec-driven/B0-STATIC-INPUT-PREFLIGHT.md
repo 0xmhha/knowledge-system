@@ -12,7 +12,7 @@
 - 네 모드·팩 off/on, K10/F-01 K5, 기존 회귀 임계치, 반복 수의 정수/범위, warm/cold·불확실성 선언을 검사한다. JSON 중복 키·잘못된 해시·임계치 완화·최종/개발 혼입을 거부한다.
 - 현재 최종 질문은 군별 독립 질문 2개씩이다. 반복 5회·warm 20회는 독립 질문 수를 늘리지 않는다. 군별 출시 추론은 inconclusive다.
 
-현재 결과는 `pending_reasons=[protocol_review_pending, dynamic_fixture_review_pending]`, 정적 승인 12/12·동적 승인 0/12다. 프로토콜·동적 문서·모든 동적 사례의 선언된 승인 메타데이터가 맞으면 `approved_input_definition`이 되지만, 이 상태도 입력 정의만의 판정이다. `official_execution_ready=false`, `v2_matrix_ready=false`, `metrics=null`을 유지한다. 실제 소스 범위·의미 사실 검토·새 strict 빌드·팩/semantic 신원·v2 날짜/subsystem·실제 K/필터·환경/모델/바이너리 잠금은 별도 실행 선행 조건이다.
+현재 결과는 `pending_reasons=[protocol_review_pending, dynamic_fixture_review_pending]`, 정적 승인 12/12·동적 승인 0/12다. 프로토콜·동적 문서·모든 동적 사례의 승인 메타데이터와 사람 결정의 정확한 protocol/fixture 원문 SHA 결합이 맞으면 `approved_input_definition`이 되지만, 이 상태도 입력 정의만의 판정이다. `official_execution_ready=false`, `v2_matrix_ready=false`, `metrics=null`을 유지한다. 실제 소스 범위·의미 사실 검토·새 strict 빌드·팩/semantic 신원·v2 날짜/subsystem·실제 K/필터·환경/모델/바이너리 잠금은 별도 실행 선행 조건이다.
 
 ## 재현 명령
 
@@ -49,3 +49,6 @@ python3 scripts/b0-prepare-static-inputs.py \
 
 
 정적 v2의 미지정 날짜/subsystem·K 결합은 [STV2-01 검토 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)과 별도 checker로 구체화했다. 현재는 draft·승인 대기이며, 실제 runtime YAML/계측 K와 source-bound pack/semantic 신원 및 새 strict 데이터셋에 연결하기 전에는 v2_matrix_ready가 아니다.
+
+
+2026-10-04 완료 재감사에서 메타데이터만으로 보류 중 최종 export가 통과하는 FIX-16을 발견했다. [승인 경계 재검증](./B1-PAIRED-REPORT-PREPARATION.md)의 수정 전 실패·수정 후 회귀를 보존했다. 이제 사람의 protocol/dynamic 결정에 `status=approved`, 검토자·시간대 있는 `reviewed_at`, `protocol_sha256_after`·`fixture_manifest_sha256_after`가 필요하다. 실제 5개 원문은 바꾸지 않았고 현재 최종 발행은 계속 대기다.

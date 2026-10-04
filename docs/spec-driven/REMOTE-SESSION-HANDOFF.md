@@ -13,6 +13,8 @@
 
 후속 B0-06: [선택형 계측](./B0-MEASUREMENT-TOOLS.md)이 knowledge pass·Stage3·health·intent를 포함한 논리 호출과 Ollama HTTP transport 시도를 캡처 measurement_id에 연결한다. mock/BGE-M3 각 48요청과 기존 v1/v2 20요청, 실모델 비계측 12응답 동등성을 확인했다. [호출 원장](../../system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04.json)에 실제 K20/6·옵션·크기·실패·모델 digest·DB SHA를 기록한다. HTTP 수는 logical 검색 수와 분리하며 startup constructor pin/probe·SQL·모델 내부 작업은 카운터 밖이다. 다음은 arm 순서 회전과 승인 K 적용 경로이며 공식 B0/B1/C0/C1은 대기다.
 
+후속 B1 준비/FIX-16: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)가 기존 네 진단 캡처의 624 SDK 응답을 source/integrity/measurement ID에 결합했다. 독립 unit은 묶음별 1이며 inconclusive·공식 품질 null이다. metadata-only 프로토콜/동적 승인과 pending v2 scope 결정의 잘못된 hash 결합을 재현 후 수정했고 42개 관련 회귀·실제 CLI 대기/최종 출력 미생성을 확인했다. 사람 입력 5개·원자료 118개 바이트는 같다. B1-04/06/08은 도구 준비 진행이고 공식 평가/사람 판정은 대기다. 최신 우선순위는 작업리스트 21절의 B0-01/02/03/05·STV2-01 결정과 이후 새 strict 빌드/공식 실행이다.
+
 ## 새 세션에 전달할 프롬프트
 
 당신은 `knowledge-system`의 스펙 기반 WBS를 이어서 수행한다. 저장소는 `https://github.com/0xmhha/knowledge-system.git`, 작업 브랜치는 `feat/spec-driven-knowledge-system`이다. 이 인계 작성 시점의 HEAD는 `021c837 fix(cks): preserve executable modes in pinned snapshots`이고 로컬 작업 트리는 깨끗했다. **`main`이 아니라 이 브랜치의 최신 원격 상태를 확인하고 시작하라.** 다른 머신에서는 경로가 다를 수 있으므로 아래의 모든 상대 경로는 저장소 루트 기준으로 해석하라. 기존 사용자 변경이 있으면 보존하라.

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "scope": "FIX-16 approval binding repair and B1 descriptive report tool preparation",
+  "diagnostic_only": true,
+  "fix16": {
+    "status": "verified_within_structural_approval_binding_scope",
+    "before_failures": [
+      "fix16-before.log",
+      "fix16-scope-before.log"
+    ],
+    "before_source_sha256": {
+      "fix16-static-inputs-before.py.txt": "4cfabc28c6cc3f7b1f023260f2f6ca943e08553e08d50849e0c4c656b16da0a4",
+      "fix16-static-v2-scopes-before.py.txt": "a1ca1131c3d90ca65d89322addc62b9a30baa8d1d4d247c427bbb17c913deae8"
+    },
+    "current_final_export": "pending_exit_2_no_inputs_created",
+    "current_static_development_and_final_replay": "pending_exit_2_no_report_created"
+  },
+  "tests": {
+    "passed": 42,
+    "suites": {
+      "b0_preflight": 8,
+      "b0_static_inputs": 11,
+      "b0_static_v2_scopes": 7,
+      "b1_matrix_summary": 16
+    },
+    "sandbox_bind_errors": 2,
+    "sandbox_errors_resolved_with": "same B0 preflight suite, synthetic localhost HTTP only"
+  },
+  "implementation_sha256": {
+    "scripts/b1-summarize-matrix.py": "9961208564315ac6d5505fea58b3859313972ab17303839c760e3311ebb19a0d",
+    "scripts/test_b1_matrix_summary.py": "2b83c7fdd9fd5c084f9a9b0c908bb8b7efaf948caa0a43d25976c9ddf030e879",
+    "scripts/b0-prepare-static-inputs.py": "0e81f79358dc32f4fc23a96ddb87f09397c604c1b568e2468f39f7b3fd623e46",
+    "scripts/test_b0_static_inputs.py": "b6c0a7914742488b036ccf7a42a705fb670f41773c13d935c0868cb6a601df74",
+    "scripts/b0-check-static-v2-scopes.py": "666efddd8fe869b44e4348a14b9c042d41ec79f0e77562774d6826cb7d2200f0",
+    "scripts/test_b0_static_v2_scopes.py": "e1d2b807286dcd2c4e6c9c922d4b243e810b6f4621b298cb55df798b3f921759",
+    "scripts/b0-export-scenarios.py": "6e0330eedebb2d4006214ca1506ccb37f28f2ad2fcdddd999e7c90ab511f0d17",
+    "scripts/b0-preflight.py": "31cea77e6a5c2610676b08ba887c6256022e18dd269eb57bf4cdcce078989a1e",
+    "scripts/b0-materialize-fixtures.py": "a2bab6d315a74581ac04845dc1764221f989457c4d9550162f052246a152d95a"
+  },
+  "replay": {
+    "schema_version": 1,
+    "diagnostic_only": true,
+    "captures": [
+      {
+        "capture": "matrix-capture-real",
+        "report": "matrix-capture-real-summary.json",
+        "status": "descriptive",
+        "observed_rows": 288,
+        "planned_rows": 288,
+        "request_variants": 6,
+        "independent_units": 1,
+        "failed_rows": 0,
+        "missing_backend_measurements": 0,
+        "backend_nonreturned_attempts": 2304,
+        "observed_ckv_k": [
+          6,
+          10
+        ],
+        "quality_metrics": null
+      },
+      {
+        "capture": "matrix-capture-mock",
+        "report": "matrix-capture-mock-summary.json",
+        "status": "descriptive",
+        "observed_rows": 288,
+        "planned_rows": 288,
+        "request_variants": 6,
+        "independent_units": 1,
+        "failed_rows": 0,
+        "missing_backend_measurements": 0,
+        "backend_nonreturned_attempts": 288,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "quality_metrics": null
+      },
+      {
+        "capture": "environment-ledger-real",
+        "report": "environment-ledger-real-summary.json",
+        "status": "descriptive",
+        "observed_rows": 24,
+        "planned_rows": 24,
+        "request_variants": 1,
+        "independent_units": 1,
+        "failed_rows": 0,
+        "missing_backend_measurements": 0,
+        "backend_nonreturned_attempts": 192,
+        "observed_ckv_k": [
+          6,
+          10
+        ],
+        "quality_metrics": null
+      },
+      {
+        "capture": "environment-ledger-mock",
+        "report": "environment-ledger-mock-summary.json",
+        "status": "descriptive",
+        "observed_rows": 24,
+        "planned_rows": 24,
+        "request_variants": 1,
+        "independent_units": 1,
+        "failed_rows": 0,
+        "missing_backend_measurements": 0,
+        "backend_nonreturned_attempts": 24,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "quality_metrics": null
+      }
+    ],
+    "sdk_rows_total": 624,
+    "captures_not_pooled": true,
+    "quality_metrics": null,
+    "human_verdicts": null
+  },
+  "retained_input_files_unchanged": 118,
+  "human_input_files_unchanged": 5,
+  "new_model_mcp_or_official_final_queries": 0,
+  "backend_nonreturned_attempts_retained": 2808,
+  "quality_metrics": null,
+  "human_verdicts": null,
+  "human_review_cost": null,
+  "official_gate_verdict": "pending",
+  "remaining": [
+    "B0-01/02/03/05 and STV2-01 actual human decisions",
+    "reviewed source/pack/semantic/scope/K locks and fresh strict dataset/preflight",
+    "official static/dynamic/final capture and full safety/state/budget/raw CKV ranking oracles",
+    "human answer/claim/policy/cost verdicts and observed C0 repairs",
+    "OP-01–08/final C1/native amd64/release decisions"
+  ]
+}

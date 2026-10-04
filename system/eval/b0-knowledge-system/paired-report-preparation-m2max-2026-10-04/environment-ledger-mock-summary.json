@@ -1,0 +1,1679 @@
+{
+  "schema_version": 1,
+  "scope": "descriptive composed-citation/paired timing analysis; not raw CKV Recall@10 or human policy/answer/release verdict",
+  "status": "descriptive",
+  "planned_rows": 24,
+  "observed_rows": 24,
+  "missing_slots": [],
+  "capture_invariant_issues": [],
+  "capture_errors": [],
+  "independent_units": 1,
+  "request_variants": 1,
+  "bootstrap": {
+    "seed": 20261003,
+    "resamples": 10000,
+    "unit": "paired independent unit; average request variants within unit after median retrieval repetitions"
+  },
+  "arm_summaries": {
+    "baseline_off": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 26477708,
+      "warm_p95_ns": 26477708,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 62951125,
+      "cold_process_p95_ns": 62951125,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 9,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 4271,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 1.0
+    },
+    "baseline_on": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 88627125,
+      "warm_p95_ns": 88627125,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 115136125,
+      "cold_process_p95_ns": 115136125,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 9,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 10006,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 3.347235531111681
+    },
+    "concept_text_off": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 45296583,
+      "warm_p95_ns": 45296583,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 87003042,
+      "cold_process_p95_ns": 87003042,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 12,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 5043,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 1.710744109724301
+    },
+    "concept_text_on": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 93897250,
+      "warm_p95_ns": 93897250,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 136287250,
+      "cold_process_p95_ns": 136287250,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 12,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 10778,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 3.546275606634834
+    },
+    "relations_off": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 35152291,
+      "warm_p95_ns": 35152291,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 82110417,
+      "cold_process_p95_ns": 82110417,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 9,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 4408,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 1.3276183497453782
+    },
+    "relations_on": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 83129750,
+      "warm_p95_ns": 83129750,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 134377917,
+      "cold_process_p95_ns": 134377917,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 9,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 10143,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 3.13961276406553
+    },
+    "combined_off": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 43996709,
+      "warm_p95_ns": 43996709,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 87764667,
+      "cold_process_p95_ns": 87764667,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 12,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 5039,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 1.661650963142278
+    },
+    "combined_on": {
+      "observed_rows": 3,
+      "planned_rows": 3,
+      "failed_rows": 0,
+      "backend_measurement_missing_rows": 0,
+      "warm_successful_calls": 1,
+      "warm_p50_ns": 93353042,
+      "warm_p95_ns": 93353042,
+      "cold_successful_calls": 1,
+      "cold_process_p50_ns": 137581416,
+      "cold_process_p95_ns": 137581416,
+      "backend_observed_attempt_totals": {
+        "ckg": 63,
+        "ckv": 12,
+        "intent": 3
+      },
+      "canonical_sdk_response_bytes_p50": 10774,
+      "human_review_cost": null,
+      "warmup_denominator": {
+        "planned": 0,
+        "observed": 0,
+        "failed": 0,
+        "missing": 0
+      },
+      "retrieval_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "warm_latency_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "cold_process_denominator": {
+        "planned": 1,
+        "observed": 1,
+        "failed": 0,
+        "missing": 0
+      },
+      "v1_no_citation_guard": {
+        "planned": 0,
+        "observed": 0,
+        "passed": 0,
+        "failed_or_missing": 0
+      },
+      "warm_p95_ratio_to_baseline_off": 3.5257221659820406
+    }
+  },
+  "paired_deltas_by_group": {
+    "code-control": {
+      "baseline_off": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "baseline_on": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": -0.08333333333333331,
+          "descriptive_ci95": [
+            -0.08333333333333331,
+            -0.08333333333333331
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "concept_text_off": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "concept_text_on": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": -0.08333333333333331,
+          "descriptive_ci95": [
+            -0.08333333333333331,
+            -0.08333333333333331
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "relations_off": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "relations_on": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": -0.08333333333333331,
+          "descriptive_ci95": [
+            -0.08333333333333331,
+            -0.08333333333333331
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "combined_off": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      },
+      "combined_on": {
+        "citation_recall_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "citation_precision_at_10": {
+          "mean": -0.08333333333333331,
+          "descriptive_ci95": [
+            -0.08333333333333331,
+            -0.08333333333333331
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        },
+        "mean_expected_reciprocal_rank_at_10": {
+          "mean": 0.0,
+          "descriptive_ci95": [
+            0.0,
+            0.0
+          ],
+          "independent_units": 1,
+          "inference": "inconclusive"
+        }
+      }
+    }
+  },
+  "per_question": {
+    "baseline_off": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "baseline_on": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "concept_text_off": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "concept_text_on": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "relations_off": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "relations_on": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "combined_off": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    },
+    "combined_on": {
+      "alpha": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0
+      }
+    }
+  },
+  "measurements": [
+    {
+      "sequence": 1,
+      "request_id": "alpha",
+      "arm": "baseline_off",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "19eba7ab2954eb1a062f3397a132f83b",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 35357625,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 4271,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "request_id": "alpha",
+      "arm": "baseline_on",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "3fd078ae36590fe21d9ad1c5b59f6c01",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 96898625,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10006,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "request_id": "alpha",
+      "arm": "concept_text_off",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "cacff9096234b4c7064cc49c14083801",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 49844792,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 5043,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "request_id": "alpha",
+      "arm": "concept_text_on",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "05f87b02d9468a903451044a76054f74",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 97892709,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10778,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "request_id": "alpha",
+      "arm": "relations_off",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "4d3d14f5bc25040b51dd6199ab6b56b1",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 36708667,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 4408,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "request_id": "alpha",
+      "arm": "relations_on",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "8af6340f0dcaf20ba88bc2e438f21d5b",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 86457083,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10143,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "request_id": "alpha",
+      "arm": "combined_off",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "6a9debce80aabc653beed2e6e3f937ec",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 43744750,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 5039,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "request_id": "alpha",
+      "arm": "combined_on",
+      "phase": "retrieval",
+      "iteration": 1,
+      "measurement_id": "e1f1541f12208c42358054cc259445cf",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 96107834,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10774,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "request_id": "alpha",
+      "arm": "baseline_on",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "464faa66049225395369548b2500dc77",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 88627125,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10006,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 10,
+      "request_id": "alpha",
+      "arm": "concept_text_off",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "ffe3a3919b591aae3496f205747fcce9",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 45296583,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 5043,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "request_id": "alpha",
+      "arm": "concept_text_on",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "6fbdfde7fdec6f46897507471aa8ccad",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 93897250,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10778,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "request_id": "alpha",
+      "arm": "relations_off",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "c6bd2b3930c2329d27c09ac330a32067",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 35152291,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 4408,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 13,
+      "request_id": "alpha",
+      "arm": "relations_on",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "33e6b65b199932f04f591e06e7d0a342",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 83129750,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10143,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 14,
+      "request_id": "alpha",
+      "arm": "combined_off",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "10c4cc6bdafaad0e98df19062bc2c3fa",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 43996709,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 5039,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 15,
+      "request_id": "alpha",
+      "arm": "combined_on",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "75ffaa6c97c51995c8d55efc1df172a8",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 93353042,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 10774,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 16,
+      "request_id": "alpha",
+      "arm": "baseline_off",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "measurement_id": "73d2c2c9b13c8ef35b77b275af6f5dc8",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 26477708,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": null,
+      "canonical_sdk_response_utf8_bytes": 4271,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "request_id": "alpha",
+      "arm": "concept_text_off",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "83b085ca7ba1cc126ce80e23b3fd3ea0",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 51987542,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 87003042,
+      "canonical_sdk_response_utf8_bytes": 5043,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 18,
+      "request_id": "alpha",
+      "arm": "concept_text_on",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "83c67a368ea89a9a14c2f215b7c4dc72",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 99643666,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 136287250,
+      "canonical_sdk_response_utf8_bytes": 10778,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 19,
+      "request_id": "alpha",
+      "arm": "relations_off",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "09c18f6e7f708d2eeda7c1d33659b7f0",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 39664167,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 82110417,
+      "canonical_sdk_response_utf8_bytes": 4408,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 20,
+      "request_id": "alpha",
+      "arm": "relations_on",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "f52b2ebd1cac9240f17e78e2a86b5e32",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 94888917,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 134377917,
+      "canonical_sdk_response_utf8_bytes": 10143,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 21,
+      "request_id": "alpha",
+      "arm": "combined_off",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "d3f66db3c5ab746b5e90615a5c72b71b",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 50199750,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 87764667,
+      "canonical_sdk_response_utf8_bytes": 5039,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 22,
+      "request_id": "alpha",
+      "arm": "combined_on",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "1250bd78fefd0e371b98359cf9f2fcf4",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 101232625,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 137581416,
+      "canonical_sdk_response_utf8_bytes": 10774,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 4,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 23,
+      "request_id": "alpha",
+      "arm": "baseline_off",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "5972e8e1e36f224e6f1a3e44f895e161",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3333333333333333,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 3
+      },
+      "elapsed_ns": 28089166,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 62951125,
+      "canonical_sdk_response_utf8_bytes": 4271,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    },
+    {
+      "sequence": 24,
+      "request_id": "alpha",
+      "arm": "baseline_on",
+      "phase": "cold_process",
+      "iteration": 1,
+      "measurement_id": "060d990fcaca2d7cb38785191e55ef4e",
+      "issues": [],
+      "citation_metrics": {
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.25,
+        "mean_expected_reciprocal_rank_at_10": 1.0,
+        "v1_no_citation_guard_pass": false,
+        "returned_unique_citations": 4
+      },
+      "elapsed_ns": 80483542,
+      "expected_no_citations": false,
+      "process_start_through_response_ns": 115136125,
+      "canonical_sdk_response_utf8_bytes": 10006,
+      "backend_measurement": {
+        "attempts_by_backend": {
+          "ckg": 21,
+          "ckv": 3,
+          "intent": 1
+        },
+        "nonreturned_attempts": 1,
+        "pending_calls": 0,
+        "observed_ckv_k": [
+          6,
+          20
+        ],
+        "ollama_http_body_bytes": {
+          "request_observed_total": 0,
+          "response_observed_total": 0,
+          "response_size_missing_attempts": 0
+        }
+      }
+    }
+  ],
+  "quality_metrics": null,
+  "official_gate_verdict": "pending",
+  "human_answer_abstention_policy_reasoning_verdicts": null,
+  "notes": [
+    "Warmup, retrieval, warm latency and cold-process observations are kept separate.",
+    "Errors/missing attempts cannot disappear from retrieval denominators; successful timing percentiles are conditional and carry failure counts.",
+    "MRR is the Go evaluator mean over expected citations after dedup and top-10; not first-relevant-only reciprocal rank.",
+    "No-citation guard is a stricter evidence oracle and is not a human answer-abstention decision.",
+    "Backend absence is null/missing, never zero; startup/constructor work is outside query counters.",
+    "Fewer than 10 independent units per group is inconclusive regardless of repetitions."
+  ],
+  "diagnostic_only": true,
+  "reporter_sha256": "9961208564315ac6d5505fea58b3859313972ab17303839c760e3311ebb19a0d",
+  "input_definition": null,
+  "static_scope_definition": null,
+  "input_sha256": {
+    "report": "a15364654c2dda567a73e907cf409e7b2d1d3aec8806381027c1517ab92ec3b8",
+    "rows": "7bb5f134aedc3d039e542aeafad57aa9c396ef37d8d44216d0d23062f7f1777b",
+    "requests": "869f8cbc684f8bddc03d9b836ec6863792ee528d51899a85d2f76136fdc32848",
+    "gold": "f5fd01e3cb9f57d39a8e53e117c0b6f1b7280c9a4995be076bffa082d0a856f1",
+    "footprints": {
+      "baseline_off": "63f99e1c6d800e9882177488961026cd8de5d375b241a3959c3536e5028316f0",
+      "baseline_on": "36fe18a5152b62fe2012940fb0e631b65bedbeb616b17ac23fbc6daecdef3fbd",
+      "concept_text_off": "3b3f0cf57eb454d4f23e064b53b2791839aba3f551e386c5586096d2870eac97",
+      "concept_text_on": "c17d5b3d54ed983a9732f7f51526f848ae40b539f5a6c6ab0fd992252c80419f",
+      "relations_off": "52c2a610fd214a9c7cb655a303ab6ad4ceb6e9c931a445f72922f618c6fb2d1e",
+      "relations_on": "ec01d83ac934e9ae745eb5697efa8873d4cf657722196c9390a296e1f6cdd0e9",
+      "combined_off": "fe358dd4540dc4f5f3ff1a76fd67de1c8f79c472b18e488e641cb5026dc1744b",
+      "combined_on": "89ebf9116b3e81b4fe1827678cc93ff7ab382e5ba65edc8b7ccf6871bd8a087c"
+    },
+    "arm_configurations": {
+      "baseline_off": "0a999832d2c51ff15cad3c2ef078200c82003cc710ad15172582043dbc15fcd7",
+      "baseline_on": "5fd05f292efabc6514c7e33c891e885bf7851bb4f6b48b3b5685637ff01553e3",
+      "concept_text_off": "306407ed64441c46e2309d5239fe68405d14c3ebfc11eab25b9f50c6200a0d63",
+      "concept_text_on": "6c29d36205bc357dae4a441617f90b8cc4ebe1612e7c29f2420873ef5607d8c7",
+      "relations_off": "dec2c92369ce18302fd899674b9ffeb3e81e7d74297341f7fe50a96379017a8b",
+      "relations_on": "a27f61629c293a3eb0b244ca70fd345c2ab458b58e857af525482695c969576b",
+      "combined_off": "c6f3a98cae71205c1f9c5b01de8d43b55cfd698fbd6dd8435983fb86d1f2cffe",
+      "combined_on": "f8689a3ccd885465eb63e205c824247743913211dd53004fb9e29cb7b80a3308"
+    }
+  },
+  "referenced_source_files_sha256": {
+    ".cks/knowledge/policies/public.yaml": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+    "README.md": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+    "main.go": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+    "main_test.go": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a"
+  },
+  "remaining_official_prerequisites": [
+    "B0 corpus/semantic-fact decisions and fresh strict build/preflight",
+    "full dynamic family safety/state/budget oracles and raw CKV ranking capture",
+    "human answer/claim/policy verdicts, reviewed cost and release criteria"
+  ]
+}

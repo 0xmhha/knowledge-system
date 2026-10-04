@@ -144,9 +144,7 @@ class StaticInputTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'duplicate JSON'):
             INPUTS.decode(b'{"status":"draft","status":"approved"}')
 
-    def test_synthetic_approval_path_binds_updated_fixture_bytes_and_v1_abstention(self):
-        # Synthetic metadata is confined to a unit-test temporary directory;
-        # no repository approval or final model execution is performed.
+    def metadata_approved(self):
         raw = list(self.raw)
         fixtures = json.loads(raw[2])
         fixtures['status'] = 'approved'
@@ -157,6 +155,34 @@ class StaticInputTest(unittest.TestCase):
         protocol.update(status='approved', reviewer='synthetic-test-only', reviewed_at='2026-10-03T00:00:00Z',
                         fixture_manifest_sha256=INPUTS.digest(raw[2]))
         raw[1] = json.dumps(protocol).encode()
+        return raw
+
+    def test_metadata_only_approval_cannot_replace_pending_human_decision(self):
+        raw = self.metadata_approved()
+        review = json.loads(raw[3])
+        review['protocol_and_dynamic_fixture_decision'] = {'status': 'pending', 'verbatim_response': '검토 후 결정'}
+        raw[3] = json.dumps(review).encode()
+        report, selected = INPUTS.inspect(*raw, partition='final')
+        self.assertEqual(report['status'], 'pending')
+        self.assertEqual(report['pending_reasons'], ['protocol_review_pending', 'dynamic_fixture_review_pending'])
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'final'
+            with self.assertRaises(INPUTS.PendingInputs):
+                INPUTS.export(report, selected, out)
+            self.assertFalse(out.exists())
+
+    def test_synthetic_approval_path_binds_updated_fixture_bytes_and_v1_abstention(self):
+        # Synthetic metadata is confined to a unit-test temporary directory;
+        # no repository approval or final model execution is performed.
+        raw = self.metadata_approved()
+        protocol = json.loads(raw[1])
+        review = json.loads(raw[3])
+        review['protocol_and_dynamic_fixture_decision'] = {
+            'status': 'approved', 'reviewer': 'synthetic-test-only',
+            'reviewed_at': '2026-10-03T00:00:00Z',
+            'protocol_sha256_after': INPUTS.digest(raw[1]),
+            'fixture_manifest_sha256_after': INPUTS.digest(raw[2])}
+        raw[3] = json.dumps(review).encode()
         report, selected = INPUTS.inspect(*raw, partition='final')
         self.assertEqual(report['status'], 'approved_input_definition')
         self.assertEqual(report['dynamic_approved_count'], 12)
@@ -168,6 +194,13 @@ class StaticInputTest(unittest.TestCase):
             abstention = json.loads((out / 'b0-abs-01.yaml').read_text())
             self.assertTrue(abstention['expect_no_citations'])
             self.assertNotIn('candidate_answer', abstention)
+        # Stale or absent human bindings cannot publish held-out inputs.
+        for field in ('protocol_sha256_after', 'fixture_manifest_sha256_after', 'reviewed_at'):
+            changed = json.loads(raw[3])
+            changed['protocol_and_dynamic_fixture_decision'][field] = 'stale'
+            mutated = list(raw); mutated[3] = json.dumps(changed).encode()
+            pending, _ = INPUTS.inspect(*mutated)
+            self.assertEqual(pending['status'], 'pending')
         # Changing only a status cannot substitute for reviewer/time metadata.
         protocol.update(reviewer=None, reviewed_at=None)
         raw[1] = json.dumps(protocol).encode()
