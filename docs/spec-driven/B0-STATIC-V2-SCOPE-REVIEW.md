@@ -33,3 +33,6 @@ python3 -m unittest discover -s scripts -p test_b0_static_v2_scopes.py
 검사기는 입력의 SHA·corpus commit/tree·실제 Git committer time·12개 ID 유일성/완전성·4/8 분할·날짜 형식/제안 근거·subsystem·정수 K10을 검사한다. row에 prompt/gold 필드를 끼워 넣으면 거부한다. 출력은 새 0600 JSON 보고서 하나이며 기존 입력·출력을 덮어쓰지 않는다. 승인 대기 상태는 보고서를 남긴 뒤 exit 2다. 최종 요청 exporter나 모델 호출 도구가 아니다.
 
 새 validator의 첫 회귀에서 Python이 ISO week date와 10.0을 각각 날짜/정수 10과 같게 처리하는 두 허점을 확인했다. MCP의 YYYY-MM-DD와 실제 Go config 정수 계약에 맞춰 엄격하게 검사하도록 고쳤다. 실패 전/후 로그는 [범위 제안 원장](../../system/eval/b0-knowledge-system/static-v2-scope-preparation-m2max-2026-10-04/summary.json)에 보존한다. 기존 정적 입력 준비 검증과의 호환도 확인한다. 이 새 보조 도구의 검증 결과를 공식 품질 점수로 기록하지 않는다.
+
+
+2026-10-04 FIX-16 재감사: scope 해시가 같은 `pending` 사람 결정이 `scope_review_record_bound`를 만족하는 실패를 재현 후 수정했다. 이제 `static_v2_query_scopes` 기록의 실제 `status=approved`, 검토자·시간대 있는 `reviewed_at`도 필요하다. 원문 scope와 실제 사람 기록은 바꾸지 않았으며 [비교 보고/승인 경계 자료](./B1-PAIRED-REPORT-PREPARATION.md)에 수정 전·후 증거를 연결했다.

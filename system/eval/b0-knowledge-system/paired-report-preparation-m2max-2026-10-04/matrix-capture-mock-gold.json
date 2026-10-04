@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "oracle_basis": "Authored fixture source: main.go line 3 defines Alpha; fixed source commit in capture identity. Six query policy-scope variants are one independent code-control unit; not policy approval.",
+  "cases": [
+    {
+      "request_id": "alpha",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    },
+    {
+      "request_id": "wrong-scope",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    },
+    {
+      "request_id": "proposed",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    },
+    {
+      "request_id": "expired",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    },
+    {
+      "request_id": "restricted",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    },
+    {
+      "request_id": "conflict",
+      "group": "code-control",
+      "independent_unit_id": "alpha-implementation-common",
+      "expected_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "expect_no_citations": false,
+      "expected_citations": [
+        {
+          "file": "main.go",
+          "start_line": 3,
+          "end_line": 3
+        }
+      ]
+    }
+  ]
+}

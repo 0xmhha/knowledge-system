@@ -159,18 +159,12 @@ def inspect(questions_raw, protocol_raw, fixtures_raw, review_raw, partition='de
         reasons.append('static_gold_review_pending')
     if protocol.get('status') not in {'draft', 'approved', 'rejected'}:
         raise ValueError('unknown protocol review status')
-    decision = review.get('protocol_and_dynamic_fixture_decision', {})
-    if not isinstance(decision, dict):
-        raise ValueError('protocol/dynamic human decision must be an object')
-    human_approved = decision.get('status') == 'approved' and reviewed(decision)
-    protocol_bound = human_approved and decision.get('protocol_sha256_after') == digest(protocol_raw)
-    fixtures_bound = human_approved and decision.get('fixture_manifest_sha256_after') == digest(fixtures_raw)
-    if protocol.get('status') != 'approved' or not reviewed(protocol) or not protocol_bound:
+    if protocol.get('status') != 'approved' or not reviewed(protocol):
         reasons.append('protocol_review_pending')
     approved = sum(f.get('review_state') == 'approved' and reviewed(f) for f in selected_fixtures)
     if fixtures.get('status') not in {'proposal_pending_human_review', 'approved', 'rejected'}:
         raise ValueError('unknown dynamic manifest review status')
-    if approved != len(selected_fixtures) or fixtures.get('status') != 'approved' or not fixtures_bound:
+    if approved != len(selected_fixtures) or fixtures.get('status') != 'approved':
         reasons.append('dynamic_fixture_review_pending')
     selected = development if partition == 'development' else final
     counts = {group: sum(q['group'] == group and q['id'] in final for q in book['questions'])
@@ -184,8 +178,6 @@ def inspect(questions_raw, protocol_raw, fixtures_raw, review_raw, partition='de
               'fixture_manifest_sha256': digest(fixtures_raw), 'human_review_sha256': digest(review_raw),
               'corpus_commit': checked['corpus_commit'], 'corpus_tree': checked['corpus_tree'],
               'static_approved_count': checked['approved_count'], 'dynamic_approved_count': approved,
-              'protocol_human_review_bound': protocol_bound,
-              'dynamic_human_review_bound': fixtures_bound,
               'selected_ids': [q['id'] for q in book['questions'] if q['id'] in selected],
               'withheld_ids': [q['id'] for q in book['questions'] if q['id'] not in selected],
               'retrieval_k': k, 'runs': runs, 'model': model, 'pending_reasons': reasons,

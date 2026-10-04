@@ -73,11 +73,11 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | B1-01 | P1 | baseline / concept_text / relations / combined의 네 가지 실행 어댑터 구현 | 실제 실행 경로가 다름을 검증; 기본 꺼짐; 원문 질의 우선; 후보 K 보존·오류/모호성 폴백; 단순 플래그 이름만 추가하지 않음 | 검증 완료: 네 MCP 경로·텍스트/관계 기여 분리·상한/폴백, mock/BGE-M3 각 20요청. 공식 품질 통과와 별개 |
 | B1-02 | P1 · B0-05/B1-01 | 팩 off/on 축을 연결하여 8 arms 구성 | 팩 잠금과 데이터셋 신원 분리; 권한·범위·출처 적용; 단순 Markdown을 검토된 팩으로 취급하지 않음 | 구현 검증 완료: 동일 dataset/lock의 8개 v2 경로, mock/BGE-M3 각 48요청·6정책 상태·인용/본문 보존·원문/integrity·DB 무변경 확인. 실제 팩 사실 검토·공식 B1 대기 |
 | B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 도구 준비: 8경로 회전·warm/cold·원응답/호출 ID·입력 전후 검증 완료. 승인된 공식 B0/B1 실행 대기 |
-| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 대기 |
+| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
 | B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 대기 |
-| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 대기 |
+| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
 | B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기 |
-| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 대기 |
+| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
 
 기존 설계 회귀 조건: 안전/좌표/비밀 혼입 0, 기권 오인용 증가 0, 전체 Recall@10·MRR 변화 ≥ −0.02, 중요 질문군 변화 ≥ −0.05, warm p95 비율 ≤ 1.25. 작은 최종 질문군의 결론 규칙은 B0-02 검토 대상이다. 수치가 충분하지 않으면 기본 활성 근거로 사용하지 않는다.
 
@@ -155,6 +155,7 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 | FIX-13 | P1 · 최신 호스트 스모크 재검증 | 고지 자산을 두 개로 가정하던 스모크가 새 네 자산의 정상 패키지를 거부한다. 필수 자산·소스/고지 전용 범위·실제 count·중복·SHA를 검사한다. | 수정 후 재검증 완료: 실제 수정 전 assertion 실패와 후 macOS 세 프로젝트 설치/재시작/업데이트/롤백 통과. 현재 두 Linux 시험 서명·설치/복구도 통과 |
 | FIX-14 | P1 · Linux 패키지 metadata 재현성 | 같은 바이너리를 두 번 검사한 ldd 주소가 달라 package manifest의 native_dependencies가 변동한다. 라이브러리/해결 경로/오류/버전 정보를 보존하며 일시 주소를 안정화한다. | 수정 후 재검증 완료: 주소만 제거하며 첫 ldd 의존/정적 링크 진단 유지; 실제 Linux 두 대상의 각 4,624개 copy-input·두 공개 packager 빌드·전체 파일/모드/archive SHA 동일·동일 시험 서명/Python/Go 검증·세 프로젝트 설치/복구 통과. 도구 체인/대상별 제한 유지 |
 | FIX-15 | P1 · translated native 고지 감사 | modernc.org/sqlite의 별도 SQLITE-LICENSE가 root prefix scan에서 빠진 실제 패키지를 확인했다. 고정 버전 required notice를 수집하고 없으면 missing으로 표시한다. | 수정 후 재검증 완료: 실제 누락/수정 전 회귀 보존, Python 16개 시험·세 플랫폼 새 package/두 검증기/설치/SQLite 고지 단독 변조 거부, ZIP/h1 기반 선택 modernc source 대조. 전체 legal/운영 적합성은 별도 |
+| FIX-16 | P1 · 승인 경계 완료 재감사 | 프로토콜/동적 메타데이터만으로 실제 보류 결정 중 최종 export가 통과하며, v2 scope의 matching hash도 pending 결정에 결합됐다. 사람 승인 상태·검토자/시간·각 입력 SHA 결합을 요구한다. | 수정 후 재검증 완료: 두 수정 전 실패, 42개 관련 회귀·실제 CLI 대기/최종 출력 미생성·5개 원문 SHA 동일; 공식 B0/B1 판정은 대기 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -279,3 +280,16 @@ FIX-15는 고정 버전의 누락 수집 수정 범위에서 완료다. 최신 �
 새 checker의 최초 회귀에서 ISO week date와 float K10.0을 받아들이는 두 허점을 확인했다. YYYY-MM-DD와 정수 K를 요구한 수정 후 새 회귀 6개·기존 정적 입력 회귀 10개를 통과했다. 실제 CLI는 승인 대기 exit 2, 기존 보고서/gold 출력 거부 exit 1, 잘못된 날짜의 출력 미생성, 입력 5개 전후 SHA 동일을 확인했다. human-review의 scope SHA 연결 없이 approved 메타데이터만 입력해도 pending이며 official_execution_ready/v2_matrix_ready=false·metrics=null을 유지한다.
 
 B0-01/02/03/05와 STV2-01의 결정을 사용자에게 요청했다. 기존 승인 기록을 바꾸거나 이 일반 재개 지시를 개별 승인으로 기록하지 않았다. 사람이 결정하면 protocol/scope의 새 해시를 함께 동결하고 실제 K/config·pack/semantic inventory·새 strict 빌드에 연결한다. 이번 준비는 B0-06 전체 완료나 공식 B0/B1 품질 합격이 아니다.
+
+
+## 21. 승인 경계 FIX-16과 B1 비교 보고 준비
+
+2026-10-04 [비교 보고 자료](./B1-PAIRED-REPORT-PREPARATION.md)와 [원장](../../system/eval/b0-knowledge-system/paired-report-preparation-m2max-2026-10-04/summary.json)을 추가했다. 완료된 정적 입력 준비 검사를 다시 감사하여, 실제 보류 결정이 있어도 approved 메타데이터만으로 최종 export가 통과하는 실패와 static v2 matching hash가 pending 사람 결정에 결합되는 실패를 재현했다. 사람의 실제 approved 상태·검토자/시간·검토한 protocol/fixture/scope 바이트 SHA를 모두 요구하도록 수정했다. FIX-16은 이 구조 수정 범위에서 완료이고 B0-06/공식 품질 전체 완료는 아니다.
+
+B1-04/06/08은 도구 준비 진행으로 변경했다. 보관 matrix 원문/설정 SHA·회전·phase·질문/인자·measurement ID, source/citation/body/v2 integrity를 결합한다. Go 인용 dedup·commit/겹침·top10·기대 인용별 평균 역순위 규칙을 유지한다. 반복 중앙값과 같은 질문의 범위 변형 unit을 분리하고 독립 unit paired bootstrap, warm 성공 조건부 nearest-rank p50/p95·별도 process cold·분모·backend/HTTP/K/크기를 기록한다. 오류·누락은 검색 분모에서 지우지 않고 missing 계측은 null이다. 구성 인용 점수는 raw CKV Recall@10이나 사람 정책/답변 판정이 아니다.
+
+기존 BGE-M3/mock 두 matrix(각 288)와 환경 원장(각 24)의 총 624 SDK 응답을 실제 재생했다. 각 묶음의 독립 unit은 1이고 군별 추론은 inconclusive다. 실모델 K10/6·mock K20/6과 각 바이너리/환경/반복은 별도로 유지했다. SDK/evidence 실패·누락 계측은 0이지만 내부 best-effort nonreturned 2,808시도는 원문 연결로 남겼다. 118개 보관 원자료/설정/로그/소스/gold 전후 SHA와 실제 5개 사람이 검토한 입력의 기존 HEAD SHA가 같다. 실제 모델·공식 최종 질문을 새로 실행하지 않았다.
+
+관련 Python 42개(8+11+7+16)를 통과했고 두 수정 전 회귀 실패 및 localhost sandbox 오류/후 재실행을 보존했다. 실제 입력 준비 final/ready 및 정적 개발/최종 비교 CLI는 exit 2·입력/평가 출력 미생성이다. synthetic-test-only 승인 경로는 메모리/임시 테스트 범위이며 실제 승인 기록을 만들지 않았다. 현재 quality_metrics·사람 verdict/cost는 null이다.
+
+다음 최상위 P0는 B0-01/02/03/05와 STV2-01의 실제 사람 결정이다. 이후 source coverage·팩/semantic·조회 scope/K·protocol을 함께 동결하고 새 strict B0-07 → 공식 B0/B1 → 사람 판단과 실제 C0 수정 → 최종 C1 순으로 수행한다. 정적 최종/동적 전체 오라클·raw CKV 후보 순위·검토 비용·운영 OP-01–08/native amd64·출시 판정은 남아 있고 작업리스트 전체는 미완료다.

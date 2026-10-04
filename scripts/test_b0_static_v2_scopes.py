@@ -35,6 +35,16 @@ class StaticV2Scopes(unittest.TestCase):
         value.update(status='approved', reviewer='synthetic-fixture-reviewer', reviewed_at='2026-10-04T00:00:00Z')
         self.assertIn('static_v2_scope_review_pending', self.inspect(value)['pending_reasons'])
 
+    def test_pending_human_decision_with_matching_hash_is_not_approval(self):
+        value = copy.deepcopy(self.scope)
+        value.update(status='approved', reviewer='synthetic-test-only', reviewed_at='2026-10-04T00:00:00Z')
+        review = json.loads(self.raw[3])
+        review['decisions'].append({'scope': 'static_v2_query_scopes', 'status': 'pending',
+            'scope_sha256_after': SCOPES.INPUTS.digest(json.dumps(value).encode()),
+            'reviewer': 'synthetic-test-only', 'reviewed_at': '2026-10-04T00:00:00Z'})
+        self.raw[3] = json.dumps(review).encode()
+        self.assertFalse(self.inspect(value)['scope_review_record_bound'])
+
     def test_scope_coverage_partition_and_gold_contamination_are_rejected(self):
         for mutation in ['missing', 'duplicate', 'partition', 'prompt']:
             with self.subTest(mutation=mutation):

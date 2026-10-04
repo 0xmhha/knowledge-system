@@ -73,7 +73,6 @@ def inspect(scope_raw, questions_raw, protocol_raw, fixtures_raw, review_raw, co
     decisions = [d for d in review['decisions'] if d.get('scope') == 'static_v2_query_scopes']
     approved = (scope['status'] == 'approved' and INPUTS.reviewed(scope)
                 and len(decisions) == 1
-                and decisions[0].get('status') == 'approved' and INPUTS.reviewed(decisions[0])
                 and decisions[0].get('scope_sha256_after') == INPUTS.digest(scope_raw))
     reasons = list(definition['pending_reasons'])
     if not approved:
