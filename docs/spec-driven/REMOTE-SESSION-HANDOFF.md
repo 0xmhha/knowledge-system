@@ -83,3 +83,6 @@
 
 
 2026-10-04 실패 복구/legacy 후속: [작업리스트 19절](./EXECUTION-WORKLIST.md)과 [복구 문서](./C1-RECOVERY-VALIDATION.md)에 최신 Darwin 시험 preview의 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·소스 없는 보관 재생을 기록했다. 구 v1 baseline의 첫 신규 소비자 전 payload SHA·별도 재색인·구 v1 rollback도 검증했고 SDK 11응답/11인용·v2 integrity 6개를 독립 재생했다. 빈 WAL/SHM은 별도 기록이며 운영 live backup 보증이 아니다. C1-06은 진행이고 최종 운영 후보/OP-08·공식 품질은 미완료다. 최상위 P0 사람 결정 후 v2 범위/실제 K 동결과 B0-07부터 공식 실행한다.
+
+
+2026-10-04 재개 후 정적 v2 범위 후속: [작업리스트 20절](./EXECUTION-WORKLIST.md)의 STV2-01은 실제 corpus committer time에서 query date=2026-10-01, corpus_project에서 subsystem=knowledge-system, runtime K10 patch를 제안한다. 새 6개/기존 10개 회귀 및 실제 CLI의 pending·불변 출력/gold·입력 SHA 검증을 통과했다. source-root .cks는 비어 있어 외부 검토된 pack/semantic inventory·잠금은 별도 선행 조건이다. 최종 프롬프트/답·공식 점수·승인 상태를 발행하지 않았다. B0-01/02/03/05와 STV2-01 결정을 요청했으며 이후 실제 K/config와 새 strict 빌드에 연결한다.

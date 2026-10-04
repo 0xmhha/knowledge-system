@@ -1,0 +1,44 @@
+[
+  {
+    "id": "actual-cli-pending",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "scripts/b0-check-static-v2-scopes.py",
+      "--output",
+      "/private/tmp/ks-static-v2-scopes-cli-20261004/report.json"
+    ],
+    "exit_code": 2
+  },
+  {
+    "id": "existing-output-refused",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "scripts/b0-check-static-v2-scopes.py",
+      "--output",
+      "/private/tmp/ks-static-v2-scopes-cli-20261004/report.json"
+    ],
+    "exit_code": 1
+  },
+  {
+    "id": "gold-output-refused",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "scripts/b0-check-static-v2-scopes.py",
+      "--output",
+      "system/eval/b0-knowledge-system/questions.json"
+    ],
+    "exit_code": 1
+  },
+  {
+    "id": "mcp-week-date-rejected",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "scripts/b0-check-static-v2-scopes.py",
+      "--scopes",
+      "/private/tmp/ks-static-v2-scopes-cli-20261004/bad-week-date.json",
+      "--output",
+      "/private/tmp/ks-static-v2-scopes-cli-20261004/bad-output.json"
+    ],
+    "exit_code": 1
+  }
+]

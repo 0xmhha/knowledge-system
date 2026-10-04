@@ -59,7 +59,7 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 | B0-03 | P0 | F-01–F-06의 개발/최종 입력·정답·실패 오라클 검토 | 12변형 검토 기록·원문 해시·독립 표본 단위 확정 | 사람 검토 대기 |
 | B0-04 | P1 · B0-03 | 초안 JSON의 입력을 실제 독립 저장소/커밋으로 생성. F-04는 순차 두 상태, F-05는 서로 다른 프로젝트 | 선언된 파일 SHA·줄·Git 독립성 일치; 재실행 바이트 동일; 기존 디렉터리 덮어쓰기 거부 | 진행: 개발 6개 준비·재현 검사 통과; F-03 project_id 원문과 불일치 수정/회귀 통과, 최종/승인 대기 |
 | B0-05 | P1 · B0-04 | F-03/05/06에 필요한 의미 사실·팩·스펙·관계·코드 앵커를 fixture 자기 스냅샷에 결합 | 검토 기록과 canonical ID·보관 줄 해시 일치; 미검토 자동 승격 0 | 진행: 개발 F-03/F-05 A·B/F-06 실제 mock/BGE-M3 결합·무승격 검증, [검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md) 준비; 사람 판정/최종 대기 |
-| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; 승인된 공식 입력·환경 실행은 남음 |
+| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
 | B0-07 | P1 · B0-01/02/03/05/06 | 공식 데이터셋을 동결된 입력으로 빌드하고 보관 원문·그래프·벡터를 감사 | strict embedding·선택 범위·input hashes·split 재조립·정렬·doctor 통과; 빌드 지연 별도 계측 | 대기 |
 | B0-08 | P2 · B0-07 | 공식 정적 `cks eval --verify-anchors`와 F-01–06 실모델 실행 | 승인 gold와 원응답 연결; 최종 입력 독립; cold/warm 혼동 없음; F-01 자격 실패는 fixture_not_qualified | 대기 |
 | B0-09 | P2 · B0-08 | B0 보고서 작성: 정답·범위·환경·지표·실패·제한 | 승인 입력과 재현 명령·원자료 포함; 실패/기권/소표본을 성공으로 합산하지 않음 | 대기 |
@@ -268,3 +268,14 @@ FIX-15는 고정 버전의 누락 수집 수정 범위에서 완료다. 최신 �
 초기 helper의 기본 반복 시간 제한·단일 JSON 출력/인용 v1 필드 가정·SQLite sidecar/읽기 전용 blob 권한·legacy 출력 경로/첫 baseline 시점 보완 및 완전 모드 미명시 실행을 보존했다. 제품 Go 코드는 변경하지 않았다. 이번 구조 진단을 최종 운영 복구/품질/지원 승인으로 합산하지 않고 C1-06을 진행으로 변경했다. OP-08과 최종 후보·실제 운영 백업/전환·대규모/플랫폼 범위는 남아 있다.
 
 최상위 P0는 B0-01/02/03/05의 실제 사람 결정이다. 결정 후 정적 v2 날짜/subsystem과 실제 K를 동결하고 B0-07 공식 strict 빌드 → B0-08/09 → B1 paired 비교/사람 판정 → C0 관측 실패 수정 → C1 최종 재평가 순으로 진행한다. OP-01–08의 역할/키/신뢰/적합성/지원/복구와 native amd64 환경을 임의로 대신하지 않는다. 공식 품질은 null이며 작업리스트 전체는 미완료다.
+
+
+## 20. 재개 후 정적 v2 날짜·subsystem·K 제안 준비
+
+2026-10-04 사용자 재개 지시에 따라 [STV2-01 검토 자료](./B0-STATIC-V2-SCOPE-REVIEW.md)와 [원장](../../system/eval/b0-knowledge-system/static-v2-scope-preparation-m2max-2026-10-04/summary.json)을 준비했다. 실제 고정 corpus committer time은 2026-10-01T20:53:13+09:00이다. 그 시간대의 달력 날짜 2026-10-01과 질문집 corpus_project=knowledge-system을 정적 12개 v2의 조회 범위로 제안하고 runtime retrieval.recall_k=10 patch를 명시했다. 정책 효력/승인 사실을 날짜에서 추론하지 않는다.
+
+실제 고정 커밋의 source-root .cks tree 목록은 비어 있다. 외부 reviewed pack/semantic inventory·source-bound 출처/잠금은 별도 선행 조건이며, pack-on unavailable 폴백을 팩 품질 효과로 판정하지 않는다. 새 파일은 ID/4–8 분할/날짜/subsystem만 포함하고 최종 프롬프트·후보 답을 발행하지 않는다. matrix가 include_knowledge를 소유하는 실제 계약도 반영했다.
+
+새 checker의 최초 회귀에서 ISO week date와 float K10.0을 받아들이는 두 허점을 확인했다. YYYY-MM-DD와 정수 K를 요구한 수정 후 새 회귀 6개·기존 정적 입력 회귀 10개를 통과했다. 실제 CLI는 승인 대기 exit 2, 기존 보고서/gold 출력 거부 exit 1, 잘못된 날짜의 출력 미생성, 입력 5개 전후 SHA 동일을 확인했다. human-review의 scope SHA 연결 없이 approved 메타데이터만 입력해도 pending이며 official_execution_ready/v2_matrix_ready=false·metrics=null을 유지한다.
+
+B0-01/02/03/05와 STV2-01의 결정을 사용자에게 요청했다. 기존 승인 기록을 바꾸거나 이 일반 재개 지시를 개별 승인으로 기록하지 않았다. 사람이 결정하면 protocol/scope의 새 해시를 함께 동결하고 실제 K/config·pack/semantic inventory·새 strict 빌드에 연결한다. 이번 준비는 B0-06 전체 완료나 공식 B0/B1 품질 합격이 아니다.

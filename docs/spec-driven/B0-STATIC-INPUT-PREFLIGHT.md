@@ -46,3 +46,6 @@ python3 scripts/b0-prepare-static-inputs.py \
 [입력 준비 원장](../../system/eval/b0-knowledge-system/static-input-preflight-m2max-2026-10-04/summary.json)에 실제 CLI 종료 코드·개발 4개 파일·최종/ready 발행 거부·입력 무변경·정상 이전 export 동등성·26개 Python 회귀와 독립 코퍼스 재감사를 연결한다. 첫 회귀 실행의 로컬 HTTP bind 제한 두 건은 샌드박스 오류이며 제품 ID 검증 실패 다섯 건과 분리한다. 실제 모델/MCP·최종 질문 평가를 실행하지 않았고 품질은 null이다.
 
 우선순위와 전체 완료 조건은 [작업리스트](./EXECUTION-WORKLIST.md)를 따른다. 필요한 사람 결정 이후 입력 정의를 새 해시로 동결하고, B0-07의 실제 데이터셋·런타임 설정 검증 뒤 공식 평가를 진행한다.
+
+
+정적 v2의 미지정 날짜/subsystem·K 결합은 [STV2-01 검토 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)과 별도 checker로 구체화했다. 현재는 draft·승인 대기이며, 실제 runtime YAML/계측 K와 source-bound pack/semantic 신원 및 새 strict 데이터셋에 연결하기 전에는 v2_matrix_ready가 아니다.

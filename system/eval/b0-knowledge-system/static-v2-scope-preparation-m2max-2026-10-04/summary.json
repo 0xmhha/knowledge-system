@@ -1,0 +1,53 @@
+{
+  "scope": "static v2 query date/subsystem/K review proposal validation; not final prompt export, actual runtime binding, pack/semantic approval, model measurement or official B0/B1 readiness",
+  "base_code_commit": "b6f1acf3c8d7e964442148f8ae9a1a07de68ad7c",
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "commit_time_evidence": "2026-10-01T20:53:13+09:00",
+  "fixed_source_root_cks_file_count": 0,
+  "proposed_knowledge_as_of": "2026-10-01",
+  "proposed_subsystem": "knowledge-system",
+  "proposed_runtime_k": 10,
+  "input_sha256_before": {
+    "system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+    "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "ee5a44c01168c2a92ada947dce78bf88da773818c86d6e572a5b9a6715819c1d"
+  },
+  "input_sha256_after": {
+    "system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+    "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "ee5a44c01168c2a92ada947dce78bf88da773818c86d6e572a5b9a6715819c1d"
+  },
+  "inputs_unchanged": true,
+  "new_tests": 6,
+  "existing_static_input_tests": 10,
+  "before_failures": [
+    "Python ISO week date accepted despite MCP YYYY-MM-DD contract",
+    "float 10.0 equated to integer runtime K10"
+  ],
+  "actual_cli_pending_exit": 2,
+  "existing_output_and_gold_refused_exit": 1,
+  "invalid_scope_no_output": true,
+  "official_execution_ready": false,
+  "v2_matrix_ready": false,
+  "final_prompts_exported": false,
+  "metrics": null,
+  "validation": {
+    "documentation": "180 live documents OK",
+    "engine_boundaries": "OK",
+    "go_code_changed": false,
+    "full_go_suite_repeated": false
+  },
+  "source_root_inventory_command": [
+    "git",
+    "ls-tree",
+    "-r",
+    "--name-only",
+    "71cb71cd55960833e930269e272f7a4a060be3aa",
+    "--",
+    ".cks"
+  ]
+}
