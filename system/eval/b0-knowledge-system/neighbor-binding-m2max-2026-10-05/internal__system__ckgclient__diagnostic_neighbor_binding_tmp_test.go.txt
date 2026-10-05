@@ -1,0 +1,110 @@
+package ckgclient
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"os"
+	"strings"
+	"testing"
+)
+
+func TestDiagnosticBoundNeighborInputs(t *testing.T) {
+	input, output := os.Getenv("B0_NEIGHBOR_REPLAY_INPUT"), os.Getenv("B0_NEIGHBOR_REPLAY_OUTPUT")
+	if input == "" || output == "" {
+		t.Fatal("owned diagnostic input/output required")
+	}
+	raw, err := os.ReadFile(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var capture struct {
+		Cases []struct {
+			MeasurementID       string            `json:"measurement_id"`
+			Ordinal             int               `json:"ordinal"`
+			Citation            contract.Citation `json:"citation"`
+			Options             NeighborsOpts     `json:"options"`
+			InputSHA            string            `json:"input_sha256"`
+			InputBytes          int               `json:"input_bytes"`
+			RecordedOutcome     string            `json:"recorded_outcome"`
+			RecordedResultCount int               `json:"recorded_result_count"`
+		} `json:"cases"`
+	}
+	if err := json.Unmarshal(raw, &capture); err != nil {
+		t.Fatal(err)
+	}
+	if len(capture.Cases) != 20 {
+		t.Fatal("expected 20 hash-bound DEV SDK seed arguments")
+	}
+	client, err := NewReal("/private/tmp/ks-large-cost-20261005/dataset/diagnostic/graph/graph.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+	rows := []map[string]any{}
+	docs, failures, returned := 0, 0, 0
+	for _, c := range capture.Cases {
+		encoded, err := json.Marshal(c.Citation)
+		if err != nil {
+			t.Fatal(err)
+		}
+		digest := sha256.Sum256(encoded)
+		if hex.EncodeToString(digest[:]) != c.InputSHA || len(encoded) != c.InputBytes {
+			t.Fatal("Go JSON argument differs from actual SDK measurement")
+		}
+		nodes, err := client.s.NodesByFilePath(c.Citation.File)
+		if err != nil {
+			t.Fatal(err)
+		}
+		symbols, structural := 0, 0
+		for _, node := range nodes {
+			if isStructuralQname(node.QualifiedName) {
+				structural++
+			} else {
+				symbols++
+			}
+		}
+		result, callErr := client.Neighbors(context.Background(), c.Citation, c.Options)
+		outcome, message := "returned", ""
+		if callErr != nil {
+			failures++
+			outcome = "backend_error"
+			message = callErr.Error()
+		} else {
+			returned++
+		}
+		if outcome != c.RecordedOutcome || len(result) != c.RecordedResultCount {
+			t.Errorf("SDK/Go mismatch at %s/%d", c.MeasurementID, c.Ordinal)
+		}
+		document := strings.HasSuffix(c.Citation.File, ".md")
+		if document {
+			docs++
+			if symbols != 0 || matchQname(nodes, c.Citation) != "" || callErr == nil || !strings.Contains(message, "no node at") {
+				t.Errorf("document no-symbol diagnosis differs at %s/%d", c.MeasurementID, c.Ordinal)
+			}
+		} else if callErr != nil {
+			t.Errorf("code seed failed: %v", callErr)
+		}
+		rows = append(rows, map[string]any{"measurement_id": c.MeasurementID, "ordinal": c.Ordinal, "input_sha256": c.InputSHA, "input_bytes": c.InputBytes, "citation": c.Citation, "options": c.Options, "document": document, "graph_symbol_candidates": symbols, "graph_structural_candidates": structural, "matched_qname": matchQname(nodes, c.Citation), "outcome": outcome, "result_count": len(result), "error": message})
+	}
+	if docs != 12 || failures != 12 || returned != 8 {
+		t.Errorf("unexpected inventory docs=%d failures=%d returned=%d", docs, failures, returned)
+	}
+	report := map[string]any{"diagnostic_only": true, "quality_metrics": nil, "official_verdict": nil, "scope": "20 actual newly hash-bound neighbors seed arguments; direct real Go adapter and actual options; historical unbound errors excluded", "planned_calls": 20, "observed_calls": len(rows), "document_no_symbol": docs, "no_node_errors": failures, "returned": returned, "rows": rows, "test_failed": t.Failed()}
+	encoded, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.Write(append(encoded, '\n')); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+}

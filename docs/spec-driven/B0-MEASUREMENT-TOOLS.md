@@ -44,6 +44,8 @@ logging:
 
 질의 scope에서는 serviceability health, intent 임베딩, 모든 CKV semantic_search와 CKG BM25/FindSymbol/Neighbors 호출을 실제 인터페이스 경계에서 관측한다. 별도 knowledge pass, Stage 1 keyword rerank, Stage 3 방향별 확장, 선택형 개념 텍스트 검색을 모두 포함한다. 원문/기호는 SHA와 UTF-8 크기, 옵션은 실제 K·필터·rerank/그래프 상한, 결과는 개수·성공/실패·ns 시간으로 기록한다. backend 오류 메시지나 원문 프롬프트·벡터를 이 이벤트에 복사하지 않는다. 기존 composer footprint 형식은 그대로다.
 
+2026-10-05 FIX-21부터 Neighbors의 `input_sha256`·`input_bytes`는 실제 `contract.Citation` 인수의 Go `encoding/json.Marshal` SHA·바이트 수다. compact JSON의 필드 순서는 file/start_line/end_line/commit_hash이며 Go 기본 HTML·줄 구분자 이스케이프를 유지한다. 파일/commit 원문은 이벤트에 넣지 않으며 계측 scope가 없으면 직렬화하지 않는다. 인수 길이는 원문/네트워크 바이트가 아니다. project/dataset 전체 좌표는 이 v1 인수에 없으므로 설정/신원·원응답과 별도로 연결한다. 이전 로그의 빈 SHA·0바이트는 소급 채우지 않는다. [새 실제 20입력·4 SDK 검증](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)은 on/off 응답 동등성·원문32개·공개 Go 계약과 실제 adapter 입력 SHA/옵션/결과의 일치를 확인했다.
+
 Ollama는 별도의 backend=ollama_http 행으로 HTTP transport **시도**를 관측한다. 리다이렉트와 실패도 각각 세며, method/path·request body의 선언된 크기·실제로 읽은 response body 바이트·HTTP status를 기록한다. 헤더·URL host·본문·임베딩 값은 받지 않는다. 시간은 시도 시작부터 마지막 body read까지이며, JSON decode 사이의 시간은 포함하고 뒤따르는 모델 검증 조회는 해당 시도 시간에 더하지 않는다. 논리 API 행과 그 내부 HTTP 행을 합산해 하나의 “검색 횟수”로 표시하지 않는다. 모델 서버의 내부 계산·tokenizer·SQL 문 수·네트워크 헤더/wire 전체 바이트를 세는 기능은 아니다.
 
 startup.intent_anchors scope는 classifier의 사전 anchor 임베딩과 그 HTTP 시도를 별도로 기록한다. scope 생성 전의 모델 pin/probe·index open은 호출 원장에 포함하지 않는다. 기존 cold_process 시간은 그 초기화를 포함한 프로세스 시작→첫 응답이며, 모델/데몬의 미상주 지연이 아니다. 요청별 scope는 mutex로 격리하고 시작 순번을 유지한다. handler 종료 시 반환되지 않은 시도는 in_flight/pending_calls로 보존하며 늦은 완료가 이미 출력한 기록을 바꾸지 않는다.

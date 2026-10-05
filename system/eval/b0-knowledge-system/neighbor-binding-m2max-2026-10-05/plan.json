@@ -1,0 +1,57 @@
+{
+  "commands": [
+    [
+      "/private/tmp/ks-neighbor-binding-cks-20261005",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-neighbor-binding-live-20261005/requests.json",
+      "--config",
+      "/private/tmp/ks-neighbor-binding-live-20261005/on.yaml",
+      "--output",
+      "/private/tmp/ks-neighbor-binding-live-20261005/on.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "90s"
+    ],
+    [
+      "/private/tmp/ks-neighbor-binding-cks-20261005",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-neighbor-binding-live-20261005/requests.json",
+      "--config",
+      "/private/tmp/ks-neighbor-binding-live-20261005/off.yaml",
+      "--output",
+      "/private/tmp/ks-neighbor-binding-live-20261005/off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "90s"
+    ]
+  ],
+  "planned_sdk_calls": 4,
+  "mode_counts": {
+    "on": 2,
+    "off": 2
+  },
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "scope": "DEV one prompt baseline/knowledge; measure on/off equality and new neighbor seed binding; no latency inference",
+  "parent_commit": "a6980a9ffdde83485ebaba43ed663352919298af",
+  "tracked_product_diff_sha256": "550b0597e75de7e9f0531a641c3a52f6a6f7dd544c678fa515c6b6675bdfe956"
+}

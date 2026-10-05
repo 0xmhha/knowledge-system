@@ -1,0 +1,21 @@
+import json,subprocess,hashlib,urllib.request,shutil,time
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-neighbor-binding-live-20261005');R.mkdir(mode=0o700,exist_ok=False);OLD=Path('/private/tmp/ks-large-cost-20261005');BIN=Path('/private/tmp/ks-neighbor-binding-cks-20261005');sha=lambda b:hashlib.sha256(b).hexdigest()
+def save(n,v):(R/n).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+shutil.copyfile(OLD/'requests.json',R/'requests.json')
+files=[BIN,R/'requests.json',ROOT/'internal/system/backendmeasure/clients.go',ROOT/'internal/system/backendmeasure/recorder_test.go']
+for mode in ('on','off'):
+ text=(OLD/'config.yaml').read_text().replace(str(OLD/'footprints'),str(R/('footprints-'+mode)))
+ assert 'measure_backend_calls: true' in text
+ if mode=='off':text=text.replace('measure_backend_calls: true','measure_backend_calls: false')
+ cfg=R/(mode+'.yaml');cfg.write_text(text);files.append(cfg)
+bindings={str(p):sha(p.read_bytes()) for p in files};save('bindings-before.json',bindings)
+model=lambda:{k:json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/'+k,timeout=15)) for k in ('version','tags','ps')};before=model();save('model-before.json',before)
+commands=[]
+for mode in ('on','off'):
+ cmd=[str(BIN),'eval','capture','--requests',str(R/'requests.json'),'--config',str(R/(mode+'.yaml')),'--output',str(R/(mode+'.json')),'--warmup','0','--retrieval-runs','1','--warm-runs','0','--cold-runs','0','--call-timeout','90s'];commands.append(cmd)
+ with (R/(mode+'.stdout.txt')).open('wb') as out,(R/(mode+'.stderr.txt')).open('wb') as err:
+  start=time.monotonic();run=subprocess.run(cmd,stdout=out,stderr=err)
+ save(mode+'-result.json',{'exit_code':run.returncode,'wall_seconds':time.monotonic()-start});assert run.returncode==0
+save('plan.json',{'commands':commands,'planned_sdk_calls':4,'mode_counts':{'on':2,'off':2},'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'scope':'DEV one prompt baseline/knowledge; measure on/off equality and new neighbor seed binding; no latency inference','parent_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'tracked_product_diff_sha256':sha(subprocess.check_output(['git','diff','--','internal/system']))})
+after={str(p):sha(p.read_bytes()) for p in files};assert bindings==after;save('bindings-after.json',after);final=model();save('model-after.json',final);assert before['tags']==final['tags'] and before['version']==final['version'];print(json.dumps({'run':str(R),'sdk_calls':4,'inputs_unchanged':True}))

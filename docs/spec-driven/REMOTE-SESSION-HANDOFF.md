@@ -4,6 +4,8 @@
 
 ## 재개 후 보고 규칙
 
+2026-10-05 최신 계측 보완: [FIX-21 neighbors 입력 SHA](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)는 수정 전 실패→관련6패키지/race2/vet→같은 BGE/부분13,575청크4 SDK/32인용·본문/Go Verify를 확인했다. 계측 on/off 전체 응답은 같으며 새20실제 seed의 SHA/길이/옵션/결과를 real Go로 일대일 재생했다. 문서12개 symbol없음/no node at·코드8 정상, 과거 미결합360/12의 제한은 유지한다. source/DB/실제 사람 입력5개 불변·39원자료·공식null·미완료28개다. 다음은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 기존 FIX-19 preview는 FIX-20/21 최종 검증 패키지가 아니므로 동결 후 재빌드한다.
+
 2026-10-05 최신 추가 확인: [선택 문서 neighbors](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)의 실제 Go adapter 직접8재생은 문서6개 symbol없음/no node at·코드2 정상이다. 기존360/새SDK12전체seed와 직접 결합할 수 없는 계측 한계는 유지한다. 임시 테스트 원문보관 후 제거·제품변경 없음·DB/source/사람 입력5개 불변·5원자료·공식null·전체28미완료다. 다음은 실제 B0/SF/STV2 결정→동결→새 strict B0-07이다.
 
 2026-10-05 직전 기술 수정: [FIX-20 FTS 후보](./B0-FTS-KEYWORD-DIAGNOSTIC.md)는 대규모 DEV 후보8개의 bare FTS 오류를 수정 전2회귀→literal 경계/실제SQLite→관련7패키지/race3/vet→같은 BGE/부분13,575청크2 SDK/16인용·본문/Go Verify로 검증했다. BM25 오류 호출당8→0·기본 근거/좌표·source/DB/model/config/binary·사람 입력5개 불변이다. neighbors12오류는 유지하며 다음 독립 확인은 실제 seed/노드 경계다. 공식 null·전체28미완료·B0/SF/STV2 결정→동결→새 strict B0-07이 최우선이다. FIX-19 preview는 FIX-20 검증 패키지가 아니고 최종 동결 후 재빌드한다.

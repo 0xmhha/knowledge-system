@@ -65,7 +65,7 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 | B0-03 | P0 | F-01–F-06의 개발/최종 입력·정답·실패 오라클 검토 | 12변형 검토 기록·원문 해시·독립 표본 단위 확정 | 사람 검토 대기 |
 | B0-04 | P1 · B0-03 | 초안 JSON의 입력을 실제 독립 저장소/커밋으로 생성. F-04는 순차 두 상태, F-05는 서로 다른 프로젝트 | 선언된 파일 SHA·줄·Git 독립성 일치; 재실행 바이트 동일; 기존 디렉터리 덮어쓰기 거부 | 진행: 개발 6개 준비·재현 검사 통과; F-03 project_id 원문과 불일치 수정/회귀 통과, 최종/승인 대기 |
 | B0-05 | P1 · B0-04 | F-03/05/06에 필요한 의미 사실·팩·스펙·관계·코드 앵커를 fixture 자기 스냅샷에 결합 | 검토 기록과 canonical ID·보관 줄 해시 일치; 미검토 자동 승격 0 | 진행: 개발 F-03/F-05 A·B/F-06 실제 mock/BGE-M3 결합·무승격 검증, [검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md) 준비; 사람 판정/최종 대기 |
-| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md)의 full eligible·실제 K/순위/source/exact/budget 재생 준비; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
+| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: [FIX-21 neighbors 인수 SHA](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)의 수정 전 실패/관련 시험·race·실제4 SDK/32본문/20입력 Go 재생과 계측 on/off 동등성 확인; 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md)의 full eligible·실제 K/순위/source/exact/budget 재생 준비; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
 | B0-07 | P1 · B0-01/02/03/05/06 | 공식 데이터셋을 동결된 입력으로 빌드하고 보관 원문·그래프·벡터를 감사 | strict embedding·선택 범위·input hashes·split 재조립·정렬·doctor 통과; 빌드 지연 별도 계측 | 대기 |
 | B0-08 | P2 · B0-07 | 공식 정적 `cks eval --verify-anchors`와 F-01–06 실모델 실행 | 승인 gold와 원응답 연결; 최종 입력 독립; cold/warm 혼동 없음; F-01 자격 실패는 fixture_not_qualified | 대기 |
 | B0-09 | P2 · B0-08 | B0 보고서 작성: 정답·범위·환경·지표·실패·제한 | 승인 입력과 재현 명령·원자료 포함; 실패/기권/소표본을 성공으로 합산하지 않음 | 대기 |
@@ -412,3 +412,11 @@ SDK 실패/누락0과 backend 오류840(BM25480·neighbors360)을 구분했다. 
 2026-10-05 [neighbors 진단](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)에서 FIX-20 SDK가 선택한8인용을 real Go adapter에 직접 재생했다. 문서6개는 symbol 후보0·qname미해결·no node at이며, 코드2개는 오류 없이 조회된다. Git hunk/path/file 구조 노드를 코드 관계로 승격하지 않았다. 임시 진단 Go 테스트를 실행하고 원문을 `.go.txt`로 보존한 뒤 코드 트리에서 제거했다. 제품 변경/일반CI 추가·실모델/SDK/FINAL 추가 실행 없음이다.
 
 실제 이전 neighbors 원장은 source 인수를 기록하지 않으므로 직접8개를 과거360 또는 새SDK12의 전체seed로 일대일 결합할 수 없다. 기존 failed_seeds6과 정합적이지만 전체 원인 확정/안전·품질 통과로 확대하지 않는다. 입력capture/adapter/helper SHA와 원본/사본 DB/source·사람 입력5개 불변·원자료5개를 기록했다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→입력 동결→새 strict B0-07이다. 완료2/진행11/대기17·공식0/4·미완료28개와 OP/native/legal/최종복구·출시를 유지한다.
+
+## 34. FIX-21 Neighbors 계측의 실제 입력 결합
+
+2026-10-05 [인수 해시 진단](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)에서 기존 neighbors의 빈 입력 계측을 보완했다. 실제 Citation의 Go JSON SHA/바이트만 기존 원장에 기록하며 원문 경로·commit을 노출하지 않고 scope가 없으면 직렬화하지 않는다. 수정 전 실패→관련6패키지/race2/vet/build→같은 BGE/부분13,575청크의 계측 on/off4 SDK·32인용/본문·Go Verify를 확인했다. 전체 SDK 응답은 동일하다.
+
+새 실제 neighbors20개를 indexed source 후보의 SHA/길이로 결합하고 같은 옵션의 real Go adapter 재생으로20/20 결과·개수 일치를 확인했다. 문서12개 symbol없음/no node at·코드8개 정상이며 과거 미결합360/12오류는 소급 판정하지 않는다. source/원본/사본 DB·모델·바이너리/설정·실제 사람 입력5개 불변·39원자료를 기록했다. 임시 Go 테스트는 원문 `.go.txt`로 보관 후 제거했다. 조립 보조 도구 필드 착오는 별도 실패 기록 후 수정했으며 SDK/제품 실패가 아니다.
+
+B0-06의 계측 보완 완료를 공식 품질 게이트 완료로 세지 않는다. 완료2/진행11/대기17·미완료28·게이트0/4다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→입력 동결→새 strict B0-07이다. FIX-19 preview는 FIX-20/21 이후 최종 패키지 검증이 아니며 최종 동결 후 재빌드한다. B0/B1/C0/C1·STV2·OP-01–08·native amd64·고지/복구/지원/출시는 남는다.

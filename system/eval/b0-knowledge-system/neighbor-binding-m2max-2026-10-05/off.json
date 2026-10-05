@@ -1,0 +1,612 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T12:46:29.79351Z",
+  "finished_at": "2026-10-05T12:46:45.450415Z",
+  "request_sha256": "97e72cdee06f62b43864a552f057683afbb216ad9ec80d502bc39fadb53f20c8",
+  "config_sha256": "bf32e3f0ce2a4e518083d93098afffe0d887e1d9029697851dc92161b7a9427d",
+  "binary_sha256": "4f4843f9a744b0be8be51aade1f270a19721e9bc374cb031eed3bc0493dc4f77",
+  "config_sha256_after": "bf32e3f0ce2a4e518083d93098afffe0d887e1d9029697851dc92161b7a9427d",
+  "binary_sha256_after": "4f4843f9a744b0be8be51aade1f270a19721e9bc374cb031eed3bc0493dc4f77",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "large-dev-code-01-baseline",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "00f0c29ee3900f0413e14cb33d599179",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": false,
+          "knowledge_as_of": "2026-10-01",
+          "knowledge_subsystem": "knowledge-system",
+          "prompt": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?"
+        },
+        "elapsed_ns": 5475660875,
+        "completed_at": "2026-10-05T21:46:39.225709+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-knowledge-system",
+              "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+              "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+              "source_mode": "committed",
+              "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa"
+            },
+            "query": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?",
+            "citations": [
+              {
+                "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                "start_line": 5,
+                "end_line": 8,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                "content_sha256": "d96aa04d8e119e2e82ce7fee2a2adeab47051e757ce57ba89fdea4707c926c59"
+              },
+              {
+                "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                "start_line": 47,
+                "end_line": 54,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                "content_sha256": "e1415f06eff285e70e5f724a8b39b3752bc9e98ad5abdbf36eba42fbf2477db1"
+              },
+              {
+                "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                "start_line": 91,
+                "end_line": 100,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+                "content_sha256": "2e13379bd28978883d739af45e1d161a9846c289041ec7218279db6ab2281ea4"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 511,
+                "end_line": 532,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "9ea57ac32bc390542ceb1526cf094d4d96f3c84762a2306a91b5be7bd766a00b"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 471,
+                "end_line": 510,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "3161289f6b0d8023650009b9d2186209d1c43363e6f6d7acdb5e982d05a18682"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 169,
+                "end_line": 195,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "f33e917f74db2554da3326ff1294d5fbf5e6ff6d70efd20edb2c6c25afbbe1a7"
+              },
+              {
+                "file": "internal/system/semantic/validate.go",
+                "start_line": 33,
+                "end_line": 33,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+                "content_sha256": "696e16b28b42e22f91ed0df44e86849e320f43f4431b4a9a981b365306e3ab5f"
+              },
+              {
+                "file": "graph/eval/ckv-mirror/corpus/validator.go",
+                "start_line": 19,
+                "end_line": 19,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f",
+                "content_sha256": "896b5d2abba437a4f57f1c1b17d5e1c9c9f428da7ed235270e0a66c169bfea8d"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                  "start_line": 5,
+                  "end_line": 8,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                  "content_sha256": "d96aa04d8e119e2e82ce7fee2a2adeab47051e757ce57ba89fdea4707c926c59"
+                },
+                "text": "## 문제\n\n현재 `cks setup`은 깨끗한 `committed` 입력만 받아 Git HEAD를 CKG/CKV 인용에 기록한다. 이는 안전한 제한이다. 더러운 작업 트리를 그대로 읽으면 두 엔진이 서로 다른 시점의 파일을 볼 수 있고, 같은 HEAD의 수정·신규 파일은 같은 버전으로 오인된다. Git이 없는 프로젝트는 지금 설치 경로에서 제외된다. 현재 CKV 매니페스트에는 안정 `project_id`/`dataset_id`/`snapshot_id`가 없으며 의미 투영은 자체 프로젝트/데이터셋 ID를 갖는다. 기존 인용 소비자는 커밋·경로·줄을 사용한다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                  "start_line": 47,
+                  "end_line": 54,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                  "content_sha256": "e1415f06eff285e70e5f724a8b39b3752bc9e98ad5abdbf36eba42fbf2477db1"
+                },
+                "text": "### 2026-09-30 CKG/CKV 기술 검증 결과\n\n`/private/tmp/ks-snapshot-spike.O1uiWX`의 작은 Go 저장소에서 한 커밋을 만들고 `git worktree add --detach`로 분기한 뒤 함수 `Before`를 `AfterWorkingTree`로 바꿨다. 현재 `ckg build --src \u003cstaged\u003e --lang go`는 수정된 `AfterWorkingTree` AST 노드를 만들고 동시에 원래 HEAD의 temporal 노드/엣지를 생성했다. 노드의 `file_path`는 `main.go`로 상대 경로였다. 반면 CKG 출력 매니페스트의 `src_root`는 임시 staged 절대 경로였다. **결론:** Git 이력과 수정 AST의 동시 수집은 작은 픽스처에서 가능하다. 임시 절대 경로를 정렬/매니페스트/인용에 남기지 않는 인터페이스 변경과 다른 언어·큰 저장소·worktree 제거 뒤 재조회 검증은 남아 있다. 이 결과만으로 ADR을 승인하지 않는다.\n\n같은 날 Go/TypeScript 2파일과 Markdown 1파일로 기술 실험을 확대했다. 수정된 두 파일을 임시 Git worktree에 오버레이하면 CKG는 새 함수 `AfterWorkingTree`와 `afterWorkingTreeTS`, 원래 HEAD의 Commit 1개를 함께 만들었다. 같은 바이트의 두 번째 worktree는 동일 Go 모듈 환경에서 같은 두 canonical ID와 같은 그래프 다이제스트를 냈다. 비Git 일반 디렉터리도 CKG 7노드/5엣지와 CKV 6청크를 만들고 Commit 노드 0개, 빈 `indexed_head`를 기록했다. 별도 `sources/blobs/\u003csha256\u003e` 시험 보관본의 네 파일은 staging 경로 없이 해시만으로 다시 읽혔다.\n\n두 결함도 재현됐다. Git worktree 빌드에서 CKG 심볼은 두 canonical ID를 가졌지만 CKV 정렬은 **0/2**였다. CKG의 같은 줄 Hunk/구문 노드가 정렬 인덱스의 첫 후보가 되고 빈 canonical ID를 복사한 것이다. 비Git 빌드에서는 **2/2**였다. 따라서 CKV 정렬 후보는 비어 있지 않은 canonical ID의 AST 심볼 타입으로 제한하고, 동일 줄의 우선순위를 고정하며, 두 모드 모두 정렬률 게이트를 적용한다. 또한 Go 빌드 캐시가 쓰기 불가인 재실행에서는 `parse_errors_count=0`인데 Go 함수 canonical ID가 비었다. Go 패키지 신원 조회 실패를 별도 `parse_degraded` 오류로 다뤄야 한다. CKG/CKV 매니페스트 모두 현재 `src_root`에 임시 절대 경로를 기록하므로 공개 전 논리 경로 분리가 필수다. 실험은 원문 보관·재조회의 엔진 통합 구현을 대신하지 않으며 A4에서 실패 주입과 플랫폼 간 결정성을 검증한다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                  "start_line": 91,
+                  "end_line": 100,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+                  "content_sha256": "2e13379bd28978883d739af45e1d161a9846c289041ec7218279db6ab2281ea4"
+                },
+                "text": "## 5. CKG와 CKS의 근거 조합\n\nCKG 현재 파일 감사는 현재 `File` 노드를, 역사 검색은 별도 temporal 그래프를 사용한다. CKG가 보유한 `canonical_id`는 오직 동일 `project_id/snapshot_id`의 CKV 코드 청크에 연결된다. AST 파서 실패/미지원 언어는 `degraded`로 표시하고 문서 텍스트 근거로 AST 관계를 만들어내지 않는다. `graph_digest`는 논리적 코드 그래프 핀으로 유지하고 `enrich_digest`·parse coverage를 별도 기록한다. 그래프 다이제스트가 이력을 제외하더라도 `snapshot_id`가 다른 데이터셋을 동일 버전으로 합치지 않는다. 정책/보안 오버레이가 바뀌면 레시피가 달라 새 데이터셋이다. 모든 검색/임베딩/개념 캐시 키에는 최소 `project_id`와 `dataset_id`를 포함해 같은 이름의 두 저장소가 캐시를 공유하지 않는다.\n\nCKS 질의는 한 고정 `dataset_id`를 열고 **raw query**를 CKV/CKG/BM25에 전달한다. 어휘/온톨로지는 원문을 대체하지 않는다. 개념 후보는 다국어 별칭과 모호성 점수를 가진 복수 목록이며 `verified` 관계만 기본 상위 K 후보의 순서를 제한적으로 바꾼다. 원래 상위 K의 ID 집합은 유지한다. 저장소가 없거나 검증 실패/시간 초과/예산 초과면 기본 경로로 돌아가고 `ontology_state=unavailable|stale|budget_exceeded`를 남긴다. ontology flag의 기본값은 B/C 판정 전까지 `off`다. 원문 검색 후보가 0이면 개념 텍스트 별도 검색은 수행할 수 있으나 이를 원래 후보였다고 표시하지 않고 출처/경로를 분리한다. D5 도메인 문맥도 원문 검색/접근 필터 **뒤**에 붙이고, 검토된 적용 정책·결정만 v2 의미 필드에 인용한다. 구체 계약은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다.\n\n기본 구조 상한은 현재 Stage 2의 개념 후보 8개·점수 증가 최대 20%, Stage 3의 확장 seed 10개/이웃 50개, EvidencePack 본문 8,000 토큰/인용 12개를 유지한다. 이 값은 안전한 작업 범위이지 품질 합격 수치가 아니다. 설정에서 조정하되 실제 사용값을 팩과 B 평가에 기록하고, 상한으로 생략된 근거를 `budget_exceeded`/`incomplete`로 드러낸다.\n\n`EvidenceRef`는 `{project_id,dataset_id,snapshot_id,origin_id,path,start_line,end_line,file_sha256,content_sha256,canonical_id?,chunk_id?,status}`다. `file_sha256`은 보관된 전체 파일, `content_sha256`은 인용 줄 범위의 **정화 전 원문 바이트**를 뜻한다. 줄은 원문 바이트의 LF(`0A`) 뒤에서 나누고 CRLF의 CR은 보존하며 마지막 줄의 LF 유무도 보존한다. 1부터 시작하는 포함 범위의 줄 바이트를 그대로 이어 SHA-256 한다. 원문 조회는 보관본의 매핑 테이블에서만 수행하고 두 해시/줄을 다시 검사한다. 절대 경로, `..`, 미등록 source, 손상 blob은 인용을 조용히 건너뛰지 않고 `source_missing` 또는 `snapshot_mismatch`로 표시한다. sanitization은 검증된 본문에 적용한 뒤에만 팩을 외부로 내보낸다. 팩 해시는 정화된 출력 본문을 보호하고 원문 해시를 본문 대신 공개하지 않는다. 보관본 읽기 오류로 중요한 근거가 빠지면 팩의 `evidence_state=partial`이고 확정 답변 상태가 될 수 없다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 511,
+                  "end_line": 532,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "9ea57ac32bc390542ceb1526cf094d4d96f3c84762a2306a91b5be7bd766a00b"
+                },
+                "text": "### 3-R-CKV-2. CKS §2-R2 수용 + 언어 스코프 정밀화 (2026-06-29)\n\n\u003e CKS가 §2-R2에서 D-1~D-5·R1·R2를 모두 확답 → **5세션 수렴 완료.** CKV는 CKS의\n\u003e \"독자 재빌드 안 함, CKG canonical graph.db를 config로 가리킴\" 결정을 수용한다.\n\u003e 단 CKS가 제기한 \"빌드 파라미터 일치\" 제약에 CKV 관점 한 가지를 추가한다.\n\n- **✅ D-1 빌드 정본 일치 수용.** CKV도 독자 빌드하지 않고 **CKG가 `0bf2f4d1b` +\n  `make eval-build-dbs LANG=auto`로 만든 정본 소스 트리/그래프에 맞춰 `ckv build`**\n  한다(동일 detached+clean 체크아웃). CKS와 동일하게 CKG 공표 sha를 기준점으로 삼는다.\n- **⚠️ 언어 스코프 정밀화(신규).** CKG `LANG=auto`는 **sol/proto 포함**이나, CKV 파서는\n  **go / solidity / typescript / javascript / markdown** 만 — **proto 미파싱**. 따라서\n  CKG의 proto 심볼 노드는 CKV 대응 청크가 *설계상* 없다. → **매칭률은 CKV가 파싱하는\n  공유 언어(go/sol/ts/js)로 스코프**하고 proto 노드는 분모에서 제외해야 한다(안 그러면\n  proto 때문에 매칭률이 인위적으로 낮게 나옴). 측정 방향(분모 = CKV청크 기준 vs CKG\n  심볼노드 기준)도 3자 합의로 못 박자 — CKV 제안: **분자 = 공유언어 CKV청크 중 CKG\n  노드에 정렬된 수 / 분모 = 공유언어 CKV청크 총수**.\n- **✅ R1/R2 수렴 확인.** CKS가 \"1024 유지 선호\" 철회 + 차원은 reindex-B 실측 후 결정,\n  flow/invariant 노출 Phase 2 확정 → §5의 두 비전 위험이 *합의로 닫혔다*(편의가 아니라\n  목표가 결정 근거). CKV는 dim 결정권을 위임받았으므로 reindex-B 실측을 CKV가 주관.\n\n---\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 471,
+                  "end_line": 510,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "3161289f6b0d8023650009b9d2186209d1c43363e6f6d7acdb5e982d05a18682"
+                },
+                "text": "### 3-R-CKV. CKV 결정 회신 (2026-06-29, D-1~D-5)\n\n\u003e coding-agent가 제기한 D-1~D-5에 대한 CKV(벡터 검색 엔진) 측 결정. CKV가\n\u003e 의사결정 당사자인 항목(D-1/D-3/D-4)은 결정, 나머지는 확인/위임.\n\n**D-1 (CRITICAL) — 재인덱싱 커밋 `0bf2f4d1b`로 통일: ✅ 동의**\n- CKG↔CKV 매칭률은 CKV 인덱스와 CKG 그래프가 **동일 소스 커밋**에서 빌드돼야 성립.\n  go-stablenet을 `0bf2f4d1b`에 체크아웃해 `ckv build` 하면 3자 한 커밋 정렬. CKV에\n  다른 커밋을 강제할 제약 없음 → \"1회 재인덱싱으로 3자 커버\" 수용.\n- ⚠️ **모델 축 분리 제안**: 매칭률(canonical_id/file:line join)은 임베딩 모델과\n  무관하지만 PR-77 retrieval 품질 bench는 모델 의존. 따라서 **커밋은 `0bf2f4d1b`로\n  핀, 모델만 2회**:\n  - reindex-A = `0bf2f4d1b` + 현행 bge-m3@1024 → 매칭률 + PR-77 현행-프로덕션 baseline\n  - reindex-B = `0bf2f4d1b` + Qwen3 → 모델 교체 A/B (동일 커밋이라 비교 유효)\n\n**D-2 — schema ≥1.19 게이트: ✅ 확인 + CKV 코드 액션**\n- 측정 그래프 cache SchemaVersion ≥1.19(현 1.22) 보장 수용. **CKV 액션**: ckgalign\n  게이트를 *PRAGMA 컬럼-존재 probe*(1.16~1.18 통과시켜 NULL을 join key로 쓰는 위험)에서\n  **manifest `schema_version \u003e= 1.19` 검사**로 교체.\n\n**D-3 — parity 분리: ✅ 동의**\n- ① recall/rerank류 = cks proxy 불요(단일 SemanticSearch + cks 소유 RRF). ADR-003 정합.\n- ② flow/invariant(flow-aware 4종 + find_invariants/get_conventions) = cks 표면 노출\n  필요(미구현). CKV가 도구를 내도 cks 노출 없으면 coding-agent에 안 닿음 → 분리 추적.\n\n**D-4 — `get_invariant_enforcement` 일정: 🟢 CKV는 defer 반대, Phase 2 포함 찬성**\n- 이미 flow-ingest Phase D 안의 bounded single-lookup(inv_id → 강제지점)이라 CKV\n  구현 비용 낮음. coding-agent H-가드레일을 무기한 블록하지 않으려면 defer 금지.\n- **조건**: CKV 도구 산출 + **CKS 표면 노출**을 *같은 Phase 2*에 묶어야 실효(D-3 ②).\n  → CKS 확답 필요(아래 §6 후속 프롬프트).\n\n**D-5 — P3/R06 중복: ⚪ CKV 무관, CKG 위임.**\n\n**schema_version 정책(fail-loud)**: CKV는 PR #12에서 임베딩 공간 불일치 시 index\nopen 거부(silent wrong-score 금지) + health embedder status 노출 → coding-agent의\n\"serviceable fail-loud \u003e silent fallback\"과 방향 일치. 확인.\n\n**CKV 코드 액션 3건**: ① ckgalign 게이트 ≥1.19 ② Phase D에서 `get_invariant_enforcement`\n우선 배치 ③ Qwen3 어댑터 query-prefix(\"Instruct:\") 흡수 + MRL 1024 truncate 경로.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 169,
+                  "end_line": 195,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "f33e917f74db2554da3326ff1294d5fbf5e6ff6d70efd20edb2c6c25afbbe1a7"
+                },
+                "text": "### 1-R3. CKG 후속 — CKS §2-R2 · CKV §3-R-CKV-2 · §6 수용 (2026-06-29)\n\n\u003e CKS §2-R2(D-1 빌드 파라미터 일치)·CKV §3-R-CKV-2(proto 언어 스코프)·§6 후속\n\u003e (모델 축·R1/R2)을 CKG가 검토·수용. 5세션 수렴 확인. CKG 사본:\n\u003e `code-knowledge-graph/docs/coordination-response-ckg-2026-06-29.md`.\n\n- **CKS §2-R2 \"빌드 파라미터 일치\" 수용 → CKG = 정본 그래프 단독 생산자.** 지적 정확:\n  `LANG=auto`(sol/proto 포함)와 `--lang go`는 다른 그래프를 낳는다. → **누구도 독자\n  재빌드하지 않고, CKG가 `0bf2f4d1b` + `make eval-build-dbs LANG=auto`로 만든 단일\n  canonical graph.db를 생산·공표(경로/sha/manifest schema_version)**; CKV는 그 소스\n  트리/그래프에 정렬, CKS는 config로 가리킨다. CKG가 이 단일 산출물 책임을 진다.\n- **CKV §3-R-CKV-2 언어 스코프 수용 (proto 제외).** CKG `LANG=auto`는 proto 심볼 노드\n  (검증 시 ~409개)를 포함하나 CKV는 proto 미파싱 → 대응 청크 부재(설계상). **매칭률 분모\n  에서 CKG-only 언어(proto) 제외**에 동의. CKV 제안 공식(분자=공유언어 CKV청크 중 CKG\n  노드 정렬 수 / 분모=공유언어 CKV청크 총수) 수용. **정밀화 1건**: 분자의 \"CKG 노드\"는\n  **canonical_id를 실제로 보유한 심볼 노드**여야 join key로 유효(비심볼 노드에 위치 정렬돼도\n  canonical_id NULL → join 불가). 공유언어 = go/sol/ts/js(CKG는 markdown 심볼 노드\n  미생산이라 자동 제외).\n- **§6-3 모델 축 순서 이의 없음 — 단 CKG 그래프는 1회.** reindex-A(bge-m3)/reindex-B\n  (Qwen3)의 \"2회 reindex\"는 **CKV 벡터 레이어** 작업이다. **CKG graph.db는 임베딩 비의존\n  → 동일 단일 그래프가 A·B 양쪽을 서비스**(canonical_id/코퍼스 동일, 벡터만 상이). CKG는\n  `0bf2f4d1b` 그래프 **1회 빌드 + sha 공표**로 충분. 순서 이의 없음.\n- **§6-2 비전 R1/R2 — CKG 입장.** R1(임베딩 차원)은 CKV/CKS 소관, **CKG 비의존**(그래프\n  동일). R2(flow/invariant의 cks 표면 노출)에 정렬: CKG는 control-flow **데이터**(노드/엣지)를\n  이미 제공하므로 D-4 Phase 2 노출을 데이터 측에서 막을 것 없음(노출은 cks 표면 작업).\n  \"post-Phase-2 defer 금지\" 가드레일에 동의.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "internal/system/semantic/validate.go",
+                  "start_line": 33,
+                  "end_line": 33,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+                  "content_sha256": "696e16b28b42e22f91ed0df44e86849e320f43f4431b4a9a981b365306e3ab5f"
+                },
+                "text": "\t\t\treturn fmt.Errorf(\"snapshot-only source cannot claim a Git commit\")\n"
+              },
+              {
+                "citation": {
+                  "file": "graph/eval/ckv-mirror/corpus/validator.go",
+                  "start_line": 19,
+                  "end_line": 19,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f",
+                  "content_sha256": "896b5d2abba437a4f57f1c1b17d5e1c9c9f428da7ed235270e0a66c169bfea8d"
+                },
+                "text": "\t\treturn errors.New(\"validator: empty email address\")\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "611442fc531e475e5df8a6575f86bba14cdc72e02646f3181ca62d2c3c2192fb"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "large-dev-code-01-knowledge",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "ad993576997513dc4c88a1bd291c7c60",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-01",
+          "knowledge_subsystem": "knowledge-system",
+          "prompt": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?"
+        },
+        "elapsed_ns": 5343499542,
+        "completed_at": "2026-10-05T21:46:44.569622+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-knowledge-system",
+              "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+              "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+              "source_mode": "committed",
+              "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa"
+            },
+            "query": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?",
+            "citations": [
+              {
+                "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                "start_line": 5,
+                "end_line": 8,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                "content_sha256": "d96aa04d8e119e2e82ce7fee2a2adeab47051e757ce57ba89fdea4707c926c59"
+              },
+              {
+                "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                "start_line": 47,
+                "end_line": 54,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                "content_sha256": "e1415f06eff285e70e5f724a8b39b3752bc9e98ad5abdbf36eba42fbf2477db1"
+              },
+              {
+                "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                "start_line": 91,
+                "end_line": 100,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+                "content_sha256": "2e13379bd28978883d739af45e1d161a9846c289041ec7218279db6ab2281ea4"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 511,
+                "end_line": 532,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "9ea57ac32bc390542ceb1526cf094d4d96f3c84762a2306a91b5be7bd766a00b"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 471,
+                "end_line": 510,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "3161289f6b0d8023650009b9d2186209d1c43363e6f6d7acdb5e982d05a18682"
+              },
+              {
+                "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                "start_line": 169,
+                "end_line": 195,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                "content_sha256": "f33e917f74db2554da3326ff1294d5fbf5e6ff6d70efd20edb2c6c25afbbe1a7"
+              },
+              {
+                "file": "internal/system/semantic/validate.go",
+                "start_line": 33,
+                "end_line": 33,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+                "content_sha256": "696e16b28b42e22f91ed0df44e86849e320f43f4431b4a9a981b365306e3ab5f"
+              },
+              {
+                "file": "graph/eval/ckv-mirror/corpus/validator.go",
+                "start_line": 19,
+                "end_line": 19,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "project_id": "b0-knowledge-system",
+                "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                "source_mode": "committed",
+                "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                "origin_id": "repo",
+                "file_sha256": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f",
+                "content_sha256": "896b5d2abba437a4f57f1c1b17d5e1c9c9f428da7ed235270e0a66c169bfea8d"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                  "start_line": 5,
+                  "end_line": 8,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                  "content_sha256": "d96aa04d8e119e2e82ce7fee2a2adeab47051e757ce57ba89fdea4707c926c59"
+                },
+                "text": "## 문제\n\n현재 `cks setup`은 깨끗한 `committed` 입력만 받아 Git HEAD를 CKG/CKV 인용에 기록한다. 이는 안전한 제한이다. 더러운 작업 트리를 그대로 읽으면 두 엔진이 서로 다른 시점의 파일을 볼 수 있고, 같은 HEAD의 수정·신규 파일은 같은 버전으로 오인된다. Git이 없는 프로젝트는 지금 설치 경로에서 제외된다. 현재 CKV 매니페스트에는 안정 `project_id`/`dataset_id`/`snapshot_id`가 없으며 의미 투영은 자체 프로젝트/데이터셋 ID를 갖는다. 기존 인용 소비자는 커밋·경로·줄을 사용한다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+                  "start_line": 47,
+                  "end_line": 54,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+                  "content_sha256": "e1415f06eff285e70e5f724a8b39b3752bc9e98ad5abdbf36eba42fbf2477db1"
+                },
+                "text": "### 2026-09-30 CKG/CKV 기술 검증 결과\n\n`/private/tmp/ks-snapshot-spike.O1uiWX`의 작은 Go 저장소에서 한 커밋을 만들고 `git worktree add --detach`로 분기한 뒤 함수 `Before`를 `AfterWorkingTree`로 바꿨다. 현재 `ckg build --src \u003cstaged\u003e --lang go`는 수정된 `AfterWorkingTree` AST 노드를 만들고 동시에 원래 HEAD의 temporal 노드/엣지를 생성했다. 노드의 `file_path`는 `main.go`로 상대 경로였다. 반면 CKG 출력 매니페스트의 `src_root`는 임시 staged 절대 경로였다. **결론:** Git 이력과 수정 AST의 동시 수집은 작은 픽스처에서 가능하다. 임시 절대 경로를 정렬/매니페스트/인용에 남기지 않는 인터페이스 변경과 다른 언어·큰 저장소·worktree 제거 뒤 재조회 검증은 남아 있다. 이 결과만으로 ADR을 승인하지 않는다.\n\n같은 날 Go/TypeScript 2파일과 Markdown 1파일로 기술 실험을 확대했다. 수정된 두 파일을 임시 Git worktree에 오버레이하면 CKG는 새 함수 `AfterWorkingTree`와 `afterWorkingTreeTS`, 원래 HEAD의 Commit 1개를 함께 만들었다. 같은 바이트의 두 번째 worktree는 동일 Go 모듈 환경에서 같은 두 canonical ID와 같은 그래프 다이제스트를 냈다. 비Git 일반 디렉터리도 CKG 7노드/5엣지와 CKV 6청크를 만들고 Commit 노드 0개, 빈 `indexed_head`를 기록했다. 별도 `sources/blobs/\u003csha256\u003e` 시험 보관본의 네 파일은 staging 경로 없이 해시만으로 다시 읽혔다.\n\n두 결함도 재현됐다. Git worktree 빌드에서 CKG 심볼은 두 canonical ID를 가졌지만 CKV 정렬은 **0/2**였다. CKG의 같은 줄 Hunk/구문 노드가 정렬 인덱스의 첫 후보가 되고 빈 canonical ID를 복사한 것이다. 비Git 빌드에서는 **2/2**였다. 따라서 CKV 정렬 후보는 비어 있지 않은 canonical ID의 AST 심볼 타입으로 제한하고, 동일 줄의 우선순위를 고정하며, 두 모드 모두 정렬률 게이트를 적용한다. 또한 Go 빌드 캐시가 쓰기 불가인 재실행에서는 `parse_errors_count=0`인데 Go 함수 canonical ID가 비었다. Go 패키지 신원 조회 실패를 별도 `parse_degraded` 오류로 다뤄야 한다. CKG/CKV 매니페스트 모두 현재 `src_root`에 임시 절대 경로를 기록하므로 공개 전 논리 경로 분리가 필수다. 실험은 원문 보관·재조회의 엔진 통합 구현을 대신하지 않으며 A4에서 실패 주입과 플랫폼 간 결정성을 검증한다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                  "start_line": 91,
+                  "end_line": 100,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+                  "content_sha256": "2e13379bd28978883d739af45e1d161a9846c289041ec7218279db6ab2281ea4"
+                },
+                "text": "## 5. CKG와 CKS의 근거 조합\n\nCKG 현재 파일 감사는 현재 `File` 노드를, 역사 검색은 별도 temporal 그래프를 사용한다. CKG가 보유한 `canonical_id`는 오직 동일 `project_id/snapshot_id`의 CKV 코드 청크에 연결된다. AST 파서 실패/미지원 언어는 `degraded`로 표시하고 문서 텍스트 근거로 AST 관계를 만들어내지 않는다. `graph_digest`는 논리적 코드 그래프 핀으로 유지하고 `enrich_digest`·parse coverage를 별도 기록한다. 그래프 다이제스트가 이력을 제외하더라도 `snapshot_id`가 다른 데이터셋을 동일 버전으로 합치지 않는다. 정책/보안 오버레이가 바뀌면 레시피가 달라 새 데이터셋이다. 모든 검색/임베딩/개념 캐시 키에는 최소 `project_id`와 `dataset_id`를 포함해 같은 이름의 두 저장소가 캐시를 공유하지 않는다.\n\nCKS 질의는 한 고정 `dataset_id`를 열고 **raw query**를 CKV/CKG/BM25에 전달한다. 어휘/온톨로지는 원문을 대체하지 않는다. 개념 후보는 다국어 별칭과 모호성 점수를 가진 복수 목록이며 `verified` 관계만 기본 상위 K 후보의 순서를 제한적으로 바꾼다. 원래 상위 K의 ID 집합은 유지한다. 저장소가 없거나 검증 실패/시간 초과/예산 초과면 기본 경로로 돌아가고 `ontology_state=unavailable|stale|budget_exceeded`를 남긴다. ontology flag의 기본값은 B/C 판정 전까지 `off`다. 원문 검색 후보가 0이면 개념 텍스트 별도 검색은 수행할 수 있으나 이를 원래 후보였다고 표시하지 않고 출처/경로를 분리한다. D5 도메인 문맥도 원문 검색/접근 필터 **뒤**에 붙이고, 검토된 적용 정책·결정만 v2 의미 필드에 인용한다. 구체 계약은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다.\n\n기본 구조 상한은 현재 Stage 2의 개념 후보 8개·점수 증가 최대 20%, Stage 3의 확장 seed 10개/이웃 50개, EvidencePack 본문 8,000 토큰/인용 12개를 유지한다. 이 값은 안전한 작업 범위이지 품질 합격 수치가 아니다. 설정에서 조정하되 실제 사용값을 팩과 B 평가에 기록하고, 상한으로 생략된 근거를 `budget_exceeded`/`incomplete`로 드러낸다.\n\n`EvidenceRef`는 `{project_id,dataset_id,snapshot_id,origin_id,path,start_line,end_line,file_sha256,content_sha256,canonical_id?,chunk_id?,status}`다. `file_sha256`은 보관된 전체 파일, `content_sha256`은 인용 줄 범위의 **정화 전 원문 바이트**를 뜻한다. 줄은 원문 바이트의 LF(`0A`) 뒤에서 나누고 CRLF의 CR은 보존하며 마지막 줄의 LF 유무도 보존한다. 1부터 시작하는 포함 범위의 줄 바이트를 그대로 이어 SHA-256 한다. 원문 조회는 보관본의 매핑 테이블에서만 수행하고 두 해시/줄을 다시 검사한다. 절대 경로, `..`, 미등록 source, 손상 blob은 인용을 조용히 건너뛰지 않고 `source_missing` 또는 `snapshot_mismatch`로 표시한다. sanitization은 검증된 본문에 적용한 뒤에만 팩을 외부로 내보낸다. 팩 해시는 정화된 출력 본문을 보호하고 원문 해시를 본문 대신 공개하지 않는다. 보관본 읽기 오류로 중요한 근거가 빠지면 팩의 `evidence_state=partial`이고 확정 답변 상태가 될 수 없다.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 511,
+                  "end_line": 532,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "9ea57ac32bc390542ceb1526cf094d4d96f3c84762a2306a91b5be7bd766a00b"
+                },
+                "text": "### 3-R-CKV-2. CKS §2-R2 수용 + 언어 스코프 정밀화 (2026-06-29)\n\n\u003e CKS가 §2-R2에서 D-1~D-5·R1·R2를 모두 확답 → **5세션 수렴 완료.** CKV는 CKS의\n\u003e \"독자 재빌드 안 함, CKG canonical graph.db를 config로 가리킴\" 결정을 수용한다.\n\u003e 단 CKS가 제기한 \"빌드 파라미터 일치\" 제약에 CKV 관점 한 가지를 추가한다.\n\n- **✅ D-1 빌드 정본 일치 수용.** CKV도 독자 빌드하지 않고 **CKG가 `0bf2f4d1b` +\n  `make eval-build-dbs LANG=auto`로 만든 정본 소스 트리/그래프에 맞춰 `ckv build`**\n  한다(동일 detached+clean 체크아웃). CKS와 동일하게 CKG 공표 sha를 기준점으로 삼는다.\n- **⚠️ 언어 스코프 정밀화(신규).** CKG `LANG=auto`는 **sol/proto 포함**이나, CKV 파서는\n  **go / solidity / typescript / javascript / markdown** 만 — **proto 미파싱**. 따라서\n  CKG의 proto 심볼 노드는 CKV 대응 청크가 *설계상* 없다. → **매칭률은 CKV가 파싱하는\n  공유 언어(go/sol/ts/js)로 스코프**하고 proto 노드는 분모에서 제외해야 한다(안 그러면\n  proto 때문에 매칭률이 인위적으로 낮게 나옴). 측정 방향(분모 = CKV청크 기준 vs CKG\n  심볼노드 기준)도 3자 합의로 못 박자 — CKV 제안: **분자 = 공유언어 CKV청크 중 CKG\n  노드에 정렬된 수 / 분모 = 공유언어 CKV청크 총수**.\n- **✅ R1/R2 수렴 확인.** CKS가 \"1024 유지 선호\" 철회 + 차원은 reindex-B 실측 후 결정,\n  flow/invariant 노출 Phase 2 확정 → §5의 두 비전 위험이 *합의로 닫혔다*(편의가 아니라\n  목표가 결정 근거). CKV는 dim 결정권을 위임받았으므로 reindex-B 실측을 CKV가 주관.\n\n---\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 471,
+                  "end_line": 510,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "3161289f6b0d8023650009b9d2186209d1c43363e6f6d7acdb5e982d05a18682"
+                },
+                "text": "### 3-R-CKV. CKV 결정 회신 (2026-06-29, D-1~D-5)\n\n\u003e coding-agent가 제기한 D-1~D-5에 대한 CKV(벡터 검색 엔진) 측 결정. CKV가\n\u003e 의사결정 당사자인 항목(D-1/D-3/D-4)은 결정, 나머지는 확인/위임.\n\n**D-1 (CRITICAL) — 재인덱싱 커밋 `0bf2f4d1b`로 통일: ✅ 동의**\n- CKG↔CKV 매칭률은 CKV 인덱스와 CKG 그래프가 **동일 소스 커밋**에서 빌드돼야 성립.\n  go-stablenet을 `0bf2f4d1b`에 체크아웃해 `ckv build` 하면 3자 한 커밋 정렬. CKV에\n  다른 커밋을 강제할 제약 없음 → \"1회 재인덱싱으로 3자 커버\" 수용.\n- ⚠️ **모델 축 분리 제안**: 매칭률(canonical_id/file:line join)은 임베딩 모델과\n  무관하지만 PR-77 retrieval 품질 bench는 모델 의존. 따라서 **커밋은 `0bf2f4d1b`로\n  핀, 모델만 2회**:\n  - reindex-A = `0bf2f4d1b` + 현행 bge-m3@1024 → 매칭률 + PR-77 현행-프로덕션 baseline\n  - reindex-B = `0bf2f4d1b` + Qwen3 → 모델 교체 A/B (동일 커밋이라 비교 유효)\n\n**D-2 — schema ≥1.19 게이트: ✅ 확인 + CKV 코드 액션**\n- 측정 그래프 cache SchemaVersion ≥1.19(현 1.22) 보장 수용. **CKV 액션**: ckgalign\n  게이트를 *PRAGMA 컬럼-존재 probe*(1.16~1.18 통과시켜 NULL을 join key로 쓰는 위험)에서\n  **manifest `schema_version \u003e= 1.19` 검사**로 교체.\n\n**D-3 — parity 분리: ✅ 동의**\n- ① recall/rerank류 = cks proxy 불요(단일 SemanticSearch + cks 소유 RRF). ADR-003 정합.\n- ② flow/invariant(flow-aware 4종 + find_invariants/get_conventions) = cks 표면 노출\n  필요(미구현). CKV가 도구를 내도 cks 노출 없으면 coding-agent에 안 닿음 → 분리 추적.\n\n**D-4 — `get_invariant_enforcement` 일정: 🟢 CKV는 defer 반대, Phase 2 포함 찬성**\n- 이미 flow-ingest Phase D 안의 bounded single-lookup(inv_id → 강제지점)이라 CKV\n  구현 비용 낮음. coding-agent H-가드레일을 무기한 블록하지 않으려면 defer 금지.\n- **조건**: CKV 도구 산출 + **CKS 표면 노출**을 *같은 Phase 2*에 묶어야 실효(D-3 ②).\n  → CKS 확답 필요(아래 §6 후속 프롬프트).\n\n**D-5 — P3/R06 중복: ⚪ CKV 무관, CKG 위임.**\n\n**schema_version 정책(fail-loud)**: CKV는 PR #12에서 임베딩 공간 불일치 시 index\nopen 거부(silent wrong-score 금지) + health embedder status 노출 → coding-agent의\n\"serviceable fail-loud \u003e silent fallback\"과 방향 일치. 확인.\n\n**CKV 코드 액션 3건**: ① ckgalign 게이트 ≥1.19 ② Phase D에서 `get_invariant_enforcement`\n우선 배치 ③ Qwen3 어댑터 query-prefix(\"Instruct:\") 흡수 + MRL 1024 truncate 경로.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/vector/coordination-prompts-2026-06-29.md",
+                  "start_line": 169,
+                  "end_line": 195,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+                  "content_sha256": "f33e917f74db2554da3326ff1294d5fbf5e6ff6d70efd20edb2c6c25afbbe1a7"
+                },
+                "text": "### 1-R3. CKG 후속 — CKS §2-R2 · CKV §3-R-CKV-2 · §6 수용 (2026-06-29)\n\n\u003e CKS §2-R2(D-1 빌드 파라미터 일치)·CKV §3-R-CKV-2(proto 언어 스코프)·§6 후속\n\u003e (모델 축·R1/R2)을 CKG가 검토·수용. 5세션 수렴 확인. CKG 사본:\n\u003e `code-knowledge-graph/docs/coordination-response-ckg-2026-06-29.md`.\n\n- **CKS §2-R2 \"빌드 파라미터 일치\" 수용 → CKG = 정본 그래프 단독 생산자.** 지적 정확:\n  `LANG=auto`(sol/proto 포함)와 `--lang go`는 다른 그래프를 낳는다. → **누구도 독자\n  재빌드하지 않고, CKG가 `0bf2f4d1b` + `make eval-build-dbs LANG=auto`로 만든 단일\n  canonical graph.db를 생산·공표(경로/sha/manifest schema_version)**; CKV는 그 소스\n  트리/그래프에 정렬, CKS는 config로 가리킨다. CKG가 이 단일 산출물 책임을 진다.\n- **CKV §3-R-CKV-2 언어 스코프 수용 (proto 제외).** CKG `LANG=auto`는 proto 심볼 노드\n  (검증 시 ~409개)를 포함하나 CKV는 proto 미파싱 → 대응 청크 부재(설계상). **매칭률 분모\n  에서 CKG-only 언어(proto) 제외**에 동의. CKV 제안 공식(분자=공유언어 CKV청크 중 CKG\n  노드 정렬 수 / 분모=공유언어 CKV청크 총수) 수용. **정밀화 1건**: 분자의 \"CKG 노드\"는\n  **canonical_id를 실제로 보유한 심볼 노드**여야 join key로 유효(비심볼 노드에 위치 정렬돼도\n  canonical_id NULL → join 불가). 공유언어 = go/sol/ts/js(CKG는 markdown 심볼 노드\n  미생산이라 자동 제외).\n- **§6-3 모델 축 순서 이의 없음 — 단 CKG 그래프는 1회.** reindex-A(bge-m3)/reindex-B\n  (Qwen3)의 \"2회 reindex\"는 **CKV 벡터 레이어** 작업이다. **CKG graph.db는 임베딩 비의존\n  → 동일 단일 그래프가 A·B 양쪽을 서비스**(canonical_id/코퍼스 동일, 벡터만 상이). CKG는\n  `0bf2f4d1b` 그래프 **1회 빌드 + sha 공표**로 충분. 순서 이의 없음.\n- **§6-2 비전 R1/R2 — CKG 입장.** R1(임베딩 차원)은 CKV/CKS 소관, **CKG 비의존**(그래프\n  동일). R2(flow/invariant의 cks 표면 노출)에 정렬: CKG는 control-flow **데이터**(노드/엣지)를\n  이미 제공하므로 D-4 Phase 2 노출을 데이터 측에서 막을 것 없음(노출은 cks 표면 작업).\n  \"post-Phase-2 defer 금지\" 가드레일에 동의.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "internal/system/semantic/validate.go",
+                  "start_line": 33,
+                  "end_line": 33,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+                  "content_sha256": "696e16b28b42e22f91ed0df44e86849e320f43f4431b4a9a981b365306e3ab5f"
+                },
+                "text": "\t\t\treturn fmt.Errorf(\"snapshot-only source cannot claim a Git commit\")\n"
+              },
+              {
+                "citation": {
+                  "file": "graph/eval/ckv-mirror/corpus/validator.go",
+                  "start_line": 19,
+                  "end_line": 19,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "project_id": "b0-knowledge-system",
+                  "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+                  "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15",
+                  "source_mode": "committed",
+                  "base_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+                  "origin_id": "repo",
+                  "file_sha256": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f",
+                  "content_sha256": "896b5d2abba437a4f57f1c1b17d5e1c9c9f428da7ed235270e0a66c169bfea8d"
+                },
+                "text": "\t\treturn errors.New(\"validator: empty email address\")\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "611442fc531e475e5df8a6575f86bba14cdc72e02646f3181ca62d2c3c2192fb"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
