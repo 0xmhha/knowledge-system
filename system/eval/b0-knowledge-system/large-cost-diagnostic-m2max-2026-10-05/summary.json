@@ -1,0 +1,177 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "human_cost": null,
+  "scope": "one DEV prompt, reused partial corpus, latest package, baseline/knowledge only; not official paired quality or scaling law",
+  "run_result": {
+    "exit_code": 0,
+    "wall_seconds": 247.70698141725734
+  },
+  "planned_calls": 60,
+  "observed_calls": 60,
+  "failed_calls": 0,
+  "missing_calls": 0,
+  "citations": 480,
+  "bodies": 480,
+  "source_and_integrity_valid": true,
+  "positive_evidence_identical_across_repetitions_and_modes": true,
+  "inputs_unchanged": true,
+  "corpus": {
+    "input_files": 1569,
+    "chunks": 13575,
+    "missing_go_files": 29,
+    "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+    "dataset_id": "393b0c24de48ecd3afb3c6499db7d7abdc9209d921016eefc3fcd7050a810a50",
+    "selected_payload_bytes": 384747268
+  },
+  "capture_bytes": 1793446,
+  "footprint_bytes": 1251195,
+  "capture_sha256": "61290f120047a2f8f06b622ff19edaf5391c8d1dcf2b8f2ccd89bc6978f1e1c5",
+  "derived_rows_sha256": "9de6f18bebb5dbe6f13f7e10b85eb6124b70e3628efdfbbc2bd6468f66550ea2",
+  "resources": {
+    "raw_time_line": "      247.29 real       119.11 user        88.10 sys",
+    "reported_maximum_resident_set_size_bytes": 96681984,
+    "note": "Raw Darwin time -l report; do not interpret as MCP process-tree/model-server peak or exclusive host capacity; sample ps tracks wrapper only"
+  },
+  "startup_intent_anchor_scopes": {
+    "count": 7,
+    "backend_attempts": {
+      "intent:embed:returned": 455,
+      "ollama_http:GET:returned": 910,
+      "ollama_http:POST:returned": 455
+    },
+    "elapsed_ns_by_scope": [
+      1423675211,
+      1404919076,
+      1566339163,
+      1324015248,
+      1232940668,
+      1284812960,
+      1240904794
+    ]
+  },
+  "requests": {
+    "large-dev-code-01-baseline": {
+      "timing_seconds": {
+        "warmup": {
+          "n": 2,
+          "min": 3.497127792,
+          "p50": 3.497127792,
+          "p95_nearest_rank": 3.897403917,
+          "max": 3.897403917
+        },
+        "retrieval": {
+          "n": 5,
+          "min": 3.47329425,
+          "p50": 3.500748583,
+          "p95_nearest_rank": 3.585642458,
+          "max": 3.585642458
+        },
+        "warm_latency": {
+          "n": 20,
+          "min": 3.444598417,
+          "p50": 3.521089584,
+          "p95_nearest_rank": 3.7373185,
+          "max": 3.792646125
+        },
+        "cold_process": {
+          "n": 3,
+          "min": 3.577490125,
+          "p50": 3.629573292,
+          "p95_nearest_rank": 4.268459125,
+          "max": 4.268459125
+        },
+        "cold_process_start_through_response": {
+          "n": 3,
+          "min": 6.075931125,
+          "p50": 6.627498625,
+          "p95_nearest_rank": 6.971892708,
+          "max": 6.971892708
+        }
+      },
+      "response_json_reserialized_utf8_bytes": {
+        "n": 30,
+        "min": 24200,
+        "max": 24200
+      },
+      "backend_attempts": {
+        "logical_calls": 990,
+        "nonreturned_attempts": 420,
+        "http_attempts": 321,
+        "http_200": 321
+      },
+      "ckv_retrieval_K_histogram": {
+        "10": 30,
+        "6": 30
+      }
+    },
+    "large-dev-code-01-knowledge": {
+      "timing_seconds": {
+        "warmup": {
+          "n": 2,
+          "min": 3.849093792,
+          "p50": 3.849093792,
+          "p95_nearest_rank": 3.867935208,
+          "max": 3.867935208
+        },
+        "retrieval": {
+          "n": 5,
+          "min": 3.793502,
+          "p50": 3.830903917,
+          "p95_nearest_rank": 3.85511225,
+          "max": 3.85511225
+        },
+        "warm_latency": {
+          "n": 20,
+          "min": 3.725247625,
+          "p50": 3.823791166,
+          "p95_nearest_rank": 4.407649583,
+          "max": 5.6043715
+        },
+        "cold_process": {
+          "n": 3,
+          "min": 3.753147833,
+          "p50": 3.830275167,
+          "p95_nearest_rank": 4.037291459,
+          "max": 4.037291459
+        },
+        "cold_process_start_through_response": {
+          "n": 3,
+          "min": 6.213939542,
+          "p50": 6.223653583,
+          "p95_nearest_rank": 6.373373584,
+          "max": 6.373373584
+        }
+      },
+      "response_json_reserialized_utf8_bytes": {
+        "n": 30,
+        "min": 24200,
+        "max": 24200
+      },
+      "backend_attempts": {
+        "logical_calls": 990,
+        "nonreturned_attempts": 420,
+        "http_attempts": 318,
+        "http_200": 318
+      },
+      "ckv_retrieval_K_histogram": {
+        "10": 30,
+        "6": 30
+      }
+    }
+  },
+  "total_backend_attempts": {
+    "logical_calls": 1980,
+    "nonreturned_attempts": 840,
+    "http_attempts": 639,
+    "http_200": 639
+  },
+  "limits": [
+    "existing dataset built before EOF/other fixes; no completeness claim",
+    "one independent development query; no FINAL exposure; repeated calls are not independent samples",
+    "nonexclusive native host; model residency changes from unloaded to loaded; cold process does not unload model",
+    "startup intent anchor scopes separated; other constructors/SQL/model internals outside per-call counters; no monetary or energy estimate",
+    "no human protocol/scope/quality/operating approval or full 8-arm comparison"
+  ]
+}

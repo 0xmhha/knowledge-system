@@ -1,0 +1,47 @@
+import json,hashlib,shutil,subprocess,time,urllib.request,os
+from pathlib import Path
+ROOT=Path.cwd(); RUN=Path('/private/tmp/ks-large-cost-20261005'); RUN.mkdir(mode=0o700,exist_ok=False)
+ORIGINAL=Path('/private/tmp/ks-b0-m2max-full-20261003/dataset/m2max-diagnostic')
+SOURCE=Path('/private/tmp/ks-b0-m2max-corpus-20261003')
+BIN=Path('/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks')
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def save(name,v): (RUN/name).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def seal(root,ephemeral=False):
+ out={}
+ for p in sorted(root.rglob('*')):
+  if p.is_file():
+   if ephemeral and (p.name.endswith('.db-shm') or p.name.endswith('.db-wal')):
+    if p.name.endswith('.db-wal'):assert p.stat().st_size==0,'nonempty WAL'
+    continue
+   out[str(p.relative_to(root))]={'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+ return out
+def model():
+ return {k:json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/'+k,timeout=15)) for k in ('version','tags','ps')}
+original=seal(ORIGINAL); source=seal(SOURCE);save('original-seal-before.json',original);save('source-seal-before.json',source)
+for p in ORIGINAL.rglob('*.db-wal'):assert p.stat().st_size==0
+COPY=RUN/'dataset'/'diagnostic';shutil.copytree(ORIGINAL,COPY,ignore=shutil.ignore_patterns('*.db-shm','*.db-wal'))
+copied=seal(COPY,True);save('copy-seal-before.json',copied)
+q=json.loads((ROOT/'system/eval/b0-knowledge-system/questions.json').read_bytes());prompt=next(x['prompt'] for x in q['questions'] if x['id']=='B0-CODE-01')
+protocol=json.loads((ROOT/'system/eval/b0-knowledge-system/protocol-m2max-draft.json').read_bytes());assert 'B0-CODE-01' in protocol['development_questions'] and 'B0-CODE-01' not in protocol['final_questions']
+requests={'schema_version':1,'requests':[{'id':'large-dev-code-01-'+mode,'tool':'cks.context.get_for_task_v2','arguments':{'prompt':prompt,'include_knowledge':include,'knowledge_as_of':'2026-10-01','knowledge_subsystem':'knowledge-system'}} for mode,include in [('baseline',False),('knowledge',True)]]};save('requests.json',requests)
+cfg=(Path('/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old.yaml').read_text().replace('/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic',str(COPY)).replace('/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old',str(SOURCE)).replace('/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/footprints',str(RUN/'footprints')).replace('http://localhost:11434','http://127.0.0.1:11434'))
+(RUN/'config.yaml').write_text(cfg)
+bindings={str(p):{'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in [BIN,RUN/'config.yaml',RUN/'requests.json',ROOT/'system/eval/b0-knowledge-system/questions.json',ROOT/'system/eval/b0-knowledge-system/protocol-m2max-draft.json']}
+config_extra='semantic:\n    store_path: ""\n' # retained template already has semantic; no appended override
+save('bindings-before.json',bindings);before=model();save('model-before.json',before)
+assert next(m['digest'] for m in before['tags']['models'] if m['name']=='bge-m3:latest')=='7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab'
+command=['/usr/bin/time','-l',str(BIN),'eval','capture','--requests',str(RUN/'requests.json'),'--config',str(RUN/'config.yaml'),'--output',str(RUN/'capture.json'),'--warmup','2','--retrieval-runs','5','--warm-runs','20','--cold-runs','3','--call-timeout','90s']
+save('plan.json',{'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'command':command,'planned_calls':60,'selected_input_files':1569,'chunks':13575,'missing_go_files':29,'note':'DEV only; process cold does not unload model; nonexclusive native host; reused previous partial index; no official input approval implied'})
+start=time.monotonic()
+with (RUN/'stdout.txt').open('wb') as out,(RUN/'stderr-time.txt').open('wb') as err:
+ p=subprocess.Popen(command,stdout=out,stderr=err)
+ while p.poll() is None:
+  time.sleep(2)
+  with (RUN/'caller-process-samples.txt').open('a') as f:
+   subprocess.run(['ps','-o','pid,ppid,%cpu,rss,etime,comm','-p',str(p.pid)],stdout=f,stderr=subprocess.DEVNULL)
+code=p.returncode
+save('run-result.json',{'exit_code':code,'wall_seconds':time.monotonic()-start})
+save('model-after.json',model());save('original-seal-after.json',seal(ORIGINAL));save('source-seal-after.json',seal(SOURCE));save('copy-seal-after.json',seal(COPY,True))
+after={str(p):{'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in [BIN,RUN/'config.yaml',RUN/'requests.json',ROOT/'system/eval/b0-knowledge-system/questions.json',ROOT/'system/eval/b0-knowledge-system/protocol-m2max-draft.json']};save('bindings-after.json',after)
+assert original==seal(ORIGINAL) and source==seal(SOURCE) and copied==seal(COPY,True) and bindings==after
+print(json.dumps({'exit_code':code,'report':str(RUN/'capture.json'),'inputs_unchanged':True}))

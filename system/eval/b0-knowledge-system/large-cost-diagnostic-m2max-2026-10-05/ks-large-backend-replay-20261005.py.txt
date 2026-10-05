@@ -1,0 +1,30 @@
+import json,hashlib,sqlite3,collections
+from pathlib import Path
+R=Path('/private/tmp/ks-large-cost-20261005');sha=lambda b:hashlib.sha256(b).hexdigest()
+events=[json.loads(x) for x in (R/'footprints/cks-mcp.jsonl').read_text().splitlines()];scopes=[x['summary'] for x in events if x.get('event')=='measurement.backend_calls' and x['summary']['tool']=='cks.context.get_for_task_v2']
+errors=collections.Counter((x['backend'],x['method'],x['outcome']) for s in scopes for x in s['calls'] if x['outcome']!='returned');target={x['input_sha256'] for s in scopes for x in s['calls'] if x['backend']=='ckg' and x['method']=='bm25_search' and x['outcome']=='backend_error'}
+vec=R/'dataset/diagnostic/vector/vector.db';graph=R/'dataset/diagnostic/graph/graph.db';before={str(p):sha(p.read_bytes()) for p in (vec,graph)}
+c=sqlite3.connect('file:'+str(vec)+'?mode=ro',uri=True);matches={}
+for file,symbol,kind in c.execute('select distinct file,symbol_name,chunk_kind from chunks'):
+ if kind in ('invariant','convention'):continue
+ name=symbol or Path(file).stem.removesuffix('_test')
+ if sha(name.encode()) in target:matches.setdefault(name,set()).add(file)
+c.close();assert len(matches)==len(target)==8
+c=sqlite3.connect('file:'+str(graph)+'?mode=ro',uri=True);rows=[]
+for term,files in sorted(matches.items()):
+ raw_error=None
+ try:raw_count=len(c.execute('select rowid from nodes_fts where nodes_fts match ? limit 5',(term,)).fetchall())
+ except sqlite3.Error as e:raw_error=str(e);raw_count=None
+ literal='"'+term.replace('"','""')+'"';quoted_error=None
+ try:quoted_count=len(c.execute('select rowid from nodes_fts where nodes_fts match ? limit 5',(literal,)).fetchall())
+ except sqlite3.Error as e:quoted_error=str(e);quoted_count=None
+ assert raw_error and not quoted_error
+ rows.append({'input_sha256':sha(term.encode()),'derived_candidate':term,'source_files':sorted(files),'bare_fts_error':raw_error,'bare_count':raw_count,'literal_fts_query':literal,'literal_error':quoted_error,'literal_count':quoted_count})
+pack=json.loads((R/'capture.json').read_bytes())['rows'][0]['call']['response']['structuredContent'];docrows=[]
+for cit in pack['citations']:
+ if cit['file'].endswith('.md'):
+  count=c.execute('select count(*) from nodes where file_path=? and start_line<=? and end_line>=?',(cit['file'],cit['end_line'],cit['start_line'])).fetchone()[0]
+  docrows.append({'citation':cit,'overlapping_graph_nodes':count})
+c.close();after={str(p):sha(p.read_bytes()) for p in (vec,graph)};assert before==after
+result={'diagnostic_only':True,'quality_metrics':None,'scope':'independent read-only Python SQLite replay; not CKG Go adapter or formal quality verdict','recorded_error_histogram':[{'backend':a,'method':b,'outcome':v,'count':n} for (a,b,v),n in sorted(errors.items())],'bm25_candidate_hashes_all_bound':True,'bm25_replays':rows,'selected_document_graph_overlap':docrows,'db_before_sha256':before,'db_after_sha256':after,'note':'bare candidate errors reproduced; literal term queries no error. No automatic C0 quality-fix or new retrieval improvement claimed; graph-only absence is separate.'}
+(R/'backend-replay.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'bound_bm25_terms':len(rows),'doc_citations':len(docrows),'doc_no_overlap':sum(x['overlapping_graph_nodes']==0 for x in docrows),'errors':[r['bare_fts_error'] for r in rows]}))

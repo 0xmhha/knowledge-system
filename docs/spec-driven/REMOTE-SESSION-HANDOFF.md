@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 최신 package 검증: [FIX-19 preview](./C1-LATEST-PREVIEW-VALIDATION.md)의 세 대상 시험 서명/설치·Darwin 재현성·Darwin 실제 BGE SDK10과 Linux CPU SDK6/원문/Go Verify/벡터/K/계측/model byte·최신 작은 복구/고정legacy 소비자 재생을 확인했다. Linux90초 initialize 실패와 종료 부근400·65anchor 직접200·후속180초 진단 성공을 분리한다. 초기24 SDK 계획은 미완료이며 후속6을 공식 ablation/지연 합격으로 바꾸지 않는다. 임시 서버 종료·원자료504개/hash 기록·공식 품질/운영 null·입력5개 불변·28미완료다. 다음은 실제 B0/STV2/SF 결정→입력 동결→새 strict B0-07이다.
+2026-10-05 최신 비용 진단: [C1 대규모 비용](./C1-LARGE-COST-DIAGNOSTIC.md)의 기존 부분13,575청크·최신 FIX-19/BGE-M3·DEV1문의60 SDK/480인용·본문과 별도RSS2 SDK/16원문·Go Verify를 확인했다. baseline/knowledge warm p95는3.737/4.408초이며 공식 합격/독립표본이 아니다. backend840 오류·bare FTS 후보8개 재현·neighbors 원인 미확정을 분리했다. 입력5개/source/DB/model/binary 불변·48원자료·공식 null·전체28미완료다. 다음 독립 작업은 BM25 후보→FTS 경계 회귀/영향 검토, 최우선 공식 경로는 B0/STV2/SF 결정→동결→새 strict B0-07이다.
+
+2026-10-05 이전 package 검증: [FIX-19 preview](./C1-LATEST-PREVIEW-VALIDATION.md)의 세 대상 시험 서명/설치·Darwin 재현성·Darwin 실제 BGE SDK10과 Linux CPU SDK6/원문/Go Verify/벡터/K/계측/model byte·최신 작은 복구/고정legacy 소비자 재생을 확인했다. Linux90초 initialize 실패와 종료 부근400·65anchor 직접200·후속180초 진단 성공을 분리한다. 초기24 SDK 계획은 미완료이며 후속6을 공식 ablation/지연 합격으로 바꾸지 않는다. 임시 서버 종료·원자료504개/hash 기록·공식 품질/운영 null·입력5개 불변·28미완료다. 다음은 실제 B0/STV2/SF 결정→입력 동결→새 strict B0-07이다.
 
 2026-10-05 이전 기술 검증: [FIX-19 SDK 음성 제어](./B0-RETAINED-GUARD-DIAGNOSTIC.md)에서 정상 pinned 연결 후 전체 vector를 다른 DEV 상태/프로젝트로 교체한 snapshot_mismatch와 blob 변조/삭제의 snapshot_mismatch/source_missing을 수정 전 실패→계약/race/vet→실제 BGE-M3 SDK로 검증했다. 전후 각각10 SDK/정상복원6·20인용·본문/음성4/backend0, 원본·사본·설정·바이너리·모델 불변이다. 이전 비인접 설정 오류와 별도 범위이며 공식 품질/FINAL null·입력5개 불변·전체28미완료다. 다음 독립 준비는 최신 패키지 시험 범위 검증, 최우선 공식 선행은 B0/STV2 결정과 strict 입력 동결이다.
 

@@ -35,3 +35,5 @@ macOS 최신 extracted preview의 작은 TypeScript/mock fixture에서 실패 �
 세부 시험 준비는 완료했지만 전체30개 중 완료2/진행11/대기17·게이트0/4·미완료28개는 유지한다. B0-01/02/03/05·STV2-01 실제 결정과 source/팩/의미/scope/K 동결→B0-07 공식 strict 빌드→공식 B0/B1→사람 판정/관측 C0→독립 C1이 다음 경로다. 최종 후보는 공식 품질 및 수정 동결 후 다시 패키징해야 한다.
 
 OP-01–08의 운영 역할/배포scope/키·독립 신뢰/개인키 접근·교체·폐기/전체 native 적합성/지원·비용/복구 담당 결정, 실제 native amd64·대규모 실모델 비용·최종 운영 백업/실패 전환·지원/출시도 남는다. 시험 키와 synthetic commit·fixture reviewer를 운영 책임자로 바꾸지 않는다. [전체 현황](./EXECUTION-STATUS.md)에서 남은 각 ID와 선행 조건을 확인한다.
+
+후속 [부분 대규모 비용 진단](./C1-LARGE-COST-DIAGNOSTIC.md)은 이 macOS package의60 SDK·별도RSS2호출/원문/Go Verify·원본 보존을 확인했다. 이전 빌드의 선택된13,575청크이며 source29개 제외·SDK 내부 backend 오류·단일DEV 반복·모델 서버 미포함의 한계를 유지한다. 공식8arm/최종/운영 비용 판정은 별도다.

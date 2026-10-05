@@ -1,0 +1,33 @@
+import importlib.util,json,hashlib,subprocess,urllib.request,platform
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-large-cost-20261005');sp=importlib.util.spec_from_file_location('base',ROOT/'scripts/b1-summarize-matrix.py');B=importlib.util.module_from_spec(sp);sp.loader.exec_module(B)
+sha=lambda b:hashlib.sha256(b).hexdigest();read=lambda n:json.loads((R/n).read_bytes())
+main=read('capture.json');memory=read('memory-capture.json');req=read('requests.json');identity=json.loads((R/'dataset/diagnostic/dataset-identity.json').read_bytes())
+assert memory['state']=='captured' and not memory.get('errors') and memory['quality_metrics'] is None and len(memory['rows'])==2 and memory['counts']=={'retrieval':1,'warmup':0,'warm_latency':0,'cold_process':0}
+assert memory['config_sha256']==memory['config_sha256_after']==sha((R/'memory-config.yaml').read_bytes()) and memory['request_sha256']==main['request_sha256']==sha((R/'requests.json').read_bytes()) and memory['binary_sha256']==memory['binary_sha256_after']==main['binary_sha256']
+derived=[];cites=bodies=0
+for i,row in enumerate(memory['rows'],1):
+ call=row['call'];request=next(q for q in req['requests'] if q['id']==row['request_id']);assert call['arguments']==request['arguments'] and not row.get('error') and not call.get('transport_error') and not call['response'].get('isError')
+ pack=call['response']['structuredContent'];B.verify_pack(pack,identity,Path('/private/tmp/ks-b0-m2max-corpus-20261003'))
+ original=next(x['call']['response']['structuredContent'] for x in main['rows'] if x['request_id']==row['request_id'])
+ for k in ('citations','bodies','coordinates'):assert pack[k]==original[k]
+ cites+=len(pack['citations']);bodies+=len(pack['bodies']);derived.append({'sequence':i,'arm':'baseline_on' if request['arguments']['include_knowledge'] else 'baseline_off',**row})
+(R/'memory-derived-sdk-rows.jsonl').write_text(''.join(json.dumps(x,ensure_ascii=False)+'\n' for x in derived))
+# Recheck payloads after the auxiliary sampling, excluding only checked-empty SQLite WAL and SHM.
+for label,root,ephemeral in [('original',Path('/private/tmp/ks-b0-m2max-full-20261003/dataset/m2max-diagnostic'),False),('source',Path('/private/tmp/ks-b0-m2max-corpus-20261003'),False),('copy',R/'dataset/diagnostic',True)]:
+ actual={}
+ for p in sorted(root.rglob('*')):
+  if p.is_file():
+   if ephemeral and (p.name.endswith('.db-shm') or p.name.endswith('.db-wal')):
+    if p.name.endswith('.db-wal'):assert p.stat().st_size==0
+    continue
+   actual[str(p.relative_to(root))]={'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+ assert actual==read(label+'-seal-before.json')
+ (R/(label+'-seal-final.json')).write_text(json.dumps(actual,indent=2)+'\n')
+metadata={k:json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/'+k,timeout=15)) for k in ('version','tags','ps')};assert metadata['version']==read('model-before.json')['version'] and metadata['tags']==read('model-before.json')['tags'];(R/'model-final.json').write_text(json.dumps(metadata,indent=2)+'\n')
+files=['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json'];inputs={}
+for file in files:
+ p=ROOT/'system/eval/b0-knowledge-system'/file;previous=subprocess.check_output(['git','show','HEAD:'+str(p.relative_to(ROOT))]);assert p.read_bytes()==previous;inputs[str(p.relative_to(ROOT))]=sha(previous)
+(R/'human-inputs-unchanged.json').write_text(json.dumps(inputs,indent=2)+'\n')
+result={'diagnostic_only':True,'quality_metrics':None,'planned_auxiliary_calls':2,'observed_auxiliary_calls':2,'failed_calls':0,'citations':cites,'bodies':bodies,'source_and_integrity_valid':True,'primary_evidence_identical':True,'final_payloads_and_human_inputs_unchanged':True,'derived_sha256':sha((R/'memory-derived-sdk-rows.jsonl').read_bytes())};(R/'memory-audit.json').write_text(json.dumps(result,indent=2)+'\n')
+(R/'host.json').write_text(json.dumps({'platform':platform.platform(),'machine':platform.machine(),'cpu_brand':subprocess.check_output(['sysctl','-n','machdep.cpu.brand_string'],text=True).strip(),'memory_bytes':int(subprocess.check_output(['sysctl','-n','hw.memsize'])),'cpu_count':int(subprocess.check_output(['sysctl','-n','hw.ncpu'])),'note':'not resource exclusive'},indent=2)+'\n');print(json.dumps(result))

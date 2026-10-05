@@ -1,0 +1,33 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "command": [
+    "/usr/bin/time",
+    "-l",
+    "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-large-cost-20261005/requests.json",
+    "--config",
+    "/private/tmp/ks-large-cost-20261005/config.yaml",
+    "--output",
+    "/private/tmp/ks-large-cost-20261005/capture.json",
+    "--warmup",
+    "2",
+    "--retrieval-runs",
+    "5",
+    "--warm-runs",
+    "20",
+    "--cold-runs",
+    "3",
+    "--call-timeout",
+    "90s"
+  ],
+  "planned_calls": 60,
+  "selected_input_files": 1569,
+  "chunks": 13575,
+  "missing_go_files": 29,
+  "note": "DEV only; process cold does not unload model; nonexclusive native host; reused previous partial index; no official input approval implied"
+}

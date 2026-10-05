@@ -105,7 +105,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-01 | P3 · C0-06 | B0/B1과 같은 조건의 최종 재평가 | 버전 차이·입력 차이·실행 원자료 명시; 독립 최종 조건 유지 | 대기 |
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
-| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: Linux arm64 실제 CPU BGE-M3의 3프로젝트 설치/재시작/업데이트/롤백·72 SDK 응답/96 인용 검증. 20초 probe 실패와 90초 진단 재실행을 분리; native amd64·대규모 비용·최종 운영 후보/품질은 남음 |
+| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: 최신 FIX-19 세 대상 preview·실모델/복구와 부분 대규모13,575청크의60 SDK·480원문/인용·별도RSS2호출 준비 검증; backend 오류840 보존·FTS 후보8개 재현. native amd64·공식 대규모/최종 운영 후보·품질은 남음 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조 완료 범위 존재; 원래 C/header·전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 진행: 최신 Darwin 시험 preview의 후보 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·원본 소스 없는 재생, 구 데이터의 첫 신규 소비자 전 SHA·새 재색인·구 v1 rollback 보존 검증. [복구 문서](./C1-RECOVERY-VALIDATION.md); 최종 후보/운영 범위·OP-08 남음 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
@@ -389,3 +389,12 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 최신 extracted preview의 작은 backup clone/원본 소스 없는 재생·실패 후보/손상 대상 거부와 고정1ded9b3 v1 소비자/합성 HTTP·새 mock v2/legacy rollback도 통과했다. 운영 복구·실제 legacy migration·native amd64·전체 legal·지원/대규모 비용·출시 판정은 남는다. 원자료504개는 binaries/DB/model/private keys를 제외해 보관했고 최종 원장/문서/경계/현황을 검증한다.
 
 전체완료2/30·진행11·대기17·공식0/4·28미완료는 유지한다. 다음 작업은 실제 B0/STV2/SF 결정 기록과 공식 입력 동결/strict 빌드이며 B0-01–09·B1-03–08·C0-01–06·C1-01–07 및 STV2-01·OP-01–08·native/운영 최종 범위를 모두 이어간다. 공식 후보는 품질/수정 동결 후 다시 패키징한다.
+
+
+## 31. 부분 대규모 데이터셋 비용과 Backend 재현
+
+2026-10-05 [C1 비용 진단](./C1-LARGE-COST-DIAGNOSTIC.md)의 최신 FIX-19 패키지/승인 BGE-M3로 기존 부분 데이터셋1,569파일/13,575청크를 별도 사본에서 조회했다. 개발1문항의 baseline/knowledge 각 warmup2·검색5·warm20·cold process3, 계획60 SDK·480인용/본문이 source SHA/줄/좌표/독립 Python·public Go Verify를 통과했다. warm p50/p95는 baseline3.521/3.737초·knowledge3.824/4.408초, cold process 시작부터 응답 p50은6.627/6.224초다. single DEV 반복/비회전/비격리·모델 residency·수정 전 부분 빌드29 Go 제외의 한계를 유지하고 공식 품질/지연으로 합산하지 않는다.
+
+SDK 실패/누락0과 backend 오류840(BM25480·neighbors360)을 구분했다. HTTP639/별도 startup7개 anchor embed455/HTTP1,365는 모두200이다. input SHA8개에 결합한 문서 후보의 bare FTS 오류와 literal quoted0결과를 읽기 전용 Python SQLite에서 재현했다. neighbors 전체 원인은 아직 확정하지 않았다. 별도RSS 보완2 SDK/16인용·본문도 같은 근거/원문/Go Verify를 통과했다. 실제 MCP의 observed RSS 최대82,992KiB와 동시 합106,656KiB는 샘플 peak/공유 페이지/모델 서버 미포함을 명시한다. 주60과 보완2의 분모를 분리한다.
+
+원본/사본 DB/manifest/source·고정 source tree·package binary/config/request·모델 tag/version/digest·사람 입력5개 불변이다. 원자료48개+SHA manifest를 결합했다. 신규 제품 변경은 아직 없고 기존 공개 verifier·독립 원문 감사를 재사용했다. 다음 독립 작업은 BM25 후보의 실제 FTS 경계 회귀 재현/영향 검토이며, 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 완료2/30·진행11·대기17·공식게이트0/4·전체28미완료 및 OP-01–08/native/legal/운영복구·출시는 유지한다.
