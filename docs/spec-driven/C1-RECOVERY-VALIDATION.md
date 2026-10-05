@@ -62,3 +62,6 @@ python3 system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/audit-artifact
 4. 사용 모델/provider와 새 경로를 확인한 설정으로 새 MCP를 시작한다. 복원 대상의 dataset/snapshot/indexed commit·원문/본문 인용을 확인하고 운영 담당자가 서비스 전환을 판정한다. doctor의 현재 소스 HEAD와 indexed commit의 차이는 별도로 기록한다.
 
 이 절차의 새 루트 복원은 위 소형 프리뷰에서 실행했다. 최종 패키지, 실제 운영 백업 방법·대규모 데이터·팩 잠금·서비스 중단/전환·지원 대상과 담당자, [운영 검토표](./C1-OPERATIONS-REVIEW.md)의 OP-08 판정은 남아 있다. 데이터 rollback과 운영 서명 키 교체/폐기는 각각 검토한다.
+
+
+2026-10-05 최신 FIX-19 extracted preview의 [후속 검증](./C1-LATEST-PREVIEW-VALIDATION.md)에서 작은 mock backup/소스 없는 재생·실패/손상/rollback과 고정 pre-WBS v1 소비자+합성 HTTP·새 v2 reindex/legacy rollback을 다시 확인했다. 실제 운영 자료·담당자·키·RTO/RPO와 최종 품질 동결 후보의 복구 승인은 별도다.

@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+import subprocess,sys
+if "build" in sys.argv[1:]:sys.exit(23)
+sys.exit(subprocess.run(['/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/ckv',*sys.argv[1:]]).returncode)

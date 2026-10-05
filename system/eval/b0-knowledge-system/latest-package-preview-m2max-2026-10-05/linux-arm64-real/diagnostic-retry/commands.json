@@ -1,0 +1,782 @@
+[
+  {
+    "project": "empty-go",
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/empty-go/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/empty-go/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/empty-go/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "Linux actual BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "init",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "init",
+      "--src",
+      "/out/diagnostic-retry/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-retry/empty-go/dataset",
+      "--config-out",
+      "/out/diagnostic-retry/empty-go/setup.yaml",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/empty-go/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-retry/empty-go/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide for empty-go",
+      "--out",
+      "/out/diagnostic-retry/empty-go/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "mcp-config",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/out/diagnostic-retry/empty-go/dataset/current",
+      "--name",
+      "ks-empty-go",
+      "--source-root",
+      "/out/diagnostic-retry/empty-go/src",
+      "--sanitize-rules",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/policies/sanitization_rules.yaml",
+      "--out",
+      "/out/diagnostic-retry/empty-go/mcp.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "second-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/empty-go/src",
+      "add",
+      "README.md"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "second-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/empty-go/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "second BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "second-setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/empty-go/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "second-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-retry/empty-go/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "rollback",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "rollback",
+      "a600d3f1",
+      "--config",
+      "/out/diagnostic-retry/empty-go/setup.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "rollback-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-retry/empty-go/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "rollback-query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide",
+      "--out",
+      "/out/diagnostic-retry/empty-go/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "sdk-capture",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/out/diagnostic-retry/empty-go/requests.json",
+      "--config",
+      "/out/diagnostic-retry/empty-go/mcp.yaml",
+      "--cks-mcp",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "--output",
+      "/out/diagnostic-retry/empty-go/capture.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "180s"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/typescript/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/typescript/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/typescript/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "Linux actual BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "init",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "init",
+      "--src",
+      "/out/diagnostic-retry/typescript/src",
+      "--dataset",
+      "/out/diagnostic-retry/typescript/dataset",
+      "--config-out",
+      "/out/diagnostic-retry/typescript/setup.yaml",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/typescript/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/typescript/src",
+      "--dataset",
+      "/out/diagnostic-retry/typescript/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide for typescript",
+      "--out",
+      "/out/diagnostic-retry/typescript/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "mcp-config",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/out/diagnostic-retry/typescript/dataset/current",
+      "--name",
+      "ks-typescript",
+      "--source-root",
+      "/out/diagnostic-retry/typescript/src",
+      "--sanitize-rules",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/policies/sanitization_rules.yaml",
+      "--out",
+      "/out/diagnostic-retry/typescript/mcp.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "second-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/typescript/src",
+      "add",
+      "README.md"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "second-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/typescript/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "second BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "second-setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/typescript/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "second-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/typescript/src",
+      "--dataset",
+      "/out/diagnostic-retry/typescript/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "rollback",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "rollback",
+      "3248b1c6",
+      "--config",
+      "/out/diagnostic-retry/typescript/setup.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "rollback-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/typescript/src",
+      "--dataset",
+      "/out/diagnostic-retry/typescript/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "rollback-query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide",
+      "--out",
+      "/out/diagnostic-retry/typescript/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "typescript",
+    "id": "sdk-capture",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/out/diagnostic-retry/typescript/requests.json",
+      "--config",
+      "/out/diagnostic-retry/typescript/mcp.yaml",
+      "--cks-mcp",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "--output",
+      "/out/diagnostic-retry/typescript/capture.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "180s"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "Linux actual BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "init",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "init",
+      "--src",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "--dataset",
+      "/out/diagnostic-retry/unsupported-python/dataset",
+      "--config-out",
+      "/out/diagnostic-retry/unsupported-python/setup.yaml",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/unsupported-python/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "--dataset",
+      "/out/diagnostic-retry/unsupported-python/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide for unsupported-python",
+      "--out",
+      "/out/diagnostic-retry/unsupported-python/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "mcp-config",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/out/diagnostic-retry/unsupported-python/dataset/current",
+      "--name",
+      "ks-unsupported-python",
+      "--source-root",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "--sanitize-rules",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/policies/sanitization_rules.yaml",
+      "--out",
+      "/out/diagnostic-retry/unsupported-python/mcp.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "second-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "add",
+      "README.md"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "second-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "second BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "second-setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-retry/unsupported-python/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "second-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "--dataset",
+      "/out/diagnostic-retry/unsupported-python/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "rollback",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "rollback",
+      "7bc4a917",
+      "--config",
+      "/out/diagnostic-retry/unsupported-python/setup.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "rollback-doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-retry/unsupported-python/src",
+      "--dataset",
+      "/out/diagnostic-retry/unsupported-python/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "rollback-query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide",
+      "--out",
+      "/out/diagnostic-retry/unsupported-python/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "unsupported-python",
+    "id": "sdk-capture",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/out/diagnostic-retry/unsupported-python/requests.json",
+      "--config",
+      "/out/diagnostic-retry/unsupported-python/mcp.yaml",
+      "--cks-mcp",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "--output",
+      "/out/diagnostic-retry/unsupported-python/capture.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "180s"
+    ],
+    "exit_code": 0
+  }
+]

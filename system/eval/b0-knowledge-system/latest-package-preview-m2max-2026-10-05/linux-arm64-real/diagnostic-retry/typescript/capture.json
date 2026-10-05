@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T11:22:31.699689135Z",
+  "finished_at": "2026-10-05T11:24:28.957004176Z",
+  "request_sha256": "f04ded11f77a17e26e712c56388bad5f95349604d49db4a8575680cee6c3f67a",
+  "config_sha256": "c2a970e48d601259a8d1de2846385ce777482bc8247f4b7148c90ea442d9124c",
+  "binary_sha256": "f084a4f0c64dba0e6d1856899e6b5751e3b1e02226f7cbc05e94524ea8d60ec9",
+  "config_sha256_after": "c2a970e48d601259a8d1de2846385ce777482bc8247f4b7148c90ea442d9124c",
+  "binary_sha256_after": "f084a4f0c64dba0e6d1856899e6b5751e3b1e02226f7cbc05e94524ea8d60ec9",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 180000000000,
+  "rows": [
+    {
+      "request_id": "guide-False",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "913ce1c6eb069ec527052707d994dd84",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": false,
+          "knowledge_as_of": "2026-10-05",
+          "knowledge_subsystem": "typescript",
+          "prompt": "Where is the committed guide for typescript?"
+        },
+        "elapsed_ns": 2403407876,
+        "completed_at": "2026-10-05T11:24:27.507045467Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+              "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+              "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+              "source_mode": "committed",
+              "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e"
+            },
+            "query": "Where is the committed guide for typescript?",
+            "citations": [
+              {
+                "file": "main.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                "source_mode": "committed",
+                "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "origin_id": "repo",
+                "file_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+                "content_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                "source_mode": "committed",
+                "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "origin_id": "repo",
+                "file_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532",
+                "content_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                  "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                  "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                  "source_mode": "committed",
+                  "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "origin_id": "repo",
+                  "file_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+                  "content_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3"
+                },
+                "text": "export function greet(): string { return \"hello\"; }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                  "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                  "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                  "source_mode": "committed",
+                  "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "origin_id": "repo",
+                  "file_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532",
+                  "content_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532"
+                },
+                "text": "# Guide\nA committed guide for typescript.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "ca9b06c287142e86a6b14bf022a19bd23b0b67eb51c9bbcdef372c8eb3287b89"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "guide-True",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "ef24039f92a4886b703e8806f6e7be56",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-05",
+          "knowledge_subsystem": "typescript",
+          "prompt": "Where is the committed guide for typescript?"
+        },
+        "elapsed_ns": 1422673709,
+        "completed_at": "2026-10-05T11:24:28.929801634Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+              "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+              "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+              "source_mode": "committed",
+              "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e"
+            },
+            "query": "Where is the committed guide for typescript?",
+            "citations": [
+              {
+                "file": "main.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                "source_mode": "committed",
+                "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "origin_id": "repo",
+                "file_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+                "content_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                "source_mode": "committed",
+                "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                "origin_id": "repo",
+                "file_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532",
+                "content_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                  "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                  "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                  "source_mode": "committed",
+                  "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "origin_id": "repo",
+                  "file_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3",
+                  "content_sha256": "6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3"
+                },
+                "text": "export function greet(): string { return \"hello\"; }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+                  "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f",
+                  "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851",
+                  "source_mode": "committed",
+                  "base_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+                  "origin_id": "repo",
+                  "file_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532",
+                  "content_sha256": "309a0b48b77246efa210b3ee37ddef8479e60f643649be19dbccef561e145532"
+                },
+                "text": "# Guide\nA committed guide for typescript.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "ca9b06c287142e86a6b14bf022a19bd23b0b67eb51c9bbcdef372c8eb3287b89"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

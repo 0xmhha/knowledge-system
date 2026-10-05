@@ -42,3 +42,6 @@ Tree-sitter runtime 원문 고지와 내부 Unicode LICENSE, Go toolchain 및 ve
 2026-10-04 Linux arm64 CPU BGE-M3 후속: [실제 모델 원장](../../system/eval/b0-knowledge-system/linux-real-model-m2max-2026-10-04/summary.json)의 세 프로젝트 설치/재시작/업데이트/rollback·72 v2 SDK 응답·96 인용·5 저장 벡터·48 startup scope 및 전후 모델 bytes/환경/입력 검증을 통과했다. 기존 20초 v1 초기화 실패와 별도 90초 client 재실행 성공을 분리한다. 의미 저장소 없는 폴백/소형 합성 진단이며 공식 품질·지연·큰 비용·운영 지원/키/적합성은 미판정이다. 제품 코드 수정은 없다.
 
 2026-10-04 FIX-15/translated source 후속: [원장](../../system/eval/b0-knowledge-system/translated-source-notice-m2max-2026-10-04/summary.json)의 modernc SQLite 별도 SQLITE-LICENSE 누락을 실제 package/회귀 실패로 확인 후 required 경로에 추가했다. 새 Darwin 35모듈/51고지·Linux 두 대상 33/49의 서명/세 프로젝트 mock 설치/재서명 고지 변조 거부를 통과했다. modernc 네 모듈의 선택 source는 Darwin 225/LARM 197/LAMD 에뮬레이션 201개가 module ZIP과 같고, h1/build info/go.sum·go mod verify를 확인했다. 원래 C/생성 header·전체 전이 native 적합성은 남아 있으며 Origin metadata를 직접 fixed-Git source 검증으로 취급하지 않는다. FIX-15 수집 수정과 C1-05 사람 적합성/운영 종료를 분리한다.
+
+
+2026-10-05 최신 FIX-19 후속: [새 preview 검증](./C1-LATEST-PREVIEW-VALIDATION.md)에서 세 대상 package 서명/설치·Darwin 재현성·실제 Darwin BGE SDK10과 Linux CPU SDK6·원문/Go Verify·벡터/계측/모델 byte 불변·새 복구/legacy 소비자 재생을 확인했다. Linux 첫90초 초기화 실패와 후속180초 진단 deadline은 별도로 보존하며 공식 지연 합격으로 해석하지 않는다. 최신 준비 증거를 보강했지만 품질·운영·전체 legal/native·대규모 비용/최종 복구/출시 판정은 여전히 필요하다.

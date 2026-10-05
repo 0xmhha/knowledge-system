@@ -378,3 +378,14 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 수정 전후 각 SDK10회/누락0·정상복원6응답/20인용/20본문은 공개 Go Verify·원문/좌표/본문 SHA를 통과했고 정상 evidence 집합이 같다. 원본/최종 사본 DB/source·설정/바이너리·BGE digest/metadata 불변과 실제 rawK10/별도K6을 확인했다. helper 필드명/빈 WAL-SHM 가정 실패는 제품 실패와 분리해 보존했다. 비어 있지 않은 WAL은 사본 생성에서 거부한다. 영향받은 계약 시험/race/vet·SDK·독립 reader·최종 문서/경계/현황/원장을 확인한다.
 
 완료2/30·진행11·대기17·공식 게이트0/4·전체28미완료는 유지한다. B0/STV2 실제 결정 후 공식 strict 빌드가 최우선이며, 독립 준비로 최신 FIX-19 패키지의 시험 범위 검증을 진행한다. B0-01–09·B1-03–08·C0-01–06·C1-01–07과 STV2-01·OP-01–08·native amd64·대규모/최종 복구/출시가 모두 남는다.
+
+
+## 30. 최신 FIX-19 package·실모델·복구 준비 재검증
+
+2026-10-05 [최신 preview 검증](./C1-LATEST-PREVIEW-VALIDATION.md)을 추가했다. 31def76b macOS/동일 tracked bytes Linux arm64·amd64 에뮬레이션 preview를 새로 빌드했고 archive/바이너리/고지 SHA·시험 서명·mock 세 프로젝트 설치/조회/재시작/업데이트/롤백과 macOS archive 재현성을 확인했다. Darwin35/51·Linux33/49·111/107항목이며 적합성은 pending이다. 잘못된 캐시 경로의 첫 Linux 실패를 그대로 보존했다.
+
+설치할 Darwin cks의 실제 BGE SDK10·음성4/정상6·20인용·본문을 다시 검증했다. Linux arm64는 read-only 승인 model byte SHA/digest·Ollama0.35.1·CPU residency와 모델2CPU/4GiB/caller1CPU/512MiB를 기록했다. 세 fixture 실제 설치/업데이트/rollback 뒤 baseline/knowledge6 SDK·8인용·본문의 Go Verify/원문 SHA·벡터1024/finite/정규화·실제K10/6·계측 연결/입력 불변을 확인했다. 첫90초 initialize 실패·종료 부근400과 원래65anchor 직접200·후속180초 진단 deadline을 분리한다. 미완료된 첫24 SDK 계획을 후속6응답으로 채워 성공 처리하지 않았으며 공식 지연/비용은 null이다. 임시 서버를 종료/자동 삭제했다.
+
+최신 extracted preview의 작은 backup clone/원본 소스 없는 재생·실패 후보/손상 대상 거부와 고정1ded9b3 v1 소비자/합성 HTTP·새 mock v2/legacy rollback도 통과했다. 운영 복구·실제 legacy migration·native amd64·전체 legal·지원/대규모 비용·출시 판정은 남는다. 원자료504개는 binaries/DB/model/private keys를 제외해 보관했고 최종 원장/문서/경계/현황을 검증한다.
+
+전체완료2/30·진행11·대기17·공식0/4·28미완료는 유지한다. 다음 작업은 실제 B0/STV2/SF 결정 기록과 공식 입력 동결/strict 빌드이며 B0-01–09·B1-03–08·C0-01–06·C1-01–07 및 STV2-01·OP-01–08·native/운영 최종 범위를 모두 이어간다. 공식 후보는 품질/수정 동결 후 다시 패키징한다.

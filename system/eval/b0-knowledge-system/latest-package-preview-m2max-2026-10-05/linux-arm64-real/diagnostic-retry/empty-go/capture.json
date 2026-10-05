@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T11:19:48.019083712Z",
+  "finished_at": "2026-10-05T11:21:50.818464922Z",
+  "request_sha256": "6e507b9018f62ae488ba366ba49c19025888f67d5ece624be62f0c62ecf9f95c",
+  "config_sha256": "ab81a01592bf1dda155cc96647dd880718e140ba175c0745c181288cab4a5c4f",
+  "binary_sha256": "f084a4f0c64dba0e6d1856899e6b5751e3b1e02226f7cbc05e94524ea8d60ec9",
+  "config_sha256_after": "ab81a01592bf1dda155cc96647dd880718e140ba175c0745c181288cab4a5c4f",
+  "binary_sha256_after": "f084a4f0c64dba0e6d1856899e6b5751e3b1e02226f7cbc05e94524ea8d60ec9",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 180000000000,
+  "rows": [
+    {
+      "request_id": "guide-False",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "6ba7bbd2919b69fc56293de564d11782",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": false,
+          "knowledge_as_of": "2026-10-05",
+          "knowledge_subsystem": "empty-go",
+          "prompt": "Where is the committed guide for empty-go?"
+        },
+        "elapsed_ns": 9981659546,
+        "completed_at": "2026-10-05T11:21:39.135049583Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+              "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+              "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+              "source_mode": "committed",
+              "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0"
+            },
+            "query": "Where is the committed guide for empty-go?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+                "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+                "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+                "source_mode": "committed",
+                "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                "origin_id": "repo",
+                "file_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa",
+                "content_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                  "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+                  "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+                  "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+                  "source_mode": "committed",
+                  "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                  "origin_id": "repo",
+                  "file_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa",
+                  "content_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa"
+                },
+                "text": "# Guide\nA committed guide for empty-go.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "876f7d69c028fbb1d8e552b995b61c0c8901208794099ceb042451dee1b52d86"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "guide-True",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "8cbdf4fb048cab15e9b03d0d092c3355",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-05",
+          "knowledge_subsystem": "empty-go",
+          "prompt": "Where is the committed guide for empty-go?"
+        },
+        "elapsed_ns": 11650650714,
+        "completed_at": "2026-10-05T11:21:50.785762922Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+              "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+              "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+              "source_mode": "committed",
+              "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0"
+            },
+            "query": "Where is the committed guide for empty-go?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+                "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+                "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+                "source_mode": "committed",
+                "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                "origin_id": "repo",
+                "file_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa",
+                "content_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                  "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+                  "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3",
+                  "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804",
+                  "source_mode": "committed",
+                  "base_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+                  "origin_id": "repo",
+                  "file_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa",
+                  "content_sha256": "0eb792396727dd41c15475df1adde202375834c586408c6dfd6f390d9beb4aaa"
+                },
+                "text": "# Guide\nA committed guide for empty-go.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "876f7d69c028fbb1d8e552b995b61c0c8901208794099ceb042451dee1b52d86"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

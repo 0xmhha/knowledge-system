@@ -1,0 +1,36 @@
+from pathlib import Path
+import tarfile,json,hashlib,subprocess,importlib.util
+ROOT=Path.cwd();sp=importlib.util.spec_from_file_location('state',ROOT/'scripts/b0-audit-state-isolation.py');S=importlib.util.module_from_spec(sp);sp.loader.exec_module(S)
+sha=lambda b:hashlib.sha256(b).hexdigest();load=lambda p:json.loads(p.read_bytes())
+roots={'darwin-arm64':Path('/private/tmp/ks-fix19-package-darwin-20261005'),'linux-arm64':Path('/private/tmp/ks-fix19-package-linux-arm64-retry-20261005'),'linux-amd64-emulated':Path('/private/tmp/ks-fix19-package-linux-amd64-20261005')};summary={'diagnostic_only':True,'official_quality_metrics':None,'official_verdict':None,'source_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'source_tree':subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip(),'packages':{}}
+for label,root in roots.items():
+ archive=next((root/'dist').glob('*.tar.gz'));declared=load(root/'package.json');assert sha(archive.read_bytes())==declared['sha256']
+ with tarfile.open(archive) as t:
+  entries={x.name.split('/',1)[1]:x for x in t if '/' in x.name};manifest=json.load(t.extractfile(entries['manifest.json']));inv=json.load(t.extractfile(entries['third-party-licenses.json']));assert manifest['scope']=='host-preview' and manifest['third_party_license_review']=='pending'
+  assert manifest['third_party_license_inventory']['sha256']==sha(t.extractfile(entries['third-party-licenses.json']).read())
+  binaries={}
+  for name in ['cks','ckg','ckv']:
+   raw=t.extractfile(entries[name]).read();assert manifest['binaries'][name]['sha256']==sha(raw);binaries[name]=sha(raw)
+  notices=[f for m in inv['modules'] for f in m['license_files']]+[f for a in inv['vendored_assets'] for f in a['license_files']]
+  for f in notices:assert sha(t.extractfile(entries[f['path']]).read())==f['sha256']
+  assert manifest['third_party_license_inventory']['missing_license_count']==manifest['third_party_license_inventory']['missing_vendored_license_count']==0
+  summary['packages'][label]={'archive_sha256':declared['sha256'],'manifest':manifest,'binary_sha256':binaries,'copied_notice_files_verified':len(notices),'tar_entries':len(t.getmembers()),'test_signatures_only':True,'third_party_legal_review':'pending','native_amd64_execution':False}
+ # Existing script completion is checked separately by process exit and retained stdout.
+repro=load(Path('/private/tmp/ks-fix19-package-darwin-repro-20261005.json'));assert repro['sha256']==summary['packages']['darwin-arm64']['archive_sha256'];summary['darwin_archive_reproducible']=True
+sdk=load(roots['darwin-arm64']/'sdk-real-bge.json');assert not sdk['test_failed'] and sdk['quality_metrics'] is None and sdk['official_verdict'] is None
+calls=[r for r in sdk['rows'] if 'raw_call' in r];assert len(calls)==10
+positive=negative=citations=bodies=0
+for r in calls:
+ res=r['raw_call']['response']
+ if r['expected_code']:
+  negative+=1;assert res['isError'] and res['structuredContent']['code']==r['expected_code']
+ else:
+  positive+=1;assert r['go_verify_valid'] and not res.get('isError');cid='F-04-DEV-old' if r['id'].startswith('F-04') else 'F-05-DEV-a';version=Path('/private/tmp/ks-f0405-preparation-20261005')/cid/'dataset/diagnostic';ident=load(version/'dataset-identity.json');pack=res['structuredContent'];S.BASE.verify_pack(pack,ident,Path('/private/tmp/ks-f0405-preparation-20261005/sources')/cid);citations+=len(pack['citations']);bodies+=len(pack['bodies'])
+for r in sdk['rows']:
+ if r['id'].endswith('-runtime'):assert r['binary_sha256']==r['binary_after_sha256']==summary['packages']['darwin-arm64']['binary_sha256']['cks'] and r['config_sha256']==r['config_after_sha256']
+ if r['id'].endswith('-seals'):assert r['original_and_copy_payloads_unchanged']
+summary['darwin_actual_bge_sdk']={'planned':10,'observed':10,'positive':positive,'negative':negative,'citations':citations,'bodies':bodies,'public_go_and_source_verify_valid':True}
+summary['owned_recovery']=load(Path('/private/tmp/ks-fix19-recovery-20261005/verification.json'))
+assert summary['owned_recovery']['binary_sha256']==summary['packages']['darwin-arm64']['binary_sha256']
+summary['legacy_scope']='pinned 1ded9b3 v1 consumer plus deterministic synthetic HTTP embeddings; current mock reindex and rollback; not production legacy-data migration'
+Path('/private/tmp/ks-fix19-package-summary-20261005.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');print('three archive/binary/notice inventories and Darwin reproducibility/actual SDK/source/recovery bindings verified')

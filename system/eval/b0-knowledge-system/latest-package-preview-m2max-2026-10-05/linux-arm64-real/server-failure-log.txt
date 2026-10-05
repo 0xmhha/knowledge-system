@@ -1,0 +1,25 @@
+slot   operator(): id  0 | task 112 | cached n_tokens = 0, memory_seq_rm [0, end)
+slot      release: id  0 | task 112 | stop processing: n_tokens = 5, truncated = 0
+srv  update_slots: all slots are idle
+[GIN] 2026/10/05 - 11:13:19 | 200 |  1.956995043s |       127.0.0.1 | POST     "/api/embed"
+[GIN] 2026/10/05 - 11:13:19 | 200 |   26.159334ms |       127.0.0.1 | GET      "/api/tags"
+[GIN] 2026/10/05 - 11:13:19 | 200 |   65.290542ms |       127.0.0.1 | GET      "/api/tags"
+slot get_availabl: id  0 | task -1 |  - checking sim = 0.143 (1/7) > 0.100
+slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.143 (> 0.100 thold), f_keep = 0.200
+slot launch_slot_: id  0 | task 114 | processing task, is_child = 0
+slot   operator(): id  0 | task 114 | new prompt, n_ctx_slot = 8192, n_keep = 0, task.n_tokens = 7
+slot   operator(): id  0 | task 114 | cached n_tokens = 0, memory_seq_rm [0, end)
+[GIN] 2026/10/05 - 11:13:20 | 200 |  1.100938834s |       127.0.0.1 | POST     "/api/embed"
+slot      release: id  0 | task 114 | stop processing: n_tokens = 7, truncated = 0
+srv  update_slots: all slots are idle
+[GIN] 2026/10/05 - 11:13:20 | 200 |   26.352375ms |       127.0.0.1 | GET      "/api/tags"
+[GIN] 2026/10/05 - 11:13:20 | 200 |   27.035625ms |       127.0.0.1 | GET      "/api/tags"
+slot get_availabl: id  0 | task -1 |  - checking sim = 0.167 (1/6) > 0.100
+slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.167 (> 0.100 thold), f_keep = 0.143
+slot launch_slot_: id  0 | task 116 | processing task, is_child = 0
+slot   operator(): id  0 | task 116 | new prompt, n_ctx_slot = 8192, n_keep = 0, task.n_tokens = 6
+slot   operator(): id  0 | task 116 | cached n_tokens = 0, memory_seq_rm [0, end)
+[GIN] 2026/10/05 - 11:13:21 | 400 |  238.997667ms |       127.0.0.1 | POST     "/api/embed"
+srv          stop: cancel task, id_task = 116
+slot      release: id  0 | task 116 | stop processing: n_tokens = 6, truncated = 0
+srv  update_slots: all slots are idle

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/out/mcp-pin-probe-90s.py", line 137, in <module>
+    main()
+  File "/out/mcp-pin-probe-90s.py", line 104, in main
+    request(proc, {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+  File "/out/mcp-pin-probe-90s.py", line 33, in request
+    raise TimeoutError(f"MCP request {request_id} timed out")
+TimeoutError: MCP request 1 timed out
