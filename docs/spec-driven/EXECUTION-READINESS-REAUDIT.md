@@ -32,3 +32,5 @@ C1-04–07에는 실제 native amd64 환경·대규모 비용·운영 서명/독
 후속 [C1 대규모 비용 진단](./C1-LARGE-COST-DIAGNOSTIC.md)은 최신 macOS preview/기존 부분13,575청크의60 SDK와RSS 보완2 SDK를 기록했다. warm/cold·size·startup/요청 호출·source/Go Verify·실제 backend 오류/읽기 전용 FTS 재현을 보존하며 공식 입력/최종/운영 승인으로 합산하지 않는다. 다음 독립 확인은 후보→FTS 경계다.
 
 후속 [FIX-20](./B0-FTS-KEYWORD-DIAGNOSTIC.md)은 관측된 구조 FTS 오류의 두 회귀/실제SQLite/관련 검증과 동일DEV2 SDK를 확인했다. BM25 오류 호출당8→0·기본 근거/좌표 보존, neighbors12오류 유지·공식 null이다. 기존 package source는 FIX-19이므로 최종 동결 후 재빌드한다.
+
+후속 [선택 문서의 Go neighbors 재생](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)은8개 직접조회 중 문서6개의 코드symbol없음/no node at·코드2 정상과 원본 불변을 확인했다. source 인수가 없는 전체 과거오류와 직접 연결하거나 공식 완료로 세지 않는다. 실제 입력 결정 후 strict 동결이 다음 최우선이다.

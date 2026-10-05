@@ -405,3 +405,10 @@ SDK 실패/누락0과 backend 오류840(BM25480·neighbors360)을 구분했다. 
 2026-10-05 [FIX-20 진단](./B0-FTS-KEYWORD-DIAGNOSTIC.md)에 대규모 DEV의 BM25480오류 중 후보8개를 input SHA/보관 source에 결합했다. 후보를 FTS literal로 전달하는 helper를 Stage1 rerank·Stage2 기본/테스트 보조 검색에 적용했다. 일반 식별자 기존 query·원래 symbol 이름·명시적 raw FTS/public search_text OR 계약을 유지한다. 수정 전 두 회귀 exit1→실제SQLite의 punctuation/연산자/quote/한글/문법 삽입 비확장→관련7패키지/race3/vet→동일 실모델DEV2 SDK/16인용·본문/public Go Verify를 확인했다. 실제 literal 후보SHA8개와 BM25 오류 호출당8→0·근거/좌표 보존을 대조했다.
 
 원본/사본 source/DB·model·binary/config/request·사람 입력5개 불변, SDK 실패/누락0이다. neighbors12오류는 미수정이며 실제 seed/노드 경계를 다음 독립 작업으로 확인한다.31원자료+해시를 기록한다. 기존 FIX-19 패키지는 이 수정본을 검증한 것이 아니며 최종 품질/수정 동결 후 새 패키지가 필요하다. FIX-20을 공식 C0 검색 품질 완료로 세지 않고2/30·진행11·대기17·0/4·전체28미완료를 유지한다. 공식 최우선은 실제 B0/SF/STV2 결정→동결→새 strict B0-07이다.
+
+
+## 33. 선택된 문서·코드의 실제 Go neighbors 재생
+
+2026-10-05 [neighbors 진단](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)에서 FIX-20 SDK가 선택한8인용을 real Go adapter에 직접 재생했다. 문서6개는 symbol 후보0·qname미해결·no node at이며, 코드2개는 오류 없이 조회된다. Git hunk/path/file 구조 노드를 코드 관계로 승격하지 않았다. 임시 진단 Go 테스트를 실행하고 원문을 `.go.txt`로 보존한 뒤 코드 트리에서 제거했다. 제품 변경/일반CI 추가·실모델/SDK/FINAL 추가 실행 없음이다.
+
+실제 이전 neighbors 원장은 source 인수를 기록하지 않으므로 직접8개를 과거360 또는 새SDK12의 전체seed로 일대일 결합할 수 없다. 기존 failed_seeds6과 정합적이지만 전체 원인 확정/안전·품질 통과로 확대하지 않는다. 입력capture/adapter/helper SHA와 원본/사본 DB/source·사람 입력5개 불변·원자료5개를 기록했다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→입력 동결→새 strict B0-07이다. 완료2/진행11/대기17·공식0/4·미완료28개와 OP/native/legal/최종복구·출시를 유지한다.

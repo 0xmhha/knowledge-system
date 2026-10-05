@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 최신 기술 수정: [FIX-20 FTS 후보](./B0-FTS-KEYWORD-DIAGNOSTIC.md)는 대규모 DEV 후보8개의 bare FTS 오류를 수정 전2회귀→literal 경계/실제SQLite→관련7패키지/race3/vet→같은 BGE/부분13,575청크2 SDK/16인용·본문/Go Verify로 검증했다. BM25 오류 호출당8→0·기본 근거/좌표·source/DB/model/config/binary·사람 입력5개 불변이다. neighbors12오류는 유지하며 다음 독립 확인은 실제 seed/노드 경계다. 공식 null·전체28미완료·B0/SF/STV2 결정→동결→새 strict B0-07이 최우선이다. FIX-19 preview는 FIX-20 검증 패키지가 아니고 최종 동결 후 재빌드한다.
+2026-10-05 최신 추가 확인: [선택 문서 neighbors](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)의 실제 Go adapter 직접8재생은 문서6개 symbol없음/no node at·코드2 정상이다. 기존360/새SDK12전체seed와 직접 결합할 수 없는 계측 한계는 유지한다. 임시 테스트 원문보관 후 제거·제품변경 없음·DB/source/사람 입력5개 불변·5원자료·공식null·전체28미완료다. 다음은 실제 B0/SF/STV2 결정→동결→새 strict B0-07이다.
+
+2026-10-05 직전 기술 수정: [FIX-20 FTS 후보](./B0-FTS-KEYWORD-DIAGNOSTIC.md)는 대규모 DEV 후보8개의 bare FTS 오류를 수정 전2회귀→literal 경계/실제SQLite→관련7패키지/race3/vet→같은 BGE/부분13,575청크2 SDK/16인용·본문/Go Verify로 검증했다. BM25 오류 호출당8→0·기본 근거/좌표·source/DB/model/config/binary·사람 입력5개 불변이다. neighbors12오류는 유지하며 다음 독립 확인은 실제 seed/노드 경계다. 공식 null·전체28미완료·B0/SF/STV2 결정→동결→새 strict B0-07이 최우선이다. FIX-19 preview는 FIX-20 검증 패키지가 아니고 최종 동결 후 재빌드한다.
 
 2026-10-05 이전 비용 진단: [C1 대규모 비용](./C1-LARGE-COST-DIAGNOSTIC.md)의 기존 부분13,575청크·최신 FIX-19/BGE-M3·DEV1문의60 SDK/480인용·본문과 별도RSS2 SDK/16원문·Go Verify를 확인했다. baseline/knowledge warm p95는3.737/4.408초이며 공식 합격/독립표본이 아니다. backend840 오류·bare FTS 후보8개 재현·neighbors 원인 미확정을 분리했다. 입력5개/source/DB/model/binary 불변·48원자료·공식 null·전체28미완료다. 다음 독립 작업은 BM25 후보→FTS 경계 회귀/영향 검토, 최우선 공식 경로는 B0/STV2/SF 결정→동결→새 strict B0-07이다.
 
