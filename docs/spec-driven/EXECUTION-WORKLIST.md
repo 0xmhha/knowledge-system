@@ -398,3 +398,10 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 SDK 실패/누락0과 backend 오류840(BM25480·neighbors360)을 구분했다. HTTP639/별도 startup7개 anchor embed455/HTTP1,365는 모두200이다. input SHA8개에 결합한 문서 후보의 bare FTS 오류와 literal quoted0결과를 읽기 전용 Python SQLite에서 재현했다. neighbors 전체 원인은 아직 확정하지 않았다. 별도RSS 보완2 SDK/16인용·본문도 같은 근거/원문/Go Verify를 통과했다. 실제 MCP의 observed RSS 최대82,992KiB와 동시 합106,656KiB는 샘플 peak/공유 페이지/모델 서버 미포함을 명시한다. 주60과 보완2의 분모를 분리한다.
 
 원본/사본 DB/manifest/source·고정 source tree·package binary/config/request·모델 tag/version/digest·사람 입력5개 불변이다. 원자료48개+SHA manifest를 결합했다. 신규 제품 변경은 아직 없고 기존 공개 verifier·독립 원문 감사를 재사용했다. 다음 독립 작업은 BM25 후보의 실제 FTS 경계 회귀 재현/영향 검토이며, 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 완료2/30·진행11·대기17·공식게이트0/4·전체28미완료 및 OP-01–08/native/legal/운영복구·출시는 유지한다.
+
+
+## 32. FIX-20 후보 문자열의 FTS 문법 오류 수정
+
+2026-10-05 [FIX-20 진단](./B0-FTS-KEYWORD-DIAGNOSTIC.md)에 대규모 DEV의 BM25480오류 중 후보8개를 input SHA/보관 source에 결합했다. 후보를 FTS literal로 전달하는 helper를 Stage1 rerank·Stage2 기본/테스트 보조 검색에 적용했다. 일반 식별자 기존 query·원래 symbol 이름·명시적 raw FTS/public search_text OR 계약을 유지한다. 수정 전 두 회귀 exit1→실제SQLite의 punctuation/연산자/quote/한글/문법 삽입 비확장→관련7패키지/race3/vet→동일 실모델DEV2 SDK/16인용·본문/public Go Verify를 확인했다. 실제 literal 후보SHA8개와 BM25 오류 호출당8→0·근거/좌표 보존을 대조했다.
+
+원본/사본 source/DB·model·binary/config/request·사람 입력5개 불변, SDK 실패/누락0이다. neighbors12오류는 미수정이며 실제 seed/노드 경계를 다음 독립 작업으로 확인한다.31원자료+해시를 기록한다. 기존 FIX-19 패키지는 이 수정본을 검증한 것이 아니며 최종 품질/수정 동결 후 새 패키지가 필요하다. FIX-20을 공식 C0 검색 품질 완료로 세지 않고2/30·진행11·대기17·0/4·전체28미완료를 유지한다. 공식 최우선은 실제 B0/SF/STV2 결정→동결→새 strict B0-07이다.

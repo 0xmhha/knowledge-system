@@ -1,0 +1,13 @@
+import json,subprocess,hashlib,urllib.request,shutil,time
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-fix20-live-20261005');R.mkdir(mode=0o700,exist_ok=False);OLD=Path('/private/tmp/ks-large-cost-20261005');BIN=Path('/private/tmp/ks-fix20-cks-20261005');sha=lambda b:hashlib.sha256(b).hexdigest()
+def save(n,v):(R/n).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+for n in ('requests.json',):shutil.copyfile(OLD/n,R/n)
+(R/'config.yaml').write_text((OLD/'config.yaml').read_text().replace(str(OLD/'footprints'),str(R/'footprints')))
+files=[BIN,R/'config.yaml',R/'requests.json',ROOT/'internal/system/ckgclient/keyword.go',ROOT/'internal/system/composer/stage1/rerank.go',ROOT/'internal/system/composer/stage2/searcher.go']
+bindings={str(p):sha(p.read_bytes()) for p in files};save('bindings-before.json',bindings)
+model=lambda:{k:json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/'+k,timeout=15)) for k in ('version','tags','ps')};before=model();save('model-before.json',before)
+cmd=[str(BIN),'eval','capture','--requests',str(R/'requests.json'),'--config',str(R/'config.yaml'),'--output',str(R/'capture.json'),'--warmup','0','--retrieval-runs','1','--warm-runs','0','--cold-runs','0','--call-timeout','90s'];save('plan.json',{'command':cmd,'planned_calls':2,'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'comparison':'before primary cost capture60 and auxiliary2; after2 on identical request/source/data; no latency inference','parent_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'tracked_product_diff_sha256':sha(subprocess.check_output(['git','diff','--','internal/system']))})
+with (R/'stdout.txt').open('wb') as out,(R/'stderr.txt').open('wb') as err:
+ start=time.monotonic();run=subprocess.run(cmd,stdout=out,stderr=err)
+save('result.json',{'exit_code':run.returncode,'wall_seconds':time.monotonic()-start});after={str(p):sha(p.read_bytes()) for p in files};assert bindings==after;save('bindings-after.json',after);final=model();save('model-after.json',final);assert before['tags']==final['tags'] and before['version']==final['version'];print(json.dumps({'exit_code':run.returncode,'run':str(R)}));assert run.returncode==0

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/private/tmp/ks-fix20-cks-20261005",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-fix20-live-20261005/requests.json",
+    "--config",
+    "/private/tmp/ks-fix20-live-20261005/config.yaml",
+    "--output",
+    "/private/tmp/ks-fix20-live-20261005/capture.json",
+    "--warmup",
+    "0",
+    "--retrieval-runs",
+    "1",
+    "--warm-runs",
+    "0",
+    "--cold-runs",
+    "0",
+    "--call-timeout",
+    "90s"
+  ],
+  "planned_calls": 2,
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "comparison": "before primary cost capture60 and auxiliary2; after2 on identical request/source/data; no latency inference",
+  "parent_commit": "c61cb64bd655a875fb550dd51a7c715dd996fa70",
+  "tracked_product_diff_sha256": "11ef5760b30e23c855372a00098d0c97476488751a9c01bbcb90308e9c73302e"
+}

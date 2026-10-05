@@ -28,3 +28,5 @@ p95는 nearest rank다. 응답 크기는 저장된 SDK 응답을 UTF-8 JSON으�
 원본·사본의 DB/manifest/source와 고정 source tree, 패키지 binary/config/request SHA, 실제 사람 입력5개는 측정 및 보완 후 유지됐다. 같은 model tag/digest/version도 유지됐다. 48개 증거 파일에 raw 응답·계측·입력/봉인·보완·읽기 전용 재현·helper 원문을 결합했다. DB/바이너리/모델 blob/private key는 Git에 넣지 않았다. raw text 로그는 바이트/SHA/원문을 가진 lossless JSON으로 보존했다.
 
 다음 독립 작업은 확인된 BM25 후보→FTS 경계의 회귀 재현과 영향 검토다. 공식 최우선은 B0-01/02/03/05·STV2 결정→입력 동결→새 strict B0-07이다. 전체30개 중 완료2/진행11/대기17·미완료28개·공식 게이트0/4를 유지한다. B0-01–09, B1-03–08, C0-01–06, C1-01–07 및 STV2-01·OP-01–08·native amd64·최종 고지/복구/지원/출시가 남는다. [현황판](./EXECUTION-STATUS.md)을 함께 확인한다.
+
+후속 [FIX-20](./B0-FTS-KEYWORD-DIAGNOSTIC.md)은 후보→FTS 경계의 두 회귀/실제SQLite/관련 패키지·race·vet와 같은 실모델2 SDK를 확인했다. BM25 오류는 호출당8→0, 기존 인용/본문/좌표는 같다. 이 문서의60호출 및 비용은 수정 전 FIX-19 package의 원래 측정으로 유지한다. neighbors 오류와 공식 품질/최종 package 범위는 별도다.

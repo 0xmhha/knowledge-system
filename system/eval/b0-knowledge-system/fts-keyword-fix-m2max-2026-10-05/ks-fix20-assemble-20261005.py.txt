@@ -1,0 +1,18 @@
+import json,hashlib,shutil,subprocess
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-fix20-live-20261005');OUT=ROOT/'system/eval/b0-knowledge-system/fts-keyword-fix-m2max-2026-10-05';OUT.mkdir(exist_ok=False);sha=lambda b:hashlib.sha256(b).hexdigest()
+assert json.loads((R/'public-go-contract.json').read_bytes())['failed']==0
+for p in sorted(R.iterdir()):
+ if not p.is_file():continue
+ if p.suffix=='.txt':
+  raw=p.read_bytes();(OUT/(p.name+'.json')).write_text(json.dumps({'original_path':str(p),'original_bytes':len(raw),'original_sha256':sha(raw),'text':raw.decode()},indent=2)+'\n')
+ else:shutil.copyfile(p,OUT/p.name)
+shutil.copyfile(R/'footprints/cks-mcp.jsonl',OUT/'footprints.jsonl')
+for p in [Path('/private/tmp/ks-fix20-prefail-20261005.json'),Path('/private/tmp/ks-fix20-tests-20261005.txt'),Path('/private/tmp/ks-fix20-race-20261005.txt'),Path('/private/tmp/ks-fix20-vet-20261005.txt'),Path('/private/tmp/ks-fix20-build-20261005.txt')]:
+ raw=p.read_bytes();(OUT/(p.name+'.json')).write_text(json.dumps({'original_path':str(p),'original_bytes':len(raw),'original_sha256':sha(raw),'text':raw.decode()},indent=2)+'\n')
+for p in [Path('/private/tmp/ks-fix20-live-20261005.py'),Path('/private/tmp/ks-fix20-audit-20261005.py'),Path('/private/tmp/ks-fix20-assemble-20261005.py')]:shutil.copyfile(p,OUT/(p.name+'.txt'))
+files=['internal/system/ckgclient/keyword.go','internal/system/ckgclient/keyword_test.go','internal/system/composer/stage1/rerank.go','internal/system/composer/stage1/rerank_test.go','internal/system/composer/stage2/searcher.go','internal/system/composer/stage2/searcher_test.go','internal/system/mcp/search.go'];sources={}
+for relative in files:
+ p=ROOT/relative;name=relative.replace('/','__')+'.txt';shutil.copyfile(p,OUT/name);sources[relative]={'snapshot':str((OUT/name).relative_to(ROOT)),'sha256':sha(p.read_bytes())}
+(OUT/'source-bindings.json').write_text(json.dumps(sources,indent=2)+'\n')
+entries=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(OUT.rglob('*')) if p.is_file()];(OUT/'evidence-manifest.json').write_text(json.dumps({'scope':'FIX-20 diagnostic; no executable/DB/model/private key; archived Go and Python text; raw text wrapped losslessly','files':entries},indent=2)+'\n');print(json.dumps({'files':len(entries),'artifact':str(OUT)}))

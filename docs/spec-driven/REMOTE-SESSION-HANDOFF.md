@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 최신 비용 진단: [C1 대규모 비용](./C1-LARGE-COST-DIAGNOSTIC.md)의 기존 부분13,575청크·최신 FIX-19/BGE-M3·DEV1문의60 SDK/480인용·본문과 별도RSS2 SDK/16원문·Go Verify를 확인했다. baseline/knowledge warm p95는3.737/4.408초이며 공식 합격/독립표본이 아니다. backend840 오류·bare FTS 후보8개 재현·neighbors 원인 미확정을 분리했다. 입력5개/source/DB/model/binary 불변·48원자료·공식 null·전체28미완료다. 다음 독립 작업은 BM25 후보→FTS 경계 회귀/영향 검토, 최우선 공식 경로는 B0/STV2/SF 결정→동결→새 strict B0-07이다.
+2026-10-05 최신 기술 수정: [FIX-20 FTS 후보](./B0-FTS-KEYWORD-DIAGNOSTIC.md)는 대규모 DEV 후보8개의 bare FTS 오류를 수정 전2회귀→literal 경계/실제SQLite→관련7패키지/race3/vet→같은 BGE/부분13,575청크2 SDK/16인용·본문/Go Verify로 검증했다. BM25 오류 호출당8→0·기본 근거/좌표·source/DB/model/config/binary·사람 입력5개 불변이다. neighbors12오류는 유지하며 다음 독립 확인은 실제 seed/노드 경계다. 공식 null·전체28미완료·B0/SF/STV2 결정→동결→새 strict B0-07이 최우선이다. FIX-19 preview는 FIX-20 검증 패키지가 아니고 최종 동결 후 재빌드한다.
+
+2026-10-05 이전 비용 진단: [C1 대규모 비용](./C1-LARGE-COST-DIAGNOSTIC.md)의 기존 부분13,575청크·최신 FIX-19/BGE-M3·DEV1문의60 SDK/480인용·본문과 별도RSS2 SDK/16원문·Go Verify를 확인했다. baseline/knowledge warm p95는3.737/4.408초이며 공식 합격/독립표본이 아니다. backend840 오류·bare FTS 후보8개 재현·neighbors 원인 미확정을 분리했다. 입력5개/source/DB/model/binary 불변·48원자료·공식 null·전체28미완료다. 다음 독립 작업은 BM25 후보→FTS 경계 회귀/영향 검토, 최우선 공식 경로는 B0/STV2/SF 결정→동결→새 strict B0-07이다.
 
 2026-10-05 이전 package 검증: [FIX-19 preview](./C1-LATEST-PREVIEW-VALIDATION.md)의 세 대상 시험 서명/설치·Darwin 재현성·Darwin 실제 BGE SDK10과 Linux CPU SDK6/원문/Go Verify/벡터/K/계측/model byte·최신 작은 복구/고정legacy 소비자 재생을 확인했다. Linux90초 initialize 실패와 종료 부근400·65anchor 직접200·후속180초 진단 성공을 분리한다. 초기24 SDK 계획은 미완료이며 후속6을 공식 ablation/지연 합격으로 바꾸지 않는다. 임시 서버 종료·원자료504개/hash 기록·공식 품질/운영 null·입력5개 불변·28미완료다. 다음은 실제 B0/STV2/SF 결정→입력 동결→새 strict B0-07이다.
 

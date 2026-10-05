@@ -1,4 +1,4 @@
-# 최신 FIX-19 패키지·실모델·복구 준비 검증
+# FIX-19 패키지·실모델·복구 준비 검증
 
 2026-10-05. [요약 원장](../../system/eval/b0-knowledge-system/latest-package-preview-m2max-2026-10-05/summary.json)과 [파일 해시 원장](../../system/eval/b0-knowledge-system/latest-package-preview-m2max-2026-10-05/evidence-manifest.json)은 `31def76b`의 최신 시험 범위를 기록한다. 최종 품질/운영 승인과 공식 C1 verdict는 null이다. 이전 FIX-15 패키지 증거로 FIX-18/19 수정본을 검증한 것으로 처리하지 않고 새 preview를 만들었다.
 
@@ -37,3 +37,5 @@ macOS 최신 extracted preview의 작은 TypeScript/mock fixture에서 실패 �
 OP-01–08의 운영 역할/배포scope/키·독립 신뢰/개인키 접근·교체·폐기/전체 native 적합성/지원·비용/복구 담당 결정, 실제 native amd64·대규모 실모델 비용·최종 운영 백업/실패 전환·지원/출시도 남는다. 시험 키와 synthetic commit·fixture reviewer를 운영 책임자로 바꾸지 않는다. [전체 현황](./EXECUTION-STATUS.md)에서 남은 각 ID와 선행 조건을 확인한다.
 
 후속 [부분 대규모 비용 진단](./C1-LARGE-COST-DIAGNOSTIC.md)은 이 macOS package의60 SDK·별도RSS2호출/원문/Go Verify·원본 보존을 확인했다. 이전 빌드의 선택된13,575청크이며 source29개 제외·SDK 내부 backend 오류·단일DEV 반복·모델 서버 미포함의 한계를 유지한다. 공식8arm/최종/운영 비용 판정은 별도다.
+
+후속 [FIX-20 후보 FTS 수정](./B0-FTS-KEYWORD-DIAGNOSTIC.md)은 이 preview 이후의 제품 변경이다. 이 패키지를 FIX-20 검증본으로 처리하지 않으며 최종 품질·수정 동결 후 새 후보를 빌드한다.

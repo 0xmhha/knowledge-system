@@ -1,0 +1,54 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "planned_calls": 2,
+  "observed_calls": 2,
+  "missing_calls": 0,
+  "failed_calls": 0,
+  "citations": 16,
+  "bodies": 16,
+  "before_after_citations_bodies_coordinates_identical": true,
+  "literal_candidate_hashes_bound": 8,
+  "before_per_call_bm25_errors": 8,
+  "after_per_call_bm25_errors": 0,
+  "remaining_backend_errors": [
+    {
+      "backend": "ckg",
+      "method": "neighbors",
+      "outcome": "backend_error",
+      "count": 12
+    }
+  ],
+  "seals": {
+    "original": {
+      "unchanged": true,
+      "file_inventory_sha256": "2f8e734518f120db671db0c4f4b65fe1e6d72e81af177987d09d19e5113fa8b4",
+      "files": 1940
+    },
+    "source": {
+      "unchanged": true,
+      "file_inventory_sha256": "3598dc95d6a171787a2e3b51116cad4b3f0f99fafe14ef97331b3eab485f2704",
+      "files": 1960
+    },
+    "copy": {
+      "unchanged": true,
+      "file_inventory_sha256": "f8d1f0fa135bb40251f43ba37c36a77cf276a6dbfa21f50b2f6e308d91b729fd",
+      "files": 1938
+    }
+  },
+  "human_inputs_unchanged": {
+    "system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+    "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "ee5a44c01168c2a92ada947dce78bf88da773818c86d6e572a5b9a6715819c1d"
+  },
+  "binary_sha256": "8e1aef454f053229dc5fa3a7a3bbd00f1e7c062274562c198ac98d6ff0ec17e5",
+  "derived_rows_sha256": "1697e31556f87e448f9dec1241911f56ee5efee59501e43dabe79dffc754c2fd",
+  "limits": [
+    "existing partial index/one DEV query; no official quality/latency or full ablation claim",
+    "neighbor errors retained, not repaired or reclassified",
+    "older package before FIX-20; final package needs rebuilt frozen source"
+  ]
+}
