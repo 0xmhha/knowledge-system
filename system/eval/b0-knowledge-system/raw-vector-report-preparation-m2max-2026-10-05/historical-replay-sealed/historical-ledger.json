@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "gate": "B0 measurement tooling diagnostic",
+  "checked_at": "2026-10-03T13:07:55.913920+00:00",
+  "base_commit": "e4ddc6c44ae607a35d5301353c7cc0ddd2c5656a",
+  "branch": "feat/spec-driven-knowledge-system",
+  "working_changes": true,
+  "quality_metrics": null,
+  "release": "preview",
+  "checks": [
+    {
+      "id": "header-before",
+      "command": "go test ./internal/vector/chunk -run TestFileChunksDoNotCitePhantomLineAfterFinalNewline -count=1",
+      "exit_code": 1,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/header-before.txt",
+        "sha256": "ed53e8db749e8d1580504ca2a894b5e378683b3f4155a349b25bab7a1bff09ba",
+        "bytes": 263
+      }
+    },
+    {
+      "id": "sqlite-uri-before",
+      "command": "initial readonly-store test with vector #?.db",
+      "exit_code": 1,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/sqlite-uri-before.txt",
+        "sha256": "35c3987c05abbd6605a19692bd5de8ada6761e3260606125f5f0a5b9c2f940e7",
+        "bytes": 424
+      }
+    },
+    {
+      "id": "header-after",
+      "command": "go test ./internal/vector/chunk ./internal/vector/build ./internal/setup ./cmd/cks/evalcli ./internal/system/eval ./cmd/b0-vector-probe ./internal/vector/store/sqlitevec",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/header-after.txt",
+        "sha256": "d2eceafd7d2ddfba83ecc71d899e201ab7f744d8f515925baeece713f7a7bc88",
+        "bytes": 487
+      }
+    },
+    {
+      "id": "all-go",
+      "command": "go test ./...",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/all-go.txt",
+        "sha256": "685c77965ff1bb81df77811721a4e5152f2687d009ff3cf6e43b54bb06614d6a",
+        "bytes": 9160
+      }
+    },
+    {
+      "id": "vet",
+      "command": "go vet ./... (before probe seal hardening; final probe vet below)",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/vet.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "race",
+      "command": "go test -race ./internal/vector/chunk ./internal/vector/store/sqlitevec ./internal/system/eval ./cmd/cks/evalcli ./cmd/b0-vector-probe (before probe seal hardening)",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/race.txt",
+        "sha256": "adf0d65deb1ffab7180e3f04a1cb9c42b8ff42ab94cdedda3044ebb2b6ab14d0",
+        "bytes": 348
+      }
+    },
+    {
+      "id": "probe-seal-test",
+      "command": "go test ./cmd/b0-vector-probe",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/probe-seal-test.txt",
+        "sha256": "41f9e01f904c5858af8b4bdd5d5c9a6894ec3e3bec3bd76f42a6a42a68c033d6",
+        "bytes": 67
+      }
+    },
+    {
+      "id": "probe-seal-race",
+      "command": "go test -race ./cmd/b0-vector-probe",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/probe-seal-race.txt",
+        "sha256": "24480b5993f897760658e8095a6a619c03b9120fb18bfc093672efaa4471bf35",
+        "bytes": 67
+      }
+    },
+    {
+      "id": "probe-seal-vet",
+      "command": "go vet ./cmd/b0-vector-probe",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/probe-seal-vet.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "boundaries",
+      "command": "scripts/check-boundaries.sh",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/boundaries.txt",
+        "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+        "bytes": 22
+      }
+    },
+    {
+      "id": "docs",
+      "command": "python3 scripts/check-docs.py",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/docs.txt",
+        "sha256": "2c96ffe5116f2162f0faecb56a142094f1e5350e91c3274a2581e6fc2dc4c5ed",
+        "bytes": 39
+      }
+    },
+    {
+      "id": "build",
+      "command": "make build-bins",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/build.txt",
+        "sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+        "bytes": 98
+      }
+    },
+    {
+      "id": "real-setup",
+      "command": "CKV_REQUIRE_COMPLETE_EMBEDDINGS=1 bin/cks setup --src /private/tmp/ks-b0-m2max-smoke-20261003/src --out /private/tmp/ks-b0-capture-fixed-data-20261003 --project-id b0-capture-smoke --source-mode committed --version fixed --embedder ollama --model-name bge-m3:latest --ollama-url http://127.0.0.1:11434",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-setup.txt",
+        "sha256": "1c8d9152028b65a0fbde098bb419a94e96a106375163e3764a823408f8c98130",
+        "bytes": 3792
+      }
+    },
+    {
+      "id": "real-capture",
+      "command": "bin/cks eval capture --requests /private/tmp/ks-b0-capture-real-requests-20261003.json --config /private/tmp/ks-b0-capture-fixed-mcp-20261003.yaml --output /private/tmp/ks-b0-capture-fixed-real-20261003.json --warmup 1 --retrieval-runs 2 --warm-runs 1 --cold-runs 1",
+      "exit_code": 0,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-capture.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "mock-capture",
+      "command": "bin/cks eval capture --requests /private/tmp/ks-b0-capture-mock-requests-20261003.json --config /private/tmp/ks-worklist-source-20261003/plain-mcp.yaml --output /private/tmp/ks-b0-capture-final-mock-20261003.json --warmup 1 --retrieval-runs 2 --warm-runs 3 --cold-runs 1 (intentional invalid knowledge scope)",
+      "exit_code": 1,
+      "raw_output": {
+        "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/mock-capture.txt",
+        "sha256": "0e096edd41ec334910afa9b393b91bb9fc545454a34c38a78cc75f32b3fae0c4",
+        "bytes": 98
+      }
+    }
+  ],
+  "artifacts": {
+    "real-v2-before.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-v2-before.json",
+      "sha256": "288f74807e2da9b6c90ddbc061d540b3e272808be99f62faa26a536cb41fcd54",
+      "bytes": 4808
+    },
+    "v1-phantom-line.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/v1-phantom-line.json",
+      "sha256": "6b183e96d2fe1b739e403cad7da486bc02a466f8a9fdf1a5fd6125bee7e35156",
+      "bytes": 4988
+    },
+    "real-v2-fixed.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-v2-fixed.json",
+      "sha256": "c76b8a20f7ba544592c7aeed2dc5a008d0c4efc09842fb9d43a2cb5f5eff103a",
+      "bytes": 52887
+    },
+    "real-v2-validation.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-v2-validation.json",
+      "sha256": "f952bff958122b658102fc5304ca02c2a490205874f94d878e42e0608d67e4cd",
+      "bytes": 410
+    },
+    "mock-v2-final.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/mock-v2-final.json",
+      "sha256": "e1d2628ca6a04fa738db1f33f877deebeb32927e852c8a0f46b29c42e89f4df8",
+      "bytes": 71726
+    },
+    "vector-probe-real.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/vector-probe-real.json",
+      "sha256": "7f53f9db293e90be8d2f24edabb572e3a8a120e3dc06c76324c6ebcab58d65d1",
+      "bytes": 22953
+    },
+    "real-requests.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/real-requests.json",
+      "sha256": "0759492595469ebf66c664a35ded438e8418973d3f7084e7a34bd9f3d20d1c09",
+      "bytes": 220
+    },
+    "mock-requests.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/mock-requests.json",
+      "sha256": "a2437926fc6dc01554f3cb186c4b6cfe111444382183073cddd0f8d02955d3da",
+      "bytes": 697
+    },
+    "vector-filter.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/vector-filter.json",
+      "sha256": "8280bf2bac21b524c25bd2b19f377eaa9d374ac897b000cf1f3f0048deb63438",
+      "bytes": 118
+    },
+    "identity-before.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/identity-before.json",
+      "sha256": "3b55cce66831f07a3d53a53a9db81d6be823a0a30a732bf3dd8ebaed0b73eb57",
+      "bytes": 1323
+    },
+    "identity-fixed.json": {
+      "path": "system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03/identity-fixed.json",
+      "sha256": "48409567b6aa96370a4b9fd1d1d0aecccb5da4d2893eaa00865f6af321bcaed1",
+      "bytes": 1323
+    }
+  },
+  "source_sha256": {
+    "cmd/cks/evalcli/main.go": "7a6f003abc4e0fa86748da1f39af35f4c9b9f9567c3ee496bc2a3aa2920e4935",
+    "cmd/cks/evalcli/capture.go": "c3a085a70529c23f85cf80064b8ccefc774a7f39d8a43066d969c3994de05b27",
+    "cmd/cks/evalcli/capture_test.go": "ba6da4a431f70069e9b37820f9aa79799872a307d5d34b8edbbcca209a233332",
+    "cmd/b0-vector-probe/main.go": "970b453f44ffc96cea55b741f3579b1b171b361b619726cdae2e621dab61c3eb",
+    "cmd/b0-vector-probe/main_test.go": "ac77e494c66132483b8b6398438e9057f3a4e24566cf9cb1fcd417e019da52e4",
+    "internal/system/eval/capture.go": "699ae68a92c99ff6ec9566e9a8bf8b86130f604e199da401857999caa36c5ad1",
+    "internal/system/eval/capture_test.go": "96ab858b9833616567d5eb0be67c8ce097e719cfd79b369f38d6df98c9a326b8",
+    "internal/system/eval/runner.go": "5203a5dfca4a22550f76fb8525e6b9ea7010847420dfff3daab46780f27a9c19",
+    "internal/vector/chunk/chunk.go": "c9c380df627bd9203550e386f6b03b794aec6807949c2bc6eb10485e644c16a6",
+    "internal/vector/chunk/chunk_test.go": "4ed3bb2a8b488f3641d7d1009842f3b41f78c1c4e5cab637631530e4cdd6dfea",
+    "internal/vector/store/sqlitevec/store.go": "f65749430a14e4901b8971e6371c7df4ed012e8d46dc51f7c3bdcc5cc97dd3b4",
+    "internal/vector/store/sqlitevec/readonly.go": "9bd67553afde8052096cccc5eb5c2d18b4b32568f90995dc078a1e31fed394a9",
+    "internal/vector/store/sqlitevec/readonly_test.go": "0d163570e198ee80298c6971e130df9fe2da3428b0bea67b2e1ab79256c74fbe"
+  },
+  "summary": {
+    "real_v2_rows": 5,
+    "body_checks": 25,
+    "mock_rows": 21,
+    "mock_partial_expected": true,
+    "exact_agreement": true,
+    "coordinate_state": "pinned",
+    "database_unchanged": true,
+    "manifest_unchanged": true,
+    "input_scope_pending": true,
+    "protocol_pending": true,
+    "dynamic_gold_pending": true
+  },
+  "limitations": [
+    "Not official B0/B1 retrieval quality or latency; Go checks overlapped real smoke.",
+    "Real probe eligible_count=1; no F-01 sparse-fixture quality claim.",
+    "Before/after used identical source and embedding identity, different builder bytes and dataset IDs.",
+    "Whole A/B/C and final platform/release gates remain open.",
+    "Mock synthetic reviewed facts do not approve operational facts."
+  ]
+}

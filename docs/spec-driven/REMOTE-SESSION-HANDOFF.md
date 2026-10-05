@@ -4,6 +4,8 @@
 
 ## 재개 후 보고 규칙
 
+2026-10-05 최신 독립 준비: [raw CKV/F-01 보고 도구](./B0-RAW-VECTOR-REPORT-PREPARATION.md)가 실제 K·원시 후보/거리·source SHA·정상 exact·상한 상태를 분리하고 full eligible 목록을 연결한다. 역사적 BGE-M3 Alpha K1은 source archive/Git blob과 같지만 희소 조건/full 목록이 부족해 `fixture_not_qualified`이며 공식 품질 null이다. Python 15+16·Go probe 6/race/vet 통과. 다음 독립 작업은 F-02 장문 꼬리/split·parent 오라클 보고 연결이다. 실제 B0-01/02/03/05·STV2-01 결정 후 새 strict B0 빌드가 최우선이며 일반 계속 지시는 개별 승인으로 기록하지 않는다.
+
 사용자의 2026-10-04 지시: **마지막에는 현재 단계, 다음 작업, 앞으로 남은 전체 작업을 항상 함께 보여준다.** 완료/진행/대기를 눈으로 구분하고 도구 검증을 공식 품질 합격으로 세지 않는다. [EXECUTION-STATUS.md](./EXECUTION-STATUS.md)와 작업리스트를 먼저 읽고 변경 후 현황판을 동기화한다. 이 요청을 일반 진행 지시나 개별 입력/운영 승인으로 해석하지 않는다.
 
 ## 2026-10-04 실행 재개 안내

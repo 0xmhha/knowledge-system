@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "probe_sha256": "7f53f9db293e90be8d2f24edabb572e3a8a120e3dc06c76324c6ebcab58d65d1",
+  "control_id": "historical-Alpha-smoke-only",
+  "control_note": "Single-target Alpha replay; these authored diagnostic controls are not F-01 DEV/FINAL gold.",
+  "coordinates": {
+    "commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+    "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+    "project_id": "b0-capture-smoke",
+    "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93"
+  },
+  "embedding_identity": {
+    "Provider": "ollama",
+    "Model": "bge-m3:latest",
+    "Dim": 1024,
+    "Pooling": "",
+    "Normalize": "",
+    "version": 2,
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "dimension_method": "native:v1",
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "truncate_policy": "reject:v1",
+    "runtime_context_tokens": 8192,
+    "runtime_batch_tokens": 8192,
+    "chunk_budget_bytes": 6144
+  },
+  "prompt": "Where is Alpha function implemented?",
+  "filter": {
+    "language": "go",
+    "path": "main.go",
+    "symbol_kinds": [
+      "Function"
+    ],
+    "chunk_kinds": [
+      "symbol"
+    ],
+    "exclude_tests": true
+  },
+  "k": 1,
+  "max_exact_candidates": 2,
+  "expected_citations": [
+    {
+      "file": "main.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+    }
+  ],
+  "f01": {
+    "k": 5,
+    "max_exact_candidates": 2,
+    "eligible_count": 1,
+    "complete_hit_count": 1,
+    "eligible_files": [
+      "main.go"
+    ]
+  }
+}

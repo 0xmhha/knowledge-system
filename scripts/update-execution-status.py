@@ -50,7 +50,7 @@ def render(raw):
     for stage in ['B0','B1','C0','C1']:
         c = Counter(t[4] for t in tasks if t[0].startswith(stage))
         lines.append(f"| {stage} | {c['done']} | {c['progress']} | {c['waiting']} | {('작업 종료; verdict=' + gates[stage]) if c['done'] == sum(t[0].startswith(stage) for t in tasks) else position[stage]} |")
-    lines += ['', '**바로 다음 독립 작업:** raw CKV 후보 순위와 F-01 exact/budget 판정의 보고 연결 준비(B0-06/B1-04).', '',
+    lines += ['', '**바로 다음 독립 작업:** F-02 장문 꼬리·split/parent 재조립 오라클과 보관 원자료 보고 연결 준비(B0-06/B1-04).', '',
       '**승인 도착 시 최우선:** B0-01/02/03/05·STV2-01 결정 기록 → source/pack/semantic/scope/K 동결 → B0-07 새 strict 빌드/감사 → B0-08/09 공식 기준선.', '',
       f"**남은 전체 작업 {30-counts['done']}개**", '', '| ID | 상태 | 우선순위·선행 | 남은 작업 |', '|---|---|---|---|']
     for qid, priority, task, status, state in tasks:
@@ -61,7 +61,7 @@ def render(raw):
       '- OP-01 역할/권한, OP-02 배포 scope/schema, OP-03 공개 키/독립 신뢰 경로, OP-04 개인 키 보관·접근·백업, OP-05 교체·폐기·유출 대응.',
       '- OP-06 original C/header·전이 native·고지 적합성, OP-07 지원 플랫폼·실모델·대규모 비용, OP-08 최종 운영 백업·실패 전환·복구 담당/실행.',
       '- native Linux amd64 실제 모델/운영 환경, 최종 패키지·마이그레이션/복구·지원/known limits와 출시 판정(C1-04–07).',
-      '- raw CKV 후보 순위와 전체 동적 가족 오라클, 독립 최종 실행, 답변·주장·정책·기권·사람 검토 비용 판정(B0/B1).', '',
+      '- 승인된 입력의 raw CKV 후보 순위와 전체 동적 가족 오라클, 독립 최종 실행, 답변·주장·정책·기권·사람 검토 비용 판정(B0/B1).', '',
       '매 턴 마지막 보고에 현재 단계, 다음 작업, 위 미완료 전체 목록을 함께 표시한다. 변경 후 이 현황판을 갱신하고 `python3 scripts/update-execution-status.py --check`로 작업리스트와 동기화한다.', '']
     return '\n'.join(lines)
 

@@ -65,7 +65,7 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 | B0-03 | P0 | F-01–F-06의 개발/최종 입력·정답·실패 오라클 검토 | 12변형 검토 기록·원문 해시·독립 표본 단위 확정 | 사람 검토 대기 |
 | B0-04 | P1 · B0-03 | 초안 JSON의 입력을 실제 독립 저장소/커밋으로 생성. F-04는 순차 두 상태, F-05는 서로 다른 프로젝트 | 선언된 파일 SHA·줄·Git 독립성 일치; 재실행 바이트 동일; 기존 디렉터리 덮어쓰기 거부 | 진행: 개발 6개 준비·재현 검사 통과; F-03 project_id 원문과 불일치 수정/회귀 통과, 최종/승인 대기 |
 | B0-05 | P1 · B0-04 | F-03/05/06에 필요한 의미 사실·팩·스펙·관계·코드 앵커를 fixture 자기 스냅샷에 결합 | 검토 기록과 canonical ID·보관 줄 해시 일치; 미검토 자동 승격 0 | 진행: 개발 F-03/F-05 A·B/F-06 실제 mock/BGE-M3 결합·무승격 검증, [검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md) 준비; 사람 판정/최종 대기 |
-| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
+| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md)의 full eligible·실제 K/순위/source/exact/budget 재생 준비; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
 | B0-07 | P1 · B0-01/02/03/05/06 | 공식 데이터셋을 동결된 입력으로 빌드하고 보관 원문·그래프·벡터를 감사 | strict embedding·선택 범위·input hashes·split 재조립·정렬·doctor 통과; 빌드 지연 별도 계측 | 대기 |
 | B0-08 | P2 · B0-07 | 공식 정적 `cks eval --verify-anchors`와 F-01–06 실모델 실행 | 승인 gold와 원응답 연결; 최종 입력 독립; cold/warm 혼동 없음; F-01 자격 실패는 fixture_not_qualified | 대기 |
 | B0-09 | P2 · B0-08 | B0 보고서 작성: 정답·범위·환경·지표·실패·제한 | 승인 입력과 재현 명령·원자료 포함; 실패/기권/소표본을 성공으로 합산하지 않음 | 대기 |
@@ -79,7 +79,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | B1-01 | P1 | baseline / concept_text / relations / combined의 네 가지 실행 어댑터 구현 | 실제 실행 경로가 다름을 검증; 기본 꺼짐; 원문 질의 우선; 후보 K 보존·오류/모호성 폴백; 단순 플래그 이름만 추가하지 않음 | 검증 완료: 네 MCP 경로·텍스트/관계 기여 분리·상한/폴백, mock/BGE-M3 각 20요청. 공식 품질 통과와 별개 |
 | B1-02 | P1 · B0-05/B1-01 | 팩 off/on 축을 연결하여 8 arms 구성 | 팩 잠금과 데이터셋 신원 분리; 권한·범위·출처 적용; 단순 Markdown을 검토된 팩으로 취급하지 않음 | 구현 검증 완료: 동일 dataset/lock의 8개 v2 경로, mock/BGE-M3 각 48요청·6정책 상태·인용/본문 보존·원문/integrity·DB 무변경 확인. 실제 팩 사실 검토·공식 B1 대기 |
 | B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 도구 준비: 8경로 회전·warm/cold·원응답/호출 ID·입력 전후 검증 완료. 승인된 공식 B0/B1 실행 대기 |
-| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
+| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md) 준비, 역사적 K1은 F-01 자격 미충족; 공식 입력·평가/사람 판정 대기 |
 | B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 진행: [안전 제어 감사](./B1-SAFETY-AUDIT-PREPARATION.md)의 공개 Go v2 검증·보관 소스/내부 인용·6정책 상태·합성 payload 비노출·off/on 후보 보존을 624 SDK 응답에서 재생. 공식 F-04/05/06·비밀/권한 전체 범위·사람 판정 대기 |
 | B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
 | B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기 |
@@ -312,3 +312,14 @@ Go 계약 감사 helper의 관련 시험·vet와 Python 제어 감사 회귀를 
 B1-05는 도구 준비 진행이며 공식 안전·권한·비밀 게이트 완료가 아니다. 정책 payload marker 검사는 작성된 합성 문자열 범위이며 일반 비밀 탐지/추론 누출을 보증하지 않는다. 공식 F-04 과거 상태, F-05 별도 프로젝트, F-06 의미/정책·답변의 사람 판정은 남아 있다.
 
 다음 독립 작업은 raw CKV 후보 순위와 F-01 exact/budget 판정의 보고 연결 준비(B0-06/B1-04)다. B0-01/02/03/05·STV2-01의 실제 결정이 도착하면 source/pack/semantic/scope/K 동결과 B0-07 새 strict 빌드를 최우선으로 진행한다. 전체 미완료 항목과 OP-01–08·native/legal/운영 범위는 현황판에서 함께 확인한다.
+
+
+## 23. Raw CKV 순위와 F-01 exact/상한 보고 재검증
+
+2026-10-05 [보고 자료](./B0-RAW-VECTOR-REPORT-PREPARATION.md)와 [원장](../../system/eval/b0-knowledge-system/raw-vector-report-preparation-m2max-2026-10-05/summary.json)을 추가했다. 직접 probe의 실제 K·원시 chunk 순위/거리·좌표/model/manifest/DB 전후 seal·source SHA를 결합한다. 원시 후보 슬롯과 구성 인용 dedup/top10 점수는 별도이며 null eligible·오류·부분 검색·planned 분모를 보존한다. source text가 parser-node 범위임을 유지하고 전체 줄 SHA와 구분한다. DB/model/최종 질문을 새로 실행하지 않았다.
+
+Go 독립 exact scan에 top K로 자르기 전 전체 eligible 목록을 보존했다. reader가 독립 목록의 개수/파일과 작성된 diagnostic controls, 완전한 무필터 희소 조건, 정상 ID/파일/줄/거리 일치, 실제 상한 초과·incomplete/candidate_limit을 분리한다. 목록 누락·다른 K·부분 무필터는 자격 미충족이며 metadata-only로 공식 verdict를 만들지 않는다.
+
+실제 역사적 BGE-M3 Alpha 프로브와 sidecar/보관 source 3개는 원래 commit Git blob과 같다. K1·eligible1·normal exact 일치는 유지되지만 희소 조건과 full eligible 목록이 부족하여 fixture_not_qualified다. @10/F-01 합격으로 합산하지 않는다. 최초 reader CLI의 Path.open opener 오류를 기록하고 수정했으며, Python 신규 15개/paired 기존 16개·Go probe 6개/race/vet·문서/경계/현황 동기화 검사를 통과했다. 과거 원자료와 실제 사람 입력을 바꾸지 않았다.
+
+B0-06/B1-04는 도구 준비 진행이고 완료 수는 그대로 2/30, 공식 품질 판정 0/4다. 다음 독립 작업은 F-02 장문 꼬리·split/parent 재조립 오라클의 보고 연결이다. B0-01/02/03/05·STV2-01의 실제 결정 후 source/pack/semantic/scope/K 동결 → 새 strict B0-07 → 공식 B0/B1 → 사람/C0 → 최종 C1 순서를 우선한다. OP-01–08·native amd64·전체 native/legal/복구/출시 범위와 전체 28개 미완료 작업을 마지막 보고에 함께 표시한다.

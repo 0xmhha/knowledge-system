@@ -1,0 +1,84 @@
+"""Historical replay recipe. Pass a fresh directory; no model/DB/FINAL queries."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+ROOT = Path.cwd()
+parser = argparse.ArgumentParser()
+parser.add_argument('--out-dir', type=Path, required=True)
+args = parser.parse_args()
+out = args.out_dir
+out.mkdir(exist_ok=False, parents=True)
+sha = lambda raw: hashlib.sha256(raw).hexdigest()
+def write(file, raw):
+    with (out / file).open('xb') as stream:
+        stream.write(raw)
+def dump(file, value):
+    write(file, (json.dumps(value, ensure_ascii=False, indent=2)+'\n').encode())
+
+old = ROOT / 'system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03'
+archive = Path('/private/tmp/ks-b0-capture-fixed-data-20261003/fixed')
+probe_raw = (old/'vector-probe-real.json').read_bytes()
+probe = json.loads(probe_raw)
+historical_path = ROOT / 'system/eval/b0-knowledge-system/measurement-tools-m2max-2026-10-03.json'
+historical_raw = historical_path.read_bytes()
+historical = json.loads(historical_raw)
+assert historical['artifacts']['vector-probe-real.json']['sha256'] == sha(probe_raw)
+manifest_raw = (archive/'vector/manifest.json').read_bytes()
+assert sha(manifest_raw) == probe['manifest_sha256'] == probe['manifest_sha256_after']
+manifest = json.loads(manifest_raw)
+source_manifest_raw = (archive/'sources/manifest.json').read_bytes()
+source_manifest = json.loads(source_manifest_raw)
+assert source_manifest['identity']['source_commit'] == probe['coordinates']['commit']
+assert source_manifest['identity']['snapshot_id'] == probe['coordinates']['snapshot_id']
+write('historical-ledger.json', historical_raw)
+write('probe.json', probe_raw)
+write('manifest.json', manifest_raw)
+write('source-manifest.json', source_manifest_raw)
+(out/'source').mkdir()
+copied = {}
+for entry in source_manifest['files']:
+    assert entry['origin_id'] == 'repo' and entry['kind'] == 'regular'
+    relative = Path(entry['path'])
+    assert not relative.is_absolute() and '..' not in relative.parts
+    raw = (archive/'sources/blobs'/entry['sha256']).read_bytes()
+    assert sha(raw) == entry['sha256'] and len(raw) == entry['size']
+    path = out/'source'/relative
+    path.parent.mkdir(exist_ok=True, parents=True)
+    with path.open('xb') as stream: stream.write(raw)
+    # Independently compare archive bytes to the old source commit's Git blob.
+    gitraw = subprocess.run(['git','-C','/private/tmp/ks-b0-m2max-smoke-20261003/src',
+                             'show',probe['coordinates']['commit']+':'+entry['path']],check=True,capture_output=True).stdout
+    assert gitraw == raw
+    copied[entry['path']] = {'sha256':sha(raw),'git_blob_equals_archive':True}
+controls = {'schema_version':1,'diagnostic_only':True,'probe_sha256':sha(probe_raw),
+            'control_id':'historical-Alpha-smoke-only',
+            'control_note':'Single-target Alpha replay; these authored diagnostic controls are not F-01 DEV/FINAL gold.',
+            **{k:probe[k] for k in ['coordinates','embedding_identity','prompt','filter','k','max_exact_candidates']},
+            'expected_citations':[{'file':'main.go','start_line':3,'end_line':4,'commit_hash':probe['coordinates']['commit']}],
+            'f01':{'k':5,'max_exact_candidates':2,'eligible_count':1,'complete_hit_count':1,'eligible_files':['main.go']}}
+dump('controls.json',controls)
+command = ['python3','scripts/b0-summarize-vector-probe.py','--probe',str(out/'probe.json'),
+           '--manifest',str(out/'manifest.json'),'--controls',str(out/'controls.json'),
+           '--source-root',str(out/'source'),'--out',str(out/'report.json')]
+run = subprocess.run(command,capture_output=True)
+write('reader-stdout.txt',run.stdout)
+write('reader-stderr.txt',run.stderr)
+dump('reader-command.json',{'command':command,'exit_code':run.returncode})
+assert run.returncode == 0
+report = json.loads((out/'report.json').read_bytes())
+assert report['k'] == 1 and report['f01']['state'] == 'fixture_not_qualified'
+assert report['f01']['normal_exact_agreement'] and not report['f01']['sparse_helper']
+assert report['f01']['full_eligible_inventory_present'] is False
+assert report['invariant_violations'] == [] and report['quality_metrics'] is None
+before = (out/'report.json').read_bytes()
+again = subprocess.run(command,capture_output=True)
+write('overwrite-refusal.txt',again.stdout+again.stderr)
+assert again.returncode == 1 and (out/'report.json').read_bytes() == before
+dump('source-copy-audit.json',{'source_commit':probe['coordinates']['commit'],'files':copied,
+     'original_probe_byte_identical':(old/'vector-probe-real.json').read_bytes() == probe_raw,
+     'original_sidecar_byte_identical':(archive/'vector/manifest.json').read_bytes() == manifest_raw,
+     'reader_opens_database_or_model':False,'official_final_queries_executed':False,
+     'overwrite_refusal_exit_code':again.returncode})
