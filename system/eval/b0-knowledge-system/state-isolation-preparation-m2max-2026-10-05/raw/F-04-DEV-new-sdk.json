@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T03:33:35.373181Z",
+  "finished_at": "2026-10-05T03:33:38.475464Z",
+  "request_sha256": "b968a2be263c4f326aa7fa58f56d5fe09e0ad5345164d12e152753d0cd711fc2",
+  "config_sha256": "ba46963ab8f0059c35bd12eb75b1c5fb2c10479983abd6a248a287d97173322d",
+  "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "config_sha256_after": "ba46963ab8f0059c35bd12eb75b1c5fb2c10479983abd6a248a287d97173322d",
+  "binary_sha256_after": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "F-04-DEV-new",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "871206276713b451cedbbb6795f693ac",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 201903666,
+        "completed_at": "2026-10-05T12:33:38.44359+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-04-dev",
+              "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+              "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+              "source_mode": "committed",
+              "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "project_id": "f-04-dev",
+                "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                "source_mode": "committed",
+                "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "origin_id": "repo",
+                "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                "content_sha256": "81fdc1ddb2afcee64a9076924ab280312f29e5d8a26d531689f08826ed32a4f4"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "project_id": "f-04-dev",
+                "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                "source_mode": "committed",
+                "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "origin_id": "repo",
+                "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                "content_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "project_id": "f-04-dev",
+                "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                "source_mode": "committed",
+                "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                "origin_id": "repo",
+                "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                  "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                  "source_mode": "committed",
+                  "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "origin_id": "repo",
+                  "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                  "content_sha256": "81fdc1ddb2afcee64a9076924ab280312f29e5d8a26d531689f08826ed32a4f4"
+                },
+                "text": "func Alpha() string { return \"DEV-new-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                  "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                  "source_mode": "committed",
+                  "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "origin_id": "repo",
+                  "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                  "content_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-new-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+                  "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+                  "source_mode": "committed",
+                  "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+                  "origin_id": "repo",
+                  "file_sha256": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b5c515f13c07fee1bf980212c861c843bbf159f10aa59e4b55a1f040864a35b1"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

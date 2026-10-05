@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 현재 독립 준비: FIX-17에서 archived Go 사본을 원문 유지 `.go.txt`로 바꾸고 최종 조립 경계/원장 검증 순서를 바로잡았다. 상세 실패와 후속 검증은 작업리스트 25절을 따른다.  [F-02 보고 도구](./B0-F02-DOCUMENT-REPORT-PREPARATION.md)의 새 strict DEV/BGE-M3 진단은 203줄/20,290바이트·5 child의 lossless 재조립, 두 raw query의 tail rank1, CKV 3 density×2언어·CKS v2 2응답/16인용·source/public Go Verify를 확인했다. raw/text K10과 knowledge K6·best-effort 실패14회를 분리했고 공식 품질/사람 verdict는 null이다. 입력5개/선택 모델 불변·최종 실행 없음. 다음은 F-04/F-05 상태/프로젝트 오라클 보고 준비다. 사용자는 남은 전체 작업 완료까지 계속 수행하고 세부 완료마다 현재/전체 미완료/다음을 화면·문서에 남기라고 재지시했다. 실제 판단이 필요한 B0/운영 항목은 비동기 검토 요청이 진행 중이다.
+2026-10-05 최신 독립 준비: [F-04/F-05 격리 보고](./B0-STATE-ISOLATION-REPORT-PREPARATION.md)의 네 strict DEV BGE-M3 상태·8 SDK/28인용·본문/public Go Verify를 확인했다. FIX-18 실제 old-index/new-source의 stale 인용/fresh=true 모순을 수정 전 실패→query/race/vet·공개 계약→같은 DB 실모델 재조회로 수정했다. fresh=false 외 trace ID를 제외한 응답은 같고 replay source/DB/config/model 불변이다. 혼합 native 설정 SDK는 reindex_required이며 초안 pinned snapshot_mismatch 합격으로 세지 않는다. 일반 계속 지시를 실제 B0/OP 승인으로 대신하지 않았고 입력5개 불변·FINAL 실행 없음·공식 품질 null이다. 다음 독립 작업은 F-01 희소/full eligible·상한 DEV 오라클이다. 전체 남은 작업은 현황판과 작업리스트 26절을 따른다.
+
+2026-10-05 이전 독립 준비: FIX-17에서 archived Go 사본을 원문 유지 `.go.txt`로 바꾸고 최종 조립 경계/원장 검증 순서를 바로잡았다. 상세 실패와 후속 검증은 작업리스트 25절을 따른다.  [F-02 보고 도구](./B0-F02-DOCUMENT-REPORT-PREPARATION.md)의 새 strict DEV/BGE-M3 진단은 203줄/20,290바이트·5 child의 lossless 재조립, 두 raw query의 tail rank1, CKV 3 density×2언어·CKS v2 2응답/16인용·source/public Go Verify를 확인했다. raw/text K10과 knowledge K6·best-effort 실패14회를 분리했고 공식 품질/사람 verdict는 null이다. 입력5개/선택 모델 불변·최종 실행 없음. 다음은 F-04/F-05 상태/프로젝트 오라클 보고 준비다. 사용자는 남은 전체 작업 완료까지 계속 수행하고 세부 완료마다 현재/전체 미완료/다음을 화면·문서에 남기라고 재지시했다. 실제 판단이 필요한 B0/운영 항목은 비동기 검토 요청이 진행 중이다.
 
 2026-10-05 이전 독립 준비: [raw CKV/F-01 보고 도구](./B0-RAW-VECTOR-REPORT-PREPARATION.md)가 실제 K·원시 후보/거리·source SHA·정상 exact·상한 상태를 분리하고 full eligible 목록을 연결한다. 역사적 BGE-M3 Alpha K1은 source archive/Git blob과 같지만 희소 조건/full 목록이 부족해 `fixture_not_qualified`이며 공식 품질 null이다. Python 15+16·Go probe 6/race/vet 통과. 다음 독립 작업은 F-02 장문 꼬리/split·parent 오라클 보고 연결이다. 실제 B0-01/02/03/05·STV2-01 결정 후 새 strict B0 빌드가 최우선이며 일반 계속 지시는 개별 승인으로 기록하지 않는다.
 

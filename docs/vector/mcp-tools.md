@@ -60,6 +60,12 @@ CKV의 MCP 서버(`ckv mcp`)가 노출하는 19개 도구의 입출력 스키마
 
 **사용 시나리오:** "JWT 토큰 검증 로직" 같은 개념 쿼리. 정확한 심볼명을 모를 때.
 
+`metadata.fresh`는 best-effort 진단이다. 정상 검색에서 조회 소스의 Git HEAD와
+인덱스 HEAD가 다르거나 반환 인용에 stale 표시가 있으면 `false`다. 결과가 0개여도
+확인된 HEAD 불일치를 숨기지 않는다. Git HEAD를 읽을 수 없거나 dry run이면
+`true`가 현재 소스 검증을 뜻하지 않는다. 엄격한 판정에는 `get_freshness`와
+보관 소스/인용 검증을 함께 사용한다.
+
 ---
 
 ### `cks.context.keyword_search`

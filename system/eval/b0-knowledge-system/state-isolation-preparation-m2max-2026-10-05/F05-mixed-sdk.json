@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T03:46:08.713983Z",
+  "finished_at": "2026-10-05T03:46:10.790821Z",
+  "request_sha256": "c0d5507b1c00e436c69584bdeb23d6e6b524dc78931610e3c425b7eda87ad8c3",
+  "config_sha256": "6ad6a09860e6e641b4717ca8a07f2394a45a1c00e5742e920d5adc07309e6b6a",
+  "binary_sha256": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+  "config_sha256_after": "6ad6a09860e6e641b4717ca8a07f2394a45a1c00e5742e920d5adc07309e6b6a",
+  "binary_sha256_after": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+  "quality_metrics": null,
+  "state": "partial",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "F-05-DEV-a",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "b01ff2a84b649a17936071fa28d8e98c",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented and which refund limit applies?"
+        },
+        "elapsed_ns": 388292,
+        "completed_at": "2026-10-05T12:46:10.763151+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=reindex_required: A pinned retained dataset is required."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "reindex_required",
+            "message": "A pinned retained dataset is required."
+          }
+        }
+      }
+    }
+  ],
+  "errors": [
+    "F-05-DEV-a: tool returned IsError"
+  ]
+}

@@ -340,3 +340,14 @@ CKV full/default/minimum density 각2응답과 CKS v2 2응답/16 source citation
 2026-10-05 F-02 마지막 경계 검사에서 이전 raw report의 보관 Go 소스 `.go` 두 파일이 system 영역의 실제 코드로 인식되는 실패를 확인했다. 이전 raw report의 검사는 이 사본을 조립하기 전이었고, F-02 검사가 실패했는데도 작업 흐름이 후속 커밋으로 진행하여 0bc81ab3에는 최종 manifest가 누락됐다. 사용자에게 이를 알리고 먼저 수정했다. 성공으로 기록하거나 승인 대기 문제로 돌리지 않는다.
 
 원문 SHA와 바이트를 그대로 보존한 `.go.txt` 사본으로 전환했다. checker 예외를 추가하거나 엔진 경계를 완화하지 않는다. [이름/원문 대조](../../system/eval/b0-knowledge-system/f02-document-preparation-m2max-2026-10-05/snapshot-rename-audit.json)와 수정 전 실패를 보존하고, 최종 조립된 자료를 대상으로 경계·Go package inventory·문서·현황·diff·모든 manifest SHA/추적 상태를 확인한 뒤 후속 커밋한다. 이는 평가 자료 분류/검증 순서 수정이며 공식 C0 검색 품질 실패의 종료 증거가 아니다. 전체 28개 미완료와 다음 F-04/F-05 준비는 유지한다.
+
+
+## 26. F-04/F-05 개발 격리 진단과 FIX-18
+
+2026-10-05 [상태·프로젝트 보고 자료](./B0-STATE-ISOLATION-REPORT-PREPARATION.md)와 [원장](../../system/eval/b0-knowledge-system/state-isolation-preparation-m2max-2026-10-05/summary.json)을 추가했다. 네 strict BGE-M3 DEV 상태의 원래/수정 바이너리 8 SDK 응답·28인용/본문은 자기 source/범위/hash/좌표·공개 Go Verify와 같고 선언된 code/policy body 범위를 포함한다. raw/text K10·knowledge K6·best-effort nonreturned8회와 모든 실패/누락을 보존한다. F-05 Markdown은 raw 합성 문서이고 verified pack으로 승격하지 않았다.
+
+FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 모순이다. Git 커밋 변경/0 hit의 수정 전 실패와 query 전체/race/vet·공개 API/MCP/CLI/client/v2 계약 재검증을 보존한다. 수정 후 같은 실제 모델·DB에서 fresh=false이고 trace ID를 제외한 나머지 응답은 같다. replay 전후 payload/source/config/request·모델 metadata 불변을 확인했다. HEAD 미확인/보관 소스·dry run의 best-effort 호환을 유지하며 공식 C0 종료로 합산하지 않는다.
+
+다른 native 디렉터리 graph/vector를 혼합한 두 설정은 SDK reindex_required/CLI operation_failed로 거부됐다. 초기 helper의 오류 보고서 미생성 가정을 수정하고 보존 partial을 검사했다. 이 설정 거부를 gold의 pinned 혼합 좌표 snapshot_mismatch로 바꾸어 세지 않으며 정확한 공식 혼합 오라클은 남는다. 12개 Python 회귀·기존 F-02 11개와 최종 조립 문서/경계/현황/원장 검사를 수행한다.
+
+완료2/30·진행11·대기17·공식 게이트0/4는 유지한다. 다음 독립 작업은 F-01 실제 희소 무필터/full eligible·상한 오라클의 개발 진단이다. B0-01/02/03/05·STV2-01 결정이 도착하면 입력/source/pack/semantic/K 동결과 새 strict B0-07을 우선한다. B1 공식 paired·사람 판단→C0 관측 수정→C1 독립 최종/운영과 OP-01–08·native/legal/대규모/복구 범위가 모두 남는다.

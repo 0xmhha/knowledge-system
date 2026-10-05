@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T03:35:50.444062Z",
+  "finished_at": "2026-10-05T03:35:52.145956Z",
+  "request_sha256": "63ae649b4ed6ac9402852bbfa24d06446b9ce7b70afad6e980e248e10ea585d7",
+  "config_sha256": "ccf0f047f6e608596e05cf6a27e9eb84604dc37393d7fe9a873fc0e03d9ddbb0",
+  "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "config_sha256_after": "ccf0f047f6e608596e05cf6a27e9eb84604dc37393d7fe9a873fc0e03d9ddbb0",
+  "binary_sha256_after": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "quality_metrics": null,
+  "state": "partial",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "F04-mixed",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "48cddc86c5f13ce68bb66c44e0eb284f",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 3852792,
+        "completed_at": "2026-10-05T12:35:52.106256+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=reindex_required: A pinned retained dataset is required."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "reindex_required",
+            "message": "A pinned retained dataset is required."
+          }
+        }
+      }
+    }
+  ],
+  "errors": [
+    "F04-mixed: tool returned IsError"
+  ]
+}
