@@ -46,7 +46,7 @@ def render(raw):
       '**단계:** 구현 재검증 ✅ → B0 입력 검토/기준선 🟡 → B1 비교 준비 🟡 → C0 공식 실패 수정 ⏳ → C1 최종 재평가/출시 ⏳', '',
       '| 단계 | 완료 | 진행 | 대기 | 현재 위치 |', '|---|---:|---:|---:|---|']
     position = {'B0':'범위·프로토콜·동적 입력·의미 사실·STV2 사람 결정 대기', 'B1':'어댑터 완료; 보고·안전 제어 도구 준비, 공식 비교/사람 판정 대기',
-                'C0':'공식 B1 관측 실패 분류 대기; 구조 FIX-01–16은 별도 기록', 'C1':'패키지/고지/복구 preview 준비; 공식 품질·운영 결정 대기'}
+                'C0':'공식 B1 관측 실패 분류 대기; 구조 FIX-01–17은 별도 기록', 'C1':'패키지/고지/복구 preview 준비; 공식 품질·운영 결정 대기'}
     for stage in ['B0','B1','C0','C1']:
         c = Counter(t[4] for t in tasks if t[0].startswith(stage))
         lines.append(f"| {stage} | {c['done']} | {c['progress']} | {c['waiting']} | {('작업 종료; verdict=' + gates[stage]) if c['done'] == sum(t[0].startswith(stage) for t in tasks) else position[stage]} |")

@@ -38,3 +38,5 @@ python3 scripts/b0-summarize-vector-probe.py \
 ```
 
 다음 독립 작업은 F-02의 장문 꼬리·split/parent 재조립 오라클과 보관 원자료 보고 연결이다. B0-01/02/03/05·STV2-01의 실제 결정이 도착하면 source/pack/semantic/scope/K 동결과 B0-07 새 strict 빌드를 우선한다. 공식 B0/B1/C0/C1·사람 판정·OP-01–08/native/legal/운영 출시 범위는 계속 남아 있다.
+
+2026-10-05 FIX-17 후속: 위 경계 검사는 archived Go 사본을 조립하기 전이었다. F-02 최종 검사에서 `.go` 사본의 실제 코드 분류 실패를 확인하여 원문 SHA를 유지한 `.go.txt`로 바꿨다. checker를 완화하지 않고 최종 조립 자료의 경계/Go package inventory와 원장 SHA를 재검증했다. 원문 조회는 `implementation/cmd/b0-vector-probe/main.go.txt` 및 `main_test.go.txt`를 사용한다. [후속 기록](./EXECUTION-WORKLIST.md)의 25절을 따른다.

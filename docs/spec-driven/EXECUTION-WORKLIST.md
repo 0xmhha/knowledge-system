@@ -162,6 +162,7 @@ B0-06의 응답 수집·직접 검색 오라클·실제 호출 계측·공유 K�
 | FIX-14 | P1 · Linux 패키지 metadata 재현성 | 같은 바이너리를 두 번 검사한 ldd 주소가 달라 package manifest의 native_dependencies가 변동한다. 라이브러리/해결 경로/오류/버전 정보를 보존하며 일시 주소를 안정화한다. | 수정 후 재검증 완료: 주소만 제거하며 첫 ldd 의존/정적 링크 진단 유지; 실제 Linux 두 대상의 각 4,624개 copy-input·두 공개 packager 빌드·전체 파일/모드/archive SHA 동일·동일 시험 서명/Python/Go 검증·세 프로젝트 설치/복구 통과. 도구 체인/대상별 제한 유지 |
 | FIX-15 | P1 · translated native 고지 감사 | modernc.org/sqlite의 별도 SQLITE-LICENSE가 root prefix scan에서 빠진 실제 패키지를 확인했다. 고정 버전 required notice를 수집하고 없으면 missing으로 표시한다. | 수정 후 재검증 완료: 실제 누락/수정 전 회귀 보존, Python 16개 시험·세 플랫폼 새 package/두 검증기/설치/SQLite 고지 단독 변조 거부, ZIP/h1 기반 선택 modernc source 대조. 전체 legal/운영 적합성은 별도 |
 | FIX-16 | P1 · 승인 경계 완료 재감사 | 프로토콜/동적 메타데이터만으로 실제 보류 결정 중 최종 export가 통과하며, v2 scope의 matching hash도 pending 결정에 결합됐다. 사람 승인 상태·검토자/시간·각 입력 SHA 결합을 요구한다. | 수정 후 재검증 완료: 두 수정 전 실패, 42개 관련 회귀·실제 CLI 대기/최종 출력 미생성·5개 원문 SHA 동일; 공식 B0/B1 판정은 대기 |
+| FIX-17 | P1 · 평가 원자료 최종 조립 경계 | raw probe Go 소스 사본을 `.go`로 보관하여 system 경계 검사와 Go package inventory에 참여했다. 앞선 검사는 사본 조립 전에 실행됐으며 후속 실패 뒤 커밋까지 진행한 검증 순서 오류도 있었다. | 수정 후 재검증: 원문 SHA 보존 `.go.txt` 전환·최종 assembled artifact 경계/Go package inventory·원장 SHA/추적 검사. 제품 검색/공식 C0 품질 판정과 구분 |
 
 호출 원장의 독립 감사는 v2 106응답의 출처/integrity와 116개 요청 scope를 확인했다. 비치명 내부 오류를 숨기지 않는다. real Neighbors 384회는 README/비심볼 header의 대응 노드 부재이며 best-effort 범위다. 첫 감사의 모든 내부 호출 성공 가정은 잘못되어 수정했다. 이 발견은 기존 여섯 수정이나 공식 C0 품질 판정과 별도로 관리한다.
 
@@ -332,3 +333,10 @@ B0-06/B1-04는 도구 준비 진행이고 완료 수는 그대로 2/30, 공식 �
 CKV full/default/minimum density 각2응답과 CKS v2 2응답/16 source citations/bodies를 확인했다. default는 꼬리 문장을 보존하지만 minimum signature는 이를 축약하며 citation/parent는 유지한다. 최소 budget20의 실제 estimated105-token floor를 보존한다. 공개 Go Verify·소스 SHA·full exact vector inventory·DB/config/model 불변, raw/text K10과 knowledge K6 scope를 대조했고 best-effort nonreturned14회를 남겼다. Python 11+15·관련 Go 장문/parent 회귀를 통과했다. budget1 공개 거부와 generated YAML/K6 helper 가정 오류도 보존했으며 제품 수정/C0 실패로 세지 않는다.
 
 사용자의 전체 완료까지 지속 진행·세부 완료마다 화면/문서에 현재 단계·전체 미완료·다음 작업을 표시하는 지시를 재기록한다. 현재 구현 완료2/30·진행11·대기17·공식 게이트0/4·미완료28개는 그대로다. F-02 독립 준비를 마쳤고 다음은 F-04/F-05 상태/프로젝트 오라클 보고 연결이다. B0-01/02/03/05·STV2-01과 OP-01–08의 실제 결정은 비동기로 요청했으며 일반 전체 완료 지시를 특정 사실/입력/운영 승인으로 기록하지 않았다. 결정 도착 후 입력 동결·새 strict 공식 B0-07 → B0/B1 → 사람/C0 → 최종 C1 순서를 우선한다.
+
+
+## 25. FIX-17 최종 조립 자료 경계 재감사
+
+2026-10-05 F-02 마지막 경계 검사에서 이전 raw report의 보관 Go 소스 `.go` 두 파일이 system 영역의 실제 코드로 인식되는 실패를 확인했다. 이전 raw report의 검사는 이 사본을 조립하기 전이었고, F-02 검사가 실패했는데도 작업 흐름이 후속 커밋으로 진행하여 0bc81ab3에는 최종 manifest가 누락됐다. 사용자에게 이를 알리고 먼저 수정했다. 성공으로 기록하거나 승인 대기 문제로 돌리지 않는다.
+
+원문 SHA와 바이트를 그대로 보존한 `.go.txt` 사본으로 전환했다. checker 예외를 추가하거나 엔진 경계를 완화하지 않는다. [이름/원문 대조](../../system/eval/b0-knowledge-system/f02-document-preparation-m2max-2026-10-05/snapshot-rename-audit.json)와 수정 전 실패를 보존하고, 최종 조립된 자료를 대상으로 경계·Go package inventory·문서·현황·diff·모든 manifest SHA/추적 상태를 확인한 뒤 후속 커밋한다. 이는 평가 자료 분류/검증 순서 수정이며 공식 C0 검색 품질 실패의 종료 증거가 아니다. 전체 28개 미완료와 다음 F-04/F-05 준비는 유지한다.

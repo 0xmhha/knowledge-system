@@ -567,5 +567,43 @@
     "official_gates_closed": 0
   },
   "next_independent_work": "F-04/F-05 old/current snapshot and cross-project oracle report preparation",
-  "priority_when_human_decisions_arrive": "Record actual B0-01/02/03/05 + STV2-01 decisions, freeze reviewed inputs, then new strict official B0-07."
+  "priority_when_human_decisions_arrive": "Record actual B0-01/02/03/05 + STV2-01 decisions, freeze reviewed inputs, then new strict official B0-07.",
+  "document_checks": [
+    {
+      "command": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/check-boundaries.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/update-execution-status.py",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "FIX17": {
+    "failed_boundary_preserved": "boundary-failure-before-snapshot-rename.txt",
+    "source_snapshot_bytes_unchanged": true,
+    "final_assembly_checks_pass": true,
+    "followup_commit_required": true
+  }
 }

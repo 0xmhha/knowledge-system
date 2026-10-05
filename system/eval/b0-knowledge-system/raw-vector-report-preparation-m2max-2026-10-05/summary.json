@@ -152,5 +152,11 @@
   "next_independent_work": "F-02 long-tail/split/parent reassembly oracle report preparation",
   "priority_when_human_decisions_arrive": "B0-01/02/03/05 + STV2-01 actual decisions; freeze source/pack/semantic/scope/K; new strict B0-07 build and formal B0/B1",
   "remaining": "All 28 unfinished rows in EXECUTION-WORKLIST.md/EXECUTION-STATUS.md plus STV2-01/OP-01–08/native amd64/full native/legal/recovery/release scope.",
-  "control_byte_binding": "Decode and hash the same single-read controls bytes."
+  "control_byte_binding": "Decode and hash the same single-read controls bytes.",
+  "final_artifact_boundary_correction": {
+    "fix": "FIX-17",
+    "failure": "Go implementation snapshots were assembled after prior boundary check and subsequently treated as system code.",
+    "resolution": "Rename archived .go snapshots to .go.txt without changing bytes; rerun checks on final assembled artifacts.",
+    "evidence": "../f02-document-preparation-m2max-2026-10-05/snapshot-rename-audit.json"
+  }
 }
