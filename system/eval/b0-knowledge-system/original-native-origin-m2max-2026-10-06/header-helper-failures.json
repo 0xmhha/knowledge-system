@@ -1,0 +1,25 @@
+{
+  "failures": [
+    {
+      "action": "header provenance helper",
+      "exit_code": 1,
+      "reason": "overlay wrapper expected text missed one blank separator before else",
+      "product_failure": false
+    },
+    {
+      "action": "helper repair script",
+      "exit_code": 1,
+      "reason": "SyntaxError: dictionary value colon omitted",
+      "product_failure": false
+    },
+    {
+      "action": "unchanged helper rerun after failed repair",
+      "exit_code": 1,
+      "reason": "FileExistsError preserved first diagnostic output directory",
+      "product_failure": false
+    }
+  ],
+  "first_partial_outputs": "header-replay-inputs",
+  "retry_outputs": "header-replay-inputs-retry1",
+  "final_checks_are_separate_from_failed_helpers": true
+}

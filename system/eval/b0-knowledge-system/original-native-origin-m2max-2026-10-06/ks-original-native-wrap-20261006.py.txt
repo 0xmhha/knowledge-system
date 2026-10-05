@@ -1,0 +1,16 @@
+import json,hashlib,shutil
+from pathlib import Path
+ROOT=Path.cwd();OUT=ROOT/'system/eval/b0-knowledge-system/original-native-origin-m2max-2026-10-06';sha=lambda b:hashlib.sha256(b).hexdigest();bindings=json.loads((OUT/'supplier-snapshot-bindings.json').read_bytes());wrapped=json.loads((OUT/'evidence-manifest.json').read_bytes()).get('losslessly_wrapped',[])
+for p in sorted(OUT.glob('*.txt')):
+ raw=p.read_bytes()
+ if not (any(line.endswith((' ','\t')) for line in raw.decode().splitlines()) or raw.endswith(b'\n\n')):continue
+ target=p.with_name(p.name+'.json');target.write_text(json.dumps({'encoding':'lossless UTF-8 text wrapper','original_name':p.name,'original_bytes':len(raw),'original_sha256':sha(raw),'text':raw.decode()},ensure_ascii=False,indent=2)+'\n')
+ for b in bindings.values():
+  if b['snapshot']==str(p.relative_to(ROOT)):
+   b['snapshot']=str(target.relative_to(ROOT));b['encoding']='lossless UTF-8 text wrapper';b['archive_sha256']=sha(target.read_bytes())
+ wrapped.append(p.name);p.unlink()
+(OUT/'supplier-snapshot-bindings.json').write_text(json.dumps(bindings,indent=2)+'\n')
+shutil.copyfile(Path('/private/tmp/ks-original-native-wrap-20261006.py'),OUT/'ks-original-native-wrap-20261006.py.txt')
+entries=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(OUT.iterdir()) if p.is_file() and p.name!='evidence-manifest.json']
+(OUT/'evidence-manifest.json').write_text(json.dumps({'scope':'partial original native origin audit; no archive/DB/binary/model/key; source inventories and inert recipe/notice/header text; original whitespace preserved with lossless JSON wrappers; legal and release pending','losslessly_wrapped':wrapped,'files':entries},indent=2)+'\n')
+print(json.dumps({'files':len(entries),'wrapped':wrapped}))

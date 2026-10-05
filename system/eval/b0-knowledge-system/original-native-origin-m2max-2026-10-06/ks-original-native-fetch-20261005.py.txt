@@ -1,0 +1,18 @@
+import json,hashlib,urllib.request,time
+from pathlib import Path
+R=Path('/private/tmp/ks-original-native-20261005');R.mkdir(mode=0o700,exist_ok=False)
+items=[('sqlite-release.html','https://sqlite.org/releaselog/3_53_3.html'),('sqlite-amalgamation.zip','https://sqlite.org/2026/sqlite-amalgamation-3530300.zip'),('musl-commit.html','https://git.musl-libc.org/cgit/musl/commit/?id=7ada6dde6f9dc6a2836c3d92c2f762d35fd229e0'),('musl-source.tar.gz','https://git.musl-libc.org/cgit/musl/snapshot/musl-7ada6dde6f9dc6a2836c3d92c2f762d35fd229e0.tar.gz')]
+results=[]
+for name,url in items:
+ start=time.monotonic();row={'name':name,'requested_url':url}
+ try:
+  with urllib.request.urlopen(url,timeout=45) as response:
+   body=response.read(64*1024*1024+1);assert len(body)<=64*1024*1024
+   row.update({'http_status':response.status,'final_url':response.url,'content_type':response.headers.get('Content-Type'),'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()})
+   assert response.status==200 and body
+   (R/name).write_bytes(body)
+ except Exception as e:row.update({'error':str(e),'type':type(e).__name__})
+ row['wall_seconds']=time.monotonic()-start;results.append(row)
+ (R/'fetch-results.json').write_text(json.dumps(results,indent=2)+'\n')
+ print(json.dumps(row),flush=True)
+assert len(results)==4 and not any('error' in r for r in results)

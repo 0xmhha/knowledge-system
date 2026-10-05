@@ -1,0 +1,4047 @@
+{
+  "scope": "selected source constants, recipe, two Linux header trees and overlays; not complete code regeneration",
+  "modules": {
+    "modernc.org/sqlite": {
+      "version": "v1.54.0",
+      "h1_recomputed": "h1:JCxR4qwkJvOaqAoYcgDoO25Nc+ROg6EJ2LfBVzdrgog=",
+      "zip_sha256": "786483c170f5df3fde377f9a62bb3dc36d654e0d4dd2bc24386343d20a0dd507",
+      "origin": {
+        "Version": "v1.54.0",
+        "Time": "2026-07-15T15:36:03Z",
+        "Origin": {
+          "VCS": "git",
+          "URL": "https://gitlab.com/cznic/sqlite",
+          "Hash": "693ff386c68d2964fe40d2f3c0b6cd06630660c4",
+          "Ref": "refs/tags/v1.54.0"
+        }
+      },
+      "input_count": 12
+    },
+    "modernc.org/libc": {
+      "version": "v1.74.1",
+      "h1_recomputed": "h1:bdR4VTKFMC4966QSNZ05XLGI/VwzVa2kTUX51Dm0riQ=",
+      "zip_sha256": "366f094f401ab6e93fa85b9edb5c823384708cdbc90f4ec3281e1992b77c7bf8",
+      "origin": {
+        "Version": "v1.74.1",
+        "Time": "2026-07-08T13:46:53Z",
+        "Origin": {
+          "VCS": "git",
+          "URL": "https://gitlab.com/cznic/libc",
+          "Hash": "7f6c23a10979fbb9e6f024c4735f51ead22f40b3",
+          "Ref": "refs/tags/v1.74.1"
+        }
+      },
+      "input_count": 489
+    }
+  },
+  "files": [
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "go.mod",
+      "bytes": 1061,
+      "sha256": "7f4512043238cc59e45c6ac6c3d33a0b5ce63b9ca5efc69adfa77847864f3c0e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "Makefile",
+      "bytes": 3612,
+      "sha256": "05c6b4f1391d5174c8b4ec6ca4f2d686e4a7676263efdb062c0c9d4973eb538b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "builder.json",
+      "bytes": 255,
+      "sha256": "af04446aeb5e3a1c4b5b74b0fcae1b04f496170f019c47ca515e97b9f1b9abcd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "README.md",
+      "bytes": 5476,
+      "sha256": "e0c7d6d03a460ef4b54911edc380f803ac24f3c9bf92a3d560e2a3c2b18e7c91",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "LICENSE",
+      "bytes": 1489,
+      "sha256": "c6fe05491a60ae13bcd223088d2705e36dede24e5587226231d2459ada5c4822",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "SQLITE-LICENSE",
+      "bytes": 1506,
+      "sha256": "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "CHANGELOG.md",
+      "bytes": 35586,
+      "sha256": "7ee4d298e1efbc394ea4806efa17d8c80a031631e23d95e67a76eeb1ff36c6ce",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "HACKING.md",
+      "bytes": 2773,
+      "sha256": "919a08c5a564cd93d43c63e7642f3e4231cac76c9e59d87d5c37dcad7eb4d1e1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "lib/sqlite.go",
+      "bytes": 1334445,
+      "sha256": "70540d83f063a1e0ec5f974058b5dd02e34dab683c2c465ae7c2f26e34da2724",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "lib/sqlite_darwin_arm64.go",
+      "bytes": 5710,
+      "sha256": "929bd78b1d28b6f403e08aa7a82d8145daef444a17cbb2b714b7159cb936c7c8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "lib/sqlite_linux_arm64.go",
+      "bytes": 1598,
+      "sha256": "ed3e02ab3c17fed72bb9c349ee4c57492685360094f1b19a178801766d5ab88f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/sqlite",
+      "version": "v1.54.0",
+      "path": "lib/sqlite_linux_amd64.go",
+      "bytes": 1297967,
+      "sha256": "f4118d1d9a21c34aa95b299b0eab4069eed112e6717237a8e773d7f27f5c43fc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "go.mod",
+      "bytes": 906,
+      "sha256": "638e179bf8d2afddd7344ad91e9e8f3242df5b0b87782f7d8cc0c3b92251b843",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "Makefile",
+      "bytes": 3189,
+      "sha256": "1340b225a51916c2570421a1aed497b34d190ee3a5fc3dc9b75a3723b8122d26",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "builder.json",
+      "bytes": 678,
+      "sha256": "bf35e2d801e0554a455d9bee206aa5b4fce1e432fea357564c4f824017aeee5f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "README.md",
+      "bytes": 506,
+      "sha256": "f88714c763eb5cfcd2163cc5092b405e8d3866e122d6fc16547ac5dee3e708f3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "LICENSE",
+      "bytes": 1482,
+      "sha256": "95ff867eb55a56935fa7492406cfa953fb7c13ca73f4c0a86ae05756b4605600",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "generator.go",
+      "bytes": 17509,
+      "sha256": "59d2540e0576e84fb9e64bb9b842e3d54192857bdedf880a7a305d9b28fa93a4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "genheaders.go",
+      "bytes": 2733,
+      "sha256": "6c1ce0adc4d0af76d83e9903ff7c81edd776fb454cf00212548be300fe4b4ac6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "generate.go",
+      "bytes": 36233,
+      "sha256": "3e6832c22a8990806d65350048fb66fe196a2c773953fb0a0520a91c159fde26",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/archive/archive.go",
+      "bytes": 279,
+      "sha256": "c08c185f388ae15ac7f2c55694ee810d9678fe51a3cb4c136c1f5039d3005ebd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "LICENSE-3RD-PARTY.md",
+      "bytes": 10505,
+      "sha256": "f597097efe3d97021f89170746bd3a0fb9a8b6fb26b82043ed68a4e0283bee6c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/aio.h",
+      "bytes": 1487,
+      "sha256": "fdb50a494eb52d43b674f8debe75d72224bc022d52dfbc53fc519895305ab1ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/alloca.h",
+      "bytes": 219,
+      "sha256": "8768404d7cf4af5fb135b1a2ca91765bd2be311ac072e0ec8b68f5cb3e6e0f3e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ar.h",
+      "bytes": 311,
+      "sha256": "a32ed9d5a0e19c2d40781a05e4a0ef094d24b69a5752dc3849b92e4502481bd4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/ftp.h",
+      "bytes": 821,
+      "sha256": "6424bd423562f20ff9c9fc4fe36b2e5aacf971149d73dbcf6ae3cb5bd51aa770",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/inet.h",
+      "bytes": 703,
+      "sha256": "8356bc3cbbdfd5671d010fdc45286c5cf40fe113ca4a2d584ad7497fc42cc29f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/nameser.h",
+      "bytes": 12343,
+      "sha256": "c0829694b0e7506674be6ceccb2b5ed4b388499796adeefb884f075a45fbcf51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/nameser_compat.h",
+      "bytes": 27,
+      "sha256": "51483cd3492d6448a32ca98d66420c2210f67779849e32762641115f61a0a235",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/telnet.h",
+      "bytes": 5752,
+      "sha256": "4dc41f35778e57506923be0ab1bc15716b96e47e19ee2757753696ec640b7d00",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/arpa/tftp.h",
+      "bytes": 544,
+      "sha256": "b596df5660906a555b12f450388d09cfafd3589db738100b806eae9437409ff5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/assert.h",
+      "bytes": 428,
+      "sha256": "477f9fcf67e8eccb59dea935f0dc7abd40829f8d61a3e73e4151ff6a18ef25f9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/alltypes.h",
+      "bytes": 11548,
+      "sha256": "2e643832d88c292c67ed8fa735924b2fb0664eb4c04ab00068c37b35d7d65c71",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/dirent.h",
+      "bytes": 201,
+      "sha256": "a1c1ccd32905b6304606802aea2a417a22be848ae2a219dff3e0315d2f6aa8b5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/errno.h",
+      "bytes": 3669,
+      "sha256": "1760adb5572357ae1fa93625bd501e975c1ba03fdb3f97fc4fce46398772ae7b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/fcntl.h",
+      "bytes": 839,
+      "sha256": "66c37030b995805fb951315d3b0935d5fb6d0c3e1ddcf651ddf42c6e418b61b7",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/fenv.h",
+      "bytes": 415,
+      "sha256": "6dce4d336ee430421fb1dae8b074a5283f90b68d274ec52571964e1b73addb2c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/float.h",
+      "bytes": 934,
+      "sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/hwcap.h",
+      "bytes": 1587,
+      "sha256": "7be3c72e8d6440e46582b6ca73415bcca44fb60188ee3b10f18fcdedfdc1a66c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/io.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/ioctl.h",
+      "bytes": 3054,
+      "sha256": "a1ef9fa70d6d1f14e1a370b21c428b27c5f89e88ebe7500174d60683b096219e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/ioctl_fix.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/ipc.h",
+      "bytes": 157,
+      "sha256": "3b90d790c859bcf8fa47f9fd7e188e6093b008c64191f7dbf0b7c542f2b6adca",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/ipcstat.h",
+      "bytes": 19,
+      "sha256": "d4d0a193a653131def47e5f9e099dc089b1407d8936578def78080a6dce4876d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/kd.h",
+      "bytes": 22,
+      "sha256": "59be3e83a6f50b751687a23cc0ac0e6bc3c20426906cbe2f301fda86ea2e61e9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/limits.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/link.h",
+      "bytes": 29,
+      "sha256": "527de5bcb140fa0da21f258e2f6fd855fbdbb0fb243cc8579acbdcd2d9188147",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/mman.h",
+      "bytes": 44,
+      "sha256": "01991d8d7135012fc9047355e2020abb106e6dbb35bbdb7ae1fffdc61e964180",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/msg.h",
+      "bytes": 239,
+      "sha256": "8c4f9b4c9761c601a16f8c5c7586204ae4d2431a8cc60ce736adaf06ec35891e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/poll.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/posix.h",
+      "bytes": 64,
+      "sha256": "abf1648b5e7ec62a420d5a870198355efca45164baa9619464bfd3872916ab7d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/ptrace.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/reg.h",
+      "bytes": 40,
+      "sha256": "d75cf98bcc7baf676881be6ee527cc4bf75d6147b66e4d630f2c75618866e753",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/resource.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/sem.h",
+      "bytes": 325,
+      "sha256": "371c8d4f6136624607ba49faa9c2921f7e2237c3c4325510e607d50583566ddf",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/setjmp.h",
+      "bytes": 37,
+      "sha256": "78213ff8a529db45cb1baf5310546e5c297e556e1c2a8e959627a32d80c973ba",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/shm.h",
+      "bytes": 472,
+      "sha256": "61d6102c230e3d9d52b75ba36ecc887aafa29a97118521626c327860cae55f3c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/signal.h",
+      "bytes": 4028,
+      "sha256": "82bc3d39e13cbb85ba355fc6e8e2b2d157e31d46e5c37369e67c22c5807cefa4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/socket.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/soundcard.h",
+      "bytes": 29,
+      "sha256": "e52f4a87168f60c2860afe01fa7cc3f235bd6f3c9be2e997597672332fb0e56e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/stat.h",
+      "bytes": 325,
+      "sha256": "32256452ca8ee261d52b7b0750ae304feeb58ee1a751eeea8f68010048004d6a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/statfs.h",
+      "bytes": 195,
+      "sha256": "6ce681e292fa857adae906fdc7a2ac641c931659d9c3ac824203eed2980199a4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/stdint.h",
+      "bytes": 540,
+      "sha256": "a901e488e09ba0e5d796d2db619ef834e120e6e3c38de8fb8e763eb148780728",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/syscall.h",
+      "bytes": 16225,
+      "sha256": "05540726feca61490bc55639da604cba005df46de3bc943ce823e95a4d041303",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/termios.h",
+      "bytes": 3509,
+      "sha256": "9d2247d093e9ed7b6dd2c4305f500987d0bbb8a5b1c4df10d51154d2e41d133a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/user.h",
+      "bytes": 361,
+      "sha256": "32a1db0929d11fec9fd800b8ce0715c7bd04955b3c5ec3212bdda0b21877a2db",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/bits/vt.h",
+      "bytes": 22,
+      "sha256": "59da9715f2ef97be98dc151d0c990b5b29885d72b21fce3b0e8182ac06f17c6a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/byteswap.h",
+      "bytes": 501,
+      "sha256": "e51244bc6433d77aba368aa53863850d6d06890c3d8691b27619a737401ec1e5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/complex.h",
+      "bytes": 3705,
+      "sha256": "4cf3568e8ab98be6d2ee34023a8d3376d0b2cdce5f3fc867ecd96ea95728e91c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/cpio.h",
+      "bytes": 551,
+      "sha256": "fd1fdd0848156a84d2af916be5069cc688117b38f4d44012e19f02bd14b6a8a9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/crypt.h",
+      "bytes": 277,
+      "sha256": "26565e8fc37e6cff0f870dd5e7a1bc2035a494470b35d05114b0404673990bed",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ctype.h",
+      "bytes": 1787,
+      "sha256": "0bf45ee657538bf2033a9a17f286f5a4cbcba22a19667deb28d43ac8952c6d30",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/dirent.h",
+      "bytes": 1711,
+      "sha256": "62f0387e896572d0360c7d696ac928a33191446ee5132cc22821bc4d0a5dbb3b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/dlfcn.h",
+      "bytes": 803,
+      "sha256": "5e0ca32c6bd7e817e55d36513efef3070bf27f36496be39fb6d52d83b93f3d6a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/elf.h",
+      "bytes": 85553,
+      "sha256": "ebfb1791bae850a20dbd4ede3908365d63a38c3677f89397d36ea5a706ec6f4a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/endian.h",
+      "bytes": 1958,
+      "sha256": "4414084736937798abcc075d1f8053e116d873c81dda0908013bfca3331771b9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/err.h",
+      "bytes": 472,
+      "sha256": "d13794712c2b56a15b3d095034a07ba79f0bbc3b76997808e39275f815169099",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/errno.h",
+      "bytes": 369,
+      "sha256": "a461912e4058202de8ec414cbd67e04a84965bbff9aff61523bd3baf090b217d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/fcntl.h",
+      "bytes": 4661,
+      "sha256": "22fb6921bcfbfd1ca74cdbea97ad811c9ce3df9ec410f6c9dedacd1da3d9680c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/features.h",
+      "bytes": 865,
+      "sha256": "6d228e77b88b69f70f9157548b6ec673ffc6b998ce6035fbbee0caddb8442903",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/fenv.h",
+      "bytes": 449,
+      "sha256": "9b6d535409cac95bb00e3305f7724af42b7003909a833b7622d6d18d7e650e2c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/float.h",
+      "bytes": 1060,
+      "sha256": "d513aa2c48b2d60672ab10dbab0ab80347db9f1b353db4ea3fae2018907964c1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/fmtmsg.h",
+      "bytes": 741,
+      "sha256": "0f7f7ee214fa88a63c23ce123520ed3ef34339d9c32128d4d937a19bb2431cd2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/fnmatch.h",
+      "bytes": 386,
+      "sha256": "31f19cc2974807ef2c516816a8188e4fbd99e35b85df9514c13276594bc30107",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ftw.h",
+      "bytes": 654,
+      "sha256": "1a1cae62ae50cb0d21b899b931ace769d129d1af0ad8787c60a076801e2677b8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/getopt.h",
+      "bytes": 559,
+      "sha256": "f1d0e215fba663710ca0108338fdafa334b7095e512d0b0f29f8110d78fbb4e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/glob.h",
+      "bytes": 901,
+      "sha256": "c794618de7c80782719d82279e02683fc147b359bc58176cd20efe7ab70a05db",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/grp.h",
+      "bytes": 1025,
+      "sha256": "e602ccbb836b06b2824671a7609ef139744e7c4f47e257ca3dbeb6086d5d6e74",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/iconv.h",
+      "bytes": 385,
+      "sha256": "7c9edd7c6ed3d036f11ec2a24f46a203c0657e5d7eea8b8cc8cd22ab705c873e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ifaddrs.h",
+      "bytes": 592,
+      "sha256": "130ca46a90011e4e2db4bae62c7ea686d86938a879226d0c2c7dac4c61635423",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/inttypes.h",
+      "bytes": 4638,
+      "sha256": "01a5b59471e351039310fc1cfb8bf8cf89e53ef957236118876ea20aea743bfb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/iso646.h",
+      "bytes": 267,
+      "sha256": "e2f3fe42ea3e1f7b236a5b37bf8c3e9a870094b81b264ad1df32845546662c08",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/langinfo.h",
+      "bytes": 1820,
+      "sha256": "a5117674322bf3a85f4e6db2c8c7bd375f90366020549cb665ebf99d4241b1f2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/lastlog.h",
+      "bytes": 18,
+      "sha256": "3c33c9e2fee950cd8545f69d5a8db1f529934b31f940a43ef9c7aadc40e4b2c0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/libgen.h",
+      "bytes": 161,
+      "sha256": "8dc8c0b1ed63e0d411b2a8742aa7aa7ed9612c2e9b8c125f17bfc4a5a6f21aa9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/libintl.h",
+      "bytes": 881,
+      "sha256": "fc92ac87ad9726228173fbd47c162187c6e35ffc56696209a2d6d39df3bca350",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/limits.h",
+      "bytes": 4179,
+      "sha256": "d6fb743478f7a8dd27f057db844a806165709641b0d0e78fbf0cabf5c88f1e12",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/link.h",
+      "bytes": 921,
+      "sha256": "696718093684a61944d7a00ef39d723b05f691fd2edc895af2c526751c74ff22",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/locale.h",
+      "bytes": 1705,
+      "sha256": "34f98ecb36b5dd160ca0991dcc59bf0d86ca7ee82c6da831dbb6284826ea8e9d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/malloc.h",
+      "bytes": 362,
+      "sha256": "8aba27d6cf64d9a93cf3fbd534f5c81b00e6e8419a2f3ec075ee012e834b2c02",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/math.h",
+      "bytes": 11491,
+      "sha256": "5559892c51d9625616fde0c4d25609f1e68e0aa3aee090d1842c6f894e63352a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/memory.h",
+      "bytes": 20,
+      "sha256": "7c7dfb862fbd4063378bb2086e49db0857322c3de8cb9d570f175da1d253a682",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/mntent.h",
+      "bytes": 837,
+      "sha256": "da0f41bd65ee34c3c909de7c94792b30e67f558a29b64599738ecadb6c6a1fcc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/monetary.h",
+      "bytes": 395,
+      "sha256": "4c02befe1f9197f86e2f1128d1f31c369289cb4917b2c80b5aa87b387c76aef8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/mqueue.h",
+      "bytes": 1102,
+      "sha256": "4379aac3732e6285f41f6d7af993e6a69eb61979dc96f7c214923dd98b07adb9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/net/ethernet.h",
+      "bytes": 1177,
+      "sha256": "ed7310b44ab44d283421a9338a7f8c17775f09694d42c0be89f6536667c51f06",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/net/if.h",
+      "bytes": 3488,
+      "sha256": "728025efbd38d94330cb5cfa4efbb8ad067f6c7dd27aabc557d08d95d9597974",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/net/if_arp.h",
+      "bytes": 2924,
+      "sha256": "74c50186936542bbe8c7c284734e52d9b397acafdeaba8bbbcec8b8ac30c7509",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/net/route.h",
+      "bytes": 2628,
+      "sha256": "ccf63326088a850307eff9a2042bc3f966158d4b119ac1e4fa623af273655c79",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netdb.h",
+      "bytes": 4001,
+      "sha256": "6f069a2a0a72a1e03866f426cc6a03990e6bfe3b601215e7b7780b6536c8f50b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/ether.h",
+      "bytes": 543,
+      "sha256": "1ce6f4350eef5a4e4e4e35f8668c7bb91464c0dfac213aab90eca56a85aed220",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/icmp6.h",
+      "bytes": 8632,
+      "sha256": "fe70d612960cf4939b258304f0b510b691da715c70ca964da72502d96e457f82",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/if_ether.h",
+      "bytes": 3675,
+      "sha256": "9735936ae7fb1903e08de9bfa4b78f8666b4b5d03d2666bfa96aa173e822f1a3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/igmp.h",
+      "bytes": 1030,
+      "sha256": "d92f1cff8afeb617afb7cdb041b66121f31a7c1df174658c63bb4a9ad1140d09",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/in.h",
+      "bytes": 12181,
+      "sha256": "250644921fbaaca7ebc11e7190f2e07cad2ba5a718d28a061e96451600b62e0c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/in_systm.h",
+      "bytes": 145,
+      "sha256": "ac876b513fb7c5a3f9bef9f1c2cdf55e8c72e01528a3c018bcc65b205d22e93a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/ip.h",
+      "bytes": 4361,
+      "sha256": "f15258c1e651431dce2cf8bf375c0f8f218b7b048a90aadaa1a28cf27aba428c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/ip6.h",
+      "bytes": 2674,
+      "sha256": "86057e7af80df24bb13873bb44df8f76c754491ddb935b503634075b7fc0fc51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/ip_icmp.h",
+      "bytes": 4660,
+      "sha256": "8176c270da5102e0bde740f098a2b0cd2e419c38842645d14fa094b0969297f4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/tcp.h",
+      "bytes": 6438,
+      "sha256": "f3e1ba1c55578e4c9b80a7300f32e3a32258c3835e85a2494e31810aaa9ed9b5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netinet/udp.h",
+      "bytes": 759,
+      "sha256": "e74ef0f1c45e82c480d32bc6d68f9fc8fc7abd2ac60fd1154ceec300275a4384",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/netpacket/packet.h",
+      "bytes": 1379,
+      "sha256": "1d628a33d18e4ff51a05f8d86b33335bebf4b384f9e81abd0da1b641e9b6738d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/nl_types.h",
+      "bytes": 316,
+      "sha256": "a0275f524b09db6dae742b73409214ef1836cc54fad803816254055008c97654",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/paths.h",
+      "bytes": 902,
+      "sha256": "9653e09329756ef2c1c51ac65f0519cc5a40156373e59bfcd3a67b8dc94c1629",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/poll.h",
+      "bytes": 994,
+      "sha256": "ef87cc4be6730c93f508e5ebde9e67f9cb3697486d92d607e26e5a7b562cbddc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/pthread.h",
+      "bytes": 9367,
+      "sha256": "85ecd05b6e9845851bf5444b480326281fb1484d3e4646742a50aaea612c4ef3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/pty.h",
+      "bytes": 312,
+      "sha256": "b5a3539229b3c2f578febf901f8971518489d97ba706cdd5aa61ec536c4ffc7f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/pwd.h",
+      "bytes": 899,
+      "sha256": "eb3f630e09e209770f6771488e8938c22067e13f6b97cea83898b3944a0f740f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/regex.h",
+      "bytes": 1227,
+      "sha256": "4acf94cf0e0f14b2eb50accac93fee886fcc4f821a9b7bb5347a5d035a027ad3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/resolv.h",
+      "bytes": 3587,
+      "sha256": "adcdb3600df635f2b6fee42987e33f3ca7a8a1e142d2f2b5d83be6fb585e8453",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sched.h",
+      "bytes": 4399,
+      "sha256": "c8375060a9ce8c5f39f64fae3c0a31f1c36cc42fbab9aa0303b06a7075eb6778",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/scsi/scsi.h",
+      "bytes": 3905,
+      "sha256": "daa7847fca1fc34b6d5848f8dcd5323acb9df21451dcbf66f97eb62511261b93",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/scsi/scsi_ioctl.h",
+      "bytes": 322,
+      "sha256": "359bfaa3dd01efaee782deae0f2e0f123d47c35bb6899bc46bad267f2801d732",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/scsi/sg.h",
+      "bytes": 3085,
+      "sha256": "affb61e1e89c8b32f962141d050268040648eae02d9e546b2fb5d039d57e951f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/search.h",
+      "bytes": 1378,
+      "sha256": "fd1e900bedd1b91d98772ead5624a0f1f23efa70fc8272b1dac1d47e9ba2617e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/semaphore.h",
+      "bytes": 810,
+      "sha256": "c20f266e552137e6827b6622f2ddf60cf09f08175cf0c34f673910cb14a0cc05",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/setjmp.h",
+      "bytes": 984,
+      "sha256": "24bc8a19bbd58f75c8223af762dfd9bd41f6aaca6cb3246145c58203c8a0e42e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/shadow.h",
+      "bytes": 721,
+      "sha256": "77c5f46b97a1a9a8c927389ea67eae5f547268b4ce53f4676b3f3b26c5cbffb2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/signal.h",
+      "bytes": 7500,
+      "sha256": "2410adbea406ecb28e00e2f376ef772837dae5a7ce187ace1d9eb2aec9cc9d44",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/spawn.h",
+      "bytes": 2913,
+      "sha256": "edec771e83d270d98aab7e8ceebcd9920d719f9148dd226b84a397b28ddba41f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdalign.h",
+      "bytes": 409,
+      "sha256": "54289e3284182b1a521dd7f8bdd8e9f4b2a85879b8da761b4ad8c421598a12f1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdarg.h",
+      "bytes": 351,
+      "sha256": "20b903cf4ddd7e0244e0bee6e615e24e1921bab2f0986957fe4f7869c608890a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdbool.h",
+      "bytes": 167,
+      "sha256": "5cd1f701b5e927e4e39bcc69f4b7e437a98c8821168e69171c626502a6fc13d9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdc-predef.h",
+      "bytes": 302,
+      "sha256": "92e5ff5d4e37556d9eaab2a0e6069650a7e56bacf7f43f093b0bef69b0776bb5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stddef.h",
+      "bytes": 547,
+      "sha256": "14e9b057525207b625943c8cdfeac111807a1c26e73af8a5415a965d37f19d78",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdint.h",
+      "bytes": 2578,
+      "sha256": "b6e77f1611e56cf499233172cab8bc09c0f7d937f3daa5ad552e1712fc6663e5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdio.h",
+      "bytes": 5863,
+      "sha256": "36dda63d91161ecdd42755393bc7ff827dbfe82e512b630d2f2386c1acb8dbfa",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdio_ext.h",
+      "bytes": 611,
+      "sha256": "d16a5f865a20b7ed68803f3da8fdc5011989e6fb1ecae31049654423899e4ffd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdlib.h",
+      "bytes": 4875,
+      "sha256": "9dade04aa761839017a0de3023d9e5500cb1e431682fc89d84f9a956e4a7c9d6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stdnoreturn.h",
+      "bytes": 129,
+      "sha256": "f5a2d37ef43395cd433e95b238a27f9be5bf20355ffaea66afe7df90fab04f50",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/string.h",
+      "bytes": 3013,
+      "sha256": "714a7724b0051be159c0fb7ec7f97c4ff9dd16c22e1be926c957f747cc6a8906",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/strings.h",
+      "bytes": 964,
+      "sha256": "b8fde0a141ac481de1f88abafbf5678ddfd8d89b309e3253adea1fa0ecb8d9e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/stropts.h",
+      "bytes": 2399,
+      "sha256": "8b02f372fc4c5c0399181013b7b949475df3dafbd33787f7fcc6898a9ce43336",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/acct.h",
+      "bytes": 1091,
+      "sha256": "171396226021c35eaf3436afc069b460a0216dcb4c032c3544d32b3c9716b7d5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/auxv.h",
+      "bytes": 200,
+      "sha256": "6bb5575bb4a8544e355b5b123a6db4b9f6ff5531bcdc838f3cf01e45e65e96a3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/cachectl.h",
+      "bytes": 347,
+      "sha256": "6a1567f2b1b61f8a3bcd858269e769342968eb0b8bb95cb817c14ffef5963a66",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/dir.h",
+      "bytes": 42,
+      "sha256": "2a97ee58b0ab37afbe5a7166c8b478a8e00e0b7fd9349144ffcbe38174aba5cd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/epoll.h",
+      "bytes": 1278,
+      "sha256": "b0e888fca45a261f9a229e2ec16aec3fe3c411bb6cb0469ca37588f83d3994c5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/errno.h",
+      "bytes": 86,
+      "sha256": "832219916d414a0571f91b56e3628904db9284010b05f49501ddd139d0e1d66c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/eventfd.h",
+      "bytes": 404,
+      "sha256": "bd12447de1421dff8465d0ee9287562179e39b6c9e3445a7acc261641195ee59",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/fanotify.h",
+      "bytes": 3531,
+      "sha256": "d0f079b694a3621a90025ed29fdf211566fb6f6064f19ed6fa523600851e9609",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/fcntl.h",
+      "bytes": 86,
+      "sha256": "6f3708b141d1886107e6fd6a85f00015c0a63f29b7c985f0e1026c9f3a74ad4b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/file.h",
+      "bytes": 261,
+      "sha256": "f4a67f7000a8519b9ec76f781db389242ae2e03a3f3fe2abe38e55753d0c1fe2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/fsuid.h",
+      "bytes": 233,
+      "sha256": "0a642cde1a9b0f8c21dfeed86ceac1a19546b31670d708e7a18abac00c7f855f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/inotify.h",
+      "bytes": 1384,
+      "sha256": "f6af7ff2154c7036457624525369affff95719e125c46e32eb910ead860a1fc4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/io.h",
+      "bytes": 219,
+      "sha256": "7b614d47423cb114a378aeb35eaeb25884de6c0871648036ce65a14bdc9bd4a1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/ioctl.h",
+      "bytes": 3083,
+      "sha256": "18cc2b9eee923943e198f03f77cae411bd8f34d9a3fc2202851a1e95dc73532e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/ipc.h",
+      "bytes": 651,
+      "sha256": "878d3f818aa5495bcaa4135a6a52e400eeff249918b2618520684e93d0da23d3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/kd.h",
+      "bytes": 21,
+      "sha256": "004dcf98bb72c0214c802dab96976774d6d115b4478609b3f8cde4cea09e39ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/klog.h",
+      "bytes": 150,
+      "sha256": "53fe42935799f4ccb9a141f08dac71e6f9221e3de0d5703c8870997e94b45fb1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/membarrier.h",
+      "bytes": 654,
+      "sha256": "6372eb814b5d9e062b18e32c98c9333819cae8a28f464b2f17bb39f06f0a97f0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/mman.h",
+      "bytes": 3584,
+      "sha256": "27f4c5212b237d94c869dbd1626b180a8b7793f48cf6462b5fb1d95df28b26ad",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/mount.h",
+      "bytes": 1927,
+      "sha256": "f217bc6987f9e420949c31ece18720d14e80b71c87be1dcfd7542d052c43d992",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/msg.h",
+      "bytes": 937,
+      "sha256": "44b328261a10b08c61d223b3f090b5146444e3c6995aa2224d481f207a7cde44",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/mtio.h",
+      "bytes": 5191,
+      "sha256": "072a8fc2ccd780ece06c76b18cacb928aa9417b06575c1d753e4290409f56b13",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/param.h",
+      "bytes": 755,
+      "sha256": "a7c797bfda03ae10b92535ad8ba628faab5947f61fb45fcb2a166d6cdb9f987e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/personality.h",
+      "bytes": 1494,
+      "sha256": "de0bd27a0bd2cce8f880d38884eac0174b562cca715737c98af839c87020f953",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/poll.h",
+      "bytes": 83,
+      "sha256": "23aa157dacb23075d28e71b466b00e10d577d576615f6514fd1a4db3eb2827a0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/prctl.h",
+      "bytes": 4885,
+      "sha256": "957b4bcfd2919686e385ef13f45ae132b7cdd41ade7a6e1fa40adc937f0248b3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/procfs.h",
+      "bytes": 1148,
+      "sha256": "dfc3b303106056ec39e3d9dfa6dd931777ac7108dfc6a032efc2e3163a36d2bf",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/ptrace.h",
+      "bytes": 3619,
+      "sha256": "92f7481f257a805432e082de8fa6ec1178cbd1867d73f352cb021ad454fa0f39",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/quota.h",
+      "bytes": 2276,
+      "sha256": "4d22a39574b82ca24f56dced381f276d5d2dd0574b98a419f3a0007caffe8d42",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/random.h",
+      "bytes": 324,
+      "sha256": "d86b275a5b27a69ae29d69508a19e934d82aa85c6441d3ac1d809cee2a233ef9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/reboot.h",
+      "bytes": 374,
+      "sha256": "e8c3200ec7f113cb32a8ccb82f9b1c03a7bc337170523025a00843f245352819",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/reg.h",
+      "bytes": 110,
+      "sha256": "30e2d5a34c8866baeb7cc10f3e3cf6922611e16599757a42401afa07c2d2730a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/resource.h",
+      "bytes": 2217,
+      "sha256": "72450db0aa279bc66100654c177e1d16475a52cc32848156f1c6cff44a3fc836",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/select.h",
+      "bytes": 1332,
+      "sha256": "cda463ae12b5b189bea17a69b403d6f53949f013d926d92fb325be11f95db3ae",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/sem.h",
+      "bytes": 1157,
+      "sha256": "27229445bd693e7c1307c040bd759d754f675bee978cdb8ea31f730e46b1898e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/sendfile.h",
+      "bytes": 305,
+      "sha256": "394011937a3c8c22d93be793b4e44fe922ad4911cf0c6f07679b6de4f55b0ea8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/shm.h",
+      "bytes": 1444,
+      "sha256": "d84bad10e6519fc63da424f351450c2a512532b2127dc118668016b55c1216ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/signal.h",
+      "bytes": 89,
+      "sha256": "3bfebd107e526b68211eb95501397458ca1b9c740847e50c3700c1731020af0f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/signalfd.h",
+      "bytes": 845,
+      "sha256": "e28b65b3a5dabe0f41bec490fd139f35e3e7323f9c5260d20fc22e9f8d648308",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/socket.h",
+      "bytes": 11299,
+      "sha256": "1e6f196e7ae112b3295078b45e705b7f69ae2a1ade7f3b72522f66fb695eda65",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/soundcard.h",
+      "bytes": 28,
+      "sha256": "905c551bef504720ebc8c05b19630fca6e9aa18eac6121e1f472a595e10c08a9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/stat.h",
+      "bytes": 4281,
+      "sha256": "ff768c64a759db3d946703c019afc8f189c20f44fa87dfbc7fdc8e45306e1506",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/statfs.h",
+      "bytes": 484,
+      "sha256": "aba62ed459ef032953beaba67a3711af9e85642d47d4f2ee77acfde48d7489f4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/statvfs.h",
+      "bytes": 1181,
+      "sha256": "cc74ef408bf5f37a076197eee7149932f7ba41f00376b622a9e2c10efb0a52d5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/stropts.h",
+      "bytes": 21,
+      "sha256": "6c8c3877ad2a4f0ff17b62742f70533f7fc7e85b2935d851eaff3144c1dab14e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/swap.h",
+      "bytes": 332,
+      "sha256": "d1f91b539dbfb9e17b7e3a680415fb78c6aa2457a6f2988bf8d366663cca0723",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/syscall.h",
+      "bytes": 81,
+      "sha256": "cba521ae5dabe3709896a250707426a1d8aa95dbbb90b2fa03f1a2a9f27ab4cc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/sysinfo.h",
+      "bytes": 634,
+      "sha256": "125d59e5ffc9063bc98506ad7eab31ca375618f990414bc2c3c438c68b75928a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/syslog.h",
+      "bytes": 20,
+      "sha256": "0371ac60bc185fd52145764c21cde79d6b541adf870f4a8e801e3072db95b508",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/sysmacros.h",
+      "bytes": 394,
+      "sha256": "5fda7d3b3af6553c9499ffb428c42e5d0da1e4e8627bd3c2211f4aaa7525a37e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/termios.h",
+      "bytes": 92,
+      "sha256": "bf4eeb215f6684b451b00237d7cbfa608ed053a7f786e24f8a98a463abbdfaac",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/time.h",
+      "bytes": 2254,
+      "sha256": "2199cd4c44b3ebc8a18ca2ff146983e43b8747cc4ed2b4c2f71b583895b4e3cb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/timeb.h",
+      "bytes": 356,
+      "sha256": "f6d6e45fb13008f7c4348c76e3e539607bb367a72c87116478aeaf32eca55a46",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/timerfd.h",
+      "bytes": 591,
+      "sha256": "d9e9fdbc773309427ff460c7c2847aeeaa67616402fd0b56da196bfc9ac486d6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/times.h",
+      "bytes": 301,
+      "sha256": "04376924e0732ed03553dd5be1131cd065533ecdbd41e2af937e1eccede54145",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/timex.h",
+      "bytes": 2160,
+      "sha256": "0a28946f15a5bacccb3096606d20f0fccd8fa8170ee3d882ad11f1044806cd4d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/ttydefaults.h",
+      "bytes": 831,
+      "sha256": "59604b11fa421a4f6c14a9baf0268d298dc999f5dc85a22f55f09915373e7c71",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/types.h",
+      "bytes": 1886,
+      "sha256": "341f6883a4b4be125847d0d4edf3ec5e5bd966e0632569837e9211bb399bf47d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/ucontext.h",
+      "bytes": 22,
+      "sha256": "09d1285d50658127d79c98b70b1206391203a7c20c5f2d1c9c0c790c40f4330e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/uio.h",
+      "bytes": 1314,
+      "sha256": "cac3edec702505e60642d02d9b5c3a507986ff22d293a25fc7676e258ed1dcf5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/un.h",
+      "bytes": 472,
+      "sha256": "186fe17ae60beb1c76395f0642bfd6ec126793987d39b04e94662be8f581cb70",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/user.h",
+      "bytes": 200,
+      "sha256": "d689e0a71144a784547dfe89bc9883e1bdd2baa7079645d35c439b37db78d82f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/utsname.h",
+      "bytes": 372,
+      "sha256": "702dc2cc191ae231a7ed092349e4cc8c0ac4369ff3848562c9a15ca4b391b268",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/vfs.h",
+      "bytes": 24,
+      "sha256": "d89f8caeb624bcd74592aabe3d67009b85bcd553e9372a44e0893a165f2ca7a7",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/vt.h",
+      "bytes": 21,
+      "sha256": "1472e3923cf0ef0fcd2b9bf9bd801a1ba9fa113d4d5271e3471cedc849f14c92",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/wait.h",
+      "bytes": 1446,
+      "sha256": "acde94b89d03174f7ae945e3fe671f5fefc3beb815c99cbff0b596958377d36f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sys/xattr.h",
+      "bytes": 921,
+      "sha256": "4f1e3d3b75fe34805cc1d95566dc10630947c16cd5239413a80fa9f54ab78de5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/syscall.h",
+      "bytes": 25,
+      "sha256": "b7bd8aa55ec85e943bb746706a569f5a455594c4e493bbbe8cf32149545de9e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/sysexits.h",
+      "bytes": 430,
+      "sha256": "821f3fce57e599da2bfa414fbc7aa79a2b6d5d2aeeb1e79cc61c570b23f7b001",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/syslog.h",
+      "bytes": 2744,
+      "sha256": "c1f3f7a96b9f35c641ec85b51c8119910e8bbe46e4d4933b987f5e515922690e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/tar.h",
+      "bytes": 578,
+      "sha256": "93bcefe2026e4909baae5f6de2357ebc0dbc6344c96c9eeb6f648bf8accf6809",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/termios.h",
+      "bytes": 968,
+      "sha256": "09b969e2fc65d080cd77a889cc728fa464de38a1edabbed145d9cbf1d567da51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/tgmath.h",
+      "bytes": 8558,
+      "sha256": "7c4b6a2e99f4e72a6ebad763ac452c60fede23e99f27106ab3b03edf24b60769",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/threads.h",
+      "bytes": 1795,
+      "sha256": "492800b04a38491e2da73fbcfee02bf006717898fcd7568329bc2d641b5d7aff",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/time.h",
+      "bytes": 4410,
+      "sha256": "f1574ec543bc9e810f7369a0e50290d51f5b7b57082eedc41db5060ff3b9c0a6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/uchar.h",
+      "bytes": 629,
+      "sha256": "53230de6c8fa9309ddd35de9ee75fcaac703b72fc0422117ad492a717d3aa77d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ucontext.h",
+      "bytes": 495,
+      "sha256": "75108c66f9904f2034ef4113762dd16a929dead6ce09438b6da87911d6d091d4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/ulimit.h",
+      "bytes": 183,
+      "sha256": "a61e61d1ed7a81a26d0890a2148c0cd68d122d25dfe661e4821eb413a0e0fc6b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/unistd.h",
+      "bytes": 13590,
+      "sha256": "d6365cc93a99349c2b5ef3eb9211659497c1390d0ad302454fabfaef78c98711",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/utime.h",
+      "bytes": 343,
+      "sha256": "43a15b0733f47a396b40d525cb1764d5973d4d6e9b4791bb64be92c12a54ecbb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/utmp.h",
+      "bytes": 998,
+      "sha256": "4efac28368f7a32374de846c266e2444c864ae548746aa581f50db1f56f9ea8a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/utmpx.h",
+      "bytes": 1302,
+      "sha256": "20f84b9fad1c60fbbd81eda0088ceae7acf014d3e9d29c067d5b9209c05e59df",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/values.h",
+      "bytes": 846,
+      "sha256": "7c5f56c3e180acfe7008a7369700bde9ecc3b85d5d457fbf94efa1a0df1ba3d8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/wait.h",
+      "bytes": 87,
+      "sha256": "7884d0a3b7b729c10ab9d074292be42c2bb4f73104bc9d2a27eec96c145341aa",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/wchar.h",
+      "bytes": 6875,
+      "sha256": "18c5adbb8fe770aeccc0a1721b03352c6a07fb8ea373a6fcdfe88be76ca5e312",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/wctype.h",
+      "bytes": 1915,
+      "sha256": "cfb9a3d564aad013b7bb8d326fd9b01263c87ff73fb69c823e7695b4989fc2e9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/arm64/wordexp.h",
+      "bytes": 650,
+      "sha256": "f72323c01c310d9a7aabb4ea62e6a20d3f2be8a390173796c100dd85e2915855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/aio.h",
+      "bytes": 1487,
+      "sha256": "fdb50a494eb52d43b674f8debe75d72224bc022d52dfbc53fc519895305ab1ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/alloca.h",
+      "bytes": 219,
+      "sha256": "8768404d7cf4af5fb135b1a2ca91765bd2be311ac072e0ec8b68f5cb3e6e0f3e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ar.h",
+      "bytes": 311,
+      "sha256": "a32ed9d5a0e19c2d40781a05e4a0ef094d24b69a5752dc3849b92e4502481bd4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/ftp.h",
+      "bytes": 821,
+      "sha256": "6424bd423562f20ff9c9fc4fe36b2e5aacf971149d73dbcf6ae3cb5bd51aa770",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/inet.h",
+      "bytes": 703,
+      "sha256": "8356bc3cbbdfd5671d010fdc45286c5cf40fe113ca4a2d584ad7497fc42cc29f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/nameser.h",
+      "bytes": 12343,
+      "sha256": "c0829694b0e7506674be6ceccb2b5ed4b388499796adeefb884f075a45fbcf51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/nameser_compat.h",
+      "bytes": 27,
+      "sha256": "51483cd3492d6448a32ca98d66420c2210f67779849e32762641115f61a0a235",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/telnet.h",
+      "bytes": 5752,
+      "sha256": "4dc41f35778e57506923be0ab1bc15716b96e47e19ee2757753696ec640b7d00",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/arpa/tftp.h",
+      "bytes": 544,
+      "sha256": "b596df5660906a555b12f450388d09cfafd3589db738100b806eae9437409ff5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/assert.h",
+      "bytes": 428,
+      "sha256": "477f9fcf67e8eccb59dea935f0dc7abd40829f8d61a3e73e4151ff6a18ef25f9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/alltypes.h",
+      "bytes": 11446,
+      "sha256": "a8990c268ef62ec2e6963e757a0efad856ed4fd3611f6c28e7df17962697cc4c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/dirent.h",
+      "bytes": 201,
+      "sha256": "a1c1ccd32905b6304606802aea2a417a22be848ae2a219dff3e0315d2f6aa8b5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/errno.h",
+      "bytes": 3669,
+      "sha256": "1760adb5572357ae1fa93625bd501e975c1ba03fdb3f97fc4fce46398772ae7b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/fcntl.h",
+      "bytes": 940,
+      "sha256": "3526dbb894665ab3b155a60d730c8527edce4fa597b3d5e51364a345d0cbdaeb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/fenv.h",
+      "bytes": 777,
+      "sha256": "406af96f4d9e50a1191873aa00f3d4c4918065cc791492fad93bdc45640dde79",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/float.h",
+      "bytes": 961,
+      "sha256": "4861d77862d3c32109ea51686ca8ebb2faa48e834ba278c7d84e04dc0e75790a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/hwcap.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/io.h",
+      "bytes": 2023,
+      "sha256": "980f6fede4761e20b269323f368305d7879a81324eba0a4a4ad446e344a48c5e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/ioctl.h",
+      "bytes": 3054,
+      "sha256": "a1ef9fa70d6d1f14e1a370b21c428b27c5f89e88ebe7500174d60683b096219e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/ioctl_fix.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/ipc.h",
+      "bytes": 157,
+      "sha256": "3b90d790c859bcf8fa47f9fd7e188e6093b008c64191f7dbf0b7c542f2b6adca",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/ipcstat.h",
+      "bytes": 19,
+      "sha256": "d4d0a193a653131def47e5f9e099dc089b1407d8936578def78080a6dce4876d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/kd.h",
+      "bytes": 22,
+      "sha256": "59be3e83a6f50b751687a23cc0ac0e6bc3c20426906cbe2f301fda86ea2e61e9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/limits.h",
+      "bytes": 22,
+      "sha256": "1cf68647701c5ccf850d6f092f1dbd1460c2b25931699b423cd3b6a98081885f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/link.h",
+      "bytes": 29,
+      "sha256": "527de5bcb140fa0da21f258e2f6fd855fbdbb0fb243cc8579acbdcd2d9188147",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/mman.h",
+      "bytes": 28,
+      "sha256": "48869831c0f6fdad38f1e91b8a19349ce9fa0380b196fcf384bb9bbff44b8d33",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/msg.h",
+      "bytes": 239,
+      "sha256": "8c4f9b4c9761c601a16f8c5c7586204ae4d2431a8cc60ce736adaf06ec35891e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/poll.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/posix.h",
+      "bytes": 64,
+      "sha256": "abf1648b5e7ec62a420d5a870198355efca45164baa9619464bfd3872916ab7d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/ptrace.h",
+      "bytes": 461,
+      "sha256": "b4c6ba3d3f4c468fe975592d3468d41695437fb7cc7a6957af6ef88578c11513",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/reg.h",
+      "bytes": 520,
+      "sha256": "64e4b93032ad97582c56fc88f2c490978f13905eb6804a5f48ad78d2ec58c387",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/resource.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/sem.h",
+      "bytes": 232,
+      "sha256": "06fb35f5f6ea72aa944795600d8bdf05a59b501f13964cef6f925f52e602c5a4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/setjmp.h",
+      "bytes": 36,
+      "sha256": "e6a786d963fa17e3f14986b63860c07d3872061f4e964c3d899214888a1f70df",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/shm.h",
+      "bytes": 472,
+      "sha256": "61d6102c230e3d9d52b75ba36ecc887aafa29a97118521626c327860cae55f3c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/signal.h",
+      "bytes": 3459,
+      "sha256": "2d19278fada3340d48888783f0567b7f82946fc6964b19b77c07190ba2717400",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/socket.h",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/soundcard.h",
+      "bytes": 29,
+      "sha256": "e52f4a87168f60c2860afe01fa7cc3f235bd6f3c9be2e997597672332fb0e56e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/stat.h",
+      "bytes": 434,
+      "sha256": "8cc7bb3263e979b7fc3bacd39a9ce5fcb33d07806944f05b1be977d97780e462",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/statfs.h",
+      "bytes": 195,
+      "sha256": "6ce681e292fa857adae906fdc7a2ac641c931659d9c3ac824203eed2980199a4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/stdint.h",
+      "bytes": 540,
+      "sha256": "a901e488e09ba0e5d796d2db619ef834e120e6e3c38de8fb8e763eb148780728",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/syscall.h",
+      "bytes": 20784,
+      "sha256": "2575768e9afc64aa3ffe571f3cef3e7696249c943dadf6bf5ad8f98853f8f8fb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/termios.h",
+      "bytes": 3509,
+      "sha256": "9d2247d093e9ed7b6dd2c4305f500987d0bbb8a5b1c4df10d51154d2e41d133a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/user.h",
+      "bytes": 1139,
+      "sha256": "e79ea399adeb8fe8c8cfcd0bd4c39fcbba4141edfcf7a0025d3f2d7a74d3e725",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/bits/vt.h",
+      "bytes": 22,
+      "sha256": "59da9715f2ef97be98dc151d0c990b5b29885d72b21fce3b0e8182ac06f17c6a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/byteswap.h",
+      "bytes": 501,
+      "sha256": "e51244bc6433d77aba368aa53863850d6d06890c3d8691b27619a737401ec1e5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/complex.h",
+      "bytes": 3705,
+      "sha256": "4cf3568e8ab98be6d2ee34023a8d3376d0b2cdce5f3fc867ecd96ea95728e91c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/cpio.h",
+      "bytes": 551,
+      "sha256": "fd1fdd0848156a84d2af916be5069cc688117b38f4d44012e19f02bd14b6a8a9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/crypt.h",
+      "bytes": 277,
+      "sha256": "26565e8fc37e6cff0f870dd5e7a1bc2035a494470b35d05114b0404673990bed",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ctype.h",
+      "bytes": 1787,
+      "sha256": "0bf45ee657538bf2033a9a17f286f5a4cbcba22a19667deb28d43ac8952c6d30",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/dirent.h",
+      "bytes": 1711,
+      "sha256": "62f0387e896572d0360c7d696ac928a33191446ee5132cc22821bc4d0a5dbb3b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/dlfcn.h",
+      "bytes": 803,
+      "sha256": "5e0ca32c6bd7e817e55d36513efef3070bf27f36496be39fb6d52d83b93f3d6a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/elf.h",
+      "bytes": 85553,
+      "sha256": "ebfb1791bae850a20dbd4ede3908365d63a38c3677f89397d36ea5a706ec6f4a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/endian.h",
+      "bytes": 1958,
+      "sha256": "4414084736937798abcc075d1f8053e116d873c81dda0908013bfca3331771b9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/err.h",
+      "bytes": 472,
+      "sha256": "d13794712c2b56a15b3d095034a07ba79f0bbc3b76997808e39275f815169099",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/errno.h",
+      "bytes": 369,
+      "sha256": "a461912e4058202de8ec414cbd67e04a84965bbff9aff61523bd3baf090b217d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/fcntl.h",
+      "bytes": 4661,
+      "sha256": "22fb6921bcfbfd1ca74cdbea97ad811c9ce3df9ec410f6c9dedacd1da3d9680c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/features.h",
+      "bytes": 865,
+      "sha256": "6d228e77b88b69f70f9157548b6ec673ffc6b998ce6035fbbee0caddb8442903",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/fenv.h",
+      "bytes": 449,
+      "sha256": "9b6d535409cac95bb00e3305f7724af42b7003909a833b7622d6d18d7e650e2c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/float.h",
+      "bytes": 1060,
+      "sha256": "d513aa2c48b2d60672ab10dbab0ab80347db9f1b353db4ea3fae2018907964c1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/fmtmsg.h",
+      "bytes": 741,
+      "sha256": "0f7f7ee214fa88a63c23ce123520ed3ef34339d9c32128d4d937a19bb2431cd2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/fnmatch.h",
+      "bytes": 386,
+      "sha256": "31f19cc2974807ef2c516816a8188e4fbd99e35b85df9514c13276594bc30107",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ftw.h",
+      "bytes": 654,
+      "sha256": "1a1cae62ae50cb0d21b899b931ace769d129d1af0ad8787c60a076801e2677b8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/getopt.h",
+      "bytes": 559,
+      "sha256": "f1d0e215fba663710ca0108338fdafa334b7095e512d0b0f29f8110d78fbb4e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/glob.h",
+      "bytes": 901,
+      "sha256": "c794618de7c80782719d82279e02683fc147b359bc58176cd20efe7ab70a05db",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/grp.h",
+      "bytes": 1025,
+      "sha256": "e602ccbb836b06b2824671a7609ef139744e7c4f47e257ca3dbeb6086d5d6e74",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/iconv.h",
+      "bytes": 385,
+      "sha256": "7c9edd7c6ed3d036f11ec2a24f46a203c0657e5d7eea8b8cc8cd22ab705c873e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ifaddrs.h",
+      "bytes": 592,
+      "sha256": "130ca46a90011e4e2db4bae62c7ea686d86938a879226d0c2c7dac4c61635423",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/inttypes.h",
+      "bytes": 4638,
+      "sha256": "01a5b59471e351039310fc1cfb8bf8cf89e53ef957236118876ea20aea743bfb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/iso646.h",
+      "bytes": 267,
+      "sha256": "e2f3fe42ea3e1f7b236a5b37bf8c3e9a870094b81b264ad1df32845546662c08",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/langinfo.h",
+      "bytes": 1820,
+      "sha256": "a5117674322bf3a85f4e6db2c8c7bd375f90366020549cb665ebf99d4241b1f2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/lastlog.h",
+      "bytes": 18,
+      "sha256": "3c33c9e2fee950cd8545f69d5a8db1f529934b31f940a43ef9c7aadc40e4b2c0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/libgen.h",
+      "bytes": 161,
+      "sha256": "8dc8c0b1ed63e0d411b2a8742aa7aa7ed9612c2e9b8c125f17bfc4a5a6f21aa9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/libintl.h",
+      "bytes": 881,
+      "sha256": "fc92ac87ad9726228173fbd47c162187c6e35ffc56696209a2d6d39df3bca350",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/limits.h",
+      "bytes": 4179,
+      "sha256": "d6fb743478f7a8dd27f057db844a806165709641b0d0e78fbf0cabf5c88f1e12",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/link.h",
+      "bytes": 921,
+      "sha256": "696718093684a61944d7a00ef39d723b05f691fd2edc895af2c526751c74ff22",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/locale.h",
+      "bytes": 1705,
+      "sha256": "34f98ecb36b5dd160ca0991dcc59bf0d86ca7ee82c6da831dbb6284826ea8e9d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/malloc.h",
+      "bytes": 362,
+      "sha256": "8aba27d6cf64d9a93cf3fbd534f5c81b00e6e8419a2f3ec075ee012e834b2c02",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/math.h",
+      "bytes": 11491,
+      "sha256": "5559892c51d9625616fde0c4d25609f1e68e0aa3aee090d1842c6f894e63352a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/memory.h",
+      "bytes": 20,
+      "sha256": "7c7dfb862fbd4063378bb2086e49db0857322c3de8cb9d570f175da1d253a682",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/mntent.h",
+      "bytes": 837,
+      "sha256": "da0f41bd65ee34c3c909de7c94792b30e67f558a29b64599738ecadb6c6a1fcc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/monetary.h",
+      "bytes": 395,
+      "sha256": "4c02befe1f9197f86e2f1128d1f31c369289cb4917b2c80b5aa87b387c76aef8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/mqueue.h",
+      "bytes": 1102,
+      "sha256": "4379aac3732e6285f41f6d7af993e6a69eb61979dc96f7c214923dd98b07adb9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/net/ethernet.h",
+      "bytes": 1177,
+      "sha256": "ed7310b44ab44d283421a9338a7f8c17775f09694d42c0be89f6536667c51f06",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/net/if.h",
+      "bytes": 3488,
+      "sha256": "728025efbd38d94330cb5cfa4efbb8ad067f6c7dd27aabc557d08d95d9597974",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/net/if_arp.h",
+      "bytes": 2924,
+      "sha256": "74c50186936542bbe8c7c284734e52d9b397acafdeaba8bbbcec8b8ac30c7509",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/net/route.h",
+      "bytes": 2628,
+      "sha256": "ccf63326088a850307eff9a2042bc3f966158d4b119ac1e4fa623af273655c79",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netdb.h",
+      "bytes": 4001,
+      "sha256": "6f069a2a0a72a1e03866f426cc6a03990e6bfe3b601215e7b7780b6536c8f50b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/ether.h",
+      "bytes": 543,
+      "sha256": "1ce6f4350eef5a4e4e4e35f8668c7bb91464c0dfac213aab90eca56a85aed220",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/icmp6.h",
+      "bytes": 8632,
+      "sha256": "fe70d612960cf4939b258304f0b510b691da715c70ca964da72502d96e457f82",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/if_ether.h",
+      "bytes": 3675,
+      "sha256": "9735936ae7fb1903e08de9bfa4b78f8666b4b5d03d2666bfa96aa173e822f1a3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/igmp.h",
+      "bytes": 1030,
+      "sha256": "d92f1cff8afeb617afb7cdb041b66121f31a7c1df174658c63bb4a9ad1140d09",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/in.h",
+      "bytes": 12181,
+      "sha256": "250644921fbaaca7ebc11e7190f2e07cad2ba5a718d28a061e96451600b62e0c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/in_systm.h",
+      "bytes": 145,
+      "sha256": "ac876b513fb7c5a3f9bef9f1c2cdf55e8c72e01528a3c018bcc65b205d22e93a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/ip.h",
+      "bytes": 4361,
+      "sha256": "f15258c1e651431dce2cf8bf375c0f8f218b7b048a90aadaa1a28cf27aba428c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/ip6.h",
+      "bytes": 2674,
+      "sha256": "86057e7af80df24bb13873bb44df8f76c754491ddb935b503634075b7fc0fc51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/ip_icmp.h",
+      "bytes": 4660,
+      "sha256": "8176c270da5102e0bde740f098a2b0cd2e419c38842645d14fa094b0969297f4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/tcp.h",
+      "bytes": 6438,
+      "sha256": "f3e1ba1c55578e4c9b80a7300f32e3a32258c3835e85a2494e31810aaa9ed9b5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netinet/udp.h",
+      "bytes": 759,
+      "sha256": "e74ef0f1c45e82c480d32bc6d68f9fc8fc7abd2ac60fd1154ceec300275a4384",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/netpacket/packet.h",
+      "bytes": 1379,
+      "sha256": "1d628a33d18e4ff51a05f8d86b33335bebf4b384f9e81abd0da1b641e9b6738d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/nl_types.h",
+      "bytes": 316,
+      "sha256": "a0275f524b09db6dae742b73409214ef1836cc54fad803816254055008c97654",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/paths.h",
+      "bytes": 902,
+      "sha256": "9653e09329756ef2c1c51ac65f0519cc5a40156373e59bfcd3a67b8dc94c1629",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/poll.h",
+      "bytes": 994,
+      "sha256": "ef87cc4be6730c93f508e5ebde9e67f9cb3697486d92d607e26e5a7b562cbddc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/pthread.h",
+      "bytes": 9367,
+      "sha256": "85ecd05b6e9845851bf5444b480326281fb1484d3e4646742a50aaea612c4ef3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/pty.h",
+      "bytes": 312,
+      "sha256": "b5a3539229b3c2f578febf901f8971518489d97ba706cdd5aa61ec536c4ffc7f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/pwd.h",
+      "bytes": 899,
+      "sha256": "eb3f630e09e209770f6771488e8938c22067e13f6b97cea83898b3944a0f740f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/regex.h",
+      "bytes": 1227,
+      "sha256": "4acf94cf0e0f14b2eb50accac93fee886fcc4f821a9b7bb5347a5d035a027ad3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/resolv.h",
+      "bytes": 3587,
+      "sha256": "adcdb3600df635f2b6fee42987e33f3ca7a8a1e142d2f2b5d83be6fb585e8453",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sched.h",
+      "bytes": 4399,
+      "sha256": "c8375060a9ce8c5f39f64fae3c0a31f1c36cc42fbab9aa0303b06a7075eb6778",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/scsi/scsi.h",
+      "bytes": 3905,
+      "sha256": "daa7847fca1fc34b6d5848f8dcd5323acb9df21451dcbf66f97eb62511261b93",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/scsi/scsi_ioctl.h",
+      "bytes": 322,
+      "sha256": "359bfaa3dd01efaee782deae0f2e0f123d47c35bb6899bc46bad267f2801d732",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/scsi/sg.h",
+      "bytes": 3085,
+      "sha256": "affb61e1e89c8b32f962141d050268040648eae02d9e546b2fb5d039d57e951f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/search.h",
+      "bytes": 1378,
+      "sha256": "fd1e900bedd1b91d98772ead5624a0f1f23efa70fc8272b1dac1d47e9ba2617e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/semaphore.h",
+      "bytes": 810,
+      "sha256": "c20f266e552137e6827b6622f2ddf60cf09f08175cf0c34f673910cb14a0cc05",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/setjmp.h",
+      "bytes": 984,
+      "sha256": "24bc8a19bbd58f75c8223af762dfd9bd41f6aaca6cb3246145c58203c8a0e42e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/shadow.h",
+      "bytes": 721,
+      "sha256": "77c5f46b97a1a9a8c927389ea67eae5f547268b4ce53f4676b3f3b26c5cbffb2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/signal.h",
+      "bytes": 7500,
+      "sha256": "2410adbea406ecb28e00e2f376ef772837dae5a7ce187ace1d9eb2aec9cc9d44",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/spawn.h",
+      "bytes": 2913,
+      "sha256": "edec771e83d270d98aab7e8ceebcd9920d719f9148dd226b84a397b28ddba41f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdalign.h",
+      "bytes": 409,
+      "sha256": "54289e3284182b1a521dd7f8bdd8e9f4b2a85879b8da761b4ad8c421598a12f1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdarg.h",
+      "bytes": 351,
+      "sha256": "20b903cf4ddd7e0244e0bee6e615e24e1921bab2f0986957fe4f7869c608890a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdbool.h",
+      "bytes": 167,
+      "sha256": "5cd1f701b5e927e4e39bcc69f4b7e437a98c8821168e69171c626502a6fc13d9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdc-predef.h",
+      "bytes": 302,
+      "sha256": "92e5ff5d4e37556d9eaab2a0e6069650a7e56bacf7f43f093b0bef69b0776bb5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stddef.h",
+      "bytes": 547,
+      "sha256": "14e9b057525207b625943c8cdfeac111807a1c26e73af8a5415a965d37f19d78",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdint.h",
+      "bytes": 2578,
+      "sha256": "b6e77f1611e56cf499233172cab8bc09c0f7d937f3daa5ad552e1712fc6663e5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdio.h",
+      "bytes": 5863,
+      "sha256": "36dda63d91161ecdd42755393bc7ff827dbfe82e512b630d2f2386c1acb8dbfa",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdio_ext.h",
+      "bytes": 611,
+      "sha256": "d16a5f865a20b7ed68803f3da8fdc5011989e6fb1ecae31049654423899e4ffd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdlib.h",
+      "bytes": 4875,
+      "sha256": "9dade04aa761839017a0de3023d9e5500cb1e431682fc89d84f9a956e4a7c9d6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stdnoreturn.h",
+      "bytes": 129,
+      "sha256": "f5a2d37ef43395cd433e95b238a27f9be5bf20355ffaea66afe7df90fab04f50",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/string.h",
+      "bytes": 3013,
+      "sha256": "714a7724b0051be159c0fb7ec7f97c4ff9dd16c22e1be926c957f747cc6a8906",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/strings.h",
+      "bytes": 964,
+      "sha256": "b8fde0a141ac481de1f88abafbf5678ddfd8d89b309e3253adea1fa0ecb8d9e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/stropts.h",
+      "bytes": 2399,
+      "sha256": "8b02f372fc4c5c0399181013b7b949475df3dafbd33787f7fcc6898a9ce43336",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/acct.h",
+      "bytes": 1091,
+      "sha256": "171396226021c35eaf3436afc069b460a0216dcb4c032c3544d32b3c9716b7d5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/auxv.h",
+      "bytes": 200,
+      "sha256": "6bb5575bb4a8544e355b5b123a6db4b9f6ff5531bcdc838f3cf01e45e65e96a3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/cachectl.h",
+      "bytes": 347,
+      "sha256": "6a1567f2b1b61f8a3bcd858269e769342968eb0b8bb95cb817c14ffef5963a66",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/dir.h",
+      "bytes": 42,
+      "sha256": "2a97ee58b0ab37afbe5a7166c8b478a8e00e0b7fd9349144ffcbe38174aba5cd",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/epoll.h",
+      "bytes": 1278,
+      "sha256": "b0e888fca45a261f9a229e2ec16aec3fe3c411bb6cb0469ca37588f83d3994c5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/errno.h",
+      "bytes": 86,
+      "sha256": "832219916d414a0571f91b56e3628904db9284010b05f49501ddd139d0e1d66c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/eventfd.h",
+      "bytes": 404,
+      "sha256": "bd12447de1421dff8465d0ee9287562179e39b6c9e3445a7acc261641195ee59",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/fanotify.h",
+      "bytes": 3531,
+      "sha256": "d0f079b694a3621a90025ed29fdf211566fb6f6064f19ed6fa523600851e9609",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/fcntl.h",
+      "bytes": 86,
+      "sha256": "6f3708b141d1886107e6fd6a85f00015c0a63f29b7c985f0e1026c9f3a74ad4b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/file.h",
+      "bytes": 261,
+      "sha256": "f4a67f7000a8519b9ec76f781db389242ae2e03a3f3fe2abe38e55753d0c1fe2",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/fsuid.h",
+      "bytes": 233,
+      "sha256": "0a642cde1a9b0f8c21dfeed86ceac1a19546b31670d708e7a18abac00c7f855f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/inotify.h",
+      "bytes": 1384,
+      "sha256": "f6af7ff2154c7036457624525369affff95719e125c46e32eb910ead860a1fc4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/io.h",
+      "bytes": 219,
+      "sha256": "7b614d47423cb114a378aeb35eaeb25884de6c0871648036ce65a14bdc9bd4a1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/ioctl.h",
+      "bytes": 3083,
+      "sha256": "18cc2b9eee923943e198f03f77cae411bd8f34d9a3fc2202851a1e95dc73532e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/ipc.h",
+      "bytes": 651,
+      "sha256": "878d3f818aa5495bcaa4135a6a52e400eeff249918b2618520684e93d0da23d3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/kd.h",
+      "bytes": 21,
+      "sha256": "004dcf98bb72c0214c802dab96976774d6d115b4478609b3f8cde4cea09e39ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/klog.h",
+      "bytes": 150,
+      "sha256": "53fe42935799f4ccb9a141f08dac71e6f9221e3de0d5703c8870997e94b45fb1",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/membarrier.h",
+      "bytes": 654,
+      "sha256": "6372eb814b5d9e062b18e32c98c9333819cae8a28f464b2f17bb39f06f0a97f0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/mman.h",
+      "bytes": 3584,
+      "sha256": "27f4c5212b237d94c869dbd1626b180a8b7793f48cf6462b5fb1d95df28b26ad",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/mount.h",
+      "bytes": 1927,
+      "sha256": "f217bc6987f9e420949c31ece18720d14e80b71c87be1dcfd7542d052c43d992",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/msg.h",
+      "bytes": 937,
+      "sha256": "44b328261a10b08c61d223b3f090b5146444e3c6995aa2224d481f207a7cde44",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/mtio.h",
+      "bytes": 5191,
+      "sha256": "072a8fc2ccd780ece06c76b18cacb928aa9417b06575c1d753e4290409f56b13",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/param.h",
+      "bytes": 755,
+      "sha256": "a7c797bfda03ae10b92535ad8ba628faab5947f61fb45fcb2a166d6cdb9f987e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/personality.h",
+      "bytes": 1494,
+      "sha256": "de0bd27a0bd2cce8f880d38884eac0174b562cca715737c98af839c87020f953",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/poll.h",
+      "bytes": 83,
+      "sha256": "23aa157dacb23075d28e71b466b00e10d577d576615f6514fd1a4db3eb2827a0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/prctl.h",
+      "bytes": 4885,
+      "sha256": "957b4bcfd2919686e385ef13f45ae132b7cdd41ade7a6e1fa40adc937f0248b3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/procfs.h",
+      "bytes": 1148,
+      "sha256": "dfc3b303106056ec39e3d9dfa6dd931777ac7108dfc6a032efc2e3163a36d2bf",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/ptrace.h",
+      "bytes": 3619,
+      "sha256": "92f7481f257a805432e082de8fa6ec1178cbd1867d73f352cb021ad454fa0f39",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/quota.h",
+      "bytes": 2276,
+      "sha256": "4d22a39574b82ca24f56dced381f276d5d2dd0574b98a419f3a0007caffe8d42",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/random.h",
+      "bytes": 324,
+      "sha256": "d86b275a5b27a69ae29d69508a19e934d82aa85c6441d3ac1d809cee2a233ef9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/reboot.h",
+      "bytes": 374,
+      "sha256": "e8c3200ec7f113cb32a8ccb82f9b1c03a7bc337170523025a00843f245352819",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/reg.h",
+      "bytes": 110,
+      "sha256": "30e2d5a34c8866baeb7cc10f3e3cf6922611e16599757a42401afa07c2d2730a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/resource.h",
+      "bytes": 2217,
+      "sha256": "72450db0aa279bc66100654c177e1d16475a52cc32848156f1c6cff44a3fc836",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/select.h",
+      "bytes": 1332,
+      "sha256": "cda463ae12b5b189bea17a69b403d6f53949f013d926d92fb325be11f95db3ae",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/sem.h",
+      "bytes": 1157,
+      "sha256": "27229445bd693e7c1307c040bd759d754f675bee978cdb8ea31f730e46b1898e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/sendfile.h",
+      "bytes": 305,
+      "sha256": "394011937a3c8c22d93be793b4e44fe922ad4911cf0c6f07679b6de4f55b0ea8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/shm.h",
+      "bytes": 1444,
+      "sha256": "d84bad10e6519fc63da424f351450c2a512532b2127dc118668016b55c1216ee",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/signal.h",
+      "bytes": 89,
+      "sha256": "3bfebd107e526b68211eb95501397458ca1b9c740847e50c3700c1731020af0f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/signalfd.h",
+      "bytes": 845,
+      "sha256": "e28b65b3a5dabe0f41bec490fd139f35e3e7323f9c5260d20fc22e9f8d648308",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/socket.h",
+      "bytes": 11299,
+      "sha256": "1e6f196e7ae112b3295078b45e705b7f69ae2a1ade7f3b72522f66fb695eda65",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/soundcard.h",
+      "bytes": 28,
+      "sha256": "905c551bef504720ebc8c05b19630fca6e9aa18eac6121e1f472a595e10c08a9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/stat.h",
+      "bytes": 4281,
+      "sha256": "ff768c64a759db3d946703c019afc8f189c20f44fa87dfbc7fdc8e45306e1506",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/statfs.h",
+      "bytes": 484,
+      "sha256": "aba62ed459ef032953beaba67a3711af9e85642d47d4f2ee77acfde48d7489f4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/statvfs.h",
+      "bytes": 1181,
+      "sha256": "cc74ef408bf5f37a076197eee7149932f7ba41f00376b622a9e2c10efb0a52d5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/stropts.h",
+      "bytes": 21,
+      "sha256": "6c8c3877ad2a4f0ff17b62742f70533f7fc7e85b2935d851eaff3144c1dab14e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/swap.h",
+      "bytes": 332,
+      "sha256": "d1f91b539dbfb9e17b7e3a680415fb78c6aa2457a6f2988bf8d366663cca0723",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/syscall.h",
+      "bytes": 81,
+      "sha256": "cba521ae5dabe3709896a250707426a1d8aa95dbbb90b2fa03f1a2a9f27ab4cc",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/sysinfo.h",
+      "bytes": 634,
+      "sha256": "125d59e5ffc9063bc98506ad7eab31ca375618f990414bc2c3c438c68b75928a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/syslog.h",
+      "bytes": 20,
+      "sha256": "0371ac60bc185fd52145764c21cde79d6b541adf870f4a8e801e3072db95b508",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/sysmacros.h",
+      "bytes": 394,
+      "sha256": "5fda7d3b3af6553c9499ffb428c42e5d0da1e4e8627bd3c2211f4aaa7525a37e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/termios.h",
+      "bytes": 92,
+      "sha256": "bf4eeb215f6684b451b00237d7cbfa608ed053a7f786e24f8a98a463abbdfaac",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/time.h",
+      "bytes": 2254,
+      "sha256": "2199cd4c44b3ebc8a18ca2ff146983e43b8747cc4ed2b4c2f71b583895b4e3cb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/timeb.h",
+      "bytes": 356,
+      "sha256": "f6d6e45fb13008f7c4348c76e3e539607bb367a72c87116478aeaf32eca55a46",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/timerfd.h",
+      "bytes": 591,
+      "sha256": "d9e9fdbc773309427ff460c7c2847aeeaa67616402fd0b56da196bfc9ac486d6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/times.h",
+      "bytes": 301,
+      "sha256": "04376924e0732ed03553dd5be1131cd065533ecdbd41e2af937e1eccede54145",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/timex.h",
+      "bytes": 2160,
+      "sha256": "0a28946f15a5bacccb3096606d20f0fccd8fa8170ee3d882ad11f1044806cd4d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/ttydefaults.h",
+      "bytes": 831,
+      "sha256": "59604b11fa421a4f6c14a9baf0268d298dc999f5dc85a22f55f09915373e7c71",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/types.h",
+      "bytes": 1886,
+      "sha256": "341f6883a4b4be125847d0d4edf3ec5e5bd966e0632569837e9211bb399bf47d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/ucontext.h",
+      "bytes": 22,
+      "sha256": "09d1285d50658127d79c98b70b1206391203a7c20c5f2d1c9c0c790c40f4330e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/uio.h",
+      "bytes": 1314,
+      "sha256": "cac3edec702505e60642d02d9b5c3a507986ff22d293a25fc7676e258ed1dcf5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/un.h",
+      "bytes": 472,
+      "sha256": "186fe17ae60beb1c76395f0642bfd6ec126793987d39b04e94662be8f581cb70",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/user.h",
+      "bytes": 200,
+      "sha256": "d689e0a71144a784547dfe89bc9883e1bdd2baa7079645d35c439b37db78d82f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/utsname.h",
+      "bytes": 372,
+      "sha256": "702dc2cc191ae231a7ed092349e4cc8c0ac4369ff3848562c9a15ca4b391b268",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/vfs.h",
+      "bytes": 24,
+      "sha256": "d89f8caeb624bcd74592aabe3d67009b85bcd553e9372a44e0893a165f2ca7a7",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/vt.h",
+      "bytes": 21,
+      "sha256": "1472e3923cf0ef0fcd2b9bf9bd801a1ba9fa113d4d5271e3471cedc849f14c92",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/wait.h",
+      "bytes": 1446,
+      "sha256": "acde94b89d03174f7ae945e3fe671f5fefc3beb815c99cbff0b596958377d36f",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sys/xattr.h",
+      "bytes": 921,
+      "sha256": "4f1e3d3b75fe34805cc1d95566dc10630947c16cd5239413a80fa9f54ab78de5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/syscall.h",
+      "bytes": 25,
+      "sha256": "b7bd8aa55ec85e943bb746706a569f5a455594c4e493bbbe8cf32149545de9e4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/sysexits.h",
+      "bytes": 430,
+      "sha256": "821f3fce57e599da2bfa414fbc7aa79a2b6d5d2aeeb1e79cc61c570b23f7b001",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/syslog.h",
+      "bytes": 2744,
+      "sha256": "c1f3f7a96b9f35c641ec85b51c8119910e8bbe46e4d4933b987f5e515922690e",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/tar.h",
+      "bytes": 578,
+      "sha256": "93bcefe2026e4909baae5f6de2357ebc0dbc6344c96c9eeb6f648bf8accf6809",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/termios.h",
+      "bytes": 968,
+      "sha256": "09b969e2fc65d080cd77a889cc728fa464de38a1edabbed145d9cbf1d567da51",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/tgmath.h",
+      "bytes": 8558,
+      "sha256": "7c4b6a2e99f4e72a6ebad763ac452c60fede23e99f27106ab3b03edf24b60769",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/threads.h",
+      "bytes": 1795,
+      "sha256": "492800b04a38491e2da73fbcfee02bf006717898fcd7568329bc2d641b5d7aff",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/time.h",
+      "bytes": 4410,
+      "sha256": "f1574ec543bc9e810f7369a0e50290d51f5b7b57082eedc41db5060ff3b9c0a6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/uchar.h",
+      "bytes": 629,
+      "sha256": "53230de6c8fa9309ddd35de9ee75fcaac703b72fc0422117ad492a717d3aa77d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ucontext.h",
+      "bytes": 495,
+      "sha256": "75108c66f9904f2034ef4113762dd16a929dead6ce09438b6da87911d6d091d4",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/ulimit.h",
+      "bytes": 183,
+      "sha256": "a61e61d1ed7a81a26d0890a2148c0cd68d122d25dfe661e4821eb413a0e0fc6b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/unistd.h",
+      "bytes": 13590,
+      "sha256": "d6365cc93a99349c2b5ef3eb9211659497c1390d0ad302454fabfaef78c98711",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/utime.h",
+      "bytes": 343,
+      "sha256": "43a15b0733f47a396b40d525cb1764d5973d4d6e9b4791bb64be92c12a54ecbb",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/utmp.h",
+      "bytes": 998,
+      "sha256": "4efac28368f7a32374de846c266e2444c864ae548746aa581f50db1f56f9ea8a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/utmpx.h",
+      "bytes": 1302,
+      "sha256": "20f84b9fad1c60fbbd81eda0088ceae7acf014d3e9d29c067d5b9209c05e59df",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/values.h",
+      "bytes": 846,
+      "sha256": "7c5f56c3e180acfe7008a7369700bde9ecc3b85d5d457fbf94efa1a0df1ba3d8",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/wait.h",
+      "bytes": 87,
+      "sha256": "7884d0a3b7b729c10ab9d074292be42c2bb4f73104bc9d2a27eec96c145341aa",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/wchar.h",
+      "bytes": 6875,
+      "sha256": "18c5adbb8fe770aeccc0a1721b03352c6a07fb8ea373a6fcdfe88be76ca5e312",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/wctype.h",
+      "bytes": 1915,
+      "sha256": "cfb9a3d564aad013b7bb8d326fd9b01263c87ff73fb69c823e7695b4989fc2e9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "include/linux/amd64/wordexp.h",
+      "bytes": 650,
+      "sha256": "f72323c01c310d9a7aabb4ea62e6a20d3f2be8a390173796c100dd85e2915855",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/386/musl/include/alltypes.h.in",
+      "bytes": 3532,
+      "sha256": "e32a79de58f8c4b8515a8bd0f0b5f74f3784cf6a6cb47ba0ea3b847431773f28",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/386/musl/src/internal/atomic.h",
+      "bytes": 5800,
+      "sha256": "7564773807b69ceeb5542882ab20e92253ded8289d8944eafe7208903aaa2e18",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/arm/musl/include/alltypes.h.in",
+      "bytes": 3532,
+      "sha256": "e32a79de58f8c4b8515a8bd0f0b5f74f3784cf6a6cb47ba0ea3b847431773f28",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/arm/musl/src/internal/atomic.h",
+      "bytes": 5800,
+      "sha256": "7564773807b69ceeb5542882ab20e92253ded8289d8944eafe7208903aaa2e18",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/loong64/musl/src/internal/atomic.h",
+      "bytes": 5866,
+      "sha256": "23c5ee856815484b932c579edef3c8df8626e723c04d1bed3cd3916001b9cd48",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/ppc64le/musl/src/internal/atomic.h",
+      "bytes": 5866,
+      "sha256": "23c5ee856815484b932c579edef3c8df8626e723c04d1bed3cd3916001b9cd48",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/riscv64/musl/src/internal/atomic.h",
+      "bytes": 5927,
+      "sha256": "5b156f7642b98ec9317bf3059fa02f2ed2e8ff4ff3bf3e479ffe6a0484c43606",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/linux/s390x/musl/src/internal/atomic.h",
+      "bytes": 5866,
+      "sha256": "23c5ee856815484b932c579edef3c8df8626e723c04d1bed3cd3916001b9cd48",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/aarch64/bits/float.h",
+      "bytes": 934,
+      "sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/aarch64/fp_arch.h",
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/aarch64/pthread_arch.h",
+      "bytes": 233,
+      "sha256": "af2cda678c2423cbd33cbb1aa4e4d6c4f401b7621ac337b6e37e13020cc4edb3",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/aarch64/syscall_arch.h",
+      "bytes": 2741,
+      "sha256": "3fca0130ed932785fd4193cb2a72109201736028fe50b900e55f30f9be5ecfab",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/arm/atomic_arch.h",
+      "bytes": 2463,
+      "sha256": "2d2b6bb39a2cdb410f870d0b1a5bca3392fe74bb521b2df4852f82ec18c52944",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/arm/bits/float.h",
+      "bytes": 404,
+      "sha256": "cbde7e32f07c8601516ad291b61a26264c77069c93026ab927eb91771964cfd7",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/arm/pthread_arch.h",
+      "bytes": 715,
+      "sha256": "09b14345c24f77dba773dae3941c1b2c9e1462ca96071519d6bcf54e1fb69084",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/arm/syscall_arch.h",
+      "bytes": 3919,
+      "sha256": "67e6a0f11d998414b8b1ba8fe7f1d3eace7fee8d09c7dcd115334b52c20fed0c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/i386/atomic_arch.h",
+      "bytes": 2591,
+      "sha256": "35946724a40fcf0a5a894b810c6305f92906f15e6001a82b347a4bbebd1bf9e5",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/i386/bits/float.h",
+      "bytes": 961,
+      "sha256": "92b43e0e7e98491f1e42fb2b4faf61b43d2221f7d37e82d31ca65fb18bd28aad",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/i386/pthread_arch.h",
+      "bytes": 199,
+      "sha256": "bb5292aab1c14c4d489796461e5bd657c5aaee17ae2aac2b2f47f718ce16d71c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/i386/syscall_arch.h",
+      "bytes": 3780,
+      "sha256": "1fb0ac263003699981ef3266ff6cc0f06d06e4e0a0fcf1a4e8a43135d3624b44",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/loongarch64/bits/float.h",
+      "bytes": 934,
+      "sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/loongarch64/pthread_arch.h",
+      "bytes": 278,
+      "sha256": "bed9c11cf1b7b25c87a49bf30ef569d7e9c861a74301ec92e4905d27dba4ff60",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/loongarch64/syscall_arch.h",
+      "bytes": 3817,
+      "sha256": "d38dbc452b1df32681188371574949f33439a60dddc3a014eda8f832cf63dd4d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/powerpc64/pthread_arch.h",
+      "bytes": 386,
+      "sha256": "c3520585e81053c28829221d72aff4ad0e0e71b4c3c197a17e93a3969a15cbcf",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/powerpc64/syscall_arch.h",
+      "bytes": 3406,
+      "sha256": "e273ba757dd718cc584974fed491999cb100c0adabbc3432fd563fd081bdc38d",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/riscv64/bits/float.h",
+      "bytes": 934,
+      "sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/riscv64/pthread_arch.h",
+      "bytes": 271,
+      "sha256": "bb43aaa0ab3d4befd748302be526ab4beb942083a6a2ce21139c55ddb54a4a22",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/riscv64/syscall_arch.h",
+      "bytes": 2754,
+      "sha256": "a7276acffc295094683e189e2197f5e7295c8eedbabea50eb513d28647f1a0ed",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/s390x/bits/float.h",
+      "bytes": 934,
+      "sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/s390x/pthread_arch.h",
+      "bytes": 239,
+      "sha256": "eaa9453f4c9391410badc7c8b2cf99365642f5df39cc93a5dc66a19cfda019ad",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/s390x/syscall_arch.h",
+      "bytes": 2703,
+      "sha256": "aa3364d6826d46d506403f2026dcd335ce35ad8c94f3d956daf48647f34c4ada",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/x86_64/bits/float.h",
+      "bytes": 961,
+      "sha256": "4861d77862d3c32109ea51686ca8ebb2faa48e834ba278c7d84e04dc0e75790a",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/x86_64/pthread_arch.h",
+      "bytes": 198,
+      "sha256": "2cf9697c64bd26b1d6d494124f66142df35f967548b61aad8eeec0e89b1a4cc6",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/arch/x86_64/syscall_arch.h",
+      "bytes": 2534,
+      "sha256": "275d223a49d398379a2826ca6f2074e0b54334dbec8bf5ec9bcf64a8594269ad",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/internal/atomic.h",
+      "bytes": 5861,
+      "sha256": "3723c5876eb168fc0e6195d7a655ed7dc26c8021b5392688dc5e3fa2c4a33e39",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/internal/libm.h",
+      "bytes": 7565,
+      "sha256": "74d8058664436ef6ab585dfca29d6d0cce3aed862e30c71b4bdc86449659f39b",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/internal/pthread_impl.h",
+      "bytes": 6106,
+      "sha256": "14d815a6a44fc595de74033545cc7e3421548f11a8c14108d8cfad042bec5a40",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/malloc/reallocarray.c",
+      "bytes": 201,
+      "sha256": "6d677fb7387bfc58ad6b10c6a91d26fc82f43f6caa0896fc46d04ce3f2ef73e9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/process/fork.c",
+      "bytes": 2374,
+      "sha256": "16f31835f661e372191802bce9d74157be234fe135db09df9ad76ce705657514",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/stdio/ext.c",
+      "bytes": 782,
+      "sha256": "c47383ed1b0e57f6f24f0a4565e85bf84f359deeae0af22be67a8925f6bbcec9",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/string/explicit_bzero.c",
+      "bytes": 182,
+      "sha256": "fd25152023be6d11845a8333efd0f4eca3816912d7cd8e622047a87c2bcbfd1c",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/time/strftime.c",
+      "bytes": 6393,
+      "sha256": "aec2e617dcafe210da1698920482a013dcd0eb8e0a26f42bfc334212ebc517f0",
+      "identical_to_pinned_module_zip": true
+    },
+    {
+      "module": "modernc.org/libc",
+      "version": "v1.74.1",
+      "path": "internal/overlay/musl/src/unistd/faccessat.c",
+      "bytes": 1503,
+      "sha256": "58b0d83ce52027480bf4457faba66d0965425374d7a63bef9a63adb4dab9a0f4",
+      "identical_to_pinned_module_zip": true
+    }
+  ]
+}

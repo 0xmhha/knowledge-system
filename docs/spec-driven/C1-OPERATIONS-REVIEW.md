@@ -17,7 +17,7 @@
 | OP-03 | 운영 공개 키·독립 배포 경로 | 실제 운영 키·fingerprint 없음 | 공개 키 DER SHA-256·독립 신뢰 경로·검토자·시각 |
 | OP-04 | 개인 키 보관·접근·백업 | 실제 방식·보유자 미확인. 시험 개인 키는 임시 경로에만 있음 | 선택 방식·권한자·접근/복구 증거; 개인 키 본문은 기록하지 않음 |
 | OP-05 | 교체·폐기·유출 대응 | 현재 검증기에 기간/폐기 조회 없음 | 효력 시점·구 키/서명 처리·신뢰 루트 교체·복구 담당과 실행 증거 |
-| OP-06 | 소스·고지 적합성 | 원문/SHA·지정 source 비교 및 FIX-15 translated SQLite 추가 고지·modernc 선택 source ZIP/h1 검증 범위 존재; original C/header/전체 적합성 pending | 정확한 버전·source/고지 범위·적합성 판정자·예외 및 잔여 범위 |
+| OP-06 | 소스·고지 적합성 | 원문/SHA·지정 source 비교 및 FIX-15 translated SQLite 추가 고지·modernc 선택 source ZIP/h1 검증 범위 존재; [원래 C/헤더 출처 감사](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)의 SQLite 공식 SHA3·Linux 헤더436개 분류/생성4 재생 자료 추가; Darwin SDK/전체 생성기·적합성 pending | 정확한 버전·source/고지 범위·적합성 판정자·예외 및 잔여 범위 |
 | OP-07 | 지원 플랫폼·실모델·비용 한계 | 아래 매트릭스의 진단 범위만 확인 | 실제 지원 대상·필수 환경·운영 비용/모델 실행·known limits |
 | OP-08 | 실패 시 이전 데이터/current/키 복구 | 최신 Darwin preview의 실패/손상 거부·새 루트 백업 복원·원본 소스 없는 재생·구 데이터 SHA/재색인/구 v1 rollback 검증 및 Linux arm64 실모델 설치의 이전 version/인용 복구 통과; 최종 운영 복구 미실행 | 최종 패키지의 원본 보존·실패 주입·이전 current/신원/인용 재생과 담당자 |
 
@@ -47,3 +47,5 @@ Linux source commit은 동결된 추적 입력으로 만든 합성 fixture commi
 
 
 2026-10-04 C1-06 후속: [복구 검증](./C1-RECOVERY-VALIDATION.md)의 최신 Darwin 시험 패키지에서 실패 후보 보존·손상 rollback 거부·새 루트 백업 복원·구 데이터 원본 SHA/재색인/구 v1 재생을 실행했다. SDK/source/integrity 독립 감사와 빈 WAL/SHM 별도 원장이 있다. 소형 mock/합성 HTTP 진단이므로 최종 운영 backup/서비스 전환·담당자·OP-08 승인과 전체 품질은 계속 대기다.
+
+2026-10-06 후속 기술 자료: [고정 SQLite·musl 원래 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)는 원래 C 신원·공식 SHA3와 두 Linux header tree의 원문430/생성4/overlay2를 연결한다. 전체 original C→Go 재생성·Darwin SDK·전이 native/법무 적합성은 판정하지 않았으며 OP-06 실제 검토는 계속 필요하다. 운영 키·검토자 권한·출시 상태를 변경하지 않았다.

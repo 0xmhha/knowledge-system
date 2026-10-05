@@ -34,3 +34,7 @@ C1-04–07에는 실제 native amd64 환경·대규모 비용·운영 서명/독
 후속 [FIX-20](./B0-FTS-KEYWORD-DIAGNOSTIC.md)은 관측된 구조 FTS 오류의 두 회귀/실제SQLite/관련 검증과 동일DEV2 SDK를 확인했다. BM25 오류 호출당8→0·기본 근거/좌표 보존, neighbors12오류 유지·공식 null이다. 기존 package source는 FIX-19이므로 최종 동결 후 재빌드한다.
 
 후속 [선택 문서의 Go neighbors 재생](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)은8개 직접조회 중 문서6개의 코드symbol없음/no node at·코드2 정상과 원본 불변을 확인했다. source 인수가 없는 전체 과거오류와 직접 연결하거나 공식 완료로 세지 않는다. 실제 입력 결정 후 strict 동결이 다음 최우선이다.
+
+후속 [FIX-21 계측 보완](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)은 새 SDK의 neighbors20입력을 SHA/길이로 결합해 같은 옵션의 real Go 결과와 일치함을 확인했다. 옛 빈 입력 원장에 소급 결합하지 않는다.
+
+2026-10-06 [C1-05 원래 native 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)는 SQLite C 공식 SHA3·C/공개 헤더 신원과 Linux 두 대상의436헤더를 원문/생성/overlay로 분류했다. 새49원자료·입력501파일/실제 사람 입력5개 불변이며 전체 생성기·Darwin SDK·법무/운영 승인은 pending이다. 새 기술 자료로 B0 입력 결정이나 공식 게이트를 닫지 않는다.

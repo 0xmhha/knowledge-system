@@ -106,7 +106,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: 최신 FIX-19 세 대상 preview·실모델/복구와 부분 대규모13,575청크의60 SDK·480원문/인용·별도RSS2호출 준비 검증; backend 오류840 보존·FTS 후보8개 재현. native amd64·공식 대규모/최종 운영 후보·품질은 남음 |
-| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조 완료 범위 존재; 원래 C/header·전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
+| C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조와 [원래 SQLite·musl 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)의 501입력·SQLite C 공식 SHA3·Linux 헤더436개 분류/생성4 재생 완료 범위 존재; Darwin SDK·전체 생성기/전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 진행: 최신 Darwin 시험 preview의 후보 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·원본 소스 없는 재생, 구 데이터의 첫 신규 소비자 전 SHA·새 재색인·구 v1 rollback 보존 검증. [복구 문서](./C1-RECOVERY-VALIDATION.md); 최종 후보/운영 범위·OP-08 남음 |
 | C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
 
@@ -420,3 +420,11 @@ SDK 실패/누락0과 backend 오류840(BM25480·neighbors360)을 구분했다. 
 새 실제 neighbors20개를 indexed source 후보의 SHA/길이로 결합하고 같은 옵션의 real Go adapter 재생으로20/20 결과·개수 일치를 확인했다. 문서12개 symbol없음/no node at·코드8개 정상이며 과거 미결합360/12오류는 소급 판정하지 않는다. source/원본/사본 DB·모델·바이너리/설정·실제 사람 입력5개 불변·39원자료를 기록했다. 임시 Go 테스트는 원문 `.go.txt`로 보관 후 제거했다. 조립 보조 도구 필드 착오는 별도 실패 기록 후 수정했으며 SDK/제품 실패가 아니다.
 
 B0-06의 계측 보완 완료를 공식 품질 게이트 완료로 세지 않는다. 완료2/진행11/대기17·미완료28·게이트0/4다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→입력 동결→새 strict B0-07이다. FIX-19 preview는 FIX-20/21 이후 최종 패키지 검증이 아니며 최종 동결 후 재빌드한다. B0/B1/C0/C1·STV2·OP-01–08·native amd64·고지/복구/지원/출시는 남는다.
+
+## 35. C1-05 원래 SQLite·musl 및 Linux 헤더 출처 보완
+
+2026-10-06 [원래 native 출처 감사](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)에서 고정 modernc/sqlite 3.53.3의 원래 C 공식 SHA3-256·C/공개 헤더 버전/source ID와 배포 모듈 상수가 같다. libc builder/archive가 지정한 고정 musl 원문을 수집해 C/헤더/템플릿/고지2,337항목을 봉인했다. 두 모듈 ZIP h1 재계산/go.sum과 선택 source/recipe/header/overlay501파일 바이트 일치·전후불변을 확인했다.
+
+Linux arm64/amd64 각218헤더는 원래215·생성2·overlay1로 분류했다. 원래 Makefile의 좁은 명령으로 alltypes/syscall4개를 재생하고 float overlay2개를 대조했다. 최초 helper의 빈 줄 가정·수정 문법/출력 디렉터리 오류는 실패 원자료로 구분해 보존했고 별도 경로 재생6검사 통과를 확인했다. 49개 증거와 실제 사람 입력5개 불변, 제품/키/출시 변경 없음이다.
+
+Darwin SDK·실제 include-use/생성기 버전·전체 C→Go 재생성과 전이 native 적합성/OP-06은 남는다. 이 기술 자료로 법무/운영 승인이나 C1-05 완료를 대신하지 않는다. 완료2/진행11/대기17·미완료28·공식0/4다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 전체 B0/B1/C0/C1·STV2·OP-01–08·native amd64·최종 고지/복구/지원/출시를 현황판에 유지한다.

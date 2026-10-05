@@ -4,6 +4,8 @@
 
 ## 재개 후 보고 규칙
 
+2026-10-06 최신 C1-05 기술 보완: [원래 native 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)는 SQLite 3.53.3 원래 C 공식 SHA3·C/공개 헤더 신원을 배포 모듈에 연결했다. 고정 musl 원문·두 ZIP h1·선택501파일·Linux 헤더436개(원문430/생성4/overlay2)를 대조하고 좁은 생성 명령4개를 재생했다. 49원자료/원문 공백 보존·입력 불변·법무/공식null·전체28미완료다. Darwin SDK·실제 include-use/전체 C→Go 재생성·OP-06은 pending이며 제품/운영 키/출시 변경 없음이다. 다음은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다.
+
 2026-10-05 최신 계측 보완: [FIX-21 neighbors 입력 SHA](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)는 수정 전 실패→관련6패키지/race2/vet→같은 BGE/부분13,575청크4 SDK/32인용·본문/Go Verify를 확인했다. 계측 on/off 전체 응답은 같으며 새20실제 seed의 SHA/길이/옵션/결과를 real Go로 일대일 재생했다. 문서12개 symbol없음/no node at·코드8 정상, 과거 미결합360/12의 제한은 유지한다. source/DB/실제 사람 입력5개 불변·39원자료·공식null·미완료28개다. 다음은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 기존 FIX-19 preview는 FIX-20/21 최종 검증 패키지가 아니므로 동결 후 재빌드한다.
 
 2026-10-05 최신 추가 확인: [선택 문서 neighbors](./B0-NEIGHBOR-REPLAY-DIAGNOSTIC.md)의 실제 Go adapter 직접8재생은 문서6개 symbol없음/no node at·코드2 정상이다. 기존360/새SDK12전체seed와 직접 결합할 수 없는 계측 한계는 유지한다. 임시 테스트 원문보관 후 제거·제품변경 없음·DB/source/사람 입력5개 불변·5원자료·공식null·전체28미완료다. 다음은 실제 B0/SF/STV2 결정→동결→새 strict B0-07이다.
