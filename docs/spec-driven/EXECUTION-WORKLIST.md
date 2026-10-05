@@ -369,3 +369,12 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 정적 입력과 v2 scope의 실제 checker를 다시 실행해 exit2/pending·정적12승인/동적0승인·protocol/dynamic/scope 사람 SHA 연결 없음·official_execution_ready=false를 확인했다. 입력5개와 과거 원자료 바이트가 같다. 전체 여섯 가족의 진단/남은 공식 오라클을 연결하고, FIX-18 이후 최종 패키지는 새 공식 후보로 재빌드해야 함을 기록했다. 사람의 ‘검토 후 결정’·SF/OP/운영/native 선행 조건을 일반 계속 지시로 대체하지 않는다.
 
 완료2/30·진행11·대기17·공식 판정0/4, 전체28미완료다. 다음은 B0-01/02/03/05·STV2-01 실제 결정 기록→source/팩/의미/scope/K 동결→새 strict B0-07→공식 B0/B1→사람/C0→최종 C1이다. OP-01–08·실제 native amd64·전체 native/legal·대규모 비용·최종 복구/출시도 남는다. 승인 도착 전 미검토 입력으로 최종 실행하거나 사람 verdict를 만들어 작업을 종료하지 않는다.
+
+
+## 29. FIX-19 보관 소스·혼합 pinned 좌표의 실제 SDK 오류 구분
+
+2026-10-05 [보관 소스 제어 진단](./B0-RETAINED-GUARD-DIAGNOSTIC.md)의 수정 전 네 subtest와 실제 SDK 음성4건을 보존했다. InspectVersionIdentity의 알려진 source 오류를 MCP가 reindex_required로 덮고 engine 좌표 불일치에 구체적 코드가 없던 원인을 수정했다. 정상 pinned SDK 초기화 후 DEV 사본의 전체 vector를 다른 상태/프로젝트로 교체해 snapshot_mismatch, blob 변조 snapshot_mismatch·삭제 source_missing과 backend0을 확인했다. 과거 비인접 설정 거부를 소급 변경하지 않았다.
+
+수정 전후 각 SDK10회/누락0·정상복원6응답/20인용/20본문은 공개 Go Verify·원문/좌표/본문 SHA를 통과했고 정상 evidence 집합이 같다. 원본/최종 사본 DB/source·설정/바이너리·BGE digest/metadata 불변과 실제 rawK10/별도K6을 확인했다. helper 필드명/빈 WAL-SHM 가정 실패는 제품 실패와 분리해 보존했다. 비어 있지 않은 WAL은 사본 생성에서 거부한다. 영향받은 계약 시험/race/vet·SDK·독립 reader·최종 문서/경계/현황/원장을 확인한다.
+
+완료2/30·진행11·대기17·공식 게이트0/4·전체28미완료는 유지한다. B0/STV2 실제 결정 후 공식 strict 빌드가 최우선이며, 독립 준비로 최신 FIX-19 패키지의 시험 범위 검증을 진행한다. B0-01–09·B1-03–08·C0-01–06·C1-01–07과 STV2-01·OP-01–08·native amd64·대규모/최종 복구/출시가 모두 남는다.

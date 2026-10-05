@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 최신 재감사: [전체 실행 선행 조건](./EXECUTION-READINESS-REAUDIT.md)에 여섯 DEV 가족의 진단/미충족 공식 범위를 연결했다. F-03/F-06 보관 mock/BGE-M3 SDK20응답은 source/투영/inner evidence/public Go Verify·proposed/unknown·baseline 집합 보존을 재확인했다. 모델/FINAL 새 실행 없음. 실제 static/v2 checker 둘 다 exit2/pending이며 정적12승인/동적0승인·protocol/dynamic/scope binding=false다. 다음은 실제 B0-01/02/03/05·STV2-01 결정과 입력 동결→새 strict 공식 B0-07이다. FIX-18 뒤 최종 패키지는 다시 빌드해야 한다. OP-01–08·native/legal/대규모/최종 복구/출시와 전체28미완료를 유지한다. 일반 계속 지시로 개별 결정을 만들지 않는다.
+2026-10-05 최신 기술 검증: [FIX-19 SDK 음성 제어](./B0-RETAINED-GUARD-DIAGNOSTIC.md)에서 정상 pinned 연결 후 전체 vector를 다른 DEV 상태/프로젝트로 교체한 snapshot_mismatch와 blob 변조/삭제의 snapshot_mismatch/source_missing을 수정 전 실패→계약/race/vet→실제 BGE-M3 SDK로 검증했다. 전후 각각10 SDK/정상복원6·20인용·본문/음성4/backend0, 원본·사본·설정·바이너리·모델 불변이다. 이전 비인접 설정 오류와 별도 범위이며 공식 품질/FINAL null·입력5개 불변·전체28미완료다. 다음 독립 준비는 최신 패키지 시험 범위 검증, 최우선 공식 선행은 B0/STV2 결정과 strict 입력 동결이다.
+
+2026-10-05 이전 재감사: [전체 실행 선행 조건](./EXECUTION-READINESS-REAUDIT.md)에 여섯 DEV 가족의 진단/미충족 공식 범위를 연결했다. F-03/F-06 보관 mock/BGE-M3 SDK20응답은 source/투영/inner evidence/public Go Verify·proposed/unknown·baseline 집합 보존을 재확인했다. 모델/FINAL 새 실행 없음. 실제 static/v2 checker 둘 다 exit2/pending이며 정적12승인/동적0승인·protocol/dynamic/scope binding=false다. 다음은 실제 B0-01/02/03/05·STV2-01 결정과 입력 동결→새 strict 공식 B0-07이다. FIX-18 뒤 최종 패키지는 다시 빌드해야 한다. OP-01–08·native/legal/대규모/최종 복구/출시와 전체28미완료를 유지한다. 일반 계속 지시로 개별 결정을 만들지 않는다.
 
 2026-10-05 이전 독립 준비: [F-01 DEV 진단](./B0-F01-SPARSE-DIAGNOSTIC.md)은 새 strict BGE-M3 Go60파일/122청크/truncated0·source61개/Git blob 동일을 확인했다. K5 무필터 대상4파일 누락·eligible Function5개/full inventory·정상 exact·budget2 incomplete/candidate_limit을 충족했고 reader diagnostic_controls_pass/invariant0이다. 원문/모델/DB 불변·FINAL 미실행·공식 품질 null이며 coarse 후보60을 eligible5로 바꾸어 기록하지 않는다. 다음은 F-03/F-06 proposed 원자료/전체 선행 조건 재감사, 실제 B0 결정 후 새 공식 strict 빌드다. 전체 28개 미완료/운영/native 범위는 현황판을 따른다.
 
