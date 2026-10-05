@@ -323,3 +323,12 @@ Go 독립 exact scan에 top K로 자르기 전 전체 eligible 목록을 보존�
 실제 역사적 BGE-M3 Alpha 프로브와 sidecar/보관 source 3개는 원래 commit Git blob과 같다. K1·eligible1·normal exact 일치는 유지되지만 희소 조건과 full eligible 목록이 부족하여 fixture_not_qualified다. @10/F-01 합격으로 합산하지 않는다. 최초 reader CLI의 Path.open opener 오류를 기록하고 수정했으며, Python 신규 15개/paired 기존 16개·Go probe 6개/race/vet·문서/경계/현황 동기화 검사를 통과했다. 과거 원자료와 실제 사람 입력을 바꾸지 않았다.
 
 B0-06/B1-04는 도구 준비 진행이고 완료 수는 그대로 2/30, 공식 품질 판정 0/4다. 다음 독립 작업은 F-02 장문 꼬리·split/parent 재조립 오라클의 보고 연결이다. B0-01/02/03/05·STV2-01의 실제 결정 후 source/pack/semantic/scope/K 동결 → 새 strict B0-07 → 공식 B0/B1 → 사람/C0 → 최종 C1 순서를 우선한다. OP-01–08·native amd64·전체 native/legal/복구/출시 범위와 전체 28개 미완료 작업을 마지막 보고에 함께 표시한다.
+
+
+## 24. F-02 장문 꼬리·부모 재조립 개발 진단
+
+2026-10-05 [F-02 보고 자료](./B0-F02-DOCUMENT-REPORT-PREPARATION.md)와 [원장](../../system/eval/b0-knowledge-system/f02-document-preparation-m2max-2026-10-05/summary.json)을 추가했다. 새 최신 바이너리·strict BGE-M3로 미승인 DEV 입력을 진단했다. 203줄/20,290바이트는 5 child의 순서/parent ID·줄/heading/hash와 함께 손실 없이 재조립되고 actual build truncated0이다. 두 raw query는 K10의 tail rank1이며 전체 저장 청크5개를 반환하는 소형 사례다. 공식 품질·독립 표본2개로 합산하지 않는다.
+
+CKV full/default/minimum density 각2응답과 CKS v2 2응답/16 source citations/bodies를 확인했다. default는 꼬리 문장을 보존하지만 minimum signature는 이를 축약하며 citation/parent는 유지한다. 최소 budget20의 실제 estimated105-token floor를 보존한다. 공개 Go Verify·소스 SHA·full exact vector inventory·DB/config/model 불변, raw/text K10과 knowledge K6 scope를 대조했고 best-effort nonreturned14회를 남겼다. Python 11+15·관련 Go 장문/parent 회귀를 통과했다. budget1 공개 거부와 generated YAML/K6 helper 가정 오류도 보존했으며 제품 수정/C0 실패로 세지 않는다.
+
+사용자의 전체 완료까지 지속 진행·세부 완료마다 화면/문서에 현재 단계·전체 미완료·다음 작업을 표시하는 지시를 재기록한다. 현재 구현 완료2/30·진행11·대기17·공식 게이트0/4·미완료28개는 그대로다. F-02 독립 준비를 마쳤고 다음은 F-04/F-05 상태/프로젝트 오라클 보고 연결이다. B0-01/02/03/05·STV2-01과 OP-01–08의 실제 결정은 비동기로 요청했으며 일반 전체 완료 지시를 특정 사실/입력/운영 승인으로 기록하지 않았다. 결정 도착 후 입력 동결·새 strict 공식 B0-07 → B0/B1 → 사람/C0 → 최종 C1 순서를 우선한다.

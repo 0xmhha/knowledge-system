@@ -1,0 +1,606 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T03:12:25.070999Z",
+  "finished_at": "2026-10-05T03:12:27.1347Z",
+  "request_sha256": "d9516cab43e301f26332d640ac0c60e13aad23c8009fea2695a07cb91d7ee054",
+  "config_sha256": "ad9c36825cee35d3d1f6107019d2708d504bf0a717245eac6670c70043539fff",
+  "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "config_sha256_after": "ad9c36825cee35d3d1f6107019d2708d504bf0a717245eac6670c70043539fff",
+  "binary_sha256_after": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "F02-DEV-0",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "9cdf9ff332f01796f79d97e57cb7716d",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "How many reviewers are required by the final refund approval quorum?"
+        },
+        "elapsed_ns": 214225542,
+        "completed_at": "2026-10-05T12:12:26.907284+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-02-dev",
+              "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+              "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+              "source_mode": "committed",
+              "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70"
+            },
+            "query": "How many reviewers are required by the final refund approval quorum?",
+            "citations": [
+              {
+                "file": "docs/decision.md",
+                "start_line": 183,
+                "end_line": 203,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 177,
+                "end_line": 182,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 123,
+                "end_line": 182,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 117,
+                "end_line": 122,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 183,
+                "end_line": 188,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 63,
+                "end_line": 122,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 57,
+                "end_line": 62,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 123,
+                "end_line": 128,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 183,
+                  "end_line": 203,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe final refund approval quorum is seven reviewers (DEV_QUORUM_TAIL).\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 177,
+                  "end_line": 182,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 123,
+                  "end_line": 182,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 117,
+                  "end_line": 122,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 183,
+                  "end_line": 188,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 63,
+                  "end_line": 122,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 57,
+                  "end_line": 62,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 123,
+                  "end_line": 128,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "1e1adcfb26a6984365f2f6e21cedac2b96e11de204058c373b7c4aa67adbb22c"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "F02-DEV-1",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "38cdadec8e26e349c223b79a784608d8",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "문서 마지막에 정의된 환급 승인 정족수는 몇 명인가요?"
+        },
+        "elapsed_ns": 202333334,
+        "completed_at": "2026-10-05T12:12:27.110095+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-02-dev",
+              "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+              "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+              "source_mode": "committed",
+              "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70"
+            },
+            "query": "문서 마지막에 정의된 환급 승인 정족수는 몇 명인가요?",
+            "citations": [
+              {
+                "file": "docs/decision.md",
+                "start_line": 183,
+                "end_line": 203,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 177,
+                "end_line": 182,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 123,
+                "end_line": 182,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 117,
+                "end_line": 122,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 183,
+                "end_line": 188,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 63,
+                "end_line": 122,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 57,
+                "end_line": 62,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              },
+              {
+                "file": "docs/decision.md",
+                "start_line": 123,
+                "end_line": 128,
+                "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "project_id": "f-02-dev",
+                "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                "source_mode": "committed",
+                "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                "origin_id": "repo",
+                "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 183,
+                  "end_line": 203,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe final refund approval quorum is seven reviewers (DEV_QUORUM_TAIL).\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 177,
+                  "end_line": 182,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 123,
+                  "end_line": 182,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 117,
+                  "end_line": 122,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 183,
+                  "end_line": 188,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 63,
+                  "end_line": 122,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 57,
+                  "end_line": 62,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/decision.md",
+                  "start_line": 123,
+                  "end_line": 128,
+                  "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "project_id": "f-02-dev",
+                  "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+                  "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+                  "source_mode": "committed",
+                  "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+                  "origin_id": "repo",
+                  "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+                  "content_sha256": "284414616c50c3db8dff5840411189888e3668a5da7b38e0bd01ad52b2da545d"
+                },
+                "text": "The opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "2ced5b61a60b58989ef6382ece0479363e73ed56f704787973006064f891027a"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

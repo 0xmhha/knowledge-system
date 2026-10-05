@@ -1,0 +1,33 @@
+[
+  {
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-f02-preparation-20261005/bin/evidence-audit",
+      "./cmd/b1-evidence-audit"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/evidence-audit",
+      "--input",
+      "/private/tmp/ks-f02-preparation-20261005/sdk-rows.jsonl",
+      "--output",
+      "/private/tmp/ks-f02-preparation-20261005/public-v2-audit.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "./internal/vector/chunk",
+      "./internal/vector/query",
+      "-run",
+      "TestLongMarkdown|TestLongSingleMarkdown|Test.*Parent"
+    ],
+    "exit_code": 0
+  }
+]

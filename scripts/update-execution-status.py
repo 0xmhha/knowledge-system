@@ -50,7 +50,7 @@ def render(raw):
     for stage in ['B0','B1','C0','C1']:
         c = Counter(t[4] for t in tasks if t[0].startswith(stage))
         lines.append(f"| {stage} | {c['done']} | {c['progress']} | {c['waiting']} | {('작업 종료; verdict=' + gates[stage]) if c['done'] == sum(t[0].startswith(stage) for t in tasks) else position[stage]} |")
-    lines += ['', '**바로 다음 독립 작업:** F-02 장문 꼬리·split/parent 재조립 오라클과 보관 원자료 보고 연결 준비(B0-06/B1-04).', '',
+    lines += ['', '**바로 다음 독립 작업:** F-04/F-05 과거/현재 snapshot·교차 프로젝트 오라클 보고 연결 준비(B0-06/B1-05).', '',
       '**승인 도착 시 최우선:** B0-01/02/03/05·STV2-01 결정 기록 → source/pack/semantic/scope/K 동결 → B0-07 새 strict 빌드/감사 → B0-08/09 공식 기준선.', '',
       f"**남은 전체 작업 {30-counts['done']}개**", '', '| ID | 상태 | 우선순위·선행 | 남은 작업 |', '|---|---|---|---|']
     for qid, priority, task, status, state in tasks:
