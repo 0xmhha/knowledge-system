@@ -1,0 +1,99 @@
+[
+  {
+    "label": "clone",
+    "command": [
+      "git",
+      "clone",
+      "--quiet",
+      "--no-local",
+      "/private/tmp/ks-b0-dynamic-dev-20261003/F-01-DEV/repo",
+      "/private/tmp/ks-f01-preparation-20261005/source"
+    ],
+    "exit_code": 0,
+    "explicit_environment": {}
+  },
+  {
+    "label": "checkout",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-f01-preparation-20261005/source",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "3433883f3d811dff182b92ada250fae491a6faa2"
+    ],
+    "exit_code": 0,
+    "explicit_environment": {}
+  },
+  {
+    "label": "strict-setup",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-f01-preparation-20261005/source",
+      "--out",
+      "/private/tmp/ks-f01-preparation-20261005/dataset",
+      "--version",
+      "diagnostic",
+      "--project-id",
+      "f-01-dev",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--query-prefix-policy",
+      "registry",
+      "--cks-bin",
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "--vector-bin",
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "--graph-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+    ],
+    "exit_code": 0,
+    "explicit_environment": {
+      "CKV_REQUIRE_COMPLETE_EMBEDDINGS": "1"
+    }
+  },
+  {
+    "label": "probe",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/probe",
+      "--vector-dir",
+      "/private/tmp/ks-f01-preparation-20261005/dataset/diagnostic/vector",
+      "--query",
+      "Where is the gas refund route implemented?",
+      "--filter-file",
+      "/private/tmp/ks-f01-preparation-20261005/filter.json",
+      "--k",
+      "5",
+      "--max-exact-candidates",
+      "2"
+    ],
+    "exit_code": 0,
+    "explicit_environment": {}
+  },
+  {
+    "label": "reader",
+    "command": [
+      "python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/b0-summarize-vector-probe.py",
+      "--probe",
+      "/private/tmp/ks-f01-preparation-20261005/probe-stdout.txt",
+      "--manifest",
+      "/private/tmp/ks-f01-preparation-20261005/dataset/diagnostic/vector/manifest.json",
+      "--controls",
+      "/private/tmp/ks-f01-preparation-20261005/controls.json",
+      "--source-root",
+      "/private/tmp/ks-f01-preparation-20261005/source",
+      "--out",
+      "/private/tmp/ks-f01-preparation-20261005/diagnostic-report.json"
+    ],
+    "exit_code": 0,
+    "explicit_environment": {}
+  }
+]

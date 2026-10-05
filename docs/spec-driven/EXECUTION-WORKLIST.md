@@ -79,7 +79,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | B1-01 | P1 | baseline / concept_text / relations / combined의 네 가지 실행 어댑터 구현 | 실제 실행 경로가 다름을 검증; 기본 꺼짐; 원문 질의 우선; 후보 K 보존·오류/모호성 폴백; 단순 플래그 이름만 추가하지 않음 | 검증 완료: 네 MCP 경로·텍스트/관계 기여 분리·상한/폴백, mock/BGE-M3 각 20요청. 공식 품질 통과와 별개 |
 | B1-02 | P1 · B0-05/B1-01 | 팩 off/on 축을 연결하여 8 arms 구성 | 팩 잠금과 데이터셋 신원 분리; 권한·범위·출처 적용; 단순 Markdown을 검토된 팩으로 취급하지 않음 | 구현 검증 완료: 동일 dataset/lock의 8개 v2 경로, mock/BGE-M3 각 48요청·6정책 상태·인용/본문 보존·원문/integrity·DB 무변경 확인. 실제 팩 사실 검토·공식 B1 대기 |
 | B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 도구 준비: 8경로 회전·warm/cold·원응답/호출 ID·입력 전후 검증 완료. 승인된 공식 B0/B1 실행 대기 |
-| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md) 준비, 역사적 K1은 F-01 자격 미충족; 공식 입력·평가/사람 판정 대기 |
+| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md) 준비, 역사적 K1은 F-01 자격 미충족; [새 F-01 DEV](./B0-F01-SPARSE-DIAGNOSTIC.md)는 K5 희소/exact/상한 진단 통과이며 공식 입력·평가/사람 판정 대기 |
 | B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 진행: [안전 제어 감사](./B1-SAFETY-AUDIT-PREPARATION.md)의 공개 Go v2 검증·보관 소스/내부 인용·6정책 상태·합성 payload 비노출·off/on 후보 보존을 624 SDK 응답에서 재생. 공식 F-04/05/06·비밀/권한 전체 범위·사람 판정 대기 |
 | B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
 | B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기 |
@@ -351,3 +351,12 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 다른 native 디렉터리 graph/vector를 혼합한 두 설정은 SDK reindex_required/CLI operation_failed로 거부됐다. 초기 helper의 오류 보고서 미생성 가정을 수정하고 보존 partial을 검사했다. 이 설정 거부를 gold의 pinned 혼합 좌표 snapshot_mismatch로 바꾸어 세지 않으며 정확한 공식 혼합 오라클은 남는다. 12개 Python 회귀·기존 F-02 11개와 최종 조립 문서/경계/현황/원장 검사를 수행한다.
 
 완료2/30·진행11·대기17·공식 게이트0/4는 유지한다. 다음 독립 작업은 F-01 실제 희소 무필터/full eligible·상한 오라클의 개발 진단이다. B0-01/02/03/05·STV2-01 결정이 도착하면 입력/source/pack/semantic/K 동결과 새 strict B0-07을 우선한다. B1 공식 paired·사람 판단→C0 관측 수정→C1 독립 최종/운영과 OP-01–08·native/legal/대규모/복구 범위가 모두 남는다.
+
+
+## 27. F-01 실제 희소 검색·상한 개발 진단
+
+2026-10-05 [F-01 자료](./B0-F01-SPARSE-DIAGNOSTIC.md)와 [원장](../../system/eval/b0-knowledge-system/f01-sparse-preparation-m2max-2026-10-05/summary.json)을 추가했다. 고정 DEV source61개/Git blob 동일·strict BGE-M3 Go60파일/122청크/truncated0이다. K5 무필터가 대상 파일4개를 누락하며 전체 eligible Function5개·정상 필터 exact ID/좌표/거리·budget2 incomplete/candidate_limit 조건을 충족했다. coarse SQL 후보60과 eligible5, raw 중복 슬롯과 구성 인용, 실제 @5와 @10을 분리한다.
+
+원본/보관 소스 reader 재생의 diagnostic_controls_pass·invariant0과 probe 전후 DB/manifest/graph·source/model 불변을 확인했다. 원래 초안/승인 입력5개를 바꾸지 않았고 FINAL 실행 없음·공식 F-01/품질/사람 verdict는 null이다. 기존 역사적 Alpha K1 자격 실패를 소급 변경하지 않는다. 기존 reader15개·최종 조립 문서/경계/현황/원장 대조를 수행했다. Go 제품 변경은 없으며 FIX-18의 이미 통과한 query/공개 계약 시험을 불필요하게 반복하지 않았다.
+
+완료2/30·진행11·대기17·공식 게이트0/4는 유지한다. 다음 우선순위는 B0-01/02/03/05·STV2-01 실제 결정→입력/source/pack/semantic/K 동결→B0-07 공식 strict 빌드다. 독립 준비는 기존 F-03/F-06 proposed/unknown·검토 자료와 전체 실행 선행 조건을 재감사한다. 사람 판정/운영/실제 native amd64가 필요한 나머지를 진단 완료로 대신하지 않는다.
