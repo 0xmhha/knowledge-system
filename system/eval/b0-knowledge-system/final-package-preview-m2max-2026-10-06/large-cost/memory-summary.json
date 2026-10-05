@@ -1,0 +1,64 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "command": [
+    "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-final-package-large-cost-20261006/requests.json",
+    "--config",
+    "/private/tmp/ks-final-package-large-cost-20261006/memory-config.yaml",
+    "--output",
+    "/private/tmp/ks-final-package-large-cost-20261006/memory-capture.json",
+    "--warmup",
+    "0",
+    "--retrieval-runs",
+    "1",
+    "--warm-runs",
+    "0",
+    "--cold-runs",
+    "0",
+    "--call-timeout",
+    "90s"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 7.1257798336446285,
+  "bindings_before": {
+    "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks": "b420a559fb84e3520a5dcf5d420f067d6f38ded821479784e515063cd822d6e8",
+    "/private/tmp/ks-final-package-large-cost-20261006/memory-config.yaml": "282e9800898883e0ae229c6f824b82220114e44beb8d7ae08b0c2738eb453220",
+    "/private/tmp/ks-final-package-large-cost-20261006/requests.json": "1b10041646bb9e2a9662f07220e1448e236deafc699ff3af9b46ced353c9af06"
+  },
+  "bindings_after": {
+    "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks": "b420a559fb84e3520a5dcf5d420f067d6f38ded821479784e515063cd822d6e8",
+    "/private/tmp/ks-final-package-large-cost-20261006/memory-config.yaml": "282e9800898883e0ae229c6f824b82220114e44beb8d7ae08b0c2738eb453220",
+    "/private/tmp/ks-final-package-large-cost-20261006/requests.json": "1b10041646bb9e2a9662f07220e1448e236deafc699ff3af9b46ced353c9af06"
+  },
+  "processes": {
+    "93935": {
+      "command": "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks",
+      "ppid": 93934,
+      "observations": 23,
+      "max_observed_rss_kib": 23520
+    },
+    "93937": {
+      "command": "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks",
+      "ppid": 93935,
+      "observations": 22,
+      "max_observed_rss_kib": 82528
+    },
+    "94238": {
+      "command": "(git)",
+      "ppid": 93937,
+      "observations": 1,
+      "max_observed_rss_kib": 144
+    }
+  },
+  "sample_count": 23,
+  "max_observed_sum_rss_kib": 106144,
+  "limitations": [
+    "sampled RSS; peaks between samples may be missed",
+    "sum RSS can double count shared pages",
+    "model daemon/runner excluded; model already resident; sampler overhead not latency baseline"
+  ]
+}

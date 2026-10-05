@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/audit-recovery.py", line 19, in <module>
+    for name in ['corrupt-target-rollback','corrupt-current-direct-rollback']:assert json.loads((root/'darwin-final'/f'{name}.stderr.txt').read_text())['code']=='snapshot_mismatch'
+                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/darwin-final/corrupt-target-rollback.stderr.txt'
+Traceback (most recent call last):
+  File "/private/tmp/ks-approved-scope-20261006/retain-final-packages.py", line 65, in <module>
+    (target/'audit-recovery.py').write_text(s);subprocess.run(['python3',str(target/'audit-recovery.py')],check=True)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python3', '/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/audit-recovery.py']' returned non-zero exit status 1.

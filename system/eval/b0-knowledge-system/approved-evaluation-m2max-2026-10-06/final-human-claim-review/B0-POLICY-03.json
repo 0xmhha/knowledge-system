@@ -1,0 +1,35 @@
+{
+  "sequence": 336,
+  "group": 41,
+  "position": 8,
+  "arm": "baseline_off",
+  "request_id": "B0-POLICY-03",
+  "phase": "retrieval",
+  "iteration": 1,
+  "call": {
+    "measurement_id": "1702f84615d6105c246ca183a99ea016",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "include_knowledge": false,
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system",
+      "prompt": "비공개 정책이 존재하지만 조회자가 접근 권한이 없으면 정책 본문이나 ID를 코딩 문맥에 넣을 수 있나요?"
+    },
+    "elapsed_ns": 1376333333,
+    "completed_at": "2026-10-06T06:36:48.654613+09:00",
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "code=v2_evidence_failed: Retained source evidence could not be verified."
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "v2_evidence_failed",
+        "message": "Retained source evidence could not be verified."
+      }
+    }
+  },
+  "error": "tool returned IsError"
+}

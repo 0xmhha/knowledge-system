@@ -1,0 +1,130 @@
+{
+  "status": "pass_test_preview",
+  "checks": [
+    {
+      "id": "test-keygen",
+      "exit_code": 0,
+      "command": [
+        "openssl",
+        "genpkey",
+        "-algorithm",
+        "ED25519",
+        "-out",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/private.pem"
+      ],
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "test-public-key",
+      "exit_code": 0,
+      "command": [
+        "openssl",
+        "pkey",
+        "-in",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/private.pem",
+        "-pubout",
+        "-out",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/public.pem"
+      ],
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "sidecar",
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/release-sidecar.py",
+        "--archive",
+        "/private/tmp/ks-final-package-darwin-20261006/dist/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview.tar.gz",
+        "--private-key",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/private.pem",
+        "--public-key",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/public.pem",
+        "--out-dir",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/sidecar"
+      ],
+      "log_sha256": "d9894f32b84d201662539fcd0ae7302a05131e1e08263eff5bb34e531bff81d8"
+    },
+    {
+      "id": "python-verify",
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-release.py",
+        "--public-key",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/public.pem",
+        "--release",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/sidecar/release.json",
+        "--signature",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/sidecar/release.json.sig",
+        "--archive",
+        "/private/tmp/ks-final-package-darwin-20261006/dist/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview.tar.gz",
+        "--target-os",
+        "darwin",
+        "--target-arch",
+        "arm64"
+      ],
+      "log_sha256": "1272a4813bd38ae5f006aa9ef68e82d6a3fbb70973fe8c4190ecde72bc63473e"
+    },
+    {
+      "id": "go-verify",
+      "exit_code": 0,
+      "command": [
+        "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview/cks",
+        "package",
+        "verify",
+        "--public-key",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/public.pem",
+        "--release",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/sidecar/release.json",
+        "--signature",
+        "/private/tmp/ks-final-package-darwin-20261006/signature/sidecar/release.json.sig",
+        "--archive",
+        "/private/tmp/ks-final-package-darwin-20261006/dist/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview.tar.gz",
+        "--target-os",
+        "darwin",
+        "--target-arch",
+        "arm64"
+      ],
+      "log_sha256": "06ac1a15f68bfd88b0ab1c14e4636d1bdf1fb168f57f3e97f7a4775cd5fe7708"
+    },
+    {
+      "id": "install-three-projects",
+      "exit_code": 0,
+      "command": [
+        "bash",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-install-smoke.sh"
+      ],
+      "log_sha256": "063756443e791f8d83571d3a16f1dbe9b71c6f9d20f17e26fed93fe5d1e2b27b"
+    },
+    {
+      "id": "recovery",
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-recovery-smoke.py",
+        "--bin-dir",
+        "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview",
+        "--out",
+        "/private/tmp/ks-final-recovery-20261006"
+      ],
+      "log_sha256": "13d0d7762bff4fbd7e3a728170356ecc985f3019465b7b9cf0a9caf549b24a45"
+    },
+    {
+      "id": "legacy-recovery",
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-legacy-recovery-smoke.py"
+      ],
+      "log_sha256": "89702fe9cd8c78d454a8964152637896e2176b068c2ff3d02ed915bc74f96d6c"
+    }
+  ],
+  "stage": "/private/tmp/ks-final-package-darwin-20261006/unpacked/knowledge-system-darwin-arm64-10cbffaa104e-dirty-preview",
+  "archive_sha256": "6435e1dd56fe5ea3a5fa458e34620ece3e39c3524f2ec9eb5830908400eb7ec2",
+  "source_commit": "10cbffaa",
+  "operating_release": false,
+  "test_keys_only": true,
+  "legal_review": "pending",
+  "finished_at": "2026-10-05T23:19:02.482010+00:00"
+}

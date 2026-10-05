@@ -49,3 +49,9 @@ Linux source commit은 동결된 추적 입력으로 만든 합성 fixture commi
 2026-10-04 C1-06 후속: [복구 검증](./C1-RECOVERY-VALIDATION.md)의 최신 Darwin 시험 패키지에서 실패 후보 보존·손상 rollback 거부·새 루트 백업 복원·구 데이터 원본 SHA/재색인/구 v1 재생을 실행했다. SDK/source/integrity 독립 감사와 빈 WAL/SHM 별도 원장이 있다. 소형 mock/합성 HTTP 진단이므로 최종 운영 backup/서비스 전환·담당자·OP-08 승인과 전체 품질은 계속 대기다.
 
 2026-10-06 후속 기술 자료: [고정 SQLite·musl 원래 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)는 원래 C 신원·공식 SHA3와 두 Linux header tree의 원문430/생성4/overlay2를 연결한다. 전체 original C→Go 재생성·Darwin SDK·전이 native/법무 적합성은 판정하지 않았으며 OP-06 실제 검토는 계속 필요하다. 운영 키·검토자 권한·출시 상태를 변경하지 않았다.
+
+## 2026-10-06 최종 후보 기술 검증 후 남은 결정
+
+[최종 package](./C1-FINAL-PACKAGE-VALIDATION.md)의 세 preview·최신 실제 BGE 두 플랫폼·전체 strict1598/13820 비용60+RSS2·최종 구 v1/current 복구와 source/public/backend 감사를 완료했다. C1-04/06 기술 범위 완료, OP 승인이나 실제운영 지원은 미완료다. latest Linux 실제 모델은4CPU/4GiB 서버·1CPU/512MiB caller·180초 deadline이며 과거 실행 수/옵션을 새 후보에 자동 적용하지 않는다. nativeAMD64는 emulation만 확인했다.
+
+[최종 종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)에 품질fail·소그룹inconclusive·disabled·운영출시보류를 명시했다. 기존 요청의 최종 scope 결정은 아직 대기다. 시험 preview를 deliverable로 한정하면 실제 운영 키/역할/신뢰/전체 적합성·backup/failover 및 미제공 환경을 명시적 잔여로 기록해야 한다. 실제 운영 출시가 필요하면 위 OP01–08 실제 결정/증거가 필요하다. 입력①–⑤는 이 결정의 승인 기록이 아니다.

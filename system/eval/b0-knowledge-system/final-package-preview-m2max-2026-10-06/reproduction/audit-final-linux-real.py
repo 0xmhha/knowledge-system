@@ -1,0 +1,45 @@
+from pathlib import Path
+import json,hashlib,importlib.util,tempfile,sqlite3,math,struct
+ROOT=Path.cwd();run=Path('/private/tmp/ks-final-linux-real-20261006')
+sp=importlib.util.spec_from_file_location('state',ROOT/'scripts/b0-audit-state-isolation.py');S=importlib.util.module_from_spec(sp);sp.loader.exec_module(S)
+sha=lambda x:hashlib.sha256(x).hexdigest();load=lambda p:json.loads(p.read_bytes())
+pkg=load(run/'package-manifest.json');cases={}
+for kind in ['empty-go','typescript','unsupported-python']:
+ base=run/'diagnostic-approved-package'/kind;cap=load(base/'capture.json');requests=load(base/'requests.json')
+ assert cap['state']=='captured' and len(cap['rows'])==2 and cap['quality_metrics'] is None and not cap.get('errors')
+ assert cap['binary_sha256']==cap['binary_sha256_after']==pkg['binaries']['cks']['sha256']
+ assert cap['request_sha256']==sha((base/'requests.json').read_bytes()) and cap['config_sha256']==cap['config_sha256_after']==sha((base/'mcp.yaml').read_bytes())
+ assert cap['counts']=={'retrieval':1,'warmup':0,'warm_latency':0,'cold_process':0}
+ first,second,rolled=[load(base/n) for n in ['doctor.stdout.txt','second-doctor.stdout.txt','rollback-doctor.stdout.txt']]
+ assert first['dataset_version']!=second['dataset_version'] and rolled['dataset_version']==first['dataset_version'] and rolled['indexed_commit']==first['commit'] and rolled['commit']==second['commit']
+ version=(base/'dataset/current').resolve();identity=load(version/'dataset-identity.json');source=load(version/'sources/manifest.json')
+ assert identity['source']['source_commit']==first['commit'] and identity['embedding_identity']['model_digest']==S.MODEL and identity['embedding_identity']['Dim']==1024
+ assert all(h['citation']['commit_hash']==first['commit'] for h in load(base/'rollback-query.stdout.txt')['hits'])
+ events=[json.loads(l) for l in (base/'footprints/cks-mcp.jsonl').read_text().splitlines()]
+ scopes={e['summary']['measurement_id']:e['summary'] for e in events if e.get('event')=='measurement.backend_calls' and e['summary']['tool']=='cks.context.get_for_task_v2'}
+ assert len(scopes)==2
+ comparisons=[];cites=bodies=0;ks=[];nonreturned=[]
+ with tempfile.TemporaryDirectory(prefix='ks-native-source-reader-') as tmp:
+  src=Path(tmp)
+  for entry in source['files']:
+   if entry['kind']=='regular' and entry['origin_id']=='repo':
+    raw=(version/'sources/blobs'/entry['sha256']).read_bytes();assert sha(raw)==entry['sha256'];p=src/entry['path'];p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+  for req,row in zip(requests['requests'],cap['rows']):
+   call=row['call'];assert row['request_id']==req['id'] and row['phase']=='retrieval' and call['arguments']==req['arguments'] and not call.get('transport_error') and not row.get('error')
+   response=call['response'];assert not response.get('isError');pack=response['structuredContent'];S.BASE.verify_pack(pack,identity,src)
+   assert pack['citations'] and pack['bodies'];cites+=len(pack['citations']);bodies+=len(pack['bodies']);comparisons.append({'citations':pack['citations'],'bodies':pack['bodies'],'coordinates':pack['coordinates']})
+   scope=scopes[call['measurement_id']];assert scope['outcome']=='returned'
+   search=[x for x in scope['calls'] if x['backend']=='ckv' and x['method'] in ['semantic_search','find_invariants','get_conventions']]
+   k=[x['options']['K'] for x in search];assert 10 in k and all(n in [6,10] for n in k);ks+=k
+   http=[x for x in scope['calls'] if x['backend']=='ollama_http'];assert http and all(x['http_status']==200 for x in http)
+   nonreturned.extend(x for x in scope['calls'] if x['outcome']!='returned')
+ assert comparisons[0]==comparisons[1]
+ with sqlite3.connect('file:'+str(version/'vector/vector.db')+'?mode=ro',uri=True) as db:
+  manifests=dict(db.execute('select key,value from manifest'));assert manifests['embedding_model_digest']==S.MODEL and manifests['embedding_dim']=='1024'
+  vectors=db.execute('select chunk_id,chunk_offset from chunk_vec_rowids').fetchall();blocks=dict(db.execute('select rowid,vectors from chunk_vec_vector_chunks00'))
+  norms=[]
+  for cid,offset in vectors:
+   v=struct.unpack('<1024f',blocks[cid][offset*4096:offset*4096+4096]);assert all(math.isfinite(x) for x in v);norm=math.sqrt(sum(x*x for x in v));assert abs(norm-1)<.001;norms.append(norm)
+ cases[kind]={'sdk_rows':2,'citations':cites,'bodies':bodies,'source_body_coordinates_verified':True,'fallback_baseline_knowledge_evidence_identical':True,'install_upgrade_rollback_verified':True,'binary_config_request_hashes_verified':True,'actual_retrieval_k':ks,'backend_nonreturned':nonreturned,'stored_finite_normalized_vectors':len(norms),'vector_norms':norms,'identity':identity}
+summary={'diagnostic_only':True,'official_quality_metrics':None,'official_verdict':None,'scope':'Linux arm64 CPU latest test preview, small synthetic installation plus SDK baseline/knowledge wiring; 180s diagnostic initialize deadline; current package capture with 180s initialize deadline; no first-attempt failure','cases':cases,'sdk_rows':sum(c['sdk_rows'] for c in cases.values()),'citations':sum(c['citations'] for c in cases.values()),'bodies':sum(c['bodies'] for c in cases.values())}
+(run/'focused-verification.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');print({k:summary[k] for k in ['sdk_rows','citations','bodies']})

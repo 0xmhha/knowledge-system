@@ -1,0 +1,34 @@
+setup: --version auto resolved to e465090f
+==> [graph-build] Build the graph index
+ !  [toolchain] toolenv: not found on this machine: go (install them, or start the server from a shell that has them)
+    resolved git=/usr/bin/git (inherited_path)
+    time=2026-10-05T23:21:59.919Z level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-05T23:21:59.923Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-05T23:22:00.281Z level=INFO msg="temporal G6 emitted" commit_nodes=2 hunk_nodes=3 changed_in_edges=0 blame_edges=0 hunk_edges=3 hunk_blobs=3 max_per_file=10
+    time=2026-10-05T23:22:00.506Z level=INFO msg="build complete" nodes=5 edges=3 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 5 nodes / 3 edges into /logs/unsupported-python/dataset/e465090f/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-05T23:22:00.601Z level=INFO msg=ckv event=project_config.loaded trace_id=57b1d5a1b933a842 run_id=c91b10f3d2450ba6 path=/tmp/cks-build-source-2638968572/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0
+    time=2026-10-05T23:22:00.607Z level=INFO msg=ckv event=build.start trace_id=2a1c6f99fbd27538 run_id=c91b10f3d2450ba6 src_root=/tmp/cks-build-source-2638968572/tree out_dir=/logs/unsupported-python/dataset/e465090f/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-05T23:22:00.668Z level=INFO msg=ckv event=ckg_align.loaded trace_id=f0b09de5921fc681 run_id=c91b10f3d2450ba6 files_indexed=0 entries=0 canonical_available=true ckg_path=/logs/unsupported-python/dataset/e465090f/graph
+    ckv: 1/1 files (30.3 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-05T23:22:00.710Z level=INFO msg=ckv event=build.done trace_id=2a1c6f99fbd27538 run_id=c91b10f3d2450ba6 latency_ms=103 category_counts=map[:1] files_indexed=1 chunks_file_header=0 languages=map[markdown:1] out_dir=/logs/unsupported-python/dataset/e465090f/vector chunks_total=1 chunks_symbol=0 chunks_flow_step=0 chunks_doc=1 chunks_truncated=0 embedder_provider="" policy_loaded=false db_sha256=2f568490a69715140efdde17350ea35d933fc1ca4ff3d68ccb74622c3f85dfd0 chunks_canonical_id=0 chunks_flow_spine=0 src_root=/tmp/cks-build-source-2638968572/tree embedder=mock-feature-hash-v1 indexed_head=e465090f99bf83cd2db3dfe7d31949c94a114db8
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=e465090f99bf83cd2db3dfe7d31949c94a114db8 built_at=2026-10-05T23:22:00Z db=/logs/unsupported-python/dataset/e465090f/vector/vector.db sha256=2f568490a69715140efdde17350ea35d933fc1ca4ff3d68ccb74622c3f85dfd0
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /logs/unsupported-python/dataset/e465090f to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

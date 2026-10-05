@@ -34,9 +34,9 @@
 | R-10 | 새 머신·BGE-M3 실측 | 검증 완료 | environment/verification-m2max JSON, 실제 digest·1024차원·Ollama 0.35.1 | 모델 변경 전후 재검사 |
 | R-11 | 독립 고정 코퍼스 | 검증 완료 | commit `71cb71cd55960833e930269e272f7a4a060be3aa`, tree `f020f8f30fd209b8de045756dedd12ff83f65cd9`; alternates 없음 | 새 실행도 같은 독립 입력 사용 |
 | R-12 | 정답 12개 승인·모델 확정 | 검증 완료 | human-review-m2max JSON, questions 12/12 승인, approved preflight | 동적 사례 승인과 구분 |
-| R-13 | 전체 코퍼스 실모델 진단 | 부분 검증 | 선택된 1,569입력/13,575청크·해시·분할 재조립·strict embedding 검사 통과 | Go 29개 제외 때문에 범위 감사 partial; 공식 품질·통제된 지연 기준선 아님 |
+| R-13 | 전체 코퍼스 실모델 진단 | 새 범위 검증 완료 | 역사적 부분1,569/13,575와 새 승인strict1,598/13,820·Go992 전부 포함·DEV/FINAL 감사 연결 | 부분 진단을 새 strict 품질로 재사용하지 않음; 현재 품질fail/소표본inconclusive |
 | R-14 | 실모델 소형·장문 스모크 | 검증 완료 | verification-m2max JSON; 작은 실제 조회와 strict 장문 입력 통과 | 전체 질문 품질을 입증하지 않음 |
-| R-15 | B0/B1/C0/C1 완료 여부 | 미완료 확인 | 공식 품질 지표 null, 동적/프로토콜 draft, release preview | 아래 전체 실행 목록 |
+| R-15 | B0/B1/C0/C1 완료 여부 | 미완료 확인 | 승인 입력·DEV/FINAL 실측·최신package/복구 완료, 품질fail/disabled·stage0/4, 전체24/30 완료 | 사람HC/비용·운영scope/OP 종료6항목; 현황판/44절 |
 
 현재 입력 진단과 승인 기록은 [B0-M2MAX-GATE-REPORT](./B0-M2MAX-GATE-REPORT.md), 과거 구조 시험은 [A8-GATE-REPORT](./A8-GATE-REPORT.md)와 [B0-H-GATE-REPORT](./B0-H-GATE-REPORT.md)를 사용한다. 원자료는 `system/eval/b0-knowledge-system/`에 있다.
 
@@ -48,13 +48,13 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 |---|---|---|---|
 | 1 | P0 | 완료 재검증 R-01–15, 범위 누락·이력 증거 확인 | 구조 재검증 통과; 세 플랫폼 mock 패키지 재검증 통과 |
 | 2 | P0 | B0-01 입력 범위, B0-02/03 프로토콜·동적 검토 | 승인 기록·입력 정의 검증 완료 |
-| 3 | P1 | B0-04/06 재현 픽스처·측정 실행 도구 | 개발 6개 준비·원응답/exact/budget·회전/환경/입력 사본 도구 검증; 승인된 공식 입력 연결 대기 |
+| 3 | P1 | B0-04/06 재현 픽스처·측정 실행 도구 | 승인 DEV/FINAL 입력·실제 원응답/raw/state/backend 감사 완료 |
 | 4 | P1 | B1-01/02 실제 ablation 어댑터·팩 축 | 네 경로와 합성 팩 off/on 8경로 구현 검증 완료; 운영 사실/공식 판정 대기 |
-| 5 | P1 | B0-05 의미 사실·팩·canonical 출처 결합 검토 | 테스트 사례 승인 완료·새 source-bound 입력 결합 진행 |
-| 6 | P2 | B0-07–09 공식 기준선 | 선행 대기 |
-| 7 | P2 | B1-03–08 동일 조건 비교·판정 | B0 대기 |
-| 8 | P2 | C0-01–06 관측 실패의 스펙·시험·수정 | B1 대기 |
-| 9 | P3 | C1-01–07 재평가·운영·출시 결정 | 공식 품질은 C0 대기; C1-04/05/06 preview 준비 진행 |
+| 5 | P1 | B0-05 의미 사실·팩·canonical 출처 결합 검토 | 테스트 사례 승인·DEV/FINAL source-bound 입력 결합 완료 |
+| 6 | P2 | B0-07–09 공식 기준선 | 새 strict1598/13820·DEV3840/v1/raw 기준선 보고 완료 |
+| 7 | P2 | B1-03–08 동일 조건 비교·판정 | DEV/FINAL paired 및 기계 검사 완료; 사람 HC/검토 비용 대기 |
+| 8 | P2 | C0-01–06 관측 실패의 스펙·시험·수정 | FIX22–28 수정/회귀·개발 검증·기술 동결 완료 |
+| 9 | P3 | C1-01–07 재평가·운영·출시 결정 | FINAL/최신 package·복구 완료; 품질fail/disabled·사람/운영 종료 대기 |
 
 ## 3. B0: 승인된 입력과 재현 가능한 실모델 기준선
 
@@ -79,11 +79,11 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | B1-01 | P1 | baseline / concept_text / relations / combined의 네 가지 실행 어댑터 구현 | 실제 실행 경로가 다름을 검증; 기본 꺼짐; 원문 질의 우선; 후보 K 보존·오류/모호성 폴백; 단순 플래그 이름만 추가하지 않음 | 검증 완료: 네 MCP 경로·텍스트/관계 기여 분리·상한/폴백, mock/BGE-M3 각 20요청. 공식 품질 통과와 별개 |
 | B1-02 | P1 · B0-05/B1-01 | 팩 off/on 축을 연결하여 8 arms 구성 | 팩 잠금과 데이터셋 신원 분리; 권한·범위·출처 적용; 단순 Markdown을 검토된 팩으로 취급하지 않음 | 구현 검증 완료: 동일 dataset/lock의 8개 v2 경로, mock/BGE-M3 각 48요청·6정책 상태·인용/본문 보존·원문/integrity·DB 무변경 확인. 실제 팩 사실 검토·공식 B1 대기 |
 | B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 검증 완료: 승인 동일 모델/입력/질문/K·범위와 회전8arm DEV3840·입력 전후 불변. SDK 오류/계측 누락0, repeats와 가족 unit 분리. FINAL 비교는 C1-01 |
-| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: 승인 DEV3840·정적 v1 anchor20/raw 계측20, native raw16·가족 오라클 및 source/공개 Go 감사 완료. static Recall0.25/MRR0.125와 3개 miss, F05/06 모든8arm MRR0.75, F02 동점 순서 차이를 [실제 개발 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 기록. HC01–08 출력 해석/사람 기권 판정과 독립 FINAL 결과 남음 |
+| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: 승인 DEV3840/FINAL4800 질문군·분모·실패240·raw/v1/source/공개 Go 감사 완료. DEV Recall0.25/MRR0.125·FINAL 양성1/6/MRR0.5/6, 두 no-citation guard fail·F05/06 MRR0.75·F02 동점 차이 보존. [HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 해석/사람 기권 판정 대기 |
 | B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 검증 완료: DEV3840 출처·좌표/public Go 오류0, F03 proposed 비승격·F04 상태·F05 프로젝트·F06 acceptance/test trace 비승격 및 native10호출 혼입/손상/없음·backend0·private payload 비노출/복원 SHA 확인. 기존 권한/sanitization 회귀 포함; 일반 비밀 탐지/운영 ACL 보증 아님 |
-| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: DEV3840의 warm p50/p95·cold·backend 호출·응답 크기·환경 원장 완료. static/dynamic/pooled 원시 관측을 각각 집계하며 combined_on p95비1.292/1.614/1.065와 한계 보존. 사람 검토 비용은 미측정이며 FINAL 비용·사람 기록 남음 |
-| B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기: [실제 출력 주장 검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) HC01–08 및 비용 응답 요청 완료. 입력①–⑤ 승인을 출력 해석/기권·사람 비용 승인으로 대신하지 않음 |
-| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: [실제 개발 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 DEV3840 paired·실패/한계·1096소스 동결·FIX22–28 증거 연결. 반복/언어/상태를 독립 표본으로 세지 않으며 작은 중요 질문군 inconclusive. FINAL 비교와 HC/비용 판정 남음 |
+| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: DEV/FINAL warm/cold·backend·응답 크기·환경·정적/동적/pooled와 같은 축 비용 완료. 최신 전체 strict package 비용60+RSS2도 별도진단으로 연결. 사람 검토 비용은 미측정; 실제 값 또는 not_measured 종료 기록 대기 |
+| B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기: [실제 출력 주장 검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) HC01–08 및 FINAL 실제행 HC09–11·비용 응답 요청 완료. 입력①–⑤ 승인을 실제 해석/기권·비용 승인으로 대신하지 않음 |
+| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: DEV/독립 FINAL paired 비교·실패/불확실·같은 축 비용·원자료·1096소스 동결 완료. 중요 그룹 n<10 inconclusive·FINAL 품질fail·disabled 유지. HC/비용 판정을 연결한 종료 남음 |
 
 기존 설계 회귀 조건: 안전/좌표/비밀 혼입 0, 기권 오인용 증가 0, 전체 Recall@10·MRR 변화 ≥ −0.02, 중요 질문군 변화 ≥ −0.05, warm p95 비율 ≤ 1.25. 작은 최종 질문군의 결론 규칙은 B0-02 검토 대상이다. 수치가 충분하지 않으면 기본 활성 근거로 사용하지 않는다.
 
@@ -105,10 +105,10 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-01 | P3 · C0-06 | B0/B1과 같은 조건의 최종 재평가 | 버전 차이·입력 차이·실행 원자료 명시; 독립 최종 조건 유지 | 검증 완료: [승인 FINAL 보고](./C1-APPROVED-FINAL-REPORT.md)에 동결 CKS/BGE/K·8arm·2/5/20/3의4800회, source/공개 Go4560 valid·POLICY03 오류240·raw20·v1 anchor40/계측40·F04 stale와5입력/저장소/1096소스 불변 연결. 실패 상태/분모를 보존하며 평가 합격으로 바꾸지 않음 |
 | C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 검증 완료: FINAL 실행오류240/4800·양성 정적1/6 회수·v1 두 인용0개 guard fail에 따라 품질fail/출시보류, 중요 질문군 n<10 inconclusive. latency population/같은 축 비교 모두 보존. 운영 stage gate 완료/출시 승인은 별도 |
 | C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 검증 완료: 사용자 승인 프로토콜 n<10의 기본 활성/출시 금지 규칙과 FINAL 실패·비용 불확실성에 따라 disabled 유지. 구현 opt-in 확인, 사람 검토 비용은 미측정. 별도 출력·운영 승인을 만들지 않음 |
-| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: 최신 FIX-19 세 대상 preview·실모델/복구와 부분 대규모13,575청크의60 SDK·480원문/인용·별도RSS2호출 준비 검증; backend 오류840 보존·FTS 후보8개 재현. native amd64·공식 대규모/최종 운영 후보·품질은 남음 |
+| C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 검증 완료: [최종 package 검증](./C1-FINAL-PACKAGE-VALIDATION.md)에 checkpoint10cb의 최신3대상 시험 서명/설치·고지/SHA·Darwin archive 재현·actual BGE guard10·Linux actual6·전체1598/13820 비용60+RSS2/원문504/공개 Go·backend 오류360/12/6 보존 연결. native amd64·실운영 비용/키/적합성은 환경 없는 대상 pending/preview로 명시 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조와 [원래 SQLite·musl 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)의 501입력·SQLite C 공식 SHA3·Linux 헤더436개 분류/생성4 재생 완료 범위 존재; Darwin SDK·전체 생성기/전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
-| C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 진행: 최신 Darwin 시험 preview의 후보 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·원본 소스 없는 재생, 구 데이터의 첫 신규 소비자 전 SHA·새 재색인·구 v1 rollback 보존 검증. [복구 문서](./C1-RECOVERY-VALIDATION.md); 최종 후보/운영 범위·OP-08 남음 |
-| C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 대기 |
+| C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 검증 완료: 최종 추출 Darwin package의 구 데이터 첫 신규 소비자 전 SHA·새 strict 재색인/구 v1 rollback·후보 실패/손상 거부·pin/update/current rollback·새 루트 backup 복원·source 없는 재생·독립 SDK11/인용11/v2 integrity6 확인. [복구 문서](./C1-RECOVERY-VALIDATION.md). 소형 mock/합성 HTTP 범위; 실제 운영 OP-08은 C1-05/07 잔여 |
+| C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 진행: [최종 지원·제한·종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)에 최신3대상 증거·native amd64 pending·품질fail/소그룹 inconclusive/disabled·전체6미완료와 사람/운영 종료 범위를 정리. 최종 범위/OP·HC 응답 대기 |
 
 ## 7. 실행 증거 원장
 
@@ -501,3 +501,15 @@ C1-01 FINAL4800을 별도 소스로 실행 중이다. static transport manifest�
 진단 원장 경로 재사용으로 추가한9로그는 전체파일/추가tail/원측정prefix 및3SHA를 보관하고240개 원 measurement ID의 prefix로 복원했다. report/rows·5승인입력·native 저장소·동결바이너리/1096소스는 그대로다. 원자료237MB를20.37MB 무손실압축 및oracle 원장으로 보관했다. 최초 Go 실패exit코드 가정/보고 분모 오류도 수정 전후 자료로 보존한다.
 
 C1-01/02/03의 수집·판정·disabled 결정 범위를 완료했다. 전체22완료/8미완료이며 official stage ledger는 사람·운영 종료가 남아0/4다. 다음 우선순위는 최종 소스 checkpoint 후 최신 세 플랫폼 package/실모델·대규모/복구 검증이다. 남은 전체 B1-04·06·07·08, C1-04·05·06·07 및 HC/비용·OP01–08/native amd64/적합성·지원/출시 범위를 유지한다.
+
+## 44. 최종 패키지·전체 strict 비용·독립 복구 완료
+
+2026-10-06 [최종 패키지 검증](./C1-FINAL-PACKAGE-VALIDATION.md)과 [보관 원장](../../system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/summary.json)에 checkpoint10cb 최신 Darwin ARM64/Linux ARM64/Linux AMD64(emulated) 서명·두 검증기·세 mock 설치/업데이트/롤백을 연결했다. 고지/세 binary SHA·Darwin 재빌드 archive SHA 일치 확인. 제품1096/승인5입력 SHA는 동결 그대로다. Linux 합성fixture와 원본commit·공식 runtime SHA를 구분한다.
+
+Darwin actualBGE state guard10·정상6/음성4, Linux CPU actualBGE3project·SDK6/8인용, 전체 strict1598파일/13820벡터의 단일DEV60 SDK/480인용·별도RSS2/16인용·Go/source/backend MID 감사를 완료했다. 비용 OFF/ON warm p95 1.682/1.995초, 관측MCP RSS82528KiB·capture23520·합106144. 공유호스트·단일 비회전질문·residentmodel·backend neighbors 오류360/12 및Linux6·180초 초기화·nativeamd64 실환경 없음 제한을 유지했다. 공식 품질/운영 승인으로 합산하지 않는다. 사용자 Ollama는 종료/언로드하지 않았고 소유Linuxmodel서버만 제거했다.
+
+최종 최신package로 실패 후보/손상 거부·pin/update/이전current·백업새루트/source없는 재생·구1ded9b3 v1/첫신규소비자전 SHA·재색인/구rollback을 확인했다. 독립원자료 SDK11/인용11/v2integrity6·payload/sidecar 감사, 추가archive-only62+6 SDK504인용 재생과 losslessfile/비바이너리자산 SHA 검사를 완료했다. 시험 privatekey/SQLite/modelblob/실행파일은 Git보관에서 제외했다. 보관helper 과거경로·표지문자열 오탐·재개중복SHA 실패와수정자료를 모두 보존했고 제품/질문/모델수집은 재실행하지 않았다.
+
+C1-04/06의 명시된 기술 완료조건을 닫았다. 실제운영 OP-08·네이티브AMD64/운영비용·법무/키/역할/지원범위는 [종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)에 잔여로 유지한다. 전체24완료/6미완료: B1-04·06·07·08, C1-05·07. HC01–08/비용·운영scope 기존질문은 대기이며 FINAL HC09–11 실제행 검토를 추가 요청했다. 다음은 사람출력/비용·scope응답 기록과 B1/C1 종료다. 품질fail·소그룹inconclusive·disabled·official stage0/4·전체목표미완료를 유지한다.
+
+최종 완료 재검증: [24항목 재검토 원장](../../system/eval/b0-knowledge-system/completion-reaudit-m2max-2026-10-06.json)은 완료조건/증거 링크·동결1096/승인5 SHA·root Go/B1 Python 후속 통과 원문·최신archive721파일/504인용·복구11행을 확인한다. [문서 검사](../../system/eval/b0-knowledge-system/final-package-closure-checks-m2max-2026-10-06/docs-check.log)는239 live문서 통과다. 실제사람판정과 운영권한·전체목표완료를 대신하지 않는다.

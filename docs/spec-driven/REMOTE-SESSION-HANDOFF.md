@@ -1,20 +1,20 @@
 # 다른 머신의 B/C 단계 작업 인계
 
-## 최신 재개 지점: 2026-10-06 FINAL4800 실패 포함 감사 완료·최신 package 검증
+## 최신 재개 지점: 2026-10-06 기술 수집·최신 패키지/복구 완료, 사람 종료 대기
 
-입력①–⑤ 승인 완료. [현황](./EXECUTION-STATUS.md), [작업리스트43절](./EXECUTION-WORKLIST.md), [DEV 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md), [FINAL 보고](./C1-APPROVED-FINAL-REPORT.md)를 우선한다. 전체22완료/8미완료·official stage0/4. 남은 전체는 B1-04·06·07·08, C1-04·05·06·07이다. 아래 과거 승인 대기/완료 수는 당시 기록이다.
+입력①–⑤ 승인 완료. [현황](./EXECUTION-STATUS.md), [작업리스트44절](./EXECUTION-WORKLIST.md), [DEV](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md), [FINAL](./C1-APPROVED-FINAL-REPORT.md), [최종 패키지](./C1-FINAL-PACKAGE-VALIDATION.md), [최종 종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)를 우선한다. **24완료/6미완료**, official stage0/4. 남은 전체 B1-04·06·07·08, C1-05·07. 아래 과거 수치/승인 대기는 당시 기록이다.
 
-DEV3840과 독립 FINAL4800 수집 종료. FINAL 원본 `/private/tmp/ks-approved-final-sweep-20261006/execution.json`의 failed_preserved 상태를 그대로 보존한다. 정상팩4560 source/공개 Go 유효, POLICY03 오류240. 정적 양성1/6·MRR0.5/6, v1 양성1pass/5miss·두 인용0개 guard fail. raw20/F01 자격/F02 noise 동점/F04 stale/v1 계측40 완료. 실제 Go로10개 retained span 검증 뒤33104바이트에서 budget_exceeded가 발생함을 확인했다. FINAL query/gold/K/상한/제품 코드를 튜닝하지 않았다.
+DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 source/공개 Go 유효·POLICY03 오류240. 양성 정적1/6·MRR0.5/6, v1 기대 양성1pass/5miss·두 인용0개 guard fail. raw20/F01 자격/F02 noise 동점/F04 stale/v1 계측40 완료. actual Go retained body33104bytes가32000 상한을 넘는 budget_exceeded 원인을 확인했다. FINAL을 보고 query/gold/K/상한/제품소스를 튜닝하지 않았다. source1096·승인5입력/native 저장소 불변, opt-in/disabled·품질fail·중요그룹inconclusive·운영출시보류 유지.
 
-실행 바이너리 `/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks` SHA `3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6`, 개발 동결1096소스/승인5입력/native 저장소 불변. 사용자 Ollama를 종료/언로드하지 않았다. 제품 기본값은 opt-in이며 승인 소표본 규칙과 실패에 따라 disabled 유지. 소수표본이나 pooled 비용 하나로 release pass를 만들지 않는다.
+실행 동결CKS `/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks` SHA3b80c36d…89d0e6. FINAL raw archive는 `system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-after-development-freeze`와 final-oracles. 최종집계 final-summary-corrected.json. 초기분모/Go exit/record가정 및 진단1회의 공식원장9줄 append는 full/prefix/tail·3SHA·original MID240 복원 증거를 보존했고 original report/rows는 유지했다.
 
-원자료는 `system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-after-development-freeze`(237MB→20.37MB, 전체계획행·failed_capture 포함) 및 `final-oracles`에 SHA/무손실 gzip 보관. 최종 집계는 final-summary-corrected.json이다. 최초 집계 source 분모 오류, Go 실패exit2/record status 가정, 진단1회 원장 재사용9로그의 전체/tail/prefix·3SHA·원 MID240 복원을 별도 보존했다. original report/rows는 그대로다. 실패한 후속 스크립트/대기3개는 작업 전용으로 종료했고 필요한 단계만 재개해 완료했다.
+새 checkpoint **10cbffaa104e062052e34d19a27cec3ee8b3548c**에서 최신 Darwin/LinuxARM/LinuxAMD(emulated)를 빌드·서명·두 검증기·mock3project 설치/업데이트/롤백·고지/SHA 검증. Darwin archive재빌드 SHA동일. 새CKS SHAb420a559…22d6e8은 공식runtime과다르며 제품source1096은동일하다. 실제 BGE Darwin guards10(정상6/음성4), Linux3project/SDK6(8인용), strict1598/13820의60SDK/480인용·별도RSS2/16인용 source/public/backend 결합 완료. backend neighbors360/12/Linux6 오류는보존. 단일DEV 비회전질문/공유host/rResidentmodel 비용이며 officialFINAL아니다. LinuxCPU4/4GiB+caller1/512MiB·180초 deadline·실제nativeAMD64없음. 사용자Ollama 유지, 소유Linux서버만종료.
 
-C1-01/02/03의 수집·판정·disabled 범위 완료. 다음 우선순위: 현재 소스·자료를 로컬 checkpoint → 최신 Darwin arm64/Linux arm64/Linux amd64(emulated) 시험 preview → 실제 BGE/승인 대규모13820·복구 → 지원/known limits·사람 출력/운영 종료. Linux fixture는 Git tracked 파일만 복사하므로 새 제품 파일을 먼저 커밋한다. 재빌드 package의 VCS/version/binary SHA와 공식 runtime을 구분하고 bit identity를 추정하지 않는다. 품질 fail인 후보를 운영 release로 부르지 않는다.
+최종 extractedDarwin의 실패/손상·pin/update/rollback·backup새root/source없는재생·구1ded9b3 v1/pristineSHA/재색인/legacyrollback 독립11SDK/11인용/v2integrity6 검증. C1-04/06 기술조건 완료. proof는 `system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06`에 약5MB·721파일+inventory, losslessraw/SHA/package비바이너리자산·작은source블롭만보존. archive-only68SDK/504인용 재생통과. 보관helper 경로/키표지 오탐/중복SHA 오류도보존. privatekey/SQLite/modelblob/실행파일은Git제외.
 
-[HC01–08 출력/비용](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 및 [운영 scope/OP](./C1-OPERATIONS-REVIEW.md) 응답은 별도 대기다. 입력 승인을 출력/사람 기권·비용·운영 정책/법적 적합성 승인으로 바꾸지 않는다. 미측정 비용은0이 아니며 native amd64 실환경/운영 키·역할/신뢰·전체 적합성은 미제공이다. 답변이 오면 frozen5입력을 수정하지 말고 별도 검토 기록에 결합한다.
+**다음은 사람 응답 기록**이다. HC01–08/실제 검토 비용·C1 시험preview vs실제운영 scope의 기존비동기질문은대기. FINAL추가HC09–11 실제행 해석/기권 질문도요청했다. `not_measured`를0비용이나사람승인으로만들지않는다. 입력①–⑤승인을 출력/운영역할/키/법무/지원승인으로확장하지않는다. reply오면 frozen5입력대신 별도검토파일에 원문·시각·근거SHA를기록한다. 시험scope선택시명시적운영잔여를기록해종료, 운영선택시OP01–08실제역할/키·신뢰/법무/native환경/backup·failover가필요하다. 제품튜닝이나대규모재수집을반복하며기다리지않는다.
 
-사용자 `.claude/`, `logs/` 보존·커밋 제외. 원격 push의 이전 구체적 승인329becf3은 이미 처리된 범위이며 새 push 승인 없음. 매 세부 완료마다 현재 단계·검증·다음·남은 전체8개를 화면 로그에 표시한다. 앱 기존 goal은 blocked 상태지만 동일 목표의 실제 작업은 계속 수행하며 완료로 바꾸지 않았다.
+사용자 `.claude/`, `logs/` 보존·커밋제외. 이전특정push승인329becf3은처리됐으며 새push승인없음. 이후로컬자료commit은운영배포/push권한이아니다. 매세부완료마다 현재단계·다음·남은전체6항목을화면에표시한다. 기존appgoal blocked지만실제동일목표작업을계속수행했고 목표완료로바꾸지않았다.
 
 작성일: 2026-10-03. 이 문서는 다른 머신의 Codex 세션에 그대로 전달할 작업 프롬프트다. 실행 전 원격 브랜치와 문서의 최신 상태를 확인하고, 이후 변경 사항이 있으면 이 문서보다 최신 커밋과 WBS를 우선한다.
 

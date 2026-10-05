@@ -1,0 +1,72 @@
+from pathlib import Path
+import tarfile,json,hashlib,subprocess,gzip,importlib.util,base64
+root=Path.cwd();r=Path('/private/tmp/ks-approved-scope-20261006');target=root/'system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06';target.mkdir(exist_ok=True);load=lambda p:json.loads(p.read_bytes());sha=lambda b:hashlib.sha256(b).hexdigest();records=[]
+def keep(p,dest):
+ raw=p.read_bytes();q=target/dest;q.parent.mkdir(parents=True,exist_ok=True)
+ if len(raw)>200000:q=q.with_name(q.name+'.gz');q.write_bytes(gzip.compress(raw,mtime=0));encoding='gzip'
+ else:q.write_bytes(raw);encoding='identity'
+ records.append({'source':str(p),'path':str(q.relative_to(target)),'raw_bytes':len(raw),'raw_sha256':sha(raw),'stored_sha256':sha(q.read_bytes()),'encoding':encoding})
+def bounded_tree(p,prefix):
+ for f in sorted(p.rglob('*')):
+  rel=f.relative_to(p)
+  if f.is_symlink()or not f.is_file()or any(x in rel.parts for x in ['.git','dist','unpacked','old','new-ckg','new-ckv','new-cks']):continue
+  if f.name=='private.pem' or f.name in ['cks','ckg','ckv']:continue
+  if f.suffix in ['.json','.jsonl','.yaml','.log','.txt','.md','.ts','.py','.sig']or f.name=='public.pem':keep(f,Path(prefix)/rel)
+roots={'darwin-arm64':Path('/private/tmp/ks-final-package-darwin-20261006'),'linux-arm64':Path('/private/tmp/ks-final-package-linux-arm64-20261006'),'linux-amd64-emulated':Path('/private/tmp/ks-final-package-linux-amd64-20261006')};summary={'scope':'latest frozen-product test preview; quality failed and operating/human approvals pending','packages':{},'source_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'quality_pass':False,'operating_release':False,'native_amd64':False}
+freeze=load(r/'development-freeze.json');assert all(sha(Path(p).read_bytes())==d for p,d in freeze['product_source_sha256'].items());assert all(sha(Path(p).read_bytes())==d for p,d in freeze['approved_input_sha256'].items());summary['frozen_product_source_files_unchanged']=1096;summary['approved_inputs_unchanged']=5
+for label,p in roots.items():
+ archive=next((p/'dist').glob('*.tar.gz'));declared=load(Path('/private/tmp/ks-final-package-darwin-20261006-package.json')if label=='darwin-arm64'else p/'package.json');assert sha(archive.read_bytes())==declared['sha256'];assets={}
+ with tarfile.open(archive)as t:
+  es={x.name.split('/',1)[1]:x for x in t if '/'in x.name};manifest=json.load(t.extractfile(es['manifest.json']));inventory=json.load(t.extractfile(es['third-party-licenses.json']));assert manifest['scope']=='host-preview'and manifest['third_party_license_review']=='pending';assert manifest['third_party_license_inventory']['sha256']==sha(t.extractfile(es['third-party-licenses.json']).read());assert manifest['third_party_license_inventory']['missing_license_count']==manifest['third_party_license_inventory']['missing_vendored_license_count']==0
+  for name in ['cks','ckg','ckv']:assert sha(t.extractfile(es[name]).read())==manifest['binaries'][name]['sha256']
+  notices=[f for m in inventory['modules']for f in m['license_files']]+[f for a in inventory['vendored_assets']for f in a['license_files']]
+  for f in notices:assert sha(t.extractfile(es[f['path']]).read())==f['sha256']
+  for name,e in es.items():
+   if not e.isfile()or name in['cks','ckg','ckv']:continue
+   raw=t.extractfile(e).read()
+   try:content={'encoding':'utf-8','text':raw.decode()}
+   except UnicodeDecodeError:content={'encoding':'base64','base64':base64.b64encode(raw).decode()}
+   assets[name]={'bytes':len(raw),'sha256':sha(raw),**content}
+  summary['packages'][label]={'archive_sha256':declared['sha256'],'archive_filename':archive.name,'manifest':manifest,'binary_sha256':{n:manifest['binaries'][n]['sha256']for n in ['cks','ckg','ckv']},'copied_notice_files_verified':len(notices),'tar_entries':len(t.getmembers()),'test_signatures_only':True,'legal_review':'pending','native_amd64_execution':False}
+ dest=target/label;dest.mkdir(exist_ok=True);(dest/'package-nonbinary-assets.json').write_text(json.dumps(assets,ensure_ascii=False,indent=2)+'\n');bounded_tree(p,label);keep(Path('/private/tmp/'+p.name+'.log')if Path('/private/tmp/'+p.name+'.log').exists()else Path('/private/tmp/ks-final-package-darwin-20261006-validation.log'),Path(label)/'host-driver.log')
+repro=load(Path('/private/tmp/ks-final-package-darwin-repro-20261006.json'));assert repro['sha256']==summary['packages']['darwin-arm64']['archive_sha256'];summary['darwin_archive_reproducible']=True;keep(Path('/private/tmp/ks-final-package-darwin-repro-20261006.json'),Path('checks/darwin-repro.json'))
+spec=importlib.util.spec_from_file_location('state',root/'scripts/b0-audit-state-isolation.py');S=importlib.util.module_from_spec(spec);spec.loader.exec_module(S);sdk=load(roots['darwin-arm64']/'actual-bge-guard-sdk.json');assert not sdk['test_failed'];cases=load(r/'approved-state-guards/cases.json');byid={c['ID']:c for c in cases};positive=negative=cites=bodies=0
+for row in sdk['rows']:
+ if 'raw_call'not in row:
+  if row['id'].endswith('-runtime'):assert row['binary_sha256']==row['binary_after_sha256']==summary['packages']['darwin-arm64']['binary_sha256']['cks'] and row['config_sha256']==row['config_after_sha256']
+  if row['id'].endswith('-seals'):assert row['original_and_copy_payloads_unchanged']
+  continue
+ response=row['raw_call']['response']
+ if row['expected_code']:negative+=1;assert response['isError']and response['structuredContent']['code']==row['expected_code']
+ else:
+  positive+=1;assert row['go_verify_valid'];version=Path(byid['F-04-DEV-old'if row['id'].startswith('F-04')else'F-05-DEV-a']['Version']);identity=load(version/'dataset-identity.json');src=Path('/private/tmp/ks-approved-dynamic-dev-20261006/sources')/('F-04-DEV-old'if row['id'].startswith('F-04')else'F-05-DEV-a')
+  # Reconstruct retained source rather than assuming a driver source-root layout.
+  import tempfile
+  with tempfile.TemporaryDirectory()as d:
+   src=Path(d)
+   for f in load(version/'sources/manifest.json')['files']:
+    if f['kind']=='regular'and f['origin_id']=='repo':
+     raw=(version/'sources/blobs'/f['sha256']).read_bytes();assert sha(raw)==f['sha256'];q=src/f['path'];q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(raw)
+   pack=response['structuredContent'];S.BASE.verify_pack(pack,identity,src);cites+=len(pack['citations']);bodies+=len(pack['bodies'])
+summary['darwin_actual_bge_sdk']={'rows':10,'positive':positive,'negative':negative,'source_verified_citations':cites,'source_verified_bodies':bodies};assert(positive,negative)==(6,4)
+recovery=Path('/private/tmp/ks-final-recovery-20261006');legacy=Path('/private/tmp/ks-final-legacy-recovery-20261006');bounded_tree(recovery,'owned-recovery');bounded_tree(legacy,'legacy')
+# Preserve unmodified source payloads; intentionally damaged updated blob is separately retained.
+for label,v in [('baseline',recovery/'backup/baseline'),('updated',recovery/'dataset/updated'),('restored',recovery/'restored-dataset/restored'),('reindexed',legacy/'dataset/reindexed')]:
+ keep(v/'dataset-identity.json',Path('retained')/label/'dataset-identity.json');keep(v/'sources/manifest.json',Path('retained')/label/'sources/manifest.json')
+ for f in load(v/'sources/manifest.json')['files']:
+  if f['kind']!='regular':continue
+  p=v/'sources/blobs'/f['sha256'];raw=p.read_bytes()
+  if sha(raw)!=f['sha256']:
+   assert label=='updated';keep(p,Path('checks/damaged-updated-blobs')/f['sha256']);raw=(recovery/'source-removed'/f['path']).read_bytes();assert sha(raw)==f['sha256'];q=target/'retained'/label/'sources/blobs'/f['sha256'];q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(raw)
+  else:keep(p,Path('retained')/label/'sources/blobs'/f['sha256'])
+summary['owned_recovery']=load(recovery/'verification.json');assert summary['owned_recovery']['binary_sha256']==summary['packages']['darwin-arm64']['binary_sha256'];summary['legacy_scope']=load(legacy/'verification.json')['scope'];(target/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+# Adapt already-tested independent recovery audit to newly retained evidence.
+s=(root/'system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/audit-artifact.py').read_text().replace("system/eval/b0-knowledge-system/recovery-m2max-2026-10-04",str(target)).replace('darwin-final','owned-recovery').replace('legacy-final','legacy').replace("summary['binary_sha256']['cks']","summary['packages']['darwin-arm64']['binary_sha256']['cks']")
+(target/'audit-recovery.py').write_text(s);subprocess.run(['python3',str(target/'audit-recovery.py')],check=True)
+bounded_tree(Path('/private/tmp/ks-final-package-large-cost-20261006'),'large-cost');bounded_tree(Path('/private/tmp/ks-final-linux-real-20261006'),'linux-arm64-real')
+for label in ['large-cost','linux-arm64-real']:
+ p=Path('/private/tmp/ks-final-package-large-cost-20261006'if label=='large-cost'else'/private/tmp/ks-final-linux-real-20261006');keep(p/('summary.json'if label=='large-cost'else'focused-verification.json'),Path('checks')/(label+'.json'))
+for f in ['validate-final-darwin-package.py','final-package-large-cost.py','final-package-large-memory.py','audit-final-package-large.py','run-final-linux-real-host.py','run-final-linux-real-focused.py','audit-final-linux-real.py','retain-final-packages.py']:keep(r/f,Path('reproduction')/f)
+for f in ['package-host.py','prepare-platform-fixture.py','license_inventory.py','release-sidecar.py','verify-release.py','wbs-linux-package-smoke.sh','wbs-install-smoke.sh','wbs-recovery-smoke.py','wbs-legacy-recovery-smoke.py','Dockerfile.linux-build','Dockerfile.linux-runtime-smoke']:keep(root/'scripts'/f,Path('source/scripts')/(f+'.txt'))
+keep(r/'development-freeze.json',Path('checks/development-freeze.json'));keep(r/'approved-state-guards/cases.json',Path('checks/approved-state-guards.json'))
+(target/'evidence-manifest.json').write_text(json.dumps({'scope':'lossless bounded metadata/raw responses/scripts; no private keys, model blobs, SQLite or executables','files':records},ensure_ascii=False,indent=2)+'\n');print('latest package evidence retained',len(records),flush=True)

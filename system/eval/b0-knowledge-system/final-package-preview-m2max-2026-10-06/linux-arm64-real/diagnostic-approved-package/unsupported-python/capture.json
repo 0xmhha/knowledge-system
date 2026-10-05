@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T23:28:52.896839378Z",
+  "finished_at": "2026-10-05T23:29:08.015004927Z",
+  "request_sha256": "bebcc1fe4553b8db2f7fbfa50562de326c6cf664d49941ea321d3c31ed292990",
+  "config_sha256": "e90cd9a685591000fdbe8133338063ed16beaa229d2c0c8cf0bc714a48e25335",
+  "binary_sha256": "499ba384cd47f6e96a7e18604e8a917f88909d701fcb87ffc70a2b69291e3dd5",
+  "config_sha256_after": "e90cd9a685591000fdbe8133338063ed16beaa229d2c0c8cf0bc714a48e25335",
+  "binary_sha256_after": "499ba384cd47f6e96a7e18604e8a917f88909d701fcb87ffc70a2b69291e3dd5",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 180000000000,
+  "rows": [
+    {
+      "request_id": "guide-False",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "9c66c77f745113c84af20bfd8e30cde5",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": false,
+          "knowledge_as_of": "2026-10-06",
+          "knowledge_subsystem": "unsupported-python",
+          "prompt": "Where is the committed guide for unsupported-python?"
+        },
+        "elapsed_ns": 654753792,
+        "completed_at": "2026-10-05T23:29:07.48961751Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+              "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+              "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+              "source_mode": "committed",
+              "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e"
+            },
+            "query": "Where is the committed guide for unsupported-python?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+                "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+                "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+                "source_mode": "committed",
+                "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                "origin_id": "repo",
+                "file_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745",
+                "content_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                  "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+                  "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+                  "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+                  "source_mode": "committed",
+                  "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                  "origin_id": "repo",
+                  "file_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745",
+                  "content_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745"
+                },
+                "text": "# Guide\nA committed guide for unsupported-python.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "bc4e780231794fa4553382d0c71c496b27c636791754730a62749f8b85648146"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "guide-True",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "b06b3d97e51aa7b386fe6ccbc44068ae",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-06",
+          "knowledge_subsystem": "unsupported-python",
+          "prompt": "Where is the committed guide for unsupported-python?"
+        },
+        "elapsed_ns": 504461959,
+        "completed_at": "2026-10-05T23:29:07.994125719Z",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+              "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+              "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+              "source_mode": "committed",
+              "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e"
+            },
+            "query": "Where is the committed guide for unsupported-python?",
+            "citations": [
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+                "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+                "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+                "source_mode": "committed",
+                "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                "origin_id": "repo",
+                "file_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745",
+                "content_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                  "project_id": "p-25da5767f0cebe4c912baba9ecb63e41",
+                  "dataset_id": "630b4411e606a6bacce2e49d1bd55402cb82e0a70fc5f69400a5a3e18bed49aa",
+                  "snapshot_id": "f99a430ec5058527384edadd9192ff277ceba36248a5e0bf18731ba8c00e8801",
+                  "source_mode": "committed",
+                  "base_commit": "c5946578c6e12dfc7f2573173b8f6e91b54b2d8e",
+                  "origin_id": "repo",
+                  "file_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745",
+                  "content_sha256": "883c5213f7192545dc792e486d6a7c6f42b6dd753b5e20c49a9e7f4085062745"
+                },
+                "text": "# Guide\nA committed guide for unsupported-python.\nThe quartz project records its setup and source in this guide.\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "bc4e780231794fa4553382d0c71c496b27c636791754730a62749f8b85648146"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

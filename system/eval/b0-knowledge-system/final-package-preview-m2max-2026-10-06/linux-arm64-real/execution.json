@@ -1,0 +1,128 @@
+{
+  "status": "captured_pending_independent_source_sdk_audit",
+  "checks": [
+    {
+      "id": "server-start",
+      "command": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "ks-final-bge-linux-arm64-20261006",
+        "--platform",
+        "linux/arm64",
+        "--network",
+        "none",
+        "--cpus",
+        "4",
+        "--memory",
+        "4g",
+        "-e",
+        "OLLAMA_HOST=127.0.0.1:11434",
+        "-e",
+        "OLLAMA_MODELS=/models",
+        "-e",
+        "OLLAMA_NUM_PARALLEL=1",
+        "-e",
+        "OLLAMA_MAX_LOADED_MODELS=1",
+        "-v",
+        "/private/tmp/ks-linux-real-model-20261004/models:/models:ro",
+        "-v",
+        "/Users/kevin/.ollama/models/blobs/sha256-daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c:/models/blobs/sha256-daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c:ro",
+        "sha256:47e391932267b8d18bcf50659b67737b63af4b16863e8da84b9e5d29f17d4ebb",
+        "serve"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "374311d57bb7b0137140fb2bd3588e7b13af5e9d8d2bd53def71973cab0c3a30",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "server-ready",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--platform",
+        "linux/arm64",
+        "--network",
+        "container:ks-final-bge-linux-arm64-20261006",
+        "knowledge-system-runtime-smoke:bookworm-arm64",
+        "python3",
+        "-c",
+        "import urllib.request,time; deadline=time.monotonic()+30\nwhile True:\n try:\n  print(urllib.request.urlopen(\"http://127.0.0.1:11434/api/version\",timeout=2).read().decode());break\n except Exception:\n  if time.monotonic()>deadline:raise\n  time.sleep(.5)"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "020f796495ffc0d024d43c7a96a06f4b82d3167482027e3a34d328645ffaf73a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "server-inspect",
+      "command": [
+        "docker",
+        "inspect",
+        "ks-final-bge-linux-arm64-20261006"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "d67dfe525660173b32f2cb569452b8d7d5e98240b8ee4138718952ca4343032a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "runtime-focused",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--platform",
+        "linux/arm64",
+        "--network",
+        "container:ks-final-bge-linux-arm64-20261006",
+        "--cpus",
+        "1",
+        "--memory",
+        "512m",
+        "-v",
+        "/private/tmp/ks-final-linux-real-20261006:/out",
+        "-v",
+        "/private/tmp/ks-final-package-linux-arm64-20261006/dist:/package/dist:ro",
+        "-v",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts:/scripts:ro",
+        "-v",
+        "/private/tmp/ks-approved-scope-20261006/run-final-linux-real-focused.py:/run-focused.py:ro",
+        "knowledge-system-runtime-smoke:bookworm-arm64",
+        "python3",
+        "/run-focused.py"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "5004ac668f074d0dae7179c0ab3923f49ec6ba1fb88cb30d6488e743de9e91e6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "server-inspect-after",
+      "command": [
+        "docker",
+        "inspect",
+        "ks-final-bge-linux-arm64-20261006"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "d67dfe525660173b32f2cb569452b8d7d5e98240b8ee4138718952ca4343032a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "server-logs",
+      "command": [
+        "docker",
+        "logs",
+        "ks-final-bge-linux-arm64-20261006"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "04dc62c418ff00a8c28bb2eab1ed87c4149f7d3109f7ba7e0ad0f292e73327f5",
+      "stderr_sha256": "4fb2ab022be125a3e357f6baf878b3666359fa67aad4abd0ec9ecca6126b9bb2"
+    }
+  ],
+  "model_bytes_unchanged": true,
+  "native_linux_arm64_vm": true,
+  "native_amd64": false,
+  "operating_release": false,
+  "quality_metrics": null,
+  "finished_at": "2026-10-05T23:29:09.061152+00:00"
+}

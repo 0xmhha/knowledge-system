@@ -1,6 +1,6 @@
 # C1 복구·구 데이터 보존 검증
 
-2026-10-04 · **프리뷰 진단 통과 / C1-06 진행**. [작업리스트](./EXECUTION-WORKLIST.md)의 복구 준비 증거다. 최종 운영 후보·담당자·운영 복구 승인과 공식 품질은 남아 있다.
+2026-10-06 최신 상태: **C1-06 기술 범위 검증 완료**. [최종 동결 패키지/복구](./C1-FINAL-PACKAGE-VALIDATION.md)에서 새 후보로 재검증했다. 아래 2026-10-04 내용은 이전 실행 이력이다. [작업리스트](./EXECUTION-WORKLIST.md)의 복구 준비 증거다. 최종 운영 후보·담당자·운영 복구 승인과 공식 품질은 남아 있다.
 
 ## 실행 범위와 결과
 
@@ -65,3 +65,5 @@ python3 system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/audit-artifact
 
 
 2026-10-05 최신 FIX-19 extracted preview의 [후속 검증](./C1-LATEST-PREVIEW-VALIDATION.md)에서 작은 mock backup/소스 없는 재생·실패/손상/rollback과 고정 pre-WBS v1 소비자+합성 HTTP·새 v2 reindex/legacy rollback을 다시 확인했다. 실제 운영 자료·담당자·키·RTO/RPO와 최종 품질 동결 후보의 복구 승인은 별도다.
+
+2026-10-06: checkpoint10cb의 최종 추출 preview에서 위 실패·pin/update/rollback·새 루트 backup/source없는 재생·구 v1/pristine SHA/reindex/legacy rollback을 다시 확인했다. [최종 독립 감사](../../system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/independent-audit.json)는 SDK11/인용11/v2 integrity6과 원본/backup/복원 payload·typed 실패를 검증했다. 작업리스트 C1-06의 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구는 완료다. 실제 운영 OP-08 담당/서비스 전환·backup/RTO/RPO·대규모/플랫폼 지원 결정은 C1-05/07 잔여로 유지한다.
