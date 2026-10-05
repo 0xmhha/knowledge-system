@@ -360,3 +360,12 @@ FIX-18은 실제 old CKV/new source에서 stale 인용과 fresh=true 요약의 �
 원본/보관 소스 reader 재생의 diagnostic_controls_pass·invariant0과 probe 전후 DB/manifest/graph·source/model 불변을 확인했다. 원래 초안/승인 입력5개를 바꾸지 않았고 FINAL 실행 없음·공식 F-01/품질/사람 verdict는 null이다. 기존 역사적 Alpha K1 자격 실패를 소급 변경하지 않는다. 기존 reader15개·최종 조립 문서/경계/현황/원장 대조를 수행했다. Go 제품 변경은 없으며 FIX-18의 이미 통과한 query/공개 계약 시험을 불필요하게 반복하지 않았다.
 
 완료2/30·진행11·대기17·공식 게이트0/4는 유지한다. 다음 우선순위는 B0-01/02/03/05·STV2-01 실제 결정→입력/source/pack/semantic/K 동결→B0-07 공식 strict 빌드다. 독립 준비는 기존 F-03/F-06 proposed/unknown·검토 자료와 전체 실행 선행 조건을 재감사한다. 사람 판정/운영/실제 native amd64가 필요한 나머지를 진단 완료로 대신하지 않는다.
+
+
+## 28. F-03/F-06 보관 proposed 재생과 전체 실행 선행 조건
+
+2026-10-05 [전체 실행 재감사](./EXECUTION-READINESS-REAUDIT.md)와 [원장](../../system/eval/b0-knowledge-system/readiness-reaudit-m2max-2026-10-05/summary.json)을 추가했다. 보관 mock/BGE-M3 F-03/F-06 SDK20응답/source·투영 줄 SHA·요청/설정/바이너리·공개 Go Verify와 baseline/combined 인용/본문 집합 동일성을 확인했다. proposed/draft·관계적용/boost0·F-06 unknown/빈 규범 tuple·CHECKED_BY 무승격을 유지한다. mock no_candidates와 real 다의어2를 구분하고 새로운 모델/FINAL 실행·품질 합격으로 합산하지 않았다.
+
+정적 입력과 v2 scope의 실제 checker를 다시 실행해 exit2/pending·정적12승인/동적0승인·protocol/dynamic/scope 사람 SHA 연결 없음·official_execution_ready=false를 확인했다. 입력5개와 과거 원자료 바이트가 같다. 전체 여섯 가족의 진단/남은 공식 오라클을 연결하고, FIX-18 이후 최종 패키지는 새 공식 후보로 재빌드해야 함을 기록했다. 사람의 ‘검토 후 결정’·SF/OP/운영/native 선행 조건을 일반 계속 지시로 대체하지 않는다.
+
+완료2/30·진행11·대기17·공식 판정0/4, 전체28미완료다. 다음은 B0-01/02/03/05·STV2-01 실제 결정 기록→source/팩/의미/scope/K 동결→새 strict B0-07→공식 B0/B1→사람/C0→최종 C1이다. OP-01–08·실제 native amd64·전체 native/legal·대규모 비용·최종 복구/출시도 남는다. 승인 도착 전 미검토 입력으로 최종 실행하거나 사람 verdict를 만들어 작업을 종료하지 않는다.

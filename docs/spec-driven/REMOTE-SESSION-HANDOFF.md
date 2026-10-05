@@ -4,7 +4,9 @@
 
 ## 재개 후 보고 규칙
 
-2026-10-05 최신 독립 준비: [F-01 DEV 진단](./B0-F01-SPARSE-DIAGNOSTIC.md)은 새 strict BGE-M3 Go60파일/122청크/truncated0·source61개/Git blob 동일을 확인했다. K5 무필터 대상4파일 누락·eligible Function5개/full inventory·정상 exact·budget2 incomplete/candidate_limit을 충족했고 reader diagnostic_controls_pass/invariant0이다. 원문/모델/DB 불변·FINAL 미실행·공식 품질 null이며 coarse 후보60을 eligible5로 바꾸어 기록하지 않는다. 다음은 F-03/F-06 proposed 원자료/전체 선행 조건 재감사, 실제 B0 결정 후 새 공식 strict 빌드다. 전체 28개 미완료/운영/native 범위는 현황판을 따른다.
+2026-10-05 최신 재감사: [전체 실행 선행 조건](./EXECUTION-READINESS-REAUDIT.md)에 여섯 DEV 가족의 진단/미충족 공식 범위를 연결했다. F-03/F-06 보관 mock/BGE-M3 SDK20응답은 source/투영/inner evidence/public Go Verify·proposed/unknown·baseline 집합 보존을 재확인했다. 모델/FINAL 새 실행 없음. 실제 static/v2 checker 둘 다 exit2/pending이며 정적12승인/동적0승인·protocol/dynamic/scope binding=false다. 다음은 실제 B0-01/02/03/05·STV2-01 결정과 입력 동결→새 strict 공식 B0-07이다. FIX-18 뒤 최종 패키지는 다시 빌드해야 한다. OP-01–08·native/legal/대규모/최종 복구/출시와 전체28미완료를 유지한다. 일반 계속 지시로 개별 결정을 만들지 않는다.
+
+2026-10-05 이전 독립 준비: [F-01 DEV 진단](./B0-F01-SPARSE-DIAGNOSTIC.md)은 새 strict BGE-M3 Go60파일/122청크/truncated0·source61개/Git blob 동일을 확인했다. K5 무필터 대상4파일 누락·eligible Function5개/full inventory·정상 exact·budget2 incomplete/candidate_limit을 충족했고 reader diagnostic_controls_pass/invariant0이다. 원문/모델/DB 불변·FINAL 미실행·공식 품질 null이며 coarse 후보60을 eligible5로 바꾸어 기록하지 않는다. 다음은 F-03/F-06 proposed 원자료/전체 선행 조건 재감사, 실제 B0 결정 후 새 공식 strict 빌드다. 전체 28개 미완료/운영/native 범위는 현황판을 따른다.
 
 2026-10-05 이전 독립 준비: [F-04/F-05 격리 보고](./B0-STATE-ISOLATION-REPORT-PREPARATION.md)의 네 strict DEV BGE-M3 상태·8 SDK/28인용·본문/public Go Verify를 확인했다. FIX-18 실제 old-index/new-source의 stale 인용/fresh=true 모순을 수정 전 실패→query/race/vet·공개 계약→같은 DB 실모델 재조회로 수정했다. fresh=false 외 trace ID를 제외한 응답은 같고 replay source/DB/config/model 불변이다. 혼합 native 설정 SDK는 reindex_required이며 초안 pinned snapshot_mismatch 합격으로 세지 않는다. 일반 계속 지시를 실제 B0/OP 승인으로 대신하지 않았고 입력5개 불변·FINAL 실행 없음·공식 품질 null이다. 다음 독립 작업은 F-01 희소/full eligible·상한 DEV 오라클이다. 전체 남은 작업은 현황판과 작업리스트 26절을 따른다.
 

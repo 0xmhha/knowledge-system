@@ -50,7 +50,7 @@ def render(raw):
     for stage in ['B0','B1','C0','C1']:
         c = Counter(t[4] for t in tasks if t[0].startswith(stage))
         lines.append(f"| {stage} | {c['done']} | {c['progress']} | {c['waiting']} | {('작업 종료; verdict=' + gates[stage]) if c['done'] == sum(t[0].startswith(stage) for t in tasks) else position[stage]} |")
-    lines += ['', '**바로 다음 독립 작업:** F-03/F-06 proposed/unknown 원자료와 전체 실행 선행 조건 재감사(B0-05/06).', '',
+    lines += ['', '**바로 다음 작업:** B0-01/02/03/05·STV2-01 실제 결정 기록과 입력 동결 후 B0-07 공식 strict 빌드. 여섯 DEV 가족의 독립 진단/제한은 EXECUTION-READINESS-REAUDIT.md를 따른다.', '',
       '**승인 도착 시 최우선:** B0-01/02/03/05·STV2-01 결정 기록 → source/pack/semantic/scope/K 동결 → B0-07 새 strict 빌드/감사 → B0-08/09 공식 기준선.', '',
       f"**남은 전체 작업 {30-counts['done']}개**", '', '| ID | 상태 | 우선순위·선행 | 남은 작업 |', '|---|---|---|---|']
     for qid, priority, task, status, state in tasks:
