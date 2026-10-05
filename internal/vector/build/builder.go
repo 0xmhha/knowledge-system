@@ -47,6 +47,7 @@ type Options struct {
 	OutDir              string
 	Embedder            types.Embedder // required
 	CKVIgnore           []string       // extra ignore patterns from --ckvignore CLI flag
+	BuildSourcesPath    string         // exact Go paths allowed through the build/ default
 	BatchSize           int            // embedding batch size; 0 → 32
 	// Version is the ckv build version recorded in the manifest. The CLI sets
 	// it from the ldflags-injected cmd/ckv.Version; empty falls back to "dev".
@@ -267,7 +268,12 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 			"file_count", len(resolved),
 		)
 	}
+	buildSources, err := discover.LoadBuildSources(o.BuildSourcesPath)
+	if err != nil {
+		return nil, fmt.Errorf("build sources: %w", err)
+	}
 	files, walkErrs, err := discover.Walk(o.SrcRoot, discover.Options{
+		BuildSources: buildSources,
 		Extra:        mergedIgnore,
 		GoBuildFiles: goBuildFiles,
 		AllowList:    allowList,
@@ -671,6 +677,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		CanonicalCount:      totalStats.CanonicalID,
 		Languages:           languageCounts,
 		CKVIgnore:           o.CKVIgnore,
+		BuildSources:        buildSources,
 		DocsRoots:           absRoots(manifestDocsRoots),
 		InputFiles:          inputFiles,
 	}

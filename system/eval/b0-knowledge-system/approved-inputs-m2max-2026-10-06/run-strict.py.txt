@@ -1,0 +1,16 @@
+from pathlib import Path
+import subprocess,json,hashlib,datetime,os,time
+r=Path('/private/tmp/ks-approved-scope-20261006');repo=Path.cwd()
+args=[str(r/'bin/cks'),'setup','--src','/private/tmp/ks-b0-approved-corpus-20261006','--out',str(r/'strict-dataset'),'--project-id','b0-knowledge-system','--version','approved-m2max-20261006','--embedder','ollama','--model-name','bge-m3:latest','--ollama-url','http://127.0.0.1:11434','--query-prefix-policy','registry','--vector-build-sources',str(repo/'system/eval/b0-knowledge-system/approved-inputs-m2max-2026-10-06/build-sources.json'),'--progress','text']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+inputs={str(p.relative_to(repo)):sha(p) for p in (repo/'system/eval/b0-knowledge-system').glob('*.json') if p.name in ['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json']}
+record={'schema_version':1,'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'command':args,'strict_complete_embeddings':True,'input_sha256_before':inputs,'binary_sha256':{n:sha(r/'bin'/n) for n in ['cks','ckv','ckg']},'build_sources_sha256':sha(Path(args[-3])),'source_commit':'71cb71cd55960833e930269e272f7a4a060be3aa','source_tree':'f020f8f30fd209b8de045756dedd12ff83f65cd9','status':'building','quality_metrics':None}
+(r/'strict-build.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+env=dict(os.environ,CKV_REQUIRE_COMPLETE_EMBEDDINGS='1',GOMODCACHE='/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod')
+start=time.monotonic()
+with (r/'strict-setup.log').open('wb') as f:code=subprocess.run(args,stdout=f,stderr=subprocess.STDOUT,env=env).returncode
+record.update(exit_code=code,elapsed_seconds=time.monotonic()-start,finished_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),status='built_pending_audit' if code==0 else 'failed',raw_log_sha256=sha(r/'strict-setup.log'))
+record['input_sha256_after']={p:sha(repo/p) for p in inputs}
+record['inputs_unchanged']=record['input_sha256_before']==record['input_sha256_after']
+(r/'strict-build.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(record));raise SystemExit(code)

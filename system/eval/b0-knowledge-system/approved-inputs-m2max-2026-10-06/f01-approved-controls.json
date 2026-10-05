@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "probe_sha256": "e2a841b2c3b25bf07e4b2ba7e0ce3327b402a0c3e46970003a50b2a813d33c15",
+  "expected_citations": [
+    {
+      "file": "src/refund00.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "3433883f3d811dff182b92ada250fae491a6faa2"
+    },
+    {
+      "file": "src/refund01.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "3433883f3d811dff182b92ada250fae491a6faa2"
+    },
+    {
+      "file": "src/refund02.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "3433883f3d811dff182b92ada250fae491a6faa2"
+    },
+    {
+      "file": "src/refund03.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "3433883f3d811dff182b92ada250fae491a6faa2"
+    },
+    {
+      "file": "src/refund04.go",
+      "start_line": 3,
+      "end_line": 4,
+      "commit_hash": "3433883f3d811dff182b92ada250fae491a6faa2"
+    }
+  ],
+  "coordinates": {
+    "commit": "3433883f3d811dff182b92ada250fae491a6faa2",
+    "dataset_id": "78c63538895d90a9b10aa36dbfd8c97b3f29e1424134ea7fa625e1f2bad210e7",
+    "project_id": "f-01-dev",
+    "snapshot_id": "62310daffc375ad4cd2c13ee227cdadef06c463373451e5c557952a699ababd0"
+  },
+  "embedding_identity": {
+    "Provider": "ollama",
+    "Model": "bge-m3:latest",
+    "Dim": 1024,
+    "Pooling": "",
+    "Normalize": "",
+    "version": 2,
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "dimension_method": "native:v1",
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "truncate_policy": "reject:v1",
+    "runtime_context_tokens": 8192,
+    "runtime_batch_tokens": 8192,
+    "chunk_budget_bytes": 6144
+  },
+  "prompt": "Where is the gas refund route implemented?",
+  "filter": {
+    "language": "go",
+    "path": "src/*.go",
+    "symbol_kinds": [
+      "Function"
+    ],
+    "chunk_kinds": [
+      "symbol"
+    ],
+    "exclude_tests": true
+  },
+  "k": 5,
+  "max_exact_candidates": 2,
+  "f01": {
+    "k": 5,
+    "max_exact_candidates": 2,
+    "eligible_count": 5,
+    "complete_hit_count": 5,
+    "eligible_files": [
+      "src/refund00.go",
+      "src/refund01.go",
+      "src/refund02.go",
+      "src/refund03.go",
+      "src/refund04.go"
+    ]
+  }
+}

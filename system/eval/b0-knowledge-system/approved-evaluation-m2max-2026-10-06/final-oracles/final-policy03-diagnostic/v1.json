@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T23:01:14.069147Z",
+  "finished_at": "2026-10-05T23:01:17.697019Z",
+  "request_sha256": "fcf4c857efbf446af5f8f14c28c4a4b2f47f574df97dded2c61e4b0b4ea6263a",
+  "config_sha256": "38298599a2ade7c407f5049c64febf94c40a08f6966cbc1990b7812a78dec43f",
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "config_sha256_after": "38298599a2ade7c407f5049c64febf94c40a08f6966cbc1990b7812a78dec43f",
+  "binary_sha256_after": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "B0-POLICY-03",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "4fc92a99facd4dae2781e051608dffca",
+        "tool": "cks.context.get_for_task",
+        "arguments": {
+          "prompt": "비공개 정책이 존재하지만 조회자가 접근 권한이 없으면 정책 본문이나 ID를 코딩 문맥에 넣을 수 있나요?"
+        },
+        "elapsed_ns": 708644166,
+        "completed_at": "2026-10-06T08:01:17.362049+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "query": "비공개 정책이 존재하지만 조회자가 접근 권한이 없으면 정책 본문이나 ID를 코딩 문맥에 넣을 수 있나요?",
+            "citations": [
+              {
+                "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                "start_line": 85,
+                "end_line": 94,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                "start_line": 101,
+                "end_line": 108,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+                "start_line": 55,
+                "end_line": 62,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "cmd/cks/knowledgecli/knowledge.go",
+                "start_line": 20,
+                "end_line": 179,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "cmd/cks/knowledgecli/knowledge.go",
+                "start_line": 180,
+                "end_line": 320,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md",
+                "start_line": 31,
+                "end_line": 45,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                "start_line": 43,
+                "end_line": 54,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                "start_line": 25,
+                "end_line": 43,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "internal/system/knowledgepack/lock.go",
+                "start_line": 80,
+                "end_line": 80,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              },
+              {
+                "file": "internal/system/config/config.go",
+                "start_line": 307,
+                "end_line": 307,
+                "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                  "start_line": 85,
+                  "end_line": 94,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "## 5. 사용자가 제공하는 지식 인스턴스\n\n프로젝트 정책에는 `id`, 원문/요약, 소유자, `source_ref`, 적용 서브시스템·행위, `effective_from`/`effective_to` 또는 명시된 명세 버전, 예외와 대체 관계, 상태/검토자를 요구한다. 시점/버전을 명시하지 않은 초안은 과거 설명 후보가 될 수 있지만 “현재 반드시 지켜야 할 정책”으로 표시하지 않는다. ADR에는 문제, 결정, 이유, 비교한 대안, 가정, 채택/폐기/대체 날짜, 영향받는 요구사항과 원천을 요구한다. 원문은 Markdown으로 보존하고 구조화 필드는 파생·검증된 레코드로 저장한다. 검토자가 원문을 확인하지 않은 LLM 추출은 `proposed`다.\n\n상태 축은 둘로 나눈다. 저장된 검토 판정은 `proposed|verified|rejected`이고, 조회 시 계산되는 유효 상태는 `current|stale|conflict|unknown|restricted`다. `verified`가 과거 스냅샷에만 맞거나 유효 기간이 끝나면 현재 질의에서는 `stale`이다. 같은 범위·시점의 양립 불가능한 검토된 정책은 `conflict`다. 근거가 없으면 `unknown`이다. 권한으로 원문을 공개할 수 없으면 후보 ID나 본문을 노출하지 않고 `restricted`만 표시한다. 삭제 대신 새 버전/대체 관계를 남겨 과거 패치 이유를 재현한다.\n\n프로젝트 `manifest.yaml`의 `review_policy.min_approvals`는 기본 1이며, 명시적으로 1 이상의 정수만 허용한다. 각 승인은 검토자 ID, 대상 원문 해시·스냅샷, 판정, 이유, 시각을 가진다. 동일 검토자의 중복 기록은 승인 수를 늘리지 않는다. 로컬 설치형에서는 검토자 ID의 **기록·감사**를 보장하며 외부 신원 제공자 없이 신원을 암호학적으로 인증한다고 주장하지 않는다. 조직이 서명 또는 인증을 요구하면 프로젝트별 권한 어댑터를 추가하고 그 전에는 해당 조직의 검토 요건을 충족했다고 표시하지 않는다.\n\n자동 추출은 정책/결정/코드 연결의 **후보**만 만든다. `verified` 승격에는 해당 입력 스냅샷의 원문 해시 재검증, 타입/범위 검증, 사람 검토자와 이유가 필요하다. 코드 심볼 앵커는 CKG의 `canonical_id`·파일·줄을, 문서 근거는 CKV/원문 보관본의 `origin_id`·경로·줄·해시를 대조한다. 소스에서 발견한 조건문은 정책 인스턴스를 생성하거나 승인하지 않는다. 정책의 작성 주체와 검토자는 W3C [PROV-O](https://www.w3.org/TR/prov-o/)의 Entity/Activity/Agent 구분에 맞게 표현할 수 있지만, 현행 시스템의 표준 준수를 주장하지 않는다.\n",
+                "token_estimate": 338
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                  "start_line": 101,
+                  "end_line": 108,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "## 6. CKS 질의와 코딩 문맥\n\n`cks.context.get_for_task_v2`는 원문 질의를 먼저 기존 CKV/BM25/정확 심볼 경로에 보내고, 결과의 프로젝트/데이터셋과 요청 서브시스템에 적용되는 잠금 팩만 연다. 접근 허용된 원천을 먼저 필터한 뒤 검토된 정책·결정→요구→심볼→테스트 경로를 제한 깊이로 탐색한다. 적용 범위가 맞지 않는 산업 팩, 제안 상태 관계, 오래된/충돌 정책은 규범 근거로 추가하지 않는다. 복수 의미 용어는 후보로 남긴다. 의미 경로 오류/시간 초과/예산 초과에서도 기존 상위 K CKV+CKG **후보 집합**을 유지한다. 외부 추적 경로는 선택형 설정 `semantic.store_path`에서 같은 데이터셋의 정렬된 의미 투영을 읽고 최대 2개 경로·총 12개 인용·32 KB 본문 한도에서만 붙인다. `cks mcp gen-config --semantic-store`로 경로를 지정한다. 저장소가 없거나 정렬에 실패하면 로컬 지식 응답과 기본 후보를 유지하고 구현 링크는 미검증으로 남긴다.\n\nv2 `semantic.knowledge_context`는 `{state, lock_digest, applicable_policies, decisions, relations, trace_links, constraints, related_requirements, test_links, unknowns, conflicts}`를 가진다. 각 항목은 안정 ID, 타입, 적용 범위, 검토/유효 상태, **v2 citation 좌표에 대한 참조**와 관계 ID를 포함한다. 텍스트 본문은 별도 인용에서만 제공하고 정화·권한 검사를 거친다. `unknowns`는 “왜”의 원천이 없거나 적용 범위가 모호한 이유를, `conflicts`는 양립하지 않는 근거의 허용 가능한 식별자만 설명한다. `state=complete`는 반환한 **근거 경로의 무결성**만 뜻하고 업무 정답률을 뜻하지 않는다. `partial|conflict|unavailable|budget_exceeded|restricted`에서는 확정적인 정책 준수/이유 문장을 만들지 않는다. 의미 필드와 모든 인용은 v2 팩 무결성 해시에 포함하며 v1 DTO/해시는 변경하지 않는다.\n\n기본 코딩 문맥은 `implemented behavior`, `required behavior`, `rationale`, `constraints`, `evidence`, `unknowns`를 명시적으로 분리한다. LLM이나 사용자가 이를 한 문장으로 뭉쳐 사실처럼 주장하지 않도록 기계 판독형 상태를 제공한다. 정책/ADR 문서는 지식 **데이터**이지 에이전트의 명령이 아니다. 사용자 요청과 시스템 권한을 뒤집는 문구가 문서에 있어도 실행 지시로 해석하지 않는다. 실모델 품질/지연의 합격 여부는 B/C에서 평가한다.\n",
+                "token_estimate": 350
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+                  "start_line": 55,
+                  "end_line": 62,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "### D5 선택형 도메인 문맥\n\n사용자가 도메인 팩을 선택하고 검토된 프로젝트 정책/결정이 존재하면 명시 v2 응답의 `semantic.knowledge_context`에 `{state, lock_digest, applicable_policies, decisions, relations, constraints, related_requirements, test_links, unknowns, conflicts}`를 싣는다. 각 항목은 안정 타입/ID와 상태, 적용 범위, **같은 응답의 v2 인용 좌표**로 검증할 수 있는 출처 참조만 가진다. 본문은 권한/정화 검사를 거친 `bodies`/인용 경로로만 노출한다. `state=complete`는 이 문맥의 근거 무결성을 뜻하며 업무 정답을 보증하지 않는다. `unknown|conflict|stale|restricted|budget_exceeded` 항목은 확정 이유나 정책 준수로 직렬화하지 않는다. `semantic` 전체가 위 `sha256-v2` 해시 범위에 든다. 팩 미설치 또는 기능 꺼짐은 `semantic=null`을 허용하며 기존 후보·v1 DTO/해시는 유지한다. 정확 필드/상태 규칙은 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)에 있다.\n\n현재 실행되는 선택형 정책 경로는 MCP 입력 `include_knowledge=true`, `knowledge_as_of=YYYY-MM-DD`, `knowledge_subsystem=\u003c명시 범위\u003e`를 요구한다. 정책 원문은 보관본 전체 파일 범위로 인용하고 정화 후 `bodies`에 둔다. 공개 가능하고 검토된 정책만 `applicable_policies`에 넣으며 `conflict`, `restricted`, `stale`, `unknown`, `budget_exceeded`, `unavailable`을 확정 답으로 취급하지 않는다. 오류 시 기존 코드 인용을 유지한다. `decisions`에는 같은 보관본의 검토된 공개 ADR을 날짜·범위·대체 관계에 따라 인용할 수 있다. `relations`는 검토된 로컬 정책/ADR 끝점 두 개가 모두 현재 질의에 선택되고 충돌하지 않을 때만 별도 보관 원문 인용과 함께 출력한다. `related_requirements`와 `test_links`는 검증된 외부 앵커가 없으면 빈 배열이다. 조직 인증/권한 어댑터나 자연어 범위 추론이 구현됐다는 뜻은 아니다.\n\n선택형 `semantic.coding_context`는 `implemented_behavior`, `required_behavior`, `rationale`, `constraints`, `evidence`, `unknowns`를 별도 배열로 반환한다. 현재 `required_behavior`는 검토된 정책 인용, `rationale`은 검토된 ADR 인용에서만 파생한다. 정책이 충돌하면 정책 원문은 `knowledge_context`의 상충 근거로 인용하되 `required_behavior`를 비우고 `conflicting_policies_require_review`를 기록한다. 검증된 코드 구현 링크가 없으면 `implemented_behavior`와 `constraints`는 비워두고 `implementation_link_unverified`를 `unknowns`에 적는다. `evidence`는 응답 안의 v2 인용 좌표만 담는다. 이 객체도 `sha256-v2` 해시 범위에 든다. 필드가 없던 이전 v2 팩은 기존 해시/바이트를 수정하지 않고 읽는다.\n",
+                "token_estimate": 443
+              },
+              {
+                "citation": {
+                  "file": "cmd/cks/knowledgecli/knowledge.go",
+                  "start_line": 20,
+                  "end_line": 179,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "func NewCmd() *cobra.Command {\n\tvar root string\n\tcmd := \u0026cobra.Command{Use: \"knowledge\", Short: \"Validate and lock local domain knowledge packs\"}\n\tcmd.PersistentFlags().StringVar(\u0026root, \"project-root\", \"\", \"project root containing .cks/knowledge\")\n\trequireRoot := func() error {\n\t\tif root == \"\" {\n\t\t\treturn fmt.Errorf(\"--project-root is required\")\n\t\t}\n\t\treturn nil\n\t}\n\tvar projectID string\n\tinitCmd := \u0026cobra.Command{Use: \"init\", Short: \"Create a core-only local knowledge template without overwriting files\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif projectID == \"\" {\n\t\t\t\treturn fmt.Errorf(\"--project-id is required\")\n\t\t\t}\n\t\t\tdir := filepath.Join(root, \".cks\", \"knowledge\")\n\t\t\tif err := os.MkdirAll(dir, 0o700); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tfor _, name := range []string{\"domain\", \"policies\", \"decisions\", \"relations\", \"trace-links\", \"reviews\", \"questions\"} {\n\t\t\t\tif err := os.MkdirAll(filepath.Join(dir, name), 0o700); err != nil {\n\t\t\t\t\treturn err\n\t\t\t\t}\n\t\t\t}\n\t\t\tpath := filepath.Join(dir, \"manifest.yaml\")\n\t\t\tfile, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)\n\t\t\tif err != nil {\n\t\t\t\treturn fmt.Errorf(\"knowledge manifest already exists or cannot be created: %w\", err)\n\t\t\t}\n\t\t\tcontent := fmt.Sprintf(\"schema_version: 1\\nproject_id: %q\\nselected_packs: []\\noverlay_root: .cks/knowledge\\nreview_policy:\\n  min_approvals: 1\\n\", projectID)\n\t\t\tif _, err := file.WriteString(content); err != nil {\n\t\t\t\tfile.Close()\n\t\t\t\tos.Remove(path)\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif err := file.Close(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"status\": \"created\", \"manifest\": path, \"project_id\": projectID})\n\t\t}}\n\tinitCmd.Flags().StringVar(\u0026projectID, \"project-id\", \"\", \"stable CKS project ID\")\n\tvalidateCmd := \u0026cobra.Command{Use: \"validate\", Short: \"Check selected local packs, dependency graph and saved lock\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tlock, err := knowledgepack.BuildLock(root)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tstatus := \"unlocked\"\n\t\t\tif _, err := os.Lstat(filepath.Join(root, \".cks\", \"knowledge\", \"knowledge.lock.json\")); err == nil {\n\t\t\t\tif _, err := knowledgepack.VerifyLock(root); err != nil {\n\t\t\t\t\treturn err\n\t\t\t\t}\n\t\t\t\tstatus = \"locked\"\n\t\t\t} else if !os.IsNotExist(err) {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tinstances, err := knowledgepack.LoadProjectInstances(root)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"status\": status, \"project_id\": lock.ProjectID,\n\t\t\t\t\"pack_count\": len(lock.Packs), \"lock_digest\": lock.LockDigest,\n\t\t\t\t\"policy_count\": len(instances.Policies), \"decision_count\": len(instances.Decisions), \"relation_count\": len(instances.Relations),\n\t\t\t\t\"conflict_count\": len(instances.Conflicts)})\n\t\t}}\n\tlockCmd := \u0026cobra.Command{Use: \"lock\", Short: \"Write the exact local pack and overlay byte lock\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tlock, err := knowledgepack.BuildLock(root)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tpath := filepath.Join(root, \".cks\", \"knowledge\", \"knowledge.lock.json\")\n\t\t\tdata, err := json.MarshalIndent(lock, \"\", \"  \")\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tdata = append(data, '\\n')\n\t\t\ttmp, err := os.CreateTemp(filepath.Dir(path), \".knowledge-lock-*\")\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tdefer os.Remove(tmp.Name())\n\t\t\tif err := tmp.Chmod(0o600); err != nil {\n\t\t\t\ttmp.Close()\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif _, err := tmp.Write(data); err != nil {\n\t\t\t\ttmp.Close()\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif err := tmp.Close(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif err := os.Rename(tmp.Name(), path); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"status\": \"locked\", \"project_id\": lock.ProjectID,\n\t\t\t\t\"pack_count\": len(lock.Packs), \"lock_digest\": lock.LockDigest, \"path\": path})\n\t\t}}\n\tvar source string\n\tdigestCmd := \u0026cobra.Command{Use: \"digest\", Short: \"Calculate one registered local pack's exact file digest\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif source == \"\" {\n\t\t\t\treturn fmt.Errorf(\"--source is required\")\n\t\t\t}\n\t\t\tloaded, err := knowledgepack.LoadRegisteredPack(root, source)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"pack_id\": loaded.Pack.PackID,\n\t\t\t\t\"version\": loaded.Pack.Version, \"sha256\": loaded.Digest})\n\t\t}}\n\tdigestCmd.Flags().StringVar(\u0026source, \"source\", \"\", \"project-relative pack directory\")\n\tvar reviewVersionDir string\n\treviewCmd := \u0026cobra.Command{Use: \"review\", Short: \"List source-backed policy and ADR records for human review\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tvar lock knowledgepack.Lock\n\t\t\tvar instances knowledgepack.Instances\n\t\t\tvar err error\n\t\t\tif reviewVersionDir != \"\" {\n\t\t\t\tinstances, lock, err = knowledgepack.LoadRetainedProjectInstances(reviewVersionDir)\n\t\t\t} else {\n\t\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\t\treturn err\n\t\t\t\t}\n\t\t\t\tlock, err = knowledgepack.BuildLock(root)\n\t\t\t\tif err == nil {\n\t\t\t\t\tinstances, err = knowledgepack.LoadProjectInstances(root)\n\t\t\t\t}\n\t\t\t}\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\ttype item struct {\n\t\t\t\tKind        string                  `json:\"kind\"`\n\t\t\t\tID          string                  `json:\"id\"`\n\t\t\t\tStatus      string                  `json:\"status\"`\n\t\t\t\tSourceRef   knowledgepack.SourceRef `json:\"source_ref\"`\n\t\t\t\tReviewedBy  string                  `json:\"reviewed_by,omitempty\"`\n\t\t\t\tReviewCount int                     `json:\"review_count\"`\n\t\t\t\tHoldReason  string                  `json:\"hold_reason,omitempty\"`\n\t\t\t}\n\t\t\tqueue := []item{}\n\t\t\treviewState := func(kind, id, status string) (string, int) {\n\t\t\t\tvotes := map[string]string{}\n\t\t\t\tfor _, record := range instances.Reviews {\n\t\t\t\t\tif record.TargetKind == kind \u0026\u0026 record.TargetID == id {",
+                "token_estimate": 1533
+              },
+              {
+                "citation": {
+                  "file": "cmd/cks/knowledgecli/knowledge.go",
+                  "start_line": 180,
+                  "end_line": 320,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "\t\t\t\t\t\tvotes[record.Reviewer] = record.Decision\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tif status == \"rejected\" {\n\t\t\t\t\treturn \"rejected_by_reviewer\", len(votes)\n\t\t\t\t}\n\t\t\t\tif status != \"proposed\" {\n\t\t\t\t\treturn \"\", len(votes)\n\t\t\t\t}\n\t\t\t\tif len(votes) == 0 {\n\t\t\t\t\treturn \"awaiting_human_review\", 0\n\t\t\t\t}\n\t\t\t\tverified, rejected := false, false\n\t\t\t\tfor _, vote := range votes {\n\t\t\t\t\tverified = verified || vote == \"verified\"\n\t\t\t\t\trejected = rejected || vote == \"rejected\"\n\t\t\t\t}\n\t\t\t\tif verified \u0026\u0026 rejected {\n\t\t\t\t\treturn \"conflicting_reviews\", len(votes)\n\t\t\t\t}\n\t\t\t\treturn \"approval_quorum_pending\", len(votes)\n\t\t\t}\n\t\t\tfor _, p := range instances.Policies {\n\t\t\t\treason, count := reviewState(\"policy\", p.ID, p.Status)\n\t\t\t\tqueue = append(queue, item{\"policy\", p.ID, p.Status, p.SourceRef, p.ReviewedBy, count, reason})\n\t\t\t}\n\t\t\tfor _, d := range instances.Decisions {\n\t\t\t\treason, count := reviewState(\"decision\", d.ID, d.Status)\n\t\t\t\tqueue = append(queue, item{\"decision\", d.ID, d.Status, d.SourceRef, d.ReviewedBy, count, reason})\n\t\t\t}\n\t\t\tfor _, relation := range instances.Relations {\n\t\t\t\treason, count := reviewState(\"relation\", relation.ID, relation.Status)\n\t\t\t\tqueue = append(queue, item{\"relation\", relation.ID, relation.Status, relation.SourceRef, relation.ReviewedBy, count, reason})\n\t\t\t}\n\t\t\tfor _, link := range instances.TraceLinks {\n\t\t\t\treason, count := reviewState(\"trace-link\", link.ID, link.Status)\n\t\t\t\tqueue = append(queue, item{\"trace-link\", link.ID, link.Status, link.SourceRef, link.ReviewedBy, count, reason})\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"project_id\": lock.ProjectID, \"items\": queue, \"conflicts\": instances.Conflicts})\n\t\t}}\n\treviewCmd.PersistentFlags().StringVar(\u0026reviewVersionDir, \"version-dir\", \"\", \"read policy and ADR records from a pinned retained dataset\")\n\tvar reviewKind, reviewID, reviewDecision, reviewer, reviewReason string\n\trecordCmd := \u0026cobra.Command{Use: \"record\", Short: \"Record a human decision against archived source bytes\", Args: cobra.NoArgs,\n\t\tRunE: func(c *cobra.Command, _ []string) error {\n\t\t\tif err := requireRoot(); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif reviewVersionDir == \"\" || reviewID == \"\" || reviewer == \"\" || reviewReason == \"\" ||\n\t\t\t\t(reviewDecision != \"verified\" \u0026\u0026 reviewDecision != \"rejected\") {\n\t\t\t\treturn fmt.Errorf(\"review record requires --version-dir, --kind, --id, --decision, --reviewer and --reason\")\n\t\t\t}\n\t\t\tmanifest, err := knowledgepack.ReadManifest(root)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tidentity, err := setup.InspectVersionIdentity(reviewVersionDir)\n\t\t\tif err != nil || identity == nil || identity.Source.ProjectID != manifest.ProjectID {\n\t\t\t\treturn fmt.Errorf(\"snapshot_mismatch: review candidate project or identity differs\")\n\t\t\t}\n\t\t\tinstances, _, err := knowledgepack.LoadRetainedProjectInstances(reviewVersionDir)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tvar source knowledgepack.SourceRef\n\t\t\tstatus := \"\"\n\t\t\tswitch reviewKind {\n\t\t\tcase \"policy\":\n\t\t\t\tfor _, p := range instances.Policies {\n\t\t\t\t\tif p.ID == reviewID {\n\t\t\t\t\t\tsource, status = p.SourceRef, p.Status\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\tcase \"decision\":\n\t\t\t\tfor _, d := range instances.Decisions {\n\t\t\t\t\tif d.ID == reviewID {\n\t\t\t\t\t\tsource, status = d.SourceRef, d.Status\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\tcase \"relation\":\n\t\t\t\tfor _, relation := range instances.Relations {\n\t\t\t\t\tif relation.ID == reviewID {\n\t\t\t\t\t\tsource, status = relation.SourceRef, relation.Status\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\tcase \"trace-link\":\n\t\t\t\tfor _, link := range instances.TraceLinks {\n\t\t\t\t\tif link.ID == reviewID {\n\t\t\t\t\t\tsource, status = link.SourceRef, link.Status\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\tdefault:\n\t\t\t\treturn fmt.Errorf(\"invalid review kind %q\", reviewKind)\n\t\t\t}\n\t\t\tif status != \"proposed\" || source.OriginID != \"repo\" {\n\t\t\t\treturn fmt.Errorf(\"evidence_unverified: review target is missing or no longer proposed\")\n\t\t\t}\n\t\t\tarchived, _, _, err := setup.ReadRetainedFile(reviewVersionDir, source.OriginID, source.Path)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tlive, err := setup.ReadSourceFileNoFollow(root, source.Path, 4\u003c\u003c20)\n\t\t\tif err != nil || !bytes.Equal(live, archived) {\n\t\t\t\treturn fmt.Errorf(\"snapshot_mismatch: live review target differs from archived candidate\")\n\t\t\t}\n\t\t\tsum := sha256.Sum256(archived)\n\t\t\trecord := knowledgepack.ReviewRecord{TargetKind: reviewKind, TargetID: reviewID, TargetRef: source,\n\t\t\t\tTargetSHA256: hex.EncodeToString(sum[:]), SnapshotID: identity.Source.SnapshotID,\n\t\t\t\tDecision: reviewDecision, Reviewer: reviewer, Reason: reviewReason,\n\t\t\t\tReviewedAt: time.Now().UTC().Format(time.RFC3339)}\n\t\t\tif err := knowledgepack.ValidateReviewRecord(record); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tbody, err := yaml.Marshal(record)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tdir := filepath.Join(root, \".cks\", \"knowledge\", \"reviews\")\n\t\t\tif err := os.Mkdir(dir, 0o700); err != nil \u0026\u0026 !os.IsExist(err) {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tinfo, err := os.Lstat(dir)\n\t\t\tif err != nil || !info.IsDir() || info.Mode()\u0026os.ModeSymlink != 0 {\n\t\t\t\treturn fmt.Errorf(\"evidence_unverified: review directory is not a real directory\")\n\t\t\t}\n\t\t\trecordHash := sha256.Sum256(body)\n\t\t\tpath := filepath.Join(dir, hex.EncodeToString(recordHash[:])+\".yaml\")\n\t\t\tif err := writeReviewRecord(dir, info, filepath.Base(path), body); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn json.NewEncoder(c.OutOrStdout()).Encode(map[string]any{\"status\": \"review_recorded\", \"target_id\": reviewID,\n\t\t\t\t\"snapshot_id\": record.SnapshotID, \"target_sha256\": record.TargetSHA256, \"path\": path, \"needs_relock\": true})\n\t\t}}\n\trecordCmd.Flags().StringVar(\u0026reviewKind, \"kind\", \"\", \"policy, decision, relation or trace-link\")\n\trecordCmd.Flags().StringVar(\u0026reviewID, \"id\", \"\", \"knowledge instance ID\")\n\trecordCmd.Flags().StringVar(\u0026reviewDecision, \"decision\", \"\", \"verified or rejected\")\n\trecordCmd.Flags().StringVar(\u0026reviewer, \"reviewer\", \"\", \"local reviewer ID\")\n\trecordCmd.Flags().StringVar(\u0026reviewReason, \"reason\", \"\", \"human review reason\")\n\treviewCmd.AddCommand(recordCmd)\n\tcmd.AddCommand(initCmd, validateCmd, lockCmd, digestCmd, reviewCmd)\n\treturn cmd\n}",
+                "token_estimate": 1496
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md",
+                  "start_line": 31,
+                  "end_line": 45,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "## 검증과 남은 범위\n\n`scripts/wbs-knowledge-lock-smoke.sh`는 비 Git 후보를 만들고, 오버레이 파일을 바꾼 뒤 오래된 잠금으로는 후보가 만들어지지 않음을 확인한다. 다시 잠근 뒤 만든 후보는 다른 `snapshot_id`와 `dataset_id`를 가지며 `current`가 새 버전으로 이동한다. 이어 선택 팩, 상충하는 검토된 정책 2개와 미검토 ADR 1개를 추가해 충돌 수와 보류 사유를 확인한 뒤 세 번째 후보를 승격한다. 단위 테스트는 의존 순서·누락·순환, 같은 로컬 ID의 네임스페이스 격리, 공통 타입 참조, 오버레이 바이트 변경과 링크 거부를 확인한다.\n\n정책 YAML과 ADR Markdown의 필드·타입·원천 경로·검토자/이유·유효 날짜를 검증한다. 같은 범위·시점에 서로 `conflicts_with`로 지정한 검토된 정책은 충돌로 보고한다. 내부 `SelectPolicies`는 범위·시점·제한 여부를 계산하지만 공개 근거 인용이 없으면 상태를 `needs_citation`으로 남긴다. 이 기록의 `verified`는 YAML에 적힌 로컬 검토 이력이며 외부 신원 인증을 뜻하지 않는다.\n\n`relations/*.yaml`은 팩의 `relation_types` 술어를 `(pack_id, local_id)`로 참조하고, 주체·객체 ID와 타입, `status`, 검토자·이유, 공개 범위, 자기 원천과 `evidence_refs`를 기록한다. 로더는 술어 방향·끝점 타입·중복 ID를 확인한다. `verified` 관계는 양쪽 끝점이 이 오버레이의 검토된 정책/ADR이고 두 원천이 근거 목록에 들어있을 때만 받는다. 요구사항·CKG 코드 심볼·테스트 등 외부 끝점의 관계는 앵커 검증이 연결되기 전까지 `proposed`만 허용한다. 등록된 관계 원문은 잠금과 보관 후보에 포함된다. v2 문맥은 충돌 없는 현재 범위의 공개 검토 관계만 별도 정화된 원문 인용과 함께 `relations`에 싣고, 아직 `related_requirements`나 `test_links`로 출력하지 않는다.\n\n선택 팩 원문은 `knowledge:\u003cpack_id\u003e` 출처로 후보의 content-addressed archive에 보관한다. 저장소와 팩이 같은 상대 경로를 써도 다른 원천이다. `review --version-dir`는 보관본만으로 팩과 정책을 재구성하고 잠금을 검증한다. 라이브 파일 편집 뒤에도 과거 결과가 같고 blob 손상은 거부한다. `cks.context.get_for_task_v2`는 `include_knowledge=true`와 명시 날짜·서브시스템을 받으면 검토된 공개 정책과 ADR만 선택한다. ADR은 선택 날짜 이전, 서브시스템 범위 일치, 대체 관계와 공개 권한 검사를 통과해야 한다. 정책은 v2 인용·정화된 본문에 연결되고 의미 객체까지 `sha256-v2` 해시에 포함된다. 비공개 정책 또는 ADR은 ID와 본문을 숨기고 `restricted` 상태만 남긴다. 지식 레이어 오류와 예산 초과 시 기본 코드 근거를 유지하고 불확실 상태를 출력한다.\n\nv2 `coding_context`는 현재 인용된 정책을 `required_behavior`, ADR을 `rationale`로 나누고 모든 반환 인용을 `evidence`에 보존한다. 확인된 구현 연결이 없으므로 `implemented_behavior`와 `constraints`는 비어 있고 `implementation_link_unverified`를 명시한다. JSON으로 전송한 뒤 다시 읽어도 의미 필드와 해시 검증이 통과하며, `coding_context`가 없는 이전 v2 팩은 수정 없이 읽는다.\n\nv4 팩 투영은 보관된 `pack.yaml`에서 `(pack_id, local_id)` 타입·관계·제약을 추출한다. 잠금 다이제스트, 팩 원문 해시, 그래프/벡터 좌표를 대조하며 구 v1–v3 JSON은 수정하지 않고 읽는다. 위 명령은 `--include-packs`를 명시한 보관 후보에만 v4를 쓴다. 원천 정의를 위조한 v4 후보는 승격되지 않는다. `wbs-knowledge-lock-smoke.sh`가 실제 후보의 v4 추출·승격·위조 거부를 검증한다.\n\n아직 **외부 끝점의 관계 승격, 조직별 권한 어댑터와 코드 앵커, ADR→요구→테스트의 검증된 의미 경로, 운영 릴리스**는 구현되지 않았다. 현재 선택형 v2 문맥은 정책·ADR 원문 인용까지 다룬다. ADR에 선언된 요구사항 ID는 관계 검증 증거가 아니라 원문 메타데이터다. 따라서 v2의 `decisions[].requirement_ids`와 `related_requirements`에는 이를 승격하지 않고 `unverified_adr_requirement_links`를 `unknowns`에 기록하며 상태를 `partial`로 낮춘다. 팩을 설치하거나 잠근 사실은 정책의 `verified` 판정이 아니다. A5.4/A5.5/A6/A7은 이 남은 계약을 통과하기 전 완료로 표시하지 않는다.",
+                "token_estimate": 618
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/END-TO-END-DESIGN.md",
+                  "start_line": 43,
+                  "end_line": 54,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "### 2.1 ID와 직렬화\n\n`project_id`는 `cks init --project-id`에 명시하거나 UUIDv4로 한 번 생성해 설정과 데이터셋 루트의 `project.json`에 저장한다. 프로젝트 표시 이름·Git remote·경로를 ID로 재계산하지 않는다. pilot은 명시적으로 `knowledge-system`을 사용한다. 중복 ID가 다른 루트의 기존 `project.json` 또는 다른 소스 지문과 만나면 자동 병합하지 않고 `project_conflict`다. 사용자가 프로젝트를 이동할 때는 함께 옮긴 `project.json`이 신원의 근거다.\n\n각 입력의 `origin_id`는 `repo`, `docs:\u003c선언한 이름\u003e`, `ontology`, `spec`, `policy:\u003c이름\u003e`, `flow:\u003c이름\u003e` 중 하나다. D5 선택형 외부 로컬 팩은 `knowledge:\u003cpack_id\u003e`를 추가하며 정확 버전/다이제스트 잠금과 같은 캡처·접근 검사를 받는다. v2는 네트워크 문서 수집을 지원하지 않는다. 외부 문서는 설정에 이름과 로컬 루트를 명시해야 하며 캡처 후 인용에는 로컬 절대 경로 대신 `origin_id`와 상대 경로를 쓴다. 생성 의미 텍스트는 원본 ontology/spec/선택 팩 파일 해시와 렌더러 버전을 빌드 레시피에 넣고 출력 바이트를 **파생 매니페스트**로 별도 검증한다. 생성 출력의 해시는 빌드 전 `dataset_id`에 넣지 않아 순환 신원을 만들지 않는다.\n\n파일 레코드는 `{origin_id, path, kind, size, sha256}`다. `path`는 `/` 구분의 저장소/원천 상대 경로로, `.`·`..`·절대 경로·NUL·비UTF-8·NFC 정규화 후 중복·macOS 대소문자 충돌을 거부한다. 일반 파일만 보관한다. 심볼릭 링크는 내부 링크도 자동 추적하지 않고 `doctor`의 미지원 개수로 표시한다. 각 경로 성분은 루트 디렉터리 핸들에서 `openat` 계열의 no-follow 방식으로 열어 검사한다. 단순 문자열 검사 뒤 `os.ReadFile`하는 시간차 취약성을 피한다. 비밀/제외 경로는 양 엔진이 공통으로 해석하는 정책으로 캡처 전에 제거하고, 사유·개수만 기록한다. CKG의 실제 파일 목록은 원본 입력 매니페스트의 허용 부분집합이어야 한다. CKV는 그 목록과 검증된 **파생 매니페스트**의 합집합만 읽는다. 선언된 원본 입력의 누락이나 미등록 파생 파일은 게이트 실패다.\n\n`file_manifest_digest`는 레코드를 `(origin_id,path)` 순으로 정렬하고 각 문자열을 UTF-8 길이 접두어로 직렬화해 SHA-256 한다. 레코드 구분과 필드 구분의 모호성을 없애며 정규화 구현의 골든 바이트를 저장한다. `source_mode`는 `committed|working-tree|snapshot-only`다. 마지막 모드는 Git이 없는 프로젝트의 정적 파일 스냅샷이며 `base_commit`은 빈 값으로 직렬화한다. `snapshot_id = SHA256(\"cks.snapshot.v2\\0\" || project_id || source_mode || base_commit || file_manifest_digest || capture_policy_digest)`다. `dataset_id = SHA256(\"cks.dataset.v2\\0\" || snapshot_id || build_recipe_digest)`다. 모든 결합 항목은 같은 길이 접두어 규칙을 쓴다. `build_recipe_digest`에는 CKG/CKV/CKS 스키마·파서/청커 버전, 선택 파일/정책, 온톨로지·스펙 입력, 임베딩 정체성, 의미 렌더러 버전, 대상 OS/CPU와 빌드 태그/Go 버전이 들어간다. OS별 파서/빌드 태그로 결과가 달라져도 같은 데이터셋 ID가 되지 않게 한다. **출력** 그래프·벡터·의미 다이제스트는 순환 ID를 만들지 않도록 계산에서 제외하고 완료 뒤 별도 검증한다.\n\nDB와 sidecar가 공유하는 `CoordinateHeader`의 필수 필드는 `format_version=2`, `project_id`, `dataset_id`, `snapshot_id`, `source_mode`, `base_commit`, `file_manifest_digest`, `build_recipe_digest`, `embedding_identity`(graph-only면 `none`), `capabilities`, `input_count`다. 빌드가 끝난 뒤 최상위 **`CompletionManifest`**가 이 헤더에 `graph_digest`, `vector_db_sha256`, `semantic_digest`(의미 없음이면 명시적 `none`), `derived_manifest_digest`를 더한다. 출력 DB의 물리 SHA를 그 DB 안에 쓰는 자기 참조는 금지한다. `src_root`는 운영 표시용이며 조인 키가 아니다. `--version`은 사람이 읽는 디렉터리 별칭이고 ID가 아니다. 프로젝트·원천·데이터셋 ID가 하나라도 다른 교차 계층 조회는 거부한다.\n",
+                "token_estimate": 631
+              },
+              {
+                "citation": {
+                  "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+                  "start_line": 25,
+                  "end_line": 43,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "## 3. 입력 배치와 잠금\n\n프로젝트 소유 입력은 `.cks/knowledge/` 아래에 둔다. Git 저장소이면 일반 저장소 파일로, 비Git이면 A4의 `snapshot-only` 캡처 원천으로 처리한다. 사용자가 별도 로컬 경로를 등록한 팩은 네트워크에서 자동 다운로드하지 않고 캡처 시 `origin_id=knowledge:\u003cpack_id\u003e`로 보관한다. 등록되지 않은 절대 경로나 심볼릭 링크는 읽지 않는다. 제외·민감 경로는 CKV/CKG와 같은 캡처 정책을 거친다.\n\n```text\n.cks/knowledge/manifest.yaml          # 프로젝트 ID, 선택 팩, 소스 범위\n.cks/knowledge/knowledge.lock.json     # 정확한 팩 버전·파일 SHA-256·정렬 순서\n.cks/knowledge/domain/*.yaml           # 프로젝트 객체·행위·용어와 타입 매핑\n.cks/knowledge/policies/*.yaml         # 정책·예외·유효 범위와 출처\n.cks/knowledge/decisions/*.md          # 결정·이유·대안·근거의 구조화된 ADR\n.cks/knowledge/questions/*.yaml        # 업무 질문·기대 경로·금지 해석\n```\n\n`cks knowledge init`은 템플릿을 만들지만 기존 파일을 덮어쓰지 않는다. `cks knowledge validate`는 읽기 전용으로 구문·타입·출처·충돌을 보고한다. `cks knowledge lock`은 명시 선택된 로컬 팩의 바이트를 해시해 재현 가능한 잠금 파일을 만든다. `cks knowledge review`는 제안 인스턴스/관계와 원천을 제시하고 사람의 검토 기록을 입력 원본에 남긴다. 실제 인덱스 빌드는 잠금 파일이 입력 바이트와 다르면 `pack_lock_mismatch`로 실패한다. 새 명령과 파일 형식은 A5.4/A5.5/A7.1 구현 과제다.\n\n잠금 파일은 `project_id`, `pack_schema_version`, 정렬된 `{pack_id, version, digest, dependencies, origin_id}`와 `overlay_digest`를 담고, 정규화된 바이트의 SHA-256으로 자체 `lock_digest`를 만든다. 자가 참조를 피하기 위해 `lock_digest` 필드는 해시 입력에서 제외한다. **`overlay_digest`의 입력에서는 `knowledge.lock.json` 전체를 제외**하고, `manifest.yaml` 및 `domain/`, `policies/`, `decisions/`, `questions/`의 등록된 일반 파일을 `(origin_id,path)` 순서로 해시한다. 각 파일 레코드는 A4의 상대 경로 정규화·바이트 SHA-256 규칙을 따르며 임시/숨김/미등록 파일을 묵인하지 않는다. `manifest.yaml`의 `source`는 저장소 루트 기준 상대 경로 또는 별도 등록한 로컬 루트의 `origin_id` 참조이며, 절대 경로·심볼릭 링크·루트 탈출은 거부한다. 외부 팩의 정확한 파일 목록과 다이제스트는 A4 원천 매니페스트에도 포함한다. `build_recipe_digest`는 `lock_digest`, resolver/renderer 버전과 관계 검증기 버전을 포함한다. 그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다. 기존 데이터셋을 제자리 수정하지 않는다.\n\n잠금의 `digest`와 `overlay_digest`는 정렬된 파일 레코드의 길이 접두어 직렬화에 대해 계산한다. 파일 해시는 **원문 바이트**에 대해 계산하므로 YAML 키 순서나 Markdown 공백 변경도 새 잠금을 요구한다. `lock_digest`만 잠금 객체에서 해당 필드를 제거한 뒤 키 순서가 고정된 정규 JSON 바이트에 대해 계산한다. 이 두 해시 절차의 골든 바이트와 충돌/누락 오류 코드는 A5.4 fixture로 고정한다.\n",
+                "token_estimate": 496
+              },
+              {
+                "citation": {
+                  "file": "internal/system/knowledgepack/lock.go",
+                  "start_line": 80,
+                  "end_line": 80,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "\t\treturn Manifest{}, fmt.Errorf(\"pack_incompatible: review_policy.min_approvals must be positive\")",
+                "token_estimate": 24
+              },
+              {
+                "citation": {
+                  "file": "internal/system/config/config.go",
+                  "start_line": 307,
+                  "end_line": 307,
+                  "commit_hash": "71cb71cd55960833e930269e272f7a4a060be3aa"
+                },
+                "text": "\t\treturn fmt.Errorf(\"config: backends.ckv.query_prefix_policy must be registry or none\")",
+                "token_estimate": 22
+              }
+            ],
+            "knowledge": [
+              {
+                "scope": "internal/vector/policy",
+                "kind": "convention",
+                "text": "package: internal/vector/policy. conventions summary.\nerrors: fmt.Errorf_wrap=4, fmt.Errorf_plain=3 (total=7)\ntests: 1 files, table_driven=2, testify=0\n"
+              }
+            ],
+            "metadata": {
+              "budget_tokens": 7200,
+              "used_tokens": 5951,
+              "utilization_ratio": 0.8265277777777778,
+              "built_at": "2026-10-05T23:01:17.359461Z",
+              "builder_version": "cks-mcp/0.0.1-dev",
+              "integrity_hash": "ab39de229d6d50922832145c82e02bdf58966e098d942981c7e1ec2668939c0b",
+              "integrity_hash_algo": "sha256"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

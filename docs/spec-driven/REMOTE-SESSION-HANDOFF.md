@@ -1,5 +1,21 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 재개 지점: 2026-10-06 FINAL4800 실패 포함 감사 완료·최신 package 검증
+
+입력①–⑤ 승인 완료. [현황](./EXECUTION-STATUS.md), [작업리스트43절](./EXECUTION-WORKLIST.md), [DEV 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md), [FINAL 보고](./C1-APPROVED-FINAL-REPORT.md)를 우선한다. 전체22완료/8미완료·official stage0/4. 남은 전체는 B1-04·06·07·08, C1-04·05·06·07이다. 아래 과거 승인 대기/완료 수는 당시 기록이다.
+
+DEV3840과 독립 FINAL4800 수집 종료. FINAL 원본 `/private/tmp/ks-approved-final-sweep-20261006/execution.json`의 failed_preserved 상태를 그대로 보존한다. 정상팩4560 source/공개 Go 유효, POLICY03 오류240. 정적 양성1/6·MRR0.5/6, v1 양성1pass/5miss·두 인용0개 guard fail. raw20/F01 자격/F02 noise 동점/F04 stale/v1 계측40 완료. 실제 Go로10개 retained span 검증 뒤33104바이트에서 budget_exceeded가 발생함을 확인했다. FINAL query/gold/K/상한/제품 코드를 튜닝하지 않았다.
+
+실행 바이너리 `/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks` SHA `3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6`, 개발 동결1096소스/승인5입력/native 저장소 불변. 사용자 Ollama를 종료/언로드하지 않았다. 제품 기본값은 opt-in이며 승인 소표본 규칙과 실패에 따라 disabled 유지. 소수표본이나 pooled 비용 하나로 release pass를 만들지 않는다.
+
+원자료는 `system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-after-development-freeze`(237MB→20.37MB, 전체계획행·failed_capture 포함) 및 `final-oracles`에 SHA/무손실 gzip 보관. 최종 집계는 final-summary-corrected.json이다. 최초 집계 source 분모 오류, Go 실패exit2/record status 가정, 진단1회 원장 재사용9로그의 전체/tail/prefix·3SHA·원 MID240 복원을 별도 보존했다. original report/rows는 그대로다. 실패한 후속 스크립트/대기3개는 작업 전용으로 종료했고 필요한 단계만 재개해 완료했다.
+
+C1-01/02/03의 수집·판정·disabled 범위 완료. 다음 우선순위: 현재 소스·자료를 로컬 checkpoint → 최신 Darwin arm64/Linux arm64/Linux amd64(emulated) 시험 preview → 실제 BGE/승인 대규모13820·복구 → 지원/known limits·사람 출력/운영 종료. Linux fixture는 Git tracked 파일만 복사하므로 새 제품 파일을 먼저 커밋한다. 재빌드 package의 VCS/version/binary SHA와 공식 runtime을 구분하고 bit identity를 추정하지 않는다. 품질 fail인 후보를 운영 release로 부르지 않는다.
+
+[HC01–08 출력/비용](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 및 [운영 scope/OP](./C1-OPERATIONS-REVIEW.md) 응답은 별도 대기다. 입력 승인을 출력/사람 기권·비용·운영 정책/법적 적합성 승인으로 바꾸지 않는다. 미측정 비용은0이 아니며 native amd64 실환경/운영 키·역할/신뢰·전체 적합성은 미제공이다. 답변이 오면 frozen5입력을 수정하지 말고 별도 검토 기록에 결합한다.
+
+사용자 `.claude/`, `logs/` 보존·커밋 제외. 원격 push의 이전 구체적 승인329becf3은 이미 처리된 범위이며 새 push 승인 없음. 매 세부 완료마다 현재 단계·검증·다음·남은 전체8개를 화면 로그에 표시한다. 앱 기존 goal은 blocked 상태지만 동일 목표의 실제 작업은 계속 수행하며 완료로 바꾸지 않았다.
+
 작성일: 2026-10-03. 이 문서는 다른 머신의 Codex 세션에 그대로 전달할 작업 프롬프트다. 실행 전 원격 브랜치와 문서의 최신 상태를 확인하고, 이후 변경 사항이 있으면 이 문서보다 최신 커밋과 WBS를 우선한다.
 
 ## 재개 후 보고 규칙

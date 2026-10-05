@@ -46,7 +46,7 @@ func modelTestPin() *setup.DatasetIdentity {
 }
 
 func TestMatrixModelIdentityProbe(t *testing.T) {
-	for _, scenario := range []string{"stable", "wrong_digest", "changed_digest", "wrong_dimension", "redirect", "cancelled"} {
+	for _, scenario := range []string{"stable", "stable_default_provider", "wrong_digest", "changed_digest", "wrong_dimension", "redirect", "cancelled"} {
 		t.Run(scenario, func(t *testing.T) {
 			tags, embeds := 0, 0
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +92,9 @@ func TestMatrixModelIdentityProbe(t *testing.T) {
 			defer server.Close()
 			cfg := config.Default()
 			cfg.Backends.CKV.Provider = "ollama"
+			if scenario == "stable_default_provider" {
+				cfg.Backends.CKV.Provider = ""
+			}
 			cfg.Backends.CKV.EmbedModel = "bge-m3"
 			cfg.Backends.CKV.OllamaURL = server.URL
 			ctx, cancel := context.WithCancel(context.Background())
@@ -100,10 +103,11 @@ func TestMatrixModelIdentityProbe(t *testing.T) {
 				cancel()
 			}
 			result := observeMatrixModel(ctx, cfg, modelTestPin())
-			if result.Valid != (scenario == "stable") {
+			stable := scenario == "stable" || scenario == "stable_default_provider"
+			if result.Valid != stable {
 				t.Fatalf("unexpected observation: %+v", result)
 			}
-			if scenario == "stable" && (tags != 2 || embeds != 1 || result.Dimension != 3 || result.ServerVersion != "test-version" || strings.Contains(string(result.Residency), "not-recorded") || strings.Contains(string(result.Residency), "other-private-model")) {
+			if stable && (result.Provider != "ollama" || tags != 2 || embeds != 1 || result.Dimension != 3 || result.ServerVersion != "test-version" || strings.Contains(string(result.Residency), "not-recorded") || strings.Contains(string(result.Residency), "other-private-model")) {
 				t.Fatal(result, tags, embeds)
 			}
 			if (scenario == "wrong_digest" || scenario == "redirect" || scenario == "cancelled") && embeds != 0 {

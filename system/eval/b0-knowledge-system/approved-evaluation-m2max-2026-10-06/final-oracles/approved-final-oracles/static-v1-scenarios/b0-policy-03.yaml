@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "b0-policy-03",
+  "prompt": "비공개 정책이 존재하지만 조회자가 접근 권한이 없으면 정책 본문이나 ID를 코딩 문맥에 넣을 수 있나요?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "internal/system/knowledgepack/instances.go",
+      "start_line": 203,
+      "end_line": 241,
+      "anchor": "if p.Visibility == \"restricted\" && !allowRestricted {"
+    }
+  ]
+}

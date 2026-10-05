@@ -1,0 +1,1159 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "scope": "approved static FINAL v1 raw SDK responses with measurement-ID/backend bindings; outside paired latency capture; anchor metrics are in separate cks eval report",
+  "command": [
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-approved-scope-20261006/approved-final-v1-instrumented/requests.json",
+    "--config",
+    "/private/tmp/ks-approved-scope-20261006/approved-final-v1-instrumented/config.yaml",
+    "--cks-mcp",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+    "--output",
+    "/private/tmp/ks-approved-scope-20261006/approved-final-v1-instrumented/capture.json",
+    "--warmup",
+    "0",
+    "--retrieval-runs",
+    "5",
+    "--warm-runs",
+    "0",
+    "--cold-runs",
+    "0",
+    "--call-timeout",
+    "90s"
+  ],
+  "capture_sha256": "b6616dcc32f3324fdac79b244ff2723067efc7a6101f002bf539c7aa4d51fe34",
+  "requests_sha256": "13140b84dcac9a4174332932580e0c6ead9fc09abbda7b121704ed2507c78b00",
+  "config_sha256": "99069f2a26869b3f827eea9ce169aab16b41bc69c6616b8192c83d93e1e43afc",
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "footprints_sha256": "d5ef52878955ad45972683453b5254a38f465b25325dadfba2e56ec8892201a5",
+  "rows": [
+    {
+      "request_id": "B0-CODE-02",
+      "iteration": 1,
+      "measurement_id": "6ded4c7567cc01b94220ce58431a1639",
+      "source_files_sha256": {
+        "internal/graph/persist/store_interface.go": "abc771ee5b0c5c2c25c4d9d20644c394f0a3ad673e1d8475778c7f4d78a101a7",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/system/ckgclient/real.go": "bdeffecdd1c2568a8907d0b9afc6bf62b56df7ee6f6993851a57c4da5dd57f9d",
+        "cmd/vector/eval.go": "47b3b4ca2a824b3ec999e46c852ac92ccc0a28b350d31f4e5799f8c3eb76c2a8",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 120,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-02",
+      "iteration": 2,
+      "measurement_id": "6f8e54fb4ed15c4fd25d0fc4a1091905",
+      "source_files_sha256": {
+        "internal/graph/persist/store_interface.go": "abc771ee5b0c5c2c25c4d9d20644c394f0a3ad673e1d8475778c7f4d78a101a7",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/system/ckgclient/real.go": "bdeffecdd1c2568a8907d0b9afc6bf62b56df7ee6f6993851a57c4da5dd57f9d",
+        "cmd/vector/eval.go": "47b3b4ca2a824b3ec999e46c852ac92ccc0a28b350d31f4e5799f8c3eb76c2a8",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 120,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-02",
+      "iteration": 3,
+      "measurement_id": "cf294c656db326cc62c5ae9dcc4751a8",
+      "source_files_sha256": {
+        "internal/graph/persist/store_interface.go": "abc771ee5b0c5c2c25c4d9d20644c394f0a3ad673e1d8475778c7f4d78a101a7",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/system/ckgclient/real.go": "bdeffecdd1c2568a8907d0b9afc6bf62b56df7ee6f6993851a57c4da5dd57f9d",
+        "cmd/vector/eval.go": "47b3b4ca2a824b3ec999e46c852ac92ccc0a28b350d31f4e5799f8c3eb76c2a8",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 120,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-02",
+      "iteration": 4,
+      "measurement_id": "95cf96dd118c906eb1698084e24ed89e",
+      "source_files_sha256": {
+        "internal/graph/persist/store_interface.go": "abc771ee5b0c5c2c25c4d9d20644c394f0a3ad673e1d8475778c7f4d78a101a7",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/system/ckgclient/real.go": "bdeffecdd1c2568a8907d0b9afc6bf62b56df7ee6f6993851a57c4da5dd57f9d",
+        "cmd/vector/eval.go": "47b3b4ca2a824b3ec999e46c852ac92ccc0a28b350d31f4e5799f8c3eb76c2a8",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 120,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-02",
+      "iteration": 5,
+      "measurement_id": "406b5207ec0b57236836fe1276079e6a",
+      "source_files_sha256": {
+        "internal/graph/persist/store_interface.go": "abc771ee5b0c5c2c25c4d9d20644c394f0a3ad673e1d8475778c7f4d78a101a7",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/system/ckgclient/real.go": "bdeffecdd1c2568a8907d0b9afc6bf62b56df7ee6f6993851a57c4da5dd57f9d",
+        "cmd/vector/eval.go": "47b3b4ca2a824b3ec999e46c852ac92ccc0a28b350d31f4e5799f8c3eb76c2a8",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 120,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-03",
+      "iteration": 1,
+      "measurement_id": "7e72cb68b55b390fe46a55985b274549",
+      "source_files_sha256": {
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/A0-TRACE-BASELINE.md": "c0e230ac0e4257f4c54ba75a2563eb85422511454a65424a248f0af50c1f2a87",
+        "docs/spec-driven/A8-GATE-REPORT.md": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "internal/system/composer/stage2/searcher.go": "1c130705b4043c245ca785bad402e675ec0302605d10689862488de0d0f15f40",
+        "internal/vector/eval/prregress/types.go": "9756208b93a099f6afe93bf9b04e7f544957d7e3f349aa5b1a186292e87a7265"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-03",
+      "iteration": 2,
+      "measurement_id": "3f3e497209484bc324b03f21c1657963",
+      "source_files_sha256": {
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/A0-TRACE-BASELINE.md": "c0e230ac0e4257f4c54ba75a2563eb85422511454a65424a248f0af50c1f2a87",
+        "docs/spec-driven/A8-GATE-REPORT.md": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "internal/system/composer/stage2/searcher.go": "1c130705b4043c245ca785bad402e675ec0302605d10689862488de0d0f15f40",
+        "internal/vector/eval/prregress/types.go": "9756208b93a099f6afe93bf9b04e7f544957d7e3f349aa5b1a186292e87a7265"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-03",
+      "iteration": 3,
+      "measurement_id": "3361b5bd3cfc13da90fbbc27cbf2779d",
+      "source_files_sha256": {
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/A0-TRACE-BASELINE.md": "c0e230ac0e4257f4c54ba75a2563eb85422511454a65424a248f0af50c1f2a87",
+        "docs/spec-driven/A8-GATE-REPORT.md": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "internal/system/composer/stage2/searcher.go": "1c130705b4043c245ca785bad402e675ec0302605d10689862488de0d0f15f40",
+        "internal/vector/eval/prregress/types.go": "9756208b93a099f6afe93bf9b04e7f544957d7e3f349aa5b1a186292e87a7265"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-03",
+      "iteration": 4,
+      "measurement_id": "3f1057cf091c336a07af6e053cbf5bbd",
+      "source_files_sha256": {
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/A0-TRACE-BASELINE.md": "c0e230ac0e4257f4c54ba75a2563eb85422511454a65424a248f0af50c1f2a87",
+        "docs/spec-driven/A8-GATE-REPORT.md": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "internal/system/composer/stage2/searcher.go": "1c130705b4043c245ca785bad402e675ec0302605d10689862488de0d0f15f40",
+        "internal/vector/eval/prregress/types.go": "9756208b93a099f6afe93bf9b04e7f544957d7e3f349aa5b1a186292e87a7265"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-03",
+      "iteration": 5,
+      "measurement_id": "65f5f4c912a681d24bcc8d542beac343",
+      "source_files_sha256": {
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/A0-TRACE-BASELINE.md": "c0e230ac0e4257f4c54ba75a2563eb85422511454a65424a248f0af50c1f2a87",
+        "docs/spec-driven/A8-GATE-REPORT.md": "fc639820245a2388d63bfe8532db826f28a7370b9a888e4034100398b2d24662",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "internal/system/composer/stage2/searcher.go": "1c130705b4043c245ca785bad402e675ec0302605d10689862488de0d0f15f40",
+        "internal/vector/eval/prregress/types.go": "9756208b93a099f6afe93bf9b04e7f544957d7e3f349aa5b1a186292e87a7265"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-01",
+      "iteration": 1,
+      "measurement_id": "910087af65705757a2ba4bdd4f4082c6",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "cmd/cks/patchcli/patch.go": "b35e96bbbdd0a54b52b5e8404bd9a11b63355beaba6ecb8060d68f80f2b51dba",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575"
+      },
+      "returned_citations": 20,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 51,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-01",
+      "iteration": 2,
+      "measurement_id": "d51ef72be0f8b0c09be7d41fb83a706c",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "cmd/cks/patchcli/patch.go": "b35e96bbbdd0a54b52b5e8404bd9a11b63355beaba6ecb8060d68f80f2b51dba",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575"
+      },
+      "returned_citations": 20,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 51,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-01",
+      "iteration": 3,
+      "measurement_id": "eac20d6fccc98bd0ff4d7b86760b9584",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "cmd/cks/patchcli/patch.go": "b35e96bbbdd0a54b52b5e8404bd9a11b63355beaba6ecb8060d68f80f2b51dba",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575"
+      },
+      "returned_citations": 20,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 51,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-01",
+      "iteration": 4,
+      "measurement_id": "91723bc87eb475df343e00391bbbc0dc",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "cmd/cks/patchcli/patch.go": "b35e96bbbdd0a54b52b5e8404bd9a11b63355beaba6ecb8060d68f80f2b51dba",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575"
+      },
+      "returned_citations": 20,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 51,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-01",
+      "iteration": 5,
+      "measurement_id": "17c082e48c48003b26f9af6c79459a6d",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "cmd/cks/patchcli/patch.go": "b35e96bbbdd0a54b52b5e8404bd9a11b63355beaba6ecb8060d68f80f2b51dba",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575"
+      },
+      "returned_citations": 20,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 51,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-02",
+      "iteration": 1,
+      "measurement_id": "6860805a51fb9b6fc20c3175c8eac4c1",
+      "source_files_sha256": {
+        "docs/dev/2026-08-14-pack-knowledge-in-engine-code.md": "4dc54e5ad3e3dea9341cec184874773d889fb773dce855ebfe97c5b988118be3",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/design/filelist-gen.md": "67cb1d52c294498260f8569769013341758595a9e6f4587c6e79a76780369f9a",
+        "docs/dev/2026-08-14-answers-on-the-launchd-label.md": "344f55c2e3400f5830f2da3fb49ac38d88ceba67a010f40d812fd1c5d2dfcca6",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "cmd/cks/setupcli/setup.go": "04e46d487fc16653e1dfda1b741d20ebb4601e816bea63d6056b56f67fd373af"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 141,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-02",
+      "iteration": 2,
+      "measurement_id": "1709797d0d223e4196856e60795d277d",
+      "source_files_sha256": {
+        "docs/dev/2026-08-14-pack-knowledge-in-engine-code.md": "4dc54e5ad3e3dea9341cec184874773d889fb773dce855ebfe97c5b988118be3",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/design/filelist-gen.md": "67cb1d52c294498260f8569769013341758595a9e6f4587c6e79a76780369f9a",
+        "docs/dev/2026-08-14-answers-on-the-launchd-label.md": "344f55c2e3400f5830f2da3fb49ac38d88ceba67a010f40d812fd1c5d2dfcca6",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "cmd/cks/setupcli/setup.go": "04e46d487fc16653e1dfda1b741d20ebb4601e816bea63d6056b56f67fd373af"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 141,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-02",
+      "iteration": 3,
+      "measurement_id": "06c532ea0b408abd187d9d6766f12228",
+      "source_files_sha256": {
+        "docs/dev/2026-08-14-pack-knowledge-in-engine-code.md": "4dc54e5ad3e3dea9341cec184874773d889fb773dce855ebfe97c5b988118be3",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/design/filelist-gen.md": "67cb1d52c294498260f8569769013341758595a9e6f4587c6e79a76780369f9a",
+        "docs/dev/2026-08-14-answers-on-the-launchd-label.md": "344f55c2e3400f5830f2da3fb49ac38d88ceba67a010f40d812fd1c5d2dfcca6",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "cmd/cks/setupcli/setup.go": "04e46d487fc16653e1dfda1b741d20ebb4601e816bea63d6056b56f67fd373af"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 141,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-02",
+      "iteration": 4,
+      "measurement_id": "bc2a81cc0fdbbe928a29952421cd2823",
+      "source_files_sha256": {
+        "docs/dev/2026-08-14-pack-knowledge-in-engine-code.md": "4dc54e5ad3e3dea9341cec184874773d889fb773dce855ebfe97c5b988118be3",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/design/filelist-gen.md": "67cb1d52c294498260f8569769013341758595a9e6f4587c6e79a76780369f9a",
+        "docs/dev/2026-08-14-answers-on-the-launchd-label.md": "344f55c2e3400f5830f2da3fb49ac38d88ceba67a010f40d812fd1c5d2dfcca6",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "cmd/cks/setupcli/setup.go": "04e46d487fc16653e1dfda1b741d20ebb4601e816bea63d6056b56f67fd373af"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 141,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-02",
+      "iteration": 5,
+      "measurement_id": "45d5bb91cc2721668c8177683d645802",
+      "source_files_sha256": {
+        "docs/dev/2026-08-14-pack-knowledge-in-engine-code.md": "4dc54e5ad3e3dea9341cec184874773d889fb773dce855ebfe97c5b988118be3",
+        "internal/setup/identity.go": "af444881d4d964158cd6483837f4eac19c8113acc684e5ee71d2bef66e93fecc",
+        "docs/spec-driven/DELIVERY-PLAN-V2.md": "cac2f0d7a80dd655e7795617f184654e5a30648b47ebb1961660480bd6b4de6a",
+        "docs/design/filelist-gen.md": "67cb1d52c294498260f8569769013341758595a9e6f4587c6e79a76780369f9a",
+        "docs/dev/2026-08-14-answers-on-the-launchd-label.md": "344f55c2e3400f5830f2da3fb49ac38d88ceba67a010f40d812fd1c5d2dfcca6",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "cmd/cks/setupcli/setup.go": "04e46d487fc16653e1dfda1b741d20ebb4601e816bea63d6056b56f67fd373af"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 141,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-02",
+      "iteration": 1,
+      "measurement_id": "6f502bce18b1d9f7b2a78b8ef9cbf9e7",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "docs/spec-driven/DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md": "be82432fac3a89703b94078b96ba89758b64308e46633e29013014062a214aaa",
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/graph/parse/solidity/overrides.go": "23303a52983cbaf8ff59e33505adcd2ac1abbca4dd3b5b6e34ba31d8c62d2bd3"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-02",
+      "iteration": 2,
+      "measurement_id": "cfd08e19ca1a46e90286cc43a29c4fad",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "docs/spec-driven/DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md": "be82432fac3a89703b94078b96ba89758b64308e46633e29013014062a214aaa",
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/graph/parse/solidity/overrides.go": "23303a52983cbaf8ff59e33505adcd2ac1abbca4dd3b5b6e34ba31d8c62d2bd3"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-02",
+      "iteration": 3,
+      "measurement_id": "2dcfc4beaf5af55027c949bcccbb245e",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "docs/spec-driven/DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md": "be82432fac3a89703b94078b96ba89758b64308e46633e29013014062a214aaa",
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/graph/parse/solidity/overrides.go": "23303a52983cbaf8ff59e33505adcd2ac1abbca4dd3b5b6e34ba31d8c62d2bd3"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-02",
+      "iteration": 4,
+      "measurement_id": "2f9039d44451e4c4b06a1e76e8dd74e2",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "docs/spec-driven/DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md": "be82432fac3a89703b94078b96ba89758b64308e46633e29013014062a214aaa",
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/graph/parse/solidity/overrides.go": "23303a52983cbaf8ff59e33505adcd2ac1abbca4dd3b5b6e34ba31d8c62d2bd3"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-02",
+      "iteration": 5,
+      "measurement_id": "7552fec1b37f80bcce0b701561d06671",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "docs/spec-driven/DOMAIN-KNOWLEDGE-PACK-PROPOSAL.md": "be82432fac3a89703b94078b96ba89758b64308e46633e29013014062a214aaa",
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "internal/system/knowledgepack/review.go": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+        "internal/graph/parse/solidity/overrides.go": "23303a52983cbaf8ff59e33505adcd2ac1abbca4dd3b5b6e34ba31d8c62d2bd3"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-03",
+      "iteration": 1,
+      "measurement_id": "436672fdefc50e9644aaef92682ea72d",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/system/config/config.go": "e8b11b18b666a876cc8397d9747662f27c8cff26281ecff9bcd49ca716ed40d6"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-03",
+      "iteration": 2,
+      "measurement_id": "446f974a625eb45d630ab2af5661dd00",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/system/config/config.go": "e8b11b18b666a876cc8397d9747662f27c8cff26281ecff9bcd49ca716ed40d6"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-03",
+      "iteration": 3,
+      "measurement_id": "cfa071c15b44fecfb5147cd021bcce67",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/system/config/config.go": "e8b11b18b666a876cc8397d9747662f27c8cff26281ecff9bcd49ca716ed40d6"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-03",
+      "iteration": 4,
+      "measurement_id": "141f28d4def25d5fb41614853ff00f7c",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/system/config/config.go": "e8b11b18b666a876cc8397d9747662f27c8cff26281ecff9bcd49ca716ed40d6"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-03",
+      "iteration": 5,
+      "measurement_id": "82419207f8dd189bdd53cf34028ba074",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md": "8de59a63c70b003cbf018fcedd6c5c0821d157ac4566ca8ca9900bcf1518b569",
+        "cmd/cks/knowledgecli/knowledge.go": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+        "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/system/config/config.go": "e8b11b18b666a876cc8397d9747662f27c8cff26281ecff9bcd49ca716ed40d6"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 31,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-01",
+      "iteration": 1,
+      "measurement_id": "25879bb354049b31d3b45fb5aa1eef56",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "projects/stablenet/domain-knowledge/flow-corpus/invariants.md": "9c79d7f3bb747d6ad38dc75c1a07982bd84456634a5f29d26762d69b6e92853b",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-blockimport.md": "62b5591d190266533173052c7aa0199e3e0b2cdf2b4dabf2b1e433a3c0ba7b5a",
+        "projects/stablenet/domain-knowledge/verification-worksheet.md": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918",
+        "projects/stablenet/domain-knowledge/inventory.md": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-finalize.md": "c2511771907923022113c688a9065602191e714a7a61fb404d7073d36a6cddd4",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/graph/persist/postgres_store.go": "04fa8bf9663488db464c8e3b3ecbd17986a801c5636796a49cca870e35a49e36"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 22,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-01",
+      "iteration": 2,
+      "measurement_id": "34189c392f0a85d7400214f0ff1b74e2",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "projects/stablenet/domain-knowledge/flow-corpus/invariants.md": "9c79d7f3bb747d6ad38dc75c1a07982bd84456634a5f29d26762d69b6e92853b",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-blockimport.md": "62b5591d190266533173052c7aa0199e3e0b2cdf2b4dabf2b1e433a3c0ba7b5a",
+        "projects/stablenet/domain-knowledge/verification-worksheet.md": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918",
+        "projects/stablenet/domain-knowledge/inventory.md": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-finalize.md": "c2511771907923022113c688a9065602191e714a7a61fb404d7073d36a6cddd4",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/graph/persist/postgres_store.go": "04fa8bf9663488db464c8e3b3ecbd17986a801c5636796a49cca870e35a49e36"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 22,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-01",
+      "iteration": 3,
+      "measurement_id": "928ff4e45b408f3d421cdae69a4d5a45",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "projects/stablenet/domain-knowledge/flow-corpus/invariants.md": "9c79d7f3bb747d6ad38dc75c1a07982bd84456634a5f29d26762d69b6e92853b",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-blockimport.md": "62b5591d190266533173052c7aa0199e3e0b2cdf2b4dabf2b1e433a3c0ba7b5a",
+        "projects/stablenet/domain-knowledge/verification-worksheet.md": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918",
+        "projects/stablenet/domain-knowledge/inventory.md": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-finalize.md": "c2511771907923022113c688a9065602191e714a7a61fb404d7073d36a6cddd4",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/graph/persist/postgres_store.go": "04fa8bf9663488db464c8e3b3ecbd17986a801c5636796a49cca870e35a49e36"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 22,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-01",
+      "iteration": 4,
+      "measurement_id": "4589881e078e432bdd48f0410441e6fb",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "projects/stablenet/domain-knowledge/flow-corpus/invariants.md": "9c79d7f3bb747d6ad38dc75c1a07982bd84456634a5f29d26762d69b6e92853b",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-blockimport.md": "62b5591d190266533173052c7aa0199e3e0b2cdf2b4dabf2b1e433a3c0ba7b5a",
+        "projects/stablenet/domain-knowledge/verification-worksheet.md": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918",
+        "projects/stablenet/domain-knowledge/inventory.md": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-finalize.md": "c2511771907923022113c688a9065602191e714a7a61fb404d7073d36a6cddd4",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/graph/persist/postgres_store.go": "04fa8bf9663488db464c8e3b3ecbd17986a801c5636796a49cca870e35a49e36"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 22,
+        "ckv": 3,
+        "ollama_http": 12,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-01",
+      "iteration": 5,
+      "measurement_id": "1de46af077bddef0b6714041e1584bfb",
+      "source_files_sha256": {
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md": "2ebf644aeb5c385795267390bd2e540f52b7cdbf42338d38af0f2d085d36e779",
+        "projects/stablenet/domain-knowledge/flow-corpus/invariants.md": "9c79d7f3bb747d6ad38dc75c1a07982bd84456634a5f29d26762d69b6e92853b",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-blockimport.md": "62b5591d190266533173052c7aa0199e3e0b2cdf2b4dabf2b1e433a3c0ba7b5a",
+        "projects/stablenet/domain-knowledge/verification-worksheet.md": "4caa84a5ea37a29c1a228368104ab5ef54b6c5331d39e3a09a48c359b42b3918",
+        "projects/stablenet/domain-knowledge/inventory.md": "fe350d6fcac8cb83958a7eaefabe0f51d13c7c8febf18a3da07e45c07b67d779",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-finalize.md": "c2511771907923022113c688a9065602191e714a7a61fb404d7073d36a6cddd4",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/spine-statetransition.md": "8ec6831a288640b03c7996ed9ccf96bcb2aa06b818ec94a412bf39846dfdd4e6",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "internal/graph/persist/postgres_store.go": "04fa8bf9663488db464c8e3b3ecbd17986a801c5636796a49cca870e35a49e36"
+      },
+      "returned_citations": 10,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 22,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-02",
+      "iteration": 1,
+      "measurement_id": "4f1d0771e960089aa2ccccbad1da6c72",
+      "source_files_sha256": {
+        "cmd/cks/packagecli/verify.go": "b3d04ae7a5328385a20be88af896aab4140875a856f5e3fdae30c1f6bd490b29",
+        "docs/spec-driven/INSTALLATION-PILOT.md": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "docs/spec-driven/DESIGN-CLOSURE.md": "5ef707e565397b23be257936ef79254382c087438e5bf38891ad4c45dad5202d",
+        "internal/system/mcp/alignment.go": "2ada6115c1515490bf94e1528fd0c29789e87099ddc213b0eb212f6e16606bc3",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/graph/parse/solidity/type_size.go": "8b3374d90543a98d62f9eff25b2fff52b0e2f520f57f379a36d8f2e9173752be"
+      },
+      "returned_citations": 25,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-02",
+      "iteration": 2,
+      "measurement_id": "1bdfa30cd630a0043dc0f105ea97140c",
+      "source_files_sha256": {
+        "cmd/cks/packagecli/verify.go": "b3d04ae7a5328385a20be88af896aab4140875a856f5e3fdae30c1f6bd490b29",
+        "docs/spec-driven/INSTALLATION-PILOT.md": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "docs/spec-driven/DESIGN-CLOSURE.md": "5ef707e565397b23be257936ef79254382c087438e5bf38891ad4c45dad5202d",
+        "internal/system/mcp/alignment.go": "2ada6115c1515490bf94e1528fd0c29789e87099ddc213b0eb212f6e16606bc3",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/graph/parse/solidity/type_size.go": "8b3374d90543a98d62f9eff25b2fff52b0e2f520f57f379a36d8f2e9173752be"
+      },
+      "returned_citations": 25,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-02",
+      "iteration": 3,
+      "measurement_id": "c9294e973f953cd3ec9e5af4d2b790dd",
+      "source_files_sha256": {
+        "cmd/cks/packagecli/verify.go": "b3d04ae7a5328385a20be88af896aab4140875a856f5e3fdae30c1f6bd490b29",
+        "docs/spec-driven/INSTALLATION-PILOT.md": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "docs/spec-driven/DESIGN-CLOSURE.md": "5ef707e565397b23be257936ef79254382c087438e5bf38891ad4c45dad5202d",
+        "internal/system/mcp/alignment.go": "2ada6115c1515490bf94e1528fd0c29789e87099ddc213b0eb212f6e16606bc3",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/graph/parse/solidity/type_size.go": "8b3374d90543a98d62f9eff25b2fff52b0e2f520f57f379a36d8f2e9173752be"
+      },
+      "returned_citations": 25,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-02",
+      "iteration": 4,
+      "measurement_id": "1307daa868c39bc80af9ed3b02f2a5ea",
+      "source_files_sha256": {
+        "cmd/cks/packagecli/verify.go": "b3d04ae7a5328385a20be88af896aab4140875a856f5e3fdae30c1f6bd490b29",
+        "docs/spec-driven/INSTALLATION-PILOT.md": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "docs/spec-driven/DESIGN-CLOSURE.md": "5ef707e565397b23be257936ef79254382c087438e5bf38891ad4c45dad5202d",
+        "internal/system/mcp/alignment.go": "2ada6115c1515490bf94e1528fd0c29789e87099ddc213b0eb212f6e16606bc3",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/graph/parse/solidity/type_size.go": "8b3374d90543a98d62f9eff25b2fff52b0e2f520f57f379a36d8f2e9173752be"
+      },
+      "returned_citations": 25,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-ABS-02",
+      "iteration": 5,
+      "measurement_id": "80239c668681739e0991be39c1e702cf",
+      "source_files_sha256": {
+        "cmd/cks/packagecli/verify.go": "b3d04ae7a5328385a20be88af896aab4140875a856f5e3fdae30c1f6bd490b29",
+        "docs/spec-driven/INSTALLATION-PILOT.md": "11859366380fa68fea796ccec19d35775fce810fb4873e3ca51ff30d0e8a3da4",
+        "projects/stablenet/domain-knowledge/flow-corpus/flows/ep-keystore.md": "3b62483bd52f8bb856018fd3e44f0081e7a9aecfccccefdfd76c2d2c971e7a85",
+        "docs/spec-driven/EXECUTION.md": "9a93dae6bf5459e4234c1aeaa47c70fd1800421992e4c9150d9422b61c587645",
+        "docs/spec-driven/DESIGN-CLOSURE.md": "5ef707e565397b23be257936ef79254382c087438e5bf38891ad4c45dad5202d",
+        "internal/system/mcp/alignment.go": "2ada6115c1515490bf94e1528fd0c29789e87099ddc213b0eb212f6e16606bc3",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/graph/parse/solidity/type_size.go": "8b3374d90543a98d62f9eff25b2fff52b0e2f520f57f379a36d8f2e9173752be"
+      },
+      "returned_citations": 25,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 125,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    }
+  ],
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "inputs_unchanged": true,
+  "stores_unchanged": true,
+  "finished_at": "2026-10-05T23:10:23.273957+00:00"
+}

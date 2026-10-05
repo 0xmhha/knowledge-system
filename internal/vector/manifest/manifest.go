@@ -65,7 +65,8 @@ type Manifest struct {
 	DBSHA256 string `json:"db_sha256,omitempty"`
 
 	// Ignore patterns surfaced for transparency
-	CKVIgnore []string `json:"ckvignore,omitempty"`
+	CKVIgnore    []string `json:"ckvignore,omitempty"`
+	BuildSources []string `json:"build_sources,omitempty"`
 
 	// DocsRoots are additional markdown corpus directories indexed via
 	// `ckv build --docs` (outside SrcRoot, e.g. a cks-rendered

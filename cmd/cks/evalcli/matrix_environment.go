@@ -23,6 +23,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
 	"github.com/0xmhha/knowledge-system/internal/system/config"
+	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 )
 
 // Snapshots are outside query timing. They are observations, not a proof of
@@ -240,6 +241,11 @@ func sameMatrixEnvironment(before, after matrixEnvironment) bool {
 
 func observeMatrixModel(ctx context.Context, cfg *config.Config, identity *setup.DatasetIdentity) matrixModelObservation {
 	m := matrixModelObservation{Provider: cfg.Backends.CKV.Provider, Model: cfg.Backends.CKV.EmbedModel, ProbePolicy: "dataset declaration only; no model probe"}
+	// Match the serving path: generated configurations omit the provider
+	// and OpenWithOptions resolves it to the shared default.
+	if m.Provider == "" {
+		m.Provider = embedder.DefaultProvider
+	}
 	fail := func(reason string) matrixModelObservation { m.Errors = append(m.Errors, reason); return m }
 	var pin struct {
 		Provider string `json:"Provider"`

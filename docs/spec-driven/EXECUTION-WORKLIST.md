@@ -10,7 +10,7 @@
 
 작업 종료에는 입력·코드·명령·원자료·판정·제한을 연결한다. 사실 검토, 테스트 성공, 품질 합격, 운영 출시를 각각 판정한다. 최종 질문은 개발 튜닝에 사용하지 않는다. 소표본의 반복 실행은 독립 표본 수를 늘리지 않는다. 임계치나 정답을 관측 결과에 맞춰 바꾸지 않는다.
 
-현재 사람 결정: 정적 질문 12개와 BGE-M3 선택은 승인됐다. 검토자 기록은 로컬 식별자 `chat-user`이며 인증된 실명은 아니다. 동적 사례와 프로토콜의 마지막 답변은 **검토 후 결정**이다. 이 두 항목은 실행 지시와 구분하여 승인 대기로 유지한다. 이전 커밋 `329becf3`의 19개 파일은 사용자가 해당 브랜치 푸시를 승인했고 원격에 반영됐다.
+현재 사람 결정(2026-10-06): 정적 질문 12개·BGE-M3에 이어 **Go 소스 29개 포함·프로토콜·F-01–06·SF-03/05-A/05-B/06의 테스트 사례 범위·STV2 설정**을 사용자가 명시적으로 승인했다. [승인 입력 기록](./B0-APPROVED-INPUTS.md)에 원문·시각·전후 SHA를 연결했다. 검토자 `chat-user`는 로컬 식별자이며 인증된 실명은 아니다. 이전 “검토 후 결정”은 이력으로 보존하며 현재 승인 대기로 취급하지 않는다. 이전 커밋 `329becf3`의 19개 파일은 사용자가 해당 브랜치 푸시를 승인했고 원격에 반영됐다.
 
 매 턴 마지막 보고에는 **현재 단계와 이번 변경/검증 → 바로 다음 작업 → 남은 전체 작업**을 함께 표시한다. 완료/진행/대기를 시각적으로 구분하고 품질 게이트 완료와 도구 준비를 따로 센다. 사용자의 2026-10-04 지시를 이후 재개에도 유지한다. 최신 요약은 [진행 현황판](./EXECUTION-STATUS.md), 상세 선행·증거·완료 조건은 이 문서가 기준이다.
 
@@ -47,10 +47,10 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 | 순서 | 우선순위 | 작업 | 현재 상태 |
 |---|---|---|---|
 | 1 | P0 | 완료 재검증 R-01–15, 범위 누락·이력 증거 확인 | 구조 재검증 통과; 세 플랫폼 mock 패키지 재검증 통과 |
-| 2 | P0 | B0-01 입력 범위, B0-02/03 프로토콜·동적 검토 | 사람 검토 대기 |
+| 2 | P0 | B0-01 입력 범위, B0-02/03 프로토콜·동적 검토 | 승인 기록·입력 정의 검증 완료 |
 | 3 | P1 | B0-04/06 재현 픽스처·측정 실행 도구 | 개발 6개 준비·원응답/exact/budget·회전/환경/입력 사본 도구 검증; 승인된 공식 입력 연결 대기 |
 | 4 | P1 | B1-01/02 실제 ablation 어댑터·팩 축 | 네 경로와 합성 팩 off/on 8경로 구현 검증 완료; 운영 사실/공식 판정 대기 |
-| 5 | P1 | B0-05 의미 사실·팩·canonical 출처 결합 검토 | 개발 4개 검토 자료 준비·사람 판정 대기 |
+| 5 | P1 | B0-05 의미 사실·팩·canonical 출처 결합 검토 | 테스트 사례 승인 완료·새 source-bound 입력 결합 진행 |
 | 6 | P2 | B0-07–09 공식 기준선 | 선행 대기 |
 | 7 | P2 | B1-03–08 동일 조건 비교·판정 | B0 대기 |
 | 8 | P2 | C0-01–06 관측 실패의 스펙·시험·수정 | B1 대기 |
@@ -60,15 +60,15 @@ P0는 잘못된 완료 판정과 입력·검토의 결손을 먼저 해결한다
 
 | ID | 우선순위·선행 | 작업과 산출물 | 완료 조건 | 상태 |
 |---|---|---|---|---|
-| B0-01 | P0 · R-13 | CKV 기본 제외로 빠진 `internal/vector/build/` 29개를 목록·해시로 고정하고 기준선 범위를 결정한다 | 기존 범위 유지 또는 정확한 소스 포함 정책을 명시; 모든 arms 동일 입력; 비밀·링크·산출물 필터 유지 | 사람 검토 대기 |
-| B0-02 | P0 · R-12 | 정적 개발 4/최종 8, 검색 5회, warm 20회·2 warmup, 별도 cold, 지표·회귀 임계치·소표본 규칙을 검토하여 프로토콜 동결 | 승인자·시각·원문 해시와 승인 프로토콜; 결과를 본 뒤 변경하지 않음 | 사람 검토 대기 |
-| B0-03 | P0 | F-01–F-06의 개발/최종 입력·정답·실패 오라클 검토 | 12변형 검토 기록·원문 해시·독립 표본 단위 확정 | 사람 검토 대기 |
-| B0-04 | P1 · B0-03 | 초안 JSON의 입력을 실제 독립 저장소/커밋으로 생성. F-04는 순차 두 상태, F-05는 서로 다른 프로젝트 | 선언된 파일 SHA·줄·Git 독립성 일치; 재실행 바이트 동일; 기존 디렉터리 덮어쓰기 거부 | 진행: 개발 6개 준비·재현 검사 통과; F-03 project_id 원문과 불일치 수정/회귀 통과, 최종/승인 대기 |
-| B0-05 | P1 · B0-04 | F-03/05/06에 필요한 의미 사실·팩·스펙·관계·코드 앵커를 fixture 자기 스냅샷에 결합 | 검토 기록과 canonical ID·보관 줄 해시 일치; 미검토 자동 승격 0 | 진행: 개발 F-03/F-05 A·B/F-06 실제 mock/BGE-M3 결합·무승격 검증, [검토 자료](./B0-SEMANTIC-FIXTURE-REVIEW.md) 준비; 사람 판정/최종 대기 |
-| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 도구 검증 완료·공식 입력 연결 대기: [FIX-21 neighbors 인수 SHA](./B0-NEIGHBOR-BINDING-DIAGNOSTIC.md)의 수정 전 실패/관련 시험·race·실제4 SDK/32본문/20입력 Go 재생과 계측 on/off 동등성 확인; 원응답/exact/budget·실제 K/CKV/CKG/intent/HTTP 시도, 공유 raw/text K10·생략 K20, 8경로 순차 회전/warm/cold·SDK 실패·입력/HEAD/실행 비트 검증. 추가 환경·strict model 전후·입력 사본을 mock/BGE-M3 48응답으로 연결 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md)의 full eligible·실제 K/순위/source/exact/budget 재생 준비; [정적 v2 범위/K 제안](./B0-STATIC-V2-SCOPE-REVIEW.md)의 ID·해시·날짜·정수 K/분할·승인 연결/불변성 검증 준비 추가; 승인된 공식 입력·실제 runtime K와 환경 실행은 남음 |
-| B0-07 | P1 · B0-01/02/03/05/06 | 공식 데이터셋을 동결된 입력으로 빌드하고 보관 원문·그래프·벡터를 감사 | strict embedding·선택 범위·input hashes·split 재조립·정렬·doctor 통과; 빌드 지연 별도 계측 | 대기 |
-| B0-08 | P2 · B0-07 | 공식 정적 `cks eval --verify-anchors`와 F-01–06 실모델 실행 | 승인 gold와 원응답 연결; 최종 입력 독립; cold/warm 혼동 없음; F-01 자격 실패는 fixture_not_qualified | 대기 |
-| B0-09 | P2 · B0-08 | B0 보고서 작성: 정답·범위·환경·지표·실패·제한 | 승인 입력과 재현 명령·원자료 포함; 실패/기권/소표본을 성공으로 합산하지 않음 | 대기 |
+| B0-01 | P0 · R-13 | CKV 기본 제외로 빠진 `internal/vector/build/` 29개를 목록·해시로 고정하고 기준선 범위를 결정한다 | 기존 범위 유지 또는 정확한 소스 포함 정책을 명시; 모든 arms 동일 입력; 비밀·링크·산출물 필터 유지 | 검증 완료: 승인한 정확한 29개 SHA/경로만 예외; 실제 discovery 1,569→1,598 차이 일치·수정 전 실패/관련 Go/race 검증. 신규 strict 빌드 감사는 B0-07 |
+| B0-02 | P0 · R-12 | 정적 개발 4/최종 8, 검색 5회, warm 20회·2 warmup, 별도 cold, 지표·회귀 임계치·소표본 규칙을 검토하여 프로토콜 동결 | 승인자·시각·원문 해시와 승인 프로토콜; 결과를 본 뒤 변경하지 않음 | 검증 완료: 명시적 프로토콜 승인·원문/시각/해시 결합; 분할·반복·임계치·소표본 규칙 동결, input-definition checker 통과 |
+| B0-03 | P0 | F-01–F-06의 개발/최종 입력·정답·실패 오라클 검토 | 12변형 검토 기록·원문 해시·독립 표본 단위 확정 | 검증 완료: F-01–06 DEV/FINAL 12변형 승인자·시각·해시 결합; source hash/분할/오라클 선언 검증 통과 |
+| B0-04 | P1 · B0-03 | 초안 JSON의 입력을 실제 독립 저장소/커밋으로 생성. F-04는 순차 두 상태, F-05는 서로 다른 프로젝트 | 선언된 파일 SHA·줄·Git 독립성 일치; 재실행 바이트 동일; 기존 디렉터리 덮어쓰기 거부 | 검증 완료: 승인 DEV/FINAL6+6 가족의 독립 소스/커밋/트리 생성; 개발 회귀·최종 두 저장소 반복 생성 bytes 일치·16상태 출처 검사. 최종 질의는 실행하지 않음 |
+| B0-05 | P1 · B0-04 | F-03/05/06에 필요한 의미 사실·팩·스펙·관계·코드 앵커를 fixture 자기 스냅샷에 결합 | 검토 기록과 canonical ID·보관 줄 해시 일치; 미검토 자동 승격 0 | 검증 완료: DEV4+FINAL4 의미/정책/코드 앵커를 각 실제 snapshot·보관 줄·native canonical로 결합. FINAL은 승인 정의와 동일 SF 사실 치환 증거; F-03 proposed·acceptance 비승인 유지. 승인 FINAL 입력 archive/source-vector 감사 참조 |
+| B0-06 | P1 | 실모델 측정 실행 도구: 전체 v1/v2 원응답, 직접 CKV exact 오라클·budget, model digest 전후, 지연·호출 수·크기 기록 | 입력 해시·실행 바이너리 SHA·모델·좌표·순서 고정; 누락/예외도 원자료; gold 답 본문을 검색 입력에 전달하지 않음 | 검증 완료: 승인 v1 anchor4×5·계측 SDK20 및 v2 DEV3840 전체 응답/measurement ID/backend K·호출/크기·warm/cold·model/입력/바이너리 전후 SHA 결합. direct raw16 full eligible/exact/상한·F01 자격·F02 동점 차이 보존. FINAL은 C1-01 |
+| B0-07 | P1 · B0-01/02/03/05/06 | 공식 데이터셋을 동결된 입력으로 빌드하고 보관 원문·그래프·벡터를 감사 | strict embedding·선택 범위·input hashes·split 재조립·정렬·doctor 통과; 빌드 지연 별도 계측 | 검증 완료: 승인 정적1,598파일/13,820벡터 + DEV8/FINAL8 각150벡터 strict 빌드·모델 pin·보관 원문/분할/DB orphan0 감사. 입력/빌더/소스/검토/정체성 결합. 쿼리·품질 판정은 B0-08/09 |
+| B0-08 | P2 · B0-07 | 공식 정적 `cks eval --verify-anchors`와 F-01–06 실모델 실행 | 승인 gold와 원응답 연결; 최종 입력 독립; cold/warm 혼동 없음; F-01 자격 실패는 fixture_not_qualified | 검증 완료: 승인 strict 정적 DEV4×5와 동적6가족/8상태·8arm DEV3840 실제 수집 및 source/공개 Go 감사 오류0. static miss3/pass1·미검토 의미 비승격·state guard/stale 오라클 보존. 독립 FINAL은 C1-01 |
+| B0-09 | P2 · B0-08 | B0 보고서 작성: 정답·범위·환경·지표·실패·제한 | 승인 입력과 재현 명령·원자료 포함; 실패/기권/소표본을 성공으로 합산하지 않음 | 검증 완료: [승인 DEV 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 정답/범위·환경·원자료·검색 실패·지연/비용·소표본 제한 연결. baseline 품질 개선/사람 답변/출시 pass로 바꾸지 않음 |
 
 F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 다의어/미등록, F-04 오래된 상태·과거 인용, F-05 프로젝트 격리/서로 다른 정책, F-06 구현·정책 충돌 및 무관 테스트를 각각 확인한다. 검토 세부 내용은 [B0-M2MAX-REVIEW](./B0-M2MAX-REVIEW.md), 동결 후보는 `dynamic-fixtures-m2max-draft.json`과 `protocol-m2max-draft.json`이다.
 
@@ -78,12 +78,12 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 |---|---|---|---|---|
 | B1-01 | P1 | baseline / concept_text / relations / combined의 네 가지 실행 어댑터 구현 | 실제 실행 경로가 다름을 검증; 기본 꺼짐; 원문 질의 우선; 후보 K 보존·오류/모호성 폴백; 단순 플래그 이름만 추가하지 않음 | 검증 완료: 네 MCP 경로·텍스트/관계 기여 분리·상한/폴백, mock/BGE-M3 각 20요청. 공식 품질 통과와 별개 |
 | B1-02 | P1 · B0-05/B1-01 | 팩 off/on 축을 연결하여 8 arms 구성 | 팩 잠금과 데이터셋 신원 분리; 권한·범위·출처 적용; 단순 Markdown을 검토된 팩으로 취급하지 않음 | 구현 검증 완료: 동일 dataset/lock의 8개 v2 경로, mock/BGE-M3 각 48요청·6정책 상태·인용/본문 보존·원문/integrity·DB 무변경 확인. 실제 팩 사실 검토·공식 B1 대기 |
-| B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 도구 준비: 8경로 회전·warm/cold·원응답/호출 ID·입력 전후 검증 완료. 승인된 공식 B0/B1 실행 대기 |
-| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; [raw CKV/F-01 보고](./B0-RAW-VECTOR-REPORT-PREPARATION.md) 준비, 역사적 K1은 F-01 자격 미충족; [새 F-01 DEV](./B0-F01-SPARSE-DIAGNOSTIC.md)는 K5 희소/exact/상한 진단 통과이며 공식 입력·평가/사람 판정 대기 |
-| B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 진행: [안전 제어 감사](./B1-SAFETY-AUDIT-PREPARATION.md)의 공개 Go v2 검증·보관 소스/내부 인용·6정책 상태·합성 payload 비노출·off/on 후보 보존을 624 SDK 응답에서 재생. 공식 F-04/05/06·비밀/권한 전체 범위·사람 판정 대기 |
-| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
-| B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기 |
-| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: [비교 보고 도구](./B1-PAIRED-REPORT-PREPARATION.md)와 기존 제어 원자료 624응답 재생 검증; 공식 입력·평가/사람 판정 대기 |
+| B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 검증 완료: 승인 동일 모델/입력/질문/K·범위와 회전8arm DEV3840·입력 전후 불변. SDK 오류/계측 누락0, repeats와 가족 unit 분리. FINAL 비교는 C1-01 |
+| B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: 승인 DEV3840·정적 v1 anchor20/raw 계측20, native raw16·가족 오라클 및 source/공개 Go 감사 완료. static Recall0.25/MRR0.125와 3개 miss, F05/06 모든8arm MRR0.75, F02 동점 순서 차이를 [실제 개발 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 기록. HC01–08 출력 해석/사람 기권 판정과 독립 FINAL 결과 남음 |
+| B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 검증 완료: DEV3840 출처·좌표/public Go 오류0, F03 proposed 비승격·F04 상태·F05 프로젝트·F06 acceptance/test trace 비승격 및 native10호출 혼입/손상/없음·backend0·private payload 비노출/복원 SHA 확인. 기존 권한/sanitization 회귀 포함; 일반 비밀 탐지/운영 ACL 보증 아님 |
+| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: DEV3840의 warm p50/p95·cold·backend 호출·응답 크기·환경 원장 완료. static/dynamic/pooled 원시 관측을 각각 집계하며 combined_on p95비1.292/1.614/1.065와 한계 보존. 사람 검토 비용은 미측정이며 FINAL 비용·사람 기록 남음 |
+| B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기: [실제 출력 주장 검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) HC01–08 및 비용 응답 요청 완료. 입력①–⑤ 승인을 출력 해석/기권·사람 비용 승인으로 대신하지 않음 |
+| B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: [실제 개발 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 DEV3840 paired·실패/한계·1096소스 동결·FIX22–28 증거 연결. 반복/언어/상태를 독립 표본으로 세지 않으며 작은 중요 질문군 inconclusive. FINAL 비교와 HC/비용 판정 남음 |
 
 기존 설계 회귀 조건: 안전/좌표/비밀 혼입 0, 기권 오인용 증가 0, 전체 Recall@10·MRR 변화 ≥ −0.02, 중요 질문군 변화 ≥ −0.05, warm p95 비율 ≤ 1.25. 작은 최종 질문군의 결론 규칙은 B0-02 검토 대상이다. 수치가 충분하지 않으면 기본 활성 근거로 사용하지 않는다.
 
@@ -91,20 +91,20 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 
 | ID | 우선순위·선행 | 작업과 산출물 | 완료 조건 | 상태 |
 |---|---|---|---|---|
-| C0-01 | P2 · B1-08 | 안전·정확성·품질·지연 실패 분류와 우선순위 | 각 실패가 실제 원자료·질문·arm·좌표에 연결; 안전/정렬 먼저 | 대기 |
-| C0-02 | P2 · C0-01 | 실패의 요구사항·스펙·개발 골든/재현 사례 작성 | 원래 계약과 기대 동작 설명; 최종 gold를 성공에 맞춰 고치지 않음 | 대기 |
-| C0-03 | P2 · C0-02 | 수정 전 실패하는 의미 있는 시험 추가 | 해당 원인을 재현하며 단순 구현 복제 시험이 아님 | 대기 |
-| C0-04 | P2 · C0-03 | 청크/필터/범위/graph/rerank/budget 중 확인된 원인 수정 | 인과관계·기본 경로·취소·상한·구버전 보존; 불필요한 일괄 재작성 없음 | 대기 |
-| C0-05 | P2 · C0-04 | 영향받은 공개 계약·회귀·race 검증 | 필요한 검사 통과, 변경된 입력/정체성의 이전 정책 기록 | 대기 |
-| C0-06 | P2 · C0-05 | 개발 세트에서 개선 확인, 수정 버전 동결 | 실패 재현 해소; 최종 세트 재평가는 C1; 실패가 없으면 수정 불필요 근거 기록 | 대기 |
+| C0-01 | P2 · B1-08 | 안전·정확성·품질·지연 실패 분류와 우선순위 | 각 실패가 실제 원자료·질문·arm·좌표에 연결; 안전/정렬 먼저 | 검증 완료: 실제 원자료에 FIX22–28 원인, static raw rank1085/47·52/301·1490의 recall 제한, F02 동점 순서, static/dynamic/pooled 비용을 분류. 소표본·optional 비용/사람·운영 제한은 해결된 품질 pass로 바꾸지 않음 |
+| C0-02 | P2 · C0-01 | 실패의 요구사항·스펙·개발 골든/재현 사례 작성 | 원래 계약과 기대 동작 설명; 최종 gold를 성공에 맞춰 고치지 않음 | 검증 완료: exact Go29 발견·stdio/계측·v2 body budget·동일 canonical header boost·요청 내 retained batch/비캐시·독립 corpus label/dataset audit 요구사항과 재현/gold 연결. 승인 질문/정답/모델/K/threshold 유지 |
+| C0-03 | P2 · C0-02 | 수정 전 실패하는 의미 있는 시험 추가 | 해당 원인을 재현하며 단순 구현 복제 시험이 아님 | 검증 완료: FIX22–28 수정 전 실제 실패/의미 있는 시험과 후 회귀를 보존. raw recall 제한은 발견/offset/필터/DB 결함으로 확인되지 않아 query/gold를 hardcode하는 제품 시험을 만들지 않음 |
+| C0-04 | P2 · C0-03 | 청크/필터/범위/graph/rerank/budget 중 확인된 원인 수정 | 인과관계·기본 경로·취소·상한·구버전 보존; 불필요한 일괄 재작성 없음 | 검증 완료: 확인된 발견/stdio/provider/budget/헤더 boost/반복 원문 검사/보고 결합 원인 수정. FIX26 .6667→.75 전8arm, FIX27 실제 pack4 전체 동일/시간 감소. optional 비용·baseline 제한은 명시하고 disabled 유지 |
+| C0-05 | P2 · C0-04 | 영향받은 공개 계약·회귀·race 검증 | 필요한 검사 통과, 변경된 입력/정체성의 이전 정책 기록 | 검증 완료: 변경 제품 관련/race/vet·root Go 및 보관 출처/배치·native source/mixing 검사 통과. B0 Python75/B1보고26 통과, 역사적 원문5파일 모듈 경계 보존. FINAL 입력에 따른 수정 없음 |
+| C0-06 | P2 · C0-05 | 개발 세트에서 개선 확인, 수정 버전 동결 | 실패 재현 해소; 최종 세트 재평가는 C1; 실패가 없으면 수정 불필요 근거 기록 | 검증 완료: 승인 DEV3840·독립 source/Go/raw/state/v1 감사 및 FIX25–27 개선 확인 후 source1096파일·실행 SHA·입력5 SHA를 기술 동결. baseline/지연/소표본 잔여 제한 포함; 사람 판정·품질 pass/출시 승인이 아님 |
 
 ## 6. C1: 재평가와 출시 결정
 
 | ID | 우선순위·선행 | 작업과 산출물 | 완료 조건 | 상태 |
 |---|---|---|---|---|
-| C1-01 | P3 · C0-06 | B0/B1과 같은 조건의 최종 재평가 | 버전 차이·입력 차이·실행 원자료 명시; 독립 최종 조건 유지 | 대기 |
-| C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 대기 |
-| C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 대기 |
+| C1-01 | P3 · C0-06 | B0/B1과 같은 조건의 최종 재평가 | 버전 차이·입력 차이·실행 원자료 명시; 독립 최종 조건 유지 | 검증 완료: [승인 FINAL 보고](./C1-APPROVED-FINAL-REPORT.md)에 동결 CKS/BGE/K·8arm·2/5/20/3의4800회, source/공개 Go4560 valid·POLICY03 오류240·raw20·v1 anchor40/계측40·F04 stale와5입력/저장소/1096소스 불변 연결. 실패 상태/분모를 보존하며 평가 합격으로 바꾸지 않음 |
+| C1-02 | P3 · C1-01 | 품질·안전·지연·질문군 게이트 판정 | 허용 회귀 충족 또는 실패/불확실 판정; 통과 없는 출시 승인 금지 | 검증 완료: FINAL 실행오류240/4800·양성 정적1/6 회수·v1 두 인용0개 guard fail에 따라 품질fail/출시보류, 중요 질문군 n<10 inconclusive. latency population/같은 축 비교 모두 보존. 운영 stage gate 완료/출시 승인은 별도 |
+| C1-03 | P3 · C1-02 | 온톨로지 기본값 결정 | 증거·이점·회귀·검토 비용·사람 결정 기록; 불확실하면 disabled 유지 | 검증 완료: 사용자 승인 프로토콜 n<10의 기본 활성/출시 금지 규칙과 FINAL 실패·비용 불확실성에 따라 disabled 유지. 구현 opt-in 확인, 사람 검토 비용은 미측정. 별도 출력·운영 승인을 만들지 않음 |
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 진행: 최신 FIX-19 세 대상 preview·실모델/복구와 부분 대규모13,575청크의60 SDK·480원문/인용·별도RSS2호출 준비 검증; backend 오류840 보존·FTS 후보8개 재현. native amd64·공식 대규모/최종 운영 후보·품질은 남음 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조와 [원래 SQLite·musl 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)의 501입력·SQLite C 공식 SHA3·Linux 헤더436개 분류/생성4 재생 완료 범위 존재; Darwin SDK·전체 생성기/전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 진행: 최신 Darwin 시험 preview의 후보 실패/손상 거부·pin/update/rollback·새 루트 백업 복원·원본 소스 없는 재생, 구 데이터의 첫 신규 소비자 전 SHA·새 재색인·구 v1 rollback 보존 검증. [복구 문서](./C1-RECOVERY-VALIDATION.md); 최종 후보/운영 범위·OP-08 남음 |
@@ -428,3 +428,76 @@ B0-06의 계측 보완 완료를 공식 품질 게이트 완료로 세지 않는
 Linux arm64/amd64 각218헤더는 원래215·생성2·overlay1로 분류했다. 원래 Makefile의 좁은 명령으로 alltypes/syscall4개를 재생하고 float overlay2개를 대조했다. 최초 helper의 빈 줄 가정·수정 문법/출력 디렉터리 오류는 실패 원자료로 구분해 보존했고 별도 경로 재생6검사 통과를 확인했다. 49개 증거와 실제 사람 입력5개 불변, 제품/키/출시 변경 없음이다.
 
 Darwin SDK·실제 include-use/생성기 버전·전체 C→Go 재생성과 전이 native 적합성/OP-06은 남는다. 이 기술 자료로 법무/운영 승인이나 C1-05 완료를 대신하지 않는다. 완료2/진행11/대기17·미완료28·공식0/4다. 다음 공식 최우선은 실제 B0-01/02/03/05·STV2 결정→동결→새 strict B0-07이다. 전체 B0/B1/C0/C1·STV2·OP-01–08·native amd64·최종 고지/복구/지원/출시를 현황판에 유지한다.
+
+## 36. 2026-10-06 명시적 승인·FIX-22 범위 보완
+
+사용자가 다섯 결정을 명시적으로 승인했다. [새 입력 기록](./B0-APPROVED-INPUTS.md)의 전후 해시·원문·로컬 검토자/시각으로 프로토콜, 12개 동적 변형, STV2, 테스트 사례 SF 판정을 연결했다. 이전 pending 답변은 보존한다. 운영 키/법무/출시와 실제 답변 주장 판정의 승인은 포함하지 않는다.
+
+FIX-22는 정확한 Go 파일 경로 목록만 CKV 기본 build/ 제외를 통과시킨다. 기존 명시적 ignore·다른 기본 제외·비밀·링크·binary·크기·allowlist/build_roots 필터는 유지한다. 옵션 JSON bytes는 setup의 configured input digest와 dataset recipe에 포함하고 CKV manifest에 경로를 남긴다. 수정 전 실제 누락 시험 실패; 관련 Go 6패키지·수집/설정 race·B0 Python72 통과. 실제 고정 소스 discovery의 1,569→1,598 차이가 승인 29개와 정확히 같다. 이는 인용/청크/graph audit의 성공을 대신하지 않는다.
+
+현재 B0-02/03 입력 동결과 B0-01 범위 검증 완료. B0-07 새 strict 전체 빌드 실행 중이며 SF 새 커밋·review·잠금·투영을 준비한다. 다음은 원문/청크/embedding/정렬·doctor 감사 후 공식 DEV 기준선과 8-arm 비교다. 최종 질문으로 튜닝하지 않는다.
+
+## 37. FIX-23 공식 실행의 stderr backpressure와 재개
+
+새 승인 DEV 실행에서 서버 시작 계측260 logical/HTTP 이벤트가 stderr pipe를 채웠다. eval.NewRunner는 transport의 stderr reader를 소비하지 않아서 initialize가 멈췄다. 이번 Python wrapper/CKS 두 프로세스만 종료하고, 시도·실행 프로세스·시작 footprint·바이너리/설정 bytes를 보존한다. 이 시도에는 점수나 유효 지연 결과가 없다.
+
+실제 Go 자식이 초기화 전에 stderr2MiB를 쓰는 회귀 시험은 수정 전 deadline 초과로 실패했다. 초기화 전부터 기본 os.Stderr로 비동기 전달하고 Close/초기화 실패는 drain 종료를 기다리도록 수정했다. 사용자 지정 sink 실패도 남은 pipe를 소비해 protocol을 막지 않는다. 정상/실패 초기화·로그 보존·idempotent close와 평가/matrix의 관련 시험·race·vet 통과. raw diagnostics는 평가 실행 로그에 남는다.
+
+검증된 전체 DB는 기존 builder SHA를 보존하고 새 eval client/server SHA를 별도로 기록한다. FIX-23은 평가 transport 소비 변경이며 검색·CKV/CKG 빌더 코드는 같다. 동일 승인 입력/DB에서 새 출력 루트로 공식 DEV 실행을 재개한다. 이후 SF/나머지 동적 입력·최종 독립 평가와 사람 판정은 남는다.
+
+## 38. FIX-24 모델 기본 제공자와 실제 정적 DEV 실행
+
+정적 v1은 DEV4×5 원응답을 기록했으며 CODE/POLICY/TRACE는 miss, WHY만 pass다. 실행 exit0을 품질 합격으로 합산하지 않는다. v1 전체 인용 지표와 v2 top10 지표는 구분한다. 첫 두 실행의 HTTP 설정은 작업자가 잘못 전달한 독립 오류다. stdio로 바로잡고 알려진 HTTP 설정은 자식 시작 전에 거부하며, 외부 호환 서버의 opaque 설정은 기존대로 전달한다. 기존 opaque-config deadline 시험의 최초 실패와 호환 수정 후 통과를 보존했다.
+
+8-arm 첫 preflight는 generated config의 빈 provider를 Ollama 서버 기본값과 다르게 해석하여 rows0/partial로 끝났다. 실제 수정 전 기본 제공자 회귀 실패를 보존하고 serving path의 DefaultProvider를 공유한다. 명시적 mock/다른 제공자·digest·dimension·redirect·cancelled 거부 계약은 유지한다. 관련 두 Go 패키지 시험/race/vet 후 새 runtime SHA를 별도 결합했다. builder/검증 DB와 승인 입력5개는 그대로다.
+
+새 정적 DEV matrix는 환경 preflight valid=true로 시작했다. 네 질문·8arms·warmup2/검색5/warm20/cold3 순차 수집 후 독립 source/integrity/backend K/paired 지표 감사를 진행한다. 현재 완료6/진행12/대기12·전체24 미완료·공식0/4다. 다음은 matrix 감사와 F-01/02/04 새 strict 입력/동적 실행이다. 전체 B0-05–09·B1-03–08·C0-01–06·C1-01–07 및 OP-01–08/native amd64/고지·복구·지원·출시는 남는다.
+
+## 39. FIX-25 v2 선택 본문과 추가 그래프 인용 분리
+
+[C0 실제 실패/수정](./C0-V2-BODY-BUDGET.md)은 승인 DEV에서 모든8arms의 WHY 오류를 재현한 뒤 v2의 선택 본문만 retained 원문으로 검증하도록 수정했다. 기존 v1 그래프·검색/정답/상한은 그대로다. 첫 matrix77/960행·17실패·미측정883행을 보존하며 공식 품질/지연 판정에 합산하지 않는다. 수정 전 handler 실패→관련4패키지/3race/4vet→실제 DEV20 Go 재생/SDK4 source-integrity 감사 통과다. 정적 miss3개와 전체 동적/최종·사람 판정은 남아 있다.
+
+F-01/02/04는 독립 source4개와 새 strict BGE-M3 dataset으로 빌드했다. F-02 문서 전용 doctor degraded는 예상 제한이며 ready로 바꾸지 않는다. wrapper의 doctor 옵션 착오/모든 사례 strict-ready 가정은 별도 실패로 보존하고 성공 빌드는 재사용했다. 다음은 실제 source/chunk/parent/vector와 F-01 exact/budget·F-04 state 오라클 감사, 새 전체8arm 평가다. 완료6·진행17·대기7·전체24 미완료·공식0/4다. B0-05–09/B1-03–08/C0-01–06/C1-01–07 및 OP/native/legal/복구/지원/출시가 남는다.
+
+
+## 40. FIX-26/27 실제 DEV 순위 회귀·보관 검증 비용
+
+승인된 동적 8상태/6가족의 2,880 SDK 행을 계획대로 완전 캡처했다. 모든 행의 원문/인용/integrity 및 공개 Go v2 계약 재생 위반은 0이다. F-01은 public SDK의 비필터 요청과 별도 실제 SearchDetailed K5/필터/exact/상한 오라클을 구분한다. F-02 tail480, F-03 proposed 확정 금지/후보 유지720, F-04 상태 격리480, F-05 프로젝트/정책 격리480, F-06 정책 표시/미검토 acceptance 금지480을 감사했다. 반복은 독립 표본 수를 늘리지 않는다.
+
+F-05-A/B와 F-06의 세 온톨로지 모드에서 MRR0.75→0.666667 회귀를 확인했다. 같은 canonical 함수의 본문+헤더에 추가 점수를 중복 적용해 정책 순위가 밀리는 원인을 FIX-26으로 재현/수정했다. FIX-27은 요청-local batch의 전후 전체 보관 검증과 각 blob 해시를 유지하면서 본문별 전체 반복 검증을 줄였다. 관련4시험/race/vet 통과, 실제 정적 SDK4 pack 동일/오류0이며 단일 진단2.09–4.55초는 공식 warm 판정이 아니다. [수정 요구/시험/증거](./C0-ONTOLOGY-HEADER-AND-ARCHIVE-BATCH.md)를 참조한다.
+
+정적 matrix는112/960행을 partial로 보존했다. 새 runtime으로 모든 DEV3,840행을 같은 승인 모델/입력/질문/K/반복으로 다시 수집한다. 원자료112MB를9.3MB lossless archive로 보관하며 압축 전후 SHA를 결합했다. 전체 Go 검사는 과거 불완전 source excerpt가 패키지로 발견되는 실패를 보존하고, 원자료 bytes/경로를 그대로 둔 nested-module 경계 수정 후 통과했다. B0 Python74검사도 로컬 테스트 서버 권한으로 통과했다.
+
+FINAL8상태 strict 빌드는 완료했으며 source/chunk/vector 감사 중이다. 승인한 FINAL 정의와 SF 사실은 marker/module/project namespace 치환 후 정확히 같은 원문으로 결합한다. cap/반환 값/TestHealth/vocabulary 변화를 기존 승인으로 넘기지 않는다. 새 human review를 했다고 기록하지 않으며 F-03 proposed와 acceptance 비승인 범위를 유지한다. 최종 질의·점수는 아직 실행하지 않았고 개발 동결 후 C1에서 평가한다.
+
+[B1 실제 출력 주장 검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 HC-01–08과 시간/비용을 사람 판정에 요청했다. 입력 승인과 답변/정책 해석, 시간 미측정과0비용을 구분한다. 현재 완료6/진행17/대기7·전체24미완료·공식0/4다. 다음은 새 DEV 순위/지연·정적 miss 분류→개발 동결→FINAL 재평가이며 전체 B0-05–09/B1-03–08/C0-01–06/C1-01–07·OP/native/legal/최종복구·지원·출시가 남는다.
+
+FINAL source/vector 감사8상태150청크 통과. [승인 FINAL 입력 원장](../../system/eval/b0-knowledge-system/approved-final-inputs-m2max-2026-10-06/artifact-manifest.json)에 source·bundle·native manifest·semantic 투영·검토 상속 증거를 연결했다. B0-05/07의 명시된 입력 결합/빌드 완료를 검증 완료로 변경하며, 쿼리/품질/사람·출시 판정은 남긴다. 현재 완료8/진행15/대기7·전체22미완료·공식0/4다.
+
+## 41. 새 개발 동적 2,880 응답의 독립 검증과 후속 검사 연결
+
+2026-10-06 FIX26/27 실행 바이너리 `3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6`로 승인 DEV 동적8상태의 2,880회를 완료했다. 각 source/identity·원문/인용 SHA·상태/프로젝트 marker·미검토 의미 비승격 오라클 위반0, backend 계측 누락0이다. 공개 Go EvidencePackV2.Verify도 동일 2,880행을 재생하여 오류0이다. F05 A/B와 F06의 두 기대 인용 평균 역순위는 모든8arm에서 .75이며 수정 전 optional .6666667 회귀가 해소됐다. 이 지표는 첫 관련 인용 MRR나 사람 답변 합격으로 바꾸지 않는다.
+
+정적960 수집 종료 뒤에만 독립 정적 보고/Go Verify → 승인 DEV 복사본의 실제 MCP 상태·프로젝트 혼입/원문 손상·없음 → Python B0 회귀 → 전체 DEV raw CKV exact/상한 → 새 실행 바이너리 v1 anchor 검사를 순차 실행하도록 후속 드라이버를 연결했다. 수집 중에는 추가 모델/빌드/시험을 실행하지 않는다. 소형 동적12요청/2,880반복을 12개 또는2,880개 독립 표본으로 합산하지 않는다. F01 필터/exact@5는 별도 native 오라클이며 공개 v2에는 filter 인자가 없다.
+
+최종4800 수집 드라이버는 개발 동결 기록·승인5입력 SHA·바이너리/제품 소스 SHA가 일치해야 실행할 수 있다. 아직 최종 질의를 실행하지 않았고 개발 원자료를 최종 결과로 재사용하지 않는다. HC01–08 출력 해석/사람 검토 비용과 C1 시험 preview/실운영 종료 범위는 이미 요청된 응답을 기다리며, 입력①–⑤를 다시 묻지 않는다. 전체 완료8/30·미완료22·공식 게이트0/4이고 B0-06·08·09, B1-03–08, C0-01–06, C1-01–07 및 OP/native amd64/고지·복구·지원/출시가 남는다.
+
+## 42. DEV3840 자동 검증 완료·기술 동결과 독립 FINAL 시작
+
+2026-10-06 [승인 개발 결과 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)에 static960+dynamic2880 전체, 공개 Go/source 오류0·measurement 누락0·입력/저장소/바이너리 SHA 불변을 연결했다. 현재 SDK guard10호출 정상6/부정4, source/프로젝트/state 혼입 snapshot_mismatch 및 missing source_missing·backend0·원본/복원 불변을 확인했다. F04 old CKV/new source stale 실제검사, raw16, 새 v1 anchor20 및 measurement/backend/source 연결20 완료. B0 Python75/B1보고26 통과.
+
+정적 baseline miss3는 raw full exact ranks1085/47·52/301·1490으로 top10 밖이며 WHY raw1/composed2다. F02 noise 동점의 순서만 다른2건은 original exact_agreement=false를 유지한다. static combined_on warm ratio1.292, dynamic on1.315–1.614, pooled combined_on1.065를 모두 보여준다. 사후 선택한 pool로 전체 pass를 만들지 않는다. 사람 HC/비용, 작은 중요 질문군 및 운영 범위는 남는다.
+
+제품 실행 SHA3b80c36d…89d0e6과 source1096파일·승인5입력을 동결했다. corpus label과 별도 dataset project ID는 독립 strict 전체 identity audit로만 결합한다. 보고 첫 오류와 기존 pending 시험의 real 승인 의존 오류를 보존하고 test 사본에 명시적 pending을 주었다. 기존 opt-in guard 시험은 승인 Prompt 선택을 지원하면서 빈 Prompt의 이전 동작을 유지했다. 런타임·gold·threshold는 바꾸지 않았다.
+
+C1-01 FINAL4800을 별도 소스로 실행 중이다. static transport manifest의 누락된 public v2 tool 이름만 해당 capture 전 명시했고8prompt/date/subsystem은 그대로이며 수정 전후 SHA를 남겼다. 이 표현 보완을 최종 결과 튜닝으로 사용하지 않았다. B0 baseline와 C0 technical task 완료를 B1 사람 판단·C1 품질/운영 승인으로 합산하지 않는다.
+
+## 43. 승인 FINAL4800 실패 포함 감사와 기본값 결정
+
+2026-10-06 [최종 보고](./C1-APPROVED-FINAL-REPORT.md): 8동적상태2880·정적8문항1920 전체 계획행 수집. 정상팩4560의 source/public Go 유효, POLICY03의240개 오류는 공개 Go의 capture_error와 정확히 같은 sequence다. 실제 Go 원문10개 검증 후33104바이트에서 budget_exceeded가 발생한다. 현재32KB 계약 상한을 올리거나 FINAL에 맞춰 코드를 수정하지 않았다. source 혼입/파일손실로 확인된 실패가 아니며 후보의 질의 처리 제한으로 기록한다.
+
+정적 양성6개 중 POLICY02만 회수(Recall1/6·MRR0.5/6), v1도1pass/5miss. 두 기권 문항의 인용0개 guard는 모두fail이며 사람의 답변 기권은 별도다. 모든8arm 정적 양성점수가 같고 F05/06 모든8arm MRR.75. raw20 F01 자격·F02 동점만 다른 순서·F04 actual stale 및 v1 measurement40 검증 완료. 실패240을 성공시간/점수에서 지우지 않으며 성공 조건부warm/cold와 전체계획 분모를 함께 남겼다.
+
+진단 원장 경로 재사용으로 추가한9로그는 전체파일/추가tail/원측정prefix 및3SHA를 보관하고240개 원 measurement ID의 prefix로 복원했다. report/rows·5승인입력·native 저장소·동결바이너리/1096소스는 그대로다. 원자료237MB를20.37MB 무손실압축 및oracle 원장으로 보관했다. 최초 Go 실패exit코드 가정/보고 분모 오류도 수정 전후 자료로 보존한다.
+
+C1-01/02/03의 수집·판정·disabled 결정 범위를 완료했다. 전체22완료/8미완료이며 official stage ledger는 사람·운영 종료가 남아0/4다. 다음 우선순위는 최종 소스 checkpoint 후 최신 세 플랫폼 package/실모델·대규모/복구 검증이다. 남은 전체 B1-04·06·07·08, C1-04·05·06·07 및 HC/비용·OP01–08/native amd64/적합성·지원/출시 범위를 유지한다.

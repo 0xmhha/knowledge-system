@@ -531,3 +531,34 @@ func addNativePins(manifest map[string]any, source SourceIdentity, datasetID str
 	manifest["file_manifest_digest"] = source.FileManifestDigest
 	manifest["capture_policy_digest"] = source.CapturePolicyDigest
 }
+
+func TestBuildSourceScopeChangesDatasetRecipe(t *testing.T) {
+	dir := t.TempDir()
+	file := filepath.Join(dir, "build-sources.json")
+	o := Options{VectorBuildSources: file}
+	if err := os.WriteFile(file, []byte(`{"schema_version":1,"paths":["build/a.go"]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	first, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(file, []byte(`{"schema_version":1,"paths":["build/b.go"]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	second, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first == second {
+		t.Fatal("scope change reused dataset recipe")
+	}
+	o.VectorBuildSources = ""
+	original, err := ConfiguredInputDigest(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if original == first || original == second {
+		t.Fatal("source exception did not change default recipe")
+	}
+}

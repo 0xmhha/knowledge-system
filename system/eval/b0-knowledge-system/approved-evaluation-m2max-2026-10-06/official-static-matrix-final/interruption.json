@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-05T18:13:49.969115+00:00",
+  "status": "operator_aborted_for_confirmed_DEV_product_failure",
+  "reason": "WHY fails in every arm: legacy graph citations exceed v2 limit12. Preserve partial denominator, do not use aborted latency as official result. Correct before rerunning full protocol.",
+  "processes": [
+    {
+      "pid": 38827,
+      "parent_pid": 38824,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks eval matrix --requests /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/development-requests.json --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/static-config.yaml --cks-mcp /private/tmp/ks-approved-scope-20261006/runtime-final/cks --output /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix --warmup 2 --retrieval-runs 5 --warm-runs 20 --cold-runs 3 --call-timeout 90s --environment-ledger --environment-note Native M2 Max shared host; no exclusive resource claim. Sequential approved DEV captures; strict build and SF builds completed before capture. No concurrent task-owned embedding/build/tests during latency measurement. Ollama model remains resident, no unload. Static has no approved ontology or selected policy pack: fallback is an observed result. --lock-file /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json --lock-file /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json --lock-file /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json --lock-file /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json --lock-file /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json",
+      "role": "matrix-client"
+    },
+    {
+      "pid": 39065,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/baseline_off.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39178,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/baseline_on.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39344,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/concept_text_off.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39486,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/concept_text_on.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39624,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/relations_off.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39804,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/relations_on.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 39951,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/combined_off.yaml",
+      "role": "matrix-server"
+    },
+    {
+      "pid": 40172,
+      "parent_pid": 38827,
+      "command": "/private/tmp/ks-approved-scope-20261006/runtime-final/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-matrix-final/matrix/combined_on.yaml",
+      "role": "matrix-server"
+    }
+  ],
+  "captured_rows": 77,
+  "planned_rows": 960,
+  "failed_rows": 17,
+  "rows_sha256": "17063b17f282f36b9762824e5f55bf1ff7fe30e8df9e696d0e9f15ac87881e9d",
+  "original_report_preserved": true,
+  "model_daemon_stopped": false
+}

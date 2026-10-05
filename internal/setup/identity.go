@@ -304,6 +304,7 @@ func ConfiguredInputDigest(o Options) (string, error) {
 		{"security-patterns", o.SecurityPatternFile, false},
 		{"vector-policy", o.VectorPolicy, false},
 		{"filelist", o.FilelistConfig, false},
+		{"vector-build-sources", o.VectorBuildSources, false},
 		{"glossary", o.GlossaryFile, false},
 		{"flow", o.FlowCorpus, false},
 		{"semantic-corpus", o.SemanticCorpus, true},

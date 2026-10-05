@@ -1,0 +1,34 @@
+package main
+
+import (
+ "context"
+ "encoding/json"
+ "fmt"
+ "os"
+ "github.com/0xmhha/knowledge-system/internal/system/config"
+ "github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
+ "github.com/0xmhha/knowledge-system/internal/system/evidencev2"
+ "github.com/0xmhha/knowledge-system/pkg/system/contract"
+)
+
+func main() {
+ raw,err:=os.ReadFile(os.Args[1]);must(err)
+ var report struct{Results []struct{Name string `json:"name"`;Calls []struct{Tool string `json:"tool"`;Response struct{Structured json.RawMessage `json:"structuredContent"`;Content []struct{Text string `json:"text"`} `json:"content"`} `json:"response"`} `json:"raw_calls"`} `json:"results"`}
+ must(json.Unmarshal(raw,&report))
+ rules,err:=config.LoadSanitizeRuleset(os.Args[3]);must(err);cleaner,err:=sanitize.New(rules);must(err)
+ rows:=[]map[string]any{}
+ for _,result:=range report.Results{for _,call:=range result.Calls{
+  if call.Tool!="cks.context.get_for_task"{continue}
+  body:=call.Response.Structured
+  if len(body)==0||string(body)=="null"{body=[]byte(call.Response.Content[0].Text)}
+  var legacy contract.EvidencePack;must(json.Unmarshal(body,&legacy))
+  _,oldErr:=evidencev2.Build(context.Background(),os.Args[2],legacy.Query,legacy.Citations,cleaner)
+  refs:=make([]contract.Citation,0,len(legacy.Bodies));for _,b:=range legacy.Bodies{refs=append(refs,b.Citation)}
+  pack,err:=evidencev2.Build(context.Background(),os.Args[2],legacy.Query,refs,cleaner);must(err);must(evidencev2.Verify(pack))
+  if len(pack.Citations)!=len(refs)||len(pack.Bodies)!=len(refs){panic("selected bodies lost")}
+  before:="";if oldErr!=nil{before=oldErr.Error()}
+  rows=append(rows,map[string]any{"question":result.Name,"legacy_citations":len(legacy.Citations),"legacy_bodies":len(legacy.Bodies),"before_error":before,"selected_citations":len(pack.Citations),"state":pack.EvidenceState,"integrity":pack.Metadata.IntegrityHash,"pack":pack})
+ }}
+ must(json.NewEncoder(os.Stdout).Encode(map[string]any{"schema_version":1,"state":"retained_body_selection_verified","rows":rows,"count":len(rows),"no_new_model_calls":true}))
+}
+func must(err error){if err!=nil{fmt.Fprintln(os.Stderr,err);os.Exit(1)}}

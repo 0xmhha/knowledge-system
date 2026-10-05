@@ -92,15 +92,17 @@ def verify_projection(projection, repo):
         raise ValueError('unrelated test cannot become an acceptance proof')
 
 
-def prepare(out, manifest, binary, embedder, model, ollama_url):
+def prepare(out, manifest, binary, embedder, model, ollama_url, partition='development'):
+    if partition not in ['development', 'final']:
+        raise ValueError('semantic source preparation partition must be development or final')
     if out.exists() or out.is_symlink():
         raise ValueError('output exists; preparation never overwrites inputs')
     out.mkdir(parents=True)
     binary_hash = sha(binary)
     input_hash = sha(manifest)
-    records = MAT.materialize(manifest, out / 'fixtures', partition='development', allow_draft=True)
+    records = MAT.materialize(manifest, out / 'fixtures', partition=partition, allow_draft=True)
     book = json.loads(manifest.read_bytes())
-    proposals = {f['id']: f for f in book['fixtures'] if f['evaluation_partition'] == 'development'}
+    proposals = {f['id']: f for f in book['fixtures'] if f['evaluation_partition'] == partition}
     checks, cases = [], []
 
     def run(label, args):
@@ -209,7 +211,7 @@ def prepare(out, manifest, binary, embedder, model, ollama_url):
     if sha(binary) != binary_hash or sha(manifest) != input_hash:
         raise ValueError('binary or frozen source book changed during preparation')
     result = {'schema_version': 1, 'state': 'prepared_pending_human_review', 'diagnostic_only': True,
-              'partition': 'development', 'quality_metrics': None, 'binary_sha256': binary_hash,
+              'partition': partition, 'quality_metrics': None, 'binary_sha256': binary_hash,
               'input_manifest_sha256': input_hash, 'embedder': embedder, 'cases': cases, 'checks': checks}
     (out / 'review-manifest.json').write_text(json_source(result))
     return result
@@ -221,10 +223,11 @@ def main():
     parser.add_argument('--manifest', type=Path, default=MAT.DEFAULT)
     parser.add_argument('--binary', type=Path, default=ROOT / 'bin/cks')
     parser.add_argument('--embedder', choices=['mock', 'ollama'], default='mock')
+    parser.add_argument('--partition', choices=['development', 'final'], default='development')
     parser.add_argument('--model-name', default='bge-m3:latest')
     parser.add_argument('--ollama-url', default='http://127.0.0.1:11434')
     args = parser.parse_args()
-    result = prepare(args.out.resolve(), args.manifest.resolve(), args.binary.resolve(), args.embedder, args.model_name, args.ollama_url)
+    result = prepare(args.out.resolve(), args.manifest.resolve(), args.binary.resolve(), args.embedder, args.model_name, args.ollama_url, args.partition)
     print(json.dumps({'state': result['state'], 'cases': len(result['cases']), 'quality_metrics': None}))
 
 

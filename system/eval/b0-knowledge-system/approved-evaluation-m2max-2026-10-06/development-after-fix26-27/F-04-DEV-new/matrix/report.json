@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "state": "captured",
+  "started_at": "2026-10-05T19:29:40.473897Z",
+  "finished_at": "2026-10-05T19:31:27.594529Z",
+  "request_sha256": "2ec6fc5f4478d6ebae206c79e8565960aa9831f97aece25e7570f2a85c4b913b",
+  "base_config_sha256": "d0653afe17c04d845429b6bd63e87c85129606f8443f2a61cdb6e5b62e0ded51",
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "binary_sha256_after": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "working_directory": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+  "runtime": {
+    "arch": "arm64",
+    "go": "go1.26.8",
+    "logical_cpus": 12,
+    "os": "darwin"
+  },
+  "dataset_identity": {
+    "source": {
+      "project_id": "f-04-dev",
+      "source_mode": "committed",
+      "source_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+      "file_manifest_digest": "29665af20b3871dc9b899a34bba0d7c4e8ce7310f11ac639225d71e89679e6d0",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "e5083faa3c83b6e20dade31399fff4c1382c50001442629b4b150746819a1550",
+    "dataset_id": "9616b2322efe0319ce69dcae5432e4b3bc0e1d6a4a4f4ada25fac3f498759ed0"
+  },
+  "locked_files_sha256": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/config.yaml": "d0653afe17c04d845429b6bd63e87c85129606f8443f2a61cdb6e5b62e0ded51",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/requests.json": "2ec6fc5f4478d6ebae206c79e8565960aa9831f97aece25e7570f2a85c4b913b",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/dataset-identity.json": "0780321b23275eac3e6924590f402d69a246fb5ccec168f46af398dead213db5",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/graph/graph.db": "7337856d41c71cb2c068a7131229c1fe896d888776a619194f7fd5fbfc209903",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/blobs/aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/history.bundle": "ddd0f0b59cc3a6748ce9af586329d29e3762ae3bf88eca9fcd64bc46484a2964",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/manifest.json": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/manifest.json": "cb670034c2cfcef4095c4a7e754d02eb4aa146e9d0a48580a9681fcd8c8e8baf",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/vector.db": "7983673ad3ec6df54bdd92acd4dbbae8dd8f05550f268644686187992d409782",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/main.go": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6"
+  },
+  "locked_files_sha256_after": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/config.yaml": "d0653afe17c04d845429b6bd63e87c85129606f8443f2a61cdb6e5b62e0ded51",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/requests.json": "2ec6fc5f4478d6ebae206c79e8565960aa9831f97aece25e7570f2a85c4b913b",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/dataset-identity.json": "0780321b23275eac3e6924590f402d69a246fb5ccec168f46af398dead213db5",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/graph/graph.db": "7337856d41c71cb2c068a7131229c1fe896d888776a619194f7fd5fbfc209903",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/blobs/aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/history.bundle": "ddd0f0b59cc3a6748ce9af586329d29e3762ae3bf88eca9fcd64bc46484a2964",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/manifest.json": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/manifest.json": "cb670034c2cfcef4095c4a7e754d02eb4aa146e9d0a48580a9681fcd8c8e8baf",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/vector.db": "7983673ad3ec6df54bdd92acd4dbbae8dd8f05550f268644686187992d409782",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/main.go": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6"
+  },
+  "counts": {
+    "cold_process": 3,
+    "retrieval": 5,
+    "warm_latency": 20,
+    "warmup": 2
+  },
+  "arms": [
+    {
+      "id": "baseline_off",
+      "mode": "baseline",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/baseline_off.yaml",
+      "config_sha256": "2e0de2dc490c99ceffe18a0c00b2bbd68ea729b42f8c47fe9211e2d41b2d7914",
+      "config_sha256_after": "2e0de2dc490c99ceffe18a0c00b2bbd68ea729b42f8c47fe9211e2d41b2d7914"
+    },
+    {
+      "id": "baseline_on",
+      "mode": "baseline",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/baseline_on.yaml",
+      "config_sha256": "e50a8e3122db0efe3f98e617b7af071dcbf13420ccc620af4aca318f4806fc10",
+      "config_sha256_after": "e50a8e3122db0efe3f98e617b7af071dcbf13420ccc620af4aca318f4806fc10"
+    },
+    {
+      "id": "concept_text_off",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/concept_text_off.yaml",
+      "config_sha256": "e425f8fdd074dec1bb99e6b93ed735d99175fee48bd07c26b7ee4a33bd5a1c2e",
+      "config_sha256_after": "e425f8fdd074dec1bb99e6b93ed735d99175fee48bd07c26b7ee4a33bd5a1c2e"
+    },
+    {
+      "id": "concept_text_on",
+      "mode": "concept_text",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/concept_text_on.yaml",
+      "config_sha256": "4778e8855c22e50aed40088be33174d89b7522c8b3253dce1730e94e974d1b6c",
+      "config_sha256_after": "4778e8855c22e50aed40088be33174d89b7522c8b3253dce1730e94e974d1b6c"
+    },
+    {
+      "id": "relations_off",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/relations_off.yaml",
+      "config_sha256": "80a381875c3bb46814cc8baa7bad54a2b5a40d1a46e4dfa75f16e6c9de31ac27",
+      "config_sha256_after": "80a381875c3bb46814cc8baa7bad54a2b5a40d1a46e4dfa75f16e6c9de31ac27"
+    },
+    {
+      "id": "relations_on",
+      "mode": "relations",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/relations_on.yaml",
+      "config_sha256": "f0a6e5a69b6c297fe8f2986d56a247fb709b66602c7ee04ce7f7bd281e5a03ba",
+      "config_sha256_after": "f0a6e5a69b6c297fe8f2986d56a247fb709b66602c7ee04ce7f7bd281e5a03ba"
+    },
+    {
+      "id": "combined_off",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/combined_off.yaml",
+      "config_sha256": "cbaa2840bf4caee76a47d509e7b508fb4c6cd041b0ad5b62f8c95dc951777028",
+      "config_sha256_after": "cbaa2840bf4caee76a47d509e7b508fb4c6cd041b0ad5b62f8c95dc951777028"
+    },
+    {
+      "id": "combined_on",
+      "mode": "combined",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-04-DEV-new/matrix/combined_on.yaml",
+      "config_sha256": "c862d6740c7c7b21ae3a0f230ef36d5884772d1e3c7fd456f85edac80c589f97",
+      "config_sha256_after": "c862d6740c7c7b21ae3a0f230ef36d5884772d1e3c7fd456f85edac80c589f97"
+    }
+  ],
+  "rows": 240,
+  "rows_sha256": "d1d5b75f70c93cf6a0e075d1e56b6be3e1fcf81ac2b05da8c3396e0b2a10a88f",
+  "call_timeout_ns": 90000000000,
+  "quality_metrics": null,
+  "rotation": "global group index mod 8; left rotate fixed arm list; every group is one request/phase/iteration across 8 arms",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "recording_policy": "full SDK response rows.jsonl; serialize and sync after each response outside call timing; no concurrent calls",
+  "source_head": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+  "source_head_after": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+  "live_executable_bits": {
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/go.mod": false,
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/main.go": false
+  },
+  "live_executable_bits_after": {
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/go.mod": false,
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source/main.go": false
+  },
+  "environment_before": {
+    "at": "2026-10-05T19:29:40.490942Z",
+    "valid": true,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 14.00 10.65 11.44 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     6796.\nPages active:                                1046807.\nPages inactive:                              1022735.\nPages speculative:                             22794.\nPages throttled:                                   0.\nPages wired down:                             361205.\nPages purgeable:                                 558.\n\"Translation faults\":                    44003806251.\nPages copy-on-write:                      5195801932.\nPages zero filled:                       18248127455.\nPages reactivated:                         871298883.\nPages purged:                              113877504.\nFile-backed pages:                            731039.\nAnonymous pages:                             1361297.\nPages stored in compressor:                  3744796.\nPages occupied by compressor:                1676929.\nDecompressions:                            555583856.\nCompressions:                              537568526.\nPageins:                                   627964314.\nPageouts:                                    4900096.\nSwapins:                                     3268588.\nSwapouts:                                    4126353.",
+      "swap": "total = 5120.00M  used = 4305.88M  free = 814.12M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 1063,
+      "process_pressure_method": "ps pcpu; platform/time-window dependent",
+      "top_cpu_processes": [
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 430.2,
+          "rss_bytes": 5535547392
+        },
+        {
+          "pid": 95720,
+          "parent_pid": 1,
+          "cpu_percent": 158.3,
+          "rss_bytes": 230981632
+        },
+        {
+          "pid": 90391,
+          "parent_pid": 8549,
+          "cpu_percent": 64,
+          "rss_bytes": 1238417408
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 28,
+          "rss_bytes": 73318400
+        },
+        {
+          "pid": 82423,
+          "parent_pid": 82159,
+          "cpu_percent": 28,
+          "rss_bytes": 145915904
+        },
+        {
+          "pid": 592,
+          "parent_pid": 1,
+          "cpu_percent": 27.3,
+          "rss_bytes": 39354368
+        },
+        {
+          "pid": 96896,
+          "parent_pid": 96884,
+          "cpu_percent": 17.1,
+          "rss_bytes": 1179648000
+        },
+        {
+          "pid": 97191,
+          "parent_pid": 97022,
+          "cpu_percent": 15,
+          "rss_bytes": 210370560
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "bge-m3:latest",
+      "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "dimension": 1024,
+      "endpoint": "http://127.0.0.1:11434",
+      "server_version": "0.35.1",
+      "runtime_options": {
+        "num_batch": 8192,
+        "num_ctx": 8192
+      },
+      "valid": true,
+      "probe_policy": "local /api/version; tags; one strict native embed with dataset runtime options; tags again; optional /api/ps; outside query timing",
+      "residency": {
+        "other_resident_model_count": 0,
+        "selected_models": [
+          {
+            "name": "bge-m3:latest",
+            "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+            "size": 963400171,
+            "size_vram": 963400171,
+            "context_length": 8192,
+            "expires_at": "2026-10-06T04:34:40.606449+09:00"
+          }
+        ]
+      }
+    },
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "CPU pressure methods are platform-specific; Linux lifetime averages and ps windows are diagnostics, not resource exclusivity",
+      "Linux memory/CPUs are kernel-visible totals; cgroup values reflect exposed self/v2 ancestors and conventional mount roots, not a certificate of effective capacity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "environment_after": {
+    "at": "2026-10-05T19:31:27.470503Z",
+    "valid": true,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 22.35 15.97 13.52 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    19132.\nPages active:                                1050110.\nPages inactive:                              1042589.\nPages speculative:                             11468.\nPages throttled:                                   0.\nPages wired down:                             363688.\nPages purgeable:                                3166.\n\"Translation faults\":                    44014316698.\nPages copy-on-write:                      5196900389.\nPages zero filled:                       18251092760.\nPages reactivated:                         871635382.\nPages purged:                              113885832.\nFile-backed pages:                            739098.\nAnonymous pages:                             1365069.\nPages stored in compressor:                  3710607.\nPages occupied by compressor:                1650296.\nDecompressions:                            555869249.\nCompressions:                              537830157.\nPageins:                                   628190424.\nPageouts:                                    4902153.\nSwapins:                                     3268604.\nSwapouts:                                    4126353.",
+      "swap": "total = 5120.00M  used = 4305.88M  free = 814.12M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 1051,
+      "process_pressure_method": "ps pcpu; platform/time-window dependent",
+      "top_cpu_processes": [
+        {
+          "pid": 95720,
+          "parent_pid": 1,
+          "cpu_percent": 160.8,
+          "rss_bytes": 239599616
+        },
+        {
+          "pid": 90391,
+          "parent_pid": 8549,
+          "cpu_percent": 77.2,
+          "rss_bytes": 1238450176
+        },
+        {
+          "pid": 82423,
+          "parent_pid": 82159,
+          "cpu_percent": 56.3,
+          "rss_bytes": 178847744
+        },
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 34.6,
+          "rss_bytes": 7373832192
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 24.9,
+          "rss_bytes": 74055680
+        },
+        {
+          "pid": 592,
+          "parent_pid": 1,
+          "cpu_percent": 23.6,
+          "rss_bytes": 40140800
+        },
+        {
+          "pid": 39953,
+          "parent_pid": 7928,
+          "cpu_percent": 12.2,
+          "rss_bytes": 475824128
+        },
+        {
+          "pid": 8549,
+          "parent_pid": 8410,
+          "cpu_percent": 12,
+          "rss_bytes": 33554432
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "bge-m3:latest",
+      "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "dimension": 1024,
+      "endpoint": "http://127.0.0.1:11434",
+      "server_version": "0.35.1",
+      "runtime_options": {
+        "num_batch": 8192,
+        "num_ctx": 8192
+      },
+      "valid": true,
+      "probe_policy": "local /api/version; tags; one strict native embed with dataset runtime options; tags again; optional /api/ps; outside query timing",
+      "residency": {
+        "other_resident_model_count": 0,
+        "selected_models": [
+          {
+            "name": "bge-m3:latest",
+            "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+            "size": 963400171,
+            "size_vram": 963400171,
+            "context_length": 8192,
+            "expires_at": "2026-10-06T04:36:27.588777+09:00"
+          }
+        ]
+      }
+    },
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "CPU pressure methods are platform-specific; Linux lifetime averages and ps windows are diagnostics, not resource exclusivity",
+      "Linux memory/CPUs are kernel-visible totals; cgroup values reflect exposed self/v2 ancestors and conventional mount roots, not a certificate of effective capacity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "environment_note": "shared M2 Max; sequential captures; no task-owned concurrent embedding/build/tests; not exclusive host; model remains resident; no daemon unload. Small synthetic variants remain clustered; repetition is not an independent sample.",
+  "locked_input_copies": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": {
+      "path": "locked-inputs/002-dynamic-fixtures-m2max-draft.json",
+      "sha256": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+      "sha256_after": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": {
+      "path": "locked-inputs/003-human-review-m2max-2026-10-03.json",
+      "sha256": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+      "sha256_after": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": {
+      "path": "locked-inputs/001-protocol-m2max-draft.json",
+      "sha256": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+      "sha256_after": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": {
+      "path": "locked-inputs/000-questions.json",
+      "sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+      "sha256_after": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": {
+      "path": "locked-inputs/004-static-v2-scopes-m2max-draft.json",
+      "sha256": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+      "sha256_after": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2"
+    }
+  }
+}

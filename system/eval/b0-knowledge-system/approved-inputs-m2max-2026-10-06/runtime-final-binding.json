@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "binary_sha256": "a463e2faa4fb1b7ed1c063d3f9b423c3601f13e68ee2966796682c50c58d5cfb",
+  "source_files": {
+    "internal/system/eval/runner.go": "16ddd357f7bef7d380610965ce17ad11197287548f400ff7ffa9db9ffa891d5f",
+    "internal/system/eval/stdio_stderr_test.go": "195748b07cf86b9abb6248d97ce78f10039922e91dc113640523c7bce9104756",
+    "cmd/cks/evalcli/matrix_environment.go": "99cc8756f2bd929d128e6b35120989615b370852cbcb43cc6fe7cf173e2d9250",
+    "cmd/cks/evalcli/matrix_environment_test.go": "189ffab75f9b852c43d622b0a39740b468245ba05108e27f10374ef107e06578"
+  },
+  "previous_v1_binary_sha256": "61bf5391e015c02a9fdf79bf8660c60e87cde2b8c89c97e8df0dd2dbdaa231fc",
+  "strict_builder_binary_sha256": "0b7cc1073639cdf7a1386e7ed073ecfa520d0e39dc835c498da4cb3078721a4a",
+  "transport_only_FIX23": true,
+  "FIX24_environment_probe_default_matches_serving_path": true,
+  "retrieval_code_changed": false,
+  "checks": {
+    "eval-final-tests.log": "3227c66f541f3aa0bfbf38352a4be1054136707ea4e0d5489202db0cd3465ad9",
+    "eval-final-race.log": "28a182c11eb2b1a9cf69e416b925efbb4e93e505cc80893ea1b012ec7c65a327",
+    "eval-final-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "failure_causes": [
+    "stderr pipe undrained before initialize (product FIX23)",
+    "initial two configs had HTTP transport (operator config error)",
+    "matrix empty provider did not resolve serving default (product FIX24)"
+  ]
+}

@@ -1,0 +1,27 @@
+from pathlib import Path
+import json,hashlib,gzip,subprocess,time,datetime
+root=Path.cwd();r=Path('/private/tmp/ks-approved-scope-20261006');f=Path('/private/tmp/ks-approved-final-sweep-20261006');read=lambda p:json.loads(p.read_bytes());digest=lambda raw:hashlib.sha256(raw).hexdigest()
+while not(r/'approved-final-v1-instrumented/summary.json').exists():time.sleep(4)
+assert read(r/'approved-final-v1-instrumented/summary.json')['status']=='pass'
+out=root/'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06';checks=[]
+def run(label,args):
+ p=r/(label+'.log')
+ with p.open('xb')as stream:code=subprocess.run([str(a)for a in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(a)for a in args],'exit_code':code,'log_sha256':digest(p.read_bytes())});assert code==0,label
+run('final-same-axis-comparisons',['python3',r/'compare-approved-final-axes.py'])
+run('final-terminal-retention',['python3',r/'retain-approved-sweep.py','--base',f,'--output',out/'final-after-development-freeze'])
+capture=out/'final-after-development-freeze';manifest=read(capture/'artifact-manifest.json')
+for name in ['final-summary.json','same-axis-comparisons.json']:
+ p=f/name;raw=p.read_bytes();dest=capture/name;assert not dest.exists();dest.write_bytes(raw);manifest['files'].append({'source_relative_path':name,'artifact_path':name,'source_bytes':len(raw),'source_sha256':digest(raw),'artifact_bytes':len(raw),'artifact_sha256':digest(raw),'encoding':'identity'})
+manifest['files'].sort(key=lambda v:v['source_relative_path']);(capture/'artifact-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+target=out/'final-oracles';target.mkdir(exist_ok=False);files=[]
+for label in ['approved-final-oracles','approved-final-stale-ckv','approved-final-v1-instrumented']:
+ for p in sorted((r/label).rglob('*')):
+  if not p.is_file():continue
+  assert not p.is_symlink()and p.suffix in {'.json','.jsonl','.log','.stderr','.yaml','.txt'}
+  relative=str(p.relative_to(r));raw=p.read_bytes();compressed=len(raw)>262144;stored=gzip.compress(raw,compresslevel=6,mtime=0)if compressed else raw;name=relative+('.gz'if compressed else'');dest=target/name;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(stored)
+  files.append({'source_path':str(p),'artifact_path':name,'source_bytes':len(raw),'source_sha256':digest(raw),'artifact_bytes':len(stored),'artifact_sha256':digest(stored),'encoding':'gzip'if compressed else'identity'})
+for name in ['audit-final-matrices.py','post-final-native-oracles.py','post-final-stale-ckv.py','post-final-v1-instrumented.py','compare-approved-final-axes.py','complete-approved-final-reports.py','final-static-request-tool-binding.json']:
+ p=r/name;raw=p.read_bytes();name=name+('.txt'if p.suffix=='.py'else'');(target/name).write_bytes(raw);files.append({'source_path':str(p),'artifact_path':name,'source_bytes':len(raw),'source_sha256':digest(raw),'artifact_bytes':len(raw),'artifact_sha256':digest(raw),'encoding':'identity'})
+(target/'artifact-manifest.json').write_text(json.dumps({'schema_version':1,'scope':'approved FINAL native/public/source/raw/v1/stale oracles and exact reproduction scripts; no human verdict invented','files':files},ensure_ascii=False,indent=2)+'\n')
+(r/'final-retention-summary.json').write_text(json.dumps({'status':'pass','checks':checks,'capture_files':len(manifest['files']),'oracle_files':len(files),'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n');print('FINAL exact capture/oracle retention complete',flush=True)

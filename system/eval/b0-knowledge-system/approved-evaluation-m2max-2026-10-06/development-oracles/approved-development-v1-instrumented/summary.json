@@ -1,0 +1,584 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "scope": "approved static DEV v1 raw SDK responses with measurement-ID/backend bindings; outside paired latency capture; anchor metrics are in separate cks eval report",
+  "command": [
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-approved-scope-20261006/approved-development-v1-instrumented/requests.json",
+    "--config",
+    "/private/tmp/ks-approved-scope-20261006/approved-development-v1-instrumented/config.yaml",
+    "--cks-mcp",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+    "--output",
+    "/private/tmp/ks-approved-scope-20261006/approved-development-v1-instrumented/capture.json",
+    "--warmup",
+    "0",
+    "--retrieval-runs",
+    "5",
+    "--warm-runs",
+    "0",
+    "--cold-runs",
+    "0",
+    "--call-timeout",
+    "90s"
+  ],
+  "capture_sha256": "3fa3908b35027c59a780b7de3716f5aa9d204720926d500048f598fc56414a31",
+  "requests_sha256": "249d6b04d37ce584b0e0df18e033f35564315c6cc7ee281bf929908a82358c85",
+  "config_sha256": "6f2a1172028f363e61ce13952e2b4db7cde148484b889e1ebae2f368c7234cf4",
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "footprints_sha256": "1cd53f8eab8907eff466b6d499faf260c2c69199dba8c37fa85d079f5b31633f",
+  "rows": [
+    {
+      "request_id": "B0-CODE-01",
+      "iteration": 1,
+      "measurement_id": "766b2f929269f1588e7edcf7fff435bc",
+      "source_files_sha256": {
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 29,
+        "ckv": 3,
+        "ollama_http": 12,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-01",
+      "iteration": 2,
+      "measurement_id": "e92b93863f904abaafb81825151f5bb2",
+      "source_files_sha256": {
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 29,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-01",
+      "iteration": 3,
+      "measurement_id": "8a798ab9e0748d49485095a0feb87b28",
+      "source_files_sha256": {
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 29,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-01",
+      "iteration": 4,
+      "measurement_id": "1765a90af0a9356545f3c75ba5922ffd",
+      "source_files_sha256": {
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 29,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-CODE-01",
+      "iteration": 5,
+      "measurement_id": "e50dfb78064b0ad587873206b757dd6c",
+      "source_files_sha256": {
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/spec-driven/END-TO-END-DESIGN.md": "8ff4a899b6d1f39aeac8f3ada13a7cdda68a6eef6dfb5c61eba9adec8af761b5",
+        "docs/vector/coordination-prompts-2026-06-29.md": "eec080f548d8d7251c9de259e92642993c1c2bdd9211e76fd8a53cf993e50b1f",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "graph/eval/ckv-mirror/corpus/validator.go": "e0f94ac83c9886930ee7409e273c8a0b5210260e24599224b2fba7ac3a469e5f"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 29,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-03",
+      "iteration": 1,
+      "measurement_id": "6ce3d7021c90be2524fa787604adc1c4",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/vector/build/promote.go": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9",
+        "internal/vector/query/flow.go": "c1e5140e78bef43441daad24867192e8ffd59c877f7880aa4b55f8616c5808ad",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/vector/manifest/manifest.go": "a09d75a898deadc738bd0342633bc5ab64b1f4247fb9dccbb1db225fff910d45"
+      },
+      "returned_citations": 22,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 61,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-03",
+      "iteration": 2,
+      "measurement_id": "93dc7003b2f751c1a752cae67f5b4185",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/vector/build/promote.go": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9",
+        "internal/vector/query/flow.go": "c1e5140e78bef43441daad24867192e8ffd59c877f7880aa4b55f8616c5808ad",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/vector/manifest/manifest.go": "a09d75a898deadc738bd0342633bc5ab64b1f4247fb9dccbb1db225fff910d45"
+      },
+      "returned_citations": 22,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 61,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-03",
+      "iteration": 3,
+      "measurement_id": "aa730b70d4eae5a705e2bed4c5a1229d",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/vector/build/promote.go": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9",
+        "internal/vector/query/flow.go": "c1e5140e78bef43441daad24867192e8ffd59c877f7880aa4b55f8616c5808ad",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/vector/manifest/manifest.go": "a09d75a898deadc738bd0342633bc5ab64b1f4247fb9dccbb1db225fff910d45"
+      },
+      "returned_citations": 22,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 61,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-03",
+      "iteration": 4,
+      "measurement_id": "aa40db5cdff78c130f49c15b8ec9ad65",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/vector/build/promote.go": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9",
+        "internal/vector/query/flow.go": "c1e5140e78bef43441daad24867192e8ffd59c877f7880aa4b55f8616c5808ad",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/vector/manifest/manifest.go": "a09d75a898deadc738bd0342633bc5ab64b1f4247fb9dccbb1db225fff910d45"
+      },
+      "returned_citations": 22,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 61,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-WHY-03",
+      "iteration": 5,
+      "measurement_id": "b795ae99f0d4dcfd9e912a06726799e9",
+      "source_files_sha256": {
+        "internal/system/patch/review.go": "343d29f9ed725906b29bc9feb28ecd8eb9470e40af1743f31efb054f2de5350f",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/vector/build/promote.go": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9",
+        "internal/vector/query/flow.go": "c1e5140e78bef43441daad24867192e8ffd59c877f7880aa4b55f8616c5808ad",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/patch/patch.go": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "internal/system/semantic/trace.go": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "internal/vector/store/sqlitevec/store.go": "bb9a0da336806f3a587e52a0950220e759801f6e3a2a28420d5b8efdf156bc71",
+        "internal/vector/manifest/manifest.go": "a09d75a898deadc738bd0342633bc5ab64b1f4247fb9dccbb1db225fff910d45"
+      },
+      "returned_citations": 22,
+      "returned_bodies": 10,
+      "backend_attempts": {
+        "ckg": 61,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-01",
+      "iteration": 1,
+      "measurement_id": "4ce4915ed0e266f9961b6889c873ecca",
+      "source_files_sha256": {
+        "docs/spec-driven/D1-DECISION-REVIEW.md": "d4d0b877a999477797ded6fff0f761e33af5ea26e8cbaf53d447eb0b55dc78c3",
+        "system/docs/system-context-map.md": "0776db06ed0aa77e595990cb501bcb3f4581feb08b492446704b641f3730d6e5",
+        "vector/policy/README.md": "fb2ad16372b5f7697f8c2b14824084ae8faa166d473e96b71b4bf67b105960a3",
+        "docs/graph/design/ts-async-await-and-interface.md": "6b52e8c7c3111cfad61b101bfa7855bee68cded00f082b470cc42a3e04764481",
+        "internal/vector/eval/prregress/runner.go": "3f35abaf02d5c0b48db48f134ea7715b9c78346815d1de3ccd0fd7a539f63107",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "cmd/graph/bench_mcp.go": "03a9f2f67b8901ded651ae4fb2391d940a552c3fe1108436bfa9b4549770738b"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 25,
+        "ckv": 3,
+        "ollama_http": 12,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-01",
+      "iteration": 2,
+      "measurement_id": "eadffce0307d3d75dc49b6baa0a82cea",
+      "source_files_sha256": {
+        "docs/spec-driven/D1-DECISION-REVIEW.md": "d4d0b877a999477797ded6fff0f761e33af5ea26e8cbaf53d447eb0b55dc78c3",
+        "system/docs/system-context-map.md": "0776db06ed0aa77e595990cb501bcb3f4581feb08b492446704b641f3730d6e5",
+        "vector/policy/README.md": "fb2ad16372b5f7697f8c2b14824084ae8faa166d473e96b71b4bf67b105960a3",
+        "docs/graph/design/ts-async-await-and-interface.md": "6b52e8c7c3111cfad61b101bfa7855bee68cded00f082b470cc42a3e04764481",
+        "internal/vector/eval/prregress/runner.go": "3f35abaf02d5c0b48db48f134ea7715b9c78346815d1de3ccd0fd7a539f63107",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "cmd/graph/bench_mcp.go": "03a9f2f67b8901ded651ae4fb2391d940a552c3fe1108436bfa9b4549770738b"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 25,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-01",
+      "iteration": 3,
+      "measurement_id": "bfa1195013088d573fbd0fc6452105c2",
+      "source_files_sha256": {
+        "docs/spec-driven/D1-DECISION-REVIEW.md": "d4d0b877a999477797ded6fff0f761e33af5ea26e8cbaf53d447eb0b55dc78c3",
+        "system/docs/system-context-map.md": "0776db06ed0aa77e595990cb501bcb3f4581feb08b492446704b641f3730d6e5",
+        "vector/policy/README.md": "fb2ad16372b5f7697f8c2b14824084ae8faa166d473e96b71b4bf67b105960a3",
+        "docs/graph/design/ts-async-await-and-interface.md": "6b52e8c7c3111cfad61b101bfa7855bee68cded00f082b470cc42a3e04764481",
+        "internal/vector/eval/prregress/runner.go": "3f35abaf02d5c0b48db48f134ea7715b9c78346815d1de3ccd0fd7a539f63107",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "cmd/graph/bench_mcp.go": "03a9f2f67b8901ded651ae4fb2391d940a552c3fe1108436bfa9b4549770738b"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 25,
+        "ckv": 3,
+        "ollama_http": 12,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-01",
+      "iteration": 4,
+      "measurement_id": "0aa2e302a096f143c3d898b0f45cd0db",
+      "source_files_sha256": {
+        "docs/spec-driven/D1-DECISION-REVIEW.md": "d4d0b877a999477797ded6fff0f761e33af5ea26e8cbaf53d447eb0b55dc78c3",
+        "system/docs/system-context-map.md": "0776db06ed0aa77e595990cb501bcb3f4581feb08b492446704b641f3730d6e5",
+        "vector/policy/README.md": "fb2ad16372b5f7697f8c2b14824084ae8faa166d473e96b71b4bf67b105960a3",
+        "docs/graph/design/ts-async-await-and-interface.md": "6b52e8c7c3111cfad61b101bfa7855bee68cded00f082b470cc42a3e04764481",
+        "internal/vector/eval/prregress/runner.go": "3f35abaf02d5c0b48db48f134ea7715b9c78346815d1de3ccd0fd7a539f63107",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "cmd/graph/bench_mcp.go": "03a9f2f67b8901ded651ae4fb2391d940a552c3fe1108436bfa9b4549770738b"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 25,
+        "ckv": 3,
+        "intent": 1,
+        "ollama_http": 9
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-POLICY-01",
+      "iteration": 5,
+      "measurement_id": "f009e88c9ec264cfa4b0d122c73d4466",
+      "source_files_sha256": {
+        "docs/spec-driven/D1-DECISION-REVIEW.md": "d4d0b877a999477797ded6fff0f761e33af5ea26e8cbaf53d447eb0b55dc78c3",
+        "system/docs/system-context-map.md": "0776db06ed0aa77e595990cb501bcb3f4581feb08b492446704b641f3730d6e5",
+        "vector/policy/README.md": "fb2ad16372b5f7697f8c2b14824084ae8faa166d473e96b71b4bf67b105960a3",
+        "docs/graph/design/ts-async-await-and-interface.md": "6b52e8c7c3111cfad61b101bfa7855bee68cded00f082b470cc42a3e04764481",
+        "internal/vector/eval/prregress/runner.go": "3f35abaf02d5c0b48db48f134ea7715b9c78346815d1de3ccd0fd7a539f63107",
+        "internal/setup/reindex.go": "c087956dd77182583779b213315845ec143502234c034c6b68a5def5270cb8c5",
+        "internal/system/knowledgepack/lock.go": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "cmd/graph/bench_mcp.go": "03a9f2f67b8901ded651ae4fb2391d940a552c3fe1108436bfa9b4549770738b"
+      },
+      "returned_citations": 8,
+      "returned_bodies": 8,
+      "backend_attempts": {
+        "ckg": 25,
+        "ckv": 3,
+        "ollama_http": 12,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-TRACE-01",
+      "iteration": 1,
+      "measurement_id": "efa376f8f22bbdbbec48a67538726176",
+      "source_files_sha256": {
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "docs/graph/adr/0001-canonical-symbol-id.md": "43e49161e692281f2be0bcfe648e0034d1f2d922f5bbc95381de8339fb3b8c3e",
+        "docs/vector/adr/007-canonical-id-join-key.md": "f22749335dfd3e97249836b999172671954a72bf6462c8de4b5b155494e29cde",
+        "system/docs/symbol-identity-design.md": "41195a76f7e15ade140d1cec8f0288488b9fd5227fdedf71361ac49b830eef10",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/vector/reindex-migration-design-2026-07-10.md": "e8de5338601a7759b7cbafe3ad31aabbf6951dc69d603420348e1829d8de9301",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/semantic/model.go": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 149,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-TRACE-01",
+      "iteration": 2,
+      "measurement_id": "a67b189ae4371d109bcdf1d1d0ebebdd",
+      "source_files_sha256": {
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "docs/graph/adr/0001-canonical-symbol-id.md": "43e49161e692281f2be0bcfe648e0034d1f2d922f5bbc95381de8339fb3b8c3e",
+        "docs/vector/adr/007-canonical-id-join-key.md": "f22749335dfd3e97249836b999172671954a72bf6462c8de4b5b155494e29cde",
+        "system/docs/symbol-identity-design.md": "41195a76f7e15ade140d1cec8f0288488b9fd5227fdedf71361ac49b830eef10",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/vector/reindex-migration-design-2026-07-10.md": "e8de5338601a7759b7cbafe3ad31aabbf6951dc69d603420348e1829d8de9301",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/semantic/model.go": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 149,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-TRACE-01",
+      "iteration": 3,
+      "measurement_id": "d922846ed85800422506c885e38b9793",
+      "source_files_sha256": {
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "docs/graph/adr/0001-canonical-symbol-id.md": "43e49161e692281f2be0bcfe648e0034d1f2d922f5bbc95381de8339fb3b8c3e",
+        "docs/vector/adr/007-canonical-id-join-key.md": "f22749335dfd3e97249836b999172671954a72bf6462c8de4b5b155494e29cde",
+        "system/docs/symbol-identity-design.md": "41195a76f7e15ade140d1cec8f0288488b9fd5227fdedf71361ac49b830eef10",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/vector/reindex-migration-design-2026-07-10.md": "e8de5338601a7759b7cbafe3ad31aabbf6951dc69d603420348e1829d8de9301",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/semantic/model.go": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 149,
+        "ckv": 4,
+        "intent": 1,
+        "ollama_http": 12
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-TRACE-01",
+      "iteration": 4,
+      "measurement_id": "1befe450710a1be4b20c5842ce03b818",
+      "source_files_sha256": {
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "docs/graph/adr/0001-canonical-symbol-id.md": "43e49161e692281f2be0bcfe648e0034d1f2d922f5bbc95381de8339fb3b8c3e",
+        "docs/vector/adr/007-canonical-id-join-key.md": "f22749335dfd3e97249836b999172671954a72bf6462c8de4b5b155494e29cde",
+        "system/docs/symbol-identity-design.md": "41195a76f7e15ade140d1cec8f0288488b9fd5227fdedf71361ac49b830eef10",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/vector/reindex-migration-design-2026-07-10.md": "e8de5338601a7759b7cbafe3ad31aabbf6951dc69d603420348e1829d8de9301",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/semantic/model.go": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 149,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    },
+    {
+      "request_id": "B0-TRACE-01",
+      "iteration": 5,
+      "measurement_id": "a32228be787c06bd8014081bb168b4d7",
+      "source_files_sha256": {
+        "docs/spec-driven/D5-DECISION-REVIEW.md": "0f06b9ea3d4ae0577472d50bdc60cade48ed5b3b9b39b22743aa4dcd2d757d03",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+        "docs/graph/adr/0001-canonical-symbol-id.md": "43e49161e692281f2be0bcfe648e0034d1f2d922f5bbc95381de8339fb3b8c3e",
+        "docs/vector/adr/007-canonical-id-join-key.md": "f22749335dfd3e97249836b999172671954a72bf6462c8de4b5b155494e29cde",
+        "system/docs/symbol-identity-design.md": "41195a76f7e15ade140d1cec8f0288488b9fd5227fdedf71361ac49b830eef10",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md": "e846d1fdaf87df0d7f2a23070e0a127c95d48f77ac28f3a80f21be1d2708f6d3",
+        "docs/vector/reindex-migration-design-2026-07-10.md": "e8de5338601a7759b7cbafe3ad31aabbf6951dc69d603420348e1829d8de9301",
+        "internal/system/semantic/validate.go": "bde09719f0e4725f5bf2720e3a6d3ee6e16aa220aeb709e8f4d4ed3d3c933af2",
+        "internal/system/semantic/model.go": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+      },
+      "returned_citations": 11,
+      "returned_bodies": 11,
+      "backend_attempts": {
+        "ckg": 149,
+        "ckv": 4,
+        "ollama_http": 15,
+        "intent": 1
+      },
+      "observed_search_k": [
+        10,
+        10,
+        6
+      ]
+    }
+  ],
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "inputs_unchanged": true,
+  "stores_unchanged": true,
+  "finished_at": "2026-10-05T20:55:30.947189+00:00"
+}

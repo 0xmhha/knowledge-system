@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime,importlib.util
+R=Path('/private/tmp/ks-approved-scope-20261006');N=Path('/private/tmp/ks-approved-final-sweep-20261006');root=Path.cwd();data=root/'system/eval/b0-knowledge-system';out=R/'approved-final-oracles';read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();execution=read(N/'execution.json');binary=R/'runtime-header-batch/cks';checks=read(out/'execution.json')['checks'];go=read(N/'public-go-verification/static-final.json');assert go['failed']==240 and len(go['records'])==1920 and checks[-1]['exit_code']==2
+errors={json.loads(l)['sequence']for l in(N/'static-final/matrix/rows.jsonl').open()if json.loads(l).get('error')};bad={v['sequence']for v in go['records']if v['status']!='valid_contract'};assert bad==errors
+# Resume only unexecuted raw/v1 steps; successful Go audits remain untouched.
+def run(label,args,allowed=(0,)):
+ log=out/(label+'.log')
+ with log.open('xb')as stream:code=subprocess.run([str(v)for v in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(v)for v in args],'exit_code':code,'log_sha256':sha(log)});print(label,code,flush=True);assert code in allowed,label
+text=(R/'post-final-native-oracles.py').read_text();tail=text[text.index('probe=R/'):text.index("assert all(sha(Path(p))==d for p,d in execution['input_sha256_after']")];exec(tail)
+seal=read(R/'final-failed-seals.json');assert all(seal[k]for k in['approved_inputs_unchanged','stores_unchanged','product_source_unchanged','binary_unchanged'])
+(out/'execution.json').write_text(json.dumps({'status':'complete_with_preserved_v2_failure','checks':checks,'raw_probes':len(probes),'v2_failed_rows':240,'v2_capture_status':'failed_preserved','public_go_failed_sequences_exactly_match_tool_errors':True,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n');print('native checks completed with v2 failure preserved',flush=True)

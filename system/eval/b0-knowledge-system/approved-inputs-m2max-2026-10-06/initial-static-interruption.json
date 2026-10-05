@@ -1,0 +1,7 @@
+{
+  "status": "interrupted_stalled_initialization",
+  "recorded_at": "2026-10-05T17:46:53.357548+00:00",
+  "processes": "22481 40833 /Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python /private/tmp/ks-approved-scope-20261006/run-static.py\n22490 22481 /private/tmp/ks-approved-scope-20261006/bin/cks eval --scenarios /private/tmp/ks-approved-scope-20261006/development --config /private/tmp/ks-approved-scope-20261006/static-config.yaml --cks-mcp /private/tmp/ks-approved-scope-20261006/bin/cks --verify-anchors /private/tmp/ks-b0-approved-corpus-20261006 --record-responses --output /private/tmp/ks-approved-scope-20261006/static-dev-v1.json\n22491 22490 /private/tmp/ks-approved-scope-20261006/bin/cks mcp --config /private/tmp/ks-approved-scope-20261006/static-config.yaml\n",
+  "cause": "MCP subprocess stderr is piped but never consumed by eval.NewRunner; startup backend measurement log exceeds pipe capacity. No quality or timing result produced.",
+  "next": "prefailing native subprocess regression, drain stderr while preserving logs, fresh evaluation attempt"
+}

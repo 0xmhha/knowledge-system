@@ -17,6 +17,12 @@ class StaticV2Scopes(unittest.TestCase):
         self.raw = [(DATA / name).read_bytes() for name in
                     ['questions.json', 'protocol-m2max-draft.json',
                      'dynamic-fixtures-m2max-draft.json', 'human-review-m2max-2026-10-03.json']]
+        # These failure oracles require an explicit draft, independent of
+        # the real human approvals retained in the repository.
+        self.scope.update(status='draft', reviewer=None, reviewed_at=None)
+        review = json.loads(self.raw[3])
+        review['decisions'] = [d for d in review['decisions'] if d.get('scope') != 'static_v2_query_scopes']
+        self.raw[3] = json.dumps(review).encode()
 
     def inspect(self, scope=None):
         value = self.scope if scope is None else scope

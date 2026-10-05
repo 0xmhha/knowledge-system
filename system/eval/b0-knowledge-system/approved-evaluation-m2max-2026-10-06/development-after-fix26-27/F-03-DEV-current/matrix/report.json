@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "state": "captured",
+  "started_at": "2026-10-05T19:31:27.645328Z",
+  "finished_at": "2026-10-05T19:36:02.065587Z",
+  "request_sha256": "27a19b0096b49380a0c4498a233e93366ad7bbeb555a81ac398314364f7eaa83",
+  "base_config_sha256": "79569fb52eb59a216e89de768c41e0f0d0d54448019b552711b0e0cd36efff9b",
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "binary_sha256_after": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "working_directory": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+  "runtime": {
+    "arch": "arm64",
+    "go": "go1.26.8",
+    "logical_cpus": 12,
+    "os": "darwin"
+  },
+  "dataset_identity": {
+    "source": {
+      "project_id": "b0-f03-dev",
+      "source_mode": "committed",
+      "source_commit": "ce06a5c9eea0eb980a3559b480037fc5d741ae23",
+      "file_manifest_digest": "f43f0d85662ebaf51aee2abeae8e21b563ee04d265d4de1801a60e0229c45227",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "b8ac7756195c1790ef2b6e862433be8757106824f33d1ed3f52d552ad1a37634"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "e5083faa3c83b6e20dade31399fff4c1382c50001442629b4b150746819a1550",
+    "dataset_id": "dc6bb1d13524d87fa569b61237164b96846a2bf3f63b609468f83572148cd615"
+  },
+  "locked_files_sha256": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/config.yaml": "79569fb52eb59a216e89de768c41e0f0d0d54448019b552711b0e0cd36efff9b",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/requests.json": "27a19b0096b49380a0c4498a233e93366ad7bbeb555a81ac398314364f7eaa83",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/dataset-identity.json": "235645cf6fd2924ca2a85ebcc5d68e2d97618e58c722609bd788b35e9920c6cc",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/graph/graph.db": "a0d98c97a1979bfad31c568ae0c1af987396ebee74901292255d5e643a473763",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df": "d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/history.bundle": "65dddc085f04d286a9377bc95e950b917fcd6be49f6bd84079e9b22b3aec665f",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/manifest.json": "3ecb4802997d44fadef65251a90a1854b199d1ff7429cace38d016d961ef8c65",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/vector/manifest.json": "cc92e8d1d76e1ebb6649a60318795c3919ab9d6937c257875c0074a9d3231459",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/vector/vector.db": "87336104ba01642522d605e8c1faad6ca9f021790f5a1ed0abc69d0e16fc6049",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/semantic-approved.db": "7128bb2cfad1255326f299f7523b97e92e17aff61ebbe7d124ea7cbaeed8a841",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/fixture-review.json": "d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837"
+  },
+  "locked_files_sha256_after": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/config.yaml": "79569fb52eb59a216e89de768c41e0f0d0d54448019b552711b0e0cd36efff9b",
+    "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/requests.json": "27a19b0096b49380a0c4498a233e93366ad7bbeb555a81ac398314364f7eaa83",
+    "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/dataset-identity.json": "235645cf6fd2924ca2a85ebcc5d68e2d97618e58c722609bd788b35e9920c6cc",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/graph/graph.db": "a0d98c97a1979bfad31c568ae0c1af987396ebee74901292255d5e643a473763",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/blobs/d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df": "d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/history.bundle": "65dddc085f04d286a9377bc95e950b917fcd6be49f6bd84079e9b22b3aec665f",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/sources/manifest.json": "3ecb4802997d44fadef65251a90a1854b199d1ff7429cace38d016d961ef8c65",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/vector/manifest.json": "cc92e8d1d76e1ebb6649a60318795c3919ab9d6937c257875c0074a9d3231459",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/approved-dataset/approved/vector/vector.db": "87336104ba01642522d605e8c1faad6ca9f021790f5a1ed0abc69d0e16fc6049",
+    "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/semantic-approved.db": "7128bb2cfad1255326f299f7523b97e92e17aff61ebbe7d124ea7cbaeed8a841",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/fixture-review.json": "d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837"
+  },
+  "counts": {
+    "cold_process": 3,
+    "retrieval": 5,
+    "warm_latency": 20,
+    "warmup": 2
+  },
+  "arms": [
+    {
+      "id": "baseline_off",
+      "mode": "baseline",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/baseline_off.yaml",
+      "config_sha256": "9c3110c723e1435c4398718f3377aec2ed3366d87622df1eaf9634720d09f5a9",
+      "config_sha256_after": "9c3110c723e1435c4398718f3377aec2ed3366d87622df1eaf9634720d09f5a9"
+    },
+    {
+      "id": "baseline_on",
+      "mode": "baseline",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/baseline_on.yaml",
+      "config_sha256": "2da90e555aceca5fb66eb3e85d593322f8f74082f30e9af2540245c490d087ac",
+      "config_sha256_after": "2da90e555aceca5fb66eb3e85d593322f8f74082f30e9af2540245c490d087ac"
+    },
+    {
+      "id": "concept_text_off",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/concept_text_off.yaml",
+      "config_sha256": "f45adbce73b9c04a7156c294bc3a2f2f3eb8e4e15d82d8acdf8fd9c286f6f295",
+      "config_sha256_after": "f45adbce73b9c04a7156c294bc3a2f2f3eb8e4e15d82d8acdf8fd9c286f6f295"
+    },
+    {
+      "id": "concept_text_on",
+      "mode": "concept_text",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/concept_text_on.yaml",
+      "config_sha256": "4c9a6a90112182e1235ba3da6a3e678e437af873799ce8c940b81d2c77499a0e",
+      "config_sha256_after": "4c9a6a90112182e1235ba3da6a3e678e437af873799ce8c940b81d2c77499a0e"
+    },
+    {
+      "id": "relations_off",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/relations_off.yaml",
+      "config_sha256": "2c27ac7eaa763453b9b55aa11670851f8544979bdf1a6979c1cd4ae5220dadbe",
+      "config_sha256_after": "2c27ac7eaa763453b9b55aa11670851f8544979bdf1a6979c1cd4ae5220dadbe"
+    },
+    {
+      "id": "relations_on",
+      "mode": "relations",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/relations_on.yaml",
+      "config_sha256": "241dca437d6c0e9b97f28319e86bd7e08f5fc68af3cacaca68649d9e528d000b",
+      "config_sha256_after": "241dca437d6c0e9b97f28319e86bd7e08f5fc68af3cacaca68649d9e528d000b"
+    },
+    {
+      "id": "combined_off",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/combined_off.yaml",
+      "config_sha256": "7bd895f25689de56d4c472f30711b719972d8e2c511f241f26610305504a0ab0",
+      "config_sha256_after": "7bd895f25689de56d4c472f30711b719972d8e2c511f241f26610305504a0ab0"
+    },
+    {
+      "id": "combined_on",
+      "mode": "combined",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-approved-development-repaired-sweep-20261006/F-03-DEV-current/matrix/combined_on.yaml",
+      "config_sha256": "fcb82fcf3b99a7545dc8f9edf8a489ed6ce0b02f1c4d0357ac21c52fb764855c",
+      "config_sha256_after": "fcb82fcf3b99a7545dc8f9edf8a489ed6ce0b02f1c4d0357ac21c52fb764855c"
+    }
+  ],
+  "rows": 720,
+  "rows_sha256": "06d59c34dd0661939e0daedbadcda9035ac6d4d5f6ab822d45173a4048e0c9ec",
+  "call_timeout_ns": 90000000000,
+  "quality_metrics": null,
+  "rotation": "global group index mod 8; left rotate fixed arm list; every group is one request/phase/iteration across 8 arms",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "recording_policy": "full SDK response rows.jsonl; serialize and sync after each response outside call timing; no concurrent calls",
+  "source_head": "ce06a5c9eea0eb980a3559b480037fc5d741ae23",
+  "source_head_after": "ce06a5c9eea0eb980a3559b480037fc5d741ae23",
+  "live_executable_bits": {
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/fixture-review.json": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/go.mod": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/main.go": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/ontology.yaml": false
+  },
+  "live_executable_bits_after": {
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/fixture-review.json": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/go.mod": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/main.go": false,
+    "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo/ontology.yaml": false
+  },
+  "environment_before": {
+    "at": "2026-10-05T19:31:27.660566Z",
+    "valid": true,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 22.35 15.97 13.52 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    17742.\nPages active:                                1051558.\nPages inactive:                              1042853.\nPages speculative:                             11549.\nPages throttled:                                   0.\nPages wired down:                             363692.\nPages purgeable:                                2725.\n\"Translation faults\":                    44014327135.\nPages copy-on-write:                      5196901837.\nPages zero filled:                       18251095591.\nPages reactivated:                         871635382.\nPages purged:                              113885832.\nFile-backed pages:                            739501.\nAnonymous pages:                             1366459.\nPages stored in compressor:                  3709087.\nPages occupied by compressor:                1649873.\nDecompressions:                            555870370.\nCompressions:                              537830157.\nPageins:                                   628190885.\nPageouts:                                    4902153.\nSwapins:                                     3268604.\nSwapouts:                                    4126353.",
+      "swap": "total = 5120.00M  used = 4305.88M  free = 814.12M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 1051,
+      "process_pressure_method": "ps pcpu; platform/time-window dependent",
+      "top_cpu_processes": [
+        {
+          "pid": 95720,
+          "parent_pid": 1,
+          "cpu_percent": 149.8,
+          "rss_bytes": 239861760
+        },
+        {
+          "pid": 90391,
+          "parent_pid": 8549,
+          "cpu_percent": 59.7,
+          "rss_bytes": 1238450176
+        },
+        {
+          "pid": 82423,
+          "parent_pid": 82159,
+          "cpu_percent": 45.4,
+          "rss_bytes": 179470336
+        },
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 30.7,
+          "rss_bytes": 7373979648
+        },
+        {
+          "pid": 592,
+          "parent_pid": 1,
+          "cpu_percent": 26.7,
+          "rss_bytes": 40157184
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 19.6,
+          "rss_bytes": 74072064
+        },
+        {
+          "pid": 8549,
+          "parent_pid": 8410,
+          "cpu_percent": 10.5,
+          "rss_bytes": 33554432
+        },
+        {
+          "pid": 47958,
+          "parent_pid": 4459,
+          "cpu_percent": 10.3,
+          "rss_bytes": 25411584
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "bge-m3:latest",
+      "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "dimension": 1024,
+      "endpoint": "http://127.0.0.1:11434",
+      "server_version": "0.35.1",
+      "runtime_options": {
+        "num_batch": 8192,
+        "num_ctx": 8192
+      },
+      "valid": true,
+      "probe_policy": "local /api/version; tags; one strict native embed with dataset runtime options; tags again; optional /api/ps; outside query timing",
+      "residency": {
+        "other_resident_model_count": 0,
+        "selected_models": [
+          {
+            "name": "bge-m3:latest",
+            "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+            "size": 963400171,
+            "size_vram": 963400171,
+            "context_length": 8192,
+            "expires_at": "2026-10-06T04:36:27.771574+09:00"
+          }
+        ]
+      }
+    },
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "CPU pressure methods are platform-specific; Linux lifetime averages and ps windows are diagnostics, not resource exclusivity",
+      "Linux memory/CPUs are kernel-visible totals; cgroup values reflect exposed self/v2 ancestors and conventional mount roots, not a certificate of effective capacity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "environment_after": {
+    "at": "2026-10-05T19:36:01.913565Z",
+    "valid": true,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 25.68 20.58 16.07 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4856.\nPages active:                                1040835.\nPages inactive:                              1034296.\nPages speculative:                              5155.\nPages throttled:                                   0.\nPages wired down:                             363695.\nPages purgeable:                                3290.\n\"Translation faults\":                    44032198981.\nPages copy-on-write:                      5198448320.\nPages zero filled:                       18256944738.\nPages reactivated:                         873061164.\nPages purged:                              113901704.\nFile-backed pages:                            718015.\nAnonymous pages:                             1362271.\nPages stored in compressor:                  3805595.\nPages occupied by compressor:                1688492.\nDecompressions:                            556787446.\nCompressions:                              538888710.\nPageins:                                   628680918.\nPageouts:                                    4906024.\nSwapins:                                     3268604.\nSwapouts:                                    4126353.",
+      "swap": "total = 5120.00M  used = 4305.88M  free = 814.12M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 1084,
+      "process_pressure_method": "ps pcpu; platform/time-window dependent",
+      "top_cpu_processes": [
+        {
+          "pid": 65781,
+          "parent_pid": 64782,
+          "cpu_percent": 111.7,
+          "rss_bytes": 154517504
+        },
+        {
+          "pid": 95720,
+          "parent_pid": 1,
+          "cpu_percent": 108.9,
+          "rss_bytes": 246759424
+        },
+        {
+          "pid": 67695,
+          "parent_pid": 64782,
+          "cpu_percent": 92.4,
+          "rss_bytes": 134823936
+        },
+        {
+          "pid": 90391,
+          "parent_pid": 8549,
+          "cpu_percent": 85.1,
+          "rss_bytes": 1238335488
+        },
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 42,
+          "rss_bytes": 6383140864
+        },
+        {
+          "pid": 91300,
+          "parent_pid": 65793,
+          "cpu_percent": 34,
+          "rss_bytes": 337592320
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 33.5,
+          "rss_bytes": 52264960
+        },
+        {
+          "pid": 46593,
+          "parent_pid": 65793,
+          "cpu_percent": 31.7,
+          "rss_bytes": 369393664
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "bge-m3:latest",
+      "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "dimension": 1024,
+      "endpoint": "http://127.0.0.1:11434",
+      "server_version": "0.35.1",
+      "runtime_options": {
+        "num_batch": 8192,
+        "num_ctx": 8192
+      },
+      "valid": true,
+      "probe_policy": "local /api/version; tags; one strict native embed with dataset runtime options; tags again; optional /api/ps; outside query timing",
+      "residency": {
+        "other_resident_model_count": 0,
+        "selected_models": [
+          {
+            "name": "bge-m3:latest",
+            "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+            "size": 963400171,
+            "size_vram": 963400171,
+            "context_length": 8192,
+            "expires_at": "2026-10-06T04:41:02.058214+09:00"
+          }
+        ]
+      }
+    },
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "CPU pressure methods are platform-specific; Linux lifetime averages and ps windows are diagnostics, not resource exclusivity",
+      "Linux memory/CPUs are kernel-visible totals; cgroup values reflect exposed self/v2 ancestors and conventional mount roots, not a certificate of effective capacity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "environment_note": "shared M2 Max; sequential captures; no task-owned concurrent embedding/build/tests; not exclusive host; model remains resident; no daemon unload. Small synthetic variants remain clustered; repetition is not an independent sample.",
+  "locked_input_copies": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": {
+      "path": "locked-inputs/002-dynamic-fixtures-m2max-draft.json",
+      "sha256": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+      "sha256_after": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": {
+      "path": "locked-inputs/003-human-review-m2max-2026-10-03.json",
+      "sha256": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+      "sha256_after": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": {
+      "path": "locked-inputs/001-protocol-m2max-draft.json",
+      "sha256": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+      "sha256_after": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": {
+      "path": "locked-inputs/000-questions.json",
+      "sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+      "sha256_after": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143"
+    },
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": {
+      "path": "locked-inputs/004-static-v2-scopes-m2max-draft.json",
+      "sha256": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2",
+      "sha256_after": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2"
+    }
+  }
+}

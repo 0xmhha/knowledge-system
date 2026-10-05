@@ -1,0 +1,111 @@
+{
+  "schema_version": 4,
+  "snapshot": {
+    "project_id": "f-05-final-a",
+    "dataset_id": "d405c747d4b9e8c1da7a6d0617751ca6a4f87b3dbdfd9acf989a1d1c6faae370",
+    "snapshot_id": "7859e850523fa9c8ef19b3324f789cda2909c75d51f9d1e8bac13149e8a5f0e8",
+    "source_mode": "committed",
+    "commit": "0290be682e5ab8ad84f0893bfb94c9ff7aca258d"
+  },
+  "evidence": [
+    {
+      "id": "ontology:dd45aee8cabdc7cb9c113bf1",
+      "snapshot": {
+        "project_id": "f-05-final-a",
+        "dataset_id": "d405c747d4b9e8c1da7a6d0617751ca6a4f87b3dbdfd9acf989a1d1c6faae370",
+        "snapshot_id": "7859e850523fa9c8ef19b3324f789cda2909c75d51f9d1e8bac13149e8a5f0e8",
+        "source_mode": "committed",
+        "commit": "0290be682e5ab8ad84f0893bfb94c9ff7aca258d"
+      },
+      "kind": "document",
+      "path": "ontology.yaml",
+      "start_line": 9,
+      "end_line": 35,
+      "content_sha256": "60a8e9c27adca0b4830d1102b137d227e55302ec58f895c10ec5df380c5196f3",
+      "extractor": "ontology-yaml-v1"
+    },
+    {
+      "id": "fixture:code:Alpha",
+      "snapshot": {
+        "project_id": "f-05-final-a",
+        "dataset_id": "d405c747d4b9e8c1da7a6d0617751ca6a4f87b3dbdfd9acf989a1d1c6faae370",
+        "snapshot_id": "7859e850523fa9c8ef19b3324f789cda2909c75d51f9d1e8bac13149e8a5f0e8",
+        "source_mode": "committed",
+        "commit": "0290be682e5ab8ad84f0893bfb94c9ff7aca258d"
+      },
+      "kind": "code",
+      "path": "main.go",
+      "start_line": 3,
+      "end_line": 3,
+      "content_sha256": "c1a1f88d8c15ebc3f729e7f5cba000da2f32be446fafd6b1c936e7914614402e",
+      "canonical_id": "example.com/b0final.Alpha",
+      "extractor": "b0-approved-sf-source-v1"
+    }
+  ],
+  "sections": null,
+  "concepts": [
+    {
+      "id": "alpha-function",
+      "kind": "process",
+      "definition": "The Alpha function returns the fixture project marker; it does not enforce a refund policy.",
+      "includes": [
+        "Source-backed function identity"
+      ],
+      "excludes": [
+        "Automatic policy compliance or acceptance"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "Alpha",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "프로젝트 식별 함수",
+          "preferred": true
+        }
+      ],
+      "evidence_id": "ontology:dd45aee8cabdc7cb9c113bf1",
+      "status": "verified",
+      "reviewed_by": "chat-user"
+    }
+  ],
+  "claims": null,
+  "knowledge": {
+    "lock_digest": "b9f5d81f8047533ebf9ef29fb6223502b4ca78a3fb20dfb899072cba899c133a",
+    "packs": [
+      {
+        "pack_id": "fixture.refund",
+        "version": "1.0.0",
+        "digest": "c02c3981602ec41bd35ea540b91472bdd51843c79d03a76480ff90d200eb0998",
+        "origin_id": "knowledge:fixture.refund",
+        "source_sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "concepts": [
+          {
+            "pack_id": "fixture.refund",
+            "local_id": "business-policy",
+            "kind": "rule",
+            "definition": "A project-scoped synthetic refund requirement; the type does not approve any instance."
+          }
+        ],
+        "relations": [],
+        "constraints": []
+      }
+    ]
+  },
+  "assertions": [
+    {
+      "id": "fixture:implementation:Alpha",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "alpha-function",
+      "object_id": "example.com/b0final.Alpha",
+      "evidence_ids": [
+        "ontology:dd45aee8cabdc7cb9c113bf1",
+        "fixture:code:Alpha"
+      ],
+      "status": "verified",
+      "reviewed_by": "chat-user"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "b0-code-01",
+  "prompt": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "internal/setup/verify.go",
+      "start_line": 57,
+      "end_line": 85,
+      "anchor": "func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {"
+    }
+  ]
+}

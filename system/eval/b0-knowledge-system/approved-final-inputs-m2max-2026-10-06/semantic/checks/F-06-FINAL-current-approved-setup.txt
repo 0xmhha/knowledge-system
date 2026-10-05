@@ -1,0 +1,35 @@
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-06T04:19:41.274+09:00 level=INFO msg="detected files" go=2 ts=0 sol=0 proto=0
+    time=2026-10-06T04:19:41.694+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-06T04:19:41.842+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=3 hunk_nodes=16 changed_in_edges=9 blame_edges=2 hunk_edges=17 hunk_blobs=16 max_per_file=10
+    time=2026-10-06T04:19:41.892+09:00 level=INFO msg="build complete" nodes=28 edges=38 pkg_tree_edges=6 topic_resolutions=3
+    ckg: built 28 nodes / 38 edges into /private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved/graph
+<== [graph-build] done
+==> [vector-preflight] Preflight the Ollama embedder
+    Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+<== [vector-preflight] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-06T04:19:41.980+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=36ff38d2ef1526d9 run_id=c9215e215ff7f474 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4172945455/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0
+    time=2026-10-06T04:19:41.981+09:00 level=INFO msg=ckv event=build.start trace_id=497288698f95eebd run_id=c9215e215ff7f474 embedder=bge-m3:latest embedder_provider="" src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4172945455/tree out_dir=/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved/vector
+    time=2026-10-06T04:19:41.994+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=17bf2459f68d131e run_id=c9215e215ff7f474 canonical_available=true ckg_path=/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved/graph files_indexed=2 entries=2
+    ckv: 3/3 files (17.6 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-06T04:19:42.203+09:00 level=INFO msg=ckv event=build.done trace_id=497288698f95eebd run_id=c9215e215ff7f474 latency_ms=222 chunks_flow_spine=0 chunks_doc=1 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4172945455/tree embedder_provider="" indexed_head=092c3995e73fe94aba20488b2c426283e787b918 languages="map[go:4 markdown:1]" chunks_total=6 embedder=bge-m3:latest files_indexed=3 chunks_canonical_id=2 out_dir=/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved/vector db_sha256=1bb86b8ef03f26d36ed07d70501e76155d78664ac508dd74e5a9ae4f330fdbd1 chunks_symbol=2 chunks_file_header=2 chunks_truncated=0 policy_loaded=false category_counts=map[:5] chunks_flow_step=0
+    ckv: indexed 3 files → 6 chunks (2 symbol, 1 doc, 2 header, 0 truncated)
+    ckv: canonical_id 2/2 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=092c3995e73fe94aba20488b2c426283e787b918 built_at=2026-10-05T19:19:42Z db=/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved/vector/vector.db sha256=1bb86b8ef03f26d36ed07d70501e76155d78664ac508dd74e5a9ae4f330fdbd1
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 2
+      db files:    2
+      in both:     2
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/approved-dataset/approved to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

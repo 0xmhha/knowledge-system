@@ -1,0 +1,129 @@
+{
+  "scope": "raw CKV exact full-inventory expected-span rank; separate from composed citation score and not a tuned query",
+  "questions": [
+    {
+      "id": "B0-CODE-01",
+      "targets": [
+        {
+          "expected": {
+            "path": "internal/setup/verify.go",
+            "anchor": "func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {",
+            "start_line": 57,
+            "end_line": 85
+          },
+          "full_exact_ranks": [
+            1085
+          ]
+        }
+      ],
+      "top10_source_files": [
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+        "docs/graph/archive/coordination-response-ckg-2026-06-29.md",
+        "docs/vector/coordination-prompts-2026-06-29.md",
+        "docs/vector/coordination-prompts-2026-06-29.md",
+        "docs/spec-driven/END-TO-END-DESIGN.md",
+        "docs/graph/archive/todo-cks-dogfood-followups-2026-05-20.md",
+        "docs/vector/coordination-prompts-2026-06-29.md",
+        "docs/vector/archive/plan-S1-ckv.md",
+        "docs/graph/archive/REMAINING-WORK-2026-07-15.md"
+      ]
+    },
+    {
+      "id": "B0-WHY-03",
+      "targets": [
+        {
+          "expected": {
+            "path": "internal/system/patch/review.go",
+            "anchor": "func Promote(ctx context.Context, dataset, patchID, storePath string) (string, error) {",
+            "start_line": 205,
+            "end_line": 281
+          },
+          "full_exact_ranks": [
+            1
+          ]
+        }
+      ],
+      "top10_source_files": [
+        "internal/system/patch/review.go",
+        "cmd/cks/mcpcli/daemon_test.go",
+        "docs/spec-driven/PATCH-WORKFLOW.md",
+        "internal/vector/build/promote_test.go",
+        "internal/setup/reindex.go",
+        "internal/system/composer/stage2/searcher_test.go",
+        "docs/dev/2026-08-14-what-broke-the-dataset.md",
+        "cmd/cks/mcpcli/daemon_test.go",
+        "internal/system/patch/review.go",
+        "internal/setup/reindex_test.go"
+      ]
+    },
+    {
+      "id": "B0-POLICY-01",
+      "targets": [
+        {
+          "expected": {
+            "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+            "anchor": "**검토된 프로젝트 정책이라도** 다른 검토된 프로젝트 정책과 충돌하면 자동 우선순위를 부여하지 않는다.",
+            "start_line": 23,
+            "end_line": 23
+          },
+          "full_exact_ranks": [
+            47
+          ]
+        },
+        {
+          "expected": {
+            "path": "internal/system/knowledgepack/instances.go",
+            "anchor": "func (i Instances) SelectPolicies(asOf string, queryScope map[string]string, allowRestricted bool) (PolicyContext, error) {",
+            "start_line": 195,
+            "end_line": 242
+          },
+          "full_exact_ranks": [
+            52
+          ]
+        }
+      ],
+      "top10_source_files": [
+        "docs/spec-driven/D1-DECISION-REVIEW.md",
+        "internal/system/knowledgepack/instances_test.go",
+        "docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md",
+        "system/docs/system-context-map.md",
+        "docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md",
+        "internal/system/knowledgepack/instances_test.go",
+        "vector/policy/README.md",
+        "system/docs/archive/integrated-workplan-2026-05-27.md",
+        "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+        "internal/vector/policy/loader_test.go"
+      ]
+    },
+    {
+      "id": "B0-TRACE-01",
+      "targets": [
+        {
+          "expected": {
+            "path": "internal/system/evidencev2/knowledge_trace.go",
+            "anchor": "func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, versionDir, asOf, subsystem string, projection semantic.ActiveProjection, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {",
+            "start_line": 20,
+            "end_line": 115
+          },
+          "full_exact_ranks": [
+            301,
+            1490
+          ]
+        }
+      ],
+      "top10_source_files": [
+        "docs/spec-driven/D5-DECISION-REVIEW.md",
+        "docs/spec-driven/SEMANTIC-CONTRACT.md",
+        "docs/graph/archive/analysis/CKS-SPEC-COMPLIANCE.md",
+        "docs/graph/adr/0001-canonical-symbol-id.md",
+        "docs/vector/adr/007-canonical-id-join-key.md",
+        "system/docs/archive/system-review-2026-05-27.md",
+        "docs/vector/archive/pending-work-2026-05-21.md",
+        "system/docs/archive/integrated-workplan-2026-05-27.md",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+        "docs/graph/archive/analysis/CKS-SPEC-COMPLIANCE.md"
+      ]
+    }
+  ]
+}

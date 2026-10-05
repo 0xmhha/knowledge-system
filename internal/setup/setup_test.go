@@ -573,3 +573,19 @@ func TestVerifyContent(t *testing.T) {
 		}
 	})
 }
+
+func TestBuildSourceScopeIsPassedOnlyToVector(t *testing.T) {
+	plan, err := BuildPlan(Options{Src: "/s", Out: "/o", VectorBuildSources: "/scope/build-sources.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, step := range plan.Steps {
+		command := strings.Join(step.Cmd, " ")
+		if step.ID == "vector-build" && !strings.Contains(command, "--build-sources /scope/build-sources.json") {
+			t.Fatal("missing vector source exception")
+		}
+		if step.ID == "graph-build" && strings.Contains(command, "--build-sources") {
+			t.Fatal("vector exception leaked to graph CLI")
+		}
+	}
+}

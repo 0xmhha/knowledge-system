@@ -23,6 +23,15 @@ def chunk_id(file, start, end, text_sha):
 def audit_children(chunks, fixture, source, commit, cap):
     RAW.require(fixture['id'] == 'F-02-DEV' and fixture['evaluation_partition'] == 'development',
                 'only diagnostic F-02 DEV supported; FINAL approval/collector is separate')
+    return audit_source_children(chunks, fixture, source, commit, cap)
+
+
+def audit_source_children(chunks, fixture, source, commit, cap):
+    """Physical source/split oracle only; caller binds approvals and partition.
+
+    This does not execute queries, approve facts or claim FINAL quality.
+    The existing diagnostic entry point remains development-only.
+    """
     oracle = fixture['expected']
     RAW.require(oracle.get('parent_id_required') is True and oracle.get('reassembled_children_equal_source') is True
                 and oracle.get('truncation_count') == 0, 'unexpected F-02 source contract')

@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib,subprocess,time,datetime
+R=Path('/private/tmp/ks-approved-scope-20261006');root=Path.cwd();read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+ledger=R/'approved-development-oracles/execution.json'
+while True:
+ if not ledger.exists():time.sleep(4);continue
+ v=read(ledger)
+ if v['status']=='running':time.sleep(4);continue
+ assert v['status']=='complete_pending_independent_interpretation';break
+out=R/'approved-development-stale-ckv';out.mkdir(exist_ok=False)
+book=read(root/'system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json');fixture=next(f for f in book['fixtures']if f['id']=='F-04-DEV')
+cases={c['id']:c for c in read(Path('/private/tmp/ks-approved-dynamic-dev-20261006/built-manifest.json'))['cases']};old=cases['F-04-DEV-old'];new=cases['F-04-DEV-new'];oldv=Path(old['version_dir']);newv=Path(new['version_dir']);source=Path(read(newv/'vector/manifest.json')['src_root']);binary=R/'runtime-header-batch/ckv'
+seals={str(p):sha(p)for v in [oldv,newv]for p in[v/'vector/vector.db',v/'vector/manifest.json',v/'dataset-identity.json',v/'sources/manifest.json']}
+records=[]
+for i,q in enumerate(fixture['queries'],1):
+ target=out/('query-'+str(i)+'.json');args=[binary,'--embedder','ollama','--model-name','bge-m3:latest','--query-prefix-policy','registry','query',q['prompt'],'--out',oldv/'vector','--src',source,'--top',str(fixture['k']),'--threshold','-1','--json']
+ with target.open('xb')as stream,(out/('query-'+str(i)+'.stderr')).open('xb')as err:code=subprocess.run([str(a)for a in args],stdout=stream,stderr=err).returncode
+ actual=read(target);assert code==0;hits=actual['hits'];assert hits and actual['metadata']['fresh'] is False
+ assert actual['metadata']['indexed_head_ckv']==old['dataset']['source']['source_commit']
+ assert all(h['citation']['commit_hash']==old['dataset']['source']['source_commit']and h.get('stale_citation')is True for h in hits)
+ records.append({'id':'F-04-DEV-direct-old-vs-new-'+str(i),'command':[str(a)for a in args],'raw_sha256':sha(target),'metadata':actual['metadata'],'hits':len(hits),'all_old_citations_marked_stale':True})
+assert all(sha(Path(p))==digest for p,digest in seals.items())
+(out/'summary.json').write_text(json.dumps({'schema_version':1,'scope':'approved F04 direct CKV old immutable index against new approved source; not a latency or quality inference','status':'pass','fixture_sha256':hashlib.sha256(json.dumps(fixture,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest(),'model_digest':read(oldv/'dataset-identity.json')['embedding_identity']['model_digest'],'binary_sha256':sha(binary),'dataset_sha256_before':seals,'datasets_unchanged':True,'records':records,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},ensure_ascii=False,indent=2)+'\n');print('Approved F04 direct CKV stale marking verified',flush=True)

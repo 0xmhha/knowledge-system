@@ -1,0 +1,62 @@
+from pathlib import Path
+import json, hashlib, subprocess, time, importlib.util, os, datetime
+root=Path.cwd();R=Path('/private/tmp/ks-approved-scope-20261006');N=Path('/private/tmp/ks-approved-development-repaired-sweep-20261006');data=root/'system/eval/b0-knowledge-system'
+read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+while True:
+ execution=read(N/'execution.json')
+ if execution['status']=='running':time.sleep(4);continue
+ assert execution['status']=='captured_pending_independent_family_oracles_and_reports',execution['status']
+ assert execution['inputs_unchanged'] and execution['stores_unchanged']
+ assert len(execution['checks'])==9 and sum(c['rows']for c in execution['checks'])==3840
+ break
+out=R/'approved-development-oracles';out.mkdir(exist_ok=False)
+checks=[]
+def run(label,args,allowed=(0,)):
+ log=out/(label+'.log');started=time.monotonic()
+ with log.open('xb')as stream:code=subprocess.run([str(v)for v in args],cwd=root,stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(v)for v in args],'exit_code':code,'elapsed_seconds':time.monotonic()-started,'log_sha256':sha(log)})
+ (out/'execution.json').write_text(json.dumps({'status':'running','checks':checks},indent=2)+'\n')
+ print(label,code,flush=True);assert code in allowed,label
+binary=R/'runtime-header-batch/cks';assert sha(binary)==execution['binary_sha256']
+run('static-descriptive',['python3',root/'scripts/b1-summarize-matrix.py','--capture-dir',N/'static-development/matrix','--gold',data/'questions.json','--source-root','/private/tmp/ks-b0-approved-corpus-20261006','--partition','development','--output',N/'static-development-summary.json'])
+run('static-public-go',[R/'runtime-header-batch/b1-evidence-audit','--input',N/'static-development/matrix/rows.jsonl','--output',N/'public-go-verification/static-development.json'])
+source=R/'approved-state-guards/retained_guard_live_test.go.txt';temporary=root/'internal/system/eval/retained_guard_live_test.go';assert not temporary.exists();temporary.write_bytes(source.read_bytes())
+oldenv=dict(os.environ)
+os.environ.update(B0_RETAINED_GUARD_CASES=str(R/'approved-state-guards/cases.json'),B0_RETAINED_GUARD_BINARY=str(binary),B0_RETAINED_GUARD_OUTPUT=str(out/'state-guards-sdk.json'))
+try:run('state-guards',['go','test','./internal/system/eval','-run','^TestRetainedGuardLiveSDK$','-count=1','-v'])
+finally:
+ assert sha(temporary)==sha(source);temporary.unlink();os.environ.clear();os.environ.update(oldenv)
+run('python-b0',['python3','-m','unittest','discover','-s','scripts','-p','test_b0*.py'])
+# Raw CKV measurements are outside latency capture. Full independent exact
+# inventory and query-vector bytes are retained, never candidate-answer text.
+probe=R/'runtime-v2-body/b0-vector-probe';book=read(data/'questions.json');protocol=read(data/'protocol-m2max-draft.json');fixtures={f['id']:f for f in read(data/'dynamic-fixtures-m2max-draft.json')['fixtures']if f['evaluation_partition']=='development'}
+requests=[]
+for q in book['questions']:
+ if q['id']in protocol['development_questions']:
+  requests.append({'id':q['id'],'prompt':q['prompt'],'K':10,'filter':{},'version':R/'strict-dataset/approved-m2max-20261006'})
+for step in execution['steps']:
+ if step['id']=='static-development':continue
+ f=fixtures[step['id'].rsplit('-',1)[0]]
+ for i,q in enumerate(f['queries'],1):requests.append({'id':step['id']+'-'+str(i)+'-'+q['language'],'prompt':q['prompt'],'K':f['k'],'filter':f['filters'],'version':Path(step['case']['version_dir'])})
+probes=[]
+for request in requests:
+ target=out/('raw-'+request['id']+'.json');filter_file=out/('filter-'+request['id']+'.json');filter_file.write_text(json.dumps(request['filter'])+'\n')
+ args=[probe,'--vector-dir',request['version']/'vector','--query',request['prompt'],'--filter-file',filter_file,'--k',str(request['K']),'--max-exact-candidates','2','--embedder','ollama','--model-name','bge-m3:latest','--ollama-url','http://127.0.0.1:11434']
+ with target.open('xb')as stream, (out/('raw-'+request['id']+'.stderr')).open('xb')as err:code=subprocess.run([str(v)for v in args],stdout=stream,stderr=err).returncode
+ v=read(target);assert code==0 and v['state']=='recorded'and v['identity_verified_after']and v['exact_agreement'],request['id']
+ assert v['database_sha256_before']==v['database_sha256_after']and v['manifest_sha256']==v['manifest_sha256_after']
+ assert v['embedding_identity']['model_digest']==protocol['model']['digest']
+ probes.append({'id':request['id'],'probe_sha256':sha(target),'eligible_count':v['oracle']['eligible_count'],'normal_exact_agreement':v['exact_agreement'],'sparse_fixture_qualified':v['sparse_fixture_qualified'],'budget_state':v['budget']['Status'],'budget_reason':v['budget']['Reason'],'binary_sha256':sha(probe)})
+ print('raw-probe',request['id'],v['oracle']['eligible_count'],flush=True)
+(out/'raw-probes.json').write_text(json.dumps(probes,indent=2)+'\n')
+# Re-run existing approved v1 scenarios on the new binary; v1 code path remains
+# distinct from v2 composed citations and from human abstention decisions.
+spec=importlib.util.spec_from_file_location('export',root/'scripts/b0-export-scenarios.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+scenarios=out/'static-v1-scenarios';scenarios.mkdir()
+for q in book['questions']:
+ if q['id']in protocol['development_questions']:(scenarios/(q['id'].lower()+'.yaml')).write_text(json.dumps(module.scenario(q,book['corpus_commit'],5),ensure_ascii=False,indent=2)+'\n')
+run('static-v1-sdk',[binary,'eval','--scenarios',scenarios,'--config',N/'static-development/config.yaml','--cks-mcp',binary,'--verify-anchors','/private/tmp/ks-b0-approved-corpus-20261006','--record-responses','--output',out/'static-v1-sdk.json'])
+assert execution['input_sha256_after']=={p:sha(Path(p))for p in execution['input_sha256_after']}
+assert execution['store_sha256_after']=={p:sha(Path(p))for p in execution['store_sha256_after']}
+(out/'execution.json').write_text(json.dumps({'status':'complete_pending_independent_interpretation','checks':checks,'raw_probes':len(probes),'binary_sha256':sha(binary),'dev_capture_sha256':sha(N/'execution.json'),'inputs_unchanged':True,'stores_unchanged':True,'final_queries_executed':False,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n')
+print('DEV independent static/Go/source-state/raw-CKV/v1 oracles complete',flush=True)

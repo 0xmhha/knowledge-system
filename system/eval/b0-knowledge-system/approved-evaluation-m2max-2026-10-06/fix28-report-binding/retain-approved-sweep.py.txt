@@ -1,0 +1,23 @@
+"""Lossless terminal-capture retention; never copies a running matrix."""
+from pathlib import Path
+import argparse,json,hashlib,gzip
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,required=True);p.add_argument('--output',type=Path,required=True);args=p.parse_args()
+read=lambda p:json.loads(p.read_bytes());digest=lambda raw:hashlib.sha256(raw).hexdigest();execution=read(args.base/'execution.json');out=args.output;out.mkdir(exist_ok=True)
+manifest_path=out/'artifact-manifest.json';manifest=read(manifest_path)if manifest_path.exists()else{'schema_version':1,'scope':'exact approved SDK raw responses/configs/footprints and independent reports; original failed runs remain separate','files':[]};records={r['source_relative_path']:r for r in manifest['files']};selected=[]
+for step in execution['steps']:
+ directory=Path(step['output']);report_path=directory/'report.json'
+ if not report_path.exists():continue
+ report=read(report_path)
+ if report['state']!='captured':continue
+ assert report['rows']==step['planned_rows']
+ selected.extend(p for p in directory.parent.rglob('*')if p.is_file())
+ label=step['id'];selected.extend(p for p in [args.base/'independent-reports'/(label+'.json'),args.base/'public-go-verification'/(label+'.json'),args.base/(label+'-summary.json')]if p.exists())
+if execution['status']!='running':selected.append(args.base/'execution.json')
+for src in sorted(set(selected)):
+ assert not src.is_symlink();relative=str(src.relative_to(args.base));raw=src.read_bytes();raw_sha=digest(raw)
+ if relative in records:
+  assert records[relative]['source_sha256']==raw_sha,relative;assert digest((out/records[relative]['artifact_path']).read_bytes())==records[relative]['artifact_sha256'];continue
+ compressed=len(raw)>262144;stored=gzip.compress(raw,compresslevel=6,mtime=0)if compressed else raw
+ relative_target=relative+('.gz'if compressed else'');dest=out/relative_target;dest.parent.mkdir(parents=True,exist_ok=True);assert not dest.exists();dest.write_bytes(stored)
+ records[relative]={'source_relative_path':relative,'artifact_path':relative_target,'source_bytes':len(raw),'source_sha256':raw_sha,'artifact_bytes':len(stored),'artifact_sha256':digest(stored),'encoding':'gzip'if compressed else'identity'}
+manifest.update(files=[records[k]for k in sorted(records)],capture_partition=execution['partition'],capture_status_at_retention=execution['status'],complete_capture=execution['status']!='running',final_queries_executed=execution['final_queries_executed']);manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'files':len(records),'raw_bytes':sum(r['source_bytes']for r in records.values()),'retained_bytes':sum(r['artifact_bytes']for r in records.values()),'capture_complete':manifest['complete_capture']}))

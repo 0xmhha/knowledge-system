@@ -1,0 +1,42 @@
+from pathlib import Path
+import json,hashlib,subprocess,time,importlib.util,datetime
+root=Path.cwd();R=Path('/private/tmp/ks-approved-scope-20261006');N=Path('/private/tmp/ks-approved-final-sweep-20261006');data=root/'system/eval/b0-knowledge-system';read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+while True:
+ execution=read(N/'execution.json')
+ if execution['status']=='running':time.sleep(4);continue
+ assert execution['status']=='captured_pending_independent_family_oracles_and_reports'and execution['inputs_unchanged']and execution['stores_unchanged']and execution['product_source_unchanged'];assert sum(c['rows']for c in execution['checks'])==4800;break
+out=R/'approved-final-oracles';out.mkdir(exist_ok=False);checks=[]
+def run(label,args,allowed=(0,)):
+ log=out/(label+'.log');started=time.monotonic()
+ with log.open('xb')as stream:code=subprocess.run([str(v)for v in args],cwd=root,stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(v)for v in args],'exit_code':code,'elapsed_seconds':time.monotonic()-started,'log_sha256':sha(log)})
+ (out/'execution.json').write_text(json.dumps({'status':'running','checks':checks},indent=2)+'\n');print(label,code,flush=True);assert code in allowed,label
+binary=R/'runtime-header-batch/cks';assert sha(binary)==execution['binary_sha256']
+run('dynamic-report',['python3',R/'audit-final-matrices.py'])
+public=N/'public-go-verification';public.mkdir(exist_ok=True)
+for step in execution['steps']:run('go-'+step['id'],[R/'runtime-header-batch/b1-evidence-audit','--input',Path(step['output'])/'rows.jsonl','--output',public/(step['id']+'.json')])
+run('static-descriptive',['python3',root/'scripts/b1-summarize-matrix.py','--capture-dir',N/'static-final/matrix','--gold',data/'questions.json','--source-root','/private/tmp/ks-b0-approved-corpus-20261006','--partition','final','--dataset-audit',data/'approved-inputs-m2max-2026-10-06/strict-audit.json','--output',N/'static-final-summary.json'])
+run('whole-descriptive',['python3',R/'summarize-approved-sweep.py','--base',N,'--output',N/'final-summary.json'])
+probe=R/'runtime-v2-body/b0-vector-probe';book=read(data/'questions.json');protocol=read(data/'protocol-m2max-draft.json');fixtures={f['id']:f for f in read(data/'dynamic-fixtures-m2max-draft.json')['fixtures']if f['evaluation_partition']=='final'};requests=[]
+for q in book['questions']:
+ if q['id']in protocol['final_questions']:requests.append({'id':q['id'],'prompt':q['prompt'],'K':10,'filter':{},'version':R/'strict-dataset/approved-m2max-20261006'})
+for step in execution['steps']:
+ if step['id']=='static-final':continue
+ f=fixtures[step['id'].rsplit('-',1)[0]]
+ for i,q in enumerate(f['queries'],1):requests.append({'id':step['id']+'-'+str(i)+'-'+q['language'],'prompt':q['prompt'],'K':f['k'],'filter':f['filters'],'version':Path(step['case']['version_dir'])})
+probes=[]
+for request in requests:
+ target=out/('raw-'+request['id']+'.json');filter_file=out/('filter-'+request['id']+'.json');filter_file.write_text(json.dumps(request['filter'])+'\n');args=[probe,'--vector-dir',request['version']/'vector','--query',request['prompt'],'--filter-file',filter_file,'--k',str(request['K']),'--max-exact-candidates','2','--embedder','ollama','--model-name','bge-m3:latest','--ollama-url','http://127.0.0.1:11434']
+ with target.open('xb')as stream,(out/('raw-'+request['id']+'.stderr')).open('xb')as err:code=subprocess.run([str(v)for v in args],stdout=stream,stderr=err).returncode
+ v=read(target);assert code==0 and v['state']=='recorded'and v['identity_verified_after'];assert v['database_sha256_before']==v['database_sha256_after']and v['manifest_sha256']==v['manifest_sha256_after'];assert v['embedding_identity']['model_digest']==protocol['model']['digest']
+ actual=v['filtered']['Hits']or[];expected=v['oracle']['hits'];by_id={h['id']:h for h in expected};same_set={h['chunk']['id']for h in actual}==set(by_id);distance_equal=same_set and all(abs(h['score']['vector_distance']-by_id[h['chunk']['id']]['distance'])<=1e-6 for h in actual);tie_only=distance_equal and all(abs(by_id[h['chunk']['id']]['distance']-expected[i]['distance'])<=1e-6 for i,h in enumerate(actual))
+ probes.append({'id':request['id'],'command':[str(v)for v in args],'probe_sha256':sha(target),'eligible_count':v['oracle']['eligible_count'],'normal_exact_agreement':v['exact_agreement'],'same_top_k_hit_set':same_set,'same_distances_within_1e_6':distance_equal,'rank_difference_only_within_ties':not v['exact_agreement']and tie_only,'sparse_fixture_qualified':v['sparse_fixture_qualified'],'f01_state':('qualified'if v['exact_agreement']and v['sparse_fixture_qualified']else'fixture_not_qualified')if request['id'].startswith('F-01-')else'not_applicable','budget_state':v['budget']['Status'],'budget_reason':v['budget']['Reason'],'binary_sha256':sha(probe)});print('raw',request['id'],flush=True)
+(out/'raw-probes.json').write_text(json.dumps(probes,indent=2)+'\n')
+spec=importlib.util.spec_from_file_location('export',root/'scripts/b0-export-scenarios.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);scenarios=out/'static-v1-scenarios';scenarios.mkdir()
+for q in book['questions']:
+ if q['id']in protocol['final_questions']:(scenarios/(q['id'].lower()+'.yaml')).write_text(json.dumps(module.scenario(q,book['corpus_commit'],5),ensure_ascii=False,indent=2)+'\n')
+# The CLI exits1 for a failed strict no-citation oracle. Preserve that result;
+# do not relabel it as a transport/model error or as a human abstention verdict.
+run('static-v1-sdk',[binary,'eval','--scenarios',scenarios,'--config',N/'static-final/config.yaml','--cks-mcp',binary,'--verify-anchors','/private/tmp/ks-b0-approved-corpus-20261006','--record-responses','--output',out/'static-v1-sdk.json'],allowed=(0,1))
+assert all(sha(Path(p))==d for p,d in execution['input_sha256_after'].items());assert all(sha(Path(p))==d for p,d in execution['store_sha256_after'].items());freeze=read(R/'development-freeze.json');assert all(sha(Path(p))==d for p,d in freeze['product_source_sha256'].items())
+(out/'execution.json').write_text(json.dumps({'status':'complete_pending_independent_interpretation','checks':checks,'raw_probes':len(probes),'binary_sha256':sha(binary),'final_capture_sha256':sha(N/'execution.json'),'inputs_unchanged':True,'stores_unchanged':True,'product_source_unchanged':True,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n');print('FINAL native/public/source/raw/v1 oracles complete',flush=True)

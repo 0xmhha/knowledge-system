@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "status": "source_bound_approvals_prepared",
+  "partition": "development",
+  "human_review_sha256": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+  "fixture_manifest_sha256": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+  "binary_sha256": "0b7cc1073639cdf7a1386e7ed073ecfa520d0e39dc835c498da4cb3078721a4a",
+  "cases": [
+    {
+      "id": "F-03-DEV-current",
+      "fixture_id": "F-03-DEV",
+      "family": "F-03",
+      "state": "current",
+      "project_id": "b0-f03-dev",
+      "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+      "base_tree": "a82bc70536c2842594f421fe9e71a8b996d0b434",
+      "supplement_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+      "supplement_tree": "a82bc70536c2842594f421fe9e71a8b996d0b434",
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+        "ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837"
+      },
+      "projection": "F-03-DEV-current/projection-proposed.json",
+      "projection_sha256": "ffb14c39b87b3fce0e25c44b68294aac9e36e34123080ad558092d413ebdb315",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.ProjectIdentity",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ],
+      "proposed_candidate_dataset": {
+        "source": {
+          "project_id": "b0-f03-dev",
+          "source_mode": "committed",
+          "source_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+          "file_manifest_digest": "7e72bb06ad2dbf3b83f404fc1acb81f20139279db066ff28697153b292b72e66",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "e5083faa3c83b6e20dade31399fff4c1382c50001442629b4b150746819a1550",
+        "dataset_id": "b52dc02f2649b25e2da88478459bc17ebd679c74f3bbcc66f83d2d4243735d7d"
+      },
+      "approved_commit": "ce06a5c9eea0eb980a3559b480037fc5d741ae23",
+      "approved_tree": "ca650245d90a68acc9aafa0de3ccec6e0f3ac985",
+      "approved_source_sha256": {
+        "fixture-review.json": "d30c52ba0fc8faf56a1377c954fe3e756b7300dbbc9f2676af8133a6ff5226df",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+        "ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837"
+      },
+      "sf_id": "SF-03"
+    },
+    {
+      "id": "F-05-DEV-a",
+      "fixture_id": "F-05-DEV",
+      "family": "F-05",
+      "state": "a",
+      "project_id": "f-05-dev-a",
+      "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+      "base_tree": "a10c851e2f517680daa43aa202a2961b70945aa4",
+      "supplement_commit": "80e9f2f327a67b69bf394b2bf3145891216332c3",
+      "supplement_tree": "155cb19c5231a749ced37f1fc16b923a50d5a77d",
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "26e62bcb7c2344f580b1627372a1a22408ce9236ed4422926c1eafd75be878ee",
+        ".cks/knowledge/manifest.yaml": "6d35f4fbb8fb011ce625b05c6dc13b42ea55b820edd7ece06e064ab0618ee1b4",
+        ".cks/knowledge/policies/refund-cap.yaml": "d40b7bb235b34f33479575674861c0ce223841400c33973c4e406a16cadea6e1",
+        "docs/policy.md": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "ontology.yaml": "4c925451ded85cf0787086ff03069de0281a3cd908d2e83b6f65c1a1e2c0f644"
+      },
+      "projection": "F-05-DEV-a/projection-proposed.json",
+      "projection_sha256": "fb52e20eb509cafb0226f3de8dcf35372b258236768d3c3032eec102bdf78035",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ],
+      "proposed_candidate_dataset": {
+        "source": {
+          "project_id": "f-05-dev-a",
+          "source_mode": "committed",
+          "source_commit": "80e9f2f327a67b69bf394b2bf3145891216332c3",
+          "file_manifest_digest": "ac408667b086cca83df91857b361a32544eaa278d626db9231b99aeab4a1e14e",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "45260fc7b5bae8d604f41bcc383d5c403238d8526393a04a4617c48d31f88908"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "eb6afeb89375ca97e4ed93e37cb85f9fd238cf82b4dac245167edb47de28d02a",
+        "dataset_id": "d7d0c2db5795ba6250005adc606aafa8b4fc1b98c0c9ebf37ffa75b519a88f0f"
+      },
+      "approved_commit": "0eae051945bfd305dfd1df825458b969fbde8508",
+      "approved_tree": "d8535dee86aef8aeb71dfb595d6b75e5d51da740",
+      "approved_source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "83af6785e9f25cbc701936ad2f59e863a22b78f131b9ba7c70ceffe8d640c865",
+        ".cks/knowledge/manifest.yaml": "6d35f4fbb8fb011ce625b05c6dc13b42ea55b820edd7ece06e064ab0618ee1b4",
+        ".cks/knowledge/policies/refund-cap.yaml": "d40b7bb235b34f33479575674861c0ce223841400c33973c4e406a16cadea6e1",
+        ".cks/knowledge/reviews/1d8b890ae3f4b077ab17e9f16818dc45991135440ab472b62b941e404c6b0154.yaml": "1d8b890ae3f4b077ab17e9f16818dc45991135440ab472b62b941e404c6b0154",
+        "docs/policy.md": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "fixture-review.json": "3301c3c35c42a870a5cf0b32338828bf1a31b409e869686813b9c56ccda69581",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "ontology.yaml": "ae4d90d1e0e7313a3d52a6bb7df65adb1debba5904fcd88bad1654db5ba985c3"
+      },
+      "sf_id": "SF-05-A"
+    },
+    {
+      "id": "F-05-DEV-b",
+      "fixture_id": "F-05-DEV",
+      "family": "F-05",
+      "state": "b",
+      "project_id": "f-05-dev-b",
+      "base_commit": "45e378b9da4fe6d4c796dd84281f28859c282e20",
+      "base_tree": "3f050094c302293d53251ad9071fb26fa04eb74e",
+      "supplement_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+      "supplement_tree": "f5f9d17743206902b26dd0e6f59b8673509a6735",
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "227a52bf8462c4b4279d23ad20bfef5ea75cdfd638d5bfc06dbf5e56a6a5e07a",
+        ".cks/knowledge/manifest.yaml": "6cbdf1e9f6cfa0a1e1f9b6dae885e9079b22d9e18bff65739911b7cef6540934",
+        ".cks/knowledge/policies/refund-cap.yaml": "1ed3ea8529365f53c070f233a39fe669d8658457bf14daade33baea78968b9f5",
+        "docs/policy.md": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "ontology.yaml": "e67219493f0efab406e36e03c4f2124dc6367b67654d1565489a65c9434e62c5"
+      },
+      "projection": "F-05-DEV-b/projection-proposed.json",
+      "projection_sha256": "0649cd7ff3829cf9ec94d32ffd38369455de863d208c2d9fc6cab03013a240fe",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ],
+      "proposed_candidate_dataset": {
+        "source": {
+          "project_id": "f-05-dev-b",
+          "source_mode": "committed",
+          "source_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+          "file_manifest_digest": "0c42a5e32d3af02b6756098ed82edd9935df831c9fe1081ebcde0df5d2289207",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "32769d81c646a67b8c9fb5c2211f48219ff71eea164657bf7119487901e98366"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "2299a5ae51344e06747a47969481bc29c94da155fde1a6d7fcb58f66b9ab039a",
+        "dataset_id": "84c12e20f4030a2f718639b9e4c9a0b639b2f14c74a59d19e09af480811175de"
+      },
+      "approved_commit": "910e50f5f0f78d829a2a0d7e7a43367bad543363",
+      "approved_tree": "162a93f4306933206ea0388a456e4ff51dda477b",
+      "approved_source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "1d9b8450c249aef166e6f1c47fd71853e5ebdddc8fa9047736db11c2aad94ee9",
+        ".cks/knowledge/manifest.yaml": "6cbdf1e9f6cfa0a1e1f9b6dae885e9079b22d9e18bff65739911b7cef6540934",
+        ".cks/knowledge/policies/refund-cap.yaml": "1ed3ea8529365f53c070f233a39fe669d8658457bf14daade33baea78968b9f5",
+        ".cks/knowledge/reviews/cf56703766903516863ee997efe7eb3e1a4d035e2be0f8cea062c023f707dd97.yaml": "cf56703766903516863ee997efe7eb3e1a4d035e2be0f8cea062c023f707dd97",
+        "docs/policy.md": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "fixture-review.json": "ff48a280713dcfcc2d0f235381673634085e7e5214e1c19c3db2803754e9954c",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "ontology.yaml": "4fedbe4780e04c39db10c2fadf82b23bd72cc53b6665da2ed753de85cfe2e109"
+      },
+      "sf_id": "SF-05-B"
+    },
+    {
+      "id": "F-06-DEV-current",
+      "fixture_id": "F-06-DEV",
+      "family": "F-06",
+      "state": "current",
+      "project_id": "f-06-dev",
+      "base_commit": "288e376c91045a69346fe67f6971e9053af344f5",
+      "base_tree": "7f4fd995cd466003922d8b655edc9aa374b39271",
+      "supplement_commit": "498c625431321aa7905bd6bf2746a50ff136010a",
+      "supplement_tree": "fd3e3ac7493c14758cc29c0b4c3f76956f088dce",
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "ebee0fba239f80abd673e8a17a58ba7f2039e6b48ce1e62297f51e81c049bf7c",
+        ".cks/knowledge/manifest.yaml": "5f27bbad2ee9b36e01391c15c5825266071bd99dced142401e6be1dc180da653",
+        ".cks/knowledge/policies/refund-cap.yaml": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+        "ontology.yaml": "fc1db1ba329abdccfe6fc229274f2f1a00c5646f32eb14b54648582d46ea147b",
+        "spec.yaml": "6e744a4e5b2332e3b1c2d1f8c3b61551fe350b523b3acbae82572a8ff1a41d83"
+      },
+      "projection": "F-06-DEV-current/projection-proposed.json",
+      "projection_sha256": "568b181d0af80c5ef91d9bacb99c04a928986a8128b99d182765a93c6df721be",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0dev.RefundLimit",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [
+        [
+          "example.com/b0dev.TestHealth",
+          "main_test.go",
+          5,
+          5,
+          "Function",
+          "TestHealth"
+        ]
+      ],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ],
+      "proposed_candidate_dataset": {
+        "source": {
+          "project_id": "f-06-dev",
+          "source_mode": "committed",
+          "source_commit": "498c625431321aa7905bd6bf2746a50ff136010a",
+          "file_manifest_digest": "52f1a2a6e0993b105377f23067fc6af75e9db67a6701d2a76dce7bf2836e4ced",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "c8f7067c3e90fdea43b4f293a98f0d70506fbc8e6da527064591ef9206caac70"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "201d98390af48179dc3fa2a680d766afcc308b8f067630c3875206115ad98487",
+        "dataset_id": "0be5c38fb5a512105407b1681993ed4677895bd054dd17484d300f8181688d13"
+      },
+      "approved_commit": "5e405adbc0aa91a145bf98293d972f000826ac57",
+      "approved_tree": "383bd5ee412f3aaf36a0f12db6b12f81d705dc44",
+      "approved_source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "4535e60d5350c79ef1298a75ddb851e9e5fbd34e8f03114e9143d82d33ec06a7",
+        ".cks/knowledge/manifest.yaml": "5f27bbad2ee9b36e01391c15c5825266071bd99dced142401e6be1dc180da653",
+        ".cks/knowledge/policies/refund-cap.yaml": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+        ".cks/knowledge/reviews/d39ffbff1972c50c82845c6fd256ea8817861f223ec7e07741a9f7f60038c435.yaml": "d39ffbff1972c50c82845c6fd256ea8817861f223ec7e07741a9f7f60038c435",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "fixture-review.json": "6fe3b3cb08b2837ef94c3278e9dd4ead7b5c7fd6731242e290ca22ef26890a0a",
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+        "ontology.yaml": "7466c2a6028b8517d0d9c34b9cfdb7f67eaa7c6c1659134643e8b8b0ca24207c",
+        "spec.yaml": "c06f1a45c8b11920b07f89e814e83e2d7023208f50263f6c466996d5e1f89266"
+      },
+      "sf_id": "SF-06"
+    }
+  ],
+  "quality_metrics": null
+}

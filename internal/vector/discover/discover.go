@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -92,6 +93,9 @@ var DefaultSecretPatterns = []string{
 type Options struct {
 	MaxBytes int64    // size cap; 0 → DefaultMaxBytes
 	Extra    []string // additional ignore patterns from CLI
+	// BuildSources permits exact Go source paths inside build/ directories.
+	// Explicit ignores, protected directories and all file safety filters win.
+	BuildSources []string
 
 	// GoBuildFiles, when non-nil, restricts the walk's Go-language
 	// output to absolute paths that appear as keys in the map. Other
@@ -134,7 +138,25 @@ func Walk(srcRoot string, opts Options) (files []File, errs []error, err error) 
 		max = DefaultMaxBytes
 	}
 
-	patterns := append([]string{}, DefaultIgnore...)
+	buildSources := make(map[string]bool, len(opts.BuildSources))
+	buildAncestors := make(map[string]bool)
+	for _, rel := range opts.BuildSources {
+		if !validBuildSource(rel) || buildSources[rel] {
+			return nil, nil, fmt.Errorf("build source must be a unique exact relative .go path inside build/: %q", rel)
+		}
+		buildSources[rel] = true
+		for dir := filepath.ToSlash(filepath.Dir(rel)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+			buildAncestors[dir] = true
+		}
+	}
+	// Only the build/ default has an exception. User rules, secrets and
+	// every other default remain unconditional, including at ancestors.
+	var patterns []string
+	for _, pattern := range DefaultIgnore {
+		if pattern != "build/" {
+			patterns = append(patterns, pattern)
+		}
+	}
 	if extra, err := loadCKVIgnore(srcRoot); err == nil {
 		patterns = append(patterns, extra...)
 	} else if !errors.Is(err, os.ErrNotExist) {
@@ -157,7 +179,7 @@ func Walk(srcRoot string, opts Options) (files []File, errs []error, err error) 
 		}
 		// Directory pruning saves the bulk of work (node_modules, .git).
 		if d.IsDir() {
-			if isIgnored(rel+"/", patterns) {
+			if isIgnored(rel+"/", patterns) || (isIgnored(rel+"/", []string{"build/"}) && !buildAncestors[rel]) {
 				return filepath.SkipDir
 			}
 			return nil
@@ -166,7 +188,7 @@ func Walk(srcRoot string, opts Options) (files []File, errs []error, err error) 
 		if d.Type()&fs.ModeSymlink != 0 {
 			return nil
 		}
-		if isIgnored(rel, patterns) {
+		if isIgnored(rel, patterns) || (isIgnored(rel, []string{"build/"}) && !buildSources[rel]) {
 			return nil
 		}
 		info, infoErr := d.Info()

@@ -1,15 +1,15 @@
 # B0 개발 의미 사실·팩 결합 검토 자료
 
-2026-10-03 · B0-05 진행 · **검토 자료 준비 완료, 사람 판정 대기**. 공식 품질 지표는 null이다. 원문 질문/소스 책과 기존 승인 기록을 바꾸지 않았다. 이 문서는 F-03/F-05/F-06 개발 사례의 추가 입력과 source-bound 관계를 검토하기 위한 자료다.
+2026-10-03 · B0-05 진행 · **2026-10-06 테스트 사례 범위 승인 완료; 새 source-bound 적용 진행**. 공식 품질 지표는 null이다. 원문 질문/소스 책과 기존 승인 기록을 바꾸지 않았다. 이 문서는 F-03/F-05/F-06 개발 사례의 추가 입력과 source-bound 관계를 검토하기 위한 자료다.
 
 ## 검토할 결정
 
 | 검토 ID | 제안과 근거 | 승인 범위 | 판정 |
 |---|---|---|---|
-| SF-03 | 원문 공통 개념 20개 유지. `project`/`프로젝트`는 `project`와 `dataset` 두 후보; 미등록 질의는 후보 없음 | 개발 사례의 다의어/무승격 기대 동작. 개념 원문은 proposed 유지, 규범 사실 승인으로 사용하지 않음 | 대기 |
-| SF-05-A | `DEV-project-a requires a refund limit of 10.`를 정책 인스턴스에 그대로 보존. Alpha는 A 식별 토큰을 반환 | A의 정책 문구·적용 subsystem=refund, alpha-function 개념과 Alpha IMPLEMENTED_BY 출처. Alpha가 환급 정책을 집행한다는 주장 없음 | 대기 |
-| SF-05-B | `DEV-project-b requires a refund limit of 20.`를 정책 인스턴스에 그대로 보존. Alpha는 B 식별 토큰을 반환 | B의 정책 문구·범위·Alpha 관계. A의 정책/인용을 사용할 수 없음 | 대기 |
-| SF-06 | README는 RefundLimit ≤10을 요구하고 `main.go:3`은 20을 반환. 추가 스펙은 req-refund-cap → ac-refund-cap, refund-cap 개념을 명시 | 요구·수용 기준 문구와 개념→RefundLimit의 구현 위치 관계를 검토. 요구 불충족이라는 후보 판정은 사람 검토 대상이며 코드 수용 승인과 구분 | 대기 |
+| SF-03 | 원문 공통 개념 20개 유지. `project`/`프로젝트`는 `project`와 `dataset` 두 후보; 미등록 질의는 후보 없음 | 개발 사례의 다의어/무승격 기대 동작. 개념 원문은 proposed 유지, 규범 사실 승인으로 사용하지 않음 | 테스트 사례 승인 |
+| SF-05-A | `DEV-project-a requires a refund limit of 10.`를 정책 인스턴스에 그대로 보존. Alpha는 A 식별 토큰을 반환 | A의 정책 문구·적용 subsystem=refund, alpha-function 개념과 Alpha IMPLEMENTED_BY 출처. Alpha가 환급 정책을 집행한다는 주장 없음 | 테스트 사례 승인 |
+| SF-05-B | `DEV-project-b requires a refund limit of 20.`를 정책 인스턴스에 그대로 보존. Alpha는 B 식별 토큰을 반환 | B의 정책 문구·범위·Alpha 관계. A의 정책/인용을 사용할 수 없음 | 테스트 사례 승인 |
+| SF-06 | README는 RefundLimit ≤10을 요구하고 `main.go:3`은 20을 반환. 추가 스펙은 req-refund-cap → ac-refund-cap, refund-cap 개념을 명시 | 요구·수용 기준 문구와 개념→RefundLimit의 구현 위치 관계를 검토. 요구 불충족이라는 후보 판정은 사람 검토 대상이며 코드 수용 승인과 구분 | 테스트 사례 승인 |
 
 `SF-06`의 TestHealth는 산술 건강 시험이며 실제 `go test ./...`는 통과했다. 이 실행은 환급 수용 기준을 검사하지 않는다. `CHECKED_BY`, `TESTED_BY`, `ACCEPTED_BY` 관계와 CriterionDecision 수용 승인은 만들지 않았다. 검토자가 요구 문구나 구현 위치를 승인하더라도 구현이 요구를 만족한다는 승인으로 기록하지 않는다.
 
@@ -41,7 +41,7 @@ A/B의 canonical ID는 둘 다 `example.com/b0dev.Alpha`일 수 있다. 서로 �
 
 모든 의미 EvidenceSpan은 같은 tuple의 보관 원문 줄 SHA와 맞으며 코드 앵커는 실제 CKG DB에서 찾았다. native `semantic promote` 검증기에 proposed 투영을 저장해 원문·좌표·AST 검증을 수행했다. 모든 개념/요구/관계의 status는 proposed이고 reviewed_by는 비어 있다. semantic_current는 0개이며 활성화하지 않았다. 최종 변형은 빌드·조회하지 않았다.
 
-## 실제 동작 확인
+## 기존 proposed 입력의 실제 동작 확인
 
 mock/승인된 실제 BGE-M3에서 각 4개 데이터셋을 준비하고 v2 기본 요청과 combined+include_knowledge 요청 14개씩을 실행했다. 실제 BGE-M3는 기존 승인 digest `790764642607…16bab`, 1024차원이며 전체 임베딩 모드를 강제했다. 실제 다의어 한/영 질의는 두 후보를 유지하고 미등록 질의는 no_match였다. mock은 일부 원문 후보가 없어 no_candidates를 반환하므로 그 행은 다의어 순위 품질의 증거로 사용하지 않는다.
 
@@ -51,8 +51,8 @@ proposed 상태에서는 관계 적용/텍스트 검색/boost가 0이고 정책 
 
 [준비·검증 원장](../../system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03.json)에 실행 명령·입력 책/바이너리/원자료 SHA·투영·정확한 입력 Git bundle을 기록한다. 큰 데이터셋/모델/DB는 저장소에 넣지 않았다.
 
-## 사람 판정 이후의 절차
+## 승인 이후의 적용 절차
 
-검토 ID별 승인/수정/보류와 검토자 식별자를 기록한다. 의미 사실 검토, 동적 사례/프로토콜 승인, 최종 수용 판정은 각각 기록한다. 소스 기반 개념/요구 검토 메타데이터와 정책 quorum 기록을 실제 입력에 반영하면 새 커밋·잠금·dataset_id가 필요하다. 승인 전 투영을 제자리에서 verified로 바꾸지 않는다. 새 원문/tuple로 다시 검증한 뒤 공식 B0-07/08과 8-arm 비교에 사용한다.
+SF-03/05-A/05-B/06의 테스트 사례 승인을 실제 원문과 시각·로컬 chat-user 기록에 연결했다. [승인 기록](./B0-APPROVED-INPUTS.md)을 따른다. 의미 사실 검토, 동적 사례/프로토콜 승인, 최종 수용 판정은 각각 기록한다. 소스 기반 개념/요구 검토 메타데이터와 정책 quorum 기록을 실제 입력에 반영하면 새 커밋·잠금·dataset_id가 필요하다. 승인 전 투영을 제자리에서 verified로 바꾸지 않는다. 새 원문/tuple로 다시 검증한 뒤 공식 B0-07/08과 8-arm 비교에 사용한다.
 
 전체 우선순위와 상태는 [작업리스트](./EXECUTION-WORKLIST.md), 기존 동적/프로토콜 검토는 [B0-M2MAX-REVIEW](./B0-M2MAX-REVIEW.md)를 따른다.

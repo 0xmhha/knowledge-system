@@ -1,0 +1,475 @@
+{
+  "state": "preparing",
+  "checks": [
+    {
+      "id": "F-03-DEV-current-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset",
+        "--project-id",
+        "b0-f03-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-setup.txt",
+      "sha256": "b4d8dbef8b6982dfefebbfeef87a1bbb15c3329fcc372aba98146da60a9f5ed6"
+    },
+    {
+      "id": "F-03-DEV-current-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo",
+        "--project-id",
+        "b0-f03-dev",
+        "--dataset-id",
+        "b52dc02f2649b25e2da88478459bc17ebd679c74f3bbcc66f83d2d4243735d7d",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-extract.txt",
+      "sha256": "7e52f72172a167580134a5962e85cfab02f50fa26ce5f686cae96ea6ce810a7f"
+    },
+    {
+      "id": "F-03-DEV-current-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-03-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-03-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-validate-proposed.txt",
+      "sha256": "af61cae6544751211a06a9444eca5ecbff8bf7ce51c1925208893ee4a67055c2"
+    },
+    {
+      "id": "F-05-DEV-a-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-lock.txt",
+      "sha256": "d57f8289616155a1c9f776f8f8dfabe5758300cf7c1b6c16f989ab1d37a90ffe"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-validate.txt",
+      "sha256": "0a5fddac907e7265f2eec6571361befed6ed540b33ef1d78f99a0f00b11184d9"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-review.txt",
+      "sha256": "50c164f3a1386570ebab4d997f172ed8ecc80642e1a7cc12188306f09c5832ba"
+    },
+    {
+      "id": "F-05-DEV-a-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset",
+        "--project-id",
+        "f-05-dev-a",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-setup.txt",
+      "sha256": "94e8e3f4355e690ba279148f26b6e075fa9c920c225cd38ceb0dde5344ca74ec"
+    },
+    {
+      "id": "F-05-DEV-a-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a",
+        "--project-id",
+        "f-05-dev-a",
+        "--dataset-id",
+        "d7d0c2db5795ba6250005adc606aafa8b4fc1b98c0c9ebf37ffa75b519a88f0f",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-extract.txt",
+      "sha256": "47a6b0fd6b8ccddc41e25277bc8c88eb045cf5b2a1b4a7ff5584d47caef4dc79"
+    },
+    {
+      "id": "F-05-DEV-a-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-a",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-a/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-validate-proposed.txt",
+      "sha256": "58ca2c190800c16448cd985f967d153e8fe7e1f33ef028d2c7f5b0ed1d07ea11"
+    },
+    {
+      "id": "F-05-DEV-b-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-lock.txt",
+      "sha256": "7693c79a47337c59a147efc1e3697c271ebcdb88372b95b146374051b6c51506"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-validate.txt",
+      "sha256": "8b5a563a71ace6cf310583b95c51adbe490b030550aff7fe57733d7559c9fffc"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-review.txt",
+      "sha256": "72b0285092c1e9972b0f3a17cc3ed7d2c8b3e36473690e8368b81d2d6593c2ff"
+    },
+    {
+      "id": "F-05-DEV-b-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset",
+        "--project-id",
+        "f-05-dev-b",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-setup.txt",
+      "sha256": "65152a233529fb6c57eb46a8c94e4ca1c32c55bb7767c1652ad83aed284bda2e"
+    },
+    {
+      "id": "F-05-DEV-b-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b",
+        "--project-id",
+        "f-05-dev-b",
+        "--dataset-id",
+        "84c12e20f4030a2f718639b9e4c9a0b639b2f14c74a59d19e09af480811175de",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-extract.txt",
+      "sha256": "0fdda390d6e5156d9f1fb3f8d3f12e789142c4069c13580de9541f283fe28b91"
+    },
+    {
+      "id": "F-05-DEV-b-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-05-DEV/project-b",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-05-DEV-b/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-validate-proposed.txt",
+      "sha256": "f661bbf4dbdd048bc081da923db671181a0f174cbaed2d2caf7fc4cb4b76ec52"
+    },
+    {
+      "id": "F-06-DEV-current-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-lock.txt",
+      "sha256": "54cfb397e71e4ef269ea65d7164e63571ad166bd974b5ceafc3857a12489d7a6"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-validate.txt",
+      "sha256": "1205cc4191217d9a0a476de6dca8494ead19ffa2a8e9638bef9a9168969798e2"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-review.txt",
+      "sha256": "6c3722fc1ad7ffee7f750a03aa378487ff94c51b8578381731a6ea8542541404"
+    },
+    {
+      "id": "F-06-DEV-current-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset",
+        "--project-id",
+        "f-06-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-setup.txt",
+      "sha256": "cfef86be9f564d979bfc6e065daf5f296145da12e331daeb8e7a99cede9b898a"
+    },
+    {
+      "id": "F-06-DEV-current-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo",
+        "--project-id",
+        "f-06-dev",
+        "--dataset-id",
+        "0be5c38fb5a512105407b1681993ed4677895bd054dd17484d300f8181688d13",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--spec",
+        "spec.yaml",
+        "--docs",
+        "README.md",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-extract.txt",
+      "sha256": "21b0d8c0aff01e084c256aac8a3c61c6885fe44f064d45737e4568b55edbccd8"
+    },
+    {
+      "id": "F-06-DEV-current-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-semantic-20261006/fixtures/F-06-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-semantic-20261006/F-06-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-validate-proposed.txt",
+      "sha256": "436810419906fa33e4524889a01f6b86265797653d2f7d1394ec5451a0066038"
+    }
+  ],
+  "quality_metrics": null
+}

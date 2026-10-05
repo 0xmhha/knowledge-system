@@ -26,6 +26,7 @@ type fileConfig struct {
 	EmbedDim            int    `yaml:"embed_dim"`
 	OllamaURL           string `yaml:"ollama_url"`
 	QueryPrefixPolicy   string `yaml:"query_prefix_policy"`
+	VectorBuildSources  string `yaml:"vector_build_sources"`
 	VectorPolicy        string `yaml:"vector_policy"`
 	SemanticCorpus      string `yaml:"semantic_corpus"`
 	SkipVector          bool   `yaml:"skip_vector"`
@@ -70,6 +71,7 @@ func LoadConfig(path string) (Options, error) {
 		EmbedDim:            fc.EmbedDim,
 		OllamaURL:           fc.OllamaURL,
 		QueryPrefixPolicy:   fc.QueryPrefixPolicy,
+		VectorBuildSources:  rel(fc.VectorBuildSources),
 		VectorPolicy:        rel(fc.VectorPolicy),
 		SemanticCorpus:      rel(fc.SemanticCorpus),
 		SkipVector:          fc.SkipVector,

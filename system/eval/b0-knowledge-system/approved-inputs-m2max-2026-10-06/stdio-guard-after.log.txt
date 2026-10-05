@@ -1,0 +1,29 @@
+ok  	github.com/0xmhha/knowledge-system/internal/system/eval	3.782s
+--- FAIL: TestCaptureInitializeDeadlineKeepsFailedReport (0.01s)
+    capture_test.go:59: deadline evidence lost: {
+          "schema_version": 1,
+          "started_at": "2026-10-05T17:58:18.742686Z",
+          "finished_at": "2026-10-05T17:58:18.74335Z",
+          "request_sha256": "a71787e118687ca83be24ecd675805a67671b408fefabffa6436f0d6059aadb5",
+          "config_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+          "binary_sha256": "93be81d539342bd01cdc6a918060416c4fa5b2f313b0cc019f02609125871716",
+          "config_sha256_after": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+          "binary_sha256_after": "93be81d539342bd01cdc6a918060416c4fa5b2f313b0cc019f02609125871716",
+          "quality_metrics": null,
+          "state": "partial",
+          "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+          "counts": {
+            "cold_process": 0,
+            "retrieval": 1,
+            "warm_latency": 0,
+            "warmup": 0
+          },
+          "call_timeout_ns": 30000000,
+          "rows": [],
+          "errors": [
+            "start warm session: eval: read server config: config: decode: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `fixture` into config.Config"
+          ]
+        }
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/cmd/cks/evalcli	2.704s
+FAIL

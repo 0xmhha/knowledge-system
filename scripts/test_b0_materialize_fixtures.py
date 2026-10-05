@@ -16,6 +16,10 @@ class MaterializationTests(unittest.TestCase):
         self.book = json.loads(MODULE.DEFAULT.read_bytes())
 
     def test_review_is_required_and_not_manufactured(self):
+        # Explicit draft prerequisite; real repository inputs may be approved.
+        self.book['status'] = 'proposal_pending_human_review'
+        for fixture in self.book['fixtures']:
+            fixture.update(review_state='draft', reviewer=None, reviewed_at=None)
         with self.assertRaisesRegex(ValueError, "review is pending"):
             MODULE.validate(self.book, "development", False)
         incomplete = copy.deepcopy(self.book)
@@ -24,7 +28,9 @@ class MaterializationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "review is pending"):
             MODULE.validate(incomplete, "development", False)
         with tempfile.TemporaryDirectory() as scratch:
-            result = MODULE.materialize(MODULE.DEFAULT, Path(scratch) / "fixtures", allow_draft=True)
+            draft = Path(scratch) / 'draft.json'
+            draft.write_text(json.dumps(self.book))
+            result = MODULE.materialize(draft, Path(scratch) / "fixtures", allow_draft=True)
             self.assertTrue(result["diagnostic_only"])
             self.assertIsNone(result["quality_metrics"])
             self.assertTrue(all(f["review_state"] == "draft" and f["reviewer"] is None for f in result["fixtures"]))

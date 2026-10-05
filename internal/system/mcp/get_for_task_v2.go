@@ -62,7 +62,17 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if err != nil {
 		return v2ToolErrorFor(err, "compose_failed"), nil
 	}
-	pack, err := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, legacy.Citations, d.EvidenceSanitizer)
+	// The composer separately appends edge-only references outside its body
+	// budget for v1 graph wiring. V2 does not yet publish that graph overlay;
+	// expanding those references into full archived bodies would bypass the
+	// selected-body budget and can exceed its 12-citation contract. Preserve
+	// the selected bodies and their rank; re-read and sanitize retained bytes
+	// rather than trusting the composer's live snippets.
+	refs := make([]contract.Citation, 0, len(legacy.Bodies))
+	for _, body := range legacy.Bodies {
+		refs = append(refs, body.Citation)
+	}
+	pack, err := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, refs, d.EvidenceSanitizer)
 	if err != nil {
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}

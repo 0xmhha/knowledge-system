@@ -1,0 +1,56 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+import sqlite3,json,hashlib,subprocess
+r=Path('/private/tmp/ks-approved-scope-20261006');v=r/'strict-dataset/approved-m2max-20261006'
+sha=lambda raw:hashlib.sha256(raw).hexdigest()
+read=lambda path:json.loads(path.read_bytes())
+identity=read(v/'dataset-identity.json'); source=read(v/'sources/manifest.json');graph=read(v/'graph/manifest.json');vector=read(v/'vector/manifest.json')
+expected=read(r/'source-inventory.json'); requested=read(Path('system/eval/b0-knowledge-system/approved-inputs-m2max-2026-10-06/build-sources.json'))['paths']
+errors=[]
+def require(ok,kind,detail):
+ if not ok:errors.append({'kind':kind,'detail':detail})
+require(vector['build_sources']==requested,'source_exception','manifest differs from approved exact list')
+require(identity['source']['source_commit']=='71cb71cd55960833e930269e272f7a4a060be3aa','commit','fixed source changed')
+filemap={(f['origin_id'],f['path']):f for f in source['files']}; inputs={f['path']:f for f in vector['input_files']}; planned={f['path']:f for f in expected['files']}
+require(set(inputs)==set(planned),'selected_scope',{'missing':sorted(set(planned)-set(inputs)),'extra':sorted(set(inputs)-set(planned))})
+lines={};bodies={}
+for path,f in inputs.items():
+ retained=filemap.get((f['origin_id'],path));require(retained is not None,'retained_missing',path)
+ if retained:
+  raw=(v/'sources/blobs'/retained['sha256']).read_bytes();require(sha(raw)==retained['sha256']==f['sha256']==planned[path]['sha256'],'input_bytes',path)
+  bodies[path]=raw;lines[path]=raw.splitlines(keepends=True)
+go_graph={f['path'] for f in graph['files'] if f['language']=='go'};go_vector={path for path in inputs if path.endswith('.go')}
+missing=sorted(go_graph-go_vector);require(not missing,'missing_graph_go',missing)
+require(set(requested)<=go_graph & go_vector,'approved_29_missing','graph/vector source coverage')
+dbpath=v/'vector/vector.db'; before=sha(dbpath.read_bytes())
+with sqlite3.connect(dbpath.as_uri()+'?mode=ro&immutable=1',uri=True) as db:
+ db.row_factory=sqlite3.Row
+ rows=[dict(row) for row in db.execute('SELECT * FROM chunks ORDER BY id')]
+ require(len(rows)==vector['chunk_count'],'chunk_count','manifest mismatch')
+ parents=defaultdict(list);source_backed=0;generated=Counter();kinds=Counter()
+ for row in rows:
+  text=row['text'].encode();kinds[row['chunk_kind']]+=1
+  require(sha(text)==row['content_sha256'],'chunk_text_sha',row['id'])
+  require(0<len(text)<=6144,'chunk_byte_cap',row['id'])
+  require(row['commit_hash']==identity['source']['source_commit'],'chunk_commit',row['id'])
+  if row['chunk_kind'] in ['convention','invariant']:
+   generated[row['chunk_kind']]+=1
+  else:
+   require(row['file'] in lines,'chunk_source_missing',row['file'])
+   if row['file'] in lines:
+    ls=lines[row['file']];start,end=row['start_line'],row['end_line']
+    require(1<=start<=end<=len(ls),'chunk_span',row['id'])
+    require(text in b''.join(ls[start-1:end]),'parser_body_not_in_span',row['id'])
+    source_backed+=1
+  if row['parent_id']:parents[(row['file'],row['parent_id'])].append(row)
+ split=[]
+ for (file,parent),children in parents.items():
+  children.sort(key=lambda c:c['part_ordinal']);start=children[0]['parent_start_line'];end=children[0]['parent_end_line'];joined=b''.join(c['text'].encode() for c in children)
+  require([c['part_ordinal'] for c in children]==list(range(1,len(children)+1)),'parent_ordinals',parent)
+  require(all(c['parent_start_line']==start and c['parent_end_line']==end for c in children),'parent_span_consistency',parent)
+  require(parent==sha(f'{file}\n{start}:{end}\n{sha(joined)}'.encode()),'parent_reassembly_hash',parent)
+  require(file in lines and joined in b''.join(lines.get(file,[])[start-1:end]),'parent_reassembly_source',parent)
+  split.append({'file':file,'parent_id':parent,'children':len(children),'start_line':start,'end_line':end,'bytes':len(joined),'sha256':sha(joined)})
+require(before==sha(dbpath.read_bytes())==vector['db_sha256'],'vector_db_sha','published bytes drifted')
+result={'schema_version':1,'status':'pass' if not errors else 'fail','scope':'new approved static corpus source/chunk/split audit; no retrieval quality verdict', 'dataset':identity,'selected_files':len(inputs),'graph_go_files':len(go_graph),'vector_go_files':len(go_vector),'missing_graph_go_files':missing,'approved_extra_go_sources':len(requested),'chunks':len(rows),'chunk_kinds':dict(kinds),'physical_source_body_checks':source_backed,'generated_statement_chunks':dict(generated),'split_parents':split,'vector_db_sha256':before,'errors':errors,'quality_metrics':None}
+write=r/'strict-audit.json';write.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:val for k,val in result.items() if k not in ['dataset','split_parents']}));raise SystemExit(bool(errors))

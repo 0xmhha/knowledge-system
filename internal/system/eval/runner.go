@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	mcpgotransport "github.com/mark3labs/mcp-go/client/transport"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
+	"github.com/0xmhha/knowledge-system/internal/system/config"
 	sysmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -105,6 +107,7 @@ type ScenarioResult struct {
 type Runner struct {
 	client          mcpClient
 	closed          bool
+	stderrDone      <-chan struct{}
 	recordResponses bool
 	rawCalls        []RawToolCall
 }
@@ -128,6 +131,7 @@ type RunnerOpts struct {
 	Env               []string
 	RecordResponses   bool
 	InitializeTimeout time.Duration
+	Stderr            io.Writer // child diagnostics; nil forwards to os.Stderr
 }
 
 // NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
@@ -135,6 +139,15 @@ type RunnerOpts struct {
 // binary's mcp subcommand (self-exec) unless CKSMCPBinary points
 // elsewhere.
 func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
+	if opts.CKSMCPConfig != "" {
+		cfg, err := config.Load(opts.CKSMCPConfig)
+		// External compatible servers can use an opaque config format.
+		// Preserve that pass-through; known CKS HTTP configs cannot work
+		// over this client's subprocess transport.
+		if err == nil && cfg.Listen.ResolvedTransport() != "stdio" {
+			return nil, fmt.Errorf("eval: subprocess evaluation requires stdio; set listen.transport=stdio in the server config")
+		}
+	}
 	bin := opts.CKSMCPBinary
 	if bin == "" {
 		if exe, err := os.Executable(); err == nil {
@@ -150,8 +163,24 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	tp := mcpgotransport.NewStdio(bin, opts.Env, args...)
 	c := mcpgoclient.NewClient(tp)
 	if err := c.Start(ctx); err != nil {
+		_ = c.Close()
 		return nil, fmt.Errorf("eval: start cks-mcp: %w", err)
 	}
+	// The transport exposes stderr but does not consume it. Drain before
+	// initialize: a server can emit more diagnostics than its pipe holds
+	// while constructing backends, otherwise both sides wait indefinitely.
+	diagnostics := opts.Stderr
+	if diagnostics == nil {
+		diagnostics = os.Stderr
+	}
+	stderrDone := make(chan struct{})
+	go func() {
+		defer close(stderrDone)
+		if _, err := io.Copy(diagnostics, tp.Stderr()); err != nil {
+			// A failed diagnostic sink must not block the protocol either.
+			_, _ = io.Copy(io.Discard, tp.Stderr())
+		}
+	}()
 	initializeCtx := ctx
 	if opts.InitializeTimeout > 0 {
 		var cancel context.CancelFunc
@@ -160,8 +189,10 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	}
 	runner, err := newRunnerWithClient(initializeCtx, c)
 	if err != nil {
+		<-stderrDone // newRunnerWithClient has closed the transport
 		return nil, err
 	}
+	runner.stderrDone = stderrDone
 	runner.recordResponses = opts.RecordResponses
 	return runner, nil
 }
@@ -213,7 +244,11 @@ func (r *Runner) Close() error {
 		return nil
 	}
 	r.closed = true
-	return r.client.Close()
+	err := r.client.Close()
+	if r.stderrDone != nil {
+		<-r.stderrDone
+	}
+	return err
 }
 
 // Execute runs s.Runs invocations of cks.context.get_for_task against

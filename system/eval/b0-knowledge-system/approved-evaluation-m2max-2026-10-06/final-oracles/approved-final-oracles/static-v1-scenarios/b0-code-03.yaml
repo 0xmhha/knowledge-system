@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "b0-code-03",
+  "prompt": "기존 v1 데이터셋에 v2 문맥 질의를 했을 때 재색인을 요구하는 경계는 어디인가요?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "internal/system/mcp/get_for_task_v2.go",
+      "start_line": 33,
+      "end_line": 55,
+      "anchor": "func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest)"
+    }
+  ]
+}

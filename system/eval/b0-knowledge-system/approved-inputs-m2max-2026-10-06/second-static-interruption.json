@@ -1,0 +1,23 @@
+{
+  "status": "interrupted_wrong_http_transport",
+  "recorded_at": "2026-10-05T17:57:00.099305+00:00",
+  "processes": [
+    [
+      77447,
+      40833,
+      "/Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python /private/tmp/ks-approved-scope-20261006/run-static-after-stderr.py"
+    ],
+    [
+      77454,
+      77447,
+      "/private/tmp/ks-approved-scope-20261006/runtime-after-stderr/cks eval --scenarios /private/tmp/ks-approved-scope-20261006/official-static-after-stderr/development --config /private/tmp/ks-approved-scope-20261006/official-static-after-stderr/static-config.yaml --cks-mcp /private/tmp/ks-approved-scope-20261006/runtime-after-stderr/cks --verify-anchors /private/tmp/ks-b0-approved-corpus-20261006 --record-responses --output /private/tmp/ks-approved-scope-20261006/official-static-after-stderr/static-dev-v1.json"
+    ],
+    [
+      77617,
+      77454,
+      "/private/tmp/ks-approved-scope-20261006/runtime-after-stderr/cks mcp --config /private/tmp/ks-approved-scope-20261006/official-static-after-stderr/static-config.yaml"
+    ]
+  ],
+  "cause": "Operator setup mistake: gen-config defaults to HTTP; this config was passed to a stdio eval client. The independently reproduced stderr backpressure bug was already fixed.",
+  "next": "explicit stdio config, pre-spawn transport guard, new attempt"
+}

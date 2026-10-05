@@ -1,0 +1,36 @@
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-06T04:19:57.283+09:00 level=INFO msg="detected files" go=60 ts=0 sol=0 proto=0
+    time=2026-10-06T04:19:57.384+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-06T04:19:57.493+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=61 changed_in_edges=181 blame_edges=60 hunk_edges=61 hunk_blobs=61 max_per_file=10
+    time=2026-10-06T04:19:57.555+09:00 level=INFO msg="build complete" nodes=243 edges=542 pkg_tree_edges=120 topic_resolutions=3
+    ckg: built 243 nodes / 542 edges into /private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved/graph
+<== [graph-build] done
+==> [vector-preflight] Preflight the Ollama embedder
+    Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+<== [vector-preflight] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-06T04:19:57.631+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=fb1b100ea1aa0f65 run_id=27e05d6577cb0915 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-3118757286/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0
+    time=2026-10-06T04:19:57.632+09:00 level=INFO msg=ckv event=build.start trace_id=529ca60e41547266 run_id=27e05d6577cb0915 embedder=bge-m3:latest embedder_provider="" src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-3118757286/tree out_dir=/private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved/vector
+    time=2026-10-06T04:19:57.650+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=61659fc063b73cdd run_id=27e05d6577cb0915 ckg_path=/private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved/graph files_indexed=60 entries=60 canonical_available=true
+    ckv: 40/60 files (19.7 files/s, elapsed 2s, ETA 1s)
+    ckv: 60/60 files (15.8 files/s, elapsed 3s, ETA 0s)
+    time=2026-10-06T04:20:01.023+09:00 level=INFO msg=ckv event=build.done trace_id=529ca60e41547266 run_id=27e05d6577cb0915 latency_ms=3391 chunks_flow_spine=0 category_counts=map[:120] chunks_total=122 chunks_symbol=60 indexed_head=25d0e6e4c94645db237a6a733fd733d2b65c628f db_sha256=78d00423a2ad17604a3230987161728b54f85e46f79f53809cdba48f559f1ef3 out_dir=/private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved/vector embedder=bge-m3:latest src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-3118757286/tree chunks_file_header=60 languages=map[go:120] files_indexed=60 policy_loaded=false embedder_provider="" chunks_flow_step=0 chunks_doc=0 chunks_truncated=0 chunks_canonical_id=60
+    ckv: indexed 60 files → 122 chunks (60 symbol, 0 doc, 60 header, 0 truncated)
+    ckv: canonical_id 60/60 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=25d0e6e4c94645db237a6a733fd733d2b65c628f built_at=2026-10-05T19:20:00Z db=/private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved/vector/vector.db sha256=78d00423a2ad17604a3230987161728b54f85e46f79f53809cdba48f559f1ef3
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 60
+      db files:    60
+      in both:     60
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-approved-final-dynamic-20261006/F-01-FINAL-current/dataset/approved to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

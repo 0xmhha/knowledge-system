@@ -55,11 +55,12 @@ type Options struct {
 
 	// Vector build knobs (optional). Embedder "" lets the vector CLI pick
 	// its default; OllamaURL is exported as CKV_OLLAMA_ENDPOINT.
-	Embedder          string
-	ModelName         string
-	EmbedDim          int
-	OllamaURL         string
-	QueryPrefixPolicy string
+	Embedder           string
+	ModelName          string
+	EmbedDim           int
+	OllamaURL          string
+	QueryPrefixPolicy  string
+	VectorBuildSources string // JSON exact Go paths permitted through CKV's build/ default
 	// VectorPolicy is the vector chunk-categorization policy YAML.
 	VectorPolicy string
 	// SemanticCorpus is a separately rendered, reviewed Markdown corpus.
@@ -291,6 +292,9 @@ func BuildPlan(o Options) (Plan, error) {
 		}
 		if o.FilelistConfig != "" {
 			vectorCmd = append(vectorCmd, "--files-from", o.FilesFromPath())
+		}
+		if o.VectorBuildSources != "" {
+			vectorCmd = append(vectorCmd, "--build-sources", o.VectorBuildSources)
 		}
 		if o.Embedder != "" {
 			vectorCmd = append(vectorCmd, "--embedder="+o.Embedder)
