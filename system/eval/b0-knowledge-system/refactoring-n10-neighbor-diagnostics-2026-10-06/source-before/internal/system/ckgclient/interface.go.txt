@@ -25,11 +25,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// ErrSeedUnresolved reports that a seed symbol or citation did not resolve to
-// an indexed symbol — it matched nothing, or a symbol name matched several and
-// the client refuses to pick one silently. Neighbors uses the same sentinel
-// when no symbol matches the citation coordinates. This is still an error;
-// it does not prove that the seed was intentionally absent from the graph.
+// ErrSeedUnresolved reports that a seed symbol did not resolve to exactly one
+// indexed symbol — it matched nothing, or it matched several and the client
+// refuses to pick one silently.
 //
 // It exists because the traversals seeded by a symbol (subgraph, impact,
 // concurrency) take an exact qualified name and return an empty result for

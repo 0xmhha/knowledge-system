@@ -28,7 +28,7 @@
 | N-07 | **완료 · 2026-10-06** | [새 DEV RED→GREEN](../../system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json), public RPC partial/typed error·13패키지 race | 32000바이트/12인용 경계 안의 보관 근거 선택/부분 상태 및 안전한 typed budget 오류를 설계하고 독립 DEV 재현 후 수정 | 본문/좌표/해시 훼손 없이 상한 준수; 오류·부분·정상 분모 유지; source_missing/mismatch 구분·권한 누출0; 원 FINAL 불변 |
 | N-08 | P1 · N-11, 필요 시N-12 | 실패 실측: FINAL 정적 양성Recall1/6·8arm 동일 | CODE/WHY/POLICY/TRACE 기대 근거가 후보/조립에서 빠지는 원인 분리. 새 DEV에서 primary recall·청크·lexical/graph 조합 개선 | 질문/gold hardcode 없음; 원문/프로젝트/모델 신원·기본 안전 유지; 사전 승인 품질/회귀·중요군 수용 기준으로 개선 확인 |
 | N-09 | P1 · N-11 | 실패 실측: ABS01/02 strict no-citation fail | 무답의 검색 근거 상태와 downstream 답변 보류 계약을 명확히 하고 부적합 인용/무근거 운영 추정을 차단 | 승인된 무답/답가능 대조 사례에서 guard 검증; 사람 기권/기계 무인용 각각 집계; 생성 답변 평가가 없으면null |
-| N-10 | P1 · N-11, N-07/08 영향 | 실패 실측/진단: 일부p95비>1.25·neighbors 오류 | model/backend/원문 검증/의미 투영 비용 분해, 비반환 neighbors 오류 원인·영향 확인, 범위 내 비용/오류 개선 | 같은pack·같은ontology·static/dynamic/pooled·warm/cold·성공/오류 분모 유지; 실제K/MID/호출/크기와 회귀1.25 검증; 운영 부하는별도 |
+| N-10 | P1 · N-11, N-07/08 영향 | 실패 실측/진단: 일부p95비>1.25·neighbors 오류; [typed 세부 진단](./N10-NEIGHBOR-DIAGNOSTICS.md) 검증, 전체 미완료 | model/backend/원문 검증/의미 투영 비용 분해, 비반환 neighbors 오류 원인·영향 확인, 범위 내 비용/오류 개선 | 같은pack·같은ontology·static/dynamic/pooled·warm/cold·성공/오류 분모 유지; 실제K/MID/호출/크기와 회귀1.25 검증; 운영 부하는별도 |
 | N-11 | **P1 · 개발 튜닝 전에 준비** | 현FINAL 소그룹n<10·이미 관측 | 새 DEV 버전/질문과 결과 사전 비공개 독립 FINAL, 중요군 표본·평가 단위·정답·임계치·회전/비용 조건을 사전 검토·동결 | 충분한 독립 중요군으로 판정하거나 여전히inconclusive/disabled 명시. 반복/언어/상태/HC 문장 표본 부풀림0·이전FINAL 튜닝/holdout 재사용0 |
 | N-12 | P1 · 실제 내용 검토 | 사람 판정 대기: [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md);27원문span/6테스트 및 [정책·ADR 보완](./N12-POLICY-ADR-REVIEW.md)의6주장/12관계·4거부 제어 확인, proposed 유지 | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음 |
 | N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
@@ -61,3 +61,5 @@ N11 [새 DEV7개/프로토콜 초안](./N11-FRESH-EVALUATION-PREPARATION.md)은 
 N12 정책·ADR 원문 주장이 준비 범위에서 누락된 것을 재감사로 발견해 [별도 검토 자료](./N12-POLICY-ADR-REVIEW.md)로 보완했다. 원문 커밋ab77ce56,6주장/12관계 proposed, 원문span 대조 및 실제 CLI4개 음성 제어 통과. 기존27개 사람 검토 요청은 보존한다. 새 주장/관계 승인0, 통합 lock/canonical·의미 수용 미완료이므로 N12 완료 체크와 전체 수는 바꾸지 않는다.
 
 N11-C [실행 보호 세부 단계](./N11-EVALUATION-RUNNER-CONTRACT.md)를 구현·검증했다. 승인된 전체 책/runtime pins 검사와 FINAL durable reservation/영구 OS 잠금을 matrix 경로에 연결했다. Python19개·관련2패키지 race·native CLI4제어 통과, 실제 초안 child dispatch0/질의0. 새 사람 판정과 실제 평가 결과가 없으므로 N11 및 전체 완료 수는 그대로다.
+
+N10 진단의 구조 RED→GREEN과 실제 SQLite3제어를 추가했다. 미해결 seed typed 표시를 추가하되 backend_error/모든 시도·composer 결과를 보존하고, 과거 정보가 없으면null이다. Go3패키지 race/vet·Python17개 통과. 비용/p95 새 평가가 없어 완료8/18·요청5/15·잔여10을 유지한다.

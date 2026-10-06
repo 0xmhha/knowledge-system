@@ -1,0 +1,23 @@
+{
+  "scope": "recorded RED tool observation before product patch; independent structural DEV, not retrieval quality",
+  "command": [
+    "go",
+    "test",
+    "./internal/system/ckgclient",
+    "./internal/system/backendmeasure",
+    "-run",
+    "TestNeighborsUnresolvedSeed|TestNeighborSeedDiagnostic",
+    "-count=1"
+  ],
+  "exit_code": 1,
+  "failures": [
+    {
+      "test": "TestNeighborsUnresolvedSeedIsDistinctFromStoreFailureAndEmptyTraversal",
+      "observed": "missing seed: result=[] err=ckgclient: no node at PRIVATE_SEED.md:2-3 traversals=0"
+    },
+    {
+      "test": "TestNeighborSeedDiagnosticPreservesErrorOutcomeAndAllAttempts",
+      "observed": "unresolved: error_kind=<nil> want=seed_unresolved"
+    }
+  ]
+}

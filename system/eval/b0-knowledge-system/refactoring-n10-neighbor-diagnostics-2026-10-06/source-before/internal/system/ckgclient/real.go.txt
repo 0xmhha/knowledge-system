@@ -379,7 +379,7 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	}
 	qname := matchQname(cands, src)
 	if qname == "" {
-		return nil, fmt.Errorf("%w: no node at %s:%d-%d", ErrSeedUnresolved, src.File, src.StartLine, src.EndLine)
+		return nil, fmt.Errorf("ckgclient: no node at %s:%d-%d", src.File, src.StartLine, src.EndLine)
 	}
 
 	// Decide direction + edge-type filter from opts.Relations.

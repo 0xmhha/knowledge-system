@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 현재 후속 실행: N10 typed neighbors 진단 (2026-10-06)
+
+사용자 다음 진행에 따라 [N10 진단](./N10-NEIGHBOR-DIAGNOSTICS.md)의 구조 RED→GREEN·실제 standalone SQLite3제어를 검증했다. 미해결 seed에 ErrSeedUnresolved/error_kind를 추가하고 outcome=backend_error/오류·시도 분모·composer seed/순위/결과를 보존했다. generic 저장소/취소/deadline을 미해결로 추정하지 않는다. 과거 정보 없는 진단은null이며 원 FINAL/입력5개는 불변이다. Go3패키지 race/vet·Python17개·경계 검사 통과. **요청5/15 완료·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 실제 N11 DEV/프로토콜·N12 판정 및 독립 FINAL 검토 후 비용·지연 실행.** 실제 새 BGE/p95·품질·사람/운영 수용은 미완료다. 아래는 이전 시점 이력이다.
+
 ## 현재 후속 실행: N11 runner 보호 검증 (2026-10-06)
 
 사용자 다음 진행에 따라 [N11 실행 보호](./N11-EVALUATION-RUNNER-CONTRACT.md)를 구현했다. 전체 입력 승인/고정 runtime pins를 확인하고 permanent OS flock·내구성 FINAL 예약 뒤 matrix를 호출한다. 예약/실제 관측을 구분하고 wrapper SIGKILL 뒤에도 child 잠금을 유지한다. Python19개, Go binding 정상1/거부10·관련2패키지 race, native CLI4제어 통과. 실제 미승인 초안 child dispatch0/새질의0. **요청15개 중5완료, 전체8/18·잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 실제 DEV/프로토콜·N12 판정 반영과 새 FINAL 검토.** 실제 사람/환경/운영 입력은 아직 대기하며 N11 전체 완료나 품질 합격으로 표시하지 않는다. 아래는 이전 시점 이력이다.

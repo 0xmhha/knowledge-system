@@ -11,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/envelope"
 )
 
@@ -23,7 +22,6 @@ type Call struct {
 	InputBytes        int             `json:"input_bytes"`
 	Options           json.RawMessage `json:"options,omitempty"`
 	Outcome           string          `json:"outcome"`
-	ErrorKind         string          `json:"error_kind,omitempty"`
 	ResultCount       int             `json:"result_count"`
 	ElapsedNS         int64           `json:"elapsed_ns"`
 	HTTPStatus        int             `json:"http_status,omitempty"`
@@ -156,12 +154,6 @@ func start(ctx context.Context, backend, method, input string, opts any) func(in
 			}
 			if errors.Is(err, context.DeadlineExceeded) {
 				call.Outcome = "deadline_exceeded"
-			}
-			// Add a safe typed diagnostic without removing the failed attempt
-			// from its historical outcome/denominator. Never classify by raw
-			// error text, or assert that an unresolved citation is expected.
-			if call.Outcome == "backend_error" && backend == "ckg" && method == "neighbors" && errors.Is(err, ckgclient.ErrSeedUnresolved) {
-				call.ErrorKind = "seed_unresolved"
 			}
 		}
 	}

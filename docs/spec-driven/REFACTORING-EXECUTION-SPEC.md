@@ -247,3 +247,12 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 ### N11-C runner 보호 세부 단계 — 검증 완료 / 전체 미완료
 
 [실행 보호 계약](./N11-EVALUATION-RUNNER-CONTRACT.md)의 사전 입력 검사·frozen runtime/source/model/config/binary/K 결합과 FINAL dispatch 전 영구 OS 잠금/내구성 예약을 구현했다. Python19개·Go binding 정상1/거부10 및 기존2패키지 race, native CLI4제어를 확인했다. 예약은 관측이 아니며 crash/실패 뒤에도 자동 회수하지 않는다. 실제 미승인 DEV 초안은 child dispatch0/새질의0으로 거부됐다. 새 승인·FINAL·실제 평가 결과가 없어 N11-A–D는 모두 미완료다. 원 FINAL/승인 입력은 불변이다.
+
+## N-10: 비용·지연과 비반환 진단
+
+**상태: 진단 세부 구현 검증 / 새 평가 대기.** [typed neighbors 진단](./N10-NEIGHBOR-DIAGNOSTICS.md)을 구현했다. 새 구조 RED→GREEN과 실제 SQLite3제어에서 미해결 seed/정상 빈 traversal/닫힌 store 오류를 구분했다. outcome/실패 분모·composer 결과·원문 argument SHA 및 이전 원자료를 보존한다. Go3패키지 race/vet·Python17개·계층 경계를 통과했다. 새 BGE/비용/paired p95 결과는 아직 없으며 전체 완료가 아니다.
+
+- [ ] N10-A N11의 사전 검토·동결한 새 입력/source/model/runtime에서 같은8arm·회전·직렬 warm/cold 비용을 측정.
+- [ ] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
+- [ ] N10-C 소스/근거/프로젝트·모델 신원·안전·검색/기권 회귀를 유지한 범위 내 개선과 p95비1.25 수용 판정; 소표본은inconclusive.
+- [ ] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.

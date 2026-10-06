@@ -1,0 +1,14 @@
+package main
+import("context";"encoding/json";"errors";"fmt";"os";"github.com/0xmhha/knowledge-system/internal/system/ckgclient";"github.com/0xmhha/knowledge-system/internal/system/backendmeasure";"github.com/0xmhha/knowledge-system/pkg/system/contract")
+func main(){
+ client,err:=ckgclient.NewReal(os.Args[1]);if err!=nil{panic(err)}
+ ctx,scope:=(&backendmeasure.Recorder{}).Begin(context.Background(),"native-new-structural-control","neighbors")
+ measured:=backendmeasure.WrapCKG(client)
+ seedDoc:=contract.Citation{File:"notes.md",StartLine:1,EndLine:1};seedCode:=contract.Citation{File:"main.go",StartLine:3,EndLine:3}
+ n,e:=measured.Neighbors(ctx,seedDoc,ckgclient.NeighborsOpts{});if !errors.Is(e,ckgclient.ErrSeedUnresolved)||len(n)!=0{panic(fmt.Sprintf("document seed: %v %v",n,e))}
+ n,e=measured.Neighbors(ctx,seedCode,ckgclient.NeighborsOpts{});if e!=nil||len(n)!=0{panic(fmt.Sprintf("resolved empty seed: %v %v",n,e))}
+ if err:=client.Close();err!=nil{panic(err)}
+ n,e=measured.Neighbors(ctx,seedCode,ckgclient.NeighborsOpts{});if e==nil||errors.Is(e,ckgclient.ErrSeedUnresolved){panic(fmt.Sprintf("closed store incorrectly diagnosed: %v %v",n,e))}
+ report:=scope.Finish("returned");if len(report.Calls)!=3||report.Calls[0].Outcome!="backend_error"||report.Calls[0].ErrorKind!="seed_unresolved"||report.Calls[1].Outcome!="returned"||report.Calls[1].ErrorKind!=""||report.Calls[2].Outcome!="backend_error"||report.Calls[2].ErrorKind!=""{panic(fmt.Sprintf("bad outcomes: %+v",report))}
+ if err:=json.NewEncoder(os.Stdout).Encode(report);err!=nil{panic(err)}
+}
