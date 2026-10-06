@@ -1,0 +1,161 @@
+from pathlib import Path
+import datetime, hashlib, json, re, subprocess
+
+root = Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system')
+study = Path('/Users/kevin/work/github/0xmhha/study')
+out = root / 'system/eval/b0-knowledge-system/study-original-plan-followup-2026-10-06'
+sha = lambda b: hashlib.sha256(b).hexdigest()
+
+def run(args, cwd):
+    p = subprocess.run(args, cwd=cwd, text=True, capture_output=True)
+    return {'argv': args, 'exit_code': p.returncode, 'stdout': p.stdout, 'stderr': p.stderr}
+
+def githead(p):
+    r = run(['git', 'rev-parse', 'HEAD'], p)
+    assert r['exit_code'] == 0
+    return r['stdout'].strip()
+
+study_observed_head = githead(study)
+study_head = '31ce3adb0ff210c740823a7d55601edcbc699c68'
+product_head = githead(root)
+assert product_head.startswith('700397b1')
+sources = [
+    'docs/learn/ai/code-intelligence/MCP_KNOWLEDGE_SYSTEM_PROPOSAL.md',
+    'projects/ai-knowledge-data/docs/00-purpose.md',
+    'projects/ai-knowledge-data/docs/knowledge-system-architecture.md',
+    'projects/ai-knowledge-data/docs/README.md',
+    'projects/ai-knowledge-data/docs/DECISIONS.md',
+    'projects/ai-knowledge-data/docs/GLOSSARY.md',
+    'projects/ai-knowledge-data/docs/IMPLEMENTATION-STATE.md',
+    'projects/ai-knowledge-data/docs/category-ontology.md',
+    'projects/coding-agent/00_background_goal.md',
+    'projects/coding-agent/07-cks-codingagent-improvements.md',
+    'projects/coding-agent/10-learning-direction.md',
+    'projects/coding-agent/12-master-workplan.md',
+    'projects/stablenet-ai-agent/claudedocs/plan-phase0-phase1-cks-mvp.md',
+]
+snapshots = {'00-purpose.md', '00_background_goal.md', '12-master-workplan.md',
+             '07-cks-codingagent-improvements.md', '10-learning-direction.md',
+             'README.md', 'DECISIONS.md'}
+bindings = []
+for name in sources:
+    data = (study / name).read_bytes()
+    committed = subprocess.check_output(['git', 'show', study_head + ':' + name], cwd=study)
+    assert data == committed, name
+    item = {'path': name, 'sha256': sha(data), 'bytes': len(data), 'matches_study_head': True}
+    if Path(name).name in snapshots:
+        dest = out / 'archive/study-snapshots' / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if Path(name).name == '00_background_goal.md':
+            dest = Path(str(dest) + '.json')
+            dest.write_text(json.dumps({'encoding': 'UTF-8', 'source_sha256': sha(data),
+                'source_text': data.decode('utf-8')}, ensure_ascii=False, indent=2) + '\n')
+            assert json.loads(dest.read_text())['source_text'].encode('utf-8') == data
+            item['snapshot_format'] = 'JSON UTF-8 text, preserving original trailing whitespace'
+        else:
+            dest.write_bytes(data)
+        item['snapshot'] = str(dest.relative_to(out))
+    bindings.append(item)
+
+history = {}
+for name in [sources[0], sources[1], sources[11]]:
+    history[name] = run(['git', 'log', '--follow', '--format=%h %aI %s', '--', name], study)
+original_master = subprocess.check_output(['git', 'show',
+    '718cb8a:docs/research/coding-agent/12-master-workplan.md'], cwd=study)
+(out / 'initial-master-workplan-2026-06-26.md').write_bytes(original_master)
+originals = ['spec-driven-requirements.md', 'spec-driven-wbs.md',
+             'ckv-ckg-ontology-installation-proposal.md']
+files = run(['rg', '--files', '--hidden', '--no-ignore', '-g', '!**/.git/**',
+             '-g', '!**/node_modules/**', '-g', '!**/.venv/**'], study)
+assert files['exit_code'] == 0
+file_history = run(['git', 'log', '--all', '--name-only', '--format='], study)
+assert file_history['exit_code'] == 0
+discovery = {'requested_original_files': originals,
+    'current_tree_matches': [p for p in files['stdout'].splitlines() if Path(p).name in originals],
+    'all_held_git_history_matches': [p for p in file_history['stdout'].splitlines() if Path(p).name in originals],
+    'file_listing_sha256': sha(files['stdout'].encode()),
+    'held_git_path_history_sha256': sha(file_history['stdout'].encode()),
+    'scope': 'local study tree and all held Git refs; no remote fetch; does not establish global absence'}
+assert not discovery['current_tree_matches'] and not discovery['all_held_git_history_matches']
+
+code_paths = [
+    'internal/system/mcp/server.go', 'internal/system/mcp/graph.go',
+    'internal/system/mcp/analysis.go', 'internal/system/mcp/concurrency.go',
+    'internal/system/mcp/alignment.go', 'internal/system/mcp/source_guard.go',
+    'internal/system/composer/stage3/expander.go',
+    'internal/system/composer/stage3/intent_relations.go',
+    'internal/system/ckvclient/flow.go', 'pkg/vector/ckv/ckv.go',
+    'internal/vector/query/flow.go', 'pkg/graph/types/enums.go',
+    'pkg/graph/policy/policy.go', 'pkg/graph/security/security.go',
+    'internal/graph/buildpipe/pipeline.go', 'internal/setup/identity.go',
+    'projects/stablenet/domain-knowledge/inventory.md', 'go.mod',
+]
+code_bindings = []
+for name in code_paths:
+    data = (root / name).read_bytes()
+    committed = subprocess.check_output(['git', 'show', product_head + ':' + name], cwd=root)
+    assert data == committed, name
+    code_bindings.append({'path': name, 'sha256': sha(data), 'bytes': len(data),
+                          'matches_product_head': True})
+value_flow_search = run(['rg', '-n', 'golang.org/x/tools/go/ssa|def_use|def-use|Edge.*(CFG|PDG|Taint)',
+    'internal/graph', 'pkg/graph', 'go.mod', '-g', '*.go', '-g', 'go.mod', '-g', '!**/*_test.go'], root)
+assert value_flow_search['exit_code'] in (0, 1)
+
+freeze_path = root / 'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json'
+freeze = json.loads(freeze_path.read_text())
+frozen_counts = {}
+for key in ['product_source_sha256', 'approved_input_sha256']:
+    for name, expected in freeze[key].items():
+        assert sha(Path(name).read_bytes()) == expected, name
+    frozen_counts[key] = len(freeze[key])
+assert frozen_counts == {'product_source_sha256': 1096, 'approved_input_sha256': 5}
+
+reports = ['STUDY-ORIGINAL-PLAN-FOLLOWUP.md', 'REFACTORING-ORIGINAL-GOALS-REAUDIT.md',
+           'REFACTORING-REMAINING-WORKLIST.md']
+links = 0
+link_targets = []
+report_bindings = []
+wis = ['WI-V1','WI-V2','WI-3','WI-4','WI-1','WI-2','WI-C','WI-6','WI-SP','WI-5']
+for name in reports:
+    p = root / 'docs/spec-driven' / name
+    contents = p.read_text()
+    for url in re.findall(r'\]\(([^)]+)\)', contents):
+        target = (p.parent / url.split('#')[0]).resolve()
+        link_targets.append(target)
+        if target != out / 'source-and-code-bindings.json':
+            assert target.is_file(), (name, url)
+        links += 1
+    report_bindings.append({'path': str(p.relative_to(root)), 'sha256': sha(p.read_bytes())})
+remaining = (root / 'docs/spec-driven/REFACTORING-REMAINING-WORKLIST.md').read_text()
+assert re.findall(r'^\| (N-\d\d) \|', remaining, re.M) == [f'N-{i:02}' for i in range(1,19)]
+followup = (root / 'docs/spec-driven/STUDY-ORIGINAL-PLAN-FOLLOWUP.md').read_text()
+assert re.findall(r'^\| (WI-[\w-]+) \|', followup, re.M) == wis
+master = (study / sources[11]).read_text()
+assert re.findall(r'^\| (WI-[\w-]+) \|', master, re.M) == wis
+
+# Write bindings first so the report's evidence link exists for link validation.
+data = {'checked_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'product_head': product_head, 'study_head': study_head, 'study_observed_head_at_verification': study_observed_head,
+    'study_git_status': run(['git', 'status', '--short'], study),
+    'source_bindings': bindings, 'source_history': history,
+    'initial_master_sha256': sha(original_master), 'original_source_discovery': discovery,
+    'code_bindings': code_bindings, 'value_flow_search': value_flow_search,
+    'frozen_inputs': frozen_counts, 'product_tasks': 18, 'upper_plan_original_ids': wis,
+    'upper_plan_status': 'partial or external unaudited or held; not 10 proven missing implementations',
+    'product_and_upper_plan_counts_additive': False, 'report_links_verified': links,
+    'model_queries_or_external_runtime_tests': False,
+    'old_evidence': 'preserved; report hashes in original audit correspond to Git commit 700397b1'}
+(out / 'source-and-code-bindings.json').write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+assert all(p.is_file() for p in link_targets)
+for command, filename in [(['python3', 'scripts/check-docs.py'], 'docs-check.log'),
+    (['python3', 'scripts/update-execution-status.py', '--check'], 'preview-status-check.log'),
+    (['git', 'diff', '--check'], 'diff-check.log')]:
+    result = run(command, root)
+    (out / filename).write_text(result['stdout'] + result['stderr'])
+    assert result['exit_code'] == 0, result
+manifest = {'product_head': product_head, 'study_head': study_head,
+    'reports': report_bindings,
+    'files': [{'path': str(p.relative_to(out)), 'sha256': sha(p.read_bytes())}
+              for p in sorted(out.rglob('*')) if p.is_file() and p.name != 'evidence-manifest.json']}
+(out / 'evidence-manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+print('PASS: 13 study source bindings; initial master history; 18 product IDs + 10 original WI IDs; links; 1096 product/5 input hashes; docs/status/diff checks; study untouched')
