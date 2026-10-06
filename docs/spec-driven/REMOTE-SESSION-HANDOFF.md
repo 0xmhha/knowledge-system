@@ -1,5 +1,11 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 실행: 후속 spec-driven 개발 (2026-10-06)
+
+사용자가 후속 작업을 순차 수행하고 매 항목의 목적·설계·수용 조건·실행 증거를 문서로 갱신하며 미완료를 완료로 체크하지 않도록 요청했다. [실행 명세](./REFACTORING-EXECUTION-SPEC.md)와 [전체 목록](./REFACTORING-REMAINING-WORKLIST.md)을 우선한다. **N-01/02 완료(2/18), 잔여 N-03–18 16개. 다음 N-03 OS 잠금.** N-02는 공개 JSON-RPC RED→GREEN, pinned/손상/별칭 쓰기 및 async 우회 거부, legacy 호환·공유 builder, 실제 새 CLI 7사례의 이전 current/원문 SHA 보존 및 동일 신원 후보 보류/승격, 관련 5패키지 race/vet·경계·문서로 검증했다. [새 DEV 증거](../../system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/cli-results.json).
+
+후속 승인 범위에서 제품 코드가 변경됐으므로 아래 역사 기록의 source1096 불변/FINAL 결과를 현재 코드 검증으로 재사용하지 않는다. 원 FINAL과 승인 입력5개는 그대로 보존하며 새로운 소스 바인딩은 N-02 evidence manifest에 기록한다. 긴 writer age reclaim·공통 OS 잠금과 내구성은 N-03/04 미완료다. BGE 품질·native Linux/실운영/파일럿 사람 승인으로 확대하지 않는다. 사용자 `.claude/`, `logs/` 및 Ollama 서버 유지, 새 push/배포 승인 없음. 아래 잔여17/미재현 문단은 N-02 구현 전 이력이다.
+
 ## 최신 요청: 원래 리팩토링 목적 대비 잔여 재감사 (2026-10-06)
 
 사용자가 최초 작업리스트/목적 문서를 찾고 현재 코드와 대조해 남은 작업을 정리하도록 요청했다. [최초 목적 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [후속 목록](./REFACTORING-REMAINING-WORKLIST.md)을 관리한다. study/main `1c350c1`에서 초기 원문을 확보하고 [시작 배경·전체 ID/v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인해 N-01 완료/잔여17개(N-02–18)로 갱신했다. 기존 preview30/30 종료는 유효하며 제품 구현을 새로 완료했다고 표시하지 않았다. 다음N-02 활성 MCP 쓰기 경로의 실패 재현/후보 빌더 계약. 운영 N-15–18은 이전 제외 범위이며 배포/새push/운영 사실 승인으로 확장하지 않는다.

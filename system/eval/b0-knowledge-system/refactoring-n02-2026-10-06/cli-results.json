@@ -1,0 +1,179 @@
+{
+  "base_commit": "c9c91ebe",
+  "scope": "native darwin arm64 CLI and real engines with deterministic mock embeddings; no quality or power-loss claim",
+  "fixture": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh",
+  "binaries": {
+    "cks": "d343c9ed3211b3b7af407f7f06efd80398569065ebde996a6b523aa1c01b5f84",
+    "ckg": "4be68afc2bfbb090a61ad54b4f5d6b7e40cd9af2188f2f229f3c9425b52066e7",
+    "ckv": "cf416856f10944b822917927ec65f59aa56237dba7aab520d8c81601a6cf6917"
+  },
+  "inputs": {
+    "go.mod": "961119b29ff5bd2b5e992f8080f25eb8c0bb8fe6dc57ad2b88b466518ab4e630",
+    "main.go": "82806f8507091e3f020a0fd1bf6ca5664450a2354d0d94563ff7ba3a1467c11a"
+  },
+  "config_sha256": "b3d44eb648663537863f7f90586ff2d9a62c1389014be1ee6d4818cd4a9dbf51",
+  "cases": [
+    {
+      "name": "initial",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "base",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.046,
+      "current": "base"
+    },
+    {
+      "name": "one-engine-failed",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "one-engine-failed",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.626,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "mixed-project",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "mixed-project",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.315,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "cancelled",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "cancelled",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.289,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "existing-version",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "base",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.07,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "held-for-review",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "held",
+        "--progress",
+        "json",
+        "--hold-for-review"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.393,
+      "current": "base",
+      "same_source_and_dataset_identity": true
+    },
+    {
+      "name": "promoted",
+      "command": [
+        "/private/tmp/ks-n02-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n02-cli-1fe4t1bh/setup.yaml",
+        "--version",
+        "next",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.402,
+      "current": "next",
+      "same_source_and_dataset_identity": true
+    }
+  ],
+  "success": true,
+  "old_identity": {
+    "source": {
+      "project_id": "n02-fixture",
+      "source_mode": "snapshot-only",
+      "source_commit": "",
+      "file_manifest_digest": "03534483459858b85228fe548240cca431476fd2b664f9bd0cdd72cab17629ab",
+      "capture_policy_digest": "bf9e1543e2fd4fdd1dd7d40e45cc521146183020231e9afdfce8a74f1188d832",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "418d3ae4372b0a077f5d2b4f1ef62ebc3c10f842f474641694886bdd8a32f194"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "822711f6978ff985f85a6bce88d13d73a9f49b5aba2873f6dfc86ea8b6ecc0b0",
+    "dataset_id": "3a1f97dc9458e17718f0cd22d41b44968acea7690a7e5987c8b9c66ac7c5dab4"
+  },
+  "new_identity": {
+    "source": {
+      "project_id": "n02-fixture",
+      "source_mode": "snapshot-only",
+      "source_commit": "",
+      "file_manifest_digest": "03534483459858b85228fe548240cca431476fd2b664f9bd0cdd72cab17629ab",
+      "capture_policy_digest": "bf9e1543e2fd4fdd1dd7d40e45cc521146183020231e9afdfce8a74f1188d832",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "418d3ae4372b0a077f5d2b4f1ef62ebc3c10f842f474641694886bdd8a32f194"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "822711f6978ff985f85a6bce88d13d73a9f49b5aba2873f6dfc86ea8b6ecc0b0",
+    "dataset_id": "3a1f97dc9458e17718f0cd22d41b44968acea7690a7e5987c8b9c66ac7c5dab4"
+  }
+}

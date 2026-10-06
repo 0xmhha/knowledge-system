@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | 기존 `cks.context.get_for_task` | v1 DTO/해시 | v1 DTO/해시 | `requires_v2` | `requires_v2` |
 | 새 `cks.context.get_for_task_v2` | `reindex_required` | v2 DTO/해시 | v2 DTO/해시 | v2 DTO/해시 |
-| 기존 `cks setup`/`mcp` | 기존 플래그 유지 | 같은 v2 후보 빌더 또는 v1 읽기 | 모드 미지정이면 committed만 | 모드 미지정이면 committed만 |
+| `cks setup --version` (설정·project pin 포함) | 기존 플래그 유지 | 같은 v2 후보 빌더 또는 v1 읽기 | 모드 미지정이면 committed만 | 모드 미지정이면 committed만 |
 | `ckv query`/CKG export 구 형식 | 기존 응답 | 기존 커밋형 응답 | `requires_v2` | `requires_v2` |
 | 명시 `--format=v2`/v2 MCP·HTTP | `reindex_required` | v2 응답 | v2 응답 | v2 응답 |
 
@@ -17,6 +17,10 @@
 구 바이너리가 새 pinned v2 DB를 읽는 역방향 호환은 제공하지 않는다. 새 CKV의 임베딩 신원 포맷을 구 CKV가 이해하지 못하므로 새 데이터셋에는 새 바이너리를 사용한다.
 
 기존 v1 응답은 **별도의 v1 DTO**로 직렬화한다. 기존 필드에 v2 좌표를 단순 추가하지 않는다. 현재 v1 팩의 `integrity_hash` 계산은 알지 못하는 JSON 필드를 버리고 다시 계산하는 소비자와 결합돼 있으므로, 혼합 DTO는 해시 불일치를 낳을 수 있다. v1 `Citation.Key()`는 커밋도 무시하므로 v2 중복 제거에 사용하지 않는다. 기존 도구가 돌려주는 committed v2 자료의 원문은 보관본으로 검증하지만 응답 자체는 v1 모양과 기존 SHA-256 해시를 유지한다. 호출자는 v1 응답을 다른 스냅샷과 조인하지 않는다.
+
+## 유지보수 쓰기 경계 (N-02)
+
+`ops.index`는 평면 legacy 데이터셋의 직접 갱신에 한정한다. 버전 고정/blue-green 경로와 손상된 pin은 export/엔진 실행 전에 `versioned_setup_required`로 거부한다. 현재 MCP `ops.setup`/`ops.reindex` 입력은 v2의 전체 설정·팩·소스·모델 신원을 전달하지 않으므로 pinned 데이터셋의 제자리 빌드와 legacy 후보로의 downgrade를 허용하지 않는다. 새 v2 후보는 동일한 검토 설정과 project ID를 사용하는 `cks setup --version <새 버전>`으로 빌드/검증/승격하며 `--hold-for-review`로 보류할 수 있다. 기존 버전 이름 재사용은 legacy도 거부한다. 평면 legacy 갱신 및 새로운 legacy blue-green 후보 빌드는 유지한다. 기존 서버는 승격 후에도 시작 시 pin한 버전을 사용하므로 새 버전을 읽으려면 재시작한다. low-level 엔진을 직접 실행한 쓰기는 이 관리 경로의 보호 밖이다. [설계·수용 조건·증거](./REFACTORING-EXECUTION-SPEC.md)를 따른다.
 
 ## v2 응답의 필수 필드
 
