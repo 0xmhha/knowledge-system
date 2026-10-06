@@ -1,0 +1,20 @@
+import hashlib,json,pathlib,shutil,subprocess
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.load(open(root/'system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json'))
+assert all(sha(root/p)==v for p,v in base['source_sha256'].items()),'product sources changed outside verified N13 binding'
+assert all(sha(root/p)==v for p,v in base['approved_input_sha256'].items()),'original approved inputs changed'
+assert 'Ran 10 tests' in (e/'input-control-tests.log').read_text() and (e/'input-control-tests.log').read_text().strip().endswith('OK')
+c=json.load(open(e/'current-draft-input-check.json'));x=json.load(open(e/'current-draft-exit.json'));assert not c['input_ready'] and not c['execution_ready'] and not c['product_release_approved'] and x['exit_code']==x['expected_code']==2 and all(n==0 for n in c['final_independent_clusters_by_group'].values())
+o=json.load(open(e/'observation-provenance.json'));assert o['rows_verified']==4800 and o['known_observed_clusters']==14 and len(o['source_artifacts'])==9
+m=json.load(open(e/'live-model-identity.json'));assert m['status']=='verified_live_identity' and m['evaluation_questions_executed']==0 and m['model_unload_requested'] is False
+assert 'documentation: OK' in (e/'docs-check.log').read_text()
+assert 'PASS 8/18 complete; 10 remaining' in (e/'progress-check.log').read_text()
+extra=['scripts/refactoring-eval-input-check.py','scripts/test_refactoring_eval_input_check.py','scripts/b0-preflight.py','system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/dev-candidates.json','system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/protocol-draft.json']
+sources={**base['source_sha256'],**{p:sha(root/p) for p in extra}}
+delta={p:s for p,s in sources.items() if base['source_sha256'].get(p)!=s}
+for p in delta:
+ target=e/'source-snapshot'/(p+'.txt');target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/p,target)
+reports=['N11-FRESH-EVALUATION-PREPARATION.md','REFACTORING-DEPENDENCY-REVIEW.md','REFACTORING-EXECUTION-SPEC.md','REMOTE-SESSION-HANDOFF.md','REFACTORING-REMAINING-WORKLIST.md']
+manifest={'schema_version':1,'status':'N11_input_controls_verified_task_incomplete','scope':'read-only input binding/freeze/recorded-cluster controls and time-scoped live model identity; no approved new gold, fresh FINAL, evaluation or product release verdict','base_commit':'324b3926','source_sha256':sources,'changed_source_sha256':delta,'approved_input_sha256':base['approved_input_sha256'],'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='input-control-manifest.json'},'completed_tasks':8,'remaining_tasks':10,'new_human_approvals':0,'new_final_units':0}
+(e/'input-control-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print('N11 input controls binding PASS:',len(sources),'source/data/dependency bindings; original product source unchanged; task remains incomplete')

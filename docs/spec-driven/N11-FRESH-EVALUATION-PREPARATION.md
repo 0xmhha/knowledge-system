@@ -15,3 +15,27 @@
 source snapshot·설정·lock·model digest/차원과 source/gold 파일·span SHA를 확인한다.8arm은 같은 입력/모델/원천을 쓰고 지연 실험을 병렬 실행하지 않는다. 검색/오류/incomplete 분모, strict 인용0 조건, 사람 답변 기권, 본문 예산 partial 진단을 별도로 센다. bootstrap10000/95%CI는 반복 행이 아니라 paired independent cluster를 단위로 한다. 외부 coding-agent 총비용이나 실제 사람의 검토 활동 시간은 도구 실행 시간·응답 대기로 추정하지 않는다.
 
 N11-A–D는 아직 체크하지 않았다. 평가 입력 동결과 실제 사용 증거가 연결돼야 완료한다. 다음은 N12의 원문·후보 관계 판정 반영과 독립 FINAL gold 작성/검토이며, N08–10 튜닝은 그 뒤에 진행한다.
+
+## 검증한 입력 검사 도구
+
+`scripts/refactoring-eval-input-check.py`는 source commit·gold 파일/span SHA, 기존 승인 프로토콜SHA·모델/arm/임계치, 별도 사람 검토 기록과 protocol/questions의 동결SHA·시각을 대조한다. 케이스별 gold/독립성/오염 검토와 unit/cluster를 명시해야 한다. 같은 unit을 여러cluster로 쪼개거나 같은 prompt를 여러독립단위로 세는 경우, DEV/FINAL cluster 중복, 선언된 이전FINAL 사실 재사용, 알려진 관측FINAL cluster 재사용, 관측 후 동결과 동결 뒤 질문/프로토콜 변경을 거부한다. 중요군은 반복 행 수가 아닌 검토된 FINAL cluster 수로 센다.9단위를 번역/반복해18행으로 만들어도 n=9/inconclusive다.
+
+이 도구는 입력의 일관성 검사다. 검토자의 실체나 gold/독립성 판정의 진실성을 인증하지 않고 실제 검색을 실행하지 않는다. `input_ready`가 참이어도 live model/통합 dataset·binary/source/runner 관측상태 검사는 별도이므로 `execution_ready`와 `product_release_approved`는 항상false다. 입력 체크 결과를 제품 품질이나 출시 승인으로 읽지 않는다.
+
+[입력 검사 증거](../../system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/input-control-manifest.json)는10개 구조 검증 시험과 현재 실제 초안의 CLI 거부(exit2)를 연결한다. 시험의 승인자·50개 케이스는 검증기용 합성 control이며 실제 사람 승인·독립 FINAL이 아니다. 현재 CODE/WHY/POLICY/TRACE/ABS의 승인된 FINAL 수는 모두0이다. N11-C의 입력 검사 부분을 구현했지만 전체 수용 조건은 미완료다.
+
+[알려진 관측 목록](../../system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/known-final-observations.json)은 기존 승인 FINAL4800행의14개 질문/fixture 묶음을 원자료에서 추출했다.9개 원시 rows SHA가 기존 corrected summary와 모두 일치했다. 시각은 이 승인 FINAL 수집에서 가장 먼저 보관된 응답 완료 시각이고 전체 과거 실험의 최초 시각이라고 주장하지 않는다. 다른 과거 관측/사실도 사전 오염 검토에 포함해야 한다. 원자료를 다시 질의하거나 새 평가 결과로 합산하지 않았다.
+
+현재 초안 확인 명령(미승인/FINAL0이므로 exit2가 정상):
+
+```bash
+python3 scripts/refactoring-eval-input-check.py \
+  --protocol system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/protocol-draft.json \
+  --questions system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/dev-candidates.json \
+  --observations system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/known-final-observations.json \
+  --require-ready
+```
+
+검토 기록은 별도 `--review FILE`로 준다. schema는 status=approved, scope=fresh-evaluation-inputs, reviewer, timezone이 있는 reviewed_at/frozen_at, protocol_sha256/questions_sha256, cases 객체다. 각 cases[questionID]는 승인한 unit_id/cluster_id와 gold_approved/independence_approved/contamination_checked=true를 가진다. 질문은 승인된 unit_id/cluster_id·review_state/source_commit과 split=DEV/FINAL을 갖는다. ABS는 빈 gold evidence와 strict_zero_citations=true 및 abstention_basis가 필요하다. 실제 판정 전 이러한true값을 채우지 않는다. 작은 표본의 입력 검토가 끝나도 sampling_verdict=inconclusive이며 실제 목표의 합격을 주장할 수 없다.
+
+2026-10-06T07:03:38Z의 [live 식별 확인](../../system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/live-model-identity.json)에서 BGE-M3 digest `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`/1024차원/runtime options가 승인 입력과 일치했고 서버는Ollama0.35.1이었다. 식별 문장1회이며 평가 질문 실행0, unload 요청0이다. 이 시점의 신원 확인이므로 실제 실험 시작/종료 시 다시 확인하고 데이터셋·바이너리 결합과 runner 관측 보호를 추가해야 한다. 검색 품질·비용·지원 환경 합격으로 합산하지 않는다.

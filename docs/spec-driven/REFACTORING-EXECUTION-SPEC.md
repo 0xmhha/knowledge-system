@@ -235,3 +235,7 @@ N-13 증거: [manifest](../../system/eval/b0-knowledge-system/refactoring-n13-20
 - [ ] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
 
 N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인딩 DEV7개와 기존 승인 조건 보존 초안을 만들었다. 아직 새 FINAL0, 새 gold/cluster 승인0, 실행0이며 N11-A–D 미완료다. 기존 FINAL은 재실행해 새holdout으로 쓰지 않는다.
+
+### N11-C 입력 검사 세부 단계 — 검증 완료 / N11 전체 미완료
+
+[N11 준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 source/gold/사전 동결·독립 cluster/오염 검토 일관성 검사를 구현했다.10개 구조 시험, 실제초안 CLI exit2/입력·실행false/군별FINAL0을 확인했다. 승인 FINAL4800행·14관측묶음을9개 원자료SHA에 결합해 재사용 금지를 확인했다. 입력 체크와 사람의 진실성/실모델·통합 dataset/runner 강제는 다르므로 N11-C checkbox는 아직unchecked다. 완료8/18와 잔여10개를 유지한다.

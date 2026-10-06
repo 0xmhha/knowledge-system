@@ -198,3 +198,9 @@ DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 so
 ### 2026-10-06 N11/N12 검토 입력 준비 — 완료 수 증가 없음
 
 N11 [DEV7개/프로토콜 초안](./N11-FRESH-EVALUATION-PREPARATION.md)은 source-bound이며 미승인, 새 FINAL0, 실행0, execution_allowed/release_eligible false다. N12 [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md)는20타입/3요구/4기준·27원문span SHA와6정확테스트를 대조했다. 모든 객체 proposed, 사람 판정0, 실제 통합 snapshot/lock/관계 및 N14 변경 수용 미완료다. 사용자에게 내용/후보 관계 판정·검토자·실제 활동 시간을 요청했다. N15–17 native Linux/운영 담당·공개키 신뢰/RTO/RPO 질문도 대기다. 완료8/18(요청15개 중5), 잔여N08–12/N14–18 10개를 유지한다. 이 준비를 합격 또는 사용자 승인으로 기록하지 않는다.
+
+### 2026-10-06 N11 입력 검사 세부 검증
+
+source/gold/사전동결·검토·cluster/관측FINAL 재사용 검사를 scripts/refactoring-eval-input-check.py에 구현했다.10개 구조 시험과 실제DEV초안 거부exit2를 확인했다. known-final-observations는 기존4800행/14묶음을9rowsSHA에 연결한 읽기 전용 추출이며 신규평가가 아니다. [N11 준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 범위를 따른다. N11 승인/새FINAL/실험0, N12 사람판정 대기, N15–17 실제환경/권한·키/복구입력 대기. N11 전체완료나 release승격 없이8/18/잔여10을 유지한다. 다음은실제검토 반영·새독립FINAL gold/분할 사전검토 및 runtime/dataset/runner guard다.
+
+N11 live BGE 식별은2026-10-06T07:03:38Z에 승인 digest/1024/options 일치(Ollama0.35.1)로 확인했다. 고정식별문장1회, 평가질문0, unload0이다. 실험시점 재검증/통합원천·binary/runner guard는 남는다. 입력 검사 구현과 이 시점 신원을 source binding에 추가하지만 N11 전체를 완료로 체크하지 않는다.

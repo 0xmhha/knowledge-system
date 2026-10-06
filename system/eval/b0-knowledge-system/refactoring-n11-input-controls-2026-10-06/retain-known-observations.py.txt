@@ -1,0 +1,22 @@
+import collections,datetime,gzip,hashlib,json,pathlib
+root=pathlib.Path.cwd();out=root/'system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06'
+prefix=root/'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-after-development-freeze'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+summary=json.load(open(prefix/'final-summary-corrected.json'))
+old=root/'system/eval/b0-knowledge-system/protocol-m2max-draft.json';questions=root/'system/eval/b0-knowledge-system/questions.json';fixtures=root/'system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json'
+proto=json.load(open(old));observations={};sources={};total=0
+for kind,binding in summary['bindings'].items():
+ p=prefix/kind/'matrix/rows.jsonl.gz';digest=hashlib.sha256();n=0
+ with gzip.open(p,'rb') as stream:
+  for line in stream:
+   digest.update(line);row=json.loads(line);n+=1
+   stamp=row['call']['completed_at'];datetime.datetime.fromisoformat(stamp)
+   cluster=row['request_id'] if kind=='static-final' else '-'.join(kind.split('-')[:2])+'-FINAL'
+   if cluster not in observations or stamp<observations[cluster]['first_observed_at']:
+    observations[cluster]={'first_observed_at':stamp,'timestamp_scope':'earliest retained completed response in this approved FINAL collection; not exhaustive global first observation','final_clusters':[cluster],'questions_sha256':sha(questions),'protocol_sha256':sha(old),'fixture_manifest_sha256':sha(fixtures),'source_rows':str(p.relative_to(root)),'request_id':row['request_id']}
+ assert digest.hexdigest()==binding['rows_sha256'],kind+' raw rows hash differs'
+ sources[str(p.relative_to(root))]={'compressed_sha256':sha(p),'raw_sha256':digest.hexdigest(),'rows':n};total+=n
+assert total==4800 and set(observations)==set(proto['final_questions']+proto['synthetic_final_fixtures'])
+(out/'known-final-observations.json').write_text(json.dumps(list(observations.values()),indent=2)+'\n')
+(out/'observation-provenance.json').write_text(json.dumps({'status':'known_observations_retained','scope':'approved FINAL response metadata only; no queries, no new outcomes or quality reevaluation','old_summary_sha256':sha(prefix/'final-summary-corrected.json'),'source_artifacts':sources,'rows_verified':total,'known_observed_clusters':len(observations),'additional_historical_contamination_review_required':True},indent=2)+'\n')
+print('Known FINAL provenance PASS:',total,'retained rows;14 observed clusters;all9 raw rows digests match original corrected summary;no queries executed')
