@@ -200,3 +200,12 @@ N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 생략이 있으면 `evidence_state=partial` 및 `metadata.evidence_budget`의 요청/unique/선택/생략 수, raw/public bytes, 이유를 integrity에 포함한다. scope는 optional knowledge/trace를 추가하기 전 `retained_core`다. 정상/중복/빈 입력의 metadata는 기존 형식을 유지한다. 비밀drop은 별도 partial이며 budget 진단이 없다. Stamp/Verify도 전체 공개body32k를 검사한다. partial knowledge addition은 완성된 policy/trace로 해석하지 않고 기존 budget/unknown fallback을 유지한다.
 
 공개 registered JSON-RPC의 controlled backend excerpts + 실제 보관 원문 시험에서 partial 및 typed error의 분모를 확인했다. 별도 native Darwin ARM64 실제 graph/vector/mock stdio MCP3요청도 실행했다. 이 native fixture는 upstream에서 큰 본문을 제외해 complete0/complete2/complete2를 반환했으며, **native fixture가 N-07 오류 경계를 재현했다고 주장하지 않는다**. exact32000/32001 UTF-8 bytes, CRLF/원문hash, sanitizer 확장, duplicate/zero/drop, 생략 후보의 foreign/missing/corrupt, metadata tamper, semantic scope/budget/trace fallback 및13개 패키지 race를 검증했다. 이전 FINAL 및 승인 입력5개는 불변이다. 품질/기권/성능 합격은 별도 N-08–11이다.
+
+## N-11: 새 평가 사전 동결
+
+**상태: 설계/입력 준비.** [검토 입력과 실행 순서](./REFACTORING-DEPENDENCY-REVIEW.md)의 모델·8arm·안전/품질/비용 임계치와 독립 표본 규칙을 유지한다. 이미 관측한 FINAL을 재사용하지 않는다. 질문/gold/독립 단위/분할/출처를 정리한 후 새 사전 검토를 받으며, 결과 관측 이전에 바이트를 고정한다. 아직 새 입력의 승인·실험 결과를 기록하지 않았다.
+
+- [ ] N11-A 새 DEV/독립 FINAL과 원문 gold·출처·독립 단위/cluster 및 기존 FINAL 제외를 검토 가능하게 작성.
+- [ ] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
+- [ ] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
+- [ ] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
