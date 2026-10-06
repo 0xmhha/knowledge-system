@@ -103,3 +103,10 @@ current·실제 rollback 참조·명시 보호·유효하게 해제되지 않은
 `reindex-resources` status는 소스 수/bytes, Git bundle bytes, 출력과 temp staging free bytes, staging+reserve 최소logical bytes, deadline 및 승격 전 실제candidate bytes를 보고한다. 엔진 출력/FS overhead 예상은null이며 절대경로나 원문을 포함하지 않는다. 여유공간 probe는 순간값으로 외부프로세스의 후속 할당을 보장하지 않는다.
 
 공개 `resource_limit`과 `build_timeout`은 제한/용량 부족과 실제deadline을 구분한다. 같은부모deadline을 연장하지 않고 engine/test command group과 출력읽기를 취소한다. rename전취소는current보존, rename후는필수sync를마치며 오류는 `durability_uncertain`을우선한다. kernel I/O를 강제중단한다는 보장은없다. native Linux/실규모 지원은 별도 검증 대상이다.
+
+
+### 보관 인용 예산 (N-07)
+
+v2 본문은32000bytes, citation은12개다. 최대128개 candidate refs를 입력 순위대로 검증하고 전체 원문 span을 선택한다. oversized span은 잘라 반환하지 않고 이후 적합한 span을 검토한다. raw/source 좌표·hash는 원문 그대로이며 공개 text는 필수 sanitizer를 거친다. 생략된 후보의 foreign/missing/corrupt도 거부한다.
+
+생략이 있으면 partial과 선택 진단 `metadata.evidence_budget`를 integrity에 포함한다. `scope=retained_core`의 수치는 optional knowledge/trace 추가 전 core 선택을 설명한다. 하나도 맞지 않는 비어 있지 않은 입력은 typed `budget_exceeded`이며 public error에는 파일·원문을 포함하지 않는다. zero refs는 complete empty, secret drop은 별도 partial이고 원문/신원 오류는 별도 코드다. Stamp/Verify는 semantic overlay 이후 전체body32k도 검사한다. 정상 응답의 optional budget field는 생략돼 기존 v2 golden/legacy v1 형식을 보존한다.

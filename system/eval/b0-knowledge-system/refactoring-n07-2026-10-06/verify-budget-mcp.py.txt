@@ -1,0 +1,58 @@
+import hashlib,json,os,pathlib,select,subprocess,tempfile,time
+repo=pathlib.Path.cwd();e=repo/'system/eval/b0-knowledge-system/refactoring-n07-2026-10-06';bins=pathlib.Path('/private/tmp/ks-n07-bin')
+root=pathlib.Path(tempfile.mkdtemp(prefix='cks-n07-cli-'));src=root/'source';src.mkdir();ds=root/'dataset'
+(src/'go.mod').write_text('module example.org/budgetfixture\n\ngo 1.25.13\n')
+(src/'main.go').write_text('package fixture\n\nfunc OversizeEvidenceMarker() string { /* '+('x'*33000)+' */ return "large" }\n\nfunc SmallEvidenceMarker() int { return 7 }\n')
+config=root/'setup.yaml';config.write_text(f'project_id: n07-fixture\nsource_mode: snapshot-only\nsrc: {src}\nout: {ds}\ngraph_bin: {bins/"ckg"}\nvector_bin: {bins/"ckv"}\nembedder: mock\n')
+r=subprocess.run([str(bins/'cks'),'setup','--config',str(config),'--version','v1','--progress','json'],capture_output=True,text=True,timeout=45)
+(e/'setup.stdout.log').write_text(r.stdout);(e/'setup.stderr.log').write_text(r.stderr);assert r.returncode==0,r.stderr
+runtime=root/'runtime.yaml';runtime.write_text(f'''version: 1
+name: n07-budget
+backends:
+  ckg:
+    path: {ds/'current/graph/graph.db'}
+    source_root: {src}
+  ckv:
+    path: {ds/'current/vector'}
+    provider: mock
+    embed_dim: 64
+    embed_model: mock-feature-hash-v1
+listen:
+  transport: stdio
+logging:
+  level: error
+  mode: prod
+  footprint_dir: {root/'footprints'}
+  audit_dir: {root/'audit'}
+sanitize:
+  rules_path: {repo/'system/policies/sanitization_rules.yaml'}
+''')
+env=os.environ.copy();env['KNOWLEDGE_MCP_NAMESPACE']='cks';stderr=(e/'mcp.stderr.log').open('w');server=subprocess.Popen([str(bins/'cks'),'mcp','--config',str(runtime)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=stderr,text=True,env=env);responses=[]
+def rpc(request):
+ server.stdin.write(json.dumps(request)+'\n');server.stdin.flush();deadline=time.monotonic()+15
+ while time.monotonic()<deadline:
+  ready,_,_=select.select([server.stdout],[],[],.2)
+  if ready:
+   line=server.stdout.readline();assert line,server.poll();value=json.loads(line);responses.append(value)
+   if value.get('id')==request['id']:return value
+ raise AssertionError('MCP response timeout')
+results=[]
+try:
+ rpc({'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'budget-native-fixture','version':'1'}}})
+ server.stdin.write(json.dumps({'jsonrpc':'2.0','method':'notifications/initialized'})+'\n');server.stdin.flush()
+ for i,prompt in enumerate(['OversizeEvidenceMarker','OversizeEvidenceMarker SmallEvidenceMarker','SmallEvidenceMarker'],2):
+  response=rpc({'jsonrpc':'2.0','id':i,'method':'tools/call','params':{'name':'cks.context.get_for_task_v2','arguments':{'prompt':prompt}}});assert 'error' not in response,response
+  result=response['result'];pack=result['structuredContent']
+  if result.get('isError'):
+   assert pack['code']=='budget_exceeded',pack;state='error';citations=0;bodybytes=0
+  else:
+   canonical=json.loads(json.dumps(pack));expected_hash=canonical['metadata'].pop('integrity_hash');assert hashlib.sha256(json.dumps(canonical,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()==expected_hash
+   state=pack['evidence_state'];citations=len(pack['citations']);bodybytes=sum(len(x['text'].encode()) for x in pack['bodies']);assert citations<=12 and bodybytes<=32000
+  assert str(root) not in json.dumps(result)
+  results.append({'prompt':prompt,'state':state,'citation_count':citations,'body_bytes':bodybytes,'budget_diagnostic':pack.get('metadata',{}).get('evidence_budget'),'error_code':pack.get('code')});print(prompt,state,citations,bodybytes,flush=True)
+finally:
+ server.stdin.close();server.stdin=None
+ try:server.communicate(timeout=10)
+ except subprocess.TimeoutExpired:server.kill();server.communicate(timeout=10)
+ stderr.close();(e/'mcp-responses.json').write_text(json.dumps(responses,indent=2)+'\n')
+(e/'mcp-results.json').write_text(json.dumps({'success':True,'scope':'native real engines/mock public stdio MCP; synthetic structural DEV, no retrieval quality claim','cases':results,'binary_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in bins.iterdir()}},indent=2)+'\n')

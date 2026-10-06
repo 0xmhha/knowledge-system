@@ -185,3 +185,8 @@ DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 so
 ### 2026-10-06 N-06 완료 / 다음 N-07
 
 공개CLI의 상한/deadline 무시 RED4개를 측정하고 실제CLI12사례 및 상한/외부origin/취소/프로세스/내구성 경계와 관련race로 검증했다. [실행 명세](./REFACTORING-EXECUTION-SPEC.md), [N-06 DEV](../../system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/manifest.json)를 기준으로 한다. N-01–06 완료6/18, 요청15개 중3완료, 잔여N-07–18 12개. 다음은N-07 본문32000bytes/12citation의 원문span선택·partial/typedbudget 계약이다. N-11 새로운 사전평가/실제파일럿/운영은 이전preview 승인으로 채우지 않는다. 열린PR없음,main/origin/main1ded9b3동기화; 후속로컬소스는기존feature브랜치이며새PR/푸시는아직수행하지않았다.
+
+
+### 2026-10-06 N-07 완료 / 다음 N-11
+
+[N-07 새 DEV](../../system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json)는 본문32000bytes/12citation의 전체 span 선택·partial 진단·typed budget 오류를 검증했다. registered public RPC에서 경계를 재현했고 native 실제 엔진 MCP는 upstream 큰본문 제외로 별도 호환성 증거다.13개 패키지 race와 byte/hash/sanitize/scope/semantic 경계를 통과했다. N-01–07 완료7/18, 요청15개 중4완료, 잔여N-08–18 11개. 다음은 튜닝 전 N-11 새 사전평가 입력/프로토콜, N-12 실제 내용 검토, N-13 팩 분리다. 이전 FINAL을 새 holdout/새소스 합격으로 재사용하지 않는다.

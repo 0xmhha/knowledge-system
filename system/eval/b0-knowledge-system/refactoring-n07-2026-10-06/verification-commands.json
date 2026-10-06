@@ -1,0 +1,131 @@
+{
+  "red-budget.log": {
+    "exit_code": 1,
+    "argv": [
+      "go",
+      "test",
+      "./internal/system/evidencev2",
+      "-run",
+      "^TestBudget",
+      "-v",
+      "-count=1"
+    ],
+    "phase": "before retained budget selection implementation",
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "green-budget.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./internal/system/evidencev2",
+      "./internal/system/mcp",
+      "-run",
+      "^TestBudget|^TestV2ToolError|^TestBuild|^TestV2Integrity",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "green-mcp-overlays.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./internal/system/mcp",
+      "./internal/system/evidencev2",
+      "-run",
+      "^TestV2ToolBudget|^TestAttach",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "final-budget-boundaries.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/system/evidencev2",
+      "./internal/system/mcp",
+      "-run",
+      "^TestBudget|^TestV2.*Budget|^TestAttachKnowledge",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "race-regression.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/system/evidencev2",
+      "./internal/system/mcp",
+      "./internal/setup",
+      "./pkg/system/contract",
+      "./internal/system/composer/...",
+      "./cmd/cks/mcpcli",
+      "./internal/system/patch",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false"
+    }
+  },
+  "mcp-run.log": {
+    "exit_code": 0,
+    "argv": [
+      "python3",
+      "system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/verify-budget-mcp.py.txt"
+    ],
+    "env": {}
+  },
+  "vet.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "vet",
+      "./internal/system/evidencev2",
+      "./internal/system/mcp",
+      "./internal/setup",
+      "./pkg/system/contract",
+      "./internal/system/composer/...",
+      "./cmd/cks/mcpcli",
+      "./internal/system/patch"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "boundaries.log": {
+    "exit_code": 0,
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ],
+    "env": {}
+  },
+  "docs.log": {
+    "exit_code": 0,
+    "argv": [
+      "make",
+      "docs-check"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  }
+}

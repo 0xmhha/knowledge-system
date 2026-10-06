@@ -132,7 +132,7 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-04 | WAL·linked RED→GREEN, 8+5 실패 경계·7 SIGKILL 복구·CLI 7+2·9패키지 race | 완료 |
 | 2026-10-06 | N-05 | GC API RED→GREEN·5 중단/취소 경계·2 process crash·공개 CLI 12사례와 live MCP pin·6패키지 race | 완료 |
 
-**현재:** N-01–06 완료(6/18). **다음:** N-07 보관 근거 예산/부분 상태. **전체 잔여:** N-07–18, 12개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01–07 완료(7/18). **다음:** N-11 사전평가 입력·프로토콜 준비, 이어 N-12/13. **전체 잔여:** N-08–18, 11개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
 
 ## N-05: 보존 정책·검토 가능한 GC와 reader pin
 
@@ -183,13 +183,20 @@ N-06 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 
 ## N-07: 보관 원문 인용의 본문 예산
 
-**상태: 설계.** retrieval의 토큰 추정과 달리 retained 원문이 32000bytes를 넘을 때 전체 요청 오류가 발생한다. 새 구조 DEV를 사용하며 이미 관측한 FINAL/gold/임계치는 변경하지 않는다.
+**상태: 완료 · 2026-10-06.** retrieval의 토큰 추정과 달리 retained 원문이 32000bytes를 넘을 때 전체 요청 오류가 발생한다. 새 구조 DEV를 사용하며 이미 관측한 FINAL/gold/임계치는 변경하지 않는다.
 
 - upstream 선택 순위를 유지하고 **전체 원문 span 단위**로 12citation/32000bytes 안에 들어가는 검증·sanitized 근거를 선택한다. 긴 span을 자르거나 좌표·원문 hash를 다시 만들어 적합한 것으로 보이지 않는다. oversized 첫 span 때문에 뒤의 적합한 span을 버리지 않는다.
 - 생략이 있으면 partial과 한정된 예산 진단(요청/중복/선택/생략 수·원문/공개body bytes)을 integrity에 포함한다. 하나도 맞지 않는 비어 있지 않은 입력은 typed budget 오류로 구분한다. 무인용/비밀drop·source_missing/snapshot_mismatch는 별개의 상태/오류로 유지한다. 비교 분모에 error/partial/complete를 모두 남긴다.
 - 모든 요청 좌표·원문 신원을 검증한다. 생략 후보의 foreign commit/누락/변조를 예산 때문에 숨기지 않는다. sanitizer 이후 바이트도 제한한다. knowledge/trace의 일부 근거를 완성된 정책/trace로 승격하지 않고 기존 fallback을 유지한다. 기존 정상 v2 hash/legacy v1 계약은 유지한다.
 
-- [ ] N07-A 독립 DEV에서 byte/citation 경계·oversized→fitting·모두초과 RED→GREEN 및 원문좌표/hash 무절단.
-- [ ] N07-B 안전한 partial/typed budget/정상·중복·zero/drop 분모와 integrity/상한 검증.
-- [ ] N07-C 생략 span 포함 source_missing/mismatch/비밀·scope/knowledge/trace 허위 수용0.
-- [ ] N07-D 실제 공개 MCP 경로와 관련 회귀·입력/소스/원자료 바인딩·이전FINAL 불변.
+- [x] N07-A 독립 DEV에서 byte/citation 경계·oversized→fitting·모두초과 RED→GREEN 및 원문좌표/hash 무절단.
+- [x] N07-B 안전한 partial/typed budget/정상·중복·zero/drop 분모와 integrity/상한 검증.
+- [x] N07-C 생략 span 포함 source_missing/mismatch/비밀·scope/knowledge/trace 허위 수용0.
+- [x] N07-D 실제 공개 MCP 경로와 관련 회귀·입력/소스/원자료 바인딩·이전FINAL 불변.
+
+
+N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json). 새 구조 DEV의 oversized first span→later fitting 및13candidate 입력에서 RED를 재현했다. GREEN은 입력 순위를 유지하고 원문 span 전체를 선택한다. raw 및 sanitizer 이후 본문 모두32000bytes, 인용12개를 지킨다. 한 개도 맞지 않으면 `ErrEvidenceBudget`이며 공개 MCP는 경로 없는 `budget_exceeded`로 반환한다. 허용 candidate 입력은128개로 제한한다. request-local visitor는 모든 좌표와 전체 archive를 전후 검증하고 한 span씩 처리하므로 생략 원문을 결과 배열에 축적하지 않는다. fail-closed/source_missing/mismatch는 예산으로 덮지 않는다.
+
+생략이 있으면 `evidence_state=partial` 및 `metadata.evidence_budget`의 요청/unique/선택/생략 수, raw/public bytes, 이유를 integrity에 포함한다. scope는 optional knowledge/trace를 추가하기 전 `retained_core`다. 정상/중복/빈 입력의 metadata는 기존 형식을 유지한다. 비밀drop은 별도 partial이며 budget 진단이 없다. Stamp/Verify도 전체 공개body32k를 검사한다. partial knowledge addition은 완성된 policy/trace로 해석하지 않고 기존 budget/unknown fallback을 유지한다.
+
+공개 registered JSON-RPC의 controlled backend excerpts + 실제 보관 원문 시험에서 partial 및 typed error의 분모를 확인했다. 별도 native Darwin ARM64 실제 graph/vector/mock stdio MCP3요청도 실행했다. 이 native fixture는 upstream에서 큰 본문을 제외해 complete0/complete2/complete2를 반환했으며, **native fixture가 N-07 오류 경계를 재현했다고 주장하지 않는다**. exact32000/32001 UTF-8 bytes, CRLF/원문hash, sanitizer 확장, duplicate/zero/drop, 생략 후보의 foreign/missing/corrupt, metadata tamper, semantic scope/budget/trace fallback 및13개 패키지 race를 검증했다. 이전 FINAL 및 승인 입력5개는 불변이다. 품질/기권/성능 합격은 별도 N-08–11이다.

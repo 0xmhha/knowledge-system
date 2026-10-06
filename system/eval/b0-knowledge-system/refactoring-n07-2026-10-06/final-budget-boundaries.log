@@ -1,0 +1,62 @@
+=== RUN   TestBudgetSkipsWholeOversizeSpanAndKeepsLaterEvidence
+--- PASS: TestBudgetSkipsWholeOversizeSpanAndKeepsLaterEvidence (0.05s)
+=== RUN   TestBudgetCitationSelectionKeepsRankAndEntireSpans
+--- PASS: TestBudgetCitationSelectionKeepsRankAndEntireSpans (0.04s)
+=== RUN   TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow
+=== RUN   TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow/exact
+=== RUN   TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow/one-byte-over
+--- PASS: TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow (0.15s)
+    --- PASS: TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow/exact (0.05s)
+    --- PASS: TestBudgetExactByteBoundaryDuplicateZeroAndTypedOverflow/one-byte-over (0.04s)
+=== RUN   TestBudgetPostSanitizationExpansionAndIntegrity
+--- PASS: TestBudgetPostSanitizationExpansionAndIntegrity (0.13s)
+=== RUN   TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence
+=== RUN   TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/foreign
+=== RUN   TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/missing
+=== RUN   TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/corrupt
+--- PASS: TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence (0.10s)
+    --- PASS: TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/foreign (0.03s)
+    --- PASS: TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/missing (0.03s)
+    --- PASS: TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence/corrupt (0.03s)
+=== RUN   TestBudgetStampEnforcesGlobalBodyLimit
+--- PASS: TestBudgetStampEnforcesGlobalBodyLimit (0.03s)
+=== RUN   TestBudgetSecretDropRemainsPartialWithoutBudgetError
+--- PASS: TestBudgetSecretDropRemainsPartialWithoutBudgetError (0.05s)
+=== RUN   TestBudgetOversizeCannotHideFailClosedSanitizer
+--- PASS: TestBudgetOversizeCannotHideFailClosedSanitizer (0.04s)
+=== RUN   TestAttachKnowledgeIncludesReviewedArchivedDecision
+--- PASS: TestAttachKnowledgeIncludesReviewedArchivedDecision (0.13s)
+=== RUN   TestAttachKnowledgeCitesReviewedLocalRelationWithoutInventingExternalLinks
+--- PASS: TestAttachKnowledgeCitesReviewedLocalRelationWithoutInventingExternalLinks (0.17s)
+=== RUN   TestAttachKnowledgeUsesReviewedArchivedPolicyWithoutReplacingBase
+--- PASS: TestAttachKnowledgeUsesReviewedArchivedPolicyWithoutReplacingBase (0.10s)
+=== RUN   TestAttachKnowledgeHidesRestrictedPolicyAndPreservesBase
+--- PASS: TestAttachKnowledgeHidesRestrictedPolicyAndPreservesBase (0.08s)
+=== RUN   TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure
+=== RUN   TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/conflict
+=== RUN   TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/restricted_over_conflict
+=== RUN   TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/expired
+=== RUN   TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/corrupt_archive
+--- PASS: TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure (0.40s)
+    --- PASS: TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/conflict (0.14s)
+    --- PASS: TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/restricted_over_conflict (0.10s)
+    --- PASS: TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/expired (0.09s)
+    --- PASS: TestAttachKnowledgeConflictRestrictionExpiryAndArchiveFailure/corrupt_archive (0.06s)
+=== RUN   TestAttachKnowledgeCitationBudgetPreservesBase
+--- PASS: TestAttachKnowledgeCitationBudgetPreservesBase (0.14s)
+PASS
+ok  	github.com/0xmhha/knowledge-system/internal/system/evidencev2	3.155s
+=== RUN   TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators
+=== RUN   TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators/budget-error
+    get_for_task_v2_budget_test.go:50: registered public response fitting=false: {"content":[{"text":"code=budget_exceeded: No complete retained evidence span fits the response budget.","type":"text"}],"isError":true,"structuredContent":{"code":"budget_exceeded","message":"No complete retained evidence span fits the response budget."}}
+=== RUN   TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators/partial
+    get_for_task_v2_budget_test.go:50: registered public response fitting=true: {"content":[{"text":"v2 evidence pack","type":"text"}],"structuredContent":{"bodies":[{"citation":{"base_commit":"","commit_hash":"","content_sha256":"93d868f3b59590f611d7646894ce8def1cea5ad63a9af0d9ccc56e9bc6968c11","dataset_id":"5caccf22025f6b0eb516c5110e92f65ac91d81f94cb9df11c8ecc9cc2e480ccd","end_line":2,"file":"README.md","file_sha256":"88f90534c801063fa3ca8e3e55f23156d2204d29cd8602e5e8d0e91d1913cb66","origin_id":"repo","project_id":"p","snapshot_id":"13da202a3a5cc2a14c6c2ea70be09cd1aa6855bbd44f7af3d62dbc6291ee22f4","source_mode":"snapshot-only","start_line":2},"text":"safe\n"}],"citations":[{"base_commit":"","commit_hash":"","content_sha256":"93d868f3b59590f611d7646894ce8def1cea5ad63a9af0d9ccc56e9bc6968c11","dataset_id":"5caccf22025f6b0eb516c5110e92f65ac91d81f94cb9df11c8ecc9cc2e480ccd","end_line":2,"file":"README.md","file_sha256":"88f90534c801063fa3ca8e3e55f23156d2204d29cd8602e5e8d0e91d1913cb66","origin_id":"repo","project_id":"p","snapshot_id":"13da202a3a5cc2a14c6c2ea70be09cd1aa6855bbd44f7af3d62dbc6291ee22f4","source_mode":"snapshot-only","start_line":2}],"coordinates":{"base_commit":"","dataset_id":"5caccf22025f6b0eb516c5110e92f65ac91d81f94cb9df11c8ecc9cc2e480ccd","project_id":"p","snapshot_id":"13da202a3a5cc2a14c6c2ea70be09cd1aa6855bbd44f7af3d62dbc6291ee22f4","source_mode":"snapshot-only"},"evidence_state":"partial","format_version":2,"graph_neighbors":[],"metadata":{"evidence_budget":{"max_body_bytes":32000,"max_citations":12,"omitted_references":1,"reasons":["body_bytes"],"requested_references":2,"scope":"retained_core","selected_body_bytes":5,"selected_citations":1,"selected_raw_bytes":5,"unique_references":2},"integrity_hash":"f1c3d24e00c3f4aa4c84951280476c7e0743b3adcfe2b76de685f997435245c1","integrity_hash_algo":"sha256-v2"},"query":"Alpha","semantic":null}}
+--- PASS: TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators (0.19s)
+    --- PASS: TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators/budget-error (0.10s)
+    --- PASS: TestV2ToolBudgetPartialAndTypedErrorPreserveDenominators/partial (0.09s)
+=== RUN   TestV2BudgetErrorRequiresTypedCause
+--- PASS: TestV2BudgetErrorRequiresTypedCause (0.00s)
+=== RUN   TestV2UsesBudgetedBodiesWithoutExpandingEdgeOnlyCitations
+--- PASS: TestV2UsesBudgetedBodiesWithoutExpandingEdgeOnlyCitations (0.06s)
+PASS
+ok  	github.com/0xmhha/knowledge-system/internal/system/mcp	2.279s
