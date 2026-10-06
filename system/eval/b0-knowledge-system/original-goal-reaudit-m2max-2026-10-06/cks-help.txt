@@ -1,0 +1,29 @@
+System engine: fused graph+vector retrieval and its toolchain
+
+Usage:
+  cks [command]
+
+Available Commands:
+  agent       Compose LLM-ready context for a task (prompt in, markdown out)
+  completion  Generate the autocompletion script for the specified shell
+  doctor      Inspect a project and its active graph/vector dataset
+  domain      Domain-knowledge toolchain (export, sync, verify, ...)
+  eval        Run retrieval-quality scenarios and emit a JSON metric report
+  eval-gate   Compare eval output against the committed baseline; fail on regression
+  filelist    Derive the build-scope file list from a filelist.yaml
+  help        Help about any command
+  init        Write a project-specific setup config without indexing
+  knowledge   Validate and lock local domain knowledge packs
+  mcp         Serve the fused knowledge MCP server (foreground)
+  package     Verify installed package artifacts
+  patch       Record external patch identity, test execution and criterion review
+  rollback    Switch current to a previously verified dataset version
+  semantic    Inspect source-backed semantic projections
+  setup       Build a knowledge dataset (graph + vector + verification)
+  viewer      Serve the unified dashboard (graph + vector UI)
+
+Flags:
+  -h, --help      help for cks
+  -v, --version   version for cks
+
+Use "cks [command] --help" for more information about a command.

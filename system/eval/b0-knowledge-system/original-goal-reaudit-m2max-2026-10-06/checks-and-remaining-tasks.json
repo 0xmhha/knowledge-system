@@ -1,0 +1,161 @@
+{
+  "checked_at": "2026-10-06T01:36:12.651717+00:00",
+  "audit_baseline": "04d3bfdf55f488ef6192e218579b694e3cf58024",
+  "baseline_code_document_hashes_verified": 39,
+  "history_snapshots_verified": 3,
+  "original_requested_documents_not_locally_available": 3,
+  "new_tasks": 18,
+  "completed_implementation_in_this_audit": 0,
+  "tasks": [
+    {
+      "id": "N-01",
+      "priority_dependencies": "P1 · 독립",
+      "current_evidence_state": "원문 미확보·추적 문서 과거 상태 남음",
+      "work": "최초 요구사항/WBS/PDF 개선 원문3개를 원래 머신/보유 Git/원격 자료에서 복구해 SHA/commit 보관. EXECUTION/PDF 추적의 과거 실측 대기 문구에 현재 감사 연결",
+      "completion_condition": "원문 확보 및 WBS/FR/INV/NFR 누락 대조, 또는 계속 미확보를 명시한 제한. 과거 기록은 보존",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-02",
+      "priority_dependencies": "**P0 · 바로 다음**",
+      "current_evidence_state": "코드 차이 확인: MCP ops.index 직접 live write",
+      "work": "pinned v2에서 활성 DB를 직접 수정하지 않게 거부/후보 빌드 경로로 통일. legacy 유지보수 동작과 migration 경계 명시",
+      "completion_condition": "한 엔진 실패/혼입/취소에도 이전current·신원·원문 보존; 실제 공개 MCP와 versioned setup 경로의 동일 후보/승격 증거",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-03",
+      "priority_dependencies": "**P0 · N-02와 관련**",
+      "current_evidence_state": "코드 차이 확인: 빌드 O_EXCL/PID/6시간, 승격 flock",
+      "work": "v2 빌드/승격/rollback의 OS 잠금 계약 정리·구현. 살아 있는 긴 빌드의 age reclaim·동시 회수 경합을 재현",
+      "completion_condition": "긴 live holder/동시 요청/owner crash에서 두 writer 없음; PID·나이로 살아 있는 잠금 탈취 없음; legacy 호환 정책 기록",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-04",
+      "priority_dependencies": "**P0 · N-03**",
+      "current_evidence_state": "내구성 미검증: current rename 뒤 parent sync 없음",
+      "work": "DB checkpoint/close·source/manifest/candidate sync·current 전환/부모 sync 순서와 crash recovery 계약 보강",
+      "completion_condition": "전환 단계별 실패/강제 종료 주입으로 이전 또는 완성된 새candidate만 관측. 전원 차단 검증/한계는 플랫폼별 구분",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-05",
+      "priority_dependencies": "P1 · N-03/04",
+      "current_evidence_state": "설계 기능 미구현: GC/보관 용량·기간",
+      "work": "활성·rollback·실행 중 pinned reader·검토 대기 candidate 참조를 보호하는 GC dry-run/실행과 용량/보관 정책·status 보고",
+      "completion_condition": "회수 계획 결정적·참조 중 blob/이력/의미 원문 삭제0; 경합/취소/복구 시험; 실제 삭제 전에 검토 가능한 dry-run",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-06",
+      "priority_dependencies": "P1 · N-03/04",
+      "current_evidence_state": "부분 구현: 캡처 기본 상한만, build2h deadline 없음",
+      "work": "파일 수/단일/총 바이트 상한을 setup/config로 전달, build deadline·용량 예상/여유 공간·공개 resource 상태 구현 또는 계약 수정 검토",
+      "completion_condition": "기본100000/32MiB/4GiB·계약2h와 설정값 결합, 초과/timeout에서 candidate 실패/이전current 보존, 민감 path 비노출",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-07",
+      "priority_dependencies": "**P0 · 새 DEV**",
+      "current_evidence_state": "실패 실측: POLICY03 모든8arm·240행 오류",
+      "work": "32000바이트/12인용 경계 안의 보관 근거 선택/부분 상태 및 안전한 typed budget 오류를 설계하고 독립 DEV 재현 후 수정",
+      "completion_condition": "본문/좌표/해시 훼손 없이 상한 준수; 오류·부분·정상 분모 유지; source_missing/mismatch 구분·권한 누출0; 원 FINAL 불변",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-08",
+      "priority_dependencies": "P1 · N-11, 필요 시N-12",
+      "current_evidence_state": "실패 실측: FINAL 정적 양성Recall1/6·8arm 동일",
+      "work": "CODE/WHY/POLICY/TRACE 기대 근거가 후보/조립에서 빠지는 원인 분리. 새 DEV에서 primary recall·청크·lexical/graph 조합 개선",
+      "completion_condition": "질문/gold hardcode 없음; 원문/프로젝트/모델 신원·기본 안전 유지; 사전 승인 품질/회귀·중요군 수용 기준으로 개선 확인",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-09",
+      "priority_dependencies": "P1 · N-11",
+      "current_evidence_state": "실패 실측: ABS01/02 strict no-citation fail",
+      "work": "무답의 검색 근거 상태와 downstream 답변 보류 계약을 명확히 하고 부적합 인용/무근거 운영 추정을 차단",
+      "completion_condition": "승인된 무답/답가능 대조 사례에서 guard 검증; 사람 기권/기계 무인용 각각 집계; 생성 답변 평가가 없으면null",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-10",
+      "priority_dependencies": "P1 · N-11, N-07/08 영향",
+      "current_evidence_state": "실패 실측/진단: 일부p95비>1.25·neighbors 오류",
+      "work": "model/backend/원문 검증/의미 투영 비용 분해, 비반환 neighbors 오류 원인·영향 확인, 범위 내 비용/오류 개선",
+      "completion_condition": "같은pack·같은ontology·static/dynamic/pooled·warm/cold·성공/오류 분모 유지; 실제K/MID/호출/크기와 회귀1.25 검증; 운영 부하는별도",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-11",
+      "priority_dependencies": "**P1 · 개발 튜닝 전에 준비**",
+      "current_evidence_state": "현FINAL 소그룹n<10·이미 관측",
+      "work": "새 DEV 버전/질문과 결과 사전 비공개 독립 FINAL, 중요군 표본·평가 단위·정답·임계치·회전/비용 조건을 사전 검토·동결",
+      "completion_condition": "충분한 독립 중요군으로 판정하거나 여전히inconclusive/disabled 명시. 반복/언어/상태/HC 문장 표본 부풀림0·이전FINAL 튜닝/holdout 재사용0",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-12",
+      "priority_dependencies": "P1 · 실제 내용 검토",
+      "current_evidence_state": "파일럿개념20/요구사항3 proposed",
+      "work": "실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록",
+      "completion_condition": "실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-13",
+      "priority_dependencies": "P1 · D5/기존D-2",
+      "current_evidence_state": "코드 차이 확인: StableNet catalog generic code",
+      "work": "worksheet 도메인 catalog를 선택형 조직/프로젝트 팩 자료로 분리하고 공통core·무팩 기본경로를 검증",
+      "completion_condition": "엔진에 조직 내용 hardcode 없음; 선택 팩 version/digest·의존/타입/출처 검증; 기존 worksheet·무팩/구팩 호환",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-14",
+      "priority_dependencies": "P2 · N-12",
+      "current_evidence_state": "구조 구현·실제 의미 수용 증거 필요",
+      "work": "실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증",
+      "completion_condition": "테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-15",
+      "priority_dependencies": "P2 · N-02–14 중 변경 영향",
+      "current_evidence_state": "환경/외부 소비자 미검증; 이전preview 제외",
+      "work": "대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증",
+      "completion_condition": "OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-16",
+      "priority_dependencies": "P2 · 운영 출시 범위 결정",
+      "current_evidence_state": "운영키·법무 미승인; test-preview 계약만",
+      "work": "OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토",
+      "completion_condition": "실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-17",
+      "priority_dependencies": "P2 · N-15/16",
+      "current_evidence_state": "OP07–08·실운영복구 미실행; 이전preview 제외",
+      "work": "실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토",
+      "completion_condition": "최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음",
+      "implemented_in_this_audit": false
+    },
+    {
+      "id": "N-18",
+      "priority_dependencies": "**P3 · N-08–17/변경 회귀**",
+      "current_evidence_state": "품질fail·소그룹inconclusive·disabled·release withheld",
+      "work": "새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비",
+      "completion_condition": "합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음",
+      "implemented_in_this_audit": false
+    }
+  ],
+  "new_report_links_verified": 18,
+  "source_frozen": true,
+  "approved_inputs_unchanged": true,
+  "new_tests_or_model_queries": false,
+  "previous_preview_30_task_status": "unchanged, synchronized",
+  "note": "static observations require targeted reproduction before fixes; current .go/.yaml unchanged; baseline document hashes are verified against audited Git HEAD, allowing new audit pointers in live prose"
+}

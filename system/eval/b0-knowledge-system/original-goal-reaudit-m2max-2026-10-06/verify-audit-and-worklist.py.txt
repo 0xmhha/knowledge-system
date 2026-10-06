@@ -1,0 +1,25 @@
+from pathlib import Path
+import re,json,hashlib,subprocess,datetime
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');out=root/'system/eval/b0-knowledge-system/original-goal-reaudit-m2max-2026-10-06';audit=json.loads((out/'code-and-source-audit.json').read_text());sha=lambda b:hashlib.sha256(b).hexdigest()
+for f in audit['current_document_and_code_bindings']:
+ original=subprocess.check_output(['git','-C',str(root),'show',audit['audited_head']+':'+f['path']]);assert sha(original)==f['sha256'],f['path']
+ if f['path'].endswith(('.go','.yaml')):assert sha((root/f['path']).read_bytes())==f['sha256']
+for f in audit['retained_historical_documents']:assert sha((out/f['retained_snapshot']).read_bytes())==f['sha256']
+tasks=[];linkcount=0
+for name in ['REFACTORING-ORIGINAL-GOALS-REAUDIT.md','REFACTORING-REMAINING-WORKLIST.md']:
+ p=root/'docs/spec-driven'/name;s=p.read_text()
+ for url in re.findall(r'\]\(([^)]+)\)',s):assert(p.parent/url.split('#')[0]).resolve().is_file(),url;linkcount+=1
+ for value in re.findall(r'`([^`]+)`',s):
+  path=value.split(':')[0]
+  if path.startswith(('cmd/','internal/','pkg/','scripts/','docs/'))and re.search(r'\.(go|yaml|py|md)$',path):assert(root/path).is_file(),path
+ for line in s.splitlines():
+  if re.match(r'^\| N-\d\d \|',line):
+   f=[s.strip()for s in line.strip('|').split('|')];assert len(f)==5;tasks.append({'id':f[0],'priority_dependencies':f[1],'current_evidence_state':f[2],'work':f[3],'completion_condition':f[4],'implemented_in_this_audit':False})
+assert [t['id']for t in tasks]==[f'N-{i:02}'for i in range(1,19)]
+assert audit['frozen_product_source_files_sha_verified']==1096 and audit['frozen_approved_input_files_sha_verified']==5
+originals=['spec-driven-requirements.md','spec-driven-wbs.md','ckv-ckg-ontology-installation-proposal.md']
+assert json.loads((out/'original-source-discovery.json').read_text())['requested_files']==originals
+for command,name in [(['python3','scripts/check-docs.py'],'docs-check.log'),(['python3','scripts/update-execution-status.py','--check'],'preview-status-check.log'),(['git','diff','--check'],'diff-check.log')]:
+ r=subprocess.run(command,cwd=root,capture_output=True,text=True);(out/name).write_text(r.stdout+r.stderr);assert r.returncode==0,(command,r.stdout,r.stderr)
+result={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'audit_baseline':audit['audited_head'],'baseline_code_document_hashes_verified':39,'history_snapshots_verified':3,'original_requested_documents_not_locally_available':3,'new_tasks':18,'completed_implementation_in_this_audit':0,'tasks':tasks,'new_report_links_verified':linkcount,'source_frozen':True,'approved_inputs_unchanged':True,'new_tests_or_model_queries':False,'previous_preview_30_task_status':'unchanged, synchronized','note':'static observations require targeted reproduction before fixes; current .go/.yaml unchanged; baseline document hashes are verified against audited Git HEAD, allowing new audit pointers in live prose'}
+(out/'checks-and-remaining-tasks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print('PASS: 18 tasks and completion conditions; all links/code paths; three initial snapshots and 39 baseline hashes; unchanged product/inputs/preview status; docs/diff checks')

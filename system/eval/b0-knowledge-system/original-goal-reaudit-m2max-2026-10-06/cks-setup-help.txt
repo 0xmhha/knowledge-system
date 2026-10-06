@@ -1,0 +1,44 @@
+Build a knowledge dataset (graph + vector + verification)
+
+Usage:
+  cks setup [flags]
+
+Aliases:
+  setup, index
+
+Flags:
+  -h, --help   help for setup
+Usage of setup:
+      --cks-bin string                 cks CLI for the domain/filelist steps (default: this executable)
+      --code-root string               working tree the project's authoritative_docs resolve against
+      --config string                  setup config file (e.g. projects/<name>/setup.yaml); explicit flags override its values
+      --derived-dir string             where the derived domain artifacts land (default: generated/ beside domain-knowledge)
+      --domain-knowledge string        project domain-knowledge dir; re-derives the corpus, governance policy and glossary before the builds
+      --embed-dim int                  vector embedding dimension
+      --embedder string                vector embedding backend (mock, bgeonnx, ollama)
+      --filelist string                filelist config; derives <out>/files-from.json and scopes both engine builds
+      --flow-corpus string             curated flow-corpus JSONL embedded with the vector index
+      --gate-min-canonical float       reindex gate: minimum canonical_id coverage (canonical/symbol chunks); 0 disables the check
+      --gate-test-arg stringArray      one argument for --gate-test-bin (repeatable, no shell expansion)
+      --gate-test-bin string           optional test executable; candidate promotes only if it exits 0 on the pinned clean source
+      --glossary-file string           committed alias glossary; checked against the domain entries
+      --graph-bin string               graph engine CLI (default: ckg beside this binary, else PATH)
+      --hold-for-review                gate and retain the version without changing current; use for external patch review
+      --max-git-history-bytes int      maximum retained Git history bundle bytes for pinned builds (default: 1 GiB)
+      --model-name string              vector embedding model name
+      --ollama-url string              ollama endpoint (exported as CKV_OLLAMA_ENDPOINT)
+      --out string                     dataset root; graph index in <out>/graph, vector index in <out>/vector (required)
+      --policy-file string             governance policy YAML for graph enrichment
+      --progress string                progress output: text (stderr) or json (one event per line on stdout) (default "text")
+      --project-id string              stable project identity from cks init
+      --query-prefix-policy string     Ollama query transformation: registry | none
+      --rollback string                blue-green: repoint <out>/current at an existing version and exit (no build)
+      --security-pattern-file string   security-pattern YAML for graph enrichment
+      --semantic-corpus string         reviewed semantic Markdown corpus directory from cks semantic export-text
+      --skip-vector                    build only the graph index
+      --source-mode string             source capture: committed | working-tree | snapshot-only (latter two require --version and --project-id) (default "committed")
+      --src string                     source tree to index (required)
+      --vector-bin string              vector engine CLI (default: ckv beside this binary, else PATH)
+      --vector-build-sources string    JSON with exact Go source paths permitted through CKV's build/ default ignore
+      --vector-policy string           vector chunk-categorization policy YAML
+      --version string                 blue-green: build into <out>/<version>, gate it, then atomically promote <out>/current; "auto" (reserved) names the version <src-commit8>[-<filelist-config-sha8>]

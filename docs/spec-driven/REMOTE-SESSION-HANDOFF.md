@@ -1,5 +1,11 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 요청: 원래 리팩토링 목적 대비 잔여 재감사 (2026-10-06)
+
+사용자가 최초 작업리스트/목적 문서를 찾고 현재 코드와 대조해 남은 작업을 정리하도록 요청했다. [최초 목적 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [새 잔여 목록](./REFACTORING-REMAINING-WORKLIST.md)을 작성했다. 기존 승인 preview30/30 목표 완료는 유효하며 새 구현을 완료했다고 표시하지 않았다. 신규 후속18개(N-01–18), 바로 다음N-02 활성 MCP 쓰기 경로의 실패 재현/후보 빌더 계약이다. 운영 N-15–18은 이전 제외 범위이며 목록 작성만으로 배포/새push/운영 사실 승인이 생기지 않는다.
+
+시작은 2026-09-29 baseline1ded9b3e/첫 실행41fa8817. 최초 EXECUTION·v2순서·상세설계 Git snapshot과 current04d3bfdf 코드/문서39SHA를 새 감사 원장에 보관했다. 원본 study의 spec-driven-requirements/spec-driven-wbs/ckv-ckg-ontology-installation-proposal 3개는 로컬work·study/product보유참조에서 미확보이며 N-01로 유지한다. 현재 확인된 차이는 ops.index live write, v2빌드 age/PID잠금(승격만flock), current rename의부모sync없음, GC/보관용량status없음, capture상한CLI/2h builddeadline없음이다. 신규 장애 재현은 아직 수행하지 않은 정적관측으로 명시했다. actual core20/spec3 proposed, 기존 품질fail/disabled/운영출시보류 유지. 제품1096/기존승인5입력 SHA 동일, 모델/운영설정/사용자폴더 불변.
+
 ## 최신 상태: 2026-10-06 실제 사람 승인·시험 preview 목표 종료
 
 사용자 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**. [실제 승인 원장](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-approval.json)·[사람/paired 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)·[최종 종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)·[작업리스트46절](./EXECUTION-WORKLIST.md)·[현황판](./EXECUTION-STATUS.md)을 현재 기준으로 읽는다. **30/30 완료·승인 범위 잔여0·4/4 stage 판정 완료**. B0 baseline pass/C0 수정·회귀 pass, B1/C1 품질fail·소그룹inconclusive·ontology disabled·운영출시보류다. 작업 종료를 품질 합격/운영 출시로 확장하지 않는다.
