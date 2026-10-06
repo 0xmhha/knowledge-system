@@ -1,0 +1,15 @@
+import hashlib,json,pathlib,subprocess,tempfile,sys
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n11-runner-controls-2026-10-06';binary=pathlib.Path('/private/tmp/ks-n11-runner-bin/cks')
+with tempfile.TemporaryDirectory(prefix='ks-fresh-run-native-controls-') as tmp:
+ t=pathlib.Path(tmp);registry=t/'registry.json';out=t/'output';marker=t/'unexpected-dispatch';stub=t/'marker-child'
+ stub.write_text('#!/bin/sh\ntouch "'+str(marker)+'"\nexit 99\n');stub.chmod(0o700)
+ commands=[('registry-init',[sys.executable,str(root/'scripts/refactoring-eval-run.py'),'init','--registry',str(registry)],0),('registry-reinit-refused',[sys.executable,str(root/'scripts/refactoring-eval-run.py'),'init','--registry',str(registry)],2),('native-binding-requires-environment',[str(binary),'eval','matrix','--evaluation-binding',str(t/'missing-binding.json')],1)]
+ commands.append(('actual-draft-refused',[sys.executable,str(root/'scripts/refactoring-eval-run.py'),'run','--protocol',str(root/'system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/protocol-draft.json'),'--questions',str(root/'system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/dev-candidates.json'),'--known-observations',str(root/'system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/known-final-observations.json'),'--registry',str(registry),'--config',str(t/'not-read.yaml'),'--binary',str(stub),'--output',str(out),'--split','DEV'],2))
+ records=[]
+ for name,command,expected in commands:
+  result=subprocess.run(command,capture_output=True,timeout=30);(e/(name+'.stdout.log')).write_bytes(result.stdout);(e/(name+'.stderr.log')).write_bytes(result.stderr)
+  assert result.returncode==expected,(name,result.returncode,result.stderr)
+  records.append({'case':name,'command':command,'exit_code':result.returncode,'expected':expected})
+ assert not marker.exists() and not out.exists() and json.loads(registry.read_text())=={'schema_version':1,'records':[]}
+ (e/'native-controls.json').write_text(json.dumps({'status':'PASS','scope':'native Darwin CLI rejection and registry controls; no fresh evaluation','cases':records,'unapproved_child_dispatches':0,'actual_registry_reservations':0,'new_final_units':0,'new_retrieval_queries':0,'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()},indent=2)+'\n')
+print('Native controls PASS:4 CLI cases; unapproved child dispatch0; new queries0')

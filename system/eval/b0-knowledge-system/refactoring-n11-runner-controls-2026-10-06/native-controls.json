@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "scope": "native Darwin CLI rejection and registry controls; no fresh evaluation",
+  "cases": [
+    {
+      "case": "registry-init",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/refactoring-eval-run.py",
+        "init",
+        "--registry",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/registry.json"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "case": "registry-reinit-refused",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/refactoring-eval-run.py",
+        "init",
+        "--registry",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/registry.json"
+      ],
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "case": "native-binding-requires-environment",
+      "command": [
+        "/private/tmp/ks-n11-runner-bin/cks",
+        "eval",
+        "matrix",
+        "--evaluation-binding",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/missing-binding.json"
+      ],
+      "exit_code": 1,
+      "expected": 1
+    },
+    {
+      "case": "actual-draft-refused",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/refactoring-eval-run.py",
+        "run",
+        "--protocol",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/protocol-draft.json",
+        "--questions",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/refactoring-n11-input-draft-2026-10-06/dev-candidates.json",
+        "--known-observations",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06/known-final-observations.json",
+        "--registry",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/registry.json",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/not-read.yaml",
+        "--binary",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/marker-child",
+        "--output",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-fresh-run-native-controls-7wq56qfb/output",
+        "--split",
+        "DEV"
+      ],
+      "exit_code": 2,
+      "expected": 2
+    }
+  ],
+  "unapproved_child_dispatches": 0,
+  "actual_registry_reservations": 0,
+  "new_final_units": 0,
+  "new_retrieval_queries": 0,
+  "binary_sha256": "fc06377164abe344038376511bcd8c8cc020b26edf51a986ddc887ad7e0d3e02"
+}

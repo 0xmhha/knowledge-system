@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 현재 후속 실행: N11 runner 보호 검증 (2026-10-06)
+
+사용자 다음 진행에 따라 [N11 실행 보호](./N11-EVALUATION-RUNNER-CONTRACT.md)를 구현했다. 전체 입력 승인/고정 runtime pins를 확인하고 permanent OS flock·내구성 FINAL 예약 뒤 matrix를 호출한다. 예약/실제 관측을 구분하고 wrapper SIGKILL 뒤에도 child 잠금을 유지한다. Python19개, Go binding 정상1/거부10·관련2패키지 race, native CLI4제어 통과. 실제 미승인 초안 child dispatch0/새질의0. **요청15개 중5완료, 전체8/18·잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 실제 DEV/프로토콜·N12 판정 반영과 새 FINAL 검토.** 실제 사람/환경/운영 입력은 아직 대기하며 N11 전체 완료나 품질 합격으로 표시하지 않는다. 아래는 이전 시점 이력이다.
+
 ## 현재 후속 상태: N11 입력 보호·N12 정책/ADR 보완 (2026-10-06)
 
 **완료 N-01–07/N-13 8/18, 요청15개 중5개 완료. 남은 전체 N-08/09/10/11/12/14/15/16/17/18 10개. 다음 N-11 새 사전평가 입력과 N-12 실제 사람 검토 판정.** [진행 원장](./REFACTORING-PROGRESS.json), [명세](./REFACTORING-EXECUTION-SPEC.md), [전체 목록](./REFACTORING-REMAINING-WORKLIST.md)을 현재 기준으로 읽는다.

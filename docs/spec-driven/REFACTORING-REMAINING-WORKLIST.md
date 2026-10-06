@@ -59,3 +59,5 @@ GraphRAG 커뮤니티, RDF/OWL/SHACL, 물리 컬렉션 분할, 긴 함수 overla
 N11 [새 DEV7개/프로토콜 초안](./N11-FRESH-EVALUATION-PREPARATION.md)은 미승인/미실행이며 새 FINAL0이다. N12 실제20타입/3요구/4기준 검토 자료를 요청했고 사람 판정·활동 시간 및 운영 환경/담당 입력을 기다린다. 준비 자료를 완료로 체크하지 않았다.
 
 N12 정책·ADR 원문 주장이 준비 범위에서 누락된 것을 재감사로 발견해 [별도 검토 자료](./N12-POLICY-ADR-REVIEW.md)로 보완했다. 원문 커밋ab77ce56,6주장/12관계 proposed, 원문span 대조 및 실제 CLI4개 음성 제어 통과. 기존27개 사람 검토 요청은 보존한다. 새 주장/관계 승인0, 통합 lock/canonical·의미 수용 미완료이므로 N12 완료 체크와 전체 수는 바꾸지 않는다.
+
+N11-C [실행 보호 세부 단계](./N11-EVALUATION-RUNNER-CONTRACT.md)를 구현·검증했다. 승인된 전체 책/runtime pins 검사와 FINAL durable reservation/영구 OS 잠금을 matrix 경로에 연결했다. Python19개·관련2패키지 race·native CLI4제어 통과, 실제 초안 child dispatch0/질의0. 새 사람 판정과 실제 평가 결과가 없으므로 N11 및 전체 완료 수는 그대로다.

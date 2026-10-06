@@ -243,3 +243,7 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 ### N12 정책·ADR 보완 — 자료 검증 완료 / 사람 판정 대기
 
 [별도6개 검토 항목](./N12-POLICY-ADR-REVIEW.md)과 [원자료 manifest](../../system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/preparation-manifest.json)를 추가했다. actual ExtractMarkdown/ValidateSources 및 공개 semantic review 경로로 현행 정책/채택 ADR의 실제6주장과 SUPPORTS/ABOUT12관계를 추출했다. 모든 보관 span의 커밋·원문SHA를 독립 대조했고 source-hash/cross-snapshot/wrong-direction/unreviewed-parent4개 제어가 거부됐다. original projection 변경0, activation0, 모든 새 항목 proposed이며 실제 사람 precision=null이다. 기존27개 검토 자료와 요청은 변경하지 않는다. standalone committed-source 추출은 통합 snapshot/lock·CKG canonical 또는 의미 수용이 아니므로 N12-A–D는 모두 unchecked다.
+
+### N11-C runner 보호 세부 단계 — 검증 완료 / 전체 미완료
+
+[실행 보호 계약](./N11-EVALUATION-RUNNER-CONTRACT.md)의 사전 입력 검사·frozen runtime/source/model/config/binary/K 결합과 FINAL dispatch 전 영구 OS 잠금/내구성 예약을 구현했다. Python19개·Go binding 정상1/거부10 및 기존2패키지 race, native CLI4제어를 확인했다. 예약은 관측이 아니며 crash/실패 뒤에도 자동 회수하지 않는다. 실제 미승인 DEV 초안은 child dispatch0/새질의0으로 거부됐다. 새 승인·FINAL·실제 평가 결과가 없어 N11-A–D는 모두 미완료다. 원 FINAL/승인 입력은 불변이다.
