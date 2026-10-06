@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 실행 관리: 완료 오표시 방지·N-04 설계 (2026-10-06)
+
+[진행 원장](./REFACTORING-PROGRESS.json)과 `python3 scripts/check-refactoring-progress.py`로 완료3/18·잔여15·다음N-04, 커밋된 수용 명세/원자료/코드 SHA 및 현행 소스/입력 바인딩을 확인한다. N-01의 과거 원자료13/보고서7도 실제 커밋 SHA로 다시 대조한다. N-04는 [실행 명세](./REFACTORING-EXECUTION-SPEC.md)에 DB/WAL·모든 후보 파일/디렉터리·포인터 sync·review-release 복구의 단계별 설계/실패 주입표를 작성했으며 **완료 아님**이다. 다음은 review-release 복구 설계 확정과 단계별 실패 재현/구현이다. 제품 N-04–18 모두 잔여이고 상위 WI10/조건부 운영은 별도다. 후속 source inventory의1100은 Go1098+go.mod/go.sum2 바인딩이다. 아래 문단은 시점별 이력이다.
+
 ## 최신 실행: N-03 공통 OS 잠금 완료 (2026-10-06)
 
 [실행 명세](./REFACTORING-EXECUTION-SPEC.md)와 [후속 전체 목록](./REFACTORING-REMAINING-WORKLIST.md)을 우선한다. **N-01/02/03 완료 3/18, 잔여 N-04–18 15개. 다음 N-04 저장 내구성/전환 순서.** 변경 전 긴 live holder 나이 탈취 및 build 중 pointer 승격을 재현하고, 공통 persistent OS flock+기존 pointer lock으로 수정했다. separate process 8 contender 거부/SIGKILL 회수/동일 inode·legacy live PID·symlink/nonregular 거부·Reindex 자체 승격, 실제 CLI build/rollback 동시 요청 거부 및 N-02 7안전 사례, 5패키지 race/vet를 검증했다. [N-03 새 DEV](../../system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/cli-results.json). 기존 `.reindex.lock`는 unlink하지 않는다. 오래된 writer를 모두 중단 후 업그레이드하며 혼합 writer/network FS를 지원한다고 주장하지 않는다. 실제 Linux/전원 차단은 별도 잔여다. 아래 2/18·16개와 제품1096 불변 기록은 당시 이력이다. 원 FINAL/입력5개·사용자 폴더/Ollama 유지, 새 push/운영 배포 승인 없음.

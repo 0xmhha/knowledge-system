@@ -72,9 +72,41 @@
 
 `.reindex.lock`는 OS 잠금 inode로 영구 유지한다. PID/시간/프로토콜 표시는 진단용이고 live holder의 나이로 삭제하지 않는다. 기존 `.promotion.lock`도 추가 보호로 유지한다. 오래된 writer를 모두 종료하고 새 프로토콜로 전환해야 한다. 구 writer와 신 writer의 동시 업그레이드, flock 의미가 불명확한 network filesystem, 실제 native Linux 실행은 이 증거 범위 밖이다. 이는 N-03의 명시적인 호환/플랫폼 경계이며 운영 환경 사실은 N-15/17에 남긴다. 전원 차단·후보/current fsync 순서는 N-04 미완료다.
 
+## N-04: 후보 저장·current 전환·복구의 내구성
+
+**상태: 설계 / 구현·실패 주입 미완료.** INV-01/02/03·FR-09/10와 A3/A8의 이전 current 또는 완성된 새 후보만 관측하는 계약이다. 프로세스 종료 시험과 전원 차단 시험을 구분한다.
+
+### 설계 범위와 누락 방지
+
+1. 엔진의 DB checkpoint/close 성공을 확인한다. 기존 CKV Checkpoint는 `PRAGMA wal_checkpoint(TRUNCATE)`의 오류만 읽으므로 busy/잔여 WAL도 판정해야 한다. graph/vector/선택 semantic DB와 보관 원문·Git archive·manifest·config/팩 신원을 모두 대상으로 한다. 이미 활성화한 버전의 원문이나 identity를 내구성 작업으로 제자리 재작성하지 않는다.
+2. 빌드/테스트/gate가 만든 모든 후보 파일을 sync하고 하위 디렉터리부터 후보/부모까지 sync한다. 마지막 검증 이후 후보가 바뀌지 않게 N-03 잠금을 유지한다. 검토 보류 기록도 후보 내구성 범위에 포함한다. symlink와 비정규 산출물·실패한 sync는 승격하지 않는다.
+3. 상대 임시 symlink 생성→포인터 rename→dataset 부모 sync의 순서를 고정한다. rename 전에 실패하면 이전 current를 보존하고, rename 뒤 부모 sync 실패는 **미승격으로 단정하지 않는 별도 상태**로 기록한다. 실패 보고를 이유로 무검증 자동 rollback하지 않는다. 재시작은 current/대상 신원·원문·완료 기록을 재검사한다.
+4. 일반 승격뿐 아니라 rollback와 사람 검토 승격도 같은 순서를 적용한다. 현재 사람 검토 경로의 `review-release.json`은 pointer 전환 뒤 쓰인다. 이 사이 중단과 기록 쓰기 실패를 복구 설계에 포함하며, 실제로 승격되지 않은 후보에 재사용 가능한 release 승인을 남기지 않는다. 승인 증거/intent와 실제 포인터 전환 완료를 구분하는 설계를 확정한 뒤 구현한다.
+5. 로컬 Darwin/Linux의 파일·디렉터리 sync 의미와 지원/오류 처리를 기록한다. 실제 전원 차단/스토리지 손실은 프로세스 SIGKILL만으로 증명하지 않는다. 미실측 플랫폼은 제한/미확인으로 유지한다.
+
+### 실패 주입 단계와 수용 체크
+
+| 단계 | 관측/수용 조건 | 상태 |
+|---|---|---|
+| 엔진 checkpoint/close, 후보 파일 sync 이전·도중 | 실패 후보 비활성·이전 current/신원/보관 원문 유지 | 미검증 |
+| 후보 디렉터리/부모 sync, 마지막 gate | 이전 또는 완성 후보; 재시작 시 미완성 후보 승격 없음 | 미검증 |
+| 임시 symlink·rename 직전 | 이전 current 유지; 임시 파일은 결정적으로 정리/무시 | 미검증 |
+| rename 뒤·dataset parent sync 실패 | 현재 관측 대상과 durability 불확실성을 구분; 거짓 미승격/자동 rollback 없음 | 미검증 |
+| 검토 hold/release 기록과 reviewed promotion 사이 | 사람 승인 intent·실제 전환 분리, 실패로 승인 우회·허위 rollback 허용 없음 | 미검증 |
+| 성공·rollback·재시작/강제 종료 | 이전 또는 신원/DB/원문이 완성된 새 버전만 제공 | 미검증 |
+
+- [ ] N04-A DB/WAL/close 및 전체 후보 artifact 내구성 순서.
+- [ ] N04-B current 전환·parent sync와 단계별 실패 주입, 결과 상태 구분.
+- [ ] N04-C 일반/검토 승격·hold/release·rollback와 재시작/강제 종료 복구.
+- [ ] N04-D 플랫폼별 보장/전원 차단 미실측 한계 및 회귀·원자료·소스 바인딩.
+
+### 완료 표시의 자동 검사
+
+[진행 원장](./REFACTORING-PROGRESS.json)을 갱신하고 완료 기록 전 `make refactoring-check`를 반드시 실행한다. 직접 명령은 `python3 scripts/check-refactoring-progress.py`다. 완료 상태는 커밋에 실제 포함된 원자료/문서/변경 코드 SHA 및 당시 완료 명세의 전체 수용 체크를 검증한다. 최신 소스/의존 파일과 승인 입력의 바인딩, 새 Go 파일 누락, 완료표/잔여수/다음 작업의 불일치도 검사한다. 문서만 완료로 바꾸거나 미검증 코드를 추가하면 실패한다. 새 항목 완료 시 그 커밋·manifest·전체 체크와 최신 소스 바인딩을 함께 갱신한다. 정상 상태와 허위 N-04 완료/누락 원자료/옛 소스 바인딩/수용 조건 삭제 4개 음성 제어를 검증했다. [검사 원자료](../../system/eval/b0-knowledge-system/refactoring-progress-guard-2026-10-06/negative-controls.json). 기계 검사는 기록 일관성을 보장하며 목적 적합성·사람/운영 사실의 진실성을 대신하지 않는다. 기존 source inventory의 1099/1100 표시는 Go뿐 아니라 go.mod/go.sum 2개를 포함한 소스·의존 파일 수다.
+
 ## 다음 작업 설계의 준비 조건
 
-N-03은 빌드/승격/rollback의 동일 OS 잠금, 긴 live holder/동시 요청/owner crash 및 legacy 경계 시험을 먼저 작성한다. N-04는 DB close/checkpoint·후보 파일/디렉터리 sync·포인터 rename/부모 sync와 실패 주입 단계표를 먼저 작성한다. 이 두 항목은 N-02의 구현만으로 완료되지 않는다.
+N-03은 수용 조건 검증을 마쳤다. N-04는 위 단계표·review-release 복구 설계를 확정하고 실패 재현/구현을 이어간다. 설계 기록과 완료 표시를 구분한다.
 
 N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 조건을 세분화한다. 새 독립 FINAL(N-11), 실제 파일럿 사실(N-12/14), 운영(N-15–18)의 별도 판정 필요성을 유지한다.
 
@@ -85,5 +117,6 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-01 | 원문 8개/FR10·INV7·NFR5·S9·WBS29 대응 및 SHA 검증, `c9c91ebe` | 완료(기존 기록) |
 | 2026-10-06 | N-02 | 공개 MCP RED→GREEN, shared guard, 실제 CLI 7사례·SHA, race/vet/경계/문서 검증 | 완료 |
 | 2026-10-06 | N-03 | RED→GREEN, 별도 process 8 contender·SIGKILL 회수, CLI build/rollback 차단, race/vet | 완료 |
+| 2026-10-06 | N-04 | DB/WAL/파일/디렉터리/포인터 sync·검토 marker의 단계별 설계/실패 주입표 작성 | 미완료(설계) |
 
-**현재:** N-01/02/03 완료(3/18). **다음:** N-04 저장 내구성/전환 순서 설계와 단계별 실패 재현. **전체 잔여:** N-04–18, 15개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01/02/03 완료(3/18). **다음:** N-04 검토 release 복구 설계 확정·단계별 실패 재현과 구현. **전체 잔여:** N-04–18, 15개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
