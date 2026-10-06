@@ -6,7 +6,7 @@
 
 N11 source/gold·동결/독립 cluster/오염 일관성 검사10개 및 실제 초안 fail-closed를 확인했다. 기존 FINAL4800행/14관측묶음·9SHA를 보존했고 bge-m3 실측 신원은 시간 한정 확인이며 새 평가 결과가 아니다. 새 FINAL0/새 입력 승인0이다. N12 기존27원문span·6테스트 자료 외에 실제 정책·ADR6주장/12관계의 [보완 검토](./N12-POLICY-ADR-REVIEW.md)를 준비했다. 원문SHA/좌표·실제 CLI4개 거부 제어 통과, 모든 항목 proposed/사람판정0/precision=null/통합 lock·canonical 미결합이다. 자료 작성 오류는 교정·보존하며 실제 사람이 반려한 것으로 집계하지 않는다.
 
-GitHub 열린 PR0과 main/origin main 1ded9b3e 일치를 확인했다. 최신 구현/증거는 feat/spec-driven-knowledge-system 로컬에 보존한다. 사람 검토·native LinuxAMD64/실제 소비자·운영 역할/public key 신뢰/RTO/RPO 입력은 미응답이며 승인되지 않은 내용/운영 사실을 만들지 않는다. 아래 최신이라는 이름의 문단들은 이전 시점 이력이다.
+앱 목표는 실제 사람·환경/운영 입력 대기(blocked)이며 전체 완료가 아니다. [재개 조건10개](./REFACTORING-DEPENDENCY-REVIEW.md#현재-실행-대기와-재개-조건)를 확인한다. 검토 자료 로컬 커밋f8479d5c, 사람 응답 후 해당 조건의 다음 작업부터 재개한다. GitHub 열린 PR0과 main/origin main 1ded9b3e 일치를 확인했다. 최신 구현/증거는 feat/spec-driven-knowledge-system 로컬에 보존한다. 사람 검토·native LinuxAMD64/실제 소비자·운영 역할/public key 신뢰/RTO/RPO 입력은 미응답이며 승인되지 않은 내용/운영 사실을 만들지 않는다. 아래 최신이라는 이름의 문단들은 이전 시점 이력이다.
 
 ## 최신 실행: N-05 보존/GC 완료, N-06 설계 (2026-10-06)
 
