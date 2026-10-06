@@ -194,3 +194,7 @@ DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 so
 ### 2026-10-06 N-13 선택형 worksheet catalog 완료
 
 [N13 DEV](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json), [catalog 계약](./WORKSHEET-CATALOG-CONTRACT-V1.md). 기존 hardcoded StableNet8항목을 명시 선택 pack 자료로 이전하고 version/digest/의존/type/출처SHA·좌표를 검증한다. 무팩/구팩 공통경로,8매핑/필터/앵커/빈queue, 실제CLI11회와 기존 파일80개 변경0/자동승격0, 관련5패키지 race 통과. 앵커 검사를 실행하지 않는 생성기가 검사 완료를 주장하던 문구와 존재하지 않는 승인 CLI 예제도 교정했다. N-01–07/N-13 완료8/18, 요청15개 중5완료, 잔여N-08–12/N-14–18 10개. 다음은N-11 새 평가와N-12 실제 내용 검토 자료; 운영 환경/담당/RTO/RPO 질문은 답변 대기다. 새 원자료 푸시/배포는 하지 않았다.
+
+### 2026-10-06 N11/N12 검토 입력 준비 — 완료 수 증가 없음
+
+N11 [DEV7개/프로토콜 초안](./N11-FRESH-EVALUATION-PREPARATION.md)은 source-bound이며 미승인, 새 FINAL0, 실행0, execution_allowed/release_eligible false다. N12 [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md)는20타입/3요구/4기준·27원문span SHA와6정확테스트를 대조했다. 모든 객체 proposed, 사람 판정0, 실제 통합 snapshot/lock/관계 및 N14 변경 수용 미완료다. 사용자에게 내용/후보 관계 판정·검토자·실제 활동 시간을 요청했다. N15–17 native Linux/운영 담당·공개키 신뢰/RTO/RPO 질문도 대기다. 완료8/18(요청15개 중5), 잔여N08–12/N14–18 10개를 유지한다. 이 준비를 합격 또는 사용자 승인으로 기록하지 않는다.

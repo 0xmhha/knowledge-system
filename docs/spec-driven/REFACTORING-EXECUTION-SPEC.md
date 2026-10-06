@@ -224,3 +224,14 @@ N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 - [x] N13-D 실제 CLI·관련 회귀/경계/문서·소스/선택 자료/원자료 바인딩, 승인/검토 상태 자동 승격0.
 
 N-13 증거: [manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json), [계약](./WORKSHEET-CATALOG-CONTRACT-V1.md). 무팩 누출 RED, 선택 팩 validation·8매핑·필터/앵커/빈queue/구팩 호환 GREEN, 실제 Darwin CLI11회와 기존 파일80개 변경0, 관련5패키지 race 및 문서/경계를 통과했다. 선택 catalog와 출처·project selection도 소스 바인딩에 포함한다. 생성은 사람 승인/앵커 검사 pass를 주장하지 않고 자동 상태 승격0이다. N-11/12/14–18 실제 평가·사람·운영 수용 조건은 남는다.
+
+## N-12: 실제 파일럿 내용·후보 관계 검토
+
+**상태: 검토 자료 준비 / 사람 판정 대기.** [검토 자료](./N12-ACTUAL-PILOT-REVIEW.md), [원자료](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-preparation-manifest.json). D1의20개는 공통 metamodel이다. 실제 커밋076f6de2에서20타입/3요구/4기준·27원문span을 추출하고 파일/줄/spanSHA를 독립 대조했다. 현행 사용 후보와6개 정확 테스트 실행을 연결했다. 별도 committed-source 추출이므로 실제 pinned v2 lock/CKG canonical 관계 또는 승격 완료라고 주장하지 않는다.
+
+- [ ] N12-A 실제 원문20개/3명세/4기준의 출처·권위·범위·시점·후보 관계를 사람이 승인/수정/기권하고 검토자로 기록.
+- [ ] N12-B 승인된 내용/관계를 새 coordinated capture·lock·snapshot/CKG canonical·semantic projection에 결합, 누락/불일치/관계 오용과 자동 승격0을 재검증.
+- [ ] N12-C 추출 오차/관계 오용의 실제 검토 결과와 실제 활동 시간/비용 기록; 미측정은 null/미측정으로 표시하고 대기 시간으로 대체하지 않음.
+- [ ] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
+
+N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인딩 DEV7개와 기존 승인 조건 보존 초안을 만들었다. 아직 새 FINAL0, 새 gold/cluster 승인0, 실행0이며 N11-A–D 미완료다. 기존 FINAL은 재실행해 새holdout으로 쓰지 않는다.

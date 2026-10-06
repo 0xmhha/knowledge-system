@@ -1,0 +1,62 @@
+import hashlib,json,pathlib,re,shutil,subprocess
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06'
+rev=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+sha=lambda b:hashlib.sha256(b).hexdigest()
+files={}
+def source(path):
+ if path not in files:
+  b=subprocess.check_output(['git','show',rev+':'+path]);assert (root/path).read_bytes()==b
+  files[path]=b;p=e/'source-snapshot'/(path+'.txt');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+ return files[path]
+def span(path,first,last):
+ b=source(path);lines=b.splitlines(keepends=True);assert 1<=first<=last<=len(lines)
+ return {'path':path,'first':first,'last':last,'file_sha256':sha(b),'content_sha256':sha(b''.join(lines[first-1:last]))}
+def anchor(path,pattern):
+ lines=source(path).decode().splitlines();start=next(i+1 for i,l in enumerate(lines) if re.search(pattern,l))
+ end=next((i+1 for i in range(start,len(lines)) if lines[i]=='}'),start)
+ return dict(span(path,start,end),declaration=lines[start-1],canonical_id=None,validation='source text and hashes checked; CKG canonical/snapshot relation not yet verified')
+p=json.load(open(e/'projection-proposed.json'));ev={x['id']:x for x in p['evidence']}
+assert len(p['concepts'])==20 and len(p['requirements'])==3
+for x in p['evidence']:
+ s=span(x['path'],x['start_line'],x['end_line']);assert s['content_sha256']==x['content_sha256']
+model='internal/system/semantic/model.go'
+usage={'project':('internal/setup/identity.go',r'^type SourceIdentity '),'dataset':('internal/setup/identity.go',r'^type DatasetIdentity '),'source-snapshot':('internal/setup/identity.go',r'^type SourceIdentity '),'source-file':('internal/setup/capture.go',r'^type CapturedFile '),'code-symbol':('pkg/graph/types/node.go',r'^type Node '),'vector-chunk':('pkg/vector/types/chunk.go',r'^type Chunk struct'),'document-section':(model,r'^type DocumentSection '),'claim':(model,r'^type Claim '),'evidence-span':(model,r'^type EvidenceSpan '),'semantic-assertion':(model,r'^type Assertion '),'concept':(model,r'^type Concept '),'term':(model,r'^type Term '),'requirement':(model,r'^type Requirement '),'acceptance-criterion':(model,r'^type AcceptanceCriterion '),'test-case':('internal/vector/store/sqlitevec/store_test.go',r'^func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\('),'test-run':('internal/system/semantic/test_run.go',r'^type TestRun '),'policy':('internal/setup/plan.go',r'^type Options '),'evidence-pack':('pkg/system/contract/v2.go',r'^type EvidencePackV2 '),'patch-attempt':('internal/system/patch/patch.go',r'^type Attempt '),'criterion-decision':('internal/system/patch/patch.go',r'^type Decision ')}
+items=[]
+def evidence(id):
+ v=ev[id];return span(v['path'],v['start_line'],v['end_line'])
+for i,c in enumerate(p['concepts'],1):
+ items.append({'review_id':f'P12-C{i:02}','kind':'concept','id':c['id'],'definition':c['definition'],'includes':c['includes'],'excludes':c['excludes'],'terms':c['terms'],'authority':'D1-approved design vocabulary; this committed projection remains proposed','scope':'knowledge-system common metamodel; not industrial facts','source':evidence(c['evidence_id']),'candidate_usage':anchor(*usage[c['id']]),'decision':None})
+criterion_map={
+'ac-filtered-recall':('internal/vector/store/sqlitevec/store.go',r'^func .* SearchDetailed\(',['TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded']),
+'ac-filtered-completeness':('internal/vector/store/sqlitevec/store.go',r'^func .* SearchDetailed\(',['TestSearchDetailedReportsCandidateLimitWithoutCompleteHits','TestSearchDetailedCancellationIsNotEmptySuccess']),
+'ac-source-evidence':('internal/system/semantic/alignment.go',r'^func ValidateDatasetAlignment\(',['TestProjectionRejectsCrossSnapshotOrMissingEvidence','TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty']),
+'ac-ontology-fallback':('internal/system/composer/stage2/ontology_provider.go',r'^func .* applyProvidedOntology\(',['TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline'])}
+rows=[json.loads(l) for l in open(e/'criterion-tests.jsonl')];observed={r['Test']:r['Package'] for r in rows if r.get('Test') and r['Action']=='pass' and '/' not in r['Test']};assert len(observed)==6
+for i,r in enumerate(p['requirements'],1):
+ items.append({'review_id':f'P12-R{i:02}','kind':'requirement','id':r['id'],'statement':r['statement'],'source':evidence(r['evidence_id']),'authority':'D1 design example, not full-product completion','scope':'spec-pilot version1 at named revision','decision':None})
+ for a in r['acceptance_criteria']:
+  path,pattern,tests=criterion_map[a['id']];links=[]
+  for test in tests:
+   pkg=observed[test];testpath=pkg.split('knowledge-system/',1)[1]
+   candidates=[str(x.relative_to(root)) for x in (root/testpath).glob('*_test.go') if re.search(r'^func '+test+r'\(',x.read_text(),re.M)]
+   assert len(candidates)==1
+   links.append({'test':test,'package':pkg,'candidate_anchor':anchor(candidates[0],r'^func '+test+r'\('),'observed_test_pass':True,'semantic_accepted':False})
+  items.append({'review_id':'P12-A'+str(1+sum(x['kind']=='criterion' for x in items)).zfill(2),'kind':'criterion','id':a['id'],'given':a['given'],'when':a['when'],'then':a['then'],'source':evidence(a['evidence_id']),'candidate_implementation':anchor(path,pattern),'candidate_test_links':links,'source_validated':True,'linked':False,'tested':True,'accepted':False,'decision':None})
+assert len(items)==27
+review={'schema_version':1,'status':'awaiting_human_review','source_commit':rev,'project_id':'knowledge-system','projection_kind':'standalone committed-source extraction; not aligned/promoted v2 dataset','source_byte_check':'27 exact source spans independently verified','items':items,'reviewer':None,'human_active_minutes':None,'human_cost':None,'automated_test_scope':'six named tests and subcases; not CriterionDecision or full end-to-end acceptance','pending':['human content/relationship decisions','CKG canonical and coordinated archive/lock alignment','real review time and costs','actual ADR-to-change acceptance, reject/rollback runs N14']}
+(e/'review-items.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+lines=['# N12 실제 파일럿 원문·현행 코드 검토 자료','',f'2026-10-06 · 원문 커밋 `{rev}` · **검토 대기 / N12 미완료**.','', '기존 D1의 뜻과 범위 승인은 유지한다. 이번 자료는 같은20개 공통 타입의 실제 원문 추출과3요구사항/4기준의 현행 코드·테스트 후보를 검토하기 위한 것이다. 산업 사실20개를 승인해 달라는 요청이 아니다. 원문27span의 SHA/좌표 일치를 독립 확인했다. 모든 추출 객체는 proposed이고 자동 verified/accepted 승격은0이다.','', '[검토 JSON](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-items.json)에 원문SHA·spanSHA·적용범위·권위·용어/포함·제외·코드 후보를 기록했다. CKG canonical/통합 snapshot/lock 및 실제 변경 수용은 아직 확인되지 않아 source 좌표만으로 관계를 verified로 쓰지 않는다.','', '## 20개 실제 원문 객체와 용도 후보','', '| 검토ID | 타입 | 원문 정의 | 원문 좌표 | 현행 사용 후보 |','|---|---|---|---|---|']
+for x in items:
+ if x['kind']!='concept':continue
+ s=x['source'];a=x['candidate_usage'];path=s['path'];ap=a['path']
+ lines.append(f"| {x['review_id']} | {x['id']} | {x['definition']} | [{path}:{s['first']}-{s['last']}](../../{path}) | [{a['declaration']}]({ '../../'+ap}) |")
+lines+=['','## 3개 명세와4개 수용 기준','', '명세 내용과 후보 구현/테스트 연결의 타당성을 각각 판정한다. 테스트 JSON의 pass는 현재 원문에서 해당 테스트가 실행됐다는 증거이고, 사람의 Given/When/Then 판정 또는 실제 변경의 수용이 아니다.','']
+for x in items:
+ if x['kind']=='requirement':lines += [f"### {x['review_id']} · {x['id']}",'',x['statement'],'']
+ elif x['kind']=='criterion':
+  a=x['candidate_implementation'];lines += [f"**{x['review_id']} · {x['id']}**",'',f"- Given: {x['given']}",f"- When: {x['when']}",f"- Then: {x['then']}",f"- 구현 후보: [{a['declaration']}](../../{a['path']})"]
+  lines += [f"- 테스트 실행 pass: `{y['test']}` · 후보 연결은 미승인" for y in x['candidate_test_links']];lines+=['']
+lines+=['## 기록할 판정','', 'P12-C01–20, R01–03, A01–04 각 항목에 승인/수정/기권과 이유, 검토자 이름을 기록한다. 사용 후보의 원문/범위가 틀리면 해당ID를 수정한다. 승인 시에도 새로운 통합 원문/lock에 대한 검증과 N14 실제 변경 수용은 별도로 남는다.','', '실제 검토에 쓴 활동 시간(분)을 알 수 있으면 알려준다. 미측정이면 null/미측정으로 유지한다. 메시지 대기 시간은 검토 시간으로 계산하지 않는다. 테스트·추출의 자동 실행 시간도 사람 비용으로 바꾸지 않는다.','', '현재 완료8/18, 요청15개 중5완료. 잔여10개: N08 검색 품질, N09 무답·기권, N10 비용·지연, N11 독립 평가, N12 실제 내용 검토, N14 실제 의미 수용, N15 지원 환경, N16 운영 권한·고지, N17 운영 복구, N18 출시 판정.']
+(root/'docs/spec-driven/N12-ACTUAL-PILOT-REVIEW.md').write_text('\n'.join(lines)+'\n')
+(e/'review-preparation-manifest.json').write_text(json.dumps({'status':'review_prepared_not_complete','source_commit':rev,'source_sha256':{p:sha(b) for p,b in files.items()},'evidence_sha256':{str(p.relative_to(e)):sha(p.read_bytes()) for p in e.rglob('*') if p.is_file() and p.name!='review-preparation-manifest.json'},'human_reviewed':0,'semantic_accepted':0,'concepts':20,'requirements':3,'criteria':4,'exact_spans':27,'named_tests_passed':6},indent=2)+'\n')
+print('N12 preparation PASS: 27 spans, 20 concepts, 3 requirements, 4 criteria, 6 named tests; human decisions 0; completion withheld')

@@ -1,0 +1,14 @@
+package main
+import("context";"encoding/json";"fmt";"os";"os/exec";"strings";"github.com/0xmhha/knowledge-system/internal/system/semantic")
+func must(err error){if err!=nil{panic(err)}}
+func main(){
+ commit,err:=exec.Command("git","rev-parse","HEAD").Output();must(err)
+ snapshot:=semantic.Snapshot{ProjectID:"knowledge-system",DatasetID:"review-candidate-076f6de2",Commit:strings.TrimSpace(string(commit))}
+ read:=func(path string)[]byte{data,err:=exec.Command("git","show",snapshot.Commit+":"+path).Output();must(err);return data}
+ p,_,err:=semantic.ExtractOntology(snapshot,"docs/spec-driven/ontology-pilot.yaml",read("docs/spec-driven/ontology-pilot.yaml"));must(err)
+ spec,_,err:=semantic.ExtractSpec(snapshot,"docs/spec-driven/spec-pilot.yaml",read("docs/spec-driven/spec-pilot.yaml"));must(err)
+ p.Evidence=append(p.Evidence,spec.Evidence...);p.Requirements=spec.Requirements
+ must(p.ValidateSources(context.Background(),"."))
+ bytes,err:=json.MarshalIndent(p,"","  ");must(err);must(os.WriteFile(os.Args[1],append(bytes,'\n'),0600))
+ fmt.Printf("extracted actual committed pilot: %d concepts, %d requirements, %d evidence spans; statuses remain proposed; no graph/vector alignment or promotion claimed\n",len(p.Concepts),len(p.Requirements),len(p.Evidence))
+}
