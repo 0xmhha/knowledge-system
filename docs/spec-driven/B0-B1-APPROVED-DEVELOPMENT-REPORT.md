@@ -1,6 +1,6 @@
 # 승인된 B0 개발 기준선과 B1/C0 재검증 결과
 
-2026-10-06 · **DEV 실제 수집·독립 자동 검사 완료 / FINAL 실행 중 / 사람 주장·비용·운영 판정 대기**. 성공한 도구 호출을 정답 성공으로 바꾸지 않는다. FINAL 결과를 이 개발 보고서에 섞지 않는다.
+2026-10-06 · **DEV 실제 수집·독립 자동 검사 완료 / FINAL 결과는 별도 보고 / 사람 주장·운영 판정 대기**. 성공한 도구 호출을 정답 성공으로 바꾸지 않는다. FINAL 결과를 이 개발 보고서에 섞지 않는다.
 
 승인 입력은 [입력 승인 기록](./B0-APPROVED-INPUTS.md), 개발 동결은 [동결 원장](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json), 전체 원자료·SHA는 [개발 manifest](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-after-fix26-27/artifact-manifest.json)와 [native 오라클 manifest](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-oracles/artifact-manifest.json)에 있다. 큰 원자료는 lossless gzip이며 압축 전후 SHA가 별도로 남는다.
 
@@ -62,4 +62,6 @@ FIX22 승인 Go29 opt-in 발견, FIX23 bounded stderr/stdio, FIX24 default-provi
 
 ## 남은 판정
 
-[HC01–08](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 실제 출력 주장/정책/기권 해석과 검토 비용 답변이 남는다. 입력①–⑤ 승인을 다시 요구하지 않는다. C1 시험 preview/실운영 종료 범위, OP01–08, native amd64·원래 Darwin header/전체 native 적합성·최종 패키지/복구/지원/출시는 별도다. 자동 검사 완료와 품질 pass, 실제 역할/키/법무 승인을 동일하게 취급하지 않는다.
+[HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 실제 출력 주장/정책/기권 판정이 남는다(B1-04/07/08). [비용 보고](./B1-COST-REPORT.md)는 실측·미측정/null 사실을 보존해 B1-06을 완료했으며 사람의 비용 승인이나 이점을 만든 것이 아니다. 입력①–⑤ 승인을 다시 요구하지 않는다.
+
+[최신 package/복구](./C1-FINAL-PACKAGE-VALIDATION.md)와 [지원/known limits·출시보류 보고](./C1-FINAL-DELIVERY-REVIEW.md)는 완료했다. 실제운영scope/OP01–08·역할/키·적합성·미확인환경 처리의 C1-05 사람 결정은 별도다. 자동 검사·보고 완료와 품질 pass, 실제 권한/법무 승인은 구분한다. 전체26/30완료, 남은전체B1-04·07·08/C1-05다.

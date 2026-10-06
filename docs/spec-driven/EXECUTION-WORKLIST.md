@@ -36,7 +36,7 @@
 | R-12 | 정답 12개 승인·모델 확정 | 검증 완료 | human-review-m2max JSON, questions 12/12 승인, approved preflight | 동적 사례 승인과 구분 |
 | R-13 | 전체 코퍼스 실모델 진단 | 새 범위 검증 완료 | 역사적 부분1,569/13,575와 새 승인strict1,598/13,820·Go992 전부 포함·DEV/FINAL 감사 연결 | 부분 진단을 새 strict 품질로 재사용하지 않음; 현재 품질fail/소표본inconclusive |
 | R-14 | 실모델 소형·장문 스모크 | 검증 완료 | verification-m2max JSON; 작은 실제 조회와 strict 장문 입력 통과 | 전체 질문 품질을 입증하지 않음 |
-| R-15 | B0/B1/C0/C1 완료 여부 | 미완료 확인 | 승인 입력·DEV/FINAL 실측·최신package/복구 완료, 품질fail/disabled·stage0/4, 전체24/30 완료 | 사람HC/비용·운영scope/OP 종료6항목; 현황판/44절 |
+| R-15 | B0/B1/C0/C1 완료 여부 | 미완료 확인 | 승인 입력·DEV/FINAL 실측·최신package/복구 완료, 품질fail/disabled·stage0/4, 전체26/30 완료 | 사람HC·운영scope/OP 종료4항목; 현황판/45절 |
 
 현재 입력 진단과 승인 기록은 [B0-M2MAX-GATE-REPORT](./B0-M2MAX-GATE-REPORT.md), 과거 구조 시험은 [A8-GATE-REPORT](./A8-GATE-REPORT.md)와 [B0-H-GATE-REPORT](./B0-H-GATE-REPORT.md)를 사용한다. 원자료는 `system/eval/b0-knowledge-system/`에 있다.
 
@@ -81,7 +81,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | B1-03 | P2 · B0-09/B1-02 | 같은 모델·입력·질문·K·필터로 paired 실행, arm 순서 회전 | 동시 지연 시험 없음; warm/cold 분리; 반복은 독립 표본으로 합산하지 않음 | 검증 완료: 승인 동일 모델/입력/질문/K·범위와 회전8arm DEV3840·입력 전후 불변. SDK 오류/계측 누락0, repeats와 가족 unit 분리. FINAL 비교는 C1-01 |
 | B1-04 | P2 · B1-03 | Recall@10, MRR, precision, 기권, 무관 인용, 오개념·정책 오용·근거 없는 이유를 질문군별 산출 | 평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리 | 진행: 승인 DEV3840/FINAL4800 질문군·분모·실패240·raw/v1/source/공개 Go 감사 완료. DEV Recall0.25/MRR0.125·FINAL 양성1/6/MRR0.5/6, 두 no-citation guard fail·F05/06 MRR0.75·F02 동점 차이 보존. [HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 해석/사람 기권 판정 대기 |
 | B1-05 | P2 · B1-03 | 좌표·비밀·권한·프로젝트/상태 혼입 검사 | 안전 위반 0; 기본 후보 보존; 미검토/만료/충돌 의미를 확정 사실로 사용한 사례 0 | 검증 완료: DEV3840 출처·좌표/public Go 오류0, F03 proposed 비승격·F04 상태·F05 프로젝트·F06 acceptance/test trace 비승격 및 native10호출 혼입/손상/없음·backend0·private payload 비노출/복원 SHA 확인. 기존 권한/sanitization 회귀 포함; 일반 비밀 탐지/운영 ACL 보증 아님 |
-| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 진행: DEV/FINAL warm/cold·backend·응답 크기·환경·정적/동적/pooled와 같은 축 비용 완료. 최신 전체 strict package 비용60+RSS2도 별도진단으로 연결. 사람 검토 비용은 미측정; 실제 값 또는 not_measured 종료 기록 대기 |
+| B1-06 | P2 · B1-03 | warm p50/p95·cold·호출 수·크기·검토 비용 | 순서와 원시 시간 보관; build/query 별도; 환경 경쟁 작업 기록 | 검증 완료: [비용 보고](./B1-COST-REPORT.md)에 DEV3840/FINAL4800 warm/cold·backend·응답 크기·순서/환경·build/query 분리·같은 축 비교와 최신 strict package60+RSS2 별도진단을 연결. 사람 비용은 not_measured/null로 사실 기록하며 0/승인/절감효과로 바꾸지 않음; 실제 사람 판정은 B1-04/07/08 |
 | B1-07 | P2 · B1-04/05 | 답변 주장·정책·기권에 대한 사람 판정표 작성/검토 | 주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리 | 대기: [실제 출력 주장 검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) HC01–08 및 FINAL 실제행 HC09–11·비용 응답 요청 완료. 입력①–⑤ 승인을 실제 해석/기권·비용 승인으로 대신하지 않음 |
 | B1-08 | P2 · B1-04–07 | paired 비교와 실패 보고서 | 기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음 | 진행: DEV/독립 FINAL paired 비교·실패/불확실·같은 축 비용·원자료·1096소스 동결 완료. 중요 그룹 n<10 inconclusive·FINAL 품질fail·disabled 유지. HC/비용 판정을 연결한 종료 남음 |
 
@@ -108,7 +108,7 @@ F-01 희소 필터/후보 상한, F-02 장문 꼬리와 부모 재조립, F-03 �
 | C1-04 | P3 · C0-05 | 최종 macOS/Linux 패키지·실제 Ollama·대규모 비용 검사 | OS/CPU별 추출 설치·롤백·의존·실모델 증거; 환경 없는 대상은 pending/preview | 검증 완료: [최종 package 검증](./C1-FINAL-PACKAGE-VALIDATION.md)에 checkpoint10cb의 최신3대상 시험 서명/설치·고지/SHA·Darwin archive 재현·actual BGE guard10·Linux actual6·전체1598/13820 비용60+RSS2/원문504/공개 Go·backend 오류360/12/6 보존 연결. native amd64·실운영 비용/키/적합성은 환경 없는 대상 pending/preview로 명시 |
 | C1-05 | P3 | 운영 서명·신뢰 루트·라이선스 검토 자료와 사람 결정 | 실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음 | 진행: 연결 모듈 35개·수집 고지 50개·Tree-sitter runtime 44개/Solidity 6개 upstream 일치·시험 서명/설치/상한/변조 거부 재검증; JS/TS·SQLite/vec 원문 41개 일치 및 최신 Linux recipe 시험 서명/설치 통과; FIX-14 Linux paired archive 및 FIX-15 SQLite 추가 고지/세 플랫폼 서명·설치·변조 거부 검증 통과; translated modernc 선택 소스의 ZIP/h1 대조와 [원래 SQLite·musl 출처](./C1-ORIGINAL-NATIVE-ORIGIN-AUDIT.md)의 501입력·SQLite C 공식 SHA3·Linux 헤더436개 분류/생성4 재생 완료 범위 존재; Darwin SDK·전체 생성기/전이 native 범위·[운영 검토표](./C1-OPERATIONS-REVIEW.md)·사람 판정 남음 |
 | C1-06 | P3 · C1-04 | 마이그레이션·복구·롤백 문서와 실행 | 구 데이터 원본 보존·재색인/오류 경로·이전 current 복구 확인 | 검증 완료: 최종 추출 Darwin package의 구 데이터 첫 신규 소비자 전 SHA·새 strict 재색인/구 v1 rollback·후보 실패/손상 거부·pin/update/current rollback·새 루트 backup 복원·source 없는 재생·독립 SDK11/인용11/v2 integrity6 확인. [복구 문서](./C1-RECOVERY-VALIDATION.md). 소형 mock/합성 HTTP 범위; 실제 운영 OP-08은 C1-05/07 잔여 |
-| C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 진행: [최종 지원·제한·종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)에 최신3대상 증거·native amd64 pending·품질fail/소그룹 inconclusive/disabled·전체6미완료와 사람/운영 종료 범위를 정리. 최종 범위/OP·HC 응답 대기 |
+| C1-07 | P3 · C1-02–06 | 지원 매트릭스·known limits·최종 게이트/출시 결정 | 전체 작업 종료 증거 또는 명시적 잔여 범위; 품질 승인과 배포 실행 권한 별도 기록 | 검증 완료: [최종 지원·제한·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)의 세 플랫폼 preview·미확인 환경·known limits·품질fail/소그룹inconclusive/disabled·출시보류와 명시적 잔여4항목을 기록. 원래 OR 조건에 따라 보고 종료; 실제 HC/운영scope·역할/키/적합성 승인은 미완료이며 전체목표/배포권한을 완료하지 않음 |
 
 ## 7. 실행 증거 원장
 
@@ -513,3 +513,11 @@ Darwin actualBGE state guard10·정상6/음성4, Linux CPU actualBGE3project·SD
 C1-04/06의 명시된 기술 완료조건을 닫았다. 실제운영 OP-08·네이티브AMD64/운영비용·법무/키/역할/지원범위는 [종료 검토](./C1-FINAL-DELIVERY-REVIEW.md)에 잔여로 유지한다. 전체24완료/6미완료: B1-04·06·07·08, C1-05·07. HC01–08/비용·운영scope 기존질문은 대기이며 FINAL HC09–11 실제행 검토를 추가 요청했다. 다음은 사람출력/비용·scope응답 기록과 B1/C1 종료다. 품질fail·소그룹inconclusive·disabled·official stage0/4·전체목표미완료를 유지한다.
 
 최종 완료 재검증: [24항목 재검토 원장](../../system/eval/b0-knowledge-system/completion-reaudit-m2max-2026-10-06.json)은 완료조건/증거 링크·동결1096/승인5 SHA·root Go/B1 Python 후속 통과 원문·최신archive721파일/504인용·복구11행을 확인한다. [문서 검사](../../system/eval/b0-knowledge-system/final-package-closure-checks-m2max-2026-10-06/docs-check.log)는239 live문서 통과다. 실제사람판정과 운영권한·전체목표완료를 대신하지 않는다.
+
+## 45. 보고 완료와 사람 판정 대기를 분리한 재검토
+
+사용자의 다음 진행 지시 후 남은6항목의 **원래 완료조건을 그대로** 재독했다. 앞선 보고에서 미측정 비용을 그대로 기록하는 일과 사람 비용 승인을 묶어 B1-06을 대기시킨 것은 불필요했다. [비용 보고](./B1-COST-REPORT.md)는 실제 시간/호출/크기/환경·순서·build/query 분리와 미측정/null 상태를 기록하며 인간의 비용 승인이나 이점으로 취급하지 않는다. 기존 보고/입력/원자료/제품 코드는 유지했다.
+
+C1-07 원래 조건은 “전체 작업 종료 증거 **또는 명시적 잔여 범위**; 품질 승인과 배포 실행 권한 별도 기록”이다. [지원·제한·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 최신지원증거·known limits·fail/inconclusive/disabled·출시보류 및 남은HC/운영권한을 명시해 보고 조건을 충족했다. 잔여를 해결하거나 운영scope를 대신 승인한 것이 아니다. 조건 원문·이전 상태·판정은 [재검토 원장](../../system/eval/b0-knowledge-system/report-closure-reaudit-m2max-2026-10-06/completion-condition-review.json)에 보존한다.
+
+현재26완료/4미완료: **B1-04·07·08, C1-05**. B1-04 오개념/정책오용/근거없는 이유·사람의 답변기권은 아직 실제 판정되지 않았으므로 전체0건으로 만들지 않는다. B1-07 HC01–11 실제 검토자 판정과 B1-08 그 기록을 반영한 비교종료, C1-05 실제운영 역할/키/신뢰/적합성 또는 명시적 종료scope 결정이 남는다. 기존HC/운영질문은 유지하며 일반 “다음” 지시를 개별 사람판정으로 바꾸지 않는다. 공식stage0/4·목표미완료·품질fail·disabled·출시보류도 그대로다. 다음은 이4항목의 실제사람판정을 연결하는 작업이다.

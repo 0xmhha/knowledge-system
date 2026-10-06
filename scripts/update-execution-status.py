@@ -45,13 +45,13 @@ def render(raw):
       '완료 수는 작업리스트의 명시된 구현/검증 범위다. 공식 게이트 verdict는 별도 원장을 읽으며 판정 완료가 pass를 의미하지 않는다. 도구 준비·과거 구조 진단을 품질 합격으로 합산하지 않는다. 최종 근거와 종료 조건은 [작업리스트](./EXECUTION-WORKLIST.md)를 따른다.', '',
       '**단계:** 구현 재검증 ✅ → B0 입력 검토/기준선 🟡 → B1 비교 🟡 → C0 실패 수정/재평가 🟡 → C1 최종 재평가/출시 🟡', '',
       '| 단계 | 완료 | 진행 | 대기 | 현재 위치 |', '|---|---:|---:|---:|---|']
-    position = {'B0':'승인 strict/DEV3840·source/Go/state/raw/v1 감사·baseline 보고 완료; FINAL은 C1', 'B1':'paired/안전 자동 검사 완료; HC01–11 주장·정책·기권·검토 비용/비교 판정 대기',
-                'C0':'FIX22–28 실제 실패 수정/회귀·DEV3840 개선 및 기술 동결 완료', 'C1':'FINAL4800·최신3플랫폼/실모델/전체strict 비용/복구 완료; 사람/운영 종료 대기'}
+    position = {'B0':'승인 strict/DEV3840·source/Go/state/raw/v1 감사·baseline 보고 완료; FINAL은 C1', 'B1':'paired/안전 자동 검사 완료; HC01–11 주장·정책·기권/비교 판정 대기; 비용 보고 완료',
+                'C0':'FIX22–28 실제 실패 수정/회귀·DEV3840 개선 및 기술 동결 완료', 'C1':'FINAL4800·패키지/비용/복구·지원/출시보류 보고 완료; C1-05 운영 사실/적합성 대기'}
     for stage in ['B0','B1','C0','C1']:
         c = Counter(t[4] for t in tasks if t[0].startswith(stage))
         lines.append(f"| {stage} | {c['done']} | {c['progress']} | {c['waiting']} | {('작업 종료; verdict=' + gates[stage]) if c['done'] == sum(t[0].startswith(stage) for t in tasks) else position[stage]} |")
-    lines += ['', '**바로 다음 작업:** HC01–11 실제 출력/기권·검토 비용 → B1 비교 종료 → 시험/운영 scope·OP 결정 → C1 지원/출시 종료.', '',
-      '**현재 최우선:** 개발/FINAL·최신 package/실모델·복구 ✅ → 사람 출력/비용·최종 scope/운영 결정.', '',
+    lines += ['', '**바로 다음 작업:** HC01–11 실제 출력/기권 판정 → B1-04/07/08 종료; C1-05 실제 운영scope·OP/적합성 결정.', '',
+      '**현재 최우선:** 개발/FINAL·최신 package/실모델·복구 ✅ → 사람 출력 판정·실제 운영scope/신뢰/적합성 결정.', '',
       f"**남은 전체 작업 {30-counts['done']}개**", '', '| ID | 상태 | 우선순위·선행 | 남은 작업 |', '|---|---|---|---|']
     for qid, priority, task, status, state in tasks:
         if state != 'done':
@@ -60,8 +60,8 @@ def render(raw):
       '- STV2-01: 승인된 날짜/subsystem·K10 실제 runtime/SDK/backend 결합 검증 완료; FINAL에서도 유지.',
       '- OP-01 역할/권한, OP-02 배포 scope/schema, OP-03 공개 키/독립 신뢰 경로, OP-04 개인 키 보관·접근·백업, OP-05 교체·폐기·유출 대응.',
       '- OP-06 original C/header·전이 native·고지 적합성, OP-07 지원 플랫폼·실모델·대규모 비용, OP-08 최종 운영 백업·실패 전환·복구 담당/실행.',
-      '- native Linux amd64 실제 모델/운영 환경은 pending/preview로 명시. C1-04/06 기술 검사 완료; 실제 운영/지원·최종 종료는 C1-05/07.',
-      '- DEV/FINAL source/raw/가족 감사·실패 판정 완료; 답변·주장·정책·기권·사람 검토 비용과 운영/지원 종료 남음(B1/C1).', '',
+      '- native Linux amd64 실제 모델/운영 환경은 pending/preview로 명시. C1-04/06 기술 검사 완료; 지원/출시보류 보고 C1-07 완료; 실제 운영scope/신뢰/적합성은 C1-05.',
+      '- DEV/FINAL source/raw/가족 감사·실패 판정 완료; 비용·지원/known limits 보고 완료; 답변·주장·정책·기권의 사람 판정과 운영 사실 종료 남음(B1-04/07/08·C1-05).', '',
       '매 턴 마지막 보고에 현재 단계, 다음 작업, 위 미완료 전체 목록을 함께 표시한다. 변경 후 이 현황판을 갱신하고 `python3 scripts/update-execution-status.py --check`로 작업리스트와 동기화한다.', '']
     return '\n'.join(lines)
 
