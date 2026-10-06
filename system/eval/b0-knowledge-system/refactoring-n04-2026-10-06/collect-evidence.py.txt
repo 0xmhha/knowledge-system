@@ -25,7 +25,7 @@ assert 'documentation: OK' in (e/'docs.log').read_text()
 changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
 assert not any(x.startswith('system/eval/') and not x.startswith('system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/') for x in changed),'historical evidence modified'
 paths=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()
-paths=sorted({p for p in paths if p.startswith(('cmd/','internal/','pkg/'))}|{'go.mod','go.sum'})
+paths=sorted(set(base['source_sha256'])|{p for p in paths if p.startswith(('cmd/','internal/','pkg/'))}|{'go.mod','go.sum'})
 source={p:sha(root/p) for p in paths};delta={p:s for p,s in source.items() if base['source_sha256'].get(p)!=s}
 for rel in delta:
  out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
