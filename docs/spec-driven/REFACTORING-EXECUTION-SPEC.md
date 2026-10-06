@@ -118,7 +118,7 @@
 
 ## 다음 작업 설계의 준비 조건
 
-N-04의 전체 수용 조건과 실행 증거를 확인했다. 다음 N-05는 아래 보존/reader/GC 명세를 따라 실패 재현부터 진행한다. 설계 기록과 완료 표시를 구분한다.
+N-04/05의 전체 수용 조건과 실행 증거를 확인했다. 다음 N-06은 아래 자원 상한/deadline 명세를 따라 실패 재현부터 진행한다. 설계 기록과 완료 표시를 구분한다.
 
 N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 조건을 세분화한다. 새 독립 FINAL(N-11), 실제 파일럿 사실(N-12/14), 운영(N-15–18)의 별도 판정 필요성을 유지한다.
 
@@ -130,12 +130,13 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-02 | 공개 MCP RED→GREEN, shared guard, 실제 CLI 7사례·SHA, race/vet/경계/문서 검증 | 완료 |
 | 2026-10-06 | N-03 | RED→GREEN, 별도 process 8 contender·SIGKILL 회수, CLI build/rollback 차단, race/vet | 완료 |
 | 2026-10-06 | N-04 | WAL·linked RED→GREEN, 8+5 실패 경계·7 SIGKILL 복구·CLI 7+2·9패키지 race | 완료 |
+| 2026-10-06 | N-05 | GC API RED→GREEN·5 중단/취소 경계·2 process crash·공개 CLI 12사례와 live MCP pin·6패키지 race | 완료 |
 
-**현재:** N-01–04 완료(4/18). **다음:** N-05 보존/reader/GC 실패 재현과 구현. **전체 잔여:** N-05–18, 14개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01–05 완료(5/18). **다음:** N-06 자원 상한/deadline 실패 재현과 구현. **전체 잔여:** N-06–18, 13개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
 
 ## N-05: 보존 정책·검토 가능한 GC와 reader pin
 
-**상태: 설계.** 원 INV-01/02/03·FR-10 및 v2 A3/A8의 원문·좌표·활성/rollback 보존 계약을 유지하면서 미참조 버전을 회수한다. 파일을 지우는 기능의 존재만으로 완료하지 않는다.
+**상태: 완료.** 원 INV-01/02/03·FR-10 및 v2 A3/A8의 원문·좌표·활성/rollback 보존 계약을 유지하면서 미참조 버전을 회수한다. 파일을 지우는 기능의 존재만으로 완료하지 않는다.
 
 ### 설계와 호환 경계
 
@@ -147,7 +148,30 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 
 ### 수용 조건
 
-- [ ] N05-A 결정적인 dry-run·정책/용량/보호 이유·검토한 계획 digest에만 결합된 실행.
-- [ ] N05-B current/rollback/reader/review/보관 원문·Git history·semantic source 보호 및 구 reader 호환 경계.
-- [ ] N05-C 경합·stale plan·취소·중단/trash 복구·실제 삭제 검증, 보호 참조 삭제0.
-- [ ] N05-D 공개 CLI/서버 pin·상태/오류 비노출·관련 회귀와 소스/실행 증거 바인딩.
+- [x] N05-A 결정적인 dry-run·정책/용량/보호 이유·검토한 계획 digest에만 결합된 실행.
+- [x] N05-B current/rollback/reader/review/보관 원문·Git history·semantic source 보호 및 구 reader 호환 경계.
+- [x] N05-C 경합·stale plan·취소·중단/trash 복구·실제 삭제 검증, 보호 참조 삭제0.
+- [x] N05-D 공개 CLI/서버 pin·상태/오류 비노출·관련 회귀와 소스/실행 증거 바인딩.
+
+### N-05 검증과 공개 경로
+
+새 기능의 변경 전 시험은 GC/reader API 부재로 실패했다. 변경 후 결정적인 계획, 활성/실제 rollback/명시 보호/reader/legacy/review 보호와 capacity 초과 보고, reader/포인터/파일 변경의 stale plan 거부, 5개 trash/취소 경계, 별도 reader crash·부분 삭제 SIGKILL, foreign/unknown trash 및 손상된 current/release/미완료 intent의 fail-closed를 시험했다. noop 재승격이 실제 rollback 참조를 잃지 않는다. 미복구 trash 용량도 보고하고 복구 전 새 삭제를 거부한다.
+
+공개 CLI는 `cks gc --out <dataset> --dry-run --plan-file <plan.json>`이 기본이며, `cks gc --out <dataset> --apply --plan-file <plan.json>`은 이 digest의 동일 참조/바이트 계획만 실행한다. `cks gc --out <dataset> --resume`은 검증한 journal만 재개한다. 기본 최근2개·최소30일, 명시적인 보호 버전과 logical file-byte 용량 목표를 보고하며 용량을 이유로 보호를 해제하지 않는다. current가 손상되면 다른 rollback 후보의 삭제를 진행하지 않는다.
+
+실제 새 CKS/CKG/CKV로 5개 pinned 버전을 만들고 공개 stdio MCP의 health에서 양 backend·model·alignment/serviceable과 v1 pin을 확인했다. current는 v5인 채로, 새 reader 때문에 이전 계획이 거부됐으며 fresh 계획으로 v2/v3만 삭제하고 v1 reader가 계속 serviceable임을 확인했다. reader 종료 후 v1을 회수하고 v4 rollback/v5 current 및 모든 v5 파일 SHA를 보존했다. 6관련 패키지 race·vet/경계·공개 CLI 모드 검증을 수행했다. 첫 MCP 시험의 잘못된 logging.mode 값은 실제 허용값 prod로 수정했고 실패 원자료를 유지했다. [DEV 자료](../../system/eval/b0-knowledge-system/refactoring-n05-2026-10-06/cli-results.json).
+
+lease는 `.readers/<version>.lock`의 OS shared flock이며 inode를 삭제하지 않는다. server는 backend/semantic/보관 원문을 열기 전에 lease를 얻고 모든 backend/임시 원문을 닫은 뒤 해제한다. 새 pinned builder만 reader protocol을 기록한다. 이전 서버/직접 low-level engine reader를 GC와 병행하지 않으며 모두 중단 후 새 managed CKS로 업그레이드한다. 이전 후보·미완성/검증 불가 버전은 자동 회수하지 않는다. 공유 hardlink/외부 symlink와 network filesystem은 허용하지 않는다. native Darwin ARM64·mock 모델 검증이며 native Linux/운영 소비자/장치 전원 장애 지원 판정은 N-15/17에 남는다.
+
+## N-06: setup/config 자원 상한과 build deadline
+
+**상태: 설계.** NFR-03 및 v2 캡처/빌드 자원 계약을 공개 입력·shared Reindex·진단에 일관되게 적용한다.
+
+- setup YAML과 명시 CLI의 우선순위를 유지하며 최대100000파일·단일32MiB·총4GiB의 기본값과 설정값을 pre-build identity/실제 capture/최종 source 재검증에 동일하게 전달한다. 운영 상한 때문에 일부 원문을 성공 후보로 만드는 대신 후보 전체를 거부한다. negative/overflow/외부 pack 포함 합산의 경계를 검증한다.
+- 기본 build2h deadline을 CLI 준비와 shared versioned Reindex에 적용한다. 캡처·staging·엔진/gate·후보 sync와 rename 직전에 취소/timeout을 확인한다. pointer rename 이후에는 필수 내구성 마무리를 완료해 거짓 unchanged/자동 rollback을 피한다. 일반 fsync의 kernel I/O는 cooperative deadline의 강제 중단으로 주장하지 않는다.
+- 원문 inventory와 보관/staging 최소 필요 바이트, 출력 filesystem의 현재 free bytes, 엔진 출력 크기 미예측 한계를 공개 resource 상태에 기록한다. 여유 공간 부족은 빌드/승격 전에 거부하고 이전 current를 유지한다. resource/error DTO에는 절대 경로·원문 내용·비밀을 넣지 않는다.
+
+- [ ] N06-A YAML/CLI/default/shared API의 상한·deadline 전달 및 입력 검증.
+- [ ] N06-B 초과/timeout/취소·외부 pack 합산에서 부분 후보 비활성·이전current/identity/원문 불변.
+- [ ] N06-C 예상/실제 free bytes·공개 resource 상태 및 오류/민감 경로 비노출.
+- [ ] N06-D 관련 공개/호환 회귀와 수용 조건별 소스·실행 원자료 바인딩.

@@ -1,0 +1,107 @@
+{
+  "red-gc.log": {
+    "exit_code": 1,
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "-run",
+      "^TestGCProtectsCurrentReaderAndReviewedHold$",
+      "-v",
+      "-count=1"
+    ],
+    "phase": "before GC product implementation",
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "green-gc.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "-run",
+      "^(TestGC|TestPromotion|TestReviewedPromotionDurable|TestDurability|TestReindexHold)",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "green-cli-unit.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./cmd/cks/setupcli",
+      "-run",
+      "^TestGCCLI",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "final-race-regression.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks/mcpcli",
+      "./cmd/cks",
+      "./internal/system/mcp",
+      "./internal/system/patch",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "cli-run.log": {
+    "exit_code": 0,
+    "argv": [
+      "python3",
+      "system/eval/b0-knowledge-system/refactoring-n05-2026-10-06/verify-gc-cli.py.txt"
+    ],
+    "env": {}
+  },
+  "vet.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "vet",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks/mcpcli",
+      "./cmd/cks",
+      "./internal/system/mcp",
+      "./internal/system/patch"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "boundaries.log": {
+    "exit_code": 0,
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ],
+    "env": {}
+  },
+  "docs.log": {
+    "exit_code": 0,
+    "argv": [
+      "make",
+      "docs-check"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  }
+}

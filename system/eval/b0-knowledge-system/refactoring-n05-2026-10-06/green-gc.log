@@ -1,0 +1,110 @@
+=== RUN   TestPromotionDurabilityFailureBoundaries
+=== RUN   TestPromotionDurabilityFailureBoundaries/checkpoint
+=== RUN   TestPromotionDurabilityFailureBoundaries/checkpoint-close
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-file
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-dir
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-parent
+=== RUN   TestPromotionDurabilityFailureBoundaries/before-rename
+=== RUN   TestPromotionDurabilityFailureBoundaries/after-rename
+=== RUN   TestPromotionDurabilityFailureBoundaries/current-parent
+--- PASS: TestPromotionDurabilityFailureBoundaries (2.35s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/checkpoint (0.24s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/checkpoint-close (0.20s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-file (0.33s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-dir (0.35s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-parent (0.17s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/before-rename (0.24s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/after-rename (0.37s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/current-parent (0.44s)
+=== RUN   TestReviewedPromotionDurableIntentRecovery
+=== RUN   TestReviewedPromotionDurableIntentRecovery/intent
+=== RUN   TestReviewedPromotionDurableIntentRecovery/before-rename
+=== RUN   TestReviewedPromotionDurableIntentRecovery/after-rename
+=== RUN   TestReviewedPromotionDurableIntentRecovery/current-parent
+=== RUN   TestReviewedPromotionDurableIntentRecovery/release
+--- PASS: TestReviewedPromotionDurableIntentRecovery (2.42s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/intent (0.44s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/before-rename (0.60s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/after-rename (0.59s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/current-parent (0.38s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/release (0.41s)
+=== RUN   TestPromotionRejectsVectorDBChangedByCheckpoint
+--- PASS: TestPromotionRejectsVectorDBChangedByCheckpoint (0.04s)
+=== RUN   TestDurabilityProcessHelper
+--- PASS: TestDurabilityProcessHelper (0.00s)
+=== RUN   TestPromotionProcessKillRecovery
+=== RUN   TestPromotionProcessKillRecovery/ordinary/before-rename
+=== RUN   TestPromotionProcessKillRecovery/ordinary/after-rename
+=== RUN   TestPromotionProcessKillRecovery/ordinary/current-parent
+=== RUN   TestPromotionProcessKillRecovery/reviewed/before-rename
+=== RUN   TestPromotionProcessKillRecovery/reviewed/after-rename
+=== RUN   TestPromotionProcessKillRecovery/reviewed/current-parent
+=== RUN   TestPromotionProcessKillRecovery/reviewed/review-marker
+--- PASS: TestPromotionProcessKillRecovery (1.51s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/before-rename (0.19s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/after-rename (0.18s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/current-parent (0.14s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/before-rename (0.22s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/after-rename (0.30s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/current-parent (0.19s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/review-marker (0.28s)
+=== RUN   TestPromotionFlushesCandidateWALBeforePointer
+--- PASS: TestPromotionFlushesCandidateWALBeforePointer (0.12s)
+=== RUN   TestPromotionRejectsLinkedCandidateArtifact
+--- PASS: TestPromotionRejectsLinkedCandidateArtifact (0.03s)
+=== RUN   TestPromotionRejectsHardlinkedDatabaseBeforeCheckpoint
+--- PASS: TestPromotionRejectsHardlinkedDatabaseBeforeCheckpoint (0.03s)
+=== RUN   TestPromotionHandlesSidecarsRemovedByCheckpointClose
+--- PASS: TestPromotionHandlesSidecarsRemovedByCheckpointClose (0.10s)
+=== RUN   TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore
+--- PASS: TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore (0.31s)
+=== RUN   TestReindexHoldDoesNotReportDoneAfterPersistenceFailure
+--- PASS: TestReindexHoldDoesNotReportDoneAfterPersistenceFailure (0.02s)
+=== RUN   TestGCDryRunDeterministicLegacyRollbackAndCapacity
+--- PASS: TestGCDryRunDeterministicLegacyRollbackAndCapacity (0.50s)
+=== RUN   TestGCRejectsStaleReferenceAndBytePlans
+=== RUN   TestGCRejectsStaleReferenceAndBytePlans/reader
+=== RUN   TestGCRejectsStaleReferenceAndBytePlans/pointer
+=== RUN   TestGCRejectsStaleReferenceAndBytePlans/bytes
+--- PASS: TestGCRejectsStaleReferenceAndBytePlans (1.12s)
+    --- PASS: TestGCRejectsStaleReferenceAndBytePlans/reader (0.37s)
+    --- PASS: TestGCRejectsStaleReferenceAndBytePlans/pointer (0.42s)
+    --- PASS: TestGCRejectsStaleReferenceAndBytePlans/bytes (0.32s)
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation/before-trash-rename
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation/after-trash-rename
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation/before-trash-delete
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation/after-trash-file
+=== RUN   TestGCInterruptedTrashRecoveryAndCancellation/cancel-after-file
+--- PASS: TestGCInterruptedTrashRecoveryAndCancellation (4.07s)
+    --- PASS: TestGCInterruptedTrashRecoveryAndCancellation/before-trash-rename (0.50s)
+    --- PASS: TestGCInterruptedTrashRecoveryAndCancellation/after-trash-rename (0.75s)
+    --- PASS: TestGCInterruptedTrashRecoveryAndCancellation/before-trash-delete (0.91s)
+    --- PASS: TestGCInterruptedTrashRecoveryAndCancellation/after-trash-file (0.97s)
+    --- PASS: TestGCInterruptedTrashRecoveryAndCancellation/cancel-after-file (0.94s)
+=== RUN   TestGCUnknownTrashIsReportedAndNeverDeleted
+--- PASS: TestGCUnknownTrashIsReportedAndNeverDeleted (0.71s)
+=== RUN   TestGCCorruptedCurrentCannotDiscardRollbackCandidates
+--- PASS: TestGCCorruptedCurrentCannotDiscardRollbackCandidates (0.66s)
+=== RUN   TestGCInvalidReleaseAndPendingIntentRemainProtected
+--- PASS: TestGCInvalidReleaseAndPendingIntentRemainProtected (0.70s)
+=== RUN   TestGCRecoveryRejectsForeignTrash
+--- PASS: TestGCRecoveryRejectsForeignTrash (0.74s)
+=== RUN   TestGCMutationBlocksReaderAdmission
+--- PASS: TestGCMutationBlocksReaderAdmission (0.60s)
+=== RUN   TestGCIdempotentPromotionPreservesActualRollbackReference
+--- PASS: TestGCIdempotentPromotionPreservesActualRollbackReference (0.70s)
+=== RUN   TestGCProcessHelper
+--- PASS: TestGCProcessHelper (0.00s)
+=== RUN   TestGCReaderCrashAndPartialDeleteProcessRecovery
+=== RUN   TestGCReaderCrashAndPartialDeleteProcessRecovery/reader
+=== RUN   TestGCReaderCrashAndPartialDeleteProcessRecovery/delete
+--- PASS: TestGCReaderCrashAndPartialDeleteProcessRecovery (1.72s)
+    --- PASS: TestGCReaderCrashAndPartialDeleteProcessRecovery/reader (0.84s)
+    --- PASS: TestGCReaderCrashAndPartialDeleteProcessRecovery/delete (0.88s)
+=== RUN   TestGCProtectsCurrentReaderAndReviewedHold
+--- PASS: TestGCProtectsCurrentReaderAndReviewedHold (0.75s)
+=== RUN   TestPromotionLockRejectsConcurrentSwapAndLinkedLock
+--- PASS: TestPromotionLockRejectsConcurrentSwapAndLinkedLock (0.05s)
+PASS
+ok  	github.com/0xmhha/knowledge-system/internal/setup	19.733s

@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 실행: N-05 보존/GC 완료, N-06 설계 (2026-10-06)
+
+현재 **N-01–05 완료5/18, 잔여13개 N-06–18, 다음 N-06 자원 상한/deadline**. 사용자가 요청한 잔여15개 가운데 N-04/05 2개를 완료했다. [GC DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n05-2026-10-06/cli-results.json)와 [실행 명세](./REFACTORING-EXECUTION-SPEC.md)를 우선한다. 결정적 dry-run·reviewed plan digest·실제 rollback 참조·reader OS lease·미해제 review/unknown legacy 보호·trash journal/취소/2 process crash 복구를 구현했다. actual CKS/CKG/CKV 5버전·공개 CLI12사례·실제 stdio MCP의 양 backend/alignment/serviceable·v1 pin을 확인하고 current v5를 보존하며 v2/v3만 회수했다. 서버 종료 뒤 v1을 회수했다. 6패키지 race/vet·경계·문서를 검증했다. 구/unleased engine reader를 GC와 병행하지 않는 업그레이드 경계 및 native Darwin 한계를 유지한다. 모든15개 완료 goal은 활성이고 종료/운영 사실을 만들지 않는다. 아래는 이전 시점의 기록이다.
+
 ## 최신 실행: N-04 내구성 완료, N-05 설계 (2026-10-06)
 
 현재 **N-01–04 완료4/18, 잔여14개 N-05–18, 다음 N-05 보존/reader/GC 실패 재현과 구현**이다. [명세](./REFACTORING-EXECUTION-SPEC.md)와 [DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/manifest.json)를 우선한다. DB/WAL/close·전체 파일/디렉터리 sync·current rename/parent sync를 보강했고 8+5 실패 주입 경계, 7 SIGKILL 복구, 실제 CLI 7+2, 9패키지 race·vet·경계·문서를 검증했다. 검토 intent와 release를 분리해 같은 승인/base만 복구하며 post-rename 실패는 durability_uncertain이다. native Darwin 실측이며 Linux/전원 차단/운영 판정을 만들지 않았다. main 동기화/열린 PR0 확인은 완료했고 최신 작업은 기존 feat 브랜치에 보존한다. 전체15개 완료 목표는 계속 활성이다. 아래 문단은 이전 시점의 이력이다.

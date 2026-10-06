@@ -88,3 +88,9 @@ v1 데이터는 커밋형 읽기 전용 `legacy_unpinned`이며 좌표를 추측
 4. v1→v2 재색인, 실패 후보, 롤백, 기존 프로세스와 새 프로세스의 서빙 ID를 재생한다. 빈 좌표의 v1과 v2 근거를 같은 팩에 섞지 않는다.
 
 과거 `internal/system/mcp/testdata/agent-mcp.schema.json`은 `task` 입력을 적고 있었지만 등록 도구는 `prompt`를 받았다. fixture와 회귀 시험을 실제 입력에 맞췄다. v2 DTO의 좌표·본문·선택형 의미 필드와 정규화 해시를 변조/왕복 시험했다.
+
+## 보존 계획·GC와 reader 계약
+
+`cks gc --out <dataset> --dry-run --plan-file <plan.json>`은 기본 최근2개·최소30일과 보호 이유·파일 바이트/미복구 trash/회수·capacity 상태를 보여 준다. `--apply --plan-file`은 동일한 계획 digest와 현재 참조/파일 상태에서만 삭제한다. `--resume`은 검증된 중단 journal만 재개하며 foreign/unknown trash를 지우거나 복구 완료라고 보고하지 않는다. 보호 때문에 capacity 목표를 못 맞추면 over_budget을 유지한다.
+
+current·실제 rollback 참조·명시 보호·유효하게 해제되지 않은 review hold/intent·살아 있는 reader를 보호한다. 새 pinned 후보는 reader-flock-v1을 기록하고 managed CKS는 backend/보관 원문을 열기 전에 shared OS lease를 얻는다. lease inode를 보존하고 종료/crash 시 OS가 해제한다. 이전 후보와 검증 불가/부분 후보는 자동 회수하지 않는다. 구 서버·직접 low-level engine reader는 GC와 병행하지 않고 중단 후 새 managed CKS로 전환한다. 이는 임의 consumer/network filesystem에 대한 reader 추적 보장이 아니다. [전체 명세·원자료](./REFACTORING-EXECUTION-SPEC.md)의 검증/플랫폼 경계를 따른다.
