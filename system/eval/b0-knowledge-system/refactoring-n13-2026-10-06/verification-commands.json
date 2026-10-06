@@ -1,0 +1,79 @@
+{
+  "green-worksheet.log": {
+    "argv": [
+      "go",
+      "test",
+      "./cmd/cks/domaincli",
+      "./internal/system/knowledgepack",
+      "-run",
+      "^TestWorksheet",
+      "-v",
+      "-count=1"
+    ],
+    "exit_code": 0
+  },
+  "final-worksheet.log": {
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./cmd/cks/domaincli",
+      "-run",
+      "^TestWorksheet",
+      "-v",
+      "-count=1"
+    ],
+    "exit_code": 0
+  },
+  "race-related.log": {
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./cmd/cks/domaincli",
+      "./internal/system/inventory",
+      "./internal/system/knowledgepack",
+      "./internal/system/domainexport",
+      "./internal/system/vocab"
+    ],
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false"
+    }
+  },
+  "native-cli.log": {
+    "argv": [
+      "python3",
+      "system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/verify-cli.py.txt"
+    ],
+    "exit_code": 0
+  },
+  "vet.log": {
+    "argv": [
+      "go",
+      "vet",
+      "./cmd/cks/domaincli",
+      "./internal/system/inventory",
+      "./internal/system/knowledgepack",
+      "./internal/system/domainexport",
+      "./internal/system/vocab"
+    ],
+    "exit_code": 0
+  },
+  "boundaries.log": {
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ],
+    "exit_code": 0
+  },
+  "docs.log": {
+    "argv": [
+      "make",
+      "docs-check"
+    ],
+    "exit_code": 0
+  }
+}

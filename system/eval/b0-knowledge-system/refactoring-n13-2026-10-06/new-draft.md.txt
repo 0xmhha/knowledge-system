@@ -1,0 +1,48 @@
+# Verification Worksheet — `go-stablenet`
+
+> **Generated**: 2026-10-06 by `cks domain worksheet`
+> **Filter**: status=`draft`, priority=`(all)`
+> **Entries in queue**: 0
+
+## Session header (one per session, fill once)
+
+- **Project**: `go-stablenet` @ `<commit-sha>`
+- **Session date**: ____________
+- **Domain expert**: ____________ · **Operator**: ____________
+- **Pre-flight**: run `cks domain check`, record its result, and confirm source anchors before approval. Generation does not run this check.
+
+### Selected review catalogs
+
+- Pack: organization.stablenet @ 1.0.0; digest: 23bfd6326850b097a61b2c8583c418342e77052cc69f4b84f75cec7e76c6ba59
+- Authority: Copied legacy keyword heuristic; human review required; scope: Explicit legacy worksheet review heuristics; not verified operating policy
+- Original hallucination-risk reference: packs/worksheet-risks/catalog-source.md:6-6 (verified source bytes; heuristic review aid)
+- Original trap catalog reference: packs/worksheet-risks/catalog-source.md:7-7 (verified source bytes; heuristic review aid)
+
+- Status policy: system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md, verification checklist.
+
+### Decision dictionary
+
+- **APPROVE** → entry promoted to `verified`; run the per-entry promotion command at the bottom of the section.
+- **REVISE** → return to author with the reviewer notes filled in; entry stays `needs_verification`.
+- **REJECT** → archive entry (rare; only if the trap is wrong, not just imprecise).
+
+---
+
+## Entries
+
+## Footer — post-session sync (runs once after all APPROVE entries are promoted)
+
+```bash
+# Re-emit policy (ckg governs) + glossary (ckv vocab) for downstream consumers
+./bin/cks domain sync --project 'projects/stablenet/domain-knowledge'
+./bin/cks domain glossary-gen --project 'projects/stablenet/domain-knowledge' --status verified
+
+# Refresh ckv (channel ② docs) + ckg (governance edges) in lockstep.
+# Build a new pinned candidate with cks setup --config YOUR_SETUP_CONFIG --version NEW_VERSION.
+```
+
+## Notes on generator behaviour
+
+- The `Maps to:` line uses a token-overlap heuristic against explicitly selected pack catalogs. If the suggested item is wrong, the reviewer should correct it in-line — the worksheet is treated as a working document, not as authoritative metadata.
+- The `suggested: …` hint on each invariant is the anchor whose `reason` field shares the most words with the invariant text. A hint is shown only when at least one anchor scores > 0; otherwise the slot is left blank.
+- B6 entries (`procedure_steps`) and B7 entries (`constants`) get extra question blocks (Q5/Q6); other knowledge types omit them.

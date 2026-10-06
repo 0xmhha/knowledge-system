@@ -190,3 +190,7 @@ DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 so
 ### 2026-10-06 N-07 완료 / 다음 N-11
 
 [N-07 새 DEV](../../system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json)는 본문32000bytes/12citation의 전체 span 선택·partial 진단·typed budget 오류를 검증했다. registered public RPC에서 경계를 재현했고 native 실제 엔진 MCP는 upstream 큰본문 제외로 별도 호환성 증거다.13개 패키지 race와 byte/hash/sanitize/scope/semantic 경계를 통과했다. N-01–07 완료7/18, 요청15개 중4완료, 잔여N-08–18 11개. 다음은 튜닝 전 N-11 새 사전평가 입력/프로토콜, N-12 실제 내용 검토, N-13 팩 분리다. 이전 FINAL을 새 holdout/새소스 합격으로 재사용하지 않는다.
+
+### 2026-10-06 N-13 선택형 worksheet catalog 완료
+
+[N13 DEV](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json), [catalog 계약](./WORKSHEET-CATALOG-CONTRACT-V1.md). 기존 hardcoded StableNet8항목을 명시 선택 pack 자료로 이전하고 version/digest/의존/type/출처SHA·좌표를 검증한다. 무팩/구팩 공통경로,8매핑/필터/앵커/빈queue, 실제CLI11회와 기존 파일80개 변경0/자동승격0, 관련5패키지 race 통과. 앵커 검사를 실행하지 않는 생성기가 검사 완료를 주장하던 문구와 존재하지 않는 승인 CLI 예제도 교정했다. N-01–07/N-13 완료8/18, 요청15개 중5완료, 잔여N-08–12/N-14–18 10개. 다음은N-11 새 평가와N-12 실제 내용 검토 자료; 운영 환경/담당/RTO/RPO 질문은 답변 대기다. 새 원자료 푸시/배포는 하지 않았다.

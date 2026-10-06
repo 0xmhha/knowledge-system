@@ -1,0 +1,31 @@
+import hashlib,json,pathlib,platform,shutil,subprocess
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n13-2026-10-06'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((root/'system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json').read_text())
+assert all(sha(root/p)==s for p,s in base['approved_input_sha256'].items())
+assert 'FAIL' in (e/'red-generic-catalog.log').read_text()
+for p in ['green-worksheet.log','final-worksheet.log','green-pack-validation.log']:
+ assert 'PASS' in (e/p).read_text() and 'FAIL' not in (e/p).read_text()
+c=json.loads((e/'cli-verification.json').read_text());assert c['status']=='PASS' and len(c['cases'])==11 and c['project_file_sha256_before_after_equal'] and c['automatic_status_promotions']==0
+packages=['cmd/cks/domaincli','internal/system/inventory','internal/system/knowledgepack','internal/system/domainexport','internal/system/vocab']
+race=(e/'race-related.log').read_text();assert 'FAIL' not in race and all('knowledge-system/'+p+'\t' in race for p in packages)
+assert not (e/'vet.log').read_text().strip()
+assert 'engine boundaries: OK' in (e/'boundaries.log').read_text()
+assert 'documentation: OK' in (e/'docs.log').read_text()
+changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
+assert not any(p.startswith('system/eval/') and not p.startswith(str(e.relative_to(root))+'/') for p in changed)
+paths=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()
+extra=['projects/stablenet/domain-knowledge/project.yaml',*[str(p.relative_to(root)) for p in (root/'projects/stablenet/domain-knowledge/packs/worksheet-risks').rglob('*') if p.is_file()]]
+paths=sorted(set(base['source_sha256'])|{p for p in paths if p.startswith(('cmd/','internal/','pkg/'))}|set(extra))
+source={p:sha(root/p) for p in paths};delta={p:s for p,s in source.items() if base['source_sha256'].get(p)!=s}
+for rel in delta:
+ out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
+commands={'green-worksheet.log':['go','test','./cmd/cks/domaincli','./internal/system/knowledgepack','-run','^TestWorksheet','-v','-count=1'],'final-worksheet.log':['go','test','-race','./cmd/cks/domaincli','-run','^TestWorksheet','-v','-count=1'],'race-related.log':['go','test','-race',*('./'+p for p in packages)],'native-cli.log':['python3',str((e/'verify-cli.py.txt').relative_to(root))],'vet.log':['go','vet',*('./'+p for p in packages)],'boundaries.log':['./scripts/check-boundaries.sh'],'docs.log':['make','docs-check']}
+commands={p:{'argv':argv,'exit_code':0} for p,argv in commands.items()}
+commands['race-related.log']['env']={'GOCACHE':'/private/tmp/ks-wbs-go-cache','GIT_CONFIG_COUNT':'1','GIT_CONFIG_KEY_0':'commit.gpgsign','GIT_CONFIG_VALUE_0':'false'}
+(e/'verification-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+(e/'environment.json').write_text(json.dumps({'system':platform.system(),'machine':platform.machine(),'go':subprocess.check_output(['go','version'],text=True).strip(),'base_commit':'fecb6f51','scope':'native Darwin CLI worksheet data separation; no new FINAL, model, human/operational approval'},indent=2)+'\n')
+reports=['REFACTORING-EXECUTION-SPEC.md','REFACTORING-REMAINING-WORKLIST.md','WORKSHEET-CATALOG-CONTRACT-V1.md','REMOTE-SESSION-HANDOFF.md']
+m={'schema_version':1,'status':'N13_acceptance_verified','base_commit':'fecb6f51','scope':'generic/explicit/old-pack worksheet, namespace/digest/provenance and existing output protection; native Darwin CLI; no status promotion or human quality/operational verdict','source_sha256':source,'changed_source_sha256':delta,'approved_input_sha256':base['approved_input_sha256'],'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='manifest.json'}}
+(e/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
+print('N13 acceptance binding PASS:',len(source),'source/data/dependency files;',len(delta),'changed/new;',len(m['evidence_sha256']),'evidence files; approved inputs 5 unchanged')

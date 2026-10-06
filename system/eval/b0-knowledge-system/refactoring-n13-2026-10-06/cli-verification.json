@@ -1,0 +1,156 @@
+{
+  "status": "PASS",
+  "platform": "native Darwin ARM64",
+  "cases": [
+    {
+      "name": "old-queue",
+      "binary_sha256": "b2bd8a756012e3f52623772ffd129add3cd7640c3ce8d32104631a74cde96623",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet"
+      ],
+      "exit": 0,
+      "output_sha256": "2645c74b844dbe1469e17a1af285dd8200913ef6e24f7291fc30a92f7a37ef95"
+    },
+    {
+      "name": "new-queue",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet"
+      ],
+      "exit": 0,
+      "output_sha256": "fec332a2b2a58dd9bc5ea5da348f155eeb6cbe952dbca18adafff0f0a627b737"
+    },
+    {
+      "name": "old-p0",
+      "binary_sha256": "b2bd8a756012e3f52623772ffd129add3cd7640c3ce8d32104631a74cde96623",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--priority",
+        "P0"
+      ],
+      "exit": 0,
+      "output_sha256": "f26fecf0d8cb15aa18c29be1f33ce45154047f6df9720ba6f8889627cbee0633"
+    },
+    {
+      "name": "new-p0",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--priority",
+        "P0"
+      ],
+      "exit": 0,
+      "output_sha256": "7688609fab142dc094cb89c34993bf25ec944511b31123f37d1d2f681e5416b1"
+    },
+    {
+      "name": "old-draft",
+      "binary_sha256": "b2bd8a756012e3f52623772ffd129add3cd7640c3ce8d32104631a74cde96623",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--status",
+        "draft"
+      ],
+      "exit": 0,
+      "output_sha256": "42f6a9215b1422518c5f9059cd5af9ee94e230c72c9bf75e64ae631c5605b7a4"
+    },
+    {
+      "name": "new-draft",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--status",
+        "draft"
+      ],
+      "exit": 0,
+      "output_sha256": "858657fcc00997936df1207e9f09decb7cc31aaecf7fb8376171593bfb7bacb3"
+    },
+    {
+      "name": "old-empty",
+      "binary_sha256": "b2bd8a756012e3f52623772ffd129add3cd7640c3ce8d32104631a74cde96623",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--status",
+        "no-such-status"
+      ],
+      "exit": 0,
+      "output_sha256": "91b1b4fadbdc61035f81bd37eb3c28c9ee451dd18543fa786ebd9e1fb78ad835"
+    },
+    {
+      "name": "new-empty",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+        "worksheet",
+        "--status",
+        "no-such-status"
+      ],
+      "exit": 0,
+      "output_sha256": "d6b3bd883953d90a91112b62716e5481538dac3a7a23d899d7167fb0e6543e96"
+    },
+    {
+      "name": "generic",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0",
+        "worksheet"
+      ],
+      "exit": 0,
+      "output_sha256": "9d094b623708dfa22abe15c4176263151c8e724a7d5661766e28f6672573cfdb"
+    },
+    {
+      "name": "generic-explicit-selection",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0",
+        "worksheet"
+      ],
+      "exit": 0,
+      "output_sha256": "676149e37f5f753defbc2ac8fb0c6f0904037dab8fa8cefc22a38535d2165d7a"
+    },
+    {
+      "name": "stale-pin",
+      "binary_sha256": "88bb9eec5d64e0f191aff2b26fc922e2f6307be1fd705f57c5d675afce871e6e",
+      "args": [
+        "domain",
+        "--project",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0",
+        "worksheet",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0/previous-review.md"
+      ],
+      "exit": 1,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "project_file_sha256_before_after_equal": true,
+  "project_files": 80,
+  "legacy_mappings_and_filters_identical": true,
+  "automatic_status_promotions": 0
+}

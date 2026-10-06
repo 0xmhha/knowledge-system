@@ -1,0 +1,288 @@
+# Verification Worksheet — `go-stablenet`
+
+> **Generated**: 2026-10-06 by `cks domain worksheet`
+> **Filter**: status=`needs_verification`, priority=`(all)`
+> **Entries in queue**: 2
+
+## Session header (one per session, fill once)
+
+- **Project**: `go-stablenet` @ `<commit-sha>`
+- **Session date**: ____________
+- **Domain expert**: ____________ · **Operator**: ____________
+- **Pre-flight**: run `cks domain check`, record its result, and confirm source anchors before approval. Generation does not run this check.
+
+### Selected review catalogs
+
+- Pack: organization.stablenet @ 1.0.0; digest: 23bfd6326850b097a61b2c8583c418342e77052cc69f4b84f75cec7e76c6ba59
+- Authority: Copied legacy keyword heuristic; human review required; scope: Explicit legacy worksheet review heuristics; not verified operating policy
+- Original hallucination-risk reference: packs/worksheet-risks/catalog-source.md:6-6 (verified source bytes; heuristic review aid)
+- Original trap catalog reference: packs/worksheet-risks/catalog-source.md:7-7 (verified source bytes; heuristic review aid)
+
+- Status policy: system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md, verification checklist.
+
+### Decision dictionary
+
+- **APPROVE** → entry promoted to `verified`; run the per-entry promotion command at the bottom of the section.
+- **REVISE** → return to author with the reviewer notes filled in; entry stays `needs_verification`.
+- **REJECT** → archive entry (rare; only if the trap is wrong, not just imprecise).
+
+---
+
+## Entries
+
+### `A1.testing.consensus_change_validation` · `[P0 · A1 · B6 · risk:high]`
+
+**Title**: Validating a WBFT consensus or state change before merge
+**Source of truth**: `code+docs` · **Status**: `needs_verification`
+**Maps to**: **07 §9 item 4** (quorum reimplementation (ceil(N−F) split-brain))
+
+**Catalog evidence**: organization.stablenet:risk-4; packs/worksheet-risks/catalog-source.md:12-12; file SHA256=d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0; span SHA256=16966a47f4365e4f284895551f102eafd47cbd78ca6cba2a3de809a9f2400b23 (heuristic, requires human review)
+
+**Summary** (read first):
+
+> Procedure a reviewer or implementer follows to validate any change to
+> WBFT consensus or state transition so it does not silently break safety
+> or liveness. Run the Go unit tests for the touched package; run them
+> under the race detector (go test -race) whenever Core.current,
+> round-state, or locks are touched (see A1.concurrency.core_lock_discipline);
+> assert consensus health (round-0 finalization rate, quorum = ceil(N-F),
+> no fork/stall) via the istanbul RPC namespace (API.Status / GetValidators);
+> and finally run an integration/regression network test. The external
+> chainbench harness provides a b-wbft regression suite that boots a
+> multi-node WBFT network on the built gstable binary — chainbench is a
+> SEPARATE repo, so it appears only in prose, not as a code anchor. Mind
+> the regression-account funding gotcha: the default profile funds only
+> the validators plus one endpoint account.
+
+**Anchors** (source coordinates to check before approval):
+
+1. `consensus/wbft/core/justification_test.go:40` · `TestJustifyTrue` — representative WBFT core consensus unit test; exercises round-change justification across quorum sizes 3..10 — run `go test ./consensus/wbft/core/...` when touching core consensus logic (step 1)
+2. `consensus/wbft/validator/default.go:226` · `defaultSet.QuorumSize` — quorum = ceil(N - F) — the value health assertion must match when checking finalization (step 3); cross-ref A1.wbft_core.quorum_calc
+3. `consensus/wbft/validator/default.go:222` · `defaultSet.F` — F = (N-1)/3 fault bound used by QuorumSize; defines the safety margin a change must not violate (step 3)
+4. `consensus/wbft/backend/api.go:165` · `API.Status` — istanbul RPC Status method returning RoundStats.RoundDistribution / TotalRounds and sealer activity — used to assert round-0 finalization rate and no-stall after a change (step 3)
+5. `consensus/wbft/backend/api.go:132` · `API.GetValidators` — istanbul RPC GetValidators — used with QuorumSize to confirm the active validator set and quorum during health assertion (step 3)
+6. `consensus/wbft/backend/engine.go:234` — registers the istanbul RPC namespace exposing Status/GetValidators; this is the namespace reached for health assertion over RPC (step 3)
+
+---
+
+#### Substantive review — STATUS_LIFECYCLE §verification-checklist
+
+**[Q1] Is the `summary` factually correct against current code?**
+
+- [ ] ✅ correct
+- [ ] ⚠️ partially (note what to revise)
+- [ ] ❌ wrong (explain)
+
+> reviewer note:
+
+**[Q2] Do the `code_keywords` match identifiers actually used in source?**
+
+Keywords: `API.Status` · `GetValidators` · `QuorumSize` · `RoundDistribution` · `b-wbft` · `c.current` · `chainbench` · `defaultSet.F` · `go test -race` · `istanbul`
+
+- [ ] ✅ all match
+- [ ] ⚠️ partial (list which are stale)
+- [ ] ❌ all stale
+
+> reviewer note:
+
+**[Q3] Invariants — does each one actually hold, and which code line enforces it?**
+
+- **I1.** *Any change touching c.current, round-state, or consensus locks must pass `go test -race` on the touched package before merge.*
+  - [ ] ✅ enforced at `__________________` (suggested: consensus/wbft/core/justification_test.go:40 `TestJustifyTrue`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I2.** *After the change, observed quorum behaviour must match QuorumSize = ceil(N - F); a finalization that succeeds with fewer commits indicates a broken safety bound.*
+  - [ ] ✅ enforced at `__________________` (suggested: consensus/wbft/validator/default.go:226 `defaultSet.QuorumSize`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I3.** *Round-0 finalization rate must not regress and no fork/stall may appear in istanbul.status RoundDistribution after the change.*
+  - [ ] ✅ enforced at `__________________` (suggested: consensus/wbft/backend/api.go:165 `API.Status`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+
+**[Q4] Pitfalls — describe one concrete failure mode for each. If you can't, the pitfall is decorative.**
+
+- **P1.** *Relying on unit tests alone for a consensus change: low-contention unit tests rarely interleave the goroutines that expose a race in c.current — only `go test -race` and a multi-node network surface it.*
+  > expected failure mode:
+- **P2.** *Skipping the integration/regression network test because unit tests are green: safety/liveness bugs (forks, stalls) only manifest with multiple nodes and adversarial timing under chainbench.*
+  > expected failure mode:
+- **P3.** *Default chainbench profile funds only validators + one endpoint account; a regression that appears to fail on consensus may actually be an unfunded-account error — fund extra accounts explicitly.*
+  > expected failure mode:
+
+**[Q5] Procedure steps — does each step still match current tooling/code paths?**
+
+- **S1.** *Step 1 — Unit tests: run the Go unit tests for every package you touched, e.g. `go test ./consensus/wbft/core/...`, `./consensus/wbft/backend/...`, `./consensus/wbft/validator/...`. justification_test.go (TestJustifyTrue/False) is the representative core consensus suite covering round-change justification.*
+  - [ ] ✅ still accurate · [ ] ⚠️ needs revision · [ ] ❌ obsolete
+- **S2.** *Step 2 — Race detector: whenever the change touches Core.current, round-state, or any lock, re-run the touched package with `go test -race ./consensus/wbft/core/...`. This is mandatory, not optional — cross-reference the lock-discipline invariant (A1.concurrency.core_lock_discipline).*
+  - [ ] ✅ still accurate · [ ] ⚠️ needs revision · [ ] ❌ obsolete
+- **S3.** *Step 3 — Health assertion: boot a node (or use an existing network) and query the istanbul RPC namespace. Use istanbul.status (API.Status) to read RoundStats.RoundDistribution and confirm a high round-0 finalization rate with no stall; use istanbul.getValidators (API.GetValidators) and compare against QuorumSize = ceil(N - F) to confirm quorum and no fork.*
+  - [ ] ✅ still accurate · [ ] ⚠️ needs revision · [ ] ❌ obsolete
+- **S4.** *Step 4 — Integration/regression: build the gstable binary and run the external chainbench b-wbft regression suite, which boots a multi-node WBFT network on that binary and replays consensus scenarios. NOTE: chainbench lives in a SEPARATE repository; reference it by name/procedure only.*
+  - [ ] ✅ still accurate · [ ] ⚠️ needs revision · [ ] ❌ obsolete
+- **S5.** *Step 5 — Funding gotcha: when running the chainbench b-wbft regression, remember the default profile funds only the validator accounts plus one endpoint account. Any regression scenario that sends from other accounts must explicitly fund them first, or it will fail with insufficient-balance rather than a real consensus fault.*
+  - [ ] ✅ still accurate · [ ] ⚠️ needs revision · [ ] ❌ obsolete
+
+**Decision**:
+
+- [ ] **APPROVE** → run:
+  ```bash
+  ./bin/cks domain verify --project 'projects/stablenet/domain-knowledge' --entry 'A1.testing.consensus_change_validation' --by REVIEWER_HANDLE
+  ```
+- [ ] **REVISE** → write notes above; entry stays `needs_verification`.
+- [ ] **REJECT** → archive entry; open a follow-up to delete or supersede.
+
+---
+
+### `A4.gov_validator.storage_and_governance` · `[P0 · A4 · B2 · risk:high]`
+
+**Title**: GovValidator (0x1001): storage layout and validator-set governance
+**Source of truth**: `code` · **Status**: `needs_verification`
+**Maps to**: **07 §9 item 1** (stake-weighted voting / slashing)
+
+**Catalog evidence**: organization.stablenet:risk-1; packs/worksheet-risks/catalog-source.md:9-9; file SHA256=d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0; span SHA256=9f80f2984dc0dbea9b2ec3ac34f95489f17641ee409ab2c093ca23921b176ab7 (heuristic, requires human review)
+
+**Summary** (read first):
+
+> GovValidator is the system contract at address 0x1001 that owns the
+> on-chain validator set. Its storage layout is defined by the
+> SLOT_VALIDATOR_* constants in systemcontracts/gov_validator.go, which
+> MUST mirror the slot annotations in solidity/v1/GovValidator.sol:
+> blsPoP precompile address (0x32), the __validators EnumerableSet.AddressSet
+> (value slot 0x33 + length, index mapping at 0x34), validatorToOperator
+> (0x35), operatorToValidator (0x36), validatorToBlsKey (0x37),
+> blsKeyToValidator (0x38) and gasTip (0x39). Slots 0x0..0x31 are reserved
+> for the inherited GovBase. initializeValidator seeds all of these at
+> genesis from systemContracts.govValidator.params (members, validators,
+> blsPublicKeys, optional gasTip), keeping the validators array, the
+> operator<->validator mappings and the BLS-key mappings index-aligned per
+> member. Mutating the set at runtime goes through GovBase's m-of-n
+> governance: an active member calls configureValidator (direct, gated by
+> onlyActiveMember) for its own slot, while quorum changes go through
+> proposeChangeQuorum / proposeAddMember / proposeRemoveMember +
+> approveProposal, which auto-executes once approvals reach the snapshotted
+> quorum (requiredApprovals).
+
+**Anchors** (source coordinates to check before approval):
+
+1. `systemcontracts/gov_validator.go:36` · `SLOT_VALIDATOR_validators` — SLOT_VALIDATOR_* const block (0x32 blsPop .. 0x39 gasTip) defining the exact storage layout that must match the Solidity contract
+2. `systemcontracts/gov_validator.go:52` · `initializeValidator` — genesis initializer: seeds blsPoP, gasTip, validators array + length, validator<->operator and validator<->BLS-key mappings from govValidator.params
+3. `systemcontracts/gov_validator.go:203` · `ValidatorList` — storage read helper: reads the __validators EnumerableSet at SLOT_VALIDATOR_validators back out as []common.Address
+4. `systemcontracts/gov_validator.go:208` · `GetBLSPublicKey` — storage read helper: reads validatorToBlsKey mapping (0x37) for a validator address
+5. `systemcontracts/gov_validator.go:212` · `GetGasTip` — storage read helper: reads gasTip slot (0x39)
+6. `systemcontracts/stateutil.go:31` · `CalculateMappingSlot` — slot-derivation helper used by initializeValidator to compute mapping slots; keeps Go writes consistent with Solidity slot math
+7. `systemcontracts/solidity/v1/GovValidator.sol` · `GovValidator` — Solidity storage layout with per-field slot annotations (0x32 blsPoP .. 0x39 gasTip) that the Go SLOT_VALIDATOR_* constants must mirror exactly
+8. `systemcontracts/solidity/v1/GovValidator.sol` · `configureValidator` — runtime path for an active member to (re)register its own validator address + BLS key, gated by onlyActiveMember
+9. `systemcontracts/solidity/abstracts/GovBase.sol:262` · `approveProposal` — governance approval entry point; auto-executes when approvals reach the snapshotted quorum (requiredApprovals)
+10. `systemcontracts/solidity/abstracts/GovBase.sol:407` · `proposeChangeQuorum` — propose path for changing the m-of-n quorum that governs validator-set / governance changes
+11. `systemcontracts/contracts.go:38` · `GovValidatorContractV1` — go:embed of compiled v1 bytecode at artifacts/v1/GovValidator; CONTRACT_GOV_VALIDATOR registers it for version v1
+
+---
+
+#### Substantive review — STATUS_LIFECYCLE §verification-checklist
+
+**[Q1] Is the `summary` factually correct against current code?**
+
+- [ ] ✅ correct
+- [ ] ⚠️ partially (note what to revise)
+- [ ] ❌ wrong (explain)
+
+> reviewer note:
+
+**[Q2] Do the `code_keywords` match identifiers actually used in source?**
+
+Keywords: `GOV_VALIDATOR_PARAM_BLS_KEYS` · `GOV_VALIDATOR_PARAM_VALIDATORS` · `GovValidator` · `SLOT_VALIDATOR_blsKeyToValidator` · `SLOT_VALIDATOR_blsPop` · `SLOT_VALIDATOR_gasTip` · `SLOT_VALIDATOR_operatorToValidator` · `SLOT_VALIDATOR_validatorToBlsKey` · `SLOT_VALIDATOR_validatorToOperator` · `SLOT_VALIDATOR_validators` · `approveProposal` · `configureValidator` · `initializeValidator` · `proposeChangeQuorum`
+
+- [ ] ✅ all match
+- [ ] ⚠️ partial (list which are stale)
+- [ ] ❌ all stale
+
+> reviewer note:
+
+**[Q3] Invariants — does each one actually hold, and which code line enforces it?**
+
+- **I1.** *Slots 0x0..0x31 are reserved for the inherited GovBase; GovValidator's own fields start at 0x32 (blsPoP).*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/gov_validator.go:36 `SLOT_VALIDATOR_validators`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I2.** *The validators array and the per-validator BLS keys are kept index-aligned: initializeValidator writes validator i, its operator/member mapping, and blsKeys[i] in the same loop iteration.*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/gov_validator.go:52 `initializeValidator`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I3.** *validatorToOperator and operatorToValidator are maintained as inverse mappings; likewise validatorToBlsKey and blsKeyToValidator. Adding/removing a validator must update both directions.*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/gov_validator.go:52 `initializeValidator`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I4.** *len(members) == len(validators) == len(blsPublicKeys) is enforced by initializeValidator; mismatched genesis params error out.*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/gov_validator.go:52 `initializeValidator`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I5.** *The Go SLOT_VALIDATOR_* constants must byte-for-byte match the Solidity slot annotations in GovValidator.sol; the file header explicitly warns that changing them requires updating the contract.*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/gov_validator.go:36 `SLOT_VALIDATOR_validators`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+- **I6.** *Validator-set / quorum changes only take effect once approveProposal reaches the snapshotted requiredApprovals (m-of-n quorum).*
+  - [ ] ✅ enforced at `__________________` (suggested: systemcontracts/solidity/abstracts/GovBase.sol:262 `approveProposal`)
+  - [ ] ⚠️ implicit / no single line (e.g. structural — absence of a field)
+  - [ ] ❌ not enforced
+
+**[Q4] Pitfalls — describe one concrete failure mode for each. If you can't, the pitfall is decorative.**
+
+- **P1.** *Changing a SLOT_VALIDATOR_* constant (or the Solidity field order) without migrating existing storage and reindexing every reader (ValidatorList, GetBLSPublicKey, GetGasTip and the EnumerableSet helpers) silently corrupts validator-set reads. Cross-reference A3.validator_set.epoch_transition, which consumes ValidatorList.*
+  > expected failure mode:
+- **P2.** *__validators is an EnumerableSet: value slot 0x33 holds the length and the array elements, while its index mapping lives at the next slot (0x34, derived via IncrementHash). Treating 0x33 as a plain array without the 0x34 index slot breaks membership/removal.*
+  > expected failure mode:
+- **P3.** *blsKeyToValidator is keyed by raw bytes (variable-length); initializeValidator uses a blsWrapper to feed the key bytes into CalculateMappingSlot. Hashing the wrong representation (e.g. padded hash vs raw bytes) yields a wrong slot.*
+  > expected failure mode:
+- **P4.** *initializeValidator only runs for Version == v1 (genesis params path); upgrades to a later version must not re-run initialization or they would overwrite existing storage.*
+  > expected failure mode:
+- **P5.** *gasTip defaults to params.InitialGasTip when govValidator.params.gasTip is absent; do not assume zero.*
+  > expected failure mode:
+
+**[Q6] Constants — do the values match what's in source today?**
+
+- **SLOT_VALIDATOR_blsPop** = `0x32`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_validators** = `0x33`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_validatorToOperator** = `0x35`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_operatorToValidator** = `0x36`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_validatorToBlsKey** = `0x37`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_blsKeyToValidator** = `0x38`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **SLOT_VALIDATOR_gasTip** = `0x39`  — cite: `systemcontracts/gov_validator.go`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **BLS_PUBLIC_KEY_LENGTH** = `48` bytes — cite: `systemcontracts/solidity/v1/GovValidator.sol`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+- **BLS_SIGNATURE_LENGTH** = `96` bytes — cite: `systemcontracts/solidity/v1/GovValidator.sol`
+  - [ ] ✅ matches · [ ] ⚠️ drifted (record new value) · [ ] ❌ removed
+
+**Decision**:
+
+- [ ] **APPROVE** → run:
+  ```bash
+  ./bin/cks domain verify --project 'projects/stablenet/domain-knowledge' --entry 'A4.gov_validator.storage_and_governance' --by REVIEWER_HANDLE
+  ```
+- [ ] **REVISE** → write notes above; entry stays `needs_verification`.
+- [ ] **REJECT** → archive entry; open a follow-up to delete or supersede.
+
+---
+
+## Footer — post-session sync (runs once after all APPROVE entries are promoted)
+
+```bash
+# Re-emit policy (ckg governs) + glossary (ckv vocab) for downstream consumers
+./bin/cks domain sync --project 'projects/stablenet/domain-knowledge'
+./bin/cks domain glossary-gen --project 'projects/stablenet/domain-knowledge' --status verified
+
+# Refresh ckv (channel ② docs) + ckg (governance edges) in lockstep.
+# Build a new pinned candidate with cks setup --config YOUR_SETUP_CONFIG --version NEW_VERSION.
+```
+
+## Notes on generator behaviour
+
+- The `Maps to:` line uses a token-overlap heuristic against explicitly selected pack catalogs. If the suggested item is wrong, the reviewer should correct it in-line — the worksheet is treated as a working document, not as authoritative metadata.
+- The `suggested: …` hint on each invariant is the anchor whose `reason` field shares the most words with the invariant text. A hint is shown only when at least one anchor scores > 0; otherwise the slot is left blank.
+- B6 entries (`procedure_steps`) and B7 entries (`constants`) get extra question blocks (Q5/Q6); other knowledge types omit them.

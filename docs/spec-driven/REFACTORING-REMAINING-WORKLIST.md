@@ -2,11 +2,11 @@
 
 2026-10-06 · 기준 코드 `04d3bfdf` · [원래 목적/코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md). 이전 [시험 preview30항목](./EXECUTION-WORKLIST.md)은 사용자 선택 범위에서 종료됐다. 이 문서는 원래 목적과 코드 사이의 잔여를 관리하는 **새 후속 목록**이다. 이전 HC·입력 승인은 다시 요구하지 않는다.
 
-후속 목록 **18개 중 N-01–07 완료, 잔여11개(N-08–18)**. 제품 구현을 새로 완료한 항목은 N-02–07 6개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
+후속 목록 **18개 중 N-01–07 및 N-13 완료, 잔여10개(N-08–12, N-14–18)**. 제품 구현을 새로 완료한 항목은 N-02–07/N-13 7개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
 
 [study 보완 감사](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에서 더 오래된 목적 원문과 2026-06-26 마스터 계획을 확보했다. **상위 WI10개는 별도 추적 대상**이며 이 제품의18개와 합산하지 않는다. 상위 범위 전체의 완료 판정에는 coding-agent/ChainBench/별도 학습 저장소의 현행 코드·실행 증거 대조도 필요하다.
 
-[후속 실행 명세·완료 판정 절차](./REFACTORING-EXECUTION-SPEC.md)에 목적·설계·수용 조건별 검증을 기록한다. N-02–07의 수용 조건별 실행 증거를 대조하고 완료했다. [진행 원장](./REFACTORING-PROGRESS.json)과 `python3 scripts/check-refactoring-progress.py`는 완료 체크/커밋 증거/현행 소스/잔여수 일치를 자동 검사한다.
+[후속 실행 명세·완료 판정 절차](./REFACTORING-EXECUTION-SPEC.md)에 목적·설계·수용 조건별 검증을 기록한다. N-02–07/N-13의 수용 조건별 실행 증거를 대조하고 완료했다. [진행 원장](./REFACTORING-PROGRESS.json)과 `python3 scripts/check-refactoring-progress.py`는 완료 체크/커밋 증거/현행 소스/잔여수 일치를 자동 검사한다.
 
 ## 상태와 증거 규칙
 
@@ -31,7 +31,7 @@
 | N-10 | P1 · N-11, N-07/08 영향 | 실패 실측/진단: 일부p95비>1.25·neighbors 오류 | model/backend/원문 검증/의미 투영 비용 분해, 비반환 neighbors 오류 원인·영향 확인, 범위 내 비용/오류 개선 | 같은pack·같은ontology·static/dynamic/pooled·warm/cold·성공/오류 분모 유지; 실제K/MID/호출/크기와 회귀1.25 검증; 운영 부하는별도 |
 | N-11 | **P1 · 개발 튜닝 전에 준비** | 현FINAL 소그룹n<10·이미 관측 | 새 DEV 버전/질문과 결과 사전 비공개 독립 FINAL, 중요군 표본·평가 단위·정답·임계치·회전/비용 조건을 사전 검토·동결 | 충분한 독립 중요군으로 판정하거나 여전히inconclusive/disabled 명시. 반복/언어/상태/HC 문장 표본 부풀림0·이전FINAL 튜닝/holdout 재사용0 |
 | N-12 | P1 · 실제 내용 검토 | 파일럿개념20/요구사항3 proposed | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음 |
-| N-13 | P1 · D5/기존D-2 | 코드 차이 확인: StableNet catalog generic code | worksheet 도메인 catalog를 선택형 조직/프로젝트 팩 자료로 분리하고 공통core·무팩 기본경로를 검증 | 엔진에 조직 내용 hardcode 없음; 선택 팩 version/digest·의존/타입/출처 검증; 기존 worksheet·무팩/구팩 호환 |
+| N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
 | N-14 | P2 · N-12 | 구조 구현·실제 의미 수용 증거 필요 | 실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증 | 테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장 |
 | N-15 | P2 · N-02–14 중 변경 영향 | 환경/외부 소비자 미검증; 이전preview 제외 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
 | N-16 | P2 · 운영 출시 범위 결정 | 운영키·법무 미승인; test-preview 계약만 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
@@ -52,6 +52,6 @@
 
 GraphRAG 커뮤니티, RDF/OWL/SHACL, 물리 컬렉션 분할, 긴 함수 overlap 조정은 [PDF 추적표](./PDF-IMPROVEMENT-TRACE.md)의 조건부 연구 항목이다. 필요성/수용 조건 없이 필수 미완료로 추가하지 않았다. 이전 May CKV 계획이나 다른 저장소의 전체 coding-agent/ChainBench 작업도 이번 목록에 자동 편입하지 않았다.
 
-**현재 단계:** N-01–07 원문 대조·쓰기 보호·OS 잠금·내구성·GC·자원 상한/deadline·본문 예산 완료(7/18). **다음 작업:** N-11 사전평가 입력·프로토콜 준비, 이어 N-12/13. **남은 전체:** N-08–N-18, 11개(운영 범위는 조건부). 세부 완료마다 화면 로그와 이 문서의 상태·다음·전체 목록을 갱신한다.
+**현재 단계:** N-01–07 및 N-13 완료(8/18), 요청15개 중5개 완료. **다음 작업:** N-11 새 사전평가 입력·프로토콜과 N-12 실제 내용 검토 자료. **남은 전체:** N-08/09/10/11/12/14/15/16/17/18, 10개. 각 실제 수용 조건이 충족되기 전에는 완료 처리하지 않는다.
 
 **상위 목표의 추가 추적 전체:** WI-V1 오라클 타당성, WI-V2 수정안 선택, WI-3 의심 라벨링, WI-4 비결정 버그, WI-1 값 흐름, WI-2 규칙 태깅, WI-C 깊은 코드 리뷰, WI-6 값 흐름 기반 다단 확장, WI-SP 정책/보안패턴 노출, WI-5 별도 사람 검토 학습. 각 상태/보류/담당·제품 N 연결은 [복구한 상위10개 표](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md#3-복구한-상위-작업계획의-전체10개-항목)를 기준으로 한다. 다음 상위 감사는 담당 저장소와 현재 WI-V1/V2/3 증거 확인이다.

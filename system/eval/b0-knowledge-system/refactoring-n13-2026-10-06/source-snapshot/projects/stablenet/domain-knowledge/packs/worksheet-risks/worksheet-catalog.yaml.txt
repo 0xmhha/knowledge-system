@@ -1,0 +1,232 @@
+{
+  "catalog_schema_version": 1,
+  "pack_id": "organization.stablenet",
+  "pack_version": "1.0.0",
+  "title": "Legacy project risk catalog",
+  "authority": "Copied legacy keyword heuristic; human review required",
+  "scope": "Explicit legacy worksheet review heuristics; not verified operating policy",
+  "references": [
+    {
+      "label": "Original hallucination-risk reference",
+      "source": {
+        "path": "catalog-source.md",
+        "first": 6,
+        "last": 6,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "8347c1d7aa7e79911818f61823927e84e2a141f190dbee5ce199fd24f5d98771"
+      }
+    },
+    {
+      "label": "Original trap catalog reference",
+      "source": {
+        "path": "catalog-source.md",
+        "first": 7,
+        "last": 7,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "3bbbdc837bd7ce2f60508f7be8938a3c0235ebb9b0f92f96bb366c410ea1e211"
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "risk-1",
+      "label": "stake-weighted voting / slashing",
+      "mapping_label": "07 §9 item 1",
+      "keywords": [
+        "stake",
+        "weight",
+        "weighted",
+        "slashing",
+        "slash",
+        "equal",
+        "power",
+        "validator"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-1"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 9,
+        "last": 9,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "9f80f2984dc0dbea9b2ec3ac34f95489f17641ee409ab2c093ca23921b176ab7"
+      }
+    },
+    {
+      "id": "risk-2",
+      "label": "reorg / probabilistic-finality (forker, Td inert under WBFT)",
+      "mapping_label": "07 §9 item 2",
+      "keywords": [
+        "reorg",
+        "finality",
+        "forker",
+        "totaldifficulty",
+        "probabilistic",
+        "td",
+        "fork"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-2"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 10,
+        "last": 10,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "e53604f1b42a03f44f4665c3b238353691e4879f645c03acd23d667d91671861"
+      }
+    },
+    {
+      "id": "risk-3",
+      "label": "ETH-denominated assumptions (WKRC, base-fee redistribution)",
+      "mapping_label": "07 §9 item 3",
+      "keywords": [
+        "eth",
+        "wkrc",
+        "basefee",
+        "base-fee",
+        "burn",
+        "redistribut",
+        "ether",
+        "wei",
+        "denominat"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-3"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 11,
+        "last": 11,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "037f48d4c47adf5ed34962215c06613ae56863016fb373503ef9088f0b04d11a"
+      }
+    },
+    {
+      "id": "risk-4",
+      "label": "quorum reimplementation (ceil(N−F) split-brain)",
+      "mapping_label": "07 §9 item 4",
+      "keywords": [
+        "quorum",
+        "ceil",
+        "n-f",
+        "split-brain",
+        "supermajority",
+        "count"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-4"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 12,
+        "last": 12,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "16966a47f4365e4f284895551f102eafd47cbd78ca6cba2a3de809a9f2400b23"
+      }
+    },
+    {
+      "id": "risk-5",
+      "label": "feepayer sigHash payload",
+      "mapping_label": "07 §9 item 5",
+      "keywords": [
+        "feepayer",
+        "sighash",
+        "payload",
+        "fee-delegation",
+        "fee_delegation",
+        "sign",
+        "rlp"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-5"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 13,
+        "last": 13,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "49a51a3a3480d3bcdcf44eba95c19a8067797ccb079ae54f3691e7ee40ae1c9b"
+      }
+    },
+    {
+      "id": "risk-6",
+      "label": "missing blacklist enforcement point",
+      "mapping_label": "07 §9 item 6",
+      "keywords": [
+        "blacklist",
+        "transfer",
+        "blacklisted",
+        "blocked",
+        "denylist"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-6"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 14,
+        "last": 14,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "0322c98781f788da7cf2929c56bea6cb61e4056f0731fe89ed09113d3e2b5d15"
+      }
+    },
+    {
+      "id": "risk-7",
+      "label": "concurrency (Core.current off mutex, txpool mutation)",
+      "mapping_label": "07 §9 item 7",
+      "keywords": [
+        "concurrenc",
+        "mutex",
+        "rwmutex",
+        "lock",
+        "race",
+        "txpool",
+        "goroutine"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-7"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 15,
+        "last": 15,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "378a5dd61937089004bf25296660631069142eb29adca440b846a74d8c4bfcab"
+      }
+    },
+    {
+      "id": "risk-8",
+      "label": "breaking cherry-pick-ability (interleave StableNet into geth)",
+      "mapping_label": "07 §9 item 8",
+      "keywords": [
+        "cherry",
+        "cherrypick",
+        "cherry-pick",
+        "upstream",
+        "isolate",
+        "interleave",
+        "geth-origin"
+      ],
+      "type": {
+        "pack_id": "organization.stablenet",
+        "local_id": "risk-8"
+      },
+      "source": {
+        "path": "catalog-source.md",
+        "first": 16,
+        "last": 16,
+        "file_sha256": "d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0",
+        "content_sha256": "5ecc5eba30c80134b933f1a1d6ff13038986c35e7e0cf0f7dafa99ad5dfdddbf"
+      }
+    }
+  ]
+}

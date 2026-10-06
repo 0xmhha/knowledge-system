@@ -132,7 +132,7 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-04 | WAL·linked RED→GREEN, 8+5 실패 경계·7 SIGKILL 복구·CLI 7+2·9패키지 race | 완료 |
 | 2026-10-06 | N-05 | GC API RED→GREEN·5 중단/취소 경계·2 process crash·공개 CLI 12사례와 live MCP pin·6패키지 race | 완료 |
 
-**현재:** N-01–07 완료(7/18). **다음:** N-11 사전평가 입력·프로토콜 준비, 이어 N-12/13. **전체 잔여:** N-08–18, 11개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01–07 및 N-13 완료(8/18). **다음:** N-11 사전평가 입력·프로토콜 및 N-12 실제 내용 검토 자료. **전체 잔여:** N-08–12, N-14–18, 10개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
 
 ## N-05: 보존 정책·검토 가능한 GC와 reader pin
 
@@ -209,3 +209,18 @@ N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 - [ ] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
 - [ ] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
 - [ ] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
+
+## N-13: worksheet의 선택형 조직 catalog
+
+**상태: 검증 완료.** 공통 worksheet가 모든 프로젝트에 StableNet 위험 목록과 다른 저장소의 참조 문서를 출력한다. D5의 공통 코어/선택 팩 분리를 만족하도록 조직 목록을 프로젝트 자료로 옮긴다. N-11 사전 평가와 실제 내용 검토가 진행되는 동안 독립적으로 구현할 수 있다.
+
+- `project.yaml`의 선택형 `worksheet_packs`에 로컬 pack ID/정확 version/digest/source를 선언한다. 공통 inventory/worksheet는 조직 이름으로 분기하지 않는다. 무팩은 공통 검토 항목·앵커 힌트만 제공한다. 기존 StableNet 프로젝트에는 같은8항목과 원래 참조를 선택형 pack으로 이전해 같은 매핑을 유지한다.
+- 기존 domain pack schema의 별도 `worksheet-catalog.yaml` 자료를 읽는다. pack/의존/namespace/type와 catalog의 schema/header/항목/출처 원문 SHA·좌표를 확인한다. catalog 파일과 출처도 pack tree digest에 포함한다. symlink/traversal·누락/변조/잘못된 타입·의존은 출력 파일을 열기 전에 거부한다.
+- 출력에는 선택 pack의 ID/version/digest와 매핑의 heuristic 지위를 명시한다. 후보 매핑이나 문서 생성이 승인·verified 승격은 아니다. old pack에 catalog가 없으면 공통 경로로 동작한다. 기존 project 필터/앵커/검토 칸/기존 생성 문서는 보존하고 별도 출력으로 확인한다.
+
+- [x] N13-A 무팩 공통 worksheet에서 조직 hardcode/잘못된 참조 RED→GREEN, code/data 분리.
+- [x] N13-B 선택 pack의 version/digest·의존/타입·출처 검증과 변조/누락/경로/입력 실패 보호.
+- [x] N13-C 기존 StableNet8항목·필터/앵커/빈 queue·무팩/구팩 호환 및 명시 선택 metadata.
+- [x] N13-D 실제 CLI·관련 회귀/경계/문서·소스/선택 자료/원자료 바인딩, 승인/검토 상태 자동 승격0.
+
+N-13 증거: [manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json), [계약](./WORKSHEET-CATALOG-CONTRACT-V1.md). 무팩 누출 RED, 선택 팩 validation·8매핑·필터/앵커/빈queue/구팩 호환 GREEN, 실제 Darwin CLI11회와 기존 파일80개 변경0, 관련5패키지 race 및 문서/경계를 통과했다. 선택 catalog와 출처·project selection도 소스 바인딩에 포함한다. 생성은 사람 승인/앵커 검사 pass를 주장하지 않고 자동 상태 승격0이다. N-11/12/14–18 실제 평가·사람·운영 수용 조건은 남는다.

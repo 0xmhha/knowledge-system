@@ -1,0 +1,55 @@
+{
+  "pack_schema_version": 1,
+  "pack_id": "organization.stablenet",
+  "version": "1.0.0",
+  "owner": "project",
+  "scope": "Explicit legacy worksheet review heuristics; not verified operating policy",
+  "requires": [],
+  "concepts": [
+    {
+      "id": "risk-1",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: stake-weighted voting / slashing."
+    },
+    {
+      "id": "risk-2",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: reorg / probabilistic-finality (forker, Td inert under WBFT)."
+    },
+    {
+      "id": "risk-3",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: ETH-denominated assumptions (WKRC, base-fee redistribution)."
+    },
+    {
+      "id": "risk-4",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: quorum reimplementation (ceil(N−F) split-brain)."
+    },
+    {
+      "id": "risk-5",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: feepayer sigHash payload."
+    },
+    {
+      "id": "risk-6",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: missing blacklist enforcement point."
+    },
+    {
+      "id": "risk-7",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: concurrency (Core.current off mutex, txpool mutation)."
+    },
+    {
+      "id": "risk-8",
+      "kind": "rule",
+      "definition": "A legacy worksheet review topic: breaking cherry-pick-ability (interleave StableNet into geth)."
+    }
+  ],
+  "relation_types": [],
+  "constraints": [],
+  "competency_questions": [
+    "Which legacy risk topic should a reviewer inspect?"
+  ]
+}
