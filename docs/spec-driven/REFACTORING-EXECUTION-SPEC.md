@@ -48,6 +48,30 @@
 
 관련 5개 패키지 race·vet, 공개 입력/출력 스키마 및 경계/문서 검사를 통과했다. 로컬 포트를 쓰는 기존 httptest는 샌드박스에서 차단되어 확장 권한으로 재실행했다. 새 공개 legacy 시험의 인자 누락은 컴파일 단계에서 수정했다. 이 시험은 Darwin ARM64·mock 임베딩의 데이터 보존 검증이며 실제 BGE 품질·외부 daemon 설치·운영/전원 차단 시험은 아니다. 동시 writer와 fsync 한계는 별도 N-03/04에 남는다. 원 FINAL과 승인 입력5개는 변경하지 않았다. 코드·실행·문서 SHA는 이 증거 디렉터리의 manifest에 연결한다.
 
+## N-03: 빌드·승격·rollback의 공통 OS 잠금
+
+**상태: 완료.** INV-01/02와 A3/A8의 단일 writer·부분 후보 비활성 계약을 보호한다. PID/시각은 진단 정보이며 OS 잠금 소유권을 대신하지 않는다.
+
+### 설계
+
+- 빌드부터 gate/검토 보류/최종 포인터 전환까지 한 dataset의 OS 배타 잠금을 유지한다. 외부 승격/사람 검토 승격/rollback도 같은 잠금을 획득한다. Reindex의 내부 승격은 보유 중인 잠금 아래 실행하여 스스로 재획득하지 않는다.
+- 살아 있는 writer의 파일 나이로 잠금을 회수하지 않는다. OS가 종료/crash 시 잠금을 해제한다. 잠금 파일은 해제할 때 unlink하지 않아, 기다리던 프로세스가 서로 다른 inode를 잠그는 경합을 만들지 않는다.
+- symlink/비정규 잠금 파일을 거부한다. 기존 promotion lock의 보호도 유지한다. OS flock 보장 범위는 지원되는 로컬 파일시스템이며 임의 network filesystem 지원을 주장하지 않는다.
+- 이전 O_EXCL/PID 방식의 기록은 살아 있는 소유자이면 나이와 무관하게 거부하고, 죽은 소유자의 기록은 공통 OS 잠금 아래 전환한다. PID 접근 권한 불확실성은 살아 있을 가능성으로 처리한다. 구/신 writer를 동시에 실행하는 업그레이드는 지원하지 않으며 구 writer를 종료한 뒤 전환한다.
+
+### 수용 조건별 체크
+
+- [x] N03-A 긴 live holder의 오래된 시각/동시 acquire에서 두 writer 없음; 잠금 inode 유지.
+- [x] N03-B build holder와 Promote/Rollback/사람 검토 승격이 같은 lock으로 직렬화; 내부 Reindex 성공/보류 경로에는 재획득 오류 없음.
+- [x] N03-C 별도 프로세스의 동시 요청/강제 종료 후 OS 자동 회수. 살아 있는 legacy PID는 오래됐어도 탈취하지 않음.
+- [x] N03-D symlink/비정규 잠금 거부·legacy 전환 경계 문서·관련 회귀/race/vet와 소스/원자료 바인딩.
+
+### N-03 검증 결과와 한계
+
+[새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/cli-results.json). 변경 전 live holder의 오래된 시각 탈취와 build 중 pointer 승격을 각각 재현했다. 수정 후 긴 holder·legacy live PID·동일 inode 재획득·linked/nonregular 파일 거부·build/승격/rollback/사람 검토 승격 충돌을 시험했다. 별도 OS 프로세스 holder에 8개 동시 contender가 모두 진입하지 못했고 SIGKILL 후 같은 inode로 회수했다. Reindex 내부 정상 승격/검토 보류의 재획득 오류가 없으며 실제 CLI의 다른 빌드/rollback 동시 요청도 실패하고 current와 기존 버전을 보존했다. N-02 CLI 7개 안전 사례를 새 CKS로 다시 실행했다. 관련 5패키지 race/vet·경계·문서 검사를 통과했다.
+
+`.reindex.lock`는 OS 잠금 inode로 영구 유지한다. PID/시간/프로토콜 표시는 진단용이고 live holder의 나이로 삭제하지 않는다. 기존 `.promotion.lock`도 추가 보호로 유지한다. 오래된 writer를 모두 종료하고 새 프로토콜로 전환해야 한다. 구 writer와 신 writer의 동시 업그레이드, flock 의미가 불명확한 network filesystem, 실제 native Linux 실행은 이 증거 범위 밖이다. 이는 N-03의 명시적인 호환/플랫폼 경계이며 운영 환경 사실은 N-15/17에 남긴다. 전원 차단·후보/current fsync 순서는 N-04 미완료다.
+
 ## 다음 작업 설계의 준비 조건
 
 N-03은 빌드/승격/rollback의 동일 OS 잠금, 긴 live holder/동시 요청/owner crash 및 legacy 경계 시험을 먼저 작성한다. N-04는 DB close/checkpoint·후보 파일/디렉터리 sync·포인터 rename/부모 sync와 실패 주입 단계표를 먼저 작성한다. 이 두 항목은 N-02의 구현만으로 완료되지 않는다.
@@ -60,5 +84,6 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 |---|---|---|---|
 | 2026-10-06 | N-01 | 원문 8개/FR10·INV7·NFR5·S9·WBS29 대응 및 SHA 검증, `c9c91ebe` | 완료(기존 기록) |
 | 2026-10-06 | N-02 | 공개 MCP RED→GREEN, shared guard, 실제 CLI 7사례·SHA, race/vet/경계/문서 검증 | 완료 |
+| 2026-10-06 | N-03 | RED→GREEN, 별도 process 8 contender·SIGKILL 회수, CLI build/rollback 차단, race/vet | 완료 |
 
-**현재:** N-02 완료. **다음:** N-03의 긴 live holder/빌드-승격 경합 재현과 OS 잠금 설계. **전체 잔여:** N-03–18, 16개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01/02/03 완료(3/18). **다음:** N-04 저장 내구성/전환 순서 설계와 단계별 실패 재현. **전체 잔여:** N-04–18, 15개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.

@@ -22,6 +22,10 @@
 
 `ops.index`는 평면 legacy 데이터셋의 직접 갱신에 한정한다. 버전 고정/blue-green 경로와 손상된 pin은 export/엔진 실행 전에 `versioned_setup_required`로 거부한다. 현재 MCP `ops.setup`/`ops.reindex` 입력은 v2의 전체 설정·팩·소스·모델 신원을 전달하지 않으므로 pinned 데이터셋의 제자리 빌드와 legacy 후보로의 downgrade를 허용하지 않는다. 새 v2 후보는 동일한 검토 설정과 project ID를 사용하는 `cks setup --version <새 버전>`으로 빌드/검증/승격하며 `--hold-for-review`로 보류할 수 있다. 기존 버전 이름 재사용은 legacy도 거부한다. 평면 legacy 갱신 및 새로운 legacy blue-green 후보 빌드는 유지한다. 기존 서버는 승격 후에도 시작 시 pin한 버전을 사용하므로 새 버전을 읽으려면 재시작한다. low-level 엔진을 직접 실행한 쓰기는 이 관리 경로의 보호 밖이다. [설계·수용 조건·증거](./REFACTORING-EXECUTION-SPEC.md)를 따른다.
 
+### dataset mutation 잠금 (N-03)
+
+versioned 빌드·gate·보류/승격과 외부 승격/rollback은 동일한 OS 배타 잠금으로 직렬화한다. `.reindex.lock` 파일을 영구 유지하고 OS가 owner 종료 후 소유권을 회수한다. 잠금 파일 나이로 live holder를 탈취하거나 해제 시 unlink하지 않는다. 이전 O_EXCL writer의 살아 있는 PID는 시각과 무관하게 거부하며, 구 writer를 모두 종료한 뒤 새 writer로 업그레이드한다. 혼합 버전 writer와 flock 의미가 보장되지 않는 network filesystem은 이 계약 밖이다. N-04의 저장 내구성과 실제 지원 환경 판정은 별도다.
+
 ## v2 응답의 필수 필드
 
 ```json

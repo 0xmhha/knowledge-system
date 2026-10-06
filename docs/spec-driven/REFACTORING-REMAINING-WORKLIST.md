@@ -2,11 +2,11 @@
 
 2026-10-06 · 기준 코드 `04d3bfdf` · [원래 목적/코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md). 이전 [시험 preview30항목](./EXECUTION-WORKLIST.md)은 사용자 선택 범위에서 종료됐다. 이 문서는 원래 목적과 코드 사이의 잔여를 관리하는 **새 후속 목록**이다. 이전 HC·입력 승인은 다시 요구하지 않는다.
 
-후속 목록 **18개 중 N-01/02 완료, 잔여16개(N-03–18)**. 제품 구현을 새로 완료한 항목은 N-02 1개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
+후속 목록 **18개 중 N-01/02/03 완료, 잔여15개(N-04–18)**. 제품 구현을 새로 완료한 항목은 N-02/03 2개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
 
 [study 보완 감사](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에서 더 오래된 목적 원문과 2026-06-26 마스터 계획을 확보했다. **상위 WI10개는 별도 추적 대상**이며 이 제품의18개와 합산하지 않는다. 상위 범위 전체의 완료 판정에는 coding-agent/ChainBench/별도 학습 저장소의 현행 코드·실행 증거 대조도 필요하다.
 
-[후속 실행 명세·완료 판정 절차](./REFACTORING-EXECUTION-SPEC.md)에 목적·설계·수용 조건별 검증을 기록한다. N-02의 수용 조건별 실행 증거를 대조하고 완료했다.
+[후속 실행 명세·완료 판정 절차](./REFACTORING-EXECUTION-SPEC.md)에 목적·설계·수용 조건별 검증을 기록한다. N-02/03의 수용 조건별 실행 증거를 대조하고 완료했다.
 
 ## 상태와 증거 규칙
 
@@ -21,8 +21,8 @@
 |---|---|---|---|---|
 | N-01 | 완료 · 2026-10-06 | study/main `1c350c1` 원문3개·초기architecture/analysis 확보 | 초기 작성/보관 시점·SHA와 시작 배경 기록. FR10/INV7/NFR5/S9·WBS29를 v2/현행 감사와 대조 | [복구·대응 원장](../../system/eval/b0-knowledge-system/original-source-recovery-2026-10-06/recovered-source-and-trace.json). 기존 탐색 증거 보존. PDF 원본 재검증·상위WI 외부 구현 감사는 별도 |
 | N-02 | **완료 · 2026-10-06** | [실행 명세·검증](./REFACTORING-EXECUTION-SPEC.md), 공개 MCP RED→GREEN/CLI 7사례 | pinned v2에서 활성 DB를 직접 수정하지 않게 거부/후보 빌드 경로로 통일. legacy 유지보수 동작과 migration 경계 명시 | 한 엔진 실패/혼입/취소에도 이전current·신원·원문 보존; 실제 공개 MCP와 versioned setup 경로의 동일 후보/승격 증거. [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/cli-results.json); 동시 writer/내구성은 N-03/04에 유지 |
-| N-03 | **P0 · 바로 다음** | 코드 차이 확인: 빌드 O_EXCL/PID/6시간, 승격 flock | v2 빌드/승격/rollback의 OS 잠금 계약 정리·구현. 살아 있는 긴 빌드의 age reclaim·동시 회수 경합을 재현 | 긴 live holder/동시 요청/owner crash에서 두 writer 없음; PID·나이로 살아 있는 잠금 탈취 없음; legacy 호환 정책 기록 |
-| N-04 | **P0 · N-03** | 내구성 미검증: current rename 뒤 parent sync 없음 | DB checkpoint/close·source/manifest/candidate sync·current 전환/부모 sync 순서와 crash recovery 계약 보강 | 전환 단계별 실패/강제 종료 주입으로 이전 또는 완성된 새candidate만 관측. 전원 차단 검증/한계는 플랫폼별 구분 |
+| N-03 | **완료 · 2026-10-06** | [공통 OS 잠금 검증](./REFACTORING-EXECUTION-SPEC.md), legacy live PID·8process 경합/SIGKILL·CLI 충돌 | v2 빌드/승격/rollback의 OS 잠금 계약 정리·구현. 살아 있는 긴 빌드의 age reclaim·동시 회수 경합을 재현 | 긴 live holder/동시 요청/owner crash에서 두 writer 없음; PID·나이로 살아 있는 잠금 탈취 없음; legacy 호환 정책 기록. [DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/cli-results.json); 구 writer 중단 후 전환·local flock 경계 |
+| N-04 | **P0 · 바로 다음** | 내구성 미검증: current rename 뒤 parent sync 없음 | DB checkpoint/close·source/manifest/candidate sync·current 전환/부모 sync 순서와 crash recovery 계약 보강 | 전환 단계별 실패/강제 종료 주입으로 이전 또는 완성된 새candidate만 관측. 전원 차단 검증/한계는 플랫폼별 구분 |
 | N-05 | P1 · N-03/04 | 설계 기능 미구현: GC/보관 용량·기간 | 활성·rollback·실행 중 pinned reader·검토 대기 candidate 참조를 보호하는 GC dry-run/실행과 용량/보관 정책·status 보고 | 회수 계획 결정적·참조 중 blob/이력/의미 원문 삭제0; 경합/취소/복구 시험; 실제 삭제 전에 검토 가능한 dry-run |
 | N-06 | P1 · N-03/04 | 부분 구현: 캡처 기본 상한만, build2h deadline 없음 | 파일 수/단일/총 바이트 상한을 setup/config로 전달, build deadline·용량 예상/여유 공간·공개 resource 상태 구현 또는 계약 수정 검토 | 기본100000/32MiB/4GiB·계약2h와 설정값 결합, 초과/timeout에서 candidate 실패/이전current 보존, 민감 path 비노출 |
 | N-07 | **P0 · 새 DEV** | 실패 실측: POLICY03 모든8arm·240행 오류 | 32000바이트/12인용 경계 안의 보관 근거 선택/부분 상태 및 안전한 typed budget 오류를 설계하고 독립 DEV 재현 후 수정 | 본문/좌표/해시 훼손 없이 상한 준수; 오류·부분·정상 분모 유지; source_missing/mismatch 구분·권한 누출0; 원 FINAL 불변 |
@@ -52,6 +52,6 @@
 
 GraphRAG 커뮤니티, RDF/OWL/SHACL, 물리 컬렉션 분할, 긴 함수 overlap 조정은 [PDF 추적표](./PDF-IMPROVEMENT-TRACE.md)의 조건부 연구 항목이다. 필요성/수용 조건 없이 필수 미완료로 추가하지 않았다. 이전 May CKV 계획이나 다른 저장소의 전체 coding-agent/ChainBench 작업도 이번 목록에 자동 편입하지 않았다.
 
-**현재 단계:** N-01 원문 대조와 N-02 유지보수 쓰기 보호 완료(2/18). **다음 작업:** N-03 긴 live holder/동시 writer 재현과 OS 잠금 계약. **남은 전체:** N-03–N-18, 16개(운영 범위는 조건부). 세부 완료마다 화면 로그와 이 문서의 상태·다음·전체 목록을 갱신한다.
+**현재 단계:** N-01 원문 대조·N-02 쓰기 보호·N-03 공통 OS 잠금 완료(3/18). **다음 작업:** N-04 저장 내구성/전환 순서 설계와 실패 재현. **남은 전체:** N-04–N-18, 15개(운영 범위는 조건부). 세부 완료마다 화면 로그와 이 문서의 상태·다음·전체 목록을 갱신한다.
 
 **상위 목표의 추가 추적 전체:** WI-V1 오라클 타당성, WI-V2 수정안 선택, WI-3 의심 라벨링, WI-4 비결정 버그, WI-1 값 흐름, WI-2 규칙 태깅, WI-C 깊은 코드 리뷰, WI-6 값 흐름 기반 다단 확장, WI-SP 정책/보안패턴 노출, WI-5 별도 사람 검토 학습. 각 상태/보류/담당·제품 N 연결은 [복구한 상위10개 표](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md#3-복구한-상위-작업계획의-전체10개-항목)를 기준으로 한다. 다음 상위 감사는 담당 저장소와 현재 WI-V1/V2/3 증거 확인이다.

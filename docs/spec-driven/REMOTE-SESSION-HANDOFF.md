@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 실행: N-03 공통 OS 잠금 완료 (2026-10-06)
+
+[실행 명세](./REFACTORING-EXECUTION-SPEC.md)와 [후속 전체 목록](./REFACTORING-REMAINING-WORKLIST.md)을 우선한다. **N-01/02/03 완료 3/18, 잔여 N-04–18 15개. 다음 N-04 저장 내구성/전환 순서.** 변경 전 긴 live holder 나이 탈취 및 build 중 pointer 승격을 재현하고, 공통 persistent OS flock+기존 pointer lock으로 수정했다. separate process 8 contender 거부/SIGKILL 회수/동일 inode·legacy live PID·symlink/nonregular 거부·Reindex 자체 승격, 실제 CLI build/rollback 동시 요청 거부 및 N-02 7안전 사례, 5패키지 race/vet를 검증했다. [N-03 새 DEV](../../system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/cli-results.json). 기존 `.reindex.lock`는 unlink하지 않는다. 오래된 writer를 모두 중단 후 업그레이드하며 혼합 writer/network FS를 지원한다고 주장하지 않는다. 실제 Linux/전원 차단은 별도 잔여다. 아래 2/18·16개와 제품1096 불변 기록은 당시 이력이다. 원 FINAL/입력5개·사용자 폴더/Ollama 유지, 새 push/운영 배포 승인 없음.
+
 ## 최신 실행: 후속 spec-driven 개발 (2026-10-06)
 
 사용자가 후속 작업을 순차 수행하고 매 항목의 목적·설계·수용 조건·실행 증거를 문서로 갱신하며 미완료를 완료로 체크하지 않도록 요청했다. [실행 명세](./REFACTORING-EXECUTION-SPEC.md)와 [전체 목록](./REFACTORING-REMAINING-WORKLIST.md)을 우선한다. **N-01/02 완료(2/18), 잔여 N-03–18 16개. 다음 N-03 OS 잠금.** N-02는 공개 JSON-RPC RED→GREEN, pinned/손상/별칭 쓰기 및 async 우회 거부, legacy 호환·공유 builder, 실제 새 CLI 7사례의 이전 current/원문 SHA 보존 및 동일 신원 후보 보류/승격, 관련 5패키지 race/vet·경계·문서로 검증했다. [새 DEV 증거](../../system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/cli-results.json).
