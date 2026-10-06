@@ -1,0 +1,130 @@
+{
+  "red-durability.log": {
+    "exit_code": 1,
+    "phase": "before product changes",
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "-run",
+      "^TestPromotion(FlushesCandidateWALBeforePointer|RejectsLinkedCandidateArtifact)$",
+      "-v",
+      "-count=1"
+    ]
+  },
+  "green-durability.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "-run",
+      "^(TestPromotion|TestReviewedPromotionDurable|TestDurability|TestReindexHold)",
+      "-v",
+      "-count=1"
+    ]
+  },
+  "green-checkpoint.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "test",
+      "./internal/vector/store/sqlitevec",
+      "-run",
+      "^TestCheckpointRejectsBusyWAL$",
+      "-v",
+      "-count=1"
+    ]
+  },
+  "final-race-regression.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/setup",
+      "./internal/system/patch",
+      "./internal/vector/store/sqlitevec",
+      "./cmd/cks",
+      "./cmd/cks/setupcli",
+      "./internal/system/mcp",
+      "./internal/system/semantic",
+      "./internal/vector/build",
+      "./internal/graph/buildpipe",
+      "-count=1"
+    ]
+  },
+  "final-close-boundary-race.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/setup",
+      "./cmd/cks",
+      "./cmd/cks/setupcli",
+      "./internal/system/patch",
+      "./internal/system/mcp",
+      "-count=1"
+    ]
+  },
+  "cli-run.log": {
+    "exit_code": 0,
+    "env": {},
+    "argv": [
+      "python3",
+      "system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/verify-cli.py.txt"
+    ]
+  },
+  "vet.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "go",
+      "vet",
+      "./internal/setup",
+      "./internal/system/patch",
+      "./internal/vector/store/sqlitevec",
+      "./cmd/cks",
+      "./cmd/cks/setupcli",
+      "./internal/system/mcp",
+      "./internal/system/semantic",
+      "./internal/vector/build",
+      "./internal/graph/buildpipe"
+    ]
+  },
+  "boundaries.log": {
+    "exit_code": 0,
+    "env": {},
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ]
+  },
+  "docs.log": {
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    },
+    "argv": [
+      "make",
+      "docs-check"
+    ]
+  }
+}

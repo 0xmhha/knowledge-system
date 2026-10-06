@@ -1,0 +1,51 @@
+import hashlib,json,pathlib,platform,shutil,subprocess,shlex
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n04-2026-10-06'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((root/'system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/manifest.json').read_text())
+assert all(sha(root/p)==s for p,s in base['approved_input_sha256'].items())
+c=json.loads((e/'cli-results.json').read_text());assert c['success'] and len(c['cases'])==7
+assert [x['exit_code'] for x in c['cases']]==[0,1,1,1,1,0,0]
+assert all(x.get('active_tree_unchanged') for x in c['cases'][1:5])
+assert all(x.get('same_source_and_dataset_identity') for x in c['cases'][5:])
+assert len(c['concurrent_requests'])==2 and all(x['exit_code']==1 and x['candidate_not_created'] for x in c['concurrent_requests'])
+assert 'uncheckpointed WAL' in (e/'red-durability.log').read_text()
+assert 'symlink artifact published' in (e/'red-durability.log').read_text()
+green=(e/'green-durability.log').read_text()
+for name in ['TestPromotionDurabilityFailureBoundaries/checkpoint-close','TestReviewedPromotionDurableIntentRecovery/release','TestPromotionProcessKillRecovery/reviewed/review-marker','TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore','TestReindexHoldDoesNotReportDoneAfterPersistenceFailure','TestPromotionHandlesSidecarsRemovedByCheckpointClose']:
+ assert name in green
+assert 'FAIL' not in green
+assert 'PASS' in (e/'green-checkpoint.log').read_text()
+packages=['internal/setup','internal/system/patch','internal/vector/store/sqlitevec','cmd/cks','cmd/cks/setupcli','internal/system/mcp','internal/system/semantic','internal/vector/build','internal/graph/buildpipe']
+race=(e/'final-race-regression.log').read_text()
+assert all('knowledge-system/'+p+'\t' in race for p in packages)
+assert 'FAIL' not in race and 'FAIL' not in (e/'final-close-boundary-race.log').read_text()
+assert not (e/'vet.log').read_text().strip()
+assert 'engine boundaries: OK' in (e/'boundaries.log').read_text()
+assert 'documentation: OK' in (e/'docs.log').read_text()
+changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
+assert not any(x.startswith('system/eval/') and not x.startswith('system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/') for x in changed),'historical evidence modified'
+paths=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()
+paths=sorted({p for p in paths if p.startswith(('cmd/','internal/','pkg/'))}|{'go.mod','go.sum'})
+source={p:sha(root/p) for p in paths};delta={p:s for p,s in source.items() if base['source_sha256'].get(p)!=s}
+for rel in delta:
+ out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
+commands={
+ 'red-durability.log':{'exit_code':1,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go test ./internal/setup -run ^TestPromotion(FlushesCandidateWALBeforePointer|RejectsLinkedCandidateArtifact)$ -v -count=1','phase':'before product changes'},
+ 'green-durability.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go test ./internal/setup -run ^(TestPromotion|TestReviewedPromotionDurable|TestDurability|TestReindexHold) -v -count=1'},
+ 'green-checkpoint.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go test ./internal/vector/store/sqlitevec -run ^TestCheckpointRejectsBusyWAL$ -v -count=1'},
+ 'final-race-regression.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go test -race '+' '.join('./'+p for p in packages)+' -count=1'},
+ 'final-close-boundary-race.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go test -race ./internal/setup ./cmd/cks ./cmd/cks/setupcli ./internal/system/patch ./internal/system/mcp -count=1'},
+ 'cli-run.log':{'exit_code':0,'command':'python3 system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/verify-cli.py.txt'},
+ 'vet.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache go vet '+' '.join('./'+p for p in packages)},
+ 'boundaries.log':{'exit_code':0,'command':'./scripts/check-boundaries.sh'},
+ 'docs.log':{'exit_code':0,'command':'GOCACHE=/private/tmp/ks-wbs-go-cache make docs-check'}}
+for value in commands.values():
+ argv=shlex.split(value.pop('command'));value['env']={}
+ if argv[0].startswith('GOCACHE='):value['env']['GOCACHE']=argv.pop(0).split('=',1)[1]
+ value['argv']=argv
+(e/'verification-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+(e/'environment.json').write_text(json.dumps({'system':platform.system(),'machine':platform.machine(),'go':subprocess.check_output(['go','version'],text=True).strip(),'base_commit':'d85b84a7','scope':'native local Darwin ARM64; mock embeddings; failure injection and SIGKILL; native Linux and power-loss not measured'},indent=2)+'\n')
+reports=['REFACTORING-EXECUTION-SPEC.md','REFACTORING-REMAINING-WORKLIST.md','PUBLIC-CONTRACT-V2.md','REMOTE-SESSION-HANDOFF.md']
+m={'schema_version':1,'status':'N04_acceptance_verified','base_commit':'d85b84a7','scope':'new DEV persistence safety on native Darwin ARM64/local filesystem; real engine mock CLI; no native Linux/power-loss/quality/operational verdict','source_sha256':source,'changed_source_sha256':delta,'approved_input_sha256':base['approved_input_sha256'],'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='manifest.json'}}
+(e/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
+print('N04 acceptance binding PASS:',len(source),'source/dependency files;',len(delta),'changed/new;',len(m['evidence_sha256']),'evidence files; approved inputs 5 unchanged')

@@ -1,5 +1,13 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 최신 실행: N-04 내구성 완료, N-05 설계 (2026-10-06)
+
+현재 **N-01–04 완료4/18, 잔여14개 N-05–18, 다음 N-05 보존/reader/GC 실패 재현과 구현**이다. [명세](./REFACTORING-EXECUTION-SPEC.md)와 [DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/manifest.json)를 우선한다. DB/WAL/close·전체 파일/디렉터리 sync·current rename/parent sync를 보강했고 8+5 실패 주입 경계, 7 SIGKILL 복구, 실제 CLI 7+2, 9패키지 race·vet·경계·문서를 검증했다. 검토 intent와 release를 분리해 같은 승인/base만 복구하며 post-rename 실패는 durability_uncertain이다. native Darwin 실측이며 Linux/전원 차단/운영 판정을 만들지 않았다. main 동기화/열린 PR0 확인은 완료했고 최신 작업은 기존 feat 브랜치에 보존한다. 전체15개 완료 목표는 계속 활성이다. 아래 문단은 이전 시점의 이력이다.
+
+## 최신 사용자 목표: 15개 완료까지 계속 (2026-10-06)
+
+사용자가 열린 PR 스쿼시 머지/main 동기화 후 N-04–18 전체 완료까지 계속하고 완료 시 알리도록 요청했다. GitHub 열린 PR은 0개였다. main/origin/main은 `1ded9b3e`로 동일하며 main checkout/ff 동기화를 확인했다. 최신 작업 코드/50개 로컬 커밋을 보존해 feat/spec-driven-knowledge-system으로 돌아왔다. 새 PR/전체 로컬 자료 push는 이 조건부 머지 요청만으로 생성하지 않았다. 앱 goal을 N-04–18 전체 완료로 설정했으며 끝나지 않은 목표를 완료로 표시하지 않는다. N-04 reviewed intent/포인터/release 복구 설계를 확정하고 실패 재현·구현을 진행한다. 현재3/18·잔여15를 유지한다.
+
 ## 최신 실행 관리: 완료 오표시 방지·N-04 설계 (2026-10-06)
 
 [진행 원장](./REFACTORING-PROGRESS.json)과 `python3 scripts/check-refactoring-progress.py`로 완료3/18·잔여15·다음N-04, 커밋된 수용 명세/원자료/코드 SHA 및 현행 소스/입력 바인딩을 확인한다. N-01의 과거 원자료13/보고서7도 실제 커밋 SHA로 다시 대조한다. N-04는 [실행 명세](./REFACTORING-EXECUTION-SPEC.md)에 DB/WAL·모든 후보 파일/디렉터리·포인터 sync·review-release 복구의 단계별 설계/실패 주입표를 작성했으며 **완료 아님**이다. 다음은 review-release 복구 설계 확정과 단계별 실패 재현/구현이다. 제품 N-04–18 모두 잔여이고 상위 WI10/조건부 운영은 별도다. 후속 source inventory의1100은 Go1098+go.mod/go.sum2 바인딩이다. 아래 문단은 시점별 이력이다.

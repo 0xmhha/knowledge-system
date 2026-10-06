@@ -74,7 +74,7 @@
 
 ## N-04: 후보 저장·current 전환·복구의 내구성
 
-**상태: 설계 / 구현·실패 주입 미완료.** INV-01/02/03·FR-09/10와 A3/A8의 이전 current 또는 완성된 새 후보만 관측하는 계약이다. 프로세스 종료 시험과 전원 차단 시험을 구분한다.
+**상태: 완료.** INV-01/02/03·FR-09/10와 A3/A8의 이전 current 또는 완성된 새 후보만 관측하는 계약이다. 프로세스 종료 시험과 전원 차단 시험을 구분한다.
 
 ### 설계 범위와 누락 방지
 
@@ -84,21 +84,33 @@
 4. 일반 승격뿐 아니라 rollback와 사람 검토 승격도 같은 순서를 적용한다. 현재 사람 검토 경로의 `review-release.json`은 pointer 전환 뒤 쓰인다. 이 사이 중단과 기록 쓰기 실패를 복구 설계에 포함하며, 실제로 승격되지 않은 후보에 재사용 가능한 release 승인을 남기지 않는다. 승인 증거/intent와 실제 포인터 전환 완료를 구분하는 설계를 확정한 뒤 구현한다.
 5. 로컬 Darwin/Linux의 파일·디렉터리 sync 의미와 지원/오류 처리를 기록한다. 실제 전원 차단/스토리지 손실은 프로세스 SIGKILL만으로 증명하지 않는다. 미실측 플랫폼은 제한/미확인으로 유지한다.
 
+### 검토 승격의 중단 복구 설계 확정
+
+검토 승인 intent를 후보에 먼저 sync하되 rollback 권한을 주는 release와 구분한다. 포인터 전환 뒤 release를 sync한다. 같은 승인/기준 base로 재시도할 때 current가 이미 이 후보이고 intent·신원이 일치하면 부모 sync와 release 기록을 복구한다. 다른 patch/결정/프로젝트/스냅샷/base 또는 이미 다른 current로 이동한 상태에서 기존 승인을 추측해 복구하지 않는다. rename 뒤 sync/release 실패는 `durability_uncertain`으로 보고하여 거짓 미승격을 피한다. 실제 사람 승인의 검증은 기존 patch workflow에 유지한다.
+
 ### 실패 주입 단계와 수용 체크
 
 | 단계 | 관측/수용 조건 | 상태 |
 |---|---|---|
-| 엔진 checkpoint/close, 후보 파일 sync 이전·도중 | 실패 후보 비활성·이전 current/신원/보관 원문 유지 | 미검증 |
-| 후보 디렉터리/부모 sync, 마지막 gate | 이전 또는 완성 후보; 재시작 시 미완성 후보 승격 없음 | 미검증 |
-| 임시 symlink·rename 직전 | 이전 current 유지; 임시 파일은 결정적으로 정리/무시 | 미검증 |
-| rename 뒤·dataset parent sync 실패 | 현재 관측 대상과 durability 불확실성을 구분; 거짓 미승격/자동 rollback 없음 | 미검증 |
-| 검토 hold/release 기록과 reviewed promotion 사이 | 사람 승인 intent·실제 전환 분리, 실패로 승인 우회·허위 rollback 허용 없음 | 미검증 |
-| 성공·rollback·재시작/강제 종료 | 이전 또는 신원/DB/원문이 완성된 새 버전만 제공 | 미검증 |
+| 엔진 checkpoint/close, 후보 파일 sync 이전·도중 | 실패 후보 비활성·이전 current/신원/보관 원문 유지 | 통과 |
+| 후보 디렉터리/부모 sync, 마지막 gate | 이전 또는 완성 후보; 재시작 시 미완성 후보 승격 없음 | 통과 |
+| 임시 symlink·rename 직전 | 이전 current 유지; 임시 파일은 결정적으로 정리/무시 | 통과 |
+| rename 뒤·dataset parent sync 실패 | 현재 관측 대상과 durability 불확실성을 구분; 거짓 미승격/자동 rollback 없음 | 통과 |
+| 검토 hold/release 기록과 reviewed promotion 사이 | 사람 승인 intent·실제 전환 분리, 실패로 승인 우회·허위 rollback 허용 없음 | 통과 |
+| 성공·rollback·재시작/강제 종료 | 이전 또는 신원/DB/원문이 완성된 새 버전만 제공 | 통과 |
 
-- [ ] N04-A DB/WAL/close 및 전체 후보 artifact 내구성 순서.
-- [ ] N04-B current 전환·parent sync와 단계별 실패 주입, 결과 상태 구분.
-- [ ] N04-C 일반/검토 승격·hold/release·rollback와 재시작/강제 종료 복구.
-- [ ] N04-D 플랫폼별 보장/전원 차단 미실측 한계 및 회귀·원자료·소스 바인딩.
+- [x] N04-A DB/WAL/close 및 전체 후보 artifact 내구성 순서.
+- [x] N04-B current 전환·parent sync와 단계별 실패 주입, 결과 상태 구분.
+- [x] N04-C 일반/검토 승격·hold/release·rollback와 재시작/강제 종료 복구.
+- [x] N04-D 플랫폼별 보장/전원 차단 미실측 한계 및 회귀·원자료·소스 바인딩.
+
+### N-04 검증 결과와 한계
+
+[새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/manifest.json). 변경 전 uncheckpointed WAL 및 linked artifact 승격을 재현했다. 변경 후 DB checkpoint/close·파일·디렉터리·부모·rename 전후의 8개 실패 경계, 검토 intent/rename/parent/release의 5개 경계, 일반/검토 승격의 별도 process SIGKILL 7개 경계에서 이전 또는 신원/보관 원문이 완성된 후보만 관측했다. busy PRAGMA row와 확장자 없는 semantic DB, hardlink DB, vector physical pin 변경, sidecar close 이후 소멸, 검토 hold 완료 이벤트 억제를 검증했다. 동일 승인/기준 base만 재시도하여 release를 복구하며 다른 승인과 일반 rollback의 hold 우회를 거부했다.
+
+실제 CKS/CKG/CKV CLI의 7안전 사례 및 build/rollback 동시 요청 2개를 최종 바이너리로 다시 검증했다. 실제 CLI에서 발견한 sidecar 목록의 소멸 순서 오류를 내부 진단으로 확인해 수정했으며 실패 원자료도 보존한다. 관련 9패키지 race, 추가 close 경계의 5패키지 race, vet·경계·문서 검사를 통과했다. 첫 회귀 명령의 잘못된 패키지 경로와 sandbox 로컬 port 제약은 수정/확장 실행한 결과와 구분한다.
+
+현재 구현은 로컬 파일·디렉터리 fsync 오류를 전파한다. rename 후 parent sync/release 실패는 `durability_uncertain`이며 이전 current 보존이라고 거짓 보고하거나 자동 rollback하지 않는다. Darwin ARM64 로컬 파일시스템에서 실행했다. native Linux·스토리지 컨트롤러/전원 차단·network filesystem의 내구성 실측은 이 결과로 주장하지 않는다. fsync가 장치/파일시스템의 전원 장애 보장을 대체하지 않으며 실제 지원/복구 환경은 N-15/17에서 판정한다. 구/신 writer 동시 운영 금지와 low-level 임의 쓰기의 관리 보호 밖 경계를 유지한다. 기존 승인 입력5개·FINAL 원자료는 그대로다.
 
 ### 완료 표시의 자동 검사
 
@@ -106,7 +118,7 @@
 
 ## 다음 작업 설계의 준비 조건
 
-N-03은 수용 조건 검증을 마쳤다. N-04는 위 단계표·review-release 복구 설계를 확정하고 실패 재현/구현을 이어간다. 설계 기록과 완료 표시를 구분한다.
+N-04의 전체 수용 조건과 실행 증거를 확인했다. 다음 N-05는 아래 보존/reader/GC 명세를 따라 실패 재현부터 진행한다. 설계 기록과 완료 표시를 구분한다.
 
 N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 조건을 세분화한다. 새 독립 FINAL(N-11), 실제 파일럿 사실(N-12/14), 운영(N-15–18)의 별도 판정 필요성을 유지한다.
 
@@ -117,6 +129,25 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-01 | 원문 8개/FR10·INV7·NFR5·S9·WBS29 대응 및 SHA 검증, `c9c91ebe` | 완료(기존 기록) |
 | 2026-10-06 | N-02 | 공개 MCP RED→GREEN, shared guard, 실제 CLI 7사례·SHA, race/vet/경계/문서 검증 | 완료 |
 | 2026-10-06 | N-03 | RED→GREEN, 별도 process 8 contender·SIGKILL 회수, CLI build/rollback 차단, race/vet | 완료 |
-| 2026-10-06 | N-04 | DB/WAL/파일/디렉터리/포인터 sync·검토 marker의 단계별 설계/실패 주입표 작성 | 미완료(설계) |
+| 2026-10-06 | N-04 | WAL·linked RED→GREEN, 8+5 실패 경계·7 SIGKILL 복구·CLI 7+2·9패키지 race | 완료 |
 
-**현재:** N-01/02/03 완료(3/18). **다음:** N-04 검토 release 복구 설계 확정·단계별 실패 재현과 구현. **전체 잔여:** N-04–18, 15개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01–04 완료(4/18). **다음:** N-05 보존/reader/GC 실패 재현과 구현. **전체 잔여:** N-05–18, 14개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+
+## N-05: 보존 정책·검토 가능한 GC와 reader pin
+
+**상태: 설계.** 원 INV-01/02/03·FR-10 및 v2 A3/A8의 원문·좌표·활성/rollback 보존 계약을 유지하면서 미참조 버전을 회수한다. 파일을 지우는 기능의 존재만으로 완료하지 않는다.
+
+### 설계와 호환 경계
+
+- GC 계획과 실행은 N-03 공통 dataset 잠금 아래 수행한다. 기본은 dry-run이며 버전별 크기·나이·보호 이유·보존 정책·회수 예정/회수 불가 용량을 공개한다. 실제 실행은 검토한 계획의 digest와 동일한 참조/신원/파일 상태에서만 진행한다. 경합/새 pin/포인터 이동/파일 변경은 stale plan으로 거부한다.
+- current, 최근 rollback 보존 수, 명시적인 보호 버전, 미해제 review hold/intent, 살아 있는 reader의 shared OS lease를 보호한다. 서버가 실제 backend·보관 원문을 열기 전에 lease를 얻고 닫은 뒤 해제한다. lease inode는 dataset 관리 영역에 두어 불변 source/DB를 변경하지 않는다. reader 종료/crash 시 OS가 해제한다.
+- 기존 서버는 lease를 기록하지 않는다. reader protocol 이전 후보는 자동 회수 대상으로 삼지 않는다. 새로운 builder가 새 후보에 프로토콜을 기록하며 구 서버를 중단 후 업그레이드하는 경계를 문서화한다. 레거시 reader가 없는 것을 PID/파일 나이로 추측하지 않는다.
+- 버전 전체를 회수 단위로 삼아 source blobs/Git history/semantic source를 부분 삭제하지 않는다. 다른 보존 버전에 공유되는 hardlink/외부 symlink는 회수 가능한 후보로 분류하지 않는다. 보존 수/기간·용량은 공개 정책이며 보호 버전 때문에 상한을 못 맞추면 그대로 보고한다.
+- 실행 중 삭제는 관리된 trash로 원자 이동·디렉터리 sync 후 수행한다. 중단된 trash는 기록된 계획/참조와 신원을 재검증하여 재개한다. 취소/프로세스 종료 중에도 보호 버전과 current를 바꾸지 않는다.
+
+### 수용 조건
+
+- [ ] N05-A 결정적인 dry-run·정책/용량/보호 이유·검토한 계획 digest에만 결합된 실행.
+- [ ] N05-B current/rollback/reader/review/보관 원문·Git history·semantic source 보호 및 구 reader 호환 경계.
+- [ ] N05-C 경합·stale plan·취소·중단/trash 복구·실제 삭제 검증, 보호 참조 삭제0.
+- [ ] N05-D 공개 CLI/서버 pin·상태/오류 비노출·관련 회귀와 소스/실행 증거 바인딩.

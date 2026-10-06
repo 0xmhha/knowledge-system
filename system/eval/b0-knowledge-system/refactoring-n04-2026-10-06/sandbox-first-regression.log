@@ -1,0 +1,30 @@
+--- FAIL: TestPreflightOllama (0.00s)
+    --- FAIL: TestPreflightOllama/model_present_(implicit_latest) (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 321 [running]:
+testing.tRunner.func1.2({0x101166560, 0x362868cc25c0})
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1977 +0x318
+panic({0x101166560?, 0x362868cc25c0?})
+	/Users/kevin/.gvm/gos/go1.26.8/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1012056e0, 0x3628689aea60})
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/knowledge-system/internal/setup.TestPreflightOllama.func1(...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/setup/preflight_test.go:12
+github.com/0xmhha/knowledge-system/internal/setup.TestPreflightOllama.func2(0x362868e7e6c8)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/setup/preflight_test.go:31 +0xa4
+testing.tRunner(0x362868e7e6c8, 0x362868cc2560)
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 320
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/knowledge-system/internal/setup	11.891s
+ok  	github.com/0xmhha/knowledge-system/internal/system/patch	0.908s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec	1.420s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks	0.954s
+FAIL

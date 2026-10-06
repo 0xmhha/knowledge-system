@@ -24,7 +24,7 @@
 
 ### dataset mutation 잠금 (N-03)
 
-versioned 빌드·gate·보류/승격과 외부 승격/rollback은 동일한 OS 배타 잠금으로 직렬화한다. `.reindex.lock` 파일을 영구 유지하고 OS가 owner 종료 후 소유권을 회수한다. 잠금 파일 나이로 live holder를 탈취하거나 해제 시 unlink하지 않는다. 이전 O_EXCL writer의 살아 있는 PID는 시각과 무관하게 거부하며, 구 writer를 모두 종료한 뒤 새 writer로 업그레이드한다. 혼합 버전 writer와 flock 의미가 보장되지 않는 network filesystem은 이 계약 밖이다. N-04의 저장 내구성과 실제 지원 환경 판정은 별도다.
+versioned 빌드·gate·보류/승격과 외부 승격/rollback은 동일한 OS 배타 잠금으로 직렬화한다. `.reindex.lock` 파일을 영구 유지하고 OS가 owner 종료 후 소유권을 회수한다. 잠금 파일 나이로 live holder를 탈취하거나 해제 시 unlink하지 않는다. 이전 O_EXCL writer의 살아 있는 PID는 시각과 무관하게 거부하며, 구 writer를 모두 종료한 뒤 새 writer로 업그레이드한다. 혼합 버전 writer와 flock 의미가 보장되지 않는 network filesystem은 이 계약 밖이다. 후보 DB checkpoint/close·전체 파일/디렉터리 sync 이후 current를 rename하고 dataset 부모를 sync한다. linked/nonregular artifact와 busy/잔여 WAL·변경된 DB pin은 승격하지 않는다. 검토 승격은 durable intent를 먼저 기록하고 포인터 전환/부모 sync 후 release를 기록한다. 같은 승인/base/신원만 중단 후 복구할 수 있다. rename 후 sync/release 실패는 `durability_uncertain`으로 보고하므로 current가 변경되지 않았다고 추측하지 않는다. 실제 지원 환경과 전원 차단 검증은 별도다.
 
 ## v2 응답의 필수 필드
 

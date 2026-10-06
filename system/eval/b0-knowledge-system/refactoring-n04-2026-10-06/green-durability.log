@@ -1,0 +1,66 @@
+=== RUN   TestPromotionDurabilityFailureBoundaries
+=== RUN   TestPromotionDurabilityFailureBoundaries/checkpoint
+=== RUN   TestPromotionDurabilityFailureBoundaries/checkpoint-close
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-file
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-dir
+=== RUN   TestPromotionDurabilityFailureBoundaries/candidate-parent
+=== RUN   TestPromotionDurabilityFailureBoundaries/before-rename
+=== RUN   TestPromotionDurabilityFailureBoundaries/after-rename
+=== RUN   TestPromotionDurabilityFailureBoundaries/current-parent
+--- PASS: TestPromotionDurabilityFailureBoundaries (1.12s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/checkpoint (0.13s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/checkpoint-close (0.12s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-file (0.12s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-dir (0.17s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/candidate-parent (0.13s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/before-rename (0.14s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/after-rename (0.14s)
+    --- PASS: TestPromotionDurabilityFailureBoundaries/current-parent (0.17s)
+=== RUN   TestReviewedPromotionDurableIntentRecovery
+=== RUN   TestReviewedPromotionDurableIntentRecovery/intent
+=== RUN   TestReviewedPromotionDurableIntentRecovery/before-rename
+=== RUN   TestReviewedPromotionDurableIntentRecovery/after-rename
+=== RUN   TestReviewedPromotionDurableIntentRecovery/current-parent
+=== RUN   TestReviewedPromotionDurableIntentRecovery/release
+--- PASS: TestReviewedPromotionDurableIntentRecovery (1.36s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/intent (0.27s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/before-rename (0.26s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/after-rename (0.17s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/current-parent (0.26s)
+    --- PASS: TestReviewedPromotionDurableIntentRecovery/release (0.39s)
+=== RUN   TestPromotionRejectsVectorDBChangedByCheckpoint
+--- PASS: TestPromotionRejectsVectorDBChangedByCheckpoint (0.04s)
+=== RUN   TestDurabilityProcessHelper
+--- PASS: TestDurabilityProcessHelper (0.00s)
+=== RUN   TestPromotionProcessKillRecovery
+=== RUN   TestPromotionProcessKillRecovery/ordinary/before-rename
+=== RUN   TestPromotionProcessKillRecovery/ordinary/after-rename
+=== RUN   TestPromotionProcessKillRecovery/ordinary/current-parent
+=== RUN   TestPromotionProcessKillRecovery/reviewed/before-rename
+=== RUN   TestPromotionProcessKillRecovery/reviewed/after-rename
+=== RUN   TestPromotionProcessKillRecovery/reviewed/current-parent
+=== RUN   TestPromotionProcessKillRecovery/reviewed/review-marker
+--- PASS: TestPromotionProcessKillRecovery (1.34s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/before-rename (0.12s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/after-rename (0.12s)
+    --- PASS: TestPromotionProcessKillRecovery/ordinary/current-parent (0.13s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/before-rename (0.15s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/after-rename (0.22s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/current-parent (0.36s)
+    --- PASS: TestPromotionProcessKillRecovery/reviewed/review-marker (0.24s)
+=== RUN   TestPromotionFlushesCandidateWALBeforePointer
+--- PASS: TestPromotionFlushesCandidateWALBeforePointer (0.06s)
+=== RUN   TestPromotionRejectsLinkedCandidateArtifact
+--- PASS: TestPromotionRejectsLinkedCandidateArtifact (0.03s)
+=== RUN   TestPromotionRejectsHardlinkedDatabaseBeforeCheckpoint
+--- PASS: TestPromotionRejectsHardlinkedDatabaseBeforeCheckpoint (0.03s)
+=== RUN   TestPromotionHandlesSidecarsRemovedByCheckpointClose
+--- PASS: TestPromotionHandlesSidecarsRemovedByCheckpointClose (0.06s)
+=== RUN   TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore
+--- PASS: TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore (0.25s)
+=== RUN   TestReindexHoldDoesNotReportDoneAfterPersistenceFailure
+--- PASS: TestReindexHoldDoesNotReportDoneAfterPersistenceFailure (0.05s)
+=== RUN   TestPromotionLockRejectsConcurrentSwapAndLinkedLock
+--- PASS: TestPromotionLockRejectsConcurrentSwapAndLinkedLock (0.04s)
+PASS
+ok  	github.com/0xmhha/knowledge-system/internal/setup	4.818s
