@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 현재 후속 실행: N11 부분 FINAL 후보 준비 (2026-10-06)
+
+[N11 후보4문항](./N11-FINAL-CANDIDATE-PREPARATION.md)을 현재 커밋 원문·span SHA에 연결했다. CODE/WHY 쌍은 각각 한 묶음이며 제안 사실군2개·승인된 독립 FINAL0이다. 과거 테스트/수용 분리와 pack identity 사실은 제외했고 남은 후보의 오염/독립성도 미판정이다. 원 DEV/프로토콜 불변, 새 부분 책 검사는 exit2로 거부·검색/예약0. **요청5/15 완료·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 기존 DEV/프로토콜·N12 판정 반영과 나머지 실제 gold/독립 FINAL 범위 준비·전체 입력 동결.** 아래는 이전 시점 이력이다.
+
 ## 현재 후속 실행: N10 typed neighbors 진단 (2026-10-06)
 
 사용자 다음 진행에 따라 [N10 진단](./N10-NEIGHBOR-DIAGNOSTICS.md)의 구조 RED→GREEN·실제 standalone SQLite3제어를 검증했다. 미해결 seed에 ErrSeedUnresolved/error_kind를 추가하고 outcome=backend_error/오류·시도 분모·composer seed/순위/결과를 보존했다. generic 저장소/취소/deadline을 미해결로 추정하지 않는다. 과거 정보 없는 진단은null이며 원 FINAL/입력5개는 불변이다. Go3패키지 race/vet·Python17개·경계 검사 통과. **요청5/15 완료·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 실제 N11 DEV/프로토콜·N12 판정 및 독립 FINAL 검토 후 비용·지연 실행.** 실제 새 BGE/p95·품질·사람/운영 수용은 미완료다. 아래는 이전 시점 이력이다.

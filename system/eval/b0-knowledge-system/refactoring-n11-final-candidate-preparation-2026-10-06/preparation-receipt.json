@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "status": "partial_candidates_only",
+  "source_commit": "f066e67be6f3fd5df23bf46a8027db6d9504606e",
+  "original_dev_sha256": "87648fcdf8872c1b6f7f4df2267ba97a34b1088f0c3b13ccdec6be1375042476",
+  "original_protocol_sha256": "9ca52cff273ee9897c19641ef757f3ae57ecaef9f8ec3eb2d12db413722472a5",
+  "candidate_rows": 4,
+  "proposed_fact_clusters": 2,
+  "approved_final_clusters_by_group": {
+    "CODE": 0,
+    "WHY": 0,
+    "POLICY": 0,
+    "TRACE": 0,
+    "ABS": 0
+  },
+  "proposed_groups": {
+    "CODE": 2,
+    "WHY": 2,
+    "POLICY": 0,
+    "TRACE": 0,
+    "ABS": 0
+  },
+  "overlap_review_required": [
+    "CODE and WHY paraphrases share their proposed fact cluster",
+    "readonly opening may share underlying facts with prior input immutability diagnostics; reviewer must adjudicate",
+    "manifest parsing may share selected-pack input validation facts; reviewer must adjudicate"
+  ],
+  "excluded_candidate_topics": [
+    {
+      "topic": "test command success versus criterion acceptance",
+      "reason": "existing B0-WHY-03/TRACE gold already covers this fact boundary; not new independent FINAL"
+    },
+    {
+      "topic": "pack lock change changes dataset identity",
+      "reason": "existing B0-WHY-02 gold already covers this fact; not new independent FINAL"
+    }
+  ],
+  "execution_allowed": false,
+  "queries_executed": 0,
+  "final_reservations": 0,
+  "results": null,
+  "release_eligible": false
+}

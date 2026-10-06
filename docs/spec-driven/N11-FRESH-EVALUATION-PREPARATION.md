@@ -6,7 +6,7 @@
 
 ## 아직 필요한 입력
 
-새 FINAL은 아직0단위다. 미승인 DEV7개를 FINAL로 바꾸지 않는다. CODE/WHY/POLICY/TRACE/ABS 각 중요군의 독립 FINAL 단위10개를 원문 gold/권위/범위/시점에 연결하고, 같은 사실의 번역·바꿔쓰기·같은 상태 변형·반복은 한 cluster로 묶어 검토한다. 질문 개수만50개로 늘려 충분한 독립 표본으로 주장하지 않는다. 특히 실제 TRACE/정책의 사실 범위는 [N12 원문 검토](./N12-ACTUAL-PILOT-REVIEW.md)와 연결하며, 테스트용 관계를 실제 정책/사람 수용으로 바꾸지 않는다.
+승인된 새 FINAL은 아직0단위다. [부분 FINAL 후보4문항/2제안 사실군](./N11-FINAL-CANDIDATE-PREPARATION.md)을 추가했지만 독립성·오염·gold 미승인이고 실제 검색 결과는 없다. 미승인 DEV7개를 FINAL로 바꾸지 않는다. CODE/WHY/POLICY/TRACE/ABS 각 중요군의 독립 FINAL 단위10개를 원문 gold/권위/범위/시점에 연결하고, 같은 사실의 번역·바꿔쓰기·같은 상태 변형·반복은 한 cluster로 묶어 검토한다. 질문 개수만50개로 늘려 충분한 독립 표본으로 주장하지 않는다. 특히 실제 TRACE/정책의 사실 범위는 [N12 원문 검토](./N12-ACTUAL-PILOT-REVIEW.md)와 연결하며, 테스트용 관계를 실제 정책/사람 수용으로 바꾸지 않는다.
 
 전체 질문/gold/cluster·DEV/FINAL 분할과 비용 조건을 사전 검토한 뒤 바이트SHA·검토자·시점을 동결한다. 실제 결과가 관측되기 전까지 `execution_allowed: false`, `release_eligible: false`, `freeze: null`, `results: null`을 유지한다. 이후 질문/임계치/원문 사실을 바꾸면 새 DEV 버전으로 남기고 독립 FINAL을 회전한다. 중요군10독립단위 미만은 descriptive/inconclusive이며 기본 활성화나 출시의 근거가 아니다.
 

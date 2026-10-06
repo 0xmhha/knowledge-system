@@ -63,3 +63,5 @@ N12 정책·ADR 원문 주장이 준비 범위에서 누락된 것을 재감사�
 N11-C [실행 보호 세부 단계](./N11-EVALUATION-RUNNER-CONTRACT.md)를 구현·검증했다. 승인된 전체 책/runtime pins 검사와 FINAL durable reservation/영구 OS 잠금을 matrix 경로에 연결했다. Python19개·관련2패키지 race·native CLI4제어 통과, 실제 초안 child dispatch0/질의0. 새 사람 판정과 실제 평가 결과가 없으므로 N11 및 전체 완료 수는 그대로다.
 
 N10 진단의 구조 RED→GREEN과 실제 SQLite3제어를 추가했다. 미해결 seed typed 표시를 추가하되 backend_error/모든 시도·composer 결과를 보존하고, 과거 정보가 없으면null이다. Go3패키지 race/vet·Python17개 통과. 비용/p95 새 평가가 없어 완료8/18·요청5/15·잔여10을 유지한다.
+
+N11 [부분 FINAL 후보](./N11-FINAL-CANDIDATE-PREPARATION.md)4문항을2제안 사실군으로 묶고 원문·span SHA에 연결했다. 원 DEV7개와 프로토콜 바이트는 불변, 승인된 독립 FINAL0·실행/예약0이다. 전체 입력 검사 exit2, 미승인/미동결 및 중요군 미충족을 유지한다. 후보 작성은 전체 N11 완료가 아니다.
