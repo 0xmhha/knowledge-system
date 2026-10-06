@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "cc9f2e3f",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-n11-runner-controls-2026-10-06/runner-control-manifest.json"
+    "revision": "0256ffe5",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n10-neighbor-diagnostics-2026-10-06/diagnostic-manifest.json"
   },
   "tasks": [
     {
@@ -106,7 +106,11 @@
     {
       "id": "N-10",
       "purpose": "비용·지연",
-      "state": "pending"
+      "state": "waiting",
+      "diagnostic_preparation": "docs/spec-driven/N10-NEIGHBOR-DIAGNOSTICS.md",
+      "verified_substep": "Typed unresolved neighbor seeds retain backend_error outcomes and failed-call denominators; composer behavior preserved; 3 native SQLite controls distinguish unresolved seed, empty traversal, and closed-store failure. Full cost/p95 evaluation remains pending.",
+      "diagnostic_evidence_revision": "0256ffe5",
+      "waiting_for": "reviewed independent N11 inputs and runtime binding, then actual same-arm cost and warm/cold latency measurements; no new FINAL or release verdict"
     },
     {
       "id": "N-11",
