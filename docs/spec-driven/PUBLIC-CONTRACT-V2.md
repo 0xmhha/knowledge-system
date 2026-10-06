@@ -94,3 +94,12 @@ v1 데이터는 커밋형 읽기 전용 `legacy_unpinned`이며 좌표를 추측
 `cks gc --out <dataset> --dry-run --plan-file <plan.json>`은 기본 최근2개·최소30일과 보호 이유·파일 바이트/미복구 trash/회수·capacity 상태를 보여 준다. `--apply --plan-file`은 동일한 계획 digest와 현재 참조/파일 상태에서만 삭제한다. `--resume`은 검증된 중단 journal만 재개하며 foreign/unknown trash를 지우거나 복구 완료라고 보고하지 않는다. 보호 때문에 capacity 목표를 못 맞추면 over_budget을 유지한다.
 
 current·실제 rollback 참조·명시 보호·유효하게 해제되지 않은 review hold/intent·살아 있는 reader를 보호한다. 새 pinned 후보는 reader-flock-v1을 기록하고 managed CKS는 backend/보관 원문을 열기 전에 shared OS lease를 얻는다. lease inode를 보존하고 종료/crash 시 OS가 해제한다. 이전 후보와 검증 불가/부분 후보는 자동 회수하지 않는다. 구 서버·직접 low-level engine reader는 GC와 병행하지 않고 중단 후 새 managed CKS로 전환한다. 이는 임의 consumer/network filesystem에 대한 reader 추적 보장이 아니다. [전체 명세·원자료](./REFACTORING-EXECUTION-SPEC.md)의 검증/플랫폼 경계를 따른다.
+
+
+### 빌드 자원 계약 (N-06)
+
+`cks setup` YAML `max_capture_files`, `max_capture_file_bytes`, `max_capture_total_bytes`, `build_timeout`, `min_free_bytes`와 같은 이름의 kebab CLI flags는 공유Reindex에 전달된다. 명시CLI가 YAML을 우선하며0은 기본상한100000/32MiB/4GiB 및2h다(YAML duration은 양수문자열). 음수/overflow는 거부한다. repo와 외부origin을 합산해 identity/capture/최종source 검사에 같은 제한을 적용하며 일부 원문으로 성공 후보를 만들지 않는다. legacy flat에서 명시capture/reserve 설정은 거부한다.
+
+`reindex-resources` status는 소스 수/bytes, Git bundle bytes, 출력과 temp staging free bytes, staging+reserve 최소logical bytes, deadline 및 승격 전 실제candidate bytes를 보고한다. 엔진 출력/FS overhead 예상은null이며 절대경로나 원문을 포함하지 않는다. 여유공간 probe는 순간값으로 외부프로세스의 후속 할당을 보장하지 않는다.
+
+공개 `resource_limit`과 `build_timeout`은 제한/용량 부족과 실제deadline을 구분한다. 같은부모deadline을 연장하지 않고 engine/test command group과 출력읽기를 취소한다. rename전취소는current보존, rename후는필수sync를마치며 오류는 `durability_uncertain`을우선한다. kernel I/O를 강제중단한다는 보장은없다. native Linux/실규모 지원은 별도 검증 대상이다.

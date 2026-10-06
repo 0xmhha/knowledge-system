@@ -1,0 +1,370 @@
+{
+  "success": true,
+  "scope": "native Darwin ARM64/mock model, real graph/vector and public CLI",
+  "cases": [
+    {
+      "name": "baseline",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/baseline.yaml",
+        "--version",
+        "baseline",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.049782458692789,
+      "expected_code": null,
+      "resources": [
+        {
+          "capture_limits": {
+            "max_files": 100000,
+            "max_file_bytes": 33554432,
+            "max_total_bytes": 4294967296
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 94,
+          "output_free_bytes": 61671882752,
+          "staging_free_bytes": 61671882752,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 94,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T08:00:33.919278Z",
+          "actual_candidate_bytes": 0,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "remaining staging copy; engine output and filesystem overhead not predicted"
+        },
+        {
+          "capture_limits": {
+            "max_files": 100000,
+            "max_file_bytes": 33554432,
+            "max_total_bytes": 4294967296
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 0,
+          "output_free_bytes": 61671260160,
+          "staging_free_bytes": 61671260160,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 0,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T08:00:33.919278Z",
+          "actual_candidate_bytes": 608853,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "pre-promotion measured candidate; staging removed; engine output not predicted"
+        }
+      ],
+      "prior_current_preserved": false
+    },
+    {
+      "name": "file-count",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/file-count.yaml",
+        "--version",
+        "file-count",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.014802792109549046,
+      "expected_code": "resource_limit",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "file-bytes",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/file-bytes.yaml",
+        "--version",
+        "file-bytes",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.01560037536546588,
+      "expected_code": "resource_limit",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "total-bytes",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/total-bytes.yaml",
+        "--version",
+        "total-bytes",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.016597124747931957,
+      "expected_code": "resource_limit",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "deadline",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/deadline.yaml",
+        "--version",
+        "deadline",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.061269250232726336,
+      "expected_code": "build_timeout",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "capacity",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/capacity.yaml",
+        "--version",
+        "capacity",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.06993829226121306,
+      "expected_code": "resource_limit",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "negative",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/negative.yaml",
+        "--version",
+        "negative",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.014562750235199928,
+      "expected_code": "operation_failed",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "overflow",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/overflow.yaml",
+        "--version",
+        "overflow",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.014179416932165623,
+      "expected_code": "operation_failed",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "invalid-timeout",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/invalid-timeout.yaml",
+        "--version",
+        "invalid-timeout",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.013881207909435034,
+      "expected_code": "operation_failed",
+      "resources": [],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "explicit-override",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/explicit-override.yaml",
+        "--version",
+        "explicit-override",
+        "--progress",
+        "json",
+        "--max-capture-files",
+        "2",
+        "--max-capture-file-bytes",
+        "128",
+        "--max-capture-total-bytes",
+        "256",
+        "--build-timeout",
+        "30s"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.48168641701340675,
+      "expected_code": null,
+      "resources": [
+        {
+          "capture_limits": {
+            "max_files": 2,
+            "max_file_bytes": 128,
+            "max_total_bytes": 256
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 94,
+          "output_free_bytes": 61671231488,
+          "staging_free_bytes": 61671231488,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 94,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T06:01:04.652762Z",
+          "actual_candidate_bytes": 0,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "remaining staging copy; engine output and filesystem overhead not predicted"
+        },
+        {
+          "capture_limits": {
+            "max_files": 2,
+            "max_file_bytes": 128,
+            "max_total_bytes": 256
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 0,
+          "output_free_bytes": 61670596608,
+          "staging_free_bytes": 61670596608,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 0,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T06:01:04.652762Z",
+          "actual_candidate_bytes": 608889,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "pre-promotion measured candidate; staging removed; engine output not predicted"
+        }
+      ],
+      "prior_current_preserved": false
+    },
+    {
+      "name": "engine-deadline",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/engine-deadline.yaml",
+        "--version",
+        "engine-deadline",
+        "--progress",
+        "json",
+        "--graph-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/slow-graph"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.219631917309016,
+      "expected_code": "build_timeout",
+      "resources": [
+        {
+          "capture_limits": {
+            "max_files": 100000,
+            "max_file_bytes": 33554432,
+            "max_total_bytes": 4294967296
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 94,
+          "output_free_bytes": 61670555648,
+          "staging_free_bytes": 61670555648,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 94,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T06:00:35.341213Z",
+          "actual_candidate_bytes": 0,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "remaining staging copy; engine output and filesystem overhead not predicted"
+        }
+      ],
+      "prior_current_preserved": true
+    },
+    {
+      "name": "gate-deadline",
+      "argv": [
+        "/private/tmp/ks-n06-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-green-ln9ft2o9/gate-deadline.yaml",
+        "--version",
+        "gate-deadline",
+        "--progress",
+        "json",
+        "--gate-test-bin",
+        "/bin/sleep",
+        "--gate-test-arg",
+        "5"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 2.0185218336991966,
+      "expected_code": "build_timeout",
+      "resources": [
+        {
+          "capture_limits": {
+            "max_files": 100000,
+            "max_file_bytes": 33554432,
+            "max_total_bytes": 4294967296
+          },
+          "source_files": 2,
+          "source_bytes": 94,
+          "git_history_bytes": 0,
+          "minimum_additional_bytes": 94,
+          "output_free_bytes": 61670559744,
+          "staging_free_bytes": 61670559744,
+          "minimum_output_bytes": 0,
+          "minimum_staging_bytes": 94,
+          "reserve_bytes": 0,
+          "deadline_utc": "2026-10-06T06:00:37.364394Z",
+          "actual_candidate_bytes": 0,
+          "engine_output_estimate_bytes": null,
+          "estimate_scope": "remaining staging copy; engine output and filesystem overhead not predicted"
+        }
+      ],
+      "prior_current_preserved": true
+    }
+  ],
+  "current_and_source_unchanged": true,
+  "source_sha256": {
+    "go.mod": "46a1b9c7f2ef4c3160d22bae5bbf19ee03ebd2b5db78eb681b695c500bc342c7",
+    "main.go": "9cab0529d25498bd3ccf41a39b6bd295721bc3fd0b305fafc22afa6466d061e4"
+  },
+  "binary_sha256": {
+    "/private/tmp/ks-n06-bin/cks": "728b0fd4706f951687c69142a83e16a89ab599f94923e615d06374ae1a470b7e",
+    "/private/tmp/ks-n06-bin/ckg": "424c97642f240be1ba5eaff3fe09b20ef48da652f9292715b7310dcf5a92291f",
+    "/private/tmp/ks-n06-bin/ckv": "58fdbb857c2656cae6186885571832240806c4d251e3569155eb6664c7d4f2e9"
+  }
+}

@@ -1,0 +1,16 @@
+baseline PASS 2.486
+file-count PASS 0.015
+file-bytes PASS 0.015
+total-bytes PASS 0.014
+deadline PASS 0.057
+capacity PASS 0.068
+negative PASS 0.013
+overflow PASS 0.013
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/verify-resource-cli.py.txt", line 31, in <module>
+    for name,setting in [('negative','max_capture_files: -1'),('overflow','max_capture_file_bytes: 9223372036854775807'),('invalid-timeout','build_timeout: -1s')]:run(name,setting,code='operation_failed')
+                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/verify-resource-cli.py.txt", line 14, in run
+    assert r.returncode!=0 and json.loads(r.stderr)['code']==code,(name,r.returncode,r.stderr)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('invalid-timeout', 1, '{"code":"build_timeout","message":"Build deadline expired before promotion; inspect the retained candidate before retrying."}\n')

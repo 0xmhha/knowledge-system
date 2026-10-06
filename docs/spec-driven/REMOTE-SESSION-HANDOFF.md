@@ -180,3 +180,8 @@ DEV3840/독립 FINAL4800 종료. FINAL 원본 failed_preserved, 정상팩4560 so
 
 
 2026-10-04 재개 후 정적 v2 범위 후속: [작업리스트 20절](./EXECUTION-WORKLIST.md)의 STV2-01은 실제 corpus committer time에서 query date=2026-10-01, corpus_project에서 subsystem=knowledge-system, runtime K10 patch를 제안한다. 새 6개/기존 10개 회귀 및 실제 CLI의 pending·불변 출력/gold·입력 SHA 검증을 통과했다. source-root .cks는 비어 있어 외부 검토된 pack/semantic inventory·잠금은 별도 선행 조건이다. 최종 프롬프트/답·공식 점수·승인 상태를 발행하지 않았다. B0-01/02/03/05와 STV2-01 결정을 요청했으며 이후 실제 K/config와 새 strict 빌드에 연결한다.
+
+
+### 2026-10-06 N-06 완료 / 다음 N-07
+
+공개CLI의 상한/deadline 무시 RED4개를 측정하고 실제CLI12사례 및 상한/외부origin/취소/프로세스/내구성 경계와 관련race로 검증했다. [실행 명세](./REFACTORING-EXECUTION-SPEC.md), [N-06 DEV](../../system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/manifest.json)를 기준으로 한다. N-01–06 완료6/18, 요청15개 중3완료, 잔여N-07–18 12개. 다음은N-07 본문32000bytes/12citation의 원문span선택·partial/typedbudget 계약이다. N-11 새로운 사전평가/실제파일럿/운영은 이전preview 승인으로 채우지 않는다. 열린PR없음,main/origin/main1ded9b3동기화; 후속로컬소스는기존feature브랜치이며새PR/푸시는아직수행하지않았다.

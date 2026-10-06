@@ -118,7 +118,7 @@
 
 ## 다음 작업 설계의 준비 조건
 
-N-04/05의 전체 수용 조건과 실행 증거를 확인했다. 다음 N-06은 아래 자원 상한/deadline 명세를 따라 실패 재현부터 진행한다. 설계 기록과 완료 표시를 구분한다.
+N-04/05의 전체 수용 조건과 실행 증거를 확인했다. N-06도 공개 CLI의 무시된 상한/deadline RED 4개를 재현하고 아래 명세로 검증했다. 설계 기록과 완료 표시를 구분한다.
 
 N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 조건을 세분화한다. 새 독립 FINAL(N-11), 실제 파일럿 사실(N-12/14), 운영(N-15–18)의 별도 판정 필요성을 유지한다.
 
@@ -132,7 +132,7 @@ N-05–18도 각각 시작 전에 위 절차로 목적·설계·모든 수용 �
 | 2026-10-06 | N-04 | WAL·linked RED→GREEN, 8+5 실패 경계·7 SIGKILL 복구·CLI 7+2·9패키지 race | 완료 |
 | 2026-10-06 | N-05 | GC API RED→GREEN·5 중단/취소 경계·2 process crash·공개 CLI 12사례와 live MCP pin·6패키지 race | 완료 |
 
-**현재:** N-01–05 완료(5/18). **다음:** N-06 자원 상한/deadline 실패 재현과 구현. **전체 잔여:** N-06–18, 13개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
+**현재:** N-01–06 완료(6/18). **다음:** N-07 보관 근거 예산/부분 상태. **전체 잔여:** N-07–18, 12개. 상위 WI10개는 별도 범위이며 [study 추적 문서](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)에 유지한다.
 
 ## N-05: 보존 정책·검토 가능한 GC와 reader pin
 
@@ -165,13 +165,31 @@ lease는 `.readers/<version>.lock`의 OS shared flock이며 inode를 삭제하�
 
 ## N-06: setup/config 자원 상한과 build deadline
 
-**상태: 설계.** NFR-03 및 v2 캡처/빌드 자원 계약을 공개 입력·shared Reindex·진단에 일관되게 적용한다.
+**상태: 완료 · 2026-10-06.** NFR-03 및 v2 캡처/빌드 자원 계약을 공개 입력·shared Reindex·진단에 일관되게 적용한다.
 
 - setup YAML과 명시 CLI의 우선순위를 유지하며 최대100000파일·단일32MiB·총4GiB의 기본값과 설정값을 pre-build identity/실제 capture/최종 source 재검증에 동일하게 전달한다. 운영 상한 때문에 일부 원문을 성공 후보로 만드는 대신 후보 전체를 거부한다. negative/overflow/외부 pack 포함 합산의 경계를 검증한다.
 - 기본 build2h deadline을 CLI 준비와 shared versioned Reindex에 적용한다. 캡처·staging·엔진/gate·후보 sync와 rename 직전에 취소/timeout을 확인한다. pointer rename 이후에는 필수 내구성 마무리를 완료해 거짓 unchanged/자동 rollback을 피한다. 일반 fsync의 kernel I/O는 cooperative deadline의 강제 중단으로 주장하지 않는다.
 - 원문 inventory와 보관/staging 최소 필요 바이트, 출력 filesystem의 현재 free bytes, 엔진 출력 크기 미예측 한계를 공개 resource 상태에 기록한다. 여유 공간 부족은 빌드/승격 전에 거부하고 이전 current를 유지한다. resource/error DTO에는 절대 경로·원문 내용·비밀을 넣지 않는다.
 
-- [ ] N06-A YAML/CLI/default/shared API의 상한·deadline 전달 및 입력 검증.
-- [ ] N06-B 초과/timeout/취소·외부 pack 합산에서 부분 후보 비활성·이전current/identity/원문 불변.
-- [ ] N06-C 예상/실제 free bytes·공개 resource 상태 및 오류/민감 경로 비노출.
-- [ ] N06-D 관련 공개/호환 회귀와 수용 조건별 소스·실행 원자료 바인딩.
+- [x] N06-A YAML/CLI/default/shared API의 상한·deadline 전달 및 입력 검증.
+- [x] N06-B 초과/timeout/취소·외부 pack 합산에서 부분 후보 비활성·이전current/identity/원문 불변.
+- [x] N06-C 예상/실제 free bytes·공개 resource 상태 및 오류/민감 경로 비노출.
+- [x] N06-D 관련 공개/호환 회귀와 수용 조건별 소스·실행 원자료 바인딩.
+
+
+N-06 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/cli-results.json), [바인딩](../../system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/manifest.json). 이전 CLI에서 YAML4개가 무시되어 승격된 RED를 보관했다. GREEN 공개 CLI12사례는 기본값·YAML/명시CLI 우선순위·상한3개·실제timeout·용량reserve·negative/overflow/잘못된duration·engine/gate deadline을 검증했다. 거부마다 이전current 및 원문/신원 전체SHA가 불변이다. source snapshot golden은 상한값이 신원에 혼입되지 않음을 확인한다. 단위 주입은 외부origin 합산, 부모deadline 유지, shared Reindex, candidate-file/before/after-rename 취소와 실제 자식출력 파이프 종료를 확인한다. 6개 검증 패키지의 race 회귀와 Git history 빌드, vet/경계/문서 검사를 통과했다.
+
+범위: native Darwin ARM64·mock 실제 엔진·임시 fixture. free-space probe는 해당 출력/실제 temp staging filesystem을 분리하고 같은volume이면 합산한다. source copy 및 Git bundle 복구의 **최소** logical bytes를 보고하며 엔진 산출물/FS overhead 예상은null이다. pre-promotion 실제candidate bytes·free-space도 다시 보고한다. OS fsync/read kernel 대기는 cooperative deadline으로 즉시 중단할 수 없으며 rename후는 내구성 마무리를 우선한다. native Linux/실규모 모델·운영 보장은 N-15에 유지한다. legacy flat은 캡처 상한/reserve를 명시하면 거부하고, build deadline은 적용한다. 민감 경로/원문은 resource DTO 및 공개 bounded 오류에 들어가지 않는다.
+
+## N-07: 보관 원문 인용의 본문 예산
+
+**상태: 설계.** retrieval의 토큰 추정과 달리 retained 원문이 32000bytes를 넘을 때 전체 요청 오류가 발생한다. 새 구조 DEV를 사용하며 이미 관측한 FINAL/gold/임계치는 변경하지 않는다.
+
+- upstream 선택 순위를 유지하고 **전체 원문 span 단위**로 12citation/32000bytes 안에 들어가는 검증·sanitized 근거를 선택한다. 긴 span을 자르거나 좌표·원문 hash를 다시 만들어 적합한 것으로 보이지 않는다. oversized 첫 span 때문에 뒤의 적합한 span을 버리지 않는다.
+- 생략이 있으면 partial과 한정된 예산 진단(요청/중복/선택/생략 수·원문/공개body bytes)을 integrity에 포함한다. 하나도 맞지 않는 비어 있지 않은 입력은 typed budget 오류로 구분한다. 무인용/비밀drop·source_missing/snapshot_mismatch는 별개의 상태/오류로 유지한다. 비교 분모에 error/partial/complete를 모두 남긴다.
+- 모든 요청 좌표·원문 신원을 검증한다. 생략 후보의 foreign commit/누락/변조를 예산 때문에 숨기지 않는다. sanitizer 이후 바이트도 제한한다. knowledge/trace의 일부 근거를 완성된 정책/trace로 승격하지 않고 기존 fallback을 유지한다. 기존 정상 v2 hash/legacy v1 계약은 유지한다.
+
+- [ ] N07-A 독립 DEV에서 byte/citation 경계·oversized→fitting·모두초과 RED→GREEN 및 원문좌표/hash 무절단.
+- [ ] N07-B 안전한 partial/typed budget/정상·중복·zero/drop 분모와 integrity/상한 검증.
+- [ ] N07-C 생략 span 포함 source_missing/mismatch/비밀·scope/knowledge/trace 허위 수용0.
+- [ ] N07-D 실제 공개 MCP 경로와 관련 회귀·입력/소스/원자료 바인딩·이전FINAL 불변.

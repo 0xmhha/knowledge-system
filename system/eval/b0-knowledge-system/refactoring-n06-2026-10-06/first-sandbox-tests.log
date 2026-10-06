@@ -1,0 +1,57 @@
+--- FAIL: TestCaptureNonGitSourceRetainsOldBytesAndDetectsCorruption (0.03s)
+    capture_test.go:94: new file after capture went unnoticed: resource_limit: source file count exceeded
+--- FAIL: TestPreflightOllama (0.00s)
+    --- FAIL: TestPreflightOllama/model_present_(implicit_latest) (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 1052 [running]:
+testing.tRunner.func1.2({0x101737440, 0x7072042565a0})
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:1977 +0x318
+panic({0x101737440?, 0x7072042565a0?})
+	/Users/kevin/.gvm/gos/go1.26.8/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1017d8580, 0x707203f0e640})
+	/Users/kevin/.gvm/gos/go1.26.8/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/knowledge-system/internal/setup.TestPreflightOllama.func1(...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/setup/preflight_test.go:12
+github.com/0xmhha/knowledge-system/internal/setup.TestPreflightOllama.func2(0x7072040e06c8)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/setup/preflight_test.go:31 +0xa4
+testing.tRunner(0x7072040e06c8, 0x707204256540)
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1051
+	/Users/kevin/.gvm/gos/go1.26.8/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/knowledge-system/internal/setup	24.411s
+--- FAIL: TestResolveAutoVersion (0.06s)
+    setup_test.go:57: git [-c user.email=t@t -c user.name=t commit -q -m x]: exit status 128 (error: gpg failed to sign the data:
+        gpg: failed to create temporary file '/Users/kevin/.gnupg/.#lk0x00000001017f0b60.Kevin-MacBookProM2.local.93213': Operation not permitted
+        gpg: can't connect to the keyboxd: Operation not permitted
+        gpg: error opening key DB: No Keybox daemon running
+        gpg: skipped "FCC6A1B56A9059AD": Input/output error
+        [GNUPG:] INV_SGNR 0 FCC6A1B56A9059AD
+        [GNUPG:] FAILURE sign 33587249
+        gpg: signing failed: Input/output error
+        
+        fatal: failed to write commit object
+        )
+--- FAIL: TestResolveAutoVersionRejectsGitIgnoredIndexableSource (0.05s)
+    setup_test.go:132: git [-c user.email=t@t -c user.name=t commit -q -m x]: exit status 128 (error: gpg failed to sign the data:
+        gpg: failed to create temporary file '/Users/kevin/.gnupg/.#lk0x0000000100a90b60.Kevin-MacBookProM2.local.93217': Operation not permitted
+        gpg: can't connect to the keyboxd: Operation not permitted
+        gpg: error opening key DB: No Keybox daemon running
+        gpg: skipped "FCC6A1B56A9059AD": Input/output error
+        [GNUPG:] INV_SGNR 0 FCC6A1B56A9059AD
+        [GNUPG:] FAILURE sign 33587249
+        gpg: signing failed: Input/output error
+        
+        fatal: failed to write commit object
+        )
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/cmd/cks/setupcli	1.025s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks	1.146s
+?   	github.com/0xmhha/knowledge-system/internal/githistory	[no test files]
+FAIL

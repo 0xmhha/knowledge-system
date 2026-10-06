@@ -1,0 +1,29 @@
+{"time":"2026-10-06T05:44:14.705242Z","step":"graph-build","type":"start","message":"Build the graph index"}
+{"time":"2026-10-06T05:44:14.705401Z","step":"toolchain","type":"output","message":"resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)"}
+{"time":"2026-10-06T05:44:14.740696Z","step":"graph-build","type":"output","message":"time=2026-10-06T14:44:14.740+09:00 level=INFO msg=\"detected files\" go=1 ts=0 sol=0 proto=0"}
+{"time":"2026-10-06T05:44:14.791583Z","step":"graph-build","type":"output","message":"time=2026-10-06T14:44:14.791+09:00 level=INFO msg=\"http client matching\" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0"}
+{"time":"2026-10-06T05:44:14.828368Z","step":"graph-build","type":"output","message":"time=2026-10-06T14:44:14.828+09:00 level=INFO msg=\"build complete\" nodes=4 edges=3 pkg_tree_edges=2 topic_resolutions=3"}
+{"time":"2026-10-06T05:44:14.828384Z","step":"graph-build","type":"output","message":"ckg: built 4 nodes / 3 edges into /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-red-3b0ge1d7/total-bytes/candidate/graph"}
+{"time":"2026-10-06T05:44:14.829316Z","step":"graph-build","type":"done"}
+{"time":"2026-10-06T05:44:14.829322Z","step":"vector-build","type":"start","message":"Build the vector index aligned to the graph"}
+{"time":"2026-10-06T05:44:14.84653Z","step":"vector-build","type":"output","message":"time=2026-10-06T14:44:14.846+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=20e3d08c05516a24 run_id=d04f67c461a77b7e languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2797523134/tree has_ckv_yaml=false"}
+{"time":"2026-10-06T05:44:14.846643Z","step":"vector-build","type":"output","message":"time=2026-10-06T14:44:14.846+09:00 level=INFO msg=ckv event=build.start trace_id=7c77911b0d6b1a57 run_id=d04f67c461a77b7e src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2797523134/tree out_dir=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-red-3b0ge1d7/total-bytes/candidate/vector embedder=mock-feature-hash-v1 embedder_provider=\"\""}
+{"time":"2026-10-06T05:44:14.856779Z","step":"vector-build","type":"output","message":"time=2026-10-06T14:44:14.856+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=9058b21891c57dcf run_id=d04f67c461a77b7e ckg_path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-red-3b0ge1d7/total-bytes/candidate/graph files_indexed=1 entries=1 canonical_available=true"}
+{"time":"2026-10-06T05:44:14.85791Z","step":"vector-build","type":"output","message":"ckv: 1/1 files (492.1 files/s, elapsed 0s, ETA 0s)"}
+{"time":"2026-10-06T05:44:14.865206Z","step":"vector-build","type":"output","message":"time=2026-10-06T14:44:14.865+09:00 level=INFO msg=ckv event=build.done trace_id=7c77911b0d6b1a57 run_id=d04f67c461a77b7e latency_ms=18 files_indexed=1 chunks_truncated=0 category_counts=map[:2] languages=map[go:2] out_dir=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-red-3b0ge1d7/total-bytes/candidate/vector indexed_head=\"\" chunks_canonical_id=1 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2797523134/tree embedder=mock-feature-hash-v1 chunks_flow_step=0 chunks_doc=0 policy_loaded=false chunks_flow_spine=0 chunks_file_header=1 db_sha256=c3117fd87b3a80ca73e5fe69ac175fcd7707e1dc97d6dca45e336822a88b4977 chunks_symbol=1 chunks_total=3 embedder_provider=\"\""}
+{"time":"2026-10-06T05:44:14.865237Z","step":"vector-build","type":"output","message":"ckv: indexed 1 files → 3 chunks (1 symbol, 0 doc, 1 header, 0 truncated)"}
+{"time":"2026-10-06T05:44:14.865252Z","step":"vector-build","type":"output","message":"ckv: canonical_id 1/1 symbols aligned · flow 0 step / 0 spine"}
+{"time":"2026-10-06T05:44:14.865255Z","step":"vector-build","type":"output","message":"ckv: indexed_head= built_at=2026-10-06T05:44:14Z db=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n06-red-3b0ge1d7/total-bytes/candidate/vector/vector.db sha256=c3117fd87b3a80ca73e5fe69ac175fcd7707e1dc97d6dca45e336822a88b4977"}
+{"time":"2026-10-06T05:44:14.86599Z","step":"vector-build","type":"done"}
+{"time":"2026-10-06T05:44:14.865996Z","step":"verify-align","type":"start","message":"Verify graph/vector alignment"}
+{"time":"2026-10-06T05:44:14.866396Z","step":"verify-align","type":"done"}
+{"time":"2026-10-06T05:44:14.93688Z","step":"reindex-gate","type":"output","message":"── schema ──  errors=0  warnings=0  info=0"}
+{"time":"0001-01-01T00:00:00Z","step":"reindex-gate","type":"warning","message":"canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified"}
+{"time":"2026-10-06T05:44:14.977037Z","step":"reindex-gate","type":"output","message":"ckg audit (go)"}
+{"time":"2026-10-06T05:44:14.977068Z","step":"reindex-gate","type":"output","message":"  build files: 1"}
+{"time":"2026-10-06T05:44:14.97707Z","step":"reindex-gate","type":"output","message":"  db files:    1"}
+{"time":"2026-10-06T05:44:14.977071Z","step":"reindex-gate","type":"output","message":"  in both:     1"}
+{"time":"2026-10-06T05:44:14.977071Z","step":"reindex-gate","type":"output","message":"  in build only (missing from DB): 0"}
+{"time":"2026-10-06T05:44:14.977072Z","step":"reindex-gate","type":"output","message":"  in db only (over-included):       0"}
+{"time":"2026-10-06T05:44:14.977073Z","step":"reindex-gate","type":"output","message":"verdict: PARITY"}
+{"time":"2026-10-06T05:44:15.109908Z","step":"reindex-promote","type":"done","message":"promoted candidate → current"}
