@@ -1,6 +1,6 @@
 # 승인된 B0 개발 기준선과 B1/C0 재검증 결과
 
-2026-10-06 · **DEV 실제 수집·독립 자동 검사 완료 / FINAL 결과는 별도 보고 / 사람 주장·운영 판정 대기**. 성공한 도구 호출을 정답 성공으로 바꾸지 않는다. FINAL 결과를 이 개발 보고서에 섞지 않는다.
+2026-10-06 · **DEV 실제 수집·독립 자동 검사 완료 / FINAL 결과는 별도 보고 / HC 해석 승인·시험 preview 종료 결정 완료**. 성공한 도구 호출을 정답 성공으로 바꾸지 않는다. FINAL 결과를 이 개발 보고서에 섞지 않는다.
 
 승인 입력은 [입력 승인 기록](./B0-APPROVED-INPUTS.md), 개발 동결은 [동결 원장](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json), 전체 원자료·SHA는 [개발 manifest](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-after-fix26-27/artifact-manifest.json)와 [native 오라클 manifest](../../system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-oracles/artifact-manifest.json)에 있다. 큰 원자료는 lossless gzip이며 압축 전후 SHA가 별도로 남는다.
 
@@ -60,8 +60,8 @@ FIX22 승인 Go29 opt-in 발견, FIX23 bounded stderr/stdio, FIX24 default-provi
 
 개발에서 확인한 실제 계약/순위/반복 원문 비용 결함의 수정과 자동 검증을 동결한다. baseline recall 제한, optional latency/소표본 제한은 해결된 품질 성공으로 바꾸지 않는다. 최종 입력은 별도8정적+6동적 가족/8상태이며4,800회를 같은 바이너리·모델·K·회전·반복으로 실행한다. FINAL을 보고 소스·query·gold·threshold를 튜닝하지 않는다.
 
-## 남은 판정
+## 사람 판정과 종료 범위
 
-[HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 실제 출력 주장/정책/기권 판정이 남는다(B1-04/07/08). [비용 보고](./B1-COST-REPORT.md)는 실측·미측정/null 사실을 보존해 B1-06을 완료했으며 사람의 비용 승인이나 이점을 만든 것이 아니다. 입력①–⑤ 승인을 다시 요구하지 않는다.
+[HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 실제 해석/사람 기권을 사용자가 승인했다. [paired 비교 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 B1-04/07/08의 분모·실패·불확실·비용과 연결했다. 사람 비용은 미측정/null이며 생성 답변 오류율을 전체 응답0으로 만들지 않았다.
 
-[최신 package/복구](./C1-FINAL-PACKAGE-VALIDATION.md)와 [지원/known limits·출시보류 보고](./C1-FINAL-DELIVERY-REVIEW.md)는 완료했다. 실제운영scope/OP01–08·역할/키·적합성·미확인환경 처리의 C1-05 사람 결정은 별도다. 자동 검사·보고 완료와 품질 pass, 실제 권한/법무 승인은 구분한다. 전체26/30완료, 남은전체B1-04·07·08/C1-05다.
+사용자가 시험 preview로 종료를 선택했고 전체30/30·승인 범위 잔여0이다. [최종 지원·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 운영 제외/미승인 항목을 기록했다. B0 기준선과 C0 수정/회귀/동결은 pass 범위, B1/C1 품질 fail·중요 그룹 inconclusive·disabled·운영 출시보류는 그대로다.

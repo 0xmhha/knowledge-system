@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "approval_event": "human-approval.json",
+  "approval_event_sha256": "a21a84322dd7c1044d3bd4e3079ae55a1ce725d112bdaa3f124cb890ffb2153f",
+  "reviewed_unit": "eleven evidence-bounded interpretation statements, not generated model answers or independent quality questions",
+  "approved_interpretations": 11,
+  "reviewed_interpretations": 11,
+  "unsupported_approved_interpretations": 0,
+  "categories": [
+    {
+      "category": "concept interpretation",
+      "claim_ids": [
+        "HC-01"
+      ],
+      "approved": 1
+    },
+    {
+      "category": "policy scope, implementation and acceptance boundaries",
+      "claim_ids": [
+        "HC-02",
+        "HC-03",
+        "HC-04",
+        "HC-05",
+        "HC-06",
+        "HC-10",
+        "HC-11"
+      ],
+      "approved": 7
+    },
+    {
+      "category": "unsupported reason / trace / answer boundaries",
+      "claim_ids": [
+        "HC-04",
+        "HC-06",
+        "HC-07",
+        "HC-08",
+        "HC-11"
+      ],
+      "approved": 5
+    }
+  ],
+  "category_overlap": true,
+  "human_abstention": {
+    "claim_ids": [
+      "HC-09",
+      "HC-10"
+    ],
+    "approved_should_abstain": 2,
+    "reviewed": 2,
+    "system_generated_abstention_rate": null,
+    "strict_no_citation_guard": "fail; unchanged"
+  },
+  "model_answer_misconception_policy_misuse_unsupported_reason_rates": null,
+  "model_answer_rate_reason": "product returns EvidencePacks, not generated answers; eleven approved interpretations cannot rate all 3840/4800 responses",
+  "human_cost_status": "not_measured",
+  "quality_pass": false
+}

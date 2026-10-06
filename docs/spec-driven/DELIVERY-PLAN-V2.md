@@ -165,3 +165,7 @@ CKS가 원문 질의를 먼저 CKV/BM25/정확 심볼 검색에 보낸다. 개�
 **판정:** 이 v2는 구현 순서, 요구사항 추적, 실패 판정과 검증 산출물을 정리한 WBS 기준선이다. 사용자가 D1–D5 **설계 결정**을 승인해 D 설계 게이트는 폐쇄됐다. D1-02의 `CHECKED_BY`는 승인된 D3 계약의 개정으로 기록했다. 20개 타입의 정의와 데이터 흐름은 [`ONTOLOGY-20-USAGE.md`](./ONTOLOGY-20-USAGE.md)에 있다. 실제 v2 기능 검증은 A의 수용 시험으로 남는다. 판정 증거는 [`DESIGN-GATES-EVIDENCE.md`](./DESIGN-GATES-EVIDENCE.md)와 [`D5-DECISION-REVIEW.md`](./D5-DECISION-REVIEW.md)에 있다. 실모델 수치와 그 결과에 따른 기본값 결정은 사용자의 순서대로 B/C에서 수행한다. 설계 폐쇄, 구현 완료, 품질 승인을 별도로 기록한다.
 
 **D5 확장:** 사용자는 공통 20개를 고정하고 공통 틀·조직별 모델을 분리하는 D5-01부터 팩 신원·출처·타입·질의·파일럿·작성/권한의 D5-02–07까지 제안대로 승인했다. R2-09–11과 A5.4/A5.5/A6/A7.1/A8/B0/B1에 [`DOMAIN-PACK-CONTRACT-V1.md`](./DOMAIN-PACK-CONTRACT-V1.md)의 상세 계약과 검증을 반영했다. 첫 파일럿은 `knowledge-system` 정책/ADR, 기본 입력은 `.cks/knowledge` 및 등록 로컬 루트, 최소 검토는 프로젝트 소유자 1명이다. 이는 산업 팩 구현이나 실제 정책 사실의 검토 완료를 뜻하지 않는다.
+
+## 2026-10-06 시험 preview 종료 결정
+
+사용자가 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**라고 명시했다. [실제 승인·비교 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)와 [지원/제한·최종 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 근거·scope를 연결해 실행 작업리스트30/30을 완료했다. B0 기준선·C0 수정/회귀는 pass 범위, B1/C1 품질 fail·중요 그룹 inconclusive·ontology disabled·운영 출시보류다. 원래 운영 조건은 역사적 기준으로 보존하며 실제 운영 OP01–08·키/법무/미확인 환경은 사용자 선택 범위 밖·미승인이다. 앞선 준비/대기 문단은 해당 날짜의 이력이다. 운영 배포·새 Git push를 승인한 결정이 아니다.

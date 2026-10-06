@@ -1,6 +1,14 @@
 # 다른 머신의 B/C 단계 작업 인계
 
-## 최신 재개 지점: 2026-10-06 보고 완료조건 재검토·26/30 완료
+## 최신 상태: 2026-10-06 실제 사람 승인·시험 preview 목표 종료
+
+사용자 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**. [실제 승인 원장](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-approval.json)·[사람/paired 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)·[최종 종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)·[작업리스트46절](./EXECUTION-WORKLIST.md)·[현황판](./EXECUTION-STATUS.md)을 현재 기준으로 읽는다. **30/30 완료·승인 범위 잔여0·4/4 stage 판정 완료**. B0 baseline pass/C0 수정·회귀 pass, B1/C1 품질fail·소그룹inconclusive·ontology disabled·운영출시보류다. 작업 종료를 품질 합격/운영 출시로 확장하지 않는다.
+
+HC 해석11/11와 사람 기권2/2를 기록했고 생성 답변 전체3840/4800 오류율을0으로 만들지 않았다. 검토 비용not_measured/null·기록 시각과 메시지 수신 시각 구분. 기존 pending 증거와 승인 전 표는 역사적 snapshot으로 보존하며 frozen5입력/제품1096파일/FINAL/패키지 원자료는 그대로다. OP01–08 실제 운영 역할/키/신뢰/관리/폐기·법무·실운영 환경/백업/실패전환·native AMD64/전체 native 적합성은 사용자 선택 scope 밖·미확인·미승인이다. 시험 키는 운영 키가 아니다.
+
+승인 범위의 다음 작업 없음, 남은 전체0. 별도 품질 개선은 새 DEV와 사전 검토한 독립 FINAL이 필요하며 기존 관측 FINAL을 독립 holdout으로 재사용하지 않는다. 사용자 `.claude/`, `logs/`는 보존·커밋 제외. 새 push/배포 승인 없음. 아래26/30·24/30·pending 기록은 당시 이력이다. [최종30항목 감사](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/completed-30-reaudit.json)에 완료조건·동결SHA·793평가증거/721패키지증거 검증을 보관했다. app goal 완료 반영 대상이며 이후 재개에 자동으로 운영 출시를 수행하지 않는다.
+
+## 이전 재개 지점: 2026-10-06 보고 완료조건 재검토·26/30 완료
 
 사용자의 다음 진행 지시 후 [작업리스트45절](./EXECUTION-WORKLIST.md)의 원래 완료조건을 다시 읽었다. B1-06은 실제비용/원시시간/환경·순서/build-query 분리와 사람비용 not_measured/null을 [비용 보고](./B1-COST-REPORT.md)에 기록하여 완료했다. 없는 측정을 정직하게 기록하는 일에 추가 승인을 기다린 이전 분류를 바로잡았다. 사람 승인/0비용/절감효과를 만들지 않았다. C1-07은 원래 “명시적 잔여 범위” OR조건의 [지원·known limits·출시보류 보고](./C1-FINAL-DELIVERY-REVIEW.md)를 완료했고 실제 운영scope/OP/HC 잔여는 그대로다.
 

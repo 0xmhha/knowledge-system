@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-preview-final-audit-20261006.py", line 37, in <module>
+    p=d/f.get('artifact_path',f.get('path'));assert sha(p)==f.get('artifact_sha256',f.get('sha256')),str(p)
+                                                    ^^^^^^
+  File "/private/tmp/ks-preview-final-audit-20261006.py", line 4, in <lambda>
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_bytes())
+                                ^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1050, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-oracles/development-oracles/approved-development-oracles/execution-first-report-binding-error.json'

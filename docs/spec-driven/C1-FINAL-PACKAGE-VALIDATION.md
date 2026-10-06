@@ -39,4 +39,4 @@ Linux ARM64는 고정 Ollama 0.35.1 image와 승인 BGE-M3 바이트를 read-onl
 
 ## 종료 범위
 
-C1-04는 최신 세 대상 preview·가용한 두 플랫폼 실제 모델·전체 strict 입력 비용·환경 없는 AMD64의 pending 표시 조건에서 검증 완료다. C1-06은 최종 패키지의 구 데이터 보존/실패·재색인/이전 current 복구 조건에서 검증 완료다. 운영 OP-08은 별도 미완료로 남긴다. [FINAL 품질](./C1-APPROVED-FINAL-REPORT.md)은 fail·소그룹 inconclusive이고 온톨로지는 disabled를 유지한다. B1-06 비용 보고와 C1-07 지원/출시보류 보고는 이후 [완료조건 재검토](./B1-COST-REPORT.md)로 닫았다. B1-04/07/08의 사람 해석·기권, C1-05 운영 신뢰/적합성·scope 결정은 남는다. 전체 완료나 운영 출시 승인으로 표기하지 않는다.
+C1-04는 최신 세 대상 preview·가용한 두 플랫폼 실제 모델·전체 strict 입력 비용·환경 없는 AMD64의 preview 표시 조건에서 검증 완료다. C1-06은 구 데이터 보존/실패·재색인/이전 current 복구 조건에서 검증 완료다. 사용자의 [HC 승인·시험 preview 종료 결정](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 따라 전체30/30 작업을 종료했다. 실제 운영 OP01–08은 승인 범위 밖·미확인·미승인이다. [FINAL 품질](./C1-APPROVED-FINAL-REPORT.md)은 fail·중요 그룹 inconclusive, ontology disabled·운영 출시보류를 유지한다. 최종 지원/제한은 [종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 있다.

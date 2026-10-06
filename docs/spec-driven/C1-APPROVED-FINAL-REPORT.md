@@ -43,12 +43,12 @@
 
 같은 pack_on 축의 ontology 비교는 dynamic concept_text/relations/combined p95비1.238/1.059/1.220이다. 같은 ontology 축의 knowledge_on/off 비교는 baseline/concept_text/relations/combined에서1.238/1.331/1.288/1.293이다. 원래 baseline_off 비교와 모두 보존하며 어떤 축이나 pooled 결과 하나를 사후 선택해 포괄적인 비용 합격을 만들지 않는다. 기존 한계1.25와 population 차이를 그대로 표시한다. 원시 p50/p95·cold·backend·크기는 집계/개별 보고서에 있다.
 
-## 최종 결정과 미완료 범위
+## 최종 결정과 승인된 종료 범위
 
 - C1-01: 승인 조건의 독립 재평가·실패 포함 원자료/감사 완료. 240개 실패를 성공으로 바꾸지 않음.
 - C1-02: 실제 실행 오류와 엄격 인용 guard 실패가 남아 **품질 fail / 출시 보류**. 중요 질문군 code2/why2/policy2/기권2, 동적 양성4가족은 소표본 inconclusive. 반복을 독립 표본으로 세지 않음.
 - C1-03: 사용자가 승인한 n<10 규칙과 실패/불확실성에 따라 **disabled 유지**. 기본 활성·운영 출시를 승인하지 않음. 구현 기본값도 opt-in이다.
-- B1-04/07/08: 사람의 출력 주장·정책·기권 판정/비교 종료 남음. B1-06은 [비용 보고](./B1-COST-REPORT.md)에 실측과 미측정/null을 연결해 완료했다. [검토표](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 입력 승인과 출력 승인을 분리한다. 실제 FINAL 기권 질문의 운영 담당자/키 소유자는 근거 없이 지정하지 않는다.
-- C1-04/06: [최종 동결 패키지](./C1-FINAL-PACKAGE-VALIDATION.md)의 최신3대상 preview·실모델·전체 strict 비용·복구를 완료했다. C1-07은 [지원/known limits·출시보류 보고](./C1-FINAL-DELIVERY-REVIEW.md)를 명시적 잔여 포함 조건으로 완료했다. C1-05의 운영 서명·신뢰/적합성/담당자·scope 결정은 남는다.
+- B1-04/07/08: [HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 실제 사용자 해석/기권 승인과 [paired 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)를 결합해 완료. 비용은 미측정/null이며 실제 운영 담당자/키 소유자를 지정한 승인이 아니다.
+- C1-04/06: [최신 패키지](./C1-FINAL-PACKAGE-VALIDATION.md)의3대상 preview·가용 실모델·strict 비용·복구 검증 완료. C1-05는 사용자가 시험 preview 종료를 명시적으로 선택하여 범위별 완료. C1-07 [지원/제한·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)와 전체30/30 종료, 운영 사실/적합성은 범위 밖·미승인.
 
 현재 작업 범위는 계속 [작업리스트](./EXECUTION-WORKLIST.md)를 따른다. 실패 판정을 완료한 것은 제품 품질을 통과시킨다는 뜻이 아니다.
