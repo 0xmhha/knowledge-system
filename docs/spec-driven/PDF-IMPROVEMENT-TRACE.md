@@ -1,6 +1,6 @@
 # PDF 기반 개선안 추적표
 
-2026-10-06 갱신 안내: 아래 표의 미측정/대기는 초기 추적 당시 상태다. 현재 DEV3840/FINAL4800 평가와 시험 preview 종료는 [최초 목적/코드 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)에 연결했다. 품질 fail·소그룹 inconclusive·disabled·운영 출시보류이며, 원래 목표 대비 남은 범위는 [N-01–18](./REFACTORING-REMAINING-WORKLIST.md)이다. 초기 요구사항/WBS/개선안 원문3개는 현재 로컬 미확보로 기록했고 직접 원문 검증했다고 주장하지 않는다. 아래 표는 당시 분석 이력으로 보존한다.
+2026-10-06 갱신 안내: 아래 표의 미측정/대기는 초기 추적 당시 상태다. 현재 DEV3840/FINAL4800 평가와 시험 preview 종료는 [최초 목적/코드 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)에 연결했다. 품질 fail·소그룹 inconclusive·disabled·운영 출시보류는 유지한다. study/main `1c350c1`에서 초기 요구사항/WBS/개선안과 분석·아키텍처를 확보해 [시작 배경·전체 초기 ID/v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. N-01 완료, [잔여 N-02–18](./REFACTORING-REMAINING-WORKLIST.md)17개다. 이번에 PDF 원본을 재검증한 것은 아니며 아래 표는 당시 분석 이력으로 보존한다.
 
 이 문서는 『데이터베이스 설계와 구축』의 OCR·원본 대조를 토대로 작성한 초기 분석(`study/docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md`)이 현재 실행 기준에 남아 있는지 확인하는 추적표다. PDF는 설계 동기이며 제품의 실측 성능이나 구현 지시가 아니다. PDF 쪽수는 원본 뷰어 기준이다. 요구사항 원본은 `study/docs/reviews/knowledge-system/spec-driven-requirements.md`, 현행 작업 순서와 종료 조건은 [WBS v2](./DELIVERY-PLAN-V2.md), 구현 증거는 [실행 기록](./EXECUTION.md)과 [A0 기준선](./A0-TRACE-BASELINE.md)에 있다.
 

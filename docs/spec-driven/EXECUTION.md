@@ -1,6 +1,6 @@
 # Spec-driven WBS execution log
 
-2026-10-06 현재 범위 안내: [최초 목적/현재 코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [새 잔여18항목](./REFACTORING-REMAINING-WORKLIST.md)을 추가했다. 사용자 승인 시험 preview30항목은 종료됐으며, 원래 품질/실제 지식/운영 목표 및 이번에 확인한 쓰기·잠금·내구성·GC/자원 설계 차이는 별도 후속 범위다. 아래 W0–W5와 dated 상태 문단은 누적 이력이며 과거 pending/미측정을 현재 상태로 읽지 않는다. 실제 품질은 fail·중요 그룹 inconclusive, ontology disabled·운영 출시보류다.
+2026-10-06 현재 범위 안내: [최초 목적/현재 코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [후속18항목 중 N-01 완료/17개 잔여](./REFACTORING-REMAINING-WORKLIST.md)를 관리한다. study/main동기화로 초기 원문을 확보해 [시작 배경·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 사용자 승인 시험 preview30항목은 종료됐으며, 원래 품질/실제 지식/운영 목표 및 쓰기·잠금·내구성·GC/자원 설계 차이는 별도 후속 범위다. 아래 W0–W5와 dated 상태 문단은 누적 이력이며 과거 pending/미측정을 현재 상태로 읽지 않는다. 실제 품질은 fail·중요 그룹 inconclusive, ontology disabled·운영 출시보류다.
 
 B0 backend-call measurement (2026-10-04): get_for_task/v2의 선택형 request scope에서 실제 CKV/CKG/intent/health와 Ollama HTTP transport 시도를 캡처 measurement_id에 연결한다. 기본 응답과 과거 trace 카운터는 유지한다. 실제 K/필터/결과 수/실패/ns와 HTTP body 크기를 분리 기록하며 원문·벡터·오류 메시지를 새 계측 이벤트에 복사하지 않는다. mock/BGE-M3 각 48요청과 기존 v1/v2 20요청, 같은 실모델 데이터셋의 비계측 12응답 동등성·소스/DB/integrity를 확인했다. scope 동시성·nonfatal knowledge 실패·Stage3·in_flight·flow 보존·조기 오류, HTTP redirect/503/취소·모델 신원 보존 및 전체 Go/race/vet 통과. [측정 계약](./B0-MEASUREMENT-TOOLS.md)과 [호출 원장](../../system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04.json)에 범위·원자료를 남긴다. 최종 구조 진단 일부가 겹쳤으므로 latency gate는 아니다. constructor startup pin/probe·SQL·모델 내부 비용은 카운터 밖이며 B0-06의 순서 회전·승인 K·공식 입력 잠금은 남아 있다.
 

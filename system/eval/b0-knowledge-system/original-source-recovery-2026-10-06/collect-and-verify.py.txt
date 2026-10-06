@@ -1,0 +1,135 @@
+from pathlib import Path
+import datetime, hashlib, json, re, subprocess
+
+root = Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system')
+study = Path('/Users/kevin/work/github/0xmhha/study')
+out = root / 'system/eval/b0-knowledge-system/original-source-recovery-2026-10-06'
+source_commit = '1c350c18625ca2a46f1ae33ef4e56efb88f9617d'
+sha = lambda b: hashlib.sha256(b).hexdigest()
+
+def run(args, cwd=root):
+    p = subprocess.run(args, cwd=cwd, text=True, capture_output=True)
+    return {'argv': args, 'exit_code': p.returncode, 'stdout': p.stdout, 'stderr': p.stderr}
+
+def gitout(args, cwd):
+    r = run(['git'] + args, cwd)
+    assert r['exit_code'] == 0, r
+    return r['stdout'].strip()
+
+assert gitout(['rev-parse','HEAD'], root).startswith('97781d52')
+main_head = gitout(['rev-parse','main'], study)
+origin_head = gitout(['rev-parse','origin/main'], study)
+assert main_head == origin_head
+assert run(['git','merge-base','--is-ancestor',source_commit,'main'], study)['exit_code'] == 0
+names = ['README.md', 'analysis-review.md', 'ckv-ckg-ontology-installation-proposal.md',
+    'spec-driven-requirements.md', 'spec-driven-architecture.md', 'spec-driven-wbs.md',
+    'analysis-metrics.json', 'ckg-validation.txt']
+source_bindings = []
+contents = {}
+for name in names:
+    path = 'docs/reviews/knowledge-system/' + name
+    data = subprocess.check_output(['git','show',source_commit+':'+path],cwd=study)
+    assert data == (study/path).read_bytes(), path
+    assert data == subprocess.check_output(['git','show','main:'+path],cwd=study), path
+    target = out / 'archive' / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    source_bindings.append({'path':path, 'sha256':sha(data), 'bytes':len(data),
+        'snapshot':str(target.relative_to(out)), 'matches_main_and_worktree':True})
+    contents[name] = data.decode('utf-8')
+
+def rows(text, pattern):
+    result = []
+    for line in text.splitlines():
+        cells = [c.strip() for c in line.strip('|').split('|')]
+        if line.startswith('|') and re.fullmatch(pattern, cells[0]):
+            result.append(cells)
+    return result
+
+audit = (root/'docs/spec-driven/REFACTORING-ORIGINAL-GOALS-REAUDIT.md').read_text()
+audit_rows = rows(audit, r'W\d\.\d+')
+wbs = rows(contents['spec-driven-wbs.md'], r'W\d\.\d+')
+assert len(wbs) == 29 and [r[0] for r in wbs] == [r[0] for r in audit_rows]
+assert all(len(r) == 6 for r in wbs)
+wbs_trace = [{'id':r[0], 'original_work':r[1], 'original_dependencies':r[2],
+    'original_contracts':r[3], 'original_completion_evidence':r[4],
+    'original_estimate_not_schedule_commitment':r[5], 'current_audit_row':a}
+    for r,a in zip(wbs,audit_rows)]
+
+trace = (root/'docs/spec-driven/REFACTORING-ORIGIN-AND-V2-TRACE.md').read_text()
+trace_rows = rows(trace, r'(?:INV|FR|NFR|S)-\d\d')
+original_rows = rows(contents['spec-driven-requirements.md'],r'(?:INV|FR|NFR)-\d\d')
+original_scenarios = rows(contents['spec-driven-requirements.md'],r'S-\d\d .*')
+expected = ([f'INV-{i:02}' for i in range(1,8)] + [f'FR-{i:02}' for i in range(1,11)]
+    + [f'NFR-{i:02}' for i in range(1,6)] + [f'S-{i:02}' for i in range(1,10)])
+assert [r[0] for r in trace_rows] == expected
+assert {r[0] for r in original_rows} == set(expected[:22])
+assert [r[0].split()[0] for r in original_scenarios] == expected[22:]
+a0 = (root/'docs/spec-driven/A0-TRACE-BASELINE.md').read_text()
+for identifier in expected[:22]:
+    assert re.search(r'^\| '+identifier+r' \|', a0, re.M), identifier
+requirements_trace = [{'id':r[0], 'original_row':next(a for a in original_rows if a[0]==r[0]),
+    'current_trace_row':r} for r in trace_rows[:22]]
+scenario_trace = [{'id':r[0], 'original_row':a, 'current_trace_row':r}
+    for r,a in zip(trace_rows[22:],original_scenarios)]
+
+remaining = (root/'docs/spec-driven/REFACTORING-REMAINING-WORKLIST.md').read_text()
+tasks = rows(remaining, r'N-\d\d')
+assert [r[0] for r in tasks] == [f'N-{i:02}' for i in range(1,19)]
+assert tasks[0][1].startswith('완료') and '17개' in remaining
+assert all(not r[1].startswith('완료') for r in tasks[1:])
+freeze_path = root/'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json'
+freeze = json.loads(freeze_path.read_text())
+for key,count in [('product_source_sha256',1096),('approved_input_sha256',5)]:
+    assert len(freeze[key]) == count
+    for filename,digest in freeze[key].items():
+        assert sha(Path(filename).read_bytes()) == digest, filename
+
+metrics = json.loads(contents['analysis-metrics.json'])
+assert metrics['source_commit'] == '1ded9b3e47bc2e09062dba329c2f918423746fa4'
+assert metrics['audit']['build_count']==877 and metrics['audit']['in_db_only']==1056
+reports = ['REFACTORING-ORIGIN-AND-V2-TRACE.md','REFACTORING-ORIGINAL-GOALS-REAUDIT.md',
+    'REFACTORING-REMAINING-WORKLIST.md','STUDY-ORIGINAL-PLAN-FOLLOWUP.md',
+    'PDF-IMPROVEMENT-TRACE.md','EXECUTION.md','REMOTE-SESSION-HANDOFF.md']
+report_bindings = []
+link_targets = []
+for name in reports:
+    p = root/'docs/spec-driven'/name
+    report_bindings.append({'path':str(p.relative_to(root)), 'sha256':sha(p.read_bytes())})
+    # Entire original reports include historical links; new audit reports have verified local links.
+    if name.startswith(('REFACTORING-', 'STUDY-')):
+        for url in re.findall(r'\]\(([^)]+)\)',p.read_text()):
+            if not url.startswith(('https://','http://')):
+                link_targets.append((p.parent/url.split('#')[0]).resolve())
+data = {'checked_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'product_head':gitout(['rev-parse','HEAD'],root), 'source_archive_commit':source_commit,
+    'source_authored_dates':'2026-09-27–29; Git archive commit 2026-10-06',
+    'study_main_at_verification':main_head, 'study_origin_main_at_verification':origin_head,
+    'synchronization':{'requested_by_user':True,'fetch':'git fetch origin main',
+        'fast_forward':'aa6d1034 -> 1c350c18',
+        'initial_branch':'docs/stablenet-eth-rpc', 'initial_head':'0dc468792612ebcd8be314b36abc4db8e163e73a',
+        'later_active_branch':gitout(['branch','--show-current'],study),
+        'note':'other sessions advanced main and resumed their own branch during audit; their branch/changes were not reverted'},
+    'study_worktree_status':run(['git','status','--short'],study),
+    'source_bindings':source_bindings,'wbs_trace':wbs_trace,
+    'requirements_trace':requirements_trace,'scenario_trace':scenario_trace,
+    'requirements':22,'scenarios':9,'wbs_subtasks':29,
+    'N01_document_recovery_complete':True,'remaining_product_tasks':[r[0]for r in tasks[1:]],
+    'new_product_implementations':0,'frozen_product_source_hashes_verified':1096,
+    'frozen_approved_input_hashes_verified':5,
+    'original_pdf_or_ocr_or_database_rerun':False,'new_model_queries':False,
+    'six_month_upper_WI_scope':'separate; no automatic scope expansion',
+    'old_discovery_and_evidence':'preserved as observations before user-authorized remote sync'}
+(out/'recovered-source-and-trace.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+assert all(p.is_file()for p in link_targets),[str(p)for p in link_targets if not p.is_file()]
+for command,filename in [(['python3','scripts/check-docs.py'],'docs-check.log'),
+    (['python3','scripts/update-execution-status.py','--check'],'preview-status-check.log'),
+    (['git','diff','--check'],'diff-check.log')]:
+    r=run(command)
+    (out/filename).write_text(r['stdout']+r['stderr'])
+    assert r['exit_code']==0,r
+manifest={'source_archive_commit':source_commit,'reports':report_bindings,
+    'files':[{'path':str(p.relative_to(out)),'sha256':sha(p.read_bytes())}
+             for p in sorted(out.rglob('*'))if p.is_file()and p.name!='evidence-manifest.json']}
+(out/'evidence-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+print('PASS: synced main; 8 recovered source bindings; 22 contracts/9 scenarios/29 WBS; N-01 complete, 17 remaining; 1096 source/5 inputs unchanged; links/docs/status/diff')

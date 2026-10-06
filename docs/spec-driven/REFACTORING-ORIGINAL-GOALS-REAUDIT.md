@@ -4,7 +4,7 @@
 
 **시험 preview의 30/30 작업은 승인 범위에서 종료됐다. 그러나 검색 품질, 실제 파일럿 지식/수용 판정, 운영 출시까지 달성했다는 뜻은 아니다.** 이번 코드 대조에서는 기존 평가 제한 외에도 쓰기 경로·잠금·내구성·보관본 정리·자원 설정에 설계 대비 잔여가 확인됐다. 과거 완료 기록을 삭제하거나 기존 preview 목표를 다시 열지 않고 새 목록으로 분리한다.
 
-**study 추가 탐색 보완:** [목적 원문·6월 마스터 계획과 현재 코드 대조](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)를 추가했다. 상위 시니어 개발자 모방 목표의 WI10개를 복구했으며 제품 후속18개만으로 전체 상위 목표의 완료율을 표시하지 않는다. 9월에 참조한 원문3개의 미확보 상태는 유지한다.
+**study 동기화 후 보완:** `study/main`의 `1c350c1`에서9월 초기 원문3개·아키텍처·분석을 확보했다. [시작 배경·초기22계약/9시나리오·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인해 N-01을 완료했다. 제품 목록18개 중1개 문서 작업 완료/17개 잔여다. [6월 상위 WI10개](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)는 별도 범위이며 합산한 완료율을 만들지 않는다.
 
 ## 1. 시작 문서와 출처 확인
 
@@ -14,10 +14,10 @@
 | 최초 v2 순서 변경 | `c0654ed6`(2026-09-30)의 [DELIVERY-PLAN-V2 원본](../../system/eval/b0-knowledge-system/original-goal-reaudit-m2max-2026-10-06/initial-delivery-plan-v2-2026-09-30.md) 확보 | 기존 FR01–10/INV01–07/NFR01–05/S01–09 유지, A→B→C 순서와 구조/품질 분리 |
 | 상세 목적/설계 | `a0a11c74`(2026-09-30)의 [END-TO-END-DESIGN 원본](../../system/eval/b0-knowledge-system/original-goal-reaudit-m2max-2026-10-06/initial-end-to-end-design-2026-09-30.md), [현행 설계](./END-TO-END-DESIGN.md) | 코드·문서·의미·스펙·설치를 공통 좌표와 근거로 연결하는 목표 계약 |
 | 현재 추적 자료 | [A0 요구사항 추적](./A0-TRACE-BASELINE.md), [PDF 개선 추적](./PDF-IMPROVEMENT-TRACE.md), [현행 WBS v2](./DELIVERY-PLAN-V2.md), [누적 실행 기록](./EXECUTION.md) | 원 요구사항 ID와 W0–W5 및 D/A/B/C의 연결. 과거 상태 문구는 당시 기록으로 읽음 |
-| 원 요구사항·원 WBS·설계 동기 | 당시 참조한 `study/docs/reviews/knowledge-system/`의 `spec-driven-requirements.md`, `spec-driven-wbs.md`, `ckv-ckg-ontology-installation-proposal.md`는 현재 로컬에서 미확보 | 원문을 직접 확인했다고 주장하지 않음. N-01로 복구/완전성 재확인 |
+| 원 요구사항·원 WBS·설계 동기 | `study/main` `1c350c1`에서 `spec-driven-requirements.md`, `spec-driven-wbs.md`, `ckv-ckg-ontology-installation-proposal.md`와 초기 architecture/analysis 확보 |9월 작성·10월 보관 시점 구분. [배경·전체 ID 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)으로 N-01 완료 |
 | 더 오래된 CKV 계획 | [2026-05-29 CKV 리팩토링 계획](../vector/archive/plan-2026-05-29-ckv-refactor.md)은 2026-07-19에 실행된 계획으로 보관 표시 | 이번 9월 spec-driven 계획과 같은 작업리스트로 합산하지 않음. 이전 도메인 검색 도구 확장의 배경 |
 
-원본 3개는 `/Users/kevin/work` 파일 검색(숨김/ignore 제외 해제, Git 내부·node_modules 제외), 현재 제품 저장소의 보유 Git 참조, `/Users/kevin/work/github/0xmhha/study`의 로컬 트리·보유 참조 이력에서 찾지 못했다. 원격 fetch는 수행하지 않았다. [원본 탐색 기록](../../system/eval/b0-knowledge-system/original-goal-reaudit-m2max-2026-10-06/original-source-discovery.json)을 보존했다. 따라서 아래는 **확보한 자료로 확인 가능한 잔여 목록**이며 v0.1 원문 전체의 누락 없음까지 인증한 목록은 아니다.
+처음 로컬 검색에서는 원문3개를 찾지 못했고 그 당시에는 원격 fetch를 수행하지 않았다. [당시 탐색 기록](../../system/eval/b0-knowledge-system/original-goal-reaudit-m2max-2026-10-06/original-source-discovery.json)은 보존한다. 이후 사용자가 다른 세션의 보관 커밋을 알려주고 main동기화를 요청해 fetch·fast-forward 후 원문을 읽었다. 초기 FR10/INV7/NFR5/S9와 WBS29를 현행 추적에 대조했으며 아래 ID 집합은 원 WBS와 일치한다. ID 대응은 내용/품질/운영 완료의 보증이 아니다.
 
 ## 2. 원래 목적과 현재 달성 범위
 
@@ -32,7 +32,7 @@
 
 ## 3. 보존된 W0–W5와 코드의 세부 대조
 
-원본 WBS 3개 문서는 미확보다. 아래 **29개 ID**는 현재 `EXECUTION.md`에 보존된 W0–W5 행과 그룹 행을 펼친 관찰 단위다. 원본 v0.1 WBS의 총 작업 수라고 단정하지 않는다. “구조 완료”는 내용 승인·품질 합격·운영 완료와 별개다.
+아래 **29개 하위ID**는 복구한 원본 v0.1 WBS와 순서까지 일치한다. W0–W5 그룹6행은 별도 요약이며 하위 작업 수에 더하지 않는다. “구조 완료”는 내용 승인·품질 합격·운영 완료와 별개다. 원문 작업·선행·요구사항·완료 증거와 이 감사의 전체 대응을 [복구 원장](../../system/eval/b0-knowledge-system/original-source-recovery-2026-10-06/recovered-source-and-trace.json)에 보관했다.
 
 | ID | 목적/현재 코드의 핵심 | 확인한 상태 | 잔여 연결 |
 |---|---|---|---|
@@ -44,9 +44,9 @@
 | W1.2 | 희소/큰 후보 검색: sqlitevec `SearchResult` | 후보 상한/취소/incomplete·F01 자격 검증 | N-08, N-10–11 |
 | W1.3 | 검색 지연 | 실측 있음; dynamic 일부 p95비>1.25 | N-10–11 |
 | W1.4 | 장문 청크: `internal/vector/chunk`, `parse/markdown` | 꼬리·부모/자식·원문 범위 보존 검증 | N-07, N-11 |
-| W1.5 | 문맥 조립: `internal/system/composer/budget`, evidencev2 | 선택 본문/보관 원문 구현; FINAL33104>32000 오류 | N-07 |
-| W1.6 | 검색/근거/기권 상태와 품질 | 상태 보고·실패 분모 보존 구현; 품질 미달 | N-08–11 |
-| W1.7 | 실제 무답/충돌·후속 주장 판정 | HC11개 해석과 사람 기권2개 승인; 생성 답변을 평가한 것은 아님 | N-09, N-12, N-14 |
+| W1.5 | 청크 생성·부모 문맥·중복 제거·재색인: chunk/composer/evidencev2 | 구조·보관 원문 구현; 문맥 조립 FINAL33104>32000 오류 | N-07, N-08/11 |
+| W1.6 | 청킹 A/B·재색인/rollback·품질/크기/줄 범위 | 구조·실측/실패 분모 보존. 개선 미달·소표본 제한 | N-07–08, N-10–11 |
+| W1.7 | 검색/근거/기권 리포트의 종단 간 실행 | HC11개 해석·사람 기권2개와 실측 있음; guard 실패·생성 답변 평가는 없음 | N-09/11, N-12/14 |
 | W2.1 | 출처 기반 의미: `semantic/model.go`, `validate.go`, `store.go` | 불변 투영·보관된 외부 문서 출처 구조 구현 | N-12 실제 지식 |
 | W2.2 | 문서/CKV/코드 앵커: `extract_markdown.go`, `chunk_links.go`, `ckg_anchor.go` | 정확 줄/해시·canonical 연결 구조 구현 | N-12, N-14 |
 | W2.3 | claim/관계 검토: `semantic/review.go` | 검토 장치 구현·합성/HC 기록 있음; 실제 추출 대표성/오차/비용 미확정 | N-12 |

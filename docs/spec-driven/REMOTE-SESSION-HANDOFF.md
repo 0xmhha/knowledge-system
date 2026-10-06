@@ -2,9 +2,9 @@
 
 ## 최신 요청: 원래 리팩토링 목적 대비 잔여 재감사 (2026-10-06)
 
-사용자가 최초 작업리스트/목적 문서를 찾고 현재 코드와 대조해 남은 작업을 정리하도록 요청했다. [최초 목적 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [새 잔여 목록](./REFACTORING-REMAINING-WORKLIST.md)을 작성했다. 기존 승인 preview30/30 목표 완료는 유효하며 새 구현을 완료했다고 표시하지 않았다. 신규 후속18개(N-01–18), 바로 다음N-02 활성 MCP 쓰기 경로의 실패 재현/후보 빌더 계약이다. 운영 N-15–18은 이전 제외 범위이며 목록 작성만으로 배포/새push/운영 사실 승인이 생기지 않는다.
+사용자가 최초 작업리스트/목적 문서를 찾고 현재 코드와 대조해 남은 작업을 정리하도록 요청했다. [최초 목적 재감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md)와 [후속 목록](./REFACTORING-REMAINING-WORKLIST.md)을 관리한다. study/main `1c350c1`에서 초기 원문을 확보하고 [시작 배경·전체 ID/v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인해 N-01 완료/잔여17개(N-02–18)로 갱신했다. 기존 preview30/30 종료는 유효하며 제품 구현을 새로 완료했다고 표시하지 않았다. 다음N-02 활성 MCP 쓰기 경로의 실패 재현/후보 빌더 계약. 운영 N-15–18은 이전 제외 범위이며 배포/새push/운영 사실 승인으로 확장하지 않는다.
 
-시작은 2026-09-29 baseline1ded9b3e/첫 실행41fa8817. 최초 EXECUTION·v2순서·상세설계 Git snapshot과 current04d3bfdf 코드/문서39SHA를 새 감사 원장에 보관했다. 원본 study의 spec-driven-requirements/spec-driven-wbs/ckv-ckg-ontology-installation-proposal 3개는 로컬work·study/product보유참조에서 미확보이며 N-01로 유지한다. 현재 확인된 차이는 ops.index live write, v2빌드 age/PID잠금(승격만flock), current rename의부모sync없음, GC/보관용량status없음, capture상한CLI/2h builddeadline없음이다. 신규 장애 재현은 아직 수행하지 않은 정적관측으로 명시했다. actual core20/spec3 proposed, 기존 품질fail/disabled/운영출시보류 유지. 제품1096/기존승인5입력 SHA 동일, 모델/운영설정/사용자폴더 불변.
+시작은 2026-09-29 baseline1ded9b3e/첫 실행41fa8817. 최초 EXECUTION·v2순서·상세설계 Git snapshot과 current04d3bfdf 코드/문서39SHA의 과거 감사 증거를 보존했다. 초기 요구사항 FR10/INV7/NFR5·S9와 WBS29개 하위ID를 복구 원문으로 확인했고 v2가 실행 기준이다. 현재 차이는 ops.index live write, v2빌드 age/PID잠금(승격만flock), current rename의부모sync없음, GC/보관용량status없음, capture상한CLI/2h builddeadline없음이다. 신규 장애 재현은 아직 수행하지 않은 정적관측이다. actual core20/spec3 proposed, 품질fail/disabled/운영출시보류 유지. 제품1096/기존승인5입력 SHA 동일, 모델/운영설정/사용자폴더 불변.
 
 ## 최신 상태: 2026-10-06 실제 사람 승인·시험 preview 목표 종료
 
