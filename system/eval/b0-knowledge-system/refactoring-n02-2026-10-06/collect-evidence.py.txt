@@ -16,14 +16,14 @@ assert not (e/'vet.log').read_text().strip()
 assert 'engine boundaries: OK' in (e/'boundaries.log').read_text()
 assert 'documentation: OK' in (e/'docs.log').read_text()
 changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
-assert not any(x.startswith('system/eval/') for x in changed),'historical evidence modified'
+assert not any(x.startswith('system/eval/') and not x.startswith('system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/') for x in changed),'historical evidence modified'
 paths=set(map(pathlib.Path,f['product_source_sha256']))
 paths.update(root/pathlib.Path(p) for p in ['internal/setup/maintenance.go','internal/setup/maintenance_test.go','internal/system/mcp/maintenance_guard_test.go'])
 source={str(p.relative_to(root)):sha(p) for p in sorted(paths)}
 delta={str(pathlib.Path(p).relative_to(root)):sha(pathlib.Path(p)) for p,s in f['product_source_sha256'].items() if sha(pathlib.Path(p))!=s}
 delta.update({p:source[p] for p in source if str(root/p) not in f['product_source_sha256']})
 for rel in delta:
- out=e/'source-snapshot'/rel;out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
+ out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
 reports=['REFACTORING-EXECUTION-SPEC.md','REFACTORING-REMAINING-WORKLIST.md','PUBLIC-CONTRACT-V2.md','EXECUTION.md','PDF-IMPROVEMENT-TRACE.md','REMOTE-SESSION-HANDOFF.md']
 m={'schema_version':1,'status':'N02_acceptance_verified','base_commit':'c9c91ebe','scope':'new DEV safety; no renewed FINAL/quality/operational verdict','source_sha256':source,'changed_source_sha256':delta,'approved_input_sha256':{str(pathlib.Path(p).relative_to(root)):s for p,s in f['approved_input_sha256'].items()},'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='manifest.json'}}
 (e/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
