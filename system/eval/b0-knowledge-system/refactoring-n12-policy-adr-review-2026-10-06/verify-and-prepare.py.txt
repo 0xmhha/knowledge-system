@@ -1,0 +1,44 @@
+import copy,hashlib,json,pathlib,subprocess,tempfile
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06';sha=lambda b:hashlib.sha256(b).hexdigest()
+p=json.load(open(e/'projection-proposed.json'));rev=p['snapshot']['commit'];seeds=json.load(open(e/'claim-seeds.json'));report=json.load(open(e/'review-report.json'))
+projection_sha=sha((e/'projection-proposed.json').read_bytes())
+assert len(p['claims'])==6 and len(p['assertions'])==12 and report['verified']==report['assertion_verified']==0 and report['reviewed_precision'] is None and report['assertion_reviewed_precision'] is None
+source_files={};proofs={v['id']:v for v in p['evidence']}
+def read(path):
+ if path not in source_files:
+  data=subprocess.check_output(['git','show',rev+':'+path]);assert data==(root/path).read_bytes();source_files[path]=data
+  dest=e/'source-snapshot'/(path+'.txt');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+ return source_files[path]
+def span(path,first,last):
+ data=read(path);parts=data.split(b'\n');lines=[x+b'\n' for x in parts[:-1]]+([parts[-1]] if parts[-1] else[]);assert 1<=first<=last<=len(lines)
+ return {'path':path,'first':first,'last':last,'file_sha256':sha(data),'content_sha256':sha(b''.join(lines[first-1:last]))}
+for v in p['evidence']:
+ assert span(v['path'],v['start_line'],v['end_line'])['content_sha256']==v['content_sha256']
+items=[]
+for seed in seeds:
+ proof=proofs['policy-evidence:'+seed['id']];source=span(seed['path'],seed['first'],seed['last']);assert source['content_sha256']==proof['content_sha256']
+ lines=read(seed['code_path']).decode().splitlines();first=next(i+1 for i,l in enumerate(lines) if l.startswith(seed['code_declaration']));last=next(i+1 for i in range(first,len(lines)) if lines[i]=='}')
+ code=dict(span(seed['code_path'],first,last),declaration=lines[first-1],canonical_id=None,status='candidate_only')
+ item=dict(seed,source=source,candidate_code=code,source_commit=rev,status='proposed',reviewer=None,decision=None,reason=None,human_active_minutes=None,candidate_relations=[a for a in p['assertions'] if a['id'].endswith(':'+seed['id'])],evaluation_use='review material only; no FINAL assignment; existing DEV/history overlap must be adjudicated before any assignment')
+ assert all(a['status']=='proposed' and not a.get('reviewed_by') for a in item['candidate_relations']);items.append(item)
+controls=[];binary='/private/tmp/ks-n13-bin/cks'
+with tempfile.TemporaryDirectory(prefix='ks-n12-policy-controls-') as tmp:
+ for mode in ['source-hash','cross-snapshot','wrong-direction','unreviewed-parent']:
+  altered=copy.deepcopy(p)
+  if mode=='source-hash':next(x for x in altered['evidence'] if x['id'].startswith('policy-evidence:'))['content_sha256']='a'*64
+  if mode=='cross-snapshot':altered['evidence'][0]['snapshot']['commit']='a'*40
+  if mode=='wrong-direction':altered['assertions'][0]['subject_id'],altered['assertions'][0]['object_id']=altered['assertions'][0]['object_id'],altered['assertions'][0]['subject_id']
+  if mode=='unreviewed-parent':altered['assertions'][0].update(status='verified',reviewed_by='negative-control-fixture-not-human-approval')
+  path=pathlib.Path(tmp)/'altered.json';path.write_text(json.dumps(altered));result=subprocess.run([binary,'semantic','review','--input',str(path),'--repo',str(root)],capture_output=True,timeout=30)
+  assert result.returncode!=0,(mode,result.stdout.decode());controls.append({'case':mode,'exit_code':result.returncode,'expected_rejection_observed':True})
+  (e/(mode+'-input.json.txt')).write_text(json.dumps(altered,indent=2)+'\n');(e/(mode+'-stderr.log')).write_bytes(result.stderr)
+ assert sha((e/'projection-proposed.json').read_bytes())==projection_sha
+(e/'negative-controls.json').write_text(json.dumps({'status':'PASS','cases':controls,'projection_mutations':0,'activation_commands_executed':0},indent=2)+'\n')
+(e/'review-items.json').write_text(json.dumps({'status':'awaiting_human_policy_adr_review','source_commit':rev,'authority_scope':'project specification/ADR normative content and candidate use only; no real operational authorization','items':items,'human_approved':0,'precision':None,'requires_prior_27_item_review':True},ensure_ascii=False,indent=2)+'\n')
+lines=['# N12 정책·ADR의 실제 주장과 관계 검토 보완','',f'2026-10-06 · 원문 커밋 `{rev}` · **추가 검토 대기 / N12 미완료**.','', '기존 [27개 타입·명세/기준 검토](./N12-ACTUAL-PILOT-REVIEW.md)는 그대로 유지한다. 원 작업리스트의 claim/정책/ADR 검토가 빠져 있어 아래6개 실제 원문 주장을 추가했다. 문서의 현행 관리 규정과 채택 ADR의 최신 보강 부분만 사용하고, ADR 초기 문제 서술/공유 worktree 기록을 현행 사실로 추출하지 않았다.','', '각 주장에 DocumentSection SUPPORTS Claim, Claim ABOUT Concept 두 관계를 제안했다.6주장/12관계 모두 proposed이며 사람 승인·verified/accepted는0, precision은null이다. 원문 SHA/좌표와 타입·방향 일치는 도구로 확인했지만 내용의 정확성·권위·관계 의미는 아직 사람이 판단하지 않았다.','', '새 projection은 standalone committed-source 검토 자료다. 통합 dataset/source archive/lock 또는 CKG canonical 관계를 승격하지 않았다. 아래 코드 좌표도 사용 후보이며 IMPLEMENTED_BY/TESTED_BY 관계라고 생성하지 않았다. 운영 담당자·키 신뢰·native 환경/RTO/RPO 결정은 이 문서의 승인 범위 밖이다.','']
+for x in items:
+ s=x['source'];c=x['candidate_code'];lines += [f"## {x['id']}",'',x['statement'],'',f"- 원문: [{s['path']}:{s['first']}-{s['last']}](../../{s['path']})",f"- 권위: {x['authority']}",f"- 범위: {x['scope']}",f"- 코드 사용 후보: [{c['declaration']}](../../{c['path']})",f"- 제안 관계: `{x['candidate_relations'][0]['id']}` SUPPORTS, `{x['candidate_relations'][1]['id']}` ABOUT → `{x['concept_id']}`",f"- DEV 중복 묶음: {x['dev_overlap_cluster'] or '미지정; 기존 관측 사실과 별도 오염 검토 필요'}",'- 판정: 승인 / 수정 / 기권 — 검토자·이유 미기록','']
+lines += ['## 검증과 필요한 판정','', '[검토 JSON](../../system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/review-items.json)에 파일/spanSHA·적용범위/권위·코드 후보/관계와 빈 판정 칸을 기록했다. actual CLI source-hash/cross-snapshot/wrong-direction/unreviewed-parent4개 음성 제어가 모두 거부됐고 원래 projection은 바뀌지 않았다. 생성 초기의 절 범위/필수 evidence 누락도 기록하고 교정했다. 이는 검토 자료 작성 오류이며 제품 실패나 실제 사람의 반려로 집계하지 않는다.','', 'P12-P01–06의 주장 내용과 SUPPORTS/ABOUT 관계를 승인/수정/기권하고 검토자 이름·이유를 알려준다. 기존27개와 별도 항목이므로 이전 항목 승인만으로 이6개가 승인되지는 않는다. 실측 활동 시간이 있으면 기록하고 없으면 미측정/null을 유지한다. 이 자료를 새 FINAL로 지정하거나 공개 질문 수를 독립 표본으로 합산하지 않았다.','', '전체 완료8/18, 요청15개 중5완료; 잔여N08/09/10/11/12/14/15/16/17/18 10개. 다음은 실제 검토 판정 반영과 source/lock·canonical 결합 및 새 독립 평가 입력 검토다.']
+(root/'docs/spec-driven/N12-POLICY-ADR-REVIEW.md').write_text('\n'.join(lines)+'\n')
+(e/'preparation-manifest.json').write_text(json.dumps({'status':'policy_adr_review_prepared_not_complete','source_commit':rev,'source_sha256':{path:sha(data) for path,data in source_files.items()},'files_sha256':{str(x.relative_to(e)):sha(x.read_bytes()) for x in e.rglob('*') if x.is_file() and x.name!='preparation-manifest.json'},'source_spans_verified':len(p['evidence']),'claims_proposed':6,'assertions_proposed':12,'negative_control_rejections':4,'human_approved':0,'activation_commands_executed':0,'new_final_units':0},indent=2)+'\n')
+print('Actual policy/ADR review preparation PASS:6 claims/12 relations proposed; all source spans match;4 native CLI rejection controls;human approvals0')

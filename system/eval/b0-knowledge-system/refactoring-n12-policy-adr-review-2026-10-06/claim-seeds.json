@@ -1,0 +1,80 @@
+[
+  {
+    "id": "P12-P01",
+    "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+    "first": 23,
+    "last": 23,
+    "concept_id": "policy",
+    "statement": "Pinned v2 유지보수는 제자리 갱신과 legacy downgrade를 거부하고 검토 설정·project ID와 새 버전으로 후보를 만든다.",
+    "scope": "CKS 공개 관리 경로; low-level engine 직접 쓰기는 보호 밖",
+    "authority": "현행 공개 계약의 N02 규정; 운영 담당자 승인 기록 아님",
+    "dev_overlap_cluster": "maintenance-ancestor",
+    "code_path": "internal/setup/maintenance.go",
+    "code_declaration": "func checkMaintenanceTarget("
+  },
+  {
+    "id": "P12-P02",
+    "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+    "first": 27,
+    "last": 27,
+    "concept_id": "dataset",
+    "statement": "후보 checkpoint/sync 뒤 current를 전환하고 부모를 sync한다. rename 후 sync 실패의 durability_uncertain은 current 불변을 뜻하지 않는다.",
+    "scope": "협력하는 local writer의 내구성 순서; 실제 전원 차단·운영 지원은 별도",
+    "authority": "현행 공개 계약 N03/N04; 운영 복구 승인 기록 아님",
+    "dev_overlap_cluster": "promotion-parent-sync",
+    "code_path": "internal/setup/durability.go",
+    "code_declaration": "func syncCurrentParent("
+  },
+  {
+    "id": "P12-P03",
+    "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+    "first": 110,
+    "last": 112,
+    "concept_id": "evidence-pack",
+    "statement": "v2 core evidence는32000bytes/12citation 안에서 검증된 전체 원문 span을 선택하고 생략을 partial/예산 진단으로 기록하며 긴 span을 잘라 반환하지 않는다.",
+    "scope": "retained_core 선택; semantic 추가 후 전체body 상한도 검사",
+    "authority": "현행 공개 계약 N07; 새 검색 품질 합격 아님",
+    "dev_overlap_cluster": "whole-span-budget",
+    "code_path": "internal/system/evidencev2/pack.go",
+    "code_declaration": "func BuildFromRefs("
+  },
+  {
+    "id": "P12-P04",
+    "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+    "first": 3,
+    "last": 3,
+    "concept_id": "policy",
+    "statement": "Worksheet의 조직 위험 목록은 명시적으로 선택한 local pack 자료에만 들어 있다. 생성은 앵커 검사를 실행하거나 항목을 verified로 승격하지 않는다.",
+    "scope": "공통 review 질문과 명시 선택형 local catalog; 운영 정책의 권위 승인 아님",
+    "authority": "현행 worksheet 계약 N13; 실제 사람 승인 기록 아님",
+    "dev_overlap_cluster": "worksheet-selection",
+    "code_path": "internal/system/knowledgepack/worksheet.go",
+    "code_declaration": "func LoadWorksheetCatalogs("
+  },
+  {
+    "id": "P12-P05",
+    "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+    "first": 63,
+    "last": 63,
+    "concept_id": "source-snapshot",
+    "statement": "Git 소스는 기준HEAD/선택 복구 객체를 해시된 history.bundle로 봉인하고 독립 저장소로 복원해 빌드하여 원본의 이후 이력 변화와 분리한다.",
+    "scope": "ADR의 B0-H 보강 계약; 최초 공유 worktree 선택보다 우선",
+    "authority": "채택 ADR의 최신 Git 이력 격리 규정; 실제 지원 규모·운영 복구 합격 아님",
+    "dev_overlap_cluster": null,
+    "code_path": "internal/setup/capture.go",
+    "code_declaration": "func (c CapturedSource) MaterializeBuildTreeContext("
+  },
+  {
+    "id": "P12-P06",
+    "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+    "first": 69,
+    "last": 69,
+    "concept_id": "source-snapshot",
+    "statement": "신규 executable-bit-v1 입력은 파일 실행 비트도 identity에 포함하며 snapshot v5와 구 v2–v4 읽기를 구분해 과거 바이트·신원을 재해석하지 않는다.",
+    "scope": "ADR의 실행 비트 교정 계약; 내용 바이트만으로 식별하지 않음",
+    "authority": "채택 ADR의 최신 파일 모드 규정; 개별 후보 source 검토는 별도",
+    "dev_overlap_cluster": null,
+    "code_path": "internal/setup/identity.go",
+    "code_declaration": "func sourceSnapshotID("
+  }
+]
