@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-recovery-smoke.py", line 187, in <module>
+    checks['restored'] = capture('restored', recoveredcfg, recovered / 'restored')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-recovery-smoke.py", line 70, in capture
+    run(name + '-capture', [bins / 'cks', 'eval', 'capture', '--requests', req, '--config', cfg, '--output', dest, '--retrieval-runs', '1', '--warmup', '0', '--warm-runs', '0', '--cold-runs', '0', '--call-timeout', '30s'])
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/wbs-recovery-smoke.py", line 36, in run
+    assert r.returncode == expected, (name, r.returncode, r.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('restored-capture', 1, '{"code":"operation_failed","message":"The operation failed; inspect project status for details."}\n{"code":"operation_failed","message":"The operation failed; inspect project status for details."}\n')
