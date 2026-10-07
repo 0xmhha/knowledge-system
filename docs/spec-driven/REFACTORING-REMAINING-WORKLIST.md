@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-07 최신: [PR97/native Linux CI](./N15-NATIVE-LINUX-CI-VALIDATION.md). 사용자 “푸시하고 Pr생성해”로 d08cb384의80커밋 공개 전송·draft PR97 생성 완료. graph/vuln Go 요구 불일치를 공개 source만 수정한 d7de0b89로 보완했고 재실행 CI5/5 success. 실제 Linux AMD64의 설치/재시작/갱신/복구, public consumer7응답/4거부, 복구10응답/13payload SHA와 artifact178파일 SHA를 확인하여 **N15-C 완료**. N15-D/E와 N17-C/D/E 운영 수용은 미완료. 추가 로컬 BGE/출처 receipt 및 본 native 기록은 미전송. **전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18. 다음 N11/N12 실제 판정과 독립 입력/런타임 결합.** 아래는 이전 시점 이력이다.
+
 2026-10-06 · 기준 코드 `04d3bfdf` · [원래 목적/코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md). 이전 [시험 preview30항목](./EXECUTION-WORKLIST.md)은 사용자 선택 범위에서 종료됐다. 이 문서는 원래 목적과 코드 사이의 잔여를 관리하는 **새 후속 목록**이다. 이전 HC·입력 승인은 다시 요구하지 않는다.
 
 후속 목록 **18개 중 N-01–07 및 N-13 완료, 잔여10개(N-08–12, N-14–18)**. 제품 구현을 새로 완료한 항목은 N-02–07/N-13 7개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
@@ -33,7 +35,7 @@
 | N-12 | P1 · 실제 내용 검토 | 사람 판정 대기: [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md);27원문span/6테스트 및 [정책·ADR 보완](./N12-POLICY-ADR-REVIEW.md)의6주장/12관계·4거부 제어 확인, proposed 유지 | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음 |
 | N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
 | N-14 | P2 · N-12 | 구조 구현·실제 의미 수용 증거 필요 | 실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증 | 테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장 |
-| N-15 | P2 · N-02–14 중 변경 영향 | 환경/외부 소비자 미검증; 이전preview 제외 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
+| N-15 | P2 · N-02–14 중 변경 영향 | native Linux C 기술검증 완료; 실제 규모/독립 운영 소비자 미검증 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
 | N-16 | P2 · 운영 출시 범위 결정 | 운영키·법무 미승인; test-preview 계약만 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
 | N-17 | P2 · N-15/16 | OP07–08·실운영복구 미실행; 이전preview 제외 | 실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토 | 최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음 |
 | N-18 | **P3 · N-08–17/변경 회귀** | 품질fail·소그룹inconclusive·disabled·release withheld | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음 |

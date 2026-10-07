@@ -1,0 +1,235 @@
+[
+  {
+    "id": "consumer-build",
+    "argv": [
+      "go",
+      "build",
+      "-mod=mod",
+      "-o",
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 196335213
+  },
+  {
+    "id": "consumer-build-info",
+    "argv": [
+      "go",
+      "version",
+      "-m",
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 3178225
+  },
+  {
+    "id": "consumer-gomod",
+    "argv": [
+      "go",
+      "env",
+      "GOMOD"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 2825834
+  },
+  {
+    "id": "consumer-empty-go-1",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/empty-go/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 38342052
+  },
+  {
+    "id": "consumer-empty-go-2",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/empty-go/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 35309700
+  },
+  {
+    "id": "consumer-typescript-1",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/typescript/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 37267731
+  },
+  {
+    "id": "consumer-typescript-2",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/typescript/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 36103518
+  },
+  {
+    "id": "consumer-unsupported-python-1",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/unsupported-python/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 36298476
+  },
+  {
+    "id": "consumer-unsupported-python-2",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-native-package/installs/unsupported-python/mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 35268630
+  },
+  {
+    "id": "reject-legacy-integrity",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--pack-file",
+      "/home/runner/work/_temp/ks-external-consumer/bad-legacy-integrity.json"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic_only": 2084689
+  },
+  {
+    "id": "reject-legacy-coordinate",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--pack-file",
+      "/home/runner/work/_temp/ks-external-consumer/bad-legacy-coordinate.json"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic_only": 2145310
+  },
+  {
+    "id": "pinned-git-init",
+    "argv": [
+      "git",
+      "init",
+      "-q",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-source"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 3690625
+  },
+  {
+    "id": "pinned-git-add",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-source",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 2451834
+  },
+  {
+    "id": "pinned-git-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-source",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "structural consumer fixture"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 4933621
+  },
+  {
+    "id": "pinned-setup",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "setup",
+      "--src",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-source",
+      "--out",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-dataset",
+      "--version",
+      "v2",
+      "--project-id",
+      "external-consumer",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 630983365
+  },
+  {
+    "id": "pinned-config",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-dataset/current",
+      "--source-root",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-source",
+      "--sanitize-rules",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/policies/sanitization_rules.yaml",
+      "--out",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-mcp.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 9478492
+  },
+  {
+    "id": "consumer-pinned-v2",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--binary",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-67e1508370da/cks",
+      "--config",
+      "/home/runner/work/_temp/ks-external-consumer/pinned-mcp.yaml",
+      "--format",
+      "v2",
+      "--prompt",
+      "Where is WireAlpha implemented?"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic_only": 33268543
+  },
+  {
+    "id": "reject-v2-coordinate",
+    "argv": [
+      "/home/runner/work/_temp/ks-external-consumer/consumer-module/consumer",
+      "--pack-file",
+      "/home/runner/work/_temp/ks-external-consumer/bad-v2-coordinate.json",
+      "--format",
+      "v2"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic_only": 2019775
+  }
+]

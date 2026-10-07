@@ -1,0 +1,30 @@
+==> [graph-build] Build the graph index
+    resolved go=/opt/hostedtoolcache/go/1.25.13/x64/bin/go (inherited_path) git=/usr/bin/git (inherited_path)
+    time=2026-10-07T07:20:55.015Z level=INFO msg="detected files" go=0 ts=1 sol=0 proto=0
+    time=2026-10-07T07:20:55.043Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-07T07:20:55.064Z level=INFO msg="temporal G6 emitted" commit_nodes=2 hunk_nodes=3 changed_in_edges=3 blame_edges=1 hunk_edges=3 hunk_blobs=3 max_per_file=10
+    time=2026-10-07T07:20:55.080Z level=INFO msg="build complete" nodes=8 edges=10 pkg_tree_edges=2 topic_resolutions=3
+    ckg: built 8 nodes / 10 edges into /home/runner/work/_temp/ks-native-recovery/dataset/failed-test/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-07T07:20:55.091Z level=INFO msg=ckv event=project_config.loaded trace_id=cfa381622df8776f run_id=44f7e21f8bb8cb6d extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/tmp/cks-build-source-4186092401/tree has_ckv_yaml=false languages_filter=[]
+    time=2026-10-07T07:20:55.091Z level=INFO msg=ckv event=build.start trace_id=2560c94bc5b9b89c run_id=44f7e21f8bb8cb6d src_root=/tmp/cks-build-source-4186092401/tree out_dir=/home/runner/work/_temp/ks-native-recovery/dataset/failed-test/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-07T07:20:55.099Z level=INFO msg=ckv event=ckg_align.loaded trace_id=d1a895946e559609 run_id=44f7e21f8bb8cb6d ckg_path=/home/runner/work/_temp/ks-native-recovery/dataset/failed-test/graph files_indexed=1 entries=1 canonical_available=true
+    ckv: 2/2 files (944.8 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-07T07:20:55.104Z level=INFO msg=ckv event=build.done trace_id=2560c94bc5b9b89c run_id=44f7e21f8bb8cb6d latency_ms=13 files_indexed=2 chunks_truncated=0 src_root=/tmp/cks-build-source-4186092401/tree indexed_head=67d6099744b312505887927d9ef7fa561a8518f5 chunks_total=3 chunks_file_header=1 db_sha256=ee1b21f9093f17f5f6589cc7124b283e5ec5a2d66431c5753a96f138256b9826 chunks_canonical_id=1 chunks_doc=1 embedder=mock-feature-hash-v1 languages="map[markdown:1 typescript:2]" chunks_symbol=1 chunks_flow_step=0 category_counts=map[:3] embedder_provider="" out_dir=/home/runner/work/_temp/ks-native-recovery/dataset/failed-test/vector policy_loaded=false chunks_flow_spine=0
+    ckv: indexed 2 files → 3 chunks (1 symbol, 1 doc, 1 header, 0 truncated)
+    ckv: canonical_id 1/1 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=67d6099744b312505887927d9ef7fa561a8518f5 built_at=2026-10-07T07:20:55Z db=/home/runner/work/_temp/ks-native-recovery/dataset/failed-test/vector/vector.db sha256=ee1b21f9093f17f5f6589cc7124b283e5ec5a2d66431c5753a96f138256b9826
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+{"code":"operation_failed","message":"The operation failed; inspect project status for details."}

@@ -1,0 +1,58 @@
+vuln-scan	govulncheck	﻿2026-10-07T06:55:34.6242411Z ##[group]Run make vuln
+vuln-scan	govulncheck	2026-10-07T06:55:34.6242824Z ^[[36;1mmake vuln^[[0m
+vuln-scan	govulncheck	2026-10-07T06:55:34.6519932Z shell: /usr/bin/bash -e {0}
+vuln-scan	govulncheck	2026-10-07T06:55:34.6520378Z env:
+vuln-scan	govulncheck	2026-10-07T06:55:34.6520651Z   GOTOOLCHAIN: local
+vuln-scan	govulncheck	2026-10-07T06:55:34.6520948Z ##[endgroup]
+vuln-scan	govulncheck	2026-10-07T06:55:34.6667869Z go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+vuln-scan	govulncheck	2026-10-07T06:55:34.7378134Z go: downloading golang.org/x/vuln v1.8.0
+vuln-scan	govulncheck	2026-10-07T06:55:34.8083830Z go: golang.org/x/vuln/cmd/govulncheck@latest: golang.org/x/vuln@v1.8.0 requires go >= 1.26.0 (running go 1.25.13; GOTOOLCHAIN=local)
+vuln-scan	govulncheck	2026-10-07T06:55:34.8091282Z make: *** [Makefile:86: vuln] Error 1
+vuln-scan	govulncheck	2026-10-07T06:55:34.8109833Z ##[error]Process completed with exit code 2.
+eval-gate-graph	make eval (self-index + 4 probes)	﻿2026-10-07T06:55:37.8511249Z ##[group]Run make -C graph eval
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8511624Z ^[[36;1mmake -C graph eval^[[0m
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8781411Z shell: /usr/bin/bash -e {0}
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8781765Z env:
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8781987Z   GOTOOLCHAIN: local
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8782232Z ##[endgroup]
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8926645Z make: Entering directory '/home/runner/work/knowledge-system/knowledge-system/graph'
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.8927522Z go build -o bin/ckg ../cmd/graph
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.9108343Z go: downloading github.com/fsnotify/fsnotify v1.10.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.9109581Z go: downloading github.com/mark3labs/mcp-go v0.56.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:37.9124241Z go: downloading github.com/spf13/cobra v1.10.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.0206006Z go: downloading gopkg.in/yaml.v3 v3.0.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.0451508Z go: downloading github.com/jackc/pgx/v5 v5.10.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.0720355Z go: downloading modernc.org/sqlite v1.54.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.1428456Z go: downloading golang.org/x/sys v0.47.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.1810091Z go: downloading github.com/spf13/pflag v1.0.9
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.2064485Z go: downloading golang.org/x/tools v0.48.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.2190791Z go: downloading github.com/google/jsonschema-go v0.4.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.2699516Z go: downloading github.com/spf13/cast v1.7.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.2836723Z go: downloading github.com/yosida95/uritemplate/v3 v3.0.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.2973925Z go: downloading github.com/google/uuid v1.6.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.3126612Z go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.3461125Z go: downloading github.com/jackc/pgpassfile v1.0.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.3539451Z go: downloading github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.3646234Z go: downloading golang.org/x/text v0.39.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.4536914Z go: downloading github.com/jackc/puddle/v2 v2.2.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.4776666Z go: downloading github.com/tree-sitter/go-tree-sitter v0.25.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.5371715Z go: downloading github.com/tree-sitter/tree-sitter-javascript v0.25.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.6200297Z go: downloading github.com/tree-sitter/tree-sitter-typescript v0.23.2
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:38.9975299Z go: downloading golang.org/x/sync v0.22.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:39.0051562Z go: downloading github.com/mattn/go-pointer v0.0.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:39.0177116Z go: downloading golang.org/x/mod v0.38.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:39.7982735Z go: downloading modernc.org/libc v1.74.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:41.1091412Z go: downloading modernc.org/memory v1.11.0
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:41.1096779Z go: downloading github.com/dustin/go-humanize v1.0.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:41.1097452Z go: downloading modernc.org/mathutil v1.7.1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:55:41.1723948Z go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:24.8191035Z === ckg eval: step 1/5 — self-index (corpus baselining) ===
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:24.8224966Z ./bin/ckg build --src=.. \
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:24.8225750Z     --files-from-main ./cmd/graph \
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:24.8226533Z     --out=eval/.ckg-data --lang=go --fail-on-parse-errors
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:25.0669882Z ckg: files-from-main: 34 include / 0 exclude patterns from [./cmd/graph]
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:27.5367316Z ckg: detect go: packages.Load in /home/runner/work/knowledge-system/knowledge-system/system/eval/b0-knowledge-system/linux-environment-m2max-2026-10-04/frozen-source: err: exit status 1: stderr: go: go.mod requires go >= 1.26.0 (running go 1.25.13; GOTOOLCHAIN=local)
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:27.5368859Z 
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:27.5371808Z make: *** [Makefile:112: eval] Error 1
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:27.5372391Z make: Leaving directory '/home/runner/work/knowledge-system/knowledge-system/graph'
+eval-gate-graph	make eval (self-index + 4 probes)	2026-10-07T06:56:27.5390321Z ##[error]Process completed with exit code 2.

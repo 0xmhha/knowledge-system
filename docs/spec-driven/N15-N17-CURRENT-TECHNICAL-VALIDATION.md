@@ -1,5 +1,7 @@
 # N15/N17 현행 패키지·외부 모듈·복구 기술 검증
 
+2026-10-07 보강: [native Linux CI 실행](./N15-NATIVE-LINUX-CI-VALIDATION.md)을 현재 플랫폼 증거로 우선한다. N15-C 완료·전체 N15/17 미완료이며 아래 미실행 표시는 이전 시점이다.
+
 2026-10-07 · **local 기술 세부 단계 통과 / 전체 N15·N16·N17 미완료**. [원자료 요약](../../system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/summary.json)과 [manifest](../../system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json)를 연결한다. 공개 소스 커밋 `b006e776b72be8f4a01b91966aebc149aaf84704`의 추적 파일만 clean checkout으로 복사해 Darwin ARM64/Go1.26.8 host-preview를 만들었다. 사용자 untracked `.claude/`, `logs/`는 제외했고 원 FINAL/승인 입력5개와 사용자 모델을 변경하지 않았다.
 
 새 루트에 candidate 백업을 복원할 때 current 전환 뒤 MCP 시작이 실패하는 문제를 발견했다. candidate의 reader-protocol.json만 복사됐고 dataset 밖의 reader lease inode가 없어 조회를 시작할 수 없었다. mutation 잠금 아래 신원·review 권한 검사 뒤 reader lease를 생성/sync하도록 수정했다. 기존 inode와 candidate 원문·신원·marker를 보존하고, linked directory/inode와 다중 hardlink는 pointer 전환 전에 거부한다. legacy target의 protocol은 자동 추가하지 않는다. readonly 조회 경로의 보호는 완화하지 않았다.
