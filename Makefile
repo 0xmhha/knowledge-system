@@ -21,11 +21,15 @@ test-race:
 vet:
 	$(GO) vet ./...
 
+# Retained evaluation inputs are immutable source evidence, not formatting
+# targets. Keep the engine testdata roots in scope alongside maintained code.
+GO_FORMAT_ROOTS := cmd internal pkg graph vector testdata projects
+
 fmt:
-	@find . -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -w
+	@find $(GO_FORMAT_ROOTS) -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -w
 
 fmt-check:
-	@drift=$$(find . -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -l); \
+	@drift=$$(find $(GO_FORMAT_ROOTS) -name '*.go' -not -path '*/node_modules/*' -print0 | xargs -0 gofmt -l); \
 	if [ -n "$$drift" ]; then \
 	    echo "gofmt drift detected — run 'make fmt' before commit:"; \
 	    echo "$$drift"; \

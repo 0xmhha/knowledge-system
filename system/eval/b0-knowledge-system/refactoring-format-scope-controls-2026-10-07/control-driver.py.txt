@@ -1,0 +1,28 @@
+from pathlib import Path
+import subprocess,json,tempfile,hashlib,shutil
+out=Path('system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07');out.mkdir()
+task=Path(tempfile.mkdtemp(prefix='ks-format-controls-'))
+for root in ['cmd','internal','pkg','graph','vector','testdata','projects']: (task/root).mkdir()
+raw=task/'system/eval/raw-source.go';raw.parent.mkdir(parents=True);raw.write_text('package fixture;func Historical()int{return 1}\n')
+original=raw.read_bytes()
+code=task/'internal/maintained.go';code.write_text('package maintained\n\nfunc Value() int { return 1 }\n')
+(task/'Makefile').write_bytes(subprocess.check_output(['git','show','4ee7c836:Makefile']))
+commands=[]
+def run(name,target,expected):
+ r=subprocess.run(['make','-C',str(task),target],capture_output=True)
+ (out/(name+'.stdout.txt')).write_bytes(r.stdout);(out/(name+'.stderr.txt')).write_bytes(r.stderr)
+ commands.append({'name':name,'target':target,'exit_code':r.returncode})
+ assert r.returncode==expected,(name,r.returncode)
+run('old-check-rejects-retained-source','fmt-check',2)
+(task/'Makefile').write_bytes(Path('Makefile').read_bytes())
+run('new-check-preserves-retained-source','fmt-check',0)
+code.write_text('package maintained;func Value()int{return 1}\n')
+run('new-check-rejects-maintained-drift','fmt-check',2)
+run('new-fmt-fixes-maintained-only','fmt',0)
+run('new-check-after-fmt','fmt-check',0)
+assert raw.read_bytes()==original
+(out/'commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+inputs=['system/eval/b0-knowledge-system/recovery-m2max-2026-10-04/legacy-fixture-source/main.go','system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/main_test.go','system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/main_test.go']
+for p in inputs:assert Path(p).read_bytes()==subprocess.check_output(['git','show','4ee7c836:'+p])
+(out/'summary.json').write_text(json.dumps({'schema_version':1,'controls':5,'controlled_raw_input_sha256':hashlib.sha256(original).hexdigest(),'original_frozen_files_unchanged':{p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in inputs},'product_go_sources_changed':False,'native_ci_executed':False,'new_final_calls':0},indent=2)+'\n')
+print('formatter controls: PASS 5; historical source unchanged, maintained drift detected and fixed')

@@ -34,3 +34,7 @@ Go public consumer는 저장소 내부 테스트로 실행하지 않았고 consu
 요청15개 중5완료·전체8/18, 남은 전체 N08/09/10/11/12/14/15/16/17/18 10개다. N15-A/B와 N17-A/B의 **위 local 기술 범위만** 체크하며 전체 N15/17 완료는 아니다. N16은 현재 패키지의 byte inventory만 갱신했고 실제 적합성·권한 판단은 없다.
 
 다음은 기존 N11 DEV/프로토콜·N12 내용/관계 판정 반영과 새 독립 gold 준비, native Linux CI 실행에 필요한 구체 원격 전송 범위 확인이다. 이후 N08 검색/N09 기권/N10 비용·지연, N14 실제 의미 수용, N15 실환경/소비자, N16 권한/고지, N17 운영 복구, N18 출시 판정을 진행한다. 입력 없이 사람/운영 사실을 채워 완료율을 올리지 않는다.
+
+## CI formatter의 동결 원문 보호
+
+최종 CI 사전 확인에서 기존 Makefile의 전역 find가 과거 평가 원문3개에 gofmt를 요구했다. [5개 제어](../../system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/summary.json)로 이전 실패·새 범위의 통과·유지보수 코드 drift 거부·fmt 수정·수정 후 통과를 확인했다. cmd/internal/pkg/graph/vector/testdata/projects를 대상으로 제한하고 system/eval의 보관 원문은 수정하지 않았다. 해당3개 원문 SHA와 모든 runtime Go 소스는 불변이다. native 패키지는 위 b006e776에서 검증했고 이후 변경은 formatter 대상뿐이므로 바이너리/복구 결과를 새 Go 변경에 확장한 것이 아니다. make fmt-check와 증거 바인딩이 통과했지만 GitHub CI 실행 결과는 아직 없다.

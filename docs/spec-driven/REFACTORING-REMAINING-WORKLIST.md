@@ -67,3 +67,5 @@ N10 진단의 구조 RED→GREEN과 실제 SQLite3제어를 추가했다. 미해
 N11 [부분 FINAL 후보](./N11-FINAL-CANDIDATE-PREPARATION.md)4문항을2제안 사실군으로 묶고 원문·span SHA에 연결했다. 원 DEV7개와 프로토콜 바이트는 불변, 승인된 독립 FINAL0·실행/예약0이다. 전체 입력 검사 exit2, 미승인/미동결 및 중요군 미충족을 유지한다. 후보 작성은 전체 N11 완료가 아니다.
 
 2026-10-07 N15/N17 [현행 패키지·외부 모듈·복구 세부 단계](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md): clean native Darwin 패키지/3mock 프로젝트/외부 Go 공개 계약7응답/4거부 제어, 새 root 복원 reader lease 결함 수정·9제어·3패키지 race·복구10응답/13payload SHA 통과. native Linux CI는 정의만 존재, 실제 BGE/외부 운영 소비자·고지/권한/RTO/RPO 수용은 미완료다. 전체8/18·요청5/15·잔여10개를 유지한다.
+
+2026-10-07 native CI 사전 검사: 전역 formatter의 동결 평가 원문3개 변경 요구를 관리 코드/fixture 범위로 제한했다. 5제어와 make fmt-check 통과, 원문/Go runtime 소스 변경0. 전체 완료 수와 CI 미실행 상태는 동일하다.

@@ -2,7 +2,7 @@
 
 ## 현재 후속 실행: N15/N17 현행 패키지·복원 결함 수정 (2026-10-07)
 
-[현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지에서3mock 설치/재시작/갱신/rollback과 외부 Go public consumer7응답·4거부 제어를 확인했다. 새 루트 복원 뒤 reader lease가 없어 MCP 시작이 실패하는 문제를 실제 발견/수정했다. missing/unsafe/live/reviewed/legacy9제어·관련3패키지 race/vet, 수정 패키지의 복구10응답·13payload SHA·source 없는 재생 통과. native Linux CI는 정의만 있고 미실행, 실제 운영 소비자/권한/고지 적합성/backup/RTO/RPO 판정은 없다. **요청5/15·전체8/18 완료, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 독립 gold 준비 및 native CI를 위한 구체 전송 범위 확인.** 아래는 이전 시점 이력이다.
+[현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지에서3mock 설치/재시작/갱신/rollback과 외부 Go public consumer7응답·4거부 제어를 확인했다. 새 루트 복원 뒤 reader lease가 없어 MCP 시작이 실패하는 문제를 실제 발견/수정했다. missing/unsafe/live/reviewed/legacy9제어·관련3패키지 race/vet, 수정 패키지의 복구10응답·13payload SHA·source 없는 재생 통과. native Linux CI는 정의만 있고 미실행, formatter가 과거 평가 원문을 수정하지 않도록7관리 root로 제한·5제어/make fmt-check 통과, 실제 운영 소비자/권한/고지 적합성/backup/RTO/RPO 판정은 없다. **요청5/15·전체8/18 완료, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 독립 gold 준비 및 native CI를 위한 구체 전송 범위 확인.** 아래는 이전 시점 이력이다.
 
 ## 현재 후속 실행: N11 부분 FINAL 후보 준비 (2026-10-06)
 
