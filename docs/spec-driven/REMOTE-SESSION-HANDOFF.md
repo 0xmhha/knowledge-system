@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 현재 후속 실행: N15/N17 현행 패키지·복원 결함 수정 (2026-10-07)
+
+[현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지에서3mock 설치/재시작/갱신/rollback과 외부 Go public consumer7응답·4거부 제어를 확인했다. 새 루트 복원 뒤 reader lease가 없어 MCP 시작이 실패하는 문제를 실제 발견/수정했다. missing/unsafe/live/reviewed/legacy9제어·관련3패키지 race/vet, 수정 패키지의 복구10응답·13payload SHA·source 없는 재생 통과. native Linux CI는 정의만 있고 미실행, 실제 운영 소비자/권한/고지 적합성/backup/RTO/RPO 판정은 없다. **요청5/15·전체8/18 완료, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 독립 gold 준비 및 native CI를 위한 구체 전송 범위 확인.** 아래는 이전 시점 이력이다.
+
 ## 현재 후속 실행: N11 부분 FINAL 후보 준비 (2026-10-06)
 
 [N11 후보4문항](./N11-FINAL-CANDIDATE-PREPARATION.md)을 현재 커밋 원문·span SHA에 연결했다. CODE/WHY 쌍은 각각 한 묶음이며 제안 사실군2개·승인된 독립 FINAL0이다. 과거 테스트/수용 분리와 pack identity 사실은 제외했고 남은 후보의 오염/독립성도 미판정이다. 원 DEV/프로토콜 불변, 새 부분 책 검사는 exit2로 거부·검색/예약0. **요청5/15 완료·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 기존 DEV/프로토콜·N12 판정 반영과 나머지 실제 gold/독립 FINAL 범위 준비·전체 입력 동결.** 아래는 이전 시점 이력이다.

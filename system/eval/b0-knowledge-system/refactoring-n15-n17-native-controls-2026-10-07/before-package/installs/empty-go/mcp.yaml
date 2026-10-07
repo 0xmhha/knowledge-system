@@ -1,0 +1,42 @@
+version: 1
+name: ks-empty-go
+description: ""
+backends:
+    ckg:
+        path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/package/installs/empty-go/dataset/current/graph/graph.db
+        source_root: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/package/installs/empty-go/src
+        timeout_ms: 5000
+        binary_path: ""
+        policy_file: ""
+    ckv:
+        path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/package/installs/empty-go/dataset/current/vector
+        provider: mock
+        binary_path: ""
+        timeout_ms: 3000
+        embed_model: mock-feature-hash-v1
+        query_prefix_policy: registry
+        ollama_url: http://localhost:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: true
+    transport: stdio
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: ""
+    audit_dir: ""
+sanitize:
+    rules_path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/package/unpacked/knowledge-system-darwin-arm64-fb357937fcc6/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: ""
+service:
+    label_prefix: ""
