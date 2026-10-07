@@ -69,3 +69,5 @@ N11 [부분 FINAL 후보](./N11-FINAL-CANDIDATE-PREPARATION.md)4문항을2제안
 2026-10-07 N15/N17 [현행 패키지·외부 모듈·복구 세부 단계](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md): clean native Darwin 패키지/3mock 프로젝트/외부 Go 공개 계약7응답/4거부 제어, 새 root 복원 reader lease 결함 수정·9제어·3패키지 race·복구10응답/13payload SHA 통과. native Linux CI는 정의만 존재, 실제 BGE/외부 운영 소비자·고지/권한/RTO/RPO 수용은 미완료다. 전체8/18·요청5/15·잔여10개를 유지한다.
 
 2026-10-07 native CI 사전 검사: 전역 formatter의 동결 평가 원문3개 변경 요구를 관리 코드/fixture 범위로 제한했다. 5제어와 make fmt-check 통과, 원문/Go runtime 소스 변경0. 전체 완료 수와 CI 미실행 상태는 동일하다.
+
+2026-10-07 [BGE-M3 작은 설치 호환성/전체 race](./N15-BGE-COMPATIBILITY-VALIDATION.md): 승인 digest/native1024의3소유 fixture 설치·MCP 재시작·데이터 갱신·rollback,6dataset identity·compact MCP7/CKV6응답과 보관 Git 원문 좌표를 확인했다. d08cb384 전체 race117패키지와 도메인 생성 자료 일치도 통과했다. N15-D의 모델 연결만 검증했으며 native Linux/규모/독립 운영 소비자·사람/운영 수용이 남아 전체8/18·요청5/15·잔여10개를 유지한다. 다음 N11/N12 실제 판정과 native CI다. 공개 전송 요청은 d08cb384의80커밋이며 추가 로컬 receipt/문서 커밋은 제외한다.

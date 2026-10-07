@@ -1,5 +1,9 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+## 현재 후속 실행: BGE-M3 작은 설치 호환성·전체 race (2026-10-07)
+
+[새 로컬 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지로 승인 BGE-M3 digest/native1024·Ollama0.35.1의3소유 fixture 설치/재시작/갱신/rollback과6dataset identity·compact MCP7/CKV6응답을 확인했다. d08cb384 전체 race117시험 패키지와 도메인 자료 일치도 통과했다. N15-D의 작은 모델 연결 부분만 검증했으며 실운영 규모/독립 소비자/native Linux·운영 판정은 미완료다. **요청5/15·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정·독립 gold와 native CI 실행.** 공개 전송 질문은 정확히 d08cb384의80커밋으로 고정한다. 추가 receipt/문서/진행 원장의 로컬 커밋은 그 범위 밖이며, 응답이 와도 최신 HEAD를 자동 푸시하지 않는다. 아래는 이전 시점 이력이다.
+
 ## 현재 후속 실행: N15/N17 현행 패키지·복원 결함 수정 (2026-10-07)
 
 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지에서3mock 설치/재시작/갱신/rollback과 외부 Go public consumer7응답·4거부 제어를 확인했다. 새 루트 복원 뒤 reader lease가 없어 MCP 시작이 실패하는 문제를 실제 발견/수정했다. missing/unsafe/live/reviewed/legacy9제어·관련3패키지 race/vet, 수정 패키지의 복구10응답·13payload SHA·source 없는 재생 통과. native Linux CI는 정의만 있고 미실행, formatter가 과거 평가 원문을 수정하지 않도록7관리 root로 제한·5제어/make fmt-check 통과, 실제 운영 소비자/권한/고지 적합성/backup/RTO/RPO 판정은 없다. **요청5/15·전체8/18 완료, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 독립 gold 준비 및 native CI를 위한 구체 전송 범위 확인.** 아래는 이전 시점 이력이다.

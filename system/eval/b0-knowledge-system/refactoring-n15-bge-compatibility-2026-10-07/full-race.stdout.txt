@@ -1,0 +1,130 @@
+go test -race ./...
+ok  	github.com/0xmhha/knowledge-system/cmd/b0-vector-probe	1.727s
+ok  	github.com/0xmhha/knowledge-system/cmd/b1-evidence-audit	1.558s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks	1.583s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/agentcli	2.012s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/doctorcli	3.977s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/domaincli	2.982s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/evalcli	6.692s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/evalgatecli	3.188s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/filelistcli	10.847s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/knowledgecli	4.133s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/mcpcli	4.507s
+?   	github.com/0xmhha/knowledge-system/cmd/cks/packagecli	[no test files]
+?   	github.com/0xmhha/knowledge-system/cmd/cks/patchcli	[no test files]
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/semanticcli	5.878s
+ok  	github.com/0xmhha/knowledge-system/cmd/cks/setupcli	6.693s
+?   	github.com/0xmhha/knowledge-system/cmd/cks/viewercli	[no test files]
+ok  	github.com/0xmhha/knowledge-system/cmd/graph	120.426s
+ok  	github.com/0xmhha/knowledge-system/cmd/vector	3.940s
+?   	github.com/0xmhha/knowledge-system/internal/githistory	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/graph/audit	5.207s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/buildpipe	192.778s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/cluster	5.126s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/detect	5.803s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/eval/retrieval	4.959s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/filterlist	5.466s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/graph	3.825s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/link	3.620s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/mcp	21.495s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/parse	4.328s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/golang	83.062s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/proto	3.804s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/solidity	16.300s
+?   	github.com/0xmhha/knowledge-system/internal/graph/parse/solidity/binding	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/typescript	4.661s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/persist	29.959s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/score	2.087s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/server	111.913s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/temporal	8.925s
+ok  	github.com/0xmhha/knowledge-system/internal/graph/validate	3.315s
+ok  	github.com/0xmhha/knowledge-system/internal/setup	64.802s
+ok  	github.com/0xmhha/knowledge-system/internal/system/auditlog	2.409s
+ok  	github.com/0xmhha/knowledge-system/internal/system/backendmeasure	2.343s
+ok  	github.com/0xmhha/knowledge-system/internal/system/ckgclient	1.753s
+ok  	github.com/0xmhha/knowledge-system/internal/system/ckvclient	1.809s
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer	1.861s
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/budget	1.563s
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/intent	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/sanitize	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage1	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage2	1.576s
+ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage3	1.922s
+ok  	github.com/0xmhha/knowledge-system/internal/system/config	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/system/daemon	60.974s
+ok  	github.com/0xmhha/knowledge-system/internal/system/domainexport	2.646s
+ok  	github.com/0xmhha/knowledge-system/internal/system/embedder	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/system/envelope	1.390s
+ok  	github.com/0xmhha/knowledge-system/internal/system/eval	3.799s
+ok  	github.com/0xmhha/knowledge-system/internal/system/evidencev2	7.689s
+ok  	github.com/0xmhha/knowledge-system/internal/system/footprint	1.428s
+ok  	github.com/0xmhha/knowledge-system/internal/system/inventory	1.735s
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	2.144s
+ok  	github.com/0xmhha/knowledge-system/internal/system/mcp	5.092s
+ok  	github.com/0xmhha/knowledge-system/internal/system/netutil	1.609s
+ok  	github.com/0xmhha/knowledge-system/internal/system/observe	1.477s
+ok  	github.com/0xmhha/knowledge-system/internal/system/patch	2.662s
+ok  	github.com/0xmhha/knowledge-system/internal/system/semantic	15.591s
+ok  	github.com/0xmhha/knowledge-system/internal/system/service	2.901s
+ok  	github.com/0xmhha/knowledge-system/internal/system/viewer	1.492s
+ok  	github.com/0xmhha/knowledge-system/internal/system/vocab	1.402s
+?   	github.com/0xmhha/knowledge-system/internal/testsupport/graphfixture	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/toolenv	1.392s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/build	8.035s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/chunk	(cached)
+ok  	github.com/0xmhha/knowledge-system/internal/vector/ckgalign	2.296s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/convention	2.236s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/discover	7.048s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx	1.517s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/cache	1.706s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/convert	1.405s
+?   	github.com/0xmhha/knowledge-system/internal/vector/embed/coreml	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/mock	1.453s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/model	33.729s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/registry	1.423s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/eval	3.539s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/eval/prregress	1.565s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/filter	1.850s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/filterlist	2.183s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/flowcorpus	1.430s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/footprint	1.584s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/freshness	2.276s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/glossary	1.415s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/invariant	1.518s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/llmprefix	1.562s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/manifest	1.573s
+?   	github.com/0xmhha/knowledge-system/internal/vector/parse	[no test files]
+?   	github.com/0xmhha/knowledge-system/internal/vector/parse/fuzzcheck	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/golang	1.401s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/javascript	1.503s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/markdown	1.786s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/prdoc	2.128s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/solidity	1.976s
+?   	github.com/0xmhha/knowledge-system/internal/vector/parse/solidity/binding	[no test files]
+ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/typescript	1.630s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/policy	1.529s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/projectcfg	1.491s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/query	7.869s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/query/bm25	1.835s
+ok  	github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec	3.558s
+ok  	github.com/0xmhha/knowledge-system/pkg/bm25	1.964s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/concurrency	1.815s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/evidence	2.319s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/hunkmodifies	1.735s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/impact	2.010s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers	324.129s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/policy	1.767s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/security	2.043s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/smartctx	2.365s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/store	2.161s
+ok  	github.com/0xmhha/knowledge-system/pkg/graph/types	1.629s
+ok  	github.com/0xmhha/knowledge-system/pkg/mcp	1.665s
+ok  	github.com/0xmhha/knowledge-system/pkg/system/contract	1.599s
+ok  	github.com/0xmhha/knowledge-system/pkg/system/testpath	1.469s
+ok  	github.com/0xmhha/knowledge-system/pkg/vector/ckv	3.680s
+ok  	github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama	2.439s
+ok  	github.com/0xmhha/knowledge-system/pkg/vector/mcp	5.072s
+ok  	github.com/0xmhha/knowledge-system/pkg/vector/types	1.833s
+ok  	github.com/0xmhha/knowledge-system/projects/stablenet/validate	1.412s
+?   	github.com/0xmhha/knowledge-system/system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04/checks	[no test files]
+?   	github.com/0xmhha/knowledge-system/system/eval/b0-knowledge-system/native-notice-audit-m2max-2026-10-04/source/cmd/cks/packagecli	[no test files]

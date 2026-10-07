@@ -284,3 +284,5 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개다. 이번 실패는 이전 N05/N04의 기록된 원자료를 바꾸지 않고 현재 복원 경로의 추가 회귀 증거로 보존한다.
 
 N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 위 A/B local 범위를 확인했다. N15-C/D/E와 N17-C/D/E의 native/실제 소비자/운영 수용 조건은 미완료다. 고지 포함 범위35모듈/4assets의 byte inventory는 갱신했으나 N16 실제 판정은 없다.
+
+2026-10-07 [실제 BGE-M3 작은 호환성 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md): 같은 clean Darwin 패키지의3소유 fixture 설치/재시작/갱신/rollback 및6dataset의 승인 digest/native1024 확인, MCP compact7·CKV6응답 통과. 현재 소스 전체 race117패키지와 도메인 자료 일치도 통과했다. N15-D의 모델 연결 부분만 검증했으며 규모/독립 운영 소비자/지원 수용이 없어 D 전체 체크는 하지 않는다. N15-C/D/E·N17-C/D/E 및 전체 완료 수는 그대로다.
