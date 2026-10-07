@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "543966d3",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/formatter-manifest.json"
+    "revision": "d76488b0",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n15-bge-compatibility-2026-10-07/manifest.json"
   },
   "tasks": [
     {
@@ -163,10 +163,13 @@
       "state": "waiting",
       "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
       "technical_evidence_revision": "de15015a",
-      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI defined but not run",
-      "waiting_for": "actual native Linux AMD64 CI/host execution, real model/scale and independent operating consumer install/upgrade acceptance",
+      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI defined but not run; approved BGE-M3 digest/native1024 on 3 small owned fixtures, 7 compact MCP and 6 CKV responses, 6 dataset identities; full root race 117 packages and generated domain artifacts passed",
+      "waiting_for": "actual native Linux AMD64 CI/host execution, operating scale/model support judgment and independent operating consumer install/binary-upgrade acceptance; small BGE wiring does not satisfy those conditions",
       "formatter_evidence_revision": "543966d3",
-      "ci_status": "defined_not_dispatched_public_transfer_pending"
+      "ci_status": "defined_not_dispatched_public_transfer_pending",
+      "local_compatibility_preparation": "docs/spec-driven/N15-BGE-COMPATIBILITY-VALIDATION.md",
+      "local_compatibility_evidence_revision": "d76488b0",
+      "local_compatibility_manifest": "system/eval/b0-knowledge-system/refactoring-n15-bge-compatibility-2026-10-07/manifest.json"
     },
     {
       "id": "N-16",
@@ -191,5 +194,21 @@
       "purpose": "기본값·출시 판정",
       "state": "pending"
     }
-  ]
+  ],
+  "pending_public_transfer": {
+    "requested_commit": "d08cb384f282f5d3cea777b9edba1748dfeea8c7",
+    "untransferred_commit_count_at_request": 80,
+    "changed_files_at_request": 9031,
+    "repository": "0xmhha/knowledge-system",
+    "visibility": "PUBLIC",
+    "branch": "feat/spec-driven-knowledge-system",
+    "actions": [
+      "push_exact_requested_commit",
+      "create_draft_PR",
+      "run_mock_native_CI_and_retain_mock_artifacts"
+    ],
+    "approval": "awaiting_user_reply",
+    "additional_local_receipt_revision": "d76488b0",
+    "additional_local_receipt_in_scope": false
+  }
 }
