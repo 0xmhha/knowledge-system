@@ -81,3 +81,49 @@ jobs:
           go-version-file: go.mod
       - name: govulncheck
         run: make vuln
+
+  # Native job runner, not an ARM-host QEMU/Docker compatibility result.
+  # Mock wiring/consumer proof stays separate from N11 gold and release gates.
+  native-install-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Build extracted host package and exercise mock installs
+        env:
+          KS_PACKAGE_SMOKE_DIR: ${{ runner.temp }}/ks-native-package
+        run: bash scripts/wbs-package-smoke.sh
+      - name: Separate-module public consumer and negative controls
+        run: >-
+          python3 scripts/wbs-external-consumer-smoke.py
+          --package-root "${{ runner.temp }}/ks-native-package"
+          --out-dir "${{ runner.temp }}/ks-external-consumer"
+          --expect-os linux --expect-arch amd64
+
+      - name: Small owned-fixture backup restore and source-absent replay
+        run: |
+          for task_stage in "${{ runner.temp }}"/ks-native-package/unpacked/*; do
+            python3 scripts/wbs-recovery-smoke.py --bin-dir "$task_stage" \
+              --out "${{ runner.temp }}/ks-native-recovery"
+          done
+      - name: Retain native mock evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-install-contract-${{ runner.os }}-${{ runner.arch }}
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ks-native-package/package.json
+            ${{ runner.temp }}/ks-native-package/installs/**/*.json
+            ${{ runner.temp }}/ks-native-package/unpacked/**/manifest.json
+            ${{ runner.temp }}/ks-external-consumer/*.json
+            ${{ runner.temp }}/ks-external-consumer/*.stdout.txt
+            ${{ runner.temp }}/ks-external-consumer/*.stderr.txt
+            ${{ runner.temp }}/ks-native-recovery/*.json
+            ${{ runner.temp }}/ks-native-recovery/*.stdout.txt
+            ${{ runner.temp }}/ks-native-recovery/*.stderr.txt
+            ${{ runner.temp }}/ks-native-recovery/pin-control/*.json
+            ${{ runner.temp }}/ks-native-recovery/pin-control/server.log

@@ -215,6 +215,11 @@ func promoteReviewedCandidateLocked(dataset, version, expectedBase, patchID, dec
 		if err := validateExistingReviewRelease(intentPath, intent); err != nil {
 			return "", err
 		}
+		if hasReaderProtocol(vdir) {
+			if err := prepareReaderLease(dataset, version); err != nil {
+				return "", fmt.Errorf("%w: reader lease: %v", ErrDurabilityUncertain, err)
+			}
+		}
 		if err := flushCandidate(vdir); err != nil {
 			return "", fmt.Errorf("%w: %v", ErrDurabilityUncertain, err)
 		}
@@ -409,6 +414,11 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 		}
 	} else if !os.IsNotExist(rerr) {
 		return "", fmt.Errorf("promote: current is not a readable version pointer: %w", rerr)
+	}
+	if hasReaderProtocol(vdir) {
+		if err := prepareReaderLease(dataset, version); err != nil {
+			return prev, fmt.Errorf("promote: reader lease: %w", err)
+		}
 	}
 	if err := flushCandidateContext(ctx, vdir); err != nil {
 		return prev, fmt.Errorf("promote: candidate persistence: %w", err)

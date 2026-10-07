@@ -256,3 +256,29 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 - [ ] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
 - [ ] N10-C 소스/근거/프로젝트·모델 신원·안전·검색/기권 회귀를 유지한 범위 내 개선과 p95비1.25 수용 판정; 소표본은inconclusive.
 - [ ] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.
+
+## N-15: 현행 패키지·외부 모듈·native 환경 검증
+
+**상태: 구현/검증 중 · 전체 미완료.** 내구성/GC/자원/본문 예산 변경 전의 패키지 증거를 현행 소스로 자동 확장하지 않는다. 새 clean Git checkout에서 host-preview를 만들고 추출된 바이너리로 별도 저장소 설치·재시작·데이터 갱신·rollback과 외부 Go 모듈의 공개 계약 사용을 확인한다. 구조 mock fixture와 실제 조직/모델 소비자를 분리한다. 공개 pkg만 import하는 외부 모듈은 internal 접근/저장소 내 테스트의 우회를 피한다. raw v2 integrity·원문/SHA와 public DTO 검사는 별도로 확인한다.
+
+- [ ] N15-A 현재 소스 commit·Go/native dependency·패키지/바이너리/고지 SHA와 clean build receipt 결합.
+- [ ] N15-B 추출 패키지의 별도 프로젝트 설치/재시작/갱신/rollback 및 외부 Go 모듈의 v1/v2 공개 계약·입력 거부 확인.
+- [ ] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
+- [ ] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
+- [ ] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
+
+현재 Darwin 구조 시험과 native CI 작업 정의를 준비한다. CI 정의만으로 실행했다고 표시하지 않는다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
+
+## N-17: 복구 루트의 reader 보호와 실제 운영 훈련
+
+**상태: 실패 재현/수정 중 · 전체 미완료.** N15 현행 패키지로 새 루트에 candidate 백업을 복사하고 rollback한 결과 current는 복원됐지만 `.readers`가 없어 MCP 초기화가 실패했다. reader protocol marker는 candidate 안에 있고 OS lease inode는 dataset 루트에 있어 백업한 버전만으로는 reader admission이 완성되지 않는다.
+
+복원/승격은 mutation OS 잠금 아래 원문·신원·review 권한을 먼저 검증한 뒤, protocol이 있는 target의 reader lease를 준비하고 sync한다. candidate의 marker/원문/신원은 다시 쓰지 않는다. 기존 inode는 유지하여 살아 있는 reader와 GC의 보호를 이어간다. linked directory/inode 또는 다중 hardlink는 pointer 전환 전에 거부한다. protocol 없는 legacy target은 자동 업그레이드하지 않는다. 조회 경로가 lock을 자동 복구하거나 삭제하도록 완화하지 않는다.
+
+- [ ] N17-A 현행 패키지의 실패 후보/current 보존·손상 대상 거부와 원본 payload SHA 기록.
+- [ ] N17-B 새 루트 백업 복원·reader lease/기존 inode 보존·원본 source 없는 인용 재생; 실제 public CLI/MCP 검증.
+- [ ] N17-C 실제 backup/failover 담당·RTO/RPO·키 복구·network/전원 정책 및 대상 호스트 판정.
+- [ ] N17-D 실제 운영 후보의 복구·실패전환 훈련과 조건별 시간/데이터 손실·사람 수용 증거.
+- [ ] N17-E 코드/원자료/한계·검토 판정 바인딩과 N18 연결. owned mock restore 시간을 실제 RTO/RPO 판정으로 사용하지 않음.
+
+N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개다. 이번 실패는 이전 N05/N04의 기록된 원자료를 바꾸지 않고 현재 복원 경로의 추가 회귀 증거로 보존한다.

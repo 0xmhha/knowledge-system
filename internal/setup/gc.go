@@ -74,7 +74,11 @@ func openReaderLock(dataset, version string, create bool) (*os.File, error) {
 	return f, nil
 }
 
-func prepareReaderProtocol(dataset, version string) error {
+// prepareReaderLease also supports a candidate restored into a new root. It
+// preserves an existing inode and never rewrites the immutable candidate.
+// Callers hold the dataset mutation lock; promotion flushes its parent before
+// switching current so a newly created .readers entry is durable as well.
+func prepareReaderLease(dataset, version string) error {
 	f, err := openReaderLock(dataset, version, true)
 	if err != nil {
 		return err
@@ -83,6 +87,13 @@ func prepareReaderProtocol(dataset, version string) error {
 		return err
 	}
 	if err := syncDirectory(filepath.Join(dataset, ".readers")); err != nil {
+		return err
+	}
+	return nil
+}
+
+func prepareReaderProtocol(dataset, version string) error {
+	if err := prepareReaderLease(dataset, version); err != nil {
 		return err
 	}
 	return writeJSONAtomic(filepath.Join(dataset, version, "reader-protocol.json"), map[string]string{"protocol": readerProtocol})

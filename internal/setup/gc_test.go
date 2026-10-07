@@ -451,3 +451,164 @@ func TestGCProtectsCurrentReaderAndReviewedHold(t *testing.T) {
 	}
 	assertDurabilityCurrent(t, dataset, "v6")
 }
+
+func TestRestorePromotionRecreatesReaderLeaseWithoutChangingCandidate(t *testing.T) {
+	for _, missing := range []string{"directory", "inode"} {
+		t.Run(missing, func(t *testing.T) {
+			dataset := t.TempDir()
+			candidate := gcVersion(t, dataset, "restored")
+			before := durabilityTree(t, candidate)
+			path := filepath.Join(dataset, ".readers", "restored.lock")
+			if missing == "directory" {
+				path = filepath.Dir(path)
+			}
+			if err := os.RemoveAll(path); err != nil {
+				t.Fatal(err)
+			}
+			if err := Rollback(dataset, "restored"); err != nil {
+				t.Fatal(err)
+			}
+			lease, err := PinVersionReader(candidate)
+			if err != nil {
+				t.Fatalf("restored reader cannot start: %v", err)
+			}
+			if lease == nil {
+				t.Fatal("restored reader has no GC lease")
+			}
+			defer lease.Close()
+			after := durabilityTree(t, candidate)
+			if len(before) != len(after) {
+				t.Fatal("candidate payload inventory changed")
+			}
+			for path, hash := range before {
+				if after[path] != hash {
+					t.Fatalf("restored candidate changed: %s", path)
+				}
+			}
+		})
+	}
+}
+
+func TestRestorePromotionRejectsUnsafeReaderLeaseBeforePointerSwap(t *testing.T) {
+	for _, kind := range []string{"linked-directory", "linked-inode", "hardlinked-inode"} {
+		t.Run(kind, func(t *testing.T) {
+			dataset := t.TempDir()
+			gcVersion(t, dataset, "before")
+			gcVersion(t, dataset, "restored")
+			if _, err := Promote(dataset, "before"); err != nil {
+				t.Fatal(err)
+			}
+			lock := filepath.Join(dataset, ".readers", "restored.lock")
+			outside := t.TempDir()
+			if kind == "linked-directory" {
+				if err := os.RemoveAll(filepath.Dir(lock)); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Symlink(outside, filepath.Dir(lock)); err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err := os.Remove(lock); err != nil {
+					t.Fatal(err)
+				}
+				target := filepath.Join(outside, "lock")
+				if err := os.WriteFile(target, nil, 0600); err != nil {
+					t.Fatal(err)
+				}
+				var err error
+				if kind == "linked-inode" {
+					err = os.Symlink(target, lock)
+				} else {
+					err = os.Link(target, lock)
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := Rollback(dataset, "restored"); err == nil {
+				t.Fatal("unsafe restored lease was promoted")
+			}
+			assertDurabilityCurrent(t, dataset, "before")
+		})
+	}
+}
+
+func TestRepeatedPromotionPreservesLiveReaderLockInode(t *testing.T) {
+	dataset := t.TempDir()
+	candidate := gcVersion(t, dataset, "active")
+	if _, err := Promote(dataset, "active"); err != nil {
+		t.Fatal(err)
+	}
+	lease, err := PinVersionReader(candidate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer lease.Close()
+	path := filepath.Join(dataset, ".readers", "active.lock")
+	before, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Promote(dataset, "active"); err != nil {
+		t.Fatal(err)
+	}
+	after, err := os.Stat(path)
+	if err != nil || !os.SameFile(before, after) {
+		t.Fatal("promotion replaced a live reader inode")
+	}
+}
+
+func TestReviewedPromotionAndRecoveryRecreateReaderLease(t *testing.T) {
+	for _, retry := range []bool{false, true} {
+		t.Run(fmt.Sprint(retry), func(t *testing.T) {
+			dataset := t.TempDir()
+			gcVersion(t, dataset, "before")
+			if _, err := Promote(dataset, "before"); err != nil {
+				t.Fatal(err)
+			}
+			durableTestVersion(t, dataset, "reviewed")
+			holdDurabilityVersion(t, dataset, "reviewed")
+			if err := prepareReaderProtocol(dataset, "reviewed"); err != nil {
+				t.Fatal(err)
+			}
+			promote := func() error {
+				_, err := PromoteReviewedCandidateIfBase(dataset, "reviewed", "before", "patch", strings.Repeat("a", 64))
+				return err
+			}
+			if retry {
+				if err := promote(); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := os.Remove(filepath.Join(dataset, ".readers", "reviewed.lock")); err != nil {
+				t.Fatal(err)
+			}
+			if err := promote(); err != nil {
+				t.Fatal(err)
+			}
+			lease, err := PinVersionReader(filepath.Join(dataset, "reviewed"))
+			if err != nil || lease == nil {
+				t.Fatalf("reviewed reader: %v", err)
+			}
+			defer lease.Close()
+		})
+	}
+}
+
+func TestLegacyPromotionDoesNotAddReaderProtocol(t *testing.T) {
+	dataset := t.TempDir()
+	version := durableTestVersion(t, dataset, "legacy")
+	if err := Rollback(dataset, "legacy"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Lstat(filepath.Join(dataset, ".readers")); !os.IsNotExist(err) {
+		t.Fatalf("legacy acquired protocol state: %v", err)
+	}
+	if hasReaderProtocol(version) {
+		t.Fatal("legacy candidate was migrated implicitly")
+	}
+	lease, err := PinVersionReader(version)
+	if err != nil || lease != nil {
+		t.Fatalf("legacy admission changed: %v", err)
+	}
+}
