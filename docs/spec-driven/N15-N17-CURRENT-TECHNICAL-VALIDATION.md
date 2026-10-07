@@ -38,3 +38,5 @@ Go public consumer는 저장소 내부 테스트로 실행하지 않았고 consu
 ## CI formatter의 동결 원문 보호
 
 최종 CI 사전 확인에서 기존 Makefile의 전역 find가 과거 평가 원문3개에 gofmt를 요구했다. [5개 제어](../../system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/summary.json)로 이전 실패·새 범위의 통과·유지보수 코드 drift 거부·fmt 수정·수정 후 통과를 확인했다. cmd/internal/pkg/graph/vector/testdata/projects를 대상으로 제한하고 system/eval의 보관 원문은 수정하지 않았다. 해당3개 원문 SHA와 모든 runtime Go 소스는 불변이다. native 패키지는 위 b006e776에서 검증했고 이후 변경은 formatter 대상뿐이므로 바이너리/복구 결과를 새 Go 변경에 확장한 것이 아니다. make fmt-check와 증거 바인딩이 통과했지만 GitHub CI 실행 결과는 아직 없다.
+
+전체 vet에서 N11의 부분 보관 Go 원문2개가 의존 타입 없이 루트 ./... 대상으로 잡힌 보관 방식 오류도 확인했다. source-snapshot에 별도 go.mod 경계를 두어 원문 바이트를 보존하면서 루트 package 대상에서 격리했다. 이후 CI와 같은 make lint(전체 vet/형식/경계/바이너리·문서)와 make build가 통과했다. 보관 원문은 실행 패키지로 사용하지 않는다. 전체 race는 이번 변경의 관련3패키지를 검증했고 GitHub 전체 CI 판정은 별도로 남는다.
