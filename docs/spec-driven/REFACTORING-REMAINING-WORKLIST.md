@@ -71,3 +71,5 @@ N11 [부분 FINAL 후보](./N11-FINAL-CANDIDATE-PREPARATION.md)4문항을2제안
 2026-10-07 native CI 사전 검사: 전역 formatter의 동결 평가 원문3개 변경 요구를 관리 코드/fixture 범위로 제한했다. 5제어와 make fmt-check 통과, 원문/Go runtime 소스 변경0. 전체 완료 수와 CI 미실행 상태는 동일하다.
 
 2026-10-07 [BGE-M3 작은 설치 호환성/전체 race](./N15-BGE-COMPATIBILITY-VALIDATION.md): 승인 digest/native1024의3소유 fixture 설치·MCP 재시작·데이터 갱신·rollback,6dataset identity·compact MCP7/CKV6응답과 보관 Git 원문 좌표를 확인했다. d08cb384 전체 race117패키지와 도메인 생성 자료 일치도 통과했다. N15-D의 모델 연결만 검증했으며 native Linux/규모/독립 운영 소비자·사람/운영 수용이 남아 전체8/18·요청5/15·잔여10개를 유지한다. 다음 N11/N12 실제 판정과 native CI다. 공개 전송 요청은 d08cb384의80커밋이며 추가 로컬 receipt/문서 커밋은 제외한다.
+
+2026-10-07 [N11 후보 출처/과거 관측 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md): 전체 보관 FINAL9파일/4,800행의 SHA를 확인했다. 후보 lock.go 파일의 동일SHA/80행 인용720개를 발견했지만 후보parser55–76행 교집합0이다. 해당3request의 반복을 독립 표본으로 세지 않으며 후보의 독립성·개념적 오염은 미판정이다. 현재4후보/2proposed cluster·승인FINAL0·새질의0·N11 전체 미완료를 유지한다. d08cb384 공개 전송은 자동 승인 검토에서 새 범위 미승인으로 차단됐고 명시 응답 대기다. 전체8/18·요청5/15·잔여10개, 다음 N11/N12 판정 및 native CI를 유지한다.

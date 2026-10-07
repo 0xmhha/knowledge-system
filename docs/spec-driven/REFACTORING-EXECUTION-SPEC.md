@@ -286,3 +286,5 @@ N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개�
 N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 위 A/B local 범위를 확인했다. N15-C/D/E와 N17-C/D/E의 native/실제 소비자/운영 수용 조건은 미완료다. 고지 포함 범위35모듈/4assets의 byte inventory는 갱신했으나 N16 실제 판정은 없다.
 
 2026-10-07 [실제 BGE-M3 작은 호환성 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md): 같은 clean Darwin 패키지의3소유 fixture 설치/재시작/갱신/rollback 및6dataset의 승인 digest/native1024 확인, MCP compact7·CKV6응답 통과. 현재 소스 전체 race117패키지와 도메인 자료 일치도 통과했다. N15-D의 모델 연결 부분만 검증했으며 규모/독립 운영 소비자/지원 수용이 없어 D 전체 체크는 하지 않는다. N15-C/D/E·N17-C/D/E 및 전체 완료 수는 그대로다.
+
+2026-10-07 [N11 후보 출처 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md): 기존 FINAL9파일/4,800행의 SHA와 직접 인용·본문을 확인했다. lock.go의 동일 file SHA/80행 인용720개가 있지만 후보55–76행 교집합0, readonly.go 직접 인용0이다. 같은 파일/개념/이전 DEV의 오염 판정은 사람에게 남기며 새 FINAL0·질의0·N11-A–D 미완료를 유지한다. 공개d08cb384 푸시는 자동 승인 검토가 범위 미승인으로 거부했고 실행하지 않았다.

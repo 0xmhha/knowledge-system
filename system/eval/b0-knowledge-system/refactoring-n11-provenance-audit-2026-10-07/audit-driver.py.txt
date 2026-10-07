@@ -1,0 +1,149 @@
+from pathlib import Path
+import collections
+import gzip
+import hashlib
+import json
+import subprocess
+
+repo = Path.cwd()
+base = Path('system/eval/b0-knowledge-system')
+final_root = base / 'approved-evaluation-m2max-2026-10-06/final-after-development-freeze'
+book_path = base / 'refactoring-n11-final-candidate-preparation-2026-10-06/partial-question-book.json'
+known_path = base / 'refactoring-n11-input-controls-2026-10-06/known-final-observations.json'
+out = base / 'refactoring-n11-provenance-audit-2026-10-07'
+assert not out.exists()
+out.mkdir()
+sha = lambda data: hashlib.sha256(data).hexdigest()
+book = json.loads(book_path.read_text())
+known = json.loads(known_path.read_text())
+archive = json.loads((final_root / 'artifact-manifest.json').read_text())
+retained = {item['artifact_path']: item for item in archive['files']}
+aggregate = json.loads((final_root / 'final-summary-corrected.json').read_text())
+candidates = [q for q in book['questions'] if q['split'] == 'FINAL']
+old = json.loads((base / 'questions.json').read_text())
+dev = json.loads((base / 'refactoring-n11-input-draft-2026-10-06/dev-candidates.json').read_text())
+policy = json.loads((base / 'refactoring-n12-policy-adr-review-2026-10-06/review-items.json').read_text())
+evidence = {}
+for q in candidates:
+    e = q['evidence'][0]
+    data = subprocess.check_output(['git', 'show', q['source_commit'] + ':' + e['path']])
+    span = b''.join(data.splitlines(keepends=True)[e['first']-1:e['last']])
+    assert sha(data) == e['file_sha256'] and sha(span) == e['content_sha256']
+    evidence[q['id']] = e
+    (out / (q['id'] + '.span.txt')).write_bytes(span)
+
+paths = sorted(final_root.rglob('rows.jsonl.gz'))
+assert len(paths) == 9
+files = []
+matches = []
+formats = collections.Counter()
+body_keywords = collections.Counter()
+rows = 0
+terms = ('OpenStoreReadOnly', 'PRAGMA user_version', 'ReadManifest', 'KnownFields')
+for path in paths:
+    rel = str(path.relative_to(final_root))
+    item = retained[rel]
+    compressed = path.read_bytes()
+    assert sha(compressed) == item['artifact_sha256']
+    raw_hash = hashlib.sha256()
+    line_count = 0
+    with gzip.open(path, 'rb') as stream:
+        for number, line in enumerate(stream, 1):
+            raw_hash.update(line)
+            row = json.loads(line)
+            rows += 1
+            line_count += 1
+            response = row.get('call', {}).get('response', {})
+            pack = response.get('structuredContent') if isinstance(response, dict) else None
+            if not isinstance(pack, dict) or pack.get('format_version') != 2:
+                formats['without_v2_pack'] += 1
+                continue
+            formats['v2_pack'] += 1
+            for body in pack.get('bodies', []):
+                for term in terms:
+                    if term in body.get('text', ''):
+                        body_keywords[term] += 1
+            for index, citation in enumerate(pack.get('citations', [])):
+                matching = [q for q in candidates if evidence[q['id']]['path'] == citation.get('file')]
+                if not matching:
+                    continue
+                verdicts = []
+                for q in matching:
+                    e = evidence[q['id']]
+                    same_bytes = citation.get('file_sha256') == e['file_sha256']
+                    overlap = max(citation['start_line'], e['first']) <= min(citation['end_line'], e['last'])
+                    verdicts.append({'candidate_id': q['id'], 'same_file_sha256': same_bytes,
+                                     'line_span_intersects': overlap,
+                                     'same_bytes_and_span_intersects': same_bytes and overlap})
+                matches.append({'source_rows': str(path), 'line_number': number,
+                                'citation_index': index, 'request_id': row['request_id'],
+                                'arm': row['arm'], 'phase': row['phase'],
+                                'iteration': row['iteration'], 'measurement_id': row['call']['measurement_id'],
+                                'citation': citation, 'candidate_checks': verdicts})
+    assert raw_hash.hexdigest() == item['source_sha256']
+    files.append({'path': str(path), 'rows': line_count, 'compressed_sha256': sha(compressed),
+                  'decompressed_sha256': raw_hash.hexdigest()})
+assert rows == aggregate['observed_rows'] == 4800
+assert formats['v2_pack'] == aggregate['successful_v2_pack_rows'] == 4560
+assert formats['without_v2_pack'] == aggregate['expected_v2_tool_error_rows'] == 240
+
+references = []
+for collection, questions in [('B0_approved_question_gold', old['questions']), ('N11_proposed_DEV', dev['questions'])]:
+    for q in questions:
+        for e in q.get('evidence', []):
+            references.append({'collection': collection, 'id': q['id'], 'path': e['path'],
+                               'first': e.get('first', e.get('start_line')), 'last': e.get('last', e.get('end_line'))})
+for item in policy['items']:
+    for key in ('source', 'candidate_code'):
+        e = item[key]
+        references.append({'collection': 'N12_policy_ADR_' + key, 'id': item['id'],
+                           'path': e['path'], 'first': e['first'], 'last': e['last']})
+reference_matches = []
+for q in candidates:
+    e = evidence[q['id']]
+    for ref in references:
+        if ref['path'] == e['path']:
+            reference_matches.append({'candidate_id': q['id'], 'reference': ref,
+                                      'line_span_intersects': max(e['first'], ref['first']) <= min(e['last'], ref['last'])})
+candidate_counts = []
+for q in candidates:
+    rows_for_q = [m for m in matches if any(c['candidate_id'] == q['id'] for c in m['candidate_checks'])]
+    candidate_counts.append({'id': q['id'], 'proposed_cluster_id': q['proposed_cluster_id'],
+                             'group': q['group'], 'gold': evidence[q['id']],
+                             'same_path_citation_occurrences': len(rows_for_q),
+                             'same_bytes_and_span_overlap_occurrences': sum(any(c['candidate_id'] == q['id'] and c['same_bytes_and_span_intersects'] for c in m['candidate_checks']) for m in rows_for_q),
+                             'observed_request_ids': sorted({m['request_id'] for m in rows_for_q}),
+                             'gold_independence_contamination_verdict': None})
+summary = {'schema_version': 1, 'status': 'N11_partial_provenance_audit_no_human_verdict',
+           'source_commit': book['source_commit'], 'candidate_count': len(candidates),
+           'proposed_cluster_count': len({q['proposed_cluster_id'] for q in candidates}),
+           'approved_independent_FINAL_count': 0, 'new_query_or_FINAL_dispatch_count': 0,
+           'audit_scope': 'all nine retained approved FINAL canonical v2 citations and body keyword checks; B0 approved gold, current proposed DEV, N12 policy/ADR source and candidate-code references',
+           'raw_files': files, 'observed_rows': rows, 'row_kinds': dict(formats),
+           'known_first_observation_file_count': len({o['source_rows'] for o in known}),
+           'known_first_observation_additional_state_files_audited': sorted({str(p) for p in paths} - {o['source_rows'] for o in known}),
+           'same_path_citation_occurrences': len(matches),
+           'same_file_byte_identity_occurrences': sum(all(c['same_file_sha256'] for c in m['candidate_checks']) for m in matches),
+           'quoted_candidate_span_overlap_occurrences': sum(any(c['same_bytes_and_span_intersects'] for c in m['candidate_checks']) for m in matches),
+           'canonical_body_keyword_occurrences': {term: body_keywords[term] for term in terms},
+           'candidate_counts': candidate_counts, 'reference_matches': reference_matches,
+           'full_task_complete': False, 'independence_approved': False, 'contamination_adjudicated': False,
+           'public_push_auto_review': {'action': 'push d08cb384 (80 commits/9031 changed files) to PUBLIC feat/spec-driven-knowledge-system',
+                                      'result': 'rejected', 'performed': False,
+                                      'reason': 'trusted explicit publication approval remained scoped to 329becf3; next proceed was not accepted as approval of this new transfer'},
+           'limitations': ['zero canonical span/keyword matches does not prove absence of fact or conceptual contamination',
+                           'same-file citations do not prove the candidate parser fact was observed',
+                           'graph-neighbor/semantic references, earlier DEV and other diagnostics, source familiarity and human exposure require separate review',
+                           '720 repetitions from three request IDs are not 720 independent units',
+                           'first-observation inventory remains unchanged; its seven files encode earliest retained cluster observations, not exhaustive state captures']}
+(out / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n')
+(out / 'matching-citations.jsonl').write_text(''.join(json.dumps(m, ensure_ascii=False, separators=(',', ':')) + '\n' for m in matches))
+(out / 'reference-index.json').write_text(json.dumps(references, ensure_ascii=False, indent=2) + '\n')
+inputs = [book_path, known_path, base / 'questions.json', base / 'refactoring-n11-input-draft-2026-10-06/dev-candidates.json',
+          base / 'refactoring-n12-policy-adr-review-2026-10-06/review-items.json', final_root / 'artifact-manifest.json',
+          final_root / 'final-summary-corrected.json']
+(out / 'input-bindings.json').write_text(json.dumps({str(p): sha(p.read_bytes()) for p in inputs}, indent=2) + '\n')
+print(json.dumps({'rows': rows, 'raw_files': len(files), 'same_path_citations': len(matches),
+                  'candidate_span_overlaps': summary['quoted_candidate_span_overlap_occurrences'],
+                  'canonical_body_keyword_occurrences': summary['canonical_body_keyword_occurrences'],
+                  'reference_same_path_matches': len(reference_matches), 'approved_FINAL': 0}, ensure_ascii=False))
