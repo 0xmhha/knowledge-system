@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "8f6e1321",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-n11-final-candidate-preparation-2026-10-06/candidate-manifest.json"
+    "revision": "de15015a",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json"
   },
   "tasks": [
     {
@@ -160,17 +160,29 @@
     {
       "id": "N-15",
       "purpose": "지원 환경·외부 소비자",
-      "state": "pending"
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI defined but not run",
+      "waiting_for": "actual native Linux AMD64 CI/host execution, real model/scale and independent operating consumer install/upgrade acceptance"
     },
     {
       "id": "N-16",
       "purpose": "운영 권한·고지",
-      "state": "pending"
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "current clean package byte inventory bound: 35 modules, 4 vendored assets, included-scope missing notices 0; suitability and operating authority not approved",
+      "waiting_for": "actual roles/scope/public key independent trust and rotation/revocation; native/transitive source and notice suitability judgment"
     },
     {
       "id": "N-17",
       "purpose": "운영 복구",
-      "state": "pending"
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "new-root restore failure reproduced and reader lease preparation fixed; 9 controls, 3-package race; 10 recovery capture responses and 13 unchanged payload files; source-absent replay passed on owned mock fixture",
+      "waiting_for": "actual backup/failover owner, RTO/RPO/key/network/power host policy and operating candidate drill/acceptance"
     },
     {
       "id": "N-18",
