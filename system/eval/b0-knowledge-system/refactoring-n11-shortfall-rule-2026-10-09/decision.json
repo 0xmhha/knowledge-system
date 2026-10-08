@@ -1,0 +1,42 @@
+{
+ "schema_version": 1,
+ "decided_at_KST": "2026-10-09",
+ "question": "N11에서 중요군별 승인 독립 FINAL이 10개에 못 미치면 어떻게 처리할까요? (결과 관측 전 사전 규칙)",
+ "user_answer": "부족 군은 inconclusive 사전 고정 (권장)",
+ "source": "direct human answer in this Claude Code conversation (AskUserQuestion)",
+ "decider_name": null,
+ "rule": "Before any new FINAL dispatch, every important group (CODE/WHY/POLICY/TRACE/ABS) with fewer than 10 approved independent FINAL clusters is fixed as descriptive/inconclusive. Such groups yield no default-on or release claim. Groups that reach 10 are evaluated with the existing thresholds. Expanding a group later requires a new pre-result review.",
+ "consistent_with_existing_protocol_field": {
+  "path": "system/eval/b0-knowledge-system/refactoring-scope-adoption-2026-10-08/candidate-protocol.json",
+  "sha256": "2b31c4aaf612bb10b6d54f54c1e6846c284eefe491f3cc230160d2a08c91fcd3",
+  "small_group_policy": "n<10 independent final questions in an important group => descriptive/inconclusive; no default-on or release claim. Expansion requires new pre-result review."
+ },
+ "does_not_change": [
+  "10-per-group sufficiency threshold",
+  "existing thresholds",
+  "approved input5",
+  "previous FINAL exclusions",
+  "existing protocol file bytes"
+ ],
+ "is_not": [
+  "gold/cluster/independence/contamination/ABS approval",
+  "protocol freeze",
+  "runtime freeze",
+  "execution approval"
+ ],
+ "proposed_cluster_counts_at_decision": {
+  "CODE": 4,
+  "WHY": 4,
+  "POLICY": 1,
+  "TRACE": 2,
+  "ABS": 1
+ },
+ "approved_cluster_counts_at_decision": {
+  "CODE": 0,
+  "WHY": 0,
+  "POLICY": 0,
+  "TRACE": 0,
+  "ABS": 0
+ },
+ "consequence": "N11 completion no longer waits for 10 clusters per group; it still needs individual human adjudication of the clusters that are used, protocol/source/model/runtime freeze, and bound evidence. With all groups currently below 10, any run would be descriptive/inconclusive for every group, and N08/N09/N10 quality verdicts could not support default-on in N18."
+}
