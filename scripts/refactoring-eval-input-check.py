@@ -151,7 +151,14 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
         refs, behavior = q.get("evidence"), q.get("expected_behavior")
         check(isinstance(refs, list) and behavior in {"cite", "abstain"} and (behavior == "cite") == bool(refs), "evidence_behavior_mismatch:" + str(ident))
         if behavior == "abstain":
-            check(group == "ABS" and q.get("strict_zero_citations") is True and bool(q.get("abstention_basis")), "abstention_scope_missing:" + str(ident))
+            # Strict zero citations is the default. Citing the recorded
+            # "unassigned" fact while abstaining is allowed only when the
+            # protocol declares that scoring rule and the item binds the basis
+            # sources it may cite.
+            strict = q.get("strict_zero_citations") is True
+            cited_basis = (q.get("strict_zero_citations") is False and isinstance(protocol.get("abstention_scoring"), dict)
+                           and bool(q.get("abstention_citation_rule")) and bool(q.get("abstention_basis_sources")))
+            check(group == "ABS" and (strict or cited_basis) and bool(q.get("abstention_basis")), "abstention_scope_missing:" + str(ident))
             # Review-only absence sources never become positive answer citations.
             # Older textual-only basis records remain compatible; when a catalog
             # is supplied, every declared byte/span must be bound to the corpus.

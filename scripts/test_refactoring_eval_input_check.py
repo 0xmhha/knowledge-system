@@ -167,6 +167,25 @@ class InputAuditTests(unittest.TestCase):
         self.assertEqual(q["evidence"], [])
         self.assertTrue(q["strict_zero_citations"])
 
+    def test_cited_unassigned_record_abstention_needs_protocol_rule_and_bound_basis(self):
+        # Allowed only when the protocol declares the scoring rule and the item
+        # binds the recorded "unassigned" basis it may cite while abstaining.
+        p, b = fixture()
+        q = next(q for q in b["questions"] if q["group"] == "ABS")
+        q.update(strict_zero_citations=False, abstention_citation_rule="cite the unassigned record only",
+                 abstention_basis_sources=copy.deepcopy(b["questions"][0]["evidence"]))
+        p["abstention_scoring"] = {"rule": "abstain; citing the recorded unassigned fact is allowed"}
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        for mode in ("no-protocol-rule", "no-item-rule", "no-basis-sources"):
+            with self.subTest(mode=mode):
+                p2, b2 = copy.deepcopy(p), copy.deepcopy(b)
+                q2 = next(q for q in b2["questions"] if q["group"] == "ABS")
+                if mode == "no-protocol-rule": del p2["abstention_scoring"]
+                if mode == "no-item-rule": del q2["abstention_citation_rule"]
+                if mode == "no-basis-sources": del q2["abstention_basis_sources"]
+                self.assertIn("abstention_scope_missing:" + q2["id"], run(p2, b2)["pending_reasons"])
+
     def test_changed_or_malformed_declared_abstention_basis_is_rejected(self):
         for mode in ("file-sha", "span-sha", "range", "bool-line", "missing-path",
                      "unsafe-path", "empty", "null", "object", "string"):
