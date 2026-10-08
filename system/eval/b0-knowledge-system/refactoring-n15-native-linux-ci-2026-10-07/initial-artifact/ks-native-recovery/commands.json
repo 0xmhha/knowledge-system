@@ -1,0 +1,375 @@
+[
+  {
+    "id": "git-init",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 3208124
+  },
+  {
+    "id": "git-add",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 1828229
+  },
+  {
+    "id": "git-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "recovery baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 3871740
+  },
+  {
+    "id": "init",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "init",
+      "--src",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "--dataset",
+      "/home/runner/work/_temp/ks-native-recovery/dataset",
+      "--config-out",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 12139202
+  },
+  {
+    "id": "baseline",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "setup",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml",
+      "--version",
+      "baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 492968002
+  },
+  {
+    "id": "runtime-config",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/home/runner/work/_temp/ks-native-recovery/dataset/current",
+      "--source-root",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "--sanitize-rules",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/policies/sanitization_rules.yaml",
+      "--out",
+      "/home/runner/work/_temp/ks-native-recovery/runtime.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 6398962
+  },
+  {
+    "id": "baseline-capture",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/home/runner/work/_temp/ks-native-recovery/baseline-requests.json",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/runtime.yaml",
+      "--output",
+      "/home/runner/work/_temp/ks-native-recovery/baseline-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 69961560
+  },
+  {
+    "id": "second-add",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "add",
+      "README.md"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 2273995
+  },
+  {
+    "id": "second-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "recovery update"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 4296740
+  },
+  {
+    "id": "test-gate-failure",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "setup",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml",
+      "--version",
+      "failed-test",
+      "--gate-test-bin",
+      "/bin/false"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 411413629
+  },
+  {
+    "id": "vector-build-failure",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "setup",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml",
+      "--version",
+      "failed-vector",
+      "--vector-bin",
+      "/home/runner/work/_temp/ks-native-recovery/fail-vector.py"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 309697929
+  },
+  {
+    "id": "corrupt-target-rollback",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "rollback",
+      "corrupt-target",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 7233549
+  },
+  {
+    "id": "updated-build",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "setup",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml",
+      "--version",
+      "updated"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 454217591
+  },
+  {
+    "id": "updated-capture",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/home/runner/work/_temp/ks-native-recovery/updated-requests.json",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/runtime.yaml",
+      "--output",
+      "/home/runner/work/_temp/ks-native-recovery/updated-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 66061212
+  },
+  {
+    "id": "normal-rollback",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "rollback",
+      "baseline",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 26423872
+  },
+  {
+    "id": "normal-rollback-capture",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/home/runner/work/_temp/ks-native-recovery/normal-rollback-requests.json",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/runtime.yaml",
+      "--output",
+      "/home/runner/work/_temp/ks-native-recovery/normal-rollback-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 66225447
+  },
+  {
+    "id": "reactivate-updated",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "rollback",
+      "updated",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 11015474
+  },
+  {
+    "id": "corrupt-current-direct-rollback",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "rollback",
+      "baseline",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/setup.yaml"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 6531480
+  },
+  {
+    "id": "restore-backup",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "rollback",
+      "restored",
+      "--out",
+      "/home/runner/work/_temp/ks-native-recovery/restored-dataset"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 12974779
+  },
+  {
+    "id": "recovered-runtime-config",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/home/runner/work/_temp/ks-native-recovery/restored-dataset/current",
+      "--source-root",
+      "/home/runner/work/_temp/ks-native-recovery/src",
+      "--sanitize-rules",
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/policies/sanitization_rules.yaml",
+      "--out",
+      "/home/runner/work/_temp/ks-native-recovery/recovered-runtime.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 5651848
+  },
+  {
+    "id": "restored-capture",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/home/runner/work/_temp/ks-native-recovery/restored-requests.json",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/recovered-runtime.yaml",
+      "--output",
+      "/home/runner/work/_temp/ks-native-recovery/restored-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 65848820
+  },
+  {
+    "id": "source-removed-capture",
+    "argv": [
+      "/home/runner/work/_temp/ks-native-package/unpacked/knowledge-system-linux-amd64-a8a7bfaa4327/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/home/runner/work/_temp/ks-native-recovery/source-removed-requests.json",
+      "--config",
+      "/home/runner/work/_temp/ks-native-recovery/recovered-runtime.yaml",
+      "--output",
+      "/home/runner/work/_temp/ks-native-recovery/source-removed-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 65885949
+  }
+]

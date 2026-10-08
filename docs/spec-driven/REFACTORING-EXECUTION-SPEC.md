@@ -263,11 +263,11 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 
 - [x] N15-A 현재 소스 commit·Go/native dependency·패키지/바이너리/고지 SHA와 clean build receipt 결합.
 - [x] N15-B 추출 패키지의 별도 프로젝트 설치/재시작/갱신/rollback 및 외부 Go 모듈의 v1/v2 공개 계약·입력 거부 확인.
-- [ ] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
+- [x] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
 - [ ] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
 - [ ] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
 
-현재 Darwin 구조 시험과 native CI 작업 정의를 준비한다. CI 정의만으로 실행했다고 표시하지 않는다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
+Darwin 구조 시험과 실제 native Linux AMD64 CI 실행을 대조했다. [native Linux 원자료/CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)으로 N15-C만 완료하며 D/E 전체 운영 수용을 유지한다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
 
 ## N-17: 복구 루트의 reader 보호와 실제 운영 훈련
 
@@ -284,3 +284,9 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개다. 이번 실패는 이전 N05/N04의 기록된 원자료를 바꾸지 않고 현재 복원 경로의 추가 회귀 증거로 보존한다.
 
 N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 위 A/B local 범위를 확인했다. N15-C/D/E와 N17-C/D/E의 native/실제 소비자/운영 수용 조건은 미완료다. 고지 포함 범위35모듈/4assets의 byte inventory는 갱신했으나 N16 실제 판정은 없다.
+
+2026-10-07 [실제 BGE-M3 작은 호환성 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md): 같은 clean Darwin 패키지의3소유 fixture 설치/재시작/갱신/rollback 및6dataset의 승인 digest/native1024 확인, MCP compact7·CKV6응답 통과. 현재 소스 전체 race117패키지와 도메인 자료 일치도 통과했다. N15-D의 모델 연결 부분만 검증했으며 규모/독립 운영 소비자/지원 수용이 없어 D 전체 체크는 하지 않는다. N15-C/D/E·N17-C/D/E 및 전체 완료 수는 그대로다.
+
+2026-10-07 [N11 후보 출처 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md): 기존 FINAL9파일/4,800행의 SHA와 직접 인용·본문을 확인했다. lock.go의 동일 file SHA/80행 인용720개가 있지만 후보55–76행 교집합0, readonly.go 직접 인용0이다. 같은 파일/개념/이전 DEV의 오염 판정은 사람에게 남기며 새 FINAL0·질의0·N11-A–D 미완료를 유지한다. 공개d08cb384 푸시는 자동 승인 검토가 범위 미승인으로 거부했고 실행하지 않았다.
+
+2026-10-07 현재 공개 전송/CI 상태는 [native Linux CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)을 우선한다. d08cb384 공개80커밋과 source-only CI 수정d7de0b89를 전송했고 draft PR97·재실행CI5/5 통과. N15-C는 실제 native AMD64 설치/갱신/복구 증거로 체크하며 N15-D/E·N17-C/D/E와 전체8/18·요청5/15·잔여10개는 유지한다. 앞의 CI 미실행/전송 거부 문구는 당시 이력이다.

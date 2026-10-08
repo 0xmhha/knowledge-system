@@ -1,0 +1,22 @@
+	root, err := registeredDir(projectRoot, ".cks/knowledge")
+	if err != nil {
+		return Manifest{}, err
+	}
+	buf, err := setup.ReadSourceFileNoFollow(root, "manifest.yaml", 1<<20)
+	if err != nil {
+		return Manifest{}, fmt.Errorf("pack_incompatible: read knowledge manifest: %w", err)
+	}
+	decoder := yaml.NewDecoder(bytes.NewReader(buf))
+	decoder.KnownFields(true)
+	var m Manifest
+	if err := decoder.Decode(&m); err != nil {
+		return Manifest{}, fmt.Errorf("pack_incompatible: manifest YAML: %w", err)
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		return Manifest{}, fmt.Errorf("pack_incompatible: multiple manifest YAML documents")
+	}
+	if m.SchemaVersion != 1 || strings.TrimSpace(m.ProjectID) == "" || m.OverlayRoot != ".cks/knowledge" {
+		return Manifest{}, fmt.Errorf("pack_incompatible: invalid knowledge manifest header")
+	}
+	if m.ReviewPolicy == nil {

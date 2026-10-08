@@ -1,0 +1,24 @@
+ckg: files-from-main: 34 include / 0 exclude patterns from [./cmd/graph]
+time=2026-10-07T16:14:54.775+09:00 level=INFO msg="detected files" go=437 ts=0 sol=0 proto=0
+time=2026-10-07T16:14:56.815+09:00 level=INFO msg="files-from applied" go=1172 go_after=437 ts=93 ts_after=0 sol=228 sol_after=0 proto=5 proto_after=0
+time=2026-10-07T16:15:11.007+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+time=2026-10-07T16:15:15.157+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=44 hunk_nodes=887 changed_in_edges=72233 blame_edges=437 hunk_edges=953 hunk_blobs=887 max_per_file=10
+time=2026-10-07T16:15:32.920+09:00 level=INFO msg="pr_history emitted" nodes_with_prs=1426
+time=2026-10-07T16:15:33.059+09:00 level=INFO msg="build complete" nodes=34976 edges=117173 pkg_tree_edges=33460 topic_resolutions=3
+ckg: built 34976 nodes / 117173 edges into eval/.ckg-data
+bench-mcp: graph=eval/.ckg-data iters=50 concurrency=4 probes=8
+  find_callers_d1            p50= 12.39 p95= 22.57 p99= 24.43 mean= 13.58 errors=0
+  find_callers_d2            p50= 16.24 p95= 22.77 p99= 23.76 mean= 16.77 errors=0
+  find_callees_d1            p50=  8.82 p95= 10.75 p99= 13.13 mean=  9.01 errors=0
+  find_callees_d2            p50= 12.73 p95= 22.93 p99= 23.83 mean= 13.64 errors=0
+  get_subgraph_d1            p50= 13.26 p95= 22.54 p99= 22.99 mean= 15.16 errors=0
+  get_subgraph_d2            p50= 20.62 p95= 24.57 p99= 27.76 mean= 20.92 errors=0
+  impact_of_change_d1        p50=  3.00 p95=  4.74 p99=  5.04 mean=  3.23 errors=0
+  impact_of_change_d2        p50= 10.39 p95= 13.22 p99= 17.09 mean= 10.73 errors=0
+bench-mcp: wrote eval/results/latest/bench-mcp.json
+time=2026-10-07T16:15:39.372+09:00 level=INFO msg="detected files" go=4 ts=3 sol=2 proto=0
+time=2026-10-07T16:15:40.034+09:00 level=INFO msg="xlang linked" binds_to=1
+time=2026-10-07T16:15:40.035+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+time=2026-10-07T16:15:43.261+09:00 level=INFO msg="build complete" nodes=82 edges=103 pkg_tree_edges=68 topic_resolutions=3
+ckg: built 82 nodes / 103 edges into eval/.synthetic-data
+eval-retrieval: 14/14 passed (aggregate R=1.00 P=0.90 F1=0.95)

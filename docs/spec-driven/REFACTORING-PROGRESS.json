@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "543966d3",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/formatter-manifest.json"
+    "revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json"
   },
   "tasks": [
     {
@@ -127,7 +127,11 @@
       "final_candidate_evidence_revision": "8f6e1321",
       "final_candidate_rows": 4,
       "proposed_final_fact_clusters": 2,
-      "approved_final_fact_clusters": 0
+      "approved_final_fact_clusters": 0,
+      "provenance_preparation": "docs/spec-driven/N11-CANDIDATE-PROVENANCE-AUDIT.md",
+      "provenance_evidence_revision": "9a0e65ad",
+      "provenance_manifest": "system/eval/b0-knowledge-system/refactoring-n11-provenance-audit-2026-10-07/manifest.json",
+      "provenance_verified_substep": "retained FINAL 9 files/4800 rows and compressed/decompressed SHA checked; 720 same-byte lock.go line80 citations from 3 repeated request IDs; candidate line55-76 intersection0 and readonly.go direct citations0; canonical keyword0; no semantic independence/contamination judgment, approved fresh FINAL0 and new dispatch0"
     },
     {
       "id": "N-12",
@@ -163,10 +167,17 @@
       "state": "waiting",
       "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
       "technical_evidence_revision": "de15015a",
-      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI defined but not run",
-      "waiting_for": "actual native Linux AMD64 CI/host execution, real model/scale and independent operating consumer install/upgrade acceptance",
+      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI definition subsequently exercised (see native_ci_run); approved BGE-M3 digest/native1024 on 3 small owned fixtures, 7 compact MCP and 6 CKV responses, 6 dataset identities; full root race 117 packages and generated domain artifacts passed; actual native Linux AMD64 CI on clean PR source tree: N15-C technical controls passed; 3 owned mock projects, 7 public consumer responses/4 rejections, 10 recovery responses/13 preserved payload files; both artifacts 178 extracted SHA checks each; graph/vuln toolchain mismatch fixed in source-only public CI commit, 5/5 jobs success",
+      "waiting_for": "operating scale/model support judgment and independent operating consumer install/binary-upgrade acceptance; native technical controls and small BGE wiring do not satisfy those conditions",
       "formatter_evidence_revision": "543966d3",
-      "ci_status": "defined_not_dispatched_public_transfer_pending"
+      "ci_status": "executed_native_linux_amd64_all_five_jobs_success",
+      "local_compatibility_preparation": "docs/spec-driven/N15-BGE-COMPATIBILITY-VALIDATION.md",
+      "local_compatibility_evidence_revision": "d76488b0",
+      "local_compatibility_manifest": "system/eval/b0-knowledge-system/refactoring-n15-bge-compatibility-2026-10-07/manifest.json",
+      "native_ci_preparation": "docs/spec-driven/N15-NATIVE-LINUX-CI-VALIDATION.md",
+      "native_ci_evidence_revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
+      "native_ci_manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json",
+      "native_ci_run": 37586641833
     },
     {
       "id": "N-16",
@@ -183,13 +194,61 @@
       "state": "waiting",
       "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
       "technical_evidence_revision": "de15015a",
-      "verified_substep": "new-root restore failure reproduced and reader lease preparation fixed; 9 controls, 3-package race; 10 recovery capture responses and 13 unchanged payload files; source-absent replay passed on owned mock fixture",
-      "waiting_for": "actual backup/failover owner, RTO/RPO/key/network/power host policy and operating candidate drill/acceptance"
+      "verified_substep": "new-root restore failure reproduced and reader lease preparation fixed; 9 controls, 3-package race; 10 recovery capture responses and 13 unchanged payload files; source-absent replay passed on owned mock fixture; same owned mock recovery controls also passed on actual native Linux AMD64 CI, 10 responses and 13 identical payload files; actual operating RTO/RPO remains pending",
+      "waiting_for": "actual backup/failover owner, RTO/RPO/key/network/power host policy and operating candidate drill/acceptance",
+      "native_ci_evidence_revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
+      "native_ci_manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json"
     },
     {
       "id": "N-18",
       "purpose": "기본값·출시 판정",
       "state": "pending"
     }
-  ]
+  ],
+  "pending_public_transfer": {
+    "requested_commit": "d08cb384f282f5d3cea777b9edba1748dfeea8c7",
+    "untransferred_commit_count_at_request": 80,
+    "changed_files_at_request": 9031,
+    "repository": "0xmhha/knowledge-system",
+    "visibility": "PUBLIC",
+    "branch": "feat/spec-driven-knowledge-system",
+    "actions": [
+      "push_exact_requested_commit",
+      "create_draft_PR",
+      "run_mock_native_CI_and_retain_mock_artifacts"
+    ],
+    "approval": "explicit_user_push_and_PR_instruction_approved",
+    "additional_local_receipt_revision": "d76488b0",
+    "additional_local_receipt_in_scope": false,
+    "transfer_executed": true,
+    "auto_review_reason": "새9,031파일/평가 원자료 PUBLIC 전송은 기존329becf3 승인 범위 밖이며 다음 진행 지시는 해당 범위의 승인으로 인정되지 않음",
+    "all_commits_after_requested_commit_excluded": false,
+    "additional_provenance_receipt_revision": "9a0e65ad",
+    "previous_auto_review_state": "auto_review_rejected_awaiting_explicit_user_reply",
+    "user_authorization_literal": "푸시하고 Pr생성해",
+    "requested_public_transfer_complete": true,
+    "pr_url": "https://github.com/0xmhha/knowledge-system/pull/97",
+    "pr_is_draft": false,
+    "excluded_local_receipt_revisions": [
+      "d76488b0",
+      "f928595c",
+      "9a0e65ad",
+      "47dd8bf2",
+      "c4adfd1b44598f3b13c9ba080972470b63e6ab31"
+    ],
+    "published_source_only_ci_repair": {
+      "commit": "d7de0b89216f1ae1238e4692262ea2accc37227b",
+      "parent": "d08cb384f282f5d3cea777b9edba1748dfeea8c7",
+      "paths": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    "public_head": "d7de0b89216f1ae1238e4692262ea2accc37227b",
+    "ci_run": 37586641833,
+    "ci_conclusion": "success",
+    "latest_receipt_public_transfer_executed": false,
+    "pr_review_status": "ready_for_review",
+    "ready_for_review_recorded_date": "2026-10-08",
+    "ready_for_review_reason": "CI5/5 passed; implemented PR review readiness is separate from remaining whole-project and production acceptance"
+  }
 }

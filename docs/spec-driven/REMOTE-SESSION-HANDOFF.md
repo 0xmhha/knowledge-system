@@ -1,5 +1,17 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+2026-10-08 현재 PR 상태: [PR97](https://github.com/0xmhha/knowledge-system/pull/97)을 일반 PR(ready for review)로 전환했다. 공개 head d7de0b89와 CI5/5 통과는 유지한다. 전체 미완료/출시 보류를 코드 검토 준비와 묶어 draft를 유지하던 판단을 바로잡았다. merge/출시/새 gold 승인은 없으며 전체8/18·요청5/15·잔여10개와 다음 N11/N12 실제 판정은 동일하다. 아래 draft 생성/유지 기록은 당시 이력이다.
+
+2026-10-07 최신: [PR97/native Linux CI](./N15-NATIVE-LINUX-CI-VALIDATION.md). 사용자 “푸시하고 Pr생성해”로 d08cb384의80커밋 공개 전송·draft PR97 생성 완료. graph/vuln Go 요구 불일치를 공개 source만 수정한 d7de0b89로 보완했고 재실행 CI5/5 success. 실제 Linux AMD64의 설치/재시작/갱신/복구, public consumer7응답/4거부, 복구10응답/13payload SHA와 artifact178파일 SHA를 확인하여 **N15-C 완료**. N15-D/E와 N17-C/D/E 운영 수용은 미완료. 추가 로컬 BGE/출처 receipt 및 본 native 기록은 미전송. **전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18. 다음 N11/N12 실제 판정과 독립 입력/런타임 결합.** 아래는 이전 시점 이력이다.
+
+## 현재 후속 실행: N11 후보 출처 대조·공개 전송 차단 (2026-10-07)
+
+[N11 출처 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md)를 우선한다. 기존 FINAL9파일/4,800행 SHA/직접인용/본문을 대조했다. 후보 lock.go 동일fileSHA의80행 인용720개를 확인했지만 parser55–76행 교집합0, readonly.go 직접인용0이다. 오염 부재/독립성을 승인하지 않았고4후보/2제안사실군·승인FINAL0·새질의0이다. “다음 진행”을 앞서 제시한 구체 공개전송 실행으로 해석했지만 자동 승인 검토가329becf3외 새scope 승인이 없다며 d08cb384의80커밋/9,031파일 PUBLIC 푸시를 실행 전에 거부했다. **푸시/PR/CI 실행 없음; 명시 승인 질문 대기; 우회하지 않음.** 승인 시 정확히d08cb384만 전송하고 이후 모든 로컬 BGE/출처 대조 커밋은 제외한다. **요청5/15·전체8/18, 잔여N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 native CI다.** 아래는 이전 시점 이력이다.
+
+## 현재 후속 실행: BGE-M3 작은 설치 호환성·전체 race (2026-10-07)
+
+[새 로컬 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지로 승인 BGE-M3 digest/native1024·Ollama0.35.1의3소유 fixture 설치/재시작/갱신/rollback과6dataset identity·compact MCP7/CKV6응답을 확인했다. d08cb384 전체 race117시험 패키지와 도메인 자료 일치도 통과했다. N15-D의 작은 모델 연결 부분만 검증했으며 실운영 규모/독립 소비자/native Linux·운영 판정은 미완료다. **요청5/15·전체8/18, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정·독립 gold와 native CI 실행.** 공개 전송 질문은 정확히 d08cb384의80커밋으로 고정한다. 추가 receipt/문서/진행 원장의 로컬 커밋은 그 범위 밖이며, 응답이 와도 최신 HEAD를 자동 푸시하지 않는다. 아래는 이전 시점 이력이다.
+
 ## 현재 후속 실행: N15/N17 현행 패키지·복원 결함 수정 (2026-10-07)
 
 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)을 우선한다. b006e776 clean Darwin 패키지에서3mock 설치/재시작/갱신/rollback과 외부 Go public consumer7응답·4거부 제어를 확인했다. 새 루트 복원 뒤 reader lease가 없어 MCP 시작이 실패하는 문제를 실제 발견/수정했다. missing/unsafe/live/reviewed/legacy9제어·관련3패키지 race/vet, 수정 패키지의 복구10응답·13payload SHA·source 없는 재생 통과. native Linux CI는 정의만 있고 미실행, formatter가 과거 평가 원문을 수정하지 않도록7관리 root로 제한·5제어/make fmt-check 통과, 실제 운영 소비자/권한/고지 적합성/backup/RTO/RPO 판정은 없다. **요청5/15·전체8/18 완료, 잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 판정과 독립 gold 준비 및 native CI를 위한 구체 전송 범위 확인.** 아래는 이전 시점 이력이다.
