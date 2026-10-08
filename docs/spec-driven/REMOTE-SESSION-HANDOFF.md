@@ -1,5 +1,7 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+2026-10-08 최신 하위 단계: **N12 기능 version2의 새 실제 source/CKG·CKV/관계15 준비 검증**. [증거·기준별 누락](./N12-FUNCTIONAL-V2-TRACE-PREPARATION.md) — source1,437/CKG62·CKV65/742chunks·621canonical,15proposed 관계/11canonical/74span/27문서,related race7시험24하위시험·5거부·원 source/dataset/store 없이 archive 재생 통과. 전체Go DRIFT992는 유지했다. 개별 판정0/spec_unapproved3/활성0/새FINAL0, 전체8/18·요청5/15·남은10개 유지. 다음 N12 actual foreign-code-anchor 승격·active 보존 통합 시험 보강과 N11 gold·독립성/실제 검토자 판정. 남은 전체 N08/09/10/11/12/14/15/16/17/18. 이전 후보·승인input5는 보존하며 새 관계를 독립 FINAL로 세지 않는다.
+
 2026-10-08 최신 하위 단계: **N11/N12 권고 범위2개 선택 적용**. [적용·원문 검증](./N11-N12-SCOPE-ADOPTION.md) — POLICY/TRACE 코드 계약과 실제 조직/검토 경로 구분, 새 metadata 초안7행;N12 core20보존+functional3·요구3/v2/criteria4·30source span/30digest 거부·SQLite reopen/bundle 독립 재생 확인. scope2선택은 개별 content 승인과 별도이며 reviewer name미입력/개별gold·관계·criterion0/spec_unapproved3/current0이다. 기존 pool·held 후보·승인input5는 보존했다. 전체8/18·남은10개 유지;다음 개별검토·부족 독립군 보강·새 전체 source/index 결합. 남은 N08/09/10/11/12/14/15/16/17/18. Claude/model/새FINAL0.
 
 2026-10-08 최신 하위 단계: **N09 CKV 평가 보조 함수의 빈 snippet 오판 수정**. [수정·검증](./N09-EMPTY-SNIPPET-VERIFICATION.md) — 수정 전4내용없음 사례 Verified=true/집계 오류 RED, 수정 후 empty_snippet 진단·관련2패키지 race103시험4하위시험 pass/실BGE smoke1skip·vet/boundary/format 통과. 임시Git 서명·Go cache 환경 실패는 별도 보존하고 명령 범위의 fixture 서명 설정만 조정했다. 실제 기권/인용0/새FINAL/사람 판정0, 전체8/18·남은10개 유지. 다음 N11 gold·독립성/범위·충분한 표본 보강과 N12 실제 관계 판정 후 동결/평가. 남은 전체 N08/09/10/11/12/14/15/16/17/18. Claude 실행/외부 전송0, Codex 직접 수행.

@@ -1,0 +1,473 @@
+{
+  "individual_approval_count": 0,
+  "not_FINAL_inputs": true,
+  "old_snapshot_approvals_inherited": false,
+  "relations": [
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-filtered-recall",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "filtered-nearest-chunk-search",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "evidence_ids": [
+          "ontology:92cc003cfd2fe7366aec0ba7",
+          "spec:fd690ab727beb00e32f3678f",
+          "functional-v2:anchor:SearchDetailed"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_scope": "Metadata-constrained nearest-chunk retrieval that reports bounded-search incompleteness."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T01",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+          "criterion:dfd2c7aa6d7c570e307c1aa5"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-recall",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T02",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-recall",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "criterion:dfd2c7aa6d7c570e307c1aa5",
+          "functional-v2:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-recall",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T03",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+          "criterion:358a6d16d10c52c48b7da62e"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T04",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "criterion:358a6d16d10c52c48b7da62e",
+          "functional-v2:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T05",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestSearchDetailedCancellationIsNotEmptySuccess",
+          "criterion:358a6d16d10c52c48b7da62e"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedCancellationIsNotEmptySuccess"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T06",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "criterion:358a6d16d10c52c48b7da62e",
+          "functional-v2:anchor:TestSearchDetailedCancellationIsNotEmptySuccess"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedCancellationIsNotEmptySuccess"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T07",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-source-evidence",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "evidence_ids": [
+          "ontology:88fc3ba5eeea4706742c8b32",
+          "spec:2378e41034b2ec4c22d04407",
+          "functional-v2:anchor:ValidateDatasetAlignment"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "coordinate-manifest mutations and unchanged active dataset; no end-to-end foreign actual CKG code anchor promotion in this test",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_scope": "Validation of semantic relation evidence against one captured source identity and coordinated graph/vector indexes."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T08",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "functional-v2:anchor:ValidateDatasetAlignment",
+          "functional-v2:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+          "criterion:5403bd5ea4a1e49ff7bfa6b3"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Store.PutAligned / ActivateAligned -\u003e ValidateDatasetAlignment",
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "coordinate-manifest mutations and unchanged active dataset; no end-to-end foreign actual CKG code anchor promotion in this test",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T09",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-source-evidence:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "criterion:5403bd5ea4a1e49ff7bfa6b3",
+          "functional-v2:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Store.PutAligned / ActivateAligned -\u003e ValidateDatasetAlignment",
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "coordinate-manifest mutations and unchanged active dataset; no end-to-end foreign actual CKG code anchor promotion in this test",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T10",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-ontology-fallback",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "optional-ontology-baseline-preservation",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "evidence_ids": [
+          "ontology:a730bfd122b853682bcfb631",
+          "spec:d4f99fd861a24742f2a61a31",
+          "functional-v2:anchor:applyProvidedOntology"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_scope": "Optional interpretation of concepts that preserves the baseline retrieval citation set for ambiguous or unreviewed meanings."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T11",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "functional-v2:anchor:applyProvidedOntology",
+          "functional-v2:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+          "criterion:76c68a59ebb50e2937b33681"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -\u003e applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T12",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-ontology-fallback:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "criterion:76c68a59ebb50e2937b33681",
+          "functional-v2:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -\u003e applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T13",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "functional-v2:anchor:applyProvidedOntology",
+          "functional-v2:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+          "criterion:76c68a59ebb50e2937b33681"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -\u003e applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T14",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-ontology-fallback:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "criterion:76c68a59ebb50e2937b33681",
+          "functional-v2:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -\u003e applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F2-T15",
+      "reviewer": null
+    }
+  ],
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "f83921128851b5e5bd6067419ba22ea9d9d154a545d3742d07126d36fe606c17",
+    "snapshot_id": "43ba745283e2d8d409020475708e1e9c10c99fcf3977202eea3b5f39b58555b9",
+    "source_mode": "committed",
+    "commit": "55d8e2db7a55b2956c4e89f986d0c3759fee4d25"
+  }
+}

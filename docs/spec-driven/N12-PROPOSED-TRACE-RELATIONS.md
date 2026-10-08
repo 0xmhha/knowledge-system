@@ -1,5 +1,7 @@
 # N12 실제 원문에서의 proposed trace 관계 준비
 
+2026-10-08 최신 하위 단계: **N12 기능 version2의 새 실제 source/CKG·CKV/관계15 준비 검증**. [증거·기준별 누락](./N12-FUNCTIONAL-V2-TRACE-PREPARATION.md) — source1,437/CKG62·CKV65/742chunks·621canonical,15proposed 관계/11canonical/74span/27문서,related race7시험24하위시험·5거부·원 source/dataset/store 없이 archive 재생 통과. 전체Go DRIFT992는 유지했다. 개별 판정0/spec_unapproved3/활성0/새FINAL0, 전체8/18·요청5/15·남은10개 유지. 다음 N12 actual foreign-code-anchor 승격·active 보존 통합 시험 보강과 N11 gold·독립성/실제 검토자 판정. 남은 전체 N08/09/10/11/12/14/15/16/17/18. 이전 후보·승인input5는 보존하며 새 관계를 독립 FINAL로 세지 않는다.
+
 2026-10-08 최신 하위 단계: **N12 누락 개념 경로5개 범위 대조·실제 retained matcher→stage2→V2 검증3사례 완료**. [범위 검토와 명세 초안](./N12-CONCEPT-PATH-SCOPE-REVIEW.md) — source18참조/관련5패키지17시험·32하위시험/변조6거부/권위9파일 불변. 기존 미작성5개·reviewed 경로0은 유지하며 기능 개념3개·requirement version2 초안은 미적용이다. **전체8/18·요청5/15·잔여10개**. 다음 명세 범위 선택 및 N11 gold/독립성·N12 개념/관계 판정. 남은 전체: N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 기본값·출시 판정. 아래 기록은 이전 단계의 증거를 보존한다.
 
 2026-10-08 · **13개 관계 기술 검증 완료 / 내용·관계 승인 및 N12·N14 전체 미완료**.

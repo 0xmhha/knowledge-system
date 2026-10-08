@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/vector/store/sqlitevec",
+    "./internal/system/semantic",
+    "./internal/system/composer/stage2",
+    "-run",
+    "^(TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded|TestSearchDetailedReportsCandidateLimitWithoutCompleteHits|TestSearchDetailedCancellationIsNotEmptySuccess|TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty|TestCodeAnchorRequiresSameSnapshotAndContainedASTSpan|TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline|TestStoredSharedAliasPreservesBaselineAndRetainedEvidence)$",
+    "-count=1"
+  ],
+  "cwd": "/private/tmp/ks-n12-functional-bwpjdpnf/source",
+  "source_commit": "55d8e2db7a55b2956c4e89f986d0c3759fee4d25",
+  "runtime_source_revision": "254b7c8797f804f807dc827770ffa60cc81c3949",
+  "environment_overrides": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "commit.gpgsign",
+    "GIT_CONFIG_VALUE_0": "false"
+  },
+  "semantic_linked_run": false,
+  "human_criterion_acceptance": null
+}

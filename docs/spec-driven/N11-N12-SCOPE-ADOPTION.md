@@ -1,5 +1,7 @@
 # N11/N12 권고 범위 선택과 소스 준비
 
+2026-10-08 최신 하위 단계: **N12 기능 version2의 새 실제 source/CKG·CKV/관계15 준비 검증**. [증거·기준별 누락](./N12-FUNCTIONAL-V2-TRACE-PREPARATION.md) — source1,437/CKG62·CKV65/742chunks·621canonical,15proposed 관계/11canonical/74span/27문서,related race7시험24하위시험·5거부·원 source/dataset/store 없이 archive 재생 통과. 전체Go DRIFT992는 유지했다. 개별 판정0/spec_unapproved3/활성0/새FINAL0, 전체8/18·요청5/15·남은10개 유지. 다음 N12 actual foreign-code-anchor 승격·active 보존 통합 시험 보강과 N11 gold·독립성/실제 검토자 판정. 남은 전체 N08/09/10/11/12/14/15/16/17/18. 이전 후보·승인input5는 보존하며 새 관계를 독립 FINAL로 세지 않는다.
+
 2026-10-08 · 사용자 직접 응답 **“모두 권고 방향으로 진행”**. [선택 기록](../../system/eval/b0-knowledge-system/refactoring-scope-adoption-2026-10-08/scope-selection.json). **범위2개 선택 반영·문서 소스 검증 완료, 전체8/18·남은10개 유지**.
 
 ## 선택한 내용과 목적
