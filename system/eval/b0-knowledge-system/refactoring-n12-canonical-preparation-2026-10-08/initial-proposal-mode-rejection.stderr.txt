@@ -1,0 +1,16 @@
+building graph-only source anchors; selected files 20 no CKV or model invocation
+time=2026-10-08T10:59:25.457+09:00 level=INFO msg="detected files" go=20 ts=0 sol=0 proto=0
+time=2026-10-08T10:59:25.458+09:00 level=INFO msg="Cache: bypassed (--no-cache); full rebuild"
+time=2026-10-08T10:59:27.760+09:00 level=INFO msg="files-from applied" go=1172 go_after=20 ts=93 ts_after=0 sol=228 sol_after=0 proto=5 proto_after=0
+time=2026-10-08T10:59:40.835+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+time=2026-10-08T10:59:46.768+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=2 hunk_nodes=357 changed_in_edges=5522 blame_edges=20 hunk_edges=493 hunk_blobs=357 max_per_file=1
+time=2026-10-08T10:59:55.711+09:00 level=INFO msg="pr_history emitted" nodes_with_prs=4690
+time=2026-10-08T10:59:55.767+09:00 level=INFO msg="build complete" nodes=5981 edges=13950 pkg_tree_edges=5491 topic_resolutions=3
+panic: source-mode semantic evidence requires snapshot_id
+
+goroutine 1 [running]:
+main.must(...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/.n12-anchor-driver/main.go:37
+main.main()
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/.n12-anchor-driver/main.go:116 +0x305c
+exit status 2

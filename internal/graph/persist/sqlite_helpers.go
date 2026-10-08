@@ -14,7 +14,7 @@ const nodeColumns = `id, type, name, qualified_name, file_path,
 	start_line, end_line, start_byte, end_byte, language,
 	COALESCE(visibility,''), COALESCE(signature,''), COALESCE(doc_comment,''),
 	COALESCE(complexity,0), in_degree, out_degree, pagerank, usage_score,
-	confidence, COALESCE(sub_kind,''), COALESCE(attrs,'')`
+	confidence, COALESCE(sub_kind,''), COALESCE(attrs,''), COALESCE(canonical_id,'')`
 
 // queryEdgesChunk is the per-chunk size for QueryEdgesForNodes. SQLite's
 // SQLITE_MAX_VARIABLE_NUMBER caps single-statement parameters; default is 999
@@ -51,7 +51,7 @@ func scanNodes(rows *sql.Rows) ([]types.Node, error) {
 			&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
 			&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
 			&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
-			&conf, &n.SubKind, &attrs); err != nil {
+			&conf, &n.SubKind, &attrs, &n.CanonicalID); err != nil {
 			return nil, fmt.Errorf("scan node row: %w", err)
 		}
 		n.Confidence = types.Confidence(conf)
@@ -78,7 +78,7 @@ func scanSearchHits(rows *sql.Rows) ([]SearchHit, error) {
 			&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
 			&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
 			&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
-			&conf, &n.SubKind, &attrs, &raw); err != nil {
+			&conf, &n.SubKind, &attrs, &n.CanonicalID, &raw); err != nil {
 			return nil, fmt.Errorf("scan search hit row: %w", err)
 		}
 		n.Confidence = types.Confidence(conf)

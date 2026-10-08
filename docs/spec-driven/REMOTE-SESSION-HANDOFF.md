@@ -1,5 +1,7 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+2026-10-08 N12 추가 진행: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md) — 현행 원문69참조/코드canonical36참조(고유33), wrong evidence7거부; 공통SQLite 조회 canonical_id 누락 수정·8경로 회귀와 증분캐시 검증. 전체 root capture의 public.pem 정책 거부는 미완료로 보존. 사람 내용·관계 판정/통합capture·lock·CKV·승격 대기, 전체8/18·요청5/15·잔여10개 유지.
+
 2026-10-08 N11 다음 세부 단계: [후보 범위·좌표 대조](./N11-COVERAGE-CANDIDATE-REVIEW.md)의 작성11개 중 과거관측 동일군2개를 제외해9후보/제안군6개가 남았다. DEV04 근거는 동일본문265–439행으로 재결합했고, 제외 재삽입 방지22시험·실제초안CLI/runner 거부(질의/예약0)를 확인했다. **승인FINAL0·전체8/18·요청5/15·잔여 N08/09/10/11/12/14/15/16/17/18 10개**, 다음 실제gold/범주/독립성·오염·무답/N12 판정과 충분한독립입력 준비다. 아래는 이전 시점 이력이다.
 
 2026-10-08 N14 보강: [실제 변경 검토 자료](./N14-ACTUAL-CHANGE-REVIEW.md)를 준비했다. 머지PR97의7변경 파일/11span과 새 exact5 test run·pass를 대조했으며 제안 연결/승인null을 유지한다. 실제 canonical trace·patch candidate/linked run·사람 수용·승격/반려/rollback은 미완료다. 우선순위와 남은 전체는 [완료 계획](./REFACTORING-COMPLETION-PLAN-2026-10-08.md)을 따른다. **전체8/18·요청5/15·잔여10개**, 다음 N11/N12 실제 판정과 독립 입력/actual candidate 결합.

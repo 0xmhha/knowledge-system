@@ -114,6 +114,28 @@ func TestIncremental_OneFileChanged(t *testing.T) {
 	src := makeMiniGoModule(t)
 	out := t.TempDir()
 	first := runBuild(t, src, out)
+	checkCachedCanonical := func() {
+		t.Helper()
+		store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() { _ = store.Close() }()
+		nodes, err := store.NodesByFilePath("b.go")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, n := range nodes {
+			if n.Name == "Mul" {
+				if n.CanonicalID != "example.com/cachetest.Mul" {
+					t.Fatalf("cached file lost canonical symbol identity: %q", n.CanonicalID)
+				}
+				return
+			}
+		}
+		t.Fatal("cached Mul symbol missing")
+	}
+	checkCachedCanonical()
 
 	firstByPath := map[string]persist.FileEntry{}
 	for _, e := range first.Files {
@@ -134,6 +156,7 @@ var _ = 0
 `)
 
 	second := runBuild(t, src, out)
+	checkCachedCanonical()
 	secondByPath := map[string]persist.FileEntry{}
 	for _, e := range second.Files {
 		secondByPath[e.Path] = e

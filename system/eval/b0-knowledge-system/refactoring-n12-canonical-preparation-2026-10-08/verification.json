@@ -1,0 +1,61 @@
+{
+  "status": "current_source_and_canonical_controls_verified_N12_incomplete",
+  "source_input_commit": "24266f3015489559249e2f810028d4bf3da70c52",
+  "execution_scope": "Darwin ARM64; graph built before reader fix at source_input_commit; current reader patch consumes same DB",
+  "source_refs_verified": 69,
+  "source_items": 33,
+  "code_test_refs_resolved": 36,
+  "unique_canonical_ids": 33,
+  "canonical_negative_controls_rejected": 7,
+  "shared_reader_regression_red_identity_loss_paths": 8,
+  "shared_reader_regression_green_paths": 8,
+  "actual_cold_incremental_canonical_retention": "pass",
+  "go_tests": {
+    "tests-green": {
+      "decompressed_sha256": "480f9ff8604fe75e32b9e5f882e60fb68e3835f2374fd9f54dd6fe237873fa55",
+      "packages_pass": 5,
+      "packages_no_tests": 0,
+      "top_level_tests_pass": 240,
+      "subtests_pass": 149,
+      "tests_skipped": 4,
+      "process_exit_code": 0
+    },
+    "full-test": {
+      "decompressed_sha256": "3f145199423913c443193a1b1d1e63b68de7b67128f7dbc9f7ff827989f4b956",
+      "packages_pass": 117,
+      "packages_no_tests": 12,
+      "top_level_tests_pass": 2327,
+      "subtests_pass": 848,
+      "tests_skipped": 16,
+      "process_exit_code": 0
+    }
+  },
+  "runtime_changed_files": [
+    "internal/graph/persist/sqlite_helpers.go",
+    "internal/graph/persist/sqlite_fts.go"
+  ],
+  "approved_inputs_changed": 0,
+  "new_model_or_FINAL_queries": 0,
+  "new_FINAL_reservations": 0,
+  "actual_human_decisions": 0,
+  "new_semantic_relationships_created": 0,
+  "source_only_proposal_activated": false,
+  "full_v2_capture_status": "rejected unsafe committed PEM path; not complete",
+  "coordinated_dataset_built": false,
+  "native_Linux_for_this_patch": "not_run",
+  "whole_N12_complete": false,
+  "requested_tasks_complete": 5,
+  "requested_tasks_total": 15,
+  "remaining_tasks": [
+    "N-08",
+    "N-09",
+    "N-10",
+    "N-11",
+    "N-12",
+    "N-14",
+    "N-15",
+    "N-16",
+    "N-17",
+    "N-18"
+  ]
+}

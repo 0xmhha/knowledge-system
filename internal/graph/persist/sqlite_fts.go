@@ -50,7 +50,7 @@ func (s *sqliteStore) SearchFTS(q string, limit int, opts SearchFTSOptions) ([]S
 		n.start_line, n.end_line, n.start_byte, n.end_byte, n.language,
 		COALESCE(n.visibility,''), COALESCE(n.signature,''), COALESCE(n.doc_comment,''),
 		COALESCE(n.complexity,0), n.in_degree, n.out_degree, n.pagerank, n.usage_score,
-		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''),
+		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''), COALESCE(n.canonical_id,''),
 		-bm25(nodes_fts) AS raw_score
 		FROM nodes_fts f
 		JOIN nodes n ON n.rowid = f.rowid
@@ -345,7 +345,7 @@ func (s *sqliteStore) SearchSubstr(q string, limit int) ([]types.Node, error) {
 		n.start_line, n.end_line, n.start_byte, n.end_byte, n.language,
 		COALESCE(n.visibility,''), COALESCE(n.signature,''), COALESCE(n.doc_comment,''),
 		COALESCE(n.complexity,0), n.in_degree, n.out_degree, n.pagerank, n.usage_score,
-		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,'')
+		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''), COALESCE(n.canonical_id,'')
 		FROM nodes n
 		WHERE n.name LIKE ? OR n.qualified_name LIKE ? LIMIT ?`, pat, pat, limit)
 	if err != nil {

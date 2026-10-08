@@ -1,0 +1,35 @@
+[
+  {
+    "step": "full_v2_capture",
+    "kind": "actual_production_policy_rejection",
+    "outcome": "root contains blocked PEM path; preserved capture protection and original evidence",
+    "full_capture_success": false
+  },
+  {
+    "step": "proposal_source_mode",
+    "kind": "preparation_driver_error",
+    "outcome": "explicit source mode without a v2 snapshot rejected; corrected to standalone historical committed-source format",
+    "human_or_quality_verdict": false
+  },
+  {
+    "step": "proposal_evidence_ids",
+    "kind": "preparation_driver_error",
+    "outcome": "relabeling old namespace retained invalid ontology evidence IDs; rejected; freshly extracted ontology/spec/markdown and kept original projections immutable",
+    "human_or_quality_verdict": false
+  },
+  {
+    "step": "canonical_reader",
+    "kind": "actual_product_bug",
+    "outcome": "DB canonical IDs exist but shared SQLite row scans omit the field; 8 correct regression cases failed before fix and actual N12 source anchors resolve after fix"
+  },
+  {
+    "step": "first_regression_fixture",
+    "kind": "test_fixture_error",
+    "outcome": "initial fixture lacked FTS rebuild; corrected before final RED; unrelated missing hits not counted as product failures"
+  },
+  {
+    "step": "second_regression_fixture",
+    "kind": "test_fixture_error",
+    "outcome": "exact symbol lookup requires full qualified_name; corrected before final RED; final RED has8 identity-loss errors and0 missing hits"
+  }
+]

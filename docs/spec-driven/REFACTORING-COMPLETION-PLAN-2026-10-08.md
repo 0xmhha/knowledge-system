@@ -13,7 +13,7 @@ PR97 head d7de0b89의 CI5/5 성공 후 사용자 지시로 main에 스쿼시 머
 | 순서 | 대상 | 목적·필요 기능 | 남은 수용과 증거 |
 |---|---|---|---|
 | P0 | 원장/완료 체크 | 기존 증거 복구와 부분 체크의 실제 커밋 결합; 완료 오표시 방지 | 부분5개(N15-A/B/C,N17-A/B)의 명세·manifest·원자료SHA·task 참조 일치, 누락/중복/미체크/거짓CI 거부. 전체8/18 유지 |
-| P1-a | N11 | 튜닝 전 DEV/FINAL 원문 gold·독립 cluster·오염 범위 및 runner 보호 동결 | DEV7/프로토콜 실제 판정; FINAL4후보/2제안군의 독립성 검토와 CODE/WHY/POLICY/TRACE/ABS 각10독립단위 충분성; source/model/config/binary/dataset·예약 결합 |
+| P1-a | N11 | 튜닝 전 DEV/FINAL 원문 gold·독립 cluster·오염 범위 및 runner 보호 동결 | DEV7/프로토콜 실제 판정; FINAL9후보/6제안군의 독립성 검토와 CODE/WHY/POLICY/TRACE/ABS 각10독립단위 충분성; source/model/config/binary/dataset·예약 결합 |
 | P1-b | N12 | 정책·ADR·메타모델/명세/기준의 실제 내용과 관계 검토 | 27항목+6주장/12관계 판정·검토자; 실제 coordinated source/lock/canonical 관계; 활동 시간 미측정은null |
 | P2-a | N08 | 근거를 정확하게 검색하도록 DEV 실패 개선 | N11 사전 동결 후 동일8arm 평가·독립 FINAL 회귀와 기존Recall/MRR/중요군 임계치·안전0 유지 |
 | P2-b | N09 | 답이 없는 경우 근거와 기권을 정확히 구분 | 원문 답가능/부재 대조; strict인용0과 실제 사람이 답변 기권해야 하는지를 별도 판정; 오인용 증가0 |
@@ -39,3 +39,5 @@ P0 검증 완료: 같은 missing-CI 음성 제어는 새 checker에서 거부되
 N14 세부 준비 완료: [실제 변경 검토 자료](./N14-ACTUAL-CHANGE-REVIEW.md)의 실제PR97 7변경 파일/11span/정확5test run·pass를 확인했다. 실제 reviewed canonical trace·hold 후보/patch register·사람 기준 판정·promote/rollback은 미완료이며 전체8/18·요청5/15·잔여10개를 유지한다.
 
 N11 다음 세부 단계: [후보 범위/출처·오염 검토](./N11-COVERAGE-CANDIDATE-REVIEW.md)의 신규7/과거4 중 같은관측군2를 제외해9후보를 유지했다. DEV04 좌표이동을 교정하고 excluded 재삽입 RED→GREEN/22시험·CLI/runner dispatch0을 확인했다. 승인FINAL0·전체8/18·요청5/15·잔여10개, 다음 실제 gold/범주/군/오염·무답 검토와 충분한독립범위 준비다.
+
+N12 다음 세부 단계: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)의 현행 원문69참조와 실제 canonical36참조를 확인하면서 공통 SQLite 조회의 ID 누락을 발견·수정했다. root source capture는 public.pem 정책 거부로 미완료이며 source-only 자료와 분리한다. 다음 N11/N12 실제 판정 반영과 approved source scope의 capture/lock 결합, 이후 N14 실제 변경 수용이다. 전체8/18·요청5/15·잔여10개를 유지한다.

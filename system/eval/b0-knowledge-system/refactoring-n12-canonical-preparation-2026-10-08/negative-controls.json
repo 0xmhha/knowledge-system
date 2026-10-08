@@ -1,0 +1,44 @@
+[
+  {
+    "error": "semantic: code anchor crosses project or snapshot",
+    "name": "cross_snapshot",
+    "proposal_unchanged": true,
+    "rejected": true
+  },
+  {
+    "error": "semantic: anchor \"n12-negative:01\" does not fit CKG symbol \"github.com/0xmhha/knowledge-system/internal/setup.sourceSnapshotID\"",
+    "name": "wrong_path",
+    "proposal_unchanged": true,
+    "rejected": true
+  },
+  {
+    "error": "semantic: anchor \"n12-negative:02\" does not fit CKG symbol \"github.com/0xmhha/knowledge-system/internal/setup.sourceSnapshotID\"",
+    "name": "outside_AST_span",
+    "proposal_unchanged": true,
+    "rejected": true
+  },
+  {
+    "error": "semantic: CKG canonical_id \"not-a-real-canonical-id\" not found",
+    "name": "missing_canonical",
+    "proposal_unchanged": true,
+    "rejected": true
+  },
+  {
+    "error": "semantic: anchor \"n12-negative:04\" is not code or test evidence",
+    "name": "document_as_code",
+    "proposal_unchanged": true,
+    "rejected": true
+  },
+  {
+    "error": "evidence \"n12-source-anchor:36\" source digest mismatch",
+    "name": "wrong_span_SHA",
+    "rejected": true,
+    "scope": "source validation independently required after anchor attachment"
+  },
+  {
+    "error": "semantic vector manifest: open /private/tmp/ks-n12-canonical-3166049601/absent-vector/manifest.json: no such file or directory",
+    "name": "no_coordinated_vector",
+    "rejected": true,
+    "scope": "graph-only source proposal cannot be an aligned dataset"
+  }
+]

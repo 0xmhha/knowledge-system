@@ -1,0 +1,221 @@
+package main
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"log/slog"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
+	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
+	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+	graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+	graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
+)
+
+type structManifest = persist.Manifest
+
+type anchor struct {
+	ReviewID    string `json:"review_id"`
+	Role        string `json:"role"`
+	Path        string `json:"path"`
+	First       int    `json:"first"`
+	Last        int    `json:"last"`
+	FileSHA     string `json:"file_sha256"`
+	ContentSHA  string `json:"content_sha256"`
+	Declaration string `json:"declaration"`
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+func digest(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }
+func save(path string, value any) {
+	b, err := json.MarshalIndent(value, "", "  ")
+	must(err)
+	must(os.WriteFile(path, append(b, '\n'), 0600))
+}
+func copyProjection(p semantic.Projection) semantic.Projection {
+	b, err := json.Marshal(p)
+	must(err)
+	var q semantic.Projection
+	must(json.Unmarshal(b, &q))
+	return q
+}
+
+func main() {
+	root, err := os.Getwd()
+	must(err)
+	out := filepath.Join(root, "system/eval/b0-knowledge-system/refactoring-n12-canonical-preparation-2026-10-08")
+	revBytes, err := exec.Command("git", "rev-parse", "HEAD").Output()
+	must(err)
+	rev := strings.TrimSpace(string(revBytes))
+	raw, err := os.ReadFile(filepath.Join(out, "anchor-inputs.json"))
+	must(err)
+	var anchors []anchor
+	must(json.Unmarshal(raw, &anchors))
+	temp := ""
+	if len(os.Args) == 2 {
+		temp = os.Args[1]
+		if !strings.HasPrefix(temp, "/private/tmp/ks-n12-canonical-") {
+			panic("reuse path outside owned namespace")
+		}
+	} else {
+		temp, err = os.MkdirTemp("/private/tmp", "ks-n12-canonical-")
+		must(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+	buildRoot := filepath.Join(temp, "restored-source")
+	// Source-only read inspection after the product's full-capture policy rejection.
+	// This independent Git checkout is not a retained v2 capture or dataset.
+	if len(os.Args) != 2 {
+		branch, err := exec.Command("git", "branch", "--show-current").Output()
+		must(err)
+		cmd := exec.CommandContext(ctx, "git", "clone", "--no-hardlinks", "--single-branch", "--branch", strings.TrimSpace(string(branch)), root, buildRoot)
+		cloneLog, err := cmd.CombinedOutput()
+		must(os.WriteFile(filepath.Join(out, "git-restore.stderr.txt"), cloneLog, 0600))
+		must(err)
+	}
+	head, err := exec.Command("git", "-C", buildRoot, "rev-parse", "HEAD").Output()
+	must(err)
+	if strings.TrimSpace(string(head)) != rev {
+		panic("restored source HEAD mismatch")
+	}
+	paths := map[string]bool{}
+	for _, a := range anchors {
+		b, err := os.ReadFile(filepath.Join(buildRoot, a.Path))
+		must(err)
+		if digest(b) != a.FileSHA {
+			panic("restored file SHA mismatch: " + a.Path)
+		}
+		paths[a.Path] = true
+	}
+	selected := []string{}
+	for p := range paths {
+		selected = append(selected, p)
+	}
+	sort.Strings(selected)
+	graphDir := filepath.Join(temp, "graph")
+	fmt.Fprintln(os.Stderr, "building graph-only source anchors; selected files", len(selected), "no CKV or model invocation")
+	var manifest structManifest
+	if len(os.Args) == 2 {
+		b, err := os.ReadFile(filepath.Join(graphDir, "manifest.json"))
+		must(err)
+		must(json.Unmarshal(b, &manifest))
+	} else {
+		manifest, err = buildpipe.Run(buildpipe.Options{SrcRoot: buildRoot, OutDir: graphDir, Languages: []string{"go"}, NoCache: true, Filter: &filterlist.FilterList{Include: selected}, Logger: slog.New(slog.NewTextHandler(os.Stderr, nil)), TemporalDepth: 1, CKGVersion: "n12-source-anchor-preparation"})
+		must(err)
+	}
+	if manifest.SrcCommit != rev || manifest.ParseErrorsCount != 0 {
+		panic("graph source/parse failure")
+	}
+	graph, err := graphstore.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
+	must(err)
+	defer graph.Close()
+	// The proposal namespace is deliberately not a coordinated dataset ID.
+	pRaw, err := os.ReadFile(filepath.Join(root, "system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/projection-proposed.json"))
+	must(err)
+	var p semantic.Projection
+	must(json.Unmarshal(pRaw, &p))
+	p.Snapshot = semantic.Snapshot{ProjectID: "knowledge-system", DatasetID: "source-anchor-proposal-" + rev[:12], Commit: rev}
+	for i := range p.Evidence {
+		p.Evidence[i].Snapshot = p.Snapshot
+	}
+	must(p.ValidateSources(ctx, buildRoot))
+	resolved := []map[string]any{}
+	missing := []map[string]any{}
+	for i, a := range anchors {
+		nodes, err := graph.NodesByFilePath(a.Path)
+		must(err)
+		matches := []graphtypes.Node{}
+		for _, n := range nodes {
+			if n.CanonicalID != "" && n.StartLine == a.First && n.EndLine >= a.Last {
+				matches = append(matches, n)
+			}
+		}
+		if len(matches) != 1 {
+			missing = append(missing, map[string]any{"review_id": a.ReviewID, "role": a.Role, "source": a, "match_count": len(matches), "state": "unresolved_no_semantic_link"})
+			continue
+		}
+		n := matches[0]
+		kind := semantic.SourceCode
+		if strings.HasSuffix(a.Path, "_test.go") {
+			kind = semantic.SourceTest
+		}
+		e := semantic.EvidenceSpan{ID: fmt.Sprintf("n12-source-anchor:%02d", i+1), Snapshot: p.Snapshot, Kind: kind, Path: a.Path, StartLine: a.First, EndLine: a.Last, ContentSHA256: a.ContentSHA, CanonicalID: n.CanonicalID, Extractor: "n12-current-source-canonical-proposal-v1"}
+		must(semantic.AttachCodeEvidence(&p, graph, e))
+		resolved = append(resolved, map[string]any{"review_id": a.ReviewID, "role": a.Role, "source": a, "canonical_id": n.CanonicalID, "node_id": n.ID, "node_type": n.Type, "node_start_line": n.StartLine, "node_end_line": n.EndLine, "evidence_id": e.ID, "state": "source_anchor_attached_only", "human_decision": nil, "semantic_relation_created": false})
+	}
+	if len(resolved) == 0 {
+		panic("no code anchors resolved")
+	}
+	must(p.ValidateSources(ctx, buildRoot))
+	must(semantic.ValidateCodeAnchors(p, graphDir))
+	valid := p.Evidence[len(p.Evidence)-1]
+	negatives := []map[string]any{}
+	cases := []struct {
+		name string
+		edit func(*semantic.EvidenceSpan)
+	}{
+		{"cross_snapshot", func(e *semantic.EvidenceSpan) { e.Snapshot.SnapshotID = strings.Repeat("0", 64) }},
+		{"wrong_path", func(e *semantic.EvidenceSpan) { e.Path = "internal/setup/not-the-symbol.go" }},
+		{"outside_AST_span", func(e *semantic.EvidenceSpan) { e.EndLine += 10000 }},
+		{"missing_canonical", func(e *semantic.EvidenceSpan) { e.CanonicalID = "not-a-real-canonical-id" }},
+		{"document_as_code", func(e *semantic.EvidenceSpan) { e.Kind = semantic.SourceDocument }},
+	}
+	for i, tc := range cases {
+		q := copyProjection(p)
+		before, err := json.Marshal(q)
+		must(err)
+		e := valid
+		e.ID = fmt.Sprintf("n12-negative:%02d", i)
+		tc.edit(&e)
+		err = semantic.AttachCodeEvidence(&q, graph, e)
+		if err == nil {
+			panic("negative accepted: " + tc.name)
+		}
+		after, marshalErr := json.Marshal(q)
+		must(marshalErr)
+		if string(before) != string(after) {
+			panic("rejected anchor changed proposal")
+		}
+		negatives = append(negatives, map[string]any{"name": tc.name, "rejected": true, "error": err.Error(), "proposal_unchanged": true})
+	}
+	tampered := copyProjection(p)
+	tampered.Evidence[len(tampered.Evidence)-1].ContentSHA256 = strings.Repeat("0", 64)
+	err = tampered.ValidateSources(ctx, buildRoot)
+	if err == nil {
+		panic("wrong span SHA accepted")
+	}
+	negatives = append(negatives, map[string]any{"name": "wrong_span_SHA", "rejected": true, "error": err.Error(), "scope": "source validation independently required after anchor attachment"})
+	// A graph-only proof must fail the three-layer alignment gate.
+	err = semantic.ValidateDatasetAlignment(p, buildRoot, graphDir, filepath.Join(temp, "absent-vector"))
+	if err == nil {
+		panic("graph-only proposal passed coordinated alignment")
+	}
+	negatives = append(negatives, map[string]any{"name": "no_coordinated_vector", "rejected": true, "error": err.Error(), "scope": "graph-only source proposal cannot be an aligned dataset"})
+	graphBytes, err := os.ReadFile(filepath.Join(graphDir, "graph.db"))
+	must(err)
+	save(filepath.Join(out, "source-restoration.json"), map[string]any{"source_commit": rev, "independent_restored_HEAD": strings.TrimSpace(string(head)), "working_directory": temp, "restoration": "independent Git clone --no-hardlinks; selected code/source SHA verified", "full_v2_capture": "rejected by policy; not retried or relaxed", "v2_snapshot_identity": nil, "coordinated_dataset": false})
+	save(filepath.Join(out, "graph-manifest.json"), manifest)
+	save(filepath.Join(out, "canonical-anchors.json"), resolved)
+	save(filepath.Join(out, "unresolved-anchors.json"), missing)
+	save(filepath.Join(out, "projection-code-anchors-proposed.json"), p)
+	save(filepath.Join(out, "negative-controls.json"), negatives)
+	save(filepath.Join(out, "canonical-summary.json"), map[string]any{"status": "graph_only_source_anchor_preparation_verified", "source_commit": rev, "selected_code_test_files": selected, "anchor_refs": len(anchors), "resolved_anchor_refs": len(resolved), "unresolved_anchor_refs": len(missing), "graph_db_sha256": digest(graphBytes), "graph_source_commit": manifest.SrcCommit, "parse_errors": manifest.ParseErrorsCount, "unresolved_graph_refs": manifest.UnresolvedRefsCount, "source_validation": "pass", "canonical_validation": "pass", "negative_controls_rejected": len(negatives), "human_approved": 0, "semantic_relationships_created": 0, "semantic_activated": false, "coordinated_dataset_built": false, "new_model_queries": 0, "full_N12_complete": false})
+	fmt.Fprintf(os.Stderr, "N12 preparation verified: %d/%d anchor refs, %d unresolved, %d negative controls; no human approval or activation\n", len(resolved), len(anchors), len(missing), len(negatives))
+}
+
+func fileDigest(path string) string { b, err := os.ReadFile(path); must(err); return digest(b) }
