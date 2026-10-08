@@ -1,0 +1,43 @@
+{
+  "go_version": "go version go1.26.8 darwin/arm64",
+  "platform": "Darwin arm64",
+  "vet": {
+    "argv": [
+      "go",
+      "vet",
+      "./internal/vector/query",
+      "./pkg/vector/ckv"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "evidence": "parent executed with cache access; tool completion exit0"
+  },
+  "boundaries": {
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ],
+    "exit_code": 0,
+    "output": "engine boundaries: OK",
+    "evidence": "parent tool completion"
+  },
+  "format": {
+    "argv": [
+      "gofmt",
+      "-l",
+      "internal/vector/query/hallucination.go",
+      "internal/vector/query/hallucination_test.go"
+    ],
+    "exit_code": 0,
+    "stdout": ""
+  },
+  "skipped_tests": [
+    {
+      "test": "TestGoStablenetBgeM3Smoke",
+      "package": "github.com/0xmhha/knowledge-system/pkg/vector/ckv"
+    }
+  ],
+  "whole_go_suite_run": false,
+  "native_Linux_run": false,
+  "actual_Claude_model_runs": 0
+}
