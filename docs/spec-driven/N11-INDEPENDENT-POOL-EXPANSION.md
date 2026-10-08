@@ -1,5 +1,7 @@
 # N11 독립 FINAL 후보 보강과 검토 범위의 부족분
 
+2026-10-08 최신 하위 단계: **N11 과거 응답 본문 노출 대조·범위 결정 안내**. [추가 감사](./N11-RESPONSE-EXPOSURE-AUDIT.md) — 26source refs/27gzip/11,632행·71,542body·graph neighbor0을 확인하고 이미 제외한 CAND05의104행이480응답에서 원문과 동일 바이트임을 재확인했다. 나머지 문자열 일치0을 독립성 승인으로 쓰지 않는다. [다음 범위 선택](./N11-N12-SCOPE-DECISIONS.md)을 요청했으며 책/gold/protocol/승인/새FINAL0은 유지한다. **전체8/18·요청5/15·남은10개**. 다음 범위·검토자 응답과 문항/관계별 판정, 부족 독립 표본 보강이다. 남은 전체: N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 기본값·출시 판정. 이전 단계의 증거는 각 커밋에서 보존한다.
+
 2026-10-08 · **검토 자료 준비 완료 / N11 전체 미완료** · [후보 책](../../system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08/candidate-question-book.json) · [실측 대조](../../system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08/summary.json) · [판정 양식](../../system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08/review-worksheet.json)
 
 목적은 반복·번역·기존 관측을 새 표본으로 세지 않고, 기존 목표의 검색 품질/정책/추적/기권을 평가할 독립 사실군을 확보하는 것이다. 질문을 많이 작성했다는 이유로 평가 준비나 제품을 완료 처리하지 않는다. 중요군별 **승인된 독립 FINAL 10개 이상** 조건은 유지한다.
