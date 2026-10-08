@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/setup"
-	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 )
 
 func patchVersion(t *testing.T, source, dataset, version string) *setup.DatasetIdentity {
@@ -119,18 +118,12 @@ func TestReviewedPromotionRechecksActiveBaseAtSwap(t *testing.T) {
 }
 
 func TestCriterionPromotionRejectsCommandOnlySuccess(t *testing.T) {
-	snapshot := semantic.Snapshot{ProjectID: "p", DatasetID: "d", SnapshotID: strings.Repeat("a", 64)}
-	projection := semantic.Projection{Snapshot: snapshot,
-		Requirements: []semantic.Requirement{{ID: "R", AcceptanceCriteria: []semantic.AcceptanceCriterion{{ID: "C"}}}},
-		Assertions: []semantic.Assertion{{ID: "check", Predicate: semantic.PredicateCheckedBy,
-			Status: semantic.StatusVerified, SubjectID: "C", ObjectID: "test"}}}
-	run := semantic.TestRun{Snapshot: snapshot, CriterionID: "C", TestCanonicalID: "test",
-		CommandPassed: true, SnapshotConsistent: true, ExitCode: 0,
-		CheckedAssertions: []string{"check"}, CommandSHA256: strings.Repeat("b", 64), OutputSHA256: strings.Repeat("c", 64)}
+	projection, run := linkedRunFixture()
+	run.Framework, run.TestName, run.TestObserved, run.TestPassed = "", "", false, false
 	if err := validateRun(projection, "C", run); err == nil {
 		t.Fatal("a successful arbitrary command was accepted as exact test proof")
 	}
-	run.Framework, run.TestName, run.TestObserved, run.TestPassed = "go-test-json", "TestExact", true, true
+	run.Framework, run.TestName, run.TestObserved, run.TestPassed = "go-test-json", "TestAlpha", true, true
 	if err := validateRun(projection, "C", run); err != nil {
 		t.Fatalf("observed exact test was rejected: %v", err)
 	}
