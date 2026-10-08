@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-08 최신 하위 단계: **N11/N12 권고 범위2개 선택 적용**. [적용·원문 검증](./N11-N12-SCOPE-ADOPTION.md) — POLICY/TRACE 코드 계약과 실제 조직/검토 경로 구분, 새 metadata 초안7행;N12 core20보존+functional3·요구3/v2/criteria4·30source span/30digest 거부·SQLite reopen/bundle 독립 재생 확인. scope2선택은 개별 content 승인과 별도이며 reviewer name미입력/개별gold·관계·criterion0/spec_unapproved3/current0이다. 기존 pool·held 후보·승인input5는 보존했다. 전체8/18·남은10개 유지;다음 개별검토·부족 독립군 보강·새 전체 source/index 결합. 남은 N08/09/10/11/12/14/15/16/17/18. Claude/model/새FINAL0.
+
 2026-10-08 최신 하위 단계: **N09 CKV 평가 보조 함수의 빈 snippet 오판 수정**. [수정·검증](./N09-EMPTY-SNIPPET-VERIFICATION.md) — 수정 전4내용없음 사례 Verified=true/집계 오류 RED, 수정 후 empty_snippet 진단·관련2패키지 race103시험4하위시험 pass/실BGE smoke1skip·vet/boundary/format 통과. 임시Git 서명·Go cache 환경 실패는 별도 보존하고 명령 범위의 fixture 서명 설정만 조정했다. 실제 기권/인용0/새FINAL/사람 판정0, 전체8/18·남은10개 유지. 다음 N11 gold·독립성/범위·충분한 표본 보강과 N12 실제 관계 판정 후 동결/평가. 남은 전체 N08/09/10/11/12/14/15/16/17/18. Claude 실행/외부 전송0, Codex 직접 수행.
 
 2026-10-08 최신 하위 단계: **Codex 직접 N11 추가 원문8범위·응답 두 표면 조사**. [조사와 보류](./N11-SOURCE-PROBE-INVESTIGATION.md) — source8+기존 제외 기준1, 고정 Markdown259개와27gzip/11,632행을 대조했다. response.content23,262문자열을 추가 검사했고 기존CAND05의480노출을 재확인했다. 6범위는 이전 설계·튜닝으로 격리,2개는 의미 중복 검토가 필요한 비실행 초안으로 보류했다. 기존DEV7/FINAL후보13/제안군8/제외6·승인0, 전체8/18·남은10개 유지. 다음 실제 범위/개별 gold·독립성·관계 판정과 더 넓은 미사용 사실군 확보. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. Claude 실행/외부 전송0이며 사용자 요청에 따라 직접 실행으로 전환했다.
