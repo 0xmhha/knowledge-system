@@ -29,13 +29,21 @@ call("semantic-build", [str(binary), "semantic", "build", "--repo", str(src), "-
 config = {"version": 1, "name": "cks", "description": "N11 frozen evaluation corpus (reviewer label: opus5.5 검토)",
     "backends": {"ckg": {"path": str(v / "graph/graph.db"), "source_root": str(src), "binary_path": str(base / "bin/ckg"), "timeout_ms": 5000},
                  "ckv": {"path": str(v / "vector"), "provider": "ollama", "binary_path": str(base / "bin/ckv"), "timeout_ms": 3000,
-                         "embed_model": "bge-m3:latest", "query_prefix_policy": "registry", "ollama_url": "http://127.0.0.1:11434"}},
+                         "embed_model": "bge-m3:latest", "embed_dim": 1024, "query_prefix_policy": "registry", "ollama_url": "http://127.0.0.1:11434"}},
     "listen": {"http_addr": "127.0.0.1:8080", "mcp_stdio": True, "transport": "stdio", "allow_remote": False},
     "logging": {"level": "info", "mode": "prod", "footprint_dir": str(base / "query-telemetry"), "measure_backend_calls": True},
     "sanitize": {"rules_path": str(ROOT / "system/policies/sanitization_rules.yaml"), "default_action": "drop", "fail_closed_on_unknown_rule": True},
     "semantic": {"store_path": str(semantic), "ontology_mode": "baseline", "ontology_budget_ms": 5000},
     "retrieval": {"recall_k": 10}}
 cfg_b = (json.dumps(config, ensure_ascii=False, indent=2) + "\n").encode()
+# Pre-dispatch guard: the runtime embedder identity implied by this config must
+# equal the index identity, or CKV opens degraded (first attempt: native:v1 vs
+# mrl-prefix-l2:v1 because embed_dim was omitted).
+vm = json.loads((v / "vector/manifest.json").read_text())
+runtime_id = dict(vm["embedding_identity_v2"], dimension_method="mrl-prefix-l2:v1" if config["backends"]["ckv"].get("embed_dim") else "native:v1")
+runtime_sum = "v2:sha256:" + sha(json.dumps(runtime_id, separators=(",", ":")).encode())
+assert runtime_sum == vm["embedding_checksum"], (runtime_sum, vm["embedding_checksum"])
+(E / "embedding-identity-guard.json").write_text(json.dumps({"index_checksum": vm["embedding_checksum"], "runtime_checksum": runtime_sum, "match": True}, indent=1) + "\n")
 (E / "runtime-config.yaml").write_bytes(cfg_b)
 commit = prep["source_commit"]
 book = json.loads((FRZ / "question-book.json").read_text()); proto = json.loads((FRZ / "protocol.json").read_text())
