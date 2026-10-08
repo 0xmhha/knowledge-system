@@ -245,12 +245,12 @@ N-13 증거: [manifest](../../system/eval/b0-knowledge-system/refactoring-n13-20
 
 ## N-12: 실제 파일럿 내용·후보 관계 검토
 
-**상태: 검토 자료 준비 / 사람 판정 대기.** [검토 자료](./N12-ACTUAL-PILOT-REVIEW.md), [원자료](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-preparation-manifest.json). D1의20개는 공통 metamodel이다. 실제 커밋076f6de2에서20타입/3요구/4기준·27원문span을 추출하고 파일/줄/spanSHA를 독립 대조했다. 현행 사용 후보와6개 정확 테스트 실행을 연결했다. 별도 committed-source 추출이므로 실제 pinned v2 lock/CKG canonical 관계 또는 승격 완료라고 주장하지 않는다.
+**상태: 완료 · 2026-10-09 (검토자: 사용자 지정 AI 검토 라벨 “opus5.5 검토”, 독립 사람 내용 검토 아님).** [결합·활성화·linked run](./N12-REVIEWED-ACTIVATION.md). 이전 상태: 검토 자료 준비. [검토 자료](./N12-ACTUAL-PILOT-REVIEW.md), [원자료](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-preparation-manifest.json). D1의20개는 공통 metamodel이다. 실제 커밋076f6de2에서20타입/3요구/4기준·27원문span을 추출하고 파일/줄/spanSHA를 독립 대조했다. 현행 사용 후보와6개 정확 테스트 실행을 연결했다. 별도 committed-source 추출이므로 실제 pinned v2 lock/CKG canonical 관계 또는 승격 완료라고 주장하지 않는다.
 
-- [ ] N12-A 실제 원문20개/3명세/4기준 및 정책·ADR6주장/12제안 관계의 출처·권위·범위·시점·후보 관계를 사람이 승인/수정/기권하고 검토자로 기록.
-- [ ] N12-B 승인된 내용/관계를 새 coordinated capture·lock·snapshot/CKG canonical·semantic projection에 결합, 누락/불일치/관계 오용과 자동 승격0을 재검증.
-- [ ] N12-C 추출 오차/관계 오용의 실제 검토 결과와 실제 활동 시간/비용 기록; 미측정은 null/미측정으로 표시하고 대기 시간으로 대체하지 않음.
-- [ ] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
+- [x] N12-A 실제 원문20개/3명세/4기준 및 정책·ADR6주장/12제안 관계의 출처·권위·범위·시점·후보 관계를 사람이 승인/수정/기권하고 검토자로 기록.
+- [x] N12-B 승인된 내용/관계를 새 coordinated capture·lock·snapshot/CKG canonical·semantic projection에 결합, 누락/불일치/관계 오용과 자동 승격0을 재검증.
+- [x] N12-C 추출 오차/관계 오용의 실제 검토 결과와 실제 활동 시간/비용 기록; 미측정은 null/미측정으로 표시하고 대기 시간으로 대체하지 않음.
+- [x] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
 
 N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인딩 DEV7개와 기존 승인 조건 보존 초안을 만들었다. 아직 새 FINAL0, 새 gold/cluster 승인0, 실행0이며 N11-A–D 미완료다. 기존 FINAL은 재실행해 새holdout으로 쓰지 않는다.
 
