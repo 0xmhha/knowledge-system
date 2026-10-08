@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "stage": "01",
+  "reference_commit": "a746e21a8d285e7139c3b7f006444dd7917029b4",
+  "destination": "Anthropic Claude service via local Claude Code",
+  "user_instruction": "각 단계마다 claude code를 실행하면서 수행해야할 동작을 prompt로 넘겨줘. 우선 한번 진행해보자. 그전에 지금까지 작업한것들은 커밋",
+  "input_files": [
+    {
+      "path": "docs/spec-driven/N11-INDEPENDENT-POOL-EXPANSION.md",
+      "sha256": "5ed928d9062c4d1e28a680fe06e488659fd31451481dd66bf3fbe469c01ebd0a",
+      "bytes": 10974,
+      "lines": 71
+    },
+    {
+      "path": "docs/spec-driven/N11-N12-SCOPE-DECISIONS.md",
+      "sha256": "d64e9dfdde925f93c6fc8cc13856af2503178fc7aac3288804643c79bd4abbc4",
+      "bytes": 3927,
+      "lines": 26
+    },
+    {
+      "path": "docs/spec-driven/REFACTORING-COMPLETION-PLAN-2026-10-08.md",
+      "sha256": "2c9d4604374a63c31b3161a00b1aa6e34aef3a37849ce685af40c0b8b51d0eb8",
+      "bytes": 14916,
+      "lines": 65
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08/candidate-question-book.json",
+      "sha256": "d7941cce8e14370ce36c4baa44ecf33c2186eeacf0fb2fa2662fa6cb723e207e",
+      "bytes": 36526,
+      "lines": 696
+    },
+    {
+      "path": "internal/system/mcp/source_guard.go",
+      "sha256": "4e8d4dda10d1fdd79199e3dd8085c7c10cb9fca270e26a652427e6d349685d2a",
+      "bytes": 729,
+      "lines": 23
+    },
+    {
+      "path": "internal/system/knowledgepack/lock.go",
+      "sha256": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+      "bytes": 8854,
+      "lines": 262
+    }
+  ],
+  "tool_access": "disabled (--tools empty); stdin input only",
+  "local_mutation": "parent writes reviewed stage documents only",
+  "excluded": "credentials; user .claude/logs; raw evaluation responses/archives/indexes; other repos",
+  "execution_state": "prepared_not_started",
+  "human_approval_generated": false
+}
