@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-09 최신 하위 단계(Claude Code): **N12 core20·기능3·요구3·기준4 기술 사전검토**. [사전검토](./N12-CORE-PREREVIEW.md) — 개념 accept13·modify10, 요구·기준 accept2·modify5. criterion-decision의 needs-review는 제품 미지원, ac-filtered-completeness는 취소를 cancelled로 반환, ontology 기준은 집합 보존 명시 필요, 한국어 용어 부분 문자열 충돌2쌍을 코드에서 재확인. 사람 판정 아님·원본 YAML 불변. 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름과 30건 판정, N11 후보 사전검토. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
+
 2026-10-09 최신 하위 단계(Claude Code): **N12 사전검토 수정10건 반영 제안**. [개정 제안](./N12-REVISED-PROPOSAL.md) — 사용자 “남은 작업별 수정을 진행해줘”를 35건 권고 채택으로 해석해 기록(확신도 Mid, 검토자 이름 없음). F3-T08/T11 대상을 code anchor gate로 바꾸고 새 관계14개(F3-R01–14)를 추가했다. 대상16개를 go/ast로 확인, 관계에 등장하는 시험11개/하위시험31 race pass. 모두 proposed·verified0, held 후보·worksheet 불변. 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름, core20·요구·기준 판정, 이후 새 capture 결합. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
 
 2026-10-09 최신 하위 단계(Claude Code): **N12 외부 snapshot 거부 gate 타입 구분**. [변경·검증](./N12-GATE-ATTRIBUTION.md) — `ErrEvidenceSnapshotMismatch`/`ErrCodeAnchorSnapshotMismatch` 추가, 기존 오류 문자열 바이트 유지. 선언만 한 상태 behavioral RED→연결 후 GREEN, semantic 의존8패키지 race251시험/264하위시험 pass. 통합 시험이 사례별 거부 gate를 특정한다. 사람 판정0·후보36353d32 불변, 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름·판정 확인과 독립 준비 작업. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
