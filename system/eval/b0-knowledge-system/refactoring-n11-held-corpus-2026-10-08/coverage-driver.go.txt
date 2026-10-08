@@ -1,0 +1,63 @@
+package main
+import(
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "net/url"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+ "github.com/0xmhha/knowledge-system/internal/setup"
+ "github.com/0xmhha/knowledge-system/internal/system/knowledgepack"
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+ graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+ _ "github.com/mattn/go-sqlite3"
+)
+func must(e error){if e!=nil{panic(e)}}
+func sha(b []byte)string{d:=sha256.Sum256(b);return hex.EncodeToString(d[:])}
+func save(p string,x any){b,e:=json.MarshalIndent(x,"","  ");must(e);must(os.WriteFile(p,append(b,'\n'),0600))}
+type ref struct{Path string `json:"path"`;First int `json:"first"`;Last int `json:"last"`;FileSHA string `json:"file_sha256"`;SpanSHA string `json:"content_sha256"`}
+type question struct{ID string `json:"id"`;Group string `json:"group"`;Split string `json:"split"`;Refs []ref `json:"evidence"`;Basis []ref `json:"abstention_basis_sources"`;Strict bool `json:"strict_zero_citations"`}
+func sourceCheck(v string,r ref)error{
+ b,_,_,e:=setup.ReadRetainedFile(v,"repo",r.Path);if e!=nil{return e};if sha(b)!=r.FileSHA{return fmt.Errorf("retained file SHA mismatch")};parts:=bytes.SplitAfter(b,[]byte{'\n'});if len(parts)>0&&len(parts[len(parts)-1])==0{parts=parts[:len(parts)-1]};if r.First<1||r.Last<r.First||r.Last>len(parts){return fmt.Errorf("invalid retained range")};if sha(bytes.Join(parts[r.First-1:r.Last],nil))!=r.SpanSHA{return fmt.Errorf("retained span SHA mismatch")};return nil
+}
+func main(){
+ root,e:=os.Getwd();must(e);out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n11-held-corpus-2026-10-08")
+ var prep struct{Base string `json:"base"`;Source string `json:"source"`;DatasetRoot string `json:"dataset_root"`};b,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e);must(json.Unmarshal(b,&prep));if !strings.HasPrefix(prep.Base,"/private/tmp/ks-n11-held-corpus-"){panic("outside owned namespace")}
+ version:=filepath.Join(prep.DatasetRoot,"n11-candidate");replay:=false;if len(os.Args)==3&&os.Args[1]=="--replay"{version=os.Args[2];replay=true;if !strings.HasPrefix(version,prep.Base+"/"){panic("outside owned replay")}}
+ identity,e:=setup.InspectVersionIdentity(version);must(e);if identity==nil{panic("missing identity")};must(setup.VerifyCandidateIdentity(version,identity.Source,identity.InputDigest));must(setup.VerifyRetainedSource(version,identity.Source));must(semantic.ValidateCanonicalCoverage(filepath.Join(version,"vector"),1))
+ instances,lock,e:=knowledgepack.LoadRetainedProjectInstances(version);must(e);if len(instances.Decisions)!=2||len(instances.Reviews)!=0{panic("human verdict changed")}
+ var book struct{Commit string `json:"source_commit"`;Questions []question `json:"questions"`};bookPath:=filepath.Join(out,"candidate-question-book.json");if replay{bookPath=filepath.Join(version,"review-inputs/question-book.json")};b,e=os.ReadFile(bookPath);must(e);must(json.Unmarshal(b,&book));if book.Commit!=identity.Source.SourceCommit{panic("book/source commit differs")}
+ graph,e:=graphstore.OpenReadOnly(filepath.Join(version,"graph/graph.db"));must(e);defer graph.Close()
+ dsn:=(&url.URL{Scheme:"file",Path:filepath.Join(version,"vector/vector.db"),RawQuery:"mode=ro"}).String();db,e:=sql.Open("sqlite3",dsn);must(e);defer db.Close()
+ ctx,cancel:=context.WithTimeout(context.Background(),5*time.Minute);defer cancel();reports:=[]map[string]any{};positive,basis:=0,0
+ for _,q:=range book.Questions{
+  for _,kind:=range []struct{name string;refs []ref}{{"positive_gold",q.Refs},{"absence_review_basis",q.Basis}}{
+   for _,r:=range kind.refs{
+    must(sourceCheck(version,r));row:=map[string]any{"question_id":q.ID,"split":q.Split,"group":q.Group,"role":kind.name,"ref":r,"retained_file_and_span_SHA_valid":true,"positive_citation_allowed":kind.name=="positive_gold"}
+    if kind.name=="positive_gold"{
+     positive++;nodes,e:=graph.NodesByFilePath(r.Path);must(e);canonical:=map[string]bool{};for _,n:=range nodes{if n.CanonicalID!=""&&n.StartLine<=r.Last&&n.EndLine>=r.First{canonical[n.CanonicalID]=true}}
+     rows,e:=db.QueryContext(ctx,`SELECT id,start_line,end_line,canonical_id,commit_hash FROM chunks WHERE file=? AND start_line<=? AND end_line>=?`,r.Path,r.Last,r.First);must(e);chunks:=[]map[string]any{};matched:=0
+     for rows.Next(){var id,c,commit string;var start,end int;must(rows.Scan(&id,&start,&end,&c,&commit));if commit!=book.Commit{panic("chunk commit differs")};same:=canonical[c];if same{matched++};chunks=append(chunks,map[string]any{"chunk_id":id,"start_line":start,"end_line":end,"canonical_id":c,"canonical_overlap":same})};must(rows.Err());must(rows.Close())
+     if len(canonical)==0||matched==0{panic("positive gold has no actual canonical/chunk overlap: "+q.ID)};row["CKG_overlapping_unique_canonical_symbols"]=len(canonical);row["CKV_overlapping_chunks"]=chunks;row["CKV_matching_canonical_chunks"]=matched;row["entire_span_index_coverage_claimed"]=false
+    }else{basis++;if len(q.Refs)!=0||!q.Strict||q.Group!="ABS"{panic("absence basis counted as positive citation")};row["strict_zero_citations"]=q.Strict;row["human_absence_judgment"]=nil}
+    reports=append(reports,row)
+   }
+  }
+ }
+ if positive!=14||basis!=2{panic("reference count changed")}
+ result:=map[string]any{"status":"held_corpus_source_and_actual_index_overlap_verified_no_human_verdict","identity":identity,"knowledge_lock_digest":lock.LockDigest,"question_rows":len(book.Questions),"positive_gold_refs":positive,"positive_refs_with_CKG_and_CKV_canonical_overlap":positive,"retained_absence_basis_refs":basis,"human_approved":0,"approved_independent_FINAL":0,"new_query_dispatches":0,"activation_count":0,"references":reports,"archive_replay":replay}
+ if replay{
+  store,e:=semantic.OpenStoreReadOnly(ctx,filepath.Join(version,"semantic/proposed.sqlite"));must(e);defer store.Close();_,e=store.Current(ctx,"knowledge-system");if !errors.Is(e,sql.ErrNoRows){panic("archive semantic current exists")}
+  stored,e:=store.Load(ctx,"knowledge-system",identity.DatasetID);must(e);must(stored.ValidateRetainedSources(version));must(semantic.ValidateDatasetAlignment(stored,prep.Source,filepath.Join(version,"graph"),filepath.Join(version,"vector")));must(semantic.ValidateCKVChunkLinks(ctx,stored,filepath.Join(version,"vector")));if stored.Knowledge==nil||stored.Knowledge.LockDigest!=lock.LockDigest{panic("archive semantic lock differs")};result["semantic_current_absent"]=true;result["semantic_retained_sources_and_chunks_verified"]=true
+  save(filepath.Join(out,"archive-replay.json"),result);fmt.Println("PASS archive replay16retained refs/14actual canonical-chunk overlaps/2uncited absence bases");return};save(filepath.Join(out,"corpus-coverage.json"),result)
+ controls:=[]map[string]any{};reject:=func(name string,e error){if e==nil{panic("negative accepted:"+name)};controls=append(controls,map[string]any{"name":name,"rejected":true,"error":e.Error()})};r:=book.Questions[0].Refs[0];x:=r;x.FileSHA=strings.Repeat("0",64);reject("wrong_retained_file_SHA",sourceCheck(version,x));x=r;x.SpanSHA=strings.Repeat("0",64);reject("wrong_retained_span_SHA",sourceCheck(version,x));x=r;x.Path="missing-source.go";reject("missing_retained_file",sourceCheck(version,x));x=r;x.First=0;reject("invalid_retained_range",sourceCheck(version,x))
+ save(filepath.Join(out,"retained-source-negative-controls.json"),controls)
+ fmt.Println("PASS16retained refs/14actual CKG-CKVcanonical overlaps/2uncited absence bases/4source controls; no query or verdict")
+}

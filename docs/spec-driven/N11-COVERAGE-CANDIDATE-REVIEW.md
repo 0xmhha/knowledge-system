@@ -93,3 +93,5 @@ ABS는 positive gold evidence가 빈 배열이며 strict_zero_citations=true다.
 CAND01–04 및 CAND07–11의 gold/범주/사실군과 개념적 오염을 실제 검토한다. CAND07/08이 TRACE 중요군에 적합하지 않으면 실제 파일럿 trace 질문으로 새로 준비한다. CAND09/10은 corpus/source 시점과 실제 무답 필요 여부·strict인용0을 따로 판정한다. 전체 입력과 모델/config/binary/dataset/runtime을 source에 결합하고 사전 동결하기 전에는 DEV도 dispatch하지 않는다. 중요군10독립단위 미만은 inconclusive/default disabled/release withheld다.
 
 현재 전체8/18·요청5/15 완료, 남은N08/09/10/11/12/14/15/16/17/18 10개. 다음은 이 후보의 실제 부분 검토 및 기존 DEV7/프로토콜·N12 실제 내용 판정 반영, 충분한 독립 FINAL 범위 준비다. 새 기본값/출시/전체 완료 체크는 없다.
+
+2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.

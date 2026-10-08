@@ -47,6 +47,21 @@ def decode(raw):
                       parse_constant=lambda value: (_ for _ in ()).throw(ValueError("nonfinite JSON")))
 
 
+def validate_source_ref(commit, ref, read_source):
+    path = ref["path"]
+    pure = PurePosixPath(path)
+    if pure.is_absolute() or ".." in pure.parts or str(pure) != path or "\\" in path:
+        raise ValueError("unsafe source path")
+    first, last = ref["first"], ref["last"]
+    if type(first) is not int or type(last) is not int:
+        raise ValueError("noninteger span")
+    source = read_source(commit, path)
+    parts = source.split(b"\n")
+    lines = [part + b"\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
+    if not 1 <= first <= last <= len(lines) or sha(source) != ref["file_sha256"] or sha(b"".join(lines[first-1:last])) != ref["content_sha256"]:
+        raise ValueError("stale source or span")
+
+
 def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_source):
     protocol, book, baseline = map(decode, (protocol_raw, questions_raw, baseline_raw))
     errors, counts = [], {group: set() for group in GROUPS}
@@ -137,20 +152,21 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
         check(isinstance(refs, list) and behavior in {"cite", "abstain"} and (behavior == "cite") == bool(refs), "evidence_behavior_mismatch:" + str(ident))
         if behavior == "abstain":
             check(group == "ABS" and q.get("strict_zero_citations") is True and bool(q.get("abstention_basis")), "abstention_scope_missing:" + str(ident))
+            # Review-only absence sources never become positive answer citations.
+            # Older textual-only basis records remain compatible; when a catalog
+            # is supplied, every declared byte/span must be bound to the corpus.
+            if "abstention_basis_sources" in q:
+                basis = q["abstention_basis_sources"]
+                valid_basis = isinstance(basis, list) and bool(basis)
+                check(valid_basis, "invalid_abstention_basis_source:" + str(ident))
+                for ref in basis if valid_basis else []:
+                    try:
+                        validate_source_ref(commit, ref, read_source)
+                    except (ValueError, KeyError, TypeError, OSError, subprocess.CalledProcessError):
+                        errors.append("invalid_abstention_basis_source:" + str(ident))
         for ref in refs if isinstance(refs, list) else []:
             try:
-                path = ref["path"]
-                pure = PurePosixPath(path)
-                if pure.is_absolute() or ".." in pure.parts or str(pure) != path or "\\" in path:
-                    raise ValueError("unsafe source path")
-                first, last = ref["first"], ref["last"]
-                if type(first) is not int or type(last) is not int:
-                    raise ValueError("noninteger span")
-                source = read_source(commit, path)
-                parts = source.split(b"\n")
-                lines = [part + b"\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
-                if not 1 <= first <= last <= len(lines) or sha(source) != ref["file_sha256"] or sha(b"".join(lines[first-1:last])) != ref["content_sha256"]:
-                    raise ValueError("stale source or span")
+                validate_source_ref(commit, ref, read_source)
             except (ValueError, KeyError, TypeError, OSError, subprocess.CalledProcessError):
                 errors.append("invalid_source_gold:" + str(ident))
         if len(errors) == case_start and split == "FINAL" and group in GROUPS:

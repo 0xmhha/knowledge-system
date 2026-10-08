@@ -157,6 +157,39 @@ class InputAuditTests(unittest.TestCase):
                 q["evidence"][0].update(first=1, last=1, file_sha256=GATE.sha(source), content_sha256=GATE.sha(b"first\rinside\r\n"))
         self.assertTrue(run(p, b, source=source)["input_ready"])
 
+    def test_declared_abstention_basis_is_source_bound_without_positive_citations(self):
+        p, b = fixture()
+        q = next(q for q in b["questions"] if q["group"] == "ABS")
+        q["abstention_basis_sources"] = copy.deepcopy(b["questions"][0]["evidence"])
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["final_independent_clusters_by_group"]["ABS"], 10)
+        self.assertEqual(q["evidence"], [])
+        self.assertTrue(q["strict_zero_citations"])
+
+    def test_changed_or_malformed_declared_abstention_basis_is_rejected(self):
+        for mode in ("file-sha", "span-sha", "range", "bool-line", "missing-path",
+                     "unsafe-path", "empty", "null", "object", "string"):
+            with self.subTest(mode=mode):
+                p, b = fixture()
+                q = next(q for q in b["questions"] if q["group"] == "ABS")
+                refs = copy.deepcopy(b["questions"][0]["evidence"])
+                if mode == "file-sha": refs[0]["file_sha256"] = "b" * 64
+                if mode == "span-sha": refs[0]["content_sha256"] = "b" * 64
+                if mode == "range": refs[0]["last"] = 2
+                if mode == "bool-line": refs[0]["first"] = True
+                if mode == "missing-path": refs[0]["path"] = "missing.go"
+                if mode == "unsafe-path": refs[0]["path"] = "../example.go"
+                if mode == "empty": refs = []
+                if mode == "null": refs = None
+                if mode == "object": refs = {"path": "example.go"}
+                if mode == "string": refs = "example.go"
+                q["abstention_basis_sources"] = refs
+                result = run(p, b)
+                self.assertFalse(result["input_ready"], result)
+                self.assertEqual(result["final_independent_clusters_by_group"]["ABS"], 9)
+                self.assertIn("invalid_abstention_basis_source:" + q["id"], result["pending_reasons"])
+
     def test_ambiguous_json_keys_and_bool_coordinate_rejected(self):
         with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
             GATE.decode(b'{"status":"approved","status":"draft"}')

@@ -43,3 +43,5 @@ python3 scripts/refactoring-eval-input-check.py \
 [개발7개 부분 검토 자료](./N11-DEV-INPUT-REVIEW.md)에 기존 질문/후보 답/출처·사실 묶음과 보존된 프로토콜 조건을 정리하고 판정을 요청했다. 원 JSON·source/spanSHA는 불변이다. 새 FINAL0이므로 전체 평가 승인으로 요청하지 않았고 부분 검토만으로 execution_ready나 N11 완료 상태를 바꾸지 않는다.
 
 [실행 보호 경로](./N11-EVALUATION-RUNNER-CONTRACT.md)를 추가했다. 기존 input checker는 기록 일관성 검사이고 execution_ready=false를 유지한다. 새 runner가 전체 승인 기록과 runtime pin·scope를 확인하고 FINAL_reserved를 내구성 저장한 뒤 실제 matrix를 호출한다. 예약 이력은 실제 응답 관측이라고 표시하지 않으며, 현재 초안은 실행 불가/새 FINAL0이다.
+
+2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.

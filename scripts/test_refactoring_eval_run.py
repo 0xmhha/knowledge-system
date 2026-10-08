@@ -64,6 +64,19 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(RUN.run(self.args,lambda *a,**k:self.fail('draft was dispatched')),2)
         self.assertEqual(before,self.args.registry.read_bytes());self.assertFalse(self.args.output.exists())
 
+    def test_changed_abstention_basis_blocks_before_output_reservation_and_child(self):
+        b = copy.deepcopy(self.b)
+        q = next(q for q in b['questions'] if q['group'] == 'ABS')
+        q['abstention_basis_sources'] = copy.deepcopy(b['questions'][0]['evidence'])
+        q['abstention_basis_sources'][0]['content_sha256'] = 'b' * 64
+        self.args.questions.write_bytes(F.encode(b))
+        self.args.review.write_bytes(F.encode(F.review(self.p, b)))
+        before = self.args.registry.read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(RUN.run(self.args,lambda *a,**k:self.fail('invalid absence basis dispatched')),2)
+        self.assertEqual(before,self.args.registry.read_bytes())
+        self.assertFalse(self.args.output.exists())
+
     def test_runtime_and_scope_must_be_frozen_before_dispatch(self):
         for mode in ('binary','config','scope','execution'):
             with self.subTest(mode=mode):
