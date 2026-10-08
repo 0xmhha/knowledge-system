@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "67d8d9aba1505469d9fa10eaebfd1823d9e7024e",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/manifest.json"
+    "revision": "b79354dedf7ef0a89f7275b1c89251a8dcc60e19",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n14-run-proof-2026-10-08/manifest.json"
   },
   "tasks": [
     {
@@ -162,7 +162,11 @@
       "scope_dependency_audit": "docs/spec-driven/N12-PROPOSED-TRACE-RELATIONS.md",
       "scope_dependency_evidence_revision": "dc3e9c6a5d7e37cc2762958b4356157002c1f51e",
       "scope_dependency_manifest": "system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/manifest.json",
-      "scope_dependency_new_independent_FINAL": 0
+      "scope_dependency_new_independent_FINAL": 0,
+      "run_proof_guard_evidence_revision": "b79354dedf7ef0a89f7275b1c89251a8dcc60e19",
+      "run_proof_guard_manifest": "system/eval/b0-knowledge-system/refactoring-n14-run-proof-2026-10-08/manifest.json",
+      "run_proof_guard_new_independent_FINAL_count": 0,
+      "run_proof_guard_does_not_freeze_or_approve_inputs": true
     },
     {
       "id": "N-12",
@@ -277,7 +281,22 @@
       "concept_path_scope_manifest": "system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/manifest.json",
       "concept_path_scope_reviewed_paths": 0,
       "concept_path_scope_linked_test_runs": 0,
-      "concept_path_scope_criterion_decisions": 0
+      "concept_path_scope_criterion_decisions": 0,
+      "run_proof_guard": "docs/spec-driven/N14-EXACT-RUN-PROOF-VALIDATION.md",
+      "run_proof_guard_manifest": "system/eval/b0-knowledge-system/refactoring-n14-run-proof-2026-10-08/manifest.json",
+      "run_proof_guard_evidence_revision": "b79354dedf7ef0a89f7275b1c89251a8dcc60e19",
+      "run_proof_guard_red_accepted_mismatches": 15,
+      "run_proof_guard_green_rejection_controls": 16,
+      "run_proof_guard_race_tests": 46,
+      "run_proof_guard_race_subtests": 31,
+      "run_proof_guard_full_Go_packages": 117,
+      "run_proof_guard_full_Go_tests": 2329,
+      "run_proof_guard_full_Go_subtests": 864,
+      "run_proof_guard_actual_held_refusals": 10,
+      "run_proof_guard_actual_linked_runs": 0,
+      "run_proof_guard_actual_human_decisions": 0,
+      "run_proof_guard_actual_patch_attempts": 0,
+      "run_proof_guard_verified_substep": "Reviewed linked path and exact TESTED_BY/CHECKED_BY complete sets, canonical test/source package argv SHA and output SHA form;15direct-validator mismatch RED ->16negative controls GREEN, positive multiple/nested proof; related race/vet/boundary/fmt and full Darwin Go117packages2329tests864subtests/16skip12no-test; actual held proposed source10linked/exact requests refused before command/canary/report,9authority SHA unchanged, no actual human/patch/promotion"
     },
     {
       "id": "N-15",
