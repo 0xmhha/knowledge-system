@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
-  "next_task": "N-12",
+  "next_task": "N-11",
   "active_source_binding": {
-    "revision": "98f7faaea2bbfabad17833eb87a0581ff28b5a99",
+    "revision": "4d3040d975facf18558c561e5c6ca3c2fe20a624",
     "manifest": "system/eval/b0-knowledge-system/refactoring-n12-reviewed-activation-2026-10-09/manifest.json"
   },
   "tasks": [
@@ -213,9 +213,9 @@
     {
       "id": "N-12",
       "purpose": "실제 파일럿 검토",
-      "state": "waiting",
+      "state": "complete",
       "preparation": "docs/spec-driven/N12-ACTUAL-PILOT-REVIEW.md",
-      "waiting_for": "Named reviewer (product ReviewedBy) for the user-adopted 35 pre-review items now applied as a revised proposal; decisions on core20, functional3, requirements3 and criteria4 wording; then new coordinated capture/CKG/CKV/projection with the changed tests and gate change, actual linked run and pilot criterion acceptance. Scope selection and adoption without a name are not verified approvals.",
+      "waiting_for": null,
       "additional_preparation": "docs/spec-driven/N12-POLICY-ADR-REVIEW.md",
       "verified_substep": "6 actual policy/ADR claims and 12 proposed assertions source-bound; 4 native CLI rejection controls; human verdict and coordinated lock/canonical binding pending",
       "preparation_revision": "f8479d5c",
@@ -389,7 +389,19 @@
       "anchor_bound_trace_verified_substep": "Fresh committed source1438/selected71, actual CKG63/CKV66/747chunks625canonical; actual anchors18/evidence81/document sections27; all17new+12legacy relations proposed, actual foreign-anchor promotion test bound to this source/index; related race8tests29subtests pass, 5projection refusals, reopened SQLite and archive1457files original source/dataset/store absent replay identical; preserved77old/approved inputs; full Go DRIFT992 retained; coordinate implementation partial and integration actual CKG/mock CKV limits explicit; no actual human/criterion acceptance/reviewed path/linked run/FINAL/activation; whole8/18 remains.",
       "assistant_prereview": "docs/spec-driven/N12-CRITERION-GAP-PREREVIEW.md",
       "assistant_prereview_substep": "Claude Code technical pre-review of F3-T01..17/claims6/legacy12 (not human); F3-T08/T11 retarget and F3-T10 Given gap recommended; criterion-gap tests for order, filtered in-flight cancellation and unverified-relation CKV+CKG baseline added and pass; reviewer and individual decisions still pending",
-      "revised_proposal": "docs/spec-driven/N12-REVISED-PROPOSAL.md"
+      "revised_proposal": "docs/spec-driven/N12-REVISED-PROPOSAL.md",
+      "evidence_revision": "4d3040d975facf18558c561e5c6ca3c2fe20a624",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n12-reviewed-activation-2026-10-09/manifest.json",
+      "required_checks": [
+        "N12-A",
+        "N12-B",
+        "N12-C",
+        "N12-D"
+      ],
+      "completion_document": "docs/spec-driven/N12-REVIEWED-ACTIVATION.md",
+      "reviewer_label": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "independent_human_content_review": false
     },
     {
       "id": "N-13",
@@ -756,6 +768,19 @@
       "docs/spec-driven/PILOT-SCOPE.json"
     ],
     "product_code_changed": false,
+    "reviewer": null,
+    "individual_human_approvals": 0,
+    "status": "PASS"
+  },
+  "latest_n12_acceptance": {
+    "revision": "4d3040d975facf18558c561e5c6ca3c2fe20a624",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n12-reviewed-activation-2026-10-09/manifest.json",
+    "document": "docs/spec-driven/N12-REVIEWED-ACTIVATION.md",
+    "unique_current_and_committed_SHA_bindings": 1523,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "changed_sources": [],
+    "product_code_changed": null,
     "reviewer": null,
     "individual_human_approvals": 0,
     "status": "PASS"
