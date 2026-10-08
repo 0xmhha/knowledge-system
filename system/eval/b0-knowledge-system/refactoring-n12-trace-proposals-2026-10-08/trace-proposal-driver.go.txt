@@ -1,0 +1,85 @@
+package main
+
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+
+ "github.com/0xmhha/knowledge-system/internal/setup"
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+
+func must(err error) { if err != nil { panic(err) } }
+func digest(b []byte) string { h:=sha256.Sum256(b);return hex.EncodeToString(h[:]) }
+func save(path string, v any) { b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600)) }
+func clone(p semantic.Projection) semantic.Projection { b,e:=json.Marshal(p);must(e);var x semantic.Projection;must(json.Unmarshal(b,&x));return x }
+func main() {
+ root,e:=os.Getwd();must(e);out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08")
+ var prep struct { Base string `json:"base"`; Source string `json:"prior_source_root"`; Version string `json:"prior_version"`; Store string `json:"new_store"` }
+ b,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e);must(json.Unmarshal(b,&prep))
+ replay:=len(os.Args)==5&&os.Args[1]=="--replay"
+ projectionPath:=filepath.Join(out,"projection-proposed.json")
+ if replay { prep.Version=os.Args[2];prep.Store=os.Args[3];projectionPath=os.Args[4];if !strings.HasPrefix(prep.Version,prep.Base+"/")||!strings.HasPrefix(projectionPath,prep.Base+"/"){panic("outside owned replay")} }
+ if !strings.HasPrefix(prep.Base,"/private/tmp/ks-n12-trace-proposals-") || !strings.HasPrefix(prep.Store,prep.Base+"/") { panic("not owned preparation") }
+ graph,vector:=filepath.Join(prep.Version,"graph"),filepath.Join(prep.Version,"vector")
+ ctx,cancel:=context.WithTimeout(context.Background(),3*time.Minute);defer cancel()
+ var p semantic.Projection;b,e=os.ReadFile(projectionPath);must(e);must(json.Unmarshal(b,&p))
+ identity,e:=setup.InspectVersionIdentity(prep.Version);must(e);if identity==nil { panic("no pinned identity") }
+ must(setup.VerifyCandidateIdentity(prep.Version,identity.Source,identity.InputDigest));must(setup.VerifyRetainedSource(prep.Version,identity.Source))
+ must(p.ValidateRetainedSources(prep.Version));must(semantic.ValidateDatasetAlignment(p,prep.Source,graph,vector));must(semantic.ValidateCodeAnchors(p,graph));must(semantic.ValidateCKVChunkLinks(ctx,p,vector))
+ if len(p.Assertions)!=25 { panic("wrong relation count") }
+ counts:=map[string]int{};for _,a:=range p.Assertions { if a.Status!=semantic.StatusProposed || a.ReviewedBy!="" { panic("false relation approval") };if strings.HasPrefix(a.ID,"trace-proposal:"){counts[a.Predicate]++} }
+ if replay {
+  ro,e:=semantic.OpenStoreReadOnly(ctx,prep.Store);must(e);defer ro.Close();stored,e:=ro.Load(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID);must(e)
+  before,e:=json.Marshal(p);must(e);after,e:=json.Marshal(stored);must(e);if !bytes.Equal(before,after){panic("replay store/projection differs")}
+  active,e:=ro.LoadAlignedRetained(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID,prep.Source,graph,vector,prep.Version);must(e);trace,e:=active.Trace();must(e)
+  for _,r:=range trace.Requirements{if r.State!=semantic.TraceSpecUnapproved||len(r.Paths)!=0{panic("replay false reviewed path")}}
+  _,e=ro.Current(ctx,p.Snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("replay current exists")}
+  save(filepath.Join(out,"archive-replay.json"),map[string]any{"restored_version":prep.Version,"restored_store":prep.Store,"projection_JSON_digest":digest(before),"source_canonical_chunk_alignment":true,"read_only_store_bytes_equal_projection":true,"trace_requirements":trace.Requirements,"semantic_current_absent":true,"model_HTTP_calls":0,"full_task_complete":false})
+  fmt.Println("PASS restored13 proposed trace relations, retained source/canonical/chunks/read-only SQLite,3unapproved requirement diagnostics/current absent");return
+ }
+ store,e:=semantic.OpenStore(prep.Store);must(e)
+ must(store.PutAlignedRetained(ctx,p,prep.Source,graph,vector,prep.Version));stored,e:=store.Load(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID);must(e)
+ original,e:=json.Marshal(p);must(e);roundtrip,e:=json.Marshal(stored);must(e);if !bytes.Equal(original,roundtrip) { panic("store roundtrip changed meaning") }
+ active,e:=store.LoadAlignedRetained(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID,prep.Source,graph,vector,prep.Version);must(e)
+ trace,e:=active.Trace();must(e);if len(trace.Requirements)!=3 {panic("missing requirement")};for _,r:=range trace.Requirements{if r.State!=semantic.TraceSpecUnapproved||len(r.Paths)!=0{panic("proposed links became reviewed paths")}}
+ plan,e:=active.Plan();must(e);for _,s:=range plan.Steps{if s.Action!=semantic.PlanReviewSpec||!s.Unconfirmed{panic("automatic acceptance plan")}}
+ for _,c:=range []string{"vector-chunk","evidence-span","concept"}{if len(active.VerifiedImplementations(c))!=0 {panic("proposed relation eligible for boost")}}
+ review,e:=p.Review(100,"n12-trace-proposals");must(e);if review.AssertionTotal!=25||review.AssertionVerified!=0||review.ConceptVerified!=0||review.RequirementVerified!=0||review.Precision!=nil||review.AssertionPrecision!=nil{panic("false human review metrics")}
+ _,e=store.Current(ctx,p.Snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("current pointer created")}
+ controls:=[]map[string]any{}
+ reject:=func(name string,err error){if err==nil{panic("accepted negative:"+name)};controls=append(controls,map[string]any{"name":name,"rejected":true,"error":err.Error()})}
+ idx:=func(pred string)int{for i,a:=range p.Assertions{if strings.HasPrefix(a.ID,"trace-proposal:")&&a.Predicate==pred{return i}};panic("missing predicate")}
+ x:=clone(p);x.Assertions[idx(semantic.PredicateImplementedBy)].ObjectID="unknown.canonical";reject("implementation_wrong_canonical",x.Validate())
+ x=clone(p);i:=idx(semantic.PredicateTestedBy);x.Assertions[i].SubjectID,x.Assertions[i].ObjectID=x.Assertions[i].ObjectID,x.Assertions[i].SubjectID;reject("reversed_code_test_endpoints",x.Validate())
+ x=clone(p);x.Assertions[idx(semantic.PredicateCheckedBy)].SubjectID="unknown-criterion";reject("missing_criterion",x.Validate())
+ x=clone(p);x.Assertions[idx(semantic.PredicateCheckedBy)].ObjectID=p.Assertions[idx(semantic.PredicateTestedBy)].SubjectID;reject("criterion_points_to_code_not_test",x.Validate())
+ x=clone(p);x.Assertions[idx(semantic.PredicateCheckedBy)].Predicate=semantic.PredicateAcceptedBy;reject("legacy_accepted_by_write_in_v4",x.Validate())
+ x=clone(p);x.Evidence[0].Snapshot.DatasetID="wrong";reject("cross_snapshot_evidence",x.Validate())
+ x=clone(p);x.Evidence[0].ContentSHA256=strings.Repeat("0",64);reject("retained_span_digest_changed",x.ValidateRetainedSources(prep.Version))
+ x=clone(p);x.Assertions[idx(semantic.PredicateImplementedBy)].Status=semantic.StatusVerified;reject("implementation_verified_without_reviewed_concept",x.Validate())
+ x=clone(p);x.Assertions=x.Assertions[:len(x.Assertions)-1];must(x.Validate());reject("immutable_store_content_replacement",store.PutAlignedRetained(ctx,x,prep.Source,graph,vector,prep.Version))
+ retained,e:=store.Load(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID);must(e);again,e:=json.Marshal(retained);must(e);if !bytes.Equal(again,original){panic("failed replacement mutated projection")}
+ // A same-snapshot, typed test anchor does not certify a semantic testing relation.
+ // Keep this deliberately mismatched proposal out of the persisted/reviewed pool.
+ var code,unrelated semantic.EvidenceSpan
+ for _,a:=range p.Evidence {if strings.Contains(a.CanonicalID,"semantic.ValidateDatasetAlignment"){code=a};if strings.Contains(a.CanonicalID,"TestProjectionRejectsCrossSnapshotOrMissingEvidence"){unrelated=a}}
+ if code.ID==""||unrelated.ID==""{panic("missing semantic boundary anchors")}
+ x=clone(p);x.Assertions=append(x.Assertions,semantic.Assertion{ID:"control-only:mismatched-test",Predicate:semantic.PredicateTestedBy,SubjectID:code.CanonicalID,ObjectID:unrelated.CanonicalID,EvidenceIDs:[]string{code.ID,unrelated.ID},Status:semantic.StatusProposed})
+ must(x.ValidateRetainedSources(prep.Version));must(semantic.ValidateDatasetAlignment(x,prep.Source,graph,vector));must(semantic.ValidateCodeAnchors(x,graph));must(semantic.ValidateCKVChunkLinks(ctx,x,vector))
+ boundary:=map[string]any{"typed_and_source_valid":true,"semantic_relationship_approved":false,"persisted":false,"claim":"structural checks do not establish that this test exercises ValidateDatasetAlignment","code":code,"test":unrelated,"control_only":true}
+ must(store.Close())
+ ro,e:=semantic.OpenStoreReadOnly(ctx,prep.Store);must(e);defer ro.Close();loaded,e:=ro.Load(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID);must(e);raw,e:=json.Marshal(loaded);must(e);if !bytes.Equal(raw,original){panic("reopen projection changed")};_,e=ro.Current(ctx,p.Snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("reopen current exists")}
+ save(filepath.Join(out,"trace-diagnostic.json"),trace);save(filepath.Join(out,"change-plan.json"),plan);save(filepath.Join(out,"review-queue.json"),review);save(filepath.Join(out,"negative-controls.json"),controls);save(filepath.Join(out,"semantic-boundary-control.json"),boundary)
+ save(filepath.Join(out,"technical-report.json"),map[string]any{"identity":identity,"new_proposed_assertions":counts,"total_assertions":25,"retained_source_alignment_canonical_and_chunks_verified":true,"roundtrip_bytes_identical":true,"reopened_readonly_bytes_identical":true,"projection_JSON_digest":digest(original),"verified_implementation_count":0,"reviewed_trace_path_count":0,"semantic_current_absent":true,"human_review_count":0,"actual_human_review_time_ns":nil,"model_HTTP_calls":0,"new_FINAL_queries":0,"activation_count":0,"patch_attempt_count":0,"semantic_linked_test_execution_count":0,"full_task_complete":false})
+ fmt.Println("PASS proposed relations13+prior12, source/canonical/chunk/SQLite roundtrip,3 unapproved trace diagnostics,9 rejection controls,1 semantic boundary; current/human/query0")
+}

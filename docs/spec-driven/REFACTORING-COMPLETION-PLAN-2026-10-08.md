@@ -1,5 +1,7 @@
 # 남은10개 완료를 위한 우선순위·실행 계획
 
+2026-10-08 다음 단계 검증: **N12 원문 기반 proposed 구현·시험·기준 관계13개 준비**. [검토 자료](./N12-PROPOSED-TRACE-RELATIONS.md) — 부정확한 테스트 연결1개 제외·미작성 개념 경로5개 유지, 생산API/SQLite/두archive 재생·9거부 제어 통과. **N11 pool13문항/8제안군과 승인0은 그대로이며 관계13개를 FINAL 표본으로 세지 않는다.** 전체8/18·요청5/15·잔여 N08/09/10/11/12/14/15/16/17/18 10개. 다음 실제 관계·명세 범위 판정 및 미작성 경로/독립 평가 입력 보강이다.
+
 2026-10-08 현재 단계: **N11 독립 후보 보강·실제 판정 대기**. [새 검토 문서](./N11-INDEPENDENT-POOL-EXPANSION.md)의 검토 대상FINAL13/8제안군, DEV7, 제외6을 준비했다. 중요군별 승인0·전체8/18·요청5/15·잔여10개를 유지한다. **다음:** 후보 gold/군/독립성·N12 실제 내용 판정과 부족 범위 보강. **남은 전체:** N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 실제 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 복구, N18 최종 판정. 아래 날짜별 기록은 이전 준비 이력을 함께 보존한다.
 
 2026-10-08 · 기준 main eeeab2e7(PR97 squash) · 후속 브랜치 feat/refactoring-followup · 전체8/18·요청5/15 완료·잔여10개. 기존 preview 종료와 상위 WI10개는 이 목록에 합산하지 않는다.
@@ -15,7 +17,7 @@ PR97 head d7de0b89의 CI5/5 성공 후 사용자 지시로 main에 스쿼시 머
 | 순서 | 대상 | 목적·필요 기능 | 남은 수용과 증거 |
 |---|---|---|---|
 | P0 | 원장/완료 체크 | 기존 증거 복구와 부분 체크의 실제 커밋 결합; 완료 오표시 방지 | 부분5개(N15-A/B/C,N17-A/B)의 명세·manifest·원자료SHA·task 참조 일치, 누락/중복/미체크/거짓CI 거부. 전체8/18 유지 |
-| P1-a | N11 | 튜닝 전 DEV/FINAL 원문 gold·독립 cluster·오염 범위 및 runner 보호 동결 | DEV7/프로토콜 실제 판정; FINAL9후보/6제안군의 독립성 검토와 CODE/WHY/POLICY/TRACE/ABS 각10독립단위 충분성; source/model/config/binary/dataset·예약 결합 |
+| P1-a | N11 | 튜닝 전 DEV/FINAL 원문 gold·독립 cluster·오염 범위 및 runner 보호 동결 | DEV7/프로토콜 실제 판정; 현행FINAL13후보/8제안군의 독립성 검토와 CODE/WHY/POLICY/TRACE/ABS 각10독립단위 충분성; source/model/config/binary/dataset·예약 결합 |
 | P1-b | N12 | 정책·ADR·메타모델/명세/기준의 실제 내용과 관계 검토 | 27항목+6주장/12관계 판정·검토자; 실제 coordinated source/lock/canonical 관계; 활동 시간 미측정은null |
 | P2-a | N08 | 근거를 정확하게 검색하도록 DEV 실패 개선 | N11 사전 동결 후 동일8arm 평가·독립 FINAL 회귀와 기존Recall/MRR/중요군 임계치·안전0 유지 |
 | P2-b | N09 | 답이 없는 경우 근거와 기권을 정확히 구분 | 원문 답가능/부재 대조; strict인용0과 실제 사람이 답변 기권해야 하는지를 별도 판정; 오인용 증가0 |
@@ -53,3 +55,5 @@ N12 다음 세부 단계: [현행 canonical 연결 준비](./N12-CANONICAL-SOURC
 2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.
 
 2026-10-08 N11 후보 보강: [독립 FINAL 후보·범위 부족분](./N11-INDEPENDENT-POOL-EXPANSION.md). 신규CODE/WHY4문항/2제안군 추가, 기존 사실과 겹칠 위험의 신규4문항 격리. 검토 대상FINAL13/8제안군·DEV7, 승인된 중요군 모두0. 과거DEV/FINAL27gzip/11,632행 및 실제20원문 참조 대조, 정보 메타데이터 교정·새runtime 미결합, 실제input checker exit2/source오류0; 모델/검색/빌드0. 전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18 유지. 다음 N11/N12 실제 내용·군/독립성 판정과 부족 범위 보강.
+
+2026-10-08 N12 trace 연결 준비: [13개 proposed 관계와 의미 경계 검증](./N12-PROPOSED-TRACE-RELATIONS.md). 구현3/시험5/기준5 관계를 별도 SQLite에 원문·canonical·CKV로 연결하고 재조회/원본 없는 두 archive 재생·9거부 제어를 통과했다. Projection.Validate 시험을 다른 정렬 함수에 연결하는 부정확한1쌍은 제외, broad concept5경로 미작성 유지. 전체25관계 proposed·3요구 spec_unapproved·검토된경로0/current없음/human0/model0. 신규FINAL로 합산하지 않으며 N11 pool13/8·승인0, 전체8/18·요청5/15·잔여10개 유지. 다음 관계/원문 범위 판정·5경로 보강과 N11 독립 입력 확보다.

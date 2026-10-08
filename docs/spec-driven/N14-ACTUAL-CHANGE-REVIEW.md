@@ -49,3 +49,5 @@ ADR→requirement와 criterion→code/test 연결은 **proposed**다. 실제 CKG
 현재 patch_registry_attempt_created=false, semantic_linked_test_report_created=false, human_decision=null, candidate_promoted=false다. N14-A–E와 N14 전체는 미완료다. 새 model/FINAL 질의0, 승인/활성 승격0, releasefalse다.
 
 전체8/18·요청5/15 완료, 잔여N08/09/10/11/12/14/15/16/17/18 10개. 다음 N11/N12 실제 검토 응답 반영, 독립 FINAL 범위 작성과 위 actual candidate 결합이다.
+
+2026-10-08 N12 trace 연결 준비: [13개 proposed 관계와 의미 경계 검증](./N12-PROPOSED-TRACE-RELATIONS.md). 구현3/시험5/기준5 관계를 별도 SQLite에 원문·canonical·CKV로 연결하고 재조회/원본 없는 두 archive 재생·9거부 제어를 통과했다. Projection.Validate 시험을 다른 정렬 함수에 연결하는 부정확한1쌍은 제외, broad concept5경로 미작성 유지. 전체25관계 proposed·3요구 spec_unapproved·검토된경로0/current없음/human0/model0. 신규FINAL로 합산하지 않으며 N11 pool13/8·승인0, 전체8/18·요청5/15·잔여10개 유지. 다음 관계/원문 범위 판정·5경로 보강과 N11 독립 입력 확보다.

@@ -1,0 +1,22 @@
+func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
+	p, dir := fixture(t)
+	p.Evidence[0].Snapshot.DatasetID = "other"
+	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "crosses") {
+		t.Fatalf("cross-snapshot evidence accepted: %v", err)
+	}
+	p, _ = fixture(t)
+	p.Claims[0].EvidenceIDs = []string{"missing"}
+	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "missing evidence") {
+		t.Fatalf("orphan claim evidence accepted: %v", err)
+	}
+	p, _ = fixture(t)
+	p.Evidence[0].Path = "../secret.md"
+	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "location") {
+		t.Fatalf("path traversal accepted: %v", err)
+	}
+	p, dir = fixture(t)
+	p.Evidence[0].ContentSHA256 = strings.Repeat("0", 64)
+	if err := p.ValidateSources(context.Background(), dir); err == nil || !strings.Contains(err.Error(), "digest mismatch") {
+		t.Fatalf("incorrect source digest accepted or misreported: %v", err)
+	}
+}
