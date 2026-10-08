@@ -58,3 +58,5 @@
 이 단계에서 technical_CKG_CKV_source_alignment_built=true, approved_coordinated_dataset_complete=false, knowledge_lock_built=false, human_approved=0, actual_human_review_time=null, current/semantic_activation0이다. 원래69참조·검토 책·claim seeds·승인 Go29와5개 승인 입력의 바이트를 보존했다. 제품 코드가 바뀌지 않아 이전 전체 Go 회귀를 참조하며 이번에 전체 Go 시험을 재실행했다고 주장하지 않는다.
 
 다음은 N11 gold·독립성과 N12의 실제 내용/관계·입력 범위·검토자 판정을 반영한 knowledge overlay/lock 결합, N14의 실제 patch/run 및 criterion별 수용이다. 전체8/18·요청5/15 완료, 남은 전체10개: N08 검색 품질, N09 무답·기권, N10 비용·지연, N11 독립 평가, N12 실제 파일럿 검토, N14 실제 의미 수용, N15 지원 환경·외부 소비자, N16 운영 권한·고지, N17 운영 복구, N18 최종 수용·출시 판정.
+
+2026-10-08 N12 ADR 기술 lock 연결: [검토 대기 ADR의 보관 lock](./N12-PROPOSED-LOCK-PREPARATION.md) — 원소스1,410 불변, proposed ADR2/정책0(운영 owner 미정)/review0의 partial overlay·lock과 별도 held snapshota0457cc1/dataset5a24904f를 생성했다. 생산 knowledge·include-packs CLI/v4 의미27문서·36코드참조/33canonical·7 lock 거부·원 소스/색인/semantic DB 없이 archive 재생 통과. 새 BGE embed HTTP62=probe2+색인60/666입력, 전체Go DRIFT998 유지. 승인 lock/사람 내용·관계·운영 판정은 미완료, N12-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 gold/독립성 및 N12 판정/정책 담당자·시점 확인.
