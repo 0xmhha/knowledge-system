@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "9c4e9f620fd659e6fa53d1980c3d37c33ed2d785",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-n11-source-probes-2026-10-08/manifest.json"
+    "revision": "8ec6bea883ae17450f7c127181686582b94e92b5",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n09-empty-snippet-2026-10-08/manifest.json"
   },
   "tasks": [
     {
@@ -101,7 +101,18 @@
     {
       "id": "N-09",
       "purpose": "무답·기권",
-      "state": "pending"
+      "state": "waiting",
+      "empty_snippet_helper_preparation": "docs/spec-driven/N09-EMPTY-SNIPPET-VERIFICATION.md",
+      "empty_snippet_helper_evidence_revision": "8ec6bea883ae17450f7c127181686582b94e92b5",
+      "empty_snippet_helper_manifest": "system/eval/b0-knowledge-system/refactoring-n09-empty-snippet-2026-10-08/manifest.json",
+      "empty_snippet_helper_test_passes": 103,
+      "empty_snippet_helper_subtest_passes": 4,
+      "empty_snippet_helper_skips": 1,
+      "empty_snippet_helper_actual_abstention_evaluated": false,
+      "empty_snippet_helper_actual_human_decisions": 0,
+      "empty_snippet_helper_committed_current_SHA_bindings": 1185,
+      "empty_snippet_helper_verified_substep": "Legacy CKV evaluation helper accepted4empty/whitespace source snippets and miscounted4hit/example fixture as1nonverified instead of3; RED4subtests+aggregate,fix separate empty_snippet after existing source/line checks; related2pkgrace103test/4subtest pass1realBGE smoke skip,vet/boundary/format pass; GPG fixture and cache restrictions preserved separately,command-local fixture signing override only; no search pipeline/strict0/actual abstention/model/FINAL/human claims.",
+      "waiting_for": "N11 source-backed independent gold/group/contamination/ABS basis human adjudication and full input/runtime freeze; actual answerability/abstention evaluation separate from mechanical empty-snippet helper checks"
     },
     {
       "id": "N-10",
