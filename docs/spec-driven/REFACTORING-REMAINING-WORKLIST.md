@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-08 현재 PR 상태: [PR97](https://github.com/0xmhha/knowledge-system/pull/97)을 일반 PR(ready for review)로 전환했다. 공개 head d7de0b89와 CI5/5 통과는 유지한다. 전체 미완료/출시 보류를 코드 검토 준비와 묶어 draft를 유지하던 판단을 바로잡았다. merge/출시/새 gold 승인은 없으며 전체8/18·요청5/15·잔여10개와 다음 N11/N12 실제 판정은 동일하다. 아래 draft 생성/유지 기록은 당시 이력이다.
+
 2026-10-07 최신: [PR97/native Linux CI](./N15-NATIVE-LINUX-CI-VALIDATION.md). 사용자 “푸시하고 Pr생성해”로 d08cb384의80커밋 공개 전송·draft PR97 생성 완료. graph/vuln Go 요구 불일치를 공개 source만 수정한 d7de0b89로 보완했고 재실행 CI5/5 success. 실제 Linux AMD64의 설치/재시작/갱신/복구, public consumer7응답/4거부, 복구10응답/13payload SHA와 artifact178파일 SHA를 확인하여 **N15-C 완료**. N15-D/E와 N17-C/D/E 운영 수용은 미완료. 추가 로컬 BGE/출처 receipt 및 본 native 기록은 미전송. **전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18. 다음 N11/N12 실제 판정과 독립 입력/런타임 결합.** 아래는 이전 시점 이력이다.
 
 2026-10-06 · 기준 코드 `04d3bfdf` · [원래 목적/코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md). 이전 [시험 preview30항목](./EXECUTION-WORKLIST.md)은 사용자 선택 범위에서 종료됐다. 이 문서는 원래 목적과 코드 사이의 잔여를 관리하는 **새 후속 목록**이다. 이전 HC·입력 승인은 다시 요구하지 않는다.
