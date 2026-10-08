@@ -1,5 +1,6 @@
-# PROPOSED requirement version 3 (not selected): adopted N12 pre-review modifications.
-# Not reviewed: reviewer name pending. spec-pilot-v2.yaml is unchanged.
+# REVIEWED revision: adopted N12 pre-review modifications.
+# reviewed_by "opus5.5 검토" is a label designated by the user for an AI model review
+# (Claude Opus 5.5) adopted in bulk by the user; not an independent human content review.
 version: 1
 project_id: knowledge-system
 requirements:
@@ -8,7 +9,8 @@ requirements:
     title: Filtered CKV recall
     statement: CKV returns eligible nearest chunks under sparse metadata filters.
     concept_ids: [filtered-nearest-chunk-search]
-    status: proposed
+    status: verified
+    reviewed_by: "opus5.5 검토"
     acceptance_criteria:
       - id: ac-filtered-recall
         given: A filter superset of at most 2048 and at most MaxExactCandidates chunks with at least K eligible chunks and at least 3K excluded chunks closer than every eligible chunk
@@ -23,7 +25,8 @@ requirements:
     title: Source-backed meaning
     statement: Reviewed semantic relationships remain tied to one captured source snapshot.
     concept_ids: [snapshot-bound-semantic-relations]
-    status: proposed
+    status: verified
+    reviewed_by: "opus5.5 검토"
     acceptance_criteria:
       - id: ac-source-evidence
         given: A relation with a code anchor from another snapshot
@@ -34,7 +37,8 @@ requirements:
     title: Safe ontology interpretation
     statement: Optional concept matching preserves the existing hybrid retrieval candidate set (membership); only verified relations may reorder it.
     concept_ids: [optional-ontology-baseline-preservation]
-    status: proposed
+    status: verified
+    reviewed_by: "opus5.5 검토"
     acceptance_criteria:
       - id: ac-ontology-fallback
         given: An ambiguous term or an unverified concept relationship
