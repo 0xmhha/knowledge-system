@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-09 최신(Claude Code): **N11 입력 동결**. [동결](./N11-INPUT-FREEZE.md) — 철회5 제거·대체 DEV2 추가, DEV7/FINAL10을 “opus5.5 검토”(사용자 지정 AI 라벨)로 승인·동결, 입력 검사 input_ready=true·sampling inconclusive. 기존 N11 corpus는 제외 경로를 포함해 새 corpus·실행 바인딩 필요, FINAL 실행은 비가역이라 사용자 결정 대기. 9/18 완료·남은 9개.
+
 2026-10-09 최신(Claude Code): **N12 완료**. [결합·활성화·linked run](./N12-REVIEWED-ACTIVATION.md) — 사용자가 사전검토 65건을 채택하고 검토자를 “opus5.5 검토”로 지정(AI 검토 라벨, 독립 사람 내용 검토 아님). 검토된 ontology v2/spec v3를 선택해 새 capture `0b9085e7`·snapshot `813b80a9`·dataset `daf9608b`에 결합, 관계43·개념23·요구3·주장6 verified, 세 요구 trace linked, 소유 held store 활성화. 실제 semantic linked run 10건 중 9건 통과·1건(F3-T10) 검토 경로 없음으로 거부, 보관본 archive-only 재생 일치. criterion accepted0은 N14로 넘긴다. **현재 9/18 완료, 요청6/15, 남은 9개:** N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 다음 N11.
 
 2026-10-09 최신 하위 단계(Claude Code): **N11 후보 책 수정 반영·기권 인용 규칙**. [수정 반영](./N11-CANDIDATE-REVISION.md) — 사용자 채택·DEV 교체·평가 문서 corpus 제외·ABS 인용 허용을 기록(검토자 이름 없음). 개정 책 DEV5/FINAL10, FINAL 군 CODE4·WHY1·POLICY1·TRACE2·ABS1(모두10 미만). 입력 검사가 protocol 규칙과 근거 원문이 있을 때만 인용 허용 기권을 받도록 RED→GREEN, 스크립트 시험26 통과, 개정 초안 검사 exit2·바이트 오류0. 승인0·동결0. 전체8/18·요청5/15·남은10개 유지.
