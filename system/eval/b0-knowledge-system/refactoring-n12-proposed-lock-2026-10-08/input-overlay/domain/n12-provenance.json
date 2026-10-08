@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "original_source_revision": "667a9af5f8608e6e984f58f3c3b61350dde0ea48",
+  "source_base_commit": "562e37aa1c9680d283de85ccd6435e5f235c21d6",
+  "proposed_decisions": [
+    {
+      "id": "P12-P05",
+      "overlay_path": ".cks/knowledge/decisions/P12-P05.md",
+      "overlay_sha256": "03ed1e7893fb6d0289084e8fb12d4cd95e644138402f8c7a8b70045eeeffefec",
+      "original_path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "original_first": 61,
+      "original_last": 65,
+      "original_file_sha256": "baeaea7bcea1db2fb258c8ecb8e087ae727c53f0066c5a4bbabaee4b01fcb86e",
+      "original_span_sha256": "2a393d49484d2595d6bdab78609861ba5b89e920c4be12f5afa9593b441ad471",
+      "status": "proposed",
+      "date": null,
+      "reviewer": null,
+      "metadata_human_interpretation_approved": false
+    },
+    {
+      "id": "P12-P06",
+      "overlay_path": ".cks/knowledge/decisions/P12-P06.md",
+      "overlay_sha256": "664c79809459dfee42b585be5d452d6819d4e437ec90b5e169986166316b1ff5",
+      "original_path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "original_first": 67,
+      "original_last": 69,
+      "original_file_sha256": "baeaea7bcea1db2fb258c8ecb8e087ae727c53f0066c5a4bbabaee4b01fcb86e",
+      "original_span_sha256": "253dd9855d860ddaee4d433007ab6b8ecb916d75f393f3e1f80e35c073eff191",
+      "status": "proposed",
+      "date": null,
+      "reviewer": null,
+      "metadata_human_interpretation_approved": false
+    }
+  ],
+  "missing_policies": [
+    {
+      "id": "P12-P01",
+      "statement": "Pinned v2 유지보수는 제자리 갱신과 legacy downgrade를 거부하고 검토 설정·project ID와 새 버전으로 후보를 만든다.",
+      "policy_instance_created": false,
+      "reason": "mandatory operating owner not supplied; no owner placeholder created",
+      "owner": null,
+      "effective_date": null
+    },
+    {
+      "id": "P12-P02",
+      "statement": "후보 checkpoint/sync 뒤 current를 전환하고 부모를 sync한다. rename 후 sync 실패의 durability_uncertain은 current 불변을 뜻하지 않는다.",
+      "policy_instance_created": false,
+      "reason": "mandatory operating owner not supplied; no owner placeholder created",
+      "owner": null,
+      "effective_date": null
+    },
+    {
+      "id": "P12-P03",
+      "statement": "v2 core evidence는32000bytes/12citation 안에서 검증된 전체 원문 span을 선택하고 생략을 partial/예산 진단으로 기록하며 긴 span을 잘라 반환하지 않는다.",
+      "policy_instance_created": false,
+      "reason": "mandatory operating owner not supplied; no owner placeholder created",
+      "owner": null,
+      "effective_date": null
+    },
+    {
+      "id": "P12-P04",
+      "statement": "Worksheet의 조직 위험 목록은 명시적으로 선택한 local pack 자료에만 들어 있다. 생성은 앵커 검사를 실행하거나 항목을 verified로 승격하지 않는다.",
+      "policy_instance_created": false,
+      "reason": "mandatory operating owner not supplied; no owner placeholder created",
+      "owner": null,
+      "effective_date": null
+    }
+  ],
+  "human_approved": 0
+}
