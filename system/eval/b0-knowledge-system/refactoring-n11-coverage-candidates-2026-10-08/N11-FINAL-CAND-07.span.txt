@@ -1,0 +1,15 @@
+func (s *Store) TraceStatus(ctx context.Context, projectID, repoRoot, graphDir, vectorDir string) (TraceDiagnosticReport, error) {
+	p, err := s.Current(ctx, projectID)
+	if err != nil {
+		return TraceDiagnosticReport{}, err
+	}
+	if err := validateActiveProjection(ctx, p, repoRoot, graphDir, vectorDir); err != nil {
+		return TraceDiagnosticReport{Snapshot: p.Snapshot, State: "stale", Reason: err.Error(),
+			Requirements: []RequirementTrace{}}, nil
+	}
+	trace, err := (ActiveProjection{projection: p}).Trace()
+	if err != nil {
+		return TraceDiagnosticReport{}, err
+	}
+	return TraceDiagnosticReport{Snapshot: trace.Snapshot, State: "current", Requirements: trace.Requirements}, nil
+}

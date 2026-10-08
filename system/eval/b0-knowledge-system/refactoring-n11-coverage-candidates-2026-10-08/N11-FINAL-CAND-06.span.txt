@@ -1,0 +1,22 @@
+		byDecision := map[string][]ReviewRecord{}
+		for _, record := range votes[key] {
+			byDecision[record.Decision] = append(byDecision[record.Decision], record)
+		}
+		if len(byDecision["verified"]) > 0 && len(byDecision["rejected"]) > 0 {
+			continue // disputed: remain proposed
+		}
+		for _, decision := range []string{"verified", "rejected"} {
+			approved := byDecision[decision]
+			if len(approved) < minApprovals {
+				continue
+			}
+			sort.Slice(approved, func(a, b int) bool { return approved[a].Reviewer < approved[b].Reviewer })
+			reviewers, reasons := make([]string, 0, len(approved)), make([]string, 0, len(approved))
+			for _, record := range approved {
+				reviewers = append(reviewers, record.Reviewer)
+				reasons = append(reasons, record.Reason)
+			}
+			*target.status = decision
+			*target.by = strings.Join(reviewers, ",")
+			*target.reason = strings.Join(reasons, " | ")
+		}

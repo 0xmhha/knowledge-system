@@ -37,3 +37,5 @@ P1-a/b와 P4 운영 입력 요청은 동시에 받는다. 응답을 기다리는
 P0 검증 완료: 같은 missing-CI 음성 제어는 새 checker에서 거부되며 실제 커밋 증거5부분체크 정상·8개 구조 시험 통과. [원자료](../../system/eval/b0-knowledge-system/refactoring-progress-guard-2026-10-08/verification.json). 전체 완료 수는8/18·요청5/15·잔여10개 그대로다. 다음 N14 실제 변경/기준/시험 검토 자료 준비 및 N11/N12 응답 반영이다.
 
 N14 세부 준비 완료: [실제 변경 검토 자료](./N14-ACTUAL-CHANGE-REVIEW.md)의 실제PR97 7변경 파일/11span/정확5test run·pass를 확인했다. 실제 reviewed canonical trace·hold 후보/patch register·사람 기준 판정·promote/rollback은 미완료이며 전체8/18·요청5/15·잔여10개를 유지한다.
+
+N11 다음 세부 단계: [후보 범위/출처·오염 검토](./N11-COVERAGE-CANDIDATE-REVIEW.md)의 신규7/과거4 중 같은관측군2를 제외해9후보를 유지했다. DEV04 좌표이동을 교정하고 excluded 재삽입 RED→GREEN/22시험·CLI/runner dispatch0을 확인했다. 승인FINAL0·전체8/18·요청5/15·잔여10개, 다음 실제 gold/범주/군/오염·무답 검토와 충분한독립범위 준비다.

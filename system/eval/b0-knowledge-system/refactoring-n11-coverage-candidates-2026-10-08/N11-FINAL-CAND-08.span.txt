@@ -1,0 +1,10 @@
+	for _, link := range result.TraceLinks {
+		if err := validateTraceLink(link, strings.TrimPrefix(link.SourceRef.Path, ".cks/knowledge/")); err != nil {
+			return Instances{}, err
+		}
+		decision, ok := decisionByID[link.DecisionID]
+		if !ok || link.Status == "verified" && (decision.Status != "verified" || !containsRequirementID(decision.RequirementIDs, link.RequirementID) ||
+			!sourceRefPresent(link.EvidenceRefs, decision.SourceRef)) {
+			return Instances{}, fmt.Errorf("evidence_unverified: trace link %q lacks reviewed ADR evidence", link.ID)
+		}
+	}

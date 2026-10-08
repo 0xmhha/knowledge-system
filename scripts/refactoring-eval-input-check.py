@@ -81,6 +81,24 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
     check(isinstance(questions, list) and bool(questions), "questions_missing")
     if not isinstance(questions, list):
         questions = []
+    excluded = book.get("excluded_candidate_questions", [])
+    declared_excluded = book.get("excluded_proposed_clusters", [])
+    valid_exclusions = isinstance(excluded, list) and isinstance(declared_excluded, list)
+    valid_exclusions = valid_exclusions and all(
+        isinstance(q, dict) and q.get("split") == "FINAL" and
+        all(isinstance(q.get(key), str) and q[key].strip()
+            for key in ("id", "proposed_cluster_id", "proposed_unit_id", "exclusion_reason"))
+        for q in excluded)
+    valid_exclusions = valid_exclusions and all(isinstance(c, str) and c.strip() for c in declared_excluded)
+    check(valid_exclusions, "invalid_excluded_candidate_catalog")
+    excluded_ids, excluded_clusters, excluded_units = set(), set(), set()
+    if valid_exclusions:
+        excluded_ids = {q["id"].casefold() for q in excluded}
+        excluded_clusters = {q["proposed_cluster_id"] for q in excluded}
+        excluded_units = {q["proposed_unit_id"] for q in excluded}
+        check(len(excluded_ids) == len(excluded) and
+              len(set(declared_excluded)) == len(declared_excluded) and
+              set(declared_excluded) == excluded_clusters, "excluded_candidate_catalog_mismatch")
     seen, units, prompts, split_clusters = set(), {}, {}, {"DEV": set(), "FINAL": set()}
     final_clusters = set()
     for q in questions:
@@ -99,6 +117,12 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
         d = decisions.get(ident, {})
         cluster, unit = q.get("cluster_id"), q.get("unit_id")
         check(isinstance(cluster, str) and bool(cluster) and isinstance(unit, str) and bool(unit), "unit_cluster_missing:" + str(ident))
+        if split == "FINAL":
+            check(not (isinstance(ident, str) and ident.casefold() in excluded_ids) and
+                  cluster not in excluded_clusters and unit not in excluded_units and
+                  q.get("proposed_cluster_id") not in excluded_clusters and
+                  q.get("proposed_unit_id") not in excluded_units,
+                  "excluded_final_candidate_reused:" + str(ident))
         check(all(d.get(key) is True for key in ("gold_approved", "independence_approved", "contamination_checked")) and d.get("cluster_id") == cluster and d.get("unit_id") == unit, "case_judgment_missing:" + str(ident))
         if cluster and unit and split in split_clusters and group in GROUPS:
             check(unit not in units or units[unit] == cluster, "unit_split_into_multiple_clusters:" + str(ident))

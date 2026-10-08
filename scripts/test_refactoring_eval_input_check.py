@@ -164,6 +164,48 @@ class InputAuditTests(unittest.TestCase):
         b["questions"][0]["evidence"][0]["first"] = True
         self.assertFalse(run(p, b)["input_ready"])
 
+    def excluded_fixture(self):
+        p, b = fixture()
+        excluded = b["questions"].pop(1)
+        b["excluded_candidate_questions"] = [dict(excluded,
+            proposed_cluster_id=excluded["cluster_id"], proposed_unit_id=excluded["unit_id"],
+            exclusion_reason="synthetic prior FINAL exposure")]
+        b["excluded_proposed_clusters"] = [excluded["cluster_id"]]
+        return p, b, excluded
+
+    def test_excluded_catalog_does_not_block_unrelated_fresh_units(self):
+        p, b, _ = self.excluded_fixture()
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["sampling_verdict"], "inconclusive")
+
+    def test_excluded_candidate_or_cluster_cannot_be_reintroduced(self):
+        for mode in ("original", "renamed-id", "renamed-cluster", "proposed-cluster", "proposed-unit"):
+            with self.subTest(mode=mode):
+                p, b, q = self.excluded_fixture()
+                if mode != "original":
+                    q["id"] = "renamed-exposed-question"
+                if mode == "renamed-cluster":
+                    q["cluster_id"] = "renamed-exposed-cluster"
+                if mode in ("proposed-cluster", "proposed-unit"):
+                    q["proposed_cluster_id" if mode == "proposed-cluster" else "proposed_unit_id"] = q["cluster_id" if mode == "proposed-cluster" else "unit_id"]
+                    q.update(cluster_id="renamed-exposed-cluster", unit_id="renamed-exposed-unit")
+                b["questions"].append(q)
+                result = run(p, b)
+                self.assertIn("excluded_final_candidate_reused:" + q["id"], result["pending_reasons"])
+                self.assertFalse(result["input_ready"])
+
+    def test_inconsistent_or_malformed_exclusion_catalog_rejected(self):
+        for mode in ("missing-cluster", "duplicate-cluster", "duplicate-id", "missing-reason", "wrong-type"):
+            with self.subTest(mode=mode):
+                p, b, _ = self.excluded_fixture()
+                if mode == "missing-cluster": b["excluded_proposed_clusters"] = []
+                if mode == "duplicate-cluster": b["excluded_proposed_clusters"] *= 2
+                if mode == "duplicate-id": b["excluded_candidate_questions"] *= 2
+                if mode == "missing-reason": b["excluded_candidate_questions"][0].pop("exclusion_reason")
+                if mode == "wrong-type": b["excluded_proposed_clusters"] = "not-a-catalog"
+                self.assertFalse(run(p, b)["input_ready"])
+
 
 if __name__ == "__main__":
     unittest.main()

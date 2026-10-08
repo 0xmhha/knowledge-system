@@ -1,0 +1,20 @@
+from pathlib import Path
+import copy,hashlib,json,subprocess,sys
+out=Path('system/eval/b0-knowledge-system/refactoring-n11-coverage-candidates-2026-10-08');base=Path('system/eval/b0-knowledge-system')
+book=out/'candidate-question-book.json';protocol=out/'candidate-protocol.json';known=base/'refactoring-n11-input-controls-2026-10-06/known-final-observations.json'
+command=[sys.executable,'scripts/refactoring-eval-input-check.py','--protocol',str(protocol),'--questions',str(book),'--observations',str(known),'--require-ready','--output',str(out/'input-check-draft.json')]
+r=subprocess.run(command,capture_output=True,text=True);assert r.returncode==2;rj=json.loads((out/'input-check-draft.json').read_text());assert not rj['input_ready'] and not any(x.startswith(('invalid_source_gold','baseline_changed','model_input_changed')) for x in rj['pending_reasons'])
+wrong=copy.deepcopy(json.loads(book.read_text()));e=next(q for q in wrong['questions'] if q['id']=='N11-DEV-04')['evidence'][0];e.update(first=254,last=428)
+p=Path('/private/tmp/ks-n11-old-gc-range.json');p.write_text(json.dumps(wrong));negative_out=out/'old-gc-coordinate-rejected.json';n=subprocess.run(command[:],capture_output=True,text=True) if False else subprocess.run([sys.executable,'scripts/refactoring-eval-input-check.py','--protocol',str(protocol),'--questions',str(p),'--observations',str(known),'--require-ready','--output',str(negative_out)],capture_output=True,text=True)
+assert n.returncode==2 and 'invalid_source_gold:N11-DEV-04' in json.loads(negative_out.read_text())['pending_reasons']
+scratch=Path('/private/tmp/ks-n11-coverage-no-dispatch');registry=scratch.with_suffix('.registry.json');output=scratch.with_suffix('.out');before_registry=registry.exists();before_output=output.exists();assert not before_registry and not before_output
+runner=subprocess.run([sys.executable,'scripts/refactoring-eval-run.py','run','--protocol',str(protocol),'--questions',str(book),'--known-observations',str(known),'--registry',str(registry),'--config',str(scratch.with_suffix('.not-frozen-config')),'--binary','bin/cks','--output',str(output),'--split','DEV'],capture_output=True,text=True)
+assert runner.returncode==2 and not registry.exists() and not output.exists();assert json.loads(runner.stdout)['input_ready'] is False
+(out/'runner-draft-rejected.json').write_text(runner.stdout);(out/'runner-draft.stderr.txt').write_text(runner.stderr)
+summary=json.loads((out/'summary.json').read_text());tests=Path('/private/tmp/ks-n11-coverage-tests.stderr.txt').read_text();assert '\nOK\n' in tests
+for q in json.loads(book.read_text())['questions']:
+ for e in q.get('evidence',[])+q.get('abstention_basis_sources',[]):
+  raw=subprocess.check_output(['git','show',q['source_commit']+':'+e['path']]);assert hashlib.sha256(raw).hexdigest()==e['file_sha256'];assert hashlib.sha256(b''.join(raw.splitlines(keepends=True)[e['first']-1:e['last']])).hexdigest()==e['content_sha256']
+verification=dict(schema_version=1,scope='draft source/basis and contamination preparation; no human or model verdict',draft_cli_exit_code=r.returncode,source_gold_errors=[],stale_gc_coordinate_rejected=True,excluded_cluster_reintroduction_red_green=json.loads(Path('/private/tmp/ks-n11-exclusion-red-green.json').read_text()),actual_runner_exit_code=runner.returncode,actual_runner_output_created=False,actual_registry_created=False,new_model_calls=0,new_FINAL_reservations=0,approved_independent_FINAL_count=0,candidate_rows_pre_exclusion=summary['candidate_rows'],eligible_candidate_rows=summary['eligible_candidate_rows'],excluded_candidate_ids=summary['excluded_candidate_ids'],excluded_cluster_rows_not_counted_as_independent=True,whole_N11_complete=False,product_release_approved=False)
+(out/'verification.json').write_text(json.dumps(verification,ensure_ascii=False,indent=2)+'\n')
+print('PASS: current gold/basis SHA, stale GC range rejection, excluded reuse RED/GREEN, unapproved runner child/output/registry0')

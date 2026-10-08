@@ -308,3 +308,7 @@ N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 
 - [ ] N14-C 검토된 trace의 실제 exact test/명령·출력SHA·spec version·snapshot-bound run을 기록하고 무관test/command-only/stale/불일치 거부.
 - [ ] N14-D 별도 실제 사람이 기준별 Given/When/Then을 승인/반려하고 이유·검토자·원문/시각·활동시간(미측정null)을 기록.
 - [ ] N14-E 실제 재색인/승격·반려·rollback·원문 신원 재생과 전체근거를 결합하며 pass/linked/verified/accepted 및 제한을 구분.
+
+### 2026-10-08 N11 후보 범위/현행 좌표 및 제외 보호 보강
+
+[N11 새 검토 자료](./N11-COVERAGE-CANDIDATE-REVIEW.md)는 POLICY/TRACE/ABS7신규 후보를 작성하고, 과거FINAL exact span480회 관측과 같은 사실군2개를 제외했다. 최종 책은DEV7/FINAL후보9·제안군6·승인FINAL0이다. DEV04의 동일span은gc.go265–439행으로 재결합했고 기존책은 보존했다. checker는 책에 선언한 제외 ID/cluster/unit·proposed identity 재삽입과 catalog 불일치를 거부한다.22시험 및 실제미승인CLI/runner 거부를 확인했으며 N11-A–D의 전체체크/모델·FINAL 실행은 추가하지 않았다.
