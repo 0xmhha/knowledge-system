@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.
+
 2026-10-08 N12 추가 진행: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md) — 현행 원문69참조/코드canonical36참조(고유33), wrong evidence7거부; 공통SQLite 조회 canonical_id 누락 수정·8경로 회귀와 증분캐시 검증. 전체 root capture의 public.pem 정책 거부는 미완료로 보존. 사람 내용·관계 판정/통합capture·lock·CKV·승격 대기, 전체8/18·요청5/15·잔여10개 유지.
 
 2026-10-08 N11 다음 세부 단계: [후보 범위·좌표 대조](./N11-COVERAGE-CANDIDATE-REVIEW.md)의 작성11개 중 과거관측 동일군2개를 제외해9후보/제안군6개가 남았다. DEV04 근거는 동일본문265–439행으로 재결합했고, 제외 재삽입 방지22시험·실제초안CLI/runner 거부(질의/예약0)를 확인했다. **승인FINAL0·전체8/18·요청5/15·잔여 N08/09/10/11/12/14/15/16/17/18 10개**, 다음 실제gold/범주/독립성·오염·무답/N12 판정과 충분한독립입력 준비다. 아래는 이전 시점 이력이다.

@@ -1,0 +1,43 @@
+import gzip,hashlib,io,json,tarfile
+from pathlib import Path
+p=Path('system/eval/b0-knowledge-system/refactoring-n12-scoped-capture-2026-10-08')
+s=json.loads((p/'capture-summary.json').read_text());version=Path(s['version_directory']);materialized=Path(s['materialized_source_root'])
+inv={r['path']:r for r in json.loads((p/'source-input-inventory.json').read_text())}
+raw=(p/'materialized-go-deps.jsonl').read_text();d=json.JSONDecoder();objects=[];i=0
+while i<len(raw):
+ while i<len(raw)and raw[i].isspace():i+=1
+ if i==len(raw):break
+ obj,i=d.raw_decode(raw,i);objects.append(obj)
+assert all(not o.get('Incomplete')and not o.get('Error')and not o.get('DepsErrors')for o in objects)
+local=[o for o in objects if o['ImportPath'].startswith('github.com/0xmhha/knowledge-system/')];files=set();embeds=set();native=set()
+for o in local:
+ directory=Path(o['Dir']); rel=directory.relative_to(materialized)
+ for key in ('GoFiles','CgoFiles','CFiles','CXXFiles','HFiles','SFiles','SysoFiles','EmbedFiles'):
+  for name in o.get(key,[]):
+   path=(rel/name).as_posix();assert path in inv,(o['ImportPath'],key,path)
+   assert hashlib.sha256((materialized/path).read_bytes()).hexdigest()==inv[path]['sha256']
+   files.add(path)
+   if key=='EmbedFiles':embeds.add(path)
+   if key in {'CFiles','CXXFiles','HFiles','SFiles','SysoFiles'}:native.add(path)
+summary={'go_list_exit_code':0,'entry_points':['./cmd/cks','./cmd/graph','./cmd/vector'],'dependencies':len(objects),'local_packages':len(local),'local_active_build_and_embed_files':len(files),'embed_files':sorted(embeds),'native_package_files':sorted(native),'all_listed_local_files_source_bound':True,'go_test_run':False,'scope':'host Darwin ARM64 active dependency closure; other build tags/platforms and full Go tests not rerun'}
+(p/'materialized-dependency-check.json').write_text(json.dumps(summary,indent=2)+'\n')
+with (p/'materialized-go-deps.jsonl.gz').open('wb')as f:
+ with gzip.GzipFile(fileobj=f,mode='wb',mtime=0,filename='')as g:g.write(raw.encode())
+(p/'materialized-go-deps.jsonl').unlink()
+# Keep actual source retention beyond ephemeral worktree lifetime.
+archive=p/'retained-source.tar.gz'
+with archive.open('wb')as f:
+ with gzip.GzipFile(fileobj=f,mode='wb',mtime=0,filename='')as g:
+  with tarfile.open(fileobj=g,mode='w|')as tar:
+   for path in sorted((version/'sources').rglob('*')):
+    if not path.is_file():continue
+    data=path.read_bytes();info=tarfile.TarInfo(path.relative_to(version).as_posix())
+    info.size=len(data);info.mode=path.stat().st_mode&0o777;info.mtime=0;info.uid=info.gid=0
+    tar.addfile(info,io.BytesIO(data))
+restore=Path(json.loads((p/'preparation.json').read_text())['owned_working_directory'])/'archived-retained-copy';restore.mkdir()
+with tarfile.open(archive,'r:gz')as tar:
+ for member in tar.getmembers():
+  assert member.isfile()and member.name.startswith('sources/')and '..'not in Path(member.name).parts
+ tar.extractall(restore,filter='data')
+(p/'archive-binding.json').write_text(json.dumps({'path':str(archive),'sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'bytes':archive.stat().st_size,'restored_version':str(restore),'contains':['sources/manifest.json','sources/history.bundle','sources/blobs/<SHA256>'],'derived_history_only':True,'original_repository_history_included':False},indent=2)+'\n')
+print(json.dumps({'dependencies':len(objects),'local_packages':len(local),'local_files':len(files),'embeds':len(embeds),'archive_bytes':archive.stat().st_size}))

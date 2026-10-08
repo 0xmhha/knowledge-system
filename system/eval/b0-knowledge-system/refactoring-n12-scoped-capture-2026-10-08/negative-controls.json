@@ -1,0 +1,42 @@
+[
+  {
+    "error": "source changed after capture \"repo\":\"internal/setup/identity.go\"",
+    "name": "source_byte_change",
+    "rejected": true
+  },
+  {
+    "error": "source mode changed after capture \"repo\":\"internal/setup/identity.go\"",
+    "name": "source_executable_bit_change",
+    "rejected": true
+  },
+  {
+    "error": "retained source \"cmd/b0-vector-probe/main.go\": snapshot_mismatch: retained source blob changed",
+    "name": "retained_blob_hash_change",
+    "rejected": true
+  },
+  {
+    "error": "retained source \"cmd/b0-vector-probe/main.go\": source_missing: lstat /private/tmp/ks-n12-scoped-capture-iuu2zemk/committed-capture/sources/blobs/1177456a479455087573ffacadb88e9aebf8e8c73a1af66684675af3dfb214dd: no such file or directory",
+    "name": "retained_blob_missing",
+    "rejected": true
+  },
+  {
+    "error": "snapshot_mismatch: retained source identity differs from candidate",
+    "name": "retained_manifest_identity_change",
+    "rejected": true
+  },
+  {
+    "error": "unsafe committed source path \"public.pem\"",
+    "name": "sensitive_committed_path",
+    "rejected": true
+  },
+  {
+    "error": "capture refused non-regular source \"internal/setup/identity.go\": not a regular file",
+    "name": "nonregular_tracked_source",
+    "rejected": true
+  },
+  {
+    "error": "resource_limit: source file count exceeded",
+    "name": "explicit_scope_exceeds_file_limit",
+    "rejected": true
+  }
+]

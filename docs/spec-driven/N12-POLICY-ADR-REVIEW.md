@@ -89,3 +89,5 @@ P12-P01–06의 주장 내용과 SUPPORTS/ABOUT 관계를 승인/수정/기권�
 전체 완료8/18, 요청15개 중5완료; 잔여N08/09/10/11/12/14/15/16/17/18 10개. 다음은 실제 검토 판정 반영과 source/lock·canonical 결합 및 새 독립 평가 입력 검토다.
 
 2026-10-08 현행 대조·연결 보완: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)에서 기존 33항목의 원문/코드 69참조가 동일함을 확인했다. 실제 CKG 코드·테스트 20파일에서 36참조/33고유 canonical ID를 결합했으나 code evidence만 붙였으며 내용·관계 승인, 통합 capture/lock/CKV 또는 활성 승격은 없다. 공통 SQLite 조회의 canonical_id 누락을 재현·수정했고 7개 근거 거부 제어를 통과했다. 저장소 전체 committed capture는 평가 public.pem 경로 때문에 실제 거부됐으므로 별도 source-only Git 검증을 통합 캡처 완료로 쓰지 않는다. N12 전체와 사람 판정은 대기를 유지한다.
+
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.

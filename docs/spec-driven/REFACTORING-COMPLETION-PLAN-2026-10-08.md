@@ -41,3 +41,5 @@ N14 세부 준비 완료: [실제 변경 검토 자료](./N14-ACTUAL-CHANGE-REVI
 N11 다음 세부 단계: [후보 범위/출처·오염 검토](./N11-COVERAGE-CANDIDATE-REVIEW.md)의 신규7/과거4 중 같은관측군2를 제외해9후보를 유지했다. DEV04 좌표이동을 교정하고 excluded 재삽입 RED→GREEN/22시험·CLI/runner dispatch0을 확인했다. 승인FINAL0·전체8/18·요청5/15·잔여10개, 다음 실제 gold/범주/군/오염·무답 검토와 충분한독립범위 준비다.
 
 N12 다음 세부 단계: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)의 현행 원문69참조와 실제 canonical36참조를 확인하면서 공통 SQLite 조회의 ID 누락을 발견·수정했다. root source capture는 public.pem 정책 거부로 미완료이며 source-only 자료와 분리한다. 다음 N11/N12 실제 판정 반영과 approved source scope의 capture/lock 결합, 이후 N14 실제 변경 수용이다. 전체8/18·요청5/15·잔여10개를 유지한다.
+
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.

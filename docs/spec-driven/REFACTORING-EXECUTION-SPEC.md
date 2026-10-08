@@ -314,3 +314,5 @@ N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 
 [N11 새 검토 자료](./N11-COVERAGE-CANDIDATE-REVIEW.md)는 POLICY/TRACE/ABS7신규 후보를 작성하고, 과거FINAL exact span480회 관측과 같은 사실군2개를 제외했다. 최종 책은DEV7/FINAL후보9·제안군6·승인FINAL0이다. DEV04의 동일span은gc.go265–439행으로 재결합했고 기존책은 보존했다. checker는 책에 선언한 제외 ID/cluster/unit·proposed identity 재삽입과 catalog 불일치를 거부한다.22시험 및 실제미승인CLI/runner 거부를 확인했으며 N11-A–D의 전체체크/모델·FINAL 실행은 추가하지 않았다.
 
 N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)의 실제 원문69참조/코드36참조·고유canonical33·근거 거부7제어를 확인했다. SQLite 공통 조회/FTS/substring의 저장된 ID 누락을 수정하고 cold→증분 캐시 심벌 유지 시험을 보강했다. 실제 내용/관계 판정과 통합 capture/lock/CKV는 남아 있으며 전체 root capture의 public.pem 정책 거부를 기록했다. N12-A–D와 N14-A–E는 미체크, 전체8/18·요청5/15·잔여10개다.
+
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.

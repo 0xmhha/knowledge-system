@@ -1,0 +1,27 @@
+{
+  "go_list_exit_code": 0,
+  "entry_points": [
+    "./cmd/cks",
+    "./cmd/graph",
+    "./cmd/vector"
+  ],
+  "dependencies": 479,
+  "local_packages": 118,
+  "local_active_build_and_embed_files": 508,
+  "embed_files": [
+    "internal/graph/persist/schema.sql",
+    "internal/system/viewer/web_assets/index.html",
+    "internal/vector/store/sqlitevec/migrations/000_baseline.sql",
+    "internal/vector/store/sqlitevec/migrations/001_add_category_guidance.sql",
+    "internal/vector/store/sqlitevec/migrations/002_add_invariant_refs.sql",
+    "internal/vector/store/sqlitevec/migrations/003_add_convention_stats.sql",
+    "internal/vector/store/sqlitevec/migrations/004_add_flow_meta.sql"
+  ],
+  "native_package_files": [
+    "internal/graph/parse/solidity/binding/parser.c",
+    "internal/vector/parse/solidity/binding/parser.c"
+  ],
+  "all_listed_local_files_source_bound": true,
+  "go_test_run": false,
+  "scope": "host Darwin ARM64 active dependency closure; other build tags/platforms and full Go tests not rerun"
+}
