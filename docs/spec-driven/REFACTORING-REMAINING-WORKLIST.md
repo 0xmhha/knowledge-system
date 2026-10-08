@@ -1,5 +1,9 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-09 최신 하위 단계(Claude Code): **N11 후보 책 수정 반영·기권 인용 규칙**. [수정 반영](./N11-CANDIDATE-REVISION.md) — 사용자 채택·DEV 교체·평가 문서 corpus 제외·ABS 인용 허용을 기록(검토자 이름 없음). 개정 책 DEV5/FINAL10, FINAL 군 CODE4·WHY1·POLICY1·TRACE2·ABS1(모두10 미만). 입력 검사가 protocol 규칙과 근거 원문이 있을 때만 인용 허용 기권을 받도록 RED→GREEN, 스크립트 시험26 통과, 개정 초안 검사 exit2·바이트 오류0. 승인0·동결0. 전체8/18·요청5/15·남은10개 유지.
+
+2026-10-09 최신 하위 단계(Claude Code): **N12 core·기능·요구·기준 수정 반영 제안**. [수정 반영](./N12-CORE-REVISION.md) — 사용자 30건 채택(검토자 이름 없음)을 ontology-pilot-v2/functional-v2/spec-pilot-v3 제안 파일로 반영, 원본·PILOT-SCOPE 불변. 생산 parser·core 검증 통과, 한국어 용어 충돌 해소를 matcher로 확인. verified0. 전체8/18·요청5/15·남은10개 유지.
+
 2026-10-09 최신 하위 단계(Claude Code): **N11 후보20문항 기술 사전검토**. [사전검토](./N11-CANDIDATE-PREREVIEW.md) — accept7·조건부1·modify5·증거보강4·reject3, span SHA 전부 일치. 후보 정답이 N11/N12 문서와 질문 책에 그대로 있어 corpus 제외 규칙 필요(치명), DEV-06/FINAL-03·DEV-07/FINAL-14 사실 공유, WHY3 reject, ABS 인용0 규칙 충돌. 채택해도 모든 군10개 미만. 사람 판정 아님. 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름과 N11/N12 판정. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
 
 2026-10-09 최신 하위 단계(Claude Code): **N12 core20·기능3·요구3·기준4 기술 사전검토**. [사전검토](./N12-CORE-PREREVIEW.md) — 개념 accept13·modify10, 요구·기준 accept2·modify5. criterion-decision의 needs-review는 제품 미지원, ac-filtered-completeness는 취소를 cancelled로 반환, ontology 기준은 집합 보존 명시 필요, 한국어 용어 부분 문자열 충돌2쌍을 코드에서 재확인. 사람 판정 아님·원본 YAML 불변. 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름과 30건 판정, N11 후보 사전검토. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
