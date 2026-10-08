@@ -1,0 +1,37 @@
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"strings"
+
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+
+func main() {
+	oldDir := "system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/"
+	newDir := "system/eval/b0-knowledge-system/refactoring-n14-run-roundtrip-2026-10-08/"
+	read := func(path string) []byte {
+		b, err := os.ReadFile(path)
+		if err != nil { panic(err) }
+		return b
+	}
+	// Parser-only coordinates; these drafts are not bound to a real candidate.
+	s := semantic.Snapshot{ProjectID: "knowledge-system", DatasetID: "parser-only-control", Commit: strings.Repeat("a",40)}
+	_, _, oldErr := semantic.ExtractOntology(s,"ontology.yaml",read(oldDir+"functional-ontology-option.yaml"))
+	if oldErr == nil { panic("old draft unexpectedly accepted") }
+	p, pack, err := semantic.ExtractOntology(s,"ontology.yaml",read(newDir+"functional-ontology-option.yaml"))
+	if err != nil { panic(err) }
+	sp, _, err := semantic.ExtractSpec(s,"spec.yaml",read(newDir+"functional-spec-option.yaml"))
+	if err != nil { panic(err) }
+	p.Requirements = sp.Requirements
+	p.Evidence = append(p.Evidence,sp.Evidence...)
+	if err := p.Validate(); err != nil { panic(err) }
+	criteria := 0
+	for _, c := range p.Concepts { if c.Status != semantic.StatusProposed || c.ReviewedBy != "" { panic("draft concept promoted") } }
+	for _, r := range p.Requirements { if r.Status != semantic.StatusProposed || r.ReviewedBy != "" { panic("draft requirement promoted") }; criteria += len(r.AcceptanceCriteria) }
+	if len(p.Assertions) != 0 { panic("draft contains claims") }
+	result := map[string]any{"old_draft_rejected":true,"old_error":oldErr.Error(),"corrected_ontology_parsed":true,"spec_parsed":true,"merged_projection_valid":true,"competency_questions":len(pack.CompetencyQuestions),"proposed_concepts":len(p.Concepts),"proposed_requirements":len(p.Requirements),"criteria":criteria,"assertions":len(p.Assertions),"parser_only":true,"source_backed_validation":false,"applied":false,"human_approved":false}
+	b,err:=json.MarshalIndent(result,"","  "); if err != nil { panic(err) }
+	if err:=os.WriteFile(newDir+"draft-parser-control.json",append(b,'\n'),0600); err != nil { panic(err) }
+}

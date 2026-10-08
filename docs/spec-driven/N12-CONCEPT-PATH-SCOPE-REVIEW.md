@@ -1,5 +1,7 @@
 # N12 개념 경로 5개: 실제 범위 대조와 명세 수정안
 
+2026-10-08 교정 안내: 이전 미적용 ontology 초안에 필수 competency_questions가 빠져 생산 파서가 거부한다. 원본은 보존하고 [새 교정본과 파서 검증](./N14-EXACT-RUN-ROUNDTRIP.md)에 질문3개를 추가했다. spec 바이트·proposed 상태는 그대로이며 적용/사람 승인0이다. 아래 범위 검토의 일반 YAML 확인을 생산 source-backed 검증으로 해석하지 않는다.
+
 2026-10-08 · **범위 대조·로컬 통합 검증 완료 / 명세 수정안 미적용 / N12·N14 전체 미완료**.
 
 [5개 검토 항목](../../system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/gap-review-items.json) · [원문18참조](../../system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/source-refs.json) · [통합 실행](../../system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/integration-report.json) · [관련 시험](../../system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/focused-tests-summary.json).
