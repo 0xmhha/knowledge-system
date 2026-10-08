@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-08 N14 보강: [실제 변경 검토 자료](./N14-ACTUAL-CHANGE-REVIEW.md)를 준비했다. 머지PR97의7변경 파일/11span과 새 exact5 test run·pass를 대조했으며 제안 연결/승인null을 유지한다. 실제 canonical trace·patch candidate/linked run·사람 수용·승격/반려/rollback은 미완료다. 우선순위와 남은 전체는 [완료 계획](./REFACTORING-COMPLETION-PLAN-2026-10-08.md)을 따른다. **전체8/18·요청5/15·잔여10개**, 다음 N11/N12 실제 판정과 독립 입력/actual candidate 결합.
+
 2026-10-08 최신: [전체 완료 실행 계획](./REFACTORING-COMPLETION-PLAN-2026-10-08.md)을 따른다. PR97 스쿼시 머지·main eeeab2e7 동기화 후 feat/refactoring-followup에서 기존 로컬 증거를 복구했다. 부분 완료 증거를 없애도 checker가 통과하던 빈틈을 실제 복사 ledger로 재현/수정했고8제어를 통과했다. N15-A/B/C·N17-A/B는 커밋 명세/manifest/원자료와 개별 결합한다. **전체8/18·요청5/15·잔여 N08/09/10/11/12/14/15/16/17/18 10개**, 다음 N11/N12 실제 검토와 N14 실제 수용 자료다. 아래는 이전 시점 이력이다.
 
 2026-10-08 현재 PR 상태: [PR97](https://github.com/0xmhha/knowledge-system/pull/97)을 일반 PR(ready for review)로 전환했다. 공개 head d7de0b89와 CI5/5 통과는 유지한다. 전체 미완료/출시 보류를 코드 검토 준비와 묶어 draft를 유지하던 판단을 바로잡았다. merge/출시/새 gold 승인은 없으며 전체8/18·요청5/15·잔여10개와 다음 N11/N12 실제 판정은 동일하다. 아래 draft 생성/유지 기록은 당시 이력이다.

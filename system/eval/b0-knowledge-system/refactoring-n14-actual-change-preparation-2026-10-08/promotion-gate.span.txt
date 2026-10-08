@@ -1,0 +1,78 @@
+func Promote(ctx context.Context, dataset, patchID, storePath string) (string, error) {
+	a, err := Load(dataset, patchID)
+	if err != nil {
+		return "", err
+	}
+	current, err := os.Readlink(filepath.Join(dataset, "current"))
+	if err != nil || (current != a.BaseVersion && current != a.ResultVersion) {
+		return "", fmt.Errorf("patch base is no longer current")
+	}
+	vdir := filepath.Join(dataset, a.ResultVersion)
+	if err := verifyTestGate(vdir, a); err != nil {
+		return "", err
+	}
+	p, err := CandidateProjection(ctx, dataset, a, storePath)
+	if err != nil {
+		return "", err
+	}
+	trace, err := p.Trace()
+	if err != nil {
+		return "", err
+	}
+	if len(trace.Requirements) == 0 {
+		return "", fmt.Errorf("patch candidate has no reviewed requirements")
+	}
+	for _, r := range trace.Requirements {
+		if r.State != semantic.TraceLinked {
+			return "", fmt.Errorf("requirement %q is %s, not linked", r.RequirementID, r.State)
+		}
+	}
+	decisions, err := readDecisions(dataset, patchID)
+	if err != nil {
+		return "", err
+	}
+	byCriterion := map[string]Decision{}
+	for _, d := range decisions {
+		if d.PatchID != patchID || d.ProjectID != a.ProjectID || d.DatasetID != a.ResultDatasetID || d.SnapshotID != a.ResultSnapshotID ||
+			byCriterion[d.CriterionID].DecisionID != "" || d.Outcome != "approved" || d.ReviewedBy == "" || d.Reason == "" {
+			return "", fmt.Errorf("patch has rejected, duplicate, or foreign criterion decision")
+		}
+		byCriterion[d.CriterionID] = d
+	}
+	criteria := 0
+	for _, r := range p.Requirements {
+		for _, c := range r.AcceptanceCriteria {
+			criteria++
+			d, ok := byCriterion[c.ID]
+			if !ok || d.SpecVersion != r.Version {
+				return "", fmt.Errorf("criterion %q lacks current human approval", c.ID)
+			}
+			evidenceSHA := ""
+			for _, e := range p.Evidence {
+				if e.ID == c.EvidenceID {
+					evidenceSHA = e.ContentSHA256
+					break
+				}
+			}
+			if evidenceSHA == "" || d.EvidenceSHA256 != evidenceSHA {
+				return "", fmt.Errorf("criterion %q approval evidence differs", c.ID)
+			}
+			run, err := loadRun(dataset, patchID, c.ID)
+			if err != nil {
+				return "", err
+			}
+			if err := validateRun(p, c.ID, run); err != nil {
+				return "", err
+			}
+		}
+	}
+	if len(byCriterion) != criteria {
+		return "", fmt.Errorf("patch has decisions for foreign criteria")
+	}
+	data, err := json.Marshal(decisions)
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256(data)
+	return setup.PromoteReviewedCandidateIfBase(dataset, a.ResultVersion, a.BaseVersion, patchID, hex.EncodeToString(sum[:]))
+}

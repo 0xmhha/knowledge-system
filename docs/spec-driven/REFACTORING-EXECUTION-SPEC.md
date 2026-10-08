@@ -298,3 +298,13 @@ N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 
 설계: 미완료 task의 checked ID와 verified_checks 목록을 정확히 대조하고 중복/다른 task/누락을 거부한다. 각 체크는 명시적인 scope·evidence_ref·커밋·manifest를 가진다. task의 해당 revision/manifest와 일치하고, 커밋 당시 명세에도 같은 체크가 있어야 한다. 보고서/실행 원자료/변경 source의 커밋SHA를 대조한다. native CI 체크는 task의 실행 상태/run ID도 결합한다. 과거 원자료를 현행 실측으로 덮어쓰지 않으며 검사기는 사람 판정의 실체/운영 적합성까지 인증하지 않는다.
 
 검증 조건: 정상5부분체크 통과, N15-C missing revision/file 및 not_run 변조 거부, 기록 누락/중복/다른 task/과거 미체크 조건·scope 누락 거부, 전체 완료8/18·잔여10개 유지. 새 모델/질의/FINAL 실행0. 승인 응답·runtime binding 없이 전체 N11/12/15/17 체크를 추가하지 않는다.
+
+## N-14: 실제 변경과 의미 수용의 종단 간 흐름
+
+**상태: 실제 변경 원문·raw 정확 시험 검토 준비 / 전체 미완료.** [실제 변경 자료](./N14-ACTUAL-CHANGE-REVIEW.md)에서 머지PR97의 req-source-evidence/ac-source-evidence와 실제7변경 파일·11원문span·새 정확시험5개를 연결했다. 이는 제안 source 연결이며 검토된 canonical trace·실제 candidate patch registry/linked run·사람 criterion decision은 없다.
+
+- [ ] N14-A 실제 ADR→요구→기준→code/test를 검토된 source/권위/범위 및 coordinated lock/snapshot·CKG canonical에 결합.
+- [ ] N14-B 실제 baseline/result 소스 변경을 hold-for-review 후보와 immutable patch attempt/변경 archive SHA에 결합하며 current 보존.
+- [ ] N14-C 검토된 trace의 실제 exact test/명령·출력SHA·spec version·snapshot-bound run을 기록하고 무관test/command-only/stale/불일치 거부.
+- [ ] N14-D 별도 실제 사람이 기준별 Given/When/Then을 승인/반려하고 이유·검토자·원문/시각·활동시간(미측정null)을 기록.
+- [ ] N14-E 실제 재색인/승격·반려·rollback·원문 신원 재생과 전체근거를 결합하며 pass/linked/verified/accepted 및 제한을 구분.

@@ -1,0 +1,1122 @@
+diff --git a/docs/spec-driven/SOURCE-SNAPSHOT-ADR.md b/docs/spec-driven/SOURCE-SNAPSHOT-ADR.md
+new file mode 100644
+index 00000000..7d74a356
+--- /dev/null
++++ b/docs/spec-driven/SOURCE-SNAPSHOT-ADR.md
+@@ -0,0 +1,69 @@
++# ADR: 소스 스냅샷과 인용 신원 (Git 이력 격리 보강)
++
++작성일: 2026-09-30 · 상태: **설계 채택, 2026-10-03 Git 이력 격리 보강** · 관련 계약: INV-01/02/03/06, FR-09/10, S-07/08/09. 세부 형식과 런타임/호환 경계는 [`END-TO-END-DESIGN.md`](./END-TO-END-DESIGN.md)가 우선한다. 아래의 임시 Git worktree 선택은 최초 설계 기록이며, 신규 고정 빌드에는 문서 끝의 B0-H 보강 계약이 우선한다.
++
++## 문제
++
++현재 `cks setup`은 깨끗한 `committed` 입력만 받아 Git HEAD를 CKG/CKV 인용에 기록한다. 이는 안전한 제한이다. 더러운 작업 트리를 그대로 읽으면 두 엔진이 서로 다른 시점의 파일을 볼 수 있고, 같은 HEAD의 수정·신규 파일은 같은 버전으로 오인된다. Git이 없는 프로젝트는 지금 설치 경로에서 제외된다. 현재 CKV 매니페스트에는 안정 `project_id`/`dataset_id`/`snapshot_id`가 없으며 의미 투영은 자체 프로젝트/데이터셋 ID를 갖는다. 기존 인용 소비자는 커밋·경로·줄을 사용한다.
++
++## 결정할 계약
++
++| 좌표 | 정의 | 필수 불변식 |
++|---|---|---|
++| `project_id` | 한 번 발급하거나 명시해 설정에 보존하는 안정 ID. 이름·로컬 절대 경로와 별개 | 같은 ID를 다른 프로젝트에 재사용하면 거부. 이동/복제 뒤에도 ID 유지. |
++| `source_commit` | 캡처 시작의 전체 HEAD SHA | Git 이력의 기준점이며 작업 트리 바이트의 유일한 신원이 아니다. |
++| `file_manifest_digest` | 선별된 저장소 상대 POSIX 경로, 파일 종류, SHA-256, 실행 비트와 제외 정책 버전을 순서대로 직렬화한 SHA-256 | 수정·신규 파일·실행 비트·정책 변경으로 값이 바뀐다. 정렬/정규화/UTF-8 경로 규칙은 골든으로 고정. 구 v2 매니페스트는 기존 해시를 유지. |
++| `snapshot_id` | `project_id`, `source_mode`, `source_commit`, `file_manifest_digest`, 캡처·Git 이력·파일 모드 정책을 버전별 도메인 분리 형식으로 해시 | 같은 HEAD의 다른 바이트·복구 이력·실행 비트가 신규 스냅샷에서 같은 ID가 될 수 없다. 구 v2–v4는 원래 계약대로 읽는다. |
++| `dataset_id` | `snapshot_id`, 빌드 전 고정한 그래프/벡터/의미 입력 파일·정책 다이제스트 및 스키마, 임베딩 정체성을 해시. 출력 다이제스트는 제외 | 같은 원천의 다른 모델/정책/스키마는 다른 데이터셋. 순환 신원 없이 빌드 전에 계산되며 사용자 버전 별칭과 다르다. |
++
++`committed`, `working-tree`, 비Git `snapshot-only`는 서로 다른 `source_mode`를 갖는다. 청결한 HEAD를 작업 트리 모드로 캡처해도 원문 파일 집합은 같지만 모드는 다른 신원이며, 검색 결과의 내용과 줄은 일치해야 한다. V1 인용의 `commit_hash` 필드는 계속 유지하고 새 v2 인용은 `snapshot_id`, `file_sha256`, `content_sha256`, `project_id`, `dataset_id`, `origin_id`를 필수로 가진다. **working-tree와 snapshot-only 인용의 `commit_hash`는 빈 문자열**이고 Git이 있을 때만 `base_commit`을 별도 필드로 기록한다. 구 소비자가 HEAD 원문으로 오해하지 않게 기존 MCP 인용 도구는 두 모드에서 `requires_v2`를 반환하고 새 v2 도구만 본문을 제공한다.
++
++## 캡처와 승격 절차
++
++1. 소스 루트의 실경로와 Git 공통 디렉터리를 확인한다. CKG/CKV가 실제 선택할 수 있는 원본 파일 경로 목록을 각 엔진의 탐지 규칙으로 계산한다. 정책이 다른 항목은 목록에 포함한 뒤 엔진별 예상 입력 여부를 표시한다. 비밀 경로, 모든 심볼릭 링크, 디바이스/소켓, 읽기 불가 파일은 명시적으로 제외하거나 오류로 처리하며 `doctor`에 개수만 노출한다. 경로 성분별 no-follow 열기로 검사한다.
++2. 파일 목록과 각 원문 SHA-256을 읽고 후보의 별도 staging 디렉터리에 저장한다. 복사 직후 원본/사본의 크기·해시를 확인한다. 하드링크는 원본의 추후 쓰기로 바뀔 수 있으므로 사용하지 않는다. staging 위치는 활성 데이터셋 밖이다. 파일 권한은 빌더에 필요한 읽기만 남긴다.
++3. Git 입력은 CKG의 이력 경로가 staged 바이트와 동일한 기준 HEAD를 볼 수 있도록 임시 Git worktree + 오버레이를 **선택한 구현**으로 사용한다. 비Git 입력은 일반 staging 디렉터리를 쓰고 이력 패스를 끈다. 빌드는 staging만 읽고 원본 작업 트리를 읽지 않는다. 엔진에는 `build_root`와 `logical_source_root`(설정에 저장한 프로젝트 위치), `snapshot_id`를 별도로 전달한다. 경로 정렬·인용은 origin 상대 경로를 쓰고, 공개 매니페스트에 임시 `build_root`를 남기지 않는다. CKV/CKG의 `canonical_id`도 임시 위치에 종속되지 않아야 한다. 해당 불변식이 테스트에서 깨지면 모드를 출시하지 않고 캡처 어댑터를 고친다.
++4. CKV/CKG와 의미 투영의 실제 원본 입력 경로/해시를 사전 목록과 대조한다. CKV가 읽는 생성 의미 텍스트는 별도 파생 매니페스트와 대조한다. 원본 작업 트리는 캡처 완료 후 바뀌어도 **캡처한 후보의 내용은 바뀌지 않는다**. 단, 캡처 도중 바뀐 파일은 실패시킨다. 후보의 저장 바이트와 각 출력 매니페스트를 빌드 종료 후 다시 검증한다.
++5. 커밋/작업 트리 모두 원문 파일을 콘텐츠 주소로 후보에 보관한다. 근거 검증 API는 보관본을 기본 원천으로 사용하고 원본 저장소가 없어도 같은 상대 경로·줄 범위·SHA-256 계약을 제공한다. 과거 인용을 현재 소스 경로나 Git HEAD의 파일로 재해석하지 않는다. 보관본이 없거나 해시가 다르면 `source_missing`/`snapshot_mismatch`를 반환한다. 공간 회수는 인용 보존 정책과 함께 별도 명령으로 수행하고 활성/롤백 가능 버전의 원문은 지우지 않는다.
++6. 그래프·벡터·의미 매니페스트의 모든 ID, 실제 파일 목록, 모델 신원을 검사한 후에만 `current`를 원자 전환한다. 실패/취소/프로세스 종료 중에는 이전 `current`와 그 원문 보관본을 유지한다. 승격 직후 질의/롤백도 같은 좌표를 재검증한다.
++
++## 기존 데이터와 이전
++
++기존 `committed` 데이터셋의 빈 `project_id`/`snapshot_id`는 `legacy_unpinned`으로 읽고 원래 커밋 인용만 제공한다. 다른 프로젝트/작업 트리와 결합하거나 의미 승격할 때 자동 보충하지 않는다. 사용자는 새 `cks init` 설정과 전체 재색인으로 v2 ID를 얻는다. 마이그레이션은 옛 DB 파일을 제자리에서 재해석하지 않는다. 새/옛 EvidencePack의 JSON 골든과 소비자 회귀가 통과해야 새 필드를 공개한다.
++
++## 기술 검증과 실패 오라클
++
++| 실험 | 통과 조건 |
++|---|---|
++| 같은 HEAD에서 추적 파일 수정→신규 파일 추가→다시 수정 | 세 `file_manifest_digest`/`snapshot_id`가 다르고 각 원문 인용이 보관본의 해당 바이트/줄을 가리킨다. |
++| Git이 없는 코드·문서 디렉터리 | `snapshot-only`에서 AST/CKV/인용이 동작하고 커밋·blame은 비활성 상태로 표시한다. 파일 변경은 새 스냅샷이다. |
++| 캡처 중 파일 변경·삭제·심볼릭 링크 교체 | 캡처 또는 해시 재검증이 실패하고 `current` 불변. |
++| CKG 이력 포함 작은 Git 픽스처 | staged AST는 수정 바이트를 인덱싱하지만 이력 기준은 원래 HEAD이고 임시 절대 경로가 공개 팩에 새지 않는다. |
++| 후보 그래프 성공/벡터 실패·의미 불일치·모델 교체 | 승격 거부, 기존 핸들/롤백 가능 버전 유지. |
++| 동일 이름 두 저장소와 동일 commit SHA 테스트 데이터 | `project_id`가 다르면 조인/질의/캐시 키 분리. |
++| 보관본 손상/삭제, 구버전 매니페스트 | 조용한 HEAD 재해석 금지. 명시 오류 또는 제한된 legacy 읽기. |
++| 외부로 나가는 링크/비밀 경로/권한 실패 | 경로·원문 누출 없이 거부 또는 기록된 제외. |
++
++### 2026-09-30 CKG/CKV 기술 검증 결과
++
++`/private/tmp/ks-snapshot-spike.O1uiWX`의 작은 Go 저장소에서 한 커밋을 만들고 `git worktree add --detach`로 분기한 뒤 함수 `Before`를 `AfterWorkingTree`로 바꿨다. 현재 `ckg build --src <staged> --lang go`는 수정된 `AfterWorkingTree` AST 노드를 만들고 동시에 원래 HEAD의 temporal 노드/엣지를 생성했다. 노드의 `file_path`는 `main.go`로 상대 경로였다. 반면 CKG 출력 매니페스트의 `src_root`는 임시 staged 절대 경로였다. **결론:** Git 이력과 수정 AST의 동시 수집은 작은 픽스처에서 가능하다. 임시 절대 경로를 정렬/매니페스트/인용에 남기지 않는 인터페이스 변경과 다른 언어·큰 저장소·worktree 제거 뒤 재조회 검증은 남아 있다. 이 결과만으로 ADR을 승인하지 않는다.
++
++같은 날 Go/TypeScript 2파일과 Markdown 1파일로 기술 실험을 확대했다. 수정된 두 파일을 임시 Git worktree에 오버레이하면 CKG는 새 함수 `AfterWorkingTree`와 `afterWorkingTreeTS`, 원래 HEAD의 Commit 1개를 함께 만들었다. 같은 바이트의 두 번째 worktree는 동일 Go 모듈 환경에서 같은 두 canonical ID와 같은 그래프 다이제스트를 냈다. 비Git 일반 디렉터리도 CKG 7노드/5엣지와 CKV 6청크를 만들고 Commit 노드 0개, 빈 `indexed_head`를 기록했다. 별도 `sources/blobs/<sha256>` 시험 보관본의 네 파일은 staging 경로 없이 해시만으로 다시 읽혔다.
++
++두 결함도 재현됐다. Git worktree 빌드에서 CKG 심볼은 두 canonical ID를 가졌지만 CKV 정렬은 **0/2**였다. CKG의 같은 줄 Hunk/구문 노드가 정렬 인덱스의 첫 후보가 되고 빈 canonical ID를 복사한 것이다. 비Git 빌드에서는 **2/2**였다. 따라서 CKV 정렬 후보는 비어 있지 않은 canonical ID의 AST 심볼 타입으로 제한하고, 동일 줄의 우선순위를 고정하며, 두 모드 모두 정렬률 게이트를 적용한다. 또한 Go 빌드 캐시가 쓰기 불가인 재실행에서는 `parse_errors_count=0`인데 Go 함수 canonical ID가 비었다. Go 패키지 신원 조회 실패를 별도 `parse_degraded` 오류로 다뤄야 한다. CKG/CKV 매니페스트 모두 현재 `src_root`에 임시 절대 경로를 기록하므로 공개 전 논리 경로 분리가 필수다. 실험은 원문 보관·재조회의 엔진 통합 구현을 대신하지 않으며 A4에서 실패 주입과 플랫폼 간 결정성을 검증한다.
++
++## 2026-09-30 구현 검증 계획 기록
++
++당시 설계는 임시 Git worktree+오버레이와 버전 디렉터리의 콘텐츠 주소 원문 blob 보관을 선택했다. 작은 Go 픽스처의 AST/이력 동시 수집은 확인했다. 큰 저장소/다언어, 원본 저장소 제거 뒤 인용 재현, 공개 v2 MCP 소비자, 파일 경로와 해시의 플랫폼 간 결정성은 구현 게이트에서 확인하도록 계획했다. 이후 Git 이력 재생은 아래 B0-H 계약으로 보강했다.
++
++## 2026-10-03 B0-H 보강: Git 복구 이력 봉인
++
++CKG는 HEAD 도달 이력에 더해 reflog/fsck에서 최대 100개의 복구 커밋을 그래프에 넣는다. 공유 `git worktree`는 개발 저장소의 이후 이력을 읽을 수 있으므로 신규 Git 소스의 `snapshot_id` v4는 파일·HEAD·캡처 정책·선택된 복구 SHA 집합과 **Git 아카이브 정책**을 포함한다. v2/v3의 신원 계산과 보관본 읽기는 유지한다.
++
++신규 캡처는 `sources/history.bundle`에 기준 HEAD와 선택된 복구 커밋의 Git 객체를 저장하고, `sources/manifest.json`에 bundle SHA-256·바이트 수·정렬된 복구 SHA를 기록한다. 캡처 시에만 원본 객체를 임시 bare 저장소의 alternate로 읽는다. bundle 출력은 기본 1 GiB(설치 시 `--max-git-history-bytes`로 조정)까지 스트리밍하며 초과·객체 누락·복구 집합 변경은 후보를 실패시킨다. 빌드는 bundle을 **독립 Git 저장소**에 복원해 캡처 파일을 덮어쓴 뒤 실행한다. 복원 저장소의 reflog/fsck가 선택된 SHA만 반환하는지 확인하고 alternate는 설치하지 않는다. 승격/보관본 검증은 bundle의 크기·해시와 v4 정책을 검사한다. 원본 저장소가 삭제되거나 GC된 뒤에도 보관본만으로 같은 입력을 재생할 수 있다.
++
++CKG의 `graph_digest`는 코드 노드/엣지의 다이제스트이며 복구용 Commit/Hunk 노드·엣지는 제외한다. 따라서 B0-H 재현 시험은 `graph_digest`에 더해 AMBIGUOUS 복구 노드 ID 집합과 총 노드·엣지 수를 비교한다. 작은 Go 픽스처에서 원본 저장소 삭제 전후 CKG 빌드가 이 네 항목에서 일치했다. 큰 저장소의 아카이브 시간·크기와 macOS/Linux 간 재생 비용은 별도 측정 대상이며 실모델 품질 수치는 아니다.
++
++## 2026-10-03 파일럿 교정: 실행 비트의 신원과 재생
++
++실행 파일 30개가 있는 고정 코퍼스의 첫 v4 빌드에서 파일 바이트를 다시 쓰자 Git checkout의 실행 비트가 사라졌다. CKG/CKV 출력은 생성됐으나 승격 게이트의 Git clean 검사에서 거부됐다. 신규 캡처는 파일별 실행 비트와 `file_mode_policy=executable-bit-v1`을 기록한다. 파일 매니페스트 v3·스냅샷 v5에 이 값을 넣어 같은 바이트의 실행 비트 변경도 다른 신원으로 만든다. `committed` 빌드는 bundle에서 복원한 Git checkout을 그대로 사용해 HEAD에 포함된 모드를 유지하고, `working-tree`는 캡처한 실행 비트를 임시 파일에 재현한다. 캡처 전후 모드가 변하면 실패한다. 구 v2–v4 보관본은 기존 신원 방식으로만 읽고 재해석하지 않는다. 검증과 파일럿 수치는 [`B0-H-GATE-REPORT.md`](./B0-H-GATE-REPORT.md)에 있다.
+diff --git a/docs/spec-driven/spec-pilot.yaml b/docs/spec-driven/spec-pilot.yaml
+new file mode 100644
+index 00000000..f83a71ea
+--- /dev/null
++++ b/docs/spec-driven/spec-pilot.yaml
+@@ -0,0 +1,40 @@
++version: 1
++project_id: knowledge-system
++requirements:
++  - id: req-filtered-recall
++    version: 1
++    title: Filtered CKV recall
++    statement: CKV returns eligible nearest chunks under sparse metadata filters.
++    concept_ids: [vector-chunk, policy]
++    status: proposed
++    acceptance_criteria:
++      - id: ac-filtered-recall
++        given: A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks
++        when: A filtered query requests K results
++        then: The response contains K eligible chunks in exact distance order
++      - id: ac-filtered-completeness
++        given: A larger filtered candidate set contains at least K eligible chunks
++        when: A filtered query reaches a search budget or is cancelled
++        then: The response marks incomplete with a reason and never claims K-result completeness
++  - id: req-source-evidence
++    version: 1
++    title: Source-backed meaning
++    statement: Reviewed semantic relationships remain tied to one captured source snapshot.
++    concept_ids: [source-snapshot, evidence-span, semantic-assertion]
++    status: proposed
++    acceptance_criteria:
++      - id: ac-source-evidence
++        given: A relation with a code anchor from another snapshot
++        when: The semantic dataset is promoted
++        then: Promotion fails and the active dataset remains unchanged
++  - id: req-ontology-fallback
++    version: 1
++    title: Safe ontology interpretation
++    statement: Optional concept matching preserves the existing hybrid retrieval candidates.
++    concept_ids: [concept, term, evidence-pack]
++    status: proposed
++    acceptance_criteria:
++      - id: ac-ontology-fallback
++        given: An ambiguous term or an unverified concept relationship
++        when: A user asks a natural-language question
++        then: The baseline CKV and CKG citation set is preserved
+diff --git a/internal/system/patch/patch_test.go b/internal/system/patch/patch_test.go
+new file mode 100644
+index 00000000..59dc0256
+--- /dev/null
++++ b/internal/system/patch/patch_test.go
+@@ -0,0 +1,137 @@
++package patch
++
++import (
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++
++	"github.com/0xmhha/knowledge-system/internal/setup"
++	"github.com/0xmhha/knowledge-system/internal/system/semantic"
++)
++
++func patchVersion(t *testing.T, source, dataset, version string) *setup.DatasetIdentity {
++	t.Helper()
++	vdir := filepath.Join(dataset, version)
++	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: source, Out: vdir, ProjectID: "pilot", SourceMode: "snapshot-only"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	expected, err := setup.NewDatasetIdentity(captured.Identity, json.RawMessage(`{"model":"mock","dim":8,"checksum":"mock-space"}`), "inputs")
++	if err != nil {
++		t.Fatal(err)
++	}
++	for _, side := range []string{"graph", "vector"} {
++		dir := filepath.Join(vdir, side)
++		if err := os.Mkdir(dir, 0o700); err != nil {
++			t.Fatal(err)
++		}
++		manifest := map[string]any{"src_root": source, "graph_digest": "graph", "schema_version": "1.23",
++			"embedding_model": "mock", "embedding_dim": 8, "embedding_checksum": "mock-space",
++			"project_id": captured.Identity.ProjectID, "snapshot_id": captured.Identity.SnapshotID,
++			"dataset_id": expected.DatasetID, "source_mode": captured.Identity.SourceMode,
++			"file_manifest_digest":  captured.Identity.FileManifestDigest,
++			"capture_policy_digest": captured.Identity.CapturePolicyDigest}
++		data, _ := json.Marshal(manifest)
++		if err := os.WriteFile(filepath.Join(dir, "manifest.json"), data, 0o600); err != nil {
++			t.Fatal(err)
++		}
++	}
++	identity, err := setup.PublishCandidateIdentity(vdir, captured.Identity, "inputs")
++	if err != nil {
++		t.Fatal(err)
++	}
++	return &identity
++}
++
++func TestPatchRegisterPinsChangedFilesAndRefusesReusedID(t *testing.T) {
++	source, dataset := t.TempDir(), t.TempDir()
++	file := filepath.Join(source, "README.md")
++	if err := os.WriteFile(file, []byte("before\n"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	patchVersion(t, source, dataset, "base")
++	if err := os.Symlink("base", filepath.Join(dataset, "current")); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(file, []byte("after\n"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	first := patchVersion(t, source, dataset, "candidate")
++	h := hold{ProjectID: "pilot", DatasetID: first.DatasetID, SnapshotID: first.Source.SnapshotID, BaseVersion: "base"}
++	data, _ := json.Marshal(h)
++	if err := os.WriteFile(filepath.Join(dataset, "candidate", "review-hold.json"), data, 0o600); err != nil {
++		t.Fatal(err)
++	}
++	a, err := Register(dataset, "candidate", "change-1")
++	if err != nil || len(a.ChangedFiles) != 1 || a.ChangedFiles[0].Path != "README.md" || a.State != "unconfirmed" {
++		t.Fatalf("registered patch: %+v %v", a, err)
++	}
++	if _, err := Register(dataset, "candidate", "change-1"); err != nil {
++		t.Fatalf("identical retry changed patch: %v", err)
++	}
++	if _, err := setup.Promote(dataset, "candidate"); err == nil {
++		t.Fatal("held patch promoted without review")
++	}
++	if err := os.WriteFile(file, []byte("different\n"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	second := patchVersion(t, source, dataset, "other")
++	h = hold{ProjectID: "pilot", DatasetID: second.DatasetID, SnapshotID: second.Source.SnapshotID, BaseVersion: "base"}
++	data, _ = json.Marshal(h)
++	if err := os.WriteFile(filepath.Join(dataset, "other", "review-hold.json"), data, 0o600); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := Register(dataset, "other", "change-1"); err == nil {
++		t.Fatal("same patch ID accepted different changed bytes")
++	}
++}
++
++func TestReviewedPromotionRechecksActiveBaseAtSwap(t *testing.T) {
++	source, dataset := t.TempDir(), t.TempDir()
++	if err := os.WriteFile(filepath.Join(source, "README.md"), []byte("source\n"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	patchVersion(t, source, dataset, "base")
++	patchVersion(t, source, dataset, "other")
++	candidate := patchVersion(t, source, dataset, "candidate")
++	if _, err := setup.Promote(dataset, "base"); err != nil {
++		t.Fatal(err)
++	}
++	h := hold{ProjectID: "pilot", DatasetID: candidate.DatasetID, SnapshotID: candidate.Source.SnapshotID, BaseVersion: "base"}
++	data, _ := json.Marshal(h)
++	if err := os.WriteFile(filepath.Join(dataset, "candidate", "review-hold.json"), data, 0o600); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := setup.Promote(dataset, "other"); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := setup.PromoteReviewedCandidateIfBase(dataset, "candidate", "base", "patch-1", strings.Repeat("a", 64)); err == nil {
++		t.Fatal("stale base promoted a reviewed candidate")
++	}
++	if current, _ := os.Readlink(filepath.Join(dataset, "current")); current != "other" {
++		t.Fatalf("stale review changed current to %q", current)
++	}
++	if _, err := os.Lstat(filepath.Join(dataset, "candidate", "review-release.json")); !os.IsNotExist(err) {
++		t.Fatalf("stale review wrote release marker: %v", err)
++	}
++}
++
++func TestCriterionPromotionRejectsCommandOnlySuccess(t *testing.T) {
++	snapshot := semantic.Snapshot{ProjectID: "p", DatasetID: "d", SnapshotID: strings.Repeat("a", 64)}
++	projection := semantic.Projection{Snapshot: snapshot,
++		Requirements: []semantic.Requirement{{ID: "R", AcceptanceCriteria: []semantic.AcceptanceCriterion{{ID: "C"}}}},
++		Assertions: []semantic.Assertion{{ID: "check", Predicate: semantic.PredicateCheckedBy,
++			Status: semantic.StatusVerified, SubjectID: "C", ObjectID: "test"}}}
++	run := semantic.TestRun{Snapshot: snapshot, CriterionID: "C", TestCanonicalID: "test",
++		CommandPassed: true, SnapshotConsistent: true, ExitCode: 0,
++		CheckedAssertions: []string{"check"}, CommandSHA256: strings.Repeat("b", 64), OutputSHA256: strings.Repeat("c", 64)}
++	if err := validateRun(projection, "C", run); err == nil {
++		t.Fatal("a successful arbitrary command was accepted as exact test proof")
++	}
++	run.Framework, run.TestName, run.TestObserved, run.TestPassed = "go-test-json", "TestExact", true, true
++	if err := validateRun(projection, "C", run); err != nil {
++		t.Fatalf("observed exact test was rejected: %v", err)
++	}
++}
+diff --git a/internal/system/patch/review.go b/internal/system/patch/review.go
+new file mode 100644
+index 00000000..4bdd081d
+--- /dev/null
++++ b/internal/system/patch/review.go
+@@ -0,0 +1,282 @@
++package patch
++
++import (
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"os"
++	"path/filepath"
++	"sort"
++	"strings"
++	"time"
++
++	"github.com/0xmhha/knowledge-system/internal/setup"
++	"github.com/0xmhha/knowledge-system/internal/system/semantic"
++)
++
++func reviewDir(dataset, patchID string) (string, error) {
++	path, err := registryPath(dataset, patchID)
++	if err != nil {
++		return "", err
++	}
++	return strings.TrimSuffix(path, ".json"), nil
++}
++
++func criterionInProjection(p semantic.Projection, id string) (semantic.Requirement, semantic.AcceptanceCriterion, error) {
++	for _, r := range p.Requirements {
++		for _, c := range r.AcceptanceCriteria {
++			if c.ID == id {
++				return r, c, nil
++			}
++		}
++	}
++	return semantic.Requirement{}, semantic.AcceptanceCriterion{}, fmt.Errorf("criterion %q is absent from candidate specification", id)
++}
++
++func loadRun(dataset, patchID, criterionID string) (semantic.TestRun, error) {
++	dir, err := reviewDir(dataset, patchID)
++	if err != nil {
++		return semantic.TestRun{}, err
++	}
++	if !safeID.MatchString(criterionID) {
++		return semantic.TestRun{}, fmt.Errorf("invalid criterion ID")
++	}
++	var run semantic.TestRun
++	if err := readJSON(filepath.Join(dir, "runs", criterionID+".json"), &run); err != nil {
++		return semantic.TestRun{}, err
++	}
++	return run, nil
++}
++
++func validateRun(p semantic.Projection, criterionID string, run semantic.TestRun) error {
++	if run.Snapshot != p.Snapshot || run.CriterionID != criterionID || run.TestCanonicalID == "" ||
++		!run.CommandPassed || !run.SnapshotConsistent || run.ExitCode != 0 || len(run.CheckedAssertions) == 0 ||
++		len(run.AcceptedAssertions) != 0 || run.CommandSHA256 == "" || run.OutputSHA256 == "" {
++		return fmt.Errorf("test execution is absent, failed, stale, or not bound to a reviewed CHECKED_BY link")
++	}
++	if run.Framework != "go-test-json" || !run.TestObserved || !run.TestPassed || run.TestName == "" {
++		return fmt.Errorf("criterion promotion requires an observed exact test result")
++	}
++	if _, _, err := criterionInProjection(p, criterionID); err != nil {
++		return err
++	}
++	linked := false
++	for _, assertion := range p.Assertions {
++		if assertion.Predicate == semantic.PredicateCheckedBy && assertion.Status == semantic.StatusVerified &&
++			assertion.SubjectID == criterionID && assertion.ObjectID == run.TestCanonicalID {
++			for _, id := range run.CheckedAssertions {
++				if id == assertion.ID {
++					linked = true
++				}
++			}
++		}
++	}
++	if !linked {
++		return fmt.Errorf("test execution does not match a reviewed criterion link")
++	}
++	return nil
++}
++
++// RecordRun imports one immutable cks semantic test report. A command exit 0
++// is retained as execution evidence only; it never approves a criterion.
++func RecordRun(ctx context.Context, dataset, patchID, storePath, reportPath string) (semantic.TestRun, error) {
++	a, err := Load(dataset, patchID)
++	if err != nil {
++		return semantic.TestRun{}, err
++	}
++	p, err := CandidateProjection(ctx, dataset, a, storePath)
++	if err != nil {
++		return semantic.TestRun{}, err
++	}
++	var run semantic.TestRun
++	if err := readJSON(reportPath, &run); err != nil {
++		return semantic.TestRun{}, err
++	}
++	if err := validateRun(p, run.CriterionID, run); err != nil {
++		return semantic.TestRun{}, err
++	}
++	dir, _ := reviewDir(dataset, patchID)
++	if err := writeImmutable(filepath.Join(dir, "runs", run.CriterionID+".json"), run); err != nil {
++		return semantic.TestRun{}, err
++	}
++	return run, nil
++}
++
++// Decide records one person's criterion judgment against the exact archived
++// spec evidence. Approved requires a separately recorded passing test run.
++func Decide(ctx context.Context, dataset, patchID, storePath, decisionID, criterionID, reviewer, outcome, reason string) (Decision, error) {
++	if !safeID.MatchString(decisionID) || !safeID.MatchString(criterionID) ||
++		strings.TrimSpace(reviewer) == "" || strings.TrimSpace(reason) == "" ||
++		(outcome != "approved" && outcome != "rejected") {
++		return Decision{}, fmt.Errorf("invalid criterion review fields")
++	}
++	a, err := Load(dataset, patchID)
++	if err != nil {
++		return Decision{}, err
++	}
++	p, err := CandidateProjection(ctx, dataset, a, storePath)
++	if err != nil {
++		return Decision{}, err
++	}
++	r, c, err := criterionInProjection(p, criterionID)
++	if err != nil {
++		return Decision{}, err
++	}
++	if outcome == "approved" {
++		run, err := loadRun(dataset, patchID, criterionID)
++		if err != nil {
++			return Decision{}, err
++		}
++		if err := validateRun(p, criterionID, run); err != nil {
++			return Decision{}, err
++		}
++	}
++	var evidenceSHA string
++	for _, e := range p.Evidence {
++		if e.ID == c.EvidenceID {
++			evidenceSHA = e.ContentSHA256
++			break
++		}
++	}
++	if evidenceSHA == "" {
++		return Decision{}, fmt.Errorf("criterion source evidence is missing")
++	}
++	d := Decision{DecisionID: decisionID, PatchID: patchID, CriterionID: criterionID, SpecVersion: r.Version,
++		ProjectID: a.ProjectID, DatasetID: a.ResultDatasetID, SnapshotID: a.ResultSnapshotID,
++		EvidenceSHA256: evidenceSHA, ReviewedBy: reviewer, Outcome: outcome, Reason: reason, CreatedAt: time.Now().UTC()}
++	dir, _ := reviewDir(dataset, patchID)
++	if err := writeImmutable(filepath.Join(dir, "decisions", decisionID+".json"), d); err != nil {
++		return Decision{}, err
++	}
++	return d, nil
++}
++
++func readDecisions(dataset, patchID string) ([]Decision, error) {
++	dir, err := reviewDir(dataset, patchID)
++	if err != nil {
++		return nil, err
++	}
++	entries, err := os.ReadDir(filepath.Join(dir, "decisions"))
++	if err != nil {
++		return nil, err
++	}
++	result := make([]Decision, 0, len(entries))
++	for _, entry := range entries {
++		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") || !safeID.MatchString(strings.TrimSuffix(entry.Name(), ".json")) {
++			return nil, fmt.Errorf("invalid patch decision entry")
++		}
++		var d Decision
++		if err := readJSON(filepath.Join(dir, "decisions", entry.Name()), &d); err != nil {
++			return nil, err
++		}
++		if d.DecisionID+".json" != entry.Name() {
++			return nil, fmt.Errorf("patch decision ID differs from file name")
++		}
++		result = append(result, d)
++	}
++	sort.Slice(result, func(i, j int) bool { return result[i].DecisionID < result[j].DecisionID })
++	return result, nil
++}
++
++func verifyTestGate(versionDir string, a Attempt) error {
++	var report struct {
++		SnapshotID         string `json:"snapshot_id"`
++		CommandPassed      bool   `json:"command_passed"`
++		SnapshotConsistent bool   `json:"snapshot_consistent"`
++		ExitCode           int    `json:"exit_code"`
++		CommandSHA256      string `json:"command_sha256"`
++		OutputSHA256       string `json:"output_sha256"`
++	}
++	if err := readJSONLoose(filepath.Join(versionDir, "test-gate.json"), &report); err != nil {
++		return err
++	}
++	if report.SnapshotID != a.ResultSnapshotID || !report.CommandPassed || !report.SnapshotConsistent || report.ExitCode != 0 ||
++		len(report.CommandSHA256) != 64 || len(report.OutputSHA256) != 64 {
++		return fmt.Errorf("candidate test gate did not pass on the patch snapshot")
++	}
++	return nil
++}
++
++// Promote requires an unchanged active base, a passing candidate test gate,
++// a current semantic trace and a separate approved human decision plus test
++// execution for every criterion. Any rejection holds the candidate.
++func Promote(ctx context.Context, dataset, patchID, storePath string) (string, error) {
++	a, err := Load(dataset, patchID)
++	if err != nil {
++		return "", err
++	}
++	current, err := os.Readlink(filepath.Join(dataset, "current"))
++	if err != nil || (current != a.BaseVersion && current != a.ResultVersion) {
++		return "", fmt.Errorf("patch base is no longer current")
++	}
++	vdir := filepath.Join(dataset, a.ResultVersion)
++	if err := verifyTestGate(vdir, a); err != nil {
++		return "", err
++	}
++	p, err := CandidateProjection(ctx, dataset, a, storePath)
++	if err != nil {
++		return "", err
++	}
++	trace, err := p.Trace()
++	if err != nil {
++		return "", err
++	}
++	if len(trace.Requirements) == 0 {
++		return "", fmt.Errorf("patch candidate has no reviewed requirements")
++	}
++	for _, r := range trace.Requirements {
++		if r.State != semantic.TraceLinked {
++			return "", fmt.Errorf("requirement %q is %s, not linked", r.RequirementID, r.State)
++		}
++	}
++	decisions, err := readDecisions(dataset, patchID)
++	if err != nil {
++		return "", err
++	}
++	byCriterion := map[string]Decision{}
++	for _, d := range decisions {
++		if d.PatchID != patchID || d.ProjectID != a.ProjectID || d.DatasetID != a.ResultDatasetID || d.SnapshotID != a.ResultSnapshotID ||
++			byCriterion[d.CriterionID].DecisionID != "" || d.Outcome != "approved" || d.ReviewedBy == "" || d.Reason == "" {
++			return "", fmt.Errorf("patch has rejected, duplicate, or foreign criterion decision")
++		}
++		byCriterion[d.CriterionID] = d
++	}
++	criteria := 0
++	for _, r := range p.Requirements {
++		for _, c := range r.AcceptanceCriteria {
++			criteria++
++			d, ok := byCriterion[c.ID]
++			if !ok || d.SpecVersion != r.Version {
++				return "", fmt.Errorf("criterion %q lacks current human approval", c.ID)
++			}
++			evidenceSHA := ""
++			for _, e := range p.Evidence {
++				if e.ID == c.EvidenceID {
++					evidenceSHA = e.ContentSHA256
++					break
++				}
++			}
++			if evidenceSHA == "" || d.EvidenceSHA256 != evidenceSHA {
++				return "", fmt.Errorf("criterion %q approval evidence differs", c.ID)
++			}
++			run, err := loadRun(dataset, patchID, c.ID)
++			if err != nil {
++				return "", err
++			}
++			if err := validateRun(p, c.ID, run); err != nil {
++				return "", err
++			}
++		}
++	}
++	if len(byCriterion) != criteria {
++		return "", fmt.Errorf("patch has decisions for foreign criteria")
++	}
++	data, err := json.Marshal(decisions)
++	if err != nil {
++		return "", err
++	}
++	sum := sha256.Sum256(data)
++	return setup.PromoteReviewedCandidateIfBase(dataset, a.ResultVersion, a.BaseVersion, patchID, hex.EncodeToString(sum[:]))
++}
+diff --git a/internal/system/semantic/alignment.go b/internal/system/semantic/alignment.go
+new file mode 100644
+index 00000000..4f262768
+--- /dev/null
++++ b/internal/system/semantic/alignment.go
+@@ -0,0 +1,279 @@
++package semantic
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"os"
++	"path/filepath"
++	"strconv"
++	"strings"
++)
++
++type graphCoordinates struct {
++	ProjectID          string `json:"project_id"`
++	SnapshotID         string `json:"snapshot_id"`
++	DatasetID          string `json:"dataset_id"`
++	FileManifestDigest string `json:"file_manifest_digest"`
++	SchemaVersion      string `json:"schema_version"`
++	SrcRoot            string `json:"src_root"`
++	SrcCommit          string `json:"src_commit"`
++	SourceMode         string `json:"source_mode"`
++	GraphDigest        string `json:"graph_digest"`
++}
++
++type vectorCoordinates struct {
++	ProjectID          string `json:"project_id"`
++	SnapshotID         string `json:"snapshot_id"`
++	DatasetID          string `json:"dataset_id"`
++	FileManifestDigest string `json:"file_manifest_digest"`
++	SrcRoot            string `json:"src_root"`
++	SrcCommit          string `json:"src_commit"`
++	SourceMode         string `json:"source_mode"`
++	SymbolCount        int    `json:"symbol_count"`
++	CanonicalCount     int    `json:"canonical_count"`
++	Sources            struct {
++		CKG struct {
++			GraphDigest string `json:"graph_digest"`
++			SrcCommit   string `json:"src_commit"`
++		} `json:"ckg"`
++	} `json:"sources"`
++}
++
++// ValidateCanonicalCoverage applies a project-specific promotion floor to
++// CKV's code-symbol alignment. Zero disables this optional gate.
++func ValidateCanonicalCoverage(vectorDir string, minimum float64) error {
++	if minimum < 0 || minimum > 1 {
++		return fmt.Errorf("canonical coverage minimum must be between 0 and 1")
++	}
++	if minimum == 0 {
++		return nil
++	}
++	var vector vectorCoordinates
++	if err := readCoordinates(filepath.Join(vectorDir, "manifest.json"), &vector); err != nil {
++		return fmt.Errorf("semantic vector manifest: %w", err)
++	}
++	if vector.SymbolCount <= 0 || vector.CanonicalCount < 0 || vector.CanonicalCount > vector.SymbolCount {
++		return fmt.Errorf("semantic canonical coverage counters missing or invalid")
++	}
++	ratio := float64(vector.CanonicalCount) / float64(vector.SymbolCount)
++	if ratio < minimum {
++		return fmt.Errorf("semantic canonical coverage %.4f below project minimum %.4f", ratio, minimum)
++	}
++	return nil
++}
++
++// ValidateDatasetAlignment requires all three layers to share an exact source
++// commit, graph coordinate pin, and source tree. Unlike legacy setup alignment
++// (which warns on old indexes), semantic promotion refuses missing coordinates.
++func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string) error {
++	if err := p.Validate(); err != nil {
++		return err
++	}
++	var graph graphCoordinates
++	if err := readCoordinates(filepath.Join(graphDir, "manifest.json"), &graph); err != nil {
++		return fmt.Errorf("semantic graph manifest: %w", err)
++	}
++	var vector vectorCoordinates
++	if err := readCoordinates(filepath.Join(vectorDir, "manifest.json"), &vector); err != nil {
++		return fmt.Errorf("semantic vector manifest: %w", err)
++	}
++	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
++	vectorPinned := vector.ProjectID != "" || vector.SnapshotID != "" || vector.DatasetID != ""
++	if graphPinned || vectorPinned {
++		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" || graph.FileManifestDigest == "" ||
++			vector.ProjectID != graph.ProjectID || vector.SnapshotID != graph.SnapshotID || vector.DatasetID != graph.DatasetID ||
++			vector.FileManifestDigest != graph.FileManifestDigest ||
++			p.Snapshot.ProjectID != graph.ProjectID || p.Snapshot.DatasetID != graph.DatasetID ||
++			p.Snapshot.SnapshotID != graph.SnapshotID {
++			return fmt.Errorf("semantic project/snapshot/dataset identity differs across graph, vector and projection")
++		}
++	}
++	parts := strings.SplitN(graph.SchemaVersion, ".", 3)
++	if len(parts) < 2 {
++		return fmt.Errorf("semantic graph schema version missing or invalid")
++	}
++	major, majorErr := strconv.Atoi(parts[0])
++	minor, minorErr := strconv.Atoi(parts[1])
++	if majorErr != nil || minorErr != nil || major < 1 || (major == 1 && minor < 19) {
++		return fmt.Errorf("semantic graph schema %q lacks canonical_id support", graph.SchemaVersion)
++	}
++	mode := p.Snapshot.SourceMode
++	if mode == "" {
++		mode = "committed"
++	}
++	if graphPinned && (graph.SourceMode != vector.SourceMode ||
++		(graph.SourceMode != "" && graph.SourceMode != mode) ||
++		(graph.SourceMode == "" && mode != "committed")) {
++		return fmt.Errorf("semantic source mode differs across graph, vector and projection")
++	}
++	if (mode != "snapshot-only" && (graph.SrcCommit == "" || vector.SrcCommit == "" || vector.Sources.CKG.SrcCommit == "")) ||
++		(mode == "snapshot-only" && p.Snapshot.Commit != "") ||
++		graph.SrcCommit != p.Snapshot.Commit || vector.SrcCommit != p.Snapshot.Commit ||
++		vector.Sources.CKG.SrcCommit != p.Snapshot.Commit {
++		return fmt.Errorf("semantic source commit is missing or differs across graph, vector and projection")
++	}
++	if !digestPattern.MatchString(graph.GraphDigest) || graph.GraphDigest != vector.Sources.CKG.GraphDigest {
++		return fmt.Errorf("semantic graph digest pin is missing or mismatched")
++	}
++	if graph.SrcRoot == "" || vector.SrcRoot == "" {
++		return fmt.Errorf("semantic source root missing from graph or vector manifest")
++	}
++	repo, err := normalizedRoot(repoRoot)
++	if err != nil {
++		return err
++	}
++	graphRoot, err := normalizedRoot(graph.SrcRoot)
++	if err != nil {
++		return err
++	}
++	vectorRoot, err := normalizedRoot(vector.SrcRoot)
++	if err != nil {
++		return err
++	}
++	if repo != graphRoot || repo != vectorRoot {
++		return fmt.Errorf("semantic source root differs across graph, vector and projection repository")
++	}
++	return nil
++}
++
++// PinnedSnapshotID returns the graph candidate's immutable snapshot ID when
++// the new contract is present. Legacy manifests return an empty string.
++func PinnedSnapshotID(graphDir, projectID, datasetID string) (string, error) {
++	var graph graphCoordinates
++	if err := readCoordinates(filepath.Join(graphDir, "manifest.json"), &graph); err != nil {
++		return "", err
++	}
++	if graph.ProjectID == "" && graph.DatasetID == "" && graph.SnapshotID == "" {
++		return "", nil
++	}
++	if graph.ProjectID != projectID || graph.DatasetID != datasetID || graph.SnapshotID == "" {
++		return "", fmt.Errorf("semantic project/dataset flags do not match pinned graph identity")
++	}
++	return graph.SnapshotID, nil
++}
++
++func normalizedRoot(root string) (string, error) {
++	if root == "" {
++		return "", fmt.Errorf("empty source root")
++	}
++	abs, err := filepath.Abs(root)
++	if err != nil {
++		return "", err
++	}
++	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
++		return filepath.Clean(resolved), nil
++	}
++	return filepath.Clean(abs), nil
++}
++
++func readCoordinates(path string, out any) error {
++	buf, err := os.ReadFile(path)
++	if err != nil {
++		return err
++	}
++	if err := json.Unmarshal(buf, out); err != nil {
++		return err
++	}
++	return nil
++}
++
++// PutAligned is the promotion entry point for projections attached to built
++// CKV/CKG datasets. It verifies engine coordinates and source bytes before
++// the immutable projection is persisted. Put remains available for preparing
++// an unpromoted projection without engine indexes.
++func (s *Store) PutAligned(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir string) error {
++	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
++		return err
++	}
++	if err := ValidateCodeAnchors(p, graphDir); err != nil {
++		return err
++	}
++	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
++		return err
++	}
++	return s.Put(ctx, p, repoRoot)
++}
++
++// PutAlignedRetained validates raw meaning against the immutable candidate
++// archive, including when the source has no Git history or has since changed.
++func (s *Store) PutAlignedRetained(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir, versionDir string) error {
++	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
++		return err
++	}
++	if err := ValidateCodeAnchors(p, graphDir); err != nil {
++		return err
++	}
++	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
++		return err
++	}
++	if err := p.ValidateRetainedSources(versionDir); err != nil {
++		return err
++	}
++	return s.putVerified(ctx, p)
++}
++
++// ActivateAligned rechecks current engine coordinates immediately before
++// selecting a projection. It keeps an older stored candidate from becoming
++// live after the graph/vector indexes have moved to another snapshot.
++func (s *Store) ActivateAligned(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir string) error {
++	p, err := s.Load(ctx, projectID, datasetID)
++	if err != nil {
++		return err
++	}
++	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
++		return err
++	}
++	if err := ValidateCodeAnchors(p, graphDir); err != nil {
++		return err
++	}
++	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
++		return err
++	}
++	if err := p.ValidateSources(ctx, repoRoot); err != nil {
++		return err
++	}
++	return s.Activate(ctx, projectID, datasetID)
++}
++
++func (s *Store) ActivateAlignedRetained(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir, versionDir string) error {
++	p, err := s.Load(ctx, projectID, datasetID)
++	if err != nil {
++		return err
++	}
++	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
++		return err
++	}
++	if err := ValidateCodeAnchors(p, graphDir); err != nil {
++		return err
++	}
++	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
++		return err
++	}
++	if err := p.ValidateRetainedSources(versionDir); err != nil {
++		return err
++	}
++	return s.Activate(ctx, projectID, datasetID)
++}
++
++// LoadAlignedRetained opens a reviewed candidate without changing the active
++// semantic pointer. Patch tests run here before the dataset is promoted.
++func (s *Store) LoadAlignedRetained(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir, versionDir string) (ActiveProjection, error) {
++	p, err := s.Load(ctx, projectID, datasetID)
++	if err != nil {
++		return ActiveProjection{}, err
++	}
++	if err := ValidateDatasetAlignment(p, repoRoot, graphDir, vectorDir); err != nil {
++		return ActiveProjection{}, err
++	}
++	if err := ValidateCodeAnchors(p, graphDir); err != nil {
++		return ActiveProjection{}, err
++	}
++	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
++		return ActiveProjection{}, err
++	}
++	if err := p.ValidateRetainedSources(versionDir); err != nil {
++		return ActiveProjection{}, err
++	}
++	return ActiveProjection{projection: p}, nil
++}
+diff --git a/internal/system/semantic/alignment_test.go b/internal/system/semantic/alignment_test.go
+new file mode 100644
+index 00000000..6976c8ec
+--- /dev/null
++++ b/internal/system/semantic/alignment_test.go
+@@ -0,0 +1,164 @@
++package semantic
++
++import (
++	"context"
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func writeCoordinates(t *testing.T, dir string, v any) {
++	t.Helper()
++	if err := os.MkdirAll(dir, 0o755); err != nil {
++		t.Fatal(err)
++	}
++	buf, err := json.Marshal(v)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(dir, "manifest.json"), buf, 0o644); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
++	p, repo := fixture(t)
++	root := t.TempDir()
++	graphDir, vectorDir := filepath.Join(root, "graph"), filepath.Join(root, "vector")
++	graph := graphCoordinates{SchemaVersion: "1.23", SrcRoot: repo, SrcCommit: p.Snapshot.Commit, GraphDigest: strings.Repeat("a", 64)}
++	vector := vectorCoordinates{SrcRoot: repo, SrcCommit: p.Snapshot.Commit}
++	vector.Sources.CKG.GraphDigest = graph.GraphDigest
++	vector.Sources.CKG.SrcCommit = p.Snapshot.Commit
++	write := func() {
++		writeCoordinates(t, graphDir, graph)
++		writeCoordinates(t, vectorDir, vector)
++	}
++	write()
++	store, err := OpenStore(filepath.Join(root, "semantic.db"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer store.Close()
++	ctx := context.Background()
++	if err := store.PutAligned(ctx, p, repo, graphDir, vectorDir); err != nil {
++		t.Fatalf("aligned promotion: %v", err)
++	}
++	if err := store.ActivateAligned(ctx, p.Snapshot.ProjectID, p.Snapshot.DatasetID, repo, graphDir, vectorDir); err != nil {
++		t.Fatal(err)
++	}
++	active, err := store.CurrentAligned(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir)
++	if err != nil || active.Snapshot() != p.Snapshot {
++		t.Fatalf("aligned active projection: %+v, %v", active.Snapshot(), err)
++	}
++	if status, err := store.TraceStatus(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir); err != nil || status.State != "current" || status.Snapshot != p.Snapshot {
++		t.Fatalf("current trace diagnostic: %+v, %v", status, err)
++	}
++	// A different project may use the same short symbol names, but its
++	// projection cannot join with this dataset's source root.
++	cases := []struct {
++		name string
++		edit func()
++		want string
++	}{
++		{"graph commit", func() { graph.SrcCommit = strings.Repeat("0", 40) }, "source commit"},
++		{"vector commit", func() { vector.SrcCommit = strings.Repeat("0", 40) }, "source commit"},
++		{"ledger commit", func() { vector.Sources.CKG.SrcCommit = strings.Repeat("0", 40) }, "source commit"},
++		{"graph pin", func() { graph.GraphDigest = "different" }, "digest pin"},
++		{"other source", func() { vector.SrcRoot = t.TempDir() }, "source root"},
++		{"missing root", func() { graph.SrcRoot = "" }, "source root"},
++		{"old graph schema", func() { graph.SchemaVersion = "1.18" }, "canonical_id"},
++	}
++	for _, tc := range cases {
++		t.Run(tc.name, func(t *testing.T) {
++			beforeGraph, beforeVector := graph, vector
++			defer func() { graph, vector = beforeGraph, beforeVector }()
++			tc.edit()
++			write()
++			if _, err := store.CurrentAligned(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), tc.want) {
++				t.Fatalf("stale read expected %q, got %v", tc.want, err)
++			}
++			status, err := store.TraceStatus(ctx, p.Snapshot.ProjectID, repo, graphDir, vectorDir)
++			if err != nil || status.State != "stale" || !strings.Contains(status.Reason, tc.want) || status.Snapshot != p.Snapshot || len(status.Requirements) != 0 {
++				t.Fatalf("stale trace leaked paths or missed diagnostic: %+v, %v", status, err)
++			}
++			other := p
++			other.Snapshot.DatasetID = "other-" + strings.ReplaceAll(tc.name, " ", "-")
++			other.Evidence = append([]EvidenceSpan(nil), p.Evidence...)
++			for i := range other.Evidence {
++				other.Evidence[i].Snapshot = other.Snapshot
++			}
++			if err := store.PutAligned(ctx, other, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), tc.want) {
++				t.Fatalf("expected %q, got %v", tc.want, err)
++			}
++			if _, err := store.Load(ctx, other.Snapshot.ProjectID, other.Snapshot.DatasetID); err == nil {
++				t.Fatal("rejected projection was stored")
++			}
++			if err := store.ActivateAligned(ctx, p.Snapshot.ProjectID, p.Snapshot.DatasetID, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), tc.want) {
++				t.Fatalf("stale activation expected %q, got %v", tc.want, err)
++			}
++			current, err := store.Current(ctx, p.Snapshot.ProjectID)
++			if err != nil || current.Snapshot.DatasetID != p.Snapshot.DatasetID {
++				t.Fatalf("failed promotion changed active projection: %+v, %v", current.Snapshot, err)
++			}
++		})
++	}
++}
++
++func TestPinnedSemanticProjectionCannotCrossDataset(t *testing.T) {
++	p, repo := fixture(t)
++	p.Snapshot.SnapshotID = strings.Repeat("b", 64)
++	for i := range p.Evidence {
++		p.Evidence[i].Snapshot = p.Snapshot
++	}
++	root := t.TempDir()
++	graphDir, vectorDir := filepath.Join(root, "graph"), filepath.Join(root, "vector")
++	graph := graphCoordinates{ProjectID: p.Snapshot.ProjectID, SnapshotID: p.Snapshot.SnapshotID,
++		DatasetID: p.Snapshot.DatasetID, FileManifestDigest: strings.Repeat("c", 64),
++		SchemaVersion: "1.23", SrcRoot: repo, SrcCommit: p.Snapshot.Commit, GraphDigest: strings.Repeat("a", 64)}
++	vector := vectorCoordinates{ProjectID: graph.ProjectID, SnapshotID: graph.SnapshotID,
++		DatasetID: graph.DatasetID, FileManifestDigest: graph.FileManifestDigest,
++		SrcRoot: repo, SrcCommit: p.Snapshot.Commit}
++	vector.Sources.CKG.GraphDigest, vector.Sources.CKG.SrcCommit = graph.GraphDigest, p.Snapshot.Commit
++	writeCoordinates(t, graphDir, graph)
++	writeCoordinates(t, vectorDir, vector)
++	if got, err := PinnedSnapshotID(graphDir, p.Snapshot.ProjectID, p.Snapshot.DatasetID); err != nil || got != p.Snapshot.SnapshotID {
++		t.Fatalf("pinned snapshot lookup: %q %v", got, err)
++	}
++	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err != nil {
++		t.Fatalf("pinned projection rejected: %v", err)
++	}
++	vector.DatasetID = "different"
++	writeCoordinates(t, vectorDir, vector)
++	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), "identity") {
++		t.Fatalf("cross-dataset projection accepted: %v", err)
++	}
++	vector.DatasetID = graph.DatasetID
++	writeCoordinates(t, vectorDir, vector)
++	p.Snapshot.DatasetID = "different"
++	for i := range p.Evidence {
++		p.Evidence[i].Snapshot = p.Snapshot
++	}
++	if err := ValidateDatasetAlignment(p, repo, graphDir, vectorDir); err == nil || !strings.Contains(err.Error(), "identity") {
++		t.Fatalf("projection from another dataset accepted: %v", err)
++	}
++}
++
++func TestValidateCanonicalCoverageUsesMeasuredProjectFloor(t *testing.T) {
++	dir := t.TempDir()
++	writeCoordinates(t, dir, map[string]any{"symbol_count": 100, "canonical_count": 94})
++	if err := ValidateCanonicalCoverage(dir, 0.94); err != nil {
++		t.Fatal(err)
++	}
++	if err := ValidateCanonicalCoverage(dir, 0.95); err == nil || !strings.Contains(err.Error(), "below project minimum") {
++		t.Fatalf("under-floor dataset passed: %v", err)
++	}
++	if err := ValidateCanonicalCoverage(dir, 1.01); err == nil {
++		t.Fatal("invalid floor accepted")
++	}
++	writeCoordinates(t, dir, map[string]any{"symbol_count": 10, "canonical_count": 11})
++	if err := ValidateCanonicalCoverage(dir, 0.1); err == nil || !strings.Contains(err.Error(), "invalid") {
++		t.Fatalf("invalid counters accepted: %v", err)
++	}
++}
+diff --git a/internal/system/semantic/validate_test.go b/internal/system/semantic/validate_test.go
+new file mode 100644
+index 00000000..d74cc211
+--- /dev/null
++++ b/internal/system/semantic/validate_test.go
+@@ -0,0 +1,109 @@
++package semantic
++
++import (
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func gitOutput(t *testing.T, dir string, args ...string) string {
++	t.Helper()
++	cmd := exec.Command("git", append([]string{"-C", dir}, args...)...)
++	out, err := cmd.CombinedOutput()
++	if err != nil {
++		t.Fatalf("git %v: %v\n%s", args, err, out)
++	}
++	return strings.TrimSpace(string(out))
++}
++
++func fixture(t *testing.T) (Projection, string) {
++	t.Helper()
++	dir := t.TempDir()
++	gitOutput(t, dir, "init", "-q")
++	if err := os.WriteFile(filepath.Join(dir, "guide.md"), []byte("# Guide\nThe switch requires a review.\n"), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	gitOutput(t, dir, "add", "guide.md")
++	gitOutput(t, dir, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
++	commit := gitOutput(t, dir, "rev-parse", "HEAD")
++	snapshot := Snapshot{ProjectID: "sample", DatasetID: "v1", Commit: commit}
++	sum := sha256.Sum256([]byte("The switch requires a review.\n"))
++	projection := Projection{
++		SchemaVersion: SchemaVersion, Snapshot: snapshot,
++		Evidence: []EvidenceSpan{{ID: "e1", Snapshot: snapshot, Kind: SourceDocument,
++			Path: "guide.md", StartLine: 2, EndLine: 2, ContentSHA256: hex.EncodeToString(sum[:]), Extractor: "markdown-v1"}},
++		Sections: []DocumentSection{{ID: "s1", Heading: "Guide", EvidenceID: "e1"}},
++		Claims: []Claim{{ID: "c1", Statement: "The switch requires review", SectionID: "s1",
++			EvidenceIDs: []string{"e1"}, Status: StatusProposed}},
++	}
++	return projection, dir
++}
++
++func TestProjectionValidatesSnapshotAndCommittedSource(t *testing.T) {
++	p, dir := fixture(t)
++	if err := p.ValidateSources(context.Background(), dir); err != nil {
++		t.Fatalf("valid projection: %v", err)
++	}
++	// The committed snapshot remains the source of truth after a local edit.
++	if err := os.WriteFile(filepath.Join(dir, "guide.md"), []byte("# Guide\nChanged in working tree.\n"), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	if err := p.ValidateSources(context.Background(), dir); err != nil {
++		t.Fatalf("working-tree edit changed committed evidence: %v", err)
++	}
++	p.Claims[0].Status = StatusVerified
++	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "reviewed_by") {
++		t.Fatalf("unreviewed verified claim accepted: %v", err)
++	}
++	p.Claims[0].ReviewedBy = "reviewer@example.com"
++	if err := p.ValidateSources(context.Background(), dir); err != nil {
++		t.Fatalf("reviewed claim with source proof: %v", err)
++	}
++}
++
++func TestNonCommittedSemanticEvidenceRequiresArchive(t *testing.T) {
++	p, repo := fixture(t)
++	p.Snapshot.SourceMode = "working-tree"
++	p.Snapshot.SnapshotID = strings.Repeat("a", 64)
++	p.Evidence[0].Snapshot = p.Snapshot
++	if err := p.Validate(); err != nil {
++		t.Fatal(err)
++	}
++	if err := p.ValidateSources(context.Background(), repo); err == nil || !strings.Contains(err.Error(), "requires_v2") {
++		t.Fatalf("non-committed evidence read from Git: %v", err)
++	}
++	p.Snapshot.SourceMode = "snapshot-only"
++	p.Snapshot.Commit = ""
++	p.Evidence[0].Snapshot = p.Snapshot
++	if err := p.Validate(); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
++	p, dir := fixture(t)
++	p.Evidence[0].Snapshot.DatasetID = "other"
++	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "crosses") {
++		t.Fatalf("cross-snapshot evidence accepted: %v", err)
++	}
++	p, _ = fixture(t)
++	p.Claims[0].EvidenceIDs = []string{"missing"}
++	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "missing evidence") {
++		t.Fatalf("orphan claim evidence accepted: %v", err)
++	}
++	p, _ = fixture(t)
++	p.Evidence[0].Path = "../secret.md"
++	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "location") {
++		t.Fatalf("path traversal accepted: %v", err)
++	}
++	p, dir = fixture(t)
++	p.Evidence[0].ContentSHA256 = strings.Repeat("0", 64)
++	if err := p.ValidateSources(context.Background(), dir); err == nil || !strings.Contains(err.Error(), "digest mismatch") {
++		t.Fatalf("incorrect source digest accepted or misreported: %v", err)
++	}
++}

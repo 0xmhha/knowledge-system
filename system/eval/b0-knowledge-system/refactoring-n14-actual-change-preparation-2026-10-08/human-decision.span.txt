@@ -1,0 +1,46 @@
+func Decide(ctx context.Context, dataset, patchID, storePath, decisionID, criterionID, reviewer, outcome, reason string) (Decision, error) {
+	if !safeID.MatchString(decisionID) || !safeID.MatchString(criterionID) ||
+		strings.TrimSpace(reviewer) == "" || strings.TrimSpace(reason) == "" ||
+		(outcome != "approved" && outcome != "rejected") {
+		return Decision{}, fmt.Errorf("invalid criterion review fields")
+	}
+	a, err := Load(dataset, patchID)
+	if err != nil {
+		return Decision{}, err
+	}
+	p, err := CandidateProjection(ctx, dataset, a, storePath)
+	if err != nil {
+		return Decision{}, err
+	}
+	r, c, err := criterionInProjection(p, criterionID)
+	if err != nil {
+		return Decision{}, err
+	}
+	if outcome == "approved" {
+		run, err := loadRun(dataset, patchID, criterionID)
+		if err != nil {
+			return Decision{}, err
+		}
+		if err := validateRun(p, criterionID, run); err != nil {
+			return Decision{}, err
+		}
+	}
+	var evidenceSHA string
+	for _, e := range p.Evidence {
+		if e.ID == c.EvidenceID {
+			evidenceSHA = e.ContentSHA256
+			break
+		}
+	}
+	if evidenceSHA == "" {
+		return Decision{}, fmt.Errorf("criterion source evidence is missing")
+	}
+	d := Decision{DecisionID: decisionID, PatchID: patchID, CriterionID: criterionID, SpecVersion: r.Version,
+		ProjectID: a.ProjectID, DatasetID: a.ResultDatasetID, SnapshotID: a.ResultSnapshotID,
+		EvidenceSHA256: evidenceSHA, ReviewedBy: reviewer, Outcome: outcome, Reason: reason, CreatedAt: time.Now().UTC()}
+	dir, _ := reviewDir(dataset, patchID)
+	if err := writeImmutable(filepath.Join(dir, "decisions", decisionID+".json"), d); err != nil {
+		return Decision{}, err
+	}
+	return d, nil
+}

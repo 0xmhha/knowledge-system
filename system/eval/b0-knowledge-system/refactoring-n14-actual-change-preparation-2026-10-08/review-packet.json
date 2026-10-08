@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "status": "actual_change_source_and_test_preparation_no_human_acceptance",
+  "recorded_at": "2026-10-08T01:30:02.369228+00:00",
+  "source_revision": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+  "runtime_source_equals_merged_main": true,
+  "merged_main_revision": "eeeab2e7116a9f85d25965598eb033624439e418",
+  "base_revision": "1ded9b3e47bc2e09062dba329c2f918423746fa4",
+  "pr_url": "https://github.com/0xmhha/knowledge-system/pull/97",
+  "actual_git_diff_sha256": "4c8f060c8ecb3216fe225ab14941ae68380de1d44c17512654669dfe561c46f0",
+  "changed_source_files": [
+    {
+      "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "before_sha256": null,
+      "after_sha256": "baeaea7bcea1db2fb258c8ecb8e087ae727c53f0066c5a4bbabaee4b01fcb86e"
+    },
+    {
+      "path": "docs/spec-driven/spec-pilot.yaml",
+      "before_sha256": null,
+      "after_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1"
+    },
+    {
+      "path": "internal/system/patch/patch_test.go",
+      "before_sha256": null,
+      "after_sha256": "0a1a26ce1093c82a268f587f122bef94fe6b06088a65210113935602a190d22a"
+    },
+    {
+      "path": "internal/system/patch/review.go",
+      "before_sha256": null,
+      "after_sha256": "7c4e9ac79d858fedaf08c84aea7cf7cbcbb534f673619e1557e679ebc917c85d"
+    },
+    {
+      "path": "internal/system/semantic/alignment.go",
+      "before_sha256": null,
+      "after_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1"
+    },
+    {
+      "path": "internal/system/semantic/alignment_test.go",
+      "before_sha256": null,
+      "after_sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9"
+    },
+    {
+      "path": "internal/system/semantic/validate_test.go",
+      "before_sha256": null,
+      "after_sha256": "05dce6f87905a398b417be346bb218d3d45be4445ad3247a9c4f877e36a2ea50"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ADR-source-alignment",
+      "kind": "adopted-design-source",
+      "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "first": 28,
+      "last": 28,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "baeaea7bcea1db2fb258c8ecb8e087ae727c53f0066c5a4bbabaee4b01fcb86e",
+      "span_sha256": "c2f6afd9a25312010dcd1a7caa477f3110fe329fbb26765e8fe5cc6fb70424ce",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "req-source-evidence",
+      "kind": "proposed-requirement-and-criterion",
+      "path": "docs/spec-driven/spec-pilot.yaml",
+      "first": 19,
+      "last": 29,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+      "span_sha256": "bec0b92549c91e346b7a6ce73d10d988ae66d64cd8c35ec7008cc650a778dcdb",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "alignment-code",
+      "kind": "implementation-candidate",
+      "path": "internal/system/semantic/alignment.go",
+      "first": 69,
+      "last": 138,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+      "span_sha256": "9fa6701c9ca8bc02dee05a91615f2f002a34733da300491270255f6a56330cd9",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "alignment-test",
+      "kind": "test-candidate",
+      "path": "internal/system/semantic/alignment_test.go",
+      "first": 26,
+      "last": 107,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9",
+      "span_sha256": "9b9e8375569a40a0ae5c791671fb152c807d973edf4bfa1beb1e9134bf1540eb",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "source-test",
+      "kind": "test-candidate",
+      "path": "internal/system/semantic/validate_test.go",
+      "first": 88,
+      "last": 109,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "05dce6f87905a398b417be346bb218d3d45be4445ad3247a9c4f877e36a2ea50",
+      "span_sha256": "a80d4670c7ca58967e2f36d840e52b2c6b4d4d7baaa24ce2db2e668766fc1923",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "exact-run-gate",
+      "kind": "promotion-gate-implementation",
+      "path": "internal/system/patch/review.go",
+      "first": 53,
+      "last": 80,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "7c4e9ac79d858fedaf08c84aea7cf7cbcbb534f673619e1557e679ebc917c85d",
+      "span_sha256": "7fa5f1d035c39b51da4d7ae764bb826ba05541c045e21e3fac6d3f063927e238",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "human-decision",
+      "kind": "human-decision-implementation",
+      "path": "internal/system/patch/review.go",
+      "first": 109,
+      "last": 154,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "7c4e9ac79d858fedaf08c84aea7cf7cbcbb534f673619e1557e679ebc917c85d",
+      "span_sha256": "b8fd126a101e202cab87519e38318af00dff6b37b2c7d1f10809f9b91c10a0b7",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "promotion-gate",
+      "kind": "promotion-gate-implementation",
+      "path": "internal/system/patch/review.go",
+      "first": 205,
+      "last": 282,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "7c4e9ac79d858fedaf08c84aea7cf7cbcbb534f673619e1557e679ebc917c85d",
+      "span_sha256": "d72c861b1040a1b217fbe7fb22480c44fa398712b3e6fdd8f91d66142abee5de",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "test-command-only",
+      "kind": "gate-control-test",
+      "path": "internal/system/patch/patch_test.go",
+      "first": 121,
+      "last": 137,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "0a1a26ce1093c82a268f587f122bef94fe6b06088a65210113935602a190d22a",
+      "span_sha256": "f61b2e6e4a2038faee2f244badd6aa152c0e39a88975680e84465081bc563cee",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "test-active-base",
+      "kind": "gate-control-test",
+      "path": "internal/system/patch/patch_test.go",
+      "first": 91,
+      "last": 119,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "0a1a26ce1093c82a268f587f122bef94fe6b06088a65210113935602a190d22a",
+      "span_sha256": "21ed8c7f0235363965d627d6faa2fae3a56cb6a5522b9ab537ce97673ca98bac",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    },
+    {
+      "id": "test-patch-digest",
+      "kind": "gate-control-test",
+      "path": "internal/system/patch/patch_test.go",
+      "first": 48,
+      "last": 89,
+      "source_commit": "8051021fb8dd7017e5d302ec3171a4faec415cfd",
+      "merged_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+      "file_sha256": "0a1a26ce1093c82a268f587f122bef94fe6b06088a65210113935602a190d22a",
+      "span_sha256": "5e7f88e7dc6a4a05fbc77baa06228bff153d489666357008a107008088f45734",
+      "review_state": "proposed",
+      "ckg_canonical_id": null
+    }
+  ],
+  "requirement_id": "req-source-evidence",
+  "criterion_id": "ac-source-evidence",
+  "relation_candidates": [
+    {
+      "from": "ADR-source-alignment",
+      "to": "req-source-evidence",
+      "relation": "design_to_requirement",
+      "state": "proposed"
+    },
+    {
+      "from": "ac-source-evidence",
+      "to": "alignment-code",
+      "relation": "criterion_to_implementation",
+      "state": "proposed"
+    },
+    {
+      "from": "ac-source-evidence",
+      "to": "alignment-test",
+      "relation": "criterion_to_test",
+      "state": "proposed"
+    },
+    {
+      "from": "ac-source-evidence",
+      "to": "source-test",
+      "relation": "criterion_to_test",
+      "state": "proposed"
+    }
+  ],
+  "raw_exact_tests_observed": [
+    "TestCriterionPromotionRejectsCommandOnlySuccess",
+    "TestPatchRegisterPinsChangedFilesAndRefusesReusedID",
+    "TestProjectionRejectsCrossSnapshotOrMissingEvidence",
+    "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+    "TestReviewedPromotionRechecksActiveBaseAtSwap"
+  ],
+  "raw_exact_tests_passed": [
+    "TestCriterionPromotionRejectsCommandOnlySuccess",
+    "TestPatchRegisterPinsChangedFilesAndRefusesReusedID",
+    "TestProjectionRejectsCrossSnapshotOrMissingEvidence",
+    "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+    "TestReviewedPromotionRechecksActiveBaseAtSwap"
+  ],
+  "raw_test_output_sha256": "2860dad403cd6a711140efc17c561445913eefb0161e538a9bead87a7b4ba32a",
+  "semantic_linked_test_report_created": false,
+  "ckg_canonical_alignment_verified": false,
+  "patch_registry_attempt_created": false,
+  "human_decision": null,
+  "real_human_activity_minutes": null,
+  "dataset_reindexed_for_this_acceptance": false,
+  "candidate_promoted": false,
+  "new_FINAL_calls": 0,
+  "full_N14_complete": false,
+  "release_approved": false,
+  "limits": [
+    "merged actual code diff with current observed exact Go tests; fixtures in those tests remain owned controls",
+    "proposed source links only, no actual reviewed CKG canonical trace or criterion decision",
+    "PR merge authorization is not a human criterion acceptance decision",
+    "prior fixture patch smoke is not actual pilot acceptance"
+  ]
+}
