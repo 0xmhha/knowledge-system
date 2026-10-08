@@ -68,6 +68,50 @@ def verify_manifest(task):
                 f"{task['id']}: committed artifact missing or changed: {artifact}")
 
 
+@functools.lru_cache(maxsize=None)
+def verify_partial_manifest(revision, path):
+    manifest = json.loads(recorded(revision, path))
+    parent = str(Path(path).parent)
+    bindings = list(manifest["reports_sha256"].items())
+    bindings += [(f"{parent}/{p}", digest) for p, digest in manifest["evidence_sha256"].items()]
+    bindings += list(manifest["changed_source_sha256"].items())
+    require(SPEC in manifest["reports_sha256"] and bool(manifest["evidence_sha256"]),
+            "partial evidence must bind specification and execution artifacts")
+    for artifact, digest in bindings:
+        require(sha(recorded(revision, artifact)) == digest,
+                f"partial committed artifact missing or changed: {artifact}")
+    return manifest
+
+
+def verify_partial_checks(task, live_spec):
+    prefix = task["id"].replace("-", "")
+    checked = set(re.findall(r"\[x\] (" + prefix + r"-[A-Z])\b", live_spec))
+    records = task.get("verified_checks", [])
+    require(isinstance(records, list) and all(isinstance(row, dict) for row in records),
+            f"{task['id']}: invalid partial check records")
+    ids = [row.get("check") for row in records]
+    require(all(isinstance(check, str) and re.fullmatch(prefix + r"-[A-Z]", check) for check in ids)
+            and len(set(ids)) == len(ids), f"{task['id']}: invalid or duplicate partial check")
+    require(set(ids) == checked, f"{task['id']}: checked partial conditions lack evidence or disagree with ledger")
+    for row in records:
+        revision, path = row.get("evidence_revision"), row.get("manifest")
+        ref = row.get("evidence_ref")
+        require(revision and path and isinstance(row.get("scope"), str) and row["scope"].strip()
+                and isinstance(ref, str) and ref,
+                f"{row['check']}: partial evidence binding/scope missing")
+        require(task.get(ref + "_evidence_revision") == revision and task.get(ref + "_manifest") == path,
+                f"{row['check']}: partial evidence reference disagrees with task")
+        require(isinstance(row.get("ledger_fields", {}), dict), f"{row['check']}: invalid ledger constraints")
+        for field, value in row.get("ledger_fields", {}).items():
+            require(field in task and task[field] == value,
+                    f"{row['check']}: partial ledger field disagrees: {field}")
+        verify_partial_manifest(revision, path)
+        historic = recorded(revision, SPEC).decode()
+        require(re.search(r"\[x\] " + re.escape(row["check"]) + r"\b", historic) is not None,
+                f"{row['check']}: not checked in bound historical specification")
+    return len(records)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, default=ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json")
@@ -82,9 +126,13 @@ def main():
     rows = re.findall(r"^\| (N-\d\d) \| ([^|]+) \|", worklist, re.M)
     checked = {ident for ident, status in rows if status.strip().lstrip("*").startswith("완료")}
     require(len(rows) == 18 and checked == done, "worklist completion disagrees with evidence ledger")
+    live_spec = (ROOT / SPEC).read_text()
+    partial = 0
     for task in tasks:
         if task["state"] == "complete":
             verify_manifest(task)
+        else:
+            partial += verify_partial_checks(task, live_spec)
     active = ledger["active_source_binding"]
     manifest = json.loads(recorded(active["revision"], active["manifest"]))
     sources = manifest["source_sha256"]
@@ -97,7 +145,7 @@ def main():
     remaining = [t["id"] for t in tasks if t["state"] != "complete"]
     require(ledger["next_task"] in remaining, "next task is already marked complete")
     require(f"{len(done)}/18" in worklist and f"{len(remaining)}개" in worklist, "progress counts drifted")
-    print(f"refactoring progress: PASS {len(done)}/18 complete; {len(remaining)} remaining; next {ledger['next_task']}; {len(sources)} source/dependency bindings")
+    print(f"refactoring progress: PASS {len(done)}/18 complete; {len(remaining)} remaining; next {ledger['next_task']}; {len(sources)} source/dependency bindings; {partial} partial checks bound")
 
 
 if __name__ == "__main__":

@@ -290,3 +290,11 @@ N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 
 2026-10-07 [N11 후보 출처 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md): 기존 FINAL9파일/4,800행의 SHA와 직접 인용·본문을 확인했다. lock.go의 동일 file SHA/80행 인용720개가 있지만 후보55–76행 교집합0, readonly.go 직접 인용0이다. 같은 파일/개념/이전 DEV의 오염 판정은 사람에게 남기며 새 FINAL0·질의0·N11-A–D 미완료를 유지한다. 공개d08cb384 푸시는 자동 승인 검토가 범위 미승인으로 거부했고 실행하지 않았다.
 
 2026-10-07 현재 공개 전송/CI 상태는 [native Linux CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)을 우선한다. d08cb384 공개80커밋과 source-only CI 수정d7de0b89를 전송했고 draft PR97·재실행CI5/5 통과. N15-C는 실제 native AMD64 설치/갱신/복구 증거로 체크하며 N15-D/E·N17-C/D/E와 전체8/18·요청5/15·잔여10개는 유지한다. 앞의 CI 미실행/전송 거부 문구는 당시 이력이다.
+
+## 2026-10-08 부분 완료 체크 보호 보강
+
+목적: 전체 미완료 작업 안의 체크도 실제 증거를 요구한다. N15-C의 증거를 유실/미실행으로 바꿔도 기존 검사가 통과하는 복사 ledger 음성 제어를 재현했다. 전체 완료8개만 검사하는 한계를 수정한다.
+
+설계: 미완료 task의 checked ID와 verified_checks 목록을 정확히 대조하고 중복/다른 task/누락을 거부한다. 각 체크는 명시적인 scope·evidence_ref·커밋·manifest를 가진다. task의 해당 revision/manifest와 일치하고, 커밋 당시 명세에도 같은 체크가 있어야 한다. 보고서/실행 원자료/변경 source의 커밋SHA를 대조한다. native CI 체크는 task의 실행 상태/run ID도 결합한다. 과거 원자료를 현행 실측으로 덮어쓰지 않으며 검사기는 사람 판정의 실체/운영 적합성까지 인증하지 않는다.
+
+검증 조건: 정상5부분체크 통과, N15-C missing revision/file 및 not_run 변조 거부, 기록 누락/중복/다른 task/과거 미체크 조건·scope 누락 거부, 전체 완료8/18·잔여10개 유지. 새 모델/질의/FINAL 실행0. 승인 응답·runtime binding 없이 전체 N11/12/15/17 체크를 추가하지 않는다.

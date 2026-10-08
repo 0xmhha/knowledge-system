@@ -1,5 +1,7 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+2026-10-08 최신: [전체 완료 실행 계획](./REFACTORING-COMPLETION-PLAN-2026-10-08.md)을 따른다. PR97 스쿼시 머지·main eeeab2e7 동기화 후 feat/refactoring-followup에서 기존 로컬 증거를 복구했다. 부분 완료 증거를 없애도 checker가 통과하던 빈틈을 실제 복사 ledger로 재현/수정했고8제어를 통과했다. N15-A/B/C·N17-A/B는 커밋 명세/manifest/원자료와 개별 결합한다. **전체8/18·요청5/15·잔여 N08/09/10/11/12/14/15/16/17/18 10개**, 다음 N11/N12 실제 검토와 N14 실제 수용 자료다. 아래는 이전 시점 이력이다.
+
 2026-10-08 현재 PR 상태: [PR97](https://github.com/0xmhha/knowledge-system/pull/97)을 일반 PR(ready for review)로 전환했다. 공개 head d7de0b89와 CI5/5 통과는 유지한다. 전체 미완료/출시 보류를 코드 검토 준비와 묶어 draft를 유지하던 판단을 바로잡았다. merge/출시/새 gold 승인은 없으며 전체8/18·요청5/15·잔여10개와 다음 N11/N12 실제 판정은 동일하다. 아래 draft 생성/유지 기록은 당시 이력이다.
 
 2026-10-07 최신: [PR97/native Linux CI](./N15-NATIVE-LINUX-CI-VALIDATION.md). 사용자 “푸시하고 Pr생성해”로 d08cb384의80커밋 공개 전송·draft PR97 생성 완료. graph/vuln Go 요구 불일치를 공개 source만 수정한 d7de0b89로 보완했고 재실행 CI5/5 success. 실제 Linux AMD64의 설치/재시작/갱신/복구, public consumer7응답/4거부, 복구10응답/13payload SHA와 artifact178파일 SHA를 확인하여 **N15-C 완료**. N15-D/E와 N17-C/D/E 운영 수용은 미완료. 추가 로컬 BGE/출처 receipt 및 본 native 기록은 미전송. **전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18. 다음 N11/N12 실제 판정과 독립 입력/런타임 결합.** 아래는 이전 시점 이력이다.

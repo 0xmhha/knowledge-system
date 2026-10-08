@@ -177,7 +177,35 @@
       "native_ci_preparation": "docs/spec-driven/N15-NATIVE-LINUX-CI-VALIDATION.md",
       "native_ci_evidence_revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
       "native_ci_manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json",
-      "native_ci_run": 37586641833
+      "native_ci_run": 37586641833,
+      "technical_manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json",
+      "verified_checks": [
+        {
+          "check": "N15-A",
+          "scope": "owned Darwin mock technical controls only; no operating acceptance",
+          "evidence_ref": "technical",
+          "evidence_revision": "de15015a",
+          "manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json"
+        },
+        {
+          "check": "N15-B",
+          "scope": "owned Darwin mock technical controls only; no operating acceptance",
+          "evidence_ref": "technical",
+          "evidence_revision": "de15015a",
+          "manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json"
+        },
+        {
+          "check": "N15-C",
+          "scope": "actual native Linux AMD64 owned mock installation/consumer/recovery; no whole operating support acceptance",
+          "evidence_ref": "native_ci",
+          "evidence_revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
+          "manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json",
+          "ledger_fields": {
+            "ci_status": "executed_native_linux_amd64_all_five_jobs_success",
+            "native_ci_run": 37586641833
+          }
+        }
+      ]
     },
     {
       "id": "N-16",
@@ -197,7 +225,24 @@
       "verified_substep": "new-root restore failure reproduced and reader lease preparation fixed; 9 controls, 3-package race; 10 recovery capture responses and 13 unchanged payload files; source-absent replay passed on owned mock fixture; same owned mock recovery controls also passed on actual native Linux AMD64 CI, 10 responses and 13 identical payload files; actual operating RTO/RPO remains pending",
       "waiting_for": "actual backup/failover owner, RTO/RPO/key/network/power host policy and operating candidate drill/acceptance",
       "native_ci_evidence_revision": "c4adfd1b44598f3b13c9ba080972470b63e6ab31",
-      "native_ci_manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json"
+      "native_ci_manifest": "system/eval/b0-knowledge-system/refactoring-n15-native-linux-ci-2026-10-07/manifest.json",
+      "technical_manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json",
+      "verified_checks": [
+        {
+          "check": "N17-A",
+          "scope": "owned Darwin mock technical controls only; no operating acceptance",
+          "evidence_ref": "technical",
+          "evidence_revision": "de15015a",
+          "manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json"
+        },
+        {
+          "check": "N17-B",
+          "scope": "owned Darwin mock technical controls only; no operating acceptance",
+          "evidence_ref": "technical",
+          "evidence_revision": "de15015a",
+          "manifest": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json"
+        }
+      ]
     },
     {
       "id": "N-18",
@@ -249,6 +294,12 @@
     "latest_receipt_public_transfer_executed": false,
     "pr_review_status": "ready_for_review",
     "ready_for_review_recorded_date": "2026-10-08",
-    "ready_for_review_reason": "CI5/5 passed; implemented PR review readiness is separate from remaining whole-project and production acceptance"
-  }
+    "ready_for_review_reason": "CI5/5 passed; implemented PR review readiness is separate from remaining whole-project and production acceptance",
+    "pr_state": "MERGED",
+    "merge_commit": "eeeab2e7116a9f85d25965598eb033624439e418",
+    "merged_at": "2026-10-08T01:16:54Z",
+    "main_synchronized_at_merge": true
+  },
+  "execution_plan": "docs/spec-driven/REFACTORING-COMPLETION-PLAN-2026-10-08.md",
+  "working_branch": "feat/refactoring-followup"
 }
