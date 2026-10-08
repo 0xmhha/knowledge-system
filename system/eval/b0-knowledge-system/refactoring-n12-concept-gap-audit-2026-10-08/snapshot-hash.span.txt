@@ -1,0 +1,19 @@
+func sourceSnapshotID(s SourceIdentity) string {
+	if s.FileModePolicy != "" {
+		return identityHashFields("cks.snapshot.v5", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
+			s.GitRecoveryDigest, s.GitArchivePolicy, s.FileModePolicy)
+	}
+	if s.GitArchivePolicy != "" {
+		return identityHashFields("cks.snapshot.v4", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
+			s.GitRecoveryDigest, s.GitArchivePolicy)
+	}
+	if s.GitRecoveryDigest != "" {
+		return identityHashFields("cks.snapshot.v3", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest, s.GitRecoveryDigest)
+	}
+	// Historical pinned versions retain their v2 identity and remain readable.
+	return identityHashFields("cks.snapshot.v2", s.ProjectID, s.SourceMode,
+		s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest)
+}

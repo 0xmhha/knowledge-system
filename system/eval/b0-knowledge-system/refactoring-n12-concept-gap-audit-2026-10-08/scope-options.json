@@ -1,0 +1,33 @@
+{
+  "status": "draft",
+  "recommended": "functional_pilot_trace",
+  "decision": null,
+  "reviewer": null,
+  "human_active_review_ns": null,
+  "current_option": {
+    "name": "keep_all_broad_concepts_required",
+    "concept_paths": 8,
+    "missing_concept_paths": 5,
+    "action": "Keep original bytes and prepare/review distinct source-backed implementation/test paths at their real scope; do not automatically reuse functions."
+  },
+  "functional_option": {
+    "name": "functional_pilot_trace",
+    "required_concept_paths": 3,
+    "ontology": "functional-ontology-option.yaml",
+    "spec": "functional-spec-option.yaml",
+    "requirement_versions": 2,
+    "original_20_concepts_preserved": true,
+    "original_statements_and_4_criteria_unchanged": true,
+    "original_13_relation_assertions_not_auto_approved_or_rewritten": true,
+    "broader_5_concepts_are_context_only_in_this_unapplied_option": true,
+    "production_schema_not_extended_for_context": true,
+    "context_scope_record": "gap-review-items.json",
+    "activation": false
+  },
+  "follow_up": [
+    "Human review of scope/definitions and exact code/test relations",
+    "If chosen, a new retained capture and source-backed extraction/index/projection with no inherited approvals",
+    "Actual held linked test runs and human criterion decisions remain separate"
+  ],
+  "new_FINAL_count": 0
+}

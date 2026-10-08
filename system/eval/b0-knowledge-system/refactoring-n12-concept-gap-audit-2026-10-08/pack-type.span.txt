@@ -1,0 +1,11 @@
+type EvidencePackV2 struct {
+	FormatVersion  int           `json:"format_version"`
+	Coordinates    V2Coordinates `json:"coordinates"`
+	Query          string        `json:"query"`
+	Citations      []CitationV2  `json:"citations"`
+	Bodies         []BodyV2      `json:"bodies"`
+	GraphNeighbors []any         `json:"graph_neighbors"`
+	Semantic       any           `json:"semantic"`
+	EvidenceState  string        `json:"evidence_state"`
+	Metadata       V2Metadata    `json:"metadata"`
+}

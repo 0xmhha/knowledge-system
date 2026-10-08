@@ -1,0 +1,136 @@
+func (a ActiveProjection) Trace() (TraceReport, error) {
+	p := a.projection
+	if err := p.Validate(); err != nil {
+		return TraceReport{}, err
+	}
+	report := TraceReport{Snapshot: p.Snapshot, Requirements: make([]RequirementTrace, 0, len(p.Requirements))}
+	concepts := map[string]Concept{}
+	for _, c := range p.Concepts {
+		concepts[c.ID] = c
+	}
+	tested := map[string][]Assertion{}
+	checked := map[string]map[string]bool{}
+	claimConcepts := map[string]map[string]bool{}
+	for _, edge := range p.Assertions {
+		if edge.Status != StatusVerified {
+			continue
+		}
+		switch edge.Predicate {
+		case PredicateTestedBy:
+			tested[edge.SubjectID] = append(tested[edge.SubjectID], edge)
+		case PredicateAcceptedBy, PredicateCheckedBy:
+			if checked[edge.ObjectID] == nil {
+				checked[edge.ObjectID] = map[string]bool{}
+			}
+			checked[edge.ObjectID][edge.SubjectID] = true
+		case PredicateAbout:
+			if claimConcepts[edge.SubjectID] == nil {
+				claimConcepts[edge.SubjectID] = map[string]bool{}
+			}
+			claimConcepts[edge.SubjectID][edge.ObjectID] = true
+		}
+	}
+	conflicts := map[string][]string{}
+	for _, edge := range p.Assertions {
+		if edge.Status != StatusVerified || edge.Predicate != PredicateContradicts {
+			continue
+		}
+		for conceptID := range claimConcepts[edge.SubjectID] {
+			if claimConcepts[edge.ObjectID][conceptID] {
+				conflicts[conceptID] = append(conflicts[conceptID], edge.ID)
+			}
+		}
+	}
+	for _, requirement := range p.Requirements {
+		item := RequirementTrace{RequirementID: requirement.ID, Version: requirement.Version,
+			Missing: []string{}, ConflictAssertions: []string{}, Paths: []TracePath{}}
+		if requirement.Status != StatusVerified {
+			item.State = TraceSpecUnapproved
+			report.Requirements = append(report.Requirements, item)
+			continue
+		}
+		if len(requirement.ConceptIDs) == 0 {
+			item.State = TraceMissingConcept
+			report.Requirements = append(report.Requirements, item)
+			continue
+		}
+		unreviewed, noCode, noTest := false, false, false
+		coveredCriteria := map[string]bool{}
+		for _, conceptID := range requirement.ConceptIDs {
+			if concepts[conceptID].Status != StatusVerified {
+				item.Missing = append(item.Missing, "unreviewed concept: "+conceptID)
+				unreviewed = true
+				continue
+			}
+			item.ConflictAssertions = append(item.ConflictAssertions, conflicts[conceptID]...)
+			impls := a.VerifiedImplementations(conceptID)
+			if len(impls) == 0 {
+				item.Missing = append(item.Missing, "implementation: "+conceptID)
+				noCode = true
+				continue
+			}
+			conceptHasTest := false
+			for _, impl := range impls {
+				for _, edge := range tested[impl.CanonicalID] {
+					conceptHasTest = true
+					path := TracePath{ConceptID: conceptID, CodeCanonicalID: impl.CanonicalID,
+						TestCanonicalID: edge.ObjectID, ImplementationAssertion: impl.AssertionID,
+						TestedByAssertion: edge.ID}
+					for _, criterion := range requirement.AcceptanceCriteria {
+						if checked[edge.ObjectID][criterion.ID] {
+							if p.SchemaVersion >= 3 {
+								path.CheckedCriterionIDs = append(path.CheckedCriterionIDs, criterion.ID)
+							} else {
+								path.AcceptedCriterionIDs = append(path.AcceptedCriterionIDs, criterion.ID)
+							}
+							coveredCriteria[criterion.ID] = true
+						}
+					}
+					item.Paths = append(item.Paths, path)
+				}
+			}
+			if !conceptHasTest {
+				item.Missing = append(item.Missing, "test for concept: "+conceptID)
+				noTest = true
+			}
+		}
+		missingAcceptance := false
+		for _, criterion := range requirement.AcceptanceCriteria {
+			if !coveredCriteria[criterion.ID] {
+				item.Missing = append(item.Missing, "acceptance test: "+criterion.ID)
+				missingAcceptance = true
+			}
+		}
+		sort.Strings(item.Missing)
+		sort.Strings(item.ConflictAssertions)
+		sort.Slice(item.Paths, func(i, j int) bool {
+			x, y := item.Paths[i], item.Paths[j]
+			if x.ConceptID != y.ConceptID {
+				return x.ConceptID < y.ConceptID
+			}
+			if x.CodeCanonicalID != y.CodeCanonicalID {
+				return x.CodeCanonicalID < y.CodeCanonicalID
+			}
+			return x.TestCanonicalID < y.TestCanonicalID
+		})
+		switch {
+		case unreviewed:
+			item.State = TraceConceptUnreviewed
+		case len(item.ConflictAssertions) > 0:
+			item.State = TraceConflict
+		case noCode:
+			item.State = TraceMissingCode
+		case noTest:
+			item.State = TraceMissingTest
+		case missingAcceptance:
+			item.State = TraceMissingAcceptanceTest
+		default:
+			item.State = TraceLinked
+		}
+		report.Requirements = append(report.Requirements, item)
+	}
+	sort.Slice(report.Requirements, func(i, j int) bool {
+		return report.Requirements[i].RequirementID < report.Requirements[j].RequirementID
+	})
+	return report, nil
+}

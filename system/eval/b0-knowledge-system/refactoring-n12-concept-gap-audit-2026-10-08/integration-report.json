@@ -1,0 +1,841 @@
+{
+  "DEV_FINAL_matrix_dispatches": 0,
+  "V2_Build_calls": 6,
+  "activation_count": 0,
+  "body_and_diagnostic_tamper_controls": 6,
+  "cases": [
+    {
+      "baseline_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "zz_unregistered_ontology_word",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "7af87e2b830170ada34b83250e277f4102ca755622eed97e284b5ce869fc82de"
+        }
+      },
+      "baseline_scored_citations_equal": true,
+      "body_tamper_rejected": true,
+      "concept_candidates": null,
+      "diagnostic_tamper_rejected": true,
+      "ontology": {
+        "mode": "relations",
+        "state": "no_match",
+        "baseline_citations": 3,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "optional_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "zz_unregistered_ontology_word",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "ontology": {
+            "mode": "relations",
+            "state": "no_match",
+            "baseline_citations": 3,
+            "matched_concepts": 0,
+            "applied_relations": 0,
+            "boosted_citations": 0
+          },
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "f80177bfb3c0b2694111134e61ffb7e9c39829ba71e75ae77dbdcdb29d7ed847"
+        }
+      },
+      "pack_coordinates_citations_bodies_neighbors_evidence_state_equal": true,
+      "query": "zz_unregistered_ontology_word",
+      "shared_alias_ambiguity_test": false
+    },
+    {
+      "baseline_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "소스 스냅샷",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "961033851ce51f50ac06b4f7ca29bb2e027a6107f58a4e3a18c86ff74f5eebd3"
+        }
+      },
+      "baseline_scored_citations_equal": true,
+      "body_tamper_rejected": true,
+      "concept_candidates": [
+        {
+          "concept_id": "source-snapshot",
+          "term": "소스 스냅샷",
+          "status": "proposed",
+          "score": 0.5
+        }
+      ],
+      "diagnostic_tamper_rejected": true,
+      "ontology": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 3,
+        "matched_concepts": 1,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "optional_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "소스 스냅샷",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 3,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 0
+          },
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "4b91081726c6185e21f88cb8b2ac4ec880fae0c234be458fd197f289bf0e0540"
+        }
+      },
+      "pack_coordinates_citations_bodies_neighbors_evidence_state_equal": true,
+      "query": "소스 스냅샷",
+      "shared_alias_ambiguity_test": false
+    },
+    {
+      "baseline_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "소스 스냅샷 소스 파일",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "72895a2e75079de7a73ed28ef37ad0c537d28e5d1d42f17dd0f21658126023e4"
+        }
+      },
+      "baseline_scored_citations_equal": true,
+      "body_tamper_rejected": true,
+      "concept_candidates": [
+        {
+          "concept_id": "source-file",
+          "term": "소스 파일",
+          "status": "proposed",
+          "score": 0.5
+        },
+        {
+          "concept_id": "source-snapshot",
+          "term": "소스 스냅샷",
+          "status": "proposed",
+          "score": 0.5
+        }
+      ],
+      "diagnostic_tamper_rejected": true,
+      "ontology": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 3,
+        "matched_concepts": 2,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "optional_pack": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "query": "소스 스냅샷 소스 파일",
+        "citations": [
+          {
+            "file": "internal/setup/identity.go",
+            "start_line": 26,
+            "end_line": 36,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+            "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 122,
+            "end_line": 130,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+          },
+          {
+            "file": "internal/system/semantic/model.go",
+            "start_line": 79,
+            "end_line": 83,
+            "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "project_id": "knowledge-system",
+            "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+            "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+            "source_mode": "committed",
+            "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+            "origin_id": "repo",
+            "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+            "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "internal/setup/identity.go",
+              "start_line": 26,
+              "end_line": 36,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+              "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18"
+            },
+            "text": "type SourceIdentity struct {\n\tProjectID           string `json:\"project_id\"`\n\tSourceMode          string `json:\"source_mode\"`\n\tSourceCommit        string `json:\"source_commit\"`\n\tFileManifestDigest  string `json:\"file_manifest_digest\"`\n\tCapturePolicyDigest string `json:\"capture_policy_digest\"`\n\tGitRecoveryDigest   string `json:\"git_recovery_digest,omitempty\"`\n\tGitArchivePolicy    string `json:\"git_archive_policy,omitempty\"`\n\tFileModePolicy      string `json:\"file_mode_policy,omitempty\"`\n\tSnapshotID          string `json:\"snapshot_id\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 122,
+              "end_line": 130,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9"
+            },
+            "text": "type Assertion struct {\n\tID          string   `json:\"id\"`\n\tPredicate   string   `json:\"predicate\"`\n\tSubjectID   string   `json:\"subject_id\"`\n\tObjectID    string   `json:\"object_id\"`\n\tEvidenceIDs []string `json:\"evidence_ids\"`\n\tStatus      Status   `json:\"status\"`\n\tReviewedBy  string   `json:\"reviewed_by,omitempty\"`\n}\n"
+          },
+          {
+            "citation": {
+              "file": "internal/system/semantic/model.go",
+              "start_line": 79,
+              "end_line": 83,
+              "commit_hash": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "project_id": "knowledge-system",
+              "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+              "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+              "source_mode": "committed",
+              "base_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+              "origin_id": "repo",
+              "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+              "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6"
+            },
+            "text": "type Term struct {\n\tLang      string `json:\"lang\" yaml:\"lang\"`\n\tValue     string `json:\"value\" yaml:\"value\"`\n\tPreferred bool   `json:\"preferred\" yaml:\"preferred\"`\n}\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 3,
+            "matched_concepts": 2,
+            "applied_relations": 0,
+            "boosted_citations": 0
+          },
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "6863b7a1f63b933b3ac77be060a08f2319a6620bcd5e20a1f5bc7026aa44f24d"
+        }
+      },
+      "pack_coordinates_citations_bodies_neighbors_evidence_state_equal": true,
+      "query": "소스 스냅샷 소스 파일",
+      "shared_alias_ambiguity_test": false
+    }
+  ],
+  "full_task_complete": false,
+  "graph_backend": "ckgclient.Fake (no live CKG search)",
+  "human_review_count": 0,
+  "model_HTTP_calls": 0,
+  "new_independent_FINAL_count": 0,
+  "offline_stage2_Search_calls": 6,
+  "real_retained_semantic_resolver": true,
+  "retained_source_refs_verified": 18,
+  "retrieval_hits": "3 controlled citations at actual canonical source anchors, no CKV query",
+  "sanitizer_policy_sha256": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+  "semantic_current_absent": true,
+  "semantic_linked_test_execution_count": 0,
+  "semantic_store_open_mode": "read-only",
+  "trace": {
+    "snapshot": {
+      "project_id": "knowledge-system",
+      "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+      "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+      "source_mode": "committed",
+      "commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+    },
+    "requirements": [
+      {
+        "requirement_id": "req-filtered-recall",
+        "version": 1,
+        "state": "spec_unapproved",
+        "missing": [],
+        "conflict_assertions": [],
+        "paths": []
+      },
+      {
+        "requirement_id": "req-ontology-fallback",
+        "version": 1,
+        "state": "spec_unapproved",
+        "missing": [],
+        "conflict_assertions": [],
+        "paths": []
+      },
+      {
+        "requirement_id": "req-source-evidence",
+        "version": 1,
+        "state": "spec_unapproved",
+        "missing": [],
+        "conflict_assertions": [],
+        "paths": []
+      }
+    ]
+  }
+}

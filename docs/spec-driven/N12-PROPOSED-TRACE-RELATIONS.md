@@ -1,5 +1,7 @@
 # N12 실제 원문에서의 proposed trace 관계 준비
 
+2026-10-08 최신 하위 단계: **N12 누락 개념 경로5개 범위 대조·실제 retained matcher→stage2→V2 검증3사례 완료**. [범위 검토와 명세 초안](./N12-CONCEPT-PATH-SCOPE-REVIEW.md) — source18참조/관련5패키지17시험·32하위시험/변조6거부/권위9파일 불변. 기존 미작성5개·reviewed 경로0은 유지하며 기능 개념3개·requirement version2 초안은 미적용이다. **전체8/18·요청5/15·잔여10개**. 다음 명세 범위 선택 및 N11 gold/독립성·N12 개념/관계 판정. 남은 전체: N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 기본값·출시 판정. 아래 기록은 이전 단계의 증거를 보존한다.
+
 2026-10-08 · **13개 관계 기술 검증 완료 / 내용·관계 승인 및 N12·N14 전체 미완료**.
 
 [관계 검토 자료](../../system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/relation-review-items.json) · [검토 ID 대응](../../system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/relation-index.json) · [실행 요약](../../system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/summary.json)

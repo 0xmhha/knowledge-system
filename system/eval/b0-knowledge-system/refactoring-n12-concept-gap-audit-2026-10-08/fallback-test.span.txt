@@ -1,0 +1,34 @@
+func TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline(t *testing.T) {
+	commit := strings.Repeat("a", 40)
+	hits := []contract.Hit{{Citation: contract.Citation{File: "main.go", StartLine: 1, EndLine: 2, CommitHash: commit}, CanonicalID: "pkg.Alpha"}}
+	plain, _ := New(&ckgclient.Fake{})
+	base, _ := plain.Search(context.Background(), "Alpha", nil, hits, contract.IntentBugFix)
+	for _, tc := range []struct {
+		name, state string
+		provider    providerFunc
+	}{
+		{"missing", "unavailable", func(context.Context) (OntologyResolver, error) { return nil, ErrOntologyUnavailable }},
+		{"stale", "stale", func(context.Context) (OntologyResolver, error) { return nil, ErrOntologyStale }},
+		{"timeout", "budget_exceeded", func(ctx context.Context) (OntologyResolver, error) { <-ctx.Done(); return nil, ctx.Err() }},
+		{"unregistered", "no_match", func(context.Context) (OntologyResolver, error) {
+			return fakeOntology{snapshot: semantic.Snapshot{Commit: commit}}, nil
+		}},
+		{"ambiguous proposed", "active", func(context.Context) (OntologyResolver, error) {
+			return fakeOntology{snapshot: semantic.Snapshot{Commit: commit}, candidates: []semantic.ConceptCandidate{{ConceptID: "one", Status: semantic.StatusProposed}, {ConceptID: "two", Status: semantic.StatusProposed}}}, nil
+		}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s, err := New(&ckgclient.Fake{}, WithOntologyProvider(tc.provider, 0.2, 10*time.Millisecond))
+			if err != nil {
+				t.Fatal(err)
+			}
+			out, err := s.Search(context.Background(), "Alpha", nil, hits, contract.IntentBugFix)
+			if err != nil || !reflect.DeepEqual(out.Citations, base.Citations) || out.Ontology == nil || out.Ontology.State != tc.state || out.Ontology.AppliedRelations != 0 {
+				t.Fatalf("fallback changed raw baseline: %+v %v", out, err)
+			}
+			if tc.name == "ambiguous proposed" && len(out.ConceptCandidates) != 2 {
+				t.Fatal("ambiguity was collapsed")
+			}
+		})
+	}
+}

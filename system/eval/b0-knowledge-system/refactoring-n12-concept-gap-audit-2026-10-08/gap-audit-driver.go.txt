@@ -1,0 +1,65 @@
+package main
+
+import (
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "reflect"
+ "time"
+
+ "github.com/0xmhha/knowledge-system/internal/setup"
+ "github.com/0xmhha/knowledge-system/internal/system/ckgclient"
+ "github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
+ "github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
+ "github.com/0xmhha/knowledge-system/internal/system/config"
+ "github.com/0xmhha/knowledge-system/internal/system/evidencev2"
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+ "github.com/0xmhha/knowledge-system/pkg/system/contract"
+)
+
+func must(err error) { if err != nil { panic(err) } }
+func save(path string,v any) { b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600)) }
+func sha(b []byte) string { h:=sha256.Sum256(b);return hex.EncodeToString(h[:]) }
+type provider struct { active semantic.ActiveProjection }
+func (p provider) Resolve(context.Context) (stage2.OntologyResolver,error) { return p.active,nil }
+func main() {
+ out:="system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08"
+ var prep struct { Source string `json:"source"`;Version string `json:"version"`;Store string `json:"store"` }
+ b,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e);must(json.Unmarshal(b,&prep))
+ ctx,cancel:=context.WithTimeout(context.Background(),2*time.Minute);defer cancel()
+ var refs []struct { ID string `json:"id"`;Path string `json:"path"`;First int `json:"first"`;Last int `json:"last"`;FileSHA string `json:"file_sha256"`;SpanSHA string `json:"content_sha256"` }
+ b,e=os.ReadFile(filepath.Join(out,"source-refs.json"));must(e);must(json.Unmarshal(b,&refs))
+ spans:=make([]setup.RetainedLineSpan,len(refs));for i,r:=range refs{spans[i]=setup.RetainedLineSpan{OriginID:"repo",Path:r.Path,First:r.First,Last:r.Last}}
+ checked:=0;must(setup.VisitRetainedLineSpans(ctx,prep.Version,spans,func(i int,r setup.RetainedEvidence)error{if r.FileSHA256!=refs[i].FileSHA||r.ContentSHA256!=refs[i].SpanSHA{return fmt.Errorf("retained mismatch %s",refs[i].ID)};checked++;return nil}))
+ store,e:=semantic.OpenStoreReadOnly(ctx,prep.Store);must(e);defer store.Close()
+ var p semantic.Projection;b,e=os.ReadFile("system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/projection-proposed.json");must(e);must(json.Unmarshal(b,&p))
+ active,e:=store.LoadAlignedRetained(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID,prep.Source,filepath.Join(prep.Version,"graph"),filepath.Join(prep.Version,"vector"),prep.Version);must(e)
+ policy,e:=os.ReadFile("system/policies/sanitization_rules.yaml");must(e);rules,e:=config.LoadSanitizeRulesetBytes(policy);must(e);cleaner,e:=sanitize.New(rules);must(e)
+ hits:=[]contract.Hit{}
+ for _,id:=range []string{"n12-proposed-lock-anchor:01","n12-proposed-lock-anchor:10","n12-proposed-lock-anchor:12"}{found:=false;for _,r:=range p.Evidence{if r.ID!=id{continue};hits=append(hits,contract.Hit{Citation:contract.Citation{File:r.Path,StartLine:r.StartLine,EndLine:r.EndLine,CommitHash:p.Snapshot.Commit},CanonicalID:r.CanonicalID});found=true};if !found{panic("missing citation fixture")}}
+ cases:=[]struct{query string;matches int;state string}{{"zz_unregistered_ontology_word",0,"no_match"},{"소스 스냅샷",1,"active"},{"소스 스냅샷 소스 파일",2,"active"}}
+ results:=[]map[string]any{}
+ for _,c:=range cases{
+  plain,e:=stage2.New(&ckgclient.Fake{});must(e);optional,e:=stage2.New(&ckgclient.Fake{},stage2.WithOntologyProvider(provider{active},0.2,time.Second));must(e)
+  baseline,e:=plain.Search(ctx,c.query,nil,hits,contract.IntentBugFix);must(e);got,e:=optional.Search(ctx,c.query,nil,hits,contract.IntentBugFix);must(e)
+  if !reflect.DeepEqual(got.Citations,baseline.Citations)||len(got.Citations)!=3||len(got.ConceptCandidates)!=c.matches||got.Ontology==nil||got.Ontology.State!=c.state||got.Ontology.AppliedRelations!=0{panic("real matcher changed baseline or lost candidates")}
+  for _,match:=range got.ConceptCandidates{if match.Status!=semantic.StatusProposed||len(active.VerifiedImplementations(match.ConceptID))!=0{panic("unreviewed concept supplied boost")}}
+  citations:=func(o stage2.Stage2Output)[]contract.Citation{r:=[]contract.Citation{};for _,s:=range o.Citations{r=append(r,s.Citation)};return r}
+  basePack,e:=evidencev2.Build(ctx,prep.Version,c.query,citations(baseline),cleaner);must(e);pack,e:=evidencev2.Build(ctx,prep.Version,c.query,citations(got),cleaner);must(e)
+  pack.Metadata.Ontology=got.Ontology;must(evidencev2.Stamp(&pack));must(evidencev2.Verify(basePack));must(evidencev2.Verify(pack))
+  if !reflect.DeepEqual(basePack.Coordinates,pack.Coordinates)||!reflect.DeepEqual(basePack.Citations,pack.Citations)||!reflect.DeepEqual(basePack.Bodies,pack.Bodies)||!reflect.DeepEqual(basePack.GraphNeighbors,pack.GraphNeighbors)||basePack.EvidenceState!=pack.EvidenceState||len(pack.Bodies)!=3||basePack.Metadata.IntegrityHash==pack.Metadata.IntegrityHash{panic("raw evidence changed or diagnostic not hashed")}
+  tampered:=pack;diag:=*pack.Metadata.Ontology;tampered.Metadata.Ontology=&diag;diag.State="control-tampered";if evidencev2.Verify(tampered)==nil{panic("diagnostic tampering accepted")}
+  bodyTampered:=pack;bodyTampered.Bodies=append([]contract.BodyV2(nil),pack.Bodies...);bodyTampered.Bodies[0].Text+="control-tampered";if evidencev2.Verify(bodyTampered)==nil{panic("body tampering accepted")}
+  results=append(results,map[string]any{"query":c.query,"concept_candidates":got.ConceptCandidates,"ontology":got.Ontology,"baseline_scored_citations_equal":true,"pack_coordinates_citations_bodies_neighbors_evidence_state_equal":true,"baseline_pack":basePack,"optional_pack":pack,"diagnostic_tamper_rejected":true,"body_tamper_rejected":true,"shared_alias_ambiguity_test":false})
+ }
+ _,e=store.Current(ctx,p.Snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("current pointer changed")}
+ trace,e:=active.Trace();must(e);for _,r:=range trace.Requirements{if r.State!=semantic.TraceSpecUnapproved||len(r.Paths)!=0{panic("human state changed")}}
+ save(filepath.Join(out,"integration-report.json"),map[string]any{"retained_source_refs_verified":checked,"cases":results,"sanitizer_policy_sha256":sha(policy),"graph_backend":"ckgclient.Fake (no live CKG search)","retrieval_hits":"3 controlled citations at actual canonical source anchors, no CKV query","real_retained_semantic_resolver":true,"offline_stage2_Search_calls":6,"V2_Build_calls":6,"body_and_diagnostic_tamper_controls":6,"semantic_store_open_mode":"read-only","semantic_current_absent":true,"trace":trace,"model_HTTP_calls":0,"DEV_FINAL_matrix_dispatches":0,"new_independent_FINAL_count":0,"human_review_count":0,"activation_count":0,"semantic_linked_test_execution_count":0,"full_task_complete":false})
+ fmt.Println("PASS retained18 source spans, real semantic matcher/stage2/retained V2 packs3 cases,6 tamper controls; proposed/current absent")
+}
