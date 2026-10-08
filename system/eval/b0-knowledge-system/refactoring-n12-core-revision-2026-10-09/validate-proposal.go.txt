@@ -1,0 +1,94 @@
+// Validate the PROPOSED N12 ontology/spec revision with production parsers.
+// Source-only: no engine coordinates, store, activation or model call.
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"reflect"
+	"sort"
+
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+func require(ok bool, msg string) {
+	if !ok {
+		panic(msg)
+	}
+}
+func read(p string) []byte { b, err := os.ReadFile(p); must(err); return b }
+
+func ids(c []semantic.ConceptCandidate) []string {
+	out := []string{}
+	for _, x := range c {
+		out = append(out, x.ConceptID)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func main() {
+	snap := semantic.Snapshot{ProjectID: "knowledge-system", DatasetID: "646443c59bc72aba926179752fea527f2ed1636e04ba29a94aa61da5a1b2f6d2", SnapshotID: "646443c59bc72aba926179752fea527f2ed1636e04ba29a94aa61da5a1b2f6d2", SourceMode: "snapshot-only"}
+	dir := "docs/spec-driven/"
+	core, _, err := semantic.ExtractOntology(snap, dir+"ontology-pilot-v2.yaml", read(dir+"ontology-pilot-v2.yaml"))
+	must(err)
+	must(semantic.ValidateCoreOntology(core))
+	oldCore, _, err := semantic.ExtractOntology(snap, dir+"ontology-pilot.yaml", read(dir+"ontology-pilot.yaml"))
+	must(err)
+	fn, _, err := semantic.ExtractOntology(snap, dir+"ontology-pilot-functional-v2.yaml", read(dir+"ontology-pilot-functional-v2.yaml"))
+	must(err)
+	must(fn.Validate())
+	require(len(core.Concepts) == 20 && len(fn.Concepts) == 23, "core20 plus3 required")
+	changed := []string{}
+	for i, a := range core.Concepts {
+		b, o := fn.Concepts[i], oldCore.Concepts[i]
+		a.EvidenceID, b.EvidenceID, o.EvidenceID = "", "", ""
+		require(reflect.DeepEqual(a, b), "functional v2 core part differs from core v2: "+a.ID)
+		require(a.ID == o.ID && a.Kind == o.Kind, "core ID/kind changed: "+a.ID)
+		if !reflect.DeepEqual(a, o) {
+			changed = append(changed, a.ID)
+		}
+		require(a.Status == semantic.StatusProposed && a.ReviewedBy == "", "concept falsely reviewed: "+a.ID)
+	}
+	oldSpec, _, err := semantic.ExtractSpec(snap, dir+"spec-pilot-v2.yaml", read(dir+"spec-pilot-v2.yaml"))
+	must(err)
+	spec, _, err := semantic.ExtractSpec(snap, dir+"spec-pilot-v3.yaml", read(dir+"spec-pilot-v3.yaml"))
+	must(err)
+	merged := fn
+	merged.Evidence = append(append([]semantic.EvidenceSpan{}, fn.Evidence...), spec.Evidence...)
+	merged.Sections = append(append([]semantic.DocumentSection{}, fn.Sections...), spec.Sections...)
+	merged.Requirements = spec.Requirements
+	must(merged.Validate())
+	criteria := 0
+	for i, r := range spec.Requirements {
+		o := oldSpec.Requirements[i]
+		require(r.ID == o.ID && r.Version == 3 && o.Version == 2 && reflect.DeepEqual(r.ConceptIDs, o.ConceptIDs), "requirement identity/version: "+r.ID)
+		require(r.Status == semantic.StatusProposed && r.ReviewedBy == "", "spec falsely reviewed")
+		require(len(r.AcceptanceCriteria) == len(o.AcceptanceCriteria), "criterion count changed")
+		criteria += len(r.AcceptanceCriteria)
+	}
+	// Korean substring collision checks with the production matcher.
+	probes := map[string][][]string{}
+	for _, q := range []string{"의미 관계", "스냅샷 결합 관계 검증", "수용 기준", "기준별 수용 판정", "수용 기준 판정"} {
+		before, err := func() ([]semantic.ConceptCandidate, error) {
+			old, _, err := semantic.ExtractOntology(snap, dir+"ontology-pilot-functional.yaml", read(dir+"ontology-pilot-functional.yaml"))
+			must(err)
+			return old.MatchConcepts(q, 8)
+		}()
+		must(err)
+		after, err := fn.MatchConcepts(q, 8)
+		must(err)
+		probes[q] = [][]string{ids(before), ids(after)}
+	}
+	out := map[string]any{"core_concepts": len(core.Concepts), "functional_concepts": len(fn.Concepts), "core_validate": "pass",
+		"changed_core_concepts": changed, "requirements": len(spec.Requirements), "criteria": criteria,
+		"all_proposed_unreviewed": true, "ko_match_probes_before_after": probes}
+	b, _ := json.MarshalIndent(out, "", " ")
+	fmt.Println(string(b))
+}
