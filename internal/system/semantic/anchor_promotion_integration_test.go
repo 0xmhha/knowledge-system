@@ -99,7 +99,7 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 	if err := ValidateDatasetAlignment(candidate, source, staleGraph, candidateVector); err != nil {
 		t.Fatalf("JSON-coordinate positive control failed: %v", err)
 	}
-	if err := ValidateCodeAnchors(candidate, staleGraph); err == nil || !strings.Contains(err.Error(), "crosses") {
+	if err := ValidateCodeAnchors(candidate, staleGraph); !errors.Is(err, ErrCodeAnchorSnapshotMismatch) {
 		t.Fatalf("actual old graph DB was not rejected: %v", err)
 	}
 	clone := func(t *testing.T) Projection {
@@ -113,18 +113,22 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 		}
 		return p
 	}
+	// gate names the typed rejection that must fire, so each case is
+	// attributed to the projection check or the actual CKG anchor check
+	// rather than to a shared message substring.
 	for _, tc := range []struct {
 		name, want string
+		gate       error
 		edit       func(*Projection)
 		graph      string
 	}{
-		{"foreign-evidence-snapshot", "crosses", func(p *Projection) { p.Evidence[len(p.Evidence)-1] = base.Evidence[len(base.Evidence)-1] }, candidateGraph},
-		{"relabelled-foreign-source-bytes", "digest mismatch", func(p *Projection) {
+		{"foreign-evidence-snapshot", "crosses", ErrEvidenceSnapshotMismatch, func(p *Projection) { p.Evidence[len(p.Evidence)-1] = base.Evidence[len(base.Evidence)-1] }, candidateGraph},
+		{"relabelled-foreign-source-bytes", "digest mismatch", nil, func(p *Projection) {
 			p.Evidence[len(p.Evidence)-1] = base.Evidence[len(base.Evidence)-1]
 			p.Evidence[len(p.Evidence)-1].Snapshot = p.Snapshot
 		}, candidateGraph},
-		{"stale-actual-graph-with-matching-JSON", "crosses", func(*Projection) {}, staleGraph},
-		{"missing-actual-canonical", "not found", func(p *Projection) {
+		{"stale-actual-graph-with-matching-JSON", "crosses", ErrCodeAnchorSnapshotMismatch, func(*Projection) {}, staleGraph},
+		{"missing-actual-canonical", "not found", nil, func(p *Projection) {
 			p.Evidence[len(p.Evidence)-1].CanonicalID = "example.test/anchor-promotion.Missing"
 			p.Assertions[0].ObjectID = p.Evidence[len(p.Evidence)-1].CanonicalID
 		}, candidateGraph},
@@ -138,8 +142,14 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 					return store.PutAlignedRetained(ctx, p, source, tc.graph, candidateVector, candidateVersion)
 				},
 			} {
-				if err := put(); err == nil || !strings.Contains(err.Error(), tc.want) {
+				err := put()
+				if err == nil || !strings.Contains(err.Error(), tc.want) {
 					t.Fatalf("expected %q before persistence, got %v", tc.want, err)
+				}
+				for _, gate := range []error{ErrEvidenceSnapshotMismatch, ErrCodeAnchorSnapshotMismatch} {
+					if errors.Is(err, gate) != (gate == tc.gate) {
+						t.Fatalf("rejection attributed to wrong gate: want %v, got %v", tc.gate, err)
+					}
 				}
 				if _, err := store.Load(ctx, p.Snapshot.ProjectID, p.Snapshot.DatasetID); !errors.Is(err, sql.ErrNoRows) {
 					t.Fatalf("rejected candidate was persisted: %v", err)
@@ -163,8 +173,8 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 				return store.ActivateAlignedRetained(ctx, candidate.Snapshot.ProjectID, candidate.Snapshot.DatasetID, source, staleGraph, candidateVector, candidateVersion)
 			},
 		} {
-			if err := activate(); err == nil || !strings.Contains(err.Error(), "crosses") {
-				t.Fatalf("stale canonical DB activation accepted: %v", err)
+			if err := activate(); !errors.Is(err, ErrCodeAnchorSnapshotMismatch) || errors.Is(err, ErrEvidenceSnapshotMismatch) {
+				t.Fatalf("stale canonical DB activation not refused by the CKG anchor gate: %v", err)
 			}
 			assertUnchanged(t)
 		}

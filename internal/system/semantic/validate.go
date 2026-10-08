@@ -83,7 +83,7 @@ func (p Projection) Validate() error {
 			return err
 		}
 		if e.Snapshot != p.Snapshot {
-			return fmt.Errorf("evidence %q crosses project or snapshot", e.ID)
+			return &snapshotMismatchError{msg: fmt.Sprintf("evidence %q crosses project or snapshot", e.ID), kind: ErrEvidenceSnapshotMismatch}
 		}
 		if e.Kind != SourceDocument && e.Kind != SourceCode && e.Kind != SourceTest {
 			return fmt.Errorf("evidence %q has invalid source kind %q", e.ID, e.Kind)

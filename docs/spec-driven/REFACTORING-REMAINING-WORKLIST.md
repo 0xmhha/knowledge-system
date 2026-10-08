@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-09 최신 하위 단계(Claude Code): **N12 외부 snapshot 거부 gate 타입 구분**. [변경·검증](./N12-GATE-ATTRIBUTION.md) — `ErrEvidenceSnapshotMismatch`/`ErrCodeAnchorSnapshotMismatch` 추가, 기존 오류 문자열 바이트 유지. 선언만 한 상태 behavioral RED→연결 후 GREEN, semantic 의존8패키지 race251시험/264하위시험 pass. 통합 시험이 사례별 거부 gate를 특정한다. 사람 판정0·후보36353d32 불변, 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름·판정 확인과 독립 준비 작업. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
+
 2026-10-09 최신 하위 단계(Claude Code): **N12 관계 기술 사전검토·기준 누락 시험3개 보강**. [사전검토](./N12-CRITERION-GAP-PREREVIEW.md) — F3-T08/T11 대상 부정확(좌표 함수가 아니라 code anchor gate가 거부), F3-T10은 code anchor Given 없음, T03 순서·T07 filtered 취소·T15/T17 미검증 관계+CKG 인용 누락을 확인했다. 순서 단언·filtered 진행 중 취소·미검증 관계 baseline 시험을 추가해 관련3패키지 race132시험/102하위시험 pass, 변이3중 상태변환 제거 검출. 사람 판정 아님·reviewer null·개별 승인0, 최신 후보36353d32 불변. 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·대상별 판정과 N11 부족분. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
 
 2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.

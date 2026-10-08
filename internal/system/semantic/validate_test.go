@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -88,8 +90,14 @@ func TestNonCommittedSemanticEvidenceRequiresArchive(t *testing.T) {
 func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
 	p, dir := fixture(t)
 	p.Evidence[0].Snapshot.DatasetID = "other"
-	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "crosses") {
+	err := p.Validate()
+	if err == nil || !strings.Contains(err.Error(), "crosses") {
 		t.Fatalf("cross-snapshot evidence accepted: %v", err)
+	}
+	// Typed attribution must not change the historical message bytes.
+	if !errors.Is(err, ErrEvidenceSnapshotMismatch) || errors.Is(err, ErrCodeAnchorSnapshotMismatch) ||
+		err.Error() != fmt.Sprintf("evidence %q crosses project or snapshot", p.Evidence[0].ID) {
+		t.Fatalf("cross-snapshot rejection lost its typed gate or message: %v", err)
 	}
 	p, _ = fixture(t)
 	p.Claims[0].EvidenceIDs = []string{"missing"}
