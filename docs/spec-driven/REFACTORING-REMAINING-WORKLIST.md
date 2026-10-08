@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-09 최신 하위 단계(Claude Code): **N12 사전검토 수정10건 반영 제안**. [개정 제안](./N12-REVISED-PROPOSAL.md) — 사용자 “남은 작업별 수정을 진행해줘”를 35건 권고 채택으로 해석해 기록(확신도 Mid, 검토자 이름 없음). F3-T08/T11 대상을 code anchor gate로 바꾸고 새 관계14개(F3-R01–14)를 추가했다. 대상16개를 go/ast로 확인, 관계에 등장하는 시험11개/하위시험31 race pass. 모두 proposed·verified0, held 후보·worksheet 불변. 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름, core20·요구·기준 판정, 이후 새 capture 결합. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
+
 2026-10-09 최신 하위 단계(Claude Code): **N12 외부 snapshot 거부 gate 타입 구분**. [변경·검증](./N12-GATE-ATTRIBUTION.md) — `ErrEvidenceSnapshotMismatch`/`ErrCodeAnchorSnapshotMismatch` 추가, 기존 오류 문자열 바이트 유지. 선언만 한 상태 behavioral RED→연결 후 GREEN, semantic 의존8패키지 race251시험/264하위시험 pass. 통합 시험이 사례별 거부 gate를 특정한다. 사람 판정0·후보36353d32 불변, 전체8/18·요청5/15·남은10개 유지. 다음 검토자 이름·판정 확인과 독립 준비 작업. 남은 전체 N08/09/10/11/12/14/15/16/17/18.
 
 2026-10-09 최신 하위 단계(Claude Code): **N12 관계 기술 사전검토·기준 누락 시험3개 보강**. [사전검토](./N12-CRITERION-GAP-PREREVIEW.md) — F3-T08/T11 대상 부정확(좌표 함수가 아니라 code anchor gate가 거부), F3-T10은 code anchor Given 없음, T03 순서·T07 filtered 취소·T15/T17 미검증 관계+CKG 인용 누락을 확인했다. 순서 단언·filtered 진행 중 취소·미검증 관계 baseline 시험을 추가해 관련3패키지 race132시험/102하위시험 pass, 변이3중 상태변환 제거 검출. 사람 판정 아님·reviewer null·개별 승인0, 최신 후보36353d32 불변. 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·대상별 판정과 N11 부족분. 남은 전체 N08/09/10/11/12/14/15/16/17/18.

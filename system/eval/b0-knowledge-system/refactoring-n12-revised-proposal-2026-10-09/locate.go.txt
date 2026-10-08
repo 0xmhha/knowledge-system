@@ -1,0 +1,86 @@
+// locate resolves "dir|Recv|Name" declarations to file and line span with
+// the SHA-256 of the exact declaration lines (LF-terminated), using go/ast.
+package main
+
+import (
+	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+type loc struct {
+	Query     string `json:"query"`
+	Path      string `json:"path"`
+	StartLine int    `json:"start_line"`
+	EndLine   int    `json:"end_line"`
+	SpanSHA   string `json:"span_sha256"`
+	FileSHA   string `json:"file_sha256"`
+	Pointer   bool   `json:"pointer_receiver"`
+}
+
+func recvName(f *ast.FuncDecl) (string, bool) {
+	if f.Recv == nil || len(f.Recv.List) == 0 {
+		return "", false
+	}
+	t := f.Recv.List[0].Type
+	ptr := false
+	if s, ok := t.(*ast.StarExpr); ok {
+		t, ptr = s.X, true
+	}
+	if id, ok := t.(*ast.Ident); ok {
+		return id.Name, ptr
+	}
+	return "?", ptr
+}
+
+func main() {
+	var out []loc
+	sc := bufio.NewScanner(os.Stdin)
+	for sc.Scan() {
+		q := strings.TrimSpace(sc.Text())
+		if q == "" {
+			continue
+		}
+		p := strings.Split(q, "|")
+		dir, recv, name := p[0], p[1], p[2]
+		files, _ := filepath.Glob(filepath.Join(dir, "*.go"))
+		found := 0
+		for _, file := range files {
+			fs := token.NewFileSet()
+			af, err := parser.ParseFile(fs, file, nil, 0)
+			if err != nil {
+				panic(err)
+			}
+			for _, d := range af.Decls {
+				fd, ok := d.(*ast.FuncDecl)
+				if !ok || fd.Name.Name != name {
+					continue
+				}
+				rn, ptr := recvName(fd)
+				if rn != recv {
+					continue
+				}
+				body, _ := os.ReadFile(file)
+				lines := strings.SplitAfter(string(body), "\n")
+				s, e := fs.Position(fd.Pos()).Line, fs.Position(fd.End()).Line
+				span := sha256.Sum256([]byte(strings.Join(lines[s-1:e], "")))
+				whole := sha256.Sum256(body)
+				out = append(out, loc{q, file, s, e, hex.EncodeToString(span[:]), hex.EncodeToString(whole[:]), ptr})
+				found++
+			}
+		}
+		if found != 1 {
+			fmt.Fprintf(os.Stderr, "query %q resolved %d declarations\n", q, found)
+			os.Exit(1)
+		}
+	}
+	json.NewEncoder(os.Stdout).Encode(out)
+}
