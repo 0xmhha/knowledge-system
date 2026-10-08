@@ -1,0 +1,22 @@
+{
+  "commands": {
+    "focused": "go test -json -count=1 ./internal/system/composer/stage2 -run ^TestStoredSharedAliasPreservesBaselineAndRetainedEvidence$",
+    "race": "go test -race -json -count=1 ./internal/system/composer/stage2 ./internal/system/semantic ./internal/system/evidencev2",
+    "vet": "go vet ./internal/system/composer/stage2 ./internal/system/semantic ./internal/system/evidencev2",
+    "boundaries": "./scripts/check-boundaries.sh",
+    "format": "gofmt -l internal/system/composer/stage2/ontology_matcher_integration_test.go"
+  },
+  "focused_exit": 0,
+  "race_exit": 0,
+  "vet_exit": 0,
+  "boundaries_exit": 0,
+  "boundary_output": "engine boundaries: OK",
+  "unformatted_files": [],
+  "go_version": "go1.26.8",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "new_Linux_run": false,
+  "full_suite_rerun": false,
+  "production_code_changed": false,
+  "actual_pilot_execution": false
+}
