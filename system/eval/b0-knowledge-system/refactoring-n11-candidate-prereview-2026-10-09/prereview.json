@@ -1,0 +1,181 @@
+{
+ "schema_version": 1,
+ "kind": "assistant_technical_prereview",
+ "is_human_decision": false,
+ "reviewer": null,
+ "input": "system/eval/b0-knowledge-system/refactoring-scope-adoption-2026-10-08/candidate-question-book.json",
+ "method": "Read-only subagent: git show 479491ba, span SHA recomputation, code reading. No runner, retrieval, index build or model call. Main session re-checked the answer-text exposure (N11-FINAL-CANDIDATE-PREPARATION.md:31) and the DEV-06/FINAL-03 shared rule (worksheet.go:102-111 vs lock.go:62-72).",
+ "span_sha_all_match": true,
+ "items": [
+  {
+   "id": "N11-DEV-01",
+   "gold_recommendation": "accept",
+   "group_recommendation": "CODE fits",
+   "reason": "maintenance.go 36-42 per-ancestor EvalSymlinks, 52-56 markers, 62-77 pins",
+   "proposed_correction": "add line 12 (versioned_setup_required string) to evidence"
+  },
+  {
+   "id": "N11-DEV-02",
+   "gold_recommendation": "modify_evidence",
+   "group_recommendation": "CODE fits",
+   "reason": "key engine_output_estimate_bytes (97) and rationale (101-102) outside span",
+   "proposed_correction": "extend span to 97-148"
+  },
+  {
+   "id": "N11-DEV-03",
+   "gold_recommendation": "modify",
+   "group_recommendation": "WHY with added evidence",
+   "reason": "span 230-241 only wraps error; rationale in durability.go 21-23, reindex.go 441-454",
+   "proposed_correction": "add those spans; add 'callers must inspect/retry, not assume pointer unchanged or roll back' (durability.go:22)"
+  },
+  {
+   "id": "N11-DEV-04",
+   "gold_recommendation": "modify",
+   "group_recommendation": "POLICY code_contract",
+   "reason": "answer mixes unknown_legacy_readers (356-357) and unverified_or_legacy (352-355)",
+   "proposed_correction": "separate reasons: no reader protocol -> unknown_legacy_readers; identity failure -> unverified_or_legacy; reader lock -> pinned_reader; any reason -> Delete=false (417)"
+  },
+  {
+   "id": "N11-DEV-05",
+   "gold_recommendation": "accept",
+   "group_recommendation": "CODE fits",
+   "reason": "96-113 omission/selection, 139-149 partial",
+   "proposed_correction": "extend to 41-155 for 32000 and budget_exceeded; 'never truncates' is absence inference"
+  },
+  {
+   "id": "N11-DEV-06",
+   "gold_recommendation": "modify_evidence",
+   "group_recommendation": "POLICY code_contract",
+   "reason": "'common path' and 'no automatic project-name selection' are in WORKSHEET-CATALOG-CONTRACT-V1.md:7,17",
+   "proposed_correction": "add those doc lines"
+  },
+  {
+   "id": "N11-DEV-07",
+   "gold_recommendation": "modify_evidence",
+   "group_recommendation": "WHY only with doc",
+   "reason": "second sentence paraphrases WORKSHEET-CATALOG-CONTRACT-V1.md:40",
+   "proposed_correction": "add doc line or reclassify CODE"
+  },
+  {
+   "id": "N11-FINAL-CAND-01",
+   "gold_recommendation": "accept",
+   "group_recommendation": "CODE fits",
+   "reason": "mode=ro (21), user_version compare+Close (28-35)",
+   "proposed_correction": null
+  },
+  {
+   "id": "N11-FINAL-CAND-02",
+   "gold_recommendation": "accept",
+   "group_recommendation": "WHY (weak)",
+   "reason": "author comment 11-12 states intent and separate OpenStore path",
+   "proposed_correction": "reviewer should note rationale restates behavior"
+  },
+  {
+   "id": "N11-FINAL-CAND-03",
+   "gold_recommendation": "accept",
+   "group_recommendation": "CODE fits; independence flag",
+   "reason": "lock.go 64-72; same KnownFields+trailing-EOF rule as DEV-06 worksheet.go 102-111",
+   "proposed_correction": "needs independence decision vs DEV"
+  },
+  {
+   "id": "N11-FINAL-CAND-04",
+   "gold_recommendation": "reject",
+   "group_recommendation": "not WHY",
+   "reason": "no rationale source; answer admits it",
+   "proposed_correction": "exclude; reclassifying adds no cluster"
+  },
+  {
+   "id": "N11-FINAL-CAND-07",
+   "gold_recommendation": "modify_evidence",
+   "group_recommendation": "TRACE code_contract",
+   "reason": "'not mistaken for current path' is at 54-56",
+   "proposed_correction": "extend span to 54-78"
+  },
+  {
+   "id": "N11-FINAL-CAND-08",
+   "gold_recommendation": "modify",
+   "group_recommendation": "TRACE code_contract",
+   "reason": "418-421; conditions unclear",
+   "proposed_correction": "state: no ADR -> reject regardless of status; verified link requires verified ADR, RequirementIDs, ADR SourceRef in EvidenceRefs"
+  },
+  {
+   "id": "N11-FINAL-CAND-09",
+   "gold_recommendation": "accept_conditional",
+   "group_recommendation": "ABS basis exists",
+   "reason": "summary.json:44 RTO/RPO null; docs state undecided",
+   "proposed_correction": "fix 'this project' = knowledge-system; strict zero-citation conflicts with citing the 'undecided' record"
+  },
+  {
+   "id": "N11-FINAL-CAND-10",
+   "gold_recommendation": "modify",
+   "group_recommendation": "ABS boundary",
+   "reason": "C1-OPERATIONS-REVIEW:15 OP-01 '미지정' is citable",
+   "proposed_correction": "expected: abstain citing the unassigned record, or relax strict_zero_citations"
+  },
+  {
+   "id": "N11-FINAL-CAND-11",
+   "gold_recommendation": "accept",
+   "group_recommendation": "POLICY code_contract",
+   "reason": "283-292, 294 4<<20",
+   "proposed_correction": null
+  },
+  {
+   "id": "N11-FINAL-CAND-12",
+   "gold_recommendation": "accept",
+   "group_recommendation": "CODE fits",
+   "reason": "15-19, 34-67",
+   "proposed_correction": null
+  },
+  {
+   "id": "N11-FINAL-CAND-13",
+   "gold_recommendation": "reject",
+   "group_recommendation": "not WHY",
+   "reason": "no design rationale; relies on SQLite transaction semantics outside span",
+   "proposed_correction": "exclude"
+  },
+  {
+   "id": "N11-FINAL-CAND-14",
+   "gold_recommendation": "modify",
+   "group_recommendation": "CODE fits; independence flag",
+   "reason": "55-58,65-72; 'relative path' relies on line 28; same span-SHA method as DEV-07",
+   "proposed_correction": "extend to 24-74 or drop 'relative'; needs independence decision vs DEV-07"
+  },
+  {
+   "id": "N11-FINAL-CAND-15",
+   "gold_recommendation": "reject",
+   "group_recommendation": "CODE not WHY",
+   "reason": "asks behavior; same cluster as CAND-14",
+   "proposed_correction": "exclude"
+  }
+ ],
+ "counts": {
+  "accept": 7,
+  "accept_conditional": 1,
+  "modify": 5,
+  "modify_evidence": 4,
+  "reject": 3
+ },
+ "surviving_independent_clusters_if_adopted": {
+  "FINAL": {
+   "CODE": "4 (2-3 if DEV overlap is strict)",
+   "WHY": 1,
+   "POLICY": "1 code_contract, organization_policy 0",
+   "TRACE": "2 code_contract, reviewed_path 0",
+   "ABS": 1
+  },
+  "DEV": {
+   "CODE": 3,
+   "WHY": 2,
+   "POLICY": 2,
+   "TRACE": 0,
+   "ABS": 0
+  }
+ },
+ "critical": [
+  "Candidate answers appear near-verbatim in committed docs (docs/spec-driven/N11-*.md, N12-*.md) and system/eval question books/span files; the frozen corpus must exclude these paths or the evaluation is invalid",
+  "DEV/FINAL share facts: DEV-06 vs FINAL-03/04 (KnownFields+trailing EOF), DEV-07 vs FINAL-14/15 (span SHA method)",
+  "strict_zero_citations for ABS conflicts with a corpus that records 'unassigned/null' explicitly"
+ ],
+ "all_groups_below_10": true,
+ "shortfall_rule": "docs/spec-driven/N11-SHORTFALL-RULE.md (all groups would be inconclusive)"
+}
