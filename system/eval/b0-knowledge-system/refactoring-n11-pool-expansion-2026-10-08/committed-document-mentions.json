@@ -1,0 +1,62 @@
+{
+  "source_commit": "479491baa50f818a5f7bb7651f35e9c7192ad906",
+  "matches": [
+    {
+      "path": "docs/spec-driven/B0-DYNAMIC-FIXTURES.md",
+      "line": 15,
+      "terms": [
+        "MatchConcepts"
+      ],
+      "text": "| F-03 다의어·미등록 표현 | 같은 자연어 표현이 둘 이상의 개념에 연결될 수 있는 팩과 어떤 개념에도 등록되지 않은 표현을 각각 질의한다. | 다의어는 여러 후보와 불확실성을 보존한다. 미등록 표현은 개념 확정 없이 기본 검색 후보를 보존한다. | `internal/system/semantic/matcher_test.go`의 `TestMatchConceptsPreservesAmbiguityAndNaturalLanguage`; `internal/system/composer/stage2/ontology_test.go`의 `TestOntologyBoostOnlyExistingSameSnapshotCanonicalCitation` | 한국어·영어 표현별 기본/개념/관계/결합 ablation에서 오개념 확정률, 후보 손실, 인용 변화를 비교한다. |"
+    },
+    {
+      "path": "docs/spec-driven/B0-M2MAX-REVIEW.md",
+      "line": 465,
+      "terms": [
+        "ResolveTracePath"
+      ],
+      "text": "68: \t\tanchors, err := projection.ResolveTracePath(link.RequirementID, link.CriterionID, link.CodeCanonicalID, link.TestCanonicalID)"
+    },
+    {
+      "path": "docs/spec-driven/DESIGN-GATES-EVIDENCE.md",
+      "line": 26,
+      "terms": [
+        "matcher.go"
+      ],
+      "text": "| `claim` / `semantic-assertion` / `concept` / `term` | 주장은 검토 가능한 문장, 단언은 타입·방향·근거가 있는 관계, 개념은 정의/포함/제외 범위, 용어는 언어별 표현이다. `internal/system/semantic/model.go`가 네 타입을 구분한다. 동음이의어는 `internal/system/semantic/matcher.go`에서 복수 후보로 남긴다. |"
+    },
+    {
+      "path": "docs/spec-driven/EXECUTION.md",
+      "line": 207,
+      "terms": [
+        "MatchConcepts"
+      ],
+      "text": "| W3.4 | Optional Stage 2 soft rerank implemented in the Go API; runtime activation pending | `Store.CurrentAligned` rechecks the active projection against Git bytes and live CKG/CKV coordinates. `MatchConcepts` retains tied meanings, supports Korean particles and checks Latin word boundaries. An opt-in Stage 2 resolver gives at most a 20% score increase only to a baseline top-K CKV citation whose canonical ID, commit, file and source lines match a verified `IMPLEMENTED_BY` relation. It cannot add a new citation, and matcher errors preserve retrieval. Unit tests cover ambiguity, stale/mismatched proof, capped candidate preservation and default-off behavior. | Wire a controlled runtime flag only after real-model concept-only/graph-only/combined ablation and latency/quality review. |"
+    },
+    {
+      "path": "docs/spec-driven/REFACTORING-ORIGINAL-GOALS-REAUDIT.md",
+      "line": 56,
+      "terms": [
+        "store_terms.go"
+      ],
+      "text": "| W3.3 | 의미 검색/텍스트 투영: `store_terms.go`, `text_corpus.go` | 결정적 투영·lookup 구현; 전체 투영 재검증 비용의 실부하 효용 미확정 | N-10–12 |"
+    },
+    {
+      "path": "docs/spec-driven/REFACTORING-ORIGINAL-GOALS-REAUDIT.md",
+      "line": 59,
+      "terms": [
+        "extract_spec.go"
+      ],
+      "text": "| W4.1 | 스펙 입력: `semantic/extract_spec.go` | 입력/검증 구현; 실제 `spec-pilot.yaml` 요구사항3개 proposed | N-12, N-14 |"
+    },
+    {
+      "path": "docs/spec-driven/REFACTORING-ORIGINAL-GOALS-REAUDIT.md",
+      "line": 60,
+      "terms": [
+        "trace_anchor.go"
+      ],
+      "text": "| W4.2 | reviewed trace: `semantic/trace.go`, `trace_anchor.go` | 구조·stale/충돌/승인 분리 구현. F06 완전 경로 없음 | N-14 |"
+    }
+  ],
+  "scope": "literal tokens only; absence is not a complete contamination review"
+}

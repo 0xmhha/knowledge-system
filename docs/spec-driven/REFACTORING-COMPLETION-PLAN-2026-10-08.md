@@ -1,5 +1,7 @@
 # 남은10개 완료를 위한 우선순위·실행 계획
 
+2026-10-08 현재 단계: **N11 독립 후보 보강·실제 판정 대기**. [새 검토 문서](./N11-INDEPENDENT-POOL-EXPANSION.md)의 검토 대상FINAL13/8제안군, DEV7, 제외6을 준비했다. 중요군별 승인0·전체8/18·요청5/15·잔여10개를 유지한다. **다음:** 후보 gold/군/독립성·N12 실제 내용 판정과 부족 범위 보강. **남은 전체:** N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 실제 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 복구, N18 최종 판정. 아래 날짜별 기록은 이전 준비 이력을 함께 보존한다.
+
 2026-10-08 · 기준 main eeeab2e7(PR97 squash) · 후속 브랜치 feat/refactoring-followup · 전체8/18·요청5/15 완료·잔여10개. 기존 preview 종료와 상위 WI10개는 이 목록에 합산하지 않는다.
 
 ## 목적과 현재 근거
@@ -49,3 +51,5 @@ N12 다음 세부 단계: [현행 canonical 연결 준비](./N12-CANONICAL-SOURC
 2026-10-08 N12 ADR 기술 lock 연결: [검토 대기 ADR의 보관 lock](./N12-PROPOSED-LOCK-PREPARATION.md) — 원소스1,410 불변, proposed ADR2/정책0(운영 owner 미정)/review0의 partial overlay·lock과 별도 held snapshota0457cc1/dataset5a24904f를 생성했다. 생산 knowledge·include-packs CLI/v4 의미27문서·36코드참조/33canonical·7 lock 거부·원 소스/색인/semantic DB 없이 archive 재생 통과. 새 BGE embed HTTP62=probe2+색인60/666입력, 전체Go DRIFT998 유지. 승인 lock/사람 내용·관계·운영 판정은 미완료, N12-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 gold/독립성 및 N12 판정/정책 담당자·시점 확인.
 
 2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.
+
+2026-10-08 N11 후보 보강: [독립 FINAL 후보·범위 부족분](./N11-INDEPENDENT-POOL-EXPANSION.md). 신규CODE/WHY4문항/2제안군 추가, 기존 사실과 겹칠 위험의 신규4문항 격리. 검토 대상FINAL13/8제안군·DEV7, 승인된 중요군 모두0. 과거DEV/FINAL27gzip/11,632행 및 실제20원문 참조 대조, 정보 메타데이터 교정·새runtime 미결합, 실제input checker exit2/source오류0; 모델/검색/빌드0. 전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18 유지. 다음 N11/N12 실제 내용·군/독립성 판정과 부족 범위 보강.

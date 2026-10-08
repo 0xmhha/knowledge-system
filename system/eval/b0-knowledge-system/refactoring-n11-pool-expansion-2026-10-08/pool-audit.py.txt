@@ -1,0 +1,107 @@
+import json,hashlib,subprocess,gzip,collections,copy
+from pathlib import Path
+ROOT=Path.cwd(); OUT=ROOT/'system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08'; OUT.mkdir(exist_ok=True)
+BASE=ROOT/'system/eval/b0-knowledge-system/refactoring-n11-held-corpus-2026-10-08'
+REV='479491baa50f818a5f7bb7651f35e9c7192ad906'
+def sha(x): return hashlib.sha256(x).hexdigest()
+def dump(p,x): (OUT/p).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+def blob(path): return subprocess.check_output(['git','show',f'{REV}:{path}'])
+def ref(path,first,last):
+ b=blob(path); assert (ROOT/path).read_bytes()==b
+ lines=b.splitlines(keepends=True); assert 1<=first<=last<=len(lines)
+ return dict(path=path,first=first,last=last,file_sha256=sha(b),content_sha256=sha(b''.join(lines[first-1:last])))
+def q(num,group,cluster,path,first,last,prompt,answer,qualification=None):
+ d=dict(id=f'N11-FINAL-CAND-{num:02}',split='FINAL',group=group,proposed_cluster_id=cluster,proposed_unit_id=cluster,independence_review=None,contamination_review=None,language='ko',prompt=prompt,candidate_answer=answer,expected_behavior='cite',review_state='draft',reviewer=None,source_commit=REV,evidence=[ref(path,first,last)],authority_scope='implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence')
+ if qualification: d['answer_qualification']=qualification
+ return d
+new=[
+ q(12,'CODE','semantic-term-index-migration-integrity','internal/system/semantic/store_terms.go',13,68,'용어 색인 마이그레이션은 기존 projection에서 어떤 무결성·신원 검사를 마친 뒤 user_version=3을 커밋하나요?','migrateTermIndex는 저장 document의 SHA-256과 digest, JSON 해석, Projection.Validate, 행의 project/dataset과 Snapshot 일치를 확인한다. 같은 트랜잭션에서 용어를 삽입하고 rows 오류·Close 오류가 없을 때 user_version=3을 설정해 Commit한다. 오류 경로에서는 defer Rollback으로 커밋하지 않는다.'),
+ q(13,'WHY','semantic-term-index-migration-integrity','internal/system/semantic/store_terms.go',13,68,'손상되거나 다른 project/dataset의 projection으로 만든 용어 색인이 부분 커밋되는 것을 이 마이그레이션은 어떻게 막나요?','저장 문서 digest와 projection·행 신원 검사를 용어 삽입과 동일한 트랜잭션에 둔다. 검사/삽입/행 처리 오류가 나면 Commit까지 도달하지 않고 Rollback하므로 이 실행의 부분 삽입과 버전 승격이 함께 남지 않는다. 이는 코드 제어 흐름에서 추론한 동작이며 별도 ADR의 설계 의도나 실측 장애 복구 보장은 아니다.','code-control-flow inference; human must accept WHY group and inferred rationale, or reclassify/exclude'),
+ q(14,'CODE','spec-span-identity-construction','internal/system/semantic/extract_spec.go',55,74,'ExtractSpec의 EvidenceSpan ID와 ContentSHA256은 어떤 입력 바이트·좌표로 만들어지나요?','LF를 보존해 나눈 행의 start–end 범위(양끝 포함)를 그대로 이어 SHA-256을 구한다. project_id, dataset_id, 상대 파일 경로, start:end, content digest를 NUL로 구분한 key의 SHA-256 앞 12바이트 hex에 prefix를 붙여 ID를 만든다. ContentSHA256에는 본문 digest 전체 hex를 기록한다.'),
+ q(15,'WHY','spec-span-identity-construction','internal/system/semantic/extract_spec.go',55,74,'같은 본문 span을 다른 project/dataset 또는 파일·행 좌표에서 추출하면 ExtractSpec이 같은 EvidenceSpan ID로 취급하나요?','본문 digest만 ID로 쓰지 않고 project/dataset·파일·행 좌표를 key에 포함하므로 좌표가 달라지면 해시 입력도 달라진다. ID는 96비트로 잘린 해시를 사용하므로 충돌 불가능을 보장한다고 표현하지 않는다. 이 분리 효과는 구현에서 추론한 것이며 ADR에서 확인한 설계 의도는 아니다.','code-derived identity separation; human must accept WHY group and inferred rationale, or reclassify/exclude')]
+quarantine=[
+ q(16,'CODE','concept-matching-ambiguity-known-scope','internal/system/semantic/matcher.go',19,72,'MatchConcepts는 limit 경계에서 같은 점수의 개념들이 남으면 어떻게 반환하나요?','점수 내림차순 및 동일 점수의 ConceptID 순으로 정렬하고 limit번째 점수와 같은 후속 후보까지 모두 남긴다. 따라서 반환 개수가 limit보다 클 수 있으며 하나의 의미로 자동 단정하지 않는다.'),
+ q(17,'WHY','concept-matching-ambiguity-known-scope','internal/system/semantic/matcher.go',19,72,'개념 후보의 limit번째 동점 후보를 왜 단순히 잘라 하나의 의미로 만들지 않나요?','주석은 모호한 term이 하나의 단정된 의미로 바뀌지 않도록 모든 cutoff 동점을 남긴다고 명시한다. rejected는 제외하며 여기서는 query rewrite나 citation 후보 filtering을 수행하지 않는다.'),
+ q(18,'CODE','trace-anchor-resolution-known-scope','internal/system/semantic/trace_anchor.go',16,70,'ResolveTracePath에서 같은 requirement/criterion/code/test에 맞는 reviewed 경로가 두 개면 어느 경로를 선택하나요?','첫 경로 이후 또 일치하는 경로를 찾으면 evidence_unverified: ambiguous reviewed trace path 오류를 반환한다. 일치 경로가 없거나 정확한 문서/code/test anchor가 부족한 경우에도 거부한다.'),
+ q(19,'WHY','trace-anchor-resolution-known-scope','internal/system/semantic/trace_anchor.go',5,70,'ResolveTracePath의 성공을 테스트 실행 또는 사람이 수용 기준을 승인했다는 판정으로 사용할 수 있나요?','TraceAnchors의 주석은 링크가 traceability evidence일 뿐 테스트 실행과 사람 criterion 수용을 주장하지 않는다고 명시한다. 성공은 검토된 한 경로와 exact anchor 해석의 범위다.')]
+for x in quarantine:
+ x['exclusion_reason']='conservative quarantine: overlaps known N12 ontology ambiguity/fallback or B0/N14 reviewed-trace and separate human-acceptance scopes; no new independent FINAL claim'
+book=json.loads((BASE/'candidate-question-book.json').read_text()); reb=[]
+for x in book['questions']+book['excluded_candidate_questions']:
+ for r in x.get('evidence',[])+x.get('abstention_basis_sources',[]):
+  n=ref(r['path'],r['first'],r['last']); assert n==r,(x['id'],n,r)
+ reb.append(dict(id=x['id'],old_source_commit=x['source_commit'],new_source_commit=REV,source_bytes_and_range_unchanged=True)); x['source_commit']=REV
+book['questions']+=new; book['excluded_candidate_questions']+=quarantine
+book['excluded_proposed_clusters']+=sorted({q['proposed_cluster_id'] for q in quarantine})
+book.update(source_commit=REV,purpose='Expanded review-only pool, source at immutable current commit; no corpus/index/runtime freeze or human scope acceptance',previous_question_book_sha256=sha((BASE/'candidate-question-book.json').read_bytes()))
+dump('candidate-question-book.json',book);dump('source-rebinding.json',reb)
+protocol=json.loads((BASE/'candidate-protocol.json').read_text()); oldmetadata={k:protocol.get(k) for k in ['final_candidate_rows','proposed_final_fact_clusters','candidate_book_sha256','execution_binding']}
+final=[q for q in book['questions'] if q['split']=='FINAL']; clusters={q['proposed_cluster_id'] for q in final}
+protocol.update(source_commit=REV,final_candidate_rows=len(final),proposed_final_fact_clusters=len(clusters),candidate_book_sha256=sha((OUT/'candidate-question-book.json').read_bytes()),execution_binding=None,binding_review_state='unbound_draft',previous_protocol_sha256=sha((BASE/'candidate-protocol.json').read_bytes()))
+dump('candidate-protocol.json',protocol)
+dump('inherited-protocol-metadata-audit.json',dict(previous_declared=oldmetadata,previous_actual_book=dict(final_candidate_rows=9,proposed_final_fact_clusters=6,candidate_book_sha256=sha((BASE/'candidate-question-book.json').read_bytes())),current_actual=dict(final_candidate_rows=len(final),proposed_final_fact_clusters=len(clusters),candidate_book_sha256=protocol['candidate_book_sha256']),scope='informational metadata corrected in new draft; previous book/protocol and runtime retained unchanged; this larger book has no bound execution runtime'))
+for q in new+quarantine:
+ r=q['evidence'][0]; b=blob(r['path']); (OUT/(q['id']+'.span.txt')).write_bytes(b''.join(b.splitlines(keepends=True)[r['first']-1:r['last']]))
+# Original FINAL hashes are also compared to the prior audited decompressed values.
+prior=json.loads((ROOT/'system/eval/b0-knowledge-system/refactoring-n11-coverage-candidates-2026-10-08/summary.json').read_text())
+expected={x['path']:x for x in prior['retained_FINAL_raw_files']}
+counters={q['id']:dict(same_path_citations=0,same_file_sha_and_span_overlap=0,request_ids=set(),keyword_rows=0) for q in new+quarantine}
+terms={'N11-FINAL-CAND-12':['migrateTermIndex','digest mismatch during term migration'],'N11-FINAL-CAND-13':['migrateTermIndex','identity mismatch during term migration'],'N11-FINAL-CAND-14':['spec-yaml-v1','ExtractSpec'],'N11-FINAL-CAND-15':['spec-yaml-v1','ExtractSpec'],'N11-FINAL-CAND-16':['MatchConcepts'],'N11-FINAL-CAND-17':['MatchConcepts'],'N11-FINAL-CAND-18':['ResolveTracePath'],'N11-FINAL-CAND-19':['ResolveTracePath']}
+logs=[]; categories=collections.Counter()
+for f in sorted((ROOT/'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06').rglob('rows.jsonl.gz')):
+ rel=str(f.relative_to(ROOT)); compressed=f.read_bytes(); assert compressed==blob(rel)
+ raw=gzip.decompress(compressed)
+ if rel in expected:
+  assert sha(compressed)==expected[rel]['compressed_sha256'] and sha(raw)==expected[rel]['decompressed_sha256']
+ cat='prior_FINAL' if '/final-after-development-freeze/' in rel else 'other_retained_DEV_or_official_static'
+ count=0
+ for line in raw.splitlines():
+  row=json.loads(line); count+=1; categories[cat]+=1
+  sc=row.get('call',{}).get('response',{}).get('structuredContent',{}) or {}
+  text=json.dumps(sc,ensure_ascii=False)
+  for q in new+quarantine:
+   c=counters[q['id']]; r=q['evidence'][0]
+   if any(term in text for term in terms[q['id']]): c['keyword_rows']+=1
+   for cited in sc.get('citations',[]):
+    if cited.get('file')!=r['path']:continue
+    c['same_path_citations']+=1
+    if cited.get('file_sha256')==r['file_sha256'] and max(cited['start_line'],r['first'])<=min(cited['end_line'],r['last']):
+     c['same_file_sha_and_span_overlap']+=1; c['request_ids'].add(row.get('request_id'))
+ logs.append(dict(path=rel,compressed_sha256=sha(compressed),decompressed_sha256=sha(raw),rows=count,category=cat,compressed_bytes_match_current_commit=True,prior_FINAL_decompressed_reference_verified=rel in expected))
+for c in counters.values(): c['request_ids']=sorted(c['request_ids']);c['semantic_independence_proven']=False
+# Review-source catalogs are a separate exposure surface, not inferred from citations.
+inputs=['system/eval/b0-knowledge-system/questions.json','system/eval/b0-knowledge-system/refactoring-n11-provenance-audit-2026-10-07/reference-index.json','system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-items.json','system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/review-items.json']
+refs=[]
+def walk(obj,src,owner=''):
+ if isinstance(obj,dict):
+  owner=obj.get('review_id',obj.get('id',owner))
+  if 'path' in obj and ('first' in obj or 'start_line' in obj): refs.append(dict(collection=src,id=owner,ref=obj))
+  for v in obj.values():walk(v,src,owner)
+ elif isinstance(obj,list):
+  for v in obj:walk(v,src,owner)
+for p in inputs: walk(json.loads((ROOT/p).read_text()),p)
+match=[]
+for q in new+quarantine:
+ a=q['evidence'][0]
+ for r in refs:
+  b=r['ref']
+  if a['path']==b['path']:
+   f=b.get('first',b.get('start_line')); l=b.get('last',b.get('end_line',f))
+   match.append(dict(candidate=q['id'],historical=r,coordinate_overlap=max(a['first'],f)<=min(a['last'],l),note='coordinate comparison alone; historical rows may use other source versions; not semantic independence verdict'))
+dump('retained-raw-log-audit.json',dict(logs=logs,row_counts_by_category=dict(categories),candidate_counts=counters,scope='explicit citations and keyword strings in structuredContent; no graph-body, latent tuning or human-exposure completeness proof'))
+dump('historical-reference-audit.json',dict(catalogs=[dict(path=p,sha256=sha((ROOT/p).read_bytes())) for p in inputs],reference_count=len(refs),same_path_matches=match))
+# Exact committed doc mentions are retained to make preparation exposure visible.
+mentions=[]
+for p in subprocess.check_output(['git','ls-files','docs/spec-driven'],text=True).splitlines():
+ if not p.endswith('.md'):continue
+ data=blob(p).decode('utf8')
+ for i,line in enumerate(data.splitlines(),1):
+  hits=[t for t in ['store_terms.go','extract_spec.go','matcher.go','trace_anchor.go','migrateTermIndex','ExtractSpec','MatchConcepts','ResolveTracePath'] if t in line]
+  if hits: mentions.append(dict(path=p,line=i,terms=hits,text=line))
+dump('committed-document-mentions.json',dict(source_commit=REV,matches=mentions,scope='literal tokens only; absence is not a complete contamination review'))
+counts={g:len({q['proposed_cluster_id'] for q in final if q['group']==g}) for g in ['CODE','WHY','POLICY','TRACE','ABS']}
+summary=dict(schema_version=1,status='review_pool_expanded_no_human_acceptance',source_commit=REV,questions=len(book['questions']),DEV_rows=7,eligible_proposed_FINAL_rows=len(final),eligible_proposed_fact_clusters=len(clusters),new_rows=len(new),new_proposed_fact_clusters=2,new_quarantined_rows=len(quarantine),excluded_rows=len(book['excluded_candidate_questions']),proposed_clusters_by_group=counts,approved_independent_clusters_by_group={g:0 for g in counts},required_approved_independent_per_group=10,actual_approved_deficit_by_group={g:10 for g in counts},optimistic_proposed_pool_deficit_if_all_approved={g:max(0,10-n) for g,n in counts.items()},retained_raw_logs=len(logs),retained_rows=sum(categories.values()),retained_FINAL_rows=categories['prior_FINAL'],source_gold_and_absence_refs_verified=sum(len(q.get('evidence',[]))+len(q.get('abstention_basis_sources',[])) for q in book['questions']),actual_human_review_time_ns=None,new_query_or_FINAL_dispatch_count=0,model_HTTP_calls=0,corpus_or_index_builds=0,new_runtime_binding=None,sampling_verdict='inconclusive',full_task_complete=False,limitations=['all groups approved0; proposed CODE/WHY pairs share clusters','WHY13/15 inference group/rationale remains human reviewed','POLICY code admission is not organization-authority fact','TRACE implementation controls are not actual accepted paths','ABS basis does not prove organization-wide absence','old runtime source198 is not new source479; no automatic rebinding'])
+dump('summary.json',summary)
+dump('review-worksheet.json',dict(schema_version=1,status='draft',reviewer=None,reviewed_at=None,human_active_review_ns=None,questions_sha256=sha((OUT/'candidate-question-book.json').read_bytes()),protocol_sha256=sha((OUT/'candidate-protocol.json').read_bytes()),cases={q['id']:dict(gold=None,group_scope=None,independence=None,contamination=None,cluster_id=None,unit_id=None,reason=None) for q in book['questions']},quarantined_ids=[q['id'] for q in quarantine],not_an_approved_checker_review=True))
+(OUT/'pool-audit.py.txt').write_bytes(Path('/private/tmp/n11-pool-audit.py').read_bytes())
+print(json.dumps(summary,ensure_ascii=False,indent=2));print('citation audit',json.dumps(counters,ensure_ascii=False));print('document mention count',len(mentions))
