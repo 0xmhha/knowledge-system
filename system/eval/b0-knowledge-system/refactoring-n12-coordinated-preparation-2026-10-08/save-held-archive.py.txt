@@ -1,0 +1,42 @@
+import gzip,hashlib,io,json,tarfile
+from pathlib import Path
+P=Path('system/eval/b0-knowledge-system/refactoring-n12-coordinated-preparation-2026-10-08');prep=json.loads((P/'preparation.json').read_text());base=Path(prep['base']);v=Path(prep['dataset_root'])/'n12-candidate'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+identity=json.loads((v/'dataset-identity.json').read_text());graph=json.loads((v/'graph/manifest.json').read_text());vector=json.loads((v/'vector/manifest.json').read_text());filelist=json.loads((v/'files-from.json').read_text());projection=json.loads((P/'projection-summary.json').read_text())
+assert projection['negative_controls_rejected']==12 and projection['chunk_linked_sections']==27 and projection['canonical_refs']==36
+expected={p for p in filelist['include']if p.endswith('.go')};actual={f['path']for f in graph['files']};assert expected==actual and len(actual)==53
+vecpaths={f['path']for f in vector['input_files']};expected_vec={p for p in filelist['include']if p.endswith(('.go','.md'))};assert vecpaths==expected_vec and len(vecpaths)==56
+inventory={f['path']:f for f in json.loads(Path('system/eval/b0-knowledge-system/refactoring-n12-scoped-capture-2026-10-08/source-input-inventory.json').read_text())}
+assert all(f['sha256']==inventory[f['path']]['sha256']for f in graph['files']);assert all(f['sha256']==inventory[f['path']]['sha256']for f in vector['input_files'])
+audit=json.loads((P/'whole-tree-audit.stdout.txt').read_text());assert not(audit.get('in_db_only')or[]);assert not set(audit['in_build_only'])&expected
+scope={'filelist_files':58,'selected_Go_files':53,'actual_CKG_Go_files':53,'actual_CKV_input_files':56,'code_and_markdown_scope_bijection':True,'source_sha_bindings_match':True,'YAML_source_files_retained_not_vectorized':['docs/spec-driven/ontology-pilot.yaml','docs/spec-driven/spec-pilot.yaml'],'whole_tree_audit':{'process_exit_code':1,'build_count':1051,'db_count':53,'in_both':53,'in_build_only':len(audit['in_build_only']),'in_db_only':0,'all_missing_files_outside_selected_Go_scope':True},'full_repository_index_coverage_claimed':False}
+(P/'index-scope-check.json').write_text(json.dumps(scope,indent=2)+'\n')
+for name in ['dataset-identity.json','review-hold.json','reader-protocol.json','files-from.json','sources/manifest.json','vector/manifest.json']:
+ (P/('retained-'+name.replace('/','-'))).write_bytes((v/name).read_bytes())
+with(P/'graph-manifest.json.gz').open('wb')as f:
+ with gzip.GzipFile(fileobj=f,mode='wb',mtime=0,filename='')as g:g.write((v/'graph/manifest.json').read_bytes())
+probe={'model':'bge-m3:latest','input':['dimension probe'],'truncate':False,'options':{'num_ctx':8192,'num_batch':8192}}
+probe_sha=sha(json.dumps(probe,separators=(',',':')).encode());stats=[]
+for prefix in ['initial-','']:
+ obs=[json.loads(l)for l in(P/(prefix+'model-http-observations.jsonl')).read_text().splitlines()];embeds=[r for r in obs if r['path']=='/api/embed'];probes=[r for r in embeds if r['request_sha256']==probe_sha];assert len(probes)==2
+ assert len(embeds)==62 and sum(r['embedding_inputs']for r in embeds)==668 and all(r['status']==200 and r['truncate']is False for r in embeds)
+ stats.append({'phase':'initial_project_mismatch'if prefix else'corrected_original_project','http_attempts':len(obs),'embedding_http_attempts':len(embeds),'startup_dimension_probe_calls':len(probes),'startup_dimension_probe_inputs':sum(r['embedding_inputs']for r in probes),'index_embedding_http_calls':len(embeds)-len(probes),'index_embedding_inputs':sum(r['embedding_inputs']for r in embeds if r not in probes),'embedding_failed_http_attempts':0,'successful_embedding_outputs':sum(r['embedding_outputs']for r in embeds),'prompt_eval_tokens':sum(r.get('prompt_eval_count')or 0 for r in embeds),'model_total_duration_ns':sum(r.get('model_total_duration_ns')or 0 for r in embeds),'setup_elapsed_ns':json.loads((P/(prefix+'setup-result.json')).read_text())['elapsed_ns']})
+(P/'model-call-accounting.json').write_text(json.dumps({'phases':stats,'total_http_attempts':sum(r['http_attempts']for r in stats),'total_embedding_http_attempts':124,'total_embedding_inputs_including_startup':1336,'total_index_embedding_inputs':1332,'total_startup_dimension_probe_inputs':4,'final_index_chunks':vector['chunk_count'],'new_DEV_FINAL_queries':0,'measurement_scope':'two local preparation index builds and adapter startup probes; not quality evaluation or query p95'},indent=2)+'\n')
+# Exclude owned lifecycle lock sidecars, old backup and zero-length WAL/SHM.
+assert (v/'vector/vector.db-wal').stat().st_size==0
+assert sha((v/'vector/vector.db').read_bytes())==vector['db_sha256']
+files=[v/n for n in ['dataset-identity.json','files-from.json','review-hold.json','reader-protocol.json','graph/graph.db','graph/manifest.json','vector/vector.db','vector/manifest.json','vector/footprint.jsonl']]+sorted((v/'sources').rglob('*'))
+files=[f for f in files if f.is_file()];rows=[];archive=P/'held-candidate.tar.gz'
+with archive.open('wb')as f:
+ with gzip.GzipFile(fileobj=f,mode='wb',mtime=0,filename='')as z:
+  with tarfile.open(fileobj=z,mode='w|')as t:
+   for path in files:
+    data=path.read_bytes();name=path.relative_to(v).as_posix();row={'path':name,'size':len(data),'sha256':sha(data),'mode':path.stat().st_mode&0o777};rows.append(row)
+    info=tarfile.TarInfo(name);info.size=len(data);info.mode=row['mode'];info.mtime=0;t.addfile(info,io.BytesIO(data))
+restore=base/'archived-held-candidate';restore.mkdir()
+with tarfile.open(archive,'r:gz')as t:
+ assert all(m.isfile()and not m.name.startswith('/')and '..'not in Path(m.name).parts for m in t.getmembers())
+ t.extractall(restore,filter='data')
+(P/'held-candidate-archive-inventory.json').write_text(json.dumps(rows,indent=2)+'\n')
+(P/'held-candidate-archive.json').write_text(json.dumps({'path':str(archive),'sha256':sha(archive.read_bytes()),'bytes':archive.stat().st_size,'archived_files':len(rows),'restored_version':str(restore),'contains_live_pointers':False,'excluded':'lifecycle locks, SQLite zero-length WAL/shared-memory sidecars, pre-initialization backup; authoritative DB SHA checked'},indent=2)+'\n')
+print(json.dumps({'archive_bytes':archive.stat().st_size,'archive_files':len(rows),'model_calls':124,'stored_chunks':vector['chunk_count'],'scope_bijection':True}))

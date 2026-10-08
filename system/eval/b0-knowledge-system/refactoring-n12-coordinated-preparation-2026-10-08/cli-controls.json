@@ -1,0 +1,58 @@
+[
+  {
+    "name": "whole-tree-audit",
+    "argv": [
+      "/private/tmp/ks-n12-coordinated-6j88bw75/bin/ckg",
+      "audit",
+      "--src",
+      "/private/tmp/ks-n12-scoped-capture-iuu2zemk/archive-only-source",
+      "--graph",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/graph",
+      "--format",
+      "json"
+    ],
+    "process_exit_code": 1,
+    "expected_exit_code": 1
+  },
+  {
+    "name": "missing-retained-knowledge-lock",
+    "argv": [
+      "/private/tmp/ks-n12-coordinated-6j88bw75/bin/cks",
+      "semantic",
+      "build",
+      "--repo",
+      "/private/tmp/ks-n12-scoped-capture-iuu2zemk/archive-only-source",
+      "--project-id",
+      "knowledge-system",
+      "--dataset-id",
+      "cce2c1f8f5de6796be3a29cbb5c505b7acc2701b3f65a7d5493ab3e50eb3bf92",
+      "--graph",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/graph",
+      "--vector",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/vector",
+      "--store",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/cli-semantic-unused.sqlite",
+      "--version-dir",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate",
+      "--out",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/rejected-pack-output.json",
+      "--extract-only",
+      "--include-packs"
+    ],
+    "process_exit_code": 1,
+    "expected_exit_code": 1
+  },
+  {
+    "name": "held-rollback",
+    "argv": [
+      "/private/tmp/ks-n12-coordinated-6j88bw75/bin/cks",
+      "setup",
+      "--out",
+      "/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project",
+      "--rollback",
+      "n12-candidate"
+    ],
+    "process_exit_code": 1,
+    "expected_exit_code": 1
+  }
+]

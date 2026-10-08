@@ -1,0 +1,152 @@
+package main
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+ "github.com/0xmhha/knowledge-system/internal/setup"
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+ "github.com/0xmhha/knowledge-system/internal/system/knowledgepack"
+ graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+ graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
+)
+func must(e error){if e!=nil{panic(e)}}
+func digest(b []byte)string{s:=sha256.Sum256(b);return hex.EncodeToString(s[:])}
+func save(path string,v any){b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600))}
+func copyProjection(p semantic.Projection)semantic.Projection{b,e:=json.Marshal(p);must(e);var q semantic.Projection;must(json.Unmarshal(b,&q));return q}
+type anchor struct{ReviewID string `json:"review_id"`;Role string `json:"role"`;Path string `json:"path"`;First int `json:"first"`;Last int `json:"last"`;FileSHA string `json:"file_sha256"`;ContentSHA string `json:"content_sha256"`}
+func main(){
+ root,e:=os.Getwd();must(e);out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-coordinated-preparation-2026-10-08")
+ var prep struct{Base string `json:"base"`;Source string `json:"source"`;DatasetRoot string `json:"dataset_root"`}
+ b,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e);must(json.Unmarshal(b,&prep))
+ if !strings.HasPrefix(prep.Base,"/private/tmp/ks-n12-coordinated-"){panic("outside owned namespace")}
+ version:=filepath.Join(prep.DatasetRoot,"n12-candidate");gdir:=filepath.Join(version,"graph");vdir:=filepath.Join(version,"vector")
+ identity,e:=setup.InspectVersionIdentity(version);must(e);if identity==nil{panic("missing pinned identity")}
+ must(setup.VerifyRetainedSource(version,identity.Source));must(setup.VerifyCandidateIdentity(version,identity.Source,identity.InputDigest));must(semantic.ValidateCanonicalCoverage(vdir,1))
+ snapshot:=semantic.Snapshot{ProjectID:identity.Source.ProjectID,DatasetID:identity.DatasetID,Commit:identity.Source.SourceCommit,SnapshotID:identity.Source.SnapshotID,SourceMode:identity.Source.SourceMode}
+ ctx,cancel:=context.WithTimeout(context.Background(),5*time.Minute);defer cancel()
+ p:=extractCurrent(ctx,version,root,snapshot)
+ linked,e:=semantic.AttachCKVChunks(ctx,&p,vdir);must(e)
+ if linked!=len(p.Sections){panic(fmt.Sprintf("unlinked doc sections: %d/%d",linked,len(p.Sections)))}
+ graph,e:=graphstore.OpenReadOnly(filepath.Join(gdir,"graph.db"));must(e);defer graph.Close()
+ b,e=os.ReadFile(filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-canonical-preparation-2026-10-08/anchor-inputs.json"));must(e);var anchors []anchor;must(json.Unmarshal(b,&anchors))
+ resolved:=[]map[string]any{};unique:=map[string]bool{}
+ for i,a:=range anchors{
+  data,_,_,e:=setup.ReadRetainedFile(version,"repo",a.Path);must(e);if digest(data)!=a.FileSHA{panic("retained file SHA mismatch")}
+  nodes,e:=graph.NodesByFilePath(a.Path);must(e);matches:=[]graphtypes.Node{}
+  for _,n:=range nodes{if n.CanonicalID!=""&&n.StartLine==a.First&&n.EndLine>=a.Last{matches=append(matches,n)}}
+  if len(matches)!=1{panic(fmt.Sprintf("canonical ambiguous/missing: %s:%d matches%d",a.Path,a.First,len(matches)))}
+  n:=matches[0];kind:=semantic.SourceCode;if strings.HasSuffix(a.Path,"_test.go"){kind=semantic.SourceTest}
+  evidence:=semantic.EvidenceSpan{ID:fmt.Sprintf("n12-coordinated-anchor:%02d",i+1),Snapshot:snapshot,Kind:kind,Path:a.Path,StartLine:a.First,EndLine:a.Last,ContentSHA256:a.ContentSHA,CanonicalID:n.CanonicalID,Extractor:"n12-coordinated-proposed-v1"}
+  must(semantic.AttachCodeEvidence(&p,graph,evidence));unique[n.CanonicalID]=true
+  resolved=append(resolved,map[string]any{"review_id":a.ReviewID,"role":a.Role,"path":a.Path,"first":a.First,"last":a.Last,"file_sha256":a.FileSHA,"content_sha256":a.ContentSHA,"canonical_id":n.CanonicalID,"snapshot":snapshot,"human_decision":nil,"semantic_relationship_created":false})
+ }
+ must(p.ValidateRetainedSources(version));must(semantic.ValidateDatasetAlignment(p,prep.Source,gdir,vdir));must(semantic.ValidateCodeAnchors(p,gdir));must(semantic.ValidateCKVChunkLinks(ctx,p,vdir))
+ store,e:=semantic.OpenStore(filepath.Join(prep.Base,"semantic-proposed.sqlite"));must(e);defer store.Close()
+ must(store.PutAlignedRetained(ctx,p,prep.Source,gdir,vdir,version))
+ stored,e:=store.Load(ctx,snapshot.ProjectID,snapshot.DatasetID);must(e)
+ before,e:=json.Marshal(p);must(e);after,e:=json.Marshal(stored);must(e);if !bytes.Equal(before,after){panic("stored projection changed")}
+ _,e=store.Current(ctx,snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("proposed store unexpectedly active")}
+ review,e:=p.Review(100,"n12-coordinated-preparation");must(e)
+ if review.Verified!=0||review.AssertionVerified!=0||review.ConceptVerified!=0||review.RequirementVerified!=0||review.Precision!=nil{panic("human verdict changed")}
+ controls:=[]map[string]any{};reject:=func(name string,e error){if e==nil{panic("negative accepted: "+name)};controls=append(controls,map[string]any{"name":name,"rejected":true,"error":e.Error()})}
+ valid:=p.Evidence[len(p.Evidence)-1]
+ for i,tc:=range []struct{name string;edit func(*semantic.EvidenceSpan)}{
+  {"cross_snapshot_anchor",func(e *semantic.EvidenceSpan){e.Snapshot.SnapshotID=strings.Repeat("0",64)}},
+  {"wrong_path_anchor",func(e *semantic.EvidenceSpan){e.Path="internal/setup/absent.go"}},
+  {"outside_AST_anchor",func(e *semantic.EvidenceSpan){e.EndLine+=10000}},
+  {"missing_canonical_anchor",func(e *semantic.EvidenceSpan){e.CanonicalID="missing-canonical"}},
+  {"document_as_code_anchor",func(e *semantic.EvidenceSpan){e.Kind=semantic.SourceDocument}},
+ }{
+  q:=copyProjection(p);raw,e:=json.Marshal(q);must(e);x:=valid;x.ID=fmt.Sprintf("n12-negative:%02d",i);tc.edit(&x);reject(tc.name,semantic.AttachCodeEvidence(&q,graph,x));now,e:=json.Marshal(q);must(e);if !bytes.Equal(raw,now){panic("rejected attachment mutated proposal")}
+ }
+ q:=copyProjection(p);q.Evidence[len(q.Evidence)-1].ContentSHA256=strings.Repeat("0",64);reject("retained_span_SHA_mismatch",q.ValidateRetainedSources(version))
+ q=copyProjection(p);q.Sections[0].ChunkIDs=[]string{"foreign-or-absent-CKV-chunk"};reject("foreign_CKV_chunk",semantic.ValidateCKVChunkLinks(ctx,q,vdir))
+ reject("other_source_root",semantic.ValidateDatasetAlignment(p,filepath.Join(prep.Base,"other-source"),gdir,vdir))
+ // Leave a foreign-manifest fixture in the owned temp tree, not the actual candidate.
+ foreign:=filepath.Join(prep.Base,"foreign-vector");must(os.Mkdir(foreign,0700));b,e=os.ReadFile(filepath.Join(vdir,"manifest.json"));must(e);var foreignManifest map[string]any;must(json.Unmarshal(b,&foreignManifest));foreignManifest["dataset_id"]=strings.Repeat("0",64);save(filepath.Join(foreign,"manifest.json"),foreignManifest)
+ reject("foreign_vector_dataset",semantic.ValidateDatasetAlignment(p,prep.Source,gdir,foreign))
+ q=copyProjection(p);q.Assertions[0].Status=semantic.StatusVerified;q.Assertions[0].ReviewedBy="owned-negative-control-only";reject("verified_assertion_with_unreviewed_parent",q.Validate())
+ _,e=knowledgepack.ProjectRetainedKnowledge(version);reject("missing_retained_knowledge_overlay_and_lock",e)
+ reject("held_rollback_without_explicit_review",setup.Rollback(prep.DatasetRoot,"n12-candidate"))
+ _,e=store.Current(ctx,snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("control activated store")}
+ if _,e=os.Lstat(filepath.Join(prep.DatasetRoot,"current"));!os.IsNotExist(e){panic("current changed")}
+ save(filepath.Join(out,"projection-proposed.json"),p);save(filepath.Join(out,"canonical-anchors.json"),resolved);save(filepath.Join(out,"review-queue.json"),review);save(filepath.Join(out,"negative-controls.json"),controls)
+ save(filepath.Join(out,"projection-summary.json"),map[string]any{"status":"held_aligned_proposed_projection_verified","snapshot":snapshot,"canonical_refs":len(resolved),"unique_canonical_ids":len(unique),"sections":len(p.Sections),"chunk_linked_sections":linked,"concepts":len(p.Concepts),"requirements":len(p.Requirements),"claims":len(p.Claims),"assertions":len(p.Assertions),"evidence":len(p.Evidence),"negative_controls_rejected":len(controls),"aligned_proposed_store_roundtrip":true,"semantic_current_absent":true,"dataset_current_absent":true,"reviewed_precision":nil,"human_approved":0,"knowledge_lock_built":false,"technical_CKG_CKV_source_alignment_built":true,"approved_coordinated_dataset_complete":false,"full_N12_complete":false})
+ fmt.Printf("PASS held alignment: %d/%d document sections, %d code refs/%d unique canonical IDs; %d negative controls; no activation or human verdict\n",linked,len(p.Sections),len(resolved),len(unique),len(controls))
+}
+func extractCurrent(ctx context.Context, versionDir, root string, snapshot semantic.Snapshot) semantic.Projection {
+	read := func(path string) []byte {
+		b, _, _, err := setup.ReadRetainedFile(versionDir, "repo", path)
+		must(err)
+		return b
+	}
+	p, _, err := semantic.ExtractOntology(snapshot, "docs/spec-driven/ontology-pilot.yaml", read("docs/spec-driven/ontology-pilot.yaml"))
+	must(err)
+	spec, _, err := semantic.ExtractSpec(snapshot, "docs/spec-driven/spec-pilot.yaml", read("docs/spec-driven/spec-pilot.yaml"))
+	must(err)
+	p.Evidence = append(p.Evidence, spec.Evidence...)
+	p.Requirements = spec.Requirements
+	type seed struct {
+		ID        string `json:"id"`
+		Path      string `json:"path"`
+		First     int    `json:"first"`
+		Last      int    `json:"last"`
+		ConceptID string `json:"concept_id"`
+		Statement string `json:"statement"`
+	}
+	raw, err := os.ReadFile(filepath.Join(root, "system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/claim-seeds.json"))
+	must(err)
+	var seeds []seed
+	must(json.Unmarshal(raw, &seeds))
+	docs := map[string]semantic.Projection{}
+	conceptEvidence := map[string]string{}
+	for _, c := range p.Concepts {
+		conceptEvidence[c.ID] = c.EvidenceID
+	}
+	for _, s := range seeds {
+		doc, ok := docs[s.Path]
+		if !ok {
+			doc, err = semantic.ExtractMarkdown(snapshot, s.Path, read(s.Path))
+			must(err)
+			docs[s.Path] = doc
+			p.Evidence = append(p.Evidence, doc.Evidence...)
+			p.Sections = append(p.Sections, doc.Sections...)
+		}
+		lines := bytes.SplitAfter(read(s.Path), []byte{'\n'})
+		if len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
+			lines = lines[:len(lines)-1]
+		}
+		if s.First < 1 || s.Last < s.First || s.Last > len(lines) {
+			panic("invalid seed range")
+		}
+		proof := semantic.EvidenceSpan{ID: "policy-evidence:" + s.ID, Snapshot: snapshot, Kind: semantic.SourceDocument, Path: s.Path, StartLine: s.First, EndLine: s.Last, ContentSHA256: digest(bytes.Join(lines[s.First-1:s.Last], nil)), Extractor: "manual-policy-review-v1"}
+		p.Evidence = append(p.Evidence, proof)
+		var chosen semantic.DocumentSection
+		var chosenEvidence semantic.EvidenceSpan
+		for _, section := range doc.Sections {
+			for _, e := range doc.Evidence {
+				if e.ID == section.EvidenceID && e.StartLine <= s.First && e.EndLine >= s.Last && (chosen.ID == "" || e.EndLine-e.StartLine < chosenEvidence.EndLine-chosenEvidence.StartLine) {
+					chosen = section
+					chosenEvidence = e
+				}
+			}
+		}
+		if chosen.ID == "" || conceptEvidence[s.ConceptID] == "" {
+			panic("unresolved seed section or concept")
+		}
+		claim := semantic.Claim{ID: "pilot-claim:" + s.ID, Statement: s.Statement, SectionID: chosen.ID, EvidenceIDs: []string{proof.ID, chosenEvidence.ID}, Status: semantic.StatusProposed}
+		p.Claims = append(p.Claims, claim)
+		p.Assertions = append(p.Assertions, semantic.Assertion{ID: "supports:" + s.ID, Predicate: semantic.PredicateSupports, SubjectID: chosen.ID, ObjectID: claim.ID, EvidenceIDs: []string{chosenEvidence.ID, proof.ID}, Status: semantic.StatusProposed}, semantic.Assertion{ID: "about:" + s.ID, Predicate: semantic.PredicateAbout, SubjectID: claim.ID, ObjectID: s.ConceptID, EvidenceIDs: []string{proof.ID, conceptEvidence[s.ConceptID]}, Status: semantic.StatusProposed})
+	}
+	must(p.ValidateRetainedSources(versionDir))
+	return p
+}

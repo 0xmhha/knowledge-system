@@ -1,0 +1,75 @@
+{"time":"2026-10-08T02:54:14.847072Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":1410,"source_bytes":11985941,"git_history_bytes":2831900,"minimum_additional_bytes":14817841,"output_free_bytes":137568178176,"staging_free_bytes":137568178176,"minimum_output_bytes":0,"minimum_staging_bytes":14817841,"reserve_bytes":0,"deadline_utc":"2026-10-08T03:24:10.386963Z","actual_candidate_bytes":0,"engine_output_estimate_bytes":null,"estimate_scope":"remaining staging copy; engine output and filesystem overhead not predicted"}}
+{"time":"2026-10-08T02:54:16.987026Z","step":"filelist-derive","type":"start","message":"Derive the build-scope file list"}
+{"time":"2026-10-08T02:54:16.987225Z","step":"toolchain","type":"output","message":"resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)"}
+{"time":"2026-10-08T02:54:17.305467Z","step":"filelist-derive","type":"output","message":"filelist-gen: 58 files -\u003e /private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/files-from.json (src 562e37aa1)"}
+{"time":"2026-10-08T02:54:17.306393Z","step":"filelist-derive","type":"done"}
+{"time":"2026-10-08T02:54:17.30641Z","step":"graph-build","type":"start","message":"Build the graph index"}
+{"time":"2026-10-08T02:54:17.837649Z","step":"graph-build","type":"output","message":"time=2026-10-08T11:54:17.837+09:00 level=INFO msg=\"detected files\" go=53 ts=0 sol=0 proto=0"}
+{"time":"2026-10-08T02:54:18.261789Z","step":"graph-build","type":"output","message":"time=2026-10-08T11:54:18.261+09:00 level=INFO msg=\"files-from applied\" go=1051 go_after=53 ts=23 ts_after=0 sol=224 sol_after=0 proto=5 proto_after=0"}
+{"time":"2026-10-08T02:54:21.07359Z","step":"graph-build","type":"output","message":"time=2026-10-08T11:54:21.073+09:00 level=INFO msg=\"http client matching\" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0"}
+{"time":"2026-10-08T02:54:21.427068Z","step":"graph-build","type":"output","message":"time=2026-10-08T11:54:21.427+09:00 level=INFO msg=\"temporal G6 emitted\" commit_nodes=1 hunk_nodes=58 changed_in_edges=9047 blame_edges=53 hunk_edges=58 hunk_blobs=58 max_per_file=10"}
+{"time":"2026-10-08T02:54:22.270104Z","step":"graph-build","type":"output","message":"time=2026-10-08T11:54:22.270+09:00 level=INFO msg=\"build complete\" nodes=9106 edges=21148 pkg_tree_edges=8979 topic_resolutions=3"}
+{"time":"2026-10-08T02:54:22.270141Z","step":"graph-build","type":"output","message":"ckg: built 9106 nodes / 21148 edges into /private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/graph"}
+{"time":"2026-10-08T02:54:22.310797Z","step":"graph-build","type":"done"}
+{"time":"2026-10-08T02:54:22.310842Z","step":"vector-preflight","type":"start","message":"Preflight the Ollama embedder"}
+{"time":"2026-10-08T02:54:22.321554Z","step":"vector-preflight","type":"output","message":"Ollama reachable at http://127.0.0.1:54999; model \"bge-m3:latest\" present (bge-m3:latest)"}
+{"time":"2026-10-08T02:54:22.32158Z","step":"vector-preflight","type":"done"}
+{"time":"2026-10-08T02:54:22.321587Z","step":"vector-build","type":"start","message":"Build the vector index aligned to the graph"}
+{"time":"2026-10-08T02:54:22.419314Z","step":"vector-build","type":"output","message":"time=2026-10-08T11:54:22.418+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=e977741a01bb28cc run_id=24ff684ff93eba28 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2982835319/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0"}
+{"time":"2026-10-08T02:54:22.419414Z","step":"vector-build","type":"output","message":"time=2026-10-08T11:54:22.419+09:00 level=INFO msg=ckv event=build.start trace_id=f74ba9e0313bbccf run_id=24ff684ff93eba28 embedder_provider=\"\" src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2982835319/tree out_dir=/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/vector embedder=bge-m3:latest"}
+{"time":"2026-10-08T02:54:22.419836Z","step":"vector-build","type":"output","message":"time=2026-10-08T11:54:22.419+09:00 level=INFO msg=ckv event=filterlist.loaded trace_id=47e124d4e78eb624 run_id=24ff684ff93eba28 exclude_count=0 path=/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/files-from.json include_count=58"}
+{"time":"2026-10-08T02:54:22.508674Z","step":"vector-build","type":"output","message":"time=2026-10-08T11:54:22.508+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=ee670396efc4e3ac run_id=24ff684ff93eba28 entries=1295 canonical_available=true ckg_path=/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/graph files_indexed=53"}
+{"time":"2026-10-08T02:54:26.189335Z","step":"vector-build","type":"output","message":"ckv: 4/56 files (1.1 files/s, elapsed 3s, ETA 47s)"}
+{"time":"2026-10-08T02:54:28.390954Z","step":"vector-build","type":"output","message":"ckv: 7/56 files (1.4 files/s, elapsed 5s, ETA 35s)"}
+{"time":"2026-10-08T02:54:31.128484Z","step":"vector-build","type":"output","message":"ckv: 11/56 files (1.5 files/s, elapsed 8s, ETA 30s)"}
+{"time":"2026-10-08T02:54:33.393581Z","step":"vector-build","type":"output","message":"ckv: 15/56 files (1.8 files/s, elapsed 10s, ETA 23s)"}
+{"time":"2026-10-08T02:54:36.802405Z","step":"vector-build","type":"output","message":"ckv: 19/56 files (1.2 files/s, elapsed 14s, ETA 31s)"}
+{"time":"2026-10-08T02:54:38.874006Z","step":"vector-build","type":"output","message":"ckv: 24/56 files (2.4 files/s, elapsed 16s, ETA 13s)"}
+{"time":"2026-10-08T02:54:40.915596Z","step":"vector-build","type":"output","message":"ckv: 32/56 files (3.9 files/s, elapsed 18s, ETA 6s)"}
+{"time":"2026-10-08T02:54:43.089013Z","step":"vector-build","type":"output","message":"ckv: 39/56 files (3.2 files/s, elapsed 20s, ETA 5s)"}
+{"time":"2026-10-08T02:54:45.166355Z","step":"vector-build","type":"output","message":"ckv: 42/56 files (1.4 files/s, elapsed 22s, ETA 9s)"}
+{"time":"2026-10-08T02:54:47.22302Z","step":"vector-build","type":"output","message":"ckv: 45/56 files (1.5 files/s, elapsed 24s, ETA 7s)"}
+{"time":"2026-10-08T02:54:50.863178Z","step":"vector-build","type":"output","message":"ckv: 48/56 files (0.8 files/s, elapsed 28s, ETA 9s)"}
+{"time":"2026-10-08T02:54:53.488059Z","step":"vector-build","type":"output","message":"ckv: 51/56 files (1.1 files/s, elapsed 30s, ETA 4s)"}
+{"time":"2026-10-08T02:54:55.976576Z","step":"vector-build","type":"output","message":"ckv: 56/56 files (2.0 files/s, elapsed 33s, ETA 0s)"}
+{"time":"2026-10-08T02:54:56.221221Z","step":"vector-build","type":"output","message":"time=2026-10-08T11:54:56.221+09:00 level=INFO msg=ckv event=build.done trace_id=f74ba9e0313bbccf run_id=24ff684ff93eba28 latency_ms=33801 chunks_total=666 embedder_provider=\"\" db_sha256=34aeea4c622ca81cff4d961c2fff908d76c9a70b933ca466d1592dad13eabc8c chunks_doc=27 languages=\"map[go:628 markdown:27]\" policy_loaded=false indexed_head=562e37aa1c9680d283de85ccd6435e5f235c21d6 chunks_symbol=566 chunks_flow_spine=0 files_indexed=56 chunks_canonical_id=566 chunks_flow_step=0 chunks_file_header=53 embedder=bge-m3:latest src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2982835319/tree out_dir=/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/vector chunks_truncated=0 category_counts=map[:655]"}
+{"time":"2026-10-08T02:54:56.221297Z","step":"vector-build","type":"output","message":"ckv: indexed 56 files → 666 chunks (566 symbol, 27 doc, 53 header, 0 truncated)"}
+{"time":"2026-10-08T02:54:56.221315Z","step":"vector-build","type":"output","message":"ckv: canonical_id 566/566 symbols aligned · flow 0 step / 0 spine"}
+{"time":"2026-10-08T02:54:56.221332Z","step":"vector-build","type":"output","message":"ckv: indexed_head=562e37aa1c9680d283de85ccd6435e5f235c21d6 built_at=2026-10-08T02:54:56Z db=/private/tmp/ks-n12-coordinated-6j88bw75/dataset-corrected-project/n12-candidate/vector/vector.db sha256=34aeea4c622ca81cff4d961c2fff908d76c9a70b933ca466d1592dad13eabc8c"}
+{"time":"2026-10-08T02:54:56.223236Z","step":"vector-build","type":"done"}
+{"time":"2026-10-08T02:54:56.223255Z","step":"verify-align","type":"start","message":"Verify graph/vector alignment"}
+{"time":"2026-10-08T02:54:56.227178Z","step":"verify-align","type":"done"}
+{"time":"2026-10-08T02:54:59.192929Z","step":"reindex-gate","type":"output","message":"── schema ──  errors=0  warnings=0  info=0"}
+{"time":"2026-10-08T02:54:59.781203Z","step":"reindex-gate","type":"output","message":"ckg audit (go)"}
+{"time":"2026-10-08T02:54:59.781292Z","step":"reindex-gate","type":"output","message":"  build files: 1051"}
+{"time":"2026-10-08T02:54:59.781314Z","step":"reindex-gate","type":"output","message":"  db files:    53"}
+{"time":"2026-10-08T02:54:59.78133Z","step":"reindex-gate","type":"output","message":"  in both:     53"}
+{"time":"2026-10-08T02:54:59.781347Z","step":"reindex-gate","type":"output","message":"  in build only (missing from DB): 998"}
+{"time":"2026-10-08T02:54:59.781361Z","step":"reindex-gate","type":"output","message":"  in db only (over-included):       0"}
+{"time":"2026-10-08T02:54:59.781377Z","step":"reindex-gate","type":"output"}
+{"time":"2026-10-08T02:54:59.781393Z","step":"reindex-gate","type":"output","message":"MISSING (build → expected in DB) (998):"}
+{"time":"2026-10-08T02:54:59.781411Z","step":"reindex-gate","type":"output","message":"  cmd/b0-vector-probe/main.go"}
+{"time":"2026-10-08T02:54:59.781421Z","step":"reindex-gate","type":"output","message":"  cmd/b0-vector-probe/main_test.go"}
+{"time":"2026-10-08T02:54:59.781432Z","step":"reindex-gate","type":"output","message":"  cmd/b1-evidence-audit/main.go"}
+{"time":"2026-10-08T02:54:59.781445Z","step":"reindex-gate","type":"output","message":"  cmd/b1-evidence-audit/main_test.go"}
+{"time":"2026-10-08T02:54:59.781458Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/agent.go"}
+{"time":"2026-10-08T02:54:59.781467Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/agent_test.go"}
+{"time":"2026-10-08T02:54:59.781481Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/format.go"}
+{"time":"2026-10-08T02:54:59.78149Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/format_test.go"}
+{"time":"2026-10-08T02:54:59.781501Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/main.go"}
+{"time":"2026-10-08T02:54:59.781511Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/doctor.go"}
+{"time":"2026-10-08T02:54:59.781527Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/doctor_test.go"}
+{"time":"2026-10-08T02:54:59.781543Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/init.go"}
+{"time":"2026-10-08T02:54:59.781554Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/init_test.go"}
+{"time":"2026-10-08T02:54:59.781567Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/anchors.go"}
+{"time":"2026-10-08T02:54:59.781578Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/check.go"}
+{"time":"2026-10-08T02:54:59.781588Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/domain.go"}
+{"time":"2026-10-08T02:54:59.781596Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/glossarygen.go"}
+{"time":"2026-10-08T02:54:59.781605Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/qualify_test.go"}
+{"time":"2026-10-08T02:54:59.781613Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/sync.go"}
+{"time":"2026-10-08T02:54:59.781619Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/sync_test.go"}
+{"time":"2026-10-08T02:54:59.781627Z","step":"reindex-gate","type":"output","message":"  ... (978 more)"}
+{"time":"2026-10-08T02:54:59.781634Z","step":"reindex-gate","type":"output","message":"verdict: DRIFT"}
+{"time":"2026-10-08T02:54:59.782621Z","step":"reindex-gate","type":"warning","message":"ckg audit reported issues (soft gate, not blocking promote): step reindex-gate: /private/tmp/ks-n12-coordinated-6j88bw75/bin/ckg: exit status 1"}
+{"time":"2026-10-08T02:55:02.931735Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":1410,"source_bytes":11985941,"git_history_bytes":2831900,"minimum_additional_bytes":0,"output_free_bytes":137767493632,"staging_free_bytes":137767493632,"minimum_output_bytes":0,"minimum_staging_bytes":0,"reserve_bytes":0,"deadline_utc":"2026-10-08T03:24:10.386963Z","actual_candidate_bytes":35867756,"engine_output_estimate_bytes":null,"estimate_scope":"pre-promotion measured candidate; staging removed; engine output not predicted"}}
+{"time":"2026-10-08T02:55:03.264018Z","step":"reindex-review","type":"done","message":"validated n12-candidate; held for explicit review"}
