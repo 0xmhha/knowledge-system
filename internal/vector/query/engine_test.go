@@ -13,6 +13,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/footprint"
+	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -244,6 +245,20 @@ func TestSearch_DryRunSkipsEmbedAndStore(t *testing.T) {
 	}
 	if res.Metadata.IndexedHeadCKV == "" {
 		t.Errorf("DryRun should still report manifest.IndexedHead")
+	}
+}
+
+func TestSearch_DryRunRejectsOversizedK(t *testing.T) {
+	out, _ := buildSample(t)
+	eng, err := Open(out, mock.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer eng.Close()
+	res, err := eng.Search(context.Background(), "alpha",
+		Options{K: sqlitevec.DefaultMaxSearchK/overfetchFactor + 1, DryRun: true})
+	if !errors.Is(err, sqlitevec.ErrSearchIncomplete) || res != nil {
+		t.Fatalf("dry run accepted oversized request: result=%+v err=%v", res, err)
 	}
 }
 

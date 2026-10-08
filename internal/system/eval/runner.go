@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	mcpgotransport "github.com/mark3labs/mcp-go/client/transport"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
+	"github.com/0xmhha/knowledge-system/internal/system/config"
 	sysmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -66,12 +68,15 @@ type Metrics struct {
 
 // ScenarioResult is the per-scenario row in the final report.
 type ScenarioResult struct {
-	Name      string  `json:"name"`
-	Prompt    string  `json:"prompt"`
-	Intent    string  `json:"intent,omitempty"`
-	Runs      int     `json:"runs"`
-	MatchMode string  `json:"match_mode"`
-	Metrics   Metrics `json:"metrics"`
+	// RawCalls is opt-in so legacy reports retain their shape. It includes
+	// failed calls and freshness checks, not just successful scored packs.
+	RawCalls  []RawToolCall `json:"raw_calls,omitempty"`
+	Name      string        `json:"name"`
+	Prompt    string        `json:"prompt"`
+	Intent    string        `json:"intent,omitempty"`
+	Runs      int           `json:"runs"`
+	MatchMode string        `json:"match_mode"`
+	Metrics   Metrics       `json:"metrics"`
 	// Error, when non-empty, indicates the tool produced an error on
 	// at least one run. Per-run errors are aggregated into a single
 	// summary string; metric fields are best-effort over the
@@ -82,21 +87,51 @@ type ScenarioResult struct {
 	// pass/fail guard, not a score, and folding it into recall would let
 	// a knowledge break trade against citation quality.
 	KnowledgeMissing []string `json:"knowledge_missing,omitempty"`
+	// CitationAbstentionPassed is present only for scenarios explicitly
+	// marked expect_no_citations. It judges evidence retrieval, not any
+	// natural-language answer produced by a downstream model.
+	CitationAbstentionPassed *bool `json:"citation_abstention_passed,omitempty"`
+	// These independent verdicts distinguish a retrieval miss, missing
+	// knowledge, unsafe no-citation behavior, and stale/unverified snapshots.
+	// They describe EvidencePack retrieval only, not a generated answer.
+	RetrievalState  string `json:"retrieval_state"`
+	EvidenceState   string `json:"evidence_state"`
+	AbstentionState string `json:"abstention_state"`
+	SnapshotState   string `json:"snapshot_state"`
+	SnapshotReason  string `json:"snapshot_reason,omitempty"`
 }
 
 // Runner owns one cks-mcp connection and executes scenarios against
 // it. Not safe for concurrent Execute calls without external
 // serialization — cks-mcp processes calls sequentially.
 type Runner struct {
-	client mcpClient
-	closed bool
+	client          mcpClient
+	closed          bool
+	stderrDone      <-chan struct{}
+	recordResponses bool
+	rawCalls        []RawToolCall
+}
+
+// RawToolCall preserves the decoded MCP result before metric aggregation.
+// ElapsedNS measures the tool call only; recording/encoding is outside it.
+type RawToolCall struct {
+	MeasurementID  string          `json:"measurement_id,omitempty"`
+	Tool           string          `json:"tool"`
+	Arguments      json.RawMessage `json:"arguments,omitempty"`
+	ElapsedNS      int64           `json:"elapsed_ns"`
+	CompletedAt    *time.Time      `json:"completed_at,omitempty"`
+	Response       json.RawMessage `json:"response,omitempty"`
+	TransportError string          `json:"transport_error,omitempty"`
 }
 
 // RunnerOpts configures NewRunner.
 type RunnerOpts struct {
-	CKSMCPBinary string
-	CKSMCPConfig string
-	Env          []string
+	CKSMCPBinary      string
+	CKSMCPConfig      string
+	Env               []string
+	RecordResponses   bool
+	InitializeTimeout time.Duration
+	Stderr            io.Writer // child diagnostics; nil forwards to os.Stderr
 }
 
 // NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
@@ -104,6 +139,15 @@ type RunnerOpts struct {
 // binary's mcp subcommand (self-exec) unless CKSMCPBinary points
 // elsewhere.
 func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
+	if opts.CKSMCPConfig != "" {
+		cfg, err := config.Load(opts.CKSMCPConfig)
+		// External compatible servers can use an opaque config format.
+		// Preserve that pass-through; known CKS HTTP configs cannot work
+		// over this client's subprocess transport.
+		if err == nil && cfg.Listen.ResolvedTransport() != "stdio" {
+			return nil, fmt.Errorf("eval: subprocess evaluation requires stdio; set listen.transport=stdio in the server config")
+		}
+	}
 	bin := opts.CKSMCPBinary
 	if bin == "" {
 		if exe, err := os.Executable(); err == nil {
@@ -119,9 +163,65 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	tp := mcpgotransport.NewStdio(bin, opts.Env, args...)
 	c := mcpgoclient.NewClient(tp)
 	if err := c.Start(ctx); err != nil {
+		_ = c.Close()
 		return nil, fmt.Errorf("eval: start cks-mcp: %w", err)
 	}
-	return newRunnerWithClient(ctx, c)
+	// The transport exposes stderr but does not consume it. Drain before
+	// initialize: a server can emit more diagnostics than its pipe holds
+	// while constructing backends, otherwise both sides wait indefinitely.
+	diagnostics := opts.Stderr
+	if diagnostics == nil {
+		diagnostics = os.Stderr
+	}
+	stderrDone := make(chan struct{})
+	go func() {
+		defer close(stderrDone)
+		if _, err := io.Copy(diagnostics, tp.Stderr()); err != nil {
+			// A failed diagnostic sink must not block the protocol either.
+			_, _ = io.Copy(io.Discard, tp.Stderr())
+		}
+	}()
+	initializeCtx := ctx
+	if opts.InitializeTimeout > 0 {
+		var cancel context.CancelFunc
+		initializeCtx, cancel = context.WithTimeout(ctx, opts.InitializeTimeout)
+		defer cancel()
+	}
+	runner, err := newRunnerWithClient(initializeCtx, c)
+	if err != nil {
+		<-stderrDone // newRunnerWithClient has closed the transport
+		return nil, err
+	}
+	runner.stderrDone = stderrDone
+	runner.recordResponses = opts.RecordResponses
+	return runner, nil
+}
+
+func (r *Runner) callTool(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	start := time.Now()
+	res, callErr := r.client.CallTool(ctx, req)
+	completed := time.Now()
+	elapsed := completed.Sub(start).Nanoseconds()
+	if !r.recordResponses {
+		return res, callErr
+	}
+	entry := RawToolCall{Tool: req.Params.Name, ElapsedNS: elapsed, CompletedAt: &completed}
+	var err error
+	entry.Arguments, err = json.Marshal(req.Params.Arguments)
+	if err != nil {
+		return nil, fmt.Errorf("record arguments: %w", err)
+	}
+	if res != nil {
+		entry.Response, err = json.Marshal(res)
+		if err != nil {
+			return nil, fmt.Errorf("record response: %w", err)
+		}
+	}
+	if callErr != nil {
+		entry.TransportError = callErr.Error()
+	}
+	r.rawCalls = append(r.rawCalls, entry)
+	return res, callErr
 }
 
 func newRunnerWithClient(ctx context.Context, c mcpClient) (*Runner, error) {
@@ -144,7 +244,11 @@ func (r *Runner) Close() error {
 		return nil
 	}
 	r.closed = true
-	return r.client.Close()
+	err := r.client.Close()
+	if r.stderrDone != nil {
+		<-r.stderrDone
+	}
+	return err
 }
 
 // Execute runs s.Runs invocations of cks.context.get_for_task against
@@ -156,6 +260,7 @@ func (r *Runner) Close() error {
 // Only structural failures (nil scenario, broken transport on every
 // run) return an error.
 func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, error) {
+	r.rawCalls = nil
 	if s == nil {
 		return nil, errors.New("eval: nil scenario")
 	}
@@ -170,9 +275,28 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 	// surfacing.
 	var knowledgeMissing []string
 	missingSeen := map[string]bool{}
+	retrievalMiss := false
+	snapshotState := "unpinned"
+	snapshotReason := ""
+	if s.ExpectedCommit != "" {
+		head, err := r.IndexedHead(ctx)
+		switch {
+		case err != nil:
+			snapshotState = "unverified"
+			snapshotReason = err.Error()
+		case head == "":
+			snapshotState = "unverified"
+			snapshotReason = "indexed head is empty"
+		case head != s.ExpectedCommit:
+			snapshotState = "conflict"
+			snapshotReason = fmt.Sprintf("indexed head %s differs from expected %s", head, s.ExpectedCommit)
+		default:
+			snapshotState = "current"
+		}
+	}
 
 	for i := 0; i < s.Runs; i++ {
-		m, missing, runErr := r.executeOnce(ctx, s)
+		m, missing, citationConflict, runErr := r.executeOnce(ctx, s)
 		if runErr != nil {
 			errMsgs = append(errMsgs, fmt.Sprintf("run %d: %v", i+1, runErr))
 			continue
@@ -184,9 +308,17 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 			}
 		}
 		perRun = append(perRun, m)
+		if len(s.ExpectedCitations) > 0 && m.FileRecall < 1 {
+			retrievalMiss = true
+		}
+		if citationConflict {
+			snapshotState = "conflict"
+			snapshotReason = "one or more citations have an empty or different commit"
+		}
 	}
 
 	out := &ScenarioResult{
+		RawCalls:  r.rawCalls,
 		Name:      s.Name,
 		Prompt:    s.Prompt,
 		Intent:    string(s.Intent),
@@ -195,6 +327,42 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		Metrics:   medianMetrics(perRun),
 
 		KnowledgeMissing: knowledgeMissing,
+		SnapshotState:    snapshotState,
+		SnapshotReason:   snapshotReason,
+		RetrievalState:   "not_evaluated",
+		EvidenceState:    "not_evaluated",
+		AbstentionState:  "not_applicable",
+	}
+	if len(perRun) != s.Runs {
+		out.RetrievalState = "error"
+	} else if len(s.ExpectedCitations) > 0 {
+		out.RetrievalState = "pass"
+		if retrievalMiss {
+			out.RetrievalState = "miss"
+		}
+	}
+	if len(s.ExpectedKnowledge) > 0 {
+		out.EvidenceState = "pass"
+		if len(perRun) != s.Runs {
+			out.EvidenceState = "error"
+		} else if len(knowledgeMissing) > 0 {
+			out.EvidenceState = "missing"
+		}
+	}
+	if s.ExpectNoCitations {
+		passed := len(perRun) == s.Runs
+		for _, m := range perRun {
+			if m.CitationCount != 0 {
+				passed = false
+			}
+		}
+		out.CitationAbstentionPassed = &passed
+		out.AbstentionState = "pass"
+		if len(perRun) != s.Runs {
+			out.AbstentionState = "error"
+		} else if !passed {
+			out.AbstentionState = "fail"
+		}
 	}
 	if len(errMsgs) > 0 {
 		out.Error = strings.Join(errMsgs, "; ")
@@ -212,7 +380,7 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolFreshness
-	res, err := r.client.CallTool(ctx, req)
+	res, err := r.callTool(ctx, req)
 	if err != nil {
 		return "", fmt.Errorf("CallTool(%s): %w", toolFreshness, err)
 	}
@@ -235,7 +403,7 @@ func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 }
 
 // executeOnce performs one tool call + metric computation.
-func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, error) {
+func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, bool, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolGetForTask
 	// Pass the scenario's declared intent so the run scores the
@@ -249,33 +417,48 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []strin
 	req.Params.Arguments = args
 
 	t0 := time.Now()
-	res, err := r.client.CallTool(ctx, req)
+	res, err := r.callTool(ctx, req)
 	elapsed := time.Since(t0)
+	if r.recordResponses && len(r.rawCalls) > 0 {
+		elapsed = time.Duration(r.rawCalls[len(r.rawCalls)-1].ElapsedNS)
+	}
 	if err != nil {
-		return Metrics{}, nil, fmt.Errorf("CallTool: %w", err)
+		return Metrics{}, nil, false, fmt.Errorf("CallTool: %w", err)
 	}
 	if res != nil && res.IsError {
-		return Metrics{}, nil, fmt.Errorf("%s", concatText(res))
+		return Metrics{}, nil, false, fmt.Errorf("%s", concatText(res))
 	}
 
 	pack, err := decodePack(res)
 	if err != nil {
-		return Metrics{}, nil, fmt.Errorf("decode: %w", err)
+		return Metrics{}, nil, false, fmt.Errorf("decode: %w", err)
 	}
 
 	missingKnowledge := missingKnowledgeScopes(s.ExpectedKnowledge, pack.Knowledge)
-	p, rec, f := precisionRecall(s.ExpectedCitations, pack.Citations, s.MatchMode)
+	metricCitations := pack.Citations
+	citationConflict := false
+	if s.ExpectedCommit != "" {
+		metricCitations = nil
+		for _, citation := range pack.Citations {
+			if citation.CommitHash != s.ExpectedCommit {
+				citationConflict = true
+				continue
+			}
+			metricCitations = append(metricCitations, citation)
+		}
+	}
+	p, rec, f := precisionRecall(s.ExpectedCitations, metricCitations, s.MatchMode)
 	return Metrics{
 		FilePrecision:    p,
 		FileRecall:       rec,
 		FileF1:           f,
-		FileMRR:          mrr(s.ExpectedCitations, pack.Citations, s.MatchMode),
+		FileMRR:          mrr(s.ExpectedCitations, metricCitations, s.MatchMode),
 		TokenUtilization: pack.Metadata.UtilizationRatio,
 		CitationCount:    len(pack.Citations),
 		BodyCount:        len(pack.Bodies),
 		RedactionCount:   len(pack.SanitizeReport),
 		LatencyMS:        elapsed.Milliseconds(),
-	}, missingKnowledge, nil
+	}, missingKnowledge, citationConflict, nil
 }
 
 // medianMetrics folds per-run Metrics into one. Scalar fields and

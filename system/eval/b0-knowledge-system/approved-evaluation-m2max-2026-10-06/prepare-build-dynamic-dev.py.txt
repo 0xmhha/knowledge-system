@@ -1,0 +1,52 @@
+from pathlib import Path
+import subprocess,json,hashlib,time,datetime,os,importlib.util
+root=Path.cwd();out=Path('/private/tmp/ks-approved-dynamic-dev-20261006');out.mkdir(exist_ok=True)
+binroot=Path('/private/tmp/ks-approved-scope-20261006/bin');base=Path('/private/tmp/ks-approved-semantic-20261006/fixtures')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('mat',root/'scripts/b0-materialize-fixtures.py');mat=importlib.util.module_from_spec(spec);spec.loader.exec_module(mat)
+manifest=base/'materialization.json';book=root/'system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json';data=json.loads(manifest.read_bytes())
+booksha=sha(book);cases=[];checks=[]
+record={'schema_version':1,'partition':'development','fixture_manifest_sha256':booksha,'materialization_sha256':sha(manifest),'builder_sha256':{p.name:sha(p)for p in binroot.iterdir()if p.is_file()},'cases':cases,'checks':checks,'status':'running','build_environment':'shared host; no exclusive build-cost claim'}
+if (out/'built-manifest.json').exists():
+ previous=json.loads((out/'built-manifest.json').read_bytes())
+ if previous['fixture_manifest_sha256']!=booksha:raise ValueError('approval changed before resume')
+ cases=previous['cases'];checks=previous['checks'];record=previous
+def save(): (out/'built-manifest.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+def run(label,args):
+ log=out/(label+'.log');start=time.monotonic()
+ env=dict(os.environ,CKV_REQUIRE_COMPLETE_EMBEDDINGS='1',GOMODCACHE='/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod')
+ with log.open('xb')as stream: code=subprocess.run([str(a)for a in args],cwd=root,env=env,stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(a)for a in args],'exit_code':code,'elapsed_seconds':time.monotonic()-start,'log_sha256':sha(log)});save()
+ if code:raise ValueError(label+' failed')
+for fixture in data['fixtures']:
+ if fixture['family']not in['F-01','F-02','F-04']:continue
+ for state in fixture['states']:
+  label=fixture['id']+'-'+state['name'];directory=out/label;repo=directory/'source';source=base/state['repository']
+  prior=next((c for c in cases if c['id']==label),None)
+  if prior is not None:
+   if 'dataset'not in prior or {f:sha(repo/f)for f in mat.git(repo,'ls-files').splitlines()}!=prior['source_sha256']:raise ValueError('partial source/build requires inspection')
+   if fixture['family']=='F-02':
+    run(label+'-doctor-document-only',[binroot/'cks','doctor','--src',repo,'--dataset',directory/'dataset'])
+    health=json.loads((out/(label+'-doctor-document-only.log')).read_bytes())
+    if health['status']!='degraded' or health['issues']!=['no code files supported by both graph and vector engines; indexing is document-only or graph-only']:raise ValueError('unexpected document-only degradation')
+    prior['doctor_status']='degraded_expected_document_only'
+   elif not any(c['exit_code']==0 and c['id']in[label+'-doctor',label+'-doctor-corrected']for c in checks):
+    run(label+'-doctor-corrected',[binroot/'cks','doctor','--src',repo,'--dataset',directory/'dataset','--strict'])
+   else: prior['doctor_status']='ready'
+   save()
+   continue
+  directory.mkdir()
+  run(label+'-clone',['git','clone','--quiet','--no-local',source,repo])
+  mat.git(repo,'checkout','--quiet','--detach',state['commit'])
+  if mat.git(repo,'status','--porcelain')or(repo/'.git/objects/info/alternates').exists():raise ValueError('source isolation failed')
+  if mat.git(repo,'rev-parse','HEAD^{tree}')!=state['tree']:raise ValueError('tree differs')
+  files=mat.git(repo,'ls-files').splitlines();sources={f:sha(repo/f)for f in files}
+  if sources!=state['source_sha256']:raise ValueError('approved source bytes differ')
+  case={'id':label,'family':fixture['family'],'state':state['name'],'project_id':state['project_id'],'source':str(repo),'source_commit':state['commit'],'source_tree':state['tree'],'source_sha256':sources};cases.append(case);save()
+  mat.git(repo,'bundle','create',str(directory/'source.bundle'),'--all')
+  run(label+'-strict-build',[binroot/'cks','setup','--src',repo,'--out',directory/'dataset','--version','approved','--project-id',state['project_id'],'--embedder','ollama','--model-name','bge-m3:latest','--ollama-url','http://127.0.0.1:11434','--query-prefix-policy','registry','--cks-bin',binroot/'cks','--graph-bin',binroot/'ckg','--vector-bin',binroot/'ckv'])
+  version=directory/'dataset/approved';case['version_dir']=str(version);case['dataset']=json.loads((version/'dataset-identity.json').read_bytes());m=json.loads((version/'vector/manifest.json').read_bytes());case['vector_manifest']=m
+  if case['dataset']['source']['source_commit']!=state['commit']or m['embedding_identity_v2']['model_digest']!='7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab':raise ValueError('model/source identity differs')
+  run(label+'-doctor',[binroot/'cks','doctor','--src',repo,'--dataset',directory/'dataset','--strict']);save()
+if sha(book)!=booksha:raise ValueError('approved input changed during build')
+record.update(status='approved_development_datasets_built_pending_oracles',finished_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),inputs_unchanged=True);save();print(json.dumps({'status':record['status'],'cases':len(cases),'build_checks':len(checks)}))

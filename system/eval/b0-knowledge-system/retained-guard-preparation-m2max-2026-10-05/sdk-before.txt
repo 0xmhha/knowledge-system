@@ -1,0 +1,15 @@
+=== RUN   TestRetainedGuardLiveSDK
+=== RUN   TestRetainedGuardLiveSDK/F-04-DEV-old
+    retained_guard_live_test.go:141: F-04-DEV-old-mixed: want snapshot_mismatch got error=true reindex_required
+    retained_guard_live_test.go:141: F-04-DEV-old-changed-blob: want snapshot_mismatch got error=true reindex_required
+    retained_guard_live_test.go:141: F-04-DEV-old-missing-blobs: want source_missing got error=true reindex_required
+    retained_guard_live_test.go:202: source or retained payload changed outside the temporary mutation
+=== RUN   TestRetainedGuardLiveSDK/F-05-DEV-a
+    retained_guard_live_test.go:141: F-05-DEV-a-mixed: want snapshot_mismatch got error=true reindex_required
+    retained_guard_live_test.go:202: source or retained payload changed outside the temporary mutation
+--- FAIL: TestRetainedGuardLiveSDK (10.19s)
+    --- FAIL: TestRetainedGuardLiveSDK/F-04-DEV-old (8.38s)
+    --- FAIL: TestRetainedGuardLiveSDK/F-05-DEV-a (1.80s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/eval	10.477s
+FAIL

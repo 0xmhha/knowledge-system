@@ -1,0 +1,7 @@
+{
+  "encoding": "lossless UTF-8 text wrapper",
+  "original_name": "header-replay-inputs-retry1__arm64-float-header.diff.txt",
+  "original_bytes": 717,
+  "original_sha256": "dcec5e4594484eec1d2cafaa539a7c53e3df9ce7ea4fd3f2917f6676af347f01",
+  "text": "--- musl-original\n+++ pinned-module-overlay\n@@ -1,3 +1,5 @@\n+#ifndef __CCGO__\n+\n #define FLT_EVAL_METHOD 0\n \n #define LDBL_TRUE_MIN 6.47517511943802511092443895822764655e-4966L\n@@ -14,3 +16,24 @@\n #define LDBL_MAX_10_EXP 4932\n \n #define DECIMAL_DIG 36\n+\n+#else // __CCGO__\n+\n+#define FLT_EVAL_METHOD 0\n+\n+#define LDBL_TRUE_MIN 4.94065645841246544177e-324L\n+#define LDBL_MIN 2.22507385850720138309e-308L\n+#define LDBL_MAX 1.79769313486231570815e+308L\n+#define LDBL_EPSILON 2.22044604925031308085e-16L\n+\n+#define LDBL_MANT_DIG 53\n+#define LDBL_MIN_EXP (-1021)\n+#define LDBL_MAX_EXP 1024\n+\n+#define LDBL_DIG 15\n+#define LDBL_MIN_10_EXP (-307)\n+#define LDBL_MAX_10_EXP 308\n+\n+#define DECIMAL_DIG 17\n+\n+#endif // __CCGO__\n"
+}

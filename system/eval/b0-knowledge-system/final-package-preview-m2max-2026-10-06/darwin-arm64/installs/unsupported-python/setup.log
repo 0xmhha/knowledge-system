@@ -1,0 +1,33 @@
+setup: --version auto resolved to 84b4c998
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-06T08:18:33.783+09:00 level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-06T08:18:33.783+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-06T08:18:33.894+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=2 changed_in_edges=0 blame_edges=0 hunk_edges=2 hunk_blobs=2 max_per_file=10
+    time=2026-10-06T08:18:33.947+09:00 level=INFO msg="build complete" nodes=3 edges=2 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 3 nodes / 2 edges into /private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-06T08:18:33.969+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=3f1545faf8f185ae run_id=8f4d3e5716ee0ca5 extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-287371194/tree has_ckv_yaml=false languages_filter=[]
+    time=2026-10-06T08:18:33.969+09:00 level=INFO msg=ckv event=build.start trace_id=733fa09a84188cd3 run_id=8f4d3e5716ee0ca5 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-287371194/tree out_dir=/private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-06T08:18:33.982+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=94c255ffe129ed3c run_id=8f4d3e5716ee0ca5 ckg_path=/private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998/graph files_indexed=0 entries=0 canonical_available=true
+    ckv: 1/1 files (384.7 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-06T08:18:33.993+09:00 level=INFO msg=ckv event=build.done trace_id=733fa09a84188cd3 run_id=8f4d3e5716ee0ca5 latency_ms=23 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-287371194/tree out_dir=/private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998/vector embedder=mock-feature-hash-v1 embedder_provider="" files_indexed=1 chunks_flow_step=0 chunks_total=1 chunks_canonical_id=0 chunks_flow_spine=0 chunks_doc=1 policy_loaded=false chunks_file_header=0 languages=map[markdown:1] db_sha256=f4b1546506ce9fb93f5d6f15e6d9011a09d38d7153c30c74b93f9bfe7cd6b4ef chunks_symbol=0 category_counts=map[:1] chunks_truncated=0 indexed_head=84b4c99872ef850489bb5f00db65d78cf1dae9ce
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=84b4c99872ef850489bb5f00db65d78cf1dae9ce built_at=2026-10-05T23:18:33Z db=/private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998/vector/vector.db sha256=f4b1546506ce9fb93f5d6f15e6d9011a09d38d7153c30c74b93f9bfe7cd6b4ef
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/tmp/ks-final-package-darwin-20261006/installs/unsupported-python/dataset/84b4c998 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

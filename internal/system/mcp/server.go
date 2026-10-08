@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/system/backendmeasure"
 	"net"
 	"net/http"
 	"time"
@@ -30,6 +31,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
+	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -38,6 +40,7 @@ import (
 // ToolNameGetForTask is the wire name of the get_for_task tool. Exported
 // so callers (and other tests) can reference it without string drift.
 var ToolNameGetForTask = toolName("context.get_for_task")
+var ToolNameGetForTaskV2 = toolName("context.get_for_task_v2")
 
 // ToolNameHealth is the wire name of the health tool.
 var ToolNameHealth = toolName("ops.health")
@@ -46,8 +49,18 @@ var ToolNameHealth = toolName("ops.health")
 // the slim C.5 surface deliberately resists envelope sprawl (HLD §7.5
 // envelope/auth fields land with Phase 3, not here).
 type Deps struct {
+	// Optional out-of-band experiment recorder; never changes a tool result.
+	BackendMeasurements *backendmeasure.Recorder
 	// Composer drives cks.context.get_for_task. Must be non-nil.
 	Composer *composer.Composer
+	// Pinned candidate and sanitizer for archive-backed v2 evidence. Empty
+	// version path leaves the v2 tool registered but returns reindex_required.
+	EvidenceVersionDir string
+	EvidenceSanitizer  *sanitize.Engine
+	// Optional SQLite semantic store. Each request rechecks its projection
+	// against this pinned version before publishing external trace anchors.
+	SemanticStorePath  string
+	EvidenceSourceRoot string
 
 	// CKG and CKV are reported by cks.ops.health. They are NOT used to
 	// short-circuit composer calls — the composer holds its own references
@@ -117,6 +130,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	}
 
 	registerGetForTask(s, d)
+	registerGetForTaskV2(s, d)
 	registerHealth(s, d)
 	registerFindSymbol(s, d)
 	registerFindCallers(s, d)

@@ -1,0 +1,30 @@
+import hashlib,json,pathlib,subprocess,shutil
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n02-2026-10-06'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+f=json.loads((root/'system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json').read_text())
+assert all(sha(pathlib.Path(p))==s for p,s in f['approved_input_sha256'].items())
+c=json.loads((e/'cli-results.json').read_text());assert c['success'] and len(c['cases'])==7
+assert [x['exit_code'] for x in c['cases']]==[0,1,1,1,1,0,0]
+assert all(x.get('active_tree_unchanged') for x in c['cases'][1:5])
+assert all(x.get('same_source_and_dataset_identity') for x in c['cases'][5:])
+assert 'FAIL' in (e/'red-public-mcp.log').read_text()
+assert 'PASS' in (e/'green-public-mcp.log').read_text()
+for pkg in ['internal/setup','internal/system/mcp','cmd/cks/setupcli','cmd/cks/mcpcli','cmd/cks']:
+ assert 'knowledge-system/'+pkg+'\t' in (e/'green-race-packages.log').read_text()
+assert 'FAIL' not in (e/'green-race-packages.log').read_text()
+assert not (e/'vet.log').read_text().strip()
+assert 'engine boundaries: OK' in (e/'boundaries.log').read_text()
+assert 'documentation: OK' in (e/'docs.log').read_text()
+changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
+assert not any(x.startswith('system/eval/') and not x.startswith('system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/') for x in changed),'historical evidence modified'
+paths=set(map(pathlib.Path,f['product_source_sha256']))
+paths.update(root/pathlib.Path(p) for p in ['internal/setup/maintenance.go','internal/setup/maintenance_test.go','internal/system/mcp/maintenance_guard_test.go'])
+source={str(p.relative_to(root)):sha(p) for p in sorted(paths)}
+delta={str(pathlib.Path(p).relative_to(root)):sha(pathlib.Path(p)) for p,s in f['product_source_sha256'].items() if sha(pathlib.Path(p))!=s}
+delta.update({p:source[p] for p in source if str(root/p) not in f['product_source_sha256']})
+for rel in delta:
+ out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
+reports=['REFACTORING-EXECUTION-SPEC.md','REFACTORING-REMAINING-WORKLIST.md','PUBLIC-CONTRACT-V2.md','EXECUTION.md','PDF-IMPROVEMENT-TRACE.md','REMOTE-SESSION-HANDOFF.md']
+m={'schema_version':1,'status':'N02_acceptance_verified','base_commit':'c9c91ebe','scope':'new DEV safety; no renewed FINAL/quality/operational verdict','source_sha256':source,'changed_source_sha256':delta,'approved_input_sha256':{str(pathlib.Path(p).relative_to(root)):s for p,s in f['approved_input_sha256'].items()},'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='manifest.json'}}
+(e/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
+print('N02 acceptance binding PASS:',len(source),'Go files;',len(delta),'changed/new;',len(m['evidence_sha256']),'evidence files; approved inputs 5 unchanged')

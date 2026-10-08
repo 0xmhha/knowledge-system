@@ -36,7 +36,7 @@ type fixture struct {
 	deps     Deps                    // produced after setup
 }
 
-func newFixture(t *testing.T, setup func(f *fixture)) *fixture {
+func newFixture(t *testing.T, setup func(f *fixture), stage2Options ...stage2.Option) *fixture {
 	t.Helper()
 	f := &fixture{
 		// Default to serviceable backends so handlers under test (e.g.
@@ -68,7 +68,7 @@ func newFixture(t *testing.T, setup func(f *fixture)) *fixture {
 	if err != nil {
 		t.Fatalf("stage1.New: %v", err)
 	}
-	s2, err := stage2.New(f.ckg)
+	s2, err := stage2.New(f.ckg, stage2Options...)
 	if err != nil {
 		t.Fatalf("stage2.New: %v", err)
 	}

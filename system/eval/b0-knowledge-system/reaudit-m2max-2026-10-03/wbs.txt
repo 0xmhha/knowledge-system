@@ -1,0 +1,44 @@
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-03T21:03:15.795+09:00 level=INFO msg="detected files" go=2 ts=0 sol=0 proto=0
+    time=2026-10-03T21:03:16.180+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T21:03:16.300+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=8 changed_in_edges=13 blame_edges=2 hunk_edges=8 hunk_blobs=8 max_per_file=10
+    time=2026-10-03T21:03:16.344+09:00 level=INFO msg="build complete" nodes=22 edges=40 pkg_tree_edges=10 topic_resolutions=3
+    ckg: built 22 nodes / 40 edges into /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T21:03:16.387+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=32c29e6faa9cbcce run_id=d5fbd43232e0ae90 languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/src has_ckv_yaml=false
+    time=2026-10-03T21:03:16.387+09:00 level=INFO msg=ckv event=build.start trace_id=06d76e17bf440778 run_id=d5fbd43232e0ae90 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/src out_dir=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke/vector embedder=mock-feature-hash-v1 embedder_provider=""
+    time=2026-10-03T21:03:16.400+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=3445d0b7fab48fac run_id=d5fbd43232e0ae90 files_indexed=2 entries=3 canonical_available=true ckg_path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke/graph
+    ckv: 3/3 files (887.5 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-03T21:03:16.410+09:00 level=INFO msg=ckv event=build.done trace_id=06d76e17bf440778 run_id=d5fbd43232e0ae90 latency_ms=22 category_counts=map[:8] chunks_symbol=3 chunks_flow_spine=0 languages="map[go:5 markdown:3]" policy_loaded=false chunks_canonical_id=3 chunks_file_header=2 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/src chunks_flow_step=0 chunks_total=9 indexed_head=423e3199980551431b9564d458f26c19176e5a92 out_dir=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke/vector embedder=mock-feature-hash-v1 embedder_provider="" db_sha256=5677ed7f41007a151ba7a9ff4dc20954933a0115085ae175eeded2ba49a8d0fc files_indexed=3 chunks_doc=3 chunks_truncated=0
+    ckv: indexed 3 files → 9 chunks (3 symbol, 3 doc, 2 header, 0 truncated)
+    ckv: canonical_id 3/3 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=423e3199980551431b9564d458f26c19176e5a92 built_at=2026-10-03T12:03:16Z db=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke/vector/vector.db sha256=5677ed7f41007a151ba7a9ff4dc20954933a0115085ae175eeded2ba49a8d0fc
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 2
+      db files:    2
+      in both:     2
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/dataset/smoke to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current
+ckg audit (go)
+  build files: 2
+  db files:    2
+  in both:     2
+  in build only (missing from DB): 0
+  in db only (over-included):       0
+verdict: PARITY
+/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/test-pass.json
+/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/test-exact.json
+/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/annotated-pack.json
+generated /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr/cks.yaml (name=ks-fixture, listen=127.0.0.1:8080 allow_remote=false)
+Structural smoke reports: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp.DJxoveCZPr

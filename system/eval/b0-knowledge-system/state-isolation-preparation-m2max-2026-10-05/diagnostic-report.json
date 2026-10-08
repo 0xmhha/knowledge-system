@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "bundle_sha256": "50fe28e03fcd47d2e52fdd0ae99de5baadcc364ad21299442194a307978d85dd",
+  "fixture_book_sha256": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+  "state": "diagnostic_replayed",
+  "rows": [
+    {
+      "id": "F-04-DEV-old",
+      "coordinates": {
+        "project_id": "f-04-dev",
+        "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+        "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+        "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+      },
+      "capture_sha256": "a1b40bdef050f4e806f67e24d0bd89b93ce6a6e8c88af9b7831a9c92854b171c",
+      "backend_sha256": "9ac56034b6d6da123c1783e85804a27a4a07add69121d96ba68d99b9da53f1e2",
+      "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 3,
+      "bodies": 3,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true
+      ],
+      "synthetic_policy_document_only": false,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 2,
+          "elapsed_ns": 232104958
+        },
+        {
+          "ordinal": 24,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 97095625
+        }
+      ],
+      "backend_nonreturned": 0
+    },
+    {
+      "id": "F-04-DEV-old",
+      "coordinates": {
+        "project_id": "f-04-dev",
+        "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+        "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+        "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+      },
+      "capture_sha256": "cd67492b3d113c1e77a9a710d6c3f3e514e0a7e6d46130ffad2aa745ffc3a163",
+      "backend_sha256": "9ac56034b6d6da123c1783e85804a27a4a07add69121d96ba68d99b9da53f1e2",
+      "binary_sha256": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 3,
+      "bodies": 3,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true
+      ],
+      "synthetic_policy_document_only": false,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 2,
+          "elapsed_ns": 35146292
+        },
+        {
+          "ordinal": 24,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 31995375
+        }
+      ],
+      "backend_nonreturned": 0
+    },
+    {
+      "id": "F-04-DEV-new",
+      "coordinates": {
+        "project_id": "f-04-dev",
+        "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+        "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+        "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+      },
+      "capture_sha256": "afbab2f6ab2981f4de013e01367b71e7a5d0571cb058830e51d28360d4554d48",
+      "backend_sha256": "e481c6b56e5e91743f88e7b1c3768c777e5bd6e850279ab9fff8dffc9a09655c",
+      "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 3,
+      "bodies": 3,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true
+      ],
+      "synthetic_policy_document_only": false,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 2,
+          "elapsed_ns": 46787583
+        },
+        {
+          "ordinal": 24,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 50744958
+        }
+      ],
+      "backend_nonreturned": 0
+    },
+    {
+      "id": "F-04-DEV-new",
+      "coordinates": {
+        "project_id": "f-04-dev",
+        "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae",
+        "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748",
+        "base_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+      },
+      "capture_sha256": "e14c16ee88ea2552f3d2ec829e783a62cba291c37cb9a45c7751d852e05eb88d",
+      "backend_sha256": "e481c6b56e5e91743f88e7b1c3768c777e5bd6e850279ab9fff8dffc9a09655c",
+      "binary_sha256": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 3,
+      "bodies": 3,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true
+      ],
+      "synthetic_policy_document_only": false,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 2,
+          "elapsed_ns": 42039166
+        },
+        {
+          "ordinal": 24,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "30b67ed50408b06d9250240a31f44019d0a20b47f88ed6150f3bbb693ed9e878",
+          "input_bytes": 29,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 35262583
+        }
+      ],
+      "backend_nonreturned": 0
+    },
+    {
+      "id": "F-05-DEV-a",
+      "coordinates": {
+        "project_id": "f-05-dev-a",
+        "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+        "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+        "base_commit": "680adada09d589cf7867c49f164ef8d779503225"
+      },
+      "capture_sha256": "5f9c022945ac8c25480018d64eaad96b5aa0006aab45aa7cc602697834961e7e",
+      "backend_sha256": "f3d1713c578288c66a0595cb35f0aaa368a62db296bcccff042bbded7b95eaaf",
+      "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 4,
+      "bodies": 4,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true,
+        true
+      ],
+      "synthetic_policy_document_only": true,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 3,
+          "elapsed_ns": 69305209
+        },
+        {
+          "ordinal": 35,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 56737584
+        }
+      ],
+      "backend_nonreturned": 2
+    },
+    {
+      "id": "F-05-DEV-a",
+      "coordinates": {
+        "project_id": "f-05-dev-a",
+        "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+        "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+        "base_commit": "680adada09d589cf7867c49f164ef8d779503225"
+      },
+      "capture_sha256": "8524a1d7e61087fcb1fec8bac4a44f4b963fee872e16908fa6f2662aaae005a6",
+      "backend_sha256": "f3d1713c578288c66a0595cb35f0aaa368a62db296bcccff042bbded7b95eaaf",
+      "binary_sha256": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 4,
+      "bodies": 4,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true,
+        true
+      ],
+      "synthetic_policy_document_only": true,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 3,
+          "elapsed_ns": 38045667
+        },
+        {
+          "ordinal": 35,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 36157625
+        }
+      ],
+      "backend_nonreturned": 2
+    },
+    {
+      "id": "F-05-DEV-b",
+      "coordinates": {
+        "project_id": "f-05-dev-b",
+        "dataset_id": "2032c8717c12198491206109ca3869ff77ba514607682cdc35695a1e67366626",
+        "snapshot_id": "3c2bb76845a7cc7bd2537437dcddf9e81e3398d9c0615b110b9f980946175c57",
+        "base_commit": "45e378b9da4fe6d4c796dd84281f28859c282e20"
+      },
+      "capture_sha256": "95fe636f7a50754bf86d6c1852e8bef6dea871df2c43e2e2a1bce39a03849bd2",
+      "backend_sha256": "94667b315e7fd4fdc7a76c9dfd0aaf62425bbfa7605963236f6ec37ad7f669cb",
+      "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 4,
+      "bodies": 4,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true,
+        true
+      ],
+      "synthetic_policy_document_only": true,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 3,
+          "elapsed_ns": 45587625
+        },
+        {
+          "ordinal": 35,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 42542708
+        }
+      ],
+      "backend_nonreturned": 2
+    },
+    {
+      "id": "F-05-DEV-b",
+      "coordinates": {
+        "project_id": "f-05-dev-b",
+        "dataset_id": "2032c8717c12198491206109ca3869ff77ba514607682cdc35695a1e67366626",
+        "snapshot_id": "3c2bb76845a7cc7bd2537437dcddf9e81e3398d9c0615b110b9f980946175c57",
+        "base_commit": "45e378b9da4fe6d4c796dd84281f28859c282e20"
+      },
+      "capture_sha256": "3e1a4ffebfbafa04f1a096be73729bf990c37e5e713ad3aab93a9fcdbdc7cae4",
+      "backend_sha256": "94667b315e7fd4fdc7a76c9dfd0aaf62425bbfa7605963236f6ec37ad7f669cb",
+      "binary_sha256": "65857055114c53b69bbff2c0944dc9245ce30e1d370018e667c3fc94d4b854e4",
+      "planned_calls": 1,
+      "observed_calls": 1,
+      "missing_calls": 0,
+      "failed_calls": 0,
+      "quality_metrics": null,
+      "state": "structural_capture_valid",
+      "citations": 4,
+      "bodies": 4,
+      "source_and_project_binding_valid": true,
+      "expected_source_body_coverage": [
+        true,
+        true
+      ],
+      "synthetic_policy_document_only": true,
+      "reviewed_policy_pack_activated": false,
+      "retrieval_attempts": [
+        {
+          "ordinal": 10,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 10,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": null
+            },
+            "BM25Rerank": true
+          },
+          "outcome": "returned",
+          "result_count": 3,
+          "elapsed_ns": 41392125
+        },
+        {
+          "ordinal": 35,
+          "backend": "ckv",
+          "method": "semantic_search",
+          "input_sha256": "d04a3091888f2030c261d1ba9d0dd3ac5822582bc4ebab4c0a7890ff85b75b6b",
+          "input_bytes": 58,
+          "options": {
+            "K": 6,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "SymbolKinds": null,
+              "CommitHash": "",
+              "ExcludeTests": false,
+              "ChunkKinds": [
+                "invariant",
+                "convention"
+              ]
+            },
+            "BM25Rerank": false
+          },
+          "outcome": "returned",
+          "result_count": 0,
+          "elapsed_ns": 33839125
+        }
+      ],
+      "backend_nonreturned": 2
+    }
+  ],
+  "queries": [
+    {
+      "hits": 3,
+      "fresh": true,
+      "indexed_head_ckv": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+    },
+    {
+      "hits": 3,
+      "fresh": true,
+      "indexed_head_ckv": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+    },
+    {
+      "hits": 3,
+      "fresh": true,
+      "indexed_head_ckv": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+    },
+    {
+      "hits": 3,
+      "fresh": true,
+      "indexed_head_ckv": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+    },
+    {
+      "hits": 4,
+      "fresh": true,
+      "indexed_head_ckv": "680adada09d589cf7867c49f164ef8d779503225"
+    },
+    {
+      "hits": 4,
+      "fresh": true,
+      "indexed_head_ckv": "680adada09d589cf7867c49f164ef8d779503225"
+    },
+    {
+      "hits": 4,
+      "fresh": true,
+      "indexed_head_ckv": "45e378b9da4fe6d4c796dd84281f28859c282e20"
+    },
+    {
+      "hits": 4,
+      "fresh": true,
+      "indexed_head_ckv": "45e378b9da4fe6d4c796dd84281f28859c282e20"
+    }
+  ],
+  "stale_query": [
+    {
+      "hits": 3,
+      "fresh": false,
+      "indexed_head_ckv": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+    }
+  ],
+  "mixed_layout": [
+    {
+      "capture_sha256": "bd24da794b037bdd7fa0a6a7edf99606982802035a0357764dbc2c45c7b8b335",
+      "observed_code": "reindex_required",
+      "expected_gold_code": "snapshot_mismatch",
+      "gold_oracle_satisfied": false,
+      "scope": "non-colocated native layout; not a pinned mixed-coordinate EvidencePackV2"
+    },
+    {
+      "capture_sha256": "c1522aeb45fda8d9b0d2f2b977fc8afc4bb0138234d4e135f46b4e07353eea34",
+      "observed_code": "reindex_required",
+      "expected_gold_code": "snapshot_mismatch",
+      "gold_oracle_satisfied": false,
+      "scope": "non-colocated native layout; not a pinned mixed-coordinate EvidencePackV2"
+    }
+  ],
+  "quality_metrics": null,
+  "human_verdict": null,
+  "official_execution_ready": false,
+  "remaining_oracle": "native pinned mixed-coordinate snapshot_mismatch; official input/pack/human review"
+}

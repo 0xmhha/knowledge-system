@@ -10,13 +10,14 @@ var Version = "dev"
 // rootFlags holds CLI flags that apply to every subcommand. They are
 // set via PersistentFlags so any leaf command can read them.
 type rootFlags struct {
-	noFootprint bool
-	embedder    string // mock | bgeonnx | ollama
-	modelDir    string // override default model cache directory
-	modelName   string // model name for backends that support multiple models (ollama)
-	embedDim    int    // >0 → MRL-truncate ollama embeddings to this dimension (0 = native)
-	logLevel    string // debug | info | warn | error; empty → $CKV_LOG_LEVEL → info
-	profile     string // path to write profile.json on Close (empty = disabled)
+	noFootprint       bool
+	embedder          string // mock | bgeonnx | ollama
+	modelDir          string // override default model cache directory
+	modelName         string // model name for backends that support multiple models (ollama)
+	embedDim          int    // >0 → MRL-truncate ollama embeddings to this dimension (0 = native)
+	queryPrefixPolicy string // registry | none
+	logLevel          string // debug | info | warn | error; empty → $CKV_LOG_LEVEL → info
+	profile           string // path to write profile.json on Close (empty = disabled)
 }
 
 var globalFlags rootFlags
@@ -41,6 +42,8 @@ func newRootCmd() *cobra.Command {
 		"model name (for ollama: default bge-m3, also qwen3-embedding:0.6b|4b; for bgeonnx: overrides default)")
 	cmd.PersistentFlags().IntVar(&globalFlags.embedDim, "embed-dim", 0,
 		"MRL-truncate ollama embeddings to this dimension (0 = model native; must be a supported dim — qwen3:4b 512|1024|2560, qwen3:0.6b 256|512|1024)")
+	cmd.PersistentFlags().StringVar(&globalFlags.queryPrefixPolicy, "query-prefix-policy", "registry",
+		"Ollama query transformation: registry | none (recorded in embedding identity)")
 	cmd.PersistentFlags().StringVar(&globalFlags.logLevel, "log-level", "",
 		"slog minimum level: debug | info | warn | error (default info; falls back to $CKV_LOG_LEVEL)")
 	cmd.PersistentFlags().StringVar(&globalFlags.profile, "profile", "",
@@ -48,6 +51,7 @@ func newRootCmd() *cobra.Command {
 
 	cmd.AddCommand(
 		newBuildCmd(),
+		newIdentityCmd(),
 		newReindexCmd(),
 		newPromoteCmd(),
 		newQueryCmd(),

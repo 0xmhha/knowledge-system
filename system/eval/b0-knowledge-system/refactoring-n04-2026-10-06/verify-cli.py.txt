@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""N04 disposable CLI safety integration; mock embeddings, real engine binaries."""
+import hashlib,json,os,pathlib,signal,subprocess,sys,tempfile,time
+repo=pathlib.Path(__file__).resolve().parents[4]
+evidence=pathlib.Path(__file__).resolve().parent
+bins=pathlib.Path('/private/tmp/ks-n04-bin')
+root=pathlib.Path(tempfile.mkdtemp(prefix='cks-n04-cli-'))
+src=root/'source'; src.mkdir(); ds=root/'dataset'
+(src/'go.mod').write_text('module example.org/fixture\n\ngo 1.25.13\n')
+(src/'main.go').write_text('package fixture\n\n// Alpha returns the reviewed fixture result.\nfunc Alpha() int { return 7 }\n')
+config=root/'setup.yaml'
+config.write_text(f'project_id: n04-fixture\nsource_mode: snapshot-only\nsrc: {src}\nout: {ds}\ngraph_bin: {bins/"ckg"}\nvector_bin: {bins/"ckv"}\nembedder: mock\nembed_dim: 8\n')
+wrapper=root/'ckv-injection'
+wrapper.write_text(f'''#!{sys.executable}
+import json,os,pathlib,subprocess,sys,time
+args=sys.argv[1:]
+if 'identity' in args: os.execv({str(bins/'ckv')!r},[{str(bins/'ckv')!r}]+args)
+mode=os.environ.get('CKS_N04_FAULT','')
+if mode=='fail': sys.exit(31)
+if mode=='cancel':
+ pathlib.Path({str(root/'entered')!r}).write_text('entered vector build')
+ time.sleep(45)
+ sys.exit(32)
+result=subprocess.run([{str(bins/'ckv')!r}]+args)
+if result.returncode: sys.exit(result.returncode)
+if mode=='mix':
+ out=pathlib.Path(args[args.index('--out')+1])/'manifest.json'
+ data=json.loads(out.read_text());data['project_id']='foreign-project';out.write_text(json.dumps(data))
+''')
+wrapper.chmod(0o700)
+
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def tree(path):
+ return {str(p.relative_to(path)):sha(p) for p in sorted(path.rglob('*')) if p.is_file() and not p.is_symlink()}
+def current(): return os.readlink(ds/'current')
+report={'base_commit':'d85b84a7','scope':'native darwin arm64 CLI and real engines with deterministic mock embeddings; no quality or power-loss claim','fixture':str(root),'binaries':{b.name:sha(b) for b in bins.iterdir()},'inputs':tree(src),'config_sha256':sha(config),'cases':[]}
+def run(name,version,extra=(),fault=''):
+ command=[str(bins/'cks'),'setup','--config',str(config),'--version',version,'--progress','json',*extra]
+ env=os.environ.copy();env['CKS_N04_FAULT']=fault
+ started=time.monotonic()
+ child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+ if fault=='cancel':
+  deadline=time.monotonic()+30
+  while not (root/'entered').exists() and child.poll() is None and time.monotonic()<deadline: time.sleep(.05)
+  assert (root/'entered').exists(),'vector build was not reached before cancellation'
+  report['concurrent_requests']=[]
+  for request,other in [
+   ('build',[str(bins/'cks'),'setup','--config',str(config),'--version','concurrent']),
+   ('rollback',[str(bins/'cks'),'rollback','base','--out',str(ds)]),
+  ]:
+   other_result=subprocess.run(other,capture_output=True,text=True,timeout=20)
+   (evidence/('concurrent-'+request+'.stdout.log')).write_text(other_result.stdout)
+   (evidence/('concurrent-'+request+'.stderr.log')).write_text(other_result.stderr)
+   assert other_result.returncode!=0 and current()=='base'
+   assert not (ds/'concurrent').exists(),'contender entered build before lock'
+   report['concurrent_requests'].append({'request':request,'command':other,'exit_code':other_result.returncode,'current':'base','candidate_not_created':True})
+  child.send_signal(signal.SIGTERM)
+ out,err=child.communicate(timeout=60)
+ (evidence/(name+'.stdout.log')).write_text(out);(evidence/(name+'.stderr.log')).write_text(err)
+ record={'name':name,'command':command,'exit_code':child.returncode,'elapsed_s':round(time.monotonic()-started,3),'current':current() if (ds/'current').exists() else None}
+ report['cases'].append(record)
+ (evidence/'cli-results.json').write_text(json.dumps(report,indent=2)+'\n')
+ print(name,child.returncode,record['current'],flush=True)
+ return child.returncode
+assert run('initial','base')==0
+old=tree(ds/'base'); old_identity=json.loads((ds/'base'/'dataset-identity.json').read_text())
+for name,fault in [('one-engine-failed','fail'),('mixed-project','mix'),('cancelled','cancel')]:
+ assert run(name,name,('--vector-bin',str(wrapper)),fault)!=0
+ assert current()=='base' and tree(ds/'base')==old,'active bytes or pointer changed on failure'
+ report['cases'][-1]['active_tree_unchanged']=True
+assert run('existing-version','base')!=0
+assert current()=='base' and tree(ds/'base')==old
+report['cases'][-1]['active_tree_unchanged']=True
+assert run('held-for-review','held',('--hold-for-review',))==0
+assert current()=='base' and tree(ds/'base')==old
+held=json.loads((ds/'held'/'dataset-identity.json').read_text())
+assert held['source']==old_identity['source'] and held['dataset_id']==old_identity['dataset_id']
+assert (ds/'held'/'review-hold.json').is_file()
+report['cases'][-1]['same_source_and_dataset_identity']=True
+assert run('promoted','next')==0
+assert current()=='next' and tree(ds/'base')==old
+new=json.loads((ds/'next'/'dataset-identity.json').read_text())
+assert new['source']==old_identity['source'] and new['dataset_id']==old_identity['dataset_id']
+report['cases'][-1]['same_source_and_dataset_identity']=True
+assert tree(src)==report['inputs']
+report['success']=True;report['old_identity']=old_identity;report['new_identity']=new
+(evidence/'cli-results.json').write_text(json.dumps(report,indent=2)+'\n')
+print('N04 CLI safety cases PASS',flush=True)

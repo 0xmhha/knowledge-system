@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
+  "next_task": "N-11",
+  "active_source_binding": {
+    "revision": "543966d3",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/formatter-manifest.json"
+  },
+  "tasks": [
+    {
+      "id": "N-01",
+      "purpose": "초기 원문·요구사항 대조",
+      "state": "complete",
+      "evidence_revision": "c9c91ebe",
+      "manifest": "system/eval/b0-knowledge-system/original-source-recovery-2026-10-06/evidence-manifest.json"
+    },
+    {
+      "id": "N-02",
+      "purpose": "공개 유지보수 쓰기 보호",
+      "state": "complete",
+      "evidence_revision": "d1d7946c",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/manifest.json",
+      "required_checks": [
+        "N02-A",
+        "N02-B",
+        "N02-C",
+        "N02-D",
+        "N02-E"
+      ]
+    },
+    {
+      "id": "N-03",
+      "purpose": "공통 OS 잠금",
+      "state": "complete",
+      "evidence_revision": "c9d27cf5",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n03-2026-10-06/manifest.json",
+      "required_checks": [
+        "N03-A",
+        "N03-B",
+        "N03-C",
+        "N03-D"
+      ]
+    },
+    {
+      "id": "N-04",
+      "purpose": "저장 내구성",
+      "state": "complete",
+      "evidence_revision": "cea18648",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/manifest.json",
+      "required_checks": [
+        "N04-A",
+        "N04-B",
+        "N04-C",
+        "N04-D"
+      ]
+    },
+    {
+      "id": "N-05",
+      "purpose": "GC·보관 정책",
+      "state": "complete",
+      "evidence_revision": "69e1031a",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n05-2026-10-06/manifest.json",
+      "required_checks": [
+        "N05-A",
+        "N05-B",
+        "N05-C",
+        "N05-D"
+      ]
+    },
+    {
+      "id": "N-06",
+      "purpose": "자원 상한·deadline",
+      "state": "complete",
+      "evidence_revision": "d4131823",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/manifest.json",
+      "required_checks": [
+        "N06-A",
+        "N06-B",
+        "N06-C",
+        "N06-D"
+      ]
+    },
+    {
+      "id": "N-07",
+      "purpose": "본문 예산",
+      "state": "complete",
+      "evidence_revision": "96364b33",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n07-2026-10-06/manifest.json",
+      "required_checks": [
+        "N07-A",
+        "N07-B",
+        "N07-C",
+        "N07-D"
+      ]
+    },
+    {
+      "id": "N-08",
+      "purpose": "검색 품질",
+      "state": "pending"
+    },
+    {
+      "id": "N-09",
+      "purpose": "무답·기권",
+      "state": "pending"
+    },
+    {
+      "id": "N-10",
+      "purpose": "비용·지연",
+      "state": "waiting",
+      "diagnostic_preparation": "docs/spec-driven/N10-NEIGHBOR-DIAGNOSTICS.md",
+      "verified_substep": "Typed unresolved neighbor seeds retain backend_error outcomes and failed-call denominators; composer behavior preserved; 3 native SQLite controls distinguish unresolved seed, empty traversal, and closed-store failure. Full cost/p95 evaluation remains pending.",
+      "diagnostic_evidence_revision": "0256ffe5",
+      "waiting_for": "reviewed independent N11 inputs and runtime binding, then actual same-arm cost and warm/cold latency measurements; no new FINAL or release verdict"
+    },
+    {
+      "id": "N-11",
+      "purpose": "독립 DEV/FINAL",
+      "state": "waiting",
+      "preparation": "docs/spec-driven/N11-FRESH-EVALUATION-PREPARATION.md",
+      "verified_substep": "source-bound input controls; frozen runtime dataset/source/config/binary/model/K check; permanent OS lock and durable FINAL reservation before dispatch; native draft rejection. No new FINAL/human approval or full evaluation.",
+      "partial_review": "docs/spec-driven/N11-DEV-INPUT-REVIEW.md",
+      "preparation_revision": "f8479d5c",
+      "waiting_for": "actual DEV/gold/protocol review; candidate gold/independence/contamination adjudication and remaining independent FINAL scopes; coordinated dataset and runner binding; no full fresh evaluation approval exists",
+      "runner_preparation": "docs/spec-driven/N11-EVALUATION-RUNNER-CONTRACT.md",
+      "runner_evidence_revision": "cc9f2e3f",
+      "final_candidate_preparation": "docs/spec-driven/N11-FINAL-CANDIDATE-PREPARATION.md",
+      "final_candidate_evidence_revision": "8f6e1321",
+      "final_candidate_rows": 4,
+      "proposed_final_fact_clusters": 2,
+      "approved_final_fact_clusters": 0
+    },
+    {
+      "id": "N-12",
+      "purpose": "실제 파일럿 검토",
+      "state": "waiting",
+      "preparation": "docs/spec-driven/N12-ACTUAL-PILOT-REVIEW.md",
+      "waiting_for": "actual human content/relationship verdict and reviewer; coordinated snapshot/lock binding remains",
+      "additional_preparation": "docs/spec-driven/N12-POLICY-ADR-REVIEW.md",
+      "verified_substep": "6 actual policy/ADR claims and 12 proposed assertions source-bound; 4 native CLI rejection controls; human verdict and coordinated lock/canonical binding pending",
+      "preparation_revision": "f8479d5c"
+    },
+    {
+      "id": "N-13",
+      "purpose": "도메인 팩 분리",
+      "state": "complete",
+      "evidence_revision": "26682b44",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json",
+      "required_checks": [
+        "N13-A",
+        "N13-B",
+        "N13-C",
+        "N13-D"
+      ]
+    },
+    {
+      "id": "N-14",
+      "purpose": "실제 의미 수용 흐름",
+      "state": "pending"
+    },
+    {
+      "id": "N-15",
+      "purpose": "지원 환경·외부 소비자",
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "clean Darwin package from b006e776; 3 owned mock installs/restarts/data updates/rollbacks; separate public Go module with 7 MCP responses and 4 rejections; native CI defined but not run",
+      "waiting_for": "actual native Linux AMD64 CI/host execution, real model/scale and independent operating consumer install/upgrade acceptance",
+      "formatter_evidence_revision": "543966d3",
+      "ci_status": "defined_not_dispatched_public_transfer_pending"
+    },
+    {
+      "id": "N-16",
+      "purpose": "운영 권한·고지",
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "current clean package byte inventory bound: 35 modules, 4 vendored assets, included-scope missing notices 0; suitability and operating authority not approved",
+      "waiting_for": "actual roles/scope/public key independent trust and rotation/revocation; native/transitive source and notice suitability judgment"
+    },
+    {
+      "id": "N-17",
+      "purpose": "운영 복구",
+      "state": "waiting",
+      "technical_preparation": "docs/spec-driven/N15-N17-CURRENT-TECHNICAL-VALIDATION.md",
+      "technical_evidence_revision": "de15015a",
+      "verified_substep": "new-root restore failure reproduced and reader lease preparation fixed; 9 controls, 3-package race; 10 recovery capture responses and 13 unchanged payload files; source-absent replay passed on owned mock fixture",
+      "waiting_for": "actual backup/failover owner, RTO/RPO/key/network/power host policy and operating candidate drill/acceptance"
+    },
+    {
+      "id": "N-18",
+      "purpose": "기본값·출시 판정",
+      "state": "pending"
+    }
+  ]
+}

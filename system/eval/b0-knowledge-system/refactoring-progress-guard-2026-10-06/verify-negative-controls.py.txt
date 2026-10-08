@@ -1,0 +1,21 @@
+import copy,json,pathlib,subprocess,tempfile
+root=pathlib.Path.cwd();folder=root/'system/eval/b0-knowledge-system/refactoring-progress-guard-2026-10-06'
+base=json.loads((root/'docs/spec-driven/REFACTORING-PROGRESS.json').read_text())
+variants={}
+a=copy.deepcopy(base);a['tasks'][3]['state']='complete';variants['false_N04_completion']=a
+a=copy.deepcopy(base);a['tasks'][1]['manifest']='system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/missing.json';variants['missing_committed_evidence']=a
+a=copy.deepcopy(base);a['active_source_binding']={'revision':'d1d7946c','manifest':base['tasks'][1]['manifest']};variants['stale_source_binding']=a
+a=copy.deepcopy(base);a['tasks'][2]['required_checks'].pop();variants['omitted_acceptance_condition']=a
+report=[]
+for name,ledger in variants.items():
+ with tempfile.TemporaryDirectory(prefix='cks-progress-negative-') as tmp:
+  path=pathlib.Path(tmp)/'progress.json';path.write_text(json.dumps(ledger))
+  command=['python3','scripts/check-refactoring-progress.py','--ledger',str(path)]
+  result=subprocess.run(command,capture_output=True,text=True,timeout=30)
+  assert result.returncode==1,(name,result.stdout,result.stderr)
+  output=result.stdout+result.stderr
+  (folder/(name+'.log')).write_text(output)
+  report.append({'case':name,'expected_exit':1,'actual_exit':result.returncode,'output':output})
+  print(name,'correctly rejected',flush=True)
+(folder/'negative-controls.json').write_text(json.dumps(report,indent=2)+'\n')
+print('progress guard negative controls PASS',flush=True)

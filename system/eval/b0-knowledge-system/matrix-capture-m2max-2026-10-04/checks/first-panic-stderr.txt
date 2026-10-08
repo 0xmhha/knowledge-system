@@ -1,0 +1,20 @@
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x0 pc=0x1049a94bc]
+
+goroutine 1 [running]:
+github.com/0xmhha/knowledge-system/internal/system/eval.(*Runner).Capture(0x0, {0x1053a33f0, 0x6964661a82a0}, {{0x6964665a6138, 0x5}, {0x6964665a8040, 0x1b}, 0x6964662a5170})
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/system/eval/capture.go:79 +0x19c
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.matrixRunWithInputs({0x1053a3498, 0x6964666b2340}, {0x16bb3a2e7, 0x2d}, {0x16bb3a31e, 0x3a}, {0x16bb3a363, 0x2b}, {0x16bb3a398, 0x2c}, ...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix.go:433 +0x1c90
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.matrixRun(...)
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix.go:228
+github.com/0xmhha/knowledge-system/cmd/cks/evalcli.newMatrixCmd.func1(0x69646674e500?, {0x69646676c120?, 0x4?, 0x104b6a0f5?})
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/evalcli/matrix.go:91 +0x16c
+github.com/spf13/cobra.(*Command).execute(0x69646674d508, {0x69646676c000, 0x12, 0x12})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1015 +0x814
+github.com/spf13/cobra.(*Command).ExecuteC(0x69646658a908)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1148 +0x350
+github.com/spf13/cobra.(*Command).Execute(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1071
+main.main()
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/main.go:68 +0x2c4

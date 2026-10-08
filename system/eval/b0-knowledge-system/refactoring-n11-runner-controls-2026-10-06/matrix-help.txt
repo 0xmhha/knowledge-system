@@ -1,0 +1,20 @@
+Capture eight sequential ablation arms with rotating order and pinned inputs
+
+Usage:
+  cks eval matrix [flags]
+
+Flags:
+      --call-timeout duration       initialize and per-call deadline (default 1m30s)
+      --cks-mcp string              server binary (default: this executable)
+      --cold-runs int               fresh-process repetitions per request/arm; model stays resident (default 3)
+      --config string               one base MCP configuration for all arms
+      --environment-ledger          record host/model before and after; privately copy --lock-file inputs (max 8 MiB each)
+      --environment-note string     operator's workload note (recorded as an unverified statement)
+      --evaluation-binding string   frozen dataset/source/config/binary/model pins; requires environment ledger (not human approval)
+  -h, --help                        help for matrix
+      --lock-file strings           additional immutable input files to hash before and after
+      --output string               new private output directory; existing paths are refused
+      --requests string             request-only v2 JSON; include_knowledge is set by the matrix
+      --retrieval-runs int          retrieval repetitions per request/arm (default 5)
+      --warm-runs int               warm latency repetitions per request/arm (default 20)
+      --warmup int                  warmup repetitions per request/arm (default 2)

@@ -1,0 +1,44 @@
+import json,hashlib,shutil,subprocess,tarfile,zipfile,collections,datetime
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-original-native-20261005');CACHE=Path('/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod');sha=lambda b:hashlib.sha256(b).hexdigest();read=lambda p:json.loads(p.read_bytes())
+s=read(R/'summary.json');mi=read(R/'module-inputs.json');hr=read(R/'header-replay.json');assert hr['observed_checks']==hr['planned_checks']==6
+for x in mi['files']:
+ p=CACHE/(x['module']+'@'+x['version'])/x['path'];raw=p.read_bytes();assert len(raw)==x['bytes'] and sha(raw)==x['sha256']
+for x in read(R/'fetch-results.json'):assert sha((R/x['name']).read_bytes())==x['sha256']
+with zipfile.ZipFile(R/'sqlite-amalgamation.zip') as z:
+ x=read(R/'sqlite-original-binding.json')
+ for f in x['original_files']:
+  raw=z.read('sqlite-amalgamation-3530300/'+f['path']);assert len(raw)==f['bytes'] and sha(raw)==f['sha256']
+with tarfile.open(R/'musl-source.tar.gz') as t:
+ x=read(R/'musl-original-inventory.json')
+ for f in x['source_and_headers']:
+  raw=t.extractfile('musl-'+x['commit']+'/'+f['path']).read();assert len(raw)==f['bytes'] and sha(raw)==f['sha256']
+# Final replay results independently match module bytes and preserved output bytes.
+for x in hr['rows']:
+ arch=x['target'].split('/')[1];name=x['header'].split('/')[1]
+ raw=(CACHE/'modernc.org/libc@v1.74.1/include'/x['target']/x['header']).read_bytes();assert sha(raw)==x['module_sha256']
+ if x['kind']=='upstream_generator_replayed':assert raw==(R/'header-replay-inputs-retry1'/(arch+'-'+name)).read_bytes()
+ else:assert raw==(CACHE/'modernc.org/libc@v1.74.1'/x['module_overlay_path']).read_bytes()
+# Approval inputs still match committed actual records.
+previous=read(ROOT/'system/eval/b0-knowledge-system/neighbor-binding-m2max-2026-10-05/summary.json');inputs=previous['human_inputs_unchanged']
+for n,h in inputs.items():assert sha((ROOT/n).read_bytes())==h and subprocess.check_output(['git','show','HEAD:'+n])==(ROOT/n).read_bytes()
+s['human_inputs_unchanged']=inputs;s['final_inventory_replay_verified']=True;s['final_recorded_at_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();(R/'summary.json').write_text(json.dumps(s,indent=2)+'\n')
+OUT=ROOT/'system/eval/b0-knowledge-system/original-native-origin-m2max-2026-10-06';OUT.mkdir(exist_ok=False)
+for p in sorted(R.glob('*.json')):shutil.copyfile(p,OUT/p.name)
+# Preserve generated-header inputs/outputs and the first partial helper outputs as inert text, not build inputs.
+for folder in ['header-replay-inputs','header-replay-inputs-retry1']:
+ for p in sorted((R/folder).iterdir()):
+  if p.is_file():shutil.copyfile(p,OUT/(folder+'__'+p.name+'.txt'))
+for p in [Path('/private/tmp/ks-original-native-fetch-20261005.py'),Path('/private/tmp/ks-original-native-audit-20261006.py'),Path('/private/tmp/ks-original-native-header-replay-20261006.py'),Path('/private/tmp/ks-original-native-assemble-20261006.py')]:shutil.copyfile(p,OUT/(p.name+'.txt'))
+# Narrow recipe/supplier notice snapshots were byte-bound to ZIP in the audit; do not archive giant generated Go or C sources.
+bindings={}
+for m,names in [('modernc.org/libc',['LICENSE','LICENSE-3RD-PARTY.md','builder.json','generator.go','genheaders.go','generate.go','internal/archive/archive.go','internal/overlay/musl/arch/aarch64/bits/float.h','internal/overlay/musl/arch/x86_64/bits/float.h']),('modernc.org/sqlite',['LICENSE','SQLITE-LICENSE','builder.json','Makefile'])]:
+ v='v1.74.1' if m.endswith('libc') else 'v1.54.0'
+ for n in names:
+  p=CACHE/(m+'@'+v)/n;name=(m+'__'+n).replace('/','__')+'.txt';shutil.copyfile(p,OUT/name);bindings[m+'@'+v+'/'+n]={'snapshot':str((OUT/name).relative_to(ROOT)),'sha256':sha(p.read_bytes())}
+with tarfile.open(R/'musl-source.tar.gz') as t:
+ raw=t.extractfile('musl-7ada6dde6f9dc6a2836c3d92c2f762d35fd229e0/COPYRIGHT').read();(OUT/'musl-upstream-COPYRIGHT.txt').write_bytes(raw)
+(OUT/'supplier-snapshot-bindings.json').write_text(json.dumps(bindings,indent=2)+'\n')
+entries=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(OUT.iterdir()) if p.is_file()]
+(OUT/'evidence-manifest.json').write_text(json.dumps({'scope':'partial original native origin audit; no archive/DB/binary/model/key; source inventories and inert recipe/notice/header text; legal and release pending','files':entries},indent=2)+'\n')
+print(json.dumps({'artifact':str(OUT),'manifest_files':len(entries),'source_inputs':501,'header_origin_classified':436,'generated_replays':4,'overlay_matches':2,'official_verdict':None}))

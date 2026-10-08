@@ -37,6 +37,7 @@ func newParsers() map[string]cparse.Parser {
 func newChunker(emb types.Embedder, cfg *projectcfg.Config) *chunk.Chunker {
 	opts := chunk.Options{
 		MaxInputTokens: emb.MaxInputTokens(),
+		MaxTextBytes:   emb.Identity().ChunkBudgetBytes,
 	}
 	if cfg != nil && cfg.Chunking.FileHeaderLines > 0 {
 		opts.FileHeaderLines = cfg.Chunking.FileHeaderLines

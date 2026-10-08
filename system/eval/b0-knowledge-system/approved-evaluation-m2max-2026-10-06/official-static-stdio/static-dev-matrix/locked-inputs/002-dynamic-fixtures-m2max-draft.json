@@ -1,0 +1,909 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "created_at": "2026-10-03T10:47:33.087811+00:00",
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "model_candidate": "bge-m3:latest",
+  "fixtures": [
+    {
+      "id": "F-01-DEV",
+      "family": "F-01",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Where is the gas refund route implemented?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "src/refund00.go": "package refund\n\n// RefundRoute00 returns the documented gas refund marker.\nfunc RefundRoute00() string { return \"DEV-refund-00\" }\n",
+        "src/refund01.go": "package refund\n\n// RefundRoute01 returns the documented gas refund marker.\nfunc RefundRoute01() string { return \"DEV-refund-01\" }\n",
+        "src/refund02.go": "package refund\n\n// RefundRoute02 returns the documented gas refund marker.\nfunc RefundRoute02() string { return \"DEV-refund-02\" }\n",
+        "src/refund03.go": "package refund\n\n// RefundRoute03 returns the documented gas refund marker.\nfunc RefundRoute03() string { return \"DEV-refund-03\" }\n",
+        "src/refund04.go": "package refund\n\n// RefundRoute04 returns the documented gas refund marker.\nfunc RefundRoute04() string { return \"DEV-refund-04\" }\n",
+        "src/distractor/refund05.go": "package refund\n\n// RefundRoute05 returns the documented gas refund marker.\nfunc RefundRoute05() string { return \"DEV-refund-05\" }\n",
+        "src/distractor/refund06.go": "package refund\n\n// RefundRoute06 returns the documented gas refund marker.\nfunc RefundRoute06() string { return \"DEV-refund-06\" }\n",
+        "src/distractor/refund07.go": "package refund\n\n// RefundRoute07 returns the documented gas refund marker.\nfunc RefundRoute07() string { return \"DEV-refund-07\" }\n",
+        "src/distractor/refund08.go": "package refund\n\n// RefundRoute08 returns the documented gas refund marker.\nfunc RefundRoute08() string { return \"DEV-refund-08\" }\n",
+        "src/distractor/refund09.go": "package refund\n\n// RefundRoute09 returns the documented gas refund marker.\nfunc RefundRoute09() string { return \"DEV-refund-09\" }\n",
+        "src/distractor/refund10.go": "package refund\n\n// RefundRoute10 returns the documented gas refund marker.\nfunc RefundRoute10() string { return \"DEV-refund-10\" }\n",
+        "src/distractor/refund11.go": "package refund\n\n// RefundRoute11 returns the documented gas refund marker.\nfunc RefundRoute11() string { return \"DEV-refund-11\" }\n",
+        "src/distractor/refund12.go": "package refund\n\n// RefundRoute12 returns the documented gas refund marker.\nfunc RefundRoute12() string { return \"DEV-refund-12\" }\n",
+        "src/distractor/refund13.go": "package refund\n\n// RefundRoute13 returns the documented gas refund marker.\nfunc RefundRoute13() string { return \"DEV-refund-13\" }\n",
+        "src/distractor/refund14.go": "package refund\n\n// RefundRoute14 returns the documented gas refund marker.\nfunc RefundRoute14() string { return \"DEV-refund-14\" }\n",
+        "src/distractor/refund15.go": "package refund\n\n// RefundRoute15 returns the documented gas refund marker.\nfunc RefundRoute15() string { return \"DEV-refund-15\" }\n",
+        "src/distractor/refund16.go": "package refund\n\n// RefundRoute16 returns the documented gas refund marker.\nfunc RefundRoute16() string { return \"DEV-refund-16\" }\n",
+        "src/distractor/refund17.go": "package refund\n\n// RefundRoute17 returns the documented gas refund marker.\nfunc RefundRoute17() string { return \"DEV-refund-17\" }\n",
+        "src/distractor/refund18.go": "package refund\n\n// RefundRoute18 returns the documented gas refund marker.\nfunc RefundRoute18() string { return \"DEV-refund-18\" }\n",
+        "src/distractor/refund19.go": "package refund\n\n// RefundRoute19 returns the documented gas refund marker.\nfunc RefundRoute19() string { return \"DEV-refund-19\" }\n",
+        "src/distractor/refund20.go": "package refund\n\n// RefundRoute20 returns the documented gas refund marker.\nfunc RefundRoute20() string { return \"DEV-refund-20\" }\n",
+        "src/distractor/refund21.go": "package refund\n\n// RefundRoute21 returns the documented gas refund marker.\nfunc RefundRoute21() string { return \"DEV-refund-21\" }\n",
+        "src/distractor/refund22.go": "package refund\n\n// RefundRoute22 returns the documented gas refund marker.\nfunc RefundRoute22() string { return \"DEV-refund-22\" }\n",
+        "src/distractor/refund23.go": "package refund\n\n// RefundRoute23 returns the documented gas refund marker.\nfunc RefundRoute23() string { return \"DEV-refund-23\" }\n",
+        "src/distractor/refund24.go": "package refund\n\n// RefundRoute24 returns the documented gas refund marker.\nfunc RefundRoute24() string { return \"DEV-refund-24\" }\n",
+        "src/distractor/refund25.go": "package refund\n\n// RefundRoute25 returns the documented gas refund marker.\nfunc RefundRoute25() string { return \"DEV-refund-25\" }\n",
+        "src/distractor/refund26.go": "package refund\n\n// RefundRoute26 returns the documented gas refund marker.\nfunc RefundRoute26() string { return \"DEV-refund-26\" }\n",
+        "src/distractor/refund27.go": "package refund\n\n// RefundRoute27 returns the documented gas refund marker.\nfunc RefundRoute27() string { return \"DEV-refund-27\" }\n",
+        "src/distractor/refund28.go": "package refund\n\n// RefundRoute28 returns the documented gas refund marker.\nfunc RefundRoute28() string { return \"DEV-refund-28\" }\n",
+        "src/distractor/refund29.go": "package refund\n\n// RefundRoute29 returns the documented gas refund marker.\nfunc RefundRoute29() string { return \"DEV-refund-29\" }\n",
+        "src/distractor/refund30.go": "package refund\n\n// RefundRoute30 returns the documented gas refund marker.\nfunc RefundRoute30() string { return \"DEV-refund-30\" }\n",
+        "src/distractor/refund31.go": "package refund\n\n// RefundRoute31 returns the documented gas refund marker.\nfunc RefundRoute31() string { return \"DEV-refund-31\" }\n",
+        "src/distractor/refund32.go": "package refund\n\n// RefundRoute32 returns the documented gas refund marker.\nfunc RefundRoute32() string { return \"DEV-refund-32\" }\n",
+        "src/distractor/refund33.go": "package refund\n\n// RefundRoute33 returns the documented gas refund marker.\nfunc RefundRoute33() string { return \"DEV-refund-33\" }\n",
+        "src/distractor/refund34.go": "package refund\n\n// RefundRoute34 returns the documented gas refund marker.\nfunc RefundRoute34() string { return \"DEV-refund-34\" }\n",
+        "src/distractor/refund35.go": "package refund\n\n// RefundRoute35 returns the documented gas refund marker.\nfunc RefundRoute35() string { return \"DEV-refund-35\" }\n",
+        "src/distractor/refund36.go": "package refund\n\n// RefundRoute36 returns the documented gas refund marker.\nfunc RefundRoute36() string { return \"DEV-refund-36\" }\n",
+        "src/distractor/refund37.go": "package refund\n\n// RefundRoute37 returns the documented gas refund marker.\nfunc RefundRoute37() string { return \"DEV-refund-37\" }\n",
+        "src/distractor/refund38.go": "package refund\n\n// RefundRoute38 returns the documented gas refund marker.\nfunc RefundRoute38() string { return \"DEV-refund-38\" }\n",
+        "src/distractor/refund39.go": "package refund\n\n// RefundRoute39 returns the documented gas refund marker.\nfunc RefundRoute39() string { return \"DEV-refund-39\" }\n",
+        "src/distractor/refund40.go": "package refund\n\n// RefundRoute40 returns the documented gas refund marker.\nfunc RefundRoute40() string { return \"DEV-refund-40\" }\n",
+        "src/distractor/refund41.go": "package refund\n\n// RefundRoute41 returns the documented gas refund marker.\nfunc RefundRoute41() string { return \"DEV-refund-41\" }\n",
+        "src/distractor/refund42.go": "package refund\n\n// RefundRoute42 returns the documented gas refund marker.\nfunc RefundRoute42() string { return \"DEV-refund-42\" }\n",
+        "src/distractor/refund43.go": "package refund\n\n// RefundRoute43 returns the documented gas refund marker.\nfunc RefundRoute43() string { return \"DEV-refund-43\" }\n",
+        "src/distractor/refund44.go": "package refund\n\n// RefundRoute44 returns the documented gas refund marker.\nfunc RefundRoute44() string { return \"DEV-refund-44\" }\n",
+        "src/distractor/refund45.go": "package refund\n\n// RefundRoute45 returns the documented gas refund marker.\nfunc RefundRoute45() string { return \"DEV-refund-45\" }\n",
+        "src/distractor/refund46.go": "package refund\n\n// RefundRoute46 returns the documented gas refund marker.\nfunc RefundRoute46() string { return \"DEV-refund-46\" }\n",
+        "src/distractor/refund47.go": "package refund\n\n// RefundRoute47 returns the documented gas refund marker.\nfunc RefundRoute47() string { return \"DEV-refund-47\" }\n",
+        "src/distractor/refund48.go": "package refund\n\n// RefundRoute48 returns the documented gas refund marker.\nfunc RefundRoute48() string { return \"DEV-refund-48\" }\n",
+        "src/distractor/refund49.go": "package refund\n\n// RefundRoute49 returns the documented gas refund marker.\nfunc RefundRoute49() string { return \"DEV-refund-49\" }\n",
+        "src/distractor/refund50.go": "package refund\n\n// RefundRoute50 returns the documented gas refund marker.\nfunc RefundRoute50() string { return \"DEV-refund-50\" }\n",
+        "src/distractor/refund51.go": "package refund\n\n// RefundRoute51 returns the documented gas refund marker.\nfunc RefundRoute51() string { return \"DEV-refund-51\" }\n",
+        "src/distractor/refund52.go": "package refund\n\n// RefundRoute52 returns the documented gas refund marker.\nfunc RefundRoute52() string { return \"DEV-refund-52\" }\n",
+        "src/distractor/refund53.go": "package refund\n\n// RefundRoute53 returns the documented gas refund marker.\nfunc RefundRoute53() string { return \"DEV-refund-53\" }\n",
+        "src/distractor/refund54.go": "package refund\n\n// RefundRoute54 returns the documented gas refund marker.\nfunc RefundRoute54() string { return \"DEV-refund-54\" }\n",
+        "src/distractor/refund55.go": "package refund\n\n// RefundRoute55 returns the documented gas refund marker.\nfunc RefundRoute55() string { return \"DEV-refund-55\" }\n",
+        "src/distractor/refund56.go": "package refund\n\n// RefundRoute56 returns the documented gas refund marker.\nfunc RefundRoute56() string { return \"DEV-refund-56\" }\n",
+        "src/distractor/refund57.go": "package refund\n\n// RefundRoute57 returns the documented gas refund marker.\nfunc RefundRoute57() string { return \"DEV-refund-57\" }\n",
+        "src/distractor/refund58.go": "package refund\n\n// RefundRoute58 returns the documented gas refund marker.\nfunc RefundRoute58() string { return \"DEV-refund-58\" }\n",
+        "src/distractor/refund59.go": "package refund\n\n// RefundRoute59 returns the documented gas refund marker.\nfunc RefundRoute59() string { return \"DEV-refund-59\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "src/refund00.go": "d8527ad2f8a535e536c50173f064f3b378c1650cc67937c21856a9c9ce72f6ce",
+        "src/refund01.go": "dbcb2182c8055f363bc3238e15779b5d66f52d3c8f2fe7d1321ec3df69fcb7be",
+        "src/refund02.go": "0a00c86593ef2d811ce349eab63387196fa12971df487a6a98c03b262937d438",
+        "src/refund03.go": "172542bf150f0fd683ee06528c83fb19cecf87c7eb8737fd899ad5c16e5bc841",
+        "src/refund04.go": "92687fbb987c47748b4c9e756aeb8f6fe9f9608b43cab64ccfc1a4d70baa17df",
+        "src/distractor/refund05.go": "f42e7b45ece6e1bb5dbbd96d284134f96e76babbb11ad75364b3188b1b5bae75",
+        "src/distractor/refund06.go": "93427b759a376cfa7bb6773c2b33e02b73a4ad94b5e681f246859de6c51899ea",
+        "src/distractor/refund07.go": "e2006f36dc61efe750564d6f25ed07d3e39d0c88d880422f0b09dbd7e53abc41",
+        "src/distractor/refund08.go": "85a5f8a8a53d961c9d845491c19734d8a8d0d44804801d56f5ffd9db65f316ac",
+        "src/distractor/refund09.go": "a22858774dd482dfd55263dd4b227af05eadd29b1f1178875ea94430d6489b75",
+        "src/distractor/refund10.go": "b85a4ded7b6c6feafc4f5b0813e18e631a860c985b25edc115c1f1d4681c98b4",
+        "src/distractor/refund11.go": "47d344a3233e111aa925ff42fb9021d4a9819ca24d81618de8a16a91fe348a1a",
+        "src/distractor/refund12.go": "ae87b66b6742883475dc7d0be45a0c6f6051302b262c71138f8205fb400e4a59",
+        "src/distractor/refund13.go": "9591edb4210114196baef93736819e6fb7962e8ef5964fb385fb46435c99e19a",
+        "src/distractor/refund14.go": "7a435a4171a77ab7540ba75b75d5c6cf4385840c702f1b5232def23e18205ab7",
+        "src/distractor/refund15.go": "253916a251098682be856788ba251c7635e0ecd31f2f718dd46a90d094bd505b",
+        "src/distractor/refund16.go": "76da6a5f2c8dae7f2573f008d60d997d46c998ff16cc3c997fc015409e1c16cc",
+        "src/distractor/refund17.go": "5d997d8101a72b4a77dc139043fcb13d2ff90f05a9496f7467a5fd74e0808543",
+        "src/distractor/refund18.go": "89d1c990bbd494bb92e3fdd9e310e5b7632caffee1c4a79de6ef5494a6f27941",
+        "src/distractor/refund19.go": "124642d51d47b7c772bf1e39b303cc530cedca26bd801d15619a672429a2844c",
+        "src/distractor/refund20.go": "6f80e6ad35e5ffa62a3891c0fd9703386abf9d75cc764ce55b1a15866d65de3c",
+        "src/distractor/refund21.go": "d400e18d0c99b9ad13edc0607ab1e724b2d3b0efe72ce8312ec96f7fe0afb25a",
+        "src/distractor/refund22.go": "c15ef11c7db09120c927e8416dbd837ed79c2d7b5dcaddd3a4e47950d548e7f2",
+        "src/distractor/refund23.go": "a472998c05a8867c328e48d4a3d9ad439e1ced4915dc98f5eff188905c9764b4",
+        "src/distractor/refund24.go": "8e9e6b7b786b77bc897c831afea349545a6f89ec6566a3ab687715bb2dfe36ce",
+        "src/distractor/refund25.go": "676de2830654d795b7e757a9d6685c963606f90e65ca1546fb190b33c92bc56a",
+        "src/distractor/refund26.go": "ad6e90585f64b347a1630b795f0deabdf9fef639e2274a10d8d0b02686a0bb83",
+        "src/distractor/refund27.go": "bc20a991608c62eb1236e4c05ae0778a8c6219c1c769253eb22c724a62163d4f",
+        "src/distractor/refund28.go": "90abec222f99d223e02e76af6583898ad049f6e7bcbd8ac93b3cf86e08df148c",
+        "src/distractor/refund29.go": "779d6784ca90efd14badab9b90fba072bbd114f6abe7d91e4f50a33040ef4371",
+        "src/distractor/refund30.go": "968f8c8aa7da90fd2242ff515bd2cb15f268dc021bd7ab066d8a1426f92dc641",
+        "src/distractor/refund31.go": "3c08a578636bcdeb43c06f2ad251a545876e1a5e669f2e4f8e5fd84985d102fd",
+        "src/distractor/refund32.go": "938a0ec7cc10e6e379303247cc0c8eb3d7330c0d6953aaf1515d311dd8813d0b",
+        "src/distractor/refund33.go": "0a881a51e4fe1cc085fa6a22455d0d5f0cdca9076ad8c78c4d3fbdcca80df159",
+        "src/distractor/refund34.go": "8f0b4d2061910109c3e94903ede2692f0c9fa66d277b2be0b7807bfb3a8144f4",
+        "src/distractor/refund35.go": "d4fd28a22bccdd273c4a236a29899e955941d2bd678d05888142ad18c481dbb5",
+        "src/distractor/refund36.go": "2ee2d7dab56e4f7d7ec1c4f59dba4fb74c5422cfc3b7ed6748bdda5ee8696524",
+        "src/distractor/refund37.go": "7b2d338d30213b9e958f8fa574b3dfd2c5e6b6ca83c8ff03132f9bf5e64bccee",
+        "src/distractor/refund38.go": "e6c2937b13fdfdfd5ca10af33da57872133c059cf0e33038fe38af640743dfdb",
+        "src/distractor/refund39.go": "bcbfabf1e611e35f50e6fe01ede1cd6dca0e18179df5e75bb1ab41a2d632b5fd",
+        "src/distractor/refund40.go": "60d996194e830010b350de83c1d918681feb70d62fb5bd099c8037b2f5a34296",
+        "src/distractor/refund41.go": "fc96be09b878098affed5133a635b02cf273b9c4eaf943043be954d948215ec9",
+        "src/distractor/refund42.go": "ddd61ca769d76bd1c261cb85e12b27465664eb348230ec8450869c7e842af937",
+        "src/distractor/refund43.go": "76464acf181f51586442d88b3d0426c641660663817032123df5bc2acfceffd9",
+        "src/distractor/refund44.go": "6935f659952192df220a3ae30b7c5f34fc1d47023870a24db96f40711120ce08",
+        "src/distractor/refund45.go": "a5039692ab4ec7647fbba3023ec84750203172994f15d4859e24c94a147a83a3",
+        "src/distractor/refund46.go": "b38acdb09b1d773cfff450f309817bd92afcc0fe8de80e7b6caddf2f696b4956",
+        "src/distractor/refund47.go": "a0fc88a03b977aeac10ec82d721a7b5a67bb020e399a6bd8889689bb393f5edb",
+        "src/distractor/refund48.go": "c8abd5598880654d268a56f563d43c37369ff1aff204e34fa78a9e8a44c60d0e",
+        "src/distractor/refund49.go": "d132c7f2c815238ebf51bec125fda24beea241c87682c121e315066d4015ecb2",
+        "src/distractor/refund50.go": "4aa97237af3fb4f9111e3250b6b899fd371061d114081630d6040f36d7e5b648",
+        "src/distractor/refund51.go": "7d5b47b0e8c57aa42f0788de3c736b59e96f6b966a3f228de28b6fff754574df",
+        "src/distractor/refund52.go": "2ac145b19793254e6831ae3011509acc34d1fc0acf4df21cea8b5c409f0e245e",
+        "src/distractor/refund53.go": "f4822d3e2a8058ce3d8ad75ccac91e63faac4a71ae44aeca03803babf9703381",
+        "src/distractor/refund54.go": "c2260b19afd019cd832a694689fe903e1bc3a92e2d28910d84d51c1504b16b93",
+        "src/distractor/refund55.go": "63cd751bcbd200e9e9ca97ed065a16583a3665c5540260db2d84c05732163d34",
+        "src/distractor/refund56.go": "d70748cf2a38a6ab77835a84ea75918c5484f5900b64eeeda6581c6562fb6596",
+        "src/distractor/refund57.go": "d4103544a6595f987ea420806d3db396cb8eedede1f2a634ac617ed5ad53e3d5",
+        "src/distractor/refund58.go": "e56dddcae586d656cda0e6b3bf8b25b35a1a08ac18b6e08b4520ea6e3a588d1b",
+        "src/distractor/refund59.go": "00409c39d74503e55e914011d77e62fbe43a39f6f2830eea1ed30177382f4e04"
+      },
+      "expected": {
+        "eligible_files": [
+          "src/refund00.go",
+          "src/refund01.go",
+          "src/refund02.go",
+          "src/refund03.go",
+          "src/refund04.go"
+        ],
+        "lines": [
+          3,
+          4
+        ],
+        "complete_hit_count": 5,
+        "candidate_limit_subcase": {
+          "max_exact_candidates": 2,
+          "status": "incomplete",
+          "reason": "candidate_limit"
+        },
+        "qualification": "Unfiltered top-5 must omit at least one eligible target. If this condition fails, report fixture_not_qualified; do not change the source after observing scores."
+      },
+      "k": 5,
+      "filters": {
+        "language": "go",
+        "path": "src/*.go",
+        "symbol_kinds": [
+          "Function"
+        ],
+        "chunk_kinds": [
+          "symbol"
+        ],
+        "exclude_tests": true
+      },
+      "synthetic": true,
+      "runner_requirements": [
+        "Direct SearchDetailed budget subcase: MaxExactCandidates is not a ckv CLI option.",
+        "Embed identical fixed source texts with the selected model; compare filtered ranking against exact distances of those same real vectors."
+      ]
+    },
+    {
+      "id": "F-02-DEV",
+      "family": "F-02",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "How many reviewers are required by the final refund approval quorum?"
+        },
+        {
+          "language": "ko",
+          "prompt": "문서 마지막에 정의된 환급 승인 정족수는 몇 명인가요?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "docs/decision.md": "# Refund decision\n\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe final refund approval quorum is seven reviewers (DEV_QUORUM_TAIL).\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "docs/decision.md": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f"
+      },
+      "expected": {
+        "citations": [
+          {
+            "path": "docs/decision.md",
+            "start_line": 203,
+            "end_line": 203
+          }
+        ],
+        "answer": "seven reviewers",
+        "parent_span": [
+          1,
+          203
+        ],
+        "parent_id_required": true,
+        "reassembled_children_equal_source": true,
+        "truncation_count": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true
+    },
+    {
+      "id": "F-03-DEV",
+      "family": "F-03",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "project"
+        },
+        {
+          "language": "ko",
+          "prompt": "프로젝트"
+        },
+        {
+          "language": "en",
+          "prompt": "xyzzy dev unseen wording"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "ontology.yaml": "# W3.1 pilot vocabulary for the knowledge-system architecture.\n# D1 approved the vocabulary design; individual source-backed concepts and\n# relationships remain proposed until their projection is reviewed.\nversion: 1\nproject_id: b0-f03-dev\ndomain: source-code knowledge systems\ncompetency_questions:\n  - Which source snapshot produced this citation and its vector chunk?\n  - Which code symbol implements a requirement, and which test verifies it?\n  - Is a claim supported by the same snapshot as the retrieved code?\n  - Which two reviewed claims contradict each other?\n  - What evidence is missing before an implementation relation can be verified?\n  - Which concepts match an ambiguous Korean or English query term?\nconcepts:\n  - id: project\n    kind: entity\n    definition: A named isolation boundary for source, indexes, reviews, and queries.\n    includes: [Project identity, project-specific policies]\n    excludes: [A Git checkout, one dataset version]\n    terms: [{lang: en, value: project, preferred: true}, {lang: ko, value: 프로젝트, preferred: true}]\n    status: proposed\n  - id: dataset\n    kind: artifact\n    definition: One immutable coordinated build of graph, vector, and optional semantic projections.\n    includes: [Build identity, index manifests]\n    excludes: [The mutable active pointer, source repository]\n    terms: [{lang: en, value: project, preferred: true}, {lang: ko, value: 프로젝트, preferred: true}]\n    status: proposed\n  - id: source-snapshot\n    kind: artifact\n    definition: A captured and identified set of source bytes and policies to which all evidence in a dataset refers.\n    includes: [Committed Git source, captured working-tree source, captured non-Git source]\n    excludes: [A Git commit alone when working-tree bytes differ, an uncaptured editor buffer]\n    terms: [{lang: en, value: source snapshot, preferred: true}, {lang: ko, value: 소스 스냅샷, preferred: true}]\n    status: proposed\n  - id: source-file\n    kind: artifact\n    definition: A source document or code file addressed relative to one source snapshot.\n    includes: [Captured code, captured Markdown]\n    excludes: [Historical hunk path counted as a current file]\n    terms: [{lang: en, value: source file, preferred: true}, {lang: ko, value: 소스 파일, preferred: true}]\n    status: proposed\n  - id: code-symbol\n    kind: entity\n    definition: A language parser's named code construct with a source range and stable join identity.\n    includes: [Function, type, method]\n    excludes: [A vector chunk without a verified AST anchor]\n    terms: [{lang: en, value: code symbol, preferred: true}, {lang: ko, value: 코드 심볼, preferred: true}]\n    status: proposed\n  - id: vector-chunk\n    kind: artifact\n    definition: A bounded source span represented by an embedding and searchable metadata.\n    includes: [Code chunk, document child chunk]\n    excludes: [A semantic fact proven only by similarity]\n    terms: [{lang: en, value: vector chunk, preferred: true}, {lang: ko, value: 벡터 청크, preferred: true}]\n    status: proposed\n  - id: document-section\n    kind: artifact\n    definition: A heading-scoped span of a source document with exact source lines.\n    includes: [Markdown section, specification section]\n    excludes: [A fabricated summary without source lines]\n    terms: [{lang: en, value: document section, preferred: true}, {lang: ko, value: 문서 절, preferred: true}]\n    status: proposed\n  - id: claim\n    kind: entity\n    definition: A reviewable statement about the project that cites a source section.\n    includes: [Proposed assertion text, reviewed statement]\n    excludes: [A heading alone, ungrounded model output]\n    terms: [{lang: en, value: claim, preferred: true}, {lang: ko, value: 주장, preferred: true}]\n    status: proposed\n  - id: evidence-span\n    kind: artifact\n    definition: An origin, relative path, line range, file digest, and range digest tied to one source snapshot.\n    includes: [Document lines, code lines, test lines]\n    excludes: [A similarity score without retrievable source]\n    terms: [{lang: en, value: evidence span, preferred: true}, {lang: ko, value: 근거 범위, preferred: true}]\n    status: proposed\n  - id: semantic-assertion\n    kind: entity\n    definition: A typed and directed relationship between two identified objects with separate evidence and review state.\n    includes: [SUPPORTS relation, CONTRADICTS relation]\n    excludes: [An untyped graph edge treated as proven meaning]\n    terms: [{lang: en, value: semantic assertion, preferred: true}, {lang: ko, value: 의미 관계, preferred: true}]\n    status: proposed\n  - id: concept\n    kind: entity\n    definition: A stable domain meaning with a definition, scope, aliases, and review status.\n    includes: [Project vocabulary entry, versioned meaning]\n    excludes: [One query token, an AST node type]\n    terms: [{lang: en, value: concept, preferred: true}, {lang: ko, value: 개념, preferred: true}]\n    status: proposed\n  - id: term\n    kind: artifact\n    definition: A language-specific preferred or alternative expression for a concept.\n    includes: [English name, Korean alias]\n    excludes: [The concept's complete definition]\n    terms: [{lang: en, value: term, preferred: true}, {lang: ko, value: 용어, preferred: true}]\n    status: proposed\n  - id: requirement\n    kind: rule\n    definition: A versioned statement of intended system behavior independent of implementation.\n    includes: [Functional requirement, nonfunctional constraint]\n    excludes: [A claim that current code already satisfies it]\n    terms: [{lang: en, value: requirement, preferred: true}, {lang: ko, value: 요구사항, preferred: true}]\n    status: proposed\n  - id: acceptance-criterion\n    kind: rule\n    definition: A checkable condition for accepting one requirement at a named snapshot.\n    includes: [Expected observation, threshold]\n    excludes: [A test result without its execution context]\n    terms: [{lang: en, value: acceptance criterion, preferred: true}, {lang: ko, value: 수용 기준, preferred: true}]\n    status: proposed\n  - id: test-case\n    kind: artifact\n    definition: A repeatable input and expected observation used to verify behavior.\n    includes: [Unit test, integration scenario]\n    excludes: [A successful result from an unspecified run]\n    terms: [{lang: en, value: test case, preferred: true}, {lang: ko, value: 테스트 사례, preferred: true}]\n    status: proposed\n  - id: test-run\n    kind: process\n    definition: An execution of tests with recorded command, environment, source snapshot, and outcome.\n    includes: [Execution metadata, pass or failure evidence]\n    excludes: [A test file that has never been run]\n    terms: [{lang: en, value: test run, preferred: true}, {lang: ko, value: 테스트 실행, preferred: true}]\n    status: proposed\n  - id: policy\n    kind: rule\n    definition: A versioned constraint controlling indexing, access, review, or evidence release.\n    includes: [Exclusion rule, sanitization rule]\n    excludes: [A retrieved passage that merely mentions a rule]\n    terms: [{lang: en, value: policy, preferred: true}, {lang: ko, value: 정책, preferred: true}]\n    status: proposed\n  - id: evidence-pack\n    kind: artifact\n    definition: A bounded and sanitized CKS response containing citations, bodies, graph neighbors, and integrity metadata.\n    includes: [Citations, redaction report]\n    excludes: [Unreviewed semantic assertion treated as verified]\n    terms: [{lang: en, value: evidence pack, preferred: true}, {lang: ko, value: 근거 묶음, preferred: true}]\n    status: proposed\n  - id: patch-attempt\n    kind: process\n    definition: An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.\n    includes: [Changed-file digests, base and result snapshots, check reports]\n    excludes: [An unexecuted change plan, promotion of the active dataset]\n    terms: [{lang: en, value: patch attempt, preferred: true}, {lang: ko, value: 변경 시도, preferred: true}]\n    status: proposed\n  - id: criterion-decision\n    kind: process\n    definition: A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.\n    includes: [Approval, rejection, needs-review decision, reviewer and reason]\n    excludes: [A passing test alone, existence of a test link]\n    terms: [{lang: en, value: criterion decision, preferred: true}, {lang: ko, value: 수용 기준 판정, preferred: true}]\n    status: proposed\n",
+        "main.go": "package fixture\n\nfunc ProjectIdentity() string { return \"project boundary\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "ontology.yaml": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a"
+      },
+      "expected": {
+        "ambiguous_concept_ids": [
+          "dataset",
+          "project"
+        ],
+        "unregistered_concept_ids": [],
+        "unique_concept_claims": 0,
+        "baseline_top_k_set_preserved": true,
+        "proposed_concepts_are_not_normative": true
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "runner_requirements": [
+        "Source concepts remain proposed. Any separately reviewed synthetic projection is fixture-scoped and must be bound to its own retained snapshot before relation ablation.",
+        "Baseline, text, relations and combined adapters must be explicit. Current CLI has no switch implementing all four arms."
+      ]
+    },
+    {
+      "id": "F-04-DEV",
+      "family": "F-04",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "What value does Alpha return?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "state-old/main.go": "package fixture\n\nfunc Alpha() string { return \"DEV-old-token\" }\n",
+        "state-new/main.go": "package fixture\n\nfunc Alpha() string { return \"DEV-new-token\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "state-old/main.go": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+        "state-new/main.go": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304"
+      },
+      "expected": {
+        "separate_immutable_datasets": [
+          "old",
+          "new"
+        ],
+        "current_citation": {
+          "path": "main.go",
+          "start_line": 3,
+          "end_line": 3,
+          "state": "new"
+        },
+        "historical_query": {
+          "state": "old",
+          "retained_old_body_available": true
+        },
+        "mixed_v2_coordinates": "snapshot_mismatch",
+        "direct_ckv_old_index_against_new_source": "stale_citation=true",
+        "old_as_current_count": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "materialization": "state-old and state-new are successive commits of the same fixture repo, not nested indexed paths. Freeze commits, trees and source hashes before queries."
+    },
+    {
+      "id": "F-05-DEV",
+      "family": "F-05",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Where is Alpha implemented and which refund limit applies?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "project-a/main.go": "package fixture\n\nfunc Alpha() string { return \"DEV-project-a\" }\n",
+        "project-b/main.go": "package fixture\n\nfunc Alpha() string { return \"DEV-project-b\" }\n",
+        "project-a/docs/policy.md": "# Refund policy A\n\nDEV-project-a requires a refund limit of 10.\n",
+        "project-b/docs/policy.md": "# Refund policy B\n\nDEV-project-b requires a refund limit of 20.\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "project-a/main.go": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "project-b/main.go": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "project-a/docs/policy.md": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "project-b/docs/policy.md": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4"
+      },
+      "expected": {
+        "project_a": {
+          "code": [
+            "main.go",
+            3,
+            3
+          ],
+          "policy": [
+            "docs/policy.md",
+            3,
+            3
+          ],
+          "answer": "limit 10"
+        },
+        "project_b": {
+          "code": [
+            "main.go",
+            3,
+            3
+          ],
+          "policy": [
+            "docs/policy.md",
+            3,
+            3
+          ],
+          "answer": "limit 20"
+        },
+        "cross_project_citations_or_bodies": 0,
+        "mixed_alignment": "snapshot_mismatch"
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "materialization": "Create two independent Git repos with distinct project IDs. The same relative paths are required. Read-only source policies are synthetic data; they are not reviewed organizational facts.",
+      "runner_requirements": [
+        "Create and review fixture-local pack overlays referencing the exact policy spans before the optional policy-pack arm; do not count a Markdown policy document as an activated verified pack."
+      ]
+    },
+    {
+      "id": "F-06-DEV",
+      "family": "F-06",
+      "evaluation_partition": "development",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Does RefundLimit satisfy the documented refund cap, and does TestHealth prove acceptance?"
+        },
+        {
+          "language": "ko",
+          "prompt": "RefundLimit 구현은 명세의 환급 상한을 지키나요? TestHealth 통과가 수용 승인을 증명하나요?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0dev\n\ngo 1.25\n",
+        "README.md": "# Refund requirement\n\nRefundLimit must return a value no greater than 10.\n",
+        "main.go": "package fixture\n\nfunc RefundLimit() int { return 20 }\n",
+        "main_test.go": "package fixture\n\nimport \"testing\"\n\nfunc TestHealth(t *testing.T) { if 1+1 != 2 { t.Fatal(\"health\") } }\n"
+      },
+      "source_sha256": {
+        "go.mod": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54"
+      },
+      "expected": {
+        "required_citations": [
+          {
+            "path": "README.md",
+            "start_line": 3,
+            "end_line": 3
+          },
+          {
+            "path": "main.go",
+            "start_line": 3,
+            "end_line": 3
+          }
+        ],
+        "unrelated_test": {
+          "path": "main_test.go",
+          "start_line": 5,
+          "end_line": 5
+        },
+        "claim_review": "spec requires <=10; implementation returns 20; unrelated test is not acceptance proof",
+        "required_relations": [
+          "Requirement.acceptance_criteria contains the refund criterion",
+          "Requirement.concept_ids references the refund concept",
+          "Concept IMPLEMENTED_BY CodeSymbol with reviewed retained source spans"
+        ],
+        "forbidden_relation": "An unrelated passing TestHealth must not be treated as a reviewed CHECKED_BY proof for the refund criterion.",
+        "automatic_human_approval_claims": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "runner_requirements": [
+        "Resolve exact code canonical IDs through graph build, bind requirement/criterion/trace evidence to retained spans, and obtain actual fixture review before execution.",
+        "Conflict is a claim-level human verdict. Do not assume the current v2 DTO automatically computes arbitrary numeric spec/code conflicts."
+      ]
+    },
+    {
+      "id": "F-01-FINAL",
+      "family": "F-01",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Where is the gas refund route implemented?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "src/refund00.go": "package refund\n\n// RefundRoute00 returns the documented gas refund marker.\nfunc RefundRoute00() string { return \"FINAL-refund-00\" }\n",
+        "src/refund01.go": "package refund\n\n// RefundRoute01 returns the documented gas refund marker.\nfunc RefundRoute01() string { return \"FINAL-refund-01\" }\n",
+        "src/refund02.go": "package refund\n\n// RefundRoute02 returns the documented gas refund marker.\nfunc RefundRoute02() string { return \"FINAL-refund-02\" }\n",
+        "src/refund03.go": "package refund\n\n// RefundRoute03 returns the documented gas refund marker.\nfunc RefundRoute03() string { return \"FINAL-refund-03\" }\n",
+        "src/refund04.go": "package refund\n\n// RefundRoute04 returns the documented gas refund marker.\nfunc RefundRoute04() string { return \"FINAL-refund-04\" }\n",
+        "src/distractor/refund05.go": "package refund\n\n// RefundRoute05 returns the documented gas refund marker.\nfunc RefundRoute05() string { return \"FINAL-refund-05\" }\n",
+        "src/distractor/refund06.go": "package refund\n\n// RefundRoute06 returns the documented gas refund marker.\nfunc RefundRoute06() string { return \"FINAL-refund-06\" }\n",
+        "src/distractor/refund07.go": "package refund\n\n// RefundRoute07 returns the documented gas refund marker.\nfunc RefundRoute07() string { return \"FINAL-refund-07\" }\n",
+        "src/distractor/refund08.go": "package refund\n\n// RefundRoute08 returns the documented gas refund marker.\nfunc RefundRoute08() string { return \"FINAL-refund-08\" }\n",
+        "src/distractor/refund09.go": "package refund\n\n// RefundRoute09 returns the documented gas refund marker.\nfunc RefundRoute09() string { return \"FINAL-refund-09\" }\n",
+        "src/distractor/refund10.go": "package refund\n\n// RefundRoute10 returns the documented gas refund marker.\nfunc RefundRoute10() string { return \"FINAL-refund-10\" }\n",
+        "src/distractor/refund11.go": "package refund\n\n// RefundRoute11 returns the documented gas refund marker.\nfunc RefundRoute11() string { return \"FINAL-refund-11\" }\n",
+        "src/distractor/refund12.go": "package refund\n\n// RefundRoute12 returns the documented gas refund marker.\nfunc RefundRoute12() string { return \"FINAL-refund-12\" }\n",
+        "src/distractor/refund13.go": "package refund\n\n// RefundRoute13 returns the documented gas refund marker.\nfunc RefundRoute13() string { return \"FINAL-refund-13\" }\n",
+        "src/distractor/refund14.go": "package refund\n\n// RefundRoute14 returns the documented gas refund marker.\nfunc RefundRoute14() string { return \"FINAL-refund-14\" }\n",
+        "src/distractor/refund15.go": "package refund\n\n// RefundRoute15 returns the documented gas refund marker.\nfunc RefundRoute15() string { return \"FINAL-refund-15\" }\n",
+        "src/distractor/refund16.go": "package refund\n\n// RefundRoute16 returns the documented gas refund marker.\nfunc RefundRoute16() string { return \"FINAL-refund-16\" }\n",
+        "src/distractor/refund17.go": "package refund\n\n// RefundRoute17 returns the documented gas refund marker.\nfunc RefundRoute17() string { return \"FINAL-refund-17\" }\n",
+        "src/distractor/refund18.go": "package refund\n\n// RefundRoute18 returns the documented gas refund marker.\nfunc RefundRoute18() string { return \"FINAL-refund-18\" }\n",
+        "src/distractor/refund19.go": "package refund\n\n// RefundRoute19 returns the documented gas refund marker.\nfunc RefundRoute19() string { return \"FINAL-refund-19\" }\n",
+        "src/distractor/refund20.go": "package refund\n\n// RefundRoute20 returns the documented gas refund marker.\nfunc RefundRoute20() string { return \"FINAL-refund-20\" }\n",
+        "src/distractor/refund21.go": "package refund\n\n// RefundRoute21 returns the documented gas refund marker.\nfunc RefundRoute21() string { return \"FINAL-refund-21\" }\n",
+        "src/distractor/refund22.go": "package refund\n\n// RefundRoute22 returns the documented gas refund marker.\nfunc RefundRoute22() string { return \"FINAL-refund-22\" }\n",
+        "src/distractor/refund23.go": "package refund\n\n// RefundRoute23 returns the documented gas refund marker.\nfunc RefundRoute23() string { return \"FINAL-refund-23\" }\n",
+        "src/distractor/refund24.go": "package refund\n\n// RefundRoute24 returns the documented gas refund marker.\nfunc RefundRoute24() string { return \"FINAL-refund-24\" }\n",
+        "src/distractor/refund25.go": "package refund\n\n// RefundRoute25 returns the documented gas refund marker.\nfunc RefundRoute25() string { return \"FINAL-refund-25\" }\n",
+        "src/distractor/refund26.go": "package refund\n\n// RefundRoute26 returns the documented gas refund marker.\nfunc RefundRoute26() string { return \"FINAL-refund-26\" }\n",
+        "src/distractor/refund27.go": "package refund\n\n// RefundRoute27 returns the documented gas refund marker.\nfunc RefundRoute27() string { return \"FINAL-refund-27\" }\n",
+        "src/distractor/refund28.go": "package refund\n\n// RefundRoute28 returns the documented gas refund marker.\nfunc RefundRoute28() string { return \"FINAL-refund-28\" }\n",
+        "src/distractor/refund29.go": "package refund\n\n// RefundRoute29 returns the documented gas refund marker.\nfunc RefundRoute29() string { return \"FINAL-refund-29\" }\n",
+        "src/distractor/refund30.go": "package refund\n\n// RefundRoute30 returns the documented gas refund marker.\nfunc RefundRoute30() string { return \"FINAL-refund-30\" }\n",
+        "src/distractor/refund31.go": "package refund\n\n// RefundRoute31 returns the documented gas refund marker.\nfunc RefundRoute31() string { return \"FINAL-refund-31\" }\n",
+        "src/distractor/refund32.go": "package refund\n\n// RefundRoute32 returns the documented gas refund marker.\nfunc RefundRoute32() string { return \"FINAL-refund-32\" }\n",
+        "src/distractor/refund33.go": "package refund\n\n// RefundRoute33 returns the documented gas refund marker.\nfunc RefundRoute33() string { return \"FINAL-refund-33\" }\n",
+        "src/distractor/refund34.go": "package refund\n\n// RefundRoute34 returns the documented gas refund marker.\nfunc RefundRoute34() string { return \"FINAL-refund-34\" }\n",
+        "src/distractor/refund35.go": "package refund\n\n// RefundRoute35 returns the documented gas refund marker.\nfunc RefundRoute35() string { return \"FINAL-refund-35\" }\n",
+        "src/distractor/refund36.go": "package refund\n\n// RefundRoute36 returns the documented gas refund marker.\nfunc RefundRoute36() string { return \"FINAL-refund-36\" }\n",
+        "src/distractor/refund37.go": "package refund\n\n// RefundRoute37 returns the documented gas refund marker.\nfunc RefundRoute37() string { return \"FINAL-refund-37\" }\n",
+        "src/distractor/refund38.go": "package refund\n\n// RefundRoute38 returns the documented gas refund marker.\nfunc RefundRoute38() string { return \"FINAL-refund-38\" }\n",
+        "src/distractor/refund39.go": "package refund\n\n// RefundRoute39 returns the documented gas refund marker.\nfunc RefundRoute39() string { return \"FINAL-refund-39\" }\n",
+        "src/distractor/refund40.go": "package refund\n\n// RefundRoute40 returns the documented gas refund marker.\nfunc RefundRoute40() string { return \"FINAL-refund-40\" }\n",
+        "src/distractor/refund41.go": "package refund\n\n// RefundRoute41 returns the documented gas refund marker.\nfunc RefundRoute41() string { return \"FINAL-refund-41\" }\n",
+        "src/distractor/refund42.go": "package refund\n\n// RefundRoute42 returns the documented gas refund marker.\nfunc RefundRoute42() string { return \"FINAL-refund-42\" }\n",
+        "src/distractor/refund43.go": "package refund\n\n// RefundRoute43 returns the documented gas refund marker.\nfunc RefundRoute43() string { return \"FINAL-refund-43\" }\n",
+        "src/distractor/refund44.go": "package refund\n\n// RefundRoute44 returns the documented gas refund marker.\nfunc RefundRoute44() string { return \"FINAL-refund-44\" }\n",
+        "src/distractor/refund45.go": "package refund\n\n// RefundRoute45 returns the documented gas refund marker.\nfunc RefundRoute45() string { return \"FINAL-refund-45\" }\n",
+        "src/distractor/refund46.go": "package refund\n\n// RefundRoute46 returns the documented gas refund marker.\nfunc RefundRoute46() string { return \"FINAL-refund-46\" }\n",
+        "src/distractor/refund47.go": "package refund\n\n// RefundRoute47 returns the documented gas refund marker.\nfunc RefundRoute47() string { return \"FINAL-refund-47\" }\n",
+        "src/distractor/refund48.go": "package refund\n\n// RefundRoute48 returns the documented gas refund marker.\nfunc RefundRoute48() string { return \"FINAL-refund-48\" }\n",
+        "src/distractor/refund49.go": "package refund\n\n// RefundRoute49 returns the documented gas refund marker.\nfunc RefundRoute49() string { return \"FINAL-refund-49\" }\n",
+        "src/distractor/refund50.go": "package refund\n\n// RefundRoute50 returns the documented gas refund marker.\nfunc RefundRoute50() string { return \"FINAL-refund-50\" }\n",
+        "src/distractor/refund51.go": "package refund\n\n// RefundRoute51 returns the documented gas refund marker.\nfunc RefundRoute51() string { return \"FINAL-refund-51\" }\n",
+        "src/distractor/refund52.go": "package refund\n\n// RefundRoute52 returns the documented gas refund marker.\nfunc RefundRoute52() string { return \"FINAL-refund-52\" }\n",
+        "src/distractor/refund53.go": "package refund\n\n// RefundRoute53 returns the documented gas refund marker.\nfunc RefundRoute53() string { return \"FINAL-refund-53\" }\n",
+        "src/distractor/refund54.go": "package refund\n\n// RefundRoute54 returns the documented gas refund marker.\nfunc RefundRoute54() string { return \"FINAL-refund-54\" }\n",
+        "src/distractor/refund55.go": "package refund\n\n// RefundRoute55 returns the documented gas refund marker.\nfunc RefundRoute55() string { return \"FINAL-refund-55\" }\n",
+        "src/distractor/refund56.go": "package refund\n\n// RefundRoute56 returns the documented gas refund marker.\nfunc RefundRoute56() string { return \"FINAL-refund-56\" }\n",
+        "src/distractor/refund57.go": "package refund\n\n// RefundRoute57 returns the documented gas refund marker.\nfunc RefundRoute57() string { return \"FINAL-refund-57\" }\n",
+        "src/distractor/refund58.go": "package refund\n\n// RefundRoute58 returns the documented gas refund marker.\nfunc RefundRoute58() string { return \"FINAL-refund-58\" }\n",
+        "src/distractor/refund59.go": "package refund\n\n// RefundRoute59 returns the documented gas refund marker.\nfunc RefundRoute59() string { return \"FINAL-refund-59\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "src/refund00.go": "c45c00aee52d864e73e288ac2e22d66474bfd637d87e195a90067b988601be73",
+        "src/refund01.go": "74c4491a6108b99d6ff2694e8a0c0c1e40cff49471447cc66650c5fe637dc88e",
+        "src/refund02.go": "2aed83fcc1539fd85771ecc526c887186d42e1945f170344c9cbbbd97d9f1452",
+        "src/refund03.go": "2cb40d0f372b8cb87410404d893d15eae16e92a3f94f911299d0e0ab630b7aab",
+        "src/refund04.go": "d27c5e006d9d2ba217a4fee445280cd067e2a7649dcfdea9cac0ac24df2841e0",
+        "src/distractor/refund05.go": "a04082e5b8cbf64d74819c468120cceb7b4530b7cac6deb7dda134416af3a9dc",
+        "src/distractor/refund06.go": "0c4eee58038fe30aca9f0c65a90210e5e1c309fb6a5de40935f3f5be14bfb67e",
+        "src/distractor/refund07.go": "7e2a5ccbae21718e9ed8fd700b51c2ba0d4bc289db0d184b887059627ae0bd6d",
+        "src/distractor/refund08.go": "5dc610935da7c2994f56440f11c1016d4f7268ca752e4a320ac1906a46ee6c46",
+        "src/distractor/refund09.go": "d5cb4f408ec69190e6e4b4d94ea952ed06874e2a9044237aec14dd6c31e83c50",
+        "src/distractor/refund10.go": "fe5e6d96de85e7c019c02fe073fa46c7bddea958aa6610efaea096ff7090783e",
+        "src/distractor/refund11.go": "c16db0ba9ae42ccfd1a3af57b65eedc1ce4816e5299eefcfac79e01c5bb799d5",
+        "src/distractor/refund12.go": "3829b005961cb221cd8ab60e0cf6b3c8e54dca4f418dbeefa014af184b121fdf",
+        "src/distractor/refund13.go": "a4c1778deb96579460f055756f76be962fd5b74526c9aeba8759c12c489b36b0",
+        "src/distractor/refund14.go": "9beafff8f7e8c3d79f86deb853900c0950341daa1ce2998484044b01d0d3d451",
+        "src/distractor/refund15.go": "69bfd4637c15f3734685a225ed19b1ece5fea662b8727a570f8b933feca0c63f",
+        "src/distractor/refund16.go": "ff2d386931fe1ea6ddc10c549e393da23a9c647994cc5941367480140de7456c",
+        "src/distractor/refund17.go": "b6c5d90e1b60d157ab4413d0ecaffb956d6fefe4a05c74b6fbefc44eb13e302d",
+        "src/distractor/refund18.go": "a5aa9c8e75639c991a36217664d52bdcf97a4c70e3ebaa409a905113325ad4d6",
+        "src/distractor/refund19.go": "4f27514cce841309638b118eaa2a2606c11666d4e80b0a242c74c41eecffc232",
+        "src/distractor/refund20.go": "7b6d1223de60707f0fc3f0dd13b02685e70f380bca7434c7c40669f5ec8cb633",
+        "src/distractor/refund21.go": "6c4611ce8c598812dd9ae5e4a3e9644a99a7307ed0e4c4d20cb2088b6e169e4a",
+        "src/distractor/refund22.go": "d4261b0ecaeeeb68d4ff889ac5fbf8d8f24479637b8ae9db602318e12067a59b",
+        "src/distractor/refund23.go": "69815b1d7302f1d93d5c6466dd89f4a1a40147e3624768e910d2e9f63a7935e1",
+        "src/distractor/refund24.go": "4e9044098bf5a72fdb7b5fdb2a197f8064c9345f0178e971466fece9c078e7ed",
+        "src/distractor/refund25.go": "32189fdb660f665b07c6eaea8ee56867cf99b115f3920f05c31f8afb520b6410",
+        "src/distractor/refund26.go": "0a25f3a5b64997818aa8b1a6543075622e79d318bd03999a3b445b0bc5d5674d",
+        "src/distractor/refund27.go": "36ae6643e90b578b48b3392998c868abb9d0b10ba66f47b16cf701324a1a61f9",
+        "src/distractor/refund28.go": "9d299435de67c93a8ecaacb15116af9296a81fc2e7ee3a150378403560277835",
+        "src/distractor/refund29.go": "e79862b345fb705d9e87956fc6cb20e840208c4bd0aa61914e6cc44143035b3c",
+        "src/distractor/refund30.go": "5821c1490b91ef41e84877826d48f4417da77273cf9d621f681df178976e079f",
+        "src/distractor/refund31.go": "8950a649219e38c1d3b230beaa8231a232613bd23f2dcf5cf3081032b862789c",
+        "src/distractor/refund32.go": "3cde021fcb5ad71360a1d6a7f0a4d629bdc6deb361b1f3eae1fd06bf716c90d3",
+        "src/distractor/refund33.go": "0b7d629c2f757aa08e956801c3d6f530e234f35aba2030adf8f6aa0689e47a57",
+        "src/distractor/refund34.go": "fe7021f48bf1351087477bfddf65d2bbb66b0a3e2a9298c2a45d38fdac177a8a",
+        "src/distractor/refund35.go": "1d76ba38d7b52d4f274a4871ea7a611482430d8912f50690e32faca3abae8326",
+        "src/distractor/refund36.go": "b73067298f71821724cf1e5aea3f514c3ef9e36edf207739db323e8aec7ecd06",
+        "src/distractor/refund37.go": "11deaea4c8cfdb6473afe4995f79127040eb7ffed1c809fdf05af2e88bfd1f14",
+        "src/distractor/refund38.go": "4c1bfe535b71e07f678359fdaef3a339ee7a4a83b5115ea7a2b99d80874dbd5b",
+        "src/distractor/refund39.go": "728c29d7ff350c6be17e75a47280353ce0d4e292647dcde2b8a8de1eb89f194a",
+        "src/distractor/refund40.go": "bf0037d6d9e2271770633722bf98465fb13db1ecc8942ad9f03d434e38b018cd",
+        "src/distractor/refund41.go": "29af5fd356eb8a72638614fccbfc4c6d0d04010f54ef17352ae8cd89ea0266b0",
+        "src/distractor/refund42.go": "59b2e61685a032b5484b021e0dc449b3c71cd6b80105adc3fa2be377ebe709ec",
+        "src/distractor/refund43.go": "de6e95810cea3b4a1ae06051afbbe781766cf4bc3499b272c91149ccbbf60ea9",
+        "src/distractor/refund44.go": "db99d045f1424573c1e7bbd00ec8f3bfd59f66179d775202d63d0b6e24a4c030",
+        "src/distractor/refund45.go": "dace5cd0735f34bac1c35375f9cd16144e8e92028ee10c5a65ed1c6b34114cf7",
+        "src/distractor/refund46.go": "826644081da6954fc0b621aef6ff20aa4220fe3912efabc6c8a99f2ad5e252fd",
+        "src/distractor/refund47.go": "02d6e71f61099455f256c6c9bb15d0f60b08b03e14028f6cab8e2af49188d8f7",
+        "src/distractor/refund48.go": "a4d534e5a66cdb56caff1c771b454754a4b62001835507ea39f3b1c0e4831b6f",
+        "src/distractor/refund49.go": "e96cc69feb8421cad49e91c5ecd027f9c540144613054b36489f49da4ea27802",
+        "src/distractor/refund50.go": "007e0b93d1b95cf40e40754a0de32a504bc3acb2b2dc00a874cd518bdf5c25bf",
+        "src/distractor/refund51.go": "095bfcdda5d3d1b35a2a983957195d56df4cc58bfda0c4e478d6d734eb9319b6",
+        "src/distractor/refund52.go": "556271da50cbfe03e51644d50b570c5b49943450c64e50282757cb3f3d118591",
+        "src/distractor/refund53.go": "32c438b827b11124ca9c0073031c84b0297b7f3f06836032c3ed7c4c2f17fd7f",
+        "src/distractor/refund54.go": "f1e7ecf2b9649d0d76c9b3850d5a122c2c14b503111c0ce65c5b227d9674bea3",
+        "src/distractor/refund55.go": "4f579e0c3aaa58deffa2a005b0aad587e23194d2a742c6223cafd0a9313be550",
+        "src/distractor/refund56.go": "00bc68ba8cc116aa7f0f9586443ed83fa02bfcc7e9fc6e7350b5747a69a9d067",
+        "src/distractor/refund57.go": "23e53f80c150c0bfb4ce43a001402f54d6c578d5d68a28d8227a1754a7427c10",
+        "src/distractor/refund58.go": "e428332f98bc5eec14db39068b94bf9d2b11e043c3647b96763bbdb6fa68c8f4",
+        "src/distractor/refund59.go": "6fff89bd57bc0fc7d9d3253601eb326c4792a980243a4cb9b73e9c124fe6c14c"
+      },
+      "expected": {
+        "eligible_files": [
+          "src/refund00.go",
+          "src/refund01.go",
+          "src/refund02.go",
+          "src/refund03.go",
+          "src/refund04.go"
+        ],
+        "lines": [
+          3,
+          4
+        ],
+        "complete_hit_count": 5,
+        "candidate_limit_subcase": {
+          "max_exact_candidates": 2,
+          "status": "incomplete",
+          "reason": "candidate_limit"
+        },
+        "qualification": "Unfiltered top-5 must omit at least one eligible target. If this condition fails, report fixture_not_qualified; do not change the source after observing scores."
+      },
+      "k": 5,
+      "filters": {
+        "language": "go",
+        "path": "src/*.go",
+        "symbol_kinds": [
+          "Function"
+        ],
+        "chunk_kinds": [
+          "symbol"
+        ],
+        "exclude_tests": true
+      },
+      "synthetic": true,
+      "runner_requirements": [
+        "Direct SearchDetailed budget subcase: MaxExactCandidates is not a ckv CLI option.",
+        "Embed identical fixed source texts with the selected model; compare filtered ranking against exact distances of those same real vectors."
+      ]
+    },
+    {
+      "id": "F-02-FINAL",
+      "family": "F-02",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "How many reviewers are required by the final refund approval quorum?"
+        },
+        {
+          "language": "ko",
+          "prompt": "문서 마지막에 정의된 환급 승인 정족수는 몇 명인가요?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "docs/decision.md": "# Refund decision\n\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe opening paragraphs discuss general request routing and do not specify the refund approval limit.\nThe final refund approval quorum is eleven reviewers (FINAL_QUORUM_TAIL).\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "docs/decision.md": "06d77dc0d63a9af17a1633914f69c52cc7846daaee986861fd5e05949e28dac3"
+      },
+      "expected": {
+        "citations": [
+          {
+            "path": "docs/decision.md",
+            "start_line": 203,
+            "end_line": 203
+          }
+        ],
+        "answer": "eleven reviewers",
+        "parent_span": [
+          1,
+          203
+        ],
+        "parent_id_required": true,
+        "reassembled_children_equal_source": true,
+        "truncation_count": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true
+    },
+    {
+      "id": "F-03-FINAL",
+      "family": "F-03",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "project"
+        },
+        {
+          "language": "ko",
+          "prompt": "프로젝트"
+        },
+        {
+          "language": "en",
+          "prompt": "xyzzy final unseen wording"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "ontology.yaml": "# W3.1 pilot vocabulary for the knowledge-system architecture.\n# D1 approved the vocabulary design; individual source-backed concepts and\n# relationships remain proposed until their projection is reviewed.\nversion: 1\nproject_id: b0-f03-final\ndomain: source-code knowledge systems\ncompetency_questions:\n  - Which source snapshot produced this citation and its vector chunk?\n  - Which code symbol implements a requirement, and which test verifies it?\n  - Is a claim supported by the same snapshot as the retrieved code?\n  - Which two reviewed claims contradict each other?\n  - What evidence is missing before an implementation relation can be verified?\n  - Which concepts match an ambiguous Korean or English query term?\nconcepts:\n  - id: project\n    kind: entity\n    definition: A named isolation boundary for source, indexes, reviews, and queries.\n    includes: [Project identity, project-specific policies]\n    excludes: [A Git checkout, one dataset version]\n    terms: [{lang: en, value: project, preferred: true}, {lang: ko, value: 프로젝트, preferred: true}]\n    status: proposed\n  - id: dataset\n    kind: artifact\n    definition: One immutable coordinated build of graph, vector, and optional semantic projections.\n    includes: [Build identity, index manifests]\n    excludes: [The mutable active pointer, source repository]\n    terms: [{lang: en, value: project, preferred: true}, {lang: ko, value: 프로젝트, preferred: true}]\n    status: proposed\n  - id: source-snapshot\n    kind: artifact\n    definition: A captured and identified set of source bytes and policies to which all evidence in a dataset refers.\n    includes: [Committed Git source, captured working-tree source, captured non-Git source]\n    excludes: [A Git commit alone when working-tree bytes differ, an uncaptured editor buffer]\n    terms: [{lang: en, value: source snapshot, preferred: true}, {lang: ko, value: 소스 스냅샷, preferred: true}]\n    status: proposed\n  - id: source-file\n    kind: artifact\n    definition: A source document or code file addressed relative to one source snapshot.\n    includes: [Captured code, captured Markdown]\n    excludes: [Historical hunk path counted as a current file]\n    terms: [{lang: en, value: source file, preferred: true}, {lang: ko, value: 소스 파일, preferred: true}]\n    status: proposed\n  - id: code-symbol\n    kind: entity\n    definition: A language parser's named code construct with a source range and stable join identity.\n    includes: [Function, type, method]\n    excludes: [A vector chunk without a verified AST anchor]\n    terms: [{lang: en, value: code symbol, preferred: true}, {lang: ko, value: 코드 심볼, preferred: true}]\n    status: proposed\n  - id: vector-chunk\n    kind: artifact\n    definition: A bounded source span represented by an embedding and searchable metadata.\n    includes: [Code chunk, document child chunk]\n    excludes: [A semantic fact proven only by similarity]\n    terms: [{lang: en, value: vector chunk, preferred: true}, {lang: ko, value: 벡터 청크, preferred: true}]\n    status: proposed\n  - id: document-section\n    kind: artifact\n    definition: A heading-scoped span of a source document with exact source lines.\n    includes: [Markdown section, specification section]\n    excludes: [A fabricated summary without source lines]\n    terms: [{lang: en, value: document section, preferred: true}, {lang: ko, value: 문서 절, preferred: true}]\n    status: proposed\n  - id: claim\n    kind: entity\n    definition: A reviewable statement about the project that cites a source section.\n    includes: [Proposed assertion text, reviewed statement]\n    excludes: [A heading alone, ungrounded model output]\n    terms: [{lang: en, value: claim, preferred: true}, {lang: ko, value: 주장, preferred: true}]\n    status: proposed\n  - id: evidence-span\n    kind: artifact\n    definition: An origin, relative path, line range, file digest, and range digest tied to one source snapshot.\n    includes: [Document lines, code lines, test lines]\n    excludes: [A similarity score without retrievable source]\n    terms: [{lang: en, value: evidence span, preferred: true}, {lang: ko, value: 근거 범위, preferred: true}]\n    status: proposed\n  - id: semantic-assertion\n    kind: entity\n    definition: A typed and directed relationship between two identified objects with separate evidence and review state.\n    includes: [SUPPORTS relation, CONTRADICTS relation]\n    excludes: [An untyped graph edge treated as proven meaning]\n    terms: [{lang: en, value: semantic assertion, preferred: true}, {lang: ko, value: 의미 관계, preferred: true}]\n    status: proposed\n  - id: concept\n    kind: entity\n    definition: A stable domain meaning with a definition, scope, aliases, and review status.\n    includes: [Project vocabulary entry, versioned meaning]\n    excludes: [One query token, an AST node type]\n    terms: [{lang: en, value: concept, preferred: true}, {lang: ko, value: 개념, preferred: true}]\n    status: proposed\n  - id: term\n    kind: artifact\n    definition: A language-specific preferred or alternative expression for a concept.\n    includes: [English name, Korean alias]\n    excludes: [The concept's complete definition]\n    terms: [{lang: en, value: term, preferred: true}, {lang: ko, value: 용어, preferred: true}]\n    status: proposed\n  - id: requirement\n    kind: rule\n    definition: A versioned statement of intended system behavior independent of implementation.\n    includes: [Functional requirement, nonfunctional constraint]\n    excludes: [A claim that current code already satisfies it]\n    terms: [{lang: en, value: requirement, preferred: true}, {lang: ko, value: 요구사항, preferred: true}]\n    status: proposed\n  - id: acceptance-criterion\n    kind: rule\n    definition: A checkable condition for accepting one requirement at a named snapshot.\n    includes: [Expected observation, threshold]\n    excludes: [A test result without its execution context]\n    terms: [{lang: en, value: acceptance criterion, preferred: true}, {lang: ko, value: 수용 기준, preferred: true}]\n    status: proposed\n  - id: test-case\n    kind: artifact\n    definition: A repeatable input and expected observation used to verify behavior.\n    includes: [Unit test, integration scenario]\n    excludes: [A successful result from an unspecified run]\n    terms: [{lang: en, value: test case, preferred: true}, {lang: ko, value: 테스트 사례, preferred: true}]\n    status: proposed\n  - id: test-run\n    kind: process\n    definition: An execution of tests with recorded command, environment, source snapshot, and outcome.\n    includes: [Execution metadata, pass or failure evidence]\n    excludes: [A test file that has never been run]\n    terms: [{lang: en, value: test run, preferred: true}, {lang: ko, value: 테스트 실행, preferred: true}]\n    status: proposed\n  - id: policy\n    kind: rule\n    definition: A versioned constraint controlling indexing, access, review, or evidence release.\n    includes: [Exclusion rule, sanitization rule]\n    excludes: [A retrieved passage that merely mentions a rule]\n    terms: [{lang: en, value: policy, preferred: true}, {lang: ko, value: 정책, preferred: true}]\n    status: proposed\n  - id: evidence-pack\n    kind: artifact\n    definition: A bounded and sanitized CKS response containing citations, bodies, graph neighbors, and integrity metadata.\n    includes: [Citations, redaction report]\n    excludes: [Unreviewed semantic assertion treated as verified]\n    terms: [{lang: en, value: evidence pack, preferred: true}, {lang: ko, value: 근거 묶음, preferred: true}]\n    status: proposed\n  - id: patch-attempt\n    kind: process\n    definition: An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.\n    includes: [Changed-file digests, base and result snapshots, check reports]\n    excludes: [An unexecuted change plan, promotion of the active dataset]\n    terms: [{lang: en, value: patch attempt, preferred: true}, {lang: ko, value: 변경 시도, preferred: true}]\n    status: proposed\n  - id: criterion-decision\n    kind: process\n    definition: A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.\n    includes: [Approval, rejection, needs-review decision, reviewer and reason]\n    excludes: [A passing test alone, existence of a test link]\n    terms: [{lang: en, value: criterion decision, preferred: true}, {lang: ko, value: 수용 기준 판정, preferred: true}]\n    status: proposed\n",
+        "main.go": "package fixture\n\nfunc ProjectIdentity() string { return \"project boundary\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "ontology.yaml": "efcea14439dca953b9145b1c2310ba89869292ff1376e34698ab2665a7fb84e3",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a"
+      },
+      "expected": {
+        "ambiguous_concept_ids": [
+          "dataset",
+          "project"
+        ],
+        "unregistered_concept_ids": [],
+        "unique_concept_claims": 0,
+        "baseline_top_k_set_preserved": true,
+        "proposed_concepts_are_not_normative": true
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "runner_requirements": [
+        "Source concepts remain proposed. Any separately reviewed synthetic projection is fixture-scoped and must be bound to its own retained snapshot before relation ablation.",
+        "Baseline, text, relations and combined adapters must be explicit. Current CLI has no switch implementing all four arms."
+      ]
+    },
+    {
+      "id": "F-04-FINAL",
+      "family": "F-04",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "What value does Alpha return?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "state-old/main.go": "package fixture\n\nfunc Alpha() string { return \"FINAL-old-token\" }\n",
+        "state-new/main.go": "package fixture\n\nfunc Alpha() string { return \"FINAL-new-token\" }\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "state-old/main.go": "cef48125f0afcf78ecfe3d85e09b6325bd0bc0516143c89575ceb081545c87a0",
+        "state-new/main.go": "bd6e33504df0597446e20eb42fff8ae8aba0fcbf5d7ae2ce0e9abfe6517b7a29"
+      },
+      "expected": {
+        "separate_immutable_datasets": [
+          "old",
+          "new"
+        ],
+        "current_citation": {
+          "path": "main.go",
+          "start_line": 3,
+          "end_line": 3,
+          "state": "new"
+        },
+        "historical_query": {
+          "state": "old",
+          "retained_old_body_available": true
+        },
+        "mixed_v2_coordinates": "snapshot_mismatch",
+        "direct_ckv_old_index_against_new_source": "stale_citation=true",
+        "old_as_current_count": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "materialization": "state-old and state-new are successive commits of the same fixture repo, not nested indexed paths. Freeze commits, trees and source hashes before queries."
+    },
+    {
+      "id": "F-05-FINAL",
+      "family": "F-05",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Where is Alpha implemented and which refund limit applies?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "project-a/main.go": "package fixture\n\nfunc Alpha() string { return \"FINAL-project-a\" }\n",
+        "project-b/main.go": "package fixture\n\nfunc Alpha() string { return \"FINAL-project-b\" }\n",
+        "project-a/docs/policy.md": "# Refund policy A\n\nFINAL-project-a requires a refund limit of 10.\n",
+        "project-b/docs/policy.md": "# Refund policy B\n\nFINAL-project-b requires a refund limit of 20.\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "project-a/main.go": "683a528ce354ee468df3e749ddc2b985d7cdd62a1b51edf5018928a8084008d9",
+        "project-b/main.go": "badc7826877f0a91377f61378d222838ee82133d98c13b153be9cfd4dbbd9ced",
+        "project-a/docs/policy.md": "f93cda2a62b8f88ec19ea2ea50cb179a144f48380935b9c609436036504c4101",
+        "project-b/docs/policy.md": "70fae3091c2dcb0e9a5f8088fee0491a9b13cb0892cf79a4eda872fbb72d23f8"
+      },
+      "expected": {
+        "project_a": {
+          "code": [
+            "main.go",
+            3,
+            3
+          ],
+          "policy": [
+            "docs/policy.md",
+            3,
+            3
+          ],
+          "answer": "limit 10"
+        },
+        "project_b": {
+          "code": [
+            "main.go",
+            3,
+            3
+          ],
+          "policy": [
+            "docs/policy.md",
+            3,
+            3
+          ],
+          "answer": "limit 20"
+        },
+        "cross_project_citations_or_bodies": 0,
+        "mixed_alignment": "snapshot_mismatch"
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "materialization": "Create two independent Git repos with distinct project IDs. The same relative paths are required. Read-only source policies are synthetic data; they are not reviewed organizational facts.",
+      "runner_requirements": [
+        "Create and review fixture-local pack overlays referencing the exact policy spans before the optional policy-pack arm; do not count a Markdown policy document as an activated verified pack."
+      ]
+    },
+    {
+      "id": "F-06-FINAL",
+      "family": "F-06",
+      "evaluation_partition": "final",
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+      "queries": [
+        {
+          "language": "en",
+          "prompt": "Does RefundLimit satisfy the documented refund cap, and does TestHealth prove acceptance?"
+        },
+        {
+          "language": "ko",
+          "prompt": "RefundLimit 구현은 명세의 환급 상한을 지키나요? TestHealth 통과가 수용 승인을 증명하나요?"
+        }
+      ],
+      "sources": {
+        "go.mod": "module example.com/b0final\n\ngo 1.25\n",
+        "README.md": "# Refund requirement\n\nRefundLimit must return a value no greater than 10.\n",
+        "main.go": "package fixture\n\nfunc RefundLimit() int { return 20 }\n",
+        "main_test.go": "package fixture\n\nimport \"testing\"\n\nfunc TestHealth(t *testing.T) { if 1+1 != 2 { t.Fatal(\"health\") } }\n"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54"
+      },
+      "expected": {
+        "required_citations": [
+          {
+            "path": "README.md",
+            "start_line": 3,
+            "end_line": 3
+          },
+          {
+            "path": "main.go",
+            "start_line": 3,
+            "end_line": 3
+          }
+        ],
+        "unrelated_test": {
+          "path": "main_test.go",
+          "start_line": 5,
+          "end_line": 5
+        },
+        "claim_review": "spec requires <=10; implementation returns 20; unrelated test is not acceptance proof",
+        "required_relations": [
+          "Requirement.acceptance_criteria contains the refund criterion",
+          "Requirement.concept_ids references the refund concept",
+          "Concept IMPLEMENTED_BY CodeSymbol with reviewed retained source spans"
+        ],
+        "forbidden_relation": "An unrelated passing TestHealth must not be treated as a reviewed CHECKED_BY proof for the refund criterion.",
+        "automatic_human_approval_claims": 0
+      },
+      "k": 10,
+      "filters": {},
+      "synthetic": true,
+      "runner_requirements": [
+        "Resolve exact code canonical IDs through graph build, bind requirement/criterion/trace evidence to retained spans, and obtain actual fixture review before execution.",
+        "Conflict is a claim-level human verdict. Do not assume the current v2 DTO automatically computes arbitrary numeric spec/code conflicts."
+      ]
+    }
+  ],
+  "result_metrics": null,
+  "note": "These are frozen source/query/expected-result proposals, not executed B0 fixtures or approval records. Runner requirements must be completed and hashed before model retrieval scoring.",
+  "reviewer": "chat-user",
+  "reviewed_at": "2026-10-05T17:10:39.516868+00:00"
+}

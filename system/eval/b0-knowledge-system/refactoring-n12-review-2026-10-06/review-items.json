@@ -1,0 +1,1205 @@
+{
+  "schema_version": 1,
+  "status": "awaiting_human_review",
+  "source_commit": "076f6de27b38423a3a2538cb95e41994d092e91b",
+  "project_id": "knowledge-system",
+  "projection_kind": "standalone committed-source extraction; not aligned/promoted v2 dataset",
+  "source_byte_check": "27 exact source spans independently verified",
+  "items": [
+    {
+      "review_id": "P12-C01",
+      "kind": "concept",
+      "id": "project",
+      "definition": "A named isolation boundary for source, indexes, reviews, and queries.",
+      "includes": [
+        "Project identity",
+        "project-specific policies"
+      ],
+      "excludes": [
+        "A Git checkout",
+        "one dataset version"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "project",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "프로젝트",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 15,
+        "last": 21,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "1574c0307f555b7c78e243fd03387d57ee3a2a57c1f66e1f0dcdc84b576d899f"
+      },
+      "candidate_usage": {
+        "path": "internal/setup/identity.go",
+        "first": 26,
+        "last": 36,
+        "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+        "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18",
+        "declaration": "type SourceIdentity struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C02",
+      "kind": "concept",
+      "id": "dataset",
+      "definition": "One immutable coordinated build of graph, vector, and optional semantic projections.",
+      "includes": [
+        "Build identity",
+        "index manifests"
+      ],
+      "excludes": [
+        "The mutable active pointer",
+        "source repository"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "dataset",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "데이터셋",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 22,
+        "last": 28,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "2e4316d7b5309316aa53159effe24e516e0bcbe7707a494e5bd83c89a9e793c7"
+      },
+      "candidate_usage": {
+        "path": "internal/setup/identity.go",
+        "first": 279,
+        "last": 284,
+        "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+        "content_sha256": "e7f78e5f42045c510b8125657cec2df026f35161af7ee8ea2d62b36dbef35659",
+        "declaration": "type DatasetIdentity struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C03",
+      "kind": "concept",
+      "id": "source-snapshot",
+      "definition": "A captured and identified set of source bytes and policies to which all evidence in a dataset refers.",
+      "includes": [
+        "Committed Git source",
+        "captured working-tree source",
+        "captured non-Git source"
+      ],
+      "excludes": [
+        "A Git commit alone when working-tree bytes differ",
+        "an uncaptured editor buffer"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "source snapshot",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "소스 스냅샷",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 29,
+        "last": 35,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d"
+      },
+      "candidate_usage": {
+        "path": "internal/setup/identity.go",
+        "first": 26,
+        "last": 36,
+        "file_sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75",
+        "content_sha256": "3c196806bfe20b062247acbe9a1cc44f488c8f67c76583226c89bba241103f18",
+        "declaration": "type SourceIdentity struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C04",
+      "kind": "concept",
+      "id": "source-file",
+      "definition": "A source document or code file addressed relative to one source snapshot.",
+      "includes": [
+        "Captured code",
+        "captured Markdown"
+      ],
+      "excludes": [
+        "Historical hunk path counted as a current file"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "source file",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "소스 파일",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 36,
+        "last": 42,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "b4c8fc678783c7d9cfffd2b36a1cc59756e665cf97b7ed67b0de911ae748b8b1"
+      },
+      "candidate_usage": {
+        "path": "internal/setup/capture.go",
+        "first": 27,
+        "last": 34,
+        "file_sha256": "6ac1079d838282136e8b0f6ed3352f19c20d173faf1b22b2a7bee346da7c9538",
+        "content_sha256": "00725dcf939a66af50b56273d0b0d7699d0d148eb9034994071758a41a52b65b",
+        "declaration": "type CapturedFile struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C05",
+      "kind": "concept",
+      "id": "code-symbol",
+      "definition": "A language parser's named code construct with a source range and stable join identity.",
+      "includes": [
+        "Function",
+        "type",
+        "method"
+      ],
+      "excludes": [
+        "A vector chunk without a verified AST anchor"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "code symbol",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "코드 심볼",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 43,
+        "last": 49,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "a43823d2d467f1f245b9fb2ce0e3ac62263f3080fe6482556d20aedce5bad72f"
+      },
+      "candidate_usage": {
+        "path": "pkg/graph/types/node.go",
+        "first": 4,
+        "last": 165,
+        "file_sha256": "591e5e881cdd76e8cd551d1cbb5ad748ce8c878924bb61fa61bf2fd3f043c73f",
+        "content_sha256": "d7e8f8808f076d18fe8e101d2adfb5602cbcc9e38bf09f3080481af686ac4181",
+        "declaration": "type Node struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C06",
+      "kind": "concept",
+      "id": "vector-chunk",
+      "definition": "A bounded source span represented by an embedding and searchable metadata.",
+      "includes": [
+        "Code chunk",
+        "document child chunk"
+      ],
+      "excludes": [
+        "A semantic fact proven only by similarity"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "vector chunk",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "벡터 청크",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 50,
+        "last": 56,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "b3f36fb94355149265aa2635a018490582246dc60b0401c9190590889066d7dc"
+      },
+      "candidate_usage": {
+        "path": "pkg/vector/types/chunk.go",
+        "first": 201,
+        "last": 232,
+        "file_sha256": "e0fc89f159514a95be9f0364709edb67c685fc8900017c13ba708b670e1418cb",
+        "content_sha256": "07c8d4b9f38abbe3065e5fc7cd1533b1e3d3dba4f955b9406223bdc9f082c362",
+        "declaration": "type Chunk struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C07",
+      "kind": "concept",
+      "id": "document-section",
+      "definition": "A heading-scoped span of a source document with exact source lines.",
+      "includes": [
+        "Markdown section",
+        "specification section"
+      ],
+      "excludes": [
+        "A fabricated summary without source lines"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "document section",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "문서 절",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 57,
+        "last": 63,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "451cd590ed5a603c0ae7c0a1565fb0c7c393ba3e7484aff43169f36b29b36e07"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 56,
+        "last": 62,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "b781ace32235fad50c759047c2f4a4b1005be96707efe7aafe61541136aacb03",
+        "declaration": "type DocumentSection struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C08",
+      "kind": "concept",
+      "id": "claim",
+      "definition": "A reviewable statement about the project that cites a source section.",
+      "includes": [
+        "Proposed assertion text",
+        "reviewed statement"
+      ],
+      "excludes": [
+        "A heading alone",
+        "ungrounded model output"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "claim",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "주장",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 64,
+        "last": 70,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "dd1b326e0a22e3974eb6cf2b56613aa1b1e943637d85c4e1421ab1378151e859"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 111,
+        "last": 118,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "7a1e4b1f77fe40da8314ea40f4e2ce12ef8a7b2194e97bb1db0c77e2713456cf",
+        "declaration": "type Claim struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C09",
+      "kind": "concept",
+      "id": "evidence-span",
+      "definition": "An origin, relative path, line range, file digest, and range digest tied to one source snapshot.",
+      "includes": [
+        "Document lines",
+        "code lines",
+        "test lines"
+      ],
+      "excludes": [
+        "A similarity score without retrievable source"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "evidence span",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "근거 범위",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 71,
+        "last": 77,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "d7e3497711de04d01152fd5f83fb8bf6be60b565e7d3c9de900baf82f6b731a0"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 42,
+        "last": 53,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "e81e14dfd3e66e057fc06c54e815361509b5099d9458464406e5ede032884607",
+        "declaration": "type EvidenceSpan struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C10",
+      "kind": "concept",
+      "id": "semantic-assertion",
+      "definition": "A typed and directed relationship between two identified objects with separate evidence and review state.",
+      "includes": [
+        "SUPPORTS relation",
+        "CONTRADICTS relation"
+      ],
+      "excludes": [
+        "An untyped graph edge treated as proven meaning"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "semantic assertion",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "의미 관계",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 78,
+        "last": 84,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "cb86290dd315b8de3ba90d2fff35ebd14105fecd24d656eb033edd6edc15de07"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 122,
+        "last": 130,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "8378b50f755ea05d6ebd599181268b58408063fcf8b4ee624fb147ae4de5ebd9",
+        "declaration": "type Assertion struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C11",
+      "kind": "concept",
+      "id": "concept",
+      "definition": "A stable domain meaning with a definition, scope, aliases, and review status.",
+      "includes": [
+        "Project vocabulary entry",
+        "versioned meaning"
+      ],
+      "excludes": [
+        "One query token",
+        "an AST node type"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "concept",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "개념",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 85,
+        "last": 91,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "cb939278aa9ca263d828da3e3eb6964e3ebb4c486a30c89ddccd4cf359966136"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 67,
+        "last": 77,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "b17ac8920daec113f24d50a2a4025d012385b386a0192084f9d4154906e7a967",
+        "declaration": "type Concept struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C12",
+      "kind": "concept",
+      "id": "term",
+      "definition": "A language-specific preferred or alternative expression for a concept.",
+      "includes": [
+        "English name",
+        "Korean alias"
+      ],
+      "excludes": [
+        "The concept's complete definition"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "term",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "용어",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 92,
+        "last": 98,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "1dfc2443cbb6af711e65f79c239c9f5802ffec101a70c91e235d4440891447a5"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 79,
+        "last": 83,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "ed65cb37ec621d604a66c70c00e3a053d7e40188ef39529ba8d7068371d9f6d6",
+        "declaration": "type Term struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C13",
+      "kind": "concept",
+      "id": "requirement",
+      "definition": "A versioned statement of intended system behavior independent of implementation.",
+      "includes": [
+        "Functional requirement",
+        "nonfunctional constraint"
+      ],
+      "excludes": [
+        "A claim that current code already satisfies it"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "requirement",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "요구사항",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 99,
+        "last": 105,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "62c03a0299cef03ab143ba18617c956cc3faffde74f2230474e17fb0f8a4ca7c"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 87,
+        "last": 97,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "d3b5ed230e74821ab31601724d7cd395df2fc9d2a1c40d94930769e9df7bb392",
+        "declaration": "type Requirement struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C14",
+      "kind": "concept",
+      "id": "acceptance-criterion",
+      "definition": "A checkable condition for accepting one requirement at a named snapshot.",
+      "includes": [
+        "Expected observation",
+        "threshold"
+      ],
+      "excludes": [
+        "A test result without its execution context"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "acceptance criterion",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "수용 기준",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 106,
+        "last": 112,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "ed95e4af9101a0c9e3228075524e44d51b5287170c652f99961e8f13dbd73703"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/model.go",
+        "first": 101,
+        "last": 107,
+        "file_sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6",
+        "content_sha256": "d6f7f69f3a12214ee2fa0dfb5fdeace955ea75f4a411534c14ff870f5230de5f",
+        "declaration": "type AcceptanceCriterion struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C15",
+      "kind": "concept",
+      "id": "test-case",
+      "definition": "A repeatable input and expected observation used to verify behavior.",
+      "includes": [
+        "Unit test",
+        "integration scenario"
+      ],
+      "excludes": [
+        "A successful result from an unspecified run"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "test case",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "테스트 사례",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 113,
+        "last": 119,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "30ea40c7bcb2ee5f8fc6cbbede5ad8f9a8ba83dbcc7f675ead1fe416f49d0b35"
+      },
+      "candidate_usage": {
+        "path": "internal/vector/store/sqlitevec/store_test.go",
+        "first": 389,
+        "last": 425,
+        "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+        "content_sha256": "f83750058a54d96557b1fd65ea1cafb709fdb56cb129d33f7ecdec5f5a2d0375",
+        "declaration": "func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C16",
+      "kind": "concept",
+      "id": "test-run",
+      "definition": "An execution of tests with recorded command, environment, source snapshot, and outcome.",
+      "includes": [
+        "Execution metadata",
+        "pass or failure evidence"
+      ],
+      "excludes": [
+        "A test file that has never been run"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "test run",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "테스트 실행",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 120,
+        "last": 126,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "508c2abb8943ff6e03fcbb6bc604e440e95a731a256c37ae5dcd0e05dd0c412f"
+      },
+      "candidate_usage": {
+        "path": "internal/system/semantic/test_run.go",
+        "first": 28,
+        "last": 52,
+        "file_sha256": "590e77cdf99bcb9911da40bc1f73b09259dd3cbe3a647cea32ea8dde3ded2500",
+        "content_sha256": "2b8f1274c3814a9e63712fc2254db0fbbd7889e387eb4fae41d7d271250bea81",
+        "declaration": "type TestRun struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C17",
+      "kind": "concept",
+      "id": "policy",
+      "definition": "A versioned constraint controlling indexing, access, review, or evidence release.",
+      "includes": [
+        "Exclusion rule",
+        "sanitization rule"
+      ],
+      "excludes": [
+        "A retrieved passage that merely mentions a rule"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "policy",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "정책",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 127,
+        "last": 133,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397"
+      },
+      "candidate_usage": {
+        "path": "internal/setup/plan.go",
+        "first": 22,
+        "last": 117,
+        "file_sha256": "cc8778ba071542fb62181ed720543244a4719e095c26068556155471496c38cc",
+        "content_sha256": "2c21a5641d2150cf728d338ee9755337284d78732335b422da5cb4f96ea7cadf",
+        "declaration": "type Options struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C18",
+      "kind": "concept",
+      "id": "evidence-pack",
+      "definition": "A bounded and sanitized CKS response containing citations, bodies, graph neighbors, and integrity metadata.",
+      "includes": [
+        "Citations",
+        "redaction report"
+      ],
+      "excludes": [
+        "Unreviewed semantic assertion treated as verified"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "evidence pack",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "근거 묶음",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 134,
+        "last": 140,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "5f28fa42b72bde5cca127279f7b0312673f787cbf903a4cae827163b4d679786"
+      },
+      "candidate_usage": {
+        "path": "pkg/system/contract/v2.go",
+        "first": 137,
+        "last": 147,
+        "file_sha256": "3fec807d746a0ec685d6776b9f162cf17e0103719028125c89ac0f7414e91b31",
+        "content_sha256": "1893a67ad2dcb2d1c54eabf1ab27fcb543b0a7345b7a059b7d6a4a43a9653a2e",
+        "declaration": "type EvidencePackV2 struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C19",
+      "kind": "concept",
+      "id": "patch-attempt",
+      "definition": "An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.",
+      "includes": [
+        "Changed-file digests",
+        "base and result snapshots",
+        "check reports"
+      ],
+      "excludes": [
+        "An unexecuted change plan",
+        "promotion of the active dataset"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "patch attempt",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "변경 시도",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 141,
+        "last": 147,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "63bc5be6a2369cee2ee9cdfb93850891e7dbdb2b85c94eb31dd1324c43ac894f"
+      },
+      "candidate_usage": {
+        "path": "internal/system/patch/patch.go",
+        "first": 34,
+        "last": 45,
+        "file_sha256": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "content_sha256": "611e6081e29d14470dc389c765a57a9b8b616080e7182c0e81e265e00312dc5d",
+        "declaration": "type Attempt struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-C20",
+      "kind": "concept",
+      "id": "criterion-decision",
+      "definition": "A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.",
+      "includes": [
+        "Approval",
+        "rejection",
+        "needs-review decision",
+        "reviewer and reason"
+      ],
+      "excludes": [
+        "A passing test alone",
+        "existence of a test link"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "criterion decision",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "수용 기준 판정",
+          "preferred": true
+        }
+      ],
+      "authority": "D1-approved design vocabulary; this committed projection remains proposed",
+      "scope": "knowledge-system common metamodel; not industrial facts",
+      "source": {
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "first": 148,
+        "last": 154,
+        "file_sha256": "76e698554e9e322d7dc07d770307c0aa15219f009c02247b9305a2ab16db5912",
+        "content_sha256": "6d7b6f3dee93dad13df4a34a0809adcc1e1a3fdde4707420d82aeef9530a1056"
+      },
+      "candidate_usage": {
+        "path": "internal/system/patch/patch.go",
+        "first": 47,
+        "last": 60,
+        "file_sha256": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5",
+        "content_sha256": "0a37bd8b40e1dd765cec052f928c6aaa6aa45210eab33b393d47a1239a86722e",
+        "declaration": "type Decision struct {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "decision": null
+    },
+    {
+      "review_id": "P12-R01",
+      "kind": "requirement",
+      "id": "req-filtered-recall",
+      "statement": "CKV returns eligible nearest chunks under sparse metadata filters.",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 4,
+        "last": 18,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "9afcd37dae6f924a6eb91816f65851e62660b70ec4de4bcb940899278f7689a3"
+      },
+      "authority": "D1 design example, not full-product completion",
+      "scope": "spec-pilot version1 at named revision",
+      "decision": null
+    },
+    {
+      "review_id": "P12-A01",
+      "kind": "criterion",
+      "id": "ac-filtered-recall",
+      "given": "A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks",
+      "when": "A filtered query requests K results",
+      "then": "The response contains K eligible chunks in exact distance order",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 11,
+        "last": 14,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "bcc38acd39dcf06ad082ce06e1bf5b28512c73eed0d05cd362bb1232210f4088"
+      },
+      "candidate_implementation": {
+        "path": "internal/vector/store/sqlitevec/store.go",
+        "first": 620,
+        "last": 820,
+        "file_sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55",
+        "content_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+        "declaration": "func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error) {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "candidate_test_links": [
+        {
+          "test": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+          "package": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec",
+          "candidate_anchor": {
+            "path": "internal/vector/store/sqlitevec/store_test.go",
+            "first": 389,
+            "last": 425,
+            "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+            "content_sha256": "f83750058a54d96557b1fd65ea1cafb709fdb56cb129d33f7ecdec5f5a2d0375",
+            "declaration": "func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        }
+      ],
+      "source_validated": true,
+      "linked": false,
+      "tested": true,
+      "accepted": false,
+      "decision": null
+    },
+    {
+      "review_id": "P12-A02",
+      "kind": "criterion",
+      "id": "ac-filtered-completeness",
+      "given": "A larger filtered candidate set contains at least K eligible chunks",
+      "when": "A filtered query reaches a search budget or is cancelled",
+      "then": "The response marks incomplete with a reason and never claims K-result completeness",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 15,
+        "last": 18,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "1a2de5ae8e580b9ee971e75e8e55baca1f993c18a094a7b035f74343e9354302"
+      },
+      "candidate_implementation": {
+        "path": "internal/vector/store/sqlitevec/store.go",
+        "first": 620,
+        "last": 820,
+        "file_sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55",
+        "content_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+        "declaration": "func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error) {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "candidate_test_links": [
+        {
+          "test": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+          "package": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec",
+          "candidate_anchor": {
+            "path": "internal/vector/store/sqlitevec/store_test.go",
+            "first": 142,
+            "last": 175,
+            "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+            "content_sha256": "f1283b2243af4fadaf6dbdc47416ef4830c8d1d0ccbd2d29a26c051b0ee4d64b",
+            "declaration": "func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        },
+        {
+          "test": "TestSearchDetailedCancellationIsNotEmptySuccess",
+          "package": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec",
+          "candidate_anchor": {
+            "path": "internal/vector/store/sqlitevec/store_test.go",
+            "first": 177,
+            "last": 195,
+            "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+            "content_sha256": "a9004d2f48360194b8fb01416650cfd51aa4c8efbfd8136574ec8219298c884c",
+            "declaration": "func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        }
+      ],
+      "source_validated": true,
+      "linked": false,
+      "tested": true,
+      "accepted": false,
+      "decision": null
+    },
+    {
+      "review_id": "P12-R02",
+      "kind": "requirement",
+      "id": "req-source-evidence",
+      "statement": "Reviewed semantic relationships remain tied to one captured source snapshot.",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 19,
+        "last": 29,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "bec0b92549c91e346b7a6ce73d10d988ae66d64cd8c35ec7008cc650a778dcdb"
+      },
+      "authority": "D1 design example, not full-product completion",
+      "scope": "spec-pilot version1 at named revision",
+      "decision": null
+    },
+    {
+      "review_id": "P12-A03",
+      "kind": "criterion",
+      "id": "ac-source-evidence",
+      "given": "A relation with a code anchor from another snapshot",
+      "when": "The semantic dataset is promoted",
+      "then": "Promotion fails and the active dataset remains unchanged",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 26,
+        "last": 29,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "262a2521fd54eaf0625428a75d99d253676a5a17008cf113d5a65a6cbdd17bcc"
+      },
+      "candidate_implementation": {
+        "path": "internal/system/semantic/alignment.go",
+        "first": 69,
+        "last": 138,
+        "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+        "content_sha256": "9fa6701c9ca8bc02dee05a91615f2f002a34733da300491270255f6a56330cd9",
+        "declaration": "func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string) error {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "candidate_test_links": [
+        {
+          "test": "TestProjectionRejectsCrossSnapshotOrMissingEvidence",
+          "package": "github.com/0xmhha/knowledge-system/internal/system/semantic",
+          "candidate_anchor": {
+            "path": "internal/system/semantic/validate_test.go",
+            "first": 88,
+            "last": 109,
+            "file_sha256": "05dce6f87905a398b417be346bb218d3d45be4445ad3247a9c4f877e36a2ea50",
+            "content_sha256": "a80d4670c7ca58967e2f36d840e52b2c6b4d4d7baaa24ce2db2e668766fc1923",
+            "declaration": "func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        },
+        {
+          "test": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+          "package": "github.com/0xmhha/knowledge-system/internal/system/semantic",
+          "candidate_anchor": {
+            "path": "internal/system/semantic/alignment_test.go",
+            "first": 26,
+            "last": 107,
+            "file_sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9",
+            "content_sha256": "9b9e8375569a40a0ae5c791671fb152c807d973edf4bfa1beb1e9134bf1540eb",
+            "declaration": "func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        }
+      ],
+      "source_validated": true,
+      "linked": false,
+      "tested": true,
+      "accepted": false,
+      "decision": null
+    },
+    {
+      "review_id": "P12-R03",
+      "kind": "requirement",
+      "id": "req-ontology-fallback",
+      "statement": "Optional concept matching preserves the existing hybrid retrieval candidates.",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 30,
+        "last": 40,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "f4a1f89b9511f138b7d2f1a4e215d157fa007e48c12e4906e3cb29b1965ffc6a"
+      },
+      "authority": "D1 design example, not full-product completion",
+      "scope": "spec-pilot version1 at named revision",
+      "decision": null
+    },
+    {
+      "review_id": "P12-A04",
+      "kind": "criterion",
+      "id": "ac-ontology-fallback",
+      "given": "An ambiguous term or an unverified concept relationship",
+      "when": "A user asks a natural-language question",
+      "then": "The baseline CKV and CKG citation set is preserved",
+      "source": {
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "first": 37,
+        "last": 40,
+        "file_sha256": "59e751667d812bafd7431765d603a395ac30707fd1eae430be7162a65ba84ac1",
+        "content_sha256": "8a8b75713b5463bc0b4d9dd7a370dcb1e610c81cb3478689ce1572bb5012502f"
+      },
+      "candidate_implementation": {
+        "path": "internal/system/composer/stage2/ontology_provider.go",
+        "first": 76,
+        "last": 244,
+        "file_sha256": "948a46cd0725e4170acee64c0d72c06ee8a8091ebd368ba79bd8b4f25d7cee25",
+        "content_sha256": "046b576e2a794a161e2d4017ae1ff9099c89d4e4c6869efd2e5b52f812b937d4",
+        "declaration": "func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, prompt string, hits []contract.Hit, baseline []ScoredCitation, demoteTests, demoteDocs bool) ([]ScoredCitation, []semantic.ConceptCandidate, *contract.OntologyDiagnostic) {",
+        "canonical_id": null,
+        "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+      },
+      "candidate_test_links": [
+        {
+          "test": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+          "package": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2",
+          "candidate_anchor": {
+            "path": "internal/system/composer/stage2/ontology_provider_test.go",
+            "first": 49,
+            "last": 82,
+            "file_sha256": "4b17855299ff913d8c23033054e363f1ea77150de093931a1ea3d8c2f2b4ebd8",
+            "content_sha256": "bb58559a029f2bfa13342e87b9260f3b043addab28df70e64ea8f4267af9c1aa",
+            "declaration": "func TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline(t *testing.T) {",
+            "canonical_id": null,
+            "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+          },
+          "observed_test_pass": true,
+          "semantic_accepted": false
+        }
+      ],
+      "source_validated": true,
+      "linked": false,
+      "tested": true,
+      "accepted": false,
+      "decision": null
+    }
+  ],
+  "reviewer": null,
+  "human_active_minutes": null,
+  "human_cost": null,
+  "automated_test_scope": "six named tests and subcases; not CriterionDecision or full end-to-end acceptance",
+  "pending": [
+    "human content/relationship decisions",
+    "CKG canonical and coordinated archive/lock alignment",
+    "real review time and costs",
+    "actual ADR-to-change acceptance, reject/rollback runs N14"
+  ]
+}

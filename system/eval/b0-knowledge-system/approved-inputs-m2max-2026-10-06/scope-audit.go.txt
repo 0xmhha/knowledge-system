@@ -1,0 +1,11 @@
+package main
+import("encoding/json";"os";"fmt";"sort";"crypto/sha256";"encoding/hex";"github.com/0xmhha/knowledge-system/internal/vector/discover")
+func main(){
+ root:=os.Args[1];paths,err:=discover.LoadBuildSources(os.Args[2]);if err!=nil{panic(err)}
+ base,errs,err:=discover.Walk(root,discover.Options{});if err!=nil||len(errs)>0{panic(fmt.Sprint(err,errs))}
+ full,errs,err:=discover.Walk(root,discover.Options{BuildSources:paths});if err!=nil||len(errs)>0{panic(fmt.Sprint(err,errs))}
+ seen:=map[string]bool{};for _,f:=range base{seen[f.RelPath]=true};added:=[]string{};files:=[]map[string]any{};langs:=map[string]int{}
+ for _,f:=range full{if !seen[f.RelPath]{added=append(added,f.RelPath)};raw,e:=os.ReadFile(f.AbsPath);if e!=nil{panic(e)};sum:=sha256.Sum256(raw);files=append(files,map[string]any{"path":f.RelPath,"sha256":hex.EncodeToString(sum[:]),"language":f.Language});langs[f.Language]++}
+ sort.Strings(paths);sort.Strings(added);if fmt.Sprint(paths)!=fmt.Sprint(added){panic(fmt.Sprintf("scope delta differs: %v",added))}
+ if err:=json.NewEncoder(os.Stdout).Encode(map[string]any{"base_file_count":len(base),"approved_file_count":len(full),"added":added,"languages":langs,"files":files});err!=nil{panic(err)}
+}

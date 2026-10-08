@@ -1,0 +1,222 @@
+[
+  {
+    "label": "old-index-new-source-fixed",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "query",
+      "What value does Alpha return?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-fixed-ckv",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "query",
+      "What value does Alpha return?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-fixed-sdk",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old-fixed-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-fixed-ckv",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "query",
+      "What value does Alpha return?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-fixed-sdk",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new-fixed-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-fixed-ckv",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "query",
+      "Where is Alpha implemented and which refund limit applies?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-fixed-sdk",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a-fixed-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F05-mixed",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F05-mixed.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F05-mixed-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 1
+  },
+  {
+    "label": "F-05-DEV-b-fixed-ckv",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/ckv",
+      "query",
+      "Where is Alpha implemented and which refund limit applies?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-fixed-sdk",
+    "command": [
+      "/private/tmp/ks-f0405-preparation-20261005/fixed-bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b-fixed-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  }
+]

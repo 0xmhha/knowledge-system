@@ -1,0 +1,88 @@
+test_bge_runtime_options_match_ckv_policy (test_b0_preflight.PreflightTest.test_bge_runtime_options_match_ckv_policy) ... ok
+test_draft_gold_cannot_be_exported (test_b0_preflight.PreflightTest.test_draft_gold_cannot_be_exported) ... ok
+test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) ... 
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='../escaped') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='/absolute') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='B0\\escaped') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='space id') ... FAIL
+test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) ... FAIL
+test_model_digest_change_during_probe_is_rejected (test_b0_preflight.PreflightTest.test_model_digest_change_during_probe_is_rejected) ... ERROR
+test_question_anchor_change_is_rejected_before_measurement (test_b0_preflight.PreflightTest.test_question_anchor_change_is_rejected_before_measurement) ... ok
+test_remote_endpoint_is_rejected (test_b0_preflight.PreflightTest.test_remote_endpoint_is_rejected) ... ok
+test_stable_model_identity_includes_dimension (test_b0_preflight.PreflightTest.test_stable_model_identity_includes_dimension) ... ERROR
+test_synthetic_approved_gold_exports_without_answers (test_b0_preflight.PreflightTest.test_synthetic_approved_gold_exports_without_answers) ... ok
+
+======================================================================
+ERROR: test_model_digest_change_during_probe_is_rejected (test_b0_preflight.PreflightTest.test_model_digest_change_during_probe_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 117, in test_model_digest_change_during_probe_is_rejected
+    server = HTTPServer(("127.0.0.1", 0), ModelHandler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_stable_model_identity_includes_dimension (test_b0_preflight.PreflightTest.test_stable_model_identity_includes_dimension)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 133, in test_stable_model_identity_includes_dimension
+    server = HTTPServer(("127.0.0.1", 0), ModelHandler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='../escaped')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='/absolute')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='B0\\escaped')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='space id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (test_b0_preflight.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 67, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.967s
+
+FAILED (failures=5, errors=2)

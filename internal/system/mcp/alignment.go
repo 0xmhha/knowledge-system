@@ -46,7 +46,10 @@ type AlignmentSources struct {
 // AlignmentReport is the health-facing verdict of the startup assert. OK=false
 // makes the instance non-serviceable (fail-loud, 2026-06-15 policy).
 type AlignmentReport struct {
-	OK bool `json:"ok"`
+	OK         bool   `json:"ok"`
+	ProjectID  string `json:"project_id,omitempty"`
+	SnapshotID string `json:"snapshot_id,omitempty"`
+	DatasetID  string `json:"dataset_id,omitempty"`
 	// DatasetVersion is the version label of the dataset directory the
 	// instance resolved at startup (the "@<ver>" segment when the versioned
 	// blue-green layout is in use; empty for legacy flat layouts).
@@ -79,6 +82,7 @@ type AlignmentReport struct {
 // AlignmentInputs carries everything ComputeAlignment needs; the caller
 // (cmd/cks-mcp) gathers them at startup.
 type AlignmentInputs struct {
+	CKGManifest []byte
 	// CKG coordinates (from ckgclient.Health / the graph manifest).
 	CKGSrcCommit string
 	CKGSchema    string
@@ -102,10 +106,16 @@ type AlignmentInputs struct {
 // indexes, in which case top-level src_commit/src_root are the fallback
 // coordinates.
 type ckvManifest struct {
-	SrcCommit   string `json:"src_commit"`
-	IndexedHead string `json:"indexed_head"`
-	SrcRoot     string `json:"src_root"`
-	Sources     struct {
+	ProjectID           string `json:"project_id"`
+	SnapshotID          string `json:"snapshot_id"`
+	DatasetID           string `json:"dataset_id"`
+	FileManifestDigest  string `json:"file_manifest_digest"`
+	CapturePolicyDigest string `json:"capture_policy_digest"`
+	SourceMode          string `json:"source_mode"`
+	SrcCommit           string `json:"src_commit"`
+	IndexedHead         string `json:"indexed_head"`
+	SrcRoot             string `json:"src_root"`
+	Sources             struct {
 		CKG struct {
 			GraphDigest   string `json:"graph_digest"`
 			SrcCommit     string `json:"src_commit"`
@@ -143,7 +153,7 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	if haveManifest {
 		// Prefer the sources ledger; fall back to the top-level fields.
 		ckvCommit = m.Sources.CKG.SrcCommit
-		if ckvCommit == "" {
+		if ckvCommit == "" && m.SourceMode != "snapshot-only" {
 			ckvCommit = firstNonEmpty(m.SrcCommit, m.IndexedHead)
 			rep.Warnings = append(rep.Warnings,
 				"ckv sources.ckg ledger absent (pre-P1 index) — using top-level src_commit")
@@ -158,10 +168,6 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	// two individually-reachable backends whose join cannot be checked are
 	// confidently-wrong, not ok. A pre-P1 index still has a top-level src_commit
 	// (ckvCommit non-empty), so only a truly missing/unparsable manifest trips.
-	if in.CKVConfigured && ckvCommit == "" {
-		errs = append(errs, "ckv index configured but its manifest is missing or has no commit — "+
-			"alignment coordinates unavailable, cannot verify the canonical_id join")
-	}
 	if in.CKGSrcCommit != "" && ckvCommit != "" && in.CKGSrcCommit != ckvCommit {
 		errs = append(errs, fmt.Sprintf(
 			"ckg/ckv built from different commits (ckg %.9s, ckv %.9s)", in.CKGSrcCommit, ckvCommit))
@@ -174,6 +180,47 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 		errs = append(errs, fmt.Sprintf(
 			"graph digest mismatch (ckg %.12s, ckv aligned to %.12s) — ckv canonical_id stale",
 			in.CKGDigest, rep.GraphDigestExpected))
+	}
+	var graph struct {
+		ProjectID           string `json:"project_id"`
+		SnapshotID          string `json:"snapshot_id"`
+		DatasetID           string `json:"dataset_id"`
+		FileManifestDigest  string `json:"file_manifest_digest"`
+		CapturePolicyDigest string `json:"capture_policy_digest"`
+		SourceMode          string `json:"source_mode"`
+	}
+	if len(in.CKGManifest) > 0 {
+		if err := json.Unmarshal(in.CKGManifest, &graph); err != nil {
+			errs = append(errs, "ckg identity manifest unparsable")
+		}
+	}
+	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
+	vectorPinned := m.ProjectID != "" || m.SnapshotID != "" || m.DatasetID != ""
+	snapshotOnlyPinned := graphPinned && vectorPinned && graph.SourceMode == "snapshot-only" && m.SourceMode == "snapshot-only" &&
+		in.CKGSrcCommit == "" && ckvCommit == "" && m.SrcCommit == "" && m.IndexedHead == "" &&
+		m.Sources.CKG.SrcCommit == "" && in.CKGDigest != "" && rep.GraphDigestExpected != "" &&
+		in.CKGDigest == rep.GraphDigestExpected
+	if in.CKVConfigured && ckvCommit == "" && !snapshotOnlyPinned {
+		errs = append(errs, "ckv index configured but its manifest is missing or has no commit — "+
+			"alignment coordinates unavailable, cannot verify the canonical_id join")
+	}
+	if graphPinned && graph.SourceMode == "snapshot-only" && (in.CKGSrcCommit != "" || ckvCommit != "" || m.SrcCommit != "" || m.IndexedHead != "" || m.Sources.CKG.SrcCommit != "") {
+		errs = append(errs, "snapshot-only index unexpectedly carries a Git commit")
+	}
+	if graphPinned && graph.SourceMode != "snapshot-only" && in.CKGSrcCommit == "" {
+		errs = append(errs, "pinned Git graph has no source commit")
+	}
+	if graphPinned || vectorPinned {
+		if graph.ProjectID == "" || graph.SnapshotID == "" || graph.DatasetID == "" ||
+			graph.FileManifestDigest == "" || graph.CapturePolicyDigest == "" || graph.SourceMode == "" ||
+			m.ProjectID == "" || m.SnapshotID == "" || m.DatasetID == "" ||
+			graph.ProjectID != m.ProjectID || graph.SnapshotID != m.SnapshotID || graph.DatasetID != m.DatasetID ||
+			graph.FileManifestDigest != m.FileManifestDigest ||
+			graph.CapturePolicyDigest != m.CapturePolicyDigest || graph.SourceMode != m.SourceMode {
+			errs = append(errs, "ckg/ckv project, snapshot or dataset identity mismatched")
+		} else {
+			rep.ProjectID, rep.SnapshotID, rep.DatasetID = graph.ProjectID, graph.SnapshotID, graph.DatasetID
+		}
 	}
 
 	// --- WARNING tier -----------------------------------------------------

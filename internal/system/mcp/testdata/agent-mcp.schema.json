@@ -7,19 +7,23 @@
    "description": "Compose a budgeted evidence pack for a development task (the primary planning entrypoint): runs the intent \u2192 stage1 (semantic) \u2192 stage2 (keyword/graph) \u2192 stage3 \u2192 budget \u2192 sanitize pipeline.",
    "input": {
     "properties": {
-     "task": {
+     "prompt": {
       "type": "string"
      },
-     "max_citations": {
-      "type": "number"
-     },
-     "budget_tokens": {
-      "type": "number"
+     "intent": {
+      "type": "string"
      }
     },
     "required": [
-     "task"
+     "prompt"
     ]
+   }
+  },
+  "cks.context.get_for_task_v2": {
+   "description": "Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity.",
+   "input": {
+    "properties": {"prompt": {"type": "string"}, "intent": {"type": "string"}, "include_knowledge": {"type": "boolean"}, "knowledge_as_of": {"type": "string"}, "knowledge_subsystem": {"type": "string"}},
+    "required": ["prompt"]
    }
   },
   "cks.context.semantic_search": {

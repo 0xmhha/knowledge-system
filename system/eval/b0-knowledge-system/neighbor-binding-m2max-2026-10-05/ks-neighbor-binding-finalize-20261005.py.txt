@@ -1,0 +1,44 @@
+import json,hashlib,subprocess,shutil
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-neighbor-binding-live-20261005');OLD=Path('/private/tmp/ks-large-cost-20261005');sha=lambda b:hashlib.sha256(b).hexdigest();read=lambda p:json.loads(p.read_bytes())
+s=read(R/'summary.json');g=read(R/'direct-go-replay.json');v=read(R/'public-go-contract.json');cases=read(R/'source-cases.json')['cases']
+assert g['test_failed'] is False and g['observed_calls']==g['planned_calls']==20 and g['no_node_errors']==12 and g['returned']==8
+assert len(v['records'])==4 and v['failed']==0 and v['input_sha256']==sha((R/'derived-sdk-rows.jsonl').read_bytes())
+for c,r in zip(cases,g['rows'],strict=True):
+ for k in ['measurement_id','ordinal','input_sha256','input_bytes','citation','options']:assert c[k]==r[k]
+ assert c['recorded_outcome']==r['outcome'] and c['recorded_result_count']==r['result_count']
+for label,root,ephemeral in [('original',Path('/private/tmp/ks-b0-m2max-full-20261003/dataset/m2max-diagnostic'),False),('source',Path('/private/tmp/ks-b0-m2max-corpus-20261003'),False),('copy',OLD/'dataset/diagnostic',True)]:
+ actual={}
+ for p in sorted(root.rglob('*')):
+  if not p.is_file():continue
+  if ephemeral and (p.name.endswith('.db-shm') or p.name.endswith('.db-wal')):
+   if p.name.endswith('.db-wal'):assert p.stat().st_size==0
+   continue
+  actual[str(p.relative_to(root))]={'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+ assert actual==read(OLD/(label+'-seal-before.json'))
+ s['seals'][label]['after_direct_go_replay_unchanged']=True
+for name,h in s['human_inputs_unchanged'].items():assert sha((ROOT/name).read_bytes())==h and subprocess.check_output(['git','show','HEAD:'+name])==(ROOT/name).read_bytes()
+s['public_go_verified_rows']=4;s['direct_go_replay']={'planned':20,'observed':20,'no_node_errors':12,'returned':8,'all_recorded_outcomes_and_counts_identical':True,'source_argument_sha_verified_by_go':True,'report_sha256':sha((R/'direct-go-replay.json').read_bytes())}
+s['limits']=s['limits'][:-1]+['Only these 20 newly bound DEV calls are source-argument replayed; no retrospective cause assertion for old logs; no official quality or complete source coverage']
+(R/'summary.json').write_text(json.dumps(s,ensure_ascii=False,indent=2)+'\n')
+# This file records observed tool exits, not invented new executions.
+(R/'verification-exits.json').write_text(json.dumps({'basis':'actual tool results from this session','prefailing_neighbor_source_test':1,'related_six_package_tests':0,'backendmeasure_mcp_race':0,'selected_vet':0,'cks_build':0,'on_sdk_capture':0,'off_sdk_capture':0,'sdk_source_binding_audit':0,'public_go_verify':0,'direct_bound_go_replay':0,'quality_metrics':None,'official_verdict':None},indent=2)+'\n')
+OUT=ROOT/'system/eval/b0-knowledge-system/neighbor-binding-m2max-2026-10-05';OUT.mkdir(exist_ok=False)
+def copy(p,name=None):
+ name=name or p.name
+ if p.suffix=='.txt':
+  raw=p.read_bytes();(OUT/(name+'.json')).write_text(json.dumps({'original_path':str(p),'original_bytes':len(raw),'original_sha256':sha(raw),'text':raw.decode()},ensure_ascii=False,indent=2)+'\n')
+ else:shutil.copyfile(p,OUT/name)
+for p in sorted(R.iterdir()):
+ if p.is_file():copy(p)
+for mode in ('on','off'):copy(R/('footprints-'+mode)/'cks-mcp.jsonl','footprints-'+mode+'.jsonl')
+for kind in ['prefail','tests','race','vet','build']:copy(Path('/private/tmp/ks-neighbor-binding-'+kind+'-20261005.txt'))
+for kind in ['live','audit','finalize']:copy(Path('/private/tmp/ks-neighbor-binding-'+kind+'-20261005.py'),'ks-neighbor-binding-'+kind+'-20261005.py.txt')
+files=['internal/system/backendmeasure/clients.go','internal/system/backendmeasure/recorder_test.go','internal/system/ckgclient/real.go','internal/system/ckgclient/diagnostic_neighbor_binding_tmp_test.go'];bindings={}
+for relative in files:
+ p=ROOT/relative;name=relative.replace('/','__')+'.txt';shutil.copyfile(p,OUT/name);bindings[relative]={'snapshot':str((OUT/name).relative_to(ROOT)),'sha256':sha(p.read_bytes()),'temporary_test_removed_after_capture':relative.endswith('diagnostic_neighbor_binding_tmp_test.go')}
+(OUT/'source-bindings.json').write_text(json.dumps(bindings,indent=2)+'\n')
+entries=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(OUT.iterdir()) if p.is_file()]
+(OUT/'evidence-manifest.json').write_text(json.dumps({'scope':'FIX-21 neighbors measurement argument binding; diagnostic only; no DB/model/binary/private key; archived code/helper text; logs losslessly wrapped','files':entries},indent=2)+'\n')
+(ROOT/'internal/system/ckgclient/diagnostic_neighbor_binding_tmp_test.go').unlink()
+print(json.dumps({'artifact':str(OUT),'files':len(entries),'direct_go':20,'sdk':4,'temporary_test_removed':True}))

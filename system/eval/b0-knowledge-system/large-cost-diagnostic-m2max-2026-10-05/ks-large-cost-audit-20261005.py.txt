@@ -1,0 +1,52 @@
+import json,hashlib,importlib.util,statistics,math,re,collections
+from pathlib import Path
+ROOT=Path.cwd();RUN=Path('/private/tmp/ks-large-cost-20261005')
+sp=importlib.util.spec_from_file_location('base',ROOT/'scripts/b1-summarize-matrix.py');B=importlib.util.module_from_spec(sp);sp.loader.exec_module(B)
+read=lambda n:json.loads((RUN/n).read_bytes());sha=lambda b:hashlib.sha256(b).hexdigest()
+cap=read('capture.json');req=read('requests.json');plan=read('plan.json');identity=json.loads((RUN/'dataset/diagnostic/dataset-identity.json').read_bytes());manifest=json.loads((RUN/'dataset/diagnostic/vector/manifest.json').read_bytes())
+assert cap['state']=='captured' and not cap.get('errors') and cap['quality_metrics'] is None and len(cap['rows'])==plan['planned_calls']==60
+assert cap['counts']=={'retrieval':5,'warmup':2,'warm_latency':20,'cold_process':3}
+assert cap['request_sha256']==sha((RUN/'requests.json').read_bytes()) and cap['config_sha256']==cap['config_sha256_after']==sha((RUN/'config.yaml').read_bytes()) and cap['binary_sha256']==cap['binary_sha256_after']
+for name in ('original-seal','source-seal','copy-seal','bindings'):assert read(name+'-before.json')==read(name+'-after.json')
+assert read('model-before.json')['version']==read('model-after.json')['version']=={'version':'0.35.1'}
+for name in ('model-before.json','model-after.json'):assert next(m['digest'] for m in read(name)['tags']['models'] if m['name']=='bge-m3:latest')==identity['embedding_identity']['model_digest']
+assert manifest['chunk_count']==13575 and len(manifest['input_files'])==1569 and identity['embedding_identity']['Dim']==1024
+scopes={}
+for line in (RUN/'footprints/cks-mcp.jsonl').read_text().splitlines():
+ e=json.loads(line)
+ if e.get('event')=='measurement.backend_calls':
+  s=e['summary'];assert s['measurement_id'] not in scopes;scopes[s['measurement_id']]=s
+startup=[s for s in scopes.values() if s['tool']=='startup.intent_anchors'];assert len(startup)==7
+scopes={k:s for k,s in scopes.items() if s['tool']=='cks.context.get_for_task_v2'}
+assert len(scopes)==60
+slots=set();canonical={};stats={};derived=[];cites=bodies=0;totals=collections.Counter();ordinal=0
+for request in req['requests']:
+ own=[r for r in cap['rows'] if r['request_id']==request['id']]; assert len(own)==30
+ timing={};sizes=[];metrics=collections.Counter(); ks=collections.Counter()
+ for r in own:
+  slot=(r['request_id'],r['phase'],r['iteration']);assert slot not in slots;slots.add(slot)
+  call=r['call'];res=call['response'];assert not r.get('error') and not call.get('transport_error') and not res.get('isError') and call['tool']==request['tool'] and call['arguments']==request['arguments']
+  p=res['structuredContent'];B.verify_pack(p,identity,Path('/private/tmp/ks-b0-m2max-corpus-20261003'));assert p['query']==request['arguments']['prompt']
+  evidence={'citations':p['citations'],'bodies':p['bodies'],'coordinates':p['coordinates']}
+  if request['id'] not in canonical:canonical[request['id']]=evidence
+  assert evidence==canonical[request['id']]
+  cites+=len(p['citations']);bodies+=len(p['bodies']);scope=scopes[call['measurement_id']];assert scope['outcome']=='returned' and scope['tool']==request['tool']
+  raw=scope['calls']; assert [x['ordinal'] for x in raw]==list(range(1,len(raw)+1))
+  for x in raw:
+   metrics['logical_calls' if x['backend']!='ollama_http' else 'http_attempts']+=1
+   metrics['nonreturned_attempts']+= x['outcome']!='returned'
+   if x['backend']=='ollama_http':metrics['http_'+str(x.get('http_status'))]+=1
+   if x['backend']=='ckv' and x['method'] in ('semantic_search','find_invariants','get_conventions'):
+    k=x.get('options',{}).get('K'); assert k in (6,10);ks[k]+=1
+  assert any(x['backend']=='ckv' and x.get('options',{}).get('K')==10 for x in raw)
+  timing.setdefault(r['phase'],[]).append(call['elapsed_ns']/1e9)
+  if r['phase']=='cold_process':timing.setdefault('cold_process_start_through_response',[]).append(r['process_start_through_response_ns']/1e9)
+  sizes.append(len(json.dumps(res,ensure_ascii=False,separators=(',',':')).encode()))
+  ordinal+=1;derived.append({'sequence':ordinal,'arm':'baseline_on' if request['arguments']['include_knowledge'] else 'baseline_off',**r})
+ stats[request['id']]={'timing_seconds':{k:{'n':len(v),'min':min(v),'p50':B.percentile(v,.5),'p95_nearest_rank':B.percentile(v,.95),'max':max(v)} for k,v in timing.items()},'response_json_reserialized_utf8_bytes':{'n':len(sizes),'min':min(sizes),'max':max(sizes)},'backend_attempts':dict(metrics),'ckv_retrieval_K_histogram':dict(ks)};totals.update(metrics)
+assert list(canonical.values())[0]==list(canonical.values())[1]
+(RUN/'derived-sdk-rows.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in derived))
+time_raw=(RUN/'stderr-time.txt').read_text(); time_line=next((x for x in time_raw.splitlines() if re.search(r'\d+\.\d+ real\s+\d+\.\d+ user\s+\d+\.\d+ sys',x)),None)
+resources={'raw_time_line':time_line,'reported_maximum_resident_set_size_bytes':next((int(x.strip().split()[0]) for x in time_raw.splitlines() if 'maximum resident set size' in x),None),'note':'Raw Darwin time -l report; do not interpret as MCP process-tree/model-server peak or exclusive host capacity; sample ps tracks wrapper only'}
+result={'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'human_cost':None,'scope':'one DEV prompt, reused partial corpus, latest package, baseline/knowledge only; not official paired quality or scaling law','run_result':read('run-result.json'),'planned_calls':60,'observed_calls':len(cap['rows']),'failed_calls':0,'missing_calls':0,'citations':cites,'bodies':bodies,'source_and_integrity_valid':True,'positive_evidence_identical_across_repetitions_and_modes':True,'inputs_unchanged':True,'corpus':{'input_files':1569,'chunks':13575,'missing_go_files':29,'source_commit':identity['source']['source_commit'],'dataset_id':identity['dataset_id'],'selected_payload_bytes':sum(x['bytes'] for x in read('copy-seal-before.json').values())},'capture_bytes':(RUN/'capture.json').stat().st_size,'footprint_bytes':(RUN/'footprints/cks-mcp.jsonl').stat().st_size,'capture_sha256':sha((RUN/'capture.json').read_bytes()),'derived_rows_sha256':sha((RUN/'derived-sdk-rows.jsonl').read_bytes()),'resources':resources,'startup_intent_anchor_scopes':{'count':len(startup),'backend_attempts':dict(collections.Counter((c['backend']+':'+c['method']+':'+c['outcome']) for s in startup for c in s['calls'])),'elapsed_ns_by_scope':[sum(c['elapsed_ns'] for c in s['calls'] if c['backend']=='intent') for s in startup]},'requests':stats,'total_backend_attempts':dict(totals),'limits':['existing dataset built before EOF/other fixes; no completeness claim','one independent development query; no FINAL exposure; repeated calls are not independent samples','nonexclusive native host; model residency changes from unloaded to loaded; cold process does not unload model','startup intent anchor scopes separated; other constructors/SQL/model internals outside per-call counters; no monetary or energy estimate','no human protocol/scope/quality/operating approval or full 8-arm comparison']}
+(RUN/'summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps(result,ensure_ascii=False,indent=2))

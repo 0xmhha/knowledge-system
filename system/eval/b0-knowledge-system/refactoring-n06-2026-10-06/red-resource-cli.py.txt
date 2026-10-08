@@ -1,0 +1,15 @@
+import json,pathlib,subprocess,tempfile
+repo=pathlib.Path.cwd();e=repo/'system/eval/b0-knowledge-system/refactoring-n06-2026-10-06';bins=pathlib.Path('/private/tmp/ks-n05-bin')
+root=pathlib.Path(tempfile.mkdtemp(prefix='cks-n06-red-'));src=root/'source';src.mkdir()
+(src/'go.mod').write_text('module example.org/resourcefixture\n\ngo 1.25.13\n');(src/'main.go').write_text('package fixture\n\nfunc Alpha() int { return 7 }\n')
+results=[]
+for name,setting in [('file-count','max_capture_files: 1'),('file-bytes','max_capture_file_bytes: 16'),('total-bytes','max_capture_total_bytes: 16'),('deadline','build_timeout: 1ms')]:
+ ds=root/name;config=root/(name+'.yaml')
+ config.write_text(f'project_id: n06-fixture\nsource_mode: snapshot-only\nsrc: {src}\nout: {ds}\ngraph_bin: {bins/"ckg"}\nvector_bin: {bins/"ckv"}\nembedder: mock\n{setting}\n')
+ command=[str(bins/'cks'),'setup','--config',str(config),'--version','candidate','--progress','json']
+ r=subprocess.run(command,capture_output=True,text=True,timeout=45)
+ (e/(name+'.red.stdout.log')).write_text(r.stdout);(e/(name+'.red.stderr.log')).write_text(r.stderr)
+ assert r.returncode==0 and (ds/'current').is_symlink(),(name,r.returncode,r.stderr)
+ results.append({'name':name,'argv':command,'exit_code':r.returncode,'required_rejection_observed':False,'current':str((ds/'current').readlink())})
+ print(name,'RED: ignored limit and promoted candidate')
+(e/'red-results.json').write_text(json.dumps({'base_commit':'f17a97cc','scope':'disposable native CLI fixture, expected limit rejection absent','cases':results},indent=2)+'\n')

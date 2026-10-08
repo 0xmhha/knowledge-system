@@ -1,0 +1,45 @@
+..FF
+======================================================================
+FAIL: test_linux_retains_all_dependencies_versions_and_missing_libraries (test_package_dependencies.DependencyMetadataTests.test_linux_retains_all_dependencies_versions_and_missing_libraries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_package_dependencies.py", line 27, in test_linux_retains_all_dependencies_versions_and_missing_libraries
+    self.assertEqual(self.inspect('Linux', output), expected)
+AssertionError: Lists differ: ['\tlibm.so.6 => /lib/libm.so.6 (0x0000ffff2222[99 chars]00)'] != ['\tlinux-vdso.so.1', '\tlibm.so.6 => /lib/libm[78 chars]o.1']
+
+First differing element 0:
+'\tlibm.so.6 => /lib/libm.so.6 (0x0000ffff22220000)'
+'\tlinux-vdso.so.1'
+
+Second list contains 1 additional elements.
+First extra element 3:
+'\t/lib/ld-linux-aarch64.so.1'
+
+- ['\tlibm.so.6 => /lib/libm.so.6 (0x0000ffff22220000)',
++ ['\tlinux-vdso.so.1',
++  '\tlibm.so.6 => /lib/libm.so.6',
+   '\tlibversion.so (ABI 0x123) => not found',
+-  '\t/lib/ld-linux-aarch64.so.1 (0x0000ffff33330000)']
+?                               ---------------------
+
++  '\t/lib/ld-linux-aarch64.so.1']
+
+======================================================================
+FAIL: test_static_binary_diagnostic_is_not_discarded (test_package_dependencies.DependencyMetadataTests.test_static_binary_diagnostic_is_not_discarded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_package_dependencies.py", line 31, in test_static_binary_diagnostic_is_not_discarded
+    self.assertEqual(self.inspect('Linux', '\tstatically linked\n'), ['\tstatically linked'])
+AssertionError: Lists differ: [] != ['\tstatically linked']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'\tstatically linked'
+
+- []
++ ['\tstatically linked']
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+FAILED (failures=2)

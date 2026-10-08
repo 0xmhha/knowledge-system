@@ -1,0 +1,63 @@
+{
+  "input_sha256_before_after": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813"
+  },
+  "commands": [
+    {
+      "name": "current-preflight",
+      "command": [
+        "python3",
+        "scripts/b0-prepare-static-inputs.py",
+        "--output",
+        "/private/tmp/ks-static-inputs-20261004/current-preflight.json",
+        "--require-ready"
+      ],
+      "exit_code": 2
+    },
+    {
+      "name": "development-export",
+      "command": [
+        "python3",
+        "scripts/b0-prepare-static-inputs.py",
+        "--output",
+        "/private/tmp/ks-static-inputs-20261004/development-preflight.json",
+        "--out-dir",
+        "/private/tmp/ks-static-inputs-20261004/development"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "final-refusal",
+      "command": [
+        "python3",
+        "scripts/b0-prepare-static-inputs.py",
+        "--partition",
+        "final",
+        "--output",
+        "/private/tmp/ks-static-inputs-20261004/final-preflight.json",
+        "--out-dir",
+        "/private/tmp/ks-static-inputs-20261004/final"
+      ],
+      "exit_code": 2
+    },
+    {
+      "name": "ready-guard",
+      "command": [
+        "python3",
+        "scripts/b0-prepare-static-inputs.py",
+        "--output",
+        "/private/tmp/ks-static-inputs-20261004/ready-guard.json",
+        "--require-ready",
+        "--out-dir",
+        "/private/tmp/ks-static-inputs-20261004/ready-guard-output"
+      ],
+      "exit_code": 2
+    }
+  ],
+  "final_output_absent": true,
+  "ready_guard_output_absent": true,
+  "model_or_mcp_query_executed": false
+}

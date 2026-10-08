@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "python3",
+      "scripts/check-docs.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "scripts/check-boundaries.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/update-execution-status.py",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0
+  }
+]

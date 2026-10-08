@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 51, in <module>
+    bad=dataset/'corrupt-target';shutil.copytree(old,bad);blob=next((bad/'sources/blobs').iterdir());blob.write_bytes(blob.read_bytes()+b'synthetic corrupt target');run('corrupt-target-rollback',[bins/'cks','rollback','corrupt-target','--config',config],expected=1);assert os.readlink(dataset/'current')=='baseline' and snapshot(old)==oldhash
+                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1067, in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/private/tmp/ks-recovery-20261004/darwin-v4/dataset/corrupt-target/sources/blobs/6bb0d095cfe7277d350d4f08237dc2c2b63f88ee8af8a7bb2236fcce711955e3'

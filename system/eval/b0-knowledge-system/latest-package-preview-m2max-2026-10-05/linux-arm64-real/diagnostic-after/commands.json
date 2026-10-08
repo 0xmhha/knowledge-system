@@ -1,0 +1,144 @@
+[
+  {
+    "project": "empty-go",
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-after/empty-go/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-after/empty-go/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/out/diagnostic-after/empty-go/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "Linux actual BGE diagnostic"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "init",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "init",
+      "--src",
+      "/out/diagnostic-after/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-after/empty-go/dataset",
+      "--config-out",
+      "/out/diagnostic-after/empty-go/setup.yaml",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "setup",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "setup",
+      "--config",
+      "/out/diagnostic-after/empty-go/setup.yaml",
+      "--version",
+      "auto",
+      "--ollama-url",
+      "http://127.0.0.1:11434"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "doctor",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "doctor",
+      "--src",
+      "/out/diagnostic-after/empty-go/src",
+      "--dataset",
+      "/out/diagnostic-after/empty-go/dataset"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "query",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/ckv",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "query",
+      "committed guide for empty-go",
+      "--out",
+      "/out/diagnostic-after/empty-go/dataset/current/vector",
+      "--threshold",
+      "-1",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "mcp-config",
+    "command": [
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/out/diagnostic-after/empty-go/dataset/current",
+      "--name",
+      "ks-empty-go",
+      "--source-root",
+      "/out/diagnostic-after/empty-go/src",
+      "--sanitize-rules",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/policies/sanitization_rules.yaml",
+      "--out",
+      "/out/diagnostic-after/empty-go/mcp.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "project": "empty-go",
+    "id": "mcp",
+    "command": [
+      "python3",
+      "/out/mcp-pin-probe-90s.py",
+      "/tmp/unpacked/knowledge-system-linux-arm64-dd5d1b3b8e2e/cks",
+      "/out/diagnostic-after/empty-go/mcp.yaml",
+      "--once",
+      "Where is the committed guide for empty-go?"
+    ],
+    "exit_code": 1
+  }
+]

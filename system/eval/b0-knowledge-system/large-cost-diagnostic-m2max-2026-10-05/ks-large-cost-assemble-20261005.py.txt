@@ -1,0 +1,23 @@
+import json,hashlib,shutil,subprocess
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-large-cost-20261005');OUT=ROOT/'system/eval/b0-knowledge-system/large-cost-diagnostic-m2max-2026-10-05';OUT.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+for file,expected in [('public-go-contract.json',60),('memory-public-go-contract.json',2)]:
+ report=json.loads((R/file).read_bytes());assert report['failed']==0 and len(report['records'])==expected
+for p in sorted(R.iterdir()):
+ if not p.is_file():continue
+ raw=p.read_bytes()
+ if p.suffix=='.txt':
+  wrapper={'original_path':str(p),'original_bytes':len(raw),'original_sha256':sha(raw),'text':raw.decode()}
+  (OUT/(p.name+'.json')).write_text(json.dumps(wrapper,ensure_ascii=False,indent=2)+'\n')
+ else:shutil.copyfile(p,OUT/p.name)
+for name in ('footprints','memory-footprints'):
+ raw=(R/name/'cks-mcp.jsonl').read_bytes();(OUT/(name+'.jsonl')).write_bytes(raw)
+for p in [Path('/private/tmp/ks-large-cost-20261005.py'),Path('/private/tmp/ks-large-cost-audit-20261005.py'),Path('/private/tmp/ks-large-memory-20261005.py'),Path('/private/tmp/ks-large-cost-memory-audit-20261005.py'),Path('/private/tmp/ks-large-cost-assemble-20261005.py')]:shutil.copyfile(p,OUT/(p.name+'.txt'))
+for p in [ROOT/'cmd/b1-evidence-audit/main.go',ROOT/'scripts/b1-summarize-matrix.py']:
+ shutil.copyfile(p,OUT/(p.name+'.txt'))
+provenance={'product_source':'31def76be0c6c4536129acb114fccb34d02d87ce','package_document':'docs/spec-driven/C1-LATEST-PREVIEW-VALIDATION.md','package_summary_sha256':sha((ROOT/'system/eval/b0-knowledge-system/latest-package-preview-m2max-2026-10-05/summary.json').read_bytes()),'collector_source_sha256':sha((ROOT/'cmd/cks/evalcli/capture.go').read_bytes()),'audit_source_sha256':sha((ROOT/'cmd/b1-evidence-audit/main.go').read_bytes()),'verifier_source_last_commit':subprocess.check_output(['git','log','-1','--format=%H','--','cmd/b1-evidence-audit/main.go'],text=True).strip(),'source_archive_note':'existing auxiliary public verifier binary reused; source unchanged, binary SHA bound in both reports; no new Go rebuild claimed','planned_primary_calls':60,'auxiliary_calls':2,'quality_metrics':None,'official_verdict':None}
+(OUT/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
+entries=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(OUT.rglob('*')) if p.is_file()]
+(OUT/'evidence-manifest.json').write_text(json.dumps({'scope':'diagnostic_only; no binary, DB, model blob or private key; raw text logs losslessly JSON wrapped','files':entries},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'artifact':str(OUT),'files':len(entries),'total_bytes':sum(e['bytes'] for e in entries)}))

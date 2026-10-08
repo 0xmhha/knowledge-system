@@ -1,0 +1,220 @@
+{
+  "fixture": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc",
+  "scope": "native Darwin ARM64 real CLI engines/mock embeddings and public stdio MCP reader; no quality, native Linux or power-loss verdict",
+  "binaries": {
+    "cks": "322edfa28d5270304278f64713928e885f27094f774e44dda25daa503ccfc671",
+    "ckg": "e999d4dc039779ff8f67d7e80586e5adc680d0e93abaee6957f04ce721b86f2a",
+    "ckv": "ad044b514a40b003a54d4f99cc3c355c560f3b216c5bc404452d3a57ce0025a4"
+  },
+  "cases": [
+    {
+      "name": "build-v1",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/setup.yaml",
+        "--version",
+        "v1",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build-v2",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/setup.yaml",
+        "--version",
+        "v2",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build-v3",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/setup.yaml",
+        "--version",
+        "v3",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build-v4",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/setup.yaml",
+        "--version",
+        "v4",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build-v5",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/setup.yaml",
+        "--version",
+        "v5",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "initial-dry-run",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--min-age",
+        "1h",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "reader-made-plan-stale",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--apply",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "reader-protected-dry-run",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--min-age",
+        "1h",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "apply-with-live-reader",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--apply",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "closed-reader-dry-run",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--min-age",
+        "1h",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "apply-after-reader-close",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--apply",
+        "--plan-file",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/reviewed.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "resume-empty-trash",
+      "argv": [
+        "/private/tmp/ks-n05-bin/cks",
+        "gc",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset",
+        "--resume"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "health": {
+    "name": "n05-reader",
+    "status": "ok",
+    "serviceable": true,
+    "builder_version": "cks-mcp/0.0.1-dev",
+    "source_root": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/source",
+    "backends": {
+      "graph": {
+        "reachable": true,
+        "schema_version": "1.23",
+        "graph_digest": "96dfe9254ed58aead3c75143120671c8d4871f3cabdffcc47c101fe2d5a7fefd",
+        "data_path": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset/v1/graph/graph.db"
+      },
+      "vector": {
+        "reachable": true,
+        "model_reachable": true,
+        "last_index_at": "2026-10-06T05:39:18Z",
+        "provider": "mock",
+        "model": "mock-feature-hash-v1",
+        "dim": 64,
+        "data_path": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n05-cli-2talyxjc/dataset/v1/vector"
+      }
+    },
+    "alignment": {
+      "ok": true,
+      "project_id": "n05-fixture",
+      "snapshot_id": "3b0a569f6db7362edb7b455889e3952235c213a8cda084438ceb41b80a87bfe2",
+      "dataset_id": "5676c3c708adcb2ac98b099cb0662b646020937b004780eeca32b9948c565029",
+      "sources": {
+        "graph": {
+          "schema_version": "1.23",
+          "graph_digest": "96dfe9254ed58aead3c75143120671c8d4871f3cabdffcc47c101fe2d5a7fefd"
+        },
+        "vector": {
+          "graph_digest": "96dfe9254ed58aead3c75143120671c8d4871f3cabdffcc47c101fe2d5a7fefd"
+        }
+      },
+      "schema_version_ckg": "1.23",
+      "graph_digest_actual": "96dfe9254ed58aead3c75143120671c8d4871f3cabdffcc47c101fe2d5a7fefd",
+      "graph_digest_expected": "96dfe9254ed58aead3c75143120671c8d4871f3cabdffcc47c101fe2d5a7fefd",
+      "source_root_ok": true
+    }
+  },
+  "live_reader_preserved": true,
+  "current_and_source_unchanged": true,
+  "closed_reader_reclaimed": true,
+  "success": true
+}

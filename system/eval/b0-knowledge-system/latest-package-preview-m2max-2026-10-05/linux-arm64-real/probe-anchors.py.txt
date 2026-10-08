@@ -1,0 +1,14 @@
+import json,urllib.request,urllib.error,time
+from pathlib import Path
+p=Path('/out');rows=[]
+for i,text in enumerate(json.loads((p/'anchors.json').read_text())):
+ data=json.dumps({'model':'bge-m3:latest','input':[text],'truncate':False,'options':{'num_ctx':8192,'num_batch':8192}}).encode();req=urllib.request.Request('http://127.0.0.1:11434/api/embed',data=data,headers={'Content-Type':'application/json'})
+ try:
+  with urllib.request.urlopen(req,timeout=90) as r:body=r.read();status=r.status
+ except urllib.error.HTTPError as e:body=e.read();status=e.code
+ record={'i':i,'input':text,'status':status,'request':json.loads(data)}
+ if status!=200:record['error_response']=body.decode()
+ else:record['dimensions']=[len(x) for x in json.loads(body)['embeddings']]
+ rows.append(record);(p/'anchor-probe-results.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+ if status!=200:print('anchor',i,'HTTP',status,body.decode(),flush=True)
+print('probed',len(rows),'actual anchors; errors',sum(r['status']!=200 for r in rows),flush=True)

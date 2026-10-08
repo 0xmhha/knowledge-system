@@ -1,0 +1,58 @@
+import json,hashlib,zipfile,tarfile,re,base64,subprocess,collections,datetime
+from pathlib import Path,PurePosixPath
+ROOT=Path.cwd();R=Path('/private/tmp/ks-original-native-20261005');CACHE=Path('/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod');sha=lambda b:hashlib.sha256(b).hexdigest();save=lambda n,v:(R/n).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+fetch=json.loads((R/'fetch-results.json').read_bytes());assert len(fetch)==4 and all(x.get('http_status')==200 and 'error' not in x for x in fetch)
+for x in fetch:assert sha((R/x['name']).read_bytes())==x['sha256']
+roots={m:CACHE/(m+'@'+v) for m,v in [('modernc.org/sqlite','v1.54.0'),('modernc.org/libc','v1.74.1')]};versions={'modernc.org/sqlite':'v1.54.0','modernc.org/libc':'v1.74.1'}
+modules={};inputs=[]
+for m,root in roots.items():
+ v=versions[m];dl=CACHE/'cache/download'/m/'@v';z=zipfile.ZipFile(dl/(v+'.zip'))
+ # Recompute Go's module ZIP h1 from archive file names/content; compare repository pin and cache marker.
+ h=hashlib.sha256()
+ for n in sorted(x for x in z.namelist() if not x.endswith('/')):h.update((sha(z.read(n))+'  '+n+'\n').encode())
+ h1='h1:'+base64.b64encode(h.digest()).decode();assert h1==(dl/(v+'.ziphash')).read_text().strip() and f'{m} {v} {h1}' in (ROOT/'go.sum').read_text().splitlines()
+ selected=['go.mod','Makefile','builder.json','README.md','LICENSE']
+ selected+=['SQLITE-LICENSE','CHANGELOG.md','HACKING.md','lib/sqlite.go','lib/sqlite_darwin_arm64.go','lib/sqlite_linux_arm64.go','lib/sqlite_linux_amd64.go'] if 'sqlite' in m else ['generator.go','genheaders.go','generate.go','internal/archive/archive.go','LICENSE-3RD-PARTY.md']
+ if 'libc' in m:selected+=sorted(str(p.relative_to(root)) for p in (root/'include/linux/arm64').rglob('*.h'))+sorted(str(p.relative_to(root)) for p in (root/'include/linux/amd64').rglob('*.h'))+sorted(str(p.relative_to(root)) for p in (root/'internal/overlay').rglob('*') if p.is_file())
+ for n in selected:
+  raw=(root/n).read_bytes();assert raw==z.read(m+'@'+v+'/'+n)
+  inputs.append({'module':m,'version':v,'path':n,'bytes':len(raw),'sha256':sha(raw),'identical_to_pinned_module_zip':True})
+ modules[m]={'version':v,'h1_recomputed':h1,'zip_sha256':sha((dl/(v+'.zip')).read_bytes()),'origin':json.loads((dl/(v+'.info')).read_bytes()),'input_count':len(selected)};z.close()
+save('module-inputs.json',{'scope':'selected source constants, recipe, two Linux header trees and overlays; not complete code regeneration','modules':modules,'files':inputs})
+# SQLite original C and public header, read in memory without executing or extracting upstream code.
+z=zipfile.ZipFile(R/'sqlite-amalgamation.zip');orig={}
+for n in z.namelist():
+ p=PurePosixPath(n);assert not p.is_absolute() and '..' not in p.parts
+ if n.endswith('/'):continue
+ raw=z.read(n);orig[p.name]=raw
+assert set(orig)=={'sqlite3.c','sqlite3.h','sqlite3ext.h','shell.c'}
+text=(roots['modernc.org/sqlite']/'lib/sqlite.go').read_text();version=re.search(r'const SQLITE_VERSION = "([^"]+)"',text).group(1);source_id=re.search(r'const SQLITE_SOURCE_ID = "([^"]+)"',text).group(1);number=int(re.search(r'const SQLITE_VERSION_NUMBER = (\d+)',text).group(1))
+page=(R/'sqlite-release.html').read_text();published=re.search(r'SHA3-256 for sqlite3.c:.*?([0-9a-f]{64})',page,re.S).group(1);actual=hashlib.sha3_256(orig['sqlite3.c']).hexdigest();assert published==actual and source_id in page
+for n in ['sqlite3.c','sqlite3.h']:
+ s=orig[n].decode();assert re.search(r'#define SQLITE_VERSION\s+"([^"]+)"',s).group(1)==version and re.search(r'#define SQLITE_SOURCE_ID\s+"([^"]+)"',s).group(1)==source_id and int(re.search(r'#define SQLITE_VERSION_NUMBER\s+(\d+)',s).group(1))==number
+commands={}
+for target in ['darwin_arm64','linux_arm64','linux_amd64']:
+ first=(roots['modernc.org/sqlite']/('lib/sqlite_'+target+'.go')).read_text().splitlines()[0];assert first.startswith('// Code generated') and 'sqlite3.c' in first
+ commands[target]={'generated_header':first,'source_constants_shared_in':'lib/sqlite.go','include_directories':re.findall(r'(?:-I|-isystem)\s+(\S+)',first),'generator_input_c':'sqlite3.c','regenerated_here':False}
+save('sqlite-original-binding.json',{'module':modules['modernc.org/sqlite'],'upstream_release_url':fetch[0]['requested_url'],'upstream_archive':fetch[1],'version':version,'source_id':source_id,'version_number':number,'published_sha3_256':published,'sqlite3_c_sha3_256':actual,'original_files':[{'path':n,'bytes':len(b),'sha256':sha(b)} for n,b in orig.items()],'target_generated_headers':commands,'identity_and_original_c_hash_match':True,'full_regeneration':False,'system_header_transitive_scope':'unresolved; generator header mentions libc/libz/libtcl include roots; not proof every listed include was used','legal_review':'pending'})
+# The musl archive is pinned by libc's distributed builder recipe.
+builder=json.loads((roots['modernc.org/libc']/'builder.json').read_bytes());urls=[u for entry in builder['download'] for u in entry['files']];assert fetch[3]['requested_url'] in urls
+commit='7ada6dde6f9dc6a2836c3d92c2f762d35fd229e0';assert commit in (R/'musl-commit.html').read_text()
+tar=tarfile.open(R/'musl-source.tar.gz','r:gz');files={};prefix='musl-'+commit+'/'
+for member in tar.getmembers():
+ p=PurePosixPath(member.name);assert not p.is_absolute() and '..' not in p.parts and (member.name==prefix[:-1] or member.name.startswith(prefix))
+ if not member.isfile():continue
+ b=tar.extractfile(member).read();files[member.name[len(prefix):]]=b
+assert 'COPYRIGHT' in files and 'include/features.h' in files
+inventory=[{'path':n,'bytes':len(b),'sha256':sha(b)} for n,b in sorted(files.items()) if n.endswith(('.c','.h','.h.in')) or n=='COPYRIGHT'];save('musl-original-inventory.json',{'commit':commit,'archive':fetch[3],'regular_files':len(files),'source_and_headers':inventory,'copyright_sha256':sha(files['COPYRIGHT'])})
+rows=[];counts={}
+for goarch,muslarch in [('arm64','aarch64'),('amd64','x86_64')]:
+ count=collections.Counter()
+ for p in sorted((roots['modernc.org/libc']/('include/linux/'+goarch)).rglob('*.h')):
+  rel=str(p.relative_to(roots['modernc.org/libc']/('include/linux/'+goarch)));b=p.read_bytes();candidates=['include/'+rel]
+  if rel.startswith('bits/'):candidates=['arch/'+muslarch+'/'+rel,'arch/generic/'+rel]
+  matching=[n for n in candidates if n in files and files[n]==b];present=[n for n in candidates if n in files];status='byte_identical_to_upstream' if matching else 'different_from_present_upstream' if present else 'generated_or_overlay_origin_unresolved';count[status]+=1
+  rows.append({'target':'linux/'+goarch,'module_header':'include/linux/'+goarch+'/'+rel,'module_sha256':sha(b),'upstream_candidates':[{'path':n,'sha256':sha(files[n]),'bytes':len(files[n])} for n in present],'matching_upstream_paths':matching,'status':status})
+ counts[goarch]=dict(count)
+save('musl-header-comparison.json',{'recipe_source':'modernc.org/libc@v1.74.1/builder.json + generator.go','musl_commit':commit,'upstream_tree':'a9fb539bb6553839248f8bce59ecea0a3e3a2b38','tree_verification':'commit HTML reference; not reconstructed Git tree','counts':counts,'rows':rows,'limits':['header directory inventory is not a preprocessor include-use trace','nonmatching/generated/overlaid files remain explicit','Darwin input header tree is absent in this distributed module; no Apple SDK equality claim','generator changes/overlays and actual original-C-to-Go regeneration not executed'],'legal_review':'pending'})
+summary={'recorded_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'parent_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'quality_metrics':None,'official_verdict':None,'legal_review':'pending','module_inputs_zip_bound':len(inputs),'sqlite_original_c_published_sha3_match':True,'sqlite_c_and_header_version_source_id_match':True,'musl_commit_pinned_in_module_builder':True,'musl_original_source_header_inventory':len(inventory),'musl_header_counts':counts,'source_inputs_unchanged':all(sha((roots[x['module']]/x['path']).read_bytes())==x['sha256'] for x in inputs),'full_native_regeneration':False,'operating_keys_used':False,'limits':['partial original-source origin audit; not legal/compatibility/release approval','module archive origin is Go proxy metadata/h1, not fixed GitLab blob comparison','Darwin SDK and generator include/transitive/overlay inputs remain incomplete','official B0 input decisions still pending']};assert summary['source_inputs_unchanged'];save('summary.json',summary);print(json.dumps(summary,indent=2))

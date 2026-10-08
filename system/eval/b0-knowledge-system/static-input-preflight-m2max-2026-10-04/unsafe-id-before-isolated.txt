@@ -1,0 +1,51 @@
+test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) ... 
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='../escaped') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='/absolute') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='B0\\escaped') ... FAIL
+  test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='space id') ... FAIL
+test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) ... FAIL
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='../escaped')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='/absolute')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='B0\\escaped')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing) (unsafe='space id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 63, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.subTest(unsafe=unsafe), self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_export_ids_cannot_escape_output_or_collide_after_lowercasing (regression.PreflightTest.test_export_ids_cannot_escape_output_or_collide_after_lowercasing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_b0_preflight.py", line 67, in test_export_ids_cannot_escape_output_or_collide_after_lowercasing
+    with self.assertRaisesRegex(ValueError, 'question ID'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.505s
+
+FAILED (failures=5)

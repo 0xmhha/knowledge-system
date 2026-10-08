@@ -1,0 +1,65 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.linux-build
+#1 transferring dockerfile: 425B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.13-bookworm
+#2 ...
+
+#3 [auth] library/golang:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.13-bookworm
+#2 DONE 1.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/2] FROM docker.io/library/golang:1.25.13-bookworm@sha256:e401dae1bf814e29204a8cb7915682e1780951e609ca0dd8865ee1937f510c48
+#5 DONE 0.0s
+
+#6 [2/2] RUN apt-get update     && apt-get install -y --no-install-recommends libsqlite3-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 writing image sha256:4b20e84ccc0a8a6bf12fafbe4d00295f66a6407b5132f6580c3057656f1bb519 done
+#7 naming to docker.io/library/knowledge-system-linux-build:go1.25.13-arm64 done
+#7 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/q9jj7up7lx5zf2zucrmgti0fg
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.linux-runtime-smoke
+#1 transferring dockerfile: 378B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#2 ...
+
+#3 [auth] library/debian:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#2 DONE 1.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/2] FROM docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+#5 DONE 0.0s
+
+#6 [2/2] RUN apt-get update     && apt-get install -y --no-install-recommends bash git python3 ca-certificates     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 writing image sha256:37be188dfb763c2e20ce839df121570a64f6eb60020e2be6a7238574e4c7115d done
+#7 naming to docker.io/library/knowledge-system-runtime-smoke:bookworm-arm64 done
+#7 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/whnh1tmaup02t22u2xl0krc8q
+Linux arm64 signed package smoke passed: /private/tmp/ks-final-package-linux-arm64-20261006

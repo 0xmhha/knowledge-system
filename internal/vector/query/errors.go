@@ -66,6 +66,10 @@ var ErrSanitizeFailed = errors.New("query: sanitize failed")
 // the operator. Defined now for forward-compatible callers.
 var ErrPolicyError = errors.New("query: policy error")
 
+// ErrRequiresV2 prevents legacy query paths from presenting a base Git
+// commit as the source of a working-tree or non-Git snapshot.
+var ErrRequiresV2 = errors.New("requires_v2: non-committed source requires retained v2 evidence")
+
 // MinBudgetTokens is the floor below which BudgetTokens can't even fit
 // a single signature-density hit. Set so a one-line Go signature
 // (~50-80 chars) rounds up to ~20 tokens with one hit; below this the

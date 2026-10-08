@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-05T18:45:38.995575+00:00",
+  "status": "complete_measurements_verified",
+  "supersedes_assumption": "configuration-assembly-correction.json",
+  "F01_primary_capture_pending": false,
+  "F01_noninstrumented": false,
+  "actual_backend_measurement_missing_rows": 0,
+  "actual_source_integrity_valid_rows": 240,
+  "derived_arm_configurations": {
+    "baseline_off.yaml": "208c92f03a03e6a8fc2c04dcc59796f36d89551449356ad47953ea822b07609f",
+    "concept_text_off.yaml": "347c601eb67524a12569eb9ce65db62c351d81789a980582ced8e6e7f6cd1b66",
+    "baseline_on.yaml": "45836673ed88f61bc6d9aa8d2092cd344ad95cdb956e0fde82d570fde1ae4713",
+    "combined_on.yaml": "b342d745c11114b73fd0ce191e63e3733fbfb3cb7aeda5b8406c6f7bf900667a",
+    "concept_text_on.yaml": "39a4b50ae1c27d061588a587f89af5b877d235c061a3d27e3408fc00731eacb3",
+    "relations_on.yaml": "c1ac26dc8b2dd6f4d906f9fa862cb65a484760962ea2baa57b16d4a62a88db38",
+    "combined_off.yaml": "d8090342c91a6ff2eaebd9d3f958ddd81f1613c523a1719dd760658839b36abb",
+    "relations_off.yaml": "e4df271d0a8825aaee63cb99ee8148424e513e78f21ab034102bf5fcfce3e997"
+  },
+  "reason": "matrixRunWithLedger always sets clone.Logging.MeasureBackendCalls=true; base YAML omission does not disable capture instrumentation. Pre-start explicit flags in other base configs are redundant and do not change the derived measurement behavior.",
+  "extra_recapture_required": false
+}

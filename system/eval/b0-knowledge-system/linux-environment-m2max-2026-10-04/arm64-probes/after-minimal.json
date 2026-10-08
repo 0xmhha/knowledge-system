@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-03T19:43:29.819534218Z",
+  "valid": true,
+  "hardware": {
+    "os": "linux",
+    "arch": "arm64",
+    "os_version": "7.0.14-linuxkit",
+    "cpu_brand": "CPU implementer=0x61; CPU architecture=8; CPU variant=0x0; CPU part=0x000; CPU revision=0",
+    "logical_cpus": 12,
+    "memory_bytes": 8214585344,
+    "load": "0.24 0.62 0.83 2/884 14",
+    "memory_state": "MemTotal:        8022056 kB\nMemFree:         1273572 kB\nMemAvailable:    5456064 kB\nBuffers:          319732 kB\nCached:          2982364 kB\nSwapCached:        20960 kB\nActive:          1562792 kB\nInactive:        3334136 kB\nActive(anon):     580332 kB\nInactive(anon):  1400792 kB\nActive(file):     982460 kB\nInactive(file):  1933344 kB\nUnevictable:          60 kB\nMlocked:               0 kB\nSwapTotal:       1048572 kB\nSwapFree:         910012 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               132 kB\nWriteback:             0 kB\nAnonPages:       1553040 kB\nMapped:           310028 kB\nShmem:            386196 kB\nKReclaimable:    1469656 kB\nSlab:            1689720 kB\nSReclaimable:    1469656 kB\nSUnreclaim:       220064 kB\nKernelStack:       14332 kB\nPageTables:        16536 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     5059600 kB\nCommitted_AS:    6555984 kB\nVmallocTotal:   135288315904 kB\nVmallocUsed:       24352 kB\nVmallocChunk:          0 kB\nPercpu:            12336 kB\nAnonHugePages:   1290240 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB",
+    "swap": "SwapCached:        20960 kB\nSwapTotal:       1048572 kB\nSwapFree:         910012 kB\n",
+    "process_count": 1,
+    "process_pressure_method": "Linux /proc/\u003cpid\u003e/stat process lifetime average CPU; PID namespace; RSS in kernel pages",
+    "resource_limits": {
+      "v2.cpu.max": "100000 100000",
+      "v2.cpuset.cpus.effective": "0-11",
+      "v2.memory.max": "536870912",
+      "v2.self.cpu.max": "100000 100000",
+      "v2.self.cpuset.cpus.effective": "0-11",
+      "v2.self.memory.max": "536870912"
+    },
+    "top_cpu_processes": [
+      {
+        "pid": 1,
+        "parent_pid": 0,
+        "cpu_percent": 20.000000004656613,
+        "rss_bytes": 13221888
+      }
+    ],
+    "unavailable": [
+      "thermal"
+    ]
+  },
+  "model": {
+    "provider": "mock",
+    "model": "mock-feature-hash-v1",
+    "dimension": 64,
+    "valid": true,
+    "probe_policy": "validated legacy mock checksum declaration; no native model probe"
+  },
+  "limitations": [
+    "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+    "CPU pressure methods are platform-specific; Linux lifetime averages and ps windows are diagnostics, not resource exclusivity",
+    "Linux memory/CPUs are kernel-visible totals; cgroup values reflect exposed self/v2 ancestors and conventional mount roots, not a certificate of effective capacity",
+    "model identity embed probes occur before/after capture, outside query timing and backend counters",
+    "operator note and input copies do not approve facts/protocol or certify quality"
+  ]
+}

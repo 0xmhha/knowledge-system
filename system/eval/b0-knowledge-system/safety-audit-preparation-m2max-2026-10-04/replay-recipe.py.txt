@@ -1,0 +1,62 @@
+import copy,hashlib,json,subprocess,sys,tempfile
+from pathlib import Path
+root=Path.cwd(); data=root/'system/eval/b0-knowledge-system'; out=data/'safety-audit-preparation-m2max-2026-10-04'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+verifier=Path('/private/tmp/ks-b1-evidence-audit-20261004'); binary_before=sha(verifier)
+results=[]; frozen={}
+for capture in ['matrix-capture','environment-ledger']:
+ for model in ['real','mock']:
+  name=capture+'-'+model;folder=data/(capture+'-m2max-2026-10-04')/model;source=data/'b1-pack-matrix-m2max-2026-10-04'/model/'source'
+  for p in [p for p in folder.rglob('*') if p.is_file()] + [p for p in source.rglob('*') if p.is_file()]:frozen[str(p.relative_to(root))]=sha(p)
+  controls=out/(name+'-controls.json'); contract=out/(name+'-go-contract.json'); safety=out/(name+'-safety.json')
+  # Re-execution replaces only this turn's owned, uncommitted initial results.
+  for p in [contract,safety]:p.unlink()
+  commands=[[str(verifier),'--input',str(folder/'rows.jsonl'),'--output',str(contract)],
+   [sys.executable,str(root/'scripts/b1-audit-safety-controls.py'),'--capture-dir',str(folder),'--controls',str(controls),'--contract-audit',str(contract),'--source-root',str(source),'--output',str(safety)]]
+  executed=[]
+  for command in commands:
+   result=subprocess.run(command,capture_output=True,text=True)
+   executed.append({'command':command,'exit_code':result.returncode,'stdout':result.stdout,'stderr':result.stderr});assert result.returncode==0,result.stderr
+  (out/(name+'-execution.json')).write_text(json.dumps(executed,indent=2)+'\n')
+  r=json.loads(safety.read_bytes());results.append({k:r[k] for k in ['status','observed_rows','nested_semantic_citation_references_checked','pack_on_states','violation_records','public_contract_failed_records']}|{'capture':name,'paired_comparisons':len(r['paired_preservation_comparisons'])})
+assert frozen=={p:sha(root/p) for p in frozen}
+assert binary_before==sha(verifier)
+(out/'input-audit.json').write_text(json.dumps({'before_sha256':frozen,'after_sha256':{p:sha(root/p) for p in frozen},'unchanged':True,'file_count':len(frozen),'verifier_binary_before_sha256':binary_before,'verifier_binary_after_sha256':sha(verifier)},indent=2)+'\n')
+# Cross-check public Go rejection independently of the Python control predicates.
+rawrows=[json.loads(line) for line in (data/'matrix-capture-m2max-2026-10-04/real/rows.jsonl').read_bytes().splitlines()]
+normal=next(r for r in rawrows if r['arm']=='baseline_on' and r['request_id']=='alpha' and r['phase']=='retrieval')
+mutants=[]
+with tempfile.TemporaryDirectory(prefix='ks-safety-mutants-',dir='/private/tmp') as temp:
+ for case in ['foreign_nested_reference','missing_complete_body','conflict_required_projection']:
+  row=copy.deepcopy(normal if case!='conflict_required_projection' else next(r for r in rawrows if r['arm']=='baseline_on' and r['request_id']=='conflict' and r['phase']=='retrieval'))
+  pack=row['call']['response']['structuredContent']
+  if case=='foreign_nested_reference':pack['semantic']['coding_context']['evidence'][0]['project_id']='other-project'
+  elif case=='missing_complete_body':pack['bodies'].pop(0)
+  else:pack['semantic']['coding_context']['required_behavior']=[{'id':'conflict-a','state':'current','citation':pack['citations'][0]}]
+  pack['metadata'].pop('integrity_hash');pack['metadata']['integrity_hash']=hashlib.sha256(json.dumps(pack,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+  inp=Path(temp)/(case+'.jsonl'); inp.write_text(json.dumps(row,ensure_ascii=False)+'\n')
+  output=out/(case+'-go-rejection.json')
+  command=[str(verifier),'--input',str(inp),'--output',str(output)];result=subprocess.run(command,capture_output=True,text=True)
+  assert result.returncode==2,result.stderr
+  r=json.loads(output.read_bytes());assert r['failed']==1 and r['records'][0]['status']=='invalid_contract'
+  mutants.append({'case':case,'exit_code':2,'input_sha256':sha(inp),'input':row,'verifier_error':r['records'][0]['error']})
+(out/'public-go-mutation-oracles.json').write_text(json.dumps(mutants,ensure_ascii=False,indent=2)+'\n')
+# Existing-output and row-hash mismatch failures preserve the committed inputs.
+folder=data/'matrix-capture-m2max-2026-10-04/real';source=data/'b1-pack-matrix-m2max-2026-10-04/real/source'
+checks=[]
+command=[str(verifier),'--input',str(folder/'rows.jsonl'),'--output',str(out/'matrix-capture-real-go-contract.json')]
+previous=sha(out/'matrix-capture-real-go-contract.json');result=subprocess.run(command,capture_output=True,text=True)
+assert result.returncode==1 and previous==sha(out/'matrix-capture-real-go-contract.json')
+checks.append({'case':'existing_go_output','exit_code':result.returncode,'stderr':result.stderr,'unchanged':True})
+with tempfile.TemporaryDirectory(prefix='ks-safety-hash-',dir='/private/tmp') as temp:
+ fake=Path(temp)/'contract.json';bad=json.loads((out/'matrix-capture-real-go-contract.json').read_bytes());bad['input_sha256']='0'*64;fake.write_text(json.dumps(bad))
+ for case,contract,target in [('wrong_raw_hash',fake,Path(temp)/'never.json'),('existing_output',out/'matrix-capture-real-go-contract.json',out/'matrix-capture-real-safety.json')]:
+  previous=sha(target) if target.exists() else None
+  command=[sys.executable,str(root/'scripts/b1-audit-safety-controls.py'),'--capture-dir',str(folder),'--controls',str(out/'matrix-capture-real-controls.json'),'--contract-audit',str(contract),'--source-root',str(source),'--output',str(target)]
+  result=subprocess.run(command,capture_output=True,text=True);assert result.returncode==1
+  if previous:assert previous==sha(target)
+  else:assert not target.exists()
+  checks.append({'case':case,'exit_code':result.returncode,'stderr':result.stderr,'output_preserved_or_absent':True})
+(out/'cli-rejection-checks.json').write_text(json.dumps(checks,indent=2)+'\n')
+(out/'replay-summary.json').write_text(json.dumps({'captures':results,'sdk_rows_total':sum(r['observed_rows'] for r in results),'nested_references_total':sum(r['nested_semantic_citation_references_checked'] for r in results),'paired_comparisons_total':sum(r['paired_comparisons'] for r in results),'quality_metrics':None,'human_verdicts':None,'official_B1_05_verdict':'pending'},indent=2)+'\n')
+print(json.dumps(results));print('original artifacts unchanged',len(frozen),'mutation cases rejected',len(mutants))

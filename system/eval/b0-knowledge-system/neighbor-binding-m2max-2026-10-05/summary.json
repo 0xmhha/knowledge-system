@@ -1,0 +1,67 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "planned_sdk_calls": 4,
+  "observed_sdk_calls": 4,
+  "failed_calls": 0,
+  "missing_calls": 0,
+  "citations": 32,
+  "bodies": 32,
+  "measure_on_off_full_sdk_responses_identical": true,
+  "before_after_base_evidence_identical": true,
+  "neighbor_attempts_bound": 20,
+  "neighbor_outcomes": {
+    "backend_error": 12,
+    "returned": 8
+  },
+  "source_inventory_counts": {
+    "vector": 13575,
+    "graph": 102112
+  },
+  "source_cases_sha256": "8c5864d490e8c1c0ed8fd96c59dcca7d5ca9cc7a7496e2f842c5517f41960cff",
+  "seals": {
+    "original": {
+      "unchanged": true,
+      "files": 1940,
+      "inventory_sha256": "2f8e734518f120db671db0c4f4b65fe1e6d72e81af177987d09d19e5113fa8b4",
+      "after_direct_go_replay_unchanged": true
+    },
+    "source": {
+      "unchanged": true,
+      "files": 1960,
+      "inventory_sha256": "3598dc95d6a171787a2e3b51116cad4b3f0f99fafe14ef97331b3eab485f2704",
+      "after_direct_go_replay_unchanged": true
+    },
+    "copy": {
+      "unchanged": true,
+      "files": 1938,
+      "inventory_sha256": "f8d1f0fa135bb40251f43ba37c36a77cf276a6dbfa21f50b2f6e308d91b729fd",
+      "after_direct_go_replay_unchanged": true
+    }
+  },
+  "human_inputs_unchanged": {
+    "system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+    "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "ee5a44c01168c2a92ada947dce78bf88da773818c86d6e572a5b9a6715819c1d"
+  },
+  "binary_sha256": "4f4843f9a744b0be8be51aade1f270a19721e9bc374cb031eed3bc0493dc4f77",
+  "limits": [
+    "DEV-only partial retained index; not official quality/release/latency",
+    "source argument SHA covers v1 citation location/commit, not complete project/dataset coordinates; those bind via sealed config/identity",
+    "new hashes do not fill old zero-byte neighbor logs; historical errors remain unbound",
+    "Only these 20 newly bound DEV calls are source-argument replayed; no retrospective cause assertion for old logs; no official quality or complete source coverage"
+  ],
+  "public_go_verified_rows": 4,
+  "direct_go_replay": {
+    "planned": 20,
+    "observed": 20,
+    "no_node_errors": 12,
+    "returned": 8,
+    "all_recorded_outcomes_and_counts_identical": true,
+    "source_argument_sha_verified_by_go": true,
+    "report_sha256": "b5ae8ba0425d063dde5b17cb34a8b366686e95b8edd2aee41291e0522ef573de"
+  }
+}

@@ -1,0 +1,21 @@
+version: 1
+project_id: ks-fixture
+domain: smoke fixture
+competency_questions:
+  - Which code symbol is described by the fixture document?
+concepts:
+  - id: alpha-function
+    kind: entity
+    definition: The fixture function that returns a string.
+    includes: [Alpha]
+    excludes: [Beta]
+    terms: [{lang: en, value: Alpha function, preferred: true}]
+    status: verified
+    reviewed_by: fixture-reviewer
+  - id: beta-function
+    kind: entity
+    definition: The fixture function that calls Alpha.
+    includes: [Beta]
+    excludes: [Alpha]
+    terms: [{lang: en, value: Beta function, preferred: true}]
+    status: proposed

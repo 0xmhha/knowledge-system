@@ -1,0 +1,18 @@
+time=2026-10-05T11:10:23.608Z level=INFO msg=ckv event=query.search.start trace_id=a0d3c1d25190ef41 run_id=c7b2fd6c6599920e k=10 dry_run=false trace_id=6aeb4a361435 intent_hash=6aeb4a361435
+time=2026-10-05T11:10:23.613Z level=INFO msg=ckv event=query.embed.start trace_id=cf0f77a0fdd4936e run_id=c7b2fd6c6599920e trace_id=6aeb4a361435
+time=2026-10-05T11:10:23.614Z level=INFO msg=ckv event=query.embed.done trace_id=cf0f77a0fdd4936e run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 dim=64
+time=2026-10-05T11:10:23.614Z level=INFO msg=ckv event=query.store.search.start trace_id=60a2dc9d1961a9dd run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 k_overfetch=30
+time=2026-10-05T11:10:23.626Z level=INFO msg=ckv event=query.store.search.done trace_id=60a2dc9d1961a9dd run_id=c7b2fd6c6599920e latency_ms=11 trace_id=6aeb4a361435 k_overfetch=30 candidates_out=1
+time=2026-10-05T11:10:23.626Z level=INFO msg=ckv event=query.bm25.rerank.start trace_id=c3b93dd335df705a run_id=c7b2fd6c6599920e enabled=false trace_id=6aeb4a361435
+time=2026-10-05T11:10:23.626Z level=INFO msg=ckv event=query.bm25.rerank.done trace_id=c3b93dd335df705a run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 enabled=false candidates_out=1
+time=2026-10-05T11:10:23.626Z level=INFO msg=ckv event=query.score.boost.start trace_id=1e40e1e545b9506e run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 enabled=false
+time=2026-10-05T11:10:23.626Z level=INFO msg=ckv event=query.score.boost.done trace_id=1e40e1e545b9506e run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 enabled=false candidates_out=1
+time=2026-10-05T11:10:23.627Z level=INFO msg=ckv event=query.threshold.drop.start trace_id=17d5817253511e9d run_id=c7b2fd6c6599920e trace_id=6aeb4a361435
+time=2026-10-05T11:10:23.627Z level=INFO msg=ckv event=query.threshold.drop.done trace_id=17d5817253511e9d run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 candidates_out=1
+time=2026-10-05T11:10:23.627Z level=INFO msg=ckv event=query.citation.enforce.start trace_id=ecea795a953e4719 run_id=c7b2fd6c6599920e trace_id=6aeb4a361435
+time=2026-10-05T11:10:23.657Z level=INFO msg=ckv event=query.citation.enforce.done trace_id=ecea795a953e4719 run_id=c7b2fd6c6599920e latency_ms=30 trace_id=6aeb4a361435 candidates_out=1 dropped=0
+time=2026-10-05T11:10:23.657Z level=INFO msg=ckv event=query.density.adjust.start trace_id=fbd010df69c0c5d2 run_id=c7b2fd6c6599920e budget_tokens=4000 trace_id=6aeb4a361435
+time=2026-10-05T11:10:23.658Z level=INFO msg=ckv event=query.density.adjust.done trace_id=fbd010df69c0c5d2 run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 budget_tokens=4000 tokens_used=13
+time=2026-10-05T11:10:23.658Z level=INFO msg=ckv event=query.metadata.enrich.start trace_id=24ee2e13866facd6 run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 enabled=false
+time=2026-10-05T11:10:23.658Z level=INFO msg=ckv event=query.metadata.enrich.done trace_id=24ee2e13866facd6 run_id=c7b2fd6c6599920e trace_id=6aeb4a361435 enabled=false
+time=2026-10-05T11:10:23.658Z level=INFO msg=ckv event=query.search.done trace_id=a0d3c1d25190ef41 run_id=c7b2fd6c6599920e latency_ms=49 tokens_used=13 trace_id=6aeb4a361435 intent_hash=6aeb4a361435 k=10 dry_run=false hits=1 examples=0

@@ -31,6 +31,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	vectorBinary := fs.String("vector-binary", "", "ckv binary path (cks.ops.index)")
 	policyFile := fs.String("policy-file", "", "ckg governance policy file")
 	embedModel := fs.String("embed-model", "", "Ollama embed model; empty defaults to \"bge-m3\"")
+	embedDim := fs.Int("embed-dim", 0, "Ollama MRL output dimension; 0 uses native dimension")
+	queryPrefixPolicy := fs.String("query-prefix-policy", "registry", "Ollama query transformation: registry | none")
 	ollamaURL := fs.String("ollama-url", "", "Ollama endpoint; empty defaults to http://localhost:11434")
 	port := fs.String("port", "", "HTTP listen port; the host is filled in automatically — 127.0.0.1, or every interface with --lan")
 	httpAddr := fs.String("http-addr", "", "full HTTP listen host:port when you need to name the interface yourself; prefer --port. Empty defaults to 127.0.0.1:8080")
@@ -40,6 +42,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	domainProjectDir := fs.String("domain-project-dir", "", "domain-knowledge project dir (enables channel 2)")
 	domainCorpusDir := fs.String("domain-corpus-dir", "", "domain corpus export dir (enables channel 2)")
 	glossaryPath := fs.String("glossary", "", "vocab glossary YAML path")
+	semanticStore := fs.String("semantic-store", "", "optional SQLite semantic store for reviewed v2 trace paths")
 	footprintDir := fs.String("footprint-dir", "", "footprint log output dir")
 	auditDir := fs.String("audit-dir", "", "audit log output dir")
 	labelPrefix := fs.String("service-label-prefix", "", "launchd label prefix for `cks mcp service`; empty uses the engine's own name (set it only when agents are already installed under another prefix, or two distributions share a host)")
@@ -97,6 +100,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		VectorBinary:       *vectorBinary,
 		PolicyFile:         *policyFile,
 		EmbedModel:         *embedModel,
+		EmbedDim:           *embedDim,
+		QueryPrefixPolicy:  *queryPrefixPolicy,
 		OllamaURL:          *ollamaURL,
 		HTTPAddr:           addr,
 		AllowRemote:        *allowRemote,
@@ -104,6 +109,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		DomainProjectDir:   *domainProjectDir,
 		DomainCorpusDir:    *domainCorpusDir,
 		GlossaryPath:       *glossaryPath,
+		SemanticStorePath:  *semanticStore,
 		FootprintDir:       *footprintDir,
 		AuditDir:           *auditDir,
 		ServiceLabelPrefix: *labelPrefix,
@@ -111,7 +117,7 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("generated config invalid: %w", err)
 	}
-	if err := config.Save(*out, cfg); err != nil {
+	if err := config.SaveNew(*out, cfg); err != nil {
 		return err
 	}
 	fmt.Fprintf(stdout, "generated %s (name=%s, listen=%s allow_remote=%v)\n",

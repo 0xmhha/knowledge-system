@@ -1,0 +1,828 @@
+{
+  "schema_version": 1,
+  "gate": "B0-06 shared recall K wiring",
+  "state": "implementation_verified",
+  "quality_metrics": null,
+  "release": "preview",
+  "base_commit": "6d874ba5",
+  "source_hashes": {
+    "internal/system/config/config.go": "e10f4040b0e784779ad3a77cb297d64919cf890f28a33223a083bcbdbede7e60",
+    "internal/system/config/config_test.go": "bca90de678b00b4e0170feffddcaf48ab567efdb4f8f0eb6752df3b08b5479cb",
+    "cmd/cks/mcpcli/serve.go": "a0e9063d37085e178a3fedd231916a90a26f10751e0557e426fb13fb6bdb1515",
+    "cmd/cks/mcpcli/ontology.go": "1e0677f88ccdc38cdeb0582dff917aea918e82902c5aa2d9a8ead498d7f5a50d",
+    "cmd/cks/mcpcli/ontology_test.go": "cb5cfb1fedc47149761e34f2b6dad320dc59add0455d58fb974643c4a31543d8",
+    "cmd/cks/mcpcli/retrieval_test.go": "1c8b40e479bd663f4195a65bca902fc62bcbb409c456304fe38dd20379757e9b",
+    "scripts/wbs-ontology-relations-smoke.py": "da58872d0a893390c2ce65e00a2ac3e4aabae616fd66158f00d8c66b6f0e52f5"
+  },
+  "runs": {
+    "real": {
+      "requests": 48,
+      "raw_and_concept_text_k": 10,
+      "summary": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/summary.json"
+    },
+    "compat": {
+      "requests": 20,
+      "raw_and_concept_text_k": 20,
+      "summary": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/summary.json"
+    }
+  },
+  "knowledge_k": 6,
+  "stage2_union_candidate_cap": 30,
+  "arm_rotation": false,
+  "limitations": [
+    "K10 is a structural diagnostic, not approval of the draft protocol or a formal quality result.",
+    "The setting pins the requested raw/concept-text top-K; union cap 30 and knowledge pass 6 remain separate.",
+    "Eight-arm paired sequencing and hardware/input official ledger remain pending.",
+    "Historical K20 evidence and preserved FTS failures remain unchanged."
+  ],
+  "checks": [
+    {
+      "name": "all Go regression",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/go-test-all.txt"
+    },
+    {
+      "name": "config/mcpcli race",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/race.txt"
+    },
+    {
+      "name": "Go vet",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/vet.txt"
+    },
+    {
+      "name": "independent v2 source/integrity and actual K audit",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/post-audit.txt"
+    },
+    {
+      "name": "documentation",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/docs.txt"
+    },
+    {
+      "name": "engine boundaries",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/boundaries.txt"
+    }
+  ],
+  "artifact_inventory": [
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/boundaries.txt",
+      "bytes": 22,
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/config-composer-tests.txt",
+      "bytes": 132,
+      "sha256": "228ce1a688a939cb413642c9afa8d1e61a40976c858c1aa841ef3d3987b31761"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/docs.txt",
+      "bytes": 39,
+      "sha256": "5932c92b1d962cafa4f4e3d23f5873c23b5de5d729e1748da42137cc6bea4841"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/go-test-all.txt",
+      "bytes": 9363,
+      "sha256": "2a7c330d1d3d0472a45bfcb0e15ff56eb3dbd6e58456139dcf6c38854686a466"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/post-audit.py",
+      "bytes": 2709,
+      "sha256": "9cbea837dc9493865e3b9c2f145b8c89608361a287fb8e563817a661902fcc70"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/post-audit.txt",
+      "bytes": 242,
+      "sha256": "b9ea6bd4b7fd94964eb7aba15b3337e680c7ccd4b3186742f373b83638de8a44"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/race.txt",
+      "bytes": 132,
+      "sha256": "afe1733d9fe3bb7deb168d9fcec491b23e9ea80618cdf3df6d4fedae203d3539"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/checks/vet.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/baseline.json",
+      "bytes": 10661,
+      "sha256": "d18a3c6a12969ce97ec0ef48e3f385ce40c704c717b9d53976e7ee30425d94ea"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/baseline.yaml",
+      "bytes": 1335,
+      "sha256": "911881914dbc611501c84825ed2aaf2cc3288a1b1242b4350e23f4b137d16e91"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-baseline.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-combined.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-combined_missing.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-combined_stale.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-concept_text.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-missing.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-relations.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-stale.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-text_missing.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/capture-text_stale.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/checks.json",
+      "bytes": 20155,
+      "sha256": "b1de7d5d815801a3cf8db63320251f93983a986c5a9ee6a8e943202c2a6ec65b"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined.json",
+      "bytes": 13220,
+      "sha256": "3ec514b797703c55e90e35e95be42cbb15e8fd9123773bd16603ee7cdde81bd9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined.yaml",
+      "bytes": 1335,
+      "sha256": "4e7fe3f7f86c35146af11acb50c8ef45a585d624f6d55fbae60b02ace347b374"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined_missing.json",
+      "bytes": 11328,
+      "sha256": "5790ec23c3995f7285812b673e96b4c20c203ff9a1cb6dee3117510a5d7d183d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined_missing.yaml",
+      "bytes": 1334,
+      "sha256": "afaafe681eedadf95e8518946d32b24cf7965e1847b0137ec39ab45711f17f95"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined_stale.json",
+      "bytes": 11327,
+      "sha256": "00dfd45ba13e152c2a7d34f150401bb50dbb9f3841b4446ffb8a3653de6d4dff"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/combined_stale.yaml",
+      "bytes": 1341,
+      "sha256": "fcdee283387cedf902277ea0394b23a219d04ac998b500c117eeabb74faae20e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/concept_text.json",
+      "bytes": 13229,
+      "sha256": "249b3a1036b4ddee49b13e3c9a9383a0a23c958dd904a771e208d6263e564669"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/concept_text.yaml",
+      "bytes": 1343,
+      "sha256": "bc9d04fb49ce5d285cadaa8076f8208dffdf1d1acbe27dcfc4a9f94dbf5d1de0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-baseline.txt",
+      "bytes": 126,
+      "sha256": "035e3391a468b70789e46d0245aaec6ce4b161e935ce2ab50ecd1da963feeb00"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-combined.txt",
+      "bytes": 126,
+      "sha256": "39628883b72dca2621ec589caf1286f2d6cc859333c6d03a0a4bf1bd580ac968"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-combined_missing.txt",
+      "bytes": 134,
+      "sha256": "72260de9b346819122194f877a99b2ffe2799ea68ebad16ffd82d2b6061994f2"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-combined_stale.txt",
+      "bytes": 132,
+      "sha256": "6ef6555c20c51a316358b3c5ce37ee73549d50cec3b56a4ebdebd6e393ad1416"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-concept_text.txt",
+      "bytes": 130,
+      "sha256": "d96b04f3d4b1916647dc3c1cc4cb8c2859dd82afcac49ab2aabdb47398412915"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-missing.txt",
+      "bytes": 125,
+      "sha256": "88772b790df469934a477bba83a8e5cdc39d23eecefa109ea2bcc3cd9e179805"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-relations.txt",
+      "bytes": 127,
+      "sha256": "9bf670e139f091dd3e4e66a24c790e35b70191be317f84425ce0a914f4961fd6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-stale.txt",
+      "bytes": 123,
+      "sha256": "ae802e0a363ef9c276eaa34380c376b346a5e57072ce236f87da0a75be132eb0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-text_missing.txt",
+      "bytes": 130,
+      "sha256": "0518aae9fe2144b1c5cb0fbfeae2cc170f500d524f386661d7eb20a70bca9d5a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/config-text_stale.txt",
+      "bytes": 128,
+      "sha256": "ffc52325cc1d257c3d8a2f2afbf818668c64f0a74223efdba415b12d19fb1877"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-add.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-bundle-verify.txt",
+      "bytes": 291,
+      "sha256": "53e304ca76f9d3f280d4b2ababa6902a2c26a13e2ea2f74d12cd38e49cdde0a3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-bundle.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-commit.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-init.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/git-status-after.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/matrix-manifest.json",
+      "bytes": 7711,
+      "sha256": "b0d3804dbec9c35d22d0e2f5beb109b11d8a02982bba7b59a5cfdaa6491eef6e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/missing.json",
+      "bytes": 11331,
+      "sha256": "e05a7aa680fcd9fbcf994961ce98082d45ee362cf1283d62a89b312a40fc51b0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/missing.yaml",
+      "bytes": 1336,
+      "sha256": "a27af156aaaa5e78f9e060fee843c39d2d3dc3d6d5ed0d4b24399a3170c2fa70"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/projection.json",
+      "bytes": 6516,
+      "sha256": "50a5ed2c64c212a43104ff46a3cfae539827dce3eee9b3524cc1584703ab6d23"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/relations.json",
+      "bytes": 11213,
+      "sha256": "fe4b6e02cea81814f34df3a7fef02cb2e94fac67f07ca267d0ce5e9f9d56645d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/relations.yaml",
+      "bytes": 1337,
+      "sha256": "4717a6e94b6171a30bbf62b42c0504fc86139dd74eb88fc1989fe84132c2a9c4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/requests.json",
+      "bytes": 353,
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/semantic-extract.txt",
+      "bytes": 294,
+      "sha256": "73bdb8a1ab7105fb1b593c6a790d67de849e7728b18d707dd9c4bb4a4122caa9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/semantic-promote.txt",
+      "bytes": 165,
+      "sha256": "d98b59fc315442516e0574ee1e10f354eafdc843ca4b06163e1a0d129afc48fe"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/setup.txt",
+      "bytes": 3696,
+      "sha256": "16e4dd75653df20da200cf185dc868f352b16904c9361d0093a39568fd0604b1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source/README.md",
+      "bytes": 71,
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source/go.mod",
+      "bytes": 39,
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source/main.go",
+      "bytes": 97,
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source/main_test.go",
+      "bytes": 142,
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source/ontology-reviewed.yaml",
+      "bytes": 631,
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/source.bundle",
+      "bytes": 1085,
+      "sha256": "502231ab4400a02dab74841b2a37bdde988bda75003b7b979ea471a5b57510ad"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/stale.json",
+      "bytes": 11329,
+      "sha256": "fc43a92c87ee5575e5b4f4138eb65626bdc17bc81011acbf74755251022981fb"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/stale.yaml",
+      "bytes": 1343,
+      "sha256": "680978253c840914c61c6391785ee242185f04c793314acd07b0ae1151ad8635"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/summary.json",
+      "bytes": 32346,
+      "sha256": "d48212fa6169143745290546de796fbfebb518c130816dadb303094896213266"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/telemetry/baseline/cks-mcp.jsonl",
+      "bytes": 32909,
+      "sha256": "2c3076d617862f8311704381303b1bbcd13b3a9d28c6635f6eb3b360a7b79d56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/telemetry/combined/cks-mcp.jsonl",
+      "bytes": 99463,
+      "sha256": "9483b4f1e07a385a6cdd03bbff29a6ceebfcc2f415a1859de73bbcba810bb080"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/telemetry/concept_text/cks-mcp.jsonl",
+      "bytes": 99439,
+      "sha256": "351df71daa3470d8abcd098b316c3acc26882da58a8748e4b916b80602a7a5ad"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/telemetry/relations/cks-mcp.jsonl",
+      "bytes": 98702,
+      "sha256": "8e25d5d6b96fa3dd0cfb9cc9b7e4758dcf0c8396e9a063971bacd204f26098ea"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/text_missing.json",
+      "bytes": 11337,
+      "sha256": "555ebd6a88fa59f42064378a970d0d8274b27b52602a24228cee6be39fa7bf0f"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/text_missing.yaml",
+      "bytes": 1342,
+      "sha256": "71d2fb83067a51bc59432dd27340833ff16b0bbea6f0c81298fb5879909367ac"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/text_stale.json",
+      "bytes": 11334,
+      "sha256": "d570a74d21053219fd5dbe8cd5ef0d2b62605e96aadaaa20e0da08e47b7ff4ab"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/compat/text_stale.yaml",
+      "bytes": 1349,
+      "sha256": "e2da2a8fb74c8413475a1e2cf52ea0035322c5620948a725bf5782d5b537ed18"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_off-requests.json",
+      "bytes": 1734,
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_off.json",
+      "bytes": 95007,
+      "sha256": "0e3829899fb9697b8a02868865e4192c9d789d13b3445c8c6bc55c6347d64b70"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_off.yaml",
+      "bytes": 1318,
+      "sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_on-requests.json",
+      "bytes": 1728,
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_on.json",
+      "bytes": 156635,
+      "sha256": "53554b26c0fe929e35b737c4f33c9c9b78f746b86c0a66cadf906cb3a014d90e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/baseline_on.yaml",
+      "bytes": 1318,
+      "sha256": "2974e0fa4660cacbfcb5e3458fbc5432045b2de0f18a68be0a29ae4550ea5f56"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-baseline_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-baseline_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-combined_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-combined_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-concept_text_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-concept_text_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-relations_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/capture-relations_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/checks.json",
+      "bytes": 18890,
+      "sha256": "39ac5664fb74f110516b3da9cb2f6c35681dea0fb249152e3dc6f9c43e2d11a1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_off-requests.json",
+      "bytes": 1734,
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_off.json",
+      "bytes": 102693,
+      "sha256": "8bd5dddf61f3d44ee409fbbfe6337aac614c296b406e9a42fed79ce755e9f0aa"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_off.yaml",
+      "bytes": 1318,
+      "sha256": "cb38255ff34229b7b78aeb019fc1c1e359879db117c056980d7bfb087c2b51cf"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_on-requests.json",
+      "bytes": 1728,
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_on.json",
+      "bytes": 164320,
+      "sha256": "09570d07a1f0c6217910ca5bfdc10b496667bfdb13872e267916c13528a46989"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/combined_on.yaml",
+      "bytes": 1318,
+      "sha256": "cb38255ff34229b7b78aeb019fc1c1e359879db117c056980d7bfb087c2b51cf"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_off-requests.json",
+      "bytes": 1734,
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_off.json",
+      "bytes": 102718,
+      "sha256": "3a435f87215e4e2109be44ec986a9e4e9573aba358bfc29818e944a2c81985c1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_off.yaml",
+      "bytes": 1326,
+      "sha256": "9a2edb89af5dc8c486396a6cb9cab50c9dc7a2650bb127396586843567077f7b"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_on-requests.json",
+      "bytes": 1728,
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_on.json",
+      "bytes": 164345,
+      "sha256": "c258cc71652bab459327e030f5cdac0957da1610c061cef717d9e10c6f53c3e7"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/concept_text_on.yaml",
+      "bytes": 1326,
+      "sha256": "9a2edb89af5dc8c486396a6cb9cab50c9dc7a2650bb127396586843567077f7b"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-baseline_off.txt",
+      "bytes": 122,
+      "sha256": "539d8be9ecf4738155a5ea2fe921225830bc9a25f16bdcf784a33f2431909726"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-baseline_on.txt",
+      "bytes": 121,
+      "sha256": "34ed03ae0228cc03e698c41101ab3059c4c5398f85a7e833a70ad029439219c9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-combined_off.txt",
+      "bytes": 122,
+      "sha256": "e06e08e2529f7d7eb2f50cf02536ed3f9bf1ff361806dc3902a55f576ac28fb1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-combined_on.txt",
+      "bytes": 121,
+      "sha256": "ec5bd1df7e45f90c832c492e6491ab23178bb737f4b3b20903a8a8215351f389"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-concept_text_off.txt",
+      "bytes": 126,
+      "sha256": "2e57c3c2e0183dfa740ac5835257cb1443a03396cf5fad6cb20146112ae91232"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-concept_text_on.txt",
+      "bytes": 125,
+      "sha256": "988e6967c278c2200563bc6d2b290354bc6c4a1ffa69749201030ff7190928fc"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-relations_off.txt",
+      "bytes": 123,
+      "sha256": "2debaf81a2aa0621d550fb127fc0f6fe3d62f8ea3ea1cd2f34b00c45cd0cb1d8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/config-relations_on.txt",
+      "bytes": 122,
+      "sha256": "522ef8766c89010f0c7aad5ad36f632e128ad6035c952996bdea2a5beaa09a30"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-add.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-bundle-verify.txt",
+      "bytes": 283,
+      "sha256": "1ca140d7d3b840beb3d776f2a1cfae738461978eb25dcc340bb1831360db7dd4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-bundle.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-commit.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-init.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/git-status-after.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/knowledge-digest.txt",
+      "bytes": 123,
+      "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/knowledge-init.txt",
+      "bytes": 134,
+      "sha256": "5aebd8f15d9e1a62aab39b38d6c62f6728aa71a9be0d3bba8d1ac43f3010bd7c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/knowledge-lock.txt",
+      "bytes": 231,
+      "sha256": "170faa1a64c70a92a3f643292151f79030396ffc11d815e37ab5d3931ed973fb"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/knowledge-review.txt",
+      "bytes": 1267,
+      "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/knowledge-validate.txt",
+      "bytes": 216,
+      "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/matrix-manifest.json",
+      "bytes": 2404870,
+      "sha256": "2267c80f18897556fedb4b22c474cc986dbd5d32d88e4d0c0aeded9f298edda5"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/projection.json",
+      "bytes": 7228,
+      "sha256": "64d3a70af767349e83412fe478d49d909e9414979d8a57d9cbc9f17fa2d31ca3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_off-requests.json",
+      "bytes": 1734,
+      "sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_off.json",
+      "bytes": 96669,
+      "sha256": "a04b714404b57eb83b7b86921157d4016bcd745fe984de2cb778327532090c1f"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_off.yaml",
+      "bytes": 1320,
+      "sha256": "ae92f0246afd25295cb267a54f36766a1063cc72f92883639496844faef68be2"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_on-requests.json",
+      "bytes": 1728,
+      "sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_on.json",
+      "bytes": 158296,
+      "sha256": "49225bcfa2790a6c928bc49bd603c919981df847d755743a68f18d8e6013e7b5"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/relations_on.yaml",
+      "bytes": 1320,
+      "sha256": "ae92f0246afd25295cb267a54f36766a1063cc72f92883639496844faef68be2"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/requests.json",
+      "bytes": 353,
+      "sha256": "6823009f6293f6053e50beec9160b3d8cc8d02d48250c93f8315bda69bbb57a0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/semantic-extract.txt",
+      "bytes": 294,
+      "sha256": "6dd20f40e92bab470e8f6d568a7bffe4c24de118d78bb029a20e149173779d6c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/semantic-promote.txt",
+      "bytes": 165,
+      "sha256": "96fd658d1d2e5423fce244fffc3249642c0de7358148581ba0b3b4b5569a741d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/setup.txt",
+      "bytes": 3811,
+      "sha256": "37ac0d0d606dd3112f0df1d9630a29498ccedc1fce68be9a0137d855686316f4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/knowledge.lock.json",
+      "bytes": 483,
+      "sha256": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/manifest.yaml",
+      "bytes": 282,
+      "sha256": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/conflict-a.yaml",
+      "bytes": 470,
+      "sha256": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/conflict-b.yaml",
+      "bytes": 470,
+      "sha256": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/expired.yaml",
+      "bytes": 475,
+      "sha256": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/proposed.yaml",
+      "bytes": 348,
+      "sha256": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/public.yaml",
+      "bytes": 443,
+      "sha256": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/.cks/knowledge/policies/restricted.yaml",
+      "bytes": 464,
+      "sha256": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/README.md",
+      "bytes": 71,
+      "sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/go.mod",
+      "bytes": 39,
+      "sha256": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/main.go",
+      "bytes": 97,
+      "sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/main_test.go",
+      "bytes": 142,
+      "sha256": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/ontology-reviewed.yaml",
+      "bytes": 631,
+      "sha256": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source/vendor/fixture-policy/pack.yaml",
+      "bytes": 291,
+      "sha256": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/source.bundle",
+      "bytes": 2996,
+      "sha256": "70b6cfdcebf9d22aa535254dc60f9d2d560119de9ac1fbce9d29794e2410d2d7"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/summary.json",
+      "bytes": 53529,
+      "sha256": "63105864bf45209ca6002941b50bd66683dede0709c2d0415dd25af1948a7122"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/telemetry/baseline/cks-mcp.jsonl",
+      "bytes": 408129,
+      "sha256": "c0bc3735fb1e45d115fc7089b3545c14c69ac02fd1add2bb5b4c8d219ed197f8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/telemetry/combined/cks-mcp.jsonl",
+      "bytes": 420788,
+      "sha256": "89b2e872ac8e2b66cc1f3af57f405a7a7c41c772243b907054b9c757c9b8a215"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/telemetry/concept_text/cks-mcp.jsonl",
+      "bytes": 420779,
+      "sha256": "978adea938d3c23df71ba571f899ccdeab405e70a3efd812c622333a139e99b8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/recall-k-m2max-2026-10-04/real/telemetry/relations/cks-mcp.jsonl",
+      "bytes": 408123,
+      "sha256": "52e5a778cef5240d18295aac028ff40d216a6b859500f6b009932200105161b9"
+    }
+  ]
+}

@@ -48,8 +48,10 @@ type GenerateOptions struct {
 
 	// EmbedModel is the Ollama model the ckv index was built with (empty →
 	// "bge-m3"). OllamaURL is the Ollama endpoint (empty → http://localhost:11434).
-	EmbedModel string
-	OllamaURL  string
+	EmbedModel        string
+	OllamaURL         string
+	EmbedDim          int
+	QueryPrefixPolicy string
 
 	// HTTPAddr is the Streamable HTTP listen address (empty → 127.0.0.1:8080).
 	// AllowRemote is the explicit opt-in to bind a routable address; Generate
@@ -63,9 +65,10 @@ type GenerateOptions struct {
 
 	// DomainProjectDir / DomainCorpusDir wire channel ② (domain-knowledge
 	// embedding); both empty disables it. GlossaryPath enables vocab expansion.
-	DomainProjectDir string
-	DomainCorpusDir  string
-	GlossaryPath     string
+	DomainProjectDir  string
+	DomainCorpusDir   string
+	GlossaryPath      string
+	SemanticStorePath string
 
 	// FootprintDir / AuditDir are the logging output directories.
 	FootprintDir string
@@ -136,11 +139,13 @@ func Generate(o GenerateOptions) *Config {
 				TimeoutMS:  5000,
 			},
 			CKV: CKVConfig{
-				Path:       vectorPath,
-				BinaryPath: o.VectorBinary,
-				EmbedModel: embedModel,
-				OllamaURL:  ollamaURL,
-				TimeoutMS:  3000,
+				Path:              vectorPath,
+				BinaryPath:        o.VectorBinary,
+				EmbedModel:        embedModel,
+				OllamaURL:         ollamaURL,
+				EmbedDim:          o.EmbedDim,
+				QueryPrefixPolicy: o.QueryPrefixPolicy,
+				TimeoutMS:         3000,
 			},
 		},
 		Listen: ListenConfig{
@@ -163,7 +168,8 @@ func Generate(o GenerateOptions) *Config {
 			ProjectDir: o.DomainProjectDir,
 			CorpusDir:  o.DomainCorpusDir,
 		},
-		Service: ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
+		Semantic: SemanticConfig{StorePath: o.SemanticStorePath},
+		Service:  ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
 		Vocab: VocabConfig{
 			GlossaryPath: o.GlossaryPath,
 		},
@@ -179,6 +185,39 @@ func Save(path string, c *Config) error {
 	}
 	if err := os.WriteFile(path, data, 0o644); err != nil {
 		return fmt.Errorf("config: write %q: %w", path, err)
+	}
+	return nil
+}
+
+// SaveNew publishes a complete generated user config without replacing an
+// existing file. The hard link fails if the destination already exists,
+// including a symlink.
+func SaveNew(path string, c *Config) error {
+	data, err := yaml.Marshal(c)
+	if err != nil {
+		return fmt.Errorf("config: marshal: %w", err)
+	}
+	file, err := os.CreateTemp(filepath.Dir(path), ".cks-config-*")
+	if err != nil {
+		return fmt.Errorf("config: stage new %q: %w", path, err)
+	}
+	defer os.Remove(file.Name())
+	if _, err = file.Write(data); err != nil {
+		file.Close()
+		return fmt.Errorf("config: write new %q: %w", path, err)
+	}
+	if err = file.Sync(); err != nil {
+		file.Close()
+		return fmt.Errorf("config: sync new %q: %w", path, err)
+	}
+	if err = file.Close(); err != nil {
+		return fmt.Errorf("config: close new %q: %w", path, err)
+	}
+	if err = os.Chmod(file.Name(), 0o644); err != nil {
+		return fmt.Errorf("config: chmod new %q: %w", path, err)
+	}
+	if err = os.Link(file.Name(), path); err != nil {
+		return fmt.Errorf("config: publish new %q: %w", path, err)
 	}
 	return nil
 }

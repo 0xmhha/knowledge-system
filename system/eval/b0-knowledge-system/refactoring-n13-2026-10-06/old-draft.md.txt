@@ -1,0 +1,46 @@
+# Verification Worksheet — `go-stablenet`
+
+> **Generated**: 2026-10-06 by `cks-promotion-worksheet`
+> **Filter**: status=`draft`, priority=`(all)`
+> **Entries in queue**: 0
+
+## Session header (one per session, fill once)
+
+- **Project**: `go-stablenet` @ `<commit-sha>`
+- **Session date**: ____________
+- **Domain expert**: ____________ · **Operator**: ____________
+- **Pre-flight**: all anchors are file+line+symbol consistent (`cks-inventory-check` passes 0 errors).
+
+### Reference catalogs (keep open in another tab)
+
+- Top hallucination risks: `coding-agent/docs/r1-refactor/07-domain-knowledge-curation.md` §9
+- T2 trap catalog: `coding-agent/docs/r1-refactor/08-p0c-foundations-t2-and-internalization.md` §4
+- Hallucination-risk re-statement: same file, §9
+- Status policy: `cks/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md` §verification-checklist
+
+### Decision dictionary
+
+- **APPROVE** → entry promoted to `verified`; run the per-entry promotion command at the bottom of the section.
+- **REVISE** → return to author with the reviewer notes filled in; entry stays `needs_verification`.
+- **REJECT** → archive entry (rare; only if the trap is wrong, not just imprecise).
+
+---
+
+## Entries
+
+## Footer — post-session sync (runs once after all APPROVE entries are promoted)
+
+```bash
+# Re-emit policy (ckg governs) + glossary (ckv vocab) for downstream consumers
+./bin/cks-domain-sync   -entries projects/stablenet/domain-knowledge
+./bin/cks-glossary-gen  -project projects/stablenet/domain-knowledge -status verified
+
+# Refresh ckv (channel ② docs) + ckg (governance edges) in lockstep.
+# Operator's MCP client: cks.ops.index { mode: "full" }
+```
+
+## Notes on generator behaviour
+
+- The `Maps to:` line uses a token-overlap heuristic against the 07 §9 catalog. If the suggested item is wrong, the reviewer should correct it in-line — the worksheet is treated as a working document, not as authoritative metadata.
+- The `suggested: …` hint on each invariant is the anchor whose `reason` field shares the most words with the invariant text. A hint is shown only when at least one anchor scores > 0; otherwise the slot is left blank.
+- B6 entries (`procedure_steps`) and B7 entries (`constants`) get extra question blocks (Q5/Q6); other knowledge types omit them.

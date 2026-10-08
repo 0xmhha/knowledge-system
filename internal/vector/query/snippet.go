@@ -124,7 +124,7 @@ func renderAt(text string, tier DensityTier, ctxLines int) string {
 
 func toResponseHit(h types.Hit, snippet string) Hit {
 	c := h.Chunk
-	return Hit{
+	out := Hit{
 		ChunkID:       c.ID,
 		Citation:      c.Citation(),
 		Snippet:       snippet,
@@ -139,6 +139,12 @@ func toResponseHit(h types.Hit, snippet string) Hit {
 		Guidance:      c.Guidance,
 		StaleCitation: h.StaleCitation,
 	}
+	if c.ParentID != "" && c.ParentStartLine > 0 && c.ParentEndLine >= c.ParentStartLine {
+		parent := types.Citation{File: c.File, StartLine: c.ParentStartLine, EndLine: c.ParentEndLine, CommitHash: c.CommitHash}
+		out.ParentCitation = &parent
+		out.HeadingPath = strings.Join(c.HeadingPath, " / ")
+	}
+	return out
 }
 
 // signatureOnly returns the first non-blank line of text. For Go

@@ -63,6 +63,7 @@ var ErrCitationNotFound = query.ErrCitationNotFound
 // Defined for forward-compatible callers.
 // Caller: log sanitize_report.reason; do not retry with same intent.
 var ErrSanitizeFailed = query.ErrSanitizeFailed
+var ErrRequiresV2 = query.ErrRequiresV2
 
 // ErrPolicyError: policy or authorization check rejected the request
 // (mTLS SAN mismatch, content policy, internal-tool exposure).

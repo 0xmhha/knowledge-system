@@ -1,0 +1,1714 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T13:06:41.659015Z",
+  "finished_at": "2026-10-03T13:06:42.342628Z",
+  "request_sha256": "a2437926fc6dc01554f3cb186c4b6cfe111444382183073cddd0f8d02955d3da",
+  "config_sha256": "611dce5ad82cc0791f575ce567abf1def4e9c57dbf589377c7af808ab4b71241",
+  "binary_sha256": "444f53a818d82ee938950de4b48f001f1d3c693366c8fcb1b56ceea329f2b4d0",
+  "config_sha256_after": "611dce5ad82cc0791f575ce567abf1def4e9c57dbf589377c7af808ab4b71241",
+  "binary_sha256_after": "444f53a818d82ee938950de4b48f001f1d3c693366c8fcb1b56ceea329f2b4d0",
+  "quality_metrics": null,
+  "state": "partial",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 1,
+    "retrieval": 2,
+    "warm_latency": 3,
+    "warmup": 1
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "archived-v2",
+      "phase": "warmup",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 24159417,
+        "completed_at": "2026-10-03T22:06:41.720206+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 19865125,
+        "completed_at": "2026-10-03T22:06:41.740125+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "retrieval",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 22562458,
+        "completed_at": "2026-10-03T22:06:41.762733+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 21944958,
+        "completed_at": "2026-10-03T22:06:41.78473+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 22102959,
+        "completed_at": "2026-10-03T22:06:41.806876+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "warm_latency",
+      "iteration": 3,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 22425125,
+        "completed_at": "2026-10-03T22:06:41.82935+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "warmup",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23651333,
+        "completed_at": "2026-10-03T22:06:41.853047+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 21965375,
+        "completed_at": "2026-10-03T22:06:41.875058+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "retrieval",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 22134250,
+        "completed_at": "2026-10-03T22:06:41.897248+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23704167,
+        "completed_at": "2026-10-03T22:06:41.921011+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23047750,
+        "completed_at": "2026-10-03T22:06:41.94413+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "warm_latency",
+      "iteration": 3,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23963083,
+        "completed_at": "2026-10-03T22:06:41.968146+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "warmup",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 20844041,
+        "completed_at": "2026-10-03T22:06:41.989037+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 22832709,
+        "completed_at": "2026-10-03T22:06:42.011882+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "retrieval",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23260833,
+        "completed_at": "2026-10-03T22:06:42.035164+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 37149792,
+        "completed_at": "2026-10-03T22:06:42.072329+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 35926833,
+        "completed_at": "2026-10-03T22:06:42.108276+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "warm_latency",
+      "iteration": 3,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 29479875,
+        "completed_at": "2026-10-03T22:06:42.13779+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "archived-v2",
+      "phase": "cold_process",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 23661708,
+        "completed_at": "2026-10-03T22:06:42.198547+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      },
+      "process_start_through_response_ns": 57240917
+    },
+    {
+      "request_id": "archived-v2-policy",
+      "phase": "cold_process",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "fixture",
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 28100666,
+        "completed_at": "2026-10-03T22:06:42.264747+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "plain",
+              "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+              "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "query": "Where is Alpha implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+              },
+              {
+                "file": "README.md",
+                "start_line": 3,
+                "end_line": 5,
+                "commit_hash": "",
+                "project_id": "plain",
+                "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                "source_mode": "snapshot-only",
+                "base_commit": "",
+                "origin_id": "repo",
+                "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+                  "content_sha256": "cc7d725af64dabf4c433dde1a475b22370708e9eeabd512017bb90b27ae2fb74"
+                },
+                "text": "func Alpha() string { return \"alpha\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 3,
+                  "end_line": 5,
+                  "commit_hash": "",
+                  "project_id": "plain",
+                  "dataset_id": "9e359aa4218b15599642298f54407463ea988fb540c345fad1482a9f9de910c9",
+                  "snapshot_id": "ab95afae853fe3e4e74fdb54cf8d16fd624b47580272cc34f457550b7536ae28",
+                  "source_mode": "snapshot-only",
+                  "base_commit": "",
+                  "origin_id": "repo",
+                  "file_sha256": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+                  "content_sha256": "25436afd6538d34af358ebdf7154a34f35f77379a39309a5a7431d39f051cdc6"
+                },
+                "text": "## Alpha\nAlpha returns a string.\n\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "acb90fb69ac9bf2853f6905a0d80cfe7c09d0a66fa985540e1ce92df0f2cdfe5"
+            }
+          }
+        }
+      },
+      "process_start_through_response_ns": 61050916
+    },
+    {
+      "request_id": "invalid-scope-v2",
+      "phase": "cold_process",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "prompt": "Where is Alpha implemented?"
+        },
+        "elapsed_ns": 25474709,
+        "completed_at": "2026-10-03T22:06:42.325686+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=invalid_knowledge_scope: A date and subsystem are required for knowledge context."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "invalid_knowledge_scope",
+            "message": "A date and subsystem are required for knowledge context."
+          }
+        }
+      },
+      "process_start_through_response_ns": 57256709
+    }
+  ],
+  "errors": [
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError",
+    "invalid-scope-v2: tool returned IsError"
+  ]
+}

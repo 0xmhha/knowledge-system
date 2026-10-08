@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "gate": "B0-diagnostic",
+  "quality_metrics": null,
+  "checked_at": "2026-10-01T18:20:47.063121+00:00",
+  "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "source_path": "cmd/cks/knowledgecli/knowledge.go",
+  "source_sha256": "dac91be14afdf931dfd4be0a18f8b9f7c37e66e2ba64d24464348bef415e0fdc",
+  "model": "bge-m3:latest",
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "ollama_version": "0.34.4",
+  "requested_num_ctx": 8192,
+  "truncate": false,
+  "probes": [
+    {
+      "requested_bytes": 4000,
+      "actual_bytes": 4000,
+      "status": "accepted",
+      "prompt_eval_count": 1497,
+      "duration_ms": 5743
+    },
+    {
+      "requested_bytes": 5000,
+      "actual_bytes": 5000,
+      "status": "accepted",
+      "prompt_eval_count": 1874,
+      "duration_ms": 1223
+    },
+    {
+      "requested_bytes": 5500,
+      "actual_bytes": 5500,
+      "status": "accepted",
+      "prompt_eval_count": 2030,
+      "duration_ms": 1387
+    },
+    {
+      "requested_bytes": 6000,
+      "actual_bytes": 6000,
+      "status": "context_rejected",
+      "prompt_eval_count": null,
+      "duration_ms": 11
+    },
+    {
+      "requested_bytes": 8000,
+      "actual_bytes": 8000,
+      "status": "context_rejected",
+      "prompt_eval_count": null,
+      "duration_ms": 4
+    },
+    {
+      "requested_bytes": 12205,
+      "actual_bytes": 12205,
+      "status": "context_rejected",
+      "prompt_eval_count": null,
+      "duration_ms": 5
+    }
+  ]
+}

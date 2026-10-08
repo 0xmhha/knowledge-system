@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "scope": "B0-06/B1-04 raw CKV/F-01 report preparation only",
+  "diagnostic_only": true,
+  "implementation_sha256": {
+    "cmd/b0-vector-probe/main.go": "1177456a479455087573ffacadb88e9aebf8e8c73a1af66684675af3dfb214dd",
+    "cmd/b0-vector-probe/main_test.go": "3c7d3c30f5a26b830153340a92935936afd4003aa45f23d07dd44e3c3e0a97ba",
+    "scripts/b0-summarize-vector-probe.py": "7bfbf82ca8398c1c0fd8ae73979221636fb946a27137855fa71cb1e4dca7f9da",
+    "scripts/test_b0_vector_summary.py": "6dfceb7e83995780dbca9aca00ea6b5018851c538e64a78cbaa76a4737c1ce0f",
+    "scripts/b1-summarize-matrix.py": "9961208564315ac6d5505fea58b3859313972ab17303839c760e3311ebb19a0d",
+    "scripts/b0-check-static-v2-scopes.py": "666efddd8fe869b44e4348a14b9c042d41ec79f0e77562774d6826cb7d2200f0",
+    "scripts/b0-prepare-static-inputs.py": "0e81f79358dc32f4fc23a96ddb87f09397c604c1b568e2468f39f7b3fd623e46"
+  },
+  "historical_real_probe": {
+    "report": "historical-replay-sealed/report.json",
+    "report_sha256": "56fac6e41b067ed00010e2e1efa43efe3637464e736f710a71b6d4ed727c6459",
+    "k": 1,
+    "eligible_count": 1,
+    "normal_exact_agreement": true,
+    "f01_state": "fixture_not_qualified",
+    "qualification_reasons": [
+      "K_differs",
+      "unfiltered_top_K_omits_no_exact_target_file",
+      "full_eligible_inventory_missing"
+    ],
+    "full_eligible_inventory_present": false,
+    "source_archive_git_blob_files": 3,
+    "indexed_source_files_checked": 2,
+    "invariant_violations": []
+  },
+  "completed_B1_01_02_evidence_reaudit": {
+    "historical_artifact_bindings": 466,
+    "interpretation": "Prior declared implementation scope remains sealed; formal quality not reclassified."
+  },
+  "human_input_files_unchanged": 5,
+  "new_model_database_MCP_official_final_queries": false,
+  "strict_official_build_executed": false,
+  "final_readiness_exit_code": 2,
+  "final_readiness_pending_reasons": [
+    "protocol_review_pending",
+    "dynamic_fixture_review_pending"
+  ],
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./cmd/b0-vector-probe"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./cmd/b0-vector-probe"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_b0_vector_summary.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_b1_matrix_summary.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_b0_vector_summary.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/check-boundaries.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/update-execution-status.py",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "test_counts": {
+    "new_python": 15,
+    "existing_paired_python": 16,
+    "go_probe": 6
+  },
+  "helper_development_failure": "Initial Path.open(opener=...) error preserved; builtin open fixed; not an existing product or C0 quality failure.",
+  "quality_metrics": null,
+  "human_verdicts": null,
+  "official_F01_verdict": null,
+  "official_B0_B1_C0_C1_verdicts": null,
+  "worklist": {
+    "total": 30,
+    "implementation_completed": 2,
+    "in_progress": 11,
+    "waiting": 17,
+    "unfinished": 28,
+    "official_gates_closed": 0
+  },
+  "next_independent_work": "F-02 long-tail/split/parent reassembly oracle report preparation",
+  "priority_when_human_decisions_arrive": "B0-01/02/03/05 + STV2-01 actual decisions; freeze source/pack/semantic/scope/K; new strict B0-07 build and formal B0/B1",
+  "remaining": "All 28 unfinished rows in EXECUTION-WORKLIST.md/EXECUTION-STATUS.md plus STV2-01/OP-01–08/native amd64/full native/legal/recovery/release scope.",
+  "control_byte_binding": "Decode and hash the same single-read controls bytes.",
+  "final_artifact_boundary_correction": {
+    "fix": "FIX-17",
+    "failure": "Go implementation snapshots were assembled after prior boundary check and subsequently treated as system code.",
+    "resolution": "Rename archived .go snapshots to .go.txt without changing bytes; rerun checks on final assembled artifacts.",
+    "evidence": "../f02-document-preparation-m2max-2026-10-05/snapshot-rename-audit.json"
+  }
+}

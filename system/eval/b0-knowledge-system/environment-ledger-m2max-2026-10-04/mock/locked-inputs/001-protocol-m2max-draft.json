@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "reviewer": null,
+  "reviewed_at": null,
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "corpus_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "question_set_sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+  "fixture_manifest_sha256": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+  "development_questions": [
+    "B0-CODE-01",
+    "B0-POLICY-01",
+    "B0-TRACE-01",
+    "B0-WHY-03"
+  ],
+  "final_questions": [
+    "B0-CODE-02",
+    "B0-CODE-03",
+    "B0-WHY-01",
+    "B0-WHY-02",
+    "B0-POLICY-02",
+    "B0-POLICY-03",
+    "B0-ABS-01",
+    "B0-ABS-02"
+  ],
+  "synthetic_development_fixtures": [
+    "F-01-DEV",
+    "F-02-DEV",
+    "F-03-DEV",
+    "F-04-DEV",
+    "F-05-DEV",
+    "F-06-DEV"
+  ],
+  "synthetic_final_fixtures": [
+    "F-01-FINAL",
+    "F-02-FINAL",
+    "F-03-FINAL",
+    "F-04-FINAL",
+    "F-05-FINAL",
+    "F-06-FINAL"
+  ],
+  "model": {
+    "provider": "ollama",
+    "model": "bge-m3:latest",
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "endpoint": "http://127.0.0.1:11434",
+    "runtime_options": {
+      "num_ctx": 8192,
+      "num_batch": 8192
+    },
+    "server_version": "0.35.1"
+  },
+  "query_prefix_policy": "registry",
+  "retrieval_k": 10,
+  "synthetic_f01_k": 5,
+  "static_filters": {},
+  "retrieval_runs": 5,
+  "warm_latency": {
+    "warmup_runs": 2,
+    "measured_runs": 20,
+    "unit": "one complete query per arm",
+    "percentile_method": "nearest_rank"
+  },
+  "cold_start": {
+    "runs": 3,
+    "definition": "fresh CKS process; Ollama model resident; report daemon/model cold load separately without unloading a user model"
+  },
+  "paired_arms": [
+    "baseline",
+    "concept_text",
+    "relations",
+    "combined"
+  ],
+  "pack_axis": [
+    "off",
+    "on"
+  ],
+  "order": "Rotate fixed eight-arm order once per repetition; same prompt/filter/K/model on paired arms. No concurrent latency trials.",
+  "thresholds": {
+    "safety_snapshot_secret_mixing_max": 0,
+    "abstention_false_citation_delta_max": 0,
+    "recall_at_10_delta_min": -0.02,
+    "mrr_delta_min": -0.02,
+    "important_group_delta_min": -0.05,
+    "warm_p95_ratio_max": 1.25
+  },
+  "uncertainty": {
+    "bootstrap_seed": 20261003,
+    "resamples": 10000,
+    "resampling_unit": "paired independent question or fixture family; cluster language/state variants within a family; never repeated runs",
+    "ci": 0.95,
+    "small_group_policy": "n<10 independent final questions in an important group => descriptive/inconclusive; no default-on or release claim. Expansion requires new pre-result review."
+  },
+  "results": null,
+  "v1_vs_v2": "Keep v1 citation metrics, v2 evidence coordinate/semantic states and human claim verdicts separate. An abstained answer can still cite evidence of absence; expect_no_citations is a separate stricter v1 oracle.",
+  "limitations": [
+    "8 static final questions are too small for subgroup release inference.",
+    "Executable adapters for separate concept-text and relation arms and budget injection are still required.",
+    "No final fixture has been executed. Source/query drafts do not imply approval of semantic facts."
+  ],
+  "discovery_policy": {
+    "ckv_default_ignore": [
+      ".git/",
+      "node_modules/",
+      "vendor/",
+      ".next/",
+      "out/",
+      "dist/",
+      "build/",
+      "target/",
+      ".venv/",
+      "__pycache__/"
+    ],
+    "observed_go_source_coverage": "963/992; 29 internal/vector/build/ source files excluded; disclose rather than assume complete corpus coverage"
+  }
+}

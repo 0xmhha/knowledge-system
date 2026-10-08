@@ -1,0 +1,1461 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "6ec465d1c5307f8e5217f2d5f16d10d18216d2dcdfb653f89103376b6e7ad30f",
+    "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743"
+  },
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "native:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "settings": {
+    "raw_recall_k": 20,
+    "stage2_candidate_cap": 30,
+    "knowledge_pass_k": 6,
+    "raw_search_filter": {},
+    "bm25_rerank": true,
+    "ontology_budget_ms": 5000
+  },
+  "settings_evidence": "compiled default source contract; not per-call backend telemetry",
+  "settings_sources_sha256": {
+    "internal/system/composer/stage1/extractor.go": "108d3a7efac9ab36b159709183d3a3f80819185ec71397b6b7a87d94869eaeca",
+    "internal/system/composer/stage2/searcher.go": "cdca1a8d0d591640c2b55a944815bcf9423f49047cbead9cf7d5064b02ae5d86",
+    "cmd/cks/mcpcli/ontology.go": "48259b3109a38a0bce3489031e5e690751f6504f4f54ab1981231adf6b6a8690",
+    "cmd/cks/mcpcli/serve.go": "9814cb03e36e8802ade68d78d7ff73d90fd0f693d93b938c5e1de44f54e1b704"
+  },
+  "input_file_sha256": {
+    "go.mod": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+    "ontology-reviewed.yaml": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+    "README.md": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+    "main.go": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+    "main_test.go": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+    ".cks/knowledge/manifest.yaml": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+    ".cks/knowledge/knowledge.lock.json": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+    ".cks/knowledge/policies/conflict-b.yaml": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+    ".cks/knowledge/policies/proposed.yaml": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+    ".cks/knowledge/policies/public.yaml": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+    ".cks/knowledge/policies/conflict-a.yaml": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+    ".cks/knowledge/policies/restricted.yaml": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+    ".cks/knowledge/policies/expired.yaml": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+    "vendor/fixture-policy/pack.yaml": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e"
+  },
+  "sizes": {
+    "input_files": 14,
+    "input_bytes": 4706,
+    "graph_db_bytes": 151552,
+    "vector_db_bytes": 4292608,
+    "semantic_db_bytes": 32768,
+    "projection_json_bytes": 7228
+  },
+  "pack_axis": "same retained pack and index; only include_knowledge changes",
+  "order": [
+    "baseline_off",
+    "concept_text_on",
+    "relations_off",
+    "combined_on",
+    "baseline_on",
+    "concept_text_off",
+    "relations_on",
+    "combined_off"
+  ],
+  "arm_rotation": false,
+  "latency_gate": "not measured; sequential structural single captures",
+  "arms": [
+    {
+      "id": "baseline_off",
+      "mode": "baseline",
+      "include_knowledge": false,
+      "config_sha256": "7ad811ab5878084910ff6e52e9566e53f1a075551428396d80fb4cd6c52a4df9",
+      "requests_sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "capture": "baseline_off.json",
+      "capture_sha256": "d46153e5adf4c4d16d315cc87ee8b8f2cae25bd4e5f0bc30217296e6346b1518",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 187838541,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 159680541,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 170845708,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 159969458,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 157463250,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": null,
+          "knowledge": null,
+          "elapsed_ns": 155710458,
+          "response_json_bytes": 10177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        }
+      ]
+    },
+    {
+      "id": "concept_text_on",
+      "mode": "concept_text",
+      "include_knowledge": true,
+      "config_sha256": "3650f67617e0783565f7ce3116fd2f8cf79c4deac54e2f3ff4ad624990d70f5d",
+      "requests_sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "capture": "concept_text_on.json",
+      "capture_sha256": "7cbde83bb2731bbebfd5fd32471382ffab662153c9239daf7c0781e0f2901a47",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "complete",
+            "policy_ids": [
+              "public"
+            ],
+            "required_behavior_ids": [
+              "public"
+            ],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 290407541,
+          "response_json_bytes": 19479,
+          "citation_count": 9,
+          "body_utf8_bytes": 811
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 233601208,
+          "response_json_bytes": 15976,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 226185792,
+          "response_json_bytes": 15976,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "stale",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 220201458,
+          "response_json_bytes": 15950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "restricted",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 202849750,
+          "response_json_bytes": 15915,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "conflict",
+            "policy_ids": [
+              "conflict-a",
+              "conflict-b"
+            ],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 219482042,
+          "response_json_bytes": 22013,
+          "citation_count": 10,
+          "body_utf8_bytes": 1308
+        }
+      ]
+    },
+    {
+      "id": "relations_off",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config_sha256": "509cea82a528c5e8dfe9f4dce2c77e0e6181ab9d77019d49cab78cf834a4b469",
+      "requests_sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "capture": "relations_off.json",
+      "capture_sha256": "72ff4d8a217a0aa3d875f720d8da0a99ebc62572d6505e0631982eba710c6303",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 196464917,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 184268000,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 183215917,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 167011208,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 171683458,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": null,
+          "elapsed_ns": 178232042,
+          "response_json_bytes": 10315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        }
+      ]
+    },
+    {
+      "id": "combined_on",
+      "mode": "combined",
+      "include_knowledge": true,
+      "config_sha256": "639445e1678cdd442715a11576c488aaf085ffe4afb0493427ba245bdb4b5dbe",
+      "requests_sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "capture": "combined_on.json",
+      "capture_sha256": "4ce41b4cc70095209004bd2d3633dd6fe52a980f9ea637e4b5c5a4410822a1c2",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "complete",
+            "policy_ids": [
+              "public"
+            ],
+            "required_behavior_ids": [
+              "public"
+            ],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 340585708,
+          "response_json_bytes": 19475,
+          "citation_count": 9,
+          "body_utf8_bytes": 811
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 240561167,
+          "response_json_bytes": 15972,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 222266291,
+          "response_json_bytes": 15972,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "stale",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 227693583,
+          "response_json_bytes": 15946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "restricted",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 214493750,
+          "response_json_bytes": 15911,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": {
+            "state": "conflict",
+            "policy_ids": [
+              "conflict-a",
+              "conflict-b"
+            ],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 222367625,
+          "response_json_bytes": 22009,
+          "citation_count": 10,
+          "body_utf8_bytes": 1308
+        }
+      ]
+    },
+    {
+      "id": "baseline_on",
+      "mode": "baseline",
+      "include_knowledge": true,
+      "config_sha256": "7ad811ab5878084910ff6e52e9566e53f1a075551428396d80fb4cd6c52a4df9",
+      "requests_sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "capture": "baseline_on.json",
+      "capture_sha256": "eaa32ccd57eb2a555d59b368fa97e46bd4691aaafa5a149dd8c8c56efb16daf2",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": null,
+          "knowledge": {
+            "state": "complete",
+            "policy_ids": [
+              "public"
+            ],
+            "required_behavior_ids": [
+              "public"
+            ],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 241401792,
+          "response_json_bytes": 18706,
+          "citation_count": 9,
+          "body_utf8_bytes": 811
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": null,
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 190481542,
+          "response_json_bytes": 15203,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": null,
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 184282292,
+          "response_json_bytes": 15203,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": null,
+          "knowledge": {
+            "state": "stale",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 165241083,
+          "response_json_bytes": 15177,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": null,
+          "knowledge": {
+            "state": "restricted",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 151792666,
+          "response_json_bytes": 15142,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": null,
+          "knowledge": {
+            "state": "conflict",
+            "policy_ids": [
+              "conflict-a",
+              "conflict-b"
+            ],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 168580834,
+          "response_json_bytes": 21240,
+          "citation_count": 10,
+          "body_utf8_bytes": 1308
+        }
+      ]
+    },
+    {
+      "id": "concept_text_off",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config_sha256": "3650f67617e0783565f7ce3116fd2f8cf79c4deac54e2f3ff4ad624990d70f5d",
+      "requests_sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "capture": "concept_text_off.json",
+      "capture_sha256": "c40f65bbdeb00197aeb5acfa842e039a1f63da0e3bf466d0e10503421197ca3a",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 250544375,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 216075583,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 218811250,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 209981750,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 216782167,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "concept_text",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 0,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 8,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 223141750,
+          "response_json_bytes": 10950,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        }
+      ]
+    },
+    {
+      "id": "relations_on",
+      "mode": "relations",
+      "include_knowledge": true,
+      "config_sha256": "509cea82a528c5e8dfe9f4dce2c77e0e6181ab9d77019d49cab78cf834a4b469",
+      "requests_sha256": "562fef3afd4bec518fa30bda73e28048160297184035a1eb89ef58a842afd923",
+      "capture": "relations_on.json",
+      "capture_sha256": "c67b89ba90076f5ba154a42b7e42fc36aa410a7e1dc67386979fce14a160e8dc",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "complete",
+            "policy_ids": [
+              "public"
+            ],
+            "required_behavior_ids": [
+              "public"
+            ],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 273438584,
+          "response_json_bytes": 18844,
+          "citation_count": 9,
+          "body_utf8_bytes": 811
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 208152084,
+          "response_json_bytes": 15341,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "unknown",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 184085792,
+          "response_json_bytes": 15341,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "stale",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 195834584,
+          "response_json_bytes": 15315,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "restricted",
+            "policy_ids": [],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 192391875,
+          "response_json_bytes": 15280,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "relations",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 2
+          },
+          "knowledge": {
+            "state": "conflict",
+            "policy_ids": [
+              "conflict-a",
+              "conflict-b"
+            ],
+            "required_behavior_ids": [],
+            "lock_digest": "61756888d0b327edb9a7085529aa1654703fa80d75fa0bd8a9eabff5e4165f15"
+          },
+          "elapsed_ns": 181954584,
+          "response_json_bytes": 21378,
+          "citation_count": 10,
+          "body_utf8_bytes": 1308
+        }
+      ]
+    },
+    {
+      "id": "combined_off",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config_sha256": "639445e1678cdd442715a11576c488aaf085ffe4afb0493427ba245bdb4b5dbe",
+      "requests_sha256": "a95a6b348ec514b904b33434a7aa0dc84a34178fcb2ccc85ef7aeb6d81d6cb34",
+      "capture": "combined_off.json",
+      "capture_sha256": "1226c4ed6ecbfa3eb5ed8c3ff410e9b84991bd3ba43fff9493ee917cfe874e0d",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 255910625,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "wrong-scope",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 231427875,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "proposed",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 259870375,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "expired",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 214229667,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "restricted",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 341480292,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        },
+        {
+          "request_id": "conflict",
+          "ontology": {
+            "mode": "combined",
+            "state": "active",
+            "baseline_citations": 10,
+            "matched_concepts": 1,
+            "applied_relations": 1,
+            "boosted_citations": 8,
+            "text_search_calls": 1,
+            "text_boosted_citations": 6,
+            "text_sources": [
+              {
+                "concept_id": "alpha-function",
+                "evidence_id": "ontology:a22a6c6ca5ac7ecfe8c7b446",
+                "query_sha256": "c428c437e2243c6f0ec10ddca97c4a0e0a0e1b2e9c1c4c088fd0efcd68e2475b",
+                "project_id": "ks-fixture",
+                "dataset_id": "e92f750655f3e993bb54f6066fb8b8a38348b096eb337ad085db5f07e5a2a743",
+                "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58",
+                "commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+                "file": "ontology-reviewed.yaml",
+                "start_line": 7,
+                "end_line": 14,
+                "content_sha256": "6be9e7fc893b1e2e74f55f1443aa63b53545765e3feeff0ab955dfec7289c146",
+                "returned_hits": 9
+              }
+            ]
+          },
+          "knowledge": null,
+          "elapsed_ns": 208957417,
+          "response_json_bytes": 10946,
+          "citation_count": 8,
+          "body_utf8_bytes": 368
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+package ckgclient
+
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"strings"
+	"testing"
+
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+)
+
+func TestDiagnosticRetainedDocumentNeighbors(t *testing.T) {
+	input := os.Getenv("B0_NEIGHBOR_REPLAY_INPUT")
+	output := os.Getenv("B0_NEIGHBOR_REPLAY_OUTPUT")
+	if input == "" || output == "" {
+		t.Skip("owned diagnostic capture/output required")
+	}
+	raw, err := os.ReadFile(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var capture struct {
+		Rows []struct {
+			Call struct {
+				Response struct {
+					Pack struct {
+						Citations []contract.Citation `json:"citations"`
+					} `json:"structuredContent"`
+				} `json:"response"`
+			} `json:"call"`
+		} `json:"rows"`
+	}
+	if err := json.Unmarshal(raw, &capture); err != nil {
+		t.Fatal(err)
+	}
+	if len(capture.Rows) != 2 {
+		t.Fatal("expected FIX-20 DEV pair")
+	}
+	client, err := NewReal("/private/tmp/ks-large-cost-20261005/dataset/diagnostic/graph/graph.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+	rows := []map[string]any{}
+	docs, failures := 0, 0
+	for _, citation := range capture.Rows[0].Call.Response.Pack.Citations {
+		nodes, err := client.s.NodesByFilePath(citation.File)
+		if err != nil {
+			t.Fatal(err)
+		}
+		symbols, structural := 0, 0
+		for _, node := range nodes {
+			if isStructuralQname(node.QualifiedName) {
+				structural++
+			} else {
+				symbols++
+			}
+		}
+		neighbors, callErr := client.Neighbors(context.Background(), citation, NeighborsOpts{Hops: 1, MaxTotal: 50})
+		message := ""
+		if callErr != nil {
+			failures++
+			message = callErr.Error()
+		}
+		isDoc := strings.HasSuffix(citation.File, ".md")
+		if isDoc {
+			docs++
+			if symbols != 0 || matchQname(nodes, citation) != "" || callErr == nil || !strings.Contains(message, "no node at") {
+				t.Errorf("document seed differs from the no-symbol diagnosis: %s", citation.File)
+			}
+		} else if callErr != nil {
+			t.Errorf("code control failed: %v", callErr)
+		}
+		rows = append(rows, map[string]any{"citation": citation, "document": isDoc, "graph_symbol_candidates": symbols, "graph_structural_candidates": structural, "matched_qname": matchQname(nodes, citation), "neighbors": len(neighbors), "error": message})
+	}
+	if docs != 6 || failures != 6 || len(rows) != 8 {
+		t.Errorf("unexpected diagnostic inventory: docs=%d failures=%d rows=%d", docs, failures, len(rows))
+	}
+	report := map[string]any{"diagnostic_only": true, "quality_metrics": nil, "official_verdict": nil, "scope": "direct real Go adapter replay of selected FIX-20 DEV pack citations; not all Stage3 seed arguments or SDK scopes", "planned_calls": 8, "observed_calls": len(rows), "document_no_symbol": docs, "no_node_errors": failures, "rows": rows, "test_failed": t.Failed()}
+	encoded, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.Write(append(encoded, '\n')); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+}

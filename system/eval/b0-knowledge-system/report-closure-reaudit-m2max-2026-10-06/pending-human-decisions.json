@@ -1,0 +1,100 @@
+{
+  "scope": "pending decision inventory; not a completed human approval record",
+  "source_review_table": "docs/spec-driven/B1-APPROVED-OUTPUT-CLAIM-REVIEW.md",
+  "source_review_table_sha256": "f051a660059e79e4ebc7193f84eebc87bbc6624387ac195ce0763529ca639e71",
+  "claim_decisions": [
+    {
+      "id": "HC-01",
+      "interpretation_for_human_review": "F-03의 여러 `core` 개념은 proposed다. 한 의미를 확정 정책/구현으로 선택하지 않는다. 실제 온톨로지 가산 0, 기본 인용·본문 유지. “뜻을 더 지정해야 한다”는 해석은 가능하지만 자동 정책 승인/답변 기권 성공을 주장하지 않는다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-02",
+      "interpretation_for_human_review": "F-05-A의 `docs/policy.md:3`, 해당 프로젝트의 검토 정책: 상한 10. B의 상한 20을 A에 적용하지 않는다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-03",
+      "interpretation_for_human_review": "F-05-B의 `docs/policy.md:3`, 해당 프로젝트의 검토 정책: 상한 20. A의 상한 10을 B에 적용하지 않는다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-04",
+      "interpretation_for_human_review": "F-05-A/B의 `main.go:3`의 Alpha는 프로젝트 marker를 반환한다. 정책 상한을 실제로 집행하거나 준수한다는 근거가 아니다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-05",
+      "interpretation_for_human_review": "F-06 `main.go:3`에서 RefundLimit은 20을 반환하고 `README.md:3`/검토 요구는 10 이하다. 원문을 사람이 대조하면 불일치다. DTO가 자동 수치 충돌 판정까지 했다고 주장하지 않는다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-06",
+      "interpretation_for_human_review": "F-06 `main_test.go:5`의 TestHealth는 관련 없는 산술 검사다. 테스트 성공을 환급 상한 acceptance 승인으로 사용하지 않는다. 실제 test/trace link는 비어 있다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-07",
+      "interpretation_for_human_review": "F-06에는 reviewed ADR→requirement→criterion→code→test 전체 경로가 없다. implemented behavior/trace의 미확정 상태를 유지하며 IMPLEMENTED_BY 순위 근거만으로 완전 추적 경로를 주장하지 않는다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-08",
+      "interpretation_for_human_review": "정적 DEV v1에서 CODE/POLICY/TRACE의 기대 근거를 못 찾았다. 이 출력만으로 기대 답을 입증했다고 판단하지 않는다. WHY는 Promote의 기대 근거를 찾았다. 인용 0개 조건과 사람이 답변을 보류할지는 별도 판정한다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-09",
+      "interpretation_for_human_review": "ABS-01 실제 출력에는 인용이 있으나 운영 가스 환불 정책의 승인 담당자를 입증하는 근거가 없다. 담당자 이름을 추정하지 않고 답변을 보류해야 한다. 인용0개 guard 실패와 사람의 답변 보류를 각각 기록한다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-10",
+      "interpretation_for_human_review": "ABS-02 실제 출력의 시험 preview 서명 근거를 production key나 실제 private key holder로 해석하지 않는다. 운영 키/소유자 답변을 보류해야 한다. v1은 인용25개, v2도 인용이 있어 strict no-citation 실패다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "HC-11",
+      "interpretation_for_human_review": "POLICY-03은 모든8arm에서 v2_evidence_failed로 종료돼 정상 정책 근거 팩을 반환하지 않았다. 실제 빌더 진단은 retained body 33,104바이트가 32,000 상한을 넘었음을 확인한다. 오류만으로 비공개 정책 내용/ID를 공개하거나 접근을 허용하는 답변을 만들 수 없으며, 해당 응답의 정책 답변 근거는 미제공이다. 제품의 권한 회귀 시험과 이 검색 실패를 구분한다.",
+      "human_verdict": null,
+      "reviewer": null,
+      "reviewed_at": null
+    }
+  ],
+  "operating_scope": {
+    "selected": null,
+    "choices": [
+      "test_preview_deliverable_with_explicit_operating_residual",
+      "actual_operating_release_requires_OP01_08_evidence"
+    ],
+    "operating_role_key_trust_legal_approval": null
+  },
+  "review_cost": "not_measured; already reported without approval",
+  "affected_tasks": [
+    "B1-04",
+    "B1-07",
+    "B1-08",
+    "C1-05"
+  ],
+  "general_next_instruction_is_not_human_verdict": true
+}

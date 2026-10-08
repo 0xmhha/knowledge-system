@@ -1,0 +1,42 @@
+"""Read completed captures only; independent families, raw timing pools, no human verdict."""
+from pathlib import Path
+import json,hashlib,importlib.util,statistics,argparse,collections
+parser=argparse.ArgumentParser();parser.add_argument('--base',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+root=Path.cwd();read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();base=args.base
+assert not args.output.exists();execution=read(base/'execution.json');partition=execution['partition'];assert execution['status']=='captured_pending_independent_family_oracles_and_reports'and execution['inputs_unchanged']and execution['stores_unchanged']
+spec=importlib.util.spec_from_file_location('matrix',root/'scripts/b1-summarize-matrix.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+protocol=read(root/'system/eval/b0-knowledge-system/protocol-m2max-draft.json'); reports=[];binding={};units=collections.defaultdict(lambda:collections.defaultdict(list));measurements=[];safety=[];contexts=collections.Counter()
+for step in execution['steps']:
+ label=step['id'];static=label.startswith('static-');path=base/(label+'-summary.json')if static else base/'independent-reports'/(label+'.json');r=read(path)
+ assert r['status']=='descriptive'and not r['missing_slots']and not r['capture_invariant_issues']and not r['capture_errors']
+ assert sum(a['failed_rows']for a in r['arm_summaries'].values())==0 and sum(a['backend_measurement_missing_rows']for a in r['arm_summaries'].values())==0
+ assert not r.get('family_oracle_violations',[])
+ go_path=base/'public-go-verification'/(label+'.json');g=read(go_path);assert g['failed']==0 and len(g['records'])==step['planned_rows']
+ binding[label]={'report_sha256':sha(path),'go_verifier_report_sha256':sha(go_path),'rows_sha256':sha(Path(step['output'])/'rows.jsonl')}
+ reports.append(r);safety.append({'id':label,'source_integrity_verified_rows':r.get('family_oracle_counts',{}).get('source_integrity_valid',r['observed_rows']),'public_go_valid_rows':len(g['records']),'family_oracle_violations':len(r.get('family_oracle_violations',[]))})
+ for row in r['measurements']:measurements.append(dict(row,capture_id=label,population='static'if static else'dynamic'))
+ if r['per_question'] is not None:
+  for arm,qs in r['per_question'].items():
+   for qid,values in qs.items():units[qid if static else label.split('-')[0]+'-'+label.split('-')[1]][arm].append(values)
+ for line in (Path(step['output'])/'rows.jsonl').open():
+  row=json.loads(line);pack=row['call']['response']['structuredContent'];context=(pack.get('semantic')or{}).get('knowledge_context')or{}
+  if row['arm'].endswith('_on'):contexts[(label,context.get('state','absent'))]+=1
+arm_summaries={}
+for population in ['static','dynamic','pooled']:
+ arm_summaries[population]={}
+ for arm in m.ARMS:
+  selected=[v for v in measurements if v['arm']==arm and(population=='pooled'or v['population']==population)]
+  warm=[v['elapsed_ns']for v in selected if v['phase']=='warm_latency'and not v['issues']];cold=[v['process_start_through_response_ns']for v in selected if v['phase']=='cold_process'and not v['issues']]
+  arm_summaries[population][arm]={'rows':len(selected),'warm_count':len(warm),'warm_p50_ns':m.percentile(warm,.5),'warm_p95_ns':m.percentile(warm,.95),'cold_process_count':len(cold),'cold_process_p50_ns':m.percentile(cold,.5),'cold_process_p95_ns':m.percentile(cold,.95),'response_bytes_p50':m.percentile([v['canonical_sdk_response_utf8_bytes']for v in selected],.5),'backend_attempts':dict(collections.Counter({name:sum(v['backend_measurement']['attempts_by_backend'].get(name,0)for v in selected)for name in sorted({name for v in selected for name in v['backend_measurement']['attempts_by_backend']})}))}
+ baseline=arm_summaries[population]['baseline_off']['warm_p95_ns']
+ for arm,v in arm_summaries[population].items():
+  v['warm_p95_ratio_to_baseline_off']=v['warm_p95_ns']/baseline if baseline else None
+  v['descriptive_warm_threshold']=None if baseline is None else'within_limit'if v['warm_p95_ratio_to_baseline_off']<=protocol['thresholds']['warm_p95_ratio_max']else'exceeds_limit'
+quality={};deltas={}
+for arm in m.ARMS:
+ q={unit:{metric:statistics.mean(v[metric]for v in arms[arm])for metric in m.METRICS}for unit,arms in units.items()};quality[arm]=q
+ for unit,metrics in q.items():
+  assert len(units[unit][arm])==len(units[unit]['baseline_off'])
+ deltas[arm]={metric:m.bootstrap_delta([q[unit][metric]-statistics.mean(v[metric]for v in units[unit]['baseline_off'])for unit in sorted(units)],protocol['uncertainty']['bootstrap_seed'],protocol['uncertainty']['resamples'])for metric in m.METRICS}
+result={'schema_version':1,'partition':partition,'status':'complete_descriptive_pending_human_and_gate_review','binary_sha256':execution['binary_sha256'],'execution_sha256':sha(base/'execution.json'),'reporter_sha256':sha(Path(__file__)),'bindings':binding,'observed_rows':len(measurements),'independent_quality_units':len(units),'dynamic_family_units':6,'arm_summaries':arm_summaries,'quality_by_independent_unit':quality,'paired_quality_deltas':deltas,'safety_replay':safety,'knowledge_on_context_states':[{'capture':label,'state':state,'rows':count}for(label,state),count in sorted(contexts.items())],'human_claim_verdicts':None,'human_review_cost':None,'official_gate_verdict':None,'thresholds':protocol['thresholds'],'limitations':['Repeated calls are not independent samples. Language/state variants are averaged within each family.','F01 direct filtered/exact@5 and F03 non-normativity have no composed positive-citation gold; excluded from composed Recall@10/MRR denominators.','Timing pools use every successful warm/cold call, not means of percentiles. Static, dynamic and pooled populations are all retained.','Ontology-mode and knowledge-pack axes are separate; same-axis comparisons and individual-capture diagnostics remain in source reports.','No human answer/abstention/policy or cost verdict is invented. No default-on or release claim follows small-group descriptive results.']}
+args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'rows':len(measurements),'quality_units':len(units),'pooled_p95_ratios':{a:round(v['warm_p95_ratio_to_baseline_off'],4)for a,v in arm_summaries['pooled'].items()}}))

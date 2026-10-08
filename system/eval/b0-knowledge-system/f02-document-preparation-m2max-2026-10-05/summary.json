@@ -1,0 +1,609 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "fixture_id": "F-02-DEV",
+  "scope": "B0-06/B1-04 document split/parent/tail diagnostic preparation only",
+  "implementation_sha256": {
+    "scripts/b0-audit-f02-document.py": "a9b5959268087ad397bd1a97a93d6531ac0c6797b49653e9244a3fb71cf4fc60",
+    "scripts/test_b0_f02_document.py": "86190515013c92f6f1146c7e4dbc106436d66ad567a78166c51d03286da9ad1e"
+  },
+  "structure": {
+    "parent_id": "1b137c249db604a0d1917aa8cbd26ecb659e7715df0198340c2482b651549095",
+    "parent_span": [
+      1,
+      203
+    ],
+    "parent_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+    "source_bytes": 20290,
+    "child_count": 5,
+    "children": [
+      {
+        "id": "cbbc96742a0cad1d0243e312369800ac4b3c4f06a909575eaa9bcd575e4097b0",
+        "ordinal": 1,
+        "start_line": 1,
+        "end_line": 2,
+        "bytes": 19,
+        "text_sha256": "019942a54e87fb276c16a4b586eced499effb31c036ab3cb2b3e89b3bf714144"
+      },
+      {
+        "id": "4a037ce25874224b06743c670fd25f471ee9e0b559350223ee05d9fac5091973",
+        "ordinal": 2,
+        "start_line": 3,
+        "end_line": 62,
+        "bytes": 6060,
+        "text_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+      },
+      {
+        "id": "affc2f8f58cc9cd0e36b89383f5c46ac3900fbcfdd22ba65200045cf3bc55424",
+        "ordinal": 3,
+        "start_line": 63,
+        "end_line": 122,
+        "bytes": 6060,
+        "text_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+      },
+      {
+        "id": "9772c0f719a103a99596db8fbe765463bb747687f31e64e5088b2b365f999e79",
+        "ordinal": 4,
+        "start_line": 123,
+        "end_line": 182,
+        "bytes": 6060,
+        "text_sha256": "4461394c973752c9f422b5ece630914fee1869a27163a7ca18838acceb207294"
+      },
+      {
+        "id": "de54c72ac8680082351f0c76681ac1418602103d9e9f25fdd2e442a156e3b48a",
+        "ordinal": 5,
+        "start_line": 183,
+        "end_line": 203,
+        "bytes": 2091,
+        "text_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+      }
+    ],
+    "child_bytes_reassemble_source": true,
+    "tail_child_ids": [
+      "de54c72ac8680082351f0c76681ac1418602103d9e9f25fdd2e442a156e3b48a"
+    ],
+    "tail_span_sha256": "c45d056685d15182002679c0b5002098fd4d6da28468e2b08ff2b4e3d76a9f15",
+    "byte_cap": 6144,
+    "heading_path": [
+      "Refund decision"
+    ],
+    "structural_truncation_count": 0
+  },
+  "raw_tail_ranks": [
+    [
+      1
+    ],
+    [
+      1
+    ]
+  ],
+  "sdk": {
+    "capture_sha256": "72ef04605c0d2efaed43c886d80e3461f2af81e08f9d861c50604d91ded5fbdb",
+    "request_sha256": "d9516cab43e301f26332d640ac0c60e13aad23c8009fea2695a07cb91d7ee054",
+    "config_sha256": "ad9c36825cee35d3d1f6107019d2708d504bf0a717245eac6670c70043539fff",
+    "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+    "planned_calls": 2,
+    "observed_calls": 2,
+    "failed_calls": 0,
+    "missing_calls": 0,
+    "rows": [
+      {
+        "request_id": "F02-DEV-0",
+        "measurement_id": "9cdf9ff332f01796f79d97e57cb7716d",
+        "failed": false,
+        "response_sha256": "bf47d0f8e286c5b01914add879b17f62725dbaae2bdffefaeae213b96ddba2ad",
+        "citations": 8,
+        "bodies": 8,
+        "tail_source_references": [
+          {
+            "file": "docs/decision.md",
+            "start_line": 183,
+            "end_line": 203,
+            "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "project_id": "f-02-dev",
+            "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+            "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+            "source_mode": "committed",
+            "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "origin_id": "repo",
+            "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+            "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+          }
+        ],
+        "tail_body_count": 1
+      },
+      {
+        "request_id": "F02-DEV-1",
+        "measurement_id": "38cdadec8e26e349c223b79a784608d8",
+        "failed": false,
+        "response_sha256": "470e431d0d871689135baf22f7b17f8026e71727857b5f9577f92e6f53c431ce",
+        "citations": 8,
+        "bodies": 8,
+        "tail_source_references": [
+          {
+            "file": "docs/decision.md",
+            "start_line": 183,
+            "end_line": 203,
+            "commit_hash": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "project_id": "f-02-dev",
+            "dataset_id": "c5c7e9d47717f48f24996fa3ac4b94552b25aec595c485d7e3aa2f6f80d33191",
+            "snapshot_id": "b4a2886a3a942e439dac0b944be4dea7970e7378def27e8485a447b8210e864c",
+            "source_mode": "committed",
+            "base_commit": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "origin_id": "repo",
+            "file_sha256": "35e63117b4a5ba5a51d42f6b9c130c740e9d8fe4064991840064b061f128ff3f",
+            "content_sha256": "57ec05487a648331435762e6da25133ceb4b5b0b34df55346ec8e074ca300a2e"
+          }
+        ],
+        "tail_body_count": 1
+      }
+    ]
+  },
+  "CKV_density_observations": {
+    "full": {
+      "tail_raw_ranks": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "query_tail": [
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "full",
+              "snippet_keeps_final_line": true
+            }
+          ],
+          "metadata": {
+            "tokens_used": 5073,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-full-0"
+          }
+        },
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "full",
+              "snippet_keeps_final_line": true
+            }
+          ],
+          "metadata": {
+            "tokens_used": 5073,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-full-1"
+          }
+        }
+      ]
+    },
+    "default": {
+      "tail_raw_ranks": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "query_tail": [
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "full",
+              "snippet_keeps_final_line": true
+            }
+          ],
+          "metadata": {
+            "tokens_used": 3709,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-default-0"
+          }
+        },
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "full",
+              "snippet_keeps_final_line": true
+            }
+          ],
+          "metadata": {
+            "tokens_used": 3709,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-default-1"
+          }
+        }
+      ]
+    },
+    "minimum": {
+      "tail_raw_ranks": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "query_tail": [
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "signature_only",
+              "snippet_keeps_final_line": false
+            }
+          ],
+          "metadata": {
+            "tokens_used": 105,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-minimum-0"
+          }
+        },
+        {
+          "tail_citation_ranks": [
+            1
+          ],
+          "tail_snippet_observations": [
+            {
+              "rank": 1,
+              "density": "signature_only",
+              "snippet_keeps_final_line": false
+            }
+          ],
+          "metadata": {
+            "tokens_used": 105,
+            "indexed_head_ckv": "08c39f18e8a46a982f2461ecd217847e9c56ab70",
+            "fresh": true,
+            "trace_id": "f02-minimum-1"
+          }
+        }
+      ]
+    }
+  },
+  "backend_scope_bindings": {
+    "9cdf9ff332f01796f79d97e57cb7716d": {
+      "raw_text_K": [
+        10,
+        10
+      ],
+      "knowledge_K": [
+        6
+      ],
+      "total_scoped_calls": 86,
+      "nonreturned": [
+        {
+          "ordinal": 43,
+          "backend": "ckg",
+          "method": "bm25_search",
+          "input_sha256": "e0f409d5ca03feb7ccae08e170f045c59175d1646c8d74950d915f934b512b18",
+          "input_bytes": 15,
+          "options": {
+            "K": 5,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "CommitHash": "",
+              "ExcludeTests": false
+            }
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 197750
+        },
+        {
+          "ordinal": 77,
+          "backend": "ckg",
+          "method": "bm25_search",
+          "input_sha256": "e0f409d5ca03feb7ccae08e170f045c59175d1646c8d74950d915f934b512b18",
+          "input_bytes": 15,
+          "options": {
+            "K": 5,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "CommitHash": "",
+              "ExcludeTests": false
+            }
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 162209
+        },
+        {
+          "ordinal": 82,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 259708
+        },
+        {
+          "ordinal": 83,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 68125
+        },
+        {
+          "ordinal": 84,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 61833
+        },
+        {
+          "ordinal": 85,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 45709
+        },
+        {
+          "ordinal": 86,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 50375
+        }
+      ]
+    },
+    "38cdadec8e26e349c223b79a784608d8": {
+      "raw_text_K": [
+        10,
+        10
+      ],
+      "knowledge_K": [
+        6
+      ],
+      "total_scoped_calls": 25,
+      "nonreturned": [
+        {
+          "ordinal": 11,
+          "backend": "ckg",
+          "method": "bm25_search",
+          "input_sha256": "e0f409d5ca03feb7ccae08e170f045c59175d1646c8d74950d915f934b512b18",
+          "input_bytes": 15,
+          "options": {
+            "K": 5,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "CommitHash": "",
+              "ExcludeTests": false
+            }
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 292458
+        },
+        {
+          "ordinal": 16,
+          "backend": "ckg",
+          "method": "bm25_search",
+          "input_sha256": "e0f409d5ca03feb7ccae08e170f045c59175d1646c8d74950d915f934b512b18",
+          "input_bytes": 15,
+          "options": {
+            "K": 5,
+            "Filter": {
+              "Language": "",
+              "PathGlob": "",
+              "CommitHash": "",
+              "ExcludeTests": false
+            }
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 331584
+        },
+        {
+          "ordinal": 21,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 229458
+        },
+        {
+          "ordinal": 22,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 102250
+        },
+        {
+          "ordinal": 23,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 53208
+        },
+        {
+          "ordinal": 24,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 44333
+        },
+        {
+          "ordinal": 25,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 44208
+        }
+      ]
+    }
+  },
+  "nonreturned_backend_calls": 14,
+  "human_inputs_unchanged": {
+    "system/eval/b0-knowledge-system/questions.json": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+    "system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "system/eval/b0-knowledge-system/dynamic-fixtures-m2max-draft.json": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+    "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "d856aa4b90dbdecfc37abb74235b19eb06071b89104423b5b8046056eb784813",
+    "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "ee5a44c01168c2a92ada947dce78bf88da773818c86d6e572a5b9a6715819c1d"
+  },
+  "quality_metrics": null,
+  "official_F02_verdict": null,
+  "human_answer_verdict": null,
+  "new_model_queries": "F-02 DEV diagnostic only, two raw probes/six valid CKV views/two SDK responses; rejected budget1 also retained",
+  "official_final_queries_executed": false,
+  "builder_observed_truncation_count": 0,
+  "canonical_coverage_gate": "disabled for symbol-free document fixture; not a code join-density result",
+  "limits": [
+    "Single 203-line synthetic document; K10 returns all five stored chunks; not official question-group quality or latency.",
+    "Minimum CKV budget20 yields signature-only estimated105 tokens because retained candidate signatures cannot be reduced further; metadata reports this floor.",
+    "Parent IDs/ordinals verified in stored/raw CKV and parent citations in CKV response; CKS v2 validates source citations/bodies and does not claim a parent-ID field.",
+    "The two SDK responses retain 14 internal best-effort failures; SDK success does not imply every backend returned."
+  ],
+  "worklist": {
+    "total": 30,
+    "completed": 2,
+    "progress": 11,
+    "waiting": 17,
+    "unfinished": 28,
+    "official_gates_closed": 0
+  },
+  "next_independent_work": "F-04/F-05 old/current snapshot and cross-project oracle report preparation",
+  "priority_when_human_decisions_arrive": "Record actual B0-01/02/03/05 + STV2-01 decisions, freeze reviewed inputs, then new strict official B0-07.",
+  "document_checks": [
+    {
+      "command": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/check-boundaries.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/update-execution-status.py",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "FIX17": {
+    "failed_boundary_preserved": "boundary-failure-before-snapshot-rename.txt",
+    "source_snapshot_bytes_unchanged": true,
+    "final_assembly_checks_pass": true,
+    "followup_commit_required": true
+  }
+}

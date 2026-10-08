@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T12:49:04.072155Z",
+  "finished_at": "2026-10-03T12:49:07.840775Z",
+  "request_sha256": "0759492595469ebf66c664a35ded438e8418973d3f7084e7a34bd9f3d20d1c09",
+  "config_sha256": "fcd21ba7c2afd11405de810ce58b7940a8c60d6696a412f50133c5a35d759503",
+  "binary_sha256": "4332b348366bb774a2313147c6ed5438df8578c73d6ecee8a7800420bd89d460",
+  "config_sha256_after": "fcd21ba7c2afd11405de810ce58b7940a8c60d6696a412f50133c5a35d759503",
+  "binary_sha256_after": "4332b348366bb774a2313147c6ed5438df8578c73d6ecee8a7800420bd89d460",
+  "quality_metrics": null,
+  "state": "partial",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 1,
+    "retrieval": 1,
+    "warm_latency": 2,
+    "warmup": 1
+  },
+  "rows": [
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "warmup",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 127783750,
+        "completed_at": "2026-10-03T21:49:05.896783+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 92129166,
+        "completed_at": "2026-10-03T21:49:05.988942+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 103848875,
+        "completed_at": "2026-10-03T21:49:06.092805+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 101428166,
+        "completed_at": "2026-10-03T21:49:06.194255+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "cold_process",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 126889584,
+        "completed_at": "2026-10-03T21:49:07.820239+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      },
+      "process_start_through_response_ns": 1621981292
+    }
+  ],
+  "errors": [
+    "smoke-alpha-v2: tool returned IsError",
+    "smoke-alpha-v2: tool returned IsError",
+    "smoke-alpha-v2: tool returned IsError",
+    "smoke-alpha-v2: tool returned IsError",
+    "smoke-alpha-v2: tool returned IsError"
+  ]
+}

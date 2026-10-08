@@ -1,0 +1,60 @@
+import importlib.util,json,hashlib
+from pathlib import Path
+ROOT=Path.cwd();RUN=Path('/private/tmp/ks-fix19-20261005')
+sp=importlib.util.spec_from_file_location('state',ROOT/'scripts/b0-audit-state-isolation.py');S=importlib.util.module_from_spec(sp);sp.loader.exec_module(S)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+cases=json.loads((RUN/'cases.json').read_bytes())
+expected_ids=[]
+for c in cases:
+ expected_ids += [c['ID']+'-'+suffix for suffix in (['baseline','mixed','restored','changed-blob','restored-blob','missing-blobs','restored-blobs'] if c['SourceGuards'] else ['baseline','mixed','restored'])]
+sets={};summaries={}
+for phase in ('before','after'):
+ raw=(RUN/f'sdk-{phase}-bound.json').read_bytes(); report=json.loads(raw)
+ assert report['diagnostic_only'] and report['quality_metrics'] is None and report['official_verdict'] is None
+ assert report['cases_sha256']==sha((RUN/'cases.json').read_bytes())
+ assert report['test_failed'] == (phase=='before')
+ rows=report['rows']; calls=[r for r in rows if 'raw_call' in r]; assert [r['id'] for r in calls]==expected_ids
+ positives=negatives=cites=bodies=0; code_rows=[]; summaries[phase]={'planned_calls':len(expected_ids),'observed_calls':len(calls),'missing_calls':0,'quality_metrics':None}
+ sets[phase]={}
+ for c in cases:
+  identity=json.loads((Path(c['Version'])/'dataset-identity.json').read_bytes())
+  assert identity['embedding_identity']['model_digest']==S.MODEL
+  runtime=next(r for r in rows if r['id']==c['ID']+'-runtime')
+  assert runtime['binary_sha256']==runtime['binary_after_sha256'] and runtime['config_sha256']==runtime['config_after_sha256']==sha(runtime['config_yaml'].encode())
+  assert runtime['effective_recall_k']==10 and runtime['footprint_sha256']==sha(runtime['footprint_jsonl'].encode())
+  events=[json.loads(l) for l in runtime['footprint_jsonl'].splitlines()]
+  scopes={e['summary']['measurement_id']:e['summary'] for e in events if e.get('event')=='measurement.backend_calls' and e['summary']['tool']=='cks.context.get_for_task_v2'}
+  seals=next(r for r in rows if r['id']==c['ID']+'-seals')
+  assert seals['original_and_copy_payloads_unchanged']
+  for a,b in [('original_sha256','original_after_sha256'),('mixed_source_sha256','mixed_after_sha256'),('copied_sha256','copied_after_sha256')]: assert seals[a]==seals[b]
+  own=[r for r in calls if r['id'].startswith(c['ID']+'-')]; assert len(scopes)==len(own)
+  baseline=None
+  for r in own:
+   call=r['raw_call'];req=r['request']; res=call['response'];p=res.get('structuredContent')
+   assert not call.get('transport_error') and req['arguments']==call['arguments']=={'prompt':'What value does Alpha return?'} and call['tool']==req['tool']=='cks.context.get_for_task_v2'
+   scope=scopes[call['measurement_id']]
+   if r['expected_code']:
+    negatives+=1; expected=r['expected_code'] if phase=='after' else 'reindex_required'
+    assert res['isError'] is True and p['code']==expected and r['actual_code']==expected
+    assert not scope['calls'] and scope['outcome']=='tool_error'
+    assert all(private not in json.dumps(res) for private in ('PRIVATE_TOKEN','never-return-this','/private/tmp/','/var/folders/'))
+    code_rows.append({'id':r['id'],'code':p['code'],'backend_calls':0})
+   else:
+    positives+=1;assert not res.get('isError') and r['go_verify_valid']
+    source_root=Path('/private/tmp/ks-f0405-preparation-20261005/sources')/c['ID']
+    S.BASE.verify_pack(p,identity,source_root)
+    cites+=len(p['citations']);bodies+=len(p['bodies'])
+    body_set={'citations':p['citations'],'bodies':p['bodies'],'coordinates':p['coordinates']}
+    if baseline is None:baseline=body_set
+    assert body_set==baseline;sets[phase][r['id']]=body_set
+    retrieval=[x for x in scope['calls'] if x['backend']=='ckv' and x['method'] in ('semantic_search','find_invariants','get_conventions')]
+    assert retrieval and any(x.get('options',{}).get('K')==10 for x in retrieval) and all(x.get('options',{}).get('K') in (6,10) for x in retrieval)
+ summaries[phase].update(positive_calls=positives,negative_calls=negatives,citations=cites,bodies=bodies,negative_codes=code_rows,binary_config_source_db_unchanged=True,positive_go_and_source_verify_valid=True,restore_citations_bodies_coordinates_identical=True,raw_capture_sha256=sha(raw))
+assert sets['before']==sets['after']
+summary={'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'source_mixing_controls':'entire vector directory replaced after initialized pinned SDK connection; source originals untouched','cases':summaries,'before_after_positive_evidence_identical':True,'source_bindings':[]}
+for c in cases:
+ for side in ('Version','MixedVersion'):
+  root=Path(c[side]);ident=json.loads((root/'dataset-identity.json').read_bytes())
+  summary['source_bindings'].append({'version':str(root),'identity':ident,'source_archive_manifest_sha256':sha((root/'sources'/'manifest.json').read_bytes())})
+(RUN/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:{x:v for x,v in row.items() if x not in ['negative_codes']} for k,row in summaries.items()},indent=2))

@@ -2,6 +2,7 @@ package build
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -111,6 +112,20 @@ func TestEmbedResilient_RecoversOversizedByTruncating(t *testing.T) {
 	}
 	if len(ov[0]) != 8 {
 		t.Fatalf("recovered vector has wrong dim %d", len(ov[0]))
+	}
+}
+
+func TestEmbedResilient_StrictRejectsPartialInput(t *testing.T) {
+	t.Setenv("CKV_REQUIRE_COMPLETE_EMBEDDINGS", "1")
+	emb := &sizeLimitEmbedder{limit: 20000, dim: 8}
+	big := strings.Repeat("x", 30000)
+	chunks, vecs, err := embedResilient(context.Background(), emb,
+		[]types.Chunk{{ID: "big", File: "docs/long.md"}}, []string{big})
+	if !errors.Is(err, ErrIncompleteEmbedding) {
+		t.Fatalf("want incomplete embedding error, got %v", err)
+	}
+	if len(chunks) != 0 || len(vecs) != 0 {
+		t.Fatalf("strict mode returned partial chunks/vectors: %d/%d", len(chunks), len(vecs))
 	}
 }
 

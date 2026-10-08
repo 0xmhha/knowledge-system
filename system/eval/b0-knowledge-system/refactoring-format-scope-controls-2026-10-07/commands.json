@@ -1,0 +1,27 @@
+[
+  {
+    "name": "old-check-rejects-retained-source",
+    "target": "fmt-check",
+    "exit_code": 2
+  },
+  {
+    "name": "new-check-preserves-retained-source",
+    "target": "fmt-check",
+    "exit_code": 0
+  },
+  {
+    "name": "new-check-rejects-maintained-drift",
+    "target": "fmt-check",
+    "exit_code": 2
+  },
+  {
+    "name": "new-fmt-fixes-maintained-only",
+    "target": "fmt",
+    "exit_code": 0
+  },
+  {
+    "name": "new-check-after-fmt",
+    "target": "fmt-check",
+    "exit_code": 0
+  }
+]

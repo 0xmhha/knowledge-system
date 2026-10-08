@@ -1,6 +1,7 @@
 package setupcli
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"os"
@@ -9,6 +10,19 @@ import (
 	"strings"
 	"testing"
 )
+
+func TestRollbackHelpShowsForwardedSetupFlags(t *testing.T) {
+	cmd := NewRollbackCmd()
+	var output bytes.Buffer
+	cmd.SetOut(&output)
+	cmd.SetArgs([]string{"--help"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), "--config") || !strings.Contains(output.String(), "--out") {
+		t.Fatalf("rollback help omitted accepted flags: %s", output.String())
+	}
+}
 
 // gitRepo creates a committed single-file git repository and returns its
 // path and HEAD commit hash.
@@ -43,7 +57,7 @@ func TestResolveAutoVersion(t *testing.T) {
 	src, head := gitRepo(t)
 
 	// Without a filelist config the name is the commit prefix alone.
-	v, err := resolveAutoVersion("", src, "")
+	v, err := resolveAutoVersion("", src, "", "")
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
 	}
@@ -59,11 +73,20 @@ func TestResolveAutoVersion(t *testing.T) {
 	}
 	sum := sha256.Sum256(body)
 	want := head[:8] + "-" + hex.EncodeToString(sum[:])[:8]
-	if v, err = resolveAutoVersion("", src, cfg); err != nil {
+	if v, err = resolveAutoVersion("", src, cfg, ""); err != nil {
 		t.Fatalf("resolve with config: %v", err)
 	}
 	if v != want {
 		t.Errorf("version = %q, want %q", v, want)
+	}
+	corpus := t.TempDir()
+	corpusManifest := []byte(`{"schema_version":1,"snapshot":{"commit":"example"}}`)
+	if err := os.WriteFile(filepath.Join(corpus, "manifest.json"), corpusManifest, 0600); err != nil {
+		t.Fatal(err)
+	}
+	corpusHash := sha256.Sum256(corpusManifest)
+	if v, err = resolveAutoVersion("", src, "", corpus); err != nil || v != head[:8]+"-s"+hex.EncodeToString(corpusHash[:])[:8] {
+		t.Fatalf("semantic corpus omitted from version identity: %q, %v", v, err)
 	}
 
 	// An existing version directory under out is refused.
@@ -71,29 +94,61 @@ func TestResolveAutoVersion(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(out, want), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := resolveAutoVersion(out, src, cfg); err == nil || !strings.Contains(err.Error(), "already exists") {
+	if _, err := resolveAutoVersion(out, src, cfg, ""); err == nil || !strings.Contains(err.Error(), "already exists") {
 		t.Errorf("existing version dir not refused: %v", err)
 	}
 
-	// A dirty tracked tree is refused; an untracked file is not dirt.
-	if err := os.WriteFile(filepath.Join(src, "untracked.txt"), []byte("u\n"), 0o644); err != nil {
+	// CKV indexes eligible untracked files, so commit-named versions must
+	// reject them rather than aliasing different bytes at the same HEAD.
+	if err := os.WriteFile(filepath.Join(src, "untracked.go"), []byte("package fixture\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := resolveAutoVersion("", src, ""); err != nil {
-		t.Errorf("untracked file must not count as dirty: %v", err)
+	if _, err := resolveAutoVersion("", src, "", ""); err == nil || !strings.Contains(err.Error(), "tracked or untracked") {
+		t.Errorf("untracked indexable source was accepted: %v", err)
+	}
+	if err := runSetup([]string{"--src", src, "--out", t.TempDir(), "--version", "named"}); err == nil || !strings.Contains(err.Error(), "dirty") {
+		t.Errorf("explicit version indexed an untracked source: %v", err)
+	}
+	if err := runSetup([]string{"--src", src, "--out", t.TempDir()}); err == nil || !strings.Contains(err.Error(), "dirty") {
+		t.Errorf("unversioned setup indexed an untracked source: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(src, "a.txt"), []byte("changed\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := resolveAutoVersion("", src, ""); err == nil || !strings.Contains(err.Error(), "dirty") {
+	if _, err := resolveAutoVersion("", src, "", ""); err == nil || !strings.Contains(err.Error(), "dirty") {
 		t.Errorf("dirty tracked tree not refused: %v", err)
 	}
 
 	// A non-repo src fails closed.
-	if _, err := resolveAutoVersion("", t.TempDir(), ""); err == nil {
+	if _, err := resolveAutoVersion("", t.TempDir(), "", ""); err == nil {
 		t.Error("non-git src not refused")
 	}
-	if _, err := resolveAutoVersion("", "", ""); err == nil {
+	if _, err := resolveAutoVersion("", "", "", ""); err == nil {
 		t.Error("empty src not refused")
+	}
+}
+
+func TestResolveAutoVersionRejectsGitIgnoredIndexableSource(t *testing.T) {
+	src, _ := gitRepo(t)
+	if err := os.WriteFile(filepath.Join(src, ".gitignore"), []byte("*.go\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command("git", "-C", src, "add", ".gitignore")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git add: %v: %s", err, out)
+	}
+	cmd = exec.Command("git", "-C", src, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "commit", "-qm", "ignore")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git commit: %v: %s", err, out)
+	}
+	if err := os.WriteFile(filepath.Join(src, "ignored.go"), []byte("package fixture\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	status, err := gitOutput(src, "status", "--porcelain")
+	if err != nil || status != "" {
+		t.Fatalf("ignored fixture not clean in Git: %q, %v", status, err)
+	}
+	if _, err := resolveAutoVersion("", src, "", ""); err == nil || !strings.Contains(err.Error(), "Git-ignored") {
+		t.Fatalf("Git-ignored Go source accepted under commit version: %v", err)
 	}
 }

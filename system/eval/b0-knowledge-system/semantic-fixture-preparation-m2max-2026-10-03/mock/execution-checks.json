@@ -1,0 +1,475 @@
+{
+  "state": "preparing",
+  "checks": [
+    {
+      "id": "F-03-DEV-current-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset",
+        "--project-id",
+        "b0-f03-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-setup.txt",
+      "sha256": "9abfa86b29b5fd27bdb6a3112e97a134197fe0d2a32de3ee13574e2d6573cc9b"
+    },
+    {
+      "id": "F-03-DEV-current-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--project-id",
+        "b0-f03-dev",
+        "--dataset-id",
+        "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-extract.txt",
+      "sha256": "6d2a9b51a63060f52f0d5bbf00a651eca0d286dce7d6a13dd4c5949a2fc3fd65"
+    },
+    {
+      "id": "F-03-DEV-current-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-03-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-03-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-DEV-current-validate-proposed.txt",
+      "sha256": "6eb17394aa538fe31614e64a779f8a8c6a255478692f5ddf1b82b9c8d6d3b2ce"
+    },
+    {
+      "id": "F-05-DEV-a-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-lock.txt",
+      "sha256": "5afdddbb3b64d08ac613b575e8b087a3cfe02fc7aea3498b58e77b2874c4e2cf"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-validate.txt",
+      "sha256": "0a5fddac907e7265f2eec6571361befed6ed540b33ef1d78f99a0f00b11184d9"
+    },
+    {
+      "id": "F-05-DEV-a-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-knowledge-review.txt",
+      "sha256": "50c164f3a1386570ebab4d997f172ed8ecc80642e1a7cc12188306f09c5832ba"
+    },
+    {
+      "id": "F-05-DEV-a-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset",
+        "--project-id",
+        "f-05-dev-a",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-setup.txt",
+      "sha256": "534808f8ed05bcc8ccf3ac6e23b9ce17b562fd3a10edba9893738f17a8d938a9"
+    },
+    {
+      "id": "F-05-DEV-a-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--project-id",
+        "f-05-dev-a",
+        "--dataset-id",
+        "e1b2b8fbd5b47463ba13b0b730bc859e12fe7d04796488bc43b1a5fb61dfc724",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-extract.txt",
+      "sha256": "c867574dd7a9a966841bdb32caa088a7e4c2c32d5c5fb0266a2606cbb6efdca6"
+    },
+    {
+      "id": "F-05-DEV-a-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-a",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-a/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-a-validate-proposed.txt",
+      "sha256": "4069a57c0ee1ad25c71c251aa9b7b060b4172552cfe07ac4bd52d0b6cb90deb7"
+    },
+    {
+      "id": "F-05-DEV-b-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-lock.txt",
+      "sha256": "ae3f07393454711824744637087d731ce0c46556336d55f2bd894fbd2402d0ee"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-validate.txt",
+      "sha256": "8b5a563a71ace6cf310583b95c51adbe490b030550aff7fe57733d7559c9fffc"
+    },
+    {
+      "id": "F-05-DEV-b-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-knowledge-review.txt",
+      "sha256": "72b0285092c1e9972b0f3a17cc3ed7d2c8b3e36473690e8368b81d2d6593c2ff"
+    },
+    {
+      "id": "F-05-DEV-b-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset",
+        "--project-id",
+        "f-05-dev-b",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-setup.txt",
+      "sha256": "883d3043415e374304d63a794bc0a42378d3e9d32c838fb15e584eefba42f4c3"
+    },
+    {
+      "id": "F-05-DEV-b-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--project-id",
+        "f-05-dev-b",
+        "--dataset-id",
+        "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-extract.txt",
+      "sha256": "4ea29757cd00c67e9e7ee944015959c7879164e106a5df38022239735c4a308d"
+    },
+    {
+      "id": "F-05-DEV-b-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-05-DEV/project-b",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-05-DEV-b/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-DEV-b-validate-proposed.txt",
+      "sha256": "91fb52aaf23f388e286e2caeff1438ec41b6b609a92a50d9247daf08d400fe9a"
+    },
+    {
+      "id": "F-06-DEV-current-pack-digest",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-lock",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-lock.txt",
+      "sha256": "5fcd5d27f84fa7ccdf64c85b1385dfc3b2a295667ae8c878e98d63023d0bd76a"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-validate",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-validate.txt",
+      "sha256": "1205cc4191217d9a0a476de6dca8494ead19ffa2a8e9638bef9a9168969798e2"
+    },
+    {
+      "id": "F-06-DEV-current-knowledge-review",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-knowledge-review.txt",
+      "sha256": "6c3722fc1ad7ffee7f750a03aa378487ff94c51b8578381731a6ea8542541404"
+    },
+    {
+      "id": "F-06-DEV-current-setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset",
+        "--project-id",
+        "f-06-dev",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-setup.txt",
+      "sha256": "2f5e53b06d61656f3222715632afa00084ecff496a921489a338105229725632"
+    },
+    {
+      "id": "F-06-DEV-current-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--project-id",
+        "f-06-dev",
+        "--dataset-id",
+        "215d38e3842a155300af98963abcb0d4727ceb19767f03f2c98887ccb2cfce29",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--spec",
+        "spec.yaml",
+        "--docs",
+        "README.md",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-extract.txt",
+      "sha256": "c563c5802db9c69e1867c51c18bb5e451b0d1426c843cddbebd76c81f63e1bfc"
+    },
+    {
+      "id": "F-06-DEV-current-validate-proposed",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/fixtures/F-06-DEV/repo",
+        "--graph",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-b0-semantic-review-fixed-mock-20261003/F-06-DEV-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-DEV-current-validate-proposed.txt",
+      "sha256": "452d339df784841b6c0dc2d1b6d856878a763fd2171b53d9faa38eca196396c4"
+    }
+  ],
+  "quality_metrics": null
+}

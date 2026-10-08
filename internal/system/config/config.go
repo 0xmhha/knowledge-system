@@ -46,14 +46,40 @@ type Config struct {
 	Name string `yaml:"name"`
 	// Description is optional human-facing metadata (e.g. "go-stablenet pr-77-2
 	// flow index") surfaced in cks.ops.health alongside Name.
-	Description string         `yaml:"description"`
-	Backends    BackendsConfig `yaml:"backends"`
-	Listen      ListenConfig   `yaml:"listen"`
-	Logging     LoggingConfig  `yaml:"logging"`
-	Sanitize    SanitizeConfig `yaml:"sanitize"`
-	Vocab       VocabConfig    `yaml:"vocab"`
-	Domain      DomainConfig   `yaml:"domain"`
-	Service     ServiceConfig  `yaml:"service"`
+	Description string          `yaml:"description"`
+	Backends    BackendsConfig  `yaml:"backends"`
+	Listen      ListenConfig    `yaml:"listen"`
+	Logging     LoggingConfig   `yaml:"logging"`
+	Sanitize    SanitizeConfig  `yaml:"sanitize"`
+	Vocab       VocabConfig     `yaml:"vocab"`
+	Domain      DomainConfig    `yaml:"domain"`
+	Semantic    SemanticConfig  `yaml:"semantic"`
+	Service     ServiceConfig   `yaml:"service"`
+	Retrieval   RetrievalConfig `yaml:"retrieval,omitempty"`
+}
+
+// RetrievalConfig pins the shared top-K for raw recall and optional concept
+// text searches. Zero preserves the historical top-K of 20. It does not
+// change the Stage-2 union cap or the separate knowledge-pass budget.
+type RetrievalConfig struct {
+	RecallK int `yaml:"recall_k,omitempty"`
+}
+
+func (c RetrievalConfig) EffectiveRecallK() int {
+	if c.RecallK == 0 {
+		return 20
+	}
+	return c.RecallK
+}
+
+// SemanticConfig enables reviewed external trace paths for the optional v2
+// knowledge response. Empty StorePath preserves the earlier v2 behavior.
+type SemanticConfig struct {
+	StorePath string `yaml:"store_path"`
+	// OntologyMode is off by default. Explicit modes select baseline,
+	// concept_text, relations or combined; unknown arms are rejected.
+	OntologyMode     string `yaml:"ontology_mode,omitempty"`
+	OntologyBudgetMS int    `yaml:"ontology_budget_ms,omitempty"`
 }
 
 // ServiceConfig carries the launchd deployment's host-level properties — the
@@ -149,7 +175,9 @@ type CKVConfig struct {
 	TimeoutMS int `yaml:"timeout_ms"`
 	// EmbedModel is the Ollama model name (e.g. "bge-m3") used to construct
 	// the in-process embedder. Must match the model the index was built with.
-	EmbedModel string `yaml:"embed_model"`
+	EmbedModel        string `yaml:"embed_model"`
+	EmbedDim          int    `yaml:"embed_dim,omitempty"`
+	QueryPrefixPolicy string `yaml:"query_prefix_policy,omitempty"`
 	// OllamaURL is the Ollama daemon endpoint. Empty resolves to
 	// http://localhost:11434 (and the CKV_OLLAMA_ENDPOINT env override).
 	OllamaURL string `yaml:"ollama_url"`
@@ -203,6 +231,8 @@ type LoggingConfig struct {
 	Mode         string `yaml:"mode"`
 	FootprintDir string `yaml:"footprint_dir"`
 	AuditDir     string `yaml:"audit_dir"`
+	// Opt-in experiment telemetry. Default response contracts stay unchanged.
+	MeasureBackendCalls bool `yaml:"measure_backend_calls,omitempty"`
 }
 
 // SanitizeConfig points to the sanitize ruleset and sets composer-wide
@@ -286,8 +316,27 @@ func (c *Config) Validate() error {
 	if c == nil {
 		return fmt.Errorf("config: nil")
 	}
+	if c.Retrieval.RecallK < 0 || c.Retrieval.RecallK > 1000 {
+		return errors.New("config: retrieval.recall_k must be 0 (default 20) or 1..1000")
+	}
 	if c.Version != configVersion {
 		return fmt.Errorf("config: version=%d, want %d", c.Version, configVersion)
+	}
+	if c.Backends.CKV.EmbedDim < 0 {
+		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
+	}
+	switch c.Semantic.OntologyMode {
+	case "", "off", "baseline", "relations", "concept_text", "combined":
+	default:
+		return fmt.Errorf("config: semantic.ontology_mode must be off, baseline, concept_text, relations or combined")
+	}
+	if c.Semantic.OntologyBudgetMS < 0 || c.Semantic.OntologyBudgetMS > 5000 {
+		return fmt.Errorf("config: semantic.ontology_budget_ms must be 0..5000 (0 selects 1000ms)")
+	}
+	switch c.Backends.CKV.QueryPrefixPolicy {
+	case "", "registry", "none":
+	default:
+		return fmt.Errorf("config: backends.ckv.query_prefix_policy must be registry or none")
 	}
 
 	switch strings.ToLower(c.Logging.Level) {
@@ -299,6 +348,12 @@ func (c *Config) Validate() error {
 	case "", "prod", "dev":
 	default:
 		return fmt.Errorf("config: logging.mode=%q invalid (prod|dev)", c.Logging.Mode)
+	}
+	if c.Logging.MeasureBackendCalls {
+		mode, level := strings.ToLower(c.Logging.Mode), strings.ToLower(c.Logging.Level)
+		if c.Logging.FootprintDir == "" || mode == "dev" || (level != "" && level != "info" && level != "debug") {
+			return fmt.Errorf("config: logging.measure_backend_calls requires footprint_dir, prod mode and info/debug level")
+		}
 	}
 
 	switch strings.ToLower(c.Listen.Transport) {

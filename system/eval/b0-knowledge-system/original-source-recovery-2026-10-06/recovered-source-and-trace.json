@@ -1,0 +1,962 @@
+{
+  "checked_at_utc": "2026-10-06T02:04:50.611226+00:00",
+  "product_head": "97781d52703ee091f898423beae70d8c1ed0af16",
+  "source_archive_commit": "1c350c18625ca2a46f1ae33ef4e56efb88f9617d",
+  "source_authored_dates": "2026-09-27–29; Git archive commit 2026-10-06",
+  "study_main_at_verification": "f84ad4b716657e80b4a1122cb94f1e64074107ce",
+  "study_origin_main_at_verification": "f84ad4b716657e80b4a1122cb94f1e64074107ce",
+  "synchronization": {
+    "requested_by_user": true,
+    "fetch": "git fetch origin main",
+    "fast_forward": "aa6d1034 -> 1c350c18",
+    "initial_branch": "docs/stablenet-eth-rpc",
+    "initial_head": "0dc468792612ebcd8be314b36abc4db8e163e73a",
+    "later_active_branch": "docs/stablenet-v110-mix",
+    "note": "other sessions advanced main and resumed their own branch during audit; their branch/changes were not reverted"
+  },
+  "study_worktree_status": {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "source_bindings": [
+    {
+      "path": "docs/reviews/knowledge-system/README.md",
+      "sha256": "7543bd8ec528d081ed28451a42c4a78e263157979b2ea7ca81f0d9b070a72f5c",
+      "bytes": 3580,
+      "snapshot": "archive/README.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/analysis-review.md",
+      "sha256": "a59198f29b489a19fec6cb85b965d9b9b72d51d4ec4a62308ff910a70737edff",
+      "bytes": 25210,
+      "snapshot": "archive/analysis-review.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/ckv-ckg-ontology-installation-proposal.md",
+      "sha256": "c421db08ba9513ce46b5bebfa579f5cb77f640a4799359bf07c184488d480e08",
+      "bytes": 32188,
+      "snapshot": "archive/ckv-ckg-ontology-installation-proposal.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/spec-driven-requirements.md",
+      "sha256": "725bbb0bf02fa14e4a57988fdcecae53204197375c36e215a6c6dbe963ccfde7",
+      "bytes": 12333,
+      "snapshot": "archive/spec-driven-requirements.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/spec-driven-architecture.md",
+      "sha256": "433faa3abf55f118a1bc4ff5f551be523060acff9ce9b4a5b599438ed74da22e",
+      "bytes": 14320,
+      "snapshot": "archive/spec-driven-architecture.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/spec-driven-wbs.md",
+      "sha256": "61cd9347634eb46f93986e3f8066a16e566c0f71b5dbb9ad9056513aea295838",
+      "bytes": 13743,
+      "snapshot": "archive/spec-driven-wbs.md",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/analysis-metrics.json",
+      "sha256": "6967c5df32c8e6da93a3c0552bda9df37fef3558dbdcbbc1c47f4c1154d5d6ec",
+      "bytes": 2544,
+      "snapshot": "archive/analysis-metrics.json",
+      "matches_main_and_worktree": true
+    },
+    {
+      "path": "docs/reviews/knowledge-system/ckg-validation.txt",
+      "sha256": "b197f0e8bc3203b1329bf2840e7849421d54a428258f5462994bd6006ce37246",
+      "bytes": 1162,
+      "snapshot": "archive/ckg-validation.txt",
+      "matches_main_and_worktree": true
+    }
+  ],
+  "wbs_trace": [
+    {
+      "id": "W0.1",
+      "original_work": "현재 CLI/MCP/DB 스키마와 평가셋 고정; CKV+CKG+CKS 실제 종단 간 기준선, 임베더 정체성·기계·커밋 기록",
+      "original_dependencies": "—",
+      "original_contracts": "INV-02/06/07, NFR-01",
+      "original_completion_evidence": "재실행 가능한 명령·매니페스트·Recall/MRR/지연 리포트",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W0.1",
+        "실모델 기준선·평가: `internal/system/eval`, `cmd/cks/evalcli`",
+        "BGE 고정 DEV/FINAL 실측 완료, 결과 fail/불확실",
+        "N-08–11"
+      ]
+    },
+    {
+      "id": "W0.2",
+      "original_work": "과거 `Hunk` 오집계 재현 테스트와 `ckg audit` 현재 파일 기준 수정",
+      "original_dependencies": "W0.1",
+      "original_contracts": "FR-01",
+      "original_completion_evidence": "과거 파일 픽스처와 대상 저장소 감사 일치; 역사 검색은 보존",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W0.2",
+        "현재 File 감사: `internal/graph/persist/sqlite_reader.go:81`",
+        "역사 Hunk 제외·실제 strict 범위 감사 증거 있음",
+        "새 수정 뒤 회귀 유지, 신규 전면 재구현 없음"
+      ]
+    },
+    {
+      "id": "W0.3",
+      "original_work": "프로젝트/스냅샷 조인과 CKV↔CKG `canonical_id` 정렬률 계측; 필터 정확 오라클·긴 문서·답 없음 평가 입력 생성",
+      "original_dependencies": "W0.1",
+      "original_contracts": "INV-01/02, FR-02/03/04",
+      "original_completion_evidence": "S-01/02/04/07/09 실행 가능, 정렬률·완화 매칭률과 재현 데이터 고정",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W0.3",
+        "계층 정렬·다중 프로젝트: `internal/setup/input_reconcile.go`, `identity.go`",
+        "strict1598/13820·프로젝트/상태 격리 구조 검증",
+        "N-02–04, N-15"
+      ]
+    },
+    {
+      "id": "W0.4",
+      "original_work": "답 없음 평가의 현행 점수 특례를 별도 기권 규칙으로 분리하는 스펙/테스트",
+      "original_dependencies": "W0.3",
+      "original_contracts": "FR-04",
+      "original_completion_evidence": "무관 인용 단정은 실패, 정답 질문 점수 유지",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W0.4",
+        "무인용 평가: `internal/system/eval/scenario.go`, `runner.go`",
+        "평가 guard 구현; 실제 두 기권 문항 guard 실패",
+        "N-09, N-11"
+      ]
+    },
+    {
+      "id": "W1.1",
+      "original_work": "필터 의미·선택도/오라클 픽스처·계측 계약 확정",
+      "original_dependencies": "W0.3",
+      "original_contracts": "FR-02, INV-01",
+      "original_completion_evidence": "필터식별 기대 후보 집합·상한 시 처리 정의",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W1.1",
+        "필터 계약: `pkg/vector/types/search.go`, sqlitevec store",
+        "필터 exact/incomplete 계약 구현·raw 오라클",
+        "N-10–11 실부하"
+      ]
+    },
+    {
+      "id": "W1.2",
+      "original_work": "CKV 조건별 정확 스캔/적응형 후보 증량 구현",
+      "original_dependencies": "W1.1",
+      "original_contracts": "FR-02",
+      "original_completion_evidence": "S-01 K개 반환, exact 대비 Recall@K, 빈/모순 필터 테스트",
+      "original_estimate_not_schedule_commitment": "3–5",
+      "current_audit_row": [
+        "W1.2",
+        "희소/큰 후보 검색: sqlitevec `SearchResult`",
+        "후보 상한/취소/incomplete·F01 자격 검증",
+        "N-08, N-10–11"
+      ]
+    },
+    {
+      "id": "W1.3",
+      "original_work": "무필터 회귀·p95/크기 측정 및 불완전 검색 상태 노출",
+      "original_dependencies": "W1.2",
+      "original_contracts": "NFR-01",
+      "original_completion_evidence": "기존 경로 결과/지연 비교, 상한 도달 시 명시",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W1.3",
+        "검색 지연",
+        "실측 있음; dynamic 일부 p95비>1.25",
+        "N-10–11"
+      ]
+    },
+    {
+      "id": "W1.4",
+      "original_work": "Markdown 부모/자식 청크와 안정 ID·원문 줄 계약",
+      "original_dependencies": "W0.3",
+      "original_contracts": "FR-03, INV-03",
+      "original_completion_evidence": "경계/코드 블록/목록 골든 테스트",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W1.4",
+        "장문 청크: `internal/vector/chunk`, `parse/markdown`",
+        "꼬리·부모/자식·원문 범위 보존 검증",
+        "N-07, N-11"
+      ]
+    },
+    {
+      "id": "W1.5",
+      "original_work": "청크 생성·부모 문맥 재구성·중복 제거·재색인",
+      "original_dependencies": "W1.4",
+      "original_contracts": "FR-03",
+      "original_completion_evidence": "S-02 끝 단락 검색/인용; 짧은 문서 호환",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W1.5",
+        "청크 생성·부모 문맥·중복 제거·재색인: chunk/composer/evidencev2",
+        "구조·보관 원문 구현; 문맥 조립 FINAL33104>32000 오류",
+        "N-07, N-08/11"
+      ]
+    },
+    {
+      "id": "W1.6",
+      "original_work": "청킹 A/B 및 재색인/롤백 검증",
+      "original_dependencies": "W1.5",
+      "original_contracts": "NFR-01/03",
+      "original_completion_evidence": "Recall·토큰·저장 크기·줄 범위 비교",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W1.6",
+        "청킹 A/B·재색인/rollback·품질/크기/줄 범위",
+        "구조·실측/실패 분모 보존. 개선 미달·소표본 제한",
+        "N-07–08, N-10–11"
+      ]
+    },
+    {
+      "id": "W1.7",
+      "original_work": "검색/근거/기권 평가 리포트를 분리해 종단 간 실행",
+      "original_dependencies": "W0.4, W1.3, W1.6",
+      "original_contracts": "FR-04",
+      "original_completion_evidence": "S-04 무근거 단정 검출, 정답 질문 성능 유지",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W1.7",
+        "검색/근거/기권 리포트의 종단 간 실행",
+        "HC11개 해석·사람 기권2개와 실측 있음; guard 실패·생성 답변 평가는 없음",
+        "N-09/11, N-12/14"
+      ]
+    },
+    {
+      "id": "W2.1",
+      "original_work": "`DocumentSection/Claim/EvidenceSpan` 최소 스키마, 원천/버전 ID 규칙",
+      "original_dependencies": "W1.6",
+      "original_contracts": "FR-05, INV-03/04",
+      "original_completion_evidence": "제약·마이그레이션·삭제/구버전 처리 설계 리뷰",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W2.1",
+        "출처 기반 의미: `semantic/model.go`, `validate.go`, `store.go`",
+        "불변 투영·보관된 외부 문서 출처 구조 구현",
+        "N-12 실제 지식"
+      ]
+    },
+    {
+      "id": "W2.2",
+      "original_work": "Markdown/스펙 섹션 추출과 AST 앵커 연결, `proposed` 기본값",
+      "original_dependencies": "W2.1",
+      "original_contracts": "FR-05",
+      "original_completion_evidence": "S-05 원천 줄 재현, 고아/잘못된 앵커 거부",
+      "original_estimate_not_schedule_commitment": "3–5",
+      "current_audit_row": [
+        "W2.2",
+        "문서/CKV/코드 앵커: `extract_markdown.go`, `chunk_links.go`, `ckg_anchor.go`",
+        "정확 줄/해시·canonical 연결 구조 구현",
+        "N-12, N-14"
+      ]
+    },
+    {
+      "id": "W2.3",
+      "original_work": "근거·관계 샘플 검토 도구와 정밀도 평가셋",
+      "original_dependencies": "W2.2",
+      "original_contracts": "FR-05, NFR-03",
+      "original_completion_evidence": "잘못된 관계 비율·검토 비용 리포트",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W2.3",
+        "claim/관계 검토: `semantic/review.go`",
+        "검토 장치 구현·합성/HC 기록 있음; 실제 추출 대표성/오차/비용 미확정",
+        "N-12"
+      ]
+    },
+    {
+      "id": "W2.4",
+      "original_work": "동일 스냅샷의 CKV/CKG/문서 참조 조인, 기존 EvidencePack 호환, 측정된 프로젝트별 정렬률 승격 게이트",
+      "original_dependencies": "W2.2, W0.3",
+      "original_contracts": "INV-01/02/06",
+      "original_completion_evidence": "S-07/09 혼입 0, 기존 소비자 계약 테스트, 기준 미달 승격 차단",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W2.4",
+        "세 계층·외부 원문·mutable 신원",
+        "신원/보관/canonical 연결 구조 구현",
+        "N-02–06, N-15"
+      ]
+    },
+    {
+      "id": "W3.1",
+      "original_work": "능력 질문, 10–20개 시범 개념, 문장형 정의·포함/제외·별칭과 검토 기록",
+      "original_dependencies": "W2.1",
+      "original_contracts": "FR-06",
+      "original_completion_evidence": "도메인 전문가 리뷰, 모호/중복 용어 목록",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W3.1",
+        "공통 온톨로지 내용",
+        "설계20개 승인; `ontology-pilot.yaml` 개별20개는 proposed",
+        "N-12"
+      ]
+    },
+    {
+      "id": "W3.2",
+      "original_work": "개념/요구/관계/정책 참조 스키마, 타입·상태·근거 검증",
+      "original_dependencies": "W3.1",
+      "original_contracts": "FR-06, INV-04",
+      "original_completion_evidence": "잘못된 타입·무근거 `verified`·구버전 참조 거부",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W3.2",
+        "타입/관계·팩: `semantic/core_ontology.go`, `knowledgepack`",
+        "20개/관계·팩 잠금/권한/검토 구조 구현",
+        "N-12–13"
+      ]
+    },
+    {
+      "id": "W3.3",
+      "original_work": "파일 원본→의미 SQLite 및 CKV 텍스트 투영, 버전 마이그레이션/롤백",
+      "original_dependencies": "W3.2",
+      "original_contracts": "FR-06, NFR-03",
+      "original_completion_evidence": "재빌드 결정성·이전 버전 재현",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W3.3",
+        "의미 검색/텍스트 투영: `store_terms.go`, `text_corpus.go`",
+        "결정적 투영·lookup 구현; 전체 투영 재검증 비용의 실부하 효용 미확정",
+        "N-10–12"
+      ]
+    },
+    {
+      "id": "W3.4",
+      "original_work": "CKS 복수 개념 후보·소프트 재순위·무온톨로지 폴백",
+      "original_dependencies": "W3.3",
+      "original_contracts": "FR-07, INV-05",
+      "original_completion_evidence": "S-06 기본 후보 보존; concept-only/graph-only/결합 ablation",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W3.4",
+        "선택형 runtime: `cmd/cks/mcpcli/ontology.go`",
+        "네 mode/팩8arm 구현. 기본 상위 K 안 boost, opt-in",
+        "N-08, N-10–12 효용"
+      ]
+    },
+    {
+      "id": "W3.5",
+      "original_work": "품질·지연·오개념 확정률 평가와 기본 활성 여부 결정",
+      "original_dependencies": "W3.4",
+      "original_contracts": "FR-07, NFR-01",
+      "original_completion_evidence": "질문군별 전후 표, 기준 미달 시 플래그 비활성",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W3.5",
+        "실제 온톨로지 품질·비용",
+        "실측 완료; 일반 개선 증명 없음·소그룹inconclusive",
+        "N-08–12, N-18"
+      ]
+    },
+    {
+      "id": "W4.1",
+      "original_work": "`Requirement/AcceptanceCriterion` 입력 형식과 스펙 상태/버전/미구현 계약",
+      "original_dependencies": "W3.2",
+      "original_contracts": "FR-08",
+      "original_completion_evidence": "코드 없는 스펙 저장; 오류/중복 ID 검사",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W4.1",
+        "스펙 입력: `semantic/extract_spec.go`",
+        "입력/검증 구현; 실제 `spec-pilot.yaml` 요구사항3개 proposed",
+        "N-12, N-14"
+      ]
+    },
+    {
+      "id": "W4.2",
+      "original_work": "Requirement→Concept→Code→Test 추적, 누락·상충·오래된 근거 리포트",
+      "original_dependencies": "W4.1, W2.4",
+      "original_contracts": "FR-08",
+      "original_completion_evidence": "S-05/07 경로와 충돌 재현, 잘못된 확정 없음",
+      "original_estimate_not_schedule_commitment": "3–5",
+      "current_audit_row": [
+        "W4.2",
+        "reviewed trace: `semantic/trace.go`, `trace_anchor.go`",
+        "구조·stale/충돌/승인 분리 구현. F06 완전 경로 없음",
+        "N-14"
+      ]
+    },
+    {
+      "id": "W4.3",
+      "original_work": "읽기 전용 변경 계획과 외부 에이전트용 EvidencePack 확장",
+      "original_dependencies": "W4.2",
+      "original_contracts": "FR-08, INV-06",
+      "original_completion_evidence": "기존 팩 필드 호환, 영향 범위/근거/미확인 표시",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W4.3",
+        "변경 계획/팩 주석: `semantic/plan.go`, `pack.go`",
+        "읽기 전용 계획·unconfirmed·근거 범위 유지 구현",
+        "N-14–15 실제 적용/소비자"
+      ]
+    },
+    {
+      "id": "W4.4",
+      "original_work": "외부 패치의 수용 기준·테스트 결과 수집 및 재색인 흐름",
+      "original_dependencies": "W4.3",
+      "original_contracts": "FR-08, INV-02",
+      "original_completion_evidence": "실패 패치 미승격, 성공 결과도 스냅샷 연결",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W4.4",
+        "정확 테스트·외부 패치: `semantic/test_run.go`, `internal/system/patch`",
+        "패치 신원·observed Go test·사람 기준 승인·승격 경계 구현",
+        "N-14 실제 의미 수용"
+      ]
+    },
+    {
+      "id": "W5.1",
+      "original_work": "세 바이너리 플랫폼별 패키징, 버전/체크섬/의존성 목록",
+      "original_dependencies": "W0.1",
+      "original_contracts": "FR-09",
+      "original_completion_evidence": "지원 OS/CPU 매트릭스 빌드·실행; 배포 라이선스 확인",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W5.1",
+        "패키지·서명·고지: `scripts/package-host.py`, `cmd/cks/packagecli/verify.go`",
+        "세 대상 시험 서명 preview 검증",
+        "N-15–18"
+      ]
+    },
+    {
+      "id": "W5.2",
+      "original_work": "`doctor/init`·언어 능력 탐지·제외/비밀 경로 정책·프로젝트 격리",
+      "original_dependencies": "W2.4",
+      "original_contracts": "FR-09, NFR-02/04",
+      "original_completion_evidence": "S-07, 미지원 언어, 권한/심볼릭 링크 실패 스모크",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W5.2",
+        "init/doctor/status: `cmd/cks/doctorcli`",
+        "비덮어쓰기·역량/신원 상태 구현. 보관 용량/GC 상태 없음",
+        "N-05–06, N-15"
+      ]
+    },
+    {
+      "id": "W5.3",
+      "original_work": "`committed`/`working-tree` 매니페스트와 변경 파일 다이제스트",
+      "original_dependencies": "W5.2, W3.3",
+      "original_contracts": "FR-10, INV-02",
+      "original_completion_evidence": "S-08 같은 HEAD의 다른 내용이 다른 데이터셋",
+      "original_estimate_not_schedule_commitment": "2–3",
+      "current_audit_row": [
+        "W5.3",
+        "임의 프로젝트/작업 트리 신원: setup capture",
+        "committed/working-tree/snapshot-only 구조 구현",
+        "N-02–06"
+      ]
+    },
+    {
+      "id": "W5.4",
+      "original_work": "`index/status/serve/rollback` 사용 흐름, 서비스 재시작 계약",
+      "original_dependencies": "W5.3, W4.4",
+      "original_contracts": "FR-09, INV-02",
+      "original_completion_evidence": "S-09 실패 승격·롤백·재시작 뒤 인용 일치",
+      "original_estimate_not_schedule_commitment": "2–4",
+      "current_audit_row": [
+        "W5.4",
+        "업데이트/rollback/pin/복구",
+        "mock/보관본·구v1·실모델 일부 증거 확보; ops.index는 직접 쓰기",
+        "N-02–04, N-17"
+      ]
+    },
+    {
+      "id": "W5.5",
+      "original_work": "빈 Go/TS/미지원 언어 저장소의 설치→질의 스모크, 문서/CLI 정합성과 Composer 순차 흐름 문서 수정",
+      "original_dependencies": "W5.4",
+      "original_contracts": "FR-09, NFR-05",
+      "original_completion_evidence": "새 저장소 수동 코드 수정 없이 실행; 지원 수준 및 실제 흐름 표시",
+      "original_estimate_not_schedule_commitment": "1–2",
+      "current_audit_row": [
+        "W5.5",
+        "다중 프로젝트 설치와 출시",
+        "시험 설치/복구 완료. 실제 운영 대상/배포 적합성은 별도",
+        "N-15–18"
+      ]
+    }
+  ],
+  "requirements_trace": [
+    {
+      "id": "INV-01",
+      "original_row": [
+        "INV-01",
+        "모든 검색·관계·인용은 `project_id`와 소스 스냅샷으로 범위가 한정된다. 교차 프로젝트 조인은 명시적 기능이 없는 한 금지한다.",
+        "같은 이름의 두 저장소/두 버전 통합 시나리오에서 혼입 0건."
+      ],
+      "current_trace_row": [
+        "INV-01",
+        "프로젝트/소스 버전 격리",
+        "A3/A4/A8, R2-02",
+        "구조 증거 있음; N-02–04/15 쓰기·실환경"
+      ]
+    },
+    {
+      "id": "INV-02",
+      "original_row": [
+        "INV-02",
+        "그래프, 벡터, 문서/온톨로지 투영은 같은 활성 데이터셋 매니페스트를 공유한다. 부분 빌드는 활성 버전이 되지 않는다.",
+        "실패 주입 후 `current` 불변, 재시도와 롤백 검증."
+      ],
+      "current_trace_row": [
+        "INV-02",
+        "공통manifest·부분build 비활성",
+        "A3/A8, R2-02",
+        "N-02–06 writer/내구성/보관/자원"
+      ]
+    },
+    {
+      "id": "INV-03",
+      "original_row": [
+        "INV-03",
+        "인용은 원본 경로·커밋 또는 파일 다이제스트·시작/끝 줄을 통해 원문으로 역추적된다.",
+        "모든 골든 질문의 인용 범위 대조; 잘린 청크의 끝쪽 테스트."
+      ],
+      "current_trace_row": [
+        "INV-03",
+        "원문·버전·줄로 인용 재현",
+        "A1/A4/A7.1, R2-03",
+        "N-07/10 본문 예산·검증 비용"
+      ]
+    },
+    {
+      "id": "INV-04",
+      "original_row": [
+        "INV-04",
+        "`verified` 사실은 타입에 맞는 주체/객체, 원천 범위, 검증자 또는 명시적 검증 규칙을 가진다.",
+        "잘못된 타입·고아 근거·무근거 승격을 빌드에서 거부."
+      ],
+      "current_trace_row": [
+        "INV-04",
+        "verified의 타입·출처·검토자",
+        "A5.1–5.5/A8, R2-10",
+        "N-12/14 실제 내용·수용"
+      ]
+    },
+    {
+      "id": "INV-05",
+      "original_row": [
+        "INV-05",
+        "개념 확장은 기본 자연어 검색을 하드 필터로 차단하지 않는다.",
+        "온톨로지 미등록 표현과 동음이의어에서 기본 후보 집합 보존."
+      ],
+      "current_trace_row": [
+        "INV-05",
+        "의미 확장으로 원 검색 차단 금지",
+        "A6/A8, R2-05/11",
+        "N-08/10/11, 미입증 기능 기본 비활성"
+      ]
+    },
+    {
+      "id": "INV-06",
+      "original_row": [
+        "INV-06",
+        "기존 공개 CLI·MCP·EvidencePack 필드는 폐기 없이 확장한다. 기존 데이터셋은 명시적 마이그레이션 또는 읽기 호환으로 다룬다.",
+        "기존 계약 스냅샷과 회귀 테스트."
+      ],
+      "current_trace_row": [
+        "INV-06",
+        "공개 계약/구DB 호환",
+        "A7.1/A8",
+        "N-15/18 외부 소비자·변경 회귀"
+      ]
+    },
+    {
+      "id": "INV-07",
+      "original_row": [
+        "INV-07",
+        "임베딩 모델·차원·전처리 정체성이 다른 벡터는 같은 검색 공간으로 묶지 않는다.",
+        "불일치 색인/질의 거부 또는 명시적 재색인."
+      ],
+      "current_trace_row": [
+        "INV-07",
+        "모델/차원/전처리 동일성",
+        "A2/A8, R2-01",
+        "고정BGE 실측 있음; N-10/15 부하·실환경"
+      ]
+    },
+    {
+      "id": "FR-01",
+      "original_row": [
+        "FR-01",
+        "`ckg audit`는 현재 소스 파일 집합만 집계한다. 역사 변경 `Hunk`의 파일 경로는 현재 파일로 세지 않는다.",
+        "작은 Git 이력 픽스처와 대상 저장소에서 감사가 현재 AST 파일 집합과 일치한다. 과거에만 있던 파일을 새로 추가해도 현재 개수 불변.",
+        "간접: 154쪽의 속성 있는 관계와 시간 맥락; 직접 근거는 코드 재현."
+      ],
+      "current_trace_row": [
+        "FR-01",
+        "현재File만 감사",
+        "W0.2/A8",
+        "수정·회귀 증거 있음; 역사Hunk 검색 유지"
+      ]
+    },
+    {
+      "id": "FR-02",
+      "original_row": [
+        "FR-02",
+        "CKV는 필터된 최근접 검색의 결과 개수와 품질을 명시적으로 관리한다.",
+        "필터가 허용한 청크가 `K`개 이상인 픽스처에서 반환 `K`개. 선택도가 낮은 언어·경로·커밋·제외 규칙의 결과를 필터된 정확 검색 오라클과 비교해 Recall@K를 기록하고, 승인된 허용 오차를 넘으면 승격 실패. 빈 필터·빈 후보도 처리.",
+        "134쪽 후필터링의 결과 수 감소."
+      ],
+      "current_trace_row": [
+        "FR-02",
+        "필터 내 K수와 회수 품질",
+        "A1/B1/C1, R2-04",
+        "N-08/10/11; K수와 정답 회수 구분"
+      ]
+    },
+    {
+      "id": "FR-03",
+      "original_row": [
+        "FR-03",
+        "긴 Markdown을 제목/단락 단위 자식 청크로 색인하고 부모 맥락을 재구성한다.",
+        "문서 앞·중간·끝 질문이 원문 줄을 인용한다. 한 청크가 길이 상한을 넘지 않는다. 동일 내용 재색인 시 안정 ID, 기존 짧은 문서는 출력 호환.",
+        "79쪽 부모·자식 청크."
+      ],
+      "current_trace_row": [
+        "FR-03",
+        "장문child 검색·parent 문맥",
+        "A1/A4/B1",
+        "N-07/08/10/11; 구조와 회수 품질 구분"
+      ]
+    },
+    {
+      "id": "FR-04",
+      "original_row": [
+        "FR-04",
+        "CKV/CKS 평가가 검색 실패, 근거 부족, 답 없음, 버전 충돌을 구분한다.",
+        "답 없음 시 인용을 붙여 단정하면 실패 처리. 예상 인용이 비어 있는 경우의 기존 점수 1.0 특례를 기권 판정과 분리한다. 정답 있는 질문의 인용 회수율을 함께 보고한다.",
+        "95쪽 답 없음 응답."
+      ],
+      "current_trace_row": [
+        "FR-04",
+        "실패/근거 부족/무답/충돌 구분",
+        "A1/A8/B1/C1",
+        "N-09/11; 기계 무인용과 사람 기권 구분"
+      ]
+    },
+    {
+      "id": "FR-05",
+      "original_row": [
+        "FR-05",
+        "Markdown과 스펙 문서의 `DocumentSection`, `Claim`, `EvidenceSpan`을 코드 앵커 및 CKV 청크와 연결한다.",
+        "원문 위치가 유효한 문서-코드 관계를 재현하고, 삭제된 원천/잘못된 줄/상충 스냅샷은 `verified`로 승격하지 않는다. 추출 오류율을 샘플 검토로 측정한다.",
+        "154쪽 관계의 방향·속성, 151–162쪽 그래프와 문서 사실."
+      ],
+      "current_trace_row": [
+        "FR-05",
+        "문서/claim/span·코드 연결",
+        "A4/A5.1/A5.5",
+        "N-12 추출 오차·관계 오용·검토 비용"
+      ]
+    },
+    {
+      "id": "FR-06",
+      "original_row": [
+        "FR-06",
+        "CKS가 작은 공통 온톨로지와 프로젝트별 도메인 어휘를 버전 관리한다.",
+        "개념 ID, 문장형 정의, 포함·제외 범위, 다국어 별칭, 관계 방향/타입, 증거 상태를 검증한다. 미구현 스펙은 코드 앵커 없이도 `proposed`로 저장 가능하지만 `verified implementation`으로 판정되지 않는다. 이전 버전 재현·롤백 가능.",
+        "172, 179, 180–182쪽."
+      ],
+      "current_trace_row": [
+        "FR-06",
+        "작은core/프로젝트 어휘 버전 관리",
+        "A5.1/A5.2/A5.4",
+        "N-12/13; 파일럿 proposed 유지"
+      ]
+    },
+    {
+      "id": "FR-07",
+      "original_row": [
+        "FR-07",
+        "온톨로지 기반 질의는 자연어 원문을 보존하고 복수 개념 후보를 소프트 신호로 사용한다.",
+        "개념 미등록 질문의 CKV/BM25 후보가 사라지지 않는다. 동음이의어 질문은 근거가 확정되기 전 한 의미로 강제하지 않는다. A/B에서 품질, 지연, 잘못된 개념 확정률 측정.",
+        "172, 179쪽의 개념·용어 정의; 질의 전략은 프로젝트 설계."
+      ],
+      "current_trace_row": [
+        "FR-07",
+        "원 질문·복수 후보·soft 신호",
+        "A6/B1/C1",
+        "N-08/10/11/18 효과·지연 판정"
+      ]
+    },
+    {
+      "id": "FR-08",
+      "original_row": [
+        "FR-08",
+        "CKS는 `Requirement → Concept/Invariant → CodeSymbol → TestCase` 추적성과 스펙-코드 충돌을 읽기 전용으로 보고한다.",
+        "요구사항별 연결 누락, 충돌, 오래된 근거를 구분해 원천 링크와 상태를 출력한다. 테스트 통과만으로 스펙 충족을 선언하지 않는다. 외부 에이전트 변경의 검사 결과는 스냅샷에 묶는다.",
+        "172–182쪽의 의미 계약; 통합 알고리즘은 프로젝트 제안."
+      ],
+      "current_trace_row": [
+        "FR-08",
+        "요구→개념→코드→test·충돌 보고",
+        "A5.3/A5.5/A8",
+        "N-12/14; linked/pass/verified/accepted 분리"
+      ]
+    },
+    {
+      "id": "FR-09",
+      "original_row": [
+        "FR-09",
+        "일반 프로젝트 설치·진단·색인·서비스·상태·롤백을 제공한다.",
+        "깨끗한 지원 언어 저장소와 미지원 언어 저장소를 별도 픽스처로 초기화한다. 기능 목록이 실제 어댑터 능력과 일치한다. 두 프로젝트 색인은 분리되고 설치 후 역추적 가능한 질문을 처리한다. 실패한 승격은 이전 활성 버전을 보존한다.",
+        "49–57쪽 컬렉션/벡터 일관성은 관련 배경; 설치 UX는 프로젝트 요구."
+      ],
+      "current_trace_row": [
+        "FR-09",
+        "임의project 설치/진단/복구",
+        "A7.1–7.5/A8",
+        "N-05/06/13/15–18; 운영 조건부"
+      ]
+    },
+    {
+      "id": "FR-10",
+      "original_row": [
+        "FR-10",
+        "`committed`와 `working-tree` 색인 모드를 분리한다.",
+        "커밋하지 않은 추적 파일과 신규 파일의 내용 다이제스트가 작업 트리 스냅샷에 들어간다. 같은 HEAD에서 내용이 바뀌면 별도 스냅샷이다. 불일치 답변을 거부/표시한다.",
+        "57쪽 공간 일관성은 관련 배경; 직접 근거는 설치형의 신선도 계약."
+      ],
+      "current_trace_row": [
+        "FR-10",
+        "committed/working-tree 분리",
+        "A3/A4/A8, R2-03",
+        "스냅샷 구조 있음; N-02–04/15"
+      ]
+    },
+    {
+      "id": "NFR-01",
+      "original_row": [
+        "NFR-01",
+        "검색 품질은 현재 CKV/CKS 실제 기준선보다 악화되지 않아야 한다.",
+        "Phase 0에서 질문 세트·오라클·허용 오차를 고정한 뒤 같은 하드웨어/모델로 비교한다. 품질 개선과 p95 지연·색인 크기·빌드 시간을 함께 보고한다."
+      ],
+      "current_trace_row": [
+        "NFR-01",
+        "품질 비열화·비용/지연/규모",
+        "B0/B1/C0/C1",
+        "N-08–11/18; fail/inconclusive 유지"
+      ]
+    },
+    {
+      "id": "NFR-02",
+      "original_row": [
+        "NFR-02",
+        "비밀 파일과 제외 경로는 기본 프로필의 색인에서 빠지고, 실제 범위는 매니페스트로 감사된다.",
+        "비밀 픽스처와 심볼릭 링크/외부 경로 적대 테스트. 프로젝트 간 접근 제한 테스트."
+      ],
+      "current_trace_row": [
+        "NFR-02",
+        "비밀/제외/링크/프로젝트 격리",
+        "A4/A7/A8",
+        "기존 안전 증거 유지; N-05/06/15 변경 회귀"
+      ]
+    },
+    {
+      "id": "NFR-03",
+      "original_row": [
+        "NFR-03",
+        "온톨로지와 의미 관계는 버전·마이그레이션·출처를 가진다.",
+        "구버전 읽기 또는 업그레이드 오류의 명확한 처리, 중간 실패 시 롤백, 다중 버전 재현."
+      ],
+      "current_trace_row": [
+        "NFR-03",
+        "의미 버전/이전/출처",
+        "A5/A8",
+        "구조 증거 있음; N-12–14/17 실제 내용/복구"
+      ]
+    },
+    {
+      "id": "NFR-04",
+      "original_row": [
+        "NFR-04",
+        "원문 파서 실패나 미지원 언어는 명시적으로 기능을 낮춘다.",
+        "파서 실패율, 미지원 파일 수, 텍스트 전용 상태를 CLI에서 공개; AST 관계를 추측해 출력하지 않는다."
+      ],
+      "current_trace_row": [
+        "NFR-04",
+        "파서 실패/미지원 능력 공개",
+        "A4/A7/A8",
+        "N-15; 전 언어 동일AST 주장 금지"
+      ]
+    },
+    {
+      "id": "NFR-05",
+      "original_row": [
+        "NFR-05",
+        "문서·도구 설명은 실행 CLI와 일치한다.",
+        "`make docs-check`, 공개 CLI/MCP 계약 테스트, 실제 사용 예제 스모크 테스트."
+      ],
+      "current_trace_row": [
+        "NFR-05",
+        "문서·CLI/MCP 계약 일치",
+        "A7.1/A8/변경 시",
+        "문서 검사 유지; N-15/18 실제 소비자/출시"
+      ]
+    }
+  ],
+  "scenario_trace": [
+    {
+      "id": "S-01",
+      "original_row": [
+        "S-01 필터 선택도",
+        "특정 커밋·경로·언어 안의 관련 청크, 필터된 정확 검색 결과",
+        "전역 상위 3K에 없다는 이유로 누락"
+      ],
+      "current_trace_row": [
+        "S-01",
+        "선택도 높은 필터의 exact oracle",
+        "A1/F-01; N-08/10/11"
+      ]
+    },
+    {
+      "id": "S-02",
+      "original_row": [
+        "S-02 긴 문서 끝",
+        "한 제목 아래 긴 Markdown의 마지막 단락과 정확 줄",
+        "앞부분만 색인, 부모 줄을 잘못 인용"
+      ],
+      "current_trace_row": [
+        "S-02",
+        "긴 문서 끝·정확 줄",
+        "A1/A4/F-02; N-07/08/11"
+      ]
+    },
+    {
+      "id": "S-03",
+      "original_row": [
+        "S-03 과거 Git 파일",
+        "현재 없는 파일을 포함한 `Hunk` 이력",
+        "감사가 과거 파일을 현재 파일로 세는 오류"
+      ],
+      "current_trace_row": [
+        "S-03",
+        "과거 Git파일 Hunk",
+        "W0.2/A8; 기존 수정·회귀 유지"
+      ]
+    },
+    {
+      "id": "S-04",
+      "original_row": [
+        "S-04 답 없음",
+        "저장소에 존재하지 않는 API·정책을 묻는 질문",
+        "무관한 인용을 달고 단정, 평가 점수 1.0"
+      ],
+      "current_trace_row": [
+        "S-04",
+        "없는API/정책의 무관 인용·단정",
+        "A1/B1/C1/ABS; N-09/11"
+      ]
+    },
+    {
+      "id": "S-05",
+      "original_row": [
+        "S-05 스펙-코드 충돌",
+        "스펙 문장과 AST 조건이 다른 고정 픽스처",
+        "스펙 또는 코드를 조용히 진실로 승격"
+      ],
+      "current_trace_row": [
+        "S-05",
+        "스펙 문장과 코드 조건의 차이",
+        "A5.3/A5.5/SF; N-12/14 실제 파일럿"
+      ]
+    },
+    {
+      "id": "S-06",
+      "original_row": [
+        "S-06 모호한 용어",
+        "같은 용어의 두 개념/한영 별칭/미등록 표현",
+        "첫 매칭을 하드 필터로 강제해 올바른 검색 결과 제거"
+      ],
+      "current_trace_row": [
+        "S-06",
+        "다의어/한영별칭/미등록어",
+        "A6/ontology ablation; N-08/11/12"
+      ]
+    },
+    {
+      "id": "S-07",
+      "original_row": [
+        "S-07 복수 프로젝트",
+        "동명 심볼이 다른 두 저장소",
+        "출처 혼합, 다른 프로젝트의 테스트를 검증 근거로 사용"
+      ],
+      "current_trace_row": [
+        "S-07",
+        "동명symbol·다른project",
+        "A3/A4/A7/A8; N-02–04/15 변경 회귀"
+      ]
+    },
+    {
+      "id": "S-08",
+      "original_row": [
+        "S-08 작업 트리",
+        "같은 HEAD에서 수정 파일 및 새 파일",
+        "HEAD만으로 같은 버전이라고 표시"
+      ],
+      "current_trace_row": [
+        "S-08",
+        "같은HEAD의 수정/신규 파일",
+        "A3/A4/F-04; N-02–04/15"
+      ]
+    },
+    {
+      "id": "S-09",
+      "original_row": [
+        "S-09 승격 실패",
+        "그래프 완료·벡터 실패 등 주입",
+        "부분 데이터셋을 `current`로 노출"
+      ],
+      "current_trace_row": [
+        "S-09",
+        "한engine 실패에서 승격 금지",
+        "A3/A7/A8; N-02–04/17"
+      ]
+    }
+  ],
+  "requirements": 22,
+  "scenarios": 9,
+  "wbs_subtasks": 29,
+  "N01_document_recovery_complete": true,
+  "remaining_product_tasks": [
+    "N-02",
+    "N-03",
+    "N-04",
+    "N-05",
+    "N-06",
+    "N-07",
+    "N-08",
+    "N-09",
+    "N-10",
+    "N-11",
+    "N-12",
+    "N-13",
+    "N-14",
+    "N-15",
+    "N-16",
+    "N-17",
+    "N-18"
+  ],
+  "new_product_implementations": 0,
+  "frozen_product_source_hashes_verified": 1096,
+  "frozen_approved_input_hashes_verified": 5,
+  "original_pdf_or_ocr_or_database_rerun": false,
+  "new_model_queries": false,
+  "six_month_upper_WI_scope": "separate; no automatic scope expansion",
+  "old_discovery_and_evidence": "preserved as observations before user-authorized remote sync"
+}

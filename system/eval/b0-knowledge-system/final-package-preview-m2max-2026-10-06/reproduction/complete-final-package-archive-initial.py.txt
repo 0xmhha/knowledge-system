@@ -1,0 +1,37 @@
+from pathlib import Path
+import json,gzip,hashlib,importlib.util,tempfile,subprocess
+root=Path.cwd();r=Path('/private/tmp/ks-approved-scope-20261006');t=root/'system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06';load=lambda p:json.loads(p.read_bytes());sha=lambda b:hashlib.sha256(b).hexdigest();manifest=load(t/'evidence-manifest.json');records=manifest['files']
+def keep(p,q):
+ raw=p.read_bytes();dest=t/q;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(raw);records.append({'source':str(p),'path':str(q),'raw_bytes':len(raw),'raw_sha256':sha(raw),'stored_sha256':sha(raw),'encoding':'identity'})
+def sources(v,label,needed=None):
+ keep(v/'dataset-identity.json',Path(label)/'dataset-identity.json');keep(v/'sources/manifest.json',Path(label)/'sources/manifest.json')
+ for f in load(v/'sources/manifest.json')['files']:
+  if f['kind']=='regular'and (needed is None or f['path']in needed):keep(v/'sources/blobs'/f['sha256'],Path(label)/'sources/blobs'/f['sha256'])
+for c in load(r/'approved-state-guards/cases.json'):sources(Path(c['Version']),'retained-guards/'+c['ID'])
+lr=Path('/private/tmp/ks-final-linux-real-20261006')
+for kind in ['empty-go','typescript','unsupported-python']:sources((lr/'diagnostic-approved-package'/kind/'dataset/current').resolve(),'retained-linux/'+kind)
+lc=Path('/private/tmp/ks-final-package-large-cost-20261006');needed={c['file']for row in load(lc/'capture.json')['rows']for c in row['call']['response']['structuredContent']['citations']};sources(lc/'dataset/pinned','retained-large',needed)
+for name in ['retain-final-packages-initial.py.txt','final-package-retention.log','final-package-retention-resumed.log','audit-final-linux-real.py','complete-final-package-archive.py']:keep(r/name,Path('reproduction')/name)
+# Every lossless copied file is replayed; generated package assets are decoded against their SHA too.
+for f in records:
+ p=t/f['path'];raw=p.read_bytes();assert sha(raw)==f['stored_sha256'];raw=gzip.decompress(raw)if f['encoding']=='gzip'else raw;assert len(raw)==f['raw_bytes']and sha(raw)==f['raw_sha256']
+for p in t.glob('*/package-nonbinary-assets.json'):
+ import base64
+ for a in load(p).values():raw=a['text'].encode()if a['encoding']=='utf-8'else base64.b64decode(a['base64']);assert len(raw)==a['bytes']and sha(raw)==a['sha256']
+# Stored source remains independently readable with no original TEMP directory.
+spec=importlib.util.spec_from_file_location('matrix',root/'scripts/b1-summarize-matrix.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);cites=0
+for label,capfile,retained in [('large',lc/'capture.json',t/'retained-large'),('memory',lc/'memory-capture.json',t/'retained-large')]+[(kind,lr/'diagnostic-approved-package'/kind/'capture.json',t/'retained-linux'/kind)for kind in['empty-go','typescript','unsupported-python']]:
+ with tempfile.TemporaryDirectory()as d:
+  src=Path(d);ident=load(retained/'dataset-identity.json')
+  for f in load(retained/'sources/manifest.json')['files']:
+   p=retained/'sources/blobs'/f['sha256']if f['kind']=='regular'else None
+   if p is not None and p.exists():
+    raw=p.read_bytes();assert sha(raw)==f['sha256'];q=src/f['path'];q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(raw)
+  for row in load(capfile)['rows']:pack=row['call']['response']['structuredContent'];m.verify_pack(pack,ident,src);cites+=len(pack['citations'])
+(t/'archive-source-replay.json').write_text(json.dumps({'source_verified_citations':cites,'rows':68,'source_from_archive_only':True,'copied_file_hashes_verified':len(records),'quality_metrics':None},indent=2)+'\n')
+(t/'evidence-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+allfiles=[]
+for p in sorted(t.rglob('*')):
+ if p.is_file():
+  raw=p.read_bytes();assert b'-----BEGIN PRIVATE KEY-----'not in raw and b'-----BEGIN RSA PRIVATE KEY-----'not in raw;assert p.name!='private.pem';allfiles.append({'path':str(p.relative_to(t)),'bytes':len(raw),'sha256':sha(raw)})
+(t/'archive-inventory.json').write_text(json.dumps({'scope':'all retained files before this inventory; private key bodies and executables excluded','files':allfiles},indent=2)+'\n');print('archive complete',len(allfiles),'files',sum(x['bytes']for x in allfiles),'bytes; source citations',cites)

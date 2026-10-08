@@ -1,0 +1,646 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "scope": "new approved static corpus source/chunk/split audit; no retrieval quality verdict",
+  "dataset": {
+    "source": {
+      "project_id": "b0-knowledge-system",
+      "source_mode": "committed",
+      "source_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+      "file_manifest_digest": "d1aa4f947944487defc32599c22db703ca54b23c8290b521487b82b11a0fc2a9",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "4337a320ba7ec1a256e171d0c9def82f528e3c305ecb757e4f05ffe59eb4fa15"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "07292e3f023f9d6a6c0b6f3fc77d1487f2aea7194f106e8b9e9b0dcfc926cac9",
+    "dataset_id": "a56625e8a262bf19647c203c8626004bebec09d04cba525c488216b4d48bc9de"
+  },
+  "selected_files": 1598,
+  "graph_go_files": 992,
+  "vector_go_files": 1055,
+  "missing_graph_go_files": [],
+  "approved_extra_go_sources": 29,
+  "chunks": 13820,
+  "chunk_kinds": {
+    "doc": 3963,
+    "symbol": 8168,
+    "file_header": 1354,
+    "invariant": 77,
+    "function_split": 105,
+    "convention": 153
+  },
+  "physical_source_body_checks": 13590,
+  "generated_statement_chunks": {
+    "invariant": 77,
+    "convention": 153
+  },
+  "split_parents": [
+    {
+      "file": "internal/setup/plan.go",
+      "parent_id": "19857bbf880dafecb759ab10666d038d50099c1b1a0dcd766e7d815622b48452",
+      "children": 2,
+      "start_line": 160,
+      "end_line": 360,
+      "bytes": 7067,
+      "sha256": "7df0b0c64e0f469d104e3f551cb29375da40dbe502aa5088f0a0618791ee2b39"
+    },
+    {
+      "file": "docs/spec-driven/SEMANTIC-CONTRACT.md",
+      "parent_id": "2c2e657bcb03b1da6be2deae388227881ca29d3d23da6dff51ac88f9baaa555d",
+      "children": 2,
+      "start_line": 29,
+      "end_line": 60,
+      "bytes": 6544,
+      "sha256": "5b0ba8f184bcb51e56fd49332df9856fc13ef6063e4ff604ce06dfa824c7ee87"
+    },
+    {
+      "file": "internal/graph/parse/solidity/resolve.go",
+      "parent_id": "8d644dbd87989fd25f155a668a187351378c0cd45d1d89567611c90ea8920e52",
+      "children": 7,
+      "start_line": 65,
+      "end_line": 998,
+      "bytes": 37696,
+      "sha256": "a3a3915e14ca8aa69d9f949e36a9b34f019dfaeab325981853d2c1bbb1b61edc"
+    },
+    {
+      "file": "tools/viewer/src/components/App.tsx",
+      "parent_id": "bbd697228b60e5b6e8af57240020ff6443425980024bb6230c82036510c8368f",
+      "children": 6,
+      "start_line": 33,
+      "end_line": 801,
+      "bytes": 33995,
+      "sha256": "c0184927867eba164ddb855833c9bf3e28e95a73c8852052ef307ca429035043"
+    },
+    {
+      "file": "docs/spec-driven/EXECUTION.md",
+      "parent_id": "664a94da7d01084e23bedfd07a60e5e6602c204ba52b30f938f3761622833d2e",
+      "children": 7,
+      "start_line": 1,
+      "end_line": 64,
+      "bytes": 30879,
+      "sha256": "76ee96bbcee32bd9d5cd84379405dff7f5098048f24f7351e7207661011a0367"
+    },
+    {
+      "file": "internal/system/composer/budget/allocator.go",
+      "parent_id": "78151f3576cd87bd19911c7725bf5a72e2c339243b100116f036c2dc4c2ed358",
+      "children": 2,
+      "start_line": 225,
+      "end_line": 404,
+      "bytes": 7016,
+      "sha256": "b5d6c925e06e1427b59008decfe06115e41f4b205fd3815805d4322ea6bf33ed"
+    },
+    {
+      "file": "docs/spec-driven/EXECUTION.md",
+      "parent_id": "3281abca1da158d2789ec9e01a749e2742c306078b242d231dd89fff58b90404",
+      "children": 2,
+      "start_line": 168,
+      "end_line": 180,
+      "bytes": 6684,
+      "sha256": "1df8140462abe08b9ad578efbac071acc8c4480a259d2597de9c9273c62d64a5"
+    },
+    {
+      "file": "internal/graph/server/api_extra_test.go",
+      "parent_id": "98d552d3667c52ddc88291999385c4fff5cc255fc69f86c44673fe01db38642b",
+      "children": 2,
+      "start_line": 38,
+      "end_line": 282,
+      "bytes": 8211,
+      "sha256": "9016a55d1dfe0779be340f8ae9a21faf8855f35a6d8b1b518caa4bc8f68e8794"
+    },
+    {
+      "file": "docs/graph/design/solidity-inheritance-and-interface-dispatch.md",
+      "parent_id": "a794d75e3d28ce98d21b36ca0e06bcdc30f2c4a6618d7794c017e3bfd5784b16",
+      "children": 6,
+      "start_line": 1,
+      "end_line": 395,
+      "bytes": 26488,
+      "sha256": "d069d28e6846234826247d78171447a55a01f81f0bb11b4785b4f869598f8a2e"
+    },
+    {
+      "file": "docs/graph/SCHEMA.md",
+      "parent_id": "cb5d7bcaeb5cd1583149ba96a9f103c9ff2aa9b120426d35d1b32b13fb29056a",
+      "children": 2,
+      "start_line": 142,
+      "end_line": 270,
+      "bytes": 7329,
+      "sha256": "a5fe604e95da20ce54c0fdd75f022afc0fc9564b9fdbc568b2a523ebded73530"
+    },
+    {
+      "file": "internal/graph/parse/solidity/using_for.go",
+      "parent_id": "69410857682d4f5258d405025fee498e9916a904c8d012c34522c3ff0e935259",
+      "children": 3,
+      "start_line": 318,
+      "end_line": 613,
+      "bytes": 12452,
+      "sha256": "a14d61017be87cbe9e837cf7b89e8a448b5c6137669c82aa86113bd8cbf38756"
+    },
+    {
+      "file": "tools/viewer/src/components/Atlas.tsx",
+      "parent_id": "739c3b83025d26be5c763d34d76dba28faade20ee80e6f60a4c6523d998aa651",
+      "children": 8,
+      "start_line": 146,
+      "end_line": 942,
+      "bytes": 38338,
+      "sha256": "37fb48476053393de17a3f856c382caf3da0ca6ebadd41c8f791f616d70e792b"
+    },
+    {
+      "file": "cmd/cks/mcpcli/genconfig.go",
+      "parent_id": "5891206dc3d02d3d6cd2335bab83d11bcd0dfdc799bae683a5257179a694fd41",
+      "children": 2,
+      "start_line": 13,
+      "end_line": 126,
+      "bytes": 6191,
+      "sha256": "0878eb5e2ef184fff04662f98f29f89742a88e6eac3de551ed7229d289b4dff6"
+    },
+    {
+      "file": "internal/system/evidencev2/knowledge_trace.go",
+      "parent_id": "2a7a8713edfa6d90c30bfd2ed90f654fc4accee88d8972dc459cd72c23b5798e",
+      "children": 2,
+      "start_line": 17,
+      "end_line": 185,
+      "bytes": 7258,
+      "sha256": "89e54fe259ae5c04e4e1fc263908fe93b681600bfa15106840227b7f9afe6313"
+    },
+    {
+      "file": "internal/graph/parse/solidity/declarations.go",
+      "parent_id": "30fd4c09cc3b3d0cb5e93767d3e2bfd43b9e61f7f2bf3c4c14acb42b4c39b7a4",
+      "children": 2,
+      "start_line": 335,
+      "end_line": 530,
+      "bytes": 8168,
+      "sha256": "f009d76e187790b9a4e9a122bc320dd49b6a535a6f0e1d55382b9a2a86086eea"
+    },
+    {
+      "file": "internal/system/evidencev2/knowledge_test.go",
+      "parent_id": "9b1d50ba199b6967d33a4808e4d91050dbda0a4d86e96180ae2b0503136e83f3",
+      "children": 2,
+      "start_line": 25,
+      "end_line": 212,
+      "bytes": 7465,
+      "sha256": "6445bc59cccbe06c79d2f6b457c75007eeb11e0e15ade6147a938d24e67e1ae0"
+    },
+    {
+      "file": "tools/viewer/src/store/store.ts",
+      "parent_id": "9f8e25a141cd7cb3b1d808a04decb64dc0243983f6f2bbfac0bcfe59e0889c92",
+      "children": 2,
+      "start_line": 59,
+      "end_line": 237,
+      "bytes": 9051,
+      "sha256": "4b159c0d5af81b54fd35ad5b26e98631467f7e89dcc06aef9762ca902beae603"
+    },
+    {
+      "file": "internal/vector/build/reindex.go",
+      "parent_id": "ac2a3e71d9b51fd6b3468a4a10bb2e7ff3f81f49c69cf311218cf3125ed7f87a",
+      "children": 4,
+      "start_line": 137,
+      "end_line": 596,
+      "bytes": 18692,
+      "sha256": "0e687d06069a28bd24dd47a4431b5dd2b423fc6639d069f397b24f1b74b13c89"
+    },
+    {
+      "file": "internal/graph/buildpipe/cache.go",
+      "parent_id": "02e0f20c261eec19e86c81cb8b4c57544c3b8cb33348ebf92c4818b179d61ccd",
+      "children": 2,
+      "start_line": 23,
+      "end_line": 166,
+      "bytes": 9286,
+      "sha256": "837531cfa505f9c65e61dc36790c20838e837b961f365bb4bce8c7820f053433"
+    },
+    {
+      "file": "internal/graph/persist/store_interface.go",
+      "parent_id": "5477d7f9d51f7c71f44574dd7e590a0ab80ad6ed7e9ef1eadae0d47275a0a032",
+      "children": 2,
+      "start_line": 30,
+      "end_line": 160,
+      "bytes": 6980,
+      "sha256": "a642c158250ef5777a75797e8b6165e798061619b895d58eafc9675bfed3ae9c"
+    },
+    {
+      "file": "internal/system/semantic/validate.go",
+      "parent_id": "a8926b17030f57397f0449b71903e37254815aa50d159a5c16052abcdc5fb53c",
+      "children": 3,
+      "start_line": 47,
+      "end_line": 386,
+      "bytes": 13818,
+      "sha256": "ccf1d5942859230f1191000c5a96d942a21ab2f4b4fb25b91dd6a81bba71553a"
+    },
+    {
+      "file": "docs/spec-driven/DELIVERY-PLAN-V2.md",
+      "parent_id": "79b5111e99bed51d9b38919db00a1e26f17b75c04c016d401a427db1f1270054",
+      "children": 3,
+      "start_line": 94,
+      "end_line": 139,
+      "bytes": 7580,
+      "sha256": "57c125a83518824e381974e8ef8284b4962d62a6b16ec41df7f4db927feeed6a"
+    },
+    {
+      "file": "docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md",
+      "parent_id": "ce9c5a0aff689e8af7da24d24617c73441d71fd6591d24d1ba789e3f8f4f5356",
+      "children": 5,
+      "start_line": 108,
+      "end_line": 417,
+      "bytes": 27424,
+      "sha256": "1b6a84a4e6914b873d2d74a8cabc8a568ad0cc9eaef5db629fc24dc1927cd242"
+    },
+    {
+      "file": "cmd/cks/semanticcli/build_test.go",
+      "parent_id": "5807fd2cc636ca04330b13dfb00c7065715adbb51ceece9de711800620fa84aa",
+      "children": 3,
+      "start_line": 31,
+      "end_line": 211,
+      "bytes": 7394,
+      "sha256": "6eb53ced281255249e7841efc24259350ac6ed18739048ca1e0c81378ac339fa"
+    },
+    {
+      "file": "system/docs/archive/system-review-2026-05-27.md",
+      "parent_id": "fc4adc34dcfed06ca9b7f3dfda94d404cb99efa6466159f9f2749082e5f1dff5",
+      "children": 3,
+      "start_line": 10,
+      "end_line": 75,
+      "bytes": 6914,
+      "sha256": "5f9575f9175b1cd5bd7dd78152e30b5b0b957cba723ac372ff8a5880bb716391"
+    },
+    {
+      "file": "docs/graph/archive/todo-cks-dogfood-followups-2026-05-20.md",
+      "parent_id": "034c90e9812417ef171d4e082fc60bff331ee45da17140bad3560be2c3dd37bb",
+      "children": 5,
+      "start_line": 219,
+      "end_line": 626,
+      "bytes": 29192,
+      "sha256": "21fd672d01fbbc87e89fe974a3e91aaf0b67e3968002ba9610e66b463a6fe202"
+    },
+    {
+      "file": "internal/system/semantic/review.go",
+      "parent_id": "84e43f809df5e43cfb1b374a56ac7dc6a00034f93c87abc8ac24e06e8861c1da",
+      "children": 2,
+      "start_line": 89,
+      "end_line": 303,
+      "bytes": 8337,
+      "sha256": "21c66282e2d7d516b1489b0cf3433197c2c9fa2279ab39c9b849fec8a762b7f1"
+    },
+    {
+      "file": "cmd/cks/knowledgecli/knowledge.go",
+      "parent_id": "fe017e340ac7b9bb41ec5047a6b05dc54a1f4b15fa8c8b23b2320b629702be1f",
+      "children": 2,
+      "start_line": 20,
+      "end_line": 320,
+      "bytes": 12122,
+      "sha256": "d2099ba08d3662896dd69cf239550193e8b6b2927ffeea7c4ebbc24e987f3bf2"
+    },
+    {
+      "file": "docs/spec-driven/A8-GATE-REPORT.md",
+      "parent_id": "234b1af2e41132efd780c15057761a0156831d36b627c9c8016f783ef7e4c29a",
+      "children": 2,
+      "start_line": 37,
+      "end_line": 71,
+      "bytes": 9115,
+      "sha256": "803dcae50a341db93adf36d7a96058f6ff92a603dffa5c8294e4d9c7c6fd6262"
+    },
+    {
+      "file": "internal/vector/build/builder.go",
+      "parent_id": "47c164220878e12628349a0643e2ada8fac2e00e0f57e9b33d57383004a0c14e",
+      "children": 4,
+      "start_line": 140,
+      "end_line": 720,
+      "bytes": 22767,
+      "sha256": "63544209bf3d0dea2485aba2bb11ea49bffeec136f232745cd3fec433608ba10"
+    },
+    {
+      "file": "pkg/graph/impact/impact.go",
+      "parent_id": "05053cae5c41e1e38df71fc44242fe4b42e6b3510ccbd0c6467e21657f30b07f",
+      "children": 2,
+      "start_line": 94,
+      "end_line": 350,
+      "bytes": 8331,
+      "sha256": "ebe2db3d91de45120bdb7b6a322c4518920e5bb956bed74a6f2788fd1f102ece"
+    },
+    {
+      "file": "docs/graph/archive/analysis/GO-PROJECT-BUILD-FLOW.md",
+      "parent_id": "9b9348d5b403782f4d7c35250902aad7d4f353aea6c64836af308fd24e9bc402",
+      "children": 3,
+      "start_line": 312,
+      "end_line": 378,
+      "bytes": 7955,
+      "sha256": "001ee49084cfe97d8728b54fe396e445f8b29fd2049092dcc9b1e54a3ee6577b"
+    },
+    {
+      "file": "internal/graph/buildpipe/h3h4_integration_test.go",
+      "parent_id": "79e24d49267bc1fc72736425d6b441b53c6249d758391b89aa58031784a043a5",
+      "children": 2,
+      "start_line": 15,
+      "end_line": 194,
+      "bytes": 7255,
+      "sha256": "9c16d5ea20681dc216dbc09e2e117b243c653f0172324ce8af47e2cf1f38894e"
+    },
+    {
+      "file": "internal/system/evidencev2/knowledge.go",
+      "parent_id": "ed07087bba6177efdb99642e31164ea3433594e19d91233ab3bac169b3b6861d",
+      "children": 2,
+      "start_line": 16,
+      "end_line": 197,
+      "bytes": 7051,
+      "sha256": "c7a795cd6abb8c368d72274c9340a34dbc1128beecaf969710e60f4a60346274"
+    },
+    {
+      "file": "internal/vector/store/sqlitevec/store.go",
+      "parent_id": "e0f7f56f0497f14ea1263036410b11e84c56c5b41fdfac62121dafce24e672cb",
+      "children": 2,
+      "start_line": 610,
+      "end_line": 813,
+      "bytes": 6937,
+      "sha256": "86165439e2f1e3d3949373c3891aa0e4fc6020445fe96c641989064972ab1429"
+    },
+    {
+      "file": "tools/viewer/src/components/NodeDetail.tsx",
+      "parent_id": "c9a6fc31d84fae33103857adb4017c991cace91dfcec1169bda9a0a98cf2cc97",
+      "children": 2,
+      "start_line": 60,
+      "end_line": 297,
+      "bytes": 9580,
+      "sha256": "20ec6dd1e54d167993b1c657e92e47e205c26de3eab3daac8964c5d48ea7aec3"
+    },
+    {
+      "file": "docs/graph/archive/SESSION-HANDOFF-2026-05-10.md",
+      "parent_id": "da74a0f1849239d7daa4b4ec160e85b5fb806eca3bc6299d9199632b4bd0a4c2",
+      "children": 3,
+      "start_line": 48,
+      "end_line": 87,
+      "bytes": 7151,
+      "sha256": "ad1c342d0eaf24feb04d14e319b22a7bdfa60f6788e91fa035a0f6591aed05c0"
+    },
+    {
+      "file": "system/docs/remaining-work.md",
+      "parent_id": "d8eb4d99f22d66bedb800504205698b24fd0f90fbdf364171fd8b15673fd0831",
+      "children": 2,
+      "start_line": 142,
+      "end_line": 162,
+      "bytes": 6408,
+      "sha256": "b4bd1670f880f50c575909a9dbe1dc1ca3fcab7724db4d7bf47afc5b782f4521"
+    },
+    {
+      "file": "pkg/graph/evidence/sol_integration_test.go",
+      "parent_id": "0d9884193773b23a8ed4e35154cf6bedaaf5700e0bb9cd4b2abc880bc2297b3b",
+      "children": 2,
+      "start_line": 10,
+      "end_line": 193,
+      "bytes": 6902,
+      "sha256": "4882307afc2bdb9b3c6eaf032bfdb4c6a0501eec11f752a8ce734b36853b83b6"
+    },
+    {
+      "file": "docs/dev/archive/2026-07-28-gap-integration-design.md",
+      "parent_id": "2860c94ae3fa54447dc7e584a8c09b518932354edc8846aa5871590b56457d82",
+      "children": 2,
+      "start_line": 187,
+      "end_line": 296,
+      "bytes": 6353,
+      "sha256": "5cf6213bad6d36d2ec8e7bb067ee6e201bdf58562c59fdbbfa9f0539bd293582"
+    },
+    {
+      "file": "pkg/vector/mcp/server.go",
+      "parent_id": "3685f250c59d33c5d790ab55174f4f5fad653946d556a88c0183c9803376b9e3",
+      "children": 3,
+      "start_line": 141,
+      "end_line": 358,
+      "bytes": 12661,
+      "sha256": "09d8a12ea42ad79ee70ed227bcba9d2c37aa13250cadefd9b29f62b1131ad678"
+    },
+    {
+      "file": "cmd/cks/mcpcli/serve.go",
+      "parent_id": "ef26aedcac6b717c81991b88fecb26b8fd22f77efb60bafd2ce9a8b77e575abc",
+      "children": 2,
+      "start_line": 142,
+      "end_line": 304,
+      "bytes": 6662,
+      "sha256": "067a379aa996352c1c1fd9eb947892556c006f69b6ed8d271e504fa1aa63dc50"
+    },
+    {
+      "file": "internal/graph/validate/schema.go",
+      "parent_id": "b29ecfbe1b7288f13be0fc8c86f3e1249f6617afb2d4898da6845b662d929053",
+      "children": 2,
+      "start_line": 57,
+      "end_line": 277,
+      "bytes": 8635,
+      "sha256": "6374129e01eb3b85ff01e52e470b06b5001f236f990ac4fc7eb0af6a61026bc3"
+    },
+    {
+      "file": "system/docs/remaining-work.md",
+      "parent_id": "6769a5dbc0d7c25db67c229334407b317ab944b9eff3d2195f3c10f35396663f",
+      "children": 3,
+      "start_line": 87,
+      "end_line": 141,
+      "bytes": 9288,
+      "sha256": "b0ad94fea46e84c827f0bc4590f07c2fc37898d8ccc2805dd4f877b4ea7a989c"
+    },
+    {
+      "file": "docs/vector/archive/featurelist.md",
+      "parent_id": "5ee9592e13002343b9e3441fb039776867ec64f32fb1aee50e9cc310112ec771",
+      "children": 3,
+      "start_line": 31,
+      "end_line": 122,
+      "bytes": 9289,
+      "sha256": "80749c102d8b6681781deb5c03a1a81d34624d23330bf40125a44bb938c03d4e"
+    },
+    {
+      "file": "internal/graph/parse/solidity/declarations.go",
+      "parent_id": "e44213a2c72d81f0ae993818d36ee5550d35dde59f69d6a2836b43f0fe9cefc8",
+      "children": 2,
+      "start_line": 97,
+      "end_line": 282,
+      "bytes": 9945,
+      "sha256": "049c7bd0b480005649a93e3a3c6471033f406d0f03196d93b553edb59b45004e"
+    },
+    {
+      "file": "tools/viewer/src/components/TicketIndex.tsx",
+      "parent_id": "bdfc296cce028e0d33d6c3b6a17d8e6c12d05a5b8a15bc89074085f64fbd4e57",
+      "children": 2,
+      "start_line": 27,
+      "end_line": 265,
+      "bytes": 11412,
+      "sha256": "85b6ec5b2c491f0b9a14b2d80941c9dd4326258f6e7fb87ce949b42017536608"
+    },
+    {
+      "file": "cmd/cks/packagecli/verify.go",
+      "parent_id": "23a4cc75afaca82a14c97ea201dceb86f362af596a1d62f381a4a7378583ee04",
+      "children": 2,
+      "start_line": 110,
+      "end_line": 307,
+      "bytes": 7540,
+      "sha256": "ec44610ef92b2d35ac4e59bbbd34ee5f4cc29e2de6d3f20a23fda4090e95a0b0"
+    },
+    {
+      "file": "docs/spec-driven/DESIGN-GATES-EVIDENCE.md",
+      "parent_id": "916e86cd138705b0ca94288f4ab2e0c57d6fbd53cb81c3ca2f6194d3ffae29eb",
+      "children": 2,
+      "start_line": 17,
+      "end_line": 67,
+      "bytes": 7598,
+      "sha256": "785488dc045127477e27d58d4c910f6a56bbdadd03e2225092fca23aa6a7e8a1"
+    },
+    {
+      "file": "system/docs/technical-analysis-2026-05-27.md",
+      "parent_id": "87c8d0d384d9e4d020d340cd3813497136b992450d107b3c51f4ba68857d7c52",
+      "children": 3,
+      "start_line": 285,
+      "end_line": 382,
+      "bytes": 7373,
+      "sha256": "8b2e2feb4ab4907096b746fcc8871a7550b45360c1cf85e5fcb7206122af27b3"
+    },
+    {
+      "file": "internal/system/mcp/alignment.go",
+      "parent_id": "175548e9e5828d707176efe4c0ae41eb18cf0173aff22db8e7791783c0e7fff0",
+      "children": 2,
+      "start_line": 128,
+      "end_line": 257,
+      "bytes": 6221,
+      "sha256": "aee8aa8f139ae3e041a81f394f63a02bc85fa18111846cf86b66ca4b260457e5"
+    },
+    {
+      "file": "docs/spec-driven/SEMANTIC-CONTRACT.md",
+      "parent_id": "4488ab653bd0dd939214f1580d640b902222ed40a740f7228a4ab6bc5dee90b8",
+      "children": 2,
+      "start_line": 61,
+      "end_line": 79,
+      "bytes": 7459,
+      "sha256": "d80a76258bbcf48d48fc423795d4e9f7812385cc9b3da23ebbcfc306d5e925b2"
+    },
+    {
+      "file": "cmd/graph/build.go",
+      "parent_id": "32b2726ae702aa62d7e409b34b18ca7ba6fdf8f4eedfd596ec3bfa4268df760c",
+      "children": 2,
+      "start_line": 16,
+      "end_line": 157,
+      "bytes": 7611,
+      "sha256": "f1545256e247357c82c79d6ab49a63fa3649957e96f9680b434154b49a17eabf"
+    },
+    {
+      "file": "pkg/graph/types/node.go",
+      "parent_id": "0c8f3a0de12b319e999f821fedd7ff96182f8983f15f26fa14d4904c3a85f315",
+      "children": 2,
+      "start_line": 3,
+      "end_line": 165,
+      "bytes": 10114,
+      "sha256": "f5c69082ecdf59024316037f2c43b1a01d3f973b805c83c182d2ecad2aa2ede8"
+    },
+    {
+      "file": "internal/graph/parse/golang/implements.go",
+      "parent_id": "bead720856a85145a88c28eb78d17afbdc6371e1cd45585df337f7368f845aaa",
+      "children": 2,
+      "start_line": 29,
+      "end_line": 202,
+      "bytes": 6154,
+      "sha256": "6e079932752f37924b415364d9a1989a45c6b21acb0f30997b9ebcd13fe1de7f"
+    },
+    {
+      "file": "tools/viewer/src/components/SearchBox.tsx",
+      "parent_id": "2f71d18e5d6d5b6ee1b6fb3187c80958984441acb1459030f126bb5e7e8a76ed",
+      "children": 2,
+      "start_line": 10,
+      "end_line": 186,
+      "bytes": 6795,
+      "sha256": "d241e7e876129c9896a1a7196aa66ce801c592074dd9890fde36b26dc0637ff0"
+    },
+    {
+      "file": "cmd/cks/setupcli/setup.go",
+      "parent_id": "71874dd6a6d0e35f1ff7c4d6cc6a40e4ec0ff263c1f964248daf91147f27f85f",
+      "children": 3,
+      "start_line": 189,
+      "end_line": 473,
+      "bytes": 12815,
+      "sha256": "42803dbcaf6dcd308184fa902253b533c240e93b206bab63f93279f8069c8f88"
+    },
+    {
+      "file": "docs/dev/archive/2026-07-28-gap-integration-design.md",
+      "parent_id": "e471e8b0207ee8ba2e982351a4dc224ead955aaef26927e35b6881002f28a2d6",
+      "children": 2,
+      "start_line": 1,
+      "end_line": 97,
+      "bytes": 6968,
+      "sha256": "958dea6b0d7e4db7f568f6035d365fef5aa7a953f8ef4b5363f1f075eff02dab"
+    },
+    {
+      "file": "internal/graph/buildpipe/incremental.go",
+      "parent_id": "58a1a5961d97c84ac30ca4c97078df9f07f8767d30945612ecd5ffbe376336ae",
+      "children": 2,
+      "start_line": 127,
+      "end_line": 359,
+      "bytes": 11597,
+      "sha256": "4b3b64bc065529d0e8032f0e17b596c1b14ce1b2b842e030fd299c11b388a07c"
+    },
+    {
+      "file": "internal/graph/buildpipe/pipeline.go",
+      "parent_id": "f4ad7628021211d393ae5505393ba5f33a02bfdd577f96daa2aa8b194b3071cf",
+      "children": 3,
+      "start_line": 303,
+      "end_line": 547,
+      "bytes": 11442,
+      "sha256": "788917e399e07deb748be2f9d92570e2411417fd56f22a5e8179002ee81ec130"
+    },
+    {
+      "file": "internal/system/knowledgepack/instances.go",
+      "parent_id": "cc5893e59a22688366726ef29dc800641f6e7a2c751cd3b4f41cb6f9ea3b1274",
+      "children": 2,
+      "start_line": 258,
+      "end_line": 467,
+      "bytes": 7388,
+      "sha256": "988aeb16daeced7fb26ccc6ae45d3c946df858aa46085a596a4b867ff09aead2"
+    },
+    {
+      "file": "internal/setup/reindex.go",
+      "parent_id": "ecbedb2e45a0a34ae42a49c6189854887b5eae993dec4cbb05b8a6a27127ce0d",
+      "children": 2,
+      "start_line": 516,
+      "end_line": 685,
+      "bytes": 6208,
+      "sha256": "7d95786ed5bd3f24bd90cfb995b08cb280eee2ae188eb64a263661a856b7620b"
+    },
+    {
+      "file": "pkg/graph/types/enums.go",
+      "parent_id": "2f54214bd3fa3d3c510e0e21d3396d4e95ef149936d75f16a068e6d892fe81d5",
+      "children": 2,
+      "start_line": 226,
+      "end_line": 436,
+      "bytes": 12166,
+      "sha256": "d8e9afe1454489c906b45c22cfe60da92bb1ea4e5d9144e078c33ab8bd085a81"
+    },
+    {
+      "file": "internal/graph/parse/golang/statements.go",
+      "parent_id": "26d1da8287777eb2532a8e48296f1a4b32f86275f72b03ace7d5c506e75fb2dc",
+      "children": 2,
+      "start_line": 13,
+      "end_line": 154,
+      "bytes": 6686,
+      "sha256": "8c89335f8cc51c2cb7a6f31996414299093d8e4e66e544dd1612f31e614cf788"
+    },
+    {
+      "file": "tools/viewer/src/components/NodeList.tsx",
+      "parent_id": "66682cc2c6957dab68d865fa5297924307637e8134da46e8407f9620b8ed80d8",
+      "children": 2,
+      "start_line": 31,
+      "end_line": 230,
+      "bytes": 8178,
+      "sha256": "2f502522608b9cfe4e015e419ce5d30e0c2d13f03bc8f93aea5dd609b7727f54"
+    }
+  ],
+  "vector_db_sha256": "5d72ff9325c859fc79852202c13cd3078463c702f92f2b6bf8d3d6eae33b124d",
+  "errors": [],
+  "quality_metrics": null
+}

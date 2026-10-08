@@ -1,0 +1,194 @@
+{
+  "schema_version": 4,
+  "snapshot": {
+    "project_id": "f-06-dev",
+    "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+    "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+    "source_mode": "committed",
+    "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+  },
+  "evidence": [
+    {
+      "id": "evidence:994d0bfc9dc5bf0aee5d1b90",
+      "snapshot": {
+        "project_id": "f-06-dev",
+        "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+        "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+        "source_mode": "committed",
+        "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+      },
+      "kind": "document",
+      "path": "README.md",
+      "start_line": 1,
+      "end_line": 3,
+      "content_sha256": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+      "extractor": "ckv-markdown-v1"
+    },
+    {
+      "id": "ontology:c2261f2f90d0094af0bebbcd",
+      "snapshot": {
+        "project_id": "f-06-dev",
+        "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+        "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+        "source_mode": "committed",
+        "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+      },
+      "kind": "document",
+      "path": "ontology.yaml",
+      "start_line": 10,
+      "end_line": 36,
+      "content_sha256": "16320ae40f0912c363bf9baea89e8c3855a43ab30cf8c385e727e50ffa0641d5",
+      "extractor": "ontology-yaml-v1"
+    },
+    {
+      "id": "spec:ba55f0055733952cb52c947c",
+      "snapshot": {
+        "project_id": "f-06-dev",
+        "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+        "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+        "source_mode": "committed",
+        "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+      },
+      "kind": "document",
+      "path": "spec.yaml",
+      "start_line": 5,
+      "end_line": 25,
+      "content_sha256": "cf34f66d134571e365ac08aa0bb7a675d1618da600a92e9a9c901f8685d57dff",
+      "extractor": "spec-yaml-v1"
+    },
+    {
+      "id": "criterion:1597cf2597f1554c18bd55e4",
+      "snapshot": {
+        "project_id": "f-06-dev",
+        "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+        "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+        "source_mode": "committed",
+        "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+      },
+      "kind": "document",
+      "path": "spec.yaml",
+      "start_line": 15,
+      "end_line": 25,
+      "content_sha256": "bf6a73a482f68c7042c41bc06fb39ddfa4c1559542c86fe6434c8feb65caac72",
+      "extractor": "spec-yaml-v1"
+    },
+    {
+      "id": "fixture:code:RefundLimit",
+      "snapshot": {
+        "project_id": "f-06-dev",
+        "dataset_id": "c3a02cd33218f42ddb79fdf215f37f10a7b95caad6a9ad1f1c915449e05d2991",
+        "snapshot_id": "6192857cbc1be8a5160cc5c7e0b5b41083bf05ce21dc282f447221d834f1a8b3",
+        "source_mode": "committed",
+        "commit": "5e405adbc0aa91a145bf98293d972f000826ac57"
+      },
+      "kind": "code",
+      "path": "main.go",
+      "start_line": 3,
+      "end_line": 3,
+      "content_sha256": "234d947fc962ad0791dfe59b17d1359b3f81227453526dc1b22c39c4f8625b54",
+      "canonical_id": "example.com/b0dev.RefundLimit",
+      "extractor": "b0-approved-sf-source-v1"
+    }
+  ],
+  "sections": [
+    {
+      "id": "section:994d0bfc9dc5bf0aee5d1b90",
+      "heading": "Refund requirement",
+      "heading_path": [
+        "Refund requirement"
+      ],
+      "evidence_id": "evidence:994d0bfc9dc5bf0aee5d1b90",
+      "chunk_ids": [
+        "a1533d7f05bc58757caa84e42b62e8a225ac2c07fb03ea260ac5ca7bfb059ef6"
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "refund-cap",
+      "kind": "process",
+      "definition": "The fixture refund limit operation, whose required cap and observed return value are separate facts.",
+      "includes": [
+        "Source-backed function identity"
+      ],
+      "excludes": [
+        "Automatic policy compliance or acceptance"
+      ],
+      "terms": [
+        {
+          "lang": "en",
+          "value": "RefundLimit",
+          "preferred": true
+        },
+        {
+          "lang": "ko",
+          "value": "환급 상한",
+          "preferred": true
+        }
+      ],
+      "evidence_id": "ontology:c2261f2f90d0094af0bebbcd",
+      "status": "verified",
+      "reviewed_by": "chat-user"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-refund-cap",
+      "version": 1,
+      "title": "Documented fixture refund cap",
+      "statement": "RefundLimit must return a value no greater than 10.",
+      "status": "verified",
+      "reviewed_by": "chat-user",
+      "evidence_id": "spec:ba55f0055733952cb52c947c",
+      "concept_ids": [
+        "refund-cap"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "ac-refund-cap",
+          "given": "The fixture RefundLimit implementation",
+          "when": "RefundLimit is invoked",
+          "then": "Its returned value is no greater than 10.",
+          "evidence_id": "criterion:1597cf2597f1554c18bd55e4"
+        }
+      ]
+    }
+  ],
+  "claims": null,
+  "knowledge": {
+    "lock_digest": "e9ff3743722f7f41f951e4d96186d49fdbf54ca3a56d844d0541422ca130ba39",
+    "packs": [
+      {
+        "pack_id": "fixture.refund",
+        "version": "1.0.0",
+        "digest": "c02c3981602ec41bd35ea540b91472bdd51843c79d03a76480ff90d200eb0998",
+        "origin_id": "knowledge:fixture.refund",
+        "source_sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "concepts": [
+          {
+            "pack_id": "fixture.refund",
+            "local_id": "business-policy",
+            "kind": "rule",
+            "definition": "A project-scoped synthetic refund requirement; the type does not approve any instance."
+          }
+        ],
+        "relations": [],
+        "constraints": []
+      }
+    ]
+  },
+  "assertions": [
+    {
+      "id": "fixture:implementation:RefundLimit",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "refund-cap",
+      "object_id": "example.com/b0dev.RefundLimit",
+      "evidence_ids": [
+        "ontology:c2261f2f90d0094af0bebbcd",
+        "fixture:code:RefundLimit"
+      ],
+      "status": "verified",
+      "reviewed_by": "chat-user"
+    }
+  ]
+}

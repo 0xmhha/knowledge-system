@@ -1,0 +1,163 @@
+package mcp
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/evidencev2"
+	"strings"
+	"testing"
+
+	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
+	mcpgo "github.com/mark3labs/mcp-go/mcp"
+)
+
+func TestV2ToolClassifiesLegacyDatasetBeforeBackendHealth(t *testing.T) {
+	f := newFixture(t, nil)
+	cleaner, err := sanitize.New(f.ruleset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.deps.EvidenceVersionDir = t.TempDir() // no pinned v2 identity
+	f.deps.EvidenceSanitizer = cleaner
+	f.ckv.HealthVal.ModelReachable = false
+	result, err := handleGetForTaskV2(context.Background(), f.deps, callToolReq(map[string]any{"prompt": "explain Alpha"}))
+	if err != nil || result == nil || !result.IsError {
+		t.Fatalf("legacy v2 request lacked a public error: %+v %v", result, err)
+	}
+	structured := result.StructuredContent.(map[string]string)
+	if structured["code"] != "reindex_required" {
+		t.Fatalf("backend error hid the required v1 migration: %+v", structured)
+	}
+}
+
+func TestV2ToolErrorHasMatchingStructuredCodeAndBoundedText(t *testing.T) {
+	for _, code := range []string{"reindex_required", "snapshot_mismatch", "knowledge_context_failed", "budget_exceeded"} {
+		result := v2ToolError(code)
+		structured, ok := result.StructuredContent.(map[string]string)
+		if !ok || !result.IsError || len(result.Content) != 1 || structured["code"] == "" || structured["message"] == "" {
+			t.Fatalf("missing structured v2 error for %q: %+v", code, result)
+		}
+		body, ok := result.Content[0].(mcpgo.TextContent)
+		if !ok || !strings.HasPrefix(body.Text, "code="+structured["code"]+": ") ||
+			strings.Contains(body.Text, "/tmp/") {
+			t.Fatalf("unbounded v2 error text for %q: %+v", code, result.Content)
+		}
+	}
+}
+
+func TestV2ToolErrorForKeepsSpecificCodeWithoutSourceDetails(t *testing.T) {
+	result := v2ToolErrorFor(fmt.Errorf("read /tmp/secret.txt: snapshot_mismatch: API_KEY=value"), "v2_evidence_failed")
+	structured := result.StructuredContent.(map[string]string)
+	text := result.Content[0].(mcpgo.TextContent).Text
+	if structured["code"] != "snapshot_mismatch" || strings.Contains(text, "secret.txt") || strings.Contains(text, "API_KEY") {
+		t.Fatalf("specific code or redaction failed: %+v", result)
+	}
+}
+
+// These mutations happen after publication: the caller must be told whether
+// retained bytes are missing or inconsistent, even when a backend is down.
+func TestV2PreflightPreservesPinnedFailureCode(t *testing.T) {
+	for _, tc := range []struct {
+		name, code string
+		mutate     func(*testing.T, string)
+	}{
+		{"changed_blob", "snapshot_mismatch", func(t *testing.T, v string) {
+			files, err := os.ReadDir(filepath.Join(v, "sources", "blobs"))
+			if err != nil || len(files) != 1 {
+				t.Fatalf("blobs: %v %v", files, err)
+			}
+			p := filepath.Join(v, "sources", "blobs", files[0].Name())
+			if err := os.Chmod(p, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(p, []byte("PRIVATE_TOKEN=never-return-this\n"), 0600); err != nil {
+				t.Fatal(err)
+			}
+		}},
+		{"missing_blob", "source_missing", func(t *testing.T, v string) {
+			if err := os.RemoveAll(filepath.Join(v, "sources", "blobs")); err != nil {
+				t.Fatal(err)
+			}
+		}},
+		{"mixed_snapshot", "snapshot_mismatch", func(t *testing.T, v string) { mutatePinnedManifest(t, v, "snapshot_id", "other-state") }},
+		{"mixed_project", "snapshot_mismatch", func(t *testing.T, v string) { mutatePinnedManifest(t, v, "project_id", "other-project") }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			version := newPinnedV2ErrorFixture(t)
+			if identity, err := setup.InspectVersionIdentity(version); err != nil || identity == nil {
+				t.Fatalf("invalid control: %v %v", identity, err)
+			}
+			tc.mutate(t, version)
+			_, inspectErr := setup.InspectVersionIdentity(version)
+			if inspectErr == nil || !strings.Contains(inspectErr.Error(), tc.code) {
+				t.Errorf("preflight code: want %s got %v", tc.code, inspectErr)
+			}
+			f := newFixture(t, nil)
+			cleaner, err := sanitize.New(f.ruleset)
+			if err != nil {
+				t.Fatal(err)
+			}
+			f.deps.EvidenceVersionDir, f.deps.EvidenceSanitizer = version, cleaner
+			f.ckv.HealthVal.ModelReachable = false
+			result, err := handleGetForTaskV2(context.Background(), f.deps, callToolReq(map[string]any{"prompt": "Alpha"}))
+			if err != nil || result == nil || !result.IsError {
+				t.Fatalf("missing tool rejection: %v %v", result, err)
+			}
+			structured, ok := result.StructuredContent.(map[string]string)
+			if !ok || structured["code"] != tc.code {
+				t.Fatalf("want %s got %+v", tc.code, result)
+			}
+			encoded, err := json.Marshal(result)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, private := range []string{version, "PRIVATE_TOKEN", "never-return-this", "other-state", "other-project"} {
+				if strings.Contains(string(encoded), private) {
+					t.Fatalf("private detail leaked: %s", private)
+				}
+			}
+		})
+	}
+}
+
+func mutatePinnedManifest(t *testing.T, version, key, value string) {
+	t.Helper()
+	p := filepath.Join(version, "vector", "manifest.json")
+	raw, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m map[string]any
+	if err := json.Unmarshal(raw, &m); err != nil {
+		t.Fatal(err)
+	}
+	m[key] = value
+	raw, err = json.Marshal(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(p, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestV2BudgetErrorRequiresTypedCause(t *testing.T) {
+	for _, tc := range []struct {
+		err  error
+		code string
+	}{
+		{fmt.Errorf("request: %w", evidencev2.ErrEvidenceBudget), "budget_exceeded"},
+		{fmt.Errorf("read /private/tmp/budget_exceeded.txt: denied"), "v2_evidence_failed"},
+	} {
+		result := v2ToolErrorFor(tc.err, "v2_evidence_failed")
+		got := result.StructuredContent.(map[string]string)
+		if got["code"] != tc.code || strings.Contains(got["message"], "/private/") {
+			t.Fatalf("unsafe budget error: %+v", got)
+		}
+	}
+}

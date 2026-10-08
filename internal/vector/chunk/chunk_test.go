@@ -3,10 +3,80 @@ package chunk
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/parse"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
+
+func TestByteBudgetPreservesLongMarkdownAndOneLineFunction(t *testing.T) {
+	const budget = 6144
+	for _, tc := range []struct {
+		name, file, language string
+		kind                 types.SymbolKind
+		text                 string
+		wantKind             types.ChunkKind
+	}{
+		{"markdown", "docs/long.md", "markdown", types.KindDocSection,
+			"# Decision\n" + strings.Repeat("정책과 근거를 보존한다.\n", 1800) + "TAIL_EVIDENCE", types.ChunkDoc},
+		{"one-line function", "x.go", "go", types.KindFunction,
+			"func Huge() { /* " + strings.Repeat("계약", 2500) + " */ }", types.ChunkFunctionSplit},
+		{"long type", "x.go", "go", types.KindStruct,
+			"type Huge struct {\n" + strings.Repeat(" Field string\n", 900) + "}", types.ChunkSymbol},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sp := parse.SymbolSpan{Name: "Huge", Kind: tc.kind, StartLine: 10,
+				EndLine: 10 + strings.Count(tc.text, "\n"), Text: tc.text}
+			chunks := New(Options{MaxInputTokens: 8192, MaxTextBytes: budget}).Chunk(Input{
+				File: tc.file, Language: tc.language, Source: []byte(tc.text), Spans: []parse.SymbolSpan{sp},
+			})
+			var joined strings.Builder
+			seen := map[string]bool{}
+			count := 0
+			for _, c := range chunks {
+				if c.ParentID == "" {
+					continue // file header is supplementary
+				}
+				count++
+				if c.ChunkKind != tc.wantKind || len(c.Text) > budget || !utf8.ValidString(c.Text) {
+					t.Errorf("invalid child: kind=%s bytes=%d validUTF8=%v", c.ChunkKind, len(c.Text), utf8.ValidString(c.Text))
+				}
+				if c.StartLine < sp.StartLine || c.EndLine > sp.EndLine || c.PartOrdinal != count || seen[c.ID] {
+					t.Errorf("invalid citation/order/ID in child %d: %+v", count, c)
+				}
+				seen[c.ID] = true
+				joined.WriteString(c.Text)
+			}
+			if count < 2 || joined.String() != tc.text {
+				t.Fatalf("split failed to preserve source: children=%d, source=%d bytes, joined=%d bytes", count, len(tc.text), joined.Len())
+			}
+		})
+	}
+}
+
+func TestByteBudgetTruncatedSupplementaryChunkRemainsUTF8(t *testing.T) {
+	text := strings.Repeat("계약", 100)
+	chunker := New(Options{MaxInputTokens: 8192, MaxTextBytes: 65, IncludeFileFull: true})
+	got := chunker.maybeTruncate(text)
+	if len(got) > 65 || !utf8.ValidString(got) || !strings.HasSuffix(got, "[CKV-TRUNCATED]") {
+		t.Fatalf("invalid UTF-8 supplementary truncation: bytes=%d text=%q", len(got), got)
+	}
+	for _, c := range chunker.Chunk(Input{File: "x.go", Language: "go", Source: []byte(text)}) {
+		if c.ContentSHA256 != types.ContentSHA256(c.Text) {
+			t.Errorf("%s hash does not match stored text", c.ChunkKind)
+		}
+	}
+}
+
+func TestSummarizeDoesNotCountMarkerInsideSourceLiteral(t *testing.T) {
+	chunks := []types.Chunk{
+		{Text: `func Example() string { return "[CKV-TRUNCATED]" }`},
+		{Text: "head\n// ... [CKV-TRUNCATED]"},
+	}
+	if got := Summarize(chunks).Truncated; got != 1 {
+		t.Fatalf("truncated count = %d, want only the appended marker", got)
+	}
+}
 
 func TestChunkSymbolAndFileHeader(t *testing.T) {
 	src := []byte(`package x
@@ -85,6 +155,37 @@ func B() { fmt.Println("b") }
 	}
 }
 
+func TestFileChunksDoNotCitePhantomLineAfterFinalNewline(t *testing.T) {
+	for _, source := range []string{"package x\n\nfunc Alpha() {}\n", "package x\n\nfunc Alpha() {}", "package x\n\nfunc Alpha() {}\n\n"} {
+		in := Input{File: "main.go", Language: "go", CommitHash: "fixture", Source: []byte(source)}
+		chunks := New(Options{IncludeFileFull: true}).Chunk(in)
+		want := len(strings.Split(strings.TrimSuffix(source, "\n"), "\n"))
+		seen := 0
+		for _, chunk := range chunks {
+			if chunk.ChunkKind != types.ChunkFileFull && chunk.ChunkKind != types.ChunkFileHeader {
+				continue
+			}
+			seen++
+			if chunk.StartLine != 1 || chunk.EndLine != want {
+				t.Fatalf("%s source=%q cites %d-%d; source has %d physical lines", chunk.ChunkKind, source, chunk.StartLine, chunk.EndLine, want)
+			}
+		}
+		if seen != 2 {
+			t.Fatalf("expected full and header chunks, got %d", seen)
+		}
+	}
+}
+
+func TestFileHeaderLineLimitPreservesPhysicalSpan(t *testing.T) {
+	for _, source := range []string{"package x\nfunc A() {}\n", "package x\nfunc A() {}\nfunc B() {}\n", "package x\nfunc A() {}\nfunc B() {}"} {
+		in := Input{File: "main.go", Language: "go", Source: []byte(source)}
+		chunks := New(Options{FileHeaderLines: 2}).Chunk(in)
+		if len(chunks) != 1 || chunks[0].StartLine != 1 || chunks[0].EndLine != 2 || chunks[0].Text != "package x\nfunc A() {}" {
+			t.Fatalf("header limit source=%q: %+v", source, chunks)
+		}
+	}
+}
+
 func TestChunkIDsDeterministic(t *testing.T) {
 	in := Input{
 		File:       "x.go",
@@ -104,6 +205,93 @@ func TestChunkIDsDeterministic(t *testing.T) {
 		if a[i].ID != b[i].ID {
 			t.Errorf("chunk %d id differs: %s vs %s", i, a[i].ID, b[i].ID)
 		}
+	}
+}
+
+func TestLongMarkdownSectionKeepsTailAndLineCitations(t *testing.T) {
+	text := "# Decision\n\n" + strings.Repeat("A short opening paragraph.\n", 8) +
+		"\nThe final requirement is QUORUM_TAIL.\n"
+	in := Input{
+		File: "docs/decision.md", Language: "markdown", CommitHash: "abc",
+		Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "decision", Kind: types.KindDocSection,
+			StartLine: 1, EndLine: strings.Count(text, "\n"), Text: text,
+			HeadingPath: []string{"Architecture", "Decision"}}},
+	}
+	chunks := New(Options{MaxInputTokens: 20}).Chunk(in)
+	if len(chunks) < 2 {
+		t.Fatalf("long section was not split: %d chunks", len(chunks))
+	}
+	var combined strings.Builder
+	parentID := chunks[0].ParentID
+	for i, ch := range chunks {
+		if ch.ChunkKind != types.ChunkDoc {
+			t.Fatalf("unexpected kind: %s", ch.ChunkKind)
+		}
+		if len(ch.Text) > 20*charsPerToken {
+			t.Fatalf("child too long: %d", len(ch.Text))
+		}
+		if parentID == "" || ch.ParentID != parentID || ch.ParentStartLine != 1 || ch.ParentEndLine != in.Spans[0].EndLine || ch.PartOrdinal != i+1 {
+			t.Fatalf("invalid parent/ordinal metadata: %+v", ch)
+		}
+		if len(ch.HeadingPath) != 2 || ch.HeadingPath[1] != "Decision" {
+			t.Fatalf("heading path lost: %+v", ch.HeadingPath)
+		}
+		combined.WriteString(ch.Text)
+	}
+	if combined.String() != text {
+		t.Fatalf("section content changed or lost")
+	}
+	last := chunks[len(chunks)-1]
+	if !strings.Contains(last.Text, "QUORUM_TAIL") || last.EndLine != in.Spans[0].EndLine {
+		t.Fatalf("tail missing or cited at wrong line: %+v", last)
+	}
+}
+
+func TestLongSingleMarkdownLineHasDistinctChildIDs(t *testing.T) {
+	text := "# Heading\n" + strings.Repeat("A", 160) + "\n"
+	in := Input{File: "long.md", Language: "markdown", CommitHash: "abc", Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "heading", Kind: types.KindDocSection, StartLine: 1, EndLine: 2, Text: text}}}
+	chunks := New(Options{MaxInputTokens: 20}).Chunk(in)
+	seen := map[string]bool{}
+	var joined strings.Builder
+	for _, ch := range chunks {
+		if seen[ch.ID] {
+			t.Fatalf("duplicate ID for repeated fragment: %s", ch.ID)
+		}
+		seen[ch.ID] = true
+		joined.WriteString(ch.Text)
+	}
+	if joined.String() != text {
+		t.Fatalf("single-line split lost source text")
+	}
+}
+
+func TestLongMarkdownSplitPrefersFenceAndListBoundaries(t *testing.T) {
+	if got := docBoundaryCut([]string{"```go\n", "alpha\n", "\n", "beta\n", "```\n", "tail\n"}); got != 5 {
+		t.Fatalf("split inside fenced code block at %d", got)
+	}
+	if got := docBoundaryCut([]string{"- first\n", "  continuation\n", "- second\n"}); got != 2 {
+		t.Fatalf("split inside list item at %d", got)
+	}
+	text := "# Guide\n" + "```go\n" + strings.Repeat("fmt.Println(1)\n", 5) + "```\n" +
+		"- first item\n" + "  continuation\n" + "- second item\n" + strings.Repeat("tail line\n", 8)
+	in := Input{File: "guide.md", Language: "markdown", CommitHash: "abc", Source: []byte(text),
+		Spans: []parse.SymbolSpan{{Name: "guide", Kind: types.KindDocSection, StartLine: 1,
+			EndLine: strings.Count(text, "\n"), Text: text}}}
+	chunks := New(Options{MaxInputTokens: 30}).Chunk(in)
+	if len(chunks) < 2 {
+		t.Fatalf("expected split, got %d", len(chunks))
+	}
+	var combined strings.Builder
+	for _, part := range chunks {
+		if len(part.Text) > 30*charsPerToken {
+			t.Fatalf("child exceeds embedding cap: %d bytes", len(part.Text))
+		}
+		combined.WriteString(part.Text)
+	}
+	if combined.String() != text {
+		t.Fatal("split did not preserve fenced/list source bytes")
 	}
 }
 
@@ -328,10 +516,12 @@ func TestMarkdownSkipsFileHeader(t *testing.T) {
 // coverage and the flow-corpus chunk kinds.
 func TestSummarize_CanonicalAndFlow(t *testing.T) {
 	chunks := []types.Chunk{
-		{ChunkKind: types.ChunkSymbol, CanonicalID: "pkg.A"},
+		{ChunkKind: types.ChunkSymbol, CanonicalID: "pkg.A", StartLine: 1},
 		{ChunkKind: types.ChunkSymbol}, // unaligned: no canonical_id
 		{ChunkKind: types.ChunkFlowStep, CanonicalID: "pkg.B"},
 		{ChunkKind: types.ChunkFlowSpine},
+		{ChunkKind: types.ChunkFileHeader, CanonicalID: "pkg.C"},
+		{ChunkKind: types.ChunkFunctionSplit, CanonicalID: "pkg.D", StartLine: 2},
 	}
 	s := Summarize(chunks)
 	if s.CanonicalID != 2 {
@@ -340,7 +530,7 @@ func TestSummarize_CanonicalAndFlow(t *testing.T) {
 	if s.FlowStep != 1 || s.FlowSpine != 1 {
 		t.Errorf("flow counts = step %d / spine %d, want 1 / 1", s.FlowStep, s.FlowSpine)
 	}
-	if s.Symbol != 2 || s.Total != 4 {
-		t.Errorf("symbol=%d total=%d, want 2 / 4", s.Symbol, s.Total)
+	if s.Symbol != 3 || s.Total != 6 {
+		t.Errorf("symbol=%d total=%d, want 3 / 6", s.Symbol, s.Total)
 	}
 }

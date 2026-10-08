@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "b0-policy-01",
+  "prompt": "같은 범위와 시점에 적용되는 검토된 프로젝트 정책 두 개가 충돌하면 어느 쪽을 자동 우선해야 하나요?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+      "start_line": 23,
+      "end_line": 23,
+      "anchor": "**검토된 프로젝트 정책이라도** 다른 검토된 프로젝트 정책과 충돌하면 자동 우선순위를 부여하지 않는다."
+    },
+    {
+      "file": "internal/system/knowledgepack/instances.go",
+      "start_line": 195,
+      "end_line": 242,
+      "anchor": "func (i Instances) SelectPolicies(asOf string, queryScope map[string]string, allowRestricted bool) (PolicyContext, error) {"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+import json,hashlib,sqlite3,subprocess,importlib.util
+root=Path.cwd();out=Path('/private/tmp/ks-approved-dynamic-dev-20261006');sf=Path('/private/tmp/ks-approved-semantic-20261006');data=root/'system/eval/b0-knowledge-system'
+sha=lambda raw:hashlib.sha256(raw).hexdigest();read=lambda p:json.loads(p.read_bytes())
+locks=[data/n for n in ['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json']];before={str(p):sha(p.read_bytes())for p in locks}
+book=read(data/'dynamic-fixtures-m2max-draft.json');fixtures={f['id']:f for f in book['fixtures']if f['evaluation_partition']=='development'}
+records=read(out/'built-manifest.json')['cases']+read(sf/'approved-built-manifest.json')['cases'];results=[]
+spec=importlib.util.spec_from_file_location('f02',root/'scripts/b0-audit-f02-document.py');doc=importlib.util.module_from_spec(spec);spec.loader.exec_module(doc)
+for case in records:
+ label=case['id'];fixture=fixtures[label.rsplit('-',1)[0]]
+ assert fixture['review_state']=='approved'and fixture['reviewer']=='chat-user'
+ version=Path(case['version_dir']);identity=read(version/'dataset-identity.json');manifest=read(version/'vector/manifest.json');captured=read(version/'sources/manifest.json')
+ assert identity==case['dataset']and captured['identity']==identity['source']
+ model=manifest['embedding_identity_v2'];assert model['model_digest']=='7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab'and model['Dim']==1024
+ repo=Path(manifest['src_root']);commit=identity['source']['source_commit'];source={}
+ for f in captured['files']:
+  raw=(version/'sources/blobs'/f['sha256']).read_bytes();assert sha(raw)==f['sha256']and len(raw)==f['size']
+  if f['origin_id']=='repo':
+   committed=subprocess.run(['git','show',commit+':'+f['path']],cwd=repo,check=True,capture_output=True).stdout;assert raw==committed;source[f['path']]=raw
+ for f in manifest['input_files']:assert sha(source[f['path']])==f['sha256']
+ dbpath=version/'vector/vector.db';database_before=sha(dbpath.read_bytes())
+ with sqlite3.connect(dbpath.as_uri()+'?mode=ro&immutable=1',uri=True)as db:
+  db.row_factory=sqlite3.Row;rows=[dict(x)for x in db.execute('SELECT * FROM chunks ORDER BY id')]
+  assert len(rows)==manifest['chunk_count'];parents=defaultdict(list);physical=0;generated=0
+  for c in rows:
+   text=c['text'].encode();assert sha(text)==c['content_sha256']and 0<len(text)<=6144 and c['commit_hash']==commit
+   if c['chunk_kind']in['convention','invariant']:generated+=1
+   else:
+    raw=source[c['file']];ls=raw.splitlines(keepends=True);assert 1<=c['start_line']<=c['end_line']<=len(ls)and text in b''.join(ls[c['start_line']-1:c['end_line']]);physical+=1
+   if c['parent_id']:parents[(c['file'],c['parent_id'])].append(c)
+  for (file,parent),children in parents.items():
+   children.sort(key=lambda c:c['part_ordinal']);start,end=children[0]['parent_start_line'],children[0]['parent_end_line'];joined=b''.join(c['text'].encode()for c in children)
+   assert [c['part_ordinal']for c in children]==list(range(1,len(children)+1));assert parent==sha((file+'\n'+str(start)+':'+str(end)+'\n'+sha(joined)).encode());assert joined in b''.join(source[file].splitlines(keepends=True)[start-1:end])
+  f02=None
+  if fixture['family']=='F-02':
+   children=[dict(c,heading_path=json.loads(c['heading_path']))for c in rows if c['chunk_kind']=='doc'];f02=doc.audit_children(children,fixture,source['docs/decision.md'],commit,6144)
+ native=subprocess.run(['/private/tmp/ks-approved-scope-20261006/runtime-v2-body/vector-integrity',str(dbpath)],check=True,capture_output=True)
+ integrity=json.loads(native.stdout);assert integrity['Chunks']==integrity['Vectors']==len(rows)
+ assert database_before==sha(dbpath.read_bytes())==manifest['db_sha256']
+ result={'id':label,'status':'pass','dataset_id':identity['dataset_id'],'source_commit':commit,'source_files':len(source),'chunks':len(rows),'physical_checks':physical,'generated':generated,'split_parents':len(parents),'vector_integrity':integrity,'vector_db_sha256':database_before,'source_sha256':{p:sha(b)for p,b in source.items()},'f02':f02};results.append(result)
+ (out/'source-vector-audit.json').write_text(json.dumps({'schema_version':1,'status':'running','partition':'development','results':results},ensure_ascii=False,indent=2)+'\n')
+after={str(p):sha(p.read_bytes())for p in locks};assert before==after
+record={'schema_version':1,'status':'pass','partition':'development','approved_inputs_sha256':before,'inputs_unchanged':True,'datasets':len(results),'results':results,'quality_metrics':None,'scope':'strict retained source/chunk/split/vector audit; query/claim/state oracles separate'}
+(out/'source-vector-audit.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'status':'pass','datasets':len(results),'chunks':sum(c['chunks']for c in results)}))

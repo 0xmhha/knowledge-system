@@ -2,13 +2,96 @@ package eval
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 	"testing"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
+
+func TestRunner_RecordResponses_PreservesErrorsAndDoesNotLeakAcrossScenarios(t *testing.T) {
+	t.Parallel()
+	for _, transportFailure := range []bool{false, true} {
+		t.Run(fmt.Sprintf("transport=%t", transportFailure), func(t *testing.T) {
+			m := &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{
+				toolGetForTask: errorResult("structured tool failure"),
+			}, callErr: map[string]error{}}
+			if transportFailure {
+				m.callErr[toolGetForTask] = errors.New("transport failed")
+			}
+			r := &Runner{client: m, recordResponses: true}
+			s := &Scenario{Version: 1, Name: "raw-errors", Prompt: "raw query", Runs: 2, MatchMode: MatchOverlap}
+			out, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if out.RetrievalState != "error" || len(out.RawCalls) != 2 {
+				t.Fatalf("lost failed runs: %+v", out)
+			}
+			for _, call := range out.RawCalls {
+				if call.Tool != toolGetForTask || call.ElapsedNS < 0 {
+					t.Fatalf("bad call: %+v", call)
+				}
+				var args map[string]any
+				if err := json.Unmarshal(call.Arguments, &args); err != nil {
+					t.Fatal(err)
+				}
+				if args["prompt"] != s.Prompt || len(args) != 1 {
+					t.Fatalf("gold leaked into request: %v", args)
+				}
+				if transportFailure {
+					if call.TransportError != "transport failed" || len(call.Response) != 0 {
+						t.Fatalf("lost transport error: %+v", call)
+					}
+				} else {
+					var wire mcpgo.CallToolResult
+					if err := json.Unmarshal(call.Response, &wire); err != nil {
+						t.Fatal(err)
+					}
+					if !wire.IsError || concatText(&wire) != "structured tool failure" {
+						t.Fatalf("lost tool error: %s", call.Response)
+					}
+				}
+			}
+			delete(m.callErr, toolGetForTask)
+			response := packResult(contract.EvidencePack{Query: "second", Citations: []contract.Citation{cit("main.go", 3, 3)}})
+			m.callOut[toolGetForTask] = response
+			s.Runs = 1
+			second, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(second.RawCalls) != 1 || len(out.RawCalls) != 2 {
+				t.Fatal("raw records leaked across scenarios")
+			}
+			var restored mcpgo.CallToolResult
+			if err := json.Unmarshal(second.RawCalls[0].Response, &restored); err != nil {
+				t.Fatal(err)
+			}
+			pack, err := decodePack(&restored)
+			if err != nil || len(pack.Citations) != 1 || pack.Citations[0].File != "main.go" {
+				t.Fatalf("lost raw citations: %v %v", pack, err)
+			}
+			response.StructuredContent = nil
+			if !strings.Contains(string(second.RawCalls[0].Response), "main.go") {
+				t.Fatal("record mutated with client response")
+			}
+			r.recordResponses = false
+			third, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			encoded, err := json.Marshal(third)
+			if err != nil || strings.Contains(string(encoded), "raw_calls") {
+				t.Fatalf("default report changed: %s %v", encoded, err)
+			}
+		})
+	}
+}
 
 // --- mockMCPClient ---
 
@@ -127,6 +210,90 @@ func TestRunner_Execute_HappyPath_ComputesMetrics(t *testing.T) {
 	}
 }
 
+func TestRunner_Execute_CitationAbstention(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		citations []contract.Citation
+		want      bool
+	}{
+		{name: "none", want: true},
+		{name: "unrelated", citations: []contract.Citation{cit("unrelated.go", 1, 2)}, want: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pack := contract.EvidencePack{Query: "missing API", Citations: tc.citations}
+			r := &Runner{client: &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{toolGetForTask: packResult(pack)}}}
+			s := &Scenario{Version: 1, Name: "missing-api", Prompt: "missing API", MatchMode: MatchOverlap, Runs: 1, ExpectNoCitations: true}
+			got, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.CitationAbstentionPassed == nil || *got.CitationAbstentionPassed != tc.want {
+				t.Fatalf("citation abstention=%v, want %v", got.CitationAbstentionPassed, tc.want)
+			}
+		})
+	}
+}
+
+func TestRunner_Execute_SeparatesRetrievalEvidenceAbstentionAndSnapshot(t *testing.T) {
+	current := strings.Repeat("a", 40)
+	stale := strings.Repeat("b", 40)
+	for _, tc := range []struct {
+		name           string
+		pack           contract.EvidencePack
+		head           string
+		expected       []contract.Citation
+		knowledge      []string
+		noCitations    bool
+		wantRetrieval  string
+		wantEvidence   string
+		wantAbstention string
+		wantSnapshot   string
+	}{
+		{
+			name: "stale citation with matching file and lines",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "a.go", StartLine: 1, EndLine: 3, CommitHash: stale}}},
+			head: current, expected: []contract.Citation{cit("a.go", 1, 3)},
+			wantRetrieval: "miss", wantEvidence: "not_evaluated", wantAbstention: "not_applicable", wantSnapshot: "conflict",
+		},
+		{
+			name: "missing knowledge",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "a.go", StartLine: 1, EndLine: 3, CommitHash: current}}},
+			head: current, expected: []contract.Citation{cit("a.go", 1, 3)}, knowledge: []string{"policy"},
+			wantRetrieval: "pass", wantEvidence: "missing", wantAbstention: "not_applicable", wantSnapshot: "current",
+		},
+		{
+			name: "no citation with stale head",
+			pack: contract.EvidencePack{}, head: stale, noCitations: true,
+			wantRetrieval: "not_evaluated", wantEvidence: "not_evaluated", wantAbstention: "pass", wantSnapshot: "conflict",
+		},
+		{
+			name: "unrelated citation violates abstention",
+			pack: contract.EvidencePack{Citations: []contract.Citation{{File: "other.go", StartLine: 1, EndLine: 2, CommitHash: current}}},
+			head: current, noCitations: true,
+			wantRetrieval: "not_evaluated", wantEvidence: "not_evaluated", wantAbstention: "fail", wantSnapshot: "current",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m := &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{
+				toolGetForTask: packResult(tc.pack),
+				toolFreshness:  mcpgo.NewToolResultStructured(map[string]string{"indexed_head": tc.head}, "freshness"),
+			}}
+			r := &Runner{client: m}
+			s := &Scenario{Version: 1, Name: "pinned", Prompt: "find handler", MatchMode: MatchOverlap, Runs: 1, ExpectedCommit: current, ExpectedCitations: tc.expected, ExpectedKnowledge: tc.knowledge, ExpectNoCitations: tc.noCitations}
+			got, err := r.Execute(context.Background(), s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.RetrievalState != tc.wantRetrieval || got.EvidenceState != tc.wantEvidence || got.AbstentionState != tc.wantAbstention || got.SnapshotState != tc.wantSnapshot {
+				t.Fatalf("states = %+v", got)
+			}
+			if tc.name == "stale citation with matching file and lines" && got.Metrics.FileRecall != 0 {
+				t.Fatalf("stale citation inflated recall: %v", got.Metrics.FileRecall)
+			}
+		})
+	}
+}
+
 func TestRunner_Execute_TakesMedianAcrossRuns(t *testing.T) {
 	t.Parallel()
 	// Runs=3 → three identical calls. Backend returns the same pack
@@ -186,6 +353,9 @@ func TestRunner_Execute_ToolErrorRecordedAsError(t *testing.T) {
 	}
 	if result.Error == "" {
 		t.Error("Result.Error should carry the tool error text")
+	}
+	if result.RetrievalState != "error" {
+		t.Errorf("retrieval state = %q, want error", result.RetrievalState)
 	}
 }
 

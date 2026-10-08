@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "sf_id": "SF-05-B",
+  "decision": {
+    "status": "approved",
+    "reviewer": "chat-user",
+    "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+    "verbatim_response": "① Go 소스 29개 포함. ② 프로토콜 승인. ③ F-01–06 승인. ④ SF-03/05-A/05-B/06을 테스트 사례 범위에서 승인. ⑤ STV2 설정 승인.",
+    "scope": "semantic_fixture_test_cases",
+    "review_document_sha256": "fa786094f4d11fe9416284ef614de5ccbc387434d9a4a9bc2d32cad0dd4178a2",
+    "ids": [
+      "SF-03",
+      "SF-05-A",
+      "SF-05-B",
+      "SF-06"
+    ],
+    "authorization_scope": "Synthetic test fixture facts and expected behavior only; SF-03 concepts remain proposed; no operating policy, criterion acceptance, legal or release approval. Source-bound fresh supplements/locks/datasets must be built."
+  },
+  "human_review_sha256": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
+  "reviewed_source_commit": "06eb4482a17053136949f6241dbcfea16571aedf",
+  "reviewed_source_sha256": {
+    ".cks/knowledge/knowledge.lock.json": "ccc31939fb197217e4ce97fcda885bcc031077b645e8ccfdbad43b1e4155a458",
+    ".cks/knowledge/manifest.yaml": "f12c147789f2db68e4add5628512f58a4dd17779bc09a83ce9b6d6d948c31832",
+    ".cks/knowledge/policies/refund-cap.yaml": "aa20356b0677561a4c45960023c4d17dbf4bbdf5d4492a482163d2349a12b485",
+    "docs/policy.md": "70fae3091c2dcb0e9a5f8088fee0491a9b13cb0892cf79a4eda872fbb72d23f8",
+    "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+    "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+    "main.go": "badc7826877f0a91377f61378d222838ee82133d98c13b153be9cfd4dbbd9ced",
+    "ontology.yaml": "916b0f29a7ecd6e382fc3c0b3241d34cb44391a8d9380f35eed15e6d66a30b03"
+  },
+  "scope": "synthetic fixture only; no criterion acceptance",
+  "approval_binding": "inherited unchanged test facts plus approved FINAL definitions",
+  "final_derivation": [
+    {
+      "family": "F-03",
+      "path": "go.mod",
+      "development_sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "final_sha256": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-03",
+      "path": "ontology.yaml",
+      "development_sha256": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+      "final_sha256": "efcea14439dca953b9145b1c2310ba89869292ff1376e34698ab2665a7fb84e3",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-03",
+      "path": "main.go",
+      "development_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+      "final_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-05",
+      "path": "go.mod",
+      "development_sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "final_sha256": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-05",
+      "path": "project-a/main.go",
+      "development_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+      "final_sha256": "683a528ce354ee468df3e749ddc2b985d7cdd62a1b51edf5018928a8084008d9",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-05",
+      "path": "project-b/main.go",
+      "development_sha256": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+      "final_sha256": "badc7826877f0a91377f61378d222838ee82133d98c13b153be9cfd4dbbd9ced",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-05",
+      "path": "project-a/docs/policy.md",
+      "development_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+      "final_sha256": "f93cda2a62b8f88ec19ea2ea50cb179a144f48380935b9c609436036504c4101",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-05",
+      "path": "project-b/docs/policy.md",
+      "development_sha256": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+      "final_sha256": "70fae3091c2dcb0e9a5f8088fee0491a9b13cb0892cf79a4eda872fbb72d23f8",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-06",
+      "path": "go.mod",
+      "development_sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "final_sha256": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-06",
+      "path": "README.md",
+      "development_sha256": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+      "final_sha256": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-06",
+      "path": "main.go",
+      "development_sha256": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+      "final_sha256": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    },
+    {
+      "family": "F-06",
+      "path": "main_test.go",
+      "development_sha256": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+      "final_sha256": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+      "fact_equivalence": "exact bytes after declared partition marker/module/project namespace substitutions"
+    }
+  ]
+}

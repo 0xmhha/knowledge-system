@@ -1,0 +1,2803 @@
+{
+  "project_id": "knowledge-system",
+  "dataset_id": "policy-review-ab77ce56",
+  "total": 6,
+  "proposed": 6,
+  "verified": 0,
+  "rejected": 0,
+  "reviewed_precision": null,
+  "sample": [
+    {
+      "claim_id": "pilot-claim:P12-P03",
+      "statement": "v2 core evidence는32000bytes/12citation 안에서 검증된 전체 원문 span을 선택하고 생략을 partial/예산 진단으로 기록하며 긴 span을 잘라 반환하지 않는다.",
+      "heading": "보관 인용 예산 (N-07)",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:db4571d62f7966dd6bc7a717",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 108,
+          "end_line": 112,
+          "content_sha256": "35e6c87ab3511ab1b09925724ddbc23045e45a39ec2eec62eabb6ad1256930f3",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    },
+    {
+      "claim_id": "pilot-claim:P12-P04",
+      "statement": "Worksheet의 조직 위험 목록은 명시적으로 선택한 local pack 자료에만 들어 있다. 생성은 앵커 검사를 실행하거나 항목을 verified로 승격하지 않는다.",
+      "heading": "선택형 검증 worksheet catalog 계약 v1",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:89631abceff67563066c1487",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 1,
+          "end_line": 4,
+          "content_sha256": "f5ddab2b6f6af6cbefdeaa6fd8993f751994569957d5f95ef68b00e74a82f0be",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    },
+    {
+      "claim_id": "pilot-claim:P12-P01",
+      "statement": "Pinned v2 유지보수는 제자리 갱신과 legacy downgrade를 거부하고 검토 설정·project ID와 새 버전으로 후보를 만든다.",
+      "heading": "유지보수 쓰기 경계 (N-02)",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:38f5b96cacf6fbc6d0f938a1",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 21,
+          "end_line": 24,
+          "content_sha256": "c529f755efc7498bc3d0ced02c9b79381b08222d4bfc7c15caa7fb564d207c8e",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    },
+    {
+      "claim_id": "pilot-claim:P12-P02",
+      "statement": "후보 checkpoint/sync 뒤 current를 전환하고 부모를 sync한다. rename 후 sync 실패의 durability_uncertain은 current 불변을 뜻하지 않는다.",
+      "heading": "dataset mutation 잠금 (N-03)",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:9dab294750aa7099159415ae",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 25,
+          "end_line": 28,
+          "content_sha256": "5f8ff451bfb32c13af11f726b8c4ffceb4ff12ba051ae31409d6059861ae3997",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    },
+    {
+      "claim_id": "pilot-claim:P12-P06",
+      "statement": "신규 executable-bit-v1 입력은 파일 실행 비트도 identity에 포함하며 snapshot v5와 구 v2–v4 읽기를 구분해 과거 바이트·신원을 재해석하지 않는다.",
+      "heading": "2026-10-03 파일럿 교정: 실행 비트의 신원과 재생",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:60c2357ecb924930b3e55fd8",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 67,
+          "end_line": 69,
+          "content_sha256": "253dd9855d860ddaee4d433007ab6b8ecb916d75f393f3e1f80e35c073eff191",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    },
+    {
+      "claim_id": "pilot-claim:P12-P05",
+      "statement": "Git 소스는 기준HEAD/선택 복구 객체를 해시된 history.bundle로 봉인하고 독립 저장소로 복원해 빌드하여 원본의 이후 이력 변화와 분리한다.",
+      "heading": "2026-10-03 B0-H 보강: Git 복구 이력 봉인",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:6addc00c569acde2cbd37f75",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 59,
+          "end_line": 66,
+          "content_sha256": "6bc79365f8c96af3d1dbd0de51e3ce49ad58a9ff67054daade6b3ba3e93eaf1c",
+          "extractor": "ckv-markdown-v1"
+        }
+      ]
+    }
+  ],
+  "assertion_total": 12,
+  "assertion_proposed": 12,
+  "assertion_verified": 0,
+  "assertion_rejected": 0,
+  "assertion_reviewed_precision": null,
+  "assertion_sample": [
+    {
+      "assertion_id": "supports:P12-P05",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:6addc00c569acde2cbd37f75",
+      "object_id": "pilot-claim:P12-P05",
+      "evidence": [
+        {
+          "id": "evidence:6addc00c569acde2cbd37f75",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 59,
+          "end_line": 66,
+          "content_sha256": "6bc79365f8c96af3d1dbd0de51e3ce49ad58a9ff67054daade6b3ba3e93eaf1c",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "supports:P12-P06",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:60c2357ecb924930b3e55fd8",
+      "object_id": "pilot-claim:P12-P06",
+      "evidence": [
+        {
+          "id": "evidence:60c2357ecb924930b3e55fd8",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 67,
+          "end_line": 69,
+          "content_sha256": "253dd9855d860ddaee4d433007ab6b8ecb916d75f393f3e1f80e35c073eff191",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "supports:P12-P01",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:38f5b96cacf6fbc6d0f938a1",
+      "object_id": "pilot-claim:P12-P01",
+      "evidence": [
+        {
+          "id": "evidence:38f5b96cacf6fbc6d0f938a1",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 21,
+          "end_line": 24,
+          "content_sha256": "c529f755efc7498bc3d0ced02c9b79381b08222d4bfc7c15caa7fb564d207c8e",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P01",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P01",
+      "object_id": "policy",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:fade50bfbfb243689f297883",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 127,
+          "end_line": 133,
+          "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P04",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P04",
+      "object_id": "policy",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:fade50bfbfb243689f297883",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 127,
+          "end_line": 133,
+          "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "supports:P12-P04",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:89631abceff67563066c1487",
+      "object_id": "pilot-claim:P12-P04",
+      "evidence": [
+        {
+          "id": "evidence:89631abceff67563066c1487",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 1,
+          "end_line": 4,
+          "content_sha256": "f5ddab2b6f6af6cbefdeaa6fd8993f751994569957d5f95ef68b00e74a82f0be",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P03",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P03",
+      "object_id": "evidence-pack",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:09b5174fe2adde265ccb7a60",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 134,
+          "end_line": 140,
+          "content_sha256": "5f28fa42b72bde5cca127279f7b0312673f787cbf903a4cae827163b4d679786",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "supports:P12-P03",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:db4571d62f7966dd6bc7a717",
+      "object_id": "pilot-claim:P12-P03",
+      "evidence": [
+        {
+          "id": "evidence:db4571d62f7966dd6bc7a717",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 108,
+          "end_line": 112,
+          "content_sha256": "35e6c87ab3511ab1b09925724ddbc23045e45a39ec2eec62eabb6ad1256930f3",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P02",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P02",
+      "object_id": "dataset",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:ca52b8f05151e741f9e9357f",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 22,
+          "end_line": 28,
+          "content_sha256": "2e4316d7b5309316aa53159effe24e516e0bcbe7707a494e5bd83c89a9e793c7",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "supports:P12-P02",
+      "predicate": "SUPPORTS",
+      "subject_id": "section:9dab294750aa7099159415ae",
+      "object_id": "pilot-claim:P12-P02",
+      "evidence": [
+        {
+          "id": "evidence:9dab294750aa7099159415ae",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 25,
+          "end_line": 28,
+          "content_sha256": "5f8ff451bfb32c13af11f726b8c4ffceb4ff12ba051ae31409d6059861ae3997",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P06",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P06",
+      "object_id": "source-snapshot",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:d37dda6d0339f309ce785511",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 29,
+          "end_line": 35,
+          "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    },
+    {
+      "assertion_id": "about:P12-P05",
+      "predicate": "ABOUT",
+      "subject_id": "pilot-claim:P12-P05",
+      "object_id": "source-snapshot",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:d37dda6d0339f309ce785511",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 29,
+          "end_line": 35,
+          "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+          "extractor": "ontology-yaml-v1"
+        }
+      ]
+    }
+  ],
+  "concept_total": 20,
+  "concept_proposed": 20,
+  "concept_verified": 0,
+  "concept_rejected": 0,
+  "concept_reviewed_precision": null,
+  "concept_sample": [
+    {
+      "concept": {
+        "id": "criterion-decision",
+        "kind": "process",
+        "definition": "A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.",
+        "includes": [
+          "Approval",
+          "rejection",
+          "needs-review decision",
+          "reviewer and reason"
+        ],
+        "excludes": [
+          "A passing test alone",
+          "existence of a test link"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "criterion decision",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "수용 기준 판정",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:de1f60d9f9c14600fa25fd62",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:de1f60d9f9c14600fa25fd62",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 148,
+        "end_line": 154,
+        "content_sha256": "6d7b6f3dee93dad13df4a34a0809adcc1e1a3fdde4707420d82aeef9530a1056",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "patch-attempt",
+        "kind": "process",
+        "definition": "An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.",
+        "includes": [
+          "Changed-file digests",
+          "base and result snapshots",
+          "check reports"
+        ],
+        "excludes": [
+          "An unexecuted change plan",
+          "promotion of the active dataset"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "patch attempt",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "변경 시도",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:1ac2b49132cd9e2355321727",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:1ac2b49132cd9e2355321727",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 141,
+        "end_line": 147,
+        "content_sha256": "63bc5be6a2369cee2ee9cdfb93850891e7dbdb2b85c94eb31dd1324c43ac894f",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "test-run",
+        "kind": "process",
+        "definition": "An execution of tests with recorded command, environment, source snapshot, and outcome.",
+        "includes": [
+          "Execution metadata",
+          "pass or failure evidence"
+        ],
+        "excludes": [
+          "A test file that has never been run"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "test run",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "테스트 실행",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:35bb0d0635e2aa1c11d7286f",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:35bb0d0635e2aa1c11d7286f",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 120,
+        "end_line": 126,
+        "content_sha256": "508c2abb8943ff6e03fcbb6bc604e440e95a731a256c37ae5dcd0e05dd0c412f",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "source-file",
+        "kind": "artifact",
+        "definition": "A source document or code file addressed relative to one source snapshot.",
+        "includes": [
+          "Captured code",
+          "captured Markdown"
+        ],
+        "excludes": [
+          "Historical hunk path counted as a current file"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "source file",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "소스 파일",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:932176eb9ad52f44bc23c311",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:932176eb9ad52f44bc23c311",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 36,
+        "end_line": 42,
+        "content_sha256": "b4c8fc678783c7d9cfffd2b36a1cc59756e665cf97b7ed67b0de911ae748b8b1",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "claim",
+        "kind": "entity",
+        "definition": "A reviewable statement about the project that cites a source section.",
+        "includes": [
+          "Proposed assertion text",
+          "reviewed statement"
+        ],
+        "excludes": [
+          "A heading alone",
+          "ungrounded model output"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "claim",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "주장",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:693f57b2d0aa18af41e82ccb",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:693f57b2d0aa18af41e82ccb",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 64,
+        "end_line": 70,
+        "content_sha256": "dd1b326e0a22e3974eb6cf2b56613aa1b1e943637d85c4e1421ab1378151e859",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "policy",
+        "kind": "rule",
+        "definition": "A versioned constraint controlling indexing, access, review, or evidence release.",
+        "includes": [
+          "Exclusion rule",
+          "sanitization rule"
+        ],
+        "excludes": [
+          "A retrieved passage that merely mentions a rule"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "policy",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "정책",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:fade50bfbfb243689f297883",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:fade50bfbfb243689f297883",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 127,
+        "end_line": 133,
+        "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "term",
+        "kind": "artifact",
+        "definition": "A language-specific preferred or alternative expression for a concept.",
+        "includes": [
+          "English name",
+          "Korean alias"
+        ],
+        "excludes": [
+          "The concept's complete definition"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "term",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "용어",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:79b0dc05e1348d9929862ffd",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:79b0dc05e1348d9929862ffd",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 92,
+        "end_line": 98,
+        "content_sha256": "1dfc2443cbb6af711e65f79c239c9f5802ffec101a70c91e235d4440891447a5",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "test-case",
+        "kind": "artifact",
+        "definition": "A repeatable input and expected observation used to verify behavior.",
+        "includes": [
+          "Unit test",
+          "integration scenario"
+        ],
+        "excludes": [
+          "A successful result from an unspecified run"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "test case",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "테스트 사례",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:c54a1e41e9d06ea65d2309cc",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:c54a1e41e9d06ea65d2309cc",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 113,
+        "end_line": 119,
+        "content_sha256": "30ea40c7bcb2ee5f8fc6cbbede5ad8f9a8ba83dbcc7f675ead1fe416f49d0b35",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "document-section",
+        "kind": "artifact",
+        "definition": "A heading-scoped span of a source document with exact source lines.",
+        "includes": [
+          "Markdown section",
+          "specification section"
+        ],
+        "excludes": [
+          "A fabricated summary without source lines"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "document section",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "문서 절",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:eca91d233779e7b0c67bcae6",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:eca91d233779e7b0c67bcae6",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 57,
+        "end_line": 63,
+        "content_sha256": "451cd590ed5a603c0ae7c0a1565fb0c7c393ba3e7484aff43169f36b29b36e07",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "source-snapshot",
+        "kind": "artifact",
+        "definition": "A captured and identified set of source bytes and policies to which all evidence in a dataset refers.",
+        "includes": [
+          "Committed Git source",
+          "captured working-tree source",
+          "captured non-Git source"
+        ],
+        "excludes": [
+          "A Git commit alone when working-tree bytes differ",
+          "an uncaptured editor buffer"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "source snapshot",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "소스 스냅샷",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:d37dda6d0339f309ce785511",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:d37dda6d0339f309ce785511",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 29,
+        "end_line": 35,
+        "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "requirement",
+        "kind": "rule",
+        "definition": "A versioned statement of intended system behavior independent of implementation.",
+        "includes": [
+          "Functional requirement",
+          "nonfunctional constraint"
+        ],
+        "excludes": [
+          "A claim that current code already satisfies it"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "requirement",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "요구사항",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:e61e83819310613eaf7cc5d3",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:e61e83819310613eaf7cc5d3",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 99,
+        "end_line": 105,
+        "content_sha256": "62c03a0299cef03ab143ba18617c956cc3faffde74f2230474e17fb0f8a4ca7c",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "code-symbol",
+        "kind": "entity",
+        "definition": "A language parser's named code construct with a source range and stable join identity.",
+        "includes": [
+          "Function",
+          "type",
+          "method"
+        ],
+        "excludes": [
+          "A vector chunk without a verified AST anchor"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "code symbol",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "코드 심볼",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:4d0dc47b8bdf20296e70269b",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:4d0dc47b8bdf20296e70269b",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 43,
+        "end_line": 49,
+        "content_sha256": "a43823d2d467f1f245b9fb2ce0e3ac62263f3080fe6482556d20aedce5bad72f",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "acceptance-criterion",
+        "kind": "rule",
+        "definition": "A checkable condition for accepting one requirement at a named snapshot.",
+        "includes": [
+          "Expected observation",
+          "threshold"
+        ],
+        "excludes": [
+          "A test result without its execution context"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "acceptance criterion",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "수용 기준",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:e5133754e5a7a3241ce4f690",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:e5133754e5a7a3241ce4f690",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 106,
+        "end_line": 112,
+        "content_sha256": "ed95e4af9101a0c9e3228075524e44d51b5287170c652f99961e8f13dbd73703",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "semantic-assertion",
+        "kind": "entity",
+        "definition": "A typed and directed relationship between two identified objects with separate evidence and review state.",
+        "includes": [
+          "SUPPORTS relation",
+          "CONTRADICTS relation"
+        ],
+        "excludes": [
+          "An untyped graph edge treated as proven meaning"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "semantic assertion",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "의미 관계",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:3d031dc9416db6ed78a1b776",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:3d031dc9416db6ed78a1b776",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 78,
+        "end_line": 84,
+        "content_sha256": "cb86290dd315b8de3ba90d2fff35ebd14105fecd24d656eb033edd6edc15de07",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "evidence-pack",
+        "kind": "artifact",
+        "definition": "A bounded and sanitized CKS response containing citations, bodies, graph neighbors, and integrity metadata.",
+        "includes": [
+          "Citations",
+          "redaction report"
+        ],
+        "excludes": [
+          "Unreviewed semantic assertion treated as verified"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "evidence pack",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "근거 묶음",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:09b5174fe2adde265ccb7a60",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:09b5174fe2adde265ccb7a60",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 134,
+        "end_line": 140,
+        "content_sha256": "5f28fa42b72bde5cca127279f7b0312673f787cbf903a4cae827163b4d679786",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "vector-chunk",
+        "kind": "artifact",
+        "definition": "A bounded source span represented by an embedding and searchable metadata.",
+        "includes": [
+          "Code chunk",
+          "document child chunk"
+        ],
+        "excludes": [
+          "A semantic fact proven only by similarity"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "vector chunk",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "벡터 청크",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:b1405b30608a29783bde30d9",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:b1405b30608a29783bde30d9",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 50,
+        "end_line": 56,
+        "content_sha256": "b3f36fb94355149265aa2635a018490582246dc60b0401c9190590889066d7dc",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "concept",
+        "kind": "entity",
+        "definition": "A stable domain meaning with a definition, scope, aliases, and review status.",
+        "includes": [
+          "Project vocabulary entry",
+          "versioned meaning"
+        ],
+        "excludes": [
+          "One query token",
+          "an AST node type"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "concept",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "개념",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:105e80fcfd373423e3b45dac",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:105e80fcfd373423e3b45dac",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 85,
+        "end_line": 91,
+        "content_sha256": "cb939278aa9ca263d828da3e3eb6964e3ebb4c486a30c89ddccd4cf359966136",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "project",
+        "kind": "entity",
+        "definition": "A named isolation boundary for source, indexes, reviews, and queries.",
+        "includes": [
+          "Project identity",
+          "project-specific policies"
+        ],
+        "excludes": [
+          "A Git checkout",
+          "one dataset version"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "project",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "프로젝트",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:7e3561dc55b17f71ddd4c316",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:7e3561dc55b17f71ddd4c316",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 15,
+        "end_line": 21,
+        "content_sha256": "1574c0307f555b7c78e243fd03387d57ee3a2a57c1f66e1f0dcdc84b576d899f",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "evidence-span",
+        "kind": "artifact",
+        "definition": "An origin, relative path, line range, file digest, and range digest tied to one source snapshot.",
+        "includes": [
+          "Document lines",
+          "code lines",
+          "test lines"
+        ],
+        "excludes": [
+          "A similarity score without retrievable source"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "evidence span",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "근거 범위",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:457d598ce39c4cfa35d79e18",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:457d598ce39c4cfa35d79e18",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 71,
+        "end_line": 77,
+        "content_sha256": "d7e3497711de04d01152fd5f83fb8bf6be60b565e7d3c9de900baf82f6b731a0",
+        "extractor": "ontology-yaml-v1"
+      }
+    },
+    {
+      "concept": {
+        "id": "dataset",
+        "kind": "artifact",
+        "definition": "One immutable coordinated build of graph, vector, and optional semantic projections.",
+        "includes": [
+          "Build identity",
+          "index manifests"
+        ],
+        "excludes": [
+          "The mutable active pointer",
+          "source repository"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "dataset",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "데이터셋",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:ca52b8f05151e741f9e9357f",
+        "status": "proposed"
+      },
+      "evidence": {
+        "id": "ontology:ca52b8f05151e741f9e9357f",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/ontology-pilot.yaml",
+        "start_line": 22,
+        "end_line": 28,
+        "content_sha256": "2e4316d7b5309316aa53159effe24e516e0bcbe7707a494e5bd83c89a9e793c7",
+        "extractor": "ontology-yaml-v1"
+      }
+    }
+  ],
+  "ambiguous_terms": [],
+  "requirement_total": 3,
+  "requirement_proposed": 3,
+  "requirement_verified": 0,
+  "requirement_rejected": 0,
+  "requirement_sample": [
+    {
+      "requirement": {
+        "id": "req-ontology-fallback",
+        "version": 1,
+        "title": "Safe ontology interpretation",
+        "statement": "Optional concept matching preserves the existing hybrid retrieval candidates.",
+        "status": "proposed",
+        "evidence_id": "spec:4a9495f4b7e1412c03039ea0",
+        "concept_ids": [
+          "concept",
+          "term",
+          "evidence-pack"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-ontology-fallback",
+            "given": "An ambiguous term or an unverified concept relationship",
+            "when": "A user asks a natural-language question",
+            "then": "The baseline CKV and CKG citation set is preserved",
+            "evidence_id": "criterion:f580cc1ef9eea489ff61441b"
+          }
+        ]
+      },
+      "evidence": {
+        "id": "spec:4a9495f4b7e1412c03039ea0",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "start_line": 30,
+        "end_line": 40,
+        "content_sha256": "f4a1f89b9511f138b7d2f1a4e215d157fa007e48c12e4906e3cb29b1965ffc6a",
+        "extractor": "spec-yaml-v1"
+      }
+    },
+    {
+      "requirement": {
+        "id": "req-source-evidence",
+        "version": 1,
+        "title": "Source-backed meaning",
+        "statement": "Reviewed semantic relationships remain tied to one captured source snapshot.",
+        "status": "proposed",
+        "evidence_id": "spec:b557f99088da868edbdf9d3b",
+        "concept_ids": [
+          "source-snapshot",
+          "evidence-span",
+          "semantic-assertion"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-source-evidence",
+            "given": "A relation with a code anchor from another snapshot",
+            "when": "The semantic dataset is promoted",
+            "then": "Promotion fails and the active dataset remains unchanged",
+            "evidence_id": "criterion:6a05a57e398df22f8d44f7b3"
+          }
+        ]
+      },
+      "evidence": {
+        "id": "spec:b557f99088da868edbdf9d3b",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "start_line": 19,
+        "end_line": 29,
+        "content_sha256": "bec0b92549c91e346b7a6ce73d10d988ae66d64cd8c35ec7008cc650a778dcdb",
+        "extractor": "spec-yaml-v1"
+      }
+    },
+    {
+      "requirement": {
+        "id": "req-filtered-recall",
+        "version": 1,
+        "title": "Filtered CKV recall",
+        "statement": "CKV returns eligible nearest chunks under sparse metadata filters.",
+        "status": "proposed",
+        "evidence_id": "spec:25df8772481ae1dc4d1ba74f",
+        "concept_ids": [
+          "vector-chunk",
+          "policy"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-filtered-recall",
+            "given": "A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks",
+            "when": "A filtered query requests K results",
+            "then": "The response contains K eligible chunks in exact distance order",
+            "evidence_id": "criterion:d2c7a07dce691e7c7b238350"
+          },
+          {
+            "id": "ac-filtered-completeness",
+            "given": "A larger filtered candidate set contains at least K eligible chunks",
+            "when": "A filtered query reaches a search budget or is cancelled",
+            "then": "The response marks incomplete with a reason and never claims K-result completeness",
+            "evidence_id": "criterion:3eb7dcbfb19cde42f0d138ff"
+          }
+        ]
+      },
+      "evidence": {
+        "id": "spec:25df8772481ae1dc4d1ba74f",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "policy-review-ab77ce56",
+          "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+        },
+        "kind": "document",
+        "path": "docs/spec-driven/spec-pilot.yaml",
+        "start_line": 4,
+        "end_line": 18,
+        "content_sha256": "9afcd37dae6f924a6eb91816f65851e62660b70ec4de4bcb940899278f7689a3",
+        "extractor": "spec-yaml-v1"
+      }
+    }
+  ],
+  "review_queue": [
+    {
+      "kind": "assertion",
+      "id": "about:P12-P01",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:fade50bfbfb243689f297883",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 127,
+          "end_line": 133,
+          "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "about:P12-P02",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:ca52b8f05151e741f9e9357f",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 22,
+          "end_line": 28,
+          "content_sha256": "2e4316d7b5309316aa53159effe24e516e0bcbe7707a494e5bd83c89a9e793c7",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "about:P12-P03",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:09b5174fe2adde265ccb7a60",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 134,
+          "end_line": 140,
+          "content_sha256": "5f28fa42b72bde5cca127279f7b0312673f787cbf903a4cae827163b4d679786",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "about:P12-P04",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:fade50bfbfb243689f297883",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 127,
+          "end_line": 133,
+          "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "about:P12-P05",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:d37dda6d0339f309ce785511",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 29,
+          "end_line": 35,
+          "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "about:P12-P06",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "ontology:d37dda6d0339f309ce785511",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 29,
+          "end_line": 35,
+          "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P01",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:38f5b96cacf6fbc6d0f938a1",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 21,
+          "end_line": 24,
+          "content_sha256": "c529f755efc7498bc3d0ced02c9b79381b08222d4bfc7c15caa7fb564d207c8e",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P02",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:9dab294750aa7099159415ae",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 25,
+          "end_line": 28,
+          "content_sha256": "5f8ff451bfb32c13af11f726b8c4ffceb4ff12ba051ae31409d6059861ae3997",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P03",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:db4571d62f7966dd6bc7a717",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 108,
+          "end_line": 112,
+          "content_sha256": "35e6c87ab3511ab1b09925724ddbc23045e45a39ec2eec62eabb6ad1256930f3",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P04",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:89631abceff67563066c1487",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 1,
+          "end_line": 4,
+          "content_sha256": "f5ddab2b6f6af6cbefdeaa6fd8993f751994569957d5f95ef68b00e74a82f0be",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P05",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:6addc00c569acde2cbd37f75",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 59,
+          "end_line": 66,
+          "content_sha256": "6bc79365f8c96af3d1dbd0de51e3ce49ad58a9ff67054daade6b3ba3e93eaf1c",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "assertion",
+      "id": "supports:P12-P06",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "evidence:60c2357ecb924930b3e55fd8",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 67,
+          "end_line": 69,
+          "content_sha256": "253dd9855d860ddaee4d433007ab6b8ecb916d75f393f3e1f80e35c073eff191",
+          "extractor": "ckv-markdown-v1"
+        },
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P01",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P01",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 23,
+          "end_line": 23,
+          "content_sha256": "5974db62cb27852ab42868c11aa5415575203ba46736cdfcbfd03c80cce9915b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:38f5b96cacf6fbc6d0f938a1",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 21,
+          "end_line": 24,
+          "content_sha256": "c529f755efc7498bc3d0ced02c9b79381b08222d4bfc7c15caa7fb564d207c8e",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P02",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P02",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 27,
+          "end_line": 27,
+          "content_sha256": "5dbd0186344b2cb8064d28682b95e82f56a652ca3853ca655afd2350b727429b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:9dab294750aa7099159415ae",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 25,
+          "end_line": 28,
+          "content_sha256": "5f8ff451bfb32c13af11f726b8c4ffceb4ff12ba051ae31409d6059861ae3997",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P03",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P03",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 110,
+          "end_line": 112,
+          "content_sha256": "25c2a624cf3b8bd700198d1ffcebd2f9fac50975bf780f03891ec480c8f9af2a",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:db4571d62f7966dd6bc7a717",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "start_line": 108,
+          "end_line": 112,
+          "content_sha256": "35e6c87ab3511ab1b09925724ddbc23045e45a39ec2eec62eabb6ad1256930f3",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P04",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P04",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 3,
+          "end_line": 3,
+          "content_sha256": "fc224e4cecc80b4501126d66d96442f323c85eac0de3f74f50e0d77fc245d845",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:89631abceff67563066c1487",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+          "start_line": 1,
+          "end_line": 4,
+          "content_sha256": "f5ddab2b6f6af6cbefdeaa6fd8993f751994569957d5f95ef68b00e74a82f0be",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P05",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P05",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 63,
+          "end_line": 63,
+          "content_sha256": "e15d50c35c0ace96d24c592034a075d9b28d51cb72602ece9f3258698377a8c8",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:6addc00c569acde2cbd37f75",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 59,
+          "end_line": 66,
+          "content_sha256": "6bc79365f8c96af3d1dbd0de51e3ce49ad58a9ff67054daade6b3ba3e93eaf1c",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "claim",
+      "id": "pilot-claim:P12-P06",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "policy-evidence:P12-P06",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 69,
+          "end_line": 69,
+          "content_sha256": "1b52b7e5b747499030be7544bcdefc2f5fcf589ef9435aa406fa9452c7454c8b",
+          "extractor": "manual-policy-review-v1"
+        },
+        {
+          "id": "evidence:60c2357ecb924930b3e55fd8",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+          "start_line": 67,
+          "end_line": 69,
+          "content_sha256": "253dd9855d860ddaee4d433007ab6b8ecb916d75f393f3e1f80e35c073eff191",
+          "extractor": "ckv-markdown-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "acceptance-criterion",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:e5133754e5a7a3241ce4f690",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 106,
+          "end_line": 112,
+          "content_sha256": "ed95e4af9101a0c9e3228075524e44d51b5287170c652f99961e8f13dbd73703",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "claim",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:693f57b2d0aa18af41e82ccb",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 64,
+          "end_line": 70,
+          "content_sha256": "dd1b326e0a22e3974eb6cf2b56613aa1b1e943637d85c4e1421ab1378151e859",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "code-symbol",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:4d0dc47b8bdf20296e70269b",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 43,
+          "end_line": 49,
+          "content_sha256": "a43823d2d467f1f245b9fb2ce0e3ac62263f3080fe6482556d20aedce5bad72f",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "concept",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:105e80fcfd373423e3b45dac",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 85,
+          "end_line": 91,
+          "content_sha256": "cb939278aa9ca263d828da3e3eb6964e3ebb4c486a30c89ddccd4cf359966136",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "criterion-decision",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:de1f60d9f9c14600fa25fd62",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 148,
+          "end_line": 154,
+          "content_sha256": "6d7b6f3dee93dad13df4a34a0809adcc1e1a3fdde4707420d82aeef9530a1056",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "dataset",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:ca52b8f05151e741f9e9357f",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 22,
+          "end_line": 28,
+          "content_sha256": "2e4316d7b5309316aa53159effe24e516e0bcbe7707a494e5bd83c89a9e793c7",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "document-section",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:eca91d233779e7b0c67bcae6",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 57,
+          "end_line": 63,
+          "content_sha256": "451cd590ed5a603c0ae7c0a1565fb0c7c393ba3e7484aff43169f36b29b36e07",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "evidence-pack",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:09b5174fe2adde265ccb7a60",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 134,
+          "end_line": 140,
+          "content_sha256": "5f28fa42b72bde5cca127279f7b0312673f787cbf903a4cae827163b4d679786",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "evidence-span",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:457d598ce39c4cfa35d79e18",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 71,
+          "end_line": 77,
+          "content_sha256": "d7e3497711de04d01152fd5f83fb8bf6be60b565e7d3c9de900baf82f6b731a0",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "patch-attempt",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:1ac2b49132cd9e2355321727",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 141,
+          "end_line": 147,
+          "content_sha256": "63bc5be6a2369cee2ee9cdfb93850891e7dbdb2b85c94eb31dd1324c43ac894f",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "policy",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:fade50bfbfb243689f297883",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 127,
+          "end_line": 133,
+          "content_sha256": "71ea4ef170d6fd8fb3c30e9b75b11fc0154b33cee46c0c55519e603daaf1c397",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "project",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:7e3561dc55b17f71ddd4c316",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 15,
+          "end_line": 21,
+          "content_sha256": "1574c0307f555b7c78e243fd03387d57ee3a2a57c1f66e1f0dcdc84b576d899f",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "requirement",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:e61e83819310613eaf7cc5d3",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 99,
+          "end_line": 105,
+          "content_sha256": "62c03a0299cef03ab143ba18617c956cc3faffde74f2230474e17fb0f8a4ca7c",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "semantic-assertion",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:3d031dc9416db6ed78a1b776",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 78,
+          "end_line": 84,
+          "content_sha256": "cb86290dd315b8de3ba90d2fff35ebd14105fecd24d656eb033edd6edc15de07",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "source-file",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:932176eb9ad52f44bc23c311",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 36,
+          "end_line": 42,
+          "content_sha256": "b4c8fc678783c7d9cfffd2b36a1cc59756e665cf97b7ed67b0de911ae748b8b1",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "source-snapshot",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:d37dda6d0339f309ce785511",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 29,
+          "end_line": 35,
+          "content_sha256": "105329df618e74e296d0bb4339593ca7e28f5952e9565ad31a961145772cfc8d",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "term",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:79b0dc05e1348d9929862ffd",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 92,
+          "end_line": 98,
+          "content_sha256": "1dfc2443cbb6af711e65f79c239c9f5802ffec101a70c91e235d4440891447a5",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "test-case",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:c54a1e41e9d06ea65d2309cc",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 113,
+          "end_line": 119,
+          "content_sha256": "30ea40c7bcb2ee5f8fc6cbbede5ad8f9a8ba83dbcc7f675ead1fe416f49d0b35",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "test-run",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:35bb0d0635e2aa1c11d7286f",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 120,
+          "end_line": 126,
+          "content_sha256": "508c2abb8943ff6e03fcbb6bc604e440e95a731a256c37ae5dcd0e05dd0c412f",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "concept",
+      "id": "vector-chunk",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "ontology:b1405b30608a29783bde30d9",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/ontology-pilot.yaml",
+          "start_line": 50,
+          "end_line": 56,
+          "content_sha256": "b3f36fb94355149265aa2635a018490582246dc60b0401c9190590889066d7dc",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "requirement",
+      "id": "req-filtered-recall",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "spec:25df8772481ae1dc4d1ba74f",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/spec-pilot.yaml",
+          "start_line": 4,
+          "end_line": 18,
+          "content_sha256": "9afcd37dae6f924a6eb91816f65851e62660b70ec4de4bcb940899278f7689a3",
+          "extractor": "spec-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "requirement",
+      "id": "req-ontology-fallback",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "spec:4a9495f4b7e1412c03039ea0",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/spec-pilot.yaml",
+          "start_line": 30,
+          "end_line": 40,
+          "content_sha256": "f4a1f89b9511f138b7d2f1a4e215d157fa007e48c12e4906e3cb29b1965ffc6a",
+          "extractor": "spec-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    },
+    {
+      "kind": "requirement",
+      "id": "req-source-evidence",
+      "status": "proposed",
+      "evidence": [
+        {
+          "id": "spec:b557f99088da868edbdf9d3b",
+          "snapshot": {
+            "project_id": "knowledge-system",
+            "dataset_id": "policy-review-ab77ce56",
+            "commit": "ab77ce5691d98328187ab271c1ae580299396265"
+          },
+          "kind": "document",
+          "path": "docs/spec-driven/spec-pilot.yaml",
+          "start_line": 19,
+          "end_line": 29,
+          "content_sha256": "bec0b92549c91e346b7a6ce73d10d988ae66d64cd8c35ec7008cc650a778dcdb",
+          "extractor": "spec-yaml-v1"
+        }
+      ],
+      "hold_reason": "awaiting_human_review"
+    }
+  ]
+}

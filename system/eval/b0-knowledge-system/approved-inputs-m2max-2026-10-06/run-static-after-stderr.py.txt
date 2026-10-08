@@ -1,0 +1,19 @@
+from pathlib import Path
+import subprocess,json,time,datetime,hashlib
+r=Path('/private/tmp/ks-approved-scope-20261006/official-static-after-stderr');root=Path.cwd();binary=Path('/private/tmp/ks-approved-scope-20261006/runtime-after-stderr/cks')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=[root/'system/eval/b0-knowledge-system'/n for n in ['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json']]
+checks=[]
+commands=[('v1-development',[binary,'eval','--scenarios',r/'development','--config',r/'static-config.yaml','--cks-mcp',binary,'--verify-anchors','/private/tmp/ks-b0-approved-corpus-20261006','--record-responses','--output',r/'static-dev-v1.json']),('v2-development-matrix',[binary,'eval','matrix','--requests',r/'static-dev-requests.json','--config',r/'static-config.yaml','--cks-mcp',binary,'--output',r/'static-dev-matrix','--warmup','2','--retrieval-runs','5','--warm-runs','20','--cold-runs','3','--call-timeout','90s','--environment-ledger','--environment-note','Native M2 Max shared host; sequential evaluations; strict build and SF builds completed before latency capture. Model remains resident; no daemon unload. Static source has no approved ontology or selected knowledge pack; optional arm fallback is part of the observed result.'])]
+for lock in locks:commands[1][1].extend(['--lock-file',lock])
+record={'schema_version':1,'partition':'development','status':'running','checks':checks,'binary_sha256':sha(binary),'input_sha256_before':{str(p):sha(p) for p in locks},'question_set_used_for_scoring_only':True}
+ledger=r/'official-static-execution.json'
+for label,args in commands:
+ start=time.monotonic();log=r/(label+'.log');record['current_step']=label;record['started_at']=datetime.datetime.now(datetime.timezone.utc).isoformat();ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+ with log.open('xb') as stream:code=subprocess.run([str(a) for a in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(a) for a in args],'exit_code':code,'elapsed_seconds':time.monotonic()-start,'log_sha256':sha(log)})
+ ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+record.update(status='executed_pending_oracle_report',input_sha256_after={str(p):sha(p) for p in locks},binary_sha256_after=sha(binary),finished_at=datetime.datetime.now(datetime.timezone.utc).isoformat())
+record['inputs_unchanged']=record['input_sha256_before']==record['input_sha256_after']
+ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n');print(json.dumps(record))
+raise SystemExit(any(c['exit_code']!=0 for c in checks))

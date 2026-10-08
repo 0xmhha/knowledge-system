@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "scope": "execution protection substep; not N11 acceptance, human approval or quality/latency",
+  "python_structural_controls": 19,
+  "go_race_packages": [
+    "github.com/0xmhha/knowledge-system/internal/system/eval",
+    "github.com/0xmhha/knowledge-system/cmd/cks/evalcli"
+  ],
+  "go_binding_cases": {
+    "normal": 1,
+    "rejected": 10
+  },
+  "native_cli_controls": 4,
+  "fresh_evaluation_queries": 0,
+  "new_final_units": 0,
+  "actual_human_approvals": 0,
+  "source_snapshot_mode": "test/source provenance only",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_refactoring_eval*.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./cmd/cks/evalcli",
+        "./internal/system/eval",
+        "-count=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./cmd/cks/evalcli",
+        "./internal/system/eval"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/check-boundaries.sh"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+from pathlib import Path
+import json,hashlib,subprocess,time,datetime
+root=Path.cwd();out=Path('/private/tmp/ks-approved-development-sweep-20261006');out.mkdir(exist_ok=False)
+binary=Path('/private/tmp/ks-approved-scope-20261006/runtime-v2-body/cks');data=root/'system/eval/b0-knowledge-system'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_bytes())
+locks=[data/n for n in ['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json']]
+fixtures={f['id']:f for f in read(locks[2])['fixtures']if f['evaluation_partition']=='development'}
+nonsemantic=read(Path('/private/tmp/ks-approved-dynamic-dev-20261006/built-manifest.json'))['cases'];semantic=read(Path('/private/tmp/ks-approved-semantic-20261006/approved-built-manifest.json'))['cases'];cases=nonsemantic+semantic
+steps=[];store_seals={}
+for case in cases:
+ version=Path(case['version_dir']);manifest=read(version/'vector/manifest.json');repo=Path(manifest['src_root']);fixture=fixtures[case['id'].rsplit('-',1)[0]];directory=out/case['id'];directory.mkdir()
+ requests=directory/'requests.json';requests.write_text(json.dumps({'schema_version':1,'requests':[{'id':case['id']+'-'+str(i+1)+'-'+q['language'],'tool':'cks.context.get_for_task_v2','arguments':{'prompt':q['prompt'],'knowledge_as_of':'2026-10-03','knowledge_subsystem':'refund'}}for i,q in enumerate(fixture['queries'])]},ensure_ascii=False,indent=2)+'\n')
+ config=directory/'config.yaml';args=[binary,'mcp','gen-config','--dataset-dir',version,'--source-root',repo,'--embed-model','bge-m3:latest','--ollama-url','http://127.0.0.1:11434','--query-prefix-policy','registry','--footprint-dir',directory/'base-footprints','--out',config]
+ if case.get('semantic_store'):args.extend(['--semantic-store',case['semantic_store']])
+ generated=subprocess.run([str(a)for a in args],cwd=root,capture_output=True);(directory/'gen-config.log').write_bytes(generated.stdout+generated.stderr)
+ if generated.returncode:raise ValueError('gen-config failed '+case['id'])
+ text=config.read_text();assert '    transport: http' in text and '    mcp_stdio: false'in text
+ text=text.replace('    transport: http','    transport: stdio').replace('    mcp_stdio: false','    mcp_stdio: true').replace('    measure_backend_calls: false','    measure_backend_calls: true');text+='\nretrieval:\n    recall_k: '+str(fixture['k'])+'\n';config.write_text(text)
+ steps.append({'id':case['id'],'case':case,'requests':str(requests),'config':str(config),'output':str(directory/'matrix'),'planned_rows':len(fixture['queries'])*8*30,'K':fixture['k'],'source_mode':'approved fixture','filter_scope':'F-01 filters/exact/budget are separately evaluated through native SearchDetailed; public v2 tool has no filter argument'if fixture['family']=='F-01'else'no filters'})
+ for path in [version/'vector/vector.db',version/'graph/graph.db',version/'dataset-identity.json',version/'sources/manifest.json']+[Path(case['semantic_store'])]if case.get('semantic_store')else[version/'vector/vector.db',version/'graph/graph.db',version/'dataset-identity.json',version/'sources/manifest.json']:
+  store_seals[str(path)]=sha(path)
+static=out/'static-development';static.mkdir();requests=static/'requests.json';requests.write_bytes(Path('/private/tmp/ks-approved-scope-20261006/official-static-stdio/static-dev-requests.json').read_bytes());config=static/'config.yaml';config.write_text(Path('/private/tmp/ks-approved-scope-20261006/official-static-stdio/static-config.yaml').read_text().replace('/official-static-stdio/footprints','/approved-development-sweep-20261006/static-development/base-footprints'))
+steps.append({'id':'static-development','requests':str(requests),'config':str(config),'output':str(static/'matrix'),'planned_rows':960,'K':10,'source_mode':'approved fixed static corpus'})
+version=Path('/private/tmp/ks-approved-scope-20261006/strict-dataset/approved-m2max-20261006')
+for path in [version/'vector/vector.db',version/'graph/graph.db',version/'dataset-identity.json',version/'sources/manifest.json']:store_seals[str(path)]=sha(path)
+record={'schema_version':1,'partition':'development','status':'running','binary_sha256':sha(binary),'input_sha256_before':{str(p):sha(p)for p in locks},'store_sha256_before':store_seals,'steps':steps,'checks':[],'planned_rows':sum(s['planned_rows']for s in steps),'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'latency_environment':'shared M2 Max; sequential captures; no task-owned concurrent embedding/build/tests; not exclusive host','protocol_counts':{'warmup':2,'retrieval':5,'warm_latency':20,'cold_process':3},'final_queries_executed':False}
+ledger=out/'execution.json'
+def save():ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+save()
+for step in steps:
+ record['current_step']=step['id'];save();start=time.monotonic();args=[binary,'eval','matrix','--requests',step['requests'],'--config',step['config'],'--cks-mcp',binary,'--output',step['output'],'--warmup','2','--retrieval-runs','5','--warm-runs','20','--cold-runs','3','--call-timeout','90s','--environment-ledger','--environment-note',record['latency_environment']+'; model remains resident; no daemon unload. Small synthetic variants remain clustered; repetition is not an independent sample.']
+ for lock in locks:args.extend(['--lock-file',lock])
+ with (Path(step['output']).parent/'matrix.log').open('xb')as log:code=subprocess.run([str(a)for a in args],stdout=log,stderr=subprocess.STDOUT).returncode
+ report=read(Path(step['output'])/'report.json');check={'id':step['id'],'command':[str(a)for a in args],'exit_code':code,'elapsed_seconds':time.monotonic()-start,'report_state':report['state'],'rows':report['rows'],'report_sha256':sha(Path(step['output'])/'report.json')};record['checks'].append(check);save();print(json.dumps(check),flush=True)
+ if code:record['status']='failed_preserved';save();raise SystemExit(code)
+record.update(status='captured_pending_independent_family_oracles_and_reports',input_sha256_after={str(p):sha(p)for p in locks},store_sha256_after={p:sha(Path(p))for p in store_seals},binary_sha256_after=sha(binary),finished_at=datetime.datetime.now(datetime.timezone.utc).isoformat())
+record['inputs_unchanged']=record['input_sha256_before']==record['input_sha256_after'];record['stores_unchanged']=record['store_sha256_before']==record['store_sha256_after'];assert record['inputs_unchanged']and record['stores_unchanged']and record['binary_sha256']==record['binary_sha256_after'];save();print(json.dumps({'status':record['status'],'rows':sum(c['rows']for c in record['checks']),'checks':len(record['checks'])}),flush=True)

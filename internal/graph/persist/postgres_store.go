@@ -767,11 +767,11 @@ func (s *pgStore) TopNodes(metric string, limit int, excludeTypes ...string) ([]
 	return scanPGNodes(rows)
 }
 
-// DistinctFilePaths returns the unique file_path values for the given language.
-// Defensive empty-string filter mirrors the SQLite implementation.
+// DistinctFilePaths returns current File-node paths for the given language.
+// Historical Hunk paths must not enter the audit's current file set.
 func (s *pgStore) DistinctFilePaths(language string) ([]string, error) {
 	rows, err := s.pool.Query(background,
-		`SELECT DISTINCT file_path FROM nodes WHERE language = $1 AND file_path != ''`,
+		`SELECT DISTINCT file_path FROM nodes WHERE language = $1 AND kind = 'File' AND file_path != ''`,
 		language)
 	if err != nil {
 		return nil, fmt.Errorf("distinct file_path (lang=%q): %w", language, err)

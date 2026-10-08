@@ -73,6 +73,9 @@ func registerGetFlow(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleGetFlow(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	q := ckvclient.FlowQuery{
 		FlowID:      req.GetString("flow_id", ""),
 		EntryPoint:  req.GetString("entry_point", ""),
@@ -113,6 +116,9 @@ func registerExpandFlow(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleExpandFlow(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	stepID := req.GetString("step_id", "")
 	if stepID == "" {
 		return mcpgo.NewToolResultError(ToolNameExpandFlow + ": missing required argument \"step_id\""), nil
@@ -160,6 +166,9 @@ func registerFindBranches(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleFindBranches(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	symptom := req.GetString("symptom_text", "")
 	if symptom == "" {
 		return mcpgo.NewToolResultError(ToolNameFindBranches + ": missing required argument \"symptom_text\""), nil
@@ -193,6 +202,9 @@ func registerGetInvariantEnforcement(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleGetInvariantEnforcement(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	invID := req.GetString("inv_id", "")
 	if invID == "" {
 		return mcpgo.NewToolResultError(ToolNameGetInvariantEnforcement + ": missing required argument \"inv_id\""), nil
@@ -236,6 +248,9 @@ func registerFindInvariants(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleFindInvariants(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	fc, errRes := flowClient(d, ToolNameFindInvariants)
 	if errRes != nil {
 		return errRes, nil
@@ -270,6 +285,9 @@ func registerGetConventions(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleGetConventions(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	fc, errRes := flowClient(d, ToolNameGetConventions)
 	if errRes != nil {
 		return errRes, nil

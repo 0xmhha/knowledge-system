@@ -1,0 +1,17 @@
+from pathlib import Path
+import subprocess,json,time,datetime,hashlib
+root=Path.cwd();out=Path('/private/tmp/ks-approved-scope-20261006/official-static-matrix-final');out.mkdir(exist_ok=False)
+binary=Path('/private/tmp/ks-approved-scope-20261006/runtime-final/cks')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+old=root/'system/eval/b0-knowledge-system'
+locks=[old/n for n in ['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json']]
+requests=out/'development-requests.json';requests.write_bytes(Path('/private/tmp/ks-approved-scope-20261006/official-static-stdio/static-dev-requests.json').read_bytes())
+config=out/'static-config.yaml';config.write_text(Path('/private/tmp/ks-approved-scope-20261006/official-static-stdio/static-config.yaml').read_text().replace('/official-static-stdio/footprints','/official-static-matrix-final/footprints'))
+args=[binary,'eval','matrix','--requests',requests,'--config',config,'--cks-mcp',binary,'--output',out/'matrix','--warmup','2','--retrieval-runs','5','--warm-runs','20','--cold-runs','3','--call-timeout','90s','--environment-ledger','--environment-note','Native M2 Max shared host; no exclusive resource claim. Sequential approved DEV captures; strict build and SF builds completed before capture. No concurrent task-owned embedding/build/tests during latency measurement. Ollama model remains resident, no unload. Static has no approved ontology or selected policy pack: fallback is an observed result.']
+for p in locks:args.extend(['--lock-file',p])
+diff=subprocess.run(['git','diff','--binary','HEAD'],check=True,capture_output=True).stdout
+(out/'runtime-working-diff.patch.txt').write_bytes(diff)
+record={'schema_version':1,'partition':'development','status':'running','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'binary_sha256':sha(binary),'source_head':subprocess.run(['git','rev-parse','HEAD'],check=True,capture_output=True,text=True).stdout.strip(),'runtime_working_diff_sha256':hashlib.sha256(diff).hexdigest(),'input_sha256_before':{str(p):sha(p)for p in locks},'config_sha256':sha(config),'requests_sha256':sha(requests),'command':[str(a)for a in args],'builder_unchanged':True,'v1_preserved_from':'../official-static-stdio/static-dev-v1.json'}
+ledger=out/'execution.json';ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n');start=time.monotonic()
+with (out/'matrix.log').open('xb')as stream:code=subprocess.run([str(a)for a in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+record.update(status='captured_pending_independent_audit'if code==0 else'failed_preserved',exit_code=code,elapsed_seconds=time.monotonic()-start,input_sha256_after={str(p):sha(p)for p in locks},binary_sha256_after=sha(binary),finished_at=datetime.datetime.now(datetime.timezone.utc).isoformat());record['inputs_unchanged']=record['input_sha256_before']==record['input_sha256_after'];ledger.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in record.items()if k not in['command','input_sha256_before','input_sha256_after']}));raise SystemExit(code)

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "project_id": "f-06-final",
+  "requirements": [
+    {
+      "id": "req-refund-cap",
+      "version": 1,
+      "title": "Documented fixture refund cap",
+      "statement": "RefundLimit must return a value no greater than 10.",
+      "status": "verified",
+      "concept_ids": [
+        "refund-cap"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "ac-refund-cap",
+          "given": "The fixture RefundLimit implementation",
+          "when": "RefundLimit is invoked",
+          "then": "Its returned value is no greater than 10."
+        }
+      ],
+      "reviewed_by": "chat-user"
+    }
+  ]
+}

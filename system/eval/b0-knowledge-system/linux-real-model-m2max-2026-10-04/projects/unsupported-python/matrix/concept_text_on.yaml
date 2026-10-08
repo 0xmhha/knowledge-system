@@ -1,0 +1,44 @@
+version: 1
+name: ks-unsupported-python
+description: ""
+backends:
+    ckg:
+        path: /out/diagnostic-after/unsupported-python/dataset/current/graph/graph.db
+        source_root: /out/diagnostic-after/unsupported-python/src
+        timeout_ms: 5000
+        binary_path: ""
+        policy_file: ""
+    ckv:
+        path: /out/diagnostic-after/unsupported-python/dataset/current/vector
+        provider: ollama
+        binary_path: ""
+        timeout_ms: 3000
+        embed_model: bge-m3:latest
+        query_prefix_policy: registry
+        ollama_url: http://127.0.0.1:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: true
+    transport: stdio
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: /out/diagnostic-after/unsupported-python/matrix/footprints/concept_text_on
+    audit_dir: ""
+    measure_backend_calls: true
+sanitize:
+    rules_path: /tmp/unpacked/knowledge-system-linux-arm64-331ff24cc6c7/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: ""
+    ontology_mode: concept_text
+service:
+    label_prefix: ""

@@ -8,11 +8,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -34,11 +36,19 @@ import (
 // Options carry the CLI/programmatic configuration. SrcRoot and OutDir
 // are required; everything else has a documented default.
 type Options struct {
-	SrcRoot   string
-	OutDir    string
-	Embedder  types.Embedder // required
-	CKVIgnore []string       // extra ignore patterns from --ckvignore CLI flag
-	BatchSize int            // embedding batch size; 0 → 32
+	ProjectID           string
+	SnapshotID          string
+	DatasetID           string
+	FileManifestDigest  string
+	CapturePolicyDigest string
+	SourceMode          string
+	SrcRoot             string
+	LogicalSrcRoot      string // public project path when SrcRoot is an immutable build tree
+	OutDir              string
+	Embedder            types.Embedder // required
+	CKVIgnore           []string       // extra ignore patterns from --ckvignore CLI flag
+	BuildSourcesPath    string         // exact Go paths allowed through the build/ default
+	BatchSize           int            // embedding batch size; 0 → 32
 	// Version is the ckv build version recorded in the manifest. The CLI sets
 	// it from the ldflags-injected cmd/ckv.Version; empty falls back to "dev".
 	Version   string
@@ -129,6 +139,10 @@ type Result struct {
 
 const defaultBatch = 32
 
+// ErrIncompleteEmbedding means a strict build refused to publish a vector
+// created from less than a chunk's complete embedding input.
+var ErrIncompleteEmbedding = errors.New("embedding input incomplete")
+
 // Run executes the full indexing pipeline once. Idempotent: re-running
 // against the same OutDir updates chunks in place (Upsert semantics).
 //
@@ -138,6 +152,12 @@ const defaultBatch = 32
 //  3. For each Go file: parse → chunk → embed → upsert.
 //  4. Write manifest.json + DB-side manifest table.
 func Run(ctx context.Context, o Options) (*Result, error) {
+	if o.ProjectID != "" || o.SnapshotID != "" || o.DatasetID != "" || o.FileManifestDigest != "" || o.CapturePolicyDigest != "" || o.SourceMode != "" {
+		if o.ProjectID == "" || o.SnapshotID == "" || o.DatasetID == "" || o.FileManifestDigest == "" || o.CapturePolicyDigest == "" ||
+			(o.SourceMode != "committed" && o.SourceMode != "working-tree" && o.SourceMode != "snapshot-only") {
+			return nil, fmt.Errorf("incomplete or unsupported pinned vector source identity")
+		}
+	}
 	if o.SrcRoot == "" || o.OutDir == "" {
 		return nil, fmt.Errorf("build: SrcRoot and OutDir are required")
 	}
@@ -174,6 +194,10 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	defer lock.release()
 
 	commit, _ := detectCommit(o.SrcRoot) // empty string when not a git repo; acceptable
+	publicRoot := o.SrcRoot
+	if o.LogicalSrcRoot != "" {
+		publicRoot = o.LogicalSrcRoot
+	}
 
 	// Load per-project hook (<src>/ckv.yaml). Absence is OK — Load
 	// returns a zero-value Config that the rest of the pipeline
@@ -244,7 +268,12 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 			"file_count", len(resolved),
 		)
 	}
+	buildSources, err := discover.LoadBuildSources(o.BuildSourcesPath)
+	if err != nil {
+		return nil, fmt.Errorf("build sources: %w", err)
+	}
 	files, walkErrs, err := discover.Walk(o.SrcRoot, discover.Options{
+		BuildSources: buildSources,
 		Extra:        mergedIgnore,
 		GoBuildFiles: goBuildFiles,
 		AllowList:    allowList,
@@ -277,6 +306,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	totalStats := chunk.Stats{}
 	languageCounts := make(map[string]int)
 	indexedFiles := 0
+	var inputFiles []manifest.InputFile
 	chunker := newChunker(o.Embedder, cfg)
 	embedTextFn := resolveEmbedTextFn(ctx, o.DisableContextualPrefix, resolveLLMPrefixer(o.LLMPrefixModel, o.OutDir))
 
@@ -355,6 +385,14 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 			}
 			if len(chunks) == 0 {
 				return
+			}
+			if o.DatasetID != "" {
+				digest, hashErr := fileSHA256(f.AbsPath)
+				if hashErr != nil {
+					perFileErr = fmt.Errorf("hash vector source %s: %w", f.RelPath, hashErr)
+					return
+				}
+				inputFiles = append(inputFiles, manifest.InputFile{OriginID: "repo", Path: f.RelPath, SHA256: digest})
 			}
 			// CKG alignment: stamp each chunk's CanonicalID by matching
 			// (file_path, start_line) into the in-memory ckg index.
@@ -561,6 +599,20 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		}
 	}
 
+	// The on-disk store is authoritative. In particular, non-symbol chunks
+	// can carry canonical IDs too; counting all of them against SymbolCount
+	// silently inflates the coverage used by the setup promotion gate.
+	validation, err := store.Validate(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("validate built index: %w", err)
+	}
+	if !validation.OK() {
+		return nil, fmt.Errorf("built index has %d orphan chunks and %d orphan vectors", validation.OrphanChunks, validation.OrphanVectors)
+	}
+	totalStats.Total = validation.Chunks
+	totalStats.Symbol = validation.SymbolChunks
+	totalStats.CanonicalID = validation.CanonicalChunks
+
 	builtAt := o.Now().UTC().Format(time.RFC3339)
 
 	// Embedding-space identity is derived from the embedder (which sources
@@ -568,42 +620,66 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	// model changes the recorded normalize/checksum automatically and a
 	// later Open with a different embedding space is rejected.
 	embID := o.Embedder.Identity()
+	if verifier, ok := o.Embedder.(types.IdentityVerifier); ok {
+		if err := verifier.VerifyIdentity(ctx); err != nil {
+			return nil, fmt.Errorf("verify embedding identity before publish: %w", err)
+		}
+	}
 	embChecksum := embID.Checksum()
+	var embIDV2 *types.EmbeddingIdentity
+	if embID.Version >= 2 {
+		embIDV2 = &embID
+	}
 
 	// Persist identity into both the JSON sidecar and the DB manifest
 	// table so /freshness can read either without coordinating opens.
 	if err := store.SetManifest(ctx, map[string]string{
-		"embedding_model":     o.Embedder.Name(),
-		"embedding_dim":       fmt.Sprintf("%d", o.Embedder.Dimension()),
-		"embedding_normalize": embID.Normalize,
-		"embedding_checksum":  embChecksum,
-		"indexed_head":        commit,
-		"built_at":            builtAt,
+		"src_root":                   absOrEmpty(publicRoot),
+		"project_id":                 o.ProjectID,
+		"snapshot_id":                o.SnapshotID,
+		"dataset_id":                 o.DatasetID,
+		"file_manifest_digest":       o.FileManifestDigest,
+		"capture_policy_digest":      o.CapturePolicyDigest,
+		"source_mode":                o.SourceMode,
+		"embedding_model":            o.Embedder.Name(),
+		"embedding_dim":              fmt.Sprintf("%d", o.Embedder.Dimension()),
+		"embedding_normalize":        embID.Normalize,
+		"embedding_checksum":         embChecksum,
+		"embedding_identity_version": fmt.Sprintf("%d", embID.Version),
+		"embedding_model_digest":     embID.ModelDigest,
+		"indexed_head":               commit,
+		"built_at":                   builtAt,
 	}); err != nil {
 		return nil, fmt.Errorf("write db manifest: %w", err)
 	}
 
 	ckvVersion := o.Version
+	sort.Slice(inputFiles, func(i, j int) bool { return inputFiles[i].Path < inputFiles[j].Path })
 	if ckvVersion == "" {
 		ckvVersion = "dev"
 	}
 	man := &manifest.Manifest{
-		SchemaVersion:      manifest.SchemaVersionCurrent,
-		CKVVersion:         ckvVersion,
-		BuiltAt:            builtAt,
-		SrcRoot:            absOrEmpty(o.SrcRoot),
-		SrcCommit:          commit,
-		IndexedHead:        commit,
-		EmbeddingModel:     o.Embedder.Name(),
-		EmbeddingDim:       o.Embedder.Dimension(),
-		EmbeddingNormalize: embID.Normalize,
-		EmbeddingChecksum:  embChecksum,
-		ChunkCount:         totalStats.Total,
-		SymbolCount:        totalStats.Symbol,
-		CanonicalCount:     totalStats.CanonicalID,
-		Languages:          languageCounts,
-		CKVIgnore:          o.CKVIgnore,
-		DocsRoots:          absRoots(manifestDocsRoots),
+		ProjectID: o.ProjectID, SnapshotID: o.SnapshotID, DatasetID: o.DatasetID,
+		FileManifestDigest: o.FileManifestDigest, CapturePolicyDigest: o.CapturePolicyDigest, SourceMode: o.SourceMode,
+		SchemaVersion:       manifest.SchemaVersionCurrent,
+		CKVVersion:          ckvVersion,
+		BuiltAt:             builtAt,
+		SrcRoot:             absOrEmpty(publicRoot),
+		SrcCommit:           commit,
+		IndexedHead:         commit,
+		EmbeddingModel:      o.Embedder.Name(),
+		EmbeddingDim:        o.Embedder.Dimension(),
+		EmbeddingNormalize:  embID.Normalize,
+		EmbeddingChecksum:   embChecksum,
+		EmbeddingIdentityV2: embIDV2,
+		ChunkCount:          totalStats.Total,
+		SymbolCount:         totalStats.Symbol,
+		CanonicalCount:      totalStats.CanonicalID,
+		Languages:           languageCounts,
+		CKVIgnore:           o.CKVIgnore,
+		BuildSources:        buildSources,
+		DocsRoots:           absRoots(manifestDocsRoots),
+		InputFiles:          inputFiles,
 	}
 	man.Sources = buildSourcesLedger(o, commit, builtAt, prSource)
 
@@ -732,6 +808,13 @@ func embedResilient(ctx context.Context, emb types.Embedder, chunks []types.Chun
 	}
 	if len(chunks) <= 1 {
 		if len(chunks) == 1 {
+			// B0 and other quality-sensitive builds can require every stored
+			// chunk to have a vector from its full input. The normal recovery
+			// path below embeds only the head or skips a rejected chunk.
+			if os.Getenv("CKV_REQUIRE_COMPLETE_EMBEDDINGS") == "1" {
+				return nil, nil, fmt.Errorf("%w: chunk %s (%s): %v",
+					ErrIncompleteEmbedding, chunks[0].ID, chunks[0].File, err)
+			}
 			// Distinguish a per-input rejection from a broken embedder: if a
 			// tiny known-good probe also fails, the embedder is down — propagate
 			// the original error rather than silently dropping every chunk to an

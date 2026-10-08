@@ -13,17 +13,24 @@ type CKGIgnore struct {
 	patterns []string
 }
 
+// These generated dependency/output trees are skipped by CKV as well. Keep
+// the defaults aligned so a Git-ignored file cannot enter only one engine.
+var defaultCKGIgnore = []string{
+	".git/", "node_modules/", "vendor/", ".next/", "out/", "dist/",
+	"build/", "target/", ".venv/", "__pycache__/",
+}
+
 // LoadCKGIgnore reads `.ckgignore` from root. Missing file is OK (returns empty matcher).
 func LoadCKGIgnore(root string) (*CKGIgnore, error) {
+	c := &CKGIgnore{patterns: append([]string(nil), defaultCKGIgnore...)}
 	f, err := os.Open(filepath.Join(root, ".ckgignore"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return &CKGIgnore{}, nil
+			return c, nil
 		}
 		return nil, err
 	}
 	defer func() { _ = f.Close() }()
-	c := &CKGIgnore{}
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())

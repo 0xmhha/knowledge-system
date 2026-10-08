@@ -1,0 +1,863 @@
+{
+  "state": "verified",
+  "quality_metrics": null,
+  "base_commit": "b762aa668e263010e580d5ec37b54816026b7582",
+  "source_hashes": {
+    "internal/system/composer/stage1/candidates.go": "e033ad912d5d53888dfd4d53ab5706afa4d768ae6281463f4b9aef9cf777b8ad",
+    "internal/system/composer/stage1/extractor_knowledge_test.go": "711ba1133f690cf6984bb103aeccdfebf2abd595bd629d26f0874377917bb3bd"
+  },
+  "binary_sha256": "379a17f8e8c779befdee4f1fe58dfd7119d24a5a10de98990dba27217f5a91f9",
+  "locked_files_sha256": {
+    "/private/tmp/ks-b0-calls-final-real-20261004/dataset/smoke/dataset-identity.json": "ee9bd2dbd84bfa4768a04664e9a38c6d767251105406381159e3f77066f6f732",
+    "/private/tmp/ks-b0-calls-final-real-20261004/dataset/smoke/vector/manifest.json": "4b072bb6dc645c5d4330680263f1c544016d2f1132485df9950bc95c8f2db5d7",
+    "/private/tmp/ks-b0-calls-final-real-20261004/dataset/smoke/graph/graph.db": "4660e2cce71cd300e18fc250404a75eab0c994654b260aa13d0d3a400f98950b",
+    "/private/tmp/ks-b0-calls-final-real-20261004/semantic.db": "660208dc8f3afe4d4a6815e4d5e3e310ad33409e562d883e536851267130dc8b",
+    "/private/tmp/ks-b0-calls-final-real-20261004/dataset/smoke/vector/vector.db": "ba8e3ac9b43e3dbd720247eee98559cf8f095533d60dcfddd0d3594abc4b0961"
+  },
+  "arm_rotation": false,
+  "arms": [
+    {
+      "arm": "baseline_off",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/baseline_off-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/baseline_off.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/baseline_off.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "5b4f654e591b7508f4d19b223f019e48668b46c5e9c21e8f84b0d23ea3b27bb7",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "55f329e457cd102a9936210d1a09877d",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "75234ee7194c3a92e6f6bac9e92b5982",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "082b0a8180a244110aa778c0e4d7f8f3",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "e52a5f1a5f68fea7f8866a59eee2968d",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "d982c8858b91ba1272d94b12c0285b52",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "14c63d037f17a669ea55447d59a77d04",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "baseline_on",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/baseline_on-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/baseline_on.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/baseline_on.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "07f5a48b45f8f1a51cbcf06b3160fd8d71e1aba5070c95d7d6af7dd36c23b8c5",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "1c9abce504e03e85ae2732e9f3e92d11",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "32540673af8cbbae3271358fc248a445",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "428e2c4b6cc1da13eab8961cd2b347ff",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "7f63792df8959682f7032911486b1600",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "d997a18354ab078cc85743e8de3a5962",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "88ad5133e26b5b38ea3f1e3fe93f4ffd",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "concept_text_off",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/concept_text_off-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/concept_text_off.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/concept_text_off.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "305dc04ea49da6630359885b98880fcbcc6e00e5451ec64ec674d04c214e6059",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "a1d5e678abe7d9ade320bbfcbcb1846a",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "1fec9de86fcf42154648ff6c616c43ba",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "aa77b9e6ae438cd02796ca2658ac079a",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "71246cf034271b20412b19100659a15a",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "d10dff8decbe557b482bd3156db8906f",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "99083cece3c5140cccd9753c6397e9ff",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "concept_text_on",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/concept_text_on-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/concept_text_on.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/concept_text_on.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "1715649c0ce2fddd2a8a8697617005f9adb7ffe0fca400361d6eef44b5d08892",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "b6b6e17587502a2535d1ebb13fe4ee51",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "2a1ab88b4239aa277619aa0a9e9a2e0c",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "022dd742ea64aacf42ed3742c709a5cd",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "55129638652c38f29a2c9a12ef0c1fbd",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "3ef9e83b8065b20e1dce9eca2d2735f3",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "abc65b90bc1c5fa7c49014f13f209ea8",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "relations_off",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/relations_off-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/relations_off.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/relations_off.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "868663d12ea27512cfa35247004886b118025828a9ed792aba6d7f12bf8110e2",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "38268a6e468fe1d6791068e6e7d04f0b",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "04e76c4f3911ab435723a46688ad9882",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "ab5ea59effadea39c58952fea352ba98",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "b2ff84995de906bd8be3f639da12b03d",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "96abc982d89447b1fc448448466fe933",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "da73cafecf24487d31721cd8200bceae",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "relations_on",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/relations_on-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/relations_on.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/relations_on.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "5b53ed8c62b13b08af0edad6927b2e741ea24554de30a16a942a2dba2886c6ae",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "8aa53251a11e2655b5fedc0d9dacfba9",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "a1998241f55335b8a22fc427c3e28641",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "42a884daa8cba1d29801aaac23926d55",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "6ca9a10042cc254ea43ac80a6bbc451d",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "56a43c88aba1cbf9266a9b181120ae1d",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "d3c37209fa0667a3751d5692c3492ee7",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "combined_off",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/combined_off-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/combined_off.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/combined_off.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "ce8ecf55338bd35423ee01ce619a406a7194632353ddc44bff9c13b1412d7a40",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "a403d95e1a3edea5ed50fd8c226b7c27",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "9578cb079402411eae5e8aeeece30667",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "642a503dddc3b282ed1bba6fd566471e",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "4f461f3934a4f3771bc12fbfb7ed47bf",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "f960621910048cbc8d17c8e83f5e452c",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "f53186119d9f8ba628d64880c7fac434",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    },
+    {
+      "arm": "combined_on",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b0-calls-final-real-20261004/combined_on-requests.json",
+        "--config",
+        "/private/tmp/ks-fix07-real-20261004/combined_on.yaml",
+        "--output",
+        "/private/tmp/ks-fix07-real-20261004/combined_on.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "capture_sha256": "e881683c4cf60840405af8aa7ecc9cd3d467572e6d1932e91ff42be6b9ce36a6",
+      "observations": [
+        {
+          "request_id": "alpha",
+          "measurement_id": "6c8a898566305505a603afe9c9c1d9bc",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "wrong-scope",
+          "measurement_id": "df79d93b129965d5ce3ac39e120e645e",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "proposed",
+          "measurement_id": "bd97e24bddd4a637940f7b26b26430e5",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "expired",
+          "measurement_id": "600506393b0e3230f62477bfdc190f9f",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "restricted",
+          "measurement_id": "d9d2ec914a991bb3bc811c85e6508212",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        },
+        {
+          "request_id": "conflict",
+          "measurement_id": "e8e48d4e39e67e49eef52666a0b40480",
+          "bm25_calls": 38,
+          "bm25_errors": 0,
+          "neighbors_errors": 8,
+          "sdk_response_identical_to_before": true
+        }
+      ]
+    }
+  ],
+  "requests": 48,
+  "sdk_responses_unchanged": 48,
+  "bm25_errors_before": 96,
+  "bm25_errors_after": 0,
+  "neighbors_errors_after": 384,
+  "physical_inputs_unchanged": true,
+  "schema_version": 1,
+  "gate": "FIX-07 synthetic knowledge keywords",
+  "release": "preview",
+  "before_evidence": "system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04.json",
+  "limitations": [
+    "Synthetic fixture structural verification only; formal B0/B1/C0 quality remains pending.",
+    "Raw/text K20 and knowledge K6 retained; arm rotation not implemented.",
+    "README/non-symbol graph span resolution failures remain best-effort and visible.",
+    "The original before-run code/48 response bytes are archived under backend-calls evidence. Replay uses an existing fixture and preserves its DB/source bytes."
+  ],
+  "checks": [
+    {
+      "name": "all Go regression",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/go-test-all.txt"
+    },
+    {
+      "name": "composer race",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/race.txt"
+    },
+    {
+      "name": "Go vet",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/vet.txt"
+    },
+    {
+      "name": "documentation",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/docs.txt"
+    },
+    {
+      "name": "engine boundaries",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/boundaries.txt"
+    },
+    {
+      "name": "source/integrity/policy audit",
+      "state": "passed",
+      "exit_code": 0,
+      "evidence": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/post-audit.txt"
+    }
+  ],
+  "artifact_inventory": [
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_off.json",
+      "bytes": 95008,
+      "sha256": "5b4f654e591b7508f4d19b223f019e48668b46c5e9c21e8f84b0d23ea3b27bb7"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_off.yaml",
+      "bytes": 1301,
+      "sha256": "39973c7c38dc8a1c14d2a44414f41a6bfe9b3df47fcd38f4ca0ab198b83db7d4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_on.json",
+      "bytes": 156634,
+      "sha256": "07f5a48b45f8f1a51cbcf06b3160fd8d71e1aba5070c95d7d6af7dd36c23b8c5"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/baseline_on.yaml",
+      "bytes": 1301,
+      "sha256": "39973c7c38dc8a1c14d2a44414f41a6bfe9b3df47fcd38f4ca0ab198b83db7d4"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/after-composer.txt",
+      "bytes": 558,
+      "sha256": "0dbacc1dbfe90d4c94f623b8f37141c0f6800a267d8c13312c5b268500f6dc58"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/before-regression.txt",
+      "bytes": 518,
+      "sha256": "7e7387bda1b8f12411fddfb07de11e2510c7e2ee1c23a124fe39028c4927e8fe"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/boundaries.txt",
+      "bytes": 22,
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/docs.txt",
+      "bytes": 39,
+      "sha256": "ea9727225396620c4ba319a50f23f904d0a394906bda22cbe8a855239664cdd6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/go-test-all.txt",
+      "bytes": 9352,
+      "sha256": "7707314ee5b025016c49b428ba5b5b62dd28afaa08da7bb6dd4aa5ef0e40e64a"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/model-after.json",
+      "bytes": 1906,
+      "sha256": "45cc449ce2fc2bf261a67be29d015c559916aca52491ffec231d0d82316ca350"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/post-audit.txt",
+      "bytes": 221,
+      "sha256": "f11211308f4bb2e307cb25dbd60ae38cdd1ab8d17c0b709694d2314dd1a25b98"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/race.txt",
+      "bytes": 550,
+      "sha256": "c88df50bcd7506970105a0882cf2abefcfa608463efb09329c7c8824b4de20cd"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/replay.py",
+      "bytes": 3652,
+      "sha256": "c8ee471db710abcd268a9e9486df75ed0297a59c6a17231d6ec157a44db1139c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/checks/vet.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_off.json",
+      "bytes": 102693,
+      "sha256": "ce8ecf55338bd35423ee01ce619a406a7194632353ddc44bff9c13b1412d7a40"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_off.yaml",
+      "bytes": 1301,
+      "sha256": "f0870e1518f07e73810e30fb391829f5916b4eda6c7af433f043bc75378c9630"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_on.json",
+      "bytes": 164320,
+      "sha256": "e881683c4cf60840405af8aa7ecc9cd3d467572e6d1932e91ff42be6b9ce36a6"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/combined_on.yaml",
+      "bytes": 1301,
+      "sha256": "f0870e1518f07e73810e30fb391829f5916b4eda6c7af433f043bc75378c9630"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_off.json",
+      "bytes": 102715,
+      "sha256": "305dc04ea49da6630359885b98880fcbcc6e00e5451ec64ec674d04c214e6059"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_off.yaml",
+      "bytes": 1309,
+      "sha256": "08b712933a160cfb2cf2869503ed91b7b01c2eb37ba27f9a8341018d6be9c83d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_on.json",
+      "bytes": 164345,
+      "sha256": "1715649c0ce2fddd2a8a8697617005f9adb7ffe0fca400361d6eef44b5d08892"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/concept_text_on.yaml",
+      "bytes": 1309,
+      "sha256": "08b712933a160cfb2cf2869503ed91b7b01c2eb37ba27f9a8341018d6be9c83d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_off.json",
+      "bytes": 96670,
+      "sha256": "868663d12ea27512cfa35247004886b118025828a9ed792aba6d7f12bf8110e2"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_off.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_off.yaml",
+      "bytes": 1303,
+      "sha256": "248c1fe3e45c5bc9269b2972f094406f2a1a31f1fa77fbf1fd566814f3f8a1d9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_on.json",
+      "bytes": 158296,
+      "sha256": "5b53ed8c62b13b08af0edad6927b2e741ea24554de30a16a942a2dba2886c6ae"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_on.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/relations_on.yaml",
+      "bytes": 1303,
+      "sha256": "248c1fe3e45c5bc9269b2972f094406f2a1a31f1fa77fbf1fd566814f3f8a1d9"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/summary.json",
+      "bytes": 20112,
+      "sha256": "03181ac2e30fe39de54d34b21deea5eaaaa072221dc46c7e6aaff8cf9199ca83"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/telemetry/baseline/cks-mcp.jsonl",
+      "bytes": 408067,
+      "sha256": "1d34abf3b7b5d8427ea9d8d0b452c84fa65242a955b13d05d3c7b34082ce11fa"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/telemetry/combined/cks-mcp.jsonl",
+      "bytes": 420626,
+      "sha256": "35d72a04a168ea588573b1a0545ed60708cf913ccb88ae6d34259711645d1bc8"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/telemetry/concept_text/cks-mcp.jsonl",
+      "bytes": 420743,
+      "sha256": "9be90b156f3fc89fd351800d2ca13fe57fea4764dad408ac45a5560801b57b52"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/fix07-knowledge-keywords-m2max-2026-10-04/telemetry/relations/cks-mcp.jsonl",
+      "bytes": 407982,
+      "sha256": "6d7427211e21b2236fd50ec26e1dcfb85d41ef1f1ca405c693c55d6e5c5c5a2a"
+    }
+  ]
+}

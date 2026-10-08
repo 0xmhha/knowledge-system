@@ -17,6 +17,26 @@ func TestDefault_PassesValidate(t *testing.T) {
 	}
 }
 
+func TestBackendMeasurementRequiresUndroppedJSONFileRecords(t *testing.T) {
+	for _, change := range []func(*Config){
+		func(c *Config) { c.Logging.FootprintDir = "" },
+		func(c *Config) { c.Logging.Mode = "dev" },
+		func(c *Config) { c.Logging.Level = "warn" },
+		func(c *Config) { c.Logging.Level = "error" },
+	} {
+		cfg := Default()
+		cfg.Logging.MeasureBackendCalls = true
+		cfg.Logging.FootprintDir = "/tmp/measurement"
+		if err := cfg.Validate(); err != nil {
+			t.Fatal(err)
+		}
+		change(cfg)
+		if err := cfg.Validate(); err == nil {
+			t.Fatal("accepted missing or suppressed measurement records")
+		}
+	}
+}
+
 func TestLoadBytes_RoundTrip(t *testing.T) {
 	t.Parallel()
 	yamlSrc := `
@@ -201,5 +221,33 @@ func TestConfig_Load_MissingFile(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "read") {
 		t.Errorf("error = %v, want 'read' context", err)
+	}
+}
+
+func TestRecallKConfigBoundsAndDefault(t *testing.T) {
+	for _, k := range []int{0, 1, 10, 20, 1000} {
+		cfg := Default()
+		cfg.Retrieval.RecallK = k
+		if err := cfg.Validate(); err != nil {
+			t.Fatalf("k=%d: %v", k, err)
+		}
+		want := k
+		if want == 0 {
+			want = 20
+		}
+		if cfg.Retrieval.EffectiveRecallK() != want {
+			t.Fatal("wrong effective K")
+		}
+	}
+	for _, k := range []int{-1, 1001} {
+		cfg := Default()
+		cfg.Retrieval.RecallK = k
+		if cfg.Validate() == nil {
+			t.Fatalf("accepted k=%d", k)
+		}
+	}
+	var cfg *Config
+	if cfg.Validate() == nil {
+		t.Fatal("nil config accepted")
 	}
 }

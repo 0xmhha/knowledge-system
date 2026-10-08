@@ -1,0 +1,20 @@
+from pathlib import Path
+import re,json,hashlib,datetime
+root=Path.cwd();base=root/'system/eval/b0-knowledge-system';pkg=base/'final-package-preview-m2max-2026-10-06';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_bytes());freeze=load(base/'approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json');assert len(freeze['product_source_sha256'])==1096
+assert all(sha(Path(p))==d for p,d in freeze['product_source_sha256'].items());assert all(sha(Path(p))==d for p,d in freeze['approved_input_sha256'].items())
+raw=(root/'docs/spec-driven/EXECUTION-WORKLIST.md').read_text();tasks=[];pending=[]
+for line in raw.splitlines():
+ if not re.match(r'^\| [BC][01]-\d\d \|',line):continue
+ f=[x.strip()for x in line.strip('|').split('|')];assert len(f)==5
+ if f[4].startswith(('검증 완료','구현 검증 완료')):
+  links=[]
+  for url in re.findall(r'\]\(([^)]+)\)',f[4]):
+   p=(root/'docs/spec-driven'/url).resolve();assert p.exists(),url;links.append({'path':str(p.relative_to(root)),'sha256':sha(p)})
+  tasks.append({'id':f[0],'completion_condition':f[3],'current_evidence_and_scope':f[4],'linked_artifacts':links,'review_result':'completion within explicitly stated technical/test scope; no quality pass or operating authority inferred'})
+ else:pending.append(f[0])
+assert len(tasks)==26 and pending==['B1-04','B1-07','B1-08','C1-05']
+rootgo=base/'approved-evaluation-m2max-2026-10-06/fix26-27/fix26-27-full-tests-module-boundary.log';python=base/'approved-evaluation-m2max-2026-10-06/fix28-report-binding/report-binding-after-independent-fixtures.log';assert '\nFAIL'not in rootgo.read_text()and 'ok  'in rootgo.read_text();assert 'Ran 26 tests'in python.read_text()and python.read_text().rstrip().endswith('OK')
+independent=load(pkg/'independent-audit.json');assert(independent['sdk_rows'],independent['citations'],independent['v2_integrity_responses'])==(11,11,6);assert load(pkg/'archive-source-replay.json')['source_verified_citations']==504;inventory=load(pkg/'archive-inventory.json');assert len(inventory['files'])==721
+for f in inventory['files']:p=pkg/f['path'];assert sha(p)==f['sha256']and p.stat().st_size==f['bytes']
+result={'schema_version':1,'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'re-read canonical completion conditions and current linked artifacts; frozen-code/root-regression evidence plus latest package/source/public/recovery proof; no new formal FINAL run, human verdict or operating authority','completed':26,'remaining':pending,'completed_tasks':tasks,'product_source_sha_matches_freeze':1096,'approved_input_sha_matches_freeze':5,'prior_root_go_pass_log':{'path':str(rootgo.relative_to(root)),'sha256':sha(rootgo)},'prior_b1_python_pass_log':{'path':str(python.relative_to(root)),'sha256':sha(python)},'latest_archive_files_hash_verified':721,'latest_archive_only_source_citations':504,'latest_recovery_sdk_rows':11,'quality_pass':False,'official_stage_verdicts':{k:'pending'for k in['B0','B1','C0','C1']},'human_claim_cost_scope_response':'pending'}
+out=base/'report-closure-reaudit-m2max-2026-10-06/completed-26-reaudit.json';out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print('26 completed scopes rechecked; 4 human/operating closure tasks remain')

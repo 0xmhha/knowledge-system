@@ -40,6 +40,13 @@ type Scenario struct {
 	Prompt            string
 	Intent            contract.Intent
 	ExpectedCitations []contract.Citation
+	// ExpectedCommit pins both the indexed head and returned citations. Without
+	// it, file/line metrics cannot establish that the evidence is current.
+	ExpectedCommit string
+	// ExpectNoCitations explicitly marks a retrieval-abstention case. An
+	// empty ExpectedCitations list alone means "no citation ground truth
+	// supplied" for backward compatibility, not necessarily no answer.
+	ExpectNoCitations bool
 	// ExpectedKnowledge lists scopes that must appear in the pack's
 	// knowledge section (contract.KnowledgeChunk.Scope). Recall and MRR
 	// are citation-based and cannot see that section at all, so without
@@ -71,6 +78,8 @@ type scenarioWire struct {
 	Prompt            string                 `yaml:"prompt"`
 	Intent            string                 `yaml:"intent,omitempty"`
 	ExpectedCitations []scenarioCitationWire `yaml:"expected_citations,omitempty"`
+	ExpectedCommit    string                 `yaml:"expected_commit,omitempty"`
+	ExpectNoCitations bool                   `yaml:"expect_no_citations,omitempty"`
 	ExpectedKnowledge []string               `yaml:"expected_knowledge,omitempty"`
 	MatchMode         MatchMode              `yaml:"match_mode,omitempty"`
 	Runs              int                    `yaml:"runs,omitempty"`
@@ -97,13 +106,15 @@ func ParseScenario(data []byte) (*Scenario, error) {
 		return nil, fmt.Errorf("scenario: decode: %w", err)
 	}
 	s := &Scenario{
-		Version:     w.Version,
-		Name:        w.Name,
-		Description: w.Description,
-		Prompt:      w.Prompt,
-		Intent:      contract.Intent(w.Intent),
-		MatchMode:   w.MatchMode,
-		Runs:        w.Runs,
+		Version:           w.Version,
+		Name:              w.Name,
+		Description:       w.Description,
+		Prompt:            w.Prompt,
+		Intent:            contract.Intent(w.Intent),
+		MatchMode:         w.MatchMode,
+		Runs:              w.Runs,
+		ExpectNoCitations: w.ExpectNoCitations,
+		ExpectedCommit:    w.ExpectedCommit,
 
 		ExpectedKnowledge: w.ExpectedKnowledge,
 	}
@@ -173,10 +184,36 @@ func (s *Scenario) Validate() error {
 	if s.Runs < 1 {
 		return fmt.Errorf("scenario: runs=%d invalid (must be >= 1)", s.Runs)
 	}
+	if s.ExpectNoCitations && len(s.ExpectedCitations) != 0 {
+		return errors.New("scenario: expect_no_citations conflicts with expected_citations")
+	}
+	if s.ExpectedCommit != "" {
+		if !fullGitSHA(s.ExpectedCommit) {
+			return errors.New("scenario: expected_commit must be a full 40-character lowercase Git SHA")
+		}
+	}
 	for i, c := range s.ExpectedCitations {
 		if !c.IsValid() {
 			return fmt.Errorf("scenario: expected_citations[%d] invalid: %+v", i, c)
 		}
+		if c.CommitHash != "" && !fullGitSHA(c.CommitHash) {
+			return fmt.Errorf("scenario: expected_citations[%d].commit_hash must be a full 40-character lowercase Git SHA", i)
+		}
+		if s.ExpectedCommit != "" && c.CommitHash != "" && c.CommitHash != s.ExpectedCommit {
+			return fmt.Errorf("scenario: expected_citations[%d].commit_hash conflicts with expected_commit", i)
+		}
 	}
 	return nil
+}
+
+func fullGitSHA(value string) bool {
+	if len(value) != 40 {
+		return false
+	}
+	for _, c := range value {
+		if c < '0' || c > '9' && c < 'a' || c > 'f' {
+			return false
+		}
+	}
+	return true
 }

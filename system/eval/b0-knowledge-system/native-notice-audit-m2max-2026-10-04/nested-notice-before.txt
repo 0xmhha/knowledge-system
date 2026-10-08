@@ -1,0 +1,16 @@
+test_missing_native_license_is_an_explicit_review_item (test_license_inventory.InventoryTests.test_missing_native_license_is_an_explicit_review_item) ... ok
+test_required_native_nested_notice_is_collected_and_missing_is_visible (test_license_inventory.InventoryTests.test_required_native_nested_notice_is_collected_and_missing_is_visible) ... FAIL
+test_vendored_notice_and_source_hashes_are_collected (test_license_inventory.InventoryTests.test_vendored_notice_and_source_hashes_are_collected) ... ok
+
+======================================================================
+FAIL: test_required_native_nested_notice_is_collected_and_missing_is_visible (test_license_inventory.InventoryTests.test_required_native_nested_notice_is_collected_and_missing_is_visible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_license_inventory.py", line 22, in test_required_native_nested_notice_is_collected_and_missing_is_visible
+    self.assertTrue(any(p.endswith('/src/unicode/LICENSE') for p in paths))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.021s
+
+FAILED (failures=1)

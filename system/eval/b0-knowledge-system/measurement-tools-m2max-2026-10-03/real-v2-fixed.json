@@ -1,0 +1,1013 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T13:01:31.042246Z",
+  "finished_at": "2026-10-03T13:01:34.332061Z",
+  "request_sha256": "0759492595469ebf66c664a35ded438e8418973d3f7084e7a34bd9f3d20d1c09",
+  "config_sha256": "fb4f847ef0f333538cb14383d5ad2b7860f8d11af484a824ad1a4e577b39d306",
+  "binary_sha256": "444f53a818d82ee938950de4b48f001f1d3c693366c8fcb1b56ceea329f2b4d0",
+  "config_sha256_after": "fb4f847ef0f333538cb14383d5ad2b7860f8d11af484a824ad1a4e577b39d306",
+  "binary_sha256_after": "444f53a818d82ee938950de4b48f001f1d3c693366c8fcb1b56ceea329f2b4d0",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 1,
+    "retrieval": 2,
+    "warm_latency": 1,
+    "warmup": 1
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "warmup",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 125824792,
+        "completed_at": "2026-10-03T22:01:32.503924+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-capture-smoke",
+              "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+              "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+              "source_mode": "committed",
+              "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+            },
+            "query": "Where is Alpha function implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+              },
+              {
+                "file": "main.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+                },
+                "text": "// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                  "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+                },
+                "text": "# Alpha behavior\n\nThe Alpha function in main.go returns the literal alpha-marker.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+                },
+                "text": "package smoke\n\n// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+                },
+                "text": "func Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+                },
+                "text": "package smoke\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b596671a734bf0db215013ab7b5ee5169921eed16b4beb6d5e2972bd87affaa3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 110904667,
+        "completed_at": "2026-10-03T22:01:32.614963+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-capture-smoke",
+              "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+              "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+              "source_mode": "committed",
+              "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+            },
+            "query": "Where is Alpha function implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+              },
+              {
+                "file": "main.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+                },
+                "text": "// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                  "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+                },
+                "text": "# Alpha behavior\n\nThe Alpha function in main.go returns the literal alpha-marker.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+                },
+                "text": "package smoke\n\n// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+                },
+                "text": "func Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+                },
+                "text": "package smoke\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b596671a734bf0db215013ab7b5ee5169921eed16b4beb6d5e2972bd87affaa3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "retrieval",
+      "iteration": 2,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 109433041,
+        "completed_at": "2026-10-03T22:01:32.724586+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-capture-smoke",
+              "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+              "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+              "source_mode": "committed",
+              "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+            },
+            "query": "Where is Alpha function implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+              },
+              {
+                "file": "main.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+                },
+                "text": "// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                  "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+                },
+                "text": "# Alpha behavior\n\nThe Alpha function in main.go returns the literal alpha-marker.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+                },
+                "text": "package smoke\n\n// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+                },
+                "text": "func Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+                },
+                "text": "package smoke\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b596671a734bf0db215013ab7b5ee5169921eed16b4beb6d5e2972bd87affaa3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 108921542,
+        "completed_at": "2026-10-03T22:01:32.833642+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-capture-smoke",
+              "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+              "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+              "source_mode": "committed",
+              "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+            },
+            "query": "Where is Alpha function implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+              },
+              {
+                "file": "main.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+                },
+                "text": "// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                  "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+                },
+                "text": "# Alpha behavior\n\nThe Alpha function in main.go returns the literal alpha-marker.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+                },
+                "text": "package smoke\n\n// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+                },
+                "text": "func Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+                },
+                "text": "package smoke\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b596671a734bf0db215013ab7b5ee5169921eed16b4beb6d5e2972bd87affaa3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "smoke-alpha-v2",
+      "phase": "cold_process",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha function implemented?"
+        },
+        "elapsed_ns": 142826625,
+        "completed_at": "2026-10-03T22:01:34.31324+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-capture-smoke",
+              "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+              "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+              "source_mode": "committed",
+              "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d"
+            },
+            "query": "Where is Alpha function implemented?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+              },
+              {
+                "file": "README.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+              },
+              {
+                "file": "main.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "project_id": "b0-capture-smoke",
+                "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                "source_mode": "committed",
+                "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                "origin_id": "repo",
+                "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "c2c138ffe762518d20364003bf671c2eadc7bbf1d48314f4ff7df670448db18b"
+                },
+                "text": "// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "README.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f",
+                  "content_sha256": "bab4cf86a6ad7a07b1d76fed1fc91a1b6a3336ed3b3d46abda4cb0112754594f"
+                },
+                "text": "# Alpha behavior\n\nThe Alpha function in main.go returns the literal alpha-marker.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45"
+                },
+                "text": "package smoke\n\n// Alpha returns the documented marker.\nfunc Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "6420877ea03b41059627bd462f4de736bd4223e4b36acf9546779bf55e1f4e8e"
+                },
+                "text": "func Alpha() string { return \"alpha-marker\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "project_id": "b0-capture-smoke",
+                  "dataset_id": "3838b29b6756234093ef27622372c8ff0080fb3aef80d6a77d812b0ac79f2655",
+                  "snapshot_id": "8078f52b0fe583ddd8b21c2eadee4418d6a3da7ee25e138d53b4144dcddb5b93",
+                  "source_mode": "committed",
+                  "base_commit": "56ac119f8555ef5202cb92dfaea8a3a3b907795d",
+                  "origin_id": "repo",
+                  "file_sha256": "2c91cbbfebaf70aaa0e8abb9832491d30d1ab624181a496cc39c15550fcfca45",
+                  "content_sha256": "a6c5d1a4993cb31306669f148dd5b2d2fb0d33f332b3effe0aef1feb48218f24"
+                },
+                "text": "package smoke\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "b596671a734bf0db215013ab7b5ee5169921eed16b4beb6d5e2972bd87affaa3"
+            }
+          }
+        }
+      },
+      "process_start_through_response_ns": 1475200583
+    }
+  ]
+}

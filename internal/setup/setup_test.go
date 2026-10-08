@@ -145,15 +145,43 @@ func TestVerifyAlignment(t *testing.T) {
 	root := t.TempDir()
 	g := filepath.Join(root, "graph")
 	v := filepath.Join(root, "vector")
+	src := filepath.Join(root, "source")
+	if err := os.Mkdir(src, 0o755); err != nil {
+		t.Fatal(err)
+	}
 
 	// Aligned: same commit, matching pin.
-	writeManifest(t, g, map[string]any{"src_commit": "abc", "graph_digest": "d1", "schema_version": "1.23"})
+	writeManifest(t, g, map[string]any{"src_root": src, "src_commit": "abc", "graph_digest": "d1", "schema_version": "1.23"})
 	writeManifest(t, v, map[string]any{
+		"src_root":   src,
 		"src_commit": "abc",
 		"sources":    map[string]any{"ckg": map[string]any{"graph_digest": "d1", "src_commit": "abc"}},
 	})
 	if err := VerifyAlignment(g, v, nil); err != nil {
 		t.Fatalf("aligned: %v", err)
+	}
+
+	// Same commit and graph digest do not prove both builders read the same
+	// source tree; a second checkout at that HEAD can have different edits.
+	writeManifest(t, v, map[string]any{
+		"src_root":   filepath.Join(root, "other-source"),
+		"src_commit": "abc",
+		"sources": map[string]any{"ckg": map[string]any{
+			"graph_digest": "d1", "src_commit": "abc",
+		}},
+	})
+	if err := VerifyAlignment(g, v, nil); err == nil || !strings.Contains(err.Error(), "different source roots") {
+		t.Fatalf("source-root mismatch: err = %v", err)
+	}
+	writeManifest(t, v, map[string]any{
+		"src_root":   filepath.Join(src, "."),
+		"src_commit": "abc",
+		"sources": map[string]any{"ckg": map[string]any{
+			"graph_digest": "d1", "src_commit": "abc",
+		}},
+	})
+	if err := VerifyAlignment(g, v, nil); err != nil {
+		t.Fatalf("equivalent source roots: %v", err)
 	}
 
 	// Pin mismatch fails.
@@ -544,4 +572,20 @@ func TestVerifyContent(t *testing.T) {
 			t.Error("a flow corpus that never reached the index must fail the build")
 		}
 	})
+}
+
+func TestBuildSourceScopeIsPassedOnlyToVector(t *testing.T) {
+	plan, err := BuildPlan(Options{Src: "/s", Out: "/o", VectorBuildSources: "/scope/build-sources.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, step := range plan.Steps {
+		command := strings.Join(step.Cmd, " ")
+		if step.ID == "vector-build" && !strings.Contains(command, "--build-sources /scope/build-sources.json") {
+			t.Fatal("missing vector source exception")
+		}
+		if step.ID == "graph-build" && strings.Contains(command, "--build-sources") {
+			t.Fatal("vector exception leaked to graph CLI")
+		}
+	}
 }

@@ -1,0 +1,521 @@
+#!/usr/bin/env python3
+"""Describe paired matrix citations/timings without issuing queries or release verdicts."""
+import argparse
+from collections import defaultdict
+import copy
+import hashlib
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path
+import random
+import re
+import statistics
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / 'system/eval/b0-knowledge-system'
+ARMS = [mode + '_' + pack for mode in ['baseline', 'concept_text', 'relations', 'combined'] for pack in ['off', 'on']]
+PHASES = ['warmup', 'retrieval', 'warm_latency', 'cold_process']
+METRICS = ['citation_recall_at_10', 'citation_precision_at_10', 'mean_expected_reciprocal_rank_at_10']
+
+
+def module(name, file):
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(file))
+    value = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(value)
+    return value
+
+
+SCOPES = module('matrix_static_scopes', 'b0-check-static-v2-scopes.py')
+INPUTS = SCOPES.INPUTS
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def decode(raw):
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('duplicate JSON key: ' + key)
+            result[key] = value
+        return result
+    return json.loads(raw, object_pairs_hook=unique,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('nonfinite JSON number')))
+
+
+def percentile(values, fraction):
+    if not values:
+        return None
+    ordered = sorted(values)
+    return ordered[max(0, math.ceil(len(ordered) * fraction) - 1)]
+
+
+def citation_key(c):
+    return (c['file'], c['start_line'], c['end_line'], c['commit_hash'])
+
+
+def source_bytes(source_root, file):
+    relative = Path(file)
+    if relative.is_absolute() or '..' in relative.parts or '\\' in file:
+        raise ValueError('unsafe citation path')
+    path = (source_root / relative).resolve()
+    if not path.is_relative_to(source_root.resolve()):
+        raise ValueError('citation escaped the retained source root')
+    return path.read_bytes()
+
+
+def citation_metrics(expected, actual):
+    # Match the public Go evaluator: dedup by location AND commit; retain order.
+    seen = set()
+    unique = []
+    for c in actual:
+        key = citation_key(c)
+        if key not in seen:
+            seen.add(key)
+            unique.append(c)
+    unique = unique[:10]
+    match = lambda e, a: (e['file'] == a['file'] and e['commit_hash'] == a['commit_hash']
+                          and e['start_line'] <= a['end_line'] and a['start_line'] <= e['end_line'])
+    hits = [next((i + 1 for i, a in enumerate(unique) if match(e, a)), None) for e in expected]
+    if not unique:
+        values = [0.0, 0.0, 0.0]
+    elif not expected:
+        values = [1.0, 0.0, 1.0]
+    else:
+        values = [sum(h is not None for h in hits) / len(expected),
+                  sum(any(match(e, a) for e in expected) for a in unique) / len(unique),
+                  sum(1 / h if h else 0 for h in hits) / len(expected)]
+    return dict(zip(METRICS, values), v1_no_citation_guard_pass=not actual,
+                returned_unique_citations=len(seen))
+
+
+def verify_pack(pack, identity, source_root):
+    if pack.get('format_version') != 2 or pack.get('metadata', {}).get('integrity_hash_algo') != 'sha256-v2':
+        raise ValueError('not a v2 sha256-v2 evidence pack')
+    canonical = copy.deepcopy(pack)
+    expected = canonical['metadata'].pop('integrity_hash')
+    if sha(json.dumps(canonical, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()) != expected:
+        raise ValueError('v2 integrity mismatch')
+    source = identity['source']
+    coordinates = {'project_id': source['project_id'], 'dataset_id': identity['dataset_id'],
+                   'snapshot_id': source['snapshot_id'], 'source_mode': source['source_mode'],
+                   'base_commit': source['source_commit']}
+    if pack.get('coordinates') != coordinates:
+        raise ValueError('foreign evidence pack coordinates')
+    for c in pack['citations']:
+        if any(c.get(k) != v for k, v in coordinates.items()) or c.get('commit_hash') != source['source_commit']:
+            raise ValueError('foreign citation coordinates/commit')
+        if (type(c.get('start_line')) is not int or type(c.get('end_line')) is not int
+                or not 1 <= c['start_line'] <= c['end_line']):
+            raise ValueError('invalid citation range')
+        raw = source_bytes(source_root, c['file'])
+        lines = raw.splitlines(keepends=True)
+        if (sha(raw) != c['file_sha256'] or c['end_line'] > len(lines)
+                or sha(b''.join(lines[c['start_line'] - 1:c['end_line']])) != c['content_sha256']):
+            raise ValueError('citation source bytes/range hash mismatch')
+    for body in pack['bodies']:
+        if body['citation'] not in pack['citations'] or sha(body['text'].encode()) != body['citation']['content_sha256']:
+            raise ValueError('body hash/reference mismatch')
+
+
+def bootstrap_delta(values, seed, resamples):
+    if not values:
+        return None
+    rng = random.Random(seed)
+    samples = [statistics.mean(rng.choices(values, k=len(values))) for _ in range(resamples)]
+    return {'mean': statistics.mean(values),
+            'descriptive_ci95': [percentile(samples, .025), percentile(samples, .975)],
+            'independent_units': len(values),
+            'inference': 'inconclusive' if len(values) < 10 else 'human_and_full_gate_review_pending'}
+
+
+def backend_scopes(directory, arm):
+    path = directory / 'footprints' / arm / 'cks-mcp.jsonl'
+    if not path.exists():
+        return {}, None
+    scopes = {}
+    raw = path.read_bytes()
+    for line in raw.splitlines():
+        event = decode(line)
+        if event.get('event') != 'measurement.backend_calls':
+            continue
+        summary = event['summary']
+        if summary.get('tool') != 'cks.context.get_for_task_v2':
+            continue  # startup constructor/probe work is not a measured query.
+        key = summary['measurement_id']
+        if key in scopes:
+            raise ValueError('duplicate backend measurement ID')
+        scopes[key] = summary
+    return scopes, sha(raw)
+
+
+def summarize(report, requests, rows, cases, source_root, ledgers, seed=20261003, resamples=10000):
+    if report.get('schema_version') != 1 or report['state'] not in {'captured', 'partial'}:
+        raise ValueError('matrix is not terminal')
+    if [a['id'] for a in report['arms']] != ARMS:
+        raise ValueError('matrix arm inventory/order differs')
+    if report['rows'] != len(rows):
+        raise ValueError('row count differs from manifest')
+    request_map = {r['id']: r for r in requests['requests']}
+    if len(request_map) != len(requests['requests']) or set(cases) != set(request_map):
+        raise ValueError('gold/request IDs must be unique and cover the selected capture')
+    if any('include_knowledge' in r['arguments'] for r in request_map.values()):
+        raise ValueError('include_knowledge is owned by the matrix pack axis')
+    identity = report['dataset_identity']
+    for case in cases.values():
+        if case['expected_commit'] != identity['source']['source_commit']:
+            raise ValueError('gold source commit differs from captured dataset')
+        if not isinstance(case['independent_unit_id'], str) or not case['independent_unit_id'] or type(case['expect_no_citations']) is not bool:
+            raise ValueError('independent unit and explicit no-citation oracle required')
+        for e in case['expected_citations']:
+            lines = source_bytes(source_root, e['file']).splitlines(keepends=True)
+            if type(e['start_line']) is not int or type(e['end_line']) is not int or not 1 <= e['start_line'] <= e['end_line'] <= len(lines):
+                raise ValueError('gold citation range differs from retained source')
+    unit_groups = defaultdict(set)
+    for c in cases.values():
+        unit_groups[c['independent_unit_id']].add(c['group'])
+    if any(len(groups) != 1 for groups in unit_groups.values()):
+        raise ValueError('one independent unit cannot be assigned to conflicting question groups')
+    groups = []
+    for phase in PHASES:
+        count = report['counts'][phase]
+        if type(count) is not int or count < (1 if phase == 'retrieval' else 0):
+            raise ValueError('invalid phase repetition count')
+        for req in requests['requests']:
+            for iteration in range(1, count + 1):
+                groups.append((phase, req['id'], iteration))
+    slots = {(phase, qid, iteration, arm) for phase, qid, iteration in groups for arm in ARMS}
+    seen, mids = set(), set()
+    measurements = []
+    invariants = []
+    for before, after in [('binary_sha256', 'binary_sha256_after'),
+                           ('locked_files_sha256', 'locked_files_sha256_after'),
+                           ('source_head', 'source_head_after'),
+                           ('live_executable_bits', 'live_executable_bits_after')]:
+        if report.get(before) != report.get(after) or report.get(before) is None:
+            invariants.append(before + '_changed_or_missing')
+    for a in report['arms']:
+        if a['config_sha256'] != a.get('config_sha256_after'):
+            invariants.append(a['id'] + '_config_changed')
+    for index, row in enumerate(rows):
+        if any(type(row.get(field)) is not int for field in ('sequence', 'group', 'position', 'iteration')) or row['sequence'] != index + 1 or not 0 <= row['group'] < len(groups) or not 1 <= row['position'] <= 8:
+            raise ValueError('invalid row sequence/group/position')
+        expected_arm = ARMS[(row['group'] + row['position'] - 1) % 8]
+        if row['arm'] != expected_arm or (row['phase'], row['request_id'], row['iteration']) != groups[row['group']]:
+            raise ValueError('row differs from rotated paired request/phase/iteration')
+        key = (row['phase'], row['request_id'], row['iteration'], row['arm'])
+        if key in seen:
+            raise ValueError('duplicate measurement slot')
+        seen.add(key)
+        call = row['call']
+        mid = call.get('measurement_id')
+        if mid:
+            if mid in mids:
+                raise ValueError('duplicate SDK measurement ID')
+            mids.add(mid)
+        issues = []
+        if not isinstance(mid, str) or not mid:
+            issues.append('sdk_measurement_id_missing_or_invalid')
+        expected_arguments = dict(request_map[row['request_id']]['arguments'], include_knowledge=row['arm'].endswith('_on'))
+        if ((not row.get('error') and (call.get('tool') != 'cks.context.get_for_task_v2' or call.get('arguments') != expected_arguments))
+                or (call.get('tool') is not None and call['tool'] != 'cks.context.get_for_task_v2')
+                or (call.get('arguments') is not None and call['arguments'] != expected_arguments)):
+            raise ValueError('captured query arguments differ from request/arm')
+        if row.get('error') or call.get('transport_error'):
+            issues.append('transport_or_initialize_error')
+        response = call.get('response')
+        pack = response.get('structuredContent') if isinstance(response, dict) else None
+        if response and response.get('isError'):
+            issues.append('mcp_tool_error')
+        if not issues:
+            try:
+                if not pack:
+                    raise ValueError('missing structured evidence pack')
+                verify_pack(pack, identity, source_root)
+                if pack['query'] != expected_arguments['prompt']:
+                    raise ValueError('evidence query differs from captured request')
+            except (ValueError, OSError, KeyError, TypeError) as exc:
+                issues.append('evidence_invalid: ' + str(exc))
+        elapsed = call.get('elapsed_ns')
+        if type(elapsed) is not int or elapsed < 0:
+            issues.append('elapsed_time_missing_or_invalid')
+        cold = row.get('process_start_through_response_ns')
+        if row['phase'] == 'cold_process' and (type(cold) is not int or cold < 0):
+            issues.append('cold_start_through_response_missing')
+        case = cases[row['request_id']]
+        expected = [dict(e, commit_hash=case['expected_commit']) for e in case['expected_citations']]
+        metrics = citation_metrics(expected, pack['citations']) if not issues else dict.fromkeys(METRICS, 0.0)
+        if issues:
+            metrics.update(v1_no_citation_guard_pass=False, returned_unique_citations=None)
+        backend = ledgers.get(row['arm'], {}).get(mid)
+        backend_info = None
+        if backend is not None:
+            events = backend['calls']
+            if backend.get('measurement_id') != mid or backend.get('tool') != call.get('tool'):
+                raise ValueError('backend measurement is not bound to the SDK call')
+            if [e.get('ordinal') for e in events] != list(range(1, len(events) + 1)) or type(backend['pending_calls']) is not int or backend['pending_calls'] < 0:
+                raise ValueError('backend ordinals/pending count invalid')
+            backend_info = {'attempts_by_backend': dict((name, sum(e['backend'] == name for e in events)) for name in sorted({e['backend'] for e in events})),
+                            'nonreturned_attempts': sum(e['outcome'] != 'returned' for e in events),
+                            'pending_calls': backend['pending_calls'],
+                            'observed_ckv_k': sorted({e.get('options', {}).get('K') for e in events if e['backend'] == 'ckv' and 'K' in e.get('options', {})}),
+                            'ollama_http_body_bytes': {
+                                'request_observed_total': sum(e.get('options', {}).get('request_body_bytes', 0) for e in events if e['backend'] == 'ollama_http'),
+                                'response_observed_total': sum(e.get('response_body_bytes', 0) for e in events if e['backend'] == 'ollama_http'),
+                                'response_size_missing_attempts': sum('response_body_bytes' not in e for e in events if e['backend'] == 'ollama_http')}}
+        measurements.append({'sequence': row['sequence'], 'request_id': row['request_id'], 'arm': row['arm'],
+                             'phase': row['phase'], 'iteration': row['iteration'], 'measurement_id': mid,
+                             'issues': issues, 'citation_metrics': metrics, 'elapsed_ns': elapsed,
+                             'expected_no_citations': case['expect_no_citations'],
+                             'process_start_through_response_ns': cold,
+                             'canonical_sdk_response_utf8_bytes': len(json.dumps(response, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()) if response else None,
+                             'backend_measurement': backend_info})
+    missing = sorted(slots - seen)
+    if missing and report['state'] == 'captured':
+        raise ValueError('captured report omitted expected measurement slots')
+    for arm, ledger in ledgers.items():
+        if set(ledger) - {m['measurement_id'] for m in measurements if m['arm'] == arm}:
+            raise ValueError('backend ledger contains query IDs outside this capture/arm')
+    per_question = {}
+    arm_summaries = {}
+    for arm in ARMS:
+        selected = [m for m in measurements if m['arm'] == arm]
+        for qid in cases:
+            rows_q = [m for m in selected if m['request_id'] == qid and m['phase'] == 'retrieval']
+            # Missing/failed attempts stay in the planned denominator; never silently drop them.
+            per_question[arm, qid] = {metric: statistics.median([m['citation_metrics'][metric] for m in rows_q]
+                                                                + [0.0] * (report['counts']['retrieval'] - len(rows_q))) for metric in METRICS}
+        warm = [m['elapsed_ns'] for m in selected if m['phase'] == 'warm_latency' and not m['issues']]
+        cold = [m['process_start_through_response_ns'] for m in selected if m['phase'] == 'cold_process' and not m['issues']]
+        arm_summaries[arm] = {'observed_rows': len(selected), 'planned_rows': len(slots) // 8,
+                              'failed_rows': sum(bool(m['issues']) for m in selected),
+                              'backend_measurement_missing_rows': sum(m['backend_measurement'] is None for m in selected),
+                              'warm_successful_calls': len(warm), 'warm_p50_ns': percentile(warm, .5), 'warm_p95_ns': percentile(warm, .95),
+                              'cold_successful_calls': len(cold), 'cold_process_p50_ns': percentile(cold, .5), 'cold_process_p95_ns': percentile(cold, .95)}
+        backend_observed = [m['backend_measurement'] for m in selected if m['backend_measurement'] is not None]
+        names = sorted({name for b in backend_observed for name in b['attempts_by_backend']})
+        arm_summaries[arm]['backend_observed_attempt_totals'] = {
+            name: sum(b['attempts_by_backend'].get(name, 0) for b in backend_observed) for name in names} if backend_observed else None
+        arm_summaries[arm]['canonical_sdk_response_bytes_p50'] = percentile(
+            [m['canonical_sdk_response_utf8_bytes'] for m in selected if m['canonical_sdk_response_utf8_bytes'] is not None], .5)
+        arm_summaries[arm]['human_review_cost'] = None
+        for phase in PHASES:
+            phase_rows = [m for m in selected if m['phase'] == phase]
+            arm_summaries[arm][phase + '_denominator'] = {
+                'planned': len(cases) * report['counts'][phase], 'observed': len(phase_rows),
+                'failed': sum(bool(m['issues']) for m in phase_rows),
+                'missing': len(cases) * report['counts'][phase] - len(phase_rows)}
+        no_cite = [m for m in selected if m['phase'] == 'retrieval' and m['expected_no_citations']]
+        arm_summaries[arm]['v1_no_citation_guard'] = {
+            'planned': sum(c['expect_no_citations'] for c in cases.values()) * report['counts']['retrieval'],
+            'observed': len(no_cite), 'passed': sum(m['citation_metrics']['v1_no_citation_guard_pass'] for m in no_cite),
+            'failed_or_missing': sum(c['expect_no_citations'] for c in cases.values()) * report['counts']['retrieval'] - sum(m['citation_metrics']['v1_no_citation_guard_pass'] for m in no_cite)}
+    comparisons = {}
+    for group in sorted({c['group'] for c in cases.values()}):
+        units = defaultdict(list)
+        for qid, case in cases.items():
+            if case['group'] == group:
+                units[case['independent_unit_id']].append(qid)
+        comparisons[group] = {}
+        for arm in ARMS:
+            deltas = {metric: [statistics.mean(per_question[arm, q][metric] - per_question['baseline_off', q][metric] for q in units[unit])
+                              for unit in sorted(units)] for metric in METRICS}
+            comparisons[group][arm] = {metric: bootstrap_delta(values, seed, resamples) for metric, values in deltas.items()}
+    baseline_p95 = arm_summaries['baseline_off']['warm_p95_ns']
+    for arm, value in arm_summaries.items():
+        value['warm_p95_ratio_to_baseline_off'] = value['warm_p95_ns'] / baseline_p95 if baseline_p95 and value['warm_p95_ns'] is not None else None
+    return {'schema_version': 1, 'scope': 'descriptive composed-citation/paired timing analysis; not raw CKV Recall@10 or human policy/answer/release verdict',
+            'status': 'descriptive' if not missing and not invariants and not report.get('errors') and report['state'] == 'captured' else 'not_evaluable_as_complete',
+            'planned_rows': len(slots), 'observed_rows': len(rows), 'missing_slots': missing,
+            'capture_invariant_issues': invariants, 'capture_errors': report.get('errors', []),
+            'independent_units': len(unit_groups), 'request_variants': len(cases),
+            'bootstrap': {'seed': seed, 'resamples': resamples, 'unit': 'paired independent unit; average request variants within unit after median retrieval repetitions'},
+            'arm_summaries': arm_summaries, 'paired_deltas_by_group': comparisons,
+            'per_question': {arm: {qid: per_question[arm, qid] for qid in cases} for arm in ARMS},
+            'measurements': measurements, 'quality_metrics': None, 'official_gate_verdict': 'pending',
+            'human_answer_abstention_policy_reasoning_verdicts': None,
+            'notes': ['Warmup, retrieval, warm latency and cold-process observations are kept separate.',
+                      'Errors/missing attempts cannot disappear from retrieval denominators; successful timing percentiles are conditional and carry failure counts.',
+                      'MRR is the Go evaluator mean over expected citations after dedup and top-10; not first-relevant-only reciprocal rank.',
+                      'No-citation guard is a stricter evidence oracle and is not a human answer-abstention decision.',
+                      'Backend absence is null/missing, never zero; startup/constructor work is outside query counters.',
+                      'Fewer than 10 independent units per group is inconclusive regardless of repetitions.']}
+
+
+def static_cases(raw_gold, raw_protocol, raw_fixtures, raw_review, raw_scopes,
+                 partition, commit_time, report, requests, dataset_audit=None):
+    definition, selected = INPUTS.inspect(raw_gold, raw_protocol, raw_fixtures, raw_review, partition)
+    scope = SCOPES.inspect(raw_scopes, raw_gold, raw_protocol, raw_fixtures, raw_review, commit_time)
+    if scope['pending_reasons']:
+        raise INPUTS.PendingInputs('reviewed static input/scopes required: ' + ', '.join(scope['pending_reasons']))
+    if report['counts'] != definition['runs']:
+        raise ValueError('captured repetitions differ from reviewed protocol')
+    book, protocol, declared = map(decode, (raw_gold, raw_protocol, raw_scopes))
+    source = report['dataset_identity']['source']
+    if source['source_commit'] != book['corpus_commit'] or source['source_mode'] != 'committed':
+        raise ValueError('captured source identity differs from reviewed static corpus')
+    # The corpus label is not necessarily the isolated dataset's project ID.
+    # A different namespace requires the independent strict source audit for
+    # the entire captured identity, never just a caller-provided alias string.
+    if dataset_audit is not None:
+        if (dataset_audit.get('schema_version') != 1 or dataset_audit.get('status') != 'pass'
+                or dataset_audit.get('errors') != []
+                or dataset_audit.get('dataset') != report['dataset_identity']):
+            raise ValueError('strict dataset audit differs from captured static identity')
+    elif source['project_id'] != book['corpus_project']:
+        raise ValueError('isolated static project ID needs a matching strict dataset audit')
+    pin = report['dataset_identity']['embedding_identity']
+    if any(pin.get(field) != protocol['model'][expected] for field, expected in
+           [('Provider', 'provider'), ('Model', 'model'), ('model_digest', 'digest'), ('Dim', 'dimension')]):
+        raise ValueError('captured embedding identity differs from reviewed model')
+    scopes = {s['id']: s for s in declared['question_scopes']}
+    expected_requests = [{'id': q['id'], 'arguments': {
+        'prompt': q['prompt'], 'knowledge_as_of': scopes[q['id']]['knowledge_as_of'],
+        'knowledge_subsystem': scopes[q['id']]['knowledge_subsystem']}} for q in selected]
+    expected_requests = [dict(r, tool='cks.context.get_for_task_v2') for r in expected_requests]
+    supplied_requests = [dict(r, tool=r.get('tool', 'cks.context.get_for_task_v2'))
+                         for r in requests.get('requests', [])]
+    if supplied_requests != expected_requests:
+        raise ValueError('static request bytes/order/scope differ from selected reviewed partition')
+    cases = {q['id']: {'request_id': q['id'], 'group': q['group'], 'independent_unit_id': q['id'],
+                       'expected_commit': book['corpus_commit'], 'expect_no_citations': q['expected_behavior'] == 'abstain',
+                       'expected_citations': [{'file': e['path'], 'start_line': e['start_line'], 'end_line': e['end_line']} for e in q['evidence']]}
+             for q in selected}
+    return cases, definition, scope
+
+
+def referenced_sources(rows, cases, source_root):
+    files = {e['file'] for c in cases.values() for e in c['expected_citations']}
+    for row in rows:
+        response = row['call'].get('response') or {}
+        pack = response.get('structuredContent') or {}
+        files.update(c['file'] for c in pack.get('citations', []))
+    return {file: sha(source_bytes(source_root, file)) for file in sorted(files)}
+
+
+def verify_retained_configs(directory, report, expected_k=None):
+    hashes = {}
+    for arm in report['arms']:
+        raw = (directory / (arm['id'] + '.yaml')).read_bytes()
+        if sha(raw) != arm['config_sha256']:
+            raise ValueError('retained arm configuration hash differs from capture')
+        modes = re.findall(r'^    ontology_mode: ([a-z_]+)\n', raw.decode(), re.MULTILINE)
+        if modes != [arm['id'].rsplit('_', 1)[0]]:
+            raise ValueError('retained ontology mode differs from arm')
+        if expected_k is not None:
+            # This reader handles the canonical YAML emitted by matrix capture.
+            # It refuses ambiguous sections rather than guessing a general YAML layout.
+            values = re.findall(r'^retrieval:\n    recall_k: ([0-9]+)\n', raw.decode(), re.MULTILINE)
+            if values != [str(expected_k)]:
+                raise ValueError('retained runtime K differs from reviewed static K')
+        hashes[arm['id']] = sha(raw)
+    return hashes
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--capture-dir', type=Path, required=True)
+    parser.add_argument('--gold', type=Path, required=True)
+    parser.add_argument('--source-root', type=Path, required=True, help='retained source bytes matching the captured identity')
+    parser.add_argument('--diagnostic-controls', action='store_true', help='explicit synthetic-control gold; no human approval claimed')
+    parser.add_argument('--partition', choices=['development', 'final'], default='development')
+    parser.add_argument('--protocol', type=Path, default=DATA / 'protocol-m2max-draft.json')
+    parser.add_argument('--fixtures', type=Path, default=DATA / 'dynamic-fixtures-m2max-draft.json')
+    parser.add_argument('--human-review', type=Path, default=DATA / 'human-review-m2max-2026-10-03.json')
+    parser.add_argument('--scopes', type=Path, default=DATA / 'static-v2-scopes-m2max-draft.json')
+    parser.add_argument('--dataset-audit', type=Path,
+                        help='independent strict source audit binding an isolated static project ID')
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    if args.output.exists() or args.output.is_symlink():
+        raise ValueError('output already exists; reports never overwrite inputs or previous evidence')
+    directory = args.capture_dir
+    raw_report, raw_rows, raw_requests, raw_gold = ((directory / 'report.json').read_bytes(), (directory / 'rows.jsonl').read_bytes(),
+                                                    (directory / 'requests.json').read_bytes(), args.gold.read_bytes())
+    report, requests, gold = map(decode, (raw_report, raw_requests, raw_gold))
+    if sha(raw_rows) != report['rows_sha256'] or sha(raw_requests) != report['request_sha256']:
+        raise ValueError('retained rows/requests hashes differ from capture report')
+    definition = scope = dataset_audit = None
+    extra_hashes = {}
+    if args.diagnostic_controls:
+        if gold.get('diagnostic_only') is not True or gold.get('schema_version') != 1:
+            raise ValueError('explicit diagnostic control gold required')
+        cases = {c['request_id']: c for c in gold['cases']}
+        if len(cases) != len(gold['cases']):
+            raise ValueError('duplicate diagnostic control ID')
+    else:
+        raw_inputs = [p.read_bytes() for p in (args.protocol, args.fixtures, args.human_review, args.scopes)]
+        commit_time = subprocess.run(['git', 'show', '-s', '--format=%cI', gold['corpus_commit']],
+                                     cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip()
+        if args.dataset_audit:
+            audit_raw = args.dataset_audit.read_bytes()
+            dataset_audit = decode(audit_raw)
+            extra_hashes['dataset_audit'] = sha(audit_raw)
+        cases, definition, scope = static_cases(raw_gold, *raw_inputs, args.partition, commit_time, report, requests,
+                                               dataset_audit=dataset_audit)
+        extra_hashes.update(zip(['protocol', 'fixtures', 'human_review', 'scopes'], map(sha, raw_inputs)))
+    rows = [decode(line) for line in raw_rows.splitlines()]
+    ledgers, footprint_hashes = {}, {}
+    for arm in ARMS:
+        ledgers[arm], footprint_hashes[arm] = backend_scopes(directory, arm)
+    configs = verify_retained_configs(directory, report, definition['retrieval_k'] if definition else None)
+    source_hashes = referenced_sources(rows, cases, args.source_root)
+    if definition:
+        for file, digest in source_hashes.items():
+            committed = subprocess.run(['git', 'show', gold['corpus_commit'] + ':' + file],
+                                       cwd=ROOT, check=True, capture_output=True).stdout
+            if sha(committed) != digest:
+                raise ValueError('static retained source differs from committed corpus: ' + file)
+    uncertainty = decode(raw_inputs[0])['uncertainty'] if definition else {'bootstrap_seed': 20261003, 'resamples': 10000, 'ci': .95}
+    if uncertainty['ci'] != .95:
+        raise ValueError('this report implements the reviewed 95% interval only')
+    result = summarize(report, requests, rows, cases, args.source_root, ledgers,
+                       uncertainty['bootstrap_seed'], uncertainty['resamples'])
+    result['diagnostic_only'] = args.diagnostic_controls
+    result['reporter_sha256'] = sha(Path(__file__).read_bytes())
+    result['input_definition'] = definition
+    result['static_scope_definition'] = scope
+    result['static_dataset_binding'] = {
+        'corpus_label': gold.get('corpus_project'),
+        'captured_project_id': report['dataset_identity']['source']['project_id'],
+        'independent_strict_audit_sha256': extra_hashes.get('dataset_audit'),
+    } if definition else None
+    result['input_sha256'] = {'report': sha(raw_report), 'rows': sha(raw_rows), 'requests': sha(raw_requests), 'gold': sha(raw_gold), 'footprints': footprint_hashes}
+    result['input_sha256'].update(extra_hashes, arm_configurations=configs)
+    result['referenced_source_files_sha256'] = source_hashes
+    result['remaining_official_prerequisites'] = ['B0 corpus/semantic-fact decisions and fresh strict build/preflight',
+        'full dynamic family safety/state/budget oracles and raw CKV ranking capture',
+        'human answer/claim/policy verdicts, reviewed cost and release criteria']
+    if referenced_sources(rows, cases, args.source_root) != source_hashes:
+        raise ValueError('retained source changed during report replay')
+    frozen = [(directory / 'report.json', sha(raw_report)), (directory / 'rows.jsonl', sha(raw_rows)),
+              (directory / 'requests.json', sha(raw_requests)), (args.gold, sha(raw_gold))]
+    frozen += [(directory / (arm + '.yaml'), digest) for arm, digest in configs.items()]
+    frozen += [(directory / 'footprints' / arm / 'cks-mcp.jsonl', digest) for arm, digest in footprint_hashes.items() if digest]
+    if definition:
+        frozen += list(zip((args.protocol, args.fixtures, args.human_review, args.scopes), map(sha, raw_inputs)))
+        if args.dataset_audit:
+            frozen.append((args.dataset_audit, extra_hashes['dataset_audit']))
+    if any(sha(file.read_bytes()) != digest for file, digest in frozen):
+        raise ValueError('retained input changed during report replay')
+    fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+        stream.write(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except INPUTS.PendingInputs as exc:
+        print('b1-summarize-matrix: ' + str(exc), file=sys.stderr)
+        sys.exit(2)
+    except (ValueError, OSError, KeyError, TypeError, subprocess.CalledProcessError) as exc:
+        print('b1-summarize-matrix: ' + str(exc), file=sys.stderr)
+        sys.exit(1)

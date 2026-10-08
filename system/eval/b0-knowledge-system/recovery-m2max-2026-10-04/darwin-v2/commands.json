@@ -1,0 +1,119 @@
+[
+  {
+    "id": "git-init",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 20543292
+  },
+  {
+    "id": "git-add",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 12044792
+  },
+  {
+    "id": "git-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/src",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "recovery baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 25182625
+  },
+  {
+    "id": "init",
+    "argv": [
+      "/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/cks",
+      "init",
+      "--src",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/src",
+      "--dataset",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/dataset",
+      "--config-out",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/setup.yaml",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 52340333
+  },
+  {
+    "id": "baseline",
+    "argv": [
+      "/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/cks",
+      "setup",
+      "--config",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/setup.yaml",
+      "--version",
+      "baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 1484188708
+  },
+  {
+    "id": "runtime-config",
+    "argv": [
+      "/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/dataset/current",
+      "--source-root",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/src",
+      "--sanitize-rules",
+      "/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/runtime.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 17768583
+  },
+  {
+    "id": "baseline-capture",
+    "argv": [
+      "/private/tmp/ks-translated-source-20261004/darwin/unpacked/knowledge-system-darwin-arm64-7b5d7bb89618-dirty-preview/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/baseline-requests.json",
+      "--config",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/runtime.yaml",
+      "--output",
+      "/private/tmp/ks-recovery-20261004/darwin-v2/baseline-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 130361833
+  }
+]

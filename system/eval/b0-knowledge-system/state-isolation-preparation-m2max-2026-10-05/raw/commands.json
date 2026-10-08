@@ -1,0 +1,466 @@
+[
+  {
+    "label": "F-04-DEV-old-clone",
+    "command": [
+      "git",
+      "clone",
+      "--no-local",
+      "--quiet",
+      "/private/tmp/ks-b0-dynamic-dev-20261003/F-04-DEV/repo",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-checkout",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "1baa8f94dbd79a3d5520616725ee86b551e95739"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-strict-setup",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset",
+      "--version",
+      "diagnostic",
+      "--project-id",
+      "f-04-dev",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--query-prefix-policy",
+      "registry",
+      "--cks-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "--vector-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "--graph-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-config",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic",
+      "--source-root",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old",
+      "--embed-model",
+      "bge-m3:latest",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-sdk",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-old-ckv",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "query",
+      "What value does Alpha return?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-old",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-clone",
+    "command": [
+      "git",
+      "clone",
+      "--no-local",
+      "--quiet",
+      "/private/tmp/ks-b0-dynamic-dev-20261003/F-04-DEV/repo",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-checkout",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-strict-setup",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset",
+      "--version",
+      "diagnostic",
+      "--project-id",
+      "f-04-dev",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--query-prefix-policy",
+      "registry",
+      "--cks-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "--vector-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "--graph-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-config",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic",
+      "--source-root",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "--embed-model",
+      "bge-m3:latest",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-sdk",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-04-DEV-new-ckv",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "query",
+      "What value does Alpha return?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-clone",
+    "command": [
+      "git",
+      "clone",
+      "--no-local",
+      "--quiet",
+      "/private/tmp/ks-b0-dynamic-dev-20261003/F-05-DEV/project-a",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-checkout",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "680adada09d589cf7867c49f164ef8d779503225"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-strict-setup",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a/dataset",
+      "--version",
+      "diagnostic",
+      "--project-id",
+      "f-05-dev-a",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--query-prefix-policy",
+      "registry",
+      "--cks-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "--vector-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "--graph-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-config",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a/dataset/diagnostic",
+      "--source-root",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a",
+      "--embed-model",
+      "bge-m3:latest",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-sdk",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-a-ckv",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "query",
+      "Where is Alpha implemented and which refund limit applies?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-a",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-clone",
+    "command": [
+      "git",
+      "clone",
+      "--no-local",
+      "--quiet",
+      "/private/tmp/ks-b0-dynamic-dev-20261003/F-05-DEV/project-b",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-checkout",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "45e378b9da4fe6d4c796dd84281f28859c282e20"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-strict-setup",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b/dataset",
+      "--version",
+      "diagnostic",
+      "--project-id",
+      "f-05-dev-b",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "bge-m3:latest",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--query-prefix-policy",
+      "registry",
+      "--cks-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "--vector-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "--graph-bin",
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-config",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b/dataset/diagnostic",
+      "--source-root",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b",
+      "--embed-model",
+      "bge-m3:latest",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-sdk",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+      "eval",
+      "capture",
+      "--config",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b.yaml",
+      "--requests",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b-requests.json",
+      "--output",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b-sdk.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "F-05-DEV-b-ckv",
+    "command": [
+      "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+      "query",
+      "Where is Alpha implemented and which refund limit applies?",
+      "--out",
+      "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b/dataset/diagnostic/vector",
+      "--src",
+      "/private/tmp/ks-f0405-preparation-20261005/sources/F-05-DEV-b",
+      "--top",
+      "10",
+      "--threshold",
+      "-1",
+      "--json",
+      "--model-name",
+      "bge-m3:latest",
+      "--no-footprint"
+    ],
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,63 @@
+import json,hashlib,importlib.util,sqlite3,collections,subprocess
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-neighbor-binding-live-20261005');OLD=Path('/private/tmp/ks-large-cost-20261005');SOURCE=Path('/private/tmp/ks-b0-m2max-corpus-20261003');sha=lambda b:hashlib.sha256(b).hexdigest();read=lambda root,n:json.loads((root/n).read_bytes())
+sp=importlib.util.spec_from_file_location('base',ROOT/'scripts/b1-summarize-matrix.py');B=importlib.util.module_from_spec(sp);sp.loader.exec_module(B)
+identity=read(OLD/'dataset/diagnostic','dataset-identity.json');commit=identity['source']['source_commit'];requests=read(R,'requests.json');base=read(Path('/private/tmp/ks-fix20-live-20261005'),'capture.json')
+assert read(R,'bindings-before.json')==read(R,'bindings-after.json') and read(R,'model-before.json')['tags']==read(R,'model-after.json')['tags']
+scopes={}
+for line in (R/'footprints-on/cks-mcp.jsonl').read_text().splitlines():
+ e=json.loads(line)
+ if e.get('event')=='measurement.backend_calls' and e['summary']['tool']=='cks.context.get_for_task_v2':
+  s=e['summary'];assert s['measurement_id'] not in scopes;scopes[s['measurement_id']]=s
+assert len(scopes)==2
+# Reconstruct source arguments from sealed indexed inventories, never from an added plaintext source log.
+def argument_bytes(c):
+ return json.dumps(c,ensure_ascii=False,separators=(',',':')).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e').replace('\u2028','\\u2028').replace('\u2029','\\u2029').encode()
+catalog={};inventory_counts={}
+for kind,db,query in [('vector',OLD/'dataset/diagnostic/vector/vector.db','select file,start_line,end_line,commit_hash from chunks'),('graph',OLD/'dataset/diagnostic/graph/graph.db','select file_path,start_line,end_line from nodes')]:
+ conn=sqlite3.connect('file:'+str(db)+'?mode=ro',uri=True);count=0
+ for row in conn.execute(query):
+  count+=1;file,start,end=row[:3]
+  if not file or start<1 or end<start:continue
+  cit={'file':file,'start_line':start,'end_line':end,'commit_hash':row[3] if kind=='vector' else commit}
+  raw=argument_bytes(cit);h=sha(raw)
+  if h in catalog:assert catalog[h]['citation']==cit
+  else:catalog[h]={'citation':cit,'bytes':len(raw),'input_sha256':h}
+ inventory_counts[kind]=count;conn.close()
+pack_by_mode={};derived=[];source_cases=[];seen_slots=set();counts=collections.Counter();cites=bodies=0
+for mode in ('on','off'):
+ cap=read(R,mode+'.json');assert cap['state']=='captured' and not cap.get('errors') and cap['quality_metrics'] is None and len(cap['rows'])==2 and cap['counts']=={'retrieval':1,'warmup':0,'warm_latency':0,'cold_process':0}
+ assert cap['request_sha256']==sha((R/'requests.json').read_bytes()) and cap['config_sha256']==cap['config_sha256_after']==sha((R/(mode+'.yaml')).read_bytes()) and cap['binary_sha256']==cap['binary_sha256_after']
+ pack_by_mode[mode]={}
+ for row in cap['rows']:
+  request=next(q for q in requests['requests'] if q['id']==row['request_id']);call=row['call'];res=call['response'];assert call['arguments']==request['arguments'] and not row.get('error') and not call.get('transport_error') and not res.get('isError')
+  pack=res['structuredContent'];B.verify_pack(pack,identity,SOURCE);pack_by_mode[mode][row['request_id']]=res;cites+=len(pack['citations']);bodies+=len(pack['bodies'])
+  previous=next(x['call']['response']['structuredContent'] for x in base['rows'] if x['request_id']==row['request_id'])
+  for key in ('coordinates','citations','bodies'):assert pack[key]==previous[key]
+  derived.append({'sequence':len(derived)+1,'arm':'baseline_on' if request['arguments']['include_knowledge'] else 'baseline_off','measurement_mode':mode,**row})
+  if mode=='on':
+   scope=scopes[call['measurement_id']];assert scope['outcome']=='returned';calls=scope['calls'];nb=[x for x in calls if x['backend']=='ckg' and x['method']=='neighbors'];assert len(nb)==10
+   assert all(x['outcome']=='returned' for x in calls if x['backend']=='ckg' and x['method']=='bm25_search')
+   for n in nb:
+    key=(call['measurement_id'],n['ordinal']);assert key not in seen_slots;seen_slots.add(key);h=n['input_sha256'];assert h in catalog and n['input_bytes']==catalog[h]['bytes']
+    item=catalog[h];cit=item['citation'];assert cit['commit_hash']==commit;relative=Path(cit['file']);assert not relative.is_absolute() and '..' not in relative.parts
+    source=(SOURCE/relative).read_bytes();lines=source.splitlines(keepends=True);assert cit['end_line']<=len(lines)
+    source_cases.append({'measurement_id':call['measurement_id'],'ordinal':n['ordinal'],'request_id':row['request_id'],'citation':cit,'options':n['options'],'input_sha256':h,'input_bytes':n['input_bytes'],'recorded_outcome':n['outcome'],'recorded_result_count':n['result_count'],'whole_file_sha256':sha(source),'line_span_sha256':sha(b''.join(lines[cit['start_line']-1:cit['end_line']]))});counts[n['outcome']]+=1
+assert pack_by_mode['on']==pack_by_mode['off']
+off_events=[json.loads(l) for l in (R/'footprints-off/cks-mcp.jsonl').read_text().splitlines()];assert not any(x.get('event')=='measurement.backend_calls' for x in off_events)
+assert len(source_cases)==20 and counts==collections.Counter({'returned':8,'backend_error':12})
+(R/'source-cases.json').write_text(json.dumps({'diagnostic_only':True,'quality_metrics':None,'input_format':'Go encoding/json.Marshal contract.Citation; file/start_line/end_line/commit_hash order; default HTML/line-separator escaping','source_capture_sha256':sha((R/'on.json').read_bytes()),'footprint_sha256':sha((R/'footprints-on/cks-mcp.jsonl').read_bytes()),'indexed_inventory_counts':inventory_counts,'catalog_unique_locations':len(catalog),'cases':source_cases},ensure_ascii=False,indent=2)+'\n')
+(R/'derived-sdk-rows.jsonl').write_text(''.join(json.dumps(x,ensure_ascii=False)+'\n' for x in derived))
+seals={}
+for label,root,ephemeral in [('original',Path('/private/tmp/ks-b0-m2max-full-20261003/dataset/m2max-diagnostic'),False),('source',SOURCE,False),('copy',OLD/'dataset/diagnostic',True)]:
+ actual={}
+ for p in sorted(root.rglob('*')):
+  if p.is_file():
+   if ephemeral and (p.name.endswith('.db-shm') or p.name.endswith('.db-wal')):
+    if p.name.endswith('.db-wal'):assert p.stat().st_size==0
+    continue
+   actual[str(p.relative_to(root))]={'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+ assert actual==read(OLD,label+'-seal-before.json');seals[label]={'unchanged':True,'files':len(actual),'inventory_sha256':sha(json.dumps(actual,sort_keys=True,separators=(',',':')).encode())}
+inputs=read(OLD,'human-inputs-unchanged.json')
+for name,h in inputs.items():assert sha((ROOT/name).read_bytes())==h and subprocess.check_output(['git','show','HEAD:'+name])==(ROOT/name).read_bytes()
+summary={'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'planned_sdk_calls':4,'observed_sdk_calls':4,'failed_calls':0,'missing_calls':0,'citations':cites,'bodies':bodies,'measure_on_off_full_sdk_responses_identical':True,'before_after_base_evidence_identical':True,'neighbor_attempts_bound':len(source_cases),'neighbor_outcomes':dict(counts),'source_inventory_counts':inventory_counts,'source_cases_sha256':sha((R/'source-cases.json').read_bytes()),'seals':seals,'human_inputs_unchanged':inputs,'binary_sha256':read(R,'on.json')['binary_sha256'],'limits':['DEV-only partial retained index; not official quality/release/latency','source argument SHA covers v1 citation location/commit, not complete project/dataset coordinates; those bind via sealed config/identity','new hashes do not fill old zero-byte neighbor logs; historical errors remain unbound','direct real Go replay of bound source cases is next']};(R/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');print(json.dumps(summary,ensure_ascii=False,indent=2))

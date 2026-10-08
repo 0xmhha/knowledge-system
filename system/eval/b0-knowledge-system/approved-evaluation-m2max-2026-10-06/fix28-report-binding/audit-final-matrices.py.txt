@@ -1,0 +1,62 @@
+from pathlib import Path
+import json,hashlib,importlib.util,collections
+root=Path.cwd();base=Path('/private/tmp/ks-approved-final-sweep-20261006');data=root/'system/eval/b0-knowledge-system';out=base/'independent-reports';out.mkdir(exist_ok=True)
+spec=importlib.util.spec_from_file_location('matrix',root/'scripts/b1-summarize-matrix.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_bytes())
+book=read(data/'dynamic-fixtures-m2max-draft.json');fixtures={f['id']:f for f in book['fixtures']if f['evaluation_partition']=='final'};execution=read(base/'execution.json');summaries=[]
+for step in execution['steps']:
+ label=step['id'];directory=Path(step['output']);dest=out/(label+'.json')
+ if label=='static-final'or dest.exists():continue
+ if not(directory/'report.json').exists():continue
+ report=read(directory/'report.json')
+ if report['state']=='running':continue
+ requests=read(directory/'requests.json');raw_rows=(directory/'rows.jsonl').read_bytes();assert sha(directory/'requests.json')==report['request_sha256']and hashlib.sha256(raw_rows).hexdigest()==report['rows_sha256']
+ rows=[json.loads(line)for line in raw_rows.splitlines()];fixture=fixtures[label.rsplit('-',1)[0]];case=step['case'];source=Path(read(Path(case['version_dir'])/'vector/manifest.json')['src_root']);commit=report['dataset_identity']['source']['source_commit']
+ assert report['dataset_identity']==case['dataset']and report['counts']=={'warmup':2,'retrieval':5,'warm_latency':20,'cold_process':3};assert all(report[key]['valid']for key in ['environment_before','environment_after'])
+ expected=[];family=fixture['family']
+ if family=='F-02':expected=[{'file':e['path'],'start_line':e['start_line'],'end_line':e['end_line']}for e in fixture['expected']['citations']]
+ elif family=='F-04':expected=[{'file':'main.go','start_line':3,'end_line':3}]
+ elif family=='F-05':expected=[{'file':f,'start_line':s,'end_line':e}for f,s,e in [fixture['expected']['project_'+case['state']]['code'],fixture['expected']['project_'+case['state']]['policy']]]
+ elif family=='F-06':expected=[{'file':e['path'],'start_line':e['start_line'],'end_line':e['end_line']}for e in fixture['expected']['required_citations']]
+ expected_requests=[{'id':label+'-'+str(i+1)+'-'+q['language'],'tool':'cks.context.get_for_task_v2','arguments':{'prompt':q['prompt'],'knowledge_as_of':'2026-10-03','knowledge_subsystem':'refund'}}for i,q in enumerate(fixture['queries'])];assert requests['requests']==expected_requests
+ cases={r['id']:{'request_id':r['id'],'group':family,'independent_unit_id':family+'-FINAL','expected_commit':commit,'expect_no_citations':False,'expected_citations':expected}for r in requests['requests']}
+ ledgers={};footprints={}
+ for arm in m.ARMS:ledgers[arm],footprints[arm]=m.backend_scopes(directory,arm)
+ config_hashes=m.verify_retained_configs(directory,report,fixture['k']);result=m.summarize(report,requests,rows,cases,source,ledgers)
+ if family in['F-01','F-03']:
+  result['per_question']=None;result['paired_deltas_by_group']=None
+  for row in result['measurements']:row['citation_metrics']=None
+  result['citation_metrics_applicable']=False;result['citation_metric_limitation']='F01 filter/exact/eligible oracle is direct SearchDetailed@5; public v2 requests have no filter argument'if family=='F-01'else'F03 declares ambiguity/non-normativity and candidate preservation, not positive citation gold'
+ else:result['citation_metrics_applicable']=True
+ baseline={(r['phase'],r['request_id'],r['iteration']):r for r in rows if r['arm']=='baseline_off'};checks=collections.Counter();violations=[]
+ for row in rows:
+  call=row['call'];rsp=call.get('response',{});pack=rsp.get('structuredContent')or{}
+  if row.get('error')or rsp.get('isError'):checks['failed_calls']+=1;continue
+  checks['successful_calls']+=1;m.verify_pack(pack,report['dataset_identity'],source)
+  checks['source_integrity_valid']+=1
+  if family=='F-02':
+   target=fixture['expected']['citations'][0];text=fixture['sources'][target['path']].splitlines()[target['start_line']-1]
+   if any(b['citation']['file']==target['path']and b['citation']['start_line']<=target['start_line']<=b['citation']['end_line']and text in b['text']for b in pack['bodies']):checks['tail_body_present']+=1
+   else:violations.append({'sequence':row['sequence'],'kind':'tail_body_missing'})
+  if family=='F-03':
+   context=(pack.get('semantic')or{}).get('knowledge_context')or{}
+   if any(context.get(k)for k in ['applicable_policies','decisions','relations','constraints','related_requirements','test_links','trace_links']):violations.append({'sequence':row['sequence'],'kind':'proposed_core_became_normative'})
+   diag=pack['metadata'].get('ontology')or{}
+   if any(diag.get(k,0)!=0 for k in ['applied_relations','boosted_citations','text_search_calls']):violations.append({'sequence':row['sequence'],'kind':'proposed_ontology_applied'})
+   peer=baseline[(row['phase'],row['request_id'],row['iteration'])]['call']['response'].get('structuredContent')
+   if peer and any(pack[k]!=peer[k]for k in ['citations','bodies']):violations.append({'sequence':row['sequence'],'kind':'baseline_source_candidates_changed'})
+  if family=='F-04':
+   own='FINAL-'+case['state']+'-token';other='FINAL-'+('new'if case['state']=='old'else'old')+'-token';text='\n'.join(b['text']for b in pack['bodies'])
+   if own not in text or other in text:violations.append({'sequence':row['sequence'],'kind':'state_marker_missing_or_foreign'})
+  if family in['F-05','F-06']:
+   context=(pack.get('semantic')or{}).get('knowledge_context')or{}
+   if context.get('test_links')or context.get('trace_links'):violations.append({'sequence':row['sequence'],'kind':'unreviewed_acceptance_or_test_trace'})
+   if family=='F-05':
+    own='FINAL-project-'+case['state'];other='FINAL-project-'+('b'if case['state']=='a'else'a');text='\n'.join(b['text']for b in pack['bodies'])
+    if own not in text or other in text:violations.append({'sequence':row['sequence'],'kind':'project_marker_missing_or_foreign'})
+   if row['arm'].endswith('_on'):
+    checks['knowledge_on_calls']+=1
+    if context.get('applicable_policies'):checks['reviewed_policy_visible']+=1
+    else:violations.append({'sequence':row['sequence'],'kind':'approved_policy_missing'})
+ result.update(fixture_id=fixture['id'],state=case['state'],dataset=report['dataset_identity'],approved_fixture_manifest_sha256=sha(data/'dynamic-fixtures-m2max-draft.json'),human_review_sha256=sha(data/'human-review-m2max-2026-10-03.json'),reporter_sha256=sha(Path(__file__)),arm_configurations=config_hashes,footprints_sha256=footprints,family_oracle_counts=dict(checks),family_oracle_violations=violations,source_binding='captured identity plus exact approved source bytes/commit',official_claim_verdict='pending',separate_noninstrumented_capture=False)
+ dest.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');summaries.append({'id':label,'state':result['status'],'rows':len(rows),'family_checks':dict(checks),'violations':len(violations),'backend_missing':sum(a['backend_measurement_missing_rows']for a in result['arm_summaries'].values())});print(json.dumps(summaries[-1]),flush=True)

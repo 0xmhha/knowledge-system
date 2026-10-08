@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "b0-why-03",
+  "prompt": "왜 패치의 테스트 실행이 성공해도 자동으로 승격되지 않나요?",
+  "runs": 5,
+  "match_mode": "overlap",
+  "expected_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "expected_citations": [
+    {
+      "file": "internal/system/patch/review.go",
+      "start_line": 205,
+      "end_line": 281,
+      "anchor": "func Promote(ctx context.Context, dataset, patchID, storePath string) (string, error) {"
+    }
+  ]
+}

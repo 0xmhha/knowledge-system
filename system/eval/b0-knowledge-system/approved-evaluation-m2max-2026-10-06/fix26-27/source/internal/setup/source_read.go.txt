@@ -1,0 +1,190 @@
+package setup
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"os"
+	"path/filepath"
+	"unicode/utf8"
+)
+
+// RetainedEvidence is one v2 citation resolved solely from a version's
+// content-addressed archive. Text is the exact, unsanitized source line bytes;
+// callers must sanitize it before exposing it in a coding context.
+type RetainedEvidence struct {
+	ProjectID     string `json:"project_id"`
+	DatasetID     string `json:"dataset_id"`
+	SnapshotID    string `json:"snapshot_id"`
+	SourceMode    string `json:"source_mode"`
+	OriginID      string `json:"origin_id"`
+	File          string `json:"file"`
+	StartLine     int    `json:"start_line"`
+	EndLine       int    `json:"end_line"`
+	CommitHash    string `json:"commit_hash"`
+	BaseCommit    string `json:"base_commit"`
+	FileSHA256    string `json:"file_sha256"`
+	ContentSHA256 string `json:"content_sha256"`
+	Text          string `json:"text"`
+}
+
+// ReadRetainedLines never falls back to the live checkout or Git HEAD. A
+// missing or changed archive is an explicit error. Each call verifies the
+// candidate tuple and all archived file hashes before returning one span;
+// long-lived servers can hold a verified archive index for batched lookups.
+func ReadRetainedLines(versionDir, originID, path string, first, last int) (RetainedEvidence, error) {
+	if (originID != "repo" && !validCaptureOriginID(originID)) || first <= 0 || last < first || path == "" {
+		return RetainedEvidence{}, fmt.Errorf("invalid retained citation coordinates")
+	}
+	buf, identity, fileSHA, err := ReadRetainedFile(versionDir, originID, path)
+	if err != nil {
+		return RetainedEvidence{}, err
+	}
+	return retainedLineEvidence(buf, identity, fileSHA, originID, path, first, last)
+}
+
+type RetainedLineSpan struct {
+	OriginID string
+	Path     string
+	First    int
+	Last     int
+}
+
+// ReadRetainedLineSpans verifies the complete archive before and after a
+// request-local batch. Each selected blob is still re-read and hashed. No
+// verification result survives the batch or permits a live-checkout fallback.
+func ReadRetainedLineSpans(versionDir string, spans []RetainedLineSpan) ([]RetainedEvidence, error) {
+	for _, span := range spans {
+		if span.First <= 0 || span.Last < span.First || (span.OriginID != "repo" && !validCaptureOriginID(span.OriginID)) || span.Path == "" {
+			return nil, fmt.Errorf("invalid retained citation coordinates")
+		}
+		if err := validateCapturedPaths([]string{span.Path}); err != nil {
+			return nil, err
+		}
+	}
+	identity, err := InspectVersionIdentity(versionDir)
+	if err != nil {
+		return nil, err
+	}
+	if identity == nil {
+		return nil, fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
+	}
+	out := make([]RetainedEvidence, 0, len(spans))
+	for _, span := range spans {
+		buf, fileSHA, err := readRetainedFileWithIdentity(versionDir, span.OriginID, span.Path, identity)
+		if err != nil {
+			return nil, err
+		}
+		evidence, err := retainedLineEvidence(buf, identity, fileSHA, span.OriginID, span.Path, span.First, span.Last)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, evidence)
+	}
+	after, err := InspectVersionIdentity(versionDir)
+	if err != nil {
+		return nil, err
+	}
+	if after == nil || after.DatasetID != identity.DatasetID {
+		return nil, fmt.Errorf("snapshot_mismatch: retained dataset changed during batch")
+	}
+	return out, nil
+}
+
+func retainedLineEvidence(buf []byte, identity *DatasetIdentity, fileSHA, originID, path string, first, last int) (RetainedEvidence, error) {
+	span, err := sourceLineBytes(buf, first, last)
+	if err != nil {
+		return RetainedEvidence{}, err
+	}
+	sum := sha256.Sum256(span)
+	commit := ""
+	if identity.Source.SourceMode == "committed" {
+		commit = identity.Source.SourceCommit
+	}
+	return RetainedEvidence{ProjectID: identity.Source.ProjectID, DatasetID: identity.DatasetID,
+		SnapshotID: identity.Source.SnapshotID, SourceMode: identity.Source.SourceMode,
+		OriginID: originID, File: path, StartLine: first, EndLine: last,
+		CommitHash: commit, BaseCommit: identity.Source.SourceCommit,
+		FileSHA256: fileSHA, ContentSHA256: hex.EncodeToString(sum[:]), Text: string(span)}, nil
+}
+
+// ReadRetainedFile returns verified original bytes for semantic extraction.
+// This is an internal raw-byte API: public responses must sanitize them.
+func ReadRetainedFile(versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
+	if (originID != "repo" && !validCaptureOriginID(originID)) || path == "" {
+		return nil, nil, "", fmt.Errorf("invalid retained source coordinates")
+	}
+	if err := validateCapturedPaths([]string{path}); err != nil {
+		return nil, nil, "", err
+	}
+	identity, err := InspectVersionIdentity(versionDir)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	if identity == nil {
+		return nil, nil, "", fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
+	}
+	buf, fileSHA, err := readRetainedFileWithIdentity(versionDir, originID, path, identity)
+	return buf, identity, fileSHA, err
+}
+
+func readRetainedFileWithIdentity(versionDir, originID, path string, identity *DatasetIdentity) ([]byte, string, error) {
+	sources := filepath.Join(versionDir, "sources")
+	info, err := os.Lstat(sources)
+	if err != nil || !info.IsDir() {
+		return nil, "", fmt.Errorf("source_missing: source archive is unavailable")
+	}
+	manifestPath := filepath.Join(sources, "manifest.json")
+	info, err = os.Lstat(manifestPath)
+	if err != nil || !info.Mode().IsRegular() {
+		return nil, "", fmt.Errorf("source_missing: source archive manifest is unavailable")
+	}
+	var captured CapturedSource
+	if err := readJSON(manifestPath, &captured); err != nil || captured.Identity != identity.Source {
+		return nil, "", fmt.Errorf("snapshot_mismatch: retained source identity changed: %v", err)
+	}
+	var record *CapturedFile
+	for i := range captured.Files {
+		if captured.Files[i].OriginID == originID && captured.Files[i].Path == path {
+			record = &captured.Files[i]
+			break
+		}
+	}
+	if record == nil {
+		return nil, "", fmt.Errorf("source_missing: citation file is not in the retained inventory")
+	}
+	captured.BlobDir = filepath.Join(sources, "blobs")
+	buf, err := captured.ReadBlob(record.SHA256)
+	if err != nil {
+		return nil, "", err
+	}
+	if int64(len(buf)) != record.Size || !utf8.Valid(buf) {
+		return nil, "", fmt.Errorf("snapshot_mismatch: retained citation file changed or is not UTF-8")
+	}
+	return buf, record.SHA256, nil
+}
+
+func sourceLineBytes(data []byte, first, last int) ([]byte, error) {
+	line := 1
+	start := 0
+	spanStart := -1
+	for start < len(data) {
+		if line == first {
+			spanStart = start
+		}
+		end := len(data)
+		if offset := bytes.IndexByte(data[start:], '\n'); offset >= 0 {
+			end = start + offset + 1
+		}
+		if line == last {
+			if spanStart < 0 {
+				return nil, fmt.Errorf("snapshot_mismatch: invalid citation span")
+			}
+			return data[spanStart:end], nil
+		}
+		start = end
+		line++
+	}
+	return nil, fmt.Errorf("source_missing: citation line range is outside the retained file")
+}

@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "started_at": "2026-10-03T18:53:14.458818Z",
+  "finished_at": "2026-10-03T18:53:14.596325Z",
+  "request_sha256": "869f8cbc684f8bddc03d9b836ec6863792ee528d51899a85d2f76136fdc32848",
+  "base_config_sha256": "155d7a781013203cbd0d9761b82d87ab92ff3e1dda7718be21d127d0bd70cb29",
+  "binary_sha256": "c554e3382f932918905fae93e67f165ec90cd10f6cd42f9dde475add21e4afee",
+  "working_directory": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+  "runtime": {
+    "arch": "arm64",
+    "go": "go1.26.8",
+    "logical_cpus": 12,
+    "os": "darwin"
+  },
+  "dataset_identity": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+      "file_manifest_digest": "79204536edc02b8f2f34c9a5751c4b8a64df5db0e61c383631b71f4a8725ea3a",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "08409a3a13b3e6a936aaec94aa4d1edf3800c61fd924fd98e598cb94c65fac58"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "209316b5b3f45f6f9dbf3e05b769dae179e129d53968a82780e127579723967d",
+    "dataset_id": "6ea431726165fa74fbdf0786c8f53b0e306d4985cc99fa2d949274a6c8a47338"
+  },
+  "locked_files_sha256": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks": "c554e3382f932918905fae93e67f165ec90cd10f6cd42f9dde475add21e4afee",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8",
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+    "/private/tmp/ks-env-ledger-20261004/requests.json": "869f8cbc684f8bddc03d9b836ec6863792ee528d51899a85d2f76136fdc32848",
+    "/private/tmp/ks-env-ledger-20261004/wrong-model.yaml": "155d7a781013203cbd0d9761b82d87ab92ff3e1dda7718be21d127d0bd70cb29",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/dataset-identity.json": "9fdbe5867d0c4a03268b77c14713a79ceb9263946084d1d11c4d887e3405388e",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/graph/graph.db": "c4706ced9aa61de28ddbf8348c70582d47ffaeb62f76b08a6d2a1380a4316089",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/blobs/f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/history.bundle": "b9717510ba5e702dd01ffd5088be7e1b55c150cdcdc2bb6a2430431cc71878ce",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/sources/manifest.json": "01fac940ad92c6c3e569d1543f7217b1d71cea11f17a04db46bc142cd71c6f4f",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/vector/manifest.json": "02d85951be290651fcbcd3a3f000c6e15630dc0294e2286472f90d2e2e930b9f",
+    "/private/tmp/ks-recall-k10-real-20261004/dataset/smoke/vector/vector.db": "7eec75855040fc07aa2241f790ac7c94535fc3176928e6a1bce1bc006a2b8f99",
+    "/private/tmp/ks-recall-k10-real-20261004/semantic.db": "7e953c823ee333968e1cc9248ef8ba3ecc7be6d36bb87499e1b8d49e7294e1e2",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/knowledge.lock.json": "839c7eff5e104eecdf2d94a028e895545af3dea09358f122b2bd83d31268e895",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/manifest.yaml": "d50b495cfd2c385a151301ea9b204a4d97437ed393835af4a5ee35b75dd2b514",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/conflict-a.yaml": "f2af04b33033fe582329f0fd451a1388b746302bcd4d93c34a89701bce80bf86",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/conflict-b.yaml": "438431ed3093d34520730dcbd587fa00afcddaf6922ee9847aec136b07525270",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/expired.yaml": "e5b1bcc0a5b1a17f32c5e53f283a6177958f298818e06d0c4505a1ce8990b4b8",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/proposed.yaml": "f4852685faaead2903b186ec5f15322c45ddd29e955d824a66e9b7e46236b3e6",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/public.yaml": "7c02ab208c8392af9c96514c249343b8fc753e87d6115335e0fd09c74e424c25",
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/restricted.yaml": "ed28c98306f0d3d37d02fb13cfae562ef2584c190ee688f82c06836dedc399d4",
+    "/private/tmp/ks-recall-k10-real-20261004/src/README.md": "177ae8ba361c9e7eaa5f55da4918bdda40a38341ca64c6f01ea53e17cb17871e",
+    "/private/tmp/ks-recall-k10-real-20261004/src/go.mod": "eec5d9131584f71a13733d92f41752d80a78ea74c08bfd8adb770d144c37a9b0",
+    "/private/tmp/ks-recall-k10-real-20261004/src/main.go": "8b8b6954b53d4c8f2cbe2f30469fdd1597be22c6a62e551b8eb4134aaf136e94",
+    "/private/tmp/ks-recall-k10-real-20261004/src/main_test.go": "a44bff3659dedc54acd9ea02acb64f30727333caf8d5b39781e94e3785e2cb2a",
+    "/private/tmp/ks-recall-k10-real-20261004/src/ontology-reviewed.yaml": "a00c7d349b805891641674cb1549390991436cef6856b613b83bd3a9cc6bd305",
+    "/private/tmp/ks-recall-k10-real-20261004/src/vendor/fixture-policy/pack.yaml": "d7a33263508700b8bfb5a4f8a2b095f860334b1386d2b3cb194de7e4a7da8a4e"
+  },
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "arms": [
+    {
+      "id": "baseline_off",
+      "mode": "baseline",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/baseline_off.yaml",
+      "config_sha256": "1a4e91033111a2080a67fa90dc14df49d89c2a42bdd2efe670ef6ea056cafd64",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "baseline_on",
+      "mode": "baseline",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/baseline_on.yaml",
+      "config_sha256": "bd2ce64d094520e10a7826ed39ff9c38e3d87d998519f0c062c167cdf7f4cd87",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "concept_text_off",
+      "mode": "concept_text",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/concept_text_off.yaml",
+      "config_sha256": "df180caa3b2dfa81e5435712b2761754f5a67545f7ac170008b13e80ffd4c63f",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "concept_text_on",
+      "mode": "concept_text",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/concept_text_on.yaml",
+      "config_sha256": "b23cea5f957dfab2089a10fa3a7742ac3e3914b1aa8af8b3a7c1783ce89e116d",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "relations_off",
+      "mode": "relations",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/relations_off.yaml",
+      "config_sha256": "3475d4379ca49e9b4a7131b43e2c37dd1410a6120ae55a4202c055ca2060b739",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "relations_on",
+      "mode": "relations",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/relations_on.yaml",
+      "config_sha256": "27cee550cc256fd658c962ec37c1148764baef8d2ee00d0ea19493a6c61d199e",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "combined_off",
+      "mode": "combined",
+      "include_knowledge": false,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/combined_off.yaml",
+      "config_sha256": "3deaca03dd552a6a396b0d4f7358165c8e23b7fb2a20a9d064baa9ba171d76cf",
+      "config_sha256_after": ""
+    },
+    {
+      "id": "combined_on",
+      "mode": "combined",
+      "include_knowledge": true,
+      "config": "/private/tmp/ks-env-ledger-20261004/wrong-model/combined_on.yaml",
+      "config_sha256": "a2f4d5001110275ec2e2bac0b7b81ab6af942ae88fc388063db18c4b1a0394d2",
+      "config_sha256_after": ""
+    }
+  ],
+  "rows": 0,
+  "call_timeout_ns": 90000000000,
+  "quality_metrics": null,
+  "rotation": "global group index mod 8; left rotate fixed arm list; every group is one request/phase/iteration across 8 arms",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "recording_policy": "full SDK response rows.jsonl; serialize and sync after each response outside call timing; no concurrent calls",
+  "errors": [
+    "environment preflight incomplete; inspect preserved environment ledger"
+  ],
+  "source_head": "cb0d7d91df897e460c92d9dd92c582e88e10316b",
+  "live_executable_bits": {
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/knowledge.lock.json": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/manifest.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/conflict-a.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/conflict-b.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/expired.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/proposed.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/public.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/.cks/knowledge/policies/restricted.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/README.md": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/go.mod": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/main.go": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/main_test.go": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/ontology-reviewed.yaml": false,
+    "/private/tmp/ks-recall-k10-real-20261004/src/vendor/fixture-policy/pack.yaml": false
+  },
+  "environment_before": {
+    "at": "2026-10-03T18:53:14.472085Z",
+    "valid": false,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 4.29 4.32 4.62 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    33357.\nPages active:                                1231201.\nPages inactive:                              1224149.\nPages speculative:                              2944.\nPages throttled:                                   0.\nPages wired down:                             336279.\nPages purgeable:                                3948.\n\"Translation faults\":                    38480850997.\nPages copy-on-write:                      4556814001.\nPages zero filled:                       15890531396.\nPages reactivated:                         592569562.\nPages purged:                               78029313.\nFile-backed pages:                            908173.\nAnonymous pages:                             1550121.\nPages stored in compressor:                  2541279.\nPages occupied by compressor:                1309415.\nDecompressions:                            392776386.\nCompressions:                              371839135.\nPageins:                                   514104337.\nPageouts:                                    3917411.\nSwapins:                                     2479183.\nSwapouts:                                    3174048.",
+      "swap": "total = 3072.00M  used = 2087.38M  free = 984.62M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 987,
+      "top_cpu_processes": [
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 34.6,
+          "rss_bytes": 11839193088
+        },
+        {
+          "pid": 70271,
+          "parent_pid": 65793,
+          "cpu_percent": 29.2,
+          "rss_bytes": 2125168640
+        },
+        {
+          "pid": 40922,
+          "parent_pid": 40463,
+          "cpu_percent": 18.3,
+          "rss_bytes": 1654718464
+        },
+        {
+          "pid": 644,
+          "parent_pid": 1,
+          "cpu_percent": 14,
+          "rss_bytes": 134512640
+        },
+        {
+          "pid": 1399,
+          "parent_pid": 40833,
+          "cpu_percent": 12.3,
+          "rss_bytes": 25460736
+        },
+        {
+          "pid": 40920,
+          "parent_pid": 40463,
+          "cpu_percent": 11.2,
+          "rss_bytes": 463749120
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 9.8,
+          "rss_bytes": 307462144
+        },
+        {
+          "pid": 65878,
+          "parent_pid": 65793,
+          "cpu_percent": 9.8,
+          "rss_bytes": 161349632
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "wrong-model:latest",
+      "dimension": 0,
+      "valid": false,
+      "probe_policy": "dataset declaration only; no model probe",
+      "errors": [
+        "configured_model_or_dataset_digest_invalid"
+      ]
+    },
+    "errors": [
+      "model_identity_not_verified"
+    ],
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "ps CPU percent is platform/window dependent; numeric processes are diagnostics, not resource exclusivity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "environment_after": {
+    "at": "2026-10-03T18:53:14.534154Z",
+    "valid": false,
+    "hardware": {
+      "os": "darwin",
+      "arch": "arm64",
+      "os_version": "26.6.2",
+      "cpu_brand": "Apple M2 Max",
+      "logical_cpus": 12,
+      "memory_bytes": 68719476736,
+      "load": "{ 4.29 4.32 4.62 }",
+      "memory_state": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    32977.\nPages active:                                1230057.\nPages inactive:                              1225537.\nPages speculative:                              2948.\nPages throttled:                                   0.\nPages wired down:                             336283.\nPages purgeable:                                3964.\n\"Translation faults\":                    38480856024.\nPages copy-on-write:                      4556814832.\nPages zero filled:                       15890533755.\nPages reactivated:                         592569562.\nPages purged:                               78029313.\nFile-backed pages:                            908178.\nAnonymous pages:                             1550364.\nPages stored in compressor:                  2541279.\nPages occupied by compressor:                1309415.\nDecompressions:                            392776386.\nCompressions:                              371839135.\nPageins:                                   514104346.\nPageouts:                                    3917411.\nSwapins:                                     2479183.\nSwapouts:                                    3174048.",
+      "swap": "total = 3072.00M  used = 2087.38M  free = 984.62M  (encrypted)",
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "process_count": 987,
+      "top_cpu_processes": [
+        {
+          "pid": 97023,
+          "parent_pid": 1,
+          "cpu_percent": 34.6,
+          "rss_bytes": 11839193088
+        },
+        {
+          "pid": 70271,
+          "parent_pid": 65793,
+          "cpu_percent": 29.2,
+          "rss_bytes": 2125922304
+        },
+        {
+          "pid": 40922,
+          "parent_pid": 40463,
+          "cpu_percent": 18.3,
+          "rss_bytes": 1654718464
+        },
+        {
+          "pid": 644,
+          "parent_pid": 1,
+          "cpu_percent": 14,
+          "rss_bytes": 134463488
+        },
+        {
+          "pid": 1399,
+          "parent_pid": 40833,
+          "cpu_percent": 12.3,
+          "rss_bytes": 26001408
+        },
+        {
+          "pid": 40920,
+          "parent_pid": 40463,
+          "cpu_percent": 11.2,
+          "rss_bytes": 463749120
+        },
+        {
+          "pid": 878,
+          "parent_pid": 1,
+          "cpu_percent": 9.8,
+          "rss_bytes": 307511296
+        },
+        {
+          "pid": 65878,
+          "parent_pid": 65793,
+          "cpu_percent": 9.8,
+          "rss_bytes": 161349632
+        }
+      ]
+    },
+    "model": {
+      "provider": "ollama",
+      "model": "wrong-model:latest",
+      "dimension": 0,
+      "valid": false,
+      "probe_policy": "dataset declaration only; no model probe",
+      "errors": [
+        "configured_model_or_dataset_digest_invalid"
+      ]
+    },
+    "errors": [
+      "model_identity_not_verified"
+    ],
+    "limitations": [
+      "two endpoint snapshots; transient changes/concurrent work between snapshots may be missed",
+      "ps CPU percent is platform/window dependent; numeric processes are diagnostics, not resource exclusivity",
+      "model identity embed probes occur before/after capture, outside query timing and backend counters",
+      "operator note and input copies do not approve facts/protocol or certify quality"
+    ]
+  },
+  "locked_input_copies": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/protocol-m2max-draft.json": {
+      "path": "locked-inputs/000-protocol-m2max-draft.json",
+      "sha256": "60c0b3af820dfda06223f78bf07be145ab09fed4bd816af37ac86e1b50d4d3e8"
+    }
+  }
+}

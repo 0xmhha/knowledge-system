@@ -88,3 +88,46 @@ func TestDefaultConfig_KnowledgeK(t *testing.T) {
 		t.Errorf("DefaultConfig.KnowledgeK = %d, want 6", DefaultConfig().KnowledgeK)
 	}
 }
+
+// A broad CKV recall may return knowledge chunks before the separate kind-
+// scoped pass. Those hits remain evidence, but their pseudo paths and policy
+// titles are not code symbols to send to CKG's raw FTS or FindSymbol pipeline.
+func TestExtract_KnowledgeRecallDoesNotGenerateCodeKeywords(t *testing.T) {
+	t.Parallel()
+	ckv := &ckvclient.Fake{SearchHits: []contract.Hit{
+		{Citation: contract.Citation{File: "main.go", StartLine: 3, EndLine: 3, CommitHash: "abc"}, Symbol: "Alpha", ChunkKind: "symbol", Source: contract.HitSourceCKV},
+		{Citation: contract.Citation{File: "/<convention>", StartLine: 1, EndLine: 1, CommitHash: "abc"}, ChunkKind: "convention", Source: contract.HitSourceCKV},
+		{Citation: contract.Citation{File: "/<invariant>", StartLine: 1, EndLine: 1, CommitHash: "abc"}, Symbol: "PolicyAnchor", ChunkKind: "invariant", Source: contract.HitSourceCKV},
+	}}
+	ckg := &ckgclient.Fake{}
+	cfg := DefaultConfig()
+	cfg.MaxRounds = 2
+	e, err := New(ckv, ckg, WithConfig(cfg))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := e.Extract(context.Background(), "Alpha implementation", contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, call := range ckg.Calls.BM25Search {
+		switch call.Query {
+		case "<convention>", "<invariant>", "PolicyAnchor":
+			t.Errorf("knowledge hit became a code keyword: %q", call.Query)
+		}
+	}
+	if len(out.Hits) != 3 {
+		t.Fatalf("knowledge evidence lost: got %d hits", len(out.Hits))
+	}
+	if len(ckv.Calls.SemanticSearch) != 3 || out.Rounds != 2 {
+		t.Fatalf("recall rounds or separate knowledge pass changed: rounds=%d calls=%d", out.Rounds, len(ckv.Calls.SemanticSearch))
+	}
+	for _, call := range ckv.Calls.SemanticSearch[:2] {
+		if call.Opts.K != DefaultInitialK || len(call.Opts.Filter.ChunkKinds) != 0 {
+			t.Fatalf("raw recall K/filter changed: %+v", call.Opts)
+		}
+	}
+	if ckv.Calls.SemanticSearch[2].Opts.K != cfg.KnowledgeK {
+		t.Fatal("knowledge pass K changed")
+	}
+}

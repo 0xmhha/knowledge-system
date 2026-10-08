@@ -1,0 +1,47 @@
+from pathlib import Path
+import json, hashlib, re, datetime
+
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system')
+docs=root/'docs/spec-driven'
+base=root/'system/eval/b0-knowledge-system'
+out=base/'human-approved-preview-closure-m2max-2026-10-06'
+out.mkdir(exist_ok=False)
+sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+dump=lambda p,v: p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+pending_path=base/'report-closure-reaudit-m2max-2026-10-06/pending-human-decisions.json'
+pending=json.loads(pending_path.read_text())
+review=docs/'B1-APPROVED-OUTPUT-CLAIM-REVIEW.md'
+assert sha(review)==pending['source_review_table_sha256']
+(out/'reviewed-interpretations-before-approval.md').write_bytes(review.read_bytes())
+worklist=docs/'EXECUTION-WORKLIST.md'
+(out/'worklist-before-closure.md').write_bytes(worklist.read_bytes())
+recorded_at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+user_reply='HC-01–11 해석 승인. 시험 preview 범위로 종료.'
+paths=[pending_path,base/'approved-evaluation-m2max-2026-10-06/human-claim-review/manifest.json',base/'approved-evaluation-m2max-2026-10-06/final-human-claim-review/manifest.json',base/'approved-evaluation-m2max-2026-10-06/development-after-fix26-27/artifact-manifest.json',base/'approved-evaluation-m2max-2026-10-06/development-oracles/artifact-manifest.json',base/'approved-evaluation-m2max-2026-10-06/final-after-development-freeze/artifact-manifest.json',base/'approved-evaluation-m2max-2026-10-06/final-oracles/artifact-manifest.json',base/'approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json',base/'final-package-preview-m2max-2026-10-06/archive-inventory.json',base/'report-closure-reaudit-m2max-2026-10-06/cost-report.json']
+bindings=[{'path':str(p.relative_to(root)),'sha256':sha(p)} for p in paths]
+dev_dir=paths[1].parent; final_dir=paths[2].parent
+dev=json.loads(paths[1].read_text())['records']; final=json.loads(paths[2].read_text())['records']
+for p, records, key in [(dev_dir,dev,'artifact'),(final_dir,final,'path')]:
+ for r in records: assert sha(p/r[key])==r['sha256']
+dev_map={r['case']:r for r in dev};final_map={r['id']:r for r in final}
+case_ids={1:['F-03-DEV-current'],2:['F-05-DEV-a'],3:['F-05-DEV-b'],4:['F-05-DEV-a','F-05-DEV-b'],5:['F-06-DEV-current'],6:['F-06-DEV-current'],7:['F-06-DEV-current'],8:[],9:['B0-ABS-01'],10:['B0-ABS-02'],11:['B0-POLICY-03']}
+claims=[]
+for c in pending['claim_decisions']:
+ n=int(c['id'].split('-')[1]); records=[]
+ for case in case_ids[n]:
+  r=(dev_map if n<=8 else final_map)[case]; directory=dev_dir if n<=8 else final_dir
+  p=directory/r['artifact' if n<=8 else 'path']
+  records.append({'case':case,'path':str(p.relative_to(root)),'sha256':sha(p),'measurement_id':r['measurement_id']})
+ claims.append({'id':c['id'],'approved_interpretation':c['interpretation_for_human_review'],'human_verdict':'approved_as_written','reviewer':'chat-user','approval_recorded_at':recorded_at,'actual_output_bindings':records,'additional_evidence':('DEV v1 four-question anchor and SDK/source audit in development-oracles manifest' if n==8 else None)})
+event={'schema_version':1,'user_reply_verbatim':user_reply,'authorization_source':'explicit human user message in this thread','reviewer':'chat-user','reviewer_identity_scope':'local chat identifier; not an authenticated legal name or operating role','approval_recorded_at':recorded_at,'user_message_timestamp':None,'reviewed_table_before_approval_sha256':pending['source_review_table_sha256'],'reviewed_table_snapshot':'reviewed-interpretations-before-approval.md','claim_decisions':claims,'evidence_bindings':bindings,'accepted_delivery_scope':'test_preview_only','accepted_scope_reduction':True,'operating_release_approved':False,'operating_role_key_trust_legal_approval':False,'release_status':'withheld','ontology_default':'disabled','quality_verdict':'fail','important_groups_verdict':'inconclusive','human_review_cost':{'status':'not_measured','seconds':None,'amount':None,'currency':None},'closed_tasks':['B1-04','B1-07','B1-08','C1-05'],'excluded_operating_work':['OP-01 through OP-08 actual operating roles/keys/trust/legal/environment/backup/failover','native AMD64 real-model/operating validation','Darwin SDK/full native regeneration/transitive legal suitability signoff'],'not_authorized_by_this_reply':['new Git push','remote deployment','production key promotion','quality pass'],'original_completion_conditions':{}}
+for line in worklist.read_text().splitlines():
+ if re.match(r'^\| (B1-04|B1-07|B1-08|C1-05) \|',line):
+  f=[s.strip() for s in line.strip('|').split('|')];event['original_completion_conditions'][f[0]]=f[3]
+dump(out/'human-approval.json',event)
+assessment={'schema_version':1,'approval_event':'human-approval.json','approval_event_sha256':sha(out/'human-approval.json'),'reviewed_unit':'eleven evidence-bounded interpretation statements, not generated model answers or independent quality questions','approved_interpretations':11,'reviewed_interpretations':11,'unsupported_approved_interpretations':0,'categories':[{'category':'concept interpretation','claim_ids':['HC-01'],'approved':1},{'category':'policy scope, implementation and acceptance boundaries','claim_ids':['HC-02','HC-03','HC-04','HC-05','HC-06','HC-10','HC-11'],'approved':7},{'category':'unsupported reason / trace / answer boundaries','claim_ids':['HC-04','HC-06','HC-07','HC-08','HC-11'],'approved':5}],'category_overlap':True,'human_abstention':{'claim_ids':['HC-09','HC-10'],'approved_should_abstain':2,'reviewed':2,'system_generated_abstention_rate':None,'strict_no_citation_guard':'fail; unchanged'},'model_answer_misconception_policy_misuse_unsupported_reason_rates':None,'model_answer_rate_reason':'product returns EvidencePacks, not generated answers; eleven approved interpretations cannot rate all 3840/4800 responses','human_cost_status':'not_measured','quality_pass':False}
+dump(out/'human-assessment.json',assessment)
+review_text=review.read_text().replace('2026-10-06 · B1-07 · 사람 판정 대기.','2026-10-06 · B1-07 · HC-01–11 해석 승인 완료.')
+review_text=review_text.replace('| 대기 |','| 승인 · chat-user |').replace('이를 제품이 자동 생성한 답변이나 이미 승인된 출력으로 기록하지 않는다.','사용자가 아래 해석 문장을 승인했다. 이를 제품이 자동 생성한 답변으로 기록하지 않는다.').replace('실제 출력의 적정성을 새로 검토해야 한다.','실제 출력에 대한 아래 해석의 적정성을 사용자가 승인했다.')
+review_text+='\n## 실제 사람 판정 기록\n\n사용자 원문: **“'+user_reply+'”**. 로컬 검토자 `chat-user`, 기록 시각 `'+recorded_at+'`. 정확한 메시지 수신 시각과 실제 검토 소요 시간은 측정하지 않았다. [승인 원장](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-approval.json)은 승인 전 표 SHA·11개 해석·실제 응답/measurement ID·개발/최종 증거 manifest에 결합한다. 이전 pending 원장은 당시 기록으로 보존했다.\n\n검토한 해석11/11 승인, 이 승인된 해석 중 근거 범위 위반0/11이다. [사람 판정 집계](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-assessment.json)의 개념1·정책/수용 경계7·이유/추적 경계5 범주는 중복을 포함한다. HC-09/10의 사람 답변 보류2/2를 승인했으며 기계의 strict no-citation 실패는 그대로다. 이11개는 독립 최종 품질 문항11개나 모델 생성 답변11개가 아니다. 전체3840/4800응답의 오개념·정책오용·근거 없는 이유 비율은 생성 답변이 없어 산출하지 않으며 미판정 응답을0건으로 만들지 않는다.\n\n승인 범위는 해석과 시험 preview 종료다. 운영 정책/키/역할·법적 적합성·품질 합격·출시/배포·새 Git push를 승인한 것으로 확장하지 않는다.\n'
+review.write_text(review_text)
+print('HC-01–11 human approval bound to original table and seven representative actual responses; preview scope recorded')

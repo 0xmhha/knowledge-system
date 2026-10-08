@@ -1,0 +1,29 @@
+import json,hashlib,tarfile,subprocess,difflib
+from pathlib import Path
+R=Path('/private/tmp/ks-original-native-20261005');M=Path('/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/modernc.org/libc@v1.74.1');sha=lambda b:hashlib.sha256(b).hexdigest();P=R/'header-replay-inputs-retry1';P.mkdir(exist_ok=False)
+prefix='musl-7ada6dde6f9dc6a2836c3d92c2f762d35fd229e0/'
+with tarfile.open(R/'musl-source.tar.gz') as tar:
+ files={m.name[len(prefix):]:tar.extractfile(m).read() for m in tar.getmembers() if m.isfile()}
+make=files['Makefile'].decode();assert 'sed -f $(srcdir)/tools/mkalltypes.sed $(srcdir)/arch/$(ARCH)/bits/alltypes.h.in $(srcdir)/include/alltypes.h.in > $@' in make and '\tcp $< $@\n\tsed -n -e s/__NR_/SYS_/p < $< >> $@' in make
+script=P/'mkalltypes.sed';script.write_bytes(files['tools/mkalltypes.sed']);rows=[]
+for goarch,muslarch in [('arm64','aarch64'),('amd64','x86_64')]:
+ target=M/('include/linux/'+goarch+'/bits')
+ a=P/(goarch+'-arch-alltypes.h.in');a.write_bytes(files['arch/'+muslarch+'/bits/alltypes.h.in']);common=P/(goarch+'-include-alltypes.h.in');common.write_bytes(files['include/alltypes.h.in'])
+ cmd=['sed','-f',str(script),str(a),str(common)];run=subprocess.run(cmd,capture_output=True);assert run.returncode==0 and not run.stderr
+ actual=run.stdout;expected=(target/'alltypes.h').read_bytes();assert actual==expected
+ (P/(goarch+'-alltypes.h')).write_bytes(actual)
+ rows.append({'target':'linux/'+goarch,'header':'bits/alltypes.h','kind':'upstream_generator_replayed','command':cmd,'exit_code':run.returncode,'recipe':'musl fixed-commit Makefile','input_hashes':{n:sha(files[n]) for n in ['tools/mkalltypes.sed','arch/'+muslarch+'/bits/alltypes.h.in','include/alltypes.h.in']},'output_sha256':sha(actual),'module_sha256':sha(expected),'byte_identical':True})
+ syscall_input='arch/'+muslarch+'/bits/syscall.h.in';sysfile=P/(goarch+'-syscall.h.in');sysfile.write_bytes(files[syscall_input]);cmd=['sed','-n','-e','s/__NR_/SYS_/p'];run=subprocess.run(cmd,input=files[syscall_input],capture_output=True);assert run.returncode==0 and not run.stderr
+ actual=files[syscall_input]+run.stdout;expected=(target/'syscall.h').read_bytes();assert actual==expected
+ (P/(goarch+'-syscall.h')).write_bytes(actual)
+ rows.append({'target':'linux/'+goarch,'header':'bits/syscall.h','kind':'upstream_generator_replayed','command':cmd,'stdin_source':syscall_input,'exit_code':run.returncode,'recipe':'musl fixed-commit Makefile: copy input then append sed output','input_sha256':sha(files[syscall_input]),'output_sha256':sha(actual),'module_sha256':sha(expected),'byte_identical':True})
+ original=files['arch/'+muslarch+'/bits/float.h'];overlay=M/('internal/overlay/musl/arch/'+muslarch+'/bits/float.h');actual=overlay.read_bytes();expected=(target/'float.h').read_bytes();assert actual==expected and actual!=original
+ diff=''.join(difflib.unified_diff(original.decode().splitlines(True),actual.decode().splitlines(True),fromfile='musl-original',tofile='pinned-module-overlay'))
+ (P/(goarch+'-float-header.diff')).write_text(diff)
+ # Verify the overlay keeps original text intact in its non-ccgo branch. Other branch remains a distinct modification.
+ head,sep,tail=actual.decode().partition('#else // __CCGO__');assert sep and head=='#ifndef __CCGO__\n\n'+original.decode()+'\n'
+ rows.append({'target':'linux/'+goarch,'header':'bits/float.h','kind':'pinned_module_overlay','module_overlay_path':str(overlay.relative_to(M)),'upstream_original_path':'arch/'+muslarch+'/bits/float.h','upstream_original_sha256':sha(original),'overlay_sha256':sha(actual),'module_sha256':sha(expected),'byte_identical_to_overlay':True,'non_ccgo_branch_preserves_original':True,'ccgo_branch_changes':{'long_double_mantissa_bits':53,'decimal_digits':17},'full_transpiler_correctness_or_legal_approval':False})
+report={'diagnostic_only':True,'planned_checks':6,'observed_checks':len(rows),'generated_header_replays':4,'overlay_byte_matches':2,'full_native_regeneration':False,'quality_metrics':None,'legal_review':'pending','rows':rows};(R/'header-replay.json').write_text(json.dumps(report,indent=2)+'\n')
+s=json.loads((R/'summary.json').read_bytes());s['header_replay']={'planned':6,'observed':6,'generated_byte_identical':4,'overlay_byte_identical':2,'report_sha256':sha((R/'header-replay.json').read_bytes())};s['musl_header_complete_origin_classification']={'arm64':{'raw_upstream':215,'generated':2,'overlay':1,'total':218},'amd64':{'raw_upstream':215,'generated':2,'overlay':1,'total':218}}
+s['limits']=[x for x in s['limits'] if 'Darwin SDK' not in x]+['Darwin SDK, exact include-use/transpiler version and full C-to-Go regeneration remain incomplete; two Linux header trees classified, not complete transitive coverage']
+(R/'summary.json').write_text(json.dumps(s,indent=2)+'\n');print(json.dumps(s,indent=2))

@@ -1,0 +1,34 @@
+setup: --version auto resolved to 2b57d801
+==> [graph-build] Build the graph index
+ !  [toolchain] toolenv: not found on this machine: go (install them, or start the server from a shell that has them)
+    resolved git=/usr/bin/git (inherited_path)
+    time=2026-10-03T21:27:24.618Z level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-03T21:27:24.618Z level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-03T21:27:24.625Z level=INFO msg="temporal G6 emitted" commit_nodes=1 hunk_nodes=2 changed_in_edges=0 blame_edges=0 hunk_edges=2 hunk_blobs=2 max_per_file=10
+    time=2026-10-03T21:27:24.677Z level=INFO msg="build complete" nodes=3 edges=2 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 3 nodes / 2 edges into /logs/empty-go/dataset/2b57d801/graph
+<== [graph-build] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-03T21:27:24.684Z level=INFO msg=ckv event=project_config.loaded trace_id=57b2e2d26859ed0e run_id=3fa4e1f37ac80307 important_symbol_count=0 path=/tmp/cks-build-source-2104624535/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0
+    time=2026-10-03T21:27:24.684Z level=INFO msg=ckv event=build.start trace_id=d3b29ba867aad4b7 run_id=3fa4e1f37ac80307 out_dir=/logs/empty-go/dataset/2b57d801/vector embedder=mock-feature-hash-v1 embedder_provider="" src_root=/tmp/cks-build-source-2104624535/tree
+    time=2026-10-03T21:27:24.700Z level=INFO msg=ckv event=ckg_align.loaded trace_id=14e24e8109843218 run_id=3fa4e1f37ac80307 ckg_path=/logs/empty-go/dataset/2b57d801/graph files_indexed=0 entries=0 canonical_available=true
+    ckv: 1/1 files (113.7 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-03T21:27:24.715Z level=INFO msg=ckv event=build.done trace_id=d3b29ba867aad4b7 run_id=3fa4e1f37ac80307 latency_ms=30 chunks_canonical_id=0 chunks_doc=1 languages=map[markdown:1] src_root=/tmp/cks-build-source-2104624535/tree embedder=mock-feature-hash-v1 embedder_provider="" policy_loaded=false db_sha256=28946d694f4c9fb7e7b6ca498b3942d0c69cb9a5c5d63bb6f74596ea18273407 chunks_file_header=0 chunks_total=1 chunks_flow_spine=0 out_dir=/logs/empty-go/dataset/2b57d801/vector chunks_flow_step=0 chunks_truncated=0 category_counts=map[:1] chunks_symbol=0 indexed_head=2b57d80129edb1d1feedfb85d4de48f652813976 files_indexed=1
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=2b57d80129edb1d1feedfb85d4de48f652813976 built_at=2026-10-03T21:27:24Z db=/logs/empty-go/dataset/2b57d801/vector/vector.db sha256=28946d694f4c9fb7e7b6ca498b3942d0c69cb9a5c5d63bb6f74596ea18273407
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /logs/empty-go/dataset/2b57d801 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

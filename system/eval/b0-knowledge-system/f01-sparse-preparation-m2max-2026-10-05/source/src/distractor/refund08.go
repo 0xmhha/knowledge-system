@@ -1,0 +1,4 @@
+package refund
+
+// RefundRoute08 returns the documented gas refund marker.
+func RefundRoute08() string { return "DEV-refund-08" }

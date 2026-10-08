@@ -1,0 +1,122 @@
+{
+  "green-resource-tests.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks",
+      "-run",
+      "^TestResource|^TestCapture|^TestSourceIdentityLengthPrefixedGolden$|^TestPublicCLIError",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false"
+    }
+  },
+  "final-error-boundary.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "./internal/setup",
+      "./cmd/cks",
+      "-run",
+      "^TestResource|^TestPublicCLIError",
+      "-v",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "final-cli-preparation.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks",
+      "-run",
+      "^TestResource|^TestPublicCLIError|^TestResolveAuto|^TestReindexHold",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false"
+    }
+  },
+  "race-regression.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks/mcpcli",
+      "./cmd/cks",
+      "./internal/system/mcp",
+      "./internal/system/patch",
+      "./internal/githistory",
+      "-count=1"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false"
+    }
+  },
+  "cli-run.log": {
+    "exit_code": 0,
+    "argv": [
+      "python3",
+      "system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/verify-resource-cli.py.txt"
+    ],
+    "env": {}
+  },
+  "vet.log": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "vet",
+      "./internal/setup",
+      "./cmd/cks/setupcli",
+      "./cmd/cks/mcpcli",
+      "./cmd/cks",
+      "./internal/system/mcp",
+      "./internal/system/patch",
+      "./internal/githistory"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  },
+  "boundaries.log": {
+    "exit_code": 0,
+    "argv": [
+      "./scripts/check-boundaries.sh"
+    ],
+    "env": {}
+  },
+  "docs.log": {
+    "exit_code": 0,
+    "argv": [
+      "make",
+      "docs-check"
+    ],
+    "env": {
+      "GOCACHE": "/private/tmp/ks-wbs-go-cache"
+    }
+  }
+}

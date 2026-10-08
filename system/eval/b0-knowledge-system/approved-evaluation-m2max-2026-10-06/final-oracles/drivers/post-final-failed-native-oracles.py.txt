@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,subprocess,hashlib,datetime
+r=Path('/private/tmp/ks-approved-scope-20261006');f=Path('/private/tmp/ks-approved-final-sweep-20261006');e=json.loads((f/'execution.json').read_bytes());assert e['status']=='failed_preserved';out=r/'approved-final-oracles';out.mkdir(exist_ok=False);checks=[];public=f/'public-go-verification';public.mkdir(exist_ok=True)
+def run(label,args,allowed=(0,)):
+ p=out/(label+'.log')
+ with p.open('xb')as stream:code=subprocess.run([str(a)for a in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+ checks.append({'id':label,'command':[str(a)for a in args],'exit_code':code,'log_sha256':hashlib.sha256(p.read_bytes()).hexdigest()});(out/'execution.json').write_text(json.dumps({'status':'running','checks':checks},indent=2)+'\n');print(label,code,flush=True);assert code in allowed,label
+for step in e['steps']:run('go-'+step['id'],[r/'runtime-header-batch/b1-evidence-audit','--input',Path(step['output'])/'rows.jsonl','--output',public/(step['id']+'.json')],(0,1))
+# Continue direct/raw and v1 checks from the original audited program without
+# asserting that a failed public-v2 capture was successful. Preserve its source.
+original=(r/'post-final-native-oracles.py').read_text();tail=original[original.index("probe=R/"):original.index("assert all(sha(Path(p))==d for p,d in execution['input_sha256_after']")];namespace={'R':r,'N':f,'root':Path.cwd(),'data':Path.cwd()/'system/eval/b0-knowledge-system','execution':e,'out':out,'checks':checks,'run':run,'binary':r/'runtime-header-batch/cks','read':lambda p:json.loads(p.read_bytes()),'sha':lambda p:hashlib.sha256(p.read_bytes()).hexdigest()};exec('import importlib.util\n'+tail,namespace)
+seal=json.loads((r/'final-failed-seals.json').read_bytes());assert all(seal[k]for k in ['approved_inputs_unchanged','stores_unchanged','product_source_unchanged','binary_unchanged'])
+(out/'execution.json').write_text(json.dumps({'status':'complete_with_preserved_v2_failure','checks':checks,'raw_probes':len(namespace['probes']),'v2_failed_rows':240,'v2_capture_status':'failed_preserved','seal_report_sha256':hashlib.sha256((r/'final-failed-seals.json').read_bytes()).hexdigest(),'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n');print('FINAL direct/public/raw/v1 checks complete; original v2 failure preserved',flush=True)

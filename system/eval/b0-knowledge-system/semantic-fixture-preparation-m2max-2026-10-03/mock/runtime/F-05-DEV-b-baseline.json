@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T14:40:01.471141Z",
+  "finished_at": "2026-10-03T14:40:01.562105Z",
+  "request_sha256": "a370ab79ce9af786d5183c84ae1411509dead8b9c58a2635f033d36977845344",
+  "config_sha256": "a63021e4e5cad93d29d4a11f64e2c877fc53ac32ec89f7707cfe00acb995a889",
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "config_sha256_after": "a63021e4e5cad93d29d4a11f64e2c877fc53ac32ec89f7707cfe00acb995a889",
+  "binary_sha256_after": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "q0",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented and which refund limit applies?"
+        },
+        "elapsed_ns": 29698792,
+        "completed_at": "2026-10-03T23:40:01.542363+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-05-dev-b",
+              "dataset_id": "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6",
+              "snapshot_id": "32769d81c646a67b8c9fb5c2211f48219ff71eea164657bf7119487901e98366",
+              "source_mode": "committed",
+              "base_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636"
+            },
+            "query": "Where is Alpha implemented and which refund limit applies?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+                "project_id": "f-05-dev-b",
+                "dataset_id": "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6",
+                "snapshot_id": "32769d81c646a67b8c9fb5c2211f48219ff71eea164657bf7119487901e98366",
+                "source_mode": "committed",
+                "base_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+                "origin_id": "repo",
+                "file_sha256": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+                "content_sha256": "266d5ee8665fd7bbe660493c4e0f89254f0bbe343316370b5dc6c7dfef4a3cc9"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+                  "project_id": "f-05-dev-b",
+                  "dataset_id": "7119008f11fee8ed1a1b730e6ffe9f76a03d2fa402e01517c1b930e4ef1d6bf6",
+                  "snapshot_id": "32769d81c646a67b8c9fb5c2211f48219ff71eea164657bf7119487901e98366",
+                  "source_mode": "committed",
+                  "base_commit": "d29ea2ef74d2ee4cbefdc8bdcc3335cd5c02b636",
+                  "origin_id": "repo",
+                  "file_sha256": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+                  "content_sha256": "266d5ee8665fd7bbe660493c4e0f89254f0bbe343316370b5dc6c7dfef4a3cc9"
+                },
+                "text": "func Alpha() string { return \"DEV-project-b\" }\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "9784e0da156a0b97f41ad01e066f2cb97f108650b4771f1ad8eead85811975fa"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

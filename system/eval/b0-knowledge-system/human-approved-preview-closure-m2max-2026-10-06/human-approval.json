@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "user_reply_verbatim": "HC-01–11 해석 승인. 시험 preview 범위로 종료.",
+  "authorization_source": "explicit human user message in this thread",
+  "reviewer": "chat-user",
+  "reviewer_identity_scope": "local chat identifier; not an authenticated legal name or operating role",
+  "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+  "user_message_timestamp": null,
+  "reviewed_table_before_approval_sha256": "f051a660059e79e4ebc7193f84eebc87bbc6624387ac195ce0763529ca639e71",
+  "reviewed_table_snapshot": "reviewed-interpretations-before-approval.md",
+  "claim_decisions": [
+    {
+      "id": "HC-01",
+      "approved_interpretation": "F-03의 여러 `core` 개념은 proposed다. 한 의미를 확정 정책/구현으로 선택하지 않는다. 실제 온톨로지 가산 0, 기본 인용·본문 유지. “뜻을 더 지정해야 한다”는 해석은 가능하지만 자동 정책 승인/답변 기권 성공을 주장하지 않는다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-03-DEV-current",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-03-DEV-current.json",
+          "sha256": "3fabc61cef00b3b9ad227064b1937bcde0b23fffb42545add99d230db2d4e61c",
+          "measurement_id": "073940488b8fa51ae61045351f6489d4"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-02",
+      "approved_interpretation": "F-05-A의 `docs/policy.md:3`, 해당 프로젝트의 검토 정책: 상한 10. B의 상한 20을 A에 적용하지 않는다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-05-DEV-a",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-05-DEV-a.json",
+          "sha256": "86dcca384c6d247ad6230683eb42851ad88f48237e97ac76aa58b51f3227ee88",
+          "measurement_id": "d704ac63ed75405e52c9a50ee4388d6f"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-03",
+      "approved_interpretation": "F-05-B의 `docs/policy.md:3`, 해당 프로젝트의 검토 정책: 상한 20. A의 상한 10을 B에 적용하지 않는다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-05-DEV-b",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-05-DEV-b.json",
+          "sha256": "5a480e5766cfd2ea438d507a16d803c4129c0450610a054c8a42157cbb9e23c3",
+          "measurement_id": "c6cf84ccd9b955af54b56e2b00afc90c"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-04",
+      "approved_interpretation": "F-05-A/B의 `main.go:3`의 Alpha는 프로젝트 marker를 반환한다. 정책 상한을 실제로 집행하거나 준수한다는 근거가 아니다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-05-DEV-a",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-05-DEV-a.json",
+          "sha256": "86dcca384c6d247ad6230683eb42851ad88f48237e97ac76aa58b51f3227ee88",
+          "measurement_id": "d704ac63ed75405e52c9a50ee4388d6f"
+        },
+        {
+          "case": "F-05-DEV-b",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-05-DEV-b.json",
+          "sha256": "5a480e5766cfd2ea438d507a16d803c4129c0450610a054c8a42157cbb9e23c3",
+          "measurement_id": "c6cf84ccd9b955af54b56e2b00afc90c"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-05",
+      "approved_interpretation": "F-06 `main.go:3`에서 RefundLimit은 20을 반환하고 `README.md:3`/검토 요구는 10 이하다. 원문을 사람이 대조하면 불일치다. DTO가 자동 수치 충돌 판정까지 했다고 주장하지 않는다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-06-DEV-current",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-06-DEV-current.json",
+          "sha256": "c7b37a76f66fee879a9c7e18c1fffb321b05ba0d334f8712d641bce05f3c92e5",
+          "measurement_id": "dcab75e3e8f441785fbc33e61a92c31b"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-06",
+      "approved_interpretation": "F-06 `main_test.go:5`의 TestHealth는 관련 없는 산술 검사다. 테스트 성공을 환급 상한 acceptance 승인으로 사용하지 않는다. 실제 test/trace link는 비어 있다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-06-DEV-current",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-06-DEV-current.json",
+          "sha256": "c7b37a76f66fee879a9c7e18c1fffb321b05ba0d334f8712d641bce05f3c92e5",
+          "measurement_id": "dcab75e3e8f441785fbc33e61a92c31b"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-07",
+      "approved_interpretation": "F-06에는 reviewed ADR→requirement→criterion→code→test 전체 경로가 없다. implemented behavior/trace의 미확정 상태를 유지하며 IMPLEMENTED_BY 순위 근거만으로 완전 추적 경로를 주장하지 않는다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "F-06-DEV-current",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/F-06-DEV-current.json",
+          "sha256": "c7b37a76f66fee879a9c7e18c1fffb321b05ba0d334f8712d641bce05f3c92e5",
+          "measurement_id": "dcab75e3e8f441785fbc33e61a92c31b"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-08",
+      "approved_interpretation": "정적 DEV v1에서 CODE/POLICY/TRACE의 기대 근거를 못 찾았다. 이 출력만으로 기대 답을 입증했다고 판단하지 않는다. WHY는 Promote의 기대 근거를 찾았다. 인용 0개 조건과 사람이 답변을 보류할지는 별도 판정한다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [],
+      "additional_evidence": {
+        "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-oracles/approved-development-oracles/static-v1-sdk.json.gz",
+        "sha256": "da4f1d236befdc10e6b3176db599fa61fe01aa736d4b2fcdbf75f324060049c1",
+        "source_sha256": "ee497302cd80f97025007cb963d09daef38c2bf8f7730b2e32c0157e45733715",
+        "question_names": [
+          "b0-code-01",
+          "b0-policy-01",
+          "b0-trace-01",
+          "b0-why-03"
+        ],
+        "scope": "actual four-question DEV v1 anchor/SDK report; per-call responses, source-bound results, not independent FINAL units"
+      }
+    },
+    {
+      "id": "HC-09",
+      "approved_interpretation": "ABS-01 실제 출력에는 인용이 있으나 운영 가스 환불 정책의 승인 담당자를 입증하는 근거가 없다. 담당자 이름을 추정하지 않고 답변을 보류해야 한다. 인용0개 guard 실패와 사람의 답변 보류를 각각 기록한다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "B0-ABS-01",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-human-claim-review/B0-ABS-01.json",
+          "sha256": "fb32a40df5cdb750a5aad3d5b24d61169e3ed1d64b4be48401ae616d070024b1",
+          "measurement_id": "a79407e039ac8aa1a20f15acd087cf87"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-10",
+      "approved_interpretation": "ABS-02 실제 출력의 시험 preview 서명 근거를 production key나 실제 private key holder로 해석하지 않는다. 운영 키/소유자 답변을 보류해야 한다. v1은 인용25개, v2도 인용이 있어 strict no-citation 실패다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "B0-ABS-02",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-human-claim-review/B0-ABS-02.json",
+          "sha256": "0cd37ae5a8da9a24c3abc8fb53e67f026619e39561f2a9076c453fa444a10a93",
+          "measurement_id": "d4d3883c42b96960963f3298dac55c4b"
+        }
+      ],
+      "additional_evidence": null
+    },
+    {
+      "id": "HC-11",
+      "approved_interpretation": "POLICY-03은 모든8arm에서 v2_evidence_failed로 종료돼 정상 정책 근거 팩을 반환하지 않았다. 실제 빌더 진단은 retained body 33,104바이트가 32,000 상한을 넘었음을 확인한다. 오류만으로 비공개 정책 내용/ID를 공개하거나 접근을 허용하는 답변을 만들 수 없으며, 해당 응답의 정책 답변 근거는 미제공이다. 제품의 권한 회귀 시험과 이 검색 실패를 구분한다.",
+      "human_verdict": "approved_as_written",
+      "reviewer": "chat-user",
+      "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+      "actual_output_bindings": [
+        {
+          "case": "B0-POLICY-03",
+          "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-human-claim-review/B0-POLICY-03.json",
+          "sha256": "6411e9705eabc6cf050bb5682fe0ba550240cba592ea2f55886120705d58b215",
+          "measurement_id": "1702f84615d6105c246ca183a99ea016"
+        }
+      ],
+      "additional_evidence": null
+    }
+  ],
+  "evidence_bindings": [
+    {
+      "path": "system/eval/b0-knowledge-system/report-closure-reaudit-m2max-2026-10-06/pending-human-decisions.json",
+      "sha256": "3160893e57c05893987890bba4d5d149b5b2332bba2eca986087bdd567b42a0e"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/human-claim-review/manifest.json",
+      "sha256": "f63164d4b2ead65c50d737b2453c55b27a68c73055b87eb1d1635ef27d6bcf0c"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-human-claim-review/manifest.json",
+      "sha256": "c00db3f2b76c645bfd0c0a5e060068b2656ed423417735c2e49a637589cf3c1d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-after-fix26-27/artifact-manifest.json",
+      "sha256": "509e32945607db80d8af5cf15f6f6dfbea1de960b292be19d84a553b7d4c1b5d"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/development-oracles/artifact-manifest.json",
+      "sha256": "27a2ba0d7e862851aeeb32f3414b1e25dddff46479c79c6ebe3e4a0a52fe9300"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-after-development-freeze/artifact-manifest.json",
+      "sha256": "3e06c04bc1598257182293bffbe0857fdfb8f5c92fc99f3a61d3ec7e8bee4bc3"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/final-oracles/artifact-manifest.json",
+      "sha256": "8fd8bea1062596a305b47c2682381b0332ee527a044ee11721576eaf709cbbde"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json",
+      "sha256": "193227009ed57beef4118eb6bee5c5ba53ed1d44515435c61152ffc3a5368eb1"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/archive-inventory.json",
+      "sha256": "0483368dd986839fcec439edd7b18d1469eae65f43e0e12cf582c3e04a54ad88"
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/report-closure-reaudit-m2max-2026-10-06/cost-report.json",
+      "sha256": "38483e5c49bea7be958400ec12dcc699c01ee6b942755de9b0baa8895ebc2efb"
+    }
+  ],
+  "accepted_delivery_scope": "test_preview_only",
+  "accepted_scope_reduction": true,
+  "operating_release_approved": false,
+  "operating_role_key_trust_legal_approval": false,
+  "release_status": "withheld",
+  "ontology_default": "disabled",
+  "quality_verdict": "fail",
+  "important_groups_verdict": "inconclusive",
+  "human_review_cost": {
+    "status": "not_measured",
+    "seconds": null,
+    "amount": null,
+    "currency": null
+  },
+  "closed_tasks": [
+    "B1-04",
+    "B1-07",
+    "B1-08",
+    "C1-05"
+  ],
+  "excluded_operating_work": [
+    "OP-01 through OP-08 actual operating roles/keys/trust/legal/environment/backup/failover",
+    "native AMD64 real-model/operating validation",
+    "Darwin SDK/full native regeneration/transitive legal suitability signoff"
+  ],
+  "not_authorized_by_this_reply": [
+    "new Git push",
+    "remote deployment",
+    "production key promotion",
+    "quality pass"
+  ],
+  "original_completion_conditions": {
+    "B1-04": "평가 분모·누락·실패 기록; v1 인용 0개와 사람의 답변 기권 판정 분리",
+    "B1-07": "주장별 근거와 판정자 연결; 자동 구조 점수와 사람 승인을 분리",
+    "B1-08": "기존 회귀 조건 적용; 불확실 구간·소표본 inconclusive 명시; 최종 사례로 튜닝하지 않음",
+    "C1-05": "실제 운영 키/정책/검토 권한 확인; 시험 키를 운영 키로 승격하지 않음"
+  }
+}

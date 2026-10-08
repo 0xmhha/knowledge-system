@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scope": "approved F04 direct CKV old immutable index against new approved source; not a latency or quality inference",
+  "status": "pass",
+  "fixture_sha256": "14487d11119730799c3842d9ab3e116addf17c7224311df09f5103935e199001",
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "binary_sha256": "cf0be4780a331447e5319e5c66894ac47409aac5de7c4cf77ff5df9432e74cbe",
+  "dataset_sha256_before": {
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-old/dataset/approved/vector/vector.db": "770ab45dd41cdb1210b50477c9c13a0c54f0776cb79a010770997381107dd9e5",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-old/dataset/approved/vector/manifest.json": "6d289df916bc8af38be0d7077014b25a1525d3ea2cafbd42eb172dfe441eea87",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-old/dataset/approved/dataset-identity.json": "c9fc95aa16c991e66c618ea4cc217de6b4b5bdf911a1035dda2b0ad2ae9a9a47",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-old/dataset/approved/sources/manifest.json": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/vector.db": "7983673ad3ec6df54bdd92acd4dbbae8dd8f05550f268644686187992d409782",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/vector/manifest.json": "cb670034c2cfcef4095c4a7e754d02eb4aa146e9d0a48580a9681fcd8c8e8baf",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/dataset-identity.json": "0780321b23275eac3e6924590f402d69a246fb5ccec168f46af398dead213db5",
+    "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/dataset/approved/sources/manifest.json": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd"
+  },
+  "datasets_unchanged": true,
+  "records": [
+    {
+      "id": "F-04-DEV-direct-old-vs-new-1",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/ckv",
+        "--embedder",
+        "ollama",
+        "--model-name",
+        "bge-m3:latest",
+        "--query-prefix-policy",
+        "registry",
+        "query",
+        "What value does Alpha return?",
+        "--out",
+        "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-old/dataset/approved/vector",
+        "--src",
+        "/private/tmp/ks-approved-dynamic-dev-20261006/F-04-DEV-new/source",
+        "--top",
+        "10",
+        "--threshold",
+        "-1",
+        "--json"
+      ],
+      "raw_sha256": "775826fb26aab62057406612a4a17fda5bfcc141c50e563789ff616007b5fbcd",
+      "metadata": {
+        "tokens_used": 36,
+        "indexed_head_ckv": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+        "fresh": false,
+        "trace_id": "30b67ed50408"
+      },
+      "hits": 3,
+      "all_old_citations_marked_stale": true
+    }
+  ],
+  "finished_at": "2026-10-05T20:54:24.989523+00:00"
+}

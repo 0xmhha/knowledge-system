@@ -1,0 +1,442 @@
+{
+  "state": "verified",
+  "quality_metrics": null,
+  "scope": "synthetic structural integration; not official B1",
+  "embedder": "ollama",
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "native:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "coordinates": {
+    "source": {
+      "project_id": "ks-fixture",
+      "source_mode": "committed",
+      "source_commit": "e7d7d49312d6423d524112e041fd6c52db6dfe98",
+      "file_manifest_digest": "82e51913c98da8a8bdd1bba4e2f7eaa6f85f67dce1f66c2c6b7a66d66b6a686f",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "3bab4624a97ca8c6853f0996e0774b086354305aac184beb1eee166e57d2a239"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "native:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "cd4f3e04d148f093d6c686e0aebd68ddb9b821138a8c0c82d867cca662701ee3",
+    "dataset_id": "f3a4d6678911bd2faf5fcc98630652f58f54d9a980958c9ed93dc35162c36a42"
+  },
+  "semantic_db_unchanged": true,
+  "semantic_current_not_required": true,
+  "states": {
+    "baseline": {
+      "v1": null,
+      "v2": null
+    },
+    "relations": {
+      "v1": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 2
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "active",
+        "baseline_citations": 10,
+        "matched_concepts": 1,
+        "applied_relations": 1,
+        "boosted_citations": 2
+      }
+    },
+    "missing": {
+      "v1": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "unavailable",
+        "reason": "store_or_dataset_missing",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    },
+    "stale": {
+      "v1": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      },
+      "v2": {
+        "mode": "relations",
+        "state": "stale",
+        "reason": "alignment_or_evidence_invalid",
+        "baseline_citations": 10,
+        "matched_concepts": 0,
+        "applied_relations": 0,
+        "boosted_citations": 0
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "git-init",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "init",
+        "-q"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-init.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-add",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "add",
+        "."
+      ],
+      "exit_code": 0,
+      "raw_output": "git-add.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-commit",
+      "command": [
+        "git",
+        "-C",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-qm",
+        "synthetic relations input"
+      ],
+      "exit_code": 0,
+      "raw_output": "git-commit.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "setup",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset",
+        "--project-id",
+        "ks-fixture",
+        "--source-mode",
+        "committed",
+        "--version",
+        "smoke",
+        "--embedder",
+        "ollama",
+        "--model-name",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434"
+      ],
+      "exit_code": 0,
+      "raw_output": "setup.txt",
+      "sha256": "26828faacd5f79dd53392f52d8fd56af93b6b4ce77536003fc26f703828b3a22"
+    },
+    {
+      "id": "semantic-extract",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--project-id",
+        "ks-fixture",
+        "--dataset-id",
+        "f3a4d6678911bd2faf5fcc98630652f58f54d9a980958c9ed93dc35162c36a42",
+        "--graph",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/projection.json",
+        "--docs",
+        "README.md",
+        "--ontology",
+        "ontology-reviewed.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-extract.txt",
+      "sha256": "cd445e546c614e39a90b18c79fc7a484d6ab9ffc176e8acae1c020b63c57688e"
+    },
+    {
+      "id": "semantic-promote",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/projection.json",
+        "--repo",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--graph",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke/graph",
+        "--vector",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke/vector",
+        "--version-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/semantic.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "semantic-promote.txt",
+      "sha256": "d4932740ddfbd6c053dd063dd383befdfb89a6d21b92aba02f5f4c51b7d7feb7"
+    },
+    {
+      "id": "config-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/baseline.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-baseline.txt",
+      "sha256": "c52cdb466dc5c5043ff313b9b528945380a630b273aa8d4948ca443f97f716c2"
+    },
+    {
+      "id": "capture-baseline",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/baseline.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/baseline.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-baseline.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/relations.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-relations.txt",
+      "sha256": "66841ad491487e323d198463461a3edfd12f8cc80bcb7defd3140468d6fb8630"
+    },
+    {
+      "id": "capture-relations",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/relations.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/relations.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-relations.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/missing.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/missing.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-missing.txt",
+      "sha256": "3c63f6d855a8fb54bfc4104bf23eaf303f5d35722c40d105ba6f73d0f8624dfd"
+    },
+    {
+      "id": "capture-missing",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/missing.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/missing.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-missing.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "config-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "mcp",
+        "gen-config",
+        "--dataset-dir",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/dataset/smoke",
+        "--source-root",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/src",
+        "--embed-model",
+        "bge-m3:latest",
+        "--ollama-url",
+        "http://127.0.0.1:11434",
+        "--semantic-store",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/stale-semantic.db",
+        "--out",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/stale.yaml"
+      ],
+      "exit_code": 0,
+      "raw_output": "config-stale.txt",
+      "sha256": "2d4ad56e40771059576cca7f2f822024938289326835387f85ab8e9c97ffa95c"
+    },
+    {
+      "id": "capture-stale",
+      "command": [
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+        "eval",
+        "capture",
+        "--requests",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/requests.json",
+        "--config",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/stale.yaml",
+        "--output",
+        "/private/tmp/ks-b1-relations-final2-real-20261003/stale.json",
+        "--warmup",
+        "0",
+        "--retrieval-runs",
+        "1",
+        "--warm-runs",
+        "0",
+        "--cold-runs",
+        "0"
+      ],
+      "exit_code": 0,
+      "raw_output": "capture-stale.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

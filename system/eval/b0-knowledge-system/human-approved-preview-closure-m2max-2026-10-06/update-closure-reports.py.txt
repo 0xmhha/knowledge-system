@@ -1,0 +1,102 @@
+from pathlib import Path
+import json,re,hashlib
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');docs=root/'docs/spec-driven';out=root/'system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06'
+approval=json.loads((out/'human-approval.json').read_text());stamp=approval['approval_recorded_at']
+link='../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-approval.json'
+gates={'B0':'pass','B1':'fail','C0':'pass','C1':'fail'}
+gate_record={'schema_version':1,'approval_recorded_at':stamp,'accepted_scope':'test_preview_only','task_completion_count':30,'remaining_accepted_scope_tasks':[],'gate_verdicts':gates,'gate_meanings':{'B0':'approved inputs and reproducible real-model baseline established; not retrieval quality acceptance','B1':'comparison and human assessment complete; latency threshold violations and small-group uncertainty preclude general quality acceptance','C0':'observed development defects reproduced, corrected, regressions passed and version frozen; baseline recall/latency limitations explicitly retained','C1':'frozen independent FINAL collected and judged; POLICY03 errors, strict no-citation failures and latency limits retain fail; operating release withheld'},'important_question_groups':'inconclusive; independent groups below ten','ontology_default':'disabled','operating_release':'withheld','human_approval_file':'human-approval.json','quality_pass':False,'operating_work':'excluded by explicit human scope choice; not completed or approved','evidence':['docs/spec-driven/B0-B1-APPROVED-DEVELOPMENT-REPORT.md','docs/spec-driven/C0-ONTOLOGY-HEADER-AND-ARCHIVE-BATCH.md','docs/spec-driven/C1-APPROVED-FINAL-REPORT.md','docs/spec-driven/B1-HUMAN-AND-PAIRED-CLOSURE.md','docs/spec-driven/C1-FINAL-DELIVERY-REVIEW.md']}
+(out/'gate-decisions.json').write_text(json.dumps(gate_record,ensure_ascii=False,indent=2)+'\n')
+(docs/'B1-HUMAN-AND-PAIRED-CLOSURE.md').write_text('''# 사람 판정과 paired 비교 종료
+
+2026-10-06 · B1-04/07/08 완료. 사용자가 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**라고 결정했다. [승인 원장](LINK)은 승인 전 표와 실제 DEV/FINAL 응답·measurement ID·원자료 SHA를 연결한다. 검토자 `chat-user`는 로컬 식별자다.
+
+## 사람 판정의 단위와 결과
+
+| 검토 범위 | 문항 | 실제 판정 |
+|---|---|---|
+| 개념 | HC-01 | proposed 다의어를 확정 의미로 승격하지 않는 해석 승인1/1 |
+| 정책·구현·수용 경계 | HC-02/03/04/05/06/10/11 | 프로젝트 정책 격리·집행/수용 미입증·키/오류 경계 해석 승인7/7 |
+| 이유·추적·답변 경계 | HC-04/06/07/08/11 | marker/산술 시험/순위/검색 miss/오류를 과잉 근거로 쓰지 않는 해석 승인5/5 |
+| 사람 답변 기권 | HC-09/10 | 운영 담당자·실제 키 소유자를 추정하지 않고 보류하는 판단 승인2/2 |
+
+범주는 중복된다. 총 검토 단위는 **해석 문장11개**, 승인11/11·승인된 해석 중 근거 범위 위반0/11이다. [집계](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/human-assessment.json)에 ID·분모를 기록했다. 제품은 생성 답변을 반환하지 않는다. 전체3,840/4,800 SDK 응답에 대한 생성 답변의 오개념·정책오용·근거 없는 이유 비율은 산출하지 않으며 `null`이다. 이 승인을 운영 정책 승인이나 자동 답변 기권 성공으로 해석하지 않는다. 검토 시간·금액은 `not_measured/null`이다.
+
+## 자동 품질·실패·비용과 결합
+
+[개발 보고](./B0-B1-APPROVED-DEVELOPMENT-REPORT.md)의 정적 양성4문항 Recall0.25/MRR0.125, [독립 FINAL 보고](./C1-APPROVED-FINAL-REPORT.md)의 양성6문항 Recall1/6/MRR0.5/6은 그대로다. FINAL 전체4,800행 중 정상팩4,560·POLICY-03 오류240을 모두 분모에 유지했다. 정상팩 source/public Go 감사와 오류를 구분한다. ABS-01/02의 v1/v2 strict no-citation은 실패이며 사람 보류2/2와 별도다. F-05/06 MRR0.75·F-02 동점 차이·F-03 비승격·F-04 상태격리를 각 보고에 보존했다.
+
+DEV 독립 양성 unit8, FINAL 양성 unit10(정적6+동적4가족), 기권2는 별도다. 중요 질문군별 독립 수는10 미만이며 **inconclusive**다. 반복·언어·상태·11개 해석으로 독립 수를 늘리지 않는다. 기존 paired/불확실 구간과 같은 축 비교는 원자료 보고에 보존했다. 작은 표본의 개선 이점이나 통계적 품질 합격을 주장하지 않는다.
+
+[비용 보고](./B1-COST-REPORT.md)의 warm/cold·backend·크기·공유 환경·build/query 분리를 유지했다. DEV combined_on static/dynamic p95비1.292/1.614, FINAL dynamic concept_text_on/relations_on/combined_on의 baseline_off 대비1.533/1.311/1.511은1.25를 넘는다. 같은 팩 축·같은 ontology 축·pooled 모집단도 함께 보존하며 유리한 축을 사후 선택하지 않는다. FINAL 오류의 빠른 거부 시간은 성공 조건부 지연에 포함하지 않는다.
+
+입력5개·제품 소스1,096개·동결 실행 버전·K·gold·임계치를 바꾸거나 FINAL 결과로 튜닝하지 않았다. HC 승인으로 기존 품질 fail·중요 그룹 inconclusive·ontology disabled·출시 보류를 바꾸지 않았다.
+
+## 종료 판정
+
+B1-04의 질문군 자동 지표와 사람 해석/기권을 위 분모로 결합했고, B1-07 실제 사람 판정을 기록했으며, B1-08 paired 실패·불확실·비용 보고를 종료했다. B1 공식 판정은 **fail**(비용 회귀와 품질 제한 유지), 중요 그룹은 inconclusive다. 작업 종료는 실패를 숨기거나 품질을 승인하는 결정이 아니다. 다음은 [최종 preview 종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)의 전체 완료 재검증이다.
+'''.replace('LINK',link))
+wl=docs/'EXECUTION-WORKLIST.md';raw=wl.read_text()
+old=re.search(r'<!-- official-gates: (.*?) -->',raw).group(0)
+raw=raw.replace(old,'<!-- official-gates: '+json.dumps(gates,separators=(',',':'))+' -->')
+raw=raw.replace('공식 게이트 판정은 위 원장과 실제 보고서 증거로 갱신한다. pending을 도구 준비만으로 pass/fail/inconclusive로 변경하지 않는다.','공식 게이트 판정은 실제 실행·회귀·사람 판정과 [종료 원장](../../system/eval/b0-knowledge-system/human-approved-preview-closure-m2max-2026-10-06/gate-decisions.json)에 연결한다. B0 pass는 재현 가능한 기준선 성립, C0 pass는 수정/회귀/동결 범위다. B1/C1은 품질 fail이며 중요 그룹 inconclusive·disabled·운영 출시보류를 유지한다. 게이트 판정 완료가 제품 품질 합격을 뜻하지 않는다.')
+raw=raw.replace('실패 결과를 기록하거나 도구만 구현한 것으로 해당 품질 게이트를 완료하지 않는다.','도구만 구현한 것으로 품질 게이트를 판정하지 않는다. 승인 범위의 실측·회귀·사람 검토까지 마쳤으면 pass/fail/inconclusive로 판정을 종료할 수 있으며 작업 완료와 품질 합격을 구분한다.')
+raw=raw.replace('| R-15 | B0/B1/C0/C1 완료 여부 | 미완료 확인 | 승인 입력·DEV/FINAL 실측·최신package/복구 완료, 품질fail/disabled·stage0/4, 전체26/30 완료 | 사람HC·운영scope/OP 종료4항목; 현황판/45절 |','| R-15 | B0/B1/C0/C1 완료 여부 | 승인 scope 검증 완료 | 승인 입력·DEV/FINAL·최신 package/복구·HC01–11 사람 판정·시험 preview 종료 결정, 전체30/30·stage4/4 판정 | 품질fail/소그룹inconclusive·disabled·운영출시보류; 운영 제외 범위는46절 |')
+raw=raw.replace('DEV/FINAL paired 및 기계 검사 완료; 사람 HC/검토 비용 대기','DEV/FINAL paired·기계 검사·HC01–11 사람 해석/기권 완료; 사람 비용 미측정 보고 완료')
+raw=raw.replace('FINAL/최신 package·복구 완료; 품질fail/disabled·사람/운영 종료 대기','FINAL/최신 package·복구·사람 결정 완료; 시험 preview로 종료·품질fail/disabled·운영 출시보류')
+raw=raw.replace('운영 사실/공식 판정 대기','시험 사실/비교 판정 완료; 운영 사실은 승인 preview 범위 밖')
+statuses={
+'B1-04':'검증 완료: DEV3840/FINAL4800 질문군·실패240·source/public Go·strict 인용 guard 및 [사람 해석 집계](./B1-HUMAN-AND-PAIRED-CLOSURE.md)를 결합. HC11/11 해석 승인·사람 기권2/2, 전체 모델 생성 답변 오류율은 산출 불가/null. FINAL 양성 Recall1/6/MRR0.5/6·두 no-citation fail·소그룹inconclusive 유지',
+'B1-07':'검증 완료: [HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 실제 사용자 승인 원문·chat-user·기록 시각·승인 전 표 SHA·DEV/FINAL 실제응답/measurement ID를 별도 원장에 결합. 사람 비용 not_measured/null·기계/사람 판정 분리',
+'B1-08':'검증 완료: [paired/사람 판정 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 DEV/FINAL·기존 회귀 조건·실패/소표본/불확실·같은 축 비용·실제HC 승인 연결. FINAL 튜닝 없음, B1 fail·그룹inconclusive·disabled·출시보류 유지',
+'C1-05':'검증 완료(사용자 승인 시험 preview scope): [실제 승인](./C1-FINAL-DELIVERY-REVIEW.md)의 “시험 preview 범위로 종료” 결정으로 검토 자료·시험 서명/신뢰 검증·고지 출처와 운영 제외 범위를 확정. 원래 운영 키/정책 조건 충족을 주장하지 않으며 OP01–08 운영 사실·키/법적 적합성/native 운영환경은 범위 밖·미승인. 시험 키 승격 없음',
+'C1-07':'검증 완료: [최종 지원·제한·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 실제HC 승인·시험 preview scope·전체30/30 완료·4stage 판정·지원 매트릭스/known limits/운영 제외를 연결. 품질fail·소그룹inconclusive·disabled·운영출시보류 유지; 운영 권한/배포/새push 승인 아님'
+}
+lines=[]
+for line in raw.splitlines():
+ if re.match(r'^\| [BC][01]-\d\d \|',line):
+  f=[s.strip()for s in line.strip('|').split('|')]
+  if f[0]in statuses:f[4]=statuses[f[0]];line='| '+' | '.join(f)+' |'
+ lines.append(line)
+raw='\n'.join(lines)+'\n'
+raw+='''
+## 46. 실제 사람 승인·시험 preview 전체 종료
+
+2026-10-06 사용자 원문: **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**. [승인 기록](LINK)에 로컬 검토자 `chat-user`·기록 UTC시각·승인 전 표 SHA·11개 해석·실제 응답/measurement ID·DEV/FINAL 원자료 manifest SHA를 결합했다. 이전 pending 원장은 당시 사실로 보존하고 승인 입력5개는 수정하지 않았다. HC 해석11/11와 사람 답변 보류2/2를 [비교 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 반영해 B1-04/07/08을 완료했다. 전체 SDK 응답의 생성 답변 오류율을0으로 만들지 않았으며 비용은 미측정이다.
+
+C1-05의 원래 운영 완료조건은 이력/행에 보존했다. 운영 조건을 충족했다고 기록하는 대신 사용자가 명시적으로 선택한 시험 preview 종료 범위를 적용했다. 운영 OP01–08의 역할/키/독립 신뢰·관리/폐기·법적 적합성·실운영 지원/백업·실패전환, native AMD64 실제 모델·Darwin SDK/전체 생성기/전이 적합성은 **승인 범위 밖·미확인·미승인**이다. 시험 키를 운영 키로 승격하지 않았고 remote deployment/new push도 실행하지 않았다.
+
+현재 **30/30 작업 완료·승인 범위 미완료0·4/4 stage 판정 완료**다. B0 pass=승인 입력의 재현 가능한 기준선, C0 pass=관측 개발 결함의 수정/회귀/동결, B1/C1 fail=품질·비용 제한과 최종 실패 보존. 중요 질문군은 inconclusive, ontology disabled·운영 출시보류다. 원래 임계치/질문/gold/K/제품 소스/FINAL 원자료를 바꾸지 않았다. 최종 감사 원장과 [현황판](./EXECUTION-STATUS.md), [지원·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)가 현재 기준이다. 앞선26/30 등의 절은 당시 진행 이력이다.
+
+다음 작업은 승인된 preview 범위 안에서는 없다. 운영 출시 또는 품질 개선은 제외된 항목/새 DEV·사전 검토한 독립 FINAL이 필요한 별도 후속 범위이며 이번 목표의 미완료 항목으로 합산하지 않는다.
+'''.replace('LINK',link)
+raw=raw.replace('현재 사람 결정(2026-10-06):','현재 사람 결정(2026-10-06): **HC-01–11 해석 승인·시험 preview 범위 종료**([최종 승인](./B1-HUMAN-AND-PAIRED-CLOSURE.md)). 정적/동적 입력에 대한 이전 승인도 유효하다. 이전 입력 결정:')
+wl.write_text(raw)
+p=docs/'B0-B1-APPROVED-DEVELOPMENT-REPORT.md';s=p.read_text().replace('사람 주장·운영 판정 대기','HC 해석 승인·시험 preview 종료 결정 완료')
+s=s[:s.index('## 남은 판정')]+'''## 사람 판정과 종료 범위
+
+[HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md)의 실제 해석/사람 기권을 사용자가 승인했다. [paired 비교 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 B1-04/07/08의 분모·실패·불확실·비용과 연결했다. 사람 비용은 미측정/null이며 생성 답변 오류율을 전체 응답0으로 만들지 않았다.
+
+사용자가 시험 preview로 종료를 선택했고 전체30/30·승인 범위 잔여0이다. [최종 지원·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 운영 제외/미승인 항목을 기록했다. B0 기준선과 C0 수정/회귀/동결은 pass 범위, B1/C1 품질 fail·중요 그룹 inconclusive·disabled·운영 출시보류는 그대로다.
+''';p.write_text(s)
+p=docs/'C1-APPROVED-FINAL-REPORT.md';s=p.read_text().replace('## 최종 결정과 미완료 범위','## 최종 결정과 승인된 종료 범위')
+s=re.sub(r'- B1-04/07/08:.*\n','- B1-04/07/08: [HC01–11](./B1-APPROVED-OUTPUT-CLAIM-REVIEW.md) 실제 사용자 해석/기권 승인과 [paired 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)를 결합해 완료. 비용은 미측정/null이며 실제 운영 담당자/키 소유자를 지정한 승인이 아니다.\n',s)
+s=re.sub(r'- C1-04/06:.*\n','- C1-04/06: [최신 패키지](./C1-FINAL-PACKAGE-VALIDATION.md)의3대상 preview·가용 실모델·strict 비용·복구 검증 완료. C1-05는 사용자가 시험 preview 종료를 명시적으로 선택하여 범위별 완료. C1-07 [지원/제한·종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)와 전체30/30 종료, 운영 사실/적합성은 범위 밖·미승인.\n',s)
+p.write_text(s)
+p=docs/'C1-OPERATIONS-REVIEW.md';s=p.read_text().replace('2026-10-04 · **검토 대기**.','2026-10-04 작성 / 2026-10-06 scope 결정 · **시험 preview 종료 승인, 실제 운영 항목은 범위 밖·미승인**.')
+s=s.replace('## 사람이 결정할 항목','## 운영 출시를 별도로 요구할 때 결정할 항목')
+s+='\n## 이번 목표의 실제 종료 결정\n\n사용자 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**를 [승인 원장]('+link+')에 기록했다. OP-02의 현재 deliverable은 test-signed-preview로 한정하며 OP01–08의 실제 운영 역할/키/관리/법무/지원/복구는 이번 승인 범위 밖이다. 위 표의 미지정/pending은 운영 출시를 요청할 때 필요한 사실이며 이번30항목 목표의 미완료로 세지 않는다. C1-05를 scope 결정/시험 자료 확인 범위로 완료하고 운영 키 조건을 충족했다는 표시는 하지 않았다. 품질fail·inconclusive·disabled·출시보류 유지, 운영 키/배포/new push 승인 없음.\n';p.write_text(s)
+p=docs/'C1-FINAL-PACKAGE-VALIDATION.md';s=p.read_text();start=s.index('C1-04는 최신 세 대상 preview')
+s=s[:start]+'''C1-04는 최신 세 대상 preview·가용한 두 플랫폼 실제 모델·전체 strict 입력 비용·환경 없는 AMD64의 preview 표시 조건에서 검증 완료다. C1-06은 구 데이터 보존/실패·재색인/이전 current 복구 조건에서 검증 완료다. 사용자의 [HC 승인·시험 preview 종료 결정](./B1-HUMAN-AND-PAIRED-CLOSURE.md)에 따라 전체30/30 작업을 종료했다. 실제 운영 OP01–08은 승인 범위 밖·미확인·미승인이다. [FINAL 품질](./C1-APPROVED-FINAL-REPORT.md)은 fail·중요 그룹 inconclusive, ontology disabled·운영 출시보류를 유지한다. 최종 지원/제한은 [종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)에 있다.
+''';p.write_text(s)
+p=docs/'REMOTE-SESSION-HANDOFF.md';s=p.read_text().replace('## 최신 재개 지점: 2026-10-06 보고 완료조건 재검토·26/30 완료','## 이전 재개 지점: 2026-10-06 보고 완료조건 재검토·26/30 완료')
+new='''## 최신 상태: 2026-10-06 실제 사람 승인·시험 preview 목표 종료
+
+사용자 **“HC-01–11 해석 승인. 시험 preview 범위로 종료.”**. [실제 승인 원장](LINK)·[사람/paired 종료](./B1-HUMAN-AND-PAIRED-CLOSURE.md)·[최종 종료 보고](./C1-FINAL-DELIVERY-REVIEW.md)·[작업리스트46절](./EXECUTION-WORKLIST.md)·[현황판](./EXECUTION-STATUS.md)을 현재 기준으로 읽는다. **30/30 완료·승인 범위 잔여0·4/4 stage 판정 완료**. B0 baseline pass/C0 수정·회귀 pass, B1/C1 품질fail·소그룹inconclusive·ontology disabled·운영출시보류다. 작업 종료를 품질 합격/운영 출시로 확장하지 않는다.
+
+HC 해석11/11와 사람 기권2/2를 기록했고 생성 답변 전체3840/4800 오류율을0으로 만들지 않았다. 검토 비용not_measured/null·기록 시각과 메시지 수신 시각 구분. 기존 pending 증거와 승인 전 표는 역사적 snapshot으로 보존하며 frozen5입력/제품1096파일/FINAL/패키지 원자료는 그대로다. OP01–08 실제 운영 역할/키/신뢰/관리/폐기·법무·실운영 환경/백업/실패전환·native AMD64/전체 native 적합성은 사용자 선택 scope 밖·미확인·미승인이다. 시험 키는 운영 키가 아니다.
+
+승인 범위의 다음 작업 없음, 남은 전체0. 별도 품질 개선은 새 DEV와 사전 검토한 독립 FINAL이 필요하며 기존 관측 FINAL을 독립 holdout으로 재사용하지 않는다. 사용자 `.claude/`, `logs/`는 보존·커밋 제외. 새 push/배포 승인 없음. 아래26/30·24/30·pending 기록은 당시 이력이다. 최종 감사/로컬 커밋 후 app goal을 complete로 반영한다.
+
+'''.replace('LINK',link)
+s=s.replace('# 다른 머신의 B/C 단계 작업 인계\n\n','# 다른 머신의 B/C 단계 작업 인계\n\n'+new,1);p.write_text(s)
+print('B1-04/07/08 and C1-05 closed within explicit human-approved preview scope; stage verdicts bound, no quality promotion')

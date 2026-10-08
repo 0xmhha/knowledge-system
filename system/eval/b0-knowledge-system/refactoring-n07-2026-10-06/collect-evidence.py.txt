@@ -1,0 +1,36 @@
+import hashlib,json,pathlib,platform,shutil,subprocess
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n07-2026-10-06'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((root/'system/eval/b0-knowledge-system/refactoring-n06-2026-10-06/manifest.json').read_text());assert all(sha(root/p)==s for p,s in base['approved_input_sha256'].items())
+red=(e/'red-budget.log').read_text();assert 'fitting retained evidence lost: budget_exceeded' in red and 'at most 12 citations' in red and 'FAIL' in red
+for name in ['green-budget.log','green-mcp-overlays.log','final-budget-boundaries.log']:
+ s=(e/name).read_text();assert 'PASS' in s and 'FAIL' not in s
+public=(e/'final-budget-boundaries.log').read_text();assert 'registered public response fitting=false:' in public and '"code":"budget_exceeded"' in public and '"evidence_state":"partial"' in public
+native=json.loads((e/'mcp-results.json').read_text());assert native['success'] and len(native['cases'])==3 and all(x['body_bytes']<=32000 and x['citation_count']<=12 for x in native['cases'])
+responses=json.loads((e/'mcp-responses.json').read_text());assert len(responses)==4
+for row in responses[1:]:
+ pack=row['result']['structuredContent']
+ if row['result'].get('isError'):assert pack['code']=='budget_exceeded'
+ else:
+  expected=pack['metadata'].pop('integrity_hash');assert hashlib.sha256(json.dumps(pack,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()==expected
+packages=['internal/system/evidencev2','internal/system/mcp','internal/setup','pkg/system/contract','internal/system/composer','internal/system/composer/budget','internal/system/composer/intent','internal/system/composer/sanitize','internal/system/composer/stage1','internal/system/composer/stage2','internal/system/composer/stage3','cmd/cks/mcpcli','internal/system/patch']
+race=(e/'race-regression.log').read_text();assert all('knowledge-system/'+p+'\t' in race for p in packages) and 'FAIL' not in race
+assert not (e/'vet.log').read_text().strip();assert 'engine boundaries: OK' in (e/'boundaries.log').read_text() and 'documentation: OK' in (e/'docs.log').read_text()
+changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines();assert not any(x.startswith('system/eval/') and not x.startswith(str(e.relative_to(root))+'/') for x in changed),'historical evidence changed'
+paths=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines();paths=sorted(set(base['source_sha256'])|{p for p in paths if p.startswith(('cmd/','internal/','pkg/'))});source={p:sha(root/p) for p in paths};delta={p:s for p,s in source.items() if base['source_sha256'].get(p)!=s}
+for rel in delta:
+ out=e/'source-snapshot'/(rel+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,out)
+commands={
+ 'red-budget.log':{'exit_code':1,'argv':['go','test','./internal/system/evidencev2','-run','^TestBudget','-v','-count=1'],'phase':'before retained budget selection implementation'},
+ 'green-budget.log':{'exit_code':0,'argv':['go','test','./internal/system/evidencev2','./internal/system/mcp','-run','^TestBudget|^TestV2ToolError|^TestBuild|^TestV2Integrity','-v','-count=1']},
+ 'green-mcp-overlays.log':{'exit_code':0,'argv':['go','test','./internal/system/mcp','./internal/system/evidencev2','-run','^TestV2ToolBudget|^TestAttach','-v','-count=1']},
+ 'final-budget-boundaries.log':{'exit_code':0,'argv':['go','test','-race','./internal/system/evidencev2','./internal/system/mcp','-run','^TestBudget|^TestV2.*Budget|^TestAttachKnowledge','-v','-count=1']},
+ 'race-regression.log':{'exit_code':0,'argv':['go','test','-race','./internal/system/evidencev2','./internal/system/mcp','./internal/setup','./pkg/system/contract','./internal/system/composer/...','./cmd/cks/mcpcli','./internal/system/patch','-count=1']},
+ 'mcp-run.log':{'exit_code':0,'argv':['python3',str((e/'verify-budget-mcp.py.txt').relative_to(root))]},
+ 'vet.log':{'exit_code':0,'argv':['go','vet','./internal/system/evidencev2','./internal/system/mcp','./internal/setup','./pkg/system/contract','./internal/system/composer/...','./cmd/cks/mcpcli','./internal/system/patch']},
+ 'boundaries.log':{'exit_code':0,'argv':['./scripts/check-boundaries.sh']},'docs.log':{'exit_code':0,'argv':['make','docs-check']}}
+for value in commands.values():value['env']={'GOCACHE':'/private/tmp/ks-wbs-go-cache'} if value['argv'][0] in ['go','make'] else {}
+commands['race-regression.log']['env'].update({'GIT_CONFIG_COUNT':'1','GIT_CONFIG_KEY_0':'commit.gpgsign','GIT_CONFIG_VALUE_0':'false'})
+(e/'verification-commands.json').write_text(json.dumps(commands,indent=2)+'\n');(e/'environment.json').write_text(json.dumps({'system':platform.system(),'machine':platform.machine(),'go':subprocess.check_output(['go','version'],text=True).strip(),'base_commit':'0e68cb38','scope':'new structural DEV; real retained archive/public registered JSON-RPC with controlled backend excerpts; native real engine/mock stdio compatibility; no quality/abstention/default-on/native Linux verdict'},indent=2)+'\n')
+reports=['REFACTORING-EXECUTION-SPEC.md','REFACTORING-REMAINING-WORKLIST.md','PUBLIC-CONTRACT-V2.md','REMOTE-SESSION-HANDOFF.md'];m={'schema_version':1,'status':'N07_acceptance_verified','base_commit':'0e68cb38','scope':'new structural DEV whole-span byte/citation budgets, partial/typed errors and public RPC/source identity safety; native engine compatibility separately; no new FINAL quality claim','source_sha256':source,'changed_source_sha256':delta,'approved_input_sha256':base['approved_input_sha256'],'reports_sha256':{str(pathlib.Path('docs/spec-driven')/p):sha(root/'docs/spec-driven'/p) for p in reports},'evidence_sha256':{str(p.relative_to(e)):sha(p) for p in sorted(e.rglob('*')) if p.is_file() and p.name!='manifest.json'}}
+(e/'manifest.json').write_text(json.dumps(m,indent=2)+'\n');print('N07 acceptance binding PASS:',len(source),'source/dependency files;',len(delta),'changed/new;',len(m['evidence_sha256']),'evidence files; approved inputs 5 unchanged')

@@ -44,6 +44,7 @@ import (
 // against the fused MCP server and emit a JSON metric report.
 func NewCmd() *cobra.Command {
 	var scenarios, mcpBinary, mcpConfig, output, verifyAnchors string
+	var recordResponses bool
 	cmd := &cobra.Command{
 		Use:   "eval",
 		Short: "Run retrieval-quality scenarios and emit a JSON metric report",
@@ -54,7 +55,7 @@ func NewCmd() *cobra.Command {
 			}
 			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
-			return run(ctx, scenarios, mcpBinary, mcpConfig, output, verifyAnchors)
+			return run(ctx, scenarios, mcpBinary, mcpConfig, output, verifyAnchors, recordResponses)
 		},
 	}
 	cmd.Flags().StringVar(&scenarios, "scenarios", "", "scenario YAML file or directory (required)")
@@ -62,10 +63,12 @@ func NewCmd() *cobra.Command {
 	cmd.Flags().StringVar(&mcpConfig, "config", "", "path to cks.yaml forwarded to the server")
 	cmd.Flags().StringVar(&output, "output", "", "write report to this file (empty = stdout)")
 	cmd.Flags().StringVar(&verifyAnchors, "verify-anchors", "", "source root for anchor verification: fail before running when any scenario's expected span no longer contains its declared anchor (guards against line drift)")
+	cmd.Flags().BoolVar(&recordResponses, "record-responses", false, "retain every MCP tool response and per-call timing in the report")
+	cmd.AddCommand(newCaptureCmd(), newMatrixCmd())
 	return cmd
 }
 
-func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, anchorRoot string) error {
+func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, anchorRoot string, recordResponses bool) error {
 	paths, err := collectScenarioPaths(scenariosPath)
 	if err != nil {
 		return fmt.Errorf("collect scenarios: %w", err)
@@ -95,8 +98,9 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 	}
 
 	runner, err := eval.NewRunner(ctx, eval.RunnerOpts{
-		CKSMCPBinary: mcpBinary,
-		CKSMCPConfig: mcpConfig,
+		CKSMCPBinary:    mcpBinary,
+		CKSMCPConfig:    mcpConfig,
+		RecordResponses: recordResponses,
 	})
 	if err != nil {
 		return fmt.Errorf("start runner: %w", err)
@@ -163,6 +167,26 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 	}
 	if missing > 0 {
 		return fmt.Errorf("%d expected knowledge scope(s) not delivered", missing)
+	}
+	failedAbstentions := 0
+	for _, r := range report.Results {
+		if r.CitationAbstentionPassed != nil && !*r.CitationAbstentionPassed {
+			log.Printf("cks-eval: citation abstention failed: %s returned %d citations", r.Name, r.Metrics.CitationCount)
+			failedAbstentions++
+		}
+	}
+	if failedAbstentions > 0 {
+		return fmt.Errorf("%d citation abstention scenario(s) failed", failedAbstentions)
+	}
+	badSnapshots := 0
+	for _, r := range report.Results {
+		if r.SnapshotState == "conflict" || r.SnapshotState == "unverified" {
+			log.Printf("cks-eval: snapshot %s: %s: %s", r.SnapshotState, r.Name, r.SnapshotReason)
+			badSnapshots++
+		}
+	}
+	if badSnapshots > 0 {
+		return fmt.Errorf("%d scenario snapshot(s) conflicted or could not be verified", badSnapshots)
 	}
 	return nil
 }

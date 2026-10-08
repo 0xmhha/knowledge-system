@@ -30,6 +30,11 @@ type RealOpts struct {
 	// DataPath is the ckv-data directory (vector.db + manifest.json)
 	// produced by `ckv build`. Passed to ckv.Open.
 	DataPath string
+	// SourceRoot overrides the manifest's logical path only for citation
+	// enforcement. A mounted retained tree keeps queries independent of the
+	// mutable checkout; empty preserves the legacy manifest-root behavior.
+	SourceRoot     string
+	RetainedSource bool
 
 	// Embedder must match the embedder the index was built with (same
 	// name + dimension) or ckv.Open returns ErrIndexUnavailable. The
@@ -46,9 +51,11 @@ type RealOpts struct {
 // the ckv binary and proxied every query over stdio, which hung 2/9 dogfood
 // runs. ckv.Engine is concurrent-safe for reads, so Real needs no locking.
 type Real struct {
-	eng    *ckv.Engine
-	emb    ckvtypes.Embedder
-	closed bool
+	eng            *ckv.Engine
+	emb            ckvtypes.Embedder
+	sourceRoot     string
+	retainedSource bool
+	closed         bool
 
 	// modelDown is tripped when a real SemanticSearch fails (the engine's
 	// embed call could not reach the model) and cleared on success, so the
@@ -84,7 +91,8 @@ func NewReal(ctx context.Context, opts RealOpts) (*Real, error) {
 	}
 	// The caller (cmd/cks-mcp) only constructs Real after buildEmbedder
 	// probed the model successfully, so the model starts known-up.
-	return &Real{eng: eng, emb: opts.Embedder, lastProbeOK: true}, nil
+	return &Real{eng: eng, emb: opts.Embedder, sourceRoot: opts.SourceRoot,
+		retainedSource: opts.RetainedSource, lastProbeOK: true}, nil
 }
 
 // SemanticSearch runs an in-process vector query and translates each
@@ -114,7 +122,8 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 	for _, ck := range opts.Filter.ChunkKinds {
 		filter.ChunkKinds = append(filter.ChunkKinds, ckvtypes.ChunkKind(ck))
 	}
-	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter, EnableBM25Rerank: opts.BM25Rerank})
+	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter,
+		SrcRoot: r.sourceRoot, RetainedSource: r.retainedSource, EnableBM25Rerank: opts.BM25Rerank})
 	if err != nil {
 		// A query failure means the engine could not embed the query —
 		// almost always the model endpoint is unreachable. Trip the flag so
@@ -128,6 +137,10 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 	}
 	out := make([]contract.Hit, 0, len(resp.Hits))
 	for i, h := range resp.Hits {
+		var parent *contract.Citation
+		if h.ParentCitation != nil {
+			parent = &contract.Citation{File: h.ParentCitation.File, StartLine: h.ParentCitation.StartLine, EndLine: h.ParentCitation.EndLine, CommitHash: h.ParentCitation.CommitHash}
+		}
 		// Symbol / CanonicalID are the composer's bridge to ckg: Stage 1
 		// extracts hit.Symbol as a candidate keyword (instead of the file
 		// basename — the basename fallback survives in extractKeywords for
@@ -137,7 +150,9 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 		// fine (omitempty on the wire); they only mean the ckv chunk lacked
 		// the metadata (e.g. doc/header chunks).
 		out = append(out, contract.Hit{
-			Text: h.Snippet,
+			Text:           h.Snippet,
+			ParentCitation: parent,
+			HeadingPath:    h.HeadingPath,
 			Citation: contract.Citation{
 				File:       h.Citation.File,
 				StartLine:  h.Citation.StartLine,

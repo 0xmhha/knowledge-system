@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T14:32:29.377018Z",
+  "finished_at": "2026-10-03T14:32:29.519803Z",
+  "request_sha256": "7733e5364704335a810c17391e6fc20686ddebf6b91e224125f30a76862e48fb",
+  "config_sha256": "3407598274d75dbfaec67e7a8e1b219cab26c6d72d8faf7a97b9e6451129dfde",
+  "binary_sha256": "90cbc4f1d8544319be0e9805f2ea83d0e400600ee117a52196fe73b9bb1e3ef6",
+  "config_sha256_after": "3407598274d75dbfaec67e7a8e1b219cab26c6d72d8faf7a97b9e6451129dfde",
+  "binary_sha256_after": "90cbc4f1d8544319be0e9805f2ea83d0e400600ee117a52196fe73b9bb1e3ef6",
+  "quality_metrics": null,
+  "state": "partial",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "q0",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "project"
+        },
+        "elapsed_ns": 29185458,
+        "completed_at": "2026-10-03T23:32:29.444176+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=knowledge_context_failed: The knowledge context could not be verified."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "knowledge_context_failed",
+            "message": "The knowledge context could not be verified."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "q1",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "프로젝트"
+        },
+        "elapsed_ns": 28132167,
+        "completed_at": "2026-10-03T23:32:29.472332+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=knowledge_context_failed: The knowledge context could not be verified."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "knowledge_context_failed",
+            "message": "The knowledge context could not be verified."
+          }
+        }
+      }
+    },
+    {
+      "request_id": "q2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "xyzzy dev unseen wording"
+        },
+        "elapsed_ns": 30408916,
+        "completed_at": "2026-10-03T23:32:29.502768+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=knowledge_context_failed: The knowledge context could not be verified."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "knowledge_context_failed",
+            "message": "The knowledge context could not be verified."
+          }
+        }
+      }
+    }
+  ],
+  "errors": [
+    "q0: tool returned IsError",
+    "q1: tool returned IsError",
+    "q2: tool returned IsError"
+  ]
+}

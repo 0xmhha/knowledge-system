@@ -248,6 +248,13 @@ func TestReindex_ReconcilesChunkCount(t *testing.T) {
 		t.Fatalf("manifest ChunkCount=%d != store COUNT(*)=%d — reconciliation missing (P2b-2)",
 			man.ChunkCount, stats.ChunkCount)
 	}
+	val, err := st.Validate(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if man.SymbolCount != val.SymbolChunks || man.CanonicalCount != val.CanonicalChunks {
+		t.Fatalf("reindex manifest coverage (%d/%d) != stored coverage (%d/%d)", man.CanonicalCount, man.SymbolCount, val.CanonicalChunks, val.SymbolChunks)
+	}
 }
 
 // TestReindex_ValidationReport checks the P2b-2 integrity report: reindex

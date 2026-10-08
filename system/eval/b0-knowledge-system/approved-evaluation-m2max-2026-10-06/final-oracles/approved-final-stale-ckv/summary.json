@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scope": "approved F04 direct CKV old immutable index against new approved source; not a latency or quality inference",
+  "status": "pass",
+  "fixture_sha256": "bd679747916cfa446f30a71f69df1404e6285b9b8c52cbc1fb2750ee248d2463",
+  "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "binary_sha256": "cf0be4780a331447e5319e5c66894ac47409aac5de7c4cf77ff5df9432e74cbe",
+  "dataset_sha256_before": {
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-old/dataset/approved/vector/vector.db": "8f4bc79be388b4f670800f02e5cfff5cb69ecadf2ab944333e5c2573f0a5c616",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-old/dataset/approved/vector/manifest.json": "be8117715be4acf9b74719dcba0bc322e0f311dbff169d17e62c194d1c5a5c68",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-old/dataset/approved/dataset-identity.json": "afdd5f2bf353214347dad16be6c38b9a10745eef9bda7b9dbcc5ea9fd71d71db",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-old/dataset/approved/sources/manifest.json": "bdb2ad9189fa55b4e4cff3d548c488af8dcdb76a8d097ca1590f00ab4c854338",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-new/dataset/approved/vector/vector.db": "79ed06dc860f0e0ddcf2e83062441563360dcbf9e998e3c285a6073edae78b57",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-new/dataset/approved/vector/manifest.json": "fcbc9f1ab2c8e793783aef78d988402c6ec6ecba2799cc0c3d6c05f2a6528c30",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-new/dataset/approved/dataset-identity.json": "6fa7cd169149a06f89f7f9d8ea80d86998299f39e1f2a70857c7e1077c31e647",
+    "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-new/dataset/approved/sources/manifest.json": "a2a3acffa3be309cabf387f1847b53ea5392f2075218c1c5d00f8f88560b3d51"
+  },
+  "datasets_unchanged": true,
+  "records": [
+    {
+      "id": "F-04-FINAL-direct-old-vs-new-1",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/ckv",
+        "--embedder",
+        "ollama",
+        "--model-name",
+        "bge-m3:latest",
+        "--query-prefix-policy",
+        "registry",
+        "query",
+        "What value does Alpha return?",
+        "--out",
+        "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-old/dataset/approved/vector",
+        "--src",
+        "/private/tmp/ks-approved-final-dynamic-20261006/F-04-FINAL-new/source",
+        "--top",
+        "10",
+        "--threshold",
+        "-1",
+        "--json"
+      ],
+      "raw_sha256": "a040c48759c115527a59d314acc60dc57d4ebb381564a183ca51e0b0f1afc1f3",
+      "metadata": {
+        "tokens_used": 37,
+        "indexed_head_ckv": "e342c80a7d27dae17cd03b6c9eb5702611aacf36",
+        "fresh": false,
+        "trace_id": "30b67ed50408"
+      },
+      "hits": 3,
+      "all_old_citations_marked_stale": true
+    }
+  ],
+  "finished_at": "2026-10-05T23:08:55.666718+00:00"
+}

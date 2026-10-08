@@ -1,0 +1,375 @@
+[
+  {
+    "id": "git-init",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 79657791
+  },
+  {
+    "id": "git-add",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 29903375
+  },
+  {
+    "id": "git-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "recovery baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 52901542
+  },
+  {
+    "id": "init",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "init",
+      "--src",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "--dataset",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/dataset",
+      "--config-out",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 52274167
+  },
+  {
+    "id": "baseline",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "setup",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml",
+      "--version",
+      "baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 2054760875
+  },
+  {
+    "id": "runtime-config",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/dataset/current",
+      "--source-root",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "--sanitize-rules",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/policies/sanitization_rules.yaml",
+      "--out",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/runtime.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 24870292
+  },
+  {
+    "id": "baseline-capture",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/baseline-requests.json",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/runtime.yaml",
+      "--output",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/baseline-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 160852500
+  },
+  {
+    "id": "second-add",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "add",
+      "README.md"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 24903583
+  },
+  {
+    "id": "second-commit",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "recovery update"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 67741417
+  },
+  {
+    "id": "test-gate-failure",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "setup",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml",
+      "--version",
+      "failed-test",
+      "--gate-test-bin",
+      "/bin/false"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 1840106208
+  },
+  {
+    "id": "vector-build-failure",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "setup",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml",
+      "--version",
+      "failed-vector",
+      "--vector-bin",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/fail-vector.py"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 1616499667
+  },
+  {
+    "id": "corrupt-target-rollback",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "rollback",
+      "corrupt-target",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 22028750
+  },
+  {
+    "id": "updated-build",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "setup",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml",
+      "--version",
+      "updated"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 2012626458
+  },
+  {
+    "id": "updated-capture",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/updated-requests.json",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/runtime.yaml",
+      "--output",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/updated-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 155146667
+  },
+  {
+    "id": "normal-rollback",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "rollback",
+      "baseline",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 57156666
+  },
+  {
+    "id": "normal-rollback-capture",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/normal-rollback-requests.json",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/runtime.yaml",
+      "--output",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/normal-rollback-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 175206875
+  },
+  {
+    "id": "reactivate-updated",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "rollback",
+      "updated",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 67136167
+  },
+  {
+    "id": "corrupt-current-direct-rollback",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "rollback",
+      "baseline",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/setup.yaml"
+    ],
+    "exit_code": 1,
+    "elapsed_ns_diagnostic": 19331167
+  },
+  {
+    "id": "restore-backup",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "rollback",
+      "restored",
+      "--out",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/restored-dataset"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 75368167
+  },
+  {
+    "id": "recovered-runtime-config",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/restored-dataset/current",
+      "--source-root",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/src",
+      "--sanitize-rules",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/policies/sanitization_rules.yaml",
+      "--out",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/recovered-runtime.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 20085458
+  },
+  {
+    "id": "restored-capture",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/restored-requests.json",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/recovered-runtime.yaml",
+      "--output",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/restored-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 150383333
+  },
+  {
+    "id": "source-removed-capture",
+    "argv": [
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-package/unpacked/knowledge-system-darwin-arm64-b006e776b72b/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/source-removed-requests.json",
+      "--config",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/recovered-runtime.yaml",
+      "--output",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/final-recovery/source-removed-capture.json",
+      "--retrieval-runs",
+      "1",
+      "--warmup",
+      "0",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0",
+      "--call-timeout",
+      "30s"
+    ],
+    "exit_code": 0,
+    "elapsed_ns_diagnostic": 144397583
+  }
+]

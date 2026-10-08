@@ -2,6 +2,7 @@ package chunk
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
@@ -45,8 +46,12 @@ func BuildEmbedText(c types.Chunk) string {
 		// SymbolName for doc sections is the heading slug (e.g.
 		// "why-sqlite-vec"). Kind ("DocSection"/"ADRSection") is
 		// useful signal — keep it.
+		section := c.SymbolName
+		if len(c.HeadingPath) > 0 {
+			section = strings.Join(c.HeadingPath, " > ")
+		}
 		return fmt.Sprintf("language: %s. file: %s. section: %s (%s).\n\n%s",
-			languageLabel(c.Language), c.File, c.SymbolName, c.SymbolKind, c.Text)
+			languageLabel(c.Language), c.File, section, c.SymbolKind, c.Text)
 	case types.ChunkPRBackground:
 		return fmt.Sprintf("pull request background. file: %s.\n\n%s", c.File, c.Text)
 	case types.ChunkPRSolution:

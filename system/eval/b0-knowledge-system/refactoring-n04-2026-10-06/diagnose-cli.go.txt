@@ -1,0 +1,7 @@
+package setup
+import("encoding/json";"os";"testing";"path/filepath")
+func TestN04Diagnostic(t *testing.T){
+ data,e:=os.ReadFile("../../system/eval/b0-knowledge-system/refactoring-n04-2026-10-06/cli-results.json");if e!=nil {t.Fatal(e)}
+ var r struct{ Fixture string `json:"fixture"` };if e=json.Unmarshal(data,&r);e!=nil{t.Fatal(e)}
+ _,e=Promote(filepath.Join(r.Fixture,"dataset"),"base");if e!=nil{t.Fatal(e)}
+}

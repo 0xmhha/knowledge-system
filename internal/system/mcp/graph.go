@@ -81,6 +81,9 @@ func registerFindSymbol(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleFindSymbol(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	name := req.GetString("name", "")
 	if name == "" {
 		return mcpgo.NewToolResultError(ToolNameFindSymbol + ": missing required argument \"name\""), nil
@@ -165,6 +168,9 @@ func handleFindRelatives(
 	toolName, direction string,
 	relations []contract.Relation,
 ) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	symbol := req.GetString("symbol", "")
 	if symbol == "" {
 		return mcpgo.NewToolResultError(toolName + ": missing required argument \"symbol\""), nil
@@ -226,6 +232,9 @@ func registerGetSubgraph(s *mcpserver.MCPServer, d Deps) {
 }
 
 func handleGetSubgraph(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+	if denied := legacyContextGuard(d); denied != nil {
+		return denied, nil
+	}
 	symbol := req.GetString("symbol", "")
 	if symbol == "" {
 		return mcpgo.NewToolResultError(ToolNameGetSubgraph + ": missing required argument \"symbol\""), nil

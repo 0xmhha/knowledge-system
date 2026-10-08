@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "structural_consumer_controls_passed_task_incomplete",
+  "source_commit": "fb357937fcc674de57f580d974dc2abc0be6da20",
+  "host_os": "darwin",
+  "host_arch": "arm64",
+  "kernel": "25.6.0",
+  "go_version": "go version go1.26.8 darwin/arm64",
+  "source_checkout_clean": true,
+  "archive_sha256": "0af7899c2124c2bbadd63e76540432c99837c982343e58b1c904cd22b774eca0",
+  "binary_sha256": {
+    "cks": "90656b177d852e5b4104c9d340649b47c4c89619140d93342e5dd87d85d182ba",
+    "ckg": "8b13042f08a5c9dd52c96be7c72c506a3debc94ceee00e098f5eb18f3197e45c",
+    "ckv": "65b95421e60b9eff250907a1caebd6ac516f532408cd61ef48cdff66e64429d8"
+  },
+  "external_gomod": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/consumer-first/consumer-module/go.mod",
+  "consumer_template_sha256": "2dc88d821399e500118d33d59e500ca9a2f8d50477e74a4b56b0e7465639700f",
+  "legacy_projects": [
+    {
+      "project": "empty-go",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "71b21319b66c9ebeb59cffdf231b14374105e5ab"
+    },
+    {
+      "project": "typescript",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "53834c09c5e34dd49d40942267b7da9a16b2a304"
+    },
+    {
+      "project": "unsupported-python",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "1451f956a7125d047b8f67d4aff740dc33d9e7b0"
+    }
+  ],
+  "v2": {
+    "citations": 1,
+    "bodies": 1,
+    "body_bytes": 20
+  },
+  "negative_controls": 4,
+  "real_model_calls": 0,
+  "new_final_calls": 0,
+  "third_party_consumer_acceptance": null,
+  "native_linux_amd64_accepted": false,
+  "release_approved": false,
+  "limits": [
+    "owned mock fixtures, local replaced Go module, no independent consumer owner",
+    "binary upgrade from deployed production version not exercised",
+    "timings diagnostic only; no latency or retrieval quality verdict",
+    "v2 raw integrity audit restricted to these fixtures; not complete JCS certification"
+  ]
+}

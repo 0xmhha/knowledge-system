@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-05T03:33:43.569378Z",
+  "finished_at": "2026-10-05T03:33:46.560543Z",
+  "request_sha256": "c0d5507b1c00e436c69584bdeb23d6e6b524dc78931610e3c425b7eda87ad8c3",
+  "config_sha256": "d47a334997acd5e31870a70c8bd50d83bb561b02bca80def3c787bcd646aca98",
+  "binary_sha256": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "config_sha256_after": "d47a334997acd5e31870a70c8bd50d83bb561b02bca80def3c787bcd646aca98",
+  "binary_sha256_after": "d886e39e11ebd3dc662a751d25d35e876634c4b49db81ccfbbded7a60ecbecbb",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "F-05-DEV-a",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "022cf9e9cc6305365f90f5d65d2a463a",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Where is Alpha implemented and which refund limit applies?"
+        },
+        "elapsed_ns": 250510792,
+        "completed_at": "2026-10-05T12:33:46.501561+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-05-dev-a",
+              "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+              "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+              "source_mode": "committed",
+              "base_commit": "680adada09d589cf7867c49f164ef8d779503225"
+            },
+            "query": "Where is Alpha implemented and which refund limit applies?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+              },
+              {
+                "file": "docs/policy.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+                },
+                "text": "func Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/policy.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                  "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+                },
+                "text": "# Refund policy A\n\nDEV-project-a requires a refund limit of 10.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "975553a9a41360a13cca4dcf1ea2b0e5eaf921800ba080b4e4317b8648c860c9"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

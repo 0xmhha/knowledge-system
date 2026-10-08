@@ -1,0 +1,208 @@
+{
+  "base_commit": "d1d7946c",
+  "scope": "native darwin arm64 CLI and real engines with deterministic mock embeddings; no quality or power-loss claim",
+  "fixture": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm",
+  "binaries": {
+    "cks": "741ea2629579d2b8af2621d9379735c30c25e6c16644a3ff9ae98bbfc9b66cfd",
+    "ckg": "4be68afc2bfbb090a61ad54b4f5d6b7e40cd9af2188f2f229f3c9425b52066e7",
+    "ckv": "cf416856f10944b822917927ec65f59aa56237dba7aab520d8c81601a6cf6917"
+  },
+  "inputs": {
+    "go.mod": "961119b29ff5bd2b5e992f8080f25eb8c0bb8fe6dc57ad2b88b466518ab4e630",
+    "main.go": "82806f8507091e3f020a0fd1bf6ca5664450a2354d0d94563ff7ba3a1467c11a"
+  },
+  "config_sha256": "f66ed920f0da0f858655f3b067fc76541a0dfbd358ab4677329b4da90d92cd73",
+  "cases": [
+    {
+      "name": "initial",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "base",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 2.17,
+      "current": "base"
+    },
+    {
+      "name": "one-engine-failed",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "one-engine-failed",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.636,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "mixed-project",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "mixed-project",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.365,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "cancelled",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "cancelled",
+        "--progress",
+        "json",
+        "--vector-bin",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/ckv-injection"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.364,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "existing-version",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "base",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 0.068,
+      "current": "base",
+      "active_tree_unchanged": true
+    },
+    {
+      "name": "held-for-review",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "held",
+        "--progress",
+        "json",
+        "--hold-for-review"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.386,
+      "current": "base",
+      "same_source_and_dataset_identity": true
+    },
+    {
+      "name": "promoted",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "next",
+        "--progress",
+        "json"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.409,
+      "current": "next",
+      "same_source_and_dataset_identity": true
+    }
+  ],
+  "concurrent_requests": [
+    {
+      "request": "build",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "setup",
+        "--config",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/setup.yaml",
+        "--version",
+        "concurrent"
+      ],
+      "exit_code": 1,
+      "current": "base",
+      "candidate_not_created": true
+    },
+    {
+      "request": "rollback",
+      "command": [
+        "/private/tmp/ks-n03-bin/cks",
+        "rollback",
+        "base",
+        "--out",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-n03-cli-c6ybhzhm/dataset"
+      ],
+      "exit_code": 1,
+      "current": "base",
+      "candidate_not_created": true
+    }
+  ],
+  "success": true,
+  "old_identity": {
+    "source": {
+      "project_id": "n03-fixture",
+      "source_mode": "snapshot-only",
+      "source_commit": "",
+      "file_manifest_digest": "03534483459858b85228fe548240cca431476fd2b664f9bd0cdd72cab17629ab",
+      "capture_policy_digest": "bf9e1543e2fd4fdd1dd7d40e45cc521146183020231e9afdfce8a74f1188d832",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "483d0d1046d030b53a931e0e11ce0ef472ffa4c372c82fc1b6ac85a2e596c9d5"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "03973405c907497f936572caf8911fc3132a81e353d00550013c88d93678074e",
+    "dataset_id": "5c5c0d2456424aad06d3e7430aa36dd6cf63e7df59606d0ffd0838dbc92fa712"
+  },
+  "new_identity": {
+    "source": {
+      "project_id": "n03-fixture",
+      "source_mode": "snapshot-only",
+      "source_commit": "",
+      "file_manifest_digest": "03534483459858b85228fe548240cca431476fd2b664f9bd0cdd72cab17629ab",
+      "capture_policy_digest": "bf9e1543e2fd4fdd1dd7d40e45cc521146183020231e9afdfce8a74f1188d832",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "483d0d1046d030b53a931e0e11ce0ef472ffa4c372c82fc1b6ac85a2e596c9d5"
+    },
+    "embedding_identity": {
+      "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+      "dim": 64,
+      "model": "mock-feature-hash-v1"
+    },
+    "input_digest": "03973405c907497f936572caf8911fc3132a81e353d00550013c88d93678074e",
+    "dataset_id": "5c5c0d2456424aad06d3e7430aa36dd6cf63e7df59606d0ffd0838dbc92fa712"
+  }
+}

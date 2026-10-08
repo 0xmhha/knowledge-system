@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-03T14:40:00.91543Z",
+  "finished_at": "2026-10-03T14:40:01.081615Z",
+  "request_sha256": "7733e5364704335a810c17391e6fc20686ddebf6b91e224125f30a76862e48fb",
+  "config_sha256": "b5055b3575dedc97658dd2ecca642327d2ec278a8867a9f11cdb0710a2df69be",
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "config_sha256_after": "b5055b3575dedc97658dd2ecca642327d2ec278a8867a9f11cdb0710a2df69be",
+  "binary_sha256_after": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "q0",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "project"
+        },
+        "elapsed_ns": 37081125,
+        "completed_at": "2026-10-03T23:40:00.992565+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-f03-dev",
+              "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+              "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+              "source_mode": "committed",
+              "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801"
+            },
+            "query": "project",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                "project_id": "b0-f03-dev",
+                "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+                "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+                "source_mode": "committed",
+                "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                "origin_id": "repo",
+                "file_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+                "content_sha256": "8b3946dca4592ad534363a71cec873a09d7925d9d031827922f6e306715a2dac"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                  "project_id": "b0-f03-dev",
+                  "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+                  "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+                  "source_mode": "committed",
+                  "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                  "origin_id": "repo",
+                  "file_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+                  "content_sha256": "8b3946dca4592ad534363a71cec873a09d7925d9d031827922f6e306715a2dac"
+                },
+                "text": "func ProjectIdentity() string { return \"project boundary\" }\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "ontology": {
+                "mode": "combined",
+                "state": "active",
+                "baseline_citations": 1,
+                "matched_concepts": 2,
+                "applied_relations": 0,
+                "boosted_citations": 0
+              },
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "c5d9dd1920774e66ef55444547f7c78fba7d7572ea4472e2f6d7ec8a6974de68"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "q1",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "프로젝트"
+        },
+        "elapsed_ns": 36356917,
+        "completed_at": "2026-10-03T23:40:01.028968+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-f03-dev",
+              "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+              "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+              "source_mode": "committed",
+              "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801"
+            },
+            "query": "프로젝트",
+            "citations": [],
+            "bodies": [],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "ontology": {
+                "mode": "combined",
+                "state": "no_candidates",
+                "baseline_citations": 0,
+                "matched_concepts": 0,
+                "applied_relations": 0,
+                "boosted_citations": 0
+              },
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "5a6d185470fc0b02bdc85e90ba281be9fda655eedcc6cbcd2d299265808f6047"
+            }
+          }
+        }
+      }
+    },
+    {
+      "request_id": "q2",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "include_knowledge": true,
+          "knowledge_as_of": "2026-10-03",
+          "knowledge_subsystem": "refund",
+          "prompt": "xyzzy dev unseen wording"
+        },
+        "elapsed_ns": 35988875,
+        "completed_at": "2026-10-03T23:40:01.064979+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "b0-f03-dev",
+              "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+              "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+              "source_mode": "committed",
+              "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801"
+            },
+            "query": "xyzzy dev unseen wording",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                "project_id": "b0-f03-dev",
+                "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+                "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+                "source_mode": "committed",
+                "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                "origin_id": "repo",
+                "file_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+                "content_sha256": "8b3946dca4592ad534363a71cec873a09d7925d9d031827922f6e306715a2dac"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                  "project_id": "b0-f03-dev",
+                  "dataset_id": "3a1c8d63ba43d3a3b4ef0bd24ddaba62ecfc267af93b3c2ce2d85d8c137a4a93",
+                  "snapshot_id": "3ae875c6340d14a37ed378c3c854da7fbfdb3494e0fe22dee8c2f946cfb75957",
+                  "source_mode": "committed",
+                  "base_commit": "ab18b7b83b62e55812bbf48446c5cb8af470c801",
+                  "origin_id": "repo",
+                  "file_sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+                  "content_sha256": "8b3946dca4592ad534363a71cec873a09d7925d9d031827922f6e306715a2dac"
+                },
+                "text": "func ProjectIdentity() string { return \"project boundary\" }\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "ontology": {
+                "mode": "combined",
+                "state": "no_match",
+                "baseline_citations": 1,
+                "matched_concepts": 0,
+                "applied_relations": 0,
+                "boosted_citations": 0
+              },
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "2d95cfb626ada478be2dd108b1632e3a631b1a8544da23b94f269ef7f499e8ab"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

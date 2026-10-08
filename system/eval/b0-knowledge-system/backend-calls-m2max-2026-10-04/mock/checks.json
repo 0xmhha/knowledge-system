@@ -1,0 +1,621 @@
+[
+  {
+    "id": "knowledge-init",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "init",
+      "--project-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--project-id",
+      "ks-fixture"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-init.txt",
+    "sha256": "8bb262102feba859a5ce458549a12694573d60fdefd309beec0a940010697a42"
+  },
+  {
+    "id": "knowledge-digest",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "digest",
+      "--project-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--source",
+      "vendor/fixture-policy"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-digest.txt",
+    "sha256": "f61e5c0e79297789906d602f93fdbe1c0a7340758d6ebbdc91badec52bce4cb2"
+  },
+  {
+    "id": "knowledge-lock",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "lock",
+      "--project-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-lock.txt",
+    "sha256": "8cae1908f500cd70fdaa5b2f7359505d5555849eafe6dd673032e8d3d61008ad"
+  },
+  {
+    "id": "knowledge-validate",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "validate",
+      "--project-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-validate.txt",
+    "sha256": "94f750c09f736dfcdcf2243d7dfa08d0e285705ab68d683aadafec2823b3417a"
+  },
+  {
+    "id": "knowledge-review",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "review",
+      "--project-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src"
+    ],
+    "exit_code": 0,
+    "raw_output": "knowledge-review.txt",
+    "sha256": "c7b24717a8d19d03eeb978dfb083862a41992ad327e40f8bc3d46a7b7121a543"
+  },
+  {
+    "id": "git-init",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-init.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-add",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "raw_output": "git-add.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-commit",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "user.name=Fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "commit",
+      "-qm",
+      "synthetic relations input"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-commit.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-bundle",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "bundle",
+      "create",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/source.bundle",
+      "--all"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-bundle.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-bundle-verify",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "bundle",
+      "verify",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/source.bundle"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-bundle-verify.txt",
+    "sha256": "7bde326632144a9ec184cae41d6daf14c7aefcab88b71954edb6721f21ace518"
+  },
+  {
+    "id": "setup",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset",
+      "--project-id",
+      "ks-fixture",
+      "--source-mode",
+      "committed",
+      "--version",
+      "smoke",
+      "--embedder",
+      "mock"
+    ],
+    "exit_code": 0,
+    "raw_output": "setup.txt",
+    "sha256": "f14d545ec621640049eb3b734883b91e4f57a94059def75e29ddd6abc0620f63"
+  },
+  {
+    "id": "semantic-extract",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "semantic",
+      "build",
+      "--repo",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--project-id",
+      "ks-fixture",
+      "--dataset-id",
+      "7d2f7b63d8c09d82a9af2f9409e9f20f46940aaffa49594922eaa2c64081e0f3",
+      "--graph",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke/graph",
+      "--vector",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke/vector",
+      "--version-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/projection.json",
+      "--docs",
+      "README.md",
+      "--ontology",
+      "ontology-reviewed.yaml",
+      "--extract-only",
+      "--include-packs"
+    ],
+    "exit_code": 0,
+    "raw_output": "semantic-extract.txt",
+    "sha256": "fef126432681e9fe9ee45a11c66226c4bbfc6cc152975d29de1ae93d7da310e4"
+  },
+  {
+    "id": "semantic-promote",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "semantic",
+      "promote",
+      "--input",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/projection.json",
+      "--repo",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--graph",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke/graph",
+      "--vector",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke/vector",
+      "--version-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db"
+    ],
+    "exit_code": 0,
+    "raw_output": "semantic-promote.txt",
+    "sha256": "0d850e7f75433f23e34c9af1d98c630b991d6dd526a0997ccb6be53de724783d"
+  },
+  {
+    "id": "config-baseline_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-baseline_off.txt",
+    "sha256": "c8c6ffa8da61d9cd615d4fb384cd2315a6e83669506d4ce3ee1d3d04703c00ce"
+  },
+  {
+    "id": "capture-baseline_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-baseline_off.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-concept_text_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_on.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-concept_text_on.txt",
+    "sha256": "9465fd00be9f7db054cb68bd53ea9cd0937867cc21cca1f86b67d7619f87bef2"
+  },
+  {
+    "id": "capture-concept_text_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_on-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_on.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_on.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-concept_text_on.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-relations_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_off.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-relations_off.txt",
+    "sha256": "14603643b713e54b89053afd1593bac1350089a60396a97da0baf2d1ee42432e"
+  },
+  {
+    "id": "capture-relations_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_off-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_off.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-relations_off.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-combined_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_on.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-combined_on.txt",
+    "sha256": "a31726d95cfdf052d73cd02520329eed2ef8fa6b75728f5b789c6474dd11ea00"
+  },
+  {
+    "id": "capture-combined_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_on-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_on.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_on.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-combined_on.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-baseline_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_on.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-baseline_on.txt",
+    "sha256": "d5bd10366809abcf4cbeaa023dac78e0640582816b6a766f79c56448dae67f68"
+  },
+  {
+    "id": "capture-baseline_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_on-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_on.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/baseline_on.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-baseline_on.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-concept_text_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_off.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-concept_text_off.txt",
+    "sha256": "a24193464bc899fabdd8866be5a0b3cdf9c56cbf743306b6972ca999b83bf277"
+  },
+  {
+    "id": "capture-concept_text_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_off-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_off.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/concept_text_off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-concept_text_off.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-relations_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_on.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-relations_on.txt",
+    "sha256": "7f4572d6cfd0b733e0a5392243ccfc6a012a84570985e91efb13fc410fa18d00"
+  },
+  {
+    "id": "capture-relations_on",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_on-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_on.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/relations_on.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-relations_on.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "config-combined_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/dataset/smoke",
+      "--source-root",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--ollama-url",
+      "http://127.0.0.1:11434",
+      "--semantic-store",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/semantic.db",
+      "--out",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_off.yaml"
+    ],
+    "exit_code": 0,
+    "raw_output": "config-combined_off.txt",
+    "sha256": "d21a4f26d0c369a0ca909f9fe01431d14ec20a514a22e380a4f7a6f7c1d9b12b"
+  },
+  {
+    "id": "capture-combined_off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "eval",
+      "capture",
+      "--requests",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_off-requests.json",
+      "--config",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_off.yaml",
+      "--output",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/combined_off.json",
+      "--warmup",
+      "0",
+      "--retrieval-runs",
+      "1",
+      "--warm-runs",
+      "0",
+      "--cold-runs",
+      "0"
+    ],
+    "exit_code": 0,
+    "raw_output": "capture-combined_off.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "git-status-after",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-b0-calls-final-mock-20261004/src",
+      "status",
+      "--porcelain"
+    ],
+    "exit_code": 0,
+    "raw_output": "git-status-after.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

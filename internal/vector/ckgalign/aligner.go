@@ -95,6 +95,10 @@ func Load(ckgPath string) (*Index, error) {
 			canonicalAvailable = canonicalHasValue(db)
 		}
 	}
+	modernGraph := false
+	if major, minor, ok := readManifestSchemaVersion(db); ok {
+		modernGraph = major > 1 || (major == 1 && minor >= 19)
+	}
 	q := `
 SELECT id, file_path, start_line, end_line, ` + canonicalSel + `
 FROM nodes
@@ -103,6 +107,20 @@ WHERE file_path != ''
   AND qualified_name NOT LIKE 'file:%'
   AND qualified_name NOT LIKE 'hunk:%'
   AND qualified_name NOT LIKE 'import:%'`
+	if modernGraph && hasCanonical {
+		// Current graphs have typed AST nodes. In a Git worktree a Hunk
+		// can share the exact line of a Function; taking that row first
+		// silently loses its canonical join key. Legacy graphs keep the
+		// broader read path for compatibility, but pinned graphs only join
+		// real AST symbols with a nonempty canonical ID.
+		q += ` AND canonical_id IS NOT NULL AND canonical_id != ''`
+		if columnExists(db, "nodes", "type") {
+			q += ` AND type IN ('Struct','Interface','Class','TypeAlias','Enum','Contract',
+ 'Mapping','Event','Function','Method','Modifier','Constructor','Constant',
+ 'Variable','Field','Parameter','LocalVariable')`
+		}
+	}
+	q += ` ORDER BY file_path, start_line, end_line, id`
 	rows, err := db.Query(q)
 	if err != nil {
 		return nil, fmt.Errorf("ckgalign: query nodes: %w", err)
@@ -123,7 +141,18 @@ WHERE file_path != ''
 	}
 	for f := range ix.byFile {
 		es := ix.byFile[f]
-		sort.Slice(es, func(i, j int) bool { return es[i].StartLine < es[j].StartLine })
+		sort.Slice(es, func(i, j int) bool {
+			if es[i].StartLine != es[j].StartLine {
+				return es[i].StartLine < es[j].StartLine
+			}
+			if es[i].EndLine != es[j].EndLine {
+				return es[i].EndLine < es[j].EndLine
+			}
+			if es[i].CanonicalID != es[j].CanonicalID {
+				return es[i].CanonicalID < es[j].CanonicalID
+			}
+			return es[i].ID < es[j].ID
+		})
 	}
 	return ix, nil
 }

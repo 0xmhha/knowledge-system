@@ -1,0 +1,40 @@
+import json,hashlib,importlib.util,collections,subprocess
+from pathlib import Path
+ROOT=Path.cwd();R=Path('/private/tmp/ks-fix20-live-20261005');OLD=Path('/private/tmp/ks-large-cost-20261005');sha=lambda b:hashlib.sha256(b).hexdigest();read=lambda root,n:json.loads((root/n).read_bytes())
+s=importlib.util.spec_from_file_location('base',ROOT/'scripts/b1-summarize-matrix.py');B=importlib.util.module_from_spec(s);s.loader.exec_module(B)
+cap=read(R,'capture.json');previous=read(OLD,'capture.json');request=read(R,'requests.json');identity=read(OLD/'dataset/diagnostic','dataset-identity.json');assert cap['quality_metrics'] is None and cap['state']=='captured' and not cap.get('errors') and len(cap['rows'])==2
+assert cap['counts']=={'retrieval':1,'warmup':0,'warm_latency':0,'cold_process':0} and cap['request_sha256']==previous['request_sha256']==sha((R/'requests.json').read_bytes()) and cap['config_sha256']==cap['config_sha256_after']==sha((R/'config.yaml').read_bytes()) and cap['binary_sha256']==cap['binary_sha256_after']
+assert read(R,'bindings-before.json')==read(R,'bindings-after.json') and read(R,'model-before.json')['tags']==read(R,'model-after.json')['tags']
+terms=read(OLD,'backend-replay.json')['bm25_replays'];literal_hashes={sha(x['literal_fts_query'].encode()) for x in terms};bare_hashes={x['input_sha256'] for x in terms}
+scopes={}
+for line in (R/'footprints/cks-mcp.jsonl').read_text().splitlines():
+ e=json.loads(line)
+ if e.get('event')=='measurement.backend_calls' and e['summary']['tool']=='cks.context.get_for_task_v2':
+  scope=e['summary'];assert scope['measurement_id'] not in scopes;scopes[scope['measurement_id']]=scope
+assert len(scopes)==2;derived=[];hist=collections.Counter();cites=bodies=0
+for i,row in enumerate(cap['rows'],1):
+ call=row['call'];res=call['response'];req=next(x for x in request['requests'] if x['id']==row['request_id']);assert not row.get('error') and not call.get('transport_error') and not res.get('isError') and call['arguments']==req['arguments']
+ pack=res['structuredContent'];B.verify_pack(pack,identity,Path('/private/tmp/ks-b0-m2max-corpus-20261003'));base=next(x['call']['response']['structuredContent'] for x in previous['rows'] if x['request_id']==row['request_id'])
+ for key in ('coordinates','citations','bodies'):assert pack[key]==base[key]
+ cites+=len(pack['citations']);bodies+=len(pack['bodies']);calls=scopes[call['measurement_id']]['calls'];bm=[c for c in calls if c['backend']=='ckg' and c['method']=='bm25_search'];assert bm and all(c['outcome']=='returned' for c in bm)
+ assert literal_hashes.issubset({c.get('input_sha256') for c in bm}) and not bare_hashes.intersection({c.get('input_sha256') for c in bm})
+ for c in calls:
+  if c['backend']=='ollama_http':assert c['http_status']==200
+  if c['outcome']!='returned':hist[(c['backend'],c['method'],c['outcome'])]+=1
+  if c['backend']=='ckv' and c['method']=='semantic_search':assert c['options']['K'] in (6,10)
+ derived.append({'sequence':i,'arm':'baseline_on' if req['arguments']['include_knowledge'] else 'baseline_off',**row})
+assert hist==collections.Counter({('ckg','neighbors','backend_error'):12})
+(R/'derived-sdk-rows.jsonl').write_text(''.join(json.dumps(x,ensure_ascii=False)+'\n' for x in derived))
+seals={}
+for label,root,ephemeral in [('original',Path('/private/tmp/ks-b0-m2max-full-20261003/dataset/m2max-diagnostic'),False),('source',Path('/private/tmp/ks-b0-m2max-corpus-20261003'),False),('copy',OLD/'dataset/diagnostic',True)]:
+ actual={}
+ for p in sorted(root.rglob('*')):
+  if p.is_file():
+   if ephemeral and (p.name.endswith('.db-shm') or p.name.endswith('.db-wal')):
+    if p.name.endswith('.db-wal'):assert p.stat().st_size==0
+    continue
+   actual[str(p.relative_to(root))]={'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+ assert actual==read(OLD,label+'-seal-before.json');seals[label]={'unchanged':True,'file_inventory_sha256':sha(json.dumps(actual,sort_keys=True,separators=(',',':')).encode()),'files':len(actual)}
+inputs=read(OLD,'human-inputs-unchanged.json')
+for name,h in inputs.items():assert sha((ROOT/name).read_bytes())==h and subprocess.check_output(['git','show','HEAD:'+name])==(ROOT/name).read_bytes()
+result={'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'planned_calls':2,'observed_calls':2,'missing_calls':0,'failed_calls':0,'citations':cites,'bodies':bodies,'before_after_citations_bodies_coordinates_identical':True,'literal_candidate_hashes_bound':len(terms),'before_per_call_bm25_errors':8,'after_per_call_bm25_errors':0,'remaining_backend_errors':[{'backend':a,'method':b,'outcome':o,'count':n} for (a,b,o),n in hist.items()],'seals':seals,'human_inputs_unchanged':inputs,'binary_sha256':cap['binary_sha256'],'derived_rows_sha256':sha((R/'derived-sdk-rows.jsonl').read_bytes()),'limits':['existing partial index/one DEV query; no official quality/latency or full ablation claim','neighbor errors retained, not repaired or reclassified','older package before FIX-20; final package needs rebuilt frozen source']};(R/'summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps(result,ensure_ascii=False,indent=2))

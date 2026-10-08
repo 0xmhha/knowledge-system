@@ -17,6 +17,46 @@ func manifestJSON(srcCommit, srcRoot, ledgerCommit, ledgerDigest string) []byte 
 	return []byte(j)
 }
 
+func TestComputeAlignmentPinnedIdentityFailsClosed(t *testing.T) {
+	graph := []byte(`{"project_id":"p","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"committed"}`)
+	vector := []byte(`{"src_commit":"abc","project_id":"p","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"committed"}`)
+	in := AlignmentInputs{CKGSrcCommit: "abc", CKGSchema: "1.23", CKGManifest: graph,
+		CKVManifest: vector, CKVConfigured: true}
+	report := ComputeAlignment(in)
+	if !report.OK || report.ProjectID != "p" || report.DatasetID != "d" {
+		t.Fatalf("matching pinned identity rejected: %+v", report)
+	}
+	in.CKGManifest = nil
+	report = ComputeAlignment(in)
+	if report.OK || !strings.Contains(report.Reason, "identity") {
+		t.Fatalf("missing graph pin accepted: %+v", report)
+	}
+	in.CKGManifest = graph
+	in.CKVManifest = []byte(`{"src_commit":"abc","project_id":"other","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"committed"}`)
+	report = ComputeAlignment(in)
+	if report.OK || !strings.Contains(report.Reason, "identity") {
+		t.Fatalf("cross-project pin accepted: %+v", report)
+	}
+}
+
+func TestComputeAlignmentSnapshotOnlyUsesPinnedIDsAndGraphDigest(t *testing.T) {
+	graph := []byte(`{"project_id":"p","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"snapshot-only"}`)
+	vector := []byte(`{"project_id":"p","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"snapshot-only","sources":{"ckg":{"graph_digest":"g"}}}`)
+	in := AlignmentInputs{CKGManifest: graph, CKVManifest: vector, CKVConfigured: true, CKGSchema: "1.23", CKGDigest: "g"}
+	if report := ComputeAlignment(in); !report.OK || report.DatasetID != "d" {
+		t.Fatalf("non-Git aligned dataset rejected: %+v", report)
+	}
+	in.CKGDigest = "other"
+	if report := ComputeAlignment(in); report.OK {
+		t.Fatalf("non-Git digest mismatch accepted: %+v", report)
+	}
+	in.CKGDigest = "g"
+	in.CKVManifest = []byte(`{"src_commit":"abc","project_id":"p","snapshot_id":"s","dataset_id":"d","file_manifest_digest":"f","capture_policy_digest":"policy","source_mode":"snapshot-only","sources":{"ckg":{"graph_digest":"g"}}}`)
+	if report := ComputeAlignment(in); report.OK {
+		t.Fatalf("non-Git dataset with commit accepted: %+v", report)
+	}
+}
+
 func TestComputeAlignment_OK(t *testing.T) {
 	t.Parallel()
 	rep := ComputeAlignment(AlignmentInputs{

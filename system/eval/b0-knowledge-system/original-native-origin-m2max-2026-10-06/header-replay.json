@@ -1,0 +1,126 @@
+{
+  "diagnostic_only": true,
+  "planned_checks": 6,
+  "observed_checks": 6,
+  "generated_header_replays": 4,
+  "overlay_byte_matches": 2,
+  "full_native_regeneration": false,
+  "quality_metrics": null,
+  "legal_review": "pending",
+  "rows": [
+    {
+      "target": "linux/arm64",
+      "header": "bits/alltypes.h",
+      "kind": "upstream_generator_replayed",
+      "command": [
+        "sed",
+        "-f",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/mkalltypes.sed",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/arm64-arch-alltypes.h.in",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/arm64-include-alltypes.h.in"
+      ],
+      "exit_code": 0,
+      "recipe": "musl fixed-commit Makefile",
+      "input_hashes": {
+        "tools/mkalltypes.sed": "8ccea9ec27a8450a52973cab8cdea0af8b4bd93d246b1f206b37ccc6fa0b8b7b",
+        "arch/aarch64/bits/alltypes.h.in": "c7539171f4717d228e770837a8dd586232aa76f6d1b131fb85c259bf7506d5a8",
+        "include/alltypes.h.in": "0258a616386b1c33c1a539317bdfd0de381dd43d7e5bebb205c4b4e1e71eef56"
+      },
+      "output_sha256": "2e643832d88c292c67ed8fa735924b2fb0664eb4c04ab00068c37b35d7d65c71",
+      "module_sha256": "2e643832d88c292c67ed8fa735924b2fb0664eb4c04ab00068c37b35d7d65c71",
+      "byte_identical": true
+    },
+    {
+      "target": "linux/arm64",
+      "header": "bits/syscall.h",
+      "kind": "upstream_generator_replayed",
+      "command": [
+        "sed",
+        "-n",
+        "-e",
+        "s/__NR_/SYS_/p"
+      ],
+      "stdin_source": "arch/aarch64/bits/syscall.h.in",
+      "exit_code": 0,
+      "recipe": "musl fixed-commit Makefile: copy input then append sed output",
+      "input_sha256": "7b20fe57bf92c6b3cf800d4f83998419e92e19a88ead2d57c89c5725e0cfb816",
+      "output_sha256": "05540726feca61490bc55639da604cba005df46de3bc943ce823e95a4d041303",
+      "module_sha256": "05540726feca61490bc55639da604cba005df46de3bc943ce823e95a4d041303",
+      "byte_identical": true
+    },
+    {
+      "target": "linux/arm64",
+      "header": "bits/float.h",
+      "kind": "pinned_module_overlay",
+      "module_overlay_path": "internal/overlay/musl/arch/aarch64/bits/float.h",
+      "upstream_original_path": "arch/aarch64/bits/float.h",
+      "upstream_original_sha256": "b0e7f9732c198c36c6af4f4836c8a9079a8955f514fb7a39046f4881fe7eefb0",
+      "overlay_sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "module_sha256": "17b1b8df20782ff05d6c8664f41229ee199ec72481e0e67e49296743bfae9f90",
+      "byte_identical_to_overlay": true,
+      "non_ccgo_branch_preserves_original": true,
+      "ccgo_branch_changes": {
+        "long_double_mantissa_bits": 53,
+        "decimal_digits": 17
+      },
+      "full_transpiler_correctness_or_legal_approval": false
+    },
+    {
+      "target": "linux/amd64",
+      "header": "bits/alltypes.h",
+      "kind": "upstream_generator_replayed",
+      "command": [
+        "sed",
+        "-f",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/mkalltypes.sed",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/amd64-arch-alltypes.h.in",
+        "/private/tmp/ks-original-native-20261005/header-replay-inputs-retry1/amd64-include-alltypes.h.in"
+      ],
+      "exit_code": 0,
+      "recipe": "musl fixed-commit Makefile",
+      "input_hashes": {
+        "tools/mkalltypes.sed": "8ccea9ec27a8450a52973cab8cdea0af8b4bd93d246b1f206b37ccc6fa0b8b7b",
+        "arch/x86_64/bits/alltypes.h.in": "3178d6112df2fac8d2ad0331ea956a9161ca38780f1e01569a97a4d76a40071e",
+        "include/alltypes.h.in": "0258a616386b1c33c1a539317bdfd0de381dd43d7e5bebb205c4b4e1e71eef56"
+      },
+      "output_sha256": "a8990c268ef62ec2e6963e757a0efad856ed4fd3611f6c28e7df17962697cc4c",
+      "module_sha256": "a8990c268ef62ec2e6963e757a0efad856ed4fd3611f6c28e7df17962697cc4c",
+      "byte_identical": true
+    },
+    {
+      "target": "linux/amd64",
+      "header": "bits/syscall.h",
+      "kind": "upstream_generator_replayed",
+      "command": [
+        "sed",
+        "-n",
+        "-e",
+        "s/__NR_/SYS_/p"
+      ],
+      "stdin_source": "arch/x86_64/bits/syscall.h.in",
+      "exit_code": 0,
+      "recipe": "musl fixed-commit Makefile: copy input then append sed output",
+      "input_sha256": "c29e9cb15ff393eda50c320a6d96bb1132191251f8e079148a0646165bb8cabd",
+      "output_sha256": "2575768e9afc64aa3ffe571f3cef3e7696249c943dadf6bf5ad8f98853f8f8fb",
+      "module_sha256": "2575768e9afc64aa3ffe571f3cef3e7696249c943dadf6bf5ad8f98853f8f8fb",
+      "byte_identical": true
+    },
+    {
+      "target": "linux/amd64",
+      "header": "bits/float.h",
+      "kind": "pinned_module_overlay",
+      "module_overlay_path": "internal/overlay/musl/arch/x86_64/bits/float.h",
+      "upstream_original_path": "arch/x86_64/bits/float.h",
+      "upstream_original_sha256": "de4738aaf93195145476108f536039c28dc572aa34ccf3ce099142266f9007df",
+      "overlay_sha256": "4861d77862d3c32109ea51686ca8ebb2faa48e834ba278c7d84e04dc0e75790a",
+      "module_sha256": "4861d77862d3c32109ea51686ca8ebb2faa48e834ba278c7d84e04dc0e75790a",
+      "byte_identical_to_overlay": true,
+      "non_ccgo_branch_preserves_original": true,
+      "ccgo_branch_changes": {
+        "long_double_mantissa_bits": 53,
+        "decimal_digits": 17
+      },
+      "full_transpiler_correctness_or_legal_approval": false
+    }
+  ]
+}

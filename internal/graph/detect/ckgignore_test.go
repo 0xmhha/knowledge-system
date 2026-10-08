@@ -45,3 +45,18 @@ func TestCKGIgnoreMatch(t *testing.T) {
 		}
 	}
 }
+
+func TestCKGDefaultIgnoreMatchesNestedGeneratedTrees(t *testing.T) {
+	c, err := detect.LoadCKGIgnore(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{"node_modules/index.ts", "web/viewer/node_modules/index.ts", "tools/vendor/lib.go", "web/dist/app.js"} {
+		if !c.Match(path) {
+			t.Errorf("default generated tree %q was not ignored", path)
+		}
+	}
+	if c.Match("web/node_modulesx/source.ts") {
+		t.Fatal("default ignore matched a partial directory name")
+	}
+}

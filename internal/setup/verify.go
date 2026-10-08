@@ -17,14 +17,28 @@ import (
 // check needs. Reading the JSON files directly (instead of importing engine
 // internals) keeps this package on the CLI-contract side of the boundary.
 type graphManifest struct {
-	SchemaVersion string `json:"schema_version"`
-	SrcCommit     string `json:"src_commit"`
-	GraphDigest   string `json:"graph_digest"`
+	ProjectID           string `json:"project_id"`
+	SnapshotID          string `json:"snapshot_id"`
+	DatasetID           string `json:"dataset_id"`
+	FileManifestDigest  string `json:"file_manifest_digest"`
+	CapturePolicyDigest string `json:"capture_policy_digest"`
+	SourceMode          string `json:"source_mode"`
+	SchemaVersion       string `json:"schema_version"`
+	SrcRoot             string `json:"src_root"`
+	SrcCommit           string `json:"src_commit"`
+	GraphDigest         string `json:"graph_digest"`
 }
 
 type vectorManifest struct {
-	SrcCommit string `json:"src_commit"`
-	Sources   *struct {
+	ProjectID           string `json:"project_id"`
+	SnapshotID          string `json:"snapshot_id"`
+	DatasetID           string `json:"dataset_id"`
+	FileManifestDigest  string `json:"file_manifest_digest"`
+	CapturePolicyDigest string `json:"capture_policy_digest"`
+	SourceMode          string `json:"source_mode"`
+	SrcRoot             string `json:"src_root"`
+	SrcCommit           string `json:"src_commit"`
+	Sources             *struct {
 		CKG *struct {
 			GraphDigest string `json:"graph_digest"`
 			SrcCommit   string `json:"src_commit"`
@@ -55,6 +69,39 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	if err := readJSON(filepath.Join(vectorDir, "manifest.json"), &vm); err != nil {
 		return fmt.Errorf("verify: vector manifest: %w", err)
 	}
+	// Legacy manifests lack all three fields. A partially upgraded build is
+	// unsafe: do not silently downgrade it to commit-only alignment.
+	graphPinned := gm.ProjectID != "" || gm.SnapshotID != "" || gm.DatasetID != ""
+	vectorPinned := vm.ProjectID != "" || vm.SnapshotID != "" || vm.DatasetID != ""
+	if graphPinned || vectorPinned {
+		if gm.ProjectID == "" || gm.SnapshotID == "" || gm.DatasetID == "" ||
+			gm.FileManifestDigest == "" || gm.CapturePolicyDigest == "" || gm.SourceMode == "" ||
+			vm.ProjectID == "" || vm.SnapshotID == "" || vm.DatasetID == "" ||
+			gm.ProjectID != vm.ProjectID || gm.SnapshotID != vm.SnapshotID || gm.DatasetID != vm.DatasetID ||
+			gm.FileManifestDigest != vm.FileManifestDigest ||
+			gm.CapturePolicyDigest != vm.CapturePolicyDigest || gm.SourceMode != vm.SourceMode {
+			return fmt.Errorf("verify: project/snapshot/dataset identity missing or mismatched across graph and vector")
+		}
+	}
+	// A commit and logical graph digest identify content, but not which source
+	// tree the two builders read. In particular, two checkouts at the same HEAD
+	// can contain different uncommitted files. This check narrows that hole for
+	// setup builds; the working-tree snapshot contract will cover the bytes.
+	if gm.SrcRoot != "" && vm.SrcRoot != "" {
+		graphRoot, err := comparableRoot(gm.SrcRoot)
+		if err != nil {
+			return fmt.Errorf("verify: graph src_root: %w", err)
+		}
+		vectorRoot, err := comparableRoot(vm.SrcRoot)
+		if err != nil {
+			return fmt.Errorf("verify: vector src_root: %w", err)
+		}
+		if graphRoot != vectorRoot {
+			return fmt.Errorf("verify: graph and vector use different source roots (%q, %q)", gm.SrcRoot, vm.SrcRoot)
+		}
+	} else {
+		warn("source root missing on one side — source-tree alignment not verifiable")
+	}
 
 	// Canonical_id — the vector<->graph join key (ADR-007) — exists only from
 	// graph schema 1.19. Aligning a vector index against an older graph is
@@ -79,8 +126,14 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 	}
 
 	switch {
+	case graphPinned && gm.SourceMode == "snapshot-only" && (gm.SrcCommit != "" || vecCommit != ""):
+		return fmt.Errorf("verify: snapshot-only index unexpectedly carries a Git commit")
+	case graphPinned && gm.SourceMode != "snapshot-only" && (gm.SrcCommit == "" || vecCommit == ""):
+		return fmt.Errorf("verify: pinned Git source commit missing on one side")
 	case gm.SrcCommit == "" || vecCommit == "":
-		warn("source commit missing on one side — commit alignment not verifiable")
+		if !graphPinned {
+			warn("source commit missing on one side — commit alignment not verifiable")
+		}
 	case gm.SrcCommit != vecCommit:
 		return fmt.Errorf("verify: graph and vector built from different commits (graph %.9s, vector %.9s)",
 			gm.SrcCommit, vecCommit)
@@ -96,6 +149,19 @@ func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {
 			gm.GraphDigest, vecPin)
 	}
 	return nil
+}
+
+func comparableRoot(root string) (string, error) {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	// Resolve aliases when the original tree is still present. A copied index
+	// remains comparable through the recorded absolute paths if it is not.
+	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
+		return filepath.Clean(resolved), nil
+	}
+	return filepath.Clean(abs), nil
 }
 
 // parseSchemaVersion splits a "major.minor[.patch]" schema string into its

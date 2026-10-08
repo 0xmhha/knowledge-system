@@ -42,6 +42,35 @@ func TestWalkBasic(t *testing.T) {
 	}
 }
 
+func TestWalkExactBuildSourceExceptionPreservesOtherFilters(t *testing.T) {
+	dir := t.TempDir()
+	paths := []string{"internal/build/engine.go", "internal/build/other.go", "build/output.go", "vendor/build/vendor.go", "internal/build/ignored.go", "internal/build/binary.go", "internal/build/big.go", "internal/build/link.go"}
+	for _, p := range paths[:len(paths)-1] {
+		mkfile(t, dir, p, "package build\n")
+	}
+	mkfile(t, dir, ".ckvignore", "ignored.go\n")
+	mkfile(t, dir, "internal/build/binary.go", "package build\x00")
+	mkfile(t, dir, "internal/build/big.go", stringRepeat("x", 100))
+	if err := os.Symlink(filepath.Join(dir, "internal/build/engine.go"), filepath.Join(dir, "internal/build/link.go")); err != nil {
+		t.Fatal(err)
+	}
+	files, errs, err := Walk(dir, Options{MaxBytes: 50, BuildSources: append([]string{paths[0]}, paths[3:]...)})
+	if err != nil || len(errs) != 0 {
+		t.Fatalf("walk errors: %v %v", err, errs)
+	}
+	if got := relPaths(files); !slices.Equal(got, []string{paths[0]}) {
+		t.Fatalf("exact build source got %v; want only %s", got, paths[0])
+	}
+	files, _, err = Walk(dir, Options{})
+	if err != nil || len(files) != 0 {
+		t.Fatalf("default behavior changed: %v %v", relPaths(files), err)
+	}
+	files, _, err = Walk(dir, Options{BuildSources: []string{paths[0]}, Extra: []string{"build/"}})
+	if err != nil || len(files) != 0 {
+		t.Fatalf("explicit ignore must win: %v %v", relPaths(files), err)
+	}
+}
+
 func TestWalkIndexesMarkdown(t *testing.T) {
 	dir := t.TempDir()
 	mkfile(t, dir, "docs/plan.md", "# Plan\n\nbody")
@@ -66,10 +95,13 @@ func TestDefaultIgnoreSkipsNodeModulesAndVendor(t *testing.T) {
 	mkfile(t, dir, "main.go", "package main")
 	mkfile(t, dir, "node_modules/foo/index.ts", "x")
 	mkfile(t, dir, "vendor/bar/lib.go", "x")
+	mkfile(t, dir, "web/viewer/node_modules/foo.ts", "x")
+	mkfile(t, dir, "tools/vendor/lib.go", "x")
+	mkfile(t, dir, "web/node_modulesx/kept.ts", "x")
 
 	files, _, _ := Walk(dir, Options{})
 	got := relPaths(files)
-	if !slices.Equal(got, []string{"main.go"}) {
+	if !slices.Equal(got, []string{"main.go", "web/node_modulesx/kept.ts"}) {
 		t.Errorf("DefaultIgnore not honored: got %v", got)
 	}
 }
@@ -307,4 +339,22 @@ func stringRepeat(s string, n int) string {
 		out = append(out, s...)
 	}
 	return string(out)
+}
+
+func TestBuildSourceScopeRejectsBroadOrEscapingPaths(t *testing.T) {
+	for _, rel := range []string{"../build/main.go", "/build/main.go", "internal/build/*.go", "internal/build/../build/a.go", "internal/build/a.md", "internal/x.go", "internal\\build\\a.go"} {
+		if _, _, err := Walk(t.TempDir(), Options{BuildSources: []string{rel}}); err == nil {
+			t.Errorf("accepted invalid build source %q", rel)
+		}
+	}
+	dir := t.TempDir()
+	file := filepath.Join(dir, "scope.json")
+	for _, raw := range []string{`{"schema_version":2,"paths":["build/a.go"]}`, `{"schema_version":1,"paths":["build/a.go","build/a.go"]}`, `{"schema_version":1,"paths":["build/a.go"],"unexpected":true}`, `{"schema_version":1,"paths":["build/a.go"]}{}`} {
+		if err := os.WriteFile(file, []byte(raw), 0600); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := LoadBuildSources(file); err == nil {
+			t.Errorf("accepted bad build source manifest %s", raw)
+		}
+	}
 }

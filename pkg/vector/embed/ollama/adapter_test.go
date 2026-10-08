@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -21,6 +23,64 @@ func TestResolveMaxInput_RegistryAware(t *testing.T) {
 		if got := resolveMaxInput(model); got != want {
 			t.Errorf("resolveMaxInput(%q) = %d; want %d", model, got, want)
 		}
+	}
+}
+
+func TestResolveRuntimeOptions_BGEOnly(t *testing.T) {
+	for _, model := range []string{"bge-m3", "bge-m3:latest", "bge-m3:567m"} {
+		got := resolveRuntimeOptions(model)
+		if got == nil || got.NumCtx != 8192 || got.NumBatch != 8192 {
+			t.Errorf("%s: unexpected runtime options %+v", model, got)
+		}
+	}
+	for _, model := range []string{"qwen3-embedding:0.6b", "bge-large-en-v1.5", "other"} {
+		if got := resolveRuntimeOptions(model); got != nil {
+			t.Errorf("%s: unexpected runtime options %+v", model, got)
+		}
+	}
+}
+
+func TestOpen_BGERuntimeOptionsAndIdentity(t *testing.T) {
+	var embedCalls int
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/tags":
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{
+				"name": "bge-m3:latest", "digest": strings.Repeat("a", 64),
+			}}})
+		case "/api/embed":
+			var req embedRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				t.Errorf("decode: %v", err)
+			}
+			if req.Truncate || req.Options == nil || req.Options.NumCtx != 8192 || req.Options.NumBatch != 8192 {
+				t.Errorf("unsafe bge-m3 embedding request: %+v", req)
+			}
+			embedCalls++
+			_ = json.NewEncoder(w).Encode(embedResponse{Model: "bge-m3:latest", Embeddings: [][]float32{{1, 2, 3}}})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+	a, err := Open(Options{Endpoint: server.URL, ModelName: "bge-m3"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := a.Embed(context.Background(), []string{"full passage"}); err != nil {
+		t.Fatal(err)
+	}
+	if embedCalls != 2 { // startup probe and ordinary passage
+		t.Fatalf("embed calls = %d, want 2", embedCalls)
+	}
+	id := a.Identity()
+	if id.RuntimeContextTokens != 8192 || id.RuntimeBatchTokens != 8192 {
+		t.Fatalf("runtime identity not pinned: %+v", id)
+	}
+	legacy := id
+	legacy.RuntimeContextTokens, legacy.RuntimeBatchTokens = 0, 0
+	if id.Checksum() == legacy.Checksum() {
+		t.Fatal("new runtime settings must require reindex from previous Ollama bge-m3")
 	}
 }
 
@@ -161,5 +221,85 @@ func TestAdapter_Interface(t *testing.T) {
 	}
 	if err := a.Close(); err != nil {
 		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestOpen_PinsDigestAndQueryPolicy(t *testing.T) {
+	var changed atomic.Bool
+	var changeDuringEmbed atomic.Bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/tags":
+			digest := strings.Repeat("a", 64)
+			if changed.Load() {
+				digest = strings.Repeat("b", 64)
+			}
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "qwen3-embedding:0.6b", "digest": digest}}})
+		case "/api/embed":
+			var req embedRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				t.Errorf("decode: %v", err)
+			}
+			if req.Truncate {
+				t.Error("truncate must be false")
+			}
+			if req.Options != nil {
+				t.Errorf("qwen3 runtime options unexpectedly changed: %+v", req.Options)
+			}
+			_ = json.NewEncoder(w).Encode(embedResponse{Model: "qwen3-embedding:0.6b", Embeddings: [][]float32{{1, 2, 3}}})
+			if changeDuringEmbed.Load() {
+				changed.Store(true)
+			}
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+	model := "qwen3-embedding:0.6b"
+	withPrefix, err := Open(Options{Endpoint: server.URL, ModelName: model, QueryPrefixPolicy: "registry"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	withoutPrefix, err := Open(Options{Endpoint: server.URL, ModelName: model, QueryPrefixPolicy: "none"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if withPrefix.Identity().ModelDigest != strings.Repeat("a", 64) {
+		t.Fatalf("digest not pinned: %+v", withPrefix.Identity())
+	}
+	if withPrefix.Identity().Checksum() == withoutPrefix.Identity().Checksum() {
+		t.Fatal("query policy must change identity")
+	}
+	changed.Store(true)
+	if _, err := withPrefix.Embed(context.Background(), []string{"hello"}); err == nil || !strings.Contains(err.Error(), "model_changed") {
+		t.Fatalf("digest replacement should fail, got %v", err)
+	}
+	changed.Store(false)
+	changeDuringEmbed.Store(true)
+	if _, err := withPrefix.Embed(context.Background(), []string{"hello"}); err == nil || !strings.Contains(err.Error(), "model_changed") {
+		t.Fatalf("replacement during an embedding batch should fail, got %v", err)
+	}
+}
+
+func TestOpen_RejectsMissingDigestAndAmbiguousAlias(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{
+			{"name": "bge-m3", "digest": strings.Repeat("a", 64)},
+			{"name": "bge-m3:latest", "digest": strings.Repeat("b", 64)},
+		}})
+	}))
+	defer server.Close()
+	if _, err := Open(Options{Endpoint: server.URL, ModelName: "bge-m3"}); err == nil || !strings.Contains(err.Error(), "ambiguous") {
+		t.Fatalf("ambiguous alias should fail, got %v", err)
+	}
+	if _, err := Open(Options{Endpoint: server.URL, ModelName: "bge-m3:latest"}); err == nil || !strings.Contains(err.Error(), "connectivity") {
+		t.Fatalf("explicit tag should reach embed probe, got %v", err)
+	}
+	missing := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "bge-m3:latest"}}})
+	}))
+	defer missing.Close()
+	if _, err := Open(Options{Endpoint: missing.URL, ModelName: "bge-m3"}); err == nil || !strings.Contains(err.Error(), "valid SHA-256 digest") {
+		t.Fatalf("missing digest should fail, got %v", err)
 	}
 }

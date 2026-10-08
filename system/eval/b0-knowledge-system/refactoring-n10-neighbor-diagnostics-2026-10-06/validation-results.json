@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "scope": "N10 typed error diagnosis substep; no new quality or paired p95 measurement",
+  "go_race_packages": [
+    "github.com/0xmhha/knowledge-system/internal/system/backendmeasure",
+    "github.com/0xmhha/knowledge-system/internal/system/ckgclient",
+    "github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
+  ],
+  "python_report_controls": 17,
+  "native_real_sqlite_calls": 3,
+  "native_nonreturned_calls": 2,
+  "native_typed_seed_unresolved": 1,
+  "original_outcome_and_denominators_preserved": true,
+  "generic_vs_typed_composer_output_unchanged": true,
+  "source_argument_sha_binding_preserved": true,
+  "past_unbound_errors_reclassified": 0,
+  "fresh_bge_retrieval_queries": 0,
+  "new_final_units": 0,
+  "quality_metrics": null,
+  "warm_p95_ratio": null,
+  "commands": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./internal/system/ckgclient",
+        "./internal/system/backendmeasure",
+        "./internal/system/composer/stage3",
+        "-count=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./internal/system/ckgclient",
+        "./internal/system/backendmeasure",
+        "./internal/system/composer/stage3"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_b1_matrix_summary.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/check-boundaries.sh"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

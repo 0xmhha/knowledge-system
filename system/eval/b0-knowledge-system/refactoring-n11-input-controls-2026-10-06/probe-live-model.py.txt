@@ -1,0 +1,10 @@
+import datetime,hashlib,importlib.util,json,pathlib,platform,time
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n11-input-controls-2026-10-06'
+p=root/'scripts/b0-preflight.py';spec=importlib.util.spec_from_file_location('b0_identity',p);mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+expected=json.load(open(root/'system/eval/b0-knowledge-system/protocol-m2max-draft.json'))['model']
+start=time.monotonic();actual,reason=mod.ollama_identity(expected['endpoint'],expected['model'])
+if actual and any(actual.get(k)!=expected.get(k) for k in ['provider','model','digest','dimension','runtime_options']):reason='approved_model_input_mismatch'
+result={'status':'verified_live_identity' if reason is None else 'pending','checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-start,'hardware':mod.hardware(),'actual_model':actual,'expected_model':expected,'pending_reason':reason,'probe_source_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'scope':'one constant identity embedding; not a DEV/FINAL retrieval, quality, latency or cost experiment','evaluation_questions_executed':0,'model_unload_requested':False,'dataset_binary_runtime_ready':False}
+(e/'live-model-identity.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ['status','checked_at','pending_reason','evaluation_questions_executed']}))
+if actual:print(json.dumps(actual))

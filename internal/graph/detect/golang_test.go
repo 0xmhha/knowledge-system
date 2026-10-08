@@ -28,6 +28,21 @@ func writeGoMod(t *testing.T, root, sub, mod string) {
 	writeFile(t, root, filepath.Join(sub, "go.mod"), "module "+mod+"\n\ngo 1.22\n")
 }
 
+func TestEmptyGoModuleDoesNotRequireToolchain(t *testing.T) {
+	root := t.TempDir()
+	writeGoMod(t, root, ".", "example.com/docs")
+	writeFile(t, root, "README.md", "# Documentation only\n")
+	t.Setenv("PATH", t.TempDir())
+	pkgs, err := detect.GoPackages(root)
+	if err != nil || len(pkgs) != 0 {
+		t.Fatalf("empty module invoked the Go toolchain: packages=%d err=%v", len(pkgs), err)
+	}
+	writeFile(t, root, "main.go", "package docs\n")
+	if _, err := detect.GoPackages(root); err == nil {
+		t.Fatal("real Go source silently indexed without a Go toolchain")
+	}
+}
+
 // TestGoFiles_BuildConstraintExcluded verifies that files gated behind a
 // build constraint no toolchain satisfies (`//go:build never`) are excluded
 // from the result, while regular files remain.
@@ -192,6 +207,21 @@ func TestGoFiles_TestFilesIncluded(t *testing.T) {
 func TestGoFiles_ErrorOnMissingSrc(t *testing.T) {
 	if _, err := detect.GoFiles("/no/such/path/exists/for-real"); err == nil {
 		t.Error("expected error for non-existent srcRoot")
+	}
+}
+
+func TestGoFiles_RejectsBrokenGoToolchainInsteadOfEmptyIndex(t *testing.T) {
+	root := t.TempDir()
+	writeGoMod(t, root, "", "example.test/broken-cache")
+	writeFile(t, root, "main.go", "package broken\nfunc Present() {}\n")
+	cacheDir := filepath.Join(t.TempDir(), "read-only-cache")
+	if err := os.Mkdir(cacheDir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(cacheDir, 0o755) })
+	t.Setenv("GOCACHE", cacheDir)
+	if _, err := detect.GoFiles(root); err == nil {
+		t.Fatal("invalid Go build cache produced a successful empty file set")
 	}
 }
 

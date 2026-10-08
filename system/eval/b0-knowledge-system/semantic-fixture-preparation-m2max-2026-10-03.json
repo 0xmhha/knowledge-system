@@ -1,0 +1,1407 @@
+{
+  "schema_version": 1,
+  "gate": "B0-05 development proposal preparation and ontology+knowledge structural correction",
+  "checked_at": "2026-10-03T14:52:53.333698+00:00",
+  "base_commit": "62e41e5fc2776d6103708efba3cb13e97c46ac73",
+  "working_changes": true,
+  "state": "prepared_pending_human_review",
+  "binary_sha256": "9439573efcee682ee2eea4b9b5db4b1e9246bd42eff0b55ab6f082eae16f67cb",
+  "input_manifest_sha256": "b3b30220e458405b420ba391c2696dd2efc9aa51e391abb9ff6d9d65d91d8fc7",
+  "quality_metrics": null,
+  "release": "preview",
+  "runtime": {
+    "mock": {
+      "review_manifest": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/review-manifest.json",
+      "runtime_summary": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/summary.json",
+      "cases": 4,
+      "requests": 14,
+      "status": "prepared_pending_human_review",
+      "semantic_current_empty": true,
+      "all_semantic_facts_proposed": true,
+      "semantic_db_unchanged_on_queries": true
+    },
+    "real": {
+      "review_manifest": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/review-manifest.json",
+      "runtime_summary": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/summary.json",
+      "cases": 4,
+      "requests": 14,
+      "status": "prepared_pending_human_review",
+      "semantic_current_empty": true,
+      "all_semantic_facts_proposed": true,
+      "semantic_db_unchanged_on_queries": true
+    }
+  },
+  "checks": [
+    {
+      "id": "python-regression",
+      "command": "python3 -m unittest scripts/test_b0_preflight.py scripts/test_b0_isolate_corpus.py scripts/test_b0_materialize_fixtures.py scripts/test_b0_semantic_review.py",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/python-all.txt"
+    },
+    {
+      "id": "materializer-before",
+      "command": "python3 -m unittest scripts/test_b0_materialize_fixtures.py",
+      "exit_code": 1,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/materializer-before.txt"
+    },
+    {
+      "id": "materializer-after",
+      "command": "python3 -m unittest scripts/test_b0_materialize_fixtures.py",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/materializer-after.txt"
+    },
+    {
+      "id": "mcp-before",
+      "command": "go test ./internal/system/mcp -run TestV2KnowledgeRequestAcceptsStampedOntologyDiagnostic -count=1",
+      "exit_code": 1,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/ontology-knowledge-before.txt"
+    },
+    {
+      "id": "mcp-after",
+      "command": "go test ./internal/system/mcp ./internal/system/evidencev2 ./internal/system/semantic",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/ontology-knowledge-after.txt"
+    },
+    {
+      "id": "go-all",
+      "command": "go test ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/go-test-all.txt"
+    },
+    {
+      "id": "race",
+      "command": "go test -race ./internal/system/mcp ./internal/system/evidencev2 ./internal/system/semantic",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/race.txt"
+    },
+    {
+      "id": "vet",
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/vet.txt"
+    },
+    {
+      "id": "build",
+      "command": "go build -o bin/cks ./cmd/cks",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/build-fixed.txt"
+    },
+    {
+      "id": "mock-preparation",
+      "command": "python3 scripts/b0-prepare-semantic-review.py --out /private/tmp/ks-b0-semantic-review-fixed-mock-20261003",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-fixed-mock.txt"
+    },
+    {
+      "id": "real-preparation",
+      "command": "python3 scripts/b0-prepare-semantic-review.py --out /private/tmp/ks-b0-semantic-review-fixed-real-20261003 --embedder ollama --model-name bge-m3:latest --ollama-url http://127.0.0.1:11434",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-fixed-real.txt"
+    },
+    {
+      "id": "mock-runtime",
+      "command": "python3 scripts/b0-verify-proposed-fixtures.py --review-dir /private/tmp/ks-b0-semantic-review-fixed-mock-20261003 --out /private/tmp/ks-b0-semantic-runtime-final2-mock-20261003",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-final2-mock.txt"
+    },
+    {
+      "id": "real-runtime",
+      "command": "python3 scripts/b0-verify-proposed-fixtures.py --review-dir /private/tmp/ks-b0-semantic-review-fixed-real-20261003 --out /private/tmp/ks-b0-semantic-runtime-final-real-20261003",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-final-real.txt"
+    },
+    {
+      "id": "unrelated-test",
+      "command": "go -C /private/tmp/ks-b0-semantic-review-fixed-real-20261003/fixtures/F-06-DEV/repo test ./...",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/f06-unrelated-test.txt"
+    },
+    {
+      "id": "boundaries",
+      "command": "./scripts/check-boundaries.sh",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/boundaries.txt"
+    },
+    {
+      "id": "docs",
+      "command": "python3 scripts/check-docs.py",
+      "exit_code": 0,
+      "raw_output": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/docs-final.txt"
+    }
+  ],
+  "source_hashes": {
+    "scripts/b0-materialize-fixtures.py": "a2bab6d315a74581ac04845dc1764221f989457c4d9550162f052246a152d95a",
+    "scripts/test_b0_materialize_fixtures.py": "78c22bad91d7fddd2fbd8cd2f3f8aa0a1d163249c2449b95b2fa2cf2f7fa2e69",
+    "scripts/b0-prepare-semantic-review.py": "9bd24c393c593de648030becaf1b0b2f021bedfd757b7bb95346b4a6e378a0d9",
+    "scripts/b0-verify-proposed-fixtures.py": "e73deb95634ba70cbf446154446af6942a11deab3bed6ac07365e13dbc422dbb",
+    "scripts/test_b0_semantic_review.py": "0ec19963d394c54c8bea411e0ee273e517a8733b100f3a3835693a7805e18a5c",
+    "internal/system/mcp/get_for_task_v2.go": "7b862f2901320173255172a7bcd3ef928bcfcfe61e4cc4ddbc3fa64b1a156d96",
+    "internal/system/mcp/server_test.go": "b220a38e5f7d7950bfb1f6a6a9febf89667641b5fa8b3bbf63322a0f10b68f3b",
+    "internal/system/mcp/get_for_task_v2_ontology_knowledge_test.go": "1c62ac9aca041b7751b68b84c6f00f1399ee756c9c5dd66e9c6ff641d7a0d67d",
+    "docs/spec-driven/B0-SEMANTIC-FIXTURE-REVIEW.md": "fa786094f4d11fe9416284ef614de5ccbc387434d9a4a9bc2d32cad0dd4178a2",
+    "docs/spec-driven/EXECUTION-WORKLIST.md": "199c4e6203dc7c01aa51bc89561684aaacf332a310c731b32a31402b1bd1c75b",
+    "docs/spec-driven/EXECUTION.md": "02ba7eba212d125d0b381d5e86c4e8e73cd8eb2861ced94a3c6ebedd78125c49",
+    "docs/spec-driven/REMOTE-SESSION-HANDOFF.md": "79feea51ccc092d7fef0e245bff409070aff9d61d36145fca153421f93bd9951"
+  },
+  "artifacts": [
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/before-fix/F-03-DEV-current-combined-capture.txt",
+      "sha256": "0e096edd41ec334910afa9b393b91bb9fc545454a34c38a78cc75f32b3fae0c4",
+      "bytes": 98
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/before-fix/F-03-DEV-current-combined-requests.json",
+      "sha256": "7733e5364704335a810c17391e6fc20686ddebf6b91e224125f30a76862e48fb",
+      "bytes": 818
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/before-fix/F-03-DEV-current-combined.json",
+      "sha256": "cd7b08986312e941d1574709a87ff3119f15f9e07e4646320a259f3a3446f8d4",
+      "bytes": 3593
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/before-fix/F-03-DEV-current-combined.yaml",
+      "sha256": "3407598274d75dbfaec67e7a8e1b219cab26c6d72d8faf7a97b9e6451129dfde",
+      "bytes": 1343
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/before-fix/checks.json",
+      "sha256": "55f18b91d0c8cff6e7d6d74ec02b6b95edb592f07eac57004fffe8ad8ecbe97c",
+      "bytes": 3395
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/boundaries.txt",
+      "sha256": "7db83c9126df609d6abcd335551e990b310bc5e3c70ccc4874c9154b8c3f9a03",
+      "bytes": 22
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/build-fixed.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/docs-final.txt",
+      "sha256": "272292cbcbfdc18f0ed81ac3d6c16f59b09259f3e5df7da9f5b7e6b0c71ccd1d",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/docs.txt",
+      "sha256": "272292cbcbfdc18f0ed81ac3d6c16f59b09259f3e5df7da9f5b7e6b0c71ccd1d",
+      "bytes": 39
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/f06-unrelated-test.txt",
+      "sha256": "d2166a964bd358427a0625fa85404950294aacf7c4d954be4654f71f9658c857",
+      "bytes": 30
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/go-test-all.txt",
+      "sha256": "685c77965ff1bb81df77811721a4e5152f2687d009ff3cf6e43b54bb06614d6a",
+      "bytes": 9160
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/materializer-after.txt",
+      "sha256": "30ddbf2af95dbd672fe9e4a2189b947b04b4193ad789626ed3e4af1c9042d41d",
+      "bytes": 101
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/materializer-before.txt",
+      "sha256": "7ce1f12430a7a114466c394bea1d3eb3941145b523c33479d0c6ae8cb8b04195",
+      "bytes": 9524
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/normative-raw-audit.json",
+      "sha256": "ea1cf62da29c6895f842a0e21608d1f6b9fe71d149e2231fa7ea63633a45ebdd",
+      "bytes": 1845
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/ontology-knowledge-after.txt",
+      "sha256": "14312942c9644dbab1add27c07689fa5f2b1e92523cbcaa9917af14a271562b4",
+      "bytes": 217
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/ontology-knowledge-before.txt",
+      "sha256": "2c8de12978595286bd91f34b04628ef31749d069565a996ff777f041f907dca2",
+      "bytes": 549
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-final-mock.txt",
+      "sha256": "cbff9c5dd5152536f8b9c33b4c91ad8a29998a616c2790a9dd1ba8e95c2a5d1e",
+      "bytes": 80
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-final-real.txt",
+      "sha256": "cbff9c5dd5152536f8b9c33b4c91ad8a29998a616c2790a9dd1ba8e95c2a5d1e",
+      "bytes": 80
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-fixed-mock.txt",
+      "sha256": "cbff9c5dd5152536f8b9c33b4c91ad8a29998a616c2790a9dd1ba8e95c2a5d1e",
+      "bytes": 80
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-fixed-real.txt",
+      "sha256": "cbff9c5dd5152536f8b9c33b4c91ad8a29998a616c2790a9dd1ba8e95c2a5d1e",
+      "bytes": 80
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/prepare-mock.txt",
+      "sha256": "cbff9c5dd5152536f8b9c33b4c91ad8a29998a616c2790a9dd1ba8e95c2a5d1e",
+      "bytes": 80
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/proposal-unit.txt",
+      "sha256": "921b60a7fd52e978fbb551cacd29df2d6708879400278e1fcc70fceeb0c6f8e0",
+      "bytes": 101
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/python-all.txt",
+      "sha256": "98ead27624743973dcbb6cd32be4a1701f0c7afbd6450709b4779c075bc042fe",
+      "bytes": 114
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/race.txt",
+      "sha256": "9cedff5105a8b66a20375944f36baafc5f407dfadcb4bb6d625b2a738ccc7324",
+      "bytes": 215
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-final-mock.txt",
+      "sha256": "62057766329c71ba4a3ce0d61d740453bd6973927343487f0770d07e2455fcdf",
+      "bytes": 623
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-final-real.txt",
+      "sha256": "f3c111f3fd44e3bb0dc30fef00733bf484c208619b349db483bb5a79185cdd8d",
+      "bytes": 86
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-final2-mock.txt",
+      "sha256": "f3c111f3fd44e3bb0dc30fef00733bf484c208619b349db483bb5a79185cdd8d",
+      "bytes": 86
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-fixed-mock.txt",
+      "sha256": "1375e10a856daf1f903817d673045c23103e7bc7f66f812b32846d4072a2f3df",
+      "bytes": 749
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/runtime-mock.txt",
+      "sha256": "1abab8238c45d1067fcf7d4e916cee188700095cff580134d97f14371b1a765e",
+      "bytes": 990
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/source-bundle-audit.json",
+      "sha256": "60f5cdea40269c6589fc3311e47f7423f7417947819787ce1046e0ca3904b164",
+      "bytes": 1635
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/checks/vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/dataset-identity.json",
+      "sha256": "44d45f7f74b9674f12f2483d4dafaa93722108aa97d09a07cb577cd1f879bcea",
+      "bytes": 973
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/projection-proposed.json",
+      "sha256": "288bb8cac2495f4c5444bb16ac100482920cf508f2ed5379df63bf2888675da0",
+      "bytes": 27504
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/source/main.go",
+      "sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+      "bytes": 77
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/source/ontology.yaml",
+      "sha256": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+      "bytes": 8552
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current/source.bundle",
+      "sha256": "00614a448d36432e3aa96820eab34e7269d1e8fc33436809ebdb6752fbad7569",
+      "bytes": 3143
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current-extract.txt",
+      "sha256": "6d2a9b51a63060f52f0d5bbf00a651eca0d286dce7d6a13dd4c5949a2fc3fd65",
+      "bytes": 296
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current-setup.txt",
+      "sha256": "9abfa86b29b5fd27bdb6a3112e97a134197fe0d2a32de3ee13574e2d6573cc9b",
+      "bytes": 3819
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-03-DEV-current-validate-proposed.txt",
+      "sha256": "6eb17394aa538fe31614e64a779f8a8c6a255478692f5ddf1b82b9c8d6d3b2ce",
+      "bytes": 166
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/dataset-identity.json",
+      "sha256": "4e68fede8945a05001086b9373e452c94cedcac14d94888f1ddc83da3a3396ea",
+      "bytes": 973
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/projection-proposed.json",
+      "sha256": "68a10d8d4713f466fb7ee971c5eaca101447c2e810e920b118b5b808e6d4c013",
+      "bytes": 3507
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "26e62bcb7c2344f580b1627372a1a22408ce9236ed4422926c1eafd75be878ee",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/.cks/knowledge/manifest.yaml",
+      "sha256": "6d35f4fbb8fb011ce625b05c6dc13b42ea55b820edd7ece06e064ab0618ee1b4",
+      "bytes": 364
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "d40b7bb235b34f33479575674861c0ce223841400c33973c4e406a16cadea6e1",
+      "bytes": 453
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/docs/policy.md",
+      "sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/main.go",
+      "sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source/ontology.yaml",
+      "sha256": "4c925451ded85cf0787086ff03069de0281a3cd908d2e83b6f65c1a1e2c0f644",
+      "bytes": 825
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a/source.bundle",
+      "sha256": "2a06d2346eb0bc178f19bee71b23328ca5428d057cb6863f79016fc2e4557430",
+      "bytes": 2789
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-extract.txt",
+      "sha256": "c867574dd7a9a966841bdb32caa088a7e4c2c32d5c5fb0266a2606cbb6efdca6",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-knowledge-lock.txt",
+      "sha256": "5afdddbb3b64d08ac613b575e8b087a3cfe02fc7aea3498b58e77b2874c4e2cf",
+      "bytes": 269
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-knowledge-review.txt",
+      "sha256": "50c164f3a1386570ebab4d997f172ed8ecc80642e1a7cc12188306f09c5832ba",
+      "bytes": 254
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-knowledge-validate.txt",
+      "sha256": "0a5fddac907e7265f2eec6571361befed6ed540b33ef1d78f99a0f00b11184d9",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-setup.txt",
+      "sha256": "534808f8ed05bcc8ccf3ac6e23b9ce17b562fd3a10edba9893738f17a8d938a9",
+      "bytes": 3801
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-a-validate-proposed.txt",
+      "sha256": "4069a57c0ee1ad25c71c251aa9b7b060b4172552cfe07ac4bd52d0b6cb90deb7",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/dataset-identity.json",
+      "sha256": "6be8c5e23f8e8ac37cebf7da23e641cb3d2bd6ade45319ab5148ee9eb83a7014",
+      "bytes": 973
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/projection-proposed.json",
+      "sha256": "4f38ee0eab27c302a407bc4507cdda9aab9fc7c5c857129bb7795df9585f8486",
+      "bytes": 3507
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "227a52bf8462c4b4279d23ad20bfef5ea75cdfd638d5bfc06dbf5e56a6a5e07a",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/.cks/knowledge/manifest.yaml",
+      "sha256": "6cbdf1e9f6cfa0a1e1f9b6dae885e9079b22d9e18bff65739911b7cef6540934",
+      "bytes": 364
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "1ed3ea8529365f53c070f233a39fe669d8658457bf14daade33baea78968b9f5",
+      "bytes": 453
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/docs/policy.md",
+      "sha256": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/main.go",
+      "sha256": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source/ontology.yaml",
+      "sha256": "e67219493f0efab406e36e03c4f2124dc6367b67654d1565489a65c9434e62c5",
+      "bytes": 825
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b/source.bundle",
+      "sha256": "54e4dc29e4e0f7cdd03698f9353a30a17694ee74208031838aea8d55401655d1",
+      "bytes": 2793
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-extract.txt",
+      "sha256": "4ea29757cd00c67e9e7ee944015959c7879164e106a5df38022239735c4a308d",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-knowledge-lock.txt",
+      "sha256": "ae3f07393454711824744637087d731ce0c46556336d55f2bd894fbd2402d0ee",
+      "bytes": 269
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-knowledge-review.txt",
+      "sha256": "72b0285092c1e9972b0f3a17cc3ed7d2c8b3e36473690e8368b81d2d6593c2ff",
+      "bytes": 254
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-knowledge-validate.txt",
+      "sha256": "8b5a563a71ace6cf310583b95c51adbe490b030550aff7fe57733d7559c9fffc",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-setup.txt",
+      "sha256": "883d3043415e374304d63a794bc0a42378d3e9d32c838fb15e584eefba42f4c3",
+      "bytes": 3801
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-05-DEV-b-validate-proposed.txt",
+      "sha256": "91fb52aaf23f388e286e2caeff1438ec41b6b609a92a50d9247daf08d400fe9a",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/dataset-identity.json",
+      "sha256": "53821d546fc5d2c1106a666df0e67c0b3b372896a60bd35c9a9fecdc32f8a5d4",
+      "bytes": 971
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/projection-proposed.json",
+      "sha256": "f4d742d2a0f624f2bed67bf37dc3983d6ebadb834e7da4f2bcd1cd14829e4cf2",
+      "bytes": 6397
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "ebee0fba239f80abd673e8a17a58ba7f2039e6b48ce1e62297f51e81c049bf7c",
+      "bytes": 481
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/.cks/knowledge/manifest.yaml",
+      "sha256": "5f27bbad2ee9b36e01391c15c5825266071bd99dced142401e6be1dc180da653",
+      "bytes": 362
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+      "bytes": 460
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/README.md",
+      "sha256": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+      "bytes": 74
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/main.go",
+      "sha256": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+      "bytes": 54
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/main_test.go",
+      "sha256": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+      "bytes": 103
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/ontology.yaml",
+      "sha256": "fc1db1ba329abdccfe6fc229274f2f1a00c5646f32eb14b54648582d46ea147b",
+      "bytes": 977
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source/spec.yaml",
+      "sha256": "6e744a4e5b2332e3b1c2d1f8c3b61551fe350b523b3acbae82572a8ff1a41d83",
+      "bytes": 596
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current/source.bundle",
+      "sha256": "fb96940410efb16c25a1ca1164e8f2e81785ea107f7c1087a90e1caba34bb260",
+      "bytes": 3202
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-extract.txt",
+      "sha256": "c563c5802db9c69e1867c51c18bb5e451b0d1426c843cddbebd76c81f63e1bfc",
+      "bytes": 292
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-knowledge-lock.txt",
+      "sha256": "5fcd5d27f84fa7ccdf64c85b1385dfc3b2a295667ae8c878e98d63023d0bd76a",
+      "bytes": 262
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-knowledge-review.txt",
+      "sha256": "6c3722fc1ad7ffee7f750a03aa378487ff94c51b8578381731a6ea8542541404",
+      "bytes": 252
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-knowledge-validate.txt",
+      "sha256": "1205cc4191217d9a0a476de6dca8494ead19ffa2a8e9638bef9a9168969798e2",
+      "bytes": 214
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-setup.txt",
+      "sha256": "2f5e53b06d61656f3222715632afa00084ecff496a921489a338105229725632",
+      "bytes": 3838
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/F-06-DEV-current-validate-proposed.txt",
+      "sha256": "452d339df784841b6c0dc2d1b6d856878a763fd2171b53d9faa38eca196396c4",
+      "bytes": 163
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/execution-checks.json",
+      "sha256": "54253398e507606e0f0be2aba3010f30a4e4c583afd1a4bd08850138346ae26c",
+      "bytes": 18695
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/review-manifest.json",
+      "sha256": "9c19372ed1f52228eb919f7a608798e0ee096b9b6a1e732a8dcdf190e5ffea7f",
+      "bytes": 30637
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-baseline-config.txt",
+      "sha256": "44e12ff269428c304de95dc36eb072c9f1c3f49d2a920ce07258602c8c403890",
+      "bytes": 151
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-baseline-requests.json",
+      "sha256": "a926f5db8195b33d232a3b226a296f4eaa251c422257c2525642dccc1efd83ca",
+      "bytes": 467
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-baseline.json",
+      "sha256": "6994bae7260932b1f8a7f58cc144be0328720ca607f9bc2475ae7bdf52d738a4",
+      "bytes": 8533
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-baseline.yaml",
+      "sha256": "5688f2e623caad81392784f1acac3d9113733f611c2f65b2528fca23d7bc30e1",
+      "bytes": 1343
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-combined-config.txt",
+      "sha256": "16c0e5421be5993981b99281436b421b9f7fd3d58e8f6e870c96432f8743d8f4",
+      "bytes": 151
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-combined-requests.json",
+      "sha256": "7733e5364704335a810c17391e6fc20686ddebf6b91e224125f30a76862e48fb",
+      "bytes": 818
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-combined.json",
+      "sha256": "bdf202e6843d91816fd2b5dbdbb50cd1d86164288f14d8b050935247a0ea1428",
+      "bytes": 9737
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-03-DEV-current-combined.yaml",
+      "sha256": "b5055b3575dedc97658dd2ecca642327d2ec278a8867a9f11cdb0710a2df69be",
+      "bytes": 1343
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-baseline-config.txt",
+      "sha256": "ed5ac6ba5d746c38bdedbd7221367809c58908775fd7942d10de94441d8948b5",
+      "bytes": 145
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-baseline-requests.json",
+      "sha256": "a370ab79ce9af786d5183c84ae1411509dead8b9c58a2635f033d36977845344",
+      "bytes": 230
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-baseline.json",
+      "sha256": "374a51830baf66bb821f027d9c758200c7ce70d575c5e184e9146e58d4cc6f14",
+      "bytes": 4111
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-baseline.yaml",
+      "sha256": "9c684ce6bb1ca789fadc1366b6096c5f2b0a0b69be65461b71c8eb374bf6ec0e",
+      "bytes": 1330
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-combined-config.txt",
+      "sha256": "3670f4387066e69df84a12a196a1cd1d8f8f40e8d1b33b9d238a06e166e60b20",
+      "bytes": 145
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-combined-requests.json",
+      "sha256": "4b44c7a62529712755ebd38def7207a60722cc9cf7e394ed543cb98a137c29a8",
+      "bytes": 347
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-combined.json",
+      "sha256": "531e9c59766a8c7d9a5f57c380deb179207d731552119fe54c3caa7fc8c47779",
+      "bytes": 6428
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-a-combined.yaml",
+      "sha256": "75d22aace30c1c602f4ceb18906f2b9de03bdcd8f529687b15d5e887af9cef5a",
+      "bytes": 1330
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-baseline-config.txt",
+      "sha256": "b1234c6006947b4fa789d72dfa2cab885e8689432c1e417c05f777be96e26187",
+      "bytes": 145
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-baseline-requests.json",
+      "sha256": "a370ab79ce9af786d5183c84ae1411509dead8b9c58a2635f033d36977845344",
+      "bytes": 230
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-baseline.json",
+      "sha256": "372347a3c36fde59c45c8fba2a6b6151edc5df279398b0ef7e1f60cbd1fe883d",
+      "bytes": 4111
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-baseline.yaml",
+      "sha256": "a63021e4e5cad93d29d4a11f64e2c877fc53ac32ec89f7707cfe00acb995a889",
+      "bytes": 1330
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-combined-config.txt",
+      "sha256": "da5440b0306a82abc9944f2dc46af1b08293977bf17d5715f94e8cf2f848c845",
+      "bytes": 145
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-combined-requests.json",
+      "sha256": "4b44c7a62529712755ebd38def7207a60722cc9cf7e394ed543cb98a137c29a8",
+      "bytes": 347
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-combined.json",
+      "sha256": "ac96cdf400baa141fe86dab2eeecd0ce252151b5f355e0cdb80aa7e18aaa557a",
+      "bytes": 6429
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-05-DEV-b-combined.yaml",
+      "sha256": "a94fa643ee093e81cb06973fe64bb29f6180957157c37e86edf4153ca6128437",
+      "bytes": 1330
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-baseline-config.txt",
+      "sha256": "fd0396951e1509da619db8234639470fade63d01c7280f16fc1a80312525ae18",
+      "bytes": 151
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-baseline-requests.json",
+      "sha256": "108745662587698740fafc0e0653eb47b3f0efcb9dd47cd6724e94d9ff136689",
+      "bytes": 504
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-baseline.json",
+      "sha256": "6f306f1b1663782dbdab4481cff900f8ea64b79a91034d4c070ca3ef3a715b6c",
+      "bytes": 14616
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-baseline.yaml",
+      "sha256": "99903058aca05da84f975c347ad6d3d63c1f31488505831222d21f44c393c185",
+      "bytes": 1343
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-combined-config.txt",
+      "sha256": "51e1328efd7a1dc216c999b6e378ecd2479a0e48682f142286a4c84018f5d165",
+      "bytes": 151
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-combined-requests.json",
+      "sha256": "19ef68b2ba92512fcf6728e8cb4a97a10e181744f3be7984d6c1a23e912be37b",
+      "bytes": 738
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-combined.json",
+      "sha256": "e27a8156bd60c5a661197d6aad0953b0e9415d0f046a59429b1a6001cafd7c3b",
+      "bytes": 22695
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/F-06-DEV-current-combined.yaml",
+      "sha256": "04b085fb0d58d756d75cb6d5f629b6ceeb3873e4d0b1fe8961e35874e29c346a",
+      "bytes": 1343
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/checks.json",
+      "sha256": "a973ddbb0a8fd9fcd1a27a2cb126bcc81b779cee3a49ab1fd8be034051320465",
+      "bytes": 13575
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/mock/runtime/summary.json",
+      "sha256": "1b93e9774ad9a063d79aa66ed9ce1e5d29f2df3062a9bf9a8c482ae579f6d5ac",
+      "bytes": 26470
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/dataset-identity.json",
+      "sha256": "50435293a0b743fe100b2d0aa1f12947f013f18716913eca2adb8584b41bc7cd",
+      "bytes": 1318
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/projection-proposed.json",
+      "sha256": "50a7a368c1d7cea99387464cbb32bbc7dfab1101de6b32ad5c919de36fde231c",
+      "bytes": 27504
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/source/main.go",
+      "sha256": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+      "bytes": 77
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/source/ontology.yaml",
+      "sha256": "1802e95323b7df624ac0c44320f86664d13e220ec7204a871e22482251bb2837",
+      "bytes": 8552
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current/source.bundle",
+      "sha256": "00614a448d36432e3aa96820eab34e7269d1e8fc33436809ebdb6752fbad7569",
+      "bytes": 3143
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current-extract.txt",
+      "sha256": "e4296996f03e9e8d72fdd14d6d73a5c913f3e21fdc2749db2071d1263a810eab",
+      "bytes": 296
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current-setup.txt",
+      "sha256": "5efc8300067045b9c0b535898ce2b56e9092e5a01ab0de3394893943c8dde249",
+      "bytes": 3983
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-03-DEV-current-validate-proposed.txt",
+      "sha256": "24b82503e1d4c31940c4f4adc5ffbc6637afd5125eb5bf6a6a0ab646ace16efd",
+      "bytes": 166
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/dataset-identity.json",
+      "sha256": "c0fc3e111888363aa1565ac5b30043aafec4c869422fc0643e6b3aa8e338a685",
+      "bytes": 1318
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/projection-proposed.json",
+      "sha256": "2e333021cd05bea2f56e5af7ed1404c0ae2e20367e2976a6e4166c2388edbd2b",
+      "bytes": 3507
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "26e62bcb7c2344f580b1627372a1a22408ce9236ed4422926c1eafd75be878ee",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/.cks/knowledge/manifest.yaml",
+      "sha256": "6d35f4fbb8fb011ce625b05c6dc13b42ea55b820edd7ece06e064ab0618ee1b4",
+      "bytes": 364
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "d40b7bb235b34f33479575674861c0ce223841400c33973c4e406a16cadea6e1",
+      "bytes": 453
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/docs/policy.md",
+      "sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/main.go",
+      "sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source/ontology.yaml",
+      "sha256": "4c925451ded85cf0787086ff03069de0281a3cd908d2e83b6f65c1a1e2c0f644",
+      "bytes": 825
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a/source.bundle",
+      "sha256": "2a06d2346eb0bc178f19bee71b23328ca5428d057cb6863f79016fc2e4557430",
+      "bytes": 2789
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-extract.txt",
+      "sha256": "69ad02f8ae49ef5f03e6bcb6c32c362be0dbd207347ce88931061a2e552af439",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-knowledge-lock.txt",
+      "sha256": "3f04b8514d126987197ed83c7980a8b7b10adbb034f3b6d1865b68f93e403d8a",
+      "bytes": 269
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-knowledge-review.txt",
+      "sha256": "50c164f3a1386570ebab4d997f172ed8ecc80642e1a7cc12188306f09c5832ba",
+      "bytes": 254
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-knowledge-validate.txt",
+      "sha256": "0a5fddac907e7265f2eec6571361befed6ed540b33ef1d78f99a0f00b11184d9",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-setup.txt",
+      "sha256": "4a58e39920cbf59aeedc69169562a9f197c79942aa95518b90303dcd54e33ff9",
+      "bytes": 3962
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-a-validate-proposed.txt",
+      "sha256": "fcb8eec7c8b1cfd99c9e83f12a9595b86d428e93844d5b269446afd7959b04c0",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/dataset-identity.json",
+      "sha256": "c741576cb44361d41c47f7f2e051904ff821a8866aa6b3e471fd2c62195a86dc",
+      "bytes": 1318
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/projection-proposed.json",
+      "sha256": "5dce1ae2bd035fe8c72dffc5684c9f04c13f4d1f100eb8c9c78690342f0abf99",
+      "bytes": 3507
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "227a52bf8462c4b4279d23ad20bfef5ea75cdfd638d5bfc06dbf5e56a6a5e07a",
+      "bytes": 483
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/.cks/knowledge/manifest.yaml",
+      "sha256": "6cbdf1e9f6cfa0a1e1f9b6dae885e9079b22d9e18bff65739911b7cef6540934",
+      "bytes": 364
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "1ed3ea8529365f53c070f233a39fe669d8658457bf14daade33baea78968b9f5",
+      "bytes": 453
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/docs/policy.md",
+      "sha256": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/main.go",
+      "sha256": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+      "bytes": 64
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source/ontology.yaml",
+      "sha256": "e67219493f0efab406e36e03c4f2124dc6367b67654d1565489a65c9434e62c5",
+      "bytes": 825
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b/source.bundle",
+      "sha256": "54e4dc29e4e0f7cdd03698f9353a30a17694ee74208031838aea8d55401655d1",
+      "bytes": 2793
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-extract.txt",
+      "sha256": "78bc027b00defa55b2b0e958ffab6b7443dbd3e4dddfd1b310ac91263990c1ee",
+      "bytes": 294
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-knowledge-lock.txt",
+      "sha256": "b914707e5cbd683bfbfd6a81a1b38c67420ab76b130a69c5b5ffd1071a553c26",
+      "bytes": 269
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-knowledge-review.txt",
+      "sha256": "72b0285092c1e9972b0f3a17cc3ed7d2c8b3e36473690e8368b81d2d6593c2ff",
+      "bytes": 254
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-knowledge-validate.txt",
+      "sha256": "8b5a563a71ace6cf310583b95c51adbe490b030550aff7fe57733d7559c9fffc",
+      "bytes": 216
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-setup.txt",
+      "sha256": "4a693e5a73659988b4bd0e1b13b7b387a4b1e9bd49a22f11d7a2025581a42c0d",
+      "bytes": 3962
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-05-DEV-b-validate-proposed.txt",
+      "sha256": "cf00e599482661441f8c120c4f0bf791c412702525d977bc48674cc8f7620856",
+      "bytes": 165
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/dataset-identity.json",
+      "sha256": "57ecd177216fef2a4c63201887604c85ba1319382116b6e7ecce86b5ceb958d6",
+      "bytes": 1316
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/projection-proposed.json",
+      "sha256": "354c00810522ed9ec251ce5b37f653ff50d32fe13f6531fc6c510fc30c9d11dd",
+      "bytes": 6397
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/.cks/knowledge/knowledge.lock.json",
+      "sha256": "ebee0fba239f80abd673e8a17a58ba7f2039e6b48ce1e62297f51e81c049bf7c",
+      "bytes": 481
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/.cks/knowledge/manifest.yaml",
+      "sha256": "5f27bbad2ee9b36e01391c15c5825266071bd99dced142401e6be1dc180da653",
+      "bytes": 362
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/.cks/knowledge/policies/refund-cap.yaml",
+      "sha256": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+      "bytes": 460
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/README.md",
+      "sha256": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+      "bytes": 74
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/fixture-packs/refund/pack.yaml",
+      "sha256": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+      "bytes": 493
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/go.mod",
+      "sha256": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+      "bytes": 34
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/main.go",
+      "sha256": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+      "bytes": 54
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/main_test.go",
+      "sha256": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+      "bytes": 103
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/ontology.yaml",
+      "sha256": "fc1db1ba329abdccfe6fc229274f2f1a00c5646f32eb14b54648582d46ea147b",
+      "bytes": 977
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source/spec.yaml",
+      "sha256": "6e744a4e5b2332e3b1c2d1f8c3b61551fe350b523b3acbae82572a8ff1a41d83",
+      "bytes": 596
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current/source.bundle",
+      "sha256": "fb96940410efb16c25a1ca1164e8f2e81785ea107f7c1087a90e1caba34bb260",
+      "bytes": 3202
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-extract.txt",
+      "sha256": "bd763d22a2ad63c967b555fc3c0f1ce7b9119bcef441c77a4c814b60dfcf50e2",
+      "bytes": 292
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-knowledge-lock.txt",
+      "sha256": "f8608e6436156b6dcbbf43516e4eb38e653db84c68eeeaa123f3e37ded556ac2",
+      "bytes": 262
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-knowledge-review.txt",
+      "sha256": "6c3722fc1ad7ffee7f750a03aa378487ff94c51b8578381731a6ea8542541404",
+      "bytes": 252
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-knowledge-validate.txt",
+      "sha256": "1205cc4191217d9a0a476de6dca8494ead19ffa2a8e9638bef9a9168969798e2",
+      "bytes": 214
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38",
+      "bytes": 123
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-setup.txt",
+      "sha256": "13fec6f6260336fc13b7f084c7c9125dfda4dd4f344d2e2c9c0270ea43c2b593",
+      "bytes": 3998
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/F-06-DEV-current-validate-proposed.txt",
+      "sha256": "8db1f476e3ab1cc29e6df415df60b9e81b9c914391860c7147f595871b5be7ce",
+      "bytes": 163
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/execution-checks.json",
+      "sha256": "5086cf155fc50f13b250423e5a40f748c35e893ddea1b082a904a57d0a7165cb",
+      "bytes": 19131
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/review-manifest.json",
+      "sha256": "b007b31967e5b16d5fc6824713f5518382fbbbfa85af8ea3bfef6a5ba3f1525b",
+      "bytes": 32743
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-baseline-config.txt",
+      "sha256": "72bafde8aea8986b0d02514ebe861d3c21f15c446867fd15c82a36b2c2ddf67e",
+      "bytes": 150
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-baseline-requests.json",
+      "sha256": "a926f5db8195b33d232a3b226a296f4eaa251c422257c2525642dccc1efd83ca",
+      "bytes": 467
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-baseline.json",
+      "sha256": "d7cbefcfa774e98230b4d1bee2eba7abef80a6beb38adc935162bcf0b1ccc74c",
+      "bytes": 20877
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-baseline.yaml",
+      "sha256": "1d1f657a1b3a4cbe7a265607ed611ab75238e8ca52eab18a1014c161f131a34d",
+      "bytes": 1338
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-combined-config.txt",
+      "sha256": "b6c06f2437c096f60a7707b5f01845a889002bce9e5694854d79b6972aa22f38",
+      "bytes": 150
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-combined-requests.json",
+      "sha256": "7733e5364704335a810c17391e6fc20686ddebf6b91e224125f30a76862e48fb",
+      "bytes": 818
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-combined.json",
+      "sha256": "83db225b392f064895396b030ed6af40863579f76d6427d5fad29ebc26f816ac",
+      "bytes": 22074
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-03-DEV-current-combined.yaml",
+      "sha256": "073f8bf32f72badd4e82f1c5a115f9e42b1b4fa2a4c1e58960388a7ca6eff2e3",
+      "bytes": 1338
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-baseline-config.txt",
+      "sha256": "60798402c11d86a8f954b0864f040bbbe48efe1e23d681fa10b4a5aa69b9a670",
+      "bytes": 144
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-baseline-requests.json",
+      "sha256": "a370ab79ce9af786d5183c84ae1411509dead8b9c58a2635f033d36977845344",
+      "bytes": 230
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-baseline.json",
+      "sha256": "4384a9b74e7b8f93595d9b6dfb1f2e37d108b22e2ee9078d61774f7b21ddf1d3",
+      "bytes": 9403
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-baseline.yaml",
+      "sha256": "675963866f21e2843932cdfa2a6c441784873c3b7094f0da8aad1acb88043b86",
+      "bytes": 1325
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-combined-config.txt",
+      "sha256": "6dbaf788405506c66197c001a86d80333e49ebe78e9f3455136bf0436e13ed77",
+      "bytes": 144
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-combined-requests.json",
+      "sha256": "4b44c7a62529712755ebd38def7207a60722cc9cf7e394ed543cb98a137c29a8",
+      "bytes": 347
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-combined.json",
+      "sha256": "ebcbcc49725929ab93bfe12ea7388301e62dd44773b39218ef664436a83d6c89",
+      "bytes": 14308
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-a-combined.yaml",
+      "sha256": "3fdfeabee43f04328fc93696ec52293b7463420ea18113084707349406cc244b",
+      "bytes": 1325
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-baseline-config.txt",
+      "sha256": "78a7e952f521a393591ccbc0fb2c3a99bf6d81d9c614b3212260d1a78a5f71bd",
+      "bytes": 144
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-baseline-requests.json",
+      "sha256": "a370ab79ce9af786d5183c84ae1411509dead8b9c58a2635f033d36977845344",
+      "bytes": 230
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-baseline.json",
+      "sha256": "45fdfbe7086a140b1c55fb066720ebf5cb4984d4e50bdd00a5c297967beb5f57",
+      "bytes": 9402
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-baseline.yaml",
+      "sha256": "d92a30ad31a7182948394667db759f81dda1de43f771179ca3f355c9f9d99c0b",
+      "bytes": 1325
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-combined-config.txt",
+      "sha256": "04127417555381af1fc5665e7286fda057ae48c79efa38be201c373f8b6c6a62",
+      "bytes": 144
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-combined-requests.json",
+      "sha256": "4b44c7a62529712755ebd38def7207a60722cc9cf7e394ed543cb98a137c29a8",
+      "bytes": 347
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-combined.json",
+      "sha256": "17499dfe52d28b93535cc692408382bb7ab6febe2c415303c6d62294ea770c92",
+      "bytes": 14308
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-05-DEV-b-combined.yaml",
+      "sha256": "2cc6f42a22d462e0b3d6444a9f75c4a707f6d7eff589d3a3c19afa2cd76b667a",
+      "bytes": 1325
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-baseline-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-baseline-config.txt",
+      "sha256": "5714163992f48ad3e698274a008186f9b5c1d08bdb0065c64a0b718a6364d957",
+      "bytes": 150
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-baseline-requests.json",
+      "sha256": "108745662587698740fafc0e0653eb47b3f0efcb9dd47cd6724e94d9ff136689",
+      "bytes": 504
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-baseline.json",
+      "sha256": "9f20c5e49fa425a09480956d75ed241dc8be83e8e1c13aae59ec9756681b61d9",
+      "bytes": 28696
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-baseline.yaml",
+      "sha256": "b0341ddaa9cc995acffb9b93f60525e0b2083ec3b740a5fed730706fcadab934",
+      "bytes": 1338
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-combined-capture.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-combined-config.txt",
+      "sha256": "66379078cdb11185fe791fc415ed60c03eb8fcbdeea3df935b8d4371c4f1f596",
+      "bytes": 150
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-combined-requests.json",
+      "sha256": "19ef68b2ba92512fcf6728e8cb4a97a10e181744f3be7984d6c1a23e912be37b",
+      "bytes": 738
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-combined.json",
+      "sha256": "c3765cc3d83ec69a2c7701a261618e6a3ffb3f779714e1f85487972e17b15a81",
+      "bytes": 43658
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/F-06-DEV-current-combined.yaml",
+      "sha256": "fea4bb7e8250a04883ee652b908f447e47c2e69d7a29f2b231e0fc03af6eacb3",
+      "bytes": 1338
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/checks.json",
+      "sha256": "2eea29760383df5f9c43c7a58caa890f33f95fde1b270cb6cfb3dc35ec592ada",
+      "bytes": 13487
+    },
+    {
+      "path": "system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03/real/runtime/summary.json",
+      "sha256": "2e25d7537621fad90eb515ce8d7fe2c4a11025d01e0350981e7ef9ded89eccdc",
+      "bytes": 37257
+    }
+  ],
+  "limitations": [
+    "All source-backed facts/requirements/edges/policies are proposed; no approval or semantic_current was manufactured.",
+    "F-03 original source vocabulary and base commit are unchanged; only generated project ID metadata was corrected.",
+    "F-05/F-06 supplementary proposed source inputs are separate deterministic commits, not edits or approval of the original fixture book.",
+    "Final variants were not materialized/built/queried by this preparation tool.",
+    "F-05 Alpha project-marker identity is separate from refund policy enforcement.",
+    "TestHealth passed as an unrelated health test; no acceptance relation or CriterionDecision was created.",
+    "Mock raw no_candidates rows do not prove ambiguous concept matching; actual BGE-M3 did retain two concepts for both languages.",
+    "Before-fix actual MCP partial responses and regression failure are preserved. Later two harness failures were no_candidates handling and omitted empty trace_links, not new producer failures.",
+    "The final runtime checker was strengthened with all normative-field assertions after captures; an independent post-capture audit validates those saved observations without rerunning model calls.",
+    "No formal retrieval or latency quality score is claimed; 14 requests/provider are development diagnostics, not independent final samples.",
+    "Model/data DB/binary files are excluded. Exact small fixture source history is retained in Git bundles.",
+    "Human SF decisions and original dynamic/protocol/input-scope decisions remain pending. B0/B1/C0/C1 official gates remain incomplete."
+  ]
+}

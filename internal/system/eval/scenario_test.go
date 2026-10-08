@@ -68,6 +68,35 @@ prompt: anything
 	}
 }
 
+func TestParseScenario_NoCitationContract(t *testing.T) {
+	s, err := ParseScenario([]byte("version: 1\nname: absent\nprompt: nonexistent API\nexpect_no_citations: true\n"))
+	if err != nil || !s.ExpectNoCitations {
+		t.Fatalf("no-citation scenario: scenario=%+v err=%v", s, err)
+	}
+	_, err = ParseScenario([]byte("version: 1\nname: conflict\nprompt: contradictory\nexpect_no_citations: true\nexpected_citations:\n  - file: a.go\n    start_line: 1\n    end_line: 1\n"))
+	if err == nil {
+		t.Fatal("expected no-citation/expected-citation conflict")
+	}
+}
+
+func TestParseScenario_ExpectedCommit(t *testing.T) {
+	commit := strings.Repeat("a", 40)
+	s, err := ParseScenario([]byte("version: 1\nname: pinned\nprompt: find handler\nexpected_commit: " + commit + "\n"))
+	if err != nil || s.ExpectedCommit != commit {
+		t.Fatalf("expected commit: scenario=%+v err=%v", s, err)
+	}
+	for _, bad := range []string{"abc", strings.Repeat("A", 40), strings.Repeat("g", 40)} {
+		_, err := ParseScenario([]byte("version: 1\nname: pinned\nprompt: find handler\nexpected_commit: " + bad + "\n"))
+		if err == nil {
+			t.Errorf("accepted invalid commit %q", bad)
+		}
+	}
+	_, err = ParseScenario([]byte("version: 1\nname: pinned\nprompt: find handler\nexpected_commit: " + commit + "\nexpected_citations:\n  - file: a.go\n    start_line: 1\n    end_line: 2\n    commit_hash: " + strings.Repeat("b", 40) + "\n"))
+	if err == nil || !strings.Contains(err.Error(), "conflicts") {
+		t.Fatalf("accepted conflicting citation commit: %v", err)
+	}
+}
+
 func TestParseScenario_RejectsWrongVersion(t *testing.T) {
 	t.Parallel()
 	yaml := `version: 2

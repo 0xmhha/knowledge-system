@@ -98,6 +98,17 @@ func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Packag
 	}
 	var out []*packages.Package
 	for _, modDir := range modDirs {
+		// A go.mod without any Go source is still a useful document-only
+		// project. Avoid invoking the external Go toolchain for that case.
+		// Modules with Go source keep the normal packages.Load path and must
+		// still fail when the toolchain is unavailable.
+		hasSource, err := moduleHasGoFiles(modDir)
+		if err != nil {
+			return nil, err
+		}
+		if !hasSource {
+			continue
+		}
 		pkgs, err := loadModule(modDir, mode)
 		if err != nil {
 			return nil, err
@@ -105,6 +116,30 @@ func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Packag
 		out = append(out, pkgs...)
 	}
 	return out, nil
+}
+
+func moduleHasGoFiles(modDir string) (bool, error) {
+	var found bool
+	err := filepath.WalkDir(modDir, func(p string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			if p != modDir && (d.Name() == "vendor" || d.Name() == "node_modules" || d.Name() == ".git" || d.Name() == "testdata") {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(d.Name(), ".go") {
+			found = true
+			return filepath.SkipAll
+		}
+		return nil
+	})
+	if err != nil {
+		return false, fmt.Errorf("walk Go source in %s: %w", modDir, err)
+	}
+	return found, nil
 }
 
 // findModuleDirs walks absRoot for every go.mod, returning the directories
@@ -145,10 +180,9 @@ func findModuleDirs(absRoot string) ([]string, error) {
 // in the build cache OUTSIDE srcRoot — callers must filter those by relpath
 // when projecting back to source-tree paths.
 //
-// Per-package errors (pkg.Errors) are intentionally NOT propagated: a single
-// package failing to type-check should not abort discovery of every other
-// module. This mirrors `go list ./...` tolerance and matches audit's prior
-// behavior.
+// Type-check errors in packages with discoverable files are tolerated. A
+// fileless package with a go-list error is different: a broken toolchain or
+// cache can otherwise turn a Go repository into a successful empty index.
 func loadModule(modDir string, mode GoPackagesLoadMode) ([]*packages.Package, error) {
 	cfg := &packages.Config{
 		Mode:  loadModeBits(mode),
@@ -159,7 +193,24 @@ func loadModule(modDir string, mode GoPackagesLoadMode) ([]*packages.Package, er
 	if err != nil {
 		return nil, fmt.Errorf("packages.Load in %s: %w", modDir, err)
 	}
+	if err := validateLoadedPackages(modDir, pkgs); err != nil {
+		return nil, err
+	}
 	return pkgs, nil
+}
+
+func validateLoadedPackages(modDir string, pkgs []*packages.Package) error {
+	for _, pkg := range pkgs {
+		if len(pkg.GoFiles) != 0 {
+			continue
+		}
+		for _, pkgErr := range pkg.Errors {
+			if pkgErr.Kind == packages.ListError {
+				return fmt.Errorf("go package list in %s (%s): %s", modDir, pkg.ID, pkgErr.Msg)
+			}
+		}
+	}
+	return nil
 }
 
 // loadModeBits maps the public GoPackagesLoadMode to packages.LoadMode bits.

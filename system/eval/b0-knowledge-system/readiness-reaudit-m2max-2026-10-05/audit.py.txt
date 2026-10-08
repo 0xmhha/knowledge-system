@@ -1,0 +1,66 @@
+import copy,hashlib,importlib.util,json,subprocess
+from pathlib import Path
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');out=Path(__file__).resolve().parent
+spec=importlib.util.spec_from_file_location('reader',root/'scripts/b1-summarize-matrix.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+def raw(x):return json.dumps(x,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()
+def sha(b):return hashlib.sha256(b).hexdigest()
+source_hashes={};result=[];all_rows=[]
+def read(p):
+ b=p.read_bytes();source_hashes[str(p.relative_to(root))]=sha(b);return b
+def proposed(x):
+ if isinstance(x,dict):
+  if 'status' in x:assert x['status']=='proposed',('unexpected status',x.get('id'),x['status'])
+  if 'reviewed_by' in x:assert not x['reviewed_by']
+  for v in x.values():proposed(v)
+ elif isinstance(x,list):
+  for v in x:proposed(v)
+for model in ['mock','real']:
+ p=root/'system/eval/b0-knowledge-system/semantic-fixture-preparation-m2max-2026-10-03'/model
+ review=json.loads(read(p/'review-manifest.json'))
+ for qid in ['F-03-DEV-current','F-06-DEV-current']:
+  c=next(c for c in review['cases'] if c['id']==qid);assert c['review_state']=='draft' and c['reviewer'] is None and c['reviewed_at'] is None
+  identity=json.loads(read(p/qid/'dataset-identity.json'));assert identity==c['dataset']
+  source=p/qid/'source'
+  for file,digest in c['source_sha256'].items():assert sha(read(source/file))==digest
+  projection=json.loads(read(p/c['projection']));assert sha(read(p/c['projection']))==c['projection_sha256'];proposed(projection)
+  snap=projection['snapshot'];assert snap['dataset_id']==identity['dataset_id'] and snap['snapshot_id']==identity['source']['snapshot_id'] and snap['commit']==identity['source']['source_commit']
+  for e in projection.get('evidence',[]):
+   assert e['snapshot']==snap
+   b=read(source/e['path']);lines=b.splitlines(keepends=True);assert sha(b''.join(lines[e['start_line']-1:e['end_line']]))==e['content_sha256']
+  assert not any(a.get('predicate')=='CHECKED_BY' or a.get('verb')=='CHECKED_BY' for a in projection.get('assertions',[]))
+  packs={}
+  for arm in ['baseline','combined']:
+   cap=json.loads(read(p/'runtime'/f'{qid}-{arm}.json'));requests_raw=read(p/'runtime'/f'{qid}-{arm}-requests.json');config=read(p/'runtime'/f'{qid}-{arm}.yaml')
+   assert cap['request_sha256']==sha(requests_raw) and cap['config_sha256']==cap['config_sha256_after']==sha(config) and cap['binary_sha256']==cap['binary_sha256_after']
+   requests=json.loads(requests_raw)['requests'];assert len(cap['rows'])==len(requests) and not cap.get('errors') and cap['quality_metrics'] is None
+   for row,request in zip(cap['rows'],requests):
+    call=row['call'];assert row['request_id']==request['id'] and call['tool']==request['tool'] and call['arguments']==request['arguments'] and not row.get('error')
+    pack=call['response']['structuredContent'];assert not call['response'].get('isError');m.verify_pack(pack,identity,source)
+    packs[(arm,row['request_id'])]=pack;all_rows.append(row)
+    meta=pack['metadata'].get('ontology');semantic=pack['semantic']
+    if arm=='combined':
+     assert meta['applied_relations']==meta['boosted_citations']==0
+     if qid=='F-03-DEV-current':
+      assert semantic is None
+      if call['arguments']['prompt'] in ['project','프로젝트']:
+       if model=='real':assert meta['matched_concepts']==2
+       else:assert meta['state']=='no_candidates' or meta['matched_concepts']==2
+      else:assert meta['matched_concepts']==0 and meta['state'] in ('no_match','no_candidates')
+     else:
+      kc=semantic['knowledge_context'];cc=semantic['coding_context'];assert kc['state']=='unknown'
+      for key in ['applicable_policies','decisions','relations','constraints','related_requirements','test_links','conflicts']:assert not kc[key]
+      assert 'no_reviewed_applicable_policy' in kc['unknowns']
+      for key in ['implemented_behavior','required_behavior','rationale','constraints']:assert not cc[key]
+      assert all(e in pack['citations'] for e in cc['evidence'])
+    result.append({'model':model,'fixture':qid,'arm':arm,'request_id':row['request_id'],'citations':len(pack['citations']),'bodies':len(pack['bodies']),
+                   'ontology':meta,'policy_state':semantic.get('knowledge_context',{}).get('state') if semantic else None,
+                   'human_claim_verdict':None,'quality_metrics':None})
+  for request in requests:
+   baseline=packs[('baseline',request['id'])];combined=packs[('combined',request['id'])]
+   assert {raw(c) for c in baseline['citations']}=={raw(c) for c in combined['citations']}
+   assert {raw(c) for c in baseline['bodies']}=={raw(c) for c in combined['bodies']}
+for rel,digest in source_hashes.items():assert sha((root/rel).read_bytes())==digest
+(out/'source-bindings.json').write_text(json.dumps(source_hashes,indent=2)+'\n')
+(out/'semantic-replay.json').write_text(json.dumps({'schema_version':1,'scope':'retained proposed F-03/F-06 mock/BGE-M3 only; no new model queries','rows':result,'source_bindings_unchanged':True,'baseline_body_citation_sets_preserved':True,'quality_metrics':None,'human_verdict':None,'official_execution_ready':False},indent=2)+'\n')
+(out/'sdk-rows.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in all_rows))
+print('retained F-03/F-06 replay:',len(result),'SDK rows; source-bound proposed, no normative/human promotion')

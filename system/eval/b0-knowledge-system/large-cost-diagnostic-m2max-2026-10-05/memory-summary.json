@@ -1,0 +1,64 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "command": [
+    "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks",
+    "eval",
+    "capture",
+    "--requests",
+    "/private/tmp/ks-large-cost-20261005/requests.json",
+    "--config",
+    "/private/tmp/ks-large-cost-20261005/memory-config.yaml",
+    "--output",
+    "/private/tmp/ks-large-cost-20261005/memory-capture.json",
+    "--warmup",
+    "0",
+    "--retrieval-runs",
+    "1",
+    "--warm-runs",
+    "0",
+    "--cold-runs",
+    "0",
+    "--call-timeout",
+    "90s"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 11.018934832885861,
+  "bindings_before": {
+    "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks": "9c7ed2a0b45aed0f1172c21404d538e34caf52163cfd18d8aae2162f008120ad",
+    "/private/tmp/ks-large-cost-20261005/memory-config.yaml": "987eba7aaf4fd705644cfbb18a08f2e5c445bad8d75921858776d2054c249d6c",
+    "/private/tmp/ks-large-cost-20261005/requests.json": "97e72cdee06f62b43864a552f057683afbb216ad9ec80d502bc39fadb53f20c8"
+  },
+  "bindings_after": {
+    "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks": "9c7ed2a0b45aed0f1172c21404d538e34caf52163cfd18d8aae2162f008120ad",
+    "/private/tmp/ks-large-cost-20261005/memory-config.yaml": "987eba7aaf4fd705644cfbb18a08f2e5c445bad8d75921858776d2054c249d6c",
+    "/private/tmp/ks-large-cost-20261005/requests.json": "97e72cdee06f62b43864a552f057683afbb216ad9ec80d502bc39fadb53f20c8"
+  },
+  "processes": {
+    "9337": {
+      "command": "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks",
+      "ppid": 9330,
+      "observations": 37,
+      "max_observed_rss_kib": 23920
+    },
+    "9380": {
+      "command": "/private/tmp/ks-fix19-package-darwin-20261005/unpacked/knowledge-system-darwin-arm64-31def76be0c6-dirty-preview/cks",
+      "ppid": 9337,
+      "observations": 35,
+      "max_observed_rss_kib": 82992
+    },
+    "9545": {
+      "command": "(git)",
+      "ppid": 9380,
+      "observations": 1,
+      "max_observed_rss_kib": 336
+    }
+  },
+  "sample_count": 37,
+  "max_observed_sum_rss_kib": 106656,
+  "limitations": [
+    "sampled RSS; peaks between samples may be missed",
+    "sum RSS can double count shared pages",
+    "model daemon/runner excluded; model already resident; sampler overhead not latency baseline"
+  ]
+}

@@ -54,6 +54,9 @@ func matchOverlap(expected, actual contract.Citation) bool {
 	if expected.File != actual.File {
 		return false
 	}
+	if expected.CommitHash != "" && expected.CommitHash != actual.CommitHash {
+		return false
+	}
 	return expected.StartLine <= actual.EndLine && actual.StartLine <= expected.EndLine
 }
 
@@ -62,7 +65,8 @@ func matchOverlap(expected, actual contract.Citation) bool {
 func matchStrict(expected, actual contract.Citation) bool {
 	return expected.File == actual.File &&
 		expected.StartLine == actual.StartLine &&
-		expected.EndLine == actual.EndLine
+		expected.EndLine == actual.EndLine &&
+		(expected.CommitHash == "" || expected.CommitHash == actual.CommitHash)
 }
 
 // matcher selects a match function for the given mode. Returns
@@ -75,30 +79,36 @@ func matcher(mode MatchMode) func(a, b contract.Citation) bool {
 	return matchOverlap
 }
 
+func citationEvalKey(c contract.Citation) string {
+	// contract.Citation.Key deliberately omits the commit for same-snapshot
+	// composition. Eval can compare different snapshots in one report, so
+	// it must retain both rather than letting a stale first hit hide a hit
+	// at the expected commit.
+	return c.Key() + "@" + c.CommitHash
+}
+
 // precisionRecall computes (precision, recall, f1) of actual against
 // expected under the given match mode.
 //
 // Semantics for edge cases:
 //   - Empty actual: precision = recall = f1 = 0 (no retrieval attempt).
-//   - Empty expected: precision = recall = 1.0 — there is no
-//     ground-truth to disprove. F1 follows. This is the "trivially
-//     correct" interpretation; scenarios without expected citations
-//     are not useful for retrieval scoring and the runner can flag
-//     them separately.
-//   - Duplicate actuals: collapsed by Citation.Key() so a backend that
-//     returns the same code location twice cannot inflate metrics.
+//   - Empty expected with non-empty actual: precision = F1 = 0,
+//     recall = 1.0. The actual citations have no declared support.
+//     Explicit no-answer cases use a separate abstention guard.
+//   - Duplicate actuals: collapsed by location and commit, so a backend
+//     returning the same snapshot location twice cannot inflate metrics.
 //
 // Computation: for each expected citation, mark it "found" iff any
 // (deduplicated) actual citation matches it under the mode; for each
 // actual, mark it "correct" iff it matches at least one expected.
 // Counts are then folded into the standard P/R/F1 formulas.
 func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (precision, recall, f1 float64) {
-	// Dedup actual by Citation.Key(); preserve first-seen order so
+	// Dedup actual by location and commit; preserve first-seen order so
 	// downstream debug output stays predictable.
 	seen := make(map[string]struct{}, len(actual))
 	dedup := make([]contract.Citation, 0, len(actual))
 	for _, c := range actual {
-		k := c.Key()
+		k := citationEvalKey(c)
 		if _, ok := seen[k]; ok {
 			continue
 		}
@@ -111,9 +121,10 @@ func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (prec
 		return 0, 0, 0
 	}
 	if len(expected) == 0 {
-		// No ground truth: nothing we returned can be disproved.
-		// Recall is trivially 1.0 (zero misses); precision likewise.
-		return 1.0, 1.0, 1.0
+		// With no expected citation, an actual citation cannot be counted
+		// as correct. Recall has no misses, but precision and F1 are zero.
+		// Explicit abstention is evaluated separately by the scenario guard.
+		return 0, 1.0, 0
 	}
 
 	m := matcher(mode)
@@ -166,7 +177,7 @@ func mrr(expected, actual []contract.Citation, mode MatchMode) float64 {
 	seen := make(map[string]struct{}, len(actual))
 	dedup := make([]contract.Citation, 0, len(actual))
 	for _, c := range actual {
-		k := c.Key()
+		k := citationEvalKey(c)
 		if _, ok := seen[k]; ok {
 			continue
 		}

@@ -71,6 +71,59 @@ func TestSchemaGolden_RegisteredToolsMatchContract(t *testing.T) {
 	}
 }
 
+// The primary tool's input shape is a consumer contract. The historical
+// fixture listed task/max_citations/budget_tokens while the registered tool
+// accepted prompt/intent; a name-only comparison did not detect that drift.
+func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
+	f := newFixture(t, nil)
+	srv := mcpserver.NewMCPServer("cks-test", "0.0.1")
+	if err := Register(srv, f.deps); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(filepath.Join("testdata", "agent-mcp.schema.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fixture struct {
+		Tools map[string]struct {
+			Input struct {
+				Properties map[string]json.RawMessage `json:"properties"`
+				Required   []string                   `json:"required"`
+			} `json:"input"`
+		} `json:"tools"`
+	}
+	if err := json.Unmarshal(raw, &fixture); err != nil {
+		t.Fatal(err)
+	}
+	for _, toolName := range []string{ToolNameGetForTask, ToolNameGetForTaskV2} {
+		t.Run(toolName, func(t *testing.T) {
+			registered := srv.GetTool(toolName)
+			if registered == nil {
+				t.Fatal("context tool is not registered")
+			}
+			want, ok := fixture.Tools[toolName]
+			if !ok {
+				t.Fatal("context tool missing from contract fixture")
+			}
+			got := registered.Tool.InputSchema
+			if strings.Join(got.Required, ",") != strings.Join(want.Input.Required, ",") {
+				t.Errorf("required inputs: registered=%v fixture=%v", got.Required, want.Input.Required)
+			}
+			actualNames := make(map[string]struct{}, len(got.Properties))
+			for name := range got.Properties {
+				actualNames[name] = struct{}{}
+			}
+			fixtureNames := make(map[string]struct{}, len(want.Input.Properties))
+			for name := range want.Input.Properties {
+				fixtureNames[name] = struct{}{}
+			}
+			if strings.Join(sortedKeys(actualNames), ",") != strings.Join(sortedKeys(fixtureNames), ",") {
+				t.Errorf("input names: registered=%v fixture=%v", sortedKeys(actualNames), sortedKeys(fixtureNames))
+			}
+		})
+	}
+}
+
 func sortedKeys(m map[string]struct{}) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {

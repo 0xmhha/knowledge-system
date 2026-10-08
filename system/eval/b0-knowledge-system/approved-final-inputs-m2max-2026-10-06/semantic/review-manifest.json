@@ -1,0 +1,717 @@
+{
+  "schema_version": 1,
+  "state": "prepared_pending_human_review",
+  "diagnostic_only": true,
+  "partition": "final",
+  "quality_metrics": null,
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "input_manifest_sha256": "79bd37739235af8ce2e95ecd6215f76fc923f8c62392ac2f263c4ac39a10a895",
+  "embedder": "mock",
+  "cases": [
+    {
+      "id": "F-03-FINAL-current",
+      "fixture_id": "F-03-FINAL",
+      "family": "F-03",
+      "state": "current",
+      "project_id": "b0-f03-final",
+      "base_commit": "591306d2e29d2d6beed850b3769598338ad3a07e",
+      "base_tree": "4fa0b2f7ae2d3b8e73223c88c6442be0aff9c493",
+      "supplement_commit": "591306d2e29d2d6beed850b3769598338ad3a07e",
+      "supplement_tree": "4fa0b2f7ae2d3b8e73223c88c6442be0aff9c493",
+      "dataset": {
+        "source": {
+          "project_id": "b0-f03-final",
+          "source_mode": "committed",
+          "source_commit": "591306d2e29d2d6beed850b3769598338ad3a07e",
+          "file_manifest_digest": "d01119255c83f11df4ff8cebab34133f551d0585ee8238ffb2ab897807e44b1b",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "30875819c0824340a9bc91c476699a4486aeff1d8d56bf18680ac6ccd200da6e"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "0511994b7f61f73715918e3829e6d55ec7d214766114e38bd2c4081daa419c84",
+        "dataset_id": "cdd9be6cb0bb50537acb08d3d3ed13b8e3f1f57eba496d287d143f83e8d488a4"
+      },
+      "source_sha256": {
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "main.go": "cb802b10a41c89e75663543b63ca1a5374244cab23a2a100dfcc7e5ae81d424a",
+        "ontology.yaml": "efcea14439dca953b9145b1c2310ba89869292ff1376e34698ab2665a7fb84e3"
+      },
+      "projection": "F-03-FINAL-current/projection-proposed.json",
+      "projection_sha256": "c330d1ce8a683c9e83d6524b56b0e3b6e38f521d663035f1f0c95570bd94a72f",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0final.ProjectIdentity",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-05-FINAL-a",
+      "fixture_id": "F-05-FINAL",
+      "family": "F-05",
+      "state": "a",
+      "project_id": "f-05-final-a",
+      "base_commit": "3bcd5c7556829cf8bbac445743794d0823d87e1b",
+      "base_tree": "871cdae62c9d75cfb008a322d80d60b2175da71a",
+      "supplement_commit": "47acd7c52b63fe0d0373e537e1e00df07452ce9d",
+      "supplement_tree": "d611619987cdfbfae65e039279cca0ff1a258002",
+      "dataset": {
+        "source": {
+          "project_id": "f-05-final-a",
+          "source_mode": "committed",
+          "source_commit": "47acd7c52b63fe0d0373e537e1e00df07452ce9d",
+          "file_manifest_digest": "d63efd24e7250d5b283001882293657a0715bf9a9d7dd72a2c4dc38fc1e66b14",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "a7b745c9450647b049f2a6d903bd4a946fb72f8f4b6c87b1237cd6d55731d404"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "a4bba8199f56ecaac729822b0540626679df561559b2bcbe8c3b3a6ade0679ea",
+        "dataset_id": "8f353f8b2ff93c368d1d5fde10a58bcb170962bd542d981d435b2f76ce34bb30"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "5eff45e1e492ba94ef64b46c3c0f4f5899da87767e7bf334c0147fd4d3c6f07c",
+        ".cks/knowledge/manifest.yaml": "c20a56235ae6c1a148b64f4b5130ac093079c70dee201e6c4d95da9e1a79c90f",
+        ".cks/knowledge/policies/refund-cap.yaml": "f75981a1beb18ab79f0a5b7e8fcef0a02f8f5203253745240666db49b3810005",
+        "docs/policy.md": "f93cda2a62b8f88ec19ea2ea50cb179a144f48380935b9c609436036504c4101",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "main.go": "683a528ce354ee468df3e749ddc2b985d7cdd62a1b51edf5018928a8084008d9",
+        "ontology.yaml": "6dcf0fe8ce123af538d9c3694f86119b2ec44b26521baa4400580d0f376ed974"
+      },
+      "projection": "F-05-FINAL-a/projection-proposed.json",
+      "projection_sha256": "94bff74bfc171b5632d29133bcc3e5ebf2b0782c1763aeed184c3f2820948d6d",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0final.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-05-FINAL-b",
+      "fixture_id": "F-05-FINAL",
+      "family": "F-05",
+      "state": "b",
+      "project_id": "f-05-final-b",
+      "base_commit": "d34cce147d315b77935a7b638f7bf9a294dcf500",
+      "base_tree": "628c7967b4cf9721dfd0eec845b72bc9e1d4dd8a",
+      "supplement_commit": "06eb4482a17053136949f6241dbcfea16571aedf",
+      "supplement_tree": "d0e4c7db4f3bda36782c87df7a2d601e0e8e748e",
+      "dataset": {
+        "source": {
+          "project_id": "f-05-final-b",
+          "source_mode": "committed",
+          "source_commit": "06eb4482a17053136949f6241dbcfea16571aedf",
+          "file_manifest_digest": "2ecfc28cb83a1866d6cf3486ca44fb60532e904dba17a883b5549a2d36720c43",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "6b952cae8998b894964dc9de70fc1b6bc3617f787bc62125601b99023e3d9948"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "eb2803d65cf92e0082590d0d796cac600415bc6699e1a759947ce390980fd296",
+        "dataset_id": "ddd1f0f744a402f710ed201e58f1c5801511cf45fcf0b865b7ff25fffdaa0998"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "ccc31939fb197217e4ce97fcda885bcc031077b645e8ccfdbad43b1e4155a458",
+        ".cks/knowledge/manifest.yaml": "f12c147789f2db68e4add5628512f58a4dd17779bc09a83ce9b6d6d948c31832",
+        ".cks/knowledge/policies/refund-cap.yaml": "aa20356b0677561a4c45960023c4d17dbf4bbdf5d4492a482163d2349a12b485",
+        "docs/policy.md": "70fae3091c2dcb0e9a5f8088fee0491a9b13cb0892cf79a4eda872fbb72d23f8",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "main.go": "badc7826877f0a91377f61378d222838ee82133d98c13b153be9cfd4dbbd9ced",
+        "ontology.yaml": "916b0f29a7ecd6e382fc3c0b3241d34cb44391a8d9380f35eed15e6d66a30b03"
+      },
+      "projection": "F-05-FINAL-b/projection-proposed.json",
+      "projection_sha256": "ed017cde2ede35c15c8e572cc2dfcf91c0457e200670927ab9ad1f0eab1aefb6",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0final.Alpha",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    },
+    {
+      "id": "F-06-FINAL-current",
+      "fixture_id": "F-06-FINAL",
+      "family": "F-06",
+      "state": "current",
+      "project_id": "f-06-final",
+      "base_commit": "15be5f4dde8402189b0bbe3fd826329577314112",
+      "base_tree": "add9ee4527aa4ee16d1cd95fce04bfc965e4adba",
+      "supplement_commit": "598dcd1614717e702e971fa0a7c45390bcbed2d8",
+      "supplement_tree": "61427a77c1fa197be3c98398f8cf42e6fdd5c478",
+      "dataset": {
+        "source": {
+          "project_id": "f-06-final",
+          "source_mode": "committed",
+          "source_commit": "598dcd1614717e702e971fa0a7c45390bcbed2d8",
+          "file_manifest_digest": "a471075b7a24f3120eba5a52a1a964fd0f9ea8176a9c3051a394f4a6d03df2a7",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "baef9e0982dd85a83b9786c972b0329293872de3dc8cdfe4f14f418e7cf3d4ee"
+        },
+        "embedding_identity": {
+          "checksum": "provider=mock;model=mock-feature-hash-v1;dim=64;pooling=;normalize=l2",
+          "dim": 64,
+          "model": "mock-feature-hash-v1"
+        },
+        "input_digest": "21c80d8137793f06e2a1ac85449f898ae257ff59eef41fee184de7f6d830ce98",
+        "dataset_id": "71747903703f963b395d65f48931deff579f3394569815e94aada3327abeaf67"
+      },
+      "source_sha256": {
+        ".cks/knowledge/knowledge.lock.json": "ac00a5e392bcf92996f3119d4a7bc1bcd8a32e460304a058e6a85e56c0b98b03",
+        ".cks/knowledge/manifest.yaml": "80abbc91ae56e724bb690da17affefa751687a8bc0651223273a21066ecf9483",
+        ".cks/knowledge/policies/refund-cap.yaml": "0952cc61e242f4656aef5065d6f3bbdf19288ddc876216916223c318f2d0fdd0",
+        "README.md": "94ab4c0f74a929dc1d32bb997fc15296aed7d8fdc611e43158eecf4786476dc3",
+        "fixture-packs/refund/pack.yaml": "f12698ac023404550badc4f7eb4fa44952c1719679ae54c573141afad55e57f1",
+        "go.mod": "08325f6533b2d4b64b9d18e4b09f3783a59127cc9981d01a55a4099cce3b40da",
+        "main.go": "73b879dd36f6ae0f7829a4ad674633c7161f352d681cd1c26c42622b052e687b",
+        "main_test.go": "b774b0baa3294c4b4840764faf26f0a96a8c39c499fcdffa53fc0db2a333bd54",
+        "ontology.yaml": "0678f8b67d8a1181e6b3e493a6086d1007e344d8e8efe7e6afb6685d3a5f75ce",
+        "spec.yaml": "b877fbb5c897c407a62c4839307964f7717bf665a5feb61ef41c37fafeeb5745"
+      },
+      "projection": "F-06-FINAL-current/projection-proposed.json",
+      "projection_sha256": "ca1664614e9c249882f46b59cf393518b5e19c11af895992b7bed9bc112bcead",
+      "review_state": "draft",
+      "reviewer": null,
+      "reviewed_at": null,
+      "native_code_anchor": {
+        "canonical_id": "example.com/b0final.RefundLimit",
+        "file": "main.go",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "unrelated_test_anchors": [
+        [
+          "example.com/b0final.TestHealth",
+          "main_test.go",
+          5,
+          5,
+          "Function",
+          "TestHealth"
+        ]
+      ],
+      "forbidden_claims": [
+        "TestHealth proves refund acceptance",
+        "An Alpha marker proves refund policy enforcement"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "F-03-FINAL-current-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-03-FINAL/repo",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset",
+        "--project-id",
+        "b0-f03-final",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-FINAL-current-setup.txt",
+      "sha256": "0911ebfe37fbcb1e9cbb936aceaa4edeb0ca7e19c8dbf48ade003fd2cc3cc86d"
+    },
+    {
+      "id": "F-03-FINAL-current-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-03-FINAL/repo",
+        "--project-id",
+        "b0-f03-final",
+        "--dataset-id",
+        "cdd9be6cb0bb50537acb08d3d3ed13b8e3f1f57eba496d287d143f83e8d488a4",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-FINAL-current-extract.txt",
+      "sha256": "f406465c2fa95907896455f9363cfa7344d685dd3e7890d0d4fc91070fcae81a"
+    },
+    {
+      "id": "F-03-FINAL-current-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-03-FINAL/repo",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-03-FINAL-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-03-FINAL-current-validate-proposed.txt",
+      "sha256": "0101f67104e92b1acc2578177d2fe21281d048876fffb3e80c47c6940fc8f508"
+    },
+    {
+      "id": "F-05-FINAL-a-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-FINAL-a-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-knowledge-lock.txt",
+      "sha256": "3d5e92257cd1a833cab353a5d4aaa2a5b11e79d295c43047beaee9480ab855e4"
+    },
+    {
+      "id": "F-05-FINAL-a-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-knowledge-validate.txt",
+      "sha256": "80eb756891e4286f2304f928980383b2c37a74a9d8ace952855ab763541ed091"
+    },
+    {
+      "id": "F-05-FINAL-a-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-knowledge-review.txt",
+      "sha256": "2497641d38074afc6e9da36c1fff000a5834d2b7b460944afd615ffc8a07cc64"
+    },
+    {
+      "id": "F-05-FINAL-a-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset",
+        "--project-id",
+        "f-05-final-a",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-setup.txt",
+      "sha256": "6d2e95c83f5548d34c941f0bb090bd6a64f6efff160eda333f14d6c3b46d1068"
+    },
+    {
+      "id": "F-05-FINAL-a-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a",
+        "--project-id",
+        "f-05-final-a",
+        "--dataset-id",
+        "8f353f8b2ff93c368d1d5fde10a58bcb170962bd542d981d435b2f76ce34bb30",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-extract.txt",
+      "sha256": "c56552af3fb6a9f03bf82e84001fe38b3c9f671a3b84ece4b17c5fbb0b2f1c70"
+    },
+    {
+      "id": "F-05-FINAL-a-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-a",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-a/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-a-validate-proposed.txt",
+      "sha256": "b709d60c5805577be5072fcb7b50c1fbbce499ea620f73121a1263fb5a9bb221"
+    },
+    {
+      "id": "F-05-FINAL-b-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-05-FINAL-b-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-knowledge-lock.txt",
+      "sha256": "dd785ca282a8906b045ea113d747a594265ff8005bbabdcdf7b7a31bbea110e9"
+    },
+    {
+      "id": "F-05-FINAL-b-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-knowledge-validate.txt",
+      "sha256": "1bb4b1782d3e3df1aa86a50b45ba6a14ad5bea49dfd5e6ff6923b363a5a19d3b"
+    },
+    {
+      "id": "F-05-FINAL-b-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-knowledge-review.txt",
+      "sha256": "8ff1d69ea2b063e2f758746ef5561cb60ba555e0eed5740571bb803cd08b8c64"
+    },
+    {
+      "id": "F-05-FINAL-b-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset",
+        "--project-id",
+        "f-05-final-b",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-setup.txt",
+      "sha256": "5dad484b127534dbcc1ce3960bcac1e8a3196731da9a384d56cb1b933582e772"
+    },
+    {
+      "id": "F-05-FINAL-b-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b",
+        "--project-id",
+        "f-05-final-b",
+        "--dataset-id",
+        "ddd1f0f744a402f710ed201e58f1c5801511cf45fcf0b865b7ff25fffdaa0998",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-extract.txt",
+      "sha256": "a1256266c2156a8483b4a0d933f84c87b2e39142c398cd24e0c68f51b399eb57"
+    },
+    {
+      "id": "F-05-FINAL-b-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-05-FINAL/project-b",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-05-FINAL-b/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-05-FINAL-b-validate-proposed.txt",
+      "sha256": "113f945911c974ad54769ff9c7b0cff71aa26a8abe352eb5a85622043b499902"
+    },
+    {
+      "id": "F-06-FINAL-current-pack-digest",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "digest",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo",
+        "--source",
+        "fixture-packs/refund"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-pack-digest.txt",
+      "sha256": "ed4e95d5c27e2097fb1e1c23e5572c29b61d9bb6c94b081840aeacb5d2453e38"
+    },
+    {
+      "id": "F-06-FINAL-current-knowledge-lock",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "lock",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-knowledge-lock.txt",
+      "sha256": "d275c67548fd4430b44fe39a3117e28263de2835aaeb043d4efeb2282b67ee9a"
+    },
+    {
+      "id": "F-06-FINAL-current-knowledge-validate",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "validate",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-knowledge-validate.txt",
+      "sha256": "bf9785891cf74b1b5e446ee2b7e528afa61f62ea66eaa7acebbcd33f7134921b"
+    },
+    {
+      "id": "F-06-FINAL-current-knowledge-review",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "knowledge",
+        "review",
+        "--project-root",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-knowledge-review.txt",
+      "sha256": "be289deb48182f0e50a510b35c608556c9a9810237b18c6a5bd80eceab506d9e"
+    },
+    {
+      "id": "F-06-FINAL-current-setup",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "setup",
+        "--src",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset",
+        "--project-id",
+        "f-06-final",
+        "--source-mode",
+        "committed",
+        "--version",
+        "review",
+        "--embedder",
+        "mock"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-setup.txt",
+      "sha256": "36e8e5d37f288beb0039365e6ed97984ab25cabfae4e773a2eafaf4f69f7ed3a"
+    },
+    {
+      "id": "F-06-FINAL-current-extract",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "build",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo",
+        "--project-id",
+        "f-06-final",
+        "--dataset-id",
+        "71747903703f963b395d65f48931deff579f3394569815e94aada3327abeaf67",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/semantic-proposed.db",
+        "--out",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/projection-proposed.json",
+        "--ontology",
+        "ontology.yaml",
+        "--extract-only",
+        "--spec",
+        "spec.yaml",
+        "--docs",
+        "README.md",
+        "--include-packs"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-extract.txt",
+      "sha256": "35eb166e082339b7497870be8de9ed5164f9276bcc6b46de4fbffce1dc05162e"
+    },
+    {
+      "id": "F-06-FINAL-current-validate-proposed",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "semantic",
+        "promote",
+        "--input",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/projection-proposed.json",
+        "--repo",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/fixtures/F-06-FINAL/repo",
+        "--graph",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review/graph",
+        "--vector",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review/vector",
+        "--version-dir",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/dataset/review",
+        "--store",
+        "/private/tmp/ks-approved-final-semantic-complete-tools-20261006/F-06-FINAL-current/semantic-proposed.db"
+      ],
+      "exit_code": 0,
+      "raw_output": "F-06-FINAL-current-validate-proposed.txt",
+      "sha256": "8496ce41bdbab072d92971b8ce6bebbd8092436e6090134ea65d04d16d90da07"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+version: 1
+name: cks
+description: ""
+backends:
+    ckg:
+        path: /private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic/graph/graph.db
+        source_root: /private/tmp/ks-f0405-preparation-20261005/sources/F-04-DEV-new
+        timeout_ms: 5000
+        binary_path: ""
+        policy_file: ""
+    ckv:
+        path: /private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic/vector
+        provider: ""
+        binary_path: ""
+        timeout_ms: 3000
+        embed_model: bge-m3:latest
+        query_prefix_policy: registry
+        ollama_url: http://localhost:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: false
+    transport: http
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: ""
+    audit_dir: ""
+sanitize:
+    rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: ""
+service:
+    label_prefix: ""

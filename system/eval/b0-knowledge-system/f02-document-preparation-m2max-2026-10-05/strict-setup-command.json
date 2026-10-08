@@ -1,0 +1,34 @@
+{
+  "command": [
+    "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+    "setup",
+    "--src",
+    "/private/tmp/ks-b0-dynamic-dev-20261003/F-02-DEV/repo",
+    "--out",
+    "/private/tmp/ks-f02-preparation-20261005/dataset",
+    "--version",
+    "f02-dev",
+    "--project-id",
+    "f-02-dev",
+    "--embedder",
+    "ollama",
+    "--model-name",
+    "bge-m3:latest",
+    "--ollama-url",
+    "http://127.0.0.1:11434",
+    "--query-prefix-policy",
+    "registry",
+    "--cks-bin",
+    "/private/tmp/ks-f02-preparation-20261005/bin/cks",
+    "--vector-bin",
+    "/private/tmp/ks-f02-preparation-20261005/bin/ckv",
+    "--graph-bin",
+    "/private/tmp/ks-f02-preparation-20261005/bin/ckg"
+  ],
+  "env": {
+    "CKV_REQUIRE_COMPLETE_EMBEDDINGS": "1"
+  },
+  "exit_code": 0,
+  "diagnostic_only": true,
+  "fixture_id": "F-02-DEV"
+}

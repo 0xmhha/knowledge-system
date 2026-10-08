@@ -341,6 +341,9 @@ func runIncremental(opt Options, log *slog.Logger,
 	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
 	m.Files = buildFileEntries(decisions, g.Nodes, g.Edges)
 	setStaleness(&m, log)
+	if opt.LogicalSrcRoot != "" {
+		m.SrcRoot = opt.LogicalSrcRoot
+	}
 	if err := store.SetManifest(m); err != nil {
 		return persist.Manifest{}, err
 	}
@@ -894,10 +897,16 @@ func extractBlobsForFiles(root string, nodes []types.Node, wanted []string) map[
 func buildManifestSkeleton(opt Options, goCount, tsCount, solCount, protoCount int,
 	g *graph.Graph, pkgTree *cluster.PkgTree, parseErrs int) persist.Manifest {
 	return persist.Manifest{
-		SchemaVersion:  SchemaVersion,
-		CKGVersion:     opt.CKGVersion,
-		BuildTimestamp: time.Now().UTC().Format(time.RFC3339),
-		SrcRoot:        opt.SrcRoot,
+		SchemaVersion:       SchemaVersion,
+		ProjectID:           opt.ProjectID,
+		SnapshotID:          opt.SnapshotID,
+		DatasetID:           opt.DatasetID,
+		FileManifestDigest:  opt.FileManifestDigest,
+		CapturePolicyDigest: opt.CapturePolicyDigest,
+		SourceMode:          opt.SourceMode,
+		CKGVersion:          opt.CKGVersion,
+		BuildTimestamp:      time.Now().UTC().Format(time.RFC3339),
+		SrcRoot:             opt.SrcRoot,
 		Languages: map[string]int{
 			"go": goCount, "ts": tsCount, "sol": solCount, "proto": protoCount,
 		},

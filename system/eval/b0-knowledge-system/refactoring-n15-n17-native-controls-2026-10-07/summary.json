@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-07T04:39:11.531657+00:00",
+  "status": "N15_N17_local_technical_substeps_verified_tasks_incomplete",
+  "source_commit": "b006e776b72be8f4a01b91966aebc149aaf84704",
+  "package_sha256": "2315c29dfa4e0008746da1eecfc11bf3ef886b8684b5125dd17bb103f4a496dd",
+  "host": {
+    "os": "darwin",
+    "arch": "arm64",
+    "go_version": "go version go1.26.8 darwin/arm64"
+  },
+  "clean_source_checkout": true,
+  "binary_sha256": {
+    "cks": "bb8cc17e2139c2284c5d5441f19793407911bfbdfe86dbdb9ea19df860c2f404",
+    "ckg": "b3f564b737f9d29ea7e589854b14922dc088d8423eb4cf2509052b45ee92af3b",
+    "ckv": "bbab738ca3db1a08eb897ee28e288504a1b1f430334862d82052575dcfef3530"
+  },
+  "install_projects": 3,
+  "external_module_v1_calls": 6,
+  "external_module_v2_calls": 1,
+  "consumer_rejection_controls": 4,
+  "platform_mismatch_refused_before_dispatch": true,
+  "reader_regression_subcases": 9,
+  "race_packages": [
+    "github.com/0xmhha/knowledge-system/cmd/cks/mcpcli",
+    "github.com/0xmhha/knowledge-system/internal/system/mcp",
+    "github.com/0xmhha/knowledge-system/internal/setup"
+  ],
+  "recovery_capture_rows": 10,
+  "recovery_payload_files_unchanged": 13,
+  "source_absent_replay": true,
+  "restored_reader_lease_created": true,
+  "license_inventory": {
+    "missing_license_count": 0,
+    "missing_vendored_license_count": 0,
+    "module_count": 35,
+    "sha256": "e0ea3a9c8c80d9aa88e58e807460981bd265791ee38904fa4d7635b6547fd93c",
+    "vendored_asset_count": 4
+  },
+  "legal_review": "pending",
+  "ci_status": "defined_not_dispatched",
+  "actual_native_linux_amd64_evidence": null,
+  "operating_backup_failover_acceptance": null,
+  "human_RTO_RPO": null,
+  "real_model_calls": 0,
+  "new_final_calls": 0,
+  "release_approved": false,
+  "limits": [
+    "controlled fixtures; separate local module via replace, no independent customer acceptance",
+    "not operating RTO/RPO, power-loss, production key trust or legal suitability",
+    "first setup test run failed from missing reviewed fixture; corrected and full 3-package race passed",
+    "first restore failure and empty-row startup error retained; no result overwritten",
+    "package binary/archive retained locally only; committed assets and metadata bind their hashes"
+  ]
+}

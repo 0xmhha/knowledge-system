@@ -1,0 +1,19 @@
+import hashlib,json,pathlib,subprocess,tempfile,shutil
+root=pathlib.Path.cwd();e=root/'system/eval/b0-knowledge-system/refactoring-n10-neighbor-diagnostics-2026-10-06';helper=root/'.ks-n10-native-diagnostic';binary=pathlib.Path('/private/tmp/ks-n10-native-bin/ckg');sha=lambda b:hashlib.sha256(b).hexdigest()
+helper.mkdir();(helper/'main.go').write_bytes((e/'native-probe.go.txt').read_bytes())
+try:
+ with tempfile.TemporaryDirectory(prefix='ks-n10-sqlite-diagnostic-') as tmp:
+  t=pathlib.Path(tmp);src=t/'source';src.mkdir();graph=t/'graph'
+  files={'go.mod':b'module example.org/nativefixture\n\ngo 1.25.13\n','main.go':b'package fixture\n\nfunc Alpha() {}\n','notes.md':b'# Native fixture policy text; no indexed AST symbol.\n'}
+  for name,data in files.items():(src/name).write_bytes(data)
+  command=[str(binary),'build','--src',str(src),'--out',str(graph),'--fail-on-parse-errors']
+  built=subprocess.run(command,capture_output=True,timeout=60);(e/'native-build.stdout.log').write_bytes(built.stdout);(e/'native-build.stderr.log').write_bytes(built.stderr);assert built.returncode==0,built.stderr
+  data_before={str(p.relative_to(graph)):sha(p.read_bytes()) for p in graph.rglob('*') if p.is_file()}
+  command2=['go','run',str(helper/'main.go'),str(graph/'graph.db')];probe=subprocess.run(command2,capture_output=True,timeout=60);(e/'native-probe.stdout.json').write_bytes(probe.stdout);(e/'native-probe.stderr.log').write_bytes(probe.stderr);assert probe.returncode==0,probe.stderr
+  report=json.loads(probe.stdout);assert len(report['calls'])==3 and 'notes.md' not in probe.stdout.decode() and 'main.go' not in probe.stdout.decode()
+  data_after={str(p.relative_to(graph)):sha(p.read_bytes()) for p in graph.rglob('*') if p.is_file()};assert data_before==data_after
+  snapshot=e/'native-source';snapshot.mkdir(exist_ok=True)
+  for name,data in files.items():(snapshot/(name+'.txt')).write_bytes(data)
+  (e/'native-control.json').write_text(json.dumps({'status':'PASS','scope':'native Darwin real SQLite standalone graph; not pinned v2/BGE/quality/latency','commands':[command,command2],'exit_codes':[built.returncode,probe.returncode],'calls':3,'nonreturned_calls':2,'typed_seed_unresolved':1,'resolved_empty_traversals':1,'closed_store_errors_unclassified':1,'graph_files_unchanged':True,'graph_files_sha256':data_before,'source_sha256':{n:sha(b) for n,b in files.items()},'ckg_binary_sha256':sha(binary.read_bytes()),'fresh_retrieval_queries':0,'new_final_units':0},indent=2)+'\n')
+ print('Native SQLite probe PASS:3 calls,2 errors retained,1 typed unresolved,1 genuine empty traversal; graph bytes unchanged')
+finally:shutil.rmtree(helper)

@@ -1,0 +1,250 @@
+{
+  "diagnostic_only": true,
+  "quality_metrics": null,
+  "official_verdict": null,
+  "source_mixing_controls": "entire vector directory replaced after initialized pinned SDK connection; source originals untouched",
+  "cases": {
+    "before": {
+      "planned_calls": 10,
+      "observed_calls": 10,
+      "missing_calls": 0,
+      "quality_metrics": null,
+      "positive_calls": 6,
+      "negative_calls": 4,
+      "citations": 20,
+      "bodies": 20,
+      "negative_codes": [
+        {
+          "id": "F-04-DEV-old-mixed",
+          "code": "reindex_required",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-04-DEV-old-changed-blob",
+          "code": "reindex_required",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-04-DEV-old-missing-blobs",
+          "code": "reindex_required",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-05-DEV-a-mixed",
+          "code": "reindex_required",
+          "backend_calls": 0
+        }
+      ],
+      "binary_config_source_db_unchanged": true,
+      "positive_go_and_source_verify_valid": true,
+      "restore_citations_bodies_coordinates_identical": true,
+      "raw_capture_sha256": "c0b97cef753b1283f305f6fb4ede8ccc89077ed69b32cd34c034a0f0aa7ad2f4"
+    },
+    "after": {
+      "planned_calls": 10,
+      "observed_calls": 10,
+      "missing_calls": 0,
+      "quality_metrics": null,
+      "positive_calls": 6,
+      "negative_calls": 4,
+      "citations": 20,
+      "bodies": 20,
+      "negative_codes": [
+        {
+          "id": "F-04-DEV-old-mixed",
+          "code": "snapshot_mismatch",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-04-DEV-old-changed-blob",
+          "code": "snapshot_mismatch",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-04-DEV-old-missing-blobs",
+          "code": "source_missing",
+          "backend_calls": 0
+        },
+        {
+          "id": "F-05-DEV-a-mixed",
+          "code": "snapshot_mismatch",
+          "backend_calls": 0
+        }
+      ],
+      "binary_config_source_db_unchanged": true,
+      "positive_go_and_source_verify_valid": true,
+      "restore_citations_bodies_coordinates_identical": true,
+      "raw_capture_sha256": "30566a0fff4e4fb2d663aae8ccaf6c1cdc428e9093f1a1250ad93ed7f298c66b"
+    }
+  },
+  "before_after_positive_evidence_identical": true,
+  "source_bindings": [
+    {
+      "version": "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-old/dataset/diagnostic",
+      "identity": {
+        "source": {
+          "project_id": "f-04-dev",
+          "source_mode": "committed",
+          "source_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+          "file_manifest_digest": "6795554ad576ebd2c6536bb508a9223cde60b3b1b4e2050125055c12d38a3e08",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "3515d78fddd6e86e588f32bdecb429cf6404d3ebcc4c11976a610f9799908963",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "71ae095fceeabaa04b82cd00ebde055453a898ad61e24a32bd8cc8a4290c5071",
+        "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660"
+      },
+      "source_archive_manifest_sha256": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea"
+    },
+    {
+      "version": "/private/tmp/ks-f0405-preparation-20261005/F-04-DEV-new/dataset/diagnostic",
+      "identity": {
+        "source": {
+          "project_id": "f-04-dev",
+          "source_mode": "committed",
+          "source_commit": "1ed6e0ebaf5bb2b118404965a882686bb8b6e3c5",
+          "file_manifest_digest": "29665af20b3871dc9b899a34bba0d7c4e8ce7310f11ac639225d71e89679e6d0",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "c707aa373dbdf52cae0c41a9263670ec5dbf5e34b38f81e891d117929aa09748"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "71ae095fceeabaa04b82cd00ebde055453a898ad61e24a32bd8cc8a4290c5071",
+        "dataset_id": "b5ee4e2576cbde62984b4f8b1183bcaf4d2b95af270416f3aeb074a9574c8bae"
+      },
+      "source_archive_manifest_sha256": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd"
+    },
+    {
+      "version": "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-a/dataset/diagnostic",
+      "identity": {
+        "source": {
+          "project_id": "f-05-dev-a",
+          "source_mode": "committed",
+          "source_commit": "680adada09d589cf7867c49f164ef8d779503225",
+          "file_manifest_digest": "786d73d924928431cbabc05f48db39de8d9f3ad96309ee0766088fdb939c95d1",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "71ae095fceeabaa04b82cd00ebde055453a898ad61e24a32bd8cc8a4290c5071",
+        "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab"
+      },
+      "source_archive_manifest_sha256": "abfaa8a933d9780b302ec10bfbb605a830f14061ca3d924eefe68fe1a04617b3"
+    },
+    {
+      "version": "/private/tmp/ks-f0405-preparation-20261005/F-05-DEV-b/dataset/diagnostic",
+      "identity": {
+        "source": {
+          "project_id": "f-05-dev-b",
+          "source_mode": "committed",
+          "source_commit": "45e378b9da4fe6d4c796dd84281f28859c282e20",
+          "file_manifest_digest": "598fd2f60cf58cf5a5b78e1abe8455f3e55d06d41c313444dac9c0a6806096c2",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "3c2bb76845a7cc7bd2537437dcddf9e81e3398d9c0615b110b9f980946175c57"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "71ae095fceeabaa04b82cd00ebde055453a898ad61e24a32bd8cc8a4290c5071",
+        "dataset_id": "2032c8717c12198491206109ca3869ff77ba514607682cdc35695a1e67366626"
+      },
+      "source_archive_manifest_sha256": "affa32f6fe59ebafef22453a549049393065f55238829a4032f207f4114924d1"
+    }
+  ],
+  "model_metadata_unchanged": true,
+  "model": {
+    "name": "bge-m3:latest",
+    "model": "bge-m3:latest",
+    "modified_at": "2026-06-07T16:31:51.998226332+09:00",
+    "size": 1157672605,
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "bert",
+      "families": [
+        "bert"
+      ],
+      "parameter_size": "566.70M",
+      "quantization_level": "F16",
+      "context_length": 8192,
+      "embedding_length": 1024
+    },
+    "capabilities": [
+      "embedding"
+    ]
+  }
+}

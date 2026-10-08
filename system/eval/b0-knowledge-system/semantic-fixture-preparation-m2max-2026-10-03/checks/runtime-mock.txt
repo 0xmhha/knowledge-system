@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/b0-verify-proposed-fixtures.py", line 89, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/b0-verify-proposed-fixtures.py", line 60, in main
+    run(label+'-'+arm+'-capture',[binary,'eval','capture','--requests',requests,'--config',config,'--output',capture,'--warmup','0','--retrieval-runs','1','--warm-runs','0','--cold-runs','0'])
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/b0-verify-proposed-fixtures.py", line 34, in run
+    if result.returncode:raise RuntimeError('capture failed; see '+str(path))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: capture failed; see /private/tmp/ks-b0-semantic-runtime-mock-20261003/F-03-DEV-current-combined-capture.txt

@@ -1,0 +1,99 @@
+{
+  "status": "complete_pending_independent_interpretation",
+  "checks": [
+    {
+      "id": "static-descriptive-bound",
+      "command": [
+        "python3",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/b1-summarize-matrix.py",
+        "--capture-dir",
+        "/private/tmp/ks-approved-development-repaired-sweep-20261006/static-development/matrix",
+        "--gold",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/questions.json",
+        "--source-root",
+        "/private/tmp/ks-b0-approved-corpus-20261006",
+        "--partition",
+        "development",
+        "--dataset-audit",
+        "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/approved-inputs-m2max-2026-10-06/strict-audit.json",
+        "--output",
+        "/private/tmp/ks-approved-development-repaired-sweep-20261006/static-development-summary.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.044878666754812,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "static-public-go",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/b1-evidence-audit",
+        "--input",
+        "/private/tmp/ks-approved-development-repaired-sweep-20261006/static-development/matrix/rows.jsonl",
+        "--output",
+        "/private/tmp/ks-approved-development-repaired-sweep-20261006/public-go-verification/static-development.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.6796010844409466,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "state-guards",
+      "command": [
+        "go",
+        "test",
+        "./internal/system/eval",
+        "-run",
+        "^TestRetainedGuardLiveSDK$",
+        "-count=1",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.025387541390955,
+      "log_sha256": "6f12271848c5c854373e90372be8e81badab5035d4f831cb71cb5e45908e50f7"
+    },
+    {
+      "id": "python-b0",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_b0*.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.769184541888535,
+      "log_sha256": "85ac698795166816dc414eb982426ca0894e841d192011e4b9ce86cbd41d8e79"
+    },
+    {
+      "id": "static-v1-sdk",
+      "command": [
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "eval",
+        "--scenarios",
+        "/private/tmp/ks-approved-scope-20261006/approved-development-oracles/static-v1-scenarios",
+        "--config",
+        "/private/tmp/ks-approved-development-repaired-sweep-20261006/static-development/config.yaml",
+        "--cks-mcp",
+        "/private/tmp/ks-approved-scope-20261006/runtime-header-batch/cks",
+        "--verify-anchors",
+        "/private/tmp/ks-b0-approved-corpus-20261006",
+        "--record-responses",
+        "--output",
+        "/private/tmp/ks-approved-scope-20261006/approved-development-oracles/static-v1-sdk.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 48.69541091704741,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "raw_probes": 16,
+  "binary_sha256": "3b80c36d77b5c052894058ec59b12d64f2e5f9e5800aa11314be9e362189d0e6",
+  "dev_capture_sha256": "b0c980efbf6e3d179a7555393e670863621b409d6c0b2e4802ccc5dd0696d3da",
+  "inputs_unchanged": true,
+  "stores_unchanged": true,
+  "final_queries_executed": false,
+  "finished_at": "2026-10-05T20:54:21.435410+00:00"
+}

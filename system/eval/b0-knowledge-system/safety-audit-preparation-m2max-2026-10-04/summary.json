@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "scope": "B1-05 synthetic safety control and public v2 verifier preparation; progress-report preference persisted",
+  "diagnostic_only": true,
+  "implementation_sha256": {
+    "cmd/b1-evidence-audit/main.go": "1f4977826551d57afbcc68c19b39d5dcee55de01a79f722a98165951eafe987e",
+    "cmd/b1-evidence-audit/main_test.go": "19e5f657bdd9b5cc61e7cbd7b5935322053d5234ebe046526d24ec241dca2967",
+    "scripts/b1-audit-safety-controls.py": "d8365f9bdb8bb37d3bd8c2215272906240a49fbdce123c559afac875e10c6a21",
+    "scripts/test_b1_safety_controls.py": "3dd90c77e1cb391629a38a45f23e477ad768711a060787c028ac57f7526f5e09",
+    "scripts/b1-summarize-matrix.py": "9961208564315ac6d5505fea58b3859313972ab17303839c760e3311ebb19a0d",
+    "scripts/update-execution-status.py": "f679c5a78b0cc223e2a5043f93d32b350c244e164ee25f7e21904d7eb89d16a9",
+    "internal/system/evidencev2/pack.go": "3cba93691d9ee0cf8cf940df756683402731a92270f754499b8cb4efc8881135",
+    "internal/system/evidencev2/knowledge.go": "af8cfeaca6f0d49f69d02f1784461b03869ae70f14718e72d2514cb661b98a5d",
+    "pkg/system/contract/v2.go": "7e6af85f4cef19e3c288fa0f9eae9780324cb6a6c5dc7a58ad88f94f023c1469"
+  },
+  "verifier_binary_sha256": "48f026f3dc27404957fb4a58039c5512d886f11e75af8d34f1d76eb7aec55056",
+  "replay": {
+    "captures": [
+      {
+        "status": "control_audit_pass",
+        "observed_rows": 288,
+        "nested_semantic_citation_references_checked": 1320,
+        "pack_on_states": {
+          "complete": 24,
+          "unknown": 48,
+          "stale": 24,
+          "restricted": 24,
+          "conflict": 24
+        },
+        "violation_records": 0,
+        "public_contract_failed_records": 0,
+        "capture": "matrix-capture-real",
+        "paired_comparisons": 144
+      },
+      {
+        "status": "control_audit_pass",
+        "observed_rows": 288,
+        "nested_semantic_citation_references_checked": 600,
+        "pack_on_states": {
+          "complete": 24,
+          "unknown": 48,
+          "stale": 24,
+          "restricted": 24,
+          "conflict": 24
+        },
+        "violation_records": 0,
+        "public_contract_failed_records": 0,
+        "capture": "matrix-capture-mock",
+        "paired_comparisons": 144
+      },
+      {
+        "status": "control_audit_pass",
+        "observed_rows": 24,
+        "nested_semantic_citation_references_checked": 132,
+        "pack_on_states": {
+          "complete": 12
+        },
+        "violation_records": 0,
+        "public_contract_failed_records": 0,
+        "capture": "environment-ledger-real",
+        "paired_comparisons": 12
+      },
+      {
+        "status": "control_audit_pass",
+        "observed_rows": 24,
+        "nested_semantic_citation_references_checked": 72,
+        "pack_on_states": {
+          "complete": 12
+        },
+        "violation_records": 0,
+        "public_contract_failed_records": 0,
+        "capture": "environment-ledger-mock",
+        "paired_comparisons": 12
+      }
+    ],
+    "sdk_rows_total": 624,
+    "nested_references_total": 2124,
+    "paired_comparisons_total": 312,
+    "quality_metrics": null,
+    "human_verdicts": null,
+    "official_B1_05_verdict": "pending"
+  },
+  "retained_inputs_unchanged": 114,
+  "human_input_files_unchanged": 5,
+  "checks": {
+    "go_helper_tests": 2,
+    "go_packages": [
+      "cmd/b1-evidence-audit",
+      "internal/system/evidencev2",
+      "pkg/system/contract"
+    ],
+    "new_command_vet": "pass",
+    "python_control_regressions": 10,
+    "real_public_verifier_mutation_rejections": 3,
+    "cli_rejection_checks": 3,
+    "existing_paired_report_regressions": 16
+  },
+  "helper_fixture_error": "initial synthetic Go fixture missing mandatory integrity algo; corrected, failure retained; not product/C0 failure",
+  "new_model_mcp_or_official_final_queries": 0,
+  "quality_metrics": null,
+  "human_verdicts": null,
+  "official_B1_05_verdict": "pending",
+  "worklist": {
+    "total_tasks": 30,
+    "done": 2,
+    "progress": 11,
+    "waiting": 17,
+    "unfinished": 28,
+    "official_gates_closed": 0,
+    "official_gates_total": 4
+  },
+  "reporting_preference": "Always end with current stage, next task and the full remaining task list; persisted in WORKLIST/HANDOFF.",
+  "next_independent_work": "raw CKV rank and F-01 exact/budget reporting adapters (B0-06/B1-04)",
+  "priority_when_human_decisions_arrive": "B0-01/02/03/05 and STV2 approval binding, frozen inputs/pack/semantic/scope/K, fresh strict B0-07 build",
+  "remaining": "all 28 unfinished task rows plus STV2-01, OP-01–08, native amd64, native/legal/operating scope in EXECUTION-STATUS.md"
+}

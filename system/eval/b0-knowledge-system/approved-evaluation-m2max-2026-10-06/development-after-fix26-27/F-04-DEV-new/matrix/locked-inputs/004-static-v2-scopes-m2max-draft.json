@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "reviewer": "chat-user",
+  "reviewed_at": "2026-10-05T17:10:39.516868+00:00",
+  "question_set_sha256": "975fbbfff441332d173f520ae4151d4fd47b36f0dfde3269eb34337a88089143",
+  "protocol_sha256": "b3de9b72a258b013317f879963714cc1ac5b910b3c9ebce390025ba3e1d3dd25",
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "corpus_tree": "f020f8f30fd209b8de045756dedd12ff83f65cd9",
+  "commit_time_evidence": "2026-10-01T20:53:13+09:00",
+  "date_basis": "calendar date in the recorded commit timezone; proposed query date, not policy approval",
+  "runtime_config_patch": {
+    "retrieval": {
+      "recall_k": 10
+    }
+  },
+  "question_scopes": [
+    {
+      "id": "B0-CODE-01",
+      "partition": "development",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-CODE-02",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-CODE-03",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-WHY-01",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-WHY-02",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-WHY-03",
+      "partition": "development",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-POLICY-01",
+      "partition": "development",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-POLICY-02",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-POLICY-03",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-TRACE-01",
+      "partition": "development",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-ABS-01",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    },
+    {
+      "id": "B0-ABS-02",
+      "partition": "final",
+      "knowledge_as_of": "2026-10-01",
+      "knowledge_subsystem": "knowledge-system"
+    }
+  ],
+  "results": null,
+  "notes": [
+    "Proposed scope only; no date/subsystem approval, final prompts, gold answers, runtime config, dataset or pack identity is published.",
+    "Calendar date is a policy query parameter; not an assertion that a policy was approved or effective at the commit instant.",
+    "Fixed corpus root .cks inventory is absent; external reviewed pack/semantic inputs and locks remain an independent prerequisite.",
+    "Matrix owns include_knowledge off/on; omit it from future request-only manifests. K10 patch must bind to the actual runtime YAML after approval."
+  ]
+}

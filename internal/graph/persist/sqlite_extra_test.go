@@ -290,13 +290,23 @@ func TestMigrate_DispatchKindIdempotent(t *testing.T) {
 
 func TestDistinctFilePaths_Go(t *testing.T) {
 	s := newFixtureStore(t)
+	// Only File nodes describe the current indexed source set. A Hunk may
+	// refer to a Go file that existed only in an earlier commit.
+	if err := s.InsertNodes([]types.Node{
+		{ID: "file000000000001", Type: types.NodeFile, Name: "mypkg.go", QualifiedName: "file:mypkg/mypkg.go", FilePath: "mypkg/mypkg.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted},
+		{ID: "file000000000002", Type: types.NodeFile, Name: "a.go", QualifiedName: "file:mypkg/a.go", FilePath: "mypkg/a.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted},
+		{ID: "file000000000003", Type: types.NodeFile, Name: "b.go", QualifiedName: "file:mypkg/b.go", FilePath: "mypkg/b.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted},
+		{ID: "file000000000004", Type: types.NodeFile, Name: "c.go", QualifiedName: "file:pkg2/c.go", FilePath: "pkg2/c.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted},
+		{ID: "hunk000000000001", Type: types.NodeHunk, Name: "old.go", QualifiedName: "hunk:old.go", FilePath: "deleted/old.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted},
+	}); err != nil {
+		t.Fatalf("InsertNodes: %v", err)
+	}
 
 	paths, err := s.DistinctFilePaths("go")
 	if err != nil {
 		t.Fatalf("DistinctFilePaths: %v", err)
 	}
-	// Fixture has 4 nodes across 4 distinct file paths
-	// (mypkg/mypkg.go, mypkg/a.go, mypkg/b.go, pkg2/c.go).
+	// File nodes cover four current paths; the historical Hunk does not.
 	sort.Strings(paths)
 	want := []string{"mypkg/a.go", "mypkg/b.go", "mypkg/mypkg.go", "pkg2/c.go"}
 	if len(paths) != len(want) {

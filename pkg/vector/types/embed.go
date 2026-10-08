@@ -2,6 +2,9 @@ package types
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 )
 
@@ -10,21 +13,39 @@ import (
 // model registry), so adding or swapping an embedding model needs no change
 // here — the identity flows from the model definition.
 type EmbeddingIdentity struct {
-	Provider  string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
-	Model     string // model name, e.g. "bge-m3"
-	Dim       int    // vector dimension
-	Pooling   string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
-	Normalize string // "l2" | "none"; "" when unknown
+	Provider             string // backend that produced the vectors, e.g. "ollama", "bgeonnx", "mock"
+	Model                string // model name, e.g. "bge-m3"
+	Dim                  int    // vector dimension
+	Pooling              string // "cls" | "mean" | "last_token"; "" when the backend does not expose it
+	Normalize            string // "l2" | "none"; "" when unknown
+	Version              int    `json:"version,omitempty"`
+	ModelDigest          string `json:"model_digest,omitempty"`
+	NativeDim            int    `json:"native_dim,omitempty"`
+	DimensionMethod      string `json:"dimension_method,omitempty"`
+	PassageTransform     string `json:"passage_transform,omitempty"`
+	QueryTransform       string `json:"query_transform,omitempty"`
+	TruncatePolicy       string `json:"truncate_policy,omitempty"`
+	RuntimeContextTokens int    `json:"runtime_context_tokens,omitempty"`
+	RuntimeBatchTokens   int    `json:"runtime_batch_tokens,omitempty"`
+	// ChunkBudgetBytes is the maximum raw chunk size used while building this
+	// index. It is part of v2 identity so incremental reindex cannot mix
+	// chunks produced by different input-budget policies.
+	ChunkBudgetBytes int `json:"chunk_budget_bytes,omitempty"`
 }
 
-// Checksum is a stable identity string for the embedding space. Two embedders
-// that produce comparable vectors yield the same Checksum; any difference
-// (provider, model, dim, pooling, normalization) yields a different one. It is
+// Checksum is a stable identity string for the embedding space. Version 1
+// preserves the original readable format; version 2 hashes all identity
+// fields, including model bytes and text transforms. It is
 // recorded in the manifest at build time and compared on Open so a
 // silently-incompatible index/embedder pair (e.g. Ollama bge-m3 vs ONNX
 // bge-m3) is rejected with a reindex hint instead of returning meaningless
 // similarity scores.
 func (id EmbeddingIdentity) Checksum() string {
+	if id.Version >= 2 {
+		payload, _ := json.Marshal(id)
+		sum := sha256.Sum256(payload)
+		return "v2:sha256:" + hex.EncodeToString(sum[:])
+	}
 	return fmt.Sprintf("provider=%s;model=%s;dim=%d;pooling=%s;normalize=%s",
 		id.Provider, id.Model, id.Dim, id.Pooling, id.Normalize)
 }
@@ -46,8 +67,9 @@ func (id EmbeddingIdentity) Checksum() string {
 //   - Name returns a stable identifier persisted in the manifest
 //     (e.g. "bge-large-en-v1.5"). Mismatch on rebuild → IndexUnavailable.
 //   - Dimension is the vector length. Used to size the sqlite-vec column.
-//   - MaxInputTokens is the model's context limit; the chunker truncates
-//     overlong text up front (signature stays at the head).
+//   - MaxInputTokens is the model's context limit. The builder uses it as a
+//     legacy text-size estimate; v2 ChunkBudgetBytes applies a conservative
+//     lossless split when the provider needs a stricter raw-input bound.
 //   - Embed is batched. Implementations choose internal batching (CPU≈32,
 //     GPU≈256) but the caller MAY pass arbitrary-size slices.
 type Embedder interface {
@@ -56,6 +78,11 @@ type Embedder interface {
 	Dimension() int
 	MaxInputTokens() int
 	Embed(ctx context.Context, batch []string) ([][]float32, error)
+}
+
+// IdentityVerifier rechecks an external model at publication boundaries.
+type IdentityVerifier interface {
+	VerifyIdentity(context.Context) error
 }
 
 // QueryEmbedder is an optional Embedder capability for asymmetric models —

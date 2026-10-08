@@ -1,0 +1,20 @@
+import json,hashlib,subprocess
+from pathlib import Path
+ROOT=Path.cwd();RUN=Path('/private/tmp/ks-fix19-20261005');OUT=ROOT/'system/eval/b0-knowledge-system/retained-guard-preparation-m2max-2026-10-05'
+OUT.mkdir(exist_ok=False)
+for p in RUN.iterdir():
+ if p.suffix in ('.json','.txt','.py'):
+  dest=OUT/(p.name+'.txt' if p.suffix=='.py' else p.name);dest.write_bytes(p.read_bytes())
+source_files=['internal/setup/identity.go','internal/system/mcp/get_for_task_v2.go','internal/system/mcp/get_for_task_v2_error_test.go','internal/system/mcp/get_for_task_v2_ontology_knowledge_test.go','internal/system/eval/retained_guard_live_test.go']
+for f in source_files:
+ dest=OUT/'source'/ (f+'.txt');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((ROOT/f).read_bytes())
+inputs=['questions.json','protocol-m2max-draft.json','dynamic-fixtures-m2max-draft.json','human-review-m2max-2026-10-03.json','static-v2-scopes-m2max-draft.json'];input_bindings=[]
+for name in inputs:
+ rel='system/eval/b0-knowledge-system/'+name;raw=(ROOT/rel).read_bytes();assert raw==subprocess.check_output(['git','show','HEAD:'+rel]);input_bindings.append({'path':rel,'sha256':hashlib.sha256(raw).hexdigest(),'unchanged_from_starting_head':True})
+meta={'starting_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'diagnostic_only':True,'quality_metrics':None,'official_verdict':None,'human_inputs':input_bindings,'source_snapshots':[f+'.txt' for f in source_files],'helper_failures':'Initial public-field compile correction and empty WAL/SHM-copy assumption are preserved separately from FIX-19 product failures. Empty WAL and associated SHM omitted only in owned copies; nonempty WAL rejected. Original complete seals include every file.'}
+(OUT/'metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+entries=[]
+for f in sorted(OUT.rglob('*')):
+ if f.is_file():raw=f.read_bytes();entries.append({'path':str(f.relative_to(ROOT)),'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
+(OUT/'evidence-manifest.json').write_text(json.dumps({'diagnostic_only':True,'quality_metrics':None,'entries':entries},indent=2)+'\n')
+print(len(entries),'evidence entries')

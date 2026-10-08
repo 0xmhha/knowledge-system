@@ -1,0 +1,30 @@
+package main
+import("bytes";"context";"crypto/sha256";"encoding/hex";"encoding/json";"fmt";"os";"os/exec";"strings";"github.com/0xmhha/knowledge-system/internal/system/semantic")
+type Seed struct{ID string `json:"id"`;Path string `json:"path"`;First int `json:"first"`;Last int `json:"last"`;ConceptID string `json:"concept_id"`;Statement string `json:"statement"`}
+func must(err error){if err!=nil{panic(err)}}
+func main(){
+ commit,err:=exec.Command("git","rev-parse","HEAD").Output();must(err)
+ snapshot:=semantic.Snapshot{ProjectID:"knowledge-system",DatasetID:"policy-review-ab77ce56",Commit:strings.TrimSpace(string(commit))}
+ read:=func(path string)[]byte{b,err:=exec.Command("git","show",snapshot.Commit+":"+path).Output();must(err);return b}
+ p,_,err:=semantic.ExtractOntology(snapshot,"docs/spec-driven/ontology-pilot.yaml",read("docs/spec-driven/ontology-pilot.yaml"));must(err)
+ sp,_,err:=semantic.ExtractSpec(snapshot,"docs/spec-driven/spec-pilot.yaml",read("docs/spec-driven/spec-pilot.yaml"));must(err)
+ p.Evidence=append(p.Evidence,sp.Evidence...);p.Requirements=sp.Requirements
+ raw,err:=os.ReadFile(os.Args[1]);must(err);var seeds []Seed;must(json.Unmarshal(raw,&seeds))
+ docs:=map[string]semantic.Projection{};conceptEvidence:=map[string]string{}
+ for _,c:=range p.Concepts{conceptEvidence[c.ID]=c.EvidenceID}
+ for _,s:=range seeds{
+  doc,ok:=docs[s.Path];if !ok{doc,err=semantic.ExtractMarkdown(snapshot,s.Path,read(s.Path));must(err);docs[s.Path]=doc;p.Evidence=append(p.Evidence,doc.Evidence...);p.Sections=append(p.Sections,doc.Sections...)}
+  lines:=bytes.SplitAfter(read(s.Path),[]byte{'\n'});if len(lines)>0&&len(lines[len(lines)-1])==0{lines=lines[:len(lines)-1]}
+  if s.First<1||s.Last<s.First||s.Last>len(lines){panic("invalid requested source span")}
+  sum:=sha256.Sum256(bytes.Join(lines[s.First-1:s.Last],nil));proof:=semantic.EvidenceSpan{ID:"policy-evidence:"+s.ID,Snapshot:snapshot,Kind:semantic.SourceDocument,Path:s.Path,StartLine:s.First,EndLine:s.Last,ContentSHA256:hex.EncodeToString(sum[:]),Extractor:"manual-policy-review-v1"}
+  p.Evidence=append(p.Evidence,proof)
+  var chosen semantic.DocumentSection;var chosenEvidence semantic.EvidenceSpan
+  for _,section:=range doc.Sections{for _,e:=range doc.Evidence{if e.ID==section.EvidenceID&&e.StartLine<=s.First&&e.EndLine>=s.Last&&(chosen.ID==""||e.EndLine-e.StartLine<chosenEvidence.EndLine-chosenEvidence.StartLine){chosen=section;chosenEvidence=e}}}
+  if chosen.ID==""||conceptEvidence[s.ConceptID]==""{panic(fmt.Sprintf("missing section or concept for %s %s:%d-%d (%d sections)",s.ID,s.Path,s.First,s.Last,len(doc.Sections)))}
+  claim:=semantic.Claim{ID:"pilot-claim:"+s.ID,Statement:s.Statement,SectionID:chosen.ID,EvidenceIDs:[]string{proof.ID,chosenEvidence.ID},Status:semantic.StatusProposed}
+  p.Claims=append(p.Claims,claim)
+  p.Assertions=append(p.Assertions,semantic.Assertion{ID:"supports:"+s.ID,Predicate:semantic.PredicateSupports,SubjectID:chosen.ID,ObjectID:claim.ID,EvidenceIDs:[]string{chosenEvidence.ID,proof.ID},Status:semantic.StatusProposed},semantic.Assertion{ID:"about:"+s.ID,Predicate:semantic.PredicateAbout,SubjectID:claim.ID,ObjectID:s.ConceptID,EvidenceIDs:[]string{proof.ID,conceptEvidence[s.ConceptID]},Status:semantic.StatusProposed})
+ }
+ must(p.ValidateSources(context.Background(),"."));output,err:=json.MarshalIndent(p,"","  ");must(err);must(os.WriteFile(os.Args[2],append(output,'\n'),0600))
+ fmt.Printf("actual policy/ADR proposed projection: %d concepts, %d requirements, %d claims, %d assertions; source bytes and typed directions validated; approvals0\n",len(p.Concepts),len(p.Requirements),len(p.Claims),len(p.Assertions))
+}

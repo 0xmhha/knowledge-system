@@ -1,0 +1,14 @@
+--- FAIL: TestV2PreflightPreservesPinnedFailureCode (0.08s)
+    --- FAIL: TestV2PreflightPreservesPinnedFailureCode/changed_blob (0.02s)
+        get_for_task_v2_error_test.go:112: want snapshot_mismatch got &{Result:{Meta:<nil>} Content:[{Annotated:{Annotations:<nil>} Meta:<nil> Type:text Text:code=reindex_required: A pinned retained dataset is required.}] StructuredContent:map[code:reindex_required message:A pinned retained dataset is required.] RawStructuredContent:[] IsError:true}
+    --- FAIL: TestV2PreflightPreservesPinnedFailureCode/missing_blob (0.02s)
+        get_for_task_v2_error_test.go:112: want source_missing got &{Result:{Meta:<nil>} Content:[{Annotated:{Annotations:<nil>} Meta:<nil> Type:text Text:code=reindex_required: A pinned retained dataset is required.}] StructuredContent:map[code:reindex_required message:A pinned retained dataset is required.] RawStructuredContent:[] IsError:true}
+    --- FAIL: TestV2PreflightPreservesPinnedFailureCode/mixed_snapshot (0.02s)
+        get_for_task_v2_error_test.go:97: preflight code: want snapshot_mismatch got vector candidate identity differs from dataset
+        get_for_task_v2_error_test.go:112: want snapshot_mismatch got &{Result:{Meta:<nil>} Content:[{Annotated:{Annotations:<nil>} Meta:<nil> Type:text Text:code=reindex_required: A pinned retained dataset is required.}] StructuredContent:map[code:reindex_required message:A pinned retained dataset is required.] RawStructuredContent:[] IsError:true}
+    --- FAIL: TestV2PreflightPreservesPinnedFailureCode/mixed_project (0.02s)
+        get_for_task_v2_error_test.go:97: preflight code: want snapshot_mismatch got vector candidate identity differs from dataset
+        get_for_task_v2_error_test.go:112: want snapshot_mismatch got &{Result:{Meta:<nil>} Content:[{Annotated:{Annotations:<nil>} Meta:<nil> Type:text Text:code=reindex_required: A pinned retained dataset is required.}] StructuredContent:map[code:reindex_required message:A pinned retained dataset is required.] RawStructuredContent:[] IsError:true}
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/mcp	0.674s
+FAIL

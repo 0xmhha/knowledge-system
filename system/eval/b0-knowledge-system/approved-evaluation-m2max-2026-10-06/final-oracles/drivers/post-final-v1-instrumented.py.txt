@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,hashlib,subprocess,time,re,collections,datetime
+R=Path('/private/tmp/ks-approved-scope-20261006');N=Path('/private/tmp/ks-approved-final-sweep-20261006');root=Path.cwd();read=lambda p:json.loads(p.read_bytes());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+while not(R/'approved-final-stale-ckv/summary.json').exists():time.sleep(4)
+assert read(R/'approved-final-stale-ckv/summary.json')['status']=='pass'
+out=R/'approved-final-v1-instrumented';out.mkdir(exist_ok=False);execution=read(N/'execution.json');binary=R/'runtime-header-batch/cks';assert execution['binary_sha256']==sha(binary)
+requests=out/'requests.json';book=read(root/'system/eval/b0-knowledge-system/questions.json');protocol=read(root/'system/eval/b0-knowledge-system/protocol-m2max-draft.json');selected=set(protocol['final_questions']);requests.write_text(json.dumps({'schema_version':1,'requests':[{'id':q['id'],'tool':'cks.context.get_for_task','arguments':{'prompt':q['prompt']}}for q in book['questions']if q['id']in selected]},ensure_ascii=False,indent=2)+'\n')
+config=out/'config.yaml';text=(N/'static-final/matrix/baseline_off.yaml').read_text();text=re.sub(r'(?m)^    footprint_dir: .*$', '    footprint_dir: '+str(out/'footprints'),text);config.write_text(text)
+args=[binary,'eval','capture','--requests',requests,'--config',config,'--cks-mcp',binary,'--output',out/'capture.json','--warmup','0','--retrieval-runs','5','--warm-runs','0','--cold-runs','0','--call-timeout','90s']
+with(out/'capture.log').open('xb')as stream:code=subprocess.run([str(v)for v in args],stdout=stream,stderr=subprocess.STDOUT).returncode
+report=read(out/'capture.json');assert code==0 and report['state']=='captured'and len(report['rows'])==40 and not report.get('errors');assert report['binary_sha256']==report['binary_sha256_after']==sha(binary)and report['config_sha256']==report['config_sha256_after']==sha(config)
+backend={}
+for l in (out/'footprints/cks-mcp.jsonl').open():
+ v=json.loads(l)
+ if v.get('event')=='measurement.backend_calls'and v['summary'].get('tool')=='cks.context.get_for_task':
+  mid=v['summary']['measurement_id'];assert mid not in backend;backend[mid]=v['summary']
+records=[];seen=set()
+for row in report['rows']:
+ call=row['call'];mid=call['measurement_id'];assert mid not in seen;seen.add(mid);assert mid in backend and not row.get('error')and not call.get('transport_error')and not call['response'].get('isError')
+ pack=call['response']['structuredContent'];files={c['file']for c in pack['citations']};hashes={}
+ for c in pack['citations']:
+  relative=Path(c['file']);assert not relative.is_absolute()and '..'not in relative.parts
+  source=Path('/private/tmp/ks-b0-approved-corpus-20261006')/relative;raw=source.read_bytes();assert c['commit_hash']==book['corpus_commit']and 1<=c['start_line']<=c['end_line']<=len(raw.splitlines());hashes[c['file']]=hashlib.sha256(raw).hexdigest()
+ records.append({'request_id':row['request_id'],'iteration':row['iteration'],'measurement_id':mid,'source_files_sha256':hashes,'returned_citations':len(pack['citations']),'returned_bodies':len(pack['bodies']),'backend_attempts':dict(collections.Counter(c['backend']for c in backend[mid]['calls'])),'observed_search_k':[c['options']['K']for c in backend[mid]['calls']if c['backend']=='ckv'and'K'in c.get('options',{})]})
+assert set(backend)==seen;assert all(sha(Path(p))==d for p,d in execution['input_sha256_before'].items());assert all(sha(Path(p))==d for p,d in execution['store_sha256_before'].items())
+(out/'summary.json').write_text(json.dumps({'schema_version':1,'status':'pass','scope':'approved static FINAL v1 raw SDK responses with measurement-ID/backend bindings; outside paired latency capture; anchor metrics are in separate cks eval report','command':[str(v)for v in args],'capture_sha256':sha(out/'capture.json'),'requests_sha256':sha(requests),'config_sha256':sha(config),'binary_sha256':sha(binary),'footprints_sha256':sha(out/'footprints/cks-mcp.jsonl'),'rows':records,'model_digest':protocol['model']['digest'],'inputs_unchanged':True,'stores_unchanged':True,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},ensure_ascii=False,indent=2)+'\n');print('Approved v1 raw SDK/backend/source bindings: 40 calls, 0 failures',flush=True)

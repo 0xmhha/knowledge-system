@@ -1,0 +1,1293 @@
+{
+  "cases_sha256": "b261d880468f317cdd1bc18b94b22aac34c3b1d6df0c3caa872875c33f2eb73f",
+  "diagnostic_only": true,
+  "official_verdict": null,
+  "quality_metrics": null,
+  "rows": [
+    {
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-04-DEV-old-baseline",
+      "raw_call": {
+        "measurement_id": "6672663fc67076c9b0e833c1493709ab",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 124978250,
+        "completed_at": "2026-10-05T19:55:38.979687+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-04-dev",
+              "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+              "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+              "source_mode": "committed",
+              "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+                },
+                "text": "func Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "6335c5ce546ce6db0f756217911547d418311d8c1a3b03a6db492d5aee0c3896"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-baseline",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "actual_code": "snapshot_mismatch",
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "snapshot_mismatch",
+      "id": "F-04-DEV-old-mixed",
+      "raw_call": {
+        "measurement_id": "668d591add5a95ce3d7ce4b135620eef",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 1330291,
+        "completed_at": "2026-10-05T19:55:39.005473+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=snapshot_mismatch: The indexed source identity does not match."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "snapshot_mismatch",
+            "message": "The indexed source identity does not match."
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-mixed",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-04-DEV-old-restored",
+      "raw_call": {
+        "measurement_id": "652b164e894a375fb2e3ce7d4c098c56",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 123821708,
+        "completed_at": "2026-10-05T19:55:39.135559+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-04-dev",
+              "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+              "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+              "source_mode": "committed",
+              "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+                },
+                "text": "func Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "6335c5ce546ce6db0f756217911547d418311d8c1a3b03a6db492d5aee0c3896"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-restored",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "actual_code": "snapshot_mismatch",
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "snapshot_mismatch",
+      "id": "F-04-DEV-old-changed-blob",
+      "raw_call": {
+        "measurement_id": "0c24ba04934d7dc9af9f220f511a1d8a",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 5656000,
+        "completed_at": "2026-10-05T19:55:39.146184+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=snapshot_mismatch: The indexed source identity does not match."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "snapshot_mismatch",
+            "message": "The indexed source identity does not match."
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-changed-blob",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-04-DEV-old-restored-blob",
+      "raw_call": {
+        "measurement_id": "5f1c6013a2bd0f523b36592328454e7b",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 122716917,
+        "completed_at": "2026-10-05T19:55:39.269402+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-04-dev",
+              "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+              "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+              "source_mode": "committed",
+              "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+                },
+                "text": "func Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "6335c5ce546ce6db0f756217911547d418311d8c1a3b03a6db492d5aee0c3896"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-restored-blob",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "actual_code": "source_missing",
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "source_missing",
+      "id": "F-04-DEV-old-missing-blobs",
+      "raw_call": {
+        "measurement_id": "d9d915c4c839c076dd8b71e60b849b23",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 4180542,
+        "completed_at": "2026-10-05T19:55:39.278257+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=source_missing: A pinned source file is missing."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "source_missing",
+            "message": "A pinned source file is missing."
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-missing-blobs",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-04-DEV-old-restored-blobs",
+      "raw_call": {
+        "measurement_id": "4eac46b905ad0197ce373b856035f140",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 113710625,
+        "completed_at": "2026-10-05T19:55:39.392366+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-04-dev",
+              "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+              "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+              "source_mode": "committed",
+              "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "project_id": "f-04-dev",
+                "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                "source_mode": "committed",
+                "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                "origin_id": "repo",
+                "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "2fd6df5085aad72549529bffa7080f338d8089973ed472e3bc1bbc6a9230de7e"
+                },
+                "text": "func Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-old-token\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "project_id": "f-04-dev",
+                  "dataset_id": "3fcddee6d851134bf32298c836b0fd1eb280ef142094553469fa20991e3a9660",
+                  "snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a",
+                  "source_mode": "committed",
+                  "base_commit": "1baa8f94dbd79a3d5520616725ee86b551e95739",
+                  "origin_id": "repo",
+                  "file_sha256": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "6335c5ce546ce6db0f756217911547d418311d8c1a3b03a6db492d5aee0c3896"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-04-DEV-old-restored-blobs",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9d56fbbec5d8753fa20a1b0c4007517f0738b777c6f5fa960352f0fe65135e1a"
+    },
+    {
+      "copied_after_sha256": {
+        "dataset-identity.json": "1bb84b9a92b689f29f655ef7e0d118d80280fad5572485962ca4b07075489e9b",
+        "graph/graph.db": "a5093332eaaf6f5c89a62855f46844cf378d84a233e44d18b5d0f2233903c669",
+        "graph/manifest.json": "50f1570d530e19c0eefc9cba883e22b1aabc4f4f2e023106ddf9e663434693b8",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+        "sources/history.bundle": "5fdf22fba307660dd046f8a7e56dc32463a552e1e85e7f12b945f4e49ad2d2f4",
+        "sources/manifest.json": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "7e65f7a695cae83f3473a41084e677f9b019cacc2765d4194d1d57b4a03b6369",
+        "vector/manifest.json": "5b7a61185e5c6263318cd7af3467181df8375b9c86465075add32dfbfbee1b07",
+        "vector/vector.db": "749c38db27e3a9a064f2122316dd2ff81120f422d9b5be5ce690a0b529ac9610",
+        "vector/vector.db.bak.1791171205": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "copied_sha256": {
+        "dataset-identity.json": "1bb84b9a92b689f29f655ef7e0d118d80280fad5572485962ca4b07075489e9b",
+        "graph/graph.db": "a5093332eaaf6f5c89a62855f46844cf378d84a233e44d18b5d0f2233903c669",
+        "graph/manifest.json": "50f1570d530e19c0eefc9cba883e22b1aabc4f4f2e023106ddf9e663434693b8",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+        "sources/history.bundle": "5fdf22fba307660dd046f8a7e56dc32463a552e1e85e7f12b945f4e49ad2d2f4",
+        "sources/manifest.json": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "7e65f7a695cae83f3473a41084e677f9b019cacc2765d4194d1d57b4a03b6369",
+        "vector/manifest.json": "5b7a61185e5c6263318cd7af3467181df8375b9c86465075add32dfbfbee1b07",
+        "vector/vector.db": "749c38db27e3a9a064f2122316dd2ff81120f422d9b5be5ce690a0b529ac9610",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171205": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "id": "F-04-DEV-old-seals",
+      "mixed_after_sha256": {
+        "dataset-identity.json": "a3d881caac4475acc32a307a63b980e3f59ac0ba6a5e9dcb3333a7ab16d73585",
+        "graph/graph.db": "b13a570a83fe55ae7a0120532df28d50440eaced038d446d19b11378142ea170",
+        "graph/manifest.json": "88f65acffa505bdc5ef3774e9289fe6d4a6dacf2e4541ab83005eeaf52bd3d2a",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+        "sources/history.bundle": "ddd0f0b59cc3a6748ce9af586329d29e3762ae3bf88eca9fcd64bc46484a2964",
+        "sources/manifest.json": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "20eeee9691d1058074a969409fd37466144bb3e7fa1585ec603b230ffea906be",
+        "vector/manifest.json": "22f7f164af910f98a06ccbad48491b4589f89b85c0c94ea68c396709c18b0f31",
+        "vector/vector.db": "e42bd2774ab31b6ed7a658a5a2463c7aa74cd6e1d38a942f21215423a26f9322",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171213": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "mixed_source_sha256": {
+        "dataset-identity.json": "a3d881caac4475acc32a307a63b980e3f59ac0ba6a5e9dcb3333a7ab16d73585",
+        "graph/graph.db": "b13a570a83fe55ae7a0120532df28d50440eaced038d446d19b11378142ea170",
+        "graph/manifest.json": "88f65acffa505bdc5ef3774e9289fe6d4a6dacf2e4541ab83005eeaf52bd3d2a",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304": "aefc2679800c6e9176eeda949d3e5468eb0380a07c29440598f7fe8afe5c0304",
+        "sources/history.bundle": "ddd0f0b59cc3a6748ce9af586329d29e3762ae3bf88eca9fcd64bc46484a2964",
+        "sources/manifest.json": "0c413e50a471943e04c3258e2a884f6459cd8ebff2eb0df8202ed91ef76abfdd",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "20eeee9691d1058074a969409fd37466144bb3e7fa1585ec603b230ffea906be",
+        "vector/manifest.json": "22f7f164af910f98a06ccbad48491b4589f89b85c0c94ea68c396709c18b0f31",
+        "vector/vector.db": "e42bd2774ab31b6ed7a658a5a2463c7aa74cd6e1d38a942f21215423a26f9322",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171213": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "original_after_sha256": {
+        "dataset-identity.json": "1bb84b9a92b689f29f655ef7e0d118d80280fad5572485962ca4b07075489e9b",
+        "graph/graph.db": "a5093332eaaf6f5c89a62855f46844cf378d84a233e44d18b5d0f2233903c669",
+        "graph/manifest.json": "50f1570d530e19c0eefc9cba883e22b1aabc4f4f2e023106ddf9e663434693b8",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+        "sources/history.bundle": "5fdf22fba307660dd046f8a7e56dc32463a552e1e85e7f12b945f4e49ad2d2f4",
+        "sources/manifest.json": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "7e65f7a695cae83f3473a41084e677f9b019cacc2765d4194d1d57b4a03b6369",
+        "vector/manifest.json": "5b7a61185e5c6263318cd7af3467181df8375b9c86465075add32dfbfbee1b07",
+        "vector/vector.db": "749c38db27e3a9a064f2122316dd2ff81120f422d9b5be5ce690a0b529ac9610",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171205": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "original_and_copy_payloads_unchanged": false,
+      "original_sha256": {
+        "dataset-identity.json": "1bb84b9a92b689f29f655ef7e0d118d80280fad5572485962ca4b07075489e9b",
+        "graph/graph.db": "a5093332eaaf6f5c89a62855f46844cf378d84a233e44d18b5d0f2233903c669",
+        "graph/manifest.json": "50f1570d530e19c0eefc9cba883e22b1aabc4f4f2e023106ddf9e663434693b8",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a": "d12a597f4a967b0bd0d539369b3d1dd09715cefbe48240fa7983b4809f40b88a",
+        "sources/history.bundle": "5fdf22fba307660dd046f8a7e56dc32463a552e1e85e7f12b945f4e49ad2d2f4",
+        "sources/manifest.json": "76245e16aabc065f26ee6a1cb71b74f88c5cb491910ef5343e672cde5056abea",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "7e65f7a695cae83f3473a41084e677f9b019cacc2765d4194d1d57b4a03b6369",
+        "vector/manifest.json": "5b7a61185e5c6263318cd7af3467181df8375b9c86465075add32dfbfbee1b07",
+        "vector/vector.db": "749c38db27e3a9a064f2122316dd2ff81120f422d9b5be5ce690a0b529ac9610",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171205": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      }
+    },
+    {
+      "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-05-DEV-a-baseline",
+      "raw_call": {
+        "measurement_id": "e754fe5cb76bb9b194cc6f133b025806",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 127553125,
+        "completed_at": "2026-10-05T19:55:41.445061+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-05-dev-a",
+              "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+              "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+              "source_mode": "committed",
+              "base_commit": "680adada09d589cf7867c49f164ef8d779503225"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+              },
+              {
+                "file": "docs/policy.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+                },
+                "text": "func Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/policy.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                  "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+                },
+                "text": "# Refund policy A\n\nDEV-project-a requires a refund limit of 10.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "9f0ff8c825d8cc9b5c63452ea35973ba077c9b22fe0cc5c95987c852888460cb"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-05-DEV-a-baseline",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba"
+    },
+    {
+      "actual_code": "snapshot_mismatch",
+      "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+      "expected_code": "snapshot_mismatch",
+      "id": "F-05-DEV-a-mixed",
+      "raw_call": {
+        "measurement_id": "bc73c888ace02f91e31db703cf208f32",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 911125,
+        "completed_at": "2026-10-05T19:55:41.468211+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "code=snapshot_mismatch: The indexed source identity does not match."
+            }
+          ],
+          "isError": true,
+          "structuredContent": {
+            "code": "snapshot_mismatch",
+            "message": "The indexed source identity does not match."
+          }
+        }
+      },
+      "request": {
+        "id": "F-05-DEV-a-mixed",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba"
+    },
+    {
+      "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+      "expected_code": "",
+      "go_verify_valid": true,
+      "id": "F-05-DEV-a-restored",
+      "raw_call": {
+        "measurement_id": "2852063e9d78a554d3a0d3440006b72c",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        },
+        "elapsed_ns": 123455167,
+        "completed_at": "2026-10-05T19:55:41.597746+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "f-05-dev-a",
+              "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+              "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+              "source_mode": "committed",
+              "base_commit": "680adada09d589cf7867c49f164ef8d779503225"
+            },
+            "query": "What value does Alpha return?",
+            "citations": [
+              {
+                "file": "main.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+              },
+              {
+                "file": "docs/policy.md",
+                "start_line": 1,
+                "end_line": 3,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+              },
+              {
+                "file": "main.go",
+                "start_line": 1,
+                "end_line": 1,
+                "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                "project_id": "f-05-dev-a",
+                "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                "source_mode": "committed",
+                "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                "origin_id": "repo",
+                "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 3,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "b93079e92071290344e6ca57a547a1583ae11ce2231b39a056e0fc011d8bebd3"
+                },
+                "text": "func Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50"
+                },
+                "text": "package fixture\n\nfunc Alpha() string { return \"DEV-project-a\" }\n"
+              },
+              {
+                "citation": {
+                  "file": "docs/policy.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+                  "content_sha256": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52"
+                },
+                "text": "# Refund policy A\n\nDEV-project-a requires a refund limit of 10.\n"
+              },
+              {
+                "citation": {
+                  "file": "main.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "680adada09d589cf7867c49f164ef8d779503225",
+                  "project_id": "f-05-dev-a",
+                  "dataset_id": "c5ad5b44267271df59ed160e700e446086d7b84797cdb249372e59bbbc05efab",
+                  "snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba",
+                  "source_mode": "committed",
+                  "base_commit": "680adada09d589cf7867c49f164ef8d779503225",
+                  "origin_id": "repo",
+                  "file_sha256": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+                  "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+                },
+                "text": "package fixture\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "9f0ff8c825d8cc9b5c63452ea35973ba077c9b22fe0cc5c95987c852888460cb"
+            }
+          }
+        }
+      },
+      "request": {
+        "id": "F-05-DEV-a-restored",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "What value does Alpha return?"
+        }
+      },
+      "source_snapshot_id": "9ed9116d5301325e7d2a8e9af51c8cd1ad09de387957ad1d5ee2ec73387625ba"
+    },
+    {
+      "copied_after_sha256": {
+        "dataset-identity.json": "6d2bb89e4d0dc23640210028b77aaf33e7cd87fbd26ade63ea94570529f525cc",
+        "graph/graph.db": "0b2612beb932d394e7699c0cb374fd08ed569a87b65379fab9f98d7bfdfc6636",
+        "graph/manifest.json": "c32aae1f4296d6495a141f9185cf0704768bb3666e499d4257a95be692d412ef",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "sources/blobs/fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "sources/history.bundle": "e259a254904c7a0af71a801320413386ae1af0b6781e72fb52e8658d892b07cf",
+        "sources/manifest.json": "abfaa8a933d9780b302ec10bfbb605a830f14061ca3d924eefe68fe1a04617b3",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "afbb2dcaff5a736bd07d42718be443cff059b1c4d24d9924685cf3ae949a48e5",
+        "vector/manifest.json": "54a97aef6a793a966d678ac0ce4de4f285b1c7b5dd4824ee6aa9dbac1e468db3",
+        "vector/vector.db": "90281cefaaf3d01b7881f374ffa62e80fb4374910a0059f021fd283829ee1a03",
+        "vector/vector.db.bak.1791171221": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "copied_sha256": {
+        "dataset-identity.json": "6d2bb89e4d0dc23640210028b77aaf33e7cd87fbd26ade63ea94570529f525cc",
+        "graph/graph.db": "0b2612beb932d394e7699c0cb374fd08ed569a87b65379fab9f98d7bfdfc6636",
+        "graph/manifest.json": "c32aae1f4296d6495a141f9185cf0704768bb3666e499d4257a95be692d412ef",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "sources/blobs/fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "sources/history.bundle": "e259a254904c7a0af71a801320413386ae1af0b6781e72fb52e8658d892b07cf",
+        "sources/manifest.json": "abfaa8a933d9780b302ec10bfbb605a830f14061ca3d924eefe68fe1a04617b3",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "afbb2dcaff5a736bd07d42718be443cff059b1c4d24d9924685cf3ae949a48e5",
+        "vector/manifest.json": "54a97aef6a793a966d678ac0ce4de4f285b1c7b5dd4824ee6aa9dbac1e468db3",
+        "vector/vector.db": "90281cefaaf3d01b7881f374ffa62e80fb4374910a0059f021fd283829ee1a03",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171221": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "id": "F-05-DEV-a-seals",
+      "mixed_after_sha256": {
+        "dataset-identity.json": "154fe1dae2b2fd1296cd9003602c5624abdb212c86cacdb6b0aff940cfd4138f",
+        "graph/graph.db": "f9437180c8c9acd352e5b35077dfc9b181c121d4ef1354fe52a8b24b6f2ae4a6",
+        "graph/manifest.json": "14cbc896a40d96ea3ecdbf12003169d50e2a377bc9a05e78e8dafe9b05623aaa",
+        "sources/blobs/2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+        "sources/history.bundle": "956eeb782fab67d56c83392880b035b7b26bed3b641b38903870c1c01fdb6692",
+        "sources/manifest.json": "affa32f6fe59ebafef22453a549049393065f55238829a4032f207f4114924d1",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "73702f879a4034e71b1556ae43d85a62247a3bdd03acf1c45a97c3eaf75f7b77",
+        "vector/manifest.json": "c6acdce0c6e964850c7fdf4992711dadae8eb73717aa9e983562c188572a5920",
+        "vector/vector.db": "e1516deaafed09eadd40fa824d342bdfde2237afcb299016bfffa1da5c59a3cd",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171230": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "mixed_source_sha256": {
+        "dataset-identity.json": "154fe1dae2b2fd1296cd9003602c5624abdb212c86cacdb6b0aff940cfd4138f",
+        "graph/graph.db": "f9437180c8c9acd352e5b35077dfc9b181c121d4ef1354fe52a8b24b6f2ae4a6",
+        "graph/manifest.json": "14cbc896a40d96ea3ecdbf12003169d50e2a377bc9a05e78e8dafe9b05623aaa",
+        "sources/blobs/2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a": "2536cc77530ee3bdce2b6731cfe3dd7f830e2b261482c7c2fb4cf42994157a0a",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4": "d93e4cd1e3990af6a886ada62e976e18f31f44b3d00e0bb5724bc59abd6488b4",
+        "sources/history.bundle": "956eeb782fab67d56c83392880b035b7b26bed3b641b38903870c1c01fdb6692",
+        "sources/manifest.json": "affa32f6fe59ebafef22453a549049393065f55238829a4032f207f4114924d1",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "73702f879a4034e71b1556ae43d85a62247a3bdd03acf1c45a97c3eaf75f7b77",
+        "vector/manifest.json": "c6acdce0c6e964850c7fdf4992711dadae8eb73717aa9e983562c188572a5920",
+        "vector/vector.db": "e1516deaafed09eadd40fa824d342bdfde2237afcb299016bfffa1da5c59a3cd",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171230": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "original_after_sha256": {
+        "dataset-identity.json": "6d2bb89e4d0dc23640210028b77aaf33e7cd87fbd26ade63ea94570529f525cc",
+        "graph/graph.db": "0b2612beb932d394e7699c0cb374fd08ed569a87b65379fab9f98d7bfdfc6636",
+        "graph/manifest.json": "c32aae1f4296d6495a141f9185cf0704768bb3666e499d4257a95be692d412ef",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "sources/blobs/fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "sources/history.bundle": "e259a254904c7a0af71a801320413386ae1af0b6781e72fb52e8658d892b07cf",
+        "sources/manifest.json": "abfaa8a933d9780b302ec10bfbb605a830f14061ca3d924eefe68fe1a04617b3",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "afbb2dcaff5a736bd07d42718be443cff059b1c4d24d9924685cf3ae949a48e5",
+        "vector/manifest.json": "54a97aef6a793a966d678ac0ce4de4f285b1c7b5dd4824ee6aa9dbac1e468db3",
+        "vector/vector.db": "90281cefaaf3d01b7881f374ffa62e80fb4374910a0059f021fd283829ee1a03",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171221": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      },
+      "original_and_copy_payloads_unchanged": false,
+      "original_sha256": {
+        "dataset-identity.json": "6d2bb89e4d0dc23640210028b77aaf33e7cd87fbd26ade63ea94570529f525cc",
+        "graph/graph.db": "0b2612beb932d394e7699c0cb374fd08ed569a87b65379fab9f98d7bfdfc6636",
+        "graph/manifest.json": "c32aae1f4296d6495a141f9185cf0704768bb3666e499d4257a95be692d412ef",
+        "sources/blobs/4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d": "4ff9b4cf678f5b6703d5c1e5893c1dd22fbac88c1ef12b0cf92d37bcdb731e5d",
+        "sources/blobs/7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52": "7b7a44eb4a77a7e012a6b702950239db74f18a5f355bcc631e1d96a24f39df52",
+        "sources/blobs/fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50": "fa5cff98757ebe93e9e46ec8fd4aa35323e971b540feeec113e54b2d3cdd3b50",
+        "sources/history.bundle": "e259a254904c7a0af71a801320413386ae1af0b6781e72fb52e8658d892b07cf",
+        "sources/manifest.json": "abfaa8a933d9780b302ec10bfbb605a830f14061ca3d924eefe68fe1a04617b3",
+        "vector/.ckv.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/footprint.jsonl": "afbb2dcaff5a736bd07d42718be443cff059b1c4d24d9924685cf3ae949a48e5",
+        "vector/manifest.json": "54a97aef6a793a966d678ac0ce4de4f285b1c7b5dd4824ee6aa9dbac1e468db3",
+        "vector/vector.db": "90281cefaaf3d01b7881f374ffa62e80fb4374910a0059f021fd283829ee1a03",
+        "vector/vector.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "vector/vector.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "vector/vector.db.bak.1791171221": "e2253452d0b47411aa853bb96773a1f6605bf264ea5d347d104647f675dd4c71"
+      }
+    }
+  ],
+  "test_failed": true
+}

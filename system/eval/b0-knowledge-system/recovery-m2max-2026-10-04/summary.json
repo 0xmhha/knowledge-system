@@ -1,0 +1,50 @@
+{
+  "scope": "macOS arm64 FIX-15 extracted test preview: small mock recovery and pre-WBS legacy migration/rollback diagnostics; not operating recovery, quality, supported-platform or human approval",
+  "base_code_commit": "f166349bb6ef8ea35ea546a6b44b0cb0fb15af12",
+  "source_package": "translated-source-notice-m2max-2026-10-04 Darwin dirty preview",
+  "binary_sha256": {
+    "cks": "6cd6de610251e9a79294c934912c727bc0dfa6b2a2a9d9c0e0d2dc0116f0708b",
+    "ckg": "f4d6ccf1ff76d5124c13c33155fe20de18f59dc467d7f9a1a56af038a952065e",
+    "ckv": "d42d28af40fd585d0edb8ffa2aeca0f90c4005574c46c526becab8ed46f47569"
+  },
+  "preview_package_sha256": "923bd83d9f0686f69f32a2b7349291f9b9a576e5aec82e0b4eb56dbe2524b57c",
+  "recovery_capture_rows": 10,
+  "recovery_citations": 10,
+  "legacy_v2_rows": 1,
+  "legacy_v2_citations": 1,
+  "baseline_payload_file_count": 12,
+  "legacy_payload_file_count": 7,
+  "actual_legacy_baseline_commit": "1ded9b3e47bc2e09062dba329c2f918423746fa4",
+  "legacy_original_before_current_consumer_matches_after": true,
+  "legacy_before_after_backup_equal": true,
+  "current_before_after_backup_restored_equal": true,
+  "transient_runtime_file_scope": "only explicit graph/vector SQLite SHM and zero-byte WAL; all observed hashes separately recorded; nonempty WAL refused",
+  "failures_retained": [
+    "initial SDK helper capture exceeded 120s with default counts; root cause undetermined; subsequent one-per-request/30s-deadline runs passed; output JSON file mistaken for directory (caught before reading)",
+    "helper required v2-only content SHA on v1",
+    "helper counted removal/creation of zero WAL and SHM as payload changes",
+    "owned read-only blob tamper initially permission denied",
+    "graph live sidecar observation clarified",
+    "legacy output parent absent before go version",
+    "initial legacy proof started after first current consumer; corrected run captures pre-consumer hashes",
+    "initial final helpers did not explicitly request complete-embedding mode; final scripts corrected and re-executed; pre-mode attempts retained separately"
+  ],
+  "quality_metrics": null,
+  "human_or_external_pending": [
+    "B0-01/02/03/05 decisions and static v2 scope/actual K freeze",
+    "official B0/B1/C0/C1 quality and final candidate",
+    "OP-01\u201308 operating trust/roles/scope/legal/support/recovery decisions",
+    "native AMD64 and large model cost scope"
+  ],
+  "excluded": "binaries/archives/DBs/Git bundles/model/private keys/user .claude and logs",
+  "complete_embeddings_mode": "CKV_REQUIRE_COMPLETE_EMBEDDINGS=1 for current recovery builds and legacy new reindex; synthetic old build kept separate",
+  "validation": {
+    "recovery_script_actual_exit": 0,
+    "legacy_script_actual_exit": 0,
+    "retained_independent_audit": "independent-audit.json",
+    "documentation": "179 live documents OK",
+    "engine_boundaries": "OK",
+    "go_code_changed": false,
+    "full_go_suite_repeated": false
+  }
+}

@@ -145,18 +145,20 @@ const (
 // PackMetadata carries provenance, budgeting, and integrity state for an
 // EvidencePack.
 type PackMetadata struct {
-	BudgetTokens     int       `json:"budget_tokens"`
-	UsedTokens       int       `json:"used_tokens"`
-	UtilizationRatio float64   `json:"utilization_ratio,omitempty"`
-	BuiltAt          time.Time `json:"built_at"`
-	BuilderVersion   string    `json:"builder_version,omitempty"`
+	Ontology         *OntologyDiagnostic `json:"ontology,omitempty"`
+	BudgetTokens     int                 `json:"budget_tokens"`
+	UsedTokens       int                 `json:"used_tokens"`
+	UtilizationRatio float64             `json:"utilization_ratio,omitempty"`
+	BuiltAt          time.Time           `json:"built_at"`
+	BuilderVersion   string              `json:"builder_version,omitempty"`
 	// CKGSchemaVersion and CKVStatsHash are opaque pin values that an
 	// evaluation harness can compare across runs to confirm the same
 	// index snapshot was used. Empty when the backend did not supply them.
 	CKGSchemaVersion string `json:"ckg_schema_version,omitempty"`
 	CKVStatsHash     string `json:"ckv_stats_hash,omitempty"`
 	// IntegrityHash is a hex-encoded hash of the canonical serialization
-	// of the entire EvidencePack with IntegrityHash itself blanked. The
+	// of the base EvidencePack with IntegrityHash itself and the optional
+	// Semantic overlay blanked. The overlay has its own digest. The
 	// receiver recomputes the same value to confirm the pack was not
 	// tampered in transit or storage. Populated by ComputeIntegrityHash
 	// when the composer finishes pack assembly; verified by
@@ -188,7 +190,11 @@ type EvidencePack struct {
 	// to produce the response the real backend would have returned.
 	// Always empty once ckv/ckg are wired in.
 	Instructions []DummyInstruction `json:"instructions,omitempty"`
-	Metadata     PackMetadata       `json:"metadata"`
+	// Semantic is an optional, separately hashed projection over citations.
+	// It is excluded from the legacy pack hash so existing consumers can
+	// verify the base EvidencePack after ignoring this additive field.
+	Semantic *SemanticOverlay `json:"semantic,omitempty"`
+	Metadata PackMetadata     `json:"metadata"`
 }
 
 // IsValid reports whether p is structurally sound:
@@ -254,12 +260,16 @@ func (p EvidencePack) IsValid() bool {
 			return false
 		}
 	}
+	if p.Semantic != nil && !p.Semantic.IsValid(p.Citations) {
+		return false
+	}
 	return true
 }
 
 // ComputeIntegrityHash returns the hex-encoded SHA-256 hash of the canonical
-// JSON serialization of p with Metadata.IntegrityHash and
-// Metadata.IntegrityHashAlgo blanked. Pure function: it does not mutate p.
+// JSON serialization of the base pack with Metadata.IntegrityHash,
+// Metadata.IntegrityHashAlgo, and the additive Semantic overlay blanked.
+// Pure function: it does not mutate p.
 //
 // To stamp a pack, callers should assign the returned hash and the algo
 // constant to p.Metadata before releasing the pack. VerifyIntegrity reverses
@@ -272,6 +282,7 @@ func (p EvidencePack) IsValid() bool {
 func ComputeIntegrityHash(p EvidencePack) (string, error) {
 	p.Metadata.IntegrityHash = ""
 	p.Metadata.IntegrityHashAlgo = ""
+	p.Semantic = nil
 	buf, err := json.Marshal(p)
 	if err != nil {
 		return "", fmt.Errorf("contract: marshal pack for hash: %w", err)

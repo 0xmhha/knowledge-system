@@ -1,0 +1,347 @@
+{
+  "diagnostic_only": true,
+  "official_quality_metrics": null,
+  "official_verdict": null,
+  "scope": "Linux arm64 CPU latest test preview, small synthetic installation plus SDK baseline/knowledge wiring; 180s diagnostic initialize deadline; first 90s failure retained",
+  "cases": {
+    "empty-go": {
+      "sdk_rows": 2,
+      "citations": 2,
+      "bodies": 2,
+      "source_body_coordinates_verified": true,
+      "fallback_baseline_knowledge_evidence_identical": true,
+      "install_upgrade_rollback_verified": true,
+      "binary_config_request_hashes_verified": true,
+      "actual_retrieval_k": [
+        10,
+        10,
+        6,
+        10,
+        10,
+        6
+      ],
+      "backend_nonreturned": [
+        {
+          "ordinal": 40,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 370750
+        },
+        {
+          "ordinal": 40,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 173583
+        }
+      ],
+      "stored_finite_normalized_vectors": 1,
+      "vector_norms": [
+        1.0000000248183443
+      ],
+      "identity": {
+        "source": {
+          "project_id": "p-3b1997fafea1be6ce59cc1880797b22f",
+          "source_mode": "committed",
+          "source_commit": "a600d3f18d4aa511544ee53373c999fd050b03d0",
+          "file_manifest_digest": "64ce12a3fd712e28ff1ce3e174f1a3630d23108ba0b8949aa7a4afb7f320e55e",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "42158f34aac3f6fcb7c337646fa9ae11527bf0e763d17b508fdd266086d5f804"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "54fb968e9700a740b18c13826dff17dd1b491074015727a210173b37c4bc3c28",
+        "dataset_id": "4ac3b86ed11c983c0dd195b70e9ec7c48b7904fad30329229a437b005b2401f3"
+      }
+    },
+    "typescript": {
+      "sdk_rows": 2,
+      "citations": 4,
+      "bodies": 4,
+      "source_body_coordinates_verified": true,
+      "fallback_baseline_knowledge_evidence_identical": true,
+      "install_upgrade_rollback_verified": true,
+      "binary_config_request_hashes_verified": true,
+      "actual_retrieval_k": [
+        10,
+        6,
+        10,
+        6
+      ],
+      "backend_nonreturned": [
+        {
+          "ordinal": 31,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 69375
+        },
+        {
+          "ordinal": 28,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": null,
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 41708
+        }
+      ],
+      "stored_finite_normalized_vectors": 3,
+      "vector_norms": [
+        0.9999999366372936,
+        1.0000004082837477,
+        0.9999998890708246
+      ],
+      "identity": {
+        "source": {
+          "project_id": "p-67ba8c92cdfd53524181ea11151a52f8",
+          "source_mode": "committed",
+          "source_commit": "3248b1c61a18ebaf57f0b8998c59287c41f4345e",
+          "file_manifest_digest": "98e2c9ef82b55396a4f29aeac08e9cba68116660c6e49b4c98ddfacabc017717",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "111aceaafffa3ee327342c4caf5aae3a24c930ecb8b37d591f0413845b4e2851"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "54fb968e9700a740b18c13826dff17dd1b491074015727a210173b37c4bc3c28",
+        "dataset_id": "226b329dbfbd8f365681f42d9259093cbcf9eb3a3530f1ab93ad5864b85be77f"
+      }
+    },
+    "unsupported-python": {
+      "sdk_rows": 2,
+      "citations": 2,
+      "bodies": 2,
+      "source_body_coordinates_verified": true,
+      "fallback_baseline_knowledge_evidence_identical": true,
+      "install_upgrade_rollback_verified": true,
+      "binary_config_request_hashes_verified": true,
+      "actual_retrieval_k": [
+        10,
+        10,
+        6,
+        10,
+        10,
+        6
+      ],
+      "backend_nonreturned": [
+        {
+          "ordinal": 50,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": [
+              "defines",
+              "implements"
+            ],
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 1111500
+        },
+        {
+          "ordinal": 47,
+          "backend": "ckg",
+          "method": "neighbors",
+          "input_bytes": 0,
+          "options": {
+            "Relations": [
+              "defines",
+              "implements"
+            ],
+            "Hops": 1,
+            "ExcludeTests": false,
+            "MaxTotal": 50
+          },
+          "outcome": "backend_error",
+          "result_count": 0,
+          "elapsed_ns": 265750
+        }
+      ],
+      "stored_finite_normalized_vectors": 1,
+      "vector_norms": [
+        0.9999997203808307
+      ],
+      "identity": {
+        "source": {
+          "project_id": "p-aebf5c8922fdd344102bae30099efa3a",
+          "source_mode": "committed",
+          "source_commit": "7bc4a9171dc419df80bda04eed3ff1289e2fdacd",
+          "file_manifest_digest": "3e550946d0a68f24f58489da3dee0e6213118ba6f425995012638b96e3a5e4dc",
+          "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+          "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+          "git_archive_policy": "bundle-selected-recovery-refs-v1",
+          "file_mode_policy": "executable-bit-v1",
+          "snapshot_id": "b3d76a938d4c8d40f8f601b44b2296f7f3d6fdc4148bd4f94f2c6f756aa6e819"
+        },
+        "embedding_identity": {
+          "Dim": 1024,
+          "Model": "bge-m3:latest",
+          "Normalize": "",
+          "Pooling": "",
+          "Provider": "ollama",
+          "chunk_budget_bytes": 6144,
+          "dimension_method": "native:v1",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "native_dim": 1024,
+          "passage_transform": "raw:v1",
+          "query_transform": "raw:v1",
+          "runtime_batch_tokens": 8192,
+          "runtime_context_tokens": 8192,
+          "truncate_policy": "reject:v1",
+          "version": 2
+        },
+        "input_digest": "54fb968e9700a740b18c13826dff17dd1b491074015727a210173b37c4bc3c28",
+        "dataset_id": "02b6907904f242244d5258a15553202eae492b1dc41b8774e4bf3d650737f270"
+      }
+    }
+  },
+  "sdk_rows": 6,
+  "citations": 8,
+  "bodies": 8,
+  "public_go_verify": {
+    "schema_version": 1,
+    "scope": "public Go EvidencePackV2.Verify replay; archive bytes and human facts are separate",
+    "input_sha256": "95cbc84ba83d2138d73677f0458cc263f07c2671452d7c2594f5ff27c99f50b3",
+    "binary_sha256": "cb2eab6d931a60a2266032581617fb16a0097b3c06fe35e3f9aed720ae11d60d",
+    "go_version": "go1.26.8",
+    "records": [
+      {
+        "sequence": 1,
+        "arm": "baseline_off",
+        "request_id": "empty-go/guide-False",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "6ba7bbd2919b69fc56293de564d11782",
+        "status": "valid_contract"
+      },
+      {
+        "sequence": 2,
+        "arm": "baseline_on",
+        "request_id": "empty-go/guide-True",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "8cbdf4fb048cab15e9b03d0d092c3355",
+        "status": "valid_contract"
+      },
+      {
+        "sequence": 3,
+        "arm": "baseline_off",
+        "request_id": "typescript/guide-False",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "913ce1c6eb069ec527052707d994dd84",
+        "status": "valid_contract"
+      },
+      {
+        "sequence": 4,
+        "arm": "baseline_on",
+        "request_id": "typescript/guide-True",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "ef24039f92a4886b703e8806f6e7be56",
+        "status": "valid_contract"
+      },
+      {
+        "sequence": 5,
+        "arm": "baseline_off",
+        "request_id": "unsupported-python/guide-False",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "215b060b5996a9dcfb2947ea68952e52",
+        "status": "valid_contract"
+      },
+      {
+        "sequence": 6,
+        "arm": "baseline_on",
+        "request_id": "unsupported-python/guide-True",
+        "phase": "retrieval",
+        "iteration": 1,
+        "measurement_id": "4958dcd7ebef0bb6e3674d15b2590dcf",
+        "status": "valid_contract"
+      }
+    ],
+    "failed": 0,
+    "quality_metrics": null
+  },
+  "model_digest_version_metadata_unchanged": true,
+  "model_cpu_resident": true,
+  "model_blob": {
+    "model_blob_bytes": 1157671200,
+    "model_blob_sha256": "daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c",
+    "mounted_readonly": true,
+    "official_quality_metrics": null
+  },
+  "diagnostic_initialize_deadline_ns": 180000000000,
+  "first_90s_initialize_failure_preserved": true
+}

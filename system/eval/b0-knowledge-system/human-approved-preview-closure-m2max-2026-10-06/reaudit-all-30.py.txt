@@ -1,0 +1,60 @@
+from pathlib import Path
+import json, hashlib, datetime, re, gzip
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');base=root/'system/eval/b0-knowledge-system';out=base/'human-approved-preview-closure-m2max-2026-10-06'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_bytes())
+approval=load(out/'human-approval.json');assert approval['user_reply_verbatim']=='HC-01–11 해석 승인. 시험 preview 범위로 종료.'
+assert approval['accepted_scope_reduction'] and approval['accepted_delivery_scope']=='test_preview_only'
+assert not approval['operating_release_approved'] and not approval['operating_role_key_trust_legal_approval']
+assert sha(out/'reviewed-interpretations-before-approval.md')==approval['reviewed_table_before_approval_sha256']
+assert [c['id']for c in approval['claim_decisions']]==[f'HC-{i:02}'for i in range(1,12)]
+for c in approval['claim_decisions']:
+ assert c['human_verdict']=='approved_as_written' and c['reviewer']=='chat-user'
+ for b in c['actual_output_bindings']:assert sha(root/b['path'])==b['sha256'] and b['measurement_id']
+supplement=approval['claim_decisions'][7]['additional_evidence']
+assert sha(root/supplement['path'])==supplement['sha256']
+assert hashlib.sha256(gzip.decompress((root/supplement['path']).read_bytes())).hexdigest()==supplement['source_sha256']
+assert len(supplement['question_names'])==4
+assessment=load(out/'human-assessment.json')
+assert assessment['approval_event_sha256']==sha(out/'human-approval.json')
+for b in approval['evidence_bindings']:assert sha(root/b['path'])==b['sha256']
+assert approval['human_review_cost']=={'status':'not_measured','seconds':None,'amount':None,'currency':None}
+freeze=load(base/'approved-evaluation-m2max-2026-10-06/fix28-report-binding/development-freeze.json')
+assert len(freeze['product_source_sha256'])==1096 and len(freeze['approved_input_sha256'])==5
+for p,d in freeze['product_source_sha256'].items():assert sha(Path(p))==d,p
+for p,d in freeze['approved_input_sha256'].items():assert sha(Path(p))==d,p
+def rows(text):
+ return {f[0]:f for line in text.splitlines() if re.match(r'^\| [BC][01]-\d\d \|',line) for f in [[s.strip()for s in line.strip('|').split('|')]]}
+original=rows((out/'worklist-before-closure.md').read_text());current=rows((root/'docs/spec-driven/EXECUTION-WORKLIST.md').read_text())
+assert len(original)==len(current)==30 and set(original)==set(current)
+tasks=[]
+for k,f in current.items():
+ assert f[3]==original[k][3],k
+ assert f[4].startswith(('검증 완료','구현 검증 완료')),k
+ links=[]
+ for url in re.findall(r'\]\(([^)]+)\)',f[4]):
+  p=(root/'docs/spec-driven'/url).resolve();assert p.is_file(),url;links.append({'path':str(p.relative_to(root)),'sha256':sha(p)})
+ tasks.append({'id':k,'original_completion_condition_preserved':f[3],'completed_evidence_and_scope':f[4],'linked_artifacts':links,'scope_exception':('explicit human-approved test preview; original operating condition not claimed satisfied'if k=='C1-05'else None)})
+gate=load(out/'gate-decisions.json');assert gate['gate_verdicts']=={'B0':'pass','B1':'fail','C0':'pass','C1':'fail'}
+worktext=(root/'docs/spec-driven/EXECUTION-WORKLIST.md').read_text();assert json.loads(re.search(r'<!-- official-gates: (.*?) -->',worktext).group(1))==gate['gate_verdicts']
+verified=[]
+for part in ['development-after-fix26-27','development-oracles','fix28-report-binding','final-after-development-freeze','final-oracles']:
+ d=base/'approved-evaluation-m2max-2026-10-06'/part;mf=d/'artifact-manifest.json';m=load(mf)
+ for f in m['files']:
+  rel=f.get('artifact_path',f.get('path'))
+  p=(d.parent if part=='development-oracles' else d)/rel
+  assert sha(p)==f.get('artifact_sha256',f.get('sha256')),str(p)
+  assert p.stat().st_size==f.get('artifact_bytes',f.get('bytes')),str(p)
+  if 'source_sha256' in f:
+   raw=gzip.decompress(p.read_bytes()) if f.get('encoding')=='gzip' else p.read_bytes()
+   assert len(raw)==f['source_bytes'] and hashlib.sha256(raw).hexdigest()==f['source_sha256'],str(p)
+ verified.append({'path':str(mf.relative_to(root)),'sha256':sha(mf),'files_verified':len(m['files'])})
+pkg=base/'final-package-preview-m2max-2026-10-06';inv=load(pkg/'archive-inventory.json');assert len(inv['files'])==721
+for f in inv['files']:
+ p=pkg/f['path'];assert sha(p)==f['sha256'] and p.stat().st_size==f['bytes']
+assert load(pkg/'archive-source-replay.json')['source_verified_citations']==504
+rec=load(pkg/'independent-audit.json');assert(rec['sdk_rows'],rec['citations'],rec['v2_integrity_responses'])==(11,11,6)
+go=base/'approved-evaluation-m2max-2026-10-06/fix26-27/fix26-27-full-tests-module-boundary.log';py=base/'approved-evaluation-m2max-2026-10-06/fix28-report-binding/report-binding-after-independent-fixtures.log'
+assert '\nFAIL'not in go.read_text()and 'ok  'in go.read_text();assert 'Ran 26 tests'in py.read_text()and py.read_text().rstrip().endswith('OK')
+result={'schema_version':1,'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'completed':30,'remaining_accepted_scope_tasks':[],'accepted_scope':'test_preview_only','completed_tasks':tasks,'original_completion_conditions_changed':False,'human_approved_operating_scope_exception':True,'approved_interpretations':11,'approved_human_abstention_statements':2,'human_verdict_automatically_fabricated':False,'human_review_cost':'not_measured/null','frozen_product_source_files_verified':1096,'frozen_approved_input_files_verified':5,'formal_evidence_manifests_verified':verified,'latest_package_archive_files_verified':721,'prior_archive_only_source_citations':504,'prior_recovery_sdk_rows':11,'unchanged_source_root_go_pass':{'path':str(go.relative_to(root)),'sha256':sha(go)},'unchanged_source_b1_python_26_pass':{'path':str(py.relative_to(root)),'sha256':sha(py)},'official_stage_verdicts':gate['gate_verdicts'],'quality_pass':False,'important_groups':'inconclusive','ontology_default':'disabled','operating_release':'withheld','new_model_queries_or_product_tuning':False}
+(out/'completed-30-reaudit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print('PASS: all 30 completion conditions preserved and rechecked; explicit preview scope exception, HC11 and abstention2 bound; source1096/input5, formal793 artifacts and package721 hashes unchanged')

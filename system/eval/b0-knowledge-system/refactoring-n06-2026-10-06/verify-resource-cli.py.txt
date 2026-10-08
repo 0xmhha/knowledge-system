@@ -1,0 +1,37 @@
+import datetime,hashlib,json,pathlib,subprocess,tempfile,time
+repo=pathlib.Path.cwd();e=repo/'system/eval/b0-knowledge-system/refactoring-n06-2026-10-06';bins=pathlib.Path('/private/tmp/ks-n06-bin')
+root=pathlib.Path(tempfile.mkdtemp(prefix='cks-n06-green-'));src=root/'source';src.mkdir();ds=root/'dataset'
+(src/'go.mod').write_text('module example.org/resourcefixture\n\ngo 1.25.13\n');(src/'main.go').write_text('package fixture\n\nfunc Alpha() int { return 7 }\n')
+base=f'project_id: n06-fixture\nsource_mode: snapshot-only\nsrc: {src}\nout: {ds}\ngraph_bin: {bins/"ckg"}\nvector_bin: {bins/"ckv"}\nembedder: mock\n'
+def digest_tree(p):return {str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()}
+results=[]
+def run(name,setting='',extra=(),code=None):
+ config=root/(name+'.yaml');config.write_text(base+setting+'\n');command=[str(bins/'cks'),'setup','--config',str(config),'--version',name,'--progress','json',*extra]
+ start=time.monotonic();r=subprocess.run(command,capture_output=True,text=True,timeout=45);elapsed=time.monotonic()-start
+ (e/(name+'.stdout.log')).write_text(r.stdout);(e/(name+'.stderr.log')).write_text(r.stderr)
+ events=[json.loads(line) for line in r.stdout.splitlines() if line.startswith('{')];resource=[x['resources'] for x in events if 'resources' in x]
+ if code:
+  assert r.returncode!=0 and json.loads(r.stderr)['code']==code,(name,r.returncode,r.stderr)
+  assert ds.joinpath('current').readlink().name==active and digest_tree(ds/active)==active_hash,(name,'current changed')
+  assert not any(x.get('step')=='reindex-promote' and x.get('type')=='done' for x in events)
+  assert str(root) not in r.stderr and 'resourcefixture' not in r.stderr
+ else:
+  assert r.returncode==0 and ds.joinpath('current').readlink().name==name,(name,r.returncode,r.stderr)
+  assert len(resource)==2 and resource[0]['source_files']==2 and resource[0]['source_bytes']==sum(f.stat().st_size for f in src.iterdir())
+  assert all(x['engine_output_estimate_bytes'] is None and x['output_free_bytes']>0 and x['staging_free_bytes']>0 and str(root) not in json.dumps(x) for x in resource)
+  assert resource[1]['actual_candidate_bytes']>resource[1]['source_bytes'] and resource[1]['minimum_staging_bytes']==0
+ results.append({'name':name,'argv':command,'exit_code':r.returncode,'elapsed_seconds':elapsed,'expected_code':code,'resources':resource,'prior_current_preserved':bool(code)})
+ print(name,'PASS',round(elapsed,3),flush=True);return resource
+resource=run('baseline');assert resource[0]['capture_limits']=={'max_files':100000,'max_file_bytes':33554432,'max_total_bytes':4294967296}
+deadline=datetime.datetime.fromisoformat(resource[0]['deadline_utc'].replace('Z','+00:00'));assert 7100<(deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds()<7201
+active='baseline';active_hash=digest_tree(ds/active)
+for name,setting in [('file-count','max_capture_files: 1'),('file-bytes','max_capture_file_bytes: 16'),('total-bytes','max_capture_total_bytes: 16')]:run(name,setting,code='resource_limit')
+run('deadline','build_timeout: 1ms',code='build_timeout')
+run('capacity','min_free_bytes: 9223372036854775000',code='resource_limit')
+for name,setting in [('negative','max_capture_files: -1'),('overflow','max_capture_file_bytes: 9223372036854775807'),('invalid-timeout','build_timeout: -1s')]:run(name,setting,code='operation_failed')
+run('explicit-override','max_capture_files: 1\nmax_capture_file_bytes: 16\nmax_capture_total_bytes: 16\nbuild_timeout: 1ms',('--max-capture-files','2','--max-capture-file-bytes','128','--max-capture-total-bytes','256','--build-timeout','30s'))
+active='explicit-override';active_hash=digest_tree(ds/active)
+slow=root/'slow-graph';slow.write_text('#!/bin/sh\nsleep 5\nexec "'+str(bins/'ckg')+'" "$@"\n');slow.chmod(0o700)
+run('engine-deadline','build_timeout: 200ms',('--graph-bin',str(slow)),code='build_timeout');assert results[-1]['elapsed_seconds']<3
+run('gate-deadline','build_timeout: 2s',('--gate-test-bin','/bin/sleep','--gate-test-arg','5'),code='build_timeout');assert results[-1]['elapsed_seconds']<4
+(e/'cli-results.json').write_text(json.dumps({'success':True,'scope':'native Darwin ARM64/mock model, real graph/vector and public CLI','cases':results,'current_and_source_unchanged':digest_tree(ds/active)==active_hash,'source_sha256':digest_tree(src),'binary_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in bins.iterdir()}},indent=2)+'\n')

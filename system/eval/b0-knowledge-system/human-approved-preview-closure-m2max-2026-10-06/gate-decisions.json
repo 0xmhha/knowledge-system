@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "approval_recorded_at": "2026-10-06T01:17:16.923743+00:00",
+  "accepted_scope": "test_preview_only",
+  "task_completion_count": 30,
+  "remaining_accepted_scope_tasks": [],
+  "gate_verdicts": {
+    "B0": "pass",
+    "B1": "fail",
+    "C0": "pass",
+    "C1": "fail"
+  },
+  "gate_meanings": {
+    "B0": "approved inputs and reproducible real-model baseline established; not retrieval quality acceptance",
+    "B1": "comparison and human assessment complete; latency threshold violations and small-group uncertainty preclude general quality acceptance",
+    "C0": "observed development defects reproduced, corrected, regressions passed and version frozen; baseline recall/latency limitations explicitly retained",
+    "C1": "frozen independent FINAL collected and judged; POLICY03 errors, strict no-citation failures and latency limits retain fail; operating release withheld"
+  },
+  "important_question_groups": "inconclusive; independent groups below ten",
+  "ontology_default": "disabled",
+  "operating_release": "withheld",
+  "human_approval_file": "human-approval.json",
+  "quality_pass": false,
+  "operating_work": "excluded by explicit human scope choice; not completed or approved",
+  "evidence": [
+    "docs/spec-driven/B0-B1-APPROVED-DEVELOPMENT-REPORT.md",
+    "docs/spec-driven/C0-ONTOLOGY-HEADER-AND-ARCHIVE-BATCH.md",
+    "docs/spec-driven/C1-APPROVED-FINAL-REPORT.md",
+    "docs/spec-driven/B1-HUMAN-AND-PAIRED-CLOSURE.md",
+    "docs/spec-driven/C1-FINAL-DELIVERY-REVIEW.md"
+  ]
+}

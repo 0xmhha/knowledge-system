@@ -1,0 +1,659 @@
+package knowledgepack
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+	"time"
+	"unicode/utf8"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
+	"gopkg.in/yaml.v3"
+)
+
+type SourceRef struct {
+	OriginID string `yaml:"origin_id" json:"origin_id"`
+	Path     string `yaml:"path" json:"path"`
+}
+
+var instanceIDPattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9._:-]{0,127}$`)
+
+type Policy struct {
+	ID            string            `yaml:"id" json:"id"`
+	Type          TypeRef           `yaml:"type" json:"type"`
+	Statement     string            `yaml:"statement" json:"statement"`
+	Owner         string            `yaml:"owner" json:"owner"`
+	Scope         map[string]string `yaml:"scope" json:"scope"`
+	EffectiveFrom string            `yaml:"effective_from" json:"effective_from"`
+	EffectiveTo   string            `yaml:"effective_to" json:"effective_to"`
+	Status        string            `yaml:"status" json:"status"`
+	ReviewedBy    string            `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason  string            `yaml:"review_reason" json:"review_reason"`
+	Visibility    string            `yaml:"visibility" json:"visibility"`
+	ConflictsWith []string          `yaml:"conflicts_with" json:"conflicts_with"`
+	SourceRef     SourceRef         `yaml:"source_ref" json:"source_ref"`
+}
+
+type Decision struct {
+	ID             string            `yaml:"id" json:"id"`
+	Type           TypeRef           `yaml:"type" json:"type"`
+	Problem        string            `yaml:"problem" json:"problem"`
+	Decision       string            `yaml:"decision" json:"decision"`
+	Rationale      string            `yaml:"rationale" json:"rationale"`
+	Alternatives   []string          `yaml:"alternatives" json:"alternatives"`
+	Assumptions    []string          `yaml:"assumptions" json:"assumptions"`
+	Scope          map[string]string `yaml:"scope" json:"scope"`
+	Date           string            `yaml:"date" json:"date"`
+	Status         string            `yaml:"status" json:"status"`
+	ReviewedBy     string            `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason   string            `yaml:"review_reason" json:"review_reason"`
+	Visibility     string            `yaml:"visibility" json:"visibility"`
+	Supersedes     string            `yaml:"supersedes" json:"supersedes"`
+	RequirementIDs []string          `yaml:"requirement_ids" json:"requirement_ids"`
+	SourceRef      SourceRef         `yaml:"source_ref" json:"source_ref"`
+	Body           string            `yaml:"-" json:"body"`
+}
+
+// RelationInstance is a reviewed, source-backed edge between typed knowledge
+// instances. External semantic/CKG endpoints remain proposed until their
+// pinned dataset anchors can be checked by the semantic promotion gate.
+type RelationInstance struct {
+	ID           string      `yaml:"id" json:"id"`
+	Type         TypeRef     `yaml:"type" json:"type"`
+	Subject      InstanceRef `yaml:"subject" json:"subject"`
+	Object       InstanceRef `yaml:"object" json:"object"`
+	Status       string      `yaml:"status" json:"status"`
+	ReviewedBy   string      `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason string      `yaml:"review_reason" json:"review_reason"`
+	Visibility   string      `yaml:"visibility" json:"visibility"`
+	SourceRef    SourceRef   `yaml:"source_ref" json:"source_ref"`
+	EvidenceRefs []SourceRef `yaml:"evidence_refs" json:"evidence_refs"`
+}
+
+// TraceLink is a human-reviewed claim about an ADR and one semantic trace
+// path. Its review status is not proof of the external requirement, CKG code,
+// or test endpoints; callers must validate those against an aligned projection.
+type TraceLink struct {
+	ID              string      `yaml:"id" json:"id"`
+	DecisionID      string      `yaml:"decision_id" json:"decision_id"`
+	RequirementID   string      `yaml:"requirement_id" json:"requirement_id"`
+	CriterionID     string      `yaml:"criterion_id" json:"criterion_id"`
+	CodeCanonicalID string      `yaml:"code_canonical_id" json:"code_canonical_id"`
+	TestCanonicalID string      `yaml:"test_canonical_id" json:"test_canonical_id"`
+	Status          string      `yaml:"status" json:"status"`
+	ReviewedBy      string      `yaml:"reviewed_by" json:"reviewed_by"`
+	ReviewReason    string      `yaml:"review_reason" json:"review_reason"`
+	Visibility      string      `yaml:"visibility" json:"visibility"`
+	SourceRef       SourceRef   `yaml:"source_ref" json:"source_ref"`
+	EvidenceRefs    []SourceRef `yaml:"evidence_refs" json:"evidence_refs"`
+}
+
+type InstanceRef struct {
+	ID   string  `yaml:"id" json:"id"`
+	Type TypeRef `yaml:"type" json:"type"`
+}
+
+type Instances struct {
+	Policies   []Policy           `json:"policies"`
+	Decisions  []Decision         `json:"decisions"`
+	Relations  []RelationInstance `json:"relations"`
+	TraceLinks []TraceLink        `json:"trace_links"`
+	Reviews    []ReviewRecord     `json:"reviews"`
+	Conflicts  []Conflict         `json:"conflicts"`
+}
+
+type Conflict struct {
+	LeftID  string `json:"left_id"`
+	RightID string `json:"right_id"`
+	Reason  string `json:"reason"`
+}
+
+type PolicySummary struct {
+	ID            string    `json:"id"`
+	State         string    `json:"state"`
+	SourceRef     SourceRef `json:"source_ref"`
+	ReviewedBy    string    `json:"reviewed_by"`
+	EffectiveFrom string    `json:"effective_from"`
+	EffectiveTo   string    `json:"effective_to,omitempty"`
+}
+
+type PolicyContext struct {
+	State      string          `json:"state"`
+	Applicable []PolicySummary `json:"applicable"`
+	Conflicts  []Conflict      `json:"conflicts"`
+	Unknowns   []string        `json:"unknowns"`
+}
+
+type DecisionSummary struct {
+	ID             string    `json:"id"`
+	State          string    `json:"state"`
+	SourceRef      SourceRef `json:"source_ref"`
+	ReviewedBy     string    `json:"reviewed_by"`
+	Date           string    `json:"date"`
+	RequirementIDs []string  `json:"requirement_ids"`
+}
+
+type DecisionContext struct {
+	State      string            `json:"state"`
+	Applicable []DecisionSummary `json:"applicable"`
+	Unknowns   []string          `json:"unknowns"`
+}
+
+// SelectDecisions exposes only reviewed, public, in-scope ADRs that existed
+// on the requested date. A reviewed successor removes its predecessor; a
+// hidden successor suppresses the whole decision context to avoid revealing
+// a stale rationale as if it were still current.
+func (i Instances) SelectDecisions(asOf string, queryScope map[string]string, allowRestricted bool) (DecisionContext, error) {
+	if !validDate(asOf) {
+		return DecisionContext{}, fmt.Errorf("invalid decision query date")
+	}
+	result := DecisionContext{State: "unknown", Applicable: []DecisionSummary{}, Unknowns: []string{}}
+	superseded := map[string]bool{}
+	restricted := false
+	for _, decision := range i.Decisions {
+		if decision.Status != "verified" || decision.Date > asOf || !policyScopeMatches(decision.Scope, queryScope) {
+			continue
+		}
+		if decision.Supersedes != "" {
+			superseded[decision.Supersedes] = true
+		}
+		if decision.Visibility == "restricted" && !allowRestricted {
+			restricted = true
+		}
+	}
+	if restricted {
+		result.State = "restricted"
+		result.Unknowns = append(result.Unknowns, "restricted_decision")
+		return result, nil
+	}
+	for _, decision := range i.Decisions {
+		if decision.Status != "verified" || decision.Date > asOf || superseded[decision.ID] ||
+			!policyScopeMatches(decision.Scope, queryScope) {
+			continue
+		}
+		result.Applicable = append(result.Applicable, DecisionSummary{ID: decision.ID, State: "current",
+			SourceRef: decision.SourceRef, ReviewedBy: decision.ReviewedBy, Date: decision.Date,
+			RequirementIDs: append([]string(nil), decision.RequirementIDs...)})
+	}
+	sort.Slice(result.Applicable, func(a, b int) bool { return result.Applicable[a].ID < result.Applicable[b].ID })
+	if len(result.Applicable) > 0 {
+		result.State = "needs_citation"
+	} else {
+		result.Unknowns = append(result.Unknowns, "no_reviewed_applicable_decision")
+	}
+	return result, nil
+}
+
+// SelectPolicies applies only reviewed, in-scope, in-time policy records.
+// It never returns policy statements: public bodies must be supplied through
+// separately authorized, sanitized source citations.
+func (i Instances) SelectPolicies(asOf string, queryScope map[string]string, allowRestricted bool) (PolicyContext, error) {
+	if !validDate(asOf) {
+		return PolicyContext{}, fmt.Errorf("invalid policy query date")
+	}
+	result := PolicyContext{State: "unknown", Applicable: []PolicySummary{}, Conflicts: []Conflict{}, Unknowns: []string{}}
+	current := map[string]bool{}
+	restricted := false
+	stale := false
+	for _, p := range i.Policies {
+		if !policyScopeMatches(p.Scope, queryScope) {
+			continue
+		}
+		if p.Status != "verified" {
+			continue
+		}
+		if asOf < p.EffectiveFrom || p.EffectiveTo != "" && asOf > p.EffectiveTo {
+			stale = true
+			continue
+		}
+		if p.Visibility == "restricted" && !allowRestricted {
+			restricted = true
+			continue
+		}
+		current[p.ID] = true
+		result.Applicable = append(result.Applicable, PolicySummary{ID: p.ID, State: "current", SourceRef: p.SourceRef,
+			ReviewedBy: p.ReviewedBy, EffectiveFrom: p.EffectiveFrom, EffectiveTo: p.EffectiveTo})
+	}
+	for _, conflict := range i.Conflicts {
+		if current[conflict.LeftID] && current[conflict.RightID] {
+			result.Conflicts = append(result.Conflicts, conflict)
+		}
+	}
+	switch {
+	case restricted:
+		result.State = "restricted"
+		result.Applicable = nil
+		result.Conflicts = nil
+	case len(result.Conflicts) > 0:
+		result.State = "conflict"
+	case len(result.Applicable) > 0:
+		result.State = "needs_citation"
+	case stale:
+		result.State = "stale"
+		result.Unknowns = append(result.Unknowns, "no_current_policy")
+	default:
+		result.Unknowns = append(result.Unknowns, "no_reviewed_applicable_policy")
+	}
+	return result, nil
+}
+
+func policyScopeMatches(policy, query map[string]string) bool {
+	for key, value := range policy {
+		if query[key] != value {
+			return false
+		}
+	}
+	return true
+}
+
+func LoadInstances(overlayRoot string, packs []LoadedPack) (Instances, error) {
+	return LoadInstancesWithReviewPolicy(overlayRoot, packs, 1)
+}
+
+func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minApprovals int) (Instances, error) {
+	if minApprovals < 1 {
+		return Instances{}, fmt.Errorf("evidence_unverified: invalid review quorum")
+	}
+	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, TraceLinks: []TraceLink{}, Reviews: []ReviewRecord{}, Conflicts: []Conflict{}}
+	types := map[TypeRef]bool{}
+	relationTypes := map[TypeRef]RelationType{}
+	for _, loaded := range packs {
+		for _, concept := range loaded.Pack.Concepts {
+			types[TypeRef{PackID: loaded.Pack.PackID, LocalID: concept.ID}] = true
+		}
+		for _, relation := range loaded.Pack.RelationTypes {
+			relationTypes[TypeRef{PackID: loaded.Pack.PackID, LocalID: relation.Predicate}] = relation
+		}
+	}
+	seen := map[string]bool{}
+	readDir := func(name string, handle func(string, []byte) error) error {
+		entries, err := os.ReadDir(filepath.Join(overlayRoot, name))
+		if os.IsNotExist(err) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() || entry.Type()&os.ModeSymlink != 0 {
+				return fmt.Errorf("evidence_unverified: nonregular %s entry", name)
+			}
+			if name == "policies" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "relations" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "reviews" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "trace-links" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "decisions" && filepath.Ext(entry.Name()) != ".md" {
+				return fmt.Errorf("evidence_unverified: unsupported %s file %q", name, entry.Name())
+			}
+			rel := name + "/" + entry.Name()
+			buf, err := setup.ReadSourceFileNoFollow(overlayRoot, rel, 4<<20)
+			if err != nil {
+				return fmt.Errorf("evidence_unverified: read %q: %w", rel, err)
+			}
+			if err := handle(rel, buf); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	if err := readDir("policies", func(rel string, buf []byte) error {
+		var p Policy
+		if err := decodeYAML(buf, &p); err != nil {
+			return fmt.Errorf("evidence_unverified: policy %q: %w", rel, err)
+		}
+		if err := validatePolicy(p, rel, types); err != nil {
+			return err
+		}
+		if seen[p.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", p.ID)
+		}
+		seen[p.ID] = true
+		result.Policies = append(result.Policies, p)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
+	if err := readDir("decisions", func(rel string, buf []byte) error {
+		var d Decision
+		front, body, err := markdownFrontMatter(buf)
+		if err != nil {
+			return fmt.Errorf("evidence_unverified: decision %q: %w", rel, err)
+		}
+		if err := decodeYAML(front, &d); err != nil {
+			return fmt.Errorf("evidence_unverified: decision %q: %w", rel, err)
+		}
+		d.Body = body
+		if err := validateDecision(d, rel, types); err != nil {
+			return err
+		}
+		if seen[d.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", d.ID)
+		}
+		seen[d.ID] = true
+		result.Decisions = append(result.Decisions, d)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
+	policyByID := map[string]Policy{}
+	for _, p := range result.Policies {
+		policyByID[p.ID] = p
+	}
+	decisionByID := map[string]Decision{}
+	for _, d := range result.Decisions {
+		decisionByID[d.ID] = d
+	}
+	if err := readDir("relations", func(rel string, buf []byte) error {
+		var edge RelationInstance
+		if err := decodeYAML(buf, &edge); err != nil {
+			return fmt.Errorf("evidence_unverified: relation %q: %w", rel, err)
+		}
+		if err := validateRelation(edge, rel, relationTypes, policyByID, decisionByID); err != nil {
+			return err
+		}
+		if seen[edge.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", edge.ID)
+		}
+		seen[edge.ID] = true
+		result.Relations = append(result.Relations, edge)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
+	if err := readDir("trace-links", func(rel string, buf []byte) error {
+		var link TraceLink
+		if err := decodeYAML(buf, &link); err != nil {
+			return fmt.Errorf("evidence_unverified: trace link %q: %w", rel, err)
+		}
+		if err := validateTraceLink(link, rel); err != nil {
+			return err
+		}
+		if seen[link.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", link.ID)
+		}
+		seen[link.ID] = true
+		result.TraceLinks = append(result.TraceLinks, link)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
+	if err := readDir("reviews", func(rel string, buf []byte) error {
+		var record ReviewRecord
+		if err := decodeYAML(buf, &record); err != nil {
+			return fmt.Errorf("evidence_unverified: review %q: %w", rel, err)
+		}
+		if err := validateReviewRecord(record); err != nil {
+			return err
+		}
+		result.Reviews = append(result.Reviews, record)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
+	if err := applyReviewRecords(overlayRoot, &result, minApprovals); err != nil {
+		return Instances{}, err
+	}
+	policyByID = map[string]Policy{}
+	for _, p := range result.Policies {
+		policyByID[p.ID] = p
+	}
+	decisionByID = map[string]Decision{}
+	for _, d := range result.Decisions {
+		decisionByID[d.ID] = d
+	}
+	for _, relation := range result.Relations {
+		if err := validateRelation(relation, strings.TrimPrefix(relation.SourceRef.Path, ".cks/knowledge/"), relationTypes, policyByID, decisionByID); err != nil {
+			return Instances{}, err
+		}
+	}
+	for _, link := range result.TraceLinks {
+		if err := validateTraceLink(link, strings.TrimPrefix(link.SourceRef.Path, ".cks/knowledge/")); err != nil {
+			return Instances{}, err
+		}
+		decision, ok := decisionByID[link.DecisionID]
+		if !ok || link.Status == "verified" && (decision.Status != "verified" || !containsRequirementID(decision.RequirementIDs, link.RequirementID) ||
+			!sourceRefPresent(link.EvidenceRefs, decision.SourceRef)) {
+			return Instances{}, fmt.Errorf("evidence_unverified: trace link %q lacks reviewed ADR evidence", link.ID)
+		}
+	}
+	for _, decision := range result.Decisions {
+		if decision.Supersedes == "" {
+			continue
+		}
+		prior, ok := decisionByID[decision.Supersedes]
+		if !ok || prior.ID == decision.ID || decision.Date == "" || prior.Date == "" ||
+			decision.Date <= prior.Date || !scopeOverlaps(decision.Scope, prior.Scope) {
+			return Instances{}, fmt.Errorf("evidence_unverified: invalid ADR supersedes reference %q", decision.Supersedes)
+		}
+	}
+	byID := map[string]Policy{}
+	for _, p := range result.Policies {
+		byID[p.ID] = p
+	}
+	conflicts := map[string]bool{}
+	for _, p := range result.Policies {
+		for _, otherID := range p.ConflictsWith {
+			other, ok := byID[otherID]
+			if !ok || otherID == p.ID {
+				return Instances{}, fmt.Errorf("evidence_unverified: invalid policy conflict reference")
+			}
+			if p.Status != "verified" || other.Status != "verified" {
+				continue
+			}
+			if !scopeOverlaps(p.Scope, other.Scope) || !timeOverlaps(p, other) {
+				continue
+			}
+			ids := []string{p.ID, otherID}
+			sort.Strings(ids)
+			key := ids[0] + "\x00" + ids[1]
+			if !conflicts[key] {
+				conflicts[key] = true
+				result.Conflicts = append(result.Conflicts, Conflict{ids[0], ids[1], "explicit_verified_policy_conflict"})
+			}
+		}
+	}
+	sort.Slice(result.Conflicts, func(i, j int) bool {
+		if result.Conflicts[i].LeftID == result.Conflicts[j].LeftID {
+			return result.Conflicts[i].RightID < result.Conflicts[j].RightID
+		}
+		return result.Conflicts[i].LeftID < result.Conflicts[j].LeftID
+	})
+	return result, nil
+}
+
+func decodeYAML(buf []byte, out any) error {
+	decoder := yaml.NewDecoder(bytes.NewReader(buf))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(out); err != nil {
+		return err
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		return fmt.Errorf("multiple YAML documents")
+	}
+	return nil
+}
+
+func markdownFrontMatter(data []byte) ([]byte, string, error) {
+	if !bytes.HasPrefix(data, []byte("---\n")) {
+		return nil, "", fmt.Errorf("missing YAML front matter")
+	}
+	end := bytes.Index(data[4:], []byte("\n---\n"))
+	if end < 0 {
+		return nil, "", fmt.Errorf("unterminated YAML front matter")
+	}
+	start := 4 + end
+	return data[4:start], string(data[start+5:]), nil
+}
+
+func validReview(status, reviewer, reason string) bool {
+	switch status {
+	case "proposed":
+		return reviewer == "" && reason == ""
+	case "verified", "rejected":
+		return strings.TrimSpace(reviewer) != "" && strings.TrimSpace(reason) != ""
+	}
+	return false
+}
+
+func validDate(value string) bool { _, err := time.Parse("2006-01-02", value); return err == nil }
+
+func validSource(ref SourceRef, path string) bool {
+	return ref.OriginID == "repo" && ref.Path == ".cks/knowledge/"+path
+}
+
+func validatePolicy(p Policy, path string, types map[TypeRef]bool) error {
+	if !instanceIDPattern.MatchString(p.ID) || !types[p.Type] || strings.TrimSpace(p.Statement) == "" ||
+		strings.TrimSpace(p.Owner) == "" || len(p.Scope) == 0 || !validSource(p.SourceRef, path) ||
+		!validReview(p.Status, p.ReviewedBy, p.ReviewReason) ||
+		(p.Visibility != "public" && p.Visibility != "restricted") {
+		return fmt.Errorf("evidence_unverified: invalid policy %q", path)
+	}
+	for key, value := range p.Scope {
+		if !instanceIDPattern.MatchString(key) || strings.TrimSpace(value) == "" || len(value) > 128 {
+			return fmt.Errorf("evidence_unverified: empty policy scope")
+		}
+	}
+	for _, id := range p.ConflictsWith {
+		if !instanceIDPattern.MatchString(id) {
+			return fmt.Errorf("evidence_unverified: invalid policy conflict ID")
+		}
+	}
+	if p.EffectiveFrom != "" && !validDate(p.EffectiveFrom) || p.EffectiveTo != "" && !validDate(p.EffectiveTo) ||
+		p.EffectiveTo != "" && (p.EffectiveFrom == "" || p.EffectiveTo < p.EffectiveFrom) ||
+		p.Status == "verified" && p.EffectiveFrom == "" {
+		return fmt.Errorf("evidence_unverified: invalid policy effective dates")
+	}
+	return nil
+}
+
+func validateDecision(d Decision, path string, types map[TypeRef]bool) error {
+	if !instanceIDPattern.MatchString(d.ID) || !types[d.Type] || strings.TrimSpace(d.Problem) == "" ||
+		strings.TrimSpace(d.Decision) == "" || strings.TrimSpace(d.Rationale) == "" ||
+		len(d.Alternatives) == 0 || len(d.Scope) == 0 || !validSource(d.SourceRef, path) ||
+		!validReview(d.Status, d.ReviewedBy, d.ReviewReason) ||
+		(d.Visibility != "public" && d.Visibility != "restricted") || strings.TrimSpace(d.Body) == "" {
+		return fmt.Errorf("evidence_unverified: invalid decision %q", path)
+	}
+	if d.Date != "" && !validDate(d.Date) || d.Status == "verified" && d.Date == "" {
+		return fmt.Errorf("evidence_unverified: invalid decision date")
+	}
+	if d.Supersedes != "" && !instanceIDPattern.MatchString(d.Supersedes) {
+		return fmt.Errorf("evidence_unverified: invalid ADR predecessor ID")
+	}
+	for _, id := range d.RequirementIDs {
+		if !instanceIDPattern.MatchString(id) {
+			return fmt.Errorf("evidence_unverified: invalid ADR requirement ID")
+		}
+	}
+	for key, value := range d.Scope {
+		if !instanceIDPattern.MatchString(key) || strings.TrimSpace(value) == "" || len(value) > 128 {
+			return fmt.Errorf("evidence_unverified: invalid ADR scope")
+		}
+	}
+	return nil
+}
+
+func validateRelation(edge RelationInstance, path string, relationTypes map[TypeRef]RelationType,
+	policies map[string]Policy, decisions map[string]Decision) error {
+	relationType, ok := relationTypes[edge.Type]
+	if !ok || !instanceIDPattern.MatchString(edge.ID) ||
+		!instanceIDPattern.MatchString(edge.Subject.ID) || !instanceIDPattern.MatchString(edge.Object.ID) ||
+		edge.Subject.Type != relationType.SubjectType || edge.Object.Type != relationType.ObjectType ||
+		!validSource(edge.SourceRef, path) || !validReview(edge.Status, edge.ReviewedBy, edge.ReviewReason) ||
+		(edge.Visibility != "public" && edge.Visibility != "restricted") || len(edge.EvidenceRefs) == 0 {
+		return fmt.Errorf("evidence_unverified: invalid relation %q", path)
+	}
+	refs := map[SourceRef]bool{}
+	for _, ref := range edge.EvidenceRefs {
+		if ref.OriginID != "repo" || !strings.HasPrefix(ref.Path, ".cks/knowledge/") ||
+			!safeRetainedPackPath(ref.Path) || refs[ref] {
+			return fmt.Errorf("evidence_unverified: invalid relation evidence reference %q", path)
+		}
+		refs[ref] = true
+	}
+	if edge.Status != "verified" {
+		return nil
+	}
+	endpoint := func(ref InstanceRef) (SourceRef, bool) {
+		if p, ok := policies[ref.ID]; ok && p.Type == ref.Type && p.Status == "verified" {
+			return p.SourceRef, true
+		}
+		if d, ok := decisions[ref.ID]; ok && d.Type == ref.Type && d.Status == "verified" {
+			return d.SourceRef, true
+		}
+		return SourceRef{}, false
+	}
+	left, leftOK := endpoint(edge.Subject)
+	right, rightOK := endpoint(edge.Object)
+	if !leftOK || !rightOK || !refs[left] || !refs[right] {
+		return fmt.Errorf("evidence_unverified: relation %q lacks verified local endpoints and source evidence", edge.ID)
+	}
+	return nil
+}
+
+func validateTraceLink(link TraceLink, path string) error {
+	if !instanceIDPattern.MatchString(link.ID) || !instanceIDPattern.MatchString(link.DecisionID) ||
+		!instanceIDPattern.MatchString(link.RequirementID) || !instanceIDPattern.MatchString(link.CriterionID) ||
+		!validCanonicalLinkID(link.CodeCanonicalID) || !validCanonicalLinkID(link.TestCanonicalID) ||
+		!validSource(link.SourceRef, path) || !validReview(link.Status, link.ReviewedBy, link.ReviewReason) ||
+		(link.Visibility != "public" && link.Visibility != "restricted") || len(link.EvidenceRefs) == 0 {
+		return fmt.Errorf("evidence_unverified: invalid trace link %q", path)
+	}
+	seen := map[SourceRef]bool{}
+	for _, ref := range link.EvidenceRefs {
+		if ref.OriginID != "repo" || !strings.HasPrefix(ref.Path, ".cks/knowledge/") ||
+			!safeRetainedPackPath(ref.Path) || seen[ref] {
+			return fmt.Errorf("evidence_unverified: invalid trace link evidence %q", path)
+		}
+		seen[ref] = true
+	}
+	return nil
+}
+
+func validCanonicalLinkID(id string) bool {
+	return id != "" && len(id) <= 512 && utf8.ValidString(id) && strings.TrimSpace(id) == id &&
+		!strings.ContainsAny(id, "\x00\r\n\t")
+}
+
+func containsRequirementID(ids []string, id string) bool {
+	for _, item := range ids {
+		if item == id {
+			return true
+		}
+	}
+	return false
+}
+
+func sourceRefPresent(refs []SourceRef, want SourceRef) bool {
+	for _, ref := range refs {
+		if ref == want {
+			return true
+		}
+	}
+	return false
+}
+
+func scopeOverlaps(a, b map[string]string) bool {
+	for key, value := range a {
+		if other, ok := b[key]; ok && other != value {
+			return false
+		}
+	}
+	return true
+}
+
+func timeOverlaps(a, b Policy) bool {
+	if a.EffectiveTo != "" && b.EffectiveFrom != "" && a.EffectiveTo < b.EffectiveFrom {
+		return false
+	}
+	if b.EffectiveTo != "" && a.EffectiveFrom != "" && b.EffectiveTo < a.EffectiveFrom {
+		return false
+	}
+	return true
+}

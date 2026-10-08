@@ -1,0 +1,108 @@
+// Command cks is the system engine's CLI: everything that composes the
+// graph and vector engines lives under one command tree.
+//
+//	cks mcp                    serve the fused MCP server (foreground)
+//	cks mcp up|down|...        manage supervised instances
+//	cks mcp gen-config         write a runtime config from flags
+//	cks mcp client-config      print an MCP client registration entry
+//	cks domain <tool>          domain-knowledge toolchain
+//	cks agent                  compose LLM-ready context for a task
+//	cks eval                   scenario evaluation harness
+//
+// See docs/design/cli-consolidation.md for the full command map.
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"regexp"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"github.com/0xmhha/knowledge-system/cmd/cks/agentcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/doctorcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/domaincli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/evalcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/evalgatecli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/filelistcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/knowledgecli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/mcpcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/packagecli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/patchcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/semanticcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/setupcli"
+	"github.com/0xmhha/knowledge-system/cmd/cks/viewercli"
+)
+
+// builderVersion is stamped into the MCP server handshake and
+// cks.ops.health responses. Override at build time:
+//
+//	go build -ldflags "-X main.builderVersion=cks-mcp/0.1.0-$(git rev-parse --short HEAD)"
+var builderVersion = "cks-mcp/0.0.1-dev"
+
+func main() {
+	root := &cobra.Command{
+		Use:           "cks",
+		Short:         "System engine: fused graph+vector retrieval and its toolchain",
+		Version:       builderVersion,
+		SilenceUsage:  true,
+		SilenceErrors: true,
+	}
+	root.AddCommand(mcpcli.NewCmd(builderVersion))
+	root.AddCommand(domaincli.NewCmd())
+	root.AddCommand(knowledgecli.NewCmd())
+	root.AddCommand(patchcli.NewCmd())
+	root.AddCommand(packagecli.NewCmd())
+	root.AddCommand(agentcli.NewCmd())
+	root.AddCommand(evalcli.NewCmd())
+	root.AddCommand(setupcli.NewCmd())
+	root.AddCommand(setupcli.NewRollbackCmd())
+	root.AddCommand(setupcli.NewGCCmd())
+	root.AddCommand(semanticcli.NewCmd())
+	root.AddCommand(doctorcli.NewCmd())
+	root.AddCommand(doctorcli.NewInitCmd())
+	root.AddCommand(filelistcli.NewCmd())
+	root.AddCommand(evalgatecli.NewCmd())
+	root.AddCommand(viewercli.NewCmd())
+
+	if err := root.Execute(); err != nil {
+		_ = json.NewEncoder(os.Stderr).Encode(publicCLIError(err))
+		os.Exit(1)
+	}
+}
+
+type cliError struct {
+	Code      string `json:"code"`
+	Message   string `json:"message"`
+	DatasetID string `json:"dataset_id,omitempty"`
+}
+
+var publicErrorCode = regexp.MustCompile(`(?:^|[^a-z_])(durability_uncertain|versioned_setup_required|requires_v2|reindex_required|snapshot_mismatch|source_missing|pack_lock_mismatch|pack_incompatible|evidence_unverified|service_unavailable|candidate_rejected|unsupported_source)(?:[^a-z_]|$)`)
+
+// publicCLIError intentionally does not echo nested tool errors. They can
+// contain source bytes, credentials, or temporary staging paths.
+func publicCLIError(err error) cliError {
+	code := "operation_failed"
+	if err != nil {
+		if match := publicErrorCode.FindStringSubmatch(strings.ToLower(err.Error())); len(match) == 2 {
+			code = match[1]
+		}
+	}
+	messages := map[string]string{
+		"durability_uncertain":     "Current may have changed; inspect its identity and retry the same operation before serving.",
+		"versioned_setup_required": "Use cks setup with the reviewed config, project ID and a new version.",
+		"requires_v2":              "Use the v2 evidence interface for this source mode.",
+		"reindex_required":         "Reindex this dataset before using this operation.",
+		"snapshot_mismatch":        "The candidate source identity does not match.",
+		"source_missing":           "A pinned source file is missing.",
+		"pack_lock_mismatch":       "Knowledge inputs differ from the saved lock.",
+		"pack_incompatible":        "The selected knowledge pack is incompatible.",
+		"evidence_unverified":      "Required evidence could not be verified.",
+		"service_unavailable":      "The requested service is unavailable.",
+		"candidate_rejected":       "The candidate did not pass its promotion gates.",
+		"unsupported_source":       "This source configuration is unsupported.",
+		"operation_failed":         "The operation failed; inspect project status for details.",
+	}
+	return cliError{Code: code, Message: messages[code]}
+}

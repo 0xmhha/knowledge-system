@@ -1,0 +1,93 @@
+# Verification Worksheet — `generic-example`
+
+> **Generated**: 2026-10-06 by `cks domain worksheet`
+> **Filter**: status=`needs_verification`, priority=`(all)`
+> **Entries in queue**: 1
+
+## Session header (one per session, fill once)
+
+- **Project**: `generic-example` @ `<commit-sha>`
+- **Session date**: ____________
+- **Domain expert**: ____________ · **Operator**: ____________
+- **Pre-flight**: run `cks domain check`, record its result, and confirm source anchors before approval. Generation does not run this check.
+
+### Selected review catalogs
+
+- Pack: organization.stablenet @ 1.0.0; digest: 23bfd6326850b097a61b2c8583c418342e77052cc69f4b84f75cec7e76c6ba59
+- Authority: Copied legacy keyword heuristic; human review required; scope: Explicit legacy worksheet review heuristics; not verified operating policy
+- Original hallucination-risk reference: packs/worksheet-risks/catalog-source.md:6-6 (verified source bytes; heuristic review aid)
+- Original trap catalog reference: packs/worksheet-risks/catalog-source.md:7-7 (verified source bytes; heuristic review aid)
+
+- Status policy: system/docs/domain-knowledge/shared/STATUS_LIFECYCLE.md, verification checklist.
+
+### Decision dictionary
+
+- **APPROVE** → entry promoted to `verified`; run the per-entry promotion command at the bottom of the section.
+- **REVISE** → return to author with the reviewer notes filled in; entry stays `needs_verification`.
+- **REJECT** → archive entry (rare; only if the trap is wrong, not just imprecise).
+
+---
+
+## Entries
+
+### `one` · `[P0 · core ·  · risk:—]`
+
+**Title**: Lock and concurrency review
+**Source of truth**: `—` · **Status**: `needs_verification`
+**Maps to**: **07 §9 item 7** (concurrency (Core.current off mutex, txpool mutation))
+
+**Catalog evidence**: organization.stablenet:risk-7; packs/worksheet-risks/catalog-source.md:15-15; file SHA256=d416667fe1e5e233f17bdd381ef3d33eef5e76f58f8c379e94d84b31d2b4a2a0; span SHA256=378a5dd61937089004bf25296660631069142eb29adca440b846a74d8c4bfcab (heuristic, requires human review)
+
+**Summary** (read first):
+
+> 
+
+---
+
+#### Substantive review — STATUS_LIFECYCLE §verification-checklist
+
+**[Q1] Is the `summary` factually correct against current code?**
+
+- [ ] ✅ correct
+- [ ] ⚠️ partially (note what to revise)
+- [ ] ❌ wrong (explain)
+
+> reviewer note:
+
+**[Q2] Do the `code_keywords` match identifiers actually used in source?**
+
+Keywords: *(none defined; consider adding)*
+
+- [ ] ✅ all match
+- [ ] ⚠️ partial (list which are stale)
+- [ ] ❌ all stale
+
+> reviewer note:
+
+**Decision**:
+
+- [ ] **APPROVE** → run:
+  ```bash
+  ./bin/cks domain verify --project '/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0' --entry 'one' --by REVIEWER_HANDLE
+  ```
+- [ ] **REVISE** → write notes above; entry stays `needs_verification`.
+- [ ] **REJECT** → archive entry; open a follow-up to delete or supersede.
+
+---
+
+## Footer — post-session sync (runs once after all APPROVE entries are promoted)
+
+```bash
+# Re-emit policy (ckg governs) + glossary (ckv vocab) for downstream consumers
+./bin/cks domain sync --project '/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0'
+./bin/cks domain glossary-gen --project '/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n13-a_a0cxt0' --status verified
+
+# Refresh ckv (channel ② docs) + ckg (governance edges) in lockstep.
+# Build a new pinned candidate with cks setup --config YOUR_SETUP_CONFIG --version NEW_VERSION.
+```
+
+## Notes on generator behaviour
+
+- The `Maps to:` line uses a token-overlap heuristic against explicitly selected pack catalogs. If the suggested item is wrong, the reviewer should correct it in-line — the worksheet is treated as a working document, not as authoritative metadata.
+- The `suggested: …` hint on each invariant is the anchor whose `reason` field shares the most words with the invariant text. A hint is shown only when at least one anchor scores > 0; otherwise the slot is left blank.
+- B6 entries (`procedure_steps`) and B7 entries (`constants`) get extra question blocks (Q5/Q6); other knowledge types omit them.

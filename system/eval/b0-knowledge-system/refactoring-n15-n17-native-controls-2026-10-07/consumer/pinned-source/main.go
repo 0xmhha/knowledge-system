@@ -1,0 +1,3 @@
+package nativewire
+
+func WireAlpha() {}

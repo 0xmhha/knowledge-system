@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
 // SchemaVersionCurrent is the on-disk schema version this build writes.
@@ -24,9 +26,15 @@ const FileName = "manifest.json"
 // Manifest is the structured index metadata. Field names are shared with
 // CKG so CKS Orchestrator can compare CKG and CKV manifests by raw key.
 type Manifest struct {
-	SchemaVersion string `json:"schema_version"`
-	CKVVersion    string `json:"ckv_version"`
-	BuiltAt       string `json:"built_at"` // RFC3339
+	SchemaVersion       string `json:"schema_version"`
+	ProjectID           string `json:"project_id,omitempty"`
+	SnapshotID          string `json:"snapshot_id,omitempty"`
+	DatasetID           string `json:"dataset_id,omitempty"`
+	FileManifestDigest  string `json:"file_manifest_digest,omitempty"`
+	CapturePolicyDigest string `json:"capture_policy_digest,omitempty"`
+	SourceMode          string `json:"source_mode,omitempty"`
+	CKVVersion          string `json:"ckv_version"`
+	BuiltAt             string `json:"built_at"` // RFC3339
 
 	// Source / git
 	SrcRoot     string `json:"src_root"`
@@ -34,10 +42,11 @@ type Manifest struct {
 	IndexedHead string `json:"indexed_head,omitempty"` // alias for SrcCommit (back-compat)
 
 	// Embedding identity
-	EmbeddingModel     string `json:"embedding_model"`
-	EmbeddingDim       int    `json:"embedding_dim"`
-	EmbeddingChecksum  string `json:"embedding_checksum,omitempty"`
-	EmbeddingNormalize string `json:"embedding_normalize,omitempty"` // "l2" | "none"
+	EmbeddingModel      string                   `json:"embedding_model"`
+	EmbeddingDim        int                      `json:"embedding_dim"`
+	EmbeddingChecksum   string                   `json:"embedding_checksum,omitempty"`
+	EmbeddingNormalize  string                   `json:"embedding_normalize,omitempty"` // "l2" | "none"
+	EmbeddingIdentityV2 *types.EmbeddingIdentity `json:"embedding_identity_v2,omitempty"`
 
 	// Aggregate stats
 	ChunkCount int            `json:"chunk_count"`
@@ -56,19 +65,29 @@ type Manifest struct {
 	DBSHA256 string `json:"db_sha256,omitempty"`
 
 	// Ignore patterns surfaced for transparency
-	CKVIgnore []string `json:"ckvignore,omitempty"`
+	CKVIgnore    []string `json:"ckvignore,omitempty"`
+	BuildSources []string `json:"build_sources,omitempty"`
 
 	// DocsRoots are additional markdown corpus directories indexed via
 	// `ckv build --docs` (outside SrcRoot, e.g. a cks-rendered
 	// domain-knowledge corpus). Recorded so callers can see every source
 	// the index covers. Additive — old readers see nil.
 	DocsRoots []string `json:"docs_roots,omitempty"`
+	// InputFiles records in-tree files that actually produced chunks. Pinned
+	// builds reconcile these byte hashes with the retained source inventory.
+	InputFiles []InputFile `json:"input_files,omitempty"`
 
 	// Sources is the per-layer knowledge-cutoff ledger (reindex-migration
 	// design §2.2): what each layer was built from, so a reindex knows what
 	// is stale and CKS can detect a CKG↔CKV mismatch. Additive — old readers
 	// see nil; each sub-block is omitted when that layer was not built.
 	Sources *Sources `json:"sources,omitempty"`
+}
+
+type InputFile struct {
+	OriginID string `json:"origin_id"`
+	Path     string `json:"path"`
+	SHA256   string `json:"sha256"`
 }
 
 // Sources records the origin + cutoff of each knowledge layer in the index.

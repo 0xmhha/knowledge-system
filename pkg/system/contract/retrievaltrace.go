@@ -92,6 +92,7 @@ type RetrievalStep struct {
 // EvidencePack is returned separately; this trace explains how that pack's
 // seeds were selected, and doubles as a "why was this picked" debug record.
 type RetrievalTrace struct {
+	Ontology *OntologyDiagnostic `json:"ontology,omitempty"`
 	// Producer attributes the trace to the algorithm that built it:
 	// "composer" (deterministic, in-process) or "agent" (LLM tool use).
 	Producer string `json:"producer"`

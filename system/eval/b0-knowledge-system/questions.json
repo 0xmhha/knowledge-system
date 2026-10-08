@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "corpus_commit": "71cb71cd55960833e930269e272f7a4a060be3aa",
+  "corpus_project": "knowledge-system",
+  "questions": [
+    {
+      "id": "B0-CODE-01",
+      "group": "code_location",
+      "language": "ko",
+      "prompt": "CKG와 CKV가 서로 다른 소스 스냅샷을 색인했을 때 어디서 거부하나요?",
+      "candidate_answer": "VerifyAlignment이 프로젝트, 스냅샷, 데이터셋, 파일 매니페스트와 캡처 정책의 일치를 확인한다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/setup/verify.go",
+          "anchor": "func VerifyAlignment(graphDir, vectorDir string, emit func(Event)) error {",
+          "start_line": 57,
+          "end_line": 85
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-CODE-02",
+      "group": "code_location",
+      "language": "en",
+      "prompt": "Where does CKV report an incomplete search when the exact candidate limit is reached?",
+      "candidate_answer": "SearchDetailed returns an incomplete result with a candidate limit reason instead of treating partial hits as complete.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/vector/store/sqlitevec/store.go",
+          "anchor": "func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error) {",
+          "start_line": 613,
+          "end_line": 654
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-CODE-03",
+      "group": "code_location",
+      "language": "ko",
+      "prompt": "기존 v1 데이터셋에 v2 문맥 질의를 했을 때 재색인을 요구하는 경계는 어디인가요?",
+      "candidate_answer": "get_for_task_v2 핸들러가 보관 데이터셋의 pinned v2 신원을 서비스 가능성 검사보다 먼저 확인한다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/system/mcp/get_for_task_v2.go",
+          "anchor": "func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest)",
+          "start_line": 33,
+          "end_line": 55
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-WHY-01",
+      "group": "why_design",
+      "language": "ko",
+      "prompt": "왜 테스트가 CHECKED_BY로 연결되어도 수용 기준이 사람에게 승인된 것으로 취급하지 않나요?",
+      "candidate_answer": "CHECKED_BY는 검토된 테스트 연결이며 CriterionDecision.approved가 별도의 사람 수용 판정이다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+          "anchor": "새 통합 데이터셋의 정식 술어는 `AcceptanceCriterion CHECKED_BY TestCase`다.",
+          "start_line": 67,
+          "end_line": 67
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-WHY-02",
+      "group": "why_design",
+      "language": "en",
+      "prompt": "Why does a project knowledge pack change create a new dataset identity even when code bytes are unchanged?",
+      "candidate_answer": "The build recipe includes the lock digest, so a changed pack or policy becomes a distinct dataset rather than mutating the active one.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+          "anchor": "그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다.",
+          "start_line": 40,
+          "end_line": 40
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-WHY-03",
+      "group": "why_design",
+      "language": "ko",
+      "prompt": "왜 패치의 테스트 실행이 성공해도 자동으로 승격되지 않나요?",
+      "candidate_answer": "테스트 보고와 사람의 기준별 승인 결정을 분리하며, 패치 승격은 연결된 근거와 모든 필수 기준의 approved 판정을 요구한다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/system/patch/review.go",
+          "anchor": "func Promote(ctx context.Context, dataset, patchID, storePath string) (string, error) {",
+          "start_line": 205,
+          "end_line": 281
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-POLICY-01",
+      "group": "policy_conflict",
+      "language": "ko",
+      "prompt": "같은 범위와 시점에 적용되는 검토된 프로젝트 정책 두 개가 충돌하면 어느 쪽을 자동 우선해야 하나요?",
+      "candidate_answer": "자동 우선순위를 부여하지 않고 충돌을 드러낸다. 승인된 대체·예외 또는 범위·유효 기간이 해소될 때만 결정적 답을 낸다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+          "anchor": "**검토된 프로젝트 정책이라도** 다른 검토된 프로젝트 정책과 충돌하면 자동 우선순위를 부여하지 않는다.",
+          "start_line": 23,
+          "end_line": 23
+        },
+        {
+          "path": "internal/system/knowledgepack/instances.go",
+          "anchor": "func (i Instances) SelectPolicies(asOf string, queryScope map[string]string, allowRestricted bool) (PolicyContext, error) {",
+          "start_line": 195,
+          "end_line": 242
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-POLICY-02",
+      "group": "policy_conflict",
+      "language": "en",
+      "prompt": "May an industry pack override a verified project policy when the two disagree?",
+      "candidate_answer": "No. An industry pack is a reusable template, while the reviewed project overlay is authoritative for that project; disagreement must be recorded or excluded.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "docs/spec-driven/DOMAIN-PACK-CONTRACT-V1.md",
+          "anchor": "산업 템플릿에는 조직 정책의 최종 권위가 없다.",
+          "start_line": 23,
+          "end_line": 23
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-POLICY-03",
+      "group": "policy_conflict",
+      "language": "ko",
+      "prompt": "비공개 정책이 존재하지만 조회자가 접근 권한이 없으면 정책 본문이나 ID를 코딩 문맥에 넣을 수 있나요?",
+      "candidate_answer": "넣을 수 없다. 비공개 정책은 응답에서 숨기고 불확실 상태를 유지한다.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/system/knowledgepack/instances.go",
+          "anchor": "if p.Visibility == \"restricted\" && !allowRestricted {",
+          "start_line": 203,
+          "end_line": 241
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-TRACE-01",
+      "group": "why_design",
+      "language": "en",
+      "prompt": "What must match before CKS can claim an ADR requirement has a verified code and test implementation path?",
+      "candidate_answer": "The reviewed trace link, current dataset coordinates, retained source references, and semantic code and test anchors must match.",
+      "expected_behavior": "cite",
+      "evidence": [
+        {
+          "path": "internal/system/evidencev2/knowledge_trace.go",
+          "anchor": "func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, versionDir, asOf, subsystem string, projection semantic.ActiveProjection, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {",
+          "start_line": 20,
+          "end_line": 115
+        }
+      ],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-ABS-01",
+      "group": "abstention",
+      "language": "ko",
+      "prompt": "이 조직의 운영 블록체인 가스 환불 정책을 승인한 담당자는 누구인가요?",
+      "candidate_answer": "이 코퍼스에는 승인된 조직 운영 정책과 담당자 근거가 없으므로 답변을 보류해야 한다.",
+      "expected_behavior": "abstain",
+      "evidence": [],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    },
+    {
+      "id": "B0-ABS-02",
+      "group": "abstention",
+      "language": "en",
+      "prompt": "Which production signing key and private key holder are used for this project's release?",
+      "candidate_answer": "The corpus does not contain an approved production signing key or holder; do not infer one from preview signing tests.",
+      "expected_behavior": "abstain",
+      "evidence": [],
+      "review_state": "approved",
+      "reviewer": "chat-user",
+      "reviewed_at": "2026-10-03T10:55:59.422676+00:00"
+    }
+  ]
+}

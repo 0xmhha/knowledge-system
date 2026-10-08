@@ -15,6 +15,7 @@ import (
 
 func newBuildCmd() *cobra.Command {
 	var src, out, outTag, atCommit, dbDsn, filesFrom, policyFile, securityPatternFile string
+	var projectID, snapshotID, datasetID, fileManifestDigest, capturePolicyDigest, sourceMode, logicalSrcRoot string
 	var langs, filesFromMain, solInclude, excludes []string
 	var noCache, force, rebuildMetrics, strictValidate, lockPropagation, failOnParseErrors bool
 	var temporalDepth int
@@ -69,7 +70,10 @@ func newBuildCmd() *cobra.Command {
 			}
 
 			m, err := buildpipe.Run(buildpipe.Options{
+				ProjectID: projectID, SnapshotID: snapshotID, DatasetID: datasetID,
+				FileManifestDigest: fileManifestDigest, CapturePolicyDigest: capturePolicyDigest, SourceMode: sourceMode,
 				SrcRoot:             effectiveSrc,
+				LogicalSrcRoot:      logicalSrcRoot,
 				OutDir:              effectiveOut,
 				Languages:           langs,
 				Logger:              log,
@@ -106,6 +110,13 @@ func newBuildCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&src, "src", "", "source root (required)")
+	cmd.Flags().StringVar(&projectID, "project-id", "", "stable project ID for a pinned dataset")
+	cmd.Flags().StringVar(&snapshotID, "snapshot-id", "", "captured source snapshot ID")
+	cmd.Flags().StringVar(&datasetID, "dataset-id", "", "pre-build dataset ID")
+	cmd.Flags().StringVar(&fileManifestDigest, "file-manifest-digest", "", "source file manifest digest")
+	cmd.Flags().StringVar(&capturePolicyDigest, "capture-policy-digest", "", "versioned source capture policy digest")
+	cmd.Flags().StringVar(&sourceMode, "source-mode", "", "committed source mode for pinned builds")
+	cmd.Flags().StringVar(&logicalSrcRoot, "logical-src-root", "", "public project root when --src is a retained build tree")
 	cmd.Flags().StringVar(&out, "out", "", "output directory (required)")
 	cmd.Flags().StringVar(&outTag, "out-tag", "",
 		`suffix appended to --out directory; "auto-commit-hash" appends the source tree's path-aware HEAD commit (short SHA)`)

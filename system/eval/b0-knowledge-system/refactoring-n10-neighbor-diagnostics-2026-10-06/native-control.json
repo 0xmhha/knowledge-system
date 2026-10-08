@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "scope": "native Darwin real SQLite standalone graph; not pinned v2/BGE/quality/latency",
+  "commands": [
+    [
+      "/private/tmp/ks-n10-native-bin/ckg",
+      "build",
+      "--src",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n10-sqlite-diagnostic-lj3hcdy2/source",
+      "--out",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n10-sqlite-diagnostic-lj3hcdy2/graph",
+      "--fail-on-parse-errors"
+    ],
+    [
+      "go",
+      "run",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/.ks-n10-native-diagnostic/main.go",
+      "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n10-sqlite-diagnostic-lj3hcdy2/graph/graph.db"
+    ]
+  ],
+  "exit_codes": [
+    0,
+    0
+  ],
+  "calls": 3,
+  "nonreturned_calls": 2,
+  "typed_seed_unresolved": 1,
+  "resolved_empty_traversals": 1,
+  "closed_store_errors_unclassified": 1,
+  "graph_files_unchanged": true,
+  "graph_files_sha256": {
+    "manifest.json": "c1a8f6196e572084f9c293efd436fe1d176a30a359c9582b44b7f449fcbe7e43",
+    "graph.db": "2ffea0d44c903504c1a764ca409d90f9379bb5e6b4c9e271d3c7c6fb4d05ca80"
+  },
+  "source_sha256": {
+    "go.mod": "04acd8df053ff850954bcdf6cc8fada5f6e7dcba017d7ad97d4a33636618178d",
+    "main.go": "25e019ace4a6b954b5ff11be694e650067498bda264bf616bdd7bab2aef7b90d",
+    "notes.md": "cbc0fcac59247d06d34bcd069cad005e8f5047c2eb1eeb9057f1bb1d2f2784c3"
+  },
+  "ckg_binary_sha256": "b890d3f58e615b5599859bbc23dfde4e7bbb18a0e17647fcbf12fe34f537018b",
+  "fresh_retrieval_queries": 0,
+  "new_final_units": 0,
+  "host": {
+    "os": "Darwin",
+    "arch": "arm64"
+  }
+}

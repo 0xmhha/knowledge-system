@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
+	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -112,7 +113,7 @@ func runQuery(ctx context.Context, opts *queryOpts, intent string) error {
 		EnableBM25Rerank: opts.bm25Rerank,
 	})
 	if err != nil {
-		return err
+		return queryFailure(err)
 	}
 
 	if opts.jsonOut {
@@ -121,6 +122,19 @@ func runQuery(ctx context.Context, opts *queryOpts, intent string) error {
 		return enc.Encode(res)
 	}
 	return renderHuman(res)
+}
+
+func queryFailure(err error) error {
+	switch {
+	case errors.Is(err, context.Canceled):
+		return fmt.Errorf("code=cancelled: %w", err)
+	case errors.Is(err, context.DeadlineExceeded),
+		errors.Is(err, sqlitevec.ErrSearchIncomplete),
+		errors.Is(err, sqlitevec.ErrIncompleteIndex):
+		return fmt.Errorf("code=incomplete: %w", err)
+	default:
+		return err
+	}
 }
 
 // renderHuman prints a compact tabular view that's still scannable

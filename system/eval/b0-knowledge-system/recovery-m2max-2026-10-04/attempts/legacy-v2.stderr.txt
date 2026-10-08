@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-recovery-20261004/legacy-recovery.py", line 197, in <module>
+    main()
+  File "/private/tmp/ks-recovery-20261004/legacy-recovery.py", line 87, in main
+    run(["go", "version"], output=scratch / "toolchain.txt")
+  File "/private/tmp/ks-recovery-20261004/legacy-recovery.py", line 57, in run
+    with open(output, "w", encoding="utf-8") as log:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/ks-recovery-20261004/legacy-v2/toolchain.txt'

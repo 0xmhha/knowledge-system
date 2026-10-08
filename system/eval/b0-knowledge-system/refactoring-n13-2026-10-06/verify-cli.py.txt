@@ -1,0 +1,41 @@
+import hashlib,json,pathlib,re,shutil,subprocess,tempfile
+root=pathlib.Path.cwd(); evidence=root/'system/eval/b0-knowledge-system/refactoring-n13-2026-10-06'
+project=root/'projects/stablenet/domain-knowledge'
+new='/private/tmp/ks-n13-bin/cks';old='/private/tmp/ks-n07-bin/cks'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+before={str(p.relative_to(project)):sha(p.read_bytes()) for p in project.rglob('*') if p.is_file()}
+rows=[]
+def run(name,binary,p,args,expect=0):
+ command=[binary,'domain','--project',str(p),'worksheet',*args]
+ result=subprocess.run(command,capture_output=True,timeout=30)
+ (evidence/(name+'.md.txt')).write_bytes(result.stdout)
+ (evidence/(name+'.stderr.log')).write_bytes(result.stderr)
+ assert (result.returncode==0)==(expect==0),(name,result.returncode,result.stderr.decode())
+ rows.append({'name':name,'binary_sha256':sha(pathlib.Path(binary).read_bytes()),'args':command[1:],'exit':result.returncode,'output_sha256':sha(result.stdout)})
+ return result.stdout.decode()
+for label,args in [('queue',[]),('p0',['--priority','P0']),('draft',['--status','draft']),('empty',['--status','no-such-status'])]:
+ a=run('old-'+label,old,project,args);b=run('new-'+label,new,project,args)
+ for pattern in [r'^### `[^`]+`',r'^\*\*Maps to\*\*:.*$',r'^\*\*Source of truth\*\*:.*$']:
+  assert re.findall(pattern,a,re.M)==re.findall(pattern,b,re.M),(label,pattern)
+ assert '23bfd6326850b097a61b2c8583c418342e77052cc69f4b84f75cec7e76c6ba59' in b
+with tempfile.TemporaryDirectory(prefix='ks-n13-') as tmp:
+ p=pathlib.Path(tmp);(p/'entries').mkdir()
+ (p/'project.yaml').write_text('id: generic-example\nschema_version: 1\n')
+ (p/'subsystems.yaml').write_text('- id: core\n  name: Core\n')
+ (p/'entries/one.yaml').write_text('id: one\nsubsystem: core\nstatus: needs_verification\npriority: P0\ntitle: Lock and concurrency review\n')
+ entry_sha=sha((p/'entries/one.yaml').read_bytes())
+ b=run('generic',new,p,[])
+ assert '07 §9' not in b and 'StableNet' not in b and 'No worksheet catalog selected' in b
+ (p/'packs').mkdir();shutil.copytree(project/'packs/worksheet-risks',p/'packs/worksheet-risks')
+ selection='worksheet_packs:\n  - pack_id: organization.stablenet\n    version: 1.0.0\n    source: packs/worksheet-risks\n    sha256: 23bfd6326850b097a61b2c8583c418342e77052cc69f4b84f75cec7e76c6ba59\n'
+ (p/'project.yaml').write_text('id: generic-example\n'+selection)
+ b=run('generic-explicit-selection',new,p,[])
+ assert '07 §9 item 7' in b and 'heuristic' in b
+ out=p/'previous-review.md';out.write_text('keep previous review\n')
+ (p/'packs/worksheet-risks/catalog-source.md').write_text('tampered\n')
+ run('stale-pin',new,p,['--out',str(out)],expect=1)
+ assert out.read_text()=='keep previous review\n'
+ assert sha((p/'entries/one.yaml').read_bytes())==entry_sha
+assert before=={str(p.relative_to(project)):sha(p.read_bytes()) for p in project.rglob('*') if p.is_file()},'project mutation'
+(evidence/'cli-verification.json').write_text(json.dumps({'status':'PASS','platform':'native Darwin ARM64','cases':rows,'project_file_sha256_before_after_equal':True,'project_files':len(before),'legacy_mappings_and_filters_identical':True,'automatic_status_promotions':0},indent=2)+'\n')
+print('native CLI PASS:',len(rows),'runs; existing project files unchanged:',len(before))

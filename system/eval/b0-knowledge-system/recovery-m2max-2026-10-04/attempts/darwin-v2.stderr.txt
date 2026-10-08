@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 36, in <module>
+    run('init',[bins/'cks','init','--src',src,'--dataset',dataset,'--config-out',config,'--embedder','mock']);run('baseline',[bins/'cks','setup','--config',config,'--version','baseline']);old=dataset/'baseline';oldhash=snapshot(old);backup=out/'backup/baseline';shutil.copytree(old,backup);assert snapshot(backup)==oldhash;cfg=mcp_config('runtime',dataset);checks={'baseline':capture('baseline',cfg,old)};assert snapshot(old)==oldhash
+                                                                                                                                                                                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-recovery-20261004/recovery-smoke.py", line 27, in capture
+    assert c['commit_hash']==identity['source']['source_commit'];raw=sources[c['file']];lines=raw.splitlines(keepends=True);assert 1<=c['start_line']<=c['end_line']<=len(lines);assert sha(b''.join(lines[c['start_line']-1:c['end_line']]))==c['content_sha256'];citations+=1
+                                                                                                                                                                                                                                               ~^^^^^^^^^^^^^^^^^^
+KeyError: 'content_sha256'

@@ -11,6 +11,7 @@ package embedder
 import (
 	"fmt"
 
+	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
@@ -40,29 +41,50 @@ var knownDims = map[string]int{"bge-m3": 1024}
 // returns a Capability populated from the requested provider/model/endpoint
 // (Dim 0) so callers can still report identity in a degraded state.
 func Open(provider, model, endpoint string) (ckvtypes.Embedder, Capability, error) {
+	return OpenWithOptions(provider, model, endpoint, 0, "")
+}
+
+// OpenWithOptions carries the index's dimension and query transformation into
+// CKS. CKV Open rejects a mismatch against the persisted v2 identity.
+func OpenWithOptions(provider, model, endpoint string, targetDim int, queryPrefixPolicy string, observers ...ollama.HTTPObserver) (ckvtypes.Embedder, Capability, error) {
 	if provider == "" {
 		provider = DefaultProvider
 	}
 	cap := Capability{Provider: provider, Model: model, Endpoint: endpoint}
 
 	switch provider {
+	case "mock":
+		// Deterministic local backend for structural end-to-end tests. Its
+		// feature hashes are not a semantic-search quality benchmark.
+		adapter := ckv.MockEmbedder()
+		if model != "" && model != adapter.Name() {
+			return nil, cap, fmt.Errorf("mock embedder model %q != %q", model, adapter.Name())
+		}
+		cap.Model = adapter.Name()
+		cap.Endpoint = ""
+		cap.Dim = adapter.Dimension()
+		return adapter, cap, nil
 	case "ollama":
 		if model == "" {
 			model = "bge-m3"
 			cap.Model = model
 		}
-		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model})
+		var observer ollama.HTTPObserver
+		if len(observers) > 0 {
+			observer = observers[0]
+		}
+		adapter, err := ollama.Open(ollama.Options{Endpoint: endpoint, ModelName: model, TargetDim: targetDim, QueryPrefixPolicy: queryPrefixPolicy, ObserveHTTP: observer})
 		if err != nil {
 			return nil, cap, err
 		}
 		dim := adapter.Dimension()
-		if want, ok := knownDims[model]; ok && dim != want {
+		if want, ok := knownDims[model]; ok && targetDim == 0 && dim != want {
 			_ = adapter.Close()
 			return nil, cap, fmt.Errorf("embedder %q dim=%d, want %d", model, dim, want)
 		}
 		cap.Dim = dim
 		return adapter, cap, nil
 	default:
-		return nil, cap, fmt.Errorf("unknown embedder provider %q (supported: ollama)", provider)
+		return nil, cap, fmt.Errorf("unknown embedder provider %q (supported: ollama, mock)", provider)
 	}
 }

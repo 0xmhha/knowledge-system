@@ -1,0 +1,90 @@
+import hashlib,json,os,pathlib,select,subprocess,tempfile,time
+repo=pathlib.Path.cwd();e=repo/'system/eval/b0-knowledge-system/refactoring-n05-2026-10-06';bins=pathlib.Path('/private/tmp/ks-n05-bin')
+root=pathlib.Path(tempfile.mkdtemp(prefix='cks-n05-cli-'));src=root/'source';src.mkdir();ds=root/'dataset'
+(src/'go.mod').write_text('module example.org/gcfixture\n\ngo 1.25.13\n');(src/'main.go').write_text('package fixture\n\nfunc Alpha() int { return 7 }\n')
+config=root/'setup.yaml';config.write_text(f'project_id: n05-fixture\nsource_mode: snapshot-only\nsrc: {src}\nout: {ds}\ngraph_bin: {bins/"ckg"}\nvector_bin: {bins/"ckv"}\nembedder: mock\nembed_dim: 8\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def tree(p):return {str(f.relative_to(p)):sha(f) for f in sorted(p.rglob('*')) if f.is_file() and not f.is_symlink()}
+report={'fixture':str(root),'scope':'native Darwin ARM64 real CLI engines/mock embeddings and public stdio MCP reader; no quality, native Linux or power-loss verdict','binaries':{p.name:sha(p) for p in bins.iterdir()},'cases':[]}
+def run(name,args,expected=0):
+ command=[str(bins/'cks'),*args];r=subprocess.run(command,capture_output=True,text=True,timeout=45)
+ (e/(name+'.stdout.log')).write_text(r.stdout);(e/(name+'.stderr.log')).write_text(r.stderr)
+ report['cases'].append({'name':name,'argv':command,'exit_code':r.returncode})
+ assert r.returncode==expected,(name,r.returncode,r.stderr)
+ return r
+for version in ['v1','v2','v3','v4','v5']:
+ run('build-'+version,['setup','--config',str(config),'--version',version,'--progress','json'])
+ assert (ds/version/'reader-protocol.json').exists()
+past=time.time()-48*3600
+for version in ['v1','v2','v3','v4','v5']:os.utime(ds/version,(past,past))
+current_before=tree(ds/'v5');planfile=root/'reviewed.json'
+initial=json.loads(run('initial-dry-run',['gc','--out',str(ds),'--min-age','1h','--plan-file',str(planfile)]).stdout)
+assert all(next(v for v in initial['versions'] if v['version']==name)['delete'] for name in ['v1','v2','v3'])
+assert os.readlink(ds/'current')=='v5' and tree(ds/'v5')==current_before
+runtime=root/'runtime.yaml';runtime.write_text(f'''version: 1
+name: n05-reader
+backends:
+  ckg:
+    path: {ds/'v1/graph/graph.db'}
+    source_root: {src}
+  ckv:
+    path: {ds/'v1/vector'}
+    provider: mock
+    embed_dim: 8
+    embed_model: mock-feature-hash-v1
+listen:
+  transport: stdio
+logging:
+  level: error
+  mode: prod
+  footprint_dir: {root/'footprints'}
+  audit_dir: {root/'audit'}
+sanitize:
+  rules_path: {repo/'system/policies/sanitization_rules.yaml'}
+''')
+env=os.environ.copy();env['KNOWLEDGE_MCP_NAMESPACE']='cks'
+stderr=(e/'mcp-reader.stderr.log').open('w');server=subprocess.Popen([str(bins/'cks'),'mcp','--config',str(runtime)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=stderr,text=True,env=env)
+responses=[]
+def rpc(request):
+ server.stdin.write(json.dumps(request)+'\n');server.stdin.flush()
+ deadline=time.monotonic()+15
+ while time.monotonic()<deadline:
+  ready,_,_=select.select([server.stdout],[],[],.2)
+  if ready:
+   line=server.stdout.readline();assert line,('MCP exited',server.poll())
+   value=json.loads(line);responses.append(value)
+   if value.get('id')==request['id']:return value
+ raise AssertionError('MCP response timeout')
+try:
+ initialized=rpc({'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'gc-native-fixture','version':'1'}}})
+ assert 'error' not in initialized
+ server.stdin.write(json.dumps({'jsonrpc':'2.0','method':'notifications/initialized'})+'\n');server.stdin.flush()
+ health=rpc({'jsonrpc':'2.0','id':2,'method':'tools/call','params':{'name':'cks.ops.health','arguments':{}}})
+ assert 'error' not in health and not health['result'].get('isError')
+ h=health['result']['structuredContent'];assert h['serviceable'] and h['alignment']['ok'] and h['backends']['graph']['reachable'] and h['backends']['vector']['reachable'] and h['backends']['vector']['provider']=='mock'
+ report['health']=h
+ stale=run('reader-made-plan-stale',['gc','--out',str(ds),'--apply','--plan-file',str(planfile)],1)
+ assert '/private/' not in stale.stderr and str(root) not in stale.stderr
+ active=json.loads(run('reader-protected-dry-run',['gc','--out',str(ds),'--min-age','1h','--plan-file',str(planfile)]).stdout)
+ reader=next(v for v in active['versions'] if v['version']=='v1');assert not reader['delete'] and 'pinned_reader' in reader['protected_reasons']
+ run('apply-with-live-reader',['gc','--out',str(ds),'--apply','--plan-file',str(planfile)])
+ assert (ds/'v1').exists() and not (ds/'v2').exists() and not (ds/'v3').exists()
+ assert os.readlink(ds/'current')=='v5' and tree(ds/'v5')==current_before
+ after=rpc({'jsonrpc':'2.0','id':3,'method':'tools/call','params':{'name':'cks.ops.health','arguments':{}}})
+ assert after['result']['structuredContent']['serviceable'] and after['result']['structuredContent']['alignment']['dataset_id']==h['alignment']['dataset_id']
+ report['live_reader_preserved']=True;report['current_and_source_unchanged']=True
+finally:
+ server.stdin.close();server.stdin=None
+ try:server.communicate(timeout=10)
+ except subprocess.TimeoutExpired:server.kill();server.communicate(timeout=10)
+ stderr.close();(e/'mcp-reader-responses.json').write_text(json.dumps(responses,indent=2)+'\n')
+os.utime(ds/'v1',(past,past))
+closed=json.loads(run('closed-reader-dry-run',['gc','--out',str(ds),'--min-age','1h','--plan-file',str(planfile)]).stdout)
+assert next(v for v in closed['versions'] if v['version']=='v1')['delete']
+run('apply-after-reader-close',['gc','--out',str(ds),'--apply','--plan-file',str(planfile)])
+assert not (ds/'v1').exists() and (ds/'v4').exists() and (ds/'v5').exists()
+run('resume-empty-trash',['gc','--out',str(ds),'--resume'])
+assert tree(ds/'v5')==current_before and os.readlink(ds/'current')=='v5'
+report['closed_reader_reclaimed']=True;report['success']=True
+(e/'cli-results.json').write_text(json.dumps(report,indent=2)+'\n')
+print('N05 CLI/MCP retention, stale-plan and live-reader cases PASS')
