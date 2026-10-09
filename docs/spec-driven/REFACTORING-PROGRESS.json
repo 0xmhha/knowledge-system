@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-11",
   "active_source_binding": {
-    "revision": "9a9ecc48d51809bfade356e0962ae010e1fd5541",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-n10-retained-batch-2026-10-09/manifest.json"
+    "revision": "81dcb8ad4b14367c8c4d86ad2c528130324d8c73",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n14-change-acceptance-2026-10-10/manifest.json"
   },
   "tasks": [
     {
@@ -419,10 +419,10 @@
     {
       "id": "N-14",
       "purpose": "실제 의미 수용 흐름",
-      "state": "waiting",
+      "state": "complete",
       "preparation": "docs/spec-driven/N14-ACTUAL-CHANGE-REVIEW.md",
       "verified_substep": "actual merged PR97 subset 7 changed files/11 source spans match committed and current bytes; raw exact5 Go tests observed/pass on same runtime code; proposed source links only, no reviewed canonical trace/linked test report/actual patch registration/human criterion acceptance",
-      "waiting_for": "actual N12 source/relationship review then coordinated canonical trace, actual held patch candidate/linked run and separate real human criterion decision before promote/rollback acceptance",
+      "waiting_for": null,
       "preparation_evidence_revision": "0f8804f8050066435ba89c2da14ce6c2679b1beb",
       "preparation_manifest": "system/eval/b0-knowledge-system/refactoring-n14-actual-change-preparation-2026-10-08/manifest.json",
       "trace_material_preparation": "docs/spec-driven/N12-PROPOSED-TRACE-RELATIONS.md",
@@ -465,7 +465,20 @@
       "run_roundtrip_actual_human_decisions": 0,
       "run_roundtrip_actual_patch_attempts": 0,
       "run_roundtrip_verified_substep": "Actual CKG CLI+source/retained identity controls feed production exact Go runner and public RecordRun;2 root/nested reports,4 import/retry successes,2 foreign-proof and2 immutable-replacement refusals, no owned human decision/promotion/semantic current;47race tests33subtests plus vet/boundaries/format pass; no actual pilot opened/changed.",
-      "run_roundtrip_unique_committed_current_SHA_bindings": 1190
+      "run_roundtrip_unique_committed_current_SHA_bindings": 1190,
+      "evidence_revision": "81dcb8ad4b14367c8c4d86ad2c528130324d8c73",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n14-change-acceptance-2026-10-10/manifest.json",
+      "required_checks": [
+        "N14-A",
+        "N14-B",
+        "N14-C",
+        "N14-D",
+        "N14-E"
+      ],
+      "acceptance_document": "docs/spec-driven/N14-CHANGE-ACCEPTANCE.md",
+      "reviewer_label": "opus",
+      "reviewer_kind": "user_provided_label_for_user_judgment",
+      "reasons_origin": "agent draft adopted unchanged by the user"
     },
     {
       "id": "N-15",
@@ -827,6 +840,19 @@
     "product_code_changed": true,
     "reviewer": null,
     "individual_human_approvals": 0,
+    "status": "PASS"
+  },
+  "latest_n14_acceptance": {
+    "revision": "81dcb8ad4b14367c8c4d86ad2c528130324d8c73",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n14-change-acceptance-2026-10-10/manifest.json",
+    "document": "docs/spec-driven/N14-CHANGE-ACCEPTANCE.md",
+    "unique_current_and_committed_SHA_bindings": 1524,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "changed_sources": [],
+    "product_code_changed": false,
+    "reviewer": "opus",
+    "individual_human_approvals": 4,
     "status": "PASS"
   }
 }
