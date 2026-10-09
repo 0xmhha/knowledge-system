@@ -141,3 +141,39 @@ func TestAttachVerifiedTracesRequiresAlignedCitedPath(t *testing.T) {
 		t.Fatalf("foreign projection path exposed: %+v %v", mismatch.Semantic, err)
 	}
 }
+
+func TestRetainedSourceValidationRejectsForeignArchiveCoordinates(t *testing.T) {
+	root, version := knowledgeVersion(t, "public", "Alpha must stay pinned.", "public")
+	identity, err := setup.InspectVersionIdentity(version)
+	if err != nil || identity == nil {
+		t.Fatalf("identity: %+v %v", identity, err)
+	}
+	body, err := os.ReadFile(filepath.Join(root, "ontology.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	good := semantic.Snapshot{ProjectID: "p", DatasetID: identity.DatasetID,
+		SnapshotID: identity.Source.SnapshotID, SourceMode: "snapshot-only"}
+	// The ontology YAML binds its project, so a foreign project fails extraction
+	// before this check; snapshot and source mode reach the archive comparison.
+	foreignSnapshot, foreignMode := good, good
+	foreignSnapshot.SnapshotID = strings.Repeat("b", 64)
+	foreignMode.SourceMode, foreignMode.Commit = "committed", strings.Repeat("c", 40)
+	for name, snapshot := range map[string]semantic.Snapshot{"aligned": good, "snapshot": foreignSnapshot,
+		"mode": foreignMode} {
+		p, _, err := semantic.ExtractOntology(snapshot, "ontology.yaml", body)
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		err = p.ValidateRetainedSources(version)
+		if name == "aligned" {
+			if err != nil {
+				t.Fatalf("aligned archive rejected: %v", err)
+			}
+			continue
+		}
+		if err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
+			t.Fatalf("%s: foreign archive coordinates accepted: %v", name, err)
+		}
+	}
+}

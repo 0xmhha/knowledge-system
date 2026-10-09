@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "dataset": "/private/tmp/ks-n11-eval-m13oocru/dataset/n11-eval-candidate (dataset cd9a22e3, source e693b312)",
+  "semantic_store": "/private/tmp/ks-n11-eval-m13oocru/semantic-eval.sqlite",
+  "method": "temporary in-package Go timing test (deleted after use); three to five sequential runs on the same machine",
+  "before": {
+    "per_step_ms": {"open": [25.3, 14.0, 20.3], "load": [5.1, 0.6, 0.6], "dataset_alignment": [3.5, 3.4, 3.5],
+                    "code_anchors": [0.0, 0.0, 0.0], "ckv_chunk_links": [35.8, 21.8, 21.6],
+                    "retained_sources": [1029.1, 959.4, 1063.3]},
+    "inspect_version_identity_ms": [667.6, 173.3, 154.8],
+    "sources_manifest_parse_ms": [2.3, 2.2, 2.3],
+    "single_retained_file_read_ms": [2.6, 2.4, 2.4]
+  },
+  "after": {
+    "evidence_files": 5,
+    "retained_sources_ms": [354.2, 298.7, 309.1, 396.8, 328.1],
+    "load_aligned_retained_total_ms": [350.2, 331.5, 338.3, 359.6, 351.1]
+  },
+  "cause": "ValidateRetainedSources called ReadRetainedFile per evidence file; each call re-ran the full archive identity verification (~155 ms warm). Five files meant five verifications per call.",
+  "change": "setup.ReadRetainedFiles verifies the archive once before and once after a request-local batch (the VisitRetainedLineSpans pattern); ValidateRetainedSources reads all evidence files through it.",
+  "unchanged_contract": "Per-request full archive verification stays; no verification result survives a request. Remaining cost is two verifications per projection load.",
+  "limits": "Timing is on one Apple M2 Max under normal desktop load; not a matrix measurement. The end-to-end effect must come from a new DEV run."
+}

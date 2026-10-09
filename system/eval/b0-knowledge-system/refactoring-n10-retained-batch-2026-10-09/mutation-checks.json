@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "mutants": [
+    {"id": "M1", "change": "drop the archive/projection coordinate comparison in ValidateRetainedSources",
+     "before_new_test": "survived (semantic, evidencev2, patch, stage2 packages all pass)",
+     "after_new_test": "killed by TestRetainedSourceValidationRejectsForeignArchiveCoordinates (snapshot case accepted)",
+     "note": "The comparison existed before this change without a test."},
+    {"id": "M2", "change": "remove the after-batch archive verification in ReadRetainedFiles",
+     "result": "survived",
+     "note": "No test injects an archive change between the two verifications. VisitRetainedLineSpans has the same gap. Static damage is still caught by the before-batch verification (tested)."}
+  ]
+}

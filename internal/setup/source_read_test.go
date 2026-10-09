@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -74,6 +75,58 @@ func TestRetainedBatchPreservesSpansAndRechecksUnselectedDamage(t *testing.T) {
 	}
 	if out, err := ReadRetainedLineSpans(version, spans); err == nil || out != nil {
 		t.Fatalf("previous verification hid unselected archive damage: %+v %v", out, err)
+	}
+}
+
+func TestRetainedFileBatchMatchesSingleReadsAndRechecksArchive(t *testing.T) {
+	root, version := t.TempDir(), t.TempDir()
+	for name, text := range map[string]string{"a.md": "alpha\r\n", "b.md": "beta\n", "unused.md": "uncited\n"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(text), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: version, ProjectID: "files", SourceMode: "snapshot-only"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	writePinnedMockManifests(t, version, root, "", captured.Identity)
+	if _, err := PublishCandidateIdentity(version, captured.Identity, "inputs"); err != nil {
+		t.Fatal(err)
+	}
+	files := []RetainedFile{{"repo", "b.md"}, {"repo", "a.md"}}
+	got, identity, err := ReadRetainedFiles(context.Background(), version, files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, f := range files {
+		want, wantIdentity, _, err := ReadRetainedFile(version, f.OriginID, f.Path)
+		if err != nil || string(got[i]) != string(want) || !reflect.DeepEqual(identity, wantIdentity) {
+			t.Fatalf("batch file %s differs from single read: %q %q %v", f.Path, got[i], want, err)
+		}
+	}
+	for _, invalid := range []RetainedFile{{"repo", "../a.md"}, {"knowledge:absent", "a.md"}, {"repo", "missing.md"}, {"repo", ""}} {
+		if out, id, err := ReadRetainedFiles(context.Background(), version, append(files, invalid)); err == nil || out != nil || id != nil {
+			t.Fatalf("invalid batch returned partial bytes: %+v %v", invalid, err)
+		}
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if out, _, err := ReadRetainedFiles(ctx, version, files); err == nil || out != nil {
+		t.Fatalf("cancelled batch returned bytes: %v", err)
+	}
+	for _, f := range captured.Files {
+		if f.Path == "unused.md" {
+			path := filepath.Join(captured.BlobDir, f.SHA256)
+			if err := os.Chmod(path, 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path, []byte("altered\n"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	if out, _, err := ReadRetainedFiles(context.Background(), version, files); err == nil || out != nil {
+		t.Fatalf("batch hid unselected archive damage: %v", err)
 	}
 }
 
