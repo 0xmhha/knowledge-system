@@ -32,7 +32,10 @@ type SourceIdentity struct {
 	GitRecoveryDigest   string `json:"git_recovery_digest,omitempty"`
 	GitArchivePolicy    string `json:"git_archive_policy,omitempty"`
 	FileModePolicy      string `json:"file_mode_policy,omitempty"`
-	SnapshotID          string `json:"snapshot_id"`
+	// GitlinkDigest binds committed submodule pointers (path and commit) that
+	// are excluded from the file manifest. Empty when there are none.
+	GitlinkDigest string `json:"gitlink_digest,omitempty"`
+	SnapshotID    string `json:"snapshot_id"`
 }
 
 type sourceFile struct {
@@ -96,6 +99,11 @@ func capturePolicyDigest(mode string) string {
 }
 
 func sourceSnapshotID(s SourceIdentity) string {
+	if s.GitlinkDigest != "" {
+		return identityHashFields("cks.snapshot.v6", s.ProjectID, s.SourceMode,
+			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
+			s.GitRecoveryDigest, s.GitArchivePolicy, s.FileModePolicy, s.GitlinkDigest)
+	}
 	if s.FileModePolicy != "" {
 		return identityHashFields("cks.snapshot.v5", s.ProjectID, s.SourceMode,
 			s.SourceCommit, s.FileManifestDigest, s.CapturePolicyDigest,
@@ -184,7 +192,7 @@ func SnapshotSourceIdentityWithLimits(ctx context.Context, root, projectID, mode
 	if err != nil {
 		return SourceIdentity{}, err
 	}
-	paths, err := captureModePathsContext(ctx, root, mode, limits.MaxFiles)
+	paths, links, err := captureModeEntriesContext(ctx, root, mode, limits.MaxFiles)
 	if err != nil {
 		return SourceIdentity{}, err
 	}
@@ -266,7 +274,7 @@ func SnapshotSourceIdentityWithLimits(ctx context.Context, root, projectID, mode
 	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
 		FileManifestDigest: fileManifestDigestForPolicy(files, fileModePolicyV1), CapturePolicyDigest: capturePolicyDigest(mode),
 		FileModePolicy:    fileModePolicyV1,
-		GitRecoveryDigest: recoveryAfter}
+		GitRecoveryDigest: recoveryAfter, GitlinkDigest: gitlinkDigest(links)}
 	if mode != "snapshot-only" {
 		result.GitArchivePolicy = gitArchivePolicyV1
 	}
