@@ -1,0 +1,688 @@
+{
+  "independent_human_content_review": false,
+  "not_FINAL_inputs": true,
+  "old_snapshot_approvals_inherited": false,
+  "relations": [
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T01",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "filtered-nearest-chunk-search",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "evidence_ids": [
+          "ontology:c42cc975e9250a0d02cd8444",
+          "spec:7016c3bc4f6c234933f4dd2c",
+          "reviewed-v3:anchor:SearchDetailed"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T01",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T02",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "reviewed-v3:anchor:SearchDetailed",
+          "reviewed-v3:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+          "criterion:90b9bb21762da166406372a8"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-recall",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T02",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T03",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-recall",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "criterion:90b9bb21762da166406372a8",
+          "reviewed-v3:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-recall",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T03",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "membership and exact distance order; eligible count equals K"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T04",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "reviewed-v3:anchor:SearchDetailed",
+          "reviewed-v3:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+          "criterion:34e540e975194393e54960a5"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T04",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T05",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "criterion:34e540e975194393e54960a5",
+          "reviewed-v3:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T05",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "exact-sized candidate_limit only"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T06",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "reviewed-v3:anchor:SearchDetailed",
+          "reviewed-v3:anchor:TestSearchDetailedCancellationIsNotEmptySuccess",
+          "criterion:34e540e975194393e54960a5"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T06",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T07",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "criterion:34e540e975194393e54960a5",
+          "reviewed-v3:anchor:TestSearchDetailedCancellationIsNotEmptySuccess"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T07",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "narrowed: unfiltered empty-store pre-start cancellation and deadline only"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T08",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+        "evidence_ids": [
+          "ontology:df8af9df557c6aff9c49719f",
+          "spec:de3d43cdcb02d250c25cb7b4",
+          "reviewed-v3:anchor:ValidateCodeAnchors"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T08",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "retargeted from ValidateDatasetAlignment"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T09",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "reviewed-v3:anchor:ValidateDatasetAlignment",
+          "reviewed-v3:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T09",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T10",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c",
+          "reviewed-v3:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T10",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "narrowed: coordinate-drift partial control; no code anchor"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T11",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "reviewed-v3:anchor:ValidateCodeAnchors",
+          "reviewed-v3:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T11",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "retargeted subject from ValidateDatasetAlignment (its positive control)"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T12",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c",
+          "reviewed-v3:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T12",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "actual CKG; coordinate-only CKV mock"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T13",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "optional-ontology-baseline-preservation",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "evidence_ids": [
+          "ontology:8318a98c1aede930dab491f2",
+          "spec:7d8b7f19c8bc38eb35ef2cb1",
+          "reviewed-v3:anchor:applyProvidedOntology"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T13",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T14",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "reviewed-v3:anchor:applyProvidedOntology",
+          "reviewed-v3:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+          "criterion:19c4a7cce5d6c43a274bc770"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T14",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T15",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "criterion:19c4a7cce5d6c43a274bc770",
+          "reviewed-v3:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T15",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "narrowed: proposed concepts with CKV-only baseline"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T16",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "reviewed-v3:anchor:applyProvidedOntology",
+          "reviewed-v3:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+          "criterion:19c4a7cce5d6c43a274bc770"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T16",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-T17",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "criterion:19c4a7cce5d6c43a274bc770",
+          "reviewed-v3:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-T17",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "narrowed: ambiguous proposed alias with CKV document hits only"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R01",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+        "evidence_ids": [
+          "reviewed-v3:anchor:SearchDetailed",
+          "reviewed-v3:anchor:TestStoreFilterLargeCandidateSetFallsBackToExact",
+          "criterion:34e540e975194393e54960a5"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R01",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R02",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+        "evidence_ids": [
+          "criterion:34e540e975194393e54960a5",
+          "reviewed-v3:anchor:TestStoreFilterLargeCandidateSetFallsBackToExact"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R02",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "vec0-path candidate_limit"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R03",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+        "evidence_ids": [
+          "reviewed-v3:anchor:SearchDetailed",
+          "reviewed-v3:anchor:TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+          "criterion:34e540e975194393e54960a5"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R03",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R04",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+        "evidence_ids": [
+          "criterion:34e540e975194393e54960a5",
+          "reviewed-v3:anchor:TestSearchDetailedFilteredCancellationAfterStartIsNotComplete"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-filtered-completeness",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R04",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "filtered in-flight cancellation, exact and large sets"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R05",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+        "evidence_ids": [
+          "ontology:df8af9df557c6aff9c49719f",
+          "spec:de3d43cdcb02d250c25cb7b4",
+          "reviewed-v3:anchor:PutAligned"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R05",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "gate chain"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R06",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAlignedRetained",
+        "evidence_ids": [
+          "ontology:df8af9df557c6aff9c49719f",
+          "spec:de3d43cdcb02d250c25cb7b4",
+          "reviewed-v3:anchor:PutAlignedRetained"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R06",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "gate chain"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R07",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+        "evidence_ids": [
+          "ontology:df8af9df557c6aff9c49719f",
+          "spec:de3d43cdcb02d250c25cb7b4",
+          "reviewed-v3:anchor:ActivateAligned"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R07",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "gate chain"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R08",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAlignedRetained",
+        "evidence_ids": [
+          "ontology:df8af9df557c6aff9c49719f",
+          "spec:de3d43cdcb02d250c25cb7b4",
+          "reviewed-v3:anchor:ActivateAlignedRetained"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R08",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "gate chain"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R09",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "reviewed-v3:anchor:PutAligned",
+          "reviewed-v3:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R09",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R10",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "reviewed-v3:anchor:ActivateAligned",
+          "reviewed-v3:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "criterion:bd5aaf8ac7fce67b6a1bbb2c"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-source-evidence",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R10",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R11",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+        "evidence_ids": [
+          "reviewed-v3:anchor:VerifiedImplementations",
+          "reviewed-v3:anchor:TestActiveProjectionExposesOnlyVerifiedImplementations",
+          "criterion:19c4a7cce5d6c43a274bc770"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R11",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R12",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "optional-ontology-baseline-preservation",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+        "evidence_ids": [
+          "ontology:8318a98c1aede930dab491f2",
+          "spec:7d8b7f19c8bc38eb35ef2cb1",
+          "reviewed-v3:anchor:VerifiedImplementations"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R12",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "excludes unverified concept relations"
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R13",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+        "evidence_ids": [
+          "reviewed-v3:anchor:applyProvidedOntology",
+          "reviewed-v3:anchor:TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+          "criterion:19c4a7cce5d6c43a274bc770"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R13",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": ""
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "reviewed-v3:F3-R14",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+        "evidence_ids": [
+          "criterion:19c4a7cce5d6c43a274bc770",
+          "reviewed-v3:anchor:TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline"
+        ],
+        "status": "verified",
+        "reviewed_by": "opus5.5 검토"
+      },
+      "criterion_id": "ac-ontology-fallback",
+      "decision": "adopted_prereview",
+      "review_id": "F3-R14",
+      "reviewer": "opus5.5 검토",
+      "reviewer_kind": "ai_model_label_designated_by_user",
+      "scope_note": "verified concept + unverified relation; CKG-only citation preserved"
+    }
+  ],
+  "reviewer": "opus5.5 검토",
+  "reviewer_kind": "ai_model_label_designated_by_user",
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "86cbe48adb3db5650236082fbc295c3141712b1c55940a56bcac5772f38e9321",
+    "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9",
+    "source_mode": "committed",
+    "commit": "79a4f5ff0ddbf205c0be162128fd5a29e7d3dc87"
+  }
+}
