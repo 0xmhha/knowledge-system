@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "decided_by": "user",
+  "recorded_before": "clean DEV3 and FINAL results (neither observed)",
+  "environment": {
+    "answer": "user clears load (Docker, Chrome, waits for mediaanalysisd) and notifies the agent",
+    "agent_check_before_start": "record uptime load averages and top CPU processes before DEV3 and before FINAL; do not start while an external process holds sustained high CPU"
+  },
+  "final_rule": {
+    "answer": "run FINAL even if some arm's DEV p95 ratio exceeds 1.25",
+    "consequence": "FINAL records the current fix level; any arm over 1.25 leaves N10 unmet. Later improvements cannot be confirmed on an independent FINAL."
+  }
+}
