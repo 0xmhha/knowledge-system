@@ -1,0 +1,305 @@
+{
+  "current_start": "base",
+  "rejection_control": {
+    "steps": [
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "register",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--version",
+          "result",
+          "--patch-id",
+          "rejection-control-7c57a388"
+        ],
+        "exit_code": 0,
+        "stdout_tail": "2032736eb70b79dba6c3b0992988137c1483a15683a70b3b116e\"},{\"origin_id\":\"repo\",\"path\":\"internal/system/semantic/validate.go\",\"before_sha256\":\"ef094d27c1f97f80c0d3aea9d1f33b1a9f7d5878a5586193b281565f14dd1e7c\",\"after_sha256\":\"35414627ce70fd5517140fcdf81dd24fd7e7fa0e5e887c7f11dbad7966765a68\"}],\"changed_files_digest\":\"a14dd67be19b77e2774ea1739dffc8899b99ea7c6340e4e599eec82e3e72d85d\",\"state\":\"unconfirmed\"}",
+        "stderr_tail": ""
+      },
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "record-run",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--patch-id",
+          "rejection-control-7c57a388",
+          "--semantic-store",
+          "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+          "--report",
+          "/private/tmp/ks-n14-accept-xasu5pdf/linked-runs/F3-T03.json"
+        ],
+        "exit_code": 0,
+        "stdout_tail": "T17:29:50.932547Z\",\"duration_ms\":2317,\"goos\":\"darwin\",\"goarch\":\"arm64\",\"go_runtime\":\"go1.26.8\",\"exit_code\":0,\"command_passed\":true,\"snapshot_consistent\":true,\"output_sha256\":\"274749481a5537a2bdadcbec2764e4efc4b3356f5c591eba15d0e74ceb34235c\",\"output_bytes\":1701,\"framework\":\"go-test-json\",\"test_name\":\"TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\",\"test_observed\":true,\"test_passed\":true}",
+        "stderr_tail": ""
+      },
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "record-run",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--patch-id",
+          "rejection-control-7c57a388",
+          "--semantic-store",
+          "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+          "--report",
+          "/private/tmp/ks-n14-accept-xasu5pdf/linked-runs/F3-T05.json"
+        ],
+        "exit_code": 0,
+        "stdout_tail": "T17:29:54.209662Z\",\"duration_ms\":734,\"goos\":\"darwin\",\"goarch\":\"arm64\",\"go_runtime\":\"go1.26.8\",\"exit_code\":0,\"command_passed\":true,\"snapshot_consistent\":true,\"output_sha256\":\"f5fa53d80107c6889cbcd27599beeb5fe2983d93e9c9311ce88cab2286eab201\",\"output_bytes\":1705,\"framework\":\"go-test-json\",\"test_name\":\"TestSearchDetailedReportsCandidateLimitWithoutCompleteHits\",\"test_observed\":true,\"test_passed\":true}",
+        "stderr_tail": ""
+      },
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "record-run",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--patch-id",
+          "rejection-control-7c57a388",
+          "--semantic-store",
+          "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+          "--report",
+          "/private/tmp/ks-n14-accept-xasu5pdf/linked-runs/F3-T12.json"
+        ],
+        "exit_code": 0,
+        "stdout_tail": "0-09T17:30:01.452303Z\",\"duration_ms\":11498,\"goos\":\"darwin\",\"goarch\":\"arm64\",\"go_runtime\":\"go1.26.8\",\"exit_code\":0,\"command_passed\":true,\"snapshot_consistent\":true,\"output_sha256\":\"1ad9d1d485113c3d9c53e6516b106741a90a5ab0563a5022b6f5f4e78aa17c6f\",\"output_bytes\":9174,\"framework\":\"go-test-json\",\"test_name\":\"TestForeignCodeAnchorPromotionPreservesActiveDataset\",\"test_observed\":true,\"test_passed\":true}",
+        "stderr_tail": ""
+      },
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "record-run",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--patch-id",
+          "rejection-control-7c57a388",
+          "--semantic-store",
+          "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+          "--report",
+          "/private/tmp/ks-n14-accept-xasu5pdf/linked-runs/F3-T15.json"
+        ],
+        "exit_code": 0,
+        "stdout_tail": ":30:13.791257Z\",\"duration_ms\":2161,\"goos\":\"darwin\",\"goarch\":\"arm64\",\"go_runtime\":\"go1.26.8\",\"exit_code\":0,\"command_passed\":true,\"snapshot_consistent\":true,\"output_sha256\":\"1e36aa6f5344073b9f837ef60c60908857e12bc99a79e405446545190b270b3d\",\"output_bytes\":7179,\"framework\":\"go-test-json\",\"test_name\":\"TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline\",\"test_observed\":true,\"test_passed\":true}",
+        "stderr_tail": ""
+      },
+      {
+        "argv": [
+          "cks",
+          "patch",
+          "decide",
+          "--dataset",
+          "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+          "--patch-id",
+          "rejection-control-7c57a388",
+          "--semantic-store",
+          "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+          "--decision-id",
+          "control-reject-source-evidence",
+          "--criterion-id",
+          "ac-source-evidence",
+          "--reviewer",
+          "rejection-control (agent synthetic; not a human judgment)",
+          "--outcome",
+          "rejected",
+          "--reason",
+          "Synthetic control: verifies that any rejected criterion holds the candidate."
+        ],
+        "exit_code": 0,
+        "stdout_tail": "38e9321\",\"snapshot_id\":\"b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9\",\"evidence_sha256\":\"dabd888cba6360468dad63aa58a4333731d7fd19f6064a02fc705398f7f721c1\",\"reviewed_by\":\"rejection-control (agent synthetic; not a human judgment)\",\"outcome\":\"rejected\",\"reason\":\"Synthetic control: verifies that any rejected criterion holds the candidate.\",\"created_at\":\"2026-10-09T17:35:28.63587Z\"}",
+        "stderr_tail": ""
+      }
+    ],
+    "promote": {
+      "argv": [
+        "cks",
+        "patch",
+        "promote",
+        "--dataset",
+        "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+        "--patch-id",
+        "rejection-control-7c57a388",
+        "--semantic-store",
+        "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite"
+      ],
+      "exit_code": 1,
+      "stdout_tail": "",
+      "stderr_tail": "{\"code\":\"operation_failed\",\"message\":\"The operation failed; inspect project status for details.\"}"
+    },
+    "current_after": "base"
+  },
+  "decisions": [
+    {
+      "argv": [
+        "cks",
+        "patch",
+        "decide",
+        "--dataset",
+        "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+        "--patch-id",
+        "retained-batch-7c57a388",
+        "--semantic-store",
+        "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+        "--decision-id",
+        "opus-ac-filtered-recall",
+        "--criterion-id",
+        "ac-filtered-recall",
+        "--reviewer",
+        "opus",
+        "--outcome",
+        "approved",
+        "--reason",
+        "The change does not touch CKV search code; F3-T03 passes on the result snapshot."
+      ],
+      "exit_code": 0,
+      "stdout_tail": "b3db5650236082fbc295c3141712b1c55940a56bcac5772f38e9321\",\"snapshot_id\":\"b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9\",\"evidence_sha256\":\"97763caa14963774f315b3d8e3a8aa0bc64fb6e87d244a05d465587a3a7406e6\",\"reviewed_by\":\"opus\",\"outcome\":\"approved\",\"reason\":\"The change does not touch CKV search code; F3-T03 passes on the result snapshot.\",\"created_at\":\"2026-10-09T17:35:30.756067Z\"}",
+      "stderr_tail": ""
+    },
+    {
+      "argv": [
+        "cks",
+        "patch",
+        "decide",
+        "--dataset",
+        "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+        "--patch-id",
+        "retained-batch-7c57a388",
+        "--semantic-store",
+        "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+        "--decision-id",
+        "opus-ac-filtered-completeness",
+        "--criterion-id",
+        "ac-filtered-completeness",
+        "--reviewer",
+        "opus",
+        "--outcome",
+        "approved",
+        "--reason",
+        "No search code change; F3-T05, F3-T07, F3-R02 and F3-R04 pass on the result snapshot."
+      ],
+      "exit_code": 0,
+      "stdout_tail": "650236082fbc295c3141712b1c55940a56bcac5772f38e9321\",\"snapshot_id\":\"b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9\",\"evidence_sha256\":\"22731e6e61aaa43671c0d24468274b918bb720680b8aefb63a8f6712f09cff33\",\"reviewed_by\":\"opus\",\"outcome\":\"approved\",\"reason\":\"No search code change; F3-T05, F3-T07, F3-R02 and F3-R04 pass on the result snapshot.\",\"created_at\":\"2026-10-09T17:35:31.714976Z\"}",
+      "stderr_tail": ""
+    },
+    {
+      "argv": [
+        "cks",
+        "patch",
+        "decide",
+        "--dataset",
+        "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+        "--patch-id",
+        "retained-batch-7c57a388",
+        "--semantic-store",
+        "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+        "--decision-id",
+        "opus-ac-source-evidence",
+        "--criterion-id",
+        "ac-source-evidence",
+        "--reviewer",
+        "opus",
+        "--outcome",
+        "approved",
+        "--reason",
+        "The change alters the retained evidence validation path; F3-T12 confirms refusal and active preservation on the result snapshot."
+      ],
+      "exit_code": 0,
+      "stdout_tail": "38e9321\",\"snapshot_id\":\"b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9\",\"evidence_sha256\":\"dabd888cba6360468dad63aa58a4333731d7fd19f6064a02fc705398f7f721c1\",\"reviewed_by\":\"opus\",\"outcome\":\"approved\",\"reason\":\"The change alters the retained evidence validation path; F3-T12 confirms refusal and active preservation on the result snapshot.\",\"created_at\":\"2026-10-09T17:35:32.548311Z\"}",
+      "stderr_tail": ""
+    },
+    {
+      "argv": [
+        "cks",
+        "patch",
+        "decide",
+        "--dataset",
+        "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+        "--patch-id",
+        "retained-batch-7c57a388",
+        "--semantic-store",
+        "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite",
+        "--decision-id",
+        "opus-ac-ontology-fallback",
+        "--criterion-id",
+        "ac-ontology-fallback",
+        "--reviewer",
+        "opus",
+        "--outcome",
+        "approved",
+        "--reason",
+        "No ontology path change; F3-T15, F3-T17 and F3-R14 pass on the result snapshot."
+      ],
+      "exit_code": 0,
+      "stdout_tail": "db3db5650236082fbc295c3141712b1c55940a56bcac5772f38e9321\",\"snapshot_id\":\"b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9\",\"evidence_sha256\":\"ce1536798c341f2690e3df810cf53051306fba649c4c9b94ae2d9197c0ae2983\",\"reviewed_by\":\"opus\",\"outcome\":\"approved\",\"reason\":\"No ontology path change; F3-T15, F3-T17 and F3-R14 pass on the result snapshot.\",\"created_at\":\"2026-10-09T17:35:33.424521Z\"}",
+      "stderr_tail": ""
+    }
+  ],
+  "promote": {
+    "argv": [
+      "cks",
+      "patch",
+      "promote",
+      "--dataset",
+      "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+      "--patch-id",
+      "retained-batch-7c57a388",
+      "--semantic-store",
+      "/private/tmp/ks-n14-accept-xasu5pdf/semantic-result.sqlite"
+    ],
+    "exit_code": 0,
+    "stdout_tail": "{\"patch_id\":\"retained-batch-7c57a388\",\"previous_version\":\"base\",\"status\":\"promoted\"}",
+    "stderr_tail": ""
+  },
+  "current_after_promote": "result",
+  "status_after_promote": {
+    "argv": [
+      "cks",
+      "patch",
+      "status",
+      "--dataset",
+      "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+      "--patch-id",
+      "retained-batch-7c57a388"
+    ],
+    "exit_code": 0,
+    "stdout_tail": "2032736eb70b79dba6c3b0992988137c1483a15683a70b3b116e\"},{\"origin_id\":\"repo\",\"path\":\"internal/system/semantic/validate.go\",\"before_sha256\":\"ef094d27c1f97f80c0d3aea9d1f33b1a9f7d5878a5586193b281565f14dd1e7c\",\"after_sha256\":\"35414627ce70fd5517140fcdf81dd24fd7e7fa0e5e887c7f11dbad7966765a68\"}],\"changed_files_digest\":\"a14dd67be19b77e2774ea1739dffc8899b99ea7c6340e4e599eec82e3e72d85d\",\"state\":\"unconfirmed\"}",
+    "stderr_tail": ""
+  },
+  "rollback_to_base": {
+    "argv": [
+      "cks",
+      "rollback",
+      "base",
+      "--out",
+      "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+      "--project-id",
+      "knowledge-system"
+    ],
+    "exit_code": 1,
+    "stdout_tail": "",
+    "stderr_tail": "{\"code\":\"operation_failed\",\"message\":\"The operation failed; inspect project status for details.\"}"
+  },
+  "current_after_rollback": "result",
+  "rollforward_to_result": {
+    "argv": [
+      "cks",
+      "rollback",
+      "result",
+      "--out",
+      "/private/tmp/ks-n14-accept-xasu5pdf/dataset",
+      "--project-id",
+      "knowledge-system"
+    ],
+    "exit_code": 0,
+    "stdout_tail": "",
+    "stderr_tail": "setup: rolled back /private/tmp/ks-n14-accept-xasu5pdf/dataset/current to result\nnote: running MCP servers still serve the previously opened dataset; restart them to pick up the new current"
+  },
+  "current_final": "result"
+}

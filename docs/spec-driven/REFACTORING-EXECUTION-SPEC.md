@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-10 최신 단계: **N14 완료**. [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388(retained archive 검증 batch)을 소유 dataset의 hold 후보(snapshot b4d63460)로 색인·patch 등록, 검토 판정 내용 동일 결합, linked run 9/10, 잘못된 run 4종 거부, 기준4개를 사용자 판정(표기 opus, 초안 이유 채택)으로 승인·승격, 반려 대조 거부, 해제된 버전 사이 rollback, 원본 없이 보관본 재생 통과. 전체10/18·남은8개: N08, N09, N10, N11, N15, N16, N17, N18.
+
 2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.
 
 2026-10-08 최신 하위 단계: **N12 actual foreign-code-anchor 승격·active 보존 통합 회귀 보강**. [새 시험·범위](./N12-CODE-ANCHOR-PROMOTION-REGRESSION.md) — 공개CKG2source/2DB·canonical stable/commit 다름,5사례8쓰기+2activation 거부/old current·저장 자료·reopen 보존. semantic race42시험20하위시험/vet/boundary/format 통과. 최초 fixture YAML 작성 오류는 제품RED와 별도 보존했다. 기존 held66artifact·승인input5 불변, 새 시험은 이전55d8/43ba/f839 pilot 후보에 아직 미포함이다. 전체8/18·남은10개 유지;다음 새 source/index/canonical 관계 결합과 N11 실제 gold·독립성/검토자 판정. 남은 N08/09/10/11/12/14/15/16/17/18. 사람 승인·새FINAL·실모델·운영 활성화0.
@@ -319,13 +321,13 @@ N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 
 
 ## N-14: 실제 변경과 의미 수용의 종단 간 흐름
 
-**상태: 실제 변경 원문·raw 정확 시험 검토 준비 / 전체 미완료.** [실제 변경 자료](./N14-ACTUAL-CHANGE-REVIEW.md)에서 머지PR97의 req-source-evidence/ac-source-evidence와 실제7변경 파일·11원문span·새 정확시험5개를 연결했다. 이는 제안 source 연결이며 검토된 canonical trace·실제 candidate patch registry/linked run·사람 criterion decision은 없다.
+**상태: 완료 · 2026-10-10.** [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388을 hold 후보·patch attempt·linked run(9/10, F3-T10 거부)·기준4개 사용자 승인(표기 opus)·승격·반려 대조·rollback·보관본 재생으로 수용했다. 아래는 이전 준비 기록이다. 이전 상태: 실제 변경 원문·raw 정확 시험 검토 준비 / 전체 미완료. [실제 변경 자료](./N14-ACTUAL-CHANGE-REVIEW.md)에서 머지PR97의 req-source-evidence/ac-source-evidence와 실제7변경 파일·11원문span·새 정확시험5개를 연결했다. 이는 제안 source 연결이며 검토된 canonical trace·실제 candidate patch registry/linked run·사람 criterion decision은 없다.
 
-- [ ] N14-A 실제 ADR→요구→기준→code/test를 검토된 source/권위/범위 및 coordinated lock/snapshot·CKG canonical에 결합.
-- [ ] N14-B 실제 baseline/result 소스 변경을 hold-for-review 후보와 immutable patch attempt/변경 archive SHA에 결합하며 current 보존.
-- [ ] N14-C 검토된 trace의 실제 exact test/명령·출력SHA·spec version·snapshot-bound run을 기록하고 무관test/command-only/stale/불일치 거부.
-- [ ] N14-D 별도 실제 사람이 기준별 Given/When/Then을 승인/반려하고 이유·검토자·원문/시각·활동시간(미측정null)을 기록.
-- [ ] N14-E 실제 재색인/승격·반려·rollback·원문 신원 재생과 전체근거를 결합하며 pass/linked/verified/accepted 및 제한을 구분.
+- [x] N14-A 실제 ADR→요구→기준→code/test를 검토된 source/권위/범위 및 coordinated lock/snapshot·CKG canonical에 결합.
+- [x] N14-B 실제 baseline/result 소스 변경을 hold-for-review 후보와 immutable patch attempt/변경 archive SHA에 결합하며 current 보존.
+- [x] N14-C 검토된 trace의 실제 exact test/명령·출력SHA·spec version·snapshot-bound run을 기록하고 무관test/command-only/stale/불일치 거부.
+- [x] N14-D 별도 실제 사람이 기준별 Given/When/Then을 승인/반려하고 이유·검토자·원문/시각·활동시간(미측정null)을 기록.
+- [x] N14-E 실제 재색인/승격·반려·rollback·원문 신원 재생과 전체근거를 결합하며 pass/linked/verified/accepted 및 제한을 구분.
 
 ### 2026-10-08 N11 후보 범위/현행 좌표 및 제외 보호 보강
 

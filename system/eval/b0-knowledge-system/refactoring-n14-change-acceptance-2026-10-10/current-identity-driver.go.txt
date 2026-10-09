@@ -1,0 +1,49 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+
+// Verifies the current version's identity and retained source, revalidates the
+// reviewed projection against current's indexes, and reports its trace states.
+func main() {
+	dataset, store, source := os.Args[1], os.Args[2], os.Args[3]
+	target, err := os.Readlink(filepath.Join(dataset, "current"))
+	must(err)
+	v := filepath.Join(dataset, target)
+	id, err := setup.InspectVersionIdentity(v)
+	must(err)
+	must(setup.VerifyCandidateIdentity(v, id.Source, id.InputDigest))
+	must(setup.VerifyRetainedSource(v, id.Source))
+	ctx := context.Background()
+	s, err := semantic.OpenStoreReadOnly(ctx, store)
+	must(err)
+	defer s.Close()
+	_, err = s.LoadAlignedRetained(ctx, id.Source.ProjectID, id.DatasetID, source, filepath.Join(v, "graph"), filepath.Join(v, "vector"), v)
+	must(err)
+	p, err := s.Load(ctx, id.Source.ProjectID, id.DatasetID)
+	must(err)
+	tr, err := p.Trace()
+	must(err)
+	states := map[string]string{}
+	for _, r := range tr.Requirements {
+		states[r.RequirementID] = string(r.State)
+	}
+	b, _ := json.Marshal(map[string]any{"current": target, "dataset_id": id.DatasetID, "snapshot_id": id.Source.SnapshotID,
+		"source_commit": id.Source.SourceCommit, "identity_verified": true, "retained_source_verified": true,
+		"reviewed_projection_revalidated": true, "trace_states": states})
+	fmt.Println(string(b))
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
