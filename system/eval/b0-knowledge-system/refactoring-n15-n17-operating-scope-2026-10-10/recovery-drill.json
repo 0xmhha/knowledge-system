@@ -1,0 +1,32 @@
+{
+  "release": "e90fab1f",
+  "version": "v1",
+  "backup_s": 4.3,
+  "backup_dir": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/ks-operating-backup/20261010T033407/v1",
+  "backup_files": 2178,
+  "backup_bytes": 1221269399,
+  "backup_sha_identical": true,
+  "backup_source_head": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+  "query_during_loss_exit": 1,
+  "rollback": {
+    "exit_code": 0,
+    "stderr_tail": "setup: rolled back /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/ks-operating/dataset/current to v1\nnote: running MCP servers still serve the previously opened dataset; restart them to pick up the new current"
+  },
+  "restore_copy_and_rollback_s": 14.5,
+  "query_after_restore_exit": 0,
+  "rto_measured_s": 93.7,
+  "rto_to_first_successful_query_s": 35.2,
+  "restored_queries_ok": true,
+  "restored_version_sha_identical": true,
+  "current_after": "v1",
+  "index_data_loss": "none: backup taken from the same version that was lost (RPO measured 0 for this drill)",
+  "lost_copy_kept_at": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/ks-operating/dataset.lost-20261010T033407",
+  "rto_target_s": 3600,
+  "rpo_target_h": 24,
+  "rto_met": true,
+  "limits": [
+    "single host; no hardware failure or device loss tested",
+    "backup on the same disk as the dataset (user decision)",
+    "drill run by the agent; the user's acceptance is recorded separately"
+  ]
+}

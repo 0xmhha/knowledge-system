@@ -1,0 +1,91 @@
+{
+  "release": "e90fab1f",
+  "label": "drill-after-restore",
+  "server_initialize_s": 3.63,
+  "server_info": {
+    "name": "cks-go-stablenet",
+    "version": "cks-mcp/0.0.1-dev"
+  },
+  "queries": [
+    {
+      "query": "블록 헤더 검증은 어디서 하나요?",
+      "elapsed_ms": 17020,
+      "is_error": false,
+      "error": null,
+      "citations": 10,
+      "files": [
+        "consensus/beacon/consensus.go:229-293",
+        "consensus/beacon/consensus.go:83-98",
+        "consensus/wbft/engine/engine.go:188-190",
+        "core/block_validator.go:50-120",
+        "consensus/beacon/consensus.go:81-98"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "d872f9fe99fe78dde9fcf4b420e6f17e4a1b4ea1b721e2d640bdbf27adea1f64"
+    },
+    {
+      "query": "Where are system contracts deployed at genesis?",
+      "elapsed_ms": 16176,
+      "is_error": false,
+      "error": null,
+      "citations": 11,
+      "files": [
+        "params/config_wbft.go:146-152",
+        "core/genesis.go:734-770",
+        "systemcontracts/systemcontracts.go:62-157",
+        "core/genesis.go:772-797",
+        "systemcontracts/systemcontracts.go:32-60"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "d872f9fe99fe78dde9fcf4b420e6f17e4a1b4ea1b721e2d640bdbf27adea1f64"
+    },
+    {
+      "query": "트랜잭션 풀에서 수수료가 부족한 트랜잭션은 어디서 거부되나요?",
+      "elapsed_ms": 15463,
+      "is_error": false,
+      "error": null,
+      "citations": 7,
+      "files": [
+        "core/txpool/legacypool/list.go:369-420",
+        "core/txpool/blobpool/blobpool.go:231-319",
+        "core/txpool/blobpool/blobpool.go:1120-1208",
+        "core/txpool/legacypool/legacypool.go:813-967",
+        "core/txpool/blobpool/blobpool.go:1271-1434"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "d872f9fe99fe78dde9fcf4b420e6f17e4a1b4ea1b721e2d640bdbf27adea1f64"
+    },
+    {
+      "query": "How does the consensus engine choose the block proposer?",
+      "elapsed_ms": 15750,
+      "is_error": false,
+      "error": null,
+      "citations": 11,
+      "files": [
+        "consensus/beacon/consensus.go:73-79",
+        "consensus/clique/clique.go:513-579",
+        "consensus/merger.go:1-1",
+        "core/blockchain_reader.go:371-372",
+        "consensus/consensus.go:67-134"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "d872f9fe99fe78dde9fcf4b420e6f17e4a1b4ea1b721e2d640bdbf27adea1f64"
+    },
+    {
+      "query": "NativeCoinAdapter의 mint 권한은 어떻게 검사하나요?",
+      "elapsed_ms": 10642,
+      "is_error": false,
+      "error": null,
+      "citations": 10,
+      "files": [
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:38-38",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:139-155",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:53-197",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:139-139",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:448-458"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "d872f9fe99fe78dde9fcf4b420e6f17e4a1b4ea1b721e2d640bdbf27adea1f64"
+    }
+  ]
+}
