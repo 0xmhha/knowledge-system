@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-10 최신 단계: **N10 요청 단위 archive 검증 공유**. [변경·DEV 측정](./N10-REQUEST-VERIFICATION.md) — 요청당 전체 검증 3–8회→2회, 시험3·변이4 검출·17패키지 race 통과, DEV 개발 측정 p95비 0.92–0.98·품질 DEV3와 동일. 종료 시 강제 종료 9건(측정 행 실패0)과 N10-C의 새 독립 FINAL 필요가 남는다. 전체13/18·남은5개: N08, N09, N10, N16, N18.
+
 2026-10-10 최신 단계: **N11 완료(inconclusive/disabled/출시 보류)**. [DEV3·FINAL 결과](./N11-FINAL-RESULT.md) — 깨끗한 DEV3와 독립 FINAL(2,400행, 오류0)을 실행·채점했다. 8arm 품질 지표 동일(FINAL Recall@10 1.0·MRR 0.587), warm p95비 1.37–1.97로 N10-C 미충족, ABS off-basis 인용 100%로 N09 미충족, N08 개선 근거 없음. 전체13/18·남은5개: N08, N09, N10, N16, N18.
 
 2026-10-10 최신 단계: **N15·N17 완료, N16 미완료**. [로컬 운영 수용](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 사용자 범위 결정(로컬 개인 운영, 소비자 go-stablenet)으로 실제 bge-m3 색인(29.5분·20,958 embedding·1.2GB), submodule 캡처 결함 수정(e90fab1f), MCP 질의 5건(11–18초), 백업·손실·복구 훈련(첫 질의 35초)을 실행하고 사용자가 수용했다. N16은 서명 키를 쓰지 않기로 해 공개키 fingerprint 조건 미충족. 전체12/18·남은6개: N08, N09, N10, N11, N16, N18.
@@ -275,6 +277,8 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 [실행 보호 계약](./N11-EVALUATION-RUNNER-CONTRACT.md)의 사전 입력 검사·frozen runtime/source/model/config/binary/K 결합과 FINAL dispatch 전 영구 OS 잠금/내구성 예약을 구현했다. Python19개·Go binding 정상1/거부10 및 기존2패키지 race, native CLI4제어를 확인했다. 예약은 관측이 아니며 crash/실패 뒤에도 자동 회수하지 않는다. 실제 미승인 DEV 초안은 child dispatch0/새질의0으로 거부됐다. 새 승인·FINAL·실제 평가 결과가 없어 N11-A–D는 모두 미완료다. 원 FINAL/승인 입력은 불변이다.
 
 ## N-10: 비용·지연과 비반환 진단
+
+**2026-10-10 후속: 요청 단위 archive 검증 공유(`37302b35`).** [변경·DEV 측정](./N10-REQUEST-VERIFICATION.md) — 요청당 검증 3–8회를 2회로 줄였고, 응답 인용은 변경 전과 같다. DEV 개발 측정의 p95비는 0.92–0.98(DEV3 1.20–1.73)이다. 동결 규칙상 관측 뒤 변경이므로 C는 새 독립 FINAL로 판정한다.
 
 **2026-10-10 상태: A·B·D 충족 / C 미충족.** [FINAL 결과](./N11-FINAL-RESULT.md) — 동결 입력 8arm 회전·직렬 측정과 비용 분해를 마쳤다. FINAL warm p95비는 기준 외 7arm 모두 1.37–1.97(DEV3 1.20–1.73)로 1.25를 넘는다. backend 시간은 arm 간 같고 증가분은 projection 검증·조립이다.
 
