@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
@@ -42,7 +43,7 @@ func TestTypeNeighborsInsertAfterAnchorWithinCaps(t *testing.T) {
 		"c.go": {usesType(c, extraType)},
 		"d.go": {usesType(d, lateType)},
 	}}
-	got := withTypeNeighbors(context.Background(), g, []contract.Citation{a, b, c, d})
+	got := withTypeNeighbors(context.Background(), g, []contract.Citation{a, b, c, d}, nil)
 	want := []contract.Citation{a, lockType, b, optsType, c, d}
 	if len(got) != len(want) {
 		t.Fatalf("got %v want %v", got, want)
@@ -68,17 +69,57 @@ func TestTypeNeighborsSkipNonGoFailuresAndOtherRelations(t *testing.T) {
 		"README.md": {usesType(doc, cite("x.go", 1, 2))},
 		"b.go":      {{Source: b, Target: cite("y.go", 1, 2), Relation: contract.RelationCalls, Distance: 1}},
 	}}
-	if got := withTypeNeighbors(context.Background(), g, []contract.Citation{doc, a, b}); got != nil {
+	if got := withTypeNeighbors(context.Background(), g, []contract.Citation{doc, a, b}, nil); got != nil {
 		t.Fatalf("unexpected extension: %v", got)
 	}
 	if len(g.asked) != 2 {
 		t.Fatalf("non-Go anchor was looked up: %d lookups", len(g.asked))
 	}
-	if got := withTypeNeighbors(context.Background(), nil, []contract.Citation{a}); got != nil {
+	if got := withTypeNeighbors(context.Background(), nil, []contract.Citation{a}, nil); got != nil {
 		t.Fatal("nil graph extended refs")
 	}
 	failing := &ckgclient.Fake{NeighborErr: errors.New("down")}
-	if got := withTypeNeighbors(context.Background(), failing, []contract.Citation{a}); got != nil {
+	if got := withTypeNeighbors(context.Background(), failing, []contract.Citation{a}, nil); got != nil {
 		t.Fatal("failed lookup extended refs")
+	}
+}
+
+func TestTypeDeclarationIncludesItsDocComment(t *testing.T) {
+	src := "package p\n\n// unrelated\n\n// lock serializes writers.\n// Owned by the OS.\ntype lock struct{}\n"
+	files := map[string][]byte{"p.go": []byte(src)}
+	read := func(f string) ([]byte, error) {
+		if b, ok := files[f]; ok {
+			return b, nil
+		}
+		return nil, errors.New("missing")
+	}
+	if got := withDocComment(cite("p.go", 7, 7), read); got.StartLine != 5 || got.EndLine != 7 {
+		t.Fatalf("doc comment not included: %+v", got)
+	}
+	for _, c := range []contract.Citation{cite("p.go", 3, 3), cite("missing.go", 7, 7), cite("p.go", 1, 1)} {
+		if got := withDocComment(c, read); got != c {
+			t.Fatalf("span changed without an adjacent comment: %+v -> %+v", c, got)
+		}
+	}
+	if got := withDocComment(cite("p.go", 7, 7), nil); got.StartLine != 7 {
+		t.Fatal("nil source changed the span")
+	}
+	long := "package p\n" + strings.Repeat("// x\n", 40) + "type t int\n"
+	files["long.go"] = []byte(long)
+	if got := withDocComment(cite("long.go", 42, 42), read); got.StartLine != 42-maxDocCommentLines {
+		t.Fatalf("comment extension not capped: %+v", got)
+	}
+}
+
+func TestTypeDeclarationCommentOverlappingACitedBodyIsSkipped(t *testing.T) {
+	src := "package p\n// header\n// lock doc\ntype lock struct{}\ntype other int\n"
+	read := func(string) ([]byte, error) { return []byte(src), nil }
+	header, fn := cite("p.go", 1, 2), cite("f.go", 1, 3)
+	g := &typeGraph{Fake: &ckgclient.Fake{}, edges: map[string][]contract.Neighbor{
+		"f.go": {usesType(fn, cite("p.go", 4, 4)), usesType(fn, cite("p.go", 5, 5))},
+	}}
+	got := withTypeNeighbors(context.Background(), g, []contract.Citation{fn, header}, read)
+	if len(got) != 3 || got[1] != cite("p.go", 5, 5) {
+		t.Fatalf("declaration whose comment overlaps a cited body was added: %v", got)
 	}
 }

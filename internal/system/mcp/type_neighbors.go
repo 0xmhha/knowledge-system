@@ -14,6 +14,9 @@ const (
 	// at most two places.
 	maxTypeNeighborAnchors = 3
 	maxTypeNeighbors       = 2
+	// A declaration's leading doc comment is part of its evidence; the CKG
+	// node span starts at the declaration line.
+	maxDocCommentLines = 30
 )
 
 // withTypeNeighbors returns refs with, right after an anchoring body, the
@@ -22,7 +25,10 @@ const (
 // when the selected function depends on them. Lookup failures leave refs
 // unchanged: the extension is optional evidence, never a reason to fail.
 // It returns nil when nothing was added.
-func withTypeNeighbors(ctx context.Context, ckg ckgclient.Client, refs []contract.Citation) []contract.Citation {
+//
+// source, when non-nil, returns the archived bytes of a file so a declaration
+// can include the contiguous // comment block directly above it.
+func withTypeNeighbors(ctx context.Context, ckg ckgclient.Client, refs []contract.Citation, source func(string) ([]byte, error)) []contract.Citation {
 	if ckg == nil || len(refs) == 0 {
 		return nil
 	}
@@ -39,10 +45,14 @@ func withTypeNeighbors(ctx context.Context, ckg ckgclient.Client, refs []contrac
 			continue
 		}
 		for _, n := range neighbors {
-			if n.Relation != contract.RelationUsesType || !n.Target.IsValid() || overlapsCited(n.Target, refs, out) {
+			if n.Relation != contract.RelationUsesType || !n.Target.IsValid() {
 				continue
 			}
-			out = append(out, n.Target)
+			declaration := withDocComment(n.Target, source)
+			if overlapsCited(declaration, refs, out) {
+				continue
+			}
+			out = append(out, declaration)
 			added++
 			break
 		}
@@ -62,4 +72,27 @@ func overlapsCited(c contract.Citation, lists ...[]contract.Citation) bool {
 		}
 	}
 	return false
+}
+
+// withDocComment extends c upward over the contiguous line comments that end
+// right above it. Unreadable sources leave c unchanged.
+func withDocComment(c contract.Citation, source func(string) ([]byte, error)) contract.Citation {
+	if source == nil || c.StartLine < 2 {
+		return c
+	}
+	buf, err := source(c.File)
+	if err != nil {
+		return c
+	}
+	lines := strings.Split(string(buf), "\n")
+	if c.StartLine > len(lines) {
+		return c
+	}
+	first := c.StartLine
+	for first > 1 && c.StartLine-(first-1) <= maxDocCommentLines &&
+		strings.HasPrefix(strings.TrimSpace(lines[first-2]), "//") {
+		first--
+	}
+	c.StartLine = first
+	return c
 }
