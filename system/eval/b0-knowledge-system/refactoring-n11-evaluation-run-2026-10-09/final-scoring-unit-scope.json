@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event": "first FINAL scoring attempt stopped before any output",
+  "error": "refactoring-eval-summarize: one independent unit cannot be assigned to conflicting question groups",
+  "cause": "The frozen question book pairs N11-FINAL-CAND-01 (CODE) and N11-FINAL-CAND-02 (WHY) in one fact cluster, semantic-readonly-open, by design. The protocol counts units per group; the reused B1 summarizer requires one group per unit.",
+  "change": "The adapter passes a group-scoped bootstrap unit (group/cluster) and records distinct_fact_clusters separately. The B1 summarizer, frozen inputs, thresholds and capture are unchanged.",
+  "metrics_observed_before_change": false,
+  "dev3_rescore_identical_except_new_fields": true,
+  "dev3_score_before_change": "dev3-score-before-unit-scope-fix.json.gz",
+  "final_capture_ended_utc": "2026-10-10T04:36:56Z"
+}

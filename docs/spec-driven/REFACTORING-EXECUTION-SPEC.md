@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-10 최신 단계: **N11 완료(inconclusive/disabled/출시 보류)**. [DEV3·FINAL 결과](./N11-FINAL-RESULT.md) — 깨끗한 DEV3와 독립 FINAL(2,400행, 오류0)을 실행·채점했다. 8arm 품질 지표 동일(FINAL Recall@10 1.0·MRR 0.587), warm p95비 1.37–1.97로 N10-C 미충족, ABS off-basis 인용 100%로 N09 미충족, N08 개선 근거 없음. 전체13/18·남은5개: N08, N09, N10, N16, N18.
+
 2026-10-10 최신 단계: **N15·N17 완료, N16 미완료**. [로컬 운영 수용](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 사용자 범위 결정(로컬 개인 운영, 소비자 go-stablenet)으로 실제 bge-m3 색인(29.5분·20,958 embedding·1.2GB), submodule 캡처 결함 수정(e90fab1f), MCP 질의 5건(11–18초), 백업·손실·복구 훈련(첫 질의 35초)을 실행하고 사용자가 수용했다. N16은 서명 키를 쓰지 않기로 해 공개키 fingerprint 조건 미충족. 전체12/18·남은6개: N08, N09, N10, N11, N16, N18.
 
 2026-10-10 최신 단계: **N14 완료**. [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388(retained archive 검증 batch)을 소유 dataset의 hold 후보(snapshot b4d63460)로 색인·patch 등록, 검토 판정 내용 동일 결합, linked run 9/10, 잘못된 run 4종 거부, 기준4개를 사용자 판정(표기 opus, 초안 이유 채택)으로 승인·승격, 반려 대조 거부, 해제된 버전 사이 rollback, 원본 없이 보관본 재생 통과. 전체10/18·남은8개: N08, N09, N10, N11, N15, N16, N17, N18.
@@ -225,12 +227,14 @@ N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 
 ## N-11: 새 평가 사전 동결
 
+**상태: 완료(2026-10-10).** [DEV3·FINAL 결과](./N11-FINAL-RESULT.md) — 동결 입력으로 DEV3 1,680행·FINAL 2,400행을 오류 0으로 실행·채점했다. 모든 중요군이 독립 단위 10개 미만이라 inconclusive, 기본값 disabled·출시 보류다. 채점 어댑터의 단위 범위 수정은 지표 관측 전이며 DEV3 값은 같았다.
+
 **상태: 설계/입력 준비.** [검토 입력과 실행 순서](./REFACTORING-DEPENDENCY-REVIEW.md)의 모델·8arm·안전/품질/비용 임계치와 독립 표본 규칙을 유지한다. 이미 관측한 FINAL을 재사용하지 않는다. 질문/gold/독립 단위/분할/출처를 정리한 후 새 사전 검토를 받으며, 결과 관측 이전에 바이트를 고정한다. 아직 새 입력의 승인·실험 결과를 기록하지 않았다.
 
-- [ ] N11-A 새 DEV/독립 FINAL과 원문 gold·출처·독립 단위/cluster 및 기존 FINAL 제외를 검토 가능하게 작성.
-- [ ] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
-- [ ] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
-- [ ] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
+- [x] N11-A 새 DEV/독립 FINAL과 원문 gold·출처·독립 단위/cluster 및 기존 FINAL 제외를 검토 가능하게 작성.
+- [x] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
+- [x] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
+- [x] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
 
 ## N-13: worksheet의 선택형 조직 catalog
 
@@ -272,12 +276,14 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 
 ## N-10: 비용·지연과 비반환 진단
 
+**2026-10-10 상태: A·B·D 충족 / C 미충족.** [FINAL 결과](./N11-FINAL-RESULT.md) — 동결 입력 8arm 회전·직렬 측정과 비용 분해를 마쳤다. FINAL warm p95비는 기준 외 7arm 모두 1.37–1.97(DEV3 1.20–1.73)로 1.25를 넘는다. backend 시간은 arm 간 같고 증가분은 projection 검증·조립이다.
+
 **상태: 진단 세부 구현 검증 / 새 평가 대기.** [typed neighbors 진단](./N10-NEIGHBOR-DIAGNOSTICS.md)을 구현했다. 새 구조 RED→GREEN과 실제 SQLite3제어에서 미해결 seed/정상 빈 traversal/닫힌 store 오류를 구분했다. outcome/실패 분모·composer 결과·원문 argument SHA 및 이전 원자료를 보존한다. Go3패키지 race/vet·Python17개·계층 경계를 통과했다. 새 BGE/비용/paired p95 결과는 아직 없으며 전체 완료가 아니다.
 
-- [ ] N10-A N11의 사전 검토·동결한 새 입력/source/model/runtime에서 같은8arm·회전·직렬 warm/cold 비용을 측정.
-- [ ] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
+- [x] N10-A N11의 사전 검토·동결한 새 입력/source/model/runtime에서 같은8arm·회전·직렬 warm/cold 비용을 측정.
+- [x] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
 - [ ] N10-C 소스/근거/프로젝트·모델 신원·안전·검색/기권 회귀를 유지한 범위 내 개선과 p95비1.25 수용 판정; 소표본은inconclusive.
-- [ ] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.
+- [x] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.
 
 ## N-15: 현행 패키지·외부 모듈·native 환경 검증
 
