@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-10 최신(Claude Code): **N15·N17 완료(로컬 개인 운영 범위), N16 미완료**. [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — go-stablenet 실제 색인(29.5분·embedding 20,958·1.2GB), submodule 캡처 결함 수정, MCP 질의 5건 11–18초, 백업·손실·복구 첫 질의 35초를 사용자가 수용했다. N16은 서명 키 미사용으로 공개키 fingerprint 조건이 남는다. **현재 12/18 완료, 남은 6개:** N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N16 신뢰·권한, N18 출시 판정. 다음 N11 DEV3·FINAL(한가한 시간).
+
 2026-10-10 최신(Claude Code): **N14 완료**. [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388을 hold 후보·불변 patch attempt·결과 snapshot linked run(9/10, F3-T10 거부)·잘못된 run 4종 거부로 검증하고, 기준 4개를 사용자 판정(표기 opus, agent 초안 이유 채택)으로 승인해 소유 dataset에서 승격했다. 반려 대조는 승격 거부, rollback은 해제된 두 버전 사이에서 확인, 보관본 단독 재생 통과. **현재 10/18 완료, 남은 8개:** N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 다음 N11 DEV3·FINAL(한가한 시간).
 
 2026-10-09 최신(Claude Code): **N11 입력 동결**. [동결](./N11-INPUT-FREEZE.md) — 철회5 제거·대체 DEV2 추가, DEV7/FINAL10을 “opus5.5 검토”(사용자 지정 AI 라벨)로 승인·동결, 입력 검사 input_ready=true·sampling inconclusive. 기존 N11 corpus는 제외 경로를 포함해 새 corpus·실행 바인딩 필요, FINAL 실행은 비가역이라 사용자 결정 대기. 9/18 완료·남은 9개.
@@ -95,9 +97,9 @@
 | N-12 | **완료 · 2026-10-09** | 사람 판정 대기: [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md);27원문span/6테스트 및 [정책·ADR 보완](./N12-POLICY-ADR-REVIEW.md)의6주장/12관계·4거부 제어 확인, proposed 유지 | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음 |
 | N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
 | N-14 | **완료 · 2026-10-10** | [수용 기록](./N14-CHANGE-ACCEPTANCE.md): 실제 변경 7c57a388 hold 후보·patch·linked run9/10·기준4 사용자 승인·승격·rollback·보관본 재생 | 실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증 | 테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장 |
-| N-15 | P2 · N-02–14 중 변경 영향 | native Linux C 기술검증 완료; 실제 규모/독립 운영 소비자 미검증 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
-| N-16 | P2 · 운영 출시 범위 결정 | 운영키·법무 미승인; test-preview 계약만 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
-| N-17 | P2 · N-15/16 | OP07–08·실운영복구 미실행; 이전preview 제외 | 실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토 | 최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음 |
+| N-15 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): go-stablenet 실제 색인·MCP 소비자·submodule 수정·지원/비용/제한 사용자 수용 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
+| N-16 | P2 · 로컬 운영 결정 기록, 서명 키 미사용 | 권한자=사용자·신뢰=commit/binary SHA·재배포 없음 기록; 공개키 fingerprint 조건 미충족 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
+| N-17 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): 백업·손실 모의·복구 첫 질의35초·RTO1h/RPO24h 사용자 수용 | 실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토 | 최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음 |
 | N-18 | **P3 · N-08–17/변경 회귀** | 품질fail·소그룹inconclusive·disabled·release withheld | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음 |
 
 ## 실행 순서와 우선순위의 이유

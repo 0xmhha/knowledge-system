@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-10 최신 단계: **N15·N17 완료, N16 미완료**. [로컬 운영 수용](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 사용자 범위 결정(로컬 개인 운영, 소비자 go-stablenet)으로 실제 bge-m3 색인(29.5분·20,958 embedding·1.2GB), submodule 캡처 결함 수정(e90fab1f), MCP 질의 5건(11–18초), 백업·손실·복구 훈련(첫 질의 35초)을 실행하고 사용자가 수용했다. N16은 서명 키를 쓰지 않기로 해 공개키 fingerprint 조건 미충족. 전체12/18·남은6개: N08, N09, N10, N11, N16, N18.
+
 2026-10-10 최신 단계: **N14 완료**. [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388(retained archive 검증 batch)을 소유 dataset의 hold 후보(snapshot b4d63460)로 색인·patch 등록, 검토 판정 내용 동일 결합, linked run 9/10, 잘못된 run 4종 거부, 기준4개를 사용자 판정(표기 opus, 초안 이유 채택)으로 승인·승격, 반려 대조 거부, 해제된 버전 사이 rollback, 원본 없이 보관본 재생 통과. 전체10/18·남은8개: N08, N09, N10, N11, N15, N16, N17, N18.
 
 2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.
@@ -279,27 +281,27 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 
 ## N-15: 현행 패키지·외부 모듈·native 환경 검증
 
-**상태: 구현/검증 중 · 전체 미완료.** 내구성/GC/자원/본문 예산 변경 전의 패키지 증거를 현행 소스로 자동 확장하지 않는다. 새 clean Git checkout에서 host-preview를 만들고 추출된 바이너리로 별도 저장소 설치·재시작·데이터 갱신·rollback과 외부 Go 모듈의 공개 계약 사용을 확인한다. 구조 mock fixture와 실제 조직/모델 소비자를 분리한다. 공개 pkg만 import하는 외부 모듈은 internal 접근/저장소 내 테스트의 우회를 피한다. raw v2 integrity·원문/SHA와 public DTO 검사는 별도로 확인한다.
+**상태: 완료 · 2026-10-10(로컬 개인 운영 범위).** [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — go-stablenet 실제 색인·소비자 질의·submodule 캡처 수정·사용자 수용. 이전 상태: 구현/검증 중 · 전체 미완료. 내구성/GC/자원/본문 예산 변경 전의 패키지 증거를 현행 소스로 자동 확장하지 않는다. 새 clean Git checkout에서 host-preview를 만들고 추출된 바이너리로 별도 저장소 설치·재시작·데이터 갱신·rollback과 외부 Go 모듈의 공개 계약 사용을 확인한다. 구조 mock fixture와 실제 조직/모델 소비자를 분리한다. 공개 pkg만 import하는 외부 모듈은 internal 접근/저장소 내 테스트의 우회를 피한다. raw v2 integrity·원문/SHA와 public DTO 검사는 별도로 확인한다.
 
 - [x] N15-A 현재 소스 commit·Go/native dependency·패키지/바이너리/고지 SHA와 clean build receipt 결합.
 - [x] N15-B 추출 패키지의 별도 프로젝트 설치/재시작/갱신/rollback 및 외부 Go 모듈의 v1/v2 공개 계약·입력 거부 확인.
 - [x] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
-- [ ] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
-- [ ] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
+- [x] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
+- [x] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
 
 Darwin 구조 시험과 실제 native Linux AMD64 CI 실행을 대조했다. [native Linux 원자료/CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)으로 N15-C만 완료하며 D/E 전체 운영 수용을 유지한다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
 
 ## N-17: 복구 루트의 reader 보호와 실제 운영 훈련
 
-**상태: 실패 재현/수정 중 · 전체 미완료.** N15 현행 패키지로 새 루트에 candidate 백업을 복사하고 rollback한 결과 current는 복원됐지만 `.readers`가 없어 MCP 초기화가 실패했다. reader protocol marker는 candidate 안에 있고 OS lease inode는 dataset 루트에 있어 백업한 버전만으로는 reader admission이 완성되지 않는다.
+**상태: 완료 · 2026-10-10(로컬 개인 운영 범위).** [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 실제 운영 데이터셋 백업·손실 모의·복구(첫 질의 35초, RTO 1시간)와 사용자 수용. 이전 상태: 실패 재현/수정 중 · 전체 미완료. N15 현행 패키지로 새 루트에 candidate 백업을 복사하고 rollback한 결과 current는 복원됐지만 `.readers`가 없어 MCP 초기화가 실패했다. reader protocol marker는 candidate 안에 있고 OS lease inode는 dataset 루트에 있어 백업한 버전만으로는 reader admission이 완성되지 않는다.
 
 복원/승격은 mutation OS 잠금 아래 원문·신원·review 권한을 먼저 검증한 뒤, protocol이 있는 target의 reader lease를 준비하고 sync한다. candidate의 marker/원문/신원은 다시 쓰지 않는다. 기존 inode는 유지하여 살아 있는 reader와 GC의 보호를 이어간다. linked directory/inode 또는 다중 hardlink는 pointer 전환 전에 거부한다. protocol 없는 legacy target은 자동 업그레이드하지 않는다. 조회 경로가 lock을 자동 복구하거나 삭제하도록 완화하지 않는다.
 
 - [x] N17-A 현행 패키지의 실패 후보/current 보존·손상 대상 거부와 원본 payload SHA 기록.
 - [x] N17-B 새 루트 백업 복원·reader lease/기존 inode 보존·원본 source 없는 인용 재생; 실제 public CLI/MCP 검증.
-- [ ] N17-C 실제 backup/failover 담당·RTO/RPO·키 복구·network/전원 정책 및 대상 호스트 판정.
-- [ ] N17-D 실제 운영 후보의 복구·실패전환 훈련과 조건별 시간/데이터 손실·사람 수용 증거.
-- [ ] N17-E 코드/원자료/한계·검토 판정 바인딩과 N18 연결. owned mock restore 시간을 실제 RTO/RPO 판정으로 사용하지 않음.
+- [x] N17-C 실제 backup/failover 담당·RTO/RPO·키 복구·network/전원 정책 및 대상 호스트 판정.
+- [x] N17-D 실제 운영 후보의 복구·실패전환 훈련과 조건별 시간/데이터 손실·사람 수용 증거.
+- [x] N17-E 코드/원자료/한계·검토 판정 바인딩과 N18 연결. owned mock restore 시간을 실제 RTO/RPO 판정으로 사용하지 않음.
 
 N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개다. 이번 실패는 이전 N05/N04의 기록된 원자료를 바꾸지 않고 현재 복원 경로의 추가 회귀 증거로 보존한다.
 
