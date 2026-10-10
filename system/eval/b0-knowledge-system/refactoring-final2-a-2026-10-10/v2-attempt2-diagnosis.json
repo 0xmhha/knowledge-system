@@ -1,0 +1,9 @@
+{
+ "schema_version": 1,
+ "attempt": "part A v2 DEV, idle wait 2026-10-10T09:34Z-12:32Z, DEV start 12:32:31Z",
+ "result": "the runner refused to start ('refactoring-eval-run: output already exists', exit 2) within one second; no rows captured, reference binary not started, FINAL not started, no reservation, part B not started",
+ "cause": "run-F2A-DEV was recreated at 09:39Z-09:50Z by the teardown-kill stress probe (scratchpad stress_probe.py), which reused the attempt 1 per-arm configs; their footprint_dir still named /private/tmp/ks-n11-eval-m13oocru/run-F2A-DEV/capture/footprints/<arm>. The directory held only 8 footprint logs from the probe.",
+ "evidence": "directory mtime 18:39 KST (after the waiter started at 18:34), footprint files last written 18:49-18:50 KST, matching the stress-1/stress-2 results at 18:47-18:48; attempt 1 configs contain the footprint_dir paths",
+ "action": "probe directory preserved as run-F2A-DEV-probe-footprints; attempt 2 records renamed v2-attempt2-*; inputs, protocol, questions and gates unchanged; waiter restarted with the same rule",
+ "classification": "operator error in the debug procedure, not a product defect"
+}
