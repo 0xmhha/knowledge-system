@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "attempt": "part A v2 DEV, 2026-10-10T08:51Z-09:24Z",
+  "result": "candidate DEV capture 1200/1200 rows with 0 row errors, but report partial: 5 cold-process server closes ended with signal: killed (concept_text_off, relations_off, relations_on, combined_off, combined_on). The runner did not start the reference binary and the gate did not start FINAL; no reservation.",
+  "observed_environment": "load averages 10-15; heavy swap (Swapouts ~6.98M, few free pages); cold start-through-response median 4-5 s with outliers 18-32 s in ontology arms",
+  "isolated_probe": "close-probe.py: one cold cks mcp per arm (baseline_off, concept_text_off, combined_on), one query, stdin closed: exit after 0.29-0.81 s at load 13-16; not reproduced",
+  "assessment": "environmental (load and memory pressure) is the leading explanation; not proven",
+  "user_decision": "한가할 때 자동 실행 (권장): wait until the 5-minute load average is at most 6 (up to 12 h), then DEV -> FINAL, then part B; the zero-error gate is unchanged",
+  "capture_kept_at": "/private/tmp/ks-n11-eval-m13oocru/run-F2A-DEV-v2-attempt1"
+}
