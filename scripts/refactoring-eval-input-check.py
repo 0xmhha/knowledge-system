@@ -180,8 +180,17 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
             counts[group].add(cluster)
     check(bool(split_clusters["DEV"]), "DEV_missing")
     check(not split_clusters["DEV"] & split_clusters["FINAL"], "DEV_FINAL_cluster_overlap")
+    # A reviewed protocol may leave important groups to a separately frozen
+    # FINAL (each excluded group needs a reason); excluded groups must not
+    # also appear here, and such a FINAL is never sufficient on its own.
+    out_of_scope = protocol.get("final_groups_out_of_scope", {})
+    check(isinstance(out_of_scope, dict) and set(out_of_scope) <= GROUPS and len(out_of_scope) < len(GROUPS) and
+          all(isinstance(v, str) and v.strip() for v in out_of_scope.values()), "invalid_final_groups_out_of_scope")
     for group, clusters in counts.items():
-        check(bool(clusters), "FINAL_group_missing:" + group)
+        if isinstance(out_of_scope, dict) and group in out_of_scope:
+            check(not clusters, "FINAL_group_declared_out_of_scope:" + group)
+        else:
+            check(bool(clusters), "FINAL_group_missing:" + group)
     for observation in observations:
         try:
             reserved = observation.get("state") == "FINAL_reserved"
@@ -197,7 +206,7 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
             errors.append("invalid_observation_record")
     errors = sorted(set(errors))
     n = {group: len(clusters) for group, clusters in sorted(counts.items())}
-    sufficient = all(size >= 10 for size in n.values())
+    sufficient = all(size >= 10 for size in n.values()) and not out_of_scope
     return {"schema_version": 1, "scope": "input bindings and recorded review/cluster consistency only",
             "input_ready": not errors, "execution_ready": False,
             "execution_pending": ["live model identity", "coordinated dataset/source/binary binding", "runner observation-state enforcement"],

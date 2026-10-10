@@ -63,6 +63,21 @@ class InputAuditTests(unittest.TestCase):
         self.assertFalse(result["execution_ready"])
         self.assertFalse(result["product_release_approved"])
 
+    def test_declared_out_of_scope_group_is_reviewed_and_never_sufficient(self):
+        p, b = fixture()
+        b["questions"] = [q for q in b["questions"] if q["group"] != "ABS"]
+        missing = run(p, b)
+        self.assertIn("FINAL_group_missing:ABS", missing["pending_reasons"])
+        p["final_groups_out_of_scope"] = {"ABS": "judged by a separately frozen FINAL"}
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["sampling_verdict"], "inconclusive")
+        _, full = fixture()
+        self.assertIn("FINAL_group_declared_out_of_scope:ABS", run(p, full)["pending_reasons"])
+        for bad in ({"OTHER": "x"}, {"ABS": " "}, ["ABS"], {g: "x" for g in GATE.GROUPS}):
+            p["final_groups_out_of_scope"] = bad
+            self.assertIn("invalid_final_groups_out_of_scope", run(p, b)["pending_reasons"])
+
     def test_repeats_translations_do_not_raise_nine_units_to_ten(self):
         p, b = fixture(9)
         for q in list(b["questions"]):
