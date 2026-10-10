@@ -1,0 +1,161 @@
+{
+ "schema_version": 1,
+ "status": "approved",
+ "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+ "reviewer": "opus5.5 검토",
+ "reviewer_kind": "ai_model_label_designated_by_user",
+ "purpose": "FINAL2 part B: declared-unknown abstention and answerable contrasts on a corpus carrying the approved overlay",
+ "questions": [
+  {
+   "id": "F2B-DEV-01",
+   "split": "DEV",
+   "group": "TRACE",
+   "cluster_id": "n14-base-rollback-refusal",
+   "expected_behavior": "cite",
+   "prompt": "patch 수용 시험에서 base 버전으로 rollback이 거부된 이유는 무엇인가요?",
+   "candidate_answer": "base는 N12의 hold 후보를 복사한 것이라 검토 해제된 적이 없어, rollback이 explicit patch review를 요구하며 거부되었다.",
+   "evidence": [
+    {
+     "path": "docs/spec-driven/N14-CHANGE-ACCEPTANCE.md",
+     "first": 18,
+     "last": 18,
+     "file_sha256": "8c657e803db23ab56213184f2e50b68ab6ee39359d03bf15d649d47d1804c26a",
+     "content_sha256": "9de33c01fbf8cbda4863a8c002ed685468f0312a95facf6aa1baba95bb98183b"
+    }
+   ],
+   "note": "unjudged DEV plumbing question added at freeze (input gate requires a DEV split)",
+   "language": "ko",
+   "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "authority_scope": "bound repository records in the derived corpus only",
+   "independence_review": "approved: new fact clusters; questions and declared-unknown match terms were written by the same agent (recorded weakness)",
+   "contamination_review": "approved: derived corpus excludes system/eval/**, docs/spec-driven/N11-*, N12-*, FINAL2-*",
+   "unit_id": "n14-base-rollback-refusal",
+   "proposed_cluster_id": "n14-base-rollback-refusal"
+  },
+  {
+   "id": "F2B-ABS-01",
+   "split": "FINAL",
+   "group": "ABS",
+   "cluster_id": "policy-owner-unassigned",
+   "expected_behavior": "abstain",
+   "prompt": "이 프로젝트에서 knowledge 정책 레코드를 작성하고 승인하는 정책 담당자는 누구로 지정되어 있나요?",
+   "candidate_answer": "지정되지 않았다. 정책 담당자가 없어 정책 instance가 없다.",
+   "evidence": [],
+   "strict_zero_citations": false,
+   "abstention_basis": "the derived corpus records that no policy owner exists; declared unknown UNK-POLICY-OWNER",
+   "abstention_basis_sources": [
+    {
+     "path": "docs/spec-driven/N14-CHANGE-ACCEPTANCE.md",
+     "first": 34,
+     "last": 34,
+     "file_sha256": "8c657e803db23ab56213184f2e50b68ab6ee39359d03bf15d649d47d1804c26a",
+     "content_sha256": "58bc38fc8ededb7a4b46046e5b5b024537b166e48348473d361847a390fc12ba"
+    }
+   ],
+   "abstention_citation_rule": "citing the recorded declared-unknown basis while abstaining is correct; citing any other source as the answer is not",
+   "language": "ko",
+   "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "authority_scope": "bound repository records in the derived corpus only",
+   "independence_review": "approved: new fact clusters; questions and declared-unknown match terms were written by the same agent (recorded weakness)",
+   "contamination_review": "approved: derived corpus excludes system/eval/**, docs/spec-driven/N11-*, N12-*, FINAL2-*",
+   "unit_id": "policy-owner-unassigned",
+   "proposed_cluster_id": "policy-owner-unassigned"
+  },
+  {
+   "id": "F2B-ABS-02",
+   "split": "FINAL",
+   "group": "ABS",
+   "cluster_id": "release-verdict-pending",
+   "expected_behavior": "abstain",
+   "prompt": "ontology와 knowledge 기능을 기본으로 켜고 출시하기로 한 판정은 언제, 누가 내렸나요?",
+   "candidate_answer": "판정되지 않았다. 합격 근거가 없으면 disabled와 출시 보류를 유지한다.",
+   "evidence": [],
+   "strict_zero_citations": false,
+   "abstention_basis": "the derived corpus records that the N-18 default/release verdict is pending; declared unknown UNK-RELEASE-VERDICT",
+   "abstention_basis_sources": [
+    {
+     "path": "docs/spec-driven/REFACTORING-REMAINING-WORKLIST.md",
+     "first": 111,
+     "last": 111,
+     "file_sha256": "2e88a147624dbb61ab62ec0b7f4d8d45d628f7201abd60848d7ab9c886ef6b6f",
+     "content_sha256": "17454fd689732c2ae9e24bba602cd950359779be6d6906477f0c745a5d54a4fa"
+    }
+   ],
+   "abstention_citation_rule": "citing the recorded declared-unknown basis while abstaining is correct; citing any other source as the answer is not",
+   "language": "ko",
+   "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "authority_scope": "bound repository records in the derived corpus only",
+   "independence_review": "approved: new fact clusters; questions and declared-unknown match terms were written by the same agent (recorded weakness)",
+   "contamination_review": "approved: derived corpus excludes system/eval/**, docs/spec-driven/N11-*, N12-*, FINAL2-*",
+   "unit_id": "release-verdict-pending",
+   "proposed_cluster_id": "release-verdict-pending"
+  },
+  {
+   "id": "F2B-ANS-01",
+   "split": "FINAL",
+   "group": "POLICY",
+   "cluster_id": "policy-record-required-fields",
+   "expected_behavior": "cite",
+   "contrast_of": "F2B-ABS-01",
+   "prompt": "knowledge 정책 레코드가 verified 상태로 받아들여지려면 어떤 필드와 날짜 조건을 갖춰야 하나요?",
+   "candidate_answer": "ID·type·statement·owner·scope·자기 파일 source_ref·검토자와 이유·public/restricted visibility가 필요하고, verified면 effective_from이 있어야 하며 effective_to는 그 이후여야 한다.",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/instances.go",
+     "first": 534,
+     "last": 557,
+     "file_sha256": "c54a7fd69c653ee26e24152a13277c4d6a29b8649b60ca4b6c2b44fa1add0d07",
+     "content_sha256": "ecb85fd0984b13bdbf14d097e1666e30ff2b350f36842b8fe83c324ba8fb40c5"
+    }
+   ],
+   "language": "ko",
+   "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "authority_scope": "bound repository records in the derived corpus only",
+   "independence_review": "approved: new fact clusters; questions and declared-unknown match terms were written by the same agent (recorded weakness)",
+   "contamination_review": "approved: derived corpus excludes system/eval/**, docs/spec-driven/N11-*, N12-*, FINAL2-*",
+   "unit_id": "policy-record-required-fields",
+   "proposed_cluster_id": "policy-record-required-fields"
+  },
+  {
+   "id": "F2B-ANS-02",
+   "split": "FINAL",
+   "group": "POLICY",
+   "cluster_id": "local-trust-path",
+   "expected_behavior": "cite",
+   "contrast_of": "F2B-ABS-02",
+   "prompt": "로컬 운영에서 설치한 cks 바이너리를 무엇으로 신뢰하기로 했나요?",
+   "candidate_answer": "로컬 소스 빌드를 commit과 binary SHA로 확인한다.",
+   "evidence": [
+    {
+     "path": "docs/spec-driven/N15-N17-LOCAL-OPERATION-ACCEPTANCE.md",
+     "first": 14,
+     "last": 14,
+     "file_sha256": "754bee5fb2e55aae65029cce36e52fa82eb98ad562ecbb00be9ff1a18c3d751d",
+     "content_sha256": "f1ba0d8272347d003b9033c9558ccc8e55faf724506bb8d3c25e925edeb39e73"
+    }
+   ],
+   "language": "ko",
+   "source_commit": "0284aa16319312ba58e85a9fc6c3b309316e55d3",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "authority_scope": "bound repository records in the derived corpus only",
+   "independence_review": "approved: new fact clusters; questions and declared-unknown match terms were written by the same agent (recorded weakness)",
+   "contamination_review": "approved: derived corpus excludes system/eval/**, docs/spec-driven/N11-*, N12-*, FINAL2-*",
+   "unit_id": "local-trust-path",
+   "proposed_cluster_id": "local-trust-path"
+  }
+ ]
+}
