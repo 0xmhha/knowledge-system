@@ -85,7 +85,7 @@ def reserve(path, registry, record):
             os.unlink(temp)
 
 
-def binding_for(protocol, config_raw, binary_path):
+def binding_for(protocol, config_raw, binary_path, pin='binary_sha256'):
     pins = protocol.get('execution_binding', {})
     require(isinstance(pins, dict) and isinstance(pins.get('dataset_id'), str) and bool(pins['dataset_id']), 'frozen execution dataset binding missing')
     require(pins.get('config_sha256') == GATE.sha(config_raw), 'config differs from reviewed protocol')
@@ -93,7 +93,7 @@ def binding_for(protocol, config_raw, binary_path):
     import hashlib
     with binary_path.open('rb') as stream:
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
-    require(pins.get('binary_sha256') == digest, 'binary differs from reviewed protocol')
+    require(pins.get(pin) == digest, 'binary differs from reviewed protocol')
     m = protocol['model']
     return dict(schema_version=1, dataset_id=pins['dataset_id'], source_commit=protocol['source_commit'],
                 config_sha256=pins['config_sha256'], binary_sha256=digest, provider=m['provider'], model=m['model'],
@@ -131,6 +131,17 @@ def run(args, launch=subprocess.run):
     config_raw = bounded(args.config)
     binary = args.binary.resolve(strict=True)
     binding = binding_for(protocol, config_raw, binary)
+    # A reviewed protocol may pin a reference binary; the same reservation then
+    # runs the same requests with it so the two binaries are compared on one
+    # FINAL. Without that pin no second binary is accepted.
+    reference = getattr(args, 'reference_binary', None)
+    reference_pinned = 'reference_binary_sha256' in protocol.get('execution_binding', {})
+    require(reference_pinned == (reference is not None), 'reference binary must match the reviewed protocol pin')
+    reference_binding = None
+    if reference is not None:
+        reference = reference.resolve(strict=True)
+        reference_binding = binding_for(protocol, config_raw, reference, 'reference_binary_sha256')
+        require(reference_binding['binary_sha256'] != binding['binary_sha256'], 'reference binary equals candidate binary')
     requests = requests_for(protocol, book, args.split)
     out = args.output.resolve()
     require(not out.is_relative_to(args.repo.resolve()), 'run output must be outside source repo')
@@ -155,17 +166,24 @@ def run(args, launch=subprocess.run):
             reserve(args.registry, registry, dict(state='FINAL_reserved', reserved_at=dt.datetime.now(dt.timezone.utc).isoformat(),
                     run_id=str(uuid.uuid4()), final_clusters=sorted({q['cluster_id'] for q in book['questions'] if q['split']=='FINAL'}),
                     questions_sha256=GATE.sha(b_raw), protocol_sha256=GATE.sha(p_raw)))
+        if reference_binding is not None:
+            path=out/'execution-binding-reference.json'; path.write_text(json.dumps(reference_binding,indent=2)+'\n'); path.chmod(0o600)
+        def matrix(exe, capture, binding_file):
+            command=[str(exe),'eval','matrix','--requests',str(out/'requests.json'),'--config',str(args.config.resolve()),
+                     '--cks-mcp',str(exe),'--output',str(out/capture),'--environment-ledger','--evaluation-binding',str(out/binding_file),
+                     '--warmup',str(protocol['warm_latency']['warmup_runs']),'--retrieval-runs',str(protocol['retrieval_runs']),
+                     '--warm-runs',str(protocol['warm_latency']['measured_runs']),'--cold-runs',str(protocol['cold_start']['runs'])]
+            for path in [*frozen_paths,args.registry]:
+                command += ['--lock-file',str(path.resolve())]
+            return command
         # Hold the OS lock through every arm/phase, including subprocess failure.
-        command=[str(binary),'eval','matrix','--requests',str(out/'requests.json'),'--config',str(args.config.resolve()),
-                 '--cks-mcp',str(binary),'--output',str(out/'capture'),'--environment-ledger','--evaluation-binding',str(out/'execution-binding.json'),
-                 '--warmup',str(protocol['warm_latency']['warmup_runs']),'--retrieval-runs',str(protocol['retrieval_runs']),
-                 '--warm-runs',str(protocol['warm_latency']['measured_runs']),'--cold-runs',str(protocol['cold_start']['runs'])]
-        for path in [*frozen_paths,args.registry]:
-            command += ['--lock-file',str(path.resolve())]
         # The matrix process inherits the same open-file-description lock. If
         # this wrapper is SIGKILLed, a still-running matrix retains exclusion.
-        child = launch(command, cwd=args.repo, pass_fds=(lock_fd,))
-        return child.returncode
+        child = launch(matrix(binary,'capture','execution-binding.json'), cwd=args.repo, pass_fds=(lock_fd,))
+        if child.returncode != 0 or reference_binding is None:
+            return child.returncode
+        # The reference runs only after a complete candidate capture.
+        return launch(matrix(reference,'reference-capture','execution-binding-reference.json'), cwd=args.repo, pass_fds=(lock_fd,)).returncode
 
 
 def main():
@@ -177,6 +195,7 @@ def main():
     for name in ('protocol','questions','known-observations','registry','config','binary','output'):
         cli.add_argument('--'+name,type=Path,required=True)
     cli.add_argument('--review',type=Path)
+    cli.add_argument('--reference-binary',type=Path,help='second binary pinned as reference_binary_sha256 by the reviewed protocol')
     cli.add_argument('--repo',type=Path,default=GATE.ROOT)
     cli.add_argument('--baseline',type=Path,default=GATE.ROOT/'system/eval/b0-knowledge-system/protocol-m2max-draft.json')
     cli.add_argument('--split',choices=('DEV','FINAL'),required=True)
