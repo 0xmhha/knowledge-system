@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event": "part A run stopped by the agent during DEV, before any FINAL reservation",
+  "stopped_at_utc": "2026-10-10T08:33Z (approximately)",
+  "cause": "Design defect found after freeze: the frozen N11 corpus indexes only 83 selected files (CKV chunks and CKG nodes). 11 of the 15 part A gold files are not indexed in either backend: cmd/cks/main.go, backendmeasure/recorder.go, ckgclient/keyword.go, ckgclient/real.go, composer/budget/tokens.go, composer/sanitize/engine.go, composer/stage3/relation_weights.go, eval/metrics.go, eval/scenario.go, knowledgepack/digest.go, semantic/trace_anchor.go. Those questions could not be retrieved by either binary, so the candidate-versus-reference comparison would be uninformative and the FINAL questions would be consumed.",
+  "missed_check": "The draft review stated that the frozen corpus could be reused; the agent did not check index scope against the gold files before asking for approval.",
+  "registry_records": 0,
+  "dev_partial_output": "/private/tmp/ks-n11-eval-m13oocru/run-F2A-DEV (partial candidate DEV capture, not used)",
+  "frozen_inputs_kept": true,
+  "next": "user decision"
+}
