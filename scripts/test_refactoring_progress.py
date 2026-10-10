@@ -11,11 +11,16 @@ progress = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(progress)
 
 
+# Last revision where N-15 and N-17 still carried partial check records;
+# later completions must not change what these fixtures exercise.
+FIXTURE_REVISION = "63bf48a144c338e0246cb502a2149480ffe373bd"
+
+
 class PartialCompletionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.ledger = json.loads((ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json").read_text())
-        cls.live = (ROOT / progress.SPEC).read_text()
+        cls.ledger = json.loads(progress.recorded(FIXTURE_REVISION, "docs/spec-driven/REFACTORING-PROGRESS.json"))
+        cls.live = progress.recorded(FIXTURE_REVISION, progress.SPEC).decode()
 
     def task(self, ident="N-15"):
         return copy.deepcopy(next(t for t in self.ledger["tasks"] if t["id"] == ident))
@@ -23,8 +28,8 @@ class PartialCompletionTests(unittest.TestCase):
     def test_actual_partial_evidence_passes_without_completing_tasks(self):
         self.assertEqual(progress.verify_partial_checks(self.task(), self.live), 3)
         self.assertEqual(progress.verify_partial_checks(self.task("N-17"), self.live), 2)
-        self.assertEqual(sum(t["state"] == "complete" for t in self.ledger["tasks"]), 8)
         self.assertNotEqual(self.task()["state"], "complete")
+        self.assertNotEqual(self.task("N-17")["state"], "complete")
 
     def test_original_missing_native_receipt_and_not_run_rejected(self):
         task = self.task()
