@@ -37,6 +37,15 @@ class Adapter(unittest.TestCase):
         self.assertEqual(cases['D1']['expected_citations'], [{'file': 'a.go', 'start_line': 3, 'end_line': 9}])
         self.assertFalse(cases['D1']['expect_no_citations'])
 
+    def test_shared_cluster_is_one_unit_per_group(self):
+        book = {'questions': [question('C1', 'FINAL', 'CODE', cluster_id='pair'),
+                              question('W1', 'FINAL', 'WHY', cluster_id='pair'),
+                              question('W2', 'FINAL', 'WHY', cluster_id='pair')]}
+        cases = S.cases_from_book(book, 'FINAL', COMMIT)
+        self.assertEqual(cases['C1']['independent_unit_id'], 'CODE/pair')
+        self.assertEqual(cases['W1']['independent_unit_id'], cases['W2']['independent_unit_id'])
+        self.assertEqual({c['cluster_id'] for c in cases.values()}, {'pair'})
+
     def test_rejects_unapproved_foreign_commit_and_abs_mismatch(self):
         for q in (question('D1', 'DEV', 'CODE', review_state='proposed'),
                   question('D1', 'DEV', 'CODE', source_commit='b' * 40),

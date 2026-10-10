@@ -43,7 +43,10 @@ def cases_from_book(book, split, source_commit):
         require(abstain == (q['group'] == 'ABS'), 'ABS/abstain mismatch: ' + q['id'])
         cases[q['id']] = {
             'group': q['group'],
-            'independent_unit_id': q['cluster_id'],
+            # Bootstrap units are counted per group (protocol cluster_policy); a
+            # reviewed CODE/WHY pair shares one fact cluster across two groups.
+            'independent_unit_id': q['group'] + '/' + q['cluster_id'],
+            'cluster_id': q['cluster_id'],
             'expected_commit': source_commit,
             # ABS rows have no answer span; the strict flag keeps the frozen per-item rule.
             'expected_citations': [{'file': e['path'], 'start_line': e['first'], 'end_line': e['last']}
@@ -140,6 +143,8 @@ def main():
     u = protocol['uncertainty']
     summary = M.summarize(report, requests, rows, cases, args.source_root, ledgers, u['bootstrap_seed'], u['resamples'])
     summary['split'] = args.split
+    summary['independent_units_scope'] = 'group-scoped units (group/cluster); see distinct_fact_clusters for clusters across groups'
+    summary['distinct_fact_clusters'] = len({c['cluster_id'] for c in cases.values()})
     summary['abstention_mechanical'] = abstention_rows(rows, cases, M.ARMS)
     summary['answer_level_abstention'] = None
     summary['frozen_threshold_application'] = verdicts(summary, protocol, cases)
