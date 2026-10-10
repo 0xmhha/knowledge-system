@@ -82,6 +82,24 @@ class Adapter(unittest.TestCase):
         self.assertEqual(v['arms_over_p95_ratio'], ['combined_on'])
         self.assertFalse(v['default_on'] or v['release_eligible'])
 
+    def test_binary_comparison_pairs_questions_and_counts_clusters_once(self):
+        book = {'questions': [question('C1', 'FINAL', 'CODE', cluster_id='pair'),
+                              question('W1', 'FINAL', 'WHY', cluster_id='pair'),
+                              question('C2', 'FINAL', 'CODE', cluster_id='solo')]}
+        cases = S.cases_from_book(book, 'FINAL', COMMIT)
+        metrics = lambda r: {'citation_recall_at_10': r, 'citation_precision_at_10': 0.0, 'mean_expected_reciprocal_rank_at_10': r}
+        def summary(values, p95):
+            return {'per_question': {arm: {q: metrics(v) for q, v in values.items()} for arm in S.M.ARMS},
+                    'arm_summaries': {arm: {'warm_p95_ns': p95} for arm in S.M.ARMS}}
+        cand = summary({'C1': 1.0, 'W1': 0.5, 'C2': 1.0}, 900)
+        ref = summary({'C1': 0.5, 'W1': 0.5, 'C2': 1.0}, 1000)
+        out = S.binary_comparison(cand, ref, cases, 1, 50)['baseline_off']
+        self.assertEqual(out['CODE']['citation_recall_at_10']['independent_units'], 2)
+        self.assertAlmostEqual(out['CODE']['citation_recall_at_10']['mean'], 0.25)
+        self.assertEqual(out['all']['citation_recall_at_10']['independent_units'], 2)
+        self.assertAlmostEqual(out['all']['citation_recall_at_10']['mean'], 0.125)
+        self.assertAlmostEqual(out['warm_p95_ratio_candidate_to_reference'], 0.9)
+
 
 if __name__ == '__main__':
     unittest.main()

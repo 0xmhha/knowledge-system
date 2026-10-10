@@ -13,6 +13,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import statistics
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -113,6 +114,47 @@ def verdicts(summary, protocol, cases):
             'reason': 'every important group has fewer than 10 independent units (frozen small-group rule)'}
 
 
+def binary_comparison(candidate, reference, cases, seed, resamples):
+    """Paired candidate-minus-reference deltas per arm on the same questions.
+
+    Units follow the summarizer (group-scoped); 'all' averages each fact
+    cluster once across groups. Small groups stay inconclusive.
+    """
+    def units_of(selected, key):
+        units = {}
+        for qid, case in selected.items():
+            units.setdefault(case[key], []).append(qid)
+        return units
+    scopes = {group: units_of({q: c for q, c in cases.items() if c['group'] == group}, 'independent_unit_id')
+              for group in sorted({c['group'] for c in cases.values()})}
+    scopes['all'] = units_of(cases, 'cluster_id')
+    out = {}
+    for arm in M.ARMS:
+        cand, ref = candidate['per_question'][arm], reference['per_question'][arm]
+        row = {scope: {metric: M.bootstrap_delta([statistics.mean(cand[q][metric] - ref[q][metric] for q in units[u])
+                                                  for u in sorted(units)], seed, resamples) for metric in M.METRICS}
+               for scope, units in scopes.items()}
+        c95, r95 = candidate['arm_summaries'][arm]['warm_p95_ns'], reference['arm_summaries'][arm]['warm_p95_ns']
+        row['warm_p95_ratio_candidate_to_reference'] = c95 / r95 if c95 is not None and r95 else None
+        out[arm] = row
+    return out
+
+
+def score_capture(d, cases, source_root, protocol):
+    raw = {name: (d / name).read_bytes() for name in ('report.json', 'rows.jsonl', 'requests.json')}
+    report, requests = M.decode(raw['report.json']), M.decode(raw['requests.json'])
+    require(sha(raw['rows.jsonl']) == report['rows_sha256'] and sha(raw['requests.json']) == report['request_sha256'],
+            'rows/requests differ from capture report')
+    rows = [M.decode(line) for line in raw['rows.jsonl'].splitlines()]
+    ledgers, footprints = {}, {}
+    for arm in M.ARMS:
+        ledgers[arm], footprints[arm] = M.backend_scopes(d, arm)
+    configs = M.verify_retained_configs(d, report, protocol['retrieval_k'])
+    u = protocol['uncertainty']
+    summary = M.summarize(report, requests, rows, cases, source_root, ledgers, u['bootstrap_seed'], u['resamples'])
+    return summary, report, rows, raw, footprints, configs
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--capture-dir', type=Path, required=True)
@@ -121,27 +163,19 @@ def main():
     parser.add_argument('--source-root', type=Path, required=True)
     parser.add_argument('--split', choices=['DEV', 'FINAL'], required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--reference-capture-dir', type=Path,
+                        help='capture of the protocol-pinned reference binary on the same requests')
     args = parser.parse_args()
     require(not (args.output.exists() or args.output.is_symlink()), 'output already exists')
-    d = args.capture_dir
-    raw = {name: (d / name).read_bytes() for name in ('report.json', 'rows.jsonl', 'requests.json')}
     raw_book, raw_protocol = args.questions.read_bytes(), args.protocol.read_bytes()
-    report, requests = M.decode(raw['report.json']), M.decode(raw['requests.json'])
     book, protocol = M.decode(raw_book), M.decode(raw_protocol)
-    require(sha(raw['rows.jsonl']) == report['rows_sha256'] and sha(raw['requests.json']) == report['request_sha256'],
-            'rows/requests differ from capture report')
-    commit = report['dataset_identity']['source']['source_commit']
+    commit = M.decode((args.capture_dir / 'report.json').read_bytes())['dataset_identity']['source']['source_commit']
     require(protocol['source_commit'] == commit and book['source_commit'] == commit, 'protocol/book source differs from capture')
     require(protocol['retrieval_k'] == 10 and protocol['uncertainty']['ci'] == .95, 'unsupported K or interval')
     cases = cases_from_book(book, args.split, commit)
-    rows = [M.decode(line) for line in raw['rows.jsonl'].splitlines()]
-    ledgers, footprints = {}, {}
-    for arm in M.ARMS:
-        ledgers[arm], footprints[arm] = M.backend_scopes(d, arm)
-    configs = M.verify_retained_configs(d, report, protocol['retrieval_k'])
+    summary, report, rows, raw, footprints, configs = score_capture(args.capture_dir, cases, args.source_root, protocol)
     sources = M.referenced_sources(rows, cases, args.source_root)
     u = protocol['uncertainty']
-    summary = M.summarize(report, requests, rows, cases, args.source_root, ledgers, u['bootstrap_seed'], u['resamples'])
     summary['split'] = args.split
     summary['independent_units_scope'] = 'group-scoped units (group/cluster); see distinct_fact_clusters for clusters across groups'
     summary['distinct_fact_clusters'] = len({c['cluster_id'] for c in cases.values()})
@@ -154,6 +188,15 @@ def main():
                                'requests': sha(raw['requests.json']), 'questions': sha(raw_book),
                                'protocol': sha(raw_protocol), 'footprints': footprints, 'arm_configurations': configs}
     summary['referenced_source_files_sha256'] = sources
+    if args.reference_capture_dir is not None:
+        pinned = protocol.get('execution_binding', {}).get('reference_binary_sha256')
+        ref_summary, ref_report, ref_rows, ref_raw, _, _ = score_capture(args.reference_capture_dir, cases, args.source_root, protocol)
+        require(pinned is not None and ref_report.get('binary_sha256') == pinned, 'reference capture differs from the protocol pin')
+        require(ref_report['dataset_identity'] == report['dataset_identity'] and ref_raw['requests.json'] == raw['requests.json'],
+                'reference capture used other inputs')
+        summary['reference'] = {k: v for k, v in ref_summary.items() if k != 'measurements'}
+        summary['reference']['input_sha256'] = {'report': sha(ref_raw['report.json']), 'rows': sha(ref_raw['rows.jsonl'])}
+        summary['binary_comparison'] = binary_comparison(summary, ref_summary, cases, u['bootstrap_seed'], u['resamples'])
     require(M.referenced_sources(rows, cases, args.source_root) == sources, 'source changed during scoring')
     fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, 'w', encoding='utf-8') as stream:
