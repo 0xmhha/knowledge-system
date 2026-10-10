@@ -432,6 +432,11 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	out := make([]contract.Neighbor, 0, len(edges))
 	for _, e := range edges {
 		rel, ok := relationFromEdgeType(e.Type, reverse)
+		// uses_type is only returned to callers that asked for it, so the
+		// default and intent-driven walks keep their existing edge set.
+		if rel == contract.RelationUsesType && !containsRelation(opts.Relations, contract.RelationUsesType) {
+			ok = false
+		}
 		if !ok {
 			continue
 		}
@@ -934,7 +939,7 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 			break
 		}
 		rel, ok := relationFromEdgeType(e.Type, false)
-		if !ok {
+		if !ok || rel == contract.RelationUsesType {
 			continue
 		}
 		srcN, srcOK := byID[e.Src]
@@ -1166,6 +1171,7 @@ func nodeMatchesKinds(n types.Node, kinds []string) bool {
 //	cks RelationTestedBy   -> ckg has no direct edge; not supported in C.1
 //	cks RelationEmbeds     -> ckg "extends"   (closest analog)
 //	cks RelationDefines    -> ckg "defines"
+//	cks RelationUsesType   -> ckg "uses_type" (explicit requests only)
 //
 // Empty input means "all forward relations": cks fans out to every
 // supported forward edge type.
@@ -1218,6 +1224,8 @@ func planTraversal(rels []contract.Relation) (bool, []string, error) {
 			add(types.EdgeExtends)
 		case contract.RelationDefines:
 			add(types.EdgeDefines)
+		case contract.RelationUsesType:
+			add(types.EdgeUsesType)
 		case contract.RelationTestedBy:
 			// ckg currently has no direct tested_by edge; skip rather
 			// than fabricate a misleading mapping.
@@ -1248,6 +1256,17 @@ func relationFromEdgeType(et types.EdgeType, reversed bool) (contract.Relation, 
 		return contract.RelationEmbeds, true
 	case types.EdgeDefines:
 		return contract.RelationDefines, true
+	case types.EdgeUsesType:
+		return contract.RelationUsesType, true
 	}
 	return "", false
+}
+
+func containsRelation(rels []contract.Relation, want contract.Relation) bool {
+	for _, r := range rels {
+		if r == want {
+			return true
+		}
+	}
+	return false
 }

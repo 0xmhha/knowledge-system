@@ -80,6 +80,16 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if err != nil {
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
+	// Add used type declarations only when every primary body still fits;
+	// otherwise keep the primary pack exactly as selected.
+	if pack.Metadata.EvidenceBudget == nil {
+		if extended := withTypeNeighbors(ctx, d.CKG, refs); extended != nil {
+			if withTypes, typeErr := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, extended, d.EvidenceSanitizer); typeErr == nil &&
+				withTypes.Metadata.EvidenceBudget == nil && withTypes.EvidenceState == pack.EvidenceState {
+				pack = withTypes
+			}
+		}
+	}
 	pack.Metadata.Ontology = legacy.Metadata.Ontology
 	// Knowledge/traces verify their input before extending it. Stamp the
 	// optional diagnostic at this boundary, not only after those layers.

@@ -611,6 +611,36 @@ func TestReal_Neighbors_DropsUntranslatableEdges(t *testing.T) {
 	}
 }
 
+func TestReal_Neighbors_UsesTypeOnlyWhenRequested(t *testing.T) {
+	t.Parallel()
+	src := contract.Citation{File: "s.go", StartLine: 1, EndLine: 5, CommitHash: "h"}
+	srcNode := node("S", "pkg.S", "s.go", 1, 5, types.NodeFunction, "go")
+	dstNode := node("D", "pkg.D", "d.go", 1, 5, types.NodeStruct, "go")
+	m := &mockStoreReader{
+		manifest:   ManifestSnapshot{SrcCommit: "h"},
+		pathNodes:  []types.Node{srcNode},
+		neighOut:   []types.Node{srcNode, dstNode},
+		neighEdges: []types.Edge{edge("S", "D", types.EdgeUsesType)},
+	}
+	r := newRealWithStore(m)
+	out, err := r.Neighbors(context.Background(), src, NeighborsOpts{Hops: 1, Relations: []contract.Relation{contract.RelationUsesType}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out) != 1 || out[0].Relation != contract.RelationUsesType || out[0].Target.File != "d.go" || !out[0].IsValid() {
+		t.Fatalf("explicit uses_type walk = %+v", out)
+	}
+	if got := m.neighCh[len(m.neighCh)-1].etypes; len(got) != 1 || got[0] != string(types.EdgeUsesType) {
+		t.Fatalf("backend edge filter = %v, want uses_type only", got)
+	}
+	for _, rels := range [][]contract.Relation{nil, {contract.RelationReferences}} {
+		out, err := r.Neighbors(context.Background(), src, NeighborsOpts{Hops: 1, Relations: rels})
+		if err != nil || len(out) != 0 {
+			t.Fatalf("relations %v returned uses_type edges: %+v %v", rels, out, err)
+		}
+	}
+}
+
 func TestReal_Neighbors_CalledByReversesDirection(t *testing.T) {
 	t.Parallel()
 	// RelationCalledBy in cks's vocabulary is the reverse of RelationCalls.

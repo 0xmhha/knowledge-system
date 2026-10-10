@@ -102,6 +102,10 @@ const (
 	// RelationDefines — Source (a file) defines Target (a top-level
 	// symbol: type, function, var, or const).
 	RelationDefines Relation = "defines"
+	// RelationUsesType — Source (a function or struct) uses Target (a type
+	// declared in the indexed project) in its signature or fields. Only
+	// requested explicitly; the default traversal does not include it.
+	RelationUsesType Relation = "uses_type"
 )
 
 // Neighbor is one graph edge in an EvidencePack. Distance is the hop count
@@ -125,7 +129,7 @@ func (n Neighbor) IsValid() bool {
 	}
 	switch n.Relation {
 	case RelationCalls, RelationCalledBy, RelationImplements, RelationImports,
-		RelationReferences, RelationTestedBy, RelationEmbeds, RelationDefines:
+		RelationReferences, RelationTestedBy, RelationEmbeds, RelationDefines, RelationUsesType:
 		return true
 	default:
 		return false
