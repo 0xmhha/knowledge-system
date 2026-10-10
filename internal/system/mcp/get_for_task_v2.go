@@ -80,9 +80,9 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if err != nil {
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
-	// Add used type declarations only when every primary body still fits;
-	// otherwise keep the primary pack exactly as selected.
-	if pack.Metadata.EvidenceBudget == nil {
+	// When enabled, add used type declarations only when every primary body
+	// still fits; otherwise keep the primary pack exactly as selected.
+	if d.TypeNeighbors && pack.Metadata.EvidenceBudget == nil {
 		source := func(file string) ([]byte, error) {
 			buf, _, _, err := setup.ReadRetainedFileContext(ctx, d.EvidenceVersionDir, "repo", file)
 			return buf, err

@@ -251,3 +251,27 @@ func TestRecallKConfigBoundsAndDefault(t *testing.T) {
 		t.Fatal("nil config accepted")
 	}
 }
+
+func TestTypeNeighborsOffByDefaultAndOptIn(t *testing.T) {
+	base := `
+version: 1
+backends:
+  ckg: {path: "./data/ckg.db", timeout_ms: 5000}
+  ckv: {path: "./data/ckv.db", timeout_ms: 3000, embed_model: "bge-base-onnx"}
+listen: {http_addr: "127.0.0.1:8080", mcp_stdio: true}
+logging: {level: "info", mode: "prod", footprint_dir: "./f", audit_dir: "./a"}
+sanitize: {rules_path: "./r.yaml", default_action: "drop", fail_closed_on_unknown_rule: true}
+`
+	for extra, want := range map[string]bool{"": false, "retrieval: {recall_k: 10}\n": false, "retrieval: {type_neighbors: true}\n": true} {
+		c, err := LoadBytes([]byte(base + extra))
+		if err != nil {
+			t.Fatalf("%q: %v", extra, err)
+		}
+		if c.Retrieval.TypeNeighbors != want {
+			t.Fatalf("%q: type_neighbors = %v", extra, c.Retrieval.TypeNeighbors)
+		}
+	}
+	if Default().Retrieval.TypeNeighbors {
+		t.Fatal("default enables type neighbors")
+	}
+}

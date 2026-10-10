@@ -3,10 +3,12 @@ package mcp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
+	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -121,5 +123,49 @@ func TestTypeDeclarationCommentOverlappingACitedBodyIsSkipped(t *testing.T) {
 	got := withTypeNeighbors(context.Background(), g, []contract.Citation{fn, header}, read)
 	if len(got) != 3 || got[1] != cite("p.go", 5, 5) {
 		t.Fatalf("declaration whose comment overlaps a cited body was added: %v", got)
+	}
+}
+
+// The v2 handler adds used type declarations only when the option is on.
+func TestV2ToolTypeNeighborsAreOptIn(t *testing.T) {
+	src := "package p\n\n// limit bounds one request.\ntype limit struct{ n int }\n\nfunc Alpha(l limit) int {\n\treturn l.n\n}\n"
+	version := newPinnedV2FilesFixture(t, map[string]string{"a.go": src})
+	anchor, decl := cite("a.go", 6, 8), cite("a.go", 4, 4)
+	for _, enabled := range []bool{false, true} {
+		f := newFixture(t, func(f *fixture) {
+			f.ckv.SearchHits = []contract.Hit{{Citation: anchor, Score: 1, Rank: 1, Symbol: "Alpha", Source: contract.HitSourceCKV}}
+			f.ckg.SymbolCitations = []contract.Citation{anchor}
+			f.ckg.NeighborEdges = []contract.Neighbor{usesType(anchor, decl)}
+			f.fetcher.Bodies[anchor.Key()] = "func Alpha(l limit) int {\n\treturn l.n\n}\n"
+		})
+		cleaner, err := sanitize.New(f.ruleset)
+		if err != nil {
+			t.Fatal(err)
+		}
+		f.deps.EvidenceVersionDir, f.deps.EvidenceSanitizer, f.deps.TypeNeighbors = version, cleaner, enabled
+		result, err := handleGetForTaskV2(context.Background(), f.deps, callToolReq(map[string]any{"prompt": "Alpha"}))
+		if err != nil || result.IsError {
+			t.Fatalf("enabled=%v: %v %+v", enabled, err, result)
+		}
+		pack := result.StructuredContent.(contract.EvidencePackV2)
+		var files []string
+		for _, c := range pack.Citations {
+			files = append(files, fmt.Sprintf("%s:%d-%d", c.File, c.StartLine, c.EndLine))
+		}
+		asked := 0
+		for _, call := range f.ckg.Calls.Neighbors {
+			for _, r := range call.Opts.Relations {
+				if r == contract.RelationUsesType {
+					asked++
+				}
+			}
+		}
+		want := []string{"a.go:6-8"}
+		if enabled {
+			want = append(want, "a.go:3-4")
+		}
+		if strings.Join(files, ",") != strings.Join(want, ",") || (asked > 0) != enabled {
+			t.Fatalf("enabled=%v: citations %v, uses_type lookups %d", enabled, files, asked)
+		}
 	}
 }

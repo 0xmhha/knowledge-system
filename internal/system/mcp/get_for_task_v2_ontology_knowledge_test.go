@@ -62,9 +62,16 @@ func newPinnedV2ErrorFixture(t *testing.T) string {
 
 func newPinnedV2ContentFixture(t *testing.T, content string) string {
 	t.Helper()
+	return newPinnedV2FilesFixture(t, map[string]string{"README.md": content})
+}
+
+func newPinnedV2FilesFixture(t *testing.T, files map[string]string) string {
+	t.Helper()
 	root, version := t.TempDir(), t.TempDir()
-	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte(content), 0600); err != nil {
-		t.Fatal(err)
+	for name, content := range files {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(content), 0600); err != nil {
+			t.Fatal(err)
+		}
 	}
 	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: version, ProjectID: "p", SourceMode: "snapshot-only"})
 	if err != nil {

@@ -63,6 +63,10 @@ type Config struct {
 // change the Stage-2 union cap or the separate knowledge-pass budget.
 type RetrievalConfig struct {
 	RecallK int `yaml:"recall_k,omitempty"`
+	// TypeNeighbors adds used type declarations after the top v2 Go bodies.
+	// Off by default: the second independent FINAL showed no recall gain and
+	// a lower MRR because the declarations rank above the expected evidence.
+	TypeNeighbors bool `yaml:"type_neighbors,omitempty"`
 }
 
 func (c RetrievalConfig) EffectiveRecallK() int {

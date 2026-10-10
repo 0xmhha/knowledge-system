@@ -61,6 +61,8 @@ type Deps struct {
 	// against this pinned version before publishing external trace anchors.
 	SemanticStorePath  string
 	EvidenceSourceRoot string
+	// Opt-in used type declarations after the top v2 Go bodies.
+	TypeNeighbors bool
 
 	// CKG and CKV are reported by cks.ops.health. They are NOT used to
 	// short-circuit composer calls — the composer holds its own references
