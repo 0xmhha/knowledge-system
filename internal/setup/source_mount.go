@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,7 +12,13 @@ import (
 // while citation checks and body fetches use exactly the archived bytes.
 // The returned cleanup must be called when the server exits.
 func MaterializeRetainedReadTree(versionDir string) (string, func(), error) {
-	identity, err := InspectVersionIdentity(versionDir)
+	return MaterializeRetainedReadTreeContext(context.Background(), versionDir)
+}
+
+// MaterializeRetainedReadTreeContext is MaterializeRetainedReadTree within a
+// request; it reuses a RequestVerification carried by ctx for the same version.
+func MaterializeRetainedReadTreeContext(ctx context.Context, versionDir string) (string, func(), error) {
+	identity, err := InspectVersionIdentityContext(ctx, versionDir)
 	if err != nil {
 		return "", nil, err
 	}

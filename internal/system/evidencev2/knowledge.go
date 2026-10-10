@@ -24,13 +24,13 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	if cleaner == nil || asOf == "" || subsystem == "" {
 		return contract.EvidencePackV2{}, fmt.Errorf("knowledge context needs date, subsystem and sanitizer")
 	}
-	if _, _, _, err := setup.ReadRetainedFile(versionDir, "repo", ".cks/knowledge/manifest.yaml"); err != nil {
+	if _, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, "repo", ".cks/knowledge/manifest.yaml"); err != nil {
 		if strings.Contains(err.Error(), "citation file is not in the retained inventory") {
 			return base, nil
 		}
 		return knowledgeUnavailable(base, "knowledge_archive_unavailable", "")
 	}
-	instances, lock, err := knowledgepack.LoadRetainedProjectInstances(versionDir)
+	instances, lock, err := knowledgepack.LoadRetainedProjectInstancesContext(ctx, versionDir)
 	if err != nil {
 		return knowledgeUnavailable(base, "knowledge_archive_unavailable", "")
 	}
@@ -84,7 +84,7 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 		if source.OriginID != "repo" {
 			return fmt.Errorf("unsupported knowledge origin")
 		}
-		buf, _, _, err := setup.ReadRetainedFile(versionDir, source.OriginID, source.Path)
+		buf, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, source.OriginID, source.Path)
 		if err != nil {
 			return err
 		}

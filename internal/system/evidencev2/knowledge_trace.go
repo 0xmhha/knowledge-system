@@ -36,7 +36,7 @@ func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, ver
 	if snapshot := projection.Snapshot(); snapshot.ProjectID != base.Coordinates.ProjectID || snapshot.DatasetID != base.Coordinates.DatasetID || snapshot.SnapshotID != base.Coordinates.SnapshotID {
 		return traceUnknown(base, "trace_snapshot_mismatch")
 	}
-	instances, lock, err := knowledgepack.LoadRetainedProjectInstances(versionDir)
+	instances, lock, err := knowledgepack.LoadRetainedProjectInstancesContext(ctx, versionDir)
 	if err != nil || lock.LockDigest != k.KnowledgeContext.LockDigest {
 		return traceUnknown(base, "trace_archive_unavailable")
 	}
@@ -71,7 +71,7 @@ func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, ver
 			unverified = true
 			continue
 		}
-		linkRef, err := traceSourceRef(versionDir, link.SourceRef)
+		linkRef, err := traceSourceRef(ctx, versionDir, link.SourceRef)
 		if err != nil {
 			unverified = true
 			continue
@@ -191,11 +191,11 @@ func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, ver
 	return base, nil
 }
 
-func traceSourceRef(versionDir string, source knowledgepack.SourceRef) (Ref, error) {
+func traceSourceRef(ctx context.Context, versionDir string, source knowledgepack.SourceRef) (Ref, error) {
 	if source.OriginID != "repo" {
 		return Ref{}, fmt.Errorf("unsupported trace origin")
 	}
-	buf, _, _, err := setup.ReadRetainedFile(versionDir, source.OriginID, source.Path)
+	buf, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, source.OriginID, source.Path)
 	if err != nil {
 		return Ref{}, err
 	}

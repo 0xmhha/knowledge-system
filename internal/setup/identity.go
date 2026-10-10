@@ -616,6 +616,9 @@ func verifyVersionIdentityContext(ctx context.Context, versionDir string) (*Data
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	if identity := requestVerifiedIdentity(ctx, versionDir); identity != nil {
+		return identity, nil
+	}
 	path := filepath.Join(versionDir, "dataset-identity.json")
 	var identity DatasetIdentity
 	if err := readJSON(path, &identity); err != nil {
@@ -644,4 +647,10 @@ func verifyVersionIdentityContext(ctx context.Context, versionDir string) (*Data
 // checked against both engine manifests before details are returned.
 func InspectVersionIdentity(versionDir string) (*DatasetIdentity, error) {
 	return verifyVersionIdentityIfPresent(versionDir)
+}
+
+// InspectVersionIdentityContext is InspectVersionIdentity within a request;
+// it reuses a RequestVerification carried by ctx for the same version.
+func InspectVersionIdentityContext(ctx context.Context, versionDir string) (*DatasetIdentity, error) {
+	return verifyVersionIdentityContext(ctx, versionDir)
 }

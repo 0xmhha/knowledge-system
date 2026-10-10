@@ -179,25 +179,27 @@ func retainedLineEvidence(buf []byte, identity *DatasetIdentity, fileSHA, origin
 // ReadRetainedFile returns verified original bytes for semantic extraction.
 // This is an internal raw-byte API: public responses must sanitize them.
 func ReadRetainedFile(versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
+	return ReadRetainedFileContext(context.Background(), versionDir, originID, path)
+}
+
+// ReadRetainedFileContext is ReadRetainedFile within a request; it reuses a
+// RequestVerification carried by ctx for the same version.
+func ReadRetainedFileContext(ctx context.Context, versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
 	if (originID != "repo" && !validCaptureOriginID(originID)) || path == "" {
 		return nil, nil, "", fmt.Errorf("invalid retained source coordinates")
 	}
 	if err := validateCapturedPaths([]string{path}); err != nil {
 		return nil, nil, "", err
 	}
-	identity, err := InspectVersionIdentity(versionDir)
+	identity, err := verifyVersionIdentityContext(ctx, versionDir)
 	if err != nil {
 		return nil, nil, "", err
 	}
 	if identity == nil {
 		return nil, nil, "", fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
 	}
-	buf, fileSHA, err := readRetainedFileWithIdentity(versionDir, originID, path, identity)
+	buf, fileSHA, err := readRetainedFileWithIdentityContext(ctx, versionDir, originID, path, identity)
 	return buf, identity, fileSHA, err
-}
-
-func readRetainedFileWithIdentity(versionDir, originID, path string, identity *DatasetIdentity) ([]byte, string, error) {
-	return readRetainedFileWithIdentityContext(context.Background(), versionDir, originID, path, identity)
 }
 
 func readRetainedFileWithIdentityContext(ctx context.Context, versionDir, originID, path string, identity *DatasetIdentity) ([]byte, string, error) {

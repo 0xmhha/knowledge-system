@@ -49,13 +49,16 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 		}
 		callerIntent = parsed
 	}
-	identity, identityErr := setup.InspectVersionIdentity(d.EvidenceVersionDir)
+	// One full archive verification is shared by every retained read in this
+	// request and repeated before the response; it never outlives the request.
+	ctx, verification, identityErr := setup.BeginRequestVerification(ctx, d.EvidenceVersionDir)
 	if identityErr != nil {
 		return v2ToolErrorFor(identityErr, "reindex_required"), nil
 	}
-	if identity == nil {
+	if verification == nil {
 		return v2ToolError("reindex_required"), nil
 	}
+	defer verification.Close()
 	if ok, _ := serviceable(ctx, d); !ok {
 		return v2ToolError("service_unavailable"), nil
 	}
@@ -113,6 +116,9 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 				}
 			}
 		}
+	}
+	if err := verification.Finish(ctx); err != nil {
+		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil
 }

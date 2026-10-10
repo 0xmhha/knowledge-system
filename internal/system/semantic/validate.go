@@ -435,6 +435,12 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 // snapshots. It also works for retained committed candidates and never opens
 // the mutable checkout or asks Git for HEAD content.
 func (p Projection) ValidateRetainedSources(versionDir string) error {
+	return p.ValidateRetainedSourcesContext(context.Background(), versionDir)
+}
+
+// ValidateRetainedSourcesContext is ValidateRetainedSources within a request;
+// it reuses a setup.RequestVerification carried by ctx for the same version.
+func (p Projection) ValidateRetainedSourcesContext(ctx context.Context, versionDir string) error {
 	if err := p.Validate(); err != nil {
 		return err
 	}
@@ -448,7 +454,7 @@ func (p Projection) ValidateRetainedSources(versionDir string) error {
 			files = append(files, setup.RetainedFile{OriginID: "repo", Path: e.Path})
 		}
 	}
-	contents, identity, batchErr := setup.ReadRetainedFiles(context.Background(), versionDir, files)
+	contents, identity, batchErr := setup.ReadRetainedFiles(ctx, versionDir, files)
 	if batchErr == nil && (identity.Source.ProjectID != p.Snapshot.ProjectID || identity.DatasetID != p.Snapshot.DatasetID ||
 		identity.Source.SnapshotID != p.Snapshot.SnapshotID || identity.Source.SourceCommit != p.Snapshot.Commit ||
 		identity.Source.SourceMode != p.Snapshot.SourceMode) {
@@ -463,7 +469,7 @@ func (p Projection) ValidateRetainedSources(versionDir string) error {
 		return err
 	}
 	if p.SchemaVersion == PackProjectionVersion {
-		return p.Knowledge.validateRetained(versionDir)
+		return p.Knowledge.validateRetained(ctx, versionDir)
 	}
 	return nil
 }

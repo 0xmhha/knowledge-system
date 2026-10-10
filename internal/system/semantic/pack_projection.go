@@ -2,6 +2,7 @@ package semantic
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -182,8 +183,8 @@ func (k *KnowledgeProjection) validate() error {
 	return nil
 }
 
-func (k *KnowledgeProjection) validateRetained(versionDir string) error {
-	lockBytes, _, _, err := setup.ReadRetainedFile(versionDir, "repo", ".cks/knowledge/knowledge.lock.json")
+func (k *KnowledgeProjection) validateRetained(ctx context.Context, versionDir string) error {
+	lockBytes, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, "repo", ".cks/knowledge/knowledge.lock.json")
 	if err != nil {
 		return err
 	}
@@ -211,7 +212,7 @@ func (k *KnowledgeProjection) validateRetained(versionDir string) error {
 		if !ok || want.Version != pin.Version || want.Digest != pin.Digest || want.OriginID != pin.OriginID {
 			return fmt.Errorf("v4 pack pin differs from lock")
 		}
-		buf, _, _, err := setup.ReadRetainedFile(versionDir, pin.OriginID, "pack.yaml")
+		buf, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, pin.OriginID, "pack.yaml")
 		if err != nil {
 			return err
 		}
