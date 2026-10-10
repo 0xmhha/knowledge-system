@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
-  "next_task": "N-08",
+  "next_task": "N-18",
   "active_source_binding": {
-    "revision": "4d69e93d73c6acc41ed26d8d0e793fc3ee306818",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-final2-a-2026-10-10/manifest-n10.json"
+    "revision": "963ac61642870cd02a1ec47013a4d5e391a9ca15",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-final2-b-2026-10-10/manifest-n09.json"
   },
   "tasks": [
     {
@@ -96,18 +96,27 @@
     {
       "id": "N-08",
       "purpose": "검색 품질",
-      "state": "verifying",
+      "state": "complete",
       "latest_result_document": "docs/spec-driven/FINAL2-RESULT.md",
       "latest_result": "FINAL2 candidate vs reference: recall delta 0.0, MRR delta -0.032 (descriptive CI95 -0.068..-0.006); inserted type declarations above gold in 5 questions, 0 improved; all groups <10 units, inconclusive; no improvement evidence",
-      "waiting_for": "user decision on the type-declaration insertion (keep, disable by default, or redesign) and a further independent FINAL for any change",
+      "waiting_for": null,
       "type_neighbors_document": "docs/spec-driven/N08-TYPE-NEIGHBORS.md",
       "type_neighbors_evidence_revision": "5488de77644065d3cc4c0fa4a6a0f2942228440f",
-      "type_neighbors_manifest": "system/eval/b0-knowledge-system/refactoring-n08-type-neighbors-2026-10-10/manifest.json"
+      "type_neighbors_manifest": "system/eval/b0-knowledge-system/refactoring-n08-type-neighbors-2026-10-10/manifest.json",
+      "evidence_revision": "a5daa601a4d093a1cbe488866c6c35c0aab87367",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-n08-disable-2026-10-11/manifest.json",
+      "required_checks": [
+        "N08-A",
+        "N08-B",
+        "N08-C"
+      ],
+      "improvement_confirmed": false,
+      "closure": "user decision 2026-10-11: no improvement evidence on FINAL2; type-declaration insertion opt-in via retrieval.type_neighbors (default off), code 16332767; default citations equal binary 37302b35 on 7/7 DEV requests"
     },
     {
       "id": "N-09",
       "purpose": "무답·기권",
-      "state": "verifying",
+      "state": "complete",
       "empty_snippet_helper_preparation": "docs/spec-driven/N09-EMPTY-SNIPPET-VERIFICATION.md",
       "empty_snippet_helper_evidence_revision": "8ec6bea883ae17450f7c127181686582b94e92b5",
       "empty_snippet_helper_manifest": "system/eval/b0-knowledge-system/refactoring-n09-empty-snippet-2026-10-08/manifest.json",
@@ -118,12 +127,21 @@
       "empty_snippet_helper_actual_human_decisions": 0,
       "empty_snippet_helper_committed_current_SHA_bindings": 1185,
       "empty_snippet_helper_verified_substep": "Legacy CKV evaluation helper accepted4empty/whitespace source snippets and miscounted4hit/example fixture as1nonverified instead of3; RED4subtests+aggregate,fix separate empty_snippet after existing source/line checks; related2pkgrace103test/4subtest pass1realBGE smoke skip,vet/boundary/format pass; GPG fixture and cache restrictions preserved separately,command-local fixture signing override only; no search pipeline/strict0/actual abstention/model/FINAL/human claims.",
-      "waiting_for": "larger approved unanswerable/answerable contrast set (>=10 units) or a user decision on closing with an inconclusive result",
+      "waiting_for": null,
       "latest_result_document": "docs/spec-driven/FINAL2-RESULT.md",
       "latest_result": "FINAL2 B: knowledge-on ABS rows 240/240 declared_unknown citing only the basis line; knowledge-off off-basis rate 1.0; contrast/DEV false abstention 0/600; two ABS units, inconclusive; answer-level abstention null",
       "declared_unknown_document": "docs/spec-driven/N09-DECLARED-UNKNOWN.md",
       "declared_unknown_evidence_revision": "5488de77644065d3cc4c0fa4a6a0f2942228440f",
-      "declared_unknown_manifest": "system/eval/b0-knowledge-system/refactoring-n09-declared-unknown-2026-10-10/manifest.json"
+      "declared_unknown_manifest": "system/eval/b0-knowledge-system/refactoring-n09-declared-unknown-2026-10-10/manifest.json",
+      "evidence_revision": "963ac61642870cd02a1ec47013a4d5e391a9ca15",
+      "manifest": "system/eval/b0-knowledge-system/refactoring-final2-b-2026-10-10/manifest-n09.json",
+      "required_checks": [
+        "N09-A",
+        "N09-B",
+        "N09-C"
+      ],
+      "effect_conclusive": false,
+      "closure": "user decision 2026-10-11: closed as inconclusive; guard verified mechanically (ABS knowledge-on 240/240 declared_unknown, false abstention 0/600); answer-level abstention null; not a default-on or release basis"
     },
     {
       "id": "N-10",
@@ -1143,6 +1161,40 @@
     "manifest": "system/eval/b0-knowledge-system/refactoring-final2-a-2026-10-10/manifest-n10.json",
     "document": "docs/spec-driven/FINAL2-RESULT.md",
     "unique_current_and_committed_SHA_bindings": 1511,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "changed_sources": [],
+    "product_code_changed": false,
+    "reviewer": null,
+    "individual_human_approvals": 0,
+    "status": "PASS"
+  },
+  "latest_n08_disable": {
+    "revision": "a5daa601a4d093a1cbe488866c6c35c0aab87367",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-n08-disable-2026-10-11/manifest.json",
+    "document": "docs/spec-driven/N08-TYPE-NEIGHBORS.md",
+    "unique_current_and_committed_SHA_bindings": 1483,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "changed_sources": [
+      "cmd/cks/mcpcli/serve.go",
+      "internal/system/config/config.go",
+      "internal/system/config/config_test.go",
+      "internal/system/mcp/get_for_task_v2.go",
+      "internal/system/mcp/get_for_task_v2_ontology_knowledge_test.go",
+      "internal/system/mcp/server.go",
+      "internal/system/mcp/type_neighbors_test.go"
+    ],
+    "product_code_changed": true,
+    "reviewer": null,
+    "individual_human_approvals": 0,
+    "status": "PASS"
+  },
+  "latest_n09_closure": {
+    "revision": "963ac61642870cd02a1ec47013a4d5e391a9ca15",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-final2-b-2026-10-10/manifest-n09.json",
+    "document": "docs/spec-driven/N09-DECLARED-UNKNOWN.md",
+    "unique_current_and_committed_SHA_bindings": 1497,
     "current_SHA_all_match": true,
     "committed_blob_SHA_all_match": true,
     "changed_sources": [],
