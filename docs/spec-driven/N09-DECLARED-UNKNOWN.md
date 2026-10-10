@@ -1,5 +1,7 @@
 # N09 검토된 미지정 사실에서의 기권
 
+2026-10-11 종료: 사용자 결정(inconclusive로 종료). guard는 기본 경로에 그대로 있고, 검토된 unknowns 레코드가 있을 때만 동작한다. **N09 완료(기계 동작 확인·inconclusive)**.
+
 2026-10-11 후속: [FINAL2](./FINAL2-RESULT.md)에서 승인 unknowns 2건으로 무답 on arm 240/240 `declared_unknown`, 대조 잘못된 기권0. 무답2단위라 inconclusive.
 
 2026-10-10 · **제품 변경·시험 완료 / 저장소 자료·검토·새 FINAL 대기 / N09 미완료**. 전체13/18, 남은5개.

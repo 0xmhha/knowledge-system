@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-11 최신 단계: **N08·N09 종료(사용자 결정)**. N08은 FINAL2 개선 근거가 없어 사용 타입 선언 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 돌렸고, 기본 인용은 이전 binary와 7/7 같다. N09는 guard 기계 동작을 확인했지만 무답 2단위라 inconclusive로 종료했다. 전체16/18·남은2개: N16, N18.
+
 2026-10-11 최신 단계: **FINAL2 실행·채점, N10 완료**. [결과·판정](./FINAL2-RESULT.md) — 후보 FINAL warm p95비 1.039–1.109로 N10-C 충족, 검색 차이는 모두 N08 삽입. N08 MRR −0.032·개선 근거 없음, N09 guard 동작·inconclusive. 전체14/18·남은4개.
 
 2026-10-10 최신 단계: **FINAL2 초안 검토 요청(미동결·미실행)**. [초안](./FINAL2-DRAFT-REVIEW.md) — 소규모: N10은 p95비로 판정 가능, N08·N09는 소표본으로 inconclusive 예정. runner 참조 binary 실행·채점기 binary 비교 추가. 전체13/18·남은5개.
@@ -281,6 +283,22 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 ### N11-C runner 보호 세부 단계 — 검증 완료 / 전체 미완료
 
 [실행 보호 계약](./N11-EVALUATION-RUNNER-CONTRACT.md)의 사전 입력 검사·frozen runtime/source/model/config/binary/K 결합과 FINAL dispatch 전 영구 OS 잠금/내구성 예약을 구현했다. Python19개·Go binding 정상1/거부10 및 기존2패키지 race, native CLI4제어를 확인했다. 예약은 관측이 아니며 crash/실패 뒤에도 자동 회수하지 않는다. 실제 미승인 DEV 초안은 child dispatch0/새질의0으로 거부됐다. 새 승인·FINAL·실제 평가 결과가 없어 N11-A–D는 모두 미완료다. 원 FINAL/승인 입력은 불변이다.
+
+## N-08: 검색 품질(사용 타입 선언)
+
+**상태: 완료(개선 근거 없음·기본 비활성) · 2026-10-11.** 이 절의 체크는 작업리스트 N-08 수용 열과 2026-10-11 사용자 종료 결정("기본 비활성 후 종료")을 옮긴 것이다. "개선 확인" 조건은 충족하지 못했다. 개선이 확인되지 않은 상태로 종료하며, 품질 개선을 주장하지 않는다. [FINAL2 결과](./FINAL2-RESULT.md) — 이전/새 binary의 recall은 같고 MRR은 −0.032다. 삽입된 선언이 5문항에서 gold보다 위에 들어갔고, 개선된 문항은 없다. [비활성 기록](./N08-TYPE-NEIGHBORS.md)
+
+- [x] N08-A 질문/gold hardcode 없이 원인을 분리하고 후보를 구현·시험. 원인은 타입 선언의 순위와 `uses_type` edge 누락이다.
+- [x] N08-B 사전 승인한 새 독립 FINAL에서 이전/새 binary의 품질·회귀를 판정. 중요군 소표본은 inconclusive로 명시하고, 개선 근거가 없음을 기록.
+- [x] N08-C 개선 근거가 없으므로 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 돌림. 기본 응답이 이전 binary와 같고 원문/신원/안전 시험이 유지됨을 확인.
+
+## N-09: 무답·기권(미지정 사실)
+
+**상태: 완료(기계 동작 확인·inconclusive) · 2026-10-11.** 이 절의 체크는 작업리스트 N-09 수용 열과 2026-10-11 사용자 종료 결정("inconclusive로 종료")을 옮긴 것이다. 무답 단위가 2개뿐이어서 효과 크기는 inconclusive다. 답변 수준 기권은 null이다. 기본 활성화나 출시 근거로 쓰지 않는다. [FINAL2 결과](./FINAL2-RESULT.md), [구현](./N09-DECLARED-UNKNOWN.md)
+
+- [x] N09-A 무답의 검색 근거 상태와 downstream 보류 계약을 구현·시험. `declared_unknown` 상태에서는 근거 줄만 인용하고, 혼합 인용과 상태 밖 레코드는 거부한다.
+- [x] N09-B 승인된 무답/답가능 대조 사례에서 guard를 검증. 무답 knowledge on은 240/240행이 `declared_unknown`이고 근거 외 인용이 0이다. 대조·DEV의 잘못된 기권은 0/600이다.
+- [x] N09-C 사람 기권과 기계 무인용을 따로 집계. 생성 답변 평가가 없으므로 답변 수준 기권은 null이고, 소표본은 inconclusive로 기록.
 
 ## N-10: 비용·지연과 비반환 진단
 

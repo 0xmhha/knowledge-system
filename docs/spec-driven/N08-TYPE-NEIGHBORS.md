@@ -1,5 +1,7 @@
 # N08 사용 타입 선언을 v2 근거에 추가 (후보 B)
 
+2026-10-11 종료: 사용자 결정(기본 비활성 후 종료)으로 삽입을 opt-in `retrieval.type_neighbors`(기본 off)로 돌렸다(`16332767`). 기본 응답은 이전 binary(`37302b35`)와 DEV 7문항 인용이 같고, 옵션을 켜면 6문항에 선언이 들어간다([기록](../../system/eval/b0-knowledge-system/refactoring-n08-disable-2026-10-11/smoke-result.json)). **N08 완료(개선 근거 없음·기본 비활성)**.
+
 2026-10-11 후속: [FINAL2](./FINAL2-RESULT.md)에서 이전 binary 대비 recall 동일, MRR −0.032(삽입 선언이 gold 위로 들어간 5문항, 개선 문항0). 개선 근거 없음, inconclusive.
 
 2026-10-10 · **코드 변경·시험·DEV 개발 측정 완료 / 새 독립 FINAL 필요 / N08 미완료**. 전체13/18, 남은5개.
