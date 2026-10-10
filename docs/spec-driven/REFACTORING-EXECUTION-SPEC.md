@@ -1,5 +1,7 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-10 최신 단계: **FINAL2 초안 검토 요청(미동결·미실행)**. [초안](./FINAL2-DRAFT-REVIEW.md) — 소규모: N10은 p95비로 판정 가능, N08·N09는 소표본으로 inconclusive 예정. runner 참조 binary 실행·채점기 binary 비교 추가. 전체13/18·남은5개.
+
 2026-10-10 최신 단계: **N09 미지정 사실 기권·N08 사용 타입 선언 추가(제품 변경)**. [N09](./N09-DECLARED-UNKNOWN.md) — 검토된 unknowns 레코드에 일치하면 근거 줄만 인용·`declared_unknown`, 혼합 인용 거부(시험6·변이6). [N08](./N08-TYPE-NEIGHBORS.md) — uses_type 선언+doc comment 최대2개 삽입, DEV 개발 측정 Recall@10 0.762→0.833·MRR 0.544→0.563, p95비 0.98–1.05. 저장소 unknowns 자료 검토·새 corpus·새 독립 FINAL(이전/새 binary 비교 포함)이 남는다. 전체13/18·남은5개.
 
 2026-10-10 최신 단계: **N10 요청 단위 archive 검증 공유**. [변경·DEV 측정](./N10-REQUEST-VERIFICATION.md) — 요청당 전체 검증 3–8회→2회, 시험3·변이4 검출·17패키지 race 통과, DEV 개발 측정 p95비 0.92–0.98·품질 DEV3와 동일. 종료 시 강제 종료 9건(측정 행 실패0)과 N10-C의 새 독립 FINAL 필요가 남는다. 전체13/18·남은5개: N08, N09, N10, N16, N18.
