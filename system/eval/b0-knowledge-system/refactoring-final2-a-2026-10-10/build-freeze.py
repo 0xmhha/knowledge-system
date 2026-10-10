@@ -1,4 +1,5 @@
-"""Freeze FINAL2 part A under the user's approval ("모두 승인, 표기 opus5.5 검토").
+"""Freeze FINAL2 part A v2 under the user's approvals ("모두 승인, 표기 opus5.5 검토" for the draft,
+"승인, 표기 opus5.5 검토" for the v2 replacements).
 
 Approves the drafted question book and protocol unchanged except for
 review fields, pins the candidate and reference binaries, declares ABS out
@@ -13,19 +14,25 @@ REVIEWER, KIND = "opus5.5 검토", "ai_model_label_designated_by_user"
 CANDIDATE = "dc6cf0a9e794f5180ca87cd414fbab780c73d344711c22fa84e3c36d0e5ca5ab"  # cks built from 7077741f
 sha = lambda b: hashlib.sha256(b).hexdigest()
 
-decision = {"schema_version": 1, "asked": "FINAL2 초안(문서 FINAL2-DRAFT-REVIEW.md)을 어떻게 처리할까요?",
+decision_v1 = {"schema_version": 1, "asked": "FINAL2 초안(문서 FINAL2-DRAFT-REVIEW.md)을 어떻게 처리할까요?",
             "answer": "모두 승인, 표기 opus5.5 검토", "answered_via": "chat option selection", "date": "2026-10-10",
             "scope": "part A questions/gold and protocol, part B unknown records and questions, reviewer label",
             "draft_document": "docs/spec-driven/FINAL2-DRAFT-REVIEW.md", "user_active_time_measured": None,
             "independent_human_content_review": False}
+decision = {"schema_version": 1, "decisions": [decision_v1, {"asked": "A v2의 교체 문항 11개를 승인할까요?",
+            "answer": "승인, 표기 opus5.5 검토 (권장)", "answered_via": "chat option selection", "date": "2026-10-10",
+            "scope": "eleven part A replacement questions (index scope defect); protocol and part B unchanged",
+            "draft_document": "docs/spec-driven/FINAL2-DRAFT-REVIEW.md section 6", "user_active_time_measured": None,
+            "independent_human_content_review": False}]}
 (D / "user-decision.json").write_text(json.dumps(decision, ensure_ascii=False, indent=1) + "\n")
 
-book = json.loads((DRAFT / "part-a-question-book.json").read_text())
+book = json.loads((DRAFT / "part-a-question-book-v2.json").read_text())
 for q in book["questions"]:
     q.update(review_state="approved", reviewer=REVIEWER, reviewer_kind=KIND,
              independence_review="approved: new fact clusters disjoint from observed N11 DEV/FINAL and B0 questions; DEV/FINAL disjoint",
              contamination_review="approved: frozen N11 corpus excludes docs/spec-driven/N11-*, N12-* and system/eval/**; observation catalog checked by input gate")
-book.update(status="approved", reviewer=REVIEWER, reviewer_kind=KIND, draft_sha256=sha((DRAFT / "part-a-question-book.json").read_bytes()))
+book.update(status="approved", reviewer=REVIEWER, reviewer_kind=KIND, draft_sha256=sha((DRAFT / "part-a-question-book-v2.json").read_bytes()),
+            index_scope_check="index-scope-check.json (required pass before freeze)")
 proto = json.loads((DRAFT / "part-a-protocol-draft.json").read_text())
 proto["execution_binding"] = dict(proto["execution_binding"], binary_sha256=CANDIDATE)
 proto.update(status="approved", reviewer=REVIEWER, reviewer_kind=KIND, execution_allowed=True,
