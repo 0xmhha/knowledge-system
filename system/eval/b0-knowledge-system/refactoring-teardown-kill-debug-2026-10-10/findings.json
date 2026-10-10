@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "symptom": "cks eval matrix records 'close <phase> <arm>: signal: killed' (DEV2 16, DEV4 9, FINAL2 A v2 DEV 5); every measured row is complete",
+  "mechanism": "mcp-go closes stdin, waits 2 s, sends SIGTERM, waits 3 s, then SIGKILL. cks mcp catches SIGTERM and continues its deferred cleanup, so any teardown longer than about 5 s is killed.",
+  "reproduction": [
+    {"time": "2026-10-10T09:43Z", "binary": "cks-7077741f", "setup": "8 warm servers alive, 12 sequential cold ontology-arm servers", "cold_exit_s": "3.2-6.4 for 10 of 12; 5 over 5 s"},
+    {"time": "2026-10-10T09:46Z-09:52Z", "binary": "temporary phase-profiled build of the same product code", "runs": 44, "over_5s": 0, "load": "up to 26"},
+    {"time": "2026-10-10T09:53Z", "binary": "cks-7077741f", "runs": 16, "over_5s": 0}
+  ],
+  "phase_profile": "stdin close to stdio server return 0.00 s; the dominant teardown step is removing the materialized read tree (~1,450 files): 0.21-0.73 s; backends, jobs, footprint and leases close in <= 0.03 s",
+  "assessment": "intermittent and not explained by CPU load alone; cold starts that build the same tree spiked to 18-32 s in the DEV attempt. Leading explanation: intermittent disk I/O contention on the temporary tree (confidence Mid, not proven).",
+  "product_defect_found": "killed servers leave their plain source copy: 78 cks-read-source-* directories (387 MB) in the user temporary directory, oldest 2026-10-07",
+  "fix": "0fb824e5 owner-PID tagged read trees and a startup sweep of copies whose owner has exited; tests and four caught mutations; legacy unowned copies are not removed by code",
+  "not_fixed": "the 5 s client grace can still be exceeded under contention; FINAL2 keeps its zero-error gate and the frozen candidate binary 7077741f does not include the sweep"
+}
