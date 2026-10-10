@@ -1,0 +1,17 @@
+{
+ "schema_version": 1,
+ "purpose": "check whether relevance-gated type-declaration insertion could fix the FINAL2 N08 result before writing a FINAL3",
+ "binary": "cks built at 16332767 (sha256 2ec344aefd5382585c5537767ce94c7bf4d97842715d7641f006f2d408df0fde), frozen N11 corpus, baseline_off config, one query per question; retrieval.type_neighbors off vs on",
+ "dev_set": "30 observed non-ABS questions (N11 DEV3 run question book 15, FINAL2 A 15); development only, never a FINAL",
+ "results": {
+  "gold_rank_1": 9, "gold_rank_2_to_10": 20, "gold_missed": 1,
+  "gold_file_in_top5": 27,
+  "declaration_gold_questions_with_rank_above_1": 6,
+  "of_which_gold_span_already_cited": 5,
+  "insertion_off_recall_mrr": [0.911, 0.519], "insertion_on_recall_mrr": [0.928, 0.499],
+  "insertion_on_rank_down": 8, "insertion_on_rank_up": 0,
+  "mrr_upper_bound_if_cited_declaration_gold_ranked_first": 0.637
+ },
+ "conclusion": "the shortfall is ordering among already-retrieved citations, not missing declarations; insertion skips spans that overlap cited ones, so gating it cannot raise MRR. A fix would be a new re-ranking design.",
+ "user_decision": "2026-10-11 재시도 중단, N18로 (권장): N08 stays closed with type-declaration insertion off by default"
+}

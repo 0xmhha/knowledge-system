@@ -1,5 +1,6 @@
 # N08 사용 타입 선언을 v2 근거에 추가 (후보 B)
 
+2026-10-11 재시도 검토: 관측된 30문항 개발 세트에서 gold 선언 6문항 중 5개는 이미 인용되어 있고(순위 2–7위), 삽입은 겹치는 선언을 넣지 않아 관련성 조건으로도 MRR을 올릴 수 없다. 원인은 이미 검색된 인용 사이의 순위다(재순위 상한 MRR 0.519→0.637). 사용자 결정으로 재시도를 중단했다([분석](../../system/eval/b0-knowledge-system/refactoring-n08-retry-analysis-2026-10-11/analysis.json)).
 2026-10-11 종료: 사용자 결정(기본 비활성 후 종료)으로 삽입을 opt-in `retrieval.type_neighbors`(기본 off)로 돌렸다(`16332767`). 기본 응답은 이전 binary(`37302b35`)와 DEV 7문항 인용이 같고, 옵션을 켜면 6문항에 선언이 들어간다([기록](../../system/eval/b0-knowledge-system/refactoring-n08-disable-2026-10-11/smoke-result.json)). **N08 완료(개선 근거 없음·기본 비활성)**.
 
 2026-10-11 후속: [FINAL2](./FINAL2-RESULT.md)에서 이전 binary 대비 recall 동일, MRR −0.032(삽입 선언이 gold 위로 들어간 5문항, 개선 문항0). 개선 근거 없음, inconclusive.
