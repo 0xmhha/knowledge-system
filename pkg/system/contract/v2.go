@@ -58,6 +58,18 @@ type KnowledgeContextV2 struct {
 	TestLinks           []string               `json:"test_links"`
 	Unknowns            []string               `json:"unknowns"`
 	Conflicts           []KnowledgeConflictV2  `json:"conflicts"`
+	// DeclaredUnknowns is set only in state "declared_unknown": the project
+	// recorded that the asked fact is not decided, and the pack cites only the
+	// archived lines that say so.
+	DeclaredUnknowns []KnowledgeUnknownV2 `json:"declared_unknowns,omitempty"`
+}
+
+// KnowledgeUnknownV2 is a reviewed record that a fact is not decided.
+type KnowledgeUnknownV2 struct {
+	ID         string       `json:"id"`
+	ReviewedBy string       `json:"reviewed_by"`
+	RecordedOn string       `json:"recorded_on"`
+	Citations  []CitationV2 `json:"citations"`
 }
 
 type KnowledgeSemanticV2 struct {

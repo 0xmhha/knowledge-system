@@ -40,7 +40,7 @@ func NewCmd() *cobra.Command {
 			if err := os.MkdirAll(dir, 0o700); err != nil {
 				return err
 			}
-			for _, name := range []string{"domain", "policies", "decisions", "relations", "trace-links", "reviews", "questions"} {
+			for _, name := range []string{"domain", "policies", "decisions", "relations", "trace-links", "unknowns", "reviews", "questions"} {
 				if err := os.MkdirAll(filepath.Join(dir, name), 0o700); err != nil {
 					return err
 				}

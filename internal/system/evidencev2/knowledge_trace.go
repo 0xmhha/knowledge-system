@@ -30,7 +30,8 @@ func AttachVerifiedTraces(ctx context.Context, base contract.EvidencePackV2, ver
 	if err != nil {
 		return contract.EvidencePackV2{}, err
 	}
-	if k.KnowledgeContext.State == "restricted" || k.KnowledgeContext.State == "conflict" || k.KnowledgeContext.State == "unavailable" {
+	if k.KnowledgeContext.State == "restricted" || k.KnowledgeContext.State == "conflict" || k.KnowledgeContext.State == "unavailable" ||
+		k.KnowledgeContext.State == "declared_unknown" {
 		return base, nil
 	}
 	if snapshot := projection.Snapshot(); snapshot.ProjectID != base.Coordinates.ProjectID || snapshot.DatasetID != base.Coordinates.DatasetID || snapshot.SnapshotID != base.Coordinates.SnapshotID {
