@@ -1,0 +1,48 @@
+version: 1
+name: cks
+description: 'FINAL2 part B corpus with declared-unknown overlay; no semantic projection for this dataset; N11 store opened read-only (reviewer label: opus5.5 검토)'
+backends:
+    ckg:
+        path: /private/tmp/ks-final2b-cp95u_sj/dataset/final2b-candidate/graph/graph.db
+        source_root: /private/tmp/ks-final2b-cp95u_sj/source
+        timeout_ms: 5000
+        binary_path: /private/tmp/ks-final2b-cp95u_sj/bin/ckg
+        policy_file: ""
+    ckv:
+        path: /private/tmp/ks-final2b-cp95u_sj/dataset/final2b-candidate/vector
+        provider: ollama
+        binary_path: /private/tmp/ks-final2b-cp95u_sj/bin/ckv
+        timeout_ms: 3000
+        embed_model: bge-m3:latest
+        embed_dim: 1024
+        query_prefix_policy: registry
+        ollama_url: http://127.0.0.1:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: true
+    transport: stdio
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: /private/tmp/ks-final2b-cp95u_sj/run-F2B-FINAL/capture/footprints/baseline_on
+    audit_dir: ""
+    measure_backend_calls: true
+sanitize:
+    rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: /private/tmp/ks-n11-eval-m13oocru/semantic-eval.sqlite
+    ontology_mode: baseline
+    ontology_budget_ms: 5000
+service:
+    label_prefix: ""
+retrieval:
+    recall_k: 10
