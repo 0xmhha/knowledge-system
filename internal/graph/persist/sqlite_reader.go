@@ -464,43 +464,43 @@ func (s *sqliteStore) SubgraphByQname(qname string, depth int) ([]types.Node, []
 // edgesFrom returns every edge whose src is in ids. When edgeTypes is
 // non-empty, the result is filtered to those types (e.g. just `calls`).
 func (s *sqliteStore) edgesFrom(ids []string, edgeTypes []string) ([]types.Edge, error) {
-	if len(ids) == 0 {
-		return nil, nil
+	return s.edgesByEndpoint("src", ids, edgeTypes)
+}
+
+// edgesByEndpoint returns every edge whose column (src or dst) is in ids,
+// optionally filtered by type. A traversal frontier can hold tens of
+// thousands of IDs, so the IN list is split into queryEdgesChunk pieces to
+// stay under SQLite's variable limit. Each edge has one value per column,
+// so chunks never return the same edge twice.
+func (s *sqliteStore) edgesByEndpoint(column string, ids []string, edgeTypes []string) ([]types.Edge, error) {
+	var out []types.Edge
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
+		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `)`
+		args := anys(chunk)
+		if len(edgeTypes) > 0 {
+			q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
+			args = append(args, anys(edgeTypes)...)
+		}
+		rows, err := s.db.Query(q, args...)
+		if err != nil {
+			return nil, fmt.Errorf("edges by %s for %d ids: %w", column, len(ids), err)
+		}
+		es, err := scanEdges(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, es...)
 	}
-	q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE src IN (` + placeholders(len(ids)) + `)`
-	args := anys(ids)
-	if len(edgeTypes) > 0 {
-		q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
-		args = append(args, anys(edgeTypes)...)
-	}
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("edges from %d ids: %w", len(ids), err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanEdges(rows)
+	return out, nil
 }
 
 // edgesPointingTo returns every edge whose dst is in ids. When edgeTypes
 // is non-empty, the result is filtered to those types.
 func (s *sqliteStore) edgesPointingTo(ids []string, edgeTypes []string) ([]types.Edge, error) {
-	if len(ids) == 0 {
-		return nil, nil
-	}
-	q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE dst IN (` + placeholders(len(ids)) + `)`
-	args := anys(ids)
-	if len(edgeTypes) > 0 {
-		q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
-		args = append(args, anys(edgeTypes)...)
-	}
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("edges pointing to %d ids: %w", len(ids), err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanEdges(rows)
+	return s.edgesByEndpoint("dst", ids, edgeTypes)
 }
 
 // NodesByIDs fetches nodes by primary key. Empty input yields a nil slice
@@ -509,12 +509,23 @@ func (s *sqliteStore) NodesByIDs(ids []string) ([]types.Node, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
-	rows, err := s.db.Query(`SELECT `+nodeColumns+` FROM nodes WHERE id IN (`+placeholders(len(ids))+`)`, anys(ids)...)
-	if err != nil {
-		return nil, fmt.Errorf("nodes by %d ids: %w", len(ids), err)
+	// Chunked like edgesByEndpoint: callers pass whole traversal frontiers
+	// and viewer selections.
+	var out []types.Node
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		rows, err := s.db.Query(`SELECT `+nodeColumns+` FROM nodes WHERE id IN (`+placeholders(len(chunk))+`)`, anys(chunk)...)
+		if err != nil {
+			return nil, fmt.Errorf("nodes by %d ids: %w", len(ids), err)
+		}
+		ns, err := scanNodes(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, ns...)
 	}
-	defer func() { _ = rows.Close() }()
-	return scanNodes(rows)
+	return out, nil
 }
 
 // AmbiguousMetaNodes returns Hunk + Commit rows with confidence='AMBIGUOUS'.
