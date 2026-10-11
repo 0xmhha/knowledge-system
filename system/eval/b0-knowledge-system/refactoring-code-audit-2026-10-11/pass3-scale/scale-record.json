@@ -1,0 +1,50 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "graph": "local operating dataset ks-operating/dataset/v1/graph/graph.db (go-stablenet 740526d0; 245,927 nodes, 1,982,706 edges), opened read-only immutable; no sidecar files appeared",
+ "probe": "scale-probe_test.go.txt run as a temporary test in internal/system/ckgclient with ZZ_GRAPH set; not committed as a test",
+ "before_fix_transcribed": {
+  "note": "copied from the probe's output at 89834297+aa259766 (pre-fix), not saved as a file at the time",
+  "get_subgraph_max80": {
+   "common.HexToHash": {
+    "d1": "524ms 87MB",
+    "d2": "350ms 94MB",
+    "d3": "335ms 104MB",
+    "d4": "3.673s 2791MB",
+    "d5": "9.145s 5415MB"
+   },
+   "types.Block.Hash": {
+    "d1": "295ms 87MB",
+    "d2": "333ms 109MB",
+    "d3": "568ms 291MB",
+    "d4": "5.991s 4582MB",
+    "d5": "18.316s 10650MB"
+   },
+   "vm.newFrontierInstructionSet": {
+    "d1": "407ms 88MB 15 edges",
+    "d2": "332ms 106MB 42 edges",
+    "d3": "365ms 132MB 62 edges",
+    "d4": "1.078s 712MB 80 edges",
+    "d5": "6.511s 3827MB 80 edges"
+   }
+  },
+  "per_call_fixed_cost": "commit(): 150ms 85MB per call (full manifest re-read)"
+ },
+ "rejected_variant": "budget on raw edges (2,000) cut vm.newFrontierInstructionSet depth 4-5 from 80 to 42 edges (after-raw-budget-rejected.txt); replaced by a budget on usable edges plus a 50,000-edge total cap",
+ "after_fix": "after-usable-budget.txt: hubs depth 2-5 about 0.14 s and 1-2 MB with 80 edges; vm.newFrontierInstructionSet keeps 42/62/80/80 edges, depth 4-5 1.1-1.7 s and 698 MB (it must walk depth 4 to reach 80 usable edges); commit() 0 MB after the first read",
+ "behavior_change": "when a shallower level already has max_total usable edges, the response takes them from that level; hubs returned 81 citations instead of 82",
+ "remaining": "FindSymbol's 85 MB in the after run was the first call and paid the one-time manifest read (commit() alone measured 0 MB right after); the worst-case 698 MB walk remains for seeds whose usable edges are sparse",
+ "fix_commit": "e5430551",
+ "tests": [
+  "internal/system/ckgclient TestCommitIsReadOnceAndFailuresAreRetried (RED: 4 reads, want 2)",
+  "TestGetSubgraphStopsDeepeningOnceTheBudgetIsReached",
+  "TestGetSubgraphTotalBudgetBoundsUnusableEdges"
+ ],
+ "regression": {
+  "revision": "e5430551",
+  "go_test_race": "3277 passed, 16 skipped, 0 failed",
+  "go_vet": "pass",
+  "gofmt": "0 files",
+  "python_script_tests": "164 passed"
+ }
+}
