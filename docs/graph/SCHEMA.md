@@ -1,6 +1,6 @@
 # CKG Schema (V0)
 
-Schema version: **1.23**.
+Schema version: **1.24**.
 
 > **Authoritative source of truth (single source).** The machine-readable
 > node/edge type lists and their exact counts live in `pkg/graph/types/enums.go`
@@ -12,42 +12,31 @@ Schema version: **1.23**.
 
 Version history (each bump invalidates the file-level cache by design):
 
-A5 (1.0 → 1.1) reserved concurrency lock slots; A3 (1.1 → 1.2) added
-incremental cache infrastructure (FK ON DELETE CASCADE on
-edges/blobs/pkg_tree/topic_tree); E3 (1.2 → 1.3) added distributed
-topology nodes/edges; E4 (1.3 → 1.4) added temporal commit nodes/edges;
-G6v3 (1.4 → 1.5) added pending_refs persistence; P2 (1.5 → 1.6) added
-context-propagation edges; Track C P1b (1.6 → 1.7) added the optional
-`dispatch_kind` metadata column on edges (populated only for `invokes`
-to disambiguate interface_method / func_value / method_value / closure);
-Hunk-graph H1+H2 (1.7 → 1.8) added NodeHunk + has_hunk/adjacent/modifies;
-schema-1.9-spec W1 (1.8 → 1.9) reused NodeEndpoint for TypeScript HTTP
-server detection (no new enum literals), W2 appended `http_calls` (TS+Go
-HTTP client call sites), W3b appended `grpc_listens_on` + `grpc_calls`
-(Go gRPC server/client detection); within-language semantics Phase 4
-(1.9 → 1.10) appended `NodeAwaitPoint` + edges `awaits` (W-B) and
-`overrides` (W-C) as slot reservations ahead of the Phase 5 detectors;
-W-C W11 V7 (1.10 → 1.11) added the `nodes.attrs` JSON-blob column
-(`internal/graph/persist/node_attrs.go`) carrying per-node markers; 1.11 → 1.13
-internal bumps; P1 #4 (1.13 → 1.14) added `NodePolicy` + edge `governed_by`
-(`pkg/graph/policy`, opt-in `--policy-file`); P1 #5 (1.14 → 1.15) added
-`NodeSecurityPattern` + edge `has_security_pattern` (`pkg/graph/security`, opt-in
-`--security-pattern-file`). `using_for` (Solidity using-for, W-C) is also
-present in the current edge set. PR #23 (1.15 → 1.18) added full Go
-signatures + qualified call resolution (1.16), promoted-method nodes (1.17),
-and `writes_field` edges (1.18); symbol-identity Phase 1 (1.18 → 1.19)
-populates `canonical_id` across all parsers — all Go node kinds (types/fields/
-const/var/interface methods), and Solidity/TypeScript/proto using the relative
-file path as qualifier (Solidity adds a `(paramTypes)` signature for overloads).
-Refinement B1 (1.19 → 1.20) stops emitting `canonical_id` for the blank
-identifier `_`; B2 + B4 + B3 (1.20 → 1.21) skip `canonical_id` for function-local `var`s (only
-package-level const/var get one), drop proto's doubled `proto:` prefix, and
-line-qualify (`@<line>`) any canonical_id shared by >1 node in one file. PR #31
-(1.21 → 1.22) added the `nodes.simple_name` column (short last-segment name) so
-suffix lookups use an indexed equi-join instead of a leading-wildcard LIKE.
-ADR-0002 (1.22 → 1.23) gives primary (non-test-variant) Go packages deterministic
-ownership of production files in `buildFileIndex` (was order-dependent first-seen-wins;
-~17.5% of production files landed on a test variant), making the graph reproducible.
+| Version | Change |
+|---|---|
+| 1.0 → 1.1 | Reserved concurrency lock slots |
+| 1.1 → 1.2 | Incremental cache infrastructure (FK `ON DELETE CASCADE` on edges/blobs/pkg_tree/topic_tree) |
+| 1.2 → 1.3 | Distributed topology nodes and edges |
+| 1.3 → 1.4 | Temporal commit nodes and edges |
+| 1.4 → 1.5 | `pending_refs` persistence |
+| 1.5 → 1.6 | Context-propagation edges |
+| 1.6 → 1.7 | Optional `dispatch_kind` edge column (populated only for `invokes`) |
+| 1.7 → 1.8 | `Hunk` node and `has_hunk` / `adjacent` / `modifies` edges |
+| 1.8 → 1.9 | TypeScript HTTP server detection (reuses `Endpoint`), `http_calls`, `grpc_listens_on`, `grpc_calls` |
+| 1.9 → 1.10 | `AwaitPoint` node and `awaits` / `overrides` edges |
+| 1.10 → 1.11 | `nodes.attrs` JSON column (`internal/graph/persist/node_attrs.go`) |
+| 1.11 → 1.13 | Internal bumps |
+| 1.13 → 1.14 | `Policy` node and `governed_by` edge (`pkg/graph/policy`, opt-in `--policy-file`) |
+| 1.14 → 1.15 | `SecurityPattern` node and `has_security_pattern` edge (`pkg/graph/security`, opt-in `--security-pattern-file`) |
+| 1.15 → 1.18 | Full Go signatures and qualified call resolution (1.16), promoted-method nodes (1.17), `writes_field` edges (1.18) |
+| 1.18 → 1.19 | `canonical_id` populated by every parser (Solidity/TypeScript/proto qualify by relative path; Solidity adds a `(paramTypes)` signature for overloads) |
+| 1.19 → 1.20 | No `canonical_id` for the blank identifier `_` |
+| 1.20 → 1.21 | No `canonical_id` for function-local `var`s; proto prefix no longer doubled; a `canonical_id` shared by more than one node in a file is line-qualified (`@<line>`) |
+| 1.21 → 1.22 | `nodes.simple_name` column so suffix lookups use an indexed equi-join |
+| 1.22 → 1.23 | Primary (non-test-variant) Go packages own production files deterministically, making the graph reproducible |
+| 1.23 → 1.24 | Review index: `nodes.is_test`, `code_edges`, `node_commits` (see [Review index](#review-index-schema-124)) |
+
+`using_for` (Solidity using-for) is also present in the current edge set.
 Full per-bump rationale: `internal/graph/buildpipe/cache.go`.
 
 ## Node types (37)
@@ -75,20 +64,20 @@ function-body locals, embedded mutexes). `sub_kind ∈ {mutex, rwmutex}`.
 typesInfo, `INFERRED` in AST-only mode. See `archive/spec-ckg-v0.2.md` § 2 and
 `internal/graph/parse/golang/concurrency_test.go`.
 
-`Endpoint` (E3): an HTTP/RPC route entry point. `qualified_name`
+`Endpoint`: an HTTP/RPC route entry point. `qualified_name`
 encodes the protocol prefix (e.g. `http:/users`, `rpc:Foo.Bar`); `name`
 is the bare route. `sub_kind ∈ {http, rpc, ...}`. Emitted by the Go
 parser for `http.HandleFunc` / `http.Handle` / `(*ServeMux).HandleFunc`
 / `(*ServeMux).Handle` calls with a string-literal route. Dynamic routes
 are skipped (a runtime trace is the right hammer for those).
 
-`MessageType` (E3): a request/response type a handler dispatches on.
+`MessageType`: a request/response type a handler dispatches on.
 `qualified_name` is `pkg.TypeName` for in-source types, or
 `rpc:Service.Method` for placeholder targets of unresolved
 `client.Call("Service.Method", …)` invocations. `sub_kind ∈
 {rpc_request, rpc_method}`.
 
-`Commit` (E4): a git commit that touched one or more source files.
+`Commit`: a git commit that touched one or more source files.
 `name` = first 12 chars of the SHA, `qualified_name` = `commit:<full-sha>`,
 `signature` = `<unix-author-time>: <subject>` (truncated to 100 chars),
 `sub_kind` = `git`, `language` = `git` (sentinel — keeps audit's
@@ -117,25 +106,25 @@ commit's subject. Confidence semantics (hunk-graph.md §11.3, finalised
 2026-05-09): `EXTRACTED` for HEAD-reachable hunks (the only kind H1
 collects today); `AMBIGUOUS` reserved for unreachable hunks collected
 via reflog/fsck (slot live, parser does emit them when run with
-unreachable-collection enabled). The H3 EvidencePack assembler filters
+unreachable-collection enabled). The EvidencePack assembler filters
 to `confidence='EXTRACTED'` so the LLM never sees code paths that were
 rolled back by force-push; the human Recovery panel surfaces AMBIGUOUS
 explicitly.
 
-`AwaitPoint` (W-B, schema 1.10): statement-level node for TypeScript
+`AwaitPoint` (schema 1.10): statement-level node for TypeScript
 `await` expressions. One node per `await` site so graph queries can
 answer "where does control yield, and to which AsyncCallSite?". The
-schema-1.10 bump reserved the enum slot; the Phase 5 detector has since
+schema-1.10 bump reserved the enum slot; the detector has since
 **shipped** — the TS parser emits one `NodeAwaitPoint` per
 `await_expression` (`internal/graph/parse/typescript/async.go:56,98,114`),
 paired 1:1 with an inbound `awaits` edge. See
 `docs/graph/design/ts-async-await-and-interface.md §2.1 + §3.2`.
 
-`Policy` (P1 #4, schema 1.14): a governance/policy node loaded from an
+`Policy` (schema 1.14): a governance/policy node loaded from an
 opt-in `--policy-file` YAML (`pkg/graph/policy`), linked to governed symbols via
 `governed_by`. Empty policy file is the no-op default.
 
-`SecurityPattern` (P1 #5, schema 1.15): a security-pattern node loaded from
+`SecurityPattern` (schema 1.15): a security-pattern node loaded from
 an opt-in `--security-pattern-file` YAML (`pkg/graph/security`), linked to matched
 symbols via `has_security_pattern`. Additive, cold-only re-ingest.
 
@@ -173,29 +162,29 @@ critical section collapse to one edge so multi-mutation methods don't
 inflate the edge count. The viewer registers styling for all three
 edges; they're off by default like other concurrency edges.
 
-`listens_on` (E3): handler function/method → `Endpoint` it serves
-(net/http registration patterns). `handles_message` (E3): handler
+`listens_on`: handler function/method → `Endpoint` it serves
+(net/http registration patterns). `handles_message`: handler
 function/method → `MessageType` it dispatches on (matched on the net/rpc
 handler signature `func (T) M(args A, reply *R) error`). `rpc_calls`
-(E3): caller function → `MessageType` placeholder for the
+caller function → `MessageType` placeholder for the
 `Service.Method` target of `client.Call(...)`. All three are off by
 default in the viewer (opt-in via filter UI).
 
-`changed_in` (E4): any symbol whose file was touched by a commit →
+`changed_in`: any symbol whose file was touched by a commit →
 that `Commit`. **File-level heuristic** (V0 simplification): every node
 sharing a touched file emits one edge per commit, not per source line.
-Line-level blame (true `file:line → commit`) is deferred to G6 Phase 2.
-`blame` (E4): `File` node → its most recent commit (V0 simplification
+Line-level blame (true `file:line → commit`) is not implemented yet.
+`blame`: `File` node → its most recent commit (V0 simplification
 of the spec's `file:line → commit (마지막 수정)`). Both are off by
 default in the viewer; toggle via filter UI.
 
-`timeout_path` (P2): self-loop on a Go Function/Method whose body calls
+`timeout_path`: self-loop on a Go Function/Method whose body calls
 `context.WithTimeout` or `context.WithDeadline`. Deadline rolls into
 `timeout_path` because both express a wall-clock budget — graph queries
 that ask "which functions impose a time bound?" don't care about the
 distinction. Confidence is `EXTRACTED` when typesInfo confirms the
 `context` package binding, `INFERRED` in AST-only mode (matches
-`context.WithTimeout` selector by name only). `cancellation_path` (P2):
+`context.WithTimeout` selector by name only). `cancellation_path`:
 self-loop on a Go Function/Method whose body calls `context.WithCancel`
 or `context.WithCancelCause` (Go 1.20+). Distinct from `timeout_path`
 because cancellation is event-driven, not deadline-driven. Multiple call
@@ -250,20 +239,20 @@ matcher synthesises an `AMBIGUOUS` placeholder Endpoint
 typesInfo-confirmed → `EXTRACTED`, AST-only suffix-matcher → `INFERRED`,
 unresolved stub type → `AMBIGUOUS` placeholder.
 
-`awaits` (W-B, schema 1.10): edge for TypeScript async-suspension flow,
-`Function`/`Method` → `AwaitPoint`. **Emitted** by the Phase 5 detector
+`awaits` (schema 1.10): edge for TypeScript async-suspension flow,
+`Function`/`Method` → `AwaitPoint`. **Emitted** by the TypeScript detector
 (`internal/graph/parse/typescript/async.go:120`), one per `AwaitPoint` (pair
 invariant: `#AwaitPoint == #awaits`). Direction encodes "this function
 suspends here". See
 `docs/graph/design/ts-async-await-and-interface.md §2.1 + §3.2`.
 
-`overrides` (W-C, schema 1.10): edge for Solidity virtual/override
+`overrides` (schema 1.10): edge for Solidity virtual/override
 semantics. `Method` → `Method` between a child contract's method that
 overrides a parent's `virtual` method (also modifier→modifier for
 overridden modifiers). Direction = child → parent (Q4 decision in
 solidity-inheritance spec §5.0). Distinct from `implements` (interface
 satisfaction) because `overrides` is concrete-to-concrete virtual
-dispatch resolution. **Emitted** by the Phase 5 detector
+dispatch resolution. **Emitted** by the Solidity detector
 (`internal/graph/parse/solidity/overrides.go`, PendingRefs from
 `declarations.go`). See
 `docs/graph/design/solidity-inheritance-and-interface-dispatch.md §2.1 + §3.3`.
@@ -272,11 +261,24 @@ dispatch resolution. **Emitted** by the Phase 5 detector
 
 The `edges` table has an optional `dispatch_kind TEXT` column populated
 only for the `invokes` edge type. Values: `interface_method`,
-`func_value`, `method_value`, `closure` (Track C P1b). Empty string
+`func_value`, `method_value`, `closure`. Empty string
 otherwise. Migrate() ALTER-ADDs this column when opening a pre-1.7 DB
 (see `sqlite.go::ensureDispatchKindColumn`). SELECT projections
 enumerate columns explicitly (no SELECT *) so pre-1.7 readers tolerate
 the column being absent.
+
+## Review index (schema 1.24)
+
+Derived after every cold or incremental build (`RebuildReviewIndex`) so a
+function can be reviewed without walking commit history or test code. The
+`cks.context.review_function` tool reads it; a graph built before 1.24 answers
+`requires_reindex`.
+
+| Table / column | Content |
+|---|---|
+| `nodes.is_test` | Production/test partition computed once at build time: the test-path rule plus module-internal or test-named packages that only test code imports |
+| `code_edges(src, dst, type, line)` | Code-relation edges whose endpoints are both production code, indexed on `(src, type)` and `(dst, type)`; walks over it never reach tests or commits |
+| `node_commits(node_id, commit_id)` | Node → commit that changed it (`modifies` Hunk → node joined with `has_hunk` Commit → Hunk); a depth-1 history lookup, because one commit links thousands of nodes |
 
 ## Confidence
 

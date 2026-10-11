@@ -10,8 +10,17 @@ sanitized `EvidencePack` and exposes it through MCP for upper layers
 
 ## Status
 
-R1′ — wired. cks composes ckv (vector/meaning) and ckg (graph/keyword) **in-process**
-and exposes a 19-tool agent-facing MCP surface (`cks.context.*` + `cks.ops.*`) over stdio.
+Wired. cks composes ckv (vector/meaning) and ckg (graph/keyword) **in-process**
+and exposes a 24-tool agent-facing MCP surface (`cks.context.*` + `cks.ops.*`) over stdio
+or loopback HTTP. The authoritative tool list is the golden schema
+`internal/system/mcp/testdata/agent-mcp.schema.json`.
+
+`cks.context.review_function` reviews one function the way a reader would: its
+signature and data in/out, internal logic, and production callers back to entry
+points (including interface dispatch, goroutines, channels and locks). Commits and
+PRs that changed the function, and the tests that call it, come back in separate
+sections, so history and test code never flood the code view. It needs a graph built with
+schema 1.24 or later; older datasets answer `requires_reindex`.
 With no datasets configured it boots in a non-crashing degraded mode (Smart Dummy +
 `cks.ops.health` reports `degraded`).
 

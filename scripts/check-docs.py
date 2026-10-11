@@ -52,6 +52,7 @@ ALLOWED = (
     ("docs/design/cli-consolidation.md", ""),   # the migration's own narrative
     ("docs/downstream-sync.md", "make build-mcp"),
     ("docs/dev/README.md", "archive/"),   # its "Dangling references" section
+    ("repro-since-injection.sh", "--since \"--output="),  # the injected value is the point
 )
 
 # Paths that legitimately do not resolve in this tree.
