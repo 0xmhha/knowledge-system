@@ -1526,3 +1526,8 @@ func scanPGEdges(rows pgx.Rows) ([]types.Edge, error) {
 	}
 	return out, nil
 }
+
+// RebuildReviewIndex is not implemented for the deprecated PostgreSQL store
+// (ADR-0003); the review index exists only in SQLite graphs, and review
+// reads report it as missing.
+func (s *pgStore) RebuildReviewIndex([]string) error { return nil }

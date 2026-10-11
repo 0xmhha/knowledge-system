@@ -198,6 +198,12 @@ type StoreWriter interface {
 	// Indexing
 	RebuildFTS() error
 
+	// RebuildReviewIndex recomputes nodes.is_test (testFiles are the
+	// file_path values classified as test code), code_edges and
+	// node_commits from the persisted nodes and edges (schema 1.24). Run
+	// after every cold or incremental build, once all edges are stored.
+	RebuildReviewIndex(testFiles []string) error
+
 	// Manifest
 	SetManifest(m Manifest) error
 }

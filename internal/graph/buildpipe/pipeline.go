@@ -511,6 +511,9 @@ func runCold(opt Options, log *slog.Logger,
 			"security_nodes", len(secNodes), "has_security_pattern_edges", len(secEdges))
 	}
 	log.Debug("persist.end")
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+		return persist.Manifest{}, err
+	}
 
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)

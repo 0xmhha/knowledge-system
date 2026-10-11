@@ -60,6 +60,25 @@ func (s *sqliteStore) Migrate() error {
 	if err := ensureSimpleNameColumn(s.db); err != nil {
 		return fmt.Errorf("migrate simple_name on nodes: %w", err)
 	}
+	if err := ensureIsTestColumn(s.db); err != nil {
+		return fmt.Errorf("migrate is_test on nodes: %w", err)
+	}
+	return nil
+}
+
+// ensureIsTestColumn ALTER-adds nodes.is_test on pre-1.24 DBs. Idempotent.
+// RebuildReviewIndex populates it; the SchemaVersion 1.24 bump forces a cold
+// rebuild, so no backfill is needed here.
+func ensureIsTestColumn(db *sql.DB) error {
+	has, err := columnExists(db, "nodes", "is_test")
+	if err != nil {
+		return err
+	}
+	if !has {
+		if _, err := db.Exec(`ALTER TABLE nodes ADD COLUMN is_test INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return fmt.Errorf("alter nodes add is_test: %w", err)
+		}
+	}
 	return nil
 }
 

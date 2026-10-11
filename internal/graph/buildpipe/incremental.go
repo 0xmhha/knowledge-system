@@ -334,6 +334,12 @@ func runIncremental(opt Options, log *slog.Logger,
 		}
 	}
 
+	// The review index depends on the whole graph (test-only packages,
+	// endpoints of every code edge), so it is recomputed, not patched.
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+		return persist.Manifest{}, err
+	}
+
 	m := buildManifestSkeleton(opt, goCount, tsCount, solCount, protoCount, g, pkgTree, parseErrs)
 	// buildManifestSkeleton computes EnrichDigest from the code-only g (always
 	// ""); recompute it from the overlay re-applied above so the manifest pin

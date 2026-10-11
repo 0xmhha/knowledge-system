@@ -163,7 +163,11 @@ import (
 // order. A cold rebuild pins them to the primary package deterministically.
 // (This does not change canonical_id values — test variants share the import
 // path; it removes a latent non-reproducibility in resolution context.)
-const SchemaVersion = "1.23"
+//
+// 1.24 (2026-10-11): review index — nodes.is_test, code_edges and
+// node_commits, recomputed after every build (RebuildReviewIndex). The bump
+// forces a cold rebuild so existing graphs gain the index.
+const SchemaVersion = "1.24"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int
