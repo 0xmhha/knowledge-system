@@ -157,6 +157,12 @@ type StoreReader interface {
 	// See pkg/types.PRRef for the record schema and the build-time
 	// derivation (internal/buildpipe.ScanPRHistory).
 	GetNodePRs(nodeID string, cutoff time.Time) ([]types.PRRef, error)
+
+	// Review returns the production-code, history and test view of the
+	// production function or method named qname (schema 1.24). It returns
+	// ErrNoReviewIndex for older graphs and ErrReviewSeedNotFound when no
+	// production function has that qualified name.
+	Review(qname string, opts ReviewOptions) (Review, error)
 }
 
 // StoreWriter is the write surface used by buildpipe to materialise a graph
