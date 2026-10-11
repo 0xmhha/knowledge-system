@@ -1,0 +1,36 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "graph": "history-bearing graph of this repository: git clone --no-local of feat/refactoring-followup at 06507979 (committed files only), ckg build --lang go --no-cache --lock-propagation over cmd/internal/pkg: 107,318 nodes / 383,612 edges, 732 commits, 38,789 node_prs rows",
+ "why_the_walk_explodes": "changed_in links every changed node to its Commit; one commit links on average 2,448 and at most 60,623 nodes, so an untyped walk reaches most of the graph within two hops",
+ "test_share": "9,481 of 16,039 calls/invokes edges start in test files (this repository)",
+ "current_get_subgraph_depth2_200_random_production_seeds": {
+  "edges": 5876,
+  "test_touching": 1769,
+  "outside_code_neighbourhood": 4245,
+  "ms_total": 19021,
+  "ms_p50": 80.5,
+  "ms_max": 509
+ },
+ "prototype_review_view_same_seeds": {
+  "ms_total": 95.8,
+  "ms_p50": 0.41,
+  "ms_max": 6.1,
+  "bytes_p50": 1668.0,
+  "bytes_max": 7727,
+  "seeds_with_history": 58,
+  "seeds_with_test_callers": 57
+ },
+ "operating_graph_prototype": {
+  "graph": "go-stablenet operating dataset, 245,927 nodes, 1,982,706 edges",
+  "load_seconds": 4.59,
+  "max_rss_MB": 949,
+  "test_nodes": 89886,
+  "per_view_seconds": "0.0008-0.0036"
+ },
+ "found_while_prototyping": [
+  "path-based test classification misses test helper packages whose names are not in the rule (internal/testlog's logger stayed in an implementation list)",
+  "an interface implementation list must also exclude test implementations (fixed in the prototype)"
+ ],
+ "caveat": "the prototype holds the whole graph in memory (Python); current get_subgraph queries SQLite per request, so the per-call timing is not a like-for-like comparison"
+}

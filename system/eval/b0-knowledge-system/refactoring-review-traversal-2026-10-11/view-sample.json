@@ -1,0 +1,174 @@
+{
+ "load_seconds": 0.97,
+ "views": [
+  {
+   "seed": "build.resolveCommit",
+   "at": "internal/vector/build/reindex.go:752",
+   "code": {
+    "data": {
+     "signature": "func resolveCommit(srcRoot, rev string) (string, error)",
+     "uses_types": [],
+     "instantiates": [],
+     "writes_fields": [],
+     "returns": 2
+    },
+    "logic": {
+     "control": {
+      "IfStmt": 1
+     },
+     "call_sites_in_order": [
+      "L753 exec.Command(\"git\", \"-C\", srcRoot, \"rev-parse\", \"--verify\", \"--quiet\", \"--end-of-options\", rev+\"^{commit}\")",
+      "L754 strings.TrimSpace(string(out))",
+      "L754 string(out)",
+      "L756 fmt.Errorf(\"reindex: %q does not name a commit\", rev)"
+     ],
+     "call_sites_total": 4,
+     "project_callees": []
+    },
+    "callers": {
+     "via_interfaces": [],
+     "direct_callers": [
+      "build.resolveChangeSet"
+     ],
+     "paths_from_entry_points": [
+      "main.newRootCmd -> main.newReindexCmd -> main.runReindex -> build.Reindex -> build.resolveChangeSet -> build.resolveCommit"
+     ],
+     "entry_points": 1,
+     "production_callers_seen": 6,
+     "edges_visited": 33
+    },
+    "dynamic": {
+     "spawns_goroutines": [],
+     "sends_to": [],
+     "recvs_from": [],
+     "acquires_locks": [],
+     "releases_locks": [],
+     "timeout_paths": [],
+     "cancellation_paths": [],
+     "interface_calls_and_implementations": {}
+    }
+   },
+   "history": {
+    "commits_changing_seed": 1,
+    "recent": [
+     "d6e31eb23d fix(index): never pass a revision argument to git as an option"
+    ],
+    "prs": []
+   },
+   "tests": {
+    "test_callers": 0,
+    "examples": []
+   },
+   "available": "history: 1 commits, 0 PRs (change_history); tests: 0 test callers (find_callers with tests)",
+   "seconds": 0.0004
+  },
+  {
+   "seed": "persist.OpenReadOnly",
+   "at": "internal/graph/persist/sqlite.go:72",
+   "code": {
+    "data": {
+     "signature": "func OpenReadOnly(path string) (*sqliteStore, error)",
+     "uses_types": [
+      "persist.sqliteStore"
+     ],
+     "instantiates": [
+      "persist.sqliteStore"
+     ],
+     "writes_fields": [],
+     "returns": 3
+    },
+    "logic": {
+     "control": {
+      "IfStmt": 2
+     },
+     "call_sites_in_order": [
+      "L73 filepath.Abs(path)",
+      "L75 fmt.Errorf(\"open sqlite ro at %s: %w\", path, err)",
+      "L79 sql.Open(\"sqlite\", uri.String())",
+      "L79 uri.String()",
+      "L81 fmt.Errorf(\"open sqlite ro at %s: %w\", path, err)"
+     ],
+     "call_sites_total": 5,
+     "project_callees": []
+    },
+    "callers": {
+     "via_interfaces": [],
+     "direct_callers": [
+      "buildpipe.readOldManifestFromDB",
+      "main.generateReport",
+      "main.newAuditCmd",
+      "main.newBenchMCPCmd",
+      "main.newBenchMCPStdioCmd",
+      "main.newBenchServerCmd",
+      "main.newBenchmarkCmd",
+      "main.newEvalRetrievalCmd",
+      "main.newEvidenceCmd",
+      "main.newExportJSONCmd",
+      "main.newExportPostgresCmd",
+      "main.newExportStaticCmd",
+      "main.newMCPCmd",
+      "main.newPathCmd",
+      "main.newQueryCmd",
+      "main.newReportCmd",
+      "main.openValidateStore",
+      "main.runAPI",
+      "store.OpenReadOnly"
+     ],
+     "paths_from_entry_points": [
+      "main.newRootCmd -> main.newAuditCmd -> persist.OpenReadOnly",
+      "mcpcli.retainedOntologyProvider.Resolve -> semantic.Store.LoadAlignedRetained -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "domaincli.NewCmd -> domaincli.newAnchorsCmd -> domaincli.runAnchors -> ckgclient.NewReal -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "domaincli.newCheckCmd -> domaincli.runCheck -> domaincli.checkDefAnchorResolution -> ckgclient.NewReal -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "mcpcli.run -> mcpcli.buildBackends -> mcpcli.buildCKGClient -> ckgclient.NewReal -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "main.main -> semanticcli.NewCmd -> semanticcli.newPromoteCmd -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "patchcli.NewCmd -> patch.RecordRun -> patch.CandidateProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "semanticcli.newExportTextCmd -> semantic.Store.CurrentAligned -> semantic.validateActiveProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "semanticcli.newLookupTermCmd -> semantic.Store.CurrentAligned -> semantic.validateActiveProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "semanticcli.newAnnotatePackCmd -> semantic.Store.CurrentAligned -> semantic.validateActiveProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "semantic.Store.PlanAligned -> semantic.Store.CurrentAligned -> semantic.validateActiveProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly",
+      "semantic.Store.TraceAligned -> semantic.Store.CurrentAligned -> semantic.validateActiveProjection -> semantic.ValidateCodeAnchors -> store.OpenReadOnly -> persist.OpenReadOnly"
+     ],
+     "entry_points": 15,
+     "production_callers_seen": 67,
+     "edges_visited": 260
+    },
+    "dynamic": {
+     "spawns_goroutines": [],
+     "sends_to": [],
+     "recvs_from": [],
+     "acquires_locks": [],
+     "releases_locks": [],
+     "timeout_paths": [],
+     "cancellation_paths": [],
+     "interface_calls_and_implementations": {}
+    }
+   },
+   "history": {
+    "commits_changing_seed": 1,
+    "recent": [
+     "396242f05c fix(graph): open read-only graph stores through a file URI"
+    ],
+    "prs": [
+     "#28 perf(persist): single-scan node/edge export and tune SQLite pragmas (2026-06-25)"
+    ]
+   },
+   "tests": {
+    "test_callers": 26,
+    "examples": [
+     "buildpipe.TestGoStablenetPolicySecurityBuild",
+     "buildpipe.TestPolicyIntegration_EndToEnd",
+     "buildpipe.TestSecurityIntegration_EndToEnd",
+     "buildpipe_test.TestIncremental_FileRemoved",
+     "buildpipe_test.TestIncremental_OneFileChanged",
+     "buildpipe_test.TestPipelineMultilangV6Markers",
+     "buildpipe_test.TestPipelineRunsOnGoFixture",
+     "buildpipe_test.TestPipelineXLangBinding",
+     "buildpipe_test.buildAndQueryFull",
+     "buildpipe_test.countCrossFileCallsEdges"
+    ]
+   },
+   "available": "history: 1 commits, 1 PRs (change_history); tests: 26 test callers (find_callers with tests)",
+   "seconds": 0.0004
+  }
+ ]
+}
