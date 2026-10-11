@@ -1,0 +1,8 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "problem": "pkg/graph/mcphandlers rebuilt the same resolve fixture in 29 tests and internal/graph/server in 9; each build walks this repository's git history (about 15 s). Under load the mcphandlers race run took 485-667 s and one full run with the default 10-minute timeout failed on it.",
+ "fix": {"296de3f3": "mcphandlers builds the fixture once per test binary; each test opens its own read-only handle", "194f2daa": "graph/server does the same"},
+ "timings": {"mcphandlers_plain": "436 s -> 72 s", "mcphandlers_race_two_runs": "200 s", "graph_server_race": "239 s -> 45 s"},
+ "regression": {"revision": "194f2daa", "command": "go test -race -count=1 ./... (default timeout)", "result": "3291 passed, 16 skipped, 0 failed; slowest package internal/graph/buildpipe 350 s, mcphandlers 115 s; vet pass; gofmt 0; python 164 passed", "load": "about 10-17"}
+}
