@@ -17,7 +17,7 @@ require (
 	github.com/yalue/onnxruntime_go v1.30.1
 	go.uber.org/zap v1.28.0
 	golang.org/x/sys v0.47.0
-	golang.org/x/text v0.39.0
+	golang.org/x/text v0.41.0
 	golang.org/x/tools v0.48.0
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.54.0
