@@ -46,8 +46,16 @@ func Open(path string) (*sqliteStore, error) {
 	// synchronous=NORMAL is the recommended durability level under WAL: safe
 	// across app crashes, only a power loss can lose the last commit — an
 	// acceptable trade for a rebuildable graph, and a meaningful write speedup.
-	dsn := path + "?_pragma=foreign_keys(1)&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)"
-	db, err := sql.Open("sqlite", dsn)
+	//
+	// A file: URI keeps the path intact: with a plain "path?query" DSN the
+	// driver cuts the path at its first "?".
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("open sqlite at %s: %w", path, err)
+	}
+	uri := url.URL{Scheme: "file", Path: abs,
+		RawQuery: "_pragma=foreign_keys(1)&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)"}
+	db, err := sql.Open("sqlite", uri.String())
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite at %s: %w", path, err)
 	}

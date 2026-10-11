@@ -13,9 +13,9 @@ import (
 // must not create WAL sidecars next to the file: a reader that leaves or
 // races -wal/-shm files breaks retained dataset directories and cleanup.
 func TestOpenReadOnlyRejectsWritesAndCreatesNoSidecars(t *testing.T) {
-	// Directory names an unescaped URI would mangle. ("?" is left out: the
-	// read-write Open used for the fixture still takes a plain path DSN.)
-	for _, dirName := range []string{"plain", "with space", "hash#and%41"} {
+	// Directory names that a plain "path?query" DSN or an unescaped URI
+	// would mangle.
+	for _, dirName := range []string{"plain", "with space", "hash#and%41", "query?mark"} {
 		t.Run(dirName, func(t *testing.T) {
 			dir := filepath.Join(t.TempDir(), dirName)
 			if err := os.Mkdir(dir, 0o755); err != nil {
@@ -90,4 +90,34 @@ func equal(a, b []string) bool {
 		}
 	}
 	return true
+}
+
+// Open must create and reopen the database at exactly the given path, also
+// when the path contains URI metacharacters.
+func TestOpenUsesTheExactPath(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "query?mark#x")
+	if err := os.Mkdir(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	dbPath := filepath.Join(dir, "graph.db")
+	st, err := Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := st.Migrate(); err != nil {
+		t.Fatal(err)
+	}
+	var mode string
+	if err := st.db.QueryRow("PRAGMA journal_mode").Scan(&mode); err != nil || mode != "wal" {
+		t.Fatalf("journal_mode = %q, %v", mode, err)
+	}
+	if err := st.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(dbPath); err != nil {
+		t.Fatalf("database not at the given path: %v", err)
+	}
+	if entries, _ := os.ReadDir(filepath.Dir(dir)); len(entries) != 1 {
+		t.Fatalf("stray files beside the directory: %v", entries)
+	}
 }
