@@ -145,7 +145,7 @@ func NewCmd(version string) *cobra.Command {
 func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOverride string) error {
 	cfg, err := loadConfig(configPath)
 	if err != nil {
-		return fmt.Errorf("load config: %w", err)
+		return fmt.Errorf("config_invalid: load config: %w", err)
 	}
 	// Launch-time overrides let one dataset config back several instances,
 	// each on its own port + name, without editing the file. The effective
@@ -202,7 +202,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 
 	ruleset, err := loadRuleset(cfg.Sanitize.RulesPath)
 	if err != nil {
-		return fmt.Errorf("load sanitize ruleset: %w", err)
+		return fmt.Errorf("config_invalid: load sanitize ruleset: %w", err)
 	}
 
 	be, err := buildBackends(ctx, cfg, retainedReadRoot)

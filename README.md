@@ -185,7 +185,7 @@ serves first-time setup and refresh.
 
 | Flag | Effect |
 |---|---|
-| `--skip-vector` | graph only — skips the embed pass when you want a fast check |
+| `--skip-vector` | graph only — skips the embed pass when you want a fast check; unversioned only (refused with `--version`) |
 | `--version <name>`, `--version auto` | blue-green: build into `<out>/<version>`, gate it, then swap `<out>/current` atomically |
 | `--progress json` | one JSON event per line, for orchestrators |
 

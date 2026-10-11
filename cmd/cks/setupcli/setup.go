@@ -310,6 +310,12 @@ func runSetup(args []string) (result error) {
 			o.SkipVector = base.SkipVector
 		}
 	}
+	// A versioned candidate is gated on graph/vector alignment and pins an
+	// embedding identity, so it cannot be graph-only. Refuse before any source
+	// capture creates the version directory.
+	if *rollback == "" && *version != "" && o.SkipVector {
+		return fmt.Errorf("skip_vector_unversioned: --skip-vector cannot be combined with --version")
+	}
 	if *holdForReview && (o.ProjectID == "" || o.SkipVector) {
 		return fmt.Errorf("--hold-for-review requires a pinned project ID and a complete graph/vector candidate")
 	}

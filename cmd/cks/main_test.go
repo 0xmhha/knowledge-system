@@ -15,6 +15,9 @@ func TestPublicCLIErrorUsesStableCodeWithoutLeakingNestedDetails(t *testing.T) {
 		{"versioned_setup_required: /tmp/stage/secret.yaml contains API_KEY=value", "versioned_setup_required"},
 		{"pack_lock_mismatch: /tmp/stage/secret.yaml contains API_KEY=value", "pack_lock_mismatch"},
 		{"promote candidate: snapshot_mismatch: /private/tmp/staging", "snapshot_mismatch"},
+		{"config_invalid: load sanitize ruleset: open /tmp/secret.yaml: no such file", "config_invalid"},
+		{"output_exists: config: \"/tmp/stage/secret.yaml\" already exists", "output_exists"},
+		{"skip_vector_unversioned: --skip-vector cannot be combined with --version", "skip_vector_unversioned"},
 		{"open /tmp/stage/secret.yaml: permission denied", "operation_failed"},
 	} {
 		body, err := json.Marshal(publicCLIError(fmt.Errorf("%s", tc.input)))

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -217,6 +219,9 @@ func SaveNew(path string, c *Config) error {
 		return fmt.Errorf("config: chmod new %q: %w", path, err)
 	}
 	if err = os.Link(file.Name(), path); err != nil {
+		if errors.Is(err, fs.ErrExist) {
+			return fmt.Errorf("output_exists: config: %q already exists; generated configs never replace a file", path)
+		}
 		return fmt.Errorf("config: publish new %q: %w", path, err)
 	}
 	return nil

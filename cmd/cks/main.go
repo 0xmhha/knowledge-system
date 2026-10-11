@@ -78,7 +78,7 @@ type cliError struct {
 	DatasetID string `json:"dataset_id,omitempty"`
 }
 
-var publicErrorCode = regexp.MustCompile(`(?:^|[^a-z_])(resource_limit|build_timeout|durability_uncertain|versioned_setup_required|requires_v2|reindex_required|snapshot_mismatch|source_missing|pack_lock_mismatch|pack_incompatible|evidence_unverified|service_unavailable|candidate_rejected|unsupported_source)(?:[^a-z_]|$)`)
+var publicErrorCode = regexp.MustCompile(`(?:^|[^a-z_])(resource_limit|build_timeout|durability_uncertain|versioned_setup_required|requires_v2|reindex_required|snapshot_mismatch|source_missing|pack_lock_mismatch|pack_incompatible|evidence_unverified|service_unavailable|candidate_rejected|unsupported_source|config_invalid|output_exists|skip_vector_unversioned)(?:[^a-z_]|$)`)
 
 // publicCLIError intentionally does not echo nested tool errors. They can
 // contain source bytes, credentials, or temporary staging paths.
@@ -104,6 +104,9 @@ func publicCLIError(err error) cliError {
 		"service_unavailable":      "The requested service is unavailable.",
 		"candidate_rejected":       "The candidate did not pass its promotion gates.",
 		"unsupported_source":       "This source configuration is unsupported.",
+		"config_invalid":           "The server config or a file it names (such as the sanitize ruleset) could not be loaded; regenerate it with cks mcp gen-config.",
+		"output_exists":            "The output file already exists; choose another --out or remove the existing file.",
+		"skip_vector_unversioned":  "--skip-vector builds an unversioned graph-only dataset; drop --version, or build both indexes.",
 		"operation_failed":         "The operation failed; inspect project status for details.",
 	}
 	return cliError{Code: code, Message: messages[code]}

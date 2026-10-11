@@ -60,8 +60,8 @@ def setup_env(opts: Options) -> Dict[str, str]:
 
 
 def gen_config_argv(opts: Options, out: Optional[Path] = None) -> List[str]:
-    # gen-config refuses to overwrite and resolves the default sanitization
-    # rules against its working directory, so pass both paths explicitly.
+    # gen-config never replaces an existing file (the caller writes to a fresh
+    # name and swaps it in); the ruleset is pinned to this checkout's baseline.
     argv = [str(opts.binary("cks")), "mcp", "gen-config", "--dataset-dir", str(opts.serving_dir),
             "--name", opts.name, "--port", str(opts.port), "--out", str(out or opts.server_config),
             "--sanitize-rules", str(repo_root() / "system" / "policies" / "sanitization_rules.yaml"),
