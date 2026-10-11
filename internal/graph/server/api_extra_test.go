@@ -6,7 +6,9 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
@@ -14,20 +16,41 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/server"
 )
 
-// buildFixture compiles the resolve testdata into a temp dir and returns a
-// read-only Store. The caller is responsible for calling store.Close().
+var (
+	fixtureOnce sync.Once
+	fixtureDir  string
+	fixtureErr  error
+)
+
+// TestMain removes the shared fixture graph after the package's tests.
+func TestMain(m *testing.M) {
+	code := m.Run()
+	if fixtureDir != "" {
+		_ = os.RemoveAll(fixtureDir)
+	}
+	os.Exit(code)
+}
+
+// buildFixture builds the resolve fixture once per test binary (each build
+// also walks this repository's git history) and opens a read-only handle
+// per test; immutable read-only handles can share the file.
 func buildFixture(t *testing.T) persist.Store {
 	t.Helper()
-	out := t.TempDir()
-	if _, err := buildpipe.Run(buildpipe.Options{
-		SrcRoot:    "../parse/golang/testdata/resolve",
-		OutDir:     out,
-		Languages:  []string{"auto"},
-		CKGVersion: "test",
-	}); err != nil {
-		t.Fatalf("buildpipe.Run: %v", err)
+	fixtureOnce.Do(func() {
+		if fixtureDir, fixtureErr = os.MkdirTemp("", "graph-server-fixture-"); fixtureErr != nil {
+			return
+		}
+		_, fixtureErr = buildpipe.Run(buildpipe.Options{
+			SrcRoot:    "../parse/golang/testdata/resolve",
+			OutDir:     fixtureDir,
+			Languages:  []string{"auto"},
+			CKGVersion: "test",
+		})
+	})
+	if fixtureErr != nil {
+		t.Fatalf("buildpipe.Run: %v", fixtureErr)
 	}
-	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
+	store, err := persist.OpenReadOnly(filepath.Join(fixtureDir, "graph.db"))
 	if err != nil {
 		t.Fatalf("OpenReadOnly: %v", err)
 	}
