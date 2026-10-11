@@ -27,6 +27,7 @@ import (
 	"net"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -429,9 +430,15 @@ func (s *Server) handleSemanticSearch(ctx context.Context, req mcpgo.CallToolReq
 		opts.DryRun = v
 	}
 	if v, ok := args["alias_path"].(string); ok && v != "" {
-		am, err := query.LoadAliasMap(v)
+		// Glossaries live with the index or the indexed source; the
+		// error never repeats the path's contents or existence.
+		path, inside := s.aliasPathInside(v)
+		if !inside {
+			return mcpgo.NewToolResultError("alias_path: must name a glossary inside the index directory or the indexed source root"), nil
+		}
+		am, err := query.LoadAliasMap(path)
 		if err != nil {
-			return mcpgo.NewToolResultError(fmt.Sprintf("alias_path: %v", err)), nil
+			return mcpgo.NewToolResultError("alias_path: cannot load the glossary (YAML with an aliases map expected)"), nil
 		}
 		opts.Aliases = am
 	}
@@ -743,6 +750,33 @@ func (s *Server) handleIndex(ctx context.Context, req mcpgo.CallToolRequest) (*m
 
 	payload["duration_ms"] = time.Since(start).Milliseconds()
 	return jsonResult(payload)
+}
+
+// aliasPathInside resolves p (relative paths against the source root) and
+// reports whether the real file lies inside the index directory or the
+// indexed source root.
+func (s *Server) aliasPathInside(p string) (string, bool) {
+	root := s.engine.Manifest().SrcRoot
+	if !filepath.IsAbs(p) {
+		p = filepath.Join(root, p)
+	}
+	real, err := filepath.EvalSymlinks(p)
+	if err != nil {
+		return "", false
+	}
+	for _, dir := range []string{s.engine.OutDir(), root} {
+		if dir == "" {
+			continue
+		}
+		base, err := filepath.EvalSymlinks(dir)
+		if err != nil {
+			continue
+		}
+		if rel, err := filepath.Rel(base, real); err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != "." {
+			return real, true
+		}
+	}
+	return "", false
 }
 
 // sameDir reports whether a and b resolve to the same directory.
