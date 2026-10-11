@@ -5,8 +5,8 @@
 //
 // Strategy:
 //
-//  1. Take Stage 2 citations and pass them through as Seeds (B.6 budget
-//     and B.8 wire-up see the full Stage 2 work).
+//  1. Take Stage 2 citations and pass them through as Seeds (the Stage 4
+//     budget and the composer wire-up see the full Stage 2 work).
 //  2. Expand only the top N seeds by score (default 10). Lower-ranked
 //     seeds are weak signals — expanding them mostly amplifies noise.
 //  3. For each expanded seed, call ckg.Neighbors with an Intent-specific
@@ -37,7 +37,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// Default tuning. Phase E revisits with real-prompt data.
+// Default tuning; to be revisited with real-prompt data.
 const (
 	DefaultMaxSeedsToExpand  = 10
 	DefaultNeighborsPerSeed  = 50
@@ -55,11 +55,11 @@ type Config struct {
 	NeighborsPerSeed int
 
 	// MaxFinalNeighbors caps the deduped Neighbors slice that Stage 3
-	// emits. Stage 4 (B.6 budget) may trim further.
+	// emits. Stage 4 (budget) may trim further.
 	MaxFinalNeighbors int
 }
 
-// DefaultConfig returns the Phase-0 tuning baseline.
+// DefaultConfig returns the baseline tuning.
 func DefaultConfig() Config {
 	return Config{
 		MaxSeedsToExpand:  DefaultMaxSeedsToExpand,
@@ -80,8 +80,8 @@ type ScoredNeighbor struct {
 	//
 	// The decay formula was chosen for simplicity; alternatives
 	// (exponential, logarithmic, threshold) and their trade-offs are
-	// analyzed in docs/composer/stage3-scoring.md §1, with a Phase E
-	// measurement plan to revise based on PR #70 data.
+	// analyzed in docs/composer/stage3-scoring.md §1, with a measurement
+	// plan to revise based on PR #70 data.
 	Score float64
 
 	// Sources records every (seed, relation, distance) that produced this
@@ -95,7 +95,7 @@ type ScoredNeighbor struct {
 // Stage3Output captures the result of one Expand call.
 type Stage3Output struct {
 	// Seeds is the full Stage 2 passthrough. Preserves the work that
-	// Stage 2 did so B.6 budget and B.8 wire-up have access to BM25 +
+	// Stage 2 did so the Stage 4 budget and the composer wire-up have access to BM25 +
 	// Symbol evidence even when Stage 3 declined to expand a seed.
 	Seeds []stage2.ScoredCitation
 
@@ -109,7 +109,7 @@ type Stage3Output struct {
 	SeedsExpanded int
 
 	// RelationCoverage counts how many neighbors arrived via each
-	// relation type. Footprint and Phase E eval use this to spot
+	// relation type. Footprint and evaluation use this to spot
 	// "Intent X always produces 0 implements" type signals.
 	RelationCoverage map[contract.Relation]int
 

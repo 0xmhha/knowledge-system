@@ -351,7 +351,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleExpandInFile)
 
-	// --- flow-aware tools (Phase D): trace a symptom to its cause over the
+	// --- flow-aware tools: trace a symptom to its cause over the
 	// curated flow corpus. READ-ONLY. ---
 	s.mcp.AddTool(mcpgo.NewTool(nsName("context.get_flow"),
 		mcpgo.WithDescription("Lay out a curated flow's steps in call order: each step's symbol, citation (file:line), reads/writes/emits, failure branches, and invariants. Select by exactly one of flow_id / entry_point / invariant_id. READ-ONLY."),

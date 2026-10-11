@@ -4,15 +4,15 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.6 — deep cross-contract chained dispatch tests.
+// Deep cross-contract chained dispatch tests.
 //
 // Shape: `<obj>.<innerFn1>().<innerFn2>().<method>(...)`. Combines
-// V1.4's receiver-type lookup with V1.5's depth-2 return-type chain.
+// the cross-contract receiver-type lookup with the depth-2 return-type chain.
 //
-// V1.6 carry-over (V1.7+): depth >= 3 generic chains
+// Not covered here: depth >= 3 generic chains
 // (`f().g().h().i()`), multi-return tuple slot selection.
 
-// TestUsingForV16_DeepCrossChainBasic — canonical V1.6 case.
+// TestUsingForV16_DeepCrossChainBasic — canonical deep cross-contract case.
 // `factory.makeStage().computeNumber().add(1)`. Receiver factory is a
 // Factory state var; makeStage returns Stage; computeNumber returns
 // uint256; .add(1) resolves through using ChainLib for uint256.
@@ -28,7 +28,7 @@ func TestUsingForV16_DeepCrossChainBasic(t *testing.T) {
 }
 
 // TestUsingForV16_DeepCrossChainUnknownMiddle — middle step's method
-// doesn't exist on the inner function's return type. V1.6 must drop
+// doesn't exist on the inner function's return type. The resolver must drop
 // without false-positive emission.
 func TestUsingForV16_DeepCrossChainUnknownMiddle(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v16", "deep_cross_chain_unknown_middle.sol")
@@ -39,7 +39,7 @@ func TestUsingForV16_DeepCrossChainUnknownMiddle(t *testing.T) {
 }
 
 // TestUsingForV16_DeepCrossChainNoBinding — chain links all resolve
-// but the final return type has no binding declaration. V1.6 must drop
+// but the final return type has no binding declaration. The resolver must drop
 // at the binding lookup step.
 func TestUsingForV16_DeepCrossChainNoBinding(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v16", "deep_cross_chain_no_binding.sol")

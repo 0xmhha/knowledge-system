@@ -107,8 +107,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				// byBareName. Captures cross-namespace refs like
 				// `rpc X(Outer.Inner) returns (...)` where candidateForType
 				// produces `proto:Outer.Inner` but the actual nested message
-				// node carries `proto:pkg.Outer.Inner`. Reviewer (W3a
-				// Important #1) caught the desync — without this, nested type
+				// node carries `proto:pkg.Outer.Inner`. A reviewer
+				// caught the desync — without this, nested type
 				// references resolve only when the source already spells out
 				// the full package-qualified path. byBareName's key is the
 				// trailing dotted segment so this single lookup catches both

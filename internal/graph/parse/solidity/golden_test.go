@@ -24,7 +24,7 @@ import (
 // rewrite TS golden by accident.
 var updateGolden = flag.Bool("update", false, "rewrite golden file from live parser output")
 
-// TestGolden_Solidity locks in the post-A2 (smacker → tree-sitter) shape of
+// TestGolden_Solidity locks in the post-migration (smacker → tree-sitter) shape of
 // the Sol parser. Walks testdata/synthetic/sol-contract/contracts, parses
 // every .sol file, runs Resolve, marshals the union to a deterministic
 // JSON form, and diffs against testdata/sol_contract_golden.json.

@@ -11,7 +11,7 @@ import (
 )
 
 // TestFindByCanonicalID covers the exact, unambiguous lookup added for
-// symbol-identity Phase 1 (ADR-0001): a hit returns the one node, a miss and an
+// symbol identity (ADR-0001): a hit returns the one node, a miss and an
 // empty input both return found=false with no error.
 func TestFindByCanonicalID(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "canonical.db")

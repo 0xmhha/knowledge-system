@@ -6,19 +6,19 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V24 — high-level walker × callable shape cross-axis lock.
+// High-level walker × callable shape cross-axis lock.
 //
 // WALKER_SYMMETRY.md (internal/parse/solidity/) marked three cells
-// '?': the high-level self-call walker (V19) was only locked on
-// function bodies (V19 / V20). Constructor, fallback/receive, and
+// '?': the high-level self-call walker was only locked on
+// function bodies (plain and try-wrapped). Constructor, fallback/receive, and
 // modifier scopes were assumed to propagate because the walker
 // shares nearestFunctionQnameAndStart with the cast walker — but
-// 'assumed to propagate' is not 'tested', and V22 / V23 already
+// 'assumed to propagate' is not 'tested', and the call-options and Yul self-call fixes already
 // proved that what's assumed and what's tested can drift.
 //
-// V24 closes all three cells in one fixture so each callable shape
-// the cast walker recognises (V14 fallback/receive, V15 constructor,
-// V17 modifier) is independently asserted on the high-level marker
+// This test closes all three cells in one fixture so each callable shape
+// the cast walker recognises (fallback/receive, constructor,
+// modifier) is independently asserted on the high-level marker
 // side.
 //
 // Expected outcome (0-line walker change required):
@@ -31,16 +31,16 @@ import (
 //     HasHighLevelSelfCall = true.
 //
 // Cross-axis assertion: HasSelfReentrantCall stays false on all
-// three — V19 is its own axis and the bodies contain no low-level
+// three — the high-level marker is its own axis and the bodies contain no low-level
 // .call/.delegatecall/.transfer/.send.
 //
-// What this catches that V19 alone doesn't:
+// What this catches that the function-body tests alone don't:
 //
 //	A refactor that introduces a scope window on the high-level
 //	walker (e.g. 'only walk function_definition bodies') would
-//	pass V19 / V20 (function body + try wrap) and silently drop
+//	pass the function-body and try-wrap tests and silently drop
 //	the marker on constructors, receives, and modifiers — exactly
-//	the shapes V14 / V15 / V17 already proved are reachable
+//	the shapes the self-cast audits already proved are reachable
 //	through the cast walker's parent-chain helper.
 func TestHighLevel_ShapeCrossAxis(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver",
@@ -69,7 +69,7 @@ func TestHighLevel_ShapeCrossAxis(t *testing.T) {
 		}
 		got[n.QualifiedName] = n.HasHighLevelSelfCall
 		// Low-level axis must stay quiet — the bodies contain no
-		// .call / .delegatecall / .transfer / .send, so V8 / V18
+		// .call / .delegatecall / .transfer / .send, so the self-cast walker
 		// should not fire either.
 		if n.HasSelfReentrantCall {
 			t.Errorf("%s HasSelfReentrantCall: got true (V24 expects false; high-level marker only)",

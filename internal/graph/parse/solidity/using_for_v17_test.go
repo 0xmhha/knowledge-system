@@ -4,16 +4,15 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.7 — depth-3 same-contract chained dispatch tests.
+// Depth-3 same-contract chained dispatch tests.
 //
 // Shape: `<fn1>().<fn2>().<fn3>().<method>(...)`. Three levels of
-// funcReturnTypes walks. V1.8+ promotes to generic depth-N walker
-// (and cross-contract variant of the same depth).
+// funcReturnTypes walks. Deeper chains (and the cross-contract variant of
+// the same depth) go through the generic depth-N walker.
 //
-// V1.7 carry-over (V1.8+): depth ≥ 4 generic chains, generic walker
-// refactor (subsume V1.3/V1.5/V1.7), multi-return tuple slot.
+// Not covered here: depth ≥ 4 generic chains, multi-return tuple slot.
 
-// TestUsingForV17_TripleChainBasic — canonical V1.7 case.
+// TestUsingForV17_TripleChainBasic — canonical depth-3 case.
 // `mkA().mkB().mkC().add(1)` — three local helper chains through
 // Stage1 → Stage2 → uint256, then .add(1) resolves via uint256 binding.
 func TestUsingForV17_TripleChainBasic(t *testing.T) {
@@ -28,7 +27,7 @@ func TestUsingForV17_TripleChainBasic(t *testing.T) {
 }
 
 // TestUsingForV17_TripleChainMiddleUnknown — middle step (link 2) not
-// found on inner function's return type. V1.7 must drop.
+// found on inner function's return type. The resolver must drop.
 func TestUsingForV17_TripleChainMiddleUnknown(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v17", "triple_chain_middle_unknown.sol")
 	got := collectUsingForCalls(nodes, edges)

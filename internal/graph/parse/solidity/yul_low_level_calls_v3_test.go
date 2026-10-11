@@ -6,13 +6,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V3 — Yul let-binding shadow guard + HasLowLevelCall marker
+// Yul let-binding shadow guard + HasLowLevelCall marker
 // on the enclosing callable for every Yul delegatecall / call /
 // staticcall regardless of receiver resolution.
 //
 // The fixture stages `delegateShadowed`, where a yul-local
 // `let impl := target` shadows the Sol-scope `impl` state-var of
-// IImpl type. Without the V3 guard the V2 walker would falsely
+// IImpl type. Without the guard the receiver-resolution walker would falsely
 // resolve to IImpl; with the guard the emit is skipped. The
 // function still carries HasLowLevelCall=true so security tooling
 // can still spot the indirection.
@@ -55,7 +55,7 @@ func TestYulLowLevelCalls_LetBindingShadow(t *testing.T) {
 	}
 }
 
-// W-C W10 V3 marker propagation — every yul delegatecall / call /
+// Marker propagation — every yul delegatecall / call /
 // staticcall lights up HasLowLevelCall on the enclosing callable,
 // not just the ones where the receiver argument resolves to a Sol
 // scope target. Re-uses the existing yul_delegate.sol fixture which

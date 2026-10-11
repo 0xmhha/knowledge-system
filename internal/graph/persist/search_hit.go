@@ -12,8 +12,7 @@ import (
 // them later is a non-breaking change because struct fields default to
 // zero on omission.
 //
-// See docs/followups-from-cks-dogfood-2026-05-19.md item CKG-2 for the
-// downstream motivation: cks currently over-fetches by FilterOverfetchRatio=3
+// Downstream motivation: cks currently over-fetches by FilterOverfetchRatio=3
 // and post-filters client-side on Language, which caps recall when filters
 // drop most of a small page.
 type SearchFTSOptions struct {
@@ -61,8 +60,7 @@ type SearchFTSOptions struct {
 // Returned by StoreReader.SearchFTS so downstream rerankers can
 // distinguish "one strong unique-identifier hit" from "five weak
 // common-word hits" — the gap that drove the cks workaround at
-// internal/ckgclient/real.go (1 - i/(N+1) fake score, see
-// docs/followups-from-cks-dogfood-2026-05-19.md item CKG-1).
+// internal/ckgclient/real.go (1 - i/(N+1) fake score).
 //
 // Two scores are exposed:
 //

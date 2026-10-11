@@ -6,9 +6,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V6 — cross-file struct sizing. ParseFile runs per-file
+// Cross-file struct sizing. ParseFile runs per-file
 // Pass 1 so a state variable typed as a struct defined in another
-// file pre-V6 fell through to the conservative 32-byte advance.
+// file would otherwise fall through to the conservative 32-byte advance.
 // Resolve now merges every parser instance's struct size map
 // (Parser.structSizes guarded by structMu) and re-packs each
 // contract's state variables with the global table, then

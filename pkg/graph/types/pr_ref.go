@@ -19,8 +19,8 @@ import "time"
 //
 // # Temporal slicing
 //
-// MergedAtUTC drives the [store.Reader.GetNodePRs] cutoff filter
-// (ckg-NEW-3). A cks scenario evaluating "what did the agent know
+// MergedAtUTC drives the [store.Reader.GetNodePRs] cutoff filter.
+// A cks scenario evaluating "what did the agent know
 // at base_sha?" must not be allowed to see PRs merged after that
 // timestamp, even though ckg's index aggregated every PR in
 // history. The cutoff is applied at the SQL layer
@@ -37,8 +37,7 @@ import "time"
 //     from …" prefix is stripped, or the raw subject when the
 //     prefix isn't present.
 //   - Summary: cleaned commit body — the "왜 이렇게 짰지?" history
-//     that CKV's semantic search ingests (docs/PROJECT-BLUEPRINT-
-//     ALIGNMENT.md §4.2 P0). Git trailers (Signed-off-by:,
+//     that CKV's semantic search ingests. Git trailers (Signed-off-by:,
 //     Co-authored-by:, Generated with…) are stripped; the result is
 //     capped at 2 KB on a line boundary so a runaway PR template
 //     can't bloat node_prs rows. Empty when the merge commit has no

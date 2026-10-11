@@ -6,14 +6,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V2 — Yul-level low-level call receiver resolution.
+// Yul-level low-level call receiver resolution.
 //
-// V0 / V1.1 surfaced Yul ops via markers; V2 closes the dispatch
+// The assembly markers only surface Yul ops; this closes the dispatch
 // loop by parsing the target argument of yul `delegatecall` /
 // `call` / `staticcall` as a yul_path, mapping its leading
 // identifier to a Sol scope receiver, and emitting EdgeInvokes
 // ConfAmbiguous with DispatchKind="low_level_call" (same as
-// W7.1's Sol-level shape).
+// the Sol-level low-level-call shape).
 //
 // The fixture stages a Proxy contract whose `impl` state-var is
 // IImpl-typed. Two Yul callers (delegatecall and staticcall)

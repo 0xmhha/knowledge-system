@@ -14,7 +14,7 @@ package mcp
 //   - WARNING (served, surfaced in health): source_root path differs from the
 //     indexed checkout at the same commit, source tree HEAD ahead/behind the
 //     indexed commit (freshness territory), or the CKV sources ledger not yet
-//     present (pre-P1 CKV index — additive rollout).
+//     present (older CKV index without the sources ledger — additive rollout).
 //
 // The interface is manifest-file based by agreement: no new backend API. CKG
 // coordinates come from ckgclient.Health (manifest-backed); CKV coordinates
@@ -102,7 +102,7 @@ type AlignmentInputs struct {
 }
 
 // ckvManifest is the subset of CKV's manifest.json the assert reads. The
-// sources ledger (§2.2 of the reindex design) is additive: absent on pre-P1
+// sources ledger (§2.2 of the reindex design) is additive: absent on older
 // indexes, in which case top-level src_commit/src_root are the fallback
 // coordinates.
 type ckvManifest struct {
@@ -156,7 +156,7 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 		if ckvCommit == "" && m.SourceMode != "snapshot-only" {
 			ckvCommit = firstNonEmpty(m.SrcCommit, m.IndexedHead)
 			rep.Warnings = append(rep.Warnings,
-				"ckv sources.ckg ledger absent (pre-P1 index) — using top-level src_commit")
+				"ckv sources.ckg ledger absent (older index) — using top-level src_commit")
 		}
 		rep.SrcCommitCKV = ckvCommit
 		rep.GraphDigestExpected = m.Sources.CKG.GraphDigest
@@ -166,7 +166,7 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 	// --- ERROR tier -------------------------------------------------------
 	// Fail closed when ckv is expected but provides no verifiable coordinates:
 	// two individually-reachable backends whose join cannot be checked are
-	// confidently-wrong, not ok. A pre-P1 index still has a top-level src_commit
+	// confidently-wrong, not ok. An older index still has a top-level src_commit
 	// (ckvCommit non-empty), so only a truly missing/unparsable manifest trips.
 	if in.CKGSrcCommit != "" && ckvCommit != "" && in.CKGSrcCommit != ckvCommit {
 		errs = append(errs, fmt.Sprintf(

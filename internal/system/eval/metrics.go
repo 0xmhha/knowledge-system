@@ -1,6 +1,6 @@
 // Package eval is the cks retrieval-quality evaluation harness.
 //
-// Phase E (Slim, Layer 1): measures the quality of the EvidencePack
+// It measures the quality of the EvidencePack
 // cks-mcp returns for a vibe prompt by comparing the citations
 // against a YAML-declared ground-truth set. No LLM is invoked; the
 // metrics here cover the cks side of the pipeline only.

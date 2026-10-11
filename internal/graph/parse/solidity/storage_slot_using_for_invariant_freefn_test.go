@@ -7,11 +7,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V10 — free-function using-form storage-layout invariant.
-// Parallels the V9 operator-form audit for Sol 0.8.13+
+// Free-function using-form storage-layout invariant.
+// Parallels the operator-form audit for Sol 0.8.13+
 // `using {f} for T;` (no operator). The shape goes through a
 // different misparse path in vendored tree-sitter-solidity, so the
-// V9 fix in runStateVarDecl only covers operator-form; this audit
+// operator-form fix in runStateVarDecl does not cover it; this audit
 // catches a future regression in the free-function path. The
 // SlotIndex on every state variable must match the equivalent
 // no-using contract.

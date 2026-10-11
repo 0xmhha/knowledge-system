@@ -50,7 +50,7 @@ type mockStoreReader struct {
 	pathErr   error
 	pathCh    []string
 
-	// G3 seam canned outputs.
+	// Impact/evidence seam canned outputs.
 	impactOut   map[string]any
 	impactErr   error
 	impactCh    []impactCall
@@ -232,7 +232,7 @@ func TestReal_BM25Search_TranslatesNodesToHits(t *testing.T) {
 	if h0.Source != contract.HitSourceCKG {
 		t.Errorf("Source = %q, want HitSourceCKG", h0.Source)
 	}
-	// G5: real ckg score passed through verbatim (no 1-i/(n+1) synthesis).
+	// Real ckg score passed through verbatim (no 1-i/(n+1) synthesis).
 	if h0.Score != 0.9 || hits[1].Score != 0.5 {
 		t.Errorf("scores = %v,%v want 0.9,0.5 (real ckg Score passthrough)", h0.Score, hits[1].Score)
 	}
@@ -768,7 +768,7 @@ func TestReal_Close_IsIdempotent(t *testing.T) {
 	}
 }
 
-// --- G3: ImpactOfChange / EvidenceForIntent / GetNodePRs ---
+// --- ImpactOfChange / EvidenceForIntent / GetNodePRs ---
 
 func TestReal_ImpactOfChange_TranslatesGroups(t *testing.T) {
 	t.Parallel()
@@ -897,7 +897,7 @@ func TestReal_GetNodePRs_ResolvesAndTranslates(t *testing.T) {
 	}
 }
 
-// --- G7: ConcurrencyImpact ---
+// --- ConcurrencyImpact ---
 
 func TestReal_ConcurrencyImpact_TranslatesModules(t *testing.T) {
 	t.Parallel()
@@ -1007,7 +1007,7 @@ func TestReal_ImplementsClient(t *testing.T) {
 	var _ Client = (*Real)(nil)
 }
 
-// TestResolveByCanonicalIDAndAmbiguity covers symbol-identity Phase 3 (ADR-0001):
+// TestResolveByCanonicalIDAndAmbiguity covers symbol-identity resolution (ADR-0001):
 // (1) an exact canonical_id resolves directly to its node, and (2) an ambiguous
 // bare name (>1 distinct qname, no exact match) resolves to "" instead of the
 // old silent first-of-N pick.

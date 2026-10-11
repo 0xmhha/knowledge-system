@@ -7,10 +7,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W7.3 V0 — modifier composition: multi-modifier order + modifier
+// Modifier composition: multi-modifier order + modifier
 // override.
 //
-// V0 captures two previously-lost dimensions of EdgeHasModifier /
+// Captures two previously-lost dimensions of EdgeHasModifier /
 // EdgeOverrides:
 //
 //   - Order: for `function f() M1 M2 M3 {}` the 3 EdgeHasModifier
@@ -20,7 +20,7 @@ import (
 //
 //   - Modifier override: `modifier m() override {}` in a child
 //     contract emits an EdgeOverrides (child mod → parent mod) the
-//     same way W2 emits override edges for function_definition with
+//     same way function overrides emit edges for function_definition with
 //     override_specifier.
 
 func TestModifierComposition_OrderAndOverride(t *testing.T) {

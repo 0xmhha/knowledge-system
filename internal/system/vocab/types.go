@@ -9,8 +9,7 @@
 // expands a prompt with the canonical code keywords before retrieval runs.
 //
 // The package is glossary-source-agnostic: integrators ship their own
-// YAML — go-stablenet glossary curation is tracked separately as V-4 /
-// D-1 in the integrated workplan. An empty glossary is a valid configuration;
+// YAML — go-stablenet glossary curation is tracked separately. An empty glossary is a valid configuration;
 // Resolve just returns the original prompt unchanged in that case.
 package vocab
 

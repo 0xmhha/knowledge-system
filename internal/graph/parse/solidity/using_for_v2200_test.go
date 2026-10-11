@@ -7,18 +7,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.20 — operator-form using directive recovery walker.
+// Operator-form using directive recovery walker.
 //
 // Three scopes (contract / library / interface) each carry one
-// `using {Math.add as +} for uint256;` directive. Before V2.20 all
+// `using {Math.add as +} for uint256;` directive. Without the walker all
 // three produced 0 EdgeUsesFor because the grammar misparses the
 // directive as a state_variable_declaration with no surrounding
-// using_directive node (V2.17 AST evidence). V2.20 pattern-matches
+// using_directive node (see using_for_v2170_test.go). The walker pattern-matches
 // the misparse and emits the binding pair so each container ends up
 // with one EdgeUsesFor to the Math library.
 //
-// V2.7 / V2.14 IOp / V2.17 locks all flip from 0 → 1 in the same
-// session; the interface-scope IOp emit in V2.14 also flips.
+// The contract-, interface- and library-scope operator-form locks
+// all flip from 0 → 1 together.
 
 func TestUsingForV2200_OperatorFormRecovery(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v2200", "operator_form_recovery.sol")

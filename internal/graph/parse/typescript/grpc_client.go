@@ -1,7 +1,6 @@
-// Package typescript — grpc_client.go implements W3c of schema 1.9
-// (CKS G5 Distributed): TypeScript gRPC-web / Connect-web client
-// detection. Companion to internal/parse/golang/grpc.go (W3b, Go server +
-// client) — the two together let graph traversal answer
+// Package typescript — grpc_client.go implements TypeScript gRPC-web /
+// Connect-web client detection (schema 1.9). Companion to
+// internal/parse/golang/grpc.go (Go server + client) — the two together let graph traversal answer
 // "TS Func → grpc_calls → Endpoint ← grpc_listens_on ← Go Method" in a
 // monorepo.
 //
@@ -36,7 +35,7 @@
 // Each detection emits an AMBIGUOUS placeholder Endpoint (Language
 // "external") and an `grpc_calls` edge (INFERRED) from the enclosing
 // TS Function to the placeholder. The placeholder lives in a distinct
-// ID space from the real server-side Endpoints emitted by Go W3b's
+// ID space from the real server-side Endpoints emitted by the Go parser's
 // `pb.RegisterXXXServer` pass, so cross-language resolution stays in
 // placeholder form until a future linker pass merges by qname suffix
 // (mirroring the §6.5 V0 limitation already documented for Go).
@@ -51,7 +50,7 @@
 // the suffix `*Client` is far too common (RedisClient / PrismaClient /
 // ApolloClient / HttpClient / S3Client / KafkaClient / MongoClient /
 // ElasticsearchClient / ApiClient) to be treated as a gRPC stub. This
-// was raised by W3c code-review as Important #1 (2026-05-11) — the prior
+// was raised in code review — the prior
 // implementation matched `*Client` unconditionally and would have
 // produced AMBIGUOUS placeholders for every non-gRPC client in a real
 // monorepo.
@@ -80,7 +79,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// runGRPCClients is the W3c entry point. Called from declVisitor.visit()
+// runGRPCClients is the gRPC client entry point. Called from declVisitor.visit()
 // after runHTTPClients(). Two passes:
 //
 //	(1) collectGRPCClientStubs — walk the tree once to register every
@@ -92,14 +91,14 @@ import (
 //	    for (a) `<stub>.method(...)` where stub is in the map, and
 //	    (b) `grpc.unary(Service.Method, ...)` descriptor-shaped calls.
 //
-// The two-pass shape mirrors the Go W3b pattern (scanFuncBodyForGRPCStubs
+// The two-pass shape mirrors the Go gRPC pattern (scanFuncBodyForGRPCStubs
 // → maybeEmitGRPCClientCall) so per-function stub-name scoping is
 // deterministic regardless of AST traversal order.
 func (v *declVisitor) runGRPCClients() {
 	intervals := collectFnIntervalsFromTree(v)
 	v.grpcClientStubsTS = map[string]string{}
 	// Pattern A gating signal — file-scoped scan for gRPC library imports.
-	// See module header for the rationale (W3c review Important #1, 2026-05-11).
+	// See module header for the rationale.
 	v.tsGRPCImportPresent = fileHasGRPCImport(v.root, v.src)
 	v.collectGRPCClientStubs(v.root, intervals)
 	v.walkForGRPCClientCalls(v.root, intervals)
@@ -235,8 +234,7 @@ func (v *declVisitor) maybeTrackGRPCClientStub(decl *sitter.Node, intervals []fn
 	// MongoClient / ApiClient all match the `*Client` suffix). Require
 	// a gRPC library import in the file before honouring the binding.
 	// Pattern B (createPromiseClient / createClient) uses an explicit
-	// factory name and is never gated. See module header + W3c review
-	// Important #1 (2026-05-11).
+	// factory name and is never gated. See module header.
 	if valueNode.Kind() == "new_expression" && !v.tsGRPCImportPresent {
 		return
 	}
@@ -386,7 +384,7 @@ func (v *declVisitor) walkForGRPCClientCalls(n *sitter.Node, intervals []fnInter
 // maybeEmitGRPCClientCallTS classifies one call_expression and emits an
 // `grpc_calls` edge when it matches a supported client pattern. The edge
 // Src is the smallest-enclosing Function/Method ID; module-scope calls
-// are dropped (same policy as W2 maybeEmitHTTPClientCall).
+// are dropped (same policy as maybeEmitHTTPClientCall).
 //
 // Two patterns:
 //
@@ -403,7 +401,7 @@ func (v *declVisitor) maybeEmitGRPCClientCallTS(call *sitter.Node, intervals []f
 	}
 	if !hasParent {
 		// Module-scope client calls — graph has nowhere to anchor the
-		// edge. Drop in V0; mirrors the W2 http_calls policy.
+		// edge. Drop in V0; mirrors the http_calls policy.
 		return
 	}
 	endpointID := v.upsertGRPCClientPlaceholderTS(svc, method, call)
@@ -416,7 +414,7 @@ func (v *declVisitor) maybeEmitGRPCClientCallTS(call *sitter.Node, intervals []f
 }
 
 // classifyTSGRPCClientCall returns (service, method, true) when the call
-// matches one of the W3c patterns. Returns ("", "", false) on miss.
+// matches one of the gRPC client patterns. Returns ("", "", false) on miss.
 // parentFnID scopes the stub-name lookup; module-scope calls (parentFnID
 // "") can still match Pattern 2 (grpc.unary) but never Pattern 1 (stub
 // var) because stubs are recorded under their enclosing function ID.
@@ -529,7 +527,7 @@ func serviceMethodFromDescriptor(arg *sitter.Node, src []byte) (string, string, 
 // upsertGRPCClientPlaceholderTS emits one AMBIGUOUS placeholder Endpoint
 // per (service, method) tuple inside this file. Distinct ID space from
 // real server-side Endpoints (Language="external"). Same shape as the Go
-// W3b upsertGRPCClientPlaceholder so a future cross-language linker pass
+// upsertGRPCClientPlaceholder so a future cross-language linker pass
 // can reuse the same qname suffix matcher.
 func (v *declVisitor) upsertGRPCClientPlaceholderTS(service, method string, call *sitter.Node) string {
 	if v.grpcClientPlaceholderIDsTS == nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V5 — struct field aggregation for storage packing. Sums
+// Struct field aggregation for storage packing. Sums
 // each struct's member byte footprint with the same packing rules as
 // top-level state vars, then uses the total to size NodeField rows
 // whose user_defined_type matches a known struct. Pre/post-slot

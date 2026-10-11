@@ -2,7 +2,7 @@ package semantic
 
 import "fmt"
 
-// CoreConceptKinds is the D1 common vocabulary. Organization and industry
+// CoreConceptKinds is the core common vocabulary. Organization and industry
 // concepts live in separately versioned packs and cannot redefine these IDs.
 var CoreConceptKinds = map[string]string{
 	"project": "entity", "dataset": "artifact", "source-snapshot": "artifact",

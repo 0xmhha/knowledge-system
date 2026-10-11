@@ -27,12 +27,12 @@ import (
 // because the differentiation belongs downstream, where it actually
 // changes behavior:
 //
-//   - B.4 ckg searcher uses Intent to pick SymbolKind filters.
-//   - B.5 graph expander uses Intent to pick Relation sets (BugFix ->
+//   - The Stage 2 ckg searcher uses Intent to pick SymbolKind filters.
+//   - The Stage 3 graph expander uses Intent to pick Relation sets (BugFix ->
 //     callers, ArchExplain -> imports, Security -> input boundaries).
-//   - B.7 sanitize uses Intent to pick rule severity (Security stricter).
+//   - Sanitize uses Intent to pick rule severity (Security stricter).
 //
-// The intent parameter is kept on the signature so Phase E can measure
+// The intent parameter is kept on the signature so evaluation can measure
 // whether intent-aware extraction (e.g., forcing a "test" candidate for
 // IntentTestAdd) improves recall enough to justify the added complexity.
 // Until that data exists, splitting candidate extraction by Intent would

@@ -7,9 +7,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W7.4 V25 — explicit-list modifier override lockdown.
+// Explicit-list modifier override lockdown.
 //
-// W7.3 V0 (modifier_composition_test.go) locked the *bare* override
+// modifier_composition_test.go locks the *bare* override
 // form: `modifier m() override { _; }`. The sibling explicit-list
 // form `modifier m() override(A, B) { _; }` has its own code path in
 // runModifierOverride (overrides.go) — the
@@ -20,7 +20,7 @@ import (
 // drift class #1: a walker invariant added on one path with the
 // sibling path implicitly assumed to track.
 //
-// V25 pins the explicit-list path. The fixture diamond-inherits from
+// This test pins the explicit-list path. The fixture diamond-inherits from
 // two unrelated abstract parents (A, B), each declaring the same
 // virtual modifier name. The child must resolve the conflict with
 // `override(A, B)` — Solidity rejects bare `override` when two
@@ -32,11 +32,11 @@ import (
 //     Child.m → A.m, Child.m → B.m.
 //   - No spurious EdgeOverrides edges from anywhere else.
 //   - Both source and destination of each edge are NodeModifier
-//     (not NodeFunction) — the W2 function-pair resolver and the
-//     W7.3 modifier-pair resolver share funcByQName but disambiguate
+//     (not NodeFunction) — the function-pair resolver and the
+//     modifier-pair resolver share funcByQName but disambiguate
 //     by NodeType.
 //
-// What this catches that V0 alone doesn't:
+// What this catches that the bare-override test alone doesn't:
 //
 //	A refactor that drops or short-circuits the
 //	`len(explicitParents) > 0` branch in runModifierOverride would

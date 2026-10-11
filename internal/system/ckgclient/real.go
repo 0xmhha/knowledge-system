@@ -71,7 +71,7 @@ func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bo
 // SearchOpts.Filter is present. Post-filter discards rows the caller
 // did not want, so we pull this many times more rows up front to keep
 // the kept-row count close to the caller's K. 3× balances "enough
-// survivors" against "extra SQLite work per call." Phase E may tune
+// survivors" against "extra SQLite work per call." Evaluation may tune
 // this based on miss rates.
 const FilterOverfetchRatio = 3
 
@@ -101,7 +101,7 @@ type ManifestSnapshot struct {
 // so mocks don't need to import internal/persist (which they can't).
 type storeReader interface {
 	LoadManifestSnapshot() (ManifestSnapshot, error)
-	// SearchFTS returns scored hits (G5): the ckg store carries a real,
+	// SearchFTS returns scored hits: the ckg store carries a real,
 	// result-set-normalized Score in [0,1] plus a backend-native RawScore.
 	SearchFTS(q string, limit int) ([]store.SearchHit, error)
 	FindSymbol(name string, exact bool) ([]types.Node, error)
@@ -113,7 +113,7 @@ type storeReader interface {
 	NodesByFilePath(path string) ([]types.Node, error)
 	NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
 	SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error)
-	// G3 seam: surface ckg's pkg/impact + pkg/evidence + GetNodePRs through
+	// Impact/evidence seam: surface ckg's pkg/impact + pkg/evidence + GetNodePRs through
 	// the same store.Reader the adapter already holds, so mocks stay injectable.
 	ImpactCompute(seedQname, seedFile string, depth int, includeBlobs bool) (map[string]any, error)
 	EvidenceBuildPack(intent, seedQname string, k int) (*evidence.Pack, error)
@@ -245,7 +245,7 @@ func newRealWithStore(s storeReader) *Real {
 // per-Citation commit filter has no incremental signal until ckg
 // supports cross-commit search.
 //
-// Score policy (G5): ckg's SearchFTS returns a real, result-set-normalized
+// Score policy: ckg's SearchFTS returns a real, result-set-normalized
 // Score in [0,1] (descending) on every SearchHit — cks consumes it verbatim
 // rather than synthesizing a rank gradient. NB: a degenerate single-row or
 // all-equal result set has every Score = 1.0 — ckg's min-max maps uniform
@@ -338,12 +338,12 @@ func matchesFilter(n types.Node, f SearchFilter) bool {
 // as given, then progressively drop leading dot-segments until the store resolves
 // it. Bare/exact names hit on the first try, so existing behaviour is unchanged.
 func (r *Real) resolveFlexibleNodes(name string) ([]types.Node, error) {
-	// Canonical-first (B7 join key): a ckg canonical_id (ADR-0001) is globally
+	// Canonical-first (ckv↔ckg join key): a ckg canonical_id (ADR-0001) is globally
 	// unique and is what ckv chunks / domain anchors carry, so it wins over
 	// qname matching. This keeps the public find_symbol / find_callers /
 	// find_callees surface honest about the canonical-id support its tool docs
-	// advertise, including "@<line>"-suffixed same-file duplicates (refinement
-	// B3) that qname suffix matching can never resolve.
+	// advertise, including "@<line>"-suffixed same-file duplicates that qname
+	// suffix matching can never resolve.
 	if n, found, err := r.s.FindByCanonicalID(name); err == nil && found {
 		return []types.Node{n}, nil
 	}
@@ -401,7 +401,7 @@ func (r *Real) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]
 // the traversal uses ckg's reverse=true argument — the only way ckg
 // surfaces inbound edges in NeighborhoodByQname's signature. If callers
 // mix forward + reverse relations in one call, this implementation
-// performs two ckg queries and concatenates; C.1 keeps it simple by
+// performs two ckg queries and concatenates; this version keeps it simple by
 // supporting a single direction per call (mixed direction yields an
 // error to make the limitation explicit).
 func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts NeighborsOpts) ([]contract.Neighbor, error) {
@@ -520,7 +520,7 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 			Source:   nodeToCitation(srcN, commit),
 			Target:   nodeToCitation(dstN, commit),
 			Relation: rel,
-			Distance: 1, // C.1: single-hop neighbor distance; depth>1 returns
+			Distance: 1, // Single-hop neighbor distance; depth>1 returns
 			// nodes/edges flattened by ckg, but ckg does not annotate per-edge
 			// hop count. Refine with BFS when depth>1 becomes a real use case.
 		})
@@ -683,7 +683,7 @@ func (r *Real) GetNodePRs(ctx context.Context, qname string, opts PRRefOpts) ([]
 }
 
 // uniqueResolved picks the node that `name` resolves to from suffix-match defs
-// WITHOUT ever silently guessing (ADR-0001, Phase 3): an exact qualified_name
+// WITHOUT ever silently guessing (ADR-0001): an exact qualified_name
 // match wins; otherwise the single distinct match is returned; a multi-match is
 // reported as unresolved (ok=false) so callers fail safe rather than binding to
 // the arbitrary first-of-N (the old `defs[0]`, which could be the wrong symbol).
@@ -1253,7 +1253,7 @@ func nodeMatchesKinds(n types.Node, kinds []string) bool {
 //	cks RelationImplements -> ckg "implements"
 //	cks RelationImports    -> ckg "imports"
 //	cks RelationReferences -> ckg "references"
-//	cks RelationTestedBy   -> ckg has no direct edge; not supported in C.1
+//	cks RelationTestedBy   -> ckg has no direct edge; not supported yet
 //	cks RelationEmbeds     -> ckg "extends"   (closest analog)
 //	cks RelationDefines    -> ckg "defines"
 //	cks RelationUsesType   -> ckg "uses_type" (explicit requests only)

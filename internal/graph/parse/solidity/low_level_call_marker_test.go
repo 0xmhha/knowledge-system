@@ -6,13 +6,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W8 V1 — HasLowLevelCall and HasValueTransfer presence markers
+// HasLowLevelCall and HasValueTransfer presence markers
 // on Solidity callables.
 //
-// Complement to W7.1 V0 EdgeInvokes which only fires when the
+// Complement to the low-level-call EdgeInvokes which only fires when the
 // receiver is a state-var / parameter typed as Contract or Interface.
 // Address-typed receivers (the common proxy pattern), address(x)
-// cast wrappers, and chained receivers all produce no edge in V0
+// cast wrappers, and chained receivers all produce no edge there
 // but the markers light up so security audits can ask
 // "which functions perform any low-level call shape".
 

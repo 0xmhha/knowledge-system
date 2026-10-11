@@ -13,8 +13,8 @@
 // Limitations of v0:
 //   - The chain provides tamper-evidence, not tamper-prevention. An attacker
 //     with write access can rewrite the entire file including hashes; only
-//     external (signed/published) anchors close that loop. Phase 3+ may add
-//     periodic Merkle anchoring.
+//     external (signed/published) anchors close that loop. A later version
+//     may add periodic Merkle anchoring.
 //   - On Open, the resume path reads the entire existing file to recover
 //     lastHash. For multi-GB logs this is wasteful; a chunked backward scan
 //     is a candidate optimization once log sizes warrant it.

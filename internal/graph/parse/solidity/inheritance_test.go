@@ -19,10 +19,10 @@ type inheritWant struct {
 	parent   string
 }
 
-// TestSolInheritance_SingleFile covers W1 (Sol inheritance) detection for
+// TestSolInheritance_SingleFile covers Sol inheritance detection for
 // all same-file cases — simple, multiple, interface-implements, abstract.
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §3.1, §4.1
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §3.1, §4.1
 // Decisions: §5.0 — same-file → EXTRACTED, child→parent direction.
 //
 // Each fixture is parsed in isolation (a fresh sol.Parser rooted at its
@@ -181,9 +181,9 @@ func TestSolInheritance_CrossFile(t *testing.T) {
 	}
 }
 
-// TestSolInheritance_InterfaceNodeEmitted verifies W1's interface emit
+// TestSolInheritance_InterfaceNodeEmitted verifies the interface emit
 // path: `interface IFoo { ... }` lands as a NodeInterface with
-// SubKind="interface". Same-file regression — without this, the W1
+// SubKind="interface". Same-file regression — without this, the
 // inheritance resolver can't classify `is IFoo` as EdgeImplements.
 func TestSolInheritance_InterfaceNodeEmitted(t *testing.T) {
 	dir := filepath.Join("testdata", "inheritance")

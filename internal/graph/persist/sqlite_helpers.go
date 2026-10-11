@@ -21,8 +21,8 @@ const nodeColumns = `id, type, name, qualified_name, file_path,
 // on older builds, 32766 on modernc.org/sqlite — but go-stablenet's 217 K
 // nodes would breach either limit when each chunk emits 2N params (src + dst).
 // 400 ids per chunk = 800 params, comfortably below the conservative 999
-// ceiling and well under the modern 32 K. Per § 3 Q5 in the G6 v3 redesign:
-// "chunked QueryEdgesForNodes" is the named fix for this exact bottleneck.
+// ceiling and well under the modern 32 K. Chunked
+// QueryEdgesForNodes is the fix for this exact bottleneck.
 const queryEdgesChunk = 400
 
 // placeholders returns a comma-separated `?,?,?` of length n. n<=0 returns
@@ -93,7 +93,7 @@ func scanSearchHits(rows *sql.Rows) ([]SearchHit, error) {
 
 // scanEdges drains rows produced by QueryEdgesForNodes (file_path/line are
 // COALESCE'd in the SELECT, so direct scan is safe here too). dispatch_kind
-// is the trailing column added in schema 1.7 (Track C P1b) — empty string
+// is the trailing column added in schema 1.7 — empty string
 // for every non-`invokes` edge.
 func scanEdges(rows *sql.Rows) ([]types.Edge, error) {
 	var out []types.Edge

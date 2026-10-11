@@ -1,5 +1,5 @@
 // Package retrieval implements the LLM-free retrieval-accuracy
-// measurement (EV1 Phase 2) — load YAML probe fixtures, dispatch each
+// measurement — load YAML probe fixtures, dispatch each
 // to the matching MCP tool through StoreReader, score result symbols
 // against an expected set with recall / precision / F1.
 //
@@ -54,7 +54,7 @@ type Probe struct {
 
 // Expect carries the gold-set symbols. The set is unordered; order is
 // not part of the assertion. If a downstream test cares about ranking
-// (top-K MRR, NDCG), that's a Phase 2.5 addition, not what this layer
+// (top-K MRR, NDCG), that's a separate addition, not what this layer
 // scores.
 type Expect struct {
 	Symbols []string `yaml:"symbols"`
@@ -105,8 +105,8 @@ func LoadFixtures(dir string) ([]Fixture, error) {
 		}
 		out = append(out, f)
 	}
-	// Sort by ID so runs are reproducible — the bench-mcp baseline
-	// idiom we already use for CKG-5.
+	// Sort by ID so runs are reproducible — the same idiom the
+	// bench-mcp baseline uses.
 	sortByID(out)
 	return out, nil
 }

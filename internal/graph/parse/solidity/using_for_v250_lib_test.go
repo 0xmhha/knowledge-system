@@ -7,13 +7,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.5 — file-level operator-form using directive with
-// library-method target. The V2.5 walker pattern-matches the
-// braced shape at source_file scope (which V2.18's file-level
+// File-level operator-form using directive with
+// library-method target. The operator-form walker pattern-matches the
+// braced shape at source_file scope (which the ERROR-tolerant file-level
 // recovery declined because identifier "global" precedes the
 // type_name in named-child order, breaking source-order extraction)
 // and emits a binding pair per (container, library) — same shape
-// V2.20 produces at contract scope.
+// the contract-scope recovery walker produces.
 //
 // Free-function form `using {mul as +}` is still grammar-recoverable
 // by the same walker, but the emitted PendingRefs drop at resolveUsing

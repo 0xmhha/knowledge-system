@@ -22,8 +22,7 @@ import (
 // Endpoint/Model fields are reserved for that change so this struct
 // does not have to be re-shaped later.
 //
-// The decision to default to DryRun=true (per dogfood plan instruction
-// ④) means `--llm` is immediately useful: an operator running ckg
+// The decision to default to DryRun=true means `--llm` is immediately useful: an operator running ckg
 // validate gets actionable prompts without any external dependency or
 // network access.
 type LLMValidator struct {

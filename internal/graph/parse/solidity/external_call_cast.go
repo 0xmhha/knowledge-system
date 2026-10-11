@@ -6,10 +6,9 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
-// Sol W-C W10 V5 (2026-05-19) — cast / wrapper shape detection
-// for HasExternalCall.
+// Sol cast / wrapper shape detection for HasExternalCall.
 //
-// W10 V4 lit up HasExternalCall on the enclosing callable when a
+// Pass 2 lights up HasExternalCall on the enclosing callable when a
 // bare-identifier receiver (`target.call(...)`) resolved to an
 // address-typed Sol scope variable through resolveLowLevelCallRef.
 // Sol code frequently uses cast wrappers around the receiver:
@@ -20,7 +19,7 @@ import (
 //
 // The cast expression always evaluates to an address (or address
 // payable), so by construction these are arbitrary-address dispatch
-// surfaces regardless of the inner argument's static type. V5
+// surfaces regardless of the inner argument's static type. This walker
 // detects the cast shape directly and marks HasExternalCall on the
 // enclosing callable without going through receiver-type
 // resolution.
@@ -52,10 +51,10 @@ func (v *declVisitor) runExternalCallCastMarker() {
 	matches := cur.Matches(query, v.root, v.src)
 	names := query.CaptureNames()
 	affected := map[string]bool{}
-	// W-C W10 V8 (2026-05-19): track self-reference casts
+	// Track self-reference casts
 	// separately so HasSelfReentrantCall takes precedence over
 	// HasExternalCall when the cast argument is `this`.
-	// W-C W10 V9 (2026-05-19): additionally track self casts whose
+	// Additionally track self casts whose
 	// method is `delegatecall` — `address(this).delegatecall(...)`
 	// is effectively dead code and warrants a separate marker.
 	selfAffected := map[string]bool{}
@@ -75,13 +74,13 @@ func (v *declVisitor) runExternalCallCastMarker() {
 				continue
 			}
 			methodName := property.Utf8Text(v.src)
-			// W-C W10 V12 (2026-05-19): also accept value-
+			// Also accept value-
 			// transfer methods (send / transfer) for the self-
 			// cast detection. `payable(this).transfer(value)`
 			// is a self-reentrant surface even though the
 			// existing low-level call branch wouldn't admit it.
 			// Arbitrary-address transfers (`payable(target)
-			// .transfer(...)`) stay on the V5 HasValueTransfer
+			// .transfer(...)`) stay on the HasValueTransfer marker
 			// path and don't trigger HasExternalCall — the
 			// value-transfer marker is its own signal.
 			if !isLowLevelMethod(methodName) && !isValueTransferMethod(methodName) {
@@ -91,7 +90,7 @@ func (v *declVisitor) runExternalCallCastMarker() {
 			if parent != nil && parent.Kind() == "expression" {
 				parent = parent.Parent()
 			}
-			// W-C W10 V18 (2026-05-21): Sol 0.7+ writes value / gas
+			// Sol 0.7+ writes value / gas
 			// overrides as `.call{value: x, gas: y}(...)`. In the
 			// tree-sitter grammar that wraps the `.call` member into a
 			// struct_expression (with another expression node above the
@@ -133,9 +132,9 @@ func (v *declVisitor) runExternalCallCastMarker() {
 					selfDelegatecallDead[id] = true
 				}
 			} else if isLowLevelMethod(methodName) {
-				// Arbitrary-address low-level call (V5 path).
+				// Arbitrary-address low-level call.
 				// Arbitrary-address value-transfer is already
-				// covered by W8 V1's HasValueTransfer marker
+				// covered by the HasValueTransfer marker
 				// — don't double-count it on HasExternalCall.
 				affected[id] = true
 			}
@@ -201,7 +200,7 @@ func isAddressCastCall(n *sitter.Node, src []byte) bool {
 		return true
 	case "type_cast_expression":
 		// First named child of a type_cast_expression is the target
-		// type; only `address(...)` qualifies for V5.
+		// type; only `address(...)` qualifies.
 		first := n.NamedChild(0)
 		if first == nil {
 			return false

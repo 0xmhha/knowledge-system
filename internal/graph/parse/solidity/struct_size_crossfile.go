@@ -7,7 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W9 V6 (2026-05-19) — cross-file struct size correction
+// Sol cross-file struct size correction
 // for storage slot index.
 //
 // computeStructSizes (Pass 1) sizes structs the file owns. Pass 2
@@ -20,9 +20,9 @@ import (
 // (within the contract — inheritance offset is added separately
 // by applyInheritanceSlotOffset).
 //
-// V6 doesn't touch the inheritance offset side of slot computation
-// (still in W9 V1 territory); diamond C3 linearization remains
-// deferred. The helper runs BEFORE applyInheritanceSlotOffset so
+// This helper doesn't touch the inheritance offset side of slot
+// computation (applyInheritanceSlotOffset owns it, including C3
+// linearization). The helper runs BEFORE applyInheritanceSlotOffset so
 // the contract-local correction lands before the inheritance offset
 // accumulates on top.
 
@@ -83,7 +83,7 @@ func applyCrossFileStructSizes(nodes []types.Node, globalStructSizes map[string]
 				} else {
 					// Truly unknown type — fall back to the
 					// conservative full-slot advance same as
-					// runStateVarDecl's pre-V6 path.
+					// runStateVarDecl's Pass 1 path.
 					slot, state = advanceForField(state, 32)
 				}
 			}

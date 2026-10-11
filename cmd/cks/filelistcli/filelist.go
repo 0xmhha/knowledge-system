@@ -138,13 +138,13 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 		return fmt.Errorf("%s: %w", configPath, err)
 	}
 	if cfg.BuildContext.GOOS == "" || cfg.BuildContext.GOARCH == "" {
-		return fmt.Errorf("%s: build_context.goos and build_context.goarch are required (design R9 — the derivation must not inherit the invoking machine's context)", configPath)
+		return fmt.Errorf("%s: build_context.goos and build_context.goarch are required (the derivation must not inherit the invoking machine's context)", configPath)
 	}
 	if len(cfg.BuildRoots) == 0 {
 		return fmt.Errorf("%s: build_roots must not be empty", configPath)
 	}
 
-	// Source-state discipline (design R10).
+	// Source-state discipline: only git-tracked, committed state counts.
 	dirty, err := dirtyTracked(srcAbs)
 	if err != nil {
 		return err
@@ -177,7 +177,7 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 		rootContrib[root] = len(include) - before
 	}
 	if counts.Build == 0 {
-		return fmt.Errorf("build roots resolved zero in-module build files — refusing to emit an empty scope (R7)")
+		return fmt.Errorf("build roots resolved zero in-module build files — refusing to emit an empty scope")
 	}
 
 	// Extra packages (outside the dep graph): resolved via go list so they
@@ -195,7 +195,7 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 		counts.ExtraPackages += len(include) - before
 	}
 
-	// Extra globs: matched against git-tracked files only (design R10).
+	// Extra globs: matched against git-tracked files only.
 	if len(cfg.ExtraGlobs) > 0 {
 		tracked, err := gitLines(srcAbs, "ls-files")
 		if err != nil {
@@ -277,7 +277,7 @@ func (c Config) tagsArgs() []string {
 }
 
 // buildEnv is the pinned build context for every go list subprocess
-// (design R9): explicit, never inherited.
+// explicit, never inherited.
 func buildEnv(cfg Config) []string {
 	cgo := "0"
 	if cfg.BuildContext.CGO {
@@ -404,8 +404,8 @@ func globToRegexp(glob string) (*regexp.Regexp, error) {
 }
 
 // dirtyTracked reports whether any TRACKED file is modified/staged/deleted.
-// Untracked files are ignorable noise (they can never enter the list — R10
-// resolves against git-tracked state).
+// Untracked files are ignorable noise (they can never enter the list — the
+// list resolves against git-tracked state).
 func dirtyTracked(src string) (bool, error) {
 	lines, err := gitLines(src, "status", "--porcelain")
 	if err != nil {

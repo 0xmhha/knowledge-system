@@ -1,6 +1,6 @@
 package ckv_test
 
-// Operator-gated smoke for M2.b/c (02-ckv-refactor.md §6): validates a REAL
+// Operator-gated smoke for a real index: validates a REAL
 // bge-m3 go-stablenet index built on a machine with Ollama. The ~10h embed is
 // run by the operator; this committed test makes the acceptance REPRODUCIBLE
 // (mirrors ckg's gated gsn_smoke_test.go). It exercises the exact cks-facing
@@ -30,7 +30,7 @@ import (
 func TestGoStablenetBgeM3Smoke(t *testing.T) {
 	indexDir := os.Getenv("CKV_GSN_INDEX")
 	if indexDir == "" {
-		t.Skip("set CKV_GSN_INDEX to a bge-m3 go-stablenet index dir (vector.db + manifest.json) to run the M2.b/c smoke")
+		t.Skip("set CKV_GSN_INDEX to a bge-m3 go-stablenet index dir (vector.db + manifest.json) to run the bge-m3 index smoke")
 	}
 	model := os.Getenv("CKV_GSN_MODEL")
 	if model == "" {
@@ -38,7 +38,7 @@ func TestGoStablenetBgeM3Smoke(t *testing.T) {
 	}
 
 	// Real, CGO-free, in-process embedder against a live Ollama daemon — the
-	// M5 gate (does this Ollama serve bge-m3 embeddings?) and the cks import
+	// model gate (does this Ollama serve bge-m3 embeddings?) and the cks import
 	// path in one shot. A failure here is the operator's signal that Ollama
 	// isn't serving the model, not a code defect.
 	emb, err := ollama.Open(ollama.Options{ModelName: model})
@@ -53,7 +53,7 @@ func TestGoStablenetBgeM3Smoke(t *testing.T) {
 	}
 	defer func() { _ = engine.Close() }()
 
-	// --- M2.b: index identity (bge-m3, 1024-dim) ---
+	// --- index identity (bge-m3, 1024-dim) ---
 	man := engine.Manifest()
 	if man.EmbeddingModel != model {
 		t.Errorf("manifest embedding_model=%q, want %q", man.EmbeddingModel, model)
@@ -64,18 +64,18 @@ func TestGoStablenetBgeM3Smoke(t *testing.T) {
 	if man.EmbeddingDim != emb.Dimension() {
 		t.Errorf("manifest dim=%d disagrees with live embedder dim=%d", man.EmbeddingDim, emb.Dimension())
 	}
-	t.Logf("M2.b identity: model=%s dim=%d chunks=%d src=%s",
+	t.Logf("identity: model=%s dim=%d chunks=%d src=%s",
 		man.EmbeddingModel, man.EmbeddingDim, man.ChunkCount, man.SrcRoot)
 
-	// --- M2.b: structured freshness reports through the cks-facing method ---
+	// --- structured freshness reports through the cks-facing method ---
 	rep, ferr := engine.Freshness()
 	if ferr != nil {
 		t.Fatalf("Freshness(): %v", ferr)
 	}
-	t.Logf("M2.b freshness: fresh=%v stale=%v indexed=%s current=%s changed=%d warnings=%v",
+	t.Logf("freshness: fresh=%v stale=%v indexed=%s current=%s changed=%d warnings=%v",
 		rep.Fresh, rep.Stale, short(rep.IndexedHead), short(rep.CurrentHead), len(rep.ChangedFiles), rep.Warnings)
 
-	// --- M2.c: domain queries return hits carrying policy guidance ---
+	// --- domain queries return hits carrying policy guidance ---
 	// go-stablenet domain intents (non-Ethereum: WBFT consensus, governance
 	// system contracts). At least one hit across these must carry a policy
 	// Category/Guidance (the operational guidance channel, 00 §4.1) and we log
@@ -104,19 +104,19 @@ func TestGoStablenetBgeM3Smoke(t *testing.T) {
 				invariantHits++
 			}
 		}
-		t.Logf("M2.c query %q → %d hits", intent, len(resp.Hits))
+		t.Logf("query %q → %d hits", intent, len(resp.Hits))
 	}
 
 	if totalHits == 0 {
-		t.Fatal("M2.c: domain queries returned 0 hits — index empty or embedder mismatch")
+		t.Fatal("domain queries returned 0 hits — index empty or embedder mismatch")
 	}
 	if guidanceHits == 0 {
-		t.Errorf("M2.c: no hit across %d domain queries carried policy Category/Guidance — "+
+		t.Errorf("no hit across %d domain queries carried policy Category/Guidance — "+
 			"is policy/stablenet.yaml applied at build time?", len(intents))
 	}
 	// Tier-2 invariant markers depend on go-stablenet-side seeding (00 §4.2);
 	// log rather than hard-fail so this smoke is useful before seeding lands.
-	t.Logf("M2.c totals: hits=%d guidance-tagged=%d invariant-chunks=%d (invariant seeding is a go-stablenet task, informational)",
+	t.Logf("domain totals: hits=%d guidance-tagged=%d invariant-chunks=%d (invariant seeding is a go-stablenet task, informational)",
 		totalHits, guidanceHits, invariantHits)
 }
 

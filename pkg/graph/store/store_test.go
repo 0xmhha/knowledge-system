@@ -17,7 +17,7 @@ var _ store.Reader = (store.Reader)(nil)
 // touch via Reader must be reachable through pkg/store. If any of these
 // alias declarations stops compiling, an external consumer has lost the
 // ability to use Reader without falling back to internal/persist (which
-// they cannot reach by the Go `internal/` rule). See CKG-6.
+// they cannot reach by the Go `internal/` rule).
 var (
 	_ store.SearchHit         = store.SearchHit{}
 	_ store.SearchFTSOptions  = store.SearchFTSOptions{}

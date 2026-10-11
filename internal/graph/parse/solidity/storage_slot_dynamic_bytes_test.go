@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V12 — dynamic bytes/string slot occupancy audit. Both
+// Dynamic bytes/string slot occupancy audit. Both
 // dynamic types occupy exactly one storage slot at the
 // declaration site (length+content inline for short values,
 // length-in-slot + hash-addressed content for long values).

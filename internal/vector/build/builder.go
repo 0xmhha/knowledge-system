@@ -68,7 +68,7 @@ type Options struct {
 	// baseline. Chunk IDs and the stored Text are unaffected either way.
 	DisableContextualPrefix bool
 
-	// LLMPrefixModel enables Phase D.2 contextual retrieval: an Ollama chat
+	// LLMPrefixModel enables LLM contextual retrieval: an Ollama chat
 	// model (e.g. "llama3") writes a one-sentence description of each chunk,
 	// prepended to the chunk's raw embed text. Empty (the default) keeps the
 	// cheap rule-based prefix. Generated prefixes are disk-cached under
@@ -370,7 +370,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 
 	// Accumulate a per-file index of code chunk line spans so a flow corpus
 	// (loaded after the source loop) can align each step's file:line to the
-	// code chunk that implements it (Phase C). Populated only when a flow
+	// code chunk that implements it. Populated only when a flow
 	// corpus is configured — no cost otherwise.
 	codeIx := flowcorpus.CodeIndex{}
 
@@ -414,7 +414,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 					}
 				}
 			}
-			// Record code chunk spans for flow-step alignment (Phase C).
+			// Record code chunk spans for flow-step alignment.
 			// Only symbol / function-split chunks are alignment targets —
 			// header/whole-file chunks span the file and would shadow the
 			// containing symbol. Skipped entirely without a flow corpus.
@@ -562,7 +562,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		for _, w := range fcStats.Warnings {
 			fmt.Fprintf(os.Stderr, "ckv: flow-corpus warning: %s\n", w)
 		}
-		// Phase C: align each flow step's file:line to the code chunk that
+		// Align each flow step's file:line to the code chunk that
 		// implements it. Done before upsert so aligned_chunk_id is persisted.
 		// A low resolution rate means the corpus drifted from the code — warn
 		// but proceed (unaligned steps still embed and retrieve on prose).
@@ -808,8 +808,8 @@ func embedResilient(ctx context.Context, emb types.Embedder, chunks []types.Chun
 	}
 	if len(chunks) <= 1 {
 		if len(chunks) == 1 {
-			// B0 and other quality-sensitive builds can require every stored
-			// chunk to have a vector from its full input. The normal recovery
+			// Quality-sensitive builds (e.g. the vector probe) can require
+			// every stored chunk to have a vector from its full input. The normal recovery
 			// path below embeds only the head or skips a rejected chunk.
 			if os.Getenv("CKV_REQUIRE_COMPLETE_EMBEDDINGS") == "1" {
 				return nil, nil, fmt.Errorf("%w: chunk %s (%s): %v",

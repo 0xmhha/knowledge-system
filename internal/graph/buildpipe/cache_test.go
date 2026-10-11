@@ -365,7 +365,7 @@ func manifestHasPath(m persist.Manifest, path string) bool {
 }
 
 // TestPartialCache_PreservesCrossFileEdges_ViaColdFallback is the regression
-// guard for the A3 follow-up: previously, when a callee file was modified
+// guard for a partial-cache bug: previously, when a callee file was modified
 // (cached caller still pointing into it), the partial-cache routing in
 // runIncremental dropped the cross-file `calls` edge because cached files
 // don't re-emit pending refs. Empirical proof: testdata/synthetic vault.go
@@ -422,7 +422,7 @@ func Helper() {}
 	runBuild(t, dir, out)
 	warmCalls := countCrossFileCallsEdges(t, filepath.Join(out, "graph.db"))
 	if warmCalls != coldCalls {
-		t.Errorf("cross-file calls drifted on partial-cache rebuild: cold=%d warm=%d (regression: A3 partial-cache silent edge loss)",
+		t.Errorf("cross-file calls drifted on partial-cache rebuild: cold=%d warm=%d (regression: partial-cache silent edge loss)",
 			coldCalls, warmCalls)
 	}
 }

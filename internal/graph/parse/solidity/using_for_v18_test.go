@@ -4,20 +4,20 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.8 — generic iterative walker tests.
+// Generic iterative walker tests.
 //
-// V1.8 handles chains the V1.3-V1.7 hardcoded predicates don't catch:
+// The generic walker handles chains the hardcoded predicates don't catch:
 //   - depth ≥ 4 same-contract chains
 //   - depth ≥ 3 cross-contract chains
 //
-// V1.3-V1.7 hardcoded predicates still catch the shallower shapes via
-// earlier caller-dispatch branches; V1.8 only fires when those reject.
+// The hardcoded predicates still catch the shallower shapes via
+// earlier caller-dispatch branches; the generic walker only fires when those reject.
 //
-// V1.8 carry-over (V1.9+): multi-return tuple slot selection,
+// Not covered here: multi-return tuple slot selection,
 // member-of-member receivers (`a.b.c.foo()`), grammar-blocked items.
 
 // TestUsingForV18_Depth4SameContract — 4 same-contract chain links.
-// `mkA().mkB().mkC().mkD().add(1)` — V1.7 (depth-3) reject, V1.8 fires.
+// `mkA().mkB().mkC().mkD().add(1)` — depth-3 predicate rejects, generic walker fires.
 func TestUsingForV18_Depth4SameContract(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v18", "depth4_same_contract.sol")
 	got := collectUsingForCalls(nodes, edges)
@@ -30,7 +30,7 @@ func TestUsingForV18_Depth4SameContract(t *testing.T) {
 }
 
 // TestUsingForV18_Depth3CrossContract — 3 cross-contract chain links.
-// `obj.foo().bar().baz().add(1)` — V1.6 (depth-2 cross) reject, V1.8 fires.
+// `obj.foo().bar().baz().add(1)` — depth-2 cross predicate rejects, generic walker fires.
 func TestUsingForV18_Depth3CrossContract(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v18", "depth3_cross_contract.sol")
 	got := collectUsingForCalls(nodes, edges)

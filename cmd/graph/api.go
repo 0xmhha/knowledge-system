@@ -43,7 +43,7 @@ func newAPICmd() *cobra.Command {
 	cmd.Flags().StringVar(&graph, "graph", "", "graph directory containing graph.db")
 	cmd.Flags().StringVar(&dbDsn, "db", "",
 		"PostgreSQL DSN (e.g. postgres://user:pass@host/dbname); if set, read graph from PG (--graph not required). DEPRECATED (ADR-0003): SQLite is the sole maintained backend")
-	// Default port 8080 matches the EXECUTION-GUIDE S0 spec
+	// Default port 8080 matches the documented API server default
 	// ("HTTP 127.0.0.1:8080 loopback bind"). Operators who run multiple
 	// CKG instances or already use 8080 can override via --port.
 	cmd.Flags().IntVar(&port, "port", 8080, "HTTP port")

@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V7 — depth-2 chained shape `a().b().call(...)`. Pass 2
+// Depth-2 chained shape `a().b().call(...)`. Pass 2
 // walks two funcReturnTypes hops: a's return type identifies a
 // contract, b is looked up on that contract, b's first return
 // type must be address-like for the marker to fire.
@@ -25,7 +25,7 @@ func TestChainedExternalCall_DeepChainAddressMarker(t *testing.T) {
 	}
 }
 
-// W-C W10 V6 — chained-call receiver shape lights up
+// Chained-call receiver shape lights up
 // HasExternalCall. `getTarget().call(data)` resolves the inner
 // function's first return type via funcReturnTypes during Pass 2;
 // when the type is address / address payable, the marker fires.

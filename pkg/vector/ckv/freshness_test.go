@@ -1,10 +1,10 @@
 package ckv_test
 
-// Structured-Freshness contract test (S-11, 02 §4 / plan Step 3). Proves the
+// Structured-Freshness contract test. Proves the
 // NEW pkg/ckv.Engine.Freshness() returns the full freshness.Report through the
 // public facade AND that an external package can read every field of
 // ckv.FreshnessReport (the internal-type-alias re-export must be reachable
-// across the module boundary — the risk flagged in plan Part D #3).
+// across the module boundary).
 //
 // The test drives a REAL fresh→stale transition through the public API: it
 // builds an index at a temp git repo's HEAD, asserts Fresh, then makes a second
@@ -73,7 +73,7 @@ func TestFreshness_StructuredFreshThenStale(t *testing.T) {
 
 	// 3. Fresh path: index HEAD == current HEAD. mustFreshness returns
 	// ckv.FreshnessReport, so this also proves the aliased type's fields are
-	// reachable from an external package (plan Part D #3).
+	// reachable from an external package.
 	rep := mustFreshness(t, engine)
 	if !rep.Fresh || rep.Stale {
 		t.Errorf("fresh build: Fresh=%v Stale=%v, want Fresh=true Stale=false (warnings=%v)",

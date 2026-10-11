@@ -131,7 +131,7 @@ type CodeAnchor struct {
 	File   string `yaml:"file"`
 	Symbol string `yaml:"symbol,omitempty"`
 	Line   int    `yaml:"line,omitempty"`
-	// Kind classifies the anchor (symbol-identity Phase 3, A1-3):
+	// Kind classifies the anchor:
 	//   "def" — points at a symbol's definition; Symbol must be uniquely
 	//           resolvable and Line == its definition line (anchor-refresh may
 	//           mechanically refresh the line).

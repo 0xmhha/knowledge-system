@@ -66,7 +66,7 @@ func collectUsingFor(nodes []types.Node, edges []types.Edge) []usingForWant {
 	return out
 }
 
-// TestUsingFor_SpecificBinding — W-C W6 baseline. `using SafeMath for
+// TestUsingFor_SpecificBinding — using-for baseline. `using SafeMath for
 // uint256` in a single contract yields exactly one EdgeUsesFor (Vault →
 // SafeMath) at ConfExtracted (same-file).
 func TestUsingFor_SpecificBinding(t *testing.T) {
@@ -89,8 +89,8 @@ func TestUsingFor_SpecificBinding(t *testing.T) {
 	}
 }
 
-// TestUsingFor_WildcardForm — `using Lib for *` shape recognition. V0
-// emits the same edge shape as specific binding (typeName not surfaced).
+// TestUsingFor_WildcardForm — `using Lib for *` shape recognition. The
+// parser emits the same edge shape as specific binding (typeName not surfaced).
 func TestUsingFor_WildcardForm(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for", "wildcard_binding.sol")
 	got := collectUsingFor(nodes, edges)

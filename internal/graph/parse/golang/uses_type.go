@@ -10,10 +10,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// uses_type.go (Track C P0): emits `uses_type` edges from a Function /
+// uses_type.go emits `uses_type` edges from a Function /
 // Method / Struct field declaration to the named Type it references.
 //
-// Granularity (Track C open question q1=B):
+// Granularity:
 //   - Function arg type    : each parameter's named type → Function uses_type Type
 //   - Function return type : each result's named type   → Function uses_type Type
 //   - Struct field type    : every field's named type   → Struct   uses_type Type
@@ -27,7 +27,7 @@ import (
 //     foreign-package types — those types resolve only against the post-load
 //     packages slice.
 //   - Running here lets us emit a `pending_refs` row for unresolved cross-package
-//     references (Track C open question q4=A) so the partial-cache rebuild
+//     references so the partial-cache rebuild
 //     replays the same input set the cold path saw.
 //
 // Skip rules (avoids edge-explosion / pure noise):
@@ -264,7 +264,7 @@ func forEachNamedTypeInExpr(info *gotypes.Info, e ast.Expr, yield func(qname str
 //	chan T      → recurse into element
 //	struct{...} → recurse into each field
 //	(no special case for interface — interface methods aren't "uses_type"
-//	 in the Track C scope; they're already covered by `implements`).
+//	 in this pass's scope; they're already covered by `implements`).
 //
 // Yield is called once per distinct top-level *types.Named encountered.
 // Builtin / unnamed types yield nothing.

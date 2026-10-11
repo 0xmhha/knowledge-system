@@ -8,8 +8,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// ConcurrencyEdgeTypes is the contract's five concurrency edge types
-// (R1' 00 C1, S1). releases_lock is intentionally excluded — see doc.go.
+// ConcurrencyEdgeTypes is the contract's five concurrency edge types.
+// releases_lock is intentionally excluded — see doc.go.
 var ConcurrencyEdgeTypes = []string{
 	string(types.EdgeSpawns),
 	string(types.EdgeSendsTo),

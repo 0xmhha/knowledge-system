@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// instantiates.go (Track C P1c): emits `instantiates` edges from a
+// instantiates.go emits `instantiates` edges from a
 // Function/Method to a Type when the function body materialises a value of
 // that type via:
 //

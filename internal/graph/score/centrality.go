@@ -10,7 +10,7 @@
 // multiplier, accurate to within ~5% for top-N ranking purposes
 // (graphify uses the same approach in nx.betweenness_centrality(k=…)).
 //
-// Meta nodes (Commit, Hunk — schema 1.4/1.8 G6 Temporal) are excluded
+// Meta nodes (Commit, Hunk — schema 1.4/1.8 temporal) are excluded
 // from both the source pool AND the output map: they have no semantic
 // edges that would produce meaningful centrality scores, and including
 // them would dilute the V scale factor.

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Sol W-C W9 V2 (2026-05-18) — primitive type byte-size lookup for
+// Sol primitive type byte-size lookup for
 // EVM storage packing.
 //
 // Per Sol §11.1 storage layout: consecutive state variables whose
@@ -178,8 +178,8 @@ func advanceForField(state slotState, size int) (int, slotState) {
 }
 
 // advanceForMapping consumes a full slot for a mapping state-var
-// and returns the slot the mapping occupies. W-C W9 V3 (2026-05-18)
-// extends the V2 advance to also produce a SlotIndex so NodeMapping
+// and returns the slot the mapping occupies. It also produces a
+// SlotIndex so NodeMapping
 // rows can be located by storage slot the same way NodeField rows
 // can. The per-key data still lives at keccak256(key, slot) at
 // runtime; this slot is just the declaration slot.
@@ -193,7 +193,7 @@ func advanceForMapping(state slotState) (int, slotState) {
 	return slot, state
 }
 
-// advanceForArrayField (W-C W9 V4, 2026-05-19) places a fixed-size
+// advanceForArrayField places a fixed-size
 // value-type array. Sol §11.1 says struct- and array-shaped state
 // variables always start a new slot, and the next variable after
 // them also starts a new slot — so we pre-align, occupy

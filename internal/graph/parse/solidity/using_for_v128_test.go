@@ -7,18 +7,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.28 — aliased import resolution.
+// Aliased import resolution.
 //
 // Solidity's named-import alias form `import {SafeMath as SM} from
 // "./util.sol"` brings the library SafeMath into the importing file's
 // namespace under the alias SM. `using SM for uint256;` then expects
 // the binding map to associate uint256 with SM, but SM is not a
-// library declaration — it's an alias for SafeMath. Pre-V1.28 the
+// library declaration — it's an alias for SafeMath. Previously the
 // runUsingFor walker looked up the bare identifier SM in
 // byName[NodeContract], missed (no library named SM), and dropped the
 // binding → all SM dispatch sites also dropped.
 //
-// V1.28 closes the gap by:
+// The fix closes the gap by:
 //   1. Walking import_directive nodes during the parse pass and
 //      recording per-file (alias → original) pairs from the positional
 //      `alias` / `import_name` fields.
@@ -28,14 +28,14 @@ import (
 //      resolution (byName[NodeContract][libraryName]) sees the correct
 //      key.
 //
-// V1.28 carry-over (V1.29+):
+// Not covered here:
 //   - Whole-file alias (`import "./util.sol" as L; L.SafeMath.add` —
 //     qualified access). Requires extending dispatch to qualified
 //     identifier lookups.
-//   - Block-scoped shadowing precision (V2+ refactor).
+//   - Block-scoped shadowing precision.
 //   - Grammar-blocked items.
 
-// TestUsingForV128_AliasedNamedImport — canonical V1.28 case. Caller
+// TestUsingForV128_AliasedNamedImport — canonical aliased-import case. Caller
 // imports SafeMath under alias SM and uses-for via SM. Expects the
 // alias to resolve to SafeMath transparently.
 func TestUsingForV128_AliasedNamedImport(t *testing.T) {

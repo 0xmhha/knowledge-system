@@ -85,7 +85,7 @@ type Response = query.Response
 // snippet, normalized score, and symbol metadata.
 type Hit = query.Hit
 
-// Flow-aware retrieval types (Phase D), re-exported so in-process consumers
+// Flow-aware retrieval types, re-exported so in-process consumers
 // (cks's ckvclient) get them without importing internal/query.
 type (
 	FlowSelector         = query.FlowSelector
@@ -195,7 +195,7 @@ func (e *Engine) SemanticSearch(ctx context.Context, intent string, opts SearchO
 	return e.inner.Search(ctx, intent, opts)
 }
 
-// GetFlow lays out a curated flow's steps in call order (Phase D). Select by
+// GetFlow lays out a curated flow's steps in call order. Select by
 // exactly one of FlowSelector.FlowID / EntryPoint / InvariantID.
 func (e *Engine) GetFlow(ctx context.Context, sel FlowSelector) (*FlowView, error) {
 	if e == nil || e.inner == nil {

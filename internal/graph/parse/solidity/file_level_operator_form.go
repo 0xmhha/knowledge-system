@@ -7,14 +7,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W6 V2.5 (2026-05-19) — file-level operator-form using
-// directive recovery.
+// Sol file-level operator-form using directive recovery.
 //
 // Sol 0.8.13+ file-level `using {f1 as +, f2 as -} for T [global];`
 // (free-function or library-method form with user-defined operator
 // bindings) is parsed by vendored tree-sitter-solidity v1.2.11 as an
 // ERROR child of source_file. Unlike the contract-scope misparse
-// V2.20 handles (which becomes a state_variable_declaration with
+// runOperatorFormRecovery handles (which becomes a state_variable_declaration with
 // recoverable named children), the file-level shape exposes only:
 //
 //	source_file
@@ -24,25 +23,25 @@ import (
 //	    identifier "global"      ← optional qualifier
 //
 // The braced body (`{f1 as +, f2 as -}`) is consumed by the ERROR
-// node text but not surfaced as named children. V2.18's walker
+// node text but not surfaced as named children. runFileLevelUsingFor
 // declines because its source-order extraction picks "global" as
 // libName but doesn't see a following type_name (typeName already
-// passed by). V2.5 fills the gap by parsing the ERROR text directly.
+// passed by). This walker fills the gap by parsing the ERROR text directly.
 //
 // Per Sol semantics, file-level using applies to every contract /
 // interface in the file regardless of the `global` qualifier (the
-// qualifier only controls cross-file binding scope, which V0
+// qualifier only controls cross-file binding scope, which
 // cross-file resolution already handles via NodeFile). One emit per
-// (container, bound function) pair, mirroring V2.18's fan-out.
+// (container, bound function) pair, mirroring runFileLevelUsingFor's fan-out.
 //
 // Multi-function form (`{add as +, sub as -}`) emits one pair per
 // function. Library-method form (`{Lib.method as +}`) reduces to the
-// library name (the same shape V2.20 emits for contract-scope), so
+// library name (the same shape runOperatorFormRecovery emits for contract-scope), so
 // downstream binding-map keys line up.
 //
 // Limitations:
 //   - The `as +` operator association is not preserved on the edge —
-//     V0 dispatch resolution does not yet detect operator usage at
+//     dispatch resolution does not yet detect operator usage at
 //     call sites, so the operator metadata would be unused.
 //   - Free-function form (no library prefix) creates an edge pointing
 //     at the free-function NodeFunction; downstream binding map
@@ -92,15 +91,15 @@ func (v *declVisitor) runFileLevelOperatorForm() {
 				continue
 			}
 			seenLib[libName] = true
-			// W-C W6 V5 / V6 (2026-05-19): when the entry's leading
-			// identifier is a namespace alias (V5) or named-import
-			// alias (V6) with a recorded source path, attach the
+			// When the entry's leading
+			// identifier is a namespace alias or named-import
+			// alias with a recorded source path, attach the
 			// path to the binding PendingRef as a homonym
 			// disambiguation hint. resolveUsingForRef prefers
 			// candidates whose file path matches the hint before
 			// falling back to pickSameFileCandidate.
 			//
-			// W-C W6 V8 (2026-05-19): also append the method name (the
+			// Also append the method name (the
 			// tail's leaf segment when present, e.g. `add` from
 			// `M.SubMath.add`) encoded with the RFC record separator
 			// so resolveUsingForRef can surface it on Edge.DispatchKind.
@@ -138,7 +137,7 @@ func (v *declVisitor) runFileLevelOperatorForm() {
 // leafSegment returns the last dot-segment of a dotted path. For
 // `SubMath.addOne` it returns `addOne`; for bare `mul` it returns
 // `mul`; for empty input it returns `""`. Used by the file-level
-// operator-form walker (W6 V8) to extract the method name when
+// operator-form walker to extract the method name when
 // the entry was a 3+ segment path like `M.SubMath.addOne`.
 func leafSegment(path string) string {
 	if path == "" {
@@ -171,7 +170,7 @@ func (v *declVisitor) resolveUsingBindingLeading(e usingBindingEntry) (string, b
 		if e.tail == "" {
 			return "", false
 		}
-		// V0 only follows the immediate sub-name; deeper paths
+		// Only the immediate sub-name is followed; deeper paths
 		// (`M.SubMod.fn`) fall back to the first segment after the
 		// namespace, matching the existing extractTypeNameText
 		// "trailing identifier" convention.

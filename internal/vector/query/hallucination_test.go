@@ -48,7 +48,7 @@ func TestVerifyHit_ExactSnippetMatchesFile(t *testing.T) {
 
 // TestVerifyHit_SignatureOnlyIsSubstringMatch: snippet is just the
 // signature line — must still verify (substring of the body slice).
-// This covers the DensitySignatureOnly tier from B3.
+// This covers the DensitySignatureOnly density tier.
 func TestVerifyHit_SignatureOnlyIsSubstringMatch(t *testing.T) {
 	dir := fixtureSrcRoot(t)
 	h := mkVerifyHit("order.go", 3, 8, "func ProcessOrder(o Order) error {")

@@ -4,17 +4,17 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.4 — cross-contract chained dispatch tests.
+// Cross-contract chained dispatch tests.
 //
 // Shape: `<obj>.<innerFn>().<method>(...)`. Resolver walks the
 // receiver's typeName (state-var or parameter) to find the inner
 // function in the receiver's contract / interface, then chains the
 // inner function's return type through the using-for binding map.
 //
-// V1.4 carry-over (V1.5+): deeper chains (`obj.foo().bar().baz()`),
+// Not covered here: deeper chains (`obj.foo().bar().baz()`),
 // multi-return tuple slot selection.
 
-// TestUsingForV14_CrossChainBasic — canonical V1.4 case.
+// TestUsingForV14_CrossChainBasic — canonical cross-contract chain case.
 // `factory.create().bump()` where factory is a state var of contract
 // type Factory, create() returns uint256, and using ChainLib for uint256
 // binds the chain to ChainLib.bump.

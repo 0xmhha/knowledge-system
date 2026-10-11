@@ -10,7 +10,7 @@ import (
 )
 
 // fixtureRepo copies testdata/fixturemod into a temp dir and turns it into a
-// committed git repository — the tool requires git-tracked state (R10). The
+// committed git repository — the tool requires git-tracked state. The
 // fixture imports stdlib only, so `go list` needs no network (design §7).
 func fixtureRepo(t *testing.T) string {
 	t.Helper()
@@ -111,14 +111,14 @@ func TestDerive_BuildTestsExtrasGlobs(t *testing.T) {
 	for _, want := range []string{
 		"cmd/app/main.go",      // build root
 		"lib/lib.go",           // closure
-		"lib/only_linux.go",    // present under GOOS=linux (R9)
-		"lib/lib_test.go",      // TestGoFiles (R2)
-		"lib/answer_x_test.go", // XTestGoFiles (R2)
-		"integtest/doc.go",     // extra package (R3)
+		"lib/only_linux.go",    // present under GOOS=linux
+		"lib/lib_test.go",      // TestGoFiles
+		"lib/answer_x_test.go", // XTestGoFiles
+		"integtest/doc.go",     // extra package
 		"integtest/integ_test.go",
 		"tool/tool.go", // extra package /... expansion
 		"tool/sub/sub.go",
-		"assets/contract.sol", // extra glob (R3)
+		"assets/contract.sol", // extra glob
 	} {
 		if !has(o, want) {
 			t.Errorf("missing %s in %v", want, o.Include)
@@ -142,7 +142,7 @@ func TestDerive_BuildTestsExtrasGlobs(t *testing.T) {
 	}
 }
 
-// TestBuildContext locks R9: the pinned GOOS decides constraint-guarded
+// TestBuildContext locks the pinned build context: the pinned GOOS decides constraint-guarded
 // files, regardless of the invoking machine.
 func TestBuildContext(t *testing.T) {
 	repo := fixtureRepo(t)
@@ -161,7 +161,7 @@ func TestEmbedSwitch(t *testing.T) {
 	}
 }
 
-// TestSourceState locks R10: dirty tracked tree refused by default,
+// TestSourceState locks source-state rules: dirty tracked tree refused by default,
 // -allow-dirty records the exception, untracked files never enter via globs.
 func TestSourceState(t *testing.T) {
 	repo := fixtureRepo(t)
@@ -190,7 +190,7 @@ func TestSourceState(t *testing.T) {
 	}
 }
 
-// TestFailClosed locks R7: unresolvable inputs are errors, never omissions.
+// TestFailClosed locks fail-closed resolution: unresolvable inputs are errors, never omissions.
 func TestFailClosed(t *testing.T) {
 	repo := fixtureRepo(t)
 	dir := t.TempDir()

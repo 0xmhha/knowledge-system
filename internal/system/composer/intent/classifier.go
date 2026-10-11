@@ -52,8 +52,8 @@ func WithUnknownThreshold(t float64) Option {
 }
 
 // WithAnchors overrides the default anchor map. Useful for tests and for
-// project-specific anchor injection (Phase D.1 project skill loader can
-// add domain anchors).
+// project-specific anchor injection (a project skill loader can add
+// domain anchors).
 func WithAnchors(anchors map[contract.Intent][]string) Option {
 	return func(c *Classifier) { c.anchors = anchors }
 }

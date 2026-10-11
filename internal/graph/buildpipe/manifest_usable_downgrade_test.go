@@ -7,13 +7,13 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
-// W-C W11 V13 — schema version downgrade guard audit.
+// Schema version downgrade guard audit.
 //
 // Background: SchemaVersion is the cache-key contributor that
 // invalidates the manifest when the extraction schema drifts.
 // TestIncremental_SchemaBumpInvalidates already locks the legacy-
 // upward direction (older persisted schema like "1.0" vs current
-// "1.11" → full rebuild). V13 audits the symmetric direction —
+// "1.11" → full rebuild). This test audits the symmetric direction —
 // a manifest written by a NEWER binary (e.g. SchemaVersion="1.99"
 // in the DB) being opened by an older binary whose constant is
 // still "1.11".

@@ -12,7 +12,7 @@ import (
 )
 
 // TestAnalyze_GoStablenetSmoke validates pkg/concurrency.Analyze against a REAL
-// go-stablenet graph (R1' M2.a). Beyond "non-empty", it cross-checks Analyze's
+// go-stablenet graph. Beyond "non-empty", it cross-checks Analyze's
 // edge set against an INDEPENDENT read of the seed's concurrency edges from the
 // store — so a regression in the traversal/filter is caught, not just emptiness.
 //
@@ -120,8 +120,8 @@ func TestAnalyze_GoStablenetSmoke(t *testing.T) {
 		t.Errorf("expected a Mutex in the blast radius of lock-acquiring %q, got %+v", seedQ, res.Modules)
 	}
 
-	// (C) Source blob must be populated (G3).
+	// (C) Source blob must be populated.
 	if b, gerr := r.GetBlob(seedID); gerr != nil || len(b) == 0 {
-		t.Errorf("expected non-empty source blob for seed %q (G3): err=%v len=%d", seedQ, gerr, len(b))
+		t.Errorf("expected non-empty source blob for seed %q: err=%v len=%d", seedQ, gerr, len(b))
 	}
 }

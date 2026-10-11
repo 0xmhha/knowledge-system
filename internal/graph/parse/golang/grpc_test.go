@@ -129,7 +129,7 @@ func TestGRPC_ClientCalls(t *testing.T) {
 	// Cross-file (server in grpc_server.go, client in grpc_client.go) →
 	// the client emits an AMBIGUOUS placeholder Endpoint (language="external")
 	// because endpointNodeIDs dedup is per-declVisitor / per-file.
-	// V0 W3b limitation: cross-file resolution to the real Endpoint is
+	// V0 limitation: cross-file resolution to the real Endpoint is
 	// deferred to a future linker pass. Both languages (server "go" Endpoint
 	// AND client "external" placeholder) coexist in the graph; users see
 	// the call site as AMBIGUOUS until the linker rewires.
@@ -221,7 +221,7 @@ func TestGRPC_ConfidenceSplit(t *testing.T) {
 // name matches the gRPC client convention (`<Svc>Client`) but whose
 // underlying kind is NOT *Interface do not produce grpc_calls edges.
 // The fixture's FakeClient (rpc_client.go) is a struct with a Call
-// method — without the interface-underlying guard, the W3b detector
+// method — without the interface-underlying guard, the gRPC detector
 // would emit a `grpc:Fake.Call` edge.
 func TestGRPC_NoFalsePositive_FakeClient(t *testing.T) {
 	root := "testdata/distributed"

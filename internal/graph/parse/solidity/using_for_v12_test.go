@@ -7,24 +7,24 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.2 — inherited using directive tests.
+// Inherited using directive tests.
 //
 // Solidity contracts can `is` other contracts; the child inherits the
 // parent's `using` declarations (in practice — solc treats them as
-// in-scope). V1.2 propagates bindings down the inheritance graph by
+// in-scope). The resolver propagates bindings down the inheritance graph by
 // BFS over the parents adjacency built in Pass 2a, merging each
 // ancestor's bindings into the descendant without clobbering local
 // declarations.
 //
-// V1.2 carry-over note (file-level using): tree-sitter-solidity
+// Note on file-level using: tree-sitter-solidity
 // v1.2.13 produces ERROR nodes for 0.8.13+ source-file-scope using
 // directives, so file-level scope is grammar-blocked. See
-// queries.go's V1.2 limitation note. V1.2 lands the inherited path
+// queries.go's limitation note. These tests cover the inherited path
 // (well-supported by the grammar) instead.
 
 // collectUsesForByContractInherited groups EdgeUsesFor edges into
-// (contract, library) pairs — same shape as V1.2 file-level helper
-// in spirit, but local to V1.2 inheritance tests so they don't have
+// (contract, library) pairs — same shape as the file-level helper
+// in spirit, but local to the inheritance tests so they don't have
 // to depend on each other's file structure.
 func collectUsesForByContractInherited(nodes []types.Node, edges []types.Edge) []callWant {
 	byID := map[string]types.Node{}
@@ -56,7 +56,7 @@ func collectUsesForByContractInherited(nodes []types.Node, edges []types.Edge) [
 //
 // Confirms:
 //   - EdgeUsesFor remains on Parent only (not synthesised for Child)
-//     — V1.2 propagates the binding map but doesn't replicate the
+//     — the resolver propagates the binding map but doesn't replicate the
 //     declaration edge.
 //   - EdgeCalls (Child.bump → ParentLib.inc) resolves through the
 //     inherited binding.
@@ -113,7 +113,7 @@ func TestUsingForV12_InheritedMultiLevel(t *testing.T) {
 // TestUsingForV12_InheritedChildOverrides — Child's own `using ChildLib
 // for uint256;` shadows P's inherited `using InheritedLib for uint256;`
 // for matching typeNames. Local declaration wins per Solidity scoping
-// (and per the V1.2 BFS rule "don't clobber a child-scope binding").
+// (and per the BFS rule "don't clobber a child-scope binding").
 func TestUsingForV12_InheritedChildOverrides(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v12", "inherited_child_overrides.sol")
 

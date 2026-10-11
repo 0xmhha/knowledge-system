@@ -18,7 +18,7 @@ const sanitizeRulesetVersion = 1
 
 // SanitizeSeverity records how serious a sanitize-rule hit is. Severity is
 // advisory: it does not change RedactionAction directly, but downstream
-// alerting (Phase 3 policy + audit) routes alerts by severity.
+// alerting (policy + audit) routes alerts by severity.
 type SanitizeSeverity string
 
 const (
@@ -34,7 +34,7 @@ const (
 // stores the compiled form in `re`; callers obtain it via Regexp().
 //
 // Action must be one of contract.RedactionMask / Drop / FailClosed. The
-// Phase-0 base ruleset does NOT use Mask (per the project policy that
+// baseline ruleset does NOT use Mask (per the project policy that
 // matched secrets must not cross the LLM boundary). Operators who choose
 // to enable Mask for development must do so via a custom ruleset.
 type SanitizeRule struct {
@@ -138,7 +138,7 @@ func (rs *SanitizeRuleset) Validate() error {
 }
 
 // Lookup returns the rule with the given ID, or nil if absent. O(n) — the
-// rule count is small (Phase-0 baseline = 8). Switch to a map if that
+// rule count is small (baseline = 8). Switch to a map if that
 // changes materially.
 func (rs *SanitizeRuleset) Lookup(id string) *SanitizeRule {
 	if rs == nil {

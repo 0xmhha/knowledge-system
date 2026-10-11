@@ -6,11 +6,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W8 V27 — cast-receiver / helper-return chain negative lock.
+// Cast-receiver / helper-return chain negative lock.
 //
-// V26 (chained_cross_contract.sol) covered the `s.getCb()(x)` shape
-// where the outer callee is itself a call_expression. V6
-// (cross_contract_fn_pointer.go) documents two more shapes as
+// chained_cross_contract.sol covers the `s.getCb()(x)` shape
+// where the outer callee is itself a call_expression.
+// cross_contract_fn_pointer.go documents two more shapes as
 // deferred:
 //
 //   - Cast-receiver: `Hub(addr).onAction(x)` — receiver is a
@@ -19,22 +19,23 @@ import (
 //     an internal helper's return value.
 //
 // Both fall through matchStateVarMethodCall's bare-identifier
-// receiver requirement. V27 pins all three rows in one fixture:
+// receiver requirement. This test pins all three rows in one fixture:
 //
-//   - bareInvoke (reference)   : HasFunctionPointerCall=true   (V6 cover)
-//   - castInvoke   (cell A)    : HasFunctionPointerCall=false  (V6 drop)
-//   - helperInvoke (cell B)    : HasFunctionPointerCall=false  (V6 drop)
+//   - bareInvoke (reference)   : HasFunctionPointerCall=true   (covered)
+//   - castInvoke   (cell A)    : HasFunctionPointerCall=false  (dropped)
+//   - helperInvoke (cell B)    : HasFunctionPointerCall=false  (dropped)
 //
-// The reference row is essential: it pins V6's positive baseline
+// The reference row is essential: it pins the cross-contract walker's positive baseline
 // inside the same fixture so the negative cells are *specifically*
 // about receiver-shape variance from the bare-identifier case, not
-// about V6 propagation being broken generally. If V6 ever regresses
+// about cross-contract propagation being broken generally. If it ever regresses
 // on the bare path, bareInvoke fails and the diagnosis is
 // "general regression," not "negative locks unexpectedly flipped."
 //
 // Cross-flip protocol: if any of the three rows flips, both this
 // test value and WALKER_SYMMETRY drift row 5 must move together —
-// the catalogue lists V26 + V27 as the *same* limitation family.
+// the catalogue lists the chained-callee and cast/helper-receiver
+// shapes as the *same* limitation family.
 func TestW8V27_CastAndHelperReceiver_NegativeLock(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var",
 		"cast_and_helper_receiver.sol")
@@ -44,7 +45,7 @@ func TestW8V27_CastAndHelperReceiver_NegativeLock(t *testing.T) {
 		ptrProp bool
 	}
 	want := map[string]cell{
-		// Reference row: V6 positive baseline.
+		// Reference row: bare-identifier positive baseline.
 		"Caller.bareInvoke": {ptrCall: true, ptrProp: false},
 		// Cell A: cast-receiver shape.
 		"Caller.castInvoke": {ptrCall: false, ptrProp: false},

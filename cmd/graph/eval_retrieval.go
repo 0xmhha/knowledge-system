@@ -1,7 +1,7 @@
 // cmd/ckg/eval_retrieval.go — `ckg eval-retrieval` runs the LLM-free
 // retrieval probes from eval/retrieval/*.yaml against a built graph
 // and emits per-fixture recall/precision/F1 plus an aggregate gate
-// result. EV1 Phase 2.
+// result.
 package main
 
 import (
@@ -24,7 +24,7 @@ func newEvalRetrievalCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "eval-retrieval",
-		Short: "Run LLM-free retrieval-accuracy probes against a graph (EV1 Phase 2)",
+		Short: "Run LLM-free retrieval-accuracy probes against a graph",
 		Long: `Load every YAML fixture under --fixtures, run each probe
 against the graph at --graph, and score the result symbols against the
 fixture's expected set. Per-fixture recall/precision/F1 plus an

@@ -36,18 +36,18 @@ type declVisitor struct {
 	mutexNodeIDs map[gotypes.Object]string
 	// fieldNodeIDs maps a *types.Object (a struct Field declaration) to its
 	// NodeField ID. Populated during emitFields when typesInfo is available.
-	// Consumed by the accessed_under_lock pass (B1 Phase 4 / G8) to translate
+	// Consumed by the accessed_under_lock pass to translate
 	// `x.field` references inside locked functions into edges anchored at the
 	// owning Field node.
 	fieldNodeIDs map[gotypes.Object]string
 	// endpointNodeIDs maps an Endpoint qname (e.g. "http:GET /users" or
 	// "http:* /users") to its node ID, deduping repeat HandleFunc calls on
-	// the same (method, route) pair within a file. E3 (G5 Distributed).
+	// the same (method, route) pair within a file.
 	// Schema 1.9 §6.2 — cross-language qname format shared with the TS parser.
 	endpointNodeIDs map[string]string
 	// messageNodeIDs maps a MessageType qname (e.g. "pkg.Args" or
 	// "rpc:Service.Method") to its node ID, deduping handles_message and
-	// rpc_calls targets that resolve to the same logical message. E3.
+	// rpc_calls targets that resolve to the same logical message.
 	messageNodeIDs map[string]string
 	// httpClientPlaceholderIDs maps an HTTP-client-call target qname
 	// ("http:METHOD /path") to the AMBIGUOUS placeholder Endpoint ID emitted
@@ -55,12 +55,12 @@ type declVisitor struct {
 	// placeholder Endpoints use Language="external" — they live in a separate
 	// ID space until the link pass (internal/link/http_match.go) either
 	// rewires the http_calls edge to a real Endpoint or leaves the placeholder
-	// in place as an external-API marker (W2, schema 1.9 §6.3 (B), §6.9).
+	// in place as an external-API marker (schema 1.9 §6.3 (B), §6.9).
 	httpClientPlaceholderIDs map[string]string
 	// grpcServerImpls tracks which (file, service) pairs have already had
 	// grpc_listens_on edges emitted, so duplicate `pb.RegisterXXXServer(s, ...)`
 	// calls for the same service in one file don't multiply the edge count.
-	// Key = "<relPath>::<service>". W3b (schema 1.9, CKS G5 Distributed).
+	// Key = "<relPath>::<service>". Schema 1.9.
 	grpcServerImpls map[string]struct{}
 	// grpcClientStubs maps a local variable name (within the current function
 	// scope) to the gRPC service name extracted from its
@@ -68,14 +68,14 @@ type declVisitor struct {
 	// scanFuncBodyForGRPCStubs (which runs before the CallExpr walk for the
 	// same body) and consumed by maybeEmitGRPCClientCall when typesInfo
 	// cannot resolve the stub's receiver type directly. Re-initialized per
-	// function scope. W3b (schema 1.9).
+	// function scope. Schema 1.9.
 	grpcClientStubs map[string]string
 	// grpcClientPlaceholderIDs maps a gRPC-client-call target qname
 	// ("grpc:Service.Method") to the AMBIGUOUS placeholder Endpoint ID
 	// emitted in upsertGRPCClientPlaceholder. Mirrors httpClientPlaceholderIDs
 	// — language="external" placeholder Endpoints live in a separate ID
 	// space from real `language="go"` Endpoints minted by the server-side
-	// RegisterXXXServer pass. W3b (schema 1.9).
+	// RegisterXXXServer pass. Schema 1.9.
 	grpcClientPlaceholderIDs map[string]string
 	// chanVarIDs maps a channel variable name (within the current function scope)
 	// to the Channel node ID emitted by emitChannelFromMake. Used to wire
@@ -87,7 +87,7 @@ type declVisitor struct {
 	// visitFuncDecl, the set of struct-Field node IDs whose values are
 	// read or written anywhere inside the body. Populated even when the
 	// function holds NO lock — buildpipe's cross-function lock propagation
-	// pass (W-A, opt-in via --lock-propagation) walks the call graph from
+	// pass (opt-in via --lock-propagation) walks the call graph from
 	// lock-holding callers into their callees and uses this map to discover
 	// "what fields does this callee touch?" without re-parsing.
 	//
@@ -159,8 +159,8 @@ func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
 	startLine, startByte := v.pos(s.Pos())
 	endLine, endByte := v.pos(s.End())
 	id := MakeID(qname, "go", startByte)
-	// canonical id for the type itself: <importpath>.<Type> (symbol-identity
-	// Phase 1). Empty in AST-only mode. Passed down so fields and interface
+	// canonical id for the type itself: <importpath>.<Type> (symbol
+	// identity). Empty in AST-only mode. Passed down so fields and interface
 	// methods qualify against the type's canonical id, not the short pkg name.
 	var cid string
 	if v.typesInfo != nil {
@@ -212,16 +212,16 @@ func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, 
 			exported(name.Name), commentText(f.Doc), "")
 		// field canonical id: <importpath>.<Type>.<Field>, derived from the
 		// owning type's canonical id (a field *types.Var carries no receiver).
-		// Skip the blank identifier `_` (struct padding fields) — see B1.
+		// Skip the blank identifier `_` (struct padding fields) — see goCanonicalID.
 		if parentCanonical != "" && name.Name != "_" {
 			v.setLastCanonicalID(parentCanonical + "." + name.Name)
 		}
 		v.edges = append(v.edges, types.Edge{
 			Src: parentID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 		})
-		// G8: index by *types.Object so the accessed_under_lock pass can
+		// Index by *types.Object so the accessed_under_lock pass can
 		// resolve `recv.field` references back to this NodeField. Empty when
-		// typesInfo is nil — that path emits nothing in G8 (avoids false
+		// typesInfo is nil — that path emits nothing (avoids false
 		// positives on AST-only mode where field receivers are ambiguous).
 		if v.typesInfo != nil {
 			if obj := v.typesInfo.Defs[name]; obj != nil {
@@ -266,7 +266,7 @@ func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
 		}
 		v.appendNode(id, nt, name.Name, qname, startLine, endLine, startByte, endByte,
 			exported(name.Name), commentText(s.Doc), "")
-		// canonical id only for PACKAGE-LEVEL const/var (B2): the AST walk also
+		// canonical id only for PACKAGE-LEVEL const/var: the AST walk also
 		// reaches `var x = …` declared inside function bodies, whose id
 		// <importpath>.<name> is neither unique (many funcs declare `gspec`,
 		// `err`, …) nor a useful retrieval target. go/types tells them apart:
@@ -320,11 +320,11 @@ func (v *declVisitor) visitFuncDecl(d *ast.FuncDecl) {
 		Src: v.fileID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 	})
 	v.emitFunctionBodyPos(qname, id, d.Body)
-	// G8 (B1 Phase 4): emit accessed_under_lock(field, mutex) for fields
+	// Emit accessed_under_lock(field, mutex) for fields
 	// referenced inside a function that holds at least one lock. No-op when
 	// typesInfo is nil or the body holds no lock — keeps AST-only mode safe.
 	v.emitAccessedUnderLock(id, d.Body)
-	// W-A (D1 Stage 2, opt-in via --lock-propagation): record funcID → fields
+	// Lock propagation (opt-in via --lock-propagation): record funcID → fields
 	// touched for ALL functions (lock-holding or not). buildpipe's
 	// propagateLockedFieldAccessDFS reads this map after Pass 2 to walk the
 	// call graph and emit accessed_under_lock for callee field accesses under
@@ -379,7 +379,7 @@ func goCanonicalID(obj gotypes.Object) string {
 	}
 	// The blank identifier `_` is not an addressable symbol — many package-level
 	// `var _ = ...` / `_ "import"` declarations share the name, so an id like
-	// `<pkg>._` is intentionally non-unique. Leave it empty (B1).
+	// `<pkg>._` is intentionally non-unique. Leave it empty.
 	if obj.Name() == "_" {
 		return ""
 	}

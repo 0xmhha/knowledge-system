@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-// W-C W11 V9 — audit that the PostgreSQL exporter mirrors the
-// SQLite nodes.attrs JSON-blob column added under schema 1.9.
+// Audit that the PostgreSQL exporter mirrors the
+// SQLite nodes.attrs JSON-blob column added under schema 1.11.
 // Without a live Postgres instance we cannot run the full Export
 // path; we instead lock the two static surfaces that need to
 // stay in sync:
@@ -16,7 +16,7 @@ import (
 //     as its trailing element so each row's marker JSON travels
 //     to Postgres alongside the rest of the node payload.
 //
-// A silent removal of either surface would reproduce the V6 gap
+// A silent removal of either surface would reproduce the earlier gap
 // (markers dropped at the persist boundary) on the Postgres path.
 func TestPostgresExporter_AttrsColumnPresent(t *testing.T) {
 	if !strings.Contains(pgSchema, "attrs") {

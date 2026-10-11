@@ -1,6 +1,6 @@
 // Command cks-agent is the coding agent CLI for cks.
 //
-// Phase D (Slim): builds an LLM-ready markdown prompt for a vibe-style
+// It builds an LLM-ready markdown prompt for a vibe-style
 // task by calling cks-mcp over an MCP stdio subprocess. cks-agent does
 // NOT itself invoke an LLM — the agent's job is to compose good
 // context, the LLM-invocation layer (Claude CLI, OpenAI, etc.) is left

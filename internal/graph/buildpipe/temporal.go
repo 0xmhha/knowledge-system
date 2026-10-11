@@ -1,4 +1,4 @@
-// Package buildpipe — temporal.go wires CKS G6 Temporal edges (E4) into
+// Package buildpipe — temporal.go wires temporal (git history) edges into
 // the cold-rebuild path. Conceptually:
 //
 //   - Run a single `git log --raw` over the repo root containing srcRoot.
@@ -30,14 +30,13 @@ import (
 )
 
 // temporalDepthDefault bounds per-file commit count when callers don't pass
-// an explicit Options.TemporalDepth. 10 is the spec recommendation in the
-// E4 task brief; keeps storage bounded for large monorepos while still
+// an explicit Options.TemporalDepth. 10 is the spec recommendation; keeps storage bounded for large monorepos while still
 // surfacing enough churn signal for the viewer.
 const temporalDepthDefault = 10
 
 // emitTemporalEdges adds NodeCommit + NodeHunk nodes and the corresponding
-// G6 Temporal edges (changed_in / blame for the file-level pass; has_hunk /
-// adjacent for the Hunk-graph H1 pass) to g. Returns the gzip-compressed
+// temporal edges (changed_in / blame for the file-level pass; has_hunk /
+// adjacent for the hunk-graph pass) to g. Returns the gzip-compressed
 // hunk patch blobs keyed by Hunk node ID — caller merges them into the
 // InsertBlobs map alongside CodeNode source slices.
 //
@@ -57,7 +56,7 @@ const temporalDepthDefault = 10
 //     graph.Validate after to catch any dangling refs introduced.
 //
 // The maxPerFile parameter caps per-file commit count for the changed_in /
-// blame pass; pass 0 to use the E4 default (10). The hunk pass uses its
+// blame pass; pass 0 to use the default (10). The hunk pass uses its
 // own commit cap (temporal.LoadHunks default) since hunks are bounded by
 // total commits walked, not per-file.
 func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerFile int,
@@ -108,7 +107,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	g.Edges = append(g.Edges, changedIn...)
 	g.Edges = append(g.Edges, blame...)
 
-	// Hunk-graph H1: append NodeHunk + has_hunk + adjacent edges, returning
+	// Hunk graph: append NodeHunk + has_hunk + adjacent edges, returning
 	// the gzip-compressed patch blobs. Hunks reuse the same commitIDByteSHA
 	// map so they anchor on the commits we just emitted (and only those —
 	// hunks for commits the file-overlap test dropped are skipped).
@@ -120,7 +119,7 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	// Hunk-graph §11.3 follow-up: append AMBIGUOUS-confidence Commit +
 	// Hunk nodes for SHAs reachable only via reflog or fsck-unreachable.
 	// These represent force-pushed-away history that the LLM retrieval
-	// layer (H3, future) must filter out — but a human "Recovery"
+	// layer must filter out — but a human "Recovery"
 	// workflow can browse them in the viewer when an agent has
 	// overwritten code that needs to come back.
 	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRoot, srcRel, repoRoot, commitIDByteSHA, filter)
@@ -129,11 +128,11 @@ func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerF
 	}
 	maps.Copy(hunkBlobs, unreachableBlobs)
 
-	// Hunk-graph H2: every Hunk gets `modifies` edges to whitelisted
+	// Hunk graph: every Hunk gets `modifies` edges to whitelisted
 	// CodeNodes in the same file whose line range overlaps the hunk's.
 	// Runs after both EXTRACTED and AMBIGUOUS hunks have been added so
 	// recovery-track hunks also get their AST overlap edges (still
-	// confidence-stamped per their parent hunk so H3 retrieval boundary
+	// confidence-stamped per their parent hunk so the retrieval boundary
 	// can filter consistently).
 	emitModifiesEdges(g)
 

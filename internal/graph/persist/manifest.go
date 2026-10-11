@@ -66,7 +66,7 @@ type Manifest struct {
 	// consumers watch it to detect "the enrichment moved" without a vector
 	// realignment. Additive + omitempty (no SchemaVersion bump).
 	EnrichDigest string `json:"enrich_digest,omitempty"`
-	// Files is the per-file incremental-cache record (A3 Phase 1, schema 1.2).
+	// Files is the per-file incremental-cache record (schema 1.2).
 	// Each entry tracks the SHA256 + cache key of one source file plus the
 	// node/edge IDs it produced, enabling subsequent builds to skip parsing
 	// for unchanged files. omitempty so pre-1.2 manifests reload as nil and
@@ -167,9 +167,9 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"ckgignore", m.CKGIgnore},
 		{"parse_errors_count", m.ParseErrorsCount},
 		{"unresolved_refs_count", m.UnresolvedRefsCount},
-		// "files" is the A3 incremental-cache fingerprint blob. It can be large
+		// "files" is the incremental-cache fingerprint blob. It can be large
 		// on big repos (~120 bytes per file), but JSON-blob storage in the
-		// existing kv table is fine for v0.2 — A3 Phase 2/3 may move this to
+		// existing kv table is fine for now — a later change may move this to
 		// per-file rows for partial query performance.
 		{"files", m.Files},
 	}

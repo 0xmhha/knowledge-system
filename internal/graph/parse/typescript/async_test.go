@@ -11,8 +11,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestTSAsync_FixtureMatrix — W-B W2 acceptance check (schema 1.10,
-// docs/design/ts-async-await-and-interface.md §3.2, §5.0). For each fixture:
+// TestTSAsync_FixtureMatrix — async/await acceptance check (schema 1.10,
+// docs/graph/design/ts-async-await-and-interface.md §3.2, §5.0). For each fixture:
 //
 //   - count of NodeAwaitPoint nodes (== count of EdgeAwaits — pair invariant)
 //   - set of (parentFnName → []awaitDisplayName) for content correctness

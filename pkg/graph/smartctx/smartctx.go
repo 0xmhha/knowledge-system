@@ -2,7 +2,7 @@
 // used by both internal/mcp.get_context_for_task and internal/eval's δ
 // baseline. Before this package existed the two callers had separate
 // algorithms — the MCP path was a 50-line BM25/PR/usage fusion, the eval
-// δ was `SearchFTS top-10 dump`. The asymmetry meant eval H1/H2 hypotheses
+// δ was `SearchFTS top-10 dump`. The asymmetry meant the eval hypotheses
 // did not measure what MCP actually returns to LLMs.
 //
 // BuildContext is now the single source of truth. Callers serialize the
@@ -30,17 +30,16 @@ import (
 // resolved to documented defaults inside BuildContext so callers can
 // pass an empty struct for the typical case.
 //
-// The IncludePRs / IncludeImpact flags drive P0 #2 — the 1-shot
-// retrieval surface from docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2.
-// Both default to false so existing callers (eval δ baseline, MCP
+// The IncludePRs / IncludeImpact flags extend the 1-shot retrieval
+// surface with PR history and reverse-dependency impact. Both default to false so existing callers (eval δ baseline, MCP
 // pre-merge consumers) see the same output shape they had before;
 // the new keys (recent_prs / impact) only appear when the caller
 // explicitly opts in.
 //
-// CandidateLimit / RankedCap / MaxSummaries (P0 #3) expose the
+// CandidateLimit / RankedCap / MaxSummaries expose the
 // pipeline width knobs that were previously baked into private
 // package constants. Bumping them widens recall at a roughly linear
-// O(N) cost — the Stage B 2026-05-29 measurement found that the
+// O(N) cost — an earlier eval measurement found that the
 // 30-candidate cap was leaving δ score at 76% of β's. The new
 // defaults (100 / 50 / 25) close most of that gap on the eval
 // fixture without changing the algorithm itself.
@@ -49,9 +48,9 @@ type Options struct {
 	IncludeBlobs bool // mcp default true; eval may set false
 	MaxBodies    int  // default 5
 
-	// CandidateLimit caps the initial Search() top-N. Bumped from
-	// 30 to 100 in P0 #3 — the prior cap was the dominant recall
-	// bottleneck in the Stage B 2026-05-29 measurement. Override
+	// CandidateLimit caps the initial Search() top-N. Raised from
+	// 30 to 100 — the prior cap was the dominant recall bottleneck
+	// in the eval measurement. Override
 	// to a smaller value when callers want a tight, fast response.
 	CandidateLimit int // default 100
 
@@ -70,7 +69,7 @@ type Options struct {
 	// BFS hop — useful when the query's relevant context lives two
 	// edges away (caller-of-caller, type-of-field-type). Bounded
 	// at HopFrontierCap per hop to prevent fan-out explosions on
-	// hub nodes. P2 #7 follow-up to the P0 #3 widening.
+	// hub nodes.
 	HopDepth int
 
 	// HopFrontierCap caps the per-hop frontier size when HopDepth
@@ -83,9 +82,8 @@ type Options struct {
 	HopFrontierCap int
 
 	// IncludePRs attaches up to PRsPerNode breadcrumbs to each body
-	// entry (the "왜" history landed in P0 #1). Off by default so
-	// the eval δ baseline's measurement remains comparable to its
-	// pre-2026-05-29 runs.
+	// entry (the "왜" history). Off by default so the eval δ
+	// baseline's measurement remains comparable to earlier runs.
 	IncludePRs bool
 	PRsPerNode int       // default 3
 	PRCutoff   time.Time // zero = no cutoff (return full history)
@@ -138,10 +136,9 @@ func (o Options) withDefaults() Options {
 // the pipeline for tight responses; the constants below are the
 // values that withDefaults applies when the Options field is unset.
 //
-// 2026-05-29 (P0 #3): the defaults were bumped from the historical
-// 30/30/15 values found by the Stage B measurement to leave δ score
-// at 0.335 — 76% of β's 0.441. Per docs/PROJECT-BLUEPRINT-ALIGNMENT.md
-// §4.2 the recall ceiling was the 30-candidate cap; widening to 100
+// The defaults were raised from the historical 30/30/15 values, which
+// an eval measurement found left δ score at 0.335 — 76% of β's 0.441.
+// The recall ceiling was the 30-candidate cap; widening to 100
 // and letting more rows reach packing closes most of that gap on
 // the eval fixture without changing the algorithm itself.
 const (
@@ -176,7 +173,7 @@ type scoredNode struct {
 //	(b) Expand   — opt.HopDepth-hop BFS via QueryEdgesForNodes, each
 //	               hop capped at opt.HopFrontierCap new nodes.
 //	(c) Score    — 0.5 BM25 + 0.3 PageRank + 0.2 Usage.
-//	(d) Diversify — V0: opt.RankedCap. Per-cluster diversity is V1+.
+//	(d) Diversify — opt.RankedCap. Per-cluster diversity is not yet done.
 //	(e) Pack     — top MaxBodies get full source; next ≤MaxSummaries get
 //	               sig+doc.
 //	(f) Cite     — every emitted item gets file_path + start_line.
@@ -408,7 +405,7 @@ func summaryEntry(n types.Node, cite string, hasCite bool) map[string]any {
 	return summary
 }
 
-// attachRecentPRs is the P0 #2 "왜" history side-channel: for each
+// attachRecentPRs is the "왜" history side-channel: for each
 // packed body entry, fetch up to opt.PRsPerNode PR breadcrumbs and
 // return them keyed by node id. Results are intentionally NOT counted
 // against opt.BudgetTokens — the PR summary text is capped at 2 KB

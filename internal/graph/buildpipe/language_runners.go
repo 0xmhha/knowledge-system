@@ -1,7 +1,7 @@
 // Package buildpipe — language_runners.go contains the per-language Pass 1 +
 // Pass 2 driver functions (runGoPipeline, runTSPipeline, runSolPipeline) and
 // their immediate helpers (stampFilePath, convertABI). Extracted from
-// pipeline.go in G4 to keep the orchestrator file under the soft 400-line cap.
+// pipeline.go to keep the orchestrator file under the soft 400-line cap.
 // Pure file move — no behavior change.
 package buildpipe
 
@@ -41,11 +41,11 @@ func parseWorkers() int {
 
 // parseConcurrent runs parseOne across files in parallel and streams the
 // per-file ParseResults through a channel to a single collector goroutine.
-// This pattern is intentional dogfood material for ckg's own concurrency
+// This pattern is intentional self-analysis material for ckg's own concurrency
 // detector: parseConcurrent emits real `go` statements, sync.WaitGroup
 // usage, channel sends/recvs, and a sync.Mutex guarding the error counter.
 // When ckg analyses its own source, the resulting graph contains non-zero
-// G4 (concurrency) edges that exercise spawns / sends_to / recvs_from /
+// concurrency edges that exercise spawns / sends_to / recvs_from /
 // acquires_lock paths end-to-end.
 //
 // "Many parsers, single writer" is preserved — the parser side fans out
@@ -129,7 +129,7 @@ func parseConcurrent(
 }
 
 // collectPendingRefs flattens per-file ParseResults into PendingRefRow records
-// (G6 v3, schema 1.5) with file_path stamped from each ParseResult.Path.
+// (schema 1.5) with file_path stamped from each ParseResult.Path.
 // Called by every language pipeline AFTER stampFilePath but BEFORE Resolve so
 // the row data carries the rel-path Resolve will consume into edges.
 func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
@@ -156,10 +156,10 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 
 // runGoPipeline drives Pass 1 (per-file ParseFile) + Pass 2 (Resolve) for Go.
 // Returns the resolved graph, the per-Function/Method body field-touch map
-// used by W-A cross-function lock propagation, count of files that failed
+// used by cross-function lock propagation, count of files that failed
 // to read or parse, and any fatal Resolve error.
 //
-// B1 (Wave 5): loads each module with full go/types info via detect.GoPackages
+// Loads each module with full go/types info via detect.GoPackages
 // and registers the result on the parser via SetPackages. This enables the
 // concurrency pass to resolve sync.Mutex receivers via *types.Object identity
 // (false-positive guard, spec §2 R2.1). The packages.Load is ~10x slower than
@@ -170,7 +170,7 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // in AST-only mode (concurrency edges become INFERRED). Logs the warning so
 // operators can investigate without breaking the build.
 //
-// funcFieldTouches (W-A return value) is nil when the typed-load fallback
+// funcFieldTouches (lock-propagation input) is nil when the typed-load fallback
 // kicks in — AST-only mode has no reliable way to map field references to
 // Field node IDs (parser.go comment). The propagator then no-ops, which
 // matches the existing INFERRED-confidence semantics of AST-only builds.
@@ -184,7 +184,7 @@ func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Res
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "go")
 	pending := collectPendingRefs(results)
 	rg, err := p.Resolve(results)
-	// P0: emit implements / extends edges from go/types satisfaction. Runs
+	// Emit implements / extends edges from go/types satisfaction. Runs
 	// post-Resolve because (a) it needs the union of Struct/Interface IDs
 	// across all files and (b) only the typed-load path has the package
 	// scopes to query. Soft no-op when Resolve failed or pkgs are unavailable
@@ -193,7 +193,7 @@ func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Res
 		implEdges := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, implEdges...)
 		log.Debug("implements emitted", "count", len(implEdges))
-		// Track C P0: uses_type post-pass. Same wiring rationale as
+		// uses_type post-pass. Same wiring rationale as
 		// implements above. Cross-package types without a node (stdlib,
 		// vendored deps) become PendingRefs — appended to the pending
 		// slice so the cold path persists them via InsertPendingRefs (q4=A).
@@ -228,7 +228,7 @@ func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Res
 				})
 			}
 		}
-		// Track C P1c: instantiates post-pass. No pending_refs path —
+		// instantiates post-pass. No pending_refs path —
 		// composite-literal targets without a node in the graph are silently
 		// dropped (the noise floor would be higher than the value).
 		instEdges := gop.EmitInstantiatesEdges(p.Pkgs(), rg.Nodes)
@@ -251,7 +251,7 @@ func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Res
 
 // stampFilePath populates Edge.FilePath for every per-file edge that lacks
 // one, drawing from the ParseResult.Path the parser already recorded.
-// Required by the A3 incremental cache: EdgesByFilePath reloads cached
+// Required by the incremental cache: EdgesByFilePath reloads cached
 // edges by file_path, and the parsers historically left it blank because
 // the V0 schema didn't surface the field. Stamping is idempotent — pre-set
 // FilePaths (e.g. on edges with line numbers) are preserved.
@@ -273,7 +273,7 @@ func stampFilePath(r *parse.ParseResult) {
 }
 
 // lineQualifyDuplicateCanonicalIDs appends "@<startLine>" to any canonical_id
-// shared by more than one node in the same file (B3), so same-file same-name
+// shared by more than one node in the same file, so same-file same-name
 // symbols — a minified-JS `function t(){}` repeated dozens of times, or several
 // Go `init` functions in one file — get distinct ids. Single-occurrence ids are
 // left untouched, so normal code keeps a stable, line-independent canonical id;
@@ -317,7 +317,7 @@ func runSolPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Re
 	return rg, pending, errs, p, err
 }
 
-// runProtoPipeline drives Pass 1 + Pass 2 for `.proto` files (schema 1.9 W3a).
+// runProtoPipeline drives Pass 1 + Pass 2 for `.proto` files (schema 1.9).
 // Mirrors runTSPipeline — proto has no cross-language ABI to surface back to
 // the caller, so the signature stays minimal.
 func runProtoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {

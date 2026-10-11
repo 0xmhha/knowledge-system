@@ -171,7 +171,7 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeHTTPCalls:
-			// W2 (schema 1.9): http_calls always points Func/Method →
+			// Schema 1.9: http_calls always points Func/Method →
 			// Endpoint (real or AMBIGUOUS placeholder). The matcher passes
 			// through with the same shape so the validation is unchanged.
 			if src.Type != types.NodeFunction && src.Type != types.NodeMethod {
@@ -191,7 +191,7 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeGRPCListensOn:
-			// W3b (schema 1.9): grpc_listens_on points server-impl Method →
+			// Schema 1.9: grpc_listens_on points server-impl Method →
 			// Endpoint (`grpc:Service.Method`). Free functions cannot listen
 			// on gRPC RPCs — a gRPC server impl is always a method on a
 			// receiver registered via pb.RegisterXXXServer.
@@ -212,7 +212,7 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeGRPCCalls:
-			// W3b (schema 1.9): grpc_calls points caller Function/Method →
+			// Schema 1.9: grpc_calls points caller Function/Method →
 			// Endpoint (real grpc Endpoint or AMBIGUOUS placeholder for
 			// unresolved external services). Mirror http_calls shape.
 			if src.Type != types.NodeFunction && src.Type != types.NodeMethod {
@@ -287,7 +287,7 @@ func isCallable(t types.NodeType) bool {
 }
 
 // isContextPathShape enforces the timeout_path / cancellation_path
-// invariants (P2): both endpoints must be the same Function or Method
+// invariants: both endpoints must be the same Function or Method
 // node, i.e. a self-loop anchored on the enclosing function. Used by
 // SchemaValidator to surface emitter regressions early.
 func isContextPathShape(src, dst *types.Node, e types.Edge) bool {

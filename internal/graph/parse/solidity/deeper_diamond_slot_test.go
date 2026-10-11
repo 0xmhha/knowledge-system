@@ -6,10 +6,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V20 — deeper-diamond inheritance MRO offset audit.
+// Deeper-diamond inheritance MRO offset audit.
 //
-// V18 covered the 3-node diamond (D ← {B, C} ← A): one shared
-// base reached via two direct paths. V20 stresses C3
+// diamond_inherit_slot_test.go covers the 3-node diamond (D ← {B, C} ← A): one shared
+// base reached via two direct paths. This test stresses C3
 // linearization on a *deeper* chain where the shared base is
 // two levels up:
 //
@@ -25,7 +25,8 @@ import (
 //
 // MRO(E) = [E, C, D, B, A]  →  storage walk = [A, B, D, C, E].
 //
-// The fixture also clarifies the slot model that V17 / V18 only
+// The fixture also clarifies the slot model that the multi-inheritance
+// and diamond tests only
 // hinted at: ckg reports SlotIndex on a NodeField with the
 // inheritance offset *folded in* for any contract that has
 // inheritance, regardless of depth. The own-scope-only case is
@@ -45,16 +46,16 @@ import (
 // linearised layout — and both C and D linearise identically on
 // top of B. Consumers that need "where does C.c live inside E's
 // layout?" reconstruct it by walking the inheritance edges plus
-// the slot-count side table; V20 does NOT change that contract,
+// the slot-count side table; this test does NOT change that contract,
 // only pins it.
 //
 // Why deeper diamonds matter:
-//   - V18 only proved direct multi-base dedup. A regression that
+//   - The flat diamond test only proves direct multi-base dedup. A regression that
 //     dropped *transitive* dedup (e.g. someone simplified MRO to
-//     immediate parents only) would pass V18 and fail V20.
+//     immediate parents only) would pass that test and fail this one.
 //   - The order-vs-set distinction in C3 only shows up at depth
 //     >= 2 — for a flat diamond, set semantics produce the right
-//     answer accidentally. V20 forces the order through D-before-C
+//     answer accidentally. This test forces the order through D-before-C
 //     in the storage walk.
 func TestDeeperDiamond_SlotOffset(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/inheritance",

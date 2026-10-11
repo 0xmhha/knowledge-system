@@ -11,7 +11,7 @@ import (
 
 // fixtureStoreWithPRs stands up a fresh on-disk SQLite store with a
 // single node and three node_prs rows spanning the 2026-04 / 2026-05 /
-// 2026-06 window — enough to exercise cutoff slicing (ckg-NEW-3) and
+// 2026-06 window — enough to exercise cutoff slicing and
 // the descending-order contract.
 func fixtureStoreWithPRs(t *testing.T) persist.Store {
 	t.Helper()
@@ -81,7 +81,7 @@ func TestGetNodePRs_AllAndDescendingOrder(t *testing.T) {
 	}
 }
 
-// TestGetNodePRs_CutoffStrictBefore documents the ckg-NEW-3 contract:
+// TestGetNodePRs_CutoffStrictBefore documents the cutoff contract:
 // `WHERE merged_at < ?` — strictly before. The May PR (merged on
 // 2026-05-15) is hidden when cutoff equals or precedes that
 // timestamp, so a cks scenario answering "what did the agent know

@@ -7,12 +7,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W8 V6 (2026-05-19) — cross-contract function pointer
-// call detection.
+// Sol cross-contract function pointer call detection.
 //
-// W8 V5 marked HasFunctionPointerCall on bare-identifier callees
-// that matched a function-typed state variable declared on the
-// SAME contract. V6 covers the cross-contract shape:
+// The function-typed var marker sets HasFunctionPointerCall on
+// bare-identifier callees that match a function-typed state variable
+// declared on the SAME contract. This walker covers the cross-contract
+// shape:
 //
 //	contract Hub {
 //	    function(uint256) external returns (uint256) onAction;
@@ -21,7 +21,7 @@ import (
 //	contract Caller {
 //	    Hub h;
 //	    function trigger(uint256 x) external {
-//	        h.onAction(x); // <- V6 detects this
+//	        h.onAction(x); // <- detected here
 //	    }
 //	}
 //
@@ -33,15 +33,15 @@ import (
 // NodeField set, and marks HasFunctionPointerCall on the source
 // callable when it matches.
 //
-// V6 limitations:
+// Limitations:
 //   - Chained / cast receivers (`getHub().onAction(x)`,
 //     `Hub(addr).onAction(x)`) drop — matchStateVarMethodCall
 //     requires a bare-identifier receiver.
 //   - Function-typed state vars inherited through `is`-clauses are
 //     visible to the byContract index only after Pass 2a populates
-//     parents, so V6 sees direct-contract-typed fields but not the
-//     inheritance-walk shape. Deferred to V7+ where the inheritance
-//     index can be threaded in.
+//     parents, so only direct-contract-typed fields are seen, not the
+//     inheritance-walk shape. Handling it requires threading the
+//     inheritance index in.
 
 const dispatchKindCrossContractFnPointerCall = "cross_contract_fn_pointer_call"
 

@@ -14,7 +14,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// Defaults. Phase E will revisit with real-prompt data.
+// Defaults; to be revisited with real-prompt data.
 const (
 	// DefaultMaxTokens approximates "typical Claude/GPT context budget
 	// allocated to evidence" — composer is one of several inputs the
@@ -101,7 +101,7 @@ type Config struct {
 	ExactSymbolReserve int
 }
 
-// DefaultConfig returns the Phase-0 tuning baseline.
+// DefaultConfig returns the baseline tuning.
 func DefaultConfig() Config {
 	return Config{
 		MaxTokens:          DefaultMaxTokens,
@@ -119,10 +119,10 @@ func DefaultConfig() Config {
 // Body intentionally holds a copy of the fetched text (not a reference
 // into the fetcher's storage). This costs memory for large allocations
 // but keeps every stage's state fully inspectable from a single
-// Stage4Output value — critical for debugging the Phase-B composer
+// Stage4Output value — critical for debugging the composer
 // while the pipeline is still being tuned. A streaming variant that
 // pipes bodies directly into EvidencePack assembly is a candidate
-// optimization once the pipeline has stabilized and Phase E has
+// optimization once the pipeline has stabilized and evaluation has
 // finished measuring the quality of the current design.
 type SelectedItem struct {
 	Citation      contract.Citation
@@ -146,7 +146,7 @@ type SelectedItem struct {
 // Stage4Output captures the result of one Allocate call.
 type Stage4Output struct {
 	// Selected is the score-ordered list of bodies that fit in the
-	// budget. EvidencePack assembly (B.8) consumes this directly.
+	// budget. EvidencePack assembly consumes this directly.
 	Selected []SelectedItem
 
 	// Skipped lists citations that were ranked but didn't fit (over

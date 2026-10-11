@@ -11,7 +11,7 @@ import (
 )
 
 // dispatchWant captures one EdgeInvokes assertion as (caller.qname,
-// interface.method.qname). The W3 emit direction is caller → interface
+// interface.method.qname). The interface-dispatch emit direction is caller → interface
 // method (§3.4), so caller = edge.Src.QualifiedName, target =
 // edge.Dst.QualifiedName.
 type dispatchWant struct {
@@ -19,7 +19,7 @@ type dispatchWant struct {
 	target string
 }
 
-// TestSolDispatch_SingleFile covers W3 interface-dispatch detection for
+// TestSolDispatch_SingleFile covers interface-dispatch detection for
 // all same-file fixtures.
 //
 // Confidence policy (§5.0 Q5): every resolved EdgeInvokes is
@@ -109,7 +109,7 @@ func TestSolDispatch_SingleFile(t *testing.T) {
 // works across file boundaries — the interface lives in one file, the
 // caller in another. Per §5.0 Q5 confidence is still AMBIGUOUS (not
 // INFERRED) because file boundary is not the source of uncertainty for
-// W3 — runtime address binding is.
+// interface dispatch — runtime address binding is.
 func TestSolDispatch_CrossFile(t *testing.T) {
 	dir := filepath.Join("testdata", "dispatch")
 	files := []string{"cross_file_iface.sol", "cross_file_caller.sol"}
@@ -222,11 +222,11 @@ contract Caller is Base {
 	}
 }
 
-// TestSolDispatch_W1W2Regression locks the W1 / W2 edge counts on the W3
-// fixtures so a regression that disturbs prior detectors fails loudly.
-// The W3 detector is purely additive (new PendingRefs, new resolver
-// branch); W1 EdgeExtends/EdgeImplements and W2 EdgeOverrides counts on
-// W3 fixtures must stay at zero (the dispatch fixtures contain neither
+// TestSolDispatch_W1W2Regression locks the inheritance / override edge counts
+// on the interface-dispatch fixtures so a regression that disturbs prior
+// detectors fails loudly. The interface-dispatch detector is purely additive
+// (new PendingRefs, new resolver branch); EdgeExtends/EdgeImplements and
+// EdgeOverrides counts on these fixtures must stay at zero (they contain neither
 // inheritance nor override modifiers).
 func TestSolDispatch_W1W2Regression(t *testing.T) {
 	files := []string{

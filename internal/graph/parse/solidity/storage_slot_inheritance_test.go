@@ -6,23 +6,23 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V1 — inheritance offset on NodeField.SlotIndex.
+// Inheritance offset on NodeField.SlotIndex.
 //
-// V0 produced per-contract local indices (each contract restarted at
-// slot 0). V1 walks the EdgeExtends adjacency in Pass 2 and adds
+// Without an offset each contract would restart at slot 0, so
+// Pass 2 walks the EdgeExtends adjacency and adds
 // the cumulative ancestor slot count so the SlotIndex reflects the
 // absolute EVM storage position the field occupies.
 //
-// V1 scope:
+// Scope of the base inheritance test:
 //   - Linear inheritance chains. Each child's offset = sum of all
 //     transitive parents' slot counts.
 //   - Diamond inheritance with repeated ancestors falls back to a
 //     naive sum (no C3 linearization); the test below covers the
 //     linear case only.
 //   - Bit-packing remains out of scope (each state-var still
-//     consumes a full slot in V1). Sol's actual layout merges
-//     sub-32-byte types into one slot; a future V2+ will model
-//     that with a per-primitive size table.
+//     consumes a full slot here). Sol's actual layout merges
+//     sub-32-byte types into one slot; that is covered by the
+//     packing tests.
 
 func TestStorageSlot_InheritanceOffset(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/storage_slot_inheritance", "linear_chain.sol")
@@ -56,7 +56,7 @@ func TestStorageSlot_InheritanceOffset(t *testing.T) {
 	}
 }
 
-// TestStorageSlot_InconsistentMROFallback — W-C W9 V8. When the
+// TestStorageSlot_InconsistentMROFallback — when the
 // inheritance graph has no consistent C3 linearization (A's MRO
 // puts X before Y, B's MRO puts Y before X, Z inherits A and B),
 // solc would reject the hierarchy. The parser falls back to
@@ -90,7 +90,7 @@ func TestStorageSlot_InconsistentMROFallback(t *testing.T) {
 	}
 }
 
-// TestStorageSlot_DiamondC3Linearization — W-C W9 V7. Verifies that
+// TestStorageSlot_DiamondC3Linearization verifies that
 // diamond inheritance (D extends B, C where both extend Base) does
 // not double-count Base's slot. The C3 MRO for D is
 // [D, B, C, Base]; the offset sums each ancestor once.
@@ -102,7 +102,7 @@ func TestStorageSlot_InconsistentMROFallback(t *testing.T) {
 //	C.z    : slot 1  (offset = Base.1)
 //	D.w    : slot 3  (offset = B.1 + C.1 + Base.1)
 //
-// Pre-V7 D.w would have been slot 4 because the naive parents
+// Without C3, D.w would be slot 4 because the naive parents
 // sum walked Base twice (once via B, once via C).
 func TestStorageSlot_DiamondC3Linearization(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/storage_slot_inheritance", "diamond_c3.sol")

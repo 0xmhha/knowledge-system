@@ -1,8 +1,7 @@
 // Package persist defines storage interfaces (StoreReader / StoreWriter /
 // Store) and a SQLite implementation. Consumers should depend on the
 // interfaces, not the concrete sqliteStore — this is the foundation for
-// future backends (e.g. PostgreSQL — see docs/spec-ckg-v0.2.md §3,
-// scheduled for B2 in docs/WORK-PLAN.md).
+// future backends (e.g. PostgreSQL).
 //
 // The interfaces are split by role (Interface Segregation Principle):
 //
@@ -75,7 +74,7 @@ type StoreReader interface {
 	QueryEdgesByType(t string) ([]types.Edge, error)
 	QueryEdgesForNodes(ids []string) ([]types.Edge, error)
 	// EdgeCountsByType returns total edge count per edge type across the
-	// entire graph (no node filter). Used by viewer Track D to show G1..G6
+	// entire graph (no node filter). Used by the viewer to show G1..G6
 	// distribution next to each pill so users can read "G4 has 19 edges
 	// total" at a glance — without it, toggling a sparse axis looks dead
 	// because the canvas barely changes. Result is `map[edge_type] = count`.
@@ -102,21 +101,21 @@ type StoreReader interface {
 	// Source bodies
 	GetBlob(id string) ([]byte, error)
 
-	// Per-file lookups (A3 incremental cache, schema 1.2). Used by
+	// Per-file lookups (incremental cache, schema 1.2). Used by
 	// buildpipe to load nodes/edges/blobs for files whose content hash
 	// matched the previous manifest — those rows are reused as-is rather
 	// than re-parsing.
 	NodesByFilePath(path string) ([]types.Node, error)
 	EdgesByFilePath(path string) ([]types.Edge, error)
 	BlobsByFilePath(path string) (map[string][]byte, error)
-	// PendingRefsByFilePath: G6 v3 partial-cache rebuild reads cached files'
+	// PendingRefsByFilePath: partial-cache rebuild reads cached files'
 	// unresolved cross-file refs back so Pass 2 Resolve sees the cold-equivalent
 	// input. Schema 1.5.
 	PendingRefsByFilePath(path string) ([]PendingRefRow, error)
 
 	// ReverseDepsForFiles returns every cached file path that has pending_refs
-	// targeting a qualified_name defined in any of dirtyPaths. Used by C1
-	// (reverse-reference invalidation) to find which cached files need their
+	// targeting a qualified_name defined in any of dirtyPaths. Used by
+	// reverse-reference invalidation to find which cached files need their
 	// pending_refs re-resolved when dirty files change their exported symbols.
 	// MUST be called BEFORE deleting dirty nodes — the lookup joins
 	// pending_refs to nodes still in DB. Returns nil when dirtyPaths is empty.
@@ -145,8 +144,8 @@ type StoreReader interface {
 	AllEdges() ([]types.Edge, error)
 
 	// GetNodePRs returns every PR breadcrumb recorded against nodeID
-	// whose merge timestamp is strictly before cutoff (ckg-NEW-3
-	// temporal slicing). Pass time.Time{} (zero value) to disable the
+	// whose merge timestamp is strictly before cutoff (temporal
+	// slicing). Pass time.Time{} (zero value) to disable the
 	// cutoff and return the full history.
 	//
 	// Order: descending by merge timestamp — most recent first, so
@@ -178,25 +177,24 @@ type StoreWriter interface {
 	InsertBlobs(blobs map[string][]byte) error
 	InsertPkgTreeFromCluster(edges []cluster.PersistClusterEdge) error
 	InsertTopicTree(t TopicTreeInput) error
-	// InsertPendingRefs: G6 v3 — cold path persists every Pass 1 unresolved
+	// InsertPendingRefs: cold path persists every Pass 1 unresolved
 	// cross-file ref so the next partial build can replay Pass 2 over a
 	// merged dirty + cached input. Schema 1.5.
 	InsertPendingRefs(refs []PendingRefRow) error
 
-	// InsertNodePRs writes the PR breadcrumb map (ckg-NEW-2, schema
-	// 1.12). Keyed by node ID; the slice value is the full list of
+	// InsertNodePRs writes the PR breadcrumb map (schema 1.12). Keyed by node ID; the slice value is the full list of
 	// PRs whose merge commit overlapped the node's source range.
 	// Idempotent — node_prs has PRIMARY KEY (node_id, number), so
 	// re-runs with INSERT OR REPLACE rewrite the existing rows.
 	InsertNodePRs(byNode map[string][]types.PRRef) error
 
-	// Per-file delete (A3 incremental cache). Drops every node whose
+	// Per-file delete (incremental cache). Drops every node whose
 	// file_path matches; FK ON DELETE CASCADE wipes the dependent edges
 	// and blobs in the same statement. Caller is responsible for then
 	// re-inserting the new parse output.
 	DeleteNodesByFilePath(path string) error
 
-	// Per-type edge delete (A3 incremental cache). Used to clear
+	// Per-type edge delete (incremental cache). Used to clear
 	// cross-language edges (e.g. binds_to) before they are recomputed —
 	// they have no FilePath so the per-file delete cannot reach them.
 	DeleteEdgesByType(t string) error

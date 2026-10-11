@@ -238,7 +238,7 @@ func (v *visitor) parseMessage(parentQual string) {
 				continue
 			case "group":
 				// proto2 `group MyGroup = N { ... }` — best-effort skip.
-				// Reviewer (W3a Important #2) caught that without this branch
+				// A reviewer caught that without this branch
 				// parseField consumes the `group` token as a type ref, the
 				// group name as the field name, then bails on the missing `;`
 				// — but the trailing `{ body }` then leaks into the enclosing
@@ -269,9 +269,9 @@ func (v *visitor) parseMessage(parentQual string) {
 func (v *visitor) parseField(msgID, parentQual string) bool {
 	start := v.pos
 	// Optional label.
-	// Preserve label so downstream consumers (viewer / link / W3b grpc
+	// Preserve label so downstream consumers (viewer / link / grpc
 	// matching) can distinguish `repeated string tags = 2` from a plain
-	// scalar — reviewer (W3a Important #3) caught that the prior
+	// scalar — a reviewer caught that the prior
 	// implementation discarded the label, leaving signatures identical for
 	// `string tags = 2` vs `repeated string tags = 2`.
 	label := ""
@@ -284,7 +284,7 @@ func (v *visitor) parseField(msgID, parentQual string) bool {
 	// The message body switch already handles label-less `group`, but proto2
 	// commonly attaches a label, so we re-check here after label consume to
 	// avoid the body tokens leaking into the enclosing message parse.
-	// Reviewer (W3a Important #2) caught the desync on labelled groups.
+	// A reviewer caught the desync on labelled groups.
 	// skipBlock() consumes the `group` keyword + balance-skips the body.
 	if t := v.peek(); t.Kind == tkIdent && t.Value == "group" {
 		v.skipBlock()

@@ -9,13 +9,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W6 V2.20 (2026-05-18) — operator-form using directive
-// ERROR-tolerant recovery.
+// Sol operator-form using directive ERROR-tolerant recovery.
 //
 // Sol 0.8.19+ `using {f as +} for T;` is parsed by vendored
 // tree-sitter-solidity v1.2.11 as an ERROR-wrapped state_variable_
-// declaration with no surrounding using_directive node. V2.17's
-// AST probe captured the exact misparse shape:
+// declaration with no surrounding using_directive node. An AST probe
+// captured the exact misparse shape:
 //
 //   contract_declaration (★HasError)
 //     identifier "Calc"
@@ -25,7 +24,7 @@ import (
 //         type_name
 //           user_defined_type
 //             identifier "Math"     ← library name (recoverable)
-//             identifier "add"      ← method name (not consumed by V0)
+//             identifier "add"      ← method name
 //         identifier "as"           ← discriminator: real state-var
 //                                     declarations never have a bare
 //                                     "as" identifier child
@@ -37,12 +36,11 @@ import (
 // downstream binding map and dispatch resolution paths reuse existing
 // infrastructure unchanged.
 //
-// V2.5 file-level operator-form keeps its 0-edge lock — its misparse
+// The file-level operator form is not handled here — its misparse
 // surfaces at source_file scope where state_variable_declaration is
-// not a valid child, and V2.18's file-level walker rejects the
-// directive at the libName-extraction step (no clean identifier).
-//
-// V2.7 / V2.14 IOp / V2.17 locks flip from 0 → 1 in the same V-cycle.
+// not a valid child, and runFileLevelUsingFor rejects the directive at
+// the libName-extraction step (no clean identifier).
+// runFileLevelOperatorForm parses that shape instead.
 
 // matchOperatorFormStateVar inspects a state_variable_declaration
 // node for the operator-form misparse signature. Returns
@@ -54,7 +52,7 @@ func matchOperatorFormStateVar(node *sitter.Node, src []byte) (string, string, b
 	return lib, boundType, ok
 }
 
-// matchOperatorFormStateVarFull is the W-C W6 V8 (2026-05-19)
+// matchOperatorFormStateVarFull is the
 // variant that also returns the method name embedded in the
 // misparse (e.g. `add` from `using {Math.add as +}`). The legacy
 // 3-tuple wrapper above keeps the original callers compiling
@@ -167,9 +165,9 @@ func (v *declVisitor) runOperatorFormRecovery() {
 				libName = orig
 			}
 
-			// W-C W6 V8 (2026-05-19): encode the method name with the
+			// Encode the method name with the
 			// RFC record separator so resolveUsingForRef can decode it
-			// without colliding with V5's `||<path>` hint syntax.
+			// without colliding with the `||<path>` homonym hint syntax.
 			target := libName
 			if methodName != "" {
 				target = libName + "\x1e" + methodName

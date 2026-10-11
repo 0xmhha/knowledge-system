@@ -7,31 +7,32 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W8 V0 (2026-05-18) — contract-type cast dispatch detection.
+// Sol contract-type cast dispatch detection.
 //
 // Pattern: `MyContract(addr).method()` where MyContract is a concrete
 // contract (not an interface). This is the concrete-type sibling of
-// W3 interface dispatch (`IFoo(addr).bar()`).
+// interface dispatch (`IFoo(addr).bar()`).
 //
-// The AST shape is identical between W3 and W8 — both are
+// The AST shape is identical between interface dispatch and contract
+// casts — both are
 // `(call_expression
 //    (member_expression
 //      (expression (call_expression function: (identifier @type)))
 //      property: (identifier @method)))`
 //
 // The two walkers do not collide because their resolvers look up
-// disjoint name indices (W3: byName[NodeInterface]; W8:
-// byName[NodeContract]). A given TypeName cannot be both an
+// disjoint name indices (interface dispatch: byName[NodeInterface];
+// contract cast: byName[NodeContract]). A given TypeName cannot be both an
 // Interface and a Contract in the same project, so at most one
 // resolver emits an edge per matched call site.
 //
-// V0 receiver semantics: same as W3 — runtime address determines
+// Receiver semantics: same as interface dispatch — runtime address determines
 // the real target, so Confidence is fixed at ConfAmbiguous regardless
 // of file boundary. DispatchKind = "contract_cast" lets downstream
 // consumers (viewer, llmSafeStoreReader filter) distinguish from
 // interface dispatch.
 //
-// Out of V0:
+// Out of scope:
 //   - Chained casts `A(B(addr).field()).method()` — already excluded
 //     by matchInterfaceDispatch's predicate (object is identifier,
 //     not call_expression result).

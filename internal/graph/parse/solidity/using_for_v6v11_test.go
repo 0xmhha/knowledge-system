@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V11 — using directive whose target is an interface.
+// Using directive whose target is an interface.
 // solc rejects this construction; vendored tree-sitter still
 // parses it. resolveUsingForRef looks up byName[NodeContract]
 // (and falls back to NodeFunction for free functions), neither
@@ -14,7 +14,7 @@ import (
 // silently and no EdgeUsesFor should appear on the Caller
 // contract.
 //
-// V11 locks the absence of a false-positive resolution. A future
+// This test locks the absence of a false-positive resolution. A future
 // regression that broadens the resolver to include
 // byName[NodeInterface] would silently emit the (semantically
 // wrong) edge and fail this test.

@@ -23,12 +23,12 @@
 // Reader.SearchFTS or Reader.FindSymbol. Manifest is the minimal
 // mirror of build-time metadata — use the GetManifest helper rather
 // than Reader.GetManifest directly so the projection (which drops
-// incremental-cache fields) stays the single source of truth (CKG-7).
+// incremental-cache fields) stays the single source of truth.
 //
 // # Do NOT
 //
 // External code MUST NOT type-alias persist.StoreReader on its own
-// (the "self-shim" pattern surfaced by the cks dogfood). That duplicates
+// (the "self-shim" pattern observed in the cks consumer). That duplicates
 // the public surface and silently drifts the moment we change
 // internal/persist. If you find yourself wanting one, it means a type
 // you need isn't re-exported here yet — open a PR to add the alias
@@ -47,19 +47,19 @@ type Reader = persist.StoreReader
 
 // SearchHit pairs a node with its full-text search relevance score.
 // Returned by Reader.SearchFTS. See persist.SearchHit doc for the
-// Score vs RawScore semantics (CKG-1).
+// Score vs RawScore semantics.
 type SearchHit = persist.SearchHit
 
 // SearchFTSOptions configures filter push-down for Reader.SearchFTS.
-// Zero value means "no filter" (CKG-2).
+// Zero value means "no filter".
 type SearchFTSOptions = persist.SearchFTSOptions
 
 // FindSymbolOptions configures filter push-down for Reader.FindSymbol
-// (Language, Kinds). Zero value means "no filter" (CKG-4).
+// (Language, Kinds). Zero value means "no filter".
 type FindSymbolOptions = persist.FindSymbolOptions
 
 // PRRef is the public alias for the build-time-derived PR breadcrumb
-// (ckg-NEW-2). External consumers (cks, ckv) read this via
+// stored per node. External consumers (cks, ckv) read this via
 // Reader.GetNodePRs; see pkg/types.PRRef for the field semantics and
 // the temporal-slicing contract.
 type PRRef = types.PRRef
@@ -89,13 +89,13 @@ var (
 var ErrInvalidMetric = persist.ErrInvalidMetric
 
 // Manifest is the public, minimal snapshot of build-time metadata an
-// external consumer needs (CKG-7). Compared to the internal
+// external consumer needs. Compared to the internal
 // persist.Manifest, this type deliberately drops incremental-cache
 // fields (SrcRoot, Files, StalenessFiles, StalenessMTimeSum, …) — those
 // rotate with build-pipeline changes and external consumers must not
 // depend on them.
 //
-// Use cases (mirroring what the cks dogfood surfaced):
+// Use cases (mirroring what the cks consumer needs):
 //   - CommitHash drives Citation.CommitHash drift detection
 //   - SchemaVersion gates compatibility in cks.ops.health
 //   - IndexTimestamp shows freshness in user-facing status output

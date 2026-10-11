@@ -1,7 +1,7 @@
 package ckgclient
 
-// B7 canonical_id join fixture (unit half). The cross-repo agreement
-// (coordination 2026-06-29, D-2/D-3) makes ckg's canonical_id THE join key
+// canonical_id join fixture (unit half). The cross-repo agreement
+// (2026-06-29) makes ckg's canonical_id THE join key
 // between ckv chunks and ckg nodes, and cks resolves it at the client surface.
 // These cases pin the two agreed caveats at that surface:
 //
@@ -9,8 +9,8 @@ package ckgclient
 //     resolve through the public FindSymbol path — the same path the
 //     find_symbol / find_callers / find_callees tools use — not only through
 //     the internal resolveQname helpers;
-//  2. same-file duplicates carry a positional "@<line>" suffix (ckg
-//     refinement B3) and must resolve as distinct nodes.
+//  2. same-file duplicates carry a positional "@<line>" suffix and must
+//     resolve as distinct nodes.
 //
 // The ≥1.19 schema-population gate is a live-dataset property and is asserted
 // by the env-gated live half (b7_join_live_test.go).
@@ -88,7 +88,7 @@ func TestFindSymbol_PathGlobFilter(t *testing.T) {
 
 func TestFindSymbol_ResolvesLineQualifiedDuplicate(t *testing.T) {
 	t.Parallel()
-	// Same-file duplicate canonical ids carry an "@<line>" suffix (B3); each
+	// Same-file duplicate canonical ids carry an "@<line>" suffix; each
 	// must resolve to its own node.
 	const base = "contracts/gov.sol:Vote(uint256)"
 	m := &mockStoreReader{

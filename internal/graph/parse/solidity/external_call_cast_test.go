@@ -6,12 +6,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V12 — payable(this).transfer / payable(this).send is a
-// self-reentrant value-transfer surface. The V12 walker
+// payable(this).transfer / payable(this).send is a
+// self-reentrant value-transfer surface. The walker
 // extension accepts value-transfer method names alongside the
 // existing low-level set, so self-cast value transfers light up
 // HasSelfReentrantCall. Arbitrary-address value transfers stay
-// on the W8 V1 HasValueTransfer path and do NOT trigger
+// on the HasValueTransfer path and do NOT trigger
 // HasExternalCall (the marker is reserved for low-level calls).
 func TestExternalCallCast_SelfValueTransferMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver", "sol_self_value_transfer.sol")
@@ -45,7 +45,7 @@ func TestExternalCallCast_SelfValueTransferMarker(t *testing.T) {
 	}
 }
 
-// W-C W10 V9 — self-delegatecall additionally lights up
+// Self-delegatecall additionally lights up
 // HasSelfDelegatecallDead. delegatecall against the contract
 // itself re-runs the same bytecode against the same storage and
 // is essentially a no-op / bug. Other self-call methods (call /
@@ -80,11 +80,11 @@ func TestExternalCallCast_SelfDelegatecallDeadMarker(t *testing.T) {
 	}
 }
 
-// W-C W10 V8 — self-reference cast routes to HasSelfReentrantCall
+// Self-reference cast routes to HasSelfReentrantCall
 // instead of HasExternalCall. `payable(this).call(...)` and
 // `address(this).call(...)` re-enter the same contract — the
 // security signal is reentrancy, not arbitrary-address dispatch.
-// Arbitrary-address cast keeps the V5 HasExternalCall behaviour.
+// Arbitrary-address cast keeps the HasExternalCall behaviour.
 func TestExternalCallCast_SelfReferenceMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver", "sol_self_cast.sol")
 
@@ -117,11 +117,11 @@ func TestExternalCallCast_SelfReferenceMarker(t *testing.T) {
 	}
 }
 
-// W-C W10 V5 — cast / wrapper shapes (`address(x).call(...)` and
+// Cast / wrapper shapes (`address(x).call(...)` and
 // `payable(x).call(...)`) light up HasExternalCall on the enclosing
 // callable. The cast itself is sufficient evidence of arbitrary-
-// address dispatch, so V5 marks at Pass 1 without going through
-// receiver-type resolution like V4 does for bare-identifier
+// address dispatch, so the marker is set in Pass 1 without going through
+// receiver-type resolution as is done for bare-identifier
 // receivers.
 func TestExternalCallCast_CastReceiverMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver", "sol_cast_external.sol")

@@ -6,10 +6,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.14 — interface-body using-for, three variants in one V-cycle.
+// Interface-body using-for, three variants in one test.
 //
-// V0 query (queries.go §W6) nests `using_directive` under
-// `interface_declaration`, so interface bodies are walked. V2.14
+// The using-for query in queries.go nests `using_directive` under
+// `interface_declaration`, so interface bodies are walked. This test
 // probes the empirical behavior for each of the three `using` forms
 // when the directive appears inside an interface body — semantically
 // nonsensical (interfaces have no state), but the question is what
@@ -20,16 +20,16 @@ import (
 //   IFree → `using {Math.add} for uint256;`       (0.8.13+ free-func)
 //   IOp   → `using {Math.add as +} for uint256;`  (0.8.19+ operator)
 //
-// Pre-RED hypothesis (assertion values may be updated post-run to
+// Initial hypothesis (assertion values may be updated post-run to
 // lock the observed empirical behavior):
-//   IBare → 1 EdgeUsesFor : V0 happy path on type_alias.
-//   IFree → 1 EdgeUsesFor : V2.6-style incidental @lib capture.
-//   IOp   → 0 EdgeUsesFor : V2.7-style AST shape mismatch.
+//   IBare → 1 EdgeUsesFor : happy path on type_alias.
+//   IFree → 1 EdgeUsesFor : incidental @lib capture (as at contract scope).
+//   IOp   → 0 EdgeUsesFor : operator-form AST shape mismatch.
 //
-// Contrast table extension (cf. V2.5/V2.6/V2.7/V2.9):
-//   scope:interface × variant:type-alias    → (V2.14 IBare)
-//   scope:interface × variant:free-func     → (V2.14 IFree)
-//   scope:interface × variant:operator-form → (V2.14 IOp)
+// Contrast table extension (cf. the contract- and file-scope tests):
+//   scope:interface × variant:type-alias    → (IBare)
+//   scope:interface × variant:free-func     → (IFree)
+//   scope:interface × variant:operator-form → (IOp)
 
 // TestUsingForV2140_InterfaceBodyVariants — locks edge counts and
 // surround-safety for all three `using` variants nested inside an
@@ -57,13 +57,13 @@ func TestUsingForV2140_InterfaceBodyVariants(t *testing.T) {
 		t.Errorf("V2.14 IBare (bare type-alias): expected 1 EdgeUsesFor, got %d", got)
 	}
 
-	// (b) IFree — free-function form. Predicted: 1 (V2.6 mirror).
+	// (b) IFree — free-function form. Predicted: 1 (mirrors contract scope).
 	if got := counts["IFree"]; got != 1 {
 		t.Errorf("V2.14 IFree (free-function): expected 1 EdgeUsesFor, got %d", got)
 	}
 
-	// (c) IOp — operator-form. Post-V2.20 (2026-05-18): 1 EdgeUsesFor.
-	// V2.20's operator-form recovery walker pattern-matches the
+	// (c) IOp — operator-form. 1 EdgeUsesFor: the
+	// operator-form recovery walker pattern-matches the
 	// misparsed `state_variable_declaration` shape and emits the
 	// binding pair, flipping this lock from 0 → 1.
 	if got := counts["IOp"]; got != 1 {

@@ -24,7 +24,7 @@ import (
 // Why per-language convention: testing frameworks pick filename rules
 // that drift between ecosystems. JUnit Java would be `Test*.java`,
 // Python pytest is `test_*.py`. Adding a language => add one branch
-// here. Keep the function short and explicit (P5 — readable beats
+// here. Keep the function short and explicit (readable beats
 // clever) so the contributor adding the next language can see at a
 // glance what to extend.
 func IsTestPath(path, lang string) bool {

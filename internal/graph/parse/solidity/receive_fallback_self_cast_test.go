@@ -6,11 +6,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V14 — receive/fallback self-cast value-transfer audit.
-// V12 wired HasSelfReentrantCall onto the cast walker for value-
-// transfer methods (send / transfer); V14 locks that the same
-// signal reaches receive() and fallback() functions (which W6
-// V1.24 emits as NodeFunction with SubKind="receive" /
+// Receive/fallback self-cast value-transfer audit.
+// The cast walker sets HasSelfReentrantCall for value-
+// transfer methods (send / transfer); this test locks that the same
+// signal reaches receive() and fallback() functions (which
+// are emitted as NodeFunction with SubKind="receive" /
 // "fallback"). A regression that excludes
 // fallback_receive_definition from nearestFunctionQnameAndStart
 // — or that splits receive/fallback into a non-function node
@@ -32,7 +32,7 @@ func TestReceiveFallback_SelfReentrantValueTransfer(t *testing.T) {
 		if _, ok := want[n.QualifiedName]; ok {
 			got[n.QualifiedName] = n.HasSelfReentrantCall
 			// Self-cast value-transfer must NOT also light up the
-			// arbitrary-address HasExternalCall path (V12 routes
+			// arbitrary-address HasExternalCall path (the walker routes
 			// self-casts to selfAffected, not affected).
 			if n.HasExternalCall {
 				t.Errorf("%s HasExternalCall: got true (V14 expects false; self-cast routes to reentrant)",

@@ -7,10 +7,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W1 — Inheritance + interface implementation detection.
+// Sol inheritance + interface implementation detection.
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §3.1, §4.1
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 5 W-C W1.
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §3.1, §4.1
 //
 // Scope: the `is`-clause on contract / interface declarations:
 //
@@ -19,13 +18,14 @@ import (
 //	contract Multi is Base, IFoo, IBar { ... }    → 3 edges, one per parent
 //	interface IB   is IA { ... }                  → EdgeExtends    (IB → IA)
 //
-// Per §5.0 decisions (2026-05-11):
+// Per §5.0 decisions:
 //   - Same-file resolution → ConfExtracted.
 //   - Cross-file resolution → ConfInferred (Pass 2 PendingRef).
-//   - Unresolved (parent qname matches no node) → drop (V0 — strict purge,
+//   - Unresolved (parent qname matches no node) → drop (strict purge,
 //     graph.Validate rejects dangling edges).
 //   - Multiple inheritance is order-preserving (one edge per parent in
-//     source order); C3 linearisation is out of scope for V0.
+//     source order); C3 linearisation is not applied to
+//     these edges (storage layout uses it; see c3_linearization.go).
 //   - Edge direction: child → parent ("child inherits from parent"),
 //     consistent with Go implements.go and TS heritage semantics.
 //
@@ -37,8 +37,8 @@ import (
 // — Pass 1 only knows local file structure; cross-file type discovery
 // belongs to Pass 2.
 //
-// Out of scope for W1 (separate dispatches): virtual/override (W2),
-// interface dispatch `IFoo(addr).bar()` (W3), `using For` (W6).
+// Out of scope here (separate detectors): virtual/override,
+// interface dispatch `IFoo(addr).bar()`, `using For`.
 
 // runInheritance walks every `is`-clause match and queues a PendingRef
 // per (child, parent) pair. The query (queryInheritance) matches both
@@ -106,7 +106,7 @@ func (v *declVisitor) runInheritance() {
 	}
 }
 
-// dispatchKindInherit tags PendingRefs that originate from W1 inheritance
+// dispatchKindInherit tags PendingRefs that originate from inheritance
 // detection so resolveInheritance can identify and process them in Pass 2.
 // String constant (rather than a typed enum) for consistency with existing
 // DispatchKind usage in golang/grpc.go ("rpc", "grpc"), which uses bare

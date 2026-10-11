@@ -1,8 +1,7 @@
 // Package audit compares the authoritative Go build file set
 // (go/packages.Load) against the file set recorded in the CKG database.
 //
-// V0 scope: Go only. TS/Sol audit is deferred (no equivalent build oracle);
-// see docs/WORK-PLAN.md Group E.
+// V0 scope: Go only. TS/Sol audit is deferred (no equivalent build oracle).
 package audit
 
 import (

@@ -1,6 +1,6 @@
 package ollama_test
 
-// External-import gate for G1 (00 §C2 / 02-ckv-refactor.md M2.a).
+// External-import gate for the public embedder and engine packages.
 //
 // This file lives in `package ollama_test` — an EXTERNAL test package — and
 // imports BOTH public surfaces a downstream module (cks, doc 03) needs:
@@ -9,8 +9,8 @@ package ollama_test
 //	github.com/0xmhha/knowledge-system/pkg/vector/ckv           (the engine)
 //
 // If `pkg/embed/ollama` were still under the module's internal/ tree, this
-// file would not compile — so the G1 move is what makes the test buildable at
-// all. The
+// file would not compile — so moving it to pkg/ is what makes the test
+// buildable at all. The
 // ollama adapter is pure HTTP (no CGO): the construction below runs against an
 // httptest server with NO Ollama daemon and NO ONNX/CGO in the embedder path.
 // (pkg/ckv still pulls the sqlite-vec CGO store transitively — that is the
@@ -136,7 +136,7 @@ func TestOllamaIndexRejectsDigestReplacementAndLegacyManifest(t *testing.T) {
 	}
 }
 
-// TestExternalImport_OllamaConstruct is the core M2.a gate: an external package
+// TestExternalImport_OllamaConstruct is the core external-import gate: an external package
 // constructs a real ollama.Adapter (pure HTTP, no CGO, no daemon) and the
 // auto-probed dimension matches the server's vector width. bge-m3 serves 1024.
 func TestExternalImport_OllamaConstruct(t *testing.T) {

@@ -1,9 +1,9 @@
 package ckgclient_test
 
-// B7 canonical_id join fixture (live half). Env-gated integration check that
+// canonical_id join fixture (live half). Env-gated integration check that
 // runs the REAL join chain cks depends on — ckv chunk → canonical_id →
 // ckg node — against a live dataset, asserting the cross-repo agreements
-// (coordination 2026-06-29, D-2/D-3):
+// (2026-06-29):
 //
 //  1. schema gate: the graph must be built at cache SchemaVersion >= 1.19,
 //     the first version whose canonical_id VALUES are populated (a 1.16–1.18
@@ -11,7 +11,7 @@ package ckgclient_test
 //  2. chunk inheritance: real ckv semantic hits must carry a ckg canonical id
 //     (CanonicalID, inherited per CKV PR #9);
 //  3. join resolution: those ids must resolve through cks's public FindSymbol
-//     surface at >= 90% — the match-rate target agreed for the B7 measurement.
+//     surface at >= 90% — the agreed match-rate target for the join.
 //
 // Skipped unless CKS_B7_LIVE_CKG points at a graph.db. Run against pr-77-2:
 //
@@ -59,7 +59,7 @@ func schemaAtLeast(version string, minMajor, minMinor int) bool {
 func TestLive_B7_CanonicalJoin(t *testing.T) {
 	graphPath := os.Getenv("CKS_B7_LIVE_CKG")
 	if graphPath == "" {
-		t.Skip("set CKS_B7_LIVE_CKG=<graph.db> (and CKS_B7_LIVE_CKV=<ckv dir>) to run the live B7 join check")
+		t.Skip("set CKS_B7_LIVE_CKG=<graph.db> (and CKS_B7_LIVE_CKV=<ckv dir>) to run the live canonical_id join check")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
@@ -142,6 +142,6 @@ func TestLive_B7_CanonicalJoin(t *testing.T) {
 		t.Logf("sample misses: %v", missed)
 	}
 	if rate < 0.9 {
-		t.Errorf("canonical join rate %.1f%% < 90%% target (D-1/§1-R agreement)", rate*100)
+		t.Errorf("canonical join rate %.1f%% < 90%% agreed target", rate*100)
 	}
 }

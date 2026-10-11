@@ -9,16 +9,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// concurrency.go implements B1 Stage 1 (spec §2): emit Mutex nodes for
+// concurrency.go implements the Go concurrency pass (spec §2): emit Mutex nodes for
 // sync.Mutex / sync.RWMutex declarations, acquires_lock / releases_lock
 // edges for Lock/Unlock/RLock/RUnlock calls, and improve Channel
 // emission with direction + buffer + elem-type attributes (in Signature).
 //
-// Stage 2 (SSA-based cross-function lock chain analysis) is D1's scope.
-// accessed_under_lock detection is deferred to a B1 follow-up — the lexical
-// scope analysis required for it is non-trivial and the value delivered by
-// just Mutex nodes + lock edges (currently zero in the production DB) is
-// already substantial.
+// Cross-function lock chain analysis lives in buildpipe's lock propagation
+// pass, and accessed_under_lock detection lives in concurrency_underlock.go.
 //
 // Receiver resolution: when typesInfo is non-nil, every detection uses
 // types.Info.ObjectOf / types.Info.TypeOf to confirm receivers belong to
@@ -27,7 +24,7 @@ import (
 // name-based matching with INFERRED confidence; this is the AST-only
 // path used by tests that call ParseFile directly without a *packages.Package.
 
-// emitConcurrencyDecls is the per-file entry point for the B1 concurrency
+// emitConcurrencyDecls is the per-file entry point for the concurrency
 // pass. Walks the file's top-level declarations to find sync.Mutex /
 // sync.RWMutex fields and locals, emits Mutex nodes, and records
 // var/field → node-ID mapping (consumed later by maybeEmitLockEdge).
@@ -83,7 +80,7 @@ func (v *declVisitor) scanStructForMutex(s *ast.TypeSpec) {
 		if len(f.Names) == 0 {
 			// Embedded mutex: synthesise a name from the underlying type.
 			// Suffix qname with #mutex to disambiguate from the Field node
-			// emitFields will emit at the same source position (G9 — the
+			// emitFields will emit at the same source position (the
 			// previous shared-qname collision caused emitFields to overwrite
 			// the Mutex node, leaving acquires_lock edges pointing at a Field
 			// node instead of the Mutex node).
@@ -514,7 +511,7 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr) s
 // Only handles inline `go func() { ... }()` literals; named-function goroutines
 // require cross-file resolution and are silently skipped.
 //
-// Track C P1a: also emits acquires_lock / releases_lock edges for Lock /
+// Also emits acquires_lock / releases_lock edges for Lock /
 // Unlock / RLock / RUnlock CallExprs nested inside the goroutine body. The
 // outer body walker (emitFunctionBodyPos) returns false on *ast.GoStmt to
 // avoid double-walking, which previously dropped every lock call inside a
@@ -570,7 +567,7 @@ func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.Ca
 				}
 			}
 		case *ast.CallExpr:
-			// Track C P1a: lock edges inside goroutine bodies. Anchored on
+			// Lock edges inside goroutine bodies. Anchored on
 			// parentFuncID (the function that spawned the goroutine), which
 			// matches the non-goroutine path emitted by maybeEmitLockEdge.
 			// No-op when parentFuncID couldn't be recovered (defensive).

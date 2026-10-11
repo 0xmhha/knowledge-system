@@ -246,7 +246,7 @@ func topMetricColumn(metric string) (string, error) {
 }
 
 // EdgeCountsByType returns total edge count per type across the whole
-// graph. Single GROUP BY query; cheap. Viewer (Track D) uses this to
+// graph. Single GROUP BY query; cheap. The viewer uses this to
 // render "G2 Semantic 758" badges so users can see axis weight without
 // a separate scan of the full edges table.
 func (s *sqliteStore) EdgeCountsByType() (map[string]int, error) {
@@ -338,8 +338,8 @@ func (s *sqliteStore) GetBlob(id string) ([]byte, error) {
 // rows to bound MCP response size.
 //
 // opts.Language pushes a `language = ?` predicate when non-empty.
-// opts.Kinds pushes a `type IN (...)` predicate when non-empty — CKG-4
-// fix that removes cks Stage 2's N round-trips for `arch_explain` intent
+// opts.Kinds pushes a `type IN (...)` predicate when non-empty — this
+// removes cks Stage 2's N round-trips for `arch_explain` intent
 // (one query per requested SymbolKind). Empty Kinds returns every type.
 func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
 	q, args := findSymbolQuery(name, exact, opts)
@@ -542,7 +542,7 @@ func (s *sqliteStore) NodesByIDs(ids []string) ([]types.Node, error) {
 // the schema enforces NOT NULL).
 //
 // The dual-type scope (Hunk + Commit) matches the §11.3 contract — other
-// AMBIGUOUS rows (TS resolve multi-candidate, Track C unresolvable
+// AMBIGUOUS rows (TS resolve multi-candidate, unresolvable
 // dispatch) are precision signals the LLM should still see and stay
 // out of the recovery panel.
 func (s *sqliteStore) AmbiguousMetaNodes() ([]types.Node, error) {
@@ -599,7 +599,7 @@ func (s *sqliteStore) AllEdges() ([]types.Edge, error) {
 
 // NodesByFilePath returns every node whose file_path equals path. Empty path
 // returns nil (no rows). Used by buildpipe to reload nodes for files that hit
-// the A3 incremental cache instead of re-parsing them.
+// the incremental cache instead of re-parsing them.
 func (s *sqliteStore) NodesByFilePath(path string) ([]types.Node, error) {
 	if path == "" {
 		return nil, nil
@@ -657,7 +657,7 @@ func (s *sqliteStore) BlobsByFilePath(path string) (map[string][]byte, error) {
 
 // GetNodePRs returns the PR breadcrumbs for a single node, descending
 // by merge timestamp, optionally truncated to merges before cutoff
-// (ckg-NEW-3). The cutoff comparison runs in SQL as a string comparison
+// for temporal slicing. The cutoff comparison runs in SQL as a string comparison
 // against the RFC3339-UTC text stored in merged_at — lexicographic
 // ordering coincides with chronological ordering for that format, so
 // no datetime() coercion is needed.

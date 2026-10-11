@@ -73,7 +73,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			if parentID, ok := callSiteParent[src]; ok {
 				src = parentID
 			}
-			// E3: listens_on PendingRefs from the distributed pass encode
+			// listens_on PendingRefs from the distributed pass encode
 			// (endpoint, handler-name) — but the conventional edge direction
 			// is handler → endpoint. Swap src↔dst so downstream consumers
 			// don't have to special-case this edge type. Documented in
@@ -96,7 +96,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 // runs Pass 1 on each, then Pass 2 across the union.
 //
 // Type-aware: registers the loaded packages with the parser via
-// SetPackages so the concurrency pass (B1) gets EXTRACTED-confidence
+// SetPackages so the concurrency pass gets EXTRACTED-confidence
 // Mutex / lock-edge emission instead of falling back to AST-only INFERRED.
 func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	cfg := &packages.Config{
@@ -134,19 +134,19 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	if err != nil || rg == nil {
 		return rg, err
 	}
-	// P0: implements / extends edges are a post-Resolve pass — they need
+	// implements / extends edges are a post-Resolve pass — they need
 	// (a) the union of nodes (qname → ID lookup) and (b) the loaded package
 	// scopes (go/types satisfaction queries). Wired here so tests using
 	// LoadAndResolve exercise the same code path as production buildpipe.
 	rg.Edges = append(rg.Edges, EmitImplementsEdges(p.Pkgs(), rg.Nodes)...)
-	// Track C P0: uses_type edges (Function/Method/Struct → Type). Same
+	// uses_type edges (Function/Method/Struct → Type). Same
 	// post-Resolve location for the same reasons. Cross-package types that
 	// don't have a node in this graph become PendingRefs (q4=A); LoadAndResolve
 	// drops the pending side because tests don't replay them, but the
 	// production buildpipe path persists them via runGoPipeline.
 	usesEdges, _ := EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, usesEdges...)
-	// Track C P1c: instantiates edges (Function/Method → Type). Walks each
+	// instantiates edges (Function/Method → Type). Walks each
 	// function body for composite literals and `new(T)` calls.
 	rg.Edges = append(rg.Edges, EmitInstantiatesEdges(p.Pkgs(), rg.Nodes)...)
 	// Defect C: promoted-method nodes (embedding type -> embedded method).

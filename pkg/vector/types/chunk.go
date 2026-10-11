@@ -49,7 +49,7 @@ const (
 	ChunkFunctionSplit ChunkKind = "function_split" // sub-chunk of a long function
 	ChunkFileHeader    ChunkKind = "file_header"    // import block / top-of-file
 	// ChunkFileFull is a coarse-granularity chunk covering a whole source file
-	// (Phase B multi-granularity, roadmap §3.1). Additive and opt-in: emitted
+	// (multi-granularity experiment). Additive and opt-in: emitted
 	// only when Options.IncludeFileFull is set, so it competes in search
 	// alongside the fine symbol chunks for file/module-level queries.
 	ChunkFileFull ChunkKind = "file_full"
@@ -124,7 +124,7 @@ type Branch struct {
 // FlowStepMeta is the structured metadata for a ChunkFlowStep chunk: the
 // symbol the step runs at, the symbols it calls, what it reads/writes/emits,
 // its conditional branches, and the invariant ids it must uphold. Serialized
-// into the flow_meta column (populated in Phase B).
+// into the flow_meta column (populated from the flow corpus).
 type FlowStepMeta struct {
 	FlowID     string   `json:"flow_id"`
 	StepID     string   `json:"step_id"`
@@ -137,7 +137,7 @@ type FlowStepMeta struct {
 	Branches   []Branch `json:"branches,omitempty"`
 	Invariants []string `json:"invariants,omitempty"`
 	// AlignedChunkID is the ID of the code chunk whose line range contains this
-	// step's file:line (Phase C alignment), letting a caller jump from a flow
+	// step's file:line (flow-to-code alignment), letting a caller jump from a flow
 	// step to its actual implementation chunk. Empty when the step's line did
 	// not resolve to any code chunk — the corpus drifted from the code.
 	AlignedChunkID string `json:"aligned_chunk_id,omitempty"`
@@ -145,7 +145,7 @@ type FlowStepMeta struct {
 
 // FlowSpineMeta is the structured metadata for a ChunkFlowSpine chunk: a
 // flow's entry point, what triggers it, and how it links to other flows.
-// Serialized into the flow_meta column (populated in Phase B).
+// Serialized into the flow_meta column (populated from the flow corpus).
 type FlowSpineMeta struct {
 	FlowID     string   `json:"flow_id"`
 	EntryPoint string   `json:"entry_point,omitempty"`

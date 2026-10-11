@@ -11,9 +11,9 @@ import (
 )
 
 // TestLockPropagation_DefaultOff_NoEmit is the §7.0 Go regression guard at
-// test level: --lock-propagation defaults to false, so building the W-A
+// test level: --lock-propagation defaults to false, so building the lock-propagation
 // fixture without the flag must produce the same accessed_under_lock count
-// as the existing B1 Phase 4 intra-function pass. Catches accidental
+// as the existing intra-function pass. Catches accidental
 // "default-on" drift before it reaches CI.
 func TestLockPropagation_DefaultOff_NoEmit(t *testing.T) {
 	off := buildAndQueryUnderLock(t, "testdata/lock_propagation", false)
@@ -21,7 +21,7 @@ func TestLockPropagation_DefaultOff_NoEmit(t *testing.T) {
 	if len(on) <= len(off) {
 		t.Fatalf("flag ON must emit more edges than OFF; got off=%d on=%d", len(off), len(on))
 	}
-	// The OFF count must match the intra-function B1 pass exactly — every
+	// The OFF count must match the intra-function pass exactly — every
 	// edge in OFF must also exist in ON (set inclusion). Catches the case
 	// where ON inadvertently overwrites or drops an OFF edge.
 	onSet := pairSet(on)
@@ -33,10 +33,10 @@ func TestLockPropagation_DefaultOff_NoEmit(t *testing.T) {
 	}
 }
 
-// TestLockPropagation_SingleHop verifies the canonical W-A positive case:
+// TestLockPropagation_SingleHop verifies the canonical positive case:
 // Apply locks mu, calls touch(); touch reads/writes value. After
 // --lock-propagation the field's accessed_under_lock edge appears, and the
-// confidence is INFERRED (W-A §5.0 Q2 — all cross-fn emits are INFERRED).
+// confidence is INFERRED (design §5.0 Q2 — all cross-fn emits are INFERRED).
 func TestLockPropagation_SingleHop(t *testing.T) {
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "SingleHop.value")
@@ -63,7 +63,7 @@ func TestLockPropagation_SingleHop(t *testing.T) {
 // Enter -> level0 -> level1 -> level2 -> level3 -> terminal; only terminal
 // touches DeepChain.value. Without DFS the edge would be missing.
 //
-// Also pins the cross-fn confidence policy (W-A §5.0 Q2): all propagated
+// Also pins the cross-fn confidence policy (design §5.0 Q2): all propagated
 // edges must be INFERRED regardless of DFS depth — the suspicion-grade
 // label that signals "could not have been derived from a single function
 // body" doesn't degrade further as the chain lengthens.
@@ -79,7 +79,7 @@ func TestLockPropagation_DeepChain(t *testing.T) {
 		t.Fatalf("expected accessed_under_lock(DeepChain.value -> DeepChain.mu) via DFS depth>=5")
 	}
 	if found.Confidence != types.ConfInferred {
-		t.Errorf("DeepChain cross-fn emit confidence=%q, want INFERRED (W-A §5.0 Q2)", found.Confidence)
+		t.Errorf("DeepChain cross-fn emit confidence=%q, want INFERRED (design §5.0 Q2)", found.Confidence)
 	}
 }
 
@@ -104,7 +104,7 @@ func TestLockPropagation_Cycle(t *testing.T) {
 		t.Fatalf("expected accessed_under_lock(Cycle.value -> Cycle.mu) — cycleA touches value")
 	}
 	if found.Confidence != types.ConfInferred {
-		t.Errorf("Cycle cross-fn emit confidence=%q, want INFERRED (W-A §5.0 Q2)", found.Confidence)
+		t.Errorf("Cycle cross-fn emit confidence=%q, want INFERRED (design §5.0 Q2)", found.Confidence)
 	}
 }
 
@@ -133,7 +133,7 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 	}
 }
 
-// TestLockPropagation_NamedGoroutine verifies the P2 #8 W-A fix: a
+// TestLockPropagation_NamedGoroutine verifies the named-goroutine fix: a
 // `go gh.touchAsync()` call from inside a lock-holding chain now
 // surfaces an accessed_under_lock edge on the goroutine target's
 // field accesses. Pre-fix the Go parser emitted only a `spawns` edge
@@ -145,7 +145,7 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 //
 // Q4 ("Goroutine body INFERRED") rides the existing uniform cross-
 // fn INFERRED label — confidence stays consistent with the other
-// W-A propagation paths.
+// propagation paths.
 func TestLockPropagation_NamedGoroutine(t *testing.T) {
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "GoroutineHolder.value")
@@ -158,7 +158,7 @@ func TestLockPropagation_NamedGoroutine(t *testing.T) {
 		t.Fatalf("expected accessed_under_lock(GoroutineHolder.value -> GoroutineHolder.mu) via named-goroutine path")
 	}
 	if found.Confidence != types.ConfInferred {
-		t.Errorf("named-goroutine cross-fn emit confidence=%q, want INFERRED (W-A §5.0 Q4)", found.Confidence)
+		t.Errorf("named-goroutine cross-fn emit confidence=%q, want INFERRED (design §5.0 Q4)", found.Confidence)
 	}
 }
 

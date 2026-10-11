@@ -9,13 +9,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W8 V3 (2026-05-19) — function-typed parameter / local marker.
+// Sol function-typed parameter / local marker.
 //
-// W8 V2 set IsFunctionTyped on NodeField for state variables declared
-// with a function type. V3 extends the signal to callables that
+// runStateVarDecl sets IsFunctionTyped on NodeField for state variables
+// declared with a function type. This walker extends the signal to callables that
 // receive function-typed values via parameter or local variable.
 //
-// Detection shape (matches W8 V2):
+// Detection shape (matches runStateVarDecl):
 //
 //	parameter | variable_declaration
 //	  type: type_name
@@ -30,7 +30,7 @@ import (
 // on the corresponding Node row.
 //
 // Why mark the containing callable, not the parameter itself:
-// parameters and locals aren't first-class graph nodes in V0
+// parameters and locals aren't first-class graph nodes
 // (paramTypes / localVarTypes are side-channel maps consumed by Pass 2
 // for dispatch resolution, not edges). The marker on the enclosing
 // callable lets security tooling answer "which functions accept or
@@ -90,15 +90,15 @@ func (v *declVisitor) runFunctionTypedVarMarker() {
 			}
 		}
 	}
-	// W-C W8 V5 (2026-05-19): collect contract-scope function-typed
+	// Collect contract-scope function-typed
 	// state variables so a call_expression whose callee resolves to
 	// a state-var name (`handler(x)` inside the same contract) also
 	// lights up the marker.
 	stateVarByContract := v.collectFunctionTypedStateVars()
 	pointerCallers := v.findFunctionPointerCallers(fnByID, stateVarByContract)
-	// W-C W8 V8 (2026-05-19): callers that PROPAGATE a function-
+	// Callers that PROPAGATE a function-
 	// typed value (assign to state var or pass as argument) without
-	// invoking it. Distinct from V4/V5/V6/V7 invocation paths.
+	// invoking it. Distinct from the invocation paths.
 	pointerPropagators := v.findFunctionPointerPropagators(fnByID, stateVarByContract)
 	if len(affected) == 0 && len(pointerCallers) == 0 && len(pointerPropagators) == 0 {
 		return
@@ -116,7 +116,7 @@ func (v *declVisitor) runFunctionTypedVarMarker() {
 	}
 }
 
-// findFunctionPointerPropagators — W-C W8 V8 (2026-05-19). Walks
+// findFunctionPointerPropagators walks
 // every assignment_expression and call_expression in the file. For
 // assignments, checks whether the RHS is a bare identifier matching
 // a function-typed name in scope (fnByID for params/locals,
@@ -221,7 +221,7 @@ func (v *declVisitor) findFunctionPointerPropagators(
 		}
 	}
 
-	// W-C W8 V10 (2026-05-19) — Pass 4: emit-statement propagation.
+	// Pass 4: emit-statement propagation.
 	// `emit MyEvent(handler)` passes a fn-typed value through an
 	// event, which logs it to the chain — security-relevant
 	// propagation that the assignment / argument / return passes
@@ -249,7 +249,7 @@ func (v *declVisitor) findFunctionPointerPropagators(
 		}
 	}
 
-	// W-C W8 V9 (2026-05-19) — Pass 3: return-position propagation.
+	// Pass 3: return-position propagation.
 	// `return cb;` where cb is a fn-typed param/local/state-var
 	// propagates the function pointer to the caller.
 	const rq = `(return_statement) @ret`
@@ -288,8 +288,8 @@ func (v *declVisitor) findFunctionPointerPropagators(
 
 // collectFunctionTypedStateVars returns (contractName -> set of
 // state-var names declared with a function type), built from the
-// IsFunctionTyped flag W8 V2 stamps on NodeField rows. Used by the
-// W8 V5 caller walk to recognise `someStateVar(args)` invocations
+// IsFunctionTyped flag runStateVarDecl stamps on NodeField rows. Used by
+// the state-var caller walk to recognise `someStateVar(args)` invocations
 // inside contract methods as function-pointer calls.
 func (v *declVisitor) collectFunctionTypedStateVars() map[string]map[string]bool {
 	out := map[string]map[string]bool{}
@@ -311,14 +311,14 @@ func (v *declVisitor) collectFunctionTypedStateVars() map[string]map[string]bool
 	return out
 }
 
-// findFunctionPointerCallers — W-C W8 V4/V5. Walks every
+// findFunctionPointerCallers walks every
 // call_expression whose callee unwraps to a bare identifier and
 // checks whether the identifier matches:
 //
 //   - a function-typed parameter or local declared in the enclosing
-//     callable (V4 — per-function fnByID set), OR
+//     callable (per-function fnByID set), OR
 //   - a function-typed state variable declared on the enclosing
-//     contract (V5 — per-contract stateVarByContract set).
+//     contract (per-contract stateVarByContract set).
 //
 // Returns the set of callable IDs that perform at least one
 // function-pointer invocation. Bare-identifier callees only —
@@ -380,7 +380,7 @@ func (v *declVisitor) findFunctionPointerCallers(
 }
 
 // walkIdentifiers recurses into a subtree and invokes fn for every
-// identifier descendant. Used by the W8 V10 emit-statement walker
+// identifier descendant. Used by the emit-statement walker
 // so an identifier nested under nested call_arguments / expression
 // wrappers is still inspected. The recursion bound is the AST
 // depth of a single emit statement (typically <10) so cost stays
@@ -403,7 +403,7 @@ func walkIdentifiers(n *sitter.Node, fn func(*sitter.Node)) {
 // function-pointer invocation shape `local(args)`). Returns nil for
 // member_expression callees (`obj.method(args)`), parenthesised /
 // chained shapes, and type-cast wrappers — those are out of scope
-// for V4 since they don't directly target a function-typed param /
+// here since they don't directly target a function-typed param /
 // local declared in the same callable.
 func bareIdentifierCallee(callNode *sitter.Node) *sitter.Node {
 	if callNode == nil {
@@ -428,10 +428,10 @@ func bareIdentifierCallee(callNode *sitter.Node) *sitter.Node {
 // typeNameIsFunctionTyped checks whether a type_name AST node carries
 // the Sol grammar shape for a function type — a `parameter` or
 // `return_parameter` named child. Mirrors the inline check in
-// runStateVarDecl (W8 V2) so both walkers agree on what counts as
+// runStateVarDecl so both walkers agree on what counts as
 // function-typed.
 //
-// W-C W8 V12 (2026-05-19): also recurses into nested type_name
+// It also recurses into nested type_name
 // wrappers so `function(uint256)[] handlers` lights up the same
 // markers as the scalar form. tree-sitter-solidity v1.2.11 models
 // the array form as an outer type_name whose first named child is
@@ -450,7 +450,7 @@ func typeNameIsFunctionTyped(typeNode *sitter.Node) bool {
 		case "parameter", "return_parameter":
 			return true
 		case "type_name":
-			// V12: nested type_name (array wrapper). Recurse
+			// Nested type_name (array wrapper). Recurse
 			// into the element type — if it's a function type,
 			// the whole array is fn-typed.
 			if typeNameIsFunctionTyped(child) {

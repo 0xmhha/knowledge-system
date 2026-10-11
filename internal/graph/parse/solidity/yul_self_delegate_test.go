@@ -6,8 +6,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V10 — Yul-level self-delegatecall surfaces as
-// HasSelfDelegatecallDead, parallel to the V9 Sol-level marker.
+// Yul-level self-delegatecall surfaces as
+// HasSelfDelegatecallDead, parallel to the Sol-level marker.
 // `delegatecall(gas(), address(), …)` is a dead-weight
 // operation since `address()` resolves to the executing
 // contract's own address. Regular Yul calls (`call(gas, target,

@@ -19,7 +19,7 @@ type concurrencyImpactResponse struct {
 	Instructions []contract.DummyInstruction `json:"instructions,omitempty"`
 }
 
-// registerConcurrencyImpact wires cks.context.concurrency_impact (G7/S1).
+// registerConcurrencyImpact wires cks.context.concurrency_impact.
 func registerConcurrencyImpact(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameConcurrencyImpact,
 		mcpgo.WithOutputSchema[concurrencyImpactResponse](),

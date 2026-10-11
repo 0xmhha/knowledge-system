@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.25 — free function regression guard.
+// Free function regression guard.
 //
 // Sol 0.7.4+ allows file-level `function` declarations outside any
 // contract / library / interface — so-called free functions. They
@@ -16,17 +16,17 @@ import (
 // which matches Sol's language rule: `using` directives are
 // contract-scope only.
 //
-// V1.25 locks in the expected behavior:
+// This test locks in the expected behavior:
 //   - free function parses without errors
 //   - free function emits no phantom EdgeCalls into the using-for
 //     dispatch path
 //   - contract using-for dispatch in the same file is unaffected
 //
-// V1.25 carry-over (V1.26+):
+// Not covered here:
 //   - abstract contract body scope captures.
 //   - inherited modifier `using` baseline.
-//   - Block-scoped shadowing precision (V2+ refactor).
-//   - Module/import handling (V2 territory).
+//   - Block-scoped shadowing precision.
+//   - Module/import handling.
 
 // TestUsingForV125_FreeFunctionAndContract — fixture has one free
 // function + one contract with using-for. Only the contract's call

@@ -7,11 +7,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V9 — combined path-hint + method-hint audit. The
+// Combined path-hint + method-hint audit. The
 // directive `using {M.SubMath.addOne as +} for uint256 global;`
 // imported under `import "./lib.sol" as M` triggers BOTH the
-// V5/V6 path hint ("||<path>") and the V8 method hint
-// ("\x1e<method>") on the same PendingRef.TargetQName. V9
+// path hint ("||<path>") and the method hint
+// ("\x1e<method>") on the same PendingRef.TargetQName. This test
 // audits that resolveUsingForRef decodes both hints
 // independently and emits the expected EdgeUsesFor:
 //
@@ -20,7 +20,7 @@ import (
 //   - Edge.DispatchKind carries the method name as
 //     `using_for|addOne` (method hint surfaced on the edge).
 //
-// Re-uses the W6 V7 fixture (same source files exercise both
+// Re-uses the nested namespace path fixture (same source files exercise both
 // hint codepaths) — this test asserts the second axis.
 func TestUsingForV6V9_CombinedHints(t *testing.T) {
 	nodes, edges := parseResolveMultiSol(t, "testdata/using_for_v6v7",
@@ -42,7 +42,7 @@ func TestUsingForV6V9_CombinedHints(t *testing.T) {
 	e := got[0]
 	dst := byID[e.Dst]
 
-	// Path hint axis (V5/V6/V7 contract).
+	// Path hint axis.
 	if !strings.HasSuffix(dst.FilePath, "lib.sol") {
 		t.Errorf("path hint axis: expected dst from lib.sol, got %q", dst.FilePath)
 	}
@@ -50,7 +50,7 @@ func TestUsingForV6V9_CombinedHints(t *testing.T) {
 		t.Errorf("path hint axis: dst name %q want \"SubMath\"", dst.Name)
 	}
 
-	// Method hint axis (V8 contract).
+	// Method hint axis.
 	if !strings.HasPrefix(e.DispatchKind, "using_for") {
 		t.Errorf("DispatchKind: missing using_for prefix: %q", e.DispatchKind)
 	}

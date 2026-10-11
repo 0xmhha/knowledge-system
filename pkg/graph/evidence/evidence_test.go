@@ -230,7 +230,7 @@ func TestBuildPack_NoCorpus(t *testing.T) {
 	}
 }
 
-// TestBuildPack_IssueIDOnly covers the H4 follow-up: with IssueID set
+// TestBuildPack_IssueIDOnly covers the issue-ID filter: with IssueID set
 // and Intent empty, BuildPack returns every hunk whose parent commit
 // cites the ticket — sorted by commit recency, no BM25 ranking.
 func TestBuildPack_IssueIDOnly(t *testing.T) {

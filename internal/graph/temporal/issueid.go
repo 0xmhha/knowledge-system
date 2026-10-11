@@ -1,6 +1,6 @@
 // Package temporal — issueid.go extracts issue/ticket identifiers from
-// commit subject lines for the H4 stage of the hunk-graph series
-// (docs/design/hunk-graph.md §10.4). Three regex passes recognise:
+// commit subject lines for the hunk graph
+// (docs/graph/design/hunk-graph.md §10.4). Three regex passes recognise:
 //
 //   - GitHub-style bare references: `#123`, `Fixes #45`, `(#67)` →
 //     normalised as `GH-123` / `GH-45` / `GH-67`.
@@ -48,7 +48,7 @@ var (
 // nil` for the "no issues" branch.
 //
 // The patterns are intentionally conservative — over-matching would
-// pollute the H3 EvidencePack with spurious "this hunk fixes #123"
+// pollute the EvidencePack with spurious "this hunk fixes #123"
 // claims that don't reflect the commit's stated intent. False
 // negatives are recoverable (a follow-up PR can widen the patterns
 // when eval shows demand); false positives ship to the LLM and can

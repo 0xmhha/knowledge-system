@@ -6,18 +6,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.19 — free-function form partial-recovery boundary lock.
+// Free-function form partial-recovery boundary lock.
 //
-// V2.6 covered the 2-entry shape; V2.19 extends to 4 entries to
-// verify the V0 query's incidental capture survives larger
-// free-function alias lists. V2.17's AST probe noted the recovery
+// using_for_v260_test.go covers the 2-entry shape; this test extends to 4 entries to
+// verify the query's incidental capture survives larger
+// free-function alias lists. An AST probe showed the recovery
 // is a fortuitous partial parse rather than first-class grammar
 // support — this test pins the broader surface so a future grammar
 // bump that flips behavior produces a clearly failing assertion
 // rather than a silent semantic shift.
 //
-// Expected post-V2.6 / pre-grammar-bump behavior:
-//   - 1 EdgeUsesFor: Calc → Math (V0 query captures the leading
+// Expected behavior until a grammar bump:
+//   - 1 EdgeUsesFor: Calc → Math (the query captures the leading
 //     identifier from the partial-recovery `type_alias` child once
 //     per (src, dst) regardless of how many free-function aliases
 //     reference Math).

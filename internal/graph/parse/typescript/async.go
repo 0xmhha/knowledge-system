@@ -8,11 +8,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TS W-B W2 — async/await detection (schema 1.10 slots NodeAwaitPoint,
+// TS async/await detection (schema 1.10 slots NodeAwaitPoint,
 // EdgeAwaits).
 //
-// Spec: docs/design/ts-async-await-and-interface.md §2.1, §3.2, §4.2, §5.0.
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 5 W-B W2.
+// Spec: docs/graph/design/ts-async-await-and-interface.md §2.1, §3.2, §4.2, §5.0.
+// Dispatch index: docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2.
 //
 // Emits:
 //
@@ -29,7 +29,7 @@ import (
 //     `pkg/types/enums.go` index 34.
 //   - Q2: async modifier reflected as Function/Method SubKind="async" —
 //     set at the canonical declaration emit site (declarations.go::runQuery).
-//     Mirror of Solidity W2's SubKind="virtual"/"override" idiom.
+//     Mirror of Solidity's SubKind="virtual"/"override" idiom.
 //   - Q3: EdgeAsyncCall skipped — callee join uses AwaitPoint.StartByte /
 //     EndByte against the CallSite emitted by statements.go (positional
 //     overlap, same idiom as `spawns` → goroutine body). One direction

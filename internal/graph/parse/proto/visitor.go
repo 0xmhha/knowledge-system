@@ -32,7 +32,7 @@ import (
 //
 // proto2 vs proto3: proto2 allows `required` / `optional` / extensions, which
 // we accept-and-ignore (the field still surfaces as a Field node — proto2
-// support is best-effort per W3a scope decision).
+// support is best-effort by scope decision).
 //
 // File layout: this file holds the visitor type, token cursor helpers,
 // recovery, top-level dispatch, and the trivial preamble productions
@@ -115,7 +115,7 @@ func (v *visitor) parse() {
 		if n.CanonicalID != "" || n.Type == types.NodeFile || n.Type == types.NodeImport {
 			continue
 		}
-		// proto qnames already carry a "proto:" prefix; strip it (B4) so the
+		// proto qnames already carry a "proto:" prefix; strip it so the
 		// canonical id reads <relpath>:<pkg>.<Msg> rather than the doubled
 		// <relpath>:proto:<pkg>.<Msg>.
 		n.CanonicalID = v.rel + ":" + strings.TrimPrefix(n.QualifiedName, "proto:")

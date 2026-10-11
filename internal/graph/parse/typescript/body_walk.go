@@ -1,7 +1,7 @@
-// Package typescript — body_walk.go implements P3 of the TS parser:
+// Package typescript — body_walk.go implements this part of the TS parser:
 // statement-level call extraction inside function/method bodies.
 //
-// Before P3 the TS parser only emitted file-level declarations (Class /
+// Before this pass the TS parser only emitted file-level declarations (Class /
 // Interface / Function / Method / Decorator / TypeAlias / Enum / Import).
 // Function bodies were unparsed, so cross-symbol call edges were absent
 // from the TS portion of the graph — the 2026-05-09 graphify-comparison
@@ -17,7 +17,7 @@
 //     a follow-up TS pass can mirror that without changing the resolution
 //     contract here.
 //   - type-aware dispatch classification (invokes + dispatch_kind) — would
-//     require a TS LSP server embedded in CKG. Track C did this for Go via
+//     require a TS LSP server embedded in CKG. The Go parser does this via
 //     go/packages.Load; TS has no equivalent in-process surface today.
 //   - field reads/writes — captured by a separate `member_expression`
 //     query if the audit shows demand.

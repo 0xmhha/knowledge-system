@@ -55,7 +55,7 @@ Tools exposed (15):
     cks.ops.warmup                 — pre-load embedder
     cks.ops.index                  — trigger full / incremental rebuild
 
-Full schema reference: docs/mcp-tools.md.
+Full schema reference: docs/vector/mcp-tools.md.
 
 Register with Claude Code (stdio):
   claude mcp add cks --command "$(pwd)/bin/ckv mcp --out=$(pwd)/ckv-data"

@@ -1,4 +1,4 @@
-// Package composer is the Phase-B wire-up that ties the six composer
+// Package composer is the wire-up that ties the six composer
 // stages into one Compose entry point.
 //
 // Pipeline (sequential):
@@ -510,7 +510,7 @@ func (c *Composer) emitFootprint(
 		zap.Int("dropped_count", countDropped(s5)),
 		zap.Int("budget_skipped", len(s4.Skipped)),
 		zap.Duration("elapsed", elapsed),
-		// Per-stage breakdown (00 §9 cost attribution).
+		// Per-stage breakdown for cost attribution.
 		zap.Duration("intent_ms", tm.intent),
 		zap.Duration("stage1_ms", tm.stage1),
 		zap.Duration("stage2_ms", tm.stage2),

@@ -7,18 +7,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.18 — cross-file tuple validation. V1.14 idiom applied to
-// V1.16: a multi-file fixture where the library + struct types live
-// in one file and the V1.16 tuple-destructuring caller lives in
+// Cross-file tuple validation. The cross-file struct idiom applied to
+// tuple destructuring: a multi-file fixture where the library + struct types live
+// in one file and the tuple-destructuring caller lives in
 // another. Confirms the localVarTypes / structFieldTypes / bindings
 // indices (built by Pass 2 sweeping all ParseResults) resolve across
 // file boundaries at ConfInferred.
 //
-// V1.18 carry-over (V1.19+):
-//   - Block-scoped shadowing precision (V2+ refactor).
+// Not covered here:
+//   - Block-scoped shadowing precision.
 //   - Grammar-blocked items (free-function form, file-level using).
 
-// TestUsingForV118_CrossFileTupleDestructure — V1.16 tuple destructuring
+// TestUsingForV118_CrossFileTupleDestructure — tuple destructuring
 // with both slots typed. UserData struct and SafeMath library live in
 // cross_file_lib.sol; the caller Vault.run lives in cross_file_vault.sol.
 // Walker chains: tuple slot u → UserData (cross-file) → balance

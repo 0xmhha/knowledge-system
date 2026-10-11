@@ -87,7 +87,7 @@ type Options struct {
 	// or polluting the footprint log with hot-path entries.
 	DryRun bool
 
-	// MaxDensity caps the snippet rendering tier (B3 ladder).
+	// MaxDensity caps the snippet rendering tier (density ladder).
 	// "" / DensityFull → no cap, downgrade only under budget pressure
 	// (the documented default). DensitySignature5 → start every hit at
 	// signature+N and downgrade to signature_only under pressure.

@@ -16,7 +16,7 @@ import (
 )
 
 // Run starts a stdio MCP server bound to store. Returns when stdin
-// closes. mcphandlers.RegisterAll wraps store with the §11.3 H3
+// closes. mcphandlers.RegisterAll wraps store with the §11.3 retrieval
 // safety filter and registers every tool — no per-tool wiring here
 // any more (the eight register* calls moved to pkg/mcphandlers).
 func Run(ctx context.Context, store persist.StoreReader) error {

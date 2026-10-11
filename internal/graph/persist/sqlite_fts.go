@@ -23,12 +23,12 @@ import (
 //
 // opts.Language pushes a `n.language = ?` predicate into the WHERE clause
 // when non-empty. Filtering at the SQL layer (rather than client-side after
-// over-fetching) is the CKG-2 fix that removes cks's FilterOverfetchRatio=3
+// over-fetching) removes cks's FilterOverfetchRatio=3
 // workaround.
 func (s *sqliteStore) SearchFTS(q string, limit int, opts SearchFTSOptions) ([]SearchHit, error) {
 	// Mode="and" over-fetches before applying the per-token presence
 	// filter so the post-filter doesn't starve recall on small pages.
-	// The 3× ratio mirrors the cks workaround that CKG-2 retired
+	// The 3× ratio mirrors the retired cks workaround
 	// (FilterOverfetchRatio=3); the floor of 30 keeps tiny pages
 	// (limit=1, 5) from collapsing to zero survivors when a single
 	// hit happens to miss the AND set.
@@ -164,8 +164,7 @@ func rewriteFTSQuery(q string) string {
 	// punctuation marks routinely show up in natural-language task
 	// descriptions (e.g. "Where does (NewBlockChain) get called:") and the
 	// false-power-user classification caused FTS5 to choke on the raw
-	// parenthesis as a "syntax error near 'does'". Reported 2026-05-11 in
-	// go-stablenet VERIFICATION_REPORT §7.3 as B1's adjacent case. We now
+	// parenthesis as a "syntax error near 'does'". We now
 	// route those queries through the same per-token sanitiser as plain
 	// prose; `trimFTSToken` strips boundary `(` / `)` / `:` so the FTS5
 	// expression stays well-formed. Hand-crafted FTS5 queries that rely
@@ -177,26 +176,26 @@ func rewriteFTSQuery(q string) string {
 	// natural-language quotes around an identifier and must still
 	// go through the rewriter. The earlier check
 	// `strings.ContainsAny(q, "*\"")` flipped on any quote
-	// anywhere in the query, which caused the post-V3+B smoke run
+	// anywhere in the query, which caused a smoke run
 	// to bypass the rewriter on a task description that quoted
 	// example qnames and to hand FTS5 the raw `Vault.deposit.`
 	// — fts5 then rejected the trailing period with the original
-	// "syntax error near '.'" surfaced as δ smartContext silent
-	// failure (2026-05-22, second iteration).
+	// "syntax error near '.'" surfaced as a silent smartContext
+	// failure.
 	if strings.Contains(q, "*") {
 		return q
 	}
 	if strings.HasPrefix(q, `"`) && strings.HasSuffix(q, `"`) && len(q) >= 2 {
 		return q
 	}
-	// 2026-05-22 (smartContext audit): dotted identifiers in task
+	// Dotted identifiers in task
 	// descriptions ("List functions that call Vault.deposit") used
 	// to tokenise as a single field `Vault.deposit`. With length ≥4
 	// the rewriter then appended `*` → `Vault.deposit*`, which
 	// FTS5 rejects with `syntax error near "."`. The full call
 	// path: smartctx.BuildContext → store.Search → SearchFTS →
-	// rewriteFTSQuery → fts5 → error. δ baseline ran with no
-	// smartContext context for the entire previous smoke run
+	// rewriteFTSQuery → fts5 → error. A baseline run got no
+	// smartContext context for an entire smoke run
 	// because of this. Splitting on `.` (and `"`, after the gate
 	// tightening above) lines up with the FTS5 tokeniser's own
 	// behaviour — it indexes dotted identifiers as separate
@@ -258,8 +257,7 @@ func isFTS5Reserved(t string) bool {
 
 // trimFTSToken strips leading/trailing characters that would confuse FTS5's
 // prefix syntax. Keeps alnum + `_`; everything else is treated as boundary
-// punctuation. Reported 2026-05-11 in go-stablenet VERIFICATION_REPORT
-// §3.1 B1: natural-language task_description ending in `.` would produce
+// punctuation. A natural-language task_description ending in `.` would produce
 // tokens like "validated." → after `+ "*"` → "validated.*", which FTS5
 // rejects with `syntax error near "."`. Stripping trailing punctuation
 // (the dominant trigger in prose) restores the well-formed `validated*`

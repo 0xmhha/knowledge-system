@@ -1,12 +1,12 @@
-// Sol W-C W10 V19 (2026-05-21) — high-level self-call marker.
+// Sol high-level self-call marker.
 //
-// V14-V18 cover the *low-level* self-call surface:
+// The cast walker covers the *low-level* self-call surface:
 // `payable(this).call(...)`, `address(this).delegatecall(...)`,
 // `payable(this).transfer(...)`, and the modern
 // `.call{value:x, gas:y}(...)` chained syntax. Those routes pass
-// through the V8 cast walker which keys on low-level method names.
+// through runExternalCallCastMarker, which keys on low-level method names.
 //
-// V19 closes the parallel *high-level* surface: typed self-calls
+// This marker closes the parallel *high-level* surface: typed self-calls
 // through Sol's message-call boundary. Three shapes:
 //
 //	this.foo()                            // bare-this dispatch
@@ -22,7 +22,7 @@
 //
 // The walker mirrors runExternalCallCastMarker's structure but
 // inverts the method filter (admit user-defined methods, exclude
-// low-level / value-transfer methods which the V18 walker already
+// low-level / value-transfer methods which the cast walker already
 // covers) and uses isSelfRef — a recursive cast-unwrap helper — to
 // recognise self even when wrapped in contract / interface casts
 // nested inside address() / payable() casts.
@@ -62,7 +62,7 @@ func (v *declVisitor) runHighLevelSelfCallMarker() {
 				continue
 			}
 			methodName := property.Utf8Text(v.src)
-			// V19 covers high-level dispatch only — the V8/V18 walker
+			// High-level dispatch only — the cast walker
 			// already marks the low-level / value-transfer surface as
 			// HasSelfReentrantCall, and double-marking would muddle the
 			// "low-level vs high-level" axis security tooling relies on.
@@ -73,10 +73,10 @@ func (v *declVisitor) runHighLevelSelfCallMarker() {
 			if parent != nil && parent.Kind() == "expression" {
 				parent = parent.Parent()
 			}
-			// W-C W10 V22 (2026-05-21): high-level dispatch also
+			// High-level dispatch also
 			// admits the `.foo{value: x, gas: y}()` options shape —
 			// `this.target{value: 0}()` parses with the same
-			// struct_expression wrapper V18 traversed for the
+			// struct_expression wrapper the cast walker traverses for the
 			// low-level path. Without this hop a typed self-call
 			// with explicit value / gas options silently loses
 			// HasHighLevelSelfCall while the equivalent

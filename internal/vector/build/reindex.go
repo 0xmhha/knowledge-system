@@ -260,10 +260,9 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 	// CKG re-alignment (P2a): re-run ckgalign against the same graph this
 	// index was built against — recorded in manifest.Sources.CKG.Path — so
 	// re-embedded chunks keep their canonical_id join key. Without this,
-	// reindexed files silently lose canonical_id (reindex-migration-design
-	// §0.2 gap1). Best-effort: a recorded-but-unloadable graph warns and
+	// reindexed files silently lose canonical_id. Best-effort: a recorded-but-unloadable graph warns and
 	// continues rather than blocking a routine reindex on ckg availability;
-	// the digest assert at Open/health (P1) owns fail-loud for a genuinely
+	// the digest assert at Open/health owns fail-loud for a genuinely
 	// mismatched graph.
 	var ckgIx *ckgalign.Index
 	if man.Sources != nil && man.Sources.CKG != nil && man.Sources.CKG.Path != "" {
@@ -422,7 +421,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 		languageCounts[lang] += chunk.Summarize(chunks).Total
 	}
 
-	// P3 — incremental PR ingest: when PR fetching is enabled, fetch merged
+	// Incremental PR ingest: when PR fetching is enabled, fetch merged
 	// PRs after the recorded cutoff and index only the new ones (dedup by
 	// number), then advance the cutoff. gh access is best-effort — a fetch
 	// failure warns and leaves the PR corpus unchanged rather than failing the
@@ -477,7 +476,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 				if _, derr := store.DeleteFlowChunks(ctx); derr != nil {
 					return nil, fmt.Errorf("reindex flow delete: %w", derr)
 				}
-				// Phase C: re-align steps to code chunks so a flow-corpus
+				// Re-align steps to code chunks so a flow-corpus
 				// reindex preserves aligned_chunk_id (a full build would set
 				// it). The code chunks already live in the store, so build the
 				// alignment index from the files the steps reference.
@@ -596,7 +595,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 }
 
 // alignFlowStepsFromStore aligns flow steps to code chunks during a flow-only
-// reindex (Phase C). The source chunks are not re-processed on this path, so it
+// reindex. The source chunks are not re-processed on this path, so it
 // builds the alignment index by querying the store for the distinct files the
 // steps reference. Best-effort: a lookup failure just leaves that file's steps
 // unaligned.

@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V28 — struct-internal reference-type slot fallback characterization.
+// Struct-internal reference-type slot fallback characterization.
 //
 // This is a *characterization lock*: it pins the walker's current
 // behaviour as test data so future changes are visible diffs
 // instead of silent flips. The behaviour pinned here is known to
-// diverge from V5's stated intent (struct_size.go); the divergence
+// diverge from the stated intent in struct_size.go; the divergence
 // itself is the value the test captures.
 //
-// What the probe (2026-05-21) revealed:
+// What a probe revealed:
 //
-//   - V5 (struct_size.go) comments document mapping / dynamic-bytes
+//   - struct_size.go comments document mapping / dynamic-bytes
 //     / dynamic-array fields inside structs as "use the conservative
 //     32-byte slot" or "use the full-slot mapping advance" — i.e.
 //     each such member should count as one full slot when
@@ -33,23 +33,23 @@ import (
 //     structSizes fall back to the conservative 1-slot path.
 //
 //   - A second observation surfaces from this fixture but not from
-//     V11 (struct_deeply_nested.sol): when several contracts in
+//     struct_deeply_nested.sol: when several contracts in
 //     the same file each declare a struct with the same identifier
 //     (here, `S`), even the all-primitive struct that *would* be
 //     resolvable in isolation lands on the same 1-slot fallback
 //     in this fixture. PrimitiveOnly.tail = 2, not 4. Whether the
 //     root cause is structSizes name-collision across contracts,
 //     state-var lookup using unqualified vs qualified names, or
-//     some interaction with the fixed-point loop is outside V28's
-//     scope; V28 only records that all four shapes land on the
+//     some interaction with the fixed-point loop is outside this test's
+//     scope; it only records that all four shapes land on the
 //     same fallback today.
 //
-// V28's pinned expectations: all four contracts produce
+// Pinned expectations: all four contracts produce
 // head=0, inner=1, tail=2. A walker change that flips ANY of these
 // cells is a behaviour change worth reviewing:
 //
 //   - If only the three failure cells (WithMap/WithBytes/WithDynArray)
-//     flip, the V5 comment intent has been resolved and the
+//     flip, the struct_size.go comment intent has been resolved and the
 //     all-primitive baseline is still fallback-bound — the test
 //     must capture which cells moved and the WALKER_SYMMETRY drift
 //     catalogue row 6 entry updates accordingly.

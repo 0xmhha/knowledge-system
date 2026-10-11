@@ -9,7 +9,7 @@ import "github.com/0xmhha/knowledge-system/pkg/system/contract"
 // The mapping is intentionally narrow: each Intent points at the symbol
 // kinds the user is overwhelmingly likely to act on. BM25Search still
 // runs unfiltered so conceptual matches survive even when the kind
-// filter rules out the obvious symbol form. Phase E will measure
+// filter rules out the obvious symbol form. Evaluation should measure
 // whether tightening or loosening individual entries improves recall.
 // Kind vocabulary note (2026-07-29): filter strings must match ckg's
 // actual node-type taxonomy lowercased (Function, Method, Struct,

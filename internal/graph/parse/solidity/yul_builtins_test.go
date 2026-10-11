@@ -7,16 +7,16 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V1.1 — Yul EVM builtin detection inside assembly blocks.
+// Yul EVM builtin detection inside assembly blocks.
 //
-// V0 added a HasAssembly presence flag on callables. V1.1 enumerates
+// HasAssembly is only a presence flag on callables. YulBuiltins enumerates
 // the security-relevant EVM opcodes that actually appear inside
 // the block (delegatecall, sstore, sload, selfdestruct, call,
 // staticcall). The walker filters to that critical set — common
 // arithmetic / memory ops like add, calldatacopy, returndatacopy
 // stay invisible to avoid noise on every assembly user.
 //
-// V1.1 surface contract:
+// Surface contract:
 //   Node.YulBuiltins []string  — sorted, deduped, lower-case names.
 //                                Empty for callables with no
 //                                qualifying assembly content.

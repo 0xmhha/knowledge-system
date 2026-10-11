@@ -28,8 +28,7 @@ import (
 // version (the live index is never partial); rollback re-points it. The fused
 // server resolves `current` once at startup and pins it, so a reader sees the
 // old or the new target, never a missing one — serving restart (adopting the
-// new version) is the instance-level blue-green step (design P5), out of scope
-// here.
+// new version) is the instance-level blue-green step, out of scope here.
 
 // validateVersion rejects version labels that are not a single, safe directory
 // name. The label becomes both a build subdirectory (dataset/<version>) and a

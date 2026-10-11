@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W11 V12 — Sol-only marker payload decision lock.
+// Sol-only marker payload decision lock.
 //
 // Background: every field on types.Node serialised through
-// nodeAttrs originates in a Sol parser pass (W6-W10 markers
+// nodeAttrs originates in a Sol parser pass (markers
 // around using-for, function pointers, storage layout, low-
 // level call surfaces, etc.). Go and TS parsers leave the
 // marker fields at their zero values, so marshalNodeAttrs
 // returns "" for Go/TS nodes — the attrs column stays NULL,
 // keeping the DB diff minimal.
 //
-// V12 audits and locks the design choice. Two alternative
+// This test audits and locks the design choice. Two alternative
 // directions exist:
 //
 //  1. Promote a subset of markers to language-agnostic
@@ -24,7 +24,7 @@ import (
 //     "unsafe"` users or TS's `//@ts-ignore` populations.
 //     Each markers carries Sol-specific semantics today and
 //     cross-language reuse would need fresh per-language
-//     detection — out of scope for V12.
+//     detection — out of scope here.
 //
 //  2. Add language-specific markers under a polymorphic
 //     payload (e.g. attrs JSON with a "language" tag).
@@ -32,7 +32,7 @@ import (
 //     read site for marginal gain. Better served by separate
 //     Node fields with their own omitempty tags.
 //
-// V12 keeps the current design: nodeAttrs fields are Sol
+// The current design is kept: nodeAttrs fields are Sol
 // markers; Go/TS nodes serialise to "" and round-trip cleanly
 // as zero-valued markers on the read side.
 //

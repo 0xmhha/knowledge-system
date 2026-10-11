@@ -7,14 +7,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V12 — wildcard target audit after V8-V11 hint encoding
-// landed. `using Helpers for *;` should still emit a single
+// Wildcard target audit with path/method hint encoding
+// in place. `using Helpers for *;` should still emit a single
 // EdgeUsesFor with the bare `using_for` DispatchKind (no
 // "|<method>" suffix since the directive doesn't name a member)
-// and no path-hint contamination from the V5/V6 alias path.
+// and no path-hint contamination from the alias path.
 //
-// The wildcard test fixture has been around since W6 V0; V12
-// adds the explicit DispatchKind assertion so the V8 method-
+// The wildcard test fixture predates hint encoding; this test
+// adds the explicit DispatchKind assertion so the method-
 // name encoding can't silently mis-fire on the wildcard form.
 func TestUsingForV6V12_WildcardAuditAfterHintEncoding(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for", "wildcard_binding.sol")
@@ -42,7 +42,7 @@ func TestUsingForV6V12_WildcardAuditAfterHintEncoding(t *testing.T) {
 	}
 
 	// DispatchKind must be the bare value — wildcard directives
-	// don't name a specific method, so V8's `using_for|<method>`
+	// don't name a specific method, so the `using_for|<method>`
 	// suffix should NOT fire here.
 	if e.DispatchKind != "using_for" {
 		t.Errorf("DispatchKind: got %q, want %q (wildcard form has no method)", e.DispatchKind, "using_for")

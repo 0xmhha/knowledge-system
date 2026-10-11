@@ -18,15 +18,15 @@ type CommitSummary struct {
 	Subject string `json:"subject"`
 }
 
-// EnrichService attaches git history to each hit. Implements
-// Phase 3 spec Step 3 (Metadata Enrichment). Per-file results are
+// EnrichService attaches git history to each hit (metadata enrichment).
+// Per-file results are
 // cached within a single Run to avoid duplicate git log calls when
 // multiple hits share a file.
 type EnrichService struct{}
 
 // Run executes `git log` for each unique file in hits and attaches
 // the results. srcRoot is the repo root. maxCommits is the per-file
-// history depth (5 matches the Phase 3 spec).
+// history depth (5 by default).
 func (s *EnrichService) Run(ctx context.Context, hits []Hit, srcRoot string, maxCommits int) []Hit {
 	if len(hits) == 0 || srcRoot == "" {
 		return hits

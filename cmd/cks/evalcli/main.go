@@ -1,7 +1,7 @@
 // Command cks-eval runs cks retrieval-quality scenarios and emits a
 // JSON metric report.
 //
-// Phase E (Slim, Layer 1) measures cks's evidence-pack quality without
+// It measures cks's evidence-pack quality without
 // invoking an LLM:
 //
 //   - Loads YAML scenarios from -scenarios (file or directory of *.yaml).

@@ -8,7 +8,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestTSHTTPClient_DetectsKnownPatterns asserts the W2 client detector emits
+// TestTSHTTPClient_DetectsKnownPatterns asserts the HTTP client detector emits
 // AMBIGUOUS placeholder Endpoints + http_calls edges for the canonical
 // patterns in testdata/distributed/clients.ts.
 //

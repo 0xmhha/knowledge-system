@@ -18,7 +18,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 )
 
-// newWatchCmd wires `ckg watch` — P3 #11. Runs an initial build, then
+// newWatchCmd wires `ckg watch`. Runs an initial build, then
 // watches --src for filesystem events and triggers an incremental
 // rebuild on relevant changes. Pairs with `ckg viewer --graph=<out>` in
 // a second terminal: SQLite WAL allows the reader to keep observing
@@ -38,7 +38,7 @@ func newWatchCmd() *cobra.Command {
 	var policyFile, securityPatternFile, filesFrom string
 	cmd := &cobra.Command{
 		Use:   "watch",
-		Short: "Watch a source tree and incrementally rebuild graph.db on change (P3 #11)",
+		Short: "Watch a source tree and incrementally rebuild graph.db on change",
 		Long: `Runs an initial build, then watches the source tree for filesystem events
 and triggers an incremental rebuild on Go / TypeScript / Solidity / Proto
 file changes. Multiple events inside the debounce window collapse to a

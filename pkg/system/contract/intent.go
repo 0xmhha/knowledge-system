@@ -20,9 +20,9 @@ import "slices"
 // Stage 2 (ckg) finds exact code. The two backends have distinct, sequential
 // roles; they do not compete on the same task.
 //
-// The set below is the Phase-0 default classification. As cks runs against
+// The set below is the default classification. As cks runs against
 // real workloads, intent distribution should be measured (see the
-// composer.intent_classified footprint event in Phase B) and the set
+// composer.intent_classified footprint event) and the set
 // revised — new intents added when distinct routing patterns emerge,
 // marginal intents merged.
 //

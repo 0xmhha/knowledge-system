@@ -7,7 +7,7 @@ import (
 // PendingRef is an unresolved cross-file reference produced in Pass 1
 // and resolved (or marked AMBIGUOUS) in Pass 2.
 //
-// DispatchKind (Track C P1b, schema 1.7): optional metadata for `invokes`
+// DispatchKind (schema 1.7): optional metadata for `invokes`
 // edges. Empty for static `calls`. Carried through Pass 2 Resolve so the
 // final edge row preserves the dispatch classification decided at AST time
 // (when types.Info is still in scope).
@@ -17,15 +17,15 @@ type PendingRef struct {
 	TargetQName string
 	HintFile    string
 	Line        int
-	// ByteOffset (W-C W6 V2.15, 2026-05-15): byte position of the
+	// ByteOffset: byte position of the
 	// referent in the source file. Used by the Solidity resolver to
-	// disambiguate same-line shadow scopes — when V2.0's line-only
+	// disambiguate same-line shadow scopes — when the line-only
 	// `declLine <= useSiteLine <= scopeEndLine` filter admits multiple
 	// decls, the byte offset breaks the tie via containment. Zero =
 	// unset (other parsers leave it default; Sol resolver falls back
-	// to V2.0 line-only behavior when bytes are missing).
+	// to line-only behavior when bytes are missing).
 	ByteOffset int
-	// Order (W-C W7.3, 2026-05-18): source-order index. Carried to the
+	// Order: source-order index. Carried to the
 	// resolved Edge.Order field. Currently populated by Sol's
 	// runHasModifier walker; ignored elsewhere.
 	Order        int

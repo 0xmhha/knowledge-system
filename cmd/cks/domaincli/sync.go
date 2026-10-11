@@ -132,7 +132,7 @@ func deriveViews(entries []inventory.Entry) (ckvFile, ckgFile) {
 	// (ckg stores e.g. "params.DefaultAnzeonConfig", not the bare
 	// "DefaultAnzeonConfig"). Without this prefix the ckg policy loader
 	// drops every governs[] target with "no code node found" and emits
-	// zero governed_by edges. See [[r1-refactor-pending-work]] #16.
+	// zero governed_by edges.
 	var ckg ckgFile
 	for _, e := range entries {
 		var governs []string

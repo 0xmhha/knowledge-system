@@ -3,13 +3,13 @@
 //
 // The composer pipeline's Stage 2 (precise) calls BM25Search and
 // FindSymbol with the keywords/symbols surfaced by Stage 1 (ckv). The
-// graph neighbor expander (Phase B.5) calls Neighbors to surround the
+// graph neighbor expander (Stage 3) calls Neighbors to surround the
 // matched citations with their calls, callers, implementations, etc.
 //
 // Two implementations are planned:
 //
-//   - Fake (this package, B.1):   in-memory canned responses for unit tests.
-//   - Real (Phase C.1):            adapter over
+//   - Fake (this package):   in-memory canned responses for unit tests.
+//   - Real:                  adapter over
 //     github.com/0xmhha/knowledge-system/graph
 //     pkg/store.Reader.
 //
@@ -51,7 +51,7 @@ type Client interface {
 	FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]contract.Citation, error)
 
 	// Neighbors traverses graph edges from src per opts. Used by the
-	// Phase B.5 expander.
+	// Stage 3 graph expander.
 	Neighbors(ctx context.Context, src contract.Citation, opts NeighborsOpts) ([]contract.Neighbor, error)
 
 	// ImpactOfChange computes reverse-dependency closure from a seed symbol,
@@ -83,7 +83,7 @@ type Client interface {
 	// ConcurrencyImpact returns the concurrency blast radius of a symbol —
 	// the goroutines/channels/locks it spawns/sends-to/acquires and the
 	// modules reached over concurrency edges in either direction. Used by
-	// cks.context.concurrency_impact (G7/S1).
+	// cks.context.concurrency_impact.
 	ConcurrencyImpact(ctx context.Context, symbol string, opts ConcurrencyOpts) (contract.ConcurrencyResult, error)
 
 	// Health reports backend reachability and version pins.

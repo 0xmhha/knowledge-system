@@ -185,7 +185,7 @@ func TestExport_PrunesStaleEntries(t *testing.T) {
 	}
 }
 
-// TestRenderEntry_LocAnchorRendersPerKind locks Phase 3 A1-3 rendering: a loc
+// TestRenderEntry_LocAnchorRendersPerKind locks per-kind anchor rendering: a loc
 // anchor shows its enclosing symbol + "(loc)" so it is not mistaken for a
 // definition, while a def anchor renders the symbol at its definition line.
 func TestRenderEntry_LocAnchorRendersPerKind(t *testing.T) {

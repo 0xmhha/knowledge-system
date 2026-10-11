@@ -7,7 +7,7 @@
 // distribution.
 //
 // This file builds only with `-tags bgeonnx` so the default build
-// avoids the libtokenizers system dependency. See docs/d1-installation-guide.md.
+// avoids the libtokenizers system dependency. See docs/vector/d1-installation-guide.md.
 
 package bgeonnx
 

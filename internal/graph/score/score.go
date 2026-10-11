@@ -10,7 +10,7 @@ import (
 
 // Compute populates InDegree, OutDegree, PageRank, and UsageScore for each node.
 //
-// Meta nodes (Commit, Hunk — schema 1.4/1.8 G6 Temporal) are excluded from
+// Meta nodes (Commit, Hunk — schema 1.4/1.8 temporal) are excluded from
 // PageRank participation per hunk-graph.md §11.7 (decision 2026-05-09):
 // Hunks have ~1 inbound edge each (has_hunk) and would rank near-zero,
 // adding noise to the metric without contributing signal. They keep

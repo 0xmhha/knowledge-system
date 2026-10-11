@@ -1,4 +1,4 @@
-// Package hunkmodifies computes the H2 line-overlap `modifies`
+// Package hunkmodifies computes the line-overlap `modifies`
 // edges that connect git Hunk nodes to the code nodes they touch.
 //
 // Previously this logic lived in `internal/buildpipe`, which made
@@ -6,11 +6,11 @@
 // evidence integration test (`pkg/evidence/sol_real_git_test.go`)
 // needed the same algorithm and ended up duplicating it inline.
 // Promoting the helper to a public package eliminates the drift
-// surface and exposes the H2 join to any external consumer that
+// surface and exposes the hunk/code join to any external consumer that
 // has parser output and temporal hunk rows ready.
 //
 // The package mirrors the design described in
-// docs/design/hunk-graph.md §4 — for each NodeHunk, scan
+// docs/graph/design/hunk-graph.md §4 — for each NodeHunk, scan
 // whitelisted CodeNodes (FunctionLike + TypeLike + Field-ish) in
 // the same file and emit an EdgeModifies whenever the
 // [StartLine, EndLine] intervals overlap.
@@ -18,7 +18,7 @@ package hunkmodifies
 
 import "github.com/0xmhha/knowledge-system/pkg/graph/types"
 
-// NodeWhitelist is the H2 §4.2 "FunctionLike + TypeLike + Field-
+// NodeWhitelist is the hunk-graph.md §4.2 "FunctionLike + TypeLike + Field-
 // ish" set: only nodes of these kinds receive `modifies` edges
 // when a hunk overlaps their byte range. Statement-level kinds
 // (CallSite, IfStmt, LoopStmt, ReturnStmt, SwitchStmt) are
@@ -41,7 +41,7 @@ var NodeWhitelist = map[types.NodeType]bool{
 	types.NodeVariable:    true,
 }
 
-// BuildEdges computes the H2 line-overlap modifies edges for the
+// BuildEdges computes the line-overlap modifies edges for the
 // given node set without mutating it. For every NodeHunk it scans
 // whitelisted CodeNodes (per NodeWhitelist) in the same file and
 // emits an EdgeModifies whenever the [StartLine, EndLine] intervals

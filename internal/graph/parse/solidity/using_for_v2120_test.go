@@ -6,27 +6,27 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.12 — user-defined value type (UDVT, Solidity 0.8.8+) as
+// User-defined value type (UDVT, Solidity 0.8.8+) as
 // the receiver type for `using Lib for Amount;`.
 //
 // UDVTs (`type Amount is uint256;`) are first-class types with no
 // implicit conversion to/from the underlying primitive. Library
 // functions taking `Amount` parameters become method-callable on
-// Amount values through using-for. The question this V cycle locks:
-// does V0's `source: (_) @type` capture user_defined_type nodes the
-// same way it captures primitive types, and does V1.0 state-var
+// Amount values through using-for. The question this test locks:
+// does the query's `source: (_) @type` capture user_defined_type nodes the
+// same way it captures primitive types, and does state-var
 // dispatch resolve through the resulting binding?
 //
-// V0 query: `(using_directive (type_alias (identifier) @lib)
+// Query: `(using_directive (type_alias (identifier) @lib)
 //                              source: (_) @type) @stmt`
 // Tree-sitter-solidity v1.2.13 wraps UDVT references in a `type_name`
 // node containing a `user_defined_type` child — same shape as
 // cross-contract type references. `normaliseUsingForType` calls
 // `extractTypeNameText` and should yield "Amount".
 //
-// V1.0 state-var dispatch:
+// State-var dispatch:
 //   - `Amount public balance;` → NodeField with Signature="Amount".
-//   - `balance.double()` → V1.0 walker captures (Vault, balance,
+//   - `balance.double()` → the walker captures (Vault, balance,
 //     double).
 //   - Pass 2: lookup bindings[Vault]["Amount"] → ["Math"], lookup
 //     funcByQName["Math.double"] → Math.double's NodeFunction ID.
@@ -42,7 +42,7 @@ func TestUsingForV2120_UDVTBinding(t *testing.T) {
 		qnameByID[n.ID] = n.QualifiedName
 	}
 
-	// (a) EdgeUsesFor: Vault → Math (V0 type_alias capture).
+	// (a) EdgeUsesFor: Vault → Math (type_alias capture).
 	seenUF := false
 	for _, e := range edges {
 		if e.Type != types.EdgeUsesFor {
@@ -56,7 +56,7 @@ func TestUsingForV2120_UDVTBinding(t *testing.T) {
 		t.Errorf("missing EdgeUsesFor Vault → Math (V2.12 UDVT binding)")
 	}
 
-	// (b) EdgeCalls: Vault.tick → Math.double via V1.0 state-var
+	// (b) EdgeCalls: Vault.tick → Math.double via state-var
 	// dispatch on Amount-typed `balance`.
 	edge, ok := findUsingForCall(nodes, edges, "Vault.tick", "Math.double")
 	if !ok {

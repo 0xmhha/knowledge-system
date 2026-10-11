@@ -6,15 +6,15 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V13 / V14 — enum slot occupancy. Sol enums with ≤256
+// Enum slot occupancy. Sol enums with ≤256
 // variants compile to uint8 (1 byte) at runtime, so consecutive
 // enum fields pack with each other and with adjacent small
-// primitives. V13 originally locked the conservative full-slot
-// fallback (one slot per enum); V14 added a per-file enumSizes
+// primitives. Instead of the conservative full-slot
+// fallback (one slot per enum), a per-file enumSizes
 // index so enum-typed state vars route through advanceForField
 // with 1-byte sizing.
 //
-// Expected layout under V14:
+// Expected layout:
 //
 //	head  -> slot 0, byte 0
 //	role1 -> slot 0, byte 1 (uint8 enum)
@@ -26,8 +26,8 @@ func TestStorageSlot_EnumConservativePacking(t *testing.T) {
 
 	want := map[string]int{
 		"EnumHolder.head":  0,
-		"EnumHolder.role1": 0, // V14: packs with head
-		"EnumHolder.role2": 0, // V14: packs with head + role1
+		"EnumHolder.role1": 0, // packs with head
+		"EnumHolder.role2": 0, // packs with head + role1
 		"EnumHolder.tail":  1, // uint256 advances to the next slot
 	}
 

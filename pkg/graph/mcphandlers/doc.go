@@ -17,9 +17,9 @@
 //	search_text          FTS5 search with AND/OR mode + language pushdown
 //	impact_of_change     reverse-dependency closure (broader than callers)
 //	get_context_for_task smart 1-shot: BM25 -> 1-hop -> score-fuse -> pack
-//	evidence_for_intent  H3 EvidencePack assembler over commit/hunk corpus
+//	evidence_for_intent  EvidencePack assembler over commit/hunk corpus
 //
-// # H3 retrieval boundary
+// # Hunk retrieval boundary
 //
 // Every handler operates on a wrapped Reader (see [NewLLMSafeReader])
 // that filters AMBIGUOUS Hunk + Commit nodes — the §11.3

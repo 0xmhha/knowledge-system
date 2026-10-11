@@ -7,32 +7,32 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.29 — whole-file alias qualified using directive.
+// Whole-file alias qualified using directive.
 //
 // Solidity's `import "./util.sol" as L; using L.SafeMath for uint256;`
 // pattern: L is a namespace alias for the whole imported file, and
 // L.SafeMath qualifies the library reference. Tree-sitter parses the
 // type_alias child of using_directive as a sequence of identifiers —
-// [L, SafeMath] for the qualified form. The V0 query
+// [L, SafeMath] for the qualified form. The base query
 // `(type_alias (identifier) @lib)` matches only the first identifier,
-// so pre-V1.29 the captured library name is "L" which doesn't exist
+// so on its own the captured library name is "L" which doesn't exist
 // as a library declaration → binding miss → dispatch drop.
 //
-// V1.29 walks all identifier children of type_alias and uses the
+// The walker walks all identifier children of type_alias and uses the
 // LAST one (the unqualified library name). The global byName index
 // (resolve.go) already keys NodeContract by Name field across all
 // files, so name-only lookup hits the actual library node.
 //
-// V1.29 carry-over (V1.30+):
+// Not covered here:
 //   - Cross-file disambiguation when two files declare libraries with
-//     the same Name — currently V0 picks first via pickSameFileCandidate;
+//     the same Name — currently the resolver picks first via pickSameFileCandidate;
 //     whole-file alias's L should narrow to a specific source file
-//     for correctness in such cases. V0 simplification accepts the
+//     for correctness in such cases. The current simplification accepts the
 //     first-hit behavior.
-//   - Block-scoped shadowing precision (V2+ refactor).
+//   - Block-scoped shadowing precision.
 //   - Grammar-blocked items.
 
-// TestUsingForV129_WholeFileAliasQualified — canonical V1.29 case.
+// TestUsingForV129_WholeFileAliasQualified — canonical whole-file alias case.
 // Caller imports lib under whole-file alias L and uses-for via
 // `L.SafeMath`. Expected: alias prefix discarded, SafeMath resolved
 // through the global byName index.
@@ -52,13 +52,13 @@ func TestUsingForV129_WholeFileAliasQualified(t *testing.T) {
 
 // TestUsingForV129_WholeFileAliasCollision — collision-risk guard.
 // An unrelated file declares contract `L` (same name as the whole-
-// file alias used by Vault). Pre-V1.29 the runUsingFor walker emits
+// file alias used by Vault). Without alias tracking the runUsingFor walker emits
 // a PendingRef for the namespace prefix `L`, and Pass 2's strict-
 // purge filters it out only because no library/contract named L
 // exists. With this collision fixture, byName[NodeContract]["L"]
 // resolves to the unrelated contract → false-positive EdgeUsesFor
-// (Vault → L) absent V1.29's namespace-alias tracking. Expectation:
-// V1.29 must skip emitting PendingRefs for known namespace aliases.
+// (Vault → L) absent namespace-alias tracking. Expectation:
+// the walker must skip emitting PendingRefs for known namespace aliases.
 func TestUsingForV129_WholeFileAliasCollision(t *testing.T) {
 	dir := filepath.Join("testdata", "using_for_v129")
 	files := []string{

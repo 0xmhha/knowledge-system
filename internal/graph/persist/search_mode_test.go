@@ -192,8 +192,8 @@ func TestSearchFTS_AndMode_NoSurvivors(t *testing.T) {
 	}
 }
 
-// TestSearchFTS_KoreanInput_GracefulEmpty covers the ckg-NEW-1 contract
-// (CKS-INTEGRATION-2026-05-23 §3.1): a pure Korean query must NOT
+// TestSearchFTS_KoreanInput_GracefulEmpty covers the non-ASCII input
+// contract: a pure Korean query must NOT
 // panic, MUST NOT raise an FTS5 syntax error, and SHOULD return an
 // empty result when no indexed token matches. This is graceful
 // degradation, not retrieval — the ckv vocabulary bridge is the

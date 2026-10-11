@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// context_paths_test.go locks down the P2 detector contract: every
+// context_paths_test.go locks down the context-path detector contract: every
 // recognised context.With* call site produces exactly one self-loop edge
 // of the right type and confidence. Run via LoadAndResolve so we exercise
 // the typed (EXTRACTED) path and the same wiring buildpipe uses.

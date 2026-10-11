@@ -42,7 +42,7 @@ func newChunker(emb types.Embedder, cfg *projectcfg.Config) *chunk.Chunker {
 	if cfg != nil && cfg.Chunking.FileHeaderLines > 0 {
 		opts.FileHeaderLines = cfg.Chunking.FileHeaderLines
 	}
-	// Phase B multi-granularity is an experiment gated behind an env flag while
+	// Multi-granularity is an experiment gated behind an env flag while
 	// its retrieval benefit is measured (docs/phase-b-*). Off by default.
 	if os.Getenv("CKV_EXPERIMENTAL_FILE_FULL") == "1" {
 		opts.IncludeFileFull = true
@@ -51,10 +51,10 @@ func newChunker(emb types.Embedder, cfg *projectcfg.Config) *chunk.Chunker {
 }
 
 // resolveEmbedTextFn selects the embed text function. When an LLM prefixer is
-// set (Phase D.2), each chunk's embed text is its generated one-sentence
+// set, each chunk's embed text is its generated one-sentence
 // context prefix followed by the rule-based prefix + raw chunk — the LLM prose
 // is layered ON TOP of the rule-based signal, not instead of it. A cache miss /
-// generation failure degrades to the rule-based prefix alone (D.1). Otherwise
+// generation failure degrades to the rule-based prefix alone. Otherwise
 // disablePrefix chooses raw (no prefix) vs the rule-based prefix.
 //
 // Combining (LLM + rule-based) beats LLM-alone: the rule-based prefix carries

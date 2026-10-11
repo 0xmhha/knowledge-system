@@ -27,7 +27,7 @@ import (
 // Sources is a human-readable evidence trail of the form
 // "bm25:<keyword>@rank=<rank>(+<contribution>)" or
 // "symbol:<keyword>@rank=<rank>(+<contribution>)". Preserved so the
-// audit log and Phase E evaluation can answer "why did this citation
+// audit log and evaluation can answer "why did this citation
 // score this high" without rerunning the search.
 type ScoredCitation struct {
 	Citation       contract.Citation

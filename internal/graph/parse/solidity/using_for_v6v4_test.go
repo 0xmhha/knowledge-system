@@ -6,15 +6,15 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V4 — namespace-aliased free-function path for the file-
+// Namespace-aliased free-function path for the file-
 // level operator-form recovery walker.
 //
 // Sol's `import "./math.sol" as M;` creates the namespace alias
 // `M`. A subsequent `using {M.mul as *} for uint256 global;` is
-// the dotted-tail-is-the-target shape. Pre-V4 the walker would
+// the dotted-tail-is-the-target shape. Without special handling the walker would
 // skip the entry at the namespaceAliases guard (no Library named
-// `M` to bind against). V4 uses the dotted tail (`mul`) as the
-// binding target and the W6 V3 NodeFunction fallback resolves it
+// `M` to bind against). The walker uses the dotted tail (`mul`) as the
+// binding target and the NodeFunction fallback resolves it
 // to the cross-file free function.
 //
 // Expected: 1 EdgeUsesFor (Calc → mul) at the file-level binding

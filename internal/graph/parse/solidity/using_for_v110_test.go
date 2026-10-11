@@ -4,22 +4,22 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.10 — struct-field receiver dispatch tests.
+// Struct-field receiver dispatch tests.
 //
 // Shape: `<obj>.<field>.<method>(...)`. obj is a state-var or
 // parameter whose type is a struct; field is a member of that struct.
 // Resolver chains obj → objType → struct field → fieldType → binding
 // lookup.
 //
-// V1.9 catches `this.<field>` first (inner.object = "this"); V1.10
-// catches all other identifier-receiver shapes. V1.10 only fires when
+// The `this.<field>` predicate runs first (inner.object = "this"); this
+// one catches all other identifier-receiver shapes. It only fires when
 // objType is a known struct in the structFieldTypes index.
 //
-// V1.10 carry-over (V1.11+): cross-file struct definitions, nested
+// Not covered here: cross-file struct definitions, nested
 // struct field receivers (`obj.outer.inner.method()`), multi-return
 // tuple destructuring.
 
-// TestUsingForV110_StructFieldBasic — canonical V1.10 case.
+// TestUsingForV110_StructFieldBasic — canonical struct-field case.
 // `info.amount.add(1)` resolves through info's UserInfo struct type
 // to amount's uint256 field type to StructLib.add.
 func TestUsingForV110_StructFieldBasic(t *testing.T) {
@@ -35,7 +35,7 @@ func TestUsingForV110_StructFieldBasic(t *testing.T) {
 
 // TestUsingForV110_StructFieldUnknown — `data.missingField.tag()`. obj
 // is a known struct state-var, but the field doesn't exist on the
-// struct. V1.10 must drop without false-positive emission.
+// struct. The resolver must drop without false-positive emission.
 func TestUsingForV110_StructFieldUnknown(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v110", "struct_field_unknown.sol")
 	got := collectUsingForCalls(nodes, edges)
@@ -46,7 +46,7 @@ func TestUsingForV110_StructFieldUnknown(t *testing.T) {
 
 // TestUsingForV110_StructFieldParam — struct receiver is a function
 // parameter (not state-var). Resolver falls back to paramTypes via the
-// V1.0/V1.1 idiom shared by other V1.x branches.
+// state-var/param idiom shared by the other using-for branches.
 func TestUsingForV110_StructFieldParam(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v110", "struct_field_param.sol")
 	got := collectUsingForCalls(nodes, edges)

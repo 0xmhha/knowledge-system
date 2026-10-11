@@ -12,8 +12,8 @@ import (
 // lifecycle. The SemanticSearch / Freshness / Health translation wraps a
 // concrete *ckv.Engine (not an interface) over an on-disk index built by
 // ckv's own pipeline — which lives in ckv's internal/ tree and cannot be
-// imported here — so the translation is exercised end-to-end by the M2
-// acceptance against a real go-stablenet index (operator-gated), not by a
+// imported here — so the translation is exercised end-to-end by the
+// acceptance smoke against a real go-stablenet index (operator-gated), not by a
 // unit test. The field copies (ckv.Hit→contract.Hit, FreshnessReport,
 // Manifest→Health) are mechanical and low-risk.
 
@@ -33,7 +33,7 @@ func TestNewReal_NilEmbedderErrors(t *testing.T) {
 
 func TestNewReal_MissingIndexErrors(t *testing.T) {
 	// A real (mock) embedder + a directory with no manifest/vector.db: ckv.Open
-	// must fail, and NewReal must surface it (fail fast, S5) rather than return
+	// must fail, and NewReal must surface it (fail fast) rather than return
 	// a half-open Real.
 	_, err := NewReal(context.Background(), RealOpts{
 		DataPath: filepath.Join(t.TempDir(), "nonexistent"),

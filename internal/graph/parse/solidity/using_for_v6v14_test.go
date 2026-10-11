@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V14 — transitive using-for audit. A library Outer
+// Transitive using-for audit. A library Outer
 // declares `using Inner for uint256;` inside its own scope; the
 // contract Caller declares `using Outer for uint256;` at its
-// file/contract scope. V14 locks two contracts:
+// file/contract scope. This test locks two contracts:
 //
 //  1. Two distinct EdgeUsesFor edges are emitted with no
 //     duplication and no cross-pollination:
 //     - Outer  -> Inner
 //     - Caller -> Outer
 //  2. Both targets resolve as NodeContract (libraries are stored
-//     as NodeContract + SubKind="library" — the V11/V13 lookup
+//     as NodeContract + SubKind="library" — the same lookup
 //     paths apply uniformly).
 //
 // A regression that confuses the enclosing scope of the inner

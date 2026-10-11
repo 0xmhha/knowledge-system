@@ -1,12 +1,12 @@
 // Package mcp exposes the cks composer pipeline as an MCP (Model Context
 // Protocol) server over stdio.
 //
-// Register wires the 13 agent-facing cks.* tools (the C1 surface): the
+// Register wires the 13 agent-facing cks.* tools: the
 // context tools (get_for_task, semantic_search, search_text, find_symbol,
 // find_callers, find_callees, get_subgraph, impact_analysis,
 // concurrency_impact, change_history) and the ops tools (health, freshness,
 // index). The exact registered set is pinned against the SSoT fixture by
-// schema_golden_test.go (M2.a).
+// schema_golden_test.go.
 //
 // The package is intentionally thin: Register attaches handlers to an
 // already-constructed *server.MCPServer so callers retain control over
@@ -46,8 +46,8 @@ var ToolNameGetForTaskV2 = toolName("context.get_for_task_v2")
 var ToolNameHealth = toolName("ops.health")
 
 // Deps bundles everything an MCP handler needs. Keep this struct small:
-// the slim C.5 surface deliberately resists envelope sprawl (HLD §7.5
-// envelope/auth fields land with Phase 3, not here).
+// the slim tool surface deliberately resists envelope sprawl (envelope/auth
+// fields belong to a later policy layer, not here).
 type Deps struct {
 	// Optional out-of-band experiment recorder; never changes a tool result.
 	BackendMeasurements *backendmeasure.Recorder
@@ -98,7 +98,7 @@ type Deps struct {
 	// no-op (the verbatim query is used).
 	Vocab *vocab.Resolver
 
-	// Index configures the cks.ops.index maintenance tool (G8). Zero value
+	// Index configures the cks.ops.index maintenance tool. Zero value
 	// (no binaries) disables it — the tool then tells the agent to run the
 	// indexers manually. Not used by the query path.
 	Index IndexConfig
@@ -149,8 +149,8 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerOpsSetup(s, d)
 	registerOpsReindex(s, d)
 	registerOpsSetupStatus(s, d)
-	// Phase D flow-aware direct-call tools (D-4). Backend bodies are stubbed
-	// until CKV ships pkg/ckv.Engine flow methods (coordination §9.2-R).
+	// Flow-aware direct-call tools. A backend without pkg/ckv.Engine flow
+	// methods answers with a "not yet available" error.
 	registerGetFlow(s, d)
 	registerExpandFlow(s, d)
 	registerFindBranches(s, d)

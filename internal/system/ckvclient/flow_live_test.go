@@ -1,6 +1,6 @@
 package ckvclient_test
 
-// Env-gated live integration check for the Phase D flow surface (T6). It opens
+// Env-gated live integration check for the flow surface. It opens
 // the REAL ckv index in-process (needs a live Ollama bge-m3) and exercises the
 // four flow methods end to end, so it is skipped unless CKS_FLOW_LIVE_CKV points
 // at a ckv-data directory. Run it against the pr-77-2 flow index:

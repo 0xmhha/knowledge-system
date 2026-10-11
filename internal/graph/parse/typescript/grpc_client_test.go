@@ -8,7 +8,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestTSGRPCClient_DetectsKnownPatterns asserts the W3c gRPC-client
+// TestTSGRPCClient_DetectsKnownPatterns asserts the gRPC-client
 // detector emits AMBIGUOUS placeholder Endpoints + grpc_calls edges for
 // the canonical patterns in testdata/distributed/grpc/grpcweb_client.ts
 // and connectweb_client.ts.
@@ -145,8 +145,7 @@ func TestTSGRPCClient_NoMatchOnNonGRPC(t *testing.T) {
 	}
 }
 
-// TestTSGRPCClient_PatternAGatedByImport locks W3c review Important #1
-// (2026-05-11): without an explicit gRPC library import, Pattern A
+// TestTSGRPCClient_PatternAGatedByImport locks the import gate: without an explicit gRPC library import, Pattern A
 // (`new <Svc>Client(host)`) must NOT emit grpc_calls edges. The `*Client`
 // suffix is far too common in TS ecosystems (RedisClient, PrismaClient,
 // HttpClient, ApolloClient, S3Client, MongoClient, KafkaClient,

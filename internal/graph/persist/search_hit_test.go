@@ -16,10 +16,9 @@ import (
 //
 // SQLite FTS5's BM25 penalises matches in longer fields (doc-length
 // normalization), so the strong node should score higher. This is the
-// exact ranking signal that CKG-1 surfaces — downstream rerankers
+// exact ranking signal SearchHit.Score surfaces — downstream rerankers
 // (cks) need it to distinguish "1 unique-identifier hit" from
-// "N common-word hits". See docs/followups-from-cks-dogfood-2026-05-19.md
-// item CKG-1.
+// "N common-word hits".
 func newScoreFixtureStore(t *testing.T) persist.Store {
 	t.Helper()
 	dbPath := filepath.Join(t.TempDir(), "score.db")
@@ -65,7 +64,7 @@ func newScoreFixtureStore(t *testing.T) persist.Store {
 	return s
 }
 
-// TestSearchFTS_ScoreMonotonic locks the core CKG-1 contract: a
+// TestSearchFTS_ScoreMonotonic locks the core score contract: a
 // stronger BM25 match yields a higher Score than a weaker one.
 // Without this, normalizeSearchHits could be silently inverted or
 // the SQL ORDER BY could drop and cks would observe scrambled ranks.
@@ -161,7 +160,7 @@ func newLangFilterFixtureStore(t *testing.T) persist.Store {
 	return s
 }
 
-// TestSearchFTS_LanguagePushdown locks the CKG-2 contract: when
+// TestSearchFTS_LanguagePushdown locks the language push-down contract: when
 // opts.Language is set, the SQL predicate drops rows from other
 // languages BEFORE the LIMIT applies — so cks no longer needs to
 // over-fetch (FilterOverfetchRatio=3) and post-filter client-side.

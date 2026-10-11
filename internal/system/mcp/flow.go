@@ -1,13 +1,13 @@
 package mcp
 
-// Phase D flow-aware MCP tools (D-4, agreed Phase 2 deliverable). These expose
+// Flow-aware MCP tools. These expose
 // the CKV flow corpus on the cks.context.* surface as DIRECT-CALL tools —
 // separate from the get_for_task composite — so coding-agent's analyzer /
 // diagnose can drive root-cause-lifecycle (produce→store→consume) by tool call.
 //
 // Wiring status: the tools are registered now (surface visible to callers), but
 // the backend bodies live in ckvclient and are stubbed until CKV ships the
-// pkg/ckv.Engine flow methods (coordination §9.2-R, T4). Until then a call
+// pkg/ckv.Engine flow methods. Until then a call
 // returns a clear "flow surface not yet available" error rather than a wrong
 // answer. Deps.CKV is type-asserted to ckvclient.FlowClient; a backend that
 // does not implement it yields the same unavailable signal.
@@ -33,7 +33,7 @@ var (
 )
 
 // flowClient extracts the optional flow surface from Deps.CKV, or returns a
-// tool error when the backend does not expose it (Smart Dummy / pre-Phase-D).
+// tool error when the backend does not expose it (Smart Dummy / older backend).
 func flowClient(d Deps, toolName string) (ckvclient.FlowClient, *mcpgo.CallToolResult) {
 	fc, ok := d.CKV.(ckvclient.FlowClient)
 	if !ok {
@@ -46,7 +46,7 @@ func flowClient(d Deps, toolName string) (ckvclient.FlowClient, *mcpgo.CallToolR
 // ErrFlowUnsupported sentinel a stable, caller-readable message.
 func flowErrResult(toolName string, err error) *mcpgo.CallToolResult {
 	if errors.Is(err, ckvclient.ErrFlowUnsupported) {
-		return mcpgo.NewToolResultErrorf("%s: flow surface not yet available (pending CKV Phase D release)", toolName)
+		return mcpgo.NewToolResultErrorf("%s: flow surface not yet available (backend has no flow support)", toolName)
 	}
 	return mcpgo.NewToolResultErrorf("%s: %v", toolName, err)
 }

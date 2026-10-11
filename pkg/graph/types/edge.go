@@ -2,7 +2,7 @@ package types
 
 // Edge mirrors the SQLite edges row (spec §5.3).
 //
-// DispatchKind (schema 1.7, Track C P1b): optional metadata column for the
+// DispatchKind (schema 1.7): optional metadata column for the
 // `invokes` edge type that disambiguates the dispatch mechanism. Valid values:
 //
 //	"interface_method" — callee is an interface method (virtual dispatch via
@@ -26,7 +26,7 @@ type Edge struct {
 	Count        int        `json:"count"      validate:"min=1"`
 	Confidence   Confidence `json:"confidence" validate:"required"`
 	DispatchKind string     `json:"dispatch_kind,omitempty"`
-	// Order (W-C W7.3, 2026-05-18): source-order index for edges where
+	// Order: source-order index for edges where
 	// position is part of the relationship. Currently used by
 	// EdgeHasModifier so multi-modifier functions preserve the
 	// application sequence (Solidity applies modifiers outer-to-inner

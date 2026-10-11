@@ -69,7 +69,7 @@ func serverChunkAlignment(t *testing.T, outDir string) (total, aligned int) {
 // re-run ckgalign against the ckg graph recorded in manifest.Sources.CKG.Path
 // so re-embedded chunks keep their canonical_id join key. Without
 // realignment the reindexed chunks silently lose canonical_id — the
-// "quietly stale" gap in reindex-migration-design §0.2 gap1.
+// "quietly stale" gap the reindex design calls out.
 func TestReindex_PreservesCanonicalAlignment(t *testing.T) {
 	src := resolveTestdataSample(t)
 	ckg := writeCKGWithNode(t)
@@ -162,7 +162,7 @@ func serverCanonical(t *testing.T, outDir string) string {
 // changes) the git diff is empty, so P2a's per-changed-file re-alignment never
 // runs. reindex must detect the digest change and re-align every chunk against
 // the new graph. Without it, canonical_id stays silently stale
-// (reindex-migration-design §1 "CKG graph regeneration" row, §0.2 gap1).
+// (the reindex design's "CKG graph regeneration" case).
 func TestReindex_RealignsOnGraphDigestChange(t *testing.T) {
 	src := resolveTestdataSample(t)
 	ckgDir := t.TempDir()
@@ -448,7 +448,7 @@ func flowStepAlignment(t *testing.T, outDir, stepID string) string {
 	return ""
 }
 
-// TestReindex_RealignsFlowStepsToCode is the Phase C reindex guard: a
+// TestReindex_RealignsFlowStepsToCode is the flow-alignment reindex guard: a
 // flow-corpus content change re-embeds the flow layer, and the re-embedded
 // steps must keep their code alignment (a full build would set it), not silently
 // drop aligned_chunk_id.
@@ -475,7 +475,7 @@ func TestReindex_RealignsFlowStepsToCode(t *testing.T) {
 	}
 	seeded := flowStepAlignment(t, out, "s1")
 	if seeded == "" {
-		t.Fatal("seed build did not align s1 — Phase C build path broken")
+		t.Fatal("seed build did not align s1 — flow-alignment build path broken")
 	}
 
 	// Change the corpus content (new summary → new content hash) so reindex

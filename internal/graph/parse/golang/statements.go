@@ -12,7 +12,7 @@ import (
 
 // emitFunctionBodyPos walks a function/method body and emits Pass-1 logic
 // blocks (5 kinds), CallSite nodes, Goroutines, and channel send/recv edges.
-// Cross-file call resolution is left to Pass 2 (T9).
+// Cross-file call resolution is left to Pass 2.
 //
 // parentID must be the ID already minted for the enclosing function/method
 // node — we accept it from the caller so we don't have to re-derive the
@@ -64,11 +64,11 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 		case *ast.CallExpr:
 			id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", s.Pos(), s.End())
 			// Pending edge: CallSite -(calls|invokes)-> callee — resolved in Pass 2.
-			// Track C P1b: classify dispatch kind so non-static dispatches
+			// Classify dispatch kind so non-static dispatches
 			// surface as `invokes` with a populated dispatch_kind metadata
 			// column instead of being conflated with static `calls`.
 			v.pending = append(v.pending, v.parsePendingFromCall(id, s))
-			// Track C P1b: for dispatch kinds whose target is unresolvable
+			// For dispatch kinds whose target is unresolvable
 			// (closure literal, func value, method value) — Resolve would
 			// drop the PendingRef because TargetQName has no matching
 			// Function/Method node — we emit a direct self-loop on the
@@ -78,11 +78,11 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 			// a runtime target. interface_method dispatch resolves cleanly
 			// to a Method node so we leave it in the PendingRef path.
 			v.maybeEmitInvokesSelfLoop(parentID, s)
-			// Concurrency phase 2: lock/unlock edges. Receiver resolution
+			// Concurrency: lock/unlock edges. Receiver resolution
 			// uses types.Info when available; falls back to AST-only INFERRED
 			// matching otherwise. No-op for non-mutex calls.
 			v.maybeEmitLockEdge(parentID, s)
-			// Concurrency phase 3: emit Channel node for make(chan ...) calls
+			// Concurrency: emit Channel node for make(chan ...) calls
 			// that were NOT already handled by the AssignStmt path above
 			// (prevents duplicate Channel nodes for `ch := make(chan T, n)`).
 			if isMakeChan(s) && !assignedMakeChan[s.Pos()] {
@@ -96,7 +96,7 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 			})
 			// Emit sends_to/recvs_from from goroutine body to known channels.
 			v.emitGoroutineChannelEdges(goroutineID, s.Call)
-			// W-A §3.3 fix (P2 #8): named-function goroutines like
+			// Named-function goroutines like
 			// `go x.method()` previously emitted no calls/invokes edge,
 			// so the cross-function lock propagator skipped the body of
 			// x.method entirely (it could only see anonymous goroutine
@@ -203,7 +203,7 @@ func (v *declVisitor) appendLogicBlockPos(parentID, parentQname string, t types.
 // The result is consumed in Pass 2 (Resolve) to materialize a `calls` (static)
 // or `invokes` (non-static dispatch) edge.
 //
-// Track C P1b: classifies dispatch kind via types.Info when available and
+// Classifies dispatch kind via types.Info when available and
 // stamps the result on PendingRef.DispatchKind. The five outcomes:
 //
 //	dispatch_kind == ""                  → static call (EdgeCalls)

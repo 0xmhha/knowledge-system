@@ -4,28 +4,28 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.15 — single-return local-var receiver tests.
+// Single-return local-var receiver tests.
 //
 // Shape: `Type x = expr; x.method(...)` where x is a function-local
 // variable_declaration. New localVarTypes index (funcID, varName →
 // typeName) plugs into the receiver-type lookup chain after
-// stateVarTypes (V1.0) → paramTypes (V1.1). V1.10/V1.11/V1.12 struct-
+// stateVarTypes → paramTypes. The struct-
 // walker `obj` resolution shares the same three-tier fallback via the
 // new `lookupReceiverType` helper.
 //
-// V1.13 (this-prefixed) intentionally bypasses the helper — `this`
+// The this-prefixed walker intentionally bypasses the helper — `this`
 // references the caller contract, so the named member must be a state
 // variable, never a parameter or local.
 //
-// V1.15 carry-over (V1.16+):
+// Not covered here:
 //   - Multi-return tuple destructuring (variable_declaration_tuple).
 //   - Local-var with RHS = function-call (use funcReturnTypes for
 //     type inference instead of declared LHS — covered indirectly when
 //     the LHS type is explicit).
-//   - Block-scoped shadowing (V1.15 V0 treats locals as function-scoped).
+//   - Block-scoped shadowing (locals are treated as function-scoped here).
 
-// TestUsingForV115_LocalVarDirect — canonical V1.15 case. Local var
-// `uint256 x` used as a V1.0-shape receiver (`x.add(1)`). Tests that
+// TestUsingForV115_LocalVarDirect — canonical local-var case. Local var
+// `uint256 x` used as a bare receiver (`x.add(1)`). Tests that
 // localVarTypes plugs into resolveUsingForCallRef after stateVar/param
 // miss.
 func TestUsingForV115_LocalVarDirect(t *testing.T) {
@@ -39,9 +39,9 @@ func TestUsingForV115_LocalVarDirect(t *testing.T) {
 	}
 }
 
-// TestUsingForV115_LocalVarStruct — local-var receiver feeding the V1.10
+// TestUsingForV115_LocalVarStruct — local-var receiver feeding the
 // struct-field walker. `UserData memory u = ...; u.balance.add(1)`.
-// Confirms localVarTypes fallback works for obj resolution in V1.10's
+// Confirms localVarTypes fallback works for obj resolution in the struct-field
 // chain too.
 func TestUsingForV115_LocalVarStruct(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v115", "local_var_struct.sol")

@@ -14,9 +14,9 @@ import "github.com/0xmhha/knowledge-system/pkg/system/contract"
 //   - Mix Korean and English freely — a multilingual embedder spans both,
 //     so adding one Korean and one English anchor is cheaper than writing
 //     two rule sets.
-//   - Cover the surface forms that real users actually type. The Phase-0
-//     set below is a starter; Phase E (evaluation) measures miscluster
-//     rates and feeds the data back here.
+//   - Cover the surface forms that real users actually type. The
+//     set below is a starter; evaluation measures miscluster rates and
+//     feeds the data back here.
 var defaultAnchors = map[contract.Intent][]string{
 	contract.IntentBugFix: {
 		"X를 변경한 뒤에도 이전 값으로 동작하고, 새 값이 적용되지 않는다 — 근본 원인을 찾아 수정해줘",

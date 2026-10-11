@@ -12,12 +12,12 @@ import (
 
 // RegisterConcurrencyImpact wires the concurrency_impact tool — the
 // concurrency blast radius of a symbol over the five contract edge types
-// (spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock;
-// R1' contract C1, S1). The algorithm body lives in pkg/concurrency so cks
-// consumes it in-process; this file is the MCP request envelope only (the
-// dev-only ckg server, 00 §7), mirroring RegisterImpactOfChange.
+// (spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock).
+// The algorithm body lives in pkg/concurrency so cks consumes it
+// in-process; this file is the MCP request envelope only (the dev-only
+// ckg server), mirroring RegisterImpactOfChange.
 func RegisterConcurrencyImpact(s *server.MCPServer, reader store.Reader) {
-	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
+	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("concurrency_impact",
 		mcp.WithDescription(
 			"Concurrency blast radius for a symbol: modules that affect or are affected by it via "+

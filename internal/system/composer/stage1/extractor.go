@@ -37,7 +37,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// Default tuning values. Phase E tuning revisits with real-prompt data.
+// Default tuning values; to be revisited with real-prompt data.
 const (
 	DefaultInitialK      = 20  // ckv recall breadth per round
 	DefaultRerankPerKW   = 5   // ckg BM25 K per keyword
@@ -73,7 +73,7 @@ type Config struct {
 	AugmentTopN int
 }
 
-// DefaultConfig returns the Phase-0 tuning baseline.
+// DefaultConfig returns the baseline tuning.
 func DefaultConfig() Config {
 	return Config{
 		KnowledgeK:    6,

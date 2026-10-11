@@ -72,7 +72,7 @@ func TestComputeAlignment_OK(t *testing.T) {
 	if !rep.SourceRootOK {
 		t.Errorf("SourceRootOK = false, want true")
 	}
-	// Pre-P1 index → ledger-absent warning is expected, nothing else.
+	// Older index without a sources ledger → ledger-absent warning is expected, nothing else.
 	for _, w := range rep.Warnings {
 		if !strings.Contains(w, "ledger absent") {
 			t.Errorf("unexpected warning: %s", w)

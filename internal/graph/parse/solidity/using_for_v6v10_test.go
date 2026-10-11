@@ -7,10 +7,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V10 — same-file free-function self-binding audit. A
+// Same-file free-function self-binding audit. A
 // file declares its own free function `addOne` and a `using {
 // addOne as * } for uint256 global;` directive in the same file.
-// Resolution: W6 V3's NodeFunction fallback finds addOne in
+// Resolution: the NodeFunction fallback finds addOne in
 // byName[NodeFunction]; pickSameFileCandidate prefers the same-
 // file candidate (which IS the only candidate here). The
 // EdgeUsesFor should land on Calc -> addOne in single_file.sol

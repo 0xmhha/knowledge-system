@@ -6,16 +6,16 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V15 — constructor self-cast audit. Constructors are
-// emitted via runConstructorDecl (W6 V1.23) as NodeFunction with
-// SubKind="constructor" and a synthetic identifier. The V5/V8/V12
+// Constructor self-cast audit. Constructors are
+// emitted via runConstructorDecl as NodeFunction with
+// SubKind="constructor" and a synthetic identifier. The
 // cast walker reaches the enclosing callable through
 // nearestFunctionQnameAndStart, which already recognises
 // constructor_definition — so HasSelfReentrantCall should fire on
 // the constructor row when the body contains
 // `payable(this).call(...)` or `.transfer(...)`.
 //
-// V15 locks the coverage. A regression that drops
+// This test locks the coverage. A regression that drops
 // constructor_definition from the enclosing-callable walk, or
 // that diverges runConstructorDecl's startByte from the
 // nearestFunctionQnameAndStart computation, would silently lose

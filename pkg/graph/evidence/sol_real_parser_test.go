@@ -30,13 +30,12 @@ func (f *realParserFakeStore) GetManifest() (persist.Manifest, error) {
 	return persist.Manifest{BuildTimestamp: "w11-v1-int", SrcCommit: "w11-v1-int"}, nil
 }
 
-// TestBuildPack_RealParserSolFixture — W-C W11 V1 (2026-05-18) real
-// parser → BuildPack integration. Closes the gap left by W11 V0
-// (TestBuildPack_SolGraphRegression), which used a hand-assembled
-// fakeStore. V1 runs the actual Sol parser over a Wallet contract,
-// captures its real ResolvedGraph (including every W-C series
-// addition: SlotIndex with V2 packing, IsFunctionTyped, HasAssembly,
-// HasLowLevelCall, etc.), pairs it with synthetic Commit + Hunk
+// TestBuildPack_RealParserSolFixture — real parser → BuildPack
+// integration. Closes the gap left by TestBuildPack_SolGraphRegression,
+// which used a hand-assembled fakeStore. This test runs the actual Sol
+// parser over a Wallet contract, captures its real ResolvedGraph
+// (including every Solidity-specific field: SlotIndex with packing,
+// IsFunctionTyped, HasAssembly, HasLowLevelCall, etc.), pairs it with synthetic Commit + Hunk
 // rows that modify Wallet.withdraw, and runs BuildPack with an
 // intent that should surface the matching hunk.
 //

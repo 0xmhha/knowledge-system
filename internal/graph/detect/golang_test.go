@@ -226,8 +226,8 @@ func TestGoFiles_RejectsBrokenGoToolchainInsteadOfEmptyIndex(t *testing.T) {
 }
 
 // TestGoFiles_GoWorkspace verifies that a srcRoot with a go.work pointing
-// to two member modules surfaces files from BOTH members. Closes WORK-PLAN
-// G5 (E2 review follow-up) — workspace handling was previously unverified.
+// to two member modules surfaces files from BOTH members — workspace
+// handling was previously unverified.
 //
 // Layout:
 //

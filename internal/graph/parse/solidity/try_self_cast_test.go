@@ -6,8 +6,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V16 — try-statement self-cast audit. The cast walker
-// (W10 V5/V8/V12) finds every member_expression via a tree-sitter
+// Try-statement self-cast audit. The cast walker
+// finds every member_expression via a tree-sitter
 // query and resolves enclosing callable through
 // nearestFunctionQnameAndStart, which walks the parent chain looking
 // for function_definition / modifier_definition / constructor_definition /
@@ -15,7 +15,7 @@ import (
 // a control-flow node — so the walker should treat it as transparent
 // and attach the self-reentrant marker to the *outer* function.
 //
-// V16 locks the coverage. The pattern is high-value because the
+// This test locks the coverage. The pattern is high-value because the
 // "I wrapped it in try, so re-entrancy doesn't matter" misconception
 // is common; the marker exists precisely to call out that the inner
 // callee can still re-enter the caller before try completes. A
@@ -23,16 +23,16 @@ import (
 // stopped nearestFunctionQnameAndStart at try_statement, would
 // silently drop this signal on every try-wrapped self-call surface.
 //
-// Two contracts exercise the two admission paths in W10:
+// Two contracts exercise the two cast-walker admission paths:
 //
 //   - TryCall.attack   : member-expression query → property=="call",
 //     inner=payable(this) cast → selfAffected.
 //   - TryTransfer.drain: same query → property=="transfer", admitted
-//     by the V12 value-transfer branch alongside
-//     the V8 low-level-call branch.
+//     by the value-transfer branch alongside
+//     the low-level-call branch.
 //
 // Both functions should end up with HasSelfReentrantCall=true and
-// HasExternalCall=false — the V8 precedence rule ("self-cast routes
+// HasExternalCall=false — the self-cast precedence rule ("self-cast routes
 // to reentrant, not external").
 func TestTryStatement_SelfReentrantCast(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver",

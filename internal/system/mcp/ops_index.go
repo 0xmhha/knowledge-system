@@ -20,10 +20,10 @@ import (
 var ToolNameOpsIndex = toolName("ops.index")
 
 // IndexConfig carries the paths the cks.ops.index tool shells out to. The
-// query path is fully in-process (G1), but the index/reindex maintenance op
+// query path is fully in-process, but the index/reindex maintenance op
 // has no in-process ckv/ckg API, so it runs the CLIs as a subprocess — an
 // explicit, infrequent, agent-triggered call, NOT the hot retrieval loop
-// (00 §C3, plan G8). Empty binaries disable the tool (it returns an error
+// Empty binaries disable the tool (it returns an error
 // telling the agent to run the indexers manually).
 type IndexConfig struct {
 	CKVBinary     string // ckv binary path; "" disables ckv reindex
@@ -83,7 +83,7 @@ type opsIndexResponse struct {
 	Alignment indexSubResult `json:"alignment"`
 }
 
-// registerOpsIndex wires cks.ops.index (G8/S2).
+// registerOpsIndex wires cks.ops.index.
 func registerOpsIndex(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsIndex,
 		mcpgo.WithOutputSchema[opsIndexResponse](),

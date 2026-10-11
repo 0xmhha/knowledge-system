@@ -9,7 +9,7 @@ import (
 
 // llmSafeReader wraps a [store.Reader] and filters AMBIGUOUS Hunk +
 // Commit nodes (the schema-1.8 §11.3 unreachable-history track) out
-// of every read surface — single enforcement point for the H3
+// of every read surface — single enforcement point for the hunk
 // retrieval boundary. Methods that don't surface Hunk/Commit data
 // pass through unmodified via the embedded interface, so future
 // Reader additions inherit the boundary automatically until they
@@ -20,14 +20,14 @@ type llmSafeReader struct {
 
 // NewLLMSafeReader wraps r so AMBIGUOUS Hunk/Commit nodes are
 // stripped from every read result. Every Register* handler applies this
-// boundary itself via [safeReader], so the §11.3 H3 boundary holds no
+// boundary itself via [safeReader], so the §11.3 retrieval boundary holds no
 // matter how tools are mounted; this constructor stays exported for
 // callers that want the wrapped reader for their own use.
 func NewLLMSafeReader(r store.Reader) store.Reader {
 	return &llmSafeReader{Reader: r}
 }
 
-// safeReader returns r wrapped in the §11.3 H3 boundary, idempotently: a
+// safeReader returns r wrapped in the §11.3 retrieval boundary, idempotently: a
 // reader that is already wrapped is returned unchanged, so handlers can wrap
 // unconditionally without double-filtering when RegisterAll (or a caller)
 // already wrapped. This makes the boundary enforced by construction rather

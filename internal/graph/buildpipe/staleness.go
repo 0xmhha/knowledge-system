@@ -2,8 +2,8 @@
 // fingerprint. Prefers a path-aware git lookup (so unrelated commits don't
 // flip the banner — see internal/server/staleness.go for the symmetrical
 // serve-side comparison); falls back to mtime sum of up to 5 detected files
-// when the source root isn't a git checkout. Extracted from pipeline.go in
-// G4. Pure file move — no behavior change.
+// when the source root isn't a git checkout. Extracted from pipeline.go.
+// Pure file move — no behavior change.
 package buildpipe
 
 import (

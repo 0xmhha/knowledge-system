@@ -7,7 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestBuildEdges_CrossLanguageFixture — W-C W11 V5. Verifies that
+// TestBuildEdges_CrossLanguageFixture verifies that
 // BuildEdges correctly emits modifies edges across language
 // boundaries when a commit touches files in different languages.
 // The fixture stages a synthetic node set with Sol contract +

@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS pending_refs (
 );
 CREATE INDEX IF NOT EXISTS idx_pending_refs_file ON pending_refs(file_path);
 
--- ckg-NEW-2/3/4 (schema 1.12): PR breadcrumb. Mirrors the SQLite
+-- Schema 1.12: PR breadcrumb. Mirrors the SQLite
 -- node_prs table (see internal/persist/schema.sql). merged_at uses
 -- TIMESTAMP WITH TIME ZONE on the PG side so the column type carries
 -- semantics rather than relying on text ordering; the Go layer still
@@ -513,7 +513,7 @@ func (s *pgStore) InsertPendingRefs(refs []PendingRefRow) error {
 	return br.Close()
 }
 
-// InsertNodePRs writes ckg-NEW-2 PR breadcrumbs into PG. ON CONFLICT
+// InsertNodePRs writes PR breadcrumbs into PG. ON CONFLICT
 // UPDATE rather than DO NOTHING because the rebuild path frequently
 // has updated title/summary text for the same (node_id, number) — see
 // the SQLite mirror for the rationale.
@@ -656,8 +656,8 @@ func (s *pgStore) RebuildFTS() error {
 // rows (same as SQLite implementation).
 //
 // opts.Language pushes a `language = $N` predicate when non-empty.
-// opts.Kinds pushes a `type IN ($N, $N+1, ...)` predicate when non-empty —
-// CKG-4 fix paralleling the SQLite path.
+// opts.Kinds pushes a `type IN ($N, $N+1, ...)` predicate when non-empty,
+// paralleling the SQLite path.
 func (s *pgStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
 	args := []any{}
 	q := `SELECT ` + pgNodeColumns + ` FROM nodes WHERE 1=1 `
@@ -1070,7 +1070,7 @@ func (s *pgStore) SearchWithOpts(q string, limit int, opts SearchFTSOptions) ([]
 // normalizeSearchHits.
 //
 // opts.Language pushes a `language = $N` predicate into the WHERE clause
-// when non-empty — CKG-2 filter push-down so cks no longer has to
+// when non-empty — filter push-down so cks no longer has to
 // over-fetch and filter client-side.
 func (s *pgStore) SearchFTS(q string, limit int, opts SearchFTSOptions) ([]SearchHit, error) {
 	// plainto_tsquery is safe for arbitrary input (no special syntax needed).
@@ -1179,7 +1179,7 @@ func (s *pgStore) GetBlob(id string) ([]byte, error) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 // NodesByFilePath returns every node whose file_path equals path, ordered by
-// start_line. The ORDER BY is critical for the G6 v4 correctness fix: nodes
+// start_line. The ORDER BY is critical for correctness: nodes
 // must be returned in declaration order for Pass 2 Resolve to produce stable
 // qnames.
 func (s *pgStore) NodesByFilePath(path string) ([]types.Node, error) {
@@ -1278,7 +1278,7 @@ func (s *pgStore) ReverseDepsForFiles(dirtyPaths []string) ([]string, error) {
 	// pending_refs.target_qname stores the unresolved AST name (e.g. "Helper"),
 	// while nodes.qualified_name is fully-qualified (e.g. "edgepin.Helper").
 	// The LIKE arm matches the suffix after the last dot — mirrors simpleName()
-	// in resolve.go so C1 finds the same candidates as Pass 2 Resolve does.
+	// in resolve.go so reverse-reference invalidation finds the same candidates as Pass 2 Resolve does.
 	rows, err := s.pool.Query(background,
 		`SELECT DISTINCT pr.file_path
 		 FROM pending_refs pr

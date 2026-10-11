@@ -16,7 +16,7 @@ import (
 // external `package store_test` consumer to catch any pkg/store alias
 // drift that would only surface across module boundaries.
 //
-// The contract is exactly the spec in plans/01 §G1:
+// The Score contract:
 //   - Score is monotonically descending across the returned hits.
 //   - Score lies in [0, 1] (min-max normalized within the result set).
 //   - RawScore is populated and tracks Score's order.
@@ -78,11 +78,11 @@ func TestSearchFTS_ScoreContract(t *testing.T) {
 	}
 }
 
-// TestBuildGoStablenetSmoke_M2D pins plans/01 §M2.d: a go-stablenet
+// TestBuildGoStablenetSmoke_M2D pins that a go-stablenet
 // build with --policy-file produces NodePolicy nodes (count > 0). The
 // reference policy view is cks-domain-sync's emitted file, which yields
 // one Policy node per verified domain entry — A4.system_contracts.addresses
-// is the canonical one (verified since 2026-06-05) so we look it up by
+// is the canonical one, so we look it up by
 // its entry-id qualified name.
 //
 // Opt-in via CKG_GSN_GRAPH like the other smoke tests, so the assertion

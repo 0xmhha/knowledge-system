@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS nodes (
     usage_score   DOUBLE PRECISION NOT NULL DEFAULT 0,
     confidence    TEXT    NOT NULL DEFAULT 'EXTRACTED',
     sub_kind      TEXT    NOT NULL DEFAULT '',
-    -- attrs (W-C W11 V9, 2026-05-19): JSON-blob carrying every
+    -- attrs: JSON-blob carrying every
     -- types.Node marker that doesn't have its own column.
-    -- Mirrors the SQLite nodes.attrs added under schema 1.9.
+    -- Mirrors the SQLite nodes.attrs added under schema 1.11.
     attrs         TEXT    NOT NULL DEFAULT ''
 );
 

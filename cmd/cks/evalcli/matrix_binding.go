@@ -16,8 +16,9 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 )
 
-// Runtime pins are a consistency check. Human input review and FINAL reservation
-// are enforced by the refactoring runner; a standalone matrix remains diagnostic.
+// Runtime pins are a consistency check. Human input review and held-out set
+// reservation are enforced by the refactoring runner; a standalone matrix
+// remains diagnostic.
 type matrixEvaluationBinding struct {
 	SchemaVersion int    `json:"schema_version"`
 	DatasetID     string `json:"dataset_id"`

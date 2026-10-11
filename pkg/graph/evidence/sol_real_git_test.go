@@ -54,14 +54,13 @@ contract Wallet {
 }
 `
 
-// TestBuildPack_RealGitFixture — W-C W11 V2 (2026-05-19). The W11 V1
-// integration test wired a hand-assembled Commit + Hunk into the
-// evidence layer to prove the parser→BuildPack wiring works after
-// every W-C series addition (HasAssembly, IsFunctionTyped, SlotIndex
-// with V2 packing, etc.). V2 replaces the synthetic temporal nodes
-// with rows materialised from a real git checkout via the temporal
-// package, exercising the LoadHistory + LoadHunks paths and the H2
-// line-overlap modifies pass that buildpipe runs in production.
+// TestBuildPack_RealGitFixture — TestBuildPack_RealParserSolFixture
+// wires a hand-assembled Commit + Hunk into the evidence layer to prove
+// the parser→BuildPack wiring works with every Solidity-specific field
+// (HasAssembly, IsFunctionTyped, SlotIndex with packing, etc.). This
+// test replaces the synthetic temporal nodes with rows materialised
+// from a real git checkout via the temporal package, exercising the
+// LoadHistory + LoadHunks paths and the hunk line-overlap modifies pass that buildpipe runs in production.
 //
 // The fixture stages a fresh git repo with two commits on Wallet.sol:
 // an initial version without an owner check, and a second commit
