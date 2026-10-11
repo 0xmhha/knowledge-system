@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-16",
   "active_source_binding": {
-    "revision": "eaa8a3a2d610d12999b5a23d3ec6c86d0b2f795b",
-    "manifest": "system/eval/b0-knowledge-system/refactoring-code-audit-2026-10-11/manifest-fixes.json"
+    "revision": "72fe8fe1bee0c84f2d8f3e2a08e2fb2285a6cd18",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-code-audit-2026-10-11/manifest-pass2.json"
   },
   "tasks": [
     {
@@ -1271,6 +1271,31 @@
       "pkg/vector/mcp/http_acl_test.go",
       "pkg/vector/mcp/index_test.go",
       "pkg/vector/mcp/server.go"
+    ],
+    "product_code_changed": true,
+    "reviewer": null,
+    "individual_human_approvals": 0,
+    "status": "PASS"
+  },
+  "latest_code_audit_pass2": {
+    "revision": "72fe8fe1bee0c84f2d8f3e2a08e2fb2285a6cd18",
+    "manifest": "system/eval/b0-knowledge-system/refactoring-code-audit-2026-10-11/manifest-pass2.json",
+    "document": "system/eval/b0-knowledge-system/refactoring-code-audit-2026-10-11/pass2/findings.json",
+    "unique_current_and_committed_SHA_bindings": 1487,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "changed_sources": [
+      "internal/graph/persist/large_frontier_test.go",
+      "internal/graph/persist/sqlite_reader.go",
+      "internal/system/mcp/graph.go",
+      "internal/system/mcp/graph_test.go",
+      "internal/vector/query/flow.go",
+      "internal/vector/query/service_keyword.go",
+      "pkg/graph/evidence/evidence.go",
+      "pkg/graph/evidence/evidence_test.go",
+      "pkg/graph/mcphandlers/depth_cap_test.go",
+      "pkg/graph/mcphandlers/handlers.go",
+      "pkg/vector/mcp/huge_k_test.go"
     ],
     "product_code_changed": true,
     "reviewer": null,
