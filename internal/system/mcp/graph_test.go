@@ -239,3 +239,32 @@ func TestHandleGetSubgraph_MissingSymbol_IsError(t *testing.T) {
 		t.Fatalf("expected IsError for missing symbol; got %+v", res)
 	}
 }
+
+// depth is caller-supplied; an untyped subgraph walk on a real graph reaches
+// most of it by depth 4, so depth is capped like ckg's impact walk.
+func TestGraphToolsCapTraversalDepth(t *testing.T) {
+	seed := cit("a.go", 1, 10)
+	f := newFixture(t, func(f *fixture) {
+		f.ckg.SymbolCitations = []contract.Citation{seed}
+		f.ckg.SubgraphCitations = []contract.Citation{seed}
+	})
+	for _, depth := range []float64{1e9, 6, -3} {
+		f.ckg.Calls.Neighbors, f.ckg.Calls.GetSubgraph = nil, nil
+		if _, err := handleFindRelatives(context.Background(), f.deps, callToolReq(map[string]any{"symbol": "pkg.Foo", "depth": depth}), ToolNameFindCallers, "callers", []contract.Relation{contract.RelationCalledBy}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := handleGetSubgraph(context.Background(), f.deps, callToolReq(map[string]any{"symbol": "pkg.Foo", "depth": depth})); err != nil {
+			t.Fatal(err)
+		}
+		want := maxTraversalDepth
+		if depth < 0 {
+			want = 0
+		}
+		if len(f.ckg.Calls.Neighbors) != 1 || f.ckg.Calls.Neighbors[0].Opts.Hops != want {
+			t.Errorf("depth %v: neighbors calls %+v", depth, f.ckg.Calls.Neighbors)
+		}
+		if len(f.ckg.Calls.GetSubgraph) != 1 || f.ckg.Calls.GetSubgraph[0].Opts.Depth != want {
+			t.Errorf("depth %v: subgraph calls %+v", depth, f.ckg.Calls.GetSubgraph)
+		}
+	}
+}

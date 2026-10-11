@@ -6,6 +6,7 @@ import (
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
 
+	"github.com/0xmhha/knowledge-system/pkg/graph/impact"
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -54,7 +55,7 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		q := req.GetString("qname", "")
-		d := int(req.GetFloat("depth", 2))
+		d := traversalDepth(req)
 		incl := req.GetBool("include_blobs", false)
 		resolved, cands, ambiguous, ok := resolveSeed(reader, q, "")
 		if ambiguous {
@@ -90,7 +91,7 @@ func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		q := req.GetString("qname", "")
-		d := int(req.GetFloat("depth", 2))
+		d := traversalDepth(req)
 		incl := req.GetBool("include_blobs", false)
 		resolved, cands, ambiguous, ok := resolveSeed(reader, q, "")
 		if ambiguous {
@@ -124,7 +125,7 @@ func RegisterGetSubgraph(s *server.MCPServer, reader store.Reader) {
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		q := req.GetString("seed_qname", "")
-		d := int(req.GetFloat("depth", 2))
+		d := traversalDepth(req)
 		incl := req.GetBool("include_blobs", false)
 		resolved, cands, ambiguous, ok := resolveSeed(reader, q, "")
 		if ambiguous {
@@ -198,4 +199,11 @@ func RegisterSearchText(s *server.MCPServer, reader store.Reader) {
 		}
 		return textResult(map[string]any{"nodes": attachBlobs(reader, hits, incl)}), nil
 	})
+}
+
+// traversalDepth is the caller's depth (default 2) clamped to
+// [0, impact.DepthCap]: an untyped walk on a real graph reaches most of it
+// by depth 4.
+func traversalDepth(req mcp.CallToolRequest) int {
+	return min(max(int(req.GetFloat("depth", 2)), 0), impact.DepthCap)
 }
