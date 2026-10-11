@@ -100,7 +100,7 @@ func Load(path, corpusRel string) ([]types.Chunk, Stats, error) {
 	if err != nil {
 		return nil, Stats{}, fmt.Errorf("flowcorpus: open %s: %w", path, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return Parse(f, corpusRel)
 }
 

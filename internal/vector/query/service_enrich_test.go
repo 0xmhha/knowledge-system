@@ -85,12 +85,20 @@ func TestEnrichService_Run_CachesPerFile(t *testing.T) {
 	// We can't easily assert subprocess count, but verify both hits
 	// end up with identical history.
 	dir := t.TempDir()
-	exec.Command("git", "-C", dir, "init", "-q").Run()
-	exec.Command("git", "-C", dir, "config", "user.email", "t@e.com").Run()
-	exec.Command("git", "-C", dir, "config", "user.name", "T").Run()
-	writeFile(filepath.Join(dir, "a.go"), "package a\n")
-	exec.Command("git", "-C", dir, "add", "a.go").Run()
-	exec.Command("git", "-C", dir, "commit", "-q", "-m", "init").Run()
+	git := func(args ...string) {
+		t.Helper()
+		if err := exec.Command("git", append([]string{"-C", dir}, args...)...).Run(); err != nil {
+			t.Fatalf("git %v: %v", args, err)
+		}
+	}
+	git("init", "-q")
+	git("config", "user.email", "t@e.com")
+	git("config", "user.name", "T")
+	if err := writeFile(filepath.Join(dir, "a.go"), "package a\n"); err != nil {
+		t.Fatal(err)
+	}
+	git("add", "a.go")
+	git("commit", "-q", "-m", "init")
 
 	s := &EnrichService{}
 	hits := []Hit{

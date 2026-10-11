@@ -91,13 +91,9 @@ func resolveAutoVersionContext(ctx context.Context, out, src, filelistConfig, se
 	return name, nil
 }
 
-// committedSourceCommit is the only source mode currently supported by the
-// setup CLI. CKV can index untracked and Git-ignored eligible files, so both
-// must be ruled out before stamping a Git commit onto citations.
-func committedSourceCommit(src string) (string, error) {
-	return committedSourceCommitContext(context.Background(), src)
-}
-
+// committedSourceCommitContext resolves the only source mode currently
+// supported by the setup CLI. CKV can index untracked and Git-ignored eligible
+// files, so both must be ruled out before stamping a Git commit onto citations.
 func committedSourceCommitContext(ctx context.Context, src string) (string, error) {
 	if src == "" {
 		return "", fmt.Errorf("committed source requires --src")

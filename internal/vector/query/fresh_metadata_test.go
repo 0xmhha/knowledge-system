@@ -49,7 +49,7 @@ func TestSearchMetadataFreshTracksSourceHead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 	search := func(opts Options) *Response {
 		t.Helper()
 		r, err := eng.Search(context.Background(), "Alpha", opts)

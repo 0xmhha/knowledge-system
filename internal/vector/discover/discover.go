@@ -239,7 +239,7 @@ func loadCKVIgnore(srcRoot string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var out []string
 	scan := bufio.NewScanner(f)
@@ -326,7 +326,7 @@ func isProbablyBinary(path string) bool {
 		// Treat unreadable as binary so we skip rather than panic later.
 		return true
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	var head [8192]byte
 	n, _ := f.Read(head[:])
 	return bytes.IndexByte(head[:n], 0) >= 0

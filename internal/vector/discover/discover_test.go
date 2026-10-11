@@ -289,8 +289,6 @@ func TestSecretFilterCanBeDisabled(t *testing.T) {
 	mkfile(t, dir, "key.pem", "package main")
 
 	t.Setenv("CKV_DISABLE_SECRET_FILTER", "1")
-	files, _, _ := Walk(dir, Options{})
-	got := relPaths(files)
 	// key.pem isn't classified as a known language so it still won't
 	// appear. The point is the *pattern* no longer fires — verify
 	// indirectly by checking the helper.
@@ -300,8 +298,8 @@ func TestSecretFilterCanBeDisabled(t *testing.T) {
 	// And via Walk: a renamed .go file with a sensitive-looking name
 	// should now pass.
 	mkfile(t, dir, "id_rsa.go", "package main")
-	files, _, _ = Walk(dir, Options{})
-	got = relPaths(files)
+	files, _, _ := Walk(dir, Options{})
+	got := relPaths(files)
 	if !slices.Contains(got, "id_rsa.go") {
 		t.Errorf("CKV_DISABLE_SECRET_FILTER=1 should allow id_rsa.go; got %v", got)
 	}

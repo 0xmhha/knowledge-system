@@ -28,8 +28,6 @@ type CapturedGitHistory struct {
 	RecoveryCommits []string `json:"recovery_commits"`
 }
 
-func runArchiveGit(args ...string) error { return runArchiveGitContext(context.Background(), args...) }
-
 func runArchiveGitContext(ctx context.Context, args ...string) error {
 	cmd := exec.CommandContext(ctx, "git", args...)
 	out, err := cmd.CombinedOutput()
@@ -37,10 +35,6 @@ func runArchiveGitContext(ctx context.Context, args ...string) error {
 		return fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, out)
 	}
 	return nil
-}
-
-func captureGitHistory(source, bundle, base string, selected []string, maxBytes int64) (*CapturedGitHistory, error) {
-	return captureGitHistoryContext(context.Background(), source, bundle, base, selected, maxBytes)
 }
 
 func captureGitHistoryContext(ctx context.Context, source, bundle, base string, selected []string, maxBytes int64) (_ *CapturedGitHistory, err error) {
@@ -60,7 +54,7 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(stage)
+	defer func() { _ = os.RemoveAll(stage) }()
 	seed := filepath.Join(stage, "seed.git")
 	if err := runArchiveGitContext(ctx, "init", "--quiet", "--bare", seed); err != nil {
 		return nil, err
@@ -123,7 +117,7 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 	if written > maxBytes {
 		_ = cmd.Process.Kill()
 		_ = cmd.Wait()
-		return nil, fmt.Errorf("Git history archive exceeds %d bytes", maxBytes)
+		return nil, fmt.Errorf("git history archive exceeds %d bytes", maxBytes)
 	}
 	if copyErr != nil && copyErr != io.EOF {
 		_ = cmd.Process.Kill()
@@ -134,7 +128,7 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 		return nil, fmt.Errorf("create Git history archive: %w: %s", err, stderr.String())
 	}
 	if written == 0 {
-		return nil, fmt.Errorf("Git history archive is empty")
+		return nil, fmt.Errorf("git history archive is empty")
 	}
 	if err := file.Sync(); err != nil {
 		return nil, err
@@ -148,10 +142,6 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 
 func (c CapturedSource) gitBundlePath() string {
 	return filepath.Join(filepath.Dir(c.BlobDir), "history.bundle")
-}
-
-func (c CapturedSource) verifyGitHistory() error {
-	return c.verifyGitHistoryContext(context.Background())
 }
 
 func (c CapturedSource) verifyGitHistoryContext(ctx context.Context) error {
@@ -185,7 +175,7 @@ func (c CapturedSource) verifyGitHistoryContext(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("snapshot_mismatch: open retained Git history archive: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	opened, err := file.Stat()
 	if err != nil || !os.SameFile(info, opened) {
 		return fmt.Errorf("snapshot_mismatch: retained Git history archive changed while opening")
@@ -201,10 +191,6 @@ func (c CapturedSource) verifyGitHistoryContext(ctx context.Context) error {
 		return fmt.Errorf("snapshot_mismatch: retained Git history archive changed")
 	}
 	return nil
-}
-
-func (c CapturedSource) materializeGitHistory(path string) error {
-	return c.materializeGitHistoryContext(context.Background(), path)
 }
 
 func (c CapturedSource) materializeGitHistoryContext(ctx context.Context, path string) error {

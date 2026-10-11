@@ -51,10 +51,10 @@ import (
 func checkDefAnchorResolution(w *os.File, p *inventory.Project, graphPath string) (errors, warnings int) {
 	cli, err := ckgclient.NewReal(graphPath)
 	if err != nil {
-		fmt.Fprintf(w, "(project): error: : open ckg graph %q: %v\n", graphPath, err)
+		_, _ = fmt.Fprintf(w, "(project): error: : open ckg graph %q: %v\n", graphPath, err)
 		return 1, 0
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }() // read-only graph handle; nothing to flush
 	ctx := context.Background()
 
 	for _, id := range p.EntryIDsSorted() {
@@ -65,7 +65,7 @@ func checkDefAnchorResolution(w *os.File, p *inventory.Project, graphPath string
 			}
 			cits, err := cli.FindSymbol(ctx, a.Symbol, ckgclient.SymbolOpts{})
 			if err != nil {
-				fmt.Fprintf(w, "%s: error: %s: FindSymbol %q: %v\n", a.File, id, a.Symbol, err)
+				_, _ = fmt.Fprintf(w, "%s: error: %s: FindSymbol %q: %v\n", a.File, id, a.Symbol, err)
 				errors++
 				continue
 			}
@@ -84,11 +84,11 @@ func checkDefAnchorResolution(w *os.File, p *inventory.Project, graphPath string
 			switch len(seen) {
 			case 0:
 				warnings++
-				fmt.Fprintf(w, "%s: warning: %s: def anchor symbol %q does not resolve in its file (renamed/moved, graph lag, or a symbol form ckg does not store)\n", a.File, id, a.Symbol)
+				_, _ = fmt.Fprintf(w, "%s: warning: %s: def anchor symbol %q does not resolve in its file (renamed/moved, graph lag, or a symbol form ckg does not store)\n", a.File, id, a.Symbol)
 			case 1:
 				// unique within the file — the def contract holds.
 			default:
-				fmt.Fprintf(w, "%s: error: %s: def anchor symbol %q resolves to %d definitions in the same file; qualify it\n", a.File, id, a.Symbol, len(seen))
+				_, _ = fmt.Fprintf(w, "%s: error: %s: def anchor symbol %q resolves to %d definitions in the same file; qualify it\n", a.File, id, a.Symbol, len(seen))
 				errors++
 			}
 		}
@@ -110,10 +110,10 @@ func reportIssues(w *os.File, issues []inventory.Issue) (errors, warnings int) {
 		switch iss.Severity {
 		case inventory.SeverityError:
 			errors++
-			fmt.Fprintf(w, "%s: error: %s: %s\n", file, iss.EntryID, iss.Message)
+			_, _ = fmt.Fprintf(w, "%s: error: %s: %s\n", file, iss.EntryID, iss.Message)
 		case inventory.SeverityWarning:
 			warnings++
-			fmt.Fprintf(w, "%s: warning: %s: %s\n", file, iss.EntryID, iss.Message)
+			_, _ = fmt.Fprintf(w, "%s: warning: %s: %s\n", file, iss.EntryID, iss.Message)
 		}
 	}
 	return errors, warnings

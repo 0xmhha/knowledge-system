@@ -108,7 +108,7 @@ func TestRetainedGuardLiveSDK(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer runner.Close()
+			defer func() { _ = runner.Close() }()
 			capture := func(id, expectedCode string) {
 				callCtx, done := context.WithTimeout(ctx, 30*time.Second)
 				defer done()

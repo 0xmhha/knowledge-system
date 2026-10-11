@@ -19,7 +19,7 @@ func newTraceCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // no writes on this path; nothing to flush
 			if diagnoseStale {
 				status, err := store.TraceStatus(cmd.Context(), project, repo, graph, vector)
 				if err != nil {

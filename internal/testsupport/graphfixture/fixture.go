@@ -3,16 +3,20 @@
 package graphfixture
 
 import (
+	"errors"
+
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-func Create(path, sourceRoot, projectID, datasetID, snapshotID, graphDigest string, nodes []types.Node) error {
+func Create(path, sourceRoot, projectID, datasetID, snapshotID, graphDigest string, nodes []types.Node) (err error) {
 	graph, err := persist.Open(path)
 	if err != nil {
 		return err
 	}
-	defer graph.Close()
+	// The fixture is written through this handle, so a failed close is a
+	// failed fixture.
+	defer func() { err = errors.Join(err, graph.Close()) }()
 	if err := graph.Migrate(); err != nil {
 		return err
 	}

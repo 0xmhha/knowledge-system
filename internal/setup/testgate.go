@@ -71,7 +71,7 @@ func runTestGateWithLimits(ctx context.Context, candidateDir, sourceRoot string,
 	if err := readJSON(filepath.Join(candidateDir, "graph", "manifest.json"), &graph); err != nil {
 		return err
 	}
-	if len(graph.SrcCommit) != 40 && !(len(pinned) == 1 && pinned[0].SourceMode == "snapshot-only" && graph.SrcCommit == "") {
+	if len(graph.SrcCommit) != 40 && (len(pinned) != 1 || pinned[0].SourceMode != "snapshot-only" || graph.SrcCommit != "") {
 		return fmt.Errorf("candidate graph has no full source commit")
 	}
 	check := func() (bool, error) { return testGateSourceCleanContext(ctx, sourceRoot, graph.SrcCommit) }
@@ -131,7 +131,7 @@ func runTestGateWithLimits(ctx context.Context, candidateDir, sourceRoot string,
 		return fmt.Errorf("create candidate test report: %w", err)
 	}
 	if _, err := file.Write(append(data, '\n')); err != nil {
-		file.Close()
+		_ = file.Close()
 		return err
 	}
 	if err := file.Close(); err != nil {

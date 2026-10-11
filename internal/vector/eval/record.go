@@ -44,7 +44,7 @@ func RecordSession(ctx context.Context, eng *query.Engine, fixturePath string, o
 
 	scanner := bufio.NewScanner(in)
 	for {
-		fmt.Fprintf(out, "\nEnter query intent (empty to quit): ")
+		_, _ = fmt.Fprintf(out, "\nEnter query intent (empty to quit): ")
 		if !scanner.Scan() {
 			break
 		}
@@ -60,39 +60,39 @@ func RecordSession(ctx context.Context, eng *query.Engine, fixturePath string, o
 			EnableBM25Rerank: opts.EnableBM25Rerank,
 		})
 		if err != nil {
-			fmt.Fprintf(out, "  search error: %v\n", err)
+			_, _ = fmt.Fprintf(out, "  search error: %v\n", err)
 			continue
 		}
 		if len(resp.Hits) == 0 {
-			fmt.Fprintf(out, "  no results found.\n")
+			_, _ = fmt.Fprintf(out, "  no results found.\n")
 			continue
 		}
 
-		fmt.Fprintf(out, "\nTop-%d results:\n", len(resp.Hits))
+		_, _ = fmt.Fprintf(out, "\nTop-%d results:\n", len(resp.Hits))
 		for i, h := range resp.Hits {
 			snippet := firstNonEmptyLine(h.Snippet)
-			fmt.Fprintf(out, "  [%d] %s:%d-%d  %s %s  (score=%.3f)\n",
+			_, _ = fmt.Fprintf(out, "  [%d] %s:%d-%d  %s %s  (score=%.3f)\n",
 				i+1, h.Citation.File, h.Citation.StartLine, h.Citation.EndLine,
 				h.SymbolKind, h.Symbol,
 				h.Score.Normalized)
 			if snippet != "" {
-				fmt.Fprintf(out, "      %s\n", snippet)
+				_, _ = fmt.Fprintf(out, "      %s\n", snippet)
 			}
 		}
 
-		fmt.Fprintf(out, "\nCorrect result? (1-%d, or 'none' to skip): ", len(resp.Hits))
+		_, _ = fmt.Fprintf(out, "\nCorrect result? (1-%d, or 'none' to skip): ", len(resp.Hits))
 		if !scanner.Scan() {
 			break
 		}
 		sel := strings.TrimSpace(scanner.Text())
 		if sel == "" || strings.EqualFold(sel, "none") {
-			fmt.Fprintf(out, "  skipped.\n")
+			_, _ = fmt.Fprintf(out, "  skipped.\n")
 			continue
 		}
 
 		idx, err := strconv.Atoi(sel)
 		if err != nil || idx < 1 || idx > len(resp.Hits) {
-			fmt.Fprintf(out, "  invalid selection %q, skipping.\n", sel)
+			_, _ = fmt.Fprintf(out, "  invalid selection %q, skipping.\n", sel)
 			continue
 		}
 		hit := resp.Hits[idx-1]
@@ -103,7 +103,7 @@ func RecordSession(ctx context.Context, eng *query.Engine, fixturePath string, o
 		if err := appendToFixture(fixturePath, entry); err != nil {
 			return fmt.Errorf("record: append fixture: %w", err)
 		}
-		fmt.Fprintf(out, "  recorded as %s → %s:%d-%d\n",
+		_, _ = fmt.Fprintf(out, "  recorded as %s → %s:%d-%d\n",
 			qID, hit.Citation.File, hit.Citation.StartLine, hit.Citation.EndLine)
 	}
 	if err := scanner.Err(); err != nil {
@@ -153,12 +153,17 @@ func formatEntry(id, intent string, hit query.Hit) string {
 	return b.String()
 }
 
-func appendToFixture(path string, entry string) error {
+func appendToFixture(path string, entry string) (err error) {
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	// Report a failed close of the appended file unless the write already failed.
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 	_, err = f.WriteString(entry)
 	return err
 }

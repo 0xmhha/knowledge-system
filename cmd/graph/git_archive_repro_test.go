@@ -87,7 +87,7 @@ func TestCapturedGitHistoryReplaysSameRecoveryGraphAfterSourceRemoval(t *testing
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer store.Close()
+		defer func() { _ = store.Close() }()
 		meta, err := store.AmbiguousMetaNodes()
 		if err != nil {
 			t.Fatal(err)

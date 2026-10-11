@@ -16,7 +16,9 @@ func TestDetectFormat_Empty(t *testing.T) {
 
 func TestDetectFormat_ONNX(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, "onnx"), 0755)
+	if err := os.MkdirAll(filepath.Join(dir, "onnx"), 0755); err != nil {
+		t.Fatal(err)
+	}
 	hasONNX, _, _ := DetectFormat(dir)
 	if !hasONNX {
 		t.Error("expected hasONNX=true when onnx/ directory exists")
@@ -25,7 +27,9 @@ func TestDetectFormat_ONNX(t *testing.T) {
 
 func TestDetectFormat_CoreML(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, "model.mlpackage"), 0755)
+	if err := os.MkdirAll(filepath.Join(dir, "model.mlpackage"), 0755); err != nil {
+		t.Fatal(err)
+	}
 	_, hasCoreML, _ := DetectFormat(dir)
 	if !hasCoreML {
 		t.Error("expected hasCoreML=true when .mlpackage exists")
@@ -34,7 +38,9 @@ func TestDetectFormat_CoreML(t *testing.T) {
 
 func TestDetectFormat_SafeTensors(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "model.safetensors"), []byte("fake"), 0644)
+	if err := os.WriteFile(filepath.Join(dir, "model.safetensors"), []byte("fake"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	_, _, hasSafe := DetectFormat(dir)
 	if !hasSafe {
 		t.Error("expected hasSafeTensors=true when .safetensors exists")

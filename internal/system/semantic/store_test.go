@@ -16,7 +16,7 @@ func TestStoreImmutableVersionsActivationAndRollback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	ctx := context.Background()
 	if err := store.Put(ctx, p, root); err != nil {
 		t.Fatal(err)
@@ -71,7 +71,7 @@ func TestStoreReadsV1ThroughV4AndRollsBackWithoutRewriting(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	ctx := context.Background()
 	original := map[string][]byte{}
 	for version := 1; version <= 4; version++ {
@@ -188,7 +188,7 @@ func TestStoreIndexesTermsAndMigratesV2WithoutRewritingProjection(t *testing.T) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	assertTerms()
 	var after []byte
 	if err := store.db.QueryRow(`SELECT document FROM semantic_projections WHERE project_id=? AND dataset_id=?`,
@@ -229,7 +229,7 @@ func TestTermMigrationRejectsCorruptLegacyDocumentAtomically(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	var version int
 	if err := db.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 2 {
 		t.Fatalf("failed migration changed schema version to %d: %v", version, err)
@@ -262,7 +262,7 @@ func TestStoreDetectsDocumentCorruptionAndFutureSchema(t *testing.T) {
 	if _, err := db.Exec("PRAGMA user_version=4"); err != nil {
 		t.Fatal(err)
 	}
-	db.Close()
+	_ = db.Close()
 	if _, err := OpenStore(path); err == nil || !strings.Contains(err.Error(), "newer") {
 		t.Fatalf("future semantic schema accepted: %v", err)
 	}
@@ -289,7 +289,7 @@ func TestStoreMigratesV1WithoutRewritingHistoricalProjection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	var version int
 	if err := store.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != StoreSchemaVersion {
 		t.Fatalf("migrated version %d: %v", version, err)
@@ -313,7 +313,7 @@ func TestStoreReadsV2ProjectionWithoutRewritingItsDocument(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	if err := store.Put(context.Background(), p, root); err != nil {
 		t.Fatal(err)
 	}

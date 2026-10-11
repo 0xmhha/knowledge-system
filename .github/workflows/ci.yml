@@ -15,7 +15,7 @@ jobs:
           go-version-file: go.mod
       - name: Build
         run: make build
-      - name: Lint (gofmt drift, vet, engine boundaries)
+      - name: Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)
         run: make lint
       - name: Test (race)
         run: make test-race

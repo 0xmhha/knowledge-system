@@ -68,7 +68,7 @@ func openReaderLock(dataset, version string, create bool) (*os.File, error) {
 	f := os.NewFile(uintptr(fd), path)
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil || stat.Mode&unix.S_IFMT != unix.S_IFREG || stat.Nlink != 1 {
-		f.Close()
+		_ = f.Close()
 		return nil, fmt.Errorf("invalid reader lease inode")
 	}
 	return f, nil
@@ -117,7 +117,7 @@ func PinVersionReader(versionDir string) (*ReaderLease, error) {
 		}
 		return nil, err
 	}
-	defer unix.Close(fd)
+	defer func() { _ = unix.Close(fd) }()
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil || stat.Mode&unix.S_IFMT != unix.S_IFREG || stat.Nlink != 1 {
 		return nil, fmt.Errorf("invalid reader admission lock")
@@ -125,7 +125,8 @@ func PinVersionReader(versionDir string) (*ReaderLease, error) {
 	if err := unix.Flock(fd, unix.LOCK_SH|unix.LOCK_NB); err != nil {
 		return nil, fmt.Errorf("reader admission conflicts with dataset mutation")
 	}
-	defer unix.Flock(fd, unix.LOCK_UN)
+	// Unlock is best-effort: closing fd (deferred above) releases the lock anyway.
+	defer func() { _ = unix.Flock(fd, unix.LOCK_UN) }()
 	if info, err := os.Lstat(versionDir); err != nil || !info.IsDir() {
 		return nil, fmt.Errorf("reader candidate disappeared or changed")
 	}
@@ -140,7 +141,7 @@ func PinVersionReader(versionDir string) (*ReaderLease, error) {
 		return nil, err
 	}
 	if err := unix.Flock(int(f.Fd()), unix.LOCK_SH|unix.LOCK_NB); err != nil {
-		f.Close()
+		_ = f.Close()
 		return nil, fmt.Errorf("reader candidate is being collected")
 	}
 	return &ReaderLease{file: f}, nil
@@ -363,7 +364,8 @@ func planGCLocked(ctx context.Context, dataset string, policy GCPolicy, at time.
 			if err := unix.Flock(int(f.Fd()), unix.LOCK_EX|unix.LOCK_NB); err != nil {
 				item.Reasons = append(item.Reasons, "pinned_reader")
 			} else {
-				unix.Flock(int(f.Fd()), unix.LOCK_UN)
+				// Best-effort: the f.Close below releases the probe lock anyway.
+				_ = unix.Flock(int(f.Fd()), unix.LOCK_UN)
 			}
 			if err := f.Close(); err != nil {
 				return plan, err

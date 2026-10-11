@@ -48,7 +48,7 @@ func TestLive_Flow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewReal(%q): %v", dataPath, err)
 	}
-	defer real.Close()
+	defer func() { _ = real.Close() }()
 
 	// 1. GetFlow — expect a non-empty step sequence for the known flow.
 	flowID := envOr("CKS_FLOW_LIVE_FLOW", "ep-cli-init")

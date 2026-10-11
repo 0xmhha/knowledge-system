@@ -242,7 +242,8 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open store: %w", err)
 	}
-	defer store.Close()
+	// Writes are committed per transaction; a close failure cannot undo them.
+	defer func() { _ = store.Close() }()
 
 	parsers := newParsers()
 	chunker := newChunker(o.Embedder, cfg)
@@ -312,7 +313,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 					fp.Emit("reindex.canonical_realigned",
 						"recorded_digest", recorded, "current_digest", current, "chunks_realigned", n)
 					if o.ProgressOut != nil {
-						fmt.Fprintf(o.ProgressOut, "ckv: ckg graph regenerated (digest %s→%s); re-aligned %d chunks\n",
+						_, _ = fmt.Fprintf(o.ProgressOut, "ckv: ckg graph regenerated (digest %s→%s); re-aligned %d chunks\n",
 							recorded, current, n)
 					}
 				}
@@ -457,7 +458,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 			}
 			result.PRsIndexed = n
 			if o.ProgressOut != nil {
-				fmt.Fprintf(o.ProgressOut, "ckv: incremental PR ingest: %d new PR chunks (cutoff #%d)\n",
+				_, _ = fmt.Fprintf(o.ProgressOut, "ckv: incremental PR ingest: %d new PR chunks (cutoff #%d)\n",
 					n, cutoff.LastPRNumber)
 			}
 		}
@@ -489,7 +490,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 				man.Sources.Flow.ContentHash = current
 				result.FlowReindexed = len(flowChunks)
 				if o.ProgressOut != nil {
-					fmt.Fprintf(o.ProgressOut, "ckv: flow corpus changed → re-indexed %d flow chunks\n", len(flowChunks))
+					_, _ = fmt.Fprintf(o.ProgressOut, "ckv: flow corpus changed → re-indexed %d flow chunks\n", len(flowChunks))
 				}
 			}
 		}
@@ -515,7 +516,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 			man.Sources.Docs.ContentHash = current
 			result.DocsReindexed = n
 			if o.ProgressOut != nil {
-				fmt.Fprintf(o.ProgressOut, "ckv: docs corpus changed → re-indexed %d doc chunks\n", n)
+				_, _ = fmt.Fprintf(o.ProgressOut, "ckv: docs corpus changed → re-indexed %d doc chunks\n", n)
 			}
 		}
 	}
@@ -620,7 +621,7 @@ func alignFlowStepsFromStore(ctx context.Context, store *sqlitevec.Store, flowCh
 	}
 	resolved, total := flowcorpus.AlignSteps(flowChunks, codeIx)
 	if total > 0 && progress != nil {
-		fmt.Fprintf(progress, "ckv: flow steps aligned to code: %d/%d\n", resolved, total)
+		_, _ = fmt.Fprintf(progress, "ckv: flow steps aligned to code: %d/%d\n", resolved, total)
 	}
 }
 

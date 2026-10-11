@@ -65,7 +65,7 @@ func TestStoredSharedAliasPreservesBaselineAndRetainedEvidence(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			graphDir, vectorDir := filepath.Join(version, "graph"), filepath.Join(version, "vector")
 			if err := store.PutAlignedRetained(ctx, projection, root, graphDir, vectorDir, version); err != nil {
 				t.Fatal(err)
@@ -82,7 +82,7 @@ func TestStoredSharedAliasPreservesBaselineAndRetainedEvidence(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			for _, term := range []struct{ lang, value string }{{"en", "SHARED"}, {"ko", "공유어"}} {
 				lookup, err := store.LookupTerm(ctx, snapshot.ProjectID, snapshot.DatasetID, term.lang, term.value)
 				if err != nil || len(lookup) != conceptCount {

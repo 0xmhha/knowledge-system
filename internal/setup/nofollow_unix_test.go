@@ -20,7 +20,7 @@ func TestCapturedOpenRefusesLinkedDirectoryAndFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	file.Close()
+	_ = file.Close()
 	for link, target := range map[string]struct{ target, requested string }{
 		"linked-dir":  {"real", "linked-dir/code.go"},
 		"linked-file": {"real/code.go", "linked-file"},
@@ -29,7 +29,7 @@ func TestCapturedOpenRefusesLinkedDirectoryAndFile(t *testing.T) {
 			t.Fatal(err)
 		}
 		if file, err := openCapturedNoFollow(root, target.requested); err == nil {
-			file.Close()
+			_ = file.Close()
 			t.Fatalf("linked path %q was opened", target.requested)
 		}
 	}

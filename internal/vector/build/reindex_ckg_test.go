@@ -30,7 +30,7 @@ func writeCKGWithNode(t *testing.T) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`
 CREATE TABLE nodes (id TEXT PRIMARY KEY, qualified_name TEXT NOT NULL,
   file_path TEXT NOT NULL, start_line INTEGER NOT NULL, end_line INTEGER NOT NULL, canonical_id TEXT);
@@ -51,7 +51,7 @@ func serverChunkAlignment(t *testing.T, outDir string) (total, aligned int) {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	chunks, err := st.LookupByFileOrdered(context.Background(), "server.go")
 	if err != nil {
 		t.Fatalf("lookup server.go: %v", err)
@@ -122,7 +122,7 @@ func writeCKGGraph(t *testing.T, dir, digest, canonical, schema string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`
 DROP TABLE IF EXISTS nodes;
 DROP TABLE IF EXISTS manifest;
@@ -144,7 +144,7 @@ func serverCanonical(t *testing.T, outDir string) string {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	chunks, err := st.LookupByFileOrdered(context.Background(), "server.go")
 	if err != nil {
 		t.Fatalf("lookup server.go: %v", err)
@@ -239,7 +239,7 @@ func TestReindex_ReconcilesChunkCount(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	stats, err := st.Stats(context.Background())
 	if err != nil {
 		t.Fatalf("stats: %v", err)
@@ -367,7 +367,7 @@ func TestIngestPRs_DedupsAndIndexes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 
 	metas := []prdoc.PRMeta{
 		{Repo: "o/r", PRNumber: 5, Title: "old pr", Body: "## Background\nold background\n",
@@ -414,7 +414,7 @@ func flowHasMarker(t *testing.T, outDir, marker string) bool {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	chunks, err := st.FlowChunks(context.Background())
 	if err != nil {
 		t.Fatalf("flow chunks: %v", err)
@@ -434,7 +434,7 @@ func flowStepAlignment(t *testing.T, outDir, stepID string) string {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	chunks, err := st.FlowChunks(context.Background())
 	if err != nil {
 		t.Fatalf("flow chunks: %v", err)
@@ -499,7 +499,7 @@ func docsHasMarker(t *testing.T, outDir, marker string) bool {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 	chunks, err := st.DocsChunks(context.Background())
 	if err != nil {
 		t.Fatalf("docs chunks: %v", err)
@@ -599,10 +599,10 @@ func TestReindex_ReindexesFlowOnContentChange(t *testing.T) {
 		t.Fatalf("open corpus for append: %v", err)
 	}
 	if _, err := f.WriteString("\n" + rec + "\n"); err != nil {
-		f.Close()
+		_ = f.Close()
 		t.Fatalf("append corpus: %v", err)
 	}
-	f.Close()
+	_ = f.Close()
 
 	if _, err := Reindex(context.Background(), ReindexOptions{
 		SrcRoot:  src,

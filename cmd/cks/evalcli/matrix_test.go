@@ -79,7 +79,7 @@ func matrixReadRows(t *testing.T, out string) (matrixReport, []matrixRow) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	var rows []matrixRow
 	s := bufio.NewScanner(f)
 	for s.Scan() {

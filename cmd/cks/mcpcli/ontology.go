@@ -61,7 +61,7 @@ func (p *retainedOntologyProvider) Resolve(ctx context.Context) (stage2.Ontology
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", stage2.ErrOntologyStale, err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }() // read-only store; nothing to flush
 	active, err := store.LoadAlignedRetained(ctx, p.expected.Source.ProjectID, p.expected.DatasetID,
 		p.sourceRoot, filepath.Join(p.versionDir, "graph"), filepath.Join(p.versionDir, "vector"), p.versionDir)
 	if err != nil {

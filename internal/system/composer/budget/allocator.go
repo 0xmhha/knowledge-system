@@ -306,7 +306,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 			// not to budget or fetch. Knowledge-kind candidates are
 			// exempt while their reserve is unfilled — domain rules must
 			// not lose their slot to yet another code body.
-			if !(isKnowledge && knowledgeSelected < a.config.KnowledgeReserve) && !exactUnrescued {
+			if (!isKnowledge || knowledgeSelected >= a.config.KnowledgeReserve) && !exactUnrescued {
 				continue
 			}
 		}

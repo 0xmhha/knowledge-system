@@ -29,7 +29,7 @@ func newIdentityCmd() *cobra.Command {
 				}{emb.Name(), emb.Dimension(), id.Checksum()}
 			}
 			if id.Provider == "ollama" && id.ModelDigest == "" {
-				return fmt.Errorf("Ollama model digest missing")
+				return fmt.Errorf("ollama model digest missing")
 			}
 			return json.NewEncoder(cmd.OutOrStdout()).Encode(map[string]any{"embedding_identity": value})
 		},

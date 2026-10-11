@@ -1,6 +1,7 @@
 package prregress
 
 import (
+	"context"
 	"math"
 	"testing"
 )
@@ -104,7 +105,7 @@ func TestScore_PopulatesMultiStageWhenGroundTruthPresent(t *testing.T) {
 		Files:          []ChangedFile{{Path: "gas_policy.go"}},
 		CommitMessages: []string{"fix: refresh AnzeonTipEnv on header GasTip change"},
 	}
-	got, err := scorer.Score(nil, entry, meta, plan, "diff body")
+	got, err := scorer.Score(context.Background(), entry, meta, plan, "diff body")
 	if err != nil {
 		t.Fatalf("Score: %v", err)
 	}
@@ -140,7 +141,7 @@ func TestScore_PopulatesMultiStageWhenGroundTruthPresent(t *testing.T) {
 func TestScore_MultiStageSilentOnLegacyEntries(t *testing.T) {
 	scorer := DeterministicScorer{}
 	plan := Plan{Markdown: "some plan", ExpectedFiles: []string{"a.go"}}
-	got, err := scorer.Score(nil, Entry{}, Meta{Files: []ChangedFile{{Path: "a.go"}}}, plan, "diff")
+	got, err := scorer.Score(context.Background(), Entry{}, Meta{Files: []ChangedFile{{Path: "a.go"}}}, plan, "diff")
 	if err != nil {
 		t.Fatalf("Score: %v", err)
 	}
@@ -169,7 +170,7 @@ func TestScore_DeterministicFileSet(t *testing.T) {
 		},
 		Background: "test",
 	}
-	got, err := scorer.Score(nil, Entry{}, meta, plan, "diff body")
+	got, err := scorer.Score(context.Background(), Entry{}, meta, plan, "diff body")
 	if err != nil {
 		t.Fatalf("Score returned error: %v", err)
 	}

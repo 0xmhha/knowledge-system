@@ -61,7 +61,7 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	baseGraph, baseVector := filepath.Join(baseVersion, "graph"), filepath.Join(baseVersion, "vector")
 	candidateGraph, candidateVector := filepath.Join(candidateVersion, "graph"), filepath.Join(candidateVersion, "vector")
 	if err := store.PutAlignedRetained(ctx, base, source, baseGraph, baseVector, baseVersion); err != nil {
@@ -187,7 +187,7 @@ func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer ro.Close()
+	defer func() { _ = ro.Close() }()
 	current, err := ro.Current(ctx, base.Snapshot.ProjectID)
 	if err != nil || !reflect.DeepEqual(current, base) {
 		t.Fatalf("reopen lost previous active projection: %+v %v", current, err)
@@ -245,7 +245,7 @@ func anchorPromotionVersion(t *testing.T, ctx context.Context, ckg, source, vers
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 	nodes, err := reader.AllNodes()
 	if err != nil {
 		t.Fatal(err)

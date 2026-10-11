@@ -121,18 +121,18 @@ func Open(path string, dim int) (*Store, error) {
 		"PRAGMA foreign_keys = ON",
 	} {
 		if _, err := db.Exec(pragma); err != nil {
-			db.Close()
+			_ = db.Close()
 			return nil, fmt.Errorf("pragma %q: %w", pragma, err)
 		}
 	}
 
 	s := &Store{db: db, dim: dim}
 	if err := s.initSchema(dim); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	if err := s.runPendingMigrations(path); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	return s, nil
@@ -277,7 +277,7 @@ func (s *Store) ensureColumn(table, column, alterDDL string) error {
 	if err != nil {
 		return fmt.Errorf("pragma table_info(%s): %w", table, err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		var (
 			cid     int
@@ -293,6 +293,9 @@ func (s *Store) ensureColumn(table, column, alterDDL string) error {
 		if name == column {
 			return nil // column already present
 		}
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("read table_info(%s): %w", table, err)
 	}
 	if _, err := s.db.Exec(alterDDL); err != nil {
 		return fmt.Errorf("alter %s: %w", table, err)
@@ -324,14 +327,14 @@ func (s *Store) setManifestKVs(ctx context.Context, kv map[string]string) error 
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	stmt, err := tx.PrepareContext(ctx, `INSERT INTO manifest (key, value) VALUES (?, ?)
 		ON CONFLICT(key) DO UPDATE SET value = excluded.value`)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 	for k, v := range kv {
 		if _, err := stmt.ExecContext(ctx, k, v); err != nil {
 			return fmt.Errorf("write manifest[%s]: %w", k, err)
@@ -361,7 +364,7 @@ func (s *Store) Upsert(ctx context.Context, chunks []types.Chunk, embeddings [][
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	insChunk, err := tx.PrepareContext(ctx, `INSERT INTO chunks (
 		id, file, start_line, end_line, language, is_test,
@@ -400,19 +403,19 @@ func (s *Store) Upsert(ctx context.Context, chunks []types.Chunk, embeddings [][
 	if err != nil {
 		return fmt.Errorf("prepare chunk insert: %w", err)
 	}
-	defer insChunk.Close()
+	defer func() { _ = insChunk.Close() }()
 
 	// vec0 does not support ON CONFLICT, so we DELETE+INSERT per chunk.
 	delVec, err := tx.PrepareContext(ctx, `DELETE FROM chunk_vec WHERE chunk_id = ?`)
 	if err != nil {
 		return fmt.Errorf("prepare vec delete: %w", err)
 	}
-	defer delVec.Close()
+	defer func() { _ = delVec.Close() }()
 	insVec, err := tx.PrepareContext(ctx, `INSERT INTO chunk_vec (chunk_id, embedding) VALUES (?, ?)`)
 	if err != nil {
 		return fmt.Errorf("prepare vec insert: %w", err)
 	}
-	defer insVec.Close()
+	defer func() { _ = insVec.Close() }()
 
 	for i, c := range chunks {
 		if got := len(embeddings[i]); got != s.dim {
@@ -462,7 +465,7 @@ func (s *Store) DeleteByFile(ctx context.Context, path string) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	rows, err := tx.QueryContext(ctx, `SELECT id FROM chunks WHERE file = ?`, path)
 	if err != nil {
@@ -472,12 +475,18 @@ func (s *Store) DeleteByFile(ctx context.Context, path string) error {
 	for rows.Next() {
 		var id string
 		if err := rows.Scan(&id); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return err
 		}
 		ids = append(ids, id)
 	}
-	rows.Close()
+	// A failed iteration must not delete a partial set: the remaining
+	// chunk_vec rows would be orphaned.
+	iterErr := rows.Err()
+	_ = rows.Close()
+	if iterErr != nil {
+		return iterErr
+	}
 
 	for _, id := range ids {
 		if _, err := tx.ExecContext(ctx, `DELETE FROM chunk_vec WHERE chunk_id = ?`, id); err != nil {
@@ -500,7 +509,7 @@ func (s *Store) DeleteFlowChunks(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	rows, err := tx.QueryContext(ctx, `SELECT id FROM chunks WHERE `+cond)
 	if err != nil {
@@ -510,12 +519,18 @@ func (s *Store) DeleteFlowChunks(ctx context.Context) (int, error) {
 	for rows.Next() {
 		var id string
 		if err := rows.Scan(&id); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return 0, err
 		}
 		ids = append(ids, id)
 	}
-	rows.Close()
+	// A failed iteration must not delete a partial set: the remaining
+	// chunk_vec rows would be orphaned.
+	iterErr := rows.Err()
+	_ = rows.Close()
+	if iterErr != nil {
+		return 0, iterErr
+	}
 
 	for _, id := range ids {
 		if _, err := tx.ExecContext(ctx, `DELETE FROM chunk_vec WHERE chunk_id = ?`, id); err != nil {
@@ -543,7 +558,7 @@ func (s *Store) DeleteDocsChunks(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	rows, err := tx.QueryContext(ctx, `SELECT id FROM chunks WHERE `+docsLayerCond)
 	if err != nil {
@@ -553,12 +568,18 @@ func (s *Store) DeleteDocsChunks(ctx context.Context) (int, error) {
 	for rows.Next() {
 		var id string
 		if err := rows.Scan(&id); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return 0, err
 		}
 		ids = append(ids, id)
 	}
-	rows.Close()
+	// A failed iteration must not delete a partial set: the remaining
+	// chunk_vec rows would be orphaned.
+	iterErr := rows.Err()
+	_ = rows.Close()
+	if iterErr != nil {
+		return 0, iterErr
+	}
 
 	for _, id := range ids {
 		if _, err := tx.ExecContext(ctx, `DELETE FROM chunk_vec WHERE chunk_id = ?`, id); err != nil {
@@ -580,7 +601,7 @@ func (s *Store) DocsChunks(ctx context.Context) ([]types.Chunk, error) {
 	if err != nil {
 		return nil, fmt.Errorf("docs_chunks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []types.Chunk
 	for rows.Next() {
 		c, scanErr := scanChunk(rows)
@@ -695,7 +716,7 @@ func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filt
 		}
 		return SearchResult{}, fmt.Errorf("vec0 search: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	out := make([]types.Hit, 0, k)
 	rank := 0
@@ -900,7 +921,7 @@ func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter 
 	for rows.Next() {
 		c, err := scanChunk(rows)
 		if err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return nil, err
 		}
 		if !filter.Matches(c) {
@@ -908,7 +929,7 @@ func (s *Store) searchExact(ctx context.Context, query []float32, k int, filter 
 		}
 		chunks = append(chunks, c)
 	}
-	rows.Close()
+	_ = rows.Close()
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -1079,12 +1100,16 @@ func (s *Store) LookupByIDs(ctx context.Context, ids []string) ([]types.Chunk, e
 		for rows.Next() {
 			c, scanErr := scanChunk(rows)
 			if scanErr != nil {
-				rows.Close()
+				_ = rows.Close()
 				return nil, scanErr
 			}
 			out = append(out, c)
 		}
-		rows.Close()
+		iterErr := rows.Err()
+		_ = rows.Close()
+		if iterErr != nil {
+			return nil, fmt.Errorf("lookup_by_ids: %w", iterErr)
+		}
 	}
 	return out, nil
 }
@@ -1113,7 +1138,7 @@ func (s *Store) FindInvariants(ctx context.Context, file, category string) ([]ty
 	if err != nil {
 		return nil, fmt.Errorf("find_invariants: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var out []types.Chunk
 	for rows.Next() {
@@ -1136,7 +1161,7 @@ func (s *Store) FlowChunks(ctx context.Context) ([]types.Chunk, error) {
 	if err != nil {
 		return nil, fmt.Errorf("flow_chunks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []types.Chunk
 	for rows.Next() {
 		c, scanErr := scanChunk(rows)
@@ -1157,7 +1182,7 @@ func (s *Store) CuratedInvariant(ctx context.Context, id string) (*types.Chunk, 
 	if err != nil {
 		return nil, fmt.Errorf("curated_invariant: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	if !rows.Next() {
 		return nil, rows.Err()
 	}
@@ -1184,7 +1209,7 @@ func (s *Store) FindConventions(ctx context.Context, packagePrefix string) ([]ty
 	if err != nil {
 		return nil, fmt.Errorf("find_conventions: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var out []types.Chunk
 	for rows.Next() {
@@ -1205,7 +1230,7 @@ func (s *Store) AllFiles(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("all_files: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []string
 	for rows.Next() {
 		var f string
@@ -1225,7 +1250,7 @@ func (s *Store) LookupByFileOrdered(ctx context.Context, file string) ([]types.C
 	if err != nil {
 		return nil, fmt.Errorf("lookup_by_file: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var out []types.Chunk
 	for rows.Next() {
@@ -1273,7 +1298,7 @@ func (s *Store) Stats(ctx context.Context) (types.Stats, error) {
 	if err != nil {
 		return st, fmt.Errorf("read manifest table: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		var k, v string
 		if err := rows.Scan(&k, &v); err != nil {
@@ -1283,7 +1308,8 @@ func (s *Store) Stats(ctx context.Context) (types.Stats, error) {
 		case "embedding_model":
 			st.EmbeddingModel = v
 		case "embedding_dim":
-			fmt.Sscanf(v, "%d", &st.EmbeddingDim)
+			// A malformed value leaves EmbeddingDim at 0, which callers treat as unknown.
+			_, _ = fmt.Sscanf(v, "%d", &st.EmbeddingDim)
 		case "indexed_head":
 			st.IndexedHead = v
 		case "built_at":
@@ -1385,13 +1411,13 @@ func (s *Store) UpdateRecentPRs(ctx context.Context, filePRs map[string][]types.
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE chunks SET recent_prs = ? WHERE file = ? AND (recent_prs IS NULL OR recent_prs = '')`)
 	if err != nil {
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	tagged := 0
 	for file, refs := range filePRs {
@@ -1414,7 +1440,7 @@ func (s *Store) LookupPRsByFile(ctx context.Context, file string) ([]types.PRRef
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	seen := map[int]bool{}
 	var out []types.PRRef
@@ -1447,13 +1473,13 @@ func (s *Store) RealignCanonical(ctx context.Context, updates map[string]string)
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE chunks SET canonical_id = ? WHERE id = ?`)
 	if err != nil {
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	n := 0
 	for id, canon := range updates {

@@ -24,7 +24,7 @@ func TestServeHTTP_AcceptsRequests(t *testing.T) {
 		t.Fatalf("listen: %v", err)
 	}
 	addr := ln.Addr().String()
-	ln.Close()
+	_ = ln.Close()
 
 	// Run ServeHTTP in background
 	done := make(chan error, 1)
@@ -64,7 +64,7 @@ func TestServeHTTP_AcceptsRequests(t *testing.T) {
 	if err != nil {
 		t.Fatalf("POST: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 500 {
 		t.Errorf("server error: %d", resp.StatusCode)
@@ -76,7 +76,7 @@ func waitForPort(addr string, timeout time.Duration) bool {
 	for time.Now().Before(deadline) {
 		conn, err := net.DialTimeout("tcp", addr, 100*time.Millisecond)
 		if err == nil {
-			conn.Close()
+			_ = conn.Close()
 			return true
 		}
 		time.Sleep(20 * time.Millisecond)

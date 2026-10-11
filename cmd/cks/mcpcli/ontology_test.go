@@ -50,7 +50,9 @@ func TestOntologyProviderDoesNotBorrowOtherDatasetOrCurrentPointer(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	s.Close()
+	if err := s.Close(); err != nil {
+		t.Fatal(err)
+	}
 	p := &retainedOntologyProvider{storePath: path, expected: &setup.DatasetIdentity{Source: setup.SourceIdentity{ProjectID: "required-project"}, DatasetID: "required-dataset"}}
 	if _, err := p.Resolve(context.Background()); !errors.Is(err, stage2.ErrOntologyUnavailable) {
 		t.Fatalf("missing pinned tuple not unavailable: %v", err)

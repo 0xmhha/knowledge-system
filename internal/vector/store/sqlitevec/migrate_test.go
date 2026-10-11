@@ -22,7 +22,7 @@ func openTestDB(t *testing.T) (*sql.DB, string) {
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}
-	t.Cleanup(func() { db.Close() })
+	t.Cleanup(func() { _ = db.Close() })
 	return db, dbPath
 }
 
@@ -317,7 +317,7 @@ func TestOpen_AutoMigrate_AppliesAllPending(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 
 	runner := NewMigrationRunner(s.db, dbPath, WithBackup(false))
 	status, err := runner.Status(context.Background())

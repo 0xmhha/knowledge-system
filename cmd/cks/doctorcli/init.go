@@ -110,12 +110,12 @@ func InitWithProjectID(src, dataset, configPath, embedder, model, projectID stri
 		return InitResult{}, fmt.Errorf("init: create config without replacing existing file: %w", err)
 	}
 	if _, err := file.Write(buf); err != nil {
-		file.Close()
-		os.Remove(configPath)
+		_ = file.Close()
+		_ = os.Remove(configPath) // best-effort cleanup; the write error is returned
 		return InitResult{}, err
 	}
 	if err := file.Close(); err != nil {
-		os.Remove(configPath)
+		_ = os.Remove(configPath) // best-effort cleanup; the close error is returned
 		return InitResult{}, err
 	}
 	return InitResult{ProjectID: projectID, SourceMode: report.SourceMode, ConfigPath: configPath, SourceRoot: report.SourceRoot, Dataset: dataset, Embedder: embedder}, nil

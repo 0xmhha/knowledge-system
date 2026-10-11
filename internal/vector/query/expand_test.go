@@ -55,7 +55,7 @@ func TestExpandQuery_DeterministicOrdering(t *testing.T) {
 	posB := strings.Index(first, "b_kw")
 	posM := strings.Index(first, "m_kw")
 	posZ := strings.Index(first, "z_kw")
-	if !(posA < posB && posB < posM && posM < posZ) {
+	if posA >= posB || posB >= posM || posM >= posZ {
 		t.Errorf("keywords not sorted: %q", first)
 	}
 }

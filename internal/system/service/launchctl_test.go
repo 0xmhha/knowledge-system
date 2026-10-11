@@ -147,8 +147,8 @@ func (q *queuedRunner) verbCount(verb string) int {
 
 const notLoadedOutput = `Could not find service "com.example.svc" in domain`
 
-// bootstrapRace is what launchd answers while it is still tearing a job down.
-var bootstrapRace = errors.New("exit status 5")
+// errBootstrapRace is what launchd answers while it is still tearing a job down.
+var errBootstrapRace = errors.New("exit status 5")
 
 func TestReplaceWaitsOutTheTeardownRace(t *testing.T) {
 	// print says "still loaded" twice, then "gone"; the first bootstrap hits
@@ -163,7 +163,7 @@ func TestReplaceWaitsOutTheTeardownRace(t *testing.T) {
 			{out: notLoadedOutput, err: errors.New("exit status 113")},
 		},
 		"bootstrap": {
-			{out: "Bootstrap failed: 5: Input/output error", err: bootstrapRace},
+			{out: "Bootstrap failed: 5: Input/output error", err: errBootstrapRace},
 			{out: ""},
 		},
 	}}
@@ -186,7 +186,7 @@ func TestReplaceFailsLoudlyWhenTheLoadNeverTakes(t *testing.T) {
 		err error
 	}{
 		"print":     {{out: notLoadedOutput, err: errors.New("exit status 113")}},
-		"bootstrap": {{out: "Bootstrap failed: 5: Input/output error", err: bootstrapRace}},
+		"bootstrap": {{out: "Bootstrap failed: 5: Input/output error", err: errBootstrapRace}},
 	}}
 	c := Controller{Runner: r, UID: 501, Sleep: func(time.Duration) {}}
 

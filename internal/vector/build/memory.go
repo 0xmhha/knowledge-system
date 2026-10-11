@@ -107,7 +107,7 @@ func PreCheckByEstimate(rawNeedMB uint64, w io.Writer) error {
 	stat, err := defaultMemProvider.Read()
 	if err != nil {
 		if w != nil {
-			fmt.Fprintf(w, "ckv: mem guard: read failed (%v), skipping pre-check\n", err)
+			_, _ = fmt.Fprintf(w, "ckv: mem guard: read failed (%v), skipping pre-check\n", err)
 		}
 		return nil
 	}
@@ -119,7 +119,7 @@ func PreCheckByEstimate(rawNeedMB uint64, w io.Writer) error {
 		)
 	}
 	if w != nil {
-		fmt.Fprintf(w, "ckv: mem guard: pre-check OK (need ~%d MB, avail %d MB, total %d MB)\n",
+		_, _ = fmt.Fprintf(w, "ckv: mem guard: pre-check OK (need ~%d MB, avail %d MB, total %d MB)\n",
 			needMB, stat.AvailableMB, stat.TotalMB)
 	}
 	return nil
@@ -174,13 +174,13 @@ func startMemWatchdog(ctx context.Context, w io.Writer) *memSignal {
 				}
 				if stat.AvailableMB < low {
 					if !sig.pressure.Swap(true) && w != nil && !loggedOnce {
-						fmt.Fprintf(w, "ckv: mem guard: pressure ON (avail %d MB < %d MB) — shrinking batch\n",
+						_, _ = fmt.Fprintf(w, "ckv: mem guard: pressure ON (avail %d MB < %d MB) — shrinking batch\n",
 							stat.AvailableMB, low)
 						loggedOnce = true
 					}
 				} else {
 					if sig.pressure.Swap(false) && w != nil {
-						fmt.Fprintf(w, "ckv: mem guard: pressure OFF (avail %d MB ≥ %d MB)\n",
+						_, _ = fmt.Fprintf(w, "ckv: mem guard: pressure OFF (avail %d MB ≥ %d MB)\n",
 							stat.AvailableMB, low)
 						loggedOnce = false
 					}

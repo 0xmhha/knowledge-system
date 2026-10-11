@@ -38,8 +38,8 @@
 package domaincli
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 	"time"
@@ -179,7 +179,7 @@ var stopWord = map[string]bool{
 
 // ------------- rendering ----------------
 
-func renderHeader(w io.Writer, p *inventory.Project, status, priority string, n int, catalogs ...knowledgepack.WorksheetCatalog) {
+func renderHeader(w *bytes.Buffer, p *inventory.Project, status, priority string, n int, catalogs ...knowledgepack.WorksheetCatalog) {
 	fmt.Fprintf(w, "# Verification Worksheet — `%s`\n\n", p.ID)
 	fmt.Fprintf(w, "> **Generated**: %s by `cks domain worksheet`\n",
 		time.Now().UTC().Format("2006-01-02"))
@@ -222,7 +222,7 @@ func renderHeader(w io.Writer, p *inventory.Project, status, priority string, n 
 	fmt.Fprintln(w)
 }
 
-func renderEntry(w io.Writer, p *inventory.Project, e inventory.Entry, catalogs ...knowledgepack.WorksheetCatalog) {
+func renderEntry(w *bytes.Buffer, p *inventory.Project, e inventory.Entry, catalogs ...knowledgepack.WorksheetCatalog) {
 	fmt.Fprintf(w, "### `%s` · `[%s · %s · %s · risk:%s]`\n\n",
 		e.ID, e.Priority, e.Subsystem, e.KnowledgeType, dashIfEmpty(e.RiskLevel))
 	fmt.Fprintf(w, "**Title**: %s\n", e.Title)
@@ -346,7 +346,7 @@ func renderEntry(w io.Writer, p *inventory.Project, e inventory.Entry, catalogs 
 	fmt.Fprintln(w)
 }
 
-func renderFooter(w io.Writer, p *inventory.Project) {
+func renderFooter(w *bytes.Buffer, p *inventory.Project) {
 	fmt.Fprintln(w, "## Footer — post-session sync (runs once after all APPROVE entries are promoted)")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "```bash")

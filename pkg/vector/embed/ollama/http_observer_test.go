@@ -17,7 +17,7 @@ func TestHTTPObserverCountsRedirectsPreservesSpaceAndSeesCancellation(t *testing
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/tags":
-			json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "fixture:latest", "digest": strings.Repeat("a", 64)}}})
+			_ = json.NewEncoder(w).Encode(map[string]any{"models": []map[string]string{{"name": "fixture:latest", "digest": strings.Repeat("a", 64)}}})
 		case "/api/embed":
 			http.Redirect(w, r, "/redirect/embed", http.StatusTemporaryRedirect)
 		case "/redirect/embed":
@@ -37,7 +37,7 @@ func TestHTTPObserverCountsRedirectsPreservesSpaceAndSeesCancellation(t *testing
 					return
 				}
 			}
-			json.NewEncoder(w).Encode(embedResponse{Model: "fixture:latest", Embeddings: [][]float32{{1}}})
+			_ = json.NewEncoder(w).Encode(embedResponse{Model: "fixture:latest", Embeddings: [][]float32{{1}}})
 		default:
 			http.NotFound(w, r)
 		}

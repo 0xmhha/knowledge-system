@@ -62,14 +62,14 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 	if err != nil {
 		return fmt.Errorf("reconcile vector inputs: %w", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	rows, err := db.Query(`SELECT DISTINCT file FROM chunks
 		WHERE commit_hash = ? AND chunk_kind IN ('symbol','function_split','file_header','doc')`,
 		captured.Identity.SourceCommit)
 	if err != nil {
 		return fmt.Errorf("reconcile vector source files: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		var path string
 		if err := rows.Scan(&path); err != nil {

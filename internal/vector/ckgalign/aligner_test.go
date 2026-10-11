@@ -21,7 +21,7 @@ func makeFixtureDB(t *testing.T) string {
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`
 CREATE TABLE nodes (
   id TEXT PRIMARY KEY,
@@ -182,7 +182,7 @@ func makeValueFixtureDB(t *testing.T) string {
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`
 CREATE TABLE nodes (
   id TEXT PRIMARY KEY,

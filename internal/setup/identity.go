@@ -125,12 +125,8 @@ func sourceSnapshotID(s SourceIdentity) string {
 
 const gitArchivePolicyV1 = "bundle-selected-recovery-refs-v1"
 
-// gitRecoveryDigest hashes the same capped commit selection as CKG's
+// gitRecoveryDigestContext hashes the same capped commit selection as CKG's
 // recovery graph. A zero-commit Git repository still has a nonempty digest.
-func gitRecoveryDigest(root, mode string) (string, error) {
-	return gitRecoveryDigestContext(context.Background(), root, mode)
-}
-
 func gitRecoveryDigestContext(ctx context.Context, root, mode string) (string, error) {
 	if err := ctx.Err(); err != nil {
 		return "", err
@@ -200,7 +196,7 @@ func SnapshotSourceIdentityWithLimits(ctx context.Context, root, projectID, mode
 	if err != nil {
 		return SourceIdentity{}, err
 	}
-	defer opened.Close()
+	defer func() { _ = opened.Close() }()
 	files := make([]sourceFile, 0, len(paths))
 	var totalBytes int64
 	addFile := func(originID, path string, buf []byte) error {
@@ -242,16 +238,16 @@ func SnapshotSourceIdentityWithLimits(ctx context.Context, root, projectID, mode
 		for _, path := range externalPaths {
 			buf, executable, readErr := readCapturedRegularWithModeContext(ctx, external, path, limits.MaxFileBytes, nil)
 			if readErr != nil {
-				external.Close()
+				_ = external.Close()
 				return SourceIdentity{}, readErr
 			}
 			if err := addFile(origin.ID, path, buf); err != nil {
-				external.Close()
+				_ = external.Close()
 				return SourceIdentity{}, err
 			}
 			files[len(files)-1].Executable = executable
 		}
-		external.Close()
+		_ = external.Close()
 	}
 	sort.Slice(files, func(i, j int) bool {
 		if files[i].OriginID == files[j].OriginID {
@@ -269,7 +265,7 @@ func SnapshotSourceIdentityWithLimits(ctx context.Context, root, projectID, mode
 		return SourceIdentity{}, err
 	}
 	if recoveryBefore != recoveryAfter {
-		return SourceIdentity{}, fmt.Errorf("Git recovery input changed during inventory")
+		return SourceIdentity{}, fmt.Errorf("git recovery input changed during inventory")
 	}
 	result := SourceIdentity{ProjectID: projectID, SourceMode: mode, SourceCommit: commit,
 		FileManifestDigest: fileManifestDigestForPolicy(files, fileModePolicyV1), CapturePolicyDigest: capturePolicyDigest(mode),
@@ -410,7 +406,7 @@ func ConfiguredInputDigest(o Options) (string, error) {
 		}
 		info, err := file.Stat()
 		if err != nil || !info.Mode().IsRegular() {
-			file.Close()
+			_ = file.Close()
 			return "", fmt.Errorf("%s binary is not a regular file: %v", bin.role, err)
 		}
 		h := sha256.New()
@@ -510,7 +506,7 @@ func vectorEmbeddingIdentity(vector map[string]json.RawMessage) (json.RawMessage
 	}
 	_ = json.Unmarshal(embedding, &identityFields)
 	if identityFields.Provider == "ollama" && identityFields.ModelDigest == "" {
-		return nil, fmt.Errorf("Ollama model digest missing from vector identity")
+		return nil, fmt.Errorf("ollama model digest missing from vector identity")
 	}
 	return embedding, nil
 }
@@ -525,17 +521,18 @@ func writeJSONAtomic(path string, value any) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmp.Name())
+	// Best-effort cleanup; after a successful rename the temp name no longer exists.
+	defer func() { _ = os.Remove(tmp.Name()) }()
 	if _, err := tmp.Write(data); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return err
 	}
 	if err := tmp.Sync(); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return err
 	}
 	if err := tmp.Chmod(0o644); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return err
 	}
 	if err := tmp.Close(); err != nil {

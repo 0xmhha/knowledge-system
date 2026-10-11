@@ -15,9 +15,10 @@ func linkedRunFixture() (semantic.Projection, semantic.TestRun) {
 	snapshot := semantic.Snapshot{ProjectID: "p", DatasetID: "d", Commit: strings.Repeat("a", 40)}
 	evidence := func(id string, kind semantic.SourceKind, path, canonical string) semantic.EvidenceSpan {
 		extractor := "ckg-ast-v1"
-		if path == "ontology.yaml" {
+		switch path {
+		case "ontology.yaml":
 			extractor = "ontology-yaml-v1"
-		} else if path == "spec.yaml" {
+		case "spec.yaml":
 			extractor = "spec-yaml-v1"
 		}
 		return semantic.EvidenceSpan{ID: id, Snapshot: snapshot, Kind: kind, Path: path,

@@ -143,7 +143,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 	if err != nil {
 		return CapturedSource{}, err
 	}
-	defer opened.Close()
+	defer func() { _ = opened.Close() }()
 	blobDir := filepath.Join(out, "sources", "blobs")
 	if err := os.MkdirAll(blobDir, 0o700); err != nil {
 		return CapturedSource{}, err
@@ -197,15 +197,15 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 		for _, rel := range externalPaths {
 			buf, executable, readErr := readCapturedRegularWithModeContext(ctx, external, rel, o.MaxFileBytes, nil)
 			if readErr != nil {
-				external.Close()
+				_ = external.Close()
 				return CapturedSource{}, readErr
 			}
 			if err := add(origin.ID, rel, buf, executable); err != nil {
-				external.Close()
+				_ = external.Close()
 				return CapturedSource{}, err
 			}
 		}
-		external.Close()
+		_ = external.Close()
 	}
 	sort.Slice(result.Files, func(i, j int) bool {
 		if result.Files[i].OriginID == result.Files[j].OriginID {
@@ -226,7 +226,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 		return CapturedSource{}, err
 	}
 	if recoveryBefore != recoveryAfter {
-		return CapturedSource{}, fmt.Errorf("Git recovery input changed during capture")
+		return CapturedSource{}, fmt.Errorf("git recovery input changed during capture")
 	}
 	files := make([]sourceFile, 0, len(result.Files))
 	for _, f := range result.Files {
@@ -245,7 +245,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 			return CapturedSource{}, err
 		}
 		if identityHashFields("cks.git-recovery.v1", selected...) != recoveryAfter {
-			return CapturedSource{}, fmt.Errorf("Git recovery input changed before archive")
+			return CapturedSource{}, fmt.Errorf("git recovery input changed before archive")
 		}
 		result.GitHistory, err = captureGitHistoryContext(ctx, root, filepath.Join(out, "sources", "history.bundle"),
 			o.SourceCommit, selected, o.MaxHistoryBytes)
@@ -254,7 +254,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 		}
 		finalRecovery, err := gitRecoveryDigestContext(ctx, root, o.SourceMode)
 		if err != nil || finalRecovery != recoveryAfter {
-			return CapturedSource{}, fmt.Errorf("Git recovery input changed while archiving: %v", err)
+			return CapturedSource{}, fmt.Errorf("git recovery input changed while archiving: %v", err)
 		}
 	}
 	result.Identity.SnapshotID = sourceSnapshotID(result.Identity)
@@ -315,7 +315,7 @@ func readCapturedRegularWithModeContext(ctx context.Context, root *os.Root, rel 
 		}
 		openedInfo, statErr := file.Stat()
 		if statErr != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(info, openedInfo) {
-			file.Close()
+			_ = file.Close()
 			return nil, false, fmt.Errorf("source changed while opening %q", rel)
 		}
 		buf, readErr := io.ReadAll(io.LimitReader(contextReader{ctx: ctx, reader: file}, maxBytes+1))
@@ -347,25 +347,14 @@ func ReadSourceFileNoFollow(rootPath, rel string, maxBytes int64) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
-	defer root.Close()
+	defer func() { _ = root.Close() }()
 	return readCapturedRegular(root, rel, maxBytes)
 }
-
-func captureHead(root string) (string, error) { return captureHeadContext(context.Background(), root) }
 
 func captureHeadContext(ctx context.Context, root string) (string, error) {
 	cmd := exec.CommandContext(ctx, "git", "-C", root, "rev-parse", "HEAD")
 	buf, err := cmd.Output()
 	return strings.TrimSpace(string(buf)), err
-}
-
-func captureModePaths(root, mode string) ([]string, error) {
-	return captureModePathsContext(context.Background(), root, mode, 0)
-}
-
-func captureModePathsContext(ctx context.Context, root, mode string, maxFiles int) ([]string, error) {
-	paths, _, err := captureModeEntriesContext(ctx, root, mode, maxFiles)
-	return paths, err
 }
 
 // CapturedGitlink is a committed submodule pointer. Its contents are not part
@@ -608,10 +597,6 @@ func (c CapturedSource) MaterializeBuildTreeContext(ctx context.Context, path st
 	return cleanup, nil
 }
 
-func capturePaths(root string) ([]string, error) {
-	return capturePathsContext(context.Background(), root, 0)
-}
-
 func capturePathsContext(ctx context.Context, root string, maxFiles int) ([]string, error) {
 	var paths []string
 	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
@@ -716,10 +701,6 @@ func prepareCaptureOrigins(inputs []CaptureOrigin, out string) ([]CaptureOrigin,
 	return result, nil
 }
 
-func captureExternalPaths(root string) ([]string, error) {
-	return captureExternalPathsContext(context.Background(), root, 0)
-}
-
 func captureExternalPathsContext(ctx context.Context, root string, maxFiles int) ([]string, error) {
 	var paths []string
 	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
@@ -805,7 +786,7 @@ func (c CapturedSource) VerifyAgainstContext(ctx context.Context, root string) e
 		if err != nil {
 			return err
 		}
-		defer opened.Close()
+		defer func() { _ = opened.Close() }()
 		for i, f := range group {
 			if paths[i] != f.Path {
 				return fmt.Errorf("source file set changed after capture for %q", originID)
@@ -863,7 +844,7 @@ func (c CapturedSource) ReadBlobContext(ctx context.Context, digest string) ([]b
 	if err != nil {
 		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed while opening: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	openedInfo, err := file.Stat()
 	if err != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(info, openedInfo) {
 		return nil, fmt.Errorf("snapshot_mismatch: retained source blob changed while opening")

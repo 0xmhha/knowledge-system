@@ -12,7 +12,7 @@ func TestKeywordFTSQueryWithRealSQLite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`CREATE VIRTUAL TABLE terms USING fts5(text)`); err != nil {
 		t.Fatal(err)
 	}

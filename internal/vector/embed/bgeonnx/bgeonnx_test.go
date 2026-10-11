@@ -56,7 +56,7 @@ func openWithStubs(t *testing.T) *Adapter {
 
 func TestIdentityFromRegistry(t *testing.T) {
 	a := openWithStubs(t)
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 	cfg, err := LookupModel(DefaultModelName)
 	if err != nil {
 		t.Fatal(err)
@@ -80,7 +80,7 @@ func TestOpenRejectsMissingModelFiles(t *testing.T) {
 
 func TestEmbedReturnsErrNotImplementedWithStubs(t *testing.T) {
 	a := openWithStubs(t)
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 	_, err := a.Embed(context.Background(), []string{"hello"})
 	if !errors.Is(err, ErrNotImplemented) {
 		t.Fatalf("expected ErrNotImplemented, got %v", err)
@@ -143,7 +143,7 @@ func TestEmbedOrchestratesTokenizerAndSession(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 
 	vecs, err := a.Embed(context.Background(), []string{"a", "b"})
 	if err != nil {
@@ -162,7 +162,7 @@ func TestEmbedOrchestratesTokenizerAndSession(t *testing.T) {
 
 func TestEmbedEmptyBatchIsCheap(t *testing.T) {
 	a := openWithStubs(t)
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 	vecs, err := a.Embed(context.Background(), nil)
 	if err != nil {
 		t.Errorf("nil batch should be a no-op, got %v", err)
@@ -179,7 +179,7 @@ func TestAdapterProviderReportsStubByDefault(t *testing.T) {
 	// safety net guaranteeing the footprint logs "stub" rather than
 	// silently falling back to an empty string.
 	a := openWithStubs(t)
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 	if got := a.Provider(); got != "stub" {
 		t.Errorf("Provider() = %q, want %q", got, "stub")
 	}
@@ -198,7 +198,7 @@ func TestAdapterProviderPassThroughInjectedSession(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 	if got := a.Provider(); got != "custom" {
 		t.Errorf("Provider() = %q, want %q", got, "custom")
 	}

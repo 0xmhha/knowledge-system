@@ -87,7 +87,7 @@ func runReindex(ctx context.Context, opts *reindexOpts) error {
 	defer cleanup()
 
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	reindexOptions := build.ReindexOptions{
 		SrcRoot:                 opts.src,

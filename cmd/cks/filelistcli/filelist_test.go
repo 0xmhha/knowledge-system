@@ -196,25 +196,33 @@ func TestFailClosed(t *testing.T) {
 	dir := t.TempDir()
 
 	bad := filepath.Join(dir, "bad-root.yaml")
-	os.WriteFile(bad, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/nonexistent]\n"), 0o644)
+	if err := os.WriteFile(bad, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/nonexistent]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, bad, filepath.Join(dir, "o.json"), false, false, false); err == nil {
 		t.Error("unknown build root must fail")
 	}
 
 	badPkg := filepath.Join(dir, "bad-pkg.yaml")
-	os.WriteFile(badPkg, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/app]\nextra_packages: [./no/such/pkg]\n"), 0o644)
+	if err := os.WriteFile(badPkg, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/app]\nextra_packages: [./no/such/pkg]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, badPkg, filepath.Join(dir, "o.json"), false, false, false); err == nil {
 		t.Error("unknown extra package must fail")
 	}
 
 	noCtx := filepath.Join(dir, "no-ctx.yaml")
-	os.WriteFile(noCtx, []byte("build_roots: [./cmd/app]\n"), 0o644)
+	if err := os.WriteFile(noCtx, []byte("build_roots: [./cmd/app]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, noCtx, filepath.Join(dir, "o.json"), false, false, false); err == nil || !strings.Contains(err.Error(), "build_context") {
 		t.Errorf("missing build_context must fail: %v", err)
 	}
 
 	strictGlob := filepath.Join(dir, "strict.yaml")
-	os.WriteFile(strictGlob, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/app]\nextra_globs: [\"nomatch/**/*.xyz\"]\n"), 0o644)
+	if err := os.WriteFile(strictGlob, []byte("build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/app]\nextra_globs: [\"nomatch/**/*.xyz\"]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, strictGlob, filepath.Join(dir, "o.json"), false, false, true); err == nil {
 		t.Error("zero-match glob with -strict must fail")
 	}
@@ -243,19 +251,27 @@ func TestCheck(t *testing.T) {
 	// Mutate the list → drift.
 	var o Output
 	buf, _ := os.ReadFile(out)
-	json.Unmarshal(buf, &o)
+	if err := json.Unmarshal(buf, &o); err != nil {
+		t.Fatal(err)
+	}
 	o.Include = append(o.Include, "zzz/injected.go")
 	mut, _ := json.Marshal(o)
-	os.WriteFile(out, mut, 0o644)
+	if err := os.WriteFile(out, mut, 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, cfg, out, true, false, false); err == nil || !strings.Contains(err.Error(), "drift") {
 		t.Errorf("mutated list must be drift: %v", err)
 	}
 
 	// Cross-context comparison → config error, not drift.
-	json.Unmarshal(buf, &o)
+	if err := json.Unmarshal(buf, &o); err != nil {
+		t.Fatal(err)
+	}
 	o.Provenance.BuildContext.GOOS = "windows"
 	mut, _ = json.Marshal(o)
-	os.WriteFile(out, mut, 0o644)
+	if err := os.WriteFile(out, mut, 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if err := run(repo, cfg, out, true, false, false); err == nil || !strings.Contains(err.Error(), "build_context") {
 		t.Errorf("cross-context check must be a config error: %v", err)
 	}

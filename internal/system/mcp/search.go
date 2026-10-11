@@ -24,7 +24,7 @@ import (
 // seeding uses KeywordFTSQuery for single literal candidates instead of OR.
 func ftsOrQuery(query string) string {
 	toks := strings.FieldsFunc(query, func(r rune) bool {
-		return !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_')
+		return !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_'
 	})
 	quoted := make([]string, 0, len(toks))
 	seen := make(map[string]struct{}, len(toks))

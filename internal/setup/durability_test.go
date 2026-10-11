@@ -75,7 +75,7 @@ func addDurabilityDB(t *testing.T, path string) *sql.DB {
 	if _, err := db.Exec(`PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0; CREATE TABLE payload(value TEXT); INSERT INTO payload VALUES ('durable evidence')`); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { db.Close() })
+	t.Cleanup(func() { _ = db.Close() })
 	return db
 }
 
@@ -298,8 +298,8 @@ func TestPromotionProcessKillRecovery(t *testing.T) {
 				}
 				t.Cleanup(func() {
 					if cmd.ProcessState == nil {
-						cmd.Process.Kill()
-						cmd.Wait()
+						_ = cmd.Process.Kill()
+						_ = cmd.Wait()
 					}
 				})
 				deadline := time.Now().Add(10 * time.Second)
@@ -357,7 +357,7 @@ func TestPromotionFlushesCandidateWALBeforePointer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(`PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0; CREATE TABLE payload(value TEXT); INSERT INTO payload VALUES ('durable evidence')`); err != nil {
 		t.Fatal(err)
@@ -458,12 +458,12 @@ func TestPromotionRejectsBusyCheckpointAndFlushesSemanticStore(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 	tx, err := reader.Begin()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 	var count int
 	if err := tx.QueryRow(`SELECT count(*) FROM payload`).Scan(&count); err != nil {
 		t.Fatal(err)

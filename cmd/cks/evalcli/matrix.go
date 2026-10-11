@@ -412,7 +412,7 @@ func matrixRunWithLedger(ctx context.Context, input, baseConfig, binary, out str
 	if err != nil {
 		return err
 	}
-	defer stream.Close()
+	defer func() { _ = stream.Close() }() // safety net for early returns; the success path closes explicitly
 	encoder := json.NewEncoder(stream)
 	sessions := make([]matrixSession, 8)
 	defer func() {

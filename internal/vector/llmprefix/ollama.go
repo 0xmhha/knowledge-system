@@ -54,7 +54,7 @@ func (g *OllamaGenerator) Generate(ctx context.Context, prompt string) (string, 
 	if err != nil {
 		return "", fmt.Errorf("ollama generate: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
 		return "", fmt.Errorf("ollama generate HTTP %d: %s", resp.StatusCode, string(b))

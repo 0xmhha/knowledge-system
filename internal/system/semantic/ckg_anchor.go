@@ -46,7 +46,7 @@ func ValidateCodeAnchors(p Projection, graphDir string) error {
 	if err != nil {
 		return fmt.Errorf("semantic: open graph for code anchors: %w", err)
 	}
-	defer graph.Close()
+	defer func() { _ = graph.Close() }()
 	manifest, err := graphstore.GetManifest(graph)
 	if err != nil {
 		return fmt.Errorf("semantic: read CKG manifest: %w", err)

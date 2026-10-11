@@ -102,7 +102,7 @@ func runEval(ctx context.Context, opts *evalOpts) error {
 	defer cleanup()
 
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	eng, err := query.Open(opts.out, emb, query.WithFootprint(fp))
 	if err != nil {
@@ -111,7 +111,7 @@ func runEval(ctx context.Context, opts *evalOpts) error {
 		}
 		return err
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }() // read-only query engine
 
 	// The JSON semantic fixture carries its own k (matching the shell
 	// script it replaces); honor it so substring-in-top-k is measured at
@@ -259,13 +259,13 @@ func runRecord(ctx context.Context, opts *evalOpts) error {
 	defer cleanup()
 
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	eng, err := query.Open(opts.out, emb, query.WithFootprint(fp))
 	if err != nil {
 		return err
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }() // read-only query engine
 
 	recOpts := eval.RecordOptions{
 		K:                opts.k,

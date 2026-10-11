@@ -27,7 +27,9 @@ func resourceSource(t *testing.T) string {
 func TestResourceLimitsIdentityCaptureAndExternalOrigins(t *testing.T) {
 	root := resourceSource(t)
 	external := t.TempDir()
-	os.WriteFile(filepath.Join(external, "third.md"), []byte("third\n"), 0600)
+	if err := os.WriteFile(filepath.Join(external, "third.md"), []byte("third\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
 	origin := CaptureOrigin{ID: "knowledge:external", Root: external}
 	for _, tc := range []struct {
 		name    string

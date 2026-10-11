@@ -137,10 +137,10 @@ func (w LinkWatcher) Check(ctx context.Context) (*LinkChange, error) {
 		return nil, err
 	}
 
-	switch {
-	case current == "":
+	switch current {
+	case "":
 		return w.observeDisconnected(st)
-	case current == st.Published:
+	case st.Published:
 		return w.observeSameAddress(st)
 	default:
 		return w.observeMoved(ctx, st, current)

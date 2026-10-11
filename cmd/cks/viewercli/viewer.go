@@ -85,7 +85,7 @@ func runViewer(ctx context.Context, graph, apiURL string, port int, open bool, s
 	}
 
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
-	fmt.Fprintf(stderr, "cks viewer: dashboard on http://%s (api backend %s)\n", addr, base)
+	_, _ = fmt.Fprintf(stderr, "cks viewer: dashboard on http://%s (api backend %s)\n", addr, base)
 	if open {
 		go openBrowser("http://" + addr)
 	}
@@ -118,7 +118,7 @@ func newExportCmd() *cobra.Command {
 			if err := viewer.CopyAssetsTo(out); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "cks viewer export: dashboard assets copied to %s\n", out)
+			_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "cks viewer export: dashboard assets copied to %s\n", out)
 			return nil
 		},
 	}

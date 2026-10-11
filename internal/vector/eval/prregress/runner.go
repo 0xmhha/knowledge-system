@@ -147,7 +147,7 @@ func RunEntry(ctx context.Context, e Entry, opts *RunOptions) Result {
 		r.Error = fmt.Sprintf("query open: %v", err)
 		return r
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	intent := meta.Background
 	if intent == "" {

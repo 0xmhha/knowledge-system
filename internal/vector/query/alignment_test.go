@@ -46,7 +46,7 @@ func setCKGCommit(t *testing.T, ckgDir, commit string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`UPDATE manifest SET value=? WHERE key='src_commit'`, commit); err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func buildAlignedIndex(t *testing.T, ckgDir string) *Engine {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	t.Cleanup(func() { eng.Close() })
+	t.Cleanup(func() { _ = eng.Close() })
 	return eng
 }
 

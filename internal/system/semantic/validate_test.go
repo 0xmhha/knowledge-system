@@ -88,7 +88,7 @@ func TestNonCommittedSemanticEvidenceRequiresArchive(t *testing.T) {
 }
 
 func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
-	p, dir := fixture(t)
+	p, _ := fixture(t)
 	p.Evidence[0].Snapshot.DatasetID = "other"
 	err := p.Validate()
 	if err == nil || !strings.Contains(err.Error(), "crosses") {
@@ -109,7 +109,7 @@ func TestProjectionRejectsCrossSnapshotOrMissingEvidence(t *testing.T) {
 	if err := p.Validate(); err == nil || !strings.Contains(err.Error(), "location") {
 		t.Fatalf("path traversal accepted: %v", err)
 	}
-	p, dir = fixture(t)
+	p, dir := fixture(t)
 	p.Evidence[0].ContentSHA256 = strings.Repeat("0", 64)
 	if err := p.ValidateSources(context.Background(), dir); err == nil || !strings.Contains(err.Error(), "digest mismatch") {
 		t.Fatalf("incorrect source digest accepted or misreported: %v", err)

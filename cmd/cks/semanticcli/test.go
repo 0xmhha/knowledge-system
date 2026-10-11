@@ -27,7 +27,7 @@ func newTestCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // no writes on this path; nothing to flush
 			var active semantic.ActiveProjection
 			if datasetID != "" || versionDir != "" {
 				if datasetID == "" || versionDir == "" {
@@ -58,7 +58,7 @@ func newTestCmd() *cobra.Command {
 				return fmt.Errorf("create test report: %w", err)
 			}
 			if _, err = file.Write(append(data, '\n')); err != nil {
-				file.Close()
+				_ = file.Close()
 				return err
 			}
 			if err = file.Close(); err != nil {

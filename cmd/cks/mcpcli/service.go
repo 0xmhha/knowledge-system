@@ -300,13 +300,13 @@ func runServiceInstall(ctx context.Context, f *serviceFlags, out io.Writer) erro
 		if err := ctl.Replace(ctx, agent.Label, path); err != nil {
 			return err
 		}
-		fmt.Fprintf(out, "loaded %s (%s)\n", agent.Label, path)
+		_, _ = fmt.Fprintf(out, "loaded %s (%s)\n", agent.Label, path)
 	}
 
 	if daemon.WaitReady(addr, installReadyTimeout, 2*time.Second) {
-		fmt.Fprintf(out, "serving at %s\n", addr)
+		_, _ = fmt.Fprintf(out, "serving at %s\n", addr)
 	} else {
-		fmt.Fprintf(out, "WARNING: not serving at %s after %s — see %s\n",
+		_, _ = fmt.Fprintf(out, "WARNING: not serving at %s after %s — see %s\n",
 			addr, installReadyTimeout, filepath.Join(dep.LogDir, dep.Instance+".launchd.log"))
 	}
 	reportPower(ctx, out)
@@ -339,7 +339,7 @@ func preflightPort(ctx context.Context, ctl service.Controller, dep service.Depl
 	if err := syscall.Kill(pid, syscall.SIGTERM); err != nil {
 		return fmt.Errorf("--takeover: stop pid %d: %w", pid, err)
 	}
-	fmt.Fprintf(out, "stopped the unmanaged process on %s (pid %d)\n", addr, pid)
+	_, _ = fmt.Fprintf(out, "stopped the unmanaged process on %s (pid %d)\n", addr, pid)
 	// Give the port time to be released before launchd binds it.
 	for i := 0; i < 20 && daemon.Serviceable(addr); i++ {
 		time.Sleep(250 * time.Millisecond)
@@ -383,7 +383,7 @@ func runServiceUninstall(ctx context.Context, f *serviceFlags, out io.Writer) er
 		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
 			return fmt.Errorf("remove %s: %w", path, err)
 		}
-		fmt.Fprintf(out, "unloaded %s\n", label)
+		_, _ = fmt.Fprintf(out, "unloaded %s\n", label)
 	}
 	return nil
 }
@@ -403,13 +403,13 @@ func runServiceStatus(ctx context.Context, f *serviceFlags, out io.Writer) error
 		if loaded {
 			state = "loaded"
 		}
-		fmt.Fprintf(out, "%-48s %s\n", label, state)
+		_, _ = fmt.Fprintf(out, "%-48s %s\n", label, state)
 	}
 	serving := "NOT serving"
 	if daemon.Serviceable(addr) {
 		serving = "serving"
 	}
-	fmt.Fprintf(out, "%-48s %s\n", addr, serving)
+	_, _ = fmt.Fprintf(out, "%-48s %s\n", addr, serving)
 	reportPower(ctx, out)
 	return nil
 }
@@ -449,10 +449,10 @@ func runServiceRecover(ctx context.Context, f *serviceFlags, out io.Writer) erro
 		}
 		return recErr
 	}
-	fmt.Fprintf(out, "%s [%s] %s — %s\n",
+	_, _ = fmt.Fprintf(out, "%s [%s] %s — %s\n",
 		time.Now().Format(time.RFC3339), report.Instance, report.Outcome, report.Detail)
 	for _, a := range report.Actions {
-		fmt.Fprintf(out, "  - %s\n", a)
+		_, _ = fmt.Fprintf(out, "  - %s\n", a)
 	}
 	return recErr
 }
@@ -509,7 +509,7 @@ func runServiceWatchNetwork(ctx context.Context, f *serviceFlags, out io.Writer)
 	return watcher.Run(ctx, func(c service.LinkChange, err error) {
 		show(c)
 		if err != nil {
-			fmt.Fprintf(out, "  ! %v\n", err)
+			_, _ = fmt.Fprintf(out, "  ! %v\n", err)
 		}
 	})
 }
@@ -517,24 +517,24 @@ func runServiceWatchNetwork(ctx context.Context, f *serviceFlags, out io.Writer)
 // printLinkChange renders one observation. The URL is the point of the whole
 // command, so it gets its own line rather than being folded into prose.
 func printLinkChange(out io.Writer, instance string, c service.LinkChange) {
-	fmt.Fprintf(out, "%s [%s] %s", time.Now().Format(time.RFC3339), instance, c.State)
+	_, _ = fmt.Fprintf(out, "%s [%s] %s", time.Now().Format(time.RFC3339), instance, c.State)
 	switch c.State {
 	case service.LinkDisconnected:
-		fmt.Fprintf(out, " — off-network for %s; still publishing %s\n", c.DownFor, c.Published)
+		_, _ = fmt.Fprintf(out, " — off-network for %s; still publishing %s\n", c.DownFor, c.Published)
 	case service.LinkMoved:
-		fmt.Fprintf(out, " — %s -> %s\n", c.Published, c.Current)
+		_, _ = fmt.Fprintf(out, " — %s -> %s\n", c.Published, c.Current)
 	default:
 		if c.DownFor != "" {
-			fmt.Fprintf(out, " — back after %s on the same address\n", c.DownFor)
+			_, _ = fmt.Fprintf(out, " — back after %s on the same address\n", c.DownFor)
 		} else {
-			fmt.Fprintf(out, " — publishing %s\n", c.Current)
+			_, _ = fmt.Fprintf(out, " — publishing %s\n", c.Current)
 		}
 	}
 	if c.Detail != "" {
-		fmt.Fprintf(out, "  - %s\n", c.Detail)
+		_, _ = fmt.Fprintf(out, "  - %s\n", c.Detail)
 	}
 	if c.URL != "" {
-		fmt.Fprintf(out, "  MCP URL: %s\n", c.URL)
+		_, _ = fmt.Fprintf(out, "  MCP URL: %s\n", c.URL)
 	}
 }
 
@@ -544,17 +544,17 @@ func printLinkChange(out io.Writer, instance string, c service.LinkChange) {
 func reportPower(ctx context.Context, out io.Writer) {
 	profile, err := service.ReadPowerProfile(ctx, service.ExecRunner{})
 	if err != nil {
-		fmt.Fprintf(out, "power policy: could not be read (%v)\n", err)
+		_, _ = fmt.Fprintf(out, "power policy: could not be read (%v)\n", err)
 		return
 	}
 	violations := service.Violations(profile)
 	if len(violations) == 0 {
-		fmt.Fprintln(out, "power policy: this host will not sleep")
+		_, _ = fmt.Fprintln(out, "power policy: this host will not sleep")
 		return
 	}
-	fmt.Fprintln(out, "power policy: the host may go unreachable —")
+	_, _ = fmt.Fprintln(out, "power policy: the host may go unreachable —")
 	for _, v := range violations {
-		fmt.Fprintf(out, "  - %s is %d, needs %d: %s\n", v.Setting, v.Got, v.Want, v.Why)
+		_, _ = fmt.Fprintf(out, "  - %s is %d, needs %d: %s\n", v.Setting, v.Got, v.Want, v.Why)
 	}
-	fmt.Fprintf(out, "  fix with: %s\n", service.RemediationCommand(violations))
+	_, _ = fmt.Fprintf(out, "  fix with: %s\n", service.RemediationCommand(violations))
 }

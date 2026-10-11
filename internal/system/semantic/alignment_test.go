@@ -40,7 +40,7 @@ func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	ctx := context.Background()
 	if err := store.PutAligned(ctx, p, repo, graphDir, vectorDir); err != nil {
 		t.Fatalf("aligned promotion: %v", err)

@@ -203,13 +203,14 @@ func SaveNew(path string, c *Config) error {
 	if err != nil {
 		return fmt.Errorf("config: stage new %q: %w", path, err)
 	}
-	defer os.Remove(file.Name())
+	// Best-effort cleanup; the published link keeps the bytes after removal.
+	defer func() { _ = os.Remove(file.Name()) }()
 	if _, err = file.Write(data); err != nil {
-		file.Close()
+		_ = file.Close()
 		return fmt.Errorf("config: write new %q: %w", path, err)
 	}
 	if err = file.Sync(); err != nil {
-		file.Close()
+		_ = file.Close()
 		return fmt.Errorf("config: sync new %q: %w", path, err)
 	}
 	if err = file.Close(); err != nil {

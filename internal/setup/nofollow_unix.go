@@ -23,7 +23,7 @@ func openCapturedNoFollow(rootPath, rel string) (*os.File, error) {
 	}
 	for i, part := range strings.Split(rel, "/") {
 		if part == "" || part == "." || part == ".." {
-			unix.Close(fd)
+			_ = unix.Close(fd)
 			return nil, fmt.Errorf("invalid captured path component")
 		}
 		flags := unix.O_RDONLY | unix.O_NOFOLLOW | unix.O_CLOEXEC
@@ -31,7 +31,7 @@ func openCapturedNoFollow(rootPath, rel string) (*os.File, error) {
 			flags |= unix.O_DIRECTORY
 		}
 		next, openErr := unix.Openat(fd, part, flags, 0)
-		unix.Close(fd)
+		_ = unix.Close(fd)
 		if openErr != nil {
 			return nil, openErr
 		}

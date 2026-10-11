@@ -52,8 +52,8 @@ func NewCmd() *cobra.Command {
 			}
 			content := fmt.Sprintf("schema_version: 1\nproject_id: %q\nselected_packs: []\noverlay_root: .cks/knowledge\nreview_policy:\n  min_approvals: 1\n", projectID)
 			if _, err := file.WriteString(content); err != nil {
-				file.Close()
-				os.Remove(path)
+				_ = file.Close()
+				_ = os.Remove(path) // best-effort cleanup; the write error is returned
 				return err
 			}
 			if err := file.Close(); err != nil {
@@ -108,13 +108,13 @@ func NewCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer os.Remove(tmp.Name())
+			defer func() { _ = os.Remove(tmp.Name()) }() // fails harmlessly once the rename has consumed the temp file
 			if err := tmp.Chmod(0o600); err != nil {
-				tmp.Close()
+				_ = tmp.Close()
 				return err
 			}
 			if _, err := tmp.Write(data); err != nil {
-				tmp.Close()
+				_ = tmp.Close()
 				return err
 			}
 			if err := tmp.Close(); err != nil {
@@ -327,7 +327,7 @@ func writeReviewRecord(dir string, checked os.FileInfo, filename string, body []
 	if err != nil {
 		return err
 	}
-	defer root.Close()
+	defer func() { _ = root.Close() }() // directory handle; nothing to flush
 	opened, err := root.Stat(".")
 	if err != nil || !os.SameFile(checked, opened) {
 		return fmt.Errorf("evidence_unverified: review directory changed before write")
@@ -342,21 +342,21 @@ func writeReviewRecord(dir string, checked os.FileInfo, filename string, body []
 		return err
 	}
 	if _, err := file.Write(body); err != nil {
-		file.Close()
-		root.Remove(temp)
+		_ = file.Close()
+		_ = root.Remove(temp)
 		return err
 	}
 	if err := file.Sync(); err != nil {
-		file.Close()
-		root.Remove(temp)
+		_ = file.Close()
+		_ = root.Remove(temp)
 		return err
 	}
 	if err := file.Close(); err != nil {
-		root.Remove(temp)
+		_ = root.Remove(temp)
 		return err
 	}
 	if err := root.Link(temp, filename); err != nil {
-		root.Remove(temp)
+		_ = root.Remove(temp) // best-effort cleanup; the link error is returned
 		return err
 	}
 	return root.Remove(temp)

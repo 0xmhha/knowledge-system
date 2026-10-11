@@ -94,7 +94,7 @@ func TestRun_AlignsFlowStepsToCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open store: %v", err)
 	}
-	defer st.Close()
+	defer func() { _ = st.Close() }()
 
 	// Resolve what the aligned code chunk for server.go:25 should be.
 	codeChunks, err := st.LookupByFileOrdered(context.Background(), "server.go")
@@ -188,7 +188,7 @@ func TestRunIndexesSample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reopen store: %v", err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	q, _ := mock.Default().Embed(context.Background(), []string{"open tcp listener on the configured address"})
 	hits, err := store.Search(context.Background(), q[0], 3, types.Filter{})
@@ -222,7 +222,7 @@ func TestRunManifestCoverageMatchesStoredCodeSymbols(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	val, err := store.Validate(context.Background())
 	if err != nil {
 		t.Fatal(err)
@@ -249,7 +249,7 @@ func TestRunIndexesMarkdownSections(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reopen store: %v", err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	// Filter by language="markdown" — must include the sample doc with
 	// at least 4 sections (sample-decisions + 3 ## headings).
@@ -399,7 +399,7 @@ func TestRunIndexesDocsRoots(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reopen store: %v", err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	q, _ := mock.Default().Embed(context.Background(), []string{"system contract address NativeCoinAdapter"})
 	hits, err := store.Search(context.Background(), q[0], 50, types.Filter{Language: "markdown"})

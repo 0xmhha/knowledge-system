@@ -48,17 +48,17 @@ func OpenStore(path string) (*Store, error) {
 	db.SetMaxOpenConns(1)
 	for _, pragma := range []string{"PRAGMA foreign_keys=ON", "PRAGMA busy_timeout=5000", "PRAGMA journal_mode=WAL"} {
 		if _, err := db.Exec(pragma); err != nil {
-			db.Close()
+			_ = db.Close()
 			return nil, err
 		}
 	}
 	var version int
 	if err := db.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	if version > StoreSchemaVersion {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("semantic store schema %d is newer than supported %d", version, StoreSchemaVersion)
 	}
 	if version == 0 {
@@ -73,7 +73,7 @@ func OpenStore(path string) (*Store, error) {
 		);
 		` + semanticTermsTable + `;
 		PRAGMA user_version=3;`); err != nil {
-			db.Close()
+			_ = db.Close()
 			return nil, fmt.Errorf("initialize semantic schema: %w", err)
 		}
 	}
@@ -81,7 +81,7 @@ func OpenStore(path string) (*Store, error) {
 		// v2 added optional requirements inside immutable JSON. v3 adds a
 		// normalized concept-term index; historical documents are not changed.
 		if err := migrateTermIndex(db); err != nil {
-			db.Close()
+			_ = db.Close()
 			return nil, fmt.Errorf("migrate semantic schema: %w", err)
 		}
 	}
@@ -111,7 +111,8 @@ func (s *Store) putVerified(ctx context.Context, p Projection) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	// Rollback after a successful Commit only reports sql.ErrTxDone.
+	defer func() { _ = tx.Rollback() }()
 	if _, err := tx.ExecContext(ctx, `INSERT INTO semantic_projections
 		(project_id, dataset_id, commit_sha, digest, document) VALUES (?,?,?,?,?)
 		ON CONFLICT(project_id, dataset_id) DO NOTHING`, p.Snapshot.ProjectID, p.Snapshot.DatasetID,
@@ -164,7 +165,7 @@ func (s *Store) LookupTerm(ctx context.Context, projectID, datasetID, lang, term
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	out := make([]ConceptCandidate, 0)
 	for rows.Next() {
 		var id string
@@ -219,7 +220,8 @@ func (s *Store) Activate(ctx context.Context, projectID, datasetID string) error
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	// Rollback after a successful Commit only reports sql.ErrTxDone.
+	defer func() { _ = tx.Rollback() }()
 	var one int
 	if err := tx.QueryRowContext(ctx, `SELECT 1 FROM semantic_projections WHERE project_id=? AND dataset_id=?`, projectID, datasetID).Scan(&one); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

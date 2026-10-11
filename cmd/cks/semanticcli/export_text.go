@@ -16,7 +16,7 @@ func newExportTextCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // no writes on this path; nothing to flush
 			active, err := store.CurrentAligned(cmd.Context(), project, repo, graph, vector)
 			if err != nil {
 				return err

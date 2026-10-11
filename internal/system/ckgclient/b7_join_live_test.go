@@ -69,7 +69,7 @@ func TestLive_B7_CanonicalJoin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ckgclient.NewReal(%q): %v", graphPath, err)
 	}
-	defer ckg.Close()
+	defer func() { _ = ckg.Close() }()
 	h, err := ckg.Health(ctx)
 	if err != nil {
 		t.Fatalf("ckg Health: %v", err)
@@ -92,7 +92,7 @@ func TestLive_B7_CanonicalJoin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ckvclient.NewReal(%q): %v", ckvPath, err)
 	}
-	defer ckv.Close()
+	defer func() { _ = ckv.Close() }()
 	t.Logf("ckv: %s/%s dim=%d", cap.Provider, cap.Model, cap.Dim)
 
 	queries := []string{

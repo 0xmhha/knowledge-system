@@ -53,10 +53,10 @@ func TestMain(m *testing.M) {
 			}
 			if request.Method == "initialize" {
 				if os.Getenv("CKS_EVAL_STDERR_BAD_INIT") == "1" {
-					fmt.Fprintf(os.Stdout, "{\"jsonrpc\":\"2.0\",\"id\":%s,\"error\":{\"code\":-32603,\"message\":\"fixture initialize rejected\"}}\n", request.ID)
+					_, _ = fmt.Fprintf(os.Stdout, "{\"jsonrpc\":\"2.0\",\"id\":%s,\"error\":{\"code\":-32603,\"message\":\"fixture initialize rejected\"}}\n", request.ID)
 					continue
 				}
-				fmt.Fprintf(os.Stdout, "{\"jsonrpc\":\"2.0\",\"id\":%s,\"result\":{\"protocolVersion\":%q,\"capabilities\":{},\"serverInfo\":{\"name\":\"noisy-fixture\",\"version\":\"1\"}}}\n", request.ID, request.Params.ProtocolVersion)
+				_, _ = fmt.Fprintf(os.Stdout, "{\"jsonrpc\":\"2.0\",\"id\":%s,\"result\":{\"protocolVersion\":%q,\"capabilities\":{},\"serverInfo\":{\"name\":\"noisy-fixture\",\"version\":\"1\"}}}\n", request.ID, request.Params.ProtocolVersion)
 			}
 		}
 	}

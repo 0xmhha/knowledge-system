@@ -54,7 +54,7 @@ func openFlowEngine(t *testing.T) *Engine {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	t.Cleanup(func() { eng.Close() })
+	t.Cleanup(func() { _ = eng.Close() })
 	return eng
 }
 

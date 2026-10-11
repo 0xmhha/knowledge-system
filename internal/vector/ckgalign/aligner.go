@@ -63,7 +63,7 @@ func Load(ckgPath string) (*Index, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ckgalign: open %s: %w", dbPath, err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// canonical_id exists only on ckg schema >= 1.16. Probe for it so this
 	// loader still works against older graphs (the column is selected only
@@ -125,7 +125,7 @@ WHERE file_path != ''
 	if err != nil {
 		return nil, fmt.Errorf("ckgalign: query nodes: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	ix := &Index{byFile: make(map[string][]Entry), canonicalAvailable: canonicalAvailable}
 	var id, file, canonicalID string
@@ -166,7 +166,7 @@ func columnExists(db *sql.DB, table, col string) bool {
 	if err != nil {
 		return false
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return rows.Next()
 }
 
@@ -189,7 +189,7 @@ func ReadCoords(ckgPath string) (Coords, error) {
 	if err != nil {
 		return Coords{}, fmt.Errorf("ckgalign: open %s: %w", dbPath, err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	get := func(key string) string {
 		var v string
 		if err := db.QueryRow(`SELECT value FROM manifest WHERE key = ?`, key).Scan(&v); err != nil {
@@ -249,7 +249,7 @@ func canonicalHasValue(db *sql.DB) bool {
 	if err != nil {
 		return false
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return rows.Next()
 }
 

@@ -77,7 +77,7 @@ func fileHash(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }() // read-only hash input; close error cannot affect the digest
 	h := sha256.New()
 	if _, err := io.Copy(h, f); err != nil {
 		return "", err
@@ -127,14 +127,14 @@ func exactOracle(ctx context.Context, path string, query []float32, filter types
 	if err != nil {
 		return oracleResult{}, err
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }() // read-only (mode=ro) handle
 	rows, err := db.QueryContext(ctx, `SELECT c.id,c.file,c.start_line,c.end_line,c.language,c.is_test,
 	 COALESCE(c.symbol_kind,''),c.chunk_kind,c.commit_hash,v.embedding
 	 FROM chunks c LEFT JOIN chunk_vec v ON v.chunk_id=c.id`)
 	if err != nil {
 		return oracleResult{}, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }() // rows.Err() is the authoritative iteration error
 	result := oracleResult{Hits: []oracleHit{}, EligibleHits: []oracleHit{}}
 	for rows.Next() {
 		var chunk types.Chunk
@@ -225,14 +225,14 @@ func probe(ctx context.Context, directory, prompt string, filter types.Filter, k
 	if err != nil {
 		return report, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }() // read-only store
 	abs, _ := filepath.Abs(dbPath)
 	uri := url.URL{Scheme: "file", Path: abs, RawQuery: "mode=ro"}
 	db, err := sql.Open("sqlite3", uri.String())
 	if err != nil {
 		return report, err
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }() // read-only (mode=ro) handle
 	var nativeChecksum string
 	if err := db.QueryRowContext(ctx, "SELECT value FROM manifest WHERE key='embedding_checksum'").Scan(&nativeChecksum); err != nil {
 		return report, err
@@ -250,7 +250,7 @@ func probe(ctx context.Context, directory, prompt string, filter types.Filter, k
 	} {
 		var actual string
 		readErr := db.QueryRowContext(ctx, "SELECT value FROM manifest WHERE key=?", key).Scan(&actual)
-		if readErr != nil && !(readErr == sql.ErrNoRows && expected == "") {
+		if readErr != nil && (readErr != sql.ErrNoRows || expected != "") {
 			return report, readErr
 		}
 		if actual != expected {
@@ -370,7 +370,7 @@ func main() {
 		case "ollama":
 			parsed, parseErr := url.Parse(*endpoint)
 			if parseErr != nil || parsed.Scheme != "http" || (parsed.Hostname() != "127.0.0.1" && parsed.Hostname() != "localhost" && parsed.Hostname() != "::1") {
-				err = fmt.Errorf("Ollama endpoint must be local HTTP loopback")
+				err = fmt.Errorf("ollama endpoint must be local HTTP loopback")
 			} else {
 				embedder, err = ollama.Open(ollama.Options{Endpoint: *endpoint, ModelName: *model, QueryPrefixPolicy: "registry"})
 			}

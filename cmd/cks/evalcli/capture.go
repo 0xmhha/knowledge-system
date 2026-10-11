@@ -80,7 +80,7 @@ func shaFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }() // read-only file
 	hash := sha256.New()
 	if _, err := io.Copy(hash, f); err != nil {
 		return "", err
@@ -152,7 +152,7 @@ func captureRun(ctx context.Context, input, config, binary, output string, warmu
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }() // safety net for early returns; the success path closes explicitly
 	create := func() (*eval.Runner, error) {
 		return eval.NewRunner(ctx, eval.RunnerOpts{CKSMCPBinary: binary, CKSMCPConfig: config, InitializeTimeout: timeout})
 	}
@@ -235,6 +235,9 @@ func captureRun(ctx context.Context, input, config, binary, output string, warmu
 		return err
 	}
 	if err := file.Sync(); err != nil {
+		return err
+	}
+	if err := file.Close(); err != nil {
 		return err
 	}
 	if report.State == "partial" {

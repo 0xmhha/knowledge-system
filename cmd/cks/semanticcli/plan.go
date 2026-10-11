@@ -17,7 +17,7 @@ func newPlanCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // no writes on this path; nothing to flush
 			plan, err := store.PlanAligned(cmd.Context(), project, repo, graph, vector)
 			if err != nil {
 				return err

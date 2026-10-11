@@ -82,11 +82,11 @@ func NewCmd() *cobra.Command {
 				failures = append(failures, msgs...)
 			}
 			if len(failures) == 0 {
-				fmt.Fprintln(cmd.OutOrStdout(), "eval-gate: PASS — no regressions detected")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "eval-gate: PASS — no regressions detected")
 				return nil
 			}
 			for _, f := range failures {
-				fmt.Fprintf(cmd.ErrOrStderr(), "  - %s\n", f)
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  - %s\n", f)
 			}
 			return fmt.Errorf("eval-gate: FAIL — %d regression(s)", len(failures))
 		},

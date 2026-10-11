@@ -128,7 +128,9 @@ func TestOracleRejectsMissingEligibleVector(t *testing.T) {
 	if _, err := db.Exec("DELETE FROM chunk_vec WHERE chunk_id='e1'"); err != nil {
 		t.Fatal(err)
 	}
-	db.Close()
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
 	q, _ := embedding.Embed(context.Background(), []string{"Alpha route"})
 	if _, err := exactOracle(context.Background(), filepath.Join(root, "vector.db"), q[0], filter, 3); err == nil {
 		t.Fatal("oracle silently omitted missing vector")

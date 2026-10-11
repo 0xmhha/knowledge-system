@@ -99,7 +99,7 @@ func TestGCRejectsStaleReferenceAndBytePlans(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer lease.Close()
+				defer func() { _ = lease.Close() }()
 			case "pointer":
 				if _, err := Promote(dataset, "v1"); err != nil {
 					t.Fatal(err)
@@ -284,7 +284,7 @@ func TestGCMutationBlocksReaderAdmission(t *testing.T) {
 	}
 	defer lock.release()
 	if lease, err := PinVersionReader(filepath.Join(dataset, "v1")); err == nil {
-		lease.Close()
+		_ = lease.Close()
 		t.Fatal("reader admitted during GC/build")
 	}
 	if _, err := PlanGC(context.Background(), dataset, GCPolicy{KeepRecent: 2}, time.Now()); err == nil {
@@ -327,7 +327,7 @@ func TestGCProcessHelper(t *testing.T) {
 		if err != nil {
 			os.Exit(32)
 		}
-		defer lease.Close()
+		defer func() { _ = lease.Close() }()
 		if err := os.WriteFile(ready, []byte("ready"), 0600); err != nil {
 			os.Exit(33)
 		}
@@ -371,8 +371,8 @@ func TestGCReaderCrashAndPartialDeleteProcessRecovery(t *testing.T) {
 			}
 			t.Cleanup(func() {
 				if cmd.ProcessState == nil {
-					cmd.Process.Kill()
-					cmd.Wait()
+					_ = cmd.Process.Kill()
+					_ = cmd.Wait()
 				}
 			})
 			deadline := time.Now().Add(10 * time.Second)
@@ -429,7 +429,7 @@ func TestGCProtectsCurrentReaderAndReviewedHold(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer lease.Close()
+	defer func() { _ = lease.Close() }()
 	holdDurabilityVersion(t, dataset, "v2")
 	policy := GCPolicy{KeepRecent: 2, MinAge: time.Hour}
 	plan, err := PlanGC(context.Background(), dataset, policy, time.Now())
@@ -475,7 +475,7 @@ func TestRestorePromotionRecreatesReaderLeaseWithoutChangingCandidate(t *testing
 			if lease == nil {
 				t.Fatal("restored reader has no GC lease")
 			}
-			defer lease.Close()
+			defer func() { _ = lease.Close() }()
 			after := durabilityTree(t, candidate)
 			if len(before) != len(after) {
 				t.Fatal("candidate payload inventory changed")
@@ -543,7 +543,7 @@ func TestRepeatedPromotionPreservesLiveReaderLockInode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer lease.Close()
+	defer func() { _ = lease.Close() }()
 	path := filepath.Join(dataset, ".readers", "active.lock")
 	before, err := os.Stat(path)
 	if err != nil {
@@ -590,7 +590,7 @@ func TestReviewedPromotionAndRecoveryRecreateReaderLease(t *testing.T) {
 			if err != nil || lease == nil {
 				t.Fatalf("reviewed reader: %v", err)
 			}
-			defer lease.Close()
+			defer func() { _ = lease.Close() }()
 		})
 	}
 }

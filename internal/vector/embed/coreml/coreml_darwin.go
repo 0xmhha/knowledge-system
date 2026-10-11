@@ -18,6 +18,24 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
+// Adapter implements types.Embedder via CoreML Framework.
+// Only available on macOS (darwin) builds with the tokenizers tag; other
+// builds get the empty stub in coreml_other.go.
+type Adapter struct {
+	modelPath string
+	modelName string
+	dim       int
+	maxSeqLen int
+	tokenizer adapterTokenizer
+}
+
+// adapterTokenizer is the interface the platform-specific tokenizer
+// satisfies; tokenizer_darwin.go has the real implementation.
+type adapterTokenizer interface {
+	Encode(text string, maxLen int) (ids, mask []int64, err error)
+	Close() error
+}
+
 // Open loads a CoreML model (.mlpackage or .mlmodelc) and its
 // tokenizer, returning an Adapter that runs inference on ANE/GPU/CPU.
 func Open(opts Options) (*Adapter, error) {

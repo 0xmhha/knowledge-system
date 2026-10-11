@@ -191,7 +191,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if filepath.Base(graphDir) == "graph" && filepath.Clean(cfg.Backends.CKV.Path) == filepath.Join(filepath.Dir(graphDir), "vector") {
 		evidenceVersionDir = filepath.Dir(graphDir)
 		if _, statErr := os.Lstat(filepath.Join(evidenceVersionDir, "sources")); statErr == nil {
-			cleanup := func() {}
+			var cleanup func()
 			retainedReadRoot, cleanup, err = setup.MaterializeRetainedReadTree(evidenceVersionDir)
 			if err != nil {
 				return fmt.Errorf("mount retained source: %w", err)
@@ -741,8 +741,10 @@ func pinDatasetReaders(cfg *config.Config) ([]*setup.ReaderLease, error) {
 				if !seen[dir] {
 					lease, err := setup.PinVersionReader(dir)
 					if err != nil {
+						// Error path: releasing already-acquired read leases is
+						// best-effort; the PinVersionReader error is what we report.
 						for _, l := range leases {
-							l.Close()
+							_ = l.Close()
 						}
 						return nil, err
 					}

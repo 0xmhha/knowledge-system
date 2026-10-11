@@ -96,9 +96,9 @@ func runDaemon(args []string, stdout io.Writer) error {
 					state = fmt.Sprintf("running but NOT serviceable after %s", *waitTimeout)
 				}
 			}
-			fmt.Fprintf(stdout, "[%s] %s (pid %d) — http://%s/mcp\n", st.Name, state, st.PID, url)
+			_, _ = fmt.Fprintf(stdout, "[%s] %s (pid %d) — http://%s/mcp\n", st.Name, state, st.PID, url)
 			if notice := loopbackNotice(st.Addr, *registry); notice != "" {
-				fmt.Fprintf(stdout, "    %s\n", notice)
+				_, _ = fmt.Fprintf(stdout, "    %s\n", notice)
 			}
 		}
 		return err
@@ -110,7 +110,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 		if err := sup.Down(reg); err != nil {
 			return err
 		}
-		fmt.Fprintf(stdout, "stopped %d instance(s) from %s\n", len(reg.Instances), *registry)
+		_, _ = fmt.Fprintf(stdout, "stopped %d instance(s) from %s\n", len(reg.Instances), *registry)
 		return nil
 	case "reload":
 		reg, err := daemon.LoadRegistry(*registry)
@@ -151,7 +151,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 		if err := sup.Stop(*name); err != nil {
 			return err
 		}
-		fmt.Fprintf(stdout, "[%s] stopped\n", *name)
+		_, _ = fmt.Fprintf(stdout, "[%s] stopped\n", *name)
 	case "status":
 		if *name != "" {
 			printInstance(stdout, sup.Status(*name), *ready)
@@ -164,7 +164,7 @@ func runDaemon(args []string, stdout io.Writer) error {
 			return err
 		}
 		if len(list) == 0 {
-			fmt.Fprintln(stdout, "(no managed instances)")
+			_, _ = fmt.Fprintln(stdout, "(no managed instances)")
 			return nil
 		}
 		for _, inst := range list {
@@ -272,7 +272,7 @@ func printInstance(w io.Writer, i daemon.Instance, probeReady bool) {
 			}
 		}
 	}
-	fmt.Fprintf(w, "[%s] %s\n", i.Name, state)
+	_, _ = fmt.Fprintf(w, "[%s] %s\n", i.Name, state)
 }
 
 // runReload health-gated blue-green reloads registry instances (all, or the one
@@ -289,7 +289,7 @@ func runReload(sup *daemon.Supervisor, reg *daemon.Registry, nameFilter, runDir 
 		matched = true
 		cur := sup.Status(e.Name)
 		if !cur.Running || cur.Addr == "" {
-			fmt.Fprintf(stdout, "[%s] not running — start it with `daemon up`\n", e.Name)
+			_, _ = fmt.Fprintf(stdout, "[%s] not running — start it with `daemon up`\n", e.Name)
 			if firstErr == nil {
 				firstErr = fmt.Errorf("daemon reload: %s is not running", e.Name)
 			}
@@ -301,13 +301,13 @@ func runReload(sup *daemon.Supervisor, reg *daemon.Registry, nameFilter, runDir 
 		}
 		inst, err := sup.Reload(e.Name, cfg, cur.Addr, daemon.ReloadOptions{})
 		if err != nil {
-			fmt.Fprintf(stdout, "[%s] %v\n", e.Name, err)
+			_, _ = fmt.Fprintf(stdout, "[%s] %v\n", e.Name, err)
 			if firstErr == nil {
 				firstErr = err
 			}
 			continue
 		}
-		fmt.Fprintf(stdout, "[%s] reloaded (pid %d) — http://%s/mcp\n",
+		_, _ = fmt.Fprintf(stdout, "[%s] reloaded (pid %d) — http://%s/mcp\n",
 			inst.Name, inst.PID, netutil.AdvertiseHostPort(cur.Addr))
 	}
 	if nameFilter != "" && !matched {

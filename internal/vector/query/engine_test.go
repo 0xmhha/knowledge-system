@@ -47,7 +47,7 @@ func TestWarmup_RunsEmbedOnLiveEngine(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 	if err := eng.Warmup(context.Background()); err != nil {
 		t.Errorf("Warmup on live engine should succeed, got %v", err)
 	}
@@ -121,7 +121,7 @@ func TestOpenAcceptsMatchingIdentity(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open with matching identity should succeed, got %v", err)
 	}
-	eng.Close()
+	_ = eng.Close()
 }
 
 func TestSearchFindsListenForTCPQuery(t *testing.T) {
@@ -130,7 +130,7 @@ func TestSearchFindsListenForTCPQuery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	res, err := eng.Search(context.Background(), "TCP socket bind on port", Options{K: 3})
 	if err != nil {
@@ -161,7 +161,7 @@ func TestSearchFindsListenForTCPQuery(t *testing.T) {
 func TestSearchHonorsFilter(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	res, err := eng.Search(context.Background(), "lock map mutex",
 		Options{K: 5, Filter: types.Filter{SymbolKinds: []types.SymbolKind{types.KindMethod}}})
@@ -182,7 +182,7 @@ func TestSearchHonorsFilter(t *testing.T) {
 func TestSearchHonorsCommitHashFilter(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	// First confirm baseline: an unfiltered search returns hits.
 	res, err := eng.Search(context.Background(), "TCP socket bind on port",
@@ -227,7 +227,7 @@ func TestSearchHonorsCommitHashFilter(t *testing.T) {
 func TestSearch_DryRunSkipsEmbedAndStore(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	res, err := eng.Search(context.Background(), "TCP socket bind on port",
 		Options{K: 5, DryRun: true})
@@ -254,7 +254,7 @@ func TestSearch_DryRunRejectsOversizedK(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 	res, err := eng.Search(context.Background(), "alpha",
 		Options{K: sqlitevec.DefaultMaxSearchK/overfetchFactor + 1, DryRun: true})
 	if !errors.Is(err, sqlitevec.ErrSearchIncomplete) || res != nil {
@@ -277,13 +277,13 @@ func TestSearch_EmitsFiveSubSpans(t *testing.T) {
 	if err != nil {
 		t.Fatalf("footprint.New: %v", err)
 	}
-	defer fp.Close()
+	defer func() { _ = fp.Close() }()
 
 	eng, err := Open(out, mock.Default(), WithFootprint(fp))
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	caller := "phase1-trace"
 	_, err = eng.Search(context.Background(), "TCP socket bind on port",
@@ -291,7 +291,9 @@ func TestSearch_EmitsFiveSubSpans(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Search: %v", err)
 	}
-	fp.Close() // flush JSONL
+	if err := fp.Close(); err != nil { // flush JSONL
+		t.Fatalf("close JSONL: %v", err)
+	}
 
 	// Walk the JSONL and collect distinct *.done event names that
 	// carried our trace_id.
@@ -336,7 +338,7 @@ func TestSearch_EmitsFiveSubSpans(t *testing.T) {
 func TestSearch_TraceIDIsEchoed(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	caller := "trace-from-cks-12345"
 	res, err := eng.Search(context.Background(), "TCP socket bind on port",
@@ -362,7 +364,7 @@ func TestSearch_TraceIDIsEchoed(t *testing.T) {
 func TestSearchEmptyIntentRejected(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	if _, err := eng.Search(context.Background(), "", Options{}); err == nil {
 		t.Fatal("expected error for empty intent")
@@ -372,7 +374,7 @@ func TestSearchEmptyIntentRejected(t *testing.T) {
 func TestThresholdDropEmitsWarning(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	// Threshold 0.999 will reject everything.
 	res, err := eng.Search(context.Background(), "anything", Options{Threshold: 0.999})
@@ -463,7 +465,7 @@ func TestSplitByTest_AllPrimaryOrAllExamples(t *testing.T) {
 func TestSearchRejectsTinyBudget(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	_, err := eng.Search(context.Background(), "anything", Options{BudgetTokens: 5})
 	if !errors.Is(err, ErrBudgetExceeded) {
@@ -477,7 +479,7 @@ func TestSearchRejectsTinyBudget(t *testing.T) {
 func TestSearchAcceptsNegativeBudgetAsDisable(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	res, err := eng.Search(context.Background(), "TCP socket bind on port", Options{K: 3, BudgetTokens: -1})
 	if err != nil {
@@ -495,7 +497,7 @@ func TestSearchAcceptsNegativeBudgetAsDisable(t *testing.T) {
 func TestSearchCitationNotFoundOnMissingSrcRoot(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 
 	// Point SrcRoot at a directory with none of the indexed files —
 	// every hit's Citation.File will fail to resolve under it.
@@ -513,7 +515,7 @@ func TestSearchCitationNotFoundOnMissingSrcRoot(t *testing.T) {
 func TestCheckFreshness_FreshIndexReturnsNil(t *testing.T) {
 	out, srcAbs := buildSample(t)
 	eng, _ := Open(out, mock.Default())
-	defer eng.Close()
+	defer func() { _ = eng.Close() }()
 	// buildSample uses repo testdata/sample which lives inside CKV repo.
 	// CheckFreshness will run git against srcAbs.
 	_ = srcAbs
