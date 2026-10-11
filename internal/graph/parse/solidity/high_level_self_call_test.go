@@ -6,11 +6,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V19 — high-level self-call marker audit.
+// High-level self-call marker audit.
 //
-// V14-V18 cover the low-level self-call surface
+// The self-cast tests cover the low-level self-call surface
 // (`payable(this).call`/`delegatecall`/`transfer`/`send` and the
-// `.call{...}` chained syntax). V19 adds the *parallel* high-level
+// `.call{...}` chained syntax). This test covers the *parallel* high-level
 // surface — typed dispatch through the same EVM message-call
 // boundary. The two are independent markers because security
 // tooling routinely characterises them differently (low-level
@@ -30,7 +30,7 @@ import (
 //
 // All three should end up HasHighLevelSelfCall=true. The low-level
 // markers (HasSelfReentrantCall, HasExternalCall) must stay false —
-// V14-V18 don't fire for typed method names, and V19 doesn't
+// the low-level walker doesn't fire for typed method names, and the high-level one doesn't
 // poison the low-level surface for the same reason.
 func TestHighLevel_SelfCallMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver",
@@ -50,8 +50,8 @@ func TestHighLevel_SelfCallMarker(t *testing.T) {
 			continue
 		}
 		got[n.QualifiedName] = n.HasHighLevelSelfCall
-		// V19 must not leak into the low-level markers — those stay
-		// reserved for the V8/V18 surface so cks can keep the two
+		// The high-level marker must not leak into the low-level markers — those stay
+		// reserved for the self-cast surface so cks can keep the two
 		// axes distinct in its rerank weights.
 		if n.HasSelfReentrantCall {
 			t.Errorf("%s HasSelfReentrantCall: got true (V19 expects false; high-level call is a separate marker)",

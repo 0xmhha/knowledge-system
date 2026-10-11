@@ -1,16 +1,16 @@
 package ckvclient
 
-// Phase D flow-aware surface (D-4, agreed Phase 2 deliverable). These types and
+// Flow-aware surface. These types and
 // the FlowClient interface are the cks-side translation of CKV's flow tools,
 // shipped in pkg/ckv as Engine.GetFlow / ExpandFlow / FindBranches /
 // GetInvariantEnforcement (CKV b8e9622, MCP 15→19). They run over the flow
 // corpus (flow_step / flow_spine / curated-invariant + flow_meta) persisted in
-// the ckv index (CKV Phase B).
+// the ckv index.
 //
 // Like SemanticSearch, Real translates the backend-native ckv types into these
 // cks-owned types so backend changes do not leak through the MCP surface.
 //
-// Alignment with the shipped API (coordination §9.2-R review): CKV did NOT
+// Alignment with the shipped API: CKV did NOT
 // adopt the two CKS-requested adjustments to the §9.1 draft —
 //   (1) budget caps: the engine methods take no max/limit, so cks applies the
 //       caps (MaxSteps / Limit / max) AFTER fetching, here in this package;
@@ -345,7 +345,7 @@ func translateConventionHits(in []ckv.ConventionHit) []ConventionHit {
 	return out
 }
 
-// --- Real: in-process pkg/ckv.Engine flow methods (T4 wired) ---------------
+// --- Real: in-process pkg/ckv.Engine flow methods ---------------------------
 
 // Compile-time assertion that Real satisfies FlowClient.
 var _ FlowClient = (*Real)(nil)

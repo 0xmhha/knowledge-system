@@ -1,0 +1,126 @@
+"""Local source probe exposure receipt. No gold, approval, or model dispatch."""
+import ast
+import collections
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import re
+import argparse
+
+ap = argparse.ArgumentParser(description=__doc__)
+ap.add_argument('--out', type=Path, required=True)
+args = ap.parse_args()
+ROOT = Path.cwd()
+INPUT = ROOT / 'system/eval/b0-knowledge-system/refactoring-n11-source-probes-2026-10-08'
+POOL = ROOT / 'system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08'
+HELPER = ROOT / 'system/eval/b0-knowledge-system/refactoring-n11-response-exposure-2026-10-08/response-exposure-audit.py.txt'
+OUT = args.out
+OUT.mkdir(parents=True, exist_ok=False)
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+def dump(name, value):
+    (OUT / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+# Reuse the already recorded comparison method without executing its CLI/main.
+tree = ast.parse(HELPER.read_text())
+names = {'strings', 'normalized_lines', 'informative_lines', 'patterns', 'match'}
+selected = ast.Module(body=[x for x in tree.body if isinstance(x, ast.FunctionDef) and x.name in names], type_ignores=[])
+exec(compile(selected, str(HELPER), 'exec'), globals())
+
+catalog = json.loads((INPUT / 'probe-catalog.json').read_text())
+rev = catalog['source_commit']
+book = json.loads((POOL / 'candidate-question-book.json').read_text())
+probes = catalog['probes']
+compiled = []
+sources = []
+for q in probes:
+    r = q['evidence'][0]
+    source = subprocess.check_output(['git', 'show', f"{rev}:{r['path']}"])
+    span = b''.join(source.splitlines(keepends=True)[r['first']-1:r['last']])
+    assert sha(source) == r['file_sha256'] and sha(span) == r['content_sha256']
+    assert (ROOT / r['path']).read_bytes() == source
+    full, windows = patterns(span.decode())
+    compiled.append((q['id'], full, windows, informative_lines(span.decode()), q['search_terms'][0]))
+    overlaps = []
+    for old in book['questions'] + book['excluded_candidate_questions']:
+        for ref in old.get('evidence', []) + old.get('abstention_basis_sources', []):
+            if ref['path'] == r['path'] and ref['first'] <= r['last'] and ref['last'] >= r['first']:
+                overlaps.append(old['id'])
+    sources.append({'id':q['id'], 'ref':r, 'committed_and_current_bytes_match':True, 'existing_book_span_intersections':overlaps})
+dump('source-verification.json', {'source_commit':rev, 'refs':sources})
+
+docs = []
+mentions = []
+for path in subprocess.check_output(['git','ls-tree','-r','--name-only',rev,'--','docs','system/docs','graph/docs','vector/docs'],text=True).splitlines():
+    if not path.endswith('.md'):
+        continue
+    source = subprocess.check_output(['git','show',f'{rev}:{path}'])
+    docs.append({'path':path,'sha256':sha(source)})
+    for number, line in enumerate(source.decode().splitlines(),1):
+        for q in probes:
+            hits = [term for term in q['search_terms'] if term in line]
+            if hits:
+                mentions.append({'id':q['id'],'path':path,'line':number,'matched_terms':hits,'line_text':line,'line_sha256':sha(line.encode())})
+dump('committed-document-mentions.json', {'reference_revision':rev,'documents':docs,'mentions':mentions,'limitation':'selected literal identifiers/paths only; SHA inventory and mere file mentions are not semantic fact exposure proof'})
+
+counts = {q['id']:collections.Counter() for q in probes}
+logs = json.loads((POOL/'retained-raw-log-audit.json').read_text())['logs']
+totals = collections.Counter()
+cache = {}
+log_refs = []
+with (OUT/'response-matches.jsonl').open('w') as matched:
+    for declared in logs:
+        compressed = (ROOT/declared['path']).read_bytes()
+        assert compressed == subprocess.check_output(['git','show',f"{rev}:{declared['path']}"])
+        raw = gzip.decompress(compressed)
+        assert sha(compressed) == declared['compressed_sha256'] and sha(raw) == declared['decompressed_sha256']
+        rows = raw.splitlines()
+        assert len(rows) == declared['rows']
+        log_refs.append(declared)
+        for number, line in enumerate(rows,1):
+            row = json.loads(line)
+            totals['rows'] += 1
+            response = row.get('call',{}).get('response',{})
+            sc = response.get('structuredContent')
+            row_hits = collections.defaultdict(set)
+            if isinstance(sc,dict):
+                totals['structured_objects'] += 1
+                totals['body_entries'] += len(sc.get('bodies',[]))
+                totals['graph_neighbor_entries'] += len(sc.get('graph_neighbors',[]))
+                for q in probes:
+                    r = q['evidence'][0]
+                    for c in sc.get('citations',[]):
+                        if c.get('file') == r['path'] and c.get('start_line',0) <= r['last'] and c.get('end_line',0) >= r['first']:
+                            kind = 'citation_same_file_SHA_overlap' if c.get('file_sha256') == r['file_sha256'] else 'citation_path_overlap_other_SHA'
+                            row_hits[q['id']].add(kind)
+                            matched.write(json.dumps({'probe':q['id'],'log':declared['path'],'row':number,'request_id':row.get('request_id'),'kind':kind,'citation':c},ensure_ascii=False)+'\n')
+            else:
+                totals['rows_without_structured_object'] += 1
+            # Separate second surface; never count duplicate output as independent rows.
+            for surface,value in [('structuredContent',sc),('content',response.get('content'))]:
+                for field,text in strings(value,surface):
+                    totals[surface+'_text_fields'] += 1
+                    digest = sha(text.encode())
+                    if digest not in cache:
+                        lineset = set(normalized_lines(text))
+                        found=[]
+                        for qid,full,windows,single,term in compiled:
+                            a,b = match(text,full,windows)
+                            c = bool(lineset & single)
+                            d = term in text
+                            kinds=[k for k,v in [('full_span',a),('eight_line',b),('informative_line',c),('identifier_literal',d)] if v]
+                            if kinds:found.append((qid,kinds))
+                        cache[digest]=found
+                    for qid,kinds in cache[digest]:
+                        row_hits[qid].update(surface+'_'+kind for kind in kinds)
+                        matched.write(json.dumps({'probe':qid,'log':declared['path'],'row':number,'request_id':row.get('request_id'),'field':field,'kinds':kinds,'field_sha256':digest},ensure_ascii=False)+'\n')
+            for qid,kinds in row_hits.items():
+                counts[qid]['any_matched_rows'] += 1
+                for kind in sorted(kinds):counts[qid][kind+'_rows'] += 1
+                counts[qid][declared['category']+'_rows'] += 1
+dump('exposure-summary.json', {'reference_revision':rev,'helper_sha256':sha(HELPER.read_bytes()),'source_refs_verified':len(sources),'committed_documents':len(docs),'document_mentions':len(mentions),'retained_logs':log_refs,'totals':dict(totals),'unique_text_values':len(cache),'probe_counts':{k:dict(v) for k,v in counts.items()},'content_surface_not_independent_samples':True,'model_HTTP_calls':0,'new_FINAL_dispatches':0,'actual_human_decisions':0,'new_approved_independent_FINAL':0,'full_task_complete':False,'limitations':['literal/normalized text and exact line overlap only, no semantic independence adjudication','historical short/sanitized/rewritten exposures can be missed','code rules do not certify actual organization policy, reviewed trace or operating facts','this newly authored proposal is itself disclosed development material']})
+print(json.dumps({'rows':totals['rows'],'probes':len(probes),'matched_rows':{k:v['any_matched_rows'] for k,v in counts.items()}},ensure_ascii=False))

@@ -1,0 +1,749 @@
+{
+ "schema_version": 1,
+ "status": "approved",
+ "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+ "purpose": "Expanded review-only pool, source at immutable current commit; no corpus/index/runtime freeze or human scope acceptance",
+ "questions": [
+  {
+   "id": "N11-DEV-01",
+   "split": "DEV",
+   "group": "CODE",
+   "proposed_cluster_id": "maintenance-ancestor",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "language": "ko",
+   "prompt": "아직 존재하지 않는 DB 경로가 current symlink 아래에 있으면 유지보수 쓰기 경계는 어떻게 확인하나요?",
+   "candidate_answer": "각 existing ancestor의 symlink를 풀고 dataset/source markers 및 manifest pins를 검사한다. pinned/versioned 흔적은 versioned_setup_required로 거부한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/maintenance.go",
+     "first": 12,
+     "last": 12,
+     "file_sha256": "b573172a5818f38e71f6befd7a0cdb3d026100702176e4376024947b94f336ee",
+     "content_sha256": "6e38f53d763f19eff427eaafc5248e62391e0e36e60d7c7f5938b8da405a470c"
+    },
+    {
+     "path": "internal/setup/maintenance.go",
+     "first": 28,
+     "last": 85,
+     "file_sha256": "b573172a5818f38e71f6befd7a0cdb3d026100702176e4376024947b94f336ee",
+     "content_sha256": "a6beb50580605c2273c3ef7c3868647420b5409f27742da1c00ffcbfbefeb4cd"
+    }
+   ],
+   "cluster_id": "maintenance-ancestor",
+   "unit_id": "maintenance-ancestor",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-DEV-02",
+   "split": "DEV",
+   "group": "CODE",
+   "proposed_cluster_id": "resource-estimate",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "language": "ko",
+   "prompt": "빌드 자원 보고서의 engine_output_estimate_bytes 값은 무엇이며 staging 예상량과 어떤 차이가 있나요?",
+   "candidate_answer": "엔진 출력 예상량은 계산하지 않아 null이다. source/staging copy 최소량과 임시/출력 free space, reserve를 따로 기록한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/resources.go",
+     "first": 97,
+     "last": 148,
+     "file_sha256": "dcf66936ac475ff03221e4143679b2fd53f0b9deb59be35f03d7f927628d4cff",
+     "content_sha256": "d32dc614fb014bcf2ce30f94f3af604fafcdc4ea3ab24176dfc36c84f0df89d3"
+    }
+   ],
+   "cluster_id": "resource-estimate",
+   "unit_id": "resource-estimate",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-DEV-03",
+   "split": "DEV",
+   "group": "WHY",
+   "proposed_cluster_id": "promotion-parent-sync",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "language": "ko",
+   "prompt": "current 변경 뒤 부모 디렉터리 동기화가 실패하면 왜 일반 실패와 다른 오류를 반환하나요?",
+   "candidate_answer": "rename 이후 저장 내구성이 확정되지 않으므로 ErrDurabilityUncertain을 반환한다. current가 이미 변경됐을 수 있다. 호출자는 current 포인터가 바뀌지 않았다고 가정하거나 rollback하지 말고 상태를 검사하고 재시도해야 한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/durability.go",
+     "first": 230,
+     "last": 241,
+     "file_sha256": "3ce1c6b3be3b6f30bfc4fb93ca8ec694c1dd6b1a417b3af2ea345f3d4f5c0b16",
+     "content_sha256": "5f8c0695789a80ed11113a823416b949b8bd6f0081ef1dce956eee62bf2f1678"
+    },
+    {
+     "path": "internal/setup/durability.go",
+     "first": 21,
+     "last": 23,
+     "file_sha256": "3ce1c6b3be3b6f30bfc4fb93ca8ec694c1dd6b1a417b3af2ea345f3d4f5c0b16",
+     "content_sha256": "5040a99fcbe20ff10c8e7d0a2f0e80a233059f64054ab2c0f0bdf093759a156a"
+    },
+    {
+     "path": "internal/setup/reindex.go",
+     "first": 441,
+     "last": 454,
+     "file_sha256": "29b88b51f79d16cb0d1911e8fbab8945d73b656643f90524e9c2eabe0ce91590",
+     "content_sha256": "42f2ba6aaa2a3d60db3df3ca840b009b4ff8c687a2bf08ddd425afca25f9ba92"
+    }
+   ],
+   "cluster_id": "promotion-parent-sync",
+   "unit_id": "promotion-parent-sync",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-DEV-04",
+   "split": "DEV",
+   "group": "POLICY",
+   "proposed_cluster_id": "gc-readers",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "language": "ko",
+   "prompt": "GC 계획에서 현재 버전 외에 활성 reader와 legacy 버전은 어떤 삭제 보호를 받나요?",
+   "candidate_answer": "reader protocol이 없으면 unknown_legacy_readers, 신원 검사에 실패하면 unverified_or_legacy, reader lock이 점유되어 있으면 pinned_reader 사유를 붙인다. 사유가 하나라도 있으면 Delete=false로 회수하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/gc.go",
+     "first": 265,
+     "last": 439,
+     "file_sha256": "db8079d93de746de60a9bf496b4aaea05362599b54f8123f546458f05c681b05",
+     "content_sha256": "79cb4b1eafa066457ad074f48257c777033b3fc296fba2fd7ed9658a9457f6e6"
+    }
+   ],
+   "policy_scope_type": "code_contract",
+   "cluster_id": "gc-readers",
+   "unit_id": "gc-readers",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-DEV-05",
+   "split": "DEV",
+   "group": "CODE",
+   "proposed_cluster_id": "whole-span-budget",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "language": "ko",
+   "prompt": "첫 원문 span이32000bytes를 넘지만 뒤의 작은 span이 들어갈 때 v2 evidence 구성은 어떻게 진행하나요?",
+   "candidate_answer": "큰 span 전체를 생략하고 뒤의 전체 span을 선택한다. 선택되면 partial/예산 진단이며 하나도 들어가지 않으면 typed budget_exceeded다. 원문 좌표나 해시를 잘라서 만들지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/evidencev2/pack.go",
+     "first": 41,
+     "last": 155,
+     "file_sha256": "99829efcfec40b3e0ea82098ef8bc645e1139bcdeaa9b7ea0e6192e92c87923a",
+     "content_sha256": "74a7aab517b1a8ab935f96fb0b4c3531224c605402467d4d15d28f9fda025ddc"
+    }
+   ],
+   "cluster_id": "whole-span-budget",
+   "unit_id": "whole-span-budget",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-FINAL-CAND-01",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "semantic-readonly-open",
+   "proposed_unit_id": "semantic-readonly-open",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "오래된 schema의 semantic 저장소를 조회용으로 열 때 생성·migration 대신 어떤 경계에서 거부하나요?",
+   "candidate_answer": "OpenStoreReadOnly가 mode=ro로 열고 PRAGMA user_version을 StoreSchemaVersion과 비교한다. 불일치하면 DB를 닫고 오류를 반환하며 조회 중 migration하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/readonly.go",
+     "first": 11,
+     "last": 36,
+     "file_sha256": "62947607fc08c933964296bf8f84a28d13f75ac3837105e3d6b36e2ff12e3201",
+     "content_sha256": "b99d80ca270feda64acca16fc1928f4a3cb26c0587001ec07b78e6a564feab2f"
+    }
+   ],
+   "authority_scope": "implementation behavior at the bound source commit; not an organizational policy or human acceptance verdict",
+   "cluster_id": "semantic-readonly-open",
+   "unit_id": "semantic-readonly-open",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-02",
+   "split": "FINAL",
+   "group": "WHY",
+   "proposed_cluster_id": "semantic-readonly-open",
+   "proposed_unit_id": "semantic-readonly-open",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "semantic 조회용 open 경로를 쓰기용 OpenStore와 분리한 이유는 무엇인가요?",
+   "candidate_answer": "평가·조회 입력을 생성하거나 migration하지 않기 위한 경계다. 읽기 전용 모드와 schema 확인을 사용하고, 옛 저장소 migration은 운영자가 별도 OpenStore 경로에서 수행한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/readonly.go",
+     "first": 11,
+     "last": 36,
+     "file_sha256": "62947607fc08c933964296bf8f84a28d13f75ac3837105e3d6b36e2ff12e3201",
+     "content_sha256": "b99d80ca270feda64acca16fc1928f4a3cb26c0587001ec07b78e6a564feab2f"
+    }
+   ],
+   "authority_scope": "implementation behavior at the bound source commit; not an organizational policy or human acceptance verdict",
+   "cluster_id": "semantic-readonly-open",
+   "unit_id": "semantic-readonly-open",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-03",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "knowledge-manifest-parser",
+   "proposed_unit_id": "knowledge-manifest-parser",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "knowledge manifest의 알 수 없는 YAML 필드와 두 번째 YAML 문서는 어느 단계에서 거부하나요?",
+   "candidate_answer": "ReadManifest가 KnownFields(true)로 첫 문서를 읽고 다시 Decode한 결과가 io.EOF인지 검사한다. 첫 문서의 알 수 없는 필드 및 추가 문서는 pack_incompatible 오류로 거부한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/lock.go",
+     "first": 55,
+     "last": 76,
+     "file_sha256": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+     "content_sha256": "8d2ded6423d7ea0908dc08422dcaf1cdae408b223e12adb4902eb01849f6ff8b"
+    }
+   ],
+   "authority_scope": "implementation behavior at the bound source commit; not an organizational policy or human acceptance verdict",
+   "cluster_id": "knowledge-manifest-parser",
+   "unit_id": "knowledge-manifest-parser",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-07",
+   "split": "FINAL",
+   "group": "TRACE",
+   "proposed_cluster_id": "trace-stale-diagnostic",
+   "proposed_unit_id": "trace-stale-diagnostic",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "저장된 semantic projection은 있지만 현재 graph/vector/source 증명이 stale이면 TraceStatus는 어떤 requirement 경로를 반환하나요?",
+   "candidate_answer": "Snapshot과 stale 상태 및 오류 이유를 반환하되 Requirements는 빈 배열이다. 과거 경로를 현재의 유효한 추적으로 제시하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/trace.go",
+     "first": 54,
+     "last": 78,
+     "file_sha256": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+     "content_sha256": "1cf3cb146414695079a245b70f74d251df5288cc642a972ee261a5ca1ad207c8"
+    }
+   ],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "trace_scope_type": "code_contract",
+   "cluster_id": "trace-stale-diagnostic",
+   "unit_id": "trace-stale-diagnostic",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-08",
+   "split": "FINAL",
+   "group": "TRACE",
+   "proposed_cluster_id": "trace-link-adr-evidence",
+   "proposed_unit_id": "trace-link-adr-evidence",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "verified knowledge trace-link가 존재해도 어떤 ADR 근거 조건을 만족하지 못하면 LoadInstances가 거부하나요?",
+   "candidate_answer": "ADR이 없으면 상태와 무관하게 거부한다. link가 verified이면 ADR도 verified여야 하고, RequirementIDs를 포함하며, EvidenceRefs에 ADR SourceRef가 있어야 한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/instances.go",
+     "first": 414,
+     "last": 423,
+     "file_sha256": "931cff918a97e2a2a50008dcfdeb0ad571e901098501fb34d52ba26bed296731",
+     "content_sha256": "24e73a98870166f61c66ca45da26825088006b692dc06c9fae532180571c051f"
+    }
+   ],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "trace_scope_type": "code_contract",
+   "cluster_id": "trace-link-adr-evidence",
+   "unit_id": "trace-link-adr-evidence",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-09",
+   "split": "FINAL",
+   "group": "ABS",
+   "proposed_cluster_id": "operating-recovery-facts-undeclared",
+   "proposed_unit_id": "operating-recovery-facts-undeclared",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "이 프로젝트에서 실제 운영 복구를 위해 승인한 RTO와 RPO는 각각 몇 분인가요?",
+   "candidate_answer": "현재 바인딩한 자료에는 실제 승인 RTO/RPO 값이 없으므로 답변을 보류한다. 작은 시험 실행 시간을 운영 목표로 추정하지 않는다.",
+   "expected_behavior": "abstain",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "strict_zero_citations": false,
+   "abstention_basis": "bounded actual recovery record has human_RTO_RPO=null; reviewer must check this corpus/scope and any other operating decisions before approving absence; never infer values from mock durations",
+   "abstention_basis_sources": [
+    {
+     "path": "docs/spec-driven/C1-RECOVERY-VALIDATION.md",
+     "first": 67,
+     "last": 69,
+     "file_sha256": "4d84ac26e0d9ad93e123c3e5aa0978bfcdc19ba17b121f4ccf4758d3a15df65b",
+     "content_sha256": "2d21560828ee2860ec86ee6ea69d74b8d940c23aa09dbe5c60d73d11059e4c00"
+    }
+   ],
+   "scope_requires_actual_human_absence_review": true,
+   "prompt_scope_note": "'this project' means knowledge-system",
+   "abstention_citation_rule": "citing the recorded unassigned/null operating fact while abstaining is correct; citing any source as the answer is not",
+   "cluster_id": "operating-recovery-facts-undeclared",
+   "unit_id": "operating-recovery-facts-undeclared",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "basis_replacement": "system/eval basis excluded from corpus; replaced by the corpus record the adopted pre-review cited",
+   "reviewer_only_basis_outside_corpus": [
+    {
+     "path": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/summary.json",
+     "first": 44,
+     "last": 44,
+     "file_sha256": "3d12f552ade4a7f61f8423158db4cab3b1f6e06f1ef7f5216aabb82264f15113",
+     "content_sha256": "4c746c7a68f741f7ac39564fef4311f9157fa0be966d26a7e14d189b91c270be",
+     "commit": "479491baa50f818a5f7bb7651f35e9c7192ad906"
+    }
+   ]
+  },
+  {
+   "id": "N11-FINAL-CAND-10",
+   "split": "FINAL",
+   "group": "ABS",
+   "proposed_cluster_id": "operating-recovery-facts-undeclared",
+   "proposed_unit_id": "operating-recovery-facts-undeclared",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "이 프로젝트의 장애 시 실제 운영 백업과 failover 복구를 맡도록 지정한 담당자는 누구인가요?",
+   "candidate_answer": "현재 바인딩한 운영 역할 기록에는 실제 복구 담당자가 미지정이다. fixture 검토자나 chat-user를 운영 담당자로 추정하지 않고 답변을 보류한다.",
+   "expected_behavior": "abstain",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "strict_zero_citations": false,
+   "abstention_basis": "OP01 real release/signing/recovery owner is explicitly unassigned; reviewer must verify applicable operating scope and any other decisions before approving absence",
+   "abstention_basis_sources": [
+    {
+     "path": "docs/spec-driven/C1-OPERATIONS-REVIEW.md",
+     "first": 15,
+     "last": 15,
+     "file_sha256": "ddec29f3f23416ede13c5444b607c79d25e37b1d76d222b1f238e24dc994e45a",
+     "content_sha256": "32d74b402ed9d6dd6f9a8a8b624e640d445a164080f088db752d96fa6751e90f"
+    }
+   ],
+   "scope_requires_actual_human_absence_review": true,
+   "abstention_citation_rule": "citing the recorded unassigned/null operating fact while abstaining is correct; citing any source as the answer is not",
+   "cluster_id": "operating-recovery-facts-undeclared",
+   "unit_id": "operating-recovery-facts-undeclared",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-11",
+   "split": "FINAL",
+   "group": "POLICY",
+   "proposed_cluster_id": "knowledge-instance-file-admission",
+   "proposed_unit_id": "knowledge-instance-file-admission",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "LoadInstances가 knowledge overlay의 항목 파일을 읽을 때 어떤 확장자와 읽기 상한을 허용하고 directory/symlink 항목은 어떻게 처리하나요?",
+   "candidate_answer": "policies/relations/reviews/trace-links는 .yaml, decisions는 .md만 허용한다. directory 또는 symlink entry를 거부하고 ReadSourceFileNoFollow로 각 파일을4MiB 상한 안에서 읽는다. 전체 파일 수/총합 바이트 상한을 보장한다는 뜻은 아니다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/instances.go",
+     "first": 274,
+     "last": 302,
+     "file_sha256": "931cff918a97e2a2a50008dcfdeb0ad571e901098501fb34d52ba26bed296731",
+     "content_sha256": "f409618c9e5586bd143e968fd33b4f439d9f6f28601457413a01f2001911c705"
+    }
+   ],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "policy_scope_type": "code_contract",
+   "cluster_id": "knowledge-instance-file-admission",
+   "unit_id": "knowledge-instance-file-admission",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-12",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "semantic-term-index-migration-integrity",
+   "proposed_unit_id": "semantic-term-index-migration-integrity",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "용어 색인 마이그레이션은 기존 projection에서 어떤 무결성·신원 검사를 마친 뒤 user_version=3을 커밋하나요?",
+   "candidate_answer": "migrateTermIndex는 저장 document의 SHA-256과 digest, JSON 해석, Projection.Validate, 행의 project/dataset과 Snapshot 일치를 확인한다. 같은 트랜잭션에서 용어를 삽입하고 rows 오류·Close 오류가 없을 때 user_version=3을 설정해 Commit한다. 오류 경로에서는 defer Rollback으로 커밋하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/store_terms.go",
+     "first": 13,
+     "last": 68,
+     "file_sha256": "a2b157fade1b0f09cbd8a45931bf817ba11d8a9e10e0a0fba8e7fb0e441a147d",
+     "content_sha256": "d29f2af4709d06cb031ed11dec770aea298cdcb28986cee616da963ede240922"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "cluster_id": "semantic-term-index-migration-integrity",
+   "unit_id": "semantic-term-index-migration-integrity",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-FINAL-CAND-14",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "spec-span-identity-construction",
+   "proposed_unit_id": "spec-span-identity-construction",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate",
+   "language": "ko",
+   "prompt": "ExtractSpec의 EvidenceSpan ID와 ContentSHA256은 어떤 입력 바이트·좌표로 만들어지나요?",
+   "candidate_answer": "LF를 보존해 나눈 행의 start–end 범위(양끝 포함)를 그대로 이어 SHA-256을 구한다. project_id, dataset_id, 상대 파일 경로, start:end, content digest를 NUL로 구분한 key의 SHA-256 앞 12바이트 hex에 prefix를 붙여 ID를 만든다. ContentSHA256에는 본문 digest 전체 hex를 기록한다.",
+   "expected_behavior": "cite",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/extract_spec.go",
+     "first": 24,
+     "last": 74,
+     "file_sha256": "433b01e9f01f1293b220248a77195bd7122f1ccdd46ffac0ff0160ec8906652a",
+     "content_sha256": "572bb3067c6c71752c857e9ca9ef6e3a4b5a855711371554df33780612185386"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "cluster_id": "spec-span-identity-construction",
+   "unit_id": "spec-span-identity-construction",
+   "reviewer_kind": "ai_model_label_designated_by_user"
+  },
+  {
+   "id": "N11-DEV-08",
+   "split": "DEV",
+   "group": "POLICY",
+   "proposed_cluster_id": "capture-default-limits",
+   "language": "ko",
+   "prompt": "명시 설정이 없을 때 source 캡처의 기본 파일 수, 단일 파일 크기, 총 크기 상한은 얼마인가요?",
+   "candidate_answer": "기본 상한은 파일 100,000개, 단일 파일 32 MiB(32<<20), 총 4 GiB(4<<30)이다.",
+   "expected_behavior": "cite",
+   "policy_scope": "code_contract",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/capture.go",
+     "first": 50,
+     "last": 54,
+     "file_sha256": "6ac1079d838282136e8b0f6ed3352f19c20d173faf1b22b2a7bee346da7c9538",
+     "content_sha256": "ceca6f689a847ee00f9df7fbbaa4c692532a9d48569828a9eccab26bc96cf0e3"
+    }
+   ],
+   "replaces": "N11-DEV-06",
+   "cluster_id": "capture-default-limits",
+   "unit_id": "capture-default-limits",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  },
+  {
+   "id": "N11-DEV-09",
+   "split": "DEV",
+   "group": "WHY",
+   "proposed_cluster_id": "mutation-lock-ownership",
+   "language": "ko",
+   "prompt": "데이터셋 변경 잠금은 왜 PID나 기록 시각으로 소유권을 판단하지 않나요?",
+   "candidate_answer": "소유권은 영구 inode에 대한 OS flock이 정하고, 프로세스가 끝나면 OS가 해제하므로 PID와 시각은 진단용일 뿐이다. 업그레이드 이전의 살아 있는 PID는 시각과 무관하게 보호하며 그 inode를 지우지 않는다.",
+   "expected_behavior": "cite",
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/setup/reindex.go",
+     "first": 60,
+     "last": 63,
+     "file_sha256": "29b88b51f79d16cb0d1911e8fbab8945d73b656643f90524e9c2eabe0ce91590",
+     "content_sha256": "f5846306a51366081741bd521dd839f82d6aab43a36f54eee63ba3266fa10edf"
+    },
+    {
+     "path": "internal/setup/reindex.go",
+     "first": 87,
+     "last": 91,
+     "file_sha256": "29b88b51f79d16cb0d1911e8fbab8945d73b656643f90524e9c2eabe0ce91590",
+     "content_sha256": "c81581018e0773ee8cb32b7ab94a3a01ab4c923759ce9c599c4ee72a19ad84e2"
+    }
+   ],
+   "replaces": "N11-DEV-07",
+   "cluster_id": "mutation-lock-ownership",
+   "unit_id": "mutation-lock-ownership",
+   "review_state": "approved",
+   "reviewer": "opus5.5 검토",
+   "reviewer_kind": "ai_model_label_designated_by_user",
+   "independence_review": "approved: DEV/FINAL disjoint after DEV-06/07 replacement; CODE/WHY pairs share their cluster by design",
+   "contamination_review": "approved with corpus exclusion rule (docs/spec-driven/N11-*, N12-*, system/eval/** excluded); prior FINAL observation catalog checked by input gate"
+  }
+ ],
+ "final_questions": null,
+ "results": null,
+ "blocking": [
+  "human gold/independence/contamination review",
+  "remaining independent CODE/WHY/POLICY/TRACE/ABS units",
+  "full protocol/dataset/runtime freeze",
+  "actual individual N12 concept/requirement/relationship decisions and new source/index binding"
+ ],
+ "previous_partial_question_book_sha256": "a50fa44cf8225313186ef56b90e9b0c086bc583218521f22b75976cc6ea9de52",
+ "excluded_candidate_questions": [
+  {
+   "id": "N11-FINAL-CAND-05",
+   "split": "FINAL",
+   "group": "POLICY",
+   "proposed_cluster_id": "review-record-adjudication",
+   "proposed_unit_id": "review-record-adjudication",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "다중 검토자 quorum이 필요한 knowledge 항목에 같은 검토자의 동일 기록을 여러 번 넣거나 inline 승인만 넣으면 어떻게 처리하나요?",
+   "candidate_answer": "같은 검토자의 같은 판정/SHA는 한 표로만 센다. 같은 검토자의 상충 판정/SHA는 오류이며 minApprovals>1이면 기존 inline 승인만으로 quorum을 충족할 수 없다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/review.go",
+     "first": 74,
+     "last": 106,
+     "file_sha256": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+     "content_sha256": "e411ae23c6c0dd34d6a67d9844f35f7ca36ac9a587be22a599ae7893cb22d016"
+    }
+   ],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "exclusion_reason": "shared proposed fact cluster has exact same-byte/span exposure in prior FINAL; not available for fresh FINAL",
+   "policy_scope_type": "code_contract"
+  },
+  {
+   "id": "N11-FINAL-CAND-06",
+   "split": "FINAL",
+   "group": "POLICY",
+   "proposed_cluster_id": "review-record-adjudication",
+   "proposed_unit_id": "review-record-adjudication",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "같은 knowledge 항목에 verified와 rejected 기록이 함께 있으면 verified 쪽의 표가 많더라도 어떤 상태를 유지하나요?",
+   "candidate_answer": "두 종류의 판정이 모두 존재하면 disputed로 proposed 상태를 유지한다. 이 분기에서 다수 표만으로 verified/rejected로 자동 승격하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/knowledgepack/review.go",
+     "first": 108,
+     "last": 129,
+     "file_sha256": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+     "content_sha256": "7a251b39c8f62f5fff99eadcd051f025a3c32af261c82e9f3a52b892f3887f39"
+    }
+   ],
+   "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+   "exclusion_reason": "shared proposed fact cluster has exact same-byte/span exposure in prior FINAL; not available for fresh FINAL",
+   "policy_scope_type": "code_contract"
+  },
+  {
+   "id": "N11-FINAL-CAND-16",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "concept-matching-ambiguity-known-scope",
+   "proposed_unit_id": "concept-matching-ambiguity-known-scope",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "MatchConcepts는 limit 경계에서 같은 점수의 개념들이 남으면 어떻게 반환하나요?",
+   "candidate_answer": "점수 내림차순 및 동일 점수의 ConceptID 순으로 정렬하고 limit번째 점수와 같은 후속 후보까지 모두 남긴다. 따라서 반환 개수가 limit보다 클 수 있으며 하나의 의미로 자동 단정하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/matcher.go",
+     "first": 19,
+     "last": 72,
+     "file_sha256": "29ca0cb683b6de6ebdf126920eddae55c6430a0de7cdf5f2e14630d0ab2397a1",
+     "content_sha256": "48f0839c9eec237d6ae07c1524593dea6642e2ebdc15f901d234ea978e8e692f"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "exclusion_reason": "conservative quarantine: overlaps known N12 ontology ambiguity/fallback or B0/N14 reviewed-trace and separate human-acceptance scopes; no new independent FINAL claim"
+  },
+  {
+   "id": "N11-FINAL-CAND-17",
+   "split": "FINAL",
+   "group": "WHY",
+   "proposed_cluster_id": "concept-matching-ambiguity-known-scope",
+   "proposed_unit_id": "concept-matching-ambiguity-known-scope",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "개념 후보의 limit번째 동점 후보를 왜 단순히 잘라 하나의 의미로 만들지 않나요?",
+   "candidate_answer": "주석은 모호한 term이 하나의 단정된 의미로 바뀌지 않도록 모든 cutoff 동점을 남긴다고 명시한다. rejected는 제외하며 여기서는 query rewrite나 citation 후보 filtering을 수행하지 않는다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/matcher.go",
+     "first": 19,
+     "last": 72,
+     "file_sha256": "29ca0cb683b6de6ebdf126920eddae55c6430a0de7cdf5f2e14630d0ab2397a1",
+     "content_sha256": "48f0839c9eec237d6ae07c1524593dea6642e2ebdc15f901d234ea978e8e692f"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "exclusion_reason": "conservative quarantine: overlaps known N12 ontology ambiguity/fallback or B0/N14 reviewed-trace and separate human-acceptance scopes; no new independent FINAL claim"
+  },
+  {
+   "id": "N11-FINAL-CAND-18",
+   "split": "FINAL",
+   "group": "CODE",
+   "proposed_cluster_id": "trace-anchor-resolution-known-scope",
+   "proposed_unit_id": "trace-anchor-resolution-known-scope",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "ResolveTracePath에서 같은 requirement/criterion/code/test에 맞는 reviewed 경로가 두 개면 어느 경로를 선택하나요?",
+   "candidate_answer": "첫 경로 이후 또 일치하는 경로를 찾으면 evidence_unverified: ambiguous reviewed trace path 오류를 반환한다. 일치 경로가 없거나 정확한 문서/code/test anchor가 부족한 경우에도 거부한다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/trace_anchor.go",
+     "first": 16,
+     "last": 70,
+     "file_sha256": "6bb7e30abde4f4559844aabb05198f8d555e152b2eaf6f52adb24ecad9a47c38",
+     "content_sha256": "662ab983f135b8129cf716d4c507204c95b7b07494bbf0cec85993c6545c866c"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "exclusion_reason": "conservative quarantine: overlaps known N12 ontology ambiguity/fallback or B0/N14 reviewed-trace and separate human-acceptance scopes; no new independent FINAL claim"
+  },
+  {
+   "id": "N11-FINAL-CAND-19",
+   "split": "FINAL",
+   "group": "WHY",
+   "proposed_cluster_id": "trace-anchor-resolution-known-scope",
+   "proposed_unit_id": "trace-anchor-resolution-known-scope",
+   "independence_review": null,
+   "contamination_review": null,
+   "language": "ko",
+   "prompt": "ResolveTracePath의 성공을 테스트 실행 또는 사람이 수용 기준을 승인했다는 판정으로 사용할 수 있나요?",
+   "candidate_answer": "TraceAnchors의 주석은 링크가 traceability evidence일 뿐 테스트 실행과 사람 criterion 수용을 주장하지 않는다고 명시한다. 성공은 검토된 한 경로와 exact anchor 해석의 범위다.",
+   "expected_behavior": "cite",
+   "review_state": "draft",
+   "reviewer": null,
+   "source_commit": "e693b312393231181ffae94f6650869d3ad5d9f2",
+   "evidence": [
+    {
+     "path": "internal/system/semantic/trace_anchor.go",
+     "first": 5,
+     "last": 70,
+     "file_sha256": "6bb7e30abde4f4559844aabb05198f8d555e152b2eaf6f52adb24ecad9a47c38",
+     "content_sha256": "a044af8c60e0710032b8415522c9994c745859c94177f126cb516123a38bd1df"
+    }
+   ],
+   "authority_scope": "implementation at bound commit only; organizational policy and accepted trace relations are outside this evidence",
+   "exclusion_reason": "conservative quarantine: overlaps known N12 ontology ambiguity/fallback or B0/N14 reviewed-trace and separate human-acceptance scopes; no new independent FINAL claim"
+  }
+ ],
+ "excluded_proposed_clusters": [
+  "review-record-adjudication",
+  "concept-matching-ambiguity-known-scope",
+  "trace-anchor-resolution-known-scope"
+ ],
+ "previous_question_book_sha256": "ab1b1a5e44d025a3f5e685adccd36292bd0c31a8477bb9494d8d74f8097a798b",
+ "scope_selection_receipt": "system/eval/b0-knowledge-system/refactoring-scope-adoption-2026-10-08/scope-selection.json",
+ "evaluation_scope": {
+  "POLICY_types": [
+   "code_contract",
+   "organization_policy"
+  ],
+  "TRACE_types": [
+   "code_contract",
+   "reviewed_path"
+  ],
+  "individual_reviews_required": true
+ },
+ "revision_of_sha256": "a412d5379a7effe64e1550b825e2eb7b110d59eeafbefd157876d4fd8f4ba390",
+ "reviewer": "opus5.5 검토",
+ "reviewer_kind": "ai_model_label_designated_by_user",
+ "withdrawn_before_freeze": [
+  "N11-DEV-06",
+  "N11-DEV-07",
+  "N11-FINAL-CAND-04",
+  "N11-FINAL-CAND-13",
+  "N11-FINAL-CAND-15"
+ ],
+ "previous_source_commit": "479491baa50f818a5f7bb7651f35e9c7192ad906",
+ "previous_frozen_book_sha256": "f7fff2dd0c74153650d6b6c961c05f8cec6ef49cb9f52650a65d355ff082bfe6"
+}

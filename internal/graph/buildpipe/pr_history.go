@@ -21,7 +21,7 @@ import (
 // [StartLine, EndLine] range overlaps the commit's touched line ranges.
 //
 // The output drives node_prs persistence (StoreWriter.InsertNodePRs)
-// and the public Reader.GetNodePRs accessor (ckg-NEW-4). Empty input
+// and the public Reader.GetNodePRs accessor. Empty input
 // (no nodes / non-git tree / no PR-tagged commits) returns an empty
 // map without an error — PR breadcrumb is optional metadata.
 //
@@ -32,7 +32,7 @@ import (
 //     captures every commit; alongside it we run the same with
 //     `--merges` so GitHub-style merge commits (which carry "(#NNN)"
 //     in the subject) survive in repos that still use --no-ff merges.
-//     The 1000-commit cap matches G6 temporal's `--max-count=10`-per-
+//     The 1000-commit cap matches the temporal pass's `--max-count=10`-per-
 //     file working window scaled up by 100× for whole-repo scope and
 //     bounded so stable-net's 50k commits don't blow the I/O budget.
 //  3. PR-number regex `\(#(\d+)\)` runs against the subject.
@@ -45,8 +45,8 @@ import (
 //     Summary is the cleaned commit body — trailers (Signed-off-by:,
 //     Co-authored-by:, Generated with…) are dropped and the result is
 //     capped at bodyExcerptMaxBytes on a line boundary. This carries
-//     the "왜" history that CKV's semantic search ingests; see
-//     docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2. Both fall back to "".
+//     the "왜" history that CKV's semantic search ingests. Both fall
+//     back to "".
 //
 // Cost is dominated by step 4 — one `git show` per PR-tagged commit.
 // On ckg's own repo (4 PRs) this is millisecond-scale; on stable-net
@@ -111,7 +111,7 @@ func ScanPRHistory(srcRoot string, nodes []types.Node) (map[string][]types.PRRef
 		}
 	}
 
-	// Pass 2 (ckg-NEW-4b): override definition-node attribution with
+	// Pass 2: override definition-node attribution with
 	// drift-free git-`-L` line-history. The Pass-1 overlap above compares a
 	// node's CURRENT [StartLine,EndLine] against each PR commit's historical
 	// hunk range; when code moves between the commit and HEAD those ranges
@@ -146,7 +146,7 @@ var defHistoryNodeTypes = map[types.NodeType]bool{
 }
 
 // lineHistoryMaxCommits bounds the per-node `git log -L` walk so a hot file's
-// god-function doesn't drag the whole pass. Mirrors the temporal G6 per-file
+// god-function doesn't drag the whole pass. Mirrors the temporal pass's per-file
 // cap intent; deeper genealogy is truncated newest-first.
 const lineHistoryMaxCommits = 40
 
@@ -360,8 +360,7 @@ const bodyExcerptMaxBytes = 2048
 // bodyExcerpt returns the "why" portion of a commit body — the
 // multi-line description sandwiched between the subject (already
 // captured in Title) and any trailing git trailers (Signed-off-by:,
-// Co-authored-by:, etc.). This is the P0 enrichment from
-// docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2 — previously this field
+// Co-authored-by:, etc.). Previously this field
 // captured only the first non-empty body line, which dropped the bulk
 // of the rationale that CKV's semantic search depends on.
 //

@@ -1,0 +1,19 @@
+{
+  "runtime_base_revision": "b35f10ef286175c1d70616c2c3291cc0b099acda",
+  "working_source_sha256": {
+    "internal/system/patch/review.go": "4591bf3c87a97f58c7b482079a6044e8ae5d23770122560389072a2bd392f0db",
+    "internal/system/patch/patch_test.go": "2fabc6e28279afab5730166e2eabf1b0cebf3c0940b594ff7c826df747c8dcff",
+    "internal/system/patch/review_test.go": "b8a35323cbd1e1f94efc14329b16cdeee88ecfbc506a464ccb6787e7b0c97ffb"
+  },
+  "GO": "go version go1.26.8 darwin/arm64",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "red": "go test -json -count=1 ./internal/system/patch -run ^TestRunValidationRejectsUnreviewedOrMismatchedProof$",
+  "green": "go test -json -count=1 ./internal/system/patch -run ^(TestRunValidationRejectsUnreviewedOrMismatchedProof|TestCriterionPromotionRejectsCommandOnlySuccess)$",
+  "race": "go test -json -count=1 -race ./internal/system/patch ./internal/system/semantic ./cmd/cks/patchcli",
+  "full": "go test -json -count=1 ./...",
+  "vet": "go vet ./internal/system/patch ./internal/system/semantic ./cmd/cks/patchcli",
+  "boundary_format": "make boundaries fmt-check",
+  "held": "go run ./.n14-run-proof-driver (helper saved as held-driver.go.txt and removed after execution)",
+  "fixture_reviewers_are_actual_humans": false,
+  "full_task_complete": false
+}

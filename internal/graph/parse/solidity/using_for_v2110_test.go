@@ -7,14 +7,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.11 — bare path-only import (Solidity default form).
+// Bare path-only import (Solidity default form).
 //
-// V1.28 / V1.29 / V2.10 covered the three import-with-clause forms:
-//   - V1.28 named alias    `import {Lib as L} from "./lib.sol"`
-//   - V1.29 namespace      `import "./lib.sol" as L`
-//   - V2.10 mixed (V2.10)  `import {LibA, LibB as L2} from "./lib.sol"`
+// Other tests cover the three import-with-clause forms:
+//   - named alias    `import {Lib as L} from "./lib.sol"`
+//   - namespace      `import "./lib.sol" as L`
+//   - mixed          `import {LibA, LibB as L2} from "./lib.sol"`
 //
-// V2.11 closes the import-shape coverage with the *default* form:
+// This test closes the import-shape coverage with the *default* form:
 //
 //   import "./lib.sol";
 //
@@ -24,15 +24,15 @@ import (
 // dispatches through the global byName[NodeContract] index. This
 // is also the form most Solidity code actually uses.
 //
-// V2.11 is primarily a regression guard — V1.14's cross-file
+// It is primarily a regression guard — the cross-file
 // dispatch infrastructure was designed for the global index, so
 // nothing should be specific to the curly-brace form. But after
-// V2.10's hidden positional-zip bug surfaced, locking the default
+// the mixed-import positional-zip bug surfaced, locking the default
 // form makes the alias-machinery test surface complete.
 
 // TestUsingForV2110_BarePathOnlyImport — `import "./lib.sol";`
 // cross-file. Verifies the default form drives the same EdgeUsesFor
-// + V1.0 dispatch path as the curly-brace forms.
+// + method-call dispatch path as the curly-brace forms.
 func TestUsingForV2110_BarePathOnlyImport(t *testing.T) {
 	dir := filepath.Join("testdata", "using_for_v2110")
 	files := []string{"bare_libs.sol", "bare_caller.sol"}
@@ -61,7 +61,7 @@ func TestUsingForV2110_BarePathOnlyImport(t *testing.T) {
 		t.Errorf("missing EdgeUsesFor Vault → SafeMath (V2.11 bare path-only import)")
 	}
 
-	// (b) EdgeCalls: Vault.compute → SafeMath.add via V1.0 dispatch.
+	// (b) EdgeCalls: Vault.compute → SafeMath.add via state-var dispatch.
 	edge, ok := findUsingForCall(nodes, edges, "Vault.compute", "SafeMath.add")
 	if !ok {
 		t.Fatalf("missing EdgeCalls Vault.compute → SafeMath.add (V2.11 bare path-only dispatch)")

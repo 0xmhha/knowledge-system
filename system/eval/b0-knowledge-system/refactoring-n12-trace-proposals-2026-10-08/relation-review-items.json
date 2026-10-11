@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+    "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+    "source_mode": "committed",
+    "commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+  },
+  "new_relation_count": 13,
+  "relations": [
+    {
+      "assertion": {
+        "id": "trace-proposal:impl:req-filtered-recall",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "vector-chunk",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "evidence_ids": [
+          "ontology:4c5df824cf9fc2d11a79fcff",
+          "spec:d8731b5558422cfeffb92798",
+          "n12-proposed-lock-anchor:21"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "candidate_code_source": {
+          "path": "internal/vector/store/sqlitevec/store.go",
+          "first": 620,
+          "last": 820,
+          "file_sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55",
+          "content_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+          "declaration": "func (s *Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "scope": "hypothesis about a common metamodel concept implemented by this function; type/source validity does not establish semantic correctness"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "n12-proposed-lock-anchor:21",
+          "n12-proposed-lock-anchor:15",
+          "criterion:a59fde572be70141fcffe186"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-recall",
+        "candidate_test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 389,
+          "last": 425,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "f83750058a54d96557b1fd65ea1cafb709fdb56cb129d33f7ecdec5f5a2d0375",
+          "declaration": "func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-recall",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "criterion:a59fde572be70141fcffe186",
+          "n12-proposed-lock-anchor:15"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-recall",
+        "candidate_test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 389,
+          "last": 425,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "f83750058a54d96557b1fd65ea1cafb709fdb56cb129d33f7ecdec5f5a2d0375",
+          "declaration": "func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:test:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "n12-proposed-lock-anchor:21",
+          "n12-proposed-lock-anchor:24",
+          "criterion:59b7a21595c5f1ef3fcd55fa"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-completeness",
+        "candidate_test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 142,
+          "last": 175,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "f1283b2243af4fadaf6dbdc47416ef4830c8d1d0ccbd2d29a26c051b0ee4d64b",
+          "declaration": "func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:criterion:ac-filtered-completeness:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "criterion:59b7a21595c5f1ef3fcd55fa",
+          "n12-proposed-lock-anchor:24"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-completeness",
+        "candidate_test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 142,
+          "last": 175,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "f1283b2243af4fadaf6dbdc47416ef4830c8d1d0ccbd2d29a26c051b0ee4d64b",
+          "declaration": "func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:test:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "n12-proposed-lock-anchor:21",
+          "n12-proposed-lock-anchor:25",
+          "criterion:59b7a21595c5f1ef3fcd55fa"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-completeness",
+        "candidate_test_name": "TestSearchDetailedCancellationIsNotEmptySuccess",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 177,
+          "last": 195,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "a9004d2f48360194b8fb01416650cfd51aa4c8efbfd8136574ec8219298c884c",
+          "declaration": "func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:criterion:ac-filtered-completeness:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "criterion:59b7a21595c5f1ef3fcd55fa",
+          "n12-proposed-lock-anchor:25"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-filtered-recall",
+        "criterion_id": "ac-filtered-completeness",
+        "candidate_test_name": "TestSearchDetailedCancellationIsNotEmptySuccess",
+        "candidate_test_source": {
+          "path": "internal/vector/store/sqlitevec/store_test.go",
+          "first": 177,
+          "last": 195,
+          "file_sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922",
+          "content_sha256": "a9004d2f48360194b8fb01416650cfd51aa4c8efbfd8136574ec8219298c884c",
+          "declaration": "func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "direct SearchDetailed calls",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:impl:req-source-evidence",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "evidence-span",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "evidence_ids": [
+          "ontology:367555795e0ad61385833dcd",
+          "spec:25c4bdb669d61e6c4586d716",
+          "n12-proposed-lock-anchor:26"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-source-evidence",
+        "candidate_code_source": {
+          "path": "internal/system/semantic/alignment.go",
+          "first": 69,
+          "last": 138,
+          "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+          "content_sha256": "9fa6701c9ca8bc02dee05a91615f2f002a34733da300491270255f6a56330cd9",
+          "declaration": "func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string) error {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "scope": "hypothesis about a common metamodel concept implemented by this function; type/source validity does not establish semantic correctness"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:test:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "n12-proposed-lock-anchor:26",
+          "n12-proposed-lock-anchor:28",
+          "criterion:d827c28469af5db889066306"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-source-evidence",
+        "criterion_id": "ac-source-evidence",
+        "candidate_test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "candidate_test_source": {
+          "path": "internal/system/semantic/alignment_test.go",
+          "first": 26,
+          "last": 107,
+          "file_sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9",
+          "content_sha256": "9b9e8375569a40a0ae5c791671fb152c807d973edf4bfa1beb1e9134bf1540eb",
+          "declaration": "func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "Store.PutAligned -> ValidateDatasetAlignment",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:criterion:ac-source-evidence:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "criterion:d827c28469af5db889066306",
+          "n12-proposed-lock-anchor:28"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-source-evidence",
+        "criterion_id": "ac-source-evidence",
+        "candidate_test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "candidate_test_source": {
+          "path": "internal/system/semantic/alignment_test.go",
+          "first": 26,
+          "last": 107,
+          "file_sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9",
+          "content_sha256": "9b9e8375569a40a0ae5c791671fb152c807d973edf4bfa1beb1e9134bf1540eb",
+          "declaration": "func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "Store.PutAligned -> ValidateDatasetAlignment",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:impl:req-ontology-fallback",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "concept",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "evidence_ids": [
+          "ontology:93e20299b6025955c4a93795",
+          "spec:29270126ce422863b7b12e7f",
+          "n12-proposed-lock-anchor:29"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-ontology-fallback",
+        "candidate_code_source": {
+          "path": "internal/system/composer/stage2/ontology_provider.go",
+          "first": 76,
+          "last": 244,
+          "file_sha256": "948a46cd0725e4170acee64c0d72c06ee8a8091ebd368ba79bd8b4f25d7cee25",
+          "content_sha256": "046b576e2a794a161e2d4017ae1ff9099c89d4e4c6869efd2e5b52f812b937d4",
+          "declaration": "func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, prompt string, hits []contract.Hit, baseline []ScoredCitation, demoteTests, demoteDocs bool) ([]ScoredCitation, []semantic.ConceptCandidate, *contract.OntologyDiagnostic) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "scope": "hypothesis about a common metamodel concept implemented by this function; type/source validity does not establish semantic correctness"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:test:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "n12-proposed-lock-anchor:29",
+          "n12-proposed-lock-anchor:30",
+          "criterion:792e23635975c8f47ac003e3"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-ontology-fallback",
+        "criterion_id": "ac-ontology-fallback",
+        "candidate_test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "candidate_test_source": {
+          "path": "internal/system/composer/stage2/ontology_provider_test.go",
+          "first": 49,
+          "last": 82,
+          "file_sha256": "4b17855299ff913d8c23033054e363f1ea77150de093931a1ea3d8c2f2b4ebd8",
+          "content_sha256": "bb58559a029f2bfa13342e87b9260f3b043addab28df70e64ea8f4267af9c1aa",
+          "declaration": "func TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "Searcher.Search -> applyProvidedOntology",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    },
+    {
+      "assertion": {
+        "id": "trace-proposal:criterion:ac-ontology-fallback:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "criterion:792e23635975c8f47ac003e3",
+          "n12-proposed-lock-anchor:30"
+        ],
+        "status": "proposed"
+      },
+      "review_context": {
+        "requirement_id": "req-ontology-fallback",
+        "criterion_id": "ac-ontology-fallback",
+        "candidate_test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "candidate_test_source": {
+          "path": "internal/system/composer/stage2/ontology_provider_test.go",
+          "first": 49,
+          "last": 82,
+          "file_sha256": "4b17855299ff913d8c23033054e363f1ea77150de093931a1ea3d8c2f2b4ebd8",
+          "content_sha256": "bb58559a029f2bfa13342e87b9260f3b043addab28df70e64ea8f4267af9c1aa",
+          "declaration": "func TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline(t *testing.T) {",
+          "canonical_id": null,
+          "validation": "source text and hashes checked; CKG canonical/snapshot relation not yet verified"
+        },
+        "test_execution_in_this_run": false,
+        "human_criterion_acceptance": null,
+        "call_relation": "Searcher.Search -> applyProvidedOntology",
+        "scope": "proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication"
+      },
+      "reviewer": null,
+      "decision": null,
+      "reason": null,
+      "human_active_review_ns": null
+    }
+  ],
+  "excluded_code_test_pairs": [
+    {
+      "criterion_id": "ac-source-evidence",
+      "candidate_code": {
+        "id": "n12-proposed-lock-anchor:26",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "kind": "code",
+        "path": "internal/system/semantic/alignment.go",
+        "start_line": 69,
+        "end_line": 138,
+        "content_sha256": "9fa6701c9ca8bc02dee05a91615f2f002a34733da300491270255f6a56330cd9",
+        "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "extractor": "n12-proposed-lock-v1"
+      },
+      "proposed_test": {
+        "id": "n12-proposed-lock-anchor:27",
+        "snapshot": {
+          "project_id": "knowledge-system",
+          "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+          "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+          "source_mode": "committed",
+          "commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9"
+        },
+        "kind": "test",
+        "path": "internal/system/semantic/validate_test.go",
+        "start_line": 88,
+        "end_line": 109,
+        "content_sha256": "a80d4670c7ca58967e2f36d840e52b2c6b4d4d7baaa24ce2db2e668766fc1923",
+        "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestProjectionRejectsCrossSnapshotOrMissingEvidence",
+        "extractor": "n12-proposed-lock-v1"
+      },
+      "reason": "test exercises Projection.Validate and ValidateSources, not ValidateDatasetAlignment; keep source test as contextual corroboration only, do not assert TESTED_BY for this code",
+      "decision": null
+    }
+  ],
+  "human_active_review_ns": null,
+  "criterion_acceptance": null,
+  "not_evaluation_FINAL_inputs": true
+}

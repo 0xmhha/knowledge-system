@@ -10,8 +10,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 )
 
-// RegisterEvidenceForIntent wires the H3 EvidencePack assembler
-// (docs/design/hunk-graph.md §5). Returns an EvidencePack JSON for
+// RegisterEvidenceForIntent wires the EvidencePack assembler
+// (docs/graph/design/hunk-graph.md §5). Returns an EvidencePack JSON for
 // an intent string + optional seed_qname / issue_id, ranked by BM25
 // over the (commit subject || patch || modifies-qnames) virtual
 // document and grouped by parent commit.
@@ -36,7 +36,7 @@ import (
 //     wrapper, the EvidencePack assembler still hides the
 //     unreachable-history track from LLM consumers.
 func RegisterEvidenceForIntent(s *server.MCPServer, reader store.Reader, cache *evidence.Cache) {
-	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
+	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("evidence_for_intent",
 		mcp.WithDescription("EvidencePack: BM25-rank past commit hunks against an intent, return top-K with patches + modifies neighbours. Filters AMBIGUOUS unreachable-history per §11.3."),
 		mcp.WithString("intent",
@@ -44,7 +44,7 @@ func RegisterEvidenceForIntent(s *server.MCPServer, reader store.Reader, cache *
 		mcp.WithString("seed_qname",
 			mcp.Description("Optional. Restrict to hunks whose modifies edges reach this CodeNode or its callers/callees (1-hop).")),
 		mcp.WithString("issue_id",
-			mcp.Description("Optional. Restrict to hunks whose parent commit cites this H4-extracted ticket (e.g. GH-42, INGEST-789). Use alone to browse a ticket's full footprint sorted by recency, or combine with intent for BM25-rank within the ticket subset.")),
+			mcp.Description("Optional. Restrict to hunks whose parent commit cites this extracted ticket ID (e.g. GH-42, INGEST-789). Use alone to browse a ticket's full footprint sorted by recency, or combine with intent for BM25-rank within the ticket subset.")),
 		mcp.WithNumber("k", mcp.DefaultNumber(5),
 			mcp.Description("Top-K commits to return. Each commit may contain multiple hunks (the adjacent edge means the Agent reads the full change).")),
 		mcp.WithNumber("budget_tokens", mcp.DefaultNumber(6000),

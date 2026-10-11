@@ -32,6 +32,7 @@ var seedCoverage = map[string]string{
 	ToolNameFindCallees:       "mcp",
 	ToolNameChangeHistory:     "mcp",
 	ToolNameGetSubgraph:       "ckgclient",
+	ToolNameReviewFunction:    "ckgclient",
 	ToolNameImpactAnalysis:    "ckgclient",
 	ToolNameConcurrencyImpact: "ckgclient",
 }

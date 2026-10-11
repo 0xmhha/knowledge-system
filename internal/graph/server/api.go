@@ -127,7 +127,7 @@ func (s *Server) handleTopNodes(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, s.decorateNodes(nodes))
 }
 
-// handleEvidence returns the H3 EvidencePack JSON for an intent string
+// handleEvidence returns the EvidencePack JSON for an intent string
 // + optional seed_qname. Mirrors the MCP evidence_for_intent tool —
 // shares the same pkg/evidence.BuildPack assembler, so HTTP and stdio
 // consumers observe the same ranking + budget behaviour.
@@ -174,7 +174,7 @@ func (s *Server) handleEvidence(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, pack)
 }
 
-// handleTickets returns the H4 issue-id index aggregated from the
+// handleTickets returns the issue-id index aggregated from the
 // cached BM25 corpus: ticket IDs sorted by hunk count, with a few
 // most-recent commit subjects per ticket. Powers the viewer's
 // TicketIndex panel.
@@ -182,7 +182,7 @@ func (s *Server) handleEvidence(w http.ResponseWriter, r *http.Request) {
 // Response shape: `[{issue_id, hunk_count, commit_count,
 // sample_commits: [{sha, subject, author_time}]}]`. Empty array
 // when the graph has no Hunks with `issues:…` doc_comment (a fresh
-// repo or a build with H4 disabled).
+// repo or a build without issue-ID extraction).
 //
 // limit query param caps the result; default 100 strikes a balance
 // between "browse the project's whole ticket footprint" and
@@ -233,6 +233,26 @@ func (s *Server) handleEdgeCounts(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, counts)
 }
 
+// maxIDsBodyBytes bounds a POST body of node IDs. The viewer sends at most a
+// few thousand 16-character IDs; 4 MiB leaves ample room.
+const maxIDsBodyBytes = 4 << 20
+
+// decodeIDsBody decodes a bounded JSON body. It writes 413 for an oversized
+// body and 400 for malformed JSON, returning false in both cases.
+func decodeIDsBody(w http.ResponseWriter, r *http.Request, v any) bool {
+	err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxIDsBodyBytes)).Decode(v)
+	if err == nil {
+		return true
+	}
+	var tooLarge *http.MaxBytesError
+	if errors.As(err, &tooLarge) {
+		http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+		return false
+	}
+	http.Error(w, err.Error(), http.StatusBadRequest)
+	return false
+}
+
 // handleEdges accepts a JSON body {"ids":[...]} and returns every edge
 // touching any of those IDs as src or dst. Used by the viewer to expand a
 // neighbourhood without preloading the full edge table.
@@ -240,8 +260,7 @@ func (s *Server) handleEdges(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		IDs []string `json:"ids"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if !decodeIDsBody(w, r, &body) {
 		return
 	}
 	edges, err := s.store.QueryEdgesForNodes(body.IDs)
@@ -259,7 +278,7 @@ func (s *Server) handleEdges(w http.ResponseWriter, r *http.Request) {
 // served as text/plain so curl / browser preview just works.
 //
 // Hunk nodes (schema 1.8) get a gzip-decompression pass on the way out
-// because the H1 design stores their unified-diff text gzipped to keep
+// because the hunk-graph design stores their unified-diff text gzipped to keep
 // the blob table compact (~70% reduction). The compressed bytes are
 // useless to a viewer / agent / curl session — decompress before send.
 // Other node types (Function / Method / Struct / etc.) have raw source
@@ -278,7 +297,7 @@ func (s *Server) handleBlob(w http.ResponseWriter, r *http.Request) {
 		// On gzip-decompress error fall through with the raw bytes — the
 		// caller still sees something rather than a 500, and the only way
 		// to land here in practice is a legacy Hunk row written by a
-		// pre-H1 build.
+		// pre-hunk-graph build.
 	}
 	w.Header().Set("content-type", "text/plain; charset=utf-8")
 	_, _ = w.Write(src)
@@ -315,8 +334,7 @@ func (s *Server) handleNodesByIDs(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		IDs []string `json:"ids"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if !decodeIDsBody(w, r, &body) {
 		return
 	}
 	if len(body.IDs) == 0 {

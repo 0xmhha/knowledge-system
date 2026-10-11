@@ -6,12 +6,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V17 — multi-inheritance storage slot offset audit.
+// Multi-inheritance storage slot offset audit.
 //
 // Solidity's storage layout for `contract C is A, B` follows the
 // reverse-MRO rule: base contracts lay out first, the derived
 // contract's own fields go at the offset = sum of base slot counts.
-// W9 V1 introduced single-inheritance offset; V17 pins the
+// storage_slot_inheritance_test.go covers the single-inheritance offset; this test pins the
 // multi-base case so a regression in resolve.go's
 // applyInheritanceStorageOffsets (or in c3_linearization.go's MRO
 // computation) is caught before it ships.

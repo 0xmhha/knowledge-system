@@ -18,22 +18,22 @@ import (
 // that already have an `edges` table without `dispatch_kind` would silently
 // keep the old shape; explicit ALTER TABLE here brings them up to current.
 //
-// Schema 1.8 → 1.9 (W1 of schema-1.9-spec): no DDL change — TypeScript
+// Schema 1.8 → 1.9 (schema-1.9-spec): no DDL change — TypeScript
 // HTTP server endpoint detection reuses the existing NodeEndpoint + edge
 // `listens_on` rows. The schema version recognition lives in
 // buildpipe/cache.go.SchemaVersion; ManifestUsable forces a cold rebuild
 // on first 1.9 run so pre-1.9 DBs don't carry forward a stale TS graph.
 // This Migrate stub is intentionally empty for 1.9 — kept as a documented
-// landing site for future 1.9 column additions (e.g. W2 http_calls suffix
-// match needs no new column, W4 Topic node reuses NodeMessageType-shaped
+// landing site for future 1.9 column additions (e.g. http_calls suffix
+// match needs no new column, the Topic node reuses NodeMessageType-shaped
 // columns).
 //
-// Schema 1.9 → 1.10 (within-language semantics Phase 4, 2026-05-11): no
+// Schema 1.9 → 1.10 (within-language semantics slot reservation): no
 // DDL change — the new enum literals (`NodeAwaitPoint`, `EdgeAwaits`,
 // `EdgeOverrides`) ride the existing `nodes.type` / `edges.type` TEXT
 // columns. The bump is purely a cache-key contributor so pre-1.10 DBs
-// drop into the cold path on first build with the new binary; once the
-// Phase 5 detectors land they will populate the slot under the same
+// drop into the cold path on first build with the new binary; the
+// detectors populate the slot under the same
 // schema version. No Migrate work required here.
 func (s *sqliteStore) Migrate() error {
 	if _, err := s.db.Exec(schemaSQL); err != nil {
@@ -45,8 +45,8 @@ func (s *sqliteStore) Migrate() error {
 	if err := ensureDispatchKindColumn(s.db, "pending_refs"); err != nil {
 		return fmt.Errorf("migrate dispatch_kind on pending_refs: %w", err)
 	}
-	// W-C W11 V7 (2026-05-19): nodes.attrs JSON blob carries every
-	// types.Node marker that doesn't have its own column. Pre-1.9
+	// nodes.attrs JSON blob carries every
+	// types.Node marker that doesn't have its own column. Pre-1.11
 	// DBs need ALTER ADD.
 	if err := ensureAttrsColumn(s.db); err != nil {
 		return fmt.Errorf("migrate attrs on nodes: %w", err)
@@ -59,6 +59,29 @@ func (s *sqliteStore) Migrate() error {
 	}
 	if err := ensureSimpleNameColumn(s.db); err != nil {
 		return fmt.Errorf("migrate simple_name on nodes: %w", err)
+	}
+	if err := ensureIsTestColumn(s.db); err != nil {
+		return fmt.Errorf("migrate is_test on nodes: %w", err)
+	}
+	// Seed resolution looks canonical ids up on every MCP call (schema 1.24).
+	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS idx_nodes_canonical_id ON nodes(canonical_id)`); err != nil {
+		return fmt.Errorf("create idx_nodes_canonical_id: %w", err)
+	}
+	return nil
+}
+
+// ensureIsTestColumn ALTER-adds nodes.is_test on pre-1.24 DBs. Idempotent.
+// RebuildReviewIndex populates it; the SchemaVersion 1.24 bump forces a cold
+// rebuild, so no backfill is needed here.
+func ensureIsTestColumn(db *sql.DB) error {
+	has, err := columnExists(db, "nodes", "is_test")
+	if err != nil {
+		return err
+	}
+	if !has {
+		if _, err := db.Exec(`ALTER TABLE nodes ADD COLUMN is_test INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return fmt.Errorf("alter nodes add is_test: %w", err)
+		}
 	}
 	return nil
 }

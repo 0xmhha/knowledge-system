@@ -10,7 +10,7 @@
 // per-language rule maintenance.
 //
 // The classifier never calls an LLM — embeddings are produced by a local
-// ONNX/transformer model (real impl lands with ckv's adapter in Phase C.2).
+// ONNX/transformer model (the real impl is shared with ckv's adapter).
 package intent
 
 import (
@@ -21,7 +21,7 @@ import (
 )
 
 // Embedder turns text into a fixed-length float vector. cks's real
-// implementation in Phase C.2 wraps the same model ckv uses for chunk
+// implementation wraps the same model ckv uses for chunk
 // embeddings, so anchor and chunk vectors live in the same space and
 // downstream pipeline stages can reuse one model.
 type Embedder interface {

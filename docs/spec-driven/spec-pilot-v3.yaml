@@ -1,0 +1,46 @@
+# REVIEWED revision: adopted N12 pre-review modifications.
+# reviewed_by "opus5.5 검토" is a label designated by the user for an AI model review
+# (Claude Opus 5.5) adopted in bulk by the user; not an independent human content review.
+version: 1
+project_id: knowledge-system
+requirements:
+  - id: req-filtered-recall
+    version: 3
+    title: Filtered CKV recall
+    statement: CKV returns eligible nearest chunks under sparse metadata filters.
+    concept_ids: [filtered-nearest-chunk-search]
+    status: verified
+    reviewed_by: "opus5.5 검토"
+    acceptance_criteria:
+      - id: ac-filtered-recall
+        given: A filter superset of at most 2048 and at most MaxExactCandidates chunks with at least K eligible chunks and at least 3K excluded chunks closer than every eligible chunk
+        when: A filtered query requests K results
+        then: The response contains K eligible chunks in exact distance order (ties by chunk ID) with status complete
+      - id: ac-filtered-completeness
+        given: A filter superset larger than MaxExactCandidates whose 3K over-fetch yields fewer than K eligible chunks, or a deadline or cancellation during search
+        when: A filtered query requests K results
+        then: The status is incomplete (candidate_limit or deadline_exceeded) or cancelled with a reason, never complete, and the legacy Search returns an error
+  - id: req-source-evidence
+    version: 3
+    title: Source-backed meaning
+    statement: Reviewed semantic relationships remain tied to one captured source snapshot.
+    concept_ids: [snapshot-bound-semantic-relations]
+    status: verified
+    reviewed_by: "opus5.5 검토"
+    acceptance_criteria:
+      - id: ac-source-evidence
+        given: A relation with a code anchor from another snapshot
+        when: PutAligned, PutAlignedRetained, ActivateAligned or ActivateAlignedRetained is called
+        then: Each returns an error unwrapping to the specific snapshot mismatch error and the active pointer is unchanged
+  - id: req-ontology-fallback
+    version: 3
+    title: Safe ontology interpretation
+    statement: Optional concept matching preserves the existing hybrid retrieval candidate set (membership); only verified relations may reorder it.
+    concept_ids: [optional-ontology-baseline-preservation]
+    status: verified
+    reviewed_by: "opus5.5 검토"
+    acceptance_criteria:
+      - id: ac-ontology-fallback
+        given: An ambiguous term or an unverified concept relationship
+        when: A query string contains the term
+        then: Returned citation keys equal the baseline set, no ontology source comes from an unverified relation, and with more than 8 tied candidates the ranking is unchanged

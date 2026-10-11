@@ -6,21 +6,21 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.9 — contract-scope bare free-function alias.
+// Contract-scope bare free-function alias.
 //
-// Alias-shape axis at contract scope after the W6 V3 NodeFunction
+// Alias-shape axis at contract scope with the NodeFunction
 // fallback in resolveUsingForRef:
 //
 //   alias-entry shape              | example                | result
 //   -------------------------------+------------------------+--------
-//   library-qualified (Lib.member) | {Math.add, Math.sub}   | V2.6: 1
-//   operator-form (Lib.m as +)     | {Math.add as +}        | V2.20: 1
-//   bare (free-fn name only)       | {addPlusOne}           | V2.9:  1 (V3)
+//   library-qualified (Lib.member) | {Math.add, Math.sub}   | 1
+//   operator-form (Lib.m as +)     | {Math.add as +}        | 1
+//   bare (free-fn name only)       | {addPlusOne}           | 1 (this test)
 //
-// V0 query `(using_directive (type_alias (identifier) @lib) ...)`
-// captures `addPlusOne` as the @lib identifier. Pre-V3, the
+// The query `(using_directive (type_alias (identifier) @lib) ...)`
+// captures `addPlusOne` as the @lib identifier. Without the fallback, the
 // resolveUsingForRef lookup against byName[NodeContract] missed
-// (free functions are NodeFunction). The V3 fallback to
+// (free functions are NodeFunction). The fallback to
 // byName[NodeFunction] now resolves to the free function, lifting
 // the historic 0-edge lock to one EdgeUsesFor per container.
 
@@ -30,7 +30,7 @@ import (
 func TestUsingForV290_ContractScopeBareFunctionAlias(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v290", "probe_bare_function_alias.sol")
 
-	// (a) Lock: 1 EdgeUsesFor (Calc → addPlusOne) after W6 V3.
+	// (a) Lock: 1 EdgeUsesFor (Calc → addPlusOne) via the NodeFunction fallback.
 	byID := map[string]types.Node{}
 	for _, n := range nodes {
 		byID[n.ID] = n
@@ -48,7 +48,7 @@ func TestUsingForV290_ContractScopeBareFunctionAlias(t *testing.T) {
 	}
 
 	// (b) Lock: 0 EdgeCalls via using-for path. The bare alias
-	// can't drive V1.0 dispatch since there's no library to look
+	// can't drive method-call dispatch since there's no library to look
 	// up `addPlusOne.addPlusOne` against. The naked receiver call
 	// `x.addPlusOne()` may surface as something else (e.g. an
 	// AMBIGUOUS unresolved call), but it must not produce a using-

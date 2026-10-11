@@ -47,6 +47,21 @@ def decode(raw):
                       parse_constant=lambda value: (_ for _ in ()).throw(ValueError("nonfinite JSON")))
 
 
+def validate_source_ref(commit, ref, read_source):
+    path = ref["path"]
+    pure = PurePosixPath(path)
+    if pure.is_absolute() or ".." in pure.parts or str(pure) != path or "\\" in path:
+        raise ValueError("unsafe source path")
+    first, last = ref["first"], ref["last"]
+    if type(first) is not int or type(last) is not int:
+        raise ValueError("noninteger span")
+    source = read_source(commit, path)
+    parts = source.split(b"\n")
+    lines = [part + b"\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
+    if not 1 <= first <= last <= len(lines) or sha(source) != ref["file_sha256"] or sha(b"".join(lines[first-1:last])) != ref["content_sha256"]:
+        raise ValueError("stale source or span")
+
+
 def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_source):
     protocol, book, baseline = map(decode, (protocol_raw, questions_raw, baseline_raw))
     errors, counts = [], {group: set() for group in GROUPS}
@@ -81,6 +96,24 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
     check(isinstance(questions, list) and bool(questions), "questions_missing")
     if not isinstance(questions, list):
         questions = []
+    excluded = book.get("excluded_candidate_questions", [])
+    declared_excluded = book.get("excluded_proposed_clusters", [])
+    valid_exclusions = isinstance(excluded, list) and isinstance(declared_excluded, list)
+    valid_exclusions = valid_exclusions and all(
+        isinstance(q, dict) and q.get("split") == "FINAL" and
+        all(isinstance(q.get(key), str) and q[key].strip()
+            for key in ("id", "proposed_cluster_id", "proposed_unit_id", "exclusion_reason"))
+        for q in excluded)
+    valid_exclusions = valid_exclusions and all(isinstance(c, str) and c.strip() for c in declared_excluded)
+    check(valid_exclusions, "invalid_excluded_candidate_catalog")
+    excluded_ids, excluded_clusters, excluded_units = set(), set(), set()
+    if valid_exclusions:
+        excluded_ids = {q["id"].casefold() for q in excluded}
+        excluded_clusters = {q["proposed_cluster_id"] for q in excluded}
+        excluded_units = {q["proposed_unit_id"] for q in excluded}
+        check(len(excluded_ids) == len(excluded) and
+              len(set(declared_excluded)) == len(declared_excluded) and
+              set(declared_excluded) == excluded_clusters, "excluded_candidate_catalog_mismatch")
     seen, units, prompts, split_clusters = set(), {}, {}, {"DEV": set(), "FINAL": set()}
     final_clusters = set()
     for q in questions:
@@ -99,6 +132,12 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
         d = decisions.get(ident, {})
         cluster, unit = q.get("cluster_id"), q.get("unit_id")
         check(isinstance(cluster, str) and bool(cluster) and isinstance(unit, str) and bool(unit), "unit_cluster_missing:" + str(ident))
+        if split == "FINAL":
+            check(not (isinstance(ident, str) and ident.casefold() in excluded_ids) and
+                  cluster not in excluded_clusters and unit not in excluded_units and
+                  q.get("proposed_cluster_id") not in excluded_clusters and
+                  q.get("proposed_unit_id") not in excluded_units,
+                  "excluded_final_candidate_reused:" + str(ident))
         check(all(d.get(key) is True for key in ("gold_approved", "independence_approved", "contamination_checked")) and d.get("cluster_id") == cluster and d.get("unit_id") == unit, "case_judgment_missing:" + str(ident))
         if cluster and unit and split in split_clusters and group in GROUPS:
             check(unit not in units or units[unit] == cluster, "unit_split_into_multiple_clusters:" + str(ident))
@@ -112,29 +151,46 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
         refs, behavior = q.get("evidence"), q.get("expected_behavior")
         check(isinstance(refs, list) and behavior in {"cite", "abstain"} and (behavior == "cite") == bool(refs), "evidence_behavior_mismatch:" + str(ident))
         if behavior == "abstain":
-            check(group == "ABS" and q.get("strict_zero_citations") is True and bool(q.get("abstention_basis")), "abstention_scope_missing:" + str(ident))
+            # Strict zero citations is the default. Citing the recorded
+            # "unassigned" fact while abstaining is allowed only when the
+            # protocol declares that scoring rule and the item binds the basis
+            # sources it may cite.
+            strict = q.get("strict_zero_citations") is True
+            cited_basis = (q.get("strict_zero_citations") is False and isinstance(protocol.get("abstention_scoring"), dict)
+                           and bool(q.get("abstention_citation_rule")) and bool(q.get("abstention_basis_sources")))
+            check(group == "ABS" and (strict or cited_basis) and bool(q.get("abstention_basis")), "abstention_scope_missing:" + str(ident))
+            # Review-only absence sources never become positive answer citations.
+            # Older textual-only basis records remain compatible; when a catalog
+            # is supplied, every declared byte/span must be bound to the corpus.
+            if "abstention_basis_sources" in q:
+                basis = q["abstention_basis_sources"]
+                valid_basis = isinstance(basis, list) and bool(basis)
+                check(valid_basis, "invalid_abstention_basis_source:" + str(ident))
+                for ref in basis if valid_basis else []:
+                    try:
+                        validate_source_ref(commit, ref, read_source)
+                    except (ValueError, KeyError, TypeError, OSError, subprocess.CalledProcessError):
+                        errors.append("invalid_abstention_basis_source:" + str(ident))
         for ref in refs if isinstance(refs, list) else []:
             try:
-                path = ref["path"]
-                pure = PurePosixPath(path)
-                if pure.is_absolute() or ".." in pure.parts or str(pure) != path or "\\" in path:
-                    raise ValueError("unsafe source path")
-                first, last = ref["first"], ref["last"]
-                if type(first) is not int or type(last) is not int:
-                    raise ValueError("noninteger span")
-                source = read_source(commit, path)
-                parts = source.split(b"\n")
-                lines = [part + b"\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
-                if not 1 <= first <= last <= len(lines) or sha(source) != ref["file_sha256"] or sha(b"".join(lines[first-1:last])) != ref["content_sha256"]:
-                    raise ValueError("stale source or span")
+                validate_source_ref(commit, ref, read_source)
             except (ValueError, KeyError, TypeError, OSError, subprocess.CalledProcessError):
                 errors.append("invalid_source_gold:" + str(ident))
         if len(errors) == case_start and split == "FINAL" and group in GROUPS:
             counts[group].add(cluster)
     check(bool(split_clusters["DEV"]), "DEV_missing")
     check(not split_clusters["DEV"] & split_clusters["FINAL"], "DEV_FINAL_cluster_overlap")
+    # A reviewed protocol may leave important groups to a separately frozen
+    # FINAL (each excluded group needs a reason); excluded groups must not
+    # also appear here, and such a FINAL is never sufficient on its own.
+    out_of_scope = protocol.get("final_groups_out_of_scope", {})
+    check(isinstance(out_of_scope, dict) and set(out_of_scope) <= GROUPS and len(out_of_scope) < len(GROUPS) and
+          all(isinstance(v, str) and v.strip() for v in out_of_scope.values()), "invalid_final_groups_out_of_scope")
     for group, clusters in counts.items():
-        check(bool(clusters), "FINAL_group_missing:" + group)
+        if isinstance(out_of_scope, dict) and group in out_of_scope:
+            check(not clusters, "FINAL_group_declared_out_of_scope:" + group)
+        else:
+            check(bool(clusters), "FINAL_group_missing:" + group)
     for observation in observations:
         try:
             reserved = observation.get("state") == "FINAL_reserved"
@@ -150,7 +206,7 @@ def audit(protocol_raw, questions_raw, baseline_raw, review, observations, read_
             errors.append("invalid_observation_record")
     errors = sorted(set(errors))
     n = {group: len(clusters) for group, clusters in sorted(counts.items())}
-    sufficient = all(size >= 10 for size in n.values())
+    sufficient = all(size >= 10 for size in n.values()) and not out_of_scope
     return {"schema_version": 1, "scope": "input bindings and recorded review/cluster consistency only",
             "input_ready": not errors, "execution_ready": False,
             "execution_pending": ["live model identity", "coordinated dataset/source/binary binding", "runner observation-state enforcement"],

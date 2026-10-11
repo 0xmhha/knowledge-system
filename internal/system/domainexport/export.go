@@ -49,7 +49,7 @@ func RenderEntry(e inventory.Entry, p *inventory.Project) string {
 		b.WriteString("## Code anchors\n")
 		for _, a := range e.CodeAnchors {
 			line := "- `" + a.File + "`"
-			// Render per kind (Phase 3 A1-3): a def anchor shows its symbol at
+			// Render per kind: a def anchor shows its symbol at
 			// its definition line; a loc anchor shows the enclosing symbol and
 			// flags that the line is a location inside it (call site / gate),
 			// not a definition — so a reader does not mistake it for the def.
@@ -92,7 +92,7 @@ func RenderEntry(e inventory.Entry, p *inventory.Project) string {
 	return strings.TrimRight(b.String(), "\n") + "\n"
 }
 
-// embeddableStatuses gates which entries are rendered. Per channel-② D2:
+// embeddableStatuses gates which entries are rendered:
 // verified + needs_verification (each doc shows its status); draft and
 // needs_author are excluded as not-yet-trustworthy.
 var embeddableStatuses = map[string]bool{

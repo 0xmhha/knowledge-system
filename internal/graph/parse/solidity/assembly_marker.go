@@ -6,13 +6,13 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
-// Sol W10 V0 (2026-05-18) — HasAssembly marker for callables.
+// Sol HasAssembly marker for callables.
 //
 // Sets Node.HasAssembly = true on every NodeFunction / NodeModifier
 // whose body contains at least one `assembly { ... }` block. The
 // marker is a presence-only signal — Yul-internal op detection
 // (delegatecall, sstore, selfdestruct, etc.) and receiver resolution
-// for low-level Yul calls are deferred to V1+.
+// for low-level Yul calls are handled by separate walkers.
 //
 // The walker runs as a post-Pass-1 sweep over assembly_statement
 // nodes, resolves each to the enclosing function-like node via
@@ -24,7 +24,7 @@ import (
 // Tree-sitter-solidity v1.2.11 (vendored) exposes assembly_statement
 // as a top-level node kind for the `assembly { ... }` block; its
 // children are Yul nodes (yul_function_call, yul_evm_builtin, ...)
-// which V0 doesn't introspect.
+// which this marker doesn't introspect.
 func (v *declVisitor) runAssemblyMarker() {
 	const q = `(assembly_statement) @asm`
 	query, qErr := sitter.NewQuery(v.lang, q)

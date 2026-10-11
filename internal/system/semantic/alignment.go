@@ -207,7 +207,7 @@ func (s *Store) PutAlignedRetained(ctx context.Context, p Projection, repoRoot, 
 	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
 		return err
 	}
-	if err := p.ValidateRetainedSources(versionDir); err != nil {
+	if err := p.ValidateRetainedSourcesContext(ctx, versionDir); err != nil {
 		return err
 	}
 	return s.putVerified(ctx, p)
@@ -250,7 +250,7 @@ func (s *Store) ActivateAlignedRetained(ctx context.Context, projectID, datasetI
 	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
 		return err
 	}
-	if err := p.ValidateRetainedSources(versionDir); err != nil {
+	if err := p.ValidateRetainedSourcesContext(ctx, versionDir); err != nil {
 		return err
 	}
 	return s.Activate(ctx, projectID, datasetID)
@@ -272,7 +272,7 @@ func (s *Store) LoadAlignedRetained(ctx context.Context, projectID, datasetID, r
 	if err := ValidateCKVChunkLinks(ctx, p, vectorDir); err != nil {
 		return ActiveProjection{}, err
 	}
-	if err := p.ValidateRetainedSources(versionDir); err != nil {
+	if err := p.ValidateRetainedSourcesContext(ctx, versionDir); err != nil {
 		return ActiveProjection{}, err
 	}
 	return ActiveProjection{projection: p}, nil

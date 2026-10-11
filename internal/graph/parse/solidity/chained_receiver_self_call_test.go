@@ -6,9 +6,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V21 — chained-receiver self-call NEGATIVE lockdown.
+// Chained-receiver self-call NEGATIVE lockdown.
 //
-// V19's isSelfRef recognises three self-ref shapes:
+// The high-level self-call walker's isSelfRef recognises three self-ref shapes:
 //
 //	identifier "this"                       (bare)
 //	payable / address / type_cast(<self>)   (cast wrapper)
@@ -64,10 +64,10 @@ func TestChainedReceiver_NoSelfMarker(t *testing.T) {
 				n.QualifiedName)
 		}
 		// Cross-axis: low-level markers must also stay false on a
-		// chained-receiver high-level call. V8 / V18 don't admit
+		// chained-receiver high-level call. The low-level self-cast walker doesn't admit
 		// helper(...).foo() either (it's not a low-level method),
 		// but pinning both keeps the negative-axis assertion
-		// symmetric with V19 / V20 / V22.
+		// symmetric with the other high-level self-call tests.
 		if n.HasSelfReentrantCall {
 			t.Errorf("%s HasSelfReentrantCall: got true, want false (low-level marker should not fire on high-level chained call)",
 				n.QualifiedName)

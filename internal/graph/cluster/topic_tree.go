@@ -54,7 +54,7 @@ const (
 // stays readable on graphs where the first Leiden pass collapsed real
 // subsystems together.
 //
-// Meta nodes (Commit, Hunk — schema 1.4/1.8 G6 Temporal) are excluded from
+// Meta nodes (Commit, Hunk — schema 1.4/1.8 temporal) are excluded from
 // community participation per hunk-graph.md §11.7 (decision 2026-05-09).
 // They have no semantic edges (no calls/invokes/references/etc.) so their
 // inclusion would yield singleton communities that pollute the resolution

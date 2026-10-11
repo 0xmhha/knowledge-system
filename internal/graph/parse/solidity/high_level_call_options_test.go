@@ -6,19 +6,19 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V22 — high-level call-options self-call audit.
+// High-level call-options self-call audit.
 //
-// V18 added a struct_expression hop on the *low-level* cast walker
+// The *low-level* cast walker has a struct_expression hop
 // so `payable(this).call{value: x, gas: y}(...)` kept its
-// HasSelfReentrantCall marker. V19 introduced the parallel
-// high-level walker but copied the pre-V18 single-hop shape — so
+// HasSelfReentrantCall marker. The parallel high-level walker
+// originally had only the single-hop shape — so
 // the typed-dispatch equivalent `this.foo{value: x}()` silently
 // lost HasHighLevelSelfCall.
 //
 // The blind spot was real (probe confirmed before the fix): both
 // `this.target{value: 0}()` and `this.target{gas: 50000}()`
 // produced HasHighLevelSelfCall=false on a graph that should have
-// fired the marker. V22 adds the same struct_expression hop to
+// fired the marker. The fix adds the same struct_expression hop to
 // runHighLevelSelfCallMarker so the two walkers stay shape-
 // consistent.
 //
@@ -45,7 +45,7 @@ func TestHighLevelCallOptions_SelfMarker(t *testing.T) {
 			continue
 		}
 		got[n.QualifiedName] = n.HasHighLevelSelfCall
-		// V19 stays a separate axis from V8 / V18 — the low-level
+		// The high-level marker stays a separate axis from the self-cast walker — the low-level
 		// markers must stay false on typed-only fixtures.
 		if n.HasSelfReentrantCall {
 			t.Errorf("%s HasSelfReentrantCall: got true (V22 expects false; high-level marker only)",

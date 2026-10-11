@@ -63,6 +63,10 @@ type Config struct {
 // change the Stage-2 union cap or the separate knowledge-pass budget.
 type RetrievalConfig struct {
 	RecallK int `yaml:"recall_k,omitempty"`
+	// TypeNeighbors adds used type declarations after the top v2 Go bodies.
+	// Off by default: an independent evaluation showed no recall gain and
+	// a lower MRR because the declarations rank above the expected evidence.
+	TypeNeighbors bool `yaml:"type_neighbors,omitempty"`
 }
 
 func (c RetrievalConfig) EffectiveRecallK() int {
@@ -144,7 +148,7 @@ type CKGConfig struct {
 	SourceRoot string `yaml:"source_root"`
 	TimeoutMS  int    `yaml:"timeout_ms"`
 	// BinaryPath is the ckg binary used by the cks.ops.index maintenance tool
-	// (G8 shells `ckg build`); empty disables the ckg leg of that tool. Not
+	// (it shells out to `ckg build`); empty disables the ckg leg of that tool. Not
 	// used on the query path (ckg is opened in-process via ckgclient.NewReal).
 	BinaryPath string `yaml:"binary_path"`
 	// PolicyFile is the ckg governance policy (the `policies/policy.yaml`
@@ -167,8 +171,9 @@ type CKVConfig struct {
 	// built with regardless of provider.
 	Provider string `yaml:"provider"`
 	// BinaryPath is retained for the agent-triggered index op (cks.ops.index,
-	// G8 shells `ckv reindex`); it is NOT used on the query path anymore —
-	// G1 imports pkg/ckv in-process, so there is no `ckv mcp` subprocess.
+	// which shells out to `ckv reindex`); it is NOT used on the query path
+	// anymore — cks imports pkg/ckv in-process, so there is no `ckv mcp`
+	// subprocess.
 	BinaryPath string `yaml:"binary_path"`
 	// TimeoutMS is unused by the in-process query path (kept for config
 	// back-compat; the subprocess call timeout it bounded no longer exists).
@@ -399,7 +404,7 @@ func (c *Config) Validate() error {
 
 // validateLoopback returns nil only when addr is a host:port pointing at a
 // loopback address (127.0.0.0/8, ::1). Non-loopback bindings are rejected
-// because cks should not expose its surface to remote callers in Phase 0/1.
+// because cks should not expose its surface to remote callers.
 func validateLoopback(addr string) error {
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {

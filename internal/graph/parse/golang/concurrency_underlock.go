@@ -7,11 +7,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// concurrency_underlock.go — B1 Phase 4 (WORK-PLAN G8). Emits
+// concurrency_underlock.go emits
 // accessed_under_lock(field, mutex) edges for struct field accesses that
 // occur inside a function holding a lock.
 //
-// V0 simplification (documented in commit message + WORK-PLAN G8):
+// V0 simplification:
 // any field access inside a function that performs ANY Lock/RLock at any
 // point is treated as "accessed under" all mutexes that function locks.
 // This over-emits relative to a precise lexical scope analysis (a field
@@ -21,7 +21,7 @@ import (
 // can't recover edges that don't).
 //
 // Cross-function lock propagation (caller holds X, callee accesses field)
-// is OUT OF SCOPE — that's D1 SSA territory. A function whose body holds
+// is OUT OF SCOPE here — buildpipe's lock propagation pass handles it. A function whose body holds
 // no lock contributes zero edges here even if its callers all hold a lock.
 //
 // Requires typesInfo: without it we can't reliably distinguish a field
@@ -115,7 +115,7 @@ func (v *declVisitor) collectHeldMutexes(body *ast.BlockStmt) []string {
 
 // recordFuncFieldTouches stashes the funcID → set-of-field-IDs touched by
 // body, regardless of whether body holds a lock. Consumed by buildpipe's
-// W-A cross-function lock propagation pass (opt-in --lock-propagation).
+// cross-function lock propagation pass (opt-in --lock-propagation).
 //
 // No-op when typesInfo is nil (AST-only mode) or fieldNodeIDs is empty
 // (no struct fields declared in this file's scope — see emitFields).

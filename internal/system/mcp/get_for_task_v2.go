@@ -49,13 +49,16 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 		}
 		callerIntent = parsed
 	}
-	identity, identityErr := setup.InspectVersionIdentity(d.EvidenceVersionDir)
+	// One full archive verification is shared by every retained read in this
+	// request and repeated before the response; it never outlives the request.
+	ctx, verification, identityErr := setup.BeginRequestVerification(ctx, d.EvidenceVersionDir)
 	if identityErr != nil {
 		return v2ToolErrorFor(identityErr, "reindex_required"), nil
 	}
-	if identity == nil {
+	if verification == nil {
 		return v2ToolError("reindex_required"), nil
 	}
+	defer verification.Close()
 	if ok, _ := serviceable(ctx, d); !ok {
 		return v2ToolError("service_unavailable"), nil
 	}
@@ -76,6 +79,20 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	pack, err := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, refs, d.EvidenceSanitizer)
 	if err != nil {
 		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
+	}
+	// When enabled, add used type declarations only when every primary body
+	// still fits; otherwise keep the primary pack exactly as selected.
+	if d.TypeNeighbors && pack.Metadata.EvidenceBudget == nil {
+		source := func(file string) ([]byte, error) {
+			buf, _, _, err := setup.ReadRetainedFileContext(ctx, d.EvidenceVersionDir, "repo", file)
+			return buf, err
+		}
+		if extended := withTypeNeighbors(ctx, d.CKG, refs, source); extended != nil {
+			if withTypes, typeErr := evidencev2.Build(ctx, d.EvidenceVersionDir, prompt, extended, d.EvidenceSanitizer); typeErr == nil &&
+				withTypes.Metadata.EvidenceBudget == nil && withTypes.EvidenceState == pack.EvidenceState {
+				pack = withTypes
+			}
+		}
 	}
 	pack.Metadata.Ontology = legacy.Metadata.Ontology
 	// Knowledge/traces verify their input before extending it. Stamp the
@@ -113,6 +130,9 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 				}
 			}
 		}
+	}
+	if err := verification.Finish(ctx); err != nil {
+		return v2ToolErrorFor(err, "v2_evidence_failed"), nil
 	}
 	return mcpgo.NewToolResultStructured(pack, "v2 evidence pack"), nil
 }

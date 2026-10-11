@@ -24,6 +24,10 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net"
+	"net/http"
+	"path/filepath"
+	"strings"
 	"time"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -127,8 +131,26 @@ func (s *Server) ServeStdio() error {
 // 1:1, HTTP supports concurrent sessions over the streamable
 // protocol (POST for requests, GET for SSE notifications).
 func (s *Server) ServeHTTP(addr string) error {
-	httpSrv := server.NewStreamableHTTPServer(s.mcp)
-	return httpSrv.Start(addr)
+	srv := &http.Server{Addr: addr, Handler: s.httpHandler(), ReadHeaderTimeout: 5 * time.Second}
+	return srv.ListenAndServe()
+}
+
+// httpHandler is the streamable HTTP transport limited to loopback clients.
+// The transport has no authentication and exposes ops.index, so a client
+// from another host must never reach it, whatever address was bound.
+func (s *Server) httpHandler() http.Handler {
+	mcpHandler := server.NewStreamableHTTPServer(s.mcp)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			host = r.RemoteAddr
+		}
+		if ip := net.ParseIP(host); ip == nil || !ip.IsLoopback() {
+			http.Error(w, "forbidden: loopback clients only", http.StatusForbidden)
+			return
+		}
+		mcpHandler.ServeHTTP(w, r)
+	})
 }
 
 // Underlying returns the *server.MCPServer for cross-package multiplex.
@@ -329,7 +351,7 @@ func (s *Server) registerTools() {
 		),
 	), s.handleExpandInFile)
 
-	// --- flow-aware tools (Phase D): trace a symptom to its cause over the
+	// --- flow-aware tools: trace a symptom to its cause over the
 	// curated flow corpus. READ-ONLY. ---
 	s.mcp.AddTool(mcpgo.NewTool(nsName("context.get_flow"),
 		mcpgo.WithDescription("Lay out a curated flow's steps in call order: each step's symbol, citation (file:line), reads/writes/emits, failure branches, and invariants. Select by exactly one of flow_id / entry_point / invariant_id. READ-ONLY."),
@@ -408,9 +430,15 @@ func (s *Server) handleSemanticSearch(ctx context.Context, req mcpgo.CallToolReq
 		opts.DryRun = v
 	}
 	if v, ok := args["alias_path"].(string); ok && v != "" {
-		am, err := query.LoadAliasMap(v)
+		// Glossaries live with the index or the indexed source; the
+		// error never repeats the path's contents or existence.
+		path, inside := s.aliasPathInside(v)
+		if !inside {
+			return mcpgo.NewToolResultError("alias_path: must name a glossary inside the index directory or the indexed source root"), nil
+		}
+		am, err := query.LoadAliasMap(path)
 		if err != nil {
-			return mcpgo.NewToolResultError(fmt.Sprintf("alias_path: %v", err)), nil
+			return mcpgo.NewToolResultError("alias_path: cannot load the glossary (YAML with an aliases map expected)"), nil
 		}
 		opts.Aliases = am
 	}
@@ -676,6 +704,11 @@ func (s *Server) handleIndex(ctx context.Context, req mcpgo.CallToolRequest) (*m
 	if outDir == "" {
 		return mcpgo.NewToolResultError("engine has no out directory configured"), nil
 	}
+	// Only the served source tree may be indexed: another directory would
+	// replace the served index and expose its files through search.
+	if !sameDir(projectRoot, s.engine.Manifest().SrcRoot) {
+		return mcpgo.NewToolResultError("project_root must be the indexed source root"), nil
+	}
 
 	start := time.Now()
 	payload := map[string]any{"mode": mode, "project_root": projectRoot}
@@ -717,6 +750,48 @@ func (s *Server) handleIndex(ctx context.Context, req mcpgo.CallToolRequest) (*m
 
 	payload["duration_ms"] = time.Since(start).Milliseconds()
 	return jsonResult(payload)
+}
+
+// aliasPathInside resolves p (relative paths against the source root) and
+// reports whether the real file lies inside the index directory or the
+// indexed source root.
+func (s *Server) aliasPathInside(p string) (string, bool) {
+	root := s.engine.Manifest().SrcRoot
+	if !filepath.IsAbs(p) {
+		p = filepath.Join(root, p)
+	}
+	real, err := filepath.EvalSymlinks(p)
+	if err != nil {
+		return "", false
+	}
+	for _, dir := range []string{s.engine.OutDir(), root} {
+		if dir == "" {
+			continue
+		}
+		base, err := filepath.EvalSymlinks(dir)
+		if err != nil {
+			continue
+		}
+		if rel, err := filepath.Rel(base, real); err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != "." {
+			return real, true
+		}
+	}
+	return "", false
+}
+
+// sameDir reports whether a and b resolve to the same directory.
+func sameDir(a, b string) bool {
+	if a == "" || b == "" {
+		return false
+	}
+	ra, errA := filepath.EvalSymlinks(a)
+	rb, errB := filepath.EvalSymlinks(b)
+	if errA != nil || errB != nil {
+		return false
+	}
+	ra, errA = filepath.Abs(ra)
+	rb, errB = filepath.Abs(rb)
+	return errA == nil && errB == nil && ra == rb
 }
 
 func (s *Server) handleKeywordSearch(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {

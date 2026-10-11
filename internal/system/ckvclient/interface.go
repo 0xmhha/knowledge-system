@@ -3,14 +3,14 @@
 //
 // The composer pipeline's Stage 1 (semantic) calls Client.SemanticSearch
 // with a natural-language vibe prompt; the returned hits feed the keyword
-// extractor (B.3) which surfaces concrete symbols/keywords for Stage 2
+// extractor which surfaces concrete symbols/keywords for Stage 2
 // (ckg search).
 //
 // Two implementations are planned:
 //
-//   - Fake (this package, B.1):   in-memory canned responses for unit
+//   - Fake (this package):   in-memory canned responses for unit
 //     tests of composer modules.
-//   - Real (Phase C.2):            adapter over
+//   - Real:                  adapter over
 //     github.com/0xmhha/knowledge-system/vector
 //     pkg/types.VectorStore.
 //

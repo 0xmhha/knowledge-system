@@ -12,7 +12,7 @@ import (
 
 // nearestEnclosingBlockEndLine walks up from n to the nearest
 // enclosing `block_statement` or `function_body` and returns its
-// end-line (1-based). Used by emitLocalVarBinding (V2.0) to record
+// end-line (1-based). Used by emitLocalVarBinding to record
 // each local's scope range. Returns 0 when no enclosing block is
 // found (defensive — every valid variable_declaration in a function
 // body sits inside one).
@@ -28,7 +28,7 @@ func nearestEnclosingBlockEndLine(n *sitter.Node) int {
 
 // nearestEnclosingBlockEndByte walks up from n to the nearest
 // enclosing `block_statement` or `function_body` and returns its
-// end byte offset. W-C W6 V2.15 (2026-05-15): mirrors
+// end byte offset. Mirrors
 // nearestEnclosingBlockEndLine but at byte precision so the
 // resolver can disambiguate same-line shadows. Returns 0 when no
 // enclosing block is found.
@@ -42,10 +42,10 @@ func nearestEnclosingBlockEndByte(n *sitter.Node) int {
 	return 0
 }
 
-// Sol W2 — virtual / override modifier detection and EdgeOverrides emit.
+// Solidity virtual / override modifier detection and EdgeOverrides emit.
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §3.3, §4.2
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 5 W-C W2.
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §3.3, §4.2
+// Dispatch index: docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2.
 //
 // Scope: Solidity function declarations carry two related modifiers that
 // shape dynamic dispatch:
@@ -55,7 +55,7 @@ func nearestEnclosingBlockEndByte(n *sitter.Node) int {
 //	function foo() public virtual override returns (uint) { ... }   // middle of chain
 //	function foo() public override(A, B) returns (uint) { ... }     // explicit parents
 //
-// Per §5.0 decisions (2026-05-11):
+// Per §5.0 decisions:
 //   - SubKind values: "function" (plain) / "virtual" / "override" /
 //     "virtual_override". `function_definition` keyword in tree-sitter
 //     grammar exposes `virtual` (sym_virtual, named) and `override_specifier`
@@ -68,20 +68,21 @@ func nearestEnclosingBlockEndByte(n *sitter.Node) int {
 //     of inherited contracts/interfaces in Pass 2 (one edge per parent that
 //     declares a same-name virtual function).
 //
-// W2 piggybacks on W1's EdgeExtends / EdgeImplements emission. The Pass 2
+// Piggybacks on the inheritance EdgeExtends / EdgeImplements emission. The Pass 2
 // resolver consults the already-resolved inheritance graph to walk a child
 // contract's parents when looking for the function being overridden. This
-// keeps W2 strictly additive — no changes to W1 edge counts or shapes.
+// keeps override detection strictly additive — no changes to inheritance
+// edge counts or shapes.
 //
-// Out of scope for W2 (separate dispatches):
+// Out of scope here (handled separately):
 //   - `super.foo()` body-walk emit. The spec (§3.3) describes super-call
 //     handling as an EdgeCalls/EdgeInvokes emission, not EdgeOverrides.
-//     W2 covers the *declaration-time* override relationship; super calls
-//     are a runtime invocation pattern that belongs with W3 (interface
-//     dispatch) since both share the resolver path for inheritance-aware
-//     name lookup. Kept out of W2 to keep this dispatch atomic.
-//   - `using For` library extension (W6).
-//   - Interface dispatch `IFoo(addr).bar()` (W3).
+//     This file covers the *declaration-time* override relationship; super
+//     calls are a runtime invocation pattern that belongs with interface
+//     dispatch since both share the resolver path for inheritance-aware
+//     name lookup. Kept out to keep this detector atomic.
+//   - `using For` library extension (using_for.go).
+//   - Interface dispatch `IFoo(addr).bar()` (dispatch.go).
 
 // runFunctionDecl replaces the generic runDecl(queryFunction, NodeFunction)
 // path so we can stamp SubKind and queue EdgeOverrides PendingRefs in the
@@ -122,9 +123,9 @@ func (v *declVisitor) runFunctionDecl() {
 
 		// Build the function node identical to the generic runDecl path so
 		// SrcID hashes line up with existing pending-ref emitters. The only
-		// added field is SubKind (W2). When the function has no
+		// added field is SubKind. When the function has no
 		// virtual/override modifier, SubKind defaults to "function" — making
-		// the Sol Function SubKind taxonomy explicit (mirrors W4's contract
+		// the Sol Function SubKind taxonomy explicit (mirrors the contract
 		// SubKind: plain contracts get SubKind="contract", not "").
 		ident := nameNode.Utf8Text(v.src)
 		startByte := int(nameNode.StartByte())
@@ -157,7 +158,7 @@ func (v *declVisitor) runFunctionDecl() {
 			Count: 1, Confidence: types.ConfExtracted,
 		})
 
-		// W-C W6 V1.1 (2026-05-12): emit parameter name→type PendingRefs
+		// Emit parameter name→type PendingRefs
 		// so Pass 2 can index (funcID, paramName) → typeName for
 		// parameter-receiver using-for dispatch resolution. function_definition
 		// holds `parameter` nodes as direct named children (verified via
@@ -166,22 +167,22 @@ func (v *declVisitor) runFunctionDecl() {
 		// `name` field (optional — anonymous parameters drop) and a
 		// `type` field (required, type_name).
 		emitParameterMetaPending(v, id, declNode)
-		// W-C W6 V1.3 (2026-05-12): emit function return-type PendingRef
+		// Emit function return-type PendingRef
 		// so Pass 2 can resolve `<localCall>().<method>(...)` chained
-		// dispatch by looking up the inner function's return type. V0
-		// captures only the first declared return type (multi-return
-		// tuples drop their tail — V1.4+).
+		// dispatch by looking up the inner function's return type. Only
+		// the first declared return type is captured (multi-return
+		// tuples drop their tail).
 		emitFunctionReturnMetaPending(v, id, declNode)
-		// W-C W6 V1.19 (2026-05-12): emit name→type PendingRefs for
+		// Emit name→type PendingRefs for
 		// named return parameters (`function f() returns (uint256 x)`).
 		// Solidity treats them as function-scope variables — they share
 		// the parameter namespace, so dispatchKindUsingForParamType is
 		// the right channel.
 		emitNamedReturnParamMetaPending(v, id, declNode)
-		// W-C W6 V1.15 (2026-05-12): emit local-variable name→type
+		// Emit local-variable name→type
 		// PendingRefs for every `variable_declaration_statement` in the
-		// function body (single-var form only — tuple destructuring is
-		// V1.16+). Pass 2 indexes these into (funcID, varName) → typeName
+		// function body (single-var and tuple-destructuring forms).
+		// Pass 2 indexes these into (funcID, varName) → typeName
 		// for local-var receiver dispatch resolution.
 		emitLocalVarMetaPending(v, id, declNode)
 
@@ -221,7 +222,7 @@ func (v *declVisitor) runFunctionDecl() {
 	}
 }
 
-// runModifierOverride — W-C W7.3 V0 (2026-05-18). Walks modifier_definition
+// runModifierOverride walks modifier_definition
 // nodes and emits EdgeOverrides PendingRefs when the override_specifier
 // child is present. Mirrors the function-override emit path in
 // emitFunctionDeclWithOverride: bare `override` becomes a
@@ -233,9 +234,9 @@ func (v *declVisitor) runFunctionDecl() {
 // Re-uses scanFunctionModifiers and collectOverrideParents — both are
 // AST-shape helpers that already work on any node with named-child
 // modifiers (function_definition, modifier_definition share the
-// override_specifier child shape per grammar v1.2.11 probe 2026-05-18).
+// override_specifier child shape per grammar v1.2.11).
 //
-// The Pass 2 W2 resolver (resolveOverridesRef) is NodeType-agnostic:
+// The Pass 2 override resolver (resolveOverridesRef) is NodeType-agnostic:
 // it indexes funcByQName with both NodeFunction and NodeModifier
 // (declarations.go assigns Modifier qnames the same `Container.name`
 // shape as Function), so modifier-pair lookups land without changes
@@ -309,8 +310,8 @@ func (v *declVisitor) runModifierOverride() {
 // emitParameterMetaPending walks the named children of a function_definition
 // and queues one PendingRef per `parameter` node carrying the (paramName,
 // typeName) binding. Pass 2 indexes these into (funcID, paramName) →
-// typeName for parameter-receiver using-for dispatch resolution (W-C W6
-// V1.1). Anonymous parameters (no name field) are skipped — their type is
+// typeName for parameter-receiver using-for dispatch resolution.
+// Anonymous parameters (no name field) are skipped — their type is
 // still in the AST but no caller can address them by identifier, so the
 // using-for receiver lookup never has a key for them.
 //
@@ -376,23 +377,23 @@ func emitParameterMetaPending(v *declVisitor, funcID string, declNode *sitter.No
 	}
 }
 
-// dispatchKindUsingForParamType (W-C W6 V1.1) tags PendingRefs carrying
+// dispatchKindUsingForParamType tags PendingRefs carrying
 // function parameter (name, type) bindings for the parameter-receiver
 // dispatch path. Resolver sweeps these into paramTypes index and emits
 // no graph edge for them — pure side-channel.
 const dispatchKindUsingForParamType = "using_for_param_type"
 
-// emitFunctionReturnMetaPending — W-C W6 V1.3 (2026-05-12). Pulls the
+// emitFunctionReturnMetaPending pulls the
 // function's first declared return type out of the `return_type` field
 // and queues a side-channel PendingRef that Pass 2 sweeps into the
 // funcReturnTypes index. Empty when the function has no return clause,
 // when the return clause has no parameter children, or when the type
 // can't be normalised (extraction-failed shapes).
 //
-// V1.3 V0 scope: first return type only. Multi-return tuples
+// Scope: first return type only. Multi-return tuples
 // (`returns (uint256, address)`) drop the tail — `foo().add(x)` chain
-// dispatch typically targets the first return slot anyway. Multi-return
-// handling (named return params, tuple destructuring) is V1.4+.
+// dispatch typically targets the first return slot anyway. Named return
+// params and tuple destructuring are handled by separate emitters.
 //
 // TargetQName encoding: bare `<typeName>` (no `|` delimiter — there's
 // only one piece of information to carry). SrcID = funcID so Pass 2
@@ -429,27 +430,27 @@ func emitFunctionReturnMetaPending(v *declVisitor, funcID string, declNode *sitt
 			Line:         int(returnDef.StartPosition().Row) + 1,
 			DispatchKind: dispatchKindUsingForFnReturn,
 		})
-		return // first return slot only (V0)
+		return // first return slot only
 	}
 }
 
-// dispatchKindUsingForFnReturn (W-C W6 V1.3) carries the function's
+// dispatchKindUsingForFnReturn carries the function's
 // first declared return type for chained-call dispatch resolution.
 // Resolver sweeps these into the funcReturnTypes index — no graph edge.
 const dispatchKindUsingForFnReturn = "using_for_fn_return"
 
-// emitNamedReturnParamMetaPending — W-C W6 V1.19 (2026-05-12). Walks
+// emitNamedReturnParamMetaPending walks
 // every parameter child of the function's `return_type` and queues a
 // paramType PendingRef whenever the parameter has both a name and a
 // type. Solidity treats named return parameters as function-scope
 // variables initialised to zero — they share the parameter namespace
 // for identifier resolution, so emitting them through dispatchKind-
-// UsingForParamType (V1.1) lets lookupReceiverType pick them up via
+// UsingForParamType lets lookupReceiverType pick them up via
 // paramTypes without any resolver changes.
 //
-// Distinct from emitFunctionReturnMetaPending (V1.3, dispatchKind-
+// Distinct from emitFunctionReturnMetaPending (dispatchKind-
 // UsingForFnReturn) — that captures the first-slot type for chained-
-// call resolution. V1.19 captures every named slot's (name, type)
+// call resolution. This captures every named slot's (name, type)
 // pair for receiver-identifier dispatch. The two side-channels
 // coexist: same return-type walk, different PendingRef payloads.
 //
@@ -491,27 +492,27 @@ func emitNamedReturnParamMetaPending(v *declVisitor, funcID string, declNode *si
 	}
 }
 
-// emitLocalVarMetaPending — W-C W6 V1.15/V1.16 (2026-05-12). Walks every
+// emitLocalVarMetaPending walks every
 // `variable_declaration_statement` reachable from a function's body and
 // queues one PendingRef per LHS-typed declaration carrying
 // (varName, typeName). Pass 2 indexes these into (funcID, varName) →
 // typeName for local-var receiver dispatch resolution.
 //
 // Scope:
-//   - V1.15: Single-var form `Type x = expr;`. variable_declaration_statement
+//   - Single-var form `Type x = expr;`. variable_declaration_statement
 //     wraps one `variable_declaration` child.
-//   - V1.16: Tuple-destructuring form `(Ta a, Tb b) = foo();`.
+//   - Tuple-destructuring form `(Ta a, Tb b) = foo();`.
 //     variable_declaration_statement wraps one `variable_declaration_tuple`
 //     child whose own children are mixed `variable_declaration` (typed
-//     slot) and `identifier` (pre-declared slot — V1.17+ scope, dropped
+//     slot) and `identifier` (pre-declared slot — not handled, dropped
 //     here since the type isn't on the LHS).
 //   - All blocks descended: variable_declaration_statement inside
-//     if / for / while bodies are captured too. V0 scope treats locals
-//     as function-scoped (no block-scope shadowing — first-declaration
-//     wins by map-overwrite order, which matches typical Solidity style
-//     where shadowing in nested blocks is rare).
+//     if / for / while bodies are captured too. Each binding records its
+//     enclosing block's scope range so Pass 2 can resolve block-scope
+//     shadowing (see emitLocalVarBinding).
 //
-// TargetQName encoding: `varName|typeName` (mirrors V1.1 parameter form).
+// TargetQName encoding: `varName|typeName|...` (extends the parameter form
+// with scope-range slots; see emitLocalVarBinding).
 // SrcID = function's node ID so Pass 2 joins against the same funcID
 // space used by containerIDByFuncID / paramTypes.
 //
@@ -520,14 +521,14 @@ func emitNamedReturnParamMetaPending(v *declVisitor, funcID string, declNode *si
 //	variable_declaration_statement
 //	  value: expression (optional, RHS)
 //	  children:
-//	    variable_declaration                ← single-var (V1.15)
+//	    variable_declaration                ← single-var
 //	      location: 'calldata' | 'memory' | 'storage' (optional)
 //	      name: identifier
 //	      type: type_name
-//	    | variable_declaration_tuple        ← tuple form (V1.16)
+//	    | variable_declaration_tuple        ← tuple form
 //	        children:
-//	          identifier                    ← pre-declared slot (V1.17+, drop)
-//	          | variable_declaration        ← typed slot (V1.16 scope)
+//	          identifier                    ← pre-declared slot (dropped)
+//	          | variable_declaration        ← typed slot
 func emitLocalVarMetaPending(v *declVisitor, funcID string, declNode *sitter.Node) {
 	if declNode == nil {
 		return
@@ -540,10 +541,10 @@ func emitLocalVarMetaPending(v *declVisitor, funcID string, declNode *sitter.Nod
 }
 
 // collectLocalVarMetaPending recursively descends every named child of n.
-// On `variable_declaration_statement`: handles both single-var (V1.15)
-// and tuple-destructuring (V1.16) forms by routing each typed slot
+// On `variable_declaration_statement`: handles both single-var
+// and tuple-destructuring forms by routing each typed slot
 // through emitLocalVarBinding. On `try_statement`: emits the returns
-// clause's named parameter slots (V1.20) so receivers bound in the
+// clause's named parameter slots so receivers bound in the
 // success block are addressable. Other nodes recurse normally so
 // nested blocks (if / for / while / try bodies) reach their statements.
 func collectLocalVarMetaPending(v *declVisitor, funcID string, n *sitter.Node) {
@@ -558,12 +559,12 @@ func collectLocalVarMetaPending(v *declVisitor, funcID string, n *sitter.Node) {
 			}
 			switch child.Kind() {
 			case "variable_declaration":
-				// V1.15 single-var form: `Type x = expr;`.
+				// Single-var form: `Type x = expr;`.
 				emitLocalVarBinding(v, funcID, child)
 			case "variable_declaration_tuple":
-				// V1.16 tuple form: `(Ta a, Tb b) = foo();`. Iterate the
+				// Tuple form: `(Ta a, Tb b) = foo();`. Iterate the
 				// tuple's children — typed slots emit, pre-declared
-				// identifier slots drop (no LHS type info — V1.17+ would
+				// identifier slots drop (no LHS type info — handling them would
 				// need funcReturnTypes multi-slot inference).
 				for j := uint(0); j < uint(child.NamedChildCount()); j++ {
 					slot := child.NamedChild(j)
@@ -579,14 +580,14 @@ func collectLocalVarMetaPending(v *declVisitor, funcID string, n *sitter.Node) {
 		return
 	}
 	if n.Kind() == "try_statement" {
-		// W6 V1.20: `try foo() returns (Ta a, Tb b) { ... }` — the
+		// `try foo() returns (Ta a, Tb b) { ... }` — the
 		// returns clause named-parameter slots are exposed as direct
 		// `parameter` children of try_statement (distinct from
 		// function_definition's `return_type` field — different AST
 		// shape). Each slot is bound for the duration of the success
-		// block (try_statement's `body` field). V2.0: scopeEndLine =
+		// block (try_statement's `body` field). scopeEndLine =
 		// success-block end so use sites outside the block don't
-		// pick up these names. V2.15: scopeEndByte mirrors at byte
+		// pick up these names. scopeEndByte mirrors at byte
 		// precision for same-line shadow disambiguation.
 		scopeEnd, scopeEndB := 0, 0
 		if body := n.ChildByFieldName("body"); body != nil {
@@ -605,11 +606,11 @@ func collectLocalVarMetaPending(v *declVisitor, funcID string, n *sitter.Node) {
 		// statements that must be visited.
 	}
 	if n.Kind() == "catch_clause" {
-		// W6 V1.21: `catch Type(Ta a, Tb b) { ... }` — the catch's
+		// `catch Type(Ta a, Tb b) { ... }` — the catch's
 		// named parameter slots are exposed as direct `parameter`
 		// children of catch_clause (alongside an optional identifier
-		// for the catch type name like "Error" / "Panic"). V2.0:
-		// scopeEndLine = catch body end. V2.15: scopeEndByte mirrors.
+		// for the catch type name like "Error" / "Panic").
+		// scopeEndLine = catch body end; scopeEndByte mirrors.
 		scopeEnd, scopeEndB := 0, 0
 		if body := n.ChildByFieldName("body"); body != nil {
 			scopeEnd = int(body.EndPosition().Row) + 1
@@ -631,17 +632,17 @@ func collectLocalVarMetaPending(v *declVisitor, funcID string, n *sitter.Node) {
 }
 
 // emitTryReturnsBinding emits one localVar PendingRef for a try_
-// statement's returns-clause `parameter` slot (V1.20). Same encoding
+// statement's returns-clause `parameter` slot. Same encoding
 // as emitLocalVarBinding so lookupReceiverType picks it up via
 // localVarTypes. Anonymous slot (no name field) skips silently —
 // nothing addressable.
 //
-// W-C W6 V2.0 (2026-05-12): scopeEndLine encoded into TargetQName
+// scopeEndLine encoded into TargetQName
 // as the third part so Pass 2 can build a per-decl line range for
 // scope-aware lookup. Callers pass the end line of the binding's
 // effective scope (try_statement.body or catch_clause.body end).
 //
-// W-C W6 V2.15 (2026-05-15): TargetQName extended to 5-part encoding
+// TargetQName extended to 5-part encoding
 // — `varName|typeName|scopeEndLine|declStartByte|scopeEndByte` — so
 // Pass 2 can byte-disambiguate same-line shadow scopes. PendingRef
 // .ByteOffset carries the decl's name-position byte; callers pass
@@ -678,20 +679,20 @@ func emitTryReturnsBinding(v *declVisitor, funcID string, p *sitter.Node, scopeE
 }
 
 // emitLocalVarBinding emits one localVar PendingRef for a single
-// `variable_declaration` node (used by both V1.15 single-var and V1.16
+// `variable_declaration` node (used by both the single-var and the
 // tuple-slot paths). Drops silently when name / type fields are missing
 // or extraction returns empty — Pass 2 won't see the slot.
 //
-// W-C W6 V2.0 (2026-05-12): scope-end line is determined by walking
+// Scope-end line is determined by walking
 // from `decl` up the parent chain to the nearest enclosing
 // block_statement / function_body and recorded in TargetQName's third
 // slot (encoded as decimal). Pass 2 uses (declLine, scopeEndLine) +
 // use-site line to do narrowest-scope-wins lookup.
 //
-// W-C W6 V2.15 (2026-05-15): byte-precision scope range added as the
+// Byte-precision scope range added as the
 // 4th and 5th encoded slots (declStartByte, scopeEndByte). PendingRef
 // .ByteOffset carries the decl's name-position byte. Pass 2 falls back
-// to V2.0 line-only behavior when the byte slots are zero (defensive
+// to line-only behavior when the byte slots are zero (defensive
 // — every valid local-var emit populates them via tree-sitter ranges).
 func emitLocalVarBinding(v *declVisitor, funcID string, decl *sitter.Node) {
 	if decl == nil {
@@ -723,7 +724,7 @@ func emitLocalVarBinding(v *declVisitor, funcID string, decl *sitter.Node) {
 	})
 }
 
-// dispatchKindUsingForLocalVar (W-C W6 V1.15) tags PendingRefs carrying
+// dispatchKindUsingForLocalVar tags PendingRefs carrying
 // function-local variable (name, type) bindings for the local-var
 // receiver dispatch path. Resolver sweeps these into localVarTypes
 // index — pure side-channel, no graph edge.
@@ -740,7 +741,7 @@ type overrideInfo struct {
 }
 
 // scanFunctionModifiers walks the named children of a function_definition
-// node, looking for the two modifier kinds W2 cares about:
+// node, looking for the two modifier kinds override detection cares about:
 //
 //   - `virtual` (sym_virtual, named) — the leaf keyword token.
 //   - `override_specifier` (sym_override_specifier, named) — either a bare
@@ -776,7 +777,7 @@ func scanFunctionModifiers(decl *sitter.Node, src []byte) (bool, overrideInfo) {
 // The grammar wraps each parent in a `user_defined_type` whose first
 // identifier child is the parent's leaf name. Qualified names like
 // `lib.Foo` would carry the leading identifier (`lib`) here, which is a
-// known V0 limitation — same as W1's parent resolution (inheritance.go
+// known limitation — same as the inheritance parent resolution (inheritance.go
 // uses the leading identifier of user_defined_type). Real codebases rarely
 // use qualified parents in override lists; flagged for follow-up.
 func collectOverrideParents(spec *sitter.Node, src []byte) []string {
@@ -807,7 +808,7 @@ func collectOverrideParents(spec *sitter.Node, src []byte) []string {
 // allows on a function_definition modifier list.
 //
 // Plain functions get SubKind="function" (explicit value, no empty
-// string) for symmetry with W4's contract SubKind.
+// string) for symmetry with the contract SubKind.
 func functionSubKind(isVirtual, hasOverride bool) string {
 	switch {
 	case isVirtual && hasOverride:
@@ -821,7 +822,7 @@ func functionSubKind(isVirtual, hasOverride bool) string {
 	}
 }
 
-// DispatchKind tag constants for W2 PendingRefs. Two distinct kinds so the
+// DispatchKind tag constants for override PendingRefs. Two distinct kinds so the
 // Pass 2 resolver can branch:
 //
 //   - dispatchKindOverride: bare `override` — resolver expands against
@@ -831,7 +832,7 @@ func functionSubKind(isVirtual, hasOverride bool) string {
 //     carries `Parent.method`, resolver looks up directly.
 //
 // String constants (not a typed enum) for consistency with existing
-// DispatchKind usage in golang/grpc.go ("rpc", "grpc") and W1's
+// DispatchKind usage in golang/grpc.go ("rpc", "grpc") and inheritance.go's
 // dispatchKindInherit.
 const (
 	dispatchKindOverride         = "override"

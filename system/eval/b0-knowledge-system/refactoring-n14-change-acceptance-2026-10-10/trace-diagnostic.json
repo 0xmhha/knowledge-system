@@ -1,0 +1,155 @@
+{
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "86cbe48adb3db5650236082fbc295c3141712b1c55940a56bcac5772f38e9321",
+    "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9",
+    "source_mode": "committed",
+    "commit": "79a4f5ff0ddbf205c0be162128fd5a29e7d3dc87"
+  },
+  "requirements": [
+    {
+      "requirement_id": "req-filtered-recall",
+      "version": 3,
+      "state": "linked",
+      "missing": [],
+      "conflict_assertions": [],
+      "paths": [
+        {
+          "concept_id": "filtered-nearest-chunk-search",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+          "implementation_assertion": "reviewed-v3:F3-T01",
+          "tested_by_assertion": "reviewed-v3:F3-T06",
+          "checked_criterion_ids": [
+            "ac-filtered-completeness"
+          ]
+        },
+        {
+          "concept_id": "filtered-nearest-chunk-search",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+          "implementation_assertion": "reviewed-v3:F3-T01",
+          "tested_by_assertion": "reviewed-v3:F3-R03",
+          "checked_criterion_ids": [
+            "ac-filtered-completeness"
+          ]
+        },
+        {
+          "concept_id": "filtered-nearest-chunk-search",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+          "implementation_assertion": "reviewed-v3:F3-T01",
+          "tested_by_assertion": "reviewed-v3:F3-T04",
+          "checked_criterion_ids": [
+            "ac-filtered-completeness"
+          ]
+        },
+        {
+          "concept_id": "filtered-nearest-chunk-search",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+          "implementation_assertion": "reviewed-v3:F3-T01",
+          "tested_by_assertion": "reviewed-v3:F3-R01",
+          "checked_criterion_ids": [
+            "ac-filtered-completeness"
+          ]
+        },
+        {
+          "concept_id": "filtered-nearest-chunk-search",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+          "implementation_assertion": "reviewed-v3:F3-T01",
+          "tested_by_assertion": "reviewed-v3:F3-T02",
+          "checked_criterion_ids": [
+            "ac-filtered-recall"
+          ]
+        }
+      ]
+    },
+    {
+      "requirement_id": "req-ontology-fallback",
+      "version": 3,
+      "state": "linked",
+      "missing": [],
+      "conflict_assertions": [],
+      "paths": [
+        {
+          "concept_id": "optional-ontology-baseline-preservation",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+          "implementation_assertion": "reviewed-v3:F3-T13",
+          "tested_by_assertion": "reviewed-v3:F3-T14",
+          "checked_criterion_ids": [
+            "ac-ontology-fallback"
+          ]
+        },
+        {
+          "concept_id": "optional-ontology-baseline-preservation",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+          "implementation_assertion": "reviewed-v3:F3-T13",
+          "tested_by_assertion": "reviewed-v3:F3-R13",
+          "checked_criterion_ids": [
+            "ac-ontology-fallback"
+          ]
+        },
+        {
+          "concept_id": "optional-ontology-baseline-preservation",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+          "implementation_assertion": "reviewed-v3:F3-T13",
+          "tested_by_assertion": "reviewed-v3:F3-T16",
+          "checked_criterion_ids": [
+            "ac-ontology-fallback"
+          ]
+        },
+        {
+          "concept_id": "optional-ontology-baseline-preservation",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+          "implementation_assertion": "reviewed-v3:F3-R12",
+          "tested_by_assertion": "reviewed-v3:F3-R11"
+        }
+      ]
+    },
+    {
+      "requirement_id": "req-source-evidence",
+      "version": 3,
+      "state": "linked",
+      "missing": [],
+      "conflict_assertions": [],
+      "paths": [
+        {
+          "concept_id": "snapshot-bound-semantic-relations",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "implementation_assertion": "reviewed-v3:F3-R07",
+          "tested_by_assertion": "reviewed-v3:F3-R10",
+          "checked_criterion_ids": [
+            "ac-source-evidence"
+          ]
+        },
+        {
+          "concept_id": "snapshot-bound-semantic-relations",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "implementation_assertion": "reviewed-v3:F3-R05",
+          "tested_by_assertion": "reviewed-v3:F3-R09",
+          "checked_criterion_ids": [
+            "ac-source-evidence"
+          ]
+        },
+        {
+          "concept_id": "snapshot-bound-semantic-relations",
+          "code_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+          "test_canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "implementation_assertion": "reviewed-v3:F3-T08",
+          "tested_by_assertion": "reviewed-v3:F3-T11",
+          "checked_criterion_ids": [
+            "ac-source-evidence"
+          ]
+        }
+      ]
+    }
+  ]
+}

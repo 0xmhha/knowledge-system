@@ -14,7 +14,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestEmitTemporalEdges_BasicGitRepo wires the full E4 path: build a tiny
+// TestEmitTemporalEdges_BasicGitRepo wires the full temporal path: build a tiny
 // git repo containing one Go file, hand-construct a Graph (mirroring what
 // graph.Build would produce — a Package + File + Function node), then run
 // emitTemporalEdges and verify:
@@ -52,7 +52,7 @@ func TestEmitTemporalEdges_BasicGitRepo(t *testing.T) {
 
 	// Edge bookkeeping: every original node in main.go should have a
 	// changed_in edge to the commit; one blame edge from the File node;
-	// schema 1.8 H1 also adds NodeHunk + has_hunk + (zero or more) adjacent
+	// schema 1.8 also adds NodeHunk + has_hunk + (zero or more) adjacent
 	// edges depending on how the file's content split into hunks.
 	changedIn := edgesByType(g.Edges, types.EdgeChangedIn)
 	if len(changedIn) != originalNodes {

@@ -6,20 +6,20 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
-// Sol W-C W8 V1 (2026-05-18) — HasLowLevelCall and HasValueTransfer
+// Sol HasLowLevelCall and HasValueTransfer
 // presence markers on callables.
 //
-// Complement to W7.1 V0 EdgeInvokes, which only fires when the
+// Complement to the low-level call EdgeInvokes, which only fires when the
 // receiver of a `.call` family invocation is a state-var / parameter
 // of Contract or Interface type. Address-typed receivers (the common
 // proxy / forwarder pattern), `address(x)` cast wrappers, and
-// chained receivers all produce no edge in V0 but the markers light
+// chained receivers all produce no edge but the markers light
 // up so security tooling can run "which functions perform any
 // low-level call shape" queries without dropping into AST analysis.
 //
-// V1 scope:
+// Scope:
 //   - HasLowLevelCall:   any `.call` / `.delegatecall` / `.staticcall`
-//                        on any receiver shape. The W7.1 walker still
+//                        on any receiver shape. The low-level call walker still
 //                        emits edges for resolvable receivers; this
 //                        marker is a superset signal.
 //   - HasValueTransfer:  any `.send` / `.transfer`. Sol semantics:
@@ -31,8 +31,8 @@ import (
 // on any member_expression whose property text matches one of the
 // six method names AND whose parent unwraps to a call_expression.
 // Yul-internal builtins (assembly delegatecall, sstore, ...) are
-// out of scope here — they live under W10's HasAssembly marker, and
-// future W10 V1+ work surfaces them separately.
+// out of scope here — they live under the HasAssembly marker and the
+// Yul builtin / low-level call walkers.
 
 func isValueTransferMethod(name string) bool {
 	switch name {
@@ -48,7 +48,7 @@ func isValueTransferMethod(name string) bool {
 // nearestFunctionQnameAndStart and flips the corresponding marker
 // on the matching node post-Pass-1.
 //
-// Same idiom as runAssemblyMarker (W10 V0): post-Pass-1 in-place
+// Same idiom as runAssemblyMarker: post-Pass-1 in-place
 // mutation, so the four function-emit paths (runFunctionDecl /
 // runConstructorDecl / runFallbackReceiveDecl / runDecl-for-modifier)
 // don't need touching.

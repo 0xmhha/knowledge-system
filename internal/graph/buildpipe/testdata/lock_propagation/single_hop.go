@@ -1,6 +1,6 @@
 // Package lockprop is the W-A (D1 Stage B) cross-function lock propagation
 // fixture. Each file isolates one scenario from the spec test plan
-// (docs/design/go-cross-function-lock-propagation.md §4.2 / §6).
+// (docs/graph/design/go-cross-function-lock-propagation.md §4.2 / §6).
 package lockprop
 
 import "sync"

@@ -1,0 +1,109 @@
+func BuildFromRefs(ctx context.Context, versionDir, query string, refs []Ref, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
+	if cleaner == nil || query == "" {
+		return contract.EvidencePackV2{}, fmt.Errorf("v2 evidence requires a query and sanitizer")
+	}
+	if len(refs) > MaxCandidateRefs {
+		return contract.EvidencePackV2{}, fmt.Errorf("%w: candidate reference limit", ErrEvidenceBudget)
+	}
+	pack := contract.EvidencePackV2{FormatVersion: 2, Query: query, Citations: []contract.CitationV2{}, Bodies: []contract.BodyV2{}, GraphNeighbors: []any{}, EvidenceState: "complete", Metadata: contract.V2Metadata{IntegrityHashAlgo: "sha256-v2"}}
+	seen := map[contract.CitationKeyV2]bool{}
+	reasons := map[string]bool{}
+	diagnostic := contract.V2EvidenceBudget{Scope: "retained_core", MaxBodyBytes: MaxBodyBytes, MaxCitations: MaxCitations, RequestedReferences: len(refs)}
+	spans := make([]setup.RetainedLineSpan, 0, len(refs))
+	for _, ref := range refs {
+		if !validV2Origin(ref.OriginID) {
+			return contract.EvidencePackV2{}, fmt.Errorf("invalid v2 citation origin")
+		}
+		spans = append(spans, setup.RetainedLineSpan{OriginID: ref.OriginID, Path: ref.Citation.File, First: ref.Citation.StartLine, Last: ref.Citation.EndLine})
+	}
+	if len(spans) > 0 {
+		err := setup.VisitRetainedLineSpans(ctx, versionDir, spans, func(i int, e setup.RetainedEvidence) error {
+			ref := refs[i].Citation
+			if ref.CommitHash != "" && ref.CommitHash != e.BaseCommit {
+				return fmt.Errorf("snapshot_mismatch: citation commit differs from retained source")
+			}
+			coordinates := contract.V2Coordinates{ProjectID: e.ProjectID, DatasetID: e.DatasetID, SnapshotID: e.SnapshotID, SourceMode: e.SourceMode, BaseCommit: e.BaseCommit}
+			if pack.Coordinates.ProjectID == "" {
+				pack.Coordinates = coordinates
+			} else if pack.Coordinates != coordinates {
+				return fmt.Errorf("snapshot_mismatch: mixed evidence coordinates")
+			}
+			citation := contract.CitationV2{File: e.File, StartLine: e.StartLine, EndLine: e.EndLine, CommitHash: e.CommitHash, ProjectID: e.ProjectID, DatasetID: e.DatasetID, SnapshotID: e.SnapshotID, SourceMode: e.SourceMode, BaseCommit: e.BaseCommit, OriginID: e.OriginID, FileSHA256: e.FileSHA256, ContentSHA256: e.ContentSHA256}
+			if seen[citation.KeyV2()] {
+				return nil
+			}
+			seen[citation.KeyV2()] = true
+			diagnostic.UniqueReferences++
+			cleaned, err := cleaner.Sanitize(ctx, []sanitize.Sanitizable{{Citation: ref, Body: e.Text}})
+			if err != nil {
+				return err
+			}
+			if cleaned.FailClosed {
+				return fmt.Errorf("fail_closed: retained evidence blocked by sanitization policy")
+			}
+			if len(cleaned.Items) != 1 || cleaned.Items[0].Citation != ref {
+				return fmt.Errorf("snapshot_mismatch: sanitizer returned incomplete evidence")
+			}
+			item := cleaned.Items[0]
+			// Sanitization policy (especially fail_closed) is checked even when the
+			// whole source span will be omitted by the byte/citation budget.
+			if len(e.Text) > MaxBodyBytes {
+				diagnostic.OmittedReferences++
+				reasons["body_bytes"] = true
+				return nil
+			}
+			overBytes := len(e.Text) > MaxBodyBytes-diagnostic.SelectedRawBytes || len(item.Body) > MaxBodyBytes-diagnostic.SelectedBodyBytes
+			overCitations := len(pack.Citations) >= MaxCitations
+			if overBytes || overCitations {
+				diagnostic.OmittedReferences++
+				if overBytes {
+					reasons["body_bytes"] = true
+				}
+				if overCitations {
+					reasons["citation_count"] = true
+				}
+				return nil
+			}
+			pack.Citations = append(pack.Citations, citation)
+			diagnostic.SelectedRawBytes += len(e.Text)
+			if item.Dropped {
+				pack.EvidenceState = "partial"
+			} else {
+				pack.Bodies = append(pack.Bodies, contract.BodyV2{Citation: citation, Text: item.Body})
+				diagnostic.SelectedBodyBytes += len(item.Body)
+			}
+			return nil
+		})
+		if err != nil {
+			return contract.EvidencePackV2{}, err
+		}
+	} else {
+		if info, err := os.Lstat(filepath.Join(versionDir, "sources", "manifest.json")); err != nil || !info.Mode().IsRegular() {
+			return contract.EvidencePackV2{}, fmt.Errorf("source_missing: retained source manifest is unavailable")
+		}
+		identity, err := setup.InspectVersionIdentity(versionDir)
+		if err != nil {
+			return contract.EvidencePackV2{}, err
+		}
+		if identity == nil {
+			return contract.EvidencePackV2{}, fmt.Errorf("reindex_required: v2 evidence needs a pinned dataset")
+		}
+		pack.Coordinates = contract.V2Coordinates{ProjectID: identity.Source.ProjectID, DatasetID: identity.DatasetID, SnapshotID: identity.Source.SnapshotID, SourceMode: identity.Source.SourceMode, BaseCommit: identity.Source.SourceCommit}
+	}
+	if diagnostic.OmittedReferences > 0 {
+		if len(pack.Citations) == 0 {
+			return contract.EvidencePackV2{}, fmt.Errorf("%w: no complete retained span fits", ErrEvidenceBudget)
+		}
+		pack.EvidenceState = "partial"
+		diagnostic.SelectedCitations = len(pack.Citations)
+		for reason := range reasons {
+			diagnostic.Reasons = append(diagnostic.Reasons, reason)
+		}
+		sort.Strings(diagnostic.Reasons)
+		pack.Metadata.EvidenceBudget = &diagnostic
+	}
+	if err := Stamp(&pack); err != nil {
+		return contract.EvidencePackV2{}, err
+	}
+	return pack, nil
+}

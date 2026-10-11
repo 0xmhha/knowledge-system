@@ -125,7 +125,7 @@ func TestHandleOpsIndex_IncrementalRunsBothBackends(t *testing.T) {
 	joined := strings.Join(ckv.args, " ")
 	if !strings.Contains(joined, "reindex") || !strings.Contains(joined, "--src /src") ||
 		!strings.Contains(joined, "--out /d/ckv") ||
-		!strings.Contains(joined, "--since abc123") || !strings.Contains(joined, "--model-name=bge-m3") {
+		!strings.Contains(joined, "--since=abc123") || !strings.Contains(joined, "--model-name=bge-m3") {
 		t.Errorf("ckv reindex args wrong: %v", ckv.args)
 	}
 	if len(ckv.env) == 0 || !strings.Contains(ckv.env[0], "CKV_OLLAMA_ENDPOINT=http://h:1") {
@@ -336,5 +336,29 @@ func TestHandleOpsIndex_NoVectorInThisDeployment(t *testing.T) {
 	}
 	if got := resultText(res); strings.Contains(got, "FAILED") {
 		t.Errorf("text = %q, want no failure for a deployment with no vector index", got)
+	}
+}
+
+// since_commit names a revision; values that could reach git or ckv as an
+// option are refused before any backend runs.
+func TestHandleOpsIndex_SinceCommitIsNeverAnOption(t *testing.T) {
+	for _, since := range []string{"--output=/tmp/x", "-p", "abc 123", "abc\n--force", "HEAD..evil"} {
+		calls := withStubRunner(t, "")
+		d := Deps{Index: IndexConfig{CKVBinary: "ckv-bin", CKVDataPath: "/d/ckv", SourceRoot: "/src"}}
+		res, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "incremental", "since_commit": since}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !res.IsError || len(*calls) != 0 {
+			t.Fatalf("since_commit %q: IsError=%v runs=%d", since, res.IsError, len(*calls))
+		}
+	}
+	for _, since := range []string{"abc123", "HEAD~3", "v1.2.0", "release/2026-10"} {
+		calls := withStubRunner(t, "")
+		d := Deps{Index: IndexConfig{CKVBinary: "ckv-bin", CKVDataPath: "/d/ckv", SourceRoot: "/src"}}
+		res, _ := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "incremental", "since_commit": since}))
+		if res.IsError || len(*calls) != 1 || !strings.Contains(strings.Join((*calls)[0].args, " "), "--since="+since) {
+			t.Fatalf("since_commit %q refused or not forwarded as one argument: %+v %+v", since, res, *calls)
+		}
 	}
 }

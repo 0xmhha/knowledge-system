@@ -1,0 +1,12 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "user_decision": "처음 한 번만 전체 검증 (권장): verify a retained version in full once per process, then compare file metadata and verify again only on change",
+ "before": "InspectVersionIdentity on the operating go-stablenet v2 dataset: about 0.6 s per call when warm (CPU profile: about 55% rehashing 2,227 retained blobs, about 40% reparsing large manifest JSON); 16 cks MCP tools call it on every request",
+ "change": "6630b16b: verifyVersionIdentityContext keeps a successful verification with a fingerprint of every entry (path and permissions; for non-directories also size, modification time, change time and inode; SQLite -wal/-shm/-journal skipped) and reuses it while the fingerprint matches; failed verifications are never cached",
+ "after": "same dataset: first inspection 2.78 s (cold cache), then 8.3-26.9 ms; fingerprint alone 7.5 ms over 2,183 entries",
+ "tests": ["TestVersionVerificationIsReusedUntilFilesChange: one full verification for three inspections; a SQLite sidecar does not force a new one; content changed behind a restored size and modification time is found (change time)", "TestFailedVerificationIsNotCached", "mutation: dropping the change time from the fingerprint makes the restored-mtime case pass undetected (test fails)"],
+ "accepted_weakness": "damage that changes no file metadata (for example silent disk corruption) is found only after the process restarts",
+ "regression": "go test -race -count=1 ./... at 6630b16b with the default timeout: 3293 passed, 16 skipped, 0 failed; vet pass; gofmt 0; python 164 passed",
+ "operating_release": "not installed; the operating dataset still runs release e39b1ee5"
+}

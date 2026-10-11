@@ -1,10 +1,10 @@
 // Package temporal extracts git-history derived facts (commits + per-file
-// touch lists) used to emit CKS G6 Temporal edges (`changed_in`, `blame`)
+// touch lists) used to emit temporal edges (`changed_in`, `blame`)
 // in the build pipeline.
 //
-// V0 scope (E4): single `git log --raw --no-renames` invocation per build,
+// V0 scope: single `git log --raw --no-renames` invocation per build,
 // streamed and parsed into a per-file commit list. Line-level blame is
-// deferred (G6 Phase 2). Repos that aren't git checkouts return an empty
+// deferred. Repos that aren't git checkouts return an empty
 // FileHistory + nil error so callers degrade gracefully.
 package temporal
 

@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W7.1 V0 — low-level call dispatch.
+// Low-level call dispatch.
 //
 // target.call(...) / .delegatecall(...) / .staticcall(...) are workhorse
 // primitives in proxy / upgradeable / bytes-encoded dispatch patterns and
-// W3 explicitly excluded them (dispatch.go §0). V0 closes the gap: emit
+// interface dispatch explicitly excludes them (dispatch.go §0). This closes the gap: emit
 // one EdgeInvokes per call, DispatchKind="low_level_call", ConfAmbiguous.
 //
-// V0 receiver resolution chain mirrors W6 lookupReceiverType (state-var
+// The receiver resolution chain mirrors the using-for lookupReceiverType (state-var
 // → param → local-var); type → byName[NodeContract|NodeInterface] →
 // Dst. Unresolved (no NodeContract/Interface with that type) → drop.
-// `address(x)` cast receivers drop in V0 per W7-D2.
+// `address(x)` cast receivers drop by design.
 //
 // Tests below verify the 3 primitives × state-var receiver baseline.
 

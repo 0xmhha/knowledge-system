@@ -4,22 +4,22 @@ import (
 	"testing"
 )
 
-// W-C W6 V2.3 — library body using-for regression guard.
+// Library body using-for regression guard.
 //
-// V0/V1.0 queryUsingFor pattern matches library_declaration bodies
+// The queryUsingFor pattern matches library_declaration bodies
 // uniformly with contract_declaration / interface_declaration bodies
 // (verified by reading queries.go). Pass 1.5 containerIDByFuncID maps
 // every NodeFunction inside a library to that library's ID. bindings
-// keyed by library ID get populated by V0 sweep. lookupReceiverType
+// keyed by library ID get populated by the binding sweep. lookupReceiverType
 // + resolveBindingLib pipeline therefore should work uniformly inside
 // library bodies as well.
 //
-// V2.3 locks this expectation in with a fixture so future refactors
+// This test locks this expectation in with a fixture so future refactors
 // don't accidentally exclude library-body using-for from the
 // dispatch pipeline.
 //
-// V2.3 carry-over (V2.4+):
-//   - Byte-range precision over V2.0's line-based fallback.
+// Not covered here:
+//   - Byte-range precision over the line-based fallback.
 //   - Module/import additional patterns.
 //   - Grammar-blocked items.
 

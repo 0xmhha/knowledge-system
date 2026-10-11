@@ -15,7 +15,7 @@ type Graph struct {
 
 // edgeKey uniquely identifies an edge by its semantic identity — two edges
 // with the same (Type, Src, Dst, Line) describe the same logical relation
-// at the same call/reference site. Used by Build for dedup (G6 v3).
+// at the same call/reference site. Used by Build for dedup.
 type edgeKey struct {
 	Type     types.EdgeType
 	Src, Dst string
@@ -28,9 +28,9 @@ type edgeKey struct {
 //
 // Cold-path semantics: each ResolvedGraph comes from a different language,
 // so edge keys cannot collide across parts. Dedup is a no-op and Build's
-// output is identical to the pre-G6-v3 append-only behaviour.
+// output is identical to plain append-only behaviour.
 //
-// Partial-cache semantics (G6 v3): the same logical edge can arrive from
+// Partial-cache semantics: the same logical edge can arrive from
 // two sources — (a) reloaded from DB for cached files, (b) freshly emitted
 // by Pass 2 Resolve over the merged dirty+cached input. Without dedup these
 // would double-count in the in-memory Graph that cluster/score/temporal

@@ -1,0 +1,52 @@
+package ckgclient
+
+import (
+	"context"
+	"os"
+	"runtime"
+	"testing"
+	"time"
+
+	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+)
+
+func TestZZScaleProbe(t *testing.T) {
+	r, err := NewReal(os.Getenv("ZZ_GRAPH"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	measure := func(label string, f func() (int, int, error)) {
+		var m0, m1 runtime.MemStats
+		runtime.GC()
+		runtime.ReadMemStats(&m0)
+		t0 := time.Now()
+		n, e, err := f()
+		el := time.Since(t0)
+		runtime.ReadMemStats(&m1)
+		t.Logf("%-58s nodes=%-6d edges=%-6d err=%v time=%-8s alloc=%dMB", label, n, e, err, el.Round(time.Millisecond), (m1.TotalAlloc-m0.TotalAlloc)>>20)
+	}
+	ctx := context.Background()
+	measure("FindSymbol only", func() (int, int, error) { c, err := r.FindSymbol(ctx, "types.Block.Hash", SymbolOpts{}); return len(c), 0, err })
+	measure("resolveSeedOrErr only", func() (int, int, error) { _, err := r.resolveSeedOrErr("types.Block.Hash"); return 0, 0, err })
+	measure("commit only", func() (int, int, error) { _, err := r.commit(); return 0, 0, err })
+	for _, q := range []string{"common.HexToHash", "types.Block.Hash", "vm.newFrontierInstructionSet"} {
+		for _, d := range []int{2, 3, 4, 5} {
+			measure("subgraph "+q+" depth="+string(rune('0'+d))+" max80", func() (int, int, error) {
+				c, nb, err := r.GetSubgraph(ctx, q, SubgraphOpts{Depth: d, MaxTotal: 80})
+				return len(c), len(nb), err
+			})
+		}
+		cits, err := r.FindSymbol(ctx, q, SymbolOpts{})
+		if err != nil || len(cits) == 0 {
+			t.Logf("seed %s: %v", q, err)
+			continue
+		}
+		for _, d := range []int{2, 5} {
+			measure("callers "+q+" depth="+string(rune('0'+d)), func() (int, int, error) {
+				nb, err := r.Neighbors(ctx, cits[0], NeighborsOpts{Relations: []contract.Relation{contract.RelationCalledBy}, Hops: d})
+				return 0, len(nb), err
+			})
+		}
+	}
+}

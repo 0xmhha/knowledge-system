@@ -6,8 +6,7 @@ import "github.com/0xmhha/knowledge-system/pkg/graph/types"
 // Zero value means "no filter" — every match on the name (and exactness mode)
 // passes through.
 //
-// See docs/followups-from-cks-dogfood-2026-05-19.md item CKG-4 for the
-// downstream motivation: cks Stage 2's `arch_explain` intent fetches
+// Downstream motivation: cks Stage 2's `arch_explain` intent fetches
 // Function / Type / Interface symbols separately, paying N round-trips
 // for what should be one. With Kinds set, the SQL layer returns a kind-
 // tagged result in a single query so cks can dedupe by Citation key on

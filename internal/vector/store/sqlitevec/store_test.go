@@ -422,6 +422,95 @@ func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {
 	if !seen["target-one"] || !seen["target-two"] {
 		t.Fatalf("wrong filtered hits: %+v", hits)
 	}
+	// target-two (distance ~1.30) is closer than target-one (~1.41); the
+	// filtered result must keep exact distance order, not just membership.
+	if hits[0].Chunk.ID != "target-two" || hits[1].Chunk.ID != "target-one" ||
+		hits[0].Score.VectorDistance > hits[1].Score.VectorDistance {
+		t.Fatalf("filtered hits not in exact distance order: %+v", hits)
+	}
+}
+
+// cancelAfterCtx reports cancellation only after the first `after` Err
+// calls, so the search passes its entry check and is interrupted while it
+// is already working on the filtered candidate set. Done stays nil so
+// database/sql does not race a watcher goroutine against the counter.
+type cancelAfterCtx struct {
+	context.Context
+	calls, after int
+}
+
+func (c *cancelAfterCtx) Err() error {
+	c.calls++
+	if c.calls > c.after {
+		return context.Canceled
+	}
+	return nil
+}
+
+func TestSearchDetailedFilteredCancellationAfterStartIsNotComplete(t *testing.T) {
+	cases := []struct {
+		name   string
+		near   int
+		filter types.Filter
+	}{
+		// 3 eligible typescript chunks among 12 closer go chunks: exact path.
+		{name: "exact-sized filtered set", near: 12, filter: types.Filter{Language: "typescript"}},
+		// Bracket glob has no pushdown prefix, so 2,052 candidates take the
+		// bounded vec0 path before any exact completion.
+		{name: "large filtered set", near: 2049, filter: types.Filter{PathGlob: "[t]*.ts"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			s, err := Open(filepath.Join(t.TempDir(), "cancel-filtered.db"), testDim)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer s.Close()
+			var chunks []types.Chunk
+			var embs [][]float32
+			for i := 0; i < tc.near; i++ {
+				chunks = append(chunks, mkChunk(fmt.Sprintf("near-%d", i), "near/a.go", "near", i+1, i+1, "go", types.KindFunction))
+				embs = append(embs, []float32{1, 0, 0, 0})
+			}
+			for i, v := range [][]float32{{0, 1, 0, 0}, {0, 0.8, 0.2, 0}, {0, 0, 1, 0}} {
+				chunks = append(chunks, mkChunk(fmt.Sprintf("target-%d", i), "target.ts", "target", i+1, i+1, "typescript", types.KindFunction))
+				embs = append(embs, v)
+			}
+			if err := s.Upsert(context.Background(), chunks, embs); err != nil {
+				t.Fatal(err)
+			}
+			const k = 2
+			// Inject cancellation at every Err checkpoint in turn, until the
+			// search finishes without ever observing it. Whenever a
+			// cancellation was observed, the result must not claim completion.
+			observed := 0
+			for after := 1; ; after++ {
+				ctx := &cancelAfterCtx{Context: context.Background(), after: after}
+				result, err := s.SearchDetailed(ctx, []float32{1, 0, 0, 0}, k, tc.filter, SearchOptions{})
+				if ctx.calls <= after {
+					if err != nil || result.Status != SearchComplete || len(result.Hits) != k {
+						t.Fatalf("uncancelled search must complete: result=%+v err=%v", result, err)
+					}
+					break
+				}
+				observed++
+				if err != nil {
+					t.Fatalf("checkpoint %d: cancellation must be a status, not an error: %v", after, err)
+				}
+				if result.Status != SearchCancelled || result.Reason != "context_cancelled" {
+					t.Fatalf("checkpoint %d: in-flight cancellation must be explicit: %+v", after, result)
+				}
+				hits, err := s.Search(&cancelAfterCtx{Context: context.Background(), after: after}, []float32{1, 0, 0, 0}, k, tc.filter)
+				if !errors.Is(err, context.Canceled) || hits != nil {
+					t.Fatalf("checkpoint %d: Search wrapper must surface cancellation: hits=%v err=%v", after, hits, err)
+				}
+			}
+			if observed == 0 {
+				t.Fatal("no in-flight cancellation checkpoint was exercised")
+			}
+			t.Logf("in-flight cancellation checkpoints exercised: %d", observed)
+		})
+	}
 }
 
 func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T) {

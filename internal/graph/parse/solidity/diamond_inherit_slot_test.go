@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V18 — diamond inheritance storage slot offset audit.
+// Diamond inheritance storage slot offset audit.
 //
 // The diamond shape (D ← {B, C} ← A) is the canonical stress
 // test for C3 linearization on storage layout. The same base
@@ -15,7 +15,7 @@ import (
 // base offset (sum of each base's slot count) would double-
 // count A and place D's own field one slot too high.
 //
-// W9's resolve.go applies C3 via c3_linearization.go and computes
+// resolve.go applies C3 via c3_linearization.go and computes
 // the inheritance offset on the *deduplicated* MRO, so the
 // expected layout is:
 //
@@ -25,9 +25,9 @@ import (
 //	D.d → 3   (D's own slot 0 + 3 slots from {A, B, C} deduped;
 //	           NOT 4, which the naive doubled-A path would yield)
 //
-// V18 pins both axes:
+// This test pins both axes:
 //
-//  1. **Per-field own-scope semantics** (matches V17): A.a, B.b,
+//  1. **Per-field own-scope semantics** (matches the multi-inheritance test): A.a, B.b,
 //     C.c keep their own-scope slot because each base is read
 //     in isolation. A regression that re-bases base contracts
 //     to absolute-in-derived would flip these.

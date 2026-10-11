@@ -7,12 +7,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.0 — method-call dispatch resolution tests.
+// Using-for method-call dispatch resolution tests.
 //
-// These tests exercise the V1.0 chain: state-var type extraction →
+// These tests exercise the chain: state-var type extraction →
 // per-contract binding map → method-call PendingRef → EdgeCalls emission.
 //
-// EdgeUsesFor (V0) assertions remain in using_for_test.go; this file
+// EdgeUsesFor assertions remain in using_for_test.go; this file
 // focuses on EdgeCalls produced through the using_for_call resolver
 // path, plus the receiver-type / binding-fallback edge cases.
 
@@ -90,7 +90,7 @@ func equalCallWants(a, b []callWant) bool {
 	return true
 }
 
-// TestUsingForV1_StateVarDispatch — canonical V1.0 case: state-variable
+// TestUsingForV1_StateVarDispatch — canonical case: state-variable
 // receiver with specific-type binding. Both .add and .sub on the
 // `balance` uint256 state var must resolve to SafeMath functions.
 func TestUsingForV1_StateVarDispatch(t *testing.T) {

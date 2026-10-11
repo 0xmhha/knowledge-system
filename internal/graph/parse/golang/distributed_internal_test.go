@@ -5,7 +5,7 @@ import "testing"
 // TestSplitGo122Pattern locks the Go 1.22+ HTTP pattern splitter's
 // conservative-fallback semantics. The function backs schema 1.9 §6.2's
 // `http:METHOD /route` qname format, so any silent regression here would
-// mangle cross-language endpoint matching (W2). The bound is:
+// mangle cross-language endpoint matching. The bound is:
 //   - Valid Go 1.22 method-prefix form: `"<UPPER>+ <slash-prefixed-path>"`
 //     → split into (method, route).
 //   - Anything else (no space, lowercase verb, no leading slash, multi-token

@@ -7,7 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestCanonicalID_DistinguishesSameNameAcrossPackages guards Phase 1 of the
+// TestCanonicalID_DistinguishesSameNameAcrossPackages guards the
 // symbol-identity design: the same method name in two different packages must
 // get distinct, import-path-qualified canonical ids, even though their short
 // qualified_name leaves (coll1.Set.Size / coll2.Other.Size) only differ by the
@@ -37,7 +37,7 @@ func TestCanonicalID_DistinguishesSameNameAcrossPackages(t *testing.T) {
 	}
 }
 
-// TestCanonicalID_AllGoNodeKinds guards symbol-identity Phase 1: canonical_id is
+// TestCanonicalID_AllGoNodeKinds guards symbol identity: canonical_id is
 // now emitted for types/structs/interfaces, fields, package-level const/var, and
 // interface methods — not just funcs/methods. Each id is import-path-qualified,
 // and an interface method's id is distinct from a same-named concrete method's.
@@ -78,7 +78,7 @@ func TestCanonicalID_AllGoNodeKinds(t *testing.T) {
 	}
 }
 
-// TestCanonicalID_BlankIdentifierSkipped guards B1: the blank identifier `_`
+// TestCanonicalID_BlankIdentifierSkipped guards that the blank identifier `_`
 // (package-level `var _ = …`, struct padding fields) must NOT receive a
 // canonical id — `<pkg>._` is intentionally non-unique and pollutes uniqueness.
 func TestCanonicalID_BlankIdentifierSkipped(t *testing.T) {
@@ -104,7 +104,7 @@ func TestCanonicalID_BlankIdentifierSkipped(t *testing.T) {
 	}
 }
 
-// TestCanonicalID_LocalVarSkipped guards B2: a function-local `var` declaration
+// TestCanonicalID_LocalVarSkipped guards that a function-local `var` declaration
 // must NOT receive a canonical id (only package-level const/var do), since
 // <pkg>.<localName> collides across the many functions that reuse a name.
 func TestCanonicalID_LocalVarSkipped(t *testing.T) {

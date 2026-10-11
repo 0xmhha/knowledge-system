@@ -4,7 +4,7 @@ import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-// Sol W-C W9 V14 (2026-05-19) — enum byte footprint computation.
+// Sol enum byte footprint computation.
 //
 // Sol enum runtime size depends on the variant count: ≤256 -> 1
 // byte (uint8), ≤65536 -> 2 bytes (uint16), ≤2^32 -> 4 bytes,
@@ -16,7 +16,7 @@ import (
 // runStateVarDecl's slot packing can call solValueTypeSize first
 // and fall back to this index before the conservative full-slot
 // path. Cross-file enum references stay on the conservative
-// fallback in V14; cross-file propagation is W9 V15+.
+// fallback here; cross-file propagation is handled separately.
 //
 // Bumping to ≤256 -> 1 byte unlocks the typical enum packing
 // scenario (a few small enum fields with primitive neighbours

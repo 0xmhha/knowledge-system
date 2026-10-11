@@ -141,7 +141,7 @@ func TestScanPRHistory_BasicOverlap(t *testing.T) {
 	if got["n2"][0].Title != "Fix Foo edge case" {
 		t.Errorf("title strip: got %q, want \"Fix Foo edge case\"", got["n2"][0].Title)
 	}
-	// Body excerpt: P0 "왜" history captures the full cleaned body,
+	// Body excerpt: the "왜" history captures the full cleaned body,
 	// not just the first line. The fixture body is two lines; both
 	// must survive trailer stripping.
 	wantSummary := "This is the body summary line.\nFurther detail."
@@ -221,12 +221,11 @@ func TestRangesOverlap(t *testing.T) {
 // unused-import warning.
 var _ = time.RFC3339
 
-// TestBodyExcerpt locks down the P0 "왜" history transformation —
+// TestBodyExcerpt locks down the "왜" history transformation —
 // the cleaned body that drives CKV's semantic search. The function
 // must (a) keep the rationale prose intact, (b) drop the canonical
 // set of git trailers, (c) cap runaway bodies on a line boundary
-// with an ellipsis marker. See docs/PROJECT-BLUEPRINT-ALIGNMENT.md
-// §4.2 P0 #1.
+// with an ellipsis marker.
 func TestBodyExcerpt(t *testing.T) {
 	cases := []struct {
 		name string

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// TestProfileAggregatesByEvent exercises B8 --profile: latencies from
+// TestProfileAggregatesByEvent exercises --profile: latencies from
 // every Span done event group by event name, percentile math runs at
 // Close, and the JSON output round-trips.
 func TestProfileAggregatesByEvent(t *testing.T) {

@@ -127,7 +127,7 @@ func BuildFromRefs(ctx context.Context, versionDir, query string, refs []Ref, cl
 		if info, err := os.Lstat(filepath.Join(versionDir, "sources", "manifest.json")); err != nil || !info.Mode().IsRegular() {
 			return contract.EvidencePackV2{}, fmt.Errorf("source_missing: retained source manifest is unavailable")
 		}
-		identity, err := setup.InspectVersionIdentity(versionDir)
+		identity, err := setup.InspectVersionIdentityContext(ctx, versionDir)
 		if err != nil {
 			return contract.EvidencePackV2{}, err
 		}

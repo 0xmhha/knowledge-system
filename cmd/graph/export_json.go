@@ -61,7 +61,7 @@ type minimalNode struct {
 }
 
 // minimalEdge keeps the join surface (Src/Dst/Type/Count/Confidence)
-// + DispatchKind (the Track C invokes-classification — high signal,
+// + DispatchKind (the invokes-edge classification — high signal,
 // low cost) but drops the auto-increment ID, which is meaningful only
 // inside the originating SQLite file.
 type minimalEdge struct {

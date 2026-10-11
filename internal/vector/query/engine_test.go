@@ -175,7 +175,7 @@ func TestSearchHonorsFilter(t *testing.T) {
 	}
 }
 
-// TestSearchHonorsCommitHashFilter exercises B2: chunks carry the
+// TestSearchHonorsCommitHashFilter exercises the commit filter: chunks carry the
 // commit_hash they were indexed at; filter.CommitHash should restrict
 // results to that snapshot. Mismatched commit_hash returns zero hits
 // (and the warning surface from the threshold path stays clean).
@@ -220,7 +220,7 @@ func TestSearchHonorsCommitHashFilter(t *testing.T) {
 	}
 }
 
-// TestSearch_DryRunSkipsEmbedAndStore verifies B5 dry_run mode:
+// TestSearch_DryRunSkipsEmbedAndStore verifies dry_run mode:
 // engine validates the request (intent, manifest identity) but skips
 // embed + store.Search + citation + density. Response carries
 // metadata only — Hits empty, DryRun=true.
@@ -459,7 +459,7 @@ func TestSplitByTest_AllPrimaryOrAllExamples(t *testing.T) {
 // TestSearchRejectsTinyBudget verifies ErrBudgetExceeded is raised when
 // the caller's positive BudgetTokens is below MinBudgetTokens. Below
 // that floor the engine can't render even one signature-only hit, and
-// silent truncation would surprise the caller. Featurelist §8.4, B6.
+// silent truncation would surprise the caller.
 func TestSearchRejectsTinyBudget(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
@@ -473,7 +473,7 @@ func TestSearchRejectsTinyBudget(t *testing.T) {
 
 // TestSearchAcceptsNegativeBudgetAsDisable verifies the documented
 // escape hatch: negative BudgetTokens disables budgeting and returns
-// hits at full density. Featurelist §8.4 caller guidance.
+// hits at full density.
 func TestSearchAcceptsNegativeBudgetAsDisable(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())
@@ -490,8 +490,8 @@ func TestSearchAcceptsNegativeBudgetAsDisable(t *testing.T) {
 
 // TestSearchCitationNotFoundOnMissingSrcRoot raises ErrCitationNotFound
 // when the recorded src_root is gone, so every threshold-passing hit
-// gets dropped at citation enforcement. Featurelist §8.4 catastrophic
-// case — currently silent, now surfaced.
+// gets dropped at citation enforcement. This catastrophic case used to be
+// silent and is now surfaced.
 func TestSearchCitationNotFoundOnMissingSrcRoot(t *testing.T) {
 	out, _ := buildSample(t)
 	eng, _ := Open(out, mock.Default())

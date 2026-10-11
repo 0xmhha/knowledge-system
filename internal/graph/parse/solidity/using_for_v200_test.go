@@ -4,14 +4,14 @@ import (
 	"testing"
 )
 
-// W-C W6 V2.0 — line-range scope-aware localVar lookup.
+// Line-range scope-aware localVar lookup.
 //
-// V1.30 V0 introduced "first-decl wins" for shadowed locals, fixing
+// "First-decl wins" for shadowed locals fixed
 // the false-negative where inner-block shadows broke outer use sites.
 // The trade-off: inner use sites where the inner shadow's type would
 // be the correct resolution also resolved via the outer's type.
 //
-// V2.0 closes that trade-off by tracking each local's scope range
+// This closes that trade-off by tracking each local's scope range
 // (declStartLine, scopeEndLine) and resolving use-site dispatch via
 // line containment + narrowest-scope-wins selection. Concretely:
 //   - emitLocalVarBinding emits encoded `varName|typeName|scopeEndLine`
@@ -24,16 +24,16 @@ import (
 //     finds decls where declLine <= useSiteLine <= scopeEndLine and
 //     picks the one with the highest declLine (narrowest scope = inner).
 //
-// V2.0 carry-over (V2.1+):
+// Not covered here:
 //   - Full byte-range precision (instead of line). Edge cases of
 //     >1 stmt per line resolve correctly. Practical Sol style makes
-//     line-precision sufficient for V2.0 V0.
+//     line-precision sufficient for now.
 //   - Module/import handling additional patterns.
 //   - Grammar-blocked items.
 
 // TestUsingForV200_InnerShadowUse — outer uint256 x + inner bytes32 x
-// + USE SITES IN BOTH SCOPES. V1.30 V0 misses inner use site (resolves
-// to outer uint256, drops bytes32-dispatch). V2.0 fix: inner use →
+// + USE SITES IN BOTH SCOPES. First-decl-wins alone misses the inner use site (resolves
+// to outer uint256, drops bytes32-dispatch). With scope ranges: inner use →
 // bytes32 → Other.tag; outer use → uint256 → SafeMath.add.
 func TestUsingForV200_InnerShadowUse(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v200", "shadow_inner_use.sol")

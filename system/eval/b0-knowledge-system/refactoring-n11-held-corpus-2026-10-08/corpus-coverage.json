@@ -1,0 +1,501 @@
+{
+  "activation_count": 0,
+  "approved_independent_FINAL": 0,
+  "archive_replay": false,
+  "human_approved": 0,
+  "identity": {
+    "source": {
+      "project_id": "knowledge-system",
+      "source_mode": "committed",
+      "source_commit": "19803801bdde0d283b262f6c2d0f7d5656923135",
+      "file_manifest_digest": "01192a66adfa4b017e0ab0fbe41fb9b32edf9b835b1028fd7b5c60a5839328b8",
+      "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+      "git_recovery_digest": "5df61cb64e024c2615a7a868f75bd0f5f8a4c0b64a6e3dc532c9efb15cb48c1b",
+      "git_archive_policy": "bundle-selected-recovery-refs-v1",
+      "file_mode_policy": "executable-bit-v1",
+      "snapshot_id": "b1204cf14904afa85250340a6420106fb5662e615acae28efdf0c2fdbbd71222"
+    },
+    "embedding_identity": {
+      "Dim": 1024,
+      "Model": "bge-m3:latest",
+      "Normalize": "",
+      "Pooling": "",
+      "Provider": "ollama",
+      "chunk_budget_bytes": 6144,
+      "dimension_method": "mrl-prefix-l2:v1",
+      "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "native_dim": 1024,
+      "passage_transform": "raw:v1",
+      "query_transform": "raw:v1",
+      "runtime_batch_tokens": 8192,
+      "runtime_context_tokens": 8192,
+      "truncate_policy": "reject:v1",
+      "version": 2
+    },
+    "input_digest": "0ea440a8eaf7c43006d21831a701a06827df635b35f0596a1f524be0e776691b",
+    "dataset_id": "ee6f91bef76a9d3867983f0f968986919b2b1241dea7d7725bda27dee6808218"
+  },
+  "knowledge_lock_digest": "da964815fe34cbc6912db0cab703e933b349f7dbeda28a4db0037c44e3034a56",
+  "new_query_dispatches": 0,
+  "positive_gold_refs": 14,
+  "positive_refs_with_CKG_and_CKV_canonical_overlap": 14,
+  "question_rows": 16,
+  "references": [
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.ErrVersionedSetupRequired",
+          "canonical_overlap": false,
+          "chunk_id": "02ad699152d571b1f3545d72133c5e807a47a48a7d2a8551360bfae3c71fef73",
+          "end_line": 50,
+          "start_line": 1
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.checkMaintenanceTarget",
+          "canonical_overlap": true,
+          "chunk_id": "28cdf0f0bf9e67c639ac05276942d7404291a52531441ec7bbf4b00725d21155",
+          "end_line": 85,
+          "start_line": 28
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "CODE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-01",
+      "ref": {
+        "path": "internal/setup/maintenance.go",
+        "first": 28,
+        "last": 85,
+        "file_sha256": "b573172a5818f38e71f6befd7a0cdb3d026100702176e4376024947b94f336ee",
+        "content_sha256": "a6beb50580605c2273c3ef7c3868647420b5409f27742da1c00ffcbfbefeb4cd"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.candidateResources",
+          "canonical_overlap": true,
+          "chunk_id": "1c951526562ca008a8bb2ee573ae3ca1f587e9b20fe253071c6556e9c6d6ca5d",
+          "end_line": 148,
+          "start_line": 101
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "CODE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-02",
+      "ref": {
+        "path": "internal/setup/resources.go",
+        "first": 103,
+        "last": 148,
+        "file_sha256": "dcf66936ac475ff03221e4143679b2fd53f0b9deb59be35f03d7f927628d4cff",
+        "content_sha256": "c6334738bdf0d7311208c4d3492a679f5c869b37c2ee6e0688d7792d336f72bf"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.syncCurrentParent",
+          "canonical_overlap": true,
+          "chunk_id": "4ec2903648697f375bb50bd706a0ee8d134b84ffc3abf83eafe5253eaee308ac",
+          "end_line": 241,
+          "start_line": 230
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "WHY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-03",
+      "ref": {
+        "path": "internal/setup/durability.go",
+        "first": 230,
+        "last": 241,
+        "file_sha256": "3ce1c6b3be3b6f30bfc4fb93ca8ec694c1dd6b1a417b3af2ea345f3d4f5c0b16",
+        "content_sha256": "5f8c0695789a80ed11113a823416b949b8bd6f0081ef1dce956eee62bf2f1678"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 2,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.planGCLocked",
+          "canonical_overlap": true,
+          "chunk_id": "43876d0d0402b702e9480d279fb9958394fb411f84352f2f517d97ddbfbd2938",
+          "end_line": 439,
+          "start_line": 265
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/setup.planGCLocked",
+          "canonical_overlap": true,
+          "chunk_id": "23a78a3c45eac86c825909711e90986a17d6bec3ef1ef7b6f244d40bd15a9a78",
+          "end_line": 389,
+          "start_line": 389
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "POLICY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-04",
+      "ref": {
+        "path": "internal/setup/gc.go",
+        "first": 265,
+        "last": 439,
+        "file_sha256": "db8079d93de746de60a9bf496b4aaea05362599b54f8123f546458f05c681b05",
+        "content_sha256": "79cb4b1eafa066457ad074f48257c777033b3fc296fba2fd7ed9658a9457f6e6"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/evidencev2.Build",
+          "canonical_overlap": false,
+          "chunk_id": "d11ec199101bb17522965da42b8172dbe92155f273c03e98cad78fb8995ea510",
+          "end_line": 50,
+          "start_line": 1
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/evidencev2.BuildFromRefs",
+          "canonical_overlap": true,
+          "chunk_id": "b8a414c86e58f4b10f0a3c74830d5216b0d6515976d7f88e5eb3b8ca219bedbc",
+          "end_line": 155,
+          "start_line": 47
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "CODE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-05",
+      "ref": {
+        "path": "internal/system/evidencev2/pack.go",
+        "first": 47,
+        "last": 155,
+        "file_sha256": "99829efcfec40b3e0ea82098ef8bc645e1139bcdeaa9b7ea0e6192e92c87923a",
+        "content_sha256": "d4dfb857291d314e7d1191816e9eb9b4c5994248877785f95f25b6b5a890ffa3"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 2,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.LoadWorksheetCatalogs",
+          "canonical_overlap": true,
+          "chunk_id": "783cf4bb4ec047a6830f996ce861faa00d293e2741b8845876766277651a6dee",
+          "end_line": 127,
+          "start_line": 51
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.LoadWorksheetCatalogs",
+          "canonical_overlap": true,
+          "chunk_id": "d6ae85f991c48addd55ca7595ae7e4b12be22a9a2c5a716aafce346a13b52811",
+          "end_line": 96,
+          "start_line": 96
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "POLICY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-06",
+      "ref": {
+        "path": "internal/system/knowledgepack/worksheet.go",
+        "first": 54,
+        "last": 127,
+        "file_sha256": "3d6cc3773ff15263448da6d5a89082b7e7a887a262b053557800d7cb668b3d9a",
+        "content_sha256": "09e76b5e7b6e205e84e5fcb5a92a09a1a1f982d084ef122af01f0bd3a500a166"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.validateWorksheetSource",
+          "canonical_overlap": true,
+          "chunk_id": "e315ee0ea900122efd1f7151ba647b47d45efa61562059e9a208be9afe3eefc0",
+          "end_line": 200,
+          "start_line": 176
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "WHY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-DEV-07",
+      "ref": {
+        "path": "internal/system/knowledgepack/worksheet.go",
+        "first": 176,
+        "last": 200,
+        "file_sha256": "3d6cc3773ff15263448da6d5a89082b7e7a887a262b053557800d7cb668b3d9a",
+        "content_sha256": "b9766560c3dbc41c0c27d5483093cdd710a2b21bab2cc924583b3653ad5d96f1"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "DEV"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 2,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.OpenStoreReadOnly",
+          "canonical_overlap": true,
+          "chunk_id": "bcdb49bb7a1a7a9971882ef0443592326dd412ffac713624db55e0087652cbf8",
+          "end_line": 37,
+          "start_line": 1
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.OpenStoreReadOnly",
+          "canonical_overlap": true,
+          "chunk_id": "36416ad8ce0138354e967f12cd7bf78f824b750e2997189005a7587555cfd37c",
+          "end_line": 37,
+          "start_line": 11
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "CODE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-01",
+      "ref": {
+        "path": "internal/system/semantic/readonly.go",
+        "first": 11,
+        "last": 36,
+        "file_sha256": "62947607fc08c933964296bf8f84a28d13f75ac3837105e3d6b36e2ff12e3201",
+        "content_sha256": "b99d80ca270feda64acca16fc1928f4a3cb26c0587001ec07b78e6a564feab2f"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 2,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.OpenStoreReadOnly",
+          "canonical_overlap": true,
+          "chunk_id": "bcdb49bb7a1a7a9971882ef0443592326dd412ffac713624db55e0087652cbf8",
+          "end_line": 37,
+          "start_line": 1
+        },
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.OpenStoreReadOnly",
+          "canonical_overlap": true,
+          "chunk_id": "36416ad8ce0138354e967f12cd7bf78f824b750e2997189005a7587555cfd37c",
+          "end_line": 37,
+          "start_line": 11
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "WHY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-02",
+      "ref": {
+        "path": "internal/system/semantic/readonly.go",
+        "first": 11,
+        "last": 36,
+        "file_sha256": "62947607fc08c933964296bf8f84a28d13f75ac3837105e3d6b36e2ff12e3201",
+        "content_sha256": "b99d80ca270feda64acca16fc1928f4a3cb26c0587001ec07b78e6a564feab2f"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.ReadManifest",
+          "canonical_overlap": true,
+          "chunk_id": "2aa16145b2f85eb55b5d453bad8fa9dc0f94eab98d90cebe1a2d0e9b9bec9e46",
+          "end_line": 83,
+          "start_line": 54
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "CODE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-03",
+      "ref": {
+        "path": "internal/system/knowledgepack/lock.go",
+        "first": 55,
+        "last": 76,
+        "file_sha256": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "content_sha256": "8d2ded6423d7ea0908dc08422dcaf1cdae408b223e12adb4902eb01849f6ff8b"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.ReadManifest",
+          "canonical_overlap": true,
+          "chunk_id": "2aa16145b2f85eb55b5d453bad8fa9dc0f94eab98d90cebe1a2d0e9b9bec9e46",
+          "end_line": 83,
+          "start_line": 54
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "WHY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-04",
+      "ref": {
+        "path": "internal/system/knowledgepack/lock.go",
+        "first": 55,
+        "last": 76,
+        "file_sha256": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+        "content_sha256": "8d2ded6423d7ea0908dc08422dcaf1cdae408b223e12adb4902eb01849f6ff8b"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).TraceStatus",
+          "canonical_overlap": true,
+          "chunk_id": "bd47e8cd2a6b61f2dff95f634d650dee1e3bd4c324c5959b673310e2fc9fb058",
+          "end_line": 78,
+          "start_line": 64
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "TRACE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-07",
+      "ref": {
+        "path": "internal/system/semantic/trace.go",
+        "first": 64,
+        "last": 78,
+        "file_sha256": "f1aff6f1dda09d09784444267934bb23ddbd60eca9e2f6e1377984562202e575",
+        "content_sha256": "fa2b9f7d60bfe2176c9606c68b9cf15d80ffbd48f2f815c4a9daa10bb83c8a5c"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.LoadInstancesWithReviewPolicy",
+          "canonical_overlap": true,
+          "chunk_id": "fa2dbcc96d4ee136d902aa1a415dc87a3f5906c22c8cb9e9728a74c020f0e8b8",
+          "end_line": 429,
+          "start_line": 258
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "TRACE",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-08",
+      "ref": {
+        "path": "internal/system/knowledgepack/instances.go",
+        "first": 414,
+        "last": 423,
+        "file_sha256": "931cff918a97e2a2a50008dcfdeb0ad571e901098501fb34d52ba26bed296731",
+        "content_sha256": "24e73a98870166f61c66ca45da26825088006b692dc06c9fae532180571c051f"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    },
+    {
+      "group": "ABS",
+      "human_absence_judgment": null,
+      "positive_citation_allowed": false,
+      "question_id": "N11-FINAL-CAND-09",
+      "ref": {
+        "path": "system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/summary.json",
+        "first": 44,
+        "last": 44,
+        "file_sha256": "3d12f552ade4a7f61f8423158db4cab3b1f6e06f1ef7f5216aabb82264f15113",
+        "content_sha256": "4c746c7a68f741f7ac39564fef4311f9157fa0be966d26a7e14d189b91c270be"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "absence_review_basis",
+      "split": "FINAL",
+      "strict_zero_citations": true
+    },
+    {
+      "group": "ABS",
+      "human_absence_judgment": null,
+      "positive_citation_allowed": false,
+      "question_id": "N11-FINAL-CAND-10",
+      "ref": {
+        "path": "docs/spec-driven/C1-OPERATIONS-REVIEW.md",
+        "first": 15,
+        "last": 15,
+        "file_sha256": "ddec29f3f23416ede13c5444b607c79d25e37b1d76d222b1f238e24dc994e45a",
+        "content_sha256": "32d74b402ed9d6dd6f9a8a8b624e640d445a164080f088db752d96fa6751e90f"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "absence_review_basis",
+      "split": "FINAL",
+      "strict_zero_citations": true
+    },
+    {
+      "CKG_overlapping_unique_canonical_symbols": 1,
+      "CKV_matching_canonical_chunks": 1,
+      "CKV_overlapping_chunks": [
+        {
+          "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/knowledgepack.LoadInstancesWithReviewPolicy",
+          "canonical_overlap": true,
+          "chunk_id": "fa2dbcc96d4ee136d902aa1a415dc87a3f5906c22c8cb9e9728a74c020f0e8b8",
+          "end_line": 429,
+          "start_line": 258
+        }
+      ],
+      "entire_span_index_coverage_claimed": false,
+      "group": "POLICY",
+      "positive_citation_allowed": true,
+      "question_id": "N11-FINAL-CAND-11",
+      "ref": {
+        "path": "internal/system/knowledgepack/instances.go",
+        "first": 274,
+        "last": 302,
+        "file_sha256": "931cff918a97e2a2a50008dcfdeb0ad571e901098501fb34d52ba26bed296731",
+        "content_sha256": "f409618c9e5586bd143e968fd33b4f439d9f6f28601457413a01f2001911c705"
+      },
+      "retained_file_and_span_SHA_valid": true,
+      "role": "positive_gold",
+      "split": "FINAL"
+    }
+  ],
+  "retained_absence_basis_refs": 2,
+  "status": "held_corpus_source_and_actual_index_overlap_verified_no_human_verdict"
+}

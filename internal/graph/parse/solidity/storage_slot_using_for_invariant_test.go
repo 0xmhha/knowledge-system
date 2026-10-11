@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V9 — using-for storage-layout invariant audit. Sol §11.1
+// Using-for storage-layout invariant audit. Sol §11.1
 // states that `using` directives don't participate in storage
 // layout. The slot index a contract assigns to its state vars
 // must therefore be identical whether or not using directives

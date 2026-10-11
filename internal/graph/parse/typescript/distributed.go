@@ -1,12 +1,11 @@
-// Package typescript — distributed.go implements W1 of schema 1.9 (CKS G5
-// Distributed cross-language interop expansion): TypeScript HTTP server
-// endpoint detection. Mirrors the Go parser's distributed.go semantics so
+// Package typescript — distributed.go implements TypeScript HTTP server
+// endpoint detection (schema 1.9 cross-language interop expansion). Mirrors the Go parser's distributed.go semantics so
 // graph traversal can answer cross-language queries
 //
 //	TS Function ← listens_on → Endpoint ← listens_on ← Go Method
 //
 // using the SAME Endpoint qname format (`http:METHOD /route`) and the SAME
-// edge type (`listens_on`). §6.2 of docs/design/schema-1.9-spec.md elected
+// edge type (`listens_on`). §6.2 of docs/graph/design/schema-1.9-spec.md elected
 // option (B) — reuse `listens_on`, distinguish languages via the Endpoint
 // node's `language` field (here always "ts").
 //
@@ -54,7 +53,7 @@ var httpVerbs = map[string]string{
 	"all":     "*", // express: register for every method
 }
 
-// runDistributed is the W1 entry point. Called once per file from
+// runDistributed is the server-side entry point. Called once per file from
 // declarations.go:visit() after the declaration queries populated v.nodes
 // (we need Function/Method intervals to anchor listens_on edges).
 //
@@ -263,11 +262,11 @@ func (v *declVisitor) maybeEmitFrameworkRoute(call *sitter.Node) {
 	if !isHTTP {
 		return
 	}
-	// W2 false-positive guard (schema 1.9): exclude obvious client-side
+	// False-positive guard (schema 1.9): exclude obvious client-side
 	// receivers from the server-side detector. `axios.put('/x', ...)` and
 	// similar client APIs share the same shape as `router.put('/x', handler)`,
 	// so without this guard a single axios call would emit BOTH a (spurious)
-	// real Endpoint via W1 AND a placeholder Endpoint via W2. The client
+	// real Endpoint via the server pass AND a placeholder Endpoint via the client pass. The client
 	// detector (http_client.go) owns the call site exclusively.
 	if obj := fn.ChildByFieldName("object"); obj != nil {
 		objName := obj.Utf8Text(v.src)

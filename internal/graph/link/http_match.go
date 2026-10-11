@@ -1,5 +1,5 @@
-// Package link — http_match.go implements W2 of schema 1.9 (cross-language
-// HTTP client → server matching).
+// Package link — http_match.go implements cross-language HTTP client →
+// server matching (schema 1.9).
 //
 // The per-language parsers (Go: internal/parse/golang/distributed.go,
 // TS: internal/parse/typescript/http_client.go) detect client-side call
@@ -15,7 +15,7 @@
 // either:
 //
 //  1. Rewires the http_calls edge to a matching real Endpoint (Language="go"
-//     or "ts" — emitted by W1 server-side detection) using the 2-stage
+//     or "ts" — emitted by server-side endpoint detection) using the 2-stage
 //     cascade specified in schema-1.9-spec §6.9:
 //
 //     a) Specific-verb lookup: `http:METHOD /path` exact match.

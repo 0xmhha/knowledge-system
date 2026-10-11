@@ -1,0 +1,20 @@
+## M1 no reuse inside request
+--- FAIL: TestRequestVerificationIsSharedOnlyWithinOneRequest (0.05s)
+    request_verification_test.go:61: request read did not reuse verification: "" retained source "unused.md": snapshot_mismatch: retained source blob changed
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/setup	0.592s
+## M2 finish skips re-verification
+--- FAIL: TestRequestVerificationIsSharedOnlyWithinOneRequest (0.04s)
+    request_verification_test.go:67: finish accepted an archive damaged during the request
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/setup	0.582s
+## M3 reuse after finish/close
+--- FAIL: TestRequestVerificationIsSharedOnlyWithinOneRequest (0.05s)
+    request_verification_test.go:67: finish accepted an archive damaged during the request
+--- FAIL: TestRequestVerificationScopeAndLifetime (0.07s)
+    request_verification_test.go:111: closed verification still served an identity
+## M4 any version reuses the verification
+--- FAIL: TestRequestVerificationScopeAndLifetime (0.08s)
+    request_verification_test.go:99: another version reused this request's verification
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/setup	0.606s

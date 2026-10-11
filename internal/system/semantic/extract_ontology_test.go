@@ -36,13 +36,13 @@ func TestPilotOntologyIsReviewableAndSourceBacked(t *testing.T) {
 		t.Fatalf("pilot shape: %d concepts, %d spans, %d questions", len(p.Concepts), len(p.Evidence), len(pack.CompetencyQuestions))
 	}
 	if err := ValidateCoreOntology(p); err != nil {
-		t.Fatalf("approved D1 core vocabulary: %v", err)
+		t.Fatalf("approved core vocabulary: %v", err)
 	}
 	changedKind := p
 	changedKind.Concepts = append([]Concept(nil), p.Concepts...)
 	changedKind.Concepts[0].Kind = "artifact"
 	if err := ValidateCoreOntology(changedKind); err == nil {
-		t.Fatal("D1 core type redefinition accepted")
+		t.Fatal("core type redefinition accepted")
 	}
 	for _, concept := range p.Concepts {
 		if concept.Status != StatusProposed || concept.ReviewedBy != "" {

@@ -87,3 +87,13 @@ Git 소스는 기준HEAD/선택 복구 객체를 해시된 history.bundle로 봉
 P12-P01–06의 주장 내용과 SUPPORTS/ABOUT 관계를 승인/수정/기권하고 검토자 이름·이유를 알려준다. 기존27개와 별도 항목이므로 이전 항목 승인만으로 이6개가 승인되지는 않는다. 실측 활동 시간이 있으면 기록하고 없으면 미측정/null을 유지한다. 이 자료를 새 FINAL로 지정하거나 공개 질문 수를 독립 표본으로 합산하지 않았다.
 
 전체 완료8/18, 요청15개 중5완료; 잔여N08/09/10/11/12/14/15/16/17/18 10개. 다음은 실제 검토 판정 반영과 source/lock·canonical 결합 및 새 독립 평가 입력 검토다.
+
+2026-10-08 현행 대조·연결 보완: [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)에서 기존 33항목의 원문/코드 69참조가 동일함을 확인했다. 실제 CKG 코드·테스트 20파일에서 36참조/33고유 canonical ID를 결합했으나 code evidence만 붙였으며 내용·관계 승인, 통합 capture/lock/CKV 또는 활성 승격은 없다. 공통 SQLite 조회의 canonical_id 누락을 재현·수정했고 7개 근거 거부 제어를 통과했다. 저장소 전체 committed capture는 평가 public.pem 경로 때문에 실제 거부됐으므로 별도 source-only Git 검증을 통합 캡처 완료로 쓰지 않는다. N12 전체와 사람 판정은 대기를 유지한다.
+
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.
+
+2026-10-08 N12 기술 연결 검증: [동일 신원의 held 색인·의미 준비](./N12-COORDINATED-PREPARATION.md) — 보관소스1,410파일/선택58의 CKG53Go·CKV56입력·666chunks/566심벌 canonical100%, 문서27/27·코드36/고유33·proposed 저장 roundtrip·12거부 제어·archive-only 재생 통과. 원문project knowledge-system로 수정한 별도 후보이며 첫 mismatch 거부와 전체Go범위 DRIFT998 경고를 보존했다. 실제 BGE embedding HTTP124회(색인입력1332·시작probe4), 새DEV/FINAL0·human0·current/semantic activation0. approved overlay/lock·내용/관계/입력범위 판정은 남아 N12-A–D/전체8/18·요청5/15·잔여10개를 유지한다.
+
+2026-10-08 N12 ADR 기술 lock 연결: [검토 대기 ADR의 보관 lock](./N12-PROPOSED-LOCK-PREPARATION.md) — 원소스1,410 불변, proposed ADR2/정책0(운영 owner 미정)/review0의 partial overlay·lock과 별도 held snapshota0457cc1/dataset5a24904f를 생성했다. 생산 knowledge·include-packs CLI/v4 의미27문서·36코드참조/33canonical·7 lock 거부·원 소스/색인/semantic DB 없이 archive 재생 통과. 새 BGE embed HTTP62=probe2+색인60/666입력, 전체Go DRIFT998 유지. 승인 lock/사람 내용·관계·운영 판정은 미완료, N12-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 gold/독립성 및 N12 판정/정책 담당자·시점 확인.
+
+2026-10-08 N12 trace 연결 준비: [13개 proposed 관계와 의미 경계 검증](./N12-PROPOSED-TRACE-RELATIONS.md). 구현3/시험5/기준5 관계를 별도 SQLite에 원문·canonical·CKV로 연결하고 재조회/원본 없는 두 archive 재생·9거부 제어를 통과했다. Projection.Validate 시험을 다른 정렬 함수에 연결하는 부정확한1쌍은 제외, broad concept5경로 미작성 유지. 전체25관계 proposed·3요구 spec_unapproved·검토된경로0/current없음/human0/model0. 신규FINAL로 합산하지 않으며 N11 pool13/8·승인0, 전체8/18·요청5/15·잔여10개 유지. 다음 관계/원문 범위 판정·5경로 보강과 N11 독립 입력 확보다.

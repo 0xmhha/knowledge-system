@@ -6,20 +6,20 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W7.2 V0 — state-var visibility / immutable encoded into
+// State-var visibility / immutable encoded into
 // NodeField.SubKind.
 //
-// V0 scope (empirical-driven by grammar v1.2.11 AST probe 2026-05-17):
+// Scope (empirical-driven by a grammar v1.2.11 AST probe):
 //   - `visibility` child → SubKind = "storage_<vis>" (public / private /
 //     internal / external)
 //   - `immutable` child → SubKind = "immutable" (takes precedence over
 //     visibility if both — semantically immutable is the storage class)
 //   - no visibility child and no immutable child → SubKind = ""
-//     (V0 doesn't synthesise the Sol default "internal" because the
+//     (the parser doesn't synthesise the Sol default "internal" because the
 //     AST has no positive signal — leaving "" lets downstream consumers
 //     distinguish "explicitly internal" from "default/unknown")
 //
-// Out of V0:
+// Out of scope:
 //   - `constant` keyword (grammar drops it from AST — needs source-text
 //     scan or grammar bump)
 //   - parameter location (memory / calldata / storage — same gap)

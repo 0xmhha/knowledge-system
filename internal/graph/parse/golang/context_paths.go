@@ -7,8 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// context_paths.go implements P2 of the dogfood plan (CKS deep-dive § 4.1
-// "Graph 3: Control Flow"): detect Go `context.With*` constructor calls and
+// context_paths.go implements control-flow context propagation: detect Go `context.With*` constructor calls and
 // emit timeout_path / cancellation_path edges anchored on the enclosing
 // Function/Method.
 //
@@ -37,7 +36,7 @@ import (
 // too noisy without a typed retry primitive to anchor on; deferred to a
 // follow-up that targets specific backoff libraries / patterns.
 
-// emitContextPaths is the per-file entry point for the P2 control-flow pass.
+// emitContextPaths is the per-file entry point for the control-flow pass.
 // Walks each top-level FuncDecl body looking for context.With* call sites
 // and emits timeout_path / cancellation_path self-loop edges on the
 // enclosing function. Idempotent: the function is called once per file by

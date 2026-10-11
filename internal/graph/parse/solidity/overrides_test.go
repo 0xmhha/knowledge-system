@@ -11,14 +11,14 @@ import (
 )
 
 // overrideWant captures one EdgeOverrides assertion as (child.qname,
-// parent.qname). The W2 emit direction is child → parent (§5.0 Q4), so
+// parent.qname). The override emit direction is child → parent (§5.0 Q4), so
 // child = edge.Src.QualifiedName, parent = edge.Dst.QualifiedName.
 type overrideWant struct {
 	child  string
 	parent string
 }
 
-// TestSolOverrides_SingleFile covers W2 declaration-time override
+// TestSolOverrides_SingleFile covers declaration-time override
 // detection for all same-file cases — simple, super-call chain,
 // virtual-only (no override), explicit multi-parent. Same-file
 // resolutions must land as ConfExtracted per §2.2.
@@ -200,11 +200,11 @@ func TestSolOverrides_CrossFile(t *testing.T) {
 	}
 }
 
-// TestSolOverrides_W1Regression locks the W1 inheritance edge counts on
-// the W2 fixtures — W2 must not change EdgeExtends / EdgeImplements
-// emission. The W2 fixtures all use single-parent or interface-free
+// TestSolOverrides_W1Regression locks the inheritance edge counts on
+// the override fixtures — override detection must not change EdgeExtends / EdgeImplements
+// emission. The override fixtures all use single-parent or interface-free
 // multi-parent inheritance; we assert a fixed (child, parent) tuple set
-// per fixture so any regression that drops or duplicates a W1 edge fails
+// per fixture so any regression that drops or duplicates an inheritance edge fails
 // loudly.
 func TestSolOverrides_W1Regression(t *testing.T) {
 	type extWant struct {

@@ -83,7 +83,7 @@ func (p Projection) Validate() error {
 			return err
 		}
 		if e.Snapshot != p.Snapshot {
-			return fmt.Errorf("evidence %q crosses project or snapshot", e.ID)
+			return &snapshotMismatchError{msg: fmt.Sprintf("evidence %q crosses project or snapshot", e.ID), kind: ErrEvidenceSnapshotMismatch}
 		}
 		if e.Kind != SourceDocument && e.Kind != SourceCode && e.Kind != SourceTest {
 			return fmt.Errorf("evidence %q has invalid source kind %q", e.ID, e.Kind)
@@ -435,22 +435,41 @@ func (p Projection) ValidateSources(ctx context.Context, repoRoot string) error 
 // snapshots. It also works for retained committed candidates and never opens
 // the mutable checkout or asks Git for HEAD content.
 func (p Projection) ValidateRetainedSources(versionDir string) error {
+	return p.ValidateRetainedSourcesContext(context.Background(), versionDir)
+}
+
+// ValidateRetainedSourcesContext is ValidateRetainedSources within a request;
+// it reuses a setup.RequestVerification carried by ctx for the same version.
+func (p Projection) ValidateRetainedSourcesContext(ctx context.Context, versionDir string) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	// One request-local batch verifies the archive identity before and after
+	// all evidence files instead of once per file.
+	var files []setup.RetainedFile
+	index := map[string]int{}
+	for _, e := range p.Evidence {
+		if _, ok := index[e.Path]; !ok {
+			index[e.Path] = len(files)
+			files = append(files, setup.RetainedFile{OriginID: "repo", Path: e.Path})
+		}
+	}
+	contents, identity, batchErr := setup.ReadRetainedFiles(ctx, versionDir, files)
+	if batchErr == nil && (identity.Source.ProjectID != p.Snapshot.ProjectID || identity.DatasetID != p.Snapshot.DatasetID ||
+		identity.Source.SnapshotID != p.Snapshot.SnapshotID || identity.Source.SourceCommit != p.Snapshot.Commit ||
+		identity.Source.SourceMode != p.Snapshot.SourceMode) {
+		batchErr = fmt.Errorf("snapshot_mismatch: semantic source coordinates differ from archive")
+	}
 	if err := p.validateSourceBytes(func(file string) ([]byte, error) {
-		buf, identity, _, err := setup.ReadRetainedFile(versionDir, "repo", file)
-		if err != nil {
-			return nil, err
+		if batchErr != nil {
+			return nil, batchErr
 		}
-		if identity.Source.ProjectID != p.Snapshot.ProjectID || identity.DatasetID != p.Snapshot.DatasetID ||
-			identity.Source.SnapshotID != p.Snapshot.SnapshotID || identity.Source.SourceCommit != p.Snapshot.Commit ||
-			identity.Source.SourceMode != p.Snapshot.SourceMode {
-			return nil, fmt.Errorf("snapshot_mismatch: semantic source coordinates differ from archive")
-		}
-		return buf, nil
+		return contents[index[file]], nil
 	}); err != nil {
 		return err
 	}
 	if p.SchemaVersion == PackProjectionVersion {
-		return p.Knowledge.validateRetained(versionDir)
+		return p.Knowledge.validateRetained(ctx, versionDir)
 	}
 	return nil
 }

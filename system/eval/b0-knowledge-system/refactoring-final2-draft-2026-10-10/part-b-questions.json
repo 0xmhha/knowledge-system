@@ -1,0 +1,26 @@
+{
+ "schema_version": 1,
+ "status": "draft_unreviewed",
+ "corpus": "derived from the repository HEAD at preparation time plus .cks/knowledge; line numbers are rebound at that commit",
+ "knowledge_scope": {"knowledge_as_of": "2026-10-10", "knowledge_subsystem": "knowledge-system"},
+ "questions": [
+  {"id": "F2B-ABS-01", "split": "FINAL", "group": "ABS", "cluster_id": "policy-owner-unassigned", "language": "ko",
+   "prompt": "이 프로젝트에서 knowledge 정책 레코드를 작성하고 승인하는 정책 담당자는 누구로 지정되어 있나요?",
+   "expected_behavior": "abstain", "abstention_basis": [{"path": "docs/spec-driven/N14-CHANGE-ACCEPTANCE.md", "anchor": "정책 담당자가 없어 정책 instance가 없기 때문이며"}],
+   "candidate_answer": "지정되지 않았다. 정책 담당자가 없어 정책 instance가 없다."},
+  {"id": "F2B-ABS-02", "split": "FINAL", "group": "ABS", "cluster_id": "release-verdict-pending", "language": "ko",
+   "prompt": "ontology와 knowledge 기능을 기본으로 켜고 출시하기로 한 판정은 언제, 누가 내렸나요?",
+   "expected_behavior": "abstain", "abstention_basis": [{"path": "docs/spec-driven/REFACTORING-REMAINING-WORKLIST.md", "anchor": "| N-18 |"}],
+   "candidate_answer": "판정되지 않았다. 합격 근거가 없으면 disabled와 출시 보류를 유지한다."},
+  {"id": "F2B-ANS-01", "split": "FINAL", "group": "POLICY", "cluster_id": "policy-record-required-fields", "language": "ko",
+   "prompt": "knowledge 정책 레코드가 verified 상태로 받아들여지려면 어떤 필드와 날짜 조건을 갖춰야 하나요?",
+   "expected_behavior": "cite", "contrast_of": "F2B-ABS-01",
+   "evidence_anchor": {"path": "internal/system/knowledgepack/instances.go", "function": "validatePolicy"},
+   "candidate_answer": "ID·type·statement·owner·scope·자기 파일 source_ref·검토자와 이유·public/restricted visibility가 필요하고, verified면 effective_from이 있어야 하며 effective_to는 그 이후여야 한다."},
+  {"id": "F2B-ANS-02", "split": "FINAL", "group": "POLICY", "cluster_id": "local-trust-path", "language": "ko",
+   "prompt": "로컬 운영에서 설치한 cks 바이너리를 무엇으로 신뢰하기로 했나요?",
+   "expected_behavior": "cite", "contrast_of": "F2B-ABS-02",
+   "evidence_anchor": {"path": "docs/spec-driven/N15-N17-LOCAL-OPERATION-ACCEPTANCE.md", "anchor": "- 신뢰: 로컬 소스 빌드를 commit과 binary SHA로 확인"},
+   "candidate_answer": "로컬 소스 빌드를 commit과 binary SHA로 확인한다. 서명 키는 쓰지 않는다."}
+ ]
+}

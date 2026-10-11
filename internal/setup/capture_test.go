@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -627,5 +628,78 @@ func TestGitHistoryArchiveFromLinkedWorktree(t *testing.T) {
 	selected, err := githistory.RecoveryCommitIDs(build, 0)
 	if err != nil || len(selected) != 1 || selected[0] != lost {
 		t.Fatalf("linked-worktree recovery commit missing: %v %v", selected, err)
+	}
+}
+
+func TestCommittedCaptureExcludesGitlinksAndBindsTheirCommits(t *testing.T) {
+	root := t.TempDir()
+	identityGit(t, root, "init", "-q")
+	if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package sample\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	pinned, moved := strings.Repeat("a", 40), strings.Repeat("b", 40)
+	identityGit(t, root, "add", ".")
+	identityGit(t, root, "update-index", "--add", "--cacheinfo", "160000,"+pinned+",vendor/sub")
+	commit := func(msg string) string {
+		identityGit(t, root, "-c", "commit.gpgsign=false", "-c", "user.email=t@example.org", "-c", "user.name=Test", "commit", "-qm", msg)
+		return identityGit(t, root, "rev-parse", "HEAD")
+	}
+	head := commit("base with submodule pointer")
+	want, err := CommittedSourceIdentity(root, "p", head)
+	if err != nil {
+		t.Fatalf("committed identity refused a gitlink: %v", err)
+	}
+	out := filepath.Join(t.TempDir(), "candidate")
+	captured, err := CaptureSource(CaptureOptions{Root: root, Out: out, ProjectID: "p", SourceMode: "committed", SourceCommit: head})
+	if err != nil || captured.Identity != want || want.GitlinkDigest == "" {
+		t.Fatalf("capture differs from pre-build identity or lost the gitlink binding: %+v want %+v: %v", captured.Identity, want, err)
+	}
+	if len(captured.Files) != 1 || captured.Files[0].Path != "main.go" ||
+		!reflect.DeepEqual(captured.Gitlinks, []CapturedGitlink{{Path: "vendor/sub", Commit: pinned}}) {
+		t.Fatalf("gitlink must be recorded, not read as a file: files=%+v links=%+v", captured.Files, captured.Gitlinks)
+	}
+	if err := VerifyRetainedSource(out, want); err != nil {
+		t.Fatal(err)
+	}
+	build := filepath.Join(t.TempDir(), "build")
+	cleanup, err := captured.MaterializeBuildTree(build)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = cleanup() }()
+	if clean, err := testGateSourceClean(build, head); err != nil || !clean {
+		t.Fatalf("restored committed source with a gitlink is not clean: %v %v", clean, err)
+	}
+	forged := captured
+	forged.Gitlinks = []CapturedGitlink{{Path: "vendor/sub", Commit: moved}}
+	if err := writeJSONAtomic(filepath.Join(out, "sources", "manifest.json"), forged); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyRetainedSource(out, want); err == nil || !strings.Contains(err.Error(), "snapshot_mismatch") {
+		t.Fatalf("forged retained gitlink accepted: %v", err)
+	}
+	identityGit(t, root, "update-index", "--cacheinfo", "160000,"+moved+",vendor/sub")
+	next := commit("move submodule pointer")
+	changed, err := CommittedSourceIdentity(root, "p", next)
+	if err != nil || changed.FileManifestDigest != want.FileManifestDigest || changed.GitlinkDigest == want.GitlinkDigest {
+		t.Fatalf("a moved submodule pointer must change only the gitlink binding: %+v %v", changed, err)
+	}
+	if err := captured.VerifyAgainst(root); err == nil {
+		t.Fatal("moved submodule pointer passed post-capture verification")
+	}
+}
+
+func TestSnapshotIdentityWithoutGitlinksKeepsV5(t *testing.T) {
+	s := SourceIdentity{ProjectID: "p", SourceMode: "committed", SourceCommit: strings.Repeat("c", 40),
+		FileManifestDigest: "f", CapturePolicyDigest: "c", GitRecoveryDigest: "r", GitArchivePolicy: gitArchivePolicyV1,
+		FileModePolicy: fileModePolicyV1}
+	v5 := identityHashFields("cks.snapshot.v5", s.ProjectID, s.SourceMode, s.SourceCommit, s.FileManifestDigest,
+		s.CapturePolicyDigest, s.GitRecoveryDigest, s.GitArchivePolicy, s.FileModePolicy)
+	if sourceSnapshotID(s) != v5 || gitlinkDigest(nil) != "" {
+		t.Fatal("repositories without submodules changed snapshot identity")
+	}
+	s.GitlinkDigest = gitlinkDigest([]CapturedGitlink{{Path: "x", Commit: strings.Repeat("a", 40)}})
+	if sourceSnapshotID(s) == v5 {
+		t.Fatal("gitlink binding did not reach the snapshot identity")
 	}
 }

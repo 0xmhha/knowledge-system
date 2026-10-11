@@ -68,17 +68,16 @@ func TestAllEdgeTypes_Contains(t *testing.T) {
 // hash-derived IDs / cached test snapshots. Identifier names are append-only
 // in spirit; NodeMutex was inserted at index 24 to keep the concurrency
 // family contiguous, which shifted statement nodes from 24-28 to 25-29 —
-// the test snapshot below records the post-A5 reality. Future additions
+// the test snapshot below records that insertion. Future additions
 // should prefer append over insert when no grouping argument applies.
-// E3 appended NodeEndpoint + NodeMessageType at indices 30-31.
-// E4 appended NodeCommit at index 32 (CKS G6 Temporal — git history).
-// H1 appended NodeHunk at index 33 (CKS G6 Temporal extension — schema 1.8).
-// W-B appended NodeAwaitPoint at index 34 (within-language semantics
-// Phase 4 — schema 1.10 slot; detector lands in Phase 5).
-// P1 #4 appended NodePolicy at index 35 (schema 1.14 — external YAML
+// Schema 1.3 appended NodeEndpoint + NodeMessageType at indices 30-31.
+// Schema 1.4 appended NodeCommit at index 32 (temporal — git history).
+// Schema 1.8 appended NodeHunk at index 33 (temporal Hunk-graph).
+// Schema 1.10 appended NodeAwaitPoint at index 34 (TS async/await).
+// Schema 1.14 appended NodePolicy at index 35 (external YAML
 // governance/protocol policy metadata).
-// P1 #5 appended NodeSecurityPattern at index 36 (schema 1.15 —
-// external YAML security risk pattern annotations).
+// Schema 1.15 appended NodeSecurityPattern at index 36 (external YAML
+// security risk pattern annotations).
 func TestAllNodeTypes_Stable(t *testing.T) {
 	want := []types.NodeType{
 		types.NodePackage, types.NodeFile, types.NodeStruct, types.NodeInterface, types.NodeClass,
@@ -102,11 +101,10 @@ func TestAllNodeTypes_Stable(t *testing.T) {
 
 // TestAllEdgeTypes_Stable mirrors the node-stability check for edges.
 // Lock edges, distributed edges, temporal edges, context-path edges,
-// hunk-graph edges, the W2 http_calls edge, the W3b grpc_listens_on /
-// grpc_calls edges, the schema 1.10 W-B `awaits` + W-C `overrides`
-// slots, the schema 1.10 W-C W6 `using_for` slot, the schema
-// 1.14 P1 #4 `governed_by` slot, and the schema 1.15 P1 #5
-// `has_security_pattern` slot are appended at the end — never interleaved.
+// hunk-graph edges, the http_calls edge, the grpc_listens_on /
+// grpc_calls edges, the schema 1.10 `awaits` + `overrides` slots, the
+// schema 1.10 `using_for` slot, the schema 1.14 `governed_by` slot,
+// and the schema 1.15 `has_security_pattern` slot are appended at the end — never interleaved.
 func TestAllEdgeTypes_Stable(t *testing.T) {
 	want := []types.EdgeType{
 		types.EdgeContains, types.EdgeDefines, types.EdgeCalls, types.EdgeInvokes, types.EdgeUsesType,

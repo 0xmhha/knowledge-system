@@ -7,10 +7,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W4 — SubKind detection for `abstract contract` and `library`.
+// Sol SubKind detection for `abstract contract` and `library`.
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §2.1, §4.4
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 3
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §2.1, §4.4
 //
 // The tree-sitter-solidity grammar exposes three distinct top-level nodes
 // for contract-like declarations (verified against binding/parser.c symbol
@@ -20,9 +19,9 @@ import (
 //     The `abstract` keyword (anon_sym_abstract) appears as an anonymous
 //     leading token child of the contract_declaration node.
 //   - `library_declaration`   — `library Foo`.
-//   - `interface_declaration` — `interface IFoo`. (Reserved for W1.)
+//   - `interface_declaration` — `interface IFoo`. (Handled by inheritance detection.)
 //
-// W4 scope is narrow: emit `NodeContract` with `SubKind` populated so
+// The scope is narrow: emit `NodeContract` with `SubKind` populated so
 // downstream consumers can distinguish abstract/library from plain
 // contracts. No new node or edge types. No schema bump.
 
@@ -76,9 +75,9 @@ func (v *declVisitor) runContractDecl() {
 //
 // Interfaces in Solidity carry function signatures but no bodies; the
 // existing queryFunction matches them globally, and nearestContractName
-// (already extended in W4 to walk interface_declaration) supplies the
+// (already extended to walk interface_declaration) supplies the
 // qualified "IFoo.bar" prefix so interface methods are addressable as
-// PendingRef targets in W3 (interface dispatch — separate dispatch).
+// PendingRef targets for interface dispatch (handled separately).
 //
 // Per §2.1 SubKind extension table, plain interfaces get
 // SubKind="interface" (mirrors the explicit "contract" / "abstract" /
@@ -163,8 +162,8 @@ func (v *declVisitor) runLibraryDecl() {
 
 // emitContractLikeNode is the shared emit path for contract / library
 // declarations. Mirrors runDecl's emit but additionally stamps SubKind.
-// Kept in this file (rather than declarations.go) to keep the W4 detector
-// logic localised — easier to extend in W1 (interface_declaration) without
+// Kept in this file (rather than declarations.go) to keep the SubKind detector
+// logic localised — easier to extend for interface_declaration without
 // re-touching declarations.go.
 func (v *declVisitor) emitContractLikeNode(
 	nameNode, declNode sitter.Node,
@@ -188,7 +187,7 @@ func (v *declVisitor) emitContractLikeNode(
 		Src: v.fileID, Dst: id, Type: types.EdgeDefines,
 		Count: 1, Confidence: types.ConfExtracted,
 	})
-	_ = declNode // reserved for future use (e.g. inheritance specifier in W1)
+	_ = declNode // reserved for future use (e.g. inheritance specifier)
 }
 
 // hasAbstractKeyword reports whether a contract_declaration node carries

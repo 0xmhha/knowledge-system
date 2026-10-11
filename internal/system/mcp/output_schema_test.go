@@ -97,6 +97,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 		ToolNameGetForTaskV2:            {"format_version", "coordinates", "query", "citations", "evidence_state", "metadata"},
 		ToolNameGetInvariantEnforcement: {"inv_id", "statement", "enforced_at"},
 		ToolNameGetSubgraph:             {"seed", "nodes", "edges"},
+		ToolNameReviewFunction:          {"seed", "code", "history", "tests", "available", "limits"},
 		ToolNameImpactAnalysis:          {"seed", "result"},
 		ToolNameSearchText:              {"query", "hits"},
 		ToolNameSemanticSearch:          {"query", "hits"},

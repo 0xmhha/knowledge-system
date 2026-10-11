@@ -249,7 +249,7 @@ func TestParseFile_EdgeCases(t *testing.T) {
 		t.Errorf("counters signature=%q, want map<...>", counters.Signature)
 	}
 	// optional field still emitted + label preserved in signature
-	// (W3a Important #3 — reviewer caught that `repeated string tags=2`
+	// (a reviewer caught that `repeated string tags=2`
 	// and plain `string tags=2` were producing identical signatures).
 	traceID := hasNode(r.Nodes, types.NodeField, "proto:edge.RunRequest.trace_id")
 	if traceID == nil {
@@ -271,7 +271,7 @@ func TestExtensions(t *testing.T) {
 	}
 }
 
-// TestNestedTypeCrossNamespace — reviewer (W3a Important #1) caught that
+// TestNestedTypeCrossNamespace — a reviewer caught that
 // an rpc method referencing a nested message by partial path
 // (`rpc X(Outer.Inner)`) was resolving only via byBareName fallback or
 // not at all, because candidateForType produces `proto:Outer.Inner` while
@@ -341,7 +341,7 @@ service S {
 	}
 }
 
-// TestProto2GroupSkipped — reviewer (W3a Important #2) caught that the
+// TestProto2GroupSkipped — a reviewer caught that the
 // proto2 `group` keyword had no dedicated branch in the message body
 // parse loop, leaving `group Body = N { ... }` to leak its trailing
 // `{ body }` tokens into the enclosing message and produce noisy
@@ -442,7 +442,7 @@ func debugNodes(ns []types.Node) string {
 	return sb.String()
 }
 
-// TestCanonicalID_NoDoubleProtoPrefix guards B4: proto qnames already carry a
+// TestCanonicalID_NoDoubleProtoPrefix guards that proto qnames already carry a
 // "proto:" prefix, so the canonical id must read <relpath>:<pkg>.<Sym>, not the
 // doubled <relpath>:proto:<pkg>.<Sym>.
 func TestCanonicalID_NoDoubleProtoPrefix(t *testing.T) {

@@ -1,0 +1,35 @@
+package main
+import (
+ "context"
+ "encoding/json"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+ "github.com/0xmhha/knowledge-system/internal/setup"
+)
+func must(e error){if e!=nil{panic(e)}}
+func main(){
+ root,e:=os.Getwd();must(e);out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-scoped-capture-2026-10-08")
+ var archive struct{Version string `json:"restored_version"`}
+ b,e:=os.ReadFile(filepath.Join(out,"archive-binding.json"));must(e);must(json.Unmarshal(b,&archive))
+ if !strings.HasPrefix(archive.Version,"/private/tmp/ks-n12-scoped-capture-") {panic("outside owned namespace")}
+ var expected setup.SourceIdentity
+ b,e=os.ReadFile(filepath.Join(out,"capture-source-identity.json"));must(e);must(json.Unmarshal(b,&expected))
+ ctx,cancel:=context.WithTimeout(context.Background(),2*time.Minute);defer cancel()
+ must(setup.VerifyRetainedSourceContext(ctx,archive.Version,expected))
+ var captured setup.CapturedSource
+ b,e=os.ReadFile(filepath.Join(archive.Version,"sources/manifest.json"));must(e);must(json.Unmarshal(b,&captured))
+ captured.BlobDir=filepath.Join(archive.Version,"sources/blobs")
+ captured.Root=filepath.Join(archive.Version,"nonexistent-original-input")
+ if _,e=os.Stat(captured.Root);!os.IsNotExist(e){panic("original input available unexpectedly")}
+ restored:=filepath.Join(filepath.Dir(archive.Version),"archive-only-source")
+ _,e=captured.MaterializeBuildTreeContext(ctx,restored);must(e)
+ must(captured.VerifyAgainstContext(ctx,restored))
+ source,e:=setup.SnapshotSourceIdentity(restored,expected.ProjectID,expected.SourceMode,expected.SourceCommit);must(e)
+ if source!=expected {panic("archive-only source identity mismatch")}
+ b,e=json.MarshalIndent(map[string]any{"status":"archive_only_retained_source_replay_verified","archive_retained_source_verified":true,"original_input_directory_available":false,"files":len(captured.Files),"source_identity":source,"restored_root":restored,"source_identity_recomputed_from_restored_tree_matches":true,"coordinated_dataset_built":false,"human_approved":0,"new_model_calls":0},"","  ");must(e)
+ must(os.WriteFile(filepath.Join(out,"archive-replay.json"),append(b,'\n'),0600))
+ fmt.Printf("PASS archive-only replay: %d files; source identity matches without original input tree\n",len(captured.Files))
+}

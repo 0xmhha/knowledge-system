@@ -1,0 +1,48 @@
+version: 1
+name: cks
+description: 'N11 frozen evaluation corpus (reviewer label: opus5.5 검토)'
+backends:
+    ckg:
+        path: /private/tmp/ks-n11-eval-m13oocru/dataset/n11-eval-candidate/graph/graph.db
+        source_root: /private/tmp/ks-n11-eval-m13oocru/source
+        timeout_ms: 5000
+        binary_path: /private/tmp/ks-n11-eval-m13oocru/bin/ckg
+        policy_file: ""
+    ckv:
+        path: /private/tmp/ks-n11-eval-m13oocru/dataset/n11-eval-candidate/vector
+        provider: ollama
+        binary_path: /private/tmp/ks-n11-eval-m13oocru/bin/ckv
+        timeout_ms: 3000
+        embed_model: bge-m3:latest
+        embed_dim: 1024
+        query_prefix_policy: registry
+        ollama_url: http://127.0.0.1:11434
+listen:
+    http_addr: 127.0.0.1:8080
+    mcp_stdio: true
+    transport: stdio
+    allow_remote: false
+    allowed_cidrs: []
+logging:
+    level: info
+    mode: prod
+    footprint_dir: /private/tmp/ks-n11-eval-m13oocru/run-DEV2/capture/footprints/concept_text_on
+    audit_dir: ""
+    measure_backend_calls: true
+sanitize:
+    rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+    default_action: drop
+    fail_closed_on_unknown_rule: true
+vocab:
+    glossary_path: ""
+domain:
+    project_dir: ""
+    corpus_dir: ""
+semantic:
+    store_path: /private/tmp/ks-n11-eval-m13oocru/semantic-eval.sqlite
+    ontology_mode: concept_text
+    ontology_budget_ms: 5000
+service:
+    label_prefix: ""
+retrieval:
+    recall_k: 10

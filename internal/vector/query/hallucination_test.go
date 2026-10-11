@@ -48,7 +48,7 @@ func TestVerifyHit_ExactSnippetMatchesFile(t *testing.T) {
 
 // TestVerifyHit_SignatureOnlyIsSubstringMatch: snippet is just the
 // signature line — must still verify (substring of the body slice).
-// This covers the DensitySignatureOnly tier from B3.
+// This covers the DensitySignatureOnly density tier.
 func TestVerifyHit_SignatureOnlyIsSubstringMatch(t *testing.T) {
 	dir := fixtureSrcRoot(t)
 	h := mkVerifyHit("order.go", 3, 8, "func ProcessOrder(o Order) error {")
@@ -122,6 +122,51 @@ func TestVerifyHit_EmptySrcRoot(t *testing.T) {
 	}
 	if got.Reason != "no_src_root" {
 		t.Errorf("Reason = %q, want no_src_root", got.Reason)
+	}
+}
+
+// Empty text cannot establish that a hit contains source evidence, even
+// though strings.Contains would accept it as a substring of any source.
+func TestVerifyHit_EmptySnippet(t *testing.T) {
+	dir := fixtureSrcRoot(t)
+	for _, tc := range []struct {
+		name    string
+		start   int
+		end     int
+		snippet string
+	}{
+		{"empty_body", 3, 8, ""},
+		{"whitespace_body", 3, 8, " \t\r\n "},
+		{"empty_blank_line", 2, 2, ""},
+		{"whitespace_blank_line", 2, 2, " \t\r\n "},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got := VerifyHit(mkVerifyHit("order.go", tc.start, tc.end, tc.snippet), dir)
+			if got.Verified || got.Reason != "empty_snippet" || got.ExpectedFile != filepath.Join(dir, "order.go") {
+				t.Errorf("empty snippet must remain unverified with its source diagnostic; got %+v", got)
+			}
+		})
+	}
+}
+
+func TestVerifyResponse_EmptySnippet(t *testing.T) {
+	dir := fixtureSrcRoot(t)
+	resp := &Response{
+		Hits: []Hit{
+			mkVerifyHit("order.go", 3, 8, "func ProcessOrder"),
+			mkVerifyHit("order.go", 3, 8, ""),
+		},
+		Examples: []Hit{
+			mkVerifyHit("order.go", 2, 2, " \t\n"),
+			mkVerifyHit("order.go", 3, 8, "func DeleteUser"),
+		},
+	}
+	verdicts, nonverified := VerifyResponse(resp, dir)
+	if len(verdicts) != 4 || nonverified != 3 {
+		t.Fatalf("want 4 verdicts and 3 nonverified snippets, got %d and %d", len(verdicts), nonverified)
+	}
+	if !verdicts[0].Verified || verdicts[1].Reason != "empty_snippet" || verdicts[2].Reason != "empty_snippet" || verdicts[3].Reason != "snippet_not_found" {
+		t.Errorf("verified source, empty evidence, and conflicting text must stay distinct: %+v", verdicts)
 	}
 }
 

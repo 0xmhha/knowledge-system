@@ -161,3 +161,28 @@ CREATE TABLE IF NOT EXISTS node_prs (
   PRIMARY KEY (node_id, number)
 );
 CREATE INDEX IF NOT EXISTS idx_node_prs_merged ON node_prs(merged_at);
+
+-- Review index (schema 1.24). Derived after every build by
+-- RebuildReviewIndex so a function can be reviewed without walking history
+-- or test code:
+--   nodes.is_test  production/test partition, computed once at build time
+--                  (path rule plus internal or test-named packages that only
+--                  test files import). Added by ensureIsTestColumn.
+--   code_edges     code-relation edges whose endpoints are both production
+--                  code; walks over it never reach test code or commits.
+--   node_commits   node -> commit that changed it (modifies Hunk -> node
+--                  joined with has_hunk Commit -> Hunk); a depth-1 history
+--                  lookup, since one commit links thousands of nodes.
+CREATE TABLE IF NOT EXISTS code_edges (
+  src   TEXT    NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  dst   TEXT    NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  type  TEXT    NOT NULL,
+  line  INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_code_edges_src ON code_edges(src, type);
+CREATE INDEX IF NOT EXISTS idx_code_edges_dst ON code_edges(dst, type);
+CREATE TABLE IF NOT EXISTS node_commits (
+  node_id   TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  commit_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+  PRIMARY KEY (node_id, commit_id)
+);

@@ -137,7 +137,7 @@ func containsID(ids []string, id string) bool {
 }
 
 // ---------------------------------------------------------------------------
-// TestPendingRefs (G6 v3, schema 1.5)
+// TestPendingRefs (schema 1.5)
 // ---------------------------------------------------------------------------
 
 // TestPendingRefs_InsertAndReload covers the cold→partial round-trip: insert
@@ -223,7 +223,7 @@ func TestPendingRefs_PrimaryKeyDeduplicates(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// TestMigrate_DispatchKindIdempotent (Track C P1b, schema 1.7)
+// TestMigrate_DispatchKindIdempotent (schema 1.7)
 // ---------------------------------------------------------------------------
 
 // TestMigrate_DispatchKindIdempotent verifies that calling Migrate() against
@@ -917,7 +917,7 @@ func TestNodesByIDs_AllInvalid(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// A3 incremental cache: NodesByFilePath / EdgesByFilePath / BlobsByFilePath
+// Incremental cache: NodesByFilePath / EdgesByFilePath / BlobsByFilePath
 // + DeleteNodesByFilePath FK CASCADE behavior
 // ---------------------------------------------------------------------------
 
@@ -1100,7 +1100,7 @@ func TestIncremental_FKCascadeOnDelete(t *testing.T) {
 	}
 }
 
-// TestReverseDepsForFiles verifies the C1 reverse-reference query:
+// TestReverseDepsForFiles verifies the reverse-reference query:
 // cached files whose pending_refs target qnames defined in dirty files are
 // returned, matching via both exact and suffix (simpleName) join.
 func TestReverseDepsForFiles(t *testing.T) {

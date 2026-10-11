@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -19,10 +20,10 @@ import (
 var ToolNameOpsIndex = toolName("ops.index")
 
 // IndexConfig carries the paths the cks.ops.index tool shells out to. The
-// query path is fully in-process (G1), but the index/reindex maintenance op
+// query path is fully in-process, but the index/reindex maintenance op
 // has no in-process ckv/ckg API, so it runs the CLIs as a subprocess — an
 // explicit, infrequent, agent-triggered call, NOT the hot retrieval loop
-// (00 §C3, plan G8). Empty binaries disable the tool (it returns an error
+// Empty binaries disable the tool (it returns an error
 // telling the agent to run the indexers manually).
 type IndexConfig struct {
 	CKVBinary     string // ckv binary path; "" disables ckv reindex
@@ -82,7 +83,7 @@ type opsIndexResponse struct {
 	Alignment indexSubResult `json:"alignment"`
 }
 
-// registerOpsIndex wires cks.ops.index (G8/S2).
+// registerOpsIndex wires cks.ops.index.
 func registerOpsIndex(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameOpsIndex,
 		mcpgo.WithOutputSchema[opsIndexResponse](),
@@ -108,6 +109,9 @@ func handleOpsIndex(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mc
 		return mcpgo.NewToolResultErrorf("%s: mode must be \"incremental\" or \"full\", got %q", ToolNameOpsIndex, mode), nil
 	}
 	since := req.GetString("since_commit", "")
+	if since != "" && (!sinceCommitPattern.MatchString(since) || strings.Contains(since, "..")) {
+		return mcpgo.NewToolResultErrorf("%s: since_commit must be a commit ID, branch or tag name", ToolNameOpsIndex), nil
+	}
 
 	ic := d.Index
 	if d.EvidenceVersionDir != "" {
@@ -243,6 +247,10 @@ func verifyIndexAlignment(ic IndexConfig, resp *opsIndexResponse) {
 // ckvIndexArgs builds the ckv subcommand. Reindex reuses the manifest's
 // src_root; full build needs --src. Both forward the Ollama embedder so the
 // re-embedded chunks land in the same model space as the query path.
+// sinceCommitPattern admits commit IDs and ref names with ~/^ suffixes. It
+// rejects a leading "-" (an option to ckv or git), whitespace and "..".
+var sinceCommitPattern = regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z._/~^-]*$`)
+
 func ckvIndexArgs(ic IndexConfig, mode, since string) []string {
 	embed := []string{"--embedder=ollama"}
 	if ic.EmbedModel != "" {
@@ -261,7 +269,8 @@ func ckvIndexArgs(ic IndexConfig, mode, since string) []string {
 	// has no git HEAD. Pass the configured source root explicitly.
 	args := []string{"reindex", "--src", ic.SourceRoot, "--out", ic.CKVDataPath}
 	if since != "" {
-		args = append(args, "--since", since)
+		// One --since=<rev> argument: the value can never become a flag.
+		args = append(args, "--since="+since)
 	}
 	return append(args, embed...)
 }

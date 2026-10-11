@@ -1,6 +1,6 @@
 package store_test
 
-// Compile-time guard for the R1' C2 surface that cks (doc 03) imports
+// Compile-time guard for the public surface that cks imports
 // in-process. If any symbol below is removed or its name/signature changes,
 // this test stops compiling — so the cross-repo contract cannot silently
 // drift between ckg and its consumers. It executes nothing.
@@ -18,7 +18,7 @@ import (
 var (
 	_ = store.OpenReadOnly
 	_ = store.GetManifest
-	_ = concurrency.Analyze // NEW (G7/S1): the concurrency_impact backend
+	_ = concurrency.Analyze // the concurrency_impact backend
 	_ = impact.Compute      // ImpactOfChange
 	_ = evidence.BuildPack  // EvidenceForIntent
 	_ = bm25.NewOkapi
@@ -40,7 +40,7 @@ var (
 	_ = store.Reader.FindSymbol
 	_ = store.Reader.NeighborhoodByQname
 	_ = store.Reader.SubgraphByQname // GetSubgraph
-	_ = store.Reader.SearchFTS       // real Score/RawScore (G1)
+	_ = store.Reader.SearchFTS       // real Score/RawScore
 	_ = store.Reader.GetNodePRs
 	_ = store.Reader.GetManifest
 	_ = store.Reader.Close

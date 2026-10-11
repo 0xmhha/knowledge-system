@@ -142,7 +142,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringSliceVar(&excludes, "exclude", nil,
 		"exclude glob(s) applied on top of a --files-from-main filter (repeatable or comma-separated); exclude trumps include")
 	cmd.Flags().BoolVar(&lockPropagation, "lock-propagation", false,
-		"enable Go cross-function lock propagation (W-A, D1 Stage B DFS depth=5); requires --no-cache to take full effect")
+		"enable Go cross-function lock propagation (DFS depth=5); requires --no-cache to take full effect")
 	cmd.Flags().StringVar(&policyFile, "policy-file", "",
 		"path to governance/protocol policy YAML (pkg/policy); enriches the graph with NodePolicy + EdgeGovernedBy rows")
 	cmd.Flags().IntVar(&temporalDepth, "temporal-depth", 0,

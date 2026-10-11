@@ -1,0 +1,100 @@
+{
+ "schema_version": 1,
+ "method": "temporary env-gated hook in setup.verifyVersionIdentityContext (not committed); one DEV request (N11-DEV-01), cks eval matrix with warmup 1, retrieval 1, warm 2, cold 0 (4 calls per arm); request-time verifications counted per arm process",
+ "before_binary": "source 7c57a388 plus hook",
+ "after_binary": "source 37302b35 plus hook",
+ "before": [
+  {
+   "per_request_verifications": 3.0,
+   "mean_ms": 190.4,
+   "has_ontology_startup": false
+  },
+  {
+   "per_request_verifications": 6.0,
+   "mean_ms": 168.8,
+   "has_ontology_startup": false
+  },
+  {
+   "per_request_verifications": 5.0,
+   "mean_ms": 167.4,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 8.0,
+   "mean_ms": 175.2,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 5.0,
+   "mean_ms": 196.5,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 8.0,
+   "mean_ms": 177.9,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 5.0,
+   "mean_ms": 186.9,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 8.0,
+   "mean_ms": 182.9,
+   "has_ontology_startup": true
+  }
+ ],
+ "after": [
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 185.4,
+   "has_ontology_startup": false
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 195.6,
+   "has_ontology_startup": false
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 189.4,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 200.5,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 191.5,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 195.0,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 204.2,
+   "has_ontology_startup": true
+  },
+  {
+   "per_request_verifications": 2.0,
+   "mean_ms": 190.6,
+   "has_ontology_startup": true
+  }
+ ],
+ "before_by_arm_kind": {
+  "baseline_off": 3,
+  "ontology_off": 5,
+  "baseline_on": 6,
+  "ontology_on": 8
+ },
+ "after_all_arms": 2,
+ "response_equivalence": "32/32 slots identical citations (file, lines, content SHA), semantic block and ontology presence; 0 errors",
+ "startup_verifications_unchanged": "PinVersionReader, MaterializeRetainedReadTree and ontology option setup still verify once each at process start",
+ "limits": "call counts are deterministic; per-call time (about 150-230 ms) varies with load"
+}

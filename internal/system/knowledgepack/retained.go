@@ -2,6 +2,7 @@ package knowledgepack
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,14 +16,20 @@ import (
 // from a verified candidate archive. The temporary tree is removed before
 // returning; callers never read a mutable checkout to answer a v2 request.
 func LoadRetainedProjectInstances(versionDir string) (Instances, Lock, error) {
-	identity, err := setup.InspectVersionIdentity(versionDir)
+	return LoadRetainedProjectInstancesContext(context.Background(), versionDir)
+}
+
+// LoadRetainedProjectInstancesContext is LoadRetainedProjectInstances within a
+// request; it reuses a setup.RequestVerification carried by ctx.
+func LoadRetainedProjectInstancesContext(ctx context.Context, versionDir string) (Instances, Lock, error) {
+	identity, err := setup.InspectVersionIdentityContext(ctx, versionDir)
 	if err != nil {
 		return Instances{}, Lock{}, err
 	}
 	if identity == nil {
 		return Instances{}, Lock{}, fmt.Errorf("reindex_required: retained knowledge needs a pinned dataset")
 	}
-	root, cleanup, err := setup.MaterializeRetainedReadTree(versionDir)
+	root, cleanup, err := setup.MaterializeRetainedReadTreeContext(ctx, versionDir)
 	if err != nil {
 		return Instances{}, Lock{}, err
 	}
@@ -59,7 +66,7 @@ func LoadRetainedProjectInstances(versionDir string) (Instances, Lock, error) {
 		if !ok {
 			return Instances{}, Lock{}, fmt.Errorf("pack_incompatible: unselected knowledge origin")
 		}
-		buf, _, _, err := setup.ReadRetainedFile(versionDir, file.OriginID, file.Path)
+		buf, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, file.OriginID, file.Path)
 		if err != nil {
 			return Instances{}, Lock{}, err
 		}

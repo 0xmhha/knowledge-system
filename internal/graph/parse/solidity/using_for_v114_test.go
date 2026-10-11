@@ -10,7 +10,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.14 — cross-file struct validation for the V1.10-V1.13
+// Cross-file struct validation for the struct-field walker
 // family. Validates that the global structFieldTypes index (built by
 // sweeping all PendingRefs across all ParseResults in Pass 2) plus
 // the binding map and library function index all resolve correctly
@@ -18,9 +18,9 @@ import (
 //
 // Confidence expectation (§2.2): cross-file resolution → ConfInferred.
 //
-// V1.14 carry-over (V1.x+):
+// Not covered here:
 //   - Multi-return tuple destructuring (statement-level local-var tracking)
-//   - V1.10-V1.13 generic-walker subsumption (V2+ refactor)
+//   - Folding the struct-field walkers into one generic walker
 //   - Grammar-blocked items (free-function form, file-level using)
 
 // parseResolveMultiSol — shared helper for cross-file tests. Parses
@@ -68,7 +68,7 @@ func findUsingForCall(nodes []types.Node, edges []types.Edge, caller, target str
 	return types.Edge{}, false
 }
 
-// TestUsingForV114_CrossFileStructFieldV10 — V1.10 depth-1 struct-field
+// TestUsingForV114_CrossFileStructFieldV10 — depth-1 struct-field
 // receiver where the struct AND library live in a different file from
 // the caller contract. Walker must thread through global indices and
 // emit ConfInferred (cross-file).
@@ -86,7 +86,7 @@ func TestUsingForV114_CrossFileStructFieldV10(t *testing.T) {
 	}
 }
 
-// TestUsingForV114_CrossFileThisNestedV13 — V1.13 this-prefixed depth-2
+// TestUsingForV114_CrossFileThisNestedV13 — this-prefixed depth-2
 // chain where the struct types AND library live in a different file
 // from the caller contract. Exercises this-prefixed walker (stateVar
 // resolved via stateVarTypes) combined with cross-file struct chain

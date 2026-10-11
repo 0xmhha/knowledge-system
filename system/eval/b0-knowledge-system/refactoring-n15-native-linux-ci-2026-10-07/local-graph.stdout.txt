@@ -1,0 +1,26 @@
+go build -o bin/ckg ../cmd/graph
+=== ckg eval: step 1/5 — self-index (corpus baselining) ===
+./bin/ckg build --src=.. \
+	    --files-from-main ./cmd/graph \
+	    --out=eval/.ckg-data --lang=go --fail-on-parse-errors
+
+=== ckg eval: step 2/5 — validate (schema integrity) ===
+./bin/ckg validate --graph=eval/.ckg-data --format=json > eval/results/latest/validate.json
+  → eval/results/latest/validate.json
+
+=== ckg eval: step 3/5 — benchmark (token reduction) ===
+./bin/ckg benchmark --graph=eval/.ckg-data --format=json > eval/results/latest/benchmark.json
+  → eval/results/latest/benchmark.json
+
+=== ckg eval: step 4/5 — bench-mcp (latency, depth sweep) ===
+./bin/ckg bench-mcp --graph=eval/.ckg-data --depth-sweep --iterations=50 \
+	    --output=eval/results/latest/bench-mcp.json
+
+=== ckg eval: step 5/5 — eval-retrieval (LLM-free recall/precision) ===
+./bin/ckg build --src=testdata/synthetic --out=eval/.synthetic-data --lang=go,ts,sol
+./bin/ckg eval-retrieval --graph=eval/.synthetic-data --fixtures=eval/retrieval \
+	    --output=eval/results/latest/retrieval.json
+
+=== Summary ===
+Compare:        diff -ur eval/baseline eval/results/latest
+Update baseline: make eval-baseline-update   (after reviewing the diff)

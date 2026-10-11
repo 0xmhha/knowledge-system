@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "command": "go test -race -count=1 -json ./internal/vector/store/sqlitevec/ ./internal/system/composer/stage2/ ./internal/system/semantic/",
+ "env_scoped": {
+  "GIT_CONFIG_COUNT": "1",
+  "GIT_CONFIG_KEY_0": "commit.gpgsign",
+  "GIT_CONFIG_VALUE_0": "false"
+ },
+ "exit": 0,
+ "go_version": "go version go1.26.8 darwin/arm64",
+ "counts": {
+  "test_pass": 132,
+  "subtest_pass": 102,
+  "package_pass": 3
+ },
+ "failures": [],
+ "additional": {
+  "go_vet": "pass (same 3 packages)",
+  "gofmt_l": "no output"
+ },
+ "new_or_changed_tests": [
+  "sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded (order assertion added)",
+  "sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete (new, 2 subtests)",
+  "stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline (new)"
+ ],
+ "classification": "criterion coverage gap fill; not product RED; all new assertions passed on unchanged product code",
+ "not": [
+  "semantic linked run",
+  "relation verified",
+  "human criterion accepted",
+  "new FINAL",
+  "model call"
+ ]
+}

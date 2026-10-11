@@ -112,6 +112,53 @@ func VisitRetainedLineSpans(ctx context.Context, versionDir string, spans []Reta
 	return ctx.Err()
 }
 
+// RetainedFile names one archived file for a request-local batch read.
+type RetainedFile struct {
+	OriginID string
+	Path     string
+}
+
+// ReadRetainedFiles verifies the whole archive once before and once after a
+// request-local batch, like VisitRetainedLineSpans, and returns each file's
+// verified bytes in request order. Each blob is still re-read and hashed. No
+// verification result survives the batch; callers discard everything on error.
+func ReadRetainedFiles(ctx context.Context, versionDir string, files []RetainedFile) ([][]byte, *DatasetIdentity, error) {
+	for _, f := range files {
+		if (f.OriginID != "repo" && !validCaptureOriginID(f.OriginID)) || f.Path == "" {
+			return nil, nil, fmt.Errorf("invalid retained source coordinates")
+		}
+		if err := validateCapturedPaths([]string{f.Path}); err != nil {
+			return nil, nil, err
+		}
+	}
+	identity, err := verifyVersionIdentityContext(ctx, versionDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	if identity == nil {
+		return nil, nil, fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
+	}
+	out := make([][]byte, 0, len(files))
+	for _, f := range files {
+		buf, _, err := readRetainedFileWithIdentityContext(ctx, versionDir, f.OriginID, f.Path, identity)
+		if err != nil {
+			return nil, nil, err
+		}
+		out = append(out, buf)
+	}
+	after, err := verifyVersionIdentityContext(ctx, versionDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	if after == nil || after.DatasetID != identity.DatasetID {
+		return nil, nil, fmt.Errorf("snapshot_mismatch: retained dataset changed during batch")
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
+	return out, identity, nil
+}
+
 func retainedLineEvidence(buf []byte, identity *DatasetIdentity, fileSHA, originID, path string, first, last int) (RetainedEvidence, error) {
 	span, err := sourceLineBytes(buf, first, last)
 	if err != nil {
@@ -132,25 +179,27 @@ func retainedLineEvidence(buf []byte, identity *DatasetIdentity, fileSHA, origin
 // ReadRetainedFile returns verified original bytes for semantic extraction.
 // This is an internal raw-byte API: public responses must sanitize them.
 func ReadRetainedFile(versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
+	return ReadRetainedFileContext(context.Background(), versionDir, originID, path)
+}
+
+// ReadRetainedFileContext is ReadRetainedFile within a request; it reuses a
+// RequestVerification carried by ctx for the same version.
+func ReadRetainedFileContext(ctx context.Context, versionDir, originID, path string) ([]byte, *DatasetIdentity, string, error) {
 	if (originID != "repo" && !validCaptureOriginID(originID)) || path == "" {
 		return nil, nil, "", fmt.Errorf("invalid retained source coordinates")
 	}
 	if err := validateCapturedPaths([]string{path}); err != nil {
 		return nil, nil, "", err
 	}
-	identity, err := InspectVersionIdentity(versionDir)
+	identity, err := verifyVersionIdentityContext(ctx, versionDir)
 	if err != nil {
 		return nil, nil, "", err
 	}
 	if identity == nil {
 		return nil, nil, "", fmt.Errorf("requires_v2: legacy dataset has no retained source identity")
 	}
-	buf, fileSHA, err := readRetainedFileWithIdentity(versionDir, originID, path, identity)
+	buf, fileSHA, err := readRetainedFileWithIdentityContext(ctx, versionDir, originID, path, identity)
 	return buf, identity, fileSHA, err
-}
-
-func readRetainedFileWithIdentity(versionDir, originID, path string, identity *DatasetIdentity) ([]byte, string, error) {
-	return readRetainedFileWithIdentityContext(context.Background(), versionDir, originID, path, identity)
 }
 
 func readRetainedFileWithIdentityContext(ctx context.Context, versionDir, originID, path string, identity *DatasetIdentity) ([]byte, string, error) {

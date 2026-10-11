@@ -1,0 +1,27 @@
+from pathlib import Path,PurePosixPath
+import json,hashlib,tarfile,io,gzip
+out=Path('system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08');prep=json.loads((out/'preparation.json').read_text());base=Path(prep['base'])
+prior=Path('system/eval/b0-knowledge-system/refactoring-n12-proposed-lock-2026-10-08/held-candidate.tar.gz')
+def sha(b):return hashlib.sha256(b).hexdigest()
+def dump(n,x):(out/n).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+assert sha(prior.read_bytes())=='0c4403f1d7701fd18ef598b16ac99ee51b7087bf26f18a47bdc2deebfbff0ad0'
+dep=dict(required_archive=str(prior),sha256=sha(prior.read_bytes()),scope='two-artifact replay; proposal layer alone is not self-contained; prior source/index archive supplies immutable bytes, new layer supplies proposal JSON and SQLite')
+dump('archive-dependency.json',dep)
+payload={n:(out/n).read_bytes() for n in ['projection-proposed.json','relation-review-items.json','remaining-concept-path-gaps.json','preparation.json','archive-dependency.json']};payload['semantic-trace-proposed.sqlite']=Path(prep['new_store']).read_bytes()
+archive=out/'trace-proposal-layer.tar.gz'
+with archive.open('wb') as f:
+ with gzip.GzipFile(filename='',mode='wb',fileobj=f,mtime=0) as gz:
+  with tarfile.open(fileobj=gz,mode='w') as tar:
+   for n,b in sorted(payload.items()):
+    i=tarfile.TarInfo(n);i.size=len(b);i.mode=0o600;i.mtime=0;tar.addfile(i,io.BytesIO(b))
+replay=base/'archive-replay';replay.mkdir();dataset=replay/'dataset';layer=replay/'proposal';dataset.mkdir();layer.mkdir()
+def extract(src,dst):
+ with tarfile.open(src) as t:
+  for m in t.getmembers():
+   p=PurePosixPath(m.name);assert m.isfile() and not p.is_absolute() and '..' not in p.parts
+   q=dst/str(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(t.extractfile(m).read())
+extract(prior,dataset);extract(archive,layer)
+for n,b in payload.items():assert (layer/n).read_bytes()==b
+inv=dict(archive=str(archive),archive_sha256=sha(archive.read_bytes()),archive_bytes=archive.stat().st_size,files=[dict(path=n,bytes=len(b),sha256=sha(b)) for n,b in sorted(payload.items())],required_base_archive=dep,replay_dataset=str(dataset),replay_layer=str(layer),verified_original_payload_bytes=True)
+dump('archive-inventory.json',inv)
+print('archive',archive.stat().st_size,'bytes',len(payload),'files',sha(archive.read_bytes()))

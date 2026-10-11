@@ -12,7 +12,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-A minor 4 — unit-level tests for Parser.FuncFieldTouches(). The
+// Unit-level tests for Parser.FuncFieldTouches(). The
 // integration tests in internal/buildpipe/lock_propagation_test.go already
 // cover the end-to-end (parser → buildpipe → SQLite) path; these tests
 // pin down the parser-level contract so a regression in the side-channel
@@ -23,8 +23,8 @@ import (
 //   1. Populated in typed mode — lock-holder fixture functions must
 //      appear in the returned map with the expected struct field.
 //   2. Deep-copy invariant — mutating the returned map must NOT affect
-//      the parser's internal state (regression guard for W-A review
-//      Important #1 — `defer Unlock`-then-return-live-map race).
+//      the parser's internal state (regression guard for the
+//      `defer Unlock`-then-return-live-map race).
 //   3. Empty in AST-only mode — without SetPackages the side-channel
 //      must short-circuit (typesInfo is nil, recordFuncFieldTouches
 //      no-ops).
@@ -128,7 +128,7 @@ func TestFuncFieldTouches_BasicPopulation(t *testing.T) {
 
 // TestFuncFieldTouches_DeepCopy — mutating the returned map must not
 // surface in subsequent FuncFieldTouches() calls. Regression guard for
-// W-A review Important #1 (commit history: the original implementation
+// an earlier race (the original implementation
 // returned a live reference under `defer Unlock`, which was safe given
 // production call ordering but would crack under any re-ordering).
 func TestFuncFieldTouches_DeepCopy(t *testing.T) {
@@ -163,7 +163,7 @@ func TestFuncFieldTouches_DeepCopy(t *testing.T) {
 //
 // Why this matters: production buildpipe always passes through typed
 // mode (SetPackages from detect.GoPackages), but ad-hoc consumers (tests,
-// CLI tools) may parse without it. The W-A propagation pass interprets
+// CLI tools) may parse without it. The lock propagation pass interprets
 // an empty map as "no field-touch data" and silently skips emit — this
 // test pins that gating so a future change can't accidentally fire the
 // AST-only path through the typed-mode logic.

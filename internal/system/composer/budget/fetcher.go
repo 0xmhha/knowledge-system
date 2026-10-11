@@ -2,21 +2,21 @@
 // subset of Stage 2's seeds and Stage 3's neighbors whose bodies fit
 // within a token budget.
 //
-// Stage 4 is the final "size reduction" step before sanitize (B.7) and
-// pack assembly (B.8). The output is a ranked, body-bearing list ready
+// Stage 4 is the final "size reduction" step before sanitize and
+// pack assembly. The output is a ranked, body-bearing list ready
 // for EvidencePack construction.
 //
 // Body sourcing: Stage 2/3 carry citations (file path + line range)
 // without inline text. Stage 4 takes a BodyFetcher and pulls text on
-// demand. Real implementations come in Phase C (filesystem read scoped
-// to the indexed snapshot, or ckg-backed retrieval); tests use a Fake.
+// demand. Real implementations are a filesystem read scoped
+// to the indexed snapshot, or ckg-backed retrieval; tests use a Fake.
 //
 // Selection: greedy by score. The candidate list is the union of seeds
 // and neighbors, sorted descending by their score. Citations are taken
 // in order; when one doesn't fit, the loop continues — a smaller
 // candidate further down the list may still fit. This is non-optimal
 // (greedy isn't knapsack-optimal), but the simplicity is worth it for
-// Phase 0; Phase E will measure whether the suboptimality matters.
+// now; evaluation will show whether the suboptimality matters.
 package budget
 
 import (
@@ -28,7 +28,7 @@ import (
 // BodyFetcher returns the source text for a Citation. Implementations:
 //
 //   - Fake (this package): canned responses for tests.
-//   - Real (Phase C): file-system read scoped to the indexed snapshot,
+//   - Real: file-system read scoped to the indexed snapshot,
 //     or a ckg-backed retrieval API that returns the chunk text directly.
 //
 // Empty string + nil error means "no body available" — the file was

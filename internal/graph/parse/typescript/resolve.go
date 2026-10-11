@@ -7,7 +7,7 @@ import (
 
 // Resolve unions per-file results and emits cross-file edges from
 // PendingRef queues. V0 cross-file resolution is name-based — TS has
-// no in-process type system the way Go does (Track C used go/packages),
+// no in-process type system the way Go does (the Go parser uses go/packages),
 // so we lean on three signals to keep the precision/recall trade-off
 // honest:
 //
@@ -37,7 +37,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// the union of nodes from all files.
 	fileBySrcID := map[string]string{}
 	byName := map[string][]types.Node{}
-	// W-B W1: heritage edges target Class / Interface nodes only — we
+	// Heritage edges target Class / Interface nodes only — we
 	// keep a separate type-restricted index so a same-named Function /
 	// Method can't pollute the resolution.
 	heritageByName := map[string][]types.Node{}
@@ -81,7 +81,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	return out, nil
 }
 
-// resolveHeritageRef resolves one W-B W1 heritage PendingRef (a single
+// resolveHeritageRef resolves one heritage PendingRef (a single
 // `extends X` / `implements X` parent reference) against the indexed
 // Class / Interface tables. Locality rules:
 //

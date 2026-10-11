@@ -10,8 +10,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// distributed.go implements E3 (CKS deep-dive § 4.1, "Graph 5: Distributed
-// Interaction") MVP for Go: HTTP route handlers, JSON-RPC handler signatures,
+// distributed.go implements distributed-interaction detection (MVP) for Go: HTTP route handlers, JSON-RPC handler signatures,
 // and `client.Call("Service.Method", ...)` style RPC dispatch. Three new
 // edge kinds (listens_on / handles_message / rpc_calls) attach to two new
 // node kinds (Endpoint / MessageType).
@@ -29,7 +28,7 @@ import (
 //     suffix-match against existing function/method qnames; on miss the edge
 //     is dropped (V0 simplification — full AMBIGUOUS handling is deferred).
 //
-// Defer (B1-style follow-up):
+// Deferred:
 //   - gRPC client calls (`stub.RpcMethod(ctx, req)`) need cross-package type
 //     info to identify Method as part of an auto-generated `XClient` interface.
 //   - gRPC server method registration (`pb.RegisterFooServer(s, &impl{})`).
@@ -39,7 +38,7 @@ import (
 // emits with INFERRED confidence and broader matching (any `HandleFunc(...)`
 // call with first-arg string literal is treated as a route handler).
 
-// emitDistributedDecls is the per-file entry point for the E3 distributed
+// emitDistributedDecls is the per-file entry point for the distributed
 // pass. Walks every function body for HTTP handler registrations + RPC client
 // calls, and every top-level function declaration for JSON-RPC handler
 // signatures. Idempotent: duplicate Endpoint/MessageType nodes are deduped
@@ -51,7 +50,7 @@ func (v *declVisitor) emitDistributedDecls(f *ast.File) {
 	if v.messageNodeIDs == nil {
 		v.messageNodeIDs = map[string]string{}
 	}
-	// W3b gRPC server pass — top-level scan for pb.RegisterXXXServer call
+	// gRPC server pass — top-level scan for pb.RegisterXXXServer call
 	// sites. Runs BEFORE the per-function body walk so the resulting real
 	// Endpoint IDs (cached in endpointNodeIDs) are visible to the client
 	// pass via upsertGRPCClientPlaceholder's same-file dedup.
@@ -66,7 +65,7 @@ func (v *declVisitor) emitDistributedDecls(f *ast.File) {
 			continue
 		}
 		funcID, funcQname := v.funcDeclIDQname(fd)
-		// W3b gRPC client pre-pass — register stub variables for this
+		// gRPC client pre-pass — register stub variables for this
 		// function body before the CallExpr walk fires. Without this,
 		// maybeEmitGRPCClientCall would miss the `client.RpcMethod(...)`
 		// edges because the stub var isn't bound yet at visit time.
@@ -87,7 +86,7 @@ func (v *declVisitor) scanFuncBodyForDistributed(parentFuncID, parentFuncQname s
 		v.maybeEmitHTTPListensOn(parentFuncID, parentFuncQname, call)
 		v.maybeEmitRPCCall(parentFuncID, call)
 		v.maybeEmitHTTPClientCall(parentFuncID, call)
-		// W3b: gRPC client call detection. Mirrors the http_calls path —
+		// gRPC client call detection. Mirrors the http_calls path —
 		// emits one grpc_calls edge per stub method call, with AMBIGUOUS
 		// placeholder fallback when the stub var type can't be resolved.
 		v.maybeEmitGRPCClientCall(parentFuncID, call)
@@ -644,8 +643,7 @@ func splitSelectorName(e ast.Expr) (string, string) {
 //
 // V0 simplification: gRPC stub calls (`stub.RpcMethod(ctx, req)`) are NOT
 // detected here — they require recognising the auto-generated `XClient`
-// interface, which needs cross-package types.Info chasing. Documented in
-// the WORK-PLAN deferred set.
+// interface, which needs cross-package types.Info chasing. Deferred.
 func (v *declVisitor) maybeEmitRPCCall(parentFuncID string, call *ast.CallExpr) {
 	sel, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok || sel.Sel.Name != "Call" {
@@ -704,7 +702,7 @@ func isExportedIdent(s string) bool {
 }
 
 // maybeEmitHTTPClientCall detects Go HTTP client call sites and emits an
-// http_calls edge (schema 1.9 W2) from the enclosing function to a
+// http_calls edge (schema 1.9) from the enclosing function to a
 // placeholder Endpoint. The link pass (internal/link/http_match.go) walks
 // these edges after all per-language parsers run and either rewires the
 // edge Dst to a matching real Endpoint (cascade: specific verb → wildcard)

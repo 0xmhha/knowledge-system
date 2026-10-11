@@ -1,9 +1,10 @@
 package mcphandlers
 
 // newFixtureStore is shared across test files that need a real
-// persist.Store built from the resolve fixture. It runs buildpipe
-// once per test into a temporary directory and registers Close via
-// t.Cleanup.
+// persist.Store built from the resolve fixture. The graph is built once
+// per test binary (each build also walks this repository's git history,
+// about 15 s) and every test opens its own read-only handle, closed via
+// t.Cleanup; read-only immutable handles can share the file safely.
 //
 // The file also carries the test-only shims (computeImpact /
 // impactDepthCap) that the historical internal/mcp test suite uses.
@@ -12,7 +13,9 @@ package mcphandlers
 // internal/mcp during T-14b) keeps working without churn.
 
 import (
+	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
@@ -20,18 +23,38 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/impact"
 )
 
+var (
+	fixtureOnce sync.Once
+	fixtureDir  string
+	fixtureErr  error
+)
+
+// TestMain removes the shared fixture graph after the package's tests.
+func TestMain(m *testing.M) {
+	code := m.Run()
+	if fixtureDir != "" {
+		_ = os.RemoveAll(fixtureDir)
+	}
+	os.Exit(code)
+}
+
 func newFixtureStore(t *testing.T) persist.Store {
 	t.Helper()
-	out := t.TempDir()
-	if _, err := buildpipe.Run(buildpipe.Options{
-		SrcRoot:    "../../../internal/graph/parse/golang/testdata/resolve",
-		OutDir:     out,
-		Languages:  []string{"auto"},
-		CKGVersion: "test",
-	}); err != nil {
-		t.Fatal(err)
+	fixtureOnce.Do(func() {
+		if fixtureDir, fixtureErr = os.MkdirTemp("", "mcphandlers-fixture-"); fixtureErr != nil {
+			return
+		}
+		_, fixtureErr = buildpipe.Run(buildpipe.Options{
+			SrcRoot:    "../../../internal/graph/parse/golang/testdata/resolve",
+			OutDir:     fixtureDir,
+			Languages:  []string{"auto"},
+			CKGVersion: "test",
+		})
+	})
+	if fixtureErr != nil {
+		t.Fatal(fixtureErr)
 	}
-	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
+	store, err := persist.OpenReadOnly(filepath.Join(fixtureDir, "graph.db"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -7,18 +7,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W10 V2 (2026-05-18) / V3 (2026-05-19) — Yul-level
-// low-level call receiver resolution and shadow guard.
+// Sol Yul-level low-level call receiver resolution and shadow guard.
 //
-// V0 marked HasAssembly on callables with inline assembly; V1.1
-// enumerated which Yul EVM builtins appeared. V2 closes the
-// dispatch loop: for Yul `delegatecall` / `call` / `staticcall`
+// runAssemblyMarker marks HasAssembly on callables with inline
+// assembly and runYulBuiltins enumerates which Yul EVM builtins
+// appeared. This walker closes the dispatch loop: for Yul `delegatecall` / `call` / `staticcall`
 // where the target argument is a `yul_path` (or bare
 // `yul_identifier`) that maps to a Sol state-var / parameter /
 // local of Contract or Interface type, emit EdgeInvokes
 // ConfAmbiguous with DispatchKind="low_level_call".
 //
-// V3 (2026-05-19) closes the two soft spots V2 left:
+// Two additional guards:
 //
 //   (1) Yul let-binding shadow guard. A yul-local `let r := ...`
 //       declaration shadows a Sol-scope identifier of the same
@@ -30,7 +29,7 @@ import (
 //   (2) HasLowLevelCall marker on the enclosing callable for every
 //       yul delegatecall / call / staticcall regardless of whether
 //       the receiver argument resolves to a known Sol scope. This
-//       lights up the W8 V1 marker for Yul-side calls the same way
+//       lights up the HasLowLevelCall marker for Yul-side calls the same way
 //       Sol-side `.call` invocations do, so security tooling can
 //       run "which functions perform a low-level call" queries
 //       across both surfaces with one signal.
@@ -45,11 +44,11 @@ import (
 // argument (index 1 after the builtin, so the 3rd named child of
 // the yul_function_call when counting the builtin itself).
 //
-// V3 limitations remaining:
+// Limitations:
 //   - Address-typed receivers still drop at the byName step
 //     (lookupReceiverType returns "address" which isn't a known
-//     Contract or Interface type — same as W7.1). The W8 V1
-//     marker is the substitute signal for those receivers.
+//     Contract or Interface type — same as the Sol-side low-level
+//     call resolver). The HasLowLevelCall marker is the substitute signal for those receivers.
 //   - The let-binding sweep collects siblings of every yul_block
 //     ancestor; nested-block shadowing where a later block
 //     re-binds the same name is captured conservatively (the call
@@ -67,18 +66,18 @@ func (v *declVisitor) runYulLowLevelCalls() {
 	matches := cur.Matches(query, v.root, v.src)
 	names := query.CaptureNames()
 	hasLowLevel := map[string]bool{}
-	// W-C W10 V10 (2026-05-19): Yul `delegatecall(gas(), address(),
+	// Yul `delegatecall(gas(), address(),
 	// …)` self-delegate sites map to the enclosing callable so we
 	// can mark HasSelfDelegatecallDead alongside HasLowLevelCall.
 	yulSelfDelegateDead := map[string]bool{}
-	// W-C W10 V23 (2026-05-21): same symmetry for Yul `call` and
+	// Same symmetry for Yul `call` and
 	// `staticcall` — `call(gas(), address(), …)` / `staticcall(gas(),
 	// address(), …)` re-enter the same contract through the EVM
 	// message-call boundary, parallel to the Sol-level
-	// `payable(this).call(...)` caught by V8. Without this set the
-	// Yul self-call path silently lost HasSelfReentrantCall while
-	// the V10 path captured the delegatecall variant — a left/right
-	// asymmetry inside the same walker.
+	// `payable(this).call(...)` caught by the cast walker. Without this
+	// set the Yul self-call path would lose HasSelfReentrantCall while
+	// the delegatecall variant is captured — a left/right asymmetry
+	// inside the same walker.
 	yulSelfReentrant := map[string]bool{}
 	for {
 		m := matches.Next()
@@ -108,8 +107,8 @@ func (v *declVisitor) runYulLowLevelCalls() {
 				continue
 			}
 			fnID := parse.MakeID(fnQ, "sol", fnStart)
-			// V3: mark the enclosing callable regardless of whether the
-			// receiver argument resolves. This mirrors the W8 V1
+			// Mark the enclosing callable regardless of whether the
+			// receiver argument resolves. This mirrors the
 			// HasLowLevelCall semantics on the Sol side.
 			hasLowLevel[fnID] = true
 			// Target address is the 2nd positional argument; index 2
@@ -118,22 +117,22 @@ func (v *declVisitor) runYulLowLevelCalls() {
 			if targetArg == nil {
 				continue
 			}
-			// W-C W10 V10 (2026-05-19): Yul-level self-delegatecall.
+			// Yul-level self-delegatecall.
 			// `delegatecall(gas(), address(), …)` invokes the
 			// contract's own bytecode against its own storage —
 			// dead-weight, parallel to the Sol-level address(this)
-			// delegatecall caught by W10 V9. Mark
+			// delegatecall caught by the cast walker. Mark
 			// HasSelfDelegatecallDead on the enclosing callable.
 			if opName == "delegatecall" && isYulSelfAddress(targetArg, v.src) {
 				yulSelfDelegateDead[fnID] = true
 			}
-			// W-C W10 V23 (2026-05-21): Yul self-call (excluding
+			// Yul self-call (excluding
 			// delegatecall, which has its own dead-weight marker
 			// above). `call(gas(), address(), …)` and
 			// `staticcall(gas(), address(), …)` re-enter the same
 			// contract — security tooling consumes
 			// HasSelfReentrantCall on these the same way it does on
-			// the Sol cast walker's V8 path.
+			// the Sol cast walker's self-call path.
 			if (opName == "call" || opName == "staticcall") && isYulSelfAddress(targetArg, v.src) {
 				yulSelfReentrant[fnID] = true
 			}
@@ -141,7 +140,7 @@ func (v *declVisitor) runYulLowLevelCalls() {
 			if receiverName == "" {
 				continue
 			}
-			// V3 shadow guard: if the receiver identifier matches a
+			// Shadow guard: if the receiver identifier matches a
 			// yul let-binding in scope, drop the emit. The let binding
 			// shadows any same-name Sol identifier; without this guard
 			// the Pass 2 resolver would silently match a Sol scope
@@ -177,7 +176,7 @@ func (v *declVisitor) runYulLowLevelCalls() {
 
 // isYulSelfAddress reports whether a Yul argument node is the
 // builtin `address()` call (no arguments) — Yul's way to fetch
-// the executing contract's own address. Used by W10 V10 to flag
+// the executing contract's own address. Used to flag
 // `delegatecall(gas, address(), …)` as a dead-weight self-
 // delegatecall.
 func isYulSelfAddress(n *sitter.Node, src []byte) bool {
@@ -205,7 +204,7 @@ func isYulSelfAddress(n *sitter.Node, src []byte) bool {
 // could shadow a Sol-scope identifier at the node's position. The
 // sweep is conservative: it includes let-bindings declared in
 // sibling positions after the node (Yul's per-block scoping makes
-// that strictly out-of-scope) since the W10 V3 contract is to drop
+// that strictly out-of-scope) since the contract here is to drop
 // rather than risk a silent wrong edge.
 func yulLetBindingsInScope(n *sitter.Node, src []byte) map[string]bool {
 	bindings := map[string]bool{}
@@ -253,12 +252,12 @@ func collectYulLetBindings(n *sitter.Node, src []byte, out map[string]bool) {
 //
 //	yul_path     — its first named child is a yul_identifier
 //	                whose text is the leading Sol identifier
-//	                (`a` in `a.b.c`). V0 ignores nested-path
-//	                segments and resolves on the leading name only.
+//	                (`a` in `a.b.c`). Nested-path segments are
+//	                ignored; resolution uses the leading name only.
 //	yul_identifier — bare Sol identifier without any dotted path.
 //
 // Anything else (numeric literal, nested yul_function_call,
-// hex literal) drops as unresolvable at the V0 layer.
+// hex literal) drops as unresolvable.
 func extractYulReceiverName(arg *sitter.Node, src []byte) string {
 	if arg == nil {
 		return ""

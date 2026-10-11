@@ -4,15 +4,15 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.1 — function-parameter receiver dispatch tests.
+// Function-parameter receiver dispatch tests.
 //
-// Builds on V1.0 (state-variable receiver). The resolver tries state-var
+// Builds on the state-variable receiver case. The resolver tries state-var
 // first, then falls back to parameter — Solidity scoping forbids a
 // parameter name from shadowing a state variable in receiver position,
 // so the lookup order is purely a hot-path optimisation, not a
 // correctness lever.
 
-// TestUsingForV11_ParamReceiverDispatch — canonical V1.1 case. A pure
+// TestUsingForV11_ParamReceiverDispatch — canonical parameter case. A pure
 // function whose receiver is a parameter (`x.times(2)`) resolves through
 // the parameter-type index instead of stateVarTypes.
 func TestUsingForV11_ParamReceiverDispatch(t *testing.T) {

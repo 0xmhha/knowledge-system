@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestCanonicalID_SolidityOverloads guards symbol-identity Phase 1 (ADR-0001)
+// TestCanonicalID_SolidityOverloads guards canonical symbol identity (ADR-0001)
 // for Solidity: two same-named functions in one contract must get distinct
 // canonical ids, separated by their parameter-type signature, while the short
 // qualified_name (Over.foo) collides. The relative file path is the qualifier

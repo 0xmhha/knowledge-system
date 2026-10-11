@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestLineQualifyDuplicateCanonicalIDs guards B3: canonical_ids shared by more
+// TestLineQualifyDuplicateCanonicalIDs guards line qualification: canonical_ids shared by more
 // than one node in the same file get a "@<line>" suffix; unique ids are left
 // stable and line-independent.
 func TestLineQualifyDuplicateCanonicalIDs(t *testing.T) {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
+	"net/url"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 )
@@ -44,21 +46,37 @@ func Open(path string) (*sqliteStore, error) {
 	// synchronous=NORMAL is the recommended durability level under WAL: safe
 	// across app crashes, only a power loss can lose the last commit — an
 	// acceptable trade for a rebuildable graph, and a meaningful write speedup.
-	dsn := path + "?_pragma=foreign_keys(1)&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)"
-	db, err := sql.Open("sqlite", dsn)
+	//
+	// A file: URI keeps the path intact: with a plain "path?query" DSN the
+	// driver cuts the path at its first "?".
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("open sqlite at %s: %w", path, err)
+	}
+	uri := url.URL{Scheme: "file", Path: abs,
+		RawQuery: "_pragma=foreign_keys(1)&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)"}
+	db, err := sql.Open("sqlite", uri.String())
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite at %s: %w", path, err)
 	}
 	return &sqliteStore{db: db}, nil
 }
 
-// OpenReadOnly opens a SQLite file in read-only mode (used by serve/mcp).
-// FK pragma is enforced per-connection via DSN; WAL/synchronous are omitted
-// because read-only mode cannot mutate journal state. busy_timeout still
-// helps a reader wait out a concurrent checkpoint instead of erroring.
+// OpenReadOnly opens a finished graph read-only (used by serve/mcp and the
+// cks graph client). The DSN must be a file: URI: the driver passes query
+// parameters to SQLite only for URIs, so a plain "path?mode=ro" opened the
+// file read-write, accepted writes and created -wal/-shm sidecars beside
+// it. immutable=1 keeps readers from creating or locking sidecars; graphs
+// are replaced by rename, never rewritten under a reader. FK pragma is
+// enforced per-connection; busy_timeout is kept for parity with Open.
 func OpenReadOnly(path string) (*sqliteStore, error) {
-	dsn := path + "?mode=ro&immutable=1&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
-	db, err := sql.Open("sqlite", dsn)
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("open sqlite ro at %s: %w", path, err)
+	}
+	uri := url.URL{Scheme: "file", Path: abs,
+		RawQuery: "mode=ro&immutable=1&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"}
+	db, err := sql.Open("sqlite", uri.String())
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite ro at %s: %w", path, err)
 	}

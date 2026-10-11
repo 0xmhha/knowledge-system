@@ -2,7 +2,8 @@ package solidity
 
 import "testing"
 
-// Unit test for the text-shape parser used by V2.5 / V6 V4. Keeps
+// Unit test for the text-shape parser used by the file-level
+// operator-form and namespace-aliased using-for recovery. Keeps
 // regression guards on the brace / for-clause / trailing-qualifier
 // handling and the leading / tail split independent of the AST
 // recovery path.

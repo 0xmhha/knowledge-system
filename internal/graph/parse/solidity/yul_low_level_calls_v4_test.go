@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V4 — HasExternalCall marker fires on callables that
+// HasExternalCall marker fires on callables that
 // perform a low-level call whose receiver resolves to an address-
 // typed Sol scope variable rather than a Contract / Interface. The
 // fixture stages a Forwarder contract with two functions: one
@@ -40,7 +40,7 @@ func TestYulLowLevelCalls_AddressTypedReceiverMarker(t *testing.T) {
 		}
 	}
 
-	// Sanity: both still light up HasLowLevelCall (W10 V3 marker
+	// Sanity: both still light up HasLowLevelCall (the marker
 	// is unconditional for every yul delegatecall/call/staticcall).
 	for _, n := range nodes {
 		if n.QualifiedName == "Forwarder.forward" || n.QualifiedName == "Forwarder.forwardViaState" {

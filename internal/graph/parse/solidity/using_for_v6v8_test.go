@@ -7,7 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V8 — method name propagation on EdgeUsesFor.DispatchKind.
+// Method name propagation on EdgeUsesFor.DispatchKind.
 // The using-for walkers carry the method name from `Lib.method`
 // forms (operator-form or namespace-aliased nested path) through
 // to Pass 2 via a TargetQName suffix encoded with the RFC record

@@ -1,0 +1,348 @@
+// New functional-v2 proposed projection. Requires actual retained CKG/CKV candidate.
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+	graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+	graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+func must(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+func require(ok bool, msg string) {
+	if !ok {
+		panic(msg)
+	}
+}
+func digest(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }
+func save(path string, x any) {
+	b, e := json.MarshalIndent(x, "", "  ")
+	must(e)
+	must(os.WriteFile(path, append(b, '\n'), 0600))
+}
+func clone(p semantic.Projection) semantic.Projection {
+	b, e := json.Marshal(p)
+	must(e)
+	var x semantic.Projection
+	must(json.Unmarshal(b, &x))
+	return x
+}
+func main() {
+	out, e := filepath.Abs(os.Args[1])
+	must(e)
+	var prep struct {
+		Base    string `json:"base"`
+		Source  string `json:"source"`
+		Dataset string `json:"dataset_root"`
+	}
+	b, e := os.ReadFile(filepath.Join(out, "preparation.json"))
+	must(e)
+	must(json.Unmarshal(b, &prep))
+	require(strings.HasPrefix(prep.Base, "/private/tmp/ks-n12-functional-"), "not owned base")
+	version := filepath.Join(prep.Dataset, "functional-v2-candidate")
+	storePath := filepath.Join(prep.Base, "semantic-functional-proposed.sqlite")
+	if len(os.Args) == 5 {
+		version, storePath = os.Args[2], os.Args[3]
+		prep.Source = os.Args[4]
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	identity, e := setup.InspectVersionIdentity(version)
+	must(e)
+	require(identity != nil, "missing actual engine identity")
+	must(setup.VerifyCandidateIdentity(version, identity.Source, identity.InputDigest))
+	must(setup.VerifyRetainedSource(version, identity.Source))
+	snap := semantic.Snapshot{ProjectID: identity.Source.ProjectID, DatasetID: identity.DatasetID, SnapshotID: identity.Source.SnapshotID, SourceMode: identity.Source.SourceMode, Commit: identity.Source.SourceCommit}
+	p := extractCurrent(ctx, version, out, snap)
+	require(len(p.Concepts) == 23 && len(p.Requirements) == 3 && len(p.Assertions) == 12, "wrong selected scope")
+	core, _, e := semantic.ExtractOntology(snap, "docs/spec-driven/ontology-pilot.yaml", readRetained(version, "docs/spec-driven/ontology-pilot.yaml"))
+	must(e)
+	must(semantic.ValidateCoreOntology(core))
+	for _, r := range p.Requirements {
+		require(r.Version == 2 && len(r.ConceptIDs) == 1, "wrong requirement scope/version")
+	}
+	graphDir, vectorDir := filepath.Join(version, "graph"), filepath.Join(version, "vector")
+	graph, e := graphstore.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
+	must(e)
+	defer graph.Close()
+	nodes, e := graph.AllNodes()
+	must(e)
+	symbols := []struct {
+		Name, Path string
+		Kind       semantic.SourceKind
+	}{
+		{"SearchDetailed", "internal/vector/store/sqlitevec/store.go", semantic.SourceCode},
+		{"ValidateDatasetAlignment", "internal/system/semantic/alignment.go", semantic.SourceCode},
+		{"applyProvidedOntology", "internal/system/composer/stage2/ontology_provider.go", semantic.SourceCode},
+		{"TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded", "internal/vector/store/sqlitevec/store_test.go", semantic.SourceTest},
+		{"TestSearchDetailedReportsCandidateLimitWithoutCompleteHits", "internal/vector/store/sqlitevec/store_test.go", semantic.SourceTest},
+		{"TestSearchDetailedCancellationIsNotEmptySuccess", "internal/vector/store/sqlitevec/store_test.go", semantic.SourceTest},
+		{"TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty", "internal/system/semantic/alignment_test.go", semantic.SourceTest},
+		{"TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline", "internal/system/composer/stage2/ontology_provider_test.go", semantic.SourceTest},
+		{"TestStoredSharedAliasPreservesBaselineAndRetainedEvidence", "internal/system/composer/stage2/ontology_matcher_integration_test.go", semantic.SourceTest},
+		{"checkCodeAnchor", "internal/system/semantic/ckg_anchor.go", semantic.SourceCode},
+		{"TestCodeAnchorRequiresSameSnapshotAndContainedASTSpan", "internal/system/semantic/ckg_anchor_test.go", semantic.SourceTest},
+	}
+	anchors := map[string]semantic.EvidenceSpan{}
+	sourceRefs := []map[string]any{}
+	for _, s := range symbols {
+		found := map[string]graphtypes.Node{}
+		for _, n := range nodes {
+			if n.Name == s.Name && n.FilePath == s.Path && n.CanonicalID != "" {
+				found[n.CanonicalID] = n
+			}
+		}
+		require(len(found) == 1, "nonunique canonical:"+s.Name)
+		var n graphtypes.Node
+		for _, v := range found {
+			n = v
+		}
+		proof, e := setup.ReadRetainedLines(version, "repo", s.Path, n.StartLine, n.EndLine)
+		must(e)
+		span := semantic.EvidenceSpan{ID: "functional-v2:anchor:" + s.Name, Snapshot: snap, Kind: s.Kind, Path: s.Path, StartLine: n.StartLine, EndLine: n.EndLine, ContentSHA256: proof.ContentSHA256, CanonicalID: n.CanonicalID, Extractor: "actual-CKG-AST-retained-v2"}
+		must(semantic.AttachCodeEvidence(&p, graph, span))
+		anchors[s.Name] = span
+		sourceRefs = append(sourceRefs, map[string]any{"name": s.Name, "node": n, "evidence": span, "context_only": s.Name == "checkCodeAnchor" || strings.HasPrefix(s.Name, "TestCodeAnchorRequires")})
+	}
+	concepts := map[string]semantic.Concept{}
+	reqs := map[string]semantic.Requirement{}
+	criteria := map[string]semantic.AcceptanceCriterion{}
+	for _, c := range p.Concepts {
+		concepts[c.ID] = c
+	}
+	for _, r := range p.Requirements {
+		reqs[r.ID] = r
+		for _, c := range r.AcceptanceCriteria {
+			criteria[c.ID] = c
+		}
+	}
+	rows := []map[string]any{}
+	add := func(id, pred, subject, obj string, refs []string, context map[string]any) {
+		a := semantic.Assertion{ID: id, Predicate: pred, SubjectID: subject, ObjectID: obj, EvidenceIDs: refs, Status: semantic.StatusProposed}
+		p.Assertions = append(p.Assertions, a)
+		rows = append(rows, map[string]any{"review_id": fmt.Sprintf("F2-T%02d", len(rows)+1), "assertion": a, "context": context, "reviewer": nil, "decision": nil, "reason": nil, "actual_human_active_ns": nil})
+	}
+	links := []struct {
+		Req, Concept, Code string
+		Tests, Criteria    []string
+		Call, Limitation   string
+	}{
+		{"req-filtered-recall", "filtered-nearest-chunk-search", "SearchDetailed", []string{"TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded", "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits", "TestSearchDetailedCancellationIsNotEmptySuccess"}, []string{"ac-filtered-recall", "ac-filtered-completeness", "ac-filtered-completeness"}, "direct SearchDetailed invocation", "controlled local vector fixtures; no live corpus recall or latency verdict"},
+		{"req-source-evidence", "snapshot-bound-semantic-relations", "ValidateDatasetAlignment", []string{"TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"}, []string{"ac-source-evidence"}, "Store.PutAligned / ActivateAligned -> ValidateDatasetAlignment", "coordinate-manifest mutations and unchanged active dataset; no end-to-end foreign actual CKG code anchor promotion in this test"},
+		{"req-ontology-fallback", "optional-ontology-baseline-preservation", "applyProvidedOntology", []string{"TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline", "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"}, []string{"ac-ontology-fallback", "ac-ontology-fallback"}, "Searcher.Search -> applyProvidedOntology", "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof"},
+	}
+	for _, l := range links {
+		code := anchors[l.Code]
+		r := reqs[l.Req]
+		context := map[string]any{"requirement_id": l.Req, "requirement_version": 2, "semantic_scope": concepts[l.Concept].Definition, "limitation": l.Limitation, "actual_human_criterion_acceptance": nil, "not_new_FINAL_input": true}
+		add("functional-v2:impl:"+l.Req, semantic.PredicateImplementedBy, l.Concept, code.CanonicalID, []string{concepts[l.Concept].EvidenceID, r.EvidenceID, code.ID}, context)
+		for i, t := range l.Tests {
+			test := anchors[t]
+			criterion := criteria[l.Criteria[i]]
+			ctx := map[string]any{"requirement_id": l.Req, "requirement_version": 2, "criterion_id": criterion.ID, "code_name": l.Code, "test_name": t, "call_chain": l.Call, "limitation": l.Limitation, "actual_named_regression_run": true, "semantic_linked_run": false, "actual_human_criterion_acceptance": nil, "not_new_FINAL_input": true}
+			add("functional-v2:test:"+t, semantic.PredicateTestedBy, code.CanonicalID, test.CanonicalID, []string{code.ID, test.ID, criterion.EvidenceID}, ctx)
+			add("functional-v2:criterion:"+criterion.ID+":"+t, semantic.PredicateCheckedBy, criterion.ID, test.CanonicalID, []string{criterion.EvidenceID, test.ID}, ctx)
+		}
+	}
+	require(len(rows) == 15 && len(p.Assertions) == 27, "wrong new relation count")
+	linked, e := semantic.AttachCKVChunks(ctx, &p, vectorDir)
+	must(e)
+	require(linked == len(p.Sections), "unlinked actual markdown section")
+	must(p.ValidateRetainedSources(version))
+	must(semantic.ValidateDatasetAlignment(p, prep.Source, graphDir, vectorDir))
+	must(semantic.ValidateCodeAnchors(p, graphDir))
+	must(semantic.ValidateCKVChunkLinks(ctx, p, vectorDir))
+	must(semantic.ValidateCanonicalCoverage(vectorDir, 1))
+	controls := []map[string]any{}
+	reject := func(name string, e error) {
+		require(e != nil, "negative accepted:"+name)
+		controls = append(controls, map[string]any{"name": name, "rejected": true, "error": e.Error()})
+	}
+	x := clone(p)
+	x.Evidence[len(x.Evidence)-1].Snapshot.DatasetID = "foreign"
+	reject("foreign_snapshot_code_test_evidence", x.Validate())
+	x = clone(p)
+	x.Evidence[len(x.Evidence)-1].ContentSHA256 = strings.Repeat("0", 64)
+	reject("altered_retained_code_test_digest", x.ValidateRetainedSources(version))
+	x = clone(p)
+	x.Evidence[len(x.Evidence)-1].CanonicalID = "missing.canonical"
+	reject("unknown_actual_CKG_canonical", semantic.ValidateCodeAnchors(x, graphDir))
+	x = clone(p)
+	x.Sections[0].ChunkIDs = []string{"unknown.chunk"}
+	reject("foreign_CKV_document_chunk", semantic.ValidateCKVChunkLinks(ctx, x, vectorDir))
+	x = clone(p)
+	x.Assertions[12].Status = semantic.StatusVerified
+	reject("scope_selection_does_not_verify_implementation", x.Validate())
+	for _, group := range [][]semantic.Assertion{p.Assertions} {
+		for _, a := range group {
+			require(a.Status == semantic.StatusProposed && a.ReviewedBy == "", "false relation review")
+		}
+	}
+	for _, c := range p.Concepts {
+		require(c.Status == semantic.StatusProposed && c.ReviewedBy == "", "false concept review")
+	}
+	if len(os.Args) != 5 {
+ store, e := semantic.OpenStore(storePath)
+ must(e)
+ must(store.PutAlignedRetained(ctx, p, prep.Source, graphDir, vectorDir, version))
+ must(store.Close())
+ }
+	ro, e := semantic.OpenStoreReadOnly(ctx, storePath)
+	must(e)
+	defer ro.Close()
+	loaded, e := ro.Load(ctx, snap.ProjectID, snap.DatasetID)
+	must(e)
+	a, e := json.Marshal(p)
+	must(e)
+	b, e = json.Marshal(loaded)
+	must(e)
+	require(bytes.Equal(a, b), "SQLite reopen changed projection")
+	active, e := ro.LoadAlignedRetained(ctx, snap.ProjectID, snap.DatasetID, prep.Source, graphDir, vectorDir, version)
+	must(e)
+	trace, e := active.Trace()
+	must(e)
+	for _, r := range trace.Requirements {
+		require(r.State == semantic.TraceSpecUnapproved && len(r.Paths) == 0, "scope became approved path")
+	}
+	for _, l := range links {
+		require(len(active.VerifiedImplementations(l.Concept)) == 0, "proposed implementation used as boost")
+	}
+	_, e = ro.Current(ctx, snap.ProjectID)
+	require(errors.Is(e, sql.ErrNoRows), "current pointer exists")
+	review, e := p.Review(100, "functional-v2")
+	must(e)
+	require(review.AssertionVerified == 0 && review.RequirementVerified == 0 && review.ConceptVerified == 0 && review.Precision == nil, "false review metrics")
+	save(filepath.Join(out, "projection-proposed.json"), p)
+	save(filepath.Join(out, "relation-review-items.json"), map[string]any{"snapshot": snap, "relations": rows, "individual_approval_count": 0, "not_FINAL_inputs": true, "old_snapshot_approvals_inherited": false})
+	save(filepath.Join(out, "canonical-source-refs.json"), sourceRefs)
+	save(filepath.Join(out, "negative-controls.json"), controls)
+	save(filepath.Join(out, "trace-diagnostic.json"), trace)
+	save(filepath.Join(out, "review-queue.json"), review)
+	save(filepath.Join(out, "projection-report.json"), map[string]any{"snapshot": snap, "identity": identity, "source_span_count": len(p.Evidence), "actual_CKG_anchors": len(anchors), "relationship_code_targets": 3, "relationship_test_targets": 6, "context_only_anchors": 2, "concepts": 23, "functional_concepts": 3, "requirements": 3, "requirement_version": 2, "criteria": 4, "document_sections": len(p.Sections), "actual_CKV_linked_sections": linked, "new_relation_count": 15, "all_assertions_proposed": 27, "new_predicates": map[string]int{"IMPLEMENTED_BY": 3, "TESTED_BY": 6, "CHECKED_BY": 6}, "projection_json_sha256": digest(a), "retained_source_CKG_CKV_validated": true, "SQLite_reopen_identical": true, "semantic_current_absent": true, "actual_human_approval_count": 0, "reviewed_path_count": 0, "activation_count": 0, "semantic_linked_run_count": 0, "negative_controls_refused": len(controls), "full_task_complete": false})
+	fmt.Println("PASS new functional v2:15 proposed trace+12 claims;11 actual canonical anchors;retained source/CKV/SQLite roundtrip;3unapproved,current0")
+}
+func readRetained(version, path string) []byte {
+	b, _, _, e := setup.ReadRetainedFile(version, "repo", path)
+	must(e)
+	return b
+}
+func extractCurrent(ctx context.Context, versionDir, root string, snapshot semantic.Snapshot) semantic.Projection {
+	read := func(path string) []byte {
+		b, _, _, err := setup.ReadRetainedFile(versionDir, "repo", path)
+		must(err)
+		return b
+	}
+	p, _, err := semantic.ExtractOntology(snapshot, "docs/spec-driven/ontology-pilot-functional.yaml", read("docs/spec-driven/ontology-pilot-functional.yaml"))
+	must(err)
+	spec, _, err := semantic.ExtractSpec(snapshot, "docs/spec-driven/spec-pilot-v2.yaml", read("docs/spec-driven/spec-pilot-v2.yaml"))
+	must(err)
+	p.Evidence = append(p.Evidence, spec.Evidence...)
+	p.Requirements = spec.Requirements
+	type seed struct {
+		ID        string `json:"id"`
+		Path      string `json:"path"`
+		First     int    `json:"first"`
+		Last      int    `json:"last"`
+		ConceptID string `json:"concept_id"`
+		Statement string `json:"statement"`
+	}
+	raw, err := os.ReadFile(filepath.Join(root, "claim-seeds.json"))
+	must(err)
+	var seeds []seed
+	must(json.Unmarshal(raw, &seeds))
+	docs := map[string]semantic.Projection{}
+	conceptEvidence := map[string]string{}
+	for _, c := range p.Concepts {
+		conceptEvidence[c.ID] = c.EvidenceID
+	}
+	for _, s := range seeds {
+		doc, ok := docs[s.Path]
+		if !ok {
+			doc, err = semantic.ExtractMarkdown(snapshot, s.Path, read(s.Path))
+			must(err)
+			docs[s.Path] = doc
+			p.Evidence = append(p.Evidence, doc.Evidence...)
+			p.Sections = append(p.Sections, doc.Sections...)
+		}
+		lines := bytes.SplitAfter(read(s.Path), []byte{'\n'})
+		if len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
+			lines = lines[:len(lines)-1]
+		}
+		if s.First < 1 || s.Last < s.First || s.Last > len(lines) {
+			panic("invalid seed range")
+		}
+		proof := semantic.EvidenceSpan{ID: "policy-evidence:" + s.ID, Snapshot: snapshot, Kind: semantic.SourceDocument, Path: s.Path, StartLine: s.First, EndLine: s.Last, ContentSHA256: digest(bytes.Join(lines[s.First-1:s.Last], nil)), Extractor: "manual-policy-review-v1"}
+		p.Evidence = append(p.Evidence, proof)
+		var chosen semantic.DocumentSection
+		var chosenEvidence semantic.EvidenceSpan
+		for _, section := range doc.Sections {
+			for _, e := range doc.Evidence {
+				if e.ID == section.EvidenceID && e.StartLine <= s.First && e.EndLine >= s.Last && (chosen.ID == "" || e.EndLine-e.StartLine < chosenEvidence.EndLine-chosenEvidence.StartLine) {
+					chosen = section
+					chosenEvidence = e
+				}
+			}
+		}
+		if chosen.ID == "" || conceptEvidence[s.ConceptID] == "" {
+			panic("unresolved seed section or concept")
+		}
+		claim := semantic.Claim{ID: "pilot-claim:" + s.ID, Statement: s.Statement, SectionID: chosen.ID, EvidenceIDs: []string{proof.ID, chosenEvidence.ID}, Status: semantic.StatusProposed}
+		p.Claims = append(p.Claims, claim)
+		p.Assertions = append(p.Assertions, semantic.Assertion{ID: "supports:" + s.ID, Predicate: semantic.PredicateSupports, SubjectID: chosen.ID, ObjectID: claim.ID, EvidenceIDs: []string{chosenEvidence.ID, proof.ID}, Status: semantic.StatusProposed}, semantic.Assertion{ID: "about:" + s.ID, Predicate: semantic.PredicateAbout, SubjectID: claim.ID, ObjectID: s.ConceptID, EvidenceIDs: []string{proof.ID, conceptEvidence[s.ConceptID]}, Status: semantic.StatusProposed})
+	}
+	must(p.ValidateRetainedSources(versionDir))
+	return p
+}
+
+func replayArchive(out string) {
+	var a struct {
+		Version string `json:"restored_version"`
+	}
+	b, e := os.ReadFile(filepath.Join(out, "held-candidate-archive.json"))
+	must(e)
+	must(json.Unmarshal(b, &a))
+	if !strings.HasPrefix(a.Version, "/private/tmp/ks-n12-coordinated-") {
+		panic("outside owned namespace")
+	}
+	var identity setup.DatasetIdentity
+	b, e = os.ReadFile(filepath.Join(out, "retained-dataset-identity.json"))
+	must(e)
+	must(json.Unmarshal(b, &identity))
+	must(setup.VerifyCandidateIdentity(a.Version, identity.Source, identity.InputDigest))
+	must(setup.VerifyRetainedSource(a.Version, identity.Source))
+	var p semantic.Projection
+	b, e = os.ReadFile(filepath.Join(out, "projection-proposed.json"))
+	must(e)
+	must(json.Unmarshal(b, &p))
+	var prep struct {
+		Source string `json:"source"`
+	}
+	b, e = os.ReadFile(filepath.Join(out, "preparation.json"))
+	must(e)
+	must(json.Unmarshal(b, &prep))
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	must(p.ValidateRetainedSources(a.Version))
+	must(semantic.ValidateCodeAnchors(p, filepath.Join(a.Version, "graph")))
+	must(semantic.ValidateCKVChunkLinks(ctx, p, filepath.Join(a.Version, "vector")))
+	must(semantic.ValidateDatasetAlignment(p, prep.Source, filepath.Join(a.Version, "graph"), filepath.Join(a.Version, "vector")))
+	must(semantic.ValidateCanonicalCoverage(filepath.Join(a.Version, "vector"), 1))
+	save(filepath.Join(out, "held-archive-replay.json"), map[string]any{"status": "retained_held_candidate_archive_verified", "source_and_dataset_identity": identity, "canonical_evidence_and_CKV_links_verified": true, "retained_source_spans_verified": true, "canonical_floor": 1, "new_model_calls": 0, "original_index_database_used": false, "original_logical_source_root_used_for_coordinate_check": prep.Source, "human_approved": 0, "activated": false})
+	fmt.Println("PASS archive-only held candidate: source/dataset identity, retained source spans, CKG anchors, CKV chunk links, full canonical floor")
+}

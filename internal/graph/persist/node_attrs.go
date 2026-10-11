@@ -1,4 +1,4 @@
-// Package persist — node_attrs.go (W-C W11 V7, 2026-05-19) bridges
+// Package persist — node_attrs.go bridges
 // the per-node JSON-blob `attrs` column to the type fields on
 // types.Node that have no dedicated SQLite column. Adding a new
 // marker on types.Node only requires a new field in this struct

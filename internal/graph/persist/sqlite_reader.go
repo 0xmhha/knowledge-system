@@ -246,7 +246,7 @@ func topMetricColumn(metric string) (string, error) {
 }
 
 // EdgeCountsByType returns total edge count per type across the whole
-// graph. Single GROUP BY query; cheap. Viewer (Track D) uses this to
+// graph. Single GROUP BY query; cheap. The viewer uses this to
 // render "G2 Semantic 758" badges so users can see axis weight without
 // a separate scan of the full edges table.
 func (s *sqliteStore) EdgeCountsByType() (map[string]int, error) {
@@ -338,20 +338,33 @@ func (s *sqliteStore) GetBlob(id string) ([]byte, error) {
 // rows to bound MCP response size.
 //
 // opts.Language pushes a `language = ?` predicate when non-empty.
-// opts.Kinds pushes a `type IN (...)` predicate when non-empty — CKG-4
-// fix that removes cks Stage 2's N round-trips for `arch_explain` intent
+// opts.Kinds pushes a `type IN (...)` predicate when non-empty — this
+// removes cks Stage 2's N round-trips for `arch_explain` intent
 // (one query per requested SymbolKind). Empty Kinds returns every type.
 func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
+	q, args := findSymbolQuery(name, exact, opts)
+	rows, err := s.db.Query(q, args...)
+	if err != nil {
+		return nil, fmt.Errorf("find symbol %q: %w", name, err)
+	}
+	defer func() { _ = rows.Close() }()
+	return scanNodes(rows)
+}
+
+// findSymbolQuery builds FindSymbol's statement. The suffix match ("Foo" hits
+// "pkg.Foo") is a UNION of two indexed lookups, qualified_name and
+// simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
+// one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
+// the whole nodes table on every MCP seed resolution.
+func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, []any) {
 	args := []any{}
-	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE 1=1 `
+	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE `
 	if exact {
-		q += `AND qualified_name = ? `
+		q += `qualified_name = ? `
 		args = append(args, name)
 	} else {
-		// simple_name equi-join replaces a leading-wildcard LIKE so the
-		// suffix match ("Foo" hits "pkg.Foo") uses idx_nodes_simple_name.
-		// COLLATE NOCASE preserves the old LIKE's case-insensitivity.
-		q += `AND (qualified_name = ? OR simple_name = ? COLLATE NOCASE) `
+		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE) `
 		args = append(args, name, name)
 	}
 	if opts.Language != "" {
@@ -364,13 +377,7 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
 			args = append(args, string(k))
 		}
 	}
-	q += `LIMIT 100`
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("find symbol %q: %w", name, err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanNodes(rows)
+	return q + `LIMIT 100`, args
 }
 
 // NeighborhoodByQname returns BFS expansion up to depth starting from any
@@ -464,43 +471,43 @@ func (s *sqliteStore) SubgraphByQname(qname string, depth int) ([]types.Node, []
 // edgesFrom returns every edge whose src is in ids. When edgeTypes is
 // non-empty, the result is filtered to those types (e.g. just `calls`).
 func (s *sqliteStore) edgesFrom(ids []string, edgeTypes []string) ([]types.Edge, error) {
-	if len(ids) == 0 {
-		return nil, nil
+	return s.edgesByEndpoint("src", ids, edgeTypes)
+}
+
+// edgesByEndpoint returns every edge whose column (src or dst) is in ids,
+// optionally filtered by type. A traversal frontier can hold tens of
+// thousands of IDs, so the IN list is split into queryEdgesChunk pieces to
+// stay under SQLite's variable limit. Each edge has one value per column,
+// so chunks never return the same edge twice.
+func (s *sqliteStore) edgesByEndpoint(column string, ids []string, edgeTypes []string) ([]types.Edge, error) {
+	var out []types.Edge
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
+		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `)`
+		args := anys(chunk)
+		if len(edgeTypes) > 0 {
+			q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
+			args = append(args, anys(edgeTypes)...)
+		}
+		rows, err := s.db.Query(q, args...)
+		if err != nil {
+			return nil, fmt.Errorf("edges by %s for %d ids: %w", column, len(ids), err)
+		}
+		es, err := scanEdges(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, es...)
 	}
-	q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE src IN (` + placeholders(len(ids)) + `)`
-	args := anys(ids)
-	if len(edgeTypes) > 0 {
-		q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
-		args = append(args, anys(edgeTypes)...)
-	}
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("edges from %d ids: %w", len(ids), err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanEdges(rows)
+	return out, nil
 }
 
 // edgesPointingTo returns every edge whose dst is in ids. When edgeTypes
 // is non-empty, the result is filtered to those types.
 func (s *sqliteStore) edgesPointingTo(ids []string, edgeTypes []string) ([]types.Edge, error) {
-	if len(ids) == 0 {
-		return nil, nil
-	}
-	q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE dst IN (` + placeholders(len(ids)) + `)`
-	args := anys(ids)
-	if len(edgeTypes) > 0 {
-		q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
-		args = append(args, anys(edgeTypes)...)
-	}
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("edges pointing to %d ids: %w", len(ids), err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanEdges(rows)
+	return s.edgesByEndpoint("dst", ids, edgeTypes)
 }
 
 // NodesByIDs fetches nodes by primary key. Empty input yields a nil slice
@@ -509,12 +516,23 @@ func (s *sqliteStore) NodesByIDs(ids []string) ([]types.Node, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
-	rows, err := s.db.Query(`SELECT `+nodeColumns+` FROM nodes WHERE id IN (`+placeholders(len(ids))+`)`, anys(ids)...)
-	if err != nil {
-		return nil, fmt.Errorf("nodes by %d ids: %w", len(ids), err)
+	// Chunked like edgesByEndpoint: callers pass whole traversal frontiers
+	// and viewer selections.
+	var out []types.Node
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		rows, err := s.db.Query(`SELECT `+nodeColumns+` FROM nodes WHERE id IN (`+placeholders(len(chunk))+`)`, anys(chunk)...)
+		if err != nil {
+			return nil, fmt.Errorf("nodes by %d ids: %w", len(ids), err)
+		}
+		ns, err := scanNodes(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, ns...)
 	}
-	defer func() { _ = rows.Close() }()
-	return scanNodes(rows)
+	return out, nil
 }
 
 // AmbiguousMetaNodes returns Hunk + Commit rows with confidence='AMBIGUOUS'.
@@ -524,7 +542,7 @@ func (s *sqliteStore) NodesByIDs(ids []string) ([]types.Node, error) {
 // the schema enforces NOT NULL).
 //
 // The dual-type scope (Hunk + Commit) matches the §11.3 contract — other
-// AMBIGUOUS rows (TS resolve multi-candidate, Track C unresolvable
+// AMBIGUOUS rows (TS resolve multi-candidate, unresolvable
 // dispatch) are precision signals the LLM should still see and stay
 // out of the recovery panel.
 func (s *sqliteStore) AmbiguousMetaNodes() ([]types.Node, error) {
@@ -581,7 +599,7 @@ func (s *sqliteStore) AllEdges() ([]types.Edge, error) {
 
 // NodesByFilePath returns every node whose file_path equals path. Empty path
 // returns nil (no rows). Used by buildpipe to reload nodes for files that hit
-// the A3 incremental cache instead of re-parsing them.
+// the incremental cache instead of re-parsing them.
 func (s *sqliteStore) NodesByFilePath(path string) ([]types.Node, error) {
 	if path == "" {
 		return nil, nil
@@ -639,7 +657,7 @@ func (s *sqliteStore) BlobsByFilePath(path string) (map[string][]byte, error) {
 
 // GetNodePRs returns the PR breadcrumbs for a single node, descending
 // by merge timestamp, optionally truncated to merges before cutoff
-// (ckg-NEW-3). The cutoff comparison runs in SQL as a string comparison
+// for temporal slicing. The cutoff comparison runs in SQL as a string comparison
 // against the RFC3339-UTC text stored in merged_at — lexicographic
 // ordering coincides with chronological ordering for that format, so
 // no datetime() coercion is needed.

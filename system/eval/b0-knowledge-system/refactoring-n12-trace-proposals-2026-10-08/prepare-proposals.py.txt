@@ -1,0 +1,43 @@
+import json,hashlib,tempfile,subprocess
+from pathlib import Path
+root=Path.cwd(); out=root/'system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08';out.mkdir(exist_ok=True)
+prior=root/'system/eval/b0-knowledge-system/refactoring-n12-proposed-lock-2026-10-08'
+p=json.loads((prior/'projection-proposed.json').read_text()); original=json.loads((root/'system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-items.json').read_text()); prep=json.loads((prior/'preparation.json').read_text())
+base=Path(tempfile.mkdtemp(prefix='ks-n12-trace-proposals-',dir='/private/tmp'))
+def dump(n,x):(out/n).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+def evidence(ref):
+ a=[e for e in p['evidence'] if e['path']==ref['path'] and e['start_line']==ref['first'] and e['end_line']==ref['last'] and e['content_sha256']==ref['content_sha256'] and e.get('canonical_id')]
+ assert a,ref
+ return a[0]
+concepts={c['id']:c for c in p['concepts']}; requirements={r['id']:r for r in p['requirements']}; criteria={c['id']:(r,c) for r in p['requirements'] for c in r['acceptance_criteria']}
+rows=[]; skipped=[]; selected_concept={'req-filtered-recall':'vector-chunk','req-source-evidence':'evidence-span','req-ontology-fallback':'concept'}; impl_seen=set();code_test_seen=set(); related=[]
+def add(id,predicate,subject,obj,refs,context):
+ a=dict(id=id,predicate=predicate,subject_id=subject,object_id=obj,evidence_ids=refs,status='proposed')
+ p['assertions'].append(a);rows.append(dict(assertion=a,review_context=context,reviewer=None,decision=None,reason=None,human_active_review_ns=None));related.append(id)
+for item in original['items']:
+ if item.get('kind')!='criterion':continue
+ req,criterion=criteria[item['id']];impl=evidence(item['candidate_implementation']);concept=selected_concept[req['id']]
+ key=(concept,impl['canonical_id'])
+ if key not in impl_seen:
+  impl_seen.add(key);add('trace-proposal:impl:'+req['id'],'IMPLEMENTED_BY',concept,impl['canonical_id'],[concepts[concept]['evidence_id'],req['evidence_id'],impl['id']],dict(requirement_id=req['id'],candidate_code_source=item['candidate_implementation'],scope='hypothesis about a common metamodel concept implemented by this function; type/source validity does not establish semantic correctness'))
+ for link in item['candidate_test_links']:
+  t=evidence(link['candidate_anchor'])
+  if link['test']=='TestProjectionRejectsCrossSnapshotOrMissingEvidence':
+   skipped.append(dict(criterion_id=item['id'],candidate_code=impl,proposed_test=t,reason='test exercises Projection.Validate and ValidateSources, not ValidateDatasetAlignment; keep source test as contextual corroboration only, do not assert TESTED_BY for this code',decision=None));continue
+  context=dict(requirement_id=req['id'],criterion_id=item['id'],candidate_test_name=link['test'],candidate_test_source=link['candidate_anchor'],test_execution_in_this_run=False,human_criterion_acceptance=None,call_relation='direct SearchDetailed calls' if req['id']=='req-filtered-recall' else 'Store.PutAligned -> ValidateDatasetAlignment' if req['id']=='req-source-evidence' else 'Searcher.Search -> applyProvidedOntology',scope='proposed semantic testing relation; direct/indirect code linkage and Given/When/Then coverage need human adjudication')
+  pair=(impl['canonical_id'],t['canonical_id'])
+  if pair not in code_test_seen:
+   code_test_seen.add(pair);add('trace-proposal:test:'+link['test'],'TESTED_BY',impl['canonical_id'],t['canonical_id'],[impl['id'],t['id'],criterion['evidence_id']],context)
+  add('trace-proposal:criterion:'+item['id']+':'+link['test'],'CHECKED_BY',item['id'],t['canonical_id'],[criterion['evidence_id'],t['id']],context)
+assert len(rows)==13 and len(skipped)==1 and len(p['assertions'])==25
+for g in ['concepts','requirements','claims','assertions']:
+ assert all(x['status']=='proposed' and not x.get('reviewed_by') for x in p[g])
+dump('projection-proposed.json',p)
+dump('relation-review-items.json',dict(schema_version=1,status='draft',snapshot=p['snapshot'],new_relation_count=len(rows),relations=rows,excluded_code_test_pairs=skipped,human_active_review_ns=None,criterion_acceptance=None,not_evaluation_FINAL_inputs=True))
+missing=[]
+for r in p['requirements']:
+ for c in r['concept_ids']:
+  if c!=selected_concept[r['id']]:missing.append(dict(requirement_id=r['id'],concept_id=c,reason='no new implementation/testing hypothesis prepared; do not automatically map every broad metamodel concept to the same function'))
+dump('remaining-concept-path-gaps.json',missing)
+dump('preparation.json',dict(base=str(base),prior_source_root=prep['source'],prior_version=str(Path(prep['dataset_root'])/'n12-candidate'),prior_projection=str(prior.relative_to(root)/'projection-proposed.json'),prior_projection_sha256=hashlib.sha256((prior/'projection-proposed.json').read_bytes()).hexdigest(),source_commit=p['snapshot']['commit'],runtime_source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),new_store=str(base/'semantic-trace-proposed.sqlite'),new_store_is_separate=True,original_source_CKG_CKV_semantic_store_unchanged=True,source_scope_human_approved=False,full_task_complete=False))
+print('prepared13 proposed relations, excluded1 mismatched code/test pair, remaining5 concept-path hypotheses',base)

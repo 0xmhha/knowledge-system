@@ -1,0 +1,92 @@
+from pathlib import Path
+import collections,copy,gzip,hashlib,json,subprocess
+base=Path('system/eval/b0-knowledge-system');out=base/'refactoring-n11-coverage-candidates-2026-10-08';out.mkdir(exist_ok=True)
+source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();sha=lambda b:hashlib.sha256(b).hexdigest()
+old_book_path=base/'refactoring-n11-final-candidate-preparation-2026-10-06/partial-question-book.json';old_proto_path=old_book_path.with_name('partial-protocol-draft.json')
+book=copy.deepcopy(json.loads(old_book_path.read_text()));proto=copy.deepcopy(json.loads(old_proto_path.read_text()));book['source_commit']=source
+rebindings=[]
+for q in book['questions']:
+ previous=q['source_commit'];q['source_commit']=source
+ for e in q['evidence']:
+  old_raw=subprocess.check_output(['git','show',previous+':'+e['path']]);old_span=b''.join(old_raw.splitlines(keepends=True)[e['first']-1:e['last']])
+  assert sha(old_raw)==e['file_sha256'] and sha(old_span)==e['content_sha256']
+  raw=subprocess.check_output(['git','show',source+':'+e['path']]);assert raw.count(old_span)==1
+  offset=raw.find(old_span);assert offset==0 or raw[offset-1:offset]==b'\n'
+  first=raw[:offset].count(b'\n')+1;last=first+len(old_span.splitlines(keepends=True))-1
+  assert b''.join(raw.splitlines(keepends=True)[first-1:last])==old_span
+  previous_ref=copy.deepcopy(e);e.update(first=first,last=last,file_sha256=sha(raw))
+  rebindings.append(dict(id=q['id'],previous_source_commit=previous,source_commit=source,previous_ref=previous_ref,current_ref=copy.deepcopy(e),content_bytes_unchanged=True,file_bytes_unchanged=sha(old_raw)==sha(raw),coordinate_moved=(first,last)!=(previous_ref['first'],previous_ref['last']),human_rebinding_review=None))
+(out/'source-rebinding.json').write_text(json.dumps(rebindings,ensure_ascii=False,indent=2)+'\n')
+def ref(ident,path,first,last):
+ raw=subprocess.check_output(['git','show',source+':'+path]);assert raw==Path(path).read_bytes();lines=raw.splitlines(keepends=True);assert 1<=first<=last<=len(lines);span=b''.join(lines[first-1:last]);(out/(ident+'.span.txt')).write_bytes(span);return dict(path=path,first=first,last=last,file_sha256=sha(raw),content_sha256=sha(span))
+def add(n,group,cluster,prompt,answer,refs,basis=None):
+ ident=f'N11-FINAL-CAND-{n:02d}'
+ q=dict(id=ident,split='FINAL',group=group,proposed_cluster_id=cluster,proposed_unit_id=cluster,independence_review=None,contamination_review=None,language='ko',prompt=prompt,candidate_answer=answer,expected_behavior='abstain' if basis else 'cite',review_state='draft',reviewer=None,source_commit=source,evidence=refs if not basis else [],authority_scope='bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved')
+ if basis:q.update(strict_zero_citations=True,abstention_basis=basis,abstention_basis_sources=refs,scope_requires_actual_human_absence_review=True)
+ book['questions'].append(q)
+add(5,'POLICY','review-record-adjudication','다중 검토자 quorum이 필요한 knowledge 항목에 같은 검토자의 동일 기록을 여러 번 넣거나 inline 승인만 넣으면 어떻게 처리하나요?','같은 검토자의 같은 판정/SHA는 한 표로만 센다. 같은 검토자의 상충 판정/SHA는 오류이며 minApprovals>1이면 기존 inline 승인만으로 quorum을 충족할 수 없다.',[ref('N11-FINAL-CAND-05','internal/system/knowledgepack/review.go',74,106)])
+add(6,'POLICY','review-record-adjudication','같은 knowledge 항목에 verified와 rejected 기록이 함께 있으면 verified 쪽의 표가 많더라도 어떤 상태를 유지하나요?','두 종류의 판정이 모두 존재하면 disputed로 proposed 상태를 유지한다. 이 분기에서 다수 표만으로 verified/rejected로 자동 승격하지 않는다.',[ref('N11-FINAL-CAND-06','internal/system/knowledgepack/review.go',108,129)])
+add(7,'TRACE','trace-stale-diagnostic','저장된 semantic projection은 있지만 현재 graph/vector/source 증명이 stale이면 TraceStatus는 어떤 requirement 경로를 반환하나요?','Snapshot과 stale 상태 및 오류 이유를 반환하되 Requirements는 빈 배열이다. 과거 경로를 현재의 유효한 추적으로 제시하지 않는다.',[ref('N11-FINAL-CAND-07','internal/system/semantic/trace.go',64,78)])
+add(8,'TRACE','trace-link-adr-evidence','verified knowledge trace-link가 존재해도 어떤 ADR 근거 조건을 만족하지 못하면 LoadInstances가 거부하나요?','참조 ADR이 존재해야 하고 verified link라면 ADR도 verified여야 한다. 요구사항이 ADR RequirementIDs에 포함되고 link EvidenceRefs에 ADR SourceRef가 있어야 하며 그렇지 않으면 reviewed ADR evidence 부족 오류다.',[ref('N11-FINAL-CAND-08','internal/system/knowledgepack/instances.go',414,423)])
+# Basis records justify an absence proposal, never positive citation gold.
+summary_path=base/'refactoring-n15-n17-native-controls-2026-10-07/summary.json';ls=summary_path.read_text().splitlines();line=next(i+1 for i,x in enumerate(ls) if '"human_RTO_RPO"' in x)
+add(9,'ABS','operating-recovery-facts-undeclared','이 프로젝트에서 실제 운영 복구를 위해 승인한 RTO와 RPO는 각각 몇 분인가요?','현재 바인딩한 자료에는 실제 승인 RTO/RPO 값이 없으므로 답변을 보류한다. 작은 시험 실행 시간을 운영 목표로 추정하지 않는다.',[ref('N11-FINAL-CAND-09',str(summary_path),line,line)],'bounded actual recovery record has human_RTO_RPO=null; reviewer must check this corpus/scope and any other operating decisions before approving absence; never infer values from mock durations')
+ops='docs/spec-driven/C1-OPERATIONS-REVIEW.md';ls=Path(ops).read_text().splitlines();line=next(i+1 for i,x in enumerate(ls) if x.startswith('| OP-01 |'))
+add(10,'ABS','operating-recovery-facts-undeclared','이 프로젝트의 장애 시 실제 운영 백업과 failover 복구를 맡도록 지정한 담당자는 누구인가요?','현재 바인딩한 운영 역할 기록에는 실제 복구 담당자가 미지정이다. fixture 검토자나 chat-user를 운영 담당자로 추정하지 않고 답변을 보류한다.',[ref('N11-FINAL-CAND-10',ops,line,line)],'OP01 real release/signing/recovery owner is explicitly unassigned; reviewer must verify applicable operating scope and any other decisions before approving absence')
+add(11,'POLICY','knowledge-instance-file-admission','LoadInstances가 knowledge overlay의 항목 파일을 읽을 때 어떤 확장자와 읽기 상한을 허용하고 directory/symlink 항목은 어떻게 처리하나요?','policies/relations/reviews/trace-links는 .yaml, decisions는 .md만 허용한다. directory 또는 symlink entry를 거부하고 ReadSourceFileNoFollow로 각 파일을4MiB 상한 안에서 읽는다. 전체 파일 수/총합 바이트 상한을 보장한다는 뜻은 아니다.',[ref('N11-FINAL-CAND-11','internal/system/knowledgepack/instances.go',274,302)])
+book.update(purpose='coverage expansion with seven POLICY/TRACE/ABS draft cases; source hash verified, gold/independence/absence unapproved; no queries',previous_partial_question_book_sha256=sha(old_book_path.read_bytes()),final_questions=None,results=None)
+proto.update(source_commit=source,status='draft_not_runnable',execution_allowed=False,release_eligible=False,freeze=None,results=None)
+proto['candidate_book_sha256']=sha((json.dumps(book,ensure_ascii=False,indent=2)+'\n').encode());proto['previous_partial_protocol_sha256']=sha(old_proto_path.read_bytes())
+(out/'candidate-question-book.json').write_text(json.dumps(book,ensure_ascii=False,indent=2)+'\n');(out/'candidate-protocol.json').write_text(json.dumps(proto,ensure_ascii=False,indent=2)+'\n')
+# Compare every draft case (positive gold OR absence basis) with all retained FINAL citations and bodies.
+final=base/'approved-evaluation-m2max-2026-10-06/final-after-development-freeze';artifact=json.loads((final/'artifact-manifest.json').read_text());retained={x['artifact_path']:x for x in artifact['files']};candidates=[q for q in book['questions'] if q['split']=='FINAL'];matches=[];files=[];rows=collections.Counter();keywords=('multi-reviewer quorum','disputed','TraceStatus','reviewed ADR evidence','human_RTO_RPO','RTO','RPO')
+wordcounts=collections.Counter();refs={q['id']:q.get('evidence',[])+q.get('abstention_basis_sources',[]) for q in candidates};path_index=collections.defaultdict(list)
+for ident,es in refs.items():
+ for e in es:path_index[e['path']].append((ident,e))
+for path in sorted(final.rglob('rows.jsonl.gz')):
+ rel=str(path.relative_to(final));a=retained[rel];assert sha(path.read_bytes())==a['artifact_sha256'];rawsha=hashlib.sha256();n=0
+ with gzip.open(path,'rb') as stream:
+  for number,line in enumerate(stream,1):
+   rawsha.update(line);n+=1;row=json.loads(line);response=row.get('call',{}).get('response',{});pack=response.get('structuredContent') if isinstance(response,dict) else None
+   if not isinstance(pack,dict) or pack.get('format_version')!=2:rows['non_v2']+=1;continue
+   rows['v2']+=1
+   for body in pack.get('bodies',[]):
+    for term in keywords:
+     if term in body.get('text',''):wordcounts[term]+=1
+   for index,c in enumerate(pack.get('citations',[])):
+    if c.get('file') not in path_index:continue
+    verdicts=[dict(candidate_id=ident,same_file_sha256=c.get('file_sha256')==e['file_sha256'],line_span_intersects=max(c['start_line'],e['first'])<=min(c['end_line'],e['last'])) for ident,e in path_index[c['file']]]
+    matches.append(dict(source_rows=str(path),line_number=number,citation_index=index,request_id=row['request_id'],measurement_id=row['call']['measurement_id'],citation=c,candidate_checks=verdicts))
+ assert rawsha.hexdigest()==a['source_sha256'];files.append(dict(path=str(path),rows=n,compressed_sha256=sha(path.read_bytes()),decompressed_sha256=rawsha.hexdigest()))
+assert len(files)==9 and rows=={'v2':4560,'non_v2':240}
+bycase=[]
+for q in candidates:
+ hit=[m for m in matches if any(v['candidate_id']==q['id'] for v in m['candidate_checks'])]
+ overlap=[m for m in hit if any(v['candidate_id']==q['id'] and v['same_file_sha256'] and v['line_span_intersects'] for v in m['candidate_checks'])]
+ bycase.append(dict(id=q['id'],group=q['group'],proposed_cluster_id=q['proposed_cluster_id'],same_path_citation_occurrences=len(hit),same_bytes_and_span_overlap_occurrences=len(overlap),observed_request_ids=sorted({m['request_id'] for m in overlap}),independence_approved=False,contamination_verdict=None,requires_human_overlap_and_concept_review=True))
+# Historical gold/source references matter even if the old retrieval failed to cite them.
+oldgold=json.loads((base/'questions.json').read_text())['questions'];dev=json.loads((base/'refactoring-n11-input-draft-2026-10-06/dev-candidates.json').read_text())['questions'];policy=json.loads((base/'refactoring-n12-policy-adr-review-2026-10-06/review-items.json').read_text())['items'];reference_index=[]
+for collection,questions in [('B0-gold',oldgold),('N11-DEV',dev)]:
+ for q in questions:
+  for e in q.get('evidence',[]):reference_index.append(dict(collection=collection,id=q['id'],path=e['path'],first=e.get('first',e.get('start_line')),last=e.get('last',e.get('end_line'))))
+for q in policy:
+ for key in ('source','candidate_code'):
+  e=q[key];reference_index.append(dict(collection='N12-'+key,id=q['id'],path=e['path'],first=e['first'],last=e['last']))
+reference_matches=[]
+for ident,es in refs.items():
+ for e in es:
+  for r in reference_index:
+   if r['path']==e['path']:reference_matches.append(dict(candidate_id=ident,reference=r,line_span_intersects=max(e['first'],r['first'])<=min(e['last'],r['last'])))
+# Exact-span observation excludes the entire shared fact-cluster, including a variant with no direct overlap.
+excluded_clusters={q['proposed_cluster_id'] for q in candidates if next(x for x in bycase if x['id']==q['id'])['same_bytes_and_span_overlap_occurrences']>0}
+book['excluded_candidate_questions']=[dict(q,exclusion_reason='shared proposed fact cluster has exact same-byte/span exposure in prior FINAL; not available for fresh FINAL') for q in candidates if q['proposed_cluster_id'] in excluded_clusters]
+book['questions']=[q for q in book['questions'] if q['split']!='FINAL' or q['proposed_cluster_id'] not in excluded_clusters]
+book['excluded_proposed_clusters']=sorted(excluded_clusters)
+(out/'candidate-question-book.json').write_text(json.dumps(book,ensure_ascii=False,indent=2)+'\n')
+proto['candidate_book_sha256']=sha((out/'candidate-question-book.json').read_bytes())
+(out/'candidate-protocol.json').write_text(json.dumps(proto,ensure_ascii=False,indent=2)+'\n')
+(out/'retained-final-matching-citations.jsonl').write_text(''.join(json.dumps(m,ensure_ascii=False,separators=(',',':'))+'\n' for m in matches));(out/'historical-reference-matches.json').write_text(json.dumps(reference_matches,ensure_ascii=False,indent=2)+'\n')
+summary=dict(schema_version=1,status='N11_coverage_candidates_unapproved_unexecuted',source_commit=source,candidate_rows=len(candidates),new_candidate_rows=7,eligible_candidate_rows=len(candidates)-len(book['excluded_candidate_questions']),excluded_candidate_ids=[q['id'] for q in book['excluded_candidate_questions']],eligible_proposed_clusters_by_group={g:len({q['proposed_cluster_id'] for q in book['questions'] if q['split']=='FINAL' and q['group']==g}) for g in sorted({'CODE','WHY','POLICY','TRACE','ABS'})},proposed_clusters=len({q['proposed_cluster_id'] for q in candidates}),proposed_clusters_by_group={g:len({q['proposed_cluster_id'] for q in candidates if q['group']==g}) for g in sorted({'CODE','WHY','POLICY','TRACE','ABS'})},approved_independent_FINAL_count=0,new_query_or_FINAL_dispatch_count=0,source_and_absence_basis_sha_verified=True,old_DEV_and_partial_book_bytes_unchanged=True,retained_FINAL_raw_files=files,retained_FINAL_rows=sum(rows.values()),retained_row_kinds=dict(rows),canonical_body_keyword_occurrences={k:wordcounts[k] for k in keywords},candidate_counts=bycase,historical_reference_matches=reference_matches,full_N11_complete=False,sampling_verdict='inconclusive',limits=['implementation trace diagnostics and ADR-link validation are proposed TRACE group membership; not an actual reviewed pilot trace path','same cluster used for two quorum questions and two operating absence questions; rows are not independent units','source/citation/basis matching does not establish conceptual independence or absence; prior DEV/other diagnostics/human familiarity remain separate','ABS basis is not positive gold and does not authorize any citation; corpus/source scope and human abstention adjudication required','source commit is a documentation/guard followup; draft protocol is not actual coordinated dataset/config/binary/model freeze'])
+(out/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+(out/'input-bindings.json').write_text(json.dumps({str(p):sha(p.read_bytes()) for p in [old_book_path,old_proto_path,base/'questions.json',base/'protocol-m2max-draft.json',base/'refactoring-n11-input-draft-2026-10-06/dev-candidates.json',final/'artifact-manifest.json']},indent=2)+'\n')
+print(json.dumps({'new_candidates':7,'excluded':summary['excluded_candidate_ids'],'eligible_candidates':summary['eligible_candidate_rows'],'total_candidates':len(candidates),'proposed_clusters':summary['proposed_clusters'],'group_proposed_clusters':summary['proposed_clusters_by_group'],'raw_rows_audited':sum(rows.values()),'candidate_exact_span_overlaps':[(x['id'],x['same_bytes_and_span_overlap_occurrences']) for x in bycase],'approved_FINAL':0,'new_queries':0},ensure_ascii=False))

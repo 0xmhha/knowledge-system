@@ -1,4 +1,4 @@
-// Package evidence implements the H3 EvidencePack assembler — given a
+// Package evidence implements the EvidencePack assembler — given a
 // free-form intent string and an optional seed qname, ranks the
 // schema-1.8 Hunk corpus by BM25 over a (commit subject || patch text
 // || modifies qnames) virtual document, groups the top-K hunks by
@@ -6,13 +6,13 @@
 // and returns the Pack JSON the Coding Agent can fold into a few-shot
 // prompt frame.
 //
-// Algorithm (mirrors docs/design/hunk-graph.md §5.2):
+// Algorithm (mirrors docs/graph/design/hunk-graph.md §5.2):
 //
 //  1. Build per-hunk virtual document = subject + decompressed patch
 //     + modifies-qnames.
 //  2. BM25-score against intent → top 50 hunks.
 //  3. If seed_qname set: filter to hunks reaching seed via the
-//     modifies edge directly OR via one hop on the G3 call graph
+//     modifies edge directly OR via one hop on the call graph
 //     (calls/invokes). Take top-K survivors.
 //  4. Group by parent commit; attach all hunks the commit contains
 //     (the adjacent edge means the Agent reads the full change).
@@ -46,7 +46,7 @@ import (
 // over the default intent" (rare but legal).
 //
 // IssueID, when set, restricts the candidate hunks to those whose
-// parent commit's H4-extracted issue set contains the requested ID.
+// parent commit's extracted issue set contains the requested ID.
 // Combines additively with Intent / SeedQname:
 //   - IssueID alone: returns the ticket's hunks ordered by commit recency.
 //   - IssueID + Intent: BM25-rank inside the ticket subset.
@@ -96,9 +96,8 @@ type CommitInfo struct {
 	SHA        string `json:"sha"`
 	Subject    string `json:"subject"`
 	AuthorTime int64  `json:"author_time"`
-	// IssueIDs is reserved for the H4 issue-id extraction stage; left
-	// empty by H3 so the schema is stable now and the Agent doesn't
-	// crash on a missing field once H4 lands.
+	// IssueIDs lists the issue/PR IDs extracted from the commit
+	// message; empty when none were recognised.
 	IssueIDs []string `json:"issue_ids,omitempty"`
 	// TopFiles is populated by TicketIndex's pickSampleCommits — the
 	// top-3 most-frequently-touched directory paths across the
@@ -133,7 +132,7 @@ const (
 	bm25TopN            = 50 // first-stage shortlist size before seed/budget filtering
 )
 
-// BuildPack runs the full H3 assembly. Returns an empty Pack (with
+// BuildPack runs the full EvidencePack assembly. Returns an empty Pack (with
 // hits=[]) when no hunks match — never nil — so the Agent's JSON
 // parsers don't have to guard against null. Errors propagate from the
 // underlying store or from gzip decompression.
@@ -162,7 +161,7 @@ type hunkCorpus struct {
 	nodeByID      map[string]types.Node
 	hunkSHA       map[string]string // hunk ID → parent commit SHA
 	hunkModifyIDs map[string]map[string]bool
-	// issuesBySHA: H4 §10.4 aggregation. Hunks store their commit's
+	// issuesBySHA: issue-ID aggregation (hunk-graph.md §10.4). Hunks store their commit's
 	// issue IDs in DocComment with the `issues:` prefix; we union
 	// per-SHA so the EvidencePack's CommitInfo.IssueIDs reflects the
 	// full set seen across that commit's hunks. (In practice all hunks
@@ -197,7 +196,7 @@ func indexCorpus(nodes []types.Node, edges []types.Edge) *hunkCorpus {
 				c.hunkByID[n.ID] = n
 				sha := parseHunkSHA(n.QualifiedName)
 				c.hunkSHA[n.ID] = sha
-				// H4: parse `issues:` prefix from doc_comment and
+				// Parse the `issues:` prefix from doc_comment and
 				// union into the per-SHA aggregate.
 				if ids := decodeIssuesFromDocComment(n.DocComment); len(ids) > 0 {
 					set, hit := c.issuesBySHA[sha]
@@ -250,7 +249,7 @@ func indexCorpus(nodes []types.Node, edges []types.Edge) *hunkCorpus {
 	return c
 }
 
-// decodeIssuesFromDocComment extracts the H4 §10.4 issue list from a
+// decodeIssuesFromDocComment extracts the §10.4 issue list from a
 // Hunk's doc_comment column (formatted `issues:ID1;ID2`). Inlined
 // here rather than imported from internal/temporal because pkg/
 // evidence is a public package and shouldn't depend on internal/.
@@ -344,7 +343,7 @@ func commitTimestamp(sig string) int64 {
 }
 
 // gunzipIfNeeded mirrors handleBlob's egress logic: hunk blobs come
-// gzipped from the H1 storage layer; pre-1.8 data may be raw. The
+// gzipped from the hunk storage layer; pre-1.8 data may be raw. The
 // magic-byte check covers both eras.
 func gunzipIfNeeded(b []byte) ([]byte, error) {
 	if len(b) >= 3 && b[0] == 0x1f && b[1] == 0x8b && b[2] == 0x08 {
@@ -360,7 +359,7 @@ func gunzipIfNeeded(b []byte) ([]byte, error) {
 
 // buildSeedAllowList returns the set of node IDs the seed-qname
 // expansion permits as `modifies` targets: the seed itself + its 1-hop
-// neighbours on the G3 call graph (calls / invokes, both directions).
+// neighbours on the call graph (calls / invokes, both directions).
 //
 // Per design §5.4 the expansion is bounded — depth=1, max-degree-cap
 // = 50 per node — so super-hub seeds (e.g. `Errorf`) don't pull every
@@ -377,7 +376,7 @@ func buildSeedAllowList(c *hunkCorpus, seedQname string) map[string]bool {
 		return allowed
 	}
 	const maxDegree = 50
-	// One hop in G3 (callers + callees). Cap per-node to bound noise.
+	// One hop on the call graph (callers + callees). Cap per-node to bound noise.
 	addCapped := func(targets []types.Node) {
 		for i, t := range targets {
 			if i >= maxDegree {
@@ -521,7 +520,8 @@ func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offs
 	}
 	commitOrder = commitOrder[offset:]
 
-	out := make([]Hit, 0, k)
+	// k is caller-supplied: size the slice by what can actually be returned.
+	out := make([]Hit, 0, min(k, len(commitOrder)))
 	usedTokens := 0
 	for _, sha := range commitOrder {
 		if len(out) >= k {

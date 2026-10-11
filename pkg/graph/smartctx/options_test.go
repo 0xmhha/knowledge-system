@@ -8,7 +8,7 @@ import (
 // TestOptionsDefaults locks the published default values so a casual
 // edit to withDefaults can't silently regress them. These numbers are
 // load-bearing for the eval δ baseline measurement — changing them
-// without a Stage B re-run would invalidate the comparison.
+// without re-running that measurement would invalidate the comparison.
 func TestOptionsDefaults(t *testing.T) {
 	got := Options{}.withDefaults()
 	if got.BudgetTokens != 8000 {
@@ -21,19 +21,19 @@ func TestOptionsDefaults(t *testing.T) {
 		t.Errorf("CandidateLimit: got %d, want %d", got.CandidateLimit, defaultCandidateLimit)
 	}
 	if got.CandidateLimit != 100 {
-		t.Errorf("CandidateLimit default drifted: got %d, want 100 (P0 #3)", got.CandidateLimit)
+		t.Errorf("CandidateLimit default drifted: got %d, want 100", got.CandidateLimit)
 	}
 	if got.RankedCap != defaultRankedCap {
 		t.Errorf("RankedCap: got %d, want %d", got.RankedCap, defaultRankedCap)
 	}
 	if got.RankedCap != 50 {
-		t.Errorf("RankedCap default drifted: got %d, want 50 (P0 #3)", got.RankedCap)
+		t.Errorf("RankedCap default drifted: got %d, want 50", got.RankedCap)
 	}
 	if got.MaxSummaries != defaultMaxSummaries {
 		t.Errorf("MaxSummaries: got %d, want %d", got.MaxSummaries, defaultMaxSummaries)
 	}
 	if got.MaxSummaries != 25 {
-		t.Errorf("MaxSummaries default drifted: got %d, want 25 (P0 #3)", got.MaxSummaries)
+		t.Errorf("MaxSummaries default drifted: got %d, want 25", got.MaxSummaries)
 	}
 	if got.PRsPerNode != 3 {
 		t.Errorf("PRsPerNode: got %d, want 3", got.PRsPerNode)
@@ -45,13 +45,13 @@ func TestOptionsDefaults(t *testing.T) {
 		t.Errorf("HopDepth: got %d, want %d", got.HopDepth, defaultHopDepth)
 	}
 	if got.HopDepth != 1 {
-		t.Errorf("HopDepth default drifted: got %d, want 1 (P2 #7)", got.HopDepth)
+		t.Errorf("HopDepth default drifted: got %d, want 1", got.HopDepth)
 	}
 	if got.HopFrontierCap != defaultHopFrontierCap {
 		t.Errorf("HopFrontierCap: got %d, want %d", got.HopFrontierCap, defaultHopFrontierCap)
 	}
 	if got.HopFrontierCap != 200 {
-		t.Errorf("HopFrontierCap default drifted: got %d, want 200 (P2 #7)", got.HopFrontierCap)
+		t.Errorf("HopFrontierCap default drifted: got %d, want 200", got.HopFrontierCap)
 	}
 	if !got.PRCutoff.IsZero() {
 		t.Errorf("PRCutoff should be zero (no cutoff) when unset, got %v", got.PRCutoff)

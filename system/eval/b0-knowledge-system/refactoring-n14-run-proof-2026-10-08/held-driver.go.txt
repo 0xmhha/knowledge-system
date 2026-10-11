@@ -1,0 +1,41 @@
+package main
+
+import (
+ "context"
+ "database/sql"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+func must(e error){if e!=nil{panic(e)}}
+func main(){
+ out:="system/eval/b0-knowledge-system/refactoring-n14-run-proof-2026-10-08"
+ var prep struct{Source string `json:"source"`;Version string `json:"version"`;Store string `json:"store"`}
+ b,e:=os.ReadFile("system/eval/b0-knowledge-system/refactoring-n12-concept-gap-audit-2026-10-08/preparation.json");must(e);must(json.Unmarshal(b,&prep))
+ var p semantic.Projection;b,e=os.ReadFile("system/eval/b0-knowledge-system/refactoring-n12-trace-proposals-2026-10-08/projection-proposed.json");must(e);must(json.Unmarshal(b,&p))
+ ctx,cancel:=context.WithTimeout(context.Background(),time.Minute);defer cancel()
+ s,e:=semantic.OpenStoreReadOnly(ctx,prep.Store);must(e);defer s.Close()
+ a,e:=s.LoadAlignedRetained(ctx,p.Snapshot.ProjectID,p.Snapshot.DatasetID,prep.Source,filepath.Join(prep.Version,"graph"),filepath.Join(prep.Version,"vector"),prep.Version);must(e)
+ canaryDir,e:=os.MkdirTemp("/private/tmp","ks-n14-no-child-");must(e);defer os.RemoveAll(canaryDir);canary:=filepath.Join(canaryDir,"unexpected-child")
+ cases:=[]struct{criterion,test string}{{"ac-filtered-recall","TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"},{"ac-filtered-completeness","TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"},{"ac-filtered-completeness","TestSearchDetailedCancellationIsNotEmptySuccess"},{"ac-source-evidence","TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"},{"ac-ontology-fallback","TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"}}
+ rows:=[]map[string]any{}
+ for _,c:=range cases{
+  canonical:="";for _,r:=range p.Evidence{if r.Kind==semantic.SourceTest&&strings.HasSuffix(r.CanonicalID,"."+c.test){canonical=r.CanonicalID;break}};if canonical==""{panic("missing real test anchor")}
+  for _,exact:=range []bool{false,true}{var run semantic.TestRun;var err error;if exact{run,err=a.ExecuteLinkedGoTestFor(ctx,prep.Source,c.criterion,canonical)}else{run,err=a.ExecuteLinkedTestFor(ctx,prep.Source,c.criterion,canonical,[]string{"/usr/bin/touch",canary})}
+   if err==nil||!strings.Contains(err.Error(),"no fully reviewed code/test path")||!run.StartedAt.IsZero()||run.CommandSHA256!=""||run.OutputBytes!=0{panic("unreviewed execution started or wrong refusal")}
+   if _,err:=os.Lstat(canary);!os.IsNotExist(err){panic("unreviewed child ran")}
+   rows=append(rows,map[string]any{"criterion_id":c.criterion,"test_canonical_id":canonical,"exact_Go":exact,"error":err.Error(),"report_started":false,"canary_child_absent":true})
+  }
+ }
+ trace,e:=a.Trace();must(e);for _,r:=range trace.Requirements{if r.State!=semantic.TraceSpecUnapproved||len(r.Paths)!=0{panic("review state changed")}}
+ _,e=s.Current(ctx,p.Snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("current pointer created")}
+ result:=map[string]any{"actual_held_candidate_gate_refusals":rows,"refusal_count":len(rows),"trace":trace,"read_only_semantic_store":true,"canary_child_absent":true,"exact_test_command_started":false,"semantic_current_absent":true,"semantic_linked_test_report_count":0,"human_decision_count":0,"patch_registry_attempt_created":false,"promotion_count":0,"model_HTTP_calls":0,"DEV_FINAL_dispatches":0,"full_task_complete":false}
+ b,e=json.MarshalIndent(result,"","  ");must(e);must(os.WriteFile(filepath.Join(out,"held-candidate-refusals.json"),append(b,'\n'),0600))
+ fmt.Println("PASS actual held proposed candidate:10 linked/exact attempts refused before command, canary absent, reports/human/current0")
+}

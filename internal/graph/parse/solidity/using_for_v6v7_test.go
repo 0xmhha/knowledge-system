@@ -7,7 +7,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V7 — nested namespace path lookup. The directive
+// Nested namespace path lookup. The directive
 // `using {M.SubMath.addOne as +} for uint256 global;` has a
 // 3-segment dotted path. resolveUsingBindingLeading takes the
 // first segment after the namespace alias (`SubMath`) as the
@@ -15,10 +15,9 @@ import (
 // to lib.sol's SubMath even though a homonym lives in
 // lib_alt.sol.
 //
-// V7 honest scope: path hint disambiguation works; the trailing
-// method name (`addOne`) is not yet carried on the binding edge
-// — the EdgeUsesFor dst is the SubMath library itself. Method-
-// name propagation is W6 V8+.
+// Scope: path hint disambiguation works; the EdgeUsesFor dst is the
+// SubMath library itself. Propagation of the trailing method name
+// (`addOne`) is covered in using_for_v6v8_test.go.
 func TestUsingForV6V7_NestedNamespacePath(t *testing.T) {
 	nodes, edges := parseResolveMultiSol(t, "testdata/using_for_v6v7",
 		[]string{"lib.sol", "lib_alt.sol", "consumer.sol"})

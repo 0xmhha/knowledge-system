@@ -64,6 +64,19 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(RUN.run(self.args,lambda *a,**k:self.fail('draft was dispatched')),2)
         self.assertEqual(before,self.args.registry.read_bytes());self.assertFalse(self.args.output.exists())
 
+    def test_changed_abstention_basis_blocks_before_output_reservation_and_child(self):
+        b = copy.deepcopy(self.b)
+        q = next(q for q in b['questions'] if q['group'] == 'ABS')
+        q['abstention_basis_sources'] = copy.deepcopy(b['questions'][0]['evidence'])
+        q['abstention_basis_sources'][0]['content_sha256'] = 'b' * 64
+        self.args.questions.write_bytes(F.encode(b))
+        self.args.review.write_bytes(F.encode(F.review(self.p, b)))
+        before = self.args.registry.read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(RUN.run(self.args,lambda *a,**k:self.fail('invalid absence basis dispatched')),2)
+        self.assertEqual(before,self.args.registry.read_bytes())
+        self.assertFalse(self.args.output.exists())
+
     def test_runtime_and_scope_must_be_frozen_before_dispatch(self):
         for mode in ('binary','config','scope','execution'):
             with self.subTest(mode=mode):
@@ -131,5 +144,44 @@ with m.registry_lock(sys.argv[2]) as fd:
             self.assertEqual(RUN.load_registry(self.args.registry)['records'],[])
             return types.SimpleNamespace(returncode=0)
         self.assertEqual(RUN.run(self.args,launch),0)
+
+    def pin_reference(self, raw=b'reference executable identity only'):
+        ref=self.root/'reference';ref.write_bytes(raw)
+        self.p['execution_binding']['reference_binary_sha256']=F.GATE.sha(raw)
+        self.args.protocol.write_bytes(F.encode(self.p));self.args.review.write_bytes(F.encode(F.review(self.p,self.b)))
+        return ref
+
+    def test_reference_binary_runs_after_candidate_under_one_reservation(self):
+        self.args.reference_binary=self.pin_reference();calls=[]
+        def launch(command,**kwargs):
+            calls.append(command);self.assertEqual(len(RUN.load_registry(self.args.registry)['records']),1)
+            return types.SimpleNamespace(returncode=0)
+        self.assertEqual(RUN.run(self.args,launch),0)
+        self.assertEqual([c[0] for c in calls],[str(self.args.binary.resolve()),str(self.args.reference_binary.resolve())])
+        self.assertEqual([c[c.index('--output')+1].rsplit('/',1)[1] for c in calls],['capture','reference-capture'])
+        ref=json.loads((self.args.output/'execution-binding-reference.json').read_text())
+        self.assertEqual(ref['binary_sha256'],self.p['execution_binding']['reference_binary_sha256'])
+
+    def test_reference_skipped_when_candidate_fails(self):
+        self.args.reference_binary=self.pin_reference();calls=[]
+        def launch(command,**kwargs):
+            calls.append(command);return types.SimpleNamespace(returncode=3)
+        self.assertEqual(RUN.run(self.args,launch),3);self.assertEqual(len(calls),1)
+
+    def test_reference_must_match_protocol_pin(self):
+        cases=[('unpinned',None,self.root/'stray'),('missing',b'reference executable identity only',None),('wrong',b'reference executable identity only',b'other bytes')]
+        for name,pinned,given in cases:
+            with self.subTest(name):
+                self.setUp()
+                if pinned is not None:self.pin_reference(pinned)
+                if isinstance(given,bytes):
+                    path=self.root/'given';path.write_bytes(given);self.args.reference_binary=path
+                elif given is not None:
+                    given.write_bytes(b'stray');self.args.reference_binary=given
+                else:
+                    self.args.reference_binary=None
+                with self.assertRaisesRegex(ValueError,'reference binary|binary differs'):
+                    RUN.run(self.args,lambda *a,**k:self.fail('dispatched'))
+                self.assertEqual(RUN.load_registry(self.args.registry)['records'],[])
 
 if __name__=='__main__':unittest.main()

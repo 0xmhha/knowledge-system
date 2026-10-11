@@ -335,7 +335,7 @@ func runSetup(args []string) (result error) {
 		return fmt.Errorf("resource capture limits require a versioned setup")
 	}
 
-	// Self-exec + sibling defaults (design D3/D4): the domain and filelist
+	// Self-exec + sibling defaults: the domain and filelist
 	// steps run this very binary; engine binaries resolve beside it first.
 	if o.CksBin == "" {
 		o.CksBin = selfExecPath()

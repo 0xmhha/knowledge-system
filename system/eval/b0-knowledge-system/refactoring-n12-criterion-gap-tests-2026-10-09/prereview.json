@@ -1,0 +1,267 @@
+{
+ "schema_version": 1,
+ "kind": "assistant_technical_prereview",
+ "is_human_decision": false,
+ "reviewer": null,
+ "individual_human_approvals": 0,
+ "target_candidate": {
+  "commit": "36353d32f1c21fc0cb2622807fa9e5d05f2daac7",
+  "snapshot_id": "672eae93464af931deb5b66605ba6d21615e50ced58c5a09cd82befc12f56ae7",
+  "dataset_id": "1e82983e45ea35eb63debbea9bf88b6961d595cb5c540db312430cc47d19a341",
+  "runtime_source": "d6fc8902c2df4c66a6ef84307477f1ab44740b8c"
+ },
+ "method": "Claude Code read cited code/tests at runtime source (product files unchanged d6fc8902..5232211b); key findings for F3-T03/T07/T11 re-read directly by the main session. Claims/legacy relations reviewed statically; no tests executed for claims.",
+ "functional_relations": [
+  {
+   "review_id": "F3-T01",
+   "recommendation": "accept",
+   "reason": "SearchDetailed (internal/vector/store/sqlitevec/store.go:620) directly implements filter candidate count, exact/vec0 branch and incomplete status.",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T02",
+   "recommendation": "accept",
+   "reason": "Test calls Search (store_test.go:411), a wrapper over SearchDetailed (store.go:603).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T03",
+   "recommendation": "accept_after_new_assertion",
+   "reason": "Original test checked membership only. This step adds exact distance order assertion (target-two before target-one) to the same test.",
+   "criterion_gap": "eligible count equals K (boundary of 'at least K')",
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T04",
+   "recommendation": "accept",
+   "reason": "Direct SearchDetailed call with MaxExactCandidates=2 (store_test.go:156-163).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T05",
+   "recommendation": "accept_partial",
+   "reason": "Covers candidate_limit on the exact-sized path only (store.go:644-647).",
+   "criterion_gap": "vec0-path candidate_limit is in TestStoreFilterLargeCandidateSetFallsBackToExact; cancellation depends on F3-T07/new test",
+   "proposed_change": "add CHECKED_BY ac-filtered-completeness -> TestStoreFilterLargeCandidateSetFallsBackToExact"
+  },
+  {
+   "review_id": "F3-T06",
+   "recommendation": "accept",
+   "reason": "Direct SearchDetailed with pre-cancelled ctx (store.go:621-622).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T07",
+   "recommendation": "modify",
+   "reason": "Original test uses empty store and Filter{} with pre-cancel only; Given (filtered set with >=K eligible) absent.",
+   "criterion_gap": "filtered in-flight cancellation",
+   "proposed_change": "add CHECKED_BY ac-filtered-completeness -> new TestSearchDetailedFilteredCancellationAfterStartIsNotComplete; narrow F3-T07 wording to unfiltered pre-cancel"
+  },
+  {
+   "review_id": "F3-T08",
+   "recommendation": "modify",
+   "reason": "ValidateDatasetAlignment (alignment.go:69-138) compares manifest coordinates; foreign code anchor rejection is in ValidateCodeAnchors/checkCodeAnchor (ckg_anchor.go:13,92-94) and Projection.Validate snapshot check (validate.go:85-86).",
+   "criterion_gap": null,
+   "proposed_change": "retarget or add IMPLEMENTED_BY -> ValidateCodeAnchors and PutAligned/PutAlignedRetained/ActivateAligned/ActivateAlignedRetained"
+  },
+  {
+   "review_id": "F3-T09",
+   "recommendation": "accept",
+   "reason": "Coordinate rejections come from ValidateDatasetAlignment (alignment.go:105-136).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T10",
+   "recommendation": "modify",
+   "reason": "Fixture has document evidence only, no code anchor; test mutates manifest coordinates. Does not create 'code anchor from another snapshot'.",
+   "criterion_gap": "code-anchor Given absent",
+   "proposed_change": "narrow to coordinate-drift partial control or reject as CHECKED_BY ac-source-evidence"
+  },
+  {
+   "review_id": "F3-T11",
+   "recommendation": "modify",
+   "reason": "Test uses ValidateDatasetAlignment as a positive control that must pass (anchor_promotion_integration_test.go:99-101); rejection comes from ValidateCodeAnchors/checkCodeAnchor/Validate.",
+   "criterion_gap": null,
+   "proposed_change": "retarget TESTED_BY subject to ValidateCodeAnchors and Put/Activate gates"
+  },
+  {
+   "review_id": "F3-T12",
+   "recommendation": "accept",
+   "reason": "Actual CKG DB two snapshots; promote fails, Current/Load unchanged and after reopen (integration_test.go:121-184).",
+   "criterion_gap": "CKV is coordinate-only mock",
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T13",
+   "recommendation": "accept_with_note",
+   "reason": "Baseline restriction (allowed set) and fallback live in applyProvidedOntology (ontology_provider.go:83-145); unverified-relation filtering is ActiveProjection.VerifiedImplementations (semantic/active.go:59-77).",
+   "criterion_gap": null,
+   "proposed_change": "add supporting IMPLEMENTED_BY -> semantic.ActiveProjection.VerifiedImplementations"
+  },
+  {
+   "review_id": "F3-T14",
+   "recommendation": "accept",
+   "reason": "Search calls applyProvidedOntology (searcher.go:362).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T15",
+   "recommendation": "modify",
+   "reason": "Ambiguous case is two proposed concepts with empty CKG fake; no verified concept + unverified relation and no CKG citation.",
+   "criterion_gap": "unverified relation; CKG citation",
+   "proposed_change": "narrow wording; add CHECKED_BY ac-ontology-fallback -> new TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline"
+  },
+  {
+   "review_id": "F3-T16",
+   "recommendation": "accept",
+   "reason": "opted.Search with real store/matcher (ontology_matcher_integration_test.go:117-128).",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "F3-T17",
+   "recommendation": "modify_partial",
+   "reason": "All concepts proposed, 0 relations, CKG fake; evidencev2 comparison builds same refs twice (:154-159).",
+   "criterion_gap": "unverified relation; CKG citation",
+   "proposed_change": "narrow wording to 'ambiguous proposed alias, CKV document hits only'"
+  }
+ ],
+ "claims": [
+  {
+   "review_id": "pilot-claim:P12-P01",
+   "recommendation": "modify",
+   "reason": "Rejection true (internal/setup/maintenance.go:28-85, internal/system/mcp/ops_index.go:113-119); 'review config/project ID' is operator guidance, not checked; scope limited to public maintenance paths.",
+   "criterion_gap": null,
+   "proposed_change": "공개 관리 경로(MCP ops.index/setup/reindex)는 pinned v2 dataset의 제자리 갱신과 legacy 후보 downgrade를 versioned_setup_required로 거부한다. 새 후보는 동일 검토 설정·project ID와 새 버전의 cks setup --version으로 만든다(low-level 엔진 직접 쓰기는 보호 밖)."
+  },
+  {
+   "review_id": "pilot-claim:P12-P02",
+   "recommendation": "accept",
+   "reason": "PUBLIC-CONTRACT-V2.md:27; internal/setup/reindex.go:423-454, durability.go:21-23,230-241. Seed authority field says N03/N04 but doc only N-03.",
+   "criterion_gap": null,
+   "proposed_change": "authority field -> N-03"
+  },
+  {
+   "review_id": "pilot-claim:P12-P03",
+   "recommendation": "accept",
+   "reason": "PUBLIC-CONTRACT-V2.md:110-112; internal/system/evidencev2/pack.go:41-43,93-109,142-151. All-oversize case is budget_exceeded, not partial.",
+   "criterion_gap": null,
+   "proposed_change": "optional: add '(전부 초과면 budget_exceeded)'"
+  },
+  {
+   "review_id": "pilot-claim:P12-P04",
+   "recommendation": "modify",
+   "reason": "WORKSHEET-CATALOG-CONTRACT-V1.md:3; cmd/cks/domaincli/domain.go:403-427. Claim drops '승인'; repository-content claim not code-verifiable.",
+   "criterion_gap": null,
+   "proposed_change": "worksheet 생성은 명시적으로 선택·pin된 local pack catalog만 읽으며, 앵커 검사를 실행하거나 항목을 승인·verified로 승격하지 않는다."
+  },
+  {
+   "review_id": "pilot-claim:P12-P05",
+   "recommendation": "modify",
+   "reason": "SOURCE-SNAPSHOT-ADR.md:61-63 says new captures; legacy GitArchivePolicy=='' path still uses shared worktree (internal/setup/capture.go:473-489).",
+   "criterion_gap": null,
+   "proposed_change": "신규 Git 캡처(snapshot v4 이상)는 기준 HEAD와 선택 복구 커밋 객체를 해시된 history.bundle로 봉인하고 독립 저장소에 복원해 빌드한다. 기존 v2/v3 보관본은 기존 방식으로 읽는다."
+  },
+  {
+   "review_id": "pilot-claim:P12-P06",
+   "recommendation": "accept",
+   "reason": "SOURCE-SNAPSHOT-ADR.md:69; internal/setup/identity.go:70-116, capture.go:748.",
+   "criterion_gap": null,
+   "proposed_change": null
+  }
+ ],
+ "legacy_support_about_relations": [
+  {
+   "review_id": "supports:P12-P01",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "supports:P12-P02",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "supports:P12-P03",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "supports:P12-P04",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "supports:P12-P05",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "supports:P12-P06",
+   "recommendation": "accept",
+   "reason": "section span contains claim line; direction section->claim correct",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "about:P12-P01",
+   "recommendation": "modify",
+   "reason": "claim is about pinned dataset immutability; 'dataset' fits better",
+   "criterion_gap": null,
+   "proposed_change": "ABOUT -> dataset (optionally keep policy)"
+  },
+  {
+   "review_id": "about:P12-P02",
+   "recommendation": "accept_with_note",
+   "reason": "'dataset' excludes mutable active pointer; no better core20 concept",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "about:P12-P03",
+   "recommendation": "accept",
+   "reason": "evidence-pack fits",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "about:P12-P04",
+   "recommendation": "accept_with_note",
+   "reason": "'policy' only partially fits; no worksheet concept in core20",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "about:P12-P05",
+   "recommendation": "accept",
+   "reason": "source-snapshot fits",
+   "criterion_gap": null,
+   "proposed_change": null
+  },
+  {
+   "review_id": "about:P12-P06",
+   "recommendation": "accept",
+   "reason": "source-snapshot fits",
+   "criterion_gap": null,
+   "proposed_change": null
+  }
+ ],
+ "not_reviewed": "core20 concept definitions individually; requirements/criteria wording beyond gap notes",
+ "authority_note": "All 6 claims derive from repository contract docs/ADR, not organization policy with owner/effective date."
+}

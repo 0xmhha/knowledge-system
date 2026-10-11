@@ -12,10 +12,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestH3H4_EvidencePackOnRealGitFixture wires the full H1+H2+H3+H4
-// stack against a real (tiny) git repo to catch regressions that pure
+// TestH3H4_EvidencePackOnRealGitFixture wires the full hunk graph,
+// modifies edges, EvidencePack retrieval and issue-ID extraction stack against a real (tiny) git repo to catch regressions that pure
 // unit tests miss: schema drift in the Hunk QualifiedName format, a
-// confidence filter regression at index time, the H4 doc_comment
+// confidence filter regression at index time, the doc_comment
 // `issues:` encoding, the §11.3 retrieval boundary, and offset paging
 // against an actual recency-sorted commit corpus.
 //
@@ -36,7 +36,7 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 	relPath := "auth.go"
 
 	// Three commits with subjects citing different tickets so we can
-	// assert both H4 extraction (issue_ids surfacing in CommitInfo) and
+	// assert both issue-ID extraction (issue_ids surfacing in CommitInfo) and
 	// recency ordering for offset paging. Each commit modifies the same
 	// file with distinct content so emitHunkGraph produces three Hunks
 	// (one per parent commit).
@@ -71,8 +71,8 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 		}
 	}
 
-	// H4: every Hunk's parent-commit subject cites an issue, so each
-	// Hunk's doc_comment should encode it. Verifies the H4 extractor
+	// Every Hunk's parent-commit subject cites an issue, so each
+	// Hunk's doc_comment should encode it. Verifies the issue-ID extractor
 	// runs on top of the real subject parser, not just the unit-test
 	// regex inputs.
 	hunkBySHA := map[string]types.Node{}
@@ -146,7 +146,7 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 			t.Errorf("AMBIGUOUS commit %s leaked into BuildPack hits", ambSHA)
 		}
 	}
-	// H4 surface: at least one hit must carry CommitInfo.IssueIDs from
+	// Issue-ID surface: at least one hit must carry CommitInfo.IssueIDs from
 	// the doc_comment encoding. (Every fixture commit cites a ticket,
 	// so any reasonable rank ordering hits at least one.)
 	anyIssueIDs := false
@@ -157,7 +157,7 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 		}
 	}
 	if !anyIssueIDs {
-		t.Errorf("no hit surfaced CommitInfo.IssueIDs (H4 surface broken)")
+		t.Errorf("no hit surfaced CommitInfo.IssueIDs (issue-ID surface broken)")
 	}
 
 	// 2) issue_id-only browse: GH-42 should yield exactly the

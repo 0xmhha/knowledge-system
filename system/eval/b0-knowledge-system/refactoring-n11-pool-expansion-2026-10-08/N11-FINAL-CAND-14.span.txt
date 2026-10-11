@@ -1,0 +1,20 @@
+	lines := bytes.SplitAfter(source, []byte{'\n'})
+	if len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
+		lines = lines[:len(lines)-1]
+	}
+	p := Projection{SchemaVersion: SchemaVersion, Snapshot: snapshot, Requirements: pack.Requirements}
+	seen := map[string]bool{}
+	addEvidence := func(prefix string, start, end int) (string, error) {
+		if start < 1 || end < start || end > len(lines) {
+			return "", fmt.Errorf("spec: invalid source span %d-%d", start, end)
+		}
+		content := bytes.Join(lines[start-1:end], nil)
+		digest := sha256.Sum256(content)
+		key := fmt.Sprintf("%s\x00%s\x00%s\x00%d:%d\x00%x", snapshot.ProjectID, snapshot.DatasetID, file, start, end, digest)
+		idHash := sha256.Sum256([]byte(key))
+		id := prefix + ":" + hex.EncodeToString(idHash[:12])
+		p.Evidence = append(p.Evidence, EvidenceSpan{ID: id, Snapshot: snapshot,
+			Kind: SourceDocument, Path: file, StartLine: start, EndLine: end,
+			ContentSHA256: hex.EncodeToString(digest[:]), Extractor: "spec-yaml-v1"})
+		return id, nil
+	}

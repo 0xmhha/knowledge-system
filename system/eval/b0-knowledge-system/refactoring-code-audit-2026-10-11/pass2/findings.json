@@ -1,0 +1,57 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "source_revision": "89834297 (after F1-F6 fixes)",
+ "method": "rebuilt the code graph (106,383 nodes / 253,647 edges) and reran sinks.py/reach.py; then probed classes not covered in pass 1: caller-sized allocations, extreme/negative numeric MCP arguments against a real ckg mcp process (mcp_probe.py), and traversal depth against this repository's graph",
+ "findings": [
+  {
+   "id": "F7",
+   "severity": "low",
+   "confidence": "high",
+   "title": "caller k sized result slices (makeslice panic)",
+   "evidence": "keyword_search k=1e15 and evidence_for_intent k=1e15 panicked with makeslice: cap out of range; mcp-go recovered at the transport, but the error reply had id null, leaving the request unanswered",
+   "fix": "386ed482: capacity capped at candidate count; k*3 over-fetch guarded",
+   "tests": [
+    "pkg/vector/mcp TestHugeKDoesNotPanic (RED keyword_search)",
+    "pkg/graph/evidence TestBuildPack_HugeKDoesNotPanic (RED)"
+   ]
+  },
+  {
+   "id": "F8",
+   "severity": "medium",
+   "confidence": "high",
+   "title": "large ID lists exceeded SQLite's variable limit",
+   "evidence": "on this repository's graph an untyped SubgraphByQname/NeighborhoodByQname failed from depth 4 (edges from 86,715 ids: too many SQL variables); NodesByIDs failed for 40,000 IDs, reachable through POST /api/nodes-by-ids within the 4 MiB body cap",
+   "fix": "d9f7fe13: edge and node lookups split into 400-ID chunks",
+   "tests": [
+    "internal/graph/persist TestLargeIDListsAreQueriedInChunks (RED: too many SQL variables)"
+   ]
+  },
+  {
+   "id": "F9",
+   "severity": "medium",
+   "confidence": "high",
+   "title": "unbounded caller traversal depth",
+   "evidence": "cks find_callers/find_callees/get_subgraph and ckg find_callers/find_callees/get_subgraph passed depth unclamped; untyped depth 3 returned about 122,000 edges and depth 5 allocated over 300 MB (impact_of_change already capped at 5)",
+   "fix": "aa259766: depth clamped to [0, 5] (impact.DepthCap)",
+   "tests": [
+    "internal/system/mcp TestGraphToolsCapTraversalDepth",
+    "pkg/graph/mcphandlers TestTraversalDepthIsCapped"
+   ]
+  }
+ ],
+ "checked_without_defect": [
+  "ckg mcp: negative offset, negative k, malformed FTS query and huge max_bodies/prs_per_node/impact_depth/hop_depth returned results or errors without crashing",
+  "semantic_search, vector_search and find_branches with k=1e15 did not panic",
+  "impact_of_change depth already capped at 5"
+ ],
+ "timing_note": "pkg/graph/mcphandlers tests take about 410-420 s with or without the chunking (load about 11); the chunking did not slow them",
+ "regression": {
+  "revision": "aa259766",
+  "go_test_race": "3274 passed, 16 skipped, 0 failed",
+  "go_vet": "pass",
+  "gofmt": "0 files",
+  "python_script_tests": "164 passed"
+ },
+ "limits": "pass 2 targeted size, depth and panic classes; taint inside functions and interface-dispatched paths remain unanalysed"
+}

@@ -1,5 +1,5 @@
-// Package llmprefix implements Anthropic-style contextual retrieval (roadmap
-// Phase D.2): an LLM writes a one-sentence description of each code chunk, which
+// Package llmprefix implements Anthropic-style contextual retrieval: an LLM
+// writes a one-sentence description of each code chunk, which
 // is prepended to the chunk's embed text so the vector carries situating
 // context. Generation is expensive, so results are disk-cached by chunk content
 // hash and a generation failure degrades to no prefix (the caller falls back to

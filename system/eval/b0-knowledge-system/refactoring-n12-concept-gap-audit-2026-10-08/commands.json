@@ -1,0 +1,6 @@
+{
+  "driver": "go run ./.n12-gap-audit-driver (source saved as gap-audit-driver.go.txt; helper removed after execution)",
+  "focused_tests": "go test -json -count=1 ./internal/setup ./internal/system/semantic ./internal/system/composer/stage2 ./internal/system/evidencev2 ./pkg/vector/types -run ^(TestCaptureNonGitSourceRetainsOldBytesAndDetectsCorruption|TestSourceIdentityLengthPrefixedGolden|TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty|TestPinnedSemanticProjectionCannotCrossDataset|TestAssertionsRequireTypedEndpointsProofAndReview|TestMatchConceptsPreservesAmbiguityAndNaturalLanguage|TestLatinTermNeedsWordBoundary|TestBuildUsesRetainedBytesAndV2Tuple|TestV2IntegrityCoversOptionalOntologyFallback|TestBuildDropsSecretAndRejectsForeignCommit|TestProjectionRejectsCrossSnapshotOrMissingEvidence|TestSnapshotSourceIdentitySeparatesWorkingTreeAndNonGit|TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline|TestFilterMatches|TestFilterIsZero|TestFilterExcludeTests|TestFilterIsZeroCountsExcludeTests)$",
+  "source_refs": "18 spans compared against git show 32d7e264:path, retained VisitRetainedLineSpans and current bytes",
+  "scope_drafts": "not applied to production or immutable candidates"
+}

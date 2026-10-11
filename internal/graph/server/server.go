@@ -18,14 +18,14 @@ import (
 //
 // The store field is the read-only persist.StoreReader interface — server
 // has no business writing to the graph. This narrowing also lets the
-// future PostgreSQL backend (spec §3 / WORK-PLAN B2) plug in without
+// future PostgreSQL backend plug in without
 // rewiring server.
 type Server struct {
 	store     persist.StoreReader
 	mux       *http.ServeMux
 	log       *slog.Logger
 	community communityCache // lazy-loaded topic_tree projection (see community.go)
-	// evidenceCache amortises the H3 BuildPack BM25 corpus across
+	// evidenceCache amortises the evidence BuildPack BM25 corpus across
 	// /api/evidence calls. Manifest-keyed invalidation handles
 	// concurrent `ckg build` rebuilds — see pkg/evidence/cache.go.
 	evidenceCache *evidence.Cache
@@ -88,7 +88,7 @@ func NewWithOptions(store persist.StoreReader, log *slog.Logger, opts Options) *
 // prewarmTicketIndex kicks the BM25 corpus build off the user's first
 // /api/evidence or /api/tickets call. The result is discarded — the
 // cache populates as a side effect of TicketIndex's ensureIndex.
-// Errors are logged at debug level only; a graph without H4 issues
+// Errors are logged at debug level only; a graph without issue IDs
 // returns no rows but populates the corpus all the same, which is
 // the actual goal.
 func (s *Server) prewarmTicketIndex() {
@@ -132,7 +132,7 @@ func (s *Server) routes(opts Options) {
 // ServeHTTP makes Server satisfy http.Handler, primarily so tests can drive
 // it via httptest.NewServer.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.mux.ServeHTTP(w, r)
+	loopbackHostOnly(s.mux).ServeHTTP(w, r)
 }
 
 // ListenAndServe runs the HTTP server until ctx is cancelled. On cancel,
@@ -144,7 +144,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           s.mux,
+		Handler:           s,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {

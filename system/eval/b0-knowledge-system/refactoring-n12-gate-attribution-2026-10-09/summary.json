@@ -1,0 +1,51 @@
+{
+ "schema_version": 1,
+ "problem": "Projection.Validate (validate.go:86) and checkCodeAnchor (ckg_anchor.go:94) both rejected foreign snapshots with a 'crosses project or snapshot' message; tests matched the substring and could not attribute which gate refused a foreign code anchor (pre-review finding for F3-T08/T11).",
+ "change": "Exported typed sentinels ErrEvidenceSnapshotMismatch and ErrCodeAnchorSnapshotMismatch; historical message bytes preserved exactly.",
+ "red": {
+  "description": "Sentinels declared but not returned; TestForeignCodeAnchorPromotionPreservesActiveDataset failed: 'actual old graph DB was not rejected: semantic: code anchor crosses project or snapshot'",
+  "file": "red-before-wiring.txt",
+  "note": "an earlier compile-only RED (undefined identifiers) preceded this behavioral RED"
+ },
+ "green": {
+  "command": "go test -race -count=1 -json <8 packages importing internal/system/semantic>",
+  "packages": [
+   "github.com/0xmhha/knowledge-system/cmd/cks/mcpcli",
+   "github.com/0xmhha/knowledge-system/cmd/cks/semanticcli",
+   "github.com/0xmhha/knowledge-system/internal/system/composer/stage2",
+   "github.com/0xmhha/knowledge-system/internal/system/evidencev2",
+   "github.com/0xmhha/knowledge-system/internal/system/knowledgepack",
+   "github.com/0xmhha/knowledge-system/internal/system/mcp",
+   "github.com/0xmhha/knowledge-system/internal/system/patch",
+   "github.com/0xmhha/knowledge-system/internal/system/semantic"
+  ],
+  "exit": 0,
+  "tests_pass": 251,
+  "subtests_pass": 264,
+  "fail": 0,
+  "skip": 0,
+  "go_vet": "pass",
+  "gofmt": "clean",
+  "go_version": "go version go1.26.8 darwin/arm64",
+  "env_scoped": {
+   "GIT_CONFIG_COUNT": "1",
+   "GIT_CONFIG_KEY_0": "commit.gpgsign",
+   "GIT_CONFIG_VALUE_0": "false"
+  }
+ },
+ "attribution_verified": {
+  "foreign-evidence-snapshot": "ErrEvidenceSnapshotMismatch only",
+  "stale-actual-graph-with-matching-JSON": "ErrCodeAnchorSnapshotMismatch only",
+  "activation (both paths)": "ErrCodeAnchorSnapshotMismatch only",
+  "relabelled-foreign-source-bytes / missing-actual-canonical": "neither sentinel"
+ },
+ "compatibility": "Error() strings unchanged byte-for-byte (asserted in TestProjectionRejectsCrossSnapshotOrMissingEvidence); no non-test consumer matched the strings (git grep).",
+ "not": [
+  "semantic linked run",
+  "relation verified",
+  "human criterion accepted",
+  "new FINAL",
+  "model call"
+ ],
+ "reviewed_candidate_unchanged": "36353d32/672eae93/1e82983e (does not include this change)"
+}

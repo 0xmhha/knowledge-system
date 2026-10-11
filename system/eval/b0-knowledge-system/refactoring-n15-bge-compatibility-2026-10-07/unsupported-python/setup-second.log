@@ -1,0 +1,36 @@
+setup: --version auto resolved to a8477071
+==> [graph-build] Build the graph index
+    resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)
+    time=2026-10-07T14:06:19.967+09:00 level=INFO msg="detected files" go=0 ts=0 sol=0 proto=0
+    time=2026-10-07T14:06:19.967+09:00 level=INFO msg="http client matching" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0
+    time=2026-10-07T14:06:20.082+09:00 level=INFO msg="temporal G6 emitted" commit_nodes=2 hunk_nodes=3 changed_in_edges=0 blame_edges=0 hunk_edges=3 hunk_blobs=3 max_per_file=10
+    time=2026-10-07T14:06:20.123+09:00 level=INFO msg="build complete" nodes=5 edges=3 pkg_tree_edges=0 topic_resolutions=3
+    ckg: built 5 nodes / 3 edges into /private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071/graph
+<== [graph-build] done
+==> [vector-preflight] Preflight the Ollama embedder
+    Ollama reachable at http://localhost:11434; model "bge-m3:latest" present (bge-m3:latest)
+<== [vector-preflight] done
+==> [vector-build] Build the vector index aligned to the graph
+    time=2026-10-07T14:06:20.180+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=d8f0d1f5a16d4507 run_id=3dfc0e5ad2063e68 languages_filter=[] extra_ignore_count=0 file_header_lines=0 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4264085779/tree has_ckv_yaml=false
+    time=2026-10-07T14:06:20.180+09:00 level=INFO msg=ckv event=build.start trace_id=c7957f29a6b8f1e9 run_id=3dfc0e5ad2063e68 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4264085779/tree out_dir=/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071/vector embedder=bge-m3:latest embedder_provider=""
+    time=2026-10-07T14:06:20.207+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=d6279c945007df01 run_id=3dfc0e5ad2063e68 ckg_path=/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071/graph files_indexed=0 entries=0 canonical_available=true
+    ckv: 1/1 files (16.4 files/s, elapsed 0s, ETA 0s)
+    time=2026-10-07T14:06:20.280+09:00 level=INFO msg=ckv event=build.done trace_id=c7957f29a6b8f1e9 run_id=3dfc0e5ad2063e68 latency_ms=99 out_dir=/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071/vector chunks_flow_step=0 chunks_doc=1 policy_loaded=false files_indexed=1 chunks_flow_spine=0 chunks_symbol=0 chunks_canonical_id=0 indexed_head=a847707130f346d389adff3be5f4b75da75c343c chunks_file_header=0 category_counts=map[:1] embedder=bge-m3:latest chunks_truncated=0 embedder_provider="" languages=map[markdown:1] chunks_total=1 db_sha256=5d65a5bfe6a6dde8c646cb95b29bc933111f4d8e5275612ff9bacc1f3f46ef8e src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-4264085779/tree
+    ckv: indexed 1 files → 1 chunks (0 symbol, 1 doc, 0 header, 0 truncated)
+    ckv: canonical_id 0/0 symbols aligned · flow 0 step / 0 spine
+    ckv: indexed_head=a847707130f346d389adff3be5f4b75da75c343c built_at=2026-10-07T05:06:20Z db=/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071/vector/vector.db sha256=5d65a5bfe6a6dde8c646cb95b29bc933111f4d8e5275612ff9bacc1f3f46ef8e
+<== [vector-build] done
+==> [verify-align] Verify graph/vector alignment
+<== [verify-align] done
+    ── schema ──  errors=0  warnings=0  info=0
+ !  [reindex-gate] canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+    ckg audit (go)
+      build files: 0
+      db files:    0
+      in both:     0
+      in build only (missing from DB): 0
+      in db only (over-included):       0
+    verdict: PARITY
+<== [reindex-promote] done
+setup: promoted /private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-n15-native-mik8rs_b/real-bge-installs/unsupported-python/dataset/a8477071 to current
+note: running MCP servers still serve the previously opened dataset; restart them to pick up the new current

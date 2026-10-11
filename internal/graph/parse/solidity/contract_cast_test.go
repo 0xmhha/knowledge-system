@@ -6,21 +6,21 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W8 V0 — contract-type cast dispatch.
+// Contract-type cast dispatch.
 //
 // `MyContract(addr).method()` is the concrete-contract sibling of
-// `IInterface(addr).method()` (W3). The AST shape is identical;
+// `IInterface(addr).method()` (interface dispatch). The AST shape is identical;
 // only the resolver target index differs (byName[NodeContract]
 // instead of byName[NodeInterface]).
 //
-// V0 scope (mirrors W3 / W7.1 conventions):
+// Scope (mirrors the interface-dispatch / low-level-call conventions):
 //   - One EdgeInvokes per matched call_expression.
 //   - DispatchKind = "contract_cast".
 //   - Confidence = ConfAmbiguous (runtime address determines the
-//     real target, same as W3).
+//     real target, same as interface dispatch).
 //   - Unresolved type name (no NodeContract with that name) drops
 //     the edge.
-//   - When the cast target is also a known Interface, W3 emits
+//   - When the cast target is also a known Interface, interface dispatch emits
 //     instead; the two walkers don't double-emit because they query
 //     disjoint name indices (NodeContract vs NodeInterface).
 
@@ -46,7 +46,7 @@ func TestContractCast_Dispatch(t *testing.T) {
 	}
 
 	// Both calls in Caller.forward target Vault.deposit / Vault.withdraw.
-	// V0 resolves at TypeName level so the Dst is the function node
+	// Resolution happens at TypeName level so the Dst is the function node
 	// (Vault.deposit or Vault.withdraw); the test asserts (Src, Dst).
 	type pair struct{ src, dst string }
 	gotPairs := map[pair]int{}

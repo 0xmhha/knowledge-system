@@ -30,7 +30,7 @@ func (p *prInjectingStore) GetNodePRs(nodeID string, _ time.Time) ([]types.PRRef
 
 // TestBuildContext_PRsOptIn verifies the 1-shot retrieval contract:
 // without IncludePRs the response carries no recent_prs key at all,
-// matching the pre-P0 #2 shape that the eval δ baseline + existing
+// matching the original response shape that the eval δ baseline + existing
 // MCP consumers rely on for cache stability.
 func TestBuildContext_PRsOptIn(t *testing.T) {
 	store := newFixtureStore(t)

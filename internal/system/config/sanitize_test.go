@@ -222,7 +222,7 @@ func TestRepoBaselineLoads(t *testing.T) {
 	if err != nil {
 		t.Fatalf("policies/sanitization_rules.yaml: %v", err)
 	}
-	// Phase-0 baseline must include at least the private-key fail-closed rule.
+	// The baseline must include at least the private-key fail-closed rule.
 	fc := rs.FailClosedRules()
 	if len(fc) == 0 {
 		t.Fatal("baseline ruleset has no fail_closed rules; private keys must be hard-stopped")

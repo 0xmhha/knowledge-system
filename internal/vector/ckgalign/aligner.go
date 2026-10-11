@@ -83,7 +83,7 @@ func Load(ckgPath string) (*Index, error) {
 	canonicalAvailable := false
 	if hasCanonical {
 		canonicalSel = "COALESCE(canonical_id,'')"
-		// Agreed gate (ADR-007 / coordination D-2): canonical_id is only a
+		// Agreed gate (ADR-007): canonical_id is only a
 		// trustworthy join key on a ckg cache at manifest schema_version
 		// >= 1.19 (the column exists from 1.16 but is populated only from
 		// 1.19). Prefer the recorded schema_version from the in-db manifest

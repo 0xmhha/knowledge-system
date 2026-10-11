@@ -14,12 +14,12 @@
 //     in the output so the caller knows a citation existed; only the
 //     text is suppressed.
 //  3. mask: each match is replaced with MaskToken (default "***").
-//     Phase-0 baseline ruleset uses no mask rules; operators can opt
+//     The baseline ruleset uses no mask rules; operators can opt
 //     in via a custom ruleset, accepting the documented LLM-exposure
 //     trade-off (see contract.RedactionMask doc).
 //
 // Stage 5 takes a generic []Sanitizable input (not budget.SelectedItem)
-// so B.8 wire-up can choose either sanitize-before-budget or
+// so the composer wire-up can choose either sanitize-before-budget or
 // sanitize-after-budget ordering.
 package sanitize
 
@@ -49,7 +49,7 @@ type Config struct {
 	MaskToken string
 }
 
-// DefaultConfig returns the Phase-0 tuning baseline.
+// DefaultConfig returns the baseline tuning.
 func DefaultConfig() Config {
 	return Config{MaskToken: DefaultMaskToken}
 }
@@ -57,7 +57,7 @@ func DefaultConfig() Config {
 // Sanitizable is one body to sanitize. Stage 5 deliberately takes a
 // generic shape so it composes with either Stage 4 (budget.SelectedItem)
 // or directly with Stage 3 output (citations + freshly-fetched bodies),
-// depending on the wire-up order B.8 chooses.
+// depending on the wire-up order the composer chooses.
 type Sanitizable struct {
 	Citation contract.Citation
 	Body     string

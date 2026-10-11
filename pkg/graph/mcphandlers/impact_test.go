@@ -266,13 +266,13 @@ func TestImpact_Citation(t *testing.T) {
 }
 
 // TestImpact_SelfGraph runs the impact tool against a self-built graph of
-// the CKG repo so we dogfood the tool on a non-toy corpus. Skipped by
+// the CKG repo so the tool is exercised on a non-toy corpus. Skipped by
 // default to keep CI fast; set CKG_SELF_GRAPH_DB to the path of a graph.db
 // produced by `ckg build --src=. --out=<dir>` to enable.
 func TestImpact_SelfGraph(t *testing.T) {
 	dbPath := os.Getenv("CKG_SELF_GRAPH_DB")
 	if dbPath == "" {
-		t.Skip("CKG_SELF_GRAPH_DB not set; skipping self-graph dogfood")
+		t.Skip("CKG_SELF_GRAPH_DB not set; skipping self-graph test")
 	}
 	store, err := persist.OpenReadOnly(dbPath)
 	if err != nil {
@@ -501,7 +501,7 @@ func TestImpact_Deterministic_100(t *testing.T) {
 	}
 }
 
-// TestImpact_SelfGraph_Deterministic dogfoods determinism on the project's
+// TestImpact_SelfGraph_Deterministic checks determinism on the project's
 // own self-graph (CKG built from itself). Skipped unless CKG_SELF_GRAPH_DB
 // is set so CI stays fast. Like TestImpact_SelfGraph but asserts byte
 // equality of two back-to-back calls.

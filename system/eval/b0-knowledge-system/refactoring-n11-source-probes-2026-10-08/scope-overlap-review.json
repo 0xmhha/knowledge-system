@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "reviews": [
+    {
+      "probe": "N11-PROBE-P01",
+      "path": "docs/spec-driven/EXECUTION.md",
+      "line": 100,
+      "file_sha256": "203d3380952c42b8ad5bac39bc2350959bdc017502e6e4ec532c9d1652dc0b2a",
+      "line_text": "A4 source-mode and v2 evidence checkpoint (2026-10-01): Versioned `cks setup --source-mode working-tree|snapshot-only --project-id ...` now calculates the mode-specific pre-build ID, captures tracked edits/new files or non-Git regular files, materializes a disposable source tree outside the source repository, passes the same IDs to both engines, reconciles their discovered files with the capture, and rejects source or configured-input drift before promotion. `scripts/wbs-source-modes-smoke.sh` built four working-tree snapshots (clean, modified, added, remodified) with four distinct snapshot IDs plus one non-Git dataset using the mock embedder. It checked JSON/SQLite pins and retained blob hashes, then ran a gate command that changed the original source: the candidate test passed but the post-gate snapshot check kept `current` on the prior version. `cks doctor` reports `base_history_only` for working-tree and `history_unavailable` for non-Git; a changed working tree does not invalidate the archived active candidate. `cks init` can create a non-Git `snapshot-only` setup config. The new `cks.context.get_for_task_v2` DTO uses retained original line hashes, sanitizes archived body bytes, keeps `commit_hash` empty for non-committed modes, deduplicates by full v2 coordinates, and hashes the v2 object with sorted JSON properties after excluding `integrity_hash`; an independent JavaScript golden and tamper/drop tests pass. All legacy `cks.context.*` tools refuse non-committed pinned datasets with `requires_v2`. CKS MCP mounts verified archived bytes as its graph/vector/budget source root. A real MCP smoke changes a non-Git file from Alpha to Zeta after indexing, observes old Alpha in v2 body, no Zeta, checks the independent hash, and sees v1 tool refusal. Direct CKV query requires an explicit retained-source mount for non-committed datasets. `go test ./...`, vet, boundaries, docs-check and the source-mode smoke pass on macOS arm64. **A4 is still open:** external source origins, stronger no-follow race guarantees, per-file CKV input hashes, full v2 semantic/graph overlays and error-envelope conformance remain. The v2 tool is a guarded partial implementation, not a Gate-A acceptance claim.",
+      "line_sha256": "71f4d7c1ee080a4cfd1c338496671a22770e38e1f2a55d5086540be232ea5f91",
+      "risk": "legacy source-mode refusal was previously documented"
+    },
+    {
+      "probe": "N11-PROBE-P02",
+      "path": "docs/spec-driven/KNOWLEDGE-PACK-IMPLEMENTATION.md",
+      "line": 29,
+      "file_sha256": "903cc99ce119a84b6f7c1d02bcb6fc95e15a1a055f2b05a52fa26452874b6c61",
+      "line_text": "선택 팩은 현재 프로젝트 루트 아래의 상대 경로만 받는다. `pack.yaml`의 `pack_schema_version: 1`, `pack_id`, `version`, `owner`, `scope`, `requires`, `concepts`, `relation_types`, `constraints`, `competency_questions`를 엄격하게 파싱한다. 참조 키는 `(pack_id, local_id)` 튜플이다. 서로 다른 팩에 같은 로컬 ID가 있어도 자동 병합하지 않는다. `core` 네임스페이스의 타입 참조는 고정된 20개에서만 찾는다. 누락·해시 불일치·중복·순환 의존, 잘못된 관계 끝점과 상속 순환은 오류다. 파일 인벤토리는 링크/비정규 파일/대소문자 충돌/숨김 파일을 거부하고 macOS·Linux에서는 경로 성분을 no-follow로 연다.",
+      "line_sha256": "118a1e198c955c788d53340bf206f582e918a052516af710fe2b0021cf8e2a62",
+      "risk": "broader local relative source/link admission already documented; precise helper differences need independent semantic review"
+    },
+    {
+      "probe": "N11-PROBE-P06",
+      "path": "docs/spec-driven/SEMANTIC-CONTRACT.md",
+      "line": 15,
+      "file_sha256": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+      "line_text": "`cks semantic build`는 문서 섹션의 원문 파일·커밋·줄 범위와 겹치는 실제 CKV Markdown `doc` 청크를 조회해 `DocumentSection.chunk_ids`에 안정 ID를 기록하고, 연결된 섹션 수를 출력한다. 청크가 없는 섹션은 비어 있는 목록으로 남아 있어 연결률을 확인할 수 있다. 승격·활성화·활성 조회는 **기록된 청크 ID가 현재 CKV DB의 동일 파일·커밋·줄 위치를 여전히 가리키는지** 다시 검사한다. 삭제되거나 다른 위치에 재사용된 ID는 의미 경로를 반환하지 않는다. 원문 `EvidenceSpan` 해시 검증과 CKV 청크 조인은 별도 검사다.",
+      "line_sha256": "02085cdea3e8b40b88c89546acfb173df2b7bceac67bf474050f2e432fd2770f",
+      "risk": "CKV coordinate join and linked sections already documented"
+    },
+    {
+      "probe": "N11-PROBE-P07",
+      "path": "docs/spec-driven/SEMANTIC-CONTRACT.md",
+      "line": 59,
+      "file_sha256": "1090a37ebbed29bc5a2fd364605235989fbd7c3d23cdee27af1484db3aedddc1",
+      "line_text": "검토된 의미 텍스트는 `cks semantic export-text --project-id <id> --repo <repo> --graph <graph-dir> --vector <vector-dir> --store <semantic.db> --out <new-corpus-dir>`로 별도 디렉터리에 출력할 수 있다. 출력은 `verified` 개념·요구사항만 포함하고 ID 순서에 따라 결정적인 Markdown 파일명·내용을 생성한다. `manifest.json`은 원본 저장소, 커밋, 의미 투영 SHA-256과 모든 Markdown 바이트의 SHA-256을 기록한다. 제안·거부 상태의 항목은 제외된다. `cks setup --src <repo> --out <dataset> --version <new-version> --semantic-corpus <new-corpus-dir> ...`는 그래프 빌드 후 코퍼스의 저장소·커밋·파일 목록·해시를 검증한 다음 CKV의 추가 문서 루트로 전달한다. 바이트 변경, 다른 프로젝트, 추가 Markdown은 벡터 빌드 전 실패하며 활성 데이터셋은 유지된다. 현재 스모크는 mock 임베더의 구조 검색만 검증한다. 자연어 품질이 입증될 때까지 온톨로지 재순위 기본값은 그대로 꺼져 있다.",
+      "line_sha256": "23378e08a8c797aa296cb90592527963d63550dc997c4cfa946640a197aa39d0",
+      "risk": "deterministic corpus filename/content and manifest digests already documented; exact ID truncation is not automatically a new fact unit"
+    },
+    {
+      "probe": "N11-PROBE-P08",
+      "path": "docs/spec-driven/REFACTORING-ORIGINAL-GOALS-REAUDIT.md",
+      "line": 61,
+      "file_sha256": "cab284ad3c86e921a1b10ec8235ccc8749f5538453312aad3198d6d02632e5ba",
+      "line_text": "| W4.3 | 변경 계획/팩 주석: `semantic/plan.go`, `pack.go` | 읽기 전용 계획·unconfirmed·근거 범위 유지 구현 | N-14–15 실제 적용/소비자 |",
+      "line_sha256": "f834c0db2090d9f4a9d5987196233f7058bc8b0559b11e4ba19e3da88c725b3d",
+      "risk": "read-only unconfirmed plans already documented"
+    },
+    {
+      "probe": "N11-PROBE-P05",
+      "path": "system/docs/composer/stage3-scoring.md",
+      "line": 120,
+      "file_sha256": "767eeae4ed7454836d39471c8fde941fab038affe86f027c0df1034861331d96",
+      "line_text": "over-weighting popularity.",
+      "line_sha256": "40bfbe0669c2d50efe881e91d5f9fbb9a8751ff5051b1d98f3a4bd6215966096",
+      "risk": "prior multi-path max aggregation design"
+    },
+    {
+      "probe": "N11-PROBE-P03",
+      "path": "internal/system/composer/budget/tokens.go",
+      "first": 5,
+      "last": 24,
+      "file_sha256": "025216cc0819f2e89c9cb5684edef7e020167baba1c07385f510b0ba9be417d0",
+      "content_sha256": "5feb3d2c00f698270444e1d1286097900df67f2fa4a987fc3759cec4dd8cef11",
+      "risk": "committed implementation describes prior heuristic or measured tuning history; not a newly demonstrated independent FINAL fact"
+    },
+    {
+      "probe": "N11-PROBE-P04",
+      "path": "internal/system/composer/stage1/rerank.go",
+      "first": 42,
+      "last": 57,
+      "file_sha256": "514d4a0d972c9e5882308f6bc8a7a93a14482c6bea873cc35825dee3eff22e0d",
+      "content_sha256": "c2c70ad6f9e695c8839521f34828a47e5536efe38d8ee925c246c78026b3e921",
+      "risk": "committed implementation describes prior heuristic or measured tuning history; not a newly demonstrated independent FINAL fact"
+    }
+  ],
+  "disposition": "six quarantined, two source-backed drafts withheld pending semantic overlap/independence review; none added to runnable book",
+  "actual_human_decisions": 0,
+  "existing_approved_inputs_modified": false
+}

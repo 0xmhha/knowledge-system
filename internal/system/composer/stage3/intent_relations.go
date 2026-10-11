@@ -5,8 +5,8 @@ import "github.com/0xmhha/knowledge-system/pkg/system/contract"
 // intentToRelations returns the graph relations Stage 3 should traverse
 // for the given Intent.
 //
-// Mapping rationale (Phase-0 baseline). Specific suspicions to verify
-// against PR #70 data in Phase E are documented in
+// Mapping rationale (baseline). Specific suspicions to verify
+// against PR #70 data are documented in
 // docs/composer/stage3-scoring.md §3.
 //
 //   - BugFix:            called_by + calls — trace bug origin and downstream
@@ -98,7 +98,7 @@ func intentToRelations(intent contract.Intent) []contract.Relation {
 //
 // Depth=3 was considered for Security but rejected: cost grows
 // exponentially with fan-out, and signal-to-noise drops fast beyond
-// 2 hops. Phase E may revisit per-Intent depth tuning.
+// 2 hops. Per-Intent depth tuning may be revisited after evaluation.
 func intentToHops(intent contract.Intent) int {
 	switch intent {
 	case contract.IntentBugFix,

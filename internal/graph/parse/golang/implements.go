@@ -8,7 +8,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// implements.go (P0): emits implements / extends edges by walking each loaded
+// implements.go emits implements / extends edges by walking each loaded
 // package's top-level type names and asking go/types whether each concrete
 // type satisfies each interface.
 //

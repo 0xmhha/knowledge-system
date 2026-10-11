@@ -7,7 +7,7 @@
 // The server runs in-process via httptest (no port allocation, no
 // cleanup races). Each endpoint is hit `iterations` times sequentially
 // per worker, with `concurrency` workers in parallel — the same load
-// profile the dogfood plan calls "warm cache, steady-state read".
+// profile as a "warm cache, steady-state read" benchmark.
 //
 // MCP tool latency is intentionally out of scope: the stdio transport
 // would require subprocess spawning and JSON-RPC framing, which

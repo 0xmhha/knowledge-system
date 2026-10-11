@@ -28,7 +28,7 @@ type Edge struct {
 // IMPORTANT: this is structural depth, NOT the spec §5.4 L0..L4 LOD band.
 // Deep monorepos (a/b/c/d package nesting) produce levels >4 (unbounded above:
 // depth-N package nesting yields file at level N+1, function at level N+2, etc.).
-// The viewer's LOD wiring (T23) must derive the LOD band from node.Type
+// The viewer's LOD wiring must derive the LOD band from node.Type
 // independently rather than reading PkgTree.level directly.
 type PkgTree struct {
 	parent map[string]string

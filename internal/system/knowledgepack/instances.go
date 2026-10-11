@@ -103,6 +103,7 @@ type Instances struct {
 	Decisions  []Decision         `json:"decisions"`
 	Relations  []RelationInstance `json:"relations"`
 	TraceLinks []TraceLink        `json:"trace_links"`
+	Unknowns   []DeclaredUnknown  `json:"unknowns"`
 	Reviews    []ReviewRecord     `json:"reviews"`
 	Conflicts  []Conflict         `json:"conflicts"`
 }
@@ -259,7 +260,7 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	if minApprovals < 1 {
 		return Instances{}, fmt.Errorf("evidence_unverified: invalid review quorum")
 	}
-	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, TraceLinks: []TraceLink{}, Reviews: []ReviewRecord{}, Conflicts: []Conflict{}}
+	result := Instances{Policies: []Policy{}, Decisions: []Decision{}, Relations: []RelationInstance{}, TraceLinks: []TraceLink{}, Unknowns: []DeclaredUnknown{}, Reviews: []ReviewRecord{}, Conflicts: []Conflict{}}
 	types := map[TypeRef]bool{}
 	relationTypes := map[TypeRef]RelationType{}
 	for _, loaded := range packs {
@@ -287,6 +288,7 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 				name == "relations" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "reviews" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "trace-links" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "unknowns" && filepath.Ext(entry.Name()) != ".yaml" ||
 				name == "decisions" && filepath.Ext(entry.Name()) != ".md" {
 				return fmt.Errorf("evidence_unverified: unsupported %s file %q", name, entry.Name())
 			}
@@ -382,6 +384,23 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	}); err != nil {
 		return Instances{}, err
 	}
+	if err := readDir("unknowns", func(rel string, buf []byte) error {
+		var u DeclaredUnknown
+		if err := decodeYAML(buf, &u); err != nil {
+			return fmt.Errorf("evidence_unverified: declared unknown %q: %w", rel, err)
+		}
+		if err := validateDeclaredUnknown(u, rel); err != nil {
+			return err
+		}
+		if seen[u.ID] {
+			return fmt.Errorf("evidence_unverified: duplicate instance ID %q", u.ID)
+		}
+		seen[u.ID] = true
+		result.Unknowns = append(result.Unknowns, u)
+		return nil
+	}); err != nil {
+		return Instances{}, err
+	}
 	if err := readDir("reviews", func(rel string, buf []byte) error {
 		var record ReviewRecord
 		if err := decodeYAML(buf, &record); err != nil {
@@ -408,6 +427,11 @@ func LoadInstancesWithReviewPolicy(overlayRoot string, packs []LoadedPack, minAp
 	}
 	for _, relation := range result.Relations {
 		if err := validateRelation(relation, strings.TrimPrefix(relation.SourceRef.Path, ".cks/knowledge/"), relationTypes, policyByID, decisionByID); err != nil {
+			return Instances{}, err
+		}
+	}
+	for _, u := range result.Unknowns {
+		if err := validateDeclaredUnknown(u, strings.TrimPrefix(u.SourceRef.Path, ".cks/knowledge/")); err != nil {
 			return Instances{}, err
 		}
 	}

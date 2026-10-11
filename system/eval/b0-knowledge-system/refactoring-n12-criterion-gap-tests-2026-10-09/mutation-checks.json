@@ -1,0 +1,26 @@
+{
+ "schema_version": 1,
+ "test": "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+ "mutations": [
+  {
+   "id": "M1",
+   "change": "remove post-vec0-loop ctx.Err status return (store.go)",
+   "result": "test passed (survived)",
+   "explanation": "cancellation also observed by later checkpoints/driver; redundant guard"
+  },
+  {
+   "id": "M2",
+   "change": "remove per-chunk ctx.Err in searchExact",
+   "result": "test passed (survived)",
+   "explanation": "redundant with driver QueryRowContext ctx check"
+  },
+  {
+   "id": "M3",
+   "change": "M1+M2 and remove exact-path interrupted status mapping",
+   "result": "test failed: checkpoint 1: cancellation must be a status, not an error",
+   "explanation": "test detects loss of cancellation-as-status contract"
+  }
+ ],
+ "product_files_restored": true,
+ "note": "Mutations were temporary local edits restored with git checkout; product store.go unchanged."
+}

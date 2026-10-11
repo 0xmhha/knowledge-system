@@ -13,7 +13,7 @@ import (
 // register* smoke tests — verify that each registration helper reaches
 // s.AddTool without panicking. The anonymous handler closures remain
 // uncovered (they require a live MCP call); coverage of the wrapper code
-// around them is sufficient for V1 maintenance.
+// around them is sufficient for routine maintenance.
 // ---------------------------------------------------------------------------
 
 func TestRegisterFindSymbol(t *testing.T) {

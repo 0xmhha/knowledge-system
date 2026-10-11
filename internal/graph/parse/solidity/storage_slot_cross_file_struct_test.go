@@ -6,9 +6,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V16 — cross-file struct size propagation audit.
-// Mirrors V15's cross-file enum lock for the struct case. W9 V5
-// added a per-file structSizes index that routes same-file
+// Cross-file struct size propagation audit.
+// Mirrors the cross-file enum lock for the struct case. A
+// per-file structSizes index routes same-file
 // struct-typed state vars through advanceForArrayField with the
 // computed sum-of-field-bytes. Cross-file struct references
 // (`Ext.Pair` after `import "./types_lib.sol" as Ext`) stay
@@ -17,10 +17,10 @@ import (
 // which forces a fresh slot when the current one is partially
 // used).
 //
-// V16 locks the current conservative behaviour. Promoting to
+// This test locks the current conservative behaviour. Promoting to
 // actual cross-file size propagation needs a globalStructSizes
 // index aggregated across ParseResults and a Pass-2 post-pass
-// that updates SlotIndex retroactively — same scope as the V15
+// that updates SlotIndex retroactively — same scope as the
 // enum-side carry-over.
 //
 // A future regression that loosens the per-file lookup (e.g. by
@@ -34,7 +34,7 @@ func TestStorageSlot_CrossFileStructConservative(t *testing.T) {
 
 	want := map[string]int{
 		"Holder.head": 0,
-		"Holder.pair": 1, // V16 lock: cross-file struct → full slot
+		"Holder.pair": 1, // locked: cross-file struct → full slot
 		"Holder.tail": 2,
 	}
 	got := map[string]int{}

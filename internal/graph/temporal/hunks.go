@@ -1,5 +1,5 @@
 // Package temporal — hunks.go extracts unified-diff hunks from `git log -p`,
-// the foundation for the CKS G6 Hunk-graph (schema 1.8 H1 stage). Each
+// the foundation for the hunk graph (schema 1.8). Each
 // HunkInfo is one contiguous block of changed lines in one file in one
 // commit; the buildpipe layer turns these into NodeHunk rows + has_hunk /
 // adjacent edges, with the gzip-compressed unified-diff text persisted as
@@ -76,8 +76,7 @@ type HunkInfo struct {
 //
 // Why --no-renames: matches LoadHistory's flag set so changed_in (file-level)
 // and has_hunk (per-hunk) agree on the path identity. Renames appear as
-// delete+add hunk pairs; the H2 modifies-edge pass that lands later in this
-// schema bump can re-link them via AST overlap if needed.
+// delete+add hunk pairs; the modifies-edge pass can re-link them via AST overlap if needed.
 //
 // Why --no-merges: merge commits' patches are noisy (they show the resolution
 // against one parent, not the actual code change), and the few cases where
@@ -190,7 +189,7 @@ func parseHunkStream(r io.Reader) ([]HunkInfo, error) {
 		case strings.HasPrefix(line, "Binary files "):
 			// Binary diffs have no @@; record a zero-content Hunk for
 			// traceability so downstream "what touched this file" queries
-			// still see them. modifies-edge emission (H2) ignores binary
+			// still see them. modifies-edge emission ignores binary
 			// hunks because there's no line interval to overlap.
 			if currentSHA == "" || currentFile == "" {
 				continue

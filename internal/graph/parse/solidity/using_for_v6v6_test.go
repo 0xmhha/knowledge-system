@@ -7,13 +7,13 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V6 — named-import alias path hint for homonym
+// Named-import alias path hint for homonym
 // disambiguation.
 //
 // `import {origMul as mul} from "./math_alpha.sol";` creates a
 // named-import alias `mul`. A `using {mul as *}` directive in the
 // same file binds via the importAliases map (alias `mul` ->
-// original `origMul`). V6 also records the source path
+// original `origMul`). The parser also records the source path
 // "./math_alpha.sol" in importPaths so resolveUsingForRef can
 // prefer the math_alpha.sol candidate over the math_beta.sol
 // homonym.

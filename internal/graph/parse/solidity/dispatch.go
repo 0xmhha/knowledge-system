@@ -7,10 +7,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W3 — Interface-typed dynamic dispatch (`IFoo(addr).bar(...)`).
+// Sol interface-typed dynamic dispatch (`IFoo(addr).bar(...)`).
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §3.4, §4.3
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 5 W-C W3.
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §3.4, §4.3
 //
 // Scope: the canonical Solidity idiom for calling a method on an
 // externally-supplied contract address through a known interface type:
@@ -32,7 +31,7 @@ import (
 //	      .property = identifier "bar"  ← the method being invoked
 //	  call_argument(s)                ← arguments forwarded to bar(...)
 //
-// Per §5.0 Q5 (decided 2026-05-11):
+// Per §5.0 Q5:
 //   - All resolved interface-dispatch edges land at ConfAmbiguous, *regardless*
 //     of whether the resolution crossed a file boundary or any implementer
 //     could be located. Rationale: the dispatch target is determined by the
@@ -43,15 +42,16 @@ import (
 //     so this confidence label keeps the data lossless for human inspection
 //     without contaminating model context.
 //   - Unresolved type names (identifier does not match any known
-//     NodeInterface) are dropped (V0 — same strict purge policy as W1/W2;
+//     NodeInterface) are dropped (same strict purge policy as inheritance and
+//     override resolution;
 //     keeps the AMBIGUOUS bucket scoped to *real* interface dispatch only).
 //
-// Out of scope for W3 (separate dispatches):
+// Out of scope here (separate detectors):
 //   - Plain contract-typed casts `MyContract(addr).foo()` — solc accepts
 //     these but they are not interface dispatch; covered in a future
 //     spec when contract-type tracking is added.
-//   - `using For` library extension (W6).
-//   - `super.foo()` body walk — declarative override edges (W2) cover the
+//   - `using For` library extension.
+//   - `super.foo()` body walk — declarative override edges cover the
 //     declaration-time relationship; super-call resolution is a separate
 //     dispatch that shares this detector's enclosing-function lookup.
 //   - Low-level `addr.call(...)`, `delegatecall`, `staticcall` — out of
@@ -108,8 +108,8 @@ func (v *declVisitor) runDispatch() {
 			fnQ, fnStart, fnOK := nearestFunctionQnameAndStart(&memberNode, v.src)
 			if !fnOK {
 				// Top-level free function / file-scoped expression — no
-				// enclosing function to attribute the call to. V0 drops
-				// these; real Sol code keeps dispatch inside functions.
+				// enclosing function to attribute the call to. These are
+				// dropped; real Sol code keeps dispatch inside functions.
 				continue
 			}
 			v.pending = append(v.pending, parse.PendingRef{
@@ -134,8 +134,8 @@ func (v *declVisitor) runDispatch() {
 //     left-recursion handler — every value position is wrapped in one.
 //  3. The cast call's `function` field descends through `expression` to a
 //     plain `identifier` (the type name). Rejects `lib.IFoo(addr).bar()`
-//     (member_expression there → not interface dispatch in V0;
-//     qualified-name support tracked alongside W1's known limitation).
+//     (member_expression there → not treated as interface dispatch;
+//     qualified names share the inheritance resolver's known limitation).
 //
 // Returns ok=false for any shape mismatch — callers should not emit an
 // edge in that case.
@@ -187,8 +187,8 @@ func unwrapExpression(n *sitter.Node) *sitter.Node {
 	return c
 }
 
-// dispatchKindInterfaceDispatch tags PendingRefs that originate from W3
+// dispatchKindInterfaceDispatch tags PendingRefs that originate from
 // interface dispatch detection so resolveInterfaceDispatch in Pass 2 can
-// identify and process them. String constant for consistency with W1
-// (dispatchKindInherit) and W2 (dispatchKindOverride / dispatchKindOverrideExplicit).
+// identify and process them. String constant for consistency with
+// dispatchKindInherit and the override kinds (dispatchKindOverride / dispatchKindOverrideExplicit).
 const dispatchKindInterfaceDispatch = "interface_dispatch"

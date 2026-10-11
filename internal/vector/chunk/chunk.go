@@ -47,7 +47,7 @@ type Options struct {
 	// the default. Sourced from project ckv.yaml.chunking.file_header_lines.
 	FileHeaderLines int
 	// IncludeFileFull emits an additional coarse chunk covering the whole file
-	// (Phase B multi-granularity, roadmap §3.1). Off by default — opt-in for
+	// (multi-granularity experiment). Off by default — opt-in for
 	// measurement. Unlike file_header (first N lines) this spans the entire
 	// file, giving file/module-level queries a coarse target alongside the fine
 	// symbol chunks. Skipped for markdown (heading sections are already coarse).
@@ -99,7 +99,7 @@ func (c *Chunker) Chunk(in Input) []types.Chunk {
 		}
 	}
 
-	// Phase B (opt-in): a coarse whole-file chunk alongside the fine symbol
+	// Opt-in: a coarse whole-file chunk alongside the fine symbol
 	// chunks, for file/module-level queries. Skip markdown (dense heading
 	// sections already provide coarse granularity).
 	if c.opts.IncludeFileFull && in.Language != "markdown" {
@@ -289,7 +289,7 @@ func isMarkdownListItem(line string) bool {
 	return i > 0 && i+1 < len(line) && (line[i] == '.' || line[i] == ')') && line[i+1] == ' '
 }
 
-// fileFullChunk returns a coarse chunk spanning the entire file (Phase B).
+// fileFullChunk returns a coarse chunk spanning the entire file.
 // Distinct id/kind from the file_header chunk so both can coexist. The text is
 // truncated to the embedder's input cap when necessary — a long file's coarse
 // vector is still a useful file-level signal even head-truncated.

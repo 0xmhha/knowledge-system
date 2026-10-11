@@ -13,7 +13,7 @@
 //
 // Together: a near-complete view of the local object store's
 // "history humans rolled back". Used to populate the schema-1.8
-// §11.3 "AMBIGUOUS" hunk class — see docs/design/hunk-graph.md
+// §11.3 "AMBIGUOUS" hunk class — see docs/graph/design/hunk-graph.md
 // for the storage / retrieval / recovery layering.
 //
 // Distinct from LoadHunks: that pass walks `git log HEAD --` only and

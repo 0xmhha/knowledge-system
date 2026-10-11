@@ -16,8 +16,7 @@ import (
 )
 
 // toolGetForTask names cks-mcp's get-for-task tool. cks-agent only
-// needs this one tool from cks's surface for Phase-D Slim (prompt
-// builder). Future agent capabilities can register additional tool
+// needs this one tool from cks's surface for its prompt builder. Future agent capabilities can register additional tool
 // names here.
 // toolGetForTask mirrors the fused server's namespaced wire name.
 var toolGetForTask = sysmcp.ToolNameGetForTask

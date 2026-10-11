@@ -61,6 +61,7 @@ type CaptureOrigin struct {
 type CapturedSource struct {
 	Identity    SourceIdentity      `json:"identity"`
 	Files       []CapturedFile      `json:"files"`
+	Gitlinks    []CapturedGitlink   `json:"gitlinks,omitempty"`
 	GitHistory  *CapturedGitHistory `json:"git_history,omitempty"`
 	BlobDir     string              `json:"-"`
 	Root        string              `json:"-"`
@@ -134,7 +135,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 	if o.MaxFiles <= 0 {
 		o.MaxFiles = defaultCaptureMaxFiles
 	}
-	paths, err := captureModePathsContext(ctx, root, o.SourceMode, o.MaxFiles)
+	paths, links, err := captureModeEntriesContext(ctx, root, o.SourceMode, o.MaxFiles)
 	if err != nil {
 		return CapturedSource{}, err
 	}
@@ -152,6 +153,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 	for _, origin := range origins {
 		result.OriginRoots[origin.ID] = origin.Root
 	}
+	result.Gitlinks = links
 	var total int64
 	add := func(originID, rel string, buf []byte, executable bool) error {
 		if len(result.Files) >= o.MaxFiles {
@@ -235,7 +237,7 @@ func CaptureSourceContext(ctx context.Context, o CaptureOptions) (CapturedSource
 	result.Identity = SourceIdentity{ProjectID: o.ProjectID, SourceMode: o.SourceMode,
 		SourceCommit: o.SourceCommit, FileManifestDigest: manifest,
 		CapturePolicyDigest: capturePolicyDigest(o.SourceMode), GitRecoveryDigest: recoveryAfter,
-		FileModePolicy: fileModePolicyV1}
+		FileModePolicy: fileModePolicyV1, GitlinkDigest: gitlinkDigest(result.Gitlinks)}
 	if o.SourceMode != "snapshot-only" {
 		result.Identity.GitArchivePolicy = gitArchivePolicyV1
 		selected, err := githistory.RecoveryCommitIDsContext(ctx, root, 0)
@@ -362,19 +364,48 @@ func captureModePaths(root, mode string) ([]string, error) {
 }
 
 func captureModePathsContext(ctx context.Context, root, mode string, maxFiles int) ([]string, error) {
+	paths, _, err := captureModeEntriesContext(ctx, root, mode, maxFiles)
+	return paths, err
+}
+
+// CapturedGitlink is a committed submodule pointer. Its contents are not part
+// of the superproject commit, so capture records the pinned commit instead of
+// reading the (possibly uninitialized) submodule directory.
+type CapturedGitlink struct {
+	Path   string `json:"path"`
+	Commit string `json:"commit"`
+}
+
+// gitlinkDigest is empty when there are no gitlinks, which keeps the snapshot
+// identity of repositories without submodules unchanged.
+func gitlinkDigest(links []CapturedGitlink) string {
+	if len(links) == 0 {
+		return ""
+	}
+	fields := make([]string, 0, 2*len(links))
+	for _, link := range links {
+		fields = append(fields, link.Path, link.Commit)
+	}
+	return identityHashFields("cks.gitlinks.v1", fields...)
+}
+
+// captureModeEntriesContext lists committed regular paths and, separately,
+// gitlink entries (mode 160000). Other modes have no gitlinks.
+func captureModeEntriesContext(ctx context.Context, root, mode string, maxFiles int) ([]string, []CapturedGitlink, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if mode != "committed" {
-		return capturePathsContext(ctx, root, maxFiles)
+		paths, err := capturePathsContext(ctx, root, maxFiles)
+		return paths, nil, err
 	}
-	cmd := buildCommandContext(ctx, "git", "-C", root, "ls-files", "-z", "--cached")
+	cmd := buildCommandContext(ctx, "git", "-C", root, "ls-files", "-z", "--cached", "--stage")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := cmd.Start(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	stop := context.AfterFunc(ctx, func() { _ = pipe.Close() })
 	defer stop()
@@ -390,13 +421,29 @@ func captureModePathsContext(ctx context.Context, root, mode string, maxFiles in
 		return 0, nil, nil
 	})
 	var paths []string
+	var links []CapturedGitlink
 	var scanErr error
 	for scan.Scan() {
+		// --stage records are "<mode> <object> <stage>\t<path>".
+		meta, path, ok := strings.Cut(scan.Text(), "\t")
+		fields := strings.Fields(meta)
+		if !ok || len(fields) != 3 || fields[2] != "0" {
+			scanErr = fmt.Errorf("unsupported committed index entry %q", scan.Text())
+			break
+		}
+		if fields[0] == "160000" {
+			if !fullObjectID(fields[1]) {
+				scanErr = fmt.Errorf("invalid committed gitlink %q", path)
+				break
+			}
+			links = append(links, CapturedGitlink{Path: path, Commit: fields[1]})
+			continue
+		}
 		if maxFiles > 0 && len(paths) >= maxFiles {
 			scanErr = fmt.Errorf("%w: source file count exceeded", ErrResourceLimit)
 			break
 		}
-		paths = append(paths, scan.Text())
+		paths = append(paths, path)
 	}
 	if scanErr == nil {
 		scanErr = scan.Err()
@@ -406,25 +453,47 @@ func captureModePathsContext(ctx context.Context, root, mode string, maxFiles in
 	}
 	waitErr := cmd.Wait()
 	if scanErr != nil {
-		return nil, scanErr
+		return nil, nil, scanErr
 	}
 	if waitErr != nil {
-		return nil, fmt.Errorf("list committed paths: %w", waitErr)
+		return nil, nil, fmt.Errorf("list committed paths: %w", waitErr)
 	}
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	for _, path := range paths {
-		if path == "" || filepath.IsAbs(path) || path == ".." || strings.HasPrefix(path, "../") ||
-			strings.ContainsRune(path, '\\') || !utf8.ValidString(path) || sensitiveCapturePath(path) {
-			return nil, fmt.Errorf("unsafe committed source path %q", path)
+		if !safeCommittedPath(path) {
+			return nil, nil, fmt.Errorf("unsafe committed source path %q", path)
+		}
+	}
+	for _, link := range links {
+		if !safeCommittedPath(link.Path) {
+			return nil, nil, fmt.Errorf("unsafe committed gitlink path %q", link.Path)
 		}
 	}
 	sort.Strings(paths)
+	sort.Slice(links, func(i, j int) bool { return links[i].Path < links[j].Path })
 	if err := validateCapturedPaths(paths); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return paths, nil
+	return paths, links, nil
+}
+
+func safeCommittedPath(path string) bool {
+	return path != "" && !filepath.IsAbs(path) && path != ".." && !strings.HasPrefix(path, "../") &&
+		!strings.ContainsRune(path, '\\') && utf8.ValidString(path) && !sensitiveCapturePath(path)
+}
+
+func fullObjectID(id string) bool {
+	if len(id) != 40 && len(id) != 64 {
+		return false
+	}
+	for _, r := range id {
+		if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
+			return false
+		}
+	}
+	return true
 }
 
 func validateCapturedPaths(paths []string) error {
@@ -719,7 +788,11 @@ func (c CapturedSource) VerifyAgainstContext(ctx context.Context, root string) e
 		if external {
 			paths, err = captureExternalPathsContext(ctx, sourceRoot, len(c.Files))
 		} else {
-			paths, err = captureModePathsContext(ctx, sourceRoot, c.Identity.SourceMode, len(c.Files))
+			var links []CapturedGitlink
+			paths, links, err = captureModeEntriesContext(ctx, sourceRoot, c.Identity.SourceMode, len(c.Files))
+			if err == nil && gitlinkDigest(links) != gitlinkDigest(c.Gitlinks) {
+				return fmt.Errorf("source gitlinks changed after capture")
+			}
 		}
 		if err != nil {
 			return fmt.Errorf("source file set changed after capture: %w", err)
@@ -862,8 +935,15 @@ func VerifyRetainedSourceContext(ctx context.Context, versionDir string, expecte
 	if expected.FileModePolicy != "" && expected.FileModePolicy != fileModePolicyV1 {
 		return fmt.Errorf("snapshot_mismatch: unsupported retained file mode policy")
 	}
+	for i, link := range captured.Gitlinks {
+		if !safeCommittedPath(link.Path) || !fullObjectID(link.Commit) || expected.SourceMode != "committed" ||
+			(i > 0 && captured.Gitlinks[i-1].Path >= link.Path) {
+			return fmt.Errorf("snapshot_mismatch: invalid retained gitlink")
+		}
+	}
 	digest := fileManifestDigestForPolicy(entries, expected.FileModePolicy)
-	if digest != expected.FileManifestDigest || sourceSnapshotID(expected) != expected.SnapshotID ||
+	if digest != expected.FileManifestDigest || gitlinkDigest(captured.Gitlinks) != expected.GitlinkDigest ||
+		sourceSnapshotID(expected) != expected.SnapshotID ||
 		expected.CapturePolicyDigest != capturePolicyDigest(expected.SourceMode) {
 		return fmt.Errorf("snapshot_mismatch: retained file inventory differs from candidate")
 	}

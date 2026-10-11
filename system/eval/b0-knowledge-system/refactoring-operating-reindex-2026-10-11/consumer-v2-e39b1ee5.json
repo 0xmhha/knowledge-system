@@ -1,0 +1,141 @@
+{
+  "release": "e39b1ee5",
+  "label": "v2-e39b1ee5",
+  "server_initialize_s": 4.3,
+  "server_info": {
+    "name": "cks-go-stablenet",
+    "version": "cks-mcp/0.0.1-dev"
+  },
+  "queries": [
+    {
+      "query": "블록 헤더 검증은 어디서 하나요?",
+      "elapsed_ms": 2861,
+      "is_error": false,
+      "error": null,
+      "citations": 10,
+      "files": [
+        "consensus/beacon/consensus.go:229-293",
+        "consensus/beacon/consensus.go:83-98",
+        "consensus/wbft/engine/engine.go:188-190",
+        "core/block_validator.go:50-120",
+        "consensus/beacon/consensus.go:81-98"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "32f1a233e1adf368cc51becf85cc1f65efc2bbf92e68b843b9a80aac9b4d466a"
+    },
+    {
+      "query": "Where are system contracts deployed at genesis?",
+      "elapsed_ms": 2221,
+      "is_error": false,
+      "error": null,
+      "citations": 11,
+      "files": [
+        "params/config_wbft.go:146-152",
+        "core/genesis.go:734-770",
+        "systemcontracts/systemcontracts.go:62-157",
+        "core/genesis.go:772-797",
+        "systemcontracts/systemcontracts.go:32-60"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "32f1a233e1adf368cc51becf85cc1f65efc2bbf92e68b843b9a80aac9b4d466a"
+    },
+    {
+      "query": "트랜잭션 풀에서 수수료가 부족한 트랜잭션은 어디서 거부되나요?",
+      "elapsed_ms": 2347,
+      "is_error": false,
+      "error": null,
+      "citations": 7,
+      "files": [
+        "core/txpool/legacypool/list.go:369-420",
+        "core/txpool/blobpool/blobpool.go:231-319",
+        "core/txpool/blobpool/blobpool.go:1120-1208",
+        "core/txpool/legacypool/legacypool.go:813-967",
+        "core/txpool/blobpool/blobpool.go:1271-1434"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "32f1a233e1adf368cc51becf85cc1f65efc2bbf92e68b843b9a80aac9b4d466a"
+    },
+    {
+      "query": "How does the consensus engine choose the block proposer?",
+      "elapsed_ms": 2137,
+      "is_error": false,
+      "error": null,
+      "citations": 11,
+      "files": [
+        "consensus/beacon/consensus.go:73-79",
+        "consensus/clique/clique.go:513-579",
+        "consensus/merger.go:1-1",
+        "core/blockchain_reader.go:371-372",
+        "consensus/consensus.go:67-134"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "32f1a233e1adf368cc51becf85cc1f65efc2bbf92e68b843b9a80aac9b4d466a"
+    },
+    {
+      "query": "NativeCoinAdapter의 mint 권한은 어떻게 검사하나요?",
+      "elapsed_ms": 1910,
+      "is_error": false,
+      "error": null,
+      "citations": 10,
+      "files": [
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:38-38",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:139-155",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:53-197",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:139-139",
+        "systemcontracts/solidity/v1/NativeCoinAdapter.sol:448-458"
+      ],
+      "base_commit": "740526d0375a8aca817b580e7a4bfc4c1028ae29",
+      "dataset_id": "32f1a233e1adf368cc51becf85cc1f65efc2bbf92e68b843b9a80aac9b4d466a"
+    }
+  ],
+  "reviews": [
+    {
+      "symbol": "snap.Syncer.assignTrienodeHealTasks",
+      "elapsed_ms": 659,
+      "is_error": false,
+      "error": null,
+      "callers": 1,
+      "caller_paths": 1,
+      "caller_walk_truncated": false,
+      "call_sites": 41,
+      "commits": 1,
+      "test_callers": 0,
+      "available": [
+        "history: 1 commits and 9 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 0 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ]
+    },
+    {
+      "symbol": "types.Block.Hash",
+      "elapsed_ms": 697,
+      "is_error": false,
+      "error": null,
+      "callers": 40,
+      "caller_paths": 12,
+      "caller_walk_truncated": false,
+      "call_sites": 3,
+      "commits": 0,
+      "test_callers": 102,
+      "available": [
+        "history: 0 commits and 1 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 102 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ]
+    },
+    {
+      "symbol": "rlp.EncodeToBytes",
+      "elapsed_ms": 644,
+      "is_error": false,
+      "error": null,
+      "callers": 40,
+      "caller_paths": 12,
+      "caller_walk_truncated": false,
+      "call_sites": 4,
+      "commits": 0,
+      "test_callers": 74,
+      "available": [
+        "history: 0 commits and 2 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 74 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ]
+    }
+  ]
+}

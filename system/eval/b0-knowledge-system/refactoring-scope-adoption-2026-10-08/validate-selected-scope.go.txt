@@ -1,0 +1,102 @@
+// Source-only selected pilot validation. No engine coordinates or activation.
+package main
+
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "fmt"
+ "os"
+ "os/exec"
+ "path/filepath"
+ "reflect"
+ "strings"
+
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+)
+
+func must(err error) { if err != nil { panic(err) } }
+func read(root, path string) []byte { b,e:=os.ReadFile(filepath.Join(root,path));must(e);return b }
+func require(ok bool, message string) { if !ok { panic(message) } }
+func save(path string, v any) { b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600)) }
+func digest(b []byte) string { s:=sha256.Sum256(b);return hex.EncodeToString(s[:]) }
+
+func main() {
+ ctx:=context.Background()
+ repo,out,dataset:=os.Args[1],os.Args[2],os.Args[3]
+ commit,e:=exec.Command("git","-C",repo,"rev-parse","HEAD").Output();must(e)
+ snap:=semantic.Snapshot{ProjectID:"knowledge-system",DatasetID:dataset,Commit:strings.TrimSpace(string(commit))}
+ oldOntology:="docs/spec-driven/ontology-pilot.yaml"
+ ontology:="docs/spec-driven/ontology-pilot-functional.yaml"
+ oldSpec:="docs/spec-driven/spec-pilot.yaml"
+ spec:="docs/spec-driven/spec-pilot-v2.yaml"
+ core,_,e:=semantic.ExtractOntology(snap,oldOntology,read(repo,oldOntology));must(e)
+ must(semantic.ValidateCoreOntology(core));must(core.ValidateSources(ctx,repo))
+ p,_,e:=semantic.ExtractOntology(snap,ontology,read(repo,ontology));must(e)
+ prior,_,e:=semantic.ExtractSpec(snap,oldSpec,read(repo,oldSpec));must(e)
+ next,_,e:=semantic.ExtractSpec(snap,spec,read(repo,spec));must(e)
+ require(len(core.Concepts)==20 && len(p.Concepts)==23,"core20 plus3 required")
+ for i,a:=range core.Concepts {
+  b:=p.Concepts[i];a.EvidenceID="";b.EvidenceID=""
+  require(reflect.DeepEqual(a,b),"core definition changed: "+a.ID)
+ }
+ expected:=map[string]string{"req-filtered-recall":"filtered-nearest-chunk-search","req-source-evidence":"snapshot-bound-semantic-relations","req-ontology-fallback":"optional-ontology-baseline-preservation"}
+ require(len(prior.Requirements)==3 && len(next.Requirements)==3,"three requirements required")
+ criteria:=0
+ for i,a:=range prior.Requirements {
+  b:=next.Requirements[i]
+  require(a.ID==b.ID && a.Title==b.Title && a.Statement==b.Statement,"requirement changed")
+  require(a.Version==1 && b.Version==2,"requirement version not1 to2")
+  require(reflect.DeepEqual(b.ConceptIDs,[]string{expected[b.ID]}),"wrong functional scope")
+  require(len(a.AcceptanceCriteria)==len(b.AcceptanceCriteria),"criterion count changed")
+  for k,x:=range a.AcceptanceCriteria {
+   y:=b.AcceptanceCriteria[k];x.EvidenceID="";y.EvidenceID=""
+   require(reflect.DeepEqual(x,y),"criterion changed");criteria++
+  }
+  require(b.Status==semantic.StatusProposed && b.ReviewedBy=="","spec falsely reviewed")
+ }
+ require(criteria==4,"four criteria required")
+ for _,c:=range p.Concepts { require(c.Status==semantic.StatusProposed && c.ReviewedBy=="","concept falsely reviewed") }
+ p.Requirements=next.Requirements;p.Evidence=append(p.Evidence,next.Evidence...)
+ must(p.Validate());must(p.ValidateSources(ctx,repo))
+ rejected:=[]string{}
+ for i:=range p.Evidence {
+  bad:=p;bad.Evidence=append([]semantic.EvidenceSpan(nil),p.Evidence...)
+  bad.Evidence[i].ContentSHA256=strings.Repeat("0",64)
+  require(bad.ValidateSources(ctx,repo)!=nil,"corrupt source digest accepted")
+  rejected=append(rejected,p.Evidence[i].ID)
+ }
+ original:=read(repo,ontology)
+ must(os.WriteFile(filepath.Join(repo,ontology),[]byte("uncommitted edit must not replace historical evidence\n"),0600))
+ must(p.ValidateSources(ctx,repo))
+ must(os.WriteFile(filepath.Join(repo,ontology),original,0600))
+ storePath:=filepath.Join(out,"source-only-proposed.sqlite")
+ store,e:=semantic.OpenStore(storePath);must(e);must(store.Put(ctx,p,repo));must(store.Close())
+ store,e=semantic.OpenStore(storePath);must(e)
+ loaded,e:=store.Load(ctx,snap.ProjectID,snap.DatasetID);must(e);must(store.Close())
+ before,e:=json.Marshal(p);must(e);after,e:=json.Marshal(loaded);must(e)
+ require(bytes.Equal(before,after),"stored projection changed")
+ db,e:=sql.Open("sqlite3",storePath);must(e)
+ var current int;must(db.QueryRow("SELECT count(*) FROM semantic_current").Scan(&current));must(db.Close())
+ require(current==0,"source-only preparation activated")
+ trace,e:=p.Trace();must(e)
+ require(len(trace.Requirements)==3,"three trace requirements expected")
+ for _,r:=range trace.Requirements { require(r.State==semantic.TraceSpecUnapproved && len(r.Paths)==0,"scope choice incorrectly authorized trace") }
+ save(filepath.Join(out,"source-only-trace.json"),trace)
+ save(filepath.Join(out,"source-only-projection.json"),p)
+ inventory:=map[string]string{}
+ for _,path:=range []string{oldOntology,ontology,oldSpec,spec} { inventory[path]=digest(read(repo,path)) }
+ save(filepath.Join(out,"source-validation-summary.json"),map[string]any{
+  "source_commit":snap.Commit,"source_preparation_dataset_id":dataset,"snapshot":snap,
+  "source_inventory_sha256":inventory,"core_concepts_unchanged":20,"total_concepts":23,
+  "functional_concepts":3,"requirements":3,"criteria":criteria,"all_content_proposed":true,
+  "source_spans_verified":len(p.Evidence),"corrupt_digest_refusals":rejected,
+  "uncommitted_source_does_not_replace_git_evidence":true,"sqlite_reopen_same_bytes":true,
+  "semantic_current_rows":current,"source_only_trace_requirements_unapproved":3,"engine_indexes_built":false,"runtime_bound":false,
+  "actual_individual_human_decisions":0,"actual_model_HTTP_calls":0,"full_task_complete":false,
+ })
+ fmt.Printf("PASS source-only selected scope:core20+3,req3/criteria4,%d spans/%d digest refusals,current0\n",len(p.Evidence),len(rejected))
+}

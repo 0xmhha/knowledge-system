@@ -3,13 +3,13 @@
 //
 // The composer pipeline's Stage 2 (precise) calls BM25Search and
 // FindSymbol with the keywords/symbols surfaced by Stage 1 (ckv). The
-// graph neighbor expander (Phase B.5) calls Neighbors to surround the
+// graph neighbor expander (Stage 3) calls Neighbors to surround the
 // matched citations with their calls, callers, implementations, etc.
 //
 // Two implementations are planned:
 //
-//   - Fake (this package, B.1):   in-memory canned responses for unit tests.
-//   - Real (Phase C.1):            adapter over
+//   - Fake (this package):   in-memory canned responses for unit tests.
+//   - Real:                  adapter over
 //     github.com/0xmhha/knowledge-system/graph
 //     pkg/store.Reader.
 //
@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -50,7 +51,7 @@ type Client interface {
 	FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]contract.Citation, error)
 
 	// Neighbors traverses graph edges from src per opts. Used by the
-	// Phase B.5 expander.
+	// Stage 3 graph expander.
 	Neighbors(ctx context.Context, src contract.Citation, opts NeighborsOpts) ([]contract.Neighbor, error)
 
 	// ImpactOfChange computes reverse-dependency closure from a seed symbol,
@@ -71,10 +72,18 @@ type Client interface {
 	// symbol, traversing all edge types. Used by cks.context.get_subgraph.
 	GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts) ([]contract.Citation, []contract.Neighbor, error)
 
+	// ReviewFunction returns the production-code, history and test view of
+	// one function or method from the graph's review index (schema 1.24):
+	// inputs/outputs, call sites in order, callers back to entry points
+	// (production code only), dynamic paths, the commits that changed it and
+	// its test callers. Used by cks.context.review_function. Graphs built
+	// before schema 1.24 return an error wrapping store.ErrNoReviewIndex.
+	ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error)
+
 	// ConcurrencyImpact returns the concurrency blast radius of a symbol —
 	// the goroutines/channels/locks it spawns/sends-to/acquires and the
 	// modules reached over concurrency edges in either direction. Used by
-	// cks.context.concurrency_impact (G7/S1).
+	// cks.context.concurrency_impact.
 	ConcurrencyImpact(ctx context.Context, symbol string, opts ConcurrencyOpts) (contract.ConcurrencyResult, error)
 
 	// Health reports backend reachability and version pins.
@@ -158,6 +167,10 @@ type EvidenceOpts struct {
 type PRRefOpts struct {
 	MaxCount int // max PR refs to return; zero means no cap
 }
+
+// ReviewOpts bounds a ReviewFunction call; zero values take the store
+// defaults (caller depth 5, 12 caller paths, 40 entries per list).
+type ReviewOpts = store.ReviewOptions
 
 // SubgraphOpts shapes a single GetSubgraph call.
 type SubgraphOpts struct {

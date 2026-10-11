@@ -6,8 +6,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V2 — type-size aware storage packing for primitive Sol
-// types. V0 emitted one slot per field; V2 packs consecutive
+// Type-size aware storage packing for primitive Sol
+// types. Instead of one slot per field, the walker packs consecutive
 // sub-32-byte primitives into shared slots per Sol §11.1.
 //
 // Coverage (solTypeSize lookup table):
@@ -20,13 +20,13 @@ import (
 //   string         → 32 (full slot)
 //   anything else  → 32 (conservative)
 //
-// V2 limitations:
+// Limitations covered by this test:
 //   - Fixed-size arrays (uint8[4]) are conservatively a full slot
-//     in V2; Sol's real layout packs short arrays. A V3+ extension
-//     could parse the bracket size out of the signature.
+//     here; Sol's real layout packs short arrays (see
+//     storage_slot_array_test.go).
 //   - Struct fields are conservatively a full slot. Sol packs
 //     struct members the same way as top-level state vars, but
-//     V2 lacks struct-member size aggregation.
+//     struct-member size aggregation is covered by storage_slot_struct_test.go.
 
 func TestStorageSlot_TypeSizePacking(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/storage_slot_packing", "packed.sol")

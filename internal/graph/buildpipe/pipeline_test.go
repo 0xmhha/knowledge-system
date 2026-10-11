@@ -45,7 +45,7 @@ func TestPipelineRunsOnGoFixture(t *testing.T) {
 
 // TestPipelineXLangBinding builds a synthetic mini multi-lang fixture
 // (1 .sol contract + 1 .ts class with the matching name) and asserts that
-// at least one binds_to edge was emitted by the cross-language linker (T20)
+// at least one binds_to edge was emitted by the cross-language linker
 // and persisted to SQLite.
 func TestPipelineXLangBinding(t *testing.T) {
 	out := t.TempDir()

@@ -1,0 +1,143 @@
+{
+  "env_scoped": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "commit.gpgsign",
+    "GIT_CONFIG_VALUE_0": "false"
+  },
+  "result_snapshot": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9",
+  "runs": [
+    {
+      "review_id": "F3-T03",
+      "criterion_id": "ac-filtered-recall",
+      "test": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "274749481a5537a2bdadcbec2764e4efc4b3356f5c591eba15d0e74ceb34235c",
+      "duration_ms": 2317,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-T05",
+      "criterion_id": "ac-filtered-completeness",
+      "test": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "f5fa53d80107c6889cbcd27599beeb5fe2983d93e9c9311ce88cab2286eab201",
+      "duration_ms": 734,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-T07",
+      "criterion_id": "ac-filtered-completeness",
+      "test": "TestSearchDetailedCancellationIsNotEmptySuccess",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "4a1c885dda81afecdc585099863797936ffc425530a0d1a05a50cc69b68610ba",
+      "duration_ms": 904,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-R02",
+      "criterion_id": "ac-filtered-completeness",
+      "test": "TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "ed37bd1486196310784fc9ed0f1c5d01e83844dbab960f227c2b3e1cf54cca3b",
+      "duration_ms": 853,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-R04",
+      "criterion_id": "ac-filtered-completeness",
+      "test": "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "17cdec7ec77590b768b40f77cd2ef28ac39ac196267d535b352e8e8f1f7db1ee",
+      "duration_ms": 1172,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-T10",
+      "criterion_id": "ac-source-evidence",
+      "test": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "exit_code": 1,
+      "stderr_tail": "{\"code\":\"operation_failed\",\"message\":\"The operation failed; inspect project status for details.\"}\n"
+    },
+    {
+      "review_id": "F3-T12",
+      "criterion_id": "ac-source-evidence",
+      "test": "TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "1ad9d1d485113c3d9c53e6516b106741a90a5ab0563a5022b6f5f4e78aa17c6f",
+      "duration_ms": 11498,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-T15",
+      "criterion_id": "ac-ontology-fallback",
+      "test": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "1e36aa6f5344073b9f837ef60c60908857e12bc99a79e405446545190b270b3d",
+      "duration_ms": 2161,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-T17",
+      "criterion_id": "ac-ontology-fallback",
+      "test": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "78ea8cd66a62aedf4775f0e9c24a0d160a5cb62e077e19b49d8da491415aa9f1",
+      "duration_ms": 2174,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    },
+    {
+      "review_id": "F3-R14",
+      "criterion_id": "ac-ontology-fallback",
+      "test": "TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "exit_code": 0,
+      "stderr_tail": "",
+      "command_passed": true,
+      "snapshot_consistent": true,
+      "test_passed": true,
+      "test_observed": true,
+      "output_sha256": "4aa84c729883752b0a1903ac7abc885d1b5a47997b10f95febf30de26ec0b0b9",
+      "duration_ms": 1336,
+      "snapshot_id": "b4d6346078f1a4e1b49c0283bd22320a385315d65c569d624afea9399ef51bc9"
+    }
+  ]
+}

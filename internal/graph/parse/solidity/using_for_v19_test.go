@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V1.9 — `this.<state-var>.<method>` receiver tests.
+// `this.<state-var>.<method>` receiver tests.
 //
-// `this` is Sol's implicit current-contract reference. V1.9 strips the
+// `this` is Sol's implicit current-contract reference. The resolver strips the
 // `this` prefix and treats the inner property as a state-var on the
-// caller's container — semantically equivalent to V1.0's bare-name
+// caller's container — semantically equivalent to the bare-name
 // `<state-var>.<method>` shape, just stylistic.
 //
-// V1.9 reuses V1.0's dispatch kind + resolver (encoding identical) so
+// This shape reuses the state-var dispatch kind + resolver (encoding identical) so
 // the resolution path is single-source. New predicate only.
 
-// TestUsingForV19_ThisStateVar — canonical V1.9 case. `this.balance.add(1)`
+// TestUsingForV19_ThisStateVar — canonical case. `this.balance.add(1)`
 // resolves through Vault's state var binding to ThisLib.add.
 func TestUsingForV19_ThisStateVar(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v19", "this_state_var.sol")
@@ -30,7 +30,7 @@ func TestUsingForV19_ThisStateVar(t *testing.T) {
 }
 
 // TestUsingForV19_ThisNoStateVar — `this.<unknown-field>.method()`
-// drops at stateVarTypes lookup. Catches false positives where V1.9
+// drops at stateVarTypes lookup. Catches false positives where the resolver
 // might inadvertently emit for any `this.<id>.<id>` shape.
 func TestUsingForV19_ThisNoStateVar(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v19", "this_no_state_var.sol")
@@ -40,8 +40,8 @@ func TestUsingForV19_ThisNoStateVar(t *testing.T) {
 	}
 }
 
-// TestUsingForV19_ThisVsBare — both `value.touch()` (V1.0) and
-// `this.value.touch()` (V1.9) resolve to the same library edge. They
+// TestUsingForV19_ThisVsBare — both `value.touch()` and
+// `this.value.touch()` resolve to the same library edge. They
 // produce two distinct call sites — the graph records both.
 func TestUsingForV19_ThisVsBare(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v19", "this_vs_bare.sol")

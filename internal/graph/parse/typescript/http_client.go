@@ -1,6 +1,6 @@
-// Package typescript — http_client.go implements W2 of schema 1.9 (CKS G5
-// Distributed cross-language interop expansion): TypeScript HTTP client
-// detection. Companion to distributed.go (server-side W1) — the two together
+// Package typescript — http_client.go implements TypeScript HTTP client
+// detection (schema 1.9 cross-language interop expansion). Companion to
+// distributed.go (server-side detection) — the two together
 // let graph traversal answer "TS Func → http_calls → Endpoint ← listens_on
 // ← Go Method" in a monorepo.
 //
@@ -54,12 +54,12 @@ var axiosVerbs = map[string]string{
 	"options": "OPTIONS",
 }
 
-// runHTTPClients is the W2 entry point. Called from runDistributed() after
-// the W1 server-side pass. Walks the parse tree for call_expression nodes
+// runHTTPClients is the HTTP client entry point. Called from runDistributed()
+// after the server-side pass. Walks the parse tree for call_expression nodes
 // matching the supported client shapes and emits http_calls edges.
 //
 // Order matters: this MUST run after the declaration queries (so v.nodes
-// has Function/Method intervals) AND after the W1 server pass (so any
+// has Function/Method intervals) AND after the server pass (so any
 // fetch/axios call inside a route handler still gets an http_calls edge
 // alongside the handler's listens_on).
 func (v *declVisitor) runHTTPClients() {

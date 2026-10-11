@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
-// Flow-aware retrieval (flow-ingest Phase D). These operate over the curated
+// Flow-aware retrieval. These operate over the curated
 // flow corpus (flow_step / flow_spine / curated-invariant chunks ingested via
 // --flow-corpus) to let an agent trace a symptom to its cause: get_flow lays a
 // flow out in call order, expand_flow walks neighbors, find_branches maps a
@@ -458,7 +458,7 @@ func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]Bra
 	for _, c := range chunks {
 		byID[c.ID] = c
 	}
-	out := make([]BranchMatch, 0, k)
+	out := make([]BranchMatch, 0, min(k, len(ids)))
 	for _, id := range ids { // preserve hit rank
 		c, ok := byID[id]
 		if !ok || c.FlowStep == nil {

@@ -1,12 +1,34 @@
 package semantic
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 
 	graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
 	graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
+
+// Typed snapshot rejections let callers and tests tell which gate refused a
+// foreign anchor. The message text is unchanged for existing consumers.
+var (
+	// ErrEvidenceSnapshotMismatch: Projection.Validate found evidence whose
+	// recorded snapshot differs from the projection snapshot.
+	ErrEvidenceSnapshotMismatch = errors.New("evidence crosses project or snapshot")
+	// ErrCodeAnchorSnapshotMismatch: the actual CKG manifest commit or the
+	// code evidence snapshot differs from the projection snapshot.
+	ErrCodeAnchorSnapshotMismatch = errors.New("semantic: code anchor crosses project or snapshot")
+)
+
+// snapshotMismatchError keeps the historical message bytes while unwrapping
+// to the typed gate rejection.
+type snapshotMismatchError struct {
+	msg  string
+	kind error
+}
+
+func (e *snapshotMismatchError) Error() string { return e.msg }
+func (e *snapshotMismatchError) Unwrap() error { return e.kind }
 
 // ValidateCodeAnchors checks every canonical code/test evidence against the
 // actual graph DB before an aligned semantic projection becomes active.
@@ -91,7 +113,7 @@ func AttachCodeEvidence(p *Projection, graph graphstore.Reader, e EvidenceSpan) 
 
 func checkCodeAnchor(snapshot Snapshot, manifest graphstore.Manifest, node graphtypes.Node, e EvidenceSpan) error {
 	if manifest.CommitHash != snapshot.Commit || e.Snapshot != snapshot {
-		return fmt.Errorf("semantic: code anchor crosses project or snapshot")
+		return ErrCodeAnchorSnapshotMismatch
 	}
 	if e.Kind != SourceCode && e.Kind != SourceTest {
 		return fmt.Errorf("semantic: anchor %q is not code or test evidence", e.ID)

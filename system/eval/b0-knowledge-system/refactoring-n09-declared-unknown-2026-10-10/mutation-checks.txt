@@ -1,0 +1,30 @@
+## M1 guard not called
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.513s
+--- FAIL: TestDeclaredUnknownCitesOnlyItsBasis (0.40s)
+--- FAIL: TestDeclaredUnknownRestrictedOrUnprovenKeepsBase (0.81s)
+--- FAIL: TestDeclaredUnknownVerifyRejectsMixedEvidence (0.43s)
+## M2 verify allows non-basis citation
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.516s
+--- FAIL: TestDeclaredUnknownVerifyRejectsMixedEvidence (0.09s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/evidencev2	2.629s
+## M3 proposed unknown selected
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.458s
+--- FAIL: TestDeclaredUnknownLeavesOtherRequestsUnchanged (0.41s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/evidencev2	1.663s
+## M5 resolved date ignored
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.457s
+--- FAIL: TestDeclaredUnknownLeavesOtherRequestsUnchanged (0.66s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/evidencev2	2.085s
+## M6 restricted unknown abstains
+ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.459s
+--- FAIL: TestDeclaredUnknownRestrictedOrUnprovenKeepsBase (0.13s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/evidencev2	1.816s
+## M4 only the first term of a group checked
+--- FAIL: TestDeclaredUnknownLoadsAndSelects (0.00s)
+FAIL
+FAIL	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	0.927s
+--- FAIL: TestDeclaredUnknownLeavesOtherRequestsUnchanged (0.51s)

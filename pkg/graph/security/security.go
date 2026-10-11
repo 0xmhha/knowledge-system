@@ -11,8 +11,7 @@
 // envelope instead of having to run a separate static analyser
 // (slither / mythril / semgrep) and reconcile its findings.
 //
-// See docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2 P1 #5 for the design
-// intent. The MVP is purely YAML-driven (operators curate the
+// The current implementation is purely YAML-driven (operators curate the
 // matches[] list); automated pattern detection (slither-style flow
 // rules) is deferred to a follow-up — the data model here is the
 // same either way.

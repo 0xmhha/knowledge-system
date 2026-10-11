@@ -1,0 +1,6 @@
+TestV2ToolTypeNeighborsAreOptIn against two mutations of internal/system/mcp/get_for_task_v2.go:
+M1 gate removed (always insert): FAIL  enabled=false: citations [a.go:6-8 a.go:3-4], uses_type lookups 1
+M2 gate forced off (never insert): FAIL  enabled=true: citations [a.go:6-8], uses_type lookups 0
+Config wiring (cmd/cks/mcpcli/serve.go TypeNeighbors: cfg.Retrieval.TypeNeighbors) is not covered by a unit
+test; it is covered by the real-binary smoke (smoke-result.json): option on adds declarations in 6/7 DEV
+requests, option off returns the same citations as binary 37302b35 (DEV4 baseline_off retrieval rows) in 7/7.

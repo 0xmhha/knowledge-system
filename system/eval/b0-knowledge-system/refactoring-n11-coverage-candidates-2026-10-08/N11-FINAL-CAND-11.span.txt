@@ -1,0 +1,29 @@
+	readDir := func(name string, handle func(string, []byte) error) error {
+		entries, err := os.ReadDir(filepath.Join(overlayRoot, name))
+		if os.IsNotExist(err) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() || entry.Type()&os.ModeSymlink != 0 {
+				return fmt.Errorf("evidence_unverified: nonregular %s entry", name)
+			}
+			if name == "policies" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "relations" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "reviews" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "trace-links" && filepath.Ext(entry.Name()) != ".yaml" ||
+				name == "decisions" && filepath.Ext(entry.Name()) != ".md" {
+				return fmt.Errorf("evidence_unverified: unsupported %s file %q", name, entry.Name())
+			}
+			rel := name + "/" + entry.Name()
+			buf, err := setup.ReadSourceFileNoFollow(overlayRoot, rel, 4<<20)
+			if err != nil {
+				return fmt.Errorf("evidence_unverified: read %q: %w", rel, err)
+			}
+			if err := handle(rel, buf); err != nil {
+				return err
+			}
+		}
+		return nil

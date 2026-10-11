@@ -1,0 +1,185 @@
+"""Read-only response text exposure audit; never adjudicates independence."""
+import argparse
+import collections
+import functools
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+ROOT = Path.cwd()
+args_parser = argparse.ArgumentParser(description=__doc__)
+args_parser.add_argument("--out", type=Path, required=True, help="new output directory; existing paths are refused")
+args_parser.add_argument("--reference-revision", default="HEAD")
+ARGS = args_parser.parse_args()
+OUT = ARGS.out.resolve()
+POOL = ROOT / "system/eval/b0-knowledge-system/refactoring-n11-pool-expansion-2026-10-08"
+REV = subprocess.check_output(["git", "rev-parse", ARGS.reference_revision], text=True).strip()
+
+
+def sha(body):
+    return hashlib.sha256(body).hexdigest()
+
+
+def dump(name, value):
+    (OUT / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
+
+
+@functools.lru_cache(maxsize=None)
+def blob(revision, path):
+    return subprocess.check_output(["git", "show", f"{revision}:{path}"])
+
+
+def strings(value, path="structuredContent"):
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            yield from strings(child, f"{path}.{key}")
+    elif isinstance(value, list):
+        for i, child in enumerate(value):
+            yield from strings(child, f"{path}[{i}]")
+
+
+def normalized_lines(text):
+    # Actual decoded newlines only: do not unescape source string literals.
+    return [line.strip() for line in text.replace("\r\n", "\n").split("\n") if line.strip()]
+
+
+def informative_lines(span):
+    return {line for line in normalized_lines(span) if len(line.encode()) >= 64 and len(re.findall(r"\w+", line)) >= 10}
+
+
+def patterns(span):
+    lines = normalized_lines(span)
+    full = "\n".join(lines)
+    windows = set()
+    for i in range(len(lines) - 7):
+        fragment = "\n".join(lines[i:i + 8])
+        if len(fragment.encode()) >= 128 and len(re.findall(r"\w+", fragment)) >= 24:
+            windows.add(fragment)
+    return full, windows
+
+
+def match(text, full, windows):
+    normalized = "\n".join(normalized_lines(text))
+    return bool(full and full in normalized), any(w in normalized for w in windows)
+
+
+def controls():
+    span = "\n".join(f"result_{i} := verifySource_{i}(snapshot, datasetIdentity)" for i in range(12))
+    full, windows = patterns(span)
+    cases = {
+        "full body without citations": match("prefix\n" + span + "\nsuffix", full, windows) == (True, True),
+        "CRLF and indentation": match("  " + span.replace("\n", "\r\n\t"), full, windows) == (True, True),
+        "partial eight-line body": match("\n".join(span.splitlines()[2:10]), full, windows) == (False, True),
+        "name only insufficient": match("verifySource_0", full, windows) == (False, False),
+        "generic fragment insufficient": match("return err\n}\n", full, windows) == (False, False),
+        "literal escaped newline not decoded again": match(span.replace("\n", "\\n"), full, windows) == (False, False),
+        "nested graph body discovered": list(strings({"graph_neighbors": [{"node": {"body": span}}]})) == [("structuredContent.graph_neighbors[0].node.body", span)],
+        "nontext values not coerced": list(strings({"count": 12, "flag": True, "missing": None})) == [],
+        "informative isolated line": len(informative_lines('return fmt.Errorf("evidence_unverified: inline review cannot meet multi-reviewer quorum")')) == 1,
+        "short boilerplate not informative": informative_lines("return err\nif err != nil {\n}") == set(),
+    }
+    assert all(cases.values()), cases
+    dump("method-controls.json", {"passed": len(cases), "cases": cases, "owned_synthetic_controls_only": True})
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=False)
+    controls()
+    book_path = POOL / "candidate-question-book.json"
+    book = json.loads(book_path.read_text())
+    rows = book["questions"] + book["excluded_candidate_questions"]
+    positive = []
+    refs = []
+    for q in rows:
+        for ref in q.get("evidence", []) + q.get("abstention_basis_sources", []):
+            source = blob(q["source_commit"], ref["path"])
+            span = b"".join(source.splitlines(keepends=True)[ref["first"] - 1:ref["last"]])
+            assert sha(source) == ref["file_sha256"] and sha(span) == ref["content_sha256"], q["id"]
+            refs.append({"id": q["id"], "ref": ref, "source_commit": q["source_commit"],
+                         "current_source_bytes_match": (ROOT / ref["path"]).read_bytes() == source})
+            if ref in q.get("evidence", []):
+                full, windows = patterns(span.decode())
+                positive.append((q["id"], full, windows, informative_lines(span.decode())))
+    dump("source-ref-verification.json", {"refs": refs, "book_sha256": sha(book_path.read_bytes()),
+                                         "reference_audit_revision": REV, "ABS_basis_is_not_positive_answer_evidence": True})
+    previous = json.loads((POOL / "retained-raw-log-audit.json").read_text())
+    counters = {qid: collections.Counter() for qid, _, _, _ in positive}
+    requests = {qid: set() for qid, _, _, _ in positive}
+    per_log = []
+    totals = collections.Counter()
+    matches_path = OUT / "matched-response-fields.jsonl"
+    cache = {}
+    with matches_path.open("w") as output:
+        for declared in previous["logs"]:
+            path = declared["path"]
+            compressed = (ROOT / path).read_bytes()
+            assert compressed == blob(REV, path)
+            raw = gzip.decompress(compressed)
+            assert sha(compressed) == declared["compressed_sha256"]
+            assert sha(raw) == declared["decompressed_sha256"]
+            counts = collections.Counter()
+            for line in raw.splitlines():
+                row = json.loads(line)
+                counts["rows"] += 1
+                category = declared["category"]
+                sc = row.get("call", {}).get("response", {}).get("structuredContent")
+                if not isinstance(sc, dict):
+                    counts["rows_without_structured_object"] += 1
+                    continue
+                counts["rows_with_structured_object"] += 1
+                counts["body_entries"] += len(sc.get("bodies", []))
+                counts["graph_neighbor_entries"] += len(sc.get("graph_neighbors", []))
+                row_matches = collections.defaultdict(set)
+                for field, text in strings(sc):
+                    counts["text_fields"] += 1
+                    digest = sha(text.encode())
+                    if digest not in cache:
+                        text_lines = set(normalized_lines(text))
+                        cache[digest] = [(qid, full_hit, window_hit, sorted(text_lines & single_lines)) for qid, full, windows, single_lines in positive
+                                         for full_hit, window_hit in [match(text, full, windows)] if full_hit or window_hit or text_lines & single_lines]
+                    for qid, full_hit, window_hit, single_hits in cache[digest]:
+                        kind = "body" if field.startswith("structuredContent.bodies[") else "graph_neighbor" if field.startswith("structuredContent.graph_neighbors[") else "other"
+                        row_matches[qid].add(kind)
+                        counters[qid]["matched_fields"] += 1
+                        counters[qid]["full_span_fields"] += int(full_hit)
+                        counters[qid]["eight_line_window_fields"] += int(window_hit)
+                        counters[qid]["informative_single_line_fields"] += bool(single_hits)
+                        output.write(json.dumps({"candidate": qid, "log": path, "category": category,
+                                                 "request_id": row.get("request_id"), "row_index": counts["rows"],
+                                                 "field": field, "field_kind": kind, "field_text_sha256": digest,
+                                                 "normalized_full_span_match": full_hit, "eight_line_window_match": window_hit,
+                                                 "informative_single_line_sha256": [sha(line.encode()) for line in single_hits]}, ensure_ascii=False) + "\n")
+                for qid, kinds in row_matches.items():
+                    counters[qid]["matched_rows"] += 1
+                    counters[qid][category + "_matched_rows"] += 1
+                    for kind in kinds:
+                        counters[qid][kind + "_matched_rows"] += 1
+                    requests[qid].add(row.get("request_id"))
+            assert counts["rows"] == declared["rows"]
+            totals.update(counts)
+            per_log.append({**declared, "counts": dict(counts), "current_and_committed_compressed_bytes_verified": True,
+                            "decompressed_sha_matches_prior_audit": True})
+    # No flags, question book or model execution are changed by this audit.
+    dump("response-exposure-summary.json", {"schema_version": 1, "status": "text_exposure_audited_no_independence_adjudication",
+          "reference_audit_revision": REV, "book_source_revision": book["source_commit"], "question_book_sha256": sha(book_path.read_bytes()),
+          "source_refs_verified": len(refs), "positive_candidate_rows_scanned": len(positive), "ABS_rows_not_text_adjudicated": 2,
+          "totals": dict(totals), "unique_text_values": len(cache), "per_log": per_log,
+          "candidate_counts": {qid: {**dict(count), "request_ids": sorted(requests[qid]), "independence_approved": False} for qid, count in counters.items()},
+          "match_file_sha256": sha(matches_path.read_bytes()), "model_HTTP_calls": 0, "new_FINAL_dispatches": 0,
+          "actual_human_decisions": 0, "actual_human_review_time_ns": None, "book_modified": False,
+          "approved_independent_per_group": {g: 0 for g in ["CODE", "WHY", "POLICY", "TRACE", "ABS"]}, "full_task_complete": False,
+          "method": "all structuredContent string values; full nonempty-line span, >=8 nonempty lines/128UTF8bytes/24wordtokens, or complete informative single line >=64UTF8bytes/10wordtokens; CRLF/indent normalization only",
+          "limitations": ["exact text/window/long-line overlap is exposure risk evidence, not semantic independence; common lines may appear in unrelated functions", "no-match does not prove no conceptual/tuning/human exposure",
+                          "body text need not be the whole symbol and sanitized/rewritten content can escape matching", "ABS requires bound corpus/authority/time review; no automatic absence judgment",
+                          "response.content text/raw unstructured errors are not scanned as a second output surface", "row counts and CODE/WHY duplicate spans are not independent samples"]})
+    print(json.dumps({"totals": dict(totals), "unique_text_values": len(cache),
+                      "matched_rows_by_candidate": {qid: c["matched_rows"] for qid, c in counters.items()}}, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

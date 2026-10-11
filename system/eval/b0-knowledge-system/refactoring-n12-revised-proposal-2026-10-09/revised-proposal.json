@@ -1,0 +1,644 @@
+{
+ "schema_version": 1,
+ "kind": "revised_proposal_after_user_adoption",
+ "base_candidate": {
+  "project_id": "knowledge-system",
+  "dataset_id": "1e82983e45ea35eb63debbea9bf88b6961d595cb5c540db312430cc47d19a341",
+  "snapshot_id": "672eae93464af931deb5b66605ba6d21615e50ced58c5a09cd82befc12f56ae7",
+  "source_mode": "committed",
+  "commit": "36353d32f1c21fc0cb2622807fa9e5d05f2daac7"
+ },
+ "source_revision_for_locations": "bc161f1e889fe7211edcb8956eaaa36d79a32b46",
+ "decision": "system/eval/b0-knowledge-system/refactoring-n12-revised-proposal-2026-10-09/decision.json",
+ "functional_relation_ops": [
+  {
+   "review_id": "F3-T01",
+   "op": "keep",
+   "held_assertion": "functional-v2:impl:req-filtered-recall",
+   "note": null
+  },
+  {
+   "review_id": "F3-T02",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+   "note": null
+  },
+  {
+   "review_id": "F3-T04",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+   "note": null
+  },
+  {
+   "review_id": "F3-T06",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestSearchDetailedCancellationIsNotEmptySuccess",
+   "note": null
+  },
+  {
+   "review_id": "F3-T09",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+   "note": null
+  },
+  {
+   "review_id": "F3-T12",
+   "op": "keep",
+   "held_assertion": "functional-v2:criterion:ac-source-evidence:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+   "note": null
+  },
+  {
+   "review_id": "F3-T14",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+   "note": null
+  },
+  {
+   "review_id": "F3-T16",
+   "op": "keep",
+   "held_assertion": "functional-v2:test:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+   "note": null
+  },
+  {
+   "review_id": "F3-T03",
+   "op": "keep",
+   "held_assertion": "functional-v2:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+   "note": "test now also asserts exact distance order (new test bytes, not in held candidate)"
+  },
+  {
+   "review_id": "F3-T05",
+   "op": "keep",
+   "held_assertion": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+   "note": "covers exact-sized candidate_limit only; vec0 path added as F3-R01/R02"
+  },
+  {
+   "review_id": "F3-T13",
+   "op": "keep",
+   "held_assertion": "functional-v2:impl:req-ontology-fallback",
+   "note": "baseline restriction lives here; unverified relation filtering added as F3-R12"
+  },
+  {
+   "review_id": "F3-T07",
+   "op": "narrow",
+   "held_assertion": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedCancellationIsNotEmptySuccess",
+   "scope": "unfiltered empty-store pre-start cancellation and deadline only",
+   "counts_as_full_criterion_proof": false
+  },
+  {
+   "review_id": "F3-T10",
+   "op": "narrow",
+   "held_assertion": "functional-v2:criterion:ac-source-evidence:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+   "scope": "coordinate-drift partial control; fixture has no code anchor",
+   "counts_as_full_criterion_proof": false
+  },
+  {
+   "review_id": "F3-T15",
+   "op": "narrow",
+   "held_assertion": "functional-v2:criterion:ac-ontology-fallback:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+   "scope": "proposed concepts with CKV-only baseline; no verified concept + unverified relation, no CKG citation",
+   "counts_as_full_criterion_proof": false
+  },
+  {
+   "review_id": "F3-T17",
+   "op": "narrow",
+   "held_assertion": "functional-v2:criterion:ac-ontology-fallback:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+   "scope": "ambiguous proposed alias with CKV document hits only",
+   "counts_as_full_criterion_proof": false
+  },
+  {
+   "review_id": "F3-T08",
+   "op": "retarget_object",
+   "held_assertion": "functional-v2:impl:req-source-evidence",
+   "from": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+   "to": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+   "to_location": {
+    "query": "internal/system/semantic||ValidateCodeAnchors",
+    "path": "internal/system/semantic/ckg_anchor.go",
+    "start_line": 35,
+    "end_line": 70,
+    "span_sha256": "be74ca28850d9a4ed0c1313561fdcd49f9513607c9113cad7e7ea13cf88a4ccf",
+    "file_sha256": "6596b3a4f432f0c407d1c64c9331fac9fd688cba94eea294bed0ef6e78352437",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors"
+   }
+  },
+  {
+   "review_id": "F3-T11",
+   "op": "retarget_subject",
+   "held_assertion": "functional-v2:test:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+   "from": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+   "to": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+   "to_location": {
+    "query": "internal/system/semantic||ValidateCodeAnchors",
+    "path": "internal/system/semantic/ckg_anchor.go",
+    "start_line": 35,
+    "end_line": 70,
+    "span_sha256": "be74ca28850d9a4ed0c1313561fdcd49f9513607c9113cad7e7ea13cf88a4ccf",
+    "file_sha256": "6596b3a4f432f0c407d1c64c9331fac9fd688cba94eea294bed0ef6e78352437",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors"
+   },
+   "note": "ValidateDatasetAlignment is the test's positive control; rejection is attributed by ErrCodeAnchorSnapshotMismatch/ErrEvidenceSnapshotMismatch"
+  }
+ ],
+ "added_relations": [
+  {
+   "review_id": "F3-R01",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+   "object_location": {
+    "query": "internal/vector/store/sqlitevec||TestStoreFilterLargeCandidateSetFallsBackToExact",
+    "path": "internal/vector/store/sqlitevec/store_test.go",
+    "start_line": 516,
+    "end_line": 550,
+    "span_sha256": "cb47195365e9f39d279c1a97ba56ddb7093bdfde532d7aef77cbe3a70cc848c9",
+    "file_sha256": "70e1b22af4144574e37bfd6543ab91ef541bbb883c72d28a9308ffe234d8b0df",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact"
+   },
+   "subject_location": {
+    "query": "internal/vector/store/sqlitevec|Store|SearchDetailed",
+    "path": "internal/vector/store/sqlitevec/store.go",
+    "start_line": 620,
+    "end_line": 820,
+    "span_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+    "file_sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed"
+   },
+   "criterion_id": "ac-filtered-completeness",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R02",
+   "predicate": "CHECKED_BY",
+   "subject_id": "ac-filtered-completeness",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+   "object_location": {
+    "query": "internal/vector/store/sqlitevec||TestStoreFilterLargeCandidateSetFallsBackToExact",
+    "path": "internal/vector/store/sqlitevec/store_test.go",
+    "start_line": 516,
+    "end_line": 550,
+    "span_sha256": "cb47195365e9f39d279c1a97ba56ddb7093bdfde532d7aef77cbe3a70cc848c9",
+    "file_sha256": "70e1b22af4144574e37bfd6543ab91ef541bbb883c72d28a9308ffe234d8b0df",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-filtered-completeness",
+   "note": "vec0-path candidate_limit",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R03",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+   "object_location": {
+    "query": "internal/vector/store/sqlitevec||TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+    "path": "internal/vector/store/sqlitevec/store_test.go",
+    "start_line": 450,
+    "end_line": 514,
+    "span_sha256": "1b65b1f32564f7ed99d9d390dea77117cfd572ddb6945381c17625d5133ab1db",
+    "file_sha256": "70e1b22af4144574e37bfd6543ab91ef541bbb883c72d28a9308ffe234d8b0df",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete"
+   },
+   "subject_location": {
+    "query": "internal/vector/store/sqlitevec|Store|SearchDetailed",
+    "path": "internal/vector/store/sqlitevec/store.go",
+    "start_line": 620,
+    "end_line": 820,
+    "span_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+    "file_sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed"
+   },
+   "criterion_id": "ac-filtered-completeness",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R04",
+   "predicate": "CHECKED_BY",
+   "subject_id": "ac-filtered-completeness",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+   "object_location": {
+    "query": "internal/vector/store/sqlitevec||TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+    "path": "internal/vector/store/sqlitevec/store_test.go",
+    "start_line": 450,
+    "end_line": 514,
+    "span_sha256": "1b65b1f32564f7ed99d9d390dea77117cfd572ddb6945381c17625d5133ab1db",
+    "file_sha256": "70e1b22af4144574e37bfd6543ab91ef541bbb883c72d28a9308ffe234d8b0df",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-filtered-completeness",
+   "note": "filtered in-flight cancellation, exact and large sets",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R05",
+   "predicate": "IMPLEMENTED_BY",
+   "subject_id": "snapshot-bound-semantic-relations",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+   "object_location": {
+    "query": "internal/system/semantic|Store|PutAligned",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 185,
+    "end_line": 196,
+    "span_sha256": "d054134c2f5091e7b7c5e877f2f1191d30bfba00ce8da189ec6e085e1120ef3e",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-source-evidence",
+   "note": "gate chain that refuses persistence/activation",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R06",
+   "predicate": "IMPLEMENTED_BY",
+   "subject_id": "snapshot-bound-semantic-relations",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAlignedRetained",
+   "object_location": {
+    "query": "internal/system/semantic|Store|PutAlignedRetained",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 200,
+    "end_line": 214,
+    "span_sha256": "ba632281f3e279cc2c41daa0a99fbe3528dadb5496b773c45d18cd90dd94e118",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAlignedRetained"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-source-evidence",
+   "note": "gate chain that refuses persistence/activation",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R07",
+   "predicate": "IMPLEMENTED_BY",
+   "subject_id": "snapshot-bound-semantic-relations",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+   "object_location": {
+    "query": "internal/system/semantic|Store|ActivateAligned",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 219,
+    "end_line": 237,
+    "span_sha256": "48d48d5abe3409a873edf03ca19543b17757c3e5d2457997dd24fe756fe91c19",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-source-evidence",
+   "note": "gate chain that refuses persistence/activation",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R08",
+   "predicate": "IMPLEMENTED_BY",
+   "subject_id": "snapshot-bound-semantic-relations",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAlignedRetained",
+   "object_location": {
+    "query": "internal/system/semantic|Store|ActivateAlignedRetained",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 239,
+    "end_line": 257,
+    "span_sha256": "40ad6520d07debde3a86028f966a6f6fc1ea81bc8d0ce693670b767451f06455",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAlignedRetained"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-source-evidence",
+   "note": "gate chain that refuses persistence/activation",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R09",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+   "object_location": {
+    "query": "internal/system/semantic||TestForeignCodeAnchorPromotionPreservesActiveDataset",
+    "path": "internal/system/semantic/anchor_promotion_integration_test.go",
+    "start_line": 25,
+    "end_line": 195,
+    "span_sha256": "4a39fb39fc11a0ae8d43c43116dc4567f5ff1678a68085aca306a557461e5181",
+    "file_sha256": "ec777802fee4465119ba720f09bcf7707059235463c13b408f16595f53cc97f3",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset"
+   },
+   "subject_location": {
+    "query": "internal/system/semantic|Store|PutAligned",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 185,
+    "end_line": 196,
+    "span_sha256": "d054134c2f5091e7b7c5e877f2f1191d30bfba00ce8da189ec6e085e1120ef3e",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned"
+   },
+   "criterion_id": "ac-source-evidence",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R10",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+   "object_location": {
+    "query": "internal/system/semantic||TestForeignCodeAnchorPromotionPreservesActiveDataset",
+    "path": "internal/system/semantic/anchor_promotion_integration_test.go",
+    "start_line": 25,
+    "end_line": 195,
+    "span_sha256": "4a39fb39fc11a0ae8d43c43116dc4567f5ff1678a68085aca306a557461e5181",
+    "file_sha256": "ec777802fee4465119ba720f09bcf7707059235463c13b408f16595f53cc97f3",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset"
+   },
+   "subject_location": {
+    "query": "internal/system/semantic|Store|ActivateAligned",
+    "path": "internal/system/semantic/alignment.go",
+    "start_line": 219,
+    "end_line": 237,
+    "span_sha256": "48d48d5abe3409a873edf03ca19543b17757c3e5d2457997dd24fe756fe91c19",
+    "file_sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned"
+   },
+   "criterion_id": "ac-source-evidence",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R11",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+   "object_location": {
+    "query": "internal/system/semantic||TestActiveProjectionExposesOnlyVerifiedImplementations",
+    "path": "internal/system/semantic/active_test.go",
+    "start_line": 8,
+    "end_line": 40,
+    "span_sha256": "19f8c680cf5222fc39db080591d283a1ca7b6721351730d50c594369aa7f1004",
+    "file_sha256": "3c4f66cb5ca27f393ce40a7cf9ab8ac4d06fd2a7c7cc0706978a7764edec8cd1",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations"
+   },
+   "subject_location": {
+    "query": "internal/system/semantic|ActiveProjection|VerifiedImplementations",
+    "path": "internal/system/semantic/active.go",
+    "start_line": 59,
+    "end_line": 88,
+    "span_sha256": "4663d02e81c151973ff2b4126bd89448ee0105235ee1738d5d8b933528da0cc6",
+    "file_sha256": "f0771c14efb337cad62f1316289a7afdcb030cada78168467163a14530b938ed",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations"
+   },
+   "criterion_id": "ac-ontology-fallback",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R12",
+   "predicate": "IMPLEMENTED_BY",
+   "subject_id": "optional-ontology-baseline-preservation",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+   "object_location": {
+    "query": "internal/system/semantic|ActiveProjection|VerifiedImplementations",
+    "path": "internal/system/semantic/active.go",
+    "start_line": 59,
+    "end_line": 88,
+    "span_sha256": "4663d02e81c151973ff2b4126bd89448ee0105235ee1738d5d8b933528da0cc6",
+    "file_sha256": "f0771c14efb337cad62f1316289a7afdcb030cada78168467163a14530b938ed",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-ontology-fallback",
+   "note": "excludes unverified concept relations",
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R13",
+   "predicate": "TESTED_BY",
+   "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+   "object_location": {
+    "query": "internal/system/composer/stage2||TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+    "path": "internal/system/composer/stage2/ontology_provider_test.go",
+    "start_line": 105,
+    "end_line": 157,
+    "span_sha256": "b0d2c40af5fcc40bb8450a44cf398866441e2d2c6863d5d41a2146a6adf018e2",
+    "file_sha256": "2b02d4afb76d3e50631f410c1467aca0358776eefd35f8204764bb71e12292e0",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline"
+   },
+   "subject_location": {
+    "query": "internal/system/composer/stage2|Searcher|applyProvidedOntology",
+    "path": "internal/system/composer/stage2/ontology_provider.go",
+    "start_line": 76,
+    "end_line": 244,
+    "span_sha256": "046b576e2a794a161e2d4017ae1ff9099c89d4e4c6869efd2e5b52f812b937d4",
+    "file_sha256": "948a46cd0725e4170acee64c0d72c06ee8a8091ebd368ba79bd8b4f25d7cee25",
+    "pointer_receiver": true,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology"
+   },
+   "criterion_id": "ac-ontology-fallback",
+   "note": null,
+   "status": "proposed"
+  },
+  {
+   "review_id": "F3-R14",
+   "predicate": "CHECKED_BY",
+   "subject_id": "ac-ontology-fallback",
+   "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+   "object_location": {
+    "query": "internal/system/composer/stage2||TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+    "path": "internal/system/composer/stage2/ontology_provider_test.go",
+    "start_line": 105,
+    "end_line": 157,
+    "span_sha256": "b0d2c40af5fcc40bb8450a44cf398866441e2d2c6863d5d41a2146a6adf018e2",
+    "file_sha256": "2b02d4afb76d3e50631f410c1467aca0358776eefd35f8204764bb71e12292e0",
+    "pointer_receiver": false,
+    "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline"
+   },
+   "subject_location": null,
+   "criterion_id": "ac-ontology-fallback",
+   "note": "verified concept + unverified relation; CKG-only citation preserved",
+   "status": "proposed"
+  }
+ ],
+ "claims": [
+  {
+   "claim_id": "pilot-claim:P12-P01",
+   "op": "reword",
+   "statement": "공개 관리 경로(MCP ops.index/setup/reindex)는 pinned v2 dataset의 제자리 갱신과 legacy 후보 downgrade를 versioned_setup_required로 거부한다. 새 후보는 동일 검토 설정·project ID와 새 버전의 cks setup --version으로 만든다(low-level 엔진 직접 쓰기는 보호 밖).",
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": null
+  },
+  {
+   "claim_id": "pilot-claim:P12-P02",
+   "op": "keep",
+   "statement": null,
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": "authority field -> N-03"
+  },
+  {
+   "claim_id": "pilot-claim:P12-P03",
+   "op": "keep",
+   "statement": null,
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": null
+  },
+  {
+   "claim_id": "pilot-claim:P12-P04",
+   "op": "reword",
+   "statement": "worksheet 생성은 명시적으로 선택·pin된 local pack catalog만 읽으며, 앵커 검사를 실행하거나 항목을 승인·verified로 승격하지 않는다.",
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": null
+  },
+  {
+   "claim_id": "pilot-claim:P12-P05",
+   "op": "reword",
+   "statement": "신규 Git 캡처(snapshot v4 이상)는 기준 HEAD와 선택 복구 커밋 객체를 해시된 history.bundle로 봉인하고 독립 저장소에 복원해 빌드한다. 기존 v2/v3 보관본은 기존 방식으로 읽는다.",
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": null
+  },
+  {
+   "claim_id": "pilot-claim:P12-P06",
+   "op": "keep",
+   "statement": null,
+   "authority_kind": "repository_contract_or_ADR_not_organization_policy",
+   "seed_fix": null
+  }
+ ],
+ "legacy_relations": [
+  {
+   "assertion_id": "supports:P12-P01",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "supports:P12-P02",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "supports:P12-P03",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "supports:P12-P04",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "supports:P12-P05",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "supports:P12-P06",
+   "op": "keep",
+   "to": null,
+   "note": "section span contains claim line; direction section->claim correct"
+  },
+  {
+   "assertion_id": "about:P12-P01",
+   "op": "retarget_object",
+   "to": "dataset",
+   "note": "claim is about pinned dataset immutability; 'dataset' fits better"
+  },
+  {
+   "assertion_id": "about:P12-P02",
+   "op": "keep",
+   "to": null,
+   "note": "'dataset' excludes mutable active pointer; no better core20 concept"
+  },
+  {
+   "assertion_id": "about:P12-P03",
+   "op": "keep",
+   "to": null,
+   "note": "evidence-pack fits"
+  },
+  {
+   "assertion_id": "about:P12-P04",
+   "op": "keep",
+   "to": null,
+   "note": "'policy' only partially fits; no worksheet concept in core20"
+  },
+  {
+   "assertion_id": "about:P12-P05",
+   "op": "keep",
+   "to": null,
+   "note": "source-snapshot fits"
+  },
+  {
+   "assertion_id": "about:P12-P06",
+   "op": "keep",
+   "to": null,
+   "note": "source-snapshot fits"
+  }
+ ],
+ "criterion_coverage_after_revision": {
+  "ac-filtered-recall": {
+   "full_proof": [
+    "F3-T03"
+   ],
+   "remaining_gap": "eligible count equals K (boundary of 'at least K')"
+  },
+  "ac-filtered-completeness": {
+   "full_proof": [
+    "F3-T05",
+    "F3-R02",
+    "F3-R04"
+   ],
+   "partial": [
+    "F3-T07"
+   ],
+   "remaining_gap": null
+  },
+  "ac-source-evidence": {
+   "full_proof": [
+    "F3-T12"
+   ],
+   "partial": [
+    "F3-T10"
+   ],
+   "remaining_gap": "CKV is a coordinate-only mock in F3-T12"
+  },
+  "ac-ontology-fallback": {
+   "full_proof": [
+    "F3-R14"
+   ],
+   "partial": [
+    "F3-T15",
+    "F3-T17"
+   ],
+   "remaining_gap": "F3-R14 composes VerifiedImplementations (F3-R11) through the resolver interface; no single real-store end-to-end case"
+  }
+ },
+ "all_status": "proposed",
+ "reviewer": null,
+ "verified_count": 0,
+ "requires_before_verified": [
+  "named reviewer (product ReviewedBy)",
+  "new coordinated capture/CKG/CKV including the changed tests and gate change",
+  "projection re-extraction and alignment checks"
+ ]
+}

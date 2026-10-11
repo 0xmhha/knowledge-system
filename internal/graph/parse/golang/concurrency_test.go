@@ -164,7 +164,7 @@ func TestConcurrency_Channel_Attributes(t *testing.T) {
 	}
 }
 
-// TestConcurrency_NoRegression_Goroutine confirms B1 didn't break the
+// TestConcurrency_NoRegression_Goroutine confirms the concurrency pass didn't break the
 // pre-existing Goroutine/spawns/sends_to/recvs_from extraction. The
 // fixture's GoroutineFanout uses all four.
 func TestConcurrency_NoRegression_Goroutine(t *testing.T) {
@@ -278,7 +278,7 @@ func TestChannelFlow_Goroutine_SendsToChannelNode(t *testing.T) {
 	}
 }
 
-// TestConcurrency_GoroutineLockEdges (Track C P1a) — lock CallExprs inside a
+// TestConcurrency_GoroutineLockEdges — lock CallExprs inside a
 // `go func() { ... }()` literal must produce acquires_lock / releases_lock
 // edges. Pre-fix, statements.go returned false on *ast.GoStmt to avoid
 // double-walking, and emitGoroutineChannelEdges only handled channel

@@ -12,9 +12,8 @@
 // per project keeps the policy surface explicit and editable without
 // forcing CKG to know each project's conventions.
 //
-// See docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2 P1 #4 for the design
-// intent and the go-stablenet-specific use cases (params/config.go
-// fork blocks, consensus/wbft/* policies, systemcontracts/*).
+// Typical go-stablenet use cases are params/config.go fork blocks,
+// consensus/wbft/* policies, and systemcontracts/*.
 //
 // # Schema
 //

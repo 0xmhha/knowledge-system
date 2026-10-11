@@ -1,0 +1,47 @@
+[
+  {
+    "error": "assertion \"trace-proposal:impl:req-filtered-recall\" IMPLEMENTED_BY needs a matching CKG code anchor",
+    "name": "implementation_wrong_canonical",
+    "rejected": true
+  },
+  {
+    "error": "assertion \"trace-proposal:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\" TESTED_BY needs code and test CKG anchors",
+    "name": "reversed_code_test_endpoints",
+    "rejected": true
+  },
+  {
+    "error": "assertion \"trace-proposal:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\" CHECKED_BY needs criterion and test sources",
+    "name": "missing_criterion",
+    "rejected": true
+  },
+  {
+    "error": "assertion \"trace-proposal:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\" CHECKED_BY needs criterion and test sources",
+    "name": "criterion_points_to_code_not_test",
+    "rejected": true
+  },
+  {
+    "error": "assertion \"trace-proposal:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded\" ACCEPTED_BY is read-only in schema 3; write CHECKED_BY",
+    "name": "legacy_accepted_by_write_in_v4",
+    "rejected": true
+  },
+  {
+    "error": "evidence \"ontology:0c47b954570792dfd90a9d9c\" crosses project or snapshot",
+    "name": "cross_snapshot_evidence",
+    "rejected": true
+  },
+  {
+    "error": "evidence \"ontology:0c47b954570792dfd90a9d9c\" source digest mismatch",
+    "name": "retained_span_digest_changed",
+    "rejected": true
+  },
+  {
+    "error": "verified assertion \"trace-proposal:impl:req-filtered-recall\" refers to unverified concept",
+    "name": "implementation_verified_without_reviewed_concept",
+    "rejected": true
+  },
+  {
+    "error": "semantic dataset knowledge-system/5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47 already exists with different content",
+    "name": "immutable_store_content_replacement",
+    "rejected": true
+  }
+]

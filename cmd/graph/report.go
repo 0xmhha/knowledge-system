@@ -612,7 +612,8 @@ func findKnowledgeGaps(nodes []types.Node, edges []types.Edge,
 //  1. AMBIGUOUS edges → relationship-clarification questions
 //  2. Bridge nodes (high betweenness) → cross-cutting concern questions
 //  3. God nodes with INFERRED neighbours → verification questions
-//     (CKG self-graph has near-zero INFERRED edges thanks to Track C;
+//     (CKG self-graph has near-zero INFERRED edges thanks to precise
+//     cross-file resolution;
 //     this category falls back to god node call analysis when empty)
 //  4. Isolated nodes → exploration questions
 //  5. Low-cohesion communities → structural questions
@@ -675,7 +676,7 @@ func suggestedQuestionsV2(
 	}
 
 	// 3. God nodes — substitute "What touches X?" since CKG rarely has
-	// INFERRED edges (Track C resolves most cross-file refs cleanly).
+	// INFERRED edges (most cross-file refs resolve cleanly).
 	for i, gn := range gods {
 		if i >= 1 {
 			break

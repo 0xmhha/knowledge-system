@@ -20,20 +20,20 @@ type declVisitor struct {
 	edges   []types.Edge
 	pending []parse.PendingRef
 	// endpointIDs deduplicates NodeEndpoint emissions inside a single file
-	// (schema 1.9 W1). Key = endpoint qname (`http:METHOD /route`),
+	// (schema 1.9). Key = endpoint qname (`http:METHOD /route`),
 	// value = node ID. Initialised lazily by runDistributed.
 	endpointIDs map[string]string
 	// httpClientPlaceholderIDs maps an HTTP-client target qname to the
 	// AMBIGUOUS placeholder Endpoint ID emitted in http_client.go.
 	// Separate from endpointIDs because placeholder Endpoints use
 	// Language="external" — they live in a distinct ID space until the
-	// link pass (internal/link/http_match.go) resolves them (W2,
-	// schema 1.9 §6.3 (B), §6.9).
+	// link pass (internal/link/http_match.go) resolves them
+	// (schema 1.9 §6.3 (B), §6.9).
 	httpClientPlaceholderIDs map[string]string
 	// grpcClientStubsTS maps a local stub variable name to the gRPC
 	// service name it was bound to via `new XxxClient(...)` /
 	// `createPromiseClient(Svc, ...)` / `createClient(Svc, ...)`.
-	// Populated by collectGRPCClientStubs (W3c, schema 1.9 §3.4).
+	// Populated by collectGRPCClientStubs (schema 1.9 §3.4).
 	// Flat per-file scope — V0 doesn't model nested-scope shadowing.
 	grpcClientStubsTS map[string]string
 	// grpcClientPlaceholderIDsTS maps a gRPC-client target qname
@@ -48,7 +48,7 @@ type declVisitor struct {
 	// gRPC stubs only when this is true — without the gating, common
 	// non-gRPC clients (RedisClient/PrismaClient/HttpClient/ApolloClient
 	// /S3Client/MongoClient/KafkaClient/ApiClient) would all produce
-	// AMBIGUOUS placeholders. W3c review Important #1 (2026-05-11).
+	// AMBIGUOUS placeholders.
 	// Set once in runGRPCClients() via fileHasGRPCImport().
 	tsGRPCImportPresent bool
 }
@@ -74,7 +74,7 @@ func (v *declVisitor) visit() {
 	v.runQuery(queryEnum, types.NodeEnum)
 	v.runQuery(queryDecorator, types.NodeDecorator)
 	v.runImports()
-	// W-B W1 (schema 1.10 slots, 2026-05-11): emit extends / implements
+	// Schema 1.10: emit extends / implements
 	// PendingRefs from class_heritage / extends_type_clause subtrees.
 	// Must run after queryClass / queryInterface so the SrcID anchors
 	// (computed independently here from the same name-identifier
@@ -86,10 +86,10 @@ func (v *declVisitor) visit() {
 	// PendingRefs anchored on each CallSite. Runs after the declaration
 	// queries so the Function/Method byte intervals (collected via
 	// collectFnIntervalsFromTree) are populated for the enclosing-fn
-	// lookup. Replaces the earlier P3 runBodyCalls — see
+	// lookup. Replaces the earlier runBodyCalls — see
 	// internal/parse/typescript/statements.go for the full schema.
 	v.runBodyStatements()
-	// W-B W2 (schema 1.10 slots, 2026-05-11): emit NodeAwaitPoint +
+	// Schema 1.10: emit NodeAwaitPoint +
 	// EdgeAwaits for every await_expression that lives inside a
 	// Function/Method interval. Runs after runBodyStatements so any
 	// CallSite/IfStmt/LoopStmt that might co-locate with an await is
@@ -98,22 +98,22 @@ func (v *declVisitor) visit() {
 	// statement-level passes contiguous makes the order easier to read).
 	// See async.go for the full shape spec.
 	v.runAsync()
-	// W1 (schema 1.9): emit HTTP server Endpoint nodes + listens_on edges
+	// Schema 1.9: emit HTTP server Endpoint nodes + listens_on edges
 	// for Express / Koa / Fastify / Hono / Next.js App Router patterns.
 	// Runs after the declaration queries so Function/Method nodes are
 	// already in v.nodes — listens_on resolution walks v.nodes to find
 	// the handler.
 	v.runDistributed()
-	// W2 (schema 1.9): emit HTTP client placeholder Endpoints + http_calls
+	// Schema 1.9: emit HTTP client placeholder Endpoints + http_calls
 	// edges for fetch / axios / useSWR / useQuery patterns. The link pass
 	// (internal/link/http_match.go) reconciles placeholders against real
 	// server-side Endpoints from the same monorepo.
 	v.runHTTPClients()
-	// W3c (schema 1.9 §3.4): emit gRPC-web / Connect-web client
+	// Schema 1.9 §3.4: emit gRPC-web / Connect-web client
 	// placeholder Endpoints + grpc_calls edges. AST-only — all edges
 	// are INFERRED per §6.5 (c) because tree-sitter parses don't carry
 	// typesInfo. Placeholder Endpoints share the qname shape
-	// `grpc:Service.Method` with W3a/W3b so a future linker pass can
+	// `grpc:Service.Method` with the proto and Go parsers so a future linker pass can
 	// rewire by suffix match.
 	v.runGRPCClients()
 }
@@ -149,7 +149,7 @@ func (v *declVisitor) runQuery(q string, nt types.NodeType) {
 					qname = className + "." + ident
 				}
 			}
-			// W-B W2 (schema 1.10): tag async function-likes via SubKind so
+			// Schema 1.10: tag async function-likes via SubKind so
 			// graph consumers can distinguish suspension-bearing callables
 			// without reaching back into the body walk. Limited to
 			// NodeFunction / NodeMethod — class/interface/etc. have no

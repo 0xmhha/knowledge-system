@@ -1,0 +1,811 @@
+[
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:SearchDetailed",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/vector/store/sqlitevec/store.go",
+      "start_line": 620,
+      "end_line": 820,
+      "content_sha256": "da8fa5c0c1e916afa0f6d6618354a0c275e49ed3ce8b79299b2497ab26ff16b1",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "SearchDetailed",
+    "node": {
+      "id": "48335fd5f83c1c01",
+      "type": "Method",
+      "name": "SearchDetailed",
+      "qualified_name": "sqlitevec.Store.SearchDetailed",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "file_path": "internal/vector/store/sqlitevec/store.go",
+      "start_line": 620,
+      "end_line": 820,
+      "start_byte": 21557,
+      "end_byte": 28281,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (Store) SearchDetailed(ctx context.Context, query []float32, k int, filter types.Filter, opts SearchOptions) (SearchResult, error)",
+      "doc_comment": "SearchDetailed uses exact scan for small filtered sets and bounded vec0\nsearch for larger sets. A short ANN result is completed by exact scan only\nwhen the SQL candidate superset fits MaxExactCandidates.",
+      "in_degree": 11,
+      "out_degree": 172,
+      "pagerank": 0.000118856841207139,
+      "usage_score": 9,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:ValidateDatasetAlignment",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/alignment.go",
+      "start_line": 69,
+      "end_line": 138,
+      "content_sha256": "9fa6701c9ca8bc02dee05a91615f2f002a34733da300491270255f6a56330cd9",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "ValidateDatasetAlignment",
+    "node": {
+      "id": "ccf6edefbd8aab75",
+      "type": "Function",
+      "name": "ValidateDatasetAlignment",
+      "qualified_name": "semantic.ValidateDatasetAlignment",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+      "file_path": "internal/system/semantic/alignment.go",
+      "start_line": 69,
+      "end_line": 138,
+      "start_byte": 2405,
+      "end_byte": 5575,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func ValidateDatasetAlignment(p Projection, repoRoot, graphDir, vectorDir string) error",
+      "doc_comment": "ValidateDatasetAlignment requires all three layers to share an exact source\ncommit, graph coordinate pin, and source tree. Unlike legacy setup alignment\n(which warns on old indexes), semantic promotion refuses missing coordinates.",
+      "in_degree": 13,
+      "out_degree": 62,
+      "pagerank": 0.00012418125532598871,
+      "usage_score": 11,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:ValidateCodeAnchors",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/ckg_anchor.go",
+      "start_line": 35,
+      "end_line": 70,
+      "content_sha256": "be74ca28850d9a4ed0c1313561fdcd49f9513607c9113cad7e7ea13cf88a4ccf",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "ValidateCodeAnchors",
+    "node": {
+      "id": "e9a9fc7cb7297efc",
+      "type": "Function",
+      "name": "ValidateCodeAnchors",
+      "qualified_name": "semantic.ValidateCodeAnchors",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateCodeAnchors",
+      "file_path": "internal/system/semantic/ckg_anchor.go",
+      "start_line": 35,
+      "end_line": 70,
+      "start_byte": 1258,
+      "end_byte": 2207,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func ValidateCodeAnchors(p Projection, graphDir string) error",
+      "doc_comment": "ValidateCodeAnchors checks every canonical code/test evidence against the\nactual graph DB before an aligned semantic projection becomes active.",
+      "in_degree": 10,
+      "out_degree": 30,
+      "pagerank": 0.00012149572855119318,
+      "usage_score": 8,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:PutAligned",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/alignment.go",
+      "start_line": 185,
+      "end_line": 196,
+      "content_sha256": "d054134c2f5091e7b7c5e877f2f1191d30bfba00ce8da189ec6e085e1120ef3e",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "PutAligned",
+    "node": {
+      "id": "8c87797d2fe079d2",
+      "type": "Method",
+      "name": "PutAligned",
+      "qualified_name": "semantic.Store.PutAligned",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAligned",
+      "file_path": "internal/system/semantic/alignment.go",
+      "start_line": 185,
+      "end_line": 196,
+      "start_byte": 7070,
+      "end_byte": 7467,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (Store) PutAligned(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir string) error",
+      "doc_comment": "PutAligned is the promotion entry point for projections attached to built\nCKV/CKG datasets. It verifies engine coordinates and source bytes before\nthe immutable projection is persisted. Put remains available for preparing\nan unpromoted projection without engine indexes.",
+      "in_degree": 5,
+      "out_degree": 16,
+      "pagerank": 0.00009405854910035942,
+      "usage_score": 3,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:PutAlignedRetained",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/alignment.go",
+      "start_line": 200,
+      "end_line": 214,
+      "content_sha256": "ba632281f3e279cc2c41daa0a99fbe3528dadb5496b773c45d18cd90dd94e118",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAlignedRetained",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "PutAlignedRetained",
+    "node": {
+      "id": "5862a7ccb6bbb788",
+      "type": "Method",
+      "name": "PutAlignedRetained",
+      "qualified_name": "semantic.Store.PutAlignedRetained",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).PutAlignedRetained",
+      "file_path": "internal/system/semantic/alignment.go",
+      "start_line": 200,
+      "end_line": 214,
+      "start_byte": 7624,
+      "end_byte": 8118,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (Store) PutAlignedRetained(ctx context.Context, p Projection, repoRoot, graphDir, vectorDir, versionDir string) error",
+      "doc_comment": "PutAlignedRetained validates raw meaning against the immutable candidate\narchive, including when the source has no Git history or has since changed.",
+      "in_degree": 6,
+      "out_degree": 20,
+      "pagerank": 0.00009374965714138791,
+      "usage_score": 4,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:ActivateAligned",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/alignment.go",
+      "start_line": 219,
+      "end_line": 237,
+      "content_sha256": "48d48d5abe3409a873edf03ca19543b17757c3e5d2457997dd24fe756fe91c19",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "ActivateAligned",
+    "node": {
+      "id": "08f95daddb1c2a60",
+      "type": "Method",
+      "name": "ActivateAligned",
+      "qualified_name": "semantic.Store.ActivateAligned",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAligned",
+      "file_path": "internal/system/semantic/alignment.go",
+      "start_line": 219,
+      "end_line": 237,
+      "start_byte": 8341,
+      "end_byte": 8917,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (Store) ActivateAligned(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir string) error",
+      "doc_comment": "ActivateAligned rechecks current engine coordinates immediately before\nselecting a projection. It keeps an older stored candidate from becoming\nlive after the graph/vector indexes have moved to another snapshot.",
+      "in_degree": 5,
+      "out_degree": 22,
+      "pagerank": 0.00009405854910035942,
+      "usage_score": 3,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:ActivateAlignedRetained",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/alignment.go",
+      "start_line": 239,
+      "end_line": 257,
+      "content_sha256": "40ad6520d07debde3a86028f966a6f6fc1ea81bc8d0ce693670b767451f06455",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAlignedRetained",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "ActivateAlignedRetained",
+    "node": {
+      "id": "0cb79bfc65874bb3",
+      "type": "Method",
+      "name": "ActivateAlignedRetained",
+      "qualified_name": "semantic.Store.ActivateAlignedRetained",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(*Store).ActivateAlignedRetained",
+      "file_path": "internal/system/semantic/alignment.go",
+      "start_line": 239,
+      "end_line": 257,
+      "start_byte": 8919,
+      "end_byte": 9520,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (Store) ActivateAlignedRetained(ctx context.Context, projectID, datasetID, repoRoot, graphDir, vectorDir, versionDir string) error",
+      "in_degree": 4,
+      "out_degree": 22,
+      "pagerank": 0.0000927882661410395,
+      "usage_score": 2,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:applyProvidedOntology",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/composer/stage2/ontology_provider.go",
+      "start_line": 76,
+      "end_line": 244,
+      "content_sha256": "046b576e2a794a161e2d4017ae1ff9099c89d4e4c6869efd2e5b52f812b937d4",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "applyProvidedOntology",
+    "node": {
+      "id": "bf8e95a8e84a552a",
+      "type": "Method",
+      "name": "applyProvidedOntology",
+      "qualified_name": "stage2.Searcher.applyProvidedOntology",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+      "file_path": "internal/system/composer/stage2/ontology_provider.go",
+      "start_line": 76,
+      "end_line": 244,
+      "start_byte": 2385,
+      "end_byte": 8979,
+      "language": "go",
+      "visibility": "private",
+      "signature": "func (Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, prompt string, hits []contract.Hit, baseline []ScoredCitation, demoteTests, demoteDocs bool) ([]ScoredCitation, []semantic.ConceptCandidate, *contract.OntologyDiagnostic)",
+      "in_degree": 14,
+      "out_degree": 135,
+      "pagerank": 0.00010016430979432179,
+      "usage_score": 11,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:VerifiedImplementations",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "code",
+      "path": "internal/system/semantic/active.go",
+      "start_line": 59,
+      "end_line": 88,
+      "content_sha256": "4663d02e81c151973ff2b4126bd89448ee0105235ee1738d5d8b933528da0cc6",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "VerifiedImplementations",
+    "node": {
+      "id": "f79576bc100078bf",
+      "type": "Method",
+      "name": "VerifiedImplementations",
+      "qualified_name": "semantic.ActiveProjection.VerifiedImplementations",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.(ActiveProjection).VerifiedImplementations",
+      "file_path": "internal/system/semantic/active.go",
+      "start_line": 59,
+      "end_line": 88,
+      "start_byte": 1932,
+      "end_byte": 2878,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func (ActiveProjection) VerifiedImplementations(conceptID string) []CodeImplementation",
+      "in_degree": 7,
+      "out_degree": 14,
+      "pagerank": 0.00010719960662023184,
+      "usage_score": 5,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 389,
+      "end_line": 431,
+      "content_sha256": "ddd4ddae2d1f28e043485007504fd21ccd7e60627837c8ed4964399a5e74f5ad",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+    "node": {
+      "id": "56445a886877869d",
+      "type": "Function",
+      "name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "qualified_name": "sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "file_path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 389,
+      "end_line": 431,
+      "start_byte": 14072,
+      "end_byte": 15641,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 40,
+      "pagerank": 0.0000910251497019438,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 142,
+      "end_line": 175,
+      "content_sha256": "f1283b2243af4fadaf6dbdc47416ef4830c8d1d0ccbd2d29a26c051b0ee4d64b",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+    "node": {
+      "id": "91cc8c39ed1b13df",
+      "type": "Function",
+      "name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "qualified_name": "sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "file_path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 142,
+      "end_line": 175,
+      "start_byte": 4187,
+      "end_byte": 5710,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 39,
+      "pagerank": 0.0000910251497019438,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestSearchDetailedCancellationIsNotEmptySuccess",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 177,
+      "end_line": 195,
+      "content_sha256": "a9004d2f48360194b8fb01416650cfd51aa4c8efbfd8136574ec8219298c884c",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestSearchDetailedCancellationIsNotEmptySuccess",
+    "node": {
+      "id": "95876b19dcc810b5",
+      "type": "Function",
+      "name": "TestSearchDetailedCancellationIsNotEmptySuccess",
+      "qualified_name": "sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+      "file_path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 177,
+      "end_line": 195,
+      "start_byte": 5712,
+      "end_byte": 6670,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T)",
+      "in_degree": 6,
+      "out_degree": 31,
+      "pagerank": 0.00010265994327286906,
+      "usage_score": 2,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 516,
+      "end_line": 550,
+      "content_sha256": "cb47195365e9f39d279c1a97ba56ddb7093bdfde532d7aef77cbe3a70cc848c9",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestStoreFilterLargeCandidateSetFallsBackToExact",
+    "node": {
+      "id": "36c1fb89dab04ecf",
+      "type": "Function",
+      "name": "TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "qualified_name": "sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterLargeCandidateSetFallsBackToExact",
+      "file_path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 516,
+      "end_line": 550,
+      "start_byte": 18894,
+      "end_byte": 20378,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 39,
+      "pagerank": 0.0000910251497019438,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 450,
+      "end_line": 514,
+      "content_sha256": "1b65b1f32564f7ed99d9d390dea77117cfd572ddb6945381c17625d5133ab1db",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+    "node": {
+      "id": "535906fa0ec9cc78",
+      "type": "Function",
+      "name": "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "qualified_name": "sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedFilteredCancellationAfterStartIsNotComplete",
+      "file_path": "internal/vector/store/sqlitevec/store_test.go",
+      "start_line": 450,
+      "end_line": 514,
+      "start_byte": 16117,
+      "end_byte": 18892,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestSearchDetailedFilteredCancellationAfterStartIsNotComplete(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 51,
+      "pagerank": 0.0000910251497019438,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/semantic/alignment_test.go",
+      "start_line": 26,
+      "end_line": 107,
+      "content_sha256": "9b9e8375569a40a0ae5c791671fb152c807d973edf4bfa1beb1e9134bf1540eb",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+    "node": {
+      "id": "b938ea026ec11f55",
+      "type": "Function",
+      "name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "qualified_name": "semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "file_path": "internal/system/semantic/alignment_test.go",
+      "start_line": 26,
+      "end_line": 107,
+      "start_byte": 411,
+      "end_byte": 4485,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty(t *testing.T)",
+      "in_degree": 6,
+      "out_degree": 99,
+      "pagerank": 0.00009981721078314511,
+      "usage_score": 4,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/semantic/anchor_promotion_integration_test.go",
+      "start_line": 25,
+      "end_line": 195,
+      "content_sha256": "4a39fb39fc11a0ae8d43c43116dc4567f5ff1678a68085aca306a557461e5181",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestForeignCodeAnchorPromotionPreservesActiveDataset",
+    "node": {
+      "id": "739bfcd60cd54506",
+      "type": "Function",
+      "name": "TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "qualified_name": "semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+      "file_path": "internal/system/semantic/anchor_promotion_integration_test.go",
+      "start_line": 25,
+      "end_line": 195,
+      "start_byte": 543,
+      "end_byte": 8532,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestForeignCodeAnchorPromotionPreservesActiveDataset(t *testing.T)",
+      "doc_comment": "CKG is built through its public CLI at two real committed snapshots. CKV\nis a coordinate-only control: no vector DB, chunk links or embeddings.\nAll meanings are proposed and the active pointer belongs only to this fixture.",
+      "in_degree": 17,
+      "out_degree": 184,
+      "pagerank": 0.00009930227709715453,
+      "usage_score": 14,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestActiveProjectionExposesOnlyVerifiedImplementations",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/semantic/active_test.go",
+      "start_line": 8,
+      "end_line": 40,
+      "content_sha256": "19f8c680cf5222fc39db080591d283a1ca7b6721351730d50c594369aa7f1004",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestActiveProjectionExposesOnlyVerifiedImplementations",
+    "node": {
+      "id": "abac486dd6732173",
+      "type": "Function",
+      "name": "TestActiveProjectionExposesOnlyVerifiedImplementations",
+      "qualified_name": "semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestActiveProjectionExposesOnlyVerifiedImplementations",
+      "file_path": "internal/system/semantic/active_test.go",
+      "start_line": 8,
+      "end_line": 40,
+      "start_byte": 52,
+      "end_byte": 2010,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestActiveProjectionExposesOnlyVerifiedImplementations(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 34,
+      "pagerank": 0.00011488311275828842,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/composer/stage2/ontology_provider_test.go",
+      "start_line": 49,
+      "end_line": 82,
+      "content_sha256": "bb58559a029f2bfa13342e87b9260f3b043addab28df70e64ea8f4267af9c1aa",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+    "node": {
+      "id": "79a96d8699727f55",
+      "type": "Function",
+      "name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "qualified_name": "stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "file_path": "internal/system/composer/stage2/ontology_provider_test.go",
+      "start_line": 49,
+      "end_line": 82,
+      "start_byte": 2094,
+      "end_byte": 4018,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline(t *testing.T)",
+      "in_degree": 2,
+      "out_degree": 34,
+      "pagerank": 0.00009492181843921088,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/composer/stage2/ontology_matcher_integration_test.go",
+      "start_line": 28,
+      "end_line": 181,
+      "content_sha256": "56ebe52605622d2cb50e688bd84d047c525bb7e9a0157f9dad000615377dc3f1",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+    "node": {
+      "id": "6d5f473a02608e8f",
+      "type": "Function",
+      "name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "qualified_name": "stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+      "file_path": "internal/system/composer/stage2/ontology_matcher_integration_test.go",
+      "start_line": 28,
+      "end_line": 181,
+      "start_byte": 827,
+      "end_byte": 8221,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestStoredSharedAliasPreservesBaselineAndRetainedEvidence(t *testing.T)",
+      "doc_comment": "Exercise the real parser, immutable store, matcher and retained evidence\npath together. The engine manifests/hits are coordinate-only controls;\nthere are no code edges, live retrieval calls or human-reviewed meanings.",
+      "in_degree": 2,
+      "out_degree": 159,
+      "pagerank": 0.00009296922899341779,
+      "usage_score": 0,
+      "confidence": "EXTRACTED"
+    }
+  },
+  {
+    "evidence": {
+      "id": "reviewed-v3:anchor:TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "snapshot": {
+        "project_id": "knowledge-system",
+        "dataset_id": "daf9608b74eb0102f4d3562604f39b9d39f0afec037354321a25ffbd64013d4f",
+        "snapshot_id": "813b80a96f7acbc8f672887f51f7b5994fda596f59615d871f29af968c8c0f83",
+        "source_mode": "committed",
+        "commit": "0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3"
+      },
+      "kind": "test",
+      "path": "internal/system/composer/stage2/ontology_provider_test.go",
+      "start_line": 105,
+      "end_line": 157,
+      "content_sha256": "b0d2c40af5fcc40bb8450a44cf398866441e2d2c6863d5d41a2146a6adf018e2",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "extractor": "actual-CKG-AST-retained-v2"
+    },
+    "name": "TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+    "node": {
+      "id": "d26041a35aed8fef",
+      "type": "Function",
+      "name": "TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "qualified_name": "stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "canonical_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline",
+      "file_path": "internal/system/composer/stage2/ontology_provider_test.go",
+      "start_line": 105,
+      "end_line": 157,
+      "start_byte": 5340,
+      "end_byte": 8152,
+      "language": "go",
+      "visibility": "exported",
+      "signature": "func TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline(t *testing.T)",
+      "doc_comment": "A verified concept whose IMPLEMENTED_BY relation is not verified exposes no\nimplementations (semantic.ActiveProjection.VerifiedImplementations, covered\nby TestActiveProjectionExposesOnlyVerifiedImplementations). Here the\ncomposed search keeps the exact baseline, including a CKG-only citation,\nwhile the verified-relation positive control proves the arm can reorder.",
+      "in_degree": 6,
+      "out_degree": 52,
+      "pagerank": 0.00010170194832772599,
+      "usage_score": 4,
+      "confidence": "EXTRACTED"
+    }
+  }
+]

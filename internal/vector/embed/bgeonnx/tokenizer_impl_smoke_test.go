@@ -1,7 +1,7 @@
 //go:build bgeonnx && bgeonnx_smoke
 
 // Smoke test for the production tokenizer. Skipped unless the model
-// directory has tokenizer.json on disk — see docs/d1-installation-guide.md.
+// directory has tokenizer.json on disk — see docs/vector/d1-installation-guide.md.
 // Run: go test -tags 'bgeonnx bgeonnx_smoke' ./internal/embed/bgeonnx/
 
 package bgeonnx
@@ -32,7 +32,7 @@ func defaultModelDir(t *testing.T) (string, ModelConfig) {
 func TestHFTokenizerSmoke_PadsToMaxInBatch(t *testing.T) {
 	dir, cfg := defaultModelDir(t)
 	if _, err := os.Stat(filepath.Join(dir, cfg.TokenizerFile)); err != nil {
-		t.Skipf("%s not installed at %s — see docs/d1-installation-guide.md", cfg.TokenizerFile, dir)
+		t.Skipf("%s not installed at %s — see docs/vector/d1-installation-guide.md", cfg.TokenizerFile, dir)
 	}
 	tk, err := newHFTokenizer(dir, cfg)
 	if err != nil {
@@ -65,7 +65,7 @@ func TestHFTokenizerSmoke_PadsToMaxInBatch(t *testing.T) {
 func TestHFTokenizerSmoke_TruncatesAboveMaxLen(t *testing.T) {
 	dir, cfg := defaultModelDir(t)
 	if _, err := os.Stat(filepath.Join(dir, cfg.TokenizerFile)); err != nil {
-		t.Skipf("%s not installed at %s — see docs/d1-installation-guide.md", cfg.TokenizerFile, dir)
+		t.Skipf("%s not installed at %s — see docs/vector/d1-installation-guide.md", cfg.TokenizerFile, dir)
 	}
 	tk, err := newHFTokenizer(dir, cfg)
 	if err != nil {

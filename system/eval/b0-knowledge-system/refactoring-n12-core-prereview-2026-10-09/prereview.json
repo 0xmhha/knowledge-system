@@ -1,0 +1,261 @@
+{
+ "schema_version": 1,
+ "kind": "assistant_technical_prereview",
+ "is_human_decision": false,
+ "reviewer": null,
+ "scope": "core20 + functional3 concepts, requirements3, criteria4 (outside the 35 items adopted earlier)",
+ "method": "Static code reading by a Claude Code subagent; main session re-checked review.go:175, matcher.go:78-90 Hangul substring rule, ko term overlaps in ontology-pilot-functional.yaml, and cancellation status. No tests run for this pre-review.",
+ "concepts": [
+  {
+   "id": "project",
+   "recommendation": "accept",
+   "reason": "Snapshot.ProjectID internal/system/semantic/model.go:32",
+   "proposed_correction": null
+  },
+  {
+   "id": "dataset",
+   "recommendation": "accept",
+   "reason": "DatasetID derived from snapshot+recipe internal/setup/identity.go:304",
+   "proposed_correction": null
+  },
+  {
+   "id": "source-snapshot",
+   "recommendation": "accept",
+   "reason": "modes committed/working-tree/snapshot-only internal/setup/identity.go:89,160",
+   "proposed_correction": null
+  },
+  {
+   "id": "source-file",
+   "recommendation": "accept",
+   "reason": "Chunk.File / EvidenceSpan.Path",
+   "proposed_correction": null
+  },
+  {
+   "id": "code-symbol",
+   "recommendation": "modify",
+   "reason": "CanonicalID empty in AST-only mode (pkg/graph/types/node.go)",
+   "proposed_correction": {
+    "definition": "... with a source range and, when type information is available, a canonical join identity."
+   }
+  },
+  {
+   "id": "vector-chunk",
+   "recommendation": "accept",
+   "reason": "pkg/vector/types/chunk.go:201",
+   "proposed_correction": null
+  },
+  {
+   "id": "document-section",
+   "recommendation": "accept",
+   "reason": "semantic/model.go:55",
+   "proposed_correction": null
+  },
+  {
+   "id": "claim",
+   "recommendation": "modify",
+   "reason": "includes 'assertion' overlaps semantic-assertion (model.go:110,122)",
+   "proposed_correction": {
+    "includes": [
+     "Proposed statement text"
+    ]
+   }
+  },
+  {
+   "id": "evidence-span",
+   "recommendation": "modify",
+   "reason": "semantic.EvidenceSpan (model.go:42) has no origin/file digest; only CitationV2 does",
+   "proposed_correction": {
+    "definition": "A relative path, line range, and range digest tied to one source snapshot; origin and file digest are carried where the v2 citation provides them."
+   }
+  },
+  {
+   "id": "semantic-assertion",
+   "recommendation": "modify",
+   "reason": "ko term '의미 관계' is a substring of functional concept ko term; Hangul matching is substring (semantic/matcher.go:78-90), so both always match",
+   "proposed_correction": {
+    "includes_add": [
+     "IMPLEMENTED_BY",
+     "TESTED_BY",
+     "CHECKED_BY",
+     "ABOUT"
+    ],
+    "resolve_ko_collision_via": "snapshot-bound-semantic-relations ko term change"
+   }
+  },
+  {
+   "id": "concept",
+   "recommendation": "accept",
+   "reason": "model.go:63",
+   "proposed_correction": null
+  },
+  {
+   "id": "term",
+   "recommendation": "accept",
+   "reason": "model.go:76",
+   "proposed_correction": null
+  },
+  {
+   "id": "requirement",
+   "recommendation": "accept",
+   "reason": "model.go:83",
+   "proposed_correction": null
+  },
+  {
+   "id": "acceptance-criterion",
+   "recommendation": "modify",
+   "reason": "type has no snapshot field (model.go:98); snapshot binding is in Decision/TestRun",
+   "proposed_correction": {
+    "definition": "A checkable condition for accepting one requirement version."
+   }
+  },
+  {
+   "id": "test-case",
+   "recommendation": "accept",
+   "reason": "CKG test symbols + TESTED_BY/CHECKED_BY (model.go:137-139)",
+   "proposed_correction": null
+  },
+  {
+   "id": "test-run",
+   "recommendation": "accept",
+   "reason": "semantic/test_run.go:28",
+   "proposed_correction": null
+  },
+  {
+   "id": "policy",
+   "recommendation": "accept",
+   "reason": "internal/vector/policy/loader.go:26; CapturePolicyDigest identity.go:31",
+   "proposed_correction": null
+  },
+  {
+   "id": "evidence-pack",
+   "recommendation": "accept",
+   "reason": "pkg/system/contract/pack.go:177",
+   "proposed_correction": null
+  },
+  {
+   "id": "patch-attempt",
+   "recommendation": "modify",
+   "reason": "Attempt holds no check report; run records are separate (internal/system/patch/review.go:147,255)",
+   "proposed_correction": {
+    "includes": "linked check reports recorded separately"
+   }
+  },
+  {
+   "id": "criterion-decision",
+   "recommendation": "modify",
+   "reason": "Decide accepts only approved/rejected (internal/system/patch/review.go:175); 'needs-review decision' unsupported. ko '수용 기준' is substring of '수용 기준 판정'",
+   "proposed_correction": {
+    "includes_remove": "needs-review decision",
+    "alternative": "add a needs-review outcome to Decide (product change)"
+   }
+  },
+  {
+   "id": "filtered-nearest-chunk-search",
+   "recommendation": "modify",
+   "reason": "exact path only when SQL superset <=2048 and <=MaxExactCandidates (sqlitevec/store.go:620-660)",
+   "proposed_correction": {
+    "includes": "Exact distance order when the filtered candidate superset fits the exact-scan limit; complete, incomplete or cancelled status with reason"
+   }
+  },
+  {
+   "id": "snapshot-bound-semantic-relations",
+   "recommendation": "modify",
+   "reason": "definition correct (alignment.go:185-260, ckg_anchor.go); ko term collides with semantic-assertion; checks all canonical evidence",
+   "proposed_correction": {
+    "ko": "스냅샷 결합 관계 검증"
+   }
+  },
+  {
+   "id": "optional-ontology-baseline-preservation",
+   "recommendation": "modify",
+   "reason": "matching is lexical (matcher.go:23); set preserved but order may change via verified boost (ontology_provider.go:213)",
+   "proposed_correction": {
+    "includes": "Lexical term matching...",
+    "definition": "... never adds or removes baseline citations and applies no boost from unreviewed meanings.",
+    "ko_note": "use 기준선 instead of 기준 (criterion confusion)"
+   }
+  }
+ ],
+ "requirements_and_criteria": [
+  {
+   "id": "req-filtered-recall",
+   "recommendation": "accept",
+   "reason": "store.go:620 filtered KNN with 3K over-fetch then exact completion",
+   "proposed_correction": null
+  },
+  {
+   "id": "ac-filtered-recall",
+   "recommendation": "modify",
+   "reason": "'exact-search-sized' means superset <=2048 and <=MaxExactCandidates (store.go:645); 'many' unquantified",
+   "proposed_correction": {
+    "given": "Filter superset <= 2048 and <= MaxExactCandidates, >= K eligible, and >= 3K excluded chunks closer than every eligible chunk",
+    "then": "The response contains K eligible chunks in exact distance order (ties by chunk ID) with status complete"
+   }
+  },
+  {
+   "id": "ac-filtered-completeness",
+   "recommendation": "modify",
+   "reason": "cancellation returns Status=cancelled not incomplete (store.go:826 interruptedSearch); budgets are candidate_limit and deadline; 'larger' undefined",
+   "proposed_correction": {
+    "given": "Filter superset > MaxExactCandidates and 3K over-fetch yields < K eligible, or a deadline/cancellation occurs",
+    "then": "Status is incomplete (candidate_limit/deadline_exceeded) or cancelled with a reason, never complete; legacy Search returns an error"
+   }
+  },
+  {
+   "id": "req-source-evidence",
+   "recommendation": "accept",
+   "reason": "alignment.go:185-260 (checks proposed evidence too, broader than reviewed)",
+   "proposed_correction": null
+  },
+  {
+   "id": "ac-source-evidence",
+   "recommendation": "modify",
+   "reason": "'promoted' covers PutAligned* (store) and ActivateAligned* (pointer); two mismatch kinds now typed",
+   "proposed_correction": {
+    "when": "PutAligned* or ActivateAligned* is called",
+    "then": "Each returns an error unwrapping to the specific snapshot mismatch error, and the active pointer is unchanged"
+   }
+  },
+  {
+   "id": "req-ontology-fallback",
+   "recommendation": "modify",
+   "reason": "set preserved via allowed filter (ontology_provider.go:213-217)",
+   "proposed_correction": {
+    "statement": "Optional concept matching preserves the existing hybrid retrieval candidate set (membership); only verified relations may reorder it."
+   }
+  },
+  {
+   "id": "ac-ontology-fallback",
+   "recommendation": "modify",
+   "reason": "'preserved' ambiguous set vs order; verified ties <=8 reorder; >8 unchanged; matching lexical",
+   "proposed_correction": {
+    "when": "A query string contains the term",
+    "then": "Returned citation keys equal the baseline set; no ontology source comes from an unverified relation; with more than 8 tied candidates the ranking is unchanged"
+   }
+  }
+ ],
+ "counts": {
+  "concepts": {
+   "accept": 13,
+   "modify": 10,
+   "reject": 0
+  },
+  "requirements_and_criteria": {
+   "accept": 2,
+   "modify": 5,
+   "reject": 0
+  }
+ },
+ "key_findings": [
+  "criterion-decision includes unsupported needs-review outcome",
+  "ac-filtered-completeness wording says incomplete for cancellation but product returns cancelled",
+  "ac-ontology-fallback 'preserved' must mean membership",
+  "two ko term substring collisions cause co-matching"
+ ],
+ "originals_unchanged": [
+  "docs/spec-driven/ontology-pilot.yaml",
+  "docs/spec-driven/ontology-pilot-functional.yaml",
+  "docs/spec-driven/spec-pilot-v2.yaml"
+ ],
+ "count_note": "Subagent summary stated 15/8; its per-item table yields 13/10. The per-item table is recorded."
+}

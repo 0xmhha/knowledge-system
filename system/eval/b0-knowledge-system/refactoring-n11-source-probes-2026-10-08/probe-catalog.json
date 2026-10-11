@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+  "purpose": "source-backed bounded investigation; not runnable FINAL/gold",
+  "probes": [
+    {
+      "id": "N11-PROBE-P01",
+      "proposed_cluster_id": "legacy-source-mode-guard",
+      "group": "CODE",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "legacy context 도구는 EvidenceVersionDir과 InspectVersionIdentity 결과에 따라 어떤 경우에 거부하는가?",
+      "candidate_answer": "version dir가 비면 허용하고 검사 오류는 snapshot_mismatch다. 신원이 존재하고 SourceMode가 committed가 아니면 requires_v2를 반환한다. 신원이 nil이거나 committed이면 nil이다. 이 함수 자체가 archive나 모든 출처의 신뢰를 검증한다고 확대하지 않는다.",
+      "evidence": [
+        {
+          "path": "internal/system/mcp/source_guard.go",
+          "first": 9,
+          "last": 23,
+          "file_sha256": "4e8d4dda10d1fdd79199e3dd8085c7c10cb9fca270e26a652427e6d349685d2a",
+          "content_sha256": "f2886c1ea1d9393712b125889d6113f876fe17b555a9bcd741a12e419194ebe6"
+        }
+      ],
+      "search_terms": [
+        "legacyContextGuard",
+        "internal/system/mcp/source_guard.go",
+        "source_guard.go"
+      ],
+      "investigation_state": "quarantined_known_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P02",
+      "proposed_cluster_id": "registered-pack-directory-admission",
+      "group": "CODE",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "등록 pack 디렉터리의 상대 경로와 symlink 경계는 어떻게 확인하는가?",
+      "candidate_answer": "빈 값·절대 경로·역슬래시·NUL을 거부한다. clean 결과가 부모 탈출 또는 선두 ./ 하나를 제거한 값과 다르면 거부한다. project root는 Abs와 EvalSymlinks로 정규화하고 이후 각 경로 구성 요소를 Lstat해 디렉터리만 허용한다. component symlink는 IsDir가 false라 거부한다. TOCTOU나 descriptor 기반 no-follow 보장을 이 함수만으로 주장하지 않는다.",
+      "evidence": [
+        {
+          "path": "internal/system/knowledgepack/lock.go",
+          "first": 234,
+          "last": 262,
+          "file_sha256": "1789b3dfe551709aa15f3bd23787e3b53a1b035687984c9393a4afacfbbcafe0",
+          "content_sha256": "da526314540019c853e49332e08d3216db419e4d732ed02403e24d64aa659fcc"
+        }
+      ],
+      "search_terms": [
+        "registeredDir",
+        "internal/system/knowledgepack/lock.go",
+        "lock.go"
+      ],
+      "investigation_state": "proposed_requires_overlap_review",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P03",
+      "proposed_cluster_id": "rune-token-heuristic",
+      "group": "CODE",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "EstimateTokens는 한글을 포함한 입력의 비용을 어떻게 추정하는가?",
+      "candidate_answer": "빈 입력은0이며 UTF-8 rune 수를4로 정수 나눈다. 1–3 rune의 비어 있지 않은 입력도0이다. 실제 tokenizer 결과나 BGE 비용 실측이 아니며 주석은 Phase E에서 실제 tokenizer 교체 필요를 명시한다.",
+      "evidence": [
+        {
+          "path": "internal/system/composer/budget/tokens.go",
+          "first": 5,
+          "last": 32,
+          "file_sha256": "025216cc0819f2e89c9cb5684edef7e020167baba1c07385f510b0ba9be417d0",
+          "content_sha256": "e98b2324f8203a22a85f18542e00fbd606aeb898cb44dcdfd15c5bb9819d7028"
+        }
+      ],
+      "search_terms": [
+        "EstimateTokens",
+        "internal/system/composer/budget/tokens.go",
+        "tokens.go"
+      ],
+      "investigation_state": "quarantined_known_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P04",
+      "proposed_cluster_id": "keyword-rerank-max-and-fold",
+      "group": "WHY",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "keyword rerank가 hit 점수를 합산하지 않고 최고점과 case-fold 중복 제거를 사용하는 이유는 무엇인가?",
+      "candidate_answer": "주석은 합산 시 K개를 채운 일반 단어가 일정 합계를 얻어 희소 식별자를 밀어낸 이전 현상을 설명한다. 최고점은 가장 강한 일치 신호를 보존한다. 점수 후 case-fold 중복 제거는 casing 변형이 cap 슬롯을 중복 소비하는 현상을 막는다. 이는 주석에 설명된 과거 이유이며 이번 실행의 품질 개선 측정은 아니다.",
+      "evidence": [
+        {
+          "path": "internal/system/composer/stage1/rerank.go",
+          "first": 39,
+          "last": 102,
+          "file_sha256": "514d4a0d972c9e5882308f6bc8a7a93a14482c6bea873cc35825dee3eff22e0d",
+          "content_sha256": "76dde75fe0416dbc34ee4ea5daeae36d1a626e59213dfa41af17cff74948c3a2"
+        }
+      ],
+      "search_terms": [
+        "computeConfidence",
+        "internal/system/composer/stage1/rerank.go",
+        "rerank.go"
+      ],
+      "investigation_state": "quarantined_prior_tuning_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P05",
+      "proposed_cluster_id": "neighbor-max-aggregation",
+      "group": "WHY",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "여러 seed가 같은 target에 도달할 때 neighbor 점수는 어떻게 합쳐지며 어떤 제한이 있는가?",
+      "candidate_answer": "Target.Key 기준으로 같은 target을 합친다. 모든 source는 추가하지만 높은 점수가 있을 때만 점수와 edge를 교체한다. 주석은 합산 시 인기 hub가 지배하는 위험을 이유로 든다. 다중 경로 central node와 한 경로 node가 같은 점수를 얻는 제한도 명시한다.",
+      "evidence": [
+        {
+          "path": "internal/system/composer/stage3/scoring.go",
+          "first": 9,
+          "last": 52,
+          "file_sha256": "f6d0a18d278cd427abc0b322aaa8e4da6cbef0a7989015ac7d7e7698bca2c6fa",
+          "content_sha256": "e38c9e40157dfda8c2a688d48d64b10a0b6420f26e120003eb4c712659f6c6c3"
+        }
+      ],
+      "search_terms": [
+        "neighborAggregator",
+        "internal/system/composer/stage3/scoring.go",
+        "scoring.go"
+      ],
+      "investigation_state": "quarantined_prior_tuning_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P06",
+      "proposed_cluster_id": "markdown-chunk-coordinate-join",
+      "group": "CODE",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "Markdown 섹션을 CKV doc chunk에 연결할 때 어떤 좌표를 쓰며 linked는 무엇을 세는가?",
+      "candidate_answer": "markdown/doc chunk만 읽는다. 각 섹션 ChunkIDs를 초기화한 뒤 projection commit·evidence path가 같고 원문 줄 범위가 겹치는 chunk ID를 모아 정렬한다. linked는 chunk 개수가 아닌 적어도 하나의 연결이 생긴 section 개수다. 본문 SHA 비교를 이 함수가 직접 수행한다고 주장하지 않는다.",
+      "evidence": [
+        {
+          "path": "internal/system/semantic/chunk_links.go",
+          "first": 19,
+          "last": 85,
+          "file_sha256": "e53e6a6208bcef537929d556c8d5a95bbdb17eb880b4b8909dc5d3e996ab8656",
+          "content_sha256": "9ec10eb7400668fbbb7a7abb22a021143e8696d1979b41b9847e124a068afaf6"
+        }
+      ],
+      "search_terms": [
+        "AttachCKVChunks",
+        "internal/system/semantic/chunk_links.go",
+        "chunk_links.go"
+      ],
+      "investigation_state": "quarantined_known_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P07",
+      "proposed_cluster_id": "concept-text-corpus-file-identity",
+      "group": "CODE",
+      "category_status": "proposed",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "semantic text corpus 파일명과 manifest SHA는 각각 어떤 입력으로 생성되는가?",
+      "candidate_answer": "파일명은 kind-와 id의 SHA256 앞16bytes hex(32문자), .md로 구성한다. manifest SHA는 id가 아니라 실제 content의 전체 SHA256이다. 파일 쓰기 성공 뒤 manifest.Files에 경로와 digest를 추가한다. 이름 해시의 충돌 불가능·전체 corpus 원자성·실제 reviewer 판정을 이 helper로 보장하지 않는다.",
+      "evidence": [
+        {
+          "path": "internal/system/semantic/text_corpus.go",
+          "first": 156,
+          "last": 165,
+          "file_sha256": "69054cdcc84d2a8d53b0cc25a0e5d388ccf4100fb0b6f7cc1288e9ecf7f58094",
+          "content_sha256": "0a520ffb12b6baf26bb0bc2a42143b6f915c2d3990372c4c4a7911b7aee53fb8"
+        }
+      ],
+      "search_terms": [
+        "writeCorpusFile",
+        "internal/system/semantic/text_corpus.go",
+        "text_corpus.go"
+      ],
+      "investigation_state": "proposed_requires_overlap_review",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-PROBE-P08",
+      "proposed_cluster_id": "advisory-trace-plan-state-map",
+      "group": "TRACE",
+      "category_status": "conditional",
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "prompt": "완전히 연결된 trace에 Plan은 어떤 동작을 제안하며 수용 완료를 뜻하는가?",
+      "candidate_answer": "TraceLinked에는 execute_acceptance_test와 linked acceptance tests를 실행·기록하라는 이유를 만든다. PlanStep은 advisory이고 side effect나 inferred approval이 없다는 주석이 있으며 Unconfirmed=true다. 실제 실행/사람 수용을 대신하지 않는다.",
+      "evidence": [
+        {
+          "path": "internal/system/semantic/plan.go",
+          "first": 18,
+          "last": 89,
+          "file_sha256": "5c891ae1c15fd7e9fdc55e7cb35e8b9390ff78d28ceed81d465abf8db5ba5804",
+          "content_sha256": "a6f03840afe6c995c761401fe07e9de8bf65418e10a204f8add76cfa92e5ab3d"
+        }
+      ],
+      "search_terms": [
+        "PlanExecuteAcceptanceTest",
+        "internal/system/semantic/plan.go",
+        "plan.go"
+      ],
+      "investigation_state": "quarantined_known_scope",
+      "review_state": "proposed",
+      "reviewer": null,
+      "independence_review": null,
+      "contamination_review": null,
+      "execution_allowed": false
+    },
+    {
+      "id": "N11-CONTROL-EXCLUDED-05",
+      "split": "FINAL",
+      "group": "POLICY",
+      "proposed_cluster_id": "review-record-adjudication",
+      "proposed_unit_id": "review-record-adjudication",
+      "independence_review": null,
+      "contamination_review": null,
+      "language": "ko",
+      "prompt": "다중 검토자 quorum이 필요한 knowledge 항목에 같은 검토자의 동일 기록을 여러 번 넣거나 inline 승인만 넣으면 어떻게 처리하나요?",
+      "candidate_answer": "같은 검토자의 같은 판정/SHA는 한 표로만 센다. 같은 검토자의 상충 판정/SHA는 오류이며 minApprovals>1이면 기존 inline 승인만으로 quorum을 충족할 수 없다.",
+      "expected_behavior": "cite",
+      "review_state": "draft",
+      "reviewer": null,
+      "source_commit": "982334b05e806fea1706355d417a45b5eac99c39",
+      "evidence": [
+        {
+          "path": "internal/system/knowledgepack/review.go",
+          "first": 74,
+          "last": 106,
+          "file_sha256": "aa51b27c3dd5d7f6f93e205894309bb5e8de47fd05e8acee201177f7dccd9338",
+          "content_sha256": "e411ae23c6c0dd34d6a67d9844f35f7ca36ac9a587be22a599ae7893cb22d016"
+        }
+      ],
+      "authority_scope": "bound implementation/repository records only; actual organizational facts and accepted relationships remain unapproved",
+      "exclusion_reason": "shared proposed fact cluster has exact same-byte/span exposure in prior FINAL; not available for fresh FINAL",
+      "search_terms": [
+        "inline review cannot meet multi-reviewer quorum",
+        "internal/system/knowledgepack/review.go"
+      ],
+      "investigation_state": "existing_excluded_positive_control_not_new_candidate",
+      "execution_allowed": false
+    }
+  ],
+  "new_approved_independent_FINAL": 0,
+  "old_book_modified": false,
+  "investigation_probe_count": 8,
+  "existing_exposure_control_count": 1
+}

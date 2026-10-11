@@ -1,10 +1,10 @@
 // Command cks-mcp serves the cks composer pipeline over an MCP (Model
 // Context Protocol) stdio transport.
 //
-// Phase C.5 (slim) registers two tools: cks.context.get_for_task and
-// cks.ops.health. See internal/mcp for handler details.
+// The server registers the agent-facing cks.context.* and cks.ops.* tools.
+// See internal/system/mcp for handler details.
 //
-// Backend wiring (post R1′ G1/G2):
+// Backend wiring:
 //   - ckg: if config.Backends.CKG.Path is set, the binary opens a real
 //     ckg SQLite store via ckgclient.NewReal. When empty, it falls back
 //     to the Smart Dummy.
@@ -164,8 +164,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		return err
 	}
 
-	// P1 (reindex-migration design): resolve dataset symlinks ONCE at startup
-	// so the instance pins a concrete immutable version for its whole lifetime
+	// Resolve dataset symlinks once at startup so the instance pins a concrete immutable version for its whole lifetime
 	// (the `current` pointer may move underneath; we never re-resolve). The
 	// resolved paths are what health reports — identity stays provable.
 	datasetVersion := resolveDatasetPaths(cfg)
@@ -295,6 +294,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		EvidenceSanitizer:   evidenceSanitizer,
 		SemanticStorePath:   cfg.Semantic.StorePath,
 		EvidenceSourceRoot:  cfg.Backends.CKG.SourceRoot,
+		TypeNeighbors:       cfg.Retrieval.TypeNeighbors,
 		CKG:                 be.ckg,
 		CKV:                 be.ckv,
 		Vocab:               vocabResolver,
@@ -372,11 +372,11 @@ func buildVocabResolver(path string) (*vocab.Resolver, error) {
 	return vocab.Load(path)
 }
 
-// buildCKVClient picks the in-process ckv adapter (G1: pkg/ckv imported
+// buildCKVClient picks the in-process ckv adapter (pkg/ckv imported
 // directly, no subprocess) when a data path AND a working embedder are
 // available, and falls back to the Smart Dummy otherwise. The fallback never
 // errors — a configured-but-unavailable ckv degrades (Smart Dummy +
-// degraded health, S5) rather than crashing the server. The Dummy records
+// degraded health) rather than crashing the server. The Dummy records
 // each would-have-been ckv call on the Composer's instruction collector so
 // the upstream LLM can fulfil the request via skills against go-stablenet.
 func buildCKVClient(ctx context.Context, cfg config.CKVConfig, emb ckvtypes.Embedder, degradedReason, sourceRoot string, retained ...bool) (ckvclient.Client, func() error, error) {
@@ -399,7 +399,7 @@ func buildCKVClient(ctx context.Context, cfg config.CKVConfig, emb ckvtypes.Embe
 		SourceRoot: sourceRoot, RetainedSource: len(retained) > 0 && retained[0]})
 	if err != nil {
 		// ckv.Open failed (index identity mismatch, missing files): degrade
-		// instead of crashing, and surface why via health (S5).
+		// instead of crashing, and surface why via health.
 		log.Printf("cks-mcp: ckv.Open failed (%v) — degraded mode", err)
 		d := withSource(ckvclient.NewDegradedDummy(err.Error()))
 		return d, d.Close, nil
@@ -432,7 +432,7 @@ func buildBackends(ctx context.Context, cfg *config.Config, sourceOverride ...st
 	}
 
 	// Construct the embedding backend once and share it between the ckv
-	// adapter and the intent classifier (one model space, G2). The Capability
+	// adapter and the intent classifier (one model space). The Capability
 	// is captured even on failure so health can report the intended model.
 	var (
 		ckvEmb         ckvtypes.Embedder
@@ -493,7 +493,7 @@ func buildBackends(ctx context.Context, cfg *config.Config, sourceOverride ...st
 
 // intentEmbedderAdapter bridges a ckv types.Embedder (batch API) to the
 // intent package's single-text Embedder, so one Ollama adapter serves both
-// the ckv chunk space and the intent anchor space (G2).
+// the ckv chunk space and the intent anchor space.
 type intentEmbedderAdapter struct{ e ckvtypes.Embedder }
 
 func (a intentEmbedderAdapter) Embed(ctx context.Context, text string) ([]float32, error) {
@@ -693,8 +693,8 @@ func buildFootprint(cfg config.LoggingConfig) (*footprint.Logger, func() error, 
 
 // resolveDatasetPaths resolves symlinks in the two dataset paths ONCE and
 // rewrites cfg in place, so the instance pins a concrete immutable version
-// even when the config points at a moving `current` pointer (blue-green,
-// reindex-migration design P1). Returns the "@<ver>" dataset-version label
+// even when the config points at a moving `current` pointer (blue-green
+// reindex). Returns the "@<ver>" dataset-version label
 // when the resolved path uses the versioned layout ("" for legacy layouts).
 func resolveDatasetPaths(cfg *config.Config) string {
 	version := ""

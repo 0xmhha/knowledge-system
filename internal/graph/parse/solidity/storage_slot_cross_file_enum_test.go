@@ -6,18 +6,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V15 — cross-file enum size propagation audit. W9 V14
-// introduced a per-file enumSizes index that drives 1-byte
+// Cross-file enum size propagation audit. A
+// per-file enumSizes index drives 1-byte
 // packing for enum-typed state-vars. Cross-file enum references
 // (`Ext.Status` after `import "./status_lib.sol" as Ext`) stay
 // outside the per-file map and fall through to solTypeSize's
 // conservative 32-byte fallback.
 //
-// V15 locks the current conservative behaviour with this audit
+// This audit locks the current conservative behaviour with this
 // test. Promoting to actual cross-file size propagation needs a
 // globalEnumSizes index aggregated across ParseResults and a
 // Pass-2 post-pass that updates SlotIndex retroactively — out of
-// scope for V15.
+// scope here.
 //
 // A future regression that mis-extends per-file enumSizes to
 // match qualified names (e.g. by stripping the namespace prefix
@@ -30,7 +30,7 @@ func TestStorageSlot_CrossFileEnumConservative(t *testing.T) {
 
 	want := map[string]int{
 		"Holder.head":    0,
-		"Holder.status1": 1, // V15 lock: cross-file enum → full slot
+		"Holder.status1": 1, // locked: cross-file enum → full slot
 		"Holder.tail":    2, // uint256 advances to next slot
 	}
 	got := map[string]int{}

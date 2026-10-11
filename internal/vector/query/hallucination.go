@@ -12,7 +12,7 @@ import (
 // with a short Reason so log readers can debug without re-running.
 //
 // The operational
-// definition: a hit is *not* a hallucination if its snippet appears as
+// definition: a hit is *not* a hallucination if its nonempty snippet appears as
 // a (whitespace-normalized) substring of the cited file's line range.
 // This handles every density tier — DensitySignatureOnly is naturally a
 // substring of a longer body, DensityFull is the full body itself.
@@ -26,10 +26,11 @@ type HallucinationResult struct {
 }
 
 // VerifyHit reports whether h.Snippet aligns with the source file at
-// srcRoot/<h.Citation.File>. Three failure modes are distinguished so
+// srcRoot/<h.Citation.File>. Four failure modes are distinguished so
 // log readers can route the response: "file_missing" (citation points
-// nowhere), "out_of_range" (line numbers exceed file length), and
-// "snippet_not_found" (content disagrees — the actual hallucination).
+// nowhere), "out_of_range" (line numbers exceed file length),
+// "empty_snippet" (no content to verify), and "snippet_not_found"
+// (content disagrees — the actual hallucination).
 //
 // Whitespace normalization: tabs / spaces / newlines collapse to a
 // single space and leading / trailing whitespace is trimmed. This
@@ -61,7 +62,15 @@ func VerifyHit(h Hit, srcRoot string) HallucinationResult {
 		}
 	}
 	fileSlice := strings.Join(lines[h.Citation.StartLine-1:h.Citation.EndLine], "\n")
-	if !strings.Contains(stripBlanks(fileSlice), stripBlanks(h.Snippet)) {
+	snippet := stripBlanks(h.Snippet)
+	if snippet == "" {
+		return HallucinationResult{
+			Verified:     false,
+			Reason:       "empty_snippet",
+			ExpectedFile: full,
+		}
+	}
+	if !strings.Contains(stripBlanks(fileSlice), snippet) {
 		return HallucinationResult{
 			Verified:     false,
 			Reason:       "snippet_not_found",

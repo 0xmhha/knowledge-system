@@ -6,19 +6,19 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.8 — file-level free-function form using directive.
+// File-level free-function form using directive.
 //
-// 2x2 (scope × alias-shape) matrix after the V2.5 file-level
-// operator-form recovery walker landed:
+// 2x2 (scope × alias-shape) matrix with the file-level
+// operator-form recovery walker:
 //
 //                  | free-function          | operator-form
 //   ---------------+------------------------+----------------------
-//   file-level     | V2.8 (this): 1 edge    | V2.5: 1 edge (library)
-//   contract-scope | V2.6: 1 edge (V0 inc.) | V2.20: 1 edge (recover)
+//   file-level     | this test: 1 edge      | 1 edge (library)
+//   contract-scope | 1 edge (incidental)    | 1 edge (recovery walker)
 //
-// The V2.5 walker (file_level_operator_form.go) parses any file-level
+// The walker (file_level_operator_form.go) parses any file-level
 // `using {...} for T [global];` ERROR child by text, so the braced
-// free-function form (V2.8) is recovered alongside the operator-form
+// free-function form is recovered alongside the operator-form
 // variant. Library-method targets reduce to the library name, so
 // `using {Math.add} for uint256 global;` resolves to `Calc → Math`.
 //
@@ -27,11 +27,11 @@ import (
 
 // TestUsingForV280_FileLevelFreeFunctionForm — `using {Math.add} for
 // uint256 global;` at file scope. Asserts file-level fan-out to
-// every non-library container after V2.5 walker landed.
+// every non-library container via the file-level walker.
 func TestUsingForV280_FileLevelFreeFunctionForm(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v280", "probe_file_level_free_function.sol")
 
-	// (a) Lock: 1 EdgeUsesFor (Calc → Math) after V2.5 walker.
+	// (a) Lock: 1 EdgeUsesFor (Calc → Math) via the file-level walker.
 	byID := map[string]types.Node{}
 	for _, n := range nodes {
 		byID[n.ID] = n

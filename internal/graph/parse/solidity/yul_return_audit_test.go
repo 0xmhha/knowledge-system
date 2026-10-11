@@ -6,14 +6,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V11 — Yul return/revert with `address()` as memory
+// Yul return/revert with `address()` as memory
 // pointer is semantically a bug but not a low-level-call
-// surface. The low-level-call walker (W10 V3/V4) restricts to
+// surface. The low-level-call walker restricts to
 // `delegatecall`, `call`, `staticcall` opcodes and the self-
-// delegate walker (V9/V10) additionally requires `delegatecall`
+// delegate walker additionally requires `delegatecall`
 // — so `return(address(), N)` should NOT light up either marker.
 //
-// V11 locks the absence of false positives: a function whose
+// This test locks the absence of false positives: a function whose
 // only assembly content is `return(address(), 32)` keeps
 // HasLowLevelCall=false and HasSelfDelegatecallDead=false, but
 // HasAssembly=true (the function does contain an assembly

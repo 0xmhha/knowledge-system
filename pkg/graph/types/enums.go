@@ -1,12 +1,11 @@
 package types
 
 // NodeType enumerates the 35 node kinds (spec §5.1; v0.2 schema 1.1 added
-// Mutex; schema 1.3 appended Endpoint + MessageType for CKS G5 Distributed;
-// schema 1.4 appended Commit for CKS G6 Temporal — git history nodes;
-// schema 1.8 appended Hunk for CKS G6 Temporal Hunk-graph — one block of
+// Mutex; schema 1.3 appended Endpoint + MessageType for distributed
+// topology; schema 1.4 appended Commit for temporal git history nodes;
+// schema 1.8 appended Hunk for the temporal Hunk-graph — one block of
 // changed lines per (commit, file); schema 1.10 appended AwaitPoint for
-// within-language semantics Phase 4 — W-B TS async/await suspension points
-// (slot reserved; detector lands in Phase 5)).
+// TS async/await suspension points).
 type NodeType string
 
 const (
@@ -34,14 +33,13 @@ const (
 	NodeDecorator     NodeType = "Decorator"
 	NodeGoroutine     NodeType = "Goroutine"
 	NodeChannel       NodeType = "Channel"
-	// NodeMutex: schema 1.1 slot — emitted by B1 Phase 1 of the Go
-	// concurrency pass for sync.Mutex / sync.RWMutex fields, package-level
-	// vars, and function-local vars. See
+	// NodeMutex: schema 1.1 slot — emitted by the Go concurrency pass for
+	// sync.Mutex / sync.RWMutex fields, package-level vars, and
+	// function-local vars. See
 	// internal/parse/golang/concurrency.go:emitMutexNode. Cross-function
-	// lock chain propagation (caller holds X, callee touches field) is
-	// deferred to D1 — see
-	// docs/design/go-cross-function-lock-propagation.md (decisions resolved
-	// 2026-05-11). Kept adjacent to the other concurrency nodes
+	// lock chain propagation (caller holds X, callee touches field) is a
+	// separate opt-in pass — see
+	// docs/graph/design/go-cross-function-lock-propagation.md. Kept adjacent to the other concurrency nodes
 	// (Goroutine/Channel) for grouping.
 	NodeMutex      NodeType = "Mutex"
 	NodeIfStmt     NodeType = "IfStmt"
@@ -49,25 +47,25 @@ const (
 	NodeCallSite   NodeType = "CallSite"
 	NodeReturnStmt NodeType = "ReturnStmt"
 	NodeSwitchStmt NodeType = "SwitchStmt"
-	// Schema 1.3 (E3 — CKS G5 Distributed): handler/route topology entries.
+	// Schema 1.3 (distributed topology): handler/route topology entries.
 	// NodeEndpoint  : an HTTP/RPC route literal. Qname follows protocol-
 	//                  specific format (schema 1.9 §6.2):
 	//                    - http  : `http:METHOD /route`   (METHOD=`*` for any)
 	//                    - rpc   : `rpc:Service.Method`
-	//                    - grpc  : `grpc:pkg.Service.Method`  (W3)
+	//                    - grpc  : `grpc:pkg.Service.Method`
 	//                    - ws    : `ws:/route[#msg]`          (later)
 	// NodeMessageType: a request/response message type a handler dispatches on
 	//                  (e.g. `pkg.MyRequest`). Appended at the end so existing
 	//                  positional indices stay stable (see TestAllNodeTypes_Stable).
 	NodeEndpoint    NodeType = "Endpoint"
 	NodeMessageType NodeType = "MessageType"
-	// Schema 1.4 (E4 — CKS G6 Temporal): a git commit that touched one or
+	// Schema 1.4 (temporal): a git commit that touched one or
 	// more source files. Name = first 12 chars of SHA, QualifiedName =
 	// `commit:<full-sha>`. SubKind = "git". StartLine/EndLine = 1 (commits
 	// have no source range). Appended at the end so existing positional
 	// indices stay stable (TestAllNodeTypes_Stable).
 	NodeCommit NodeType = "Commit"
-	// Schema 1.8 (Hunk-graph H1 — CKS G6 Temporal extension): one contiguous
+	// Schema 1.8 (temporal Hunk-graph): one contiguous
 	// block of changed lines in one file in one commit, as defined by
 	// unified-diff `@@` headers. Name = "<sha12>:<file>:<idx>",
 	// QualifiedName = `hunk:<full-sha>:<file>:<idx>` (idx = 0-based per-commit
@@ -75,39 +73,37 @@ const (
 	// SubKind = "git". StartLine/EndLine = the hunk's @@ header new-file
 	// line range; StartByte = 0 / EndByte = 1 sentinels (the patch text
 	// lives in blobs.source, gzip-compressed; see hunk-graph.md §2.2-2.3).
-	// Confidence semantics (hunk-graph.md §11.3 — finalised 2026-05-09):
-	//   - EXTRACTED: HEAD-reachable hunks (the only kind H1 collects).
+	// Confidence semantics (hunk-graph.md §11.3):
+	//   - EXTRACTED: HEAD-reachable hunks (the only kind currently collected).
 	//   - AMBIGUOUS: reserved for unreachable hunks that a future PR will
-	//                collect via reflog/fsck. The H3 EvidencePack assembler
+	//                collect via reflog/fsck. The EvidencePack assembler
 	//                MUST filter to confidence='EXTRACTED' so the LLM never
 	//                sees code paths that were rolled back by force-push.
 	// Appended at the end so existing positional indices stay stable
 	// (TestAllNodeTypes_Stable).
 	NodeHunk NodeType = "Hunk"
-	// Schema 1.10 (within-language semantics Phase 4 — W-B TS async/await):
-	// statement-level node emitted at each `await` expression in TypeScript
-	// source. Marks an async suspension point so graph queries can answer
-	// "where does control yield, and to which AsyncCallSite?". Slot
-	// reserved 2026-05-11; detector lands in Phase 5 (W-B W2). See
-	// docs/design/ts-async-await-and-interface.md §2.1 + §3.2 and
-	// docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 4. Appended at the
+	// Schema 1.10 (TS async/await): statement-level node emitted at each
+	// `await` expression in TypeScript source. Marks an async suspension
+	// point so graph queries can answer "where does control yield, and to
+	// which AsyncCallSite?". See
+	// docs/graph/design/ts-async-await-and-interface.md §2.1 + §3.2 and
+	// docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2. Appended at the
 	// end so existing positional indices stay stable
 	// (TestAllNodeTypes_Stable).
 	NodeAwaitPoint NodeType = "AwaitPoint"
 
-	// NodePolicy (schema 1.14, P1 #4) — governance/protocol policy
+	// NodePolicy (schema 1.14) — governance/protocol policy
 	// metadata loaded from an external YAML rather than the parsed
 	// source tree. Surfaces "why does this code exist?" — fork blocks,
 	// gas schedules, consensus parameters, security policies — so an
 	// LLM can answer policy-driven questions ("which fork activated
 	// this?", "what gas schedule governs this?") without first
-	// searching the code itself. See docs/PROJECT-BLUEPRINT-ALIGNMENT.md
-	// §4.2 P1 #4 and pkg/policy for the YAML loader. FilePath /
+	// searching the code itself. See pkg/policy for the YAML loader. FilePath /
 	// StartLine cite the YAML entry's source location so citations
 	// stay grounded.
 	NodePolicy NodeType = "Policy"
 
-	// NodeSecurityPattern (schema 1.15, P1 #5) — security risk
+	// NodeSecurityPattern (schema 1.15) — security risk
 	// pattern annotations loaded from an external YAML. Captures
 	// "this symbol is reachable in a reentrancy / access-control /
 	// Byzantine / overflow scenario" so an LLM modifying the code
@@ -116,7 +112,7 @@ const (
 	// category (reentrancy / access-control / …), the attrs JSON
 	// blob carries severity (info / low / medium / high / critical)
 	// and an optional remediation hint. See pkg/security for the
-	// YAML loader and PROJECT-BLUEPRINT-ALIGNMENT.md §4.2 P1 #5.
+	// YAML loader.
 	NodeSecurityPattern NodeType = "SecurityPattern"
 )
 
@@ -128,18 +124,18 @@ const (
 // nodes (NodeIfStmt..NodeSwitchStmt) from indices 24-28 to 25-29 — no
 // callers key on those indices, so the shift is safe; future additions
 // should prefer append over insert when no grouping reason argues
-// otherwise. NodeEndpoint + NodeMessageType (schema 1.3, E3) are appended
+// otherwise. NodeEndpoint + NodeMessageType (schema 1.3) are appended
 // (indices 30-31) — distributed topology is a distinct family from
 // concurrency / statements, no grouping argument applied. NodeCommit
-// (schema 1.4, E4) is appended at index 32 — temporal/git history is a
-// distinct family from everything above. NodeHunk (schema 1.8, Hunk-graph
-// H1) is appended at index 33 — same temporal family as NodeCommit but
+// (schema 1.4) is appended at index 32 — temporal/git history is a
+// distinct family from everything above. NodeHunk (schema 1.8, Hunk-graph)
+// is appended at index 33 — same temporal family as NodeCommit but
 // finer-grained (one block of changed lines, not a whole commit).
-// NodeAwaitPoint (schema 1.10, W-B) is appended at index 34 — TS async
-// suspension family, slot reserved before the Phase 5 detector lands.
-// NodePolicy (schema 1.14, P1 #4) is appended at index 35 — domain
+// NodeAwaitPoint (schema 1.10) is appended at index 34 — TS async
+// suspension family.
+// NodePolicy (schema 1.14) is appended at index 35 — domain
 // governance/protocol policy metadata loaded from an external YAML.
-// NodeSecurityPattern (schema 1.15, P1 #5) is appended at index 36 —
+// NodeSecurityPattern (schema 1.15) is appended at index 36 —
 // security risk pattern annotations loaded from an external YAML.
 func AllNodeTypes() []NodeType {
 	return []NodeType{
@@ -210,17 +206,14 @@ func SymbolNodeTypes() []NodeType {
 
 // EdgeType enumerates the 41 edge kinds (spec §5.2; v0.2 schema 1.1 added 3
 // lock edges; schema 1.3 appended listens_on / handles_message / rpc_calls
-// for CKS G5 Distributed; schema 1.4 appended changed_in / blame for CKS
-// G6 Temporal — git history derived; schema 1.6 appended timeout_path /
-// cancellation_path for CKS G3 dogfood P2 — Go context.With* propagation;
-// schema 1.8 appended has_hunk / adjacent for the Hunk-graph H1 stage,
-// then `modifies` for the H2 AST-overlap stage; schema 1.9 W2 appended
-// `http_calls` — caller Function → Endpoint (HTTP client call sites);
-// schema 1.9 W3b appended `grpc_listens_on` + `grpc_calls` — Go gRPC
-// server/client detection; schema 1.10 appended `awaits` (W-B, TS async
-// suspension flow) + `overrides` (W-C, Solidity virtual/override semantics)
-// for within-language semantics Phase 4 — slots reserved 2026-05-11,
-// detectors land in Phase 5).
+// for distributed topology; schema 1.4 appended changed_in / blame for
+// temporal git history; schema 1.6 appended timeout_path /
+// cancellation_path for Go context.With* propagation; schema 1.8 appended
+// has_hunk / adjacent for the Hunk-graph, then `modifies` for hunk/AST
+// overlap; schema 1.9 appended `http_calls` — caller Function → Endpoint
+// (HTTP client call sites) — and `grpc_listens_on` + `grpc_calls` — Go
+// gRPC server/client detection; schema 1.10 appended `awaits` (TS async
+// suspension flow) + `overrides` (Solidity virtual/override semantics)).
 type EdgeType string
 
 const (
@@ -258,15 +251,15 @@ const (
 	//     internal/parse/golang/concurrency_underlock.go — intra-function
 	//     lexical heuristic (any field access in a body that holds any lock
 	//     gets one edge per (field, mutex) pair). Cross-function chain
-	//     propagation is deferred to D1 — see
-	//     docs/design/go-cross-function-lock-propagation.md (decisions
-	//     resolved 2026-05-11, --lock-propagation opt-in flag).
+	//     propagation is a separate pass behind the --lock-propagation
+	//     opt-in flag — see
+	//     docs/graph/design/go-cross-function-lock-propagation.md.
 	// Appended (not interleaved) so existing edge-type hash positions /
 	// test snapshots stay stable.
 	EdgeAcquiresLock      EdgeType = "acquires_lock"
 	EdgeReleasesLock      EdgeType = "releases_lock"
 	EdgeAccessedUnderLock EdgeType = "accessed_under_lock"
-	// Schema 1.3 (E3 — CKS G5 Distributed): handler/RPC topology edges.
+	// Schema 1.3 (distributed topology): handler/RPC topology edges.
 	// listens_on:      handler function/method → endpoint route
 	// handles_message: handler function/method → message type it dispatches on
 	// rpc_calls:       caller function → server method (or message-type placeholder)
@@ -275,18 +268,18 @@ const (
 	EdgeListensOn      EdgeType = "listens_on"
 	EdgeHandlesMessage EdgeType = "handles_message"
 	EdgeRPCCalls       EdgeType = "rpc_calls"
-	// Schema 1.4 (E4 — CKS G6 Temporal): git-history derived edges.
+	// Schema 1.4 (temporal): git-history derived edges.
 	// changed_in: any symbol whose file was touched by a commit → that
 	//             commit. Heuristic — file-level (not line-level). Bounded
 	//             by Options.TemporalDepth (default 10) most-recent commits
-	//             per file. Line-level blame is deferred (G6 Phase 2).
+	//             per file. Line-level blame is deferred.
 	// blame:      File node → most-recent commit touching that file
-	//             (V0 simplification of `file:line → commit`).
+	//             (simplification of `file:line → commit`).
 	// Appended (not interleaved) so existing edge-type hash positions /
 	// test snapshots stay stable.
 	EdgeChangedIn EdgeType = "changed_in"
 	EdgeBlame     EdgeType = "blame"
-	// Schema 1.6 (P2 — CKS G3 control-flow context propagation): Go
+	// Schema 1.6 (control-flow context propagation): Go
 	// context.With* creation sites. Self-loop edges anchored on the
 	// enclosing Function/Method:
 	//   timeout_path:      context.WithTimeout / context.WithDeadline call
@@ -298,7 +291,7 @@ const (
 	//                      site (Go 1.20+ for the latter). Distinct from
 	//                      timeout_path because cancellation is event-driven,
 	//                      not deadline-driven.
-	// TODO: retry_path is intentionally NOT emitted in V0 — the heuristic
+	// TODO: retry_path is intentionally NOT emitted yet — the heuristic
 	// (loops around RPC calls? error-handling branches?) is too noisy to
 	// ship without false-positive cleanup. Reserved for a follow-up once
 	// we have a typed retry pattern (e.g. detecting backoff libraries
@@ -308,7 +301,7 @@ const (
 	// test snapshots stay stable.
 	EdgeTimeoutPath      EdgeType = "timeout_path"
 	EdgeCancellationPath EdgeType = "cancellation_path"
-	// Schema 1.8 (Hunk-graph H1 — CKS G6 Temporal extension):
+	// Schema 1.8 (temporal Hunk-graph):
 	//   has_hunk: Commit → Hunk. One per Hunk; "this commit produced this
 	//             block of changed lines". Confidence mirrors the Hunk's
 	//             own (EXTRACTED for HEAD-reachable, AMBIGUOUS for
@@ -320,24 +313,24 @@ const (
 	//             of a commit's edits without a separate ORDER BY query.
 	//             Emitted only between hunks within one (commit, file)
 	//             pair — never across commits or files. Out-of-scope edges:
-	//             modifies (Hunk → CodeNode interval overlap) lands in H2;
+	//             modifies (Hunk → CodeNode interval overlap) is a separate edge;
 	//             same_logical_change clustering across commits is out of
 	//             scope (see hunk-graph.md §11.5 decision).
 	// Appended (not interleaved) so existing edge-type hash positions /
 	// test snapshots stay stable.
 	EdgeHasHunk  EdgeType = "has_hunk"
 	EdgeAdjacent EdgeType = "adjacent"
-	// Schema 1.8 (Hunk-graph H2 — CKS G6 Temporal extension):
+	// Schema 1.8 (Hunk-graph AST overlap):
 	//   modifies: Hunk → CodeNode (Function/Method/Struct/Interface/Field
 	//             /etc) when the hunk's [start_line, end_line] interval
 	//             overlaps the CodeNode's interval inside the same file.
 	//             Whitelisted to "FunctionLike + TypeLike + Field-ish" so
 	//             noise-level statement nodes (CallSite / IfStmt / ...)
 	//             don't blow up the edge count without retrieval signal.
-	//             See docs/design/hunk-graph.md §4.
+	//             See docs/graph/design/hunk-graph.md §4.
 	// Appended at the end so existing hash positions stay stable.
 	EdgeModifies EdgeType = "modifies"
-	// Schema 1.9 W2 (CKS G5 Distributed cross-language interop expansion):
+	// Schema 1.9 (cross-language interop — HTTP client calls):
 	//   http_calls: caller Function/Method → Endpoint when the function
 	//               invokes an HTTP client (TS: fetch / axios / useSWR /
 	//               useQuery; Go: http.Get / http.Post / http.NewRequest /
@@ -349,7 +342,7 @@ const (
 	// On miss the matcher synthesises an AMBIGUOUS placeholder Endpoint
 	// (schema-1.9-spec §6.3 (B)) so the call site stays surfaceable for
 	// monorepo external-API audits. Path matching is EXACT (schema-1.9-spec
-	// §3.3 decision: V0 chooses exact-match over suffix-match because
+	// §3.3 decision: exact-match is chosen over suffix-match because
 	// false-positives across distinct services with overlapping path
 	// suffixes are far worse than the false-negatives exact-match incurs
 	// in well-curated monorepos).
@@ -357,8 +350,8 @@ const (
 	// Appended at the end so existing edge-type hash positions / test
 	// snapshots stay stable.
 	EdgeHTTPCalls EdgeType = "http_calls"
-	// Schema 1.9 W3b (CKS G5 Distributed cross-language interop expansion —
-	// Go gRPC server/client detection):
+	// Schema 1.9 (cross-language interop — Go gRPC server/client
+	// detection):
 	//   grpc_listens_on: server impl Method → Endpoint when the file calls
 	//                    `pb.RegisterXXXServer(s, &impl{})`. Each method on
 	//                    the impl receiver type whose name matches an rpc
@@ -383,33 +376,31 @@ const (
 	// snapshots stay stable.
 	EdgeGRPCListensOn EdgeType = "grpc_listens_on"
 	EdgeGRPCCalls     EdgeType = "grpc_calls"
-	// Schema 1.10 (within-language semantics Phase 4 — slots reserved
-	// 2026-05-11; detectors land in Phase 5):
-	//   awaits   (W-B): Function/Method → AwaitPoint, and AwaitPoint →
+	// Schema 1.10 (within-language semantics):
+	//   awaits:         Function/Method → AwaitPoint, and AwaitPoint →
 	//                   AsyncCallSite. Marks async suspension flow in
 	//                   TypeScript source so graph queries can answer
 	//                   "where does control yield, and what call awaits
-	//                   here?". See docs/design/ts-async-await-and-interface.md
+	//                   here?". See docs/graph/design/ts-async-await-and-interface.md
 	//                   §2.1 + §3.2.
-	//   overrides (W-C): Method → Method between a child contract's method
+	//   overrides:      Method → Method between a child contract's method
 	//                   that overrides a parent's `virtual` method in
 	//                   Solidity. Direction = child → parent (Q4 decision
 	//                   in solidity-inheritance spec §5.0). Distinct from
 	//                   `implements` (interface satisfaction) because
 	//                   `overrides` is concrete-to-concrete virtual
 	//                   dispatch resolution. See
-	//                   docs/design/solidity-inheritance-and-interface-dispatch.md
+	//                   docs/graph/design/solidity-inheritance-and-interface-dispatch.md
 	//                   §2.1 + §3.3.
-	//   using_for (W-C W6): Contract → Library binding emitted from
+	//   using_for:      Contract → Library binding emitted from
 	//                   `using SafeMath for uint256` directives. First-class
 	//                   so binding queries can run as a single edge-type
 	//                   filter (matches the extends/implements/overrides/
 	//                   has_modifier idiom — every other Sol-specific
-	//                   semantic relation is already first-class). Q9-1 (b)
-	//                   decision (2026-05-12). Direction = contract →
-	//                   library; the call site of `balance.add(...)` still
-	//                   produces a separate EdgeCalls into the library
-	//                   function. See solidity-inheritance-and-interface-
+	//                   semantic relation is already first-class). Direction =
+	//                   contract → library; the call site of `balance.add(...)`
+	//                   still produces a separate EdgeCalls into the
+	//                   library function. See solidity-inheritance-and-interface-
 	//                   dispatch.md §4.6.
 	//
 	// Appended at the end so existing edge-type hash positions / test
@@ -417,7 +408,7 @@ const (
 	EdgeAwaits    EdgeType = "awaits"
 	EdgeOverrides EdgeType = "overrides"
 	EdgeUsesFor   EdgeType = "using_for"
-	// Schema 1.14 (P1 #4 — policy metadata): code symbol → Policy node.
+	// Schema 1.14 (policy metadata): code symbol → Policy node.
 	// Emitted from pkg/policy.Resolve when a YAML policy entry's
 	// governs[].qname matches an existing Function/Method/Field/Struct/
 	// Constant/Variable in the parsed graph. Direction = governed node
@@ -425,7 +416,7 @@ const (
 	// rules apply to this symbol?". Multiple policies can govern the
 	// same symbol; the Policy node side fans in.
 	EdgeGovernedBy EdgeType = "governed_by"
-	// Schema 1.15 (P1 #5 — security pattern annotations): code symbol
+	// Schema 1.15 (security pattern annotations): code symbol
 	// → SecurityPattern node. Emitted from pkg/security.Resolve when
 	// a YAML security pattern's matches[].qname hits an existing
 	// Function/Method/Field/Struct/Modifier in the parsed graph.
@@ -437,14 +428,13 @@ const (
 
 // AllEdgeTypes returns all 43 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
-// EdgeAwaits (W-B) + EdgeOverrides (W-C) are appended at indices 38-39
-// for schema 1.10 (slot-only; detectors land in Phase 5).
-// EdgeUsesFor (W-C W6) is appended at index 40 (schema 1.10 W6 — using
-// For library extension; first-class binding edge per Q9-1 (b) 2026-05-12).
-// EdgeGovernedBy (P1 #4) is appended at index 41 (schema 1.14 — code
+// EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
+// EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
+// extension as a first-class binding edge).
+// EdgeGovernedBy is appended at index 41 (schema 1.14 — code
 // symbol → external Policy node loaded from YAML; first-class so
 // policy queries can run as a single edge-type filter).
-// EdgeHasSecurityPattern (P1 #5) is appended at index 42 (schema 1.15 —
+// EdgeHasSecurityPattern is appended at index 42 (schema 1.15 —
 // code symbol → SecurityPattern node loaded from YAML).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{

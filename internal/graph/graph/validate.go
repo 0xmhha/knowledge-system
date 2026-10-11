@@ -18,7 +18,7 @@ type DanglingEdge struct {
 // ValidationReport summarizes the result of Inspect. Schema errors are
 // fatal-worthy (unknown type / invalid confidence — these mean the emitter
 // is broken). Dangling edges are recoverable: Sanitize drops them and the
-// build proceeds with a warning. This separation lets dogfooding self-analysis
+// build proceeds with a warning. This separation lets self-analysis
 // proceed even when the parser emits an orphaned reference.
 type ValidationReport struct {
 	SchemaErrors  []error
@@ -128,7 +128,7 @@ func Sanitize(g *Graph, report *ValidationReport) int {
 // Returns the FIRST violation as an error; preserved for backward
 // compatibility with tests and strict-mode builds. New callers should
 // prefer Inspect (which collects everything) plus Sanitize (which drops
-// dangling edges) to enable lenient dogfooding flows.
+// dangling edges) to enable lenient self-analysis flows.
 func Validate(g *Graph) error {
 	report := Inspect(g)
 	if len(report.SchemaErrors) > 0 {

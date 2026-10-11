@@ -25,7 +25,7 @@ import (
 // match what was indexed. The fetcher does NOT enforce this — cks's
 // EvidencePack already carries CommitHash so the consuming LLM can
 // detect drift if it matters. A strict-mode follow-up could add a
-// match check; for Phase-0 dogfood the working tree IS the snapshot.
+// match check; for local self-evaluation the working tree IS the snapshot.
 //
 // Safety: paths are joined with filepath.Join and rejected outside
 // Root via filepath.Rel + ".." prefix check, so a citation with a

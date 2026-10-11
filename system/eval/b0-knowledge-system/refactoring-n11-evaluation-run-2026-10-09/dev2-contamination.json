@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run": "DEV2 (cks 7c57a388, binary e53c308e)",
+  "report_state": "partial",
+  "exit_code": 1,
+  "rows": 1680,
+  "missing_slots": 0,
+  "capture_errors": "16 cold-process closes ended with 'signal: killed'",
+  "load_average": {"before": "7.27 7.66 7.46", "after": "41.96 30.79 20.27", "first_dev_before": "5.32 7.30 8.30"},
+  "observed_external_load_at_end": {
+    "mediaanalysisd": "189% CPU, elapsed 01:09:08 at 2026-10-09T02:53Z (started near DEV2 start)",
+    "Docker VM and backend": "~56% and ~48% CPU",
+    "Chrome, WindowServer": "present"
+  },
+  "verdict": "contaminated: not a valid latency or cold-start measurement; quality rows usable only as a repeat check",
+  "observed_without_claim": "Citations identical to DEV1 in all arms. Within-run warm p95 ratios fell (ontology off arms 1.21-1.37 vs 1.85-2.18; knowledge on arms 1.63-1.93 vs 2.16-3.29) but load differs, so no improvement is claimed.",
+  "processes_not_touched": "User processes were not stopped by the agent."
+}

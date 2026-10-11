@@ -25,7 +25,7 @@ import (
 )
 
 // emitDerivedPasses runs the post-graph.Build derived passes against g IN
-// MEMORY: cross-language link (Sol→TS binds_to), G6 Temporal (commit nodes
+// MEMORY: cross-language link (Sol→TS binds_to), temporal (commit nodes
 // + changed_in/blame), cluster (pkg + topic), and score. Returns the cluster
 // outputs so the caller can persist them.
 //
@@ -40,7 +40,7 @@ import (
 // and binds_to are the caller's responsibility (cold wipes everything via
 // openColdStore; incremental issues targeted DeleteEdgesByType).
 //
-// goFuncFieldTouches (W-A): per Go Function/Method node ID → set of struct-
+// goFuncFieldTouches (lock propagation): per Go Function/Method node ID → set of struct-
 // Field node IDs whose values are read/written in the body. Sourced from
 // the Go parser's FuncFieldTouches() accessor on the cold path; nil on
 // the incremental path (which short-circuits the propagation pass even
@@ -61,10 +61,10 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 		}
 		log.Info("xlang linked", "binds_to", len(xlEdges))
 	}
-	// W2 (schema 1.9 §6.9): HTTP client → server Endpoint matching.
+	// HTTP client → server Endpoint matching (schema 1.9 §6.9).
 	// Cascade resolves AMBIGUOUS placeholder Endpoints emitted by the per-
 	// language parsers (Go: distributed.go, TS: http_client.go) against the
-	// real server-side Endpoints from W1. See internal/link/http_match.go
+	// real server-side Endpoints. See internal/link/http_match.go
 	// for the algorithm + §3.3 exact-match decision.
 	newNodes, newEdges, httpResult := link.MatchHTTPClients(g.Nodes, g.Edges)
 	g.Nodes = newNodes
@@ -85,7 +85,7 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	if _, err := validateAndSanitize(g, log, "temporal", strict); err != nil {
 		return nil, nil, nil, err
 	}
-	// W-A (D1 Stage B): cross-function lock propagation. Runs BEFORE
+	// Cross-function lock propagation. Runs BEFORE
 	// cluster/score so the propagated edges contribute to PageRank /
 	// in-degree statistics consistently with the existing intra-function
 	// edges. Opt-in (Options.LockPropagation) — when off the call is a
@@ -120,12 +120,12 @@ type Options struct {
 	Languages           []string // {"auto"} | subset of {"go","ts","sol"}
 	Logger              *slog.Logger
 	CKGVersion          string
-	// NoCache forces a full rebuild — bypasses the A3 incremental cache and
+	// NoCache forces a full rebuild — bypasses the incremental cache and
 	// wipes graph.db at start. Use when the cache is suspect, or for clean
 	// benchmark runs.
 	NoCache bool
 	// RebuildMetrics forces PageRank/Leiden recompute even when the cache
-	// would otherwise reuse them. Phase 1 ALWAYS recomputes when any file
+	// would otherwise reuse them. The pipeline ALWAYS recomputes when any file
 	// is dirty (see Run below) — this flag is the explicit operator escape
 	// for the "all-cached but I want fresh metrics" case.
 	RebuildMetrics bool
@@ -137,7 +137,7 @@ type Options struct {
 	// StrictValidate, when true, fails the build on the first dangling edge or
 	// schema violation (legacy v0.x behaviour). Default false: dangling edges
 	// are dropped with a warning, schema violations still abort. Lenient mode
-	// is required for dogfooding self-analysis, where parser bugs would
+	// is required for self-analysis, where parser bugs would
 	// otherwise prevent graph.db from being written and block measurement.
 	StrictValidate bool
 	// FilesFromPath is the optional path to a JSON include/exclude filter
@@ -151,15 +151,14 @@ type Options struct {
 	// that never touch disk. Callers must not set both a non-nil Filter and a
 	// non-empty FilesFromPath.
 	Filter *filterlist.FilterList
-	// LockPropagation enables D1 Stage B cross-function lock propagation
-	// (W-A, Within-language semantics Phase 5). When true, the cold build
+	// LockPropagation enables cross-function lock propagation. When true, the cold build
 	// path walks the Go call graph from every lock-holding function up to
 	// lockPropagationMaxDepth=5 hops and emits accessed_under_lock(field,
 	// mutex) edges for fields touched in reachable callee bodies. Default
-	// false (opt-in per W-A §5.0 Q5) so existing builds are byte-identical.
+	// false (opt-in per design §5.0 Q5) so existing builds are byte-identical.
 	// Incremental cache path skips propagation regardless of this flag —
 	// run with --no-cache when the flag is on to measure full effect.
-	// Spec: docs/design/go-cross-function-lock-propagation.md.
+	// Spec: docs/graph/design/go-cross-function-lock-propagation.md.
 	LockPropagation bool
 
 	// PolicyFile is the optional path to a governance/protocol policy
@@ -167,8 +166,7 @@ type Options struct {
 	// policy entries against the parsed graph and emits NodePolicy +
 	// EdgeGovernedBy rows so an LLM can answer "what policy governs
 	// this code?" without leaving the graph. Empty means "no policy
-	// enrichment" — existing builds stay byte-identical. P1 #4 (see
-	// docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2). Incremental cache
+	// enrichment" — existing builds stay byte-identical. Incremental cache
 	// path skips policy resolution for the same reason it skips lock
 	// propagation — the policy file's content is decoupled from the
 	// per-file parse output, so re-resolving is a cold-only step
@@ -177,13 +175,13 @@ type Options struct {
 
 	// SecurityPatternFile is the optional path to a security risk
 	// pattern YAML (pkg/security). Sibling to PolicyFile but for the
-	// P1 #5 risk-surface axis: reentrancy, access-control, Byzantine,
+	// risk-surface axis: reentrancy, access-control, Byzantine,
 	// overflow patterns flagged against specific code symbols. Empty
 	// means "no security enrichment". Same cold-only constraint as
 	// PolicyFile — re-run with --no-cache when the YAML changes.
 	SecurityPatternFile string
 
-	// TemporalDepth caps the per-file commit count the temporal pass (G6)
+	// TemporalDepth caps the per-file commit count the temporal pass
 	// walks when emitting Commit/Hunk nodes and changed_in/blame edges.
 	// 0 (the zero value) means "use the built-in default" (temporalDepthDefault
 	// = 10). Raising it deepens commit-level history at a roughly linear cost
@@ -239,7 +237,7 @@ func validateAndSanitize(g *graph.Graph, log *slog.Logger, stage string, strict 
 // and OutDir/manifest.json. Returns the persisted Manifest summary so the
 // caller can print stats without re-reading SQLite.
 //
-// Cache routing (A3 Phase 1):
+// Cache routing:
 //   - --no-cache OR no prior manifest OR schema/version mismatch → cold rebuild
 //   - all-cached AND no removals → short-circuit (timestamp refresh only)
 //   - mixed dirty/cached → incremental (parse only dirty, reuse cached node sets)
@@ -274,13 +272,13 @@ func Run(opt Options) (persist.Manifest, error) {
 	log.Info("detected files", "go", goCount, "ts", tsCount, "sol", solCount, "proto", protoCount)
 	log.Debug("discovery.end", "total", goCount+tsCount+solCount+protoCount)
 
-	// (2) cache routing — three paths (G6 v4, schema 1.5):
+	// (2) cache routing — three paths (schema 1.5):
 	//
 	//   - runShortCircuit: 100% cache hit, no removals (manifest timestamp
 	//     refresh only). Load-bearing for CI re-runs on unchanged source.
 	//   - runIncremental: partial-hit — parse only dirty files, reload cached
 	//     nodes in declaration order (NodesByFilePath ORDER BY start_line —
-	//     G6 v4 fix for H3 root cause), merge + rerun Pass 2.
+	//     keeps edge emission order stable), merge + rerun Pass 2.
 	//   - runCold: --no-cache, missing manifest, schema/version mismatch.
 	dbPath := filepath.Join(opt.OutDir, "graph.db")
 	old := readOldManifestFromDB(dbPath, opt.DBDSN)
@@ -330,7 +328,7 @@ func runCold(opt Options, log *slog.Logger,
 	resolved := []*parse.ResolvedGraph{}
 	allPending := []persist.PendingRefRow{}
 	parseErrs := 0
-	// goFuncFieldTouches: W-A side-channel from the Go parser (per
+	// goFuncFieldTouches: lock-propagation side-channel from the Go parser (per
 	// Function/Method node ID → set of struct-Field node IDs touched in
 	// body). Consumed by emitDerivedPasses' propagateLockedFieldAccess
 	// when opt.LockPropagation is true. Stays nil when the Go pipeline
@@ -349,7 +347,7 @@ func runCold(opt Options, log *slog.Logger,
 		log.Debug("pass1.end", "language", "go", "nodes", len(rg.Nodes), "errs", n)
 	}
 	// solParser is retained across the language passes so that the
-	// cross-language linker (T20) can read Solidity ABI sigs after graph.Build.
+	// cross-language linker can read Solidity ABI sigs after graph.Build.
 	// nil signals "no Sol pipeline ran" — xlang stage is skipped in that case.
 	var solParser *solp.Parser
 	if shouldRun("ts", opt.Languages) && len(files.TS) > 0 {
@@ -375,10 +373,10 @@ func runCold(opt Options, log *slog.Logger,
 		allPending = append(allPending, pending...)
 		log.Debug("pass1.end", "language", "sol", "nodes", len(rg.Nodes), "errs", n)
 	}
-	// W3a (schema 1.9): .proto schema parser. Hand-rolled lexer + recursive-
+	// Schema 1.9: .proto schema parser. Hand-rolled lexer + recursive-
 	// descent — emits Service/Method/MessageType/Enum/Field/Package nodes plus
 	// uses_type pending refs for rpc request/response types. gRPC client/server
-	// detection in Go/TS lives in W3b/W3c.
+	// detection lives in the Go/TS parsers.
 	if shouldRun("proto", opt.Languages) && len(files.Proto) > 0 {
 		log.Debug("pass1.start", "language", "proto", "files", len(files.Proto))
 		rg, pending, n, err := runProtoPipeline(opt.SrcRoot, files.Proto, log)
@@ -404,7 +402,7 @@ func runCold(opt Options, log *slog.Logger,
 
 	// (4b/4c/5/6) derived passes — xlang, temporal, cluster, score. Shared
 	// helper so the partial-cache rebuild path runs identical in-memory
-	// transformations (G6 v3 § 4.4). v2's "emitted-vs-DB 0" bug was caused
+	// transformations. An earlier "emitted-vs-DB 0" bug was caused
 	// by temporal living only in cold; the helper makes that recurrence
 	// structurally impossible.
 	log.Debug("metrics.start")
@@ -430,7 +428,7 @@ func runCold(opt Options, log *slog.Logger,
 	if err := persistColdArtifacts(store, opt.SrcRoot, g, pkgTree, topicTree, hunkBlobs); err != nil {
 		return persist.Manifest{}, err
 	}
-	// G6 v3 (schema 1.5): persist Pass 1 pending refs so the next partial
+	// Schema 1.5: persist Pass 1 pending refs so the next partial
 	// build can replay Pass 2 over a merged dirty + cached input set without
 	// re-parsing cached files. INSERT after persistColdArtifacts so node FKs
 	// are satisfied. The cold path builds into a fresh temp DB via openColdStore,
@@ -439,7 +437,7 @@ func runCold(opt Options, log *slog.Logger,
 	if err := store.InsertPendingRefs(allPending); err != nil {
 		return persist.Manifest{}, fmt.Errorf("persist pending_refs: %w", err)
 	}
-	// ckg-NEW-2 PR breadcrumb (schema 1.12): scan git log for PR-tagged
+	// PR breadcrumb (schema 1.12): scan git log for PR-tagged
 	// commits and persist the node ↔ PR mapping. Runs after the node
 	// rows land so the node_prs FK has its targets. Failure here is
 	// logged but non-fatal — PR metadata is strictly additive and a
@@ -454,7 +452,7 @@ func runCold(opt Options, log *slog.Logger,
 		}
 		log.Info("pr_history emitted", "nodes_with_prs", len(prByNode))
 	}
-	// P1 #4 policy metadata (schema 1.14): load the operator-supplied
+	// Policy metadata (schema 1.14): load the operator-supplied
 	// YAML, resolve governs[] qnames against the parsed graph, persist
 	// NodePolicy rows + EdgeGovernedBy edges. Runs after the main node
 	// insert so the FK on EdgeGovernedBy.src targets resolved code IDs.
@@ -486,7 +484,7 @@ func runCold(opt Options, log *slog.Logger,
 		log.Info("policy enrichment emitted",
 			"policy_nodes", len(policyNodes), "governed_by_edges", len(policyEdges))
 	}
-	// P1 #5 security pattern annotations (schema 1.15): same load-
+	// Security pattern annotations (schema 1.15): same load-
 	// resolve-persist shape as policy enrichment above. Runs after
 	// policy so its own matches[] index reuses the (now larger)
 	// g.Nodes set if a future YAML wanted to label a Policy node
@@ -511,6 +509,9 @@ func runCold(opt Options, log *slog.Logger,
 			"security_nodes", len(secNodes), "has_security_pattern_edges", len(secEdges))
 	}
 	log.Debug("persist.end")
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+		return persist.Manifest{}, err
+	}
 
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
@@ -616,7 +617,7 @@ func openStore(outDir, dbDsn string) (persist.Store, error) {
 // persistColdArtifacts performs the bulk-insert phase of a cold rebuild.
 // All inserts are unconditional — the DB was just wiped by openColdStore.
 //
-// hunkBlobs (schema 1.8 H1) is the gzip-compressed unified-diff text per
+// hunkBlobs (schema 1.8) is the gzip-compressed unified-diff text per
 // Hunk node ID, returned by emitTemporalEdges. Merged into the regular
 // extractBlobs map so a single InsertBlobs round-trip persists both
 // CodeNode source slices and hunk patches under the same blobs.node_id PK.

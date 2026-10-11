@@ -7,34 +7,36 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W7.1 (2026-05-17) — low-level call dispatch detection.
+// Sol low-level call dispatch detection.
 //
 // Detects: `target.call(...)`, `target.delegatecall(...)`,
 // `target.staticcall(...)` where `target` is a bare identifier
-// resolvable via W6 lookupReceiverType (state-var / param / local-var).
+// resolvable via lookupReceiverType (state-var / param / local-var).
 //
-// V0 scope (per design doc §2.1):
+// Scope (per design doc §2.1):
 //   - Bare identifier receivers only. `address(x)` cast / chained
-//     expressions drop (W7-D2).
+//     expressions drop.
 //   - 3 method names: call / delegatecall / staticcall. Value-transfer
-//     primitives (send / transfer) deferred to W7.1 V1+.
+//     primitives (send / transfer) are left to the HasValueTransfer
+//     marker.
 //   - Resolver: receiver type → byName[NodeContract|NodeInterface] →
-//     Dst. ConfAmbiguous regardless of file boundary (W3 idiom).
+//     Dst. ConfAmbiguous regardless of file boundary (same as interface
+//     dispatch).
 //
 // Re-uses every infrastructure piece:
 //   - `unwrapExpression` + `member.ChildByFieldName("object"|"property")`
 //     from using_for.go matchStateVarMethodCall.
-//   - W6 V1.0 lookupReceiverType chain (resolveLowLevelCallRef).
+//   - The using-for lookupReceiverType chain (resolveLowLevelCallRef).
 //   - PendingRef.DispatchKind routing.
 //
 // dispatchKindLowLevelCall — tags PendingRefs from this walker so the
 // Pass 2 dispatch switch routes them to resolveLowLevelCallRef.
 const dispatchKindLowLevelCall = "low_level_call"
 
-// isLowLevelMethod returns true iff name matches one of the three V0
+// isLowLevelMethod returns true iff name matches one of the three
 // primitives. send / transfer (value-transfer) intentionally excluded
 // — different semantics (no method dispatch, just balance change) and
-// warrant a separate edge type (EdgeTransfersValue) candidate for V1+.
+// warrant a separate edge type (EdgeTransfersValue is a candidate).
 func isLowLevelMethod(name string) bool {
 	switch name {
 	case "call", "delegatecall", "staticcall":

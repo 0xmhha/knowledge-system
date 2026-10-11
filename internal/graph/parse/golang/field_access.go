@@ -10,7 +10,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// field_access.go (defect E): emits `writes_field` edges from a
+// field_access.go emits `writes_field` edges from a
 // Function/Method to a struct Field node when the function body assigns to
 // that field — `x.F = v`, `x.F op= v`, or `x.F++` / `x.F--`.
 //

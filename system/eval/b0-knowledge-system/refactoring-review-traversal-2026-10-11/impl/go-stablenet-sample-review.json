@@ -1,0 +1,255 @@
+{
+ "seed": {
+  "id": "02140c6c0ae51a0e",
+  "qualified_name": "snap.Syncer.assignTrienodeHealTasks",
+  "type": "Method",
+  "file_path": "eth/protocols/snap/sync.go",
+  "start_line": 1358,
+  "end_line": 1482
+ },
+ "signature": "func (Syncer) assignTrienodeHealTasks(success chan *trienodeHealResponse, fail chan *trienodeHealRequest, cancel chan struct{})",
+ "uses_types": [
+  {
+   "id": "852a2ded4d180b99",
+   "qualified_name": "snap.trienodeHealRequest",
+   "type": "Struct",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 241,
+   "end_line": 256
+  },
+  {
+   "id": "dc5d6ef7324cb6cc",
+   "qualified_name": "snap.trienodeHealResponse",
+   "type": "Struct",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 259,
+   "end_line": 265
+  }
+ ],
+ "instantiates": [
+  {
+   "id": "87d3464dc4fbe603",
+   "qualified_name": "snap.capacitySort",
+   "type": "Struct",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 3162,
+   "end_line": 3165
+  },
+  {
+   "id": "852a2ded4d180b99",
+   "qualified_name": "snap.trienodeHealRequest",
+   "type": "Struct",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 241,
+   "end_line": 256
+  }
+ ],
+ "writes_fields": [
+  {
+   "id": "dcc7a402468015b1",
+   "qualified_name": "snap.capacitySort.caps",
+   "type": "Field",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 3164,
+   "end_line": 3164
+  },
+  {
+   "id": "67053dea35f1ae02",
+   "qualified_name": "snap.capacitySort.ids",
+   "type": "Field",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 3163,
+   "end_line": 3163
+  },
+  {
+   "id": "530d0e1fc4736a17",
+   "qualified_name": "snap.trienodeHealRequest.timeout",
+   "type": "Field",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 249,
+   "end_line": 249
+  }
+ ],
+ "return_statements": 3,
+ "control": {
+  "IfStmt": 10,
+  "LoopStmt": 6
+ },
+ "call_sites": [
+  {
+   "line": 1359,
+   "text": "s.lock.Lock()"
+  },
+  {
+   "line": 1360,
+   "text": "s.lock.Unlock()"
+  },
+  {
+   "line": 1364,
+   "text": "make([]string, 0, len(s.trienodeHealIdlers))"
+  },
+  {
+   "line": 1364,
+   "text": "len(s.trienodeHealIdlers)"
+  },
+  {
+   "line": 1365,
+   "text": "make([]int, 0, len(s.trienodeHealIdlers))"
+  },
+  {
+   "line": 1365,
+   "text": "len(s.trienodeHealIdlers)"
+  },
+  {
+   "line": 1367,
+   "text": "s.rates.TargetTimeout()"
+  },
+  {
+   "line": 1372,
+   "text": "append(idlers.ids, id)"
+  }
+ ],
+ "call_sites_total": 41,
+ "callees": [
+  {
+   "id": "b68f3880006e0298",
+   "qualified_name": "msgrate.Trackers.TargetTimeout",
+   "type": "Method",
+   "file_path": "p2p/msgrate/msgrate.go",
+   "start_line": 367,
+   "end_line": 376
+  },
+  {
+   "id": "29e155194ba203e2",
+   "qualified_name": "msgrate.Trackers.Capacity",
+   "type": "Method",
+   "file_path": "p2p/msgrate/msgrate.go",
+   "start_line": 445,
+   "end_line": 454
+  },
+  {
+   "id": "1a6aa51c43efa0c6",
+   "qualified_name": "trie.Sync.Pending",
+   "type": "Method",
+   "file_path": "trie/sync.go",
+   "start_line": 466,
+   "end_line": 468
+  },
+  {
+   "id": "a6a10167cfb23ec5",
+   "qualified_name": "trie.Sync.Missing",
+   "type": "Method",
+   "file_path": "trie/sync.go",
+   "start_line": 328,
+   "end_line": 361
+  },
+  {
+   "id": "d87633637cf47e4d",
+   "qualified_name": "snap.sortByAccountPath",
+   "type": "Function",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 3248,
+   "end_line": 3257
+  },
+  {
+   "id": "724b0b1f1b36c2a0",
+   "qualified_name": "log.Logger.Debug",
+   "type": "Method",
+   "file_path": "log/logger.go",
+   "start_line": 121,
+   "end_line": 121
+  },
+  {
+   "id": "b9eba875d227aaac",
+   "qualified_name": "snap.SyncPeer.Log",
+   "type": "Method",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 431,
+   "end_line": 431
+  },
+  {
+   "id": "b6462a8b7548bd5f",
+   "qualified_name": "msgrate.Trackers.Update",
+   "type": "Method",
+   "file_path": "p2p/msgrate/msgrate.go",
+   "start_line": 458,
+   "end_line": 465
+  }
+ ],
+ "callers": [
+  {
+   "id": "81702d2d3ee2a4e9",
+   "qualified_name": "snap.Syncer.Sync",
+   "type": "Method",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 606,
+   "end_line": 752
+  }
+ ],
+ "via_interfaces": null,
+ "caller_paths": [
+  [
+   "downloader.New",
+   "downloader.Downloader.stateFetcher",
+   "downloader.Downloader.runStateSync",
+   "downloader.stateSync.run",
+   "snap.Syncer.Sync",
+   "snap.Syncer.assignTrienodeHealTasks"
+  ]
+ ],
+ "entry_points": 1,
+ "caller_walk_truncated": false,
+ "goroutines": [
+  {
+   "id": "9e5ceaf82713ede6",
+   "qualified_name": "snap.Syncer.assignTrienodeHealTasks#Goroutine@54843",
+   "type": "Goroutine",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 1472,
+   "end_line": 1480
+  }
+ ],
+ "sends_to": null,
+ "recvs_from": null,
+ "acquires_locks": [
+  {
+   "id": "5d6bac89b48c1cb2",
+   "qualified_name": "snap.Syncer.lock#mutex",
+   "type": "Mutex",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 510,
+   "end_line": 510
+  }
+ ],
+ "releases_locks": [
+  {
+   "id": "5d6bac89b48c1cb2",
+   "qualified_name": "snap.Syncer.lock#mutex",
+   "type": "Mutex",
+   "file_path": "eth/protocols/snap/sync.go",
+   "start_line": 510,
+   "end_line": 510
+  }
+ ],
+ "timeout_paths": null,
+ "cancellation_paths": null,
+ "interface_implementers": {
+  "log.Logger.Debug": [
+   "log.logger"
+  ],
+  "snap.SyncPeer.Log": [
+   "eth.snapPeer",
+   "snap.Peer"
+  ]
+ },
+ "commits": [
+  {
+   "sha": "b23c5a83176cda9fefa8cd6d2414e60ee2f82437",
+   "time": 1774933901,
+   "subject": "feat: delayed p2p message decoding via rlp.RawList (#65)"
+  }
+ ],
+ "commits_total": 1,
+ "test_callers": null,
+ "test_callers_total": 0
+}

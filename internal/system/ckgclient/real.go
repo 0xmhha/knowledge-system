@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/concurrency"
@@ -35,11 +36,42 @@ const DefaultSearchLimit = 10
 // and handle the larger payload.
 const DefaultSubgraphMaxTotal = 80
 
+// subgraphTraversalBudget is the total edge count at which GetSubgraph stops
+// deepening even when too few of the edges are usable in the response.
+const subgraphTraversalBudget = 50000
+
+// usableSubgraphEdges counts, up to limit, the edges GetSubgraph's response
+// would accept: a mapped relation other than uses_type, both endpoints
+// present, and no test endpoint when tests are excluded.
+func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bool, limit int) int {
+	byID := make(map[string]types.Node, len(nodes))
+	for _, n := range nodes {
+		byID[n.ID] = n
+	}
+	count := 0
+	for _, e := range edges {
+		if count >= limit {
+			break
+		}
+		rel, ok := relationFromEdgeType(e.Type, false)
+		if !ok || rel == contract.RelationUsesType {
+			continue
+		}
+		srcN, srcOK := byID[e.Src]
+		dstN, dstOK := byID[e.Dst]
+		if !srcOK || !dstOK || (excludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath))) {
+			continue
+		}
+		count++
+	}
+	return count
+}
+
 // FilterOverfetchRatio scales the SearchFTS limit when a non-empty
 // SearchOpts.Filter is present. Post-filter discards rows the caller
 // did not want, so we pull this many times more rows up front to keep
 // the kept-row count close to the caller's K. 3× balances "enough
-// survivors" against "extra SQLite work per call." Phase E may tune
+// survivors" against "extra SQLite work per call." Evaluation may tune
 // this based on miss rates.
 const FilterOverfetchRatio = 3
 
@@ -69,7 +101,7 @@ type ManifestSnapshot struct {
 // so mocks don't need to import internal/persist (which they can't).
 type storeReader interface {
 	LoadManifestSnapshot() (ManifestSnapshot, error)
-	// SearchFTS returns scored hits (G5): the ckg store carries a real,
+	// SearchFTS returns scored hits: the ckg store carries a real,
 	// result-set-normalized Score in [0,1] plus a backend-native RawScore.
 	SearchFTS(q string, limit int) ([]store.SearchHit, error)
 	FindSymbol(name string, exact bool) ([]types.Node, error)
@@ -81,12 +113,13 @@ type storeReader interface {
 	NodesByFilePath(path string) ([]types.Node, error)
 	NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
 	SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error)
-	// G3 seam: surface ckg's pkg/impact + pkg/evidence + GetNodePRs through
+	// Impact/evidence seam: surface ckg's pkg/impact + pkg/evidence + GetNodePRs through
 	// the same store.Reader the adapter already holds, so mocks stay injectable.
 	ImpactCompute(seedQname, seedFile string, depth int, includeBlobs bool) (map[string]any, error)
 	EvidenceBuildPack(intent, seedQname string, k int) (*evidence.Pack, error)
 	GetNodePRs(nodeID string, cutoff time.Time) ([]store.PRRef, error)
 	ConcurrencyAnalyze(symbol string, depth, maxTotal int) (concurrency.Result, error)
+	Review(qname string, opts store.ReviewOptions) (store.Review, error)
 	Close() error
 }
 
@@ -95,6 +128,10 @@ type storeReader interface {
 // which strips the persist.Manifest dependency.
 type realStoreReader struct {
 	r store.Reader
+}
+
+func (a *realStoreReader) Review(qname string, opts store.ReviewOptions) (store.Review, error) {
+	return a.r.Review(qname, opts)
 }
 
 func (a *realStoreReader) LoadManifestSnapshot() (ManifestSnapshot, error) {
@@ -156,6 +193,13 @@ func (a *realStoreReader) Close() error {
 type Real struct {
 	s      storeReader
 	closed bool
+
+	// commitMu guards commitID, the indexed commit stamped on citations.
+	// The store is opened immutable, so a successful read holds for its
+	// lifetime; re-reading the manifest per request cost about 85 MB on a
+	// production-size graph.
+	commitMu sync.Mutex
+	commitID string
 }
 
 // Compile-time guarantee Real satisfies Client.
@@ -201,7 +245,7 @@ func newRealWithStore(s storeReader) *Real {
 // per-Citation commit filter has no incremental signal until ckg
 // supports cross-commit search.
 //
-// Score policy (G5): ckg's SearchFTS returns a real, result-set-normalized
+// Score policy: ckg's SearchFTS returns a real, result-set-normalized
 // Score in [0,1] (descending) on every SearchHit — cks consumes it verbatim
 // rather than synthesizing a rank gradient. NB: a degenerate single-row or
 // all-equal result set has every Score = 1.0 — ckg's min-max maps uniform
@@ -294,12 +338,12 @@ func matchesFilter(n types.Node, f SearchFilter) bool {
 // as given, then progressively drop leading dot-segments until the store resolves
 // it. Bare/exact names hit on the first try, so existing behaviour is unchanged.
 func (r *Real) resolveFlexibleNodes(name string) ([]types.Node, error) {
-	// Canonical-first (B7 join key): a ckg canonical_id (ADR-0001) is globally
+	// Canonical-first (ckv↔ckg join key): a ckg canonical_id (ADR-0001) is globally
 	// unique and is what ckv chunks / domain anchors carry, so it wins over
 	// qname matching. This keeps the public find_symbol / find_callers /
 	// find_callees surface honest about the canonical-id support its tool docs
-	// advertise, including "@<line>"-suffixed same-file duplicates (refinement
-	// B3) that qname suffix matching can never resolve.
+	// advertise, including "@<line>"-suffixed same-file duplicates that qname
+	// suffix matching can never resolve.
 	if n, found, err := r.s.FindByCanonicalID(name); err == nil && found {
 		return []types.Node{n}, nil
 	}
@@ -357,7 +401,7 @@ func (r *Real) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]
 // the traversal uses ckg's reverse=true argument — the only way ckg
 // surfaces inbound edges in NeighborhoodByQname's signature. If callers
 // mix forward + reverse relations in one call, this implementation
-// performs two ckg queries and concatenates; C.1 keeps it simple by
+// performs two ckg queries and concatenates; this version keeps it simple by
 // supporting a single direction per call (mixed direction yields an
 // error to make the limitation explicit).
 func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts NeighborsOpts) ([]contract.Neighbor, error) {
@@ -432,6 +476,11 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	out := make([]contract.Neighbor, 0, len(edges))
 	for _, e := range edges {
 		rel, ok := relationFromEdgeType(e.Type, reverse)
+		// uses_type is only returned to callers that asked for it, so the
+		// default and intent-driven walks keep their existing edge set.
+		if rel == contract.RelationUsesType && !containsRelation(opts.Relations, contract.RelationUsesType) {
+			ok = false
+		}
 		if !ok {
 			continue
 		}
@@ -471,7 +520,7 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 			Source:   nodeToCitation(srcN, commit),
 			Target:   nodeToCitation(dstN, commit),
 			Relation: rel,
-			Distance: 1, // C.1: single-hop neighbor distance; depth>1 returns
+			Distance: 1, // Single-hop neighbor distance; depth>1 returns
 			// nodes/edges flattened by ckg, but ckg does not annotate per-edge
 			// hop count. Refine with BFS when depth>1 becomes a real use case.
 		})
@@ -634,7 +683,7 @@ func (r *Real) GetNodePRs(ctx context.Context, qname string, opts PRRefOpts) ([]
 }
 
 // uniqueResolved picks the node that `name` resolves to from suffix-match defs
-// WITHOUT ever silently guessing (ADR-0001, Phase 3): an exact qualified_name
+// WITHOUT ever silently guessing (ADR-0001): an exact qualified_name
 // match wins; otherwise the single distinct match is returned; a multi-match is
 // reported as unresolved (ok=false) so callers fail safe rather than binding to
 // the arbitrary first-of-N (the old `defs[0]`, which could be the wrong symbol).
@@ -871,34 +920,57 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	// the same reason a reverse walk does: a concrete method's inbound edges
 	// land on the interface method, and a neighbourhood that omits them is
 	// missing precisely the callers the question is usually about.
+	seeds := r.reverseSeeds(qname)
+	walk := func(d int) ([]types.Node, []types.Edge, error) {
+		var nodes []types.Node
+		var edges []types.Edge
+		nodeSeen := make(map[string]struct{})
+		edgeSeen := make(map[string]struct{})
+		for _, sd := range seeds {
+			ns, es, err := r.s.SubgraphByQname(sd, d)
+			if err != nil {
+				// As in ImpactOfChange: the seed must resolve, a bridged
+				// interface method need not be present.
+				if sd == qname {
+					return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
+				}
+				continue
+			}
+			for _, n := range ns {
+				if _, dup := nodeSeen[n.ID]; dup {
+					continue
+				}
+				nodeSeen[n.ID] = struct{}{}
+				nodes = append(nodes, n)
+			}
+			for _, e := range es {
+				k := e.Src + "|" + e.Dst + "|" + string(e.Type)
+				if _, dup := edgeSeen[k]; dup {
+					continue
+				}
+				edgeSeen[k] = struct{}{}
+				edges = append(edges, e)
+			}
+		}
+		return nodes, edges, nil
+	}
+	limit := opts.MaxTotal
+	if limit <= 0 {
+		limit = DefaultSubgraphMaxTotal
+	}
+	// Deepen one level at a time. Stop once the walk already holds limit
+	// edges the response can use, or subgraphTraversalBudget edges in all:
+	// an untyped walk grows about tenfold per level, and depth 5 allocated
+	// up to 10 GB on a production-size graph to return 80 edges.
 	var nodes []types.Node
 	var edges []types.Edge
-	nodeSeen := make(map[string]struct{})
-	edgeSeen := make(map[string]struct{})
-	for _, sd := range r.reverseSeeds(qname) {
-		ns, es, err := r.s.SubgraphByQname(sd, depth)
+	for d := 1; d <= depth; d++ {
+		nodes, edges, err = walk(d)
 		if err != nil {
-			// As in ImpactOfChange: the seed must resolve, a bridged
-			// interface method need not be present.
-			if sd == qname {
-				return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
-			}
-			continue
+			return nil, nil, err
 		}
-		for _, n := range ns {
-			if _, dup := nodeSeen[n.ID]; dup {
-				continue
-			}
-			nodeSeen[n.ID] = struct{}{}
-			nodes = append(nodes, n)
-		}
-		for _, e := range es {
-			k := e.Src + "|" + e.Dst + "|" + string(e.Type)
-			if _, dup := edgeSeen[k]; dup {
-				continue
-			}
-			edgeSeen[k] = struct{}{}
-			edges = append(edges, e)
+		if len(edges) >= subgraphTraversalBudget || usableSubgraphEdges(nodes, edges, opts.ExcludeTests, limit) >= limit {
+			break
 		}
 	}
 	commit, _ := r.commit()
@@ -910,11 +982,6 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	// only the nodes incident to the kept edges plus the seed, keeping nodes
 	// and edges consistent and bounded. MaxTotal<=0 means "use the default cap"
 	// (a true unbounded subgraph is what caused the overflow).
-	limit := opts.MaxTotal
-	if limit <= 0 {
-		limit = DefaultSubgraphMaxTotal
-	}
-
 	byID := make(map[string]types.Node, len(nodes))
 	var seedID string
 	for _, n := range nodes {
@@ -934,7 +1001,7 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 			break
 		}
 		rel, ok := relationFromEdgeType(e.Type, false)
-		if !ok {
+		if !ok || rel == contract.RelationUsesType {
 			continue
 		}
 		srcN, srcOK := byID[e.Src]
@@ -1013,6 +1080,23 @@ func (r *Real) ConcurrencyImpact(ctx context.Context, symbol string, opts Concur
 	return out, nil
 }
 
+// ReviewFunction resolves a partial seed the same way GetSubgraph does, then
+// reads the review index.
+func (r *Real) ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error) {
+	if qname == "" {
+		return store.Review{}, errors.New("ckgclient: empty qname")
+	}
+	resolved, err := r.resolveSeedOrErr(qname)
+	if err != nil {
+		return store.Review{}, err
+	}
+	rv, err := r.s.Review(resolved, opts)
+	if err != nil {
+		return store.Review{}, fmt.Errorf("ckgclient: review %s: %w", resolved, err)
+	}
+	return rv, nil
+}
+
 // Health round-trips a manifest read and reports reachability + the
 // snapshot's schema version + indexed head commit. Unlike BM25Search,
 // Health never swallows the manifest error — operators need to see why
@@ -1045,10 +1129,16 @@ func (r *Real) Close() error {
 // return Citations with an empty CommitHash) but is surfaced to the
 // caller through Health.
 func (r *Real) commit() (string, error) {
+	r.commitMu.Lock()
+	defer r.commitMu.Unlock()
+	if r.commitID != "" {
+		return r.commitID, nil
+	}
 	snap, err := r.s.LoadManifestSnapshot()
 	if err != nil {
 		return "", err
 	}
+	r.commitID = snap.SrcCommit
 	return snap.SrcCommit, nil
 }
 
@@ -1163,9 +1253,10 @@ func nodeMatchesKinds(n types.Node, kinds []string) bool {
 //	cks RelationImplements -> ckg "implements"
 //	cks RelationImports    -> ckg "imports"
 //	cks RelationReferences -> ckg "references"
-//	cks RelationTestedBy   -> ckg has no direct edge; not supported in C.1
+//	cks RelationTestedBy   -> ckg has no direct edge; not supported yet
 //	cks RelationEmbeds     -> ckg "extends"   (closest analog)
 //	cks RelationDefines    -> ckg "defines"
+//	cks RelationUsesType   -> ckg "uses_type" (explicit requests only)
 //
 // Empty input means "all forward relations": cks fans out to every
 // supported forward edge type.
@@ -1218,6 +1309,8 @@ func planTraversal(rels []contract.Relation) (bool, []string, error) {
 			add(types.EdgeExtends)
 		case contract.RelationDefines:
 			add(types.EdgeDefines)
+		case contract.RelationUsesType:
+			add(types.EdgeUsesType)
 		case contract.RelationTestedBy:
 			// ckg currently has no direct tested_by edge; skip rather
 			// than fabricate a misleading mapping.
@@ -1248,6 +1341,17 @@ func relationFromEdgeType(et types.EdgeType, reversed bool) (contract.Relation, 
 		return contract.RelationEmbeds, true
 	case types.EdgeDefines:
 		return contract.RelationDefines, true
+	case types.EdgeUsesType:
+		return contract.RelationUsesType, true
 	}
 	return "", false
+}
+
+func containsRelation(rels []contract.Relation, want contract.Relation) bool {
+	for _, r := range rels {
+		if r == want {
+			return true
+		}
+	}
+	return false
 }

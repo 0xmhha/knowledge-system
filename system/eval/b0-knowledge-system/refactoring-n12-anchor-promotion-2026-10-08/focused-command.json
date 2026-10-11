@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/system/semantic",
+    "-run",
+    "^TestForeignCodeAnchorPromotionPreservesActiveDataset$",
+    "-count=1"
+  ],
+  "environment_overrides": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "commit.gpgsign",
+    "GIT_CONFIG_VALUE_0": "false"
+  },
+  "preparation_revision": "b487e8766b89020ff9d4575e32c2d581d68ecae2",
+  "new_test_sha256": "cb4c9c39dedba99fc58ea4fd536abae1f274242ef6096b59c67692a2160151ef",
+  "purpose": "close missing public actual-CKG foreign anchor promotion/active-pointer integration control; no existing product failure expected",
+  "actual_human_review_count": 0
+}

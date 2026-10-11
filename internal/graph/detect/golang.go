@@ -29,7 +29,7 @@ import (
 //
 // Implementation: thin wrapper over GoPackagesMode(srcRoot, ModeFiles) so
 // detect.GoFiles and detect.GoPackages share a single discovery oracle.
-// (B1 introduced GoPackages so the Go parser can access types.Info; this
+// (GoPackages exists so the Go parser can access types.Info; this
 // keeps the file-list contract unchanged.)
 func GoFiles(srcRoot string) ([]string, error) {
 	pkgs, err := GoPackagesMode(srcRoot, ModeFiles)

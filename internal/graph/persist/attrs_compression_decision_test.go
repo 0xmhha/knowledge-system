@@ -7,11 +7,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W11 V11 — attrs compression decision lock.
+// Attrs compression decision lock.
 //
-// Background: W11 V7 stores marker metadata as a JSON-blob TEXT
+// Background: the nodes.attrs column stores marker metadata as a JSON-blob TEXT
 // column on nodes. A natural follow-up would gzip the blob to
-// reduce DB size on large repos. V11 audited that option and
+// reduce DB size on large repos. That option was audited and
 // declined it for two reasons:
 //
 //  1. Payload is small. A typical marker set (booleans +
@@ -43,7 +43,7 @@ func TestAttrs_StoredAsPlainText(t *testing.T) {
 		t.Errorf("schemaSQL: missing %q column definition (was it changed to BLOB or compressed?)", colDef)
 	}
 	if strings.Contains(schemaSQL, "attrs          BLOB") {
-		t.Errorf("nodes.attrs is declared as BLOB — V11 decision is plain JSON in TEXT")
+		t.Errorf("nodes.attrs is declared as BLOB — the decision is plain JSON in TEXT")
 	}
 
 	// (b) marshalNodeAttrs returns a plain JSON string, not a
@@ -61,6 +61,6 @@ func TestAttrs_StoredAsPlainText(t *testing.T) {
 		t.Errorf("marshalNodeAttrs returned non-JSON output (first byte = 0x%02x): %q", blob[0], blob)
 	}
 	if strings.HasPrefix(blob, "\x1f\x8b") {
-		t.Errorf("marshalNodeAttrs returned a gzip-framed blob — V11 decision is plain JSON")
+		t.Errorf("marshalNodeAttrs returned a gzip-framed blob — the decision is plain JSON")
 	}
 }

@@ -4,7 +4,7 @@ import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-// Sol W-C W9 V5 (2026-05-19) — struct field aggregation for storage
+// Sol struct field aggregation for storage
 // slot packing.
 //
 // Per Sol §11.1, a storage-located struct packs its fields the same
@@ -20,12 +20,13 @@ import (
 // advanceForArrayField path that handles fixed-size arrays place
 // struct state-vars by reusing the ceil(bytes / 32) slot math.
 //
-// V5 scope limitations (call out as separate V6+ work):
+// Scope limitations:
 //   - Cross-file struct references resolve through user_defined_type
-//     identifiers, but cross-file struct sizes aren't propagated yet
+//     identifiers, but cross-file struct sizes aren't propagated here
 //     (each file computes its own structSizes from its local
 //     declarations). State-vars typed as a cross-file struct fall
-//     back to the conservative full-slot path.
+//     back to the conservative full-slot path until
+//     applyCrossFileStructSizes corrects them in Pass 2.
 //   - Mapping fields inside structs use the full-slot mapping
 //     advance (Sol stores each mapping's data at hashed locations
 //     but the declaration slot consumes one position).
@@ -87,7 +88,7 @@ func (v *declVisitor) computeStructSizes() {
 	// declared later in the file becomes resolvable on the next
 	// iteration. The loop terminates after at most len(queue) passes
 	// because each pass either makes progress or all remaining
-	// structs have cross-file dependencies that V5 doesn't follow.
+	// structs have cross-file dependencies that this pass doesn't follow.
 	pendingByName := map[string]*sitter.Node{}
 	for _, p := range queue {
 		pendingByName[p.name] = p.body

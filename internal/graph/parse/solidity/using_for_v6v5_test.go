@@ -7,14 +7,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V5 — homonym disambiguation for free-function using-for.
+// Homonym disambiguation for free-function using-for.
 //
 // Two files declare a `mul` free function each. The consumer file
 // imports math_alpha.sol under the namespace alias `M` and binds
-// `M.mul` as the `*` operator for uint256. Pre-V5 the resolver
+// `M.mul` as the `*` operator for uint256. Without a hint the resolver
 // looked up the first matching `mul` candidate via
 // pickSameFileCandidate; with two cross-file candidates and no
-// same-file match, it picked an arbitrary one. V5 records the
+// same-file match, it picked an arbitrary one. The parser records the
 // namespace alias source path during runImportAliases and the file-
 // level operator-form walker attaches the path as a "||<path>"
 // hint on the binding PendingRef. resolveUsingForRef now prefers

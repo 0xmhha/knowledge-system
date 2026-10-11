@@ -16,13 +16,12 @@ import (
 // δ baseline measures exactly the same algorithm the LLM consumer
 // runs at request time.
 //
-// 1-shot enrichment (P0 #2, docs/PROJECT-BLUEPRINT-ALIGNMENT.md
-// §4.2): opt-in flags include_recent_prs and include_impact fold
+// 1-shot enrichment: opt-in flags include_recent_prs and include_impact fold
 // the PR breadcrumb and reverse-deps closures into the same
 // response, so a coding-agent can answer "what is this, why did
 // it change, what depends on it?" in a single tool call.
 func RegisterGetContextForTask(s *server.MCPServer, reader store.Reader) {
-	reader = safeReader(reader) // enforce the §11.3 H3 boundary regardless of caller
+	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("get_context_for_task",
 		mcp.WithDescription("Smart 1-shot retrieval: BM25 -> 1-hop expand -> score -> diversify -> pack. "+
 			"Optionally folds PR breadcrumbs (include_recent_prs) and reverse-dep impact "+

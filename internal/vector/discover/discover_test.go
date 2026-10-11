@@ -23,7 +23,7 @@ func TestWalkBasic(t *testing.T) {
 	dir := t.TempDir()
 	mkfile(t, dir, "main.go", "package main")
 	mkfile(t, dir, "internal/x.go", "package internal")
-	mkfile(t, dir, "README.md", "# readme") // markdown is indexed (Appendix B.1.b)
+	mkfile(t, dir, "README.md", "# readme") // markdown is indexed
 	mkfile(t, dir, "ui.tsx", "export {}")
 	mkfile(t, dir, "Token.sol", "pragma solidity ^0.8.0;")
 

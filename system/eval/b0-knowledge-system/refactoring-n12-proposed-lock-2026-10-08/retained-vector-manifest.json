@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0",
+  "project_id": "knowledge-system",
+  "snapshot_id": "a0457cc1c51791dfdfbdaa3cd7272364bf9197f5aadbe968bd0701c40136bea5",
+  "dataset_id": "5a24904fb0ad21bfd0bae7f6d05d0afef1e52de7c03ffa8f11c97be8966bda47",
+  "file_manifest_digest": "9d1852b30e98f1c5c3eb4df736b41085edb11cdceca6b0508bd49039cefe3513",
+  "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+  "source_mode": "committed",
+  "ckv_version": "dev",
+  "built_at": "2026-10-08T03:18:56Z",
+  "src_root": "/private/tmp/ks-n12-proposed-lock-jey6o42c/source",
+  "src_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+  "indexed_head": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+  "embedding_model": "bge-m3:latest",
+  "embedding_dim": 1024,
+  "embedding_checksum": "v2:sha256:bf165130adad86eea2fd49dbe45ebe3017139eb0c43aa50cd8117bd34c96af81",
+  "embedding_identity_v2": {
+    "Provider": "ollama",
+    "Model": "bge-m3:latest",
+    "Dim": 1024,
+    "Pooling": "",
+    "Normalize": "",
+    "version": 2,
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "dimension_method": "mrl-prefix-l2:v1",
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "truncate_policy": "reject:v1",
+    "runtime_context_tokens": 8192,
+    "runtime_batch_tokens": 8192,
+    "chunk_budget_bytes": 6144
+  },
+  "chunk_count": 666,
+  "languages": {
+    "go": 628,
+    "markdown": 27
+  },
+  "symbol_count": 566,
+  "canonical_count": 566,
+  "db_sha256": "738f9930c18ca2c69e0854fd73271fdaa4e6a5a459228d8485493a4dd4f2850a",
+  "build_sources": [
+    "internal/vector/build/builder.go",
+    "internal/vector/build/builder_test.go",
+    "internal/vector/build/checkpoint.go",
+    "internal/vector/build/checkpoint_test.go",
+    "internal/vector/build/convention_test.go",
+    "internal/vector/build/embed_resilient_test.go",
+    "internal/vector/build/invariant_paths.go",
+    "internal/vector/build/invariant_paths_test.go",
+    "internal/vector/build/invariant_test.go",
+    "internal/vector/build/lock.go",
+    "internal/vector/build/lock_test.go",
+    "internal/vector/build/memory.go",
+    "internal/vector/build/memory_darwin.go",
+    "internal/vector/build/memory_test.go",
+    "internal/vector/build/pipeline.go",
+    "internal/vector/build/pipeline_test.go",
+    "internal/vector/build/policy_test.go",
+    "internal/vector/build/prfetch.go",
+    "internal/vector/build/prfetch_test.go",
+    "internal/vector/build/progress.go",
+    "internal/vector/build/progress_test.go",
+    "internal/vector/build/promote.go",
+    "internal/vector/build/promote_test.go",
+    "internal/vector/build/reindex.go",
+    "internal/vector/build/reindex_ckg_test.go",
+    "internal/vector/build/reindex_resume_test.go",
+    "internal/vector/build/reindex_test.go",
+    "internal/vector/build/sources.go",
+    "internal/vector/build/sources_test.go"
+  ],
+  "input_files": [
+    {
+      "origin_id": "repo",
+      "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+      "sha256": "9536643c9c24883b8f4e84b0481b629347bade5d792633d1bd034f7e60913eb3"
+    },
+    {
+      "origin_id": "repo",
+      "path": "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "sha256": "baeaea7bcea1db2fb258c8ecb8e087ae727c53f0066c5a4bbabaee4b01fcb86e"
+    },
+    {
+      "origin_id": "repo",
+      "path": "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md",
+      "sha256": "cf0b1fa3ecdb5527e33d039eeccfffdf1729ea53c253b67ff08aac2a86a2e34c"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/setup/capture.go",
+      "sha256": "6ac1079d838282136e8b0f6ed3352f19c20d173faf1b22b2a7bee346da7c9538"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/setup/durability.go",
+      "sha256": "3ce1c6b3be3b6f30bfc4fb93ca8ec694c1dd6b1a417b3af2ea345f3d4f5c0b16"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/setup/identity.go",
+      "sha256": "f7f620ba5d7c6c58f08e75b7d0bef8753101b7b44c6888baafc9d6d017f0da75"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/setup/maintenance.go",
+      "sha256": "b573172a5818f38e71f6befd7a0cdb3d026100702176e4376024947b94f336ee"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/setup/plan.go",
+      "sha256": "cc8778ba071542fb62181ed720543244a4719e095c26068556155471496c38cc"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/composer/stage2/ontology_provider.go",
+      "sha256": "948a46cd0725e4170acee64c0d72c06ee8a8091ebd368ba79bd8b4f25d7cee25"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/composer/stage2/ontology_provider_test.go",
+      "sha256": "4b17855299ff913d8c23033054e363f1ea77150de093931a1ea3d8c2f2b4ebd8"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/evidencev2/pack.go",
+      "sha256": "99829efcfec40b3e0ea82098ef8bc645e1139bcdeaa9b7ea0e6192e92c87923a"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/knowledgepack/worksheet.go",
+      "sha256": "3d6cc3773ff15263448da6d5a89082b7e7a887a262b053557800d7cb668b3d9a"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/patch/patch.go",
+      "sha256": "99f0e6d9bcaa8bc7ccf6a721d6f8298e67a2ca61f694968ceb40cc52105506d5"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/semantic/alignment.go",
+      "sha256": "2430fea9e727ab290267e9f3508a1d6412bf7df36c52e60e95d6bfc1d802c7e1"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/semantic/alignment_test.go",
+      "sha256": "65ba464478cd3adf4f1dd9bd88ea4bf449eb46389e084bb217dac33e5e83f2d9"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/semantic/model.go",
+      "sha256": "b297959b6512267c630e6ec3fc334d30a16873c4aba605d8823cfb84e2775bb6"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/semantic/test_run.go",
+      "sha256": "590e77cdf99bcb9911da40bc1f73b09259dd3cbe3a647cea32ea8dde3ded2500"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/system/semantic/validate_test.go",
+      "sha256": "05dce6f87905a398b417be346bb218d3d45be4445ad3247a9c4f877e36a2ea50"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/builder.go",
+      "sha256": "602f677ee08b0735b892df67aae5d5ac4f22df1064347ebdcbc3ae4d704f332a"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/builder_test.go",
+      "sha256": "c1374eb3bc70f89f4e730b56f6fbba933a36aadc05566528dc39b2f225f31bda"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/checkpoint.go",
+      "sha256": "9b39b4cf3c6c8d79e79972c86fa465953dd17e9c9195f75ab3f35b1225aaf38b"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/checkpoint_test.go",
+      "sha256": "923f14e2836172f54afbcac19b3cce63b71539e99fa6025f06019bc204711bbb"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/convention_test.go",
+      "sha256": "bb7ebc288ea2aa58e724121d6eca407fba0cface203db782888bb814136f3cbd"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/embed_resilient_test.go",
+      "sha256": "580f2dea9959b7330052ba13dd8260731a92046324aade9db2ce6fafc00b9f47"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/invariant_paths.go",
+      "sha256": "ef7fe86bd10464f28bf5ec890a30d7b670ad70afc419b1cb7dc4a0d2e15de5a3"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/invariant_paths_test.go",
+      "sha256": "5cc4534455561a8fe7785c5b10d964a943ca85eb58447d1132145fb0b1aa4528"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/invariant_test.go",
+      "sha256": "04dd4988a096533ce08e7a4e50841eafac09172108e77cb2ca8db297b711e23f"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/lock.go",
+      "sha256": "bb4b297cb1eab65f1469e55207793d7e0dbb2c1ec795993fb99729b2bbc85edd"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/lock_test.go",
+      "sha256": "1c8b24a6a3995e3dddf70127795216cc9b0f88ec06f4f0b79a1627cf1ff7913e"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/memory.go",
+      "sha256": "6f15ca28cae62f299322f0ee04081418e793baa267b8e95fa72ea53f6b4b9579"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/memory_darwin.go",
+      "sha256": "eb7f9510794104695890d5a86317124df002fbe9eb222321c7e4934f6d53f03d"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/memory_test.go",
+      "sha256": "2b8958a1cabb31ea99c4727a4a7f8e7556b92c078bd581b8dad69db5042a96d3"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/pipeline.go",
+      "sha256": "880448a3d6cf1f6bff58129e80afa135ce0e30e808ddebd01c7b8986f2fd9c73"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/pipeline_test.go",
+      "sha256": "f624f71ff827794c21aeb4cccaadbed7423ff6ba6f249b4eca386193dc61feeb"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/policy_test.go",
+      "sha256": "25d0159f518b53dd1b201cfc4a38e13a8626ae7b5c33ee404ebc462194c32106"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/prfetch.go",
+      "sha256": "e55ba8722720ddb1634b29a42003f3267586129bc1986cc8a379dbc7713a1384"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/prfetch_test.go",
+      "sha256": "0b7ab80bcdde1a1eb2556f3e8837e067f071aaa40b921bcd244758bc2de24022"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/progress.go",
+      "sha256": "e9b37a3783454338c3be86a7917b3357dcd6ae18776f56aea8d625eccc1ab2f2"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/progress_test.go",
+      "sha256": "5cdc5716761eeb83fc55ae41779a191aae53f75e1301dd0b49953257f7654673"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/promote.go",
+      "sha256": "86fb3473e53cd3310b51f0923b3c8713c041141d1198e5b103908aad6260c8e9"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/promote_test.go",
+      "sha256": "1b0d7a95753199690a90a4fdd5f9516f6877ab3795749759bd3323e6a925bcac"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/reindex.go",
+      "sha256": "728f49f8f66858bbc4810ab9a74ec0a1f9f28abd967e6ae8541e8a30304a0ecf"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/reindex_ckg_test.go",
+      "sha256": "16f28f28fef745afe0aa64dbc7e46bfda0b771b3e476c5e3a31a2eafb15f9526"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/reindex_resume_test.go",
+      "sha256": "564e34b95167c6b34b37a04dac6def89a3620d35b76f2b5421d28539246089b7"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/reindex_test.go",
+      "sha256": "4e2336c66d1930576b6f41fd1d0aa4e70b5325e028b2cf4fd430723bc532f60b"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/sources.go",
+      "sha256": "bbc1e6085ae96e5849d292697a9eba92357b6106cb48d8e2cc40bbe5d017b987"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/build/sources_test.go",
+      "sha256": "4400b9cc450787782e774188c12e0bd9fcee5629078b57551c9b2a0e2420bb53"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/store/sqlitevec/store.go",
+      "sha256": "f18d8d2554c03e17c4422568f289066f7259cdd7f89c45fce7da84072d13ab55"
+    },
+    {
+      "origin_id": "repo",
+      "path": "internal/vector/store/sqlitevec/store_test.go",
+      "sha256": "b4beeecfefe797171e9d63abf51334358c2a5b35b15eca128c6af86de99ef922"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/graph/types/edge.go",
+      "sha256": "37f3fa6351df2249a95a08d51691a0ed0ab12720a5a8817d0620390bcd03392c"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/graph/types/enums.go",
+      "sha256": "8ad5f0817d3339ecdffc70d8a5938b333f450f777fa20c39f08fd6728679f4e6"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/graph/types/node.go",
+      "sha256": "591e5e881cdd76e8cd551d1cbb5ad748ce8c878924bb61fa61bf2fd3f043c73f"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/graph/types/pr_ref.go",
+      "sha256": "04b7b30676ac43cfba973b05f31a7bb67693d81eaba0041be3a007cceec4d3a0"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/graph/types/types_test.go",
+      "sha256": "5b609d3bf05c7c1d2df3e8e4afd64a5a1d095dd5ea36ff4f5f0434c36bfc4c80"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/system/contract/v2.go",
+      "sha256": "3fec807d746a0ec685d6776b9f162cf17e0103719028125c89ac0f7414e91b31"
+    },
+    {
+      "origin_id": "repo",
+      "path": "pkg/vector/types/chunk.go",
+      "sha256": "e0fc89f159514a95be9f0364709edb67c685fc8900017c13ba708b670e1418cb"
+    }
+  ],
+  "sources": {
+    "code": {
+      "indexed_head": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+      "built_at": "2026-10-08T03:18:56Z"
+    },
+    "ckg": {
+      "graph_digest": "bc5bd4fe37cfc72f46b6359cab465c15607c59c5cc6c8c57abdb84715ef0347b",
+      "src_commit": "32d7e2641640b82995cf443bd8a2553dd0ce69b9",
+      "schema_version": "1.23",
+      "path": "/private/tmp/ks-n12-proposed-lock-jey6o42c/dataset/n12-candidate/graph"
+    }
+  }
+}

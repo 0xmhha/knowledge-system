@@ -36,3 +36,7 @@ wrapper가 matrix 종료까지 잠금을 보유하고 자식에게 같은 fd를 
 N11-A/B의 새 gold/독립성·오염 판정·입력 동결, N11-C의 실제 coordinated dataset/model/binary 결합 실행, N11-D의 N08–10 사용 증거는 남는다. 충분한 독립 중요군이 없으면 inconclusive/default disabled/release withheld다. 단지 코드 보호를 구현했다고 N11 전체 완료를 표시하지 않는다.
 
 현재 요청15개 중5완료, 남은 전체 N08/09/10/11/12/14/15/16/17/18 10개. 다음은 실제 DEV/프로토콜 및 N12 내용·관계 판정 반영과 새 독립 FINAL 사전 검토다.
+
+2026-10-08 [후보 범위·현행 좌표 대조](./N11-COVERAGE-CANDIDATE-REVIEW.md): 전체 질문책의 사전 검토 보호를 유지했다. excluded_candidate_questions와 excluded_proposed_clusters의 ID/군/단위 재사용 및 catalog 불일치 거부가 추가됐으며22입력/runner 시험·미승인 실제책 child0·FINAL예약0을 확인했다. 새 gold/독립성/운영 승인은 없다.
+
+2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.

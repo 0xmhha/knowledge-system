@@ -15,7 +15,7 @@ func n(id, qname string, t types.NodeType) types.Node {
 		Language: "go", Confidence: types.ConfExtracted}
 }
 
-// TestBuildEdgeDedup_KeepFirst (G6 v3 § 4.3) — duplicate edges with the same
+// TestBuildEdgeDedup_KeepFirst — duplicate edges with the same
 // (Type, Src, Dst, Line) are deduped keep-first. Tie-breaker is "first wins"
 // for Count/Confidence/FilePath, NOT count summation (verified empirically:
 // cold builds emit Edge.Count=1 universally, so summing would inflate under

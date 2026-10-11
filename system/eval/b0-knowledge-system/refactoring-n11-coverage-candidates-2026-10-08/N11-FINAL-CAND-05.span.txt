@@ -1,0 +1,33 @@
+	votes := map[string]map[string]ReviewRecord{}
+	for _, record := range instances.Reviews {
+		key := record.TargetKind + "\x00" + record.TargetID
+		target, ok := targets[key]
+		if !ok || target.ref != record.TargetRef || *target.status != "proposed" {
+			return fmt.Errorf("evidence_unverified: review target missing or already decided")
+		}
+		rel := strings.TrimPrefix(record.TargetRef.Path, ".cks/knowledge/")
+		buf, err := setup.ReadSourceFileNoFollow(root, rel, 4<<20)
+		if err != nil {
+			return fmt.Errorf("evidence_unverified: review target unreadable: %w", err)
+		}
+		sum := sha256.Sum256(buf)
+		if hex.EncodeToString(sum[:]) != record.TargetSHA256 {
+			return fmt.Errorf("evidence_unverified: review target bytes changed")
+		}
+		if votes[key] == nil {
+			votes[key] = map[string]ReviewRecord{}
+		}
+		if previous, duplicate := votes[key][record.Reviewer]; duplicate {
+			if previous.Decision != record.Decision || previous.TargetSHA256 != record.TargetSHA256 {
+				return fmt.Errorf("evidence_unverified: conflicting reviewer records")
+			}
+			continue // one reviewer never counts twice
+		}
+		votes[key][record.Reviewer] = record
+	}
+	for key, target := range targets {
+		if *target.status != "proposed" {
+			if minApprovals > 1 {
+				return fmt.Errorf("evidence_unverified: inline review cannot meet multi-reviewer quorum")
+			}
+			continue // legacy inline approval, read-only compatibility

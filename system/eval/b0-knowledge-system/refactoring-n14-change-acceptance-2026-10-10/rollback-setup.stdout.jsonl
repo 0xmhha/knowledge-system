@@ -1,0 +1,79 @@
+{"time":"2026-10-09T17:36:30.174823Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":1441,"source_bytes":12273088,"git_history_bytes":2917412,"minimum_additional_bytes":15190500,"output_free_bytes":107846512640,"staging_free_bytes":107846512640,"minimum_output_bytes":0,"minimum_staging_bytes":15190500,"reserve_bytes":0,"deadline_utc":"2026-10-09T18:06:21.478635Z","actual_candidate_bytes":0,"engine_output_estimate_bytes":null,"estimate_scope":"remaining staging copy; engine output and filesystem overhead not predicted"}}
+{"time":"2026-10-09T17:36:32.627411Z","step":"filelist-derive","type":"start","message":"Derive the build-scope file list"}
+{"time":"2026-10-09T17:36:32.627638Z","step":"toolchain","type":"output","message":"resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)"}
+{"time":"2026-10-09T17:36:33.061783Z","step":"filelist-derive","type":"output","message":"filelist-gen: 76 files -\u003e /private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/files-from.json (src 0b9085e7b)"}
+{"time":"2026-10-09T17:36:33.062944Z","step":"filelist-derive","type":"done"}
+{"time":"2026-10-09T17:36:33.062974Z","step":"graph-build","type":"start","message":"Build the graph index"}
+{"time":"2026-10-09T17:36:33.826279Z","step":"graph-build","type":"output","message":"time=2026-10-10T02:36:33.826+09:00 level=INFO msg=\"detected files\" go=65 ts=0 sol=0 proto=0"}
+{"time":"2026-10-09T17:36:34.341744Z","step":"graph-build","type":"output","message":"time=2026-10-10T02:36:34.341+09:00 level=INFO msg=\"files-from applied\" go=1055 go_after=65 ts=23 ts_after=0 sol=224 sol_after=0 proto=5 proto_after=0"}
+{"time":"2026-10-09T17:36:37.810215Z","step":"graph-build","type":"output","message":"time=2026-10-10T02:36:37.810+09:00 level=INFO msg=\"http client matching\" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0"}
+{"time":"2026-10-09T17:36:38.27127Z","step":"graph-build","type":"output","message":"time=2026-10-10T02:36:38.270+09:00 level=INFO msg=\"temporal G6 emitted\" commit_nodes=1 hunk_nodes=77 changed_in_edges=10662 blame_edges=65 hunk_edges=77 hunk_blobs=77 max_per_file=10"}
+{"time":"2026-10-09T17:36:39.306735Z","step":"graph-build","type":"output","message":"time=2026-10-10T02:36:39.306+09:00 level=INFO msg=\"build complete\" nodes=10741 edges=24926 pkg_tree_edges=10582 topic_resolutions=3"}
+{"time":"2026-10-09T17:36:39.306805Z","step":"graph-build","type":"output","message":"ckg: built 10741 nodes / 24926 edges into /private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/graph"}
+{"time":"2026-10-09T17:36:39.354679Z","step":"graph-build","type":"done"}
+{"time":"2026-10-09T17:36:39.35476Z","step":"vector-preflight","type":"start","message":"Preflight the Ollama embedder"}
+{"time":"2026-10-09T17:36:39.367395Z","step":"vector-preflight","type":"output","message":"Ollama reachable at http://127.0.0.1:54923; model \"bge-m3:latest\" present (bge-m3:latest)"}
+{"time":"2026-10-09T17:36:39.36743Z","step":"vector-preflight","type":"done"}
+{"time":"2026-10-09T17:36:39.367439Z","step":"vector-build","type":"start","message":"Build the vector index aligned to the graph"}
+{"time":"2026-10-09T17:36:39.475557Z","step":"vector-build","type":"output","message":"time=2026-10-10T02:36:39.474+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=666e2d1205d1184f run_id=13e4f2150658ec64 important_symbol_count=0 path=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2051668109/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0"}
+{"time":"2026-10-09T17:36:39.475663Z","step":"vector-build","type":"output","message":"time=2026-10-10T02:36:39.475+09:00 level=INFO msg=ckv event=build.start trace_id=1d8f4cf7352135a3 run_id=13e4f2150658ec64 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2051668109/tree out_dir=/private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/vector embedder=bge-m3:latest embedder_provider=\"\""}
+{"time":"2026-10-09T17:36:39.476084Z","step":"vector-build","type":"output","message":"time=2026-10-10T02:36:39.476+09:00 level=INFO msg=ckv event=filterlist.loaded trace_id=18fb84dd9808722a run_id=13e4f2150658ec64 path=/private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/files-from.json include_count=76 exclude_count=0"}
+{"time":"2026-10-09T17:36:39.588168Z","step":"vector-build","type":"output","message":"time=2026-10-10T02:36:39.588+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=15a718c473d68d02 run_id=13e4f2150658ec64 files_indexed=65 entries=1440 canonical_available=true ckg_path=/private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/graph"}
+{"time":"2026-10-09T17:36:41.681412Z","step":"vector-build","type":"output","message":"ckv: 3/68 files (1.4 files/s, elapsed 2s, ETA 45s)"}
+{"time":"2026-10-09T17:36:44.434404Z","step":"vector-build","type":"output","message":"ckv: 4/68 files (0.4 files/s, elapsed 4s, ETA 2m56s)"}
+{"time":"2026-10-09T17:36:46.713769Z","step":"vector-build","type":"output","message":"ckv: 7/68 files (1.3 files/s, elapsed 7s, ETA 46s)"}
+{"time":"2026-10-09T17:36:48.819776Z","step":"vector-build","type":"output","message":"ckv: 10/68 files (1.4 files/s, elapsed 9s, ETA 40s)"}
+{"time":"2026-10-09T17:36:51.301177Z","step":"vector-build","type":"output","message":"ckv: 13/68 files (1.2 files/s, elapsed 11s, ETA 45s)"}
+{"time":"2026-10-09T17:36:53.622984Z","step":"vector-build","type":"output","message":"ckv: 18/68 files (2.2 files/s, elapsed 14s, ETA 23s)"}
+{"time":"2026-10-09T17:36:55.740303Z","step":"vector-build","type":"output","message":"ckv: 23/68 files (2.4 files/s, elapsed 16s, ETA 19s)"}
+{"time":"2026-10-09T17:36:57.926227Z","step":"vector-build","type":"output","message":"ckv: 28/68 files (2.3 files/s, elapsed 18s, ETA 17s)"}
+{"time":"2026-10-09T17:37:01.704805Z","step":"vector-build","type":"output","message":"ckv: 31/68 files (0.8 files/s, elapsed 22s, ETA 46s)"}
+{"time":"2026-10-09T17:37:03.817461Z","step":"vector-build","type":"output","message":"ckv: 36/68 files (2.4 files/s, elapsed 24s, ETA 13s)"}
+{"time":"2026-10-09T17:37:05.964837Z","step":"vector-build","type":"output","message":"ckv: 44/68 files (3.7 files/s, elapsed 26s, ETA 6s)"}
+{"time":"2026-10-09T17:37:08.239174Z","step":"vector-build","type":"output","message":"ckv: 51/68 files (3.1 files/s, elapsed 28s, ETA 5s)"}
+{"time":"2026-10-09T17:37:10.435896Z","step":"vector-build","type":"output","message":"ckv: 54/68 files (1.4 files/s, elapsed 30s, ETA 10s)"}
+{"time":"2026-10-09T17:37:12.541307Z","step":"vector-build","type":"output","message":"ckv: 57/68 files (1.4 files/s, elapsed 32s, ETA 7s)"}
+{"time":"2026-10-09T17:37:16.493679Z","step":"vector-build","type":"output","message":"ckv: 60/68 files (0.8 files/s, elapsed 36s, ETA 10s)"}
+{"time":"2026-10-09T17:37:19.559721Z","step":"vector-build","type":"output","message":"ckv: 63/68 files (1.0 files/s, elapsed 39s, ETA 5s)"}
+{"time":"2026-10-09T17:37:22.245724Z","step":"vector-build","type":"output","message":"ckv: 68/68 files (1.9 files/s, elapsed 42s, ETA 0s)"}
+{"time":"2026-10-09T17:37:22.497812Z","step":"vector-build","type":"output","message":"time=2026-10-10T02:37:22.497+09:00 level=INFO msg=ckv event=build.done trace_id=1d8f4cf7352135a3 run_id=13e4f2150658ec64 latency_ms=43024 category_counts=map[:754] out_dir=/private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/vector files_indexed=68 indexed_head=0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3 chunks_flow_spine=0 src_root=/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/cks-build-source-2051668109/tree embedder=bge-m3:latest db_sha256=438e5bce6cde9c1b773b3446e482ecfde944e1fadeafd342a57544c2106e30fc chunks_flow_step=0 chunks_doc=27 chunks_total=765 languages=\"map[go:727 markdown:27]\" chunks_file_header=65 chunks_truncated=0 embedder_provider=\"\" chunks_symbol=641 chunks_canonical_id=641 policy_loaded=false"}
+{"time":"2026-10-09T17:37:22.498011Z","step":"vector-build","type":"output","message":"ckv: indexed 68 files → 765 chunks (641 symbol, 27 doc, 65 header, 0 truncated)"}
+{"time":"2026-10-09T17:37:22.498054Z","step":"vector-build","type":"output","message":"ckv: canonical_id 641/641 symbols aligned · flow 0 step / 0 spine"}
+{"time":"2026-10-09T17:37:22.498071Z","step":"vector-build","type":"output","message":"ckv: indexed_head=0b9085e7b88c7f2a1fba651cf5d8c75b12da7da3 built_at=2026-10-09T17:37:22Z db=/private/tmp/ks-n14-accept-xasu5pdf/dataset/released-base/vector/vector.db sha256=438e5bce6cde9c1b773b3446e482ecfde944e1fadeafd342a57544c2106e30fc"}
+{"time":"2026-10-09T17:37:22.499564Z","step":"vector-build","type":"done"}
+{"time":"2026-10-09T17:37:22.500355Z","step":"verify-align","type":"start","message":"Verify graph/vector alignment"}
+{"time":"2026-10-09T17:37:22.504372Z","step":"verify-align","type":"done"}
+{"time":"2026-10-09T17:37:27.707791Z","step":"reindex-gate","type":"output","message":"── schema ──  errors=0  warnings=0  info=0"}
+{"time":"2026-10-09T17:37:29.894976Z","step":"reindex-gate","type":"output","message":"ckg audit (go)"}
+{"time":"2026-10-09T17:37:29.895143Z","step":"reindex-gate","type":"output","message":"  build files: 1055"}
+{"time":"2026-10-09T17:37:29.89531Z","step":"reindex-gate","type":"output","message":"  db files:    65"}
+{"time":"2026-10-09T17:37:29.895341Z","step":"reindex-gate","type":"output","message":"  in both:     65"}
+{"time":"2026-10-09T17:37:29.895433Z","step":"reindex-gate","type":"output","message":"  in build only (missing from DB): 990"}
+{"time":"2026-10-09T17:37:29.895446Z","step":"reindex-gate","type":"output","message":"  in db only (over-included):       0"}
+{"time":"2026-10-09T17:37:29.895452Z","step":"reindex-gate","type":"output"}
+{"time":"2026-10-09T17:37:29.895457Z","step":"reindex-gate","type":"output","message":"MISSING (build → expected in DB) (990):"}
+{"time":"2026-10-09T17:37:29.895475Z","step":"reindex-gate","type":"output","message":"  cmd/b0-vector-probe/main.go"}
+{"time":"2026-10-09T17:37:29.895485Z","step":"reindex-gate","type":"output","message":"  cmd/b0-vector-probe/main_test.go"}
+{"time":"2026-10-09T17:37:29.895495Z","step":"reindex-gate","type":"output","message":"  cmd/b1-evidence-audit/main.go"}
+{"time":"2026-10-09T17:37:29.8955Z","step":"reindex-gate","type":"output","message":"  cmd/b1-evidence-audit/main_test.go"}
+{"time":"2026-10-09T17:37:29.895505Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/agent.go"}
+{"time":"2026-10-09T17:37:29.895509Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/agent_test.go"}
+{"time":"2026-10-09T17:37:29.895513Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/format.go"}
+{"time":"2026-10-09T17:37:29.895519Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/format_test.go"}
+{"time":"2026-10-09T17:37:29.895619Z","step":"reindex-gate","type":"output","message":"  cmd/cks/agentcli/main.go"}
+{"time":"2026-10-09T17:37:29.89581Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/doctor.go"}
+{"time":"2026-10-09T17:37:29.895837Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/doctor_test.go"}
+{"time":"2026-10-09T17:37:29.895848Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/init.go"}
+{"time":"2026-10-09T17:37:29.895858Z","step":"reindex-gate","type":"output","message":"  cmd/cks/doctorcli/init_test.go"}
+{"time":"2026-10-09T17:37:29.895868Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/anchors.go"}
+{"time":"2026-10-09T17:37:29.895875Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/check.go"}
+{"time":"2026-10-09T17:37:29.895882Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/domain.go"}
+{"time":"2026-10-09T17:37:29.89589Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/glossarygen.go"}
+{"time":"2026-10-09T17:37:29.895897Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/qualify_test.go"}
+{"time":"2026-10-09T17:37:29.895908Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/sync.go"}
+{"time":"2026-10-09T17:37:29.895918Z","step":"reindex-gate","type":"output","message":"  cmd/cks/domaincli/sync_test.go"}
+{"time":"2026-10-09T17:37:29.895949Z","step":"reindex-gate","type":"output","message":"  ... (970 more)"}
+{"time":"2026-10-09T17:37:29.895963Z","step":"reindex-gate","type":"output","message":"verdict: DRIFT"}
+{"time":"2026-10-09T17:37:29.897784Z","step":"reindex-gate","type":"warning","message":"ckg audit reported issues (soft gate, not blocking promote): step reindex-gate: /private/tmp/ks-n14-accept-xasu5pdf/bin/ckg: exit status 1"}
+{"time":"2026-10-09T17:37:37.3955Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":1441,"source_bytes":12273088,"git_history_bytes":2917412,"minimum_additional_bytes":0,"output_free_bytes":107832020992,"staging_free_bytes":107832020992,"minimum_output_bytes":0,"minimum_staging_bytes":0,"reserve_bytes":0,"deadline_utc":"2026-10-09T18:06:21.478635Z","actual_candidate_bytes":39353239,"engine_output_estimate_bytes":null,"estimate_scope":"pre-promotion measured candidate; staging removed; engine output not predicted"}}
+{"time":"2026-10-09T17:37:38.725317Z","step":"reindex-promote","type":"done","message":"promoted released-base → current (was result; rollback: knowledge-setup --rollback result)"}

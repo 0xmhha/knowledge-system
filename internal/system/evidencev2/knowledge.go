@@ -24,15 +24,30 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 	if cleaner == nil || asOf == "" || subsystem == "" {
 		return contract.EvidencePackV2{}, fmt.Errorf("knowledge context needs date, subsystem and sanitizer")
 	}
-	if _, _, _, err := setup.ReadRetainedFile(versionDir, "repo", ".cks/knowledge/manifest.yaml"); err != nil {
+	if _, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, "repo", ".cks/knowledge/manifest.yaml"); err != nil {
 		if strings.Contains(err.Error(), "citation file is not in the retained inventory") {
 			return base, nil
 		}
 		return knowledgeUnavailable(base, "knowledge_archive_unavailable", "")
 	}
-	instances, lock, err := knowledgepack.LoadRetainedProjectInstances(versionDir)
+	instances, lock, err := knowledgepack.LoadRetainedProjectInstancesContext(ctx, versionDir)
 	if err != nil {
 		return knowledgeUnavailable(base, "knowledge_archive_unavailable", "")
+	}
+	unknowns, restrictedUnknown, err := instances.SelectDeclaredUnknowns(asOf, map[string]string{"subsystem": subsystem}, base.Query)
+	if err != nil {
+		return contract.EvidencePackV2{}, err
+	}
+	if restrictedUnknown {
+		k := emptyKnowledgeContext("restricted", lock.LockDigest)
+		base.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k, CodingContext: buildCodingContext(k, base.Citations)}
+		if err := Stamp(&base); err != nil {
+			return contract.EvidencePackV2{}, err
+		}
+		return base, nil
+	}
+	if len(unknowns) > 0 {
+		return declaredUnknownPack(ctx, base, versionDir, unknowns, lock.LockDigest, cleaner)
 	}
 	selected, err := instances.SelectPolicies(asOf, map[string]string{"subsystem": subsystem}, false)
 	if err != nil {
@@ -84,7 +99,7 @@ func AttachKnowledge(ctx context.Context, base contract.EvidencePackV2, versionD
 		if source.OriginID != "repo" {
 			return fmt.Errorf("unsupported knowledge origin")
 		}
-		buf, _, _, err := setup.ReadRetainedFile(versionDir, source.OriginID, source.Path)
+		buf, _, _, err := setup.ReadRetainedFileContext(ctx, versionDir, source.OriginID, source.Path)
 		if err != nil {
 			return err
 		}
@@ -274,7 +289,7 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 	}
 	k := overlay.KnowledgeContext
 	switch k.State {
-	case "complete", "partial", "conflict", "unknown", "stale", "restricted", "budget_exceeded", "unavailable":
+	case "complete", "partial", "conflict", "unknown", "stale", "restricted", "budget_exceeded", "unavailable", "declared_unknown":
 	default:
 		return fmt.Errorf("v2 knowledge context has invalid state")
 	}
@@ -308,6 +323,9 @@ func validateKnowledgeSemantic(value any, citations map[contract.CitationV2]bool
 			return fmt.Errorf("v2 knowledge relation lacks reviewed endpoints and archive citation")
 		}
 		ids[relation.ID] = true
+	}
+	if err := validateDeclaredUnknowns(k, citations, ids); err != nil {
+		return err
 	}
 	requirements, tests := []string{}, []string{}
 	for _, link := range k.TraceLinks {
@@ -413,4 +431,81 @@ func containsString(values []string, target string) bool {
 		}
 	}
 	return false
+}
+
+// validateDeclaredUnknowns keeps an abstention honest: in state
+// declared_unknown the pack carries no policy, decision, relation or trace
+// claim, and every citation is a basis line of a reviewed unknown.
+func validateDeclaredUnknowns(k contract.KnowledgeContextV2, citations map[contract.CitationV2]bool, ids map[string]bool) error {
+	if k.State != "declared_unknown" {
+		if len(k.DeclaredUnknowns) != 0 {
+			return fmt.Errorf("v2 declared unknowns outside declared_unknown state")
+		}
+		return nil
+	}
+	if len(k.DeclaredUnknowns) == 0 || len(k.ApplicablePolicies) != 0 || len(k.Decisions) != 0 ||
+		len(k.Relations) != 0 || len(k.TraceLinks) != 0 || len(k.Conflicts) != 0 {
+		return fmt.Errorf("v2 declared_unknown state mixes answer claims")
+	}
+	basis := map[contract.CitationV2]bool{}
+	for _, u := range k.DeclaredUnknowns {
+		if u.ID == "" || ids[u.ID] || u.ReviewedBy == "" || u.RecordedOn == "" || len(u.Citations) == 0 {
+			return fmt.Errorf("v2 declared unknown lacks reviewed identity or basis")
+		}
+		ids[u.ID] = true
+		for _, c := range u.Citations {
+			if !citations[c] || c.OriginID != "repo" {
+				return fmt.Errorf("v2 declared unknown basis is not an archive citation")
+			}
+			basis[c] = true
+		}
+	}
+	for c := range citations {
+		if !basis[c] {
+			return fmt.Errorf("v2 declared_unknown pack cites non-basis evidence")
+		}
+	}
+	return nil
+}
+
+// declaredUnknownPack replaces the retrieved evidence with the archived basis
+// lines of the matched reviewed unknowns. Retrieved code or documents near
+// the topic are not presented as an answer to a fact the project has not
+// decided. If a basis span cannot be verified, the base pack is kept and the
+// knowledge layer reports itself unavailable instead of abstaining unproven.
+func declaredUnknownPack(ctx context.Context, base contract.EvidencePackV2, versionDir string, unknowns []knowledgepack.UnknownSummary, lockDigest string, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
+	refs := []Ref{}
+	index := map[contract.Citation]int{}
+	for _, u := range unknowns {
+		for _, b := range u.Basis {
+			c := contract.Citation{File: b.Path, StartLine: b.StartLine, EndLine: b.EndLine}
+			if _, ok := index[c]; !ok {
+				index[c] = len(refs)
+				refs = append(refs, Ref{OriginID: "repo", Citation: c})
+			}
+		}
+	}
+	if len(refs) > MaxCitations {
+		return knowledgeUnavailable(base, "declared_unknown_basis_budget", lockDigest)
+	}
+	out, err := BuildFromRefs(ctx, versionDir, base.Query, refs, cleaner)
+	if err != nil || out.Metadata.EvidenceBudget != nil || len(out.Citations) != len(refs) ||
+		len(out.Bodies) != len(out.Citations) || out.Coordinates != base.Coordinates {
+		return knowledgeUnavailable(base, "declared_unknown_basis_unavailable", lockDigest)
+	}
+	out.Metadata.Ontology = base.Metadata.Ontology
+	k := emptyKnowledgeContext("declared_unknown", lockDigest)
+	for _, u := range unknowns {
+		record := contract.KnowledgeUnknownV2{ID: u.ID, ReviewedBy: u.ReviewedBy, RecordedOn: u.RecordedOn}
+		for _, b := range u.Basis {
+			record.Citations = append(record.Citations, out.Citations[index[contract.Citation{File: b.Path, StartLine: b.StartLine, EndLine: b.EndLine}]])
+		}
+		k.DeclaredUnknowns = append(k.DeclaredUnknowns, record)
+		k.Unknowns = append(k.Unknowns, "declared_unknown:"+u.ID)
+	}
+	out.Semantic = contract.KnowledgeSemanticV2{KnowledgeContext: k, CodingContext: buildCodingContext(k, out.Citations)}
+	if err := Stamp(&out); err != nil {
+		return contract.EvidencePackV2{}, err
+	}
+	return out, nil
 }

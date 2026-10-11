@@ -8,15 +8,16 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
-// Sol W-C W10 V1.1 (2026-05-18) — Yul EVM builtin detection.
+// Sol Yul EVM builtin detection.
 //
-// W10 V0 flipped a single HasAssembly bool on callables containing
-// any `assembly { ... }` block. V1.1 enumerates the security-
+// runAssemblyMarker flips a single HasAssembly bool on callables
+// containing any `assembly { ... }` block. This walker enumerates the
+// security-
 // relevant EVM opcodes that actually appear inside the block so
 // audits can ask "which functions use delegatecall in Yul" without
 // re-parsing source.
 //
-// V1.1 filters to a critical-set whitelist:
+// It filters to a critical-set whitelist:
 //
 //   call          — low-level call inside assembly
 //   delegatecall  — proxy / forwarder pattern (highest-risk)
@@ -31,7 +32,7 @@ import (
 // blocks are arithmetic or memory copies.
 //
 // Grammar shape (vendored tree-sitter-solidity v1.2.11, verified via
-// V2.18 / W10 probes):
+// AST probes):
 //
 //   assembly_statement
 //     yul_function_call
@@ -44,7 +45,7 @@ import (
 
 // criticalYulBuiltins gates what gets recorded. Adding a new entry
 // (e.g. "create2", "extcodecopy") is the supported way to extend
-// coverage; nothing else in V1.1 needs to change.
+// coverage; nothing else needs to change.
 var criticalYulBuiltins = map[string]bool{
 	"call":         true,
 	"delegatecall": true,
@@ -59,8 +60,8 @@ var criticalYulBuiltins = map[string]bool{
 // its enclosing callable via nearestFunctionQnameAndStart, and
 // mutates v.nodes post-Pass-1 with a sorted, deduped slice.
 //
-// Same idiom as runAssemblyMarker (W10 V0) and runLowLevelCallMarker
-// (W8 V1): post-Pass-1 in-place mutation, no edges emitted.
+// Same idiom as runAssemblyMarker and runLowLevelCallMarker:
+// post-Pass-1 in-place mutation, no edges emitted.
 func (v *declVisitor) runYulBuiltins() {
 	const q = `(yul_evm_builtin) @op`
 	query, qErr := sitter.NewQuery(v.lang, q)

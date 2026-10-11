@@ -11,8 +11,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestTSHeritage_FixtureMatrix — W-B W1 acceptance check (schema 1.10 §4.1,
-// docs/design/ts-async-await-and-interface.md §3.1). Each fixture parses +
+// TestTSHeritage_FixtureMatrix — heritage acceptance check (schema 1.10 §4.1,
+// docs/graph/design/ts-async-await-and-interface.md §3.1). Each fixture parses +
 // resolves to a fixed (extends, implements) edge set with ConfExtracted
 // (same-file) and child → parent direction.
 //

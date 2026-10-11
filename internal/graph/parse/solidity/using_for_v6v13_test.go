@@ -6,19 +6,19 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V13 — `using SelfLib for uint256;` declared inside the
+// `using SelfLib for uint256;` declared inside the
 // library SelfLib itself. Sol allows a library to reference
 // itself as the using-for target; the binding still resolves via
 // the standard byName[NodeContract] lookup since libraries are
 // indexed as NodeContract + SubKind="library".
 //
-// V13 locks two properties:
+// This test locks two properties:
 //
 //  1. Exactly one EdgeUsesFor is emitted, src == dst == SelfLib.
 //     The resolver must not loop or short-circuit when the
 //     directive's enclosing scope matches the target.
 //  2. The free-function/contract-name collision path
-//     (resolveUsingForRef's NodeFunction fallback added in V6 V2.5)
+//     (resolveUsingForRef's NodeFunction fallback)
 //     must NOT mis-fire for the self-binding case. The fallback
 //     is keyed by free-function name, and a library named SelfLib
 //     has no free-function counterpart.
@@ -52,7 +52,7 @@ func TestUsingForV6V13_LibrarySelfBinding(t *testing.T) {
 	}
 
 	// Target must be the library NodeContract, not a NodeFunction
-	// fallback hit (V6 V2.5's free-function path).
+	// fallback hit (the free-function path).
 	if byID[e.Dst].Type != types.NodeContract {
 		t.Errorf("self-binding target type: got %v, want NodeContract", byID[e.Dst].Type)
 	}

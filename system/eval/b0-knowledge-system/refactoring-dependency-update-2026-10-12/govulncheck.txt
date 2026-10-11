@@ -1,0 +1,735 @@
+go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+=== Symbol Results ===
+
+Vulnerability #1: GO-2026-6617
+    HTTP/2 server crash due to HPACK encoder race in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6617
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #2: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #3: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #4: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #5: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #6: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #7: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #8: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #9: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #10: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #11: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #12: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #13: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #14: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #15: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #16: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #17: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #18: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #19: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #20: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #21: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #22: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #23: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #24: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #25: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #26: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #27: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #28: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #29: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #30: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #31: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #32: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #33: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #34: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #35: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #36: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #37: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #38: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #39: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #40: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #41: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #42: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #43: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #44: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #45: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #46: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #47: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #48: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #49: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #50: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #51: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #52: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #53: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #54: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #55: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #56: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #57: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #58: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #59: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #60: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #61: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #62: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #63: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #64: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #65: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #66: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #67: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #68: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #69: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #70: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #71: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #72: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #73: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #74: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #75: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #76: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #77: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #78: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #79: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #80: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #81: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #82: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #83: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #84: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #85: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #86: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #87: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #88: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #89: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #90: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #91: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #92: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #93: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #94: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #95: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #96: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #97: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #98: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #99: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #100: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #101: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #102: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #103: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #104: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #105: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #106: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #107: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #108: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #109: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #110: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #111: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #112: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #113: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #114: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #115: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #116: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #117: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #118: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #119: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #120: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #121: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #122: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #123: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #124: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #125: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #126: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #127: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #128: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #129: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #130: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #131: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #132: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #133: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #134: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #135: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #136: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #137: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #138: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #139: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+      #140: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+
+Vulnerability #2: GO-2026-6613
+    HTTP/1 server connection desynchronization after 2xx CONNECT response in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6613
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #2: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #3: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #4: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #5: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #6: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #7: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.Header.Get
+      #8: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #9: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #10: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #11: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #12: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #13: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #14: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #15: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #16: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #17: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #18: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #19: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #20: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #21: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #22: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #23: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #24: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #25: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #26: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #27: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #28: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #29: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close, which eventually calls http.expectContinueReader.Close
+      #30: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #31: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #32: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #33: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #34: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #35: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #36: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #37: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #38: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #39: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #40: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #41: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close, which eventually calls http.readTrackingBody.Close
+      #42: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #43: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #44: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #45: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #46: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #47: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+
+Vulnerability #3: GO-2026-6612
+    Double flow control refund on HTTP/2 server streams in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6612
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #2: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #3: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #4: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #5: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #6: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #7: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #8: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #9: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #10: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #11: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #12: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #13: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #14: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #15: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #16: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #17: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #18: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #19: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #20: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #21: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #22: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #23: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #24: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #25: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #26: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #27: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #28: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #29: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #30: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #31: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #32: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #33: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #34: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #35: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #36: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #37: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #38: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #39: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #40: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #41: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #42: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #43: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #44: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #45: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #46: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #47: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #48: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #49: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #50: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #51: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #52: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #53: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #54: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #55: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #56: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #57: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #58: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #59: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #60: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #61: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #62: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #63: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #64: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #65: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #66: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #67: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #68: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #69: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #70: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #71: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #72: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #73: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #74: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #75: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #76: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #77: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #78: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #79: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #80: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #81: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #82: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #83: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #84: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #85: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #86: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #87: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #88: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #89: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #90: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #91: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #92: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #93: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #94: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #95: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #96: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #97: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #98: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #99: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #100: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #101: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #102: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #103: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #104: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #105: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #106: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #107: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #108: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #109: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #110: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #111: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #112: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #113: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #114: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #115: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #116: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #117: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #118: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #119: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #120: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #121: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #122: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #123: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #124: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #125: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #126: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #127: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #128: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #129: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #130: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #131: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #132: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #133: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #134: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #135: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #136: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #137: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #138: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #139: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+      #140: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+
+Vulnerability #4: GO-2026-6611
+    Excessive CPU consumption from repeated initial window changes in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6611
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #2: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #3: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #4: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #5: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #6: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #7: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #8: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #9: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #10: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #11: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #12: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #13: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #14: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #15: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #16: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #17: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #18: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #19: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #20: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #21: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #22: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #23: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #24: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #25: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #26: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #27: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #28: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #29: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #30: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #31: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #32: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #33: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #34: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #35: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #36: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #37: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #38: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #39: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #40: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #41: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #42: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #43: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #44: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #45: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #46: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #47: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #48: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #49: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #50: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #51: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #52: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #53: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #54: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #55: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #56: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #57: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #58: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #59: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #60: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #61: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #62: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #63: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #64: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #65: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #66: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #67: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #68: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #69: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #70: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #71: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #72: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #73: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #74: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #75: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #76: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #77: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #78: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #79: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #80: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #81: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #82: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #83: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #84: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #85: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #86: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #87: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #88: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #89: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #90: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #91: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #92: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #93: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #94: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #95: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #96: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #97: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #98: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #99: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #100: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #101: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #102: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #103: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #104: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #105: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #106: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #107: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #108: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #109: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #110: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #111: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #112: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #113: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #114: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #115: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #116: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #117: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #118: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #119: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #120: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #121: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #122: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #123: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #124: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #125: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #126: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #127: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #128: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #129: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #130: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #131: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #132: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #133: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #134: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #135: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #136: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #137: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #138: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #139: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+      #140: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+
+Vulnerability #5: GO-2026-6610
+    HTTP/2 transport accepts malformed framing-related headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6610
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #2: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #3: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #4: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #5: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #6: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #7: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #8: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #9: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #10: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+
+Vulnerability #6: GO-2026-6609
+    Lack of limit on size of parsed Range headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6609
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: internal/graph/server/host_guard.go:20:17: server.loopbackHostOnly calls http.ServeMux.ServeHTTP, which calls http.fileHandler.ServeHTTP
+
+Vulnerability #7: GO-2026-6608
+    Memory limit bypass when parsing MIME headers in net/textproto,
+    mime/multipart
+  More info: https://pkg.go.dev/vuln/GO-2026-6608
+  Standard library
+    Found in: net/textproto@go1.26.8
+    Fixed in: net/textproto@go1.26.9
+    Example traces found:
+      #1: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read, which eventually calls textproto.Reader.ReadMIMEHeader
+
+Vulnerability #8: GO-2026-6607
+    Reject malformed ECH outer extension references in crypto/tls
+  More info: https://pkg.go.dev/vuln/GO-2026-6607
+  Standard library
+    Found in: crypto/tls@go1.26.8
+    Fixed in: crypto/tls@go1.26.9
+    Example traces found:
+      #1: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe, which eventually calls tls.Conn.HandshakeContext
+      #2: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read, which calls tls.Conn.Read
+      #3: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls tls.Conn.Write
+      #4: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip, which eventually calls tls.Dialer.DialContext
+
+Vulnerability #9: GO-2026-6605
+    HTTP/1 client connection desynchronization after CONNECT rejection in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6605
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #2: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #3: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #4: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #5: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #6: internal/graph/server/host_guard.go:20:17: server.loopbackHostOnly calls http.ServeMux.ServeHTTP, which calls httputil.ReverseProxy.ServeHTTP
+
+Vulnerability #10: GO-2026-6604
+    Root.Mkdir(All) can follow junctions out of the root on Windows in os
+  More info: https://pkg.go.dev/vuln/GO-2026-6604
+  Standard library
+    Found in: os@go1.26.8
+    Fixed in: os@go1.26.9
+    Platforms: windows
+    Example traces found:
+      #1: cmd/cks/knowledgecli/knowledge.go:358:21: knowledgecli.writeReviewRecord calls os.Root.Link
+      #2: cmd/cks/knowledgecli/knowledge.go:346:14: knowledgecli.writeReviewRecord calls os.Root.Remove
+      #3: cmd/cks/knowledgecli/knowledge.go:340:28: knowledgecli.writeReviewRecord calls os.Root.OpenFile, which eventually calls os.doInRoot[int]
+      #4: internal/setup/capture.go:293:26: setup.readCapturedRegularWithModeContext calls os.Root.Lstat, which eventually calls os.doInRoot[os.FileInfo]
+
+Vulnerability #11: GO-2026-6603
+    HTTP/2 server memory exhaustion due to Trailer headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6603
+  Standard library
+    Found in: net/http@go1.26.8
+    Fixed in: net/http@go1.26.9
+    Example traces found:
+      #1: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #2: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.CanonicalHeaderKey
+      #3: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #4: pkg/vector/embed/ollama/adapter.go:291:32: ollama.Adapter.Embed calls http.Client.Do
+      #5: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #6: internal/setup/preflight.go:28:25: setup.PreflightOllama calls http.Client.Get
+      #7: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #8: cmd/cks/viewercli/viewer.go:157:23: viewercli.waitReady calls http.Get
+      #9: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #10: internal/graph/server/server.go:135:35: server.Server.ServeHTTP calls http.HandlerFunc.ServeHTTP
+      #11: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #12: buildpipe.patchLineRanges calls strings.splitSeq, which eventually calls http.Header.Del
+      #13: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #14: internal/system/mcp/server.go:194:32: mcp.Run calls server.ServeStdio, which eventually calls http.Header.Get
+      #15: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #16: pkg/vector/embed/ollama/adapter.go:289:16: ollama.Adapter.Embed calls http.Header.Set
+      #17: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #18: pkg/vector/embed/ollama/adapter.go:285:40: ollama.Adapter.Embed calls http.NewRequestWithContext
+      #19: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #20: internal/system/mcp/server.go:231:12: mcp.RunHTTP calls http.ServeMux.Handle
+      #21: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #22: internal/system/mcp/server.go:230:16: mcp.RunHTTP calls http.ServeMux.HandleFunc
+      #23: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #24: internal/graph/server/server.go:158:30: server.Server.ListenAndServe calls http.Server.ListenAndServe
+      #25: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #26: cmd/graph/bench_server.go:146:28: graph.newBenchServerCmd calls httptest.NewServer, which eventually calls http.Server.Serve
+      #27: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #28: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Server.SetKeepAlivesEnabled
+      #29: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #30: internal/system/mcp/server.go:241:22: mcp.RunHTTP calls http.Server.Shutdown
+      #31: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #32: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which calls http.Transport.CloseIdleConnections
+      #33: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #34: pkg/vector/embed/ollama/http_observer.go:25:26: ollama.observedTransport.RoundTrip calls http.Transport.RoundTrip
+      #35: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #36: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.body.Close
+      #37: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #38: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.body.Read
+      #39: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #40: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.bodyEOFSignal.Close
+      #41: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #42: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.bodyEOFSignal.Read
+      #43: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #44: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.bodyLocked.Read
+      #45: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #46: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.bufioFlushWriter.Write
+      #47: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #48: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.cancelTimerBody.Close
+      #49: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #50: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.cancelTimerBody.Read
+      #51: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #52: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.checkConnErrorWriter.Write
+      #53: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #54: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.chunkWriter.Write
+      #55: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #56: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.connReader.Read
+      #57: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #58: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.expectContinueReader.Read
+      #59: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #60: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.gzipReader.Close
+      #61: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #62: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.gzipReader.Read
+      #63: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #64: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2ConnectionError.Error
+      #65: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #66: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2ErrCode.String
+      #67: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #68: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameHeader.String
+      #69: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #70: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameType.String
+      #71: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #72: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2FrameWriteRequest.String
+      #73: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #74: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2GoAwayError.Error
+      #75: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #76: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2Setting.String
+      #77: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #78: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2SettingID.String
+      #79: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #80: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2StreamError.Error
+      #81: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #82: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2bufferedWriterTimeoutWriter.Write
+      #83: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #84: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2chunkWriter.Write
+      #85: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #86: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2connError.Error
+      #87: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #88: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2duplicatePseudoHeaderError.Error
+      #89: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #90: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2gzipReader.Close
+      #91: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #92: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2gzipReader.Read
+      #93: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #94: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldNameError.Error
+      #95: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #96: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2headerFieldValueError.Error
+      #97: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #98: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.http2pseudoHeaderError.Error
+      #99: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #100: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.http2requestBody.Read
+      #101: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #102: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.Write
+      #103: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #104: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.http2responseWriter.WriteString
+      #105: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #106: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.http2stickyErrWriter.Write
+      #107: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #108: pkg/vector/embed/ollama/adapter.go:295:2: ollama.Adapter.Embed calls http.http2transportResponseBody.Close
+      #109: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #110: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.http2transportResponseBody.Read
+      #111: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #112: internal/vector/glossary/extract.go:469:27: glossary.WriteYAML calls fmt.Fprintln, which eventually calls http.http2writeData.String
+      #113: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #114: cmd/graph/bench_server.go:147:27: graph.newBenchServerCmd calls httptest.Server.Close, which eventually calls http.loggingConn.Close
+      #115: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #116: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.loggingConn.Read
+      #117: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #118: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.loggingConn.Write
+      #119: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #120: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #121: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #122: internal/graph/persist/postgres_store.go:237:14: persist.pgStore.Close calls pgxpool.Pool.Close, which eventually calls http.onceCloseListener.Close
+      #123: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #124: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConn.Read
+      #125: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #126: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.persistConnWriter.ReadFrom
+      #127: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #128: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which eventually calls http.persistConnWriter.Write
+      #129: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #130: internal/setup/capture.go:871:24: setup.CapturedSource.ReadBlobContext calls io.ReadAll, which calls http.readTrackingBody.Read
+      #131: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #132: pkg/vector/embed/ollama/http_observer.go:52:29: ollama.observedBody.Read calls http.readWriteCloserBody.Read
+      #133: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #134: internal/setup/identity.go:417:19: setup.ConfiguredInputDigest calls io.Copy, which eventually calls http.response.ReadFrom
+      #135: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #136: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.Write
+      #137: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #138: cmd/cks/agentcli/agent.go:142:29: agentcli.Agent.Run calls io.WriteString, which calls http.response.WriteString
+      #139: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+      #140: cmd/b0-vector-probe/main.go:387:27: b0.main calls http.transportReadFromServerError.Error
+
+Your code is affected by 11 vulnerabilities from the Go standard library.
+This scan also found 2 vulnerabilities in packages you import and 2
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+exit status 3
+make: *** [vuln] Error 1

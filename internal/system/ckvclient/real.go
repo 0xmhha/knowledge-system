@@ -23,7 +23,7 @@ const DefaultK = 10
 // between probes.
 const modelProbeTTL = 5 * time.Second
 
-// RealOpts configures the in-process ckv adapter (G1). The old subprocess
+// RealOpts configures the in-process ckv adapter. The old subprocess
 // fields (BinaryPath / Env / CallTimeout) are gone — cks imports pkg/ckv
 // directly, so there is no child process to spawn or restart.
 type RealOpts struct {
@@ -44,12 +44,12 @@ type RealOpts struct {
 	Embedder ckvtypes.Embedder
 }
 
-// Real is the in-process ckv adapter (G1). It holds an open *ckv.Engine and
+// Real is the in-process ckv adapter. It holds an open *ckv.Engine and
 // translates ckv.Hit / Manifest / FreshnessReport into cks contract types.
 //
 // No subprocess, no MCP transport: the 543-LOC proxy this replaced spawned
-// the ckv binary and proxied every query over stdio, which hung 2/9 dogfood
-// runs. ckv.Engine is concurrent-safe for reads, so Real needs no locking.
+// the ckv binary and proxied every query over stdio, which hung 2/9
+// self-evaluation runs. ckv.Engine is concurrent-safe for reads, so Real needs no locking.
 type Real struct {
 	eng            *ckv.Engine
 	emb            ckvtypes.Embedder
@@ -74,7 +74,7 @@ type Real struct {
 var _ Client = (*Real)(nil)
 
 // NewReal opens the ckv index at opts.DataPath with opts.Embedder, in
-// process. It fails fast (S5) when DataPath is empty, the Embedder is nil,
+// process. It fails fast when DataPath is empty, the Embedder is nil,
 // or the embedder can't serve the index (identity mismatch) — the caller
 // (cmd/cks-mcp) catches the error and falls back to the Smart Dummy plus a
 // degraded cks.ops.health status rather than crashing.
@@ -144,7 +144,7 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 		// Symbol / CanonicalID are the composer's bridge to ckg: Stage 1
 		// extracts hit.Symbol as a candidate keyword (instead of the file
 		// basename — the basename fallback survives in extractKeywords for
-		// hits with empty Symbol); CanonicalID is the build-stable B7 join
+		// hits with empty Symbol); CanonicalID is the build-stable ckv↔ckg join
 		// key (ADR-0001) the chunk inherited from the aligned ckg node,
 		// resolvable via ckg's canonical-first FindSymbol. Empty values are
 		// fine (omitempty on the wire); they only mean the ckv chunk lacked
@@ -171,7 +171,7 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 }
 
 // Freshness reports index-vs-HEAD staleness via ckv's structured
-// Engine.Freshness (02 G6). Git unavailability is reported by ckv as
+// Engine.Freshness. Git unavailability is reported by ckv as
 // Fresh=false with warnings, not as an error here.
 func (r *Real) Freshness(ctx context.Context) (FreshnessReport, error) {
 	rep, err := r.eng.Freshness()

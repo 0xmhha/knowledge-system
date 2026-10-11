@@ -1,0 +1,145 @@
+package main
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "database/sql"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "time"
+ "github.com/0xmhha/knowledge-system/internal/setup"
+ "github.com/0xmhha/knowledge-system/internal/system/semantic"
+ "github.com/0xmhha/knowledge-system/internal/system/knowledgepack"
+ graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+ graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
+)
+func must(e error){if e!=nil{panic(e)}}
+func digest(b []byte)string{s:=sha256.Sum256(b);return hex.EncodeToString(s[:])}
+func save(path string,v any){b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600))}
+type anchor struct{ReviewID string `json:"review_id"`;Role string `json:"role"`;Path string `json:"path"`;First int `json:"first"`;Last int `json:"last"`;FileSHA string `json:"file_sha256"`;ContentSHA string `json:"content_sha256"`}
+func main(){
+ root,e:=os.Getwd();must(e);out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-proposed-lock-2026-10-08")
+ var prep struct{Base,Source,DatasetRoot string};b,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e)
+ var raw map[string]json.RawMessage;must(json.Unmarshal(b,&raw));must(json.Unmarshal(raw["base"],&prep.Base));must(json.Unmarshal(raw["source"],&prep.Source));must(json.Unmarshal(raw["dataset_root"],&prep.DatasetRoot))
+ if !strings.HasPrefix(prep.Base,"/private/tmp/ks-n12-proposed-lock-"){panic("outside owned namespace")}
+ version:=filepath.Join(prep.DatasetRoot,"n12-candidate");replay:=false
+ if len(os.Args)==3&&os.Args[1]=="--replay"{version=os.Args[2];replay=true;if !strings.HasPrefix(version,prep.Base+"/"){panic("outside owned replay")}}
+ identity,e:=setup.InspectVersionIdentity(version);must(e);if identity==nil{panic("missing pinned identity")}
+ must(setup.VerifyRetainedSource(version,identity.Source));must(setup.VerifyCandidateIdentity(version,identity.Source,identity.InputDigest));must(semantic.ValidateCanonicalCoverage(filepath.Join(version,"vector"),1))
+ instances,lock,e:=knowledgepack.LoadRetainedProjectInstances(version);must(e)
+ if len(instances.Decisions)!=2||len(instances.Policies)!=0||len(instances.Reviews)!=0||len(instances.Relations)!=0||len(instances.TraceLinks)!=0{panic("false knowledge coverage")}
+ for _,d:=range instances.Decisions{if d.Status!="proposed"||d.ReviewedBy!=""||d.Date!=""{panic("false human decision")}}
+ decisionSelection,e:=instances.SelectDecisions("2026-10-08",map[string]string{"project":"knowledge-system","contract":"SOURCE-SNAPSHOT-ADR","stage":"proposed-review"},false);must(e)
+ policySelection,e:=instances.SelectPolicies("2026-10-08",map[string]string{"project":"knowledge-system"},false);must(e)
+ if len(decisionSelection.Applicable)!=0||len(policySelection.Applicable)!=0||decisionSelection.State!="unknown"||policySelection.State!="unknown"{panic("unreviewed context selected")}
+ snapshot:=semantic.Snapshot{ProjectID:identity.Source.ProjectID,DatasetID:identity.DatasetID,Commit:identity.Source.SourceCommit,SnapshotID:identity.Source.SnapshotID,SourceMode:identity.Source.SourceMode}
+ ctx,cancel:=context.WithTimeout(context.Background(),5*time.Minute);defer cancel()
+ p:=extractCurrent(ctx,version,root,snapshot);p.Knowledge,e=knowledgepack.ProjectRetainedKnowledge(version);must(e);p.SchemaVersion=semantic.PackProjectionVersion
+ linked,e:=semantic.AttachCKVChunks(ctx,&p,filepath.Join(version,"vector"));must(e);if linked!=len(p.Sections){panic("document link missing")}
+ graph,e:=graphstore.OpenReadOnly(filepath.Join(version,"graph/graph.db"));must(e);defer graph.Close()
+ b,e=os.ReadFile(filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-canonical-preparation-2026-10-08/anchor-inputs.json"));must(e);var anchors []anchor;must(json.Unmarshal(b,&anchors));unique:=map[string]bool{}
+ for i,a:=range anchors{
+ data,_,_,e:=setup.ReadRetainedFile(version,"repo",a.Path);must(e);if digest(data)!=a.FileSHA{panic("retained file changed")}
+ nodes,e:=graph.NodesByFilePath(a.Path);must(e);matches:=[]graphtypes.Node{};for _,n:=range nodes{if n.CanonicalID!=""&&n.StartLine==a.First&&n.EndLine>=a.Last{matches=append(matches,n)}};if len(matches)!=1{panic("canonical ambiguous")};n:=matches[0];kind:=semantic.SourceCode;if strings.HasSuffix(a.Path,"_test.go"){kind=semantic.SourceTest}
+ proof:=semantic.EvidenceSpan{ID:fmt.Sprintf("n12-proposed-lock-anchor:%02d",i+1),Snapshot:snapshot,Kind:kind,Path:a.Path,StartLine:a.First,EndLine:a.Last,ContentSHA256:a.ContentSHA,CanonicalID:n.CanonicalID,Extractor:"n12-proposed-lock-v1"};must(semantic.AttachCodeEvidence(&p,graph,proof));unique[n.CanonicalID]=true
+ }
+ must(p.ValidateRetainedSources(version));must(semantic.ValidateDatasetAlignment(p,prep.Source,filepath.Join(version,"graph"),filepath.Join(version,"vector")));must(semantic.ValidateCodeAnchors(p,filepath.Join(version,"graph")));must(semantic.ValidateCKVChunkLinks(ctx,p,filepath.Join(version,"vector")))
+ if p.Knowledge.LockDigest!=lock.LockDigest||len(p.Knowledge.Packs)!=1{panic("knowledge lock link differs")}
+ report:=map[string]any{"status":"proposed_retained_lock_and_alignment_verified","identity":identity,"lock":lock,"retained_decisions":2,"retained_policies":0,"knowledge_relation_instances":0,"review_records":0,"selection_decisions":decisionSelection,"selection_policies":policySelection,"document_sections_linked":linked,"code_refs":len(anchors),"unique_canonical_ids":len(unique),"semantic_claims":len(p.Claims),"semantic_assertions":len(p.Assertions),"semantic_schema_version":p.SchemaVersion,"human_approved":0,"new_semantic_trace_relations":0,"activated":false,"archive_replay":replay}
+ if replay{save(filepath.Join(out,"archive-replay.json"),report);fmt.Println("PASS archive replay: retained lock2 proposed ADRs, no applicable policy/decision, v4 aligned semantic sources/canonical/chunks");return}
+ store,e:=semantic.OpenStore(filepath.Join(prep.Base,"semantic-proposed.sqlite"));must(e);defer store.Close();must(store.PutAlignedRetained(ctx,p,prep.Source,filepath.Join(version,"graph"),filepath.Join(version,"vector"),version));stored,e:=store.Load(ctx,snapshot.ProjectID,snapshot.DatasetID);must(e);before,e:=json.Marshal(p);must(e);after,e:=json.Marshal(stored);must(e);if !bytes.Equal(before,after){panic("stored projection changed")};_,e=store.Current(ctx,snapshot.ProjectID);if !errors.Is(e,sql.ErrNoRows){panic("proposed store active")}
+ review,e:=p.Review(100,"n12-proposed-lock");must(e);if review.Verified!=0||review.AssertionVerified!=0||review.ConceptVerified!=0||review.RequirementVerified!=0||review.Precision!=nil{panic("false semantic review")}
+ save(filepath.Join(out,"projection-proposed.json"),p);save(filepath.Join(out,"retained-knowledge-report.json"),report);save(filepath.Join(out,"review-queue.json"),review);save(filepath.Join(out,"retained-instances.json"),instances)
+ fixture,cleanup,e:=setup.MaterializeRetainedReadTree(version);must(e);defer cleanup()
+ // The reconstruction API already checked duplicated repo/knowledge pack origin bytes.
+ // Use a copy of the complete source for reversible live lock admission controls.
+ controls:=[]map[string]any{};reject:=func(name string,e error){if e==nil{panic("negative accepted:"+name)};controls=append(controls,map[string]any{"name":name,"rejected":true,"error":e.Error()})}
+ _=fixture
+ mutate:=func(name,path string,body []byte,check func()error){original,e:=os.ReadFile(path);must(e);must(os.WriteFile(path,body,0600));err:=check();must(os.WriteFile(path,original,0600));reject(name,err)}
+ adr:=filepath.Join(prep.Source,".cks/knowledge/decisions/P12-P05.md");original,e:=os.ReadFile(adr);must(e)
+ mutate("changed_overlay_stale_lock",adr,append(append([]byte{},original...),[]byte("\nchanged\n")...),func()error{_,e:=knowledgepack.VerifyLock(prep.Source);return e})
+ mutate("unreviewed_ADR_marked_verified",adr,bytes.Replace(original,[]byte(`"status": "proposed"`),[]byte(`"status": "verified"`),1),func()error{_,e:=knowledgepack.BuildLock(prep.Source);return e})
+ pp:=filepath.Join(prep.Source,"packs/n12-proposed/pack.yaml");original,e=os.ReadFile(pp);must(e)
+ mutate("selected_pack_digest_changed",pp,append(append([]byte{},original...),[]byte("\n ")...),func()error{_,e:=knowledgepack.BuildLock(prep.Source);return e})
+ mp:=filepath.Join(prep.Source,".cks/knowledge/manifest.yaml");original,e=os.ReadFile(mp);must(e)
+ mutate("zero_review_quorum",mp,bytes.Replace(original,[]byte(`"min_approvals": 1`),[]byte(`"min_approvals": 0`),1),func()error{_,e:=knowledgepack.BuildLock(prep.Source);return e})
+ mutate("project_changed_stale_lock",mp,bytes.Replace(original,[]byte(`"project_id": "knowledge-system"`),[]byte(`"project_id": "other-project"`),1),func()error{_,e:=knowledgepack.VerifyLock(prep.Source);return e})
+ lp:=filepath.Join(prep.Source,".cks/knowledge/knowledge.lock.json");original,e=os.ReadFile(lp);must(e);var bad knowledgepack.Lock;must(json.Unmarshal(original,&bad));bad.LockDigest=strings.Repeat("0",64);bb,e:=json.Marshal(bad);must(e)
+ mutate("saved_lock_digest_tampered",lp,bb,func()error{_,e:=knowledgepack.VerifyLock(prep.Source);return e})
+ badpolicy:=filepath.Join(prep.Source,".cks/knowledge/policies/ownerless.yaml");b,e=json.Marshal(knowledgepack.Policy{ID:"P12-P01",Type:knowledgepack.TypeRef{PackID:"local.n12",LocalID:"source-adr"},Statement:"owner not supplied",Scope:map[string]string{"project":"knowledge-system"},Status:"proposed",Visibility:"public",SourceRef:knowledgepack.SourceRef{OriginID:"repo",Path:".cks/knowledge/policies/ownerless.yaml"}});must(e);must(os.WriteFile(badpolicy,b,0600));_,e=knowledgepack.BuildLock(prep.Source);must(os.Remove(badpolicy));reject("ownerless_policy",e)
+ must(setup.VerifyRetainedSource(version,identity.Source));_,e=knowledgepack.VerifyLock(prep.Source);must(e)
+ save(filepath.Join(out,"negative-controls.json"),controls)
+ fmt.Println("PASS proposed lock2 ADRs/0 policies, v4 aligned36refs/33canonical,27sections,7 lock controls, store roundtrip/current absent")
+}
+func extractCurrent(ctx context.Context, versionDir, root string, snapshot semantic.Snapshot) semantic.Projection {
+	read := func(path string) []byte {
+		b, _, _, err := setup.ReadRetainedFile(versionDir, "repo", path)
+		must(err)
+		return b
+	}
+	p, _, err := semantic.ExtractOntology(snapshot, "docs/spec-driven/ontology-pilot.yaml", read("docs/spec-driven/ontology-pilot.yaml"))
+	must(err)
+	spec, _, err := semantic.ExtractSpec(snapshot, "docs/spec-driven/spec-pilot.yaml", read("docs/spec-driven/spec-pilot.yaml"))
+	must(err)
+	p.Evidence = append(p.Evidence, spec.Evidence...)
+	p.Requirements = spec.Requirements
+	type seed struct {
+		ID        string `json:"id"`
+		Path      string `json:"path"`
+		First     int    `json:"first"`
+		Last      int    `json:"last"`
+		ConceptID string `json:"concept_id"`
+		Statement string `json:"statement"`
+	}
+	raw, err := os.ReadFile(filepath.Join(root, "system/eval/b0-knowledge-system/refactoring-n12-policy-adr-review-2026-10-06/claim-seeds.json"))
+	must(err)
+	var seeds []seed
+	must(json.Unmarshal(raw, &seeds))
+	docs := map[string]semantic.Projection{}
+	conceptEvidence := map[string]string{}
+	for _, c := range p.Concepts {
+		conceptEvidence[c.ID] = c.EvidenceID
+	}
+	for _, s := range seeds {
+		doc, ok := docs[s.Path]
+		if !ok {
+			doc, err = semantic.ExtractMarkdown(snapshot, s.Path, read(s.Path))
+			must(err)
+			docs[s.Path] = doc
+			p.Evidence = append(p.Evidence, doc.Evidence...)
+			p.Sections = append(p.Sections, doc.Sections...)
+		}
+		lines := bytes.SplitAfter(read(s.Path), []byte{'\n'})
+		if len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
+			lines = lines[:len(lines)-1]
+		}
+		if s.First < 1 || s.Last < s.First || s.Last > len(lines) {
+			panic("invalid seed range")
+		}
+		proof := semantic.EvidenceSpan{ID: "policy-evidence:" + s.ID, Snapshot: snapshot, Kind: semantic.SourceDocument, Path: s.Path, StartLine: s.First, EndLine: s.Last, ContentSHA256: digest(bytes.Join(lines[s.First-1:s.Last], nil)), Extractor: "manual-policy-review-v1"}
+		p.Evidence = append(p.Evidence, proof)
+		var chosen semantic.DocumentSection
+		var chosenEvidence semantic.EvidenceSpan
+		for _, section := range doc.Sections {
+			for _, e := range doc.Evidence {
+				if e.ID == section.EvidenceID && e.StartLine <= s.First && e.EndLine >= s.Last && (chosen.ID == "" || e.EndLine-e.StartLine < chosenEvidence.EndLine-chosenEvidence.StartLine) {
+					chosen = section
+					chosenEvidence = e
+				}
+			}
+		}
+		if chosen.ID == "" || conceptEvidence[s.ConceptID] == "" {
+			panic("unresolved seed section or concept")
+		}
+		claim := semantic.Claim{ID: "pilot-claim:" + s.ID, Statement: s.Statement, SectionID: chosen.ID, EvidenceIDs: []string{proof.ID, chosenEvidence.ID}, Status: semantic.StatusProposed}
+		p.Claims = append(p.Claims, claim)
+		p.Assertions = append(p.Assertions, semantic.Assertion{ID: "supports:" + s.ID, Predicate: semantic.PredicateSupports, SubjectID: chosen.ID, ObjectID: claim.ID, EvidenceIDs: []string{chosenEvidence.ID, proof.ID}, Status: semantic.StatusProposed}, semantic.Assertion{ID: "about:" + s.ID, Predicate: semantic.PredicateAbout, SubjectID: claim.ID, ObjectID: s.ConceptID, EvidenceIDs: []string{proof.ID, conceptEvidence[s.ConceptID]}, Status: semantic.StatusProposed})
+	}
+	must(p.ValidateRetainedSources(versionDir))
+	return p
+}

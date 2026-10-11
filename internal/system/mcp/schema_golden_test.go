@@ -11,7 +11,7 @@ import (
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 
-// TestSchemaGolden_RegisteredToolsMatchContract is the M2.a conformance gate:
+// TestSchemaGolden_RegisteredToolsMatchContract is the conformance gate:
 // the cks.* tools the server actually registers must equal — exactly — the
 // cks.* tool set in the vendored SSoT fixture (internal/mcp/testdata/
 // agent-mcp.schema.json). Adding a tool without updating the fixture (or vice

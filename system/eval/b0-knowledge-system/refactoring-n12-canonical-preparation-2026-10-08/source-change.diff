@@ -1,0 +1,195 @@
+diff --git a/internal/graph/buildpipe/cache_test.go b/internal/graph/buildpipe/cache_test.go
+index 868fa6f1..0b6416bf 100644
+--- a/internal/graph/buildpipe/cache_test.go
++++ b/internal/graph/buildpipe/cache_test.go
+@@ -114,6 +114,28 @@ func TestIncremental_OneFileChanged(t *testing.T) {
+ 	src := makeMiniGoModule(t)
+ 	out := t.TempDir()
+ 	first := runBuild(t, src, out)
++	checkCachedCanonical := func() {
++		t.Helper()
++		store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
++		if err != nil {
++			t.Fatal(err)
++		}
++		defer func() { _ = store.Close() }()
++		nodes, err := store.NodesByFilePath("b.go")
++		if err != nil {
++			t.Fatal(err)
++		}
++		for _, n := range nodes {
++			if n.Name == "Mul" {
++				if n.CanonicalID != "example.com/cachetest.Mul" {
++					t.Fatalf("cached file lost canonical symbol identity: %q", n.CanonicalID)
++				}
++				return
++			}
++		}
++		t.Fatal("cached Mul symbol missing")
++	}
++	checkCachedCanonical()
+ 
+ 	firstByPath := map[string]persist.FileEntry{}
+ 	for _, e := range first.Files {
+@@ -134,6 +156,7 @@ var _ = 0
+ `)
+ 
+ 	second := runBuild(t, src, out)
++	checkCachedCanonical()
+ 	secondByPath := map[string]persist.FileEntry{}
+ 	for _, e := range second.Files {
+ 		secondByPath[e.Path] = e
+diff --git a/internal/graph/persist/find_by_canonical_id_test.go b/internal/graph/persist/find_by_canonical_id_test.go
+index b39365dc..fa7d1dac 100644
+--- a/internal/graph/persist/find_by_canonical_id_test.go
++++ b/internal/graph/persist/find_by_canonical_id_test.go
+@@ -1,6 +1,8 @@
+ package persist_test
+ 
+ import (
++	"encoding/json"
++	"os"
+ 	"path/filepath"
+ 	"testing"
+ 
+@@ -70,3 +72,87 @@ func TestFindByCanonicalID(t *testing.T) {
+ 		t.Errorf("empty input: found=%v err=%v, want found=false err=nil", found, err)
+ 	}
+ }
++
++func TestCanonicalIDsSurviveSharedReadPathsAndExport(t *testing.T) {
++	s, err := persist.Open(filepath.Join(t.TempDir(), "canonical.db"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { _ = s.Close() })
++	if err := s.Migrate(); err != nil {
++		t.Fatal(err)
++	}
++	nodes := []types.Node{
++		{ID: "retained00000001", Type: types.NodeFunction, Name: "Retained", QualifiedName: "pkg.보존.Retained",
++			CanonicalID: "example.com/pkg.Retained", FilePath: "pkg/retained.go", StartLine: 2, EndLine: 4,
++			Language: "go", DocComment: "보존", Confidence: types.ConfExtracted},
++		{ID: "legacy0000000001", Type: types.NodeFunction, Name: "Legacy", QualifiedName: "pkg.Legacy",
++			FilePath: "pkg/retained.go", StartLine: 6, EndLine: 8, Language: "go", Confidence: types.ConfExtracted},
++	}
++	if err := s.InsertNodes(nodes); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.RebuildFTS(); err != nil {
++		t.Fatal(err)
++	}
++	// Establish that the identity is stored before exercising the shared scanners.
++	if n, found, err := s.FindByCanonicalID(nodes[0].CanonicalID); err != nil || !found || n.ID != nodes[0].ID {
++		t.Fatalf("stored canonical lookup: %+v, %v, %v", n, found, err)
++	}
++	check := func(t *testing.T, got []types.Node, err error) {
++		t.Helper()
++		if err != nil {
++			t.Fatal(err)
++		}
++		found := false
++		for _, n := range got {
++			if n.ID == nodes[0].ID {
++				found = true
++				if n.CanonicalID != nodes[0].CanonicalID {
++					t.Fatalf("stored identity lost on read: %q", n.CanonicalID)
++				}
++			}
++			if n.ID == nodes[1].ID && n.CanonicalID != "" {
++				t.Fatalf("legacy node acquired canonical identity: %q", n.CanonicalID)
++			}
++		}
++		if !found {
++			t.Fatal("expected canonical symbol missing")
++		}
++	}
++	for name, read := range map[string]func() ([]types.Node, error){
++		"file-cache": func() ([]types.Node, error) { return s.NodesByFilePath(nodes[0].FilePath) },
++		"IDs":        func() ([]types.Node, error) { return s.NodesByIDs([]string{nodes[0].ID, nodes[1].ID}) },
++		"symbol": func() ([]types.Node, error) {
++			return s.FindSymbol(nodes[0].QualifiedName, true, persist.FindSymbolOptions{})
++		},
++		"ranked": func() ([]types.Node, error) { return s.TopNodes("pagerank", 10) },
++		"search": func() ([]types.Node, error) { return s.Search("Retained", 10) },
++		"CJK":    func() ([]types.Node, error) { return s.Search("보존", 10) },
++	} {
++		t.Run(name, func(t *testing.T) { got, err := read(); check(t, got, err) })
++	}
++	t.Run("FTS", func(t *testing.T) {
++		hits, err := s.SearchFTS("Retained", 10, persist.SearchFTSOptions{})
++		got := make([]types.Node, len(hits))
++		for i, hit := range hits {
++			got[i] = hit.Node
++		}
++		check(t, got, err)
++	})
++	t.Run("export", func(t *testing.T) {
++		out := t.TempDir()
++		if err := s.ExportChunked(out, 10, 10); err != nil {
++			t.Fatal(err)
++		}
++		raw, err := os.ReadFile(filepath.Join(out, "nodes", "chunk_0000.json"))
++		if err != nil {
++			t.Fatal(err)
++		}
++		var got []types.Node
++		if err := json.Unmarshal(raw, &got); err != nil {
++			t.Fatal(err)
++		}
++		check(t, got, nil)
++	})
++}
+diff --git a/internal/graph/persist/sqlite_fts.go b/internal/graph/persist/sqlite_fts.go
+index c483fd18..b37609bf 100644
+--- a/internal/graph/persist/sqlite_fts.go
++++ b/internal/graph/persist/sqlite_fts.go
+@@ -50,7 +50,7 @@ func (s *sqliteStore) SearchFTS(q string, limit int, opts SearchFTSOptions) ([]S
+ 		n.start_line, n.end_line, n.start_byte, n.end_byte, n.language,
+ 		COALESCE(n.visibility,''), COALESCE(n.signature,''), COALESCE(n.doc_comment,''),
+ 		COALESCE(n.complexity,0), n.in_degree, n.out_degree, n.pagerank, n.usage_score,
+-		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''),
++		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''), COALESCE(n.canonical_id,''),
+ 		-bm25(nodes_fts) AS raw_score
+ 		FROM nodes_fts f
+ 		JOIN nodes n ON n.rowid = f.rowid
+@@ -345,7 +345,7 @@ func (s *sqliteStore) SearchSubstr(q string, limit int) ([]types.Node, error) {
+ 		n.start_line, n.end_line, n.start_byte, n.end_byte, n.language,
+ 		COALESCE(n.visibility,''), COALESCE(n.signature,''), COALESCE(n.doc_comment,''),
+ 		COALESCE(n.complexity,0), n.in_degree, n.out_degree, n.pagerank, n.usage_score,
+-		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,'')
++		n.confidence, COALESCE(n.sub_kind,''), COALESCE(n.attrs,''), COALESCE(n.canonical_id,'')
+ 		FROM nodes n
+ 		WHERE n.name LIKE ? OR n.qualified_name LIKE ? LIMIT ?`, pat, pat, limit)
+ 	if err != nil {
+diff --git a/internal/graph/persist/sqlite_helpers.go b/internal/graph/persist/sqlite_helpers.go
+index 4d35e7ed..a9d07289 100644
+--- a/internal/graph/persist/sqlite_helpers.go
++++ b/internal/graph/persist/sqlite_helpers.go
+@@ -14,7 +14,7 @@ const nodeColumns = `id, type, name, qualified_name, file_path,
+ 	start_line, end_line, start_byte, end_byte, language,
+ 	COALESCE(visibility,''), COALESCE(signature,''), COALESCE(doc_comment,''),
+ 	COALESCE(complexity,0), in_degree, out_degree, pagerank, usage_score,
+-	confidence, COALESCE(sub_kind,''), COALESCE(attrs,'')`
++	confidence, COALESCE(sub_kind,''), COALESCE(attrs,''), COALESCE(canonical_id,'')`
+ 
+ // queryEdgesChunk is the per-chunk size for QueryEdgesForNodes. SQLite's
+ // SQLITE_MAX_VARIABLE_NUMBER caps single-statement parameters; default is 999
+@@ -51,7 +51,7 @@ func scanNodes(rows *sql.Rows) ([]types.Node, error) {
+ 			&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
+ 			&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
+ 			&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
+-			&conf, &n.SubKind, &attrs); err != nil {
++			&conf, &n.SubKind, &attrs, &n.CanonicalID); err != nil {
+ 			return nil, fmt.Errorf("scan node row: %w", err)
+ 		}
+ 		n.Confidence = types.Confidence(conf)
+@@ -78,7 +78,7 @@ func scanSearchHits(rows *sql.Rows) ([]SearchHit, error) {
+ 			&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
+ 			&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
+ 			&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
+-			&conf, &n.SubKind, &attrs, &raw); err != nil {
++			&conf, &n.SubKind, &attrs, &n.CanonicalID, &raw); err != nil {
+ 			return nil, fmt.Errorf("scan search hit row: %w", err)
+ 		}
+ 		n.Confidence = types.Confidence(conf)

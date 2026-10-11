@@ -1,0 +1,14 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "finish the branch: clean docs/, clean code and comments (remove development-stage terms, use general wording), verify build, test, lint and fmt, then commit, open a PR and squash-merge",
+ "change": {
+  "98bbb9ce": "comments, help text and test messages only in 394 Go files: planning labels replaced with plain descriptions; design-document references repointed to docs/graph and docs/vector; attrs-column schema notes aligned to 1.11",
+  "d02f1369": "docs/README.md and docs/spec-driven/README.md indexes; docs/graph/SCHEMA.md to schema 1.24 with review index section; system/README.md tool count 24 and review_function; release verdict records the merge decision; check-docs accepts the recorded injection payload"
+ },
+ "unchanged": "identifiers, persisted or machine-read strings, test assertions, testdata fixtures",
+ "regression": "go test -race -count=1 ./... before commit (tree identical to 98bbb9ce for Go files): 3293 passed, 16 skipped, 0 failed; go build and go vet pass; gofmt -l empty; make fmt-check, boundaries and docs-check pass (312 live documents); python script tests 164 passed",
+ "product_behaviour_changed": false,
+ "reviewer": null,
+ "individual_human_approvals": 0
+}

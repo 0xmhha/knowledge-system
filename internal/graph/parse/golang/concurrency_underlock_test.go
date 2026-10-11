@@ -8,7 +8,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestConcurrency_AccessedUnderLock_Basic asserts G8 (B1 Phase 4) emits at
+// TestConcurrency_AccessedUnderLock_Basic asserts the accessed_under_lock pass emits at
 // least one accessed_under_lock edge from a Field node to a Mutex node for
 // the existing concurrency fixture. The Counter struct has a `count`
 // field protected by `mu`; the Inc/Get methods both lock and touch it,

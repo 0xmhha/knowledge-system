@@ -60,7 +60,7 @@ func resolveTestdataSample(t *testing.T) string {
 	return abs
 }
 
-// TestRun_AlignsFlowStepsToCode is the Phase C guard: a flow step whose
+// TestRun_AlignsFlowStepsToCode is the flow-alignment guard: a flow step whose
 // file:line falls inside a real code chunk gets that chunk's ID stamped as
 // AlignedChunkID, so a caller can jump from the flow prose to its implementation.
 func TestRun_AlignsFlowStepsToCode(t *testing.T) {

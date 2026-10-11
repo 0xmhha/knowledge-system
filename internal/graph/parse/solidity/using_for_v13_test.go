@@ -4,19 +4,19 @@ import (
 	"testing"
 )
 
-// W-C W6 V1.3 — return-value chaining tests.
+// Return-value chaining tests.
 //
 // Chained call dispatch: `<innerFn>().<method>(...)`. The resolver
 // recovers the inner function's return type via funcReturnTypes and
-// treats it as the receiver type for binding lookup. V1.3 V0 supports
+// treats it as the receiver type for binding lookup. This shape covers
 // only same-contract inner functions (cross-contract chaining
-// `obj.foo().bar()` is V1.4+).
+// `obj.foo().bar()` is covered in using_for_v14_test.go).
 //
 // File-level using directive and free-function form using_alias are
 // blocked by tree-sitter-solidity v1.2.13 grammar limitations
-// (ERROR-node parse on 0.8.13+ syntax). Both remain V1.x carry-over.
+// (ERROR-node parse on 0.8.13+ syntax). Both are handled separately.
 
-// TestUsingForV13_ReturnChainBasic — canonical V1.3 case. `factory()`
+// TestUsingForV13_ReturnChainBasic — canonical return-chain case. `factory()`
 // returns uint256; `.add(1)` resolves through the using-for binding for
 // uint256 to ChainLib.add.
 func TestUsingForV13_ReturnChainBasic(t *testing.T) {
@@ -43,7 +43,7 @@ func TestUsingForV13_ReturnChainNoBinding(t *testing.T) {
 }
 
 // TestUsingForV13_ReturnChainUnknownFn — chained call where the inner
-// identifier doesn't resolve to a known function in the build. V1.3
+// identifier doesn't resolve to a known function in the build. The resolver
 // must drop (innerFnName → funcByQName lookup miss).
 func TestUsingForV13_ReturnChainUnknownFn(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v13", "return_chain_unknown_fn.sol")

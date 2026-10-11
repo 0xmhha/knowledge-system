@@ -114,6 +114,28 @@ func TestIncremental_OneFileChanged(t *testing.T) {
 	src := makeMiniGoModule(t)
 	out := t.TempDir()
 	first := runBuild(t, src, out)
+	checkCachedCanonical := func() {
+		t.Helper()
+		store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() { _ = store.Close() }()
+		nodes, err := store.NodesByFilePath("b.go")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, n := range nodes {
+			if n.Name == "Mul" {
+				if n.CanonicalID != "example.com/cachetest.Mul" {
+					t.Fatalf("cached file lost canonical symbol identity: %q", n.CanonicalID)
+				}
+				return
+			}
+		}
+		t.Fatal("cached Mul symbol missing")
+	}
+	checkCachedCanonical()
 
 	firstByPath := map[string]persist.FileEntry{}
 	for _, e := range first.Files {
@@ -134,6 +156,7 @@ var _ = 0
 `)
 
 	second := runBuild(t, src, out)
+	checkCachedCanonical()
 	secondByPath := map[string]persist.FileEntry{}
 	for _, e := range second.Files {
 		secondByPath[e.Path] = e
@@ -342,7 +365,7 @@ func manifestHasPath(m persist.Manifest, path string) bool {
 }
 
 // TestPartialCache_PreservesCrossFileEdges_ViaColdFallback is the regression
-// guard for the A3 follow-up: previously, when a callee file was modified
+// guard for a partial-cache bug: previously, when a callee file was modified
 // (cached caller still pointing into it), the partial-cache routing in
 // runIncremental dropped the cross-file `calls` edge because cached files
 // don't re-emit pending refs. Empirical proof: testdata/synthetic vault.go
@@ -399,7 +422,7 @@ func Helper() {}
 	runBuild(t, dir, out)
 	warmCalls := countCrossFileCallsEdges(t, filepath.Join(out, "graph.db"))
 	if warmCalls != coldCalls {
-		t.Errorf("cross-file calls drifted on partial-cache rebuild: cold=%d warm=%d (regression: A3 partial-cache silent edge loss)",
+		t.Errorf("cross-file calls drifted on partial-cache rebuild: cold=%d warm=%d (regression: partial-cache silent edge loss)",
 			coldCalls, warmCalls)
 	}
 }

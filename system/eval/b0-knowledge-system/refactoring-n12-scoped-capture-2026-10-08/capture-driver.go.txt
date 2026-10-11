@@ -1,0 +1,84 @@
+package main
+
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "encoding/hex"
+ "encoding/json"
+ "fmt"
+ "os"
+ "os/exec"
+ "path/filepath"
+ "strings"
+ "time"
+
+ "github.com/0xmhha/knowledge-system/internal/setup"
+)
+func must(err error) { if err != nil { panic(err) } }
+func sha(b []byte) string { s:=sha256.Sum256(b); return hex.EncodeToString(s[:]) }
+func save(path string,v any) { b,e:=json.MarshalIndent(v,"","  ");must(e);must(os.WriteFile(path,append(b,'\n'),0600)) }
+func runGit(root string,args ...string) []byte { cmd:=exec.Command("git",append([]string{"-C",root},args...)...);b,e:=cmd.CombinedOutput(); if e!=nil { panic(fmt.Sprintf("git failed: %s: %v",b,e)) };return b }
+func main() {
+ root,e:=os.Getwd();must(e)
+ out:=filepath.Join(root,"system/eval/b0-knowledge-system/refactoring-n12-scoped-capture-2026-10-08")
+ var prep struct { Original string `json:"original_revision"`; Commit string `json:"derived_source_commit"`; Base string `json:"owned_working_directory"`; Root string `json:"source_root"`; Approved []string `json:"approved_build_go_sources"` }
+ raw,e:=os.ReadFile(filepath.Join(out,"preparation.json"));must(e);must(json.Unmarshal(raw,&prep))
+ if !strings.HasPrefix(prep.Base,"/private/tmp/ks-n12-scoped-capture-") || prep.Root!=filepath.Join(prep.Base,"source-input") { panic("outside owned namespace") }
+ if strings.TrimSpace(string(runGit(root,"rev-parse","HEAD")))!=prep.Original { panic("runtime source changed") }
+ var inventory []struct { Path string `json:"path"`; SHA string `json:"sha256"`; Mode string `json:"git_mode"` }
+ raw,e=os.ReadFile(filepath.Join(out,"source-input-inventory.json"));must(e);must(json.Unmarshal(raw,&inventory))
+ expected:=map[string]string{}
+ for _,f:=range inventory { if setup.SensitiveCapturePath(f.Path) { panic("sensitive input: "+f.Path) }; expected[f.Path]=f.SHA }
+ ctx,cancel:=context.WithTimeout(context.Background(),5*time.Minute);defer cancel()
+ project:="knowledge-system-n12-proposed-source"
+ snap,e:=setup.CaptureSourceContext(ctx,setup.CaptureOptions{Root:prep.Root,Out:filepath.Join(prep.Base,"snapshot-only-confirmation"),ProjectID:project,SourceMode:"snapshot-only"});must(e)
+ snapPaths:=map[string]bool{};for _,f:=range snap.Files {snapPaths[f.Path]=true}
+ omitted:=[]string{};for _,f:=range inventory { if !snapPaths[f.Path] { omitted=append(omitted,f.Path) } }
+ approvedOmitted:=[]string{};for _,p:=range prep.Approved { if !snapPaths[p] {approvedOmitted=append(approvedOmitted,p)} }
+ if len(omitted)!=32 || len(approvedOmitted)!=29 { panic("unexpected snapshot-only omission inventory") }
+ save(filepath.Join(out,"snapshot-only-comparison.json"),map[string]any{"identity":snap.Identity,"captured_files":len(snap.Files),"omitted_from_explicit_input":omitted,"approved_go_sources_omitted":approvedOmitted,"default_capture_policy_unchanged":true,"complete_input_capture":false})
+ version:=filepath.Join(prep.Base,"committed-capture")
+ opts:=setup.CaptureOptions{Root:prep.Root,Out:version,ProjectID:project,SourceMode:"committed",SourceCommit:prep.Commit}
+ pre,e:=setup.SnapshotSourceIdentity(prep.Root,project,"committed",prep.Commit);must(e)
+ c,e:=setup.CaptureSourceContext(ctx,opts);must(e)
+ if c.Identity!=pre || len(c.Files)!=len(inventory) { panic("capture identity/count mismatch") }
+ for _,f:=range c.Files { if expected[f.Path]!=f.SHA256 {panic("captured SHA mismatch")};delete(expected,f.Path) }
+ if len(expected)!=0 {panic("source missing from capture")}
+ must(c.VerifyBlobsContext(ctx));must(c.VerifyAgainstContext(ctx,prep.Root));must(setup.VerifyRetainedSourceContext(ctx,version,c.Identity))
+ repeatedOpts:=opts;repeatedOpts.Out=filepath.Join(prep.Base,"repeat-committed-capture")
+ repeat,e:=setup.CaptureSourceContext(ctx,repeatedOpts);must(e)
+ if repeat.Identity!=c.Identity {panic("repeat capture identity drift")}
+ materialized:=filepath.Join(prep.Base,"materialized-source")
+ _,e=c.MaterializeBuildTreeContext(ctx,materialized);must(e)
+ must(c.VerifyAgainstContext(ctx,materialized))
+ restoredHEAD:=strings.TrimSpace(string(runGit(materialized,"rev-parse","HEAD")))
+ if restoredHEAD!=prep.Commit {panic("materialized history mismatch")}
+ for _,f:=range c.Files { b,e:=os.ReadFile(filepath.Join(materialized,f.Path));must(e);if sha(b)!=f.SHA256 {panic("materialized bytes mismatch")};info,e:=os.Stat(filepath.Join(materialized,f.Path));must(e);if (info.Mode()&0111!=0)!=f.Executable {panic("materialized mode mismatch")} }
+ // All destructive controls affect only the owned preparation tree/blobs.
+ controls:=[]map[string]any{}
+ rejected:=func(name string,e error){if e==nil {panic("control accepted: "+name)};controls=append(controls,map[string]any{"name":name,"rejected":true,"error":e.Error()})}
+ path:=filepath.Join(prep.Root,"internal/setup/identity.go");original,e:=os.ReadFile(path);must(e)
+ changed:=append([]byte(nil),original...);changed[0]^=1;must(os.WriteFile(path,changed,0600));rejected("source_byte_change",c.VerifyAgainstContext(ctx,prep.Root));must(os.WriteFile(path,original,0600))
+ must(os.Chmod(path,0700));rejected("source_executable_bit_change",c.VerifyAgainstContext(ctx,prep.Root));must(os.Chmod(path,0600))
+ f:=c.Files[0];blob:=filepath.Join(c.BlobDir,f.SHA256);blobOriginal,e:=os.ReadFile(blob);must(e);info,e:=os.Stat(blob);must(e);mode:=info.Mode().Perm()
+ must(os.Chmod(blob,0600));bad:=append([]byte(nil),blobOriginal...);if len(bad)==0 {bad=[]byte{0}}else{bad[0]^=1};must(os.WriteFile(blob,bad,0600));rejected("retained_blob_hash_change",c.VerifyBlobsContext(ctx));must(os.WriteFile(blob,blobOriginal,0600));must(os.Chmod(blob,mode))
+ must(os.Rename(blob,blob+".owned-control"));rejected("retained_blob_missing",c.VerifyBlobsContext(ctx));must(os.Rename(blob+".owned-control",blob))
+ manifestPath:=filepath.Join(version,"sources/manifest.json");manifestOriginal,e:=os.ReadFile(manifestPath);must(e)
+ manifestBad:=bytes.Replace(manifestOriginal,[]byte(c.Identity.SnapshotID),[]byte(strings.Repeat("0",len(c.Identity.SnapshotID))),1)
+ if bytes.Equal(manifestBad,manifestOriginal) {panic("manifest identity not found")}
+ must(os.WriteFile(manifestPath,manifestBad,0600));rejected("retained_manifest_identity_change",setup.VerifyRetainedSourceContext(ctx,version,c.Identity));must(os.WriteFile(manifestPath,manifestOriginal,0600))
+ sensitive:=filepath.Join(prep.Root,"public.pem");must(os.WriteFile(sensitive,[]byte("owned admission control; not a credential\n"),0600));runGit(prep.Root,"add","--","public.pem")
+ badOpts:=opts;badOpts.Out=filepath.Join(prep.Base,"rejected-sensitive");_,e=setup.CaptureSourceContext(ctx,badOpts);rejected("sensitive_committed_path",e);runGit(prep.Root,"rm","--cached","--","public.pem");must(os.Remove(sensitive))
+ must(os.Remove(path));must(os.Symlink("identity-no-such-target.go",path));badOpts.Out=filepath.Join(prep.Base,"rejected-symlink");_,e=setup.CaptureSourceContext(ctx,badOpts);rejected("nonregular_tracked_source",e);must(os.Remove(path));must(os.WriteFile(path,original,0600))
+ badOpts=opts;badOpts.Out=filepath.Join(prep.Base,"rejected-limit");badOpts.MaxFiles=len(c.Files)-1;_,e=setup.CaptureSourceContext(ctx,badOpts);rejected("explicit_scope_exceeds_file_limit",e)
+ must(c.VerifyAgainstContext(ctx,prep.Root));must(c.VerifyBlobsContext(ctx));must(setup.VerifyRetainedSourceContext(ctx,version,c.Identity))
+ if len(runGit(prep.Root,"status","--porcelain"))!=0 {panic("controls left dirty input")}
+ originalBlocked:="system/eval/b0-knowledge-system/final-package-preview-m2max-2026-10-06/darwin-arm64/signature/public.pem"
+ if !setup.SensitiveCapturePath(originalBlocked) {panic("original guard weakened")}
+ save(filepath.Join(out,"capture-files.json"),c.Files)
+ save(filepath.Join(out,"capture-source-identity.json"),c.Identity)
+ save(filepath.Join(out,"negative-controls.json"),controls)
+ save(filepath.Join(out,"capture-summary.json"),map[string]any{"status":"explicit_derived_source_capture_verified_not_N12_acceptance","runtime_source_revision":prep.Original,"original_source_revision":prep.Original,"derived_source_commit":prep.Commit,"capture_source_identity":c.Identity,"selected_files":len(inventory),"captured_files":len(c.Files),"all_source_sha_matches":true,"approved_build_go_sources_retained":len(prep.Approved),"prebuild_identity_matches":true,"repeated_identity_matches":true,"materialized_files_verified":len(c.Files),"materialized_commit":restoredHEAD,"negative_controls_rejected":len(controls),"recovery_after_controls_verified":true,"original_root_sensitive_guard_still_rejects":originalBlocked,"version_directory":version,"materialized_source_root":materialized,"input_scope_human_approved":false,"knowledge_lock_built":false,"coordinated_dataset_built":false,"semantic_activated":false,"human_approved":0,"new_model_calls":0,"FINAL_queries":0,"N12_complete":false})
+ fmt.Printf("PASS scoped capture: %d files; %d approved Go sources; %d rejected controls; no model calls or acceptance\n",len(c.Files),len(prep.Approved),len(controls))
+}

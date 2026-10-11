@@ -1,10 +1,10 @@
-// Package buildpipe — cache.go implements the A3 file-level incremental
-// cache (spec v0.2 § 4 Phase 1). Cache key composition, manifest diffing
-// (hit/miss/removed classification) and parser-version derivation live here.
+// Package buildpipe — cache.go implements the file-level incremental
+// cache. Cache key composition, manifest diffing (hit/miss/removed
+// classification) and parser-version derivation live here.
 //
-// Phase 1 scope: per-file SHA256 + cache key, skip parse on hit, full Pass 2
-// re-run, full PageRank/Leiden recompute when ANY file is dirty. Phase 2
-// (reverse-reference invalidation, partial Pass 2) is C1's job.
+// Scope: per-file SHA256 + cache key, skip parse on hit, full Pass 2
+// re-run, full PageRank/Leiden recompute when ANY file is dirty.
+// Reverse-reference invalidation and partial Pass 2 live in incremental.go.
 package buildpipe
 
 import (
@@ -21,57 +21,55 @@ import (
 )
 
 // SchemaVersion is the cache-key contributor for the extraction schema. Bumped
-// from "1.1" to "1.2" by A3 (FK ON DELETE CASCADE on edges/blobs/pkg_tree/
-// topic_tree). Bumped from "1.2" to "1.3" by E3 because new node kinds
+// from "1.1" to "1.2" for FK ON DELETE CASCADE on edges/blobs/pkg_tree/
+// topic_tree. Bumped from "1.2" to "1.3" because new node kinds
 // (Endpoint, MessageType) and edge kinds (listens_on, handles_message,
 // rpc_calls) materially change the extraction surface — pre-1.3 DBs are
 // missing those rows, so incremental invalidation must force a cold rebuild
-// on first run with this binary. Bumped from "1.3" to "1.4" by E4 (CKS G6
-// Temporal): NodeCommit + changed_in/blame edges are emitted by the new
+// on first run with this binary. Bumped from "1.3" to "1.4" for temporal
+// edges: NodeCommit + changed_in/blame edges are emitted by the new
 // post-Build temporal pass; pre-1.4 DBs are missing those rows. Bumped from
-// "1.4" to "1.5" by G6 v3 (pending_refs persistence): Pass 1's unresolved
+// "1.4" to "1.5" for pending_refs persistence: Pass 1's unresolved
 // cross-file references are now persisted per-file so the partial-cache
 // rebuild path can reconstruct Pass 2's input without re-parsing cached
 // files. Pre-1.5 DBs are missing the table, so the first 1.5 build is forced
-// cold by ManifestUsable's version check. Bumped from "1.5" to "1.6" by P2
-// (CKS G3 control-flow context propagation): timeout_path /
+// cold by ManifestUsable's version check. Bumped from "1.5" to "1.6" for
+// control-flow context propagation: timeout_path /
 // cancellation_path self-loop edges are emitted from Go context.With* call
 // sites; pre-1.6 DBs are missing those rows so the first 1.6 build must run
-// cold. Bumped from "1.6" to "1.7" by Track C (detector gap fill): the
+// cold. Bumped from "1.6" to "1.7" for detector gap fill: the
 // edges row gains an optional `dispatch_kind` TEXT column populated for
-// `invokes` edges (P1b), plus three new emit sites — `uses_type` (P0),
-// `instantiates` (P1c), and the lock-edge fix inside goroutine bodies
-// (P1a). Pre-1.7 DBs are missing the column AND the new edges; opening
+// `invokes` edges, plus three new emit sites — `uses_type`,
+// `instantiates`, and the lock-edge fix inside goroutine bodies.
+// Pre-1.7 DBs are missing the column AND the new edges; opening
 // such a DB triggers an idempotent ALTER ADD COLUMN via Migrate(), and
 // ManifestUsable's version check forces a cold rebuild on first 1.7 run
 // so the new edges land in their natural emission order.
-// Bumped from "1.7" to "1.8" by Hunk-graph H1 (CKS G6 Temporal extension):
+// Bumped from "1.7" to "1.8" for the hunk graph (temporal extension):
 // new node type NodeHunk + new edges has_hunk / adjacent + gzip-compressed
 // unified-diff blobs persisted under the existing blobs.node_id PK. No
 // schema DDL change (the new rows reuse existing tables); pre-1.8 DBs are
 // missing the rows + the new node/edge type literals so ManifestUsable's
 // version check forces a cold rebuild on first 1.8 run.
-// Bumped from "1.8" to "1.9" by W1 of schema-1.9-spec (cross-language interop
-// expansion): TypeScript HTTP server endpoint detection (Express / Fastify
+// Bumped from "1.8" to "1.9" for cross-language interop expansion:
+// TypeScript HTTP server endpoint detection (Express / Fastify
 // / Hono / Next.js App Router). Reuses the existing NodeEndpoint type +
 // `listens_on` edge — no new enum literals, no new columns. The bump is
 // purely a cache-key contributor so pre-1.9 DBs don't carry forward a
 // missing-Endpoint TS graph view on first 1.9 build. Per §6.1 of the
-// design spec, future W2/W3/W4 stages (HTTP client matching, gRPC,
-// message queue) will stay on 1.9 and append-only.
-// Bumped from "1.9" to "1.10" by within-language semantics Phase 4
-// (2026-05-11): slot reservation for W-B (`NodeAwaitPoint` + `EdgeAwaits`,
-// TS async/await suspension flow) and W-C (`EdgeOverrides`, Solidity
-// virtual/override semantics). detectors land in Phase 5 — this commit
-// is slot-only, so pre-1.10 DBs are byte-identical in their existing
+// design spec, later interop stages (HTTP client matching, gRPC,
+// message queue) stay on 1.9 and append-only.
+// Bumped from "1.9" to "1.10" for within-language semantics slot
+// reservation: `NodeAwaitPoint` + `EdgeAwaits` (TS async/await suspension
+// flow) and `EdgeOverrides` (Solidity virtual/override semantics). The
+// detectors landed separately — this bump is slot-only, so pre-1.10 DBs are byte-identical in their existing
 // rows but the cache key flip forces a cold rebuild on first 1.10 run
 // for symmetry with prior bumps. No new DDL (the new enum literals
 // fit existing nodes.type / edges.type TEXT columns); see
-// docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 4 and
+// docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 and
 // docs/design/{ts-async-await-and-interface,solidity-inheritance-and-interface-dispatch}.md.
 //
-// Bumped from "1.10" to "1.11" by W-C W11 V7 (2026-05-19): the
-// nodes table gains the `attrs` JSON-blob column that carries
+// Bumped from "1.10" to "1.11": the nodes table gains the `attrs` JSON-blob column that carries
 // every types.Node marker without its own SQLite column (SlotIndex,
 // HasAssembly, HasLowLevelCall, HasValueTransfer, YulBuiltins,
 // IsFunctionTyped, HasFunctionTypedVar, HasFunctionPointerCall,
@@ -84,7 +82,7 @@ import (
 // ones touched by dirty files. See internal/persist/node_attrs.go
 // for the JSON encoding.
 //
-// Bumped from "1.13" to "1.14" by P1 #4 (policy metadata): introduces
+// Bumped from "1.13" to "1.14" for policy metadata: introduces
 // NodePolicy + EdgeGovernedBy slots and the buildpipe Options.PolicyFile
 // path that loads them from a YAML and resolves governs[] qnames
 // against the parsed graph. No DDL change — the new enum literals fit
@@ -93,15 +91,14 @@ import (
 // PolicyFile flag don't carry forward a stale "no policy nodes" view
 // when the operator subsequently turns the flag on. Empty PolicyFile
 // is the no-op default; only operators who opt in see new rows. See
-// pkg/policy + docs/PROJECT-BLUEPRINT-ALIGNMENT.md §4.2 P1 #4.
+// pkg/policy.
 //
-// Bumped from "1.14" to "1.15" by P1 #5 (security pattern metadata):
+// Bumped from "1.14" to "1.15" for security pattern metadata:
 // introduces NodeSecurityPattern + EdgeHasSecurityPattern slots and
 // the buildpipe Options.SecurityPatternFile path that loads them
 // from a YAML and resolves matches[] qnames against the parsed
-// graph. Same shape as P1 #4 — no DDL change, additive, cold-only
-// re-ingest. See pkg/security + docs/PROJECT-BLUEPRINT-ALIGNMENT.md
-// §4.2 P1 #5.
+// graph. Same shape as the policy bump — no DDL change, additive,
+// cold-only re-ingest. See pkg/security.
 //
 // Kept here (not in pkg/types) because only the cache key needs it;
 // pkg/types schema version bumps already trigger rebuilds via this constant.
@@ -116,16 +113,16 @@ import (
 // Both repopulate stored rows, so existing graphs are stale until reindexed —
 // bump to force a cold re-extraction on first run with this binary.
 //
-// Bumped from "1.16" to "1.17" (defect C): EmitPromotedMethods materialises a
+// Bumped from "1.16" to "1.17": EmitPromotedMethods materialises a
 // method node (+ defines edge) for each method an in-module struct promotes
 // from an embedded type, so find_symbol("T.M") resolves promoted methods. New
 // rows → existing graphs are stale until reindexed.
 //
-// Bumped from "1.17" to "1.18" (defect E): EmitFieldWriteEdges emits
+// Bumped from "1.17" to "1.18": EmitFieldWriteEdges emits
 // writes_field edges (function -> struct field it assigns) for Go, so an agent
 // can find who mutates a field. New edges → reindex required.
 //
-// Bumped from "1.18" to "1.19" by symbol-identity Phase 1 (ADR-0001): every
+// Bumped from "1.18" to "1.19" by symbol identity (ADR-0001): every
 // parser now populates nodes.canonical_id. Go covers types/structs/interfaces,
 // fields, package-level const/var, and interface methods (previously
 // func/method only); Solidity, TypeScript, and proto use the relative file path
@@ -135,17 +132,17 @@ import (
 // cache-key flip forces a cold rebuild to repopulate canonical_id graph-wide.
 // Additive — qualified_name, node IDs, edges unchanged.
 //
-// Bumped from "1.19" to "1.20" by symbol-identity refinement B1: the blank
+// Bumped from "1.19" to "1.20" by a symbol-identity refinement: the blank
 // identifier `_` (package-level `var _`, struct padding fields) no longer
 // receives a canonical_id (it was a non-unique <pkg>._ before). Stored
 // canonical_id values change for those nodes, so force a cold rebuild.
 //
-// Bumped from "1.20" to "1.21" by refinements B2 + B4 + B3: function-local
+// Bumped from "1.20" to "1.21" by further symbol-identity refinements: function-local
 // `var` declarations no longer receive a canonical_id (only package-level
 // const/var do — the local <pkg>.<name> id collided across functions); proto
 // canonical ids drop the doubled `proto:` prefix (<relpath>:<pkg>.<Sym>); and
 // a canonical_id shared by >1 node in the same file is line-qualified with
-// "@<line>" (B3 — minified-JS `function t(){}`, multiple Go `init`). All change
+// "@<line>" (e.g. minified-JS `function t(){}`, multiple Go `init`). All change
 // stored canonical_id values, so force a cold rebuild.
 //
 // Bumped from "1.21" to "1.22" by the simple_name column: nodes now store the
@@ -163,7 +160,11 @@ import (
 // order. A cold rebuild pins them to the primary package deterministically.
 // (This does not change canonical_id values — test variants share the import
 // path; it removes a latent non-reproducibility in resolution context.)
-const SchemaVersion = "1.23"
+//
+// 1.24 (2026-10-11): review index — nodes.is_test, code_edges and
+// node_commits, recomputed after every build (RebuildReviewIndex). The bump
+// forces a cold rebuild so existing graphs gain the index.
+const SchemaVersion = "1.24"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int
@@ -227,13 +228,13 @@ func SHA256Hex(content []byte) string {
 }
 
 // parserVersionFor returns a deterministic identifier for the parser used on
-// language lang. V0 simplification per spec § 4: Go ties to runtime.Version()
+// language lang. Simplification: Go ties to runtime.Version()
 // (the host toolchain that drives go/packages.Load); TS/Sol tie to the
 // tree-sitter wrapper module pseudo-version read from BuildInfo, falling back
 // to a constant if BuildInfo is unavailable (e.g. in unit tests via `go run`).
 //
-// Perfect introspection (e.g. embedded grammar SHAs) is C1+ scope. The bar
-// for V0 is "any change to the parser binary changes this string".
+// Perfect introspection (e.g. embedded grammar SHAs) is out of scope. The bar
+// is "any change to the parser binary changes this string".
 func parserVersionFor(lang string) string {
 	switch lang {
 	case "go":
@@ -256,7 +257,7 @@ func parserVersionFor(lang string) string {
 // BuildInfo isn't available (test runs without -buildvcs, for instance).
 //
 // Pinned to the exact runtime path github.com/tree-sitter/go-tree-sitter
-// (post-A1+A2 migration). An earlier substring match on "tree-sitter"
+// (after the go-tree-sitter migration). An earlier substring match on "tree-sitter"
 // matched THREE deps (the runtime + tree-sitter-typescript +
 // tree-sitter-javascript grammar bindings) and returned whichever
 // BuildInfo's Deps iteration happened to surface first — non-deterministic
@@ -265,10 +266,10 @@ func parserVersionFor(lang string) string {
 // transitively versioned through the runtime release; bumping either
 // grammar without bumping the runtime is unusual.
 //
-// Cache invalidation across A1+A2: pre-migration manifests recorded
+// Cache invalidation across the migration: pre-migration manifests recorded
 // "tree-sitter/v0.0.0-20240827..." (the smacker pseudo-version);
 // post-migration records "tree-sitter/v0.25.0". The string mismatch
-// fires the slow-path reparse on first build of any pre-A1+A2 graph dir.
+// fires the slow-path reparse on first build of any pre-migration graph dir.
 const tsRuntimePath = "github.com/tree-sitter/go-tree-sitter"
 
 func treeSitterModuleVersion() string {

@@ -1,0 +1,70 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "fixes": [
+  {
+   "finding": "F1",
+   "commit": "d6e31eb2",
+   "change": "ckv reindex resolves --since and the manifest head with git rev-parse --verify --end-of-options <rev>^{commit} and diffs only commit IDs after --end-of-options; freshness diff uses --end-of-options; cks ops.index validates since_commit (ref-name pattern, no leading '-', whitespace or '..') and forwards a single --since=<rev>",
+   "tests": [
+    "internal/vector/build TestReindex_SinceIsNeverAGitOption (RED: --output accepted; GREEN)",
+    "internal/system/mcp TestHandleOpsIndex_SinceCommitIsNeverAnOption (RED; GREEN)",
+    "internal/vector/freshness TestCheckNeverPassesIndexedHeadAsAnOption (RED: victim truncated; GREEN)"
+   ],
+   "end_to_end": "repro-since-injection.sh now fails with 'does not name a commit' and the victim keeps its content (repro-f1-after.txt)"
+  },
+  {
+   "finding": "F2",
+   "commit": "ace4a7e8",
+   "change": "graph REST API (ServeHTTP and ListenAndServe) and viewer handler reject non-loopback Host headers with 403",
+   "tests": [
+    "internal/graph/server TestServerRejectsNonLoopbackHost (RED: 200 for attacker.example; GREEN)",
+    "internal/system/viewer TestHandlerRejectsNonLoopbackHost (RED; GREEN)"
+   ]
+  },
+  {
+   "finding": "F5",
+   "commit": "ace4a7e8",
+   "change": "POST /api/edges and /api/nodes-by-ids bodies capped at 4 MiB with 413",
+   "tests": [
+    "internal/graph/server TestPostBodiesAreBounded (RED: 5 MiB accepted; GREEN)"
+   ]
+  },
+  {
+   "finding": "F3",
+   "commit": "81937e37",
+   "change": "ckv mcp --http binds an empty host to 127.0.0.1 and refuses non-loopback addresses; the HTTP handler rejects non-loopback clients; ops.index accepts only the indexed source root",
+   "tests": [
+    "cmd/vector TestLoopbackListenAddr",
+    "pkg/vector/mcp TestHTTPHandlerRejectsNonLoopbackClients",
+    "pkg/vector/mcp TestHandleIndex_RefusesForeignProjectRoot"
+   ],
+   "behavior_change": "--http 0.0.0.0:port or a LAN address now fails at startup; there is no remote option"
+  },
+  {
+   "finding": "F4",
+   "commit": "343e3873",
+   "change": "semantic_search alias_path must resolve (after symlinks) inside the index directory or the indexed source root; load errors carry no path or content; the ckv query --alias CLI is unchanged",
+   "tests": [
+    "pkg/vector/mcp TestSemanticSearchAliasPathStaysInsideTheIndex (RED: error echoed OPENAI_...; GREEN)"
+   ]
+  },
+  {
+   "finding": "F6",
+   "commit": "fbd09750",
+   "change": "read-write persist.Open builds an escaped absolute file: URI with the same pragmas",
+   "tests": [
+    "internal/graph/persist TestOpenUsesTheExactPath (RED: DB created elsewhere for a '?' path; GREEN)",
+    "TestOpenReadOnlyRejectsWritesAndCreatesNoSidecars now also covers a '?' directory"
+   ]
+  }
+ ],
+ "regression": {
+  "revision": "fbd09750",
+  "go_test_race": "3269 passed, 16 skipped, 0 failed",
+  "go_vet": "pass",
+  "gofmt": "0 files",
+  "python_script_tests": "164 passed"
+ },
+ "not_done": "no new audit pass was run after the fixes; findings outside the six were not searched again"
+}

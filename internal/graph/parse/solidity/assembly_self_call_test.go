@@ -6,32 +6,32 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V23 — Yul self-call marker symmetry audit. V10 marked
+// Yul self-call marker symmetry audit. The Yul delegatecall walker marked
 // `delegatecall(gas(), address(), …)` as HasSelfDelegatecallDead
 // but left the sibling shapes `call(gas(), address(), …)` and
 // `staticcall(gas(), address(), …)` unmarked — a left/right
-// asymmetry inside yul_low_level_calls.go itself. V23 mirrors the
-// V8 Sol convention: a Yul self-call (excluding delegatecall, which
+// asymmetry inside yul_low_level_calls.go itself. The fix mirrors the
+// Sol self-cast convention: a Yul self-call (excluding delegatecall, which
 // keeps its dead-weight marker) sets HasSelfReentrantCall on the
 // enclosing callable.
 //
 // The asymmetry was real and noticeable in practice — a contract
 // using inline assembly to issue a self-`call` had the YulBuiltins
-// list populated and HasAssembly=true, but neither the V8 cast
-// walker (no Sol-level call expression) nor V10 (delegatecall-
+// list populated and HasAssembly=true, but neither the self-cast
+// walker (no Sol-level call expression) nor the Yul delegatecall walker (delegatecall-
 // only) flagged the reentrancy surface.
 //
 // Two fixtures lock the post-fix behaviour:
 //
 //   - AsmSelf.fire         : call(gas(), address(), 0, 0, 0, 0, 0)
-//     → HasSelfReentrantCall=true (V23 fix).
+//     → HasSelfReentrantCall=true.
 //   - AsmSelfDelegate.fire : delegatecall(gas(), address(), 0, 0, 0, 0)
-//     → HasSelfDelegatecallDead=true (V10 unchanged) and
+//     → HasSelfDelegatecallDead=true (unchanged) and
 //     HasSelfReentrantCall stays false because delegatecall has
 //     its dedicated marker rather than the reentrant one.
 //
 // The cross-axis assertion (delegatecall NOT setting
-// HasSelfReentrantCall) keeps the V10 / V23 separation explicit —
+// HasSelfReentrantCall) keeps the delegatecall / self-call separation explicit —
 // a future refactor that merged the two markers would silently
 // change the cks-side signal mix.
 func TestAssembly_SelfCallMarker(t *testing.T) {

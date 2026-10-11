@@ -1,0 +1,93 @@
+{
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "1e82983e45ea35eb63debbea9bf88b6961d595cb5c540db312430cc47d19a341",
+    "snapshot_id": "672eae93464af931deb5b66605ba6d21615e50ced58c5a09cd82befc12f56ae7",
+    "source_mode": "committed",
+    "commit": "36353d32f1c21fc0cb2622807fa9e5d05f2daac7"
+  },
+  "coverage": [
+    {
+      "requirement_id": "req-filtered-recall",
+      "criterion": {
+        "id": "ac-filtered-recall",
+        "given": "A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks",
+        "when": "A filtered query requests K results",
+        "then": "The response contains K eligible chunks in exact distance order",
+        "evidence_id": "criterion:fa5025ed47389d8028366365"
+      },
+      "proposed_review_ids": [
+        "F3-T03"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-filtered-recall",
+      "criterion": {
+        "id": "ac-filtered-completeness",
+        "given": "A larger filtered candidate set contains at least K eligible chunks",
+        "when": "A filtered query reaches a search budget or is cancelled",
+        "then": "The response marks incomplete with a reason and never claims K-result completeness",
+        "evidence_id": "criterion:621cfb24989277d158b47ecf"
+      },
+      "proposed_review_ids": [
+        "F3-T05",
+        "F3-T07"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-source-evidence",
+      "criterion": {
+        "id": "ac-source-evidence",
+        "given": "A relation with a code anchor from another snapshot",
+        "when": "The semantic dataset is promoted",
+        "then": "Promotion fails and the active dataset remains unchanged",
+        "evidence_id": "criterion:fdd4032d8e920ac8a0d7dfee"
+      },
+      "proposed_review_ids": [
+        "F3-T10",
+        "F3-T12"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": true,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-ontology-fallback",
+      "criterion": {
+        "id": "ac-ontology-fallback",
+        "given": "An ambiguous term or an unverified concept relationship",
+        "when": "A user asks a natural-language question",
+        "then": "The baseline CKV and CKG citation set is preserved",
+        "evidence_id": "criterion:cd6e6cf4aeba0c7951d7e1dc"
+      },
+      "proposed_review_ids": [
+        "F3-T15",
+        "F3-T17"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    }
+  ],
+  "reviewer": null,
+  "full_task_complete": false,
+  "scope": "owned regression coverage; actual pilot acceptance remains pending"
+}

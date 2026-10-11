@@ -1,0 +1,26 @@
+# Unapproved standalone scope option. Not part of any held source/projection/lock.
+version: 1
+project_id: knowledge-system
+domain: pilot behavioral trace concepts
+concepts:
+  - id: filtered-nearest-chunk-search
+    kind: rule
+    definition: Metadata-constrained nearest-chunk retrieval that reports bounded-search incompleteness.
+    includes: ["Eligible nearest chunks, exact-sized sparse candidate ordering, cancellation and search budget status"]
+    excludes: ["Versioned policy authority, source capture, semantic truth"]
+    terms: [{lang: en, value: "filtered nearest chunk search", preferred: true}, {lang: ko, value: "조건부 근접 청크 검색", preferred: true}]
+    status: proposed
+  - id: snapshot-bound-semantic-relations
+    kind: rule
+    definition: Validation of semantic relation evidence against one captured source identity and coordinated graph/vector indexes.
+    includes: ["Typed proof references, source snapshot alignment, rejection before storing or switching a candidate"]
+    excludes: ["Full capture lifecycle implementation, human approval of relation meaning, automatic criterion acceptance"]
+    terms: [{lang: en, value: "snapshot bound semantic relations", preferred: true}, {lang: ko, value: "스냅샷에 결합된 의미 관계", preferred: true}]
+    status: proposed
+  - id: optional-ontology-baseline-preservation
+    kind: rule
+    definition: Optional interpretation of concepts that preserves the baseline retrieval citation set for ambiguous or unreviewed meanings.
+    includes: ["Natural-language matching, no unreviewed relation boost, optional fallback"]
+    excludes: ["Whole term storage implementation, whole evidence response construction, live retrieval quality proof"]
+    terms: [{lang: en, value: "optional ontology baseline preservation", preferred: true}, {lang: ko, value: "선택적 온톨로지 기준 후보 보존", preferred: true}]
+    status: proposed

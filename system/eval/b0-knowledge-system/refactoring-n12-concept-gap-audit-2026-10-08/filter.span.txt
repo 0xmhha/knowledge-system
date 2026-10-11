@@ -1,0 +1,20 @@
+type Filter struct {
+	Language    string       `json:"language,omitempty"`
+	PathGlob    string       `json:"path,omitempty"`
+	SymbolKinds []SymbolKind `json:"symbol_kinds,omitempty"`
+	CommitHash  string       `json:"commit_hash,omitempty"`
+	// ChunkKinds, when non-empty, restricts to chunks produced by these
+	// chunking strategies (e.g. "invariant", "convention", "doc"). Lets a
+	// caller retrieve knowledge chunks directly instead of hoping they
+	// outrank 14k code chunks in a generic query.
+	ChunkKinds []ChunkKind `json:"chunk_kinds,omitempty"`
+	// ExcludeTests drops test files and test-only support code.
+	//
+	// It belongs on the filter rather than being applied to the result,
+	// because the store over-fetches whenever a filter is set. Dropping test
+	// hits from an already-truncated k rows returns fewer than k, and for a
+	// query whose nearest neighbours are all tests it returns none — the
+	// caller reads "no such code" from what is really "your k was spent on
+	// rows I then threw away".
+	ExcludeTests bool `json:"exclude_tests,omitempty"`
+}

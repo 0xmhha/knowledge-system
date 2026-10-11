@@ -26,13 +26,13 @@ func TestMCPServerConstructs(t *testing.T) {
 	defer func() { _ = store.Close() }()
 	// We can't easily invoke stdio in a unit test; this just verifies
 	// registration doesn't panic.
-	_ = mcppkg.Run // referenced for compilation; full registration smoke in T29
+	_ = mcppkg.Run // referenced for compilation; full registration smoke lives elsewhere
 }
 
 // TestRunWiresMCPHandlersRegisterAll is a static guard against
-// regressing the post-T-14b architecture: Run() must hand off to
+// regressing the current architecture: Run() must hand off to
 // pkg/mcphandlers.RegisterAll, which is the single source of truth
-// for the eight-tool wiring and the §11.3 H3 safety wrapper. The
+// for the eight-tool wiring and the §11.3 retrieval safety wrapper. The
 // per-tool registration coverage lives in
 // pkg/mcphandlers/example_test.go::TestRegisterAll_LocksEightTools;
 // that test confirms each tool name shows up after RegisterAll, so

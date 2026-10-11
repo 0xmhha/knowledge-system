@@ -63,6 +63,21 @@ class InputAuditTests(unittest.TestCase):
         self.assertFalse(result["execution_ready"])
         self.assertFalse(result["product_release_approved"])
 
+    def test_declared_out_of_scope_group_is_reviewed_and_never_sufficient(self):
+        p, b = fixture()
+        b["questions"] = [q for q in b["questions"] if q["group"] != "ABS"]
+        missing = run(p, b)
+        self.assertIn("FINAL_group_missing:ABS", missing["pending_reasons"])
+        p["final_groups_out_of_scope"] = {"ABS": "judged by a separately frozen FINAL"}
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["sampling_verdict"], "inconclusive")
+        _, full = fixture()
+        self.assertIn("FINAL_group_declared_out_of_scope:ABS", run(p, full)["pending_reasons"])
+        for bad in ({"OTHER": "x"}, {"ABS": " "}, ["ABS"], {g: "x" for g in GATE.GROUPS}):
+            p["final_groups_out_of_scope"] = bad
+            self.assertIn("invalid_final_groups_out_of_scope", run(p, b)["pending_reasons"])
+
     def test_repeats_translations_do_not_raise_nine_units_to_ten(self):
         p, b = fixture(9)
         for q in list(b["questions"]):
@@ -157,12 +172,106 @@ class InputAuditTests(unittest.TestCase):
                 q["evidence"][0].update(first=1, last=1, file_sha256=GATE.sha(source), content_sha256=GATE.sha(b"first\rinside\r\n"))
         self.assertTrue(run(p, b, source=source)["input_ready"])
 
+    def test_declared_abstention_basis_is_source_bound_without_positive_citations(self):
+        p, b = fixture()
+        q = next(q for q in b["questions"] if q["group"] == "ABS")
+        q["abstention_basis_sources"] = copy.deepcopy(b["questions"][0]["evidence"])
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["final_independent_clusters_by_group"]["ABS"], 10)
+        self.assertEqual(q["evidence"], [])
+        self.assertTrue(q["strict_zero_citations"])
+
+    def test_cited_unassigned_record_abstention_needs_protocol_rule_and_bound_basis(self):
+        # Allowed only when the protocol declares the scoring rule and the item
+        # binds the recorded "unassigned" basis it may cite while abstaining.
+        p, b = fixture()
+        q = next(q for q in b["questions"] if q["group"] == "ABS")
+        q.update(strict_zero_citations=False, abstention_citation_rule="cite the unassigned record only",
+                 abstention_basis_sources=copy.deepcopy(b["questions"][0]["evidence"]))
+        p["abstention_scoring"] = {"rule": "abstain; citing the recorded unassigned fact is allowed"}
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        for mode in ("no-protocol-rule", "no-item-rule", "no-basis-sources"):
+            with self.subTest(mode=mode):
+                p2, b2 = copy.deepcopy(p), copy.deepcopy(b)
+                q2 = next(q for q in b2["questions"] if q["group"] == "ABS")
+                if mode == "no-protocol-rule": del p2["abstention_scoring"]
+                if mode == "no-item-rule": del q2["abstention_citation_rule"]
+                if mode == "no-basis-sources": del q2["abstention_basis_sources"]
+                self.assertIn("abstention_scope_missing:" + q2["id"], run(p2, b2)["pending_reasons"])
+
+    def test_changed_or_malformed_declared_abstention_basis_is_rejected(self):
+        for mode in ("file-sha", "span-sha", "range", "bool-line", "missing-path",
+                     "unsafe-path", "empty", "null", "object", "string"):
+            with self.subTest(mode=mode):
+                p, b = fixture()
+                q = next(q for q in b["questions"] if q["group"] == "ABS")
+                refs = copy.deepcopy(b["questions"][0]["evidence"])
+                if mode == "file-sha": refs[0]["file_sha256"] = "b" * 64
+                if mode == "span-sha": refs[0]["content_sha256"] = "b" * 64
+                if mode == "range": refs[0]["last"] = 2
+                if mode == "bool-line": refs[0]["first"] = True
+                if mode == "missing-path": refs[0]["path"] = "missing.go"
+                if mode == "unsafe-path": refs[0]["path"] = "../example.go"
+                if mode == "empty": refs = []
+                if mode == "null": refs = None
+                if mode == "object": refs = {"path": "example.go"}
+                if mode == "string": refs = "example.go"
+                q["abstention_basis_sources"] = refs
+                result = run(p, b)
+                self.assertFalse(result["input_ready"], result)
+                self.assertEqual(result["final_independent_clusters_by_group"]["ABS"], 9)
+                self.assertIn("invalid_abstention_basis_source:" + q["id"], result["pending_reasons"])
+
     def test_ambiguous_json_keys_and_bool_coordinate_rejected(self):
         with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
             GATE.decode(b'{"status":"approved","status":"draft"}')
         p, b = fixture()
         b["questions"][0]["evidence"][0]["first"] = True
         self.assertFalse(run(p, b)["input_ready"])
+
+    def excluded_fixture(self):
+        p, b = fixture()
+        excluded = b["questions"].pop(1)
+        b["excluded_candidate_questions"] = [dict(excluded,
+            proposed_cluster_id=excluded["cluster_id"], proposed_unit_id=excluded["unit_id"],
+            exclusion_reason="synthetic prior FINAL exposure")]
+        b["excluded_proposed_clusters"] = [excluded["cluster_id"]]
+        return p, b, excluded
+
+    def test_excluded_catalog_does_not_block_unrelated_fresh_units(self):
+        p, b, _ = self.excluded_fixture()
+        result = run(p, b)
+        self.assertTrue(result["input_ready"], result)
+        self.assertEqual(result["sampling_verdict"], "inconclusive")
+
+    def test_excluded_candidate_or_cluster_cannot_be_reintroduced(self):
+        for mode in ("original", "renamed-id", "renamed-cluster", "proposed-cluster", "proposed-unit"):
+            with self.subTest(mode=mode):
+                p, b, q = self.excluded_fixture()
+                if mode != "original":
+                    q["id"] = "renamed-exposed-question"
+                if mode == "renamed-cluster":
+                    q["cluster_id"] = "renamed-exposed-cluster"
+                if mode in ("proposed-cluster", "proposed-unit"):
+                    q["proposed_cluster_id" if mode == "proposed-cluster" else "proposed_unit_id"] = q["cluster_id" if mode == "proposed-cluster" else "unit_id"]
+                    q.update(cluster_id="renamed-exposed-cluster", unit_id="renamed-exposed-unit")
+                b["questions"].append(q)
+                result = run(p, b)
+                self.assertIn("excluded_final_candidate_reused:" + q["id"], result["pending_reasons"])
+                self.assertFalse(result["input_ready"])
+
+    def test_inconsistent_or_malformed_exclusion_catalog_rejected(self):
+        for mode in ("missing-cluster", "duplicate-cluster", "duplicate-id", "missing-reason", "wrong-type"):
+            with self.subTest(mode=mode):
+                p, b, _ = self.excluded_fixture()
+                if mode == "missing-cluster": b["excluded_proposed_clusters"] = []
+                if mode == "duplicate-cluster": b["excluded_proposed_clusters"] *= 2
+                if mode == "duplicate-id": b["excluded_candidate_questions"] *= 2
+                if mode == "missing-reason": b["excluded_candidate_questions"][0].pop("exclusion_reason")
+                if mode == "wrong-type": b["excluded_proposed_clusters"] = "not-a-catalog"
+                self.assertFalse(run(p, b)["input_ready"])
 
 
 if __name__ == "__main__":

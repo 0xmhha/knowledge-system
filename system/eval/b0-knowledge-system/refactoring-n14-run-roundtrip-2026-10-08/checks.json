@@ -1,0 +1,25 @@
+{
+  "commands": {
+    "race": "go test -race -json -count=1 ./internal/system/patch ./internal/system/semantic ./cmd/cks/patchcli",
+    "focused": "go test -json -count=1 ./internal/system/patch -run ^TestExactRunnerReportRoundTripDoesNotApproveOrPromote$",
+    "vet": "go vet ./internal/system/patch ./internal/system/semantic ./cmd/cks/patchcli",
+    "boundaries": "./scripts/check-boundaries.sh",
+    "format": "gofmt -l internal/system/patch/review_roundtrip_test.go",
+    "parser": "go run ./.n14-roundtrip-driver"
+  },
+  "race_exit": 0,
+  "focused_exit": 0,
+  "vet_exit": 0,
+  "boundary_output": "engine boundaries: OK",
+  "format_unformatted_files": [],
+  "go_version": "go1.26.8",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "linux_run": false,
+  "production_code_changed": false,
+  "full_suite_rerun": false,
+  "actual_pilot_execution": false,
+  "actual_human_decisions": 0,
+  "new_FINAL_runs": 0,
+  "model_HTTP_calls": 0
+}

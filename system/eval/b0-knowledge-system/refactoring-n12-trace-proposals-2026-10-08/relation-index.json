@@ -1,0 +1,113 @@
+{
+  "status": "draft",
+  "relation_book_sha256": "d123ddd0e6127fb2529a6677e596a08ffe2166ccc2247d91ac440b93240f0607",
+  "reviewer": null,
+  "reviewed_at": null,
+  "human_active_review_ns": null,
+  "items": {
+    "P12-T01": {
+      "assertion_id": "trace-proposal:impl:req-filtered-recall",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "vector-chunk",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T02": {
+      "assertion_id": "trace-proposal:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "predicate": "TESTED_BY",
+      "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T03": {
+      "assertion_id": "trace-proposal:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "predicate": "CHECKED_BY",
+      "subject_id": "ac-filtered-recall",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T04": {
+      "assertion_id": "trace-proposal:test:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "predicate": "TESTED_BY",
+      "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T05": {
+      "assertion_id": "trace-proposal:criterion:ac-filtered-completeness:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "predicate": "CHECKED_BY",
+      "subject_id": "ac-filtered-completeness",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T06": {
+      "assertion_id": "trace-proposal:test:TestSearchDetailedCancellationIsNotEmptySuccess",
+      "predicate": "TESTED_BY",
+      "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T07": {
+      "assertion_id": "trace-proposal:criterion:ac-filtered-completeness:TestSearchDetailedCancellationIsNotEmptySuccess",
+      "predicate": "CHECKED_BY",
+      "subject_id": "ac-filtered-completeness",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T08": {
+      "assertion_id": "trace-proposal:impl:req-source-evidence",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "evidence-span",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T09": {
+      "assertion_id": "trace-proposal:test:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "predicate": "TESTED_BY",
+      "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T10": {
+      "assertion_id": "trace-proposal:criterion:ac-source-evidence:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "predicate": "CHECKED_BY",
+      "subject_id": "ac-source-evidence",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T11": {
+      "assertion_id": "trace-proposal:impl:req-ontology-fallback",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "concept",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T12": {
+      "assertion_id": "trace-proposal:test:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "predicate": "TESTED_BY",
+      "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "decision": null,
+      "reason": null
+    },
+    "P12-T13": {
+      "assertion_id": "trace-proposal:criterion:ac-ontology-fallback:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "predicate": "CHECKED_BY",
+      "subject_id": "ac-ontology-fallback",
+      "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+      "decision": null,
+      "reason": null
+    }
+  }
+}

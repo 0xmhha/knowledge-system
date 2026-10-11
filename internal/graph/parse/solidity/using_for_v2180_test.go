@@ -5,12 +5,11 @@ import (
 	"testing"
 )
 
-// W-C W6 V2.18 — file-level using directive ERROR-tolerant walker
-// (V2.16 row 1 closure).
+// File-level using directive ERROR-tolerant walker.
 //
 // Sol 0.8.13+ `using LibName for T [global];` at source_file scope
 // is grammar-blocked in vendored tree-sitter-solidity v1.2.11. The
-// V2.18 probe (2026-05-17) showed the directive parses into a
+// AST probe showed the directive parses into a
 // single ERROR child of source_file with recoverable identifiers:
 //
 //   source_file
@@ -20,21 +19,21 @@ import (
 //       type_name (primitive_type "uint256")                 ← bound type
 //       [identifier "global"]                                ← optional
 //
-// V2.18 deliverable: runFileLevelUsingFor walker pattern-matches
+// The runFileLevelUsingFor walker pattern-matches
 // this ERROR shape and emits the same PendingRef pair that
 // runUsingFor uses for contract-body using directives. Binding fans
 // out per-contract-in-file so Sol's file-level semantics ("applies
 // to all contracts in this source") are preserved end-to-end through
 // dispatch resolution.
 //
-// V2.16 row 1 status flip: A (grammar-block) → A-recovered.
-// V2.5 (file-level operator-form) stays at 0 — V2.17 analysis showed
-// no recoverable shape for `as +` variant at any scope.
+// Status flip for file-level using: A (grammar-block) → A-recovered.
+// File-level operator-form is handled by a separate text-shape walker
+// (file_level_operator_form.go).
 
 // TestUsingForV2180_FileLevelUsingGlobal — `using SafeMath for
 // uint256 global;` at source_file scope produces 1 EdgeUsesFor
 // (Vault → SafeMath) and dispatch wires through (`x.add(1)` →
-// SafeMath.add). Locks V2.16 row 1 closure for the single-contract
+// SafeMath.add). Locks file-level recovery for the single-contract
 // case.
 func TestUsingForV2180_FileLevelUsingGlobal(t *testing.T) {
 	nodes, edges := parseResolveOneSol(t, "testdata/using_for_v2180", "file_level_using_global.sol")

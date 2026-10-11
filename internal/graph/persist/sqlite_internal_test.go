@@ -2,8 +2,8 @@ package persist
 
 import "testing"
 
-// TestRewriteFTSQuery_TrailingPunctuation locks B1 fix (2026-05-11 stablenet
-// VERIFICATION_REPORT §3.1): natural-language task descriptions ending in
+// TestRewriteFTSQuery_TrailingPunctuation locks the trailing-punctuation
+// fix: natural-language task descriptions ending in
 // `.` or other punctuation would propagate the punctuation into the
 // generated FTS5 prefix expression (`validated.*`), which FTS5 rejects
 // with `syntax error near "."`. trimFTSToken now strips trailing/leading
@@ -108,7 +108,7 @@ func TestRewriteFTSQuery_PowerUserGateNarrowed(t *testing.T) {
 // now splits on `.` in addition to whitespace, so each segment
 // becomes its own prefix-matched token.
 //
-// Symptom that motivated this: δ baseline ran with no smartContext
+// Symptom that motivated this: a baseline run got no smartContext
 // context for a full smoke run because store.Search bubbled the
 // FTS error up to BuildContext, which the runner silently swallowed.
 func TestRewriteFTSQuery_DottedIdentifierSplit(t *testing.T) {
@@ -151,8 +151,8 @@ func TestRewriteFTSQuery_DottedIdentifierSplit(t *testing.T) {
 	}
 }
 
-// TestRewriteFTSQuery_PowerUserGate locks B3 fix (2026-05-11
-// VERIFICATION_REPORT §7.3): the earlier power-user passthrough triggered
+// TestRewriteFTSQuery_PowerUserGate locks the power-user gate fix: the
+// earlier power-user passthrough triggered
 // on any of `*"():` chars, which mis-classified natural-language
 // descriptions containing parentheses ("Where does (X) get called:") and
 // fed the raw `(` straight to FTS5. Power-user passthrough now requires
@@ -163,7 +163,7 @@ func TestRewriteFTSQuery_PowerUserGate(t *testing.T) {
 		in   string
 		want string
 	}{
-		// B3 reproduction: parenthesis in prose no longer triggers passthrough.
+		// Reproduction: parenthesis in prose no longer triggers passthrough.
 		// `get` (3 chars) keeps without `*` per rewriteFTSQuery's length tier.
 		{
 			"prose with parentheses",

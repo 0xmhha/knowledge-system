@@ -20,7 +20,7 @@
 // Intent influences only the FindSymbol filter (which SymbolKinds to
 // consider), per the design decision documented in stage1: the lexical
 // extraction in Stage 1 is universal, the precise filter in Stage 2 is
-// intent-shaped, and the relation-graph expansion in Stage 3 (B.5) is
+// intent-shaped, and the relation-graph expansion in Stage 3 is
 // also intent-shaped.
 package stage2
 
@@ -39,7 +39,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// Default tuning. Phase E will revisit with real-prompt data.
+// Default tuning; to be revisited with real-prompt data.
 const (
 	DefaultBM25K        = 10
 	DefaultMaxCitations = 30
@@ -78,7 +78,7 @@ type Config struct {
 	// BM25K is the per-keyword K passed to ckg.BM25Search.
 	BM25K int
 	// MaxCitations caps the final ScoredCitation slice length. The
-	// downstream graph expander (B.5) sees at most this many seeds.
+	// downstream graph expander (Stage 3) sees at most this many seeds.
 	MaxCitations int
 	// RRFK is the k constant in the RRF formula 1/(k+rank). Default 60
 	// (Cormack et al., 2009). Lower values bias toward the head of each
@@ -93,7 +93,7 @@ type Config struct {
 	CkvWeight float64
 }
 
-// DefaultConfig returns the Phase-0 tuning baseline.
+// DefaultConfig returns the baseline tuning.
 func DefaultConfig() Config {
 	return Config{
 		BM25K:        DefaultBM25K,
@@ -108,7 +108,7 @@ func DefaultConfig() Config {
 // Stage2Output captures the result of one Search call.
 //
 // Citations vs Hits: Citations is the canonical, deduped, score-ranked
-// output that downstream stages (B.5 graph expander, evaluation) consume.
+// output that downstream stages (Stage 3 graph expander, evaluation) consume.
 // Hits is a raw audit trail — it preserves every BM25 result returned by
 // ckg, including duplicates when the same citation hits via multiple
 // keywords. Precision/recall computation should use Citations; Hits

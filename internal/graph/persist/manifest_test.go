@@ -73,7 +73,7 @@ func TestManifestRoundTrip(t *testing.T) {
 }
 
 // TestManifestRoundTrip_FilesV2 verifies that the schema-1.2 Files block
-// (A3 incremental cache) survives Set/Get unchanged. Locks the FileEntry
+// (incremental cache) survives Set/Get unchanged. Locks the FileEntry
 // JSON shape so a future refactor can't silently drop a field.
 func TestManifestRoundTrip_FilesV2(t *testing.T) {
 	store, err := persist.Open(filepath.Join(t.TempDir(), "graph.db"))
@@ -182,6 +182,6 @@ func TestManifestRoundTrip_FilesAbsent_LegacyCompat(t *testing.T) {
 
 // persistSchemaVersionForTest mirrors the buildpipe.SchemaVersion constant
 // without importing the package (avoids import cycle in persist tests).
-// Update when the constant moves. Current value tracks W-C W11 V8
-// (2026-05-19): 1.11 for the nodes.attrs JSON-blob column.
+// Update when the constant moves. Current value: 1.11 for the
+// nodes.attrs JSON-blob column.
 func persistSchemaVersionForTest() string { return "1.11" }

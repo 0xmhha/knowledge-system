@@ -6,6 +6,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -34,6 +35,9 @@ func (r *rerankFake) EvidenceForIntent(_ context.Context, _ string, _ ckgclient.
 }
 func (r *rerankFake) GetNodePRs(_ context.Context, _ string, _ ckgclient.PRRefOpts) ([]contract.PRRef, error) {
 	return nil, nil
+}
+func (r *rerankFake) ReviewFunction(_ context.Context, _ string, _ ckgclient.ReviewOpts) (store.Review, error) {
+	return store.Review{}, nil
 }
 func (r *rerankFake) GetSubgraph(_ context.Context, _ string, _ ckgclient.SubgraphOpts) ([]contract.Citation, []contract.Neighbor, error) {
 	return nil, nil, nil

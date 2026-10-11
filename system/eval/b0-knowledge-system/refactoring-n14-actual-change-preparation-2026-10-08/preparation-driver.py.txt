@@ -1,0 +1,46 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime,shutil
+out=Path('system/eval/b0-knowledge-system/refactoring-n14-actual-change-preparation-2026-10-08');out.mkdir(exist_ok=True)
+sha=lambda b:hashlib.sha256(b).hexdigest();git=lambda *args:subprocess.check_output(['git',*args]);source=git('rev-parse','HEAD').decode().strip();base='1ded9b3e47bc2e09062dba329c2f918423746fa4';merged='eeeab2e7116a9f85d25965598eb033624439e418'
+refs=[]
+def add(ident,path,first,last,kind):
+ data=git('show',source+':'+path);assert data==git('show',merged+':'+path)==Path(path).read_bytes(),path
+ lines=data.splitlines(keepends=True);assert 1<=first<=last<=len(lines)
+ span=b''.join(lines[first-1:last]);(out/(ident+'.span.txt')).write_bytes(span)
+ refs.append(dict(id=ident,kind=kind,path=path,first=first,last=last,source_commit=source,merged_commit=merged,file_sha256=sha(data),span_sha256=sha(span),review_state='proposed',ckg_canonical_id=None))
+def function(ident,path,name,kind):
+ lines=git('show',source+':'+path).decode().splitlines();start=next(i for i,x in enumerate(lines) if x.startswith('func ') and ((' '+name+'(') in x))
+ end=next((i for i in range(start+1,len(lines)) if lines[i].startswith('func ')),len(lines))
+ while end>start and (not lines[end-1].strip() or lines[end-1].startswith('//')):end-=1
+ add(ident,path,start+1,end,kind)
+adr_lines=Path('docs/spec-driven/SOURCE-SNAPSHOT-ADR.md').read_text().splitlines();adr_line=next(i+1 for i,line in enumerate(adr_lines) if line.startswith('6. 그래프·벡터·의미 매니페스트'))
+add('ADR-source-alignment','docs/spec-driven/SOURCE-SNAPSHOT-ADR.md',adr_line,adr_line,'adopted-design-source')
+# The exact current ADR statement must say all coordinated IDs are checked before pointer switching.
+assert '모든 ID' in (out/'ADR-source-alignment.span.txt').read_text()
+path='docs/spec-driven/spec-pilot.yaml';lines=Path(path).read_text().splitlines();first=next(i for i,x in enumerate(lines) if '- id: req-source-evidence' in x);last=next(i for i in range(first+1,len(lines)) if lines[i].startswith('  - id:'))
+add('req-source-evidence',path,first+1,last,'proposed-requirement-and-criterion')
+function('alignment-code','internal/system/semantic/alignment.go','ValidateDatasetAlignment','implementation-candidate')
+function('alignment-test','internal/system/semantic/alignment_test.go','TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty','test-candidate')
+function('source-test','internal/system/semantic/validate_test.go','TestProjectionRejectsCrossSnapshotOrMissingEvidence','test-candidate')
+function('exact-run-gate','internal/system/patch/review.go','validateRun','promotion-gate-implementation')
+function('human-decision','internal/system/patch/review.go','Decide','human-decision-implementation')
+function('promotion-gate','internal/system/patch/review.go','Promote','promotion-gate-implementation')
+function('test-command-only','internal/system/patch/patch_test.go','TestCriterionPromotionRejectsCommandOnlySuccess','gate-control-test')
+function('test-active-base','internal/system/patch/patch_test.go','TestReviewedPromotionRechecksActiveBaseAtSwap','gate-control-test')
+function('test-patch-digest','internal/system/patch/patch_test.go','TestPatchRegisterPinsChangedFilesAndRefusesReusedID','gate-control-test')
+paths=sorted({r['path'] for r in refs});patch=git('diff','--no-ext-diff',base,merged,'--',*paths);(out/'actual-merged-change.diff').write_bytes(patch)
+changed=[]
+for path in paths:
+ def blob(rev):
+  r=subprocess.run(['git','show',rev+':'+path],capture_output=True)
+  return sha(r.stdout) if r.returncode==0 else None
+ before,after=blob(base),blob(merged)
+ if before!=after:changed.append({'path':path,'before_sha256':before,'after_sha256':after})
+rows=[json.loads(x) for x in Path('/private/tmp/ks-n14-actual-run.stdout.jsonl').read_text().splitlines()]
+names={'TestProjectionRejectsCrossSnapshotOrMissingEvidence','TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty','TestCriterionPromotionRejectsCommandOnlySuccess','TestReviewedPromotionRechecksActiveBaseAtSwap','TestPatchRegisterPinsChangedFilesAndRefusesReusedID'}
+observed={r['Test'] for r in rows if r.get('Test') in names and r['Action']=='run'};passed={r['Test'] for r in rows if r.get('Test') in names and r['Action']=='pass'};assert observed==passed==names and not any(r['Action']=='fail' for r in rows)
+assert len({r['Package'] for r in rows if r['Action']=='pass' and 'Test' not in r})==2
+for name,tmp in [('test-run.jsonl','ks-n14-actual-run.stdout.jsonl'),('test-run.stderr.txt','ks-n14-actual-run.stderr.txt')]:shutil.copy2(Path('/private/tmp')/tmp,out/name)
+if Path('/private/tmp/ks-pr97-squash-merge.json').exists():shutil.copy2('/private/tmp/ks-pr97-squash-merge.json',out/'pr97-merge.json')
+packet={'schema_version':1,'status':'actual_change_source_and_test_preparation_no_human_acceptance','recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_revision':source,'runtime_source_equals_merged_main':True,'merged_main_revision':merged,'base_revision':base,'pr_url':'https://github.com/0xmhha/knowledge-system/pull/97','actual_git_diff_sha256':sha(patch),'changed_source_files':changed,'evidence':refs,'requirement_id':'req-source-evidence','criterion_id':'ac-source-evidence','relation_candidates':[{'from':'ADR-source-alignment','to':'req-source-evidence','relation':'design_to_requirement','state':'proposed'},{'from':'ac-source-evidence','to':'alignment-code','relation':'criterion_to_implementation','state':'proposed'},{'from':'ac-source-evidence','to':'alignment-test','relation':'criterion_to_test','state':'proposed'},{'from':'ac-source-evidence','to':'source-test','relation':'criterion_to_test','state':'proposed'}],'raw_exact_tests_observed':sorted(observed),'raw_exact_tests_passed':sorted(passed),'raw_test_output_sha256':sha((out/'test-run.jsonl').read_bytes()),'semantic_linked_test_report_created':False,'ckg_canonical_alignment_verified':False,'patch_registry_attempt_created':False,'human_decision':None,'real_human_activity_minutes':None,'dataset_reindexed_for_this_acceptance':False,'candidate_promoted':False,'new_FINAL_calls':0,'full_N14_complete':False,'release_approved':False,'limits':['merged actual code diff with current observed exact Go tests; fixtures in those tests remain owned controls','proposed source links only, no actual reviewed CKG canonical trace or criterion decision','PR merge authorization is not a human criterion acceptance decision','prior fixture patch smoke is not actual pilot acceptance']}
+(out/'review-packet.json').write_text(json.dumps(packet,ensure_ascii=False,indent=2)+'\n');print('N14 actual patch sources',len(refs),'refs',len(changed),'changed files; exact5 observed/pass, accepted0; source',source)

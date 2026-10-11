@@ -24,7 +24,7 @@ import (
 // rewrite Sol golden by accident.
 var updateGolden = flag.Bool("update", false, "rewrite golden file from live parser output")
 
-// TestGolden_TypeScript locks in the post-A1 (smacker → tree-sitter) shape
+// TestGolden_TypeScript locks in the post-migration (smacker → tree-sitter) shape
 // of the TS parser. Walks testdata/synthetic/ts-frontend/src, parses every
 // .ts/.tsx/.js file, runs Resolve, marshals the union to a deterministic
 // JSON form, and diffs against testdata/ts_frontend_golden.json.

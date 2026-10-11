@@ -7,10 +7,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TS W-B W1 — heritage detection (extends / implements).
+// TS heritage detection (extends / implements).
 //
-// Spec: docs/design/ts-async-await-and-interface.md §3.1, §4.1.
-// Dispatch index: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 5 W-B W1.
+// Spec: docs/graph/design/ts-async-await-and-interface.md §3.1, §4.1.
+// Dispatch index: docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2.
 //
 // Scope: three tree-sitter shapes (verified 2026-05-11 against
 // tree-sitter-typescript v0.23.2):
@@ -275,7 +275,7 @@ func trailingName(n *sitter.Node, src []byte) string {
 	return ""
 }
 
-// dispatchKindHeritage tags PendingRefs produced by W-B W1 so the
+// dispatchKindHeritage tags PendingRefs produced by heritage detection so the
 // Pass 2 resolver can route them through the heritage-specific path
 // (cross-file → ConfInferred, unresolved → drop). String literal
 // matches the existing convention (golang/grpc.go "rpc"/"grpc",

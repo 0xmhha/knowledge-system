@@ -6,17 +6,17 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W8 V2 — function-typed state variable marker.
+// Function-typed state variable marker.
 //
-// V0 detects shape: state_variable_declaration.type_name has a
+// Detection is by shape: state_variable_declaration.type_name has a
 // `parameter` or `return_parameter` child (the function-type
 // signature components) instead of the usual primitive / user-
 // defined / mapping shape. Sets NodeField.IsFunctionTyped = true.
 //
-// V0 limitations: call-site resolution `handler(args)` against
+// Limitations: call-site resolution `handler(args)` against
 // function-typed state vars is not modelled (no function-type
 // tracking in lookupReceiverType yet). Adding such tracking is
-// the natural V3+ extension once a consumer needs it.
+// the natural extension once a consumer needs it.
 
 func TestFunctionTypedVar_Marker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "registry.sol")

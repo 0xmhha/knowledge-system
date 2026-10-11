@@ -1,0 +1,362 @@
+// N14 result candidate: the same reviewed N12 judgments re-bound to the changed snapshot.
+// No reviewed evidence span lies in a changed file (checked before running).
+// Reviewed N12 projection (reviewer label designated by the user for an AI
+// model review). Requires the actual retained CKG/CKV candidate.
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/semantic"
+	graphstore "github.com/0xmhha/knowledge-system/pkg/graph/store"
+	graphtypes "github.com/0xmhha/knowledge-system/pkg/graph/types"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+// Reviewer is the label the user designated; reviewer_kind is recorded in every report.
+const Reviewer = "opus5.5 검토"
+
+func must(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+func require(ok bool, msg string) {
+	if !ok {
+		panic(msg)
+	}
+}
+func digest(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }
+func save(path string, x any) {
+	b, e := json.MarshalIndent(x, "", "  ")
+	must(e)
+	must(os.WriteFile(path, append(b, '\n'), 0600))
+}
+func clone(p semantic.Projection) semantic.Projection {
+	b, e := json.Marshal(p)
+	must(e)
+	var x semantic.Projection
+	must(json.Unmarshal(b, &x))
+	return x
+}
+func main() {
+	out, e := filepath.Abs(os.Args[1])
+	must(e)
+	var prep struct {
+		Base    string `json:"base"`
+		Source  string `json:"source"`
+		Dataset string `json:"dataset_root"`
+	}
+	b, e := os.ReadFile(filepath.Join(out, "preparation.json"))
+	must(e)
+	must(json.Unmarshal(b, &prep))
+	version := filepath.Join(prep.Dataset, "result")
+	storePath := filepath.Join(prep.Base, "semantic-result.sqlite")
+	replay := len(os.Args) == 5
+	if replay {
+		version, storePath = os.Args[2], os.Args[3]
+		prep.Source = os.Args[4]
+	} else {
+		require(strings.HasPrefix(prep.Base, "/private/tmp/ks-n14-accept-"), "not owned base")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	identity, e := setup.InspectVersionIdentity(version)
+	must(e)
+	require(identity != nil, "missing actual engine identity")
+	must(setup.VerifyCandidateIdentity(version, identity.Source, identity.InputDigest))
+	must(setup.VerifyRetainedSource(version, identity.Source))
+	snap := semantic.Snapshot{ProjectID: identity.Source.ProjectID, DatasetID: identity.DatasetID, SnapshotID: identity.Source.SnapshotID, SourceMode: identity.Source.SourceMode, Commit: identity.Source.SourceCommit}
+	p := extractCurrent(ctx, version, out, snap)
+	require(len(p.Concepts) == 23 && len(p.Requirements) == 3 && len(p.Assertions) == 12 && len(p.Claims) == 6, "wrong reviewed scope")
+	core, _, e := semantic.ExtractOntology(snap, "docs/spec-driven/ontology-pilot-v2.yaml", readRetained(version, "docs/spec-driven/ontology-pilot-v2.yaml"))
+	must(e)
+	must(semantic.ValidateCoreOntology(core))
+	for _, c := range p.Concepts {
+		require(c.Status == semantic.StatusVerified && c.ReviewedBy == Reviewer, "concept not reviewed: "+c.ID)
+	}
+	for _, r := range p.Requirements {
+		require(r.Version == 3 && len(r.ConceptIDs) == 1 && r.Status == semantic.StatusVerified && r.ReviewedBy == Reviewer, "requirement not reviewed v3: "+r.ID)
+	}
+	graphDir, vectorDir := filepath.Join(version, "graph"), filepath.Join(version, "vector")
+	graph, e := graphstore.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
+	must(e)
+	defer graph.Close()
+	nodes, e := graph.AllNodes()
+	must(e)
+	code, test := semantic.SourceCode, semantic.SourceTest
+	symbols := []struct {
+		Name, Path string
+		Kind       semantic.SourceKind
+	}{
+		{"SearchDetailed", "internal/vector/store/sqlitevec/store.go", code},
+		{"ValidateDatasetAlignment", "internal/system/semantic/alignment.go", code},
+		{"ValidateCodeAnchors", "internal/system/semantic/ckg_anchor.go", code},
+		{"PutAligned", "internal/system/semantic/alignment.go", code},
+		{"PutAlignedRetained", "internal/system/semantic/alignment.go", code},
+		{"ActivateAligned", "internal/system/semantic/alignment.go", code},
+		{"ActivateAlignedRetained", "internal/system/semantic/alignment.go", code},
+		{"applyProvidedOntology", "internal/system/composer/stage2/ontology_provider.go", code},
+		{"VerifiedImplementations", "internal/system/semantic/active.go", code},
+		{"TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded", "internal/vector/store/sqlitevec/store_test.go", test},
+		{"TestSearchDetailedReportsCandidateLimitWithoutCompleteHits", "internal/vector/store/sqlitevec/store_test.go", test},
+		{"TestSearchDetailedCancellationIsNotEmptySuccess", "internal/vector/store/sqlitevec/store_test.go", test},
+		{"TestStoreFilterLargeCandidateSetFallsBackToExact", "internal/vector/store/sqlitevec/store_test.go", test},
+		{"TestSearchDetailedFilteredCancellationAfterStartIsNotComplete", "internal/vector/store/sqlitevec/store_test.go", test},
+		{"TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty", "internal/system/semantic/alignment_test.go", test},
+		{"TestForeignCodeAnchorPromotionPreservesActiveDataset", "internal/system/semantic/anchor_promotion_integration_test.go", test},
+		{"TestActiveProjectionExposesOnlyVerifiedImplementations", "internal/system/semantic/active_test.go", test},
+		{"TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline", "internal/system/composer/stage2/ontology_provider_test.go", test},
+		{"TestStoredSharedAliasPreservesBaselineAndRetainedEvidence", "internal/system/composer/stage2/ontology_matcher_integration_test.go", test},
+		{"TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline", "internal/system/composer/stage2/ontology_provider_test.go", test},
+	}
+	anchors := map[string]semantic.EvidenceSpan{}
+	sourceRefs := []map[string]any{}
+	for _, s := range symbols {
+		found := map[string]graphtypes.Node{}
+		for _, n := range nodes {
+			if n.Name == s.Name && n.FilePath == s.Path && n.CanonicalID != "" {
+				found[n.CanonicalID] = n
+			}
+		}
+		require(len(found) == 1, "nonunique canonical:"+s.Name)
+		var n graphtypes.Node
+		for _, v := range found {
+			n = v
+		}
+		proof, e := setup.ReadRetainedLines(version, "repo", s.Path, n.StartLine, n.EndLine)
+		must(e)
+		span := semantic.EvidenceSpan{ID: "reviewed-v3:anchor:" + s.Name, Snapshot: snap, Kind: s.Kind, Path: s.Path, StartLine: n.StartLine, EndLine: n.EndLine, ContentSHA256: proof.ContentSHA256, CanonicalID: n.CanonicalID, Extractor: "actual-CKG-AST-retained-v2"}
+		must(semantic.AttachCodeEvidence(&p, graph, span))
+		anchors[s.Name] = span
+		sourceRefs = append(sourceRefs, map[string]any{"name": s.Name, "node": n, "evidence": span})
+	}
+	concepts := map[string]semantic.Concept{}
+	reqs := map[string]semantic.Requirement{}
+	criteria := map[string]semantic.AcceptanceCriterion{}
+	criterionReq := map[string]string{}
+	for _, c := range p.Concepts {
+		concepts[c.ID] = c
+	}
+	for _, r := range p.Requirements {
+		reqs[r.ID] = r
+		for _, c := range r.AcceptanceCriteria {
+			criteria[c.ID] = c
+			criterionReq[c.ID] = r.ID
+		}
+	}
+	conceptReq := map[string]string{"filtered-nearest-chunk-search": "req-filtered-recall", "snapshot-bound-semantic-relations": "req-source-evidence", "optional-ontology-baseline-preservation": "req-ontology-fallback"}
+	type rel struct{ ID, Pred, Subject, Object, Criterion, Scope string }
+	// Adopted revised proposal: F3-T01..17 with F3-T08/T11 retargeted and four
+	// narrowed scopes, plus F3-R01..14.
+	rels := []rel{
+		{"F3-T01", "IMPL", "filtered-nearest-chunk-search", "SearchDetailed", "", ""},
+		{"F3-T02", "TEST", "SearchDetailed", "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded", "ac-filtered-recall", ""},
+		{"F3-T03", "CHECK", "ac-filtered-recall", "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded", "ac-filtered-recall", "membership and exact distance order; eligible count equals K"},
+		{"F3-T04", "TEST", "SearchDetailed", "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits", "ac-filtered-completeness", ""},
+		{"F3-T05", "CHECK", "ac-filtered-completeness", "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits", "ac-filtered-completeness", "exact-sized candidate_limit only"},
+		{"F3-T06", "TEST", "SearchDetailed", "TestSearchDetailedCancellationIsNotEmptySuccess", "ac-filtered-completeness", ""},
+		{"F3-T07", "CHECK", "ac-filtered-completeness", "TestSearchDetailedCancellationIsNotEmptySuccess", "ac-filtered-completeness", "narrowed: unfiltered empty-store pre-start cancellation and deadline only"},
+		{"F3-T08", "IMPL", "snapshot-bound-semantic-relations", "ValidateCodeAnchors", "", "retargeted from ValidateDatasetAlignment"},
+		{"F3-T09", "TEST", "ValidateDatasetAlignment", "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty", "ac-source-evidence", ""},
+		{"F3-T10", "CHECK", "ac-source-evidence", "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty", "ac-source-evidence", "narrowed: coordinate-drift partial control; no code anchor"},
+		{"F3-T11", "TEST", "ValidateCodeAnchors", "TestForeignCodeAnchorPromotionPreservesActiveDataset", "ac-source-evidence", "retargeted subject from ValidateDatasetAlignment (its positive control)"},
+		{"F3-T12", "CHECK", "ac-source-evidence", "TestForeignCodeAnchorPromotionPreservesActiveDataset", "ac-source-evidence", "actual CKG; coordinate-only CKV mock"},
+		{"F3-T13", "IMPL", "optional-ontology-baseline-preservation", "applyProvidedOntology", "", ""},
+		{"F3-T14", "TEST", "applyProvidedOntology", "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline", "ac-ontology-fallback", ""},
+		{"F3-T15", "CHECK", "ac-ontology-fallback", "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline", "ac-ontology-fallback", "narrowed: proposed concepts with CKV-only baseline"},
+		{"F3-T16", "TEST", "applyProvidedOntology", "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence", "ac-ontology-fallback", ""},
+		{"F3-T17", "CHECK", "ac-ontology-fallback", "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence", "ac-ontology-fallback", "narrowed: ambiguous proposed alias with CKV document hits only"},
+		{"F3-R01", "TEST", "SearchDetailed", "TestStoreFilterLargeCandidateSetFallsBackToExact", "ac-filtered-completeness", ""},
+		{"F3-R02", "CHECK", "ac-filtered-completeness", "TestStoreFilterLargeCandidateSetFallsBackToExact", "ac-filtered-completeness", "vec0-path candidate_limit"},
+		{"F3-R03", "TEST", "SearchDetailed", "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete", "ac-filtered-completeness", ""},
+		{"F3-R04", "CHECK", "ac-filtered-completeness", "TestSearchDetailedFilteredCancellationAfterStartIsNotComplete", "ac-filtered-completeness", "filtered in-flight cancellation, exact and large sets"},
+		{"F3-R05", "IMPL", "snapshot-bound-semantic-relations", "PutAligned", "", "gate chain"},
+		{"F3-R06", "IMPL", "snapshot-bound-semantic-relations", "PutAlignedRetained", "", "gate chain"},
+		{"F3-R07", "IMPL", "snapshot-bound-semantic-relations", "ActivateAligned", "", "gate chain"},
+		{"F3-R08", "IMPL", "snapshot-bound-semantic-relations", "ActivateAlignedRetained", "", "gate chain"},
+		{"F3-R09", "TEST", "PutAligned", "TestForeignCodeAnchorPromotionPreservesActiveDataset", "ac-source-evidence", ""},
+		{"F3-R10", "TEST", "ActivateAligned", "TestForeignCodeAnchorPromotionPreservesActiveDataset", "ac-source-evidence", ""},
+		{"F3-R11", "TEST", "VerifiedImplementations", "TestActiveProjectionExposesOnlyVerifiedImplementations", "ac-ontology-fallback", ""},
+		{"F3-R12", "IMPL", "optional-ontology-baseline-preservation", "VerifiedImplementations", "", "excludes unverified concept relations"},
+		{"F3-R13", "TEST", "applyProvidedOntology", "TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline", "ac-ontology-fallback", ""},
+		{"F3-R14", "CHECK", "ac-ontology-fallback", "TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline", "ac-ontology-fallback", "verified concept + unverified relation; CKG-only citation preserved"},
+	}
+	rows := []map[string]any{}
+	for _, r := range rels {
+		var a semantic.Assertion
+		switch r.Pred {
+		case "IMPL":
+			c, obj := concepts[r.Subject], anchors[r.Object]
+			a = semantic.Assertion{Predicate: semantic.PredicateImplementedBy, SubjectID: r.Subject, ObjectID: obj.CanonicalID, EvidenceIDs: []string{c.EvidenceID, reqs[conceptReq[r.Subject]].EvidenceID, obj.ID}}
+		case "TEST":
+			sub, obj, cr := anchors[r.Subject], anchors[r.Object], criteria[r.Criterion]
+			a = semantic.Assertion{Predicate: semantic.PredicateTestedBy, SubjectID: sub.CanonicalID, ObjectID: obj.CanonicalID, EvidenceIDs: []string{sub.ID, obj.ID, cr.EvidenceID}}
+		case "CHECK":
+			cr, obj := criteria[r.Subject], anchors[r.Object]
+			a = semantic.Assertion{Predicate: semantic.PredicateCheckedBy, SubjectID: cr.ID, ObjectID: obj.CanonicalID, EvidenceIDs: []string{cr.EvidenceID, obj.ID}}
+		}
+		require(a.SubjectID != "" && a.ObjectID != "", "unresolved relation "+r.ID)
+		a.ID, a.Status, a.ReviewedBy = "reviewed-v3:"+r.ID, semantic.StatusVerified, Reviewer
+		p.Assertions = append(p.Assertions, a)
+		rows = append(rows, map[string]any{"review_id": r.ID, "assertion": a, "criterion_id": r.Criterion, "scope_note": r.Scope, "reviewer": Reviewer, "reviewer_kind": "ai_model_label_designated_by_user", "decision": "adopted_prereview", "actual_human_active_ns": nil})
+	}
+	require(len(rows) == 31 && len(p.Assertions) == 43, "wrong relation count")
+	must(p.Validate())
+	linked, e := semantic.AttachCKVChunks(ctx, &p, vectorDir)
+	must(e)
+	require(linked == len(p.Sections), "unlinked actual markdown section")
+	must(p.ValidateRetainedSources(version))
+	must(semantic.ValidateDatasetAlignment(p, prep.Source, graphDir, vectorDir))
+	must(semantic.ValidateCodeAnchors(p, graphDir))
+	must(semantic.ValidateCKVChunkLinks(ctx, p, vectorDir))
+	must(semantic.ValidateCanonicalCoverage(vectorDir, 1))
+	controls := []map[string]any{}
+	reject := func(name string, e error) {
+		require(e != nil, "negative accepted:"+name)
+		controls = append(controls, map[string]any{"name": name, "rejected": true, "error": e.Error()})
+	}
+	x := clone(p)
+	x.Evidence[len(x.Evidence)-1].Snapshot.DatasetID = "foreign"
+	reject("foreign_snapshot_code_test_evidence", x.Validate())
+	x = clone(p)
+	x.Evidence[len(x.Evidence)-1].ContentSHA256 = strings.Repeat("0", 64)
+	reject("altered_retained_code_test_digest", x.ValidateRetainedSources(version))
+	x = clone(p)
+	x.Evidence[len(x.Evidence)-1].CanonicalID = "missing.canonical"
+	reject("unknown_actual_CKG_canonical", semantic.ValidateCodeAnchors(x, graphDir))
+	x = clone(p)
+	x.Sections[0].ChunkIDs = []string{"unknown.chunk"}
+	reject("foreign_CKV_document_chunk", semantic.ValidateCKVChunkLinks(ctx, x, vectorDir))
+	x = clone(p)
+	x.Assertions[12].ReviewedBy = ""
+	reject("verified_relation_without_reviewer", x.Validate())
+	x = clone(p)
+	x.Concepts[0].ReviewedBy = ""
+	reject("verified_concept_without_reviewer", x.Validate())
+	if !replay {
+		store, e := semantic.OpenStore(storePath)
+		must(e)
+		must(store.PutAlignedRetained(ctx, p, prep.Source, graphDir, vectorDir, version))
+		must(store.ActivateAlignedRetained(ctx, snap.ProjectID, snap.DatasetID, prep.Source, graphDir, vectorDir, version))
+		must(store.Close())
+	}
+	ro, e := semantic.OpenStoreReadOnly(ctx, storePath)
+	must(e)
+	defer ro.Close()
+	loaded, e := ro.Load(ctx, snap.ProjectID, snap.DatasetID)
+	must(e)
+	a, e := json.Marshal(p)
+	must(e)
+	b, e = json.Marshal(loaded)
+	must(e)
+	require(bytes.Equal(a, b), "SQLite reopen changed projection")
+	current, e := ro.Current(ctx, snap.ProjectID)
+	must(e)
+	c, e := json.Marshal(current)
+	must(e)
+	require(bytes.Equal(a, c), "active projection differs")
+	active, e := ro.LoadAlignedRetained(ctx, snap.ProjectID, snap.DatasetID, prep.Source, graphDir, vectorDir, version)
+	must(e)
+	trace, e := active.Trace()
+	must(e)
+	states := map[string]string{}
+	for _, r := range trace.Requirements {
+		states[r.RequirementID] = string(r.State)
+	}
+	impl := map[string]int{}
+	for concept := range conceptReq {
+		impl[concept] = len(active.VerifiedImplementations(concept))
+	}
+	review, e := p.Review(100, "reviewed-v3")
+	must(e)
+	save(filepath.Join(out, "projection-reviewed.json"), p)
+	save(filepath.Join(out, "relation-review-items.json"), map[string]any{"snapshot": snap, "relations": rows, "reviewer": Reviewer, "reviewer_kind": "ai_model_label_designated_by_user", "independent_human_content_review": false, "not_FINAL_inputs": true, "old_snapshot_approvals_inherited": false})
+	save(filepath.Join(out, "canonical-source-refs.json"), sourceRefs)
+	save(filepath.Join(out, "negative-controls.json"), controls)
+	save(filepath.Join(out, "trace-diagnostic.json"), trace)
+	save(filepath.Join(out, "review-queue.json"), review)
+	save(filepath.Join(out, "projection-report.json"), map[string]any{"snapshot": snap, "identity": identity, "source_span_count": len(p.Evidence), "actual_CKG_anchors": len(anchors), "concepts_verified": len(p.Concepts), "requirements_verified_v3": len(p.Requirements), "criteria": len(criteria), "claims_verified": len(p.Claims), "relations_verified_new": len(rows), "assertions_verified_total": len(p.Assertions), "document_sections": len(p.Sections), "actual_CKV_linked_sections": linked, "projection_json_sha256": digest(a), "retained_source_CKG_CKV_validated": true, "SQLite_reopen_identical": true, "semantic_current_is_this_dataset": true, "trace_states": states, "verified_implementations_by_concept": impl, "reviewer": Reviewer, "reviewer_kind": "ai_model_label_designated_by_user", "independent_human_content_review": false, "negative_controls_refused": len(controls), "owned_held_store_only": true, "full_task_complete": false})
+	fmt.Println("PASS reviewed v3: 31 verified trace relations + 12 claim relations; activated in owned held store; trace", states)
+}
+
+func readRetained(version, path string) []byte {
+	b, _, _, e := setup.ReadRetainedFile(version, "repo", path)
+	must(e)
+	return b
+}
+func extractCurrent(ctx context.Context, versionDir, root string, snapshot semantic.Snapshot) semantic.Projection {
+	read := func(path string) []byte {
+		b, _, _, err := setup.ReadRetainedFile(versionDir, "repo", path)
+		must(err)
+		return b
+	}
+	p, _, err := semantic.ExtractOntology(snapshot, "docs/spec-driven/ontology-pilot-functional-v2.yaml", read("docs/spec-driven/ontology-pilot-functional-v2.yaml"))
+	must(err)
+	spec, _, err := semantic.ExtractSpec(snapshot, "docs/spec-driven/spec-pilot-v3.yaml", read("docs/spec-driven/spec-pilot-v3.yaml"))
+	must(err)
+	p.Evidence = append(p.Evidence, spec.Evidence...)
+	p.Requirements = spec.Requirements
+	type seed struct {
+		ID        string `json:"id"`
+		Path      string `json:"path"`
+		First     int    `json:"first"`
+		Last      int    `json:"last"`
+		ConceptID string `json:"concept_id"`
+		Statement string `json:"statement"`
+	}
+	raw, err := os.ReadFile(filepath.Join(root, "claim-seeds.json"))
+	must(err)
+	var seeds []seed
+	must(json.Unmarshal(raw, &seeds))
+	docs := map[string]semantic.Projection{}
+	conceptEvidence := map[string]string{}
+	for _, c := range p.Concepts {
+		conceptEvidence[c.ID] = c.EvidenceID
+	}
+	for _, s := range seeds {
+		doc, ok := docs[s.Path]
+		if !ok {
+			doc, err = semantic.ExtractMarkdown(snapshot, s.Path, read(s.Path))
+			must(err)
+			docs[s.Path] = doc
+			p.Evidence = append(p.Evidence, doc.Evidence...)
+			p.Sections = append(p.Sections, doc.Sections...)
+		}
+		lines := bytes.SplitAfter(read(s.Path), []byte{'\n'})
+		if len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
+			lines = lines[:len(lines)-1]
+		}
+		if s.First < 1 || s.Last < s.First || s.Last > len(lines) {
+			panic("invalid seed range")
+		}
+		proof := semantic.EvidenceSpan{ID: "policy-evidence:" + s.ID, Snapshot: snapshot, Kind: semantic.SourceDocument, Path: s.Path, StartLine: s.First, EndLine: s.Last, ContentSHA256: digest(bytes.Join(lines[s.First-1:s.Last], nil)), Extractor: "manual-policy-review-v1"}
+		p.Evidence = append(p.Evidence, proof)
+		var chosen semantic.DocumentSection
+		var chosenEvidence semantic.EvidenceSpan
+		for _, section := range doc.Sections {
+			for _, e := range doc.Evidence {
+				if e.ID == section.EvidenceID && e.StartLine <= s.First && e.EndLine >= s.Last && (chosen.ID == "" || e.EndLine-e.StartLine < chosenEvidence.EndLine-chosenEvidence.StartLine) {
+					chosen = section
+					chosenEvidence = e
+				}
+			}
+		}
+		if chosen.ID == "" || conceptEvidence[s.ConceptID] == "" {
+			panic("unresolved seed section or concept")
+		}
+		claim := semantic.Claim{ID: "pilot-claim:" + s.ID, Statement: s.Statement, SectionID: chosen.ID, EvidenceIDs: []string{proof.ID, chosenEvidence.ID}, Status: semantic.StatusVerified, ReviewedBy: Reviewer}
+		p.Claims = append(p.Claims, claim)
+		p.Assertions = append(p.Assertions, semantic.Assertion{ID: "supports:" + s.ID, Predicate: semantic.PredicateSupports, SubjectID: chosen.ID, ObjectID: claim.ID, EvidenceIDs: []string{chosenEvidence.ID, proof.ID}, Status: semantic.StatusVerified, ReviewedBy: Reviewer}, semantic.Assertion{ID: "about:" + s.ID, Predicate: semantic.PredicateAbout, SubjectID: claim.ID, ObjectID: s.ConceptID, EvidenceIDs: []string{proof.ID, conceptEvidence[s.ConceptID]}, Status: semantic.StatusVerified, ReviewedBy: Reviewer})
+	}
+	must(p.ValidateRetainedSources(versionDir))
+	return p
+}

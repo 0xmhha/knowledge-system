@@ -1,5 +1,7 @@
 # N15/N17 현행 패키지·외부 모듈·복구 기술 검증
 
+2026-10-07 보강: [native Linux CI 실행](./N15-NATIVE-LINUX-CI-VALIDATION.md)을 현재 플랫폼 증거로 우선한다. N15-C 완료·전체 N15/17 미완료이며 아래 미실행 표시는 이전 시점이다.
+
 2026-10-07 · **local 기술 세부 단계 통과 / 전체 N15·N16·N17 미완료**. [원자료 요약](../../system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/summary.json)과 [manifest](../../system/eval/b0-knowledge-system/refactoring-n15-n17-native-controls-2026-10-07/technical-manifest.json)를 연결한다. 공개 소스 커밋 `b006e776b72be8f4a01b91966aebc149aaf84704`의 추적 파일만 clean checkout으로 복사해 Darwin ARM64/Go1.26.8 host-preview를 만들었다. 사용자 untracked `.claude/`, `logs/`는 제외했고 원 FINAL/승인 입력5개와 사용자 모델을 변경하지 않았다.
 
 새 루트에 candidate 백업을 복원할 때 current 전환 뒤 MCP 시작이 실패하는 문제를 발견했다. candidate의 reader-protocol.json만 복사됐고 dataset 밖의 reader lease inode가 없어 조회를 시작할 수 없었다. mutation 잠금 아래 신원·review 권한 검사 뒤 reader lease를 생성/sync하도록 수정했다. 기존 inode와 candidate 원문·신원·marker를 보존하고, linked directory/inode와 다중 hardlink는 pointer 전환 전에 거부한다. legacy target의 protocol은 자동 추가하지 않는다. readonly 조회 경로의 보호는 완화하지 않았다.
@@ -40,3 +42,9 @@ Go public consumer는 저장소 내부 테스트로 실행하지 않았고 consu
 최종 CI 사전 확인에서 기존 Makefile의 전역 find가 과거 평가 원문3개에 gofmt를 요구했다. [5개 제어](../../system/eval/b0-knowledge-system/refactoring-format-scope-controls-2026-10-07/summary.json)로 이전 실패·새 범위의 통과·유지보수 코드 drift 거부·fmt 수정·수정 후 통과를 확인했다. cmd/internal/pkg/graph/vector/testdata/projects를 대상으로 제한하고 system/eval의 보관 원문은 수정하지 않았다. 해당3개 원문 SHA와 모든 runtime Go 소스는 불변이다. native 패키지는 위 b006e776에서 검증했고 이후 변경은 formatter 대상뿐이므로 바이너리/복구 결과를 새 Go 변경에 확장한 것이 아니다. make fmt-check와 증거 바인딩이 통과했지만 GitHub CI 실행 결과는 아직 없다.
 
 전체 vet에서 N11의 부분 보관 Go 원문2개가 의존 타입 없이 루트 ./... 대상으로 잡힌 보관 방식 오류도 확인했다. source-snapshot에 별도 go.mod 경계를 두어 원문 바이트를 보존하면서 루트 package 대상에서 격리했다. 이후 CI와 같은 make lint(전체 vet/형식/경계/바이너리·문서)와 make build가 통과했다. 보관 원문은 실행 패키지로 사용하지 않는다. 전체 race는 이번 변경의 관련3패키지를 검증했고 GitHub 전체 CI 판정은 별도로 남는다.
+
+## 추가 로컬 검증: 실제 모델 연결과 전체 race
+
+[BGE-M3 호환성 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md)에서 동일 clean 패키지를 새 소유 fixture3개에 연결했다. Ollama0.35.1/승인 digest/native1024의 원본·갱신6개 dataset identity를 대조하고 설치·MCP 재시작·데이터 갱신·rollback을 통과했다. MCP compact7·CKV6응답은 호환성 제어이며 새 FINAL/품질·실운영 규모·독립 운영 소비자 수용이 아니다. d08cb384의 전체 race117패키지와 도메인 생성 자료 일치도 통과했다. 위 관련3패키지 결과에 추가하는 새 실행 증거이며 과거 원자료를 바꾸지 않는다.
+
+native Linux는 여전히 미실행이다. 공개 전송 요청은 d08cb384의80커밋으로 고정하며 이 추가 로컬 receipt/문서 커밋은 포함하지 않는다. 전체8/18·요청5/15·잔여10개 및 N15-C/D/E·N17-C/D/E 미완료를 유지한다.

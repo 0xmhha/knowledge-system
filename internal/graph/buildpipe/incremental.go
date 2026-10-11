@@ -1,18 +1,18 @@
-// Package buildpipe — incremental.go drives the A3 file-level cache build path
-// (spec v0.2 § 4 Phase 1). Two entry points:
+// Package buildpipe — incremental.go drives the file-level cache build path.
+// Two entry points:
 //
 //   - runCold: full rebuild (legacy V0 path, used on --no-cache or unusable cache).
 //   - runIncremental: parse only dirty files, reload cached node sets from DB,
 //     then rerun Pass 2 / cluster / score across the merged graph.
 //
-// C1 reverse-reference invalidation: IMPLEMENTED. runIncremental queries
+// Reverse-reference invalidation: IMPLEMENTED. runIncremental queries
 // store.ReverseDepsForFiles (sqlite_reader.go / postgres_store.go) so cached
 // files whose pending_refs target a dirty/removed file get their refs
 // re-resolved, while unaffected files keep their DB edges — see the runIncremental
 // flow comment. Pass 2 Resolve still sees the full per-language node set (that
 // part is intentional, not a gap).
 //
-// Remaining Phase 1 simplifications (per spec):
+// Remaining simplifications (per spec):
 //   - PageRank/Leiden recompute on ANY dirt (no <1% change-ratio shortcut).
 //   - Cross-language Sol↔TS link rebuilt whenever any TS or Sol file is dirty.
 //
@@ -124,14 +124,14 @@ func readOldManifestFromDB(dbPath, dbDsn string) *persist.Manifest {
 	return &m
 }
 
-// runIncremental implements the partial-cache build path (G6 v4). Caller
+// runIncremental implements the partial-cache build path. Caller
 // must have already determined the cache base is usable (ManifestUsable) and
 // at least one file is cached (so we have something to reuse).
 //
-// Flow (G6 v4 + C1 reverse-reference invalidation):
+// Flow (with reverse-reference invalidation):
 //  1. DROP temporal + xlang edges from DB — they are always rebuilt and
 //     would otherwise duplicate or stale.
-//     1.5. C1: query reverse-dirty cached files BEFORE deleting dirty nodes.
+//     1.5. Query reverse-dirty cached files BEFORE deleting dirty nodes.
 //     Cached files whose pending_refs target qnames in dirty/removed files
 //     need their pending_refs re-resolved (their edges to dirty nodes were
 //     cascade-deleted). Non-reverse-dirty files skip PendingRefsByFilePath
@@ -173,7 +173,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// FilePath, so the per-file CASCADE in step (2) does not remove them —
 	// they must be dropped here or every incremental build duplicates rows.
 	//
-	// http_calls (W2, schema 1.9): rebuilt every incremental pass. cached
+	// http_calls (schema 1.9): rebuilt every incremental pass. cached
 	// client files are reloaded into memory by reloadCachedEdges (with
 	// non-zero IDs); MatchHTTPClients re-matches them against the current
 	// Endpoint set and resets their IDs to 0 so the persist step INSERTs
@@ -189,7 +189,7 @@ func runIncremental(opt Options, log *slog.Logger,
 		}
 	}
 
-	// (1.5) C1: reverse-reference invalidation — find cached files that have
+	// (1.5) Reverse-reference invalidation — find cached files that have
 	// pending_refs pointing to qnames exported by dirty/removed files. These
 	// "reverse-dirty" files need their pending_refs re-resolved even though
 	// their own source is unchanged. Query BEFORE step (2) deletes dirty nodes.
@@ -214,7 +214,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	}
 
 	// (3) Per-language Pass 1 + reload cached nodes. pending_refs are only
-	// loaded for dirty + reverse-dirty files (C1 optimization).
+	// loaded for dirty + reverse-dirty files.
 	resolved, dirtyPending, parseErrs, _, solParser, err := runLanguagePipelines(
 		opt.SrcRoot, dirtyByLang, cachedByLang, reverseDirtySet, store, log)
 	if err != nil {
@@ -244,13 +244,13 @@ func runIncremental(opt Options, log *slog.Logger,
 
 	// (5) Derived passes — xlang, temporal, cluster, score. Same helper as
 	// cold path; DB drops in step (1) ensure the in-memory re-emission
-	// translates cleanly to the persist step. hunkBlobs (schema 1.8 H1) are
+	// translates cleanly to the persist step. hunkBlobs (schema 1.8) are
 	// merged into InsertBlobs alongside the dirty-file CodeNode slices.
 	//
-	// W-A: lock propagation is structurally skipped on the incremental path
+	// Lock propagation is structurally skipped on the incremental path
 	// — per-function field-touch maps for cached files aren't reconstructed
 	// from DB, so the propagator would over-emit (only seeing dirty files'
-	// callees). Operators wanting the W-A KPI must run with --no-cache.
+	// callees). Operators wanting propagated edges must run with --no-cache.
 	// Passing nil + false makes emitDerivedPasses' propagation call a no-op
 	// regardless of opt.LockPropagation.
 	// The temporal pass re-enumerates from git, so it needs the same
@@ -334,6 +334,12 @@ func runIncremental(opt Options, log *slog.Logger,
 		}
 	}
 
+	// The review index depends on the whole graph (test-only packages,
+	// endpoints of every code edge), so it is recomputed, not patched.
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+		return persist.Manifest{}, err
+	}
+
 	m := buildManifestSkeleton(opt, goCount, tsCount, solCount, protoCount, g, pkgTree, parseErrs)
 	// buildManifestSkeleton computes EnrichDigest from the code-only g (always
 	// ""); recompute it from the overlay re-applied above so the manifest pin
@@ -380,7 +386,7 @@ func partitionByLang(decisions CacheDecisions) (dirty, cached map[string][]strin
 // for whether any TS/Sol file changed (drives xlang rebuild decision) + the
 // Sol parser instance for ABI extraction.
 //
-// reverseDirty (C1): set of cached file paths whose pending_refs need
+// reverseDirty: set of cached file paths whose pending_refs need
 // re-resolving because a dirty/removed file changed their target qnames.
 func runLanguagePipelines(srcRoot string, dirty, cached map[string][]string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) ([]*parse.ResolvedGraph, []persist.PendingRefRow, int, bool, *solp.Parser, error) {
@@ -444,7 +450,7 @@ func runLanguagePipelines(srcRoot string, dirty, cached map[string][]string,
 // Cross-file edges spanning a dirty endpoint are NOT reloaded — they were
 // either cascade-deleted (dirty src) or will be re-emitted by Resolve from
 // the dirty side (dirty dst). Edges that need re-emission from the cached
-// side are a Phase 2 problem (reverse-reference index → C1).
+// side are handled by reverse-reference invalidation (reverseDirty).
 func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([]types.Edge, map[string]bool, error) {
 	reloaded := []types.Edge{}
 	cachedNodeIDs := map[string]bool{}
@@ -500,7 +506,7 @@ func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([
 // pkg/topic trees (full replace), per-dirty-file blobs + hunk blobs, FTS
 // rebuild.
 //
-// hunkBlobs (schema 1.8 H1) is the gzip-compressed unified-diff text per
+// hunkBlobs (schema 1.8) is the gzip-compressed unified-diff text per
 // Hunk node ID. Hunks aren't file-owned in the cache sense (§11.8), so the
 // full set is re-inserted on every build alongside the dirty-file CodeNode
 // blobs. INSERT OR REPLACE on blobs.node_id idempotently overwrites the
@@ -585,12 +591,12 @@ func hasCached(m map[string][]string, lang string) bool {
 }
 
 // runGoPipelineIncremental parses dirtyFiles, then loads cached files' nodes
-// AND (C1) conditionally their pending refs from DB and synthesises ParseResults
+// AND conditionally their pending refs from DB and synthesises ParseResults
 // so Pass 2's qIndex AND its pending-ref consumer see the full set. Returns
 // ResolvedGraph plus the dirty pending refs (caller persists those — cached
 // refs survive in DB via FK; only fresh refs from re-parse need INSERT).
 //
-// C1 optimization: only files in reverseDirty need PendingRefsByFilePath —
+// Optimization: only files in reverseDirty need PendingRefsByFilePath —
 // their edges to dirty-file qnames were cascade-deleted and must be re-resolved.
 // Non-reverse-dirty cached files contribute nodes only; their edges are intact
 // in DB and will be reloaded by reloadCachedEdges, skipping a DB round-trip.
@@ -649,7 +655,7 @@ func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 		implEdges := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, implEdges...)
 		log.Debug("implements emitted (incremental)", "count", len(implEdges))
-		// Track C P0 (uses_type) — same wiring as cold path. Pending refs
+		// uses_type — same wiring as cold path. Pending refs
 		// for dirty files surface as additional dirtyPending rows so the
 		// next partial build picks them up; cached files' uses_type pending
 		// refs already live in DB and get reloaded above.
@@ -688,7 +694,7 @@ func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 				})
 			}
 		}
-		// Track C P1c (instantiates) — same wiring as cold path.
+		// instantiates — same wiring as cold path.
 		instEdges := gop.EmitInstantiatesEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, instEdges...)
 		log.Debug("instantiates emitted (incremental)", "count", len(instEdges))
@@ -730,7 +736,7 @@ func pendingRefsFromRows(rows []persist.PendingRefRow) []parse.PendingRef {
 }
 
 // runTSPipelineIncremental mirrors runGoPipelineIncremental for TypeScript.
-// See C1 optimization note on runGoPipelineIncremental.
+// See the optimization note on runGoPipelineIncremental.
 func runTSPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
 	p := tsp.New(srcRoot)
@@ -776,9 +782,9 @@ func runTSPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 }
 
 // runProtoPipelineIncremental mirrors runTSPipelineIncremental for `.proto`.
-// proto has no cross-language ABI surface (W3a scope — gRPC client/server
-// detection lives in W3b/W3c), so the signature matches the TS variant.
-// See C1 optimization note on runGoPipelineIncremental for reverseDirty
+// proto has no cross-language ABI surface (gRPC client/server detection
+// lives in the Go/TS parsers), so the signature matches the TS variant.
+// See the optimization note on runGoPipelineIncremental for reverseDirty
 // semantics.
 func runProtoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
@@ -826,7 +832,7 @@ func runProtoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []strin
 
 // runSolPipelineIncremental mirrors runGoPipelineIncremental for Solidity.
 // Returns the parser instance for caller use (xlang ABI source).
-// See C1 optimization note on runGoPipelineIncremental.
+// See the optimization note on runGoPipelineIncremental.
 func runSolPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, *solp.Parser, error) {
 	p := solp.New(srcRoot)

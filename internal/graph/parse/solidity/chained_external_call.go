@@ -7,35 +7,32 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Sol W-C W10 V6 (2026-05-19) — chained-call receiver shape for
-// HasExternalCall.
+// Sol chained-call receiver shape for HasExternalCall.
 //
-// V4 marked HasExternalCall via Pass 2 receiver-type lookup for
-// bare-identifier receivers (`target.call(...)`); V5 caught Sol
-// cast wrappers (`address(t).call(...)`). V6 covers chained
-// shapes:
+// Bare-identifier receivers (`target.call(...)`) are marked via Pass 2
+// receiver-type lookup and Sol cast wrappers (`address(t).call(...)`)
+// by the cast walker. This file covers chained shapes:
 //
 //	getTarget().call(data)
 //	loadHandler().delegatecall(data)
 //
-// Detection re-uses matchChainedMethodCall (W6 V1.3) which matches
+// Detection re-uses matchChainedMethodCall (using-for chained dispatch) which matches
 // `<innerFn>().<method>(...)`. When `<method>` is a low-level
 // method and the inner function's first return type is
 // `address` / `address payable`, the marker fires. The funcReturn
-// Types index built for W6 V1.3 chained dispatch is the lookup
+// Types index built for using-for chained dispatch is the lookup
 // source — no new index needed.
 //
-// V6 limitations remaining:
+// Limitations:
 //   - Multi-return chained shape (`getThings()` returning a tuple)
-//     consults only the first return slot, matching W6 V1.3.
+//     consults only the first return slot, matching chained dispatch.
 //   - Deep chains (`a().b().call(...)`) consult b's return type
 //     only when b is registered via funcReturnTypes; otherwise the
 //     receiver drops at the type lookup.
 
 const dispatchKindChainedExternalCall = "chained_external_call"
 
-// dispatchKindDeepChainedExternalCall (W-C W10 V7, 2026-05-19)
-// tags depth-2 chained shape `a().b().call(...)` — TargetQName
+// dispatchKindDeepChainedExternalCall tags depth-2 chained shape `a().b().call(...)` — TargetQName
 // encodes `<innerFn1>|<innerFn2>|<method>`.
 const dispatchKindDeepChainedExternalCall = "deep_chained_external_call"
 
@@ -60,8 +57,8 @@ func (v *declVisitor) runChainedExternalCall() {
 				continue
 			}
 			memberNode := c.Node
-			// V7: try depth-2 (`a().b().call(...)`) first because
-			// V6's single-level predicate would otherwise reject
+			// Try depth-2 (`a().b().call(...)`) first because
+			// the single-level predicate would otherwise reject
 			// the outer member (its `object` is a call_expression
 			// whose function is a member_expression, not an
 			// identifier — so single-level already drops).
@@ -83,7 +80,7 @@ func (v *declVisitor) runChainedExternalCall() {
 				})
 				continue
 			}
-			// V6: single-level chained shape.
+			// Single-level chained shape.
 			innerFnName, methodName, ok := matchChainedMethodCall(&memberNode, v.src)
 			if !ok {
 				continue

@@ -9,11 +9,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestSolSubKind_AbstractLibrary covers Sol W4 — the SubKind field on
+// TestSolSubKind_AbstractLibrary covers the Sol SubKind field on
 // NodeContract for plain / abstract / library declarations.
 //
-// Spec: docs/design/solidity-inheritance-and-interface-dispatch.md §2.1, §4.4
-// Dispatch: docs/DISPATCH-WITHIN-LANG-SEMANTICS.md §2 Phase 3
+// Spec: docs/graph/design/solidity-inheritance-and-interface-dispatch.md §2.1, §4.4
+// Dispatch: docs/graph/archive/DISPATCH-WITHIN-LANG-SEMANTICS.md §2
 //
 // The Sol grammar exposes three distinct top-level decls; the detector
 // must distinguish them via:
@@ -96,7 +96,7 @@ func TestSolSubKind_AbstractLibrary(t *testing.T) {
 
 // TestSolSubKind_VaultRegression confirms the existing vault.sol fixture
 // (single plain `contract`) emits SubKind="contract" — guards against
-// the W4 detector changing meaning for the pre-existing testdata baseline.
+// the SubKind detector changing meaning for the pre-existing testdata baseline.
 func TestSolSubKind_VaultRegression(t *testing.T) {
 	dir := "testdata"
 	src, err := os.ReadFile(filepath.Join(dir, "vault.sol"))

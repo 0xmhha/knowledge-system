@@ -7,21 +7,21 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestBuildPack_SolGraphRegression — W-C W11 V0 (2026-05-18) regression
-// safety net for the Sol parser's evolving Node / Edge shape.
+// TestBuildPack_SolGraphRegression — regression safety net for the Sol
+// parser's evolving Node / Edge shape.
 //
-// Background: the W-C series (W6 using-for, W7 storage/modifier, W8
-// contract-type cast, W9 storage slot, W10 inline-assembly marker)
-// has added several Sol-specific fields on Node and Edge:
+// Background: the Solidity detectors (using-for, storage/modifier,
+// contract-type cast, storage slot, inline-assembly marker) have added
+// several Sol-specific fields on Node and Edge:
 //
-//	Node.SubKind       — W4 contract subkind + W7.2 storage location
+//	Node.SubKind       — contract subkind + storage location
 //	                      on NodeField ("storage_public", "immutable", ...)
-//	Node.SlotIndex     — W9 V0 per-contract slot counter on NodeField
-//	Node.HasAssembly   — W10 V0 presence flag on NodeFunction / NodeModifier
-//	Edge.DispatchKind  — W3 / W7.1 / W8 / etc. dispatch metadata
+//	Node.SlotIndex     — per-contract slot counter on NodeField
+//	Node.HasAssembly   — presence flag on NodeFunction / NodeModifier
+//	Edge.DispatchKind  — dispatch metadata
 //	                      ("interface_method", "low_level_call",
 //	                       "contract_cast", ...)
-//	Edge.Order         — W7.3 multi-modifier source order
+//	Edge.Order         — multi-modifier source order
 //
 // None of these reach the EvidencePack output (BuildPack assembles
 // Commit / Hunk subset, not Function / Field / Edge). But the evidence
@@ -32,9 +32,9 @@ import (
 // field (with realistic non-zero values) plus a known-issue commit
 // subject, then runs BuildPack and locks the surface invariants:
 //
-//  1. BuildPack succeeds without panic when W-C fields are populated.
+//  1. BuildPack succeeds without panic when Sol fields are populated.
 //  2. AMBIGUOUS leak check holds (existing §11.3 boundary).
-//  3. Sol-shaped commit subjects flow through H4 issue extraction
+//  3. Sol-shaped commit subjects flow through commit-subject issue extraction
 //     end to end (the Pack still surfaces the underlying hunks for
 //     commits with extractable issue IDs).
 //  4. The Pack's deterministic ordering by commit timestamp survives
@@ -87,7 +87,7 @@ func TestBuildPack_SolGraphRegression(t *testing.T) {
 				Signature:     "ambiguous hunk should drop",
 				Confidence:    types.ConfAmbiguous,
 			},
-			// Sol-shaped support nodes carrying the new W-C fields.
+			// Sol-shaped support nodes carrying the Sol-specific fields.
 			// These don't appear in Pack hits (Pack is Commit / Hunk
 			// only), but their presence in the store exercises every
 			// AllNodes consumer that BuildPack chains through.
@@ -101,7 +101,7 @@ func TestBuildPack_SolGraphRegression(t *testing.T) {
 				Language:    "sol",
 				Confidence:  types.ConfExtracted,
 				SubKind:     "function",
-				HasAssembly: true, // W10
+				HasAssembly: true,
 			},
 			{
 				ID:            "fld1",
@@ -114,23 +114,23 @@ func TestBuildPack_SolGraphRegression(t *testing.T) {
 				Language:   "sol",
 				Confidence: types.ConfExtracted,
 				Signature:  "address",
-				SubKind:    "storage_public", // W7.2
-				SlotIndex:  0,                // W9
+				SubKind:    "storage_public",
+				SlotIndex:  0,
 			},
 		},
 		edges: []types.Edge{
-			// Sol-shaped edges carrying the new W-C metadata.
+			// Sol-shaped edges carrying the Sol-specific metadata.
 			{
 				Src: "fn1", Dst: "fn1", Type: types.EdgeInvokes,
 				Count: 1, Confidence: types.ConfAmbiguous,
-				DispatchKind: "low_level_call", // W7.1
+				DispatchKind: "low_level_call",
 			},
 			{
 				Src: "fn1", Dst: "fld1", Type: types.EdgeHasModifier,
 				Count: 1, Confidence: types.ConfExtracted,
-				Order: 2, // W7.3
+				Order: 2,
 			},
-			// modifies edge from hunk → file-level field (the H2
+			// modifies edge from hunk → file-level field (the hunk-overlap
 			// §11 path that BuildPack walks).
 			{
 				Src: "h1", Dst: "fn1", Type: types.EdgeModifies,

@@ -247,3 +247,7 @@ func TestDSNHost(t *testing.T) {
 		})
 	}
 }
+
+func (m *mockStoreReader) Review(string, ReviewOptions) (Review, error) {
+	return Review{}, ErrNoReviewIndex
+}

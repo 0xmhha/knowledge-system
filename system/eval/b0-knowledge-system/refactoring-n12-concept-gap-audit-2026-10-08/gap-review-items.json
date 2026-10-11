@@ -1,0 +1,104 @@
+{
+  "status": "draft",
+  "reviewer": null,
+  "decision": null,
+  "human_active_review_ns": null,
+  "items": [
+    {
+      "id": "P12-G01",
+      "requirement_id": "req-filtered-recall",
+      "concept_id": "policy",
+      "finding": "metadata Filter has no version/owner/review/release-policy identity; a retrieval eligibility predicate is not the whole versioned policy concept",
+      "source_ref_ids": [
+        "ontology",
+        "spec",
+        "filter",
+        "trace"
+      ],
+      "observed_coverage": "AND-combined metadata predicates and sparse nearest-neighbor behavior, not policy authority or release enforcement",
+      "missing": "choose a requirement-specific retrieval concept, or identify and review a real versioned policy path and its relevant tests; do not map policy to SearchDetailed just to fill Trace",
+      "reviewer": null,
+      "decision": null,
+      "reason": null
+    },
+    {
+      "id": "P12-G02",
+      "requirement_id": "req-source-evidence",
+      "concept_id": "source-snapshot",
+      "finding": "SourceIdentity represents bytes/policy identity and sourceSnapshotID derives it; ValidateDatasetAlignment verifies coordinated layers but neither alone is the entire captured-source lifecycle",
+      "source_ref_ids": [
+        "ontology",
+        "spec",
+        "identity",
+        "snapshot-hash",
+        "alignment",
+        "trace"
+      ],
+      "observed_coverage": "identity/working-tree/non-Git capture and cross-layer rejection tested separately",
+      "missing": "review partial behavior versus lifecycle representation; identity or capture tests alone do not establish the promoted semantic code-anchor criterion",
+      "reviewer": null,
+      "decision": null,
+      "reason": null
+    },
+    {
+      "id": "P12-G03",
+      "requirement_id": "req-source-evidence",
+      "concept_id": "semantic-assertion",
+      "finding": "Assertion is a typed directed record and Projection.Validate checks endpoint/evidence/review conditions; alignment delegates validation, rather than implementing all assertion meaning",
+      "source_ref_ids": [
+        "ontology",
+        "spec",
+        "assertion",
+        "validate",
+        "alignment"
+      ],
+      "observed_coverage": "typed proof/review conditions and mixed snapshot refusal tested; review names in fixtures are synthetic",
+      "missing": "test full reviewed relation lifecycle separately; Validate is retained but outside selected CKG/CKV input and cannot be newly claimed canonical here",
+      "reviewer": null,
+      "decision": null,
+      "reason": null
+    },
+    {
+      "id": "P12-G04",
+      "requirement_id": "req-ontology-fallback",
+      "concept_id": "term",
+      "finding": "Term represents language/value/preferred; actual MatchConcepts handles aliases, ties and natural language. The existing fallback test uses fakeOntology.MatchConcepts with preselected candidates",
+      "source_ref_ids": [
+        "ontology",
+        "spec",
+        "term",
+        "matcher",
+        "matcher-test",
+        "fallback-test",
+        "fake-matcher"
+      ],
+      "observed_coverage": "real retained matcher to stage2 preserves the scored baseline for 0/1/2 matches; existing separate synthetic unit fixture tests shared-alias ambiguity",
+      "missing": "integration multi-term case is not a same-alias ambiguity case; matcher and matcher_test are retained but outside selected CKG/CKV input",
+      "reviewer": null,
+      "decision": null,
+      "reason": null
+    },
+    {
+      "id": "P12-G05",
+      "requirement_id": "req-ontology-fallback",
+      "concept_id": "evidence-pack",
+      "finding": "EvidencePackV2 is a response DTO, BuildFromRefs creates bounded/sanitized retained evidence. Stage2 preserves scored citations and does not create or sanitize the whole response",
+      "source_ref_ids": [
+        "ontology",
+        "spec",
+        "pack-type",
+        "pack-build",
+        "pack-secret-test",
+        "fallback",
+        "fallback-test"
+      ],
+      "observed_coverage": "real retained resolver, controlled graph/CKV inputs, production V2 Build and actual sanitizer: raw coordinates/citations/bodies/empty-neighbors/evidence-state invariant, diagnostics stamped; body/diagnostic tampering rejected",
+      "missing": "no live hybrid retrieval, populated graph neighbors, reviewed semantic overlay or reviewed criterion acceptance; broader full-pack implementation/test path still needs scope review",
+      "reviewer": null,
+      "decision": null,
+      "reason": null
+    }
+  ],
+  "technical_audit_complete": true,
+  "missing_paths_closed": 0
+}

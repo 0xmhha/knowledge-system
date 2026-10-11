@@ -190,7 +190,7 @@ func TestMatchHTTPClients_ExactNotSuffix(t *testing.T) {
 }
 
 // TestMatchHTTPClients_TSClientToGoServer is the 4-permutation acceptance
-// criterion (schema-1.9-spec §7 W2) for TS→Go.
+// criterion (schema-1.9-spec §7) for TS→Go.
 func TestMatchHTTPClients_TSClientToGoServer(t *testing.T) {
 	tsClient := node("ts-fn", types.NodeFunction, "ts", "Caller", types.ConfExtracted, "")
 	tsPlaceholder := node("ph-1", types.NodeEndpoint, "external", "http:POST /api/users", types.ConfAmbiguous, "http")

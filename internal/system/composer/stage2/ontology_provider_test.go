@@ -96,3 +96,62 @@ func TestProvidedOntologyLimitsTiesWithoutAssertingOneMeaning(t *testing.T) {
 		}
 	}
 }
+
+// A verified concept whose IMPLEMENTED_BY relation is not verified exposes no
+// implementations (semantic.ActiveProjection.VerifiedImplementations, covered
+// by TestActiveProjectionExposesOnlyVerifiedImplementations). Here the
+// composed search keeps the exact baseline, including a CKG-only citation,
+// while the verified-relation positive control proves the arm can reorder.
+func TestProvidedOntologyUnverifiedRelationPreservesCKGAndCKVBaseline(t *testing.T) {
+	commit := strings.Repeat("a", 40)
+	ckvHits := []contract.Hit{
+		{Citation: contract.Citation{File: "a.go", StartLine: 1, EndLine: 2, CommitHash: commit}},
+		{Citation: contract.Citation{File: "b.go", StartLine: 1, EndLine: 2, CommitHash: commit}, CanonicalID: "pkg.Beta"},
+	}
+	graphOnly := contract.Citation{File: "graph.go", StartLine: 5, EndLine: 9, CommitHash: commit}
+	backend := func() *ckgclient.Fake {
+		return &ckgclient.Fake{BM25Hits: []contract.Hit{{Citation: graphOnly, CanonicalID: "pkg.Graph"}}}
+	}
+	verifiedConcept := []semantic.ConceptCandidate{{ConceptID: "beta", Status: semantic.StatusVerified}}
+	plain, err := New(backend())
+	if err != nil {
+		t.Fatal(err)
+	}
+	base, err := plain.Search(context.Background(), "Beta", []string{"Beta"}, ckvHits, contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hasGraph := false
+	for _, c := range base.Citations {
+		hasGraph = hasGraph || c.Citation.Key() == graphOnly.Key()
+	}
+	if !hasGraph || len(base.Citations) != 3 || base.Citations[0].Citation.File == "b.go" {
+		t.Fatalf("fixture baseline must hold the CKG-only citation and not already rank b.go first: %+v", base.Citations)
+	}
+	run := func(implementations map[string][]semantic.CodeImplementation) Stage2Output {
+		t.Helper()
+		f := fakeOntology{snapshot: semantic.Snapshot{Commit: commit}, candidates: verifiedConcept, implementations: implementations}
+		s, err := New(backend(), WithOntologyProvider(providerFunc(func(context.Context) (OntologyResolver, error) { return f, nil }), 0.2, time.Second))
+		if err != nil {
+			t.Fatal(err)
+		}
+		out, err := s.Search(context.Background(), "Beta", []string{"Beta"}, ckvHits, contract.IntentBugFix)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+	unverified := run(nil)
+	if !reflect.DeepEqual(unverified.Citations, base.Citations) || unverified.Ontology == nil ||
+		unverified.Ontology.State != "active" || unverified.Ontology.AppliedRelations != 0 || unverified.Ontology.BoostedCitations != 0 {
+		t.Fatalf("unverified relation changed the CKV+CKG baseline: %+v", unverified)
+	}
+	if len(unverified.ConceptCandidates) != 1 || unverified.ConceptCandidates[0].Status != semantic.StatusVerified {
+		t.Fatalf("verified concept interpretation was lost: %+v", unverified.ConceptCandidates)
+	}
+	verified := run(map[string][]semantic.CodeImplementation{"beta": {{AssertionID: "verified", CanonicalID: "pkg.Beta",
+		Evidence: semantic.EvidenceSpan{Snapshot: semantic.Snapshot{Commit: commit}, Path: "b.go", StartLine: 1, EndLine: 2}}}})
+	if verified.Ontology == nil || verified.Ontology.AppliedRelations != 1 || reflect.DeepEqual(verified.Citations, base.Citations) {
+		t.Fatalf("positive control: a verified relation must be able to reorder: %+v", verified)
+	}
+}

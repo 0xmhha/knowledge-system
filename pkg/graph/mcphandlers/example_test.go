@@ -68,7 +68,7 @@ func TestRegisterAll_LocksEightTools(t *testing.T) {
 // Register* function end to end without RegisterAll, so callers that
 // only need a subset of the tool surface (cks may want everything
 // except evidence_for_intent, for example) have a guaranteed-to-work
-// pattern. The H3 safety wrapper is *not* applied in this branch —
+// pattern. The safety wrapper is *not* applied in this branch —
 // individual Register* callers are responsible for wrapping their
 // reader themselves; the test verifies the unwrapped form compiles
 // and answers a real query.

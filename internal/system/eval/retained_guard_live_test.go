@@ -20,8 +20,9 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
-// This opt-in SDK diagnostic uses only private copies of already built DEV
-// fixtures. Never point it at FINAL inputs. It produces no quality verdict.
+// This opt-in SDK diagnostic uses only private copies of already built
+// development (DEV) fixtures. Never point it at held-out final evaluation
+// inputs. It produces no quality verdict.
 func TestRetainedGuardLiveSDK(t *testing.T) {
 	casesPath := os.Getenv("B0_RETAINED_GUARD_CASES")
 	if casesPath == "" {

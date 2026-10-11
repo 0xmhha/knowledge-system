@@ -456,7 +456,7 @@ INSERT INTO nodes VALUES ('n_a', 'pkg.A', 'a/f.go', 20, 30);
 	}
 }
 
-// TestCanonicalAvailable_ManifestSchemaGate verifies the ADR-007/D-2 gate: a
+// TestCanonicalAvailable_ManifestSchemaGate verifies the ADR-007 gate: a
 // graph whose in-db manifest records schema_version >= 1.19 is trusted (even
 // before a population probe), and < 1.19 is refused. Float-pitfall guarded:
 // "1.9" must be treated as < "1.19".

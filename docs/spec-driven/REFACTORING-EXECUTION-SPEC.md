@@ -1,6 +1,42 @@
 # 후속 리팩토링 실행 명세와 완료 판정
 
+2026-10-11 최신 단계: **N18 완료(사용자 승인)**. [판정](./N18-RELEASE-VERDICT-DRAFT.md) — 선택 기능 기본값 유지, 로컬 개인 운영 허용, merge·공개 배포 보류. N16은 사용자 결정으로 공개키 fingerprint 미충족 유지. 전체17/18·남은1개: N16.
+
+2026-10-11 최신 단계: **N08·N09 종료(사용자 결정)**. N08은 FINAL2 개선 근거가 없어 사용 타입 선언 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 돌렸고, 기본 인용은 이전 binary와 7/7 같다. N09는 guard 기계 동작을 확인했지만 무답 2단위라 inconclusive로 종료했다. 전체16/18·남은2개: N16, N18.
+
+2026-10-11 최신 단계: **FINAL2 실행·채점, N10 완료**. [결과·판정](./FINAL2-RESULT.md) — 후보 FINAL warm p95비 1.039–1.109로 N10-C 충족, 검색 차이는 모두 N08 삽입. N08 MRR −0.032·개선 근거 없음, N09 guard 동작·inconclusive. 전체14/18·남은4개.
+
+2026-10-10 최신 단계: **FINAL2 초안 검토 요청(미동결·미실행)**. [초안](./FINAL2-DRAFT-REVIEW.md) — 소규모: N10은 p95비로 판정 가능, N08·N09는 소표본으로 inconclusive 예정. runner 참조 binary 실행·채점기 binary 비교 추가. 전체13/18·남은5개.
+
+2026-10-10 최신 단계: **N09 미지정 사실 기권·N08 사용 타입 선언 추가(제품 변경)**. [N09](./N09-DECLARED-UNKNOWN.md) — 검토된 unknowns 레코드에 일치하면 근거 줄만 인용·`declared_unknown`, 혼합 인용 거부(시험6·변이6). [N08](./N08-TYPE-NEIGHBORS.md) — uses_type 선언+doc comment 최대2개 삽입, DEV 개발 측정 Recall@10 0.762→0.833·MRR 0.544→0.563, p95비 0.98–1.05. 저장소 unknowns 자료 검토·새 corpus·새 독립 FINAL(이전/새 binary 비교 포함)이 남는다. 전체13/18·남은5개.
+
+2026-10-10 최신 단계: **N10 요청 단위 archive 검증 공유**. [변경·DEV 측정](./N10-REQUEST-VERIFICATION.md) — 요청당 전체 검증 3–8회→2회, 시험3·변이4 검출·17패키지 race 통과, DEV 개발 측정 p95비 0.92–0.98·품질 DEV3와 동일. 종료 시 강제 종료 9건(측정 행 실패0)과 N10-C의 새 독립 FINAL 필요가 남는다. 전체13/18·남은5개: N08, N09, N10, N16, N18.
+
+2026-10-10 최신 단계: **N11 완료(inconclusive/disabled/출시 보류)**. [DEV3·FINAL 결과](./N11-FINAL-RESULT.md) — 깨끗한 DEV3와 독립 FINAL(2,400행, 오류0)을 실행·채점했다. 8arm 품질 지표 동일(FINAL Recall@10 1.0·MRR 0.587), warm p95비 1.37–1.97로 N10-C 미충족, ABS off-basis 인용 100%로 N09 미충족, N08 개선 근거 없음. 전체13/18·남은5개: N08, N09, N10, N16, N18.
+
+2026-10-10 최신 단계: **N15·N17 완료, N16 미완료**. [로컬 운영 수용](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 사용자 범위 결정(로컬 개인 운영, 소비자 go-stablenet)으로 실제 bge-m3 색인(29.5분·20,958 embedding·1.2GB), submodule 캡처 결함 수정(e90fab1f), MCP 질의 5건(11–18초), 백업·손실·복구 훈련(첫 질의 35초)을 실행하고 사용자가 수용했다. N16은 서명 키를 쓰지 않기로 해 공개키 fingerprint 조건 미충족. 전체12/18·남은6개: N08, N09, N10, N11, N16, N18.
+
+2026-10-10 최신 단계: **N14 완료**. [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388(retained archive 검증 batch)을 소유 dataset의 hold 후보(snapshot b4d63460)로 색인·patch 등록, 검토 판정 내용 동일 결합, linked run 9/10, 잘못된 run 4종 거부, 기준4개를 사용자 판정(표기 opus, 초안 이유 채택)으로 승인·승격, 반려 대조 거부, 해제된 버전 사이 rollback, 원본 없이 보관본 재생 통과. 전체10/18·남은8개: N08, N09, N10, N11, N15, N16, N17, N18.
+
+2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.
+
+2026-10-08 최신 하위 단계: **N12 actual foreign-code-anchor 승격·active 보존 통합 회귀 보강**. [새 시험·범위](./N12-CODE-ANCHOR-PROMOTION-REGRESSION.md) — 공개CKG2source/2DB·canonical stable/commit 다름,5사례8쓰기+2activation 거부/old current·저장 자료·reopen 보존. semantic race42시험20하위시험/vet/boundary/format 통과. 최초 fixture YAML 작성 오류는 제품RED와 별도 보존했다. 기존 held66artifact·승인input5 불변, 새 시험은 이전55d8/43ba/f839 pilot 후보에 아직 미포함이다. 전체8/18·남은10개 유지;다음 새 source/index/canonical 관계 결합과 N11 실제 gold·독립성/검토자 판정. 남은 N08/09/10/11/12/14/15/16/17/18. 사람 승인·새FINAL·실모델·운영 활성화0.
+
+2026-10-08 최신 하위 단계: **N12 기능 version2의 새 실제 source/CKG·CKV/관계15 준비 검증**. [증거·기준별 누락](./N12-FUNCTIONAL-V2-TRACE-PREPARATION.md) — source1,437/CKG62·CKV65/742chunks·621canonical,15proposed 관계/11canonical/74span/27문서,related race7시험24하위시험·5거부·원 source/dataset/store 없이 archive 재생 통과. 전체Go DRIFT992는 유지했다. 개별 판정0/spec_unapproved3/활성0/새FINAL0, 전체8/18·요청5/15·남은10개 유지. 다음 N12 actual foreign-code-anchor 승격·active 보존 통합 시험 보강과 N11 gold·독립성/실제 검토자 판정. 남은 전체 N08/09/10/11/12/14/15/16/17/18. 이전 후보·승인input5는 보존하며 새 관계를 독립 FINAL로 세지 않는다.
+
+2026-10-08 최신 하위 단계: **N11/N12 권고 범위2개 선택 적용**. [적용·원문 검증](./N11-N12-SCOPE-ADOPTION.md) — POLICY/TRACE 코드 계약과 실제 조직/검토 경로 구분, 새 metadata 초안7행;N12 core20보존+functional3·요구3/v2/criteria4·30source span/30digest 거부·SQLite reopen/bundle 독립 재생 확인. scope2선택은 개별 content 승인과 별도이며 reviewer name미입력/개별gold·관계·criterion0/spec_unapproved3/current0이다. 기존 pool·held 후보·승인input5는 보존했다. 전체8/18·남은10개 유지;다음 개별검토·부족 독립군 보강·새 전체 source/index 결합. 남은 N08/09/10/11/12/14/15/16/17/18. Claude/model/새FINAL0.
+
+2026-10-08 최신 하위 단계: **N09 CKV 평가 보조 함수의 빈 snippet 오판 수정**. [수정·검증](./N09-EMPTY-SNIPPET-VERIFICATION.md) — 수정 전4내용없음 사례 Verified=true/집계 오류 RED, 수정 후 empty_snippet 진단·관련2패키지 race103시험4하위시험 pass/실BGE smoke1skip·vet/boundary/format 통과. 임시Git 서명·Go cache 환경 실패는 별도 보존하고 명령 범위의 fixture 서명 설정만 조정했다. 실제 기권/인용0/새FINAL/사람 판정0, 전체8/18·남은10개 유지. 다음 N11 gold·독립성/범위·충분한 표본 보강과 N12 실제 관계 판정 후 동결/평가. 남은 전체 N08/09/10/11/12/14/15/16/17/18. Claude 실행/외부 전송0, Codex 직접 수행.
+
+2026-10-08 최신 하위 단계: **Codex 직접 N11 추가 원문8범위·응답 두 표면 조사**. [조사와 보류](./N11-SOURCE-PROBE-INVESTIGATION.md) — source8+기존 제외 기준1, 고정 Markdown259개와27gzip/11,632행을 대조했다. response.content23,262문자열을 추가 검사했고 기존CAND05의480노출을 재확인했다. 6범위는 이전 설계·튜닝으로 격리,2개는 의미 중복 검토가 필요한 비실행 초안으로 보류했다. 기존DEV7/FINAL후보13/제안군8/제외6·승인0, 전체8/18·남은10개 유지. 다음 실제 범위/개별 gold·독립성·관계 판정과 더 넓은 미사용 사실군 확보. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. Claude 실행/외부 전송0이며 사용자 요청에 따라 직접 실행으로 전환했다.
+
 2026-10-06 · 개발 시작 코드 `c9c91ebe` · [전체 작업·우선순위](./REFACTORING-REMAINING-WORKLIST.md) · [원래 요구사항/WBS 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)
+
+2026-10-08 추가 검증: [N14 exact 보고서 통합 회귀](./N14-EXACT-RUN-ROUNDTRIP.md)의 소유 root/nested CKG 원문·생산 runner→공개 import/재시도·proof 거부·immutable 보존·자동 판정/승격 없음과 race47시험33하위시험 통과. N12 미적용 범위 초안의 필수 질문을 교정하고 생산 파서/구조를 확인했으나 실제 source binding/사람 승인으로 대체하지 않는다. 전체8/18·남은10개, N14-A–E는 미체크다.
+
+2026-10-08 N12 추가 검증: [생산 shared-alias 통합 회귀](./N12-SHARED-ALIAS-INTEGRATION.md)는 소유한 원문/좌표 fixture의 실제 파서·SQLite 재열기·동률 matcher2/9개·상한 fallback·retained 정제/무결성을 연결했다.10질문 제어/변조10거부 및 관련 race116시험104하위시험 통과. 기존 실제 파일럿 미적용·사람 판정/새 FINAL0이며 N12-A–D/N14-A–E와 전체8/18·남은10개를 유지한다.
+
+2026-10-08 N11 추가 출처 대조: [응답 본문 감사](./N11-RESPONSE-EXPOSURE-AUDIT.md)로 기존27gzip/11,632행·71,542body·graph neighbor0 및26source refs를 검증했다. CAND05의104행480본문은 실제fileSHA/행SHA까지 동일하며 기존 제외를 유지한다. 긴 단일 행까지 검사한 나머지 일치0은 독립성 승인으로 사용하지 않는다. 전체8/18·남은10개 및 N11-A–D 미체크, scope/gold/군·독립성 판정과 동결은 남는다.
 
 ## 목적과 유지할 계약
 
@@ -203,12 +239,14 @@ N-07 검증: [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactori
 
 ## N-11: 새 평가 사전 동결
 
+**상태: 완료(2026-10-10).** [DEV3·FINAL 결과](./N11-FINAL-RESULT.md) — 동결 입력으로 DEV3 1,680행·FINAL 2,400행을 오류 0으로 실행·채점했다. 모든 중요군이 독립 단위 10개 미만이라 inconclusive, 기본값 disabled·출시 보류다. 채점 어댑터의 단위 범위 수정은 지표 관측 전이며 DEV3 값은 같았다.
+
 **상태: 설계/입력 준비.** [검토 입력과 실행 순서](./REFACTORING-DEPENDENCY-REVIEW.md)의 모델·8arm·안전/품질/비용 임계치와 독립 표본 규칙을 유지한다. 이미 관측한 FINAL을 재사용하지 않는다. 질문/gold/독립 단위/분할/출처를 정리한 후 새 사전 검토를 받으며, 결과 관측 이전에 바이트를 고정한다. 아직 새 입력의 승인·실험 결과를 기록하지 않았다.
 
-- [ ] N11-A 새 DEV/독립 FINAL과 원문 gold·출처·독립 단위/cluster 및 기존 FINAL 제외를 검토 가능하게 작성.
-- [ ] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
-- [ ] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
-- [ ] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
+- [x] N11-A 새 DEV/독립 FINAL과 원문 gold·출처·독립 단위/cluster 및 기존 FINAL 제외를 검토 가능하게 작성.
+- [x] N11-B 모델·팩/ontology arm·회전·분모·임계치·비용·표본 조건의 사전 검토 기록과 입력 동결.
+- [x] N11-C 실행 전 source/model/입력·평가 단위 검증 및 중요군 부족/관측·변경 시 inconclusive/회전/disabled 보호.
+- [x] N11-D 현재 코드/입력/실행 증거에 바인딩하고 N-08/09/10에서 기존 FINAL 튜닝/부풀림 없이 사용.
 
 ## N-13: worksheet의 선택형 조직 catalog
 
@@ -227,12 +265,12 @@ N-13 증거: [manifest](../../system/eval/b0-knowledge-system/refactoring-n13-20
 
 ## N-12: 실제 파일럿 내용·후보 관계 검토
 
-**상태: 검토 자료 준비 / 사람 판정 대기.** [검토 자료](./N12-ACTUAL-PILOT-REVIEW.md), [원자료](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-preparation-manifest.json). D1의20개는 공통 metamodel이다. 실제 커밋076f6de2에서20타입/3요구/4기준·27원문span을 추출하고 파일/줄/spanSHA를 독립 대조했다. 현행 사용 후보와6개 정확 테스트 실행을 연결했다. 별도 committed-source 추출이므로 실제 pinned v2 lock/CKG canonical 관계 또는 승격 완료라고 주장하지 않는다.
+**상태: 완료 · 2026-10-09 (검토자: 사용자 지정 AI 검토 라벨 “opus5.5 검토”, 독립 사람 내용 검토 아님).** [결합·활성화·linked run](./N12-REVIEWED-ACTIVATION.md). 이전 상태: 검토 자료 준비. [검토 자료](./N12-ACTUAL-PILOT-REVIEW.md), [원자료](../../system/eval/b0-knowledge-system/refactoring-n12-review-2026-10-06/review-preparation-manifest.json). D1의20개는 공통 metamodel이다. 실제 커밋076f6de2에서20타입/3요구/4기준·27원문span을 추출하고 파일/줄/spanSHA를 독립 대조했다. 현행 사용 후보와6개 정확 테스트 실행을 연결했다. 별도 committed-source 추출이므로 실제 pinned v2 lock/CKG canonical 관계 또는 승격 완료라고 주장하지 않는다.
 
-- [ ] N12-A 실제 원문20개/3명세/4기준 및 정책·ADR6주장/12제안 관계의 출처·권위·범위·시점·후보 관계를 사람이 승인/수정/기권하고 검토자로 기록.
-- [ ] N12-B 승인된 내용/관계를 새 coordinated capture·lock·snapshot/CKG canonical·semantic projection에 결합, 누락/불일치/관계 오용과 자동 승격0을 재검증.
-- [ ] N12-C 추출 오차/관계 오용의 실제 검토 결과와 실제 활동 시간/비용 기록; 미측정은 null/미측정으로 표시하고 대기 시간으로 대체하지 않음.
-- [ ] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
+- [x] N12-A 실제 원문20개/3명세/4기준 및 정책·ADR6주장/12제안 관계의 출처·권위·범위·시점·후보 관계를 사람이 승인/수정/기권하고 검토자로 기록.
+- [x] N12-B 승인된 내용/관계를 새 coordinated capture·lock·snapshot/CKG canonical·semantic projection에 결합, 누락/불일치/관계 오용과 자동 승격0을 재검증.
+- [x] N12-C 추출 오차/관계 오용의 실제 검토 결과와 실제 활동 시간/비용 기록; 미측정은 null/미측정으로 표시하고 대기 시간으로 대체하지 않음.
+- [x] N12-D 현행 소스/입력/원자료/검토 판정 바인딩과 다음 N14 실제 의미 수용 계획 연결; 테스트 pass/linked/verified/accepted를 분리.
 
 N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인딩 DEV7개와 기존 승인 조건 보존 초안을 만들었다. 아직 새 FINAL0, 새 gold/cluster 승인0, 실행0이며 N11-A–D 미완료다. 기존 FINAL은 재실행해 새holdout으로 쓰지 않는다.
 
@@ -248,39 +286,115 @@ N11은 [준비 기록](./N11-FRESH-EVALUATION-PREPARATION.md)의 원문 바인�
 
 [실행 보호 계약](./N11-EVALUATION-RUNNER-CONTRACT.md)의 사전 입력 검사·frozen runtime/source/model/config/binary/K 결합과 FINAL dispatch 전 영구 OS 잠금/내구성 예약을 구현했다. Python19개·Go binding 정상1/거부10 및 기존2패키지 race, native CLI4제어를 확인했다. 예약은 관측이 아니며 crash/실패 뒤에도 자동 회수하지 않는다. 실제 미승인 DEV 초안은 child dispatch0/새질의0으로 거부됐다. 새 승인·FINAL·실제 평가 결과가 없어 N11-A–D는 모두 미완료다. 원 FINAL/승인 입력은 불변이다.
 
+## N-08: 검색 품질(사용 타입 선언)
+
+**상태: 완료(개선 근거 없음·기본 비활성) · 2026-10-11.** 이 절의 체크는 작업리스트 N-08 수용 열과 2026-10-11 사용자 종료 결정("기본 비활성 후 종료")을 옮긴 것이다. "개선 확인" 조건은 충족하지 못했다. 개선이 확인되지 않은 상태로 종료하며, 품질 개선을 주장하지 않는다. [FINAL2 결과](./FINAL2-RESULT.md) — 이전/새 binary의 recall은 같고 MRR은 −0.032다. 삽입된 선언이 5문항에서 gold보다 위에 들어갔고, 개선된 문항은 없다. [비활성 기록](./N08-TYPE-NEIGHBORS.md)
+
+- [x] N08-A 질문/gold hardcode 없이 원인을 분리하고 후보를 구현·시험. 원인은 타입 선언의 순위와 `uses_type` edge 누락이다.
+- [x] N08-B 사전 승인한 새 독립 FINAL에서 이전/새 binary의 품질·회귀를 판정. 중요군 소표본은 inconclusive로 명시하고, 개선 근거가 없음을 기록.
+- [x] N08-C 개선 근거가 없으므로 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 돌림. 기본 응답이 이전 binary와 같고 원문/신원/안전 시험이 유지됨을 확인.
+
+## N-09: 무답·기권(미지정 사실)
+
+**상태: 완료(기계 동작 확인·inconclusive) · 2026-10-11.** 이 절의 체크는 작업리스트 N-09 수용 열과 2026-10-11 사용자 종료 결정("inconclusive로 종료")을 옮긴 것이다. 무답 단위가 2개뿐이어서 효과 크기는 inconclusive다. 답변 수준 기권은 null이다. 기본 활성화나 출시 근거로 쓰지 않는다. [FINAL2 결과](./FINAL2-RESULT.md), [구현](./N09-DECLARED-UNKNOWN.md)
+
+- [x] N09-A 무답의 검색 근거 상태와 downstream 보류 계약을 구현·시험. `declared_unknown` 상태에서는 근거 줄만 인용하고, 혼합 인용과 상태 밖 레코드는 거부한다.
+- [x] N09-B 승인된 무답/답가능 대조 사례에서 guard를 검증. 무답 knowledge on은 240/240행이 `declared_unknown`이고 근거 외 인용이 0이다. 대조·DEV의 잘못된 기권은 0/600이다.
+- [x] N09-C 사람 기권과 기계 무인용을 따로 집계. 생성 답변 평가가 없으므로 답변 수준 기권은 null이고, 소표본은 inconclusive로 기록.
+
+## N-18: 기본값·출시 판정
+
+**상태: 완료 · 2026-10-11(사용자 승인).** [판정](./N18-RELEASE-VERDICT-DRAFT.md) — 선택 검색 기능(ontology arm, knowledge pack, 사용 타입 선언)은 개선 근거가 없거나 소표본이어서 기본 off·opt-in을 유지한다. 출시 범위는 수용된 로컬 개인 운영만 허용한다. `main` merge와 공개 배포는 보류한다. 사람의 독립 내용 검토가 없고(검토 라벨 "opus5.5 검토"), N16 서명 조건이 미충족이기 때문이다. 이 절의 체크는 작업리스트 N-18 수용 열과 사용자 승인을 옮긴 것이다.
+
+- [x] N18-A 독립 평가(N11·FINAL2), 비용(N10), 원래 회귀(HEAD 전체 race, 1개 간헐 실패 기록)로 기능별 기본값을 판정. 합격 근거가 없는 선택 기능은 disabled 또는 opt-in으로 유지.
+- [x] N18-B 운영 결정(N15·N17 로컬 개인 운영, N16 미충족)으로 출시 범위를 판정. 로컬 운영은 허용하고 merge·공개 배포는 보류.
+- [x] N18-C 판정 문서, 회귀 결과, 한계를 원장에 결합. merge·push·배포는 별도 권한으로 남김.
+
 ## N-10: 비용·지연과 비반환 진단
+
+**상태: 완료 · 2026-10-11.** [FINAL2 결과](./FINAL2-RESULT.md) — 사전 승인 규칙대로 후보 binary(`7077741f`) FINAL에서 기준 외 7arm warm p95비 1.039–1.109(≤1.25), 참조(`7c57a388`) 1.334–1.873. 행 오류0·cold 분모30/30. 후보 인용 목록은 10문항 모두 참조 순서를 유지하고 차이는 N08 타입 선언 삽입뿐이라 N10 자체의 검색 회귀는 없다. B에서 기권 경로의 잘못된 기권0. 소표본 품질 판정은 N08·N09에서 inconclusive로 남긴다.
+
+**2026-10-10 후속: 요청 단위 archive 검증 공유(`37302b35`).** [변경·DEV 측정](./N10-REQUEST-VERIFICATION.md) — 요청당 검증 3–8회를 2회로 줄였고, 응답 인용은 변경 전과 같다. DEV 개발 측정의 p95비는 0.92–0.98(DEV3 1.20–1.73)이다. 동결 규칙상 관측 뒤 변경이므로 C는 새 독립 FINAL로 판정한다.
+
+**2026-10-10 상태: A·B·D 충족 / C 미충족.** [FINAL 결과](./N11-FINAL-RESULT.md) — 동결 입력 8arm 회전·직렬 측정과 비용 분해를 마쳤다. FINAL warm p95비는 기준 외 7arm 모두 1.37–1.97(DEV3 1.20–1.73)로 1.25를 넘는다. backend 시간은 arm 간 같고 증가분은 projection 검증·조립이다.
 
 **상태: 진단 세부 구현 검증 / 새 평가 대기.** [typed neighbors 진단](./N10-NEIGHBOR-DIAGNOSTICS.md)을 구현했다. 새 구조 RED→GREEN과 실제 SQLite3제어에서 미해결 seed/정상 빈 traversal/닫힌 store 오류를 구분했다. outcome/실패 분모·composer 결과·원문 argument SHA 및 이전 원자료를 보존한다. Go3패키지 race/vet·Python17개·계층 경계를 통과했다. 새 BGE/비용/paired p95 결과는 아직 없으며 전체 완료가 아니다.
 
-- [ ] N10-A N11의 사전 검토·동결한 새 입력/source/model/runtime에서 같은8arm·회전·직렬 warm/cold 비용을 측정.
-- [ ] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
-- [ ] N10-C 소스/근거/프로젝트·모델 신원·안전·검색/기권 회귀를 유지한 범위 내 개선과 p95비1.25 수용 판정; 소표본은inconclusive.
-- [ ] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.
+- [x] N10-A N11의 사전 검토·동결한 새 입력/source/model/runtime에서 같은8arm·회전·직렬 warm/cold 비용을 측정.
+- [x] N10-B 실제K/MID/요청·원문/반환 크기·논리/HTTP 시도와 성공/오류/incomplete 분모를 보존하며 비용·원인 분해.
+- [x] N10-C 소스/근거/프로젝트·모델 신원·안전·검색/기권 회귀를 유지한 범위 내 개선과 p95비1.25 수용 판정; 소표본은inconclusive.
+- [x] N10-D 현행 소스/입력/원자료·제한과 검토자/비용 기록을 연결하며 과거 unbound 오류의 원인/현재 품질로 소급 단정하지 않음.
 
 ## N-15: 현행 패키지·외부 모듈·native 환경 검증
 
-**상태: 구현/검증 중 · 전체 미완료.** 내구성/GC/자원/본문 예산 변경 전의 패키지 증거를 현행 소스로 자동 확장하지 않는다. 새 clean Git checkout에서 host-preview를 만들고 추출된 바이너리로 별도 저장소 설치·재시작·데이터 갱신·rollback과 외부 Go 모듈의 공개 계약 사용을 확인한다. 구조 mock fixture와 실제 조직/모델 소비자를 분리한다. 공개 pkg만 import하는 외부 모듈은 internal 접근/저장소 내 테스트의 우회를 피한다. raw v2 integrity·원문/SHA와 public DTO 검사는 별도로 확인한다.
+**상태: 완료 · 2026-10-10(로컬 개인 운영 범위).** [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — go-stablenet 실제 색인·소비자 질의·submodule 캡처 수정·사용자 수용. 이전 상태: 구현/검증 중 · 전체 미완료. 내구성/GC/자원/본문 예산 변경 전의 패키지 증거를 현행 소스로 자동 확장하지 않는다. 새 clean Git checkout에서 host-preview를 만들고 추출된 바이너리로 별도 저장소 설치·재시작·데이터 갱신·rollback과 외부 Go 모듈의 공개 계약 사용을 확인한다. 구조 mock fixture와 실제 조직/모델 소비자를 분리한다. 공개 pkg만 import하는 외부 모듈은 internal 접근/저장소 내 테스트의 우회를 피한다. raw v2 integrity·원문/SHA와 public DTO 검사는 별도로 확인한다.
 
 - [x] N15-A 현재 소스 commit·Go/native dependency·패키지/바이너리/고지 SHA와 clean build receipt 결합.
 - [x] N15-B 추출 패키지의 별도 프로젝트 설치/재시작/갱신/rollback 및 외부 Go 모듈의 v1/v2 공개 계약·입력 거부 확인.
-- [ ] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
-- [ ] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
-- [ ] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
+- [x] N15-C 실제 native Linux AMD64 호스트의 설치/갱신/복구 및 native dependency 실행 증거. ARM 위 에뮬레이션과 구별.
+- [x] N15-D 실제 모델·규모·외부 운영 소비자 설치/upgrade와 지원·비용·제한 수용 판정.
+- [x] N15-E 현재 소스/원자료/수용 판정·한계를 문서/원장에 결합. local mock 통과로 전체 지원 또는 품질 합격을 주장하지 않음.
 
-현재 Darwin 구조 시험과 native CI 작업 정의를 준비한다. CI 정의만으로 실행했다고 표시하지 않는다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
+Darwin 구조 시험과 실제 native Linux AMD64 CI 실행을 대조했다. [native Linux 원자료/CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)으로 N15-C만 완료하며 D/E 전체 운영 수용을 유지한다. 운영 역할·고지 적합성·복구 RTO/RPO는 N16/17 조건이다. 원 FINAL·새 N11 입력·사용자 자료/모델은 변경하지 않는다.
 
 ## N-17: 복구 루트의 reader 보호와 실제 운영 훈련
 
-**상태: 실패 재현/수정 중 · 전체 미완료.** N15 현행 패키지로 새 루트에 candidate 백업을 복사하고 rollback한 결과 current는 복원됐지만 `.readers`가 없어 MCP 초기화가 실패했다. reader protocol marker는 candidate 안에 있고 OS lease inode는 dataset 루트에 있어 백업한 버전만으로는 reader admission이 완성되지 않는다.
+**상태: 완료 · 2026-10-10(로컬 개인 운영 범위).** [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md) — 실제 운영 데이터셋 백업·손실 모의·복구(첫 질의 35초, RTO 1시간)와 사용자 수용. 이전 상태: 실패 재현/수정 중 · 전체 미완료. N15 현행 패키지로 새 루트에 candidate 백업을 복사하고 rollback한 결과 current는 복원됐지만 `.readers`가 없어 MCP 초기화가 실패했다. reader protocol marker는 candidate 안에 있고 OS lease inode는 dataset 루트에 있어 백업한 버전만으로는 reader admission이 완성되지 않는다.
 
 복원/승격은 mutation OS 잠금 아래 원문·신원·review 권한을 먼저 검증한 뒤, protocol이 있는 target의 reader lease를 준비하고 sync한다. candidate의 marker/원문/신원은 다시 쓰지 않는다. 기존 inode는 유지하여 살아 있는 reader와 GC의 보호를 이어간다. linked directory/inode 또는 다중 hardlink는 pointer 전환 전에 거부한다. protocol 없는 legacy target은 자동 업그레이드하지 않는다. 조회 경로가 lock을 자동 복구하거나 삭제하도록 완화하지 않는다.
 
 - [x] N17-A 현행 패키지의 실패 후보/current 보존·손상 대상 거부와 원본 payload SHA 기록.
 - [x] N17-B 새 루트 백업 복원·reader lease/기존 inode 보존·원본 source 없는 인용 재생; 실제 public CLI/MCP 검증.
-- [ ] N17-C 실제 backup/failover 담당·RTO/RPO·키 복구·network/전원 정책 및 대상 호스트 판정.
-- [ ] N17-D 실제 운영 후보의 복구·실패전환 훈련과 조건별 시간/데이터 손실·사람 수용 증거.
-- [ ] N17-E 코드/원자료/한계·검토 판정 바인딩과 N18 연결. owned mock restore 시간을 실제 RTO/RPO 판정으로 사용하지 않음.
+- [x] N17-C 실제 backup/failover 담당·RTO/RPO·키 복구·network/전원 정책 및 대상 호스트 판정.
+- [x] N17-D 실제 운영 후보의 복구·실패전환 훈련과 조건별 시간/데이터 손실·사람 수용 증거.
+- [x] N17-E 코드/원자료/한계·검토 판정 바인딩과 N18 연결. owned mock restore 시간을 실제 RTO/RPO 판정으로 사용하지 않음.
 
 N17-A/B의 local 기술 재검증과 N17-C/D의 실제 운영 판정은 별개다. 이번 실패는 이전 N05/N04의 기록된 원자료를 바꾸지 않고 현재 복원 경로의 추가 회귀 증거로 보존한다.
 
 N15/N17 [현행 기술 검증](./N15-N17-CURRENT-TECHNICAL-VALIDATION.md)에서 위 A/B local 범위를 확인했다. N15-C/D/E와 N17-C/D/E의 native/실제 소비자/운영 수용 조건은 미완료다. 고지 포함 범위35모듈/4assets의 byte inventory는 갱신했으나 N16 실제 판정은 없다.
+
+2026-10-07 [실제 BGE-M3 작은 호환성 검증](./N15-BGE-COMPATIBILITY-VALIDATION.md): 같은 clean Darwin 패키지의3소유 fixture 설치/재시작/갱신/rollback 및6dataset의 승인 digest/native1024 확인, MCP compact7·CKV6응답 통과. 현재 소스 전체 race117패키지와 도메인 자료 일치도 통과했다. N15-D의 모델 연결 부분만 검증했으며 규모/독립 운영 소비자/지원 수용이 없어 D 전체 체크는 하지 않는다. N15-C/D/E·N17-C/D/E 및 전체 완료 수는 그대로다.
+
+2026-10-07 [N11 후보 출처 대조](./N11-CANDIDATE-PROVENANCE-AUDIT.md): 기존 FINAL9파일/4,800행의 SHA와 직접 인용·본문을 확인했다. lock.go의 동일 file SHA/80행 인용720개가 있지만 후보55–76행 교집합0, readonly.go 직접 인용0이다. 같은 파일/개념/이전 DEV의 오염 판정은 사람에게 남기며 새 FINAL0·질의0·N11-A–D 미완료를 유지한다. 공개d08cb384 푸시는 자동 승인 검토가 범위 미승인으로 거부했고 실행하지 않았다.
+
+2026-10-07 현재 공개 전송/CI 상태는 [native Linux CI 검증](./N15-NATIVE-LINUX-CI-VALIDATION.md)을 우선한다. d08cb384 공개80커밋과 source-only CI 수정d7de0b89를 전송했고 draft PR97·재실행CI5/5 통과. N15-C는 실제 native AMD64 설치/갱신/복구 증거로 체크하며 N15-D/E·N17-C/D/E와 전체8/18·요청5/15·잔여10개는 유지한다. 앞의 CI 미실행/전송 거부 문구는 당시 이력이다.
+
+## 2026-10-08 부분 완료 체크 보호 보강
+
+목적: 전체 미완료 작업 안의 체크도 실제 증거를 요구한다. N15-C의 증거를 유실/미실행으로 바꿔도 기존 검사가 통과하는 복사 ledger 음성 제어를 재현했다. 전체 완료8개만 검사하는 한계를 수정한다.
+
+설계: 미완료 task의 checked ID와 verified_checks 목록을 정확히 대조하고 중복/다른 task/누락을 거부한다. 각 체크는 명시적인 scope·evidence_ref·커밋·manifest를 가진다. task의 해당 revision/manifest와 일치하고, 커밋 당시 명세에도 같은 체크가 있어야 한다. 보고서/실행 원자료/변경 source의 커밋SHA를 대조한다. native CI 체크는 task의 실행 상태/run ID도 결합한다. 과거 원자료를 현행 실측으로 덮어쓰지 않으며 검사기는 사람 판정의 실체/운영 적합성까지 인증하지 않는다.
+
+검증 조건: 정상5부분체크 통과, N15-C missing revision/file 및 not_run 변조 거부, 기록 누락/중복/다른 task/과거 미체크 조건·scope 누락 거부, 전체 완료8/18·잔여10개 유지. 새 모델/질의/FINAL 실행0. 승인 응답·runtime binding 없이 전체 N11/12/15/17 체크를 추가하지 않는다.
+
+## N-14: 실제 변경과 의미 수용의 종단 간 흐름
+
+**상태: 완료 · 2026-10-10.** [수용 기록](./N14-CHANGE-ACCEPTANCE.md) — 실제 변경 7c57a388을 hold 후보·patch attempt·linked run(9/10, F3-T10 거부)·기준4개 사용자 승인(표기 opus)·승격·반려 대조·rollback·보관본 재생으로 수용했다. 아래는 이전 준비 기록이다. 이전 상태: 실제 변경 원문·raw 정확 시험 검토 준비 / 전체 미완료. [실제 변경 자료](./N14-ACTUAL-CHANGE-REVIEW.md)에서 머지PR97의 req-source-evidence/ac-source-evidence와 실제7변경 파일·11원문span·새 정확시험5개를 연결했다. 이는 제안 source 연결이며 검토된 canonical trace·실제 candidate patch registry/linked run·사람 criterion decision은 없다.
+
+- [x] N14-A 실제 ADR→요구→기준→code/test를 검토된 source/권위/범위 및 coordinated lock/snapshot·CKG canonical에 결합.
+- [x] N14-B 실제 baseline/result 소스 변경을 hold-for-review 후보와 immutable patch attempt/변경 archive SHA에 결합하며 current 보존.
+- [x] N14-C 검토된 trace의 실제 exact test/명령·출력SHA·spec version·snapshot-bound run을 기록하고 무관test/command-only/stale/불일치 거부.
+- [x] N14-D 별도 실제 사람이 기준별 Given/When/Then을 승인/반려하고 이유·검토자·원문/시각·활동시간(미측정null)을 기록.
+- [x] N14-E 실제 재색인/승격·반려·rollback·원문 신원 재생과 전체근거를 결합하며 pass/linked/verified/accepted 및 제한을 구분.
+
+### 2026-10-08 N11 후보 범위/현행 좌표 및 제외 보호 보강
+
+[N11 새 검토 자료](./N11-COVERAGE-CANDIDATE-REVIEW.md)는 POLICY/TRACE/ABS7신규 후보를 작성하고, 과거FINAL exact span480회 관측과 같은 사실군2개를 제외했다. 최종 책은DEV7/FINAL후보9·제안군6·승인FINAL0이다. DEV04의 동일span은gc.go265–439행으로 재결합했고 기존책은 보존했다. checker는 책에 선언한 제외 ID/cluster/unit·proposed identity 재삽입과 catalog 불일치를 거부한다.22시험 및 실제미승인CLI/runner 거부를 확인했으며 N11-A–D의 전체체크/모델·FINAL 실행은 추가하지 않았다.
+
+N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./N12-CANONICAL-SOURCE-PREPARATION.md)의 실제 원문69참조/코드36참조·고유canonical33·근거 거부7제어를 확인했다. SQLite 공통 조회/FTS/substring의 저장된 ID 누락을 수정하고 cold→증분 캐시 심벌 유지 시험을 보강했다. 실제 내용/관계 판정과 통합 capture/lock/CKV는 남아 있으며 전체 root capture의 public.pem 정책 거부를 기록했다. N12-A–D와 N14-A–E는 미체크, 전체8/18·요청5/15·잔여10개다.
+
+2026-10-08 N12 캡처 입력 준비 검증: [명시 소스 범위의 보관 캡처](./N12-SCOPED-CAPTURE-PREPARATION.md) — 원본667a9af5에서 소스·의존·검토 문서1,410개를 독립 준비 Git 커밋562e37aa로 구성해 committed 캡처/복원·archive-only 재생/신원·69검토span·승인Go29·8거부 제어를 확인했다. snapshot-only는 build31/vendor fixture1 등32개를 제외하므로 전체 입력 보관으로 사용하지 않았다. 제품 정책/소스 변경0, 새 모델/FINAL질의·사람 판정0. 제안 입력 범위·내용/관계 승인 및 새 coordinated CKG/CKV/lock 결합은 미완료, 전체8/18·요청5/15·잔여10개 유지.
+
+2026-10-08 N12 기술 연결 검증: [동일 신원의 held 색인·의미 준비](./N12-COORDINATED-PREPARATION.md) — 보관소스1,410파일/선택58의 CKG53Go·CKV56입력·666chunks/566심벌 canonical100%, 문서27/27·코드36/고유33·proposed 저장 roundtrip·12거부 제어·archive-only 재생 통과. 원문project knowledge-system로 수정한 별도 후보이며 첫 mismatch 거부와 전체Go범위 DRIFT998 경고를 보존했다. 실제 BGE embedding HTTP124회(색인입력1332·시작probe4), 새DEV/FINAL0·human0·current/semantic activation0. approved overlay/lock·내용/관계/입력범위 판정은 남아 N12-A–D/전체8/18·요청5/15·잔여10개를 유지한다.
+
+2026-10-08 N12 ADR 기술 lock 연결: [검토 대기 ADR의 보관 lock](./N12-PROPOSED-LOCK-PREPARATION.md) — 원소스1,410 불변, proposed ADR2/정책0(운영 owner 미정)/review0의 partial overlay·lock과 별도 held snapshota0457cc1/dataset5a24904f를 생성했다. 생산 knowledge·include-packs CLI/v4 의미27문서·36코드참조/33canonical·7 lock 거부·원 소스/색인/semantic DB 없이 archive 재생 통과. 새 BGE embed HTTP62=probe2+색인60/666입력, 전체Go DRIFT998 유지. 승인 lock/사람 내용·관계·운영 판정은 미완료, N12-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 gold/독립성 및 N12 판정/정책 담당자·시점 확인.
+
+2026-10-08 N11 검토 대기 코퍼스 연결: [코퍼스·색인·실행 신원 준비](./N11-HELD-CORPUS-PREPARATION.md) — 이전 N12 색인의6Go 누락/ABS2보관 누락을 실제 대조하고 별도 Git19803801/snapshotb1204cf1/datasetee6f91be의 source1,419/선택66·CKG59/CKV63/785chunks/667canonical을 결합했다. 원문16/16·positive14/14 실제 canonical/chunk·ABS2 uncited basis, 무답 basis 검사 누락 RED11→GREEN25와 실제 DEV/FINAL runner child/output/registry0, 원본 source/index/semantic DB 없이 archive 재생 통과. 새 embedding HTTP71/색인785/probe3, 전체Go DRIFT992 유지. scope/gold/군·독립성/사람 판정/동결은 미승인·FINAL0, N11-A–D unchecked·전체8/18·요청5/15·잔여10개 유지. 다음 N11 실제 판정/독립 FINAL 보강과 N12 판정이다.
+
+2026-10-08 N11 후보 보강: [독립 FINAL 후보·범위 부족분](./N11-INDEPENDENT-POOL-EXPANSION.md). 신규CODE/WHY4문항/2제안군 추가, 기존 사실과 겹칠 위험의 신규4문항 격리. 검토 대상FINAL13/8제안군·DEV7, 승인된 중요군 모두0. 과거DEV/FINAL27gzip/11,632행 및 실제20원문 참조 대조, 정보 메타데이터 교정·새runtime 미결합, 실제input checker exit2/source오류0; 모델/검색/빌드0. 전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18 유지. 다음 N11/N12 실제 내용·군/독립성 판정과 부족 범위 보강.
+
+2026-10-08 N12 trace 연결 준비: [13개 proposed 관계와 의미 경계 검증](./N12-PROPOSED-TRACE-RELATIONS.md). 구현3/시험5/기준5 관계를 별도 SQLite에 원문·canonical·CKV로 연결하고 재조회/원본 없는 두 archive 재생·9거부 제어를 통과했다. Projection.Validate 시험을 다른 정렬 함수에 연결하는 부정확한1쌍은 제외, broad concept5경로 미작성 유지. 전체25관계 proposed·3요구 spec_unapproved·검토된경로0/current없음/human0/model0. 신규FINAL로 합산하지 않으며 N11 pool13/8·승인0, 전체8/18·요청5/15·잔여10개 유지. 다음 관계/원문 범위 판정·5경로 보강과 N11 독립 입력 확보다.
+
+2026-10-08 N12 미작성 경로 범위 검증: [실제5개 개념 대조와 명세 수정안](./N12-CONCEPT-PATH-SCOPE-REVIEW.md). 원문18/관련17시험·32하위시험/실제 matcher→stage2→V2 제어3사례·변조6거부 및 기존9권위파일 불변을 확인했다. 7참조파일은 retained source에만 있고 기존 선택 색인에 없어 새 canonical 링크를 주장하지 않는다. 현재 Trace는 모든 ConceptIDs 경로를 요구하며 이를 완화하지 않았다. 기능 개념3개·requirement version2 초안은 원 statement/4criteria를 유지하되 미적용/미승인이다. 기존 미작성5개·reviewed 경로0·N12-A–D/N14-A–E unchecked 및 전체8/18·잔여10개 유지. 다음 명세 범위/실제 내용·관계와 독립 FINAL 판정이다.
+
+2026-10-08 N14 실행 근거 검사 보완: [exact 보고서/검토 경로 일치 계약](./N14-EXACT-RUN-PROOF-VALIDATION.md). RecordRun/approved Decide/Promote는 해당 requirement의 fully linked trace, criterion/test에 해당하는 TESTED_BY/CHECKED_BY 전체 ID집합, 관찰시험명/canonical·명령 argv SHA/출력SHA형식을 확인한다. 동일 target의 ambiguous/non-Go anchor, 추가/중복/부분 proof 및 무관 시험을 거부한다. 수정 전15불일치 수용 RED→수정 후16제어거부 및 정상multiple/nested 회귀·관련race/vet·실제미검토후보10요청 실행전거부/권위9SHA불변을 보관한다. 합성 reviewer는 실제사람판정이 아니며 N14-A–E unchecked/전체8/18·잔여10개 유지. 다음 명세/관계 및 gold/독립성 판정 후 수정runtime/source결합으로 실제N14후보를 진행한다.

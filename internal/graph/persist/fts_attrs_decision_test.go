@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-// W-C W11 V10 — FTS5 attrs indexing decision lock.
+// FTS5 attrs indexing decision lock.
 //
-// Background: W11 V7 added the nodes.attrs JSON-blob column.
+// Background: schema 1.11 added the nodes.attrs JSON-blob column.
 // A natural follow-up would index attrs into nodes_fts so a
 // security reviewer typing "external call" could find callables
-// with HasExternalCall=true. V10 audited that option and
+// with HasExternalCall=true. That option was audited and
 // declined it for two reasons:
 //
 //  1. JSON noise. The blob contains keys like
@@ -47,7 +47,7 @@ func TestFTS5_DoesNotIndexAttrs(t *testing.T) {
 	}
 	fts := schemaSQL[idx : idx+endIdx]
 	if strings.Contains(fts, "attrs") {
-		t.Errorf("nodes_fts indexes attrs — review the V10 decision and remove this test or update the rationale")
+		t.Errorf("nodes_fts indexes attrs — review the attrs indexing decision and remove this test or update the rationale")
 	}
 	// Affirm the intended four columns ARE there so the audit
 	// also catches a silent FTS column rename.

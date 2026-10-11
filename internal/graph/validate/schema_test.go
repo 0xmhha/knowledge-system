@@ -77,7 +77,7 @@ func TestSchemaValidator_DanglingEdge(t *testing.T) {
 	}
 }
 
-// TestSchemaValidator_ContextPathBadShape locks down the P2 invariant on
+// TestSchemaValidator_ContextPathBadShape locks down the context-path invariant on
 // timeout_path / cancellation_path edges: each must be a self-loop on a
 // callable kind (Function/Method). Self-loops on non-callable types
 // (e.g. Package) and non-self-loops between callables both fail the shape

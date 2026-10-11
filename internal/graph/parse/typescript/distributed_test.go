@@ -10,8 +10,8 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestTSDistributed_FixtureMatrix is the W1 acceptance check (schema 1.9 spec
-// §7 W1). Each fixture must yield at least one ts Endpoint + one listens_on
+// TestTSDistributed_FixtureMatrix is the server-side acceptance check (schema
+// 1.9 spec §7). Each fixture must yield at least one ts Endpoint + one listens_on
 // edge. Routes declared twice in one file must collapse to one Endpoint.
 // Computed routes (variable / concat) must be flagged INFERRED with a
 // "<computed>" placeholder name so downstream UI can surface them distinctly.

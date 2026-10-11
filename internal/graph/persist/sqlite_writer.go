@@ -30,12 +30,12 @@ type TopicTreeInput interface {
 // import-free of the parse package — buildpipe bridges the two when emitting
 // from cold path or reloading for partial-cache rebuild.
 //
-// G6 v3 (schema 1.5): persisting pending refs lets the partial path replay
+// Schema 1.5: persisting pending refs lets the partial path replay
 // Pass 2 over the merged dirty + cached input set without re-parsing cached
 // files. Without this table the cached-side pending refs were silently
-// dropped (the v1/v2 cross-file edge regression).
+// dropped (an earlier cross-file edge regression).
 //
-// DispatchKind (Track C P1b, schema 1.7): mirrors the edges table column —
+// DispatchKind (schema 1.7): mirrors the edges table column —
 // preserves the AST-time dispatch classification across the cache boundary.
 // Empty for static `calls`.
 type PendingRefRow struct {
@@ -49,7 +49,7 @@ type PendingRefRow struct {
 }
 
 // InsertNodes bulk-inserts nodes (transactional). The trailing
-// attrs column carries the W11 V7 JSON blob (SlotIndex,
+// attrs column carries the marker JSON blob (SlotIndex,
 // HasAssembly, IsFunctionTyped, HasFunctionPointerCall,
 // HasExternalCall, YulBuiltins, HasInheritanceMROFallback, …).
 func (s *sqliteStore) InsertNodes(nodes []types.Node) error {
@@ -81,8 +81,8 @@ func (s *sqliteStore) InsertNodes(nodes []types.Node) error {
 	return tx.Commit()
 }
 
-// InsertEdges bulk-inserts edges (transactional). dispatch_kind (schema 1.7,
-// Track C P1b) is written as the empty string for non-`invokes` edges; SQLite
+// InsertEdges bulk-inserts edges (transactional). dispatch_kind (schema 1.7)
+// is written as the empty string for non-`invokes` edges; SQLite
 // stores it as a regular TEXT value either way.
 func (s *sqliteStore) InsertEdges(edges []types.Edge) error {
 	tx, err := s.db.Begin()
@@ -218,7 +218,7 @@ func (s *sqliteStore) InsertPendingRefs(refs []PendingRefRow) error {
 	return tx.Commit()
 }
 
-// InsertNodePRs writes PR breadcrumbs for ckg-NEW-2. INSERT OR REPLACE
+// InsertNodePRs writes PR breadcrumbs. INSERT OR REPLACE
 // (rather than OR IGNORE) because the rebuild path frequently has new
 // title/summary text for the same (node_id, number) — keeping the latest
 // commit-message-derived metadata is more useful than rejecting the

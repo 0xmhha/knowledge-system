@@ -50,7 +50,7 @@ type Parser struct {
 	// funcFieldTouches aggregates per-function field-access sets across every
 	// file ParseFile sees. Keyed by Function/Method node ID, value is the set
 	// of struct-Field node IDs whose values are read or written in the body.
-	// Used by buildpipe's W-A cross-function lock propagation pass (opt-in
+	// Used by buildpipe's cross-function lock propagation pass (opt-in
 	// via --lock-propagation).
 	//
 	// Lifetime: populated by ParseFile, read by FuncFieldTouches() after the
@@ -166,11 +166,11 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		// node that doesn't need a pre-walk index.
 		v.emitConcurrencyDecls(tf.file)
 		ast.Walk(v, tf.file)
-		// E3 (G5 Distributed): runs AFTER ast.Walk so v.nodes already contains
+		// Distributed pass: runs AFTER ast.Walk so v.nodes already contains
 		// the Function/Method node IDs we resolve handler / RPC-target args
 		// against. Idempotent within a single file.
 		v.emitDistributedDecls(tf.file)
-		// P2 (G3 control-flow context propagation): runs AFTER
+		// Control-flow context propagation: runs AFTER
 		// emitDistributedDecls so the same v.nodes function-ID lookup is
 		// usable. Self-loop edges only — never produces new nodes.
 		v.emitContextPaths(tf.file)
@@ -223,11 +223,11 @@ func (p *Parser) mergeFuncFieldTouches(src map[string]map[string]struct{}) {
 // → set of struct-Field node IDs touched by the body. Populated during
 // ParseFile when typesInfo is available; empty otherwise.
 //
-// Consumed by buildpipe's W-A cross-function lock propagation pass.
+// Consumed by buildpipe's cross-function lock propagation pass.
 //
 // Returns a deep copy of the internal map so the parser's worker pool can
 // continue mutating its own state without risking a data race with the
-// caller. W-A review (2026-05-11 Important #1) caught that the prior
+// caller. A review caught that the prior
 // implementation `defer Unlock` then returned the live map reference —
 // safe today because runGoPipeline only calls this after parseConcurrent
 // completes, but a single re-ordering would surface a silent race. The

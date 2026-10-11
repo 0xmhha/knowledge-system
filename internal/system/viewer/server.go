@@ -25,7 +25,7 @@ func Handler(apiBase *url.URL, devDir string) (http.Handler, error) {
 
 	if devDir != "" {
 		mux.Handle("/", http.FileServerFS(os.DirFS(devDir)))
-		return mux, nil
+		return loopbackHostOnly(mux), nil
 	}
 	sub, err := fs.Sub(viewerFS, "web_assets")
 	if err != nil {
@@ -34,5 +34,5 @@ func Handler(apiBase *url.URL, devDir string) (http.Handler, error) {
 		return nil, fmt.Errorf("viewer FS missing web_assets/: %w", err)
 	}
 	mux.Handle("/", http.FileServerFS(sub))
-	return mux, nil
+	return loopbackHostOnly(mux), nil
 }

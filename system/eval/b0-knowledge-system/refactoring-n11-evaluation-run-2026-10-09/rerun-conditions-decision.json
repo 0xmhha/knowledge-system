@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "decided_by": "user",
+  "recorded_before": "clean DEV3 and FINAL results (neither observed)",
+  "environment": {
+    "answer": "run at an idle time: the user stops other sessions while away (~4h) and notifies the agent",
+    "agent_check_before_start": "record uptime load averages and top CPU processes before DEV3 and before FINAL; do not start while an external process holds sustained high CPU",
+    "clarification": "Load affects only latency/cold start (N10); citations, recall/MRR and abstention are deterministic for the same inputs."
+  },
+  "final_rule": {
+    "answer": "run FINAL even if some arm's DEV p95 ratio exceeds 1.25",
+    "consequence": "FINAL records the current fix level; any arm over 1.25 leaves N10 unmet. Later improvements cannot be confirmed on an independent FINAL."
+  }
+}

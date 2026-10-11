@@ -11,7 +11,7 @@ import (
 // invoking each Register* function individually plus
 // [RegisterEvidenceForIntent] with a fresh [evidence.NewCache].
 //
-// The §11.3 H3 retrieval boundary is enforced inside every Register*
+// The §11.3 retrieval boundary is enforced inside every Register*
 // (each wraps its reader via safeReader, idempotently), so it holds for the
 // whole tool set here and for any individual handler mounted on its own —
 // callers can no longer forget to wrap. Callers that need a different

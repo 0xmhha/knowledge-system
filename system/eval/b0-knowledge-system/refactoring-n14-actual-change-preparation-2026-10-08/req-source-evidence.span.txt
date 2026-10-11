@@ -1,0 +1,11 @@
+  - id: req-source-evidence
+    version: 1
+    title: Source-backed meaning
+    statement: Reviewed semantic relationships remain tied to one captured source snapshot.
+    concept_ids: [source-snapshot, evidence-span, semantic-assertion]
+    status: proposed
+    acceptance_criteria:
+      - id: ac-source-evidence
+        given: A relation with a code anchor from another snapshot
+        when: The semantic dataset is promoted
+        then: Promotion fails and the active dataset remains unchanged

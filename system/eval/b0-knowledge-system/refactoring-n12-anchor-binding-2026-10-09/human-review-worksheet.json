@@ -1,0 +1,1780 @@
+{
+  "schema_version": 1,
+  "snapshot": {
+    "project_id": "knowledge-system",
+    "dataset_id": "1e82983e45ea35eb63debbea9bf88b6961d595cb5c540db312430cc47d19a341",
+    "snapshot_id": "672eae93464af931deb5b66605ba6d21615e50ced58c5a09cd82befc12f56ae7",
+    "source_mode": "committed",
+    "commit": "36353d32f1c21fc0cb2622807fa9e5d05f2daac7"
+  },
+  "projection_sha256": "6d02a408c95e958c653e008c665922b5c96ba452eba68476bf51301808ebd069",
+  "scope_selection_already_accepted": true,
+  "scope_selection_is_not_content_approval": true,
+  "concepts": [
+    {
+      "content": {
+        "id": "project",
+        "kind": "entity",
+        "definition": "A named isolation boundary for source, indexes, reviews, and queries.",
+        "includes": [
+          "Project identity",
+          "project-specific policies"
+        ],
+        "excludes": [
+          "A Git checkout",
+          "one dataset version"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "project",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "프로젝트",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:b0cf38dde27f8e41a2a43488",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "dataset",
+        "kind": "artifact",
+        "definition": "One immutable coordinated build of graph, vector, and optional semantic projections.",
+        "includes": [
+          "Build identity",
+          "index manifests"
+        ],
+        "excludes": [
+          "The mutable active pointer",
+          "source repository"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "dataset",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "데이터셋",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:084ab02a2ec5d60047a1aba9",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "source-snapshot",
+        "kind": "artifact",
+        "definition": "A captured and identified set of source bytes and policies to which all evidence in a dataset refers.",
+        "includes": [
+          "Committed Git source",
+          "captured working-tree source",
+          "captured non-Git source"
+        ],
+        "excludes": [
+          "A Git commit alone when working-tree bytes differ",
+          "an uncaptured editor buffer"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "source snapshot",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "소스 스냅샷",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:48a2eba5de73001b6ee48019",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "source-file",
+        "kind": "artifact",
+        "definition": "A source document or code file addressed relative to one source snapshot.",
+        "includes": [
+          "Captured code",
+          "captured Markdown"
+        ],
+        "excludes": [
+          "Historical hunk path counted as a current file"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "source file",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "소스 파일",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:1b0cdc9a16ef6e42efb87b0a",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "code-symbol",
+        "kind": "entity",
+        "definition": "A language parser's named code construct with a source range and stable join identity.",
+        "includes": [
+          "Function",
+          "type",
+          "method"
+        ],
+        "excludes": [
+          "A vector chunk without a verified AST anchor"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "code symbol",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "코드 심볼",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:a8a2133c0dd97d65d380b0d8",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "vector-chunk",
+        "kind": "artifact",
+        "definition": "A bounded source span represented by an embedding and searchable metadata.",
+        "includes": [
+          "Code chunk",
+          "document child chunk"
+        ],
+        "excludes": [
+          "A semantic fact proven only by similarity"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "vector chunk",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "벡터 청크",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:2d3a988ded945f460b9d7caf",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "document-section",
+        "kind": "artifact",
+        "definition": "A heading-scoped span of a source document with exact source lines.",
+        "includes": [
+          "Markdown section",
+          "specification section"
+        ],
+        "excludes": [
+          "A fabricated summary without source lines"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "document section",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "문서 절",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:d8ac662e2e28489f16a7063e",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "claim",
+        "kind": "entity",
+        "definition": "A reviewable statement about the project that cites a source section.",
+        "includes": [
+          "Proposed assertion text",
+          "reviewed statement"
+        ],
+        "excludes": [
+          "A heading alone",
+          "ungrounded model output"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "claim",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "주장",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:a93f243beeedb37084d4e427",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "evidence-span",
+        "kind": "artifact",
+        "definition": "An origin, relative path, line range, file digest, and range digest tied to one source snapshot.",
+        "includes": [
+          "Document lines",
+          "code lines",
+          "test lines"
+        ],
+        "excludes": [
+          "A similarity score without retrievable source"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "evidence span",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "근거 범위",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:7d7ed783d0612319b805582c",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "semantic-assertion",
+        "kind": "entity",
+        "definition": "A typed and directed relationship between two identified objects with separate evidence and review state.",
+        "includes": [
+          "SUPPORTS relation",
+          "CONTRADICTS relation"
+        ],
+        "excludes": [
+          "An untyped graph edge treated as proven meaning"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "semantic assertion",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "의미 관계",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:29d9847f63b6a723df20a89e",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "concept",
+        "kind": "entity",
+        "definition": "A stable domain meaning with a definition, scope, aliases, and review status.",
+        "includes": [
+          "Project vocabulary entry",
+          "versioned meaning"
+        ],
+        "excludes": [
+          "One query token",
+          "an AST node type"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "concept",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "개념",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:ad55aff6157c3ce58ed7a860",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "term",
+        "kind": "artifact",
+        "definition": "A language-specific preferred or alternative expression for a concept.",
+        "includes": [
+          "English name",
+          "Korean alias"
+        ],
+        "excludes": [
+          "The concept's complete definition"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "term",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "용어",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:d09cb0c64e9ee310156e8192",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "requirement",
+        "kind": "rule",
+        "definition": "A versioned statement of intended system behavior independent of implementation.",
+        "includes": [
+          "Functional requirement",
+          "nonfunctional constraint"
+        ],
+        "excludes": [
+          "A claim that current code already satisfies it"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "requirement",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "요구사항",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:b890171bd144a15c164700df",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "acceptance-criterion",
+        "kind": "rule",
+        "definition": "A checkable condition for accepting one requirement at a named snapshot.",
+        "includes": [
+          "Expected observation",
+          "threshold"
+        ],
+        "excludes": [
+          "A test result without its execution context"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "acceptance criterion",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "수용 기준",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:cb4c87375a3964a9bbeabae0",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "test-case",
+        "kind": "artifact",
+        "definition": "A repeatable input and expected observation used to verify behavior.",
+        "includes": [
+          "Unit test",
+          "integration scenario"
+        ],
+        "excludes": [
+          "A successful result from an unspecified run"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "test case",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "테스트 사례",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:5d4782baa6f5f3e5eff7769b",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "test-run",
+        "kind": "process",
+        "definition": "An execution of tests with recorded command, environment, source snapshot, and outcome.",
+        "includes": [
+          "Execution metadata",
+          "pass or failure evidence"
+        ],
+        "excludes": [
+          "A test file that has never been run"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "test run",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "테스트 실행",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:47785982bdfee4fc27ff7926",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "policy",
+        "kind": "rule",
+        "definition": "A versioned constraint controlling indexing, access, review, or evidence release.",
+        "includes": [
+          "Exclusion rule",
+          "sanitization rule"
+        ],
+        "excludes": [
+          "A retrieved passage that merely mentions a rule"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "policy",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "정책",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:5344636799a59548564725de",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "evidence-pack",
+        "kind": "artifact",
+        "definition": "A bounded and sanitized CKS response containing citations, bodies, graph neighbors, and integrity metadata.",
+        "includes": [
+          "Citations",
+          "redaction report"
+        ],
+        "excludes": [
+          "Unreviewed semantic assertion treated as verified"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "evidence pack",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "근거 묶음",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:2d35f60072412185ea2deab8",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "patch-attempt",
+        "kind": "process",
+        "definition": "An immutable attempt to apply a change from one base snapshot, producing a result snapshot and check evidence.",
+        "includes": [
+          "Changed-file digests",
+          "base and result snapshots",
+          "check reports"
+        ],
+        "excludes": [
+          "An unexecuted change plan",
+          "promotion of the active dataset"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "patch attempt",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "변경 시도",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:3bde907bf868ed31bfabad94",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "criterion-decision",
+        "kind": "process",
+        "definition": "A human decision with reasons and evidence about one acceptance criterion at a named specification version and result snapshot.",
+        "includes": [
+          "Approval",
+          "rejection",
+          "needs-review decision",
+          "reviewer and reason"
+        ],
+        "excludes": [
+          "A passing test alone",
+          "existence of a test link"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "criterion decision",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "수용 기준 판정",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:ca93667511e0a9391ffcb7a6",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "filtered-nearest-chunk-search",
+        "kind": "rule",
+        "definition": "Metadata-constrained nearest-chunk retrieval that reports bounded-search incompleteness.",
+        "includes": [
+          "Eligible nearest chunks, exact-sized sparse candidate ordering, cancellation and search budget status"
+        ],
+        "excludes": [
+          "Versioned policy authority, source capture, semantic truth"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "filtered nearest chunk search",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "조건부 근접 청크 검색",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:4f463e3dca0288e21ef91bd1",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "snapshot-bound-semantic-relations",
+        "kind": "rule",
+        "definition": "Validation of semantic relation evidence against one captured source identity and coordinated graph/vector indexes.",
+        "includes": [
+          "Typed proof references, source snapshot alignment, rejection before storing or switching a candidate"
+        ],
+        "excludes": [
+          "Full capture lifecycle implementation, human approval of relation meaning, automatic criterion acceptance"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "snapshot bound semantic relations",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "스냅샷에 결합된 의미 관계",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:3f497b7c1935f8103b8d16e9",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "optional-ontology-baseline-preservation",
+        "kind": "rule",
+        "definition": "Optional interpretation of concepts that preserves the baseline retrieval citation set for ambiguous or unreviewed meanings.",
+        "includes": [
+          "Natural-language matching, no unreviewed relation boost, optional fallback"
+        ],
+        "excludes": [
+          "Whole term storage implementation, whole evidence response construction, live retrieval quality proof"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "optional ontology baseline preservation",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "선택적 온톨로지 기준 후보 보존",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:33ccc5f89604e492bfc60d43",
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    }
+  ],
+  "requirements": [
+    {
+      "content": {
+        "id": "req-filtered-recall",
+        "version": 2,
+        "title": "Filtered CKV recall",
+        "statement": "CKV returns eligible nearest chunks under sparse metadata filters.",
+        "status": "proposed",
+        "evidence_id": "spec:a2c49afd91d52f6dc4f03e8d",
+        "concept_ids": [
+          "filtered-nearest-chunk-search"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-filtered-recall",
+            "given": "A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks",
+            "when": "A filtered query requests K results",
+            "then": "The response contains K eligible chunks in exact distance order",
+            "evidence_id": "criterion:fa5025ed47389d8028366365"
+          },
+          {
+            "id": "ac-filtered-completeness",
+            "given": "A larger filtered candidate set contains at least K eligible chunks",
+            "when": "A filtered query reaches a search budget or is cancelled",
+            "then": "The response marks incomplete with a reason and never claims K-result completeness",
+            "evidence_id": "criterion:621cfb24989277d158b47ecf"
+          }
+        ]
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "req-source-evidence",
+        "version": 2,
+        "title": "Source-backed meaning",
+        "statement": "Reviewed semantic relationships remain tied to one captured source snapshot.",
+        "status": "proposed",
+        "evidence_id": "spec:2868255705fe2b6f98210659",
+        "concept_ids": [
+          "snapshot-bound-semantic-relations"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-source-evidence",
+            "given": "A relation with a code anchor from another snapshot",
+            "when": "The semantic dataset is promoted",
+            "then": "Promotion fails and the active dataset remains unchanged",
+            "evidence_id": "criterion:fdd4032d8e920ac8a0d7dfee"
+          }
+        ]
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "req-ontology-fallback",
+        "version": 2,
+        "title": "Safe ontology interpretation",
+        "statement": "Optional concept matching preserves the existing hybrid retrieval candidates.",
+        "status": "proposed",
+        "evidence_id": "spec:7d0bb3ba39cff41744d02d80",
+        "concept_ids": [
+          "optional-ontology-baseline-preservation"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-ontology-fallback",
+            "given": "An ambiguous term or an unverified concept relationship",
+            "when": "A user asks a natural-language question",
+            "then": "The baseline CKV and CKG citation set is preserved",
+            "evidence_id": "criterion:cd6e6cf4aeba0c7951d7e1dc"
+          }
+        ]
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    }
+  ],
+  "claims": [
+    {
+      "content": {
+        "id": "pilot-claim:P12-P01",
+        "statement": "Pinned v2 유지보수는 제자리 갱신과 legacy downgrade를 거부하고 검토 설정·project ID와 새 버전으로 후보를 만든다.",
+        "section_id": "section:d8b127f6d4aff5ce3e3686f5",
+        "evidence_ids": [
+          "policy-evidence:P12-P01",
+          "evidence:d8b127f6d4aff5ce3e3686f5"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "pilot-claim:P12-P02",
+        "statement": "후보 checkpoint/sync 뒤 current를 전환하고 부모를 sync한다. rename 후 sync 실패의 durability_uncertain은 current 불변을 뜻하지 않는다.",
+        "section_id": "section:50ec3721edb6dd9e0518209b",
+        "evidence_ids": [
+          "policy-evidence:P12-P02",
+          "evidence:50ec3721edb6dd9e0518209b"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "pilot-claim:P12-P03",
+        "statement": "v2 core evidence는32000bytes/12citation 안에서 검증된 전체 원문 span을 선택하고 생략을 partial/예산 진단으로 기록하며 긴 span을 잘라 반환하지 않는다.",
+        "section_id": "section:4611cac2bb1e373c0840cb54",
+        "evidence_ids": [
+          "policy-evidence:P12-P03",
+          "evidence:4611cac2bb1e373c0840cb54"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "pilot-claim:P12-P04",
+        "statement": "Worksheet의 조직 위험 목록은 명시적으로 선택한 local pack 자료에만 들어 있다. 생성은 앵커 검사를 실행하거나 항목을 verified로 승격하지 않는다.",
+        "section_id": "section:1b991fd8b11ba799ac8982ae",
+        "evidence_ids": [
+          "policy-evidence:P12-P04",
+          "evidence:1b991fd8b11ba799ac8982ae"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "pilot-claim:P12-P05",
+        "statement": "Git 소스는 기준HEAD/선택 복구 객체를 해시된 history.bundle로 봉인하고 독립 저장소로 복원해 빌드하여 원본의 이후 이력 변화와 분리한다.",
+        "section_id": "section:a837ad8bc9f88e1fe36d0d3f",
+        "evidence_ids": [
+          "policy-evidence:P12-P05",
+          "evidence:a837ad8bc9f88e1fe36d0d3f"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "pilot-claim:P12-P06",
+        "statement": "신규 executable-bit-v1 입력은 파일 실행 비트도 identity에 포함하며 snapshot v5와 구 v2–v4 읽기를 구분해 과거 바이트·신원을 재해석하지 않는다.",
+        "section_id": "section:765cef330f57ff7a00b8e329",
+        "evidence_ids": [
+          "policy-evidence:P12-P06",
+          "evidence:765cef330f57ff7a00b8e329"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    }
+  ],
+  "legacy_support_about_relations": [
+    {
+      "content": {
+        "id": "supports:P12-P01",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:d8b127f6d4aff5ce3e3686f5",
+        "object_id": "pilot-claim:P12-P01",
+        "evidence_ids": [
+          "evidence:d8b127f6d4aff5ce3e3686f5",
+          "policy-evidence:P12-P01"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P01",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P01",
+        "object_id": "policy",
+        "evidence_ids": [
+          "policy-evidence:P12-P01",
+          "ontology:5344636799a59548564725de"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "supports:P12-P02",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:50ec3721edb6dd9e0518209b",
+        "object_id": "pilot-claim:P12-P02",
+        "evidence_ids": [
+          "evidence:50ec3721edb6dd9e0518209b",
+          "policy-evidence:P12-P02"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P02",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P02",
+        "object_id": "dataset",
+        "evidence_ids": [
+          "policy-evidence:P12-P02",
+          "ontology:084ab02a2ec5d60047a1aba9"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "supports:P12-P03",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:4611cac2bb1e373c0840cb54",
+        "object_id": "pilot-claim:P12-P03",
+        "evidence_ids": [
+          "evidence:4611cac2bb1e373c0840cb54",
+          "policy-evidence:P12-P03"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P03",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P03",
+        "object_id": "evidence-pack",
+        "evidence_ids": [
+          "policy-evidence:P12-P03",
+          "ontology:2d35f60072412185ea2deab8"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "supports:P12-P04",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:1b991fd8b11ba799ac8982ae",
+        "object_id": "pilot-claim:P12-P04",
+        "evidence_ids": [
+          "evidence:1b991fd8b11ba799ac8982ae",
+          "policy-evidence:P12-P04"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P04",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P04",
+        "object_id": "policy",
+        "evidence_ids": [
+          "policy-evidence:P12-P04",
+          "ontology:5344636799a59548564725de"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "supports:P12-P05",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:a837ad8bc9f88e1fe36d0d3f",
+        "object_id": "pilot-claim:P12-P05",
+        "evidence_ids": [
+          "evidence:a837ad8bc9f88e1fe36d0d3f",
+          "policy-evidence:P12-P05"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P05",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P05",
+        "object_id": "source-snapshot",
+        "evidence_ids": [
+          "policy-evidence:P12-P05",
+          "ontology:48a2eba5de73001b6ee48019"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "supports:P12-P06",
+        "predicate": "SUPPORTS",
+        "subject_id": "section:765cef330f57ff7a00b8e329",
+        "object_id": "pilot-claim:P12-P06",
+        "evidence_ids": [
+          "evidence:765cef330f57ff7a00b8e329",
+          "policy-evidence:P12-P06"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    },
+    {
+      "content": {
+        "id": "about:P12-P06",
+        "predicate": "ABOUT",
+        "subject_id": "pilot-claim:P12-P06",
+        "object_id": "source-snapshot",
+        "evidence_ids": [
+          "policy-evidence:P12-P06",
+          "ontology:48a2eba5de73001b6ee48019"
+        ],
+        "status": "proposed"
+      },
+      "decision": null,
+      "reason": null,
+      "reviewer": null,
+      "actual_human_active_ns": null
+    }
+  ],
+  "functional_relation_review": [
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-filtered-recall",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "filtered-nearest-chunk-search",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "evidence_ids": [
+          "ontology:4f463e3dca0288e21ef91bd1",
+          "spec:a2c49afd91d52f6dc4f03e8d",
+          "functional-v2:anchor:SearchDetailed"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_scope": "Metadata-constrained nearest-chunk retrieval that reports bounded-search incompleteness."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T01",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+          "criterion:fa5025ed47389d8028366365"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-recall",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T02",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-recall:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-recall",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+        "evidence_ids": [
+          "criterion:fa5025ed47389d8028366365",
+          "functional-v2:anchor:TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-recall",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T03",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+          "criterion:621cfb24989277d158b47ecf"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T04",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "evidence_ids": [
+          "criterion:621cfb24989277d158b47ecf",
+          "functional-v2:anchor:TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T05",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.(*Store).SearchDetailed",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "functional-v2:anchor:SearchDetailed",
+          "functional-v2:anchor:TestSearchDetailedCancellationIsNotEmptySuccess",
+          "criterion:621cfb24989277d158b47ecf"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedCancellationIsNotEmptySuccess"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T06",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-filtered-completeness:TestSearchDetailedCancellationIsNotEmptySuccess",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-filtered-completeness",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec.TestSearchDetailedCancellationIsNotEmptySuccess",
+        "evidence_ids": [
+          "criterion:621cfb24989277d158b47ecf",
+          "functional-v2:anchor:TestSearchDetailedCancellationIsNotEmptySuccess"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct SearchDetailed invocation",
+        "code_name": "SearchDetailed",
+        "criterion_id": "ac-filtered-completeness",
+        "limitation": "controlled local vector fixtures; no live corpus recall or latency verdict",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-filtered-recall",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestSearchDetailedCancellationIsNotEmptySuccess"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T07",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-source-evidence",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "snapshot-bound-semantic-relations",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "evidence_ids": [
+          "ontology:3f497b7c1935f8103b8d16e9",
+          "spec:2868255705fe2b6f98210659",
+          "functional-v2:anchor:ValidateDatasetAlignment"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "alignment implementation covers coordinate consistency; original coordinate-control test is partial; new actual CKG promotion test covers wider source/canonical/activation gates with coordinate-only CKV",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_scope": "Validation of semantic relation evidence against one captured source identity and coordinated graph/vector indexes."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T08",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "functional-v2:anchor:ValidateDatasetAlignment",
+          "functional-v2:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+          "criterion:fdd4032d8e920ac8a0d7dfee"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Store.PutAligned / ActivateAligned -> ValidateDatasetAlignment",
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "alignment implementation covers coordinate consistency; original coordinate-control test is partial; new actual CKG promotion test covers wider source/canonical/activation gates with coordinate-only CKV",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T09",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-source-evidence:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "evidence_ids": [
+          "criterion:fdd4032d8e920ac8a0d7dfee",
+          "functional-v2:anchor:TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Store.PutAligned / ActivateAligned -> ValidateDatasetAlignment",
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "alignment implementation covers coordinate consistency; original coordinate-control test is partial; new actual CKG promotion test covers wider source/canonical/activation gates with coordinate-only CKV",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T10",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.ValidateDatasetAlignment",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "functional-v2:anchor:ValidateDatasetAlignment",
+          "functional-v2:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+          "criterion:fdd4032d8e920ac8a0d7dfee"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct ValidateDatasetAlignment positive control; PutAligned/PutAlignedRetained and ActivateAligned/ActivateAlignedRetained -> coordinate/canonical/source gates",
+        "caller_evidence_ids": [
+          "functional-v2:anchor:PutAligned",
+          "functional-v2:anchor:PutAlignedRetained",
+          "functional-v2:anchor:ActivateAligned",
+          "functional-v2:anchor:ActivateAlignedRetained",
+          "functional-v2:anchor:anchorPromotionVersion",
+          "functional-v2:anchor:anchorPromotionCommand"
+        ],
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "actual CKG2build/2Git snapshots with stable Alpha canonical; foreign snapshot/relabelled old source/stale actual graph with consistent JSON/missing canonical/activation recheck; coordinate-only CKV, no embeddings/chunk links; owned fixture current only, not actual pilot acceptance",
+        "not_new_FINAL_input": true,
+        "owned_integrated_criterion_control": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestForeignCodeAnchorPromotionPreservesActiveDataset"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T11",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-source-evidence:TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-source-evidence",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/semantic.TestForeignCodeAnchorPromotionPreservesActiveDataset",
+        "evidence_ids": [
+          "criterion:fdd4032d8e920ac8a0d7dfee",
+          "functional-v2:anchor:TestForeignCodeAnchorPromotionPreservesActiveDataset"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "direct ValidateDatasetAlignment positive control; PutAligned/PutAlignedRetained and ActivateAligned/ActivateAlignedRetained -> coordinate/canonical/source gates",
+        "caller_evidence_ids": [
+          "functional-v2:anchor:PutAligned",
+          "functional-v2:anchor:PutAlignedRetained",
+          "functional-v2:anchor:ActivateAligned",
+          "functional-v2:anchor:ActivateAlignedRetained",
+          "functional-v2:anchor:anchorPromotionVersion",
+          "functional-v2:anchor:anchorPromotionCommand"
+        ],
+        "code_name": "ValidateDatasetAlignment",
+        "criterion_id": "ac-source-evidence",
+        "limitation": "actual CKG2build/2Git snapshots with stable Alpha canonical; foreign snapshot/relabelled old source/stale actual graph with consistent JSON/missing canonical/activation recheck; coordinate-only CKV, no embeddings/chunk links; owned fixture current only, not actual pilot acceptance",
+        "not_new_FINAL_input": true,
+        "owned_integrated_criterion_control": true,
+        "requirement_id": "req-source-evidence",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestForeignCodeAnchorPromotionPreservesActiveDataset"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T12",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:impl:req-ontology-fallback",
+        "predicate": "IMPLEMENTED_BY",
+        "subject_id": "optional-ontology-baseline-preservation",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "evidence_ids": [
+          "ontology:33ccc5f89604e492bfc60d43",
+          "spec:7d0bb3ba39cff41744d02d80",
+          "functional-v2:anchor:applyProvidedOntology"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_scope": "Optional interpretation of concepts that preserves the baseline retrieval citation set for ambiguous or unreviewed meanings."
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T13",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "functional-v2:anchor:applyProvidedOntology",
+          "functional-v2:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+          "criterion:cd6e6cf4aeba0c7951d7e1dc"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -> applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T14",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-ontology-fallback:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "evidence_ids": [
+          "criterion:cd6e6cf4aeba0c7951d7e1dc",
+          "functional-v2:anchor:TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -> applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T15",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:test:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "predicate": "TESTED_BY",
+        "subject_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.(*Searcher).applyProvidedOntology",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "functional-v2:anchor:applyProvidedOntology",
+          "functional-v2:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+          "criterion:cd6e6cf4aeba0c7951d7e1dc"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -> applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T16",
+      "reviewer": null
+    },
+    {
+      "actual_human_active_ns": null,
+      "assertion": {
+        "id": "functional-v2:criterion:ac-ontology-fallback:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "predicate": "CHECKED_BY",
+        "subject_id": "ac-ontology-fallback",
+        "object_id": "github.com/0xmhha/knowledge-system/internal/system/composer/stage2.TestStoredSharedAliasPreservesBaselineAndRetainedEvidence",
+        "evidence_ids": [
+          "criterion:cd6e6cf4aeba0c7951d7e1dc",
+          "functional-v2:anchor:TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+        ],
+        "status": "proposed"
+      },
+      "context": {
+        "actual_human_criterion_acceptance": null,
+        "actual_named_regression_run": true,
+        "call_chain": "Searcher.Search -> applyProvidedOntology",
+        "code_name": "applyProvidedOntology",
+        "criterion_id": "ac-ontology-fallback",
+        "limitation": "first uses fake resolver; second uses real parser/SQLite/matcher/retained bodies with fake engine manifests and CKG/hits; no live hybrid retrieval quality proof",
+        "not_new_FINAL_input": true,
+        "requirement_id": "req-ontology-fallback",
+        "requirement_version": 2,
+        "semantic_linked_run": false,
+        "test_name": "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+      },
+      "decision": null,
+      "reason": null,
+      "review_id": "F3-T17",
+      "reviewer": null
+    }
+  ],
+  "criterion_review": [
+    {
+      "requirement_id": "req-filtered-recall",
+      "criterion": {
+        "id": "ac-filtered-recall",
+        "given": "A sparse filter leaves an exact-search-sized candidate set with at least K eligible chunks and many closer excluded chunks",
+        "when": "A filtered query requests K results",
+        "then": "The response contains K eligible chunks in exact distance order",
+        "evidence_id": "criterion:fa5025ed47389d8028366365"
+      },
+      "proposed_review_ids": [
+        "F3-T03"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-filtered-recall",
+      "criterion": {
+        "id": "ac-filtered-completeness",
+        "given": "A larger filtered candidate set contains at least K eligible chunks",
+        "when": "A filtered query reaches a search budget or is cancelled",
+        "then": "The response marks incomplete with a reason and never claims K-result completeness",
+        "evidence_id": "criterion:621cfb24989277d158b47ecf"
+      },
+      "proposed_review_ids": [
+        "F3-T05",
+        "F3-T07"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-source-evidence",
+      "criterion": {
+        "id": "ac-source-evidence",
+        "given": "A relation with a code anchor from another snapshot",
+        "when": "The semantic dataset is promoted",
+        "then": "Promotion fails and the active dataset remains unchanged",
+        "evidence_id": "criterion:fdd4032d8e920ac8a0d7dfee"
+      },
+      "proposed_review_ids": [
+        "F3-T10",
+        "F3-T12"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": true,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    },
+    {
+      "requirement_id": "req-ontology-fallback",
+      "criterion": {
+        "id": "ac-ontology-fallback",
+        "given": "An ambiguous term or an unverified concept relationship",
+        "when": "A user asks a natural-language question",
+        "then": "The baseline CKV and CKG citation set is preserved",
+        "evidence_id": "criterion:cd6e6cf4aeba0c7951d7e1dc"
+      },
+      "proposed_review_ids": [
+        "F3-T15",
+        "F3-T17"
+      ],
+      "actual_named_regression_pass": true,
+      "owned_integrated_foreign_anchor_control_present": false,
+      "human_acceptance": null,
+      "semantic_linked_run": false,
+      "actual_pilot_criterion_accepted": false,
+      "not_full_criterion_acceptance": true
+    }
+  ],
+  "reviewer": null,
+  "individual_human_approvals": 0,
+  "old_approvals_inherited": false,
+  "not_independent_FINAL_inputs": true,
+  "not_activation_authorization": true
+}

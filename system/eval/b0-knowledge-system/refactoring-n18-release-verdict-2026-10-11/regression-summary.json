@@ -1,0 +1,25 @@
+{
+ "revision": "c85bac899dc944ff3727580170f141474631d5e0",
+ "command": "go test -race -count=1 -json ./... ; go vet ./... ; gofmt -l cmd internal pkg ; python3 -m pytest -q scripts",
+ "counts": {
+  "test_pass": 3252,
+  "package_pass": 116,
+  "package_skip": 12,
+  "test_skip": 16,
+  "test_fail": 1,
+  "package_fail": 1
+ },
+ "exits": {
+  "go_exit": "1",
+  "vet_exit": "0",
+  "gofmt_files": "0",
+  "pytest_exit": "0"
+ },
+ "failures": [
+  {
+   "package": "github.com/0xmhha/knowledge-system/internal/graph/server",
+   "test": "TestHandleImpact_BadRequest"
+  }
+ ],
+ "failure_note": "TempDir RemoveAll cleanup: directory not empty after a passing body; package unchanged by this work (last change 849e127d); isolated reruns 3/3 pass (flaky-rerun.txt); classified as an intermittent test-isolation defect, not fixed"
+}

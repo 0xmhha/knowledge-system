@@ -9,7 +9,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// grpc.go implements W3b (schema 1.9, CKS G5 Distributed): Go gRPC
+// grpc.go implements schema 1.9 distributed-interaction detection for Go gRPC
 // server/client detection. Two new edge kinds:
 //
 //   - grpc_listens_on: server impl Method → Endpoint
@@ -22,7 +22,7 @@ import (
 //                      placeholder). Triggered by stub-variable method
 //                      calls where the stub was assigned from a
 //                      `pb.NewXXXClient(conn)` call. Placeholder uses
-//                      Language="external" — mirrors W2 http_calls.
+//                      Language="external" — mirrors http_calls.
 //
 // Confidence split (schema-1.9-spec §6.5 (C)):
 //   - typesInfo present + receiver type resolves to a generated gRPC server
@@ -37,13 +37,13 @@ import (
 //     nodes by suffix-match.
 //   - Streaming, bidirectional, and per-message recursion through the impl
 //     are not modelled — each method emits a single edge regardless of
-//     stream semantics. Streaming detection is out-of-scope for W3b.
+//     stream semantics. Streaming detection is out of scope.
 //   - Server impl method discovery uses receiver-name match against
 //     v.nodes (typesInfo-aware via fn.Pkg() / Name lookup). Out-of-file
 //     methods are not chased; the receiver type must be declared in the
 //     same package as the Register call.
 
-// emitGRPCDecls is the per-file entry point for the W3b gRPC pass. Walks
+// emitGRPCDecls is the per-file entry point for the gRPC pass. Walks
 // every function body for RegisterXXXServer + stub-creating NewXClient
 // patterns. Idempotent: grpcServerEmitted/grpcClientStubs reset per file.
 //
@@ -72,7 +72,7 @@ func (v *declVisitor) emitGRPCDecls(f *ast.File) {
 
 // scanFileForGRPCServers walks every CallExpr in every function body and
 // dispatches to maybeEmitGRPCServerRegistration. Mirrors
-// scanFuncBodyForDistributed but is dedicated to W3b's server pass so the
+// scanFuncBodyForDistributed but is dedicated to the gRPC server pass so the
 // stub-var scope is per-function (handled in emitGRPCClientCalls, called
 // from scanFuncBodyForDistributed in distributed.go).
 func (v *declVisitor) scanFileForGRPCServers(f *ast.File) {
@@ -204,7 +204,7 @@ type grpcImplMethod struct {
 //     Confidence INFERRED.
 //
 // Empty result (no matching methods) signals the caller to skip emission —
-// it's the W3b equivalent of HTTP's "unknown receiver, skip" guard.
+// it's the gRPC equivalent of HTTP's "unknown receiver, skip" guard.
 func (v *declVisitor) collectGRPCImplMethods(arg ast.Expr) ([]grpcImplMethod, types.Confidence) {
 	recvName := ""
 	conf := types.ConfInferred
@@ -229,7 +229,7 @@ func (v *declVisitor) collectGRPCImplMethods(arg ast.Expr) ([]grpcImplMethod, ty
 		if n.Type != types.NodeMethod {
 			continue
 		}
-		// W3b review Minor #1 (2026-05-11): match strictly by qname prefix
+		// Match strictly by qname prefix
 		// `<pkg>.<recv>.<method>`. Earlier code had a `strings.Contains`
 		// fallback for the same suffix that was effectively dead within a
 		// single-file declVisitor (pkgName is single-valued per visitor) but
@@ -502,7 +502,7 @@ func callTargetNewXClient(call *ast.CallExpr) string {
 
 // upsertGRPCClientPlaceholder emits an AMBIGUOUS placeholder Endpoint for a
 // grpc_calls edge target when no real server-side Endpoint exists in the
-// graph (yet). The placeholder uses Language="external" — mirrors W2's
+// graph (yet). The placeholder uses Language="external" — mirrors the
 // HTTP placeholder pattern (see upsertHTTPClientPlaceholder).
 //
 // When a real Endpoint with qname `grpc:Service.Method` already exists in

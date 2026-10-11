@@ -6,29 +6,29 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V17 — modifier-scope self-cast audit. Modifiers are emitted
-// via runDecl(NodeModifier) and the cast walker (W10 V5/V8/V12) keys
+// Modifier-scope self-cast audit. Modifiers are emitted
+// via runDecl(NodeModifier) and the cast walker keys
 // the HasSelfReentrantCall marker on the (qname, startByte) pair that
-// nearestFunctionQnameAndStart returns. Since W6 V1.22 taught that
-// helper to recognise modifier_definition as an enclosing-callable
+// nearestFunctionQnameAndStart returns. Since that
+// helper recognises modifier_definition as an enclosing-callable
 // shape, the marker should land on the NodeModifier row when the
 // body contains payable(this).call(...) or .transfer(...).
 //
-// V17 locks the coverage. Modifiers wrapping other functions are a
+// This test locks the coverage. Modifiers wrapping other functions are a
 // classic re-entrancy vector: a self-call inside `_; payable(this).call(...)`
 // re-enters the wrapped function before its state-mutation hooks
 // settle. The marker must surface that surface independently of the
 // wrapped function's own markers.
 //
-// Two contracts exercise the two W10 admission paths:
+// Two contracts exercise the two cast-walker admission paths:
 //
 //   - GuardSelf.reentrantGuard   : property=="call",
 //     inner=payable(this) → selfAffected.
 //   - GuardTransfer.refundGuard  : property=="transfer", admitted by
-//     the V12 value-transfer branch alongside V8 low-level-call.
+//     the value-transfer branch alongside the low-level-call branch.
 //
 // Both modifier rows should end up with HasSelfReentrantCall=true and
-// HasExternalCall=false — the V8 precedence rule still applies on
+// HasExternalCall=false — the self-cast precedence rule still applies on
 // NodeModifier (the walker doesn't gate on node type).
 func TestModifier_SelfReentrantCast(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver",

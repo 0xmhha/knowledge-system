@@ -33,7 +33,7 @@ func validateActiveProjection(ctx context.Context, p Projection, repoRoot, graph
 		return err
 	}
 	if p.Snapshot.SourceMode == "working-tree" || p.Snapshot.SourceMode == "snapshot-only" {
-		if err := p.ValidateRetainedSources(filepath.Dir(graphDir)); err != nil {
+		if err := p.ValidateRetainedSourcesContext(ctx, filepath.Dir(graphDir)); err != nil {
 			return err
 		}
 	} else if err := p.ValidateSources(ctx, repoRoot); err != nil {

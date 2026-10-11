@@ -1,4 +1,4 @@
-// Package proto implements the CKG parser for `.proto` files (schema 1.9 W3a).
+// Package proto implements the CKG parser for `.proto` files (schema 1.9).
 //
 // Design (schema-1.9-spec §6.4): dependency-free hand-rolled lexer + recursive-
 // descent parser. The proto3 grammar is small enough that pulling in tree-sitter
@@ -6,8 +6,8 @@
 // community grammar at github.com/coder3101/tree-sitter-proto/blob/main/grammar.js
 // so production names and token boundaries align with mainstream tooling.
 //
-// Scope (W3a): emit nodes/edges for service/rpc/message/enum/field/package.
-// gRPC server/client detection in Go/TS lives in W3b/W3c — out of scope here.
+// Scope: emit nodes/edges for service/rpc/message/enum/field/package.
+// gRPC server/client detection lives in the Go/TS parsers — out of scope here.
 // The parser produces parse.ParseResult exactly like every other language
 // parser; the cross-language linker can later wire up rpc_calls/listens_on
 // against these proto nodes by qualified-name suffix match.

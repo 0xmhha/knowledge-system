@@ -10,30 +10,31 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W6 V1.0/V1.1/V1.3/V1.10 binding-map types. The per-contract using-for
+// Binding-map types. The per-contract using-for
 // binding info reaches Pass 2 method-call resolution through five
 // intermediate maps; declaring them as package types lets helpers
 // keep narrow signatures. The sixth lookup (funcID → contractID)
-// reuses the existing containerIDByFuncID map from W-C W2 review M1+M3.
+// reuses the existing containerIDByFuncID map built for override resolution.
 //
 //	bindingMap:         contractID → (typeName | "*") → libraryName
 //	stateVarTypes:      contractID → varName → typeName (NodeField.Signature)
-//	paramTypeMap:       funcID → paramName → typeName (V1.1)
-//	funcReturnTypeMap:  funcID → first-return typeName (V1.3)
-//	structFieldTypeMap: structName → fieldName → fieldType (V1.10 —
-//	                              struct-field receiver dispatch needs
+//	paramTypeMap:       funcID → paramName → typeName
+//	funcReturnTypeMap:  funcID → first-return typeName
+//	structFieldTypeMap: structName → fieldName → fieldType
+//	                              (struct-field receiver dispatch needs
 //	                              the field's declared type as the
 //	                              binding lookup key).
-//	localVarTypeMap:    funcID → localVarName → typeName (V1.15 —
-//	                              function-local variable receiver
+//	localVarTypeMap:    funcID → localVarName → typeName
+//	                              (function-local variable receiver
 //	                              dispatch; resolver fallback after
 //	                              stateVarTypes → paramTypes).
 //
-// bindingMap (V2.2 onwards): contractID → (typeName | "*") → []libraryName.
+// bindingMap: contractID → (typeName | "*") → []libraryName.
 // Multi-value to support `using A for uint256; using B for uint256;`
-// where both libraries apply and each provides different methods. V0
-// pre-V2.2 was single-value and second-wins overwrite; V2.2 appends
-// per directive and resolution tries each library until a method hit.
+// where both libraries apply and each provides different methods. An
+// earlier single-value map let the second directive overwrite the first;
+// the list appends per directive and resolution tries each library until
+// a method hit.
 type bindingMap map[string]map[string][]string
 type stateVarTypeMap map[string]map[string]string
 type paramTypeMap map[string]map[string]string
@@ -41,13 +42,12 @@ type funcReturnTypeMap map[string]string
 type structFieldTypeMap map[string]map[string]string
 
 // localDecl carries one local-variable declaration's scope range +
-// typeName. W-C W6 V2.0 (2026-05-12): line-range fields drive
-// narrowest-scope-wins lookup at the use site. W-C W6 V2.15
-// (2026-05-15): declStartByte / scopeEndByte added so same-line
+// typeName. Line-range fields drive narrowest-scope-wins lookup at
+// the use site. declStartByte / scopeEndByte let same-line
 // shadows disambiguate via byte containment (line-only tied
 // `declLine > bestDeclLine` left first-appended outer winning).
 // Byte fields are zero when the parser omitted them (defensive
-// fallback to V2.0 line-only behavior).
+// fallback to line-only behavior).
 type localDecl struct {
 	declLine      int
 	scopeEndLine  int
@@ -56,41 +56,41 @@ type localDecl struct {
 	typeName      string
 }
 
-// localVarTypeMap (V2.0): funcID → varName → []localDecl. Each
+// localVarTypeMap: funcID → varName → []localDecl. Each
 // emitted variable_declaration appends an entry; the same name can
 // have multiple entries when shadowed in nested blocks. Resolution
 // at the use site uses line containment + max declLine selection.
 type localVarTypeMap map[string]map[string][]localDecl
 
-// Resolve unions per-file results. V0 cross-file resolution is name-based:
+// Resolve unions per-file results. Cross-file resolution is name-based:
 // pending edges (emits_event, has_modifier, writes_mapping) are matched
 // against any node whose Name (or QualifiedName for mappings) equals the
 // pending TargetQName. Cross-file matches are tagged INFERRED; same-file
 // matches stay EXTRACTED. Mirrors the TypeScript resolver.
 //
-// W1 (Sol inheritance, 2026-05-11): adds resolution for `is`-clause
+// Inheritance: resolves `is`-clause
 // PendingRefs (DispatchKind="inherit"). The detector (inheritance.go)
 // emits these with a provisional EdgeType=EdgeExtends; this resolver
 // reclassifies to EdgeImplements when the resolved parent is an
 // Interface node. Contract / Interface lookups share the byName index
 // keyed by NodeType.
 //
-// W2 (Sol virtual/override, 2026-05-11): adds resolution for
+// Virtual/override: resolves
 // override-specifier PendingRefs (DispatchKind="override" /
-// "override_explicit"). Bare overrides walk the inheritance graph emitted
-// in W1 to find every parent that declares a same-name function; explicit
+// "override_explicit"). Bare overrides walk the resolved inheritance graph
+// to find every parent that declares a same-name function; explicit
 // `override(A, B)` looks up "Parent.method" directly. Both paths emit
 // EdgeOverrides (child → parent) at ConfExtracted (same-file) or
 // ConfInferred (cross-file).
 //
-// W3 (Sol interface dispatch, 2026-05-11): adds resolution for
+// Interface dispatch: resolves
 // `IFoo(addr).bar()` PendingRefs (DispatchKind="interface_dispatch").
 // Two-step lookup: (1) TypeName must resolve to a NodeInterface; (2)
 // `TypeName.MethodName` must resolve to a Function declared on that
 // interface. Both hits → emit EdgeInvokes at ConfAmbiguous (§5.0 Q5 —
 // confidence is constant regardless of file boundary; runtime dispatch
 // makes the resolved target an over-approximation). Any miss → drop
-// (V0 strict-purge — keeps the AMBIGUOUS bucket scoped to real
+// (strict-purge — keeps the AMBIGUOUS bucket scoped to real
 // interface dispatch only).
 func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, error) {
 	out := &parse.ResolvedGraph{}
@@ -98,7 +98,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// nodeFile maps node ID -> source file, so we can mark cross-file
 	// resolutions as INFERRED.
 	nodeFile := map[string]string{}
-	// nodeType maps node ID -> declared type — used by W1 inheritance
+	// nodeType maps node ID -> declared type — used by inheritance
 	// resolution to reclassify EdgeExtends → EdgeImplements when the
 	// target is an Interface.
 	nodeType := map[string]types.NodeType{}
@@ -111,7 +111,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		byName[nt][key] = append(byName[nt][key], id)
 	}
 
-	// W2 indexes — populated in the same single pass over all per-file
+	// Indexes — populated in the same single pass over all per-file
 	// results below. The three maps work together so bare-override
 	// resolution can walk Function → enclosing Container → parent
 	// Containers → parent Function in O(1) per hop:
@@ -126,7 +126,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	//     reverse-direction map used to label parent contract IDs from
 	//     the inheritance index when constructing the "Parent.method"
 	//     qname for funcByQName lookup. Sol allows three container kinds
-	//     (Contract / Interface / Library) — V0 W2 indexes the first two
+	//     (Contract / Interface / Library) — override resolution indexes the first two
 	//     (Library has no override semantics in Sol).
 	//   - containerIDByFuncID: funcID → enclosing containerID. Pre-built
 	//     reverse index that replaces the O(N) scan over funcByQName +
@@ -158,7 +158,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				add(types.NodeEvent, n.Name, n.ID)
 			case types.NodeModifier:
 				add(types.NodeModifier, n.Name, n.ID)
-				// W-C W7.3 V0 (2026-05-18): also index modifiers by qname
+				// Also index modifiers by qname
 				// (`Container.modifier`) so resolveOverridesRef can find
 				// parent-modifier candidates the same way it finds parent-
 				// function candidates. Modifier qname is set by runDecl's
@@ -169,7 +169,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 			case types.NodeMapping:
 				add(types.NodeMapping, n.QualifiedName, n.ID)
-			// W1: index Contracts and Interfaces by Name so inheritance
+			// Index Contracts and Interfaces by Name so inheritance
 			// PendingRefs (which only know the parent's unqualified name)
 			// can resolve cross-file.
 			case types.NodeContract:
@@ -181,12 +181,12 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				containerNameByID[n.ID] = n.Name
 				containerByNameFile[n.Name+"|"+n.FilePath] = n.ID
 			case types.NodeFunction:
-				// W2: explicit override `override(A,B)` queues a
+				// Explicit override `override(A,B)` queues a
 				// TargetQName of "Parent.method", so we index every Sol
 				// function by its qualified name. Bare-override resolution
 				// uses the same index, scoped by parent contract name.
 				funcByQName[n.QualifiedName] = append(funcByQName[n.QualifiedName], n.ID)
-				// W-C W6 V3 (2026-05-19): index free functions (qname ==
+				// Index free functions (qname ==
 				// name, no enclosing container) under byName[NodeFunction]
 				// so resolveUsingForRef's NodeFunction fallback can join
 				// the operator-form / free-function recovery walkers'
@@ -201,12 +201,12 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// Pass 1.5 — build containerIDByFuncID and the W6 V1.0 state-variable
+	// Pass 1.5 — build containerIDByFuncID and the state-variable
 	// type index. Both require Function / Container / Field nodes already
 	// indexed (above), so they run as a separate loop.
 	//
-	//   containerIDByFuncID: funcID → enclosing containerID (W2 reverse
-	//                        index, reused by W6 V1.0 for call→contract
+	//   containerIDByFuncID: funcID → enclosing containerID (override
+	//                        reverse index, reused by using-for for call→contract
 	//                        recovery).
 	//   stateVarTypes:       contractID → varName → declared typeName
 	//                        (NodeField.Signature, set by runStateVarDecl
@@ -215,14 +215,14 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	//
 	// Both indexes derive the enclosing container from the node's
 	// QualifiedName prefix (`<Container>.<member>`) — emitted by
-	// runFunctionDecl and (since W6 V1.0) by runStateVarDecl. file-level
+	// runFunctionDecl and runStateVarDecl. File-level
 	// helpers without a container prefix are skipped (Sol allows free
 	// functions but not free state vars; either way override / using-for
 	// semantics don't apply).
 	stateVarTypes := stateVarTypeMap{}
 	for _, r := range results {
 		for _, n := range r.Nodes {
-			// W-C W6 V1.22 (2026-05-12): NodeModifier joins NodeFunction
+			// NodeModifier joins NodeFunction
 			// in containerIDByFuncID — modifier bodies can host using-for
 			// receivers (params, locals) just like function bodies. Same
 			// qname-prefix idiom (Container.<name>).
@@ -253,8 +253,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// Pass 2a — resolve W1 inheritance edges first, before W2 needs them.
-	// W2 bare-override resolution walks the EdgeExtends/EdgeImplements
+	// Pass 2a — resolve inheritance edges first, before override resolution needs them.
+	// Bare-override resolution walks the EdgeExtends/EdgeImplements
 	// adjacency built in buildInheritanceIndex; that index must include
 	// both same-file (already in out.Edges from Pass 1) and cross-file
 	// (resolved here) inheritance. Splitting the pending iteration into
@@ -271,14 +271,14 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// W2 inheritance edge index — contractID → []parentContractID. Built
+	// Inheritance edge index — contractID → []parentContractID. Built
 	// from the (now fully-resolved) EdgeExtends + EdgeImplements edges
 	// after Pass 2a above. Order is preserved (one entry per `is`-clause
 	// parent in source order), so `override` against a multi-parent class
 	// hits parents in the declared order.
 	parents := buildInheritanceIndex(out.Edges)
 
-	// W-C W9 V6 (2026-05-19) — re-pack state-var SlotIndex with the
+	// Re-pack state-var SlotIndex with the
 	// cross-file struct size table merged from every parsed file's
 	// Pass 1 (Parser.structSizes guarded by structMu). A state var
 	// typed as a foreign struct now sizes correctly; runs before
@@ -290,34 +290,32 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	p.structMu.Unlock()
 	applyCrossFileStructSizes(out.Nodes, globalStructSizes)
 
-	// W-C W9 V1 (2026-05-18) — inheritance offset on NodeField
-	// SlotIndex. V0 emitted per-contract local indices (each contract
-	// restarted at 0); V1 walks the parent adjacency and adds the
-	// cumulative ancestor slot count so the value reflects absolute
-	// EVM storage position in linear inheritance chains. Diamond
-	// inheritance with repeated ancestors falls back to a naive sum
-	// (no C3 linearization in V1 — known limitation, documented in
-	// docs/design/solidity-storage-slot-index.md §V1).
+	// Inheritance offset on NodeField SlotIndex. Pass 1 emits
+	// per-contract local indices (each contract restarts at 0); this
+	// step adds the cumulative ancestor slot count so the value
+	// reflects absolute EVM storage position. The ancestor walk uses
+	// C3 linearization (see applyInheritanceSlotOffset and
+	// docs/graph/design/solidity-storage-slot-index.md).
 	applyInheritanceSlotOffset(out.Nodes, parents)
 
-	// W6 V1.0 (2026-05-12) — pre-build the (contractID, typeName) →
+	// Pre-build the (contractID, typeName) →
 	// libraryName binding map by sweeping all dispatchKindUsingForTypeBind
 	// PendingRefs across results. Done before Pass 2b so the using-for-call
 	// branch can consume it without ordering surprises.
 	bindings := bindingMap{}
-	// W6 V1.1 (2026-05-12) — pre-build (funcID, paramName) → typeName so
+	// Pre-build (funcID, paramName) → typeName so
 	// parameter-receiver method calls can resolve their receiver's
 	// declared type the same way state-variable receivers do.
 	paramTypes := paramTypeMap{}
-	// W6 V1.3 (2026-05-12) — pre-build funcID → first-return typeName so
+	// Pre-build funcID → first-return typeName so
 	// `<fn>().<method>` chained dispatch can look up the inner
 	// function's return type as the receiver type.
 	funcReturnTypes := funcReturnTypeMap{}
-	// W6 V1.10 (2026-05-12) — pre-build (structName, fieldName) →
+	// Pre-build (structName, fieldName) →
 	// fieldType so `<obj>.<field>.<method>` dispatch can look up the
 	// field's declared type and feed it to the binding map.
 	structFieldTypes := structFieldTypeMap{}
-	// W6 V1.15 (2026-05-12) — pre-build (funcID, localVarName) →
+	// Pre-build (funcID, localVarName) →
 	// typeName so `Type x = ...; x.method(...)` local-var receiver
 	// dispatch can resolve x's declared type. Fallback chain on receivers:
 	// stateVarTypes → paramTypes → localVarTypes.
@@ -336,7 +334,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				if bindings[pr.SrcID] == nil {
 					bindings[pr.SrcID] = map[string][]string{}
 				}
-				// V2.2: append (was overwrite). Multi-binding (multiple
+				// Append (was overwrite). Multi-binding (multiple
 				// `using` directives for the same type) preserves each
 				// library so resolution can try them in order.
 				bindings[pr.SrcID][typeName] = append(bindings[pr.SrcID][typeName], libName)
@@ -355,7 +353,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				paramTypes[pr.SrcID][paramName] = typeName
 			case dispatchKindUsingForFnReturn:
 				// TargetQName encoding from emitFunctionReturnMetaPending:
-				// bare `typeName` (no `|`). First-return only (V0).
+				// bare `typeName` (no `|`). First return value only.
 				funcReturnTypes[pr.SrcID] = pr.TargetQName
 			case dispatchKindUsingForStructField:
 				// TargetQName encoding from runStructFieldMeta:
@@ -370,7 +368,6 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				structFieldTypes[structName][fieldName] = fieldType
 			case dispatchKindUsingForLocalVar:
-				// W-C W6 V2.0 (2026-05-12) + V2.15 (2026-05-15):
 				// TargetQName encoding from emitLocalVarBinding /
 				// emitTryReturnsBinding —
 				//   `varName|typeName|scopeEndLine|declStartByte|scopeEndByte`
@@ -411,33 +408,33 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// W6 V1.2 (2026-05-12) + V2.13 (2026-05-13) — propagate inherited
+	// Propagate inherited
 	// bindings down the inheritance graph so a child contract picks
 	// up its parents' `using` declarations. Solidity 0.8.13+
 	// formalises this via `internal using`, but in practice solc
 	// treats child-visible using directives this way for backwards-
 	// compat; the grammar doesn't separate the `internal` keyword at
-	// the using_directive level, so V0 treats every contract-scope
+	// the using_directive level, so this pass treats every contract-scope
 	// using as inherited.
 	//
 	// Algorithm: BFS over the inheritance graph (child → parents)
 	// merging each ancestor's bindings into the descendant.
 	//
-	// Shadowing vs union semantics (V2.13 fix):
+	// Shadowing vs union semantics:
 	//   - Child's OWN local binding for a type shadows ALL inherited
 	//     bindings on that type (per Solidity scoping). We snapshot
 	//     child's local binding keys BEFORE the BFS to distinguish
 	//     local from inherited.
 	//   - When the child has no local binding for a type, multiple
-	//     ancestors contributing bindings on that type union (V2.2
-	//     multi-binding semantics extended across inheritance).
+	//     ancestors contributing bindings on that type union
+	//     (multi-binding semantics extended across inheritance).
 	//
-	// Pre-V2.13 bug: the BFS used a single `if !exists` guard to
+	// An earlier bug: the BFS used a single `if !exists` guard to
 	// decide whether to copy an ancestor's binding into the child.
 	// Once the first ancestor visited had populated the slot, the
 	// guard then conflated "child's local binding" with "another
 	// ancestor's already-merged binding," silently dropping every
-	// subsequent ancestor's binding on the same type. V2.13 splits
+	// subsequent ancestor's binding on the same type. The fix splits
 	// the guard: local check uses the pre-BFS snapshot; ancestor-to-
 	// ancestor merge appends de-duplicated libraries.
 	//
@@ -478,7 +475,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				// Union: append libs that aren't already present
 				// (from a previously visited ancestor on the same
 				// type). De-duplication keeps the list compact and
-				// preserves the V2.2 multi-binding invariant.
+				// preserves the multi-binding invariant.
 				existing := bindings[childID][typeName]
 				for _, lib := range libNames {
 					if !slices.Contains(existing, lib) {
@@ -491,21 +488,21 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// W-C W10 V4 (2026-05-19): collect callable IDs that performed a
+	// Collect callable IDs that performed a
 	// low-level call to an address-typed receiver so we can mark
 	// HasExternalCall after Pass 2b completes. Distinct from
 	// HasLowLevelCall (any low-level call) because consumers often
 	// care about arbitrary-address dispatch surfaces specifically.
 	externalCallSrcs := map[string]bool{}
 
-	// W-C W6 V10 (2026-05-19): dedup EdgeUsesFor emit. Multiple
+	// Dedup EdgeUsesFor emit. Multiple
 	// walkers can pattern-match the same ERROR-wrapped misparse,
 	// so the resolver guards against double emit by remembering
 	// (Src, Dst, Type, Line, DispatchKind) tuples seen for the
 	// dispatchKindUsingFor branch.
 	usingForEdgeSeen := map[string]bool{}
 
-	// W-C W8 V6 (2026-05-19) / V7 (2026-05-19): collect callable IDs
+	// Collect callable IDs
 	// that invoked a cross-contract function-pointer (receiver typed
 	// as another contract whose method — or an inherited method — is
 	// a function-typed state variable) so we can mark
@@ -530,24 +527,24 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 		fnTypedFields[contract][field] = true
 	}
-	// W-C W8 V7 (2026-05-19): the C3 MRO is reused here to walk
+	// The C3 MRO is reused here to walk
 	// inherited function-typed fields. Computed once for the entire
 	// resolve pass.
 	//
-	// W-C W9 V8 (2026-05-19): the variant call also surfaces the
+	// The variant call also surfaces the
 	// set of contracts whose hierarchy required the C3 fallback so
 	// we can stamp HasInheritanceMROFallback after Pass 2b.
 	mroByContractID, mroFallbackIDs := computeC3LinearizationWithFallbacks(parents)
 
-	// Pass 2b — everything except W1 inheritance (already done) and any
-	// future detector-specific branches go through this loop. W2 overrides
+	// Pass 2b — everything except inheritance (already done) and any
+	// future detector-specific branches go through this loop. Overrides
 	// rely on the `parents` index built between the two sub-passes.
 	for _, r := range results {
 		for _, pr := range r.Pending {
 			if pr.DispatchKind == dispatchKindInherit {
 				continue // already handled in Pass 2a
 			}
-			// W2 override branch — fans out one EdgeOverrides per resolved
+			// Override branch — fans out one EdgeOverrides per resolved
 			// parent. Bare `override` consults the inheritance index; the
 			// explicit form does a direct qname lookup.
 			if pr.DispatchKind == dispatchKindOverride ||
@@ -559,7 +556,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				out.Edges = append(out.Edges, edges...)
 				continue
 			}
-			// W3 interface-dispatch branch — resolves IFoo(addr).bar()
+			// Interface-dispatch branch — resolves IFoo(addr).bar()
 			// against the Interface index. Confidence is fixed at
 			// ConfAmbiguous per §5.0 Q5 regardless of cross-file boundary.
 			if pr.DispatchKind == dispatchKindInterfaceDispatch {
@@ -570,9 +567,9 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W8 contract-cast branch (2026-05-18) — resolves
+			// Contract-cast branch — resolves
 			// MyContract(addr).method() against the Contract index.
-			// Disjoint from W3 (Interface index) so no double-emit.
+			// Disjoint from interface dispatch (Interface index) so no double-emit.
 			if pr.DispatchKind == dispatchKindContractCast {
 				if edge, ok := resolveContractCastRef(
 					pr, byName, funcByQName, nodeFile,
@@ -581,18 +578,18 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 using-for branch — resolves `using LibName for ...` to
-			// EdgeUsesFor (Container → Library). Library is emitted by W4
+			// Using-for branch — resolves `using LibName for ...` to
+			// EdgeUsesFor (Container → Library). Library is emitted by runDecl
 			// as NodeContract + SubKind="library", so we use the same
 			// byName[NodeContract] index as inheritance resolution but
 			// further filter to library-subkind nodes via the existing
 			// containerNameByID map. Same-file → ConfExtracted, cross-file
-			// → ConfInferred, unresolved → drop (V0 strict-purge).
+			// → ConfInferred, unresolved → drop (strict-purge).
 			if pr.DispatchKind == dispatchKindUsingFor {
 				if edge, ok := resolveUsingForRef(
 					pr, byName, nodeFile,
 				); ok {
-					// W-C W6 V10 (2026-05-19): the file-level
+					// The file-level
 					// using_for and file-level operator-form
 					// walkers both pattern-match the same
 					// ERROR-wrapped misparse in some shapes, so
@@ -610,7 +607,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.0/V1.1/V1.3/V1.10 typebind/param-type/fn-return/
+			// typebind/param-type/fn-return/
 			// struct-field — already consumed before this loop into
 			// the bindings / paramTypes / funcReturnTypes /
 			// structFieldTypes maps. Skip silently here so the default
@@ -621,11 +618,11 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				pr.DispatchKind == dispatchKindUsingForStructField {
 				continue
 			}
-			// W6 V1.0/V1.1 using-for method-call branch — resolves
+			// Using-for method-call branch — resolves
 			// `<receiver>.<method>(...)` to an EdgeCalls into the
 			// library function bound for the receiver's type. Receiver
-			// may be a state variable (V1.0) or a function parameter
-			// (V1.1). Drops when any link in the chain fails (no
+			// may be a state variable or a function parameter.
+			// Drops when any link in the chain fails (no
 			// receiver of that name, no binding for that type, no
 			// library function with that method) — strict-purge same
 			// as the other Sol resolvers.
@@ -638,7 +635,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W-C W10 V7 (2026-05-19) — depth-2 chained shape
+			// Depth-2 chained shape
 			// `a().b().call(data)`. Resolve a's first return type
 			// to a contract, then b within that contract, then b's
 			// first return type. Mark when the final return type
@@ -687,7 +684,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W-C W10 V6 (2026-05-19) — chained-call shape for
+			// Chained-call shape for
 			// HasExternalCall. `getTarget().call(data)` resolves
 			// the inner function's first return type via
 			// funcReturnTypes; if that type is address-like, mark
@@ -718,7 +715,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W-C W8 V6 (2026-05-19) — cross-contract function-pointer
+			// Cross-contract function-pointer
 			// call. Resolves `r.handler(x)` to a marker on the
 			// enclosing callable when r's declared type is a known
 			// contract whose `handler` is a function-typed state-var.
@@ -740,12 +737,12 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				if typeName == "" {
 					continue
 				}
-				// V6: direct contract hit.
+				// Direct contract hit.
 				if fields, has := fnTypedFields[typeName]; has && fields[methodName] {
 					fnPointerCallSrcs[pr.SrcID] = true
 					continue
 				}
-				// V7: walk the receiver type's C3 MRO so an
+				// Walk the receiver type's C3 MRO so an
 				// inherited function-typed state-var also lights
 				// up the marker.
 				matched := false
@@ -769,13 +766,13 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W7.1 (2026-05-17) low-level call branch — resolves
+			// Low-level call branch — resolves
 			// `target.call/delegatecall/staticcall(...)` against
 			// Contract/Interface byName index. ConfAmbiguous always
 			// (runtime address determines real target). Receiver
-			// resolution chain mirrors W6 lookupReceiverType.
+			// resolution chain mirrors using-for lookupReceiverType.
 			//
-			// W-C W10 V4 (2026-05-19): when the receiver resolves
+			// When the receiver resolves
 			// to an address-typed Sol scope variable but no
 			// Contract / Interface candidate is found, mark
 			// HasExternalCall on the source callable so security
@@ -793,10 +790,10 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.3 chained-call branch — resolves
+			// Chained-call branch — resolves
 			// `<innerFn>().<method>(...)` to an EdgeCalls into the
 			// library function bound for the inner function's return
-			// type. Same drop policy as V1.0/V1.1.
+			// type. Same drop policy as the receiver method-call branch.
 			if pr.DispatchKind == dispatchKindUsingForChainCall {
 				if edge, ok := resolveUsingForChainCallRef(
 					pr, bindings, funcReturnTypes,
@@ -806,7 +803,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.4 cross-contract chained branch — resolves
+			// Cross-contract chained branch — resolves
 			// `<obj>.<innerFn>().<method>(...)` by walking the
 			// receiver's typeName to find the inner function in the
 			// receiver's contract / interface, then chaining through
@@ -822,7 +819,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.5 depth-2 chained branch — resolves
+			// Depth-2 chained branch — resolves
 			// `<innerFn1>().<innerFn2>().<method>(...)`. Walks two
 			// levels of funcReturnTypes (innerFn1's return then
 			// innerFn2's return) before reaching the using-for
@@ -836,9 +833,9 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.6 deep cross-contract chained branch — resolves
+			// Deep cross-contract chained branch — resolves
 			// `<obj>.<innerFn1>().<innerFn2>().<method>(...)` by
-			// combining V1.4's receiver-type lookup with V1.5's
+			// combining the cross-contract receiver-type lookup with the
 			// depth-2 return-type chain. 8-step total chain.
 			if pr.DispatchKind == dispatchKindUsingForDeepCrossChainCall {
 				if edge, ok := resolveUsingForDeepCrossChainCallRef(
@@ -850,7 +847,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.7 depth-3 same-contract chained branch — resolves
+			// Depth-3 same-contract chained branch — resolves
 			// `<fn1>().<fn2>().<fn3>().<method>(...)`. Walks three
 			// levels of funcReturnTypes.
 			if pr.DispatchKind == dispatchKindUsingForTripleChainCall {
@@ -862,10 +859,10 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.8 generic chain branch — handles arbitrary-depth
+			// Generic chain branch — handles arbitrary-depth
 			// chains (depth ≥ 4 same-contract, depth ≥ 3 cross-
 			// contract). Iterative walker through funcReturnTypes;
-			// V1.3-V1.7 hardcoded predicates caught the shallow cases
+			// the hardcoded depth-1..3 predicates caught the shallow cases
 			// before reaching this point.
 			if pr.DispatchKind == dispatchKindUsingForGenericChainCall {
 				if edge, ok := resolveUsingForGenericChainCallRef(
@@ -877,7 +874,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.13 this-prefixed nested chain — resolves
+			// This-prefixed nested chain — resolves
 			// `this.<stateVar>.<f1>...<fN>.<method>(...)` (N ≥ 1) by
 			// walking stateVar's struct type through structFieldTypes
 			// for each hop, then binding lookup on the final namespace.
@@ -894,7 +891,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.10 struct-field receiver — resolves
+			// Struct-field receiver — resolves
 			// `<obj>.<field>.<method>(...)` by walking obj's struct
 			// type to the field's declared type, then binding lookup.
 			if pr.DispatchKind == dispatchKindUsingForStructFieldCall {
@@ -907,7 +904,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.11 nested struct-field receiver — resolves
+			// Nested struct-field receiver — resolves
 			// `<obj>.<field1>.<field2>.<method>(...)` by walking
 			// structFieldTypes twice (obj's struct field1 → its
 			// struct's field2).
@@ -921,7 +918,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			// W6 V1.12 generic member-chain walker — arbitrary-depth
+			// Generic member-chain walker — arbitrary-depth
 			// (≥ 3) pure member access chains. Iterative walker
 			// through structFieldTypes.
 			if pr.DispatchKind == dispatchKindUsingForGenericMemberChainCall {
@@ -960,7 +957,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			})
 		}
 	}
-	// W-C W10 V4 (2026-05-19): apply HasExternalCall to every callable
+	// Apply HasExternalCall to every callable
 	// node that the Pass 2b loop flagged with an address-typed low-
 	// level call receiver. The marker complements HasLowLevelCall (set
 	// in Pass 1) by isolating the arbitrary-address dispatch surface
@@ -972,7 +969,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 	}
-	// W-C W8 V6 (2026-05-19): apply HasFunctionPointerCall to every
+	// Apply HasFunctionPointerCall to every
 	// callable that invoked a cross-contract function-pointer (a
 	// member_expression whose property is a function-typed state-var
 	// on the receiver's contract).
@@ -983,7 +980,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 	}
-	// W-C W9 V8 (2026-05-19): stamp HasInheritanceMROFallback on
+	// Stamp HasInheritanceMROFallback on
 	// every NodeContract / NodeInterface whose C3 linearization
 	// required the depth-first fallback. solc would reject those
 	// hierarchies; downstream tooling surfaces the diagnostic.
@@ -997,8 +994,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	return out, nil
 }
 
-// applyInheritanceSlotOffset — W-C W9 V1 (2026-05-18) / V7
-// (2026-05-19). Adjusts every NodeField's SlotIndex to include the
+// applyInheritanceSlotOffset adjusts every NodeField's SlotIndex to include the
 // cumulative ancestor slot count using the C3 linearization MRO
 // (Method Resolution Order) Sol's reference compiler applies to
 // storage layout. Each contract's offset is the sum of slotCount
@@ -1008,7 +1004,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 // Algorithm:
 //
 //  1. Index contracts by Name (first occurrence wins for cross-file
-//     homonyms — same disambiguation idiom as W3 / W8).
+//     homonyms — same disambiguation idiom as interface dispatch /
+//     contract cast).
 //
 //  2. Count slots per contract: the maximum SlotIndex + 1 across
 //     non-mapping NodeField rows whose qname prefix matches a
@@ -1032,7 +1029,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 //   - Cross-file homonymous contracts pick the first-occurrence ID
 //     (same idiom every other byName resolver uses).
 //   - Inconsistent hierarchies (no C3 solution exists, which solc
-//     would reject) fall back to the V1 depth-first walk so the
+//     would reject) fall back to a depth-first walk so the
 //     result stays deterministic.
 func applyInheritanceSlotOffset(nodes []types.Node, parents map[string][]string) {
 	contractIDByName := map[string]string{}
@@ -1102,7 +1099,7 @@ func applyInheritanceSlotOffset(nodes []types.Node, parents map[string][]string)
 
 // buildInheritanceIndex collects every EdgeExtends / EdgeImplements edge
 // into a child → []parent adjacency map. Order is preserved in append
-// order, matching the source-order semantics W1 emits (parents listed
+// order, matching the source-order inheritance emit (parents listed
 // left-to-right in the `is`-clause). Bare-override resolution iterates
 // this list to find every parent that declares a same-name virtual
 // function, so order stability matters for deterministic edge ordering.
@@ -1117,7 +1114,7 @@ func buildInheritanceIndex(edges []types.Edge) map[string][]string {
 	return out
 }
 
-// resolveOverridesRef fans one W2 PendingRef out into zero or more
+// resolveOverridesRef fans one override PendingRef out into zero or more
 // EdgeOverrides edges. Two dispatch kinds:
 //
 //   - dispatchKindOverrideExplicit: TargetQName is "Parent.method".
@@ -1133,10 +1130,9 @@ func buildInheritanceIndex(edges []types.Edge) map[string][]string {
 // containerIDByFuncID reverse index (single hop, O(1)). The earlier
 // implementation scanned funcByQName to extract the qname prefix and
 // then scanned containerNameByID by (name + file) to recover the ID —
-// both passes are subsumed by the index. M1 + M3 (W-C W2 review,
-// 2026-05-12).
+// both passes are subsumed by the index.
 //
-// Confidence policy mirrors W1: same-file → ConfExtracted, cross-file →
+// Confidence policy mirrors inheritance: same-file → ConfExtracted, cross-file →
 // ConfInferred. Multiple parents in a single bare override fan out into
 // multiple edges, each independently scored.
 func resolveOverridesRef(
@@ -1230,12 +1226,12 @@ func resolveOverridesRef(
 	return nil
 }
 
-// resolveUsingForRef resolves one W6 PendingRef (`using LibName for ...`)
+// resolveUsingForRef resolves one using-for PendingRef (`using LibName for ...`)
 // to a single EdgeUsesFor edge. The library reference uses bare name
-// matching against the NodeContract index (libraries are emitted by W4 as
+// matching against the NodeContract index (libraries are emitted by runDecl as
 // NodeContract + SubKind="library").
 //
-// Confidence policy mirrors W1 / W2: same-file → ConfExtracted, cross-file
+// Confidence policy mirrors inheritance / override: same-file → ConfExtracted, cross-file
 // → ConfInferred, unresolved → ok=false (caller drops the edge).
 //
 // We don't filter byName[NodeContract] hits to library-subkind only —
@@ -1245,21 +1241,21 @@ func resolveOverridesRef(
 // EdgeUsesFor still lands; the graph consumer can filter by Library
 // subkind downstream. Strict pre-filter would introduce a silent drop
 // path that's hard to diagnose if the library declaration gets missed by
-// W4 (real bug surface).
+// the declaration pass (real bug surface).
 //
 // Multiple homonymous libraries across files: prefer same-file via
-// pickSameFileCandidate (same idiom as W1 / W2 explicit-override path).
+// pickSameFileCandidate (same idiom as the inheritance / explicit-override path).
 func resolveUsingForRef(
 	pr parse.PendingRef,
 	byName map[types.NodeType]map[string][]string,
 	nodeFile map[string]string,
 ) (types.Edge, bool) {
-	// W-C W6 V5 / V8 (2026-05-19): the using-for walkers may attach
+	// The using-for walkers may attach
 	// two TargetQName hints to a binding PendingRef:
 	//
-	//   - "||<importPath>" — V5/V6 namespace / named-import alias
+	//   - "||<importPath>" — namespace / named-import alias
 	//     source path for cross-file homonym disambiguation.
-	//   - "\x1e<methodName>" — V8 method name from `Lib.method`
+	//   - "\x1e<methodName>" — method name from `Lib.method`
 	//     forms so the Edge.DispatchKind can surface it.
 	//
 	// The two separators are distinct (`||` vs `\x1e`) so the
@@ -1276,7 +1272,7 @@ func resolveUsingForRef(
 		target = target[:idx]
 	}
 	ids := byName[types.NodeContract][target]
-	// W-C W6 V3 (2026-05-19): Sol 0.8.13+ `using {f as +} for T;`
+	// Sol 0.8.13+ `using {f as +} for T;`
 	// allows free-function targets (`f` resolves to a NodeFunction
 	// at file scope). When the NodeContract lookup misses, fall
 	// back to NodeFunction so the operator-form / free-function
@@ -1299,7 +1295,7 @@ func resolveUsingForRef(
 	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
 		conf = types.ConfInferred
 	}
-	// W-C W6 V8 (2026-05-19): when the walker carried a method name,
+	// When the walker carried a method name,
 	// publish it on Edge.DispatchKind as `using_for|<method>` so
 	// downstream consumers can read which library member the using
 	// directive targets without re-parsing source. Empty method
@@ -1317,7 +1313,7 @@ func resolveUsingForRef(
 
 // pickByPathHint returns the candidate ID whose file path matches
 // the hint (exact match preferred, suffix match accepted). Used by
-// W6 V5 to disambiguate free-function homonyms when the using
+// resolveUsingForRef to disambiguate free-function homonyms when the using
 // directive came from a namespace alias whose source path is known.
 // Returns "" when no candidate matches the hint, signalling the
 // caller to fall back to pickSameFileCandidate.
@@ -1339,35 +1335,35 @@ func pickByPathHint(ids []string, pathHint string, nodeFile map[string]string) s
 }
 
 // lookupReceiverType resolves a receiver identifier to its declared type.
-// Per Solidity scoping rules (W-C W6 V1.17 fix, 2026-05-12),
+// Per Solidity scoping rules,
 // function-scope shadows contract-scope on identifier conflict — so the
 // lookup order is:
 //
-//  1. localVarTypes  (V1.15 function-local declaration — innermost)
-//  2. paramTypes     (V1.1 function parameter)
-//  3. stateVarTypes  (V1.0 state variable — outermost)
+//  1. localVarTypes  (function-local declaration — innermost)
+//  2. paramTypes     (function parameter)
+//  3. stateVarTypes  (state variable — outermost)
 //
-// Pre-V1.17 walked state-var → param → local-var (reverse of Solidity
+// An earlier version walked state-var → param → local-var (reverse of Solidity
 // semantics). The bug manifested as a false negative when a local
 // shadowed a state-var with the same name: the resolver picked the
 // state-var type and dropped if its type had no binding.
 //
 // Shared across every using-for resolver that needs to look up an
-// identifier-named receiver (V1.0/V1.1/V1.9/V1.15, V1.10/V1.11/V1.12
-// struct-walker obj). V1.13's `this.<state-var>...` shape intentionally
+// identifier-named receiver (state-var / param / local-var receivers and
+// the struct-walker obj). The `this.<state-var>...` shape intentionally
 // bypasses this helper — `this` is an explicit contract reference that
 // bypasses the function scope, so the named member must be a state
 // variable, never a param or local.
 //
-// W-C W6 V2.0 (2026-05-12): useSiteLine drives scope-aware local-var
+// useSiteLine drives scope-aware local-var
 // lookup. localVarTypes carries multiple decls per (funcID, varName)
 // when shadowing happens; this helper selects the narrowest scope that
 // still contains useSiteLine (max declLine where declLine <= useSiteLine
 // AND useSiteLine <= scopeEndLine). useSiteLine = 0 falls back to the
-// first-decl-wins behavior of V1.30 V0 (used by callers that don't
+// first-decl-wins behavior (used by callers that don't
 // have a use-site line — e.g. binding declaration walks).
 //
-// W-C W6 V2.15 (2026-05-15): useSiteByte adds byte-precision scope
+// useSiteByte adds byte-precision scope
 // containment so same-line shadows disambiguate. When all of decl
 // and use-site bytes are non-zero, selection switches to byte-based
 // containment + max declStartByte tiebreak. Falls back to line-only
@@ -1400,10 +1396,10 @@ func lookupReceiverType(
 	return ""
 }
 
-// resolveBindingLib — W-C W6 V2.2 (2026-05-12). Iterates the
+// resolveBindingLib iterates the
 // multi-value binding list for (typeName | "*") and returns the
 // libIDs of the first library whose `<lib>.<methodName>` qname is
-// indexed in funcByQName. Used by every V1.x resolver path that
+// indexed in funcByQName. Used by every using-for resolver path that
 // otherwise had identical `bindMap[typeName] → libName → funcByQName`
 // lookup chains.
 //
@@ -1411,7 +1407,7 @@ func lookupReceiverType(
 // binding exists for typeName. Within either list, the first library
 // to have the method wins — preserves Solidity's "directives apply
 // in order, first method match wins" semantics for multi-binding
-// while keeping single-binding behavior identical to pre-V2.2.
+// while keeping single-binding behavior identical to the single-value map.
 func resolveBindingLib(
 	bindMap map[string][]string,
 	typeName, methodName string,
@@ -1432,27 +1428,27 @@ func resolveBindingLib(
 // selectLocalDecl picks the narrowest local declaration whose scope
 // range contains the use site. When useSiteLine is 0 (caller has no
 // use-site context — e.g. emit walks), falls back to the first decl
-// in source order, matching V1.30 V0's first-decl-wins behavior.
+// in source order (first-decl-wins).
 //
-// V2.0 selection (line-based): filter decls where declLine <=
+// Line-based selection: filter decls where declLine <=
 // useSiteLine AND useSiteLine <= scopeEndLine, then choose the one
 // with the highest declLine — narrowest enclosing scope.
 //
-// V2.15 selection (byte-precision): when useSiteByte > 0 AND every
+// Byte-precision selection: when useSiteByte > 0 AND every
 // candidate decl has non-zero declStartByte / scopeEndByte, filter
 // by byte containment (declStartByte <= useSiteByte <= scopeEndByte)
 // and tiebreak on max declStartByte. This resolves same-line
-// shadow cases where V2.0's `declLine > bestDeclLine` strict-`>`
+// shadow cases where the line-based `declLine > bestDeclLine` strict-`>`
 // tiebreak left the first-appended outer winning. Falls back to
-// V2.0 line-only when bytes are absent.
+// line-only selection when bytes are absent.
 func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) string {
 	if useSiteLine == 0 {
-		// Defensive fallback — first-decl-wins (V1.30 V0 semantics).
+		// Defensive fallback — first-decl-wins.
 		return decls[0].typeName
 	}
-	// V2.15 byte-precision path: only when use-site AND every decl
+	// Byte-precision path: only when use-site AND every decl
 	// carries non-zero byte ranges. Mixed populations fall back to
-	// V2.0 line-only so partial parser upgrades don't misbehave.
+	// line-only selection so partial parser upgrades don't misbehave.
 	if useSiteByte > 0 && allHaveBytes(decls) {
 		bestIdx := -1
 		for i, d := range decls {
@@ -1491,7 +1487,7 @@ func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) string {
 	return decls[bestIdx].typeName
 }
 
-// allHaveBytes — W-C W6 V2.15. Returns true iff every decl has both
+// allHaveBytes returns true iff every decl has both
 // declStartByte and scopeEndByte populated (>0). Used to gate the
 // byte-precision selection path: a mixed population (some bytes,
 // some zeros) would silently mis-rank decls without bytes, so we
@@ -1505,16 +1501,16 @@ func allHaveBytes(decls []localDecl) bool {
 	return true
 }
 
-// resolveUsingForCallRef resolves one W6 V1.0/V1.1/V1.9/V1.15
+// resolveUsingForCallRef resolves one using-for
 // method-call PendingRef (`<receiver>.<method>(...)`) to a single
 // EdgeCalls edge. Four-step chain — any step's failure drops the edge
-// (V0 strict-purge):
+// (strict-purge):
 //
 //  1. funcID → enclosing containerID via containerIDByFuncID.
 //  2. receiverName → typeName via three-tier fallback:
-//     - (containerID, name) → stateVarTypes (V1.0 state-var)
-//     - (funcID, name) → paramTypes (V1.1 parameter)
-//     - (funcID, name) → localVarTypes (V1.15 local-var)
+//     - (containerID, name) → stateVarTypes (state-var)
+//     - (funcID, name) → paramTypes (parameter)
+//     - (funcID, name) → localVarTypes (local-var)
 //     stateVar / param / local share one identifier namespace per
 //     function in Solidity (solc errors on shadowing within scope), so
 //     the order shapes precedence but cannot mis-resolve in valid code.
@@ -1526,8 +1522,8 @@ func allHaveBytes(decls []localDecl) bool {
 // Confidence: ConfExtracted when both endpoints are in the same file;
 // ConfInferred when the chain crosses files (library declared in another
 // file). Sol's library dispatch is statically determinable once the
-// binding is known, so we don't downgrade to AMBIGUOUS the way W3
-// (interface dispatch) does — the call resolution is concrete.
+// binding is known, so we don't downgrade to AMBIGUOUS the way
+// interface dispatch does — the call resolution is concrete.
 func resolveUsingForCallRef(
 	pr parse.PendingRef,
 	bindings bindingMap,
@@ -1550,20 +1546,20 @@ func resolveUsingForCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	// Receiver type lookup chain: state-var (V1.0) → parameter (V1.1) →
-	// local-var (V1.15). Solidity scoping rules mean these three name-
+	// Receiver type lookup chain: state-var → parameter →
+	// local-var. Solidity scoping rules mean these three name-
 	// spaces don't legally overlap within a single function, so the
 	// order shapes precedence but cannot mis-resolve in valid code.
-	// V2.0: useSiteLine = pr.Line drives narrowest-scope-wins for
+	// useSiteLine = pr.Line drives narrowest-scope-wins for
 	// shadowed locals.
-	// V2.15: useSiteByte = pr.ByteOffset for byte-precision same-line
-	// shadow disambiguation in addition to V2.0 line-precision filter.
+	// useSiteByte = pr.ByteOffset for byte-precision same-line
+	// shadow disambiguation in addition to the line-precision filter.
 	typeName := lookupReceiverType(receiverName, contractID, pr.SrcID,
 		pr.Line, pr.ByteOffset, stateVarTypes, paramTypes, localVarTypes)
 	if typeName == "" {
 		return types.Edge{}, false
 	}
-	// V2.2: multi-binding aware resolution via resolveBindingLib.
+	// Multi-binding aware resolution via resolveBindingLib.
 	ids, ok := resolveBindingLib(bindings[contractID], typeName, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -1580,7 +1576,7 @@ func resolveUsingForCallRef(
 	}, true
 }
 
-// resolveLowLevelCallRef — W-C W7.1 V0 (2026-05-17). Resolves one
+// resolveLowLevelCallRef resolves one
 // low-level call PendingRef (`target.call/delegatecall/staticcall(...)`)
 // to a single EdgeInvokes edge.
 //
@@ -1590,22 +1586,22 @@ func resolveUsingForCallRef(
 //
 // Three-step chain — any failure drops:
 //
-//  1. funcID → receiverName via lookupReceiverType (W6 V1.0-V1.15 chain:
+//  1. funcID → receiverName via lookupReceiverType (using-for chain:
 //     state-var → param → local-var). useSiteByte = pr.ByteOffset
-//     drives V2.15 byte-precision shadow disambiguation.
+//     drives byte-precision shadow disambiguation.
 //  2. typeName → byName[NodeContract] OR byName[NodeInterface] →
 //     candidate Dst IDs.
-//  3. Pick same-file candidate first if available (W3 disambiguation
+//  3. Pick same-file candidate first if available (interface-dispatch disambiguation
 //     idiom).
 //
 // Confidence: ConfAmbiguous always — runtime address determines actual
-// dispatch target. Same rule as W3 interface dispatch (§5.0 Q5) since
+// dispatch target. Same rule as interface dispatch (§5.0 Q5) since
 // the AST evidence is the same shape (typed receiver, runtime selector).
 //
 // DispatchKind preserved on the emitted edge so downstream consumers
 // (viewer, llmSafeStoreReader filter) can distinguish low-level calls
 // from regular interface dispatch.
-// resolveLowLevelCallRefExt is the W-C W10 V4 (2026-05-19) extension
+// resolveLowLevelCallRefExt is the extension
 // of resolveLowLevelCallRef that additionally reports whether the
 // receiver resolved to an address-typed Sol scope variable. The flag
 // drives HasExternalCall marking on the source callable when no
@@ -1638,7 +1634,7 @@ func resolveLowLevelCallRefExt(
 	isAddress := typeName == "address" || typeName == "address payable"
 	// Try Interface first then Contract — interface-typed receivers are
 	// the more common shape for low-level call patterns (proxies). Same
-	// byName candidate-pick rule as W3.
+	// byName candidate-pick rule as interface dispatch.
 	candidates := byName[types.NodeInterface][typeName]
 	if len(candidates) == 0 {
 		candidates = byName[types.NodeContract][typeName]
@@ -1655,7 +1651,7 @@ func resolveLowLevelCallRefExt(
 	}, false, true
 }
 
-// resolveUsingForChainCallRef — W6 V1.3 (2026-05-12). Resolves a chained
+// resolveUsingForChainCallRef resolves a chained
 // call PendingRef (`<innerFn>().<method>(...)`) to a single EdgeCalls
 // edge by looking up the inner function's return type as the receiver
 // type. Five-step chain — any failure drops the edge:
@@ -1663,9 +1659,9 @@ func resolveLowLevelCallRefExt(
 //  1. funcID (caller) → enclosing containerID via containerIDByFuncID.
 //  2. innerFnName → innerFuncID via funcByQName. Prefers the same-
 //     contract candidate (`<callerContract>.<innerFn>`) over arbitrary
-//     bare-name matches. V0 limitation: cross-contract resolution
+//     bare-name matches. Limitation: cross-contract resolution
 //     follows the first matching candidate (homonym disambiguation is
-//     V1.4+ alongside cross-contract chaining).
+//     handled by the cross-contract chaining resolvers).
 //  3. innerFuncID → returnTypeName via funcReturnTypes.
 //  4. (callerContractID, returnTypeName) → libraryName via bindings;
 //     wildcard `*` fallback per Q9-3 (a).
@@ -1673,7 +1669,7 @@ func resolveLowLevelCallRefExt(
 //
 // Confidence: ConfExtracted when caller and library are same-file;
 // ConfInferred otherwise. The inner function's file doesn't downgrade
-// confidence here because V1.3 V0 only fires for known callable
+// confidence here because this resolver only fires for known callable
 // returns — uncertainty about the *resolution* is captured by drop,
 // not by AMBIGUOUS.
 func resolveUsingForChainCallRef(
@@ -1701,7 +1697,7 @@ func resolveUsingForChainCallRef(
 	// `Container.innerFn` keys the funcByQName index. Fall back to a
 	// global single-result scan when the inner function lives outside
 	// the caller's contract (e.g. file-level free function in 0.8.13+
-	// — V0 doesn't capture those but the global path also covers
+	// — not captured yet, but the global path also covers
 	// imported helpers that happen to share names).
 	containerName := ""
 	for qname, ids := range funcByQName {
@@ -1730,7 +1726,7 @@ func resolveUsingForChainCallRef(
 	if !ok || returnType == "" {
 		return types.Edge{}, false
 	}
-	// V2.2: multi-binding aware resolution via resolveBindingLib.
+	// Multi-binding aware resolution via resolveBindingLib.
 	ids, ok := resolveBindingLib(bindings[contractID], returnType, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -1747,14 +1743,14 @@ func resolveUsingForChainCallRef(
 	}, true
 }
 
-// resolveUsingForCrossChainCallRef — W6 V1.4 (2026-05-12). Resolves a
+// resolveUsingForCrossChainCallRef resolves a
 // cross-contract chained call PendingRef
 // (`<obj>.<innerFn>().<method>(...)`) to a single EdgeCalls edge.
 // 7-step chain — any failure drops the edge:
 //
 //  1. funcID (caller) → callerContainerID via containerIDByFuncID.
 //  2. receiverObjName → receiverType (stateVarTypes first, then
-//     paramTypes) — same lookup order as V1.0/V1.1.
+//     paramTypes) — same lookup order as resolveUsingForCallRef.
 //  3. receiverType → receiverContainerID via byName[NodeContract /
 //     NodeInterface] (primitive types like uint256 → fail because
 //     they're not in the container index, dropping cleanly).
@@ -1792,7 +1788,7 @@ func resolveUsingForCrossChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	// Receiver type (V1.0 / V1.1 idiom): state-var first, then parameter.
+	// Receiver type: state-var first, then parameter.
 	var receiverType string
 	if varMap := stateVarTypes[callerContractID]; varMap != nil {
 		receiverType = varMap[receiverObj]
@@ -1821,7 +1817,7 @@ func resolveUsingForCrossChainCallRef(
 	if !ok || returnType == "" {
 		return types.Edge{}, false
 	}
-	// V2.2: multi-binding aware resolution.
+	// Multi-binding aware resolution.
 	libIDs, ok := resolveBindingLib(bindings[callerContractID], returnType, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -1837,14 +1833,14 @@ func resolveUsingForCrossChainCallRef(
 	}, true
 }
 
-// resolveUsingForDeepChainCallRef — W6 V1.5 (2026-05-12). Resolves a
+// resolveUsingForDeepChainCallRef resolves a
 // depth-2 chained call PendingRef
 // (`<innerFn1>().<innerFn2>().<method>(...)`) to a single EdgeCalls
 // edge. 7-step chain — any failure drops the edge:
 //
 //  1. funcID (caller) → callerContainerID via containerIDByFuncID.
 //  2. innerFn1 → innerFn1FuncID via funcByQName
-//     (`<callerContainer>.<innerFn1>`, V1.3 idiom).
+//     (`<callerContainer>.<innerFn1>`, same as resolveUsingForChainCallRef).
 //  3. innerFn1FuncID → returnType1 via funcReturnTypes.
 //  4. `<returnType1>.<innerFn2>` → innerFn2FuncID via funcByQName.
 //     returnType1 must be a known Container (Contract / Interface)
@@ -1918,7 +1914,7 @@ func resolveUsingForDeepChainCallRef(
 	if !ok || returnType2 == "" {
 		return types.Edge{}, false
 	}
-	// Step 6-7: V2.2 multi-binding aware binding + library lookup.
+	// Step 6-7: multi-binding aware binding + library lookup.
 	libIDs, ok := resolveBindingLib(bindings[callerContractID], returnType2, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -1934,7 +1930,7 @@ func resolveUsingForDeepChainCallRef(
 	}, true
 }
 
-// resolveUsingForDeepCrossChainCallRef — W6 V1.6 (2026-05-12). Resolves
+// resolveUsingForDeepCrossChainCallRef resolves
 // a deep cross-contract chained PendingRef
 // (`<obj>.<innerFn1>().<innerFn2>().<method>(...)`) to a single
 // EdgeCalls edge. 8-step chain — any failure drops:
@@ -1977,7 +1973,7 @@ func resolveUsingForDeepCrossChainCallRef(
 		return types.Edge{}, false
 	}
 	srcFile := nodeFile[pr.SrcID]
-	// Receiver type lookup (V1.0/V1.1 idiom).
+	// Receiver type lookup (state-var, then parameter).
 	var receiverType string
 	if varMap := stateVarTypes[callerContractID]; varMap != nil {
 		receiverType = varMap[receiverObj]
@@ -2012,7 +2008,7 @@ func resolveUsingForDeepCrossChainCallRef(
 	if !ok || returnType2 == "" {
 		return types.Edge{}, false
 	}
-	// Step 7-8: V2.2 multi-binding aware lookup.
+	// Step 7-8: multi-binding aware lookup.
 	libIDs, ok := resolveBindingLib(bindings[callerContractID], returnType2, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -2028,7 +2024,7 @@ func resolveUsingForDeepCrossChainCallRef(
 	}, true
 }
 
-// resolveUsingForTripleChainCallRef — W6 V1.7 (2026-05-12). Resolves a
+// resolveUsingForTripleChainCallRef resolves a
 // depth-3 same-contract chained PendingRef
 // (`<fn1>().<fn2>().<fn3>().<method>(...)`) to a single EdgeCalls edge.
 // 9-step chain — any failure drops:
@@ -2047,10 +2043,9 @@ func resolveUsingForDeepCrossChainCallRef(
 // ConfInferred (cross-file). Intermediate functions' files don't
 // downgrade.
 //
-// V1.8+ note: this hardcoded depth-3 resolver should be subsumed by a
-// generic iterative walker once V1.8 lands. Until then it's a
-// straightforward extension of resolveUsingForDeepChainCallRef (V1.5)
-// with one more return-type hop.
+// Note: resolveUsingForGenericChainCallRef handles deeper chains; this
+// hardcoded depth-3 resolver is a straightforward extension of
+// resolveUsingForDeepChainCallRef with one more return-type hop.
 func resolveUsingForTripleChainCallRef(
 	pr parse.PendingRef,
 	bindings bindingMap,
@@ -2122,7 +2117,7 @@ func resolveUsingForTripleChainCallRef(
 	if !ok || returnType3 == "" {
 		return types.Edge{}, false
 	}
-	// Step 8-9: V2.2 multi-binding aware lookup.
+	// Step 8-9: multi-binding aware lookup.
 	libIDs, ok := resolveBindingLib(bindings[callerContractID], returnType3, methodName, funcByQName)
 	if !ok {
 		return types.Edge{}, false
@@ -2138,10 +2133,10 @@ func resolveUsingForTripleChainCallRef(
 	}, true
 }
 
-// resolveUsingForGenericChainCallRef — W6 V1.8 (2026-05-12). Generic
+// resolveUsingForGenericChainCallRef is the generic
 // iterative resolver for arbitrary-depth chained dispatch. Subsumes the
-// hardcoded V1.3 / V1.5 / V1.7 (same-contract chains) and V1.4 / V1.6
-// (cross-contract chains) for chains the earlier predicates didn't
+// hardcoded depth-1/2/3 same-contract and depth-1/2 cross-contract
+// resolvers for chains the earlier predicates didn't
 // already claim. Driven by `matchGenericChain`'s encoded PendingRef.
 //
 // TargetQName encoding (split by `|`):
@@ -2168,7 +2163,7 @@ func resolveUsingForTripleChainCallRef(
 //
 // Confidence: ConfExtracted (caller + library same-file) /
 // ConfInferred (cross-file). Intermediate functions' files don't
-// downgrade. Same policy as V1.3-V1.7.
+// downgrade. Same policy as the hardcoded chain resolvers.
 func resolveUsingForGenericChainCallRef(
 	pr parse.PendingRef,
 	bindings bindingMap,
@@ -2181,7 +2176,7 @@ func resolveUsingForGenericChainCallRef(
 ) (types.Edge, bool) {
 	parts := strings.Split(pr.TargetQName, "|")
 	// Minimum parts: mode + recv + at least 1 segment + method = 4
-	// (same-contract depth-1 hypothetical). Real V1.8 PendingRefs have
+	// (same-contract depth-1 hypothetical). Real generic-chain PendingRefs have
 	// depth ≥ 3 cross or ≥ 4 same, but we don't enforce that here —
 	// resolver works for any depth.
 	if len(parts) < 4 {
@@ -2256,7 +2251,7 @@ func resolveUsingForGenericChainCallRef(
 		currentNamespace = returnType
 	}
 
-	// V2.2 multi-binding aware lookup on the final return type.
+	// Multi-binding aware lookup on the final return type.
 	libIDs, libOK := resolveBindingLib(bindings[callerContractID], currentNamespace, methodName, funcByQName)
 	if !libOK {
 		return types.Edge{}, false
@@ -2272,7 +2267,7 @@ func resolveUsingForGenericChainCallRef(
 	}, true
 }
 
-// resolveUsingForStructFieldCallRef — W6 V1.10 (2026-05-12). Resolves a
+// resolveUsingForStructFieldCallRef resolves a
 // struct-field-receiver PendingRef (`<obj>.<field>.<method>(...)`) to a
 // single EdgeCalls edge. 7-step chain — any failure drops:
 //
@@ -2310,11 +2305,11 @@ func resolveUsingForStructFieldCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	// V1.15: state-var → param → local-var three-tier fallback.
-	// V2.0: useSiteLine = pr.Line drives narrowest-scope-wins for
+	// State-var → param → local-var three-tier fallback.
+	// useSiteLine = pr.Line drives narrowest-scope-wins for
 	// shadowed locals.
-	// V2.15: useSiteByte = pr.ByteOffset for byte-precision same-line
-	// shadow disambiguation in addition to V2.0 line-precision filter.
+	// useSiteByte = pr.ByteOffset for byte-precision same-line
+	// shadow disambiguation in addition to the line-precision filter.
 	objType := lookupReceiverType(objName, callerContractID, pr.SrcID,
 		pr.Line, pr.ByteOffset, stateVarTypes, paramTypes, localVarTypes)
 	if objType == "" {
@@ -2330,7 +2325,7 @@ func resolveUsingForStructFieldCallRef(
 	if !ok || fieldType == "" {
 		return types.Edge{}, false
 	}
-	// V2.2 multi-binding aware lookup on the field's type.
+	// Multi-binding aware lookup on the field's type.
 	libIDs, libOK := resolveBindingLib(bindings[callerContractID], fieldType, methodName, funcByQName)
 	if !libOK {
 		return types.Edge{}, false
@@ -2347,15 +2342,14 @@ func resolveUsingForStructFieldCallRef(
 	}, true
 }
 
-// resolveUsingForNestedStructFieldCallRef — W6 V1.11 (2026-05-12).
-// Resolves a depth-2 nested struct-field PendingRef
+// resolveUsingForNestedStructFieldCallRef resolves a depth-2 nested struct-field PendingRef
 // (`<obj>.<field1>.<field2>.<method>(...)`) to a single EdgeCalls
 // edge. 8-step chain — any failure drops:
 //
 //  1. funcID → callerContainerID
 //  2. objName → objType (stateVarTypes → paramTypes fallback)
 //  3. structFieldTypes[objType][field1] → field1Type
-//     (field1Type must itself be a struct for V1.11 to continue)
+//     (field1Type must itself be a struct to continue)
 //  4. structFieldTypes[field1Type][field2] → field2Type
 //  5. (callerContainerID, field2Type) → libraryName (bindings + `*`)
 //  6. `<libraryName>.<methodName>` → libraryFunctionID
@@ -2386,11 +2380,11 @@ func resolveUsingForNestedStructFieldCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	// V1.15: state-var → param → local-var three-tier fallback.
-	// V2.0: useSiteLine = pr.Line drives narrowest-scope-wins for
+	// State-var → param → local-var three-tier fallback.
+	// useSiteLine = pr.Line drives narrowest-scope-wins for
 	// shadowed locals.
-	// V2.15: useSiteByte = pr.ByteOffset for byte-precision same-line
-	// shadow disambiguation in addition to V2.0 line-precision filter.
+	// useSiteByte = pr.ByteOffset for byte-precision same-line
+	// shadow disambiguation in addition to the line-precision filter.
 	objType := lookupReceiverType(objName, callerContractID, pr.SrcID,
 		pr.Line, pr.ByteOffset, stateVarTypes, paramTypes, localVarTypes)
 	if objType == "" {
@@ -2414,7 +2408,7 @@ func resolveUsingForNestedStructFieldCallRef(
 	if !ok || field2Type == "" {
 		return types.Edge{}, false
 	}
-	// Step 5-6: V2.2 multi-binding aware lookup on field2Type.
+	// Step 5-6: multi-binding aware lookup on field2Type.
 	libIDs, libOK := resolveBindingLib(bindings[callerContractID], field2Type, methodName, funcByQName)
 	if !libOK {
 		return types.Edge{}, false
@@ -2431,9 +2425,9 @@ func resolveUsingForNestedStructFieldCallRef(
 	}, true
 }
 
-// resolveUsingForGenericMemberChainCallRef — W6 V1.12 (2026-05-12).
-// Generic iterative resolver for arbitrary-depth pure member access
-// chains. Subsumes V1.10/V1.11 hardcoded depth-1/2 patterns for chains
+// resolveUsingForGenericMemberChainCallRef is the generic
+// iterative resolver for arbitrary-depth pure member access chains.
+// Subsumes the hardcoded depth-1/2 struct-field patterns for chains
 // the earlier predicates didn't already claim (depth ≥ 3).
 //
 // TargetQName encoding (split by `|`):
@@ -2484,11 +2478,11 @@ func resolveUsingForGenericMemberChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	// V1.15: state-var → param → local-var three-tier fallback.
-	// V2.0: useSiteLine = pr.Line drives narrowest-scope-wins for
+	// State-var → param → local-var three-tier fallback.
+	// useSiteLine = pr.Line drives narrowest-scope-wins for
 	// shadowed locals.
-	// V2.15: useSiteByte = pr.ByteOffset for byte-precision same-line
-	// shadow disambiguation in addition to V2.0 line-precision filter.
+	// useSiteByte = pr.ByteOffset for byte-precision same-line
+	// shadow disambiguation in addition to the line-precision filter.
 	objType := lookupReceiverType(objName, callerContractID, pr.SrcID,
 		pr.Line, pr.ByteOffset, stateVarTypes, paramTypes, localVarTypes)
 	if objType == "" {
@@ -2507,7 +2501,7 @@ func resolveUsingForGenericMemberChainCallRef(
 		}
 		currentNamespace = fieldType
 	}
-	// V2.2 multi-binding aware lookup on the final field type.
+	// Multi-binding aware lookup on the final field type.
 	libIDs, libOK := resolveBindingLib(bindings[callerContractID], currentNamespace, methodName, funcByQName)
 	if !libOK {
 		return types.Edge{}, false
@@ -2524,8 +2518,7 @@ func resolveUsingForGenericMemberChainCallRef(
 	}, true
 }
 
-// resolveUsingForThisNestedChainCallRef — W6 V1.13 (2026-05-12).
-// Resolves a this-prefixed nested member-chain PendingRef
+// resolveUsingForThisNestedChainCallRef resolves a this-prefixed nested member-chain PendingRef
 // (`this.<stateVar>.<f1>.<f2>....<fN>.<method>(...)`, N ≥ 1) to a
 // single EdgeCalls edge.
 //
@@ -2546,8 +2539,8 @@ func resolveUsingForGenericMemberChainCallRef(
 //     (bindings + `*` fallback).
 //  6. `<libraryName>.<methodName>` → libraryFunctionID.
 //
-// V1.9 cousin: same dispatch idiom (`this.<x>...`), but V1.9 stops at
-// stateVarType directly (no field walk). V1.13 = V1.9 + V1.10/V1.11/V1.12
+// Cousin of the explicit-this receiver: same dispatch idiom (`this.<x>...`),
+// but that one stops at stateVarType directly (no field walk). This adds
 // struct-walking, with the bare-`this` constraint forcing stateVarTypes-
 // only lookup (paramTypes excluded by Solidity semantics).
 //
@@ -2602,7 +2595,7 @@ func resolveUsingForThisNestedChainCallRef(
 		}
 		currentNamespace = fieldType
 	}
-	// V2.2 multi-binding aware lookup on the final field type.
+	// Multi-binding aware lookup on the final field type.
 	libIDs, libOK := resolveBindingLib(bindings[callerContractID], currentNamespace, methodName, funcByQName)
 	if !libOK {
 		return types.Edge{}, false
@@ -2621,7 +2614,7 @@ func resolveUsingForThisNestedChainCallRef(
 
 // edgeIdentityKey returns a stable string key identifying an
 // edge's logical identity (Src + Type + Dst + Line +
-// DispatchKind). Used by the W6 V10 dedup guard to discard
+// DispatchKind). Used by the using-for dedup guard to discard
 // duplicate EdgeUsesFor emits when two walkers pattern-match
 // the same misparse.
 func edgeIdentityKey(e types.Edge) string {
@@ -2629,8 +2622,8 @@ func edgeIdentityKey(e types.Edge) string {
 }
 
 // pickSameFileCandidate returns the candidate ID whose file matches srcFile
-// when one exists, otherwise the first candidate. Used by W1 inheritance and
-// W2 explicit-override resolution to disambiguate homonymous targets across
+// when one exists, otherwise the first candidate. Used by inheritance and
+// explicit-override resolution to disambiguate homonymous targets across
 // files: a same-file resolution is structurally more likely correct (a
 // child won't usually inherit from a parent in an unrelated file with the
 // same name), and falling back to the first ID keeps cross-file resolution
@@ -2646,7 +2639,7 @@ func pickSameFileCandidate(ids []string, srcFile string, nodeFile map[string]str
 	return ids[0]
 }
 
-// resolveInheritanceRef resolves one W1 PendingRef (a single `is X` parent
+// resolveInheritanceRef resolves one inheritance PendingRef (a single `is X` parent
 // reference) against the indexed Contract / Interface tables.
 //
 // Edge-type classification (§2.1 / §3.1) depends on *both* child and
@@ -2682,9 +2675,8 @@ func resolveInheritanceRef(
 	// name-resolution behaviour (interfaces and contracts share one
 	// global namespace in Solidity). Within the matching type bucket,
 	// prefer a same-file candidate so homonymous parents declared across
-	// files don't shadow the locally-resolvable one. M2 (W-C W2 review,
-	// 2026-05-12) — explicit override path already does this; the
-	// inheritance path was the missing half.
+	// files don't shadow the locally-resolvable one. The explicit
+	// override path does the same.
 	srcFile := nodeFile[pr.SrcID]
 	var dstID string
 	var parentType types.NodeType
@@ -2718,7 +2710,7 @@ func resolveInheritanceRef(
 	}, true
 }
 
-// resolveInterfaceDispatchRef resolves one W3 PendingRef (an
+// resolveInterfaceDispatchRef resolves one interface-dispatch PendingRef (an
 // `IFoo(addr).bar(...)` invocation) into a single EdgeInvokes edge.
 //
 // pr.TargetQName carries `TypeName.MethodName` (set in dispatch.go).
@@ -2731,10 +2723,10 @@ func resolveInheritanceRef(
 //  2. The fully-qualified `TypeName.MethodName` must resolve to a
 //     Function node — i.e. the interface declares a `bar(...)` method.
 //     Unknown methods on a known interface (typos, evolving APIs across
-//     branch builds) drop, matching W1/W2's strict-purge policy.
+//     branch builds) drop, matching the inheritance/override strict-purge policy.
 //
 // Confidence is *constant* ConfAmbiguous (§5.0 Q5). This differs from
-// W1 (file-boundary tagged) and W2 (file-boundary tagged) because the
+// inheritance and override resolution (file-boundary tagged) because the
 // runtime address determines actual dispatch — the resolver can only
 // identify the interface-method declaration, never the live target.
 // The `llmSafeStoreReader` wrapper (hunk-graph §11.3) filters
@@ -2744,7 +2736,7 @@ func resolveInheritanceRef(
 // qname (rare — would require duplicate interface declarations across
 // files), pick the first candidate. Disambiguation could be sharpened
 // by preferring same-file or the interface's own file, but with no
-// real-world impact in the V0 corpus (validated against
+// real-world impact in the current corpus (validated against
 // testdata/dispatch fixtures).
 func resolveInterfaceDispatchRef(
 	pr parse.PendingRef,
@@ -2754,7 +2746,7 @@ func resolveInterfaceDispatchRef(
 ) (types.Edge, bool) {
 	// Split TargetQName on the first "." into (typeName, methodName).
 	// dispatch.go always emits exactly one "." — no qualified parent
-	// names in V0 (matches W1's known limitation: leading-identifier
+	// names (matches the inheritance resolver's known limitation: leading-identifier
 	// only).
 	dot := strings.IndexByte(pr.TargetQName, '.')
 	if dot <= 0 || dot == len(pr.TargetQName)-1 {
@@ -2792,7 +2784,7 @@ func resolveInterfaceDispatchRef(
 	}, true
 }
 
-// resolveContractCastRef — Sol W8 V0 (2026-05-18). Resolves one
+// resolveContractCastRef resolves one
 // contract-cast PendingRef (`MyContract(addr).method()`) to a single
 // EdgeInvokes edge by looking up the method on the named contract.
 //
@@ -2801,11 +2793,11 @@ func resolveInterfaceDispatchRef(
 // DispatchKind="contract_cast". Library subkinds (NodeContract with
 // SubKind="library") are accepted at the byName layer — libraries
 // can be cast in some patterns, and filtering would add a
-// containerNameByID/subKind lookup without clear value at V0.
+// containerNameByID/subKind lookup without clear value.
 //
 // Confidence is fixed at ConfAmbiguous: the cast resolves a typed
 // receiver but the runtime address determines the actual target,
-// just like W3 interface dispatch.
+// just like interface dispatch.
 func resolveContractCastRef(
 	pr parse.PendingRef,
 	byName map[types.NodeType]map[string][]string,

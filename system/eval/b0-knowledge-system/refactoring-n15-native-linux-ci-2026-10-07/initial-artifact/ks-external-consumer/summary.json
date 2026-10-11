@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "structural_consumer_controls_passed_task_incomplete",
+  "source_commit": "a8a7bfaa43279499edcaf2a7eb85507bb641447f",
+  "host_os": "linux",
+  "host_arch": "amd64",
+  "kernel": "6.17.0-1022-azure",
+  "go_version": "go version go1.25.13 linux/amd64",
+  "source_checkout_clean": true,
+  "archive_sha256": "f652c8564be089414558e8adfb9635a18b75d0a7333ba1b06a2e5b4525cad442",
+  "binary_sha256": {
+    "cks": "6e96b19f54203dcd459a6da2655a78d815131faa5844ac13cab8d1813237d52f",
+    "ckg": "06be4e31a5192fd2d5cec9f8b54618a7596eac4b71da13c3ff0d845ab6fd9952",
+    "ckv": "be7d0f66764e00e21a26772073dc2315814a9e8823084df44a8437dfc52d9857"
+  },
+  "external_gomod": "/home/runner/work/_temp/ks-external-consumer/consumer-module/go.mod",
+  "consumer_template_sha256": "2dc88d821399e500118d33d59e500ca9a2f8d50477e74a4b56b0e7465639700f",
+  "legacy_projects": [
+    {
+      "project": "empty-go",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "c3f7578ecb6d0fbdd5232498ae831c5365fbe069"
+    },
+    {
+      "project": "typescript",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "cf955ddc367888e9b9f20eabd4f19940af886f24"
+    },
+    {
+      "project": "unsupported-python",
+      "format": "v1",
+      "restart_calls": 2,
+      "citations": 1,
+      "commit": "66baf11e63e7fb14c436d216b9983b0532e09acd"
+    }
+  ],
+  "v2": {
+    "citations": 1,
+    "bodies": 1,
+    "body_bytes": 20
+  },
+  "negative_controls": 4,
+  "real_model_calls": 0,
+  "new_final_calls": 0,
+  "third_party_consumer_acceptance": null,
+  "native_linux_amd64_accepted": false,
+  "release_approved": false,
+  "limits": [
+    "owned mock fixtures, local replaced Go module, no independent consumer owner",
+    "binary upgrade from deployed production version not exercised",
+    "timings diagnostic only; no latency or retrieval quality verdict",
+    "v2 raw integrity audit restricted to these fixtures; not complete JCS certification"
+  ]
+}

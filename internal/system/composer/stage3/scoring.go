@@ -17,7 +17,7 @@ import (
 //
 // Trade-off documented in docs/composer/stage3-scoring.md §2. The known
 // limitation — genuinely central nodes get the same score as one-path
-// nodes — will be re-evaluated against PR #70 data in Phase E.
+// nodes — will be re-evaluated against PR #70 data.
 type neighborAggregator struct {
 	byTarget map[string]*ScoredNeighbor
 }

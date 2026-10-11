@@ -33,7 +33,7 @@ func TestDistributed_HTTP_Endpoints(t *testing.T) {
 		if _, want := wantRoutes[n.QualifiedName]; want {
 			wantRoutes[n.QualifiedName] = true
 		}
-		// Scope the sub_kind assertion to HTTP endpoints — the W3b grpc
+		// Scope the sub_kind assertion to HTTP endpoints — the grpc
 		// detection lands in the same fixture and emits sub_kind="grpc"
 		// Endpoint nodes that share the listens_on edge type but a different
 		// route family. Filtering by qname prefix keeps the HTTP test
@@ -252,7 +252,7 @@ func TestDistributed_RPCCalls_NetRPC(t *testing.T) {
 	}
 }
 
-// TestDistributed_HTTP_ClientCalls asserts the W2 client detector emits
+// TestDistributed_HTTP_ClientCalls asserts the HTTP client detector emits
 // placeholder Endpoints + http_calls edges for Go HTTP client call sites
 // in testdata/distributed/http_clients.go. The placeholders use
 // Language="external" so the downstream link pass (internal/link/http_match.go)
@@ -268,7 +268,7 @@ func TestDistributed_HTTP_ClientCalls(t *testing.T) {
 		if n.Type != types.NodeEndpoint || n.Language != "external" {
 			continue
 		}
-		// Scope to HTTP placeholders — W3b grpc client detection emits
+		// Scope to HTTP placeholders — grpc client detection emits
 		// language="external" Endpoints with sub_kind="grpc" in the same
 		// fixture (CallExternalService), which would otherwise fail the
 		// sub_kind/AMBIGUOUS assertions tailored to HTTP.
@@ -346,7 +346,7 @@ func mapKeysNode(m map[string]types.Node) []string {
 	return out
 }
 
-// TestDistributed_NoRegression confirms E3's pass doesn't disturb the B1
+// TestDistributed_NoRegression confirms the distributed pass doesn't disturb the
 // concurrency emission or the existing call-graph wiring on the same
 // fixture (the testdata is HTTP/RPC-heavy but should still report 0 Mutex
 // nodes and zero acquires_lock edges since no sync.Mutex is in scope).
@@ -373,7 +373,7 @@ func TestDistributed_NoRegression(t *testing.T) {
 	}
 	for _, w := range wantFuncs {
 		if !have[w] {
-			t.Errorf("missing Function/Method node for %q (E3 anchor)", w)
+			t.Errorf("missing Function/Method node for %q (distributed anchor)", w)
 		}
 	}
 }

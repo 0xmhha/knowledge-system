@@ -26,7 +26,7 @@ const (
 	// destroys the secret value but may leak structure (length, prefix,
 	// surrounding context). Use only when partial exposure is acceptable.
 	//
-	// The Phase-0 base ruleset (policies/sanitization_rules.yaml) does NOT
+	// The baseline ruleset (policies/sanitization_rules.yaml) does NOT
 	// use mask; it is defined here so operators can opt-in per project
 	// policy (e.g., dev-only environments) without code changes.
 	RedactionMask RedactionAction = "mask"
@@ -102,6 +102,10 @@ const (
 	// RelationDefines — Source (a file) defines Target (a top-level
 	// symbol: type, function, var, or const).
 	RelationDefines Relation = "defines"
+	// RelationUsesType — Source (a function or struct) uses Target (a type
+	// declared in the indexed project) in its signature or fields. Only
+	// requested explicitly; the default traversal does not include it.
+	RelationUsesType Relation = "uses_type"
 )
 
 // Neighbor is one graph edge in an EvidencePack. Distance is the hop count
@@ -125,7 +129,7 @@ func (n Neighbor) IsValid() bool {
 	}
 	switch n.Relation {
 	case RelationCalls, RelationCalledBy, RelationImplements, RelationImports,
-		RelationReferences, RelationTestedBy, RelationEmbeds, RelationDefines:
+		RelationReferences, RelationTestedBy, RelationEmbeds, RelationDefines, RelationUsesType:
 		return true
 	default:
 		return false
@@ -133,7 +137,7 @@ func (n Neighbor) IsValid() bool {
 }
 
 // IntegrityHashAlgo identifies which hash function the IntegrityHash uses.
-// Phase-0 fixes this to SHA-256; the field exists so future migrations
+// It is currently fixed to SHA-256; the field exists so future migrations
 // (e.g., to HMAC for adversarial integrity) can be announced without
 // breaking older consumers.
 type IntegrityHashAlgo string
@@ -171,9 +175,9 @@ type PackMetadata struct {
 // sanitized, hash-integrity-stamped bundle of citations and code bodies
 // that an upper-layer LLM client can consume directly.
 //
-// Phase-0 GraphNeighbors are populated by the Phase-B.5 expander; the field
-// is present in the contract from P0.3.1 so the type does not change shape
-// when B.5 ships.
+// GraphNeighbors are populated by the Stage 3 graph expander; the field was
+// part of the contract from the first version so the type did not change
+// shape when the expander shipped.
 type EvidencePack struct {
 	Intent         Intent     `json:"intent,omitempty"`
 	Query          string     `json:"query"`

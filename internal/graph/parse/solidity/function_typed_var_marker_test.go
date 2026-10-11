@@ -6,12 +6,12 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W8 V8 — function pointer propagation marker. fires when a
+// Function pointer propagation marker. Fires when a
 // callable assigns a fn-typed value to a state var, or passes it
 // as an argument to another call, WITHOUT invoking it.
-// HasFunctionPointerCall covers invocation; V8 covers the
+// HasFunctionPointerCall covers invocation; this marker covers the
 // orthogonal propagation axis. assignTo / forwardArg / register
-// all propagate; invokeOnly invokes (so V8 marker stays false
+// all propagate; invokeOnly invokes (so the propagation marker stays false
 // there).
 func TestFunctionTypedVar_PropagationMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "propagation.sol")
@@ -51,16 +51,16 @@ func TestFunctionTypedVar_PropagationMarker(t *testing.T) {
 	}
 }
 
-// W-C W8 V15 — modifier-scope function-typed local audit. The
-// V3 marker query targets every (parameter)/(variable_declaration)
-// node and walks up via nearestFunctionQnameAndStart, which W6
-// V1.22 extended to recognise modifier_definition. runDecl emits
+// Modifier-scope function-typed local audit. The
+// function-typed var marker query targets every (parameter)/(variable_declaration)
+// node and walks up via nearestFunctionQnameAndStart, which
+// also recognises modifier_definition. runDecl emits
 // NodeModifier with the same (qname, startByte) pair that
 // parse.MakeID consumes, so the marker's affected[id] write
 // should land on the NodeModifier row's HasFunctionTypedVar
 // field.
 //
-// V15 locks the contract. A regression that excludes
+// This test locks the contract. A regression that excludes
 // modifier_definition from nearestFunctionQnameAndStart, or that
 // emits NodeModifier with a different startByte than the
 // identifier's start, would silently drop coverage on every
@@ -84,7 +84,7 @@ func TestFunctionTypedVar_ModifierScope(t *testing.T) {
 	}
 }
 
-// W-C W8 V14 — function-of-function-pointer audit. A state-var
+// Function-of-function-pointer audit. A state-var
 // typed as `function(...) returns (function(...) returns (...))`
 // is itself a function pointer whose return value is another
 // function pointer. typeNameIsFunctionTyped checks the outer
@@ -92,7 +92,7 @@ func TestFunctionTypedVar_ModifierScope(t *testing.T) {
 // nodes, so the marker fires for the outer level regardless of
 // what the return-parameter's inner type happens to be.
 //
-// V14 locks two properties:
+// This test locks two properties:
 //
 //  1. The state-var IsFunctionTyped=true.
 //  2. A function declaring such a local has HasFunctionTypedVar=true.
@@ -133,11 +133,11 @@ func TestFunctionTypedVar_NestedReturnTypeFunctionPointer(t *testing.T) {
 	}
 }
 
-// W-C W8 V13 — mapping value as function pointer. The state-var
+// Mapping value as function pointer. The state-var
 // `mapping(address => function(...)) handlers` is emitted as a
 // NodeMapping (mapping's own node type) rather than NodeField,
-// but the IsFunctionTyped flag still applies — V13 drops the
-// V2 `!isMapping` guard so the same shared
+// but the IsFunctionTyped flag still applies — there is no
+// `!isMapping` guard, so the same shared
 // typeNameIsFunctionTyped check fires on the mapping outer
 // type_name (its nested type_name child carries the function
 // signature).
@@ -161,7 +161,7 @@ func TestFunctionTypedVar_MappingValueFunctionPointer(t *testing.T) {
 	}
 }
 
-// W-C W8 V12 — function pointer array marker. typeNameIsFunctionTyped
+// Function pointer array marker. typeNameIsFunctionTyped
 // now recurses into array_type wrappers so
 // `function(uint256)[] handlers` lights up the same markers as
 // the scalar form. The state-var gets IsFunctionTyped=true and a
@@ -202,14 +202,14 @@ func TestFunctionTypedVar_FunctionPointerArray(t *testing.T) {
 	}
 }
 
-// W-C W8 V11 — try/catch with fn-typed returns parameter
+// Try/catch with fn-typed returns parameter
 // propagation. `try provider.getCallback() returns (function(...)
 // cb) { handler = cb; }` extracts a function pointer from a try-
 // block's returns clause and propagates it to a state variable.
-// V3 already marks HasFunctionTypedVar (the cb declaration goes
+// The declaration marker already sets HasFunctionTypedVar (the cb declaration goes
 // through emitTryReturnsBinding and the parameter node lives in
-// the function's body), and the V8 propagation walker catches
-// the `handler = cb` assignment. V11 audits the full
+// the function's body), and the propagation walker catches
+// the `handler = cb` assignment. This test audits the full
 // declaration -> propagation chain through the try-block scope.
 func TestFunctionTypedVar_TryCatchPropagation(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "try_catch_prop.sol")
@@ -246,9 +246,9 @@ func TestFunctionTypedVar_TryCatchPropagation(t *testing.T) {
 	}
 }
 
-// W-C W8 V10 — emit-statement propagation. `emit Event(handler)`
+// Emit-statement propagation. `emit Event(handler)`
 // logs the fn-typed value to chain — propagation surface that
-// the V8 assignment / argument and V9 return passes don't cover.
+// the assignment / argument and return passes don't cover.
 // HasFunctionPointerPropagation=true on the emitting function;
 // HasFunctionPointerCall=false (no invocation).
 func TestFunctionTypedVar_EmitPropagation(t *testing.T) {
@@ -287,9 +287,9 @@ func TestFunctionTypedVar_EmitPropagation(t *testing.T) {
 	}
 }
 
-// W-C W8 V9 — return-position propagation. `return cb;` where cb
+// Return-position propagation. `return cb;` where cb
 // is a fn-typed param/local/state-var counts as propagation
-// (HasFunctionPointerPropagation=true), parallel to the V8
+// (HasFunctionPointerPropagation=true), parallel to the
 // assignment / call-argument paths. The function does not invoke
 // the pointer so HasFunctionPointerCall stays false.
 func TestFunctionTypedVar_ReturnPropagation(t *testing.T) {
@@ -329,10 +329,10 @@ func TestFunctionTypedVar_ReturnPropagation(t *testing.T) {
 	}
 }
 
-// W-C W8 V7 — inherited function-typed state-var invocation.
+// Inherited function-typed state-var invocation.
 // Hub extends Base; Base declares `onAction`. Caller does
-// `h.onAction(x)` where h is Hub-typed. Pre-V7 the lookup missed
-// because fnTypedFields only had Base, not Hub. V7 walks Hub's
+// `h.onAction(x)` where h is Hub-typed. A direct lookup misses
+// because fnTypedFields only has Base, not Hub, so the walker walks Hub's
 // C3 MRO so the marker fires.
 func TestFunctionTypedVar_InheritedCrossContractCall(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "inherited_cross_contract.sol")
@@ -349,7 +349,7 @@ func TestFunctionTypedVar_InheritedCrossContractCall(t *testing.T) {
 	}
 }
 
-// W-C W8 V6 — HasFunctionPointerCall fires on cross-contract
+// HasFunctionPointerCall fires on cross-contract
 // function-pointer invocations: `h.onAction(x)` where `h` is a
 // state-var of type Hub and Hub.onAction is a function-typed
 // NodeField. Pass 2 walks the receiver type chain, finds the
@@ -361,8 +361,8 @@ func TestFunctionTypedVar_CrossContractCall(t *testing.T) {
 		"Caller.trigger": true,
 		"Caller.noop":    false,
 		// Hub.setHook declares a fn-typed param `cb` but only
-		// assigns it to a state-var — never invokes it. V4/V5/V6
-		// look for invocations, so HasFunctionPointerCall stays
+		// assigns it to a state-var — never invokes it. The call
+		// markers look for invocations, so HasFunctionPointerCall stays
 		// false. (HasFunctionTypedVar would still be true.)
 		"Hub.setHook": false,
 	}
@@ -382,10 +382,10 @@ func TestFunctionTypedVar_CrossContractCall(t *testing.T) {
 	}
 }
 
-// W-C W8 V5 — HasFunctionPointerCall fires on calls to function-
+// HasFunctionPointerCall fires on calls to function-
 // typed state variables (`onAction(x)` where onAction is a state-
-// var of function type). Extends V4 (bare-identifier param/local
-// invocations) to contract-scope state variables.
+// var of function type). Extends the bare-identifier param/local
+// invocation case to contract-scope state variables.
 func TestFunctionTypedVar_StateVarPointerCall(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "state_var_call.sol")
 
@@ -409,7 +409,7 @@ func TestFunctionTypedVar_StateVarPointerCall(t *testing.T) {
 	}
 }
 
-// W-C W8 V4 — HasFunctionPointerCall marker. True when the callable
+// HasFunctionPointerCall marker. True when the callable
 // invokes a function-typed parameter or local via a bare-identifier
 // call_expression (`local(args)`). Complements HasFunctionTypedVar
 // which marks declarations.
@@ -447,9 +447,9 @@ func TestFunctionTypedVar_PointerCallMarker(t *testing.T) {
 	}
 }
 
-// W-C W8 V3 — function-typed parameter / local marker. Extends W8 V2
-// (state-var) to callables that own a function-typed parameter or
-// local variable. The marker is presence-only: V0 dispatch resolution
+// Function-typed parameter / local marker. Extends the state-var
+// marker to callables that own a function-typed parameter or
+// local variable. The marker is presence-only: dispatch resolution
 // does not follow indirect calls through function pointers.
 func TestFunctionTypedVar_CallableMarker(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/function_typed_var", "dispatcher.sol")

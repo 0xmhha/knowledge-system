@@ -37,7 +37,7 @@ func TestEnforceCitationsPassesThroughWhenNoSrcRoot(t *testing.T) {
 	}
 }
 
-// TestEnforceCitationsAt_StaleCommitHashFlag exercises B4: when the
+// TestEnforceCitationsAt_StaleCommitHashFlag exercises stale-commit flagging: when the
 // chunk's recorded commit_hash differs from currentHead, the hit
 // survives (file is fine) but carries StaleCitation=true and counts
 // toward the stale return.
@@ -72,7 +72,7 @@ func TestEnforceCitationsAt_StaleCommitHashFlag(t *testing.T) {
 	}
 }
 
-// TestEnforceCitationsAt_FlowStepLineDrift is the Phase C2 guard: a flow_step
+// TestEnforceCitationsAt_FlowStepLineDrift is the flow line-drift guard: a flow_step
 // whose curated line drifted past the current file's end is flagged stale (not
 // dropped), while an in-bounds step is left fresh. Flow chunks carry no commit
 // hash, so this line-bounds check is their only staleness signal and runs even

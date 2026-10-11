@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V4 — fixed-size value-type array slot packing. Extends W9 V2
+// Fixed-size value-type array slot packing. Extends primitive packing
 // (which conservatively treated arrays as full slots) to actually
 // compute the array's storage footprint and place it across as many
 // slots as needed. Per Sol §11.1, fixed arrays start a new slot and

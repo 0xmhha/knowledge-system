@@ -21,14 +21,14 @@ import (
 // Parser implements parse.Parser for Solidity source.
 //
 // abi accumulates per-contract function signatures across ParseFile calls
-// so that the cross-language linker (T20) can match them to TypeScript
+// so that the cross-language linker can match them to TypeScript
 // classes by name. Mutated in place from declVisitor.collectABI under
 // abiMu — buildpipe runs ParseFile concurrently across files.
 type Parser struct {
 	srcRoot string
 	abiMu   sync.Mutex
 	abi     map[string][]ABISig
-	// W-C W9 V6 (2026-05-19): cross-file struct byte footprints.
+	// Cross-file struct byte footprints.
 	// ParseFile runs per-file Pass 1 which computes structSizes from
 	// the file's own struct declarations. Cross-file refs (state-var
 	// typed as a struct declared in another file) need the union of
@@ -79,7 +79,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		}
 		p.abiMu.Unlock()
 	}
-	// W-C W9 V6 (2026-05-19): merge per-file struct sizes so cross-
+	// Merge per-file struct sizes so cross-
 	// file refs can be resolved during Pass 2. Conflicts (same struct
 	// name with different sizes across files) prefer the larger
 	// value — defensive against incomplete declarations.
@@ -101,7 +101,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 }
 
 // ABI returns the per-contract signatures collected during ParseFile.
-// Used by the cross-language linker (T20). Caller is expected to invoke
+// Used by the cross-language linker. Caller is expected to invoke
 // ABI only after all ParseFile calls have completed (buildpipe enforces
 // this by collecting all results before reading ABI). The mutex guard is
 // defensive — under the documented call sequence there is no contention.

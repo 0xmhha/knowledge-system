@@ -1,12 +1,12 @@
-// Package buildpipe — lock_propagation.go implements D1 Stage B (W-A,
-// Within-language semantics Phase 5): cross-function lock propagation for
+// Package buildpipe — lock_propagation.go implements cross-function lock
+// propagation for
 // the Go concurrency pass. Extends the existing intra-function
 // accessed_under_lock detector (internal/parse/golang/concurrency_underlock.go)
 // by walking the call graph from lock-holding functions into their callees
 // and emitting accessed_under_lock(field, mutex) edges for fields touched
 // inside reachable callee bodies.
 //
-// Spec reference: docs/design/go-cross-function-lock-propagation.md
+// Spec reference: docs/graph/design/go-cross-function-lock-propagation.md
 // (decisions resolved 2026-05-11, §5.0 — Stage B DFS depth=5, INFERRED
 // confidence for all cross-function emits, calls+invokes traversal,
 // goroutine bodies forced to INFERRED, opt-in flag, dedup with confidence
@@ -14,7 +14,7 @@
 //
 // Opt-in only: gated by Options.LockPropagation (CLI: --lock-propagation,
 // default false). When the flag is off, the pass is a structural no-op —
-// the existing intra-function B1 Phase 4 emit is unchanged.
+// the existing intra-function emit is unchanged.
 package buildpipe
 
 import (
@@ -25,7 +25,7 @@ import (
 )
 
 // lockPropagationMaxDepth caps the DFS depth from any lock-holding function.
-// Spec §3.2 (W-A §5.0 Q1): user-decided 3-5 range; we pick 5 as the upper
+// Spec §3.2 (design §5.0 Q1): user-decided 3-5 range; we pick 5 as the upper
 // bound to maximize transitive reach while still bounding noise. Larger
 // depths would chase helper chains into stdlib-flavoured utility methods
 // that almost never share the caller's critical section. Cycle protection
@@ -36,14 +36,14 @@ const lockPropagationMaxDepth = 5
 // propagateLockedFieldAccess emits cross-function accessed_under_lock edges
 // in place on g.Edges. The algorithm (spec §3.2):
 //
-//  1. Build callgraph adjacency from calls + invokes edges (W-A §5.0 Q3).
+//  1. Build callgraph adjacency from calls + invokes edges (design §5.0 Q3).
 //  2. Index each function/method by its acquires_lock targets (the mutexes
 //     it directly locks; intra-function emits already exist for these).
 //  3. For each lock-holding function f with held mutex set H:
 //     - DFS from f up to lockPropagationMaxDepth via callgraph adjacency.
 //     - At every reachable callee c, for every field in funcFields[c], emit
 //     accessed_under_lock(field, mutex) for each mutex in H.
-//  4. Dedup against existing edges and within this pass (W-A §5.0 Q6):
+//  4. Dedup against existing edges and within this pass (design §5.0 Q6):
 //     priority EXTRACTED > INFERRED > AMBIGUOUS. Existing intra-function
 //     edges (INFERRED) survive — we only add new (field, mutex) pairs.
 //
@@ -51,7 +51,7 @@ const lockPropagationMaxDepth = 5
 // the Go parser (parse/golang.Parser.FuncFieldTouches). Nil/empty disables
 // the pass (no work possible — every callee's field set is unknown).
 //
-// Confidence policy (W-A §5.0 Q2 + Q4): all cross-function emits are
+// Confidence policy (design §5.0 Q2 + Q4): all cross-function emits are
 // INFERRED. Goroutine bodies entered through the DFS chain also stay
 // INFERRED — the spec marks them as the lowest-trust path because async
 // scheduling separates the lock-acquiring caller from the callee's
@@ -74,7 +74,7 @@ func propagateLockedFieldAccess(g *graph.Graph, funcFields map[string]map[string
 	}
 
 	// callees adjacency: funcID → []calleeID via `calls` + `invokes` edges
-	// (W-A §5.0 Q3 — future-proof for invokes once interface dispatch
+	// (design §5.0 Q3 — future-proof for invokes once interface dispatch
 	// resolution lands). Self-loops are kept; the visited set in DFS handles
 	// recursive functions naturally.
 	callees := buildCalleeAdjacency(g.Edges, nodeKind)
@@ -90,7 +90,7 @@ func propagateLockedFieldAccess(g *graph.Graph, funcFields map[string]map[string
 	// existing: (field, mutex) pairs already in g.Edges. We dedup against
 	// these so the propagator never produces a duplicate of an intra-function
 	// edge already emitted by concurrency_underlock.go. Existing edge wins
-	// per W-A §5.0 Q6 — we never demote an INFERRED to a lower confidence.
+	// per design §5.0 Q6 — we never demote an INFERRED to a lower confidence.
 	existing := make(map[edgePairKey]struct{}, 64)
 	for _, e := range g.Edges {
 		if e.Type != types.EdgeAccessedUnderLock {
@@ -101,7 +101,7 @@ func propagateLockedFieldAccess(g *graph.Graph, funcFields map[string]map[string
 
 	emitted := 0
 	for funcID, mutexes := range holdersByFunc {
-		// DFS from funcID. visited prevents cycle revisits (W-A §5.0 Q1 —
+		// DFS from funcID. visited prevents cycle revisits (design §5.0 Q1 —
 		// visited set is the only cycle defence; depth limit is independent).
 		visited := map[string]struct{}{funcID: {}}
 		stack := []dfsFrame{{id: funcID, depth: 0}}
@@ -110,7 +110,7 @@ func propagateLockedFieldAccess(g *graph.Graph, funcFields map[string]map[string
 			stack = stack[:len(stack)-1]
 			// At the lock-holding function itself (depth 0), intra-function
 			// emit already handled this; skip the field walk. Depth > 0 means
-			// we crossed at least one call edge — that's the W-A territory.
+			// we crossed at least one call edge — that's the cross-function case.
 			if cur.depth > 0 {
 				if touched, ok := funcFields[cur.id]; ok {
 					for fieldID := range touched {
@@ -139,7 +139,7 @@ func propagateLockedFieldAccess(g *graph.Graph, funcFields map[string]map[string
 					continue
 				}
 				// Skip nodes outside this build (stdlib, vendored deps). This is
-				// the W-A §3.3 stdlib guard — a callee with no funcFields entry
+				// the design §3.3 stdlib guard — a callee with no funcFields entry
 				// AND no graph node is almost certainly external; including it
 				// would chase phantom edges. We still descend through nodes
 				// known to the graph even if they have no field touches (they
@@ -172,13 +172,13 @@ type dfsFrame struct {
 
 // edgePairKey dedupes (src, dst) accessed_under_lock pairs. Type and
 // confidence are constant across the propagator's emits (EdgeAccessedUnderLock
-// + ConfInferred per W-A §5.0 Q2), so they're not part of the key.
+// + ConfInferred per design §5.0 Q2), so they're not part of the key.
 type edgePairKey struct {
 	src, dst string
 }
 
 // buildCalleeAdjacency returns funcID → []calleeID derived from
-// calls + invokes edges (W-A §5.0 Q3). Both edge types are merged into a
+// calls + invokes edges (design §5.0 Q3). Both edge types are merged into a
 // single adjacency list; the propagator treats them identically because the
 // downstream emit confidence is INFERRED for both cases.
 //

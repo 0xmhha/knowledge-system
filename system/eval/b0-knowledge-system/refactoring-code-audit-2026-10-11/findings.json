@@ -1,0 +1,98 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "source_revision": "2ac811a6 (HEAD at audit time; tree exported with git archive: cmd internal pkg go.mod go.sum)",
+ "method": "ckg build --lang go --no-cache --lock-propagation on the exported tree (105,914 nodes / 252,563 edges; 6,287 functions and methods; 52,343 call sites; 13,979 calls edges). sinks.py slices every production call site's AST byte range from the snapshot to classify risky calls; reach.py runs BFS (depth<=10) along calls edges from 54 external entry points (graph REST handlers, viewer, cks and ckv MCP tool handlers). Candidates were then read in source and reproduced with temporary tests or binaries; temporary probe tests were deleted.",
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "high",
+   "confidence": "high",
+   "title": "git option injection through revision arguments overwrites arbitrary files and silently skips reindexing",
+   "path": "cks MCP cks.ops.index(since_commit) -> ckvIndexArgs -> ckv reindex --since -> build.resolveChangeSet -> git -C src diff --name-status <since> <HEAD>",
+   "files": [
+    "internal/system/mcp/ops_index.go:263",
+    "internal/vector/build/reindex.go:215",
+    "internal/vector/build/reindex.go:736"
+   ],
+   "reproduced": "repro-since-injection.sh: --since --output=<file> replaced the file's content with the diff output; the run reported 0 files and still advanced the indexed head, so the real change was never indexed",
+   "preconditions": "cks.ops.index is reachable in legacy (non-versioned) setups with index binaries configured; any MCP caller, including an agent steered by prompt injection, or a direct ckv reindex --since caller",
+   "siblings": "freshness.gitDiffNameOnly and resolveChangeSet also pass manifest IndexedHead as a positional revision (exploitable only by editing the manifest)",
+   "fix": "validate revisions (full or short hex, or git rev-parse --verify --end-of-options) before use, and put --end-of-options before positional revisions"
+  },
+  {
+   "id": "F2",
+   "severity": "medium",
+   "confidence": "high",
+   "title": "graph REST API and viewer accept any Host header (DNS rebinding exposes indexed source)",
+   "files": [
+    "internal/graph/server/server.go:115",
+    "internal/system/viewer/server.go:20"
+   ],
+   "reproduced": "temporary test: requests with Host/Origin attacker.example returned 200 for /api/nodes/top and /api/blob/{id} (source text) and for a text/plain POST /api/edges",
+   "preconditions": "ckg api or cks viewer running (127.0.0.1) while the user's browser visits a page that rebinds its name to 127.0.0.1",
+   "contrast": "cks MCP HTTP is protected: mcp-go v0.56 rejected the same Host with 403",
+   "fix": "reject requests whose Host is not a loopback name/address (and the configured port) in both handlers"
+  },
+  {
+   "id": "F3",
+   "severity": "medium",
+   "confidence": "high",
+   "title": "ckv mcp --http has no client ACL or authentication and exposes ops.index with an arbitrary project_root",
+   "files": [
+    "cmd/vector/mcp.go:70",
+    "pkg/vector/mcp/server.go:129",
+    "pkg/vector/mcp/server.go:661"
+   ],
+   "evidence": "flag help suggests ':8080' (all interfaces); ServeHTTP starts mcp-go without ACL; handleIndex builds from any project_root into the served out dir, after which search returns its contents. mcp-go's rebinding guard only applies to loopback connections.",
+   "not_reproduced": "LAN access was not exercised",
+   "fix": "default to 127.0.0.1, add the cks clientACL, and restrict project_root to the configured source root"
+  },
+  {
+   "id": "F4",
+   "severity": "low",
+   "confidence": "high",
+   "title": "vector semantic_search alias_path reads any file; errors reveal existence and the first characters",
+   "files": [
+    "pkg/vector/mcp/server.go:410",
+    "internal/vector/query/expand.go:45"
+   ],
+   "reproduced": "temporary test: a .env file produced \"cannot unmarshal !!str `OPENAI_...`\"; a missing path produced the open error",
+   "fix": "resolve alias files relative to the index or configuration and do not echo parse errors"
+  },
+  {
+   "id": "F5",
+   "severity": "low",
+   "confidence": "high",
+   "title": "graph REST POST handlers decode request bodies without a size limit",
+   "files": [
+    "internal/graph/server/api.go:243",
+    "internal/graph/server/api.go:318"
+   ],
+   "evidence": "json.NewDecoder(r.Body) without http.MaxBytesReader; loopback-only listener",
+   "fix": "wrap bodies with http.MaxBytesReader"
+  },
+  {
+   "id": "F6",
+   "severity": "low",
+   "confidence": "high",
+   "title": "read-write graph Open still builds a plain path DSN",
+   "files": [
+    "internal/graph/persist/sqlite.go:47"
+   ],
+   "evidence": "same driver rule as the fixed OpenReadOnly: a '?' in the path is cut and the database is created elsewhere (seen while writing the regression test)",
+   "fix": "build an escaped file: URI as in OpenReadOnly"
+  }
+ ],
+ "checked_without_defect": [
+  "SQL: no string-built queries with external input; dynamic WHERE clauses use placeholders (sqlitevec candidateWhere)",
+  "locks: every Lock/RLock in production is followed by defer Unlock or an unlock before any return (one parser-string false positive)",
+  "write paths: retained blob and DB backup writes check write/close/sync errors",
+  "semantic git show commit:file: commits are validated as 40-hex before use",
+  "toolenv login shell: variable names are pattern-checked; only GOPATH is requested",
+  "cks MCP HTTP transport: client IP ACL plus mcp-go DNS-rebinding guard (403 on foreign Host)",
+  "query.gitLog passes the file after --",
+  "no leftover graph -wal/-shm files in evaluation or operating datasets"
+ ],
+ "limits": "pattern-based sinks and depth-10 call reachability; calls through interfaces or function values without CKG edges can be missed; no taint tracking inside functions; non-Go code not analysed"
+}

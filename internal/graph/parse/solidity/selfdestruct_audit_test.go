@@ -6,18 +6,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V13 — selfdestruct audit. Sol's `selfdestruct(addr)` is
+// Selfdestruct audit. Sol's `selfdestruct(addr)` is
 // a top-level builtin call, not a member-expression on a
-// receiver, so the existing W10 V8/V9/V12 cast walkers (which
-// match `<cast>.<method>(...)`) don't see it. The W10 V0
-// HasAssembly / W8 V1 HasLowLevelCall markers also don't fire
+// receiver, so the existing cast walkers (which
+// match `<cast>.<method>(...)`) don't see it. The
+// HasAssembly / HasLowLevelCall markers also don't fire
 // because the call form is a bare identifier, not an inline
 // assembly block or member-expression low-level call.
 //
-// V13 locks the current behaviour: selfdestruct(this) does NOT
+// This test locks the current behaviour: selfdestruct(this) does NOT
 // surface on any of HasExternalCall, HasSelfReentrantCall, or
 // HasSelfDelegatecallDead. Treating selfdestruct as its own
-// dispatch surface is a separate W10 V14+ scope decision.
+// dispatch surface is a separate scope decision.
 func TestSelfdestructAudit_NoMarkerFalsePositive(t *testing.T) {
 	nodes, _ := parseResolveOneSol(t, "testdata/yul_receiver", "selfdestruct_this.sol")
 

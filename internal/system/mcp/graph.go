@@ -56,6 +56,10 @@ type subgraphResponse struct {
 // the two together.
 const defaultTraversalDepth = 2
 
+// maxTraversalDepth caps a caller's depth, matching ckg's impact.DepthCap.
+// An untyped subgraph walk on a real graph reaches most of it by depth 4.
+const maxTraversalDepth = 5
+
 // registerFindSymbol wires cks.context.find_symbol.
 func registerFindSymbol(s *mcpserver.MCPServer, d Deps) {
 	tool := mcpgo.NewTool(ToolNameFindSymbol,
@@ -191,7 +195,7 @@ func handleFindRelatives(
 
 	opts := ckgclient.NeighborsOpts{
 		Relations: relations,
-		Hops:      intArg(req, "depth", defaultTraversalDepth),
+		Hops:      depthArg(req),
 		MaxTotal:  intArg(req, "max_total", 0),
 		// Pushed down so max_total buys max_total usable neighbours.
 		ExcludeTests: excludeTestsArg(req),
@@ -240,7 +244,7 @@ func handleGetSubgraph(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (
 		return mcpgo.NewToolResultError(ToolNameGetSubgraph + ": missing required argument \"symbol\""), nil
 	}
 	opts := ckgclient.SubgraphOpts{
-		Depth:    intArg(req, "depth", defaultTraversalDepth),
+		Depth:    depthArg(req),
 		MaxTotal: intArg(req, "max_total", 0),
 		// Pushed down: filtering afterwards both shrinks the result below the
 		// cap and leaves edges pointing at nodes that were removed.
@@ -274,6 +278,11 @@ func splitCSV(s string) []string {
 		out = append(out, p)
 	}
 	return out
+}
+
+// depthArg is the caller's traversal depth clamped to [0, maxTraversalDepth].
+func depthArg(req mcpgo.CallToolRequest) int {
+	return min(max(intArg(req, "depth", defaultTraversalDepth), 0), maxTraversalDepth)
 }
 
 // intArg pulls an integer-shaped argument from the request, defaulting

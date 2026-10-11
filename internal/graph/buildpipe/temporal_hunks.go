@@ -1,13 +1,13 @@
-// Package buildpipe — temporal_hunks.go wires the CKS G6 Hunk-graph H1
-// stage (schema 1.8) on top of emitTemporalEdges. Per design
-// docs/design/hunk-graph.md (decisions finalised 2026-05-09):
+// Package buildpipe — temporal_hunks.go wires the hunk graph
+// (schema 1.8) on top of emitTemporalEdges. Per design
+// docs/graph/design/hunk-graph.md (decisions finalised 2026-05-09):
 //
 //   - Encoding (§11.1):  gzip stdlib, ~70% size reduction on diff text.
-//   - Dedup    (§11.2):  none in H1; keep chronology of rebased hunks.
-//   - Reach    (§11.3):  H1 only collects HEAD-reachable hunks
+//   - Dedup    (§11.2):  none; keep chronology of rebased hunks.
+//   - Reach    (§11.3):  this pass only collects HEAD-reachable hunks
 //     (Confidence='EXTRACTED'). A future PR adds
 //     unreachable collection (Confidence='AMBIGUOUS')
-//     via reflog/fsck — H3's EvidencePack assembler
+//     via reflog/fsck — the EvidencePack assembler
 //     MUST filter to EXTRACTED so the LLM never sees
 //     force-pushed-away code paths.
 //   - Lang     (§11.4):  hunk inherits its target file's extension when
@@ -119,11 +119,11 @@ func emitHunkGraph(g *graph.Graph, srcRel string, commitIDByteSHA map[string]str
 // nodes already present in g (emitted by buildCommitNodes earlier in
 // emitTemporalEdges). The subject lives in Node.Signature as
 // "<unix>: <subject>" — we strip the timestamp prefix to recover the
-// bare subject text H4 needs for issue-ID extraction.
+// bare subject text issue-ID extraction needs.
 //
 // Returns an empty (non-nil) map when no Commit nodes exist yet —
 // callers can pass directly to buildHunkNodes which treats nil and
-// empty maps the same way (no H4 enrichment for those hunks).
+// empty maps the same way (no issue-ID enrichment for those hunks).
 func commitSubjectMapFromGraph(g *graph.Graph) map[string]string {
 	out := make(map[string]string, 256)
 	for _, n := range g.Nodes {
@@ -145,7 +145,7 @@ func commitSubjectMapFromGraph(g *graph.Graph) map[string]string {
 // emitUnreachableHunkGraph adds Commit + Hunk nodes for SHAs reachable
 // only via reflog or fsck-unreachable (i.e. force-pushed-away history).
 // All nodes + edges get confidence='AMBIGUOUS' per docs/design/hunk-
-// graph.md §11.3. The H3 retrieval layer (future) MUST filter to
+// graph.md §11.3. The retrieval layer MUST filter to
 // EXTRACTED so the LLM never sees code paths that were rolled back.
 //
 // Commit nodes for unreachable SHAs are emitted here (not by
@@ -310,12 +310,12 @@ func remapHunksToSrcRel(hunks []temporal.HunkInfo, srcRel string) ([]temporal.Hu
 //
 // confidence stamps both the Hunk node and the has_hunk/adjacent edges:
 // EXTRACTED for the HEAD-reachable pass, AMBIGUOUS for the unreachable
-// follow-up pass per docs/design/hunk-graph.md §11.3.
+// follow-up pass per docs/graph/design/hunk-graph.md §11.3.
 //
-// subjectBySHA maps each commit SHA → its subject line; used by H4
+// subjectBySHA maps each commit SHA → its subject line; used
 // (§10.4) to extract issue/ticket IDs into the Hunk node's
 // doc_comment column with the `issues:ID1;ID2` prefix. Pass nil for
-// the empty map — H4 enrichment silently no-ops.
+// the empty map — issue-ID enrichment silently no-ops.
 func buildHunkNodes(hunks []temporal.HunkInfo, _ string,
 	commitIDByteSHA map[string]string,
 	subjectBySHA map[string]string,
@@ -411,11 +411,11 @@ func buildHunkNodes(hunks []temporal.HunkInfo, _ string,
 // for the same (sha, file, idx) tuple via MakeID. FilePath is the target
 // file (post-remap), so viewer queries "show me the hunks that touched
 // main.go" can filter by file_path directly. doc_comment / signature stay
-// empty in H1 — they're reserved for H4's issue-id extraction.
+// empty here — doc_comment is filled by issue-ID extraction.
 //
 // confidence is stamped on the row so the §11.3 hybrid (EXTRACTED for
 // HEAD-reachable, AMBIGUOUS for reflog/fsck-collected unreachable) can
-// be distinguished by H3 retrieval queries via a single SQL filter.
+// be distinguished by retrieval queries via a single SQL filter.
 func makeHunkNode(h temporal.HunkInfo, confidence types.Confidence) types.Node {
 	qname := fmt.Sprintf("hunk:%s:%s:%d", h.SHA, h.FilePath, h.Index)
 	displayName := h.SHA
@@ -493,7 +493,7 @@ func capPatchText(b []byte) []byte {
 // default level. The empirical 70% size reduction on real diff text
 // (high-entropy code interleaved with low-entropy `+`/`-` markers and
 // repeated context lines) is plenty given the §11.6 64KB pre-cap; level
-// tuning is a non-goal for H1.
+// tuning is a non-goal.
 func gzipPatch(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	gw := gzip.NewWriter(&buf)
@@ -506,7 +506,7 @@ func gzipPatch(b []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// emitModifiesEdges (H2) walks every Hunk node and emits a `modifies`
+// emitModifiesEdges walks every Hunk node and emits a `modifies`
 // edge for each whitelisted CodeNode in the same file whose
 // [start_line, end_line] interval overlaps the hunk's. Confidence
 // follows the hunk: EXTRACTED for HEAD-reachable hunks, AMBIGUOUS for
@@ -536,7 +536,7 @@ func emitModifiesEdges(g *graph.Graph) {
 // BuildModifiesEdges retained as a buildpipe-internal alias for
 // historical callers and tests; the canonical implementation lives
 // in pkg/hunkmodifies so consumers outside this repository's
-// internal tree can compose the H2 join without crossing the
+// internal tree can compose the hunk-to-code join without crossing the
 // internal boundary. Both forms call the same underlying function.
 func BuildModifiesEdges(nodes []types.Node) []types.Edge {
 	return hunkmodifies.BuildEdges(nodes)

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "decided_at": "2026-10-10",
+  "decided_by": "user (chat)",
+  "n15_d": {"question": "Accept support/cost/limits of local go-stablenet operation (index 29.5 min / 1.2 GB, query 11-18 s, submodule contents excluded)?",
+            "answer": "accepted; query latency is a follow-up improvement"},
+  "n16": {"question": "Record local trust/authority decisions (sole operator and authority = user; no signing key; trust local builds by commit and binary SHA; no redistribution, so third-party notice distribution review is out of scope)?",
+          "answer": "record as stated",
+          "unmet_literal_condition": "public key fingerprint / signed trust path: the user chose no signing key"},
+  "n17": {"question": "Accept the recovery drill (first query 35 s after loss; RTO 1 h, RPO 24 h) and operating policy (owner user; backup on the same Mac; network: local Ollama only; index on AC power, an interrupted build keeps current and is rerun)?",
+          "answer": "accepted",
+          "key_recovery": "not applicable: no signing or encryption keys in this scope",
+          "failover_scope": "single host: failover means restoring the backed-up version as current; no second host"},
+  "activity_time": null,
+  "options_were_recommended_by_agent": true
+}

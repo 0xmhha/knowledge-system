@@ -7,14 +7,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.4 — cross-file multi-binding regression guard. V2.2 added
-// multi-value binding semantics (`using A for T; using B for T;`) +
+// Cross-file multi-binding regression guard. Multi-value
+// binding semantics (`using A for T; using B for T;`) +
 // resolveBindingLib helper that iterates the multi-bound libraries
-// to find the one with the requested method. V2.4 validates this
+// to find the one with the requested method. This test validates this
 // works across file boundaries — libs in one file, caller in another.
 //
-// V2.4 carry-over (V2.5+):
-//   - Byte-range precision (V2.0 line-based fallback).
+// Not covered here:
+//   - Byte-range precision (line-based fallback).
 //   - Module/import additional patterns.
 //   - Grammar-blocked items.
 

@@ -6,15 +6,15 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.5 / V3 — operator-form using directive with free-function
+// Operator-form using directive with free-function
 // target.
 //
-// V2.5 added the file-level operator-form recovery walker, which
+// The file-level operator-form recovery walker
 // parses the braced body of `using {mul as *} for uint256 global;`
-// from raw ERROR text and emits PendingRefs. The original V2.5 lock
+// from raw ERROR text and emits PendingRefs. The original lock
 // asserted those refs drop at resolution because resolveUsingForRef
-// only looked up byName[NodeContract]. W6 V3 adds a NodeFunction
-// fallback so the free-function form resolves to the free function
+// only looked up byName[NodeContract]. A NodeFunction
+// fallback now lets the free-function form resolve to the free function
 // itself, flipping the historic 0-edge lock to one EdgeUsesFor per
 // non-library container.
 

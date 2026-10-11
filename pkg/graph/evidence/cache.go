@@ -1,5 +1,5 @@
 // Package evidence — cache.go amortises the per-call corpus indexing
-// across BuildPack invocations. The H3 ranking algorithm scans every
+// across BuildPack invocations. The ranking algorithm scans every
 // node + edge + hunk blob to build the BM25 corpus; on a 240K-node /
 // 9K-hunk graph that's ~4s wall time per query, dominated by ~9K
 // GetBlob calls (each gzip-decompressing the patch text on the way
@@ -65,7 +65,7 @@ const manifestCacheTTL = time.Second
 // — every method takes the lock internally.
 func NewCache() *Cache { return &Cache{} }
 
-// BuildPack runs the H3 assembly with the cached index when possible.
+// BuildPack runs the EvidencePack assembly with the cached index when possible.
 // Falls back to the uncached path on the first call (or any rebuild
 // of the underlying graph.db).
 //
@@ -93,7 +93,7 @@ func (c *Cache) BuildPack(store persist.StoreReader, opt Options) (*Pack, error)
 		return pack, nil
 	}
 
-	// IssueID filter (H4 follow-up): restrict the candidate set to
+	// IssueID filter: restrict the candidate set to
 	// hunks whose parent commit cites the requested ticket. When
 	// Intent is empty AND IssueID is set, skip BM25 entirely and
 	// rank by commit recency — the user is asking "show me everything
@@ -300,7 +300,7 @@ func (c *Cache) getManifest(store persist.StoreReader) (persist.Manifest, error)
 }
 
 // TicketRow is one entry in the TicketIndex output: an issue/PR ID
-// the H4 extractor recognised + how many hunks / commits cite it +
+// the issue-ID extractor recognised + how many hunks / commits cite it +
 // up to 3 most-recent commit subjects for context. The Coding Agent
 // or a human reviewer uses this to navigate "what tickets does this
 // codebase track most heavily" without round-tripping to GitHub.

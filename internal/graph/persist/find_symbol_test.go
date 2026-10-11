@@ -52,7 +52,7 @@ func newKindsFixtureStore(t *testing.T) persist.Store {
 	return s
 }
 
-// TestFindSymbol_KindsSingle locks the CKG-4 contract for the
+// TestFindSymbol_KindsSingle locks the kind push-down contract for the
 // single-kind case: opts.Kinds restricts the result set in SQL,
 // so the consumer no longer needs to over-fetch + post-filter.
 func TestFindSymbol_KindsSingle(t *testing.T) {

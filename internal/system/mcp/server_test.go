@@ -190,7 +190,7 @@ func TestHandleHealth_AllReachable_ReturnsOK(t *testing.T) {
 
 func TestHandleHealth_CKGDown_ReturnsDown(t *testing.T) {
 	t.Parallel()
-	// HLD §10: ckg unreachable -> fail closed. Health should reflect
+	// ckg unreachable -> fail closed. Health should reflect
 	// that the pack-producing path is no longer usable.
 	f := newFixture(t, func(f *fixture) {
 		f.ckg.HealthErr = errors.New("ckg backend unreachable")

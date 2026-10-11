@@ -14,7 +14,7 @@ import (
 // <out>/footprint.jsonl unless --no-footprint is set, and always emits
 // human-readable slog output to stderr.
 //
-// Respects the persistent root flags (B8):
+// Respects the persistent root flags:
 //   - --log-level (or $CKV_LOG_LEVEL) sets the slog minimum level.
 //   - --profile <path> tells the logger to aggregate per-event
 //     latencies and dump them as profile.json on Close.

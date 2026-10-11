@@ -6,24 +6,24 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.13 — diamond inheritance + multi-parent using-for
+// Diamond inheritance + multi-parent using-for
 // binding union.
 //
-// V1.2 introduced BFS-based inheritance propagation for binding
+// BFS-based inheritance propagation for binding
 // maps so a child contract picks up its parents' `using` directives
-// transparently. V2.2 then extended bindings to multi-value to
+// transparently. Bindings are also multi-value to
 // support `contract Foo { using A for T; using B for T; }` within
 // a single contract.
 //
-// V2.13 probes the intersection: when a child inherits from two
+// This test probes the intersection: when a child inherits from two
 // parents A and B that BOTH bind the same type T to different
 // libraries, do both bindings survive in the child's binding map?
 //
-// Pre-V2.13 code: the BFS "don't clobber" branch (resolve.go
-// ~L385) writes `bindings[childID][typeName] = cloned` only when
-// the slot doesn't already exist. After the first ancestor's
-// binding sets the slot, subsequent ancestors' bindings for the
-// same type are dropped — child-shadows-inherited semantics
+// Earlier code: the BFS "don't clobber" branch in resolve.go
+// wrote `bindings[childID][typeName] = cloned` only when
+// the slot didn't already exist. After the first ancestor's
+// binding set the slot, subsequent ancestors' bindings for the
+// same type were dropped — child-shadows-inherited semantics
 // applied incorrectly to peer-ancestors at the SAME inheritance
 // depth.
 //

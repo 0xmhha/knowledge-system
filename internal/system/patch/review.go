@@ -59,24 +59,87 @@ func validateRun(p semantic.Projection, criterionID string, run semantic.TestRun
 	if run.Framework != "go-test-json" || !run.TestObserved || !run.TestPassed || run.TestName == "" {
 		return fmt.Errorf("criterion promotion requires an observed exact test result")
 	}
-	if _, _, err := criterionInProjection(p, criterionID); err != nil {
+	requirement, _, err := criterionInProjection(p, criterionID)
+	if err != nil {
 		return err
 	}
-	linked := false
-	for _, assertion := range p.Assertions {
-		if assertion.Predicate == semantic.PredicateCheckedBy && assertion.Status == semantic.StatusVerified &&
-			assertion.SubjectID == criterionID && assertion.ObjectID == run.TestCanonicalID {
-			for _, id := range run.CheckedAssertions {
-				if id == assertion.ID {
-					linked = true
+	trace, err := p.Trace()
+	if err != nil {
+		return err
+	}
+	tested := map[string]bool{}
+	for _, item := range trace.Requirements {
+		if item.RequirementID != requirement.ID || item.State != semantic.TraceLinked {
+			continue
+		}
+		for _, path := range item.Paths {
+			if path.TestCanonicalID != run.TestCanonicalID {
+				continue
+			}
+			for _, id := range path.CriterionIDs() {
+				if id == criterionID {
+					tested[path.TestedByAssertion] = true
 				}
 			}
 		}
 	}
-	if !linked {
+	if len(tested) == 0 || !assertionIDsMatch(run.TestedByAssertions, tested) {
+		return fmt.Errorf("test execution does not match the fully reviewed code/test path")
+	}
+	checked := map[string]bool{}
+	for _, assertion := range p.Assertions {
+		if assertion.Predicate == semantic.PredicateCheckedBy && assertion.Status == semantic.StatusVerified &&
+			assertion.SubjectID == criterionID && assertion.ObjectID == run.TestCanonicalID {
+			checked[assertion.ID] = true
+		}
+	}
+	if !assertionIDsMatch(run.CheckedAssertions, checked) {
 		return fmt.Errorf("test execution does not match a reviewed criterion link")
 	}
+	if run.Executable != "go" || !strings.HasSuffix(run.TestCanonicalID, "."+run.TestName) {
+		return fmt.Errorf("observed Go test name differs from the reviewed canonical target")
+	}
+	var anchor *semantic.EvidenceSpan
+	for i := range p.Evidence {
+		e := &p.Evidence[i]
+		if e.Kind != semantic.SourceTest || e.CanonicalID != run.TestCanonicalID {
+			continue
+		}
+		if anchor != nil && (anchor.Path != e.Path || anchor.StartLine != e.StartLine || anchor.EndLine != e.EndLine) {
+			return fmt.Errorf("reviewed Go test has ambiguous source anchors")
+		}
+		anchor = e
+	}
+	if anchor == nil || !strings.HasSuffix(anchor.Path, "_test.go") {
+		return fmt.Errorf("reviewed Go test source anchor is missing")
+	}
+	packagePath := "."
+	if dir := filepath.Dir(anchor.Path); dir != "." {
+		packagePath = "./" + filepath.ToSlash(dir)
+	}
+	argv, _ := json.Marshal([]string{"go", "test", "-json", "-count=1", "-run", "^" + run.TestName + "$", packagePath})
+	commandHash := sha256.Sum256(argv)
+	if run.CommandSHA256 != hex.EncodeToString(commandHash[:]) {
+		return fmt.Errorf("test command digest differs from the reviewed exact Go test command")
+	}
+	if outputHash, err := hex.DecodeString(run.OutputSHA256); err != nil || len(outputHash) != sha256.Size {
+		return fmt.Errorf("test output digest is not SHA-256")
+	}
 	return nil
+}
+
+func assertionIDsMatch(recorded []string, expected map[string]bool) bool {
+	if len(recorded) != len(expected) {
+		return false
+	}
+	seen := map[string]bool{}
+	for _, id := range recorded {
+		if !expected[id] || seen[id] {
+			return false
+		}
+		seen[id] = true
+	}
+	return true
 }
 
 // RecordRun imports one immutable cks semantic test report. A command exit 0

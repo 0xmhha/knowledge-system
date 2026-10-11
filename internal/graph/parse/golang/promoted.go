@@ -8,7 +8,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// promoted.go (defect C): materialises Go *promoted* methods as method nodes.
+// promoted.go materialises Go *promoted* methods as method nodes.
 //
 // When a struct T embeds a type E, T's method set includes E's methods
 // (Go method promotion). The per-file parser only emits a node for the

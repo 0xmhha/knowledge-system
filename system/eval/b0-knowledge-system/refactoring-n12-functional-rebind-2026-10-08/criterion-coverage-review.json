@@ -1,0 +1,46 @@
+{
+  "source_commit": "55d8e2db7a55b2956c4e89f986d0c3759fee4d25",
+  "criteria": [
+    {
+      "id": "ac-filtered-recall",
+      "named_test": "TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded",
+      "technical_scope": "local exact-sized sparse metadata filter K and ordering fixture",
+      "actual_named_test_pass": true,
+      "actual_human_acceptance": null
+    },
+    {
+      "id": "ac-filtered-completeness",
+      "named_tests": [
+        "TestSearchDetailedReportsCandidateLimitWithoutCompleteHits",
+        "TestSearchDetailedCancellationIsNotEmptySuccess"
+      ],
+      "technical_scope": "candidate limit completeness + canceled/deadline is an error, not empty successful K-completeness",
+      "actual_named_test_pass": true,
+      "actual_human_acceptance": null
+    },
+    {
+      "id": "ac-source-evidence",
+      "named_tests": [
+        "TestPutAlignedRejectsCrossLayerSnapshotAndLeavesStoreEmpty",
+        "TestCodeAnchorRequiresSameSnapshotAndContainedASTSpan"
+      ],
+      "technical_scope": "former tests manifest alignment, refusal to store/activate and unchanged active pointer; latter checks raw anchor snapshot/span in helper",
+      "missing_integrated_case": "real CKG canonical foreign-source evidence passed to promotion entry point; rejection before storing with old active pointer retained",
+      "complete_criterion_proof": false,
+      "actual_named_test_pass": true,
+      "actual_human_acceptance": null
+    },
+    {
+      "id": "ac-ontology-fallback",
+      "named_tests": [
+        "TestProvidedOntologyFallbackAndAmbiguityDoNotReplaceBaseline",
+        "TestStoredSharedAliasPreservesBaselineAndRetainedEvidence"
+      ],
+      "technical_scope": "fake resolver fallback; real immutable SQLite/matcher shared aliases and retained sanitized V2 with controlled engines/hits",
+      "live_hybrid_retrieval_evaluated": false,
+      "actual_named_test_pass": true,
+      "actual_human_acceptance": null
+    }
+  ],
+  "next_technical_task": "Add an actual CKG canonical foreign-anchor promotion regression with active pointer preservation, then source-bind new test separately. Do not mutate this immutable held snapshot."
+}

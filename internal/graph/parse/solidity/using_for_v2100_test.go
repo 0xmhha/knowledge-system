@@ -7,11 +7,11 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W6 V2.10 — mixed bare + aliased entries in single import.
+// Mixed bare + aliased entries in single import.
 //
-// V1.28 introduced importAliases handling for named-import alias form
+// importAliases handles the named-import alias form
 // `import {Lib as L} from "./lib.sol"` and the multi-aliased variant
-// `import {LibA as A, LibB as B}`. V2.10 closes the heterogeneous-
+// `import {LibA as A, LibB as B}`. This test closes the heterogeneous-
 // entry blind spot: one import statement where ONE entry has `as
 // Alias` and another DOES NOT:
 //
@@ -75,7 +75,7 @@ func TestUsingForV2100_MixedBareAndAliasedImport(t *testing.T) {
 	}
 }
 
-// TestUsingForV2100_MixedImportDispatchBarePath — V1.0 state-var
+// TestUsingForV2100_MixedImportDispatchBarePath — state-var
 // dispatch must work for the BARE-imported library. Confirms the
 // alias machinery doesn't break the non-aliased code path.
 func TestUsingForV2100_MixedImportDispatchBarePath(t *testing.T) {

@@ -36,7 +36,7 @@ type Fake struct {
 	// CloseErr, when non-nil, is returned by Close.
 	CloseErr error
 
-	// Flow* back the FlowClient methods (Phase D). Each *Val is returned on
+	// Flow* back the FlowClient methods. Each *Val is returned on
 	// success; the matching *Err takes precedence when non-nil.
 	FlowVal                    Flow
 	GetFlowErr                 error

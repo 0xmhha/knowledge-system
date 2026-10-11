@@ -1,0 +1,17 @@
+{
+  "initial_related_race_exit": 1,
+  "failed_fixture_tests": [
+    {
+      "test": "TestFreshness_StructuredFreshThenStale",
+      "reason": "owned test fixture git commit inherited global GPG signing and sandbox could not access signing daemon; product assertion not reached"
+    },
+    {
+      "test": "TestEnrichService_Run_AttachesHistory",
+      "reason": "owned test fixture git commit inherited global GPG signing and sandbox could not access signing daemon; product assertion not reached"
+    }
+  ],
+  "new_empty_snippet_regressions_passed_in_initial_run": true,
+  "vet_initial_failure": "sandbox denied Go build cache read; vet did not complete",
+  "retry_plan": "command-local commit.gpgsign=false for owned test fixture Git only; no global config or signing key access",
+  "command_local_fixture_retry": "Git signing override configured correctly but Go compile denied build cache access; no product tests ran"
+}

@@ -6,14 +6,14 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W10 V0 — Node.HasAssembly marker for callables containing
+// Node.HasAssembly marker for callables containing
 // `assembly { ... }` blocks.
 //
-// V0 detects presence only — any assembly_statement descendant of a
+// The marker detects presence only — any assembly_statement descendant of a
 // function / modifier / constructor / fallback body flips the flag.
 // Yul-internal op detection (which builtins are called, target
 // resolution for delegatecall / call / staticcall, storage-slot
-// references via sstore / sload) are V1+.
+// references via sstore / sload) are out of scope.
 //
 // The flag is a NodeFunction / NodeModifier metadata bit. Functions
 // without assembly leave it at the zero default (false, omitted from

@@ -6,7 +6,7 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// W-C W9 V11 — deep struct packing audit. Inner is a 2-slot
+// Deep struct packing audit. Inner is a 2-slot
 // struct, Middle wraps Inner + uint256 -> 3 slots, Outer wraps
 // Middle + uint8 -> 4 slots. The state-var declaration order:
 //
@@ -16,7 +16,7 @@ import (
 //
 // computeStructSizes runs a fixed-point loop: Inner is sized
 // first (no struct deps), then Middle (depends on Inner), then
-// Outer (depends on Middle). V11 locks the final layout — a
+// Outer (depends on Middle). This test locks the final layout — a
 // regression that breaks the dependency order would shift
 // wrapped or tail by a slot.
 func TestStorageSlot_DeeplyNestedStructPacking(t *testing.T) {

@@ -31,7 +31,7 @@ type Dummy struct {
 
 	// Degraded marks this Dummy as a fallback for an UNAVAILABLE real ckv
 	// (e.g. Ollama down). When set, Health reports Reachable=false so the
-	// cks.ops.health rollup yields "degraded" (S5) instead of falsely "ok".
+	// cks.ops.health rollup yields "degraded" instead of falsely "ok".
 	// DegradedReason is surfaced in the health Reason field for operators.
 	Degraded       bool
 	DegradedReason string
@@ -46,7 +46,7 @@ func NewDummy() *Dummy {
 }
 
 // NewDegradedDummy returns a Dummy that additionally reports the ckv backend
-// as unreachable via Health, so cks.ops.health rolls up to "degraded" (S5).
+// as unreachable via Health, so cks.ops.health rolls up to "degraded".
 // Used when a real ckv index is configured but the embedder (Ollama) is
 // unavailable: the pipeline still flows via recorded instructions, but the
 // operator sees the degraded signal instead of a false "ok".
