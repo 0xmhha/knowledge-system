@@ -730,14 +730,32 @@ func resolveChangeSet(srcRoot, prevHead, newHead string, forceFiles []string) (c
 	if newHead == "" {
 		return changeSet{}, errors.New("reindex: source tree has no git HEAD — pass --files or commit first")
 	}
-	if prevHead == newHead {
+	// prevHead comes from --since or the manifest: resolve it to a commit ID
+	// so a value such as "--output=<file>" is never read as a git option.
+	prev, err := resolveCommit(srcRoot, prevHead)
+	if err != nil {
+		return changeSet{}, err
+	}
+	if prev == newHead {
 		return changeSet{}, nil // already fresh
 	}
-	out, err := exec.Command("git", "-C", srcRoot, "diff", "--name-status", prevHead, newHead).Output()
+	out, err := exec.Command("git", "-C", srcRoot, "diff", "--name-status", "--end-of-options", prev, newHead).Output()
 	if err != nil {
 		return changeSet{}, fmt.Errorf("git diff %s..%s: %w", prevHead, newHead, err)
 	}
 	return parseDiffNameStatus(string(out)), nil
+}
+
+// resolveCommit resolves rev to the full ID of a commit in srcRoot.
+// --end-of-options keeps a revision that starts with "-" from being parsed
+// as an option; anything that does not name a commit is rejected.
+func resolveCommit(srcRoot, rev string) (string, error) {
+	out, err := exec.Command("git", "-C", srcRoot, "rev-parse", "--verify", "--quiet", "--end-of-options", rev+"^{commit}").Output()
+	id := strings.TrimSpace(string(out))
+	if err != nil || id == "" {
+		return "", fmt.Errorf("reindex: %q does not name a commit", rev)
+	}
+	return id, nil
 }
 
 // parseDiffNameStatus turns `git diff --name-status` output into a

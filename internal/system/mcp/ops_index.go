@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -108,6 +109,9 @@ func handleOpsIndex(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mc
 		return mcpgo.NewToolResultErrorf("%s: mode must be \"incremental\" or \"full\", got %q", ToolNameOpsIndex, mode), nil
 	}
 	since := req.GetString("since_commit", "")
+	if since != "" && (!sinceCommitPattern.MatchString(since) || strings.Contains(since, "..")) {
+		return mcpgo.NewToolResultErrorf("%s: since_commit must be a commit ID, branch or tag name", ToolNameOpsIndex), nil
+	}
 
 	ic := d.Index
 	if d.EvidenceVersionDir != "" {
@@ -243,6 +247,10 @@ func verifyIndexAlignment(ic IndexConfig, resp *opsIndexResponse) {
 // ckvIndexArgs builds the ckv subcommand. Reindex reuses the manifest's
 // src_root; full build needs --src. Both forward the Ollama embedder so the
 // re-embedded chunks land in the same model space as the query path.
+// sinceCommitPattern admits commit IDs and ref names with ~/^ suffixes. It
+// rejects a leading "-" (an option to ckv or git), whitespace and "..".
+var sinceCommitPattern = regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z._/~^-]*$`)
+
 func ckvIndexArgs(ic IndexConfig, mode, since string) []string {
 	embed := []string{"--embedder=ollama"}
 	if ic.EmbedModel != "" {
@@ -261,7 +269,8 @@ func ckvIndexArgs(ic IndexConfig, mode, since string) []string {
 	// has no git HEAD. Pass the configured source root explicitly.
 	args := []string{"reindex", "--src", ic.SourceRoot, "--out", ic.CKVDataPath}
 	if since != "" {
-		args = append(args, "--since", since)
+		// One --since=<rev> argument: the value can never become a flag.
+		args = append(args, "--since="+since)
 	}
 	return append(args, embed...)
 }

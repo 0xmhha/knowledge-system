@@ -71,7 +71,9 @@ func gitDiffNameOnly(srcRoot, from, to string) ([]string, error) {
 	// `git diff --name-only A B` returns the union of changes between
 	// the two revisions. We list both directions (A..B) so renamed
 	// files appear once.
-	out, err := exec.Command("git", "-C", srcRoot, "diff", "--name-only", from, to).Output()
+	// --end-of-options: a manifest value such as "--output=<file>" stays a
+	// (nonexistent) revision instead of becoming a git option.
+	out, err := exec.Command("git", "-C", srcRoot, "diff", "--name-only", "--end-of-options", from, to).Output()
 	if err != nil {
 		return nil, err
 	}
