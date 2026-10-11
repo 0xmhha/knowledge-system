@@ -1,0 +1,39 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "fix the engine defects found while building the setup tool",
+ "commit": "ff493c69 fix(cks): actionable errors for config generation and graph-only versions",
+ "defects": {
+  "gen_config_rules_path": {
+   "before": "default sanitize ruleset written as <cwd>/system/policies/sanitization_rules.yaml; outside the checkout the file is missing and cks mcp exits operation_failed",
+   "after": "baseline located beside the binary (bin/../system/policies, package policies/) or in the working directory and its parents; none found -> config_invalid and no config written"
+  },
+  "gen_config_overwrite": {
+   "before": "existing --out refused with operation_failed",
+   "after": "output_exists; still never replaces a file"
+  },
+  "versioned_skip_vector": {
+   "before": "--version with --skip-vector always failed (empty dataset ID with a project ID; alignment without one) after capturing the source, leaving <version>/ so the same label failed later",
+   "after": "refused before any write with skip_vector_unversioned; README notes graph-only builds are unversioned"
+  },
+  "serve_config_errors": {
+   "after": "config and ruleset load failures reported as config_invalid"
+  }
+ },
+ "public_error_contract": "three new codes with fixed messages; nested error text is still not echoed (main_test asserts no path or secret leaks)",
+ "tests": {
+  "new": [
+   "TestPublicCLIErrorUsesStableCodeWithoutLeakingNestedDetails (3 new cases)",
+   "TestRunGenConfigRefusesAnExistingOutputWithAPublicCode",
+   "TestRunGenConfigLocatesTheBaselineBesideTheBinary (checkout and package layouts, unrelated working directory)",
+   "TestRunGenConfigFailsWhenNoBaselineIsFound",
+   "TestRunReportsAMissingRulesetAsConfigInvalid",
+   "TestVersionedSetupRefusesSkipVectorBeforeCapture"
+  ],
+  "red_green": "each new test failed against the pre-fix code and passes after it",
+  "regression": "go test -race -count=1 ./...: 3300 passed, 16 skipped, 0 failed; make lint pass (313 live documents); make setup-tool-test 14 OK",
+  "cli": "cli-checks.txt with the rebuilt binaries"
+ },
+ "reviewer": null,
+ "individual_human_approvals": 0
+}
