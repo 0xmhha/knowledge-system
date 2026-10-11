@@ -1,5 +1,7 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
+2026-10-11 최신(Claude Code): **N18 완료(사용자 승인)**. [판정](./N18-RELEASE-VERDICT-DRAFT.md) — 선택 기능 기본값 유지, 로컬 개인 운영 허용, merge·공개 배포 보류. N16은 공개키 fingerprint 조건을 사용자 결정으로 미충족 유지. **현재 17/18 완료, 남은 1개:** N16 신뢰·권한.
+
 2026-10-11 최신(Claude Code): **N08·N09 종료(사용자 결정)**. N08: FINAL2 개선 근거 없음 → 사용 타입 선언 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 전환(`16332767`), 기본 인용은 이전 binary와 7/7 동일. N09: guard 기계 동작 확인, 무답2단위 inconclusive로 종료. **현재 16/18 완료, 남은 2개:** N16 신뢰·권한(서명 키), N18 기본값·출시 판정.
 
 2026-10-11 최신(Claude Code): **FINAL2 실행·채점, N10 완료**. [결과·판정](./FINAL2-RESULT.md) — A(후보/참조 각 DEV1,200·FINAL2,400행)와 B(DEV240·FINAL960행)를 오류0으로 실행했다. 후보 FINAL warm p95비 1.039–1.109(참조 1.334–1.873)로 N10-C 충족. N08은 recall 동일·MRR −0.032(타입 선언 삽입이 gold 위로 들어간 5문항)로 개선 근거 없음. N09는 무답 on arm 240/240 `declared_unknown`·대조 잘못된 기권0이나 무답2단위라 inconclusive. **현재 14/18 완료, 남은 4개:** N08 검색 품질, N09 기권, N16 신뢰·권한(서명 키), N18 출시 판정.
@@ -110,9 +112,9 @@
 | N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
 | N-14 | **완료 · 2026-10-10** | [수용 기록](./N14-CHANGE-ACCEPTANCE.md): 실제 변경 7c57a388 hold 후보·patch·linked run9/10·기준4 사용자 승인·승격·rollback·보관본 재생 | 실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증 | 테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장 |
 | N-15 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): go-stablenet 실제 색인·MCP 소비자·submodule 수정·지원/비용/제한 사용자 수용 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
-| N-16 | P2 · 로컬 운영 결정 기록, 서명 키 미사용 | 권한자=사용자·신뢰=commit/binary SHA·재배포 없음 기록; 공개키 fingerprint 조건 미충족 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
+| N-16 | P2 · 사용자 결정으로 미충족 유지(2026-10-11) | 권한자=사용자·신뢰=commit/binary SHA·재배포 없음 기록; 공개키 fingerprint 조건 미충족 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
 | N-17 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): 백업·손실 모의·복구 첫 질의35초·RTO1h/RPO24h 사용자 수용 | 실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토 | 최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음 |
-| N-18 | **P3 · N-08–17/변경 회귀** | 품질fail·소그룹inconclusive·disabled·release withheld | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음 |
+| N-18 | **완료** · 2026-10-11(사용자 승인) | [판정](./N18-RELEASE-VERDICT-DRAFT.md): 선택 기능 기본값 유지(ontology off·knowledge opt-in·타입 선언 off), 로컬 개인 운영 허용, merge·공개 배포 보류. 회귀 3,252개 통과·1개 간헐 실패 기록 | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음 |
 
 ## 실행 순서와 우선순위의 이유
 
