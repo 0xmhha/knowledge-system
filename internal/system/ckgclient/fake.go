@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -42,6 +43,10 @@ type Fake struct {
 	SubgraphNeighbors []contract.Neighbor
 	SubgraphErr       error
 
+	// ReviewResult is returned by ReviewFunction on success.
+	ReviewResult store.Review
+	ReviewErr    error
+
 	// ConcurrencyResult is returned by ConcurrencyImpact on success.
 	ConcurrencyResult contract.ConcurrencyResult
 	ConcurrencyErr    error
@@ -66,6 +71,7 @@ type FakeCalls struct {
 	EvidenceForIntent []EvidenceForIntentCall
 	GetNodePRs        []GetNodePRsCall
 	GetSubgraph       []GetSubgraphCall
+	ReviewFunction    []ReviewFunctionCall
 	ConcurrencyImpact []ConcurrencyImpactCall
 	Health            int
 	Close             int
@@ -221,6 +227,24 @@ func (f *Fake) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		return nil, nil, errors.New("ckgclient: empty qname")
 	}
 	return f.SubgraphCitations, f.SubgraphNeighbors, nil
+}
+
+// ReviewFunctionCall captures the arguments of one ReviewFunction invocation.
+type ReviewFunctionCall struct {
+	Qname string
+	Opts  ReviewOpts
+}
+
+// ReviewFunction records the call, then returns f.ReviewResult or f.ReviewErr.
+func (f *Fake) ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error) {
+	f.Calls.ReviewFunction = append(f.Calls.ReviewFunction, ReviewFunctionCall{Qname: qname, Opts: opts})
+	if f.ReviewErr != nil {
+		return store.Review{}, f.ReviewErr
+	}
+	if qname == "" {
+		return store.Review{}, errors.New("ckgclient: empty qname")
+	}
+	return f.ReviewResult, nil
 }
 
 // ConcurrencyImpact records the call, then returns f.ConcurrencyResult or f.ConcurrencyErr.

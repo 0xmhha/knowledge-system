@@ -64,6 +64,25 @@ type FindSymbolOptions = persist.FindSymbolOptions
 // the temporal-slicing contract.
 type PRRef = types.PRRef
 
+// Review is the production-code, history and test view of one function
+// returned by Reader.Review (schema 1.24). ReviewOptions bounds it; see
+// persist.Review for the field semantics.
+type (
+	Review         = persist.Review
+	ReviewOptions  = persist.ReviewOptions
+	ReviewSymbol   = persist.ReviewSymbol
+	ReviewCallSite = persist.ReviewCallSite
+	ReviewCommit   = persist.ReviewCommit
+)
+
+// ErrNoReviewIndex is returned by Reader.Review for graphs built before
+// schema 1.24; ErrReviewSeedNotFound when no production function or method
+// has the requested qualified name.
+var (
+	ErrNoReviewIndex      = persist.ErrNoReviewIndex
+	ErrReviewSeedNotFound = persist.ErrReviewSeedNotFound
+)
+
 // ErrInvalidMetric is returned by Reader.TopNodes when the metric
 // argument is not one of the supported column names. HTTP layers
 // typically map this to 400.

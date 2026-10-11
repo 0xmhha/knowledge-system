@@ -138,6 +138,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerFindCallers(s, d)
 	registerFindCallees(s, d)
 	registerGetSubgraph(s, d)
+	registerReviewFunction(s, d)
 	registerImpactAnalysis(s, d)
 	registerConcurrencyImpact(s, d)
 	registerChangeHistory(s, d)

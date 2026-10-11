@@ -119,6 +119,25 @@
     ]
    }
   },
+  "cks.context.review_function": {
+   "description": "Review one function in three separate views: production code (inputs/outputs, call sites in order, callees, callers and paths to entry points, dynamic paths), history (commits and PRs that changed it) and tests (test callers, listed only).",
+   "input": {
+    "properties": {
+     "symbol": {
+      "type": "string"
+     },
+     "caller_depth": {
+      "type": "number"
+     },
+     "max_items": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "symbol"
+    ]
+   }
+  },
   "cks.context.impact_analysis": {
    "description": "Reverse-dependency closure of a symbol, grouped by coupling category (callers/interface/type_users/distributed/concurrent/other).",
    "input": {

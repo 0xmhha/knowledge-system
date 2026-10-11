@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -250,6 +251,29 @@ func (d *Dummy) GetNodePRs(ctx context.Context, qname string, opts PRRefOpts) ([
 		Directive:  directive,
 	})
 	return nil, nil
+}
+
+// ReviewFunction records a ckg.ReviewFunction instruction and returns an
+// empty review.
+func (d *Dummy) ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error) {
+	directive := fmt.Sprintf(
+		"Use the skills under %s to review %q in the indexed source tree at %s: its inputs and "+
+			"outputs, call sites in order, production callers back to entry points, goroutines, "+
+			"channels and locks, the commits that changed it, and its test callers listed separately. "+
+			"Respond with one store.Review JSON object.",
+		d.skill(), qname, d.source(),
+	)
+	d.record(ctx, contract.DummyInstruction{
+		Backend:    "graph",
+		Operation:  "ReviewFunction",
+		SkillPath:  d.skill(),
+		SourcePath: d.source(),
+		Query:      qname,
+		Args:       map[string]string{"caller_depth": fmt.Sprintf("%d", opts.CallerDepth)},
+		Expected:   "store.Review",
+		Directive:  directive,
+	})
+	return store.Review{}, nil
 }
 
 // GetSubgraph records a ckg.GetSubgraph instruction and returns no nodes

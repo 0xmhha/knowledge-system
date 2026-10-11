@@ -64,6 +64,9 @@ type mockStoreReader struct {
 	// subgraphCh records the seeds SubgraphByQname was asked for, so a test
 	// can assert the interface bridge probed the interface method too.
 	subgraphCh []string
+	reviewCh   []string
+	reviewOut  store.Review
+	reviewErr  error
 
 	concurrencyOut concurrency.Result
 	concurrencyErr error
@@ -164,6 +167,10 @@ func (m *mockStoreReader) NodesByFilePath(path string) ([]types.Node, error) {
 func (m *mockStoreReader) SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error) {
 	m.subgraphCh = append(m.subgraphCh, qname)
 	return m.neighOut, m.neighEdges, m.neighErr
+}
+func (m *mockStoreReader) Review(qname string, opts store.ReviewOptions) (store.Review, error) {
+	m.reviewCh = append(m.reviewCh, qname)
+	return m.reviewOut, m.reviewErr
 }
 func (m *mockStoreReader) Close() error {
 	m.closed = true
@@ -982,6 +989,12 @@ func TestReal_SeedResolutionFailureIsAnError(t *testing.T) {
 			}
 			if _, _, err := r.GetSubgraph(context.Background(), tc.seed, SubgraphOpts{}); !errors.Is(err, ErrSeedUnresolved) {
 				t.Errorf("GetSubgraph error = %v, want ErrSeedUnresolved", err)
+			}
+			if _, err := r.ReviewFunction(context.Background(), tc.seed, ReviewOpts{}); !errors.Is(err, ErrSeedUnresolved) {
+				t.Errorf("ReviewFunction error = %v, want ErrSeedUnresolved", err)
+			}
+			if len(m.reviewCh) != 0 {
+				t.Errorf("an unresolved seed reached the review index: %v", m.reviewCh)
 			}
 		})
 	}

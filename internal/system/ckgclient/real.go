@@ -119,6 +119,7 @@ type storeReader interface {
 	EvidenceBuildPack(intent, seedQname string, k int) (*evidence.Pack, error)
 	GetNodePRs(nodeID string, cutoff time.Time) ([]store.PRRef, error)
 	ConcurrencyAnalyze(symbol string, depth, maxTotal int) (concurrency.Result, error)
+	Review(qname string, opts store.ReviewOptions) (store.Review, error)
 	Close() error
 }
 
@@ -127,6 +128,10 @@ type storeReader interface {
 // which strips the persist.Manifest dependency.
 type realStoreReader struct {
 	r store.Reader
+}
+
+func (a *realStoreReader) Review(qname string, opts store.ReviewOptions) (store.Review, error) {
+	return a.r.Review(qname, opts)
 }
 
 func (a *realStoreReader) LoadManifestSnapshot() (ManifestSnapshot, error) {
@@ -1073,6 +1078,23 @@ func (r *Real) ConcurrencyImpact(ctx context.Context, symbol string, opts Concur
 		})
 	}
 	return out, nil
+}
+
+// ReviewFunction resolves a partial seed the same way GetSubgraph does, then
+// reads the review index.
+func (r *Real) ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error) {
+	if qname == "" {
+		return store.Review{}, errors.New("ckgclient: empty qname")
+	}
+	resolved, err := r.resolveSeedOrErr(qname)
+	if err != nil {
+		return store.Review{}, err
+	}
+	rv, err := r.s.Review(resolved, opts)
+	if err != nil {
+		return store.Review{}, fmt.Errorf("ckgclient: review %s: %w", resolved, err)
+	}
+	return rv, nil
 }
 
 // Health round-trips a manifest read and reports reachability + the

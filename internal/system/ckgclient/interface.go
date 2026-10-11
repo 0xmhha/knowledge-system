@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -70,6 +71,14 @@ type Client interface {
 	// GetSubgraph returns all nodes and edges within depth hops of a seed
 	// symbol, traversing all edge types. Used by cks.context.get_subgraph.
 	GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts) ([]contract.Citation, []contract.Neighbor, error)
+
+	// ReviewFunction returns the production-code, history and test view of
+	// one function or method from the graph's review index (schema 1.24):
+	// inputs/outputs, call sites in order, callers back to entry points
+	// (production code only), dynamic paths, the commits that changed it and
+	// its test callers. Used by cks.context.review_function. Graphs built
+	// before schema 1.24 return an error wrapping store.ErrNoReviewIndex.
+	ReviewFunction(ctx context.Context, qname string, opts ReviewOpts) (store.Review, error)
 
 	// ConcurrencyImpact returns the concurrency blast radius of a symbol —
 	// the goroutines/channels/locks it spawns/sends-to/acquires and the
@@ -158,6 +167,10 @@ type EvidenceOpts struct {
 type PRRefOpts struct {
 	MaxCount int // max PR refs to return; zero means no cap
 }
+
+// ReviewOpts bounds a ReviewFunction call; zero values take the store
+// defaults (caller depth 5, 12 caller paths, 40 entries per list).
+type ReviewOpts = store.ReviewOptions
 
 // SubgraphOpts shapes a single GetSubgraph call.
 type SubgraphOpts struct {
