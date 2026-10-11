@@ -619,6 +619,15 @@ func verifyVersionIdentityContext(ctx context.Context, versionDir string) (*Data
 	if identity := requestVerifiedIdentity(ctx, versionDir); identity != nil {
 		return identity, nil
 	}
+	abs, absErr := filepath.Abs(versionDir)
+	fingerprint, fpErr := versionFingerprint(versionDir)
+	cacheable := absErr == nil && fpErr == nil
+	if cacheable {
+		if identity := cachedVersionIdentity(abs, fingerprint); identity != nil {
+			return identity, nil
+		}
+	}
+	fullVerifications.Add(1)
 	path := filepath.Join(versionDir, "dataset-identity.json")
 	var identity DatasetIdentity
 	if err := readJSON(path, &identity); err != nil {
@@ -638,6 +647,9 @@ func verifyVersionIdentityContext(ctx context.Context, versionDir string) (*Data
 	}
 	if err := VerifyAlignment(filepath.Join(versionDir, "graph"), filepath.Join(versionDir, "vector"), nil); err != nil {
 		return nil, err
+	}
+	if cacheable {
+		rememberVersionIdentity(abs, fingerprint, identity)
 	}
 	return &identity, nil
 }
