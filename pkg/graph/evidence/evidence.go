@@ -521,7 +521,8 @@ func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offs
 	}
 	commitOrder = commitOrder[offset:]
 
-	out := make([]Hit, 0, k)
+	// k is caller-supplied: size the slice by what can actually be returned.
+	out := make([]Hit, 0, min(k, len(commitOrder)))
 	usedTokens := 0
 	for _, sha := range commitOrder {
 		if len(out) >= k {

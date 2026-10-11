@@ -458,7 +458,7 @@ func (e *Engine) FindBranches(ctx context.Context, symptom string, k int) ([]Bra
 	for _, c := range chunks {
 		byID[c.ID] = c
 	}
-	out := make([]BranchMatch, 0, k)
+	out := make([]BranchMatch, 0, min(k, len(ids)))
 	for _, id := range ids { // preserve hit rank
 		c, ok := byID[id]
 		if !ok || c.FlowStep == nil {

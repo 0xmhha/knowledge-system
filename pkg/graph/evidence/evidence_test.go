@@ -686,3 +686,22 @@ func TestGunzipIfNeeded(t *testing.T) {
 		t.Logf("truncated gzip err = %v (informational)", err)
 	}
 }
+
+// K comes from MCP and HTTP callers; a huge value must not size an
+// allocation.
+func TestBuildPack_HugeKDoesNotPanic(t *testing.T) {
+	store := &fakeStore{
+		nodes: []types.Node{
+			{ID: "c1", Type: types.NodeCommit, QualifiedName: "commit:aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111",
+				Signature: "1700000100: fix panel re-mount jitter", Confidence: types.ConfExtracted},
+			{ID: "h1", Type: types.NodeHunk, QualifiedName: "hunk:aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111:Panel.tsx:0",
+				FilePath: "Panel.tsx", StartLine: 42, EndLine: 71, Confidence: types.ConfExtracted},
+		},
+		edges: []types.Edge{},
+		blobs: map[string][]byte{"h1": gz("@@ -42,8 +42,12 @@\n+panel jitter fix")},
+	}
+	pack, err := BuildPack(store, Options{Intent: "panel jitter", K: 1 << 50, BudgetTokens: 6000})
+	if err != nil || pack == nil || len(pack.Hits) != 1 {
+		t.Fatalf("pack=%+v err=%v", pack, err)
+	}
+}

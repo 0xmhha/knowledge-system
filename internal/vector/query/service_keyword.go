@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"math"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
 	"github.com/0xmhha/knowledge-system/pkg/bm25"
@@ -86,12 +87,13 @@ func (e *Engine) KeywordSearch(ctx context.Context, query string, k int, filter 
 	}
 
 	fetch := k
-	if !filter.IsZero() {
+	if !filter.IsZero() && k <= math.MaxInt/3 {
 		fetch = k * 3
 	}
 	scored := idx.scorer.TopK(tokens, fetch)
 
-	out := make([]Hit, 0, k)
+	// k is caller-supplied: size the slice by the scored candidates.
+	out := make([]Hit, 0, min(k, len(scored)))
 	rank := 0
 	for _, sd := range scored {
 		c, ok := idx.idToCh[sd.ID]
