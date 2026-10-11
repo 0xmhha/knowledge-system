@@ -132,7 +132,7 @@ func (s *Server) routes(opts Options) {
 // ServeHTTP makes Server satisfy http.Handler, primarily so tests can drive
 // it via httptest.NewServer.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.mux.ServeHTTP(w, r)
+	loopbackHostOnly(s.mux).ServeHTTP(w, r)
 }
 
 // ListenAndServe runs the HTTP server until ctx is cancelled. On cancel,
@@ -144,7 +144,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           s.mux,
+		Handler:           s,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {

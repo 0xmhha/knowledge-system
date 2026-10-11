@@ -233,6 +233,26 @@ func (s *Server) handleEdgeCounts(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, counts)
 }
 
+// maxIDsBodyBytes bounds a POST body of node IDs. The viewer sends at most a
+// few thousand 16-character IDs; 4 MiB leaves ample room.
+const maxIDsBodyBytes = 4 << 20
+
+// decodeIDsBody decodes a bounded JSON body. It writes 413 for an oversized
+// body and 400 for malformed JSON, returning false in both cases.
+func decodeIDsBody(w http.ResponseWriter, r *http.Request, v any) bool {
+	err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxIDsBodyBytes)).Decode(v)
+	if err == nil {
+		return true
+	}
+	var tooLarge *http.MaxBytesError
+	if errors.As(err, &tooLarge) {
+		http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+		return false
+	}
+	http.Error(w, err.Error(), http.StatusBadRequest)
+	return false
+}
+
 // handleEdges accepts a JSON body {"ids":[...]} and returns every edge
 // touching any of those IDs as src or dst. Used by the viewer to expand a
 // neighbourhood without preloading the full edge table.
@@ -240,8 +260,7 @@ func (s *Server) handleEdges(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		IDs []string `json:"ids"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if !decodeIDsBody(w, r, &body) {
 		return
 	}
 	edges, err := s.store.QueryEdgesForNodes(body.IDs)
@@ -315,8 +334,7 @@ func (s *Server) handleNodesByIDs(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		IDs []string `json:"ids"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if !decodeIDsBody(w, r, &body) {
 		return
 	}
 	if len(body.IDs) == 0 {
