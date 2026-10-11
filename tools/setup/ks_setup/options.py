@@ -44,6 +44,10 @@ class Options:
     build_timeout: str = "2h"
     strict_embeddings: bool = True      # fail when any chunk is left without an embedding
     extra_setup_args: List[str] = field(default_factory=list)
+    pack_dir: Optional[Path] = None     # project pack (projects/<name>) whose inputs the build uses
+    skip_pack_inputs: List[str] = field(default_factory=list)  # setup.yaml keys to leave out
+    min_canonical: Optional[float] = None  # promotion gate: minimum canonical_id coverage
+    compare_with: Optional[Path] = None  # another dataset to profile side by side after the build
 
     @property
     def bins(self) -> Path:
@@ -66,8 +70,17 @@ class Options:
         return self.out.parent / f"{self.out.name}-cks-stdio.yaml"
 
     @property
+    def report_file(self) -> Path:
+        return self.out.parent / f"{self.out.name}-setup-report.json"
+
+    @property
     def log_file(self) -> Path:
         return self.out.parent / f"{self.out.name}-setup-logs" / time.strftime("%Y%m%d-%H%M%S.log")
+
+    @property
+    def derived_dir(self) -> Path:
+        """Where the pack's domain artifacts are rendered for this dataset."""
+        return self.out.parent / f"{self.out.name}-derived"
 
     @property
     def versioned(self) -> bool:

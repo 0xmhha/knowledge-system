@@ -120,6 +120,26 @@ def check_ollama(opts: Options, get_json: Callable[[str], dict] = _get_json) -> 
     return checks
 
 
+def check_pack(opts: Options) -> List[Check]:
+    if opts.pack_dir is None:
+        return []
+    from . import pack as packs
+    try:
+        pack = packs.load(opts.pack_dir, opts.src)
+    except (ValueError, OSError, ImportError) as err:
+        return [Check("project pack", False, str(err))]
+    for key in opts.skip_pack_inputs:
+        pack.inputs.pop(key, None)
+    missing = pack.missing()
+    if missing:
+        return [Check("project pack", False, "missing input(s): " + "; ".join(missing))]
+    checks = [Check("project pack", True, f"{pack.name}: {', '.join(sorted(pack.inputs)) or 'no inputs'}")]
+    if not opts.graph_only and pack.model_name and pack.model_name.split(":")[0] != opts.model.split(":")[0]:
+        checks.append(Check("pack model", False, f"the pack declares {pack.model_name}, this run embeds with {opts.model}",
+                            fatal=False))
+    return checks
+
+
 def run_all(opts: Options) -> List[Check]:
     checks = [check_repo(), check_tool("git", ["--version"])]
     if opts.build:
@@ -130,5 +150,6 @@ def run_all(opts: Options) -> List[Check]:
         checks.append(check_binaries(opts))
     checks += check_source(opts)
     checks += check_output(opts)
+    checks += check_pack(opts)
     checks += check_ollama(opts)
     return checks

@@ -73,6 +73,8 @@ class Run:
         self.log: Deque[str] = deque(maxlen=log_lines)
         self.warnings: List[str] = []
         self.summary: List[str] = []
+        self.comparison: List[tuple] = []      # (metric, this build, compared dataset)
+        self.compare_label = ""
         self.error: Optional[str] = None
         self.started = time.monotonic()
 

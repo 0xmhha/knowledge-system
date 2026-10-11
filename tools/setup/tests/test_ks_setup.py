@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from ks_setup import events, mcp_check, pipeline, preflight  # noqa: E402
+from ks_setup import events, mcp_check, pack, pipeline, preflight, profile  # noqa: E402
 from ks_setup.model import Run, Status, Step  # noqa: E402
 from ks_setup.options import Options, choose_version, repo_root, slug  # noqa: E402
 from ks_setup.ui import PlainView, fmt_elapsed, run_worker  # noqa: E402
@@ -58,6 +58,14 @@ class EventTests(unittest.TestCase):
         self.assertIn("2 source files", parent.note)
         self.assertTrue(any("canonical_id" in w for w in run.warnings))
         self.assertIn("[graph-build] built 10 nodes", run.log)
+
+    def test_audit_gap_becomes_a_warning(self):
+        run, parent = Run([]), Step("index", "Index")
+        for n in ("0", "238"):
+            events.apply(run, parent, events.parse(json.dumps(
+                {"step": "reindex-gate", "type": "output", "message": f"  in build only (missing from DB): {n}"})))
+        self.assertEqual(len(run.warnings), 1)
+        self.assertIn("238 source files", run.warnings[0])
 
 
 class OptionTests(unittest.TestCase):
@@ -112,6 +120,109 @@ class CommandTests(unittest.TestCase):
         self.assertIn("transport: stdio", out)
         with self.assertRaises(ValueError):
             mcp_check.stdio_variant("listen: {}\n")
+
+
+class PackTests(unittest.TestCase):
+    def make_pack(self, root: Path) -> Path:
+        pk = root / "pack"
+        (pk / "policies").mkdir(parents=True)
+        (pk / "dk" / "flow").mkdir(parents=True)
+        for f in ("policies/graph.yaml", "policies/vector.yaml", "dk/glossary.yaml", "dk/flow/corpus.jsonl", "filelist.yaml"):
+            (pk / f).write_text("x: 1\n")
+        (pk / "setup.yaml").write_text(
+            "policy_file: policies/graph.yaml\nvector_policy: policies/vector.yaml\nembedder: ollama\n"
+            "model_name: bge-m3\ndomain_knowledge: dk\nglossary_file: dk/glossary.yaml\n"
+            "flow_corpus: dk/flow/corpus.jsonl\ncode_root: ${CKS_CODE_ROOT}\nfilelist: filelist.yaml\n")
+        return pk
+
+    def test_inputs_resolve_against_the_pack_and_the_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            pk, src = self.make_pack(Path(d)), Path(d) / "src"
+            loaded = pack.load(pk, src)
+            self.assertEqual(loaded.inputs["policy_file"], (pk / "policies/graph.yaml").resolve())
+            self.assertEqual(loaded.inputs["code_root"], src.resolve())
+            o = Options(src=src, out=Path(d) / "kd" / "proj", name="proj", bin_dir=Path("/b"), pack_dir=pk)
+            argv = pipeline.setup_argv(o, "v1", loaded)
+            for flag in ("--policy-file", "--vector-policy", "--domain-knowledge", "--glossary-file",
+                         "--flow-corpus", "--filelist", "--code-root", "--derived-dir"):
+                self.assertIn(flag, argv)
+            self.assertEqual(argv[argv.index("--derived-dir") + 1], str(Path(d) / "kd" / "proj-derived"))
+            server = pipeline.gen_config_argv(o, pack=loaded)
+            self.assertEqual(server[server.index("--domain-corpus-dir") + 1],
+                             str(Path(d) / "kd" / "proj-derived" / "domain-corpus"))
+            self.assertIn("--glossary", server)
+
+    def test_graph_only_drops_vector_inputs_and_skip_removes_one(self):
+        with tempfile.TemporaryDirectory() as d:
+            pk = self.make_pack(Path(d))
+            o = Options(src=Path(d), out=Path(d) / "kd", name="p", bin_dir=Path("/b"), pack_dir=pk,
+                        graph_only=True, skip_pack_inputs=["filelist"])
+            argv = pipeline.setup_argv(o, None, pipeline.load_pack(o))
+            self.assertIn("--policy-file", argv)
+            for flag in ("--vector-policy", "--flow-corpus", "--domain-knowledge", "--filelist", "--derived-dir"):
+                self.assertNotIn(flag, argv)
+
+    def test_preflight_reports_missing_inputs_and_model_mismatch(self):
+        with tempfile.TemporaryDirectory() as d:
+            pk = self.make_pack(Path(d))
+            (pk / "filelist.yaml").unlink()
+            o = Options(src=Path(d), out=Path(d) / "kd", name="p", pack_dir=pk, model="qwen3-embedding:4b")
+            first = preflight.check_pack(o)[0]
+            self.assertFalse(first.ok)
+            self.assertIn("filelist", first.detail)
+            o.skip_pack_inputs = ["filelist"]
+            checks = preflight.check_pack(o)
+            self.assertTrue(checks[0].ok)
+            self.assertEqual([(c.name, c.fatal) for c in checks[1:]], [("pack model", False)])
+            unset = Path(d) / "bad"
+            unset.mkdir()
+            (unset / "setup.yaml").write_text("code_root: ${NOT_SET_ANYWHERE_42}\n")
+            self.assertFalse(preflight.check_pack(Options(src=Path(d), out=Path(d) / "kd", name="p", pack_dir=unset))[0].ok)
+
+
+class ProfileTests(unittest.TestCase):
+    def test_profile_and_compare(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "ds"
+            (root / "graph").mkdir(parents=True)
+            (root / "vector").mkdir()
+            (root / "graph" / "manifest.json").write_text(json.dumps(
+                {"schema_version": "1.24", "src_commit": "a" * 40, "languages": {"go": 2},
+                 "files": [{}, {}], "stats": {"nodes": 10, "edges": 20}}))
+            g = sqlite3.connect(root / "graph" / "graph.db")
+            g.executescript("CREATE TABLE nodes(id, type, is_test); CREATE TABLE edges(src, dst, type);"
+                            "CREATE TABLE node_prs(node_id); CREATE TABLE code_edges(src);"
+                            "INSERT INTO nodes VALUES ('1','Function',0),('2','Policy',0);"
+                            "INSERT INTO edges VALUES ('1','2','governed_by');")
+            g.commit(); g.close()
+            (root / "vector" / "manifest.json").write_text(json.dumps(
+                {"chunk_count": 3, "embedding_model": "bge-m3", "embedding_dim": 1024, "languages": {"go": 3}}))
+            v = sqlite3.connect(root / "vector" / "vector.db")
+            v.executescript("CREATE TABLE chunks(chunk_kind, category, guidance, canonical_id, flow_meta, is_test);"
+                            "INSERT INTO chunks VALUES ('symbol','consensus','g','c',NULL,0),"
+                            "('doc','domain',NULL,NULL,NULL,0),('symbol',NULL,NULL,NULL,'{}',1);")
+            v.commit(); v.close()
+            p = profile.dataset_profile(root)
+            self.assertEqual((p["graph"]["policy_nodes"], p["graph"]["governed_by_edges"], p["graph"]["files"]), (1, 1, 2))
+            self.assertEqual((p["vector"]["categorized"], p["vector"]["domain_chunks"], p["vector"]["flow_chunks"]), (2, 1, 1))
+            self.assertFalse(any(f.name.endswith(("-wal", "-shm")) for f in root.rglob("*")))
+            rows = dict((m, (a, b)) for m, a, b in profile.compare(p, {"graph": {"nodes": 7}}))
+            self.assertEqual(rows["graph nodes"], (10, 7))
+            self.assertEqual(rows["graph language: go"], (2, None))
+
+
+class RetentionTests(unittest.TestCase):
+    def test_counts_version_directories_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d)
+            for v in ("v1", "v2"):
+                (out / v / "graph").mkdir(parents=True)
+                (out / v / "graph" / "graph.db").write_bytes(b"x" * 10)
+            (out / "current").symlink_to("v2")
+            (out / "rollback-targets.json").write_text("{}")
+            kept = profile.retained_versions(out)
+            self.assertEqual((kept["count"], kept["bytes"], kept["labels"]), (2, 20, ["v1", "v2"]))
 
 
 class PreflightTests(unittest.TestCase):

@@ -31,10 +31,24 @@ def fmt_elapsed(seconds: Optional[float]) -> str:
     return f"{h}h{m:02d}m"
 
 
+def fmt_value(value) -> str:
+    if value is None:
+        return "-"
+    if isinstance(value, int) and not isinstance(value, bool):
+        return f"{value:,}"
+    text = str(value)
+    return text[:12] if len(text) == 40 and all(c in "0123456789abcdef" for c in text) else text
+
+
 def header_rows(opts: Options) -> List[tuple]:
     mode = "graph only" if opts.graph_only else f"graph + vector ({opts.embedder}: {opts.model}, {opts.embed_dim}d)"
-    return [("Source", str(opts.src)), ("Dataset", str(opts.out)), ("Index", mode),
-            ("Source mode", opts.source_mode), ("Server", f"{opts.name} @ 127.0.0.1:{opts.port}")]
+    rows = [("Source", str(opts.src)), ("Dataset", str(opts.out)), ("Index", mode),
+            ("Source mode", opts.source_mode)]
+    if opts.pack_dir:
+        skipped = f" (without {', '.join(opts.skip_pack_inputs)})" if opts.skip_pack_inputs else ""
+        rows.append(("Project pack", f"{opts.pack_dir}{skipped}"))
+    rows.append(("Server", f"{opts.name} @ 127.0.0.1:{opts.port}"))
+    return rows
 
 
 def run_worker(work: Callable[[], bool], on_interrupt: Callable[[], None], tick: Callable[[], None],
@@ -138,6 +152,16 @@ class RichView:
         if ok:
             body = Text("\n".join(self.run.summary))
             self.console.print(Panel(body, title="[bold green]Dataset ready", title_align="left", border_style="green"))
+            if self.run.comparison:
+                from rich.table import Table
+                table = Table(title=f"Compared with {self.run.compare_label}", title_justify="left")
+                table.add_column("Metric")
+                table.add_column("This build", justify="right")
+                table.add_column("Compared", justify="right")
+                for metric, a, b in self.run.comparison:
+                    style = "" if a == b else "yellow"
+                    table.add_row(metric, fmt_value(a), fmt_value(b), style=style)
+                self.console.print(table)
         else:
             body = Text(f"{self.run.error}\n\nFull log: {self.log_path}")
             self.console.print(Panel(body, title="[bold red]Setup failed", title_align="left", border_style="red"))
@@ -146,7 +170,8 @@ class RichView:
 class PlainView:
     """Line-per-change output for pipes, CI logs and terminals without rich."""
 
-    def __init__(self, opts: Options, run: Run, log_path: str, write: Callable[[str], None] = print) -> None:
+    def __init__(self, opts: Options, run: Run, log_path: str,
+                 write: Callable[[str], None] = lambda line: print(line, flush=True)) -> None:
         self.opts, self.run, self.log_path, self.write = opts, run, log_path, write
         self.seen: Dict[str, tuple] = {}
 
@@ -174,6 +199,11 @@ class PlainView:
             self.write("Dataset ready.")
             for line in self.run.summary:
                 self.write("  " + line)
+            if self.run.comparison:
+                self.write(f"Compared with {self.run.compare_label}:")
+                for metric, a, b in self.run.comparison:
+                    mark = " " if a == b else "*"
+                    self.write(f" {mark} {metric:<34} {fmt_value(a):>14}  {fmt_value(b):>14}")
         else:
             self.write(f"Setup failed: {self.run.error}")
             self.write(f"Full log: {self.log_path}")

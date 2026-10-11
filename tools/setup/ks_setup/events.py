@@ -7,6 +7,7 @@ Each stdout line is one JSON object: {"time", "step", "type", "message"?,
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -24,7 +25,16 @@ STAGE_TITLES = {
     "reindex-gate": "Promotion gate",
     "reindex-review": "Hold for review",
     "reindex-promote": "Promote to current",
+    "domain-export": "Render the domain corpus",
+    "policy-fresh": "Governance policy matches entries",
+    "glossary-fresh": "Glossary matches entries",
+    "filelist-derive": "Derive the build scope",
+    "verify-content": "Domain and flow content reached the index",
 }
+
+# The promotion gate's ckg audit line for files the Go build compiles but the
+# graph did not index.
+_AUDIT_GAP = re.compile(r"in build only \(missing from DB\):\s*(\d+)")
 
 # Status-only stages carry no start/done pair; they are folded into the log.
 STATUS_ONLY = {"reindex-resources", "toolchain"}
@@ -78,6 +88,10 @@ def apply(run: Run, parent: Step, event: Event) -> None:
             parent.detail = sub.title
         elif event.type == "output":
             run.add_log(f"[{event.step}] {event.message}")
+            gap = _AUDIT_GAP.search(event.message)
+            if gap and int(gap.group(1)) > 0:
+                run.warn(f"graph is missing {gap.group(1)} source files the project build compiles "
+                         "(a pack file list narrows the scope; --skip-pack-input filelist indexes them)")
             if sub.status == Status.PENDING:
                 sub.start()
             if sub.status != Status.WARNING:  # keep the warning text visible

@@ -6,6 +6,7 @@ import queue
 import re
 import subprocess
 import threading
+import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -77,6 +78,9 @@ class StdioClient:
         self._send({"jsonrpc": "2.0", "method": "notifications/initialized"})
         return result
 
+    def call_raw(self, tool: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        return self.request("tools/call", {"name": tool, "arguments": arguments})
+
     def call(self, tool: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         result = self.request("tools/call", {"name": tool, "arguments": arguments})
         return result.get("structuredContent") or {}
@@ -92,6 +96,53 @@ class StdioClient:
         except subprocess.TimeoutExpired:
             self.proc.kill()
             self.proc.wait()
+
+
+def busiest_function(graph_db: Path) -> Optional[str]:
+    """The production function with the most production callers: a seed that
+    exercises the review index the way an agent's first question would."""
+    import sqlite3
+    try:
+        conn = sqlite3.connect(f"file:{graph_db}?mode=ro&immutable=1", uri=True)
+        try:
+            row = conn.execute(
+                "SELECT n.qualified_name FROM code_edges e JOIN nodes n ON n.id = e.dst "
+                "WHERE e.type IN ('calls','invokes') AND n.type IN ('Function','Method') "
+                "GROUP BY e.dst ORDER BY count(*) DESC LIMIT 1").fetchone()
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        return None
+    return row[0] if row else None
+
+
+def smoke_queries(cks: Path, config: Path, symbol: Optional[str], with_vector: bool) -> Dict[str, Any]:
+    """Ask the questions a coding agent asks first and record whether they answer."""
+    out: Dict[str, Any] = {}
+    client = StdioClient(cks, config)
+    try:
+        client.initialize()
+        if symbol:
+            started = time.monotonic()
+            r = client.call_raw("cks.context.review_function", {"symbol": symbol})
+            sc = r.get("structuredContent") or {}
+            code = sc.get("code") or {}
+            out["review_function"] = {
+                "symbol": symbol, "ok": not r.get("isError"), "ms": round((time.monotonic() - started) * 1000),
+                "callers": len(code.get("callers") or []), "call_sites": code.get("call_sites_total"),
+                "commits": (sc.get("history") or {}).get("commits_total"),
+                "test_callers": (sc.get("tests") or {}).get("callers_total")}
+        if with_vector:
+            prompt = f"Where is {symbol.rsplit('.', 1)[-1]} implemented and who calls it?" if symbol else "Where is the entry point?"
+            started = time.monotonic()
+            r = client.call_raw("cks.context.get_for_task_v2", {"prompt": prompt})
+            sc = r.get("structuredContent") or {}
+            out["get_for_task_v2"] = {"prompt": prompt, "ok": not r.get("isError"),
+                                      "ms": round((time.monotonic() - started) * 1000),
+                                      "citations": len(sc.get("citations") or [])}
+    finally:
+        client.close()
+    return out
 
 
 def health(cks: Path, config: Path) -> Dict[str, Any]:

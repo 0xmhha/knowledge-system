@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
+from .pack import PATH_FLAGS
 from .options import DEFAULT_DIM, DEFAULT_MODEL, DEFAULT_OLLAMA, DEFAULT_PORT, Options, expand, slug
 from .pipeline import Pipeline, new_run
 from .ui import PlainView, header_rows
@@ -40,6 +41,14 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--no-verify", action="store_true", help="skip starting the server for a health check")
     p.add_argument("--allow-missing-embeddings", action="store_true",
                    help="do not fail when some chunks could not be embedded")
+    p.add_argument("--pack", help="project pack directory (e.g. projects/stablenet) whose setup.yaml inputs the build uses: "
+                   "graph policy, vector policy, domain knowledge, glossary, flow corpus, file list")
+    p.add_argument("--skip-pack-input", action="append", default=[], choices=sorted(PATH_FLAGS), metavar="KEY",
+                   help="leave one pack input out (repeatable), e.g. filelist to index the whole repository")
+    p.add_argument("--min-canonical", type=float, metavar="RATIO",
+                   help="promotion gate: minimum canonical_id coverage of symbol chunks (e.g. 0.9 for Go); "
+                        "without it the engine skips the join-density check and warns")
+    p.add_argument("--compare", help="another dataset directory to profile side by side after the build")
     p.add_argument("--plain", action="store_true", help="print one line per change instead of the live dashboard")
     p.add_argument("-y", "--yes", action="store_true", help="start without the confirmation prompt")
     return p
@@ -67,7 +76,9 @@ def build_options(ns: argparse.Namespace, interactive: bool) -> Options:
                    embed_dim=ns.embed_dim, ollama_url=ns.ollama_url, port=ns.port, version=ns.version_label,
                    graph_only=ns.graph_only, source_mode=ns.source_mode, build=not (ns.no_build or bin_dir),
                    bin_dir=bin_dir, verify=not ns.no_verify, build_timeout=ns.build_timeout,
-                   strict_embeddings=not ns.allow_missing_embeddings)
+                   strict_embeddings=not ns.allow_missing_embeddings,
+                   pack_dir=expand(ns.pack) if ns.pack else None, skip_pack_inputs=list(ns.skip_pack_input),
+                   compare_with=expand(ns.compare) if ns.compare else None, min_canonical=ns.min_canonical)
 
 
 def _rich_available() -> bool:

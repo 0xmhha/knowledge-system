@@ -33,7 +33,7 @@ first failure.
 
 | Needed for | Requirement |
 |---|---|
-| Running the tool | Python 3.9+ and [`rich`](https://github.com/Textualize/rich) (installed automatically by `uv`) |
+| Running the tool | Python 3.9+, [`rich`](https://github.com/Textualize/rich) and PyYAML (installed automatically by `uv`) |
 | Building the binaries | Go and `make` (skip with `--no-build` or `--bin-dir`) |
 | Indexing | Git; the project must be a Git repository with at least one commit |
 | Vector index | [Ollama](https://ollama.com) with `bge-m3` pulled (`ollama pull bge-m3`); not needed with `--graph-only` |
@@ -51,7 +51,42 @@ tools/setup/ks-setup --src ~/work/my-project --out ~/work/knowledge-data/my-proj
 
 # Graph only (no Ollama), plain line output for logs or CI.
 tools/setup/ks-setup --src ~/work/my-project --out /tmp/kd/my-project --graph-only --plain
+
+# A project with a pack: governance policy, vector chunk policy, domain
+# knowledge, glossary, flow corpus and build scope from projects/stablenet.
+tools/setup/ks-setup --src ~/work/go-stablenet --out ~/work/knowledge-data/go-stablenet \
+    --pack projects/stablenet --compare ~/work/knowledge-data/go-stablenet@0bf2f4d1b
 ```
+
+### Project packs
+
+`--pack projects/<name>` reads the pack's `setup.yaml` and passes each input
+to `cks setup` as an absolute path: `policy_file`, `security_pattern_file`,
+`vector_policy`, `domain_knowledge`, `glossary_file`, `flow_corpus`,
+`filelist`, `code_root` (`${CKS_CODE_ROOT}` expands to `--src`) and
+`vector_build_sources`. The server config gets the same governance policy,
+glossary and domain corpus, so queries see what the build consumed. The
+rendered domain corpus goes to `<out>-derived/`, one directory per dataset.
+
+`--skip-pack-input KEY` leaves one input out; for example
+`--skip-pack-input filelist` indexes the whole repository instead of the
+pack's build closure. A pack file list narrows the graph to the files its
+build roots compile for one platform; for go-stablenet that left out 238 Go
+files the promotion gate's audit still counts, along with the TypeScript and
+proto sources, so the tool raises a warning whenever the audit reports files
+missing from the graph. With `--graph-only`, inputs that only feed the vector
+index are dropped automatically. Preflight fails when an input is missing and
+warns when the pack declares a different embedding model.
+
+### Measuring and comparing builds
+
+After the health check the tool profiles the served dataset: graph files,
+nodes, edges, functions, commits, policy nodes and `governed_by` edges,
+node-PR links; vector chunks by kind, categorized chunks, chunks with
+guidance or a `canonical_id`, domain and flow chunks. The profile and the
+step timings are written to `<out>-setup-report.json`. `--compare <dataset>`
+profiles another dataset (versioned or flat layout) the same way and prints
+the two side by side, marking the rows that differ.
 
 The launcher uses `uv` when it is installed (it creates a `.venv` beside the tool
 with `rich`); otherwise it runs `python3 -m ks_setup` and falls back to plain
@@ -71,7 +106,7 @@ ks-setup --src ~/work/my-project
 | 3 | Write the project setup config | `cks init` (skipped when `<out>-setup.yaml` exists, so the project ID stays stable) |
 | 4 | Build the knowledge dataset | `cks setup --config … --version … --progress json`; engine stages appear as nested rows |
 | 5 | Write the MCP server config | `cks mcp gen-config` → `<out>-cks.yaml` (HTTP) and `<out>-cks-stdio.yaml` (stdio) |
-| 6 | Start the server and check health | `cks mcp --config <out>-cks-stdio.yaml`, then `initialize`, `tools/list`, `cks.ops.health` |
+| 6 | Start the server and check health | `cks mcp --config <out>-cks-stdio.yaml`, then `initialize`, `tools/list`, `cks.ops.health`, and two first questions an agent asks: `review_function` on the most-called production function and `get_for_task_v2`, which must return citations |
 
 ### Files it writes
 
@@ -84,10 +119,18 @@ Next to the dataset directory `<out>`:
 | `<out>-cks.yaml` | MCP server config, HTTP on `127.0.0.1:<port>` |
 | `<out>-cks-stdio.yaml` | the same config for stdio clients |
 | `<out>-setup-logs/` | one full log per run, including every command line |
+| `<out>-setup-report.json` | step timings, health, dataset profile and the comparison, if any |
+| `<out>-derived/` | the pack's rendered domain corpus (with `--pack` and domain knowledge) |
 
 Rerunning the tool on the same `--out` builds a new version and promotes it
 only after its gates pass; the previous version stays available for
-`cks setup --rollback`. Servers that are already running keep the dataset
+`cks setup --rollback`. The summary shows how many versions are retained and
+how much disk they use, with the `cks gc --dry-run` command that reviews a
+cleanup; the tool never deletes versions itself.
+
+`--min-canonical RATIO` turns on the promotion gate's join-density check
+(the share of symbol chunks that carry a `canonical_id`). Without it the
+engine skips the check and warns; Go projects typically reach above 0.95. Servers that are already running keep the dataset
 they opened, so restart them after a rebuild.
 
 ### Options
@@ -106,7 +149,11 @@ they opened, so restart them after a rebuild.
 | `--no-build`, `--bin-dir` | build | reuse existing binaries |
 | `--no-verify` | verify | skip the server health check |
 | `--allow-missing-embeddings` | strict | do not fail when some chunks could not be embedded |
-| `--plain` | dashboard on a terminal | one line per change |
+| `--pack` | none | project pack whose `setup.yaml` inputs the build uses |
+| `--skip-pack-input` | none | leave one pack input out (repeatable) |
+| `--compare` | none | dataset to profile side by side after the build |
+| `--min-canonical` | off | promotion gate: minimum canonical_id coverage |
+| `--plain` | dashboard on a terminal | one line per change, flushed immediately |
 | `-y`, `--yes` | ask | start without confirmation |
 
 Exit status: 0 success, 1 failure, 2 usage error, 130 cancelled. Ctrl-C stops

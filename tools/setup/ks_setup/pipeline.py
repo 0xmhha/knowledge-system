@@ -6,14 +6,16 @@ stops at the first failure.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
+import time
 import subprocess
 import threading
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, TextIO
 
-from . import events, mcp_check, preflight
+from . import events, mcp_check, pack as packs, preflight, profile
 from .model import Run, Status, Step
 from .options import Options, choose_version, repo_root
 
@@ -40,16 +42,29 @@ def init_argv(opts: Options) -> List[str]:
             "--embedder", opts.embedder, "--model-name", opts.model, "--config-out", str(opts.setup_config)]
 
 
-def setup_argv(opts: Options, version: Optional[str]) -> List[str]:
+def load_pack(opts: Options) -> Optional[packs.Pack]:
+    if opts.pack_dir is None:
+        return None
+    pack = packs.load(opts.pack_dir, opts.src)
+    for key in opts.skip_pack_inputs:
+        pack.inputs.pop(key, None)
+    return pack
+
+
+def setup_argv(opts: Options, version: Optional[str], pack: Optional[packs.Pack] = None) -> List[str]:
     cks = str(opts.binary("cks"))
     common = ["--progress", "json", "--build-timeout", opts.build_timeout]
+    pack_flags = pack.setup_flags(opts.graph_only, opts.derived_dir) if pack else []
     if opts.graph_only:
-        return [cks, "setup", "--src", str(opts.src), "--out", str(opts.out), "--skip-vector"] + common + opts.extra_setup_args
+        return ([cks, "setup", "--src", str(opts.src), "--out", str(opts.out), "--skip-vector"] + common
+                + pack_flags + opts.extra_setup_args)
     argv = [cks, "setup", "--config", str(opts.setup_config), "--version", str(version),
             "--source-mode", opts.source_mode, "--embed-dim", str(opts.embed_dim)] + common
     if opts.embedder == "ollama":
         argv += ["--ollama-url", opts.ollama_url, "--query-prefix-policy", "registry"]
-    return argv + opts.extra_setup_args
+    if opts.min_canonical is not None:
+        argv += ["--gate-min-canonical", f"{opts.min_canonical:g}"]
+    return argv + pack_flags + opts.extra_setup_args
 
 
 def setup_env(opts: Options) -> Dict[str, str]:
@@ -59,7 +74,7 @@ def setup_env(opts: Options) -> Dict[str, str]:
     return env
 
 
-def gen_config_argv(opts: Options, out: Optional[Path] = None) -> List[str]:
+def gen_config_argv(opts: Options, out: Optional[Path] = None, pack: Optional[packs.Pack] = None) -> List[str]:
     # gen-config never replaces an existing file (the caller writes to a fresh
     # name and swaps it in); the ruleset is pinned to this checkout's baseline.
     argv = [str(opts.binary("cks")), "mcp", "gen-config", "--dataset-dir", str(opts.serving_dir),
@@ -69,6 +84,8 @@ def gen_config_argv(opts: Options, out: Optional[Path] = None) -> List[str]:
             "--vector-binary", str(opts.binary("ckv"))]
     if opts.embedder == "ollama":
         argv += ["--ollama-url", opts.ollama_url, "--embed-model", opts.model, "--embed-dim", str(opts.embed_dim)]
+    if pack:
+        argv += pack.server_flags(opts.graph_only, opts.derived_dir)
     return argv
 
 
@@ -88,6 +105,9 @@ class Pipeline:
         self.proc: Optional[subprocess.Popen] = None
         self.cancelled = threading.Event()
         self._last_stderr = ""
+        self.pack: Optional[packs.Pack] = None
+        self.profile: Optional[dict] = None
+        self.comparison: List[tuple] = []
 
     def _log(self, line: str) -> None:
         self.log.write(line.rstrip("\n") + "\n")
@@ -156,6 +176,7 @@ class Pipeline:
                 if s.status == Status.PENDING:
                     s.status = Status.SKIPPED
             return False
+        self._measure()
         self._summarize()
         return True
 
@@ -173,6 +194,7 @@ class Pipeline:
         if fatal:
             raise StepFailed("; ".join(f"{c.name}: {c.detail}" for c in fatal))
         self.commit = preflight.source_commit(self.opts.src)
+        self.pack = load_pack(self.opts)
         warned = sum(1 for c in checks if not c.ok)
         step.finish(Status.WARNING if warned else Status.DONE,
                     f"{len(checks)} checks, {warned} warning(s)" if warned else f"{len(checks)} checks passed")
@@ -216,7 +238,7 @@ class Pipeline:
             if (self.opts.out / self.version).exists():
                 raise StepFailed(f"version {self.version} already exists under {self.opts.out}")
             step.detail = f"version {self.version}"
-        argv = setup_argv(self.opts, self.version)
+        argv = setup_argv(self.opts, self.version, self.pack)
         code = self._exec(argv, lambda l: events.apply(self.run, step, events.parse(l)) if l.strip() else None,
                           env=setup_env(self.opts), merge_stderr=False)
         failed = [s for s in step.substeps if s.status == Status.FAILED]
@@ -235,7 +257,7 @@ class Pipeline:
         if fresh.exists():
             fresh.unlink()
         output: List[str] = []
-        code = self._exec(gen_config_argv(self.opts, fresh), lambda l: (output.append(l), self.run.add_log(l)))
+        code = self._exec(gen_config_argv(self.opts, fresh, self.pack), lambda l: (output.append(l), self.run.add_log(l)))
         if code != 0:
             raise StepFailed(f"cks mcp gen-config exited {code}: {''.join(output[-2:]).strip()}")
         stdio = mcp_check.stdio_variant(fresh.read_text())
@@ -263,8 +285,57 @@ class Pipeline:
                        (h.get("vector_reason") or "unreachable")[:120])
             if self.opts.embedder != "mock":
                 raise StepFailed("vector index is not reachable: " + str(h.get("vector_reason")))
+        self.health = h
+        symbol = mcp_check.busiest_function(self.opts.serving_dir / "graph" / "graph.db")
+        smoke = mcp_check.smoke_queries(self.opts.binary("cks"), self.opts.stdio_config, symbol,
+                                        with_vector=not self.opts.graph_only and self.opts.embedder != "mock")
+        self.health["queries"] = smoke
+        failed = []
+        rv = smoke.get("review_function")
+        if rv:
+            sub = step.substep("review_function", "Query: review_function")
+            sub.finish(Status.DONE if rv["ok"] else Status.FAILED,
+                       f"{rv['symbol']}: {rv['callers']} callers, {rv['commits']} commits, {rv['ms']} ms")
+            failed += [] if rv["ok"] else ["review_function"]
+        gt = smoke.get("get_for_task_v2")
+        if gt:
+            ok = gt["ok"] and gt["citations"] > 0
+            step.substep("get_for_task_v2", "Query: get_for_task_v2").finish(
+                Status.DONE if ok else Status.FAILED, f"{gt['citations']} citations, {gt['ms']} ms")
+            failed += [] if ok else ["get_for_task_v2"]
+        if failed:
+            raise StepFailed("the server answered health but not " + ", ".join(failed))
         detail = f"{h['tools']} MCP tools, status {h['status']}"
         step.finish(Status.DONE if h["serviceable"] else Status.WARNING, detail)
+
+    def _measure(self) -> None:
+        """Profile the served dataset (and the comparison one) and write the report."""
+        try:
+            self.profile = profile.dataset_profile(self.opts.serving_dir)
+            other = profile.dataset_profile(self.opts.compare_with) if self.opts.compare_with else None
+        except (OSError, ValueError) as err:  # measuring is informative only
+            self.run.warn(f"profile: {err}")
+            return
+        if other:
+            self.comparison = profile.compare(self.profile, other)
+            self.run.comparison = self.comparison
+            self.run.compare_label = str(self.opts.compare_with)
+        report = {
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "source": str(self.opts.src), "source_commit": self.commit, "dataset": str(self.opts.out),
+            "version": self.version, "pack": str(self.opts.pack_dir) if self.opts.pack_dir else None,
+            "pack_inputs": sorted(self.pack.inputs) if self.pack else [],
+            "embedder": None if self.opts.graph_only else {"backend": self.opts.embedder, "model": self.opts.model,
+                                                            "dim": self.opts.embed_dim},
+            "steps": [{"key": s.key, "status": s.status.value, "seconds": round(s.elapsed() or 0, 1),
+                       "substeps": [{"key": x.key, "status": x.status.value, "seconds": round(x.elapsed() or 0, 1)}
+                                    for x in s.substeps]} for s in self.run.steps],
+            "health": getattr(self, "health", None),
+            "profile": self.profile,
+            "compared_with": str(self.opts.compare_with) if self.opts.compare_with else None,
+            "comparison": [{"metric": m, "this": a, "other": b} for m, a, b in self.comparison],
+        }
+        self.opts.report_file.write_text(json.dumps(report, indent=1, ensure_ascii=False) + "\n")
 
     def _summarize(self) -> None:
         o = self.opts
@@ -274,7 +345,13 @@ class Pipeline:
         lines.append(f"Serve:          {o.binary('cks')} mcp --config {o.server_config}")
         lines.append(f"Client entry:   {o.binary('cks')} mcp client-config --config {o.server_config}")
         if self.version:
+            kept = profile.retained_versions(o.out)
+            lines.append(f"Versions:       {kept['count']} retained, {kept['bytes'] / 2**30:.1f} GiB; review a cleanup with "
+                         f"{o.binary('cks')} gc --out {o.out} --dry-run")
             lines.append("Rebuild:        rerun this tool; a new version is promoted only after its gates pass")
             lines.append(f"Roll back:      {o.binary('cks')} setup --out {o.out} --src {o.src} --rollback <version>")
+        if self.profile:
+            lines += profile.summary_lines(self.profile)
+            lines.append(f"Report:         {o.report_file}")
         lines.append("Running servers keep the dataset they opened; restart them after a rebuild.")
         self.run.summary = lines
