@@ -1,0 +1,19 @@
+{
+ "schema_version": 1,
+ "symptom": "internal/graph/server TestHandleImpact_BadRequest failed once in the HEAD race run (c85bac89): TempDir RemoveAll cleanup: unlinkat .../001: directory not empty; isolated reruns passed 3/3",
+ "root_cause": "persist.OpenReadOnly built the DSN as path + \"?mode=ro&immutable=1&_pragma=...\". modernc.org/sqlite v1.54.0 (conn.go) strips the query from a non-file: DSN and opens with SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE, applying only _pragma parameters. The read-only store therefore opened read-write on a WAL-mode graph.db, created graph.db-wal/-shm on first read and removed them when its last connection closed.",
+ "race": "server.New starts prewarm goroutines that query the store; a connection still in use when the test's cleanups run closes later and removes the sidecars while t.TempDir's RemoveAll walks the directory, giving ENOTEMPTY. The ordering is inferred from the observed sidecar creation and removal, not traced per goroutine.",
+ "observations": [
+  "debug run: after a build the directory held graph.db and manifest.json; after the read-only open and a request it also held graph.db-wal and graph.db-shm, which were gone 3 ms later",
+  "DSN comparison on separate copies: plain path DSN accepted CREATE TABLE and created sidecars; file: URI mode=ro rejected the write but created sidecars; file: URI mode=ro&immutable=1 rejected the write and created none"
+ ],
+ "impact": "OpenReadOnly is used by cks (ckgclient.NewReal, semantic ckg anchors) on retained version directories and by ckg serve/mcp/query. Those handles could write to graph.db and left sidecars in retained directories while open. No writes are issued by those code paths; no leftover sidecars were found in the N11/FINAL2 evaluation datasets or the local operating dataset.",
+ "fix": "396242f0: escaped absolute file: URI with mode=ro&immutable=1 plus the existing pragmas",
+ "tests": {
+  "regression": "internal/graph/persist TestOpenReadOnlyRejectsWritesAndCreatesNoSidecars (plain, space, '#'/'%' directory names): RED on the original code (write accepted), GREEN with the fix",
+  "mutation": "dropping immutable=1 fails the sidecar check (files while open = graph.db, graph.db-shm, graph.db-wal)",
+  "full_race": "go test -race -count=1 ./... after the fix: 3257 tests passed, 0 failed (race.jsonl.gz)"
+ },
+ "known_limit": "a '?' in the directory path is still mangled by the read-write Open, which keeps a plain path DSN; not changed here",
+ "tradeoff": "immutable=1 makes a reader ignore locks and any -wal content; graphs are replaced by rename and the contract is to restart readers after a rebuild, so a reader must not be held open across an in-place incremental build"
+}

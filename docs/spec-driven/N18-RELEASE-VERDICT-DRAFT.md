@@ -41,6 +41,7 @@ N18은 지금까지 나온 증거로 두 가지를 정한다. 하나는 각 선�
 - `go vet`, gofmt: 문제 0건.
 - Python script 시험: 164개 통과.
 - 실패한 `internal/graph/server` `TestHandleImpact_BadRequest`는 본문은 통과했지만, TempDir 정리 단계에서 "directory not empty"로 실패했다. 이번 작업은 이 패키지를 바꾸지 않았다(마지막 변경 `849e127d`). 단독 재실행은 3/3 통과했다. 시험이 끝난 뒤에도 무언가 임시 디렉터리에 쓰는 간헐적인 시험 격리 결함으로 보며, 고치지 않았다. merge 전에 원인을 확인할 것을 권장한다.
+- **2026-10-11 후속: 원인 수정(`396242f0`).** 원인은 `persist.OpenReadOnly`의 DSN이 `file:` URI가 아니어서 `mode=ro`·`immutable=1`이 무시된 것이었다. 그 결과 읽기 전용 handle이 실제로는 읽기·쓰기로 열렸고, 쓰기를 허용하고 `-wal`/`-shm`을 만들었다. 늦게 닫힌 연결이 TempDir 정리와 경쟁해 실패했다. 회귀 시험은 수정 전 RED, 수정 후 GREEN이다. 수정 후 전체 race는 3,257개 통과, 실패 0이다([기록](../../system/eval/b0-knowledge-system/refactoring-graph-readonly-fix-2026-10-11/findings.json)). 판정(기본값 유지, merge·공개 배포 보류)은 바뀌지 않는다.
 
 ## 5. N16 처리
 
