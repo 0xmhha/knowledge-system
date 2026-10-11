@@ -1,0 +1,20 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "python-based setup tool under tools/setup that shows install steps and processing state as a CLI UI",
+ "commit": "fa292ce1 feat(tools): add ks-setup",
+ "checks": {
+  "unit_and_e2e": "14 tests OK (KS_SETUP_E2E=1: mock-embedder dataset built twice; second run promotes a new version and keeps the first as rollback target) -> unit-tests.txt",
+  "real_ollama_run": "launcher via uv, bge-m3:latest on a one-file repository: all six steps done, cks.ops.health status ok, vector reachable, 24 MCP tools -> ollama-run.txt",
+  "live_dashboard": "rich Live view under a pseudo-terminal (script): exit 0, dataset ready, second version promoted",
+  "cancellation": "SIGINT during the graph build: exit 130, 'Setup failed: cancelled', no cks/ckg/ckv process left, current unchanged; a KeyboardInterrupt inside Thread.join made the first version report error None, fixed by waiting on an Event"
+ },
+ "engine_findings_not_changed": [
+  "cks mcp gen-config resolves the default sanitization rules path against its working directory; a config generated elsewhere makes `cks mcp` exit with an opaque operation_failed",
+  "cks mcp gen-config refuses to overwrite an existing --out with an opaque operation_failed",
+  "cks setup --version with --skip-vector is refused (versioned_setup_required) and leaves an empty <version>/sources directory, so the same label fails later"
+ ],
+ "makefile": "setup-tool-test target added",
+ "reviewer": null,
+ "individual_human_approvals": 0
+}
