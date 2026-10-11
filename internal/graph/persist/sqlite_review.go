@@ -162,12 +162,17 @@ func (s *sqliteStore) reviewNeighbours(where, end string, limit int, args ...any
 		ORDER BY n.qualified_name LIMIT `+fmt.Sprint(limit), args...)
 }
 
+// reviewContainsQuery lists the seed's statements. "+e.type" keeps SQLite
+// from choosing idx_edges_type, which would scan every contains edge in the
+// graph (67 ms on this repository's graph) instead of the seed's own.
+const reviewContainsQuery = `SELECT n.type, n.start_line, n.start_byte, n.end_byte FROM edges e JOIN nodes n ON n.id = e.dst
+		WHERE e.src = ? AND +e.type = 'contains' ORDER BY n.start_byte`
+
 // reviewLogic fills control counts, return count, call-site text in source
 // order (sliced from the seed's stored source) and project callees by line.
 func (s *sqliteStore) reviewLogic(r *Review, seedStart, limit int) error {
 	src, _ := s.GetBlob(r.Seed.ID)
-	rows, err := s.db.Query(`SELECT n.type, n.start_line, n.start_byte, n.end_byte FROM edges e JOIN nodes n ON n.id = e.dst
-		WHERE e.src = ? AND e.type = 'contains' ORDER BY n.start_byte`, r.Seed.ID)
+	rows, err := s.db.Query(reviewContainsQuery, r.Seed.ID)
 	if err != nil {
 		return fmt.Errorf("review logic: %w", err)
 	}

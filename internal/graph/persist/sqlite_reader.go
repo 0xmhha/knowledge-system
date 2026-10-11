@@ -342,16 +342,29 @@ func (s *sqliteStore) GetBlob(id string) ([]byte, error) {
 // fix that removes cks Stage 2's N round-trips for `arch_explain` intent
 // (one query per requested SymbolKind). Empty Kinds returns every type.
 func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
+	q, args := findSymbolQuery(name, exact, opts)
+	rows, err := s.db.Query(q, args...)
+	if err != nil {
+		return nil, fmt.Errorf("find symbol %q: %w", name, err)
+	}
+	defer func() { _ = rows.Close() }()
+	return scanNodes(rows)
+}
+
+// findSymbolQuery builds FindSymbol's statement. The suffix match ("Foo" hits
+// "pkg.Foo") is a UNION of two indexed lookups, qualified_name and
+// simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
+// one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
+// the whole nodes table on every MCP seed resolution.
+func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, []any) {
 	args := []any{}
-	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE 1=1 `
+	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE `
 	if exact {
-		q += `AND qualified_name = ? `
+		q += `qualified_name = ? `
 		args = append(args, name)
 	} else {
-		// simple_name equi-join replaces a leading-wildcard LIKE so the
-		// suffix match ("Foo" hits "pkg.Foo") uses idx_nodes_simple_name.
-		// COLLATE NOCASE preserves the old LIKE's case-insensitivity.
-		q += `AND (qualified_name = ? OR simple_name = ? COLLATE NOCASE) `
+		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE) `
 		args = append(args, name, name)
 	}
 	if opts.Language != "" {
@@ -364,13 +377,7 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
 			args = append(args, string(k))
 		}
 	}
-	q += `LIMIT 100`
-	rows, err := s.db.Query(q, args...)
-	if err != nil {
-		return nil, fmt.Errorf("find symbol %q: %w", name, err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanNodes(rows)
+	return q + `LIMIT 100`, args
 }
 
 // NeighborhoodByQname returns BFS expansion up to depth starting from any

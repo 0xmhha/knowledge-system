@@ -3,6 +3,7 @@ package persist
 import (
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
@@ -103,5 +104,26 @@ func TestRebuildReviewIndex(t *testing.T) {
 	_ = st.db.QueryRow(`SELECT (SELECT count(*) FROM code_edges) + (SELECT count(*) FROM node_commits)`).Scan(&left)
 	if left != 0 {
 		t.Fatalf("%d derived rows survived the file delete", left)
+	}
+}
+
+// The seed's statements come from its own contains edges, not a scan of all
+// of them.
+func TestReviewContainsQueryUsesTheSourceIndex(t *testing.T) {
+	st := reviewFixture(t)
+	rows, err := st.db.Query("EXPLAIN QUERY PLAN "+reviewContainsQuery, "x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = rows.Close() }()
+	var plan []string
+	for rows.Next() {
+		var id, parent, notused int
+		var detail string
+		_ = rows.Scan(&id, &parent, &notused, &detail)
+		plan = append(plan, detail)
+	}
+	if p := strings.Join(plan, "; "); !strings.Contains(p, "idx_edges_src") {
+		t.Fatalf("contains plan = %q", p)
 	}
 }

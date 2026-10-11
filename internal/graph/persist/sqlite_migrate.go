@@ -63,6 +63,10 @@ func (s *sqliteStore) Migrate() error {
 	if err := ensureIsTestColumn(s.db); err != nil {
 		return fmt.Errorf("migrate is_test on nodes: %w", err)
 	}
+	// Seed resolution looks canonical ids up on every MCP call (schema 1.24).
+	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS idx_nodes_canonical_id ON nodes(canonical_id)`); err != nil {
+		return fmt.Errorf("create idx_nodes_canonical_id: %w", err)
+	}
 	return nil
 }
 
