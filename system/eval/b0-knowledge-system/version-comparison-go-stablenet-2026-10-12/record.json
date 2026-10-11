@@ -1,0 +1,43 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "compare knowledge data built by the earlier program version with data built by the current version, holding the inputs fixed",
+ "reference": {
+  "path": "knowledge-data/go-stablenet@0bf2f4d1b",
+  "built_at": "2026-07-26",
+  "program": "repository state at or after cebac8c7 (last commit before the build); builder_version 0.1.0 and ckv_version dev do not identify the exact commit",
+  "graph_schema": "1.23",
+  "source_clone": "auto-coding/test/go-stablenet @ 0bf2f4d1"
+ },
+ "rebuild": {
+  "path": "knowledge-data/go-stablenet-refinputs/current -> v20261012-063653-0bf2f4d1",
+  "program": "feat/setup-tool at ad75507f via tools/setup/ks-setup",
+  "graph_schema": "1.24",
+  "source_clone": "auto-coding/chain/go-stablenet @ 0bf2f4d1",
+  "duration": "25m56s",
+  "server_checks": "health ok, 24 tools, review_function log.Info 40 callers, get_for_task_v2 8 citations"
+ },
+ "inputs_held_equal": {
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "graph_policy": "projects/stablenet/policies/graph.yaml at b967c42a (36 policies, sha256 79b5d8aae2970ac192846903ce8a06b0dcbb5cc301f092274289ccbc3022a3b2)",
+  "vector_policy": "projects/stablenet/policies/vector.yaml (sha256 59148ebc93fdc6f8543a5e550595b99b4740ba98c538839598f6da420c9e4315, unchanged since the reference)",
+  "embedding_model": "bge-m3:latest digest 790764642607 (the only bge-m3 tag installed; bge-m3 resolves to it)",
+  "file_list": "none (whole repository)",
+  "domain_glossary_flow": "none"
+ },
+ "findings": {
+  "graph_code_layer": "identical: graph_digest 65d74ed74f57a940 equal, 1323 files, 18830 functions, 36 policies / 112 governed_by, pkg_tree_edges 228815",
+  "graph_temporal_layer": "differs by clone, not by program: Commit 6401 vs 6404, Hunk 9072 vs 8961; the extra commits are reflog/branch commits outside HEAD (dee3db6a on dev in the test clone; 35cea5a2 and three others on origin/fix/simulated-backend-close-node-cleanup in the chain clone), which the temporal pass adds as AMBIGUOUS hunks by design",
+  "vector_symbols": "new program adds Var 900 and Const 542 symbol chunks, Contract 22 -> 61, and splits long functions into function_split chunks (211) instead of truncating them",
+  "vector_text": "8684 of 17068 shared symbol chunks changed: the chunk now starts at the doc comment and includes the declaration keyword",
+  "vector_canonical_id": "symbol 16028/17228 -> 18420/18566; file_header 11 -> 1250; invariant 46 -> 161",
+  "vector_categories": "categorized 17556 -> 18899, every category grew; uncategorized 1787 -> 1991",
+  "vector_scope_loss": "internal/build/*.go (7 files, 68 chunks incl. one convention) are no longer indexed: the default build/ ignore now matches nested build directories (eeeab2e7, FIX-22) and needs an explicit vector_build_sources list; the graph still indexes those files, and the alignment gate did not report the gap",
+  "chunk_totals": "19343 -> 20890"
+ },
+ "not_done": [
+  "query-level comparison of answers between the two datasets",
+  "serving the schema 1.23 reference with the current server",
+  "tools/setup does not yet detect or offer vector_build_sources for Go sources under build/ directories"
+ ]
+}
