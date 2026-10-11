@@ -76,6 +76,9 @@ type Review struct {
 	ViaInterfaces []ReviewSymbol `json:"via_interfaces"`
 	CallerPaths   [][]string     `json:"caller_paths"`
 	EntryPoints   int            `json:"entry_points"`
+	// CallerWalkTruncated is set when the walk stopped at
+	// reviewCallerBudget callers; EntryPoints then counts where it stopped.
+	CallerWalkTruncated bool `json:"caller_walk_truncated"`
 
 	// Dynamic paths.
 	Goroutines            []ReviewSymbol      `json:"goroutines"`

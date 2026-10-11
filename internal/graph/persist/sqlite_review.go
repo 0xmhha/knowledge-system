@@ -215,7 +215,7 @@ func (s *sqliteStore) reviewLogic(r *Review, seedStart, limit int) error {
 		FROM code_edges c
 		JOIN nodes m ON m.id = c.dst
 		JOIN code_edges d ON d.dst = m.id AND d.type = 'defines'
-		JOIN nodes i ON i.id = d.src AND i.type = 'Interface'
+		JOIN nodes i ON i.id = d.src AND +i.type = 'Interface'
 		JOIN code_edges im ON im.dst = i.id AND im.type = 'implements'
 		JOIN nodes impl ON impl.id = im.src
 		WHERE c.src = ? AND c.type IN ('calls', 'invokes')
@@ -234,6 +234,20 @@ func (s *sqliteStore) reviewLogic(r *Review, seedStart, limit int) error {
 		}
 	}
 	return impl.Err()
+}
+
+// reviewCallerBudget bounds the reverse walk: a widely used function has
+// thousands of transitive callers, while a review shows 40 callers and 12
+// paths (walking them all cost up to 250 ms on the go-stablenet graph).
+const reviewCallerBudget = 2000
+
+// reviewCallersQuery returns one walk level's callers for n frontier IDs.
+// "+n.type" keeps SQLite from choosing idx_nodes_type for long IN lists,
+// which read every function and method on each level.
+func reviewCallersQuery(n int) string {
+	return `SELECT c.dst, c.src FROM code_edges c JOIN nodes n ON n.id = c.src
+		WHERE c.dst IN (` + placeholders(n) + `) AND c.type IN ('calls', 'invokes') AND +n.type IN ('Function', 'Method')
+		ORDER BY c.dst, n.qualified_name`
 }
 
 // reviewCallers walks production callers back toward entry points. A
@@ -267,9 +281,7 @@ func (s *sqliteStore) reviewCallers(r *Review, opts ReviewOptions) error {
 		callersOf := map[string][]string{}
 		for start := 0; start < len(frontier); start += queryEdgesChunk {
 			chunk := frontier[start:min(start+queryEdgesChunk, len(frontier))]
-			rows, err := s.db.Query(`SELECT c.dst, c.src FROM code_edges c JOIN nodes n ON n.id = c.src
-				WHERE c.dst IN (`+placeholders(len(chunk))+`) AND c.type IN ('calls', 'invokes') AND n.type IN ('Function', 'Method')
-				ORDER BY c.dst, n.qualified_name`, anys(chunk)...)
+			rows, err := s.db.Query(reviewCallersQuery(len(chunk)), anys(chunk)...)
 			if err != nil {
 				return fmt.Errorf("review callers: %w", err)
 			}
@@ -296,6 +308,10 @@ func (s *sqliteStore) reviewCallers(r *Review, opts ReviewOptions) error {
 			}
 		}
 		frontier = next
+		if len(prev) > reviewCallerBudget {
+			r.CallerWalkTruncated = len(frontier) > 0
+			break
+		}
 	}
 	roots = append(roots, frontier...) // the walk's depth limit is its edge
 	r.EntryPoints = len(roots)
@@ -309,16 +325,14 @@ func (s *sqliteStore) reviewCallers(r *Review, opts ReviewOptions) error {
 	for id := range direct {
 		ids = append(ids, id)
 	}
-	names, err := s.NodesByIDs(append(ids, roots...))
+	names, err := s.NodesByIDs(ids)
 	if err != nil {
 		return err
 	}
 	qn := map[string]string{}
 	for _, n := range names {
 		qn[n.ID] = n.QualifiedName
-		if direct[n.ID] {
-			r.Callers = append(r.Callers, ReviewSymbol{ID: n.ID, QualifiedName: n.QualifiedName, Type: string(n.Type), FilePath: n.FilePath, StartLine: n.StartLine, EndLine: n.EndLine})
-		}
+		r.Callers = append(r.Callers, ReviewSymbol{ID: n.ID, QualifiedName: n.QualifiedName, Type: string(n.Type), FilePath: n.FilePath, StartLine: n.StartLine, EndLine: n.EndLine})
 	}
 	sort.Slice(r.Callers, func(i, j int) bool { return r.Callers[i].QualifiedName < r.Callers[j].QualifiedName })
 	r.Callers = r.Callers[:min(len(r.Callers), opts.MaxItems)]

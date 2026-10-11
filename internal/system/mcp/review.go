@@ -39,6 +39,7 @@ type reviewCodeView struct {
 	ViaInterfaces         []store.ReviewSymbol   `json:"via_interfaces"`
 	CallerPaths           [][]string             `json:"caller_paths"`
 	EntryPoints           int                    `json:"entry_points"`
+	CallerWalkTruncated   bool                   `json:"caller_walk_truncated"`
 	Goroutines            []store.ReviewSymbol   `json:"goroutines"`
 	SendsTo               []store.ReviewSymbol   `json:"sends_to"`
 	RecvsFrom             []store.ReviewSymbol   `json:"recvs_from"`
@@ -119,7 +120,7 @@ func handleReviewFunction(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 			Signature: rv.Signature, UsesTypes: rv.UsesTypes, Instantiates: rv.Instantiates, WritesFields: rv.WritesFields,
 			ReturnStatements: rv.ReturnStatements, Control: rv.Control, CallSites: rv.CallSites, CallSitesTotal: rv.CallSitesTotal,
 			Callees: rv.Callees, InterfaceImplementers: rv.InterfaceImplementers, Callers: rv.Callers, ViaInterfaces: rv.ViaInterfaces,
-			CallerPaths: rv.CallerPaths, EntryPoints: rv.EntryPoints, Goroutines: rv.Goroutines, SendsTo: rv.SendsTo, RecvsFrom: rv.RecvsFrom,
+			CallerPaths: rv.CallerPaths, EntryPoints: rv.EntryPoints, CallerWalkTruncated: rv.CallerWalkTruncated, Goroutines: rv.Goroutines, SendsTo: rv.SendsTo, RecvsFrom: rv.RecvsFrom,
 			AcquiresLocks: rv.AcquiresLocks, ReleasesLocks: rv.ReleasesLocks, TimeoutPaths: rv.TimeoutPaths, CancellationPaths: rv.CancellationPaths,
 		},
 		History: reviewHistoryView{Commits: rv.Commits, CommitsTotal: rv.CommitsTotal},
