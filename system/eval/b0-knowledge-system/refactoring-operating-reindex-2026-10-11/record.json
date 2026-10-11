@@ -1,0 +1,13 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "user_decision": "재색인 진행 (권장): build a new version from the same source commit, switch current, keep the old version for rollback",
+ "release": "e39b1ee5 (release-binaries.json)",
+ "source": "clean git clone of /Users/kevin/work/github/wemade/go-stablenet checked out at 740526d0 (the commit v1 serves); the user's repository, now at a2c5f3d4f on dev, was only read",
+ "setup": "run-operating-reindex.py = the N15 setup script with the source path as an argument and a HEAD assertion; v2-setup-result.json: exit 0, 1,824.8 s, 20,958 embeddings, 0 failed",
+ "dataset": "current -> v2 (dataset 32f1a233...), schema 1.24, code_edges 60,951, test nodes 90,718; rollback-targets lists v1; v2 is 1.2 GB",
+ "config_change": "cks-operating.yaml and cks-operating-stdio.yaml binary_path e90fab1f -> e39b1ee5; originals kept as *.bak-e90fab1f",
+ "consumer_check": "consumer-v2-e39b1ee5.json: 5 get_for_task_v2 queries without errors, 7-11 citations each, 1.9-2.9 s, all on 740526d0 and dataset 32f1a233; review_function on 3 functions without errors, about 0.65 s each, most of it the per-request archive identity check",
+ "rollback": "cks setup --rollback v1 against the dataset (and restore the *.bak-e90fab1f configs)",
+ "not_done": "no MCP client configuration was changed; a client that launches a specific cks binary must point at releases/e39b1ee5/bin/cks to get review_function"
+}
