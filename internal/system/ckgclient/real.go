@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/concurrency"
@@ -34,6 +35,37 @@ const DefaultSearchLimit = 10
 // already tripped it). Callers wanting a wider view pass an explicit MaxTotal
 // and handle the larger payload.
 const DefaultSubgraphMaxTotal = 80
+
+// subgraphTraversalBudget is the total edge count at which GetSubgraph stops
+// deepening even when too few of the edges are usable in the response.
+const subgraphTraversalBudget = 50000
+
+// usableSubgraphEdges counts, up to limit, the edges GetSubgraph's response
+// would accept: a mapped relation other than uses_type, both endpoints
+// present, and no test endpoint when tests are excluded.
+func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bool, limit int) int {
+	byID := make(map[string]types.Node, len(nodes))
+	for _, n := range nodes {
+		byID[n.ID] = n
+	}
+	count := 0
+	for _, e := range edges {
+		if count >= limit {
+			break
+		}
+		rel, ok := relationFromEdgeType(e.Type, false)
+		if !ok || rel == contract.RelationUsesType {
+			continue
+		}
+		srcN, srcOK := byID[e.Src]
+		dstN, dstOK := byID[e.Dst]
+		if !srcOK || !dstOK || (excludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath))) {
+			continue
+		}
+		count++
+	}
+	return count
+}
 
 // FilterOverfetchRatio scales the SearchFTS limit when a non-empty
 // SearchOpts.Filter is present. Post-filter discards rows the caller
@@ -156,6 +188,13 @@ func (a *realStoreReader) Close() error {
 type Real struct {
 	s      storeReader
 	closed bool
+
+	// commitMu guards commitID, the indexed commit stamped on citations.
+	// The store is opened immutable, so a successful read holds for its
+	// lifetime; re-reading the manifest per request cost about 85 MB on a
+	// production-size graph.
+	commitMu sync.Mutex
+	commitID string
 }
 
 // Compile-time guarantee Real satisfies Client.
@@ -876,34 +915,57 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	// the same reason a reverse walk does: a concrete method's inbound edges
 	// land on the interface method, and a neighbourhood that omits them is
 	// missing precisely the callers the question is usually about.
+	seeds := r.reverseSeeds(qname)
+	walk := func(d int) ([]types.Node, []types.Edge, error) {
+		var nodes []types.Node
+		var edges []types.Edge
+		nodeSeen := make(map[string]struct{})
+		edgeSeen := make(map[string]struct{})
+		for _, sd := range seeds {
+			ns, es, err := r.s.SubgraphByQname(sd, d)
+			if err != nil {
+				// As in ImpactOfChange: the seed must resolve, a bridged
+				// interface method need not be present.
+				if sd == qname {
+					return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
+				}
+				continue
+			}
+			for _, n := range ns {
+				if _, dup := nodeSeen[n.ID]; dup {
+					continue
+				}
+				nodeSeen[n.ID] = struct{}{}
+				nodes = append(nodes, n)
+			}
+			for _, e := range es {
+				k := e.Src + "|" + e.Dst + "|" + string(e.Type)
+				if _, dup := edgeSeen[k]; dup {
+					continue
+				}
+				edgeSeen[k] = struct{}{}
+				edges = append(edges, e)
+			}
+		}
+		return nodes, edges, nil
+	}
+	limit := opts.MaxTotal
+	if limit <= 0 {
+		limit = DefaultSubgraphMaxTotal
+	}
+	// Deepen one level at a time. Stop once the walk already holds limit
+	// edges the response can use, or subgraphTraversalBudget edges in all:
+	// an untyped walk grows about tenfold per level, and depth 5 allocated
+	// up to 10 GB on a production-size graph to return 80 edges.
 	var nodes []types.Node
 	var edges []types.Edge
-	nodeSeen := make(map[string]struct{})
-	edgeSeen := make(map[string]struct{})
-	for _, sd := range r.reverseSeeds(qname) {
-		ns, es, err := r.s.SubgraphByQname(sd, depth)
+	for d := 1; d <= depth; d++ {
+		nodes, edges, err = walk(d)
 		if err != nil {
-			// As in ImpactOfChange: the seed must resolve, a bridged
-			// interface method need not be present.
-			if sd == qname {
-				return nil, nil, fmt.Errorf("ckgclient: SubgraphByQname: %w", err)
-			}
-			continue
+			return nil, nil, err
 		}
-		for _, n := range ns {
-			if _, dup := nodeSeen[n.ID]; dup {
-				continue
-			}
-			nodeSeen[n.ID] = struct{}{}
-			nodes = append(nodes, n)
-		}
-		for _, e := range es {
-			k := e.Src + "|" + e.Dst + "|" + string(e.Type)
-			if _, dup := edgeSeen[k]; dup {
-				continue
-			}
-			edgeSeen[k] = struct{}{}
-			edges = append(edges, e)
+		if len(edges) >= subgraphTraversalBudget || usableSubgraphEdges(nodes, edges, opts.ExcludeTests, limit) >= limit {
+			break
 		}
 	}
 	commit, _ := r.commit()
@@ -915,11 +977,6 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	// only the nodes incident to the kept edges plus the seed, keeping nodes
 	// and edges consistent and bounded. MaxTotal<=0 means "use the default cap"
 	// (a true unbounded subgraph is what caused the overflow).
-	limit := opts.MaxTotal
-	if limit <= 0 {
-		limit = DefaultSubgraphMaxTotal
-	}
-
 	byID := make(map[string]types.Node, len(nodes))
 	var seedID string
 	for _, n := range nodes {
@@ -1050,10 +1107,16 @@ func (r *Real) Close() error {
 // return Citations with an empty CommitHash) but is surfaced to the
 // caller through Health.
 func (r *Real) commit() (string, error) {
+	r.commitMu.Lock()
+	defer r.commitMu.Unlock()
+	if r.commitID != "" {
+		return r.commitID, nil
+	}
 	snap, err := r.s.LoadManifestSnapshot()
 	if err != nil {
 		return "", err
 	}
+	r.commitID = snap.SrcCommit
 	return snap.SrcCommit, nil
 }
 
