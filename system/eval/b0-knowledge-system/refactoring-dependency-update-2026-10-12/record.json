@@ -1,0 +1,11 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "trigger": "PR #98 CI vuln-scan (advisory) failed; local make vuln at 98bbb9ce reported GO-2026-6629 in golang.org/x/text v0.39.0 plus 11 Go standard-library advisories fixed in go1.26.9",
+ "change": "go.mod/go.sum: golang.org/x/text v0.39.0 -> v0.41.0",
+ "after": "make vuln: the x/text finding is gone; 11 standard-library findings remain (crypto/tls, net/http x8, net/textproto, os) and need a Go toolchain at go1.26.9 or later, outside this repository",
+ "regression": "go test -race -count=1 ./... after the upgrade: 3293 passed, 16 skipped, 0 failed; go build and go vet pass",
+ "product_behaviour_changed": false,
+ "reviewer": null,
+ "individual_human_approvals": 0
+}
