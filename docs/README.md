@@ -9,6 +9,8 @@ at the time.
 
 - [`../README.md`](../README.md) — install, build the binaries, build a
   dataset (`cks setup`), and serve it over MCP.
+- [`../tools/setup/README.md`](../tools/setup/README.md) — `ks-setup`, a guided
+  setup that builds and verifies a dataset with a live progress view.
 - [`../system/README.md`](../system/README.md) — the `cks` command, its
   subcommands and the agent-facing MCP tools.
 - [`docs/downstream-sync.md`](./downstream-sync.md) — porting this repository into a

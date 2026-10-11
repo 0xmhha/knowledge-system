@@ -122,6 +122,16 @@ is `--out`'s job.
 
 ## Quick start
 
+For a guided run that checks the prerequisites, builds the binaries, indexes a
+project and verifies the server with a live progress view, use
+[`tools/setup/ks-setup`](tools/setup/README.md):
+
+```sh
+tools/setup/ks-setup --src "$CKS_CODE_ROOT" --out /abs/path/for/the/dataset
+```
+
+The same steps by hand:
+
 ```sh
 # 1. binaries  (`make build` only compiles; it writes nothing to bin/)
 make build-bins

@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries docs-check refactoring-check build-bins install-hooks sync-domain-artifacts check-domain-artifacts
+.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries docs-check refactoring-check build-bins install-hooks sync-domain-artifacts check-domain-artifacts setup-tool-test
 
 GO ?= go
 
@@ -48,6 +48,11 @@ boundaries:
 # exist; build-bins is cheap when they are already current.
 docs-check: build-bins
 	@python3 ./scripts/check-docs.py
+
+# setup-tool-test: unit tests for tools/setup (ks-setup), plus an end-to-end
+# run with the mock embedder against the binaries in bin/.
+setup-tool-test: build-bins
+	KS_SETUP_E2E=1 python3 -m unittest discover -s tools/setup/tests
 
 # Run before recording a completed follow-up refactoring stage. This verifies
 # committed acceptance evidence and the latest source/input binding.
