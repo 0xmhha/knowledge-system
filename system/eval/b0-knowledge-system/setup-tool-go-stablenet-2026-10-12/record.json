@@ -1,0 +1,30 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "build a knowledge db for chain/go-stablenet with tools/setup; compare with knowledge-data/go-stablenet@0bf2f4d1b and improve tools/setup; clean the lint findings and add golangci-lint to lint",
+ "source": {
+  "path": "/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet",
+  "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "modified": false
+ },
+ "reference": {
+  "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet@0bf2f4d1b",
+  "layout": "flat, schema 1.23, built 2026-07-26 with the stablenet graph and vector policies"
+ },
+ "runs": {
+  "run1_baseline": "tools/setup without pack inputs: 39m30s; graph equal to the reference in scope, 0 policy nodes and 0 categorized chunks -> run1-baseline.txt",
+  "run2_pack_with_filelist": "--pack projects/stablenet: 28m19s; policies and categories present, domain 346 and flow 96 chunks, but the pack file list left 1040 of 1323 files (238 Go build files missing per the gate audit) -> run2-pack-with-filelist.txt",
+  "run3_pack_full_scope": "--pack projects/stablenet --skip-pack-input filelist --min-canonical 0.9: 34m10s; served as current; gate PARITY without warnings; review_function and get_for_task_v2 answered -> run3-pack-full-scope.txt, run3-setup-report.json"
+ },
+ "served_dataset": "knowledge-data/go-stablenet/current -> v20261012-030550-0bf2f4d1; server configs go-stablenet-cks.yaml (127.0.0.1:8941) and go-stablenet-cks-stdio.yaml",
+ "comparison_run3_vs_reference": "same files (1323), functions (18830) and languages; policy nodes 42 vs 36, governed_by 140 vs 112, categorized chunks 19245 vs 17556, canonical_id chunks 20042 vs 16085, domain 346 vs 0, flow 96 vs 0 -> profiles.json",
+ "tool_improvements": "9e113602: --pack, --skip-pack-input, --compare and setup report, --min-canonical, query smoke checks, coverage-gap warning, per-line flush, retained-version summary",
+ "lint": "3d76e836: .golangci.yml + make golangci in make lint and CI; 618 uncapped findings fixed (92 shown under default caps); rows.Err checks added in the vector store",
+ "verification": "go test -race -count=1 ./...: 3300 passed, 16 skipped, 0 failed; make lint (fmt-check, vet, golangci 0 issues, boundaries, docs 313) pass; make setup-tool-test OK; python script tests OK",
+ "not_done": [
+  "older versions v20261012-015018 and v20261012-023650 are retained (about 2 GiB); cleanup is a reviewed cks gc step left to the user",
+  "the earlier buildpipe timeout (612 s) happened under load 18-22 while a dataset build ran; rerun alone passed in 312 s"
+ ],
+ "reviewer": null,
+ "individual_human_approvals": 0
+}

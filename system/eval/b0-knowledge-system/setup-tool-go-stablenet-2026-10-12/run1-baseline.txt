@@ -1,0 +1,47 @@
+      Source: /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet
+     Dataset: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet
+       Index: graph + vector (ollama: bge-m3:latest, 1024d)
+ Source mode: committed
+      Server: go-stablenet @ 127.0.0.1:8941
+[   done] 1. Check prerequisites (0s) - 8 checks passed
+[   done] 1. Check prerequisites / knowledge-system (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system
+[   done] 1. Check prerequisites / git (0s) - git version 2.55.0
+[   done] 1. Check prerequisites / go (0s) - go version go1.26.8 darwin/arm64
+[   done] 1. Check prerequisites / make (0s) - GNU Make 3.81
+[   done] 1. Check prerequisites / source (0s) - /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet @ 0bf2f4d1bfeb
+[   done] 1. Check prerequisites / dataset (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet (58.3 GiB free)
+[   done] 1. Check prerequisites / ollama (0s) - http://127.0.0.1:11434 (version 0.35.1)
+[   done] 1. Check prerequisites / embedding model (0s) - bge-m3:latest
+[running] 2. Build ckg / ckv / cks - go build ckg
+[   done] 2. Build ckg / ckv / cks (1s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin
+[running] 3. Write the project setup config
+[   done] 3. Write the project setup config (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-setup.yaml
+[running] 4. Build the knowledge dataset - version v20261012-015018-0bf2f4d1
+[running] 4. Build the knowledge dataset / Graph index (ckg) - Build the graph index
+[   done] 4. Build the knowledge dataset / Graph index (ckg) (12m13s) - ckg: built 244822 nodes / 1963773 edges into /Users/kevin/work/github/0xmhha/auto-coding/…
+[   done] 4. Build the knowledge dataset / Embedding service check (0s) - Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+[running] 4. Build the knowledge dataset / Vector index (ckv) - Build the vector index aligned to the graph
+[   done] 4. Build the knowledge dataset / Vector index (ckv) (24m34s) - ckv: indexed_head=0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8 built_at=2026-10-11T17:28:40Z …
+[   done] 4. Build the knowledge dataset / Graph/vector alignment (0s) - Verify graph/vector alignment
+[running] 4. Build the knowledge dataset / Promotion gate - ── schema ── errors=0 warnings=0 info=0
+[warning] 4. Build the knowledge dataset / Promotion gate (1s) - canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+[warning] 4. Build the knowledge dataset (39m22s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-015018-0bf2f4d1
+[   done] 4. Build the knowledge dataset / Promote to current (0s) - promoted v20261012-015018-0bf2f4d1 → current
+[   done] 5. Write the MCP server config (0s) - go-stablenet-cks.yaml, go-stablenet-cks-stdio.yaml
+[running] 6. Start the server and check health
+[   done] 6. Start the server and check health (4s) - 24 MCP tools, status ok
+[   done] 6. Start the server and check health / graph (0s) - schema 1.24, head 0bf2f4d1bfeb
+[   done] 6. Start the server and check health / vector (0s) - reachable
+Dataset ready.
+  Dataset:        /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/current  (version v20261012-015018-0bf2f4d1)
+  Server config:  /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml  (HTTP, 127.0.0.1:8941)
+  Stdio config:   /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks-stdio.yaml
+  Serve:          /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml
+  Client entry:   /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp client-config --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml
+  Rebuild:        rerun this tool; a new version is promoted only after its gates pass
+  Roll back:      /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks setup --out /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet --src /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet --rollback <version>
+  Running servers keep the dataset they opened; restart them after a rebuild.
+real 2370.48
+user 1366.23
+sys 499.83
+exit=0
