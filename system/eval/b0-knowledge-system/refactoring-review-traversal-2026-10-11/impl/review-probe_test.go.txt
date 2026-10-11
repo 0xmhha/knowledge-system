@@ -1,0 +1,88 @@
+package ckgclient
+
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"runtime"
+	"sort"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestZZReviewProbe(t *testing.T) {
+	r, err := NewReal(os.Getenv("ZZ_GRAPH"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	raw, _ := os.ReadFile(os.Getenv("ZZ_SEEDS"))
+	alloc := func() uint64 { var m runtime.MemStats; runtime.ReadMemStats(&m); return m.TotalAlloc }
+	type row struct {
+		Q                                  string
+		RevMS, SubMS                       float64
+		RevKB, SubKB, RevBytes, SubBytes   int
+		Callers, Paths, Commits, TestCalls int
+		Err                                string
+	}
+	var rows []row
+	ctx := context.Background()
+	_, _ = r.commit()
+	for _, q := range strings.Fields(string(raw)) {
+		var x row
+		x.Q = q
+		a0, t0 := alloc(), time.Now()
+		rv, err := r.ReviewFunction(ctx, q, ReviewOpts{})
+		x.RevMS, x.RevKB = float64(time.Since(t0).Microseconds())/1000, int((alloc()-a0)>>10)
+		if err != nil {
+			x.Err = err.Error()
+		}
+		b, _ := json.Marshal(rv)
+		x.RevBytes, x.Callers, x.Paths, x.Commits, x.TestCalls = len(b), len(rv.Callers), len(rv.CallerPaths), rv.CommitsTotal, rv.TestCallersTotal
+		a0, t0 = alloc(), time.Now()
+		c, n, _ := r.GetSubgraph(ctx, q, SubgraphOpts{Depth: 2, MaxTotal: 80})
+		x.SubMS, x.SubKB = float64(time.Since(t0).Microseconds())/1000, int((alloc()-a0)>>10)
+		b, _ = json.Marshal(map[string]any{"c": c, "n": n})
+		x.SubBytes = len(b)
+		rows = append(rows, x)
+	}
+	pct := func(f func(row) float64, p float64) float64 {
+		v := make([]float64, 0, len(rows))
+		for _, x := range rows {
+			v = append(v, f(x))
+		}
+		sort.Float64s(v)
+		return v[int(p*float64(len(v)-1))]
+	}
+	errs := 0
+	for _, x := range rows {
+		if x.Err != "" {
+			errs++
+		}
+	}
+	sum := map[string]any{
+		"seeds": len(rows), "review_errors": errs,
+		"review_ms_p50": pct(func(x row) float64 { return x.RevMS }, .5), "review_ms_p95": pct(func(x row) float64 { return x.RevMS }, .95), "review_ms_max": pct(func(x row) float64 { return x.RevMS }, 1),
+		"subgraph_ms_p50": pct(func(x row) float64 { return x.SubMS }, .5), "subgraph_ms_p95": pct(func(x row) float64 { return x.SubMS }, .95), "subgraph_ms_max": pct(func(x row) float64 { return x.SubMS }, 1),
+		"review_alloc_kb_p95": pct(func(x row) float64 { return float64(x.RevKB) }, .95), "subgraph_alloc_kb_p95": pct(func(x row) float64 { return float64(x.SubKB) }, .95),
+		"review_bytes_p50": pct(func(x row) float64 { return float64(x.RevBytes) }, .5), "review_bytes_max": pct(func(x row) float64 { return float64(x.RevBytes) }, 1),
+		"subgraph_bytes_p50": pct(func(x row) float64 { return float64(x.SubBytes) }, .5),
+		"seeds_with_callers": count(rows, func(x row) bool { return x.Callers > 0 }), "seeds_with_commits": count(rows, func(x row) bool { return x.Commits > 0 }),
+		"seeds_with_test_callers": count(rows, func(x row) bool { return x.TestCalls > 0 }),
+	}
+	b, _ := json.MarshalIndent(map[string]any{"summary": sum, "rows": rows}, "", " ")
+	_ = os.WriteFile(os.Getenv("ZZ_OUT"), b, 0o644)
+	s, _ := json.MarshalIndent(sum, "", " ")
+	t.Logf("%s", s)
+}
+
+func count[T any](xs []T, f func(T) bool) int {
+	n := 0
+	for _, x := range xs {
+		if f(x) {
+			n++
+		}
+	}
+	return n
+}

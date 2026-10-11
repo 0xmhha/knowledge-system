@@ -1,0 +1,58 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-11",
+ "design": "user-chosen alternative 1: partition at index time. Schema 1.24 adds nodes.is_test, code_edges (code-relation edges with both endpoints production) and node_commits (node -> commit via modifies/has_hunk), recomputed after every cold and incremental build; seed lookups gained idx_nodes_canonical_id. New MCP tool cks.context.review_function returns code, history and tests views; get_subgraph is unchanged (assumption stated to the user: new tool rather than changing get_subgraph).",
+ "commits": {
+  "a8080923": "review index schema and build step",
+  "3992628c": "Store Review reader",
+  "30e11371": "ckgclient ReviewFunction and MCP tool",
+  "db6ccf8e": "canonical_id index, indexed suffix lookup, contains plan",
+  "08a8dbc4": "bounded caller walk and walk plan"
+ },
+ "test_classification": "testpath rule plus internal or test-named packages of the module that only test code imports, iterated to a fixed point; go-stablenet internal/testlog now drops out of interface implementer lists",
+ "graphs": {
+  "repository": "git clone of feat/refactoring-followup at 06507979, cmd/internal/pkg: 107,318 nodes, 383,612 edges, code_edges 16,526, test nodes 47,052, node_commits 5,463, +2.8 MB",
+  "go-stablenet": "git clone of the operating source at 740526d0 (user repository read only): 222,388 nodes, 1,927,133 edges, code_edges 56,498, test nodes 90,622, node_commits 9,735; build 465 s at load about 35"
+ },
+ "measurements": {
+  "repository_200_random_functions": {
+   "review_ms_p50": 2.0,
+   "review_ms_p95": 14.3,
+   "get_subgraph_ms_p50": 4.7,
+   "get_subgraph_ms_p95": 20.2,
+   "review_alloc_kb_p95": 166,
+   "get_subgraph_alloc_kb_p95": 7245,
+   "review_bytes_p50": 1961,
+   "get_subgraph_bytes_p50": 10159
+  },
+  "go_stablenet_203_random_functions": {
+   "review_ms_p50": 3.7,
+   "review_ms_p95": 15.7,
+   "review_ms_max": 91.5,
+   "get_subgraph_ms_p50": 10.1,
+   "get_subgraph_ms_p95": 41.2,
+   "review_alloc_kb_p95": 181,
+   "get_subgraph_alloc_kb_p95": 14102,
+   "review_bytes_p50": 2114,
+   "get_subgraph_bytes_p50": 7361,
+   "load": "about 34-36"
+  }
+ },
+ "defects_found_and_fixed_on_the_way": [
+  "canonical_id had no index: every MCP seed resolution scanned nodes twice (18 ms each on the repository graph)",
+  "SQLite 3.53 (modernc) planned the FindSymbol suffix OR predicate as a full scan (30 ms); now a UNION of two indexed lookups. Seed resolution for every MCP tool: 64 ms -> 0.1 ms",
+  "review statement lookup chose idx_edges_type (67 ms); fixed with +e.type",
+  "caller walk chose idx_nodes_type for long IN lists (about 240 ms per review on go-stablenet); fixed with +n.type, plus a 2,000-caller budget reported as caller_walk_truncated"
+ ],
+ "regression": {
+  "revision": "08a8dbc4",
+  "command": "go test -race -count=1 -timeout 40m ./...",
+  "result": "3291 passed, 16 skipped, 0 failed; vet pass; gofmt 0; python 164 passed",
+  "timeout_note": "pkg/graph/mcphandlers took 667 s and internal/graph/buildpipe 432 s at load about 35; an earlier run with the default 10-minute timeout (db6ccf8e) failed mcphandlers on the timeout. A same-condition comparison measured the package at ('pass', 577.202) before the review index and ('pass', 484.835) after, so the review index did not slow it; the package is close to the default timeout under load"
+ },
+ "limits": [
+  "operating datasets built before schema 1.24 answer review_function with requires_reindex until rebuilt",
+  "function values, callbacks, reflection and generated code have no edges",
+  "history covers the commits the temporal pass walks per file"
+ ]
+}
