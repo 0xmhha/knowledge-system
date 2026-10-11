@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -67,7 +69,7 @@ Run as HTTP server (multi-client):
 
 	f := cmd.Flags()
 	f.StringVar(&opts.out, "out", "./ckv-data", "data directory")
-	f.StringVar(&opts.httpAddr, "http", "", "HTTP listen address (e.g. :8080); empty uses stdio")
+	f.StringVar(&opts.httpAddr, "http", "", "HTTP listen address on loopback (e.g. :8080 = 127.0.0.1:8080); empty uses stdio")
 	f.StringVar(&opts.namespace, "namespace", "", "tool-namespace root override (default: env/build-time, else \"cks\")")
 
 	return cmd
@@ -99,8 +101,12 @@ func runMCP(opts *mcpOpts) error {
 	srv := ckvmcp.NewServer(eng, ckvmcp.WithFootprint(fp))
 
 	if opts.httpAddr != "" {
-		fmt.Fprintf(os.Stderr, "ckv mcp: HTTP listening on %s\n", opts.httpAddr)
-		if err := srv.ServeHTTP(opts.httpAddr); err != nil {
+		addr, err := loopbackListenAddr(opts.httpAddr)
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "ckv mcp: HTTP listening on %s\n", addr)
+		if err := srv.ServeHTTP(addr); err != nil {
 			return fmt.Errorf("mcp serve http: %w", err)
 		}
 		return nil
@@ -111,4 +117,24 @@ func runMCP(opts *mcpOpts) error {
 		return fmt.Errorf("mcp serve stdio: %w", err)
 	}
 	return nil
+}
+
+// loopbackListenAddr binds the unauthenticated HTTP transport to loopback:
+// an empty host becomes 127.0.0.1 and any other non-loopback host is
+// refused.
+func loopbackListenAddr(addr string) (string, error) {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return "", fmt.Errorf("ckv mcp: --http %q: %w", addr, err)
+	}
+	if host == "" {
+		return net.JoinHostPort("127.0.0.1", port), nil
+	}
+	if strings.EqualFold(host, "localhost") {
+		return addr, nil
+	}
+	if ip := net.ParseIP(host); ip != nil && ip.IsLoopback() {
+		return addr, nil
+	}
+	return "", fmt.Errorf("ckv mcp: --http %q: the HTTP transport has no authentication and binds loopback only", addr)
 }

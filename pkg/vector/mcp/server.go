@@ -24,6 +24,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net"
+	"net/http"
+	"path/filepath"
 	"time"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
@@ -127,8 +130,26 @@ func (s *Server) ServeStdio() error {
 // 1:1, HTTP supports concurrent sessions over the streamable
 // protocol (POST for requests, GET for SSE notifications).
 func (s *Server) ServeHTTP(addr string) error {
-	httpSrv := server.NewStreamableHTTPServer(s.mcp)
-	return httpSrv.Start(addr)
+	srv := &http.Server{Addr: addr, Handler: s.httpHandler(), ReadHeaderTimeout: 5 * time.Second}
+	return srv.ListenAndServe()
+}
+
+// httpHandler is the streamable HTTP transport limited to loopback clients.
+// The transport has no authentication and exposes ops.index, so a client
+// from another host must never reach it, whatever address was bound.
+func (s *Server) httpHandler() http.Handler {
+	mcpHandler := server.NewStreamableHTTPServer(s.mcp)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			host = r.RemoteAddr
+		}
+		if ip := net.ParseIP(host); ip == nil || !ip.IsLoopback() {
+			http.Error(w, "forbidden: loopback clients only", http.StatusForbidden)
+			return
+		}
+		mcpHandler.ServeHTTP(w, r)
+	})
 }
 
 // Underlying returns the *server.MCPServer for cross-package multiplex.
@@ -676,6 +697,11 @@ func (s *Server) handleIndex(ctx context.Context, req mcpgo.CallToolRequest) (*m
 	if outDir == "" {
 		return mcpgo.NewToolResultError("engine has no out directory configured"), nil
 	}
+	// Only the served source tree may be indexed: another directory would
+	// replace the served index and expose its files through search.
+	if !sameDir(projectRoot, s.engine.Manifest().SrcRoot) {
+		return mcpgo.NewToolResultError("project_root must be the indexed source root"), nil
+	}
 
 	start := time.Now()
 	payload := map[string]any{"mode": mode, "project_root": projectRoot}
@@ -717,6 +743,21 @@ func (s *Server) handleIndex(ctx context.Context, req mcpgo.CallToolRequest) (*m
 
 	payload["duration_ms"] = time.Since(start).Milliseconds()
 	return jsonResult(payload)
+}
+
+// sameDir reports whether a and b resolve to the same directory.
+func sameDir(a, b string) bool {
+	if a == "" || b == "" {
+		return false
+	}
+	ra, errA := filepath.EvalSymlinks(a)
+	rb, errB := filepath.EvalSymlinks(b)
+	if errA != nil || errB != nil {
+		return false
+	}
+	ra, errA = filepath.Abs(ra)
+	rb, errB = filepath.Abs(rb)
+	return errA == nil && errB == nil && ra == rb
 }
 
 func (s *Server) handleKeywordSearch(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
