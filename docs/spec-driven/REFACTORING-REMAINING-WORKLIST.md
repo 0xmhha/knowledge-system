@@ -1,6 +1,10 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
-2026-10-11 최신(Claude Code): **N18 완료(사용자 승인)**. [판정](./N18-RELEASE-VERDICT-DRAFT.md) — 선택 기능 기본값 유지, 로컬 개인 운영 허용, merge·공개 배포 보류. N16은 공개키 fingerprint 조건을 사용자 결정으로 미충족 유지. **현재 17/18 완료, 남은 1개:** N16 신뢰·권한.
+**2026-10-12 현재: 17/18 완료, N16 보류(미충족).** [N18 판정](./N18-RELEASE-VERDICT-DRAFT.md)에 따라 선택 기능 기본값과 로컬 개인 운영 범위를 유지한다. PR #98은 `067ed5f3`으로 `main`에 머지됐다. 태그·공개 배포는 보류한다. N12는 사용자 일괄 채택과 AI 검토 라벨로 완료 처리했으며, 독립적인 사람의 항목별 내용 검토는 없었다.
+
+## 날짜별 진행 기록
+
+아래의 “최신”, 완료 수와 다음 작업은 각 기록 시점의 상태다. 현재 상태는 위 요약과 [진행 원장](./REFACTORING-PROGRESS.json)을 따른다.
 
 2026-10-11 최신(Claude Code): **N08·N09 종료(사용자 결정)**. N08: FINAL2 개선 근거 없음 → 사용 타입 선언 삽입을 opt-in(`retrieval.type_neighbors`, 기본 off)으로 전환(`16332767`), 기본 인용은 이전 binary와 7/7 동일. N09: guard 기계 동작 확인, 무답2단위 inconclusive로 종료. **현재 16/18 완료, 남은 2개:** N16 신뢰·권한(서명 키), N18 기본값·출시 판정.
 
@@ -78,6 +82,8 @@
 
 2026-10-07 최신: [PR97/native Linux CI](./N15-NATIVE-LINUX-CI-VALIDATION.md). 사용자 “푸시하고 Pr생성해”로 d08cb384의80커밋 공개 전송·draft PR97 생성 완료. graph/vuln Go 요구 불일치를 공개 source만 수정한 d7de0b89로 보완했고 재실행 CI5/5 success. 실제 Linux AMD64의 설치/재시작/갱신/복구, public consumer7응답/4거부, 복구10응답/13payload SHA와 artifact178파일 SHA를 확인하여 **N15-C 완료**. N15-D/E와 N17-C/D/E 운영 수용은 미완료. 추가 로컬 BGE/출처 receipt 및 본 native 기록은 미전송. **전체8/18·요청5/15·잔여10개 N08/09/10/11/12/14/15/16/17/18. 다음 N11/N12 실제 판정과 독립 입력/런타임 결합.** 아래는 이전 시점 이력이다.
 
+## 2026-10-06 작성 당시 계획
+
 2026-10-06 · 기준 코드 `04d3bfdf` · [원래 목적/코드 대조](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md). 이전 [시험 preview30항목](./EXECUTION-WORKLIST.md)은 사용자 선택 범위에서 종료됐다. 이 문서는 원래 목적과 코드 사이의 잔여를 관리하는 **새 후속 목록**이다. 이전 HC·입력 승인은 다시 요구하지 않는다.
 
 후속 목록 **18개 중 N-01–07 및 N-13 완료, 잔여10개(N-08–12, N-14–18)**. 제품 구현을 새로 완료한 항목은 N-02–07/N-13 7개다. N-15–18의 실제 운영 범위는 이전에 제외됐으며 목록 작성만으로 수행·배포가 승인된 것은 아니다. `study/main` 동기화로 초기 원문3개와 아키텍처/분석을 확보하고 [전체 초기 ID·v2 대응](./REFACTORING-ORIGIN-AND-V2-TRACE.md)을 확인했다. 이 목록의 크기를 원래 전체 목표의 완료율로 환산하지 않는다.
@@ -93,9 +99,9 @@
 - **내용/환경/운영 대기**: 도구가 있다고 실제 사람 판정·native 실행·운영 사실을 채우지 않는다.
 - 완료는 해당 행의 수용 조건·코드/입력/실행/원자료·제한을 연결했을 때 기록한다. 새 수치 목표/프로토콜은 실험 결과를 보기 전에 고정한다. 기존 안전/좌표/비밀 혼입0·기권 오인용 증가0·Recall/MRR 변화−0.02/중요군−0.05·p95비1.25·소표본 규칙은 임의 변경하지 않는다.
 
-## 남은 전체 목록
+## 전체 작업 목록과 현재 상태
 
-| ID | 우선순위·선행 | 상태·현재 근거 | 해야 할 작업 | 완료 조건 |
+| ID | 우선순위·선행 | 상태·현재 근거 | 당초 목표 | 판정 기준·제한 |
 |---|---|---|---|---|
 | N-01 | 완료 · 2026-10-06 | study/main `1c350c1` 원문3개·초기architecture/analysis 확보 | 초기 작성/보관 시점·SHA와 시작 배경 기록. FR10/INV7/NFR5/S9·WBS29를 v2/현행 감사와 대조 | [복구·대응 원장](../../system/eval/b0-knowledge-system/original-source-recovery-2026-10-06/recovered-source-and-trace.json). 기존 탐색 증거 보존. PDF 원본 재검증·상위WI 외부 구현 감사는 별도 |
 | N-02 | **완료 · 2026-10-06** | [실행 명세·검증](./REFACTORING-EXECUTION-SPEC.md), 공개 MCP RED→GREEN/CLI 7사례 | pinned v2에서 활성 DB를 직접 수정하지 않게 거부/후보 빌드 경로로 통일. legacy 유지보수 동작과 migration 경계 명시 | 한 엔진 실패/혼입/취소에도 이전current·신원·원문 보존; 실제 공개 MCP와 versioned setup 경로의 동일 후보/승격 증거. [새 DEV 원자료](../../system/eval/b0-knowledge-system/refactoring-n02-2026-10-06/cli-results.json); 동시 writer/내구성은 N-03/04에 유지 |
@@ -108,13 +114,13 @@
 | N-09 | **완료**(기계 동작 확인·inconclusive) · 2026-10-11 | [FINAL2](./FINAL2-RESULT.md): 무답 on arm 240/240 `declared_unknown`·근거 외 인용0, 대조·DEV 잘못된 기권0/600. 무답2단위 inconclusive, 답변 수준 기권 null. 사용자 결정으로 종료, 기본 활성·출시 근거 아님 | 무답의 검색 근거 상태와 downstream 답변 보류 계약을 명확히 하고 부적합 인용/무근거 운영 추정을 차단 | 승인된 무답/답가능 대조 사례에서 guard 검증; 사람 기권/기계 무인용 각각 집계; 생성 답변 평가가 없으면null |
 | N-10 | **완료** · 2026-10-11 | [FINAL2](./FINAL2-RESULT.md): 후보 FINAL warm p95비 1.039–1.109(참조 1.334–1.873), 오류0. 검색 차이는 모두 N08 삽입이며 N10 자체 회귀 없음. A·B·D는 [N11 FINAL](./N11-FINAL-RESULT.md) | model/backend/원문 검증/의미 투영 비용 분해, 비반환 neighbors 오류 원인·영향 확인, 범위 내 비용/오류 개선 | 같은pack·같은ontology·static/dynamic/pooled·warm/cold·성공/오류 분모 유지; 실제K/MID/호출/크기와 회귀1.25 검증; 운영 부하는별도 |
 | N-11 | **완료 · 2026-10-10(inconclusive/disabled)** | [DEV3·FINAL 결과](./N11-FINAL-RESULT.md): 동결 입력·DEV3 1,680행·FINAL 2,400행 오류0, 모든 중요군 단위10 미만 | 새 DEV 버전/질문과 결과 사전 비공개 독립 FINAL, 중요군 표본·평가 단위·정답·임계치·회전/비용 조건을 사전 검토·동결 | 충분한 독립 중요군으로 판정하거나 여전히inconclusive/disabled 명시. 반복/언어/상태/HC 문장 표본 부풀림0·이전FINAL 튜닝/holdout 재사용0 |
-| N-12 | **완료 · 2026-10-09** | 사람 판정 대기: [실제 검토 자료](./N12-ACTUAL-PILOT-REVIEW.md);27원문span/6테스트 및 [정책·ADR 보완](./N12-POLICY-ADR-REVIEW.md)의6주장/12관계·4거부 제어 확인, proposed 유지 | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 실제 사람 승인/수정/기권·근거 원문SHA/권위/범위/시점과 새lock/snapshot 결합; HC/SF 승인 재사용으로 운영 사실 승인하지 않음 |
+| N-12 | **완료 · 2026-10-09** | [결합·활성화 기록](./N12-REVIEWED-ACTIVATION.md): AI 사전검토 65건을 사용자가 일괄 채택하고 AI 검토 라벨을 지정했다. 독립적인 사람의 항목별 내용 검토는 없었고, 사람 활동 시간도 미측정이다 | 실제 파일럿 concept/term/claim/정책/ADR/요구·기준과 코드 앵커를 검토. 대표 추출 오차/관계 오용/검토 시간·비용 기록 | 사용자 일괄 채택과 지정 라벨로 완료 처리한 범위를 명시한다. 원문SHA/권위/범위/시점 및 새 lock/snapshot 결합 근거를 보존한다. 독립 사람 검토 완료로 확대 해석하지 않는다 |
 | N-13 | 완료 · 2026-10-06 | [N13 DEV manifest](../../system/eval/b0-knowledge-system/refactoring-n13-2026-10-06/manifest.json) · CLI11회/기존 파일80개 변경0/관련5패키지 race | 조직 catalog를 명시 선택형 pack 자료로 분리; 생성기의 허위 앵커 검사 완료 문구와 구 CLI 명령 교정 | 무팩/구팩·8매핑/필터/앵커/빈queue; pin/의존/type/출처/경로 검증; 기존 출력 보호·상태 자동 승격0 검증 |
 | N-14 | **완료 · 2026-10-10** | [수용 기록](./N14-CHANGE-ACCEPTANCE.md): 실제 변경 7c57a388 hold 후보·patch·linked run9/10·기준4 사용자 승인·승격·rollback·보관본 재생 | 실제 파일럿 ADR→requirement→criterion→code→test 연결, 변경patch→실제run→사람 수용→새색인/승격·거부/rollback 사례 검증 | 테스트pass/linked/verified/accepted 각각 기록, 무관test·정책/구현불일치·stale로 허위승격0; 실제 검토 계획/수용 원장 |
 | N-15 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): go-stablenet 실제 색인·MCP 소비자·submodule 수정·지원/비용/제한 사용자 수용 | 대상 지원을 확정하고 native LinuxAMD64·실운영 규모/모델·외부 CLI/MCP/daemon 및 실제 프로젝트 설치/upgrade 검증 | OS/CPU/binary/source/모델 pin과 native/에뮬 구분; 실제지원/preview/미지원 명시. coding-agent 총비용은 외부별도측정 |
-| N-16 | P2 · 사용자 결정으로 미충족 유지(2026-10-11) | 권한자=사용자·신뢰=commit/binary SHA·재배포 없음 기록; 공개키 fingerprint 조건 미충족 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 실제 권한자/공개키fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확고지범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
+| N-16 | **보류(미충족)** · 사용자 결정 2026-10-12 | 권한자=사용자·신뢰=commit/binary SHA·재배포 없음 기록; 공개키 fingerprint 조건 미충족. 보류 중에는 완료나 공개 배포 가능으로 표시하지 않음 | OP01–06 역할/권한·scope/schema·public key/독립 신뢰·보관/교체/폐기·native/전이 고지 적합성 검토 | 재개 시 실제 권한자/공개키 fingerprint/신뢰경로·결정시각/근거, 운영계약 회귀, 정확한 고지 범위·담당 적합성 판정; 개인키 본문은 저장하지 않음 |
 | N-17 | **완료 · 2026-10-10(로컬 개인 운영)** | [수용 기록](./N15-N17-LOCAL-OPERATION-ACCEPTANCE.md): 백업·손실 모의·복구 첫 질의35초·RTO1h/RPO24h 사용자 수용 | 실제 backup/failover/복구 담당·RTO/RPO/재시작/키 복구를 정하고 실훈련. network agent/전원 정책의호스트상태 확인; AC-only 정책 범위 검토 | 최신 운영후보/데이터로 복원·이전current/인용/키 신뢰 재생; 실제 실행·한계/담당 기록. 원격운영 상태를 로컬code만으로 완료하지 않음 |
-| N-18 | **완료** · 2026-10-11(사용자 승인) | [판정](./N18-RELEASE-VERDICT-DRAFT.md): 선택 기능 기본값 유지(ontology off·knowledge opt-in·타입 선언 off), 로컬 개인 운영 허용, merge·공개 배포 보류. 회귀 3,252개 통과·1개 간헐 실패 기록 | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면disabled/보류 유지. 실제 merge/push/배포는 구체 산출물과 별도권한으로 실행; preview종료 승인을 운영권한으로 확장하지 않음 |
+| N-18 | **완료** · 2026-10-11(사용자 승인) | [판정](./N18-RELEASE-VERDICT-DRAFT.md): 선택 기능 기본값 유지(ontology off·knowledge opt-in·타입 선언 off), 로컬 개인 운영 허용. 2026-10-12 별도 지시로 PR #98 `main` 머지 완료; 태그·공개 배포 보류. 간헐 실패는 `396242f0`에서 수정 | 새 독립평가·원래회귀·사람비용/내용·대상지원·운영결정으로 기본값/출시 판정. 릴리스 문서/리뷰/merge/publish 준비 | 합격 근거 없으면 disabled/보류 유지. 태그·공개 배포는 별도 결정이 필요하며, preview 종료 승인을 운영권한으로 확장하지 않음 |
 
 ## 실행 순서와 우선순위의 이유
 
@@ -130,7 +136,7 @@
 
 GraphRAG 커뮤니티, RDF/OWL/SHACL, 물리 컬렉션 분할, 긴 함수 overlap 조정은 [PDF 추적표](./PDF-IMPROVEMENT-TRACE.md)의 조건부 연구 항목이다. 필요성/수용 조건 없이 필수 미완료로 추가하지 않았다. 이전 May CKV 계획이나 다른 저장소의 전체 coding-agent/ChainBench 작업도 이번 목록에 자동 편입하지 않았다.
 
-**현재 단계:** N-01–07 및 N-13 완료(8/18), 요청15개 중5개 완료. **다음 작업:** N-11 새 사전평가 입력·프로토콜과 N-12 실제 내용 검토 판정. **남은 전체:** N-08/09/10/11/12/14/15/16/17/18, 10개. 각 실제 수용 조건이 충족되기 전에는 완료 처리하지 않는다.
+**2026-10-06 작성 당시 단계:** N-01–07 및 N-13 완료(8/18), 요청15개 중5개 완료. **당시 다음 작업:** N-11 새 사전평가 입력·프로토콜과 N-12 실제 내용 검토 판정. **당시 남은 전체:** N-08/09/10/11/12/14/15/16/17/18, 10개. 현재 상태는 문서 맨 위의 2026-10-12 요약을 따른다.
 
 **상위 목표의 추가 추적 전체:** WI-V1 오라클 타당성, WI-V2 수정안 선택, WI-3 의심 라벨링, WI-4 비결정 버그, WI-1 값 흐름, WI-2 규칙 태깅, WI-C 깊은 코드 리뷰, WI-6 값 흐름 기반 다단 확장, WI-SP 정책/보안패턴 노출, WI-5 별도 사람 검토 학습. 각 상태/보류/담당·제품 N 연결은 [복구한 상위10개 표](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md#3-복구한-상위-작업계획의-전체10개-항목)를 기준으로 한다. 다음 상위 감사는 담당 저장소와 현재 WI-V1/V2/3 증거 확인이다.
 
