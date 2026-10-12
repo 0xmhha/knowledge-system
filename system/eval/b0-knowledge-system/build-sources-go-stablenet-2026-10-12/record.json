@@ -1,0 +1,18 @@
+{
+ "schema_version": 1,
+ "date": "2026-10-12",
+ "user_request": "fix the internal/build vector scope gap found by the program-version comparison, using the recommended approach (ks-setup detects and lists the Go sources)",
+ "defect": "the vector indexer's default build/ ignore matches nested build directories, so go-stablenet internal/build (7 Go files) had graph nodes but no vector chunks; the alignment gate did not report it (see version-comparison-go-stablenet-2026-10-12)",
+ "change": "aa50ba5f: tools/setup lists the Go files go list loads under build/ directories, writes <out>-derived/vector-build-sources.json and passes --vector-build-sources; a pack list takes precedence; --no-build-sources turns it off; after the build it warns on any graph Go file missing from the vector index",
+ "tests": "make setup-tool-test: 24 tests OK including the mock end-to-end build, which asserts build_sources [internal/build/util.go] and an empty Go scope gap -> setup-tool-test.txt; check-docs OK -> check-docs.txt",
+ "real_build": {
+  "command": "tools/setup/ks-setup --src chain/go-stablenet --out knowledge-data/go-stablenet --name go-stablenet --port 8941 --pack projects/stablenet --skip-pack-input filelist --min-canonical 0.9 --compare knowledge-data/go-stablenet/v20261012-030550-0bf2f4d1 --plain -y",
+  "version": "v20261012-231308-0bf2f4d1, promoted to current (previous v20261012-030550-0bf2f4d1 kept for rollback)",
+  "result": "7 build sources listed; gate PARITY; Go scope check: every graph Go file is in the vector index; health ok, 24 tools, review_function and get_for_task_v2 answered",
+  "versus_previous": "graph identical (nodes, edges, policies, commits); vector chunks 21236 -> 21304 (+68 = 7 file_header, 60 symbol, 1 convention, all under internal/build); canonical_id chunks 20042 -> 20109; categorized unchanged at 19245"
+ },
+ "not_done": [
+  "the engine's own alignment gate still does not compare graph and vector Go file sets; the check lives in ks-setup only",
+  "four go-stablenet versions are retained (4.4 GiB); cleanup is a reviewed cks gc step left to the user"
+ ]
+}
