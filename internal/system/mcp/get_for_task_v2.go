@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"os"
@@ -12,6 +13,7 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
+	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/evidencev2"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -23,6 +25,7 @@ func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithDescription("Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity."),
 		mcpgo.WithString("prompt", mcpgo.Required(), mcpgo.Description("Natural-language development task.")),
 		mcpgo.WithString("intent", mcpgo.Description("Optional task intent override.")),
+		mcpgo.WithBoolean("explain_ontology", mcpgo.DefaultBool(false), mcpgo.Description("Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.")),
 		mcpgo.WithBoolean("include_knowledge", mcpgo.DefaultBool(false), mcpgo.Description("Add reviewed local policy context from this retained dataset.")),
 		mcpgo.WithString("knowledge_as_of", mcpgo.Description("Policy date (YYYY-MM-DD) when include_knowledge is true.")),
 		mcpgo.WithString("knowledge_subsystem", mcpgo.Description("Explicit subsystem scope when include_knowledge is true.")))
@@ -62,6 +65,9 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if ok, _ := serviceable(ctx, d); !ok {
 		return v2ToolError("service_unavailable"), nil
 	}
+	if req.GetBool("explain_ontology", false) {
+		ctx = stage2.WithOntologyExplanation(ctx)
+	}
 	legacy, err := d.Composer.ComposeWithIntent(ctx, prompt, callerIntent)
 	if err != nil {
 		return v2ToolErrorFor(err, "compose_failed"), nil
@@ -95,6 +101,33 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 		}
 	}
 	pack.Metadata.Ontology = legacy.Metadata.Ontology
+	if req.GetBool("explain_ontology", false) {
+		if pack.Metadata.Ontology == nil {
+			pack.Metadata.Ontology = &contract.OntologyDiagnostic{Mode: "off", State: "off", BaselineCitations: len(refs), Explanation: &contract.OntologyExplanation{State: "off"}}
+		}
+		e := pack.Metadata.Ontology.Explanation
+		if e != nil {
+			selected := map[string]bool{}
+			for _, body := range legacy.Bodies {
+				sum := sha256.Sum256([]byte(body.Citation.Key()))
+				selected[fmt.Sprintf("%x", sum)] = true
+			}
+			for i := range e.Changes {
+				e.Changes[i].SelectedByComposer = selected[e.Changes[i].CitationKeySHA256]
+			}
+			e.FinalBodyBudgetPartial = pack.Metadata.EvidenceBudget != nil
+			if len(e.Matches) > 0 || len(e.Changes) > 0 {
+				reason := "no_citable_evidence"
+				if len(pack.Citations) > 0 {
+					c := pack.Citations[0]
+					reason = safeSemanticValue(ctx, d, e, contract.Citation{File: c.File, StartLine: c.StartLine, EndLine: c.EndLine, CommitHash: c.CommitHash})
+				}
+				if reason != "ready" {
+					pack.Metadata.Ontology.Explanation = &contract.OntologyExplanation{State: reason}
+				}
+			}
+		}
+	}
 	// Knowledge/traces verify their input before extending it. Stamp the
 	// optional diagnostic at this boundary, not only after those layers.
 	if pack.Metadata.Ontology != nil {

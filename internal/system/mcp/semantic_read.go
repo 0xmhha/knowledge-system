@@ -84,6 +84,13 @@ func readArgs(req mcpgo.CallToolRequest, names ...string) (int, bool) {
 // Scan raw string values, not escaped JSON, so multi-line secret rules work.
 // Curated meaning is never published without the server's sanitizer.
 func semanticReadSafe(ctx context.Context, d Deps, result any, evidence []semantic.EvidenceSpan) string {
+	if len(evidence) == 0 {
+		return "source_unavailable"
+	}
+	e := evidence[0]
+	return safeSemanticValue(ctx, d, result, contract.Citation{File: e.Path, StartLine: e.StartLine, EndLine: e.EndLine, CommitHash: e.Snapshot.Commit})
+}
+func safeSemanticValue(ctx context.Context, d Deps, result any, citation contract.Citation) string {
 	if ctx.Err() != nil {
 		return "budget_exceeded"
 	}
@@ -119,11 +126,7 @@ func semanticReadSafe(ctx context.Context, d Deps, result any, evidence []semant
 		}
 	}
 	walk(reflect.ValueOf(result))
-	if len(evidence) == 0 {
-		return "source_unavailable"
-	}
-	e := evidence[0]
-	cleaned, err := d.EvidenceSanitizer.Sanitize(ctx, []sanitize.Sanitizable{{Citation: contract.Citation{File: e.Path, StartLine: e.StartLine, EndLine: e.EndLine, CommitHash: e.Snapshot.Commit}, Body: text.String()}})
+	cleaned, err := d.EvidenceSanitizer.Sanitize(ctx, []sanitize.Sanitizable{{Citation: citation, Body: text.String()}})
 	if ctx.Err() != nil {
 		return "budget_exceeded"
 	}

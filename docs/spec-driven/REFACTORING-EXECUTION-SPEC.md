@@ -432,7 +432,7 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 
 ### O-04 설명·적용 전후 평가
 
-- [ ] O04-A query에 매칭 개념·사용한 검토 관계/원문과 후보 점수·rank/body 변화의 bounded 설명; off/no_match/active-but-zero 구분.
+- [x] O04-A query에 매칭 개념·사용한 검토 관계/원문과 후보 점수·rank/body 변화의 bounded 설명; off/no_match/active-but-zero 구분.
 - [ ] O04-B 같은 dataset/model/질문·off/on의 인용·본문·순위·상태/latency 비교 및 실패 분모/모델 호출, 기존 FINAL 새 독립 표본 재사용0.
 - [ ] O04-C controlled 기능 설명과 실제 도메인 효과 판정을 분리, 실제 도메인 자료/독립 평가 조건·부족 표본/활동시간·quality 한계 기록.
 - [ ] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
@@ -442,3 +442,5 @@ O01 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·171시험/156하�
 O02 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·175시험/169하위시험/3패키지 race pass, tools28/input/output schema·immutable/sanitizer/단계 상태 분리. 다음 O03, 전체 잔여3개(N16/O03/O04).
 
 O03-A/B 기술 검증: [기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·Go55/48 race·Python26pass1skip·actual mock CLI/MCP held preparation·old current/config SHA 보존·source/project mismatch2거부. O03-C/D의 실제 도메인/운영 결합은 대기이며 전체 O2/4·잔여 N16/O03/O04의3개다.
+
+O04-A 기술 검증: v2 요청별 explain_ontology, 최대8개 개념/20개 변화, no_effect와 fallback 구별, 제한 설명은 restricted/원본문 유지, v2 해시 검증. 관련5패키지 race227시험232하위시험/실패0·vet. compare-responses는 저장 응답의 구조만 검증하므로 O04-B/C/D 실제 조건·실행·품질 판정은 아직 미완료이며 전체 O2/4·잔여 N16/O03/O04의3개다.

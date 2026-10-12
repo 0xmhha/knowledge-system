@@ -52,3 +52,25 @@ ks-setup은 --project-id/--semantic-store/--ontology-mode/--ontology-budget-ms�
 관련 Go3패키지 race55시험/48하위시험 pass·Python26pass/optional E2E1skip. 별도 실제 통합은 실행했다. [원자료](../../system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/verification.json), [공개 설치 사용법](../../tools/setup/README.md#reviewed-meaning-and-ontology-readiness).
 
 O03-A/B 기술 조건은 충족. O03-C의 실제 도메인 채택과 O03-D의 대상 운영 결합은 **미완료**다. go-stablenet의 ontology/spec/관계·검토자와 적용할 원문/버전이 아직 정해지지 않았다. 기존 knowledge-system 파일럿 DB를 다른 corpus로 전용하지 않는다. 실제 자료가 정해지기 전에는 온톨로지 2/4 완료와 전체 잔여 N16/O03/O04의3개를 유지한다.
+
+## O04: 설명과 저장 응답 비교 — 실제 효과 평가 대기
+
+v2 get_for_task의 `explain_ontology=true`는 요청 하나에만 설명을 붙인다. mode/store 설정을 켜거나 바꾸지 않고 기본 응답에는 새 설명을 붙이지 않는다. 최대8개 매칭 개념 ID/status, 최대20개 점수·순위 변화와 전체 변화 수/잘림, 사용한 relation/text evidence ID를 보여 준다. 후보 키는 SHA256으로 표현해 인용되지 않은 path/본문을 직접 노출하지 않는다. `selected_by_composer`는 composer 본문 선택 여부이며, v2 최종 budget 추가 누락은 `final_body_budget_partial`와 실제 공개 Bodies로 확인한다.
+
+기존 ontology diagnostic의 active는 처리 경로가 실행됐다는 뜻이다. 설명의 applied는 점수 또는 순위가 바뀌었다는 뜻이고, no_effect는 active여도 변화0이라는 뜻이다. off/no_match/unavailable/stale/budget_exceeded는 구별한다. **applied가 더 정확한 답변이라는 뜻은 아니다.** `quality_evaluated=false`다. 설명의 string values도 기존 sanitizer를 통과해야 하며 restricted면 세부 ID/변화 없이 안정 state만 반환하고 이미 검증된 본문은 유지한다. 점수는 소수 문자열로 출력해 v2 정수 전용 canonical 규약을 유지하며 새 metadata도 최종 hash에 포함한다.
+
+`cks semantic compare-responses --off off.json --on on.json`은 저장된 v2 JSON(각4MiB 이하)의 hash/같은 query/coordinates를 검증한다. off와 on mode를 구별하고 인용 membership/order, 최종 body 출력 변화와 hash를 보고한다. 원문 질문/경로/본문은 비교 보고서에 넣지 않는다. 서로 다른 입력·좌표/무결성 변조/잘못된 arm/unknown state/trailing JSON/초과 입력을 거부한다. 두 응답의 구조만으로는 같은 binary/config/model/모든 요청 옵션·활동시간/실패 분모/모델 호출/정답/독립 단위를 입증할 수 없다. `quality_evaluated`, `latency_evaluated`, `control_conditions_verified`는 false이며 기존 FINAL을 새 독립 표본으로 계산하지 않았다.
+
+검증은 실제 retained source를 읽는 MCP v2 handler에 **controlled provider/검색 fixture**를 결합해 인과 동작을 고립시켰다. fake의 검토 relation/canonical은 실제 corpus 관계나 사람 승인을 뜻하지 않는다. off→on 후보2의 순위2→1과 score 증가, 선택/사용 관계 표시·hash 검증, 기본 explanation 없음, active-but-zero/no_effect, unavailable, restricted 세부 제거/원본문 유지가 통과했다. 별도 실제 v2 builder 출력의 동일 입력/order/body 변화와 changed membership/no_effect·6개 불일치 거부, Cobra CLI 및 파일 한계도 검증했다.
+
+관련5패키지 race **227시험/232하위시험, 실패0·skip0**, vet/boundary/docs/progress guard 확인. 원자료에는 baseline 설명 옵션 부재 RED, 초기 score float의 v2 canonical 충돌, 이후 회귀, 마지막 시험의 기존 restricted 코드에 대한 잘못된 기대값 수정 이력도 구별해 보존한다. [원자료](../../system/eval/b0-knowledge-system/ontology-o04-explanation-2026-10-13/verification.json).
+
+**O04-A만 충족**. B 실제 paired 실행·timing/실패 분모·모델 호출 및 같은 조건의 receipt, C 실제 도메인 채점·독립성/표본/quality 판정, D 그 실제 평가와 source 결합은 남았다. 공개 문서/저장 비교 도구가 있어도 실제 실행/품질 완료로 체크하지 않는다.
+
+### 다음 작업과 전체 잔여
+
+- N16: 사용자가 미충족 유지한 서명 키/fingerprint. 로컬 commit/binary SHA 신뢰 범위 유지; 키를 임의로 만들지 않는다.
+- O03: 사용할 실제 프로젝트의 ontology/spec/관계와 검토 기록·대상 원문/commit/version을 확정하고 held candidate로 준비·검증한다. 기존 운영 current/config는 그대로 두었다.
+- O04: O03 자료가 정해진 뒤 같은 dataset/model/binary/config/질문·요청 옵션/seed·실행 순서·warm 조건과 독립 평가 조건을 먼저 동결하고 off/on 인용·본문·상태·지연/실패 분모/모델 호출을 비교한다. 표본 부족은 inconclusive이며 효과 개선을 보장하지 않는다.
+
+현재 기존 N17/18·온톨로지2/4 완료, 전체 잔여3개다. 이 문서와 원장의 부분 체크는 기술 준비와 실제 수용을 나누며, 완료로 바꿀 때에는 해당 전체 조건과 committed/current SHA 결합이 필요하다.

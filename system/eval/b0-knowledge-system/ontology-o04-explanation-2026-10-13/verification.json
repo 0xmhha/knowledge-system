@@ -1,0 +1,65 @@
+{
+  "step": "O-04",
+  "date_KST": "2026-10-13",
+  "verified_at_UTC": "2026-10-12 23:40:31 UTC",
+  "base_revision": "11c8f39d100a09a105b6ae58fc02154a59bb31fc",
+  "scope": "bounded explanation and structural saved-response comparison; actual domain paired runtime/quality evaluation pending",
+  "go_race": {
+    "test_pass": 227,
+    "subtest_pass": 232,
+    "package_pass": 5
+  },
+  "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false go test -race -json ./internal/system/mcp ./internal/system/composer/stage2 ./pkg/system/contract ./internal/system/evidencev2 ./cmd/cks/semanticcli",
+  "vet_packages": [
+    "mcp",
+    "stage2",
+    "contract",
+    "evidencev2",
+    "semanticcli"
+  ],
+  "vet_exit": 0,
+  "boundary_exit": 0,
+  "docs_exit": 0,
+  "docs_scanned": 314,
+  "docs_binary_override": {
+    "cks": "/private/tmp/ks-o04-cks",
+    "SHA256": "b5ec6cdd0c148d7781409e41e5386c18ccc26ee182b150393b02b78c48eeac6d",
+    "ckg": "b9701c17524a3241c8a255e9ced26d05f985031d506d9710d8aa9cf5774914ee",
+    "ckv": "020e316a55162bb0d439bc4d1f5c4b71280691fc9155359f41950515ad7b5f78",
+    "reason": "existing local cks binary did not contain the new command; new owned binary used without replacing operating binaries"
+  },
+  "progress_guard_tests": 11,
+  "readiness_or_activation_changes": 0,
+  "actual_domain_quality_evaluated": false,
+  "latency_evaluated": false,
+  "control_conditions_verified": false,
+  "new_FINAL_samples": 0,
+  "full_task_complete": false,
+  "technical_checks_verified": [
+    "O04-A"
+  ],
+  "limits": [
+    "MCP mechanism fixture uses a controlled resolver/search backend and actual retained-source reader; fake relations/canonical IDs are not accepted corpus facts",
+    "saved response comparison verifies hashes and common query/coordinates, not common binary/config/model/options or runtime denominator",
+    "no actual go-stablenet ontology/spec/review/target binding or independent quality verdict"
+  ],
+  "red_history": [
+    {
+      "file": "red.jsonl.gz",
+      "meaning": "pre-change registration lacks explain_ontology input"
+    },
+    {
+      "file": "canonical-compatibility-failure.jsonl.gz",
+      "meaning": "new score floats violated v2 safe-integer canonical rule; fixed to decimal strings without relaxing integrity"
+    },
+    {
+      "file": "test-expectation-failure.jsonl.gz",
+      "meaning": "new test expected evidence_restricted instead of the existing restricted code; test-only expectation corrected"
+    }
+  ],
+  "remaining": [
+    "O04-B actual paired runtime/model/timing/failure denominator",
+    "O04-C actual domain and independent evaluation verdict",
+    "O04-D actual execution/quality/source binding"
+  ]
+}

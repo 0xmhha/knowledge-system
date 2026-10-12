@@ -3,6 +3,7 @@ package contract
 // OntologyDiagnostic describes an optional retrieval path, not a truth verdict
 // about the user's question. It is absent from default/off responses.
 type OntologyDiagnostic struct {
+	Explanation          *OntologyExplanation `json:"explanation,omitempty"`
 	Mode                 string               `json:"mode"`
 	State                string               `json:"state"`
 	Reason               string               `json:"reason,omitempty"`

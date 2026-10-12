@@ -11,7 +11,7 @@ sanitized `EvidencePack` and exposes it through MCP for upper layers
 ## Status
 
 Wired. cks composes ckv (vector/meaning) and ckg (graph/keyword) **in-process**
-and exposes a 24-tool agent-facing MCP surface (`cks.context.*` + `cks.ops.*`) over stdio
+and exposes a 28-tool agent-facing MCP surface (`cks.context.*`, `cks.ops.*`, and `cks.semantic.*`) over stdio
 or loopback HTTP. The authoritative tool list is the golden schema
 `internal/system/mcp/testdata/agent-mcp.schema.json`.
 
