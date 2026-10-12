@@ -95,7 +95,8 @@ func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
 	if err := json.Unmarshal(raw, &fixture); err != nil {
 		t.Fatal(err)
 	}
-	for _, toolName := range []string{ToolNameGetForTask, ToolNameGetForTaskV2} {
+	for _, toolName := range []string{ToolNameGetForTask, ToolNameGetForTaskV2,
+		ToolNameSemanticLookupTerm, ToolNameSemanticGetConcept, ToolNameSemanticTraceRequirement} {
 		t.Run(toolName, func(t *testing.T) {
 			registered := srv.GetTool(toolName)
 			if registered == nil {

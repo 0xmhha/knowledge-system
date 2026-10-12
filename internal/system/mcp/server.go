@@ -1,11 +1,12 @@
 // Package mcp exposes the cks composer pipeline as an MCP (Model Context
 // Protocol) server over stdio.
 //
-// Register wires the 13 agent-facing cks.* tools: the
+// Register wires the agent-facing cks.* tools: the
 // context tools (get_for_task, semantic_search, search_text, find_symbol,
 // find_callers, find_callees, get_subgraph, impact_analysis,
 // concurrency_impact, change_history) and the ops tools (health, freshness,
-// index). The exact registered set is pinned against the SSoT fixture by
+// index), plus read-only ontology status, terms, concepts and requirement traces.
+// The exact registered set is pinned against the SSoT fixture by
 // schema_golden_test.go.
 //
 // The package is intentionally thin: Register attaches handlers to an
@@ -136,6 +137,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerGetForTask(s, d)
 	registerGetForTaskV2(s, d)
 	registerSemanticStatus(s, d)
+	registerSemanticReads(s, d)
 	registerHealth(s, d)
 	registerFindSymbol(s, d)
 	registerFindCallers(s, d)

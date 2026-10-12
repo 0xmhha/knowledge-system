@@ -403,6 +403,58 @@
     "properties": {},
     "required": []
    }
+  },
+  "cks.semantic.lookup_term": {
+   "description": "Read aligned retained meaning without mutation or acceptance inference.",
+   "input": {
+    "properties": {
+     "language": {
+      "type": "string"
+     },
+     "term": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "language",
+     "term"
+    ]
+   }
+  },
+  "cks.semantic.get_concept": {
+   "description": "Read aligned retained meaning without mutation or acceptance inference.",
+   "input": {
+    "properties": {
+     "concept_id": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "concept_id"
+    ]
+   }
+  },
+  "cks.semantic.trace_requirement": {
+   "description": "Read aligned retained meaning without mutation or acceptance inference.",
+   "input": {
+    "properties": {
+     "requirement_id": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "requirement_id"
+    ]
+   }
   }
  }
 }

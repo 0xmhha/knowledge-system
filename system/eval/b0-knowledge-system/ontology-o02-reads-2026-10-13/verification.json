@@ -1,0 +1,35 @@
+{
+  "task": "O-02",
+  "date_KST": "2026-10-13",
+  "base_revision": "78ed75124a1f4cff1b43b1f8e46c503dba92bf56",
+  "new_tools": [
+    "cks.semantic.lookup_term",
+    "cks.semantic.get_concept",
+    "cks.semantic.trace_requirement"
+  ],
+  "registry_count": 28,
+  "race": {
+    "test_pass": 175,
+    "subtest_pass": 169,
+    "package_pass": 3
+  },
+  "red": "three read tools absent from MCP tools/list",
+  "fixture_authoring_error": "test-only sanitize rule was uncompiled; Validate was added before creating the engine; no product behavior change",
+  "public_read_fixture": "actual source capture, ontology/spec parsers, retained validators and SQLite, ambiguous/proposed/verified records with synthetic fixture label; no real code anchors/model vectors or human reviews",
+  "pure_selector_fixture": "model-only typed direction, rejected relation, stable cutoff, detached data; not actual source proof",
+  "protected_behavior": [
+    "immutable source/store",
+    "no activation",
+    "same pinned dataset",
+    "stable unavailable/stale/deadline states",
+    "output budget 32000 payload bytes",
+    "limit1..100",
+    "fail-closed sanitized raw strings",
+    "ambiguous total/truncated",
+    "trace is not test execution/acceptance",
+    "JSON response SHA excluding digest field"
+  ],
+  "actual_model_calls": 0,
+  "actual_human_reviews": 0,
+  "operating_data_or_configs_changed": false
+}

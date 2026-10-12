@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/0xmhha/knowledge-system/internal/setup"
+	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 	"os"
@@ -33,6 +34,9 @@ func TestSemanticStatusIsRegistered(t *testing.T) {
 // Document-only fixtures use production capture/store/retained validators.
 // They contain no code anchors, model vectors, real reviews or activation.
 func semanticReadFixture(t *testing.T, reviewed bool) Deps {
+	return semanticReadFixtureN(t, reviewed, false)
+}
+func semanticReadFixtureN(t *testing.T, reviewed, ambiguous bool) Deps {
 	t.Helper()
 	source, version := t.TempDir(), t.TempDir()
 	statusLine := "status: proposed"
@@ -52,6 +56,34 @@ concepts:
     terms: [{lang: en, value: feature, preferred: true}]
     %s
 `, statusLine))
+	if ambiguous {
+		body = append(body, []byte(`  - id: feature-alt
+    kind: entity
+    definition: Alternative fixture meaning.
+    includes: [fixture]
+    excludes: [quality]
+    terms: [{lang: en, value: feature, preferred: true}]
+    status: proposed
+`)...)
+	}
+	specBody := []byte(`version: 1
+project_id: status-fixture
+requirements:
+  - id: req-feature
+    version: 3
+    title: Read feature
+    statement: The fixture feature can be inspected.
+    concept_ids: [feature]
+    status: proposed
+    acceptance_criteria:
+      - id: ac-feature
+        given: Captured meaning
+        when: It is read
+        then: Review status is retained
+`)
+	if err := os.WriteFile(filepath.Join(source, "spec.yaml"), specBody, 0600); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(filepath.Join(source, "ontology.yaml"), body, 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -83,6 +115,12 @@ concepts:
 	if err != nil {
 		t.Fatal(err)
 	}
+	spec, _, err := semantic.ExtractSpec(snapshot, "spec.yaml", specBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.Requirements = spec.Requirements
+	p.Evidence = append(p.Evidence, spec.Evidence...)
 	storePath := filepath.Join(t.TempDir(), "meaning.sqlite")
 	store, err := semantic.OpenStore(storePath)
 	if err != nil {
@@ -94,7 +132,13 @@ concepts:
 	if err := store.Close(); err != nil {
 		t.Fatal(err)
 	}
-	d := newFixture(t, nil).deps
+	f := newFixture(t, nil)
+	d := f.deps
+	cleaner, err := sanitize.New(f.ruleset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d.EvidenceSanitizer = cleaner
 	d.EvidenceVersionDir = version
 	d.EvidenceSourceRoot = source
 	d.SemanticStorePath = storePath

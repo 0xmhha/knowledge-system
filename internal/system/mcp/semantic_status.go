@@ -20,6 +20,7 @@ type semanticStatusResponse struct {
 	State           string                     `json:"state"`
 	Mode            string                     `json:"mode"`
 	Availability    string                     `json:"availability"`
+	ReadReason      string                     `json:"read_reason,omitempty"`
 	Reason          string                     `json:"reason"`
 	StoreConfigured bool                       `json:"store_configured"`
 	ReadToolsReady  bool                       `json:"read_tools_ready"`
@@ -69,6 +70,9 @@ func loadSemanticProjection(ctx context.Context, d Deps) (semantic.ActiveProject
 	defer verification.Close()
 	identity, err := setup.InspectVersionIdentityContext(ctx, d.EvidenceVersionDir)
 	if err != nil || identity == nil {
+		if ctx.Err() != nil {
+			return empty, "budget_exceeded"
+		}
 		return empty, "stale"
 	}
 	store, err := semantic.OpenStoreReadOnly(ctx, d.SemanticStorePath)
@@ -138,7 +142,11 @@ func inspectSemanticStatus(ctx context.Context, d Deps) semanticStatusResponse {
 	}
 	snapshot, counts := active.Snapshot(), active.Counts()
 	out.Snapshot, out.Counts = &snapshot, &counts
-	out.ReadToolsReady = true
+	out.ReadToolsReady = d.EvidenceSanitizer != nil
+	out.ReadReason = "ready"
+	if !out.ReadToolsReady {
+		out.ReadReason = "sanitizer_unavailable"
+	}
 	out.Reason = "retrieval_disabled"
 	if enabled {
 		out.State = "unreviewed"

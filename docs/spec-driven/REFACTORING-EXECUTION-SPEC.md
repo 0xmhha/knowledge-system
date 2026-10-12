@@ -417,11 +417,11 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 
 읽기 도구는 O01과 같은 retained 검증 경계를 사용한다. lookup_term은 정확 언어/용어의 모든 bounded 모호 후보를 보존한다. get_concept는 정의/terms/includes/excludes/status/reviewer/evidence 및 incident typed 관계를 제공한다. trace_requirement는 정책 instance 첨부 없이 요구·기준·검토 경로·미연결/충돌을 조회한다. 데이터를 mutable reference로 반환하지 않으며 반환 상한/실제 truncated를 명시한다. linked는 시험 실행/criterion accepted와 구분한다.
 
-- [ ] O02-A tools/list·input/output schema, lookup/get/trace 계약과 invalid/missing 인수 거부.
-- [ ] O02-B 정확 용어·모호성·검토 상태/관계 방향·원문 evidence·same snapshot 및 비검토 관계 과장0.
-- [ ] O02-C requirement 기준/trace state·미연결/충돌·상한/truncated, 명령 실행/자동 의미 승인0.
-- [ ] O02-D O01의 missing/stale/read-only/권한·deadline 보호를 공유; raw 오류/잘못된 원문·다른 dataset 혼입0.
-- [ ] O02-E 실제 공개 handler/등록·원자료 및 current/committed source SHA와 문서/진행 결합.
+- [x] O02-A tools/list·input/output schema, lookup/get/trace 계약과 invalid/missing 인수 거부.
+- [x] O02-B 정확 용어·모호성·검토 상태/관계 방향·원문 evidence·same snapshot 및 비검토 관계 과장0.
+- [x] O02-C requirement 기준/trace state·미연결/충돌·상한/truncated, 명령 실행/자동 의미 승인0.
+- [x] O02-D O01의 missing/stale/read-only/권한·deadline 보호를 공유; raw 오류/잘못된 원문·다른 dataset 혼입0.
+- [x] O02-E 실제 공개 handler/등록·원자료 및 current/committed source SHA와 문서/진행 결합.
 
 ### O-03 프로젝트 자료·설치 연결
 
@@ -438,3 +438,5 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 - [ ] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
 
 O01 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·171시험/156하위시험/3패키지 race pass, progress guard11·vet/boundary 통과. readiness와 실제 quality/criterion acceptance를 분리했고 운영 자료는 변경하지 않았다. 다음 O02, 전체 잔여4개(N16/O02/O03/O04).
+
+O02 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·175시험/169하위시험/3패키지 race pass, tools28/input/output schema·immutable/sanitizer/단계 상태 분리. 다음 O03, 전체 잔여3개(N16/O03/O04).
