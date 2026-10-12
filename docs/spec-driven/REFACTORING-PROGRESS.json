@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-16",
   "active_source_binding": {
-    "revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json"
+    "revision": "4067f2a6598cee47c96e25d7a03020860d9e18a3",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-explanation-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2109,15 +2109,31 @@
     {
       "id": "O-04",
       "purpose": "온톨로지 영향 설명·적용 전후 평가",
-      "state": "pending"
+      "state": "waiting",
+      "explanation_preparation_evidence_revision": "4067f2a6598cee47c96e25d7a03020860d9e18a3",
+      "explanation_preparation_manifest": "system/eval/b0-knowledge-system/ontology-o04-explanation-2026-10-13/manifest.json",
+      "actual_operating_data_changed": false,
+      "waiting_for": "Actual project data/review and paired binary/config/model/request/runtime bindings plus independent domain evaluation are pending; saved-response structural comparison does not supply quality or latency judgments.",
+      "verified_checks": [
+        {
+          "check": "O04-A",
+          "evidence_revision": "4067f2a6598cee47c96e25d7a03020860d9e18a3",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o04-explanation-2026-10-13/manifest.json",
+          "evidence_ref": "explanation_preparation",
+          "scope": "bounded MCP explanation, retained evidence hash and sanitizer regression; structural off/on saved-response comparison only, no actual domain paired execution or quality verdict",
+          "ledger_fields": {
+            "actual_operating_data_changed": false
+          }
+        }
+      ]
     }
   ],
   "ontology_next_task": "O-03",
   "latest_ontology_verification": {
-    "task": "O-03",
-    "revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1527,
+    "task": "O-04",
+    "revision": "4067f2a6598cee47c96e25d7a03020860d9e18a3",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-explanation-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1533,
     "status": "PASS"
   }
 }
