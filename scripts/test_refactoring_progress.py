@@ -4,6 +4,9 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
+import contextlib
+import io
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("progress", ROOT / "scripts/check-refactoring-progress.py")
@@ -87,6 +90,32 @@ class PartialCompletionTests(unittest.TestCase):
                 row.update(evidence_revision=revision, manifest=path)
                 with self.assertRaises(progress.subprocess.CalledProcessError):
                     progress.verify_partial_checks(task, self.live)
+
+
+class OntologyProgressTests(unittest.TestCase):
+ def fixture(self):
+  tasks=[{"id":f"O-{i:02d}","state":"pending"}for i in range(1,5)]
+  worklist="0/4\n"+"\n".join(f"| {t['id']} | pending |"for t in tasks)
+  return {"ontology_tasks":tasks,"ontology_next_task":"O-01"},worklist
+ def check(self,ledger,worklist):
+  with contextlib.redirect_stdout(io.StringIO()),mock.patch.object(progress,"verify_partial_checks",return_value=0),mock.patch.object(progress,"verify_manifest")as verify:
+   progress.verify_ontology_progress(ledger,worklist,"",{"pending","complete"},1)
+   return verify.call_count
+ def test_pending_is_not_completion(self):
+  l,w=self.fixture();self.assertEqual(self.check(l,w),0)
+ def test_missing_duplicate_and_completed_next_rejected(self):
+  for kind in ['absent','duplicate','next']:
+   with self.subTest(kind=kind):
+    l,w=self.fixture()
+    if kind=='absent':l.pop('ontology_tasks')
+    elif kind=='duplicate':l['ontology_tasks'][1]['id']='O-01'
+    else:l['ontology_tasks'][0]['state']='complete';w=w.replace('0/4','1/4').replace('| O-01 | pending |','| O-01 | 완료 |')
+    with self.assertRaises(ValueError):self.check(l,w)
+ def test_complete_requires_manifest_and_agrees_with_table(self):
+  l,w=self.fixture();l['ontology_tasks'][0]['state']='complete';l['ontology_next_task']='O-02'
+  with self.assertRaises(ValueError):self.check(l,w)
+  w=w.replace('0/4','1/4').replace('| O-01 | pending |','| O-01 | 완료 |')
+  self.assertEqual(self.check(l,w),1)
 
 
 if __name__ == "__main__":

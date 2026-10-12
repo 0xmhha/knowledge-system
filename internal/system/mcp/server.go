@@ -59,8 +59,10 @@ type Deps struct {
 	EvidenceSanitizer  *sanitize.Engine
 	// Optional SQLite semantic store. Each request rechecks its projection
 	// against this pinned version before publishing external trace anchors.
-	SemanticStorePath  string
-	EvidenceSourceRoot string
+	SemanticStorePath    string
+	EvidenceSourceRoot   string
+	SemanticOntologyMode string
+	SemanticBudgetMS     int
 	// Opt-in used type declarations after the top v2 Go bodies.
 	TypeNeighbors bool
 
@@ -133,6 +135,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 
 	registerGetForTask(s, d)
 	registerGetForTaskV2(s, d)
+	registerSemanticStatus(s, d)
 	registerHealth(s, d)
 	registerFindSymbol(s, d)
 	registerFindCallers(s, d)

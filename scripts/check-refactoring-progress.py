@@ -112,6 +112,33 @@ def verify_partial_checks(task, live_spec):
     return len(records)
 
 
+def verify_ontology_progress(ledger, worklist, live_spec, allowed, original_remaining):
+    partial = 0
+    ontology = ledger.get("ontology_tasks", [])
+    require(bool(ontology) == bool(re.search(r"^\| O-\d\d \|", worklist, re.M)),
+            "ontology worklist lacks a matching progress record")
+    if ontology:
+        require([t["id"] for t in ontology] == [f"O-{i:02d}" for i in range(1, 5)],
+                "missing, reordered or duplicate ontology task")
+        require(all(t["state"] in allowed for t in ontology), "unrecognized ontology state")
+        odone = {t["id"] for t in ontology if t["state"] == "complete"}
+        orows = re.findall(r"^\| (O-\d\d) \| ([^|]+) \|", worklist, re.M)
+        ochecked = {i for i, s in orows if s.strip().lstrip("*").startswith("완료")}
+        require(len(orows) == 4 and ochecked == odone, "ontology completion disagrees with ledger")
+        for task in ontology:
+            if task["state"] == "complete":
+                verify_manifest(task)
+            else:
+                partial += verify_partial_checks(task, live_spec)
+        oremaining = [t["id"] for t in ontology if t["state"] != "complete"]
+        require(ledger.get("ontology_next_task") in oremaining if oremaining else
+                ledger.get("ontology_next_task") is None, "ontology next task disagrees")
+        require(f"{len(odone)}/4" in worklist, "ontology progress count drifted")
+        print(f"ontology progress: PASS {len(odone)}/4 complete; {len(oremaining)} remaining; "
+              f"next {ledger.get('ontology_next_task')}; total remaining {original_remaining+len(oremaining)}")
+    return partial
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, default=ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json")
@@ -145,6 +172,7 @@ def main():
     remaining = [t["id"] for t in tasks if t["state"] != "complete"]
     require(ledger["next_task"] in remaining, "next task is already marked complete")
     require(f"{len(done)}/18" in worklist and f"{len(remaining)}개" in worklist, "progress counts drifted")
+    partial += verify_ontology_progress(ledger, worklist, live_spec, allowed, len(remaining))
     print(f"refactoring progress: PASS {len(done)}/18 complete; {len(remaining)} remaining; next {ledger['next_task']}; {len(sources)} source/dependency bindings; {partial} partial checks bound")
 
 

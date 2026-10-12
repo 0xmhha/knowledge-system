@@ -398,3 +398,43 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 2026-10-08 N12 미작성 경로 범위 검증: [실제5개 개념 대조와 명세 수정안](./N12-CONCEPT-PATH-SCOPE-REVIEW.md). 원문18/관련17시험·32하위시험/실제 matcher→stage2→V2 제어3사례·변조6거부 및 기존9권위파일 불변을 확인했다. 7참조파일은 retained source에만 있고 기존 선택 색인에 없어 새 canonical 링크를 주장하지 않는다. 현재 Trace는 모든 ConceptIDs 경로를 요구하며 이를 완화하지 않았다. 기능 개념3개·requirement version2 초안은 원 statement/4criteria를 유지하되 미적용/미승인이다. 기존 미작성5개·reviewed 경로0·N12-A–D/N14-A–E unchecked 및 전체8/18·잔여10개 유지. 다음 명세 범위/실제 내용·관계와 독립 FINAL 판정이다.
 
 2026-10-08 N14 실행 근거 검사 보완: [exact 보고서/검토 경로 일치 계약](./N14-EXACT-RUN-PROOF-VALIDATION.md). RecordRun/approved Decide/Promote는 해당 requirement의 fully linked trace, criterion/test에 해당하는 TESTED_BY/CHECKED_BY 전체 ID집합, 관찰시험명/canonical·명령 argv SHA/출력SHA형식을 확인한다. 동일 target의 ambiguous/non-Go anchor, 추가/중복/부분 proof 및 무관 시험을 거부한다. 수정 전15불일치 수용 RED→수정 후16제어거부 및 정상multiple/nested 회귀·관련race/vet·실제미검토후보10요청 실행전거부/권위9SHA불변을 보관한다. 합성 reviewer는 실제사람판정이 아니며 N14-A–E unchecked/전체8/18·잔여10개 유지. 다음 명세/관계 및 gold/독립성 판정 후 수정runtime/source결합으로 실제N14후보를 진행한다.
+
+## 온톨로지 추가 보완 O-01–04 — 2026-10-13
+
+목적: 검토된 의미 자료를 agent가 MCP로 발견·조회하고 실제 프로젝트에 명시적으로 연결하며 적용 영향을 이해하게 한다. vector semantic_search/용어집 expand/정책 첨부와 reviewed ontology를 구분한다. 기존 FINAL은 새 holdout으로 재사용하지 않으며 기존 N16 미충족 결정을 유지한다. 전체 잔여5개(N16/O01–04), 다음 O01.
+
+### O-01 준비 상태
+
+`cks.semantic.status`는 pinned retained source/CKG/CKV와 읽기 전용 의미 저장소를 검사한다. mode와 자료 availability를 별도 표기하므로 off이지만 자료 준비된 상태도 보인다. store 경로/DB 오류/원문 문자열을 상태 이유에 노출하지 않고 안정된 reason code를 쓴다. 상태/조회는 자동 승인·activation·model query를 수행하지 않는다. 상한 기본1초/최대5초, deadline 이후 결과 폐기.
+
+- [x] O01-A 실제 MCP 등록/input/output schema 및 CLI startup mode/budget 전달.
+- [x] O01-B off/미설정/store·dataset·projection 누락/invalid mode/stale/예산 및 ready 구분.
+- [x] O01-C ready에 same dataset/snapshot/source·실제 validator를 통과한 좌표와 검토/전체 개수만 제공; readiness는 품질/criterion acceptance가 아님.
+- [x] O01-D 자료 없음에서 DB 생성0, source/store/pointer 불변, source/data 오류에 raw path 누출0, 읽기 전용 및 취소 제어.
+- [x] O01-E 의미 있는 기존·새 시험/회귀·도구 schema·SHA·한계와 현재 소스를 커밋 원장에 결합.
+
+### O-02 읽기 조회
+
+읽기 도구는 O01과 같은 retained 검증 경계를 사용한다. lookup_term은 정확 언어/용어의 모든 bounded 모호 후보를 보존한다. get_concept는 정의/terms/includes/excludes/status/reviewer/evidence 및 incident typed 관계를 제공한다. trace_requirement는 정책 instance 첨부 없이 요구·기준·검토 경로·미연결/충돌을 조회한다. 데이터를 mutable reference로 반환하지 않으며 반환 상한/실제 truncated를 명시한다. linked는 시험 실행/criterion accepted와 구분한다.
+
+- [ ] O02-A tools/list·input/output schema, lookup/get/trace 계약과 invalid/missing 인수 거부.
+- [ ] O02-B 정확 용어·모호성·검토 상태/관계 방향·원문 evidence·same snapshot 및 비검토 관계 과장0.
+- [ ] O02-C requirement 기준/trace state·미연결/충돌·상한/truncated, 명령 실행/자동 의미 승인0.
+- [ ] O02-D O01의 missing/stale/read-only/권한·deadline 보호를 공유; raw 오류/잘못된 원문·다른 dataset 혼입0.
+- [ ] O02-E 실제 공개 handler/등록·원자료 및 current/committed source SHA와 문서/진행 결합.
+
+### O-03 프로젝트 자료·설치 연결
+
+- [ ] O03-A gen-config/setup의 explicit semantic store/mode/budget·ontology/spec 준비 옵션, off 기본/잘못된 조합 거부 및 기존 경로 호환.
+- [ ] O03-B 준비·검토·연결·activation 단계를 구분, 대상 dataset와 source 입력을 결합하고 projection 검증 없이 ready/activate0.
+- [ ] O03-C controlled 설치→MCP status/조회 positive 및 missing/stale 실패 제어; 실제 도메인 채택/리뷰 기록은 명확한 사용자 판정 필요.
+- [ ] O03-D 운영 설정/새 인덱스/선택 팩과의 연계·재색인 시 stale 전환·기존 current 보존, 실제 대상 원문·한계와 source SHA 기록.
+
+### O-04 설명·적용 전후 평가
+
+- [ ] O04-A query에 매칭 개념·사용한 검토 관계/원문과 후보 점수·rank/body 변화의 bounded 설명; off/no_match/active-but-zero 구분.
+- [ ] O04-B 같은 dataset/model/질문·off/on의 인용·본문·순위·상태/latency 비교 및 실패 분모/모델 호출, 기존 FINAL 새 독립 표본 재사용0.
+- [ ] O04-C controlled 기능 설명과 실제 도메인 효과 판정을 분리, 실제 도메인 자료/독립 평가 조건·부족 표본/활동시간·quality 한계 기록.
+- [ ] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
+
+O01 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·171시험/156하위시험/3패키지 race pass, progress guard11·vet/boundary 통과. readiness와 실제 quality/criterion acceptance를 분리했고 운영 자료는 변경하지 않았다. 다음 O02, 전체 잔여4개(N16/O02/O03/O04).

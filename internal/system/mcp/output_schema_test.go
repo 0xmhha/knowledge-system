@@ -103,6 +103,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 		ToolNameSemanticSearch:          {"query", "hits"},
 		ToolNameFreshness:               {"fresh", "indexed_head", "current_head"},
 		ToolNameHealth:                  {"name", "status", "serviceable"},
+		ToolNameSemanticStatus:          {"state", "mode", "availability", "read_tools_ready", "retrieval_ready"},
 		ToolNameOpsIndex:                {"mode", "graph", "vector", "alignment"},
 		ToolNameOpsReindex:              {"job_id", "state", "version"},
 		ToolNameOpsSetup:                {"job_id", "state"},

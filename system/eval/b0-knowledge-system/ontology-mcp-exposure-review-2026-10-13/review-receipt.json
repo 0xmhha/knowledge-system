@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "status": "review_complete_implementation_not_performed",
+  "date_KST": "2026-10-13",
+  "revision": "0b852cf69442f9c3fd053b7ffd3e93c9d4ea03a9",
+  "branch": "feat/setup-tool",
+  "source_sha256": {
+    "internal/system/mcp/server.go": "4d520d4c71ddf1f17ded48c853ac7228586f5d2fd17bab713114939e03deccae",
+    "internal/system/mcp/get_for_task_v2.go": "7ab63d3f36251e9789475f19c610edc3c90506a5c0860c49c042924c922ed740",
+    "internal/system/mcp/health.go": "67b416ac0741137f3d17c86c6bc921aff55efcb093c04b2395d5c7cf9be8518e",
+    "internal/system/mcp/review.go": "e3141c76730f04174da2c00c74dbc25098f2728af3d4c3b28d7bbfdfbee5214a",
+    "internal/system/mcp/testfilter.go": "267e9a78e5d095b36f6969d8bd4f23423b61022d5f7a556b04e5c2e872f5f5b6",
+    "internal/system/mcp/testdata/agent-mcp.schema.json": "9e91f1e9a1899f0f6a59915cf1efdd34ea9e4119938ca9e31c98561635554414",
+    "cmd/cks/mcpcli/ontology.go": "fbed8b670cb61782c4463bb0ee7252d43347661ec97cd64d851d9b278d0c6e12",
+    "cmd/cks/mcpcli/serve.go": "ede460d75b13968278be63613ab409e681866fc8ce8ef2f72de9bd0e42311548",
+    "cmd/cks/mcpcli/genconfig.go": "a910eeed6985ca6c1231503a9a7f67eac137bc96d65677b638127cfa09ea335d",
+    "internal/system/config/generate.go": "b72e8975ebacef1da531229a4ed8049e5cc2b6c825da8435dcb21d0cc5d0fe41",
+    "internal/system/config/config.go": "92150584d097d8f791bfd226a6692954f4130d0a44e273e5e4bcb8b87306481a",
+    "internal/system/composer/stage2/ontology_provider.go": "948a46cd0725e4170acee64c0d72c06ee8a8091ebd368ba79bd8b4f25d7cee25",
+    "internal/system/composer/stage2/ontology.go": "e179dbfa85008620d0a6db44110346fad31100bc4b32baba6568dd1a5cb1b32f",
+    "internal/system/evidencev2/knowledge_trace.go": "87f82b3582d72411199db9cb12664b6f7db9f5d8b866c75c45283fee258e611a",
+    "tools/setup/ks_setup/pipeline.py": "67b16eea895eeaa034d31fa390a91293966b38f2a9d3a73901093d907f10618a",
+    "tools/setup/ks_setup/cli.py": "09ffb43fe5d1efaf62a8ad420884305d74e4fb1fa3528b72c4a453f30bbb9b67",
+    "pkg/system/contract/ontology.go": "3b73b84f376d366a1237bb9bc001156b856da6f0b48ef88d780846b085bb892a"
+  },
+  "historical_FINAL2_path": "system/eval/b0-knowledge-system/refactoring-final2-a-2026-10-10/final-run/capture/rows.jsonl.gz",
+  "historical_FINAL2_sha256": "4497ff4188ac0b2af8544685babb15c24a2c45a560518fd8c68d673d639eeac0",
+  "current_generated_config_observations": [
+    {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml",
+      "sha256": "7f562d20aea0497b5ff63d8ef49b8106e1c267ec6f407db7bb40ba90c1039504",
+      "semantic_block_only": [
+        "semantic:",
+        "    store_path: \"\""
+      ],
+      "ontology_mode_present": false,
+      "store_path_empty": true,
+      "running_process_uses_this_file_not_checked": true
+    },
+    {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks-stdio.yaml",
+      "sha256": "2e61bf2fec7d3d5bd5a1c82a6321f6d5640341f7ee76a2e97d54862ebba40c7f",
+      "semantic_block_only": [
+        "semantic:",
+        "    store_path: \"\""
+      ],
+      "ontology_mode_present": false,
+      "store_path_empty": true,
+      "running_process_uses_this_file_not_checked": true
+    }
+  ],
+  "report_sha256": "cf602634ddef1ba9e99c1d119f8e5bf3e3bb66a9b53edf0dfe99f8a896f55b0e",
+  "artifacts_sha256": {
+    "related-tests-summary.json": "a8979d83a48868750297a5ea559fa1ca0896f275d88d626fb9e19dbd948bfb40",
+    "observed-config-fields.json": "8ba719879607b62a4a8dd2a7bc30ca55ace7f2aeeeda8d44d33a33a6b1ac6e8c",
+    "related-tests.jsonl.gz": "0b90eae6fa5d6f0d4ab78158572be989fbe49b6c314e6908be80836e21c04753",
+    "historical-final2-ontology-diagnostics.json": "ffccaa1773dc720641e8c3437f4ee8c657aa0ba2bf83b997b6c22e7ff6839645"
+  },
+  "tests": {
+    "counts": {
+      "subtest_pass": 39,
+      "test_pass": 19,
+      "package_pass": 3
+    },
+    "exit_code": 0,
+    "raw_sha256": "7eb09e0d091aeae002ba2cd127a472082ba9347a36eaa8da6e11e4c2bbef6d2e",
+    "scope": "three local packages, named existing ontology/provider/MCP registry and diagnostic tests; fixture based, no live model or deployed-server request",
+    "production_code_changed": false,
+    "runtime_config_changed": false,
+    "actual_model_calls": 0
+  },
+  "code_or_runtime_configuration_changed": false,
+  "existing_progress": {
+    "complete": 17,
+    "total": 18,
+    "next": "N-16"
+  },
+  "not_new_FINAL_or_human_approval": true
+}
