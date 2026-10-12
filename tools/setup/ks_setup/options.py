@@ -48,6 +48,7 @@ class Options:
     skip_pack_inputs: List[str] = field(default_factory=list)  # setup.yaml keys to leave out
     min_canonical: Optional[float] = None  # promotion gate: minimum canonical_id coverage
     compare_with: Optional[Path] = None  # another dataset to profile side by side after the build
+    build_sources: bool = True          # list Go sources under build/ dirs for the vector index
 
     @property
     def bins(self) -> Path:
@@ -81,6 +82,11 @@ class Options:
     def derived_dir(self) -> Path:
         """Where the pack's domain artifacts are rendered for this dataset."""
         return self.out.parent / f"{self.out.name}-derived"
+
+    @property
+    def build_sources_file(self) -> Path:
+        """The generated vector_build_sources list (see buildsrc)."""
+        return self.derived_dir / "vector-build-sources.json"
 
     @property
     def versioned(self) -> bool:

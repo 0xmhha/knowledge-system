@@ -15,7 +15,7 @@ import threading
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, TextIO
 
-from . import events, mcp_check, pack as packs, preflight, profile
+from . import buildsrc, events, mcp_check, pack as packs, preflight, profile
 from .model import Run, Status, Step
 from .options import Options, choose_version, repo_root
 
@@ -51,7 +51,8 @@ def load_pack(opts: Options) -> Optional[packs.Pack]:
     return pack
 
 
-def setup_argv(opts: Options, version: Optional[str], pack: Optional[packs.Pack] = None) -> List[str]:
+def setup_argv(opts: Options, version: Optional[str], pack: Optional[packs.Pack] = None,
+               build_sources: Optional[Path] = None) -> List[str]:
     cks = str(opts.binary("cks"))
     common = ["--progress", "json", "--build-timeout", opts.build_timeout]
     pack_flags = pack.setup_flags(opts.graph_only, opts.derived_dir) if pack else []
@@ -64,6 +65,8 @@ def setup_argv(opts: Options, version: Optional[str], pack: Optional[packs.Pack]
         argv += ["--ollama-url", opts.ollama_url, "--query-prefix-policy", "registry"]
     if opts.min_canonical is not None:
         argv += ["--gate-min-canonical", f"{opts.min_canonical:g}"]
+    if build_sources is not None:
+        argv += ["--vector-build-sources", str(build_sources)]
     return argv + pack_flags + opts.extra_setup_args
 
 
@@ -108,6 +111,8 @@ class Pipeline:
         self.pack: Optional[packs.Pack] = None
         self.profile: Optional[dict] = None
         self.comparison: List[tuple] = []
+        self.build_source_paths: List[str] = []
+        self.go_scope_gap: List[str] = []
 
     def _log(self, line: str) -> None:
         self.log.write(line.rstrip("\n") + "\n")
@@ -238,7 +243,7 @@ class Pipeline:
             if (self.opts.out / self.version).exists():
                 raise StepFailed(f"version {self.version} already exists under {self.opts.out}")
             step.detail = f"version {self.version}"
-        argv = setup_argv(self.opts, self.version, self.pack)
+        argv = setup_argv(self.opts, self.version, self.pack, self._build_sources(step))
         code = self._exec(argv, lambda l: events.apply(self.run, step, events.parse(l)) if l.strip() else None,
                           env=setup_env(self.opts), merge_stderr=False)
         failed = [s for s in step.substeps if s.status == Status.FAILED]
@@ -248,8 +253,50 @@ class Pipeline:
         for s in step.substeps:
             if s.status == Status.RUNNING:
                 s.finish(Status.DONE)
+        if not self.opts.graph_only:
+            self._check_go_scope(step)
         where = f"{self.opts.out}/{self.version}" if self.version else str(self.opts.out)
         step.finish(Status.WARNING if any(s.status == Status.WARNING for s in step.substeps) else Status.DONE, where)
+
+    def _build_sources(self, step: Step) -> Optional[Path]:
+        """List the Go files under build/ directories that the graph loads, so
+        the vector index reads them too. A pack's own list takes precedence."""
+        if self.opts.graph_only or not self.opts.build_sources:
+            return None
+        sub = step.substep("build-sources", "Go sources under build/")
+        if self.pack and "vector_build_sources" in self.pack.inputs:
+            sub.finish(Status.DONE, "using the pack's vector_build_sources")
+            return None
+        try:
+            paths = buildsrc.discover(self.opts.src, committed=self.opts.source_mode == "committed")
+        except (OSError, RuntimeError, subprocess.SubprocessError) as err:
+            sub.finish(Status.WARNING, f"not listed: {err}"[:160])
+            self.run.warn(f"build sources: {err}")
+            return None
+        self.build_source_paths = paths
+        self._log("build sources: " + (", ".join(paths) or "none"))
+        if not paths:
+            sub.finish(Status.DONE, "none")
+            return None
+        buildsrc.write(self.opts.build_sources_file, paths)
+        sub.finish(Status.DONE, f"{len(paths)} file(s), e.g. {paths[0]}")
+        return self.opts.build_sources_file
+
+    def _check_go_scope(self, step: Step) -> None:
+        """Warn when a Go file is in the graph but the vector index skipped it."""
+        sub = step.substep("go-scope", "Graph/vector Go scope")
+        try:
+            gap = buildsrc.go_scope_gap(self.opts.serving_dir)
+        except (OSError, ValueError) as err:
+            sub.finish(Status.WARNING, f"not checked: {err}"[:160])
+            return
+        self.go_scope_gap = gap
+        if gap:
+            detail = f"{len(gap)} Go file(s) only in the graph, e.g. {', '.join(gap[:3])}"
+            sub.finish(Status.WARNING, detail)
+            self.run.warn(f"Go scope: {detail}")
+        else:
+            sub.finish(Status.DONE, "every graph Go file is in the vector index")
 
     def do_serve(self, step: Step) -> None:
         target = self.opts.server_config
@@ -325,6 +372,7 @@ class Pipeline:
             "source": str(self.opts.src), "source_commit": self.commit, "dataset": str(self.opts.out),
             "version": self.version, "pack": str(self.opts.pack_dir) if self.opts.pack_dir else None,
             "pack_inputs": sorted(self.pack.inputs) if self.pack else [],
+            "build_sources": self.build_source_paths, "go_scope_gap": self.go_scope_gap,
             "embedder": None if self.opts.graph_only else {"backend": self.opts.embedder, "model": self.opts.model,
                                                             "dim": self.opts.embed_dim},
             "steps": [{"key": s.key, "status": s.status.value, "seconds": round(s.elapsed() or 0, 1),

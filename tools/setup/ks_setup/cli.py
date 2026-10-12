@@ -48,6 +48,9 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--min-canonical", type=float, metavar="RATIO",
                    help="promotion gate: minimum canonical_id coverage of symbol chunks (e.g. 0.9 for Go); "
                         "without it the engine skips the join-density check and warns")
+    p.add_argument("--no-build-sources", action="store_true",
+                   help="do not list Go sources under build/ directories for the vector index; by default the "
+                        "Go files the graph loads there (e.g. internal/build) are indexed by both engines")
     p.add_argument("--compare", help="another dataset directory to profile side by side after the build")
     p.add_argument("--plain", action="store_true", help="print one line per change instead of the live dashboard")
     p.add_argument("-y", "--yes", action="store_true", help="start without the confirmation prompt")
@@ -78,7 +81,8 @@ def build_options(ns: argparse.Namespace, interactive: bool) -> Options:
                    bin_dir=bin_dir, verify=not ns.no_verify, build_timeout=ns.build_timeout,
                    strict_embeddings=not ns.allow_missing_embeddings,
                    pack_dir=expand(ns.pack) if ns.pack else None, skip_pack_inputs=list(ns.skip_pack_input),
-                   compare_with=expand(ns.compare) if ns.compare else None, min_canonical=ns.min_canonical)
+                   compare_with=expand(ns.compare) if ns.compare else None, min_canonical=ns.min_canonical,
+                   build_sources=not ns.no_build_sources)
 
 
 def _rich_available() -> bool:

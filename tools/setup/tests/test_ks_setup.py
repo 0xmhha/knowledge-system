@@ -6,25 +6,30 @@ when KS_SETUP_E2E=1 and the binaries exist in bin/.
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from ks_setup import events, mcp_check, pack, pipeline, preflight, profile  # noqa: E402
+from ks_setup import buildsrc, events, mcp_check, pack, pipeline, preflight, profile  # noqa: E402
 from ks_setup.model import Run, Status, Step  # noqa: E402
 from ks_setup.options import Options, choose_version, repo_root, slug  # noqa: E402
 from ks_setup.ui import PlainView, fmt_elapsed, run_worker  # noqa: E402
 
 
-def git_repo(root: Path) -> Path:
+def git_repo(root: Path, files: Optional[dict] = None) -> Path:
     src = root / "demo"
     src.mkdir()
     (src / "go.mod").write_text("module demo\n\ngo 1.22\n")
     (src / "a.go").write_text("package demo\n\nfunc A() int { return B() }\nfunc B() int { return 1 }\n")
+    for rel, text in (files or {}).items():
+        (src / rel).parent.mkdir(parents=True, exist_ok=True)
+        (src / rel).write_text(text)
     env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
     for argv in (["git", "init", "-q"], ["git", "add", "."], ["git", "commit", "-qm", "init"]):
         subprocess.run(argv, cwd=src, check=True, env=env)
@@ -106,6 +111,12 @@ class CommandTests(unittest.TestCase):
         self.assertNotIn("CKV_REQUIRE_COMPLETE_EMBEDDINGS", pipeline.setup_env(self.o)
                          if "CKV_REQUIRE_COMPLETE_EMBEDDINGS" not in os.environ else {})
 
+    def test_build_sources_flag(self):
+        argv = pipeline.setup_argv(self.o, "v1", build_sources=Path("/d/proj-derived/vector-build-sources.json"))
+        i = argv.index("--vector-build-sources")
+        self.assertEqual(argv[i + 1], "/d/proj-derived/vector-build-sources.json")
+        self.assertNotIn("--vector-build-sources", pipeline.setup_argv(self.o, "v1"))
+
     def test_server_config_reads_current(self):
         argv = pipeline.gen_config_argv(self.o)
         self.assertEqual(argv[argv.index("--dataset-dir") + 1], "/d/proj/current")
@@ -178,6 +189,49 @@ class PackTests(unittest.TestCase):
             unset.mkdir()
             (unset / "setup.yaml").write_text("code_root: ${NOT_SET_ANYWHERE_42}\n")
             self.assertFalse(preflight.check_pack(Options(src=Path(d), out=Path(d) / "kd", name="p", pack_dir=unset))[0].ok)
+
+
+BUILD_TREE = {
+    "internal/build/util.go": "package build\n\nfunc Util() {}\n",
+    "internal/build/util_test.go": "package build\n\nimport \"testing\"\n\nfunc TestUtil(t *testing.T) {}\n",
+    "internal/build/testdata/fixture.go": "package fixture\n",
+    "build/ci.go": "//go:build none\n\npackage main\n\nfunc main() {}\n",
+    "vendor/x/build/v.go": "package build\n",
+    "tools/build.go": "package tools\n",
+}
+
+
+@unittest.skipUnless(shutil.which("go"), "go not installed")
+class BuildSourceTests(unittest.TestCase):
+    def test_lists_what_go_loads_under_build_dirs(self):
+        with tempfile.TemporaryDirectory() as d:
+            src = git_repo(Path(d), BUILD_TREE)
+            # build constraints, testdata and vendor apply as they do for the graph
+            self.assertEqual(buildsrc.discover(src, committed=True),
+                             ["internal/build/util.go", "internal/build/util_test.go"])
+            (src / "internal/build/new.go").write_text("package build\n")
+            self.assertNotIn("internal/build/new.go", buildsrc.discover(src, committed=True))
+            self.assertIn("internal/build/new.go", buildsrc.discover(src, committed=False))
+            out = Path(d) / "list.json"
+            buildsrc.write(out, ["internal/build/util.go"])
+            self.assertEqual(json.loads(out.read_text()), {"schema_version": 1, "paths": ["internal/build/util.go"]})
+
+    def test_no_build_dirs_means_no_list(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(buildsrc.discover(git_repo(Path(d)), committed=True), [])
+
+    def test_go_scope_gap_compares_go_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "graph").mkdir()
+            (root / "vector").mkdir()
+            (root / "graph" / "manifest.json").write_text(json.dumps({"files": [
+                {"path": "a.go", "language": "go"}, {"path": "internal/build/b.go", "language": "go"},
+                {"path": "x.proto", "language": "proto"}]}))
+            (root / "vector" / "manifest.json").write_text(json.dumps({"input_files": [{"path": "a.go"}]}))
+            self.assertEqual(buildsrc.go_scope_gap(root), ["internal/build/b.go"])
+            (root / "vector" / "manifest.json").write_text(json.dumps({"chunk_count": 1}))
+            self.assertEqual(buildsrc.go_scope_gap(root), [])
 
 
 class ProfileTests(unittest.TestCase):
@@ -294,7 +348,7 @@ class FailureTests(unittest.TestCase):
 class EndToEndTests(unittest.TestCase):
     def test_mock_dataset_round_trip(self):
         with tempfile.TemporaryDirectory() as d:
-            src = git_repo(Path(d))
+            src = git_repo(Path(d), {"internal/build/util.go": "package build\n\nfunc Util() int { return 2 }\n"})
             out = Path(d) / "kd" / "demo"
             cmd = [sys.executable, "-m", "ks_setup", "--src", str(src), "--out", str(out), "--embedder", "mock",
                    "--no-build", "--plain", "--yes", "--port", "18931"]
@@ -303,6 +357,9 @@ class EndToEndTests(unittest.TestCase):
             self.assertIn("Dataset ready.", proc.stdout)
             self.assertTrue((out / "current" / "graph" / "graph.db").is_file())
             self.assertIn("transport: stdio", (out.parent / "demo-cks-stdio.yaml").read_text())
+            report = json.loads((out.parent / "demo-setup-report.json").read_text())
+            self.assertEqual(report["build_sources"], ["internal/build/util.go"])
+            self.assertEqual(report["go_scope_gap"], [])
             # A second run reuses the project config and promotes a new version.
             proc = subprocess.run(cmd, cwd=Path(__file__).resolve().parents[1], capture_output=True, text=True, timeout=600)
             self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)

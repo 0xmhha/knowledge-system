@@ -78,6 +78,25 @@ missing from the graph. With `--graph-only`, inputs that only feed the vector
 index are dropped automatically. Preflight fails when an input is missing and
 warns when the pack declares a different embedding model.
 
+### Go sources under build/ directories
+
+The vector indexer skips every directory named `build/`, at any depth, unless
+a `vector_build_sources` list names the exact Go files to keep; the graph has
+no such rule. Without a list, a package such as go-stablenet's
+internal/build package is in the graph but has no vector chunks. Before the build
+the tool asks `go list` which Go files the graph loads under `build/`
+directories (same build constraints, so `//go:build none` scripts such as
+`build/ci.go` stay out; `vendor/` and `testdata/` are skipped), writes them to
+`<out>-derived/vector-build-sources.json` and passes the file to `cks setup`.
+A pack that declares its own `vector_build_sources` keeps it, and
+`--no-build-sources` turns the list off. The list is part of the dataset
+identity, so turning it on or off yields a different dataset.
+
+After the build the tool compares the Go files in the graph manifest with
+the files the vector index read and warns about any Go file that is only in
+the graph. Other languages are not compared, since the vector indexer has no
+reader for some graph languages (proto).
+
 ### Measuring and comparing builds
 
 After the health check the tool profiles the served dataset: graph files,
@@ -119,8 +138,8 @@ Next to the dataset directory `<out>`:
 | `<out>-cks.yaml` | MCP server config, HTTP on `127.0.0.1:<port>` |
 | `<out>-cks-stdio.yaml` | the same config for stdio clients |
 | `<out>-setup-logs/` | one full log per run, including every command line |
-| `<out>-setup-report.json` | step timings, health, dataset profile and the comparison, if any |
-| `<out>-derived/` | the pack's rendered domain corpus (with `--pack` and domain knowledge) |
+| `<out>-setup-report.json` | step timings, health, the build-source list and Go scope gap, dataset profile and the comparison, if any |
+| `<out>-derived/` | the pack's rendered domain corpus (with `--pack` and domain knowledge) and `vector-build-sources.json` |
 
 Rerunning the tool on the same `--out` builds a new version and promotes it
 only after its gates pass; the previous version stays available for
@@ -151,6 +170,7 @@ they opened, so restart them after a rebuild.
 | `--allow-missing-embeddings` | strict | do not fail when some chunks could not be embedded |
 | `--pack` | none | project pack whose `setup.yaml` inputs the build uses |
 | `--skip-pack-input` | none | leave one pack input out (repeatable) |
+| `--no-build-sources` | listed | do not list Go sources under `build/` directories for the vector index |
 | `--compare` | none | dataset to profile side by side after the build |
 | `--min-canonical` | off | promotion gate: minimum canonical_id coverage |
 | `--plain` | dashboard on a terminal | one line per change, flushed immediately |
