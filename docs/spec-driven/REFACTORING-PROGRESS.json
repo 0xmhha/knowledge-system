@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-16",
   "active_source_binding": {
-    "revision": "a41c10effd2dbd5f4be9026699aae5c9de0d233a",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o02-reads-2026-10-13/manifest.json"
+    "revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2078,7 +2078,33 @@
     {
       "id": "O-03",
       "purpose": "프로젝트 의미 자료·설치 연결",
-      "state": "pending"
+      "state": "waiting",
+      "installation_preparation_evidence_revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
+      "installation_preparation_manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json",
+      "actual_operating_data_changed": false,
+      "waiting_for": "Actual project ontology/spec/relations, content review and target source/version selection are pending; technical preparation does not supply those judgments.",
+      "verified_checks": [
+        {
+          "check": "O03-A",
+          "evidence_revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json",
+          "evidence_ref": "installation_preparation",
+          "scope": "explicit installation options and same-snapshot held preparation; actual mock CLI/MCP integration, no automatic review/activation, old current/operator configs preserved",
+          "ledger_fields": {
+            "actual_operating_data_changed": false
+          }
+        },
+        {
+          "check": "O03-B",
+          "evidence_revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json",
+          "evidence_ref": "installation_preparation",
+          "scope": "explicit installation options and same-snapshot held preparation; actual mock CLI/MCP integration, no automatic review/activation, old current/operator configs preserved",
+          "ledger_fields": {
+            "actual_operating_data_changed": false
+          }
+        }
+      ]
     },
     {
       "id": "O-04",
@@ -2088,10 +2114,10 @@
   ],
   "ontology_next_task": "O-03",
   "latest_ontology_verification": {
-    "task": "O-02",
-    "revision": "a41c10effd2dbd5f4be9026699aae5c9de0d233a",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o02-reads-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1514,
+    "task": "O-03",
+    "revision": "7cfe71cabb0a8c485dc69c7e87461f1694224858",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1527,
     "status": "PASS"
   }
 }
