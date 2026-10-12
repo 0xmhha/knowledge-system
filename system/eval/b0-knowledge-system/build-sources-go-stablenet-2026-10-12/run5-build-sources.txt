@@ -1,0 +1,91 @@
+      Source: /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet
+     Dataset: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet
+       Index: graph + vector (ollama: bge-m3:latest, 1024d)
+ Source mode: committed
+Project pack: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet (without filelist)
+      Server: go-stablenet @ 127.0.0.1:8941
+[   done] 1. Check prerequisites (0s) - 9 checks passed
+[   done] 1. Check prerequisites / knowledge-system (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system
+[   done] 1. Check prerequisites / git (0s) - git version 2.55.0
+[   done] 1. Check prerequisites / go (0s) - go version go1.26.8 darwin/arm64
+[   done] 1. Check prerequisites / make (0s) - GNU Make 3.81
+[   done] 1. Check prerequisites / source (0s) - /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet @ 0bf2f4d1bfeb
+[   done] 1. Check prerequisites / dataset (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet (181.9 GiB free)
+[   done] 1. Check prerequisites / project pack (0s) - stablenet: code_root, domain_knowledge, flow_corpus, glossary_file, policy_file, vector_policy
+[   done] 1. Check prerequisites / ollama (0s) - http://127.0.0.1:11434 (version 0.35.1)
+[   done] 1. Check prerequisites / embedding model (0s) - bge-m3:latest
+[running] 2. Build ckg / ckv / cks - go build ckg
+[   done] 2. Build ckg / ckv / cks (3s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin
+[   done] 3. Write the project setup config (0s) - reusing go-stablenet-setup.yaml (project ID kept)
+[running] 4. Build the knowledge dataset - version v20261012-231308-0bf2f4d1
+[   done] 4. Build the knowledge dataset / Go sources under build/ (0s) - 7 file(s), e.g. internal/build/archive.go
+[   done] 4. Build the knowledge dataset / Render the domain corpus (0s) - domain export: 44 entries, 0 docs -> /Users/kevin/work/github/0xmhha/auto-coding/knowledg…
+[   done] 4. Build the knowledge dataset / Governance policy matches entries (0s) - the governance policy matches its entries
+[   done] 4. Build the knowledge dataset / Glossary matches entries (0s) - the alias glossary matches its entries
+[running] 4. Build the knowledge dataset / Graph index (ckg) - Build the graph index
+[   done] 4. Build the knowledge dataset / Graph index (ckg) (6m05s) - ckg: built 244822 nodes / 1963773 edges into /Users/kevin/work/github/0xmhha/auto-coding/…
+[   done] 4. Build the knowledge dataset / Embedding service check (0s) - Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+[running] 4. Build the knowledge dataset / Vector index (ckv) - Build the vector index aligned to the graph
+[   done] 4. Build the knowledge dataset / Vector index (ckv) (21m10s) - ckv: indexed_head=0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8 built_at=2026-10-12T14:41:48Z …
+[running] 4. Build the knowledge dataset / Graph/vector alignment - Verify graph/vector alignment
+[   done] 4. Build the knowledge dataset / Graph/vector alignment (0s) - Verify graph/vector alignment
+[   done] 4. Build the knowledge dataset / Domain and flow content reached the index (0s) - docs roots 2, markdown chunks 633
+[running] 4. Build the knowledge dataset / Promotion gate - ── schema ── errors=0 warnings=0 info=0
+[   done] 4. Build the knowledge dataset (29m29s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-231308-0bf2f4d1
+[   done] 4. Build the knowledge dataset / Promotion gate (23s) - verdict: PARITY
+[   done] 4. Build the knowledge dataset / Promote to current (0s) - promoted v20261012-231308-0bf2f4d1 → current (was v20261012-030550-0bf2f4d1; rollback: kn…
+[   done] 4. Build the knowledge dataset / Graph/vector Go scope (0s) - every graph Go file is in the vector index
+[   done] 5. Write the MCP server config (0s) - go-stablenet-cks.yaml, go-stablenet-cks-stdio.yaml
+[running] 6. Start the server and check health
+[   done] 6. Start the server and check health / graph (0s) - schema 1.24, head 0bf2f4d1bfeb
+[   done] 6. Start the server and check health / vector (0s) - reachable
+[   done] 6. Start the server and check health (8s) - 24 MCP tools, status ok
+[   done] 6. Start the server and check health / Query: review_function (0s) - log.Info: 40 callers, 0 commits, 46 ms
+[   done] 6. Start the server and check health / Query: get_for_task_v2 (0s) - 8 citations, 814 ms
+Dataset ready.
+  Dataset:        /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/current  (version v20261012-231308-0bf2f4d1)
+  Server config:  /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml  (HTTP, 127.0.0.1:8941)
+  Stdio config:   /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks-stdio.yaml
+  Serve:          /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml
+  Client entry:   /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp client-config --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-cks.yaml
+  Versions:       4 retained, 4.4 GiB; review a cleanup with /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks gc --out /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet --dry-run
+  Rebuild:        rerun this tool; a new version is promoted only after its gates pass
+  Roll back:      /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks setup --out /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet --src /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet --rollback <version>
+  Graph:          1323 files, 244822 nodes, 1963773 edges, 18830 functions, 6404 commits, 42 policies / 140 governed_by
+  Vector:         21304 chunks (bge-m3:latest, 1024d), 19245 categorized, 18899 with guidance, 346 domain, 96 flow
+  Report:         /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-setup-report.json
+  Running servers keep the dataset they opened; restart them after a rebuild.
+Compared with /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-030550-0bf2f4d1:
+   graph schema                                 1.24            1.24
+   source commit                        0bf2f4d1bfeb    0bf2f4d1bfeb
+   graph files                                 1,323           1,323
+   graph nodes                               244,822         244,822
+   graph edges                             1,963,773       1,963,773
+   functions + methods                        18,830          18,830
+   commits                                     6,404           6,404
+   policy nodes                                   42              42
+   governed_by edges                             140             140
+   node-PR links                             172,702         172,702
+ * vector chunks                              21,304          21,236
+   categorized chunks                         19,245          19,245
+   chunks with guidance                       18,899          18,899
+ * chunks with canonical_id                   20,109          20,042
+   domain chunks                                 346             346
+   flow chunks                                    96              96
+   test chunks                                 5,422           5,422
+   graph language: go                          1,256           1,256
+   graph language: proto                           4               4
+   graph language: sol                            24              24
+   graph language: ts                             39              39
+ * vector language: go                        19,489          19,422
+   vector language: javascript                   422             422
+   vector language: markdown                     633             633
+   vector language: solidity                     444             444
+ * vector chunk_kind: convention                 204             203
+   vector chunk_kind: doc                        633             633
+ * vector chunk_kind: file_header              1,356           1,349
+   vector chunk_kind: flow_spine                  18              18
+   vector chunk_kind: flow_step                   78              78
+   vector chunk_kind: function_split             211             211
+   vector chunk_kind: invariant                  178             178
+ * vector chunk_kind: symbol                  18,626          18,566
