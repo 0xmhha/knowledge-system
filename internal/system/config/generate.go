@@ -67,10 +67,12 @@ type GenerateOptions struct {
 
 	// DomainProjectDir / DomainCorpusDir wire channel ② (domain-knowledge
 	// embedding); both empty disables it. GlossaryPath enables vocab expansion.
-	DomainProjectDir  string
-	DomainCorpusDir   string
-	GlossaryPath      string
-	SemanticStorePath string
+	DomainProjectDir     string
+	DomainCorpusDir      string
+	GlossaryPath         string
+	SemanticStorePath    string
+	SemanticOntologyMode string
+	SemanticBudgetMS     int
 
 	// FootprintDir / AuditDir are the logging output directories.
 	FootprintDir string
@@ -128,6 +130,12 @@ func Generate(o GenerateOptions) *Config {
 		vectorPath = filepath.Join(o.DatasetDir, "vector")
 	}
 
+	ontologyMode := o.SemanticOntologyMode
+	// Preserve the legacy default query path; an explicit baseline still opts
+	// into raw-query-first for controlled ontology comparisons.
+	if ontologyMode == "off" {
+		ontologyMode = ""
+	}
 	return &Config{
 		Version:     configVersion,
 		Name:        name,
@@ -170,7 +178,7 @@ func Generate(o GenerateOptions) *Config {
 			ProjectDir: o.DomainProjectDir,
 			CorpusDir:  o.DomainCorpusDir,
 		},
-		Semantic: SemanticConfig{StorePath: o.SemanticStorePath},
+		Semantic: SemanticConfig{StorePath: o.SemanticStorePath, OntologyMode: ontologyMode, OntologyBudgetMS: o.SemanticBudgetMS},
 		Service:  ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
 		Vocab: VocabConfig{
 			GlossaryPath: o.GlossaryPath,

@@ -192,3 +192,35 @@ KS_SETUP_E2E=1 python3 -m unittest discover -s tools/setup/tests
 The end-to-end test builds a dataset from a throwaway repository twice and
 checks that the second run promotes a new version and keeps the first as a
 rollback target.
+
+### Reviewed meaning and ontology readiness
+
+`--semantic-store PATH`, `--ontology-mode off|baseline|concept_text|relations|combined`
+and `--ontology-budget-ms 1..5000` connect a pinned semantic store. The default
+is off and preserves the existing query path. An explicitly enabled mode needs
+meaning data; `cks.semantic.status` is checked separately from backend health.
+A reachable graph/vector index does not imply that ontology data is ready.
+
+To prepare source-backed meaning, keep `ontology.yaml` and `spec.yaml` inside
+the committed source tree and give both the same stable project ID:
+
+```sh
+tools/setup/ks-setup --src /path/to/project --out /path/to/data \
+  --project-id my-project --ontology ontology.yaml --spec spec.yaml \
+  --ontology-mode off --ontology-budget-ms 5000
+```
+
+Semantic inputs or an existing semantic store make the graph/vector build a
+**held candidate**. The tool calls `cks semantic build` on that candidate's
+retained files and writes a reviewable projection and a candidate-specific MCP
+config. It never supplies `--activate`, never approves records, and keeps the
+old `current` and operator MCP configs. If preparation fails or the projection
+belongs to another snapshot, it refuses readiness and keeps that old state.
+The held candidate can be inspected with the read-only semantic tools before
+review/release; proposed data is readable but supplies no reviewed ranking boost.
+
+`--project-id` must agree with an existing setup config. No signing key or
+reviewer label is generated. Preparing definitions/specs does not invent
+IMPLEMENTED_BY/TESTED_BY/CHECKED_BY edges: code anchors and reviewed links need
+separate authoring and validation. Actual project-content approval and an
+independent effect evaluation remain distinct from the setup smoke check.

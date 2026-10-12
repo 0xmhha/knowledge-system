@@ -368,3 +368,56 @@ class EndToEndTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class SemanticSetupTests(unittest.TestCase):
+    def test_explicit_semantic_settings_and_held_candidate_are_preserved(self):
+        o = Options(src=Path("/s/project"), out=Path("/d/project"), name="project",
+                    project_id="project", semantic_store=Path("/d/meaning.sqlite"),
+                    ontology_mode="combined", ontology_budget_ms=5000)
+        argv = pipeline.gen_config_argv(o)
+        self.assertEqual(argv[argv.index("--semantic-store") + 1], "/d/meaning.sqlite")
+        self.assertEqual(argv[argv.index("--ontology-mode") + 1], "combined")
+        self.assertEqual(argv[argv.index("--ontology-budget-ms") + 1], "5000")
+        self.assertEqual(pipeline.init_argv(o)[-2:], ["--project-id", "project"])
+        o.ontology = "ontology.yaml"
+        o.semantic_candidate_dir = Path("/d/project/v-held")
+        self.assertIn("--hold-for-review", pipeline.setup_argv(o, "v-held"))
+        self.assertEqual(o.serving_dir, Path("/d/project/v-held"))
+        self.assertNotEqual(o.server_config, Path("/d/project-cks.yaml"))
+        self.assertIn("semantic", [s.key for s in pipeline.new_run(o).steps])
+
+    def test_invalid_and_unpinned_inputs_are_rejected(self):
+        cases = [dict(ontology_mode="typo"), dict(ontology_mode="combined"),
+                 dict(ontology_budget_ms=0), dict(ontology_budget_ms=5001),
+                 dict(graph_only=True, semantic_store=Path("/data/meaning.sqlite")),
+                 dict(semantic_store=Path("/source/meaning.sqlite")),
+                 dict(ontology="../outside.yaml"), dict(ontology="/outside.yaml")]
+        for values in cases:
+            with self.subTest(values=values):
+                with self.assertRaises(ValueError):
+                    Options(src=Path("/source"), out=Path("/data"), name="x", **values).validate_semantic()
+
+    def test_semantic_preparation_does_not_activate_or_overwrite_operator_configs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source"
+            source.mkdir()
+            (source / "ontology.yaml").write_text("project_id: demo\n")
+            o = Options(src=source, out=root / "dataset", name="demo", ontology="ontology.yaml", project_id="demo")
+            o.validate_semantic()
+            candidate = o.out / "v-held"
+            candidate.mkdir(parents=True)
+            (candidate / "dataset-identity.json").write_text(json.dumps({"source": {"project_id": "demo"}, "dataset_id": "fixture"}))
+            o.semantic_candidate_dir = candidate
+            current = o.out / "current"
+            current.symlink_to("old")
+            server = root / "dataset-cks.yaml"
+            server.write_text("operator chosen config\n")
+            p = pipeline.Pipeline(o, pipeline.new_run(o), io.StringIO())
+            calls = []
+            p._exec = lambda argv, cb, **kwargs: calls.append(argv) or 0
+            p.do_semantic(p.run.step("semantic"))
+            self.assertEqual(os.readlink(current), "old")
+            self.assertEqual(server.read_text(), "operator chosen config\n")
+            self.assertNotIn("--activate", calls[0])
+            self.assertEqual(calls[0][calls[0].index("--version-dir") + 1], str(candidate))

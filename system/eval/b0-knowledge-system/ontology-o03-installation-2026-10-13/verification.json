@@ -1,0 +1,53 @@
+{
+  "step": "O-03",
+  "date_KST": "2026-10-13",
+  "base_revision": "74744da22855cdc26a3be3c0b9628d69b2ccfab3",
+  "scope": "installer/config/preparation implemented; actual domain adoption and operating binding pending",
+  "go_race": {
+    "test_pass": 55,
+    "subtest_pass": 48,
+    "package_pass": 3
+  },
+  "python_tests": {
+    "passed": 26,
+    "skipped": 1,
+    "skipped_scope": "old optional E2E; separate actual CLI/MCP integration executed with owned binaries"
+  },
+  "actual_cli_binary_SHA": {
+    "cks": "1c147042bbabbcbaf8c4466e6cd2aa45fd1a866aec8ba9fc4fc015e78c7601a8",
+    "ckg": "fd09f969fe9141dd3043ba66cfafdef5786dca4167a19c8e38b9b83c9a5e934e",
+    "ckv": "3ebcc03cecc4f55df140d39dd1e2961faf0d46c5ce472cc61270551d0403d0ae"
+  },
+  "actual_mock_integration": {
+    "real_CKG_CKV_SQLite_and_retained_source": true,
+    "semantic_store_written": true,
+    "semantic_activation_count": 0,
+    "source_review_status": "proposed",
+    "MCP_registered_tools": 28,
+    "MCP_calls": [
+      "status",
+      "lookup_term",
+      "get_concept",
+      "trace_requirement"
+    ],
+    "readiness": true,
+    "retrieval_enabled": false,
+    "prior_current_and_operator_config_SHA_preserved": true,
+    "negative_controls": [
+      "new source cannot borrow existing projection",
+      "foreign project_id in captured YAML refused"
+    ]
+  },
+  "real_embedding_model_used": false,
+  "actual_operating_project_changed": false,
+  "actual_domain_content_approved": false,
+  "full_task_complete": false,
+  "technical_checks_verified": [
+    "O03-A",
+    "O03-B"
+  ],
+  "remaining": [
+    "O03-C actual domain content decision",
+    "O03-D actual target binding/operating evidence"
+  ]
+}

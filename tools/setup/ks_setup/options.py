@@ -30,6 +30,13 @@ class Options:
     src: Path
     out: Path
     name: str
+    project_id: Optional[str] = None    # explicit identity for project ontology/spec inputs
+    semantic_store: Optional[Path] = None
+    ontology_mode: str = "off"
+    ontology_budget_ms: int = 1000
+    ontology: Optional[str] = None       # source-relative YAML, captured in the candidate
+    spec: Optional[str] = None
+    semantic_candidate_dir: Optional[Path] = None  # held candidate; never the current pointer
     embedder: str = "ollama"            # ollama | mock (mock is for trying the flow only)
     model: str = DEFAULT_MODEL
     embed_dim: int = DEFAULT_DIM
@@ -64,11 +71,13 @@ class Options:
 
     @property
     def server_config(self) -> Path:
-        return self.out.parent / f"{self.out.name}-cks.yaml"
+        suffix = f"-candidate-{self.semantic_candidate_dir.name}" if self.semantic_candidate_dir else ""
+        return self.out.parent / f"{self.out.name}{suffix}-cks.yaml"
 
     @property
     def stdio_config(self) -> Path:
-        return self.out.parent / f"{self.out.name}-cks-stdio.yaml"
+        suffix = f"-candidate-{self.semantic_candidate_dir.name}" if self.semantic_candidate_dir else ""
+        return self.out.parent / f"{self.out.name}{suffix}-cks-stdio.yaml"
 
     @property
     def report_file(self) -> Path:
@@ -96,7 +105,44 @@ class Options:
     @property
     def serving_dir(self) -> Path:
         """The directory the server reads: <out>/current for versioned builds."""
-        return self.out / "current" if self.versioned else self.out
+        return self.semantic_candidate_dir or (self.out / "current" if self.versioned else self.out)
+
+    @property
+    def prepares_semantic(self) -> bool:
+        return bool(self.ontology or self.spec)
+
+    @property
+    def meaning_store(self) -> Optional[Path]:
+        if self.semantic_store:
+            return self.semantic_store
+        if self.prepares_semantic:
+            return self.out.parent / f"{self.out.name}-semantic.sqlite"
+        return None
+
+    def validate_semantic(self) -> None:
+        if self.ontology_mode not in {"off", "baseline", "concept_text", "relations", "combined"}:
+            raise ValueError("unsupported ontology mode")
+        if not 1 <= self.ontology_budget_ms <= 5000:
+            raise ValueError("ontology budget must be 1..5000ms")
+        if self.graph_only and (self.meaning_store or self.prepares_semantic or self.ontology_mode not in {"off", "baseline"}):
+            raise ValueError("semantic inputs need a versioned graph+vector dataset")
+        if self.ontology_mode not in {"off", "baseline"} and not self.meaning_store:
+            raise ValueError("an enabled ontology mode requires --semantic-store or captured semantic inputs")
+        if self.meaning_store:
+            store = self.meaning_store.resolve()
+            if store == self.src.resolve() or self.src.resolve() in store.parents:
+                raise ValueError("semantic store must be outside the source tree")
+        for name in (self.ontology, self.spec):
+            if not name:
+                continue
+            file = Path(name)
+            if file.is_absolute() or ".." in file.parts:
+                raise ValueError("ontology/spec paths must be source-relative without ..")
+            resolved = (self.src / file).resolve()
+            if self.src.resolve() not in resolved.parents or not resolved.is_file():
+                raise ValueError("ontology/spec input is missing or outside the source tree")
+        if self.prepares_semantic and not (self.project_id or self.setup_config.exists()):
+            raise ValueError("--project-id is required for new ontology/spec preparation; use the same ID in the YAML")
 
 
 def choose_version(out: Path, commit: str, now: Optional[float] = None) -> str:

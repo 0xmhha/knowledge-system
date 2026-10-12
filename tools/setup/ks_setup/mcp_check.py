@@ -166,3 +166,15 @@ def health(cks: Path, config: Path) -> Dict[str, Any]:
         "vector_reachable": vector.get("reachable"),
         "vector_reason": vector.get("reason"),
     }
+
+
+def semantic_status(cks: Path, config: Path) -> Dict[str, Any]:
+    """Query the pinned semantic readiness tool without model queries or writes."""
+    client = StdioClient(cks, config)
+    try:
+        client.initialize()
+        if "cks.semantic.status" not in client.list_tools():
+            return {"availability": "unsupported", "reason": "semantic_status_tool_missing"}
+        return client.call("cks.semantic.status", {})
+    finally:
+        client.close()

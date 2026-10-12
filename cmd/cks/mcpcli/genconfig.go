@@ -44,6 +44,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	domainCorpusDir := fs.String("domain-corpus-dir", "", "domain corpus export dir (enables channel 2)")
 	glossaryPath := fs.String("glossary", "", "vocab glossary YAML path")
 	semanticStore := fs.String("semantic-store", "", "optional SQLite semantic store for reviewed v2 trace paths")
+	ontologyMode := fs.String("ontology-mode", "off", "optional reviewed ontology arm: off | baseline | concept_text | relations | combined")
+	ontologyBudget := fs.Int("ontology-budget-ms", 1000, "ontology preparation/retrieval budget in milliseconds (1..5000)")
 	footprintDir := fs.String("footprint-dir", "", "footprint log output dir")
 	auditDir := fs.String("audit-dir", "", "audit log output dir")
 	labelPrefix := fs.String("service-label-prefix", "", "launchd label prefix for `cks mcp service`; empty uses the engine's own name (set it only when agents are already installed under another prefix, or two distributions share a host)")
@@ -53,6 +55,13 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	}
 	if *out == "" {
 		return fmt.Errorf("--out is required")
+	}
+
+	if (*ontologyMode == "relations" || *ontologyMode == "concept_text" || *ontologyMode == "combined") && *semanticStore == "" {
+		return fmt.Errorf("--semantic-store is required for an enabled --ontology-mode")
+	}
+	if *ontologyBudget < 1 || *ontologyBudget > 5000 {
+		return fmt.Errorf("--ontology-budget-ms must be 1..5000")
 	}
 
 	// A written config is used from an arbitrary working directory, so the
@@ -94,30 +103,40 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		addr = net.JoinHostPort(wildcardBind, p)
 	}
 
+	semanticPath := *semanticStore
+	if semanticPath != "" {
+		var err error
+		semanticPath, err = filepath.Abs(semanticPath)
+		if err != nil {
+			return err
+		}
+	}
 	cfg := config.Generate(config.GenerateOptions{
-		Name:               *name,
-		Description:        *description,
-		DatasetDir:         *datasetDir,
-		GraphPath:          *graphPath,
-		VectorPath:         *vectorPath,
-		SourceRoot:         *sourceRoot,
-		GraphBinary:        *graphBinary,
-		VectorBinary:       *vectorBinary,
-		PolicyFile:         *policyFile,
-		EmbedModel:         *embedModel,
-		EmbedDim:           *embedDim,
-		QueryPrefixPolicy:  *queryPrefixPolicy,
-		OllamaURL:          *ollamaURL,
-		HTTPAddr:           addr,
-		AllowRemote:        *allowRemote,
-		SanitizeRulesPath:  sanitizePath,
-		DomainProjectDir:   *domainProjectDir,
-		DomainCorpusDir:    *domainCorpusDir,
-		GlossaryPath:       *glossaryPath,
-		SemanticStorePath:  *semanticStore,
-		FootprintDir:       *footprintDir,
-		AuditDir:           *auditDir,
-		ServiceLabelPrefix: *labelPrefix,
+		Name:                 *name,
+		Description:          *description,
+		DatasetDir:           *datasetDir,
+		GraphPath:            *graphPath,
+		VectorPath:           *vectorPath,
+		SourceRoot:           *sourceRoot,
+		GraphBinary:          *graphBinary,
+		VectorBinary:         *vectorBinary,
+		PolicyFile:           *policyFile,
+		EmbedModel:           *embedModel,
+		EmbedDim:             *embedDim,
+		QueryPrefixPolicy:    *queryPrefixPolicy,
+		OllamaURL:            *ollamaURL,
+		HTTPAddr:             addr,
+		AllowRemote:          *allowRemote,
+		SanitizeRulesPath:    sanitizePath,
+		DomainProjectDir:     *domainProjectDir,
+		DomainCorpusDir:      *domainCorpusDir,
+		GlossaryPath:         *glossaryPath,
+		SemanticStorePath:    semanticPath,
+		SemanticOntologyMode: *ontologyMode,
+		SemanticBudgetMS:     *ontologyBudget,
+		FootprintDir:         *footprintDir,
+		AuditDir:             *auditDir,
+		ServiceLabelPrefix:   *labelPrefix,
 	})
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("generated config invalid: %w", err)

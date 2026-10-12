@@ -181,3 +181,42 @@ func TestRunGenConfigFailsWhenNoBaselineIsFound(t *testing.T) {
 		t.Fatalf("a config naming a missing ruleset was written: %v", err)
 	}
 }
+
+func TestGenConfigOntologyModesRoundTrip(t *testing.T) {
+	out := filepath.Join(t.TempDir(), "ontology.yaml")
+	args := []string{"--out", out, "--dataset-dir", "/fixture/version", "--source-root", "/fixture/source", "--sanitize-rules", "/fixture/rules.yaml", "--semantic-store", "/fixture/meaning.sqlite", "--ontology-mode", "combined", "--ontology-budget-ms", "5000"}
+	if err := runGenConfig(args, io.Discard); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Semantic.OntologyMode != "combined" || cfg.Semantic.OntologyBudgetMS != 5000 || cfg.Semantic.StorePath != "/fixture/meaning.sqlite" {
+		t.Fatalf("settings lost: %+v", cfg.Semantic)
+	}
+}
+
+func TestGenConfigRejectsIncompleteOntologyWithoutWriting(t *testing.T) {
+	for _, flags := range [][]string{{"--ontology-mode", "combined"}, {"--ontology-mode", "typo"}, {"--ontology-budget-ms", "0"}, {"--ontology-budget-ms", "5001"}} {
+		out := filepath.Join(t.TempDir(), "new.yaml")
+		args := append([]string{"--out", out, "--dataset-dir", "/fixture", "--sanitize-rules", "/fixture/rules.yaml"}, flags...)
+		if err := runGenConfig(args, io.Discard); err == nil {
+			t.Fatalf("invalid options accepted: %v", flags)
+		}
+		if _, err := os.Stat(out); !os.IsNotExist(err) {
+			t.Fatal("invalid options wrote a config")
+		}
+	}
+	out := filepath.Join(t.TempDir(), "off.yaml")
+	if err := runGenConfig([]string{"--out", out, "--dataset-dir", "/fixture", "--sanitize-rules", "/fixture/rules.yaml"}, io.Discard); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Semantic.OntologyMode != "" {
+		t.Fatal("default off changed the legacy raw-query-first setting")
+	}
+}

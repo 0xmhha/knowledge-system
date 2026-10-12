@@ -36,3 +36,19 @@ lookup의 반복·번역 후보를 독립 표본으로 세지 않는다. 모호 
 관련3패키지 전체 race **175시험·169하위시험 pass, fail0/skip0**, vet/boundary/diff 및 MCP28등록·새 입력/output schema 통과. 세 조회도구 미등록 RED→GREEN; test-only sanitizer 작성 오류는 별도로 보존. [원자료](../../system/eval/b0-knowledge-system/ontology-o02-reads-2026-10-13/verification.json).
 
 **현재 O2/4 완료. 다음 O03 프로젝트 ontology/spec 준비·설치 연결. 남은 전체 N16/O03/O04의3개.**
+
+## O03: 명시적 설치 연결 — 기술 준비 완료 / 실제 도메인 대기
+
+cks mcp gen-config에 --ontology-mode/--ontology-budget-ms를 추가하고 의미 저장소 경로를 절대 경로로 보존한다. enabled mode+store 미지정·잘못된 mode/budget은 설정을 쓰기 전에 거부한다. default off는 기존 raw-query-first 선택을 바꾸지 않도록 YAML mode를 비워 둔다(표시 상태는 off).
+
+ks-setup은 --project-id/--semantic-store/--ontology-mode/--ontology-budget-ms와 source-relative --ontology/--spec을 지원한다. store는 소스 트리 밖에 두며 graph-only 의미 입력·외부/탈출 경로·잘못된 budget/mode는 거부한다. 새 ontology/spec에는 안정 project ID가 필요하고 기존 init 설정과 다르면 거부한다. 기존 binary에 기본 경로의 새 옵션을 강제 전달하지 않는다.
+
+의미 입력 또는 store 연결이 요청되면 index를 --hold-for-review로 만든다. ontology/spec 파일은 같은 candidate의 **retained source**에서 추출하고 검증 후 저장·제안 JSON을 만든다. --activate는 전달하지 않으며 source status/reviewer를 임의로 바꾸지 않는다. config는 후보 전용 이름/버전 경로를 사용하므로 이전 current·운영 config를 덮어쓰지 않는다.
+
+준비 단계는 정의/요구를 추출할 뿐 code/test 관계를 발명하지 않는다. status smoke는 backend health와 구별해 read_tools_ready를 확인하고, 명시된 enabled mode에는 retrieval_ready를 요구한다. 모호성/미검토는 조회 가능하지만 재순위 수용으로 간주하지 않는다.
+
+자체 **실제 Git source/CKG·CKV DB(mock embedder)/semantic SQLite/CLI3/stdio MCP**에서 긍정/부정 통합을 실행했다. proposed 개념1/요구1을 같은 snapshot에서 읽었고, mode off·read ready true·retrieval ready false였다. 새 source에 옛 store를 빌리거나 다른 project ID의 YAML을 주면 거부됐고 매번 old current/운영 설정 SHA가 같았다. 실모델은 쓰지 않았고 startup은 닫힌 시험 loopback endpoint를 사용해 모델 불가(degraded)이며, 읽기 의미 도구는 독립적으로 동작했다. 이는 실제 go-stablenet의 데이터/내용 수용 또는 검색 품질 시험이 아니다.
+
+관련 Go3패키지 race55시험/48하위시험 pass·Python26pass/optional E2E1skip. 별도 실제 통합은 실행했다. [원자료](../../system/eval/b0-knowledge-system/ontology-o03-installation-2026-10-13/verification.json), [공개 설치 사용법](../../tools/setup/README.md#reviewed-meaning-and-ontology-readiness).
+
+O03-A/B 기술 조건은 충족. O03-C의 실제 도메인 채택과 O03-D의 대상 운영 결합은 **미완료**다. go-stablenet의 ontology/spec/관계·검토자와 적용할 원문/버전이 아직 정해지지 않았다. 기존 knowledge-system 파일럿 DB를 다른 corpus로 전용하지 않는다. 실제 자료가 정해지기 전에는 온톨로지 2/4 완료와 전체 잔여 N16/O03/O04의3개를 유지한다.

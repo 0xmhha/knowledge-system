@@ -425,8 +425,8 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 
 ### O-03 프로젝트 자료·설치 연결
 
-- [ ] O03-A gen-config/setup의 explicit semantic store/mode/budget·ontology/spec 준비 옵션, off 기본/잘못된 조합 거부 및 기존 경로 호환.
-- [ ] O03-B 준비·검토·연결·activation 단계를 구분, 대상 dataset와 source 입력을 결합하고 projection 검증 없이 ready/activate0.
+- [x] O03-A gen-config/setup의 explicit semantic store/mode/budget·ontology/spec 준비 옵션, off 기본/잘못된 조합 거부 및 기존 경로 호환.
+- [x] O03-B 준비·검토·연결·activation 단계를 구분, 대상 dataset와 source 입력을 결합하고 projection 검증 없이 ready/activate0.
 - [ ] O03-C controlled 설치→MCP status/조회 positive 및 missing/stale 실패 제어; 실제 도메인 채택/리뷰 기록은 명확한 사용자 판정 필요.
 - [ ] O03-D 운영 설정/새 인덱스/선택 팩과의 연계·재색인 시 stale 전환·기존 current 보존, 실제 대상 원문·한계와 source SHA 기록.
 
@@ -440,3 +440,5 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 O01 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·171시험/156하위시험/3패키지 race pass, progress guard11·vet/boundary 통과. readiness와 실제 quality/criterion acceptance를 분리했고 운영 자료는 변경하지 않았다. 다음 O02, 전체 잔여4개(N16/O02/O03/O04).
 
 O02 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·175시험/169하위시험/3패키지 race pass, tools28/input/output schema·immutable/sanitizer/단계 상태 분리. 다음 O03, 전체 잔여3개(N16/O03/O04).
+
+O03-A/B 기술 검증: [기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·Go55/48 race·Python26pass1skip·actual mock CLI/MCP held preparation·old current/config SHA 보존·source/project mismatch2거부. O03-C/D의 실제 도메인/운영 결합은 대기이며 전체 O2/4·잔여 N16/O03/O04의3개다.

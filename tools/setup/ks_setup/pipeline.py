@@ -25,21 +25,27 @@ class StepFailed(Exception):
 
 
 def new_run(opts: Options) -> Run:
-    return Run([
+    steps = [
         Step("preflight", "Check prerequisites"),
         Step("build", "Build ckg / ckv / cks"),
         Step("init", "Write the project setup config"),
         Step("index", "Build the knowledge dataset"),
         Step("serve", "Write the MCP server config"),
         Step("verify", "Start the server and check health"),
-    ])
+    ]
+    if opts.prepares_semantic:
+        steps.insert(4, Step("semantic", "Prepare captured meaning for review (held, not activated)"))
+    return Run(steps)
 
 
 # --- command builders (pure, unit-tested) ---------------------------------
 
 def init_argv(opts: Options) -> List[str]:
-    return [str(opts.binary("cks")), "init", "--src", str(opts.src), "--dataset", str(opts.out),
+    argv = [str(opts.binary("cks")), "init", "--src", str(opts.src), "--dataset", str(opts.out),
             "--embedder", opts.embedder, "--model-name", opts.model, "--config-out", str(opts.setup_config)]
+    if opts.project_id:
+        argv += ["--project-id", opts.project_id]
+    return argv
 
 
 def load_pack(opts: Options) -> Optional[packs.Pack]:
@@ -67,7 +73,10 @@ def setup_argv(opts: Options, version: Optional[str], pack: Optional[packs.Pack]
         argv += ["--gate-min-canonical", f"{opts.min_canonical:g}"]
     if build_sources is not None:
         argv += ["--vector-build-sources", str(build_sources)]
-    return argv + pack_flags + opts.extra_setup_args
+    argv += pack_flags + opts.extra_setup_args
+    if opts.meaning_store:
+        argv += ["--hold-for-review"]
+    return argv
 
 
 def setup_env(opts: Options) -> Dict[str, str]:
@@ -85,10 +94,15 @@ def gen_config_argv(opts: Options, out: Optional[Path] = None, pack: Optional[pa
             "--sanitize-rules", str(repo_root() / "system" / "policies" / "sanitization_rules.yaml"),
             "--source-root", str(opts.src), "--graph-binary", str(opts.binary("ckg")),
             "--vector-binary", str(opts.binary("ckv"))]
+    argv += ["--ollama-url", opts.ollama_url]
     if opts.embedder == "ollama":
-        argv += ["--ollama-url", opts.ollama_url, "--embed-model", opts.model, "--embed-dim", str(opts.embed_dim)]
+        argv += ["--embed-model", opts.model, "--embed-dim", str(opts.embed_dim)]
     if pack:
         argv += pack.server_flags(opts.graph_only, opts.derived_dir)
+    if opts.meaning_store:
+        argv += ["--semantic-store", str(opts.meaning_store)]
+    if opts.meaning_store or opts.ontology_mode != "off" or opts.ontology_budget_ms != 1000:
+        argv += ["--ontology-mode", opts.ontology_mode, "--ontology-budget-ms", str(opts.ontology_budget_ms)]
     return argv
 
 
@@ -172,6 +186,8 @@ class Pipeline:
     def execute(self) -> bool:
         order = [("preflight", self.do_preflight), ("build", self.do_build), ("init", self.do_init),
                  ("index", self.do_index), ("serve", self.do_serve), ("verify", self.do_verify)]
+        if self.opts.prepares_semantic:
+            order.insert(4, ("semantic", self.do_semantic))
         try:
             for key, fn in order:
                 self._step(key, fn)
@@ -188,6 +204,7 @@ class Pipeline:
     # --- steps ---------------------------------------------------------------
 
     def do_preflight(self, step: Step) -> None:
+        self.opts.validate_semantic()
         checks = preflight.run_all(self.opts)
         for c in checks:
             sub = step.substep(c.name)
@@ -226,6 +243,10 @@ class Pipeline:
             return
         cfg = self.opts.setup_config
         if cfg.exists():
+            if self.opts.project_id:
+                match = re.search(r"(?m)^project_id:\s*(.+?)\s*$", cfg.read_text())
+                if not match or match.group(1).strip("\"'") != self.opts.project_id:
+                    raise StepFailed("existing setup project_id differs; choose another --out")
             existing = config_src(cfg)
             if existing and Path(existing).resolve() != self.opts.src.resolve():
                 raise StepFailed(f"{cfg} was written for {existing}; choose another --out")
@@ -250,6 +271,8 @@ class Pipeline:
         if code != 0:
             reason = failed[0].detail if failed else (self._last_stderr or f"cks setup exited {code}")
             raise StepFailed(reason)
+        if self.opts.meaning_store:
+            self.opts.semantic_candidate_dir = self.opts.out / self.version
         for s in step.substeps:
             if s.status == Status.RUNNING:
                 s.finish(Status.DONE)
@@ -257,6 +280,27 @@ class Pipeline:
             self._check_go_scope(step)
         where = f"{self.opts.out}/{self.version}" if self.version else str(self.opts.out)
         step.finish(Status.WARNING if any(s.status == Status.WARNING for s in step.substeps) else Status.DONE, where)
+
+    def do_semantic(self, step: Step) -> None:
+        candidate = self.opts.semantic_candidate_dir
+        if not candidate or not self.opts.meaning_store:
+            raise StepFailed("semantic preparation needs a held version and store")
+        identity = json.loads((candidate / "dataset-identity.json").read_text())
+        self.opts.derived_dir.mkdir(parents=True, exist_ok=True)
+        output_file = self.opts.derived_dir / f"{candidate.name}-semantic-proposed.json"
+        argv = [str(self.opts.binary("cks")), "semantic", "build", "--repo", str(self.opts.src),
+                "--project-id", identity["source"]["project_id"], "--dataset-id", identity["dataset_id"],
+                "--graph", str(candidate / "graph"), "--vector", str(candidate / "vector"),
+                "--version-dir", str(candidate), "--store", str(self.opts.meaning_store), "--out", str(output_file)]
+        for flag, value in (("--ontology", self.opts.ontology), ("--spec", self.opts.spec)):
+            if value:
+                argv += [flag, value]
+        if self.opts.min_canonical is not None:
+            argv += ["--min-canonical-ratio", str(self.opts.min_canonical)]
+        code = self._exec(argv, self.run.add_log)
+        if code != 0:
+            raise StepFailed("captured semantic preparation failed; current is unchanged")
+        step.finish(Status.DONE, f"{output_file.name}; no review or activation performed")
 
     def _build_sources(self, step: Step) -> Optional[Path]:
         """List the Go files under build/ directories that the graph loads, so
@@ -332,6 +376,12 @@ class Pipeline:
                        (h.get("vector_reason") or "unreachable")[:120])
             if self.opts.embedder != "mock":
                 raise StepFailed("vector index is not reachable: " + str(h.get("vector_reason")))
+        ontology = mcp_check.semantic_status(self.opts.binary("cks"), self.opts.stdio_config)
+        h["ontology"] = ontology
+        if self.opts.meaning_store and not ontology.get("read_tools_ready"):
+            raise StepFailed("semantic data is not readable: " + str(ontology.get("availability", "unsupported")))
+        if self.opts.ontology_mode not in {"off", "baseline"} and not ontology.get("retrieval_ready"):
+            raise StepFailed("requested ontology mode is not ready: " + str(ontology.get("reason")))
         self.health = h
         symbol = mcp_check.busiest_function(self.opts.serving_dir / "graph" / "graph.db")
         smoke = mcp_check.smoke_queries(self.opts.binary("cks"), self.opts.stdio_config, symbol,
@@ -401,5 +451,7 @@ class Pipeline:
         if self.profile:
             lines += profile.summary_lines(self.profile)
             lines.append(f"Report:         {o.report_file}")
+        if o.meaning_store:
+            lines.append("HELD semantic candidate: current and existing server configs were not changed; review before release.")
         lines.append("Running servers keep the dataset they opened; restart them after a rebuild.")
         self.run.summary = lines

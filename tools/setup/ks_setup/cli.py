@@ -25,6 +25,12 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--src", help="Git repository to index (asked for when omitted)")
     p.add_argument("--out", help="dataset directory, outside the source tree (default: ../knowledge-data/<name> beside the source)")
     p.add_argument("--name", help="MCP instance name (default: source directory name)")
+    p.add_argument("--project-id", help="stable ID matching ontology/spec project_id (kept on rebuild)")
+    p.add_argument("--semantic-store", help="aligned semantic SQLite store; never activated by this tool")
+    p.add_argument("--ontology-mode", choices=["off", "baseline", "concept_text", "relations", "combined"], default="off")
+    p.add_argument("--ontology-budget-ms", type=int, default=1000, help="optional ontology/status budget 1..5000ms")
+    p.add_argument("--ontology", help="source-relative ontology YAML; prepare a held candidate without changing current")
+    p.add_argument("--spec", help="source-relative spec YAML; requires the same project_id as the dataset")
     p.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"HTTP port written into the server config (default {DEFAULT_PORT})")
     p.add_argument("--graph-only", action="store_true", help="build only the graph index; no Ollama needed")
     p.add_argument("--embedder", choices=["ollama", "mock"], default="ollama",
@@ -75,7 +81,9 @@ def build_options(ns: argparse.Namespace, interactive: bool) -> Options:
     if not out_arg:
         out_arg = _ask("Dataset directory", default_out) if interactive else default_out
     bin_dir = expand(ns.bin_dir) if ns.bin_dir else None
-    return Options(src=src, out=expand(out_arg), name=name, embedder=ns.embedder, model=ns.model,
+    return Options(src=src, out=expand(out_arg), name=name,
+                   project_id=ns.project_id, semantic_store=expand(ns.semantic_store) if ns.semantic_store else None,
+                   ontology_mode=ns.ontology_mode, ontology_budget_ms=ns.ontology_budget_ms, ontology=ns.ontology, spec=ns.spec, embedder=ns.embedder, model=ns.model,
                    embed_dim=ns.embed_dim, ollama_url=ns.ollama_url, port=ns.port, version=ns.version_label,
                    graph_only=ns.graph_only, source_mode=ns.source_mode, build=not (ns.no_build or bin_dir),
                    bin_dir=bin_dir, verify=not ns.no_verify, build_timeout=ns.build_timeout,
