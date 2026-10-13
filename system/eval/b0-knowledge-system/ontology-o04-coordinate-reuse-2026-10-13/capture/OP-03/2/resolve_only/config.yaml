@@ -1,0 +1,46 @@
+backends:
+  ckg:
+    binary_path: ''
+    path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/dataset/v-approved-wbft-baca2869/graph/graph.db
+    policy_file: ''
+    source_root: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/source
+    timeout_ms: 5000
+  ckv:
+    binary_path: ''
+    embed_dim: 1024
+    embed_model: bge-m3:latest
+    ollama_url: http://127.0.0.1:11434
+    path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/dataset/v-approved-wbft-baca2869/vector
+    provider: ''
+    query_prefix_policy: registry
+    timeout_ms: 3000
+description: ''
+domain:
+  corpus_dir: ''
+  project_dir: ''
+listen:
+  allow_remote: false
+  allowed_cidrs: []
+  http_addr: 127.0.0.1:8080
+  mcp_stdio: true
+  transport: stdio
+logging:
+  audit_dir: ''
+  footprint_dir: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/coordinate-reuse-2026-10-13/OP-03/2/resolve_only/events
+  level: info
+  mode: prod
+  measure_backend_calls: true
+name: approved-wbft-held
+sanitize:
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+semantic:
+  ontology_budget_ms: 5000
+  store_path: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/semantic.sqlite
+  ontology_mode: relations
+service:
+  label_prefix: ''
+version: 1
+vocab:
+  glossary_path: ''
