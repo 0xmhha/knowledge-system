@@ -486,6 +486,11 @@ func fullObjectID(id string) bool {
 }
 
 func validateCapturedPaths(paths []string) error {
+	for _, p := range paths {
+		if p == "@cks" || strings.HasPrefix(p, "@cks/") {
+			return fmt.Errorf("reserved retained corpus namespace %q", p)
+		}
+	}
 	seen := make(map[string]string, len(paths))
 	fold := cases.Fold()
 	for _, path := range paths {

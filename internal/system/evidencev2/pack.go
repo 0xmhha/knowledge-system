@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -26,7 +27,14 @@ import (
 func Build(ctx context.Context, versionDir, query string, refs []contract.Citation, cleaner *sanitize.Engine) (contract.EvidencePackV2, error) {
 	requested := make([]Ref, 0, len(refs))
 	for _, ref := range refs {
-		requested = append(requested, Ref{OriginID: "repo", Citation: ref})
+		origin := "repo"
+		if index, relative, reserved, valid := sourcepath.Parse(ref.File); reserved {
+			if !valid {
+				return contract.EvidencePackV2{}, fmt.Errorf("invalid retained corpus citation")
+			}
+			origin, ref.File = sourcepath.Origin(index), relative
+		}
+		requested = append(requested, Ref{OriginID: origin, Citation: ref})
 	}
 	return BuildFromRefs(ctx, versionDir, query, requested, cleaner)
 }
@@ -241,10 +249,12 @@ func validatePack(pack contract.EvidencePackV2) error {
 	return nil
 }
 
+var corpusOrigin = regexp.MustCompile(`^docs:corpus\.(0|[1-9][0-9]*)$`)
+
 var knowledgeOrigin = regexp.MustCompile(`^knowledge:[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)+$`)
 
 func validV2Origin(origin string) bool {
-	return origin == "repo" || knowledgeOrigin.MatchString(origin)
+	return origin == "repo" || knowledgeOrigin.MatchString(origin) || corpusOrigin.MatchString(origin)
 }
 
 func hexDigest(value string) bool {

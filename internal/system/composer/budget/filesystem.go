@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -51,6 +52,24 @@ type FilesystemFetcher struct {
 // skip-not-error per the BodyFetcher contract.
 func (f *FilesystemFetcher) Fetch(_ context.Context, c contract.Citation) (string, error) {
 	roots := append([]string{f.Root}, f.DocsRoots...)
+	if index, relative, reserved, valid := sourcepath.Parse(c.File); reserved {
+		if !valid {
+			return "", nil
+		}
+		// Mounted archives already expose namespaced paths. Otherwise use
+		// exactly the registered document root, never an unqualified fallback.
+		if path, ok := resolveUnder(f.Root, c.File); ok && f.Root != "" {
+			if data, err := os.ReadFile(path); err == nil {
+				return extractLines(string(data), c.StartLine, c.EndLine), nil
+			} else if !errors.Is(err, fs.ErrNotExist) {
+				return "", err
+			}
+		}
+		if index >= len(f.DocsRoots) {
+			return "", nil
+		}
+		c.File, roots = relative, []string{f.DocsRoots[index]}
+	}
 	if filepath.IsAbs(c.File) {
 		roots = roots[:1] // absolute path ignores root; a single attempt suffices
 	}

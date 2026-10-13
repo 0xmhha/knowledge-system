@@ -22,6 +22,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"io"
 	"os"
 	"strings"
@@ -134,6 +135,10 @@ func Parse(r io.Reader, corpusRel string) ([]types.Chunk, Stats, error) {
 				st.Warnings = append(st.Warnings, fmt.Sprintf("line %d: flow missing id/summary", lineNo))
 				continue
 			}
+			if _, _, reserved, valid := sourcepath.Parse(corpusRel); reserved && valid {
+				c.StartLine, c.EndLine = lineNo, lineNo
+				c.ID = types.ChunkID(corpusRel, lineNo, lineNo, c.ContentSHA256)
+			}
 			chunks = append(chunks, c)
 			st.Flows++
 		case "step":
@@ -151,6 +156,10 @@ func Parse(r io.Reader, corpusRel string) ([]types.Chunk, Stats, error) {
 				st.Skipped++
 				st.Warnings = append(st.Warnings, fmt.Sprintf("line %d: invariant missing id/statement", lineNo))
 				continue
+			}
+			if _, _, reserved, valid := sourcepath.Parse(corpusRel); reserved && valid {
+				c.StartLine, c.EndLine = lineNo, lineNo
+				c.ID = types.ChunkID(corpusRel, lineNo, lineNo, c.ContentSHA256)
 			}
 			chunks = append(chunks, c)
 			st.Invariants++

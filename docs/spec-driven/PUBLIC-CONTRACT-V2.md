@@ -52,6 +52,8 @@ versioned 빌드·gate·보류/승격과 외부 승격/rollback은 동일한 OS 
 
 `coordinates`와 각 인용의 ID/모드는 완전히 같아야 한다. `origin_id`와 `file`은 보관본의 등록된 상대 경로를 가리킨다. `committed`에서는 `commit_hash=base_commit`, `working-tree`와 `snapshot-only`에서는 `commit_hash=""`다. 비Git `snapshot-only`의 `base_commit`도 빈 문자열이다. `file_sha256`은 전체 보관 파일, `content_sha256`은 지정 줄 범위의 정화 전 원문 바이트다. 두 값을 재검증한 뒤 본문을 정화한다. 상태가 `partial`이면 확정 답변으로 사용할 수 없다.
 
+pinned setup의 domain/flow corpus도 코드와 함께 보관한다. domain export는 identity 고정 전에 한 번 실행하고, CKV docs roots 순서로 `docs:corpus.<index>` origin을 부여한다. 검색·v1 본문 선택에서 `@cks/docs/<index>/<relative-path>`를 사용하고 v2 공개 인용은 origin과 원래 상대 경로로 분리한다. 같은 파일명을 가진 repo와 문서는 서로 다른 근거다. `@cks/`는 예약 경로이며 repo capture와 잘못된 namespace를 거부한다. flow step은 코드 줄을, flow spine/curated invariant는 JSONL의 실제 행을 인용한다. 보관 origin이 없는 이전 dataset은 새 버전으로 재색인해야 한다. origin 등록이나 정상 인용은 문서의 사람 검토·정책 승인을 뜻하지 않는다. [실측 검증과 비교](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
+
 현재 CKV의 `chunks.content_sha256`은 청크 텍스트의 다이제스트다. v2 인용의 `content_sha256`은 **보관 원문 줄 바이트에서 새로 계산**하며 이 값을 CKV의 기존 열에서 그대로 복사하지 않는다. 줄 끝과 범위는 internal/system/evidencev2의 보관 원문 바이트·줄 경계 검증을 따른다.
 
 v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start_line,end_line,file_sha256,content_sha256)`의 순서 있는 튜플이다. 문자열 결합으로 충돌을 만들지 않도록 길이 접두어 직렬화하거나 튜플 자체로 비교한다. 서로 다른 스냅샷에서 경로와 줄이 같아도 합치지 않는다.

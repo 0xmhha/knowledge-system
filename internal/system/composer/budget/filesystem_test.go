@@ -224,3 +224,19 @@ func TestFilesystemFetcher_EmptyRootKeepsRelative(t *testing.T) {
 
 // Compile-time guarantee.
 var _ BodyFetcher = (*FilesystemFetcher)(nil)
+
+func TestFilesystemFetcherNamespacedCorpusDoesNotSelectSameNamedCode(t *testing.T) {
+	root, docs := t.TempDir(), t.TempDir()
+	for path, text := range map[string]string{filepath.Join(root, "same.md"): "code", filepath.Join(docs, "same.md"): "docs"} {
+		if err := os.WriteFile(path, []byte(text), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	f := &FilesystemFetcher{Root: root, DocsRoots: []string{docs}}
+	for file, expected := range map[string]string{"same.md": "code", "@cks/docs/0/same.md": "docs", "@cks/docs/1/same.md": "", "@cks/docs/0/../same.md": ""} {
+		got, err := f.Fetch(context.Background(), contract.Citation{File: file, StartLine: 1, EndLine: 1})
+		if err != nil || got != expected {
+			t.Fatalf("%s: %q %v", file, got, err)
+		}
+	}
+}

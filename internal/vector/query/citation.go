@@ -1,6 +1,7 @@
 package query
 
 import (
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -128,6 +129,19 @@ func flowStepLineDrifted(srcRoot string, c types.Chunk, docsRoots []string) bool
 // resolveExisting returns the first root/rel path that exists as a regular file
 // (srcRoot first, then docsRoots), or "" when none does.
 func resolveExisting(srcRoot, rel string, docsRoots []string) string {
+	index, relative, reserved, valid := sourcepath.Parse(rel)
+	if reserved {
+		if !valid {
+			return ""
+		}
+		if fileExistsUnder(srcRoot, rel) {
+			return filepath.Join(srcRoot, rel)
+		}
+		if index < len(docsRoots) && fileExistsUnder(docsRoots[index], relative) {
+			return filepath.Join(docsRoots[index], relative)
+		}
+		return ""
+	}
 	if fileExistsUnder(srcRoot, rel) {
 		return filepath.Join(srcRoot, rel)
 	}
@@ -192,6 +206,9 @@ func hasSyntheticCitation(c types.Chunk) bool {
 // hasSyntheticCitation) — otherwise every PR / convention / flow-spine hit
 // would be silently dropped.
 func verifyCitation(srcRoot string, c types.Chunk, docsRoots []string) bool {
+	if _, _, reserved, valid := sourcepath.Parse(c.File); reserved {
+		return valid && c.StartLine > 0 && c.EndLine >= c.StartLine && resolveExisting(srcRoot, c.File, docsRoots) != ""
+	}
 	if hasSyntheticCitation(c) {
 		return true
 	}

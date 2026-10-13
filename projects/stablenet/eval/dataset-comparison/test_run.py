@@ -64,5 +64,23 @@ class EvidenceComparisonTests(unittest.TestCase):
         question['expected_anchor']['line'] = 2
         self.assertEqual(M.anchor_score(question, self.pack)['hit_at_10'], 0)
 
+    def test_backend_cost_matches_captured_measurement_ids(self):
+        M.write(self.root / 'questions.json', {'questions': []})
+        rows = []
+        for arm in ('baseline', 'candidate'):
+            identifier = arm + '-scored'
+            rows.append({'arm': arm, 'block': 1, 'request_id': 'q', 'phase': 'warm_latency', 'iteration': 1,
+                         'call': {'measurement_id': identifier, 'response': {'isError': True}}})
+            directory = self.root / 'capture' / '1' / arm / 'events'; directory.mkdir(parents=True)
+            events = [{'event': 'measurement.backend_calls', 'summary': {'measurement_id': measurement,
+                       'pending_calls': pending, 'calls': [{'backend': 'ollama_http', 'options': {'path': '/api/embed'}}]}}
+                      for measurement, pending in [(identifier, 0), (arm + '-startup', 5)]]
+            (directory / 'cks-mcp.jsonl').write_text('\n'.join(json.dumps(event) for event in events) + '\n')
+        summary = M.summarize(rows, {'baseline': self.root, 'candidate': self.root}, self.root)
+        for arm in ('baseline', 'candidate'):
+            self.assertEqual(summary['backend_observation'][arm]['observed_scopes'], 1)
+            self.assertEqual(summary['backend_observation'][arm]['pending_calls'], 0)
+            self.assertEqual(summary['backend_observation'][arm]['HTTP_attempts'], {'/api/embed': 1})
+
 
 if __name__ == '__main__': unittest.main()

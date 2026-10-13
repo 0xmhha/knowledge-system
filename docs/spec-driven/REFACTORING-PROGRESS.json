@@ -2511,5 +2511,32 @@
     "deferred_release_work_only_on_explicit_user_request": true,
     "always_report_active_task_progress_remaining_next": true,
     "active_worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md"
+  },
+  "active_dataset_followup": {
+    "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "evidence": "system/eval/stablenet-corpus-repair-2026-10-14",
+    "requested_tasks": 3,
+    "completed": 1,
+    "state": "42_question_replay_in_progress",
+    "sequence": [
+      {
+        "order": 1,
+        "task": "retain domain and flow citation sources",
+        "state": "complete",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/candidate-verification.json",
+        "smoke": "system/eval/stablenet-corpus-repair-2026-10-14/stage1-smoke-verification.json"
+      },
+      {
+        "order": 2,
+        "task": "replay unchanged42 questions",
+        "state": "in_progress"
+      },
+      {
+        "order": 3,
+        "task": "review SNK06 scope and expected results",
+        "state": "pending"
+      }
+    ],
+    "runtime_source_binding": "new verification pending; historical acceptance records unchanged"
   }
 }

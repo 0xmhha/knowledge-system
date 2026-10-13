@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -47,8 +48,17 @@ func MaterializeRetainedReadTreeContext(ctx context.Context, versionDir string) 
 	}
 	cleanup := func() { _ = os.RemoveAll(root) }
 	for _, file := range captured.Files {
+		relative := file.Path
 		if file.OriginID != "repo" {
-			continue
+			if !strings.HasPrefix(file.OriginID, "docs:corpus.") {
+				continue
+			}
+			index, err := strconv.Atoi(strings.TrimPrefix(file.OriginID, "docs:corpus."))
+			if err != nil || index < 0 || sourcepath.Origin(index) != file.OriginID {
+				cleanup()
+				return "", nil, fmt.Errorf("invalid retained docs origin")
+			}
+			relative = sourcepath.Docs(index, file.Path)
 		}
 		buf, err := captured.ReadBlob(file.SHA256)
 		if err != nil {
@@ -59,7 +69,7 @@ func MaterializeRetainedReadTreeContext(ctx context.Context, versionDir string) 
 			cleanup()
 			return "", nil, fmt.Errorf("snapshot_mismatch: retained source size changed")
 		}
-		path := filepath.Join(root, filepath.FromSlash(file.Path))
+		path := filepath.Join(root, filepath.FromSlash(relative))
 		if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 			cleanup()
 			return "", nil, err

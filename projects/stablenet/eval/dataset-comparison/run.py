@@ -246,12 +246,14 @@ def summarize(rows, versions, workspace):
     telemetry = {}
     for arm in versions:
         calls = Counter(); pending = 0; scopes = 0
+        expected_measurements = {row['call'].get('measurement_id') for row in rows if row['arm'] == arm}
+        expected_measurements.discard(None)
         for path in (workspace / 'capture').glob('*/' + arm + '/events/cks-mcp.jsonl'):
             for line in path.read_text().splitlines():
                 event = json.loads(line)
                 if event.get('event') == 'measurement.backend_calls':
                     summary = event['summary']
-                    if summary.get('phase') == 'startup.intent_anchors': continue
+                    if summary.get('measurement_id') not in expected_measurements: continue
                     scopes += 1; pending += summary.get('pending_calls', 0)
                     for call in summary.get('calls', []):
                         if call.get('backend') == 'ollama_http': calls[call.get('options', {}).get('path', 'unknown')] += 1

@@ -109,3 +109,16 @@ func TestLoad_ChunkIDsUnique(t *testing.T) {
 		seen[c.ID] = true
 	}
 }
+
+func TestNamespacedFilelessFlowCitesActualJSONLRow(t *testing.T) {
+	corpus := "\n{\"type\":\"flow\",\"id\":\"f\",\"summary\":\"flow summary\"}\n{\"type\":\"invariant\",\"id\":\"i\",\"statement\":\"rule\"}\n"
+	chunks, _, err := Parse(strings.NewReader(corpus), "@cks/docs/1/corpus.jsonl")
+	if err != nil || len(chunks) != 2 {
+		t.Fatalf("parse: %+v %v", chunks, err)
+	}
+	for i, c := range chunks {
+		if c.StartLine != i+2 || c.EndLine != i+2 || c.File != "@cks/docs/1/corpus.jsonl" {
+			t.Fatalf("not a retained JSONL span: %+v", c)
+		}
+	}
+}

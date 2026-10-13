@@ -480,3 +480,55 @@ func TestRun_PublishesDBSHA256(t *testing.T) {
 		t.Errorf("vector.db-wal is %d bytes; checkpoint(TRUNCATE) should empty it", fi.Size())
 	}
 }
+
+func TestPinnedCorpusPathsAndManifestKeepSameNamedSourcesDistinct(t *testing.T) {
+	src, docs, flows, out := t.TempDir(), t.TempDir(), t.TempDir(), t.TempDir()
+	for path, content := range map[string]string{
+		filepath.Join(src, "same.md"):        "# Repository\n\nrepository body\n",
+		filepath.Join(docs, "same.md"):       "# Corpus\n\ndomain body\n",
+		filepath.Join(flows, "corpus.jsonl"): `{"type":"flow","id":"f","summary":"flow summary"}` + "\n",
+	} {
+		if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	_, err := Run(context.Background(), Options{SrcRoot: src, OutDir: out, DocsRoots: []string{docs}, FlowCorpus: filepath.Join(flows, "corpus.jsonl"), Embedder: mock.Default(), ProjectID: "p", SnapshotID: strings.Repeat("a", 64), DatasetID: strings.Repeat("b", 64), FileManifestDigest: strings.Repeat("c", 64), CapturePolicyDigest: strings.Repeat("d", 64), SourceMode: "snapshot-only"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store, err := sqlitevec.Open(filepath.Join(out, "vector.db"), mock.Default().Dimension())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = store.Close() }()
+	q, _ := mock.Default().Embed(context.Background(), []string{"body summary"})
+	hits, err := store.Search(context.Background(), q[0], 50, types.Filter{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := map[string]bool{}
+	for _, hit := range hits {
+		found[hit.Chunk.File] = true
+		if hit.Chunk.File == "@cks/docs/1/corpus.jsonl" && hit.Chunk.StartLine != 1 {
+			t.Fatal("flow has no real source row")
+		}
+	}
+	for _, path := range []string{"same.md", "@cks/docs/0/same.md", "@cks/docs/1/corpus.jsonl"} {
+		if !found[path] {
+			t.Fatalf("missing distinct source %q: %+v", path, found)
+		}
+	}
+	m, err := manifest.Load(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	inputs := map[string]bool{}
+	for _, f := range m.InputFiles {
+		inputs[f.OriginID+"/"+f.Path] = len(f.SHA256) == 64
+	}
+	for _, key := range []string{"repo/same.md", "docs:corpus.0/same.md", "docs:corpus.1/corpus.jsonl"} {
+		if !inputs[key] {
+			t.Fatalf("missing input byte binding: %s", key)
+		}
+	}
+}

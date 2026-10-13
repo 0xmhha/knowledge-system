@@ -53,3 +53,17 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 사용자가 별도로 보류한 출시 사항은 요청 전까지 일반 진행 보고에 포함하지 않는다. 이 작업의 진행/남은 일/다음 단계만 보고한다.
 
 프로토콜과 실행 근거: [evaluation packet](../../system/eval/stablenet-dataset-comparison-2026-10-13/), [protocol](../../system/eval/stablenet-dataset-comparison-2026-10-13/protocol.json), [최종 결과](../../system/eval/stablenet-dataset-comparison-2026-10-13/result.json). 실제 경로와 검증 바이너리는 프로토콜을 따른다.
+
+## 후속 수정과 수용 조건
+
+사용자가 요청한 순서에 따라 아래 세 작업을 수행한다. 앞선 비교 원자료와 기존 current는 보존한다. 새 실행 근거가 확보되기 전에는 완료로 표시하지 않는다.
+
+| 순서 | 작업 | 상태 | 완료에 필요한 근거 |
+|---|---|---|---|
+| 1 | domain/flow 출처 보관과 v2 매핑 | 완료 | 생성 문서를 identity 고정 전에 캡처; 코드와 문서 경로 충돌 방지; JSONL flow 인용의 실제 행; namespace 검증; 변조·누락·동명 경로 회귀 시험; 별도 실측 build/doctor |
+| 2 | 같은 42질문 재평가 | 진행 중 | 원래 requests SHA 유지; 수정 바이너리/새 dataset 좌표 고정; 기존 오류와 비교; 모든 정상 pack의 원문·좌표·hash 검증; 반복 조건·결과·지연 한계 기록 |
+| 3 | SNK06 범위·기대 결과 검토 | 대기 | 원 fixture 실패 보존; 추가 test.*의 실제 검색 일치 여부 확인; 전역 검색 계약과 package 기대 범위 불일치 판정; 별도 명시한 검토 fixture 검증 |
+
+설계: pinned build의 외부 corpus는 CKV `docs_roots` 순서와 일치하는 `docs:corpus.<index>` origin으로 보관한다. v1 검색·본문 선택 동안 `@cks/docs/<index>/<path>` 경로를 사용하여 코드와 동일한 파일명을 구분한다. v2는 이를 origin과 원래 상대 경로로 분리하고 기존 보관 원문/hash/예산/소독 검증을 적용한다. flow step은 구현 코드 인용을 유지하며, flow spine/curated invariant는 corpus JSONL의 실제 행을 인용한다. 이전 dataset에 새 원문을 사후 삽입하지 않으며 재색인이 필요하다. 이 출처 구분은 사람의 검토나 정책 승인을 부여하지 않는다.
+
+1번 검증: 실제29분24초 index, 21304청크, namespace 파일45개, JSONL flow spine/invariant34개 실제 행 확인. repo2224/domain44/flow자료27개 원문을 출처별로 보관했다. strict doctor ready·모델/DB/좌표 일치·기존4개 root/current·source HEAD 보존. ANCHOR-01은 domain 문서 원문을 포함한 complete11인용으로 정상 응답했다. 전체 Go118패키지·관련 race8패키지·vet·lint0issues·comparison Python8시험 통과. lint 수정 뒤 setup/build2패키지를 다시 확인했다. canonical18691/18837을 SQL로 직접 확인했고, 비활성 threshold gate를 통과로 바꾸지 않았다. [수정 검증 자료](../../system/eval/stablenet-corpus-repair-2026-10-14/).
