@@ -28,3 +28,7 @@
 완료 증거는 원장의 각 revision에서 읽는다. squash merge 후에도 원 manifest가 참조하는 커밋 객체가 필요하므로 feat/refactoring-followup/feat/setup-tool의 증거 이력을 삭제하지 않는다. 과거 capture·gold·프로토콜·source snapshot을 고쳐 현행 실행처럼 보이게 만들지 않는다. 운영 source/current/config/DB·모델은 변경하지 않았고, 사용자 .claude/ 및 logs 자료는 접근하지 않는다.
 
 개발 필수 잔여는 N16 하나이며 현재 보류한다. 별도의 저장소 전달 작업인 브랜치 원격 반영·일반 PR 생성은 완료했다. 다음은 CI Go/린터 버전 정합성 수정과 필수 검사 재실행, 권고용 취약점 검토, PR 리뷰다. main merge는 별도 지시가 필요하다. [PR 게시 기록과 검토 자료](./SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md)에 실제 PR과 남은 전달 작업을 정리했다. 작업 완료, 로컬 커밋, 원격 push, PR 생성, main merge, 공개 배포를 각각 따로 확인한다.
+
+## CI 수정 검증 진행 — 2026-10-13
+
+[CI 검증 기록](./CI-TOOLCHAIN-VALIDATION-2026-10-13.md): CI의 세 도구 작업에 Go1.26.9를 고정하고 읽기 전용 정리의 린트 오류2개를 수정했다. 로컬 build/lint·두 수정 패키지 race·도메인 산출물·취약점 검사는 통과했다. 전체 race와 수정 후 GitHub CI는 확인 중이며, 이전 CI 실패를 통과로 표시하지 않는다. 미호출 모듈 취약점2개는 별도 한계로 기록한다. 기존 완료 수와 N16 보류는 유지한다.

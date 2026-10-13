@@ -43,7 +43,7 @@ func readComparisonPack(path string) (contract.EvidencePackV2, error) {
 	if err != nil {
 		return pack, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }() // read-only file; decoding errors are returned below
 	info, err := f.Stat()
 	if err != nil || !info.Mode().IsRegular() || info.Size() > 4<<20 {
 		return pack, fmt.Errorf("response must be a regular file up to 4 MiB")

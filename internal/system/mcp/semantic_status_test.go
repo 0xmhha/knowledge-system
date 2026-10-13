@@ -176,7 +176,11 @@ func TestSemanticStatusDistinguishesReadinessFromMode(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer store.Close()
+			t.Cleanup(func() {
+				if err := store.Close(); err != nil {
+					t.Errorf("close read-only semantic store: %v", err)
+				}
+			})
 			if _, err := store.Current(context.Background(), on.Snapshot.ProjectID); err == nil {
 				t.Fatal("status activated a candidate")
 			}
