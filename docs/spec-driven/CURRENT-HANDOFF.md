@@ -32,3 +32,7 @@
 ## CI 수정 검증 진행 — 2026-10-13
 
 [CI 검증 기록](./CI-TOOLCHAIN-VALIDATION-2026-10-13.md): CI의 세 도구 작업에 Go1.26.9를 고정하고 읽기 전용 정리의 린트 오류2개를 수정했다. 로컬 build/lint·두 수정 패키지 race·도메인 산출물·취약점 검사는 통과했다. 전체 race와 수정 후 GitHub CI는 확인 중이며, 이전 CI 실패를 통과로 표시하지 않는다. 미호출 모듈 취약점2개는 별도 한계로 기록한다. 기존 완료 수와 N16 보류는 유지한다.
+
+### Linux CI 추가 수정 — 2026-10-13
+
+5935fa96의 GitHub CI는4/5 통과했으나 Linux 전용 memory_linux.go에서 읽기 전용 파일 정리의 errcheck1개가 실패했다. macOS 린트 범위에 없는 파일이다. `/proc/meminfo` 닫기를 명시적으로 정리하도록 수정했으며, 최종 Linux CI 통과 전에는 전체 CI 완료로 표시하지 않는다. [실패·수정 기록](../../system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/verification.json)을 보존한다.

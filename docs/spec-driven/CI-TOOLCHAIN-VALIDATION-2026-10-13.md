@@ -38,3 +38,7 @@ verbose 결과의 미호출 모듈 항목은 golang.org/x/mod v0.38.0의 [GO-202
 다음은 수정 브랜치의 실제 GitHub CI 검증이다. 그 뒤 PR 리뷰가 남으며, main merge는 별도 지시가 필요하다. 기존 개발 잔여는 N16 공개키 fingerprint/신뢰 조건 미충족으로 보류된1개다. 태그·공개 배포도 보류한다.
 
 [검증 원자료](../../system/eval/b0-knowledge-system/ci-toolchain-fix-2026-10-13/local-verification.json), [현재 인수인계](./CURRENT-HANDOFF.md), [작업리스트](./REFACTORING-REMAINING-WORKLIST.md).
+
+### Linux CI 추가 수정 — 2026-10-13
+
+5935fa96의 GitHub CI는4/5 통과했으나 Linux 전용 memory_linux.go에서 읽기 전용 파일 정리의 errcheck1개가 실패했다. macOS 린트 범위에 없는 파일이다. `/proc/meminfo` 닫기를 명시적으로 정리하도록 수정했으며, 최종 Linux CI 통과 전에는 전체 CI 완료로 표시하지 않는다. [실패·수정 기록](../../system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/verification.json)을 보존한다.

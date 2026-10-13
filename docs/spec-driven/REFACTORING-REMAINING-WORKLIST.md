@@ -102,3 +102,7 @@ O03 완료: 승인본과 실제501파일(Go494) WBFT held 후보·동일 source/
 O04-B 실제DEV 대조 완료: 사전 동결·같은 입력/신원과 실패 분모·모델 호출·지연/위치지표를 검증했다. C의 독립 평가 요구는 사용자 “다음 진행”만으로 면제하지 않았으며 D 최종 수용과 전체 O04 미완료를 유지한다. [결과와 한계](./ONTOLOGY-DEV-PILOT-RESULT-2026-10-13.md). 전체 잔여 N16/O04의2개.
 
 O04 후속: [비용과독립입력준비](./ONTOLOGY-COST-AND-INDEPENDENT-INPUTS-2026-10-13.md). 같은파일바이트SHA를재확인하는bounded JSON좌표해석재사용, 동일DEV원자료/출력불변·미수용지연을기록했다. 8후보/7제안군은내용/전체이력·의미독립성미승인이다. C/D unchecked·전체잔여 N16/O04 유지.
+
+### Linux CI 추가 수정 — 2026-10-13
+
+5935fa96의 GitHub CI는4/5 통과했으나 Linux 전용 memory_linux.go에서 읽기 전용 파일 정리의 errcheck1개가 실패했다. macOS 린트 범위에 없는 파일이다. `/proc/meminfo` 닫기를 명시적으로 정리하도록 수정했으며, 최종 Linux CI 통과 전에는 전체 CI 완료로 표시하지 않는다. [실패·수정 기록](../../system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/verification.json)을 보존한다.
