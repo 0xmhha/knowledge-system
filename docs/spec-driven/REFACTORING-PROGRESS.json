@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "5e0eb22f26548875ce8cc27717a11b26f1c28c15",
-    "manifest": "system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/manifest.json"
+    "revision": "501a67568a9702764212f023d595f29d6fb17835",
+    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-acceptance-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2265,12 +2265,12 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T06:32:54.770223+00:00",
+    "checked_at": "2026-10-13T07:02:49.773355+00:00",
     "repository": "0xmhha/knowledge-system",
     "local_branch": "feat/setup-tool",
-    "inspected_local_head": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
+    "inspected_local_head": "de3dcee1d09c54718338454c3721f335fd72bb72",
+    "remote_feature_head": "de3dcee1d09c54718338454c3721f335fd72bb72",
     "remote_main": "21e26ac28fa8104116ec01b91b4a6478b81b8ff2",
-    "remote_feature_head": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
     "remote_feature_branch_exists": true,
     "branch_PRs": [
       {
@@ -2278,44 +2278,83 @@
         "url": "https://github.com/0xmhha/knowledge-system/pull/99",
         "state": "OPEN",
         "isDraft": false,
-        "headRefOid": "82dbb6843b94754e159942636c65ff8dc5c9ece1"
+        "headRefOid": "de3dcee1d09c54718338454c3721f335fd72bb72"
       }
     ],
-    "unpublished_commits": 0,
-    "changed_paths_vs_main": 939,
-    "main_is_ancestor": true,
-    "scope": "initial publication snapshot; subsequent documentation commits may advance the branch",
+    "scope": "successful CI verification snapshot at de3dcee1 before final documentation commits; later document-only commits advance the branch",
     "push_or_PR_created": true,
+    "CI_accepted": true,
     "main_merge_executed": false,
     "tag_or_deployment_executed": false
   },
   "latest_documentation_review": {
-    "scope": "publication status and live documentation verification; original acceptance states and frozen evidence unchanged",
-    "revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
-    "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1722,
+    "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
+    "revision": "501a67568a9702764212f023d595f29d6fb17835",
+    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-acceptance-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1725,
     "source_dependency_bindings": 1579,
+    "changed_sources": [
+      ".github/workflows/ci.yml",
+      "internal/system/mcp/semantic_status_test.go",
+      "cmd/cks/semanticcli/compare.go",
+      "internal/vector/build/memory_linux.go"
+    ],
     "status": "PASS",
-    "code_or_frozen_evaluation_changes": 0,
+    "state": "complete",
+    "verification": {
+      "checked_at": "2026-10-13T07:01:26.283267+00:00",
+      "state": "complete",
+      "scope": "CI toolchain alignment and three cleanup lint fixes; original product and release acceptance unchanged",
+      "GitHub_CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
+      "isolated_whole_module_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
+      "GitHub_CI_verified_run": 38359250800,
+      "GitHub_CI_URL": "https://github.com/0xmhha/knowledge-system/actions/runs/38359250800",
+      "GitHub_CI_jobs": {
+        "native-install-contract": "success",
+        "vuln-scan": "success",
+        "eval-gate-vector": "success",
+        "eval-gate-graph": "success",
+        "build-and-test": "success"
+      },
+      "Go_local": "1.26.9 darwin/arm64",
+      "local_lint": "PASS, 0 issues",
+      "domain_artifacts": "PASS",
+      "targeted_race": "PASS semanticcli/system-mcp after close fixes",
+      "initial_whole_module_race": "FAIL: 116 packages passed; graph/buildpipe Git fsck exited2 during concurrent commits; failure retained",
+      "subsequent_working_repository_fsck": "PASS exit0, no persistent missing objects; no original Git objects changed/deleted to force success",
+      "isolated_whole_module_race": "PASS exit0, 117 packages; exact source/input hashes match committed5935fa96",
+      "vulnerability_check": "PASS reachable0/imported-package0; module-only2 retained as bounded limitation",
+      "module_only_findings": [
+        "GO-2026-6180",
+        "GO-2026-6179"
+      ],
+      "scan_scope_limit": "Go1.26.9 builds only; previously built/installed binaries and Go1.25 minimum-version compatibility artifacts are not reclassified as remediated by this scan; C/native dependency vulnerabilities not covered",
+      "source_dependency_bindings": 1579,
+      "approved_inputs": 5,
+      "original_complete": 17,
+      "ontology_complete": 4,
+      "remaining_original": [
+        "N-16 on hold"
+      ],
+      "delivery_remaining": [
+        "PR review; main merge only on separate instruction"
+      ],
+      "tag_deployment_activation_or_quality_decision_changed": false
+    },
     "ontology_complete": 4,
     "original_complete": 17,
-    "remaining": [
-      "N-16"
+    "remaining_original": [
+      "N-16 on hold"
     ],
-    "remote_feature_branch_exists": true,
-    "matching_PR_exists": true,
+    "tag_or_deployment_executed": false,
     "public_transfer": true,
     "PR": 99,
     "PR_is_draft": false,
-    "CI_acceptance": false,
-    "Git_status_scope": "initial published 82dbb684 snapshot, not the later documentation head",
-    "progress_check": "PASS original17/18 and ontology4/4; N16 on hold",
+    "CI_acceptance": true,
+    "Git_status_scope": "successful CI de3dcee1 snapshot before final documentation commits",
     "delivery_remaining": [
-      "CI toolchain/linter alignment and required checks",
-      "advisory vulnerability review",
       "PR review; main merge requires separate instruction"
-    ],
-    "tag_or_deployment_executed": false
+    ]
   },
   "setup_ontology_public_transfer": {
     "approval": "explicit user reply 승인 to whole-branch push and normal PR proposal",
@@ -2330,15 +2369,17 @@
     "PR_creation_complete": true,
     "evidence_revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
     "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json",
-    "CI_accepted": false,
+    "CI_accepted": true,
     "main_merge_executed": false,
-    "tag_or_deployment_executed": false
+    "tag_or_deployment_executed": false,
+    "CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
+    "CI_verified_run": 38359250800
   },
   "latest_ci_remediation": {
     "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
-    "revision": "5e0eb22f26548875ce8cc27717a11b26f1c28c15",
-    "manifest": "system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1718,
+    "revision": "501a67568a9702764212f023d595f29d6fb17835",
+    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-acceptance-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1725,
     "source_dependency_bindings": 1579,
     "changed_sources": [
       ".github/workflows/ci.yml",
@@ -2347,20 +2388,46 @@
       "internal/vector/build/memory_linux.go"
     ],
     "status": "PASS SHA binding; CI acceptance remains separately recorded",
-    "state": "verifying",
+    "state": "complete",
     "verification": {
-      "state": "verifying",
-      "scope": "Linux-only read-only memory metadata cleanup; no lint exclusions or product acceptance changes",
-      "previous_CI_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
-      "previous_CI_result": "4/5 jobs passed; Linux errcheck failure before race",
-      "changed_file": "internal/vector/build/memory_linux.go",
-      "local_Darwin_lint_scope": "Linux-tagged file excluded; Linux validation requires actual CI",
-      "GitHub_CI_after_Linux_fix": "pending",
+      "checked_at": "2026-10-13T07:01:26.283267+00:00",
+      "state": "complete",
+      "scope": "CI toolchain alignment and three cleanup lint fixes; original product and release acceptance unchanged",
+      "GitHub_CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
+      "isolated_whole_module_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
+      "GitHub_CI_verified_run": 38359250800,
+      "GitHub_CI_URL": "https://github.com/0xmhha/knowledge-system/actions/runs/38359250800",
+      "GitHub_CI_jobs": {
+        "native-install-contract": "success",
+        "vuln-scan": "success",
+        "eval-gate-vector": "success",
+        "eval-gate-graph": "success",
+        "build-and-test": "success"
+      },
+      "Go_local": "1.26.9 darwin/arm64",
+      "local_lint": "PASS, 0 issues",
+      "domain_artifacts": "PASS",
+      "targeted_race": "PASS semanticcli/system-mcp after close fixes",
+      "initial_whole_module_race": "FAIL: 116 packages passed; graph/buildpipe Git fsck exited2 during concurrent commits; failure retained",
+      "subsequent_working_repository_fsck": "PASS exit0, no persistent missing objects; no original Git objects changed/deleted to force success",
+      "isolated_whole_module_race": "PASS exit0, 117 packages; exact source/input hashes match committed5935fa96",
+      "vulnerability_check": "PASS reachable0/imported-package0; module-only2 retained as bounded limitation",
+      "module_only_findings": [
+        "GO-2026-6180",
+        "GO-2026-6179"
+      ],
+      "scan_scope_limit": "Go1.26.9 builds only; previously built/installed binaries and Go1.25 minimum-version compatibility artifacts are not reclassified as remediated by this scan; C/native dependency vulnerabilities not covered",
+      "source_dependency_bindings": 1579,
+      "approved_inputs": 5,
       "original_complete": 17,
       "ontology_complete": 4,
       "remaining_original": [
         "N-16 on hold"
-      ]
+      ],
+      "delivery_remaining": [
+        "PR review; main merge only on separate instruction"
+      ],
+      "tag_deployment_activation_or_quality_decision_changed": false
     },
     "ontology_complete": 4,
     "original_complete": 17,
@@ -2368,5 +2435,10 @@
       "N-16 on hold"
     ],
     "tag_or_deployment_executed": false
-  }
+  },
+  "delivery_next_task": "PR review",
+  "delivery_remaining": [
+    "PR review",
+    "main squash merge only on separate user instruction"
+  ]
 }
