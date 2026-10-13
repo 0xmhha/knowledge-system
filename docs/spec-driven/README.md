@@ -15,7 +15,7 @@ captures and decisions retain the facts and limitations recorded at the time.
 | Which committed evidence supports completion? | [REFACTORING-PROGRESS.json](./REFACTORING-PROGRESS.json) |
 | How do clients use ontology over MCP? | [Ontology MCP reference](../../system/docs/ontology-mcp.md), [tool mapping](../../system/docs/coding-agent-mcp-mapping.md) |
 | What did the latest ontology comparison establish? | [ONTOLOGY-FINAL-VERDICT-2026-10-13.md](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md) — observations complete, independent quality inconclusive, default off |
-| Has this branch been pushed or given a PR? | [SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md](./SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md) — inspected snapshot and prepared description |
+| Has this branch been pushed or given a PR? | [SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md](./SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md) — normal PR #99 created; initial publication receipt and remaining CI/review work |
 | What release scope was accepted? | [N18-RELEASE-VERDICT-DRAFT.md](./N18-RELEASE-VERDICT-DRAFT.md) — local operation, prior PR #98 merged; public tag/release on hold |
 
 ## Design and original purpose

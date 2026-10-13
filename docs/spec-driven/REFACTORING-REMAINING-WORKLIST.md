@@ -1,6 +1,6 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
-**2026-10-13 현재: 기존17/18·온톨로지4/4 완료. 전체 잔여1개는 N16 보류(미충족)다.** [O04 최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md)은 품질inconclusive·독립승인0·기본off다. PR #98의 과거 main 머지는 완료됐지만 이번 feat/setup-tool 브랜치의 push/PR은 아직 없다. 태그·공개 배포는 보류한다.
+**2026-10-13 현재: 기존17/18·온톨로지4/4 완료. 전체 잔여1개는 N16 보류(미충족)다.** [O04 최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md)은 품질inconclusive·독립승인0·기본off다. PR #98의 과거 main 머지는 완료됐지만 이번 feat/setup-tool 브랜치는 push·[일반 PR #99 생성](https://github.com/0xmhha/knowledge-system/pull/99)을 완료했다. 최초 공개 HEAD `82dbb684`에서 필수 CI는 Go/린터 버전 불일치로 실패했고 권고용 취약점 검사도 실패했다. 별도 전달 잔여는 CI 수정·재검증, 취약점 검토, PR 리뷰이며 이번 main merge는 미진행이다. 태그·공개 배포는 보류한다.
 
 이 문서는 현재 작업 표를 유지한다. [현재 인수인계](./CURRENT-HANDOFF.md)에서 읽기 순서를 확인하고, 이전 단계의 “최신/현재” 기록은 [날짜별 이력](./REFACTORING-STATUS-HISTORY-2026-10-13.md)에서 읽는다. 초기 목적과 상위 WI 범위는 [원래 목표 감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md), [study 보완 감사](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)를 따른다. 기존 preview와 상위 WI를 이번 완료율에 합산하지 않는다.
 

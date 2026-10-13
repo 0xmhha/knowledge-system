@@ -13,7 +13,7 @@
 
 이번 확인 시작 시 feat/setup-tool의 HEAD는 d5784a20이었다. origin/main21e26ac2와 비교하면 이 브랜치에44커밋/908변경파일, main에만 문서 수정1커밋이 있었다. 원격 feat/setup-tool 브랜치와 해당 PR, 열린 PR은 없었다. 이후 문서 정리 커밋 수는 추가될 수 있으므로 이 숫자를 실시간 상태로 사용하지 않는다. 실제 [확인 원자료](../../system/eval/b0-knowledge-system/documentation-status-review-2026-10-13/git-status-before-cleanup.json)를 보존했다.
 
-과거 PR #98은067ed5f3으로 main에 squash merge됐다. 그것을 이번 브랜치의 공개 반영 완료로 표시하지 않는다. 원격 main의 문서 수정21e26ac2를 현재 작업 브랜치에 로컬 통합하고 문서 충돌4개를 해결했다. 통합 커밋은0c87bee9다. local main은 checkout하거나 수정하지 않았다. push/PR 생성은 아직 미진행이다. 태그·공개 배포는 보류 상태다.
+과거 PR #98은067ed5f3으로 main에 squash merge됐다. 그것을 이번 브랜치의 공개 반영 완료로 표시하지 않는다. 원격 main의 문서 수정21e26ac2를 현재 작업 브랜치에 로컬 통합하고 문서 충돌4개를 해결했다. 통합 커밋은0c87bee9다. local main은 checkout하거나 수정하지 않았다. 사용자의 전체 브랜치 게시 승인 후 최초 공개 HEAD `82dbb684`를 push하고 [일반 PR #99](https://github.com/0xmhha/knowledge-system/pull/99)를 생성했다(Draft 아님). 이 최초 공개 커밋에서 필수 CI는 린터/Go 버전 불일치로 실패했으며 권고용 취약점 검사도 실패했다. [게시·CI 확인 기록](../../system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/publication-verification.json)을 보존했다. 이번 PR의 main merge는 미진행이며 태그·공개 배포는 보류 상태다.
 
 ## 먼저 읽을 순서
 
@@ -27,4 +27,4 @@
 
 완료 증거는 원장의 각 revision에서 읽는다. squash merge 후에도 원 manifest가 참조하는 커밋 객체가 필요하므로 feat/refactoring-followup/feat/setup-tool의 증거 이력을 삭제하지 않는다. 과거 capture·gold·프로토콜·source snapshot을 고쳐 현행 실행처럼 보이게 만들지 않는다. 운영 source/current/config/DB·모델은 변경하지 않았고, 사용자 .claude/ 및 logs 자료는 접근하지 않는다.
 
-개발 필수 잔여는 N16 하나이며 현재 보류한다. 별도의 저장소 전달 작업으로 현재 브랜치 원격 반영/PR 생성이 미진행이다. [PR 검토 준비 자료](./SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md)에 대상과 제안 본문을 정리했다. 작업 완료, 로컬 커밋, 원격 push, PR 생성, main merge, 공개 배포를 각각 따로 확인한다.
+개발 필수 잔여는 N16 하나이며 현재 보류한다. 별도의 저장소 전달 작업인 브랜치 원격 반영·일반 PR 생성은 완료했다. 다음은 CI Go/린터 버전 정합성 수정과 필수 검사 재실행, 권고용 취약점 검토, PR 리뷰다. main merge는 별도 지시가 필요하다. [PR 게시 기록과 검토 자료](./SETUP-ONTOLOGY-PR-PREPARATION-2026-10-13.md)에 실제 PR과 남은 전달 작업을 정리했다. 작업 완료, 로컬 커밋, 원격 push, PR 생성, main merge, 공개 배포를 각각 따로 확인한다.
