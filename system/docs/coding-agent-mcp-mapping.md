@@ -51,7 +51,7 @@ Wire names are the strings the MCP client sends; constants live in `internal/sys
 | `cks.semantic.get_concept` | `ToolNameSemanticGetConcept` | `concept_id` | `limit` (1..100) | Read definition/scope, source evidence and typed incident relations. |
 | `cks.semantic.trace_requirement` | `ToolNameSemanticTraceRequirement` | `requirement_id` | `limit` (1..100) | Read criteria and code/test paths, including missing/unapproved/conflicting links; does not execute acceptance tests. |
 
-The semantic reads use one pinned retained dataset and a read-only store. Proposed/rejected meanings remain visible; only verified, aligned inputs can affect retrieval. `read_tools_ready` and `retrieval_ready` are preparation states, not search quality verdicts. Optional v2 `explain_ontology=true` distinguishes off/no_match/fallback from applied/no_effect, hashes uncited candidate keys, and reports at most 20 changes. `selected_by_composer` precedes the final v2 body budget; inspect published bodies for exact final inclusion. Scores are decimal strings to preserve v2 canonical integrity. Restricted explanation details are withheld while the base evidence is kept. See [implementation and verification](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).
+The semantic reads use one pinned retained dataset and a read-only store. Proposed/rejected meanings remain visible; only verified, aligned inputs can affect retrieval. `read_tools_ready` and `retrieval_ready` are preparation states, not search quality verdicts. Optional v2 `explain_ontology=true` distinguishes off/no_match/no_candidates/fallback from applied/no_effect, hashes uncited candidate keys, and reports at most 20 changes. `selected_by_composer` precedes the final v2 body budget; inspect published bodies for exact final inclusion. Scores are decimal strings to preserve v2 canonical integrity. Restricted explanation details are withheld while the base evidence is kept. See [implementation and verification](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).
 
 For a read-only structural comparison of saved v2 JSON responses:
 
@@ -276,3 +276,7 @@ This file should be re-checked whenever any of the following changes:
 3. A roadmap item from §5 lands ("rerank" toggle, `include_concurrency`, etc.). Move the row out of §5 and into §3.
 
 When uncertain, run `cks mcp` against the tools/list MCP method and compare the names there with §2. The wire names are the contract.
+
+### Capturing explanation responses for a controlled comparison
+
+The request-only manifest for `cks eval capture` accepts v2 `explain_ontology` as a boolean; v1 and non-boolean values are refused. Preserve all runtime inputs and request options. For ontology control arms, use explicit semantic mode `baseline` versus the desired enabled mode so that both use raw-query-first; comparing the default blank/off mode can also change Stage1 query strategy. Backend measurement logs and capture receipts are needed for timing, failed request denominators, and scoped embedding HTTP attempts. Repetition counts are not independent quality samples. See the [controlled stdio capture record](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md#o04-후속-실제-stdio-수집-연결과-같은-검색-전략의-시험).

@@ -1,0 +1,64 @@
+{
+  "step": "O-04 runtime preparation follow-up",
+  "date_KST": "2026-10-13",
+  "base_revision": "8cc8bb4df2102b5cabfb425caca62dc9a6cf6bef",
+  "go_race": {
+    "test_pass": 278,
+    "subtest_pass": 260,
+    "package_pass": 6,
+    "test_skip": 2
+  },
+  "skipped_tests": [
+    "TestRetainedGuardLiveSDK",
+    "TestMatrixLinuxEnvironmentProbe"
+  ],
+  "skip_limit": "explicit DEV fixtures and actual Linux probe not supplied; owned mock stdio run does not replace those scopes",
+  "vet_exit": 0,
+  "boundary_exit": 0,
+  "docs_exit": 0,
+  "progress_guard_tests": 11,
+  "actual_stdio": {
+    "responses": 20,
+    "verified_pairs": 10,
+    "failed": 0,
+    "missing": 0,
+    "pending": 0,
+    "on_states": {
+      "no_candidates": 5,
+      "no_match": 5
+    },
+    "citation_body_changes": 0,
+    "same_raw_query_strategy": true,
+    "same_binary_config_model_requests_verified": true,
+    "current_and_operator_config_preserved": true
+  },
+  "quality_evaluated": false,
+  "performance_accepted": false,
+  "real_domain_review_supplied": false,
+  "real_model_used": false,
+  "new_FINAL_samples": 0,
+  "full_task_complete": false,
+  "technical_checks_verified": [
+    "O04-A"
+  ],
+  "partial_preparation": "actual stdio runtime/latency/denominator/backend observations are controlled mock only; O04-B/C/D actual domain trial remains unchecked",
+  "red_history": [
+    "normal no_candidates rejected in response comparer",
+    "no_candidates request-scoped explanation absent",
+    "eval capture validator rejected new explain_ontology input; v2 boolean pass-through added while rejecting v1/string/gold/write tools"
+  ],
+  "actual_input_readiness": {
+    "operating_config_sha256": "2e61bf2fec7d3d5bd5a1c82a6321f6d5640341f7ee76a2e97d54862ebba40c7f",
+    "source_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "semantic_store_configured": false,
+    "graph_path_exists": true,
+    "vector_path_exists": true,
+    "same_candidate_directory": true,
+    "dataset_identity_exists": true,
+    "retained_source_manifest_exists": true,
+    "pack": "projects/stablenet/domain-knowledge",
+    "pack_code_baseline": "ec6a4e96b",
+    "tracked_ontology_or_spec_inputs": [],
+    "user_domain_adoption_or_review_invented": false
+  }
+}

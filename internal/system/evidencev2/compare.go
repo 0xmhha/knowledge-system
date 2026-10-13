@@ -58,7 +58,7 @@ func CompareResponses(off, on contract.EvidencePackV2) (ResponseComparison, erro
 	}
 	// Stable states only; an arbitrary saved string is not a public diagnostic.
 	switch d.State {
-	case "active", "no_match", "unavailable", "stale", "budget_exceeded":
+	case "active", "no_match", "no_candidates", "unavailable", "stale", "budget_exceeded":
 	default:
 		return result, fmt.Errorf("on_state_invalid")
 	}

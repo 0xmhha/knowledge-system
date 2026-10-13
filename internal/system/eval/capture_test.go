@@ -15,6 +15,8 @@ func TestCaptureRejectsGoldAndWriteToolsBeforeCall(t *testing.T) {
 		{ID: "bad", Tool: "cks.knowledge.review", Arguments: map[string]any{"prompt": "Alpha"}},
 		{ID: "bad", Tool: toolGetForTask, Arguments: map[string]any{"prompt": "Alpha", "expected_answer": "secret gold"}},
 		{ID: "bad", Tool: toolGetForTask, Arguments: map[string]any{"prompt": "Alpha", "include_knowledge": true}},
+		{ID: "bad", Tool: toolGetForTask, Arguments: map[string]any{"prompt": "Alpha", "explain_ontology": true}},
+		{ID: "bad", Tool: sysmcp.ToolNameGetForTaskV2, Arguments: map[string]any{"prompt": "Alpha", "explain_ontology": "true"}},
 		{ID: "bad", Tool: sysmcp.ToolNameGetForTaskV2, Arguments: map[string]any{"prompt": "Alpha", "include_knowledge": "true"}},
 		{ID: "bad", Tool: toolGetForTask, Arguments: map[string]any{"prompt": "Alpha", "intent": "made-up"}},
 	} {
@@ -38,7 +40,7 @@ func TestCapturePreservesV2CoordinatesBodiesAndStructuredErrors(t *testing.T) {
 	}, "full v2 pack")
 	client := &mockMCPClient{callOut: map[string]*mcpgo.CallToolResult{sysmcp.ToolNameGetForTaskV2: result}, callErr: map[string]error{}}
 	runner := &Runner{client: client}
-	request := CaptureRequest{ID: "v2", Tool: sysmcp.ToolNameGetForTaskV2, Arguments: map[string]any{"prompt": "Alpha", "include_knowledge": true}}
+	request := CaptureRequest{ID: "v2", Tool: sysmcp.ToolNameGetForTaskV2, Arguments: map[string]any{"prompt": "Alpha", "include_knowledge": true, "explain_ontology": true}}
 	call, err := runner.Capture(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
@@ -55,7 +57,7 @@ func TestCapturePreservesV2CoordinatesBodiesAndStructuredErrors(t *testing.T) {
 	if pack["coordinates"].(map[string]any)["dataset_id"] != "dataset" || pack["bodies"].([]any)[0].(map[string]any)["text"] != "retained policy body" {
 		t.Fatalf("lost raw coordinates/body: %s", call.Response)
 	}
-	if len(client.calls) != 1 || client.calls[0].args["include_knowledge"] != true || len(client.calls[0].args) != 2 {
+	if len(client.calls) != 1 || client.calls[0].args["include_knowledge"] != true || client.calls[0].args["explain_ontology"] != true || len(client.calls[0].args) != 3 {
 		t.Fatal("request changed")
 	}
 	result.IsError = true

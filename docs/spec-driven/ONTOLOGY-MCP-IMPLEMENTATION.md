@@ -74,3 +74,19 @@ v2 get_for_task의 `explain_ontology=true`는 요청 하나에만 설명을 붙�
 - O04: O03 자료가 정해진 뒤 같은 dataset/model/binary/config/질문·요청 옵션/seed·실행 순서·warm 조건과 독립 평가 조건을 먼저 동결하고 off/on 인용·본문·상태·지연/실패 분모/모델 호출을 비교한다. 표본 부족은 inconclusive이며 효과 개선을 보장하지 않는다.
 
 현재 기존 N17/18·온톨로지2/4 완료, 전체 잔여3개다. 이 문서와 원장의 부분 체크는 기술 준비와 실제 수용을 나누며, 완료로 바꿀 때에는 해당 전체 조건과 committed/current SHA 결합이 필요하다.
+
+## O04 후속: 실제 stdio 수집 연결과 같은 검색 전략의 시험
+
+2026-10-13. 빈 후보가 정상인 no_candidates 상태를 설명과 compare-responses가 보존하도록 보완했다. 기존 eval capture의 요청-only 입력 validator에 v2 boolean explain_ontology가 빠져 있었으므로 이를 허용하고 그대로 전송하게 했다. v1에서의 옵션 사용, boolean 아닌 값, gold/쓰기 도구는 계속 거부한다. 세 누락은 변경 전 RED 원자료로 구별해 보존했다.
+
+자체 retained-source/CKG·CKV(mock-feature-hash-v1,64차원)/proposed 의미 저장소와 현재 실제 바이너리로 stdio MCP를 실행했다. 단순 default off는 Stage1 검색 전략도 바꿀 수 있으므로 off arm에는 semantic mode baseline, on에는 relations를 지정해 양쪽 모두 raw-query-first로 고정했다. 차이는 ontology_mode와 기록용 footprint 목적지뿐이며 그 외 config·바이너리·모델·질문·설명 옵션이 같음을 검증했다.
+
+자체 질문2개, 각 arm warmup1/retrieval1/warm2/cold-process1로 총20개 응답을 기록하고, 10쌍을 실제 compare-responses로 해시·동일 query/coordinates·인용·본문 대조했다. 실패0/누락0/pending backend call0, scope별 backend 기록 모두 연결됨. on 상태는 no_candidates5/no_match5, 인용/본문 변화0이었다. mock의 scoped Ollama HTTP 요청은0이고 논리 호출/시작 scope는 별도로 기록했다. 외부 실모델을 쓴 결과가 아니다.
+
+지연은 warmup/retrieval/warm_latency/cold_process별 관측값과 median/min/max만 기록했다. 반복은 독립 표본이 아니며 cold는 새 MCP process를 뜻하고 filesystem/model cache cold가 아니다. sequential off→on 순서도 명시했다. **질문2개나 무변화로 품질 성공/실패·성능 수용을 판정하지 않았고**, O04-B의 실제 도메인 실행과 C/D는 여전히 미완료다. 기존 current와 operator config SHA는 같다.
+
+관련6패키지 race278시험/260하위시험 pass·실패0. skip2는 명시적 DEV fixture를 요구하는 RetainedGuardLiveSDK와 Linux artifact probe이며 이번 실행으로 해당 시험을 대체했다고 주장하지 않는다. vet/boundary/docs/progress guard를 확인한다. [후속 원자료](../../system/eval/b0-knowledge-system/ontology-o04-runtime-2026-10-13/verification.json).
+
+실제 운영 설정의 소스 commit은 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8이다. graph/vector가 같은 candidate에 있고 dataset identity·retained source manifest도 있으나 의미 store 경로는 비어 있으며 추적 ontology/spec 입력이 없다. 기존 projects/stablenet 팩은 glossary/flow/검토 자료로 존재하고 pack의 code baseline은 ec6a4e96b다. 이 자료를 새 source의 검토 ontology/spec/관계로 자동 승격하지 않는다. 기존 팩 기반 proposed 초안·출처/앵커 대조부터 준비한 뒤 실제 내용 검토와 대상 연결이 필요하다.
+
+다음 O03 proposed 입력/출처 정합성 준비, 이후 실제 검토·held 연결과 O04 actual off/on 평가. 전체 잔여는 N16/O03/O04의3개, 기존17/18·온톨로지2/4 유지다.

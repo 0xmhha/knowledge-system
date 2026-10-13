@@ -444,3 +444,5 @@ O02 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·175시험/169하�
 O03-A/B 기술 검증: [기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·Go55/48 race·Python26pass1skip·actual mock CLI/MCP held preparation·old current/config SHA 보존·source/project mismatch2거부. O03-C/D의 실제 도메인/운영 결합은 대기이며 전체 O2/4·잔여 N16/O03/O04의3개다.
 
 O04-A 기술 검증: v2 요청별 explain_ontology, 최대8개 개념/20개 변화, no_effect와 fallback 구별, 제한 설명은 restricted/원본문 유지, v2 해시 검증. 관련5패키지 race227시험232하위시험/실패0·vet. compare-responses는 저장 응답의 구조만 검증하므로 O04-B/C/D 실제 조건·실행·품질 판정은 아직 미완료이며 전체 O2/4·잔여 N16/O03/O04의3개다.
+
+O04-A 후속 검증: no_candidates 설명·응답 비교 허용, v2 explain_ontology 입력의 실제 eval capture 전달 보강. 관련6패키지 race278시험260하위시험 pass/실패0/명시적 DEV·Linux 선택 시험2skip, 자체 실제 stdio mock20응답/10쌍·실패/누락/pending0, 같은 raw-query-first·운영 current/config SHA 유지. O04-B 실제 도메인 paired 조건·평가와 C/D는 unchecked 유지한다.

@@ -35,3 +35,17 @@ func TestOntologyExplanationSeparatesNoEffectFromUnavailable(t *testing.T) {
 		}
 	}
 }
+
+func TestOntologyExplanationPreservesNoCandidates(t *testing.T) {
+	search, err := New(&ckgclient.Fake{}, WithOntologyProvider(providerFunc(func(context.Context) (OntologyResolver, error) { return fakeOntology{}, nil }), .2, time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := search.Search(WithOntologyExplanation(context.Background()), "feature", nil, nil, contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out.Ontology == nil || out.Ontology.Explanation == nil || out.Ontology.Explanation.State != "no_candidates" || out.Ontology.Explanation.QualityEvaluated {
+		t.Fatalf("empty-candidate explanation missing: %+v", out.Ontology)
+	}
+}

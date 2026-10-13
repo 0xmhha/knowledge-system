@@ -47,6 +47,14 @@ func TestCompareResponsesReportsStructureWithoutQualityVerdict(t *testing.T) {
 	if err := Verify(off); err != nil {
 		t.Fatal("comparison mutated inputs", err)
 	}
+	on.Metadata.Ontology.State = "no_candidates"
+	if err := Stamp(&on); err != nil {
+		t.Fatal(err)
+	}
+	if r, err := CompareResponses(off, on); err != nil || r.OnState != "no_candidates" {
+		t.Fatal("valid empty-candidate fallback refused", r, err)
+	}
+	on.Metadata.Ontology.State = "active"
 	// An active, unchanged arm is no evidence of benefit.
 	on.Citations = off.Citations
 	on.Bodies = off.Bodies
