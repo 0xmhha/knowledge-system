@@ -89,7 +89,7 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 | SD-01 | 원인 재현과 종료 경로 진단 | 완료 | 실제 retained dataset, EOF·SIGTERM 구분, 지연/스택 기록, 강제 종료 지점 확인 |
 | SD-02 | 서버 종료 계약 수정 | 완료 | 서버 컨텍스트 전달, 정상 EOF와 취소 처리, 진행 중 작업 처리와 자원 해제, 의미 있는 회귀 시험 |
 | SD-03 | 실제 세션 재검증 | 완료 | 고정42질문·378호출 세션2회에서 응답 오류0·종료 오류0, EOF·SIGTERM 정상 종료와 read-tree 정리 확인 |
-| SD-04 | 문서·커밋 근거 정리 | 커밋 검증 대기 | 기존 오류 보존, 현재 결과/남은 작업 최신화, 소스·원자료 SHA 및 커밋 근거 검증 |
+| SD-04 | 문서·커밋 근거 정리 | 완료 | 기존 오류 보존, 현재 결과/남은 작업 최신화, 소스·원자료 SHA 및 커밋 근거 검증 |
 
 현재 최초 최소 재현에서 정상 v2 응답 후 EOF 종료는 exit0·1.784초다. 동일42질문 및 클라이언트 종료 경로를 추가 확인 중이며 근본 원인은 아직 확정하지 않았다.
 
@@ -97,4 +97,6 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 
 수정 설계: pinned dataset의 repo와 `docs:corpus.N` 파일을 검증된 archive reader로 직접 읽는다. CKV 인용 검증과 composer 본문 조회는 같은 authoritative reader를 사용하며, 임시 원문 트리 생성·종료 시 일괄 삭제를 제거한다. 선택 blob은 매번 SHA/size를 확인하며 v2의 전체 candidate 요청 전후 검증도 유지한다. 미보관·변조 원문은 live checkout으로 대체하지 않는다. stdio는 명령 컨텍스트를 입력/worker에 전달하고 EOF에서는 수락한 요청을 완료한다. 평가 취소는 SIGTERM과5초 fallback을 사용한다. 실제 종료 실패는 여전히 partial/오류이며, 신규 캡처에는 세션별 종료 시간·오류를 별도 기록한다.
 
-최종 실측: 동일 requests SHA·같은 dataset/model로378호출 세션2회 모두 exit0·captured. 정상756팩의 원문/좌표/무결성 실패0, 질의 오류0, 세션 종료 오류0. Close11.127541ms·10.902875ms. 별도 EOF18.585ms·대기 SIGTERM18.904ms·10요청을 보낸 실행 중 SIGTERM176.910ms에서 모두 exit0·강제 종료false·임시 원문 트리0·reader lease 해제. 이전 수정 결과756쌍과 인용·본문 변경0. 기존 두 실패 및 진단 중 SIGQUIT와 의도적으로 취소한 중간 시험은 보존하고 수용 통계에서 제외했다. 전체 Go118패키지·race8패키지·추가 snapshot-only reader race·vet·lint0issues·Python8·경계 검사 통과. 마지막은 커밋 SHA와 기존 진행 원장 확인이다. 일반 workspace `bin/cks`도 실측한 최종 바이너리로 갱신했다.
+최종 실측: 동일 requests SHA·같은 dataset/model로378호출 세션2회 모두 exit0·captured. 정상756팩의 원문/좌표/무결성 실패0, 질의 오류0, 세션 종료 오류0. Close11.127541ms·10.902875ms. 별도 EOF18.585ms·대기 SIGTERM18.904ms·10요청을 보낸 실행 중 SIGTERM176.910ms에서 모두 exit0·강제 종료false·임시 원문 트리0·reader lease 해제. 이전 수정 결과756쌍과 인용·본문 변경0. 기존 두 실패 및 진단 중 SIGQUIT와 의도적으로 취소한 중간 시험은 보존하고 수용 통계에서 제외했다. 전체 Go118패키지·race8패키지·추가 snapshot-only reader race·vet·lint0issues·Python8·경계 검사 통과. material commit d0b7ad2a의 현재/커밋 SHA1839개 및 기존 진행 guard PASS를 확인했다. 일반 workspace `bin/cks`도 실측한 최종 바이너리로 갱신했다.
+
+서버 종료 보완은4/4 완료다. 소스·실측·작업 문서의 material commit은 `d0b7ad2a`이며 [커밋 검증](../../system/eval/stablenet-shutdown-2026-10-14/committed-binding-proof.json)을 따른다. 기존 task·ontology 수용 기록을 변경하지 않았고, 최종 완료 문서의 hash는 별도 [완료 기록](../../system/eval/stablenet-shutdown-2026-10-14/completion.json)에 연결한다. 이 추가 요청의 남은 작업0개, 다음 작업없음.

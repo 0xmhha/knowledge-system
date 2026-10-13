@@ -1,4 +1,4 @@
-현재 활성 추가 작업: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md). SD-01 진단·SD-02 구현·SD-03 실측 검증 완료. 남은 작업은 SD-04 커밋 근거 확인1개다. 이전 두 종료 오류는 보존한다.
+추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
 
 # 남은 전체 작업
 

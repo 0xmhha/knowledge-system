@@ -1,4 +1,4 @@
-서버 종료 수정 후 검증: 동일42질문·378호출 세션2회에서756팩 검증 실패0·질의/종료 오류0. Close11.1/10.9ms, 별도 EOF·대기/실행 SIGTERM 모두 exit0·강제 종료없음·reader lease 해제. 이전 인용/본문756쌍 변경0. 기존 두 종료 실패는 보존하며 최종 커밋 근거를 확인 중이다. [진행 작업표](./GO-STABLENET-DATASET-COMPARISON.md).
+서버 종료 수정 후 검증: 동일42질문·378호출 세션2회에서756팩 검증 실패0·질의/종료 오류0. Close11.1/10.9ms, 별도 EOF·대기/실행 SIGTERM 모두 exit0·강제 종료없음·reader lease 해제. 이전 인용/본문756쌍 변경0. 기존 두 종료 실패를 보존했고 material commit d0b7ad2a의 SHA1839개와 진행 guard PASS를 확인했다. [진행 작업표](./GO-STABLENET-DATASET-COMPARISON.md).
 
 # 현재 평가 결과와 판정 한계
 

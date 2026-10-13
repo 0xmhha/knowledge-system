@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "3fa62e15deabe3b2ee6ac2376842a88e6a32c707",
-    "manifest": "system/eval/stablenet-corpus-repair-2026-10-14/manifest.json"
+    "revision": "d0b7ad2af4fee5a4488380c24d04fb4ce60cc4a9",
+    "manifest": "system/eval/stablenet-shutdown-2026-10-14/manifest.json"
   },
   "tasks": [
     {
@@ -2558,7 +2558,7 @@
     }
   },
   "active_shutdown_followup": {
-    "state": "actual_execution_verified_pending_committed_binding",
+    "state": "complete_after_committed_SHA_and_existing_progress_checks",
     "scope": "retained dataset server shutdown after successful evaluation requests",
     "workflow_document": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
     "evidence_packet": "system/eval/stablenet-shutdown-2026-10-14",
@@ -2578,14 +2578,28 @@
       },
       {
         "id": "SD-04",
-        "state": "pending_committed_binding"
+        "state": "complete"
       }
     ],
-    "remaining_requested_tasks": [
-      "SD-04"
-    ],
-    "next_task": "SD-04",
+    "remaining_requested_tasks": [],
+    "next_task": null,
     "prior_two_close_failures_preserved": true,
-    "actual_verification": "system/eval/stablenet-shutdown-2026-10-14/verification.json"
+    "actual_verification": "system/eval/stablenet-shutdown-2026-10-14/verification.json",
+    "material_revision": "d0b7ad2af4fee5a4488380c24d04fb4ce60cc4a9",
+    "binding_proof": "system/eval/stablenet-shutdown-2026-10-14/committed-binding-proof.json",
+    "completion_record": "system/eval/stablenet-shutdown-2026-10-14/completion.json",
+    "late_artifact_sha256": {
+      "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md": "808906539c3e0328ad3c1c428c386de8b71200f3a81c7461a87eaa75e1d934a0",
+      "docs/spec-driven/CURRENT-HANDOFF.md": "92d06e2a7ba4bd4359a5b83e998c35da4dce552b3d2c2fb031de18fce06637f4",
+      "docs/REMAINING-WORK.md": "6d7df1198d8e9283cf9a7d66d2fdb28f5e4ec70bfd5dda01c3d22fe5341079e6",
+      "docs/spec-driven/EVALUATION-STATUS.md": "c0c383c6f2df3f39a0b598268f011a967eae7d12decc14dea5a557c7d9f7a806",
+      "system/eval/stablenet-shutdown-2026-10-14/committed-binding-proof.json": "5ce1fad54375e5f3ee57bcc68967bb051852c458fda00aa61851cb585ea2a669",
+      "system/eval/stablenet-shutdown-2026-10-14/progress-check.txt": "b5472a21606eb1b05d8742e66d01343d6917576e2660b8800195b16bce04be7c",
+      "system/eval/stablenet-shutdown-2026-10-14/completion.json": "4e852150a3848dd861811d3cd87b79648d5d3e3e8147705a34c6e281698eeaad"
+    }
+  },
+  "previous_source_binding_before_shutdown_repair": {
+    "revision": "3fa62e15deabe3b2ee6ac2376842a88e6a32c707",
+    "manifest": "system/eval/stablenet-corpus-repair-2026-10-14/manifest.json"
   }
 }
