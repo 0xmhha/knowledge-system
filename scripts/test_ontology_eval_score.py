@@ -124,6 +124,42 @@ class ScoringContract(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.score()
 
+    def candidate_fixture(self):
+        seed=copy.deepcopy(self.book['questions'][0])
+        self.book['scope']=self.protocol['scope']='source_bound_candidate_observation'
+        self.protocol.update(planned_retrieval_questions=13, approved_independent_units=0)
+        self.book['questions']=[]
+        self.rows=[]
+        for i in range(13):
+            q=copy.deepcopy(seed)
+            q.update(id='IC-'+str(i),fact_cluster='cluster-'+str(i%10))
+            self.book['questions'].append(q)
+            for arm in ('off','on'):
+                for phase,n in self.protocol['counts'].items():
+                    for iteration in range(1,n+1):
+                        self.rows.append(dict(arm=arm,request_id=q['id'],phase=phase,iteration=iteration,
+                            call=dict(tool=q['tool'],arguments=q['arguments'],elapsed_ns=100,
+                            response=dict(structuredContent=dict(query=q['question'],citations=q['evidence'])))))
+        self.protocol['retrieval_question_ids']=[q['id']for q in self.book['questions']]
+
+    def test_larger_frozen_candidate_inventory_still_has_zero_independent_units(self):
+        self.candidate_fixture()
+        result=self.score()
+        self.assertEqual(result['arms']['off']['planned_calls'],351)
+        self.assertEqual(result['proposed_fact_clusters'],10)
+        self.assertEqual(result['approved_independent_units'],0)
+        self.assertEqual(result['new_FINAL_samples'],0)
+        self.assertFalse(result['full_task_complete'])
+        self.assertIn('not established',result['quality_verdict'])
+
+    def test_candidate_duplicate_inventory_and_inferred_approval_rejected(self):
+        self.candidate_fixture()
+        self.book['questions'].append(copy.deepcopy(self.book['questions'][0]))
+        with self.assertRaises(ValueError): self.score()
+        self.book['questions'].pop()
+        self.protocol['approved_independent_units']=10
+        with self.assertRaises(ValueError): self.score()
+
 
 if __name__ == '__main__':
     unittest.main()

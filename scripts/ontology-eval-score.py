@@ -20,8 +20,15 @@ def score(book, protocol, rows, verify_pack):
     This is not answer scoring, independence review, or a release decision.
     Duplicate/unplanned rows or unverified returned evidence stop scoring.
     """
-    questions = {q['id']: q for q in book['questions'] if q['kind'] == 'retrieval'}
-    require(len(questions) == 6 and list(questions) == protocol['retrieval_question_ids'], 'question inventory differs')
+    question_rows = [q for q in book['questions'] if q['kind'] == 'retrieval']
+    questions = {q['id']: q for q in question_rows}
+    candidate_observation = protocol.get('scope') == 'source_bound_candidate_observation'
+    planned = protocol.get('planned_retrieval_questions') if candidate_observation else 6
+    require(type(planned) is int and planned > 0 and len(question_rows) == len(questions) == planned
+            and list(questions) == protocol['retrieval_question_ids'], 'question inventory differs')
+    if candidate_observation:
+        require(book['scope'] == protocol['scope'] and protocol['approved_independent_units'] == 0,
+                'candidate observation cannot imply independent approval')
     require(protocol['activation'] is False and protocol['release_eligible'] is False, 'pilot cannot release')
     require(all(q['independent_FINAL_eligible'] is False for q in questions.values()), 'DEV cannot become independent FINAL')
     counts = protocol['counts']
@@ -92,7 +99,8 @@ def score(book, protocol, rows, verify_pack):
     off, on = arms['off'], arms['on']
     ratio = on['warm_p95_ns'] / off['warm_p95_ns'] if off['warm_p95_ns'] else None
     unsuccessful = sum(a['failed_calls'] + a['missing_calls'] for a in arms.values())
-    return {'scope': 'descriptive_DEV_pilot', 'arms': arms, 'per_question': per_question,
+    return {'scope': 'source_bound_candidate_observation' if candidate_observation else 'descriptive_DEV_pilot',
+            'arms': arms, 'per_question': per_question,
             'cluster_mean_on_minus_off': {metric: on['cluster_mean'][metric] - off['cluster_mean'][metric] for metric in M.METRICS},
             'warm_p95_ratio_on_to_off': ratio,
             'pilot_cost_budget_max': protocol['proposed_warm_p95_ratio_max'],
@@ -101,5 +109,7 @@ def score(book, protocol, rows, verify_pack):
             'location_metrics_evaluated': True, 'answer_quality_evaluated': False,
             'answer_level_abstention': None, 'proposed_fact_clusters': len(off['per_cluster']),
             'approved_independent_units': 0, 'new_FINAL_samples': 0,
-            'quality_verdict': 'inconclusive: known DEV overlap and fewer than 10 independent units',
+            'quality_verdict': ('inconclusive: independent review and statistical independence not established'
+                                if candidate_observation else
+                                'inconclusive: known DEV overlap and fewer than 10 independent units'),
             'default_on': False, 'release_eligible': False, 'full_task_complete': False}

@@ -1,0 +1,188 @@
+{
+  "scope": "technical source-fact review, not human independence approval",
+  "rows": [
+    {
+      "id": "IC-02",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "주소가 같으면 false를 반환하고 append를 하지 않는다. 실제 quorum 재계산 또는 테스트 통과를 주장하지 않는다.",
+      "source_spans": [
+        "func (valSet *defaultSet) AddValidator(address common.Address, blsPublicKey []byte) bool {\n\tvalSet.validatorMu.Lock()\n\tdefer valSet.validatorMu.Unlock()\n\tfor _, v := range valSet.validators {\n\t\tif v.Address() == address {\n\t\t\treturn false\n\t\t}\n\t}\n\tvalSet.validators = append(valSet.validators, New(address, blsPublicKey))\n\treturn true\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-03",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "찾지 못하면 false를 반환하며 삭제를 수행하지 않는다. 찾으면 목록을 재구성하고 true를 반환한다.",
+      "source_spans": [
+        "func (valSet *defaultSet) RemoveValidator(address common.Address) bool {\n\tvalSet.validatorMu.Lock()\n\tdefer valSet.validatorMu.Unlock()\n\n\tfor i, v := range valSet.validators {\n\t\tif v.Address() == address {\n\t\t\tvalSet.validators = append(valSet.validators[:i], valSet.validators[i+1:]...)\n\t\t\treturn true\n\t\t}\n\t}\n\treturn false\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-04",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "양수 상한 분기에서 timeout=baseTimeout으로 시작한다. round 반복 중 2배 후 상한 초과이면 상한으로 바꾸고 break한다. 그 뒤 timeout<baseTimeout인 의심 경로에도 상한을 적용한다. round=0이면 반복이 없어 baseTimeout 자체가 상한보다 커도 이 비교로 제한하지 않는다는 코드의 경계도 유지한다. 모든 overflow를 검출한다고 주장하지 않는다.",
+      "source_spans": [
+        "\t// set timeout based on the round number\n\tcfg := c.config.GetConfig(c.current.Sequence())\n\tbaseTimeout := time.Duration(cfg.RequestTimeout) * time.Millisecond\n\tround := c.current.Round().Uint64()\n\tmaxRequestTimeout := time.Duration(cfg.MaxRequestTimeoutSeconds) * time.Second\n\n\t// If the upper limit of the request timeout is capped by small maxRequestTimeout, round can be a quite large number,\n\t// which leads to float64 overflow, making its value negative or zero forever after some point.\n\t// In this case we cannot simply use math.Pow and have to implement a safeguard on our own, at the cost of performance (which is not important in this case).\n\tvar timeout time.Duration\n\tif maxRequestTimeout > time.Duration(0) {\n\t\ttimeout = baseTimeout\n\t\tfor i := uint64(0); i < round; i++ {\n\t\t\ttimeout = timeout * 2\n\t\t\tif timeout > maxRequestTimeout {\n\t\t\t\ttimeout = maxRequestTimeout\n\t\t\t\tbreak\n\t\t\t}\n\t\t}\n\t\t// prevent log storm when unexpected overflow happens\n\t\tif timeout < baseTimeout {\n\t\t\tc.currentLogger(true, nil).Warn(\"WBFT: Possible request timeout overflow detected, setting timeout value to maxRequestTimeout\",\n\t\t\t\t\"timeout\", timeout.Seconds(),\n\t\t\t\t\"max_request_timeout\", maxRequestTimeout.Seconds(),\n\t\t\t)\n\t\t\ttimeout = maxRequestTimeout\n\t\t}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-05",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "주어진 round보다 높은 round만 대상으로 주소 map을 만들고 len(addresses)를 반환하므로 여러 round에 같은 주소가 있어도1개로 센다.",
+      "source_spans": [
+        "func (rcs *roundChangeSet) higherRoundMessages(round *big.Int) int {\n\trcs.mu.Lock()\n\tdefer rcs.mu.Unlock()\n\n\taddresses := make(map[common.Address]struct{})\n\tfor k, rms := range rcs.roundChanges {\n\t\tif k > round.Uint64() {\n\t\t\tfor addr := range rms.messages {\n\t\t\t\taddresses[addr] = struct{}{}\n\t\t\t}\n\t\t}\n\t}\n\treturn len(addresses)\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-06",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "아니다. 큰 round의 키가 없으면 인자로 받은 round를 반환하며, 있으면 오름차순 정렬한 첫 키를 반환한다.",
+      "source_spans": [
+        "func (rcs *roundChangeSet) getMinRoundChange(round *big.Int) *big.Int {\n\trcs.mu.Lock()\n\tdefer rcs.mu.Unlock()\n\n\tvar keys []int\n\tfor k := range rcs.roundChanges {\n\t\tif k > round.Uint64() {\n\t\t\tkeys = append(keys, int(k))\n\t\t}\n\t}\n\tsort.Ints(keys)\n\tif len(keys) == 0 {\n\t\treturn round\n\t}\n\treturn big.NewInt(int64(keys[0]))\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-07",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "빈 집합 또는 기준보다 작은 round를 지우고 roundChanges/highestPreparedRound/highestPreparedBlock/prepareMessages의 네 map에서 해당 키를 함께 삭제한다.",
+      "source_spans": [
+        "func (rcs *roundChangeSet) ClearLowerThan(round *big.Int) {\n\trcs.mu.Lock()\n\tdefer rcs.mu.Unlock()\n\n\tfor k, rms := range rcs.roundChanges {\n\t\tif len(rms.Values()) == 0 || k < round.Uint64() {\n\t\t\tdelete(rcs.roundChanges, k)\n\t\t\tdelete(rcs.highestPreparedRound, k)\n\t\t\tdelete(rcs.highestPreparedBlock, k)\n\t\t\tdelete(rcs.prepareMessages, k)\n\t\t}\n\t}\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-08",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "PreparedRound가 nil 또는0이고 PreparedDigest가 zero hash여야 카운트한다. nilCount가 quorumSize와 같아지면 nil을 반환한다. 전부 돌아도 충족하지 못하면 error다.",
+      "source_spans": [
+        "func hasQuorumOfRoundChangeMessagesForNil(roundChangeMessages []*wbfmessage.SignedRoundChangePayload, quorumSize int) error {\n\tnilCount := 0\n\tfor _, m := range roundChangeMessages {\n\t\tlog.Trace(\"WBFT: hasQuorumOfRoundChangeMessagesForNil\", \"rc\", m)\n\t\tif (m.PreparedRound == nil || m.PreparedRound.Cmp(common.Big0) == 0) && m.PreparedDigest == (common.Hash{}) {\n\t\t\tnilCount++\n\t\t\tif nilCount == quorumSize {\n\t\t\t\treturn nil\n\t\t\t}\n\t\t}\n\t}\n\treturn errors.New(\"quorum of roundchange messages with nil prepared round not found\")\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-09",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "view가 현재보다 작고 상태가 StateAcceptRequest이며 이전 sequence/current.sequence-1 및 PriorRound와 정확히 같은 view이고 PriorValidators가 nil이 아닐 때만 이전 집합을 사용한다. 그 외는 현재 valSet이다.",
+      "source_spans": [
+        "func (c *Core) checkValidatorSignature(data []byte, sig []byte, view wbft.View) (common.Address, error) {\n\tif view.Cmp(c.currentView()) < 0 && c.state == StateAcceptRequest && view.Cmp(&wbft.View{\n\t\tSequence: new(big.Int).Sub(c.current.Sequence(), common.Big1),\n\t\tRound:    c.PriorRound(),\n\t}) == 0 {\n\t\tif valSet := c.PriorValidators(); valSet != nil {\n\t\t\treturn wbft.CheckValidatorSignature(valSet, data, sig)\n\t\t}\n\t}\n\treturn wbft.CheckValidatorSignature(c.valSet, data, sig)\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-11",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "state 값이 달라질 때만 값과 로그를 바꾸지만, StateAcceptRequest이면 processPendingRequests를 호출하고 모든 호출에서 processBacklog를 호출한다. 실제 큐 처리 성공이나 동시성 준수까지 이 함수만으로 판단하지 않는다.",
+      "source_spans": [
+        "func (c *Core) setState(state State) {\n\tif c.state != state {\n\t\toldState := c.state\n\t\tc.state = state\n\t\tc.currentLogger(false, nil).Debug(\"WBFT: changed state\", \"old.state\", oldState.String(), \"new.state\", state.String())\n\t}\n\tif state == StateAcceptRequest {\n\t\tc.processPendingRequests()\n\t}\n\n\t// each time we change state, we process backlog for possible message that are\n\t// now ready\n\tc.processBacklog()\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-12",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "header 사본에 WBFTHashWithRoundNumber(round)를 적용한 바이트 뒤에 byte(sealType)을 붙이고 Keccak256Hash의 바이트를 반환한다. 서명 생성이나 검증의 성공을 증명하는 함수는 아니다.",
+      "source_spans": [
+        "func PrepareSeal(header *types.Header, round uint32, sealType SealType) []byte {\n\th := types.CopyHeader(header)\n\troundHeader := h.WBFTHashWithRoundNumber(round).Bytes()\n\treturn crypto.Keccak256Hash(append(roundHeader, byte(sealType))).Bytes()\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-16",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "msg.Source가 c.Address와 같으면 경고 후 바로 반환한다. 다른 주소는 backlogsMu를 잡고 주소별 큐를 필요시 생성한 뒤 메시지를 view 기반 우선순위로 넣는다.",
+      "source_spans": [
+        "func (c *Core) addToBacklog(msg wbfmessage.WBFTMessage) {\n\tlogger := c.currentLogger(true, msg)\n\n\tsrc := msg.Source()\n\tif src == c.Address() {\n\t\tlogger.Warn(\"WBFT: backlog from self\")\n\t\treturn\n\t}\n\n\tlogger.Trace(\"WBFT: new backlog message\", \"backlogs_size\", len(c.backlogs))\n\n\tc.backlogsMu.Lock()\n\tdefer c.backlogsMu.Unlock()\n\n\tbacklog := c.backlogs[src]\n\tif backlog == nil {\n\t\tbacklog = prque.New[int64, wbfmessage.WBFTMessage](nil)\n\t\tc.backlogs[src] = backlog\n\t}\n\tview := msg.View()\n\tbacklog.Push(msg, toNegatePriority(msg.Code(), &view))\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-17",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "request 또는 Proposal이 nil이면 errInvalidMessage, current가 nil이면 errCurrentIsNil이다. current.sequence가 proposal.Number보다 크면 errOldMessage, 작으면 errFutureMessage, 같으면 nil이다. 이것은 입구 분류이고 실제 합의 수용은 별도다.",
+      "source_spans": [
+        "func (c *Core) checkRequestMsg(request *Request) error {\n\tif request == nil || request.Proposal == nil {\n\t\treturn errInvalidMessage\n\t}\n\n\tif c.current == nil {\n\t\treturn errCurrentIsNil\n\t}\n\n\tif cmp := c.current.sequence.Cmp(request.Proposal.Number()); cmp > 0 {\n\t\treturn errOldMessage\n\t} else if cmp < 0 {\n\t\treturn errFutureMessage\n\t} else {\n\t\treturn nil\n\t}\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    },
+    {
+      "id": "IC-18",
+      "reviewer": "Codex direct source inspection",
+      "human_review": false,
+      "source_span_SHA_checked": true,
+      "source_index_receipt": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/source-index-check.json",
+      "checked_fact": "checkRequestMsg 통과 후 pendingRequest를 저장하지만, StateAcceptRequest이면서 current.Round가 0일 때만 sendPreprepareMsg를 호출한다. 양수 round에서는 여기서 즉시 전송하지 않는다. ROUND-CHANGE quorum 후 전송 성공을 이 함수로 증명하지 않는다.",
+      "source_spans": [
+        "func (c *Core) handleRequest(request *Request) error {\n\tlogger := c.currentLogger(true, nil)\n\n\tlogger.Debug(\"WBFT: handle block proposal request\")\n\n\tif err := c.checkRequestMsg(request); err != nil {\n\t\tif err == errInvalidMessage {\n\t\t\tlogger.Error(\"WBFT: invalid request\")\n\t\t\treturn err\n\t\t}\n\t\tlogger.Error(\"WBFT: unexpected request\", \"err\", err, \"number\", request.Proposal.Number(), \"hash\", request.Proposal.Hash())\n\t\treturn err\n\t}\n\n\tc.current.pendingRequest = request\n\tif c.state == StateAcceptRequest {\n\t\tif c.current.Round().Uint64() == 0 {\n\t\t\t// if round > 0, then we don't send preprepare because it would be failed due to having no justification\n\t\t\t// after that we will send preprepare when 2/3+ round change messages are received\n\t\t\tc.sendPreprepareMsg(request)\n\t\t}\n\t}\n\n\treturn nil\n}\n"
+      ],
+      "semantic_independence": "not_established",
+      "relation_assertion": false
+    }
+  ],
+  "independent_units_approved": 0,
+  "historical_exclusions": [
+    "IC-01",
+    "IC-10",
+    "IC-13",
+    "IC-14",
+    "IC-15"
+  ],
+  "source_index_check_sha256": "1e026d493d69584073942914ab0b6aceb9eed86db09393e9ac344a0bea59a4de",
+  "user_execution_authorization": {
+    "user_message": "나머지 004도 모두 진행.\n완료까지 계속 진행하고 모두 완료후 보고할것.",
+    "scope": "autonomous technical review, frozen measurement, final criterion verdict and local documentation/commits; not a fabricated human independence review"
+  },
+  "quality_accepted": false
+}
