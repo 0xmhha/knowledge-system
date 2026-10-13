@@ -1,0 +1,86 @@
+{
+  "step": "O-03",
+  "date_KST": "2026-10-13",
+  "scope": "actual approved WBFT held pilot, explicit dependency scope501 files/Go494; not operating activation/full-project release",
+  "content_approval": "trusted user message: 모두 추천 제안으로 승인",
+  "reviewer_identity": "current conversation user approval; no personal name inferred",
+  "required_checks": [
+    "O03-A",
+    "O03-B",
+    "O03-C",
+    "O03-D"
+  ],
+  "go_race": {
+    "test_pass": 218,
+    "package_pass": 4,
+    "subtest_pass": 222
+  },
+  "vet_exit": 0,
+  "boundary_exit": 0,
+  "docs_exit": 0,
+  "progress_guard_tests": 11,
+  "actual_MCP": {
+    "tools": 28,
+    "read_tools_ready": true,
+    "retrieval_mode": "off",
+    "verified_concepts": 4,
+    "verified_requirements": 4,
+    "missing_code_traces": 4,
+    "acceptance_evaluated": false,
+    "semantic_assertions": 0,
+    "negative_controls": [
+      "tampered definition refused/store SHA preserved",
+      "old dataset projection_missing/no borrowed data"
+    ],
+    "operator_source_current_config_preserved": true,
+    "activation": false
+  },
+  "scope_audit": {
+    "scope": "explicit filelist Go scope, distinct from full go/packages audit",
+    "expected_go_files": 494,
+    "actual_go_files": 494,
+    "missing_selected": [],
+    "overincluded": [],
+    "full_audit_drift_outside_scope": 762,
+    "full_project_release_verdict": null
+  },
+  "original_source_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_commit": "baca2869118774c5f6219932dc76e197a47e6ecd",
+  "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+  "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+  "model": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "mrl-prefix-l2:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "binary_sha256": {
+    "cks": "24d33fc47e60c74ab8c3663ce0c245e8608a3f6861ed0ef38c77db7407c99aec",
+    "ckg": "c5277e46defa91c378a16b75cc223893246ea185daee69746888a4ec48da576b",
+    "ckv": "ab694f084b52a5e984fbec9e13d04398fef0967fec54bb37cec8819f28d8fc94"
+  },
+  "retained_artifact_sha256": {
+    "sources/manifest.json": "e587383dab29257e85b23bb053eff22c3cbbdd2e28f78af6b039e7e95fafa373",
+    "sources/history.bundle": "b04914aea300263d3690f7e13067110695ee7b31c6252bd86e9f00b639d3da9c",
+    "graph/graph.db": "98e0be1110e419d891e2ebb8da5101de778a76876b69bd7a92743eccd53e055b",
+    "vector/vector.db": "e1f4393bae5b47a234314953ac7143bdee93214f338e80f3ce0d794d26f61af4"
+  },
+  "semantic_store_sha256": "da4e5cb1b57b78fea64683b5a661db6cddade821949279f0f54a8ec87c255a5a",
+  "full_task_complete": true,
+  "quality_evaluated": false,
+  "remaining": [
+    "N16 signing condition intentionally unmet",
+    "O04 independent quality/gold/evaluation verdict"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "step": "O-04",
+  "scope": "actual BGE-M3 WBFT held pilot DEV mechanism probes; no new independent FINAL or answer quality verdict",
+  "date_KST": "2026-10-13",
+  "actual_model": "BGE-M3 latest digest790764642607…16bab/1024, pinned to held dataset identity",
+  "variant_limit": "before-fix DEV protocol binds its earlier binary hash; after-fix is current source/binary. Runs are not pooled as new independent samples",
+  "same_execution_inputs_verified_within_each_variant": true,
+  "per_variant": {
+    "responses": 216,
+    "verified_pairs": 108,
+    "failed": 0,
+    "missing": 0,
+    "pending": 0,
+    "counts_per_query_per_arm": {
+      "warmup": 2,
+      "retrieval": 5,
+      "warm_latency": 20,
+      "cold_process": 0
+    }
+  },
+  "after_fix_retrieval_summary": {
+    "C01": {
+      "retrieval_pairs": 5,
+      "explanation_states": {
+        "applied": 5
+      },
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5
+    },
+    "C02": {
+      "retrieval_pairs": 5,
+      "explanation_states": {
+        "applied": 5
+      },
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5
+    },
+    "C03": {
+      "retrieval_pairs": 5,
+      "explanation_states": {
+        "applied": 5
+      },
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5
+    },
+    "C04": {
+      "retrieval_pairs": 5,
+      "explanation_states": {
+        "no_effect": 5
+      },
+      "rank_changed_pairs": 0,
+      "body_changed_pairs": 0
+    }
+  },
+  "after_fix_changed_pairs": 81,
+  "after_fix_warm_p95_ns": {
+    "off": 452051458,
+    "on": 588721958
+  },
+  "p95_ratio": 1.3023339435839183,
+  "scoped_ollama_http_paths": {
+    "off": {
+      "/api/tags": 880,
+      "/api/embed": 440
+    },
+    "on": {
+      "/api/tags": 1102,
+      "/api/embed": 551
+    }
+  },
+  "observability_limit": "per-request scope HTTP attempts include tags and embeddings, not only embeddings; startup scopes separate and constructor probes outside scope uncounted",
+  "quality_evaluated": false,
+  "quality_metrics": null,
+  "quality_verdict": "not_evaluated: no independent gold/answer reference or independent unit classification supplied",
+  "performance_accepted": false,
+  "latency_limit": "same fixed DEV questions, sequential off then on, not a randomized acceptance run; original B0 thresholds not changed or borrowed as new scope acceptance",
+  "independent_units": null,
+  "new_FINAL_samples": 0,
+  "operating_current_config_preserved": true,
+  "full_task_complete": false,
+  "technical_checks_verified": [
+    "O04-A"
+  ],
+  "runtime_preparation_complete": true,
+  "remaining": [
+    "O04-B reviewed independent runtime/evaluation binding",
+    "O04-C independent questions/gold/reference/unit and actual quality verdict",
+    "O04-D final quality acceptance/limits and committed binding"
+  ]
+}

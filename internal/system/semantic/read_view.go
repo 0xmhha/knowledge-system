@@ -2,6 +2,7 @@ package semantic
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 )
@@ -133,13 +134,21 @@ func (a ActiveProjection) RequirementView(id string, limit int) (RequirementRead
 	if !found {
 		return out, false, nil
 	}
-	p := a.projection
-	p.Requirements = []Requirement{out.Requirement}
-	report, err := (ActiveProjection{projection: p}).Trace()
+	// Peer requirements own source spans and assertion endpoints. Validate
+	// their complete projection before selecting a single public trace.
+	report, err := a.Trace()
 	if err != nil {
 		return out, true, err
 	}
-	out.Trace = report.Requirements[0]
+	for _, trace := range report.Requirements {
+		if trace.RequirementID == id {
+			out.Trace = trace
+			break
+		}
+	}
+	if out.Trace.RequirementID == "" {
+		return out, true, fmt.Errorf("requirement trace is missing")
+	}
 	out.TotalPaths = len(out.Trace.Paths)
 	limit = readLimit(limit)
 	out.Truncated = out.TotalPaths > limit

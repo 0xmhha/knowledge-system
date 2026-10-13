@@ -427,8 +427,8 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 
 - [x] O03-A gen-config/setup의 explicit semantic store/mode/budget·ontology/spec 준비 옵션, off 기본/잘못된 조합 거부 및 기존 경로 호환.
 - [x] O03-B 준비·검토·연결·activation 단계를 구분, 대상 dataset와 source 입력을 결합하고 projection 검증 없이 ready/activate0.
-- [ ] O03-C controlled 설치→MCP status/조회 positive 및 missing/stale 실패 제어; 실제 도메인 채택/리뷰 기록은 명확한 사용자 판정 필요.
-- [ ] O03-D 운영 설정/새 인덱스/선택 팩과의 연계·재색인 시 stale 전환·기존 current 보존, 실제 대상 원문·한계와 source SHA 기록.
+- [x] O03-C controlled 설치→MCP status/조회 positive 및 missing/stale 실패 제어; 실제 도메인 채택/리뷰 기록은 명확한 사용자 판정 필요.
+- [x] O03-D 운영 설정/새 인덱스/선택 팩과의 연계·재색인 시 stale 전환·기존 current 보존, 실제 대상 원문·한계와 source SHA 기록.
 
 ### O-04 설명·적용 전후 평가
 
@@ -448,3 +448,5 @@ O04-A 기술 검증: v2 요청별 explain_ontology, 최대8개 개념/20개 변�
 O04-A 후속 검증: no_candidates 설명·응답 비교 허용, v2 explain_ontology 입력의 실제 eval capture 전달 보강. 관련6패키지 race278시험260하위시험 pass/실패0/명시적 DEV·Linux 선택 시험2skip, 자체 실제 stdio mock20응답/10쌍·실패/누락/pending0, 같은 raw-query-first·운영 current/config SHA 유지. O04-B 실제 도메인 paired 조건·평가와 C/D는 unchecked 유지한다.
 
 O03 후속 준비 검증: 실제 stablenet 팩 기반 proposed concept4/requirement4/criteria5·13source spans/queue8, semantic race44시험20하위시험 pass·관계 assertion0/코드 테스트 실행0. 과거 mhha 검토는 새 승인이 아니며 R04 read-under-write-lock 표현 수정 제안과 기계 앵커/원문 SHA를 기록했다. O03-C/D 내용 승인/운영 source-index 결합과 O04-B/C/D 실제 평가의 unchecked를 유지한다.
+
+O03 A–D 완료(명시적 실제 WBFT held 파일럿 범위): C01–04/R01–04 사용자 내용 승인·실제 BGE-M3/scoped Go494/source2226/동일 tuple·MCP28/status/조회/trace·변조/옛 dataset 거부·운영 source/current/config 보존. full audit762 scope 밖 DRIFT와 scoped missing/overincluded0을 구별했다. 관련4패키지 race218/222·실패0. O04 actual DEV216응답/108쌍은 기계 관측 자료이며 gold/독립 단위 부재로 B/C/D의 실제 품질·최종 판정은 unchecked 유지. 기존17/18·온톨로지3/4·전체 잔여 N16/O04의2개.

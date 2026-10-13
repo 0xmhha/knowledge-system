@@ -1,0 +1,60 @@
+{
+  "scope": "actual BGE-M3 WBFT held pilot DEV mechanism probes; no new independent FINAL or answer quality verdict",
+  "queries": [
+    [
+      "C01",
+      "쿼럼 크기를 계산하는 코드"
+    ],
+    [
+      "C02",
+      "라운드 변경과 prepared block 처리"
+    ],
+    [
+      "C03",
+      "합의 메시지 처리와 중복 메시지"
+    ],
+    [
+      "C04",
+      "current 읽기 락과 쓰기 보호"
+    ]
+  ],
+  "query_source": "approved concept aliases and competency scope; not blinded gold",
+  "counts": {
+    "warmup": 2,
+    "retrieval": 5,
+    "warm_latency": 20,
+    "cold_process": 0
+  },
+  "on_mode": "concept_text",
+  "off_mode": "baseline",
+  "ontology_budget_ms": 5000,
+  "arm_order": [
+    "off",
+    "on"
+  ],
+  "binary_sha256": "24d33fc47e60c74ab8c3663ce0c245e8608a3f6861ed0ef38c77db7407c99aec",
+  "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+  "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "mrl-prefix-l2:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "independent_units": null,
+  "quality_metrics": null,
+  "latency_acceptance_threshold": null,
+  "constructor_HTTP_scope_limit": "scoped backend record excludes constructor probes outside a request/anchor scope",
+  "operator_activation": false
+}

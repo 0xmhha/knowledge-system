@@ -106,3 +106,29 @@ R04는 기존 summary의 RLock 또는 write Lock 아래 읽기 허용과 첫 inv
 O03-C/D unchecked, O04-B/C/D unchecked를 유지한다. 다음 C01–C04/R01–R04(특히 R04)의 내용 채택·검토자 기록과 정확한 code/test·criterion 관계 검토, 이후 held source/index/semantic 결합과 실제 off/on 평가. 전체 잔여 N16/O03/O04의3개·기존17/18·온톨로지2/4다.
 
 감사 기록 정정: 최초 audit의 baseline_file_available=false를 bytes unchanged=false로 표현해 파일 변화로 오독했다. 원래 기록을 보존하고 baseline 부재인 경우 nullable/비교미확인으로 고쳤다. 실제 pack/코드 내용 승인으로 확장하지 않는다.
+
+## O03 완료: 사용자 승인과 실제 held WBFT 파일럿 결합
+
+2026-10-13 사용자 “모두 추천 제안으로 승인”을 C01–C04/R01–R04·기준5개·R04의 read-under-write-lock 해석에 기록했다. [승인본/범위](../../projects/stablenet/domain-knowledge/meaning-approved/README.md). 검토자 개인 이름은 지정되지 않았으므로 current conversation user approval을 사용하며 과거 mhha 검토를 옮기지 않는다. 실제 stable project ID에 envelope/status/reviewed_by만 정렬했고 내용은 승인한 초안과 같다. 관계 후보16개·criterion 실행·품질·N16은 이번 승인 범위가 아니다.
+
+원본 code commit0bf2f4d1를 부모로 하는 별도 Git 복사본에 승인 문서2개만 추가했다(후보 source baca2869118774c5f6219932dc76e197a47e6ecd). WBFT core/validator/messages의 explicit dependency closure501파일(Go494)을 실제 BGE-M3 latest/digest790764642607…16bab·1024차원으로 새 source/graph/vector에 결합했다. 운영 source·current·config는 그대로이며 새 dataset에 current pointer를 만들지 않았다. held source2226파일/45,041,303bytes·Git recovery206,663,101bytes·candidate537,846,197bytes다. 전체 프로젝트 배포나 기존 full-corpus 평가를 대신하지 않는다.
+
+필수 schema/alignment/content/coverage 게이트가 통과했다. full go/packages audit는1256 expected/494 DB로762 missing의 DRIFT soft warning을 남겼다. explicit scope와 DB의 Go494파일을 읽기 전용으로 다시 대조해 missing0/overincluded0이며,762는 scope 밖이다. 전체 audit가 clean이라고 표시하지 않는다.
+
+actual semantic build·실제 stdio MCP28도구를 사용해 read_tools_ready=true/mode off/retrieval_ready=false, verified concept4/requirement4·source-backed lookup/concept/trace를 확인했다. 구현 관계를 만들지 않았으므로 trace4는 missing_code(검토된 코드 연결 부재), acceptance_evaluated=false다. 변조된 definition 승격은 거부돼 store SHA가 유지됐고, 옛 dataset은 새 store를 projection_missing으로 거부했다. source/current/config·활성0을 검증했다.
+
+다중 요구 조회에서 peer requirement/source evidence를 먼저 잘라 p.Validate가 실패하던 제품 버그를 실제 자료로 발견했다. 전체 projection을 검증한 뒤 한 trace를 선택하도록 고쳐 실제4개 조회가 통과했다. 실제 C04 질의의 mixed Latin/Hangul term에 붙은 조사도 매칭되도록 endpoint별 경계를 적용했고 Latin 식별자 안의 오탐을 거부하는 회귀를 유지했다. RED·수정 전 MCP/DEV 관측은 별도 보존한다.
+
+관련4패키지 race218시험222하위시험 pass/실패0/skip0·vet/boundary/docs/progress guard. [실제 연결 원자료](../../system/eval/b0-knowledge-system/ontology-o03-accepted-2026-10-13/verification.json). O03 A–D는 이 명시적 실제 WBFT held 파일럿 연결 범위에서 충족하며 운영 전환/전체 corpus 출시를 완료로 세지 않는다. 기존 N18 공개 배포 보류와 N16 미충족 유지 결정은 바뀌지 않았다.
+
+## O04 후속: 실제 BGE-M3 관측 — 품질 판정 미완료
+
+같은 후보/dataset/model/binary·질문·요청 옵션·raw-query-first에서 baseline off와 concept_text on을 비교했다. 실제4개 질문은 승인된 alias 기반 DEV probe이며 gold/블라인드 독립 질문이 아니다. 각 arm warmup2/retrieval5/warm20/cold0로108calls·총216응답/108쌍, 실패/누락/pending0. 수정 전/후 관측을 별도 고정했고 기존 FINAL은 재사용0이다. [원자료/한계](../../system/eval/b0-knowledge-system/ontology-o04-actual-preview-2026-10-13/verification.json).
+
+수정 후 retrieval5회에서 C01–03은 매번 applied·인용 순서/본문 변화, C04는 mixed term에 매칭되지만 매번 no_effect였다. 전체108쌍 중81쌍 순위/본문 변화. source definition으로 raw candidate pool 안의 score/rank만 바뀌며 code/test 관계가 새로 증명되지는 않는다. C04의0효과를 연결 불가와 구별했다.
+
+warm80회/arm의 aggregate p95는 off452.05ms/on588.72ms(약30.2% 높음). 요청 scope의 Ollama HTTP는1320/1653이며 그 중 /api/embed440/551, /api/tags880/1102다. startup scope는 별도이고 constructor probe의 scope 밖 요청은 이 분모에 없다. 모델 호출 전체를0/단일 embedding 수로 오독하지 않는다. 실행은 순차 off→on, 모델/cache cold 또는 randomized latency acceptance가 아니다.
+
+이 결과는 실제 기계적 효과·비용 관측이며 검색 정답 품질 판정은 not_evaluated다. 독립 단위/gold/answer reference가 없어 MRR/Recall/F1·답변 평가·성능 수용을 계산하지 않았다. O04-B의 actual runtime 자료는 준비됐으나 독립 평가 조건·정답 범위 C와 최종 실제 평가/판정 결합 D가 남아 전체 O04 완료로 체크하지 않는다.
+
+다음은 독립 평가 질문·인용 gold/정답·채점 단위/검토 자료를 사전에 마련하고 실제 품질·한계를 판정하는 일이다. 현재 기존17/18·온톨로지3/4 완료, 전체 잔여 N16/O04의2개다.

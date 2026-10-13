@@ -44,3 +44,21 @@ func TestLatinTermNeedsWordBoundary(t *testing.T) {
 		t.Fatal("Korean particle blocked exact term")
 	}
 }
+
+func TestMixedLanguageTermUsesItsEndpointBoundaries(t *testing.T) {
+	for _, tc := range []struct {
+		query, term string
+		want        bool
+	}{
+		{"current 읽기 락과 쓰기 보호", "current 읽기 락", true},
+		{"xcurrent 읽기 락과", "current 읽기 락", false},
+		{"쿼럼 api endpoint", "쿼럼 api", true},
+		{"쿼럼 apical", "쿼럼 api", false},
+		{"읽기 currentmutex와", "읽기 currentmutex", false},
+		{"capillary api", "api", true},
+	} {
+		if got := containsTerm(tc.query, tc.term); got != tc.want {
+			t.Fatalf("query=%q term=%q got=%v want=%v", tc.query, tc.term, got, tc.want)
+		}
+	}
+}

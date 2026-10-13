@@ -1,6 +1,6 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
-2026-10-13 온톨로지 보완: 기존 N항목17/18·잔여N16 유지. **O-01–04 2/4 완료·2개 남음**. O01 상태/O02 조회 완료, O03 설치 준비와 O04 설명·저장 응답 비교 구현·검증 완료. 실제 자료/검토·적용 대상(O03-C/D), 실제 같은 조건의 실행 및 독립 도메인 효과 평가(O04-B/C/D)는 대기. 전체 잔여3개 N16/O03/O04. O03 proposed subset4개 개념/4개 요구·5개 기준과 출처/앵커 대조를 준비했다. 다음은 C01–C04/R01–R04 내용 검토(특히 R04 잠금 해석)·관계/테스트 매핑 뒤 실제 held 연결과 O04 도메인 평가다. 운영 활성화0.
+2026-10-13: 기존 N17/18·잔여N16 유지. **O-01–04 3/4 완료·1개 남음**. O01 상태/O02 조회/O03 사용자 승인과 실제 WBFT held 파일럿 연결 완료. O04는 실제 BGE-M3 DEV216응답·108쌍과 기계적 효과/지연/호출 관측까지 준비했고 독립 품질 판정은 미완료. 전체 잔여2개 N16/O04. 다음 독립 평가 질문·gold·채점 단위/검토 자료 준비와 실제 효과 판정이다. 운영 전환/공개 배포 보류·활성0 유지.
 
 2026-10-11 최신(Claude Code): **N18 완료(사용자 승인)**. [판정](./N18-RELEASE-VERDICT-DRAFT.md) — 선택 기능 기본값 유지, 로컬 개인 운영 허용, merge·공개 배포 보류. N16은 공개키 fingerprint 조건을 사용자 결정으로 미충족 유지. **현재 17/18 완료, 남은 1개:** N16 신뢰·권한.
 
@@ -166,7 +166,7 @@ N11 [부분 FINAL 후보](./N11-FINAL-CANDIDATE-PREPARATION.md)4문항을2제안
 |---|---|---|---|
 | O-01 | 완료 | MCP 온톨로지 준비 상태와 사용 가능 이유 노출 | off/미설정/누락/stale/준비/예산 구분, 동일 신원·읽기 전용·출력 schema/도구 등록·원자료 검증 |
 | O-02 | 완료 | O01 기반 개념·용어·관계·요구 추적 읽기 MCP | 모호 후보/검토 상태/원문/기준·시험 링크·미연결 이유·상한·권한·무결성; 검색 모드와 독립 |
-| O-03 | 구현·실제 자료 대기 | O02 기반 프로젝트 ontology/spec/store/mode 설치 연결 | 명시 입력·같은 후보 신원 검증·off 기본·불가 상태 smoke; 실제 도메인 검토 필요한 항목은 대기 |
+| O-03 | 완료 | O02 기반 프로젝트 ontology/spec/store/mode 설치 연결 | 명시 입력·같은 후보 신원 검증·off 기본·불가 상태 smoke; 실제 도메인 검토 필요한 항목은 대기 |
 | O-04 | 구현·실제 평가 대기 | 온톨로지 영향 설명과 적용 전후 대조 | 어떤 개념/관계가 점수·인용/본문/지연에 기여했는지 설명, independent protocol·표본/품질 한계 기록 |
 
 **온톨로지 현재2/4 완료·2개 남음. 다음 O-03. 전체 잔여3개: N-16/O-03/O-04.**
@@ -178,3 +178,5 @@ O04-A 설명 기능 검증 완료, 저장 off/on 비교 도구는 기술 준비�
 O04 후속 완료: no_candidates 설명/비교와 eval capture의 v2 설명 입력 전달 누락 수정, 실제 stdio mock20응답/10쌍·실패/누락/pending0·기존 current/config SHA 보존. 실제 도메인 품질은 미평가, O04-B/C/D 미완료. 운영 source0bf2f4d1에는 추적 ontology/spec0, store 미연결; 기존 pack baselineec6a4e96b와 새 source 정합성 대조가 다음 O03 준비다. 전체 잔여 N16/O03/O04의3개.
 
 O03 후속 기술 준비: [실제 팩 기반 proposed 검토 자료](../../projects/stablenet/domain-knowledge/meaning-draft/README.md) — concept4/requirement4/criteria5, 관계 후보16개 비실행, source span13/queue8, race44/20 pass. 이전 verified/mhha 기록을 새 승인으로 옮기지 않았다. 전체anchor134/selectedsymbol14의 기계 대조와 R04 표현 차이를 기록했다. C/D 내용/대상 수용은 미완료. 전체 잔여 N16/O03/O04의3개, 다음 subset 내용 검토·검토자·code/test 후보 판단이다.
+
+O03 완료: 승인본과 실제501파일(Go494) WBFT held 후보·동일 source/index/semantic tuple·MCP조회/trace·실패 제어 검증. source/current/config 보존·활성0. O04 실제DEV 기계 관측과 source 한계를 기록했지만 품질/gold·독립성 판정은 미완료. 전체 잔여2개 N16/O04. [실제 연결·결과 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md#o03-완료-사용자-승인과-실제-held-wbft-파일럿-결합).
