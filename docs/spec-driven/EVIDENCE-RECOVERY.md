@@ -2,10 +2,10 @@
 
 Completion evidence is read at each task's recorded `evidence_revision` and `manifest` in [the progress ledger](./REFACTORING-PROGRESS.json). Historical reports are not rewritten to match current sources. Removing a completed report from the working tree does not remove the commit that the ledger verifies.
 
-The source/evidence branches `feat/refactoring-followup` and `feat/setup-tool` must be retained. PR #99 was squashed into main as `9a397188`; its original tip `1e3ace26` remains on `feat/setup-tool`. To obtain those objects in a fresh clone, fetch the evidence branches before running the progress check:
+The source/evidence branches `feat/refactoring-followup`, `feat/setup-tool` and `codex/refresh-current-documentation` must be retained. The documentation branch holds the active source-binding commits, which a main squash commit alone does not preserve as history. PR #99 was squashed into main as `9a397188`; its original tip `1e3ace26` remains on `feat/setup-tool`. To obtain those objects in a fresh clone, fetch the evidence branches before running the progress check:
 
 ```sh
-git fetch origin feat/refactoring-followup feat/setup-tool
+git fetch origin feat/refactoring-followup feat/setup-tool codex/refresh-current-documentation
 python3 scripts/check-refactoring-progress.py
 ```
 

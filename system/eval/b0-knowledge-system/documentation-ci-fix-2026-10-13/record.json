@@ -1,0 +1,58 @@
+{
+  "checked_at": "2026-10-13T10:48:39.024522+00:00",
+  "scope": "repair the documentation cleanup CI failure, current installation guide packaging and repository-directory link validation; acceptance/defaults/key hold unchanged",
+  "initial_failed_CI": {
+    "run": 38383410958,
+    "revision": "a3df2bf736da45904870e32812419c8c39e1aaaa",
+    "failed_jobs": [
+      "build-and-test",
+      "native-install-contract"
+    ],
+    "cause": [
+      "removed installation report still named by package-host.py",
+      "links to removed ADR directories passed locally because empty directories remained"
+    ]
+  },
+  "changes": [
+    "package current docs/INSTALLATION.md as archive INSTALLATION.md and verify identical bytes/hash",
+    "link current architecture/purpose references instead of deleted ADR directories",
+    "reject a local directory link without repository files",
+    "keep documentation evidence branch available after squash merge"
+  ],
+  "checks": {
+    "clean_checkout_documentation": "PASS 106 live documents; all72 current references",
+    "documentation_regression_tests": 20,
+    "package_notice_and_current_guide_tests": 3,
+    "current_host_extracted_archive_and_three_owned_installs": "PASS",
+    "original_completion_progress_guard": "pending_new_committed_binding"
+  },
+  "runtime_Go_changed": false,
+  "packaging_tool_changed": true,
+  "current_references": 72,
+  "obsolete_prose_removed": 263,
+  "frozen_or_domain_input_bytes_changed": false,
+  "required_remaining": [
+    "N-16 on hold"
+  ],
+  "original_complete": 17,
+  "ontology_complete": 4,
+  "quality_or_release_acceptance_changed": false,
+  "publication": {
+    "PR": 100,
+    "url": "https://github.com/0xmhha/knowledge-system/pull/100",
+    "state": "OPEN",
+    "isDraft": false,
+    "merge_authorization": "explicit user instruction: if CI passes, squash merge and synchronize main",
+    "new_head_CI": "pending_after_fix_push"
+  },
+  "changed_sources": [
+    "Makefile",
+    "docs/INSTALLATION.md",
+    "scripts/check-docs.py",
+    "scripts/documentation_contract.py",
+    "scripts/package-host.py",
+    "scripts/test_documentation_contract.py",
+    "scripts/test_package_notice_recipe.py",
+    "scripts/wbs-package-smoke.sh"
+  ]
+}

@@ -4,6 +4,7 @@ These entry points describe the current repository. Source files, registered too
 
 | Need | Read |
 |---|---|
+| Use an extracted host package | [package installation](./INSTALLATION.md) |
 | Install and build a dataset | [repository quick start](../README.md), [guided setup](../tools/setup/README.md), [setup reference](../system/docs/SETUP.md) |
 | Understand architecture and purpose | [architecture](./ARCHITECTURE.md), [purpose and scope](./spec-driven/PURPOSE-AND-SCOPE.md), [graph purpose](./graph/VISION.md) |
 | Find all remaining work | [remaining work](./REMAINING-WORK.md) |

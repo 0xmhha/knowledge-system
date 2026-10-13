@@ -87,7 +87,7 @@ def markdown_links(text):
             yield number, match.group(1).strip('<>')
 
 
-def validate_links(root, path, text):
+def validate_links(root, path, text, repository_files=None):
     findings = []
     for lineno, link in markdown_links(text):
         parsed = urlsplit(link)
@@ -97,6 +97,15 @@ def validate_links(root, path, text):
         if not target.exists():
             findings.append((path, lineno, f'local Markdown target does not exist: {link}'))
             continue
+        if repository_files is not None:
+            try:
+                relative = target.resolve().relative_to(root.resolve()).as_posix()
+            except ValueError:
+                relative = None
+            if relative is not None and target.is_dir() and not any(
+                    relative == '.' or p.startswith(relative.rstrip('/') + '/') for p in repository_files):
+                findings.append((path, lineno, f'local Markdown directory has no repository files: {link}'))
+                continue
         if parsed.fragment and target.is_file() and target.suffix.lower() == '.md':
             if unquote(parsed.fragment) not in heading_ids(target.read_text(encoding='utf-8')):
                 findings.append((path, lineno, f'Markdown heading does not exist: {link}'))

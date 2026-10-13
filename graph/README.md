@@ -132,7 +132,7 @@ Front both with a reverse proxy: `/api/* → :8080`, `/* → /srv/ckg/static`.
 - [`docs/graph/EVAL.md`](../docs/graph/EVAL.md) — eval harness and scoring
 - [Graph architecture](../docs/graph/ARCHITECTURE.md) — package responsibilities and limits.
 
-"What is true now" = code + git. For decisions, see [`docs/graph/adr/`](../docs/graph/adr/).
+"What is true now" = code + git. Current decisions and limits are in [the architecture](../docs/graph/ARCHITECTURE.md) and [purpose and scope](../docs/spec-driven/PURPOSE-AND-SCOPE.md).
 
 ## Contributing
 

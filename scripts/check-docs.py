@@ -335,7 +335,7 @@ def main() -> int:
         if not should_check(path, head, rows):
             continue
         if path.endswith(".md"):
-            findings.extend(validate_links(root, path, text))
+            findings.extend(validate_links(root, path, text, repository_files=tracked))
         scanned += 1
         engine = engine_of(path)
         in_fence = False

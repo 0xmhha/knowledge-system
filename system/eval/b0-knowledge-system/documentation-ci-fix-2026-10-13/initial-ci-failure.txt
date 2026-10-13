@@ -1,0 +1,256 @@
+native-install-contract	Build extracted host package and exercise mock installs	﻿2026-10-13T10:27:16.1023837Z ##[group]Run bash scripts/wbs-package-smoke.sh
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1024159Z ^[[36;1mbash scripts/wbs-package-smoke.sh^[[0m
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1242662Z shell: /usr/bin/bash -e {0}
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1242904Z env:
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1243049Z   GOTOOLCHAIN: local
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1243270Z   KS_PACKAGE_SMOKE_DIR: /home/runner/work/_temp/ks-native-package
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:16.1243495Z ##[endgroup]
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8556349Z Traceback (most recent call last):
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8557107Z   File "/home/runner/work/knowledge-system/knowledge-system/scripts/package-host.py", line 185, in <module>
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8557589Z     main()
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8558011Z   File "/home/runner/work/knowledge-system/knowledge-system/scripts/package-host.py", line 180, in main
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8558580Z     archive = package(args.out_dir.resolve(), args.allow_dirty)
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8559101Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8559655Z   File "/home/runner/work/knowledge-system/knowledge-system/scripts/package-host.py", line 138, in package
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8560583Z     shutil.copy2(ROOT / "docs" / "spec-driven" / "INSTALLATION-PILOT.md", stage / "INSTALLATION.md")
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8561072Z   File "/usr/lib/python3.12/shutil.py", line 475, in copy2
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8564449Z     copyfile(src, dst, follow_symlinks=follow_symlinks)
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8564894Z   File "/usr/lib/python3.12/shutil.py", line 260, in copyfile
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8565250Z     with open(src, 'rb') as fsrc:
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8565523Z          ^^^^^^^^^^^^^^^
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8566102Z FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/knowledge-system/knowledge-system/docs/spec-driven/INSTALLATION-PILOT.md'
+native-install-contract	Build extracted host package and exercise mock installs	2026-10-13T10:27:40.8697487Z ##[error]Process completed with exit code 1.
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	﻿2026-10-13T10:28:21.5415266Z ##[group]Run make lint
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.5415574Z ^[[36;1mmake lint^[[0m
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.5482500Z shell: /usr/bin/bash -e {0}
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.5482784Z env:
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.5482990Z   GOTOOLCHAIN: local
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.5483227Z ##[endgroup]
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:21.9324258Z go vet ./...
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:33.6651238Z go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0 run --timeout 15m ./...
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:33.7012783Z go: downloading github.com/golangci/golangci-lint/v2 v2.14.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1033473Z go: downloading charm.land/lipgloss/v2 v2.0.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1034493Z go: downloading github.com/fatih/color v1.19.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1035666Z go: downloading github.com/gofrs/flock v0.13.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1043568Z go: downloading github.com/ldez/grignotin v0.10.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1303573Z go: downloading github.com/pelletier/go-toml/v2 v2.4.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1305462Z go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1562230Z go: downloading github.com/spf13/pflag v1.0.10
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1753651Z go: downloading github.com/spf13/viper v1.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1776165Z go: downloading go.yaml.in/yaml/v3 v3.0.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1900498Z go: downloading github.com/pelletier/go-toml v1.9.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.1933435Z go: downloading golang.org/x/mod v0.41.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2288957Z go: downloading golang.org/x/tools v0.50.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2301453Z go: downloading github.com/go-viper/mapstructure/v2 v2.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2330555Z go: downloading github.com/hashicorp/go-version v1.9.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2409310Z go: downloading github.com/mitchellh/go-homedir v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2590171Z go: downloading github.com/alecthomas/chroma/v2 v2.27.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.2595902Z go: downloading github.com/rogpeppe/go-internal v1.16.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.3240283Z go: downloading github.com/golangci/plugin-module-register v0.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.3442643Z go: downloading github.com/mattn/go-colorable v0.1.15
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.3685738Z go: downloading github.com/sirupsen/logrus v1.10.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.4062974Z go: downloading github.com/stretchr/testify v1.12.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.4539194Z go: downloading github.com/go-xmlfmt/xmlfmt v1.1.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.4772575Z go: downloading github.com/golangci/revgrep v0.8.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.4994366Z go: downloading golang.org/x/sys v0.48.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.5092883Z go: downloading github.com/mattn/go-isatty v0.0.22
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.5323670Z go: downloading github.com/charmbracelet/colorprofile v0.4.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.5561885Z go: downloading github.com/charmbracelet/ultraviolet v0.0.0-20260811164956-006e29f97886
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.5926838Z go: downloading github.com/charmbracelet/x/ansi v0.11.8
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.6342778Z go: downloading github.com/charmbracelet/x/term v0.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.6575481Z go: downloading github.com/clipperhouse/displaywidth v0.11.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.6849786Z go: downloading github.com/lucasb-eyer/go-colorful v1.4.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7003855Z go: downloading github.com/rivo/uniseg v0.4.7
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7136151Z go: downloading github.com/fsnotify/fsnotify v1.9.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7139395Z go: downloading github.com/mitchellh/mapstructure v1.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7392319Z go: downloading github.com/spf13/afero v1.15.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7543381Z go: downloading github.com/spf13/cast v1.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7597395Z go: downloading github.com/spf13/jwalterweatherman v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7670370Z go: downloading golang.org/x/sync v0.23.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7686007Z go: downloading github.com/daixiang0/gci v0.13.7
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7895200Z go: downloading github.com/golangci/gofmt v0.0.0-20260820135601-e84e05053792
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7959366Z go: downloading mvdan.cc/gofumpt v0.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7960081Z go: downloading github.com/golangci/golines v0.15.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.7960710Z go: downloading github.com/sourcegraph/go-diff v0.9.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8355218Z go: downloading github.com/golangci/swaggoswag v0.0.0-20250504205917-77f2aca3143e
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8357219Z go: downloading go.augendre.info/arangolint v0.4.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8399028Z go: downloading github.com/alingse/asasalint v0.0.11
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8407305Z go: downloading github.com/golangci/asciicheck v0.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8517236Z go: downloading github.com/breml/bidichk v0.3.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8597611Z go: downloading github.com/timakin/bodyclose v0.0.0-20260723120731-857993a2939c
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8655738Z go: downloading github.com/golangci/canonicalheader v0.0.0-20260827115959-a25c71c521f6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8735006Z go: downloading github.com/ClickHouse/clickhouse-go-linter v1.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8835799Z go: downloading github.com/sivchari/containedctx v1.0.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8882192Z go: downloading github.com/kkHAIKE/contextcheck v1.1.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8944781Z go: downloading github.com/karamaru-alpha/copyloopvar v1.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.8945670Z go: downloading github.com/bkielbasa/cyclop v1.2.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9047037Z go: downloading gitlab.com/bosi/decorder v0.4.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9070529Z go: downloading github.com/OpenPeeDeeP/depguard/v2 v2.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9174495Z go: downloading github.com/golangci/dupl v0.0.0-20260401084720-c99c5cf5c202
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9186507Z go: downloading github.com/Abirdcfly/dupword v0.1.8
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9271896Z go: downloading github.com/charithe/durationcheck v0.0.11
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9306254Z go: downloading github.com/manuelarte/embeddedstructfieldcheck v0.4.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9379425Z go: downloading github.com/Djarvur/go-err113 v0.1.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9444362Z go: downloading github.com/kisielk/errcheck v1.20.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9528454Z go: downloading github.com/breml/errchkjson v0.4.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9577613Z go: downloading github.com/Antonboom/errname v1.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9599327Z go: downloading codeberg.org/polyfloyd/go-errorlint v1.9.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9680826Z go: downloading github.com/nishanths/exhaustive v0.13.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9683995Z go: downloading dev.gaijin.team/go/exhaustruct/v4 v4.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9796260Z go: downloading dev.gaijin.team/go/exhaustruct/v5 v5.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9879107Z go: downloading github.com/ldez/exptostd v0.4.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:34.9932612Z go: downloading go.augendre.info/fatcontext v0.10.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0093109Z go: downloading github.com/ashanbrown/forbidigo/v2 v2.3.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0112505Z go: downloading github.com/gostaticanalysis/forcetypeassert v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0217930Z go: downloading github.com/manuelarte/funcorder v0.6.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0251883Z go: downloading github.com/ultraware/funlen v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0314255Z go: downloading github.com/nunnatsa/ginkgolinter v0.24.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0433509Z go: downloading 4d63.com/gocheckcompilerdirectives v1.4.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0485650Z go: downloading 4d63.com/gochecknoglobals v0.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0640724Z go: downloading github.com/alecthomas/go-check-sumtype v0.5.1-0.20260828200218-ae6904d28606
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0641675Z go: downloading github.com/uudashr/gocognit v1.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0759778Z go: downloading github.com/jgautheron/goconst v1.11.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0776666Z go: downloading github.com/go-critic/go-critic v0.15.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.0950952Z go: downloading github.com/quasilyte/go-ruleguard/dsl v0.3.23
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1006763Z go: downloading github.com/fzipp/gocyclo v0.6.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1156538Z go: downloading github.com/quasilyte/go-ruleguard v0.4.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1257796Z go: downloading github.com/godoc-lint/godoc-lint v0.11.4
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1852056Z go: downloading github.com/tetafro/godot v1.5.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1969699Z go: downloading github.com/matoous/godox v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1970622Z go: downloading github.com/denis-tingaikin/go-header v0.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.1975399Z go: downloading github.com/ldez/gomoddirectives v0.10.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2050084Z go: downloading github.com/Masterminds/semver/v3 v3.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2202834Z go: downloading github.com/ryancurrah/gomodguard v1.4.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2206901Z go: downloading github.com/ryancurrah/gomodguard/v2 v2.1.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2224573Z go: downloading github.com/golangci/go-printf-func-name v0.1.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2265540Z go: downloading github.com/securego/gosec/v2 v2.29.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2951272Z go: downloading github.com/xen0n/gosmopolitan v1.3.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2960289Z go: downloading github.com/uudashr/iface v1.5.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.2961104Z go: downloading github.com/leonklingele/grouper v1.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3275461Z go: downloading github.com/julz/importas v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3276346Z go: downloading github.com/macabu/inamedparam v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3440925Z go: downloading github.com/gordonklaus/ineffassign v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3489094Z go: downloading github.com/sashamelentyev/interfacebloat v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3562137Z go: downloading github.com/ckaznocha/intrange v0.3.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3598259Z go: downloading github.com/AdminBenni/iota-mixing v1.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3651558Z go: downloading github.com/butuzov/ireturn v0.4.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3782303Z go: downloading github.com/timonwong/loggercheck v0.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3816797Z go: downloading github.com/yagipy/maintidx v1.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3818905Z go: downloading github.com/ashanbrown/makezero/v2 v2.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.3909902Z go: downloading github.com/butuzov/mirror v1.3.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4053114Z go: downloading github.com/golangci/misspell v0.8.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4063230Z go: downloading github.com/tommy-muehle/go-mnd/v2 v2.5.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4066301Z go: downloading go-simpler.org/musttag v0.14.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4151068Z go: downloading github.com/alexkohler/nakedret/v2 v2.0.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4285757Z go: downloading github.com/nakabonne/nestif v0.3.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4334483Z go: downloading github.com/gostaticanalysis/nilerr v0.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4490533Z go: downloading github.com/alingse/nilnesserr v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4514624Z go: downloading github.com/Antonboom/nilnil v1.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4537081Z go: downloading github.com/ssgreg/nlreturn/v2 v2.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4614144Z go: downloading github.com/sonatard/noctx v0.5.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4892540Z go: downloading github.com/AlwxSin/noinlineerr v1.0.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4903701Z go: downloading github.com/firefart/nonamedreturns v1.0.8
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4911082Z go: downloading github.com/stbenjam/no-sprintf-host-port v0.3.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.4950211Z go: downloading github.com/kunwardeep/paralleltest v1.0.15
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5102705Z go: downloading github.com/catenacyber/perfsprint v0.10.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5132084Z go: downloading github.com/alexkohler/prealloc v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5157843Z go: downloading github.com/nishanths/predeclared v0.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5159013Z go: downloading github.com/yeya24/promlinter v0.3.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5347764Z go: downloading github.com/ghostiam/protogetter v1.0.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5370964Z go: downloading github.com/curioswitch/go-reassign v0.3.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5380729Z go: downloading github.com/raeperd/recvcheck v0.3.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5555006Z go: downloading github.com/BurntSushi/toml v1.6.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.5573128Z go: downloading github.com/mgechev/revive v1.17.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.6498758Z go: downloading github.com/golangci/rowserrcheck v0.0.0-20260419091836-c5f79b8a11ba
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.6505584Z go: downloading go-simpler.org/sloglint v0.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.6506465Z go: downloading github.com/jjti/go-spancheck v0.6.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.6714569Z go: downloading github.com/ryanrolds/sqlclosecheck v0.6.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.6716089Z go: downloading honnef.co/go/tools v0.8.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9200397Z go: downloading github.com/4meepo/tagalign v1.4.4
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9201145Z go: downloading github.com/ldez/tagliatelle v0.8.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9202067Z go: downloading github.com/maratori/testableexamples v1.0.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9203148Z go: downloading github.com/Antonboom/testifylint v1.6.4
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9456191Z go: downloading github.com/maratori/testpackage v1.1.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9458324Z go: downloading github.com/kulti/thelper v0.7.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9482156Z go: downloading github.com/moricho/tparallel v0.3.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9678339Z go: downloading mvdan.cc/unparam v0.0.0-20260823230713-2fa3d841b0c8
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9679261Z go: downloading github.com/golangci/unconvert v0.0.0-20250410112200-a129a6e6413e
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9787894Z go: downloading github.com/MirrexOne/unqueryvet v1.5.4
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9878194Z go: downloading github.com/sashamelentyev/usestdlibvars v1.29.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:35.9881148Z go: downloading github.com/ldez/usetesting v0.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0152464Z go: downloading github.com/blizzy78/varnamelen v0.8.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0172597Z go: downloading github.com/sanposhiho/wastedassign/v2 v2.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0360389Z go: downloading github.com/ultraware/whitespace v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0406574Z go: downloading github.com/tomarrell/wrapcheck/v2 v2.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0546394Z go: downloading github.com/bombsimon/wsl/v4 v4.7.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0746281Z go: downloading github.com/bombsimon/wsl/v5 v5.9.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.0924687Z go: downloading github.com/ykadowak/zerologlint v0.1.5
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1117505Z go: downloading github.com/stretchr/objx v0.5.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1185894Z go: downloading github.com/xo/terminfo v1.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1332785Z go: downloading github.com/charmbracelet/x/termios v0.1.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1399322Z go: downloading github.com/charmbracelet/x/windows v0.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1480647Z go: downloading github.com/muesli/cancelreader v0.2.2
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1565925Z go: downloading github.com/clipperhouse/uax29/v2 v2.7.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1680443Z go: downloading github.com/mattn/go-runewidth v0.0.24
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.1889243Z go: downloading github.com/subosito/gotenv v1.4.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.2013264Z go: downloading github.com/hashicorp/hcl v1.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.2379517Z go: downloading gopkg.in/ini.v1 v1.67.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.2380284Z go: downloading github.com/magiconair/properties v1.8.6
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.2649215Z go: downloading github.com/hexops/gotextdiff v1.0.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.2836725Z go: downloading go.uber.org/zap v1.27.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.3397060Z go: downloading github.com/dave/dst v0.27.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.3774605Z go: downloading github.com/gostaticanalysis/analysisutil v0.7.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.3776261Z go: downloading github.com/go-toolsmith/astcast v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.3992350Z go: downloading github.com/gobwas/glob v0.2.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.3995179Z go: downloading dev.gaijin.team/go/golib v0.8.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4299620Z go: downloading github.com/google/go-cmp v0.7.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4304048Z go: downloading github.com/go-toolsmith/astcopy v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4437602Z go: downloading github.com/go-toolsmith/astequal v1.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4580337Z go: downloading github.com/go-toolsmith/astfmt v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4706064Z go: downloading github.com/go-toolsmith/astp v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4728458Z go: downloading github.com/go-toolsmith/strparse v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4865034Z go: downloading github.com/go-toolsmith/typep v1.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.4962769Z go: downloading github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5009374Z go: downloading github.com/ccojocar/zxcvbn-go v1.0.4
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5010283Z go: downloading github.com/gostaticanalysis/comment v1.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5132033Z go: downloading github.com/prometheus/client_golang v1.12.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5245876Z go: downloading github.com/prometheus/client_model v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5421294Z go: downloading github.com/fatih/structtag v1.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5580017Z go: downloading github.com/ettle/strcase v0.2.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5592459Z go: downloading github.com/hashicorp/go-immutable-radix/v2 v2.1.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5593554Z go: downloading github.com/alfatraining/structtag v1.0.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5723072Z go: downloading github.com/dlclark/regexp2/v2 v2.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5802962Z go: downloading github.com/ldez/structtags v0.6.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5814905Z go: downloading golang.org/x/exp/typeparams v0.0.0-20260811152304-ee035b5b010f
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5890827Z go: downloading github.com/quasilyte/gogrep v0.5.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.5965079Z go: downloading golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6218306Z go: downloading github.com/quasilyte/stdinfo v0.0.0-20220114132959-f7386bf02567
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6249648Z go: downloading github.com/golang/protobuf v1.5.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6730945Z go: downloading codeberg.org/chavacava/garif v0.2.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6750230Z go: downloading github.com/beorn7/perks v1.0.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6922328Z go: downloading github.com/cespare/xxhash/v2 v2.3.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.6937205Z go: downloading github.com/prometheus/common v0.32.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.7337781Z go: downloading github.com/prometheus/procfs v0.7.3
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.7427751Z go: downloading google.golang.org/protobuf v1.36.12
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.7478759Z go: downloading github.com/hashicorp/golang-lru/v2 v2.0.7
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:36.8220035Z go: downloading github.com/dlclark/regexp2 v1.12.0
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:28:37.0284435Z go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:39.8281266Z 0 issues.
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:40.3427009Z engine boundaries: OK
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:40.3443904Z go build  -o bin/ckg ./cmd/graph
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:42.3360406Z go build  -o bin/ckv ./cmd/vector
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:43.8731282Z go build  -o bin/cks ./cmd/cks
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:46.0422827Z ..................
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:46.0423443Z ----------------------------------------------------------------------
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:46.0424018Z Ran 18 tests in 0.009s
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:46.0424238Z 
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:46.0424367Z OK
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4985080Z check-docs: 4 finding(s) — live documentation disagrees with the code:
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4986113Z   graph/README.md:135: local Markdown target does not exist: ../docs/graph/adr/
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4986945Z   graph/README.md:135: path `docs/graph/adr` does not exist
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4987837Z   vector/README.md:141: local Markdown target does not exist: ../docs/vector/adr/
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4988698Z   vector/README.md:141: path `docs/vector/adr` does not exist
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4989100Z 
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.4989638Z Fix the current reference or catalog classification; current prose is not exempt by a historical banner.
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.5057654Z make: *** [Makefile:59: docs-check] Error 1
+build-and-test	Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)	2026-10-13T10:29:47.5074400Z ##[error]Process completed with exit code 2.

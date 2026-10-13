@@ -138,7 +138,7 @@ pkg/vector/ckv     Engine wrapper around internal/vector/query (in-process consu
 - [`docs/vector/embedder-integration.md`](../docs/vector/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
 - [`docs/vector/d1-installation-guide.md`](../docs/vector/d1-installation-guide.md) — building the optional `bgeonnx`/ONNX path (default runtime is ollama/bge-m3).
 - [`docs/vector/eval-metrics.md`](../docs/vector/eval-metrics.md) — `ckv eval` metrics.
-- [`docs/vector/adr/`](../docs/vector/adr/) — architecture decision records (001–010).
+- [Purpose and scope](../docs/spec-driven/PURPOSE-AND-SCOPE.md) — retained decisions, ownership and limits; removed historical records remain recoverable through Git.
 
 "What is true now" = code + git.
 

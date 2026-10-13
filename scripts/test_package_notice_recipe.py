@@ -11,6 +11,27 @@ SPEC.loader.exec_module(HOST)
 
 
 class NativeRecipeTests(unittest.TestCase):
+    def test_current_installation_guide_is_copied_and_hashed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); stage = root / 'stage'; stage.mkdir()
+            guide = root / 'docs/INSTALLATION.md'; guide.parent.mkdir()
+            guide.write_text('Current extracted package instructions\n')
+            original = HOST.ROOT; HOST.ROOT = root
+            self.addCleanup(setattr, HOST, 'ROOT', original)
+            metadata = HOST.copy_installation_guide(stage)
+            self.assertEqual((stage / 'INSTALLATION.md').read_bytes(), guide.read_bytes())
+            self.assertEqual(metadata, {'source': 'docs/INSTALLATION.md', 'sha256': HOST.digest(guide)})
+
+    def test_obsolete_pilot_does_not_replace_missing_current_guide(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); stage = root / 'stage'; stage.mkdir()
+            old = root / 'docs/spec-driven/INSTALLATION-PILOT.md'; old.parent.mkdir(parents=True)
+            old.write_text('Superseded report')
+            original = HOST.ROOT; HOST.ROOT = root
+            self.addCleanup(setattr, HOST, 'ROOT', original)
+            with self.assertRaises(FileNotFoundError):
+                HOST.copy_installation_guide(stage)
+
     def test_recipe_binds_version_source_set_source_bytes_and_notice(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); cache = root / 'cache'; go = root / 'go'

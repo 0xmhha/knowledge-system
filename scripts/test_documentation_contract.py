@@ -45,6 +45,16 @@ class DocumentationContractTests(unittest.TestCase):
     def test_missing_local_target_is_rejected(self):
         self.assertTrue(contract.validate_links(self.root, 'docs/current.md', '[old](deleted.md)'))
 
+    def test_leftover_empty_directory_link_is_rejected(self):
+        (self.root / 'docs/removed-adr').mkdir()
+        findings = contract.validate_links(self.root, 'docs/current.md',
+            '[old](removed-adr/)', repository_files={'docs/current.md'})
+        self.assertTrue(any('no repository files' in f[2] for f in findings))
+
+    def test_repository_directory_link_resolves(self):
+        self.assertEqual([], contract.validate_links(self.root, 'docs/current.md',
+            '[current](./)', repository_files={'docs/current.md'}))
+
     def test_missing_heading_is_rejected(self):
         self.assertTrue(contract.validate_links(self.root, 'docs/current.md', '[old](current.md#removed)'))
 
