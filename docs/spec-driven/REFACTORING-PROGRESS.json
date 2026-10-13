@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-16",
   "active_source_binding": {
-    "revision": "b091d4769b967f3078d5132e838c02349679e2e9",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o04-evaluation-review-2026-10-13/manifest.json"
+    "revision": "6c304926fa24bf13434ac8e1f35821a5625b3ae5",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2111,7 +2111,7 @@
       "explanation_preparation_evidence_revision": "3f9496dadc2f226fb73247e8966f1be4c1711f76",
       "explanation_preparation_manifest": "system/eval/b0-knowledge-system/ontology-o04-runtime-2026-10-13/manifest.json",
       "actual_operating_data_changed": false,
-      "waiting_for": "Proposed 8-question descriptive DEV book/gold/protocol and evaluation scope review; original independent O04-C remains unmet because all four fact clusters overlap prior DEV. After review: separate input freeze, paired measurement, truthful scoring/limits and final acceptance binding.",
+      "waiting_for": "O04-C unobserved independent question/gold/fact-unit review and final quality/performance verdict; warm p95 DEV ratio1.3047 exceeds pilot budget1.25. O04-D final acceptance binding remains pending. No scope waiver was inferred from continuation.",
       "verified_checks": [
         {
           "check": "O04-A",
@@ -2122,6 +2122,19 @@
           "ledger_fields": {
             "actual_operating_data_changed": false
           }
+        },
+        {
+          "check": "O04-B",
+          "evidence_revision": "6c304926fa24bf13434ac8e1f35821a5625b3ae5",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13/manifest.json",
+          "evidence_ref": "evaluation_DEV",
+          "scope": "same held BGE-M3 dataset/snapshot/source/binary/model/config/requests, 324 responses/162 verified pairs and2 trace guards; source/integrity/backend/failure denominators and DEV location/cost observations, no independent FINAL or quality acceptance",
+          "ledger_fields": {
+            "actual_operating_data_changed": false,
+            "independent_quality_accepted": false,
+            "DEV_location_metrics_evaluated": true,
+            "execution_scope_changed": false
+          }
         }
       ],
       "actual_DEV_evidence_revision": "710cfd567983de8628c42ecbd2ff62421ddee94f",
@@ -2131,17 +2144,23 @@
       "proposed_evaluation_questions": 8,
       "proposed_CODE_fact_clusters": 4,
       "approved_independent_units": 0,
-      "evaluation_input_review_state": "proposed"
+      "evaluation_input_review_state": "accepted_for_DEV_execution",
+      "evaluation_DEV_evidence_revision": "6c304926fa24bf13434ac8e1f35821a5625b3ae5",
+      "evaluation_DEV_manifest": "system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13/manifest.json",
+      "independent_quality_accepted": false,
+      "DEV_location_metrics_evaluated": true,
+      "DEV_pilot_cost_budget_observation": "over_budget",
+      "execution_scope_changed": false
     }
   ],
   "ontology_next_task": "O-04",
   "latest_ontology_verification": {
     "task": "O-04",
-    "scope": "proposed DEV evaluation input preparation only; no additional completed criterion",
-    "revision": "b091d4769b967f3078d5132e838c02349679e2e9",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o04-evaluation-review-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1597,
-    "source_dependency_bindings": 1568,
+    "scope": "actual descriptive DEV paired comparison; O04-B only, original independent C/D pending",
+    "revision": "6c304926fa24bf13434ac8e1f35821a5625b3ae5",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1656,
+    "source_dependency_bindings": 1571,
     "status": "PASS",
     "new_FINAL_samples": 0,
     "full_task_complete": false
