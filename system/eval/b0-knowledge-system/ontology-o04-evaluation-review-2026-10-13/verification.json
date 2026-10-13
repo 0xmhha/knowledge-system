@@ -1,0 +1,57 @@
+{
+  "task": "O-04",
+  "status": "preparation_valid_review_pending",
+  "scope": "proposed descriptive DEV input preparation, no model or MCP runtime invocation",
+  "date_KST": "2026-10-13",
+  "retrieval_questions": 6,
+  "trace_guards": 2,
+  "code_gold_spans": 10,
+  "source_files_verified": 7,
+  "proposed_CODE_fact_clusters": 4,
+  "known_overlap_with_prior_DEV": true,
+  "approved_independent_units": 0,
+  "new_FINAL_samples": 0,
+  "new_MCP_model_calls": 0,
+  "tests": {
+    "input_contract": 25,
+    "existing_location_metrics": 17,
+    "existing_eval_adapter": 7,
+    "progress_guard": 11,
+    "total": 60,
+    "failed": 0,
+    "skipped": 0
+  },
+  "docs_validation": {
+    "current_pilot_binaries": "PASS 314 live docs",
+    "stale_repository_bin": "4 findings for compare-responses off/on; owned current source-matched binaries recognize both flags; no documentation command change needed"
+  },
+  "preparation_corrections": [
+    "SQLite canonical_id IS NOT NULL includes empty IDs: exclude empty IDs in location receipt",
+    "indexed chunk text can omit terminal newline: bind original gold line SHA separately from indexed text SHA"
+  ],
+  "book_review_state": "proposed",
+  "protocol_review_state": "proposed",
+  "proposed_cost_budget_approved": false,
+  "quality_evaluated": false,
+  "quality_verdict": "not_evaluated",
+  "performance_accepted": false,
+  "evaluation_eligible": false,
+  "evaluation_default_exit": 2,
+  "full_task_complete": false,
+  "additional_checks_completed": [],
+  "existing_checks_preserved": [
+    "O04-A"
+  ],
+  "operating_source_current_config_preserved": true,
+  "held_index_databases_unchanged": true,
+  "code_test_relation_assertions": 0,
+  "B0_approved_inputs_unchanged": true,
+  "activation": false,
+  "remaining": [
+    "human content/protocol and scope review",
+    "separate approval receipt and frozen input",
+    "paired runtime and descriptive scoring",
+    "unobserved independent inputs if original O04-C scope retained",
+    "verdict/limits/committed ledger binding"
+  ]
+}

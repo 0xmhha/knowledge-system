@@ -450,3 +450,5 @@ O04-A 후속 검증: no_candidates 설명·응답 비교 허용, v2 explain_onto
 O03 후속 준비 검증: 실제 stablenet 팩 기반 proposed concept4/requirement4/criteria5·13source spans/queue8, semantic race44시험20하위시험 pass·관계 assertion0/코드 테스트 실행0. 과거 mhha 검토는 새 승인이 아니며 R04 read-under-write-lock 표현 수정 제안과 기계 앵커/원문 SHA를 기록했다. O03-C/D 내용 승인/운영 source-index 결합과 O04-B/C/D 실제 평가의 unchecked를 유지한다.
 
 O03 A–D 완료(명시적 실제 WBFT held 파일럿 범위): C01–04/R01–04 사용자 내용 승인·실제 BGE-M3/scoped Go494/source2226/동일 tuple·MCP28/status/조회/trace·변조/옛 dataset 거부·운영 source/current/config 보존. full audit762 scope 밖 DRIFT와 scoped missing/overincluded0을 구별했다. 관련4패키지 race218/222·실패0. O04 actual DEV216응답/108쌍은 기계 관측 자료이며 gold/독립 단위 부재로 B/C/D의 실제 품질·최종 판정은 unchecked 유지. 기존17/18·온톨로지3/4·전체 잔여 N16/O04의2개.
+
+O04 입력 준비: [질문8·gold10·프로토콜 검토안](./ONTOLOGY-EVALUATION-REVIEW-2026-10-13.md)과 실제 graph/vector 위치·보관/retained 원문 SHA 대조, 입력25/기존채점17/adapter7/진행guard11시험 pass. 검색6·별도trace2, 이전DEV4사실군과 겹침·승인독립단위0·새FINAL0이다. 기존 B0 입력/임계치를 유지하며 warm p95비1.25는 새 파일럿 비용 예산 제안으로만 기록했다. 입력 검사 통과는 내용 승인·실행/품질 합격이 아니다. B/C/D는 unchecked, 전체 잔여 N16/O04 유지. 다음 검토·범위 판정→별도 동결→paired 실행→품질/비용/한계 기록이며, 독립 평가 대신 파일럿으로 O04를 종료하려면 사용자의 명시적인 수용 범위 변경이 필요하다.
