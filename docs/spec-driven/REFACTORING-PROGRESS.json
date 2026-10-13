@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "b8fd76954b8dbc899284e4a7af58d470e21a3002",
-    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-fix-2026-10-13/manifest.json"
+    "revision": "5e0eb22f26548875ce8cc27717a11b26f1c28c15",
+    "manifest": "system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2336,39 +2336,31 @@
   },
   "latest_ci_remediation": {
     "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
-    "revision": "b8fd76954b8dbc899284e4a7af58d470e21a3002",
-    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-fix-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1725,
+    "revision": "5e0eb22f26548875ce8cc27717a11b26f1c28c15",
+    "manifest": "system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1718,
     "source_dependency_bindings": 1579,
     "changed_sources": [
       ".github/workflows/ci.yml",
       "internal/system/mcp/semantic_status_test.go",
-      "cmd/cks/semanticcli/compare.go"
+      "cmd/cks/semanticcli/compare.go",
+      "internal/vector/build/memory_linux.go"
     ],
     "status": "PASS SHA binding; CI acceptance remains separately recorded",
     "state": "verifying",
     "verification": {
-      "checked_at": "2026-10-13T06:42:14.884185+00:00",
       "state": "verifying",
-      "scope": "CI toolchain and two cleanup lint fixes; no new product acceptance",
-      "Go": "1.26.9 darwin/arm64",
-      "local_build": "PASS",
-      "local_lint": "PASS 0 issues, boundaries, 315 documents",
-      "domain_artifacts": "PASS",
-      "targeted_race": "PASS semanticcli and system/mcp",
-      "whole_module_race": "IN_PROGRESS; final result not yet claimed",
-      "vulnerability_check": "PASS reachable0, imported-package0; module-only2",
-      "module_only_findings": [
-        "GO-2026-6180",
-        "GO-2026-6179"
-      ],
-      "CI_after_fix": "not run yet; previous CI failure retained",
+      "scope": "Linux-only read-only memory metadata cleanup; no lint exclusions or product acceptance changes",
+      "previous_CI_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
+      "previous_CI_result": "4/5 jobs passed; Linux errcheck failure before race",
+      "changed_file": "internal/vector/build/memory_linux.go",
+      "local_Darwin_lint_scope": "Linux-tagged file excluded; Linux validation requires actual CI",
+      "GitHub_CI_after_Linux_fix": "pending",
       "original_complete": 17,
       "ontology_complete": 4,
-      "original_remaining": [
+      "remaining_original": [
         "N-16 on hold"
-      ],
-      "default_or_release_decision_changed": false
+      ]
     },
     "ontology_complete": 4,
     "original_complete": 17,
