@@ -1,0 +1,756 @@
+{
+  "arms": {
+    "baseline": {
+      "observed": 756,
+      "failure_codes": {
+        "source_missing": 360
+      },
+      "failed_by_question": {
+        "T03-systemcontracts-v2-upgrade": 18,
+        "T04-pr77-anzeon-tip-callers": 18,
+        "T08-pr75-wbft-futureview": 18,
+        "T09-pr73-govcouncil-sync": 18,
+        "T12-pr58-chainconfig-engine": 18,
+        "T13-pr56-system-contract-init": 18,
+        "T14-pr55-wbft-race": 18,
+        "T15-wbft-roundchange-flow": 18,
+        "T16-wbft-commit-finalization": 18,
+        "T17-wbft-validator-set": 18,
+        "T18-wbft-backlog-replay": 18,
+        "T19-wbft-proposal-lifecycle": 18,
+        "T20-govstaking-deposit-flow": 18,
+        "T21-systemcontract-upgrade-codepatch": 18,
+        "ANCHOR-01": 18,
+        "ANCHOR-02": 18,
+        "ANCHOR-03": 18,
+        "ANCHOR-04": 18,
+        "ANCHOR-05": 18,
+        "ANCHOR-06": 18
+      },
+      "successful_warm_by_question": {
+        "T01-newblockchain-callers": {
+          "n": 10,
+          "p95_ms": 1007.263917,
+          "median_ms": 856.898104
+        },
+        "T02-wbft-prepare-validation": {
+          "n": 10,
+          "p95_ms": 1501.815625,
+          "median_ms": 1071.433542
+        },
+        "T05-pr70-effectivegasprice": {
+          "n": 10,
+          "p95_ms": 1035.337041,
+          "median_ms": 899.6521875
+        },
+        "T06-pr72-getreceiptsbyhash": {
+          "n": 10,
+          "p95_ms": 1437.549375,
+          "median_ms": 1298.2989375
+        },
+        "T07-pr74-txmaxsize": {
+          "n": 10,
+          "p95_ms": 1015.0425,
+          "median_ms": 818.414854
+        },
+        "T10-pr67-secp256r1-boho": {
+          "n": 10,
+          "p95_ms": 903.92975,
+          "median_ms": 681.4655415
+        },
+        "T11-pr63-govminter-burn-refund": {
+          "n": 10,
+          "p95_ms": 766.926667,
+          "median_ms": 662.961646
+        },
+        "T22-statedb-commit-pipeline": {
+          "n": 10,
+          "p95_ms": 851.020791,
+          "median_ms": 800.3242915000001
+        },
+        "T23-snapshot-rebuild": {
+          "n": 10,
+          "p95_ms": 847.455666,
+          "median_ms": 826.1153125000001
+        },
+        "T24-tx-validation-pipeline": {
+          "n": 10,
+          "p95_ms": 1063.769917,
+          "median_ms": 979.864229
+        },
+        "T25-block-import-transition": {
+          "n": 10,
+          "p95_ms": 1068.107583,
+          "median_ms": 1004.4617915
+        },
+        "T26-genesis-init-codepatch": {
+          "n": 10,
+          "p95_ms": 872.628375,
+          "median_ms": 804.58125
+        },
+        "T27-trie-commit-pruning": {
+          "n": 10,
+          "p95_ms": 1079.859667,
+          "median_ms": 892.8868540000001
+        },
+        "T28-state-sync-recovery": {
+          "n": 10,
+          "p95_ms": 1067.696875,
+          "median_ms": 1033.3745625000001
+        },
+        "T29-eth-sync-flow": {
+          "n": 10,
+          "p95_ms": 769.948166,
+          "median_ms": 746.3564375
+        },
+        "T30-miner-block-building-codepatch": {
+          "n": 10,
+          "p95_ms": 1448.183334,
+          "median_ms": 1155.5911664999999
+        },
+        "ANCHOR-07": {
+          "n": 10,
+          "p95_ms": 708.250875,
+          "median_ms": 672.3507495
+        },
+        "ANCHOR-08": {
+          "n": 10,
+          "p95_ms": 1165.801333,
+          "median_ms": 1139.4485415
+        },
+        "ANCHOR-09": {
+          "n": 10,
+          "p95_ms": 746.058959,
+          "median_ms": 683.428146
+        },
+        "ANCHOR-10": {
+          "n": 10,
+          "p95_ms": 768.809125,
+          "median_ms": 712.0453124999999
+        },
+        "ANCHOR-11": {
+          "n": 10,
+          "p95_ms": 984.518041,
+          "median_ms": 803.0226255
+        },
+        "ANCHOR-12": {
+          "n": 10,
+          "p95_ms": 1016.0365,
+          "median_ms": 805.721375
+        }
+      },
+      "all_warm_by_question": {
+        "T01-newblockchain-callers": {
+          "n": 10,
+          "p95_ms": 1007.263917,
+          "median_ms": 856.898104
+        },
+        "T02-wbft-prepare-validation": {
+          "n": 10,
+          "p95_ms": 1501.815625,
+          "median_ms": 1071.433542
+        },
+        "T03-systemcontracts-v2-upgrade": {
+          "n": 10,
+          "p95_ms": 2146.373,
+          "median_ms": 787.9317085
+        },
+        "T04-pr77-anzeon-tip-callers": {
+          "n": 10,
+          "p95_ms": 906.76,
+          "median_ms": 720.9871255
+        },
+        "T05-pr70-effectivegasprice": {
+          "n": 10,
+          "p95_ms": 1035.337041,
+          "median_ms": 899.6521875
+        },
+        "T06-pr72-getreceiptsbyhash": {
+          "n": 10,
+          "p95_ms": 1437.549375,
+          "median_ms": 1298.2989375
+        },
+        "T07-pr74-txmaxsize": {
+          "n": 10,
+          "p95_ms": 1015.0425,
+          "median_ms": 818.414854
+        },
+        "T08-pr75-wbft-futureview": {
+          "n": 10,
+          "p95_ms": 843.344459,
+          "median_ms": 688.7850625000001
+        },
+        "T09-pr73-govcouncil-sync": {
+          "n": 10,
+          "p95_ms": 997.484125,
+          "median_ms": 784.0881039999999
+        },
+        "T10-pr67-secp256r1-boho": {
+          "n": 10,
+          "p95_ms": 903.92975,
+          "median_ms": 681.4655415
+        },
+        "T11-pr63-govminter-burn-refund": {
+          "n": 10,
+          "p95_ms": 766.926667,
+          "median_ms": 662.961646
+        },
+        "T12-pr58-chainconfig-engine": {
+          "n": 10,
+          "p95_ms": 1143.360334,
+          "median_ms": 773.9694585
+        },
+        "T13-pr56-system-contract-init": {
+          "n": 10,
+          "p95_ms": 1069.201584,
+          "median_ms": 729.7148125
+        },
+        "T14-pr55-wbft-race": {
+          "n": 10,
+          "p95_ms": 695.569583,
+          "median_ms": 615.2070209999999
+        },
+        "T15-wbft-roundchange-flow": {
+          "n": 10,
+          "p95_ms": 860.708083,
+          "median_ms": 750.038542
+        },
+        "T16-wbft-commit-finalization": {
+          "n": 10,
+          "p95_ms": 1137.504667,
+          "median_ms": 860.7780415
+        },
+        "T17-wbft-validator-set": {
+          "n": 10,
+          "p95_ms": 793.710042,
+          "median_ms": 761.6073120000001
+        },
+        "T18-wbft-backlog-replay": {
+          "n": 10,
+          "p95_ms": 735.93475,
+          "median_ms": 707.8207915
+        },
+        "T19-wbft-proposal-lifecycle": {
+          "n": 10,
+          "p95_ms": 803.470541,
+          "median_ms": 720.697188
+        },
+        "T20-govstaking-deposit-flow": {
+          "n": 10,
+          "p95_ms": 690.326,
+          "median_ms": 653.004146
+        },
+        "T21-systemcontract-upgrade-codepatch": {
+          "n": 10,
+          "p95_ms": 749.961542,
+          "median_ms": 685.1563125
+        },
+        "T22-statedb-commit-pipeline": {
+          "n": 10,
+          "p95_ms": 851.020791,
+          "median_ms": 800.3242915000001
+        },
+        "T23-snapshot-rebuild": {
+          "n": 10,
+          "p95_ms": 847.455666,
+          "median_ms": 826.1153125000001
+        },
+        "T24-tx-validation-pipeline": {
+          "n": 10,
+          "p95_ms": 1063.769917,
+          "median_ms": 979.864229
+        },
+        "T25-block-import-transition": {
+          "n": 10,
+          "p95_ms": 1068.107583,
+          "median_ms": 1004.4617915
+        },
+        "T26-genesis-init-codepatch": {
+          "n": 10,
+          "p95_ms": 872.628375,
+          "median_ms": 804.58125
+        },
+        "T27-trie-commit-pruning": {
+          "n": 10,
+          "p95_ms": 1079.859667,
+          "median_ms": 892.8868540000001
+        },
+        "T28-state-sync-recovery": {
+          "n": 10,
+          "p95_ms": 1067.696875,
+          "median_ms": 1033.3745625000001
+        },
+        "T29-eth-sync-flow": {
+          "n": 10,
+          "p95_ms": 769.948166,
+          "median_ms": 746.3564375
+        },
+        "T30-miner-block-building-codepatch": {
+          "n": 10,
+          "p95_ms": 1448.183334,
+          "median_ms": 1155.5911664999999
+        },
+        "ANCHOR-01": {
+          "n": 10,
+          "p95_ms": 1046.261708,
+          "median_ms": 657.526125
+        },
+        "ANCHOR-02": {
+          "n": 10,
+          "p95_ms": 675.903,
+          "median_ms": 584.8668124999999
+        },
+        "ANCHOR-03": {
+          "n": 10,
+          "p95_ms": 725.022584,
+          "median_ms": 643.942875
+        },
+        "ANCHOR-04": {
+          "n": 10,
+          "p95_ms": 739.057958,
+          "median_ms": 694.5893125
+        },
+        "ANCHOR-05": {
+          "n": 10,
+          "p95_ms": 618.2175,
+          "median_ms": 609.0112915
+        },
+        "ANCHOR-06": {
+          "n": 10,
+          "p95_ms": 781.964708,
+          "median_ms": 579.691458
+        },
+        "ANCHOR-07": {
+          "n": 10,
+          "p95_ms": 708.250875,
+          "median_ms": 672.3507495
+        },
+        "ANCHOR-08": {
+          "n": 10,
+          "p95_ms": 1165.801333,
+          "median_ms": 1139.4485415
+        },
+        "ANCHOR-09": {
+          "n": 10,
+          "p95_ms": 746.058959,
+          "median_ms": 683.428146
+        },
+        "ANCHOR-10": {
+          "n": 10,
+          "p95_ms": 768.809125,
+          "median_ms": 712.0453124999999
+        },
+        "ANCHOR-11": {
+          "n": 10,
+          "p95_ms": 984.518041,
+          "median_ms": 803.0226255
+        },
+        "ANCHOR-12": {
+          "n": 10,
+          "p95_ms": 1016.0365,
+          "median_ms": 805.721375
+        }
+      },
+      "matched_request_measurement_scopes": 756,
+      "pending_calls": 0,
+      "request_HTTP_attempts": {
+        "/api/tags": 6276,
+        "/api/embed": 3138
+      },
+      "capture_elapsed_s": [
+        313.2644957918674,
+        314.95720691699535
+      ]
+    },
+    "candidate": {
+      "observed": 756,
+      "failure_codes": {
+        "source_missing": 360
+      },
+      "failed_by_question": {
+        "T03-systemcontracts-v2-upgrade": 18,
+        "T04-pr77-anzeon-tip-callers": 18,
+        "T08-pr75-wbft-futureview": 18,
+        "T09-pr73-govcouncil-sync": 18,
+        "T12-pr58-chainconfig-engine": 18,
+        "T13-pr56-system-contract-init": 18,
+        "T14-pr55-wbft-race": 18,
+        "T15-wbft-roundchange-flow": 18,
+        "T16-wbft-commit-finalization": 18,
+        "T17-wbft-validator-set": 18,
+        "T18-wbft-backlog-replay": 18,
+        "T19-wbft-proposal-lifecycle": 18,
+        "T20-govstaking-deposit-flow": 18,
+        "T21-systemcontract-upgrade-codepatch": 18,
+        "ANCHOR-01": 18,
+        "ANCHOR-02": 18,
+        "ANCHOR-03": 18,
+        "ANCHOR-04": 18,
+        "ANCHOR-05": 18,
+        "ANCHOR-06": 18
+      },
+      "successful_warm_by_question": {
+        "T01-newblockchain-callers": {
+          "n": 10,
+          "p95_ms": 918.431125,
+          "median_ms": 853.4838540000001
+        },
+        "T02-wbft-prepare-validation": {
+          "n": 10,
+          "p95_ms": 1345.59675,
+          "median_ms": 1085.0361035
+        },
+        "T05-pr70-effectivegasprice": {
+          "n": 10,
+          "p95_ms": 793.516834,
+          "median_ms": 761.3972289999999
+        },
+        "T06-pr72-getreceiptsbyhash": {
+          "n": 10,
+          "p95_ms": 1555.702875,
+          "median_ms": 1181.8380419999999
+        },
+        "T07-pr74-txmaxsize": {
+          "n": 10,
+          "p95_ms": 895.041542,
+          "median_ms": 769.270667
+        },
+        "T10-pr67-secp256r1-boho": {
+          "n": 10,
+          "p95_ms": 843.988417,
+          "median_ms": 647.7428335
+        },
+        "T11-pr63-govminter-burn-refund": {
+          "n": 10,
+          "p95_ms": 670.273209,
+          "median_ms": 616.397375
+        },
+        "T22-statedb-commit-pipeline": {
+          "n": 10,
+          "p95_ms": 935.818917,
+          "median_ms": 803.2431664999999
+        },
+        "T23-snapshot-rebuild": {
+          "n": 10,
+          "p95_ms": 1184.089958,
+          "median_ms": 844.13675
+        },
+        "T24-tx-validation-pipeline": {
+          "n": 10,
+          "p95_ms": 999.203917,
+          "median_ms": 965.875563
+        },
+        "T25-block-import-transition": {
+          "n": 10,
+          "p95_ms": 1047.434667,
+          "median_ms": 995.047417
+        },
+        "T26-genesis-init-codepatch": {
+          "n": 10,
+          "p95_ms": 836.823333,
+          "median_ms": 800.7224165
+        },
+        "T27-trie-commit-pruning": {
+          "n": 10,
+          "p95_ms": 893.7355,
+          "median_ms": 878.7939584999999
+        },
+        "T28-state-sync-recovery": {
+          "n": 10,
+          "p95_ms": 1072.029375,
+          "median_ms": 1022.442333
+        },
+        "T29-eth-sync-flow": {
+          "n": 10,
+          "p95_ms": 804.084333,
+          "median_ms": 733.9671665000001
+        },
+        "T30-miner-block-building-codepatch": {
+          "n": 10,
+          "p95_ms": 1191.89425,
+          "median_ms": 1128.2965835
+        },
+        "ANCHOR-07": {
+          "n": 10,
+          "p95_ms": 1371.86,
+          "median_ms": 693.2746665
+        },
+        "ANCHOR-08": {
+          "n": 10,
+          "p95_ms": 1396.562584,
+          "median_ms": 1142.6777295
+        },
+        "ANCHOR-09": {
+          "n": 10,
+          "p95_ms": 706.196125,
+          "median_ms": 677.594021
+        },
+        "ANCHOR-10": {
+          "n": 10,
+          "p95_ms": 761.084042,
+          "median_ms": 706.470437
+        },
+        "ANCHOR-11": {
+          "n": 10,
+          "p95_ms": 863.026417,
+          "median_ms": 792.3190420000001
+        },
+        "ANCHOR-12": {
+          "n": 10,
+          "p95_ms": 949.670166,
+          "median_ms": 796.335458
+        }
+      },
+      "all_warm_by_question": {
+        "T01-newblockchain-callers": {
+          "n": 10,
+          "p95_ms": 918.431125,
+          "median_ms": 853.4838540000001
+        },
+        "T02-wbft-prepare-validation": {
+          "n": 10,
+          "p95_ms": 1345.59675,
+          "median_ms": 1085.0361035
+        },
+        "T03-systemcontracts-v2-upgrade": {
+          "n": 10,
+          "p95_ms": 1140.000375,
+          "median_ms": 780.15175
+        },
+        "T04-pr77-anzeon-tip-callers": {
+          "n": 10,
+          "p95_ms": 892.393584,
+          "median_ms": 673.5676455
+        },
+        "T05-pr70-effectivegasprice": {
+          "n": 10,
+          "p95_ms": 793.516834,
+          "median_ms": 761.3972289999999
+        },
+        "T06-pr72-getreceiptsbyhash": {
+          "n": 10,
+          "p95_ms": 1555.702875,
+          "median_ms": 1181.8380419999999
+        },
+        "T07-pr74-txmaxsize": {
+          "n": 10,
+          "p95_ms": 895.041542,
+          "median_ms": 769.270667
+        },
+        "T08-pr75-wbft-futureview": {
+          "n": 10,
+          "p95_ms": 740.189042,
+          "median_ms": 682.8134585
+        },
+        "T09-pr73-govcouncil-sync": {
+          "n": 10,
+          "p95_ms": 1034.571292,
+          "median_ms": 779.7050624999999
+        },
+        "T10-pr67-secp256r1-boho": {
+          "n": 10,
+          "p95_ms": 843.988417,
+          "median_ms": 647.7428335
+        },
+        "T11-pr63-govminter-burn-refund": {
+          "n": 10,
+          "p95_ms": 670.273209,
+          "median_ms": 616.397375
+        },
+        "T12-pr58-chainconfig-engine": {
+          "n": 10,
+          "p95_ms": 1079.52575,
+          "median_ms": 728.884604
+        },
+        "T13-pr56-system-contract-init": {
+          "n": 10,
+          "p95_ms": 1058.796334,
+          "median_ms": 727.0835
+        },
+        "T14-pr55-wbft-race": {
+          "n": 10,
+          "p95_ms": 669.180709,
+          "median_ms": 593.027292
+        },
+        "T15-wbft-roundchange-flow": {
+          "n": 10,
+          "p95_ms": 786.187417,
+          "median_ms": 727.5085005000001
+        },
+        "T16-wbft-commit-finalization": {
+          "n": 10,
+          "p95_ms": 943.72025,
+          "median_ms": 849.0350005
+        },
+        "T17-wbft-validator-set": {
+          "n": 10,
+          "p95_ms": 1011.4375,
+          "median_ms": 777.5430005000001
+        },
+        "T18-wbft-backlog-replay": {
+          "n": 10,
+          "p95_ms": 750.749041,
+          "median_ms": 705.7101035
+        },
+        "T19-wbft-proposal-lifecycle": {
+          "n": 10,
+          "p95_ms": 720.420125,
+          "median_ms": 691.852646
+        },
+        "T20-govstaking-deposit-flow": {
+          "n": 10,
+          "p95_ms": 669.686417,
+          "median_ms": 648.3095205
+        },
+        "T21-systemcontract-upgrade-codepatch": {
+          "n": 10,
+          "p95_ms": 743.901875,
+          "median_ms": 688.2409170000001
+        },
+        "T22-statedb-commit-pipeline": {
+          "n": 10,
+          "p95_ms": 935.818917,
+          "median_ms": 803.2431664999999
+        },
+        "T23-snapshot-rebuild": {
+          "n": 10,
+          "p95_ms": 1184.089958,
+          "median_ms": 844.13675
+        },
+        "T24-tx-validation-pipeline": {
+          "n": 10,
+          "p95_ms": 999.203917,
+          "median_ms": 965.875563
+        },
+        "T25-block-import-transition": {
+          "n": 10,
+          "p95_ms": 1047.434667,
+          "median_ms": 995.047417
+        },
+        "T26-genesis-init-codepatch": {
+          "n": 10,
+          "p95_ms": 836.823333,
+          "median_ms": 800.7224165
+        },
+        "T27-trie-commit-pruning": {
+          "n": 10,
+          "p95_ms": 893.7355,
+          "median_ms": 878.7939584999999
+        },
+        "T28-state-sync-recovery": {
+          "n": 10,
+          "p95_ms": 1072.029375,
+          "median_ms": 1022.442333
+        },
+        "T29-eth-sync-flow": {
+          "n": 10,
+          "p95_ms": 804.084333,
+          "median_ms": 733.9671665000001
+        },
+        "T30-miner-block-building-codepatch": {
+          "n": 10,
+          "p95_ms": 1191.89425,
+          "median_ms": 1128.2965835
+        },
+        "ANCHOR-01": {
+          "n": 10,
+          "p95_ms": 680.012959,
+          "median_ms": 638.408604
+        },
+        "ANCHOR-02": {
+          "n": 10,
+          "p95_ms": 728.537542,
+          "median_ms": 592.3053745
+        },
+        "ANCHOR-03": {
+          "n": 10,
+          "p95_ms": 693.76925,
+          "median_ms": 638.998334
+        },
+        "ANCHOR-04": {
+          "n": 10,
+          "p95_ms": 751.994834,
+          "median_ms": 706.473896
+        },
+        "ANCHOR-05": {
+          "n": 10,
+          "p95_ms": 1027.488875,
+          "median_ms": 604.9337290000001
+        },
+        "ANCHOR-06": {
+          "n": 10,
+          "p95_ms": 618.432958,
+          "median_ms": 585.3993754999999
+        },
+        "ANCHOR-07": {
+          "n": 10,
+          "p95_ms": 1371.86,
+          "median_ms": 693.2746665
+        },
+        "ANCHOR-08": {
+          "n": 10,
+          "p95_ms": 1396.562584,
+          "median_ms": 1142.6777295
+        },
+        "ANCHOR-09": {
+          "n": 10,
+          "p95_ms": 706.196125,
+          "median_ms": 677.594021
+        },
+        "ANCHOR-10": {
+          "n": 10,
+          "p95_ms": 761.084042,
+          "median_ms": 706.470437
+        },
+        "ANCHOR-11": {
+          "n": 10,
+          "p95_ms": 863.026417,
+          "median_ms": 792.3190420000001
+        },
+        "ANCHOR-12": {
+          "n": 10,
+          "p95_ms": 949.670166,
+          "median_ms": 796.335458
+        }
+      },
+      "matched_request_measurement_scopes": 756,
+      "pending_calls": 0,
+      "request_HTTP_attempts": {
+        "/api/tags": 6272,
+        "/api/embed": 3136
+      },
+      "capture_elapsed_s": [
+        307.03236645879224,
+        306.767109666951
+      ]
+    }
+  },
+  "successful_warm_p95_ratio_by_question": {
+    "T01-newblockchain-callers": 0.9118078286130049,
+    "T02-wbft-prepare-validation": 0.8959799908860316,
+    "T05-pr70-effectivegasprice": 0.7664333473798703,
+    "T06-pr72-getreceiptsbyhash": 1.0821909160511443,
+    "T07-pr74-txmaxsize": 0.8817774053795777,
+    "T10-pr67-secp256r1-boho": 0.9336880625955722,
+    "T11-pr63-govminter-burn-refund": 0.8739730118160045,
+    "T22-statedb-commit-pipeline": 1.099642837045564,
+    "T23-snapshot-rebuild": 1.3972293837964618,
+    "T24-tx-validation-pipeline": 0.9393045441799234,
+    "T25-block-import-transition": 0.9806452867398097,
+    "T26-genesis-init-codepatch": 0.9589687396997606,
+    "T27-trie-commit-pruning": 0.8276404122796078,
+    "T28-state-sync-recovery": 1.0040577996446791,
+    "T29-eth-sync-flow": 1.0443356689546293,
+    "T30-miner-block-building-codepatch": 0.8230271831038762,
+    "ANCHOR-07": 1.9369690153930272,
+    "ANCHOR-08": 1.1979421745951975,
+    "ANCHOR-09": 0.9465687885399418,
+    "ANCHOR-10": 0.9899518843510084,
+    "ANCHOR-11": 0.8765978692715495,
+    "ANCHOR-12": 0.9346811517105931
+  },
+  "latency_samples_per_query": 10,
+  "inference": "descriptive repeated-request timing only; not independent quality or accepted latency gate",
+  "failure_denominators_preserved": true,
+  "scope_matching_excludes_startup_and_unmatched_probes": true
+}

@@ -1,0 +1,32 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,collections,sqlite3,subprocess,importlib.util
+root=Path.cwd();run=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014');packet=root/'system/eval/stablenet-corpus-repair-2026-10-14'
+spec=importlib.util.spec_from_file_location('comparison',root/'projects/stablenet/eval/dataset-comparison/run.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+p=json.loads((run/'protocol.json').read_text());module.baselines_guard(p);module.model_guard(p)
+version=Path(p['candidate_dataset'])/p['candidate_version'];assert (version.parent/'current').resolve()==version.resolve()
+sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest()
+assert all(sha(root/f)==h for f,h in p['source_runtime_sha256'].items())
+assert all(sha(run/'bin'/name)==h for name,h in p['binary_sha256'].items())
+assert subprocess.check_output(['git','-C',p['source'],'rev-parse','HEAD'],text=True).strip()==p['source_commit']
+identity=json.loads((version/'dataset-identity.json').read_text());retained=json.loads((version/'sources/manifest.json').read_text());vector=json.loads((version/'vector/manifest.json').read_text());graph=json.loads((version/'graph/manifest.json').read_text())
+assert identity['source']==retained['identity'];assert identity['source']['source_commit']==p['source_commit'];assert vector['embedding_identity_v2']['model_digest']==p['model']['digest']
+for manifest in [vector,graph]:
+ for k in ['project_id','snapshot_id','file_manifest_digest','capture_policy_digest','source_mode']:assert manifest[k]==identity['source'][k]
+ assert manifest['dataset_id']==identity['dataset_id']
+assert sha(version/'vector/vector.db')==vector['db_sha256']
+files={(f['origin_id'],f['path']):f for f in retained['files']}
+for f in vector['input_files']:assert files[(f['origin_id'],f['path'])]['sha256']==f['sha256']
+con=sqlite3.connect(f'file:{version}/vector/vector.db?mode=ro',uri=True)
+namespace_files={r[0]for r in con.execute("select distinct file from chunks where file like '@cks/%'")}
+for file in namespace_files:
+ index,relative=file[len('@cks/docs/'):].split('/',1);assert ('docs:corpus.'+index,relative)in files
+flowless=con.execute("select file,start_line,end_line,chunk_kind from chunks where file like '@cks/docs/%/corpus.jsonl' and chunk_kind in ('flow_spine','invariant')").fetchall()
+assert flowless and all(first>0 and last>=first for _,first,last,_ in flowless)
+counts=dict(con.execute('select chunk_kind,count(*)from chunks group by chunk_kind'));total=con.execute('select count(*) from chunks').fetchone()[0];con.close()
+argv=[str(run/'bin/cks'),'doctor','--src',p['source'],'--dataset',p['candidate_dataset'],'--strict'];r=subprocess.run(argv,capture_output=True,text=True,timeout=300)
+assert r.returncode==0,r.stderr;doctor=json.loads(r.stdout);assert doctor['status']=='ready'and not doctor['issues']
+proof={'checked_at':datetime.now(timezone.utc).isoformat(),'status':'ready','doctor':doctor,'doctor_command':argv,'doctor_exit':r.returncode,'source_commit':p['source_commit'],'project_id':identity['source']['project_id'],'dataset_id':identity['dataset_id'],'snapshot_id':identity['source']['snapshot_id'],'retained_files_by_origin':dict(collections.Counter(f['origin_id']for f in retained['files'])),'namespace_files':len(namespace_files),'flow_fileless_records_with_real_JSONL_lines':len(flowless),'vector_chunks':total,'vector_chunk_kinds':counts,'all_vector_input_file_SHA_match_retained':True,'vector_DB_SHA_match':True,'graph_vector_source_coordinates_match':True,'baseline_DB_manifest_current_preserved':True,'source_HEAD_preserved':True,'model_digest_preserved':True,'runtime_source_and_binary_pins_preserved':True}
+(packet/'candidate-verification.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+for f,target in [('dataset-identity.json','candidate-identity.json'),('graph/manifest.json','candidate-graph-manifest.json'),('vector/manifest.json','candidate-vector-manifest.json'),('sources/manifest.json','candidate-source-manifest.json')]: (packet/target).write_bytes((version/f).read_bytes())
+print(json.dumps({k:proof[k]for k in ['status','retained_files_by_origin','namespace_files','flow_fileless_records_with_real_JSONL_lines','vector_chunks']}))

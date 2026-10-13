@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -31,6 +33,22 @@ func TestRunnerRejectsHTTPConfigBeforeSpawningStdioChild(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	if marker := os.Getenv("CKS_EVAL_SHUTDOWN_MARKER"); marker != "" {
+		if os.Getenv("CKS_EVAL_IGNORE_TERM") == "1" {
+			signal.Ignore(syscall.SIGTERM)
+			_, _ = os.Stdout.WriteString("ready\n")
+			time.Sleep(time.Minute)
+			os.Exit(5)
+		}
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, syscall.SIGTERM)
+		_, _ = os.Stdout.WriteString("ready\n")
+		<-signals
+		if err := os.WriteFile(marker, []byte("cleanup completed"), 0600); err != nil {
+			os.Exit(4)
+		}
+		os.Exit(0)
+	}
 	if os.Getenv("CKS_EVAL_STDERR_HELPER") == "1" {
 		// Write more than an OS pipe can hold BEFORE accepting initialize.
 		if _, err := os.Stderr.Write(bytes.Repeat([]byte("x"), noisyChildBytes)); err != nil {
@@ -61,6 +79,90 @@ func TestMain(m *testing.M) {
 		}
 	}
 	os.Exit(m.Run())
+}
+
+func TestEvaluationCancellationBoundsUnresponsiveServer(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	marker := filepath.Join(t.TempDir(), "must-not-exist")
+	cmd, err := gracefulCommand(ctx, os.Args[0], []string{"CKS_EVAL_SHUTDOWN_MARKER=" + marker, "CKS_EVAL_IGNORE_TERM=1"}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+	ready := make(chan error, 1)
+	go func() { buffer := make([]byte, 6); _, err := io.ReadFull(stdout, buffer); ready <- err }()
+	select {
+	case err := <-ready:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(3 * time.Second):
+		cancel()
+		_ = cmd.Wait()
+		t.Fatal("child did not become ready")
+	}
+	started := time.Now()
+	cancel()
+	done := make(chan error, 1)
+	go func() { done <- cmd.Wait() }()
+	select {
+	case err := <-done:
+		if err == nil || !strings.Contains(err.Error(), "killed") {
+			t.Fatalf("forced termination hidden: %v", err)
+		}
+		if time.Since(started) < 5*time.Second {
+			t.Fatal("killed before graceful deadline")
+		}
+	case <-time.After(8 * time.Second):
+		_ = cmd.Process.Kill()
+		<-done
+		t.Fatal("unresponsive child cleanup was unbounded")
+	}
+}
+
+func TestEvaluationCancellationLetsServerCleanUp(t *testing.T) {
+	marker := filepath.Join(t.TempDir(), "cleanup")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	cmd, err := gracefulCommand(ctx, os.Args[0], []string{"CKS_EVAL_SHUTDOWN_MARKER=" + marker}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+	ready := make(chan error, 1)
+	go func() { buffer := make([]byte, 6); _, err := io.ReadFull(stdout, buffer); ready <- err }()
+	select {
+	case err := <-ready:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(3 * time.Second):
+		cancel()
+		_ = cmd.Wait()
+		t.Fatal("child did not become ready")
+	}
+	cancel()
+	// The parent still reports cancellation even though the child exits zero.
+	if err := cmd.Wait(); err == nil || !strings.Contains(err.Error(), "canceled") {
+		t.Fatalf("cancellation result lost: %v", err)
+	}
+	raw, err := os.ReadFile(marker)
+	if err != nil || string(raw) != "cleanup completed" {
+		t.Fatalf("child was killed before cleanup: %q, %v", raw, err)
+	}
 }
 
 func TestRunnerNoisyInitializeFailureClosesDiagnosticReader(t *testing.T) {

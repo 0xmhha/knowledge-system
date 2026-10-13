@@ -23,6 +23,8 @@ type Options struct {
 	// ExternalOrigins are selected local pack roots retained under distinct
 	// origin IDs. They never enter the engine's source tree.
 	ExternalOrigins []CaptureOrigin
+	// RetainedCorporaPrepared prevents regeneration after the snapshot is pinned.
+	RetainedCorporaPrepared bool
 	// KnowledgeInputs are verified local overlay and selected pack roots.
 	// Their bytes contribute to the build recipe and are checked again before
 	// promotion. Paths are resolved before this options struct is used.
@@ -224,11 +226,13 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 		// is large, nobody reads it by hand, and the vector build consumes it
 		// directly. The policy and the glossary stay committed and are only
 		// checked — see VerifyDerivedFresh for why.
-		steps = append(steps, Step{
-			ID:    "domain-export",
-			Title: "Render the domain-knowledge embedding corpus",
-			Cmd:   exportCmd,
-		})
+		if !o.RetainedCorporaPrepared {
+			steps = append(steps, Step{
+				ID:    "domain-export",
+				Title: "Render the domain-knowledge embedding corpus",
+				Cmd:   exportCmd,
+			})
+		}
 		if o.PolicyFile != "" {
 			argv := []string{cksBin, "domain", "sync", "--project", o.DomainKnowledge, "--ckv-out", os.DevNull, "--ckg-out"}
 			steps = append(steps, Step{

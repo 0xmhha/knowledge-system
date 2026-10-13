@@ -1,0 +1,517 @@
+{
+  "checked_at": "2026-10-13T17:25:38.426489+00:00",
+  "status": "scope_mismatch_confirmed_and_explicit_scoped_probe_verified",
+  "original_probe": {
+    "tool": "search_text",
+    "args": {
+      "query": "mint allowance",
+      "mode": "and",
+      "language": "go",
+      "top_k": 15
+    }
+  },
+  "original_fixture_sha256": "d6846537faa12a11ff19ef9471e1f4d8ba1c0a7582e797fadba40842533cb4d7",
+  "original_fixture_bytes_preserved": true,
+  "original_current_candidate_keyword_result": {
+    "passed": 7,
+    "failed": 1,
+    "SNK06": {
+      "id": "SNK06-and-mint-allowance",
+      "tool": "search_text",
+      "pass": false,
+      "pass_recall": true,
+      "pass_precision": false,
+      "score": {
+        "recall": 1,
+        "precision": 0.4,
+        "f1": 0.5714285714285715,
+        "extra": [
+          "test.EdgeCaseTestContext.InitialMinterAllowance",
+          "test.EdgeCaseTestContext.MinterAllowance",
+          "test.GovWBFT.GetMinterAllowance",
+          "test.GovWBFT.GetMockFiatTokenMinterAllowance",
+          "test.GovWBFT.MinterAllowance",
+          "test.StateChangeExpectation.MinterAllowanceDecrease",
+          "test.StateSnapshot.MinterAllowance",
+          "test.TestEdgeCase_E2_MintAllowanceBoundary",
+          "test.TestGovMasterMinter_MinterAllowanceTracking"
+        ]
+      },
+      "got": [
+        "systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE",
+        "test.StateSnapshot.MinterAllowance",
+        "test.TestEdgeCase_E2_MintAllowanceBoundary",
+        "test.StateChangeExpectation.MinterAllowanceDecrease",
+        "test.TestGovMasterMinter_MinterAllowanceTracking",
+        "test.GovWBFT.MinterAllowance",
+        "systemcontracts.DefaultMaxMinterAllowance",
+        "systemcontracts.GetMaxMinterAllowance",
+        "test.EdgeCaseTestContext.MinterAllowance",
+        "systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance",
+        "test.EdgeCaseTestContext.InitialMinterAllowance",
+        "systemcontracts.TestDefaultMaxMinterAllowance",
+        "systemcontracts.TestGetMaxMinterAllowance",
+        "test.GovWBFT.GetMinterAllowance",
+        "test.GovWBFT.GetMockFiatTokenMinterAllowance"
+      ]
+    }
+  },
+  "all15_global_results_match_declared_AND_substring_search_and_retained_source": true,
+  "expected_systemcontracts_results": 6,
+  "additional_valid_test_package_results": 9,
+  "source_checks": [
+    {
+      "symbol": "systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE",
+      "node_type": "Constant",
+      "file": "systemcontracts/gov_master_minter.go",
+      "start_line": 32,
+      "end_line": 32,
+      "file_sha256": "8585212679018ea81dbae19bc7aff19cb14ffd2b0c2382b417b310c09e7d20fc",
+      "span_sha256": "03bca24ad2fa901389fefdd6d98c35b19d0092cc9455ce5586ad389b4d77e56f",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "test.StateSnapshot.MinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.StateSnapshot.MinterAllowance",
+      "node_type": "Field",
+      "file": "systemcontracts/test/helpers_edge_cases.go",
+      "start_line": 528,
+      "end_line": 528,
+      "file_sha256": "79f91a8593ddf63d4185cb71844aa99573ae53328ff878499eff76495e64ac0f",
+      "span_sha256": "5f095230d65a045b9fb88afd3c5cad87b8d1ea59c2b6637f3661f33e00b11ba5",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "test.TestEdgeCase_E2_MintAllowanceBoundary",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.TestEdgeCase_E2_MintAllowanceBoundary",
+      "node_type": "Function",
+      "file": "systemcontracts/test/gov_minter_edge_cases_test.go",
+      "start_line": 1522,
+      "end_line": 1598,
+      "file_sha256": "f4fd905a2c354917f845393b4106adbfa3e3fd85d76b081ef58d0bed881c3186",
+      "span_sha256": "c4cfdb6d44749880ec083a6a3d18d4d6223ac3333712237bbff64ad687fff0c7",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "test.StateChangeExpectation.MinterAllowanceDecrease",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.StateChangeExpectation.MinterAllowanceDecrease",
+      "node_type": "Field",
+      "file": "systemcontracts/test/helpers_edge_cases.go",
+      "start_line": 815,
+      "end_line": 815,
+      "file_sha256": "79f91a8593ddf63d4185cb71844aa99573ae53328ff878499eff76495e64ac0f",
+      "span_sha256": "a9dab277bb0d27f2709de5540ce1ff12affa99ff32a4f63885d89af7766238b6",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "test.TestGovMasterMinter_MinterAllowanceTracking",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.TestGovMasterMinter_MinterAllowanceTracking",
+      "node_type": "Function",
+      "file": "systemcontracts/test/gov_master_minter_integration_test.go",
+      "start_line": 264,
+      "end_line": 281,
+      "file_sha256": "e11de816ebcfc395b5f17439d4174375a0339461d3d4ce70434522fe3a8f17c3",
+      "span_sha256": "afadd20cba1d72d105d8acbf0ca83595d400e743a3e3ad2a27563cee09fdf8a0",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "test.GovWBFT.MinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.(*GovWBFT).MinterAllowance",
+      "node_type": "Method",
+      "file": "systemcontracts/test/contracts_wbft.go",
+      "start_line": 1126,
+      "end_line": 1128,
+      "file_sha256": "ace2e6206df7000235e87b374ef2b798612bd4c769c6713d8e1d43d773442c33",
+      "span_sha256": "fd19c2f0779e3f79e7365c7eacc0abbbc82ff06f400b02723e0506ad25f99a0a",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "systemcontracts.DefaultMaxMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.DefaultMaxMinterAllowance",
+      "node_type": "Variable",
+      "file": "systemcontracts/gov_master_minter.go",
+      "start_line": 53,
+      "end_line": 56,
+      "file_sha256": "8585212679018ea81dbae19bc7aff19cb14ffd2b0c2382b417b310c09e7d20fc",
+      "span_sha256": "e96a62c05a483700176503d52cf8e83cec8a920f2b152547bcc19d85b410b46c",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "systemcontracts.GetMaxMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.GetMaxMinterAllowance",
+      "node_type": "Function",
+      "file": "systemcontracts/gov_master_minter.go",
+      "start_line": 192,
+      "end_line": 196,
+      "file_sha256": "8585212679018ea81dbae19bc7aff19cb14ffd2b0c2382b417b310c09e7d20fc",
+      "span_sha256": "ec1315f8f92a61b34822cbce05b72e228c473497203f9703660b53a432325970",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "test.EdgeCaseTestContext.MinterAllowance",
+      "canonical_id": "",
+      "node_type": "Method",
+      "file": "systemcontracts/test/contracts_wbft.go",
+      "start_line": 1126,
+      "end_line": 1128,
+      "file_sha256": "ace2e6206df7000235e87b374ef2b798612bd4c769c6713d8e1d43d773442c33",
+      "span_sha256": "fd19c2f0779e3f79e7365c7eacc0abbbc82ff06f400b02723e0506ad25f99a0a",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature",
+          "doc_comment"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance",
+      "node_type": "Constant",
+      "file": "systemcontracts/gov_master_minter.go",
+      "start_line": 45,
+      "end_line": 45,
+      "file_sha256": "8585212679018ea81dbae19bc7aff19cb14ffd2b0c2382b417b310c09e7d20fc",
+      "span_sha256": "e014370c21a1ff7c912974a3f4d6e412425243fc57dfad0efabd07ea9b5a1446",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "test.EdgeCaseTestContext.InitialMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.EdgeCaseTestContext.InitialMinterAllowance",
+      "node_type": "Field",
+      "file": "systemcontracts/test/helpers_edge_cases.go",
+      "start_line": 291,
+      "end_line": 291,
+      "file_sha256": "79f91a8593ddf63d4185cb71844aa99573ae53328ff878499eff76495e64ac0f",
+      "span_sha256": "48f74de4bfc9e0c8cc88bf273813fbb8da9076b8b924a48d734a091d12961126",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "systemcontracts.TestDefaultMaxMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.TestDefaultMaxMinterAllowance",
+      "node_type": "Function",
+      "file": "systemcontracts/gov_master_minter_test.go",
+      "start_line": 522,
+      "end_line": 533,
+      "file_sha256": "a01c1351cc861f1aeec32dd01c1925ada74a41fe8e221f61751728daea83019b",
+      "span_sha256": "13f8aa8c7385667a36ffa7e6d11bb6dc7fa4a70a79a92dad3af6ee4e23cac61a",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "systemcontracts.TestGetMaxMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts.TestGetMaxMinterAllowance",
+      "node_type": "Function",
+      "file": "systemcontracts/gov_master_minter_test.go",
+      "start_line": 488,
+      "end_line": 520,
+      "file_sha256": "a01c1351cc861f1aeec32dd01c1925ada74a41fe8e221f61751728daea83019b",
+      "span_sha256": "46a5a47125f9a58eef5f734dd4ba5da60dbd604d5afeb778a62567ab1bfe027e",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "systemcontracts",
+      "expected_in_original": true
+    },
+    {
+      "symbol": "test.GovWBFT.GetMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.(*GovWBFT).GetMinterAllowance",
+      "node_type": "Method",
+      "file": "systemcontracts/test/contracts_wbft.go",
+      "start_line": 704,
+      "end_line": 711,
+      "file_sha256": "ace2e6206df7000235e87b374ef2b798612bd4c769c6713d8e1d43d773442c33",
+      "span_sha256": "b9059130c9e59e8d1909deb2d701890492ca7e15fe99f8ca481a711ff269e624",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    },
+    {
+      "symbol": "test.GovWBFT.GetMockFiatTokenMinterAllowance",
+      "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/test.(*GovWBFT).GetMockFiatTokenMinterAllowance",
+      "node_type": "Method",
+      "file": "systemcontracts/test/contracts_wbft.go",
+      "start_line": 797,
+      "end_line": 807,
+      "file_sha256": "ace2e6206df7000235e87b374ef2b798612bd4c769c6713d8e1d43d773442c33",
+      "span_sha256": "69fd9a98a0f51962bbd05b55a85cff6ad5a2e4f2738af9ec1bf25f9133d5dd7e",
+      "source_declaration_confirmed": true,
+      "query_token_matches": {
+        "mint": [
+          "name",
+          "qualified_name",
+          "signature"
+        ],
+        "allowance": [
+          "name",
+          "qualified_name",
+          "signature"
+        ]
+      },
+      "package": "test",
+      "expected_in_original": false
+    }
+  ],
+  "scoped_probe": {
+    "id": "SNK06-systemcontracts-mint-allowance",
+    "description": "Package-scoped follow-up diagnostic for the original SNK06 scope mismatch.\nThe original global probe and its failed precision score remain unchanged.\nUse explicit FTS column scope plus AND operators; mode=or bypasses the\nnatural-language substring-AND filter because this is a power-user query.\nThe symbol-only default excludes CallSite/ReturnStmt rows. Keep the original\nsix expected symbols, including the two tests in the systemcontracts package.\nThis probe was derived after source review, not frozen independent quality gold.\n",
+    "probe": {
+      "tool": "search_text",
+      "args": {
+        "query": "qualified_name:systemcontracts AND mint* AND allowance*",
+        "mode": "or",
+        "language": "go",
+        "top_k": 15
+      }
+    },
+    "expected": {
+      "symbols": [
+        "systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE",
+        "systemcontracts.DefaultMaxMinterAllowance",
+        "systemcontracts.GetMaxMinterAllowance",
+        "systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance",
+        "systemcontracts.TestDefaultMaxMinterAllowance",
+        "systemcontracts.TestGetMaxMinterAllowance"
+      ]
+    },
+    "scoring": {
+      "recall_min": 1.0,
+      "precision_min": 1.0
+    }
+  },
+  "scoped_probe_sha256": "a0ea71d3a03a89fb93e5f495a9ab91669cbee143a8a1a66c9a9a9ff629e74951",
+  "scoped_results_on_all5_datasets": [
+    {
+      "dataset": "go-stablenet",
+      "exit": 0,
+      "report": "SNK06-scoped-go-stablenet.json",
+      "recall": 1,
+      "precision": 1,
+      "F1": 1,
+      "expected_symbols": 6,
+      "observed_symbols": 6
+    },
+    {
+      "dataset": "go-stablenet-refinputs",
+      "exit": 0,
+      "report": "SNK06-scoped-go-stablenet-refinputs.json",
+      "recall": 1,
+      "precision": 1,
+      "F1": 1,
+      "expected_symbols": 6,
+      "observed_symbols": 6
+    },
+    {
+      "dataset": "go-stablenet@0bf2f4d1b",
+      "exit": 0,
+      "report": "SNK06-scoped-go-stablenet@0bf2f4d1b.json",
+      "recall": 1,
+      "precision": 1,
+      "F1": 1,
+      "expected_symbols": 6,
+      "observed_symbols": 6
+    },
+    {
+      "dataset": "previous-comparison-candidate",
+      "exit": 0,
+      "report": "SNK06-scoped-previous-comparison-candidate.json",
+      "recall": 1,
+      "precision": 1,
+      "F1": 1,
+      "expected_symbols": 6,
+      "observed_symbols": 6
+    },
+    {
+      "dataset": "candidate",
+      "exit": 0,
+      "report": "SNK06-scoped-candidate.json",
+      "recall": 1,
+      "precision": 1,
+      "F1": 1,
+      "expected_symbols": 6,
+      "observed_symbols": 6
+    }
+  ],
+  "finding": "Original probe is global but expected set is package-specific. Use an explicit qualified_name column scope with raw FTS AND operators. Existing precision failure is preserved; do not label valid global test helpers as retrieval errors.",
+  "posthoc_engineering_diagnostic": true,
+  "independent_quality_gold_or_approval": false,
+  "production_search_code_changed": false
+}

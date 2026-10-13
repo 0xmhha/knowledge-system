@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-13T16:48:47.256109Z",
+  "finished_at": "2026-10-13T16:48:53.305163Z",
+  "request_sha256": "6049c441fc3ddd5df0cec46a776065b49734347528fc092375c62d01f0a8126d",
+  "config_sha256": "93511136b813fb84e7ab2f711207d4c1b5f307da64eacc519b0bfea250b4dd55",
+  "binary_sha256": "52e708c9da0bb1736402b8f4b93a594765d91c2ea3fa043747060b6c8b46ae90",
+  "config_sha256_after": "93511136b813fb84e7ab2f711207d4c1b5f307da64eacc519b0bfea250b4dd55",
+  "binary_sha256_after": "52e708c9da0bb1736402b8f4b93a594765d91c2ea3fa043747060b6c8b46ae90",
+  "quality_metrics": null,
+  "state": "captured",
+  "cold_definition": "fresh MCP process through first tool response; daemon/model residency unchanged, not model-cold",
+  "counts": {
+    "cold_process": 0,
+    "retrieval": 1,
+    "warm_latency": 0,
+    "warmup": 0
+  },
+  "call_timeout_ns": 90000000000,
+  "rows": [
+    {
+      "request_id": "ANCHOR-01",
+      "phase": "retrieval",
+      "iteration": 1,
+      "call": {
+        "measurement_id": "1d5a6f685b052af3954e8e9c1e80238e",
+        "tool": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Explain handlePrepareMsg: WBFT prepare message signature and validator-set validation."
+        },
+        "elapsed_ns": 1660212166,
+        "completed_at": "2026-10-14T01:48:52.643295+09:00",
+        "response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "v2 evidence pack"
+            }
+          ],
+          "structuredContent": {
+            "format_version": 2,
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+              "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "query": "Explain handlePrepareMsg: WBFT prepare message signature and validator-set validation.",
+            "citations": [
+              {
+                "file": "consensus/wbft/core/prepare.go",
+                "start_line": 83,
+                "end_line": 146,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+                "content_sha256": "f24e1db6bd10bc6904d24832c32571a94246ae8451e2077d38cf4087b6b431dd"
+              },
+              {
+                "file": "entries/A1.wbft_core.message_handlers.md",
+                "start_line": 1,
+                "end_line": 12,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "docs:corpus.0",
+                "file_sha256": "e3d63c65543cf64c54a790f058412b94ddd0ecad76997b157aabd2a0b8421174",
+                "content_sha256": "6029ffc51c483a416e796fd6d037ebd9f944233906f83b0671497e49a6f3fbfc"
+              },
+              {
+                "file": "consensus/wbft/messages/prepare.go",
+                "start_line": 31,
+                "end_line": 36,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "058ffdcc12b640cb7edea6e49dee403e60bd1eb2a08a577257c9870a88836882",
+                "content_sha256": "367df71f5874e6e71774ecd62ba351e44666444a6cda14559d9ba396c171ce28"
+              },
+              {
+                "file": "core/rawdb/freezer.go",
+                "start_line": 340,
+                "end_line": 368,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "11d34a46805f25b85b3005e19414696dedd4809493daa2c93bc5d9985c92bbcc",
+                "content_sha256": "eb2cfc7c8a8c8e57b3c494f1019100156a047aefb37f0190571a185cddd7d07d"
+              },
+              {
+                "file": "consensus/wbft/messages/prepare.go",
+                "start_line": 50,
+                "end_line": 55,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "058ffdcc12b640cb7edea6e49dee403e60bd1eb2a08a577257c9870a88836882",
+                "content_sha256": "db970b49555317796dbfc5b6b2db31cfea40aa538b7d65b1cde8f08f4c369d18"
+              },
+              {
+                "file": "consensus/wbft/core/handler.go",
+                "start_line": 265,
+                "end_line": 311,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "107ceb4ac49f25bbb16cb8a3c13265805a75b6afa615579e4f694847a7a7834a",
+                "content_sha256": "20348cf31cdabbbb2f5222b4857c6975d179cabc8d067592bf63952830199106"
+              },
+              {
+                "file": "consensus/wbft/utils.go",
+                "start_line": 59,
+                "end_line": 73,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "a85568d8e5b9d4a384d2be31462517fa9e99d94b6886d38cf9e2116890f024b7",
+                "content_sha256": "eeeb9bb97a143bcd27ce1f86acf25970e0b9ae280efc74e0e455ff948115e378"
+              },
+              {
+                "file": "consensus/wbft/core/preprepare.go",
+                "start_line": 109,
+                "end_line": 181,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "486771c7444c2be120da08af776cb33ea75129a754c3d54e3ca5b74b3f0ad335",
+                "content_sha256": "8ad65f58710bf55a7b21e7e4c5806f4818ac56fadd1bf50f06edda91fa409a99"
+              },
+              {
+                "file": "entries/A1.wbft_core.message_handlers.md",
+                "start_line": 20,
+                "end_line": 24,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "docs:corpus.0",
+                "file_sha256": "e3d63c65543cf64c54a790f058412b94ddd0ecad76997b157aabd2a0b8421174",
+                "content_sha256": "431c3fd13d46900037d3437ff414d0fd01a164a9d213666eb6e713f166714fd1"
+              },
+              {
+                "file": "consensus/wbft/core/prepare.go",
+                "start_line": 87,
+                "end_line": 146,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+                "content_sha256": "416a292c1ad288e1237d09d4cdbeae5b1067fa5a13232a0eb48c6187c51ddcea"
+              },
+              {
+                "file": "consensus/wbft/core/commit.go",
+                "start_line": 36,
+                "end_line": 82,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+                "content_sha256": "951af07740c65b49a30c252554ff3a759a61255c95cff4159c875b6e05d20e0d"
+              }
+            ],
+            "bodies": [
+              {
+                "citation": {
+                  "file": "consensus/wbft/core/prepare.go",
+                  "start_line": 83,
+                  "end_line": 146,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+                  "content_sha256": "f24e1db6bd10bc6904d24832c32571a94246ae8451e2077d38cf4087b6b431dd"
+                },
+                "text": "// It\n// - validates PREPARE message digest matches the current block proposal\n// - accumulates valid PREPARE message until reaching quorum\n// - when quorum is reached update states to \"Prepared\" and broadcast COMMIT\nfunc (c *Core) handlePrepareMsg(prepare *wbfmessage.Prepare) error {\n\tlogger := c.currentLogger(true, prepare).New()\n\n\tlogger.Debug(\"WBFT: handle PREPARE message\", \"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif prepare.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid PREPARE message digest\")\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check prepareSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from PREPARE message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(prepare.CommonPayload.Round.Uint64()), SealTypePrepare,\n\t\tprepare.PrepareSeal, prepare.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from PREPARE message\", \"number\", block.Header().Number, \"from\", prepare.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Save PREPARE messages\n\tif err := c.current.WBFTPrepares.Add(prepare); err != nil {\n\t\tlogger.Error(\"WBFT: failed to save PREPARE message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Change to \"Prepared\" state if we've received quorum of PREPARE messages\n\t// and we are in earlier state than \"Prepared\"\n\tif (c.current.WBFTPrepares.Size() \u003e= c.valSet.QuorumSize()) \u0026\u0026 c.state.Cmp(StatePrepared) \u003c 0 {\n\t\tlogger.Info(\"WBFT: received quorum of PREPARE messages\")\n\n\t\t// Accumulates PREPARE messages\n\t\tc.current.preparedRound = c.currentView().Round\n\t\tc.WBFTPreparedPrepares = make([]*wbfmessage.Prepare, 0)\n\t\tfor _, m := range c.current.WBFTPrepares.Values() {\n\t\t\tc.WBFTPreparedPrepares = append(\n\t\t\t\tc.WBFTPreparedPrepares,\n\t\t\t\twbfmessage.NewPrepareWithSigAndSource(\n\t\t\t\t\tm.View().Sequence, m.View().Round, m.(*wbfmessage.Prepare).Digest, m.Signature(), m.Source(), m.(*wbfmessage.Prepare).PrepareSeal))\n\t\t}\n\n\t\tif c.current.Proposal() != nil \u0026\u0026 c.current.Proposal().Hash() == prepare.Digest {\n\t\t\tlogger.Trace(\"WBFT: PREPARE message matches proposal\", \"proposal\", c.current.Proposal().Hash(), \"prepare\", prepare.Digest)\n\t\t\tc.current.preparedBlock = c.current.Proposal()\n\t\t}\n\n\t\tc.setState(StatePrepared)\n\t\tc.broadcastCommit()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted PREPARE messages\")\n\t}\n\n\treturn nil\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "entries/A1.wbft_core.message_handlers.md",
+                  "start_line": 1,
+                  "end_line": 12,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "docs:corpus.0",
+                  "file_sha256": "e3d63c65543cf64c54a790f058412b94ddd0ecad76997b157aabd2a0b8421174",
+                  "content_sha256": "6029ffc51c483a416e796fd6d037ebd9f944233906f83b0671497e49a6f3fbfc"
+                },
+                "text": "# WBFT consensus message handlers: preprepare, prepare, commit\n\n**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B3\n\nThree handlers drive the per-round state machine. handlePreprepareMsg\nvalidates the proposer's block and transitions to StatePreprepared;\nhandlePrepareMsg accumulates PREPARE votes and transitions to\nStatePrepared at quorum; handleCommitMsg accumulates COMMIT votes and\nfinalises the block at quorum. Every handler verifies the message\nsignature, the sequence/round view, and the sender's authorisation\nbefore applying state changes.\n\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/messages/prepare.go",
+                  "start_line": 31,
+                  "end_line": 36,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "058ffdcc12b640cb7edea6e49dee403e60bd1eb2a08a577257c9870a88836882",
+                  "content_sha256": "367df71f5874e6e71774ecd62ba351e44666444a6cda14559d9ba396c171ce28"
+                },
+                "text": "// A WBFT PREPARE message.\ntype Prepare struct {\n\tCommonPayload\n\tDigest      common.Hash\n\tPrepareSeal []byte\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "core/rawdb/freezer.go",
+                  "start_line": 340,
+                  "end_line": 368,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "11d34a46805f25b85b3005e19414696dedd4809493daa2c93bc5d9985c92bbcc",
+                  "content_sha256": "eb2cfc7c8a8c8e57b3c494f1019100156a047aefb37f0190571a185cddd7d07d"
+                },
+                "text": "func (f *Freezer) validate() error {\n\tif len(f.tables) == 0 {\n\t\treturn nil\n\t}\n\tvar (\n\t\thead uint64\n\t\ttail uint64\n\t\tname string\n\t)\n\t// Hack to get boundary of any table\n\tfor kind, table := range f.tables {\n\t\thead = table.items.Load()\n\t\ttail = table.itemHidden.Load()\n\t\tname = kind\n\t\tbreak\n\t}\n\t// Now check every table against those boundaries.\n\tfor kind, table := range f.tables {\n\t\tif head != table.items.Load() {\n\t\t\treturn fmt.Errorf(\"freezer tables %s and %s have differing head: %d != %d\", kind, name, table.items.Load(), head)\n\t\t}\n\t\tif tail != table.itemHidden.Load() {\n\t\t\treturn fmt.Errorf(\"freezer tables %s and %s have differing tail: %d != %d\", kind, name, table.itemHidden.Load(), tail)\n\t\t}\n\t}\n\tf.frozen.Store(head)\n\tf.tail.Store(tail)\n\treturn nil\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/messages/prepare.go",
+                  "start_line": 50,
+                  "end_line": 55,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "058ffdcc12b640cb7edea6e49dee403e60bd1eb2a08a577257c9870a88836882",
+                  "content_sha256": "db970b49555317796dbfc5b6b2db31cfea40aa538b7d65b1cde8f08f4c369d18"
+                },
+                "text": "func NewPrepareWithSigAndSource(sequence *big.Int, round *big.Int, digest common.Hash, signature []byte, source common.Address, seal []byte) *Prepare {\n\tprepare := NewPrepare(sequence, round, digest, seal)\n\tprepare.signature = signature\n\tprepare.source = source\n\treturn prepare\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/core/handler.go",
+                  "start_line": 265,
+                  "end_line": 311,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "107ceb4ac49f25bbb16cb8a3c13265805a75b6afa615579e4f694847a7a7834a",
+                  "content_sha256": "20348cf31cdabbbb2f5222b4857c6975d179cabc8d067592bf63952830199106"
+                },
+                "text": "// Verifies the signature of the message m and of any justification payloads\n// piggybacked in m, if any. It also sets the source address on the messages\n// and justification payloads.\nfunc (c *Core) verifySignatures(m wbfmessage.WBFTMessage) error {\n\tlogger := c.currentLogger(true, m)\n\n\t// Anonymous function to verify the signature of a single message or payload\n\tverify := func(m wbfmessage.WBFTMessage) error {\n\t\tpayload, err := m.EncodePayloadForSigning()\n\t\tif err != nil {\n\t\t\tlogger.Error(\"WBFT: invalid message payload\", \"err\", err)\n\t\t\treturn err\n\t\t}\n\t\tsource, err := c.validateFn(payload, m.Signature(), m.View())\n\t\tif err != nil {\n\t\t\tlogger.Error(\"WBFT: invalid message signature\", \"err\", err)\n\t\t\treturn errInvalidSigner\n\t\t}\n\t\tm.SetSource(source)\n\t\treturn nil\n\t}\n\n\t// Verifies the signature of the message\n\tif err := verify(m); err != nil {\n\t\treturn err\n\t}\n\n\t// Verifies the signature of piggybacked justification payloads.\n\tswitch msgType := m.(type) {\n\tcase *wbfmessage.RoundChange:\n\t\tsignedPreparePayloads := msgType.Justification\n\t\tfor _, p := range signedPreparePayloads {\n\t\t\tif err := verify(p); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t}\n\tcase *wbfmessage.Preprepare:\n\t\tsignedRoundChangePayloads := msgType.JustificationRoundChanges\n\t\tfor _, p := range signedRoundChangePayloads {\n\t\t\tif err := verify(p); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t}\n\t}\n\n\treturn nil\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/utils.go",
+                  "start_line": 59,
+                  "end_line": 73,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "a85568d8e5b9d4a384d2be31462517fa9e99d94b6886d38cf9e2116890f024b7",
+                  "content_sha256": "eeeb9bb97a143bcd27ce1f86acf25970e0b9ae280efc74e0e455ff948115e378"
+                },
+                "text": "func CheckValidatorSignature(valSet ValidatorSet, data []byte, sig []byte) (common.Address, error) {\n\t// 1. Get signature address\n\tsigner, err := GetSignatureAddress(data, sig)\n\tif err != nil {\n\t\tlog.Error(\"WBFT: Failed to get signer address\", \"err\", err)\n\t\treturn common.Address{}, err\n\t}\n\n\t// 2. Check validator\n\tif _, val := valSet.GetByAddress(signer); val != nil {\n\t\treturn val.Address(), nil\n\t}\n\n\treturn common.Address{}, ErrUnauthorizedAddress\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/core/preprepare.go",
+                  "start_line": 109,
+                  "end_line": 181,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "486771c7444c2be120da08af776cb33ea75129a754c3d54e3ca5b74b3f0ad335",
+                  "content_sha256": "8ad65f58710bf55a7b21e7e4c5806f4818ac56fadd1bf50f06edda91fa409a99"
+                },
+                "text": "// It\n// - validates PRE-PREPARE message was created by the right proposer node\n// - validates PRE-PREPARE message justification\n// - validates PRE-PREPARE message block proposal\nfunc (c *Core) handlePreprepareMsg(preprepare *wbfmessage.Preprepare) error {\n\tlogger := c.currentLogger(true, preprepare)\n\n\tlogger = logger.New(\"proposal.number\", preprepare.Proposal.Number().Uint64(), \"proposal.hash\", preprepare.Proposal.Hash().String())\n\n\tc.logger.Debug(\"WBFT: handle PRE-PREPARE message\")\n\n\t// Validates PRE-PREPARE message comes from current proposer\n\tif !c.valSet.IsProposer(preprepare.Source()) {\n\t\tlogger.Warn(\"WBFT: ignore PRE-PREPARE message from non proposer\", \"proposer\", c.valSet.GetProposer().Address())\n\t\treturn errNotFromProposer\n\t}\n\n\t// Reject if sequence ≠ proposal number\n\tif preprepare.Sequence.Uint64() != preprepare.Proposal.Number().Uint64() {\n\t\tlogger.Warn(\"WBFT: ignore PRE-PREPARE with mismatched sequence and proposal number\")\n\t\treturn errInvalidPreparedBlock\n\t}\n\n\t// Validates PRE-PREPARE message justification\n\tif preprepare.Round.Uint64() \u003e 0 {\n\t\tif err := isJustified(preprepare.Proposal, preprepare.JustificationRoundChanges, preprepare.JustificationPrepares, c.valSet.QuorumSize()); err != nil {\n\t\t\tlogger.Warn(\"WBFT: invalid PRE-PREPARE message justification\", \"err\", err)\n\t\t\treturn errInvalidPreparedBlock\n\t\t}\n\t}\n\n\t// Validates PRE-PREPARE block proposal we received\n\tif duration, err := c.backend.Verify(preprepare.Proposal); err != nil {\n\t\t// if it's a future block, we will handle it again after the duration\n\t\tif err == consensus.ErrFutureBlock {\n\t\t\tlogger.Info(\"WBFT: PRE-PREPARE block proposal is in the future (will be treated again later)\", \"duration\", duration)\n\n\t\t\t// start a timer to re-input PRE-PREPARE message as a backlog event\n\t\t\tc.timerMu.Lock()\n\t\t\tc.stopFuturePreprepareTimer()\n\t\t\tc.futurePreprepareTimer = time.AfterFunc(duration, func() {\n\t\t\t\t_, validator := c.valSet.GetByAddress(preprepare.Source())\n\t\t\t\tc.sendEvent(backlogEvent{\n\t\t\t\t\tsrc: validator,\n\t\t\t\t\tmsg: preprepare,\n\t\t\t\t})\n\t\t\t})\n\t\t\tc.timerMu.Unlock()\n\t\t} else {\n\t\t\tlogger.Warn(\"WBFT: invalid PRE-PREPARE block proposal\", \"err\", err)\n\t\t}\n\n\t\treturn err\n\t}\n\n\t// Here is about to accept the PRE-PREPARE\n\tif c.state == StateAcceptRequest {\n\t\tc.logger.Debug(\"WBFT: accepted PRE-PREPARE message\")\n\n\t\t// Re-initialize ROUND-CHANGE timer\n\t\tc.newRoundChangeTimer()\n\t\tc.consensusTimestamp = time.Now()\n\n\t\t// Update current state\n\t\tc.current.SetPreprepare(preprepare)\n\t\tc.setState(StatePreprepared)\n\n\t\t// Broadcast prepare message to other validators\n\t\tc.broadcastPrepare()\n\t}\n\n\treturn nil\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "entries/A1.wbft_core.message_handlers.md",
+                  "start_line": 20,
+                  "end_line": 24,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "docs:corpus.0",
+                  "file_sha256": "e3d63c65543cf64c54a790f058412b94ddd0ecad76997b157aabd2a0b8421174",
+                  "content_sha256": "431c3fd13d46900037d3437ff414d0fd01a164a9d213666eb6e713f166714fd1"
+                },
+                "text": "## Code anchors\n- `consensus/wbft/core/preprepare.go` Core.handlePreprepareMsg:115 — validates proposer signature and block, transitions to StatePreprepared\n- `consensus/wbft/core/prepare.go` Core.handlePrepareMsg:87 — accumulates PREPARE messages, transition to StatePrepared at QuorumSize\n- `consensus/wbft/core/commit.go` Core.handleCommitMsg:90 — accumulates COMMIT messages, finalises block at QuorumSize\n\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/core/prepare.go",
+                  "start_line": 87,
+                  "end_line": 146,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+                  "content_sha256": "416a292c1ad288e1237d09d4cdbeae5b1067fa5a13232a0eb48c6187c51ddcea"
+                },
+                "text": "func (c *Core) handlePrepareMsg(prepare *wbfmessage.Prepare) error {\n\tlogger := c.currentLogger(true, prepare).New()\n\n\tlogger.Debug(\"WBFT: handle PREPARE message\", \"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif prepare.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid PREPARE message digest\")\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check prepareSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from PREPARE message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(prepare.CommonPayload.Round.Uint64()), SealTypePrepare,\n\t\tprepare.PrepareSeal, prepare.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from PREPARE message\", \"number\", block.Header().Number, \"from\", prepare.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Save PREPARE messages\n\tif err := c.current.WBFTPrepares.Add(prepare); err != nil {\n\t\tlogger.Error(\"WBFT: failed to save PREPARE message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Change to \"Prepared\" state if we've received quorum of PREPARE messages\n\t// and we are in earlier state than \"Prepared\"\n\tif (c.current.WBFTPrepares.Size() \u003e= c.valSet.QuorumSize()) \u0026\u0026 c.state.Cmp(StatePrepared) \u003c 0 {\n\t\tlogger.Info(\"WBFT: received quorum of PREPARE messages\")\n\n\t\t// Accumulates PREPARE messages\n\t\tc.current.preparedRound = c.currentView().Round\n\t\tc.WBFTPreparedPrepares = make([]*wbfmessage.Prepare, 0)\n\t\tfor _, m := range c.current.WBFTPrepares.Values() {\n\t\t\tc.WBFTPreparedPrepares = append(\n\t\t\t\tc.WBFTPreparedPrepares,\n\t\t\t\twbfmessage.NewPrepareWithSigAndSource(\n\t\t\t\t\tm.View().Sequence, m.View().Round, m.(*wbfmessage.Prepare).Digest, m.Signature(), m.Source(), m.(*wbfmessage.Prepare).PrepareSeal))\n\t\t}\n\n\t\tif c.current.Proposal() != nil \u0026\u0026 c.current.Proposal().Hash() == prepare.Digest {\n\t\t\tlogger.Trace(\"WBFT: PREPARE message matches proposal\", \"proposal\", c.current.Proposal().Hash(), \"prepare\", prepare.Digest)\n\t\t\tc.current.preparedBlock = c.current.Proposal()\n\t\t}\n\n\t\tc.setState(StatePrepared)\n\t\tc.broadcastCommit()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted PREPARE messages\")\n\t}\n\n\treturn nil\n}\n"
+              },
+              {
+                "citation": {
+                  "file": "consensus/wbft/core/commit.go",
+                  "start_line": 36,
+                  "end_line": 82,
+                  "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+                  "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                  "origin_id": "repo",
+                  "file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+                  "content_sha256": "951af07740c65b49a30c252554ff3a759a61255c95cff4159c875b6e05d20e0d"
+                },
+                "text": "func (c *Core) broadcastCommit() {\n\tvar err error\n\n\tlogger := c.currentLogger(true, nil)\n\n\tsub := c.current.Subject()\n\n\tvar header *types.Header\n\tif block, ok := c.current.Proposal().(*types.Block); ok {\n\t\theader = block.Header()\n\t}\n\n\t// Create Commit Seal\n\tcommitSeal := c.backend.SignWithoutHashing(PrepareSeal(header, uint32(c.currentView().Round.Uint64()), SealTypeCommit))\n\tcommit := wbfmessage.NewCommit(sub.View.Sequence, sub.View.Round, sub.Digest, commitSeal)\n\tcommit.SetSource(c.Address())\n\n\t// Sign Message\n\tencodedPayload, err := commit.EncodePayloadForSigning()\n\tif err != nil {\n\t\twithMsg(logger, commit).Error(\"WBFT: failed to encode payload of COMMIT message\", \"err\", err)\n\t\treturn\n\t}\n\n\tsignature, err := c.backend.Sign(encodedPayload)\n\tif err != nil {\n\t\twithMsg(logger, commit).Error(\"WBFT: failed to sign COMMIT message\", \"err\", err)\n\t\treturn\n\t}\n\tcommit.SetSignature(signature)\n\n\t// RLP-encode message\n\tpayload, err := rlp.EncodeToBytes(\u0026commit)\n\tif err != nil {\n\t\twithMsg(logger, commit).Error(\"WBFT: failed to encode COMMIT message\", \"err\", err)\n\t\treturn\n\t}\n\n\twithMsg(logger, commit).Info(\"WBFT: broadcast COMMIT message\")\n\twithMsg(logger, commit).Trace(\"WBFT: COMMIT payload\", \"payload\", hexutil.Encode(payload))\n\n\t// Broadcast RLP-encoded message\n\tif err = c.backend.Broadcast(c.valSet, commit.Code(), payload); err != nil {\n\t\twithMsg(logger, commit).Error(\"WBFT: failed to broadcast COMMIT message\", \"err\", err)\n\t\treturn\n\t}\n}\n"
+              }
+            ],
+            "graph_neighbors": [],
+            "semantic": null,
+            "evidence_state": "complete",
+            "metadata": {
+              "integrity_hash_algo": "sha256-v2",
+              "integrity_hash": "bbdfab3fa04b740fffa851631d917a996ecba80c76c4e5e97bcdfad229622479"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

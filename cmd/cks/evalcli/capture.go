@@ -32,21 +32,41 @@ type captureRow struct {
 }
 
 type captureReport struct {
-	SchemaVersion     int            `json:"schema_version"`
-	StartedAt         time.Time      `json:"started_at"`
-	FinishedAt        time.Time      `json:"finished_at"`
-	RequestSHA256     string         `json:"request_sha256"`
-	ConfigSHA256      string         `json:"config_sha256"`
-	BinarySHA256      string         `json:"binary_sha256"`
-	ConfigSHA256After string         `json:"config_sha256_after"`
-	BinarySHA256After string         `json:"binary_sha256_after"`
-	QualityMetrics    any            `json:"quality_metrics"`
-	State             string         `json:"state"`
-	ColdDefinition    string         `json:"cold_definition"`
-	Counts            map[string]int `json:"counts"`
-	CallTimeoutNS     int64          `json:"call_timeout_ns"`
-	Rows              []captureRow   `json:"rows"`
-	Errors            []string       `json:"errors,omitempty"`
+	SchemaVersion     int                   `json:"schema_version"`
+	StartedAt         time.Time             `json:"started_at"`
+	FinishedAt        time.Time             `json:"finished_at"`
+	RequestSHA256     string                `json:"request_sha256"`
+	ConfigSHA256      string                `json:"config_sha256"`
+	BinarySHA256      string                `json:"binary_sha256"`
+	ConfigSHA256After string                `json:"config_sha256_after"`
+	BinarySHA256After string                `json:"binary_sha256_after"`
+	QualityMetrics    any                   `json:"quality_metrics"`
+	State             string                `json:"state"`
+	ColdDefinition    string                `json:"cold_definition"`
+	Counts            map[string]int        `json:"counts"`
+	CallTimeoutNS     int64                 `json:"call_timeout_ns"`
+	Rows              []captureRow          `json:"rows"`
+	Errors            []string              `json:"errors,omitempty"`
+	SessionClosures   []captureSessionClose `json:"session_closures,omitempty"`
+}
+
+type captureSessionClose struct {
+	Session   string `json:"session"`
+	RequestID string `json:"request_id,omitempty"`
+	Iteration int    `json:"iteration,omitempty"`
+	ElapsedNS int64  `json:"elapsed_ns"`
+	Error     string `json:"error,omitempty"`
+}
+
+func (report *captureReport) closeSession(runner *eval.Runner, session, requestID string, iteration int) {
+	started := time.Now()
+	err := runner.Close()
+	closed := captureSessionClose{Session: session, RequestID: requestID, Iteration: iteration, ElapsedNS: time.Since(started).Nanoseconds()}
+	if err != nil {
+		closed.Error = err.Error()
+		report.Errors = append(report.Errors, "close "+session+" session: "+err.Error())
+	}
+	report.SessionClosures = append(report.SessionClosures, closed)
 }
 
 func loadCapturePlan(raw []byte) (capturePlan, error) {
@@ -191,9 +211,7 @@ func captureRun(ctx context.Context, input, config, binary, output string, warmu
 				}
 			}
 		}
-		if err := runner.Close(); err != nil {
-			report.Errors = append(report.Errors, "close warm session: "+err.Error())
-		}
+		report.closeSession(runner, "warm", "", 0)
 	}
 	for _, request := range plan.Requests {
 		for iteration := 1; iteration <= cold; iteration++ {
@@ -209,9 +227,7 @@ func captureRun(ctx context.Context, input, config, binary, output string, warmu
 				continue
 			}
 			appendCall(runner, request, "cold_process", iteration, started)
-			if err := runner.Close(); err != nil {
-				report.Errors = append(report.Errors, "close cold session: "+err.Error())
-			}
+			report.closeSession(runner, "cold", request.ID, iteration)
 		}
 	}
 	if ctx.Err() != nil {

@@ -1,10 +1,10 @@
 # Body provenance: current guarantees and the legacy gap
 
-2026-10-13 · Current source: [MCP startup](../../cmd/cks/mcpcli/serve.go), [filesystem fetcher](../../internal/system/composer/budget/filesystem.go), [alignment](../../internal/system/mcp/alignment.go), [v2 pack](../../internal/system/evidencev2/pack.go).
+2026-10-14 · Current source: [MCP startup](../../cmd/cks/mcpcli/serve.go), [filesystem fetcher](../../internal/system/composer/budget/filesystem.go), [alignment](../../internal/system/mcp/alignment.go), [v2 pack](../../internal/system/evidencev2/pack.go).
 
 | Serving path | Body source and guarantee | Limit |
 |---|---|---|
-| Coordinated immutable version with retained sources | Startup materializes the captured read tree and uses it as the fetch root. Public v2 evidence revalidates identity and captured bytes. | DocsRoots remains a separate document-source boundary; retained code is not a claim that arbitrary external docs are captured. |
+| Coordinated immutable version with retained sources | Startup opens a verified archive reader. CKV citation checks and composer body reads use retained blobs directly, without a temporary read tree. Selected blobs are re-read and hashed; public v2 evidence also revalidates the complete candidate before and after each request. | Repository and retained docs:corpus.N files use separate namespaces. Missing or changed archived files fail without live-checkout fallback. Older datasets without captured document origins need reindexing for those citations. |
 | Legacy flat graph/vector config | FilesystemFetcher reads source_root (or cwd) and document roots. Alignment gates graph/vector coordinate mismatches. | Checkout HEAD/path drift is a warning; it does not replace the fetcher or independently prove every served body has indexed bytes. |
 
 The old proposal for Store.BodyByRange, a CKV FetchBody API, SnapshotFetcher/FallbackVerified, and a health body_provenance field is **not implemented** under those interfaces. Retained-source v2 serving resolves much of the original code-body problem by a different design. Do not claim a snapshot-first vector-chunk fetcher or a verified legacy filesystem fallback exists.

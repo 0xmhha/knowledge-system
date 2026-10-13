@@ -1,0 +1,21 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,shutil,gzip,hashlib,importlib.util
+root=Path.cwd();run=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014');packet=root/'system/eval/stablenet-corpus-repair-2026-10-14'
+summary=json.loads((run/'capture/summary.json').read_text());extra=json.loads((run/'matched-request-summary.json').read_text());assert summary['responses']==1512
+for arm,expected in [('baseline',396),('candidate',756)]:
+ stat=summary['arms'][arm];assert stat['observed']==756 and stat['missing']==0 and stat['valid_packs']==expected and not stat['invalid_packs']
+assert summary['arms']['baseline']['failed']==360 and summary['arms']['candidate']['failed']==0
+assert len(extra['resolved_error_question_ids'])==20 and not extra['regressed_error_question_ids']
+for block in [1,2]:
+ for arm in ['baseline','candidate']:
+  source=run/'capture'/str(block)/arm;target=packet/'capture'/str(block)/arm;target.mkdir(parents=True,exist_ok=True)
+  for filename in ['config.yaml','command.json','capture.json.gz']:shutil.copy2(source/filename,target/filename)
+  with (source/'events/cks-mcp.jsonl').open('rb')as original,gzip.open(target/'backend-events.jsonl.gz','wb')as compressed:shutil.copyfileobj(original,compressed)
+(packet/'replay-summary.json').write_bytes((run/'capture/summary.json').read_bytes());(packet/'matched-request-summary.json').write_bytes((run/'matched-request-summary.json').read_bytes());(packet/'served-domain-corpus-pins.json').write_bytes((run/'served-domain-corpus-pins.json').read_bytes())
+protocol=json.loads((run/'protocol.json').read_text());spec=importlib.util.spec_from_file_location('comparison',root/'projects/stablenet/eval/dataset-comparison/run.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.baselines_guard(protocol);module.model_guard(protocol)
+assert all(module.sha(Path(path))==expected for path,expected in json.loads((run/'served-domain-corpus-pins.json').read_text()).items())
+assert all(module.sha(root/path)==expected for path,expected in protocol['source_runtime_sha256'].items())
+assert module.sha(root/'projects/stablenet/eval/dataset-comparison/run.py')==protocol['comparison_runner_sha256']
+proof={'checked_at':datetime.now(timezone.utc).isoformat(),'responses':1512,'missing_responses':0,'baseline_errors':360,'candidate_errors':0,'baseline_valid_v2_packs':396,'candidate_valid_v2_packs':756,'invalid_v2_packs':0,'source_missing_questions_resolved':20,'resolved_question_ids':extra['resolved_error_question_ids'],'paired_valid_packs':summary['both_valid_pairs'],'citation_order_changed_pairs':summary['citation_order_changed_pairs'],'body_outputs_changed_pairs':summary['body_outputs_changed_pairs'],'source_signature_anchors':{a:{'hit_at_10':s['source_derived_anchor_hit_at_10'],'RR_at_10':s['source_derived_anchor_RR_at_10']}for a,s in summary['arms'].items()},'paired_successful_warm':extra['paired_successful_warm'],'session_close_errors':extra['session_close_errors'],'capture_harness_full_pass':all(s['exit']==0 for s in extra['capture_sessions']),'all_original4_dataset_roots_and_model_and_source_and_runtime_pins_preserved':True,'request_SHA256':module.sha(run/'requests.json'),'generated_answer_quality_evaluated':False,'latency_improvement_accepted':False,'scope':'execution and archive-backed citation correctness; capture teardown errors retained separately'}
+(packet/'replay-verification.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(json.dumps(proof,ensure_ascii=False))

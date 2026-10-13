@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 
 	mcpgoclient "github.com/mark3labs/mcp-go/client"
@@ -160,7 +162,7 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	if opts.CKSMCPConfig != "" {
 		args = append(args, "--config", opts.CKSMCPConfig)
 	}
-	tp := mcpgotransport.NewStdio(bin, opts.Env, args...)
+	tp := mcpgotransport.NewStdioWithOptions(bin, opts.Env, args, mcpgotransport.WithCommandFunc(gracefulCommand))
 	c := mcpgoclient.NewClient(tp)
 	if err := c.Start(ctx); err != nil {
 		_ = c.Close()
@@ -195,6 +197,18 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	runner.stderrDone = stderrDone
 	runner.recordResponses = opts.RecordResponses
 	return runner, nil
+}
+
+// A cancelled evaluation must give its server the same chance to release
+// readers and temporary source copies as an explicit Close. CommandContext's
+// default Cancel sends SIGKILL immediately; retain a bounded fallback for a
+// server that ignores SIGTERM instead.
+func gracefulCommand(ctx context.Context, command string, env []string, args []string) (*exec.Cmd, error) {
+	cmd := exec.CommandContext(ctx, command, args...)
+	cmd.Env = append(os.Environ(), env...)
+	cmd.Cancel = func() error { return cmd.Process.Signal(syscall.SIGTERM) }
+	cmd.WaitDelay = 5 * time.Second
+	return cmd, nil
 }
 
 func (r *Runner) callTool(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {

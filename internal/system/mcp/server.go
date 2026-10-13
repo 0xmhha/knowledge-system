@@ -21,14 +21,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/0xmhha/knowledge-system/internal/system/backendmeasure"
+	"io"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 
+	"github.com/0xmhha/knowledge-system/internal/system/backendmeasure"
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
@@ -192,11 +194,18 @@ func Run(ctx context.Context, d Deps) error {
 	if err != nil {
 		return err
 	}
-	// mcp-go's stdio server does not currently surface ctx into its
-	// loop; the caller's ctx still gates anything Compose / Health do
-	// (each handler threads ctx through to the composer / clients).
-	_ = ctx
-	if err := mcpserver.ServeStdio(s); err != nil {
+	return runStdio(ctx, s, os.Stdin, os.Stdout)
+}
+
+func runStdio(ctx context.Context, s *mcpserver.MCPServer, in io.Reader, out io.Writer) error {
+	// The command owns signal handling. ServeStdio creates an unrelated
+	// background context, so use Listen to propagate cancellation to both
+	// the input loop and active tool handlers. Cancel the notification loop
+	// on EOF too, after Listen has drained accepted tool calls.
+	sessionCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	err := mcpserver.NewStdioServer(s).Listen(sessionCtx, in, out)
+	if err != nil && (ctx.Err() == nil || !errors.Is(err, ctx.Err())) {
 		return fmt.Errorf("mcp: serve stdio: %w", err)
 	}
 	return nil

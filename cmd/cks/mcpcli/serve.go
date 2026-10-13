@@ -32,6 +32,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"io"
 	"log"
 	"net"
@@ -93,7 +94,7 @@ func NewCmd(version string) *cobra.Command {
 		Short:   "Serve the fused knowledge MCP server (foreground)",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+			ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
 			if portOverride != "" && httpAddrOverride != "" {
 				return fmt.Errorf("--port and --http-addr are mutually exclusive (--http-addr already carries a port)")
@@ -186,17 +187,16 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if derived := deriveSourceRoot(cfg); derived != "" {
 		log.Printf("cks-mcp: source_root derived from graph manifest: %s", derived)
 	}
-	var evidenceVersionDir, retainedReadRoot string
+	var evidenceVersionDir string
+	var retainedReader sourcepath.Reader
 	graphDir := filepath.Dir(cfg.Backends.CKG.Path)
 	if filepath.Base(graphDir) == "graph" && filepath.Clean(cfg.Backends.CKV.Path) == filepath.Join(filepath.Dir(graphDir), "vector") {
 		evidenceVersionDir = filepath.Dir(graphDir)
 		if _, statErr := os.Lstat(filepath.Join(evidenceVersionDir, "sources")); statErr == nil {
-			var cleanup func()
-			retainedReadRoot, cleanup, err = setup.MaterializeRetainedReadTree(evidenceVersionDir)
+			retainedReader, err = setup.OpenRetainedSourceReader(ctx, evidenceVersionDir)
 			if err != nil {
 				return fmt.Errorf("mount retained source: %w", err)
 			}
-			defer cleanup()
 		}
 	}
 
@@ -205,7 +205,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 		return fmt.Errorf("config_invalid: load sanitize ruleset: %w", err)
 	}
 
-	be, err := buildBackends(ctx, cfg, retainedReadRoot)
+	be, err := buildBackends(ctx, cfg, retainedReader)
 	if err != nil {
 		return err
 	}
@@ -228,12 +228,9 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	}
 	defer func() { _ = fpCloser() }()
 
-	// Real BodyFetcher: read the cited line range from disk. The
-	// indexed source tree at cfg.Backends.CKG.SourceRoot (cwd when
-	// empty) MUST match the snapshot ckg was built against — otherwise
-	// the body returned for a citation could differ from what was
-	// indexed. cks does not enforce this; Citation.CommitHash on the
-	// returned EvidencePack is the operator's drift signal.
+	// Pinned datasets read verified archive bytes directly. Legacy datasets
+	// still resolve cited lines against the configured source/document roots;
+	// those trees must match the indexed commit.
 	// DocsRoots (from the ckv index manifest) let the fetcher resolve
 	// doc/markdown corpus citations, which live outside SourceRoot. Only
 	// the Real ckv backend has a manifest; Dummy/Degraded contribute none.
@@ -241,11 +238,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if rv, ok := be.ckv.(*ckvclient.Real); ok {
 		docsRoots = rv.DocsRoots()
 	}
-	fetchRoot := cfg.Backends.CKG.SourceRoot
-	if retainedReadRoot != "" {
-		fetchRoot = retainedReadRoot
-	}
-	fetcher := &budget.FilesystemFetcher{Root: fetchRoot, DocsRoots: docsRoots}
+	fetcher := &budget.FilesystemFetcher{Root: cfg.Backends.CKG.SourceRoot, DocsRoots: docsRoots, ReadSource: retainedReader}
 
 	vocabResolver, err := buildVocabResolver(cfg.Vocab.GlossaryPath)
 	if err != nil {
@@ -381,7 +374,7 @@ func buildVocabResolver(path string) (*vocab.Resolver, error) {
 // degraded health) rather than crashing the server. The Dummy records
 // each would-have-been ckv call on the Composer's instruction collector so
 // the upstream LLM can fulfil the request via skills against go-stablenet.
-func buildCKVClient(ctx context.Context, cfg config.CKVConfig, emb ckvtypes.Embedder, degradedReason, sourceRoot string, retained ...bool) (ckvclient.Client, func() error, error) {
+func buildCKVClient(ctx context.Context, cfg config.CKVConfig, emb ckvtypes.Embedder, degradedReason, sourceRoot string, reader sourcepath.Reader) (ckvclient.Client, func() error, error) {
 	withSource := func(d *ckvclient.Dummy) *ckvclient.Dummy {
 		if sourceRoot != "" {
 			d.SourcePath = sourceRoot
@@ -398,7 +391,7 @@ func buildCKVClient(ctx context.Context, cfg config.CKVConfig, emb ckvtypes.Embe
 		return d, d.Close, nil
 	}
 	real, err := ckvclient.NewReal(ctx, ckvclient.RealOpts{DataPath: cfg.Path, Embedder: emb,
-		SourceRoot: sourceRoot, RetainedSource: len(retained) > 0 && retained[0]})
+		SourceRoot: sourceRoot, RetainedSource: reader != nil, SourceReader: reader})
 	if err != nil {
 		// ckv.Open failed (index identity mismatch, missing files): degrade
 		// instead of crashing, and surface why via health.
@@ -422,11 +415,8 @@ type backends struct {
 	close     func()
 }
 
-func buildBackends(ctx context.Context, cfg *config.Config, sourceOverride ...string) (*backends, error) {
+func buildBackends(ctx context.Context, cfg *config.Config, reader sourcepath.Reader) (*backends, error) {
 	sourceRoot := cfg.Backends.CKG.SourceRoot
-	if len(sourceOverride) > 0 && sourceOverride[0] != "" {
-		sourceRoot = sourceOverride[0]
-	}
 
 	ckg, ckgCloser, err := buildCKGClient(cfg.Backends.CKG.Path, sourceRoot)
 	if err != nil {
@@ -463,7 +453,7 @@ func buildBackends(ctx context.Context, cfg *config.Config, sourceOverride ...st
 	}
 
 	ckv, ckvCloser, err := buildCKVClient(ctx, cfg.Backends.CKV, ckvEmb, degradedReason, sourceRoot,
-		len(sourceOverride) > 0 && sourceOverride[0] != "")
+		reader)
 	if err != nil {
 		_ = ckgCloser()
 		return nil, fmt.Errorf("build ckv client: %w", err)

@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"io"
 	"os"
 	"os/exec"
@@ -515,7 +516,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	// Not a git repo (commit=""); tagged Category="domain" so callers can
 	// tell curated knowledge from code. processFile handles markdown the
 	// same as in-tree docs.
-	for _, docsRoot := range o.DocsRoots {
+	for docsIndex, docsRoot := range o.DocsRoots {
 		docFiles, docWalkErrs, werr := discover.Walk(docsRoot, discover.Options{})
 		if werr != nil {
 			return nil, fmt.Errorf("walk docs %q: %w", docsRoot, werr)
@@ -524,13 +525,24 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 			fmt.Fprintf(os.Stderr, "ckv: docs walk warning: %v\n", e)
 		}
 		for _, f := range docFiles {
-			chunks, perr := processFile(f.AbsPath, f.RelPath, f.Language, "", parsers, cfg, chunker)
+			citationPath := f.RelPath
+			if o.DatasetID != "" {
+				citationPath = sourcepath.Docs(docsIndex, f.RelPath)
+			}
+			chunks, perr := processFile(f.AbsPath, citationPath, f.Language, "", parsers, cfg, chunker)
 			if perr != nil {
 				fmt.Fprintf(os.Stderr, "ckv: %v\n", perr)
 				continue
 			}
 			if len(chunks) == 0 {
 				continue
+			}
+			if o.DatasetID != "" {
+				digest, err := fileSHA256(f.AbsPath)
+				if err != nil {
+					return nil, err
+				}
+				inputFiles = append(inputFiles, manifest.InputFile{OriginID: sourcepath.Origin(docsIndex), Path: f.RelPath, SHA256: digest})
 			}
 			// Do not call pol.Apply here: docs chunks always carry the
 			// "domain" category regardless of PolicyPath (a source-tree
@@ -556,6 +568,24 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	manifestDocsRoots := append([]string{}, o.DocsRoots...)
 	if o.FlowCorpus != "" {
 		corpusRel := filepath.Base(o.FlowCorpus)
+		if o.DatasetID != "" {
+			docsIndex := len(o.DocsRoots)
+			for i, root := range o.DocsRoots {
+				if filepath.Clean(root) == filepath.Clean(filepath.Dir(o.FlowCorpus)) {
+					docsIndex = i
+					break
+				}
+			}
+			corpusRel = sourcepath.Docs(docsIndex, corpusRel)
+		}
+		if o.DatasetID != "" {
+			index, _, _, _ := sourcepath.Parse(corpusRel)
+			digest, err := fileSHA256(o.FlowCorpus)
+			if err != nil {
+				return nil, err
+			}
+			inputFiles = append(inputFiles, manifest.InputFile{OriginID: sourcepath.Origin(index), Path: filepath.Base(o.FlowCorpus), SHA256: digest})
+		}
 		flowChunks, fcStats, ferr := flowcorpus.Load(o.FlowCorpus, corpusRel)
 		if ferr != nil {
 			return nil, fmt.Errorf("flow corpus: %w", ferr)
@@ -655,7 +685,12 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	}
 
 	ckvVersion := o.Version
-	sort.Slice(inputFiles, func(i, j int) bool { return inputFiles[i].Path < inputFiles[j].Path })
+	sort.Slice(inputFiles, func(i, j int) bool {
+		if inputFiles[i].OriginID != inputFiles[j].OriginID {
+			return inputFiles[i].OriginID < inputFiles[j].OriginID
+		}
+		return inputFiles[i].Path < inputFiles[j].Path
+	})
 	if ckvVersion == "" {
 		ckvVersion = "dev"
 	}

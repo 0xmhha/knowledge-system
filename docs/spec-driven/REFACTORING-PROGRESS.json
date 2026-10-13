@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "b514446f43c63c0360be74eaf1a4fd085173195a",
-    "manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json"
+    "revision": "d0b7ad2af4fee5a4488380c24d04fb4ce60cc4a9",
+    "manifest": "system/eval/stablenet-shutdown-2026-10-14/manifest.json"
   },
   "tasks": [
     {
@@ -735,7 +735,7 @@
     "main_synchronized_at_merge": true
   },
   "execution_plan": "docs/spec-driven/REFACTORING-COMPLETION-PLAN-2026-10-08.md",
-  "working_branch": "codex/refresh-current-documentation",
+  "working_branch": "codex/go-stablenet-dataset-comparison",
   "followup_merge": {
     "source_branch": "feat/refactoring-followup",
     "pr_number": 98,
@@ -2265,24 +2265,15 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T10:48:41.953610+00:00",
-    "repository": "0xmhha/knowledge-system",
-    "local_branch": "codex/refresh-current-documentation",
-    "inspected_local_head": "b514446f43c63c0360be74eaf1a4fd085173195a",
-    "scope": "local CI-fix material snapshot before proof/ledger commit and push; later publication/merge must be read from GitHub or git status",
-    "local_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "remote_main_at_initial_check": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "documentation_PR": 100,
-    "documentation_PR_url": "https://github.com/0xmhha/knowledge-system/pull/100",
-    "PR_state_at_check": "OPEN",
-    "isDraft": false,
-    "previous_published_documentation_head": "a3df2bf736da45904870e32812419c8c39e1aaaa",
-    "initial_CI_run": 38383410958,
-    "initial_CI": "failure; retained and repaired",
-    "fix_CI": "pending_after_push",
-    "merge_approved_if_CI_passes": true,
-    "PR100_main_merge_executed": false,
-    "tag_or_deployment_executed": false
+    "checked_at": "2026-10-13T15:39:13.906796+00:00",
+    "scope": "corpus repair material commit before final proof commit; use git status for current HEAD",
+    "local_branch": "codex/go-stablenet-dataset-comparison",
+    "inspected_local_head": "3fa62e15deabe3b2ee6ac2376842a88e6a32c707",
+    "main_and_origin_main_at_task_start": "cd5c35d6a82d4877e31ea194f766f892deddbdf9",
+    "previous_documentation_PR": 100,
+    "previous_documentation_PR_state": "MERGED",
+    "comparison_branch_pushed": false,
+    "comparison_PR_created": false
   },
   "latest_documentation_review": {
     "checked_at": "2026-10-13T10:48:41.953610+00:00",
@@ -2467,11 +2458,8 @@
     ],
     "tag_or_deployment_executed": false
   },
-  "delivery_next_task": "PR100 fix CI verification then authorized squash merge and main synchronization",
-  "delivery_remaining": [
-    "PR100 fix CI verification",
-    "CI success then authorized squash merge and main synchronization"
-  ],
+  "delivery_next_task": null,
+  "delivery_remaining": [],
   "documentation_maintenance": {
     "state": "complete",
     "material_revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
@@ -2491,5 +2479,127 @@
     "latest_fix_manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json",
     "latest_fix_proof": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/committed-binding-proof.json",
     "historical_evidence_branch": "codex/refresh-current-documentation; retain after squash merge"
+  },
+  "latest_dataset_comparison": {
+    "checked_at": "2026-10-13T15:39:13.906796+00:00",
+    "revision": "7231d271d6fec983891643ea545d0538eba22b28",
+    "manifest": "system/eval/stablenet-dataset-comparison-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1809,
+    "source_dependency_bindings": 1586,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "comparison_execution_complete": true,
+    "known_API_source_missing_failures_preserved": true,
+    "independent_generated_answer_quality_accepted": false,
+    "runtime_Go_changed": false,
+    "operator_baselines_preserved": true,
+    "status": "PASS",
+    "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "result": "system/eval/stablenet-dataset-comparison-2026-10-13/result.json",
+    "execution_tasks_complete": 7,
+    "independent_quality_accepted": false,
+    "next_task": "completed by active_dataset_followup; see its optional maintenance note",
+    "publication": "local committed comparison; no new remote push or PR requested in this task",
+    "completion_state": "complete_after_committed_SHA_and_existing_progress_checks",
+    "late_artifact_sha256": {
+      "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md": "29a4dd13e3da4eed55b3d026bcb8abfe5b89aabef5e1ef7343667bf0e3194fa6",
+      "system/eval/stablenet-dataset-comparison-2026-10-13/committed-binding-proof.json": "ab55afd6606de1076763d61dca2db27c5a2c5858bd926b9036396a5d955faeb1",
+      "system/eval/stablenet-dataset-comparison-2026-10-13/progress-check.txt": "b68b7391f45fa433a9822bb65711dcab95d486ebe2173d56de1fb854b9cf1e6c"
+    }
+  },
+  "reporting_preferences": {
+    "deferred_release_work_only_on_explicit_user_request": true,
+    "always_report_active_task_progress_remaining_next": true,
+    "active_worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md"
+  },
+  "active_dataset_followup": {
+    "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "evidence": "system/eval/stablenet-corpus-repair-2026-10-14",
+    "requested_tasks": 3,
+    "completed": 3,
+    "state": "complete_after_committed_SHA_and_existing_progress_checks",
+    "sequence": [
+      {
+        "order": 1,
+        "task": "retain domain and flow citation sources",
+        "state": "complete",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/candidate-verification.json",
+        "smoke": "system/eval/stablenet-corpus-repair-2026-10-14/stage1-smoke-verification.json"
+      },
+      {
+        "order": 2,
+        "task": "replay unchanged42 questions",
+        "state": "complete_with_session_close_errors_preserved",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/replay-verification.json"
+      },
+      {
+        "order": 3,
+        "task": "review SNK06 scope and expected results",
+        "state": "complete",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/SNK06-scope-review.json"
+      }
+    ],
+    "runtime_source_binding": "verified current and committed source/input bytes",
+    "remaining_requested_tasks": [],
+    "result": "system/eval/stablenet-corpus-repair-2026-10-14/result.json",
+    "optional_next_maintenance": "investigate capture warm session close deadline; preserve recorded errors",
+    "material_evidence_revision": "3fa62e15deabe3b2ee6ac2376842a88e6a32c707",
+    "manifest": "system/eval/stablenet-corpus-repair-2026-10-14/manifest.json",
+    "committed_binding_proof": "system/eval/stablenet-corpus-repair-2026-10-14/committed-binding-proof.json",
+    "completion": "system/eval/stablenet-corpus-repair-2026-10-14/completion.json",
+    "existing_progress_guard": "PASS",
+    "existing_ontology_guard": "PASS",
+    "late_artifact_sha256": {
+      "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md": "c8456e13be3295adb782cff37341233edc05065c64bb5e62bf7d18681615e31d",
+      "docs/spec-driven/CURRENT-HANDOFF.md": "0671050a102093c6b00191dc47c9b90a7d7f665c1db1c8c609ca0c559fc23bc7",
+      "system/eval/stablenet-corpus-repair-2026-10-14/committed-binding-proof.json": "793e2ece2b889b01289a1cd47bcd82941c5707d815b33a4d45aedb28b45e15d7",
+      "system/eval/stablenet-corpus-repair-2026-10-14/progress-check.txt": "f44673dec8d93dc270c524048c6a48d005a2dbc29e1b0475c9844d1cf25c7867",
+      "system/eval/stablenet-corpus-repair-2026-10-14/completion.json": "120ca0ffc7beb9c8b9ddde5891b3bf2d4a9d07473528c4117551daadcd6bed8a"
+    }
+  },
+  "active_shutdown_followup": {
+    "state": "complete_after_committed_SHA_and_existing_progress_checks",
+    "scope": "retained dataset server shutdown after successful evaluation requests",
+    "workflow_document": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "evidence_packet": "system/eval/stablenet-shutdown-2026-10-14",
+    "tasks": [
+      {
+        "id": "SD-01",
+        "state": "complete",
+        "evidence": "before-full-probe.json and before-full-stderr.txt"
+      },
+      {
+        "id": "SD-02",
+        "state": "complete"
+      },
+      {
+        "id": "SD-03",
+        "state": "complete"
+      },
+      {
+        "id": "SD-04",
+        "state": "complete"
+      }
+    ],
+    "remaining_requested_tasks": [],
+    "next_task": null,
+    "prior_two_close_failures_preserved": true,
+    "actual_verification": "system/eval/stablenet-shutdown-2026-10-14/verification.json",
+    "material_revision": "d0b7ad2af4fee5a4488380c24d04fb4ce60cc4a9",
+    "binding_proof": "system/eval/stablenet-shutdown-2026-10-14/committed-binding-proof.json",
+    "completion_record": "system/eval/stablenet-shutdown-2026-10-14/completion.json",
+    "late_artifact_sha256": {
+      "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md": "808906539c3e0328ad3c1c428c386de8b71200f3a81c7461a87eaa75e1d934a0",
+      "docs/spec-driven/CURRENT-HANDOFF.md": "92d06e2a7ba4bd4359a5b83e998c35da4dce552b3d2c2fb031de18fce06637f4",
+      "docs/REMAINING-WORK.md": "6d7df1198d8e9283cf9a7d66d2fdb28f5e4ec70bfd5dda01c3d22fe5341079e6",
+      "docs/spec-driven/EVALUATION-STATUS.md": "c0c383c6f2df3f39a0b598268f011a967eae7d12decc14dea5a557c7d9f7a806",
+      "system/eval/stablenet-shutdown-2026-10-14/committed-binding-proof.json": "5ce1fad54375e5f3ee57bcc68967bb051852c458fda00aa61851cb585ea2a669",
+      "system/eval/stablenet-shutdown-2026-10-14/progress-check.txt": "b5472a21606eb1b05d8742e66d01343d6917576e2660b8800195b16bce04be7c",
+      "system/eval/stablenet-shutdown-2026-10-14/completion.json": "4e852150a3848dd861811d3cd87b79648d5d3e3e8147705a34c6e281698eeaad"
+    }
+  },
+  "previous_source_binding_before_shutdown_repair": {
+    "revision": "3fa62e15deabe3b2ee6ac2376842a88e6a32c707",
+    "manifest": "system/eval/stablenet-corpus-repair-2026-10-14/manifest.json"
   }
 }

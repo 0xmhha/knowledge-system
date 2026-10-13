@@ -1,0 +1,18 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,importlib.util,yaml
+root=Path.cwd();packet=root/'system/eval/stablenet-corpus-repair-2026-10-14';run=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014')
+p=json.loads((run/'protocol.json').read_text());version=Path(p['candidate_dataset'])/p['candidate_version'];directory=run/'stage1-smoke';directory.mkdir(exist_ok=False)
+requests=json.loads((run/'requests.json').read_text());requests['requests']=[r for r in requests['requests']if r['id']=='ANCHOR-01'];assert len(requests['requests'])==1
+(directory/'requests.json').write_text(json.dumps(requests,ensure_ascii=False,indent=2)+'\n')
+config=yaml.safe_load((version.parent.parent/'go-stablenet-retained-corpus-20261014-cks-stdio.yaml').read_text());config.setdefault('logging',{}).update(footprint_dir=str(directory/'events'),measure_backend_calls=True,mode='prod',level='info');(directory/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
+argv=[str(run/'bin/cks'),'eval','capture','--requests',str(directory/'requests.json'),'--config',str(directory/'config.yaml'),'--cks-mcp',str(run/'bin/cks'),'--output',str(directory/'response.json'),'--warmup','0','--retrieval-runs','1','--warm-runs','0','--cold-runs','0','--call-timeout','90s']
+r=subprocess.run(argv,capture_output=True,text=True,timeout=300)
+receipt={'argv':argv,'exit':r.returncode,'stdout':r.stdout,'stderr':r.stderr};(packet/'stage1-smoke-command.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');assert r.returncode==0,r.stderr
+capture=json.loads((directory/'response.json').read_text());assert len(capture['rows'])==1
+response=capture['rows'][0]['call']['response'];assert not response.get('isError');pack=response['structuredContent']
+spec=importlib.util.spec_from_file_location('comparison',root/'projects/stablenet/eval/dataset-comparison/run.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.verify_pack(pack,version)
+assert any(c['origin_id']=='docs:corpus.0'and c['file']=='entries/A1.wbft_core.message_handlers.md'for c in pack['citations']),pack['citations']
+(packet/'stage1-smoke-response.json').write_bytes((directory/'response.json').read_bytes())
+proof={'checked_at':datetime.now(timezone.utc).isoformat(),'request':'ANCHOR-01','exit':r.returncode,'old_error':'source_missing','candidate_error':None,'verified_v2_pack':True,'cited_origins':sorted(set(c['origin_id']for c in pack['citations'])),'citations':len(pack['citations']),'evidence_state':pack['evidence_state'],'domain_document_verified_from_retained_archive':True}
+(packet/'stage1-smoke-verification.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))

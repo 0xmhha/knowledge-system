@@ -7,6 +7,7 @@ These entry points describe the current repository. Source files, registered too
 | Use an extracted host package | [package installation](./INSTALLATION.md) |
 | Install and build a dataset | [repository quick start](../README.md), [guided setup](../tools/setup/README.md), [setup reference](../system/docs/SETUP.md) |
 | Understand architecture and purpose | [architecture](./ARCHITECTURE.md), [purpose and scope](./spec-driven/PURPOSE-AND-SCOPE.md), [graph purpose](./graph/VISION.md) |
+| Follow the active dataset comparison | [go-stablenet dataset comparison](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md) |
 | Find all remaining work | [remaining work](./REMAINING-WORK.md) |
 | Resume development and verify completion | [current handoff](./spec-driven/CURRENT-HANDOFF.md), [execution specification](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [progress ledger](./spec-driven/REFACTORING-PROGRESS.json) |
 | Query code and meaning over MCP | [system](../system/README.md), [ontology](../system/docs/ontology-mcp.md), [tool mapping](../system/docs/coding-agent-mcp-mapping.md) |

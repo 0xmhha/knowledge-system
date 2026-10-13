@@ -27,13 +27,13 @@ func testCleaner(t *testing.T) *sanitize.Engine {
 	return cleaner
 }
 
-func testVersion(t *testing.T, content string) (string, string) {
+func testVersion(t *testing.T, content string, origins ...setup.CaptureOrigin) (string, string) {
 	t.Helper()
 	root, version := t.TempDir(), t.TempDir()
 	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: version, ProjectID: "p", SourceMode: "snapshot-only"})
+	captured, err := setup.CaptureSource(setup.CaptureOptions{Root: root, Out: version, ProjectID: "p", SourceMode: "snapshot-only", ExternalOrigins: origins})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,5 +151,48 @@ func TestV2IntegrityMatchesIndependentJSGolden(t *testing.T) {
 	}
 	if want := "d725ea84b43532b833751a95b41a09fbf954982aeb2abe6840f89a81c25817b4"; pack.Metadata.IntegrityHash != want {
 		t.Fatalf("v2 JCS golden changed: %s, want %s", pack.Metadata.IntegrityHash, want)
+	}
+}
+
+func TestBuildRetainedCorpusKeepsSamePathDistinctAndRejectsTampering(t *testing.T) {
+	docs := t.TempDir()
+	if err := os.WriteFile(filepath.Join(docs, "README.md"), []byte("archived corpus\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	_, version := testVersion(t, "repository body\n", setup.CaptureOrigin{ID: "docs:corpus.0", Root: docs})
+	// A changed live corpus must never enter v2 evidence.
+	if err := os.WriteFile(filepath.Join(docs, "README.md"), []byte("live replacement\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	refs := []contract.Citation{{File: "README.md", StartLine: 1, EndLine: 1}, {File: "@cks/docs/0/README.md", StartLine: 1, EndLine: 1}}
+	pack, err := Build(context.Background(), version, "why", refs, testCleaner(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pack.Bodies) != 2 || pack.Bodies[0].Text != "repository body\n" || pack.Bodies[1].Text != "archived corpus\n" || pack.Citations[1].OriginID != "docs:corpus.0" || pack.Citations[1].File != "README.md" || Verify(pack) != nil {
+		t.Fatalf("wrong corpus evidence: %+v", pack)
+	}
+	mounted, cleanup, err := setup.MaterializeRetainedReadTree(version)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+	buf, err := os.ReadFile(filepath.Join(mounted, "@cks/docs/0/README.md"))
+	if err != nil || string(buf) != "archived corpus\n" {
+		t.Fatalf("incorrect mounted corpus: %q %v", buf, err)
+	}
+	for _, file := range []string{"@cks/docs/1/README.md", "@cks/docs/0/../README.md"} {
+		if _, err := Build(context.Background(), version, "why", []contract.Citation{{File: file, StartLine: 1, EndLine: 1}}, testCleaner(t)); err == nil {
+			t.Fatalf("invalid/absent origin accepted: %s", file)
+		}
+	}
+	if err := os.Chmod(filepath.Join(version, "sources/blobs", pack.Citations[1].FileSHA256), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(version, "sources/blobs", pack.Citations[1].FileSHA256), []byte("tampered archive\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Build(context.Background(), version, "why", refs, testCleaner(t)); err == nil {
+		t.Fatal("tampered archived corpus accepted")
 	}
 }

@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,collections,statistics,math
+run=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014');out=run/'capture'
+p95=lambda values:sorted(values)[max(0,math.ceil(len(values)*.95)-1)]if values else None
+rows=[];byarm={};paired={};sessions=[]
+for arm in ['baseline','candidate']:
+ failures=collections.Counter();failedids=collections.Counter();warm=collections.defaultdict(list);scopes=0;pending=0;cost=collections.Counter();seen=[]
+ for block in [1,2]:
+  directory=out/str(block)/arm;cap=json.loads((directory/'capture.json').read_text());sessions.append({'arm':arm,'block':block,'state':cap['state'],'exit':json.loads((directory/'command.json').read_text())['exit'],'errors':cap.get('errors',[])})
+  expected={r['call']['measurement_id']for r in cap['rows']}
+  for row in cap['rows']:
+   row['arm']=arm;row['block']=block;rows.append(row);call=row['call'];response=call.get('response')or{};bad=bool(row.get('error')or call.get('transport_error')or response.get('isError'))
+   if bad:
+    failures[(response.get('structuredContent')or{}).get('code')or row.get('error')or call.get('transport_error')or'unknown']+=1;failedids[row['request_id']]+=1
+   if row['phase']=='warm_latency':
+    ms=call['elapsed_ns']/1e6
+    if not bad:warm[row['request_id']].append(ms)
+    paired.setdefault((block,row['request_id'],row['phase'],row['iteration']),{})[arm]=None if bad else ms
+  for line in (directory/'events/cks-mcp.jsonl').read_text().splitlines():
+   event=json.loads(line)
+   if event.get('event')!='measurement.backend_calls':continue
+   summary=event['summary']
+   if summary['measurement_id']not in expected:continue
+   scopes+=1;pending+=summary.get('pending_calls',0);seen.append(summary['measurement_id'])
+   for call in summary.get('calls',[]):
+    if call.get('backend')=='ollama_http':cost[call.get('options',{}).get('path','unknown')]+=1
+ assert scopes==756 and len(set(seen))==756 and pending==0
+ byarm[arm]={'observed':sum(r['arm']==arm for r in rows),'failure_codes':dict(failures),'failed_by_question':dict(failedids),'successful_warm_by_question':{q:{'n':len(v),'p95_ms':p95(v),'median_ms':statistics.median(v)}for q,v in warm.items()},'matched_request_scopes':scopes,'pending_calls':pending,'HTTP_attempts':dict(cost)}
+common=[arms for arms in paired.values()if arms.get('baseline')is not None and arms.get('candidate')is not None]
+paired_metrics={arm:{'n':len(common),'p95_ms':p95([r[arm]for r in common]),'median_ms':statistics.median(r[arm]for r in common)}for arm in ['baseline','candidate']}
+resolved=sorted(q for q in byarm['baseline']['failed_by_question']if q not in byarm['candidate']['failed_by_question'])
+summary=json.loads((out/'summary.json').read_text());assert not any(s['invalid_packs']for s in summary['arms'].values())
+result={'capture_sessions':sessions,'session_close_errors':[{'arm':s['arm'],'block':s['block'],'error':e}for s in sessions for e in s['errors']if e.startswith('close ')],'arms':byarm,'paired_successful_warm':paired_metrics,'resolved_error_question_ids':resolved,'regressed_error_question_ids':sorted(set(byarm['candidate']['failed_by_question'])-set(byarm['baseline']['failed_by_question'])),'cost_excludes_unmatched_and_startup_scopes':True,'paired_success_latency_population_only':True,'new_all_question_latency_not_directly_ratioed_against_old22_successful_questions':True,'generated_answers_scored':False,'independent_quality_accepted':False}
+(run/'matched-request-summary.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'errors':{a:s['failure_codes']for a,s in byarm.items()},'resolved_questions':len(resolved),'paired_successful_warm':paired_metrics}))

@@ -1,0 +1,213 @@
+{
+  "finished_at": "2026-10-13T15:33:39.691771+00:00",
+  "scope": "real same-source dataset rebuild and engineering comparison; errors retained, no independent generated-answer quality verdict",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "candidate_dataset": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-comparison-20261013",
+  "candidate_version": "v20261013-main-cd5c35d6-0bf2f4d1",
+  "model": {
+    "provider": "ollama",
+    "model": "bge-m3:latest",
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "runtime_context_tokens": 8192,
+    "runtime_batch_tokens": 8192
+  },
+  "responses": 1512,
+  "baseline": {
+    "observed": 756,
+    "failed": 360,
+    "failure_rate": 0.47619047619047616,
+    "failure_codes": {
+      "source_missing": 360
+    },
+    "valid_packs": 396,
+    "successful_warm_n": 220,
+    "successful_warm_p95_ms": 1238.934459,
+    "expected_signature_hit_at_10": 0.5,
+    "expected_signature_RR_at_10": 0.3888888888888889,
+    "request_HTTP_attempts": {
+      "/api/tags": 6276,
+      "/api/embed": 3138
+    }
+  },
+  "candidate": {
+    "observed": 756,
+    "failed": 360,
+    "failure_rate": 0.47619047619047616,
+    "failure_codes": {
+      "source_missing": 360
+    },
+    "valid_packs": 396,
+    "successful_warm_n": 220,
+    "successful_warm_p95_ms": 1191.89425,
+    "expected_signature_hit_at_10": 0.5,
+    "expected_signature_RR_at_10": 0.3888888888888889,
+    "request_HTTP_attempts": {
+      "/api/tags": 6272,
+      "/api/embed": 3136
+    }
+  },
+  "both_valid_pairs": 396,
+  "citation_order_changed_pairs": 0,
+  "body_outputs_changed_pairs": 0,
+  "successful_warm_p95_ratio": 0.9620317211630643,
+  "per_question_successful_p95_ratio_range": [
+    0.7664333473798703,
+    1.9369690153930272
+  ],
+  "structural_comparison_all_rows_equal": true,
+  "keyword_comparison": [
+    {
+      "dataset": "go-stablenet",
+      "exit": 1,
+      "fixtures": 8,
+      "passed": 7,
+      "failed": 1,
+      "aggregate": {
+        "recall": 1,
+        "precision": 0.7352941176470589,
+        "f1": 0.8474576271186441
+      },
+      "failed_ids": [
+        "SNK06-and-mint-allowance"
+      ]
+    },
+    {
+      "dataset": "go-stablenet-refinputs",
+      "exit": 1,
+      "fixtures": 8,
+      "passed": 7,
+      "failed": 1,
+      "aggregate": {
+        "recall": 1,
+        "precision": 0.7352941176470589,
+        "f1": 0.8474576271186441
+      },
+      "failed_ids": [
+        "SNK06-and-mint-allowance"
+      ]
+    },
+    {
+      "dataset": "go-stablenet@0bf2f4d1b",
+      "exit": 1,
+      "fixtures": 8,
+      "passed": 7,
+      "failed": 1,
+      "aggregate": {
+        "recall": 1,
+        "precision": 0.7352941176470589,
+        "f1": 0.8474576271186441
+      },
+      "failed_ids": [
+        "SNK06-and-mint-allowance"
+      ]
+    },
+    {
+      "dataset": "candidate",
+      "exit": 1,
+      "fixtures": 8,
+      "passed": 7,
+      "failed": 1,
+      "aggregate": {
+        "recall": 1,
+        "precision": 0.7352941176470589,
+        "f1": 0.8474576271186441
+      },
+      "failed_ids": [
+        "SNK06-and-mint-allowance"
+      ]
+    }
+  ],
+  "candidate_verification": {
+    "doctor_command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/bin/cks",
+      "doctor",
+      "--src",
+      "/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet",
+      "--dataset",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-comparison-20261013",
+      "--strict"
+    ],
+    "doctor_exit": 0,
+    "stdout": "{\n  \"project_id\": \"p-3fa6368dd3f6757c6b6a86121f0a9b7d\",\n  \"snapshot_id\": \"24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a\",\n  \"dataset_id\": \"f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9\",\n  \"source_mode\": \"committed\",\n  \"history_status\": \"available\",\n  \"identity_status\": \"pinned\",\n  \"source_root\": \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\",\n  \"commit\": \"0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8\",\n  \"indexed_commit\": \"0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8\",\n  \"dirty\": false,\n  \"languages\": {\n    \"go\": 1287,\n    \"javascript\": 39,\n    \"markdown\": 58,\n    \"solidity\": 24\n  },\n  \"shared_code_files\": 1350,\n  \"graph_only_proto\": 4,\n  \"symlinks_skipped\": 0,\n  \"unreadable_files\": 0,\n  \"secret_path_count\": 0,\n  \"ignored_indexable\": 0,\n  \"dataset_version\": \"v20261013-main-cd5c35d6-0bf2f4d1\",\n  \"issues\": [],\n  \"status\": \"ready\"\n}\n",
+    "stderr": "",
+    "canonical_symbol_count": 18837,
+    "canonical_bound_symbol_count": 18691,
+    "canonical_ratio": 0.9922492965971227,
+    "canonical_threshold_gate_was_disabled": true,
+    "vector_DB_SHA_matches_manifest": true,
+    "graph_vector_same_dataset": true,
+    "graph_vector_same_snapshot": true,
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "model_digest_matched_protocol": true,
+    "go_scope_gap": [],
+    "embedding_required_complete": true,
+    "identity": {
+      "source": {
+        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+        "source_mode": "committed",
+        "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "file_manifest_digest": "853fcfba3fbcbda87da642fbe08a756be91f07490b804be1537530e2d264452f",
+        "capture_policy_digest": "ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74",
+        "git_recovery_digest": "b298b65c462f68057727d6d5a15d87eb1f979f591f8d434e8e90c0fd1d9e582d",
+        "git_archive_policy": "bundle-selected-recovery-refs-v1",
+        "file_mode_policy": "executable-bit-v1",
+        "gitlink_digest": "fffb6b23b7ed5934b00adb8fd3c6987013f82031c765678c747201c86ba56659",
+        "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a"
+      },
+      "embedding_identity": {
+        "Dim": 1024,
+        "Model": "bge-m3:latest",
+        "Normalize": "",
+        "Pooling": "",
+        "Provider": "ollama",
+        "chunk_budget_bytes": 6144,
+        "dimension_method": "mrl-prefix-l2:v1",
+        "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+        "native_dim": 1024,
+        "passage_transform": "raw:v1",
+        "query_transform": "raw:v1",
+        "runtime_batch_tokens": 8192,
+        "runtime_context_tokens": 8192,
+        "truncate_policy": "reject:v1",
+        "version": 2
+      },
+      "input_digest": "840de09527dd8206a7a02780a5fcbd85879dfbd24670e36b7590c70de9ac1f09",
+      "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9"
+    },
+    "build_warnings": [
+      "canonical threshold gate disabled; ratio verified directly but not relabelled as threshold gate acceptance"
+    ]
+  },
+  "source_missing_representative_diagnostic": {
+    "legacy_body_refs_absent_from_retained_repo": [
+      {
+        "file": "entries/A1.wbft_core.message_handlers.md",
+        "start_line": 1,
+        "end_line": 12,
+        "in_retained_repo_manifest": false
+      },
+      {
+        "file": "entries/A1.wbft_core.message_handlers.md",
+        "start_line": 20,
+        "end_line": 24,
+        "in_retained_repo_manifest": false
+      }
+    ],
+    "same_query_refinputs_v2_success": true,
+    "refinputs_v2_citations": 11,
+    "finding": "generated domain-corpus entries used by legacy composer are outside retained repo source lookup; v2 build refuses these references and returns source_missing",
+    "scope_limit": "representative prepare-handler probe; not every failed prompt traced independently"
+  },
+  "all_original_baseline_DB_SHA_current_and_source_HEAD_preserved": true,
+  "new_existing_operator_dataset_activation": false,
+  "run_notes": [
+    "new current pointer belongs only to the separate comparison dataset root",
+    "diagnostic used the first baseline logging directory after scored captures; final request-cost counters match exact scored measurement IDs and exclude diagnostics/startup",
+    "canonical ratio directly verified; disabled threshold gate not relabelled as passed",
+    "30 reused prompts and12 mechanical signature anchors; no generated answer scoring or independent quality approval",
+    "timing successful responses only:220/420 warm samples per arm;420 total include failures",
+    "two alternating arm blocks, same warm model/shared host,10 timing samples per question; performance observations not acceptance"
+  ],
+  "next_work": "retain both datasets; first fix generated-domain citation provenance in v2 serving, then repeat the same42 question comparison"
+}

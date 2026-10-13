@@ -3,6 +3,7 @@ package setup
 import (
 	"database/sql"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"path/filepath"
 	"strings"
 
@@ -20,7 +21,9 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 		return fmt.Errorf("engine input reconciliation requires pinned source mode")
 	}
 	files := make(map[string]string, len(captured.Files))
+	origins := make(map[string]string, len(captured.Files))
 	for _, f := range captured.Files {
+		origins[f.OriginID+"/"+f.Path] = f.SHA256
 		if f.OriginID == "repo" {
 			files[f.Path] = f.SHA256
 		}
@@ -51,11 +54,11 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 	}
 	vectorFiles := make(map[string]string, len(vector.InputFiles))
 	for _, f := range vector.InputFiles {
-		if f.OriginID != "repo" || f.Path == "" || files[f.Path] == "" ||
-			files[f.Path] != f.SHA256 || vectorFiles[f.Path] != "" {
+		key := f.OriginID + "/" + f.Path
+		if f.Path == "" || origins[key] == "" || origins[key] != f.SHA256 || vectorFiles[key] != "" {
 			return fmt.Errorf("reconcile vector input %q differs from retained source", f.Path)
 		}
-		vectorFiles[f.Path] = f.SHA256
+		vectorFiles[key] = f.SHA256
 	}
 	dbPath := filepath.Join(versionDir, "vector", "vector.db")
 	db, err := sql.Open("sqlite3", "file:"+dbPath+"?mode=ro")
@@ -64,7 +67,7 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 	}
 	defer func() { _ = db.Close() }()
 	rows, err := db.Query(`SELECT DISTINCT file FROM chunks
-		WHERE commit_hash = ? AND chunk_kind IN ('symbol','function_split','file_header','doc')`,
+		WHERE commit_hash = ? AND file NOT LIKE '@cks/%' AND chunk_kind IN ('symbol','function_split','file_header','doc')`,
 		captured.Identity.SourceCommit)
 	if err != nil {
 		return fmt.Errorf("reconcile vector source files: %w", err)
@@ -76,9 +79,30 @@ func VerifyEngineInputs(versionDir string, captured CapturedSource) error {
 			return err
 		}
 		if path == "" || filepath.IsAbs(path) || filepath.ToSlash(filepath.Clean(path)) != path ||
-			path == ".." || strings.HasPrefix(path, "../") || vectorFiles[path] == "" {
+			path == ".." || strings.HasPrefix(path, "../") || vectorFiles["repo/"+path] == "" {
 			return fmt.Errorf("reconcile vector input %q is absent from retained source", path)
 		}
 	}
-	return rows.Err()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if err := rows.Close(); err != nil {
+		return err
+	}
+	external, err := db.Query(`SELECT DISTINCT file FROM chunks WHERE file LIKE '@cks/%'`)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = external.Close() }()
+	for external.Next() {
+		var file string
+		if err := external.Scan(&file); err != nil {
+			return err
+		}
+		index, relative, reserved, valid := sourcepath.Parse(file)
+		if !reserved || !valid || vectorFiles[sourcepath.Origin(index)+"/"+relative] == "" {
+			return fmt.Errorf("uncaptured vector corpus input %q", file)
+		}
+	}
+	return external.Err()
 }

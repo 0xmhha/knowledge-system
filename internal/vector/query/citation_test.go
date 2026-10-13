@@ -220,3 +220,27 @@ func TestEnforceCitations_SyntheticExempt(t *testing.T) {
 		}
 	}
 }
+
+func TestNamespacedCorpusUsesOnlyRegisteredRoot(t *testing.T) {
+	root, docs := t.TempDir(), t.TempDir()
+	for _, dir := range []string{root, docs} {
+		if err := os.WriteFile(filepath.Join(dir, "same.md"), []byte("line\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := types.Chunk{File: "@cks/docs/0/same.md", StartLine: 1, EndLine: 1, ChunkKind: types.ChunkDoc}
+	if !verifyCitation(root, c, []string{docs}) || resolveExisting(root, c.File, []string{docs}) != filepath.Join(docs, "same.md") {
+		t.Fatal("corpus did not resolve to registered root")
+	}
+	for _, file := range []string{"@cks/docs/1/same.md", "@cks/docs/0/../same.md"} {
+		c.File = file
+		if verifyCitation(root, c, []string{docs}) {
+			t.Fatalf("invalid corpus accepted: %s", file)
+		}
+	}
+	c.File = "@cks/docs/0/same.md"
+	c.ChunkKind = types.ChunkFlowSpine
+	if verifyCitation(root, c, nil) {
+		t.Fatal("missing namespaced flow corpus bypassed verification")
+	}
+}

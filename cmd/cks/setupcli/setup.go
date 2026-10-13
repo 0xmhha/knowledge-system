@@ -405,6 +405,9 @@ func runSetup(args []string) (result error) {
 			return err
 		}
 		if o.ProjectID != "" {
+			if err := setup.PrepareRetainedCorpora(ctx, &o, setup.SubprocessRunner{}, emit); err != nil {
+				return err
+			}
 			preBuildSnapshot, err = setup.SnapshotSourceIdentityWithLimits(ctx, o.Src, o.ProjectID, *sourceMode, preBuildCommit, o.CaptureLimits(), o.ExternalOrigins...)
 			if err != nil {
 				return err

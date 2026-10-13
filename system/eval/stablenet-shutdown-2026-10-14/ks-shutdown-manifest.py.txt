@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+root=Path.cwd();packet=root/'system/eval/stablenet-shutdown-2026-10-14';old=json.loads((root/'system/eval/stablenet-corpus-repair-2026-10-14/manifest.json').read_text());sha=lambda p:hashlib.file_digest(Path(p).open('rb'),'sha256').hexdigest()
+proof=json.loads((packet/'verification.json').read_text());assert proof['state']=='verified'and proof['responses']==756 and proof['close_errors']==0
+sources={p:sha(root/p)for p in old['source_sha256']}
+inventory=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()
+sources.update({p:sha(root/p)for p in inventory if p.startswith(('cmd/','internal/','pkg/'))})
+reports={p:sha(root/p)for p in old['reports_sha256']};approved={p:sha(root/p)for p in old['approved_input_sha256']};assert approved==old['approved_input_sha256']
+changed=subprocess.check_output(['git','diff','--name-only','173fd9c5','--','cmd','internal','pkg'],text=True).splitlines();changed_sources={p:sha(root/p)for p in changed if(root/p).is_file()};changed_sources.update({p:h for p,h in sources.items()if p not in old['source_sha256']})
+shutil.copy2('/private/tmp/ks-shutdown-manifest.py',packet/'ks-shutdown-manifest.py.txt')
+evidence={str(p.relative_to(packet)):sha(p)for p in packet.rglob('*')if p.is_file()and p.name not in ['manifest.json','committed-binding-proof.json','progress-check.txt','completion.json']}
+manifest={'schema_version':1,'status':'server_shutdown_verified_pending_committed_binding','verification':{'actual_dataset':'verification.json','checks':'checks.json','original_two_close_failures_preserved':True,'source_tests_and_dataset_queries_and_shutdown_separately_verified':True,'committed_source_binding':'pending material commit verification'},'source_sha256':dict(sorted(sources.items())),'approved_input_sha256':approved,'changed_source_sha256':dict(sorted(changed_sources.items())),'reports_sha256':reports,'evidence_sha256':dict(sorted(evidence.items()))}
+(packet/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');print('Prepared material binding:',len(sources),'sources,',len(evidence),'evidence files')

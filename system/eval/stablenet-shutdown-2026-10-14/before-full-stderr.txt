@@ -1,0 +1,421 @@
+SIGQUIT: quit
+PC=0x185b5750c m=0 sigcode=0
+
+goroutine 0 gp=0x103e7e840 m=0 mp=0x103e7fa80 [idle]:
+runtime.pthread_cond_wait(0x103e7ffe8, 0x103e7ffa8)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/sys_darwin.go:488 +0x20 fp=0x16d1a56c0 sp=0x16d1a5690 pc=0x102cc0bd0
+runtime.semasleep(0xffffffffffffffff)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/os_darwin.go:77 +0x80 fp=0x16d1a5720 sp=0x16d1a56c0 pc=0x102c9bde0
+runtime.notesleep(0x103e7fbd8)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/lock_sema.go:62 +0xac fp=0x16d1a5750 sp=0x16d1a5720 pc=0x102c7246c
+runtime.mPark(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:1967
+runtime.stoplockedm()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:3263 +0x64 fp=0x16d1a57b0 sp=0x16d1a5750 pc=0x102ca6e84
+runtime.schedule()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:4143 +0x34 fp=0x16d1a57f0 sp=0x16d1a57b0 pc=0x102ca9764
+runtime.park_m(0x5e35a9484960)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:4304 +0x244 fp=0x16d1a5850 sp=0x16d1a57f0 pc=0x102ca9c44
+runtime.mcall()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:339 +0x54 fp=0x16d1a5860 sp=0x16d1a5850 pc=0x102cda6e4
+
+goroutine 1 gp=0x5e35a8fda1e0 m=12 mp=0x5e35a9501808 [syscall]:
+syscall.syscalln(0x102d1b310, {0x5e35a902eb70, 0x3, 0x3})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/sys_darwin.go:38 +0x20 fp=0x5e35a902eb40 sp=0x5e35a902eaf0 pc=0x102cd8bf0
+syscall.syscall(0x5e35aa0241b0?, 0x8?, 0x103cada60?, 0x5e35a9eb6ea0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/syscall/syscall_darwin.go:384 +0x24 fp=0x5e35a902eb90 sp=0x5e35a902eb40 pc=0x102d1a344
+syscall.unlinkat(0xd, {0x5e35aa0241b0?, 0x0?}, 0x0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/syscall/zsyscall_darwin_arm64.go:1842 +0x74 fp=0x5e35a902ebe0 sp=0x5e35a902eb90 pc=0x102d1ab64
+internal/syscall/unix.Unlinkat(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/internal/syscall/unix/at_libc2.go:15
+os.removeAllFrom.removefileat.func1(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/root_unix.go:238
+os.ignoringEINTR(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/file_posix.go:263
+os.removefileat(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/root_unix.go:237
+os.removeAllFrom(0xd, {0x5e35aa0241b0, 0x8})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/removeall_at.go:68 +0x50 fp=0x5e35a902ecd0 sp=0x5e35a902ebe0 pc=0x102d3d810
+os.removeAllFrom(0xb, {0x5e35a9f7fe30, 0x6})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/removeall_at.go:123 +0x300 fp=0x5e35a902edc0 sp=0x5e35a902ecd0 pc=0x102d3dac0
+os.removeAllFrom(0x8, {0x5e35ac31fc1a, 0x6})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/removeall_at.go:123 +0x300 fp=0x5e35a902eeb0 sp=0x5e35a902edc0 pc=0x102d3dac0
+os.removeAllFrom(0x5, {0x5e35a97ba941, 0x1f})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/removeall_at.go:123 +0x300 fp=0x5e35a902efa0 sp=0x5e35a902eeb0 pc=0x102d3dac0
+os.removeAll({0x5e35a97ba910, 0x50})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/removeall_at.go:56 +0x1bc fp=0x5e35a902f060 sp=0x5e35a902efa0 pc=0x102d3d65c
+os.RemoveAll(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/path.go:74
+github.com/0xmhha/knowledge-system/internal/setup.MaterializeRetainedReadTreeContext.func1()
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/setup/source_mount.go:49 +0x20 fp=0x5e35a902f080 sp=0x5e35a902f060 pc=0x103282700
+runtime.deferreturn()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:668 +0x60 fp=0x5e35a902f110 sp=0x5e35a902f080 pc=0x102c9d2f0
+github.com/0xmhha/knowledge-system/cmd/cks/mcpcli.run({0x103db5d98, 0x5e35a95da380}, {0x16d1a6338?, 0x2?}, {0x0, 0x0}, {0x0, 0x0}, {0x0, 0x0})
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/mcpcli/serve.go:340 +0x1198 fp=0x5e35a902fae0 sp=0x5e35a902f110 pc=0x103397e38
+github.com/0xmhha/knowledge-system/cmd/cks/mcpcli.NewCmd.func1(0x5e35a9140c00?, {0x5e35a9142700?, 0x4?, 0x103534f36?})
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/mcpcli/serve.go:101 +0x158 fp=0x5e35a902fb80 sp=0x5e35a902fae0 pc=0x103396c58
+github.com/spf13/cobra.(*Command).execute(0x5e35a946ac08, {0x5e35a91426c0, 0x2, 0x2})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1015 +0x814 fp=0x5e35a902fd30 sp=0x5e35a902fb80 pc=0x102de7504
+github.com/spf13/cobra.(*Command).ExecuteC(0x5e35a946a908)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1148 +0x350 fp=0x5e35a902fe20 sp=0x5e35a902fd30 pc=0x102de7b20
+github.com/spf13/cobra.(*Command).Execute(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1071
+main.main()
+	/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/cmd/cks/main.go:69 +0x2e0 fp=0x5e35a902ff30 sp=0x5e35a902fe20 pc=0x1033c4580
+runtime.main()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:290 +0x2b4 fp=0x5e35a902ffd0 sp=0x5e35a902ff30 pc=0x102ca18a4
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a902ffd0 sp=0x5e35a902ffd0 pc=0x102cdc8f4
+
+goroutine 2 gp=0x5e35a8fdad20 m=nil [force gc (idle), 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9064f90 sp=0x5e35a9064f70 pc=0x102cd4f5c
+runtime.goparkunlock(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:468
+runtime.forcegchelper()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:375 +0xb4 fp=0x5e35a9064fd0 sp=0x5e35a9064f90 pc=0x102ca1bc4
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9064fd0 sp=0x5e35a9064fd0 pc=0x102cdc8f4
+created by runtime.init.7 in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:363 +0x24
+
+goroutine 18 gp=0x5e35a909c3c0 m=nil [GC sweep wait]:
+runtime.gopark(0x103e7cd01?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9060770 sp=0x5e35a9060750 pc=0x102cd4f5c
+runtime.goparkunlock(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:468
+runtime.bgsweep(0x5e35a90aa000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgcsweep.go:324 +0x178 fp=0x5e35a90607b0 sp=0x5e35a9060770 pc=0x102c8c8b8
+runtime.gcenable.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:214 +0x20 fp=0x5e35a90607d0 sp=0x5e35a90607b0 pc=0x102c7dcd0
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90607d0 sp=0x5e35a90607d0 pc=0x102cdc8f4
+created by runtime.gcenable in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:214 +0x6c
+
+goroutine 19 gp=0x5e35a909c5a0 m=nil [GC scavenge wait]:
+runtime.gopark(0x10000?, 0x6c139?, 0x0?, 0x0?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9060f60 sp=0x5e35a9060f40 pc=0x102cd4f5c
+runtime.goparkunlock(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:468
+runtime.(*scavengerState).park(0x103e7df80)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgcscavenge.go:425 +0x5c fp=0x5e35a9060f90 sp=0x5e35a9060f60 pc=0x102c8a3cc
+runtime.bgscavenge(0x5e35a90aa000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgcscavenge.go:658 +0xac fp=0x5e35a9060fb0 sp=0x5e35a9060f90 pc=0x102c8a96c
+runtime.gcenable.gowrap2()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:215 +0x20 fp=0x5e35a9060fd0 sp=0x5e35a9060fb0 pc=0x102c7dc90
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9060fd0 sp=0x5e35a9060fd0 pc=0x102cdc8f4
+created by runtime.gcenable in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:215 +0xac
+
+goroutine 3 gp=0x5e35a8fdb680 m=nil [GOMAXPROCS updater (idle), 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9065770 sp=0x5e35a9065750 pc=0x102cd4f5c
+runtime.goparkunlock(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:468
+runtime.updateMaxProcsGoroutine()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:7095 +0xf4 fp=0x5e35a90657d0 sp=0x5e35a9065770 pc=0x102cb0374
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90657d0 sp=0x5e35a90657d0 pc=0x102cdc8f4
+created by runtime.defaultGOMAXPROCSUpdateEnable in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:7083 +0x48
+
+goroutine 4 gp=0x5e35a8fdbc20 m=nil [finalizer wait, 6 minutes]:
+runtime.gopark(0x5e35a90645c8?, 0x102ce09cc?, 0xc8?, 0x45?, 0x102fae864?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9064580 sp=0x5e35a9064560 pc=0x102cd4f5c
+runtime.runFinalizers()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mfinal.go:210 +0x100 fp=0x5e35a90647d0 sp=0x5e35a9064580 pc=0x102c7ccf0
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90647d0 sp=0x5e35a90647d0 pc=0x102cdc8f4
+created by runtime.createfing in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mfinal.go:172 +0x78
+
+goroutine 20 gp=0x5e35a909c780 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c0bdb3270?, 0x3?, 0xf6?, 0x62?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9061720 sp=0x5e35a9061700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a90617b0 sp=0x5e35a9061720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a90617d0 sp=0x5e35a90617b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90617d0 sp=0x5e35a90617d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 34 gp=0x5e35a9484000 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c08715574?, 0x1?, 0x57?, 0x32?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a948a720 sp=0x5e35a948a700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a948a7b0 sp=0x5e35a948a720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a948a7d0 sp=0x5e35a948a7b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a948a7d0 sp=0x5e35a948a7d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 5 gp=0x5e35a913e000 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c37b3fd50?, 0x1?, 0x26?, 0x86?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9065f20 sp=0x5e35a9065f00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a9065fb0 sp=0x5e35a9065f20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a9065fd0 sp=0x5e35a9065fb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9065fd0 sp=0x5e35a9065fd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 35 gp=0x5e35a94841e0 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c37b40426?, 0x1?, 0x49?, 0xbb?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a948af20 sp=0x5e35a948af00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a948afb0 sp=0x5e35a948af20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a948afd0 sp=0x5e35a948afb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a948afd0 sp=0x5e35a948afd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 21 gp=0x5e35a909c960 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c37ab3280?, 0x3?, 0x57?, 0x11?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9061f20 sp=0x5e35a9061f00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a9061fb0 sp=0x5e35a9061f20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a9061fd0 sp=0x5e35a9061fb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9061fd0 sp=0x5e35a9061fd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 6 gp=0x5e35a913e1e0 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c673d9b3d48?, 0x1?, 0x71?, 0x81?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9066720 sp=0x5e35a9066700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a90667b0 sp=0x5e35a9066720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a90667d0 sp=0x5e35a90667b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90667d0 sp=0x5e35a90667d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 7 gp=0x5e35a913e3c0 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c36c07784?, 0x3?, 0x5?, 0x98?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9074f20 sp=0x5e35a9074f00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a9074fb0 sp=0x5e35a9074f20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a9074fd0 sp=0x5e35a9074fb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9074fd0 sp=0x5e35a9074fd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 36 gp=0x5e35a94843c0 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c0bdb3c88?, 0x1?, 0x5e?, 0x71?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a948b720 sp=0x5e35a948b700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a948b7b0 sp=0x5e35a948b720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a948b7d0 sp=0x5e35a948b7b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a948b7d0 sp=0x5e35a948b7d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 8 gp=0x5e35a913e5a0 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c37b3ec8d?, 0x1?, 0x9a?, 0x8d?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9067720 sp=0x5e35a9067700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a90677b0 sp=0x5e35a9067720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a90677d0 sp=0x5e35a90677b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90677d0 sp=0x5e35a90677d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 9 gp=0x5e35a913e780 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c0bdb2fff?, 0x3?, 0xac?, 0xe?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9067f20 sp=0x5e35a9067f00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a9067fb0 sp=0x5e35a9067f20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a9067fd0 sp=0x5e35a9067fb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9067fd0 sp=0x5e35a9067fd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 22 gp=0x5e35a909cb40 m=nil [GC worker (idle)]:
+runtime.gopark(0xb3c6c37b419f6?, 0x3?, 0xe6?, 0x26?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9062720 sp=0x5e35a9062700 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a90627b0 sp=0x5e35a9062720 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a90627d0 sp=0x5e35a90627b0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a90627d0 sp=0x5e35a90627d0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 37 gp=0x5e35a94845a0 m=nil [GC worker (idle)]:
+runtime.gopark(0x103ea9700?, 0x1?, 0xca?, 0xb3?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a923ef20 sp=0x5e35a923ef00 pc=0x102cd4f5c
+runtime.gcBgMarkWorker(0x5e35a943a000)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1791 +0xe0 fp=0x5e35a923efb0 sp=0x5e35a923ef20 pc=0x102c80730
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x20 fp=0x5e35a923efd0 sp=0x5e35a923efb0 pc=0x102c80630
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a923efd0 sp=0x5e35a923efd0 pc=0x102cdc8f4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mgc.go:1695 +0x134
+
+goroutine 50 gp=0x5e35a9484780 m=nil [cleanup wait, 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9489f50 sp=0x5e35a9489f30 pc=0x102cd4f5c
+runtime.goparkunlock(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:468
+runtime.(*cleanupQueue).dequeue(0x103e7e680)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mcleanup.go:522 +0x160 fp=0x5e35a9489f90 sp=0x5e35a9489f50 pc=0x102c79c80
+runtime.runCleanups()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mcleanup.go:718 +0x40 fp=0x5e35a9489fd0 sp=0x5e35a9489f90 pc=0x102c7a3d0
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9489fd0 sp=0x5e35a9489fd0 pc=0x102cdc8f4
+created by runtime.(*cleanupQueue).createGs in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/mcleanup.go:672 +0x108
+
+goroutine 23 gp=0x5e35a9484960 m=nil [select, 6 minutes, locked to thread]:
+runtime.gopark(0x5e35a948c7a0?, 0x2?, 0xa8?, 0xc6?, 0x5e35a948c790?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a923de10 sp=0x5e35a923ddf0 pc=0x102cd4f5c
+runtime.selectgo(0x5e35a923dfa0, 0x5e35a948c78c, 0x0?, 0x0, 0x0?, 0x1)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/select.go:351 +0x83c fp=0x5e35a923df50 sp=0x5e35a923de10 pc=0x102cb513c
+runtime.ensureSigM.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/signal_unix.go:1091 +0x148 fp=0x5e35a923dfd0 sp=0x5e35a923df50 pc=0x102ccf848
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a923dfd0 sp=0x5e35a923dfd0 pc=0x102cdc8f4
+created by runtime.ensureSigM in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/signal_unix.go:1074 +0xcc
+
+goroutine 66 gp=0x5e35a9504780 m=8 mp=0x5e35a9098808 [syscall, 6 minutes]:
+runtime.sigNoteSleep(0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/os_darwin.go:138 +0x20 fp=0x5e35a9486790 sp=0x5e35a9486750 pc=0x102c9c050
+os/signal.signal_recv()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/sigqueue.go:149 +0x108 fp=0x5e35a94867b0 sp=0x5e35a9486790 pc=0x102cd72f8
+os/signal.loop()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/signal/signal_unix.go:23 +0x1c fp=0x5e35a94867d0 sp=0x5e35a94867b0 pc=0x102f77c0c
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a94867d0 sp=0x5e35a94867d0 pc=0x102cdc8f4
+created by os/signal.Notify.func1.1 in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/signal/signal.go:152 +0x28
+
+goroutine 24 gp=0x5e35a9484f00 m=nil [select, 6 minutes]:
+runtime.gopark(0x5e35a948cf90?, 0x2?, 0x0?, 0x0?, 0x5e35a948cf84?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9077e00 sp=0x5e35a9077de0 pc=0x102cd4f5c
+runtime.selectgo(0x5e35a9077f90, 0x5e35a948cf80, 0x0?, 0x0, 0x0?, 0x1)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/select.go:351 +0x83c fp=0x5e35a9077f40 sp=0x5e35a9077e00 pc=0x102cb513c
+os/signal.NotifyContext.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/signal/signal.go:292 +0x74 fp=0x5e35a9077fd0 sp=0x5e35a9077f40 pc=0x102f776c4
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9077fd0 sp=0x5e35a9077fd0 pc=0x102cdc8f4
+created by os/signal.NotifyContext in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/os/signal/signal.go:291 +0x134
+
+goroutine 640 gp=0x5e35a93501e0 m=nil [chan receive, 6 minutes]:
+runtime.gopark(0x5e35a9a89c00?, 0xf?, 0x0?, 0x2f?, 0x5e35a9917900?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35a9062ef0 sp=0x5e35a9062ed0 pc=0x102cd4f5c
+runtime.chanrecv(0x5e35a9ab4690, 0x0, 0x1)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/chan.go:667 +0x470 fp=0x5e35a9062f70 sp=0x5e35a9062ef0 pc=0x102c6cbd0
+runtime.chanrecv1(0x103db5c80?, 0x5e35a9917b80?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/chan.go:509 +0x14 fp=0x5e35a9062fa0 sp=0x5e35a9062f70 pc=0x102c6c724
+github.com/mark3labs/mcp-go/server.ServeStdio.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/mark3labs/mcp-go@v0.56.0/server/stdio.go:855 +0x28 fp=0x5e35a9062fd0 sp=0x5e35a9062fa0 pc=0x102f92928
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35a9062fd0 sp=0x5e35a9062fd0 pc=0x102cdc8f4
+created by github.com/mark3labs/mcp-go/server.ServeStdio in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/github.com/mark3labs/mcp-go@v0.56.0/server/stdio.go:854 +0x190
+
+goroutine 497083 gp=0x5e35aceb0000 m=nil [select]:
+runtime.gopark(0x5e35abe1ff38?, 0x2?, 0x80?, 0x2a?, 0x5e35abe1fee4?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35abe1fd60 sp=0x5e35abe1fd40 pc=0x102cd4f5c
+runtime.selectgo(0x5e35abe1ff38, 0x5e35abe1fee0, 0x5e35aa0dd080?, 0x0, 0x5e35a9202d50?, 0x1)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/select.go:351 +0x83c fp=0x5e35abe1fea0 sp=0x5e35abe1fd60 pc=0x102cb513c
+net/http.(*persistConn).writeLoop(0x5e35a96abb80)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:2657 +0x98 fp=0x5e35abe1ffb0 sp=0x5e35abe1fea0 pc=0x102f031c8
+net/http.(*Transport).dialConn.gowrap3()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:1995 +0x20 fp=0x5e35abe1ffd0 sp=0x5e35abe1ffb0 pc=0x102f00490
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35abe1ffd0 sp=0x5e35abe1ffd0 pc=0x102cdc8f4
+created by net/http.(*Transport).dialConn in goroutine 497211
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:1995 +0x10e4
+
+goroutine 497082 gp=0x5e35ad8952c0 m=nil [IO wait]:
+runtime.gopark(0x5e35abe22b18?, 0x102d19288?, 0xd0?, 0xb1?, 0x5e35abe22b00?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/proc.go:462 +0xbc fp=0x5e35abe22ac0 sp=0x5e35abe22aa0 pc=0x102cd4f5c
+runtime.netpollblock(0x5e35abfcf000?, 0x1000?, 0x0?)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/netpoll.go:575 +0x150 fp=0x5e35abe22b00 sp=0x5e35abe22ac0 pc=0x102c9b010
+internal/poll.runtime_pollWait(0x131aa9200, 0x72)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/netpoll.go:351 +0xa0 fp=0x5e35abe22b30 sp=0x5e35abe22b00 pc=0x102cd4170
+internal/poll.(*pollDesc).wait(0x5e35ac31c980?, 0x5e35abfcf000?, 0x0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/internal/poll/fd_poll_runtime.go:84 +0x28 fp=0x5e35abe22b60 sp=0x5e35abe22b30 pc=0x102d33a68
+internal/poll.(*pollDesc).waitRead(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x5e35ac31c980, {0x5e35abfcf000, 0x1000, 0x1000})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/internal/poll/fd_unix.go:165 +0x234 fp=0x5e35abe22c00 sp=0x5e35abe22b60 pc=0x102d34844
+net.(*netFD).Read(0x5e35ac31c980, {0x5e35abfcf000?, 0x8000?, 0x18?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/fd_posix.go:68 +0x28 fp=0x5e35abe22c50 sp=0x5e35abe22c00 pc=0x102db74d8
+net.(*conn).Read(0x5e35a909a180, {0x5e35abfcf000?, 0x0?, 0x5e35abe22d28?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/net.go:196 +0x34 fp=0x5e35abe22ca0 sp=0x5e35abe22c50 pc=0x102dc0194
+net/http.(*persistConn).Read(0x5e35a96abb80, {0x5e35abfcf000?, 0x103dae328?, 0x103e5fa00?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:2174 +0x48 fp=0x5e35abe22d00 sp=0x5e35abe22ca0 pc=0x102f00e48
+bufio.(*Reader).fill(0x5e35ac2661e0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/bufio/bufio.go:113 +0xe0 fp=0x5e35abe22d40 sp=0x5e35abe22d00 pc=0x102dcd6c0
+bufio.(*Reader).Peek(0x5e35ac2661e0, 0x1)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/bufio/bufio.go:152 +0x58 fp=0x5e35abe22d60 sp=0x5e35abe22d40 pc=0x102dcd808
+net/http.(*persistConn).readLoop(0x5e35a96abb80)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:2330 +0x110 fp=0x5e35abe22fb0 sp=0x5e35abe22d60 pc=0x102f01a70
+net/http.(*Transport).dialConn.gowrap2()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:1994 +0x20 fp=0x5e35abe22fd0 sp=0x5e35abe22fb0 pc=0x102f004d0
+runtime.goexit({})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/asm_arm64.s:1447 +0x4 fp=0x5e35abe22fd0 sp=0x5e35abe22fd0 pc=0x102cdc8f4
+created by net/http.(*Transport).dialConn in goroutine 497211
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/transport.go:1994 +0x109c
+
+r0      0x104
+r1      0x0
+r2      0x1a00
+r3      0x0
+r4      0x0
+r5      0xa0
+r6      0x0
+r7      0x0
+r8      0x16d1a55a8
+r9      0x0
+r10     0x0
+r11     0x2
+r12     0x2
+r13     0x0
+r14     0x0
+r15     0x0
+r16     0x131
+r17     0x1f3c17310
+r18     0x0
+r19     0x103e7ffa8
+r20     0x103e7ffe8
+r21     0x1f25d6260
+r22     0x0
+r23     0x0
+r24     0x1a00
+r25     0x48901
+r26     0x48a00
+r27     0x103e5d000
+r28     0x103e7e840
+r29     0x16d1a5620
+lr      0x185b98128
+sp      0x16d1a5590
+pc      0x185b5750c
+fault   0x185b5750c

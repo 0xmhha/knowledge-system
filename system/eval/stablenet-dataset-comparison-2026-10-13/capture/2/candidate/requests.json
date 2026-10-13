@@ -1,0 +1,299 @@
+{
+  "schema_version": 1,
+  "requests": [
+    {
+      "id": "T01-newblockchain-callers",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "List every Go function or method in this codebase that DIRECTLY calls\ncore.NewBlockChain (depth = 1, no transitive callers). Return the\nfully qualified names only, one per line, no commentary"
+      }
+    },
+    {
+      "id": "T02-wbft-prepare-validation",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain how a WBFT prepare message is validated when it arrives at a\nnode. Cover which signature checks run, how the validator set is\nconsulted, how the round number and sequence are matched against the\ncurrent consensus state, and what happens if the message does not\nalign with a known preprepare. Refer to specific function names where\nrelevant"
+      }
+    },
+    {
+      "id": "T03-systemcontracts-v2-upgrade",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Describe the concrete steps required to ship a v2 version of the\nGovStaking system contract that activates at a future hard fork\nblock. Identify the directory the new artifact JSON goes into, the\nembed directive that picks it up, where the hard fork block number\nis declared in params, the upgrade registration point in ethconfig,\nand the InjectContracts integration point that installs the new\nbytecode at genesis or fork activation"
+      }
+    },
+    {
+      "id": "T04-pr77-anzeon-tip-callers",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Identify the function that decides whether AnzeonTipEnv.currentBlock should\nrefresh, and find all callers of SetCurrentBlock that pass header GasTip.\nPR #77 added refresh-on-gasTip-change logic to AnzeonTipEnv."
+      }
+    },
+    {
+      "id": "T05-pr70-effectivegasprice",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Find all implementations of effectiveGasPrice across transaction types\nand the ethapi helper. PR #70 unified gas price derivation for receipts\nacross LegacyTx, AccessListTx, DynamicFeeTx, BlobTx, and others."
+      }
+    },
+    {
+      "id": "T06-pr72-getreceiptsbyhash",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace the eth_GetReceiptsByHash RPC call from the API handler to the\ncore blockchain reader. PR #72 added a new RPC method to fetch all\nreceipts for a canonical block by hash."
+      }
+    },
+    {
+      "id": "T07-pr74-txmaxsize",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Identify the constant that defines the maximum transaction size in the\nlegacy pool and its relationship to txSlotSize. PR #74 increased\ntxMaxSize to 256KB (8 slots × 32KB) to align with MaxCodeSize."
+      }
+    },
+    {
+      "id": "T08-pr75-wbft-futureview",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain the future-view check in WBFT consensus. How does\nisTooFarFutureMessage decide to drop a message, and what thresholds\napply to sequence vs round differences? PR #75 prevents valid\nnext-sequence messages from being incorrectly dropped."
+      }
+    },
+    {
+      "id": "T09-pr73-govcouncil-sync",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace how Account.Extra bits (blacklisted, authorized) are synced with\nGovCouncil contract storage slots during genesis initialization. PR #73\nreconciles genesis config params with on-chain contract state."
+      }
+    },
+    {
+      "id": "T10-pr67-secp256r1-boho",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace the secp256r1 (P256VERIFY) precompile activation path. Which fork\nwas it moved from and to, and how does ActivePrecompiles select it?\nPR #67 moved the precompile from Anzeon fork to Boho fork."
+      }
+    },
+    {
+      "id": "T11-pr63-govminter-burn-refund",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Describe the GovMinter v2 burn-refund mechanism introduced at the Boho\nhardfork. How are burned coins tracked and how can they be reclaimed?\nPR #63 added burn refund via _cleanupBurnDeposit and claimBurnRefund."
+      }
+    },
+    {
+      "id": "T12-pr58-chainconfig-engine",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain how LoadChainConfigWithOverride prevents consensus engine\nmismatch between stored and in-memory configurations. What is the\noverride application order? PR #58 loads chain config before engine init."
+      }
+    },
+    {
+      "id": "T13-pr56-system-contract-init",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "How does splitAndTrim normalize comma-separated config strings (members,\nvalidators, blacklist) for consistent genesis state root hashing?\nPR #56 prevents hash divergence from trailing commas or whitespace."
+      }
+    },
+    {
+      "id": "T14-pr55-wbft-race",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Identify the WBFT consensus fields that had race conditions and the\nsynchronisation primitives added to fix them. PR #55 added RWMutex\nprotection to roundChangeTimer, roundState, and lastSentTimeoutCanceled."
+      }
+    },
+    {
+      "id": "T15-wbft-roundchange-flow",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain the WBFT round change protocol flow end-to-end. Cover what\ntriggers a round change, how the broadcast propagates to peers, what\nvalidations the receiving node performs, and how the new round is\nestablished once enough round-change messages arrive."
+      }
+    },
+    {
+      "id": "T16-wbft-commit-finalization",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Describe how WBFT finalizes a block after the commit phase. What\nconditions must hold for a commit to succeed, how is the committed\nblock sealed, and what happens to the state after finalization?\nReference specific function names in consensus/wbft/core/."
+      }
+    },
+    {
+      "id": "T17-wbft-validator-set",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "How is the WBFT validator set determined and updated? Explain where\nthe validator list comes from (genesis vs on-chain governance), how\na new validator joining affects the quorum size, and how the proposer\nrotation selects the next block producer."
+      }
+    },
+    {
+      "id": "T18-wbft-backlog-replay",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain the WBFT message backlog mechanism. When are incoming consensus\nmessages stored rather than processed immediately? How does the backlog\nreplay work when the node catches up to the correct round/sequence?\nMention isTooFarFutureMessage and the backlog data structure."
+      }
+    },
+    {
+      "id": "T19-wbft-proposal-lifecycle",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace the lifecycle of a block proposal in WBFT from the proposer's\nperspective. How does the proposer build the preprepare message, what\ndoes it include, and how do other validators verify it before entering\nthe prepare phase?"
+      }
+    },
+    {
+      "id": "T20-govstaking-deposit-flow",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Describe the GovStaking deposit and withdrawal flow. How does a\nvalidator stake tokens via the system contract, what state transitions\noccur in the contract storage, and how does unstaking work including\nany lockup period?"
+      }
+    },
+    {
+      "id": "T21-systemcontract-upgrade-codepatch",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Write a code patch that adds a new v3 GovConfig system contract\nartifact that activates at a future hard fork. Show the directory\nwhere the artifact JSON goes, the embed directive update, and the\nregistration in GovContractUpgrades."
+      }
+    },
+    {
+      "id": "T22-statedb-commit-pipeline",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain the StateDB commit pipeline from dirty state to persisted\ntrie nodes. Cover IntermediateRoot, Commit, and how the journal\ntracks reverts. What role does the snapshot layer play during commit?"
+      }
+    },
+    {
+      "id": "T23-snapshot-rebuild",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "How does the snapshot tree rebuild process work? When is a rebuild\ntriggered, how does it iterate through the state trie to populate\nthe snapshot layers, and how does it handle concurrent block processing\nduring the rebuild?"
+      }
+    },
+    {
+      "id": "T24-tx-validation-pipeline",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace the transaction validation pipeline from submission to pool\ninclusion. Cover ValidateTransaction, ValidateTransactionWithState,\nnonce ordering, gas price checks, and how fee-delegation transactions\nare handled differently."
+      }
+    },
+    {
+      "id": "T25-block-import-transition",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Describe the block import and state transition process in\ncore.BlockChain. How does InsertChain validate the block, apply\ntransactions, update the state root, and handle reorgs? What role\ndoes the consensus engine play during import?"
+      }
+    },
+    {
+      "id": "T26-genesis-init-codepatch",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Write a code patch that adds a new precompiled contract address to\nthe genesis alloc for the Boho fork. Show how to register the prealloc\nentry in genesis.go and wire it into the chain config's fork schedule."
+      }
+    },
+    {
+      "id": "T27-trie-commit-pruning",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain the trie commit and pruning lifecycle. How does Trie.Commit\nproduce a node set, how does the triedb database batch and persist\nthose nodes, and what pruning strategy removes stale trie data after\na configurable number of blocks?"
+      }
+    },
+    {
+      "id": "T28-state-sync-recovery",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "How does a node recover state from peers using snap sync? Describe\nthe account and storage trie download phases, how the snapshot is\nreconstructed from downloaded data, and how the node transitions from\nsnap sync to full block processing."
+      }
+    },
+    {
+      "id": "T29-eth-sync-flow",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Trace the eth protocol handler sync flow. How does the handler decide\nwhen to start syncing, how does it select peers for sync, and what\nis the handshake sequence when two nodes establish an eth protocol\nconnection?"
+      }
+    },
+    {
+      "id": "T30-miner-block-building-codepatch",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Write a code patch that adds a new transaction ordering strategy to\nthe miner's block building pipeline. Show where commitWork selects\ntransactions, how the pending set is consumed, and where the new\nordering hook should be inserted."
+      }
+    },
+    {
+      "id": "ANCHOR-01",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain handlePrepareMsg: WBFT prepare message signature and validator-set validation."
+      }
+    },
+    {
+      "id": "ANCHOR-02",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain broadcastRoundChange: WBFT broadcast round-change certificate and peers."
+      }
+    },
+    {
+      "id": "ANCHOR-03",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain handleCommitMsg: WBFT commit message validation and committed seal."
+      }
+    },
+    {
+      "id": "ANCHOR-04",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain startNewRound: WBFT start new round and validator state."
+      }
+    },
+    {
+      "id": "ANCHOR-05",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain processBacklog: WBFT future-message backlog replay."
+      }
+    },
+    {
+      "id": "ANCHOR-06",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain QuorumSize: WBFT validator quorum size."
+      }
+    },
+    {
+      "id": "ANCHOR-07",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain SuggestTipCap: gas-price oracle suggest transaction tip cap."
+      }
+    },
+    {
+      "id": "ANCHOR-08",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain validateTx: legacy transaction pool validate transaction."
+      }
+    },
+    {
+      "id": "ANCHOR-09",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain Commit: StateDB commit state changes."
+      }
+    },
+    {
+      "id": "ANCHOR-10",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain InsertChain: BlockChain import and insert blocks."
+      }
+    },
+    {
+      "id": "ANCHOR-11",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain Run: EVM interpreter execute contract bytecode."
+      }
+    },
+    {
+      "id": "ANCHOR-12",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "Explain Go: Go build tool invocation in internal build package."
+      }
+    }
+  ]
+}
