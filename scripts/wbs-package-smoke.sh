@@ -14,7 +14,7 @@ else
   python3 "$repo_root/scripts/package-host.py" --out-dir "$scratch/dist" \
     > "$scratch/package.json"
 fi
-stage="$(python3 - "$scratch/package.json" "$scratch/unpacked" <<'PY'
+stage="$(KS_PACKAGE_REPO_ROOT="$repo_root" python3 - "$scratch/package.json" "$scratch/unpacked" <<'PY'
 import hashlib
 import json
 from pathlib import Path
@@ -39,6 +39,9 @@ for name in ('ckg', 'ckv', 'cks'):
     assert hashlib.sha256(binary.read_bytes()).hexdigest() == manifest['binaries'][name]['sha256'], name
 for name in ('LICENSE', 'INSTALLATION.md', 'modules.txt', 'policies/sanitization_rules.yaml', 'third-party-licenses.json'):
     assert (stage / name).is_file(), name
+assert manifest['installation_guide']['source'] == 'docs/INSTALLATION.md'
+assert hashlib.sha256((stage / 'INSTALLATION.md').read_bytes()).hexdigest() == manifest['installation_guide']['sha256']
+assert (stage / 'INSTALLATION.md').read_bytes() == (Path(__import__('os').environ['KS_PACKAGE_REPO_ROOT']) / 'docs/INSTALLATION.md').read_bytes()
 inventory = json.loads((stage / 'third-party-licenses.json').read_text())
 assert inventory['modules'] and manifest['third_party_license_inventory']['module_count'] == len(inventory['modules'])
 assert manifest['third_party_license_inventory']['missing_license_count'] == 0

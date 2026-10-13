@@ -15,7 +15,7 @@ an MCP-enabled LLM, or a 3D web viewer.
 ## Features
 
 - **Multi-language parsing** — Go (`go/packages`), TypeScript & Solidity (tree-sitter), Protobuf
-- **Persistent graph store** — SQLite (the maintained backend; the PostgreSQL backend is deprecated, see [ADR-0003](../docs/graph/adr/0003-deprecate-postgres-backend.md))
+- **Persistent graph store** — SQLite (the maintained backend; the PostgreSQL backend is deprecated, see [ADR-0003](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/adr/0003-deprecate-postgres-backend.md))
 - **Multiple query surfaces** — REST API, MCP server (10 tools), 3D viewer
 - **Incremental builds** — file-level caching (cold / short-circuit / partial) for fast re-indexing
 - **Rich schema** — 37 node kinds + 43 edge kinds across six axes (structural, semantic, execution, concurrency, distributed, temporal); see [SCHEMA](../docs/graph/SCHEMA.md)
@@ -59,12 +59,12 @@ Common patterns:
 ```
 
 The build is **deterministic**: the same source tree + commit + ckg binary
-yields the same graph (see [`docs/graph/adr/0002-staged-graph-composition.md`](../docs/graph/adr/0002-staged-graph-composition.md)).
+yields the same graph (see [historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/adr/0002-staged-graph-composition.md)).
 
 **Filtering (`--files-from`).** A JSON `{ "include": [...], "exclude": [...] }`
 of globs (`**` spans any path depth). Without it, ckg indexes the whole tree
 (every `.go`/`.ts`/`.sol`/`.proto`, tests included). Two ready-made filters for
-the go-stablenet corpus live under [`eval/stablenet/`](eval/stablenet/):
+the go-stablenet corpus live under [`eval/stablenet/`](../projects/stablenet/eval/graph/):
 
 | Filter | Tests | Use |
 |---|---|---|
@@ -127,12 +127,12 @@ Front both with a reverse proxy: `/api/* → :8080`, `/* → /srv/ckg/static`.
 
 - [`docs/graph/VISION.md`](../docs/graph/VISION.md) — **start here**: purpose, the CKG/CKV/CKS triangle, retrieval-accuracy north star
 - [`docs/graph/DOC-MAP.md`](../docs/graph/DOC-MAP.md) — documentation index + tier map (which doc is authoritative)
-- [`docs/graph/ARCHITECTURE.md`](../docs/graph/ARCHITECTURE.md) — 1-page architecture; [`ARCHITECTURE-DETAILED.md`](../docs/graph/ARCHITECTURE-DETAILED.md) for the full pipeline
+- [`docs/graph/ARCHITECTURE.md`](../docs/graph/ARCHITECTURE.md) — 1-page architecture; [`ARCHITECTURE-DETAILED.md`](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/ARCHITECTURE-DETAILED.md) for the full pipeline
 - [`docs/graph/SCHEMA.md`](../docs/graph/SCHEMA.md) — authoritative node/edge enumeration + schema version history
 - [`docs/graph/EVAL.md`](../docs/graph/EVAL.md) — eval harness and scoring
-- [`docs/graph/STUDY-GUIDE.md`](../docs/graph/STUDY-GUIDE.md) — background on Leiden, MCP, tree-sitter, 3D layout
+- [Graph architecture](../docs/graph/ARCHITECTURE.md) — package responsibilities and limits.
 
-"What is true now" = code + git. For decisions, see [`docs/graph/adr/`](../docs/graph/adr/).
+"What is true now" = code + git. Current decisions and limits are in [the architecture](../docs/graph/ARCHITECTURE.md) and [purpose and scope](../docs/spec-driven/PURPOSE-AND-SCOPE.md).
 
 ## Contributing
 
@@ -150,7 +150,7 @@ Report bugs and request features at
 ## License
 
 CKG is licensed under the **GNU Affero General Public License v3.0** —
-see [LICENSE](LICENSE).
+see [LICENSE](../LICENSE).
 
 AGPL-3.0 requires that if you run a modified version of CKG as a
 network-accessible service, you must make the corresponding source

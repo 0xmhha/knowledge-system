@@ -1,6 +1,6 @@
 # Entry Schema
 
-> Every YAML file under `projects/<id>/entries/` follows this schema.
+> Every entry YAML under the selected project inventory directory follows this schema. The committed example is `projects/stablenet/domain-knowledge/entries/`.
 > The shape is stable across projects; new projects do not extend it
 > without bumping `schema_version` in `project.yaml` and updating
 > `entry.schema.yaml`.

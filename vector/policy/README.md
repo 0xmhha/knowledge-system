@@ -2,7 +2,7 @@
 
 Policy YAML files classify code chunks by path and attach
 `ModificationGuidance` (also_review, required_tests, watch_out) that
-travels with every search hit. The agent reads these hints to know
+travels with matched search hits. The agent reads these hints to know
 which neighbouring areas it should inspect, which tests to add, and
 what risks to watch out for when modifying the chunk.
 
@@ -10,18 +10,18 @@ what risks to watch out for when modifying the chunk.
 
 | File | Use |
 |------|-----|
-| `stablenet.yaml` | Categories for the `go-stablenet` repo |
+| `projects/stablenet/policies/vector.yaml` | Example project-owned categories; paths are relative to the repository root |
 
 To use a policy file during build / reindex:
 
 ```sh
 ckv build   --src ../go-stablenet --out ./ckv-data \
-            --policy policy/stablenet.yaml
+            --policy projects/stablenet/policies/vector.yaml
 ckv reindex --src ../go-stablenet --out ./ckv-data \
-            --policy policy/stablenet.yaml
+            --policy projects/stablenet/policies/vector.yaml
 ```
 
-Search responses then carry `category` and `guidance` on every hit
+Matched search responses carry `category` and `guidance` when populated
 (MCP `schema_version: "1.1"`).
 
 ## Authoring a category
@@ -58,11 +58,11 @@ most specific rules first. The convention is:
 
 ### Coverage target
 
-Unclassified ratio should stay ≤ 30%. Run
+Choose a project-specific coverage target; no universal30% threshold is an accepted product gate. Run
 
 ```sh
 ckv build --src <repo> --out /tmp/ckv-coverage \
-          --policy policy/stablenet.yaml
+          --policy projects/stablenet/policies/vector.yaml
 sqlite3 /tmp/ckv-coverage/vector.db \
   "SELECT category, COUNT(*) FROM chunks GROUP BY category ORDER BY 2 DESC;"
 ```

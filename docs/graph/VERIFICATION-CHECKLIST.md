@@ -106,5 +106,5 @@
 
 ## 7. 참조
 
-- 이번 세션 사례별 회고: `docs/graph/archive/SESSION-HANDOFF-2026-05-10.md` §1
+- 이번 세션 사례별 회고: [historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/archive/SESSION-HANDOFF-2026-05-10.md) §1
 - 평가 fixture / 회귀 안전망: `internal/graph/buildpipe/h3h4_integration_test.go`, `internal/graph/temporal/issueid_test.go::TestExtractIssueIDs_CorpusPrecisionRecall`, `pkg/graph/mcphandlers/safety_test.go` (`llmSafeStoreReader` AMBIGUOUS-drop coverage)

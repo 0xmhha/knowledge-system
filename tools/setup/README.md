@@ -149,7 +149,7 @@ cleanup; the tool never deletes versions itself.
 
 `--min-canonical RATIO` turns on the promotion gate's join-density check
 (the share of symbol chunks that carry a `canonical_id`). Without it the
-engine skips the check and warns; Go projects typically reach above 0.95. Servers that are already running keep the dataset
+engine skips the check and warns; A historical project ratio is not a guarantee for another source scope. Servers that are already running keep the dataset
 they opened, so restart them after a rebuild.
 
 ### Options
@@ -163,7 +163,7 @@ they opened, so restart them after a rebuild.
 | `--graph-only` | off | graph index only; unversioned layout; no Ollama |
 | `--embedder` | `ollama` | `mock` builds without embeddings, to try the flow; such a dataset cannot answer semantic queries |
 | `--model`, `--embed-dim`, `--ollama-url` | `bge-m3:latest`, 1024, `http://127.0.0.1:11434` | embedding settings |
-| `--source-mode` | `committed` | `working-tree` also indexes uncommitted edits (less reproducible) |
+| `--source-mode` | `committed` | `working-tree` captures uncommitted edits into its own snapshot; it does not claim a clean committed tree |
 | `--version` | `v<date>-<time>-<commit8>` | version label |
 | `--no-build`, `--bin-dir` | build | reuse existing binaries |
 | `--no-verify` | verify | skip the server health check |

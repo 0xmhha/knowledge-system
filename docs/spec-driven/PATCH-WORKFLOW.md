@@ -1,6 +1,6 @@
 # 외부 패치 후보와 기준별 판정
 
-상태: A5.3의 **명시 경로 부분 구현** (2026-10-01). 이 절차는 코드를 자동 수정하지 않는다. `TestExecution.pass`와 `CriterionDecision.approved`를 분리하는 [종단 간 설계](./END-TO-END-DESIGN.md)의 검증 경로다.
+현재 구현: 불변 패치 등록·시험 실행 결합·기준별 사람 판정·승격과 rollback. 이 절차는 코드를 자동 수정하지 않는다. `TestExecution.pass`와 `CriterionDecision.approved`를 분리하는 [종단 간 설계](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/spec-driven/END-TO-END-DESIGN.md)의 검증 경로다.
 
 ## 커밋된 Git 후보의 순서
 
@@ -11,4 +11,4 @@
 5. 검토자가 Given/When/Then과 실제 코드·테스트 근거를 읽고 `cks patch --dataset DATA --patch-id PATCH decide --semantic-store STORE --decision-id DECISION --criterion-id CRITERION --reviewer REVIEWER --outcome approved|rejected --reason TEXT`로 기준별 판정을 남긴다. `approved`에는 같은 스냅샷에서 성공한 테스트 실행 기록이 선행돼야 한다.
 6. 모든 요구사항의 추적 상태가 `linked`, 모든 기준에 성공 실행과 `approved`가 있고 상충 판정이 없을 때만 `cks patch --dataset DATA --patch-id PATCH promote --semantic-store STORE`가 `current`를 바꾼다. 테스트 성공 직후에는 `unconfirmed`이고, 일반 `setup --rollback NEXT`로 보류를 우회할 수 없다. 검토 후 승격된 버전은 이후 일반 롤백 대상으로 사용할 수 있다.
 
-`scripts/wbs-patch-smoke.sh`가 실제 Go AST/CKV/CKG 후보, 정확 테스트 실행, 사람 판정 부재 시 거부, 승격과 왕복 롤백을 mock 임베더로 재생한다. 이 스모크는 조직 정책의 진위나 자연어 품질을 판정하지 않는다. 현재 정확 테스트 실행은 커밋된 Git 소스의 Go 테스트에 맞춰져 있고, 다른 프레임워크 및 working-tree/비Git 기준별 실행은 남은 A 작업이다. 로컬 `reviewer`는 감사용 ID이며 외부 신원 인증이 아니다.
+`scripts/wbs-patch-smoke.sh`가 실제 Go AST/CKV/CKG 후보, 정확 테스트 실행, 사람 판정 부재 시 거부, 승격과 왕복 롤백을 mock 임베더로 재생한다. 이 스모크는 조직 정책의 진위나 자연어 품질을 판정하지 않는다. 정확한 테스트 실행의 지원 범위는 현재 커밋된 Git 소스의 Go 테스트다. 다른 프레임워크 및 working-tree/비Git 기준별 실행을 지원한다고 주장하지 않으며 채택하려면 별도 설계·검증이 필요하다. 로컬 `reviewer`는 감사용 ID이며 외부 신원 인증이 아니다.

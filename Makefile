@@ -55,6 +55,8 @@ boundaries:
 # Ground truth is a --help walk of bin/{ckg,ckv,cks}, so the binaries have to
 # exist; build-bins is cheap when they are already current.
 docs-check: build-bins
+	@python3 ./scripts/test_documentation_contract.py
+	@python3 ./scripts/test_package_notice_recipe.py
 	@python3 ./scripts/check-docs.py
 
 # setup-tool-test: unit tests for tools/setup (ks-setup), plus an end-to-end

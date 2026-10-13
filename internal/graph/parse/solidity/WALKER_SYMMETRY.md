@@ -127,7 +127,7 @@ walkers above already sets, ask the following before merging:
    four-shape lockdown work that V14-V17 already did.
 
 6. **Lockdown test placement**: every new (walker, marker) pair needs a
-   `*_test.go` file under `internal/parse/solidity/`. The fixture goes
+   `*_test.go` file under `internal/graph/parse/solidity/`. The fixture goes
    under `testdata/<topic>/`. The test must assert both the positive
    case AND that *unrelated* markers (the axis siblings) stay false.
 

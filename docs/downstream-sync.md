@@ -6,9 +6,7 @@ repos serve different purposes on purpose — upstream generalizes and grows
 features; a downstream specializes for one project — so the sync is a
 **deliberate, verified port**, not a git merge (the histories are unrelated).
 
-Status: finalized (2026-07-27). Graph, vector, retrieval, and fused-server
-equivalence to the pre-consolidation 3-repo tools is verified end to end —
-see the review doc §8.16 for the evidence.
+Validate a port against its selected source revision. Previous equivalence observations are historical evidence, not proof that a current downstream checkout or running host matches this tree.
 
 ## What makes the port mechanical
 
@@ -20,7 +18,7 @@ Three structural properties keep the delta small:
    branding:
 
    ```
-   make build-mcp NAMESPACE=stablenet_knowledge
+   make build-bins NAMESPACE=stablenet_knowledge
    ```
 
 2. **Project data lives in a pack** (`projects/<name>/`): policies,
@@ -57,7 +55,7 @@ Run these against the ported tree; all of them exist in-repo:
 | Build/test/lint | `make build test lint` | green (lint includes engine-boundary rules) |
 | Graph equivalence | build the same source with upstream and ported binaries; compare `graph_digest` in both manifests | digests byte-equal |
 | Full-DB audit (optional, stronger) | sorted-dump hash per table (`nodes`, `edges` minus rowid, `blobs`, `node_prs`, `pending_refs`, `pkg_tree`, FTS content) | all hashes equal (`topic_tree` requires the deterministic-clustering fix; manifest differs only in additive identity keys) |
-| Retrieval behavior | `eval-retrieval --fixtures projects/<name>/eval/graph-keyword/fixtures` on both binaries against their own builds | output JSON deep-equal (excluding the graph path field) |
+| Retrieval behavior | `ckg eval-retrieval --fixtures projects/<name>/eval/graph-keyword/fixtures` on both binaries against their own builds | output JSON deep-equal (excluding the graph path field) |
 | Tool names | start each MCP server with the downstream namespace; `tools/list` | names are `<root>.context.*` / `<root>.ops.*` with the intended root |
 | Alignment gate | `cks setup --config projects/<name>/setup.yaml ...` | verify-align step passes |
 

@@ -1,6 +1,6 @@
 # CKS v1/v2 공개 계약과 호환 골든
 
-상태: 선택형 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 선택 팩의 외부 origin 보관·인용, 검토된 정책/ADR 오버레이, 정렬된 의미 투영에 한정한 ADR→요구→코드→테스트 추적 경로를 구현했다. 조직 인증 어댑터와 운영 도메인 사실의 사람 검토는 별도다. 이 문서는 `END-TO-END-DESIGN.md` 7절의 직렬화와 버전 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
+상태: 선택형 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 선택 팩의 외부 origin 보관·인용, 검토된 정책/ADR 오버레이, 정렬된 의미 투영에 한정한 ADR→요구→코드→테스트 추적 경로를 구현했다. 조직 인증 어댑터와 운영 도메인 사실의 사람 검토는 별도다. 직렬화는 pkg/system/contract와 internal/system/evidencev2를 기준으로 아래 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
 
 ## 버전 선택
 
@@ -10,7 +10,7 @@
 | 새 `cks.context.get_for_task_v2` | `reindex_required` | v2 DTO/해시 | v2 DTO/해시 | v2 DTO/해시 |
 | `cks setup --version` (설정·project pin 포함) | 기존 플래그 유지 | 같은 v2 후보 빌더 또는 v1 읽기 | 모드 미지정이면 committed만 | 모드 미지정이면 committed만 |
 | `ckv query`/CKG export 구 형식 | 기존 응답 | 기존 커밋형 응답 | `requires_v2` | `requires_v2` |
-| 명시 `--format=v2`/v2 MCP·HTTP | `reindex_required` | v2 응답 | v2 응답 | v2 응답 |
+| 명시 `cks.context.get_for_task_v2` | `reindex_required` | v2 응답 | v2 응답 | v2 응답 |
 
 구현 상태: `cks.context.get_for_task_v2`와 비커밋 데이터셋의 기존 CKS 문맥 도구 거부는 실제 MCP 스모크로 검증했다. 고정된 main 기준선의 v1 MCP 응답을 가짜 Ollama와 별도 바이너리로 재생했고, 새 `doctor`의 `legacy_unpinned` 및 새 v2 MCP의 `reindex_required`를 확인했다. 직접 `ckv query`는 보관본 마운트 없이 비커밋 데이터셋을 거부한다. CKG 독립 export와 일반 `--format=v2`/HTTP 표면은 아직 이 표의 설계 계약에 머무른다.
 
@@ -52,13 +52,13 @@ versioned 빌드·gate·보류/승격과 외부 승격/rollback은 동일한 OS 
 
 `coordinates`와 각 인용의 ID/모드는 완전히 같아야 한다. `origin_id`와 `file`은 보관본의 등록된 상대 경로를 가리킨다. `committed`에서는 `commit_hash=base_commit`, `working-tree`와 `snapshot-only`에서는 `commit_hash=""`다. 비Git `snapshot-only`의 `base_commit`도 빈 문자열이다. `file_sha256`은 전체 보관 파일, `content_sha256`은 지정 줄 범위의 정화 전 원문 바이트다. 두 값을 재검증한 뒤 본문을 정화한다. 상태가 `partial`이면 확정 답변으로 사용할 수 없다.
 
-현재 CKV의 `chunks.content_sha256`은 청크 텍스트의 다이제스트다. v2 인용의 `content_sha256`은 **보관 원문 줄 바이트에서 새로 계산**하며 이 값을 CKV의 기존 열에서 그대로 복사하지 않는다. 줄 끝 규칙은 `END-TO-END-DESIGN.md` 2.1절의 원문 바이트·줄 경계를 따른다.
+현재 CKV의 `chunks.content_sha256`은 청크 텍스트의 다이제스트다. v2 인용의 `content_sha256`은 **보관 원문 줄 바이트에서 새로 계산**하며 이 값을 CKV의 기존 열에서 그대로 복사하지 않는다. 줄 끝과 범위는 internal/system/evidencev2의 보관 원문 바이트·줄 경계 검증을 따른다.
 
 v2 인용 중복 키는 `(project_id,dataset_id,snapshot_id,origin_id,file,start_line,end_line,file_sha256,content_sha256)`의 순서 있는 튜플이다. 문자열 결합으로 충돌을 만들지 않도록 길이 접두어 직렬화하거나 튜플 자체로 비교한다. 서로 다른 스냅샷에서 경로와 줄이 같아도 합치지 않는다.
 
 `sha256-v2`는 `metadata.integrity_hash`를 **제외**하고 `metadata.integrity_hash_algo`를 포함한 전체 v2 응답을 [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785.html)으로 정규화한 UTF-8 바이트의 SHA-256이다. 정화된 본문과 `semantic` 필드까지 포함한다. 중복 JSON 키, 유효하지 않은 UTF-8, I-JSON 밖의 수치는 거부한다. 구현은 Go 생산자와 독립 소비자의 동일 바이트·해시 골든을 갖춘다. v1의 `ComputeIntegrityHash`는 바꾸지 않는다.
 
-현재 v2 생산자는 고정 DTO의 ASCII 속성명, 문자열, null, 배열, 안전 정수만 정규화한다. 부동소수점과 사용자 정의 오버레이 객체는 거부하며 `semantic=null`, `graph_neighbors=[]`로 출력한다. 이는 완성된 범용 JCS 구현을 뜻하지 않는다. JavaScript 소비자 골든은 현재 DTO의 정규화 바이트를 고정하며, 오버레이를 공개할 때 추가 골든이 필요하다.
+현재 v2 생산자는 고정 DTO의 ASCII 속성명, 문자열, null, 배열, 안전 정수만 정규화한다. 부동소수점과 임의 객체는 허용된 고정 DTO 계약으로 제한한다. 선택형 검증된 semantic 문맥과 ontology explanation은 현재 DTO에 포함되며 기능 미요청/꺼짐에서 null을 허용한다. 이는 완성된 범용 JCS 구현을 뜻하지 않는다. JavaScript 소비자 골든은 현재 DTO의 정규화 바이트를 고정하며, 각 공개 선택 필드는 해당 스키마/해시 골든과 소비자 회귀를 함께 유지한다.
 
 ### D5 선택형 도메인 문맥
 
@@ -110,3 +110,7 @@ current·실제 rollback 참조·명시 보호·유효하게 해제되지 않은
 v2 본문은32000bytes, citation은12개다. 최대128개 candidate refs를 입력 순위대로 검증하고 전체 원문 span을 선택한다. oversized span은 잘라 반환하지 않고 이후 적합한 span을 검토한다. raw/source 좌표·hash는 원문 그대로이며 공개 text는 필수 sanitizer를 거친다. 생략된 후보의 foreign/missing/corrupt도 거부한다.
 
 생략이 있으면 partial과 선택 진단 `metadata.evidence_budget`를 integrity에 포함한다. `scope=retained_core`의 수치는 optional knowledge/trace 추가 전 core 선택을 설명한다. 하나도 맞지 않는 비어 있지 않은 입력은 typed `budget_exceeded`이며 public error에는 파일·원문을 포함하지 않는다. zero refs는 complete empty, secret drop은 별도 partial이고 원문/신원 오류는 별도 코드다. Stamp/Verify는 semantic overlay 이후 전체body32k도 검사한다. 정상 응답의 optional budget field는 생략돼 기존 v2 golden/legacy v1 형식을 보존한다.
+
+## 온톨로지 준비 상태와 설명
+
+현재 cks.semantic.status/lookup_term/get_concept/trace_requirement는 읽기 전용으로 같은 좌표를 검증한다. cks.context.get_for_task_v2의 explain_ontology는 최대8개념·20변경의 bounded 설명을 선택 출력한다. 설정 모드를 바꾸지 않으며, 점수는 문자열이고 미인용 후보 식별자는 해시로 제한한다. 설명과 semantic 문맥도 v2 무결성 계약으로 검증한다. [도구 가이드](../../system/docs/ontology-mcp.md)를 따른다.

@@ -24,7 +24,7 @@ code in their own modules; this doc grows when they do.
 
 ## 1. `Chunk` — the indexable record
 
-Source: [`pkg/vector/types/chunk.go`](../pkg/types/chunk.go).
+Source: [`pkg/vector/types/chunk.go`](../../pkg/vector/types/chunk.go).
 
 A `Chunk` is one embeddable region: a function/method, a struct
 declaration, a markdown heading section, or the top-N-lines file
@@ -101,7 +101,7 @@ normalization. Computed once via `types.ContentSHA256`.
 
 ### `InvariantRef` / `InvariantTier`
 
-Source: [`pkg/types/chunk.go::InvariantRef`, `::InvariantTier`](../pkg/types/chunk.go).
+Source: [`pkg/types/chunk.go::InvariantRef`, `::InvariantTier`](../../pkg/vector/types/chunk.go).
 
 A source `Chunk` carries a list of `InvariantRef` back-pointers to the
 `ChunkInvariant` chunk(s) extracted from inside or near it. Kept small so
@@ -126,7 +126,7 @@ higher confidence; callers can filter by tier when noise tolerance is low):
 
 ## 2. `Citation` — what every hit cites
 
-Source: [`pkg/types/chunk.go::Citation`](../pkg/types/chunk.go).
+Source: [`pkg/types/chunk.go::Citation`](../../pkg/vector/types/chunk.go).
 
 | Field | JSON key | Type |
 |-------|----------|------|
@@ -142,7 +142,7 @@ CKG uses the same shape so hybrid responses merge without translation
 
 ## 3. `Manifest` — index identity
 
-Source: [`internal/manifest/manifest.go::Manifest`](../internal/manifest/manifest.go).
+Source: [`internal/manifest/manifest.go::Manifest`](../../internal/vector/manifest/manifest.go).
 
 Written to `<out>/manifest.json` (atomic via tmp + rename) and mirrored
 into the `manifest` SQLite table so freshness checks can read either
@@ -167,7 +167,7 @@ without coordinating opens.
 Mismatch on Open between manifest and live `Embedder` is fatal:
 returns `ErrIndexUnavailable` (model/dim) or `ErrEmbedderMismatch`
 (reindex with different embedder) — see
-[`internal/vector/query/errors.go`](../internal/query/errors.go).
+[`internal/vector/query/errors.go`](../../internal/vector/query/errors.go).
 
 ### CKG ↔ CKV manifest compatibility
 
@@ -187,7 +187,7 @@ decide if the indexes are synchronized.
 
 ## 4. SQLite layout
 
-Source: [`internal/store/sqlitevec/store.go::initSchema`](../internal/store/sqlitevec/store.go).
+Source: [`internal/store/sqlitevec/store.go::initSchema`](../../internal/vector/store/sqlitevec/store.go).
 
 Two regular tables plus one sqlite-vec virtual table, all in
 `<out>/vector.db`:
@@ -279,7 +279,7 @@ ckv migrate --out ./ckv-data --no-backup
 ```
 
 Authoring new migrations: see
-[`internal/vector/store/sqlitevec/migrations/README.md`](../internal/store/sqlitevec/migrations/README.md).
+[`internal/vector/store/sqlitevec/migrations/README.md`](../../internal/vector/store/sqlitevec/migrations/README.md).
 
 ---
 
@@ -312,11 +312,11 @@ shim). No such bump has happened on CKV's 1.0 line.
 
 ## Cross-references
 
-- [`pkg/vector/types/chunk.go`](../pkg/types/chunk.go) — `Chunk`, `Citation`,
+- [`pkg/vector/types/chunk.go`](../../pkg/vector/types/chunk.go) — `Chunk`, `Citation`,
   `ChunkID`, `ContentSHA256`
-- [`internal/vector/manifest/manifest.go`](../internal/manifest/manifest.go) — `Manifest`
-- [`internal/vector/store/sqlitevec/store.go`](../internal/store/sqlitevec/store.go) — DDL + migrations
-- [`internal/vector/query/errors.go`](../internal/query/errors.go) — error model
-- [`plan-S1-ckv.md §4`](./archive/plan-S1-ckv.md) — original schema design
+- [`internal/vector/manifest/manifest.go`](../../internal/vector/manifest/manifest.go) — `Manifest`
+- [`internal/vector/store/sqlitevec/store.go`](../../internal/vector/store/sqlitevec/store.go) — DDL + migrations
+- [`internal/vector/query/errors.go`](../../internal/vector/query/errors.go) — error model
+- [`plan-S1-ckv.md §4`](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/vector/archive/plan-S1-ckv.md) — original schema design
   notes (predates some additive changes)
-- [`ADR-001`](./adr/001-sqlite-vec-storage.md) — *why* sqlite-vec
+- [`ADR-001`](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/vector/adr/001-sqlite-vec-storage.md) — *why* sqlite-vec

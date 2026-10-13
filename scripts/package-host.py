@@ -27,6 +27,7 @@ from license_inventory import collect as collect_licenses
 
 ROOT = Path(__file__).resolve().parent.parent
 BINARIES = ("ckg", "ckv", "cks")
+INSTALLATION_GUIDE = Path("docs/INSTALLATION.md")
 
 
 def run(*args: str) -> str:
@@ -39,6 +40,13 @@ def digest(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             sha.update(block)
     return sha.hexdigest()
+
+
+def copy_installation_guide(stage: Path) -> dict:
+    source = ROOT / INSTALLATION_GUIDE
+    target = stage / "INSTALLATION.md"
+    shutil.copy2(source, target)
+    return {"source": str(INSTALLATION_GUIDE), "sha256": digest(target)}
 
 
 def native_dependencies(binary: Path) -> list[str]:
@@ -135,7 +143,7 @@ def package(out_dir: Path, allow_dirty: bool) -> Path:
             metadata["binaries"][binary_name] = {"sha256": digest(target), "bytes": target.stat().st_size}
             metadata["native_dependencies"][binary_name] = native_dependencies(target)
         shutil.copy2(ROOT / "LICENSE", stage / "LICENSE")
-        shutil.copy2(ROOT / "docs" / "spec-driven" / "INSTALLATION-PILOT.md", stage / "INSTALLATION.md")
+        metadata["installation_guide"] = copy_installation_guide(stage)
         policy = stage / "policies" / "sanitization_rules.yaml"
         policy.parent.mkdir()
         shutil.copy2(ROOT / "system" / "policies" / "sanitization_rules.yaml", policy)

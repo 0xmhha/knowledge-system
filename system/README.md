@@ -11,7 +11,7 @@ sanitized `EvidencePack` and exposes it through MCP for upper layers
 ## Status
 
 Wired. cks composes ckv (vector/meaning) and ckg (graph/keyword) **in-process**
-and exposes a 28-tool agent-facing MCP surface (`cks.context.*`, `cks.ops.*`, and `cks.semantic.*`) over stdio
+and exposes the agent-facing MCP surface (`cks.context.*`, `cks.ops.*`, and `cks.semantic.*`) over stdio
 or loopback HTTP. The authoritative tool list is the golden schema
 `internal/system/mcp/testdata/agent-mcp.schema.json`.
 
@@ -21,8 +21,7 @@ points (including interface dispatch, goroutines, channels and locks). Commits a
 PRs that changed the function, and the tests that call it, come back in separate
 sections, so history and test code never flood the code view. It needs a graph built with
 schema 1.24 or later; older datasets answer `requires_reindex`.
-With no datasets configured it boots in a non-crashing degraded mode (Smart Dummy +
-`cks.ops.health` reports `degraded`).
+Unconfigured development backends have an explicit degraded/dummy state. A configured real backend failure is not an implicit permission to substitute dummy results; inspect health and actionable startup errors.
 
 Read the [ontology MCP guide](./docs/ontology-mcp.md) for readiness, meaning lookup,
 requirement trace and bounded v2 explanations. Readiness and completed evaluation
@@ -89,15 +88,15 @@ external LLM client / coding agent
    (vector)   (graph+BM25)
 ```
 
-No LLM calls inside cks itself; LLM is invoked only by `cks agent` and `cks eval`.
+The composition/MCP evidence path does not call an answer-generating LLM. Agent or optional evaluation workflows may invoke external models; embeddings are separate backend calls.
 
 ## Build
 
 ```
 make build         # go build ./...
-make test          # go test -race ./...
+make test          # go test ./...
 make test-short    # go test -short ./...
-make lint          # golangci-lint run
+GOTOOLCHAIN=go1.26.9 make lint # whole-module validation
 make fmt           # gofmt -s -w .
 make tidy          # go mod tidy
 ```
@@ -110,7 +109,7 @@ cp policies/cks.yaml.example ./cks.yaml          # edit backend paths / source_r
 ./bin/cks mcp --config ./cks.yaml               # serves stdio by default
 ```
 
-`-config` is optional — omitted, it falls back to `config.Default()` (dummy backends, dev
+`--config` is optional — omitted, it falls back to `config.Default()` (dummy backends, dev
 mode). Real backends activate when `backends.ckv.path` / `backends.ckg.path` point at built
 ckv/ckg datasets and a live Ollama serves the `embed_model` (bge-m3, 1024-dim).
 

@@ -53,7 +53,7 @@ ground truth by grep):
 | 3 | regression only — determinism of results confirmed |
 
 Latency envelope (go-stablenet graph, ~10K call edges; see
-[ARCHITECTURE-DETAILED.md](ARCHITECTURE-DETAILED.md) §17.2):
+[ARCHITECTURE-DETAILED.md](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/ARCHITECTURE-DETAILED.md) §17.2):
 
 | Tool | Depth | Time |
 |---|---|---|
@@ -73,7 +73,7 @@ neighbours are wanted and the result set must stay minimal.
 ## Provenance
 
 The `depth=2` recommendation originated in the Stage-A depth analysis of
-[design/go-cross-function-lock-propagation.md](design/go-cross-function-lock-propagation.md)
+[design/go-cross-function-lock-propagation.md](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/design/go-cross-function-lock-propagation.md)
 §Q1 ("(b) depth=2 fixed — sweet spot, noise controllable"). This doc
 consolidates that decision and the measured latency/recall evidence into the
 standing reference the tool descriptions point at.

@@ -32,8 +32,8 @@ Example:
 
 ```
 cks domain anchors \
-  -project docs/domain-knowledge/projects/go-stablenet \
-  -graph   data/ckg-stablenet/graph.db
+  --project projects/stablenet/domain-knowledge \
+  --graph /abs/dataset/graph/graph.db
 ```
 
 ## Behaviour (conservative)
