@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
-    "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json"
+    "revision": "b514446f43c63c0360be74eaf1a4fd085173195a",
+    "manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2265,50 +2265,35 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T10:16:26.073180+00:00",
+    "checked_at": "2026-10-13T10:48:41.953610+00:00",
     "repository": "0xmhha/knowledge-system",
     "local_branch": "codex/refresh-current-documentation",
-    "inspected_local_head": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
+    "inspected_local_head": "b514446f43c63c0360be74eaf1a4fd085173195a",
+    "scope": "local CI-fix material snapshot before proof/ledger commit and push; later publication/merge must be read from GitHub or git status",
     "local_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "remote_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "remote_feature_head": "1e3ace26337205417d7923ddeca620d02abbc370",
-    "remote_feature_branch_exists": true,
-    "snapshot_PRs": [
-      {
-        "baseRefName": "main",
-        "headRefName": "feat/setup-tool",
-        "headRefOid": "1e3ace26337205417d7923ddeca620d02abbc370",
-        "isDraft": false,
-        "mergeCommit": {
-          "oid": "9a39718807ed25a0add30405f7cd1f1ebff4a629"
-        },
-        "mergedAt": "2026-10-13T07:21:09Z",
-        "number": 99,
-        "state": "MERGED",
-        "url": "https://github.com/0xmhha/knowledge-system/pull/99"
-      }
-    ],
-    "scope": "committed documentation-material snapshot; proof/ledger commit advances local branch after this snapshot; PR99 merge and main CI are observed, new documentation branch not published",
-    "documentation_branch_pushed": false,
-    "documentation_PR_created": false,
-    "main_merge_executed": true,
-    "CI_accepted_at_main_revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+    "remote_main_at_initial_check": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+    "documentation_PR": 100,
+    "documentation_PR_url": "https://github.com/0xmhha/knowledge-system/pull/100",
+    "PR_state_at_check": "OPEN",
+    "isDraft": false,
+    "previous_published_documentation_head": "a3df2bf736da45904870e32812419c8c39e1aaaa",
+    "initial_CI_run": 38383410958,
+    "initial_CI": "failure; retained and repaired",
+    "fix_CI": "pending_after_push",
+    "merge_approved_if_CI_passes": true,
+    "PR100_main_merge_executed": false,
     "tag_or_deployment_executed": false
   },
   "latest_documentation_review": {
-    "checked_at": "2026-10-13T10:16:26.073180+00:00",
-    "revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
-    "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json",
+    "checked_at": "2026-10-13T10:48:41.953610+00:00",
+    "revision": "b514446f43c63c0360be74eaf1a4fd085173195a",
+    "manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json",
     "unique_current_and_committed_SHA_bindings": 1768,
-    "source_dependency_bindings": 1582,
-    "approved_inputs": 5,
-    "reports": 183,
-    "evidence": 9,
+    "source_dependency_bindings": 1584,
     "current_SHA_all_match": true,
     "committed_blob_SHA_all_match": true,
     "runtime_Go_changed": false,
-    "frozen_existing_bytes_changed": false,
-    "original_acceptance_clause_count": 83,
+    "packaging_tool_changed": true,
     "original_complete": 17,
     "ontology_complete": 4,
     "required_remaining": [
@@ -2316,112 +2301,83 @@
     ],
     "quality_or_release_acceptance_changed": false,
     "status": "PASS",
-    "scope": "documentation consolidation and executable documentation checks only; product acceptance/defaults/held key conditions unchanged",
-    "state": "complete",
+    "scope": "repair the documentation cleanup CI failure, current installation guide packaging and repository-directory link validation; acceptance/defaults/key hold unchanged",
+    "state": "complete_local_verification; CI_pending_after_push",
     "verification": {
-      "checked_at": "2026-10-13T10:16:14.039723+00:00",
-      "state": "complete",
-      "scope": "documentation consolidation and executable documentation checks only; product acceptance/defaults/held key conditions unchanged",
-      "preservation": {
-        "base_revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-        "protected_existing_files_checked": 12311,
-        "protected_existing_files_changed": 0,
-        "project_entrypoint_exception": "projects/stablenet/README.md is maintained usage reference; domain/evaluation/fixture bytes unchanged",
-        "Go_runtime_files_checked": 1166,
-        "Go_runtime_files_changed": 0,
-        "ordinary_prose_before": 328,
-        "obsolete_prose_removed": 263,
-        "retained_prose_count": 263,
-        "current_prose_count": 71,
-        "role_counts": {
-          "reference": 58,
-          "workflow": 5,
-          "contract": 7,
-          "agent_instructions": 1,
-          "fixture": 4,
-          "domain_data": 30,
-          "frozen_evidence": 158
-        },
-        "historical_evidence_commits_preserved": true,
-        "original_complete": 17,
-        "ontology_complete": 4,
-        "required_remaining": [
-          "N-16 on hold"
+      "checked_at": "2026-10-13T10:48:39.024522+00:00",
+      "scope": "repair the documentation cleanup CI failure, current installation guide packaging and repository-directory link validation; acceptance/defaults/key hold unchanged",
+      "initial_failed_CI": {
+        "run": 38383410958,
+        "revision": "a3df2bf736da45904870e32812419c8c39e1aaaa",
+        "failed_jobs": [
+          "build-and-test",
+          "native-install-contract"
         ],
-        "quality": "inconclusive",
-        "performance_accepted": false
+        "cause": [
+          "removed installation report still named by package-host.py",
+          "links to removed ADR directories passed locally because empty directories remained"
+        ]
       },
-      "acceptance_preservation": {
-        "checks": 83,
-        "IDs_and_text_unchanged": true,
-        "original_and_ontology_task_records_unchanged": true
-      },
+      "changes": [
+        "package current docs/INSTALLATION.md as archive INSTALLATION.md and verify identical bytes/hash",
+        "link current architecture/purpose references instead of deleted ADR directories",
+        "reject a local directory link without repository files",
+        "keep documentation evidence branch available after squash merge"
+      ],
       "checks": {
-        "docs_check": "PASS 105 live prose/script/config documents, including all71 current prose references",
-        "documentation_guard_tests": 18,
-        "progress_guard_tests": 11,
-        "git_diff_check": "PASS"
+        "clean_checkout_documentation": "PASS 106 live documents; all72 current references",
+        "documentation_regression_tests": 20,
+        "package_notice_and_current_guide_tests": 3,
+        "current_host_extracted_archive_and_three_owned_installs": "PASS",
+        "original_completion_progress_guard": "pending_new_committed_binding"
       },
-      "Go_runtime_changed": false,
-      "Go_full_tests_rerun": false,
-      "unchanged_runtime_main_CI": {
-        "run": 38362113044,
-        "revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-        "url": "https://github.com/0xmhha/knowledge-system/actions/runs/38362113044",
-        "jobs": {
-          "native-install-contract": "success",
-          "vuln-scan": "success",
-          "eval-gate-vector": "success",
-          "eval-gate-graph": "success",
-          "build-and-test": "success"
-        }
-      },
-      "original_complete": 17,
-      "ontology_complete": 4,
+      "runtime_Go_changed": false,
+      "packaging_tool_changed": true,
+      "current_references": 72,
+      "obsolete_prose_removed": 263,
+      "frozen_or_domain_input_bytes_changed": false,
       "required_remaining": [
         "N-16 on hold"
       ],
-      "tag_deployment_activation_or_quality_decision_changed": false,
-      "current_references": 71,
-      "obsolete_prose_removed": 263,
-      "legacy_body_snapshot_gap_preserved_as_separately_scoped_followup": true,
-      "initial_check_failure": "sandbox blocked existing Go cache; retained then rerun with permitted cache access",
-      "source_audit": "registered commands/help, setup materialization/alignment, v2 evidence contract, ontology dispatch and scoring, package APIs and registry; source paths indexed by documentation catalog",
-      "new_current_binding_counts": {
-        "source": 1582,
-        "approved": 5,
-        "reports": 183
+      "original_complete": 17,
+      "ontology_complete": 4,
+      "quality_or_release_acceptance_changed": false,
+      "publication": {
+        "PR": 100,
+        "url": "https://github.com/0xmhha/knowledge-system/pull/100",
+        "state": "OPEN",
+        "isDraft": false,
+        "merge_authorization": "explicit user instruction: if CI passes, squash merge and synchronize main",
+        "new_head_CI": "pending_after_fix_push"
       },
       "changed_sources": [
         "Makefile",
-        "cmd/cks/domaincli/README-anchors.md",
-        "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
-        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
-        "internal/graph/parse/solidity/WALKER_SYMMETRY.md",
+        "docs/INSTALLATION.md",
         "scripts/check-docs.py",
         "scripts/documentation_contract.py",
-        "scripts/test_documentation_contract.py"
+        "scripts/package-host.py",
+        "scripts/test_documentation_contract.py",
+        "scripts/test_package_notice_recipe.py",
+        "scripts/wbs-package-smoke.sh"
       ]
     },
     "changed_sources": [
       "Makefile",
-      "cmd/cks/domaincli/README-anchors.md",
-      "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
-      "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
-      "internal/graph/parse/solidity/WALKER_SYMMETRY.md",
+      "docs/INSTALLATION.md",
       "scripts/check-docs.py",
       "scripts/documentation_contract.py",
-      "scripts/test_documentation_contract.py"
+      "scripts/package-host.py",
+      "scripts/test_documentation_contract.py",
+      "scripts/test_package_notice_recipe.py",
+      "scripts/wbs-package-smoke.sh"
     ],
     "remaining_original": [
       "N-16 on hold"
     ],
-    "delivery_remaining": [],
-    "delivery_next_task": null,
-    "progress_check": "PASS ontology4/4; original17/18; required remaining N-16 on hold",
+    "progress_check": "PASS original17/18 ontology4/4; N-16 on hold",
     "late_report_sha256": {
-      "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/committed-binding-proof.json": "20c34f90225bce7273fd61d877e1dd902bb81e44713aa55f7dd1fe1b1b74e997",
-      "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/progress-check.txt": "e48ed0be0e1752f11da47131c6ae3348321d803bea621fdf99e26a94b97a7450"
+      "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/committed-binding-proof.json": "041949468d8771bfb2ede81400e7cfd528b4599a2783d8706f0235c5139cd448",
+      "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/progress-check.txt": "fe0b60e275cef8806ea5863dd5c626791ce793b311b3683a8986b7512e5b258e"
     }
   },
   "setup_ontology_public_transfer": {
@@ -2511,22 +2467,29 @@
     ],
     "tag_or_deployment_executed": false
   },
-  "delivery_next_task": null,
-  "delivery_remaining": [],
+  "delivery_next_task": "PR100 fix CI verification then authorized squash merge and main synchronization",
+  "delivery_remaining": [
+    "PR100 fix CI verification",
+    "CI success then authorized squash merge and main synchronization"
+  ],
   "documentation_maintenance": {
     "state": "complete",
     "material_revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
     "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json",
     "proof": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/committed-binding-proof.json",
     "removed_prose": 263,
-    "current_references": 71,
+    "current_references": 72,
     "retained_data_prose": 192,
     "all_remaining_work_document": "docs/REMAINING-WORK.md",
     "current_entrypoint": "docs/README.md",
     "local_branch": "codex/refresh-current-documentation",
-    "publication": "not_requested_for_this_documentation_change; local committed branch",
+    "publication": "PR100 OPEN, normal PR; fix publication and CI pending at this snapshot",
     "previous_PR99_delivery": "merged_on_explicit_user_instruction; independent_review_not_inferred",
     "required_next_task": "N-16 on hold; await explicit resume decision",
-    "optional_followups_are_separate_scope": true
+    "optional_followups_are_separate_scope": true,
+    "latest_fix_material_revision": "b514446f43c63c0360be74eaf1a4fd085173195a",
+    "latest_fix_manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json",
+    "latest_fix_proof": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/committed-binding-proof.json",
+    "historical_evidence_branch": "codex/refresh-current-documentation; retain after squash merge"
   }
 }
