@@ -456,3 +456,7 @@ O04 입력 준비: [질문8·gold10·프로토콜 검토안](./ONTOLOGY-EVALUATI
 O04-B DEV 전후 대조 완료: [실제 파일럿 결과](./ONTOLOGY-DEV-PILOT-RESULT-2026-10-13.md) — 사전 동결50dea115·실제BGE-M3/같은 tuple·binary·설정·질문,324응답/162쌍·별도trace2·실패/누락/pending/범위미결합0·v2/원문 SHA 검증. 4제안군 평균 Recall0.667→0.750·평균 expected RR0.352→0.369, warm p95비1.3047(DEV예산1.25초과). 과거DEV와 겹쳐 독립단위0/새FINAL0·inconclusive·기본off 유지. 입력/채점39·guard11시험 pass. A/B만 체크하고 C/D·전체O04는 미완료, 전체 잔여 N16/O04의2개 유지.
 
 O04 비용/입력후속: [진단·보완·새후보](./ONTOLOGY-COST-AND-INDEPENDENT-INPUTS-2026-10-13.md) — baseline/relations/concept_text 각동일조건의수정전후126응답/84대조, before/after인용·본문126쌍불변. 전체파일바이트SHA+타입으로작은좌표값16개만재사용하며source/anchor/chunk 검증유지; race247/249·실패/skip0·vet/boundary pass. 매칭문항textp95562→477ms지만no_match이상치432→728ms를보존했고전체성능미수용. 882응답노출대조·auditor12시험, 새10후보중2격리·8검토대기/7제안군·독립승인0·새FINAL0. C/D와전체O04 unchecked·전체잔여 N16/O04 유지.
+
+## O04 독립 입력 이력·검토 준비 후속
+
+[이력 대조·후보 보강·검토 조건](./ONTOLOGY-INDEPENDENT-HISTORY-REVIEW-2026-10-13.md): 평가 JSON4,758·Markdown/YAML1,618의 총6,376 SHA를 포착 커밋에 결합, 빈3개 외6,373개 해석. 전체 응답34,011·중복 제외표현1,005와 gold624표현을 대조했다. 후보18/19gold의 실제 source/canonical/chunk 전체 행 포함 확인, 과거노출4·기존설계맥락1 제외. 검토13문항·보수적제안10군은 독립승인0/FINAL가능0이며 기존DEV 노출작성자·같은개념군·외부/삭제/채팅이력 한계와 추가통합 시 부족 가능성을 기록했다. 입력/채점/노출70시험 pass·운영HEAD/current/config/heldDB SHA 보존·모델호출0. O04-A/B만 완료, C/D·전체O04 unchecked. 다음 실제 내용/gold/범위/군·의미적독립성 검토→조건 충족 시 사전동결→평가/최종수용. 전체잔여 O04/N16의2개.

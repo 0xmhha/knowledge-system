@@ -1,0 +1,66 @@
+{
+  "status": "unapproved_content_gold_scope_and_semantic_independence_review_needed",
+  "machine_line_body_or_query_exposure_quarantined": [
+    "IC-01",
+    "IC-10",
+    "IC-13",
+    "IC-14"
+  ],
+  "author_conservative_prior_design_context_excluded": [
+    "IC-15"
+  ],
+  "prior_design_context": {
+    "file": "docs/vector/evaluation-design-2026-05-22.md",
+    "lines": [
+      511,
+      517
+    ],
+    "sha256": "014e1d3c246afce07246f5d5b350c70723b94f1aa467be20db41d24b7fc3662d",
+    "reason": "existing WBFT future-view off-by-one evaluation intent names isTooFarFutureMessage; this is design-context exclusion, not observed gold-line overlap"
+  },
+  "review_question_ids": [
+    "IC-02",
+    "IC-03",
+    "IC-04",
+    "IC-05",
+    "IC-06",
+    "IC-07",
+    "IC-08",
+    "IC-09",
+    "IC-11",
+    "IC-12",
+    "IC-16",
+    "IC-17",
+    "IC-18"
+  ],
+  "review_questions": 13,
+  "individual_proposed_clusters_before_conservative_merges": 12,
+  "review_fact_cluster_assignment": {
+    "IC-02": "validator-membership",
+    "IC-03": "validator-membership",
+    "IC-04": "round-timeout",
+    "IC-05": "higher-round-count",
+    "IC-06": "round-selection",
+    "IC-07": "round-pruning",
+    "IC-08": "nil-prepared-justification",
+    "IC-09": "previous-view-signer-selection",
+    "IC-11": "message-queue-entry-and-state-drain",
+    "IC-12": "seal-domain-hash",
+    "IC-16": "message-queue-entry-and-state-drain",
+    "IC-17": "request-entry-validation-and-broadcast",
+    "IC-18": "request-entry-validation-and-broadcast"
+  },
+  "proposed_review_clusters_after_merges": 10,
+  "minimum_independent_units": 10,
+  "proposed_cluster_shortfall_before_human_review": 0,
+  "approved_independent_units": 0,
+  "FINAL_eligible_questions": 0,
+  "new_model_queries": 0,
+  "limits": [
+    "Conservative merges are proposals, not reviewed units.",
+    "Same approved concept families and author exposed to earlier DEV remain.",
+    "No content/semantic-independence approval is inferred from next/continue.",
+    "Catalog covers saved repository JSON and requested Markdown/YAML roots; no recovery of missing/chat/external/deleted history.",
+    "Any further correlation merger or exposure exclusion may make the independent-unit floor unmet."
+  ]
+}
