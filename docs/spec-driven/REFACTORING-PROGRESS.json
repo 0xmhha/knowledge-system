@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "501a67568a9702764212f023d595f29d6fb17835",
-    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-acceptance-2026-10-13/manifest.json"
+    "revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
+    "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -735,7 +735,7 @@
     "main_synchronized_at_merge": true
   },
   "execution_plan": "docs/spec-driven/REFACTORING-COMPLETION-PLAN-2026-10-08.md",
-  "working_branch": "feat/setup-tool",
+  "working_branch": "codex/refresh-current-documentation",
   "followup_merge": {
     "source_branch": "feat/refactoring-followup",
     "pr_number": 98,
@@ -2265,96 +2265,164 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T07:02:49.773355+00:00",
+    "checked_at": "2026-10-13T10:16:26.073180+00:00",
     "repository": "0xmhha/knowledge-system",
-    "local_branch": "feat/setup-tool",
-    "inspected_local_head": "de3dcee1d09c54718338454c3721f335fd72bb72",
-    "remote_feature_head": "de3dcee1d09c54718338454c3721f335fd72bb72",
-    "remote_main": "21e26ac28fa8104116ec01b91b4a6478b81b8ff2",
+    "local_branch": "codex/refresh-current-documentation",
+    "inspected_local_head": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
+    "local_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+    "remote_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+    "remote_feature_head": "1e3ace26337205417d7923ddeca620d02abbc370",
     "remote_feature_branch_exists": true,
-    "branch_PRs": [
+    "snapshot_PRs": [
       {
-        "number": 99,
-        "url": "https://github.com/0xmhha/knowledge-system/pull/99",
-        "state": "OPEN",
+        "baseRefName": "main",
+        "headRefName": "feat/setup-tool",
+        "headRefOid": "1e3ace26337205417d7923ddeca620d02abbc370",
         "isDraft": false,
-        "headRefOid": "de3dcee1d09c54718338454c3721f335fd72bb72"
+        "mergeCommit": {
+          "oid": "9a39718807ed25a0add30405f7cd1f1ebff4a629"
+        },
+        "mergedAt": "2026-10-13T07:21:09Z",
+        "number": 99,
+        "state": "MERGED",
+        "url": "https://github.com/0xmhha/knowledge-system/pull/99"
       }
     ],
-    "scope": "successful CI verification snapshot at de3dcee1 before final documentation commits; later document-only commits advance the branch",
-    "push_or_PR_created": true,
-    "CI_accepted": true,
-    "main_merge_executed": false,
+    "scope": "committed documentation-material snapshot; proof/ledger commit advances local branch after this snapshot; PR99 merge and main CI are observed, new documentation branch not published",
+    "documentation_branch_pushed": false,
+    "documentation_PR_created": false,
+    "main_merge_executed": true,
+    "CI_accepted_at_main_revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
     "tag_or_deployment_executed": false
   },
   "latest_documentation_review": {
-    "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
-    "revision": "501a67568a9702764212f023d595f29d6fb17835",
-    "manifest": "system/eval/b0-knowledge-system/ci-toolchain-acceptance-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1725,
-    "source_dependency_bindings": 1579,
-    "changed_sources": [
-      ".github/workflows/ci.yml",
-      "internal/system/mcp/semantic_status_test.go",
-      "cmd/cks/semanticcli/compare.go",
-      "internal/vector/build/memory_linux.go"
+    "checked_at": "2026-10-13T10:16:26.073180+00:00",
+    "revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
+    "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1768,
+    "source_dependency_bindings": 1582,
+    "approved_inputs": 5,
+    "reports": 183,
+    "evidence": 9,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "runtime_Go_changed": false,
+    "frozen_existing_bytes_changed": false,
+    "original_acceptance_clause_count": 83,
+    "original_complete": 17,
+    "ontology_complete": 4,
+    "required_remaining": [
+      "N-16 on hold"
     ],
+    "quality_or_release_acceptance_changed": false,
     "status": "PASS",
+    "scope": "documentation consolidation and executable documentation checks only; product acceptance/defaults/held key conditions unchanged",
     "state": "complete",
     "verification": {
-      "checked_at": "2026-10-13T07:01:26.283267+00:00",
+      "checked_at": "2026-10-13T10:16:14.039723+00:00",
       "state": "complete",
-      "scope": "CI toolchain alignment and three cleanup lint fixes; original product and release acceptance unchanged",
-      "GitHub_CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
-      "isolated_whole_module_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
-      "GitHub_CI_verified_run": 38359250800,
-      "GitHub_CI_URL": "https://github.com/0xmhha/knowledge-system/actions/runs/38359250800",
-      "GitHub_CI_jobs": {
-        "native-install-contract": "success",
-        "vuln-scan": "success",
-        "eval-gate-vector": "success",
-        "eval-gate-graph": "success",
-        "build-and-test": "success"
+      "scope": "documentation consolidation and executable documentation checks only; product acceptance/defaults/held key conditions unchanged",
+      "preservation": {
+        "base_revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+        "protected_existing_files_checked": 12311,
+        "protected_existing_files_changed": 0,
+        "project_entrypoint_exception": "projects/stablenet/README.md is maintained usage reference; domain/evaluation/fixture bytes unchanged",
+        "Go_runtime_files_checked": 1166,
+        "Go_runtime_files_changed": 0,
+        "ordinary_prose_before": 328,
+        "obsolete_prose_removed": 263,
+        "retained_prose_count": 263,
+        "current_prose_count": 71,
+        "role_counts": {
+          "reference": 58,
+          "workflow": 5,
+          "contract": 7,
+          "agent_instructions": 1,
+          "fixture": 4,
+          "domain_data": 30,
+          "frozen_evidence": 158
+        },
+        "historical_evidence_commits_preserved": true,
+        "original_complete": 17,
+        "ontology_complete": 4,
+        "required_remaining": [
+          "N-16 on hold"
+        ],
+        "quality": "inconclusive",
+        "performance_accepted": false
       },
-      "Go_local": "1.26.9 darwin/arm64",
-      "local_lint": "PASS, 0 issues",
-      "domain_artifacts": "PASS",
-      "targeted_race": "PASS semanticcli/system-mcp after close fixes",
-      "initial_whole_module_race": "FAIL: 116 packages passed; graph/buildpipe Git fsck exited2 during concurrent commits; failure retained",
-      "subsequent_working_repository_fsck": "PASS exit0, no persistent missing objects; no original Git objects changed/deleted to force success",
-      "isolated_whole_module_race": "PASS exit0, 117 packages; exact source/input hashes match committed5935fa96",
-      "vulnerability_check": "PASS reachable0/imported-package0; module-only2 retained as bounded limitation",
-      "module_only_findings": [
-        "GO-2026-6180",
-        "GO-2026-6179"
-      ],
-      "scan_scope_limit": "Go1.26.9 builds only; previously built/installed binaries and Go1.25 minimum-version compatibility artifacts are not reclassified as remediated by this scan; C/native dependency vulnerabilities not covered",
-      "source_dependency_bindings": 1579,
-      "approved_inputs": 5,
+      "acceptance_preservation": {
+        "checks": 83,
+        "IDs_and_text_unchanged": true,
+        "original_and_ontology_task_records_unchanged": true
+      },
+      "checks": {
+        "docs_check": "PASS 105 live prose/script/config documents, including all71 current prose references",
+        "documentation_guard_tests": 18,
+        "progress_guard_tests": 11,
+        "git_diff_check": "PASS"
+      },
+      "Go_runtime_changed": false,
+      "Go_full_tests_rerun": false,
+      "unchanged_runtime_main_CI": {
+        "run": 38362113044,
+        "revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+        "url": "https://github.com/0xmhha/knowledge-system/actions/runs/38362113044",
+        "jobs": {
+          "native-install-contract": "success",
+          "vuln-scan": "success",
+          "eval-gate-vector": "success",
+          "eval-gate-graph": "success",
+          "build-and-test": "success"
+        }
+      },
       "original_complete": 17,
       "ontology_complete": 4,
-      "remaining_original": [
+      "required_remaining": [
         "N-16 on hold"
       ],
-      "delivery_remaining": [
-        "PR review; main merge only on separate instruction"
-      ],
-      "tag_deployment_activation_or_quality_decision_changed": false
+      "tag_deployment_activation_or_quality_decision_changed": false,
+      "current_references": 71,
+      "obsolete_prose_removed": 263,
+      "legacy_body_snapshot_gap_preserved_as_separately_scoped_followup": true,
+      "initial_check_failure": "sandbox blocked existing Go cache; retained then rerun with permitted cache access",
+      "source_audit": "registered commands/help, setup materialization/alignment, v2 evidence contract, ontology dispatch and scoring, package APIs and registry; source paths indexed by documentation catalog",
+      "new_current_binding_counts": {
+        "source": 1582,
+        "approved": 5,
+        "reports": 183
+      },
+      "changed_sources": [
+        "Makefile",
+        "cmd/cks/domaincli/README-anchors.md",
+        "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+        "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+        "internal/graph/parse/solidity/WALKER_SYMMETRY.md",
+        "scripts/check-docs.py",
+        "scripts/documentation_contract.py",
+        "scripts/test_documentation_contract.py"
+      ]
     },
-    "ontology_complete": 4,
-    "original_complete": 17,
+    "changed_sources": [
+      "Makefile",
+      "cmd/cks/domaincli/README-anchors.md",
+      "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+      "docs/spec-driven/SOURCE-SNAPSHOT-ADR.md",
+      "internal/graph/parse/solidity/WALKER_SYMMETRY.md",
+      "scripts/check-docs.py",
+      "scripts/documentation_contract.py",
+      "scripts/test_documentation_contract.py"
+    ],
     "remaining_original": [
       "N-16 on hold"
     ],
-    "tag_or_deployment_executed": false,
-    "public_transfer": true,
-    "PR": 99,
-    "PR_is_draft": false,
-    "CI_acceptance": true,
-    "Git_status_scope": "successful CI de3dcee1 snapshot before final documentation commits",
-    "delivery_remaining": [
-      "PR review; main merge requires separate instruction"
-    ]
+    "delivery_remaining": [],
+    "delivery_next_task": null,
+    "progress_check": "PASS ontology4/4; original17/18; required remaining N-16 on hold",
+    "late_report_sha256": {
+      "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/committed-binding-proof.json": "20c34f90225bce7273fd61d877e1dd902bb81e44713aa55f7dd1fe1b1b74e997",
+      "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/progress-check.txt": "e48ed0be0e1752f11da47131c6ae3348321d803bea621fdf99e26a94b97a7450"
+    }
   },
   "setup_ontology_public_transfer": {
     "approval": "explicit user reply 승인 to whole-branch push and normal PR proposal",
@@ -2363,17 +2431,24 @@
     "branch": "feat/setup-tool",
     "PR_number": 99,
     "PR_url": "https://github.com/0xmhha/knowledge-system/pull/99",
-    "PR_state": "OPEN",
+    "PR_state": "MERGED",
     "isDraft": false,
     "push_complete": true,
     "PR_creation_complete": true,
     "evidence_revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
     "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json",
     "CI_accepted": true,
-    "main_merge_executed": false,
+    "main_merge_executed": true,
     "tag_or_deployment_executed": false,
     "CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
-    "CI_verified_run": 38359250800
+    "CI_verified_run": 38359250800,
+    "merge_commit": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
+    "merged_at": "2026-10-13T07:21:09Z",
+    "state_checked_at": "2026-10-13T10:16:26.073180+00:00",
+    "merge_authorization": "explicit user instruction to squash merge and synchronize main",
+    "independent_PR_review_completed": false,
+    "main_CI_verified_run": 38362113044,
+    "main_CI_verified_revision": "9a39718807ed25a0add30405f7cd1f1ebff4a629"
   },
   "latest_ci_remediation": {
     "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
@@ -2436,9 +2511,22 @@
     ],
     "tag_or_deployment_executed": false
   },
-  "delivery_next_task": "PR review",
-  "delivery_remaining": [
-    "PR review",
-    "main squash merge only on separate user instruction"
-  ]
+  "delivery_next_task": null,
+  "delivery_remaining": [],
+  "documentation_maintenance": {
+    "state": "complete",
+    "material_revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
+    "manifest": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/manifest.json",
+    "proof": "system/eval/b0-knowledge-system/documentation-cleanup-2026-10-13/committed-binding-proof.json",
+    "removed_prose": 263,
+    "current_references": 71,
+    "retained_data_prose": 192,
+    "all_remaining_work_document": "docs/REMAINING-WORK.md",
+    "current_entrypoint": "docs/README.md",
+    "local_branch": "codex/refresh-current-documentation",
+    "publication": "not_requested_for_this_documentation_change; local committed branch",
+    "previous_PR99_delivery": "merged_on_explicit_user_instruction; independent_review_not_inferred",
+    "required_next_task": "N-16 on hold; await explicit resume decision",
+    "optional_followups_are_separate_scope": true
+  }
 }
