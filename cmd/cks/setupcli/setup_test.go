@@ -152,3 +152,21 @@ func TestResolveAutoVersionRejectsGitIgnoredIndexableSource(t *testing.T) {
 		t.Fatalf("Git-ignored Go source accepted under commit version: %v", err)
 	}
 }
+
+func TestVersionedSetupRefusesSkipVectorBeforeCapture(t *testing.T) {
+	src := t.TempDir()
+	out := filepath.Join(t.TempDir(), "dataset")
+	for _, args := range [][]string{
+		{"--src", src, "--out", out, "--version", "g1", "--skip-vector"},
+		{"--src", src, "--out", out, "--version", "g1", "--skip-vector", "--project-id", "p-0123456789abcdef0123456789abcdef"},
+	} {
+		err := runSetup(args)
+		if err == nil || !strings.Contains(err.Error(), "skip_vector_unversioned") {
+			t.Fatalf("runSetup(%v) = %v, want skip_vector_unversioned", args, err)
+		}
+	}
+	// Refused before anything is written: no dataset or version directory.
+	if _, err := os.Lstat(out); !os.IsNotExist(err) {
+		t.Fatalf("refused setup left %s behind: %v", out, err)
+	}
+}

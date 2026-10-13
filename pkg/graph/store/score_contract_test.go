@@ -39,7 +39,7 @@ func TestSearchFTS_ScoreContract(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open graph %q: %v", dbPath, err)
 	}
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	// A common identifier any go-stablenet graph will hit.
 	hits, err := r.SearchFTS("Finalize", 5, store.SearchFTSOptions{})
@@ -102,7 +102,7 @@ func TestBuildGoStablenetSmoke_M2D(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open graph %q: %v", dbPath, err)
 	}
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	const entryID = "A4.system_contracts.addresses"
 	ns, err := r.FindSymbol(entryID, true, store.FindSymbolOptions{})

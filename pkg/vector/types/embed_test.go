@@ -6,7 +6,7 @@ func TestEmbeddingIdentityChecksum(t *testing.T) {
 	base := EmbeddingIdentity{Provider: "ollama", Model: "bge-m3", Dim: 1024}
 
 	// Stable and equal for identical identities.
-	if base.Checksum() != base.Checksum() {
+	if first, second := base.Checksum(), base.Checksum(); first != second {
 		t.Fatal("checksum must be stable for the same identity")
 	}
 	same := EmbeddingIdentity{Provider: "ollama", Model: "bge-m3", Dim: 1024}

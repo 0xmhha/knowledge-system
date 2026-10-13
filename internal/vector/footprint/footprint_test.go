@@ -79,7 +79,7 @@ func TestProfileDisabledByDefault(t *testing.T) {
 	}
 	done := l.Span("query.search")
 	done()
-	l.Close()
+	_ = l.Close()
 
 	entries, _ := os.ReadDir(dir)
 	for _, e := range entries {
@@ -138,7 +138,7 @@ func TestSpanEmitsStartAndDoneWithLatency(t *testing.T) {
 	done := l.Span("query.search", "k", 5)
 	time.Sleep(2 * time.Millisecond)
 	done("hits", 3, "citation_drops", 0)
-	l.Close()
+	_ = l.Close()
 
 	events := readEvents(t, path)
 	if len(events) != 2 {
@@ -171,7 +171,7 @@ func TestRunIDStableAcrossEvents(t *testing.T) {
 	l, _ := New(Options{JSONLPath: path, RunID: "explicit-run-id"})
 	l.Emit("a")
 	l.Emit("b")
-	l.Close()
+	_ = l.Close()
 
 	events := readEvents(t, path)
 	if len(events) != 2 {
@@ -199,11 +199,11 @@ func TestJSONLIsAppendOnly(t *testing.T) {
 	// First logger
 	l1, _ := New(Options{JSONLPath: path})
 	l1.Emit("session.a")
-	l1.Close()
+	_ = l1.Close()
 	// Second logger: must append, not truncate
 	l2, _ := New(Options{JSONLPath: path})
 	l2.Emit("session.b")
-	l2.Close()
+	_ = l2.Close()
 
 	events := readEvents(t, path)
 	if len(events) != 2 {
@@ -217,7 +217,7 @@ func readEvents(t *testing.T, path string) []Event {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	var out []Event
 	scan := bufio.NewScanner(f)
 	scan.Buffer(make([]byte, 1<<20), 1<<20)

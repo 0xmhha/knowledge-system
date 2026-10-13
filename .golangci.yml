@@ -1,0 +1,27 @@
+# golangci-lint v2 configuration, run by `make golangci` (part of `make lint`).
+# The default linter set (errcheck, govet, ineffassign, staticcheck, unused)
+# applies to every package; nothing is disabled per rule.
+version: "2"
+
+linters:
+  default: standard
+  exclusions:
+    paths:
+      # Recorded evaluation evidence: inputs are hashed by their manifests and
+      # must stay byte-for-byte as captured.
+      - ^system/eval/
+      - ^projects/[^/]+/eval/
+
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    paths:
+      - ^system/eval/
+      - ^projects/[^/]+/eval/
+
+issues:
+  # Report every finding; the defaults cap output per linter and per message,
+  # which once hid 526 of 618 findings behind a count of 92.
+  max-issues-per-linter: 0
+  max-same-issues: 0

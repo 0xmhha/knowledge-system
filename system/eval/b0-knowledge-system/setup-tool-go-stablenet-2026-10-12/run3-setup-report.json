@@ -1,0 +1,426 @@
+{
+ "generated_at": "2026-10-12T03:39:48+0900",
+ "source": "/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet",
+ "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+ "dataset": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet",
+ "version": "v20261012-030550-0bf2f4d1",
+ "pack": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet",
+ "pack_inputs": [
+  "code_root",
+  "domain_knowledge",
+  "flow_corpus",
+  "glossary_file",
+  "policy_file",
+  "vector_policy"
+ ],
+ "embedder": {
+  "backend": "ollama",
+  "model": "bge-m3:latest",
+  "dim": 1024
+ },
+ "steps": [
+  {
+   "key": "preflight",
+   "status": "done",
+   "seconds": 0.2,
+   "substeps": [
+    {
+     "key": "knowledge-system",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "git",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "go",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "make",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "source",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "dataset",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "project pack",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "ollama",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "embedding model",
+     "status": "done",
+     "seconds": 0
+    }
+   ]
+  },
+  {
+   "key": "build",
+   "status": "done",
+   "seconds": 11.7,
+   "substeps": []
+  },
+  {
+   "key": "init",
+   "status": "done",
+   "seconds": 0.0,
+   "substeps": []
+  },
+  {
+   "key": "index",
+   "status": "done",
+   "seconds": 2007.3,
+   "substeps": [
+    {
+     "key": "domain-export",
+     "status": "done",
+     "seconds": 0.1
+    },
+    {
+     "key": "policy-fresh",
+     "status": "done",
+     "seconds": 0.0
+    },
+    {
+     "key": "glossary-fresh",
+     "status": "done",
+     "seconds": 0.0
+    },
+    {
+     "key": "graph-build",
+     "status": "done",
+     "seconds": 444.9
+    },
+    {
+     "key": "vector-preflight",
+     "status": "done",
+     "seconds": 0.0
+    },
+    {
+     "key": "vector-build",
+     "status": "done",
+     "seconds": 1428.7
+    },
+    {
+     "key": "verify-align",
+     "status": "done",
+     "seconds": 0.1
+    },
+    {
+     "key": "verify-content",
+     "status": "done",
+     "seconds": 0.0
+    },
+    {
+     "key": "reindex-gate",
+     "status": "done",
+     "seconds": 32.4
+    },
+    {
+     "key": "reindex-promote",
+     "status": "done",
+     "seconds": 0
+    }
+   ]
+  },
+  {
+   "key": "serve",
+   "status": "done",
+   "seconds": 0.0,
+   "substeps": []
+  },
+  {
+   "key": "verify",
+   "status": "done",
+   "seconds": 27.4,
+   "substeps": [
+    {
+     "key": "graph",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "vector",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "review_function",
+     "status": "done",
+     "seconds": 0
+    },
+    {
+     "key": "get_for_task_v2",
+     "status": "done",
+     "seconds": 0
+    }
+   ]
+  }
+ ],
+ "health": {
+  "status": "ok",
+  "serviceable": true,
+  "tools": 24,
+  "graph_reachable": true,
+  "graph_schema": "1.24",
+  "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "vector_reachable": true,
+  "vector_reason": null,
+  "queries": {
+   "review_function": {
+    "symbol": "log.Info",
+    "ok": true,
+    "ms": 3087,
+    "callers": 40,
+    "call_sites": 1,
+    "commits": 0,
+    "test_callers": 2
+   },
+   "get_for_task_v2": {
+    "prompt": "Where is Info implemented and who calls it?",
+    "ok": true,
+    "ms": 3332,
+    "citations": 8
+   }
+  }
+ },
+ "profile": {
+  "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-030550-0bf2f4d1",
+  "graph": {
+   "schema_version": "1.24",
+   "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+   "languages": {
+    "go": 1256,
+    "proto": 4,
+    "sol": 24,
+    "ts": 39
+   },
+   "files": 1323,
+   "nodes": 244822,
+   "edges": 1963773,
+   "functions": 18830,
+   "commits": 6404,
+   "policy_nodes": 42,
+   "security_pattern_nodes": 0,
+   "governed_by_edges": 140,
+   "node_pr_links": 172702,
+   "test_nodes": 89639,
+   "review_code_edges": 60821,
+   "db_bytes": 826834944
+  },
+  "vector": {
+   "chunks": 21236,
+   "languages": {
+    "go": 19422,
+    "javascript": 422,
+    "markdown": 633,
+    "solidity": 444
+   },
+   "model": "bge-m3:latest",
+   "dim": 1024,
+   "policy": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/policies/vector.yaml",
+   "chunk_kinds": {
+    "convention": 203,
+    "doc": 633,
+    "file_header": 1349,
+    "flow_spine": 18,
+    "flow_step": 78,
+    "function_split": 211,
+    "invariant": 178,
+    "symbol": 18566
+   },
+   "categorized": 19245,
+   "with_guidance": 18899,
+   "with_canonical_id": 20042,
+   "domain_chunks": 346,
+   "flow_chunks": 96,
+   "test_chunks": 5422,
+   "db_bytes": 128483328
+  }
+ },
+ "compared_with": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet@0bf2f4d1b",
+ "comparison": [
+  {
+   "metric": "graph schema",
+   "this": "1.24",
+   "other": "1.23"
+  },
+  {
+   "metric": "source commit",
+   "this": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+   "other": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+  },
+  {
+   "metric": "graph files",
+   "this": 1323,
+   "other": 1323
+  },
+  {
+   "metric": "graph nodes",
+   "this": 244822,
+   "other": 244930
+  },
+  {
+   "metric": "graph edges",
+   "this": 1963773,
+   "other": 1963805
+  },
+  {
+   "metric": "functions + methods",
+   "this": 18830,
+   "other": 18830
+  },
+  {
+   "metric": "commits",
+   "this": 6404,
+   "other": 6401
+  },
+  {
+   "metric": "policy nodes",
+   "this": 42,
+   "other": 36
+  },
+  {
+   "metric": "governed_by edges",
+   "this": 140,
+   "other": 112
+  },
+  {
+   "metric": "node-PR links",
+   "this": 172702,
+   "other": 172676
+  },
+  {
+   "metric": "vector chunks",
+   "this": 21236,
+   "other": 19343
+  },
+  {
+   "metric": "categorized chunks",
+   "this": 19245,
+   "other": 17556
+  },
+  {
+   "metric": "chunks with guidance",
+   "this": 18899,
+   "other": 17556
+  },
+  {
+   "metric": "chunks with canonical_id",
+   "this": 20042,
+   "other": 16085
+  },
+  {
+   "metric": "domain chunks",
+   "this": 346,
+   "other": 0
+  },
+  {
+   "metric": "flow chunks",
+   "this": 96,
+   "other": 0
+  },
+  {
+   "metric": "test chunks",
+   "this": 5422,
+   "other": 5096
+  },
+  {
+   "metric": "graph language: go",
+   "this": 1256,
+   "other": 1256
+  },
+  {
+   "metric": "graph language: proto",
+   "this": 4,
+   "other": 4
+  },
+  {
+   "metric": "graph language: sol",
+   "this": 24,
+   "other": 24
+  },
+  {
+   "metric": "graph language: ts",
+   "this": 39,
+   "other": 39
+  },
+  {
+   "metric": "vector language: go",
+   "this": 19422,
+   "other": 17922
+  },
+  {
+   "metric": "vector language: javascript",
+   "this": 422,
+   "other": 420
+  },
+  {
+   "metric": "vector language: markdown",
+   "this": 633,
+   "other": 393
+  },
+  {
+   "metric": "vector language: solidity",
+   "this": 444,
+   "other": 404
+  },
+  {
+   "metric": "vector chunk_kind: convention",
+   "this": 203,
+   "other": 204
+  },
+  {
+   "metric": "vector chunk_kind: doc",
+   "this": 633,
+   "other": 393
+  },
+  {
+   "metric": "vector chunk_kind: file_header",
+   "this": 1349,
+   "other": 1356
+  },
+  {
+   "metric": "vector chunk_kind: flow_spine",
+   "this": 18,
+   "other": null
+  },
+  {
+   "metric": "vector chunk_kind: flow_step",
+   "this": 78,
+   "other": null
+  },
+  {
+   "metric": "vector chunk_kind: function_split",
+   "this": 211,
+   "other": null
+  },
+  {
+   "metric": "vector chunk_kind: invariant",
+   "this": 178,
+   "other": 162
+  },
+  {
+   "metric": "vector chunk_kind: symbol",
+   "this": 18566,
+   "other": 17228
+  }
+ ]
+}

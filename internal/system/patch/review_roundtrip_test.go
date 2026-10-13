@@ -95,7 +95,7 @@ func TestExactRunnerReportRoundTripDoesNotApproveOrPromote(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer reader.Close()
+			defer func() { _ = reader.Close() }()
 			for _, anchor := range []struct {
 				id, canonical string
 				kind          semantic.SourceKind
@@ -127,7 +127,7 @@ func TestExactRunnerReportRoundTripDoesNotApproveOrPromote(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			if err := store.PutAlignedRetained(ctx, p, source, graphDir, vectorDir, vdir); err != nil {
 				t.Fatal(err)
 			}
@@ -203,7 +203,7 @@ func TestExactRunnerReportRoundTripDoesNotApproveOrPromote(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer check.Close()
+			defer func() { _ = check.Close() }()
 			if _, err := check.Current(ctx, snapshot.ProjectID); err != sql.ErrNoRows {
 				t.Fatalf("import activated semantic current: %v", err)
 			}

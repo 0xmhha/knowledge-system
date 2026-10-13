@@ -1,0 +1,9 @@
+$ cd /tmp && cks mcp gen-config --dataset-dir <ds>/current --name demo --out g2.yaml
+    rules_path: ~/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+$ (same again)
+{"code":"output_exists","message":"The output file already exists; choose another --out or remove the existing file."}
+$ cks setup --version g1 --skip-vector
+{"code":"skip_vector_unversioned","message":"--skip-vector builds an unversioned graph-only dataset; drop --version, or build both indexes."}
+out dir exists: no
+$ cks mcp --config <config naming a missing ruleset>
+{"code":"config_invalid","message":"The server config or a file it names (such as the sanitize ruleset) could not be loaded; regenerate it with cks mcp gen-config."}

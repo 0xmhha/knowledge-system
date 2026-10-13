@@ -83,7 +83,7 @@ func TestSearch_FindsHits(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer engine.Close()
+	defer func() { _ = engine.Close() }()
 
 	resp, err := engine.SemanticSearch(context.Background(),
 		"server listen function",
@@ -111,7 +111,7 @@ func TestSearch_FindsHits(t *testing.T) {
 func TestSearch_EmptyIntent(t *testing.T) {
 	out := buildSampleIndex(t)
 	engine, _ := ckv.Open(out, ckv.OpenOptions{Embedder: ckv.MockEmbedder()})
-	defer engine.Close()
+	defer func() { _ = engine.Close() }()
 
 	_, err := engine.SemanticSearch(context.Background(), "", ckv.SearchOptions{})
 	if err == nil {
@@ -148,7 +148,7 @@ func TestEngine_Warmup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer engine.Close()
+	defer func() { _ = engine.Close() }()
 	if err := engine.Warmup(context.Background()); err != nil {
 		t.Errorf("Warmup: %v", err)
 	}
@@ -157,7 +157,7 @@ func TestEngine_Warmup(t *testing.T) {
 func TestEngine_WarmupAfterCloseFails(t *testing.T) {
 	out := buildSampleIndex(t)
 	engine, _ := ckv.Open(out, ckv.OpenOptions{Embedder: ckv.MockEmbedder()})
-	engine.Close()
+	_ = engine.Close()
 	if err := engine.Warmup(context.Background()); err == nil {
 		t.Fatal("expected Warmup after Close to error")
 	}
@@ -196,7 +196,7 @@ func TestErrorModel_AllSentinelsExported(t *testing.T) {
 func TestSearch_BudgetExceeded_PropagatesThroughCKVFacade(t *testing.T) {
 	out := buildSampleIndex(t)
 	engine, _ := ckv.Open(out, ckv.OpenOptions{Embedder: ckv.MockEmbedder()})
-	defer engine.Close()
+	defer func() { _ = engine.Close() }()
 
 	_, err := engine.SemanticSearch(context.Background(), "x",
 		ckv.SearchOptions{BudgetTokens: 5})
@@ -210,7 +210,7 @@ func TestSearch_BudgetExceeded_PropagatesThroughCKVFacade(t *testing.T) {
 func TestCheckFreshness_AfterCloseFails(t *testing.T) {
 	out := buildSampleIndex(t)
 	engine, _ := ckv.Open(out, ckv.OpenOptions{Embedder: ckv.MockEmbedder()})
-	engine.Close()
+	_ = engine.Close()
 	if err := engine.CheckFreshness(); err == nil {
 		t.Fatal("expected CheckFreshness after Close to error")
 	}
@@ -219,7 +219,7 @@ func TestCheckFreshness_AfterCloseFails(t *testing.T) {
 func TestEngine_Manifest(t *testing.T) {
 	out := buildSampleIndex(t)
 	engine, _ := ckv.Open(out, ckv.OpenOptions{Embedder: ckv.MockEmbedder()})
-	defer engine.Close()
+	defer func() { _ = engine.Close() }()
 
 	man := engine.Manifest()
 	if man.EmbeddingModel == "" {

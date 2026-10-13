@@ -1,0 +1,12 @@
+go vet ./...
+go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0 run --timeout 15m ./...
+cmd/cks/semanticcli/compare.go:46:15: Error return value of `f.Close` is not checked (errcheck)
+	defer f.Close()
+	             ^
+internal/system/mcp/semantic_status_test.go:179:21: Error return value of `store.Close` is not checked (errcheck)
+			defer store.Close()
+			                 ^
+2 issues:
+* errcheck: 2
+exit status 1
+make: *** [golangci] Error 1

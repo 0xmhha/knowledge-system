@@ -77,7 +77,8 @@ func containsTerm(query, term string) bool {
 	}
 	// Latin identifiers need letter/digit boundaries: "api" should not match
 	// inside "capillary". Hangul terms may be followed by particles without
-	// spaces, so substring matching is retained for those.
+	// spaces, including mixed phrases ending in Hangul. Apply identifier
+	// boundaries only at endpoints that are not Hangul.
 	latin := false
 	for _, r := range term {
 		if unicode.In(r, unicode.Latin) {
@@ -85,6 +86,10 @@ func containsTerm(query, term string) bool {
 			break
 		}
 	}
+	first, _ := utf8.DecodeRuneInString(term)
+	last, _ := utf8.DecodeLastRuneInString(term)
+	leftBoundary := latin && !unicode.In(first, unicode.Hangul)
+	rightBoundary := latin && !unicode.In(last, unicode.Hangul)
 	for offset := 0; offset < len(query); {
 		at := strings.Index(query[offset:], term)
 		if at < 0 {
@@ -92,7 +97,7 @@ func containsTerm(query, term string) bool {
 		}
 		at += offset
 		end := at + len(term)
-		if !latin || (termBoundary(query[:at], true) && termBoundary(query[end:], false)) {
+		if (!leftBoundary || termBoundary(query[:at], true)) && (!rightBoundary || termBoundary(query[end:], false)) {
 			return true
 		}
 		offset = end

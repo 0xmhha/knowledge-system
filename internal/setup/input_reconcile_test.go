@@ -23,7 +23,7 @@ func TestEngineInputReconciliationRejectsUnknownAndAlteredSources(t *testing.T) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	if _, err := db.Exec(`CREATE TABLE chunks(file TEXT, commit_hash TEXT, chunk_kind TEXT);
 		INSERT INTO chunks VALUES ('main.go', ?, 'symbol')`, commit); err != nil {
 		t.Fatal(err)

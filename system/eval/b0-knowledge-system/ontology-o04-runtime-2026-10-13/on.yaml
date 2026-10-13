@@ -1,0 +1,46 @@
+backends:
+  ckg:
+    binary_path: /private/tmp/ks-o03-actual-thgnlgbm/bin/ckg
+    path: /private/tmp/ks-o03-actual-thgnlgbm/dataset/v20261013-080645-850cb040/graph/graph.db
+    policy_file: ''
+    source_root: /private/tmp/ks-o03-actual-thgnlgbm/source
+    timeout_ms: 5000
+  ckv:
+    binary_path: /private/tmp/ks-o03-actual-thgnlgbm/bin/ckv
+    embed_dim: 64
+    embed_model: mock-feature-hash-v1
+    ollama_url: http://127.0.0.1:1
+    path: /private/tmp/ks-o03-actual-thgnlgbm/dataset/v20261013-080645-850cb040/vector
+    provider: mock
+    query_prefix_policy: registry
+    timeout_ms: 3000
+description: ''
+domain:
+  corpus_dir: ''
+  project_dir: ''
+listen:
+  allow_remote: false
+  allowed_cidrs: []
+  http_addr: 127.0.0.1:8930
+  mcp_stdio: true
+  transport: stdio
+logging:
+  audit_dir: ''
+  footprint_dir: /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o04-runtime-ghqk1odk/on/events
+  level: info
+  mode: prod
+  measure_backend_calls: true
+name: owned-semantic
+sanitize:
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+semantic:
+  ontology_budget_ms: 5000
+  store_path: /private/tmp/ks-o03-actual-thgnlgbm/dataset-semantic.sqlite
+  ontology_mode: relations
+service:
+  label_prefix: ''
+version: 1
+vocab:
+  glossary_path: ''

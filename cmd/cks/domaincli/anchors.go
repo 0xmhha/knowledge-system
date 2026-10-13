@@ -51,7 +51,7 @@ func runAnchors(projectDir, graphPath string, check bool, maxShift int) error {
 	if err != nil {
 		return fmt.Errorf("open graph %q: %w", graphPath, err)
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }() // read-only graph handle; nothing to flush
 	ctx := context.Background()
 
 	// Deterministic order: entries by id.

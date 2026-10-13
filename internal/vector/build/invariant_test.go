@@ -68,7 +68,7 @@ func newErr(s string) error { return nil }
 	if err != nil {
 		t.Fatalf("open db: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	var invCount int
 	err = db.QueryRow(`SELECT COUNT(*) FROM chunks WHERE chunk_kind = 'invariant'`).Scan(&invCount)

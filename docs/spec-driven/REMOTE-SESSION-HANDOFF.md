@@ -1,5 +1,7 @@
 # 다른 머신의 B/C 단계 작업 인계
 
+> 역사 인수인계 문서: 아래의 현재 상태·잔여 작업·실행 범위는 작성 당시 기록이다. 새 세션은 [CURRENT-HANDOFF.md](./CURRENT-HANDOFF.md)와 현행 진행 원장을 먼저 읽는다. 과거 위임/전송 범위를 새 실행 권한으로 사용하지 않는다.
+
 2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.
 
 2026-10-08 최신 하위 단계: **N12 actual foreign-code-anchor 승격·active 보존 통합 회귀 보강**. [새 시험·범위](./N12-CODE-ANCHOR-PROMOTION-REGRESSION.md) — 공개CKG2source/2DB·canonical stable/commit 다름,5사례8쓰기+2activation 거부/old current·저장 자료·reopen 보존. semantic race42시험20하위시험/vet/boundary/format 통과. 최초 fixture YAML 작성 오류는 제품RED와 별도 보존했다. 기존 held66artifact·승인input5 불변, 새 시험은 이전55d8/43ba/f839 pilot 후보에 아직 미포함이다. 전체8/18·남은10개 유지;다음 새 source/index/canonical 관계 결합과 N11 실제 gold·독립성/검토자 판정. 남은 N08/09/10/11/12/14/15/16/17/18. 사람 승인·새FINAL·실모델·운영 활성화0.

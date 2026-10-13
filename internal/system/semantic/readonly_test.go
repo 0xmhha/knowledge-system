@@ -43,14 +43,14 @@ func TestReadOnlySemanticStorePreservesProjectionAndRejectsWrites(t *testing.T) 
 	if err := ro.Activate(ctx, p.Snapshot.ProjectID, "v1"); err == nil {
 		t.Fatal("read-only store wrote current pointer")
 	}
-	ro.Close()
+	_ = ro.Close()
 	after, _ := os.ReadFile(path)
 	if sha256.Sum256(before) != sha256.Sum256(after) {
 		t.Fatal("query changed semantic DB")
 	}
 	missing := filepath.Join(t.TempDir(), "missing.db")
 	if s, err := OpenStoreReadOnly(ctx, missing); err == nil {
-		s.Close()
+		_ = s.Close()
 		t.Fatal("missing store opened")
 	}
 	if _, err := os.Stat(missing); !os.IsNotExist(err) {

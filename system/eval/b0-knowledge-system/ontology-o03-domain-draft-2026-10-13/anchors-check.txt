@@ -1,0 +1,31 @@
+DRIFT      A1.concurrency.core_lock_discipline  consensus/wbft/core/core.go  "Core.currentMutex"  line 108 -> 106
+DRIFT      A1.testing.consensus_change_validation  consensus/wbft/backend/api.go  "API.Status"  line 165 -> 169
+DRIFT      A1.testing.consensus_change_validation  consensus/wbft/backend/api.go  "API.GetValidators"  line 132 -> 136
+DRIFT      A1.wbft_core.consensus_flow_architecture  consensus/wbft/core/core.go  "Core.startNewRound"  line 163 -> 161
+DRIFT      A1.wbft_core.message_handlers  consensus/wbft/core/preprepare.go  "Core.handlePreprepareMsg"  line 115 -> 113
+DRIFT      A11.txpool.type_taxonomy_admission  core/types/tx_fee_delegation.go  "types.FeeDelegateDynamicFeeTx.txType"  line 117 -> 116
+UNRESOLVED A11.txpool.type_taxonomy_admission  core/types/transaction_signing.go:35  symbol "ErrInvalidFeePayer" not found in that file (moved/renamed/deleted?)
+DRIFT      A11.txpool.type_taxonomy_admission  core/types/transaction_signing.go  "FeePayer"  line 167 -> 161
+DRIFT      A12.seals.feepayer_sighash  core/types/tx_fee_delegation.go  "FeeDelegateDynamicFeeTx.sigHash"  line 159 -> 158
+DRIFT      A12.seals.feepayer_sighash  core/types/tx_fee_delegation.go  "FeeDelegateDynamicFeeTx.setSignatureValues"  line 148 -> 147
+DRIFT      A13.sealing.reorg_serialization  core/txpool/legacypool/legacypool.go  "LegacyPool.loop"  line 375 -> 373
+REVIEW     A13.sealing.reorg_serialization  core/txpool/legacypool/legacypool.go  "queueTxEvent"  line 1340 (symbol defined at 1284; moved 56 > max-shift 15 - likely a call-site/sub-line anchor)
+DRIFT      A14.theory.equivocation  consensus/wbft/core/preprepare.go  "Core.handlePreprepareMsg"  line 115 -> 113
+DRIFT      A14.theory.flp_partial_synchrony  consensus/wbft/core/core.go  "Core.roundChangeTimer"  line 112 -> 110
+DRIFT      A14.theory.justification_locking  consensus/wbft/core/preprepare.go  "Core.handlePreprepareMsg"  line 115 -> 113
+REVIEW     A4.system_contracts.build_deploy_pipeline  systemcontracts/contracts.go  "SystemContractCodes"  line 37 (symbol defined at 55; moved 18 > max-shift 15 - likely a call-site/sub-line anchor)
+DRIFT      A6.anzeon_gas.tip_override  eth/gasprice/anzeon.go  "AnzeonTipEnv.SetCurrentBlock"  line 53 -> 50
+DRIFT      A6.anzeon_gas.tip_override  eth/gasprice/anzeon.go  "AnzeonTipEnv.IsAnzeon"  line 74 -> 71
+DRIFT      A6.anzeon_gas.tip_override  eth/gasprice/anzeon.go  "AnzeonTipEnv.GetAnzeonTipCap"  line 104 -> 90
+DRIFT      A6.fee_delegation.signing_model  core/types/tx_fee_delegation.go  "FeeDelegateDynamicFeeTx.setSignatureValues"  line 148 -> 147
+DRIFT      A6.fee_delegation.signing_model  core/types/tx_fee_delegation.go  "FeeDelegateDynamicFeeTx.rawSignatureValues"  line 144 -> 143
+DRIFT      A6.fee_delegation.signing_model  core/types/tx_fee_delegation.go  "FeeDelegateDynamicFeeTx.rawFeePayerSignatureValues"  line 129 -> 128
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.NodeAddress"  line 80 -> 84
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.GetCommitSignersFromBlock"  line 86 -> 90
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.GetCommitSignersFromBlockByHash"  line 103 -> 107
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.GetValidators"  line 132 -> 136
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.GetValidatorsAtHash"  line 152 -> 156
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "API.Status"  line 165 -> 169
+DRIFT      A9.istanbul_rpc.api_reference  consensus/wbft/backend/api.go  "backend.Status"  line 72 -> 76
+
+checked=134 clean=105 drift=26 review=2 unresolved=1 loc_skipped=16

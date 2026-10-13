@@ -26,11 +26,11 @@ func OpenStoreReadOnly(ctx context.Context, path string) (*Store, error) {
 	db.SetMaxOpenConns(1)
 	var version int
 	if err := db.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	if version != StoreSchemaVersion {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("semantic: read-only store schema %d requires supported schema %d", version, StoreSchemaVersion)
 	}
 	return &Store{db: db}, nil

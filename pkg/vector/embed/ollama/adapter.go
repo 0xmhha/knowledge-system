@@ -292,7 +292,7 @@ func (a *Adapter) Embed(ctx context.Context, batch []string) ([][]float32, error
 	if err != nil {
 		return nil, fmt.Errorf("ollama: HTTP request to %s failed: %w", url, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("ollama: HTTP %d from embedding endpoint", resp.StatusCode)
@@ -430,7 +430,7 @@ func (a *Adapter) resolveModel(ctx context.Context) (string, string, error) {
 	if err != nil {
 		return "", "", fmt.Errorf("model list unavailable: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("model list HTTP %d", resp.StatusCode)
 	}
@@ -445,7 +445,7 @@ func (a *Adapter) resolveModel(ctx context.Context) (string, string, error) {
 	}
 	var name, digest string
 	for _, model := range tags.Models {
-		if model.Name != a.modelName && !(model.Name == a.modelName+":latest" && !strings.Contains(a.modelName, ":")) {
+		if model.Name != a.modelName && (model.Name != a.modelName+":latest" || strings.Contains(a.modelName, ":")) {
 			continue
 		}
 		if name != "" {

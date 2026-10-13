@@ -1,6 +1,7 @@
 package prregress
 
 import (
+	"context"
 	"strings"
 	"testing"
 )
@@ -38,7 +39,7 @@ func TestSummarizeResults_Empty(t *testing.T) {
 }
 
 func TestRunFixture_NilFixtureGuarded(t *testing.T) {
-	_, err := RunFixture(nil, nil, nil)
+	_, err := RunFixture(context.Background(), nil, nil)
 	if err == nil {
 		t.Error("expected error for nil fixture")
 	}
@@ -50,7 +51,7 @@ func TestRunFixture_RequiresEmbedder(t *testing.T) {
 		PRs:           []Entry{{ID: "x", Repo: "a/b", PRNumber: 1, SourcePath: "/tmp", BaseSHA: "aaaaaaa"}},
 	}
 	// No embedder in opts → fill() fails fast.
-	_, err := RunFixture(nil, fx, &RunOptions{})
+	_, err := RunFixture(context.Background(), fx, &RunOptions{})
 	if err == nil {
 		t.Error("expected error when Embedder unset")
 	}

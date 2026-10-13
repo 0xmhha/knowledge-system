@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "scope": "source_bound_candidate_observation",
+  "review_state": "technically_reviewed_for_observation",
+  "coordinates": {
+    "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+    "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+    "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+    "source_mode": "committed",
+    "base_commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+  },
+  "arms": {
+    "off": "baseline",
+    "on": "concept_text"
+  },
+  "counts": {
+    "warmup": 2,
+    "retrieval": 5,
+    "warm_latency": 20,
+    "cold_process": 0
+  },
+  "retrieval_k": 10,
+  "independent_unit_floor": 10,
+  "proposed_warm_p95_ratio_max": 1.25,
+  "cost_budget_approval": "existing descriptive budget1.25 reused as an observation; not independent release acceptance",
+  "retrieval_question_ids": [
+    "IC-02",
+    "IC-03",
+    "IC-04",
+    "IC-05",
+    "IC-06",
+    "IC-07",
+    "IC-08",
+    "IC-09",
+    "IC-11",
+    "IC-12",
+    "IC-16",
+    "IC-17",
+    "IC-18"
+  ],
+  "guard_question_ids": [
+    "OP-07",
+    "OP-08"
+  ],
+  "order_per_question": {
+    "IC-02": [
+      "off",
+      "on"
+    ],
+    "IC-03": [
+      "on",
+      "off"
+    ],
+    "IC-04": [
+      "off",
+      "on"
+    ],
+    "IC-05": [
+      "on",
+      "off"
+    ],
+    "IC-06": [
+      "off",
+      "on"
+    ],
+    "IC-07": [
+      "on",
+      "off"
+    ],
+    "IC-08": [
+      "off",
+      "on"
+    ],
+    "IC-09": [
+      "on",
+      "off"
+    ],
+    "IC-11": [
+      "off",
+      "on"
+    ],
+    "IC-12": [
+      "on",
+      "off"
+    ],
+    "IC-16": [
+      "off",
+      "on"
+    ],
+    "IC-17": [
+      "on",
+      "off"
+    ],
+    "IC-18": [
+      "off",
+      "on"
+    ]
+  },
+  "binary_sha256": "5e47f44f711278ceaa5eea374cb1db1924387a30b3bb5a5b29c3a7cb3f57da53",
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "mrl-prefix-l2:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "ontology_budget_ms": 5000,
+  "activation": false,
+  "release_eligible": false,
+  "answer_level_scoring": null,
+  "metrics": [
+    "citation_recall_at_10",
+    "citation_precision_at_10",
+    "mean_expected_reciprocal_rank_at_10"
+  ],
+  "metric_engine": "scripts/b1-summarize-matrix.py::citation_metrics; exact source commit and location-overlap matching; not factual answer support",
+  "uncertainty": "13 source-bound candidate questions, ten conservatively merged proposed clusters, independent approved units0. Not blind/random sampled. Cluster means descriptive; no significance or independent quality success.",
+  "failure_policy": "missing/error/timeout retrieval slots remain planned denominator with all retrieval metrics zero; warm errors excluded from latency quantiles but separate error fraction over all planned calls; never describe latency as passing if errors/missing occurred",
+  "guard_policy": "two existing read-only trace guards retained, never added to quality denominator",
+  "paired_inputs": "same binary SHA/dataset/snapshot/source/model/requests/config except ontology_mode and footprint path; off baseline keeps raw-query-first shared with concept_text; validate before/after bindings",
+  "backend_policy": "sum request-scoped /api/embed and /api/tags attempts separately; startup scopes separate; constructor probes outside scope explicitly uncounted",
+  "body_policy": "report citation order/membership/body deltas; validate v2 source/body/integrity before retrieval metrics; body changes are not an improvement verdict",
+  "default_on": false,
+  "code_relation_approval": false,
+  "frozen_B0_changes": false,
+  "prior_DEV_protocol_sha256": "eebe63a10581490bb03be9d3c8a96c8711bd0c469d434d9a1fc3e0a976f87f72",
+  "execution_scope_changed": false,
+  "frozen_at": "2026-10-13T04:45:56.477352+00:00",
+  "planned_retrieval_questions": 13,
+  "approved_independent_units": 0,
+  "completion_authorization": {
+    "user_message": "나머지 004도 모두 진행.\n완료까지 계속 진행하고 모두 완료후 보고할것.",
+    "scope": "autonomous technical review, frozen measurement, final criterion verdict and local documentation/commits; not a fabricated human independence review"
+  },
+  "limitations": [
+    "prior author exposure and same concept families",
+    "saved-history source-range exclusion cannot prove statistical or semantic independence",
+    "three historical empty artifacts, unrecovered chat/external/deleted history",
+    "no generated-answer score; location overlap only",
+    "alternating order and shared host, warm measurements; no cold filesystem/model or randomized trial",
+    "constructor backend probes outside request scopes remain uncounted"
+  ]
+}

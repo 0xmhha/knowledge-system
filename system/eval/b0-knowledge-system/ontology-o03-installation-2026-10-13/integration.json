@@ -1,0 +1,230 @@
+{
+  "base": "/private/tmp/ks-o03-actual-thgnlgbm",
+  "fixture_source_commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee",
+  "previous_current": "v20261013-080642-850cb040",
+  "candidate": "/private/tmp/ks-o03-actual-thgnlgbm/dataset/v20261013-080645-850cb040",
+  "current_unchanged": true,
+  "existing_operator_configs_SHA_unchanged": {
+    "/private/tmp/ks-o03-actual-thgnlgbm/dataset-cks.yaml": "3888c76b5cdf2574313576a9c6546faec10c598ec9e4078ebbcc190114b45171",
+    "/private/tmp/ks-o03-actual-thgnlgbm/dataset-cks-stdio.yaml": "d9a2cac2eb9927e8396ccdd8a8d39955fc0405a4d1be0569a5ddaffaddb9487f"
+  },
+  "new_candidate_config": "/private/tmp/ks-o03-actual-thgnlgbm/dataset-candidate-v20261013-080645-850cb040-cks-stdio.yaml",
+  "status": {
+    "state": "off",
+    "mode": "off",
+    "availability": "ready",
+    "read_reason": "ready",
+    "reason": "retrieval_disabled",
+    "store_configured": true,
+    "read_tools_ready": true,
+    "retrieval_ready": false,
+    "supported_modes": [
+      "off",
+      "baseline",
+      "concept_text",
+      "relations",
+      "combined"
+    ],
+    "snapshot": {
+      "project_id": "demo",
+      "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+      "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+      "source_mode": "committed",
+      "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+    },
+    "counts": {
+      "concepts": 1,
+      "verified_concepts": 0,
+      "requirements": 1,
+      "verified_requirements": 0,
+      "assertions": 0,
+      "verified_assertions": 0,
+      "verified_implementations": 0
+    }
+  },
+  "lookup": {
+    "state": "ready",
+    "reason": "ready",
+    "result": {
+      "snapshot": {
+        "project_id": "demo",
+        "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+        "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+        "source_mode": "committed",
+        "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+      },
+      "language": "en",
+      "term": "feature",
+      "candidates": [
+        {
+          "concept_id": "feature",
+          "term": "feature",
+          "status": "proposed",
+          "score": 1
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ontology:8c2692d2fc630b0cc0a47eac",
+          "snapshot": {
+            "project_id": "demo",
+            "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+            "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+            "source_mode": "committed",
+            "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+          },
+          "kind": "document",
+          "path": "ontology.yaml",
+          "start_line": 6,
+          "end_line": 12,
+          "content_sha256": "bc7cea7f9a478ac341e596299fdfd1cfb84d3c676cd2bce03022cd010d6415c7",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "total_candidates": 1,
+      "ambiguous": false,
+      "truncated": false
+    },
+    "digest": "9aa8e3ead87f8b927f768948c75985a20793d34bc7c16f5d161f26ceed7dbcb7"
+  },
+  "concept": {
+    "state": "ready",
+    "reason": "ready",
+    "result": {
+      "snapshot": {
+        "project_id": "demo",
+        "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+        "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+        "source_mode": "committed",
+        "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+      },
+      "concept": {
+        "id": "feature",
+        "kind": "entity",
+        "definition": "A fixture feature.",
+        "includes": [
+          "fixture"
+        ],
+        "excludes": [
+          "quality"
+        ],
+        "terms": [
+          {
+            "lang": "en",
+            "value": "feature",
+            "preferred": true
+          }
+        ],
+        "evidence_id": "ontology:8c2692d2fc630b0cc0a47eac",
+        "status": "proposed"
+      },
+      "relations": [],
+      "evidence": [
+        {
+          "id": "ontology:8c2692d2fc630b0cc0a47eac",
+          "snapshot": {
+            "project_id": "demo",
+            "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+            "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+            "source_mode": "committed",
+            "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+          },
+          "kind": "document",
+          "path": "ontology.yaml",
+          "start_line": 6,
+          "end_line": 12,
+          "content_sha256": "bc7cea7f9a478ac341e596299fdfd1cfb84d3c676cd2bce03022cd010d6415c7",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "total_relations": 0,
+      "truncated": false
+    },
+    "digest": "d0534e982cb178b5a298bfb6dba2f7d89cb5bbbd95da813da03b25133a97c8b7"
+  },
+  "trace": {
+    "state": "ready",
+    "reason": "ready",
+    "result": {
+      "snapshot": {
+        "project_id": "demo",
+        "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+        "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+        "source_mode": "committed",
+        "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+      },
+      "requirement": {
+        "id": "req-feature",
+        "version": 3,
+        "title": "Inspect feature",
+        "statement": "The source-backed fixture is inspectable.",
+        "status": "proposed",
+        "evidence_id": "spec:50166c08a76f6b9cb65ac49e",
+        "concept_ids": [
+          "feature"
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "ac-feature",
+            "given": "Captured source",
+            "when": "A semantic read is made",
+            "then": "Proposed status is retained",
+            "evidence_id": "criterion:5fb6616462276605d66af7e3"
+          }
+        ]
+      },
+      "trace": {
+        "requirement_id": "req-feature",
+        "version": 3,
+        "state": "spec_unapproved",
+        "missing": [],
+        "conflict_assertions": [],
+        "paths": []
+      },
+      "evidence": [
+        {
+          "id": "criterion:5fb6616462276605d66af7e3",
+          "snapshot": {
+            "project_id": "demo",
+            "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+            "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+            "source_mode": "committed",
+            "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+          },
+          "kind": "document",
+          "path": "spec.yaml",
+          "start_line": 11,
+          "end_line": 14,
+          "content_sha256": "a8f19322cd66d5cc75c64aa8e8d4eebdb0ad4df22a5a6522cca95e1dea394b58",
+          "extractor": "spec-yaml-v1"
+        },
+        {
+          "id": "spec:50166c08a76f6b9cb65ac49e",
+          "snapshot": {
+            "project_id": "demo",
+            "dataset_id": "af2c879a7215eb79028095e2e3b6a0cbd84bbc884954a632a8f97ee8c154d596",
+            "snapshot_id": "92ea67e1d7d47d72e25bade80248e9dd873b72764383a2332795683c002f9599",
+            "source_mode": "committed",
+            "commit": "850cb040bf7a4f9ecc4881a52a3a5423b38d15ee"
+          },
+          "kind": "document",
+          "path": "spec.yaml",
+          "start_line": 4,
+          "end_line": 14,
+          "content_sha256": "72ace288d93f7a40919ddd3a9af93114a59fe5e69ba3264da1c03753edf1ac72",
+          "extractor": "spec-yaml-v1"
+        }
+      ],
+      "total_paths": 0,
+      "truncated": false,
+      "acceptance_evaluated": false
+    },
+    "digest": "4dfbb31d9c7f76354007d7fcab50dc020b076b96f3924caf8d2208daf05420a9"
+  },
+  "tool_count": 28,
+  "semantic_candidate_only": true,
+  "actual_human_review_count": 0,
+  "real_embedding_model_used": false,
+  "model_endpoint": "closed owned-test loopback endpoint",
+  "model_queries_for_read_tools": 0
+}

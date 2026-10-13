@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "scope": "diagnostic DEV ablation of optional projection/definition-search paths; not FINAL or acceptance",
+  "frozen_at": "2026-10-13T02:41:26.510208+00:00",
+  "user_authorization": "1번 진행: O04 cost diagnosis and independent input preparation",
+  "coordinates": {
+    "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+    "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+    "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+    "source_mode": "committed",
+    "base_commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+  },
+  "binary_sha256": "24d33fc47e60c74ab8c3663ce0c245e8608a3f6861ed0ef38c77db7407c99aec",
+  "embedding_identity": {
+    "Dim": 1024,
+    "Model": "bge-m3:latest",
+    "Normalize": "",
+    "Pooling": "",
+    "Provider": "ollama",
+    "chunk_budget_bytes": 6144,
+    "dimension_method": "mrl-prefix-l2:v1",
+    "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "native_dim": 1024,
+    "passage_transform": "raw:v1",
+    "query_transform": "raw:v1",
+    "runtime_batch_tokens": 8192,
+    "runtime_context_tokens": 8192,
+    "truncate_policy": "reject:v1",
+    "version": 2
+  },
+  "queries": [
+    {
+      "id": "OP-03",
+      "kind": "retrieval",
+      "review_state": "accepted_for_DEV_execution",
+      "fact_cluster": "message-handlers",
+      "metric_group": "CODE",
+      "prior_DEV_cluster_overlap": true,
+      "independent_FINAL_eligible": false,
+      "expected_concept": "wbft-message-handlers",
+      "question": "프리페어 표가 충분한 상태에서 이미 StatePrepared인 경우에도 Prepared 전이와 broadcastCommit을 반복하는가?",
+      "answer_reference": "handlePrepareMsg의 전이 분기는 표 수 >= QuorumSize와 c.state < StatePrepared를 함께 요구한다. 이미 Prepared 이상이면 이 분기의 전이와 broadcastCommit은 실행하지 않는다.",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "프리페어 표가 충분한 상태에서 이미 StatePrepared인 경우에도 Prepared 전이와 broadcastCommit을 반복하는가?",
+        "explain_ontology": true
+      },
+      "strict_zero_citations": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/prepare.go",
+          "start_line": 119,
+          "end_line": 140,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+          "content_sha256": "ed593954c96fa5892acb8197a4e73a90eea7bdff4403390c39d781605d70eebc",
+          "source_copy": "consensus__wbft__core__prepare.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handlePrepareMsg",
+          "chunk_ids": [
+            "51718330e3583657f0cfae4152b02c5965901e4efd27b977f0954c560717b5a4"
+          ],
+          "chunk_representation": "indexed text may omit terminal newline; citation gold hashes original full lines",
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "OP-05",
+      "kind": "retrieval",
+      "review_state": "accepted_for_DEV_execution",
+      "fact_cluster": "message-handlers",
+      "metric_group": "CODE",
+      "prior_DEV_cluster_overlap": true,
+      "independent_FINAL_eligible": false,
+      "expected_concept": "wbft-message-handlers",
+      "question": "BFT message handlers의 표 집합에서 동일 Source 주소의 메시지를 두 번 Add하면 Size가 늘어나는가?",
+      "answer_reference": "wbftMsgSet.Add는 messages[msg.Source()]에 덮어쓴다. Size는 len(messages)이므로 같은 Source를 재추가해도 키 수는 늘지 않는다. 모든 핸들러의 전체 idempotency를 이 사실만으로 증명하지 않는다.",
+      "tool": "cks.context.get_for_task_v2",
+      "arguments": {
+        "prompt": "BFT message handlers의 표 집합에서 동일 Source 주소의 메시지를 두 번 Add하면 Size가 늘어나는가?",
+        "explain_ontology": true
+      },
+      "strict_zero_citations": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/qbft_msg_set.go",
+          "start_line": 66,
+          "end_line": 71,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "dde3f7210d89f8eadfa349eccdb625f03fbbd085adbc6e7ab3959ba47ea5a6f1",
+          "content_sha256": "c36d59db4b1fd6fcc1f56c3bda2be5015e8336a6c4b7c03608c5590548c49ebc",
+          "source_copy": "consensus__wbft__core__qbft_msg_set.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*wbftMsgSet).Add",
+          "chunk_ids": [
+            "c032b9c9d6f3b21ff270248e690925f4c7517c82ba9600db4cd45efb348e8733"
+          ],
+          "chunk_representation": "indexed text may omit terminal newline; citation gold hashes original full lines",
+          "relation_assertion": false
+        },
+        {
+          "file": "consensus/wbft/core/qbft_msg_set.go",
+          "start_line": 84,
+          "end_line": 88,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "dde3f7210d89f8eadfa349eccdb625f03fbbd085adbc6e7ab3959ba47ea5a6f1",
+          "content_sha256": "18317f62d1fdf59dd6a2af014ba59aa5e4e010f0de0a164cae8e314380937a2b",
+          "source_copy": "consensus__wbft__core__qbft_msg_set.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*wbftMsgSet).Size",
+          "chunk_ids": [
+            "4d2d4f341b702ab22795b4ca361e5aef919cc112a6fedb294915835431b8c142"
+          ],
+          "chunk_representation": "indexed text may omit terminal newline; citation gold hashes original full lines",
+          "relation_assertion": false
+        }
+      ]
+    }
+  ],
+  "arms": {
+    "baseline": "baseline",
+    "resolve_only": "relations",
+    "text": "concept_text"
+  },
+  "schedule": [
+    [
+      "baseline",
+      "resolve_only",
+      "text"
+    ],
+    [
+      "resolve_only",
+      "text",
+      "baseline"
+    ],
+    [
+      "text",
+      "baseline",
+      "resolve_only"
+    ]
+  ],
+  "per_block_counts": {
+    "warmup": 1,
+    "retrieval": 1,
+    "warm_latency": 5,
+    "cold_process": 0
+  },
+  "blocks": 3,
+  "planned_responses": 126,
+  "warm_count_per_arm": 30,
+  "verified_relations": 0,
+  "hypothesis": "with no verified code edges, relations mode resolves/validates but cannot rerank; text additionally searches one reviewed definition for matched OP-03, while OP-05 is no_match",
+  "failure_policy": "keep planned/missing/error/pending denominators; any incomplete slot invalidates cost comparison",
+  "limits": [
+    "fixed cyclic schedule not randomized",
+    "same shared host, no benchmark or test process deliberately run during captures",
+    "only2 already observed DEV questions; no independent quality verdict",
+    "constructor HTTP probes outside request scope uncounted"
+  ],
+  "activation": false,
+  "new_FINAL_samples": 0,
+  "complete_O04": false
+}

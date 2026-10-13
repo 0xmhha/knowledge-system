@@ -130,12 +130,12 @@ func writeImmutable(path string, value any) error {
 		return err
 	}
 	if _, err = f.Write(data); err != nil {
-		f.Close()
-		os.Remove(path)
+		_ = f.Close()
+		_ = os.Remove(path)
 		return err
 	}
 	if err = f.Close(); err != nil {
-		os.Remove(path)
+		_ = os.Remove(path)
 		return err
 	}
 	return nil
@@ -304,7 +304,8 @@ func CandidateProjection(ctx context.Context, dataset string, a Attempt, storePa
 	if err != nil {
 		return semantic.Projection{}, err
 	}
-	defer store.Close()
+	// The store is only read here (Load), so a close error cannot lose data.
+	defer func() { _ = store.Close() }()
 	p, err := store.Load(ctx, a.ProjectID, a.ResultDatasetID)
 	if err != nil {
 		return semantic.Projection{}, err

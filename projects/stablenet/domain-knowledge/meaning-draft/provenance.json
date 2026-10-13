@@ -1,0 +1,696 @@
+{
+  "schema_version": 1,
+  "project_id": "go-stablenet",
+  "state": "proposed",
+  "observed_target_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "pack_code_baseline": "ec6a4e96b",
+  "source_entries": [
+    {
+      "concept_id": "wbft-quorum",
+      "requirement_id": "req-wbft-quorum",
+      "source_entry": "projects/stablenet/domain-knowledge/entries/A1.wbft_core.quorum_calc.yaml",
+      "source_sha256": "ad4d933b155306114f569097df4227c7d3de53e99b957dd5c6bbb69c58d5082e",
+      "source_fields": {
+        "summary": {
+          "start_line": 5,
+          "end_line": 29
+        },
+        "invariants": {
+          "start_line": 68,
+          "end_line": 71
+        },
+        "korean_aliases": {
+          "start_line": 56,
+          "end_line": 60
+        },
+        "english_aliases": {
+          "start_line": 61,
+          "end_line": 64
+        }
+      },
+      "definition_transform": "verbatim first summary paragraph, strip only boundary whitespace",
+      "statement_transform": "verbatim first invariants item",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "derived_status": "proposed",
+      "derived_reviewed_by": null,
+      "authored_parts_requiring_review": [
+        "concept ID/kind/scope",
+        "term preference choices",
+        "Given/When and example criterion conversion"
+      ],
+      "anchors": [
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "symbol": "defaultSet.F",
+          "recorded_line": 222,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "symbol": "defaultSet.QuorumSize",
+          "recorded_line": 226,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/prepare.go",
+          "symbol": "Core.handlePrepareMsg",
+          "recorded_line": 87,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/types.go",
+          "symbol": "ValidatorSet",
+          "recorded_line": 216,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "da6cbd73113f3f1c31a4a68632dda93783f07f906cc5e8fe202e91dbb369e834",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "concept_id": "wbft-round-change",
+      "requirement_id": "req-wbft-round-change",
+      "source_entry": "projects/stablenet/domain-knowledge/entries/A1.wbft_core.round_change_protocol.yaml",
+      "source_sha256": "d7d0901f1bd2dacbc22b4414b3017b5e14e83434ca6409fd0eabfafbfda988d3",
+      "source_fields": {
+        "summary": {
+          "start_line": 5,
+          "end_line": 11
+        },
+        "invariants": {
+          "start_line": 58,
+          "end_line": 60
+        },
+        "korean_aliases": {
+          "start_line": 42,
+          "end_line": 47
+        },
+        "english_aliases": {
+          "start_line": 48,
+          "end_line": 52
+        }
+      },
+      "definition_transform": "verbatim first summary paragraph, strip only boundary whitespace",
+      "statement_transform": "verbatim first invariants item",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-07",
+      "derived_status": "proposed",
+      "derived_reviewed_by": null,
+      "authored_parts_requiring_review": [
+        "concept ID/kind/scope",
+        "term preference choices",
+        "Given/When and example criterion conversion"
+      ],
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.broadcastNextRoundChange",
+          "recorded_line": 40,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.broadcastRoundChange",
+          "recorded_line": 52,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.handleRoundChangeMsg",
+          "recorded_line": 103,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "symbol": "RoundChange",
+          "recorded_line": 37,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "symbol": "SignedRoundChangePayload",
+          "recorded_line": 64,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "concept_id": "wbft-message-handlers",
+      "requirement_id": "req-wbft-message-handlers",
+      "source_entry": "projects/stablenet/domain-knowledge/entries/A1.wbft_core.message_handlers.yaml",
+      "source_sha256": "53991c83e0276de4e451ff5252cc2246914548dcc40d4dd3b4af37db09e897ac",
+      "source_fields": {
+        "summary": {
+          "start_line": 5,
+          "end_line": 12
+        },
+        "invariants": {
+          "start_line": 50,
+          "end_line": 52
+        },
+        "korean_aliases": {
+          "start_line": 35,
+          "end_line": 40
+        },
+        "english_aliases": {
+          "start_line": 41,
+          "end_line": 45
+        }
+      },
+      "definition_transform": "verbatim first summary paragraph, strip only boundary whitespace",
+      "statement_transform": "verbatim first invariants item",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "derived_status": "proposed",
+      "derived_reviewed_by": null,
+      "authored_parts_requiring_review": [
+        "concept ID/kind/scope",
+        "term preference choices",
+        "Given/When and example criterion conversion"
+      ],
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/preprepare.go",
+          "symbol": "Core.handlePreprepareMsg",
+          "recorded_line": 115,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "486771c7444c2be120da08af776cb33ea75129a754c3d54e3ca5b74b3f0ad335",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/prepare.go",
+          "symbol": "Core.handlePrepareMsg",
+          "recorded_line": 87,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/commit.go",
+          "symbol": "Core.handleCommitMsg",
+          "recorded_line": 90,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "concept_id": "wbft-current-lock",
+      "requirement_id": "req-wbft-current-lock",
+      "source_entry": "projects/stablenet/domain-knowledge/entries/A1.concurrency.core_lock_discipline.yaml",
+      "source_sha256": "e2b083decdcc9d11cfb48c8d6919c99cdf8c645278a2bd27c09e54616b62c8e5",
+      "source_fields": {
+        "summary": {
+          "start_line": 5,
+          "end_line": 26
+        },
+        "invariants": {
+          "start_line": 62,
+          "end_line": 65
+        },
+        "korean_aliases": {
+          "start_line": 48,
+          "end_line": 52
+        },
+        "english_aliases": {
+          "start_line": 53,
+          "end_line": 57
+        }
+      },
+      "definition_transform": "verbatim first summary paragraph, strip only boundary whitespace",
+      "statement_transform": "authored proposed reconciliation: summary allows reads under currentMutex.RLock or the encompassing currentMutex.Lock, while first invariant mentions RLock only",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "derived_status": "proposed",
+      "derived_reviewed_by": null,
+      "authored_parts_requiring_review": [
+        "concept ID/kind/scope",
+        "term preference choices",
+        "Given/When and example criterion conversion",
+        "read lock versus read within write-locked mutation distinction"
+      ],
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": "Core.currentMutex",
+          "recorded_line": 108,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": null,
+          "recorded_line": 155,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": null,
+          "recorded_line": 162,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/priorstate.go",
+          "symbol": "priorState",
+          "recorded_line": 28,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "13925117c7b00d10964a83fda76bc87a10f6189027c285d2f7c49513f93b51bd",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ],
+      "review_risks": [
+        {
+          "id": "LOCK-READ-WRITE-SCOPE",
+          "state": "awaiting_content_review",
+          "source_summary": "read under currentMutex.RLock or currentMutex.Lock",
+          "source_invariant": "Every read of c.current (and sub-fields Sequence/Round/pendingRequest) is inside currentMutex.RLock().",
+          "target_source_observation": {
+            "file": "consensus/wbft/core/core.go",
+            "write_lock_line": 162,
+            "read_under_write_lock_line": 166,
+            "meaning": "source observation only; not a complete access or race audit"
+          }
+        }
+      ]
+    }
+  ],
+  "candidate_relations": [
+    {
+      "id": "candidate-wbft-quorum-1",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-quorum",
+      "candidate_file": "consensus/wbft/validator/default.go",
+      "candidate_symbol": "defaultSet.F",
+      "historical_line": 222,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-quorum-2",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-quorum",
+      "candidate_file": "consensus/wbft/validator/default.go",
+      "candidate_symbol": "defaultSet.QuorumSize",
+      "historical_line": 226,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-quorum-3",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-quorum",
+      "candidate_file": "consensus/wbft/core/prepare.go",
+      "candidate_symbol": "Core.handlePrepareMsg",
+      "historical_line": 87,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-quorum-4",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-quorum",
+      "candidate_file": "consensus/wbft/types.go",
+      "candidate_symbol": "ValidatorSet",
+      "historical_line": 216,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-round-change-1",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-round-change",
+      "candidate_file": "consensus/wbft/core/roundchange.go",
+      "candidate_symbol": "Core.broadcastNextRoundChange",
+      "historical_line": 40,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-round-change-2",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-round-change",
+      "candidate_file": "consensus/wbft/core/roundchange.go",
+      "candidate_symbol": "Core.broadcastRoundChange",
+      "historical_line": 52,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-round-change-3",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-round-change",
+      "candidate_file": "consensus/wbft/core/roundchange.go",
+      "candidate_symbol": "Core.handleRoundChangeMsg",
+      "historical_line": 103,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-round-change-4",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-round-change",
+      "candidate_file": "consensus/wbft/messages/roundchange.go",
+      "candidate_symbol": "RoundChange",
+      "historical_line": 37,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-round-change-5",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-round-change",
+      "candidate_file": "consensus/wbft/messages/roundchange.go",
+      "candidate_symbol": "SignedRoundChangePayload",
+      "historical_line": 64,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-message-handlers-1",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-message-handlers",
+      "candidate_file": "consensus/wbft/core/preprepare.go",
+      "candidate_symbol": "Core.handlePreprepareMsg",
+      "historical_line": 115,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-message-handlers-2",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-message-handlers",
+      "candidate_file": "consensus/wbft/core/prepare.go",
+      "candidate_symbol": "Core.handlePrepareMsg",
+      "historical_line": 87,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-message-handlers-3",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-message-handlers",
+      "candidate_file": "consensus/wbft/core/commit.go",
+      "candidate_symbol": "Core.handleCommitMsg",
+      "historical_line": 90,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-current-lock-1",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-current-lock",
+      "candidate_file": "consensus/wbft/core/core.go",
+      "candidate_symbol": "Core.currentMutex",
+      "historical_line": 108,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-current-lock-2",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-current-lock",
+      "candidate_file": "consensus/wbft/core/core.go",
+      "candidate_symbol": null,
+      "historical_line": 155,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-current-lock-3",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-current-lock",
+      "candidate_file": "consensus/wbft/core/core.go",
+      "candidate_symbol": null,
+      "historical_line": 162,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    },
+    {
+      "id": "candidate-wbft-current-lock-4",
+      "predicate": "IMPLEMENTED_BY",
+      "subject_id": "wbft-current-lock",
+      "candidate_file": "consensus/wbft/core/priorstate.go",
+      "candidate_symbol": "priorState",
+      "historical_line": 28,
+      "status": "proposed",
+      "reviewed_by": null,
+      "canonical_id": null,
+      "evidence_id": null,
+      "executable_assertion": false,
+      "missing": [
+        "same-retained-snapshot ontology/spec source",
+        "exact source/CKG/CKV canonical+span binding",
+        "substantive relation/content review",
+        "independent test/criterion mapping"
+      ]
+    }
+  ],
+  "ontology_review_transferred": false,
+  "semantic_assertions_created": 0,
+  "quality_evaluated": false,
+  "code_or_test_criterion_acceptance_evaluated": false,
+  "runtime_or_operator_config_changes": 0,
+  "mechanical_anchor_scope": {
+    "symbol_anchors_selected": 14,
+    "same_definition_line": 12,
+    "shifted_definition_line": 2,
+    "line_only_anchors_not_symbol_checked": 2,
+    "semantic_behavior_reverified": false
+  },
+  "test_inventory_observations": {
+    "tracked_wbft_test_files": [
+      "consensus/wbft/backend/backend_test.go",
+      "consensus/wbft/backend/engine_test.go",
+      "consensus/wbft/backend/handler_test.go",
+      "consensus/wbft/backend/multiengine_test.go",
+      "consensus/wbft/config_test.go",
+      "consensus/wbft/core/backlog_test.go",
+      "consensus/wbft/core/extraseal_test.go",
+      "consensus/wbft/core/justification_test.go",
+      "consensus/wbft/engine/engine_test.go",
+      "consensus/wbft/testutils/genesis_test.go",
+      "consensus/wbft/types_test.go",
+      "consensus/wbft/validator/default_test.go"
+    ],
+    "queried_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "validator_test_file": "consensus/wbft/validator/default_test.go",
+    "validator_test_sha256": "44c9a3d7d353681b48894184eba30d8648d8da461985fa75f48c5cf6fc05b15d",
+    "test_function": "TestValidatorSet",
+    "direct_QuorumSize_token_present": false,
+    "test_execution_performed": false,
+    "criterion_mapping_approved": false,
+    "limitation": "name/token inventory is not coverage or behavior proof; no TESTED_BY/criterion link is created"
+  },
+  "baseline_file_comparison_available": false,
+  "baseline_file_comparison_limit": "ec6a4e96b commit is absent from the local source repository; no baseline byte/change verdict is available"
+}

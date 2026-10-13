@@ -64,7 +64,9 @@ func runMigrate(ctx context.Context, opts *migrateOpts) error {
 	if err != nil {
 		return fmt.Errorf("open sqlite: %w", err)
 	}
-	defer db.Close()
+	// Migrations commit inside their own transactions, so a close error
+	// cannot undo applied work; closing is best-effort.
+	defer func() { _ = db.Close() }()
 
 	runner := sqlitevec.NewMigrationRunner(db, dbPath,
 		sqlitevec.WithBackup(!opts.noBackup),

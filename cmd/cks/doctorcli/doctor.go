@@ -160,7 +160,7 @@ func Inspect(src, dataset string) (Report, error) {
 		}
 		var head [8192]byte
 		n, readErr := file.Read(head[:])
-		file.Close()
+		_ = file.Close() // read-only file
 		if readErr != nil && readErr != io.EOF {
 			report.UnreadableFiles++
 			return nil

@@ -60,7 +60,7 @@ categories:
 	if err != nil {
 		t.Fatalf("open db: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	var goCount int
 	err = db.QueryRow(
@@ -110,7 +110,7 @@ categories:
 	if err != nil {
 		t.Fatalf("re-open store: %v", err)
 	}
-	s.Close()
+	_ = s.Close()
 }
 
 func contains(s, substr string) bool {

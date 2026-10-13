@@ -39,7 +39,7 @@ func TestStoreUpsertAndSearch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	chunks := []types.Chunk{
@@ -79,7 +79,7 @@ func TestStoreUpsertAndSearch(t *testing.T) {
 func TestStoreFilterByLanguage(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "v.db")
 	s, _ := Open(dbPath, testDim)
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	chunks := []types.Chunk{
@@ -105,7 +105,7 @@ func TestFilteredSearchRejectsMissingEmbeddingInsteadOfReturningShortSuccess(t *
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 	chunks := []types.Chunk{
 		mkChunk("a", "a.go", "a", 1, 1, "go", types.KindFunction),
@@ -128,7 +128,7 @@ func TestSearchRejectsCancelledContextEvenForEmptyResult(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	for _, filter := range []types.Filter{{}, {Language: "go"}} {
@@ -144,7 +144,7 @@ func TestSearchDetailedReportsCandidateLimitWithoutCompleteHits(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	chunks := []types.Chunk{
 		mkChunk("a", "a.go", "a", 1, 1, "go", types.KindFunction),
 		mkChunk("b", "b.go", "b", 1, 1, "go", types.KindFunction),
@@ -179,7 +179,7 @@ func TestSearchDetailedCancellationIsNotEmptySuccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	result, err := s.SearchDetailed(ctx, []float32{1, 0, 0, 0}, 2, types.Filter{}, SearchOptions{})
@@ -199,7 +199,7 @@ func TestSearchDetailedEmptyAndContradictoryFiltersAreComplete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	query := []float32{1, 0, 0, 0}
 	for _, filter := range []types.Filter{{}, {Language: "typescript", CommitHash: "missing"}} {
 		result, err := s.SearchDetailed(context.Background(), query, 5, filter, SearchOptions{})
@@ -217,7 +217,7 @@ func TestSearchDetailedRejectsOversizedKBeforeAllocation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	result, err := s.SearchDetailed(context.Background(), []float32{1, 0, 0, 0},
 		DefaultMaxSearchK+1, types.Filter{}, SearchOptions{})
 	if err != nil || result.Status != SearchIncomplete || result.Reason != "requested_k_exceeds_limit" || len(result.Hits) != 0 {
@@ -234,7 +234,7 @@ func TestStoreFilterPathPrefixKeepsExactGlobSemantics(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	chunks := []types.Chunk{
 		mkChunk("near-excluded", "internal/vector/other.go", "near", 1, 1, "go", types.KindFunction),
 		mkChunk("target", "internal/vector/store/sqlitevec/store.go", "target", 1, 1, "go", types.KindFunction),
@@ -258,7 +258,7 @@ func TestStoreCombinedFilterMatchesExactOracle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	var chunks []types.Chunk
 	var vectors [][]float32
 	for i := 0; i < 60; i++ {
@@ -319,7 +319,7 @@ func TestStorePreservesDocumentParentMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 	doc := mkChunk("doc-child", "README.md", "tail paragraph", 40, 42, "markdown", types.KindDocSection)
 	doc.ChunkKind = types.ChunkDoc
@@ -392,7 +392,7 @@ func TestStoreFilterReturnsKWhenGlobalTopCandidatesAreExcluded(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 	var chunks []types.Chunk
 	var embs [][]float32
@@ -465,7 +465,7 @@ func TestSearchDetailedFilteredCancellationAfterStartIsNotComplete(t *testing.T)
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer s.Close()
+			defer func() { _ = s.Close() }()
 			var chunks []types.Chunk
 			var embs [][]float32
 			for i := 0; i < tc.near; i++ {
@@ -518,7 +518,7 @@ func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 	chunks := make([]types.Chunk, 0, 2050)
 	embs := make([][]float32, 0, 2050)
@@ -552,7 +552,7 @@ func TestStoreFilterLargeCandidateSetFallsBackToExact(t *testing.T) {
 func TestDeleteDocsChunks(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "v.db")
 	s, _ := Open(dbPath, testDim)
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	// Curated docs layer (chunk_kind=doc, category=domain) alongside a
@@ -593,7 +593,7 @@ func TestDeleteDocsChunks(t *testing.T) {
 func TestStoreDeleteByFile(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "v.db")
 	s, _ := Open(dbPath, testDim)
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	chunks := []types.Chunk{
@@ -628,7 +628,7 @@ func TestReopenRejectsDimMismatch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("first open: %v", err)
 	}
-	s.Close()
+	_ = s.Close()
 
 	if _, err := Open(dbPath, 8); err == nil {
 		t.Fatal("expected dim-mismatch error, got nil")
@@ -638,7 +638,7 @@ func TestReopenRejectsDimMismatch(t *testing.T) {
 func TestStatsReflectsManifest(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "v.db")
 	s, _ := Open(dbPath, testDim)
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	_ = s.SetManifest(ctx, map[string]string{

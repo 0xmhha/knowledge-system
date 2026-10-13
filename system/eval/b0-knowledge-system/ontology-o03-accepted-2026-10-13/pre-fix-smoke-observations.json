@@ -1,0 +1,190 @@
+{
+  "status": {
+    "state": "off",
+    "mode": "off",
+    "availability": "ready",
+    "read_reason": "ready",
+    "reason": "retrieval_disabled",
+    "store_configured": true,
+    "read_tools_ready": true,
+    "retrieval_ready": false,
+    "supported_modes": [
+      "off",
+      "baseline",
+      "concept_text",
+      "relations",
+      "combined"
+    ],
+    "snapshot": {
+      "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+      "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+      "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+      "source_mode": "committed",
+      "commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+    },
+    "counts": {
+      "concepts": 4,
+      "verified_concepts": 4,
+      "requirements": 4,
+      "verified_requirements": 4,
+      "assertions": 0,
+      "verified_assertions": 0,
+      "verified_implementations": 0
+    }
+  },
+  "lookup": {
+    "state": "ready",
+    "reason": "ready",
+    "result": {
+      "snapshot": {
+        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+        "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+        "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+        "source_mode": "committed",
+        "commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+      },
+      "language": "ko",
+      "term": "쿼럼",
+      "candidates": [
+        {
+          "concept_id": "wbft-quorum",
+          "term": "쿼럼",
+          "status": "verified",
+          "score": 1
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ontology:8d7b3a49a86cbe0c11420745",
+          "snapshot": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+            "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+            "source_mode": "committed",
+            "commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+          },
+          "kind": "document",
+          "path": "docs/approved-meaning/ontology.yaml",
+          "start_line": 12,
+          "end_line": 51,
+          "content_sha256": "7bdcf5001949e8ffeff152c7f3902504d2b5c3058fc3807c8460a2b246bc84ef",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "total_candidates": 1,
+      "ambiguous": false,
+      "truncated": false
+    },
+    "digest": "df6865aa0e66211643233b9abcab34d618de5a124932d46f951fba67bdff8608"
+  },
+  "concept": {
+    "state": "ready",
+    "reason": "ready",
+    "result": {
+      "snapshot": {
+        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+        "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+        "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+        "source_mode": "committed",
+        "commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+      },
+      "concept": {
+        "id": "wbft-current-lock",
+        "kind": "rule",
+        "definition": "The WBFT Core's `current` round-state pointer is guarded by\n`currentMutex` (consensus/wbft/core/core.go:106 — a sync.RWMutex).\nEvery accessor that reads `c.current` MUST hold currentMutex.RLock\n(read) or currentMutex.Lock (write). Examples in-repo: the\ncurrent-proposal accessor at core.go:155-157 acquires RLock around\nthe read; the round-state mutator at core.go:162-166 acquires\nLock for the entire write region.",
+        "includes": [
+          "WBFT Core lock discipline — never read Core.current off currentMutex"
+        ],
+        "excludes": [
+          "Unreviewed implementation or test links",
+          "Independent search quality or timing claims"
+        ],
+        "terms": [
+          {
+            "lang": "ko",
+            "value": "동시성",
+            "preferred": true
+          },
+          {
+            "lang": "ko",
+            "value": "락 규율",
+            "preferred": false
+          },
+          {
+            "lang": "ko",
+            "value": "RWMutex",
+            "preferred": false
+          },
+          {
+            "lang": "ko",
+            "value": "current 읽기 락",
+            "preferred": false
+          },
+          {
+            "lang": "en",
+            "value": "lock discipline",
+            "preferred": true
+          },
+          {
+            "lang": "en",
+            "value": "current round state lock",
+            "preferred": false
+          },
+          {
+            "lang": "en",
+            "value": "RWMutex",
+            "preferred": false
+          },
+          {
+            "lang": "en",
+            "value": "data race",
+            "preferred": false
+          }
+        ],
+        "evidence_id": "ontology:5f9f928fa30117c4e1b09152",
+        "status": "verified",
+        "reviewed_by": "current conversation user approval"
+      },
+      "relations": [],
+      "evidence": [
+        {
+          "id": "ontology:5f9f928fa30117c4e1b09152",
+          "snapshot": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+            "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+            "source_mode": "committed",
+            "commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+          },
+          "kind": "document",
+          "path": "docs/approved-meaning/ontology.yaml",
+          "start_line": 150,
+          "end_line": 196,
+          "content_sha256": "d0ae4caa1d3c435272b8817c89752ceb017a692c1af4424dda65fc37a383cfd0",
+          "extractor": "ontology-yaml-v1"
+        }
+      ],
+      "total_relations": 0,
+      "truncated": false
+    },
+    "digest": "43f5442239692821d89ccfd5083f39e7e02fa13454c97fafc85fdeefe3488edb"
+  },
+  "traces": {
+    "req-wbft-quorum": {
+      "state": "stale",
+      "reason": "stale"
+    },
+    "req-wbft-round-change": {
+      "state": "stale",
+      "reason": "stale"
+    },
+    "req-wbft-message-handlers": {
+      "state": "stale",
+      "reason": "stale"
+    },
+    "req-wbft-current-lock": {
+      "state": "stale",
+      "reason": "stale"
+    }
+  }
+}

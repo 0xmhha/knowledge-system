@@ -12,7 +12,7 @@ func TestCheckpointRejectsBusyWAL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	if _, err := s.db.Exec(`PRAGMA busy_timeout=100; CREATE TABLE checkpoint_payload(value TEXT); INSERT INTO checkpoint_payload VALUES ('before')`); err != nil {
 		t.Fatal(err)
 	}
@@ -20,12 +20,12 @@ func TestCheckpointRejectsBusyWAL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 	tx, err := reader.Begin()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 	var count int
 	if err := tx.QueryRow(`SELECT count(*) FROM checkpoint_payload`).Scan(&count); err != nil {
 		t.Fatal(err)

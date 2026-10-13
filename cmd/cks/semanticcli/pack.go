@@ -27,7 +27,7 @@ func newAnnotatePackCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // no writes on this path; nothing to flush
 			active, err := store.CurrentAligned(cmd.Context(), project, repo, graph, vector)
 			if err != nil {
 				return err
@@ -44,7 +44,7 @@ func newAnnotatePackCmd() *cobra.Command {
 				return fmt.Errorf("create annotated pack: %w", err)
 			}
 			if _, err := file.Write(append(data, '\n')); err != nil {
-				file.Close()
+				_ = file.Close()
 				return err
 			}
 			if err := file.Close(); err != nil {

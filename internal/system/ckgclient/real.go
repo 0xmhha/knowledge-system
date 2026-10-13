@@ -446,7 +446,6 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	}
 	nodeByID := make(map[string]types.Node)
 	edgeSeen := make(map[string]struct{})
-	nodes := make([]types.Node, 0)
 	edges := make([]types.Edge, 0)
 	for _, sd := range seeds {
 		ns, es, err := r.s.NeighborhoodByQname(sd, depth, reverse, edgeTypes...)
@@ -458,7 +457,6 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 				continue
 			}
 			nodeByID[n.ID] = n
-			nodes = append(nodes, n)
 		}
 		for _, e := range es {
 			k := e.Src + "|" + e.Dst + "|" + string(e.Type)

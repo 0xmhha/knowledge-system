@@ -36,7 +36,7 @@ func TestRun_ConventionExtraction_EndToEnd(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open db: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	var convCount int
 	err = db.QueryRow(`SELECT COUNT(*) FROM chunks WHERE chunk_kind = 'convention'`).Scan(&convCount)

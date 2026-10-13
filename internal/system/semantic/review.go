@@ -113,9 +113,10 @@ func (p Projection) Review(limit int, salt string) (ReviewReport, error) {
 	queue := func(kind, id string, status Status, reviewer string, ids ...string) {
 		item := ReviewQueueItem{Kind: kind, ID: id, Status: status, ReviewedBy: reviewer,
 			Evidence: make([]EvidenceSpan, 0, len(ids))}
-		if status == StatusProposed {
+		switch status {
+		case StatusProposed:
 			item.HoldReason = "awaiting_human_review"
-		} else if status == StatusRejected {
+		case StatusRejected:
 			item.HoldReason = "rejected_by_reviewer"
 		}
 		for _, evidenceID := range ids {

@@ -103,7 +103,7 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 	defer cleanup()
 
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	buildOpts := build.Options{
 		ProjectID: opts.projectID, SnapshotID: opts.snapshotID, DatasetID: opts.datasetID,

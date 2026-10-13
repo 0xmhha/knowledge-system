@@ -1,0 +1,511 @@
+{
+  "schema_version": 1,
+  "scope": "candidate source/gold preparation only; not independent FINAL input",
+  "coordinates": {
+    "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+    "dataset_id": "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+    "snapshot_id": "99ad6ae09c82fb2cfa2c70b405bde55f5caf112116562249463903aadff43bb4",
+    "source_mode": "committed",
+    "base_commit": "baca2869118774c5f6219932dc76e197a47e6ecd"
+  },
+  "author": "Codex, exposed to previous DEV and cost diagnosis",
+  "reviewer": null,
+  "review_state": "proposed",
+  "history_audit_complete": false,
+  "independent_units_approved": 0,
+  "proposed_fact_clusters": 16,
+  "questions": [
+    {
+      "id": "IC-01",
+      "review_state": "proposed",
+      "question": "쿼럼 계산에 쓰이는 validator 집합 Size는 락 없이 길이를 읽는가?",
+      "answer_reference": "Size는 validatorMu.RLock/RUnlock을 사용해 len(validators)를 반환한다. 다른 Core.current 락의 준수 여부는 이 사실만으로 판단하지 않는다.",
+      "fact_cluster_proposed": "validator-membership",
+      "expected_concept": "wbft-quorum",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "start_line": 91,
+          "end_line": 95,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "content_sha256": "d1a0e732d3c4b96c800372c51e96572849d19c895ff3101e2f5cf3643d120b1a",
+          "source_copy": "consensus__wbft__validator__default.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).Size",
+          "chunk_ids": [
+            "8eb31d5809fa36189dec0b23c30cfb3f28b13f29ecda367982c54af30eb69d1d"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-02",
+      "review_state": "proposed",
+      "question": "validator 집합에 이미 있는 주소를 AddValidator로 추가하면 키와 quorum 입력 수는 어떻게 되는가?",
+      "answer_reference": "주소가 같으면 false를 반환하고 append를 하지 않는다. 실제 quorum 재계산 또는 테스트 통과를 주장하지 않는다.",
+      "fact_cluster_proposed": "validator-membership",
+      "expected_concept": "wbft-quorum",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "start_line": 186,
+          "end_line": 196,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "content_sha256": "5f65b9eec503359ad5342af4639753ebeb293979d9dbcba921c800202dbb8b61",
+          "source_copy": "consensus__wbft__validator__default.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).AddValidator",
+          "chunk_ids": [
+            "b087634286acc3a03ba1f880abc7f58c262f6e1fa20c6c6c9f66da025fa390c4"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-03",
+      "review_state": "proposed",
+      "question": "RemoveValidator에서 대상 주소를 찾지 못하면 무엇을 반환하며 목록을 바꾸는가?",
+      "answer_reference": "찾지 못하면 false를 반환하며 삭제를 수행하지 않는다. 찾으면 목록을 재구성하고 true를 반환한다.",
+      "fact_cluster_proposed": "validator-membership",
+      "expected_concept": "wbft-quorum",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "start_line": 198,
+          "end_line": 209,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "content_sha256": "88ba709860707581144867e390e18093ca6b84d792a6841571bb6293649088e2",
+          "source_copy": "consensus__wbft__validator__default.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).RemoveValidator",
+          "chunk_ids": [
+            "287e0c384d51d8784bd2a3b591641243410637f2e90d5d788db017487a0956de"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-04",
+      "review_state": "proposed",
+      "question": "라운드 체인지 타이머에 양수 MaxRequestTimeoutSeconds가 설정된 경우 timeout을 어떻게 증가시키고 overflow를 처리하는가?",
+      "answer_reference": "baseTimeout을 시작으로 round만큼2배씩 증가시키며 상한 초과 시 상한으로 제한한다. timeout<baseTimeout인 overflow 의심 경로도 상한으로 설정한다. 상한이0일 때의 다른 경로와 혼동하지 않는다.",
+      "fact_cluster_proposed": "round-timeout",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 347,
+          "end_line": 373,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "9aed396ff3802db99207b3c9d9a49c886ea136ce1e2450f6ad141d8c1bc116e0",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).newRoundChangeTimer",
+          "chunk_ids": [
+            "b513bfb22a672e274eeb218eb6d4f1b8428b0779487baa3149c3635d965f242a"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-05",
+      "review_state": "proposed",
+      "question": "더 높은 여러 round에서 같은 validator가 보낸 ROUND-CHANGE는 higherRoundMessages에서 여러 표로 계산되는가?",
+      "answer_reference": "주어진 round보다 높은 round만 대상으로 주소 map을 만들고 len(addresses)를 반환하므로 여러 round에 같은 주소가 있어도1개로 센다.",
+      "fact_cluster_proposed": "higher-round-count",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "start_line": 280,
+          "end_line": 293,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "content_sha256": "70ecde56fda74f08e69ad5edd312c18b0c5c2838841c11c5f2cd19ce4159d225",
+          "source_copy": "consensus__wbft__core__roundchange.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*roundChangeSet).higherRoundMessages",
+          "chunk_ids": [
+            "00ba43618f40fa7a959fa5b751c76b75ef6caa6121e33b431449b1e9b663e2e5"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-06",
+      "review_state": "proposed",
+      "question": "getMinRoundChange에서 현재보다 큰 round가 없으면 nil을 반환하는가?",
+      "answer_reference": "아니다. 큰 round의 키가 없으면 인자로 받은 round를 반환하며, 있으면 오름차순 정렬한 첫 키를 반환한다.",
+      "fact_cluster_proposed": "round-selection",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "start_line": 308,
+          "end_line": 323,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "content_sha256": "968543a0e278ecebc758c5cc7b555223b4e01977c22af0ed8fa48800e3e9a936",
+          "source_copy": "consensus__wbft__core__roundchange.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*roundChangeSet).getMinRoundChange",
+          "chunk_ids": [
+            "bfde22e085af65dbd4e471cdd0fa5dbeb017bcdeb63fc7e675b37efa7769d26d"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-07",
+      "review_state": "proposed",
+      "question": "ClearLowerThan은 이전 round만 지우는가, 메시지가 빈 집합도 함께 지우는가?",
+      "answer_reference": "빈 집합 또는 기준보다 작은 round를 지우고 roundChanges/highestPreparedRound/highestPreparedBlock/prepareMessages의 네 map에서 해당 키를 함께 삭제한다.",
+      "fact_cluster_proposed": "round-pruning",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "start_line": 326,
+          "end_line": 338,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "content_sha256": "54ba2fc10bc5f55d0c2785e5879d3638fa6092904318a22109798214550d2e73",
+          "source_copy": "consensus__wbft__core__roundchange.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*roundChangeSet).ClearLowerThan",
+          "chunk_ids": [
+            "d40aef4fc7f6f3e75c738c7abda1f4437c19e21bbdcc7f763a9be5768f7bbbea"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-08",
+      "review_state": "proposed",
+      "question": "prepared 상태가 없는 ROUND-CHANGE quorum을 셀 때 PreparedRound와 PreparedDigest에는 어떤 조건이 필요한가?",
+      "answer_reference": "PreparedRound가 nil 또는0이고 PreparedDigest가 zero hash여야 카운트한다. nilCount가 quorumSize와 같아지면 nil을 반환한다. 전부 돌아도 충족하지 못하면 error다.",
+      "fact_cluster_proposed": "nil-prepared-justification",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/justification.go",
+          "start_line": 75,
+          "end_line": 87,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "3681ff1c5a19b1c0aaea4423fef870595148d8dfe095613b978c16bc42f74771",
+          "content_sha256": "c02418263e5300907851018c8db45ed82da35d5fdb5ca3c9db01a6e19d919988",
+          "source_copy": "consensus__wbft__core__justification.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.hasQuorumOfRoundChangeMessagesForNil",
+          "chunk_ids": [
+            "4a845ca271b991614c477748b075fea91b390622395d4f7c80a8a8a7b0f30d70"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-09",
+      "review_state": "proposed",
+      "question": "checkValidatorSignature는 언제 현재 validator 집합 대신 이전 validator 집합을 사용하는가?",
+      "answer_reference": "view가 현재보다 작고 상태가 StateAcceptRequest이며 이전 sequence/current.sequence-1 및 PriorRound와 정확히 같은 view이고 PriorValidators가 nil이 아닐 때만 이전 집합을 사용한다. 그 외는 현재 valSet이다.",
+      "fact_cluster_proposed": "previous-view-signer-selection",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 433,
+          "end_line": 443,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "b0aad3e57e7b6f4698b8fcc0183a0fa17ab61ea1cfc49cbb1fb6052c5c4d88f0",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).checkValidatorSignature",
+          "chunk_ids": [
+            "fa7c308cab0b9d6659af4e67baa105afe7826d3c5dc29f76558bef450d4dca22"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-10",
+      "review_state": "proposed",
+      "question": "ROUND-CHANGE 서명 payload에는 메시지 code와 prepared 정보가 어떻게 포함되는가?",
+      "answer_reference": "내부 payload는 sequence/round/prepared list다. PreparedRound가nil아니고 digest가zero아닐때만 prepared를 넣는다. 최종 서명용 RLP는 code와 내부 encoded payload를 감싼다.",
+      "fact_cluster_proposed": "round-change-signing-domain",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "start_line": 158,
+          "end_line": 168,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "content_sha256": "914e3e765c9fd4c9135483d9bc9a55980da16954c5872e17effcab5b6a6ca538",
+          "source_copy": "consensus__wbft__messages__roundchange.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/messages.(*SignedRoundChangePayload).encodePayloadInternal",
+          "chunk_ids": [
+            "af7ab18eda9a4ed0e04a8988e6f6dd7b2f4a70c3c210b9509d41d796ffcc5ee2"
+          ],
+          "relation_assertion": false
+        },
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "start_line": 170,
+          "end_line": 182,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "content_sha256": "afaa0aa8f7236b1d80eeff14b8f9ae7ee250bf635591488582a7973df17b7708",
+          "source_copy": "consensus__wbft__messages__roundchange.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/messages.(*SignedRoundChangePayload).EncodePayloadForSigning",
+          "chunk_ids": [
+            "ad9337860565bb028f29b7615b2a59f694ba0e47106cf8eced563496e690575a"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-11",
+      "review_state": "proposed",
+      "question": "BFT message handlers에서 setState를 현재와 같은 StateAcceptRequest로 다시 호출해도 pending request와 backlog를 처리하는가?",
+      "answer_reference": "state 값이 달라질 때만 값과 로그를 바꾸지만, StateAcceptRequest이면 processPendingRequests를 호출하고 모든 호출에서 processBacklog를 호출한다. 실제 큐 처리 성공이나 동시성 준수까지 이 함수만으로 판단하지 않는다.",
+      "fact_cluster_proposed": "state-entry-queue-processing",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 289,
+          "end_line": 302,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "7d5f42180d02f4271ead723e219622361e73821017728596dcb1d753e16a2451",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).setState",
+          "chunk_ids": [
+            "681e8bcdd0acbee5c99068f56accc55d63493fe5cf78bbc2542792deec050fbd"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-12",
+      "review_state": "proposed",
+      "question": "BFT message handlers의 PrepareSeal은 round와 sealType을 서명 대상에 어떻게 결합하는가?",
+      "answer_reference": "header 사본에 WBFTHashWithRoundNumber(round)를 적용한 바이트 뒤에 byte(sealType)을 붙이고 Keccak256Hash의 바이트를 반환한다. 서명 생성이나 검증의 성공을 증명하는 함수는 아니다.",
+      "fact_cluster_proposed": "seal-domain-hash",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 446,
+          "end_line": 450,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "47e0bcaa2e45ff9a0b7fc36096559ba5b188ff902b78f28df753cad87bc33b33",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.PrepareSeal",
+          "chunk_ids": [
+            "a9ae0d5c47f213c481c43ba934316a3966db817956abab8888bd64f4d2a23b43"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-13",
+      "review_state": "proposed",
+      "question": "round change로 updateRoundState를 호출할 때 기존 prepared block이 bad proposal이면 어떤 상태와 seal을 지우는가?",
+      "answer_reference": "roundChange이고 current가 있을 때 preparedBlock이 존재하고 HasBadProposal이면 preparedRound와 preparedBlock을 nil로 하고 ClearExtraSeals(current.sequence+1)를 호출한다. 이후 새 roundState는 기존 Preprepare와 pendingRequest를 넘겨 생성하고 valSet을 nextValSet으로 바꾼다.",
+      "fact_cluster_proposed": "bad-prepared-block-reset",
+      "expected_concept": "wbft-round-change",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 268,
+          "end_line": 287,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "cda67bd167d29d840405bcebcb042924e0061f7d37fa174ea11053dc7d319689",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).updateRoundState",
+          "chunk_ids": [
+            "80cf17ed94ed99a3bd62da091939e603b3451a3080d2c289038ed72f0a1fb07c"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-14",
+      "review_state": "proposed",
+      "question": "Core.current 락 관점에서 retry round-change 타이머의 callback은 current를 다시 읽는가?",
+      "answer_reference": "newRetrySendingRoundChangeTimer는 currentMutex.RLock 안에서 sequence와 round를 big.Int 사본으로 만든다. 둘 중 nil이면 종료하고, 타이머 callback은 복사한 round로 retryTimeoutEvent를 보낸다. 다른 read site 준수는 주장하지 않는다.",
+      "fact_cluster_proposed": "retry-view-snapshot",
+      "expected_concept": "wbft-current-lock",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 407,
+          "end_line": 431,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "content_sha256": "facec0f91588143f43bae0b3c2363dd6d9958f7eb1fbd3d53cced1b46342ed70",
+          "source_copy": "consensus__wbft__core__core.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).newRetrySendingRoundChangeTimer",
+          "chunk_ids": [
+            "8ba24ccaa7442b1868da17e900bd10d5ccf9ec21a5492ce3f9df9e690f74fa7d"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-15",
+      "review_state": "proposed",
+      "question": "BFT 메시지 핸들러의 isTooFarFutureMessage는 미래 sequence와 round를 어떤 조건에서 각각 검사하는가?",
+      "answer_reference": "sequence가 현재보다 크면 sequence 차이 검사를 하며, round 차이 검사는 sequence가 현재와 같고 round가 클 때만 한다. 해당 검사가 tooFar이면 true, 그 외 false다. 이 함수만으로 이후 큐 수용이나 합의 성공을 주장하지 않는다.",
+      "fact_cluster_proposed": "future-message-view-filter",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/backlog.go",
+          "start_line": 64,
+          "end_line": 91,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "b09324c9c608af53ad86ffb8ec5844ebe0b0ae1d90fa11d452b7f4400391ee10",
+          "content_sha256": "3d752971c2d87c8a1d8da54debe34e686ffdfbb6ec7b1f76a5334cecc3cb9307",
+          "source_copy": "consensus__wbft__core__backlog.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).isTooFarFutureMessage",
+          "chunk_ids": [
+            "08da5c87f7fa8752124d92d4282e639a0a764211e2b6d7b0a63ef88ff2ef375d"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-16",
+      "review_state": "proposed",
+      "question": "BFT 메시지 핸들러에서 자신의 주소로부터 온 메시지를 addToBacklog에 넘기면 큐에 저장하는가?",
+      "answer_reference": "msg.Source가 c.Address와 같으면 경고 후 바로 반환한다. 다른 주소는 backlogsMu를 잡고 주소별 큐를 필요시 생성한 뒤 메시지를 view 기반 우선순위로 넣는다.",
+      "fact_cluster_proposed": "backlog-self-admission",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/backlog.go",
+          "start_line": 185,
+          "end_line": 206,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "b09324c9c608af53ad86ffb8ec5844ebe0b0ae1d90fa11d452b7f4400391ee10",
+          "content_sha256": "ea3cf89f199c938283df776f639d36dc14d4fee42813df468a04898f66001b53",
+          "source_copy": "consensus__wbft__core__backlog.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).addToBacklog",
+          "chunk_ids": [
+            "7ef65a8f0de99948f8c991edf3208eac932a9033fc21e4dfdea5e13c4ce4ce71"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-17",
+      "review_state": "proposed",
+      "question": "BFT 메시지 핸들러의 checkRequestMsg는 nil 요청과 없는 current, 과거·미래 proposal number를 어떻게 구분하는가?",
+      "answer_reference": "request 또는 Proposal이 nil이면 errInvalidMessage, current가 nil이면 errCurrentIsNil이다. current.sequence가 proposal.Number보다 크면 errOldMessage, 작으면 errFutureMessage, 같으면 nil이다. 이것은 입구 분류이고 실제 합의 수용은 별도다.",
+      "fact_cluster_proposed": "request-view-validation",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/request.go",
+          "start_line": 63,
+          "end_line": 79,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "a40cc7513dde051ea095c13bd749f35a8a0a40d513647bfb8d6634b3416c82d9",
+          "content_sha256": "146789766ec552eea618916427d89249d3963a45f7fa674ef10c1727c086a2d8",
+          "source_copy": "consensus__wbft__core__request.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).checkRequestMsg",
+          "chunk_ids": [
+            "d9cf959453c249a58fdaa60e790c3335839fc01fd3ffaf471acfd6d856343c26"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    },
+    {
+      "id": "IC-18",
+      "review_state": "proposed",
+      "question": "BFT 메시지 핸들러의 handleRequest에서 유효한 요청을 받아도 round가 양수이면 바로 PRE-PREPARE를 보내는가?",
+      "answer_reference": "checkRequestMsg 통과 후 pendingRequest를 저장하지만, StateAcceptRequest이면서 current.Round가 0일 때만 sendPreprepareMsg를 호출한다. 양수 round에서는 여기서 즉시 전송하지 않는다. ROUND-CHANGE quorum 후 전송 성공을 이 함수로 증명하지 않는다.",
+      "fact_cluster_proposed": "initial-round-proposal-broadcast",
+      "expected_concept": "wbft-message-handlers",
+      "concept_family_seen_in_DEV": true,
+      "independent_FINAL_eligible": false,
+      "evidence": [
+        {
+          "file": "consensus/wbft/core/request.go",
+          "start_line": 33,
+          "end_line": 57,
+          "commit_hash": "baca2869118774c5f6219932dc76e197a47e6ecd",
+          "file_sha256": "a40cc7513dde051ea095c13bd749f35a8a0a40d513647bfb8d6634b3416c82d9",
+          "content_sha256": "deaee6b2f143f35598ac07892411aafed67f4184ec335de937cd39a4ea1d4e4f",
+          "source_copy": "consensus__wbft__core__request.go.txt",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handleRequest",
+          "chunk_ids": [
+            "f66a41d1718cb2945f1c096d8305aed557af28516943470121eff93374cdbe2f",
+            "a5288d439fee9f81c4f387c6d592989e21cda57d888ca82919bc566757829e9b"
+          ],
+          "relation_assertion": false
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "No wording or line-overlap result certifies semantic independence.",
+    "Author Codex has seen earlier DEV and all four approved concept families.",
+    "IC-02/03 share a validator-membership cluster.",
+    "Previous IC-01/10 remain quarantined; new candidates are also subject to full saved-artifact audit.",
+    "No model query, relation assertion or criterion acceptance is granted.",
+    "Machine JSON artifact catalog cannot recover missing/deleted/chat/external history."
+  ],
+  "supersedes_candidate_book": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/eval/b0-knowledge-system/ontology-o04-independent-candidates-2026-10-13/candidate-book.json"
+}

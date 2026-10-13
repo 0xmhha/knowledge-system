@@ -173,7 +173,7 @@ prs:
 	t.Run("env_unset_errors_with_hint", func(t *testing.T) {
 		// Make sure the var is not set.
 		t.Setenv("CKV_TEST_STABLENET_PATH", "")
-		os.Unsetenv("CKV_TEST_STABLENET_PATH")
+		_ = os.Unsetenv("CKV_TEST_STABLENET_PATH")
 		_, err := LoadFixture(path)
 		if err == nil {
 			t.Fatal("expected error when placeholder is unset")

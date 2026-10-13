@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -65,10 +67,12 @@ type GenerateOptions struct {
 
 	// DomainProjectDir / DomainCorpusDir wire channel ② (domain-knowledge
 	// embedding); both empty disables it. GlossaryPath enables vocab expansion.
-	DomainProjectDir  string
-	DomainCorpusDir   string
-	GlossaryPath      string
-	SemanticStorePath string
+	DomainProjectDir     string
+	DomainCorpusDir      string
+	GlossaryPath         string
+	SemanticStorePath    string
+	SemanticOntologyMode string
+	SemanticBudgetMS     int
 
 	// FootprintDir / AuditDir are the logging output directories.
 	FootprintDir string
@@ -126,6 +130,12 @@ func Generate(o GenerateOptions) *Config {
 		vectorPath = filepath.Join(o.DatasetDir, "vector")
 	}
 
+	ontologyMode := o.SemanticOntologyMode
+	// Preserve the legacy default query path; an explicit baseline still opts
+	// into raw-query-first for controlled ontology comparisons.
+	if ontologyMode == "off" {
+		ontologyMode = ""
+	}
 	return &Config{
 		Version:     configVersion,
 		Name:        name,
@@ -168,7 +178,7 @@ func Generate(o GenerateOptions) *Config {
 			ProjectDir: o.DomainProjectDir,
 			CorpusDir:  o.DomainCorpusDir,
 		},
-		Semantic: SemanticConfig{StorePath: o.SemanticStorePath},
+		Semantic: SemanticConfig{StorePath: o.SemanticStorePath, OntologyMode: ontologyMode, OntologyBudgetMS: o.SemanticBudgetMS},
 		Service:  ServiceConfig{LabelPrefix: o.ServiceLabelPrefix},
 		Vocab: VocabConfig{
 			GlossaryPath: o.GlossaryPath,
@@ -201,13 +211,14 @@ func SaveNew(path string, c *Config) error {
 	if err != nil {
 		return fmt.Errorf("config: stage new %q: %w", path, err)
 	}
-	defer os.Remove(file.Name())
+	// Best-effort cleanup; the published link keeps the bytes after removal.
+	defer func() { _ = os.Remove(file.Name()) }()
 	if _, err = file.Write(data); err != nil {
-		file.Close()
+		_ = file.Close()
 		return fmt.Errorf("config: write new %q: %w", path, err)
 	}
 	if err = file.Sync(); err != nil {
-		file.Close()
+		_ = file.Close()
 		return fmt.Errorf("config: sync new %q: %w", path, err)
 	}
 	if err = file.Close(); err != nil {
@@ -217,6 +228,9 @@ func SaveNew(path string, c *Config) error {
 		return fmt.Errorf("config: chmod new %q: %w", path, err)
 	}
 	if err = os.Link(file.Name(), path); err != nil {
+		if errors.Is(err, fs.ErrExist) {
+			return fmt.Errorf("output_exists: config: %q already exists; generated configs never replace a file", path)
+		}
 		return fmt.Errorf("config: publish new %q: %w", path, err)
 	}
 	return nil

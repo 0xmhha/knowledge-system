@@ -237,6 +237,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	if len(keywords) == 0 && len(ckvHits) == 0 {
 		if s.ontologyProvider != nil && s.ontologyBoost > 0 {
 			out.Ontology = &contract.OntologyDiagnostic{Mode: s.providedOntologyMode(), State: "no_candidates"}
+			if ontologyExplanationRequested(ctx) {
+				out.Ontology.Explanation = &contract.OntologyExplanation{State: "no_candidates"}
+			}
 		}
 		s.emitFootprint(ctx, intent, keywords, out, 0, 0, "")
 		return out, nil

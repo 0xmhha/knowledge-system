@@ -91,13 +91,9 @@ func resolveAutoVersionContext(ctx context.Context, out, src, filelistConfig, se
 	return name, nil
 }
 
-// committedSourceCommit is the only source mode currently supported by the
-// setup CLI. CKV can index untracked and Git-ignored eligible files, so both
-// must be ruled out before stamping a Git commit onto citations.
-func committedSourceCommit(src string) (string, error) {
-	return committedSourceCommitContext(context.Background(), src)
-}
-
+// committedSourceCommitContext resolves the only source mode currently
+// supported by the setup CLI. CKV can index untracked and Git-ignored eligible
+// files, so both must be ruled out before stamping a Git commit onto citations.
 func committedSourceCommitContext(ctx context.Context, src string) (string, error) {
 	if src == "" {
 		return "", fmt.Errorf("committed source requires --src")
@@ -309,6 +305,12 @@ func runSetup(args []string) (result error) {
 		if !set["skip-vector"] {
 			o.SkipVector = base.SkipVector
 		}
+	}
+	// A versioned candidate is gated on graph/vector alignment and pins an
+	// embedding identity, so it cannot be graph-only. Refuse before any source
+	// capture creates the version directory.
+	if *rollback == "" && *version != "" && o.SkipVector {
+		return fmt.Errorf("skip_vector_unversioned: --skip-vector cannot be combined with --version")
 	}
 	if *holdForReview && (o.ProjectID == "" || o.SkipVector) {
 		return fmt.Errorf("--hold-for-review requires a pinned project ID and a complete graph/vector candidate")

@@ -22,7 +22,7 @@ func TestSearchWithinKinds_FindsRareKindsKNNWouldMiss(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	// Many code chunks near the query, one invariant chunk far from it.
@@ -78,7 +78,7 @@ func TestSearchWithinKinds_RespectsOtherFilterFields(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 	ctx := context.Background()
 
 	a := mkKindChunk("inv-go", "docs/a.md", "go rule", types.ChunkInvariant)

@@ -1,0 +1,352 @@
+{
+  "task": "O-04",
+  "scope": "cost diagnosis, source-byte keyed coordinate JSON decoding reuse, source/gold candidate preparation; independent quality acceptance pending",
+  "reference_code_revision": "710cfd567983de8628c42ecbd2ff62421ddee94f",
+  "reference_protocol_revision": "a19b6bcbad1a0ad50b40875c8319d44b1ce2d2f0",
+  "candidate_code_revision": "35457f5c482f65565d8dbbcb2d7b33bc48749fd8",
+  "older_and_newer_results_are_separate_not_pooled": true,
+  "per_variant": {
+    "responses": 126,
+    "comparisons": 84,
+    "failed": 0,
+    "missing": 0,
+    "pending": 0,
+    "warm_per_case_arm": 15,
+    "warm_per_arm": 30
+  },
+  "before_after_same_case_arm_phase_iteration": {
+    "pairs": 126,
+    "citation_and_body_changes": 0
+  },
+  "before": {
+    "OP-03": {
+      "baseline": {
+        "warm_n": 15,
+        "warm_p95_ns": 385003000,
+        "warm_median_ns": 361133750,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "resolve_only": {
+        "warm_n": 15,
+        "warm_p95_ns": 465903875,
+        "warm_median_ns": 424038000,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "text": {
+        "warm_n": 15,
+        "warm_p95_ns": 561528667,
+        "warm_median_ns": 510989000,
+        "HTTP_attempts": {
+          "/api/tags": 216,
+          "/api/embed": 108
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 216,
+          "ollama_http.POST": 108,
+          "intent.embed": 21,
+          "ckv.semantic_search": 84,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "p95_ratios_to_baseline": {
+        "resolve_only": 1.2101305054765807,
+        "text": 1.4585046532104944
+      }
+    },
+    "OP-05": {
+      "baseline": {
+        "warm_n": 15,
+        "warm_p95_ns": 385750875,
+        "warm_median_ns": 356233208,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "resolve_only": {
+        "warm_n": 15,
+        "warm_p95_ns": 438959083,
+        "warm_median_ns": 408429667,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "text": {
+        "warm_n": 15,
+        "warm_p95_ns": 432160833,
+        "warm_median_ns": 411393875,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "p95_ratios_to_baseline": {
+        "resolve_only": 1.1379341213419154,
+        "text": 1.1203107005266029
+      }
+    }
+  },
+  "after": {
+    "OP-03": {
+      "baseline": {
+        "warm_n": 15,
+        "warm_p95_ns": 433748000,
+        "warm_median_ns": 372505584,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "resolve_only": {
+        "warm_n": 15,
+        "warm_p95_ns": 398449000,
+        "warm_median_ns": 377812083,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "text": {
+        "warm_n": 15,
+        "warm_p95_ns": 476989125,
+        "warm_median_ns": 457532208,
+        "HTTP_attempts": {
+          "/api/tags": 216,
+          "/api/embed": 108
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 216,
+          "ollama_http.POST": 108,
+          "intent.embed": 21,
+          "ckv.semantic_search": 84,
+          "ckg.bm25_search": 1470,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "p95_ratios_to_baseline": {
+        "resolve_only": 0.9186186449274694,
+        "text": 1.0996918141409298
+      }
+    },
+    "OP-05": {
+      "baseline": {
+        "warm_n": 15,
+        "warm_p95_ns": 375206542,
+        "warm_median_ns": 358268209,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "resolve_only": {
+        "warm_n": 15,
+        "warm_p95_ns": 689456000,
+        "warm_median_ns": 369685167,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "text": {
+        "warm_n": 15,
+        "warm_p95_ns": 728053959,
+        "warm_median_ns": 373470542,
+        "HTTP_attempts": {
+          "/api/tags": 174,
+          "/api/embed": 87
+        },
+        "backend_methods": {
+          "ckg.health": 21,
+          "ckv.health": 21,
+          "ollama_http.GET": 174,
+          "ollama_http.POST": 87,
+          "intent.embed": 21,
+          "ckv.semantic_search": 63,
+          "ckg.bm25_search": 2016,
+          "ckg.find_symbol": 168,
+          "ckg.neighbors": 210
+        }
+      },
+      "p95_ratios_to_baseline": {
+        "resolve_only": 1.8375372570129653,
+        "text": 1.9404084883999704
+      }
+    }
+  },
+  "outlier_preserved": "OP-05 block3 text728.054ms/resolve689.456ms; not removed or blamed on a cause without evidence",
+  "performance_accepted": false,
+  "quality_accepted": false,
+  "default_on": false,
+  "activation": false,
+  "release_eligible": false,
+  "full_task_complete": false,
+  "held_DB_original_source_current_config_preserved": true,
+  "reference_binary_preserved": true,
+  "Go_tests": {
+    "packages": 4,
+    "tests": 247,
+    "subtests": 249,
+    "failed": 0,
+    "skipped": 0,
+    "race": "PASS",
+    "vet": "PASS",
+    "boundaries": "PASS"
+  },
+  "Python_tests": {
+    "tests": 51,
+    "failed": 0,
+    "skipped": 0
+  },
+  "docs_check": "PASS 314 live documents on candidate CKS/reference unchanged CKG/CKV grammar",
+  "exposure_audit": {
+    "captured_responses": 882,
+    "capture_files": 34,
+    "source_gold_candidates": 10,
+    "gold_spans": 11,
+    "quarantined_ids": [
+      "IC-01",
+      "IC-10"
+    ],
+    "review_ids": [
+      "IC-02",
+      "IC-03",
+      "IC-04",
+      "IC-05",
+      "IC-06",
+      "IC-07",
+      "IC-08",
+      "IC-09"
+    ],
+    "proposed_units": 7,
+    "independent_units_approved": 0,
+    "minimum_cluster_shortfall": 3,
+    "older_B0_FINAL_history_complete": false,
+    "new_model_queries_for_candidates": 0,
+    "new_FINAL_samples": 0
+  },
+  "additional_criteria_completed": [],
+  "completed_criteria_preserved": [
+    "O04-A",
+    "O04-B"
+  ],
+  "remaining": [
+    "complete older B0/FINAL corpus exposure audit",
+    "gold/content/scope/fact-cluster and semantic independence review",
+    "additional fresh facts to meet or honestly limit independent-unit coverage",
+    "independent off/on quality/cost verdict",
+    "final acceptance and ledger binding"
+  ]
+}

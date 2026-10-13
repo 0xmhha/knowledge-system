@@ -1,0 +1,23 @@
+{
+  "date_KST": "2026-10-13",
+  "step": "O-01",
+  "base_revision": "0b852cf69442f9c3fd053b7ffd3e93c9d4ea03a9",
+  "red": "TestSemanticStatusIsRegistered refused missing MCP discovery before implementation",
+  "fixture_authoring_error": "First follow-up fixture had a non-ontology extractor and was refused before status assertions; corrected to production ExtractOntology on captured YAML; not product RED",
+  "related_race": {
+    "test_pass": 171,
+    "subtest_pass": 156,
+    "package_pass": 3
+  },
+  "race_command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false go test -race -json ./internal/system/mcp ./internal/system/semantic ./cmd/cks/mcpcli",
+  "progress_guard_tests": 11,
+  "semantic_status_available": true,
+  "old_tools_compatible": true,
+  "actual_new_registry_count": 25,
+  "quality_improved_claimed": false,
+  "model_calls": 0,
+  "actual_domain_review_count": 0,
+  "operating_config_or_dataset_changed": false,
+  "fixture_only_readiness": "source capture, actual ontology extraction and SQLite retained validators; document-only fixtures have no actual graph nodes/CKV model vectors and no activation",
+  "source_bindings_committed_verified": "bound by subsequent ledger revision"
+}

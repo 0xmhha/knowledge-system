@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
@@ -43,6 +44,8 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	domainCorpusDir := fs.String("domain-corpus-dir", "", "domain corpus export dir (enables channel 2)")
 	glossaryPath := fs.String("glossary", "", "vocab glossary YAML path")
 	semanticStore := fs.String("semantic-store", "", "optional SQLite semantic store for reviewed v2 trace paths")
+	ontologyMode := fs.String("ontology-mode", "off", "optional reviewed ontology arm: off | baseline | concept_text | relations | combined")
+	ontologyBudget := fs.Int("ontology-budget-ms", 1000, "ontology preparation/retrieval budget in milliseconds (1..5000)")
 	footprintDir := fs.String("footprint-dir", "", "footprint log output dir")
 	auditDir := fs.String("audit-dir", "", "audit log output dir")
 	labelPrefix := fs.String("service-label-prefix", "", "launchd label prefix for `cks mcp service`; empty uses the engine's own name (set it only when agents are already installed under another prefix, or two distributions share a host)")
@@ -54,14 +57,25 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		return fmt.Errorf("--out is required")
 	}
 
-	// A written config is used from an arbitrary working directory, so resolve
-	// the sanitize ruleset to an absolute path (defaulting to the in-repo
-	// baseline) rather than emitting a cwd-relative one that would fail to load.
+	if (*ontologyMode == "relations" || *ontologyMode == "concept_text" || *ontologyMode == "combined") && *semanticStore == "" {
+		return fmt.Errorf("--semantic-store is required for an enabled --ontology-mode")
+	}
+	if *ontologyBudget < 1 || *ontologyBudget > 5000 {
+		return fmt.Errorf("--ontology-budget-ms must be 1..5000")
+	}
+
+	// A written config is used from an arbitrary working directory, so the
+	// sanitize ruleset is written as an absolute path. An explicit path is
+	// taken as given (it may name a file on the serving host); the default
+	// baseline is located on disk and must exist.
 	sanitizePath := *sanitizeRules
 	if sanitizePath == "" {
-		sanitizePath = config.DefaultSanitizeRulesPath
-	}
-	if abs, err := filepath.Abs(sanitizePath); err == nil {
+		found, err := locateBaselineRuleset()
+		if err != nil {
+			return err
+		}
+		sanitizePath = found
+	} else if abs, err := filepath.Abs(sanitizePath); err == nil {
 		sanitizePath = abs
 	}
 
@@ -89,30 +103,40 @@ func runGenConfig(args []string, stdout io.Writer) error {
 		addr = net.JoinHostPort(wildcardBind, p)
 	}
 
+	semanticPath := *semanticStore
+	if semanticPath != "" {
+		var err error
+		semanticPath, err = filepath.Abs(semanticPath)
+		if err != nil {
+			return err
+		}
+	}
 	cfg := config.Generate(config.GenerateOptions{
-		Name:               *name,
-		Description:        *description,
-		DatasetDir:         *datasetDir,
-		GraphPath:          *graphPath,
-		VectorPath:         *vectorPath,
-		SourceRoot:         *sourceRoot,
-		GraphBinary:        *graphBinary,
-		VectorBinary:       *vectorBinary,
-		PolicyFile:         *policyFile,
-		EmbedModel:         *embedModel,
-		EmbedDim:           *embedDim,
-		QueryPrefixPolicy:  *queryPrefixPolicy,
-		OllamaURL:          *ollamaURL,
-		HTTPAddr:           addr,
-		AllowRemote:        *allowRemote,
-		SanitizeRulesPath:  sanitizePath,
-		DomainProjectDir:   *domainProjectDir,
-		DomainCorpusDir:    *domainCorpusDir,
-		GlossaryPath:       *glossaryPath,
-		SemanticStorePath:  *semanticStore,
-		FootprintDir:       *footprintDir,
-		AuditDir:           *auditDir,
-		ServiceLabelPrefix: *labelPrefix,
+		Name:                 *name,
+		Description:          *description,
+		DatasetDir:           *datasetDir,
+		GraphPath:            *graphPath,
+		VectorPath:           *vectorPath,
+		SourceRoot:           *sourceRoot,
+		GraphBinary:          *graphBinary,
+		VectorBinary:         *vectorBinary,
+		PolicyFile:           *policyFile,
+		EmbedModel:           *embedModel,
+		EmbedDim:             *embedDim,
+		QueryPrefixPolicy:    *queryPrefixPolicy,
+		OllamaURL:            *ollamaURL,
+		HTTPAddr:             addr,
+		AllowRemote:          *allowRemote,
+		SanitizeRulesPath:    sanitizePath,
+		DomainProjectDir:     *domainProjectDir,
+		DomainCorpusDir:      *domainCorpusDir,
+		GlossaryPath:         *glossaryPath,
+		SemanticStorePath:    semanticPath,
+		SemanticOntologyMode: *ontologyMode,
+		SemanticBudgetMS:     *ontologyBudget,
+		FootprintDir:         *footprintDir,
+		AuditDir:             *auditDir,
+		ServiceLabelPrefix:   *labelPrefix,
 	})
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("generated config invalid: %w", err)
@@ -120,7 +144,42 @@ func runGenConfig(args []string, stdout io.Writer) error {
 	if err := config.SaveNew(*out, cfg); err != nil {
 		return err
 	}
-	fmt.Fprintf(stdout, "generated %s (name=%s, listen=%s allow_remote=%v)\n",
+	_, _ = fmt.Fprintf(stdout, "generated %s (name=%s, listen=%s allow_remote=%v)\n",
 		*out, cfg.Name, cfg.Listen.HTTPAddr, cfg.Listen.AllowRemote)
 	return nil
+}
+
+// executablePath is os.Executable, replaceable in tests.
+var executablePath = os.Executable
+
+// locateBaselineRuleset finds the shipped sanitize baseline. It looks beside
+// the running binary first (a checkout's bin/ next to system/policies, or a
+// package root holding policies/), then in the working directory and its
+// parents, so the result does not depend on where gen-config is run from.
+func locateBaselineRuleset() (string, error) {
+	var candidates []string
+	if exe, err := executablePath(); err == nil {
+		if resolved, err := filepath.EvalSymlinks(exe); err == nil {
+			exe = resolved
+		}
+		dir := filepath.Dir(exe)
+		candidates = append(candidates,
+			filepath.Join(dir, "..", config.DefaultSanitizeRulesPath),
+			filepath.Join(dir, "policies", "sanitization_rules.yaml"),
+			filepath.Join(dir, "..", "policies", "sanitization_rules.yaml"))
+	}
+	if wd, err := os.Getwd(); err == nil {
+		for dir := wd; ; dir = filepath.Dir(dir) {
+			candidates = append(candidates, filepath.Join(dir, config.DefaultSanitizeRulesPath))
+			if filepath.Dir(dir) == dir {
+				break
+			}
+		}
+	}
+	for _, c := range candidates {
+		if info, err := os.Stat(c); err == nil && info.Mode().IsRegular() {
+			return filepath.Abs(filepath.Clean(c))
+		}
+	}
+	return "", fmt.Errorf("config_invalid: no sanitize baseline ruleset found beside the binary or in the working tree; pass --sanitize-rules")
 }

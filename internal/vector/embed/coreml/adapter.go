@@ -15,24 +15,6 @@ package coreml
 
 import "fmt"
 
-// Adapter implements types.Embedder via CoreML Framework.
-// Only available on macOS (darwin) builds.
-type Adapter struct {
-	modelPath string
-	modelName string
-	dim       int
-	maxSeqLen int
-	tokenizer adapterTokenizer
-}
-
-// adapterTokenizer is the interface the platform-specific tokenizer
-// satisfies. Defined here so the Adapter struct compiles on all
-// platforms; only darwin has a real implementation.
-type adapterTokenizer interface {
-	Encode(text string, maxLen int) (ids, mask []int64, err error)
-	Close() error
-}
-
 // Options configures the CoreML adapter.
 type Options struct {
 	ModelPath     string // path to .mlpackage or .mlmodelc directory

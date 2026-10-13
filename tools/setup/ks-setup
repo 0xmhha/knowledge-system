@@ -1,0 +1,8 @@
+#!/bin/sh
+# Launcher: uses uv when present (installs rich into an isolated environment),
+# otherwise the system python3 with rich, otherwise plain output.
+DIR=$(cd "$(dirname "$0")" && pwd)
+if command -v uv >/dev/null 2>&1; then
+  exec uv run --quiet --project "$DIR" python -m ks_setup "$@"
+fi
+PYTHONPATH="$DIR${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m ks_setup "$@"

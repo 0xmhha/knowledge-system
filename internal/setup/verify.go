@@ -269,7 +269,7 @@ func VerifyDerivedFresh(step, label string, argv []string, committed string, emi
 	if err != nil {
 		return fmt.Errorf("verify: %s: %w", label, err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 
 	fresh := filepath.Join(dir, filepath.Base(committed))
 	cmd := exec.Command(argv[0], append(append([]string{}, argv[1:]...), fresh)...)

@@ -187,7 +187,7 @@ func verifyRelease(publicKeyPath, releasePath, signaturePath, archivePath, targe
 	if err != nil {
 		return nil, err
 	}
-	defer archive.Close()
+	defer func() { _ = archive.Close() }() // read-only file
 	info, err := archive.Stat()
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ func verifyRelease(publicKeyPath, releasePath, signaturePath, archivePath, targe
 	if err != nil {
 		return nil, err
 	}
-	defer zipped.Close()
+	defer func() { _ = zipped.Close() }() // read-only decompressor; nothing to flush
 	reader := tar.NewReader(zipped)
 	files := map[string][]byte{}
 	modes := map[string]int64{}
@@ -245,7 +245,8 @@ func verifyRelease(publicKeyPath, releasePath, signaturePath, archivePath, targe
 		if _, exists := modes[name]; exists {
 			return nil, errors.New("duplicate archive member")
 		}
-		if header.Typeflag != tar.TypeReg && header.Typeflag != tar.TypeRegA && header.Typeflag != tar.TypeDir {
+		// tar.Reader.Next already rewrites legacy TypeRegA headers to TypeReg/TypeDir.
+		if header.Typeflag != tar.TypeReg && header.Typeflag != tar.TypeDir {
 			return nil, errors.New("unsafe archive entry type")
 		}
 		modes[name] = header.Mode

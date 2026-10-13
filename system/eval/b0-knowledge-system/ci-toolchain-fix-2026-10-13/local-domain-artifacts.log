@@ -1,0 +1,11 @@
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+./bin/cks domain sync --project projects/stablenet/domain-knowledge \
+	    --ckg-out projects/stablenet/policies/graph.yaml \
+	    --ckv-out /dev/null
+cks-domain-sync: 42 verified entries → 14 ckv categories, 42 ckg policies
+./bin/cks domain glossary-gen --project projects/stablenet/domain-knowledge \
+	    --out projects/stablenet/domain-knowledge/glossary.yaml
+domain glossary-gen: included=42 skipped=2 (gate=verified)
+domain artifacts match their entries

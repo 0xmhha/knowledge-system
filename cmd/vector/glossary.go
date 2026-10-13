@@ -83,8 +83,12 @@ func runGlossaryExtract(opts *glossaryOpts) error {
 	if err != nil {
 		return fmt.Errorf("create %s: %w", opts.out, err)
 	}
-	defer f.Close()
 	if err := glossary.WriteYAML(f, aliases); err != nil {
+		_ = f.Close() // error path: the write error is the one reported
+		return fmt.Errorf("write %s: %w", opts.out, err)
+	}
+	// The file is the command's product: a failed close may mean lost bytes.
+	if err := f.Close(); err != nil {
 		return fmt.Errorf("write %s: %w", opts.out, err)
 	}
 	fmt.Fprintf(os.Stderr, "ckv glossary: wrote %d aliases to %s\n", len(aliases), opts.out)

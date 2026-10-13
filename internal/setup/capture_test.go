@@ -289,7 +289,7 @@ func TestCaptureRejectsReplacementAtLstatOpenBoundary(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer root.Close()
+			defer func() { _ = root.Close() }()
 			_, err = readCapturedRegularWithOpenHook(root, "nested/policy.md", 1024, func() {
 				switch replacement {
 				case "linked-leaf":

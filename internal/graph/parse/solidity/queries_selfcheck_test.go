@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -62,31 +63,40 @@ func TestQueryCompileDetectsFailure(t *testing.T) {
 func discoverQueries(t *testing.T, dir string) map[string]string {
 	t.Helper()
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, func(fi os.FileInfo) bool {
-		return !strings.HasSuffix(fi.Name(), "_test.go")
-	}, 0)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		t.Fatalf("parse package source: %v", err)
 	}
+	files := map[string]*ast.File{}
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		path := filepath.Join(dir, name)
+		file, err := parser.ParseFile(fset, path, nil, 0)
+		if err != nil {
+			t.Fatalf("parse package source: %v", err)
+		}
+		files[path] = file
+	}
 
 	out := map[string]string{}
-	for _, pkg := range pkgs {
-		for name, file := range pkg.Files {
-			ast.Inspect(file, func(n ast.Node) bool {
-				lit, ok := n.(*ast.BasicLit)
-				if !ok || lit.Kind != token.STRING {
-					return true
-				}
-				val, err := strconv.Unquote(lit.Value)
-				if err != nil || !looksLikeQuery(val) {
-					return true
-				}
-				if _, dup := out[val]; !dup {
-					out[val] = fmt.Sprintf("%s:%d", name, fset.Position(lit.Pos()).Line)
-				}
+	for name, file := range files {
+		ast.Inspect(file, func(n ast.Node) bool {
+			lit, ok := n.(*ast.BasicLit)
+			if !ok || lit.Kind != token.STRING {
 				return true
-			})
-		}
+			}
+			val, err := strconv.Unquote(lit.Value)
+			if err != nil || !looksLikeQuery(val) {
+				return true
+			}
+			if _, dup := out[val]; !dup {
+				out[val] = fmt.Sprintf("%s:%d", name, fset.Position(lit.Pos()).Line)
+			}
+			return true
+		})
 	}
 	return out
 }

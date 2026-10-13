@@ -190,7 +190,7 @@ func runBuild(ctx context.Context, cmd *cobra.Command, o buildOptions) error {
 		if err != nil {
 			return err
 		}
-		defer store.Close()
+		defer func() { _ = store.Close() }() // every write is committed in its own transaction before Close
 		if o.versionDir != "" {
 			err = store.PutAlignedRetained(ctx, p, repo, o.graph, o.vector, o.versionDir)
 		} else {
@@ -237,9 +237,9 @@ func writeProjection(output string, content []byte) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmp.Name())
+	defer func() { _ = os.Remove(tmp.Name()) }() // fails harmlessly once the rename has consumed the temp file
 	if _, err := tmp.Write(content); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return err
 	}
 	if err := tmp.Close(); err != nil {

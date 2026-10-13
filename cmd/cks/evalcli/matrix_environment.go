@@ -157,7 +157,8 @@ func parseMatrixProcesses(raw string) ([]matrixProcess, int) {
 }
 func observeMatrixHardware() matrixHardware {
 	h := matrixHardware{OS: runtime.GOOS, Arch: runtime.GOARCH, LogicalCPUs: runtime.NumCPU()}
-	if runtime.GOOS == "darwin" {
+	switch runtime.GOOS {
+	case "darwin":
 		h.OSVersion = environmentCommand("sw_vers", "-productVersion")
 		h.CPUBrand = environmentCommand("sysctl", "-n", "machdep.cpu.brand_string")
 		h.MemoryBytes, _ = strconv.ParseInt(environmentCommand("sysctl", "-n", "hw.memsize"), 10, 64)
@@ -165,13 +166,13 @@ func observeMatrixHardware() matrixHardware {
 		h.MemoryState = environmentCommand("vm_stat")
 		h.Swap = environmentCommand("sysctl", "-n", "vm.swapusage")
 		h.Thermal = environmentCommand("pmset", "-g", "therm")
-	} else if runtime.GOOS == "linux" {
+	case "linux":
 		read := func(path string) string {
 			file, err := os.Open(path)
 			if err != nil {
 				return ""
 			}
-			defer file.Close()
+			defer func() { _ = file.Close() }() // read-only file
 			data, err := io.ReadAll(io.LimitReader(file, 64*1024))
 			if err != nil {
 				return ""
@@ -290,7 +291,7 @@ func observeMatrixModel(ctx context.Context, cfg *config.Config, identity *setup
 	m.Endpoint = cfg.Backends.CKV.OllamaURL
 	m.ProbePolicy = "local /api/version; tags; one strict native embed with dataset runtime options; tags again; optional /api/ps; outside query timing"
 	u, err := url.Parse(m.Endpoint)
-	if err != nil || u.Scheme != "http" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "" && u.Path != "/" || !(u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" || u.Hostname() == "::1") {
+	if err != nil || u.Scheme != "http" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "" && u.Path != "/" || u.Hostname() != "localhost" && u.Hostname() != "127.0.0.1" && u.Hostname() != "::1" {
 		return fail("model_endpoint_must_be_loopback_http")
 	}
 	client := &http.Client{Timeout: 90 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
@@ -322,7 +323,7 @@ func observeMatrixModel(ctx context.Context, cfg *config.Config, identity *setup
 		if e != nil {
 			return e
 		}
-		defer response.Body.Close()
+		defer func() { _ = response.Body.Close() }() // response fully read; close error is irrelevant
 		if response.StatusCode != 200 {
 			return fmt.Errorf("unexpected model HTTP status")
 		}

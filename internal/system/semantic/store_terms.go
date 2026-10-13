@@ -16,7 +16,8 @@ func migrateTermIndex(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	// Rollback after a successful Commit only reports sql.ErrTxDone.
+	defer func() { _ = tx.Rollback() }()
 	if _, err := tx.ExecContext(ctx, semanticTermsTable); err != nil {
 		return err
 	}
@@ -28,34 +29,34 @@ func migrateTermIndex(db *sql.DB) error {
 		var projectID, datasetID, digest string
 		var document []byte
 		if err := rows.Scan(&projectID, &datasetID, &digest, &document); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return err
 		}
 		hash := sha256.Sum256(document)
 		if hex.EncodeToString(hash[:]) != digest {
-			rows.Close()
+			_ = rows.Close()
 			return fmt.Errorf("projection %s/%s digest mismatch during term migration", projectID, datasetID)
 		}
 		var p Projection
 		if err := json.Unmarshal(document, &p); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return err
 		}
 		if err := p.Validate(); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return err
 		}
 		if p.Snapshot.ProjectID != projectID || p.Snapshot.DatasetID != datasetID {
-			rows.Close()
+			_ = rows.Close()
 			return fmt.Errorf("projection %s/%s identity mismatch during term migration", projectID, datasetID)
 		}
 		if err := insertTermRows(ctx, tx, p); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return err
 		}
 	}
 	if err := rows.Err(); err != nil {
-		rows.Close()
+		_ = rows.Close()
 		return err
 	}
 	if err := rows.Close(); err != nil {

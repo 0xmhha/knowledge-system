@@ -2,6 +2,8 @@
 
 **2026-10-12 현재:** 후속 작업은 17/18 완료됐고 N16 신뢰·권한은 사용자 결정으로 보류(미충족) 중이다. PR #98은 `067ed5f3`으로 `main`에 머지됐다. 태그·공개 배포는 보류한다. [현재 작업리스트](./REFACTORING-REMAINING-WORKLIST.md), [진행 원장](./REFACTORING-PROGRESS.json), [N18 판정](./N18-RELEASE-VERDICT-DRAFT.md)을 따른다.
 
+2026-10-13 이후 재개는 [현재 인수인계](./CURRENT-HANDOFF.md)를 따른다. 이 파일은 작성 당시 계획과 후속 상태 설명을 보존한다.
+
 아래의 “최신”, “현재”, 8/18 완료와 남은 10개는 2026-10-08~09의 단계별 기록이다. 당시 증거와 판단을 보존하기 위해 소급해서 17/18로 바꾸지 않았다.
 
 2026-10-09 최신 하위 단계: **N12 새 승격 통합 시험의 동일 source/index/관계 결합 및 archive-only 재생 검증 완료**. [개별 검토 자료](./N12-ANCHOR-BOUND-TRACE-REVIEW.md) — source1,438/선택71·CKG63/CKV66/747chunks625canonical, 실제canonical18·evidence81·신규proposed17(총29), race8시험29하위시험/변조5거부, 원본 source/index/store 없이 archive1,457권위파일 재생·bytes 동일. 전체Go DRIFT992 유지. 좌표 함수의 부분 역할과 실제CKG+mockCKV 통합 제어를 구별했다. human/reviewed path/linked run/FINAL/actual activation0, 전체8/18·요청5/15·남은10개 유지. 다음 실제 검토자·개별 내용 판정 및 N11 gold/독립성·부족 표본·runtime 동결. 남은 전체 N08 검색 품질, N09 기권, N10 비용·지연, N11 독립 평가, N12 파일럿 검토, N14 변경 수용, N15 규모·이식성, N16 신뢰·권한, N17 실제 복구, N18 출시 판정. 아래는 이전 단계 이력이다.

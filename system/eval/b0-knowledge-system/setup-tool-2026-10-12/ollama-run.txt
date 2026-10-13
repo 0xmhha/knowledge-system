@@ -1,0 +1,40 @@
+      Source: /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/demo
+     Dataset: /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo
+       Index: graph + vector (ollama: bge-m3:latest, 1024d)
+ Source mode: committed
+      Server: demo @ 127.0.0.1:18934
+[   done] 1. Check prerequisites (0s) - 8 checks passed
+[   done] 1. Check prerequisites / knowledge-system (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system
+[   done] 1. Check prerequisites / git (0s) - git version 2.55.0
+[   done] 1. Check prerequisites / go (0s) - go version go1.26.8 darwin/arm64
+[   done] 1. Check prerequisites / binaries (0s) - /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin
+[   done] 1. Check prerequisites / source (0s) - /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/demo @ cd09d13c9f10
+[   done] 1. Check prerequisites / dataset (0s) - /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo (65.2 GiB free)
+[   done] 1. Check prerequisites / ollama (0s) - http://127.0.0.1:11434 (version 0.35.1)
+[   done] 1. Check prerequisites / embedding model (0s) - bge-m3:latest
+[skipped] 2. Build ckg / ckv / cks - using /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin
+[   done] 3. Write the project setup config (0s) - /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo-setup.yaml
+[running] 4. Build the knowledge dataset - version v20261012-010702-cd09d13c
+[   done] 4. Build the knowledge dataset / Graph index (ckg) (0s) - ckg: built 10 nodes / 19 edges into /private/tmp/claude-501/-Users-kevin-work-github-0xmh…
+[   done] 4. Build the knowledge dataset / Embedding service check (0s) - Ollama reachable at http://127.0.0.1:11434; model "bge-m3:latest" present (bge-m3:latest)
+[running] 4. Build the knowledge dataset / Vector index (ckv) - Build the vector index aligned to the graph
+[   done] 4. Build the knowledge dataset / Vector index (ckv) (0s) - ckv: indexed_head=cd09d13c9f1018109b27d600b3f32cc0b37ed04e built_at=2026-10-11T16:07:05Z …
+[   done] 4. Build the knowledge dataset / Graph/vector alignment (0s) - Verify graph/vector alignment
+[warning] 4. Build the knowledge dataset / Promotion gate (0s) - canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified
+[warning] 4. Build the knowledge dataset (3s) - /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo/v20261012-010702-cd09d13c
+[   done] 4. Build the knowledge dataset / Promote to current (0s) - promoted v20261012-010702-cd09d13c → current
+[   done] 5. Write the MCP server config (0s) - demo-cks.yaml, demo-cks-stdio.yaml
+[running] 6. Start the server and check health
+[   done] 6. Start the server and check health (1s) - 24 MCP tools, status ok
+[   done] 6. Start the server and check health / graph (0s) - schema 1.24, head cd09d13c9f10
+[   done] 6. Start the server and check health / vector (0s) - reachable
+Dataset ready.
+  Dataset:        /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo/current  (version v20261012-010702-cd09d13c)
+  Server config:  /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo-cks.yaml  (HTTP, 127.0.0.1:18934)
+  Stdio config:   /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo-cks-stdio.yaml
+  Serve:          /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp --config /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo-cks.yaml
+  Client entry:   /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks mcp client-config --config /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo-cks.yaml
+  Rebuild:        rerun this tool; a new version is promoted only after its gates pass
+  Roll back:      /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks setup --out /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/kd/demo --src /private/tmp/claude-501/-Users-kevin-work-github-0xmhha-auto-coding-knowledge-knowledge-system/63a9ee50-8b6b-4a25-9ded-b48c9ccc54fe/scratchpad/e2e-ev/demo --rollback <version>
+  Running servers keep the dataset they opened; restart them after a rebuild.
+exit=0

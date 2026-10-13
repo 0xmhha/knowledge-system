@@ -9,6 +9,7 @@
 package domaincli
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -78,14 +79,14 @@ func newExportCmd(project *string) *cobra.Command {
 				return err
 			}
 			for _, w := range res.Warnings {
-				fmt.Fprintf(cmd.ErrOrStderr(), "domain export: warning: %s\n", w)
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "domain export: warning: %s\n", w)
 			}
 			if want := len(p.AuthoritativeDocs); want > res.DocsCopied && !allowMissingDocs {
 				return fmt.Errorf("%d of %d authoritative_docs could not be resolved"+
 					" (code_root=%q). The corpus would ship without them; pass --code-root, or"+
 					" --allow-missing-docs to accept the gap", want-res.DocsCopied, want, p.CodeRoot)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "domain export: %d entries, %d docs -> %s\n", res.EntriesWritten, res.DocsCopied, outDir)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "domain export: %d entries, %d docs -> %s\n", res.EntriesWritten, res.DocsCopied, outDir)
 			return nil
 		},
 	}
@@ -172,7 +173,7 @@ func runGlossaryGen(projectDir, outPath, statusGate string, dryRun bool, stderr 
 		included++
 	}
 
-	fmt.Fprintf(stderr, "domain glossary-gen: included=%d skipped=%d (gate=%s)\n", included, skipped, statusGate)
+	_, _ = fmt.Fprintf(stderr, "domain glossary-gen: included=%d skipped=%d (gate=%s)\n", included, skipped, statusGate)
 
 	// Round-trip validate: feed the result through vocab.New so any
 	// generator bug that produces a malformed glossary surfaces here,
@@ -272,9 +273,9 @@ func runVerify(projectDir, entryRef, reviewer, date string, skipInventory bool, 
 		switch iss.Severity {
 		case inventory.SeverityError:
 			errCount++
-			fmt.Fprintf(stderr, "%s: error: %s: %s\n", iss.File, iss.EntryID, iss.Message)
+			_, _ = fmt.Fprintf(stderr, "%s: error: %s: %s\n", iss.File, iss.EntryID, iss.Message)
 		case inventory.SeverityWarning:
-			fmt.Fprintf(stderr, "%s: warning: %s: %s\n", iss.File, iss.EntryID, iss.Message)
+			_, _ = fmt.Fprintf(stderr, "%s: warning: %s: %s\n", iss.File, iss.EntryID, iss.Message)
 		}
 	}
 	if errCount > 0 {
@@ -284,7 +285,7 @@ func runVerify(projectDir, entryRef, reviewer, date string, skipInventory bool, 
 	if err := inventory.MarkVerified(sourcePath, date, reviewer); err != nil {
 		return err
 	}
-	fmt.Fprintf(stderr, "domain verify: %s -> verified (by=%s date=%s)\n", entryID, reviewer, date)
+	_, _ = fmt.Fprintf(stderr, "domain verify: %s -> verified (by=%s date=%s)\n", entryID, reviewer, date)
 
 	if skipInventory {
 		return nil
@@ -300,7 +301,7 @@ func runVerify(projectDir, entryRef, reviewer, date string, skipInventory bool, 
 	if err := inventory.UpdateInventoryCounts(invPath, p2); err != nil {
 		return fmt.Errorf("update inventory.md: %w", err)
 	}
-	fmt.Fprintf(stderr, "domain verify: refreshed %s\n", invPath)
+	_, _ = fmt.Fprintf(stderr, "domain verify: refreshed %s\n", invPath)
 	return nil
 }
 
@@ -409,23 +410,32 @@ func newWorksheetCmd(project *string) *cobra.Command {
 			}
 			entries := filterAndSort(p, status, priority)
 
-			var w io.Writer = cmd.OutOrStdout()
+			// Render into memory first so a failed write to --out (or stdout)
+			// surfaces as a command error instead of a silently short file.
+			var buf bytes.Buffer
+			renderHeader(&buf, p, status, priority, len(entries), catalogs...)
+			for _, e := range entries {
+				renderEntry(&buf, p, e, catalogs...)
+			}
+			renderFooter(&buf, p)
+
 			if outPath != "" {
 				f, err := os.Create(outPath)
 				if err != nil {
 					return err
 				}
-				defer f.Close()
-				w = f
+				if _, err := buf.WriteTo(f); err != nil {
+					_ = f.Close() // the write error is the one worth reporting
+					return err
+				}
+				if err := f.Close(); err != nil {
+					return err
+				}
+			} else if _, err := buf.WriteTo(cmd.OutOrStdout()); err != nil {
+				return err
 			}
 
-			renderHeader(w, p, status, priority, len(entries), catalogs...)
-			for _, e := range entries {
-				renderEntry(w, p, e, catalogs...)
-			}
-			renderFooter(w, p)
-
-			fmt.Fprintf(cmd.ErrOrStderr(), "domain worksheet: %d entries emitted (status=%s priority=%s)\n",
+			_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "domain worksheet: %d entries emitted (status=%s priority=%s)\n",
 				len(entries), status, displayOrAll(priority))
 			return nil
 		},

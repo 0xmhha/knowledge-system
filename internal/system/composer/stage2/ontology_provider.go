@@ -75,6 +75,16 @@ func (p preparedOntology) VerifiedImplementations(id string) []semantic.CodeImpl
 
 func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, prompt string, hits []contract.Hit, baseline []ScoredCitation, demoteTests, demoteDocs bool) ([]ScoredCitation, []semantic.ConceptCandidate, *contract.OntologyDiagnostic) {
 	diagnostic := &contract.OntologyDiagnostic{Mode: s.providedOntologyMode(), State: "unavailable", BaselineCitations: len(baseline)}
+	if ontologyExplanationRequested(ctx) {
+		diagnostic.Explanation = &contract.OntologyExplanation{State: "unavailable"}
+		defer func() {
+			if diagnostic.State != "active" {
+				diagnostic.Explanation.State = diagnostic.State
+				diagnostic.Explanation.Changes = nil
+				diagnostic.Explanation.TotalChanged = 0
+			}
+		}()
+	}
 	if s.ontologyProvider == nil {
 		return baseline, nil, diagnostic
 	}
@@ -240,5 +250,6 @@ func (s *Searcher) applyProvidedOntology(ctx context.Context, agg *aggregator, p
 	}
 	diagnostic.AppliedRelations = len(proofs)
 	diagnostic.State = "active"
+	explainOntology(diagnostic, baseline, ranked, candidates)
 	return ranked, candidates, diagnostic
 }

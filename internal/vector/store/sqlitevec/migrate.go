@@ -190,7 +190,7 @@ func (r *MigrationRunner) applyOne(ctx context.Context, m Migration) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	if _, err := tx.ExecContext(ctx, m.SQL); err != nil {
 		return fmt.Errorf("exec: %w", err)
@@ -267,7 +267,7 @@ func (r *MigrationRunner) loadApplied(ctx context.Context) (map[string]Migration
 	if err != nil {
 		return nil, fmt.Errorf("query schema_migrations: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	out := map[string]Migration{}
 	for rows.Next() {
@@ -292,23 +292,25 @@ func (r *MigrationRunner) backupDB() error {
 	if err != nil {
 		return err
 	}
-	defer src.Close()
+	defer func() { _ = src.Close() }()
 
 	bakPath := fmt.Sprintf("%s.bak.%d", r.dbPath, time.Now().Unix())
 	dst, err := os.OpenFile(bakPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
 	if err != nil {
 		return err
 	}
-	defer dst.Close()
+	// The deferred close covers the error paths; the success path closes
+	// explicitly below so a failed close of the backup is reported.
+	defer func() { _ = dst.Close() }()
 
 	if _, err := io.Copy(dst, src); err != nil {
-		os.Remove(bakPath)
+		_ = os.Remove(bakPath) // best-effort removal of the partial backup
 		return err
 	}
 	if err := dst.Sync(); err != nil {
 		return err
 	}
-	return nil
+	return dst.Close()
 }
 
 // BackupPath returns the conventional backup filename for the given

@@ -426,7 +426,7 @@ func writeJSONString(out *bytes.Buffer, value string) error {
 			out.WriteString(`\r`)
 		default:
 			if r < 0x20 {
-				out.WriteString(fmt.Sprintf(`\u%04x`, r))
+				fmt.Fprintf(out, `\u%04x`, r)
 			} else {
 				out.WriteRune(r)
 			}

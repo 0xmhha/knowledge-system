@@ -108,14 +108,16 @@ func TestEmbed_SendsCorrectRequest(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var req embedRequest
-		json.NewDecoder(r.Body).Decode(&req)
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Errorf("decode request: %v", err)
+		}
 		receivedModel = req.Model
 		receivedInput = req.Input
 
 		resp := embedResponse{
 			Embeddings: [][]float32{{0.1, 0.2, 0.3}},
 		}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer server.Close()
 
@@ -154,7 +156,7 @@ func TestEmbed_EmptyBatch(t *testing.T) {
 func TestEmbed_ServerError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("model not found"))
+		_, _ = w.Write([]byte("model not found"))
 	}))
 	defer server.Close()
 
@@ -168,7 +170,7 @@ func TestEmbed_ServerError(t *testing.T) {
 func TestEmbed_CountMismatch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// One embedding for a two-input batch — must be rejected at the boundary.
-		json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1, 0.2}}})
+		_ = json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1, 0.2}}})
 	}))
 	defer server.Close()
 
@@ -181,7 +183,7 @@ func TestEmbed_CountMismatch(t *testing.T) {
 func TestEmbed_Timeout(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(200 * time.Millisecond)
-		json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1}}})
+		_ = json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1}}})
 	}))
 	defer server.Close()
 
@@ -194,7 +196,7 @@ func TestEmbed_Timeout(t *testing.T) {
 func TestOpen_TimeoutBounded(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(200 * time.Millisecond)
-		json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1}}})
+		_ = json.NewEncoder(w).Encode(embedResponse{Embeddings: [][]float32{{0.1}}})
 	}))
 	defer server.Close()
 

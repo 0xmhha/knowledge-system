@@ -130,8 +130,12 @@ func TestBudgetOmissionCannotHideForeignMissingOrCorruptedEvidence(t *testing.T)
 			case "corrupt":
 				entries, _ := os.ReadDir(filepath.Join(version, "sources", "blobs"))
 				path := filepath.Join(version, "sources", "blobs", entries[0].Name())
-				os.Chmod(path, 0600)
-				os.WriteFile(path, []byte("tampered"), 0600)
+				if err := os.Chmod(path, 0600); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.WriteFile(path, []byte("tampered"), 0600); err != nil {
+					t.Fatal(err)
+				}
 			}
 			_, err := Build(context.Background(), version, "scope DEV", refs, testCleaner(t))
 			if err == nil || !strings.Contains(err.Error(), code) || errors.Is(err, ErrEvidenceBudget) {

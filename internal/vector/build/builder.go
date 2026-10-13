@@ -290,7 +290,8 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open store: %w", err)
 	}
-	defer store.Close()
+	// Writes are committed per transaction; a close failure cannot undo them.
+	defer func() { _ = store.Close() }()
 
 	// Treat manifest.json as the build's commit marker. From here on the
 	// vector.db is mutated in place, so drop any prior manifest before the
@@ -486,13 +487,13 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 					fmt.Fprintf(os.Stderr, "ckv: pr-tag warning: %v\n", err)
 				} else if tagged > 0 {
 					if o.ProgressOut != nil {
-						fmt.Fprintf(o.ProgressOut, "ckv: tagged %d source chunks with PR breadcrumbs\n", tagged)
+						_, _ = fmt.Fprintf(o.ProgressOut, "ckv: tagged %d source chunks with PR breadcrumbs\n", tagged)
 					}
 				}
 			}
 
 			if o.ProgressOut != nil {
-				fmt.Fprintf(o.ProgressOut, "ckv: indexed %d PRs → %d PR chunks\n", len(prMetas), len(prChunks))
+				_, _ = fmt.Fprintf(o.ProgressOut, "ckv: indexed %d PRs → %d PR chunks\n", len(prMetas), len(prChunks))
 			}
 		}
 	}
@@ -577,7 +578,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 		if totalSteps > 0 {
 			pct := resolved * 100 / totalSteps
 			if o.ProgressOut != nil {
-				fmt.Fprintf(o.ProgressOut, "ckv: flow steps aligned to code: %d/%d (%d%%)\n", resolved, totalSteps, pct)
+				_, _ = fmt.Fprintf(o.ProgressOut, "ckv: flow steps aligned to code: %d/%d (%d%%)\n", resolved, totalSteps, pct)
 			}
 			if pct < 80 {
 				fmt.Fprintf(os.Stderr, "ckv: warning: only %d%% of flow steps aligned to code chunks "+

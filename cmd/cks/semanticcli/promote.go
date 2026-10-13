@@ -49,7 +49,7 @@ func newPromoteCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }() // every write is committed in its own transaction before Close
 			put := func() error { return store.PutAligned(cmd.Context(), p, root, graph, vector) }
 			if versionDir != "" {
 				put = func() error { return store.PutAlignedRetained(cmd.Context(), p, root, graph, vector, versionDir) }
@@ -96,7 +96,7 @@ func readProjection(path string) (semantic.Projection, error) {
 	if err != nil {
 		return semantic.Projection{}, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }() // read-only file
 	var p semantic.Projection
 	decoder := json.NewDecoder(f)
 	decoder.DisallowUnknownFields()

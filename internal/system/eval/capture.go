@@ -44,9 +44,9 @@ func (r CaptureRequest) Validate() error {
 			if _, valid := contract.ParseIntent(intent); !valid {
 				return fmt.Errorf("capture intent is invalid")
 			}
-		case "include_knowledge":
+		case "include_knowledge", "explain_ontology":
 			if _, ok := value.(bool); !isV2 || !ok {
-				return fmt.Errorf("include_knowledge requires v2 and a boolean")
+				return fmt.Errorf("%s requires v2 and a boolean", key)
 			}
 		case "knowledge_as_of", "knowledge_subsystem":
 			if _, ok := value.(string); !isV2 || !ok {

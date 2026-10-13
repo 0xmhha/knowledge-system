@@ -75,10 +75,6 @@ func sqliteArtifact(path string) (bool, error) {
 	return bytes.Equal(header, []byte("SQLite format 3\x00")), nil
 }
 
-func checkpointArtifact(path string) error {
-	return checkpointArtifactContext(context.Background(), path)
-}
-
 func checkpointArtifactContext(ctx context.Context, path string) error {
 	// Only mutable SQLite database artifacts, never retained source blobs, reach here.
 	u := url.URL{Scheme: "file", Path: path}

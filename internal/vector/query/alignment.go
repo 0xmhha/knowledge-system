@@ -90,7 +90,7 @@ func (e *Engine) CheckAlignment() AlignmentReport {
 	if rec.GraphDigest == "" || cur.GraphDigest == "" {
 		rep.Warnings = append(rep.Warnings, "graph_digest unavailable — commit-only verification")
 	}
-	if maj, min, ok := parseMajorMinorQ(rep.SchemaVersion); ok && !(maj > 1 || (maj == 1 && min >= 19)) {
+	if maj, min, ok := parseMajorMinorQ(rep.SchemaVersion); ok && maj <= 1 && (maj != 1 || min < 19) {
 		rep.Warnings = append(rep.Warnings, "ckg schema_version < 1.19 — canonical_id not populated")
 	}
 	if len(rep.Warnings) > 0 {

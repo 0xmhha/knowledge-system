@@ -11,7 +11,7 @@ sanitized `EvidencePack` and exposes it through MCP for upper layers
 ## Status
 
 Wired. cks composes ckv (vector/meaning) and ckg (graph/keyword) **in-process**
-and exposes a 24-tool agent-facing MCP surface (`cks.context.*` + `cks.ops.*`) over stdio
+and exposes a 28-tool agent-facing MCP surface (`cks.context.*`, `cks.ops.*`, and `cks.semantic.*`) over stdio
 or loopback HTTP. The authoritative tool list is the golden schema
 `internal/system/mcp/testdata/agent-mcp.schema.json`.
 
@@ -24,6 +24,10 @@ schema 1.24 or later; older datasets answer `requires_reindex`.
 With no datasets configured it boots in a non-crashing degraded mode (Smart Dummy +
 `cks.ops.health` reports `degraded`).
 
+Read the [ontology MCP guide](./docs/ontology-mcp.md) for readiness, meaning lookup,
+requirement trace and bounded v2 explanations. Readiness and completed evaluation
+records do not certify independent quality; ontology retrieval remains opt-in.
+
 ## Components
 
 Everything ships in the single `cks` binary (`cmd/cks`); each row is a
@@ -31,7 +35,7 @@ subcommand.
 
 | Subcommand | Purpose |
 |---|---|
-| `cks mcp` | MCP server (stdio or HTTP) — exposes `cks.context.*`, `cks.ops.*` |
+| `cks mcp` | MCP server (stdio or HTTP) — exposes `cks.context.*`, `cks.ops.*`, `cks.semantic.*` |
 | `cks agent` | Coding agent CLI — vibe prompt → LLM-ready evidence markdown |
 | `cks eval` | Evaluation harness — scenario runs, metric collection |
 | `cks eval-gate` | Baseline drift gate (CI) |

@@ -95,7 +95,9 @@ func TestWorksheetCatalogRejectsRepinnedInvalidClaims(t *testing.T) {
 			if mode == "unknown-field" {
 				data, _ := os.ReadFile(path)
 				var object map[string]any
-				yaml.Unmarshal(data, &object)
+				if err := yaml.Unmarshal(data, &object); err != nil {
+					t.Fatal(err)
+				}
 				object["made_up_field"] = true
 				putWorksheetYAML(t, path, object)
 			}
@@ -104,8 +106,12 @@ func TestWorksheetCatalogRejectsRepinnedInvalidClaims(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				f.WriteString("\n---\n{}\n")
-				f.Close()
+				if _, err := f.WriteString("\n---\n{}\n"); err != nil {
+					t.Fatal(err)
+				}
+				if err := f.Close(); err != nil {
+					t.Fatal(err)
+				}
 			}
 			selected = worksheetSelection(t, root, selected.Source, selected.PackID)
 			if _, err := LoadWorksheetCatalogs(root, []Selection{selected}); err == nil || !strings.Contains(err.Error(), "pack_incompatible") {
@@ -122,7 +128,9 @@ func TestWorksheetCatalogRejectsStalePinMissingDependencyAndSymlink(t *testing.T
 			packRoot := filepath.Join(root, selected.Source)
 			switch mode {
 			case "stale":
-				os.WriteFile(filepath.Join(packRoot, "source.md"), []byte("changed\n"), 0600)
+				if err := os.WriteFile(filepath.Join(packRoot, "source.md"), []byte("changed\n"), 0600); err != nil {
+					t.Fatal(err)
+				}
 			case "version":
 				selected.Version = "2.0.0"
 			case "missing-pack":
@@ -136,10 +144,16 @@ func TestWorksheetCatalogRejectsStalePinMissingDependencyAndSymlink(t *testing.T
 				putWorksheetYAML(t, filepath.Join(packRoot, "pack.yaml"), loaded.Pack)
 				selected = worksheetSelection(t, root, selected.Source, selected.PackID)
 			case "linked-source":
-				os.Remove(filepath.Join(packRoot, "source.md"))
-				os.Symlink(filepath.Join(t.TempDir(), "foreign.md"), filepath.Join(packRoot, "source.md"))
+				if err := os.Remove(filepath.Join(packRoot, "source.md")); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Symlink(filepath.Join(t.TempDir(), "foreign.md"), filepath.Join(packRoot, "source.md")); err != nil {
+					t.Fatal(err)
+				}
 			case "linked-pack":
-				os.Symlink(packRoot, filepath.Join(root, "alias"))
+				if err := os.Symlink(packRoot, filepath.Join(root, "alias")); err != nil {
+					t.Fatal(err)
+				}
 				selected.Source = "alias"
 			}
 			selections := []Selection{selected}

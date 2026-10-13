@@ -77,7 +77,7 @@ Run as HTTP server (multi-client):
 
 func runMCP(opts *mcpOpts) error {
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	emb, cleanup, err := resolveEmbedder(globalFlags.embedder, globalFlags.modelDir)
 	if err != nil {
@@ -92,7 +92,7 @@ func runMCP(opts *mcpOpts) error {
 		}
 		return err
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }() // read-only query engine
 
 	// Client-visible tool names follow the shared namespace rule (pkg/mcp):
 	// "cks" root by default, overridden by --namespace, the

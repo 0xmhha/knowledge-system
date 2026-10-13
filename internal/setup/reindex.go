@@ -292,13 +292,14 @@ func writeReviewRelease(path string, value map[string]string) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(f.Name())
+	// Best-effort cleanup; after a successful rename the temp name no longer exists.
+	defer func() { _ = os.Remove(f.Name()) }()
 	if _, err = f.Write(data); err != nil {
-		f.Close()
+		_ = f.Close()
 		return err
 	}
 	if err = f.Sync(); err != nil {
-		f.Close()
+		_ = f.Close()
 		return err
 	}
 	if err = f.Close(); err != nil {
@@ -341,7 +342,7 @@ func withPointerLock(dataset string, action func() (string, error)) (string, err
 	if err != nil {
 		return "", fmt.Errorf("promote: open promotion lock: %w", err)
 	}
-	defer unix.Close(fd)
+	defer func() { _ = unix.Close(fd) }()
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil || stat.Mode&unix.S_IFMT != unix.S_IFREG {
 		return "", fmt.Errorf("promote: invalid promotion lock")
@@ -349,7 +350,8 @@ func withPointerLock(dataset string, action func() (string, error)) (string, err
 	if err := unix.Flock(fd, unix.LOCK_EX|unix.LOCK_NB); err != nil {
 		return "", fmt.Errorf("promote: another promotion is in progress")
 	}
-	defer unix.Flock(fd, unix.LOCK_UN)
+	// Unlock is best-effort: closing fd (deferred above) releases the lock anyway.
+	defer func() { _ = unix.Flock(fd, unix.LOCK_UN) }()
 	return action()
 }
 
@@ -433,7 +435,8 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 	if err := os.Symlink(version, tmp); err != nil { // relative target: the version name
 		return prev, fmt.Errorf("promote: stage symlink: %w", err)
 	}
-	defer os.Remove(tmp)
+	// Best-effort cleanup; after a successful rename the staged link no longer exists.
+	defer func() { _ = os.Remove(tmp) }()
 	if err := durabilityStep("before-rename", current); err != nil {
 		return prev, err
 	}

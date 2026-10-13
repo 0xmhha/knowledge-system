@@ -45,9 +45,6 @@ Example:
 }
 
 func runPromote(ctx context.Context, opts *promoteOpts) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	if err := build.PromoteVersion(opts.dataset, opts.version); err != nil {
 		return err
 	}

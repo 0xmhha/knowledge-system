@@ -75,7 +75,7 @@ func runQuery(ctx context.Context, opts *queryOpts, intent string) error {
 	defer cleanup()
 
 	fp := newFootprint(opts.out, "")
-	defer fp.Close()
+	defer func() { _ = fp.Close() }() // diagnostic log only; never fails the command
 
 	eng, err := query.Open(opts.out, emb, query.WithFootprint(fp))
 	if err != nil {
@@ -84,7 +84,7 @@ func runQuery(ctx context.Context, opts *queryOpts, intent string) error {
 		}
 		return err
 	}
-	defer eng.Close()
+	defer func() { _ = eng.Close() }() // read-only query engine
 
 	filter := types.Filter{
 		Language:   opts.lang,

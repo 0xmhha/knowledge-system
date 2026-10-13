@@ -145,7 +145,9 @@ func TestGate(t *testing.T) {
 		writeAlignedVersion(t, ver)
 		if mutate != nil {
 			var m map[string]any
-			readJSON(filepath.Join(ver, "vector", "manifest.json"), &m)
+			if err := readJSON(filepath.Join(ver, "vector", "manifest.json"), &m); err != nil {
+				t.Fatal(err)
+			}
 			mutate(m)
 			writeManifest(t, filepath.Join(ver, "vector"), m)
 		}

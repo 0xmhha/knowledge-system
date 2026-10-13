@@ -1,0 +1,35 @@
+{
+  "scope": "CI toolchain and cleanup checks; no original product acceptance or release decision changes",
+  "revision": "5e0eb22f26548875ce8cc27717a11b26f1c28c15",
+  "manifest": "system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/manifest.json",
+  "unique_current_and_committed_SHA_bindings": 1718,
+  "source_dependency_bindings": 1579,
+  "changed_sources": [
+    ".github/workflows/ci.yml",
+    "internal/system/mcp/semantic_status_test.go",
+    "cmd/cks/semanticcli/compare.go",
+    "internal/vector/build/memory_linux.go"
+  ],
+  "status": "PASS SHA binding; CI acceptance remains separately recorded",
+  "state": "verifying",
+  "verification": {
+    "state": "verifying",
+    "scope": "Linux-only read-only memory metadata cleanup; no lint exclusions or product acceptance changes",
+    "previous_CI_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
+    "previous_CI_result": "4/5 jobs passed; Linux errcheck failure before race",
+    "changed_file": "internal/vector/build/memory_linux.go",
+    "local_Darwin_lint_scope": "Linux-tagged file excluded; Linux validation requires actual CI",
+    "GitHub_CI_after_Linux_fix": "pending",
+    "original_complete": 17,
+    "ontology_complete": 4,
+    "remaining_original": [
+      "N-16 on hold"
+    ]
+  },
+  "ontology_complete": 4,
+  "original_complete": 17,
+  "remaining_original": [
+    "N-16 on hold"
+  ],
+  "tag_or_deployment_executed": false
+}

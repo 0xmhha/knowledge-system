@@ -1,0 +1,9 @@
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+KS_SETUP_E2E=1 python3 -m unittest discover -s tools/setup/tests
+........................
+----------------------------------------------------------------------
+Ran 24 tests in 13.285s
+
+OK

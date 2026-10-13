@@ -1,0 +1,10 @@
+build_context:
+  goos: darwin
+  goarch: arm64
+  cgo: true
+build_roots:
+- ./consensus/wbft/core
+- ./consensus/wbft/validator
+- ./consensus/wbft/messages
+include_package_tests: true
+include_embed_files: true

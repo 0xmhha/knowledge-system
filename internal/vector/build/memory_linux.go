@@ -25,7 +25,7 @@ func (linuxMemProvider) Read() (MemStat, error) {
 	if err != nil {
 		return MemStat{}, fmt.Errorf("open /proc/meminfo: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }() // read-only /proc metadata; no writes to flush
 
 	var totalKB, availKB uint64
 	sc := bufio.NewScanner(f)

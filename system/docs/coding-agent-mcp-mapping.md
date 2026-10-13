@@ -2,22 +2,22 @@
 
 > This document is the contract between the coding-agent plugin (separate repo) and the CKS MCP server it talks to. It exists because the coding-agent HLD (`docs/superpowers/specs/phase3-cks-mcp-ckv.md` and `phase4-cks-mcp-ckg.md`) was written before CKS was implemented; the HLD describes virtual tool signatures (`ckv_search`, `ckg_query`, etc.) that do not match the actual tool names CKS now exposes. Anyone wiring the coding-agent to CKS should read the mapping here first — guessing the names by analogy will yield "tool not found" errors.
 
-**Authoritative source**: `internal/graph/mcp/*.go` in this repo. When wire names or schemas diverge between this doc and the code, the code wins.
+**Authoritative source**: `internal/system/mcp/*.go` in this repo. When wire names or schemas diverge between this doc and the code, the code wins.
 
 ## 1. Architecture in one paragraph
 
-The coding-agent never talks to CKV or CKG directly. It opens a single MCP stdio session against `cks mcp`. `cks mcp` exposes 19 tools (table below); under the hood, those tools route to `internal/system/ckvclient` and `internal/system/ckgclient`, which open the real ckv/ckg backends **in-process** (no subprocess) or fall back to a Smart Dummy that returns LLM-actionable instructions instead of fake data. From the coding-agent's point of view there is exactly one MCP server to install.
+The coding-agent never talks to CKV or CKG directly. It opens a single MCP stdio session against `cks mcp`. `cks mcp` exposes 28 tools (table below); under the hood, those tools route to `internal/system/ckvclient` and `internal/system/ckgclient`, which open the real ckv/ckg backends **in-process** (no subprocess) or fall back to a Smart Dummy that returns LLM-actionable instructions instead of fake data. From the coding-agent's point of view there is exactly one MCP server to install.
 
 ```
 coding-agent  ─stdio MCP─▶  cks mcp  ─Go import─▶  ckvclient ─pkg/ckv (in-process)──▶  ckv
                                        ─Go import─▶  ckgclient ─pkg/store (in-process)─▶  ckg
 ```
 
-Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/graph/mcp/*.go`, pinned against `internal/system/mcp/testdata/agent-mcp.schema.json` by `internal/system/mcp/schema_golden_test.go`.
+Beyond the original set, **`cks.context.concurrency_impact`** (goroutine/channel/lock blast radius), the six flow/knowledge tools (**`get_flow`**, **`expand_flow`**, **`find_branches`**, **`get_invariant_enforcement`**, **`find_invariants`**, **`get_conventions`**), and **`cks.ops.index`** (agent-triggered ckv+ckg reindex) are now live. The authoritative list is `internal/system/mcp/*.go`, pinned against `internal/system/mcp/testdata/agent-mcp.schema.json` by `internal/system/mcp/schema_golden_test.go`.
 
-## 2. Live tool catalog (19 tools)
+## 2. Live tool catalog (28 tools)
 
-Wire names are the strings the MCP client sends; constants live in `internal/graph/mcp/*.go`.
+Wire names are the strings the MCP client sends; constants live in `internal/system/mcp/*.go`.
 
 | Wire name | Constant | Required input | Optional input | Purpose |
 |---|---|---|---|---|
@@ -40,6 +40,26 @@ Wire names are the strings the MCP client sends; constants live in `internal/gra
 | `cks.ops.health` | `ToolNameHealth` | — | — | Aggregate backend health: `ok` / `degraded` / `down`. |
 | `cks.ops.freshness` | `ToolNameFreshness` | — | — | CKV index freshness vs working tree. Use before relying on `semantic_search` after a long indexing pause. |
 | `cks.ops.index` | `ToolNameOpsIndex` | — | `mode` (`incremental`/`full`), `since_commit` (string) | Refresh the ckv + ckg indexes. Use ONLY after `cks.ops.freshness` reports stale. Disabled unless `backends.{ckv,ckg}.binary_path` are configured. |
+
+| `cks.context.get_for_task_v2` | `ToolNameGetForTaskV2` | `prompt` (string) | `intent`, `include_knowledge`, `knowledge_as_of`, `knowledge_subsystem`, `explain_ontology` | Retained-source v2 evidence. Optional ontology explanation reports bounded candidate changes; it does not enable ontology or assert quality. |
+| `cks.context.review_function` | `ToolNameReviewFunction` | `symbol` (string) | `caller_depth`, `max_items` | Review a function and its production callers using graph/source evidence. |
+| `cks.ops.setup` | `ToolNameOpsSetup` | — | `src`, `out`, `embedder`, `model_name`, `skip_vector` | Start an explicitly configured setup job. |
+| `cks.ops.reindex` | `ToolNameOpsReindex` | — | `src`, `out`, `version`, `embedder`, `model_name`, `min_canonical_ratio` | Start a configured reindex job. |
+| `cks.ops.setup_status` | `ToolNameOpsSetupStatus` | — | `job_id`, `tail` | Read setup/reindex job state and events. |
+| `cks.semantic.status` | `ToolNameSemanticStatus` | — | — | Separate configured mode, aligned data availability, read readiness, and retrieval readiness. No model or quality check. |
+| `cks.semantic.lookup_term` | `ToolNameSemanticLookupTerm` | `language`, `term` | `limit` (1..100) | Read exact term interpretations, review status and ambiguity. |
+| `cks.semantic.get_concept` | `ToolNameSemanticGetConcept` | `concept_id` | `limit` (1..100) | Read definition/scope, source evidence and typed incident relations. |
+| `cks.semantic.trace_requirement` | `ToolNameSemanticTraceRequirement` | `requirement_id` | `limit` (1..100) | Read criteria and code/test paths, including missing/unapproved/conflicting links; does not execute acceptance tests. |
+
+The semantic reads use one pinned retained dataset and a read-only store. Proposed/rejected meanings remain visible; only verified, aligned inputs can affect retrieval. `read_tools_ready` and `retrieval_ready` are preparation states, not search quality verdicts. Optional v2 `explain_ontology=true` distinguishes off/no_match/no_candidates/fallback from applied/no_effect, hashes uncited candidate keys, and reports at most 20 changes. `selected_by_composer` precedes the final v2 body budget; inspect published bodies for exact final inclusion. Scores are decimal strings to preserve v2 canonical integrity. Restricted explanation details are withheld while the base evidence is kept. See [implementation and verification](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).
+
+For a read-only structural comparison of saved v2 JSON responses:
+
+```sh
+cks semantic compare-responses --off off.json --on on.json
+```
+
+This verifies both hashes and common query/coordinates before comparing published citation order/membership and body outputs. It does not verify common binary/config/model/request options, timing, failed request denominator, model calls, ground truth or independent samples. Its quality/latency/control-condition flags remain false. Neither this command nor the read tools enables retrieval or changes the current dataset.
 
 ## 3. Mapping from HLD virtual signatures
 
@@ -251,8 +271,12 @@ A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-age
 
 This file should be re-checked whenever any of the following changes:
 
-1. `internal/graph/mcp/*.go` adds, renames, or changes a tool's schema. The matching row in §2 and any §3 mapping line updates here.
+1. `internal/system/mcp/*.go` adds, renames, or changes a tool's schema. The matching row in §2 and any §3 mapping line updates here.
 2. The coding-agent HLD evolves a virtual signature (phase3 §7.x or phase4 §7.x). Add a new mapping row in §3 or amend the existing one.
 3. A roadmap item from §5 lands ("rerank" toggle, `include_concurrency`, etc.). Move the row out of §5 and into §3.
 
 When uncertain, run `cks mcp` against the tools/list MCP method and compare the names there with §2. The wire names are the contract.
+
+### Capturing explanation responses for a controlled comparison
+
+The request-only manifest for `cks eval capture` accepts v2 `explain_ontology` as a boolean; v1 and non-boolean values are refused. Preserve all runtime inputs and request options. For ontology control arms, use explicit semantic mode `baseline` versus the desired enabled mode so that both use raw-query-first; comparing the default blank/off mode can also change Stage1 query strategy. Backend measurement logs and capture receipts are needed for timing, failed request denominators, and scoped embedding HTTP attempts. Repetition counts are not independent quality samples. See the [controlled stdio capture record](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md#o04-후속-실제-stdio-수집-연결과-같은-검색-전략의-시험).

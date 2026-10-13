@@ -251,7 +251,7 @@ func (c Chunk) Citation() Citation {
 // rename tracking is the caller's responsibility.
 func ChunkID(file string, startLine, endLine int, contentSHA256 string) string {
 	h := sha256.New()
-	fmt.Fprintf(h, "%s\n%d:%d\n%s", file, startLine, endLine, contentSHA256)
+	_, _ = fmt.Fprintf(h, "%s\n%d:%d\n%s", file, startLine, endLine, contentSHA256)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -260,7 +260,7 @@ func ChunkID(file string, startLine, endLine int, contentSHA256 string) string {
 // text and therefore the same file, line range, and content hash.
 func ChunkFragmentID(file string, startLine, endLine, startByte int, contentSHA256 string) string {
 	h := sha256.New()
-	fmt.Fprintf(h, "fragment\n%s\n%d:%d:%d\n%s", file, startLine, endLine, startByte, contentSHA256)
+	_, _ = fmt.Fprintf(h, "fragment\n%s\n%d:%d:%d\n%s", file, startLine, endLine, startByte, contentSHA256)
 	return hex.EncodeToString(h.Sum(nil))
 }
 

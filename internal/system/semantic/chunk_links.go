@@ -26,13 +26,13 @@ func vectorDocChunks(ctx context.Context, vectorDir string) ([]docChunk, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	rows, err := db.QueryContext(ctx, `SELECT id, file, start_line, end_line, commit_hash
 		FROM chunks WHERE language = 'markdown' AND chunk_kind = 'doc'`)
 	if err != nil {
 		return nil, fmt.Errorf("read CKV document chunks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var chunks []docChunk
 	for rows.Next() {
 		var chunk docChunk

@@ -1,0 +1,30 @@
+{
+  "scope": "publication verification only; no runtime, task acceptance, frozen input or raw evaluation changes",
+  "initial_published_head": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
+  "PR": 99,
+  "PR_url": "https://github.com/0xmhha/knowledge-system/pull/99",
+  "PR_is_draft": false,
+  "push_complete": true,
+  "PR_creation_complete": true,
+  "CI_passed": false,
+  "checks_at_initial_published_head": {
+    "build-and-test": "FAILURE",
+    "eval-gate-vector": "SUCCESS",
+    "eval-gate-graph": "SUCCESS",
+    "vuln-scan": "FAILURE",
+    "native-install-contract": "SUCCESS"
+  },
+  "build_failure": "make lint: golangci-lint v2.14.0 requires Go >=1.26.0, but the build job runs Go1.25.13 with GOTOOLCHAIN=local; build and vet completed, race tests were not reached",
+  "vulnerability_job": "advisory-only continue-on-error job: 11 standard-library findings in Go1.26.8; recorded scanner says fixed in Go1.26.9. This receipt does not independently assess exploitability or approve a toolchain upgrade",
+  "next_delivery_work": [
+    "reconcile CI Go/linter versions and rerun required checks",
+    "review advisory vulnerability findings and select a validated toolchain update",
+    "PR review; merge only upon a separate instruction"
+  ],
+  "remaining_original_development": [
+    "N-16 on hold; public-key fingerprint/trust condition unmet"
+  ],
+  "ontology_complete": 4,
+  "original_complete": 17,
+  "merge_tag_deployment_executed": false
+}

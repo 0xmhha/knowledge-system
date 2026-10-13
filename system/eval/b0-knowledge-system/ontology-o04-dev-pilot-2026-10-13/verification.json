@@ -1,0 +1,320 @@
+{
+  "task": "O-04",
+  "status": "DEV_paired_comparison_verified_independent_quality_pending",
+  "date_KST": "2026-10-13",
+  "frozen_input_revision": "50dea115",
+  "execution_scope_change_authorized": false,
+  "technical_checks_verified": [
+    "O04-B"
+  ],
+  "full_task_complete": false,
+  "responses": 324,
+  "pairs": 162,
+  "guards": 2,
+  "failures": 0,
+  "missing": 0,
+  "pending": 0,
+  "unbound_scopes": 0,
+  "same_conditions_verified": true,
+  "pack_integrity_and_retained_source_verified": true,
+  "per_question": {
+    "OP-01": {
+      "rank_changed_pairs": 0,
+      "body_changed_pairs": 0,
+      "off": {
+        "fact_cluster": "quorum",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.2,
+        "mean_expected_reciprocal_rank_at_10": 0.5625
+      },
+      "on": {
+        "fact_cluster": "quorum",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.2,
+        "mean_expected_reciprocal_rank_at_10": 0.5625
+      }
+    },
+    "OP-02": {
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5,
+      "off": {
+        "fact_cluster": "round-change",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 0.0,
+        "citation_precision_at_10": 0.0,
+        "mean_expected_reciprocal_rank_at_10": 0.0
+      },
+      "on": {
+        "fact_cluster": "round-change",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 0.0,
+        "citation_precision_at_10": 0.0,
+        "mean_expected_reciprocal_rank_at_10": 0.0
+      }
+    },
+    "OP-03": {
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5,
+      "off": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 0.0,
+        "citation_precision_at_10": 0.0,
+        "mean_expected_reciprocal_rank_at_10": 0.0
+      },
+      "on": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.1,
+        "mean_expected_reciprocal_rank_at_10": 0.2
+      }
+    },
+    "OP-04": {
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5,
+      "off": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.1,
+        "mean_expected_reciprocal_rank_at_10": 0.25
+      },
+      "on": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.1,
+        "mean_expected_reciprocal_rank_at_10": 0.25
+      }
+    },
+    "OP-05": {
+      "rank_changed_pairs": 0,
+      "body_changed_pairs": 0,
+      "off": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.2,
+        "mean_expected_reciprocal_rank_at_10": 0.29166666666666663
+      },
+      "on": {
+        "fact_cluster": "message-handlers",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.2,
+        "mean_expected_reciprocal_rank_at_10": 0.29166666666666663
+      }
+    },
+    "OP-06": {
+      "rank_changed_pairs": 5,
+      "body_changed_pairs": 5,
+      "off": {
+        "fact_cluster": "current-lock",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3,
+        "mean_expected_reciprocal_rank_at_10": 0.6666666666666666
+      },
+      "on": {
+        "fact_cluster": "current-lock",
+        "planned_retrieval": 5,
+        "failed_retrieval": 0,
+        "missing_retrieval": 0,
+        "citation_recall_at_10": 1.0,
+        "citation_precision_at_10": 0.3,
+        "mean_expected_reciprocal_rank_at_10": 0.6666666666666666
+      }
+    }
+  },
+  "arms": {
+    "off": {
+      "planned_calls": 162,
+      "observed_calls": 162,
+      "failed_calls": 0,
+      "missing_calls": 0,
+      "unsuccessful_fraction": 0.0,
+      "phases": {
+        "warmup": {
+          "planned": 12,
+          "observed": 12,
+          "failed": 0,
+          "missing": 0
+        },
+        "retrieval": {
+          "planned": 30,
+          "observed": 30,
+          "failed": 0,
+          "missing": 0
+        },
+        "warm_latency": {
+          "planned": 120,
+          "observed": 120,
+          "failed": 0,
+          "missing": 0
+        },
+        "cold_process": {
+          "planned": 0,
+          "observed": 0,
+          "failed": 0,
+          "missing": 0
+        }
+      },
+      "warm_p95_ns": 454328916,
+      "warm_success_n": 120,
+      "per_cluster": {
+        "quorum": {
+          "citation_recall_at_10": 1.0,
+          "citation_precision_at_10": 0.2,
+          "mean_expected_reciprocal_rank_at_10": 0.5625
+        },
+        "round-change": {
+          "citation_recall_at_10": 0.0,
+          "citation_precision_at_10": 0.0,
+          "mean_expected_reciprocal_rank_at_10": 0.0
+        },
+        "message-handlers": {
+          "citation_recall_at_10": 0.6666666666666666,
+          "citation_precision_at_10": 0.1,
+          "mean_expected_reciprocal_rank_at_10": 0.18055555555555555
+        },
+        "current-lock": {
+          "citation_recall_at_10": 1.0,
+          "citation_precision_at_10": 0.3,
+          "mean_expected_reciprocal_rank_at_10": 0.6666666666666666
+        }
+      },
+      "cluster_mean": {
+        "citation_recall_at_10": 0.6666666666666666,
+        "citation_precision_at_10": 0.15,
+        "mean_expected_reciprocal_rank_at_10": 0.3524305555555555
+      }
+    },
+    "on": {
+      "planned_calls": 162,
+      "observed_calls": 162,
+      "failed_calls": 0,
+      "missing_calls": 0,
+      "unsuccessful_fraction": 0.0,
+      "phases": {
+        "warmup": {
+          "planned": 12,
+          "observed": 12,
+          "failed": 0,
+          "missing": 0
+        },
+        "retrieval": {
+          "planned": 30,
+          "observed": 30,
+          "failed": 0,
+          "missing": 0
+        },
+        "warm_latency": {
+          "planned": 120,
+          "observed": 120,
+          "failed": 0,
+          "missing": 0
+        },
+        "cold_process": {
+          "planned": 0,
+          "observed": 0,
+          "failed": 0,
+          "missing": 0
+        }
+      },
+      "warm_p95_ns": 592741792,
+      "warm_success_n": 120,
+      "per_cluster": {
+        "quorum": {
+          "citation_recall_at_10": 1.0,
+          "citation_precision_at_10": 0.2,
+          "mean_expected_reciprocal_rank_at_10": 0.5625
+        },
+        "round-change": {
+          "citation_recall_at_10": 0.0,
+          "citation_precision_at_10": 0.0,
+          "mean_expected_reciprocal_rank_at_10": 0.0
+        },
+        "message-handlers": {
+          "citation_recall_at_10": 1.0,
+          "citation_precision_at_10": 0.13333333333333333,
+          "mean_expected_reciprocal_rank_at_10": 0.2472222222222222
+        },
+        "current-lock": {
+          "citation_recall_at_10": 1.0,
+          "citation_precision_at_10": 0.3,
+          "mean_expected_reciprocal_rank_at_10": 0.6666666666666666
+        }
+      },
+      "cluster_mean": {
+        "citation_recall_at_10": 0.75,
+        "citation_precision_at_10": 0.15833333333333333,
+        "mean_expected_reciprocal_rank_at_10": 0.3690972222222222
+      }
+    }
+  },
+  "p95_ratio": 1.3046534594773624,
+  "pilot_cost_budget_observation": "over_budget",
+  "request_HTTP_paths": {
+    "off": {
+      "/api/tags": 1324,
+      "/api/embed": 662
+    },
+    "on": {
+      "/api/tags": 1602,
+      "/api/embed": 801
+    }
+  },
+  "constructor_cost_limit": "outside-scope constructor probes uncounted; startup recorded separately",
+  "independent_units": 0,
+  "new_FINAL_samples": 0,
+  "location_metrics_evaluated": true,
+  "answer_quality_evaluated": false,
+  "independent_quality_accepted": false,
+  "quality_verdict": "inconclusive: known DEV overlap and fewer than 10 independent units",
+  "operating_source_current_config_preserved": true,
+  "held_index_semantic_SHA_preserved": true,
+  "default_on": false,
+  "release_eligible": false,
+  "B0_approved_input_changes": 0,
+  "tests": {
+    "input_and_score": 39,
+    "progress_guard": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "activity_limit": "shared host; input/score tests and progress guard11 (11.025s) ran during capture; no quiet-machine or randomized/cold acceptance",
+  "runtime": {
+    "python": "3.11.4 (v3.11.4:d2340ef257, Jun  6 2023, 19:15:51) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "PyYAML": "6.0"
+  },
+  "remaining": [
+    "O04-C original independent evaluation input/review and final quality/performance verdict",
+    "O04-D final acceptance and evidence/ledger binding",
+    "N16 public key fingerprint/trust condition per existing user decision"
+  ]
+}

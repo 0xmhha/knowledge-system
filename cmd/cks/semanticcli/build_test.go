@@ -133,7 +133,7 @@ requirements:
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	current, err := store.Current(context.Background(), "example")
 	if err != nil || current.Snapshot.DatasetID != "cut-1" {
 		t.Fatalf("active projection = %+v, %v", current.Snapshot, err)

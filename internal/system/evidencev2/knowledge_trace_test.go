@@ -71,7 +71,7 @@ func reviewedTraceFixture(t *testing.T, statement string) (string, semantic.Acti
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	ctx := context.Background()
 	if err := store.PutAlignedRetained(ctx, p, root, filepath.Join(version, "graph"), filepath.Join(version, "vector"), version); err != nil {
 		t.Fatal(err)

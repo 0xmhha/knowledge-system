@@ -8,6 +8,10 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
+// Adapter is the stub embedder for builds without CoreML support; every
+// method reports that CoreML is unavailable.
+type Adapter struct{}
+
 // Open returns an error on non-macOS platforms.
 func Open(opts Options) (*Adapter, error) {
 	return nil, errNotAvailable

@@ -1,6 +1,9 @@
 package mcpcli
 
 import (
+	"context"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/config"
@@ -86,5 +89,23 @@ func TestOverrideListenRejectsUnparseableAddress(t *testing.T) {
 					cfg.Listen.HTTPAddr, configured)
 			}
 		})
+	}
+}
+
+// A config naming a ruleset that does not exist must fail with a public code
+// the operator can act on, not the generic operation_failed.
+func TestRunReportsAMissingRulesetAsConfigInvalid(t *testing.T) {
+	dir := t.TempDir()
+	cfg := config.Generate(config.GenerateOptions{
+		DatasetDir:        filepath.Join(dir, "dataset"),
+		SanitizeRulesPath: filepath.Join(dir, "missing", "sanitization_rules.yaml"),
+	})
+	path := filepath.Join(dir, "cks.yaml")
+	if err := config.SaveNew(path, cfg); err != nil {
+		t.Fatal(err)
+	}
+	err := run(context.Background(), path, "", "", "")
+	if err == nil || !strings.Contains(err.Error(), "config_invalid") {
+		t.Fatalf("run = %v, want config_invalid", err)
 	}
 }

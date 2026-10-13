@@ -145,7 +145,7 @@ func NewCmd(version string) *cobra.Command {
 func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOverride string) error {
 	cfg, err := loadConfig(configPath)
 	if err != nil {
-		return fmt.Errorf("load config: %w", err)
+		return fmt.Errorf("config_invalid: load config: %w", err)
 	}
 	// Launch-time overrides let one dataset config back several instances,
 	// each on its own port + name, without editing the file. The effective
@@ -191,7 +191,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if filepath.Base(graphDir) == "graph" && filepath.Clean(cfg.Backends.CKV.Path) == filepath.Join(filepath.Dir(graphDir), "vector") {
 		evidenceVersionDir = filepath.Dir(graphDir)
 		if _, statErr := os.Lstat(filepath.Join(evidenceVersionDir, "sources")); statErr == nil {
-			cleanup := func() {}
+			var cleanup func()
 			retainedReadRoot, cleanup, err = setup.MaterializeRetainedReadTree(evidenceVersionDir)
 			if err != nil {
 				return fmt.Errorf("mount retained source: %w", err)
@@ -202,7 +202,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 
 	ruleset, err := loadRuleset(cfg.Sanitize.RulesPath)
 	if err != nil {
-		return fmt.Errorf("load sanitize ruleset: %w", err)
+		return fmt.Errorf("config_invalid: load sanitize ruleset: %w", err)
 	}
 
 	be, err := buildBackends(ctx, cfg, retainedReadRoot)
@@ -288,21 +288,23 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	defer jobs.Shutdown()
 
 	deps := cksmcp.Deps{
-		BackendMeasurements: measurements,
-		Composer:            c,
-		EvidenceVersionDir:  evidenceVersionDir,
-		EvidenceSanitizer:   evidenceSanitizer,
-		SemanticStorePath:   cfg.Semantic.StorePath,
-		EvidenceSourceRoot:  cfg.Backends.CKG.SourceRoot,
-		TypeNeighbors:       cfg.Retrieval.TypeNeighbors,
-		CKG:                 be.ckg,
-		CKV:                 be.ckv,
-		Vocab:               vocabResolver,
-		BuilderVersion:      builderVersion,
-		Alignment:           alignment,
-		InstanceName:        cfg.Name,
-		InstanceDescription: cfg.Description,
-		Embed:               be.cap,
+		BackendMeasurements:  measurements,
+		Composer:             c,
+		EvidenceVersionDir:   evidenceVersionDir,
+		EvidenceSanitizer:    evidenceSanitizer,
+		SemanticStorePath:    cfg.Semantic.StorePath,
+		SemanticOntologyMode: cfg.Semantic.OntologyMode,
+		SemanticBudgetMS:     cfg.Semantic.OntologyBudgetMS,
+		EvidenceSourceRoot:   cfg.Backends.CKG.SourceRoot,
+		TypeNeighbors:        cfg.Retrieval.TypeNeighbors,
+		CKG:                  be.ckg,
+		CKV:                  be.ckv,
+		Vocab:                vocabResolver,
+		BuilderVersion:       builderVersion,
+		Alignment:            alignment,
+		InstanceName:         cfg.Name,
+		InstanceDescription:  cfg.Description,
+		Embed:                be.cap,
 		Index: cksmcp.IndexConfig{
 			CKVBinary:        cfg.Backends.CKV.BinaryPath,
 			CKGBinary:        cfg.Backends.CKG.BinaryPath,
@@ -741,8 +743,10 @@ func pinDatasetReaders(cfg *config.Config) ([]*setup.ReaderLease, error) {
 				if !seen[dir] {
 					lease, err := setup.PinVersionReader(dir)
 					if err != nil {
+						// Error path: releasing already-acquired read leases is
+						// best-effort; the PinVersionReader error is what we report.
 						for _, l := range leases {
-							l.Close()
+							_ = l.Close()
 						}
 						return nil, err
 					}

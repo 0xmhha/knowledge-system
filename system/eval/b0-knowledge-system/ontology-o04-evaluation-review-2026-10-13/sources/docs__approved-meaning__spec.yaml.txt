@@ -1,0 +1,71 @@
+# Content approved by the user; code/test links and criterion execution are separate.
+version: 1
+project_id: p-3fa6368dd3f6757c6b6a86121f0a9b7d
+requirements:
+- id: req-wbft-quorum
+  version: 1
+  title: WBFT quorum size calculation
+  statement: QuorumSize is exactly ceil(N - F) with F = (N-1)/3; the live code computes it in float64 via math.Ceil
+    (default.go:226). Any alternative formula must yield the identical value for every N.
+  concept_ids:
+  - wbft-quorum
+  status: verified
+  acceptance_criteria:
+  - id: ac-wbft-quorum
+    given: A WBFT validator set with N >= 1 validators.
+    when: The validator quorum size is calculated.
+    then: QuorumSize is exactly ceil(N - F) with F = (N-1)/3; the live code computes it in float64 via math.Ceil
+      (default.go:226). Any alternative formula must yield the identical value for every N.
+  - id: ac-wbft-quorum-examples
+    given: Validator sets of sizes 5, 6 and 8.
+    when: The existing pack quorum formula is calculated.
+    then: The expected quorum sizes are 4, 5 and 6 respectively; this proposed criterion has not been executed
+      against the target source.
+  reviewed_by: current conversation user approval
+- id: req-wbft-round-change
+  version: 1
+  title: 'WBFT round change: timeout-triggered round bump with prepared-block justification'
+  statement: A ROUND-CHANGE carries the highest prepared block this node has seen, so a quorum of view changes
+    resumes from that prepared state and never from a lower round.
+  concept_ids:
+  - wbft-round-change
+  status: verified
+  acceptance_criteria:
+  - id: ac-wbft-round-change
+    given: A WBFT node with a recorded prepared block enters round change.
+    when: A ROUND-CHANGE message is prepared for a new round.
+    then: A ROUND-CHANGE carries the highest prepared block this node has seen, so a quorum of view changes
+      resumes from that prepared state and never from a lower round.
+  reviewed_by: current conversation user approval
+- id: req-wbft-message-handlers
+  version: 1
+  title: 'WBFT consensus message handlers: preprepare, prepare, commit'
+  statement: Each handler is idempotent for duplicate messages from the same sender at the same view (sequence,
+    round).
+  concept_ids:
+  - wbft-message-handlers
+  status: verified
+  acceptance_criteria:
+  - id: ac-wbft-message-handlers
+    given: Duplicate consensus messages from one sender at the same sequence and round.
+    when: A consensus message handler processes the repeated message.
+    then: Each handler is idempotent for duplicate messages from the same sender at the same view (sequence,
+      round).
+  reviewed_by: current conversation user approval
+- id: req-wbft-current-lock
+  version: 1
+  title: WBFT Core lock discipline — never read Core.current off currentMutex
+  statement: Reads of c.current or its subfields must hold currentMutex.RLock or the encompassing currentMutex.Lock
+    write region; writes must hold currentMutex.Lock for the full mutation. Holding only priorState.RWMutex
+    does not satisfy this requirement.
+  concept_ids:
+  - wbft-current-lock
+  status: verified
+  acceptance_criteria:
+  - id: ac-wbft-current-lock
+    given: Code reads the WBFT current-state pointer or its subfields.
+    when: The current-state accessor executes.
+    then: Reads of c.current or its subfields must hold currentMutex.RLock or the encompassing currentMutex.Lock
+      write region; writes must hold currentMutex.Lock for the full mutation. Holding only priorState.RWMutex
+      does not satisfy this requirement.
+  reviewed_by: current conversation user approval

@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Check proposed source gold against an explicit saved-response corpus.
+
+Absence from this corpus never certifies semantic independence or FINAL
+eligibility. Older/unbound history and human review remain separate conditions.
+"""
+import argparse
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import sys
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def source(root, name):
+    require(isinstance(name, str) and name and '\\' not in name and not Path(name).is_absolute()
+            and '..' not in Path(name).parts, 'unsafe source path')
+    path = (root / name).resolve()
+    require(path.is_relative_to(root.resolve()) and path.is_file(), 'source escaped or missing')
+    return path.read_bytes()
+
+
+def normalize_query(query):
+    return ' '.join(query.lower().split())
+
+
+def audit(book, packs, source_root):
+    questions = book['questions']
+    require(len({q['id'] for q in questions}) == len(questions), 'duplicate candidate ID')
+    require(book['review_state'] == 'proposed' and book['independent_units_approved'] == 0,
+            'exposure audit cannot approve content or units')
+    require(re.fullmatch('[0-9a-f]{40}', book['coordinates']['base_commit']) is not None, 'invalid commit')
+    results = []
+    for q in questions:
+        require(q['review_state'] == 'proposed' and q['independent_FINAL_eligible'] is False,
+                'candidate cannot become approved or FINAL through exposure audit')
+        require(q['evidence'] and q['fact_cluster_proposed'], 'gold or proposed cluster missing')
+        for gold in q['evidence']:
+            require(gold['commit_hash'] == book['coordinates']['base_commit'], 'foreign gold commit')
+            raw = source(source_root, gold['file'])
+            first, last = gold['start_line'], gold['end_line']
+            lines = raw.splitlines(keepends=True)
+            require(type(first) is int and type(last) is int and 1 <= first <= last <= len(lines), 'invalid gold lines')
+            require(sha(raw) == gold['file_sha256'] and
+                    sha(b''.join(lines[first - 1:last])) == gold['content_sha256'], 'changed gold source')
+            require(gold['relation_assertion'] is False, 'gold cannot approve code relation')
+        cited, body, ambiguous, duplicate_query = 0, 0, 0, 0
+        for pack in packs:
+            duplicate_query += normalize_query(pack.get('query', '')) == normalize_query(q['question'])
+            seen, seen_body, unknown = False, False, False
+            for citation in pack.get('citations', []):
+                for gold in q['evidence']:
+                    if citation['file'] != gold['file']:
+                        continue
+                    if citation.get('file_sha256') != gold['file_sha256']:
+                        unknown = True  # lines from another file revision are not directly comparable.
+                    elif (citation['start_line'] <= gold['end_line'] and gold['start_line'] <= citation['end_line']):
+                        seen = True
+                        seen_body |= any(b.get('citation') == citation for b in pack.get('bodies', []))
+            cited += seen
+            body += seen_body
+            ambiguous += unknown
+        results.append({'id': q['id'], 'proposed_cluster': q['fact_cluster_proposed'],
+                        'prior_query_exact_matches': duplicate_query,
+                        'prior_same_file_gold_overlap_responses': cited,
+                        'prior_body_gold_overlap_responses': body,
+                        'different_or_missing_file_SHA_responses': ambiguous,
+                        'range_not_seen_in_scanned_corpus': cited == 0 and ambiguous == 0,
+                        'independent_FINAL_eligible': False,
+                        'reason': 'content/unit review and complete historical/semantic contamination review are absent'})
+    return {'scope': 'explicit corpus source-range exposure audit only', 'saved_responses': len(packs),
+            'candidates': results, 'candidates_with_gold_exposure': sum(r['prior_same_file_gold_overlap_responses'] > 0 for r in results),
+            'candidates_without_range_exposure_in_scanned_corpus': sum(r['range_not_seen_in_scanned_corpus'] for r in results),
+            'proposed_fact_clusters': len({q['fact_cluster_proposed'] for q in questions}),
+            'approved_independent_units': 0, 'FINAL_eligible_questions': 0,
+            'history_audit_complete': False, 'quality_evaluated': False, 'new_model_calls': 0,
+            'limit': 'absence of line overlap or a new question string is not semantic independence; repeats are exposure observations, not independent units'}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--book', type=Path, required=True)
+    parser.add_argument('--source-root', type=Path, required=True)
+    parser.add_argument('--captures', type=Path, nargs='+', required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    book = json.loads(args.book.read_bytes())
+    packs, bindings = [], {}
+    for path in args.captures:
+        require(str(path) not in bindings, 'duplicate corpus file')
+        raw = path.read_bytes()
+        bindings[str(path)] = sha(raw)
+        opener = gzip.open if path.suffix == '.gz' else open
+        with opener(path, 'rb') as stream:
+            decoded = stream.read(64 * 1024 * 1024 + 1)
+        require(len(decoded) <= 64 * 1024 * 1024, 'capture exceeds audit input limit')
+        capture = json.loads(decoded)
+        for row in capture['rows']:
+            response = row.get('call', {}).get('response') or {}
+            pack = response.get('structuredContent')
+            if isinstance(pack, dict) and 'citations' in pack:
+                packs.append(pack)
+    report = audit(book, packs, args.source_root)
+    report['input_sha256'] = {'book': sha(args.book.read_bytes()), 'captures': bindings,
+                              'auditor': sha(Path(__file__).read_bytes())}
+    with args.output.open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    print(json.dumps({k: report[k] for k in ['saved_responses', 'candidates_with_gold_exposure',
+                                           'candidates_without_range_exposure_in_scanned_corpus', 'FINAL_eligible_questions']}))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        print('ontology exposure audit: FAIL: ' + str(error), file=sys.stderr)
+        sys.exit(1)

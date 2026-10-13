@@ -1,0 +1,414 @@
+{
+  "scope": "actual stdio processes on controlled owned mock fixture, not actual go-stablenet domain evaluation",
+  "binary_sha256": "d11249b02eb9e6cbeedb08d57a72a326b766607eac16019d9f772a969a90831d",
+  "same_binary_config_model_requests_verified": true,
+  "search_strategy": "baseline vs relations both raw-query-first; ontology_mode and footprint destination only differ",
+  "captured_arm_order": [
+    "off",
+    "on"
+  ],
+  "rows": {
+    "off": {
+      "planned_calls": 10,
+      "observed_calls": 10,
+      "failed_calls": 0,
+      "missing_calls": 0,
+      "scoped_http_embedding_attempts": 0,
+      "scoped_calls": {
+        "ckg.health": 10,
+        "ckv.health": 10,
+        "intent.embed": 10,
+        "ckv.semantic_search": 30,
+        "ckg.bm25_search": 50
+      },
+      "pending_calls": 0,
+      "phases": {
+        "warmup": {
+          "calls": 2,
+          "median_ns": 23365125.0,
+          "min_ns": 22123750,
+          "max_ns": 24606500,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "retrieval": {
+          "calls": 2,
+          "median_ns": 22941708.5,
+          "min_ns": 22880042,
+          "max_ns": 23003375,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "warm_latency": {
+          "calls": 4,
+          "median_ns": 22517833.5,
+          "min_ns": 21681458,
+          "max_ns": 23507500,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "cold_process": {
+          "calls": 2,
+          "median_ns": 25472020.5,
+          "min_ns": 25355750,
+          "max_ns": 25588291,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        }
+      },
+      "startup_scopes": [
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        },
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        },
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        }
+      ]
+    },
+    "on": {
+      "planned_calls": 10,
+      "observed_calls": 10,
+      "failed_calls": 0,
+      "missing_calls": 0,
+      "scoped_http_embedding_attempts": 0,
+      "scoped_calls": {
+        "ckg.health": 10,
+        "ckv.health": 10,
+        "intent.embed": 10,
+        "ckv.semantic_search": 30,
+        "ckg.bm25_search": 50
+      },
+      "pending_calls": 0,
+      "phases": {
+        "warmup": {
+          "calls": 2,
+          "median_ns": 26537145.5,
+          "min_ns": 25536041,
+          "max_ns": 27538250,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "retrieval": {
+          "calls": 2,
+          "median_ns": 24850749.5,
+          "min_ns": 24103416,
+          "max_ns": 25598083,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "warm_latency": {
+          "calls": 4,
+          "median_ns": 24002312.5,
+          "min_ns": 23116083,
+          "max_ns": 24524917,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        },
+        "cold_process": {
+          "calls": 2,
+          "median_ns": 28259417.0,
+          "min_ns": 26001334,
+          "max_ns": 30517500,
+          "interpretation": "descriptive controlled fixture; no performance acceptance"
+        }
+      },
+      "startup_scopes": [
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        },
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        },
+        {
+          "tool": "startup.intent_anchors",
+          "calls": 65,
+          "pending_calls": 0
+        }
+      ]
+    }
+  },
+  "response_pairs": [
+    {
+      "request_id": "fixture-feature",
+      "phase": "cold_process",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "37740fa367508287ed0d42b23c7d1e6dd26061020ef530f1ce83c9deab4e1c7e",
+        "on_integrity_hash": "df95785f948003151eb381402ff5238aa733976969d6e53bfcc11786c335ebaf",
+        "on_mode": "relations",
+        "on_state": "no_candidates",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-feature",
+      "phase": "retrieval",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "37740fa367508287ed0d42b23c7d1e6dd26061020ef530f1ce83c9deab4e1c7e",
+        "on_integrity_hash": "df95785f948003151eb381402ff5238aa733976969d6e53bfcc11786c335ebaf",
+        "on_mode": "relations",
+        "on_state": "no_candidates",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-feature",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "37740fa367508287ed0d42b23c7d1e6dd26061020ef530f1ce83c9deab4e1c7e",
+        "on_integrity_hash": "df95785f948003151eb381402ff5238aa733976969d6e53bfcc11786c335ebaf",
+        "on_mode": "relations",
+        "on_state": "no_candidates",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-feature",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "37740fa367508287ed0d42b23c7d1e6dd26061020ef530f1ce83c9deab4e1c7e",
+        "on_integrity_hash": "df95785f948003151eb381402ff5238aa733976969d6e53bfcc11786c335ebaf",
+        "on_mode": "relations",
+        "on_state": "no_candidates",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-feature",
+      "phase": "warmup",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "37740fa367508287ed0d42b23c7d1e6dd26061020ef530f1ce83c9deab4e1c7e",
+        "on_integrity_hash": "df95785f948003151eb381402ff5238aa733976969d6e53bfcc11786c335ebaf",
+        "on_mode": "relations",
+        "on_state": "no_candidates",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-no-match",
+      "phase": "cold_process",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "23646279b79d3cce95e1bb32503fd6f318385b1a5ba25a5305d90c04ebad9e3d",
+        "on_integrity_hash": "d59f1ebe8949a68a9c42033bfc88650455d5ab95745abc846be9c5035292655c",
+        "on_mode": "relations",
+        "on_state": "no_match",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-no-match",
+      "phase": "retrieval",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "23646279b79d3cce95e1bb32503fd6f318385b1a5ba25a5305d90c04ebad9e3d",
+        "on_integrity_hash": "d59f1ebe8949a68a9c42033bfc88650455d5ab95745abc846be9c5035292655c",
+        "on_mode": "relations",
+        "on_state": "no_match",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-no-match",
+      "phase": "warm_latency",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "23646279b79d3cce95e1bb32503fd6f318385b1a5ba25a5305d90c04ebad9e3d",
+        "on_integrity_hash": "d59f1ebe8949a68a9c42033bfc88650455d5ab95745abc846be9c5035292655c",
+        "on_mode": "relations",
+        "on_state": "no_match",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-no-match",
+      "phase": "warm_latency",
+      "iteration": 2,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "23646279b79d3cce95e1bb32503fd6f318385b1a5ba25a5305d90c04ebad9e3d",
+        "on_integrity_hash": "d59f1ebe8949a68a9c42033bfc88650455d5ab95745abc846be9c5035292655c",
+        "on_mode": "relations",
+        "on_state": "no_match",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    },
+    {
+      "request_id": "fixture-no-match",
+      "phase": "warmup",
+      "iteration": 1,
+      "comparison": {
+        "scope": "saved_response_structure",
+        "off_integrity_hash": "23646279b79d3cce95e1bb32503fd6f318385b1a5ba25a5305d90c04ebad9e3d",
+        "on_integrity_hash": "d59f1ebe8949a68a9c42033bfc88650455d5ab95745abc846be9c5035292655c",
+        "on_mode": "relations",
+        "on_state": "no_match",
+        "off_evidence_state": "complete",
+        "on_evidence_state": "complete",
+        "citation_membership_changed": false,
+        "citation_order_changed": false,
+        "body_outputs_changed": false,
+        "citations": [],
+        "quality_evaluated": false,
+        "latency_evaluated": false,
+        "control_conditions_verified": false,
+        "limitations": [
+          "binary/config/model identity and all request options are not bound by saved packs",
+          "no timing, failed request denominator, model call count, ground truth, or independent sample verdict",
+          "citation ranks describe published order; candidate score changes require explain_ontology"
+        ]
+      }
+    }
+  ],
+  "quality_metrics": null,
+  "quality_evaluated": false,
+  "performance_accepted": false,
+  "independent_units": null,
+  "owned_request_units": 2,
+  "new_FINAL_samples": 0,
+  "real_model_used": false,
+  "real_domain_review_supplied": false,
+  "current_and_operator_config_preserved": true,
+  "limits": [
+    "2 fixture questions and repeated calls are not independent quality samples",
+    "sequential arm order is recorded; no order-randomized domain trial",
+    "fresh process timing is not machine/model/cache cold",
+    "mock feature hashes do not measure semantic quality",
+    "O04-B actual domain binary/model/runtime protocol and C/D remain pending"
+  ]
+}

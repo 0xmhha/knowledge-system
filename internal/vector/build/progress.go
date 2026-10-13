@@ -80,7 +80,7 @@ func (p *progress) Tick(processed int) bool {
 		eta = time.Duration(float64(remaining) / rate * float64(time.Second))
 	}
 
-	fmt.Fprintf(p.w, "ckv: %d/%d files (%.1f files/s, elapsed %s, ETA %s)\n",
+	_, _ = fmt.Fprintf(p.w, "ckv: %d/%d files (%.1f files/s, elapsed %s, ETA %s)\n",
 		processed, p.total, rate, truncSeconds(elapsed), truncSeconds(eta))
 	p.lastEmit = now
 	p.lastEmitIdx = processed
