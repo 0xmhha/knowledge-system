@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "29e953302b096fb504e6c16130603e33c5dba89d",
-    "manifest": "system/eval/b0-knowledge-system/documentation-status-review-2026-10-13/current-manifest.json"
+    "revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
+    "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2265,24 +2265,35 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T05:58:18.205716+00:00",
+    "checked_at": "2026-10-13T06:32:54.770223+00:00",
     "repository": "0xmhha/knowledge-system",
     "local_branch": "feat/setup-tool",
-    "inspected_local_head": "29e953302b096fb504e6c16130603e33c5dba89d",
+    "inspected_local_head": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
     "remote_main": "21e26ac28fa8104116ec01b91b4a6478b81b8ff2",
-    "remote_feature_branch_exists": false,
-    "branch_PRs": [],
-    "unpublished_commits": 47,
-    "changed_paths_vs_main": 936,
+    "remote_feature_head": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
+    "remote_feature_branch_exists": true,
+    "branch_PRs": [
+      {
+        "number": 99,
+        "url": "https://github.com/0xmhha/knowledge-system/pull/99",
+        "state": "OPEN",
+        "isDraft": false,
+        "headRefOid": "82dbb6843b94754e159942636c65ff8dc5c9ece1"
+      }
+    ],
+    "unpublished_commits": 0,
+    "changed_paths_vs_main": 939,
     "main_is_ancestor": true,
-    "scope": "read-only final remote check before final local evidence commit",
-    "push_or_PR_created": false
+    "scope": "initial publication snapshot; subsequent documentation commits may advance the branch",
+    "push_or_PR_created": true,
+    "main_merge_executed": false,
+    "tag_or_deployment_executed": false
   },
   "latest_documentation_review": {
-    "scope": "documentation cleanup, local integration and Git/PR read-only status; no completion criteria or product acceptance changed",
-    "revision": "29e953302b096fb504e6c16130603e33c5dba89d",
-    "manifest": "system/eval/b0-knowledge-system/documentation-status-review-2026-10-13/current-manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1731,
+    "scope": "publication status and live documentation verification; original acceptance states and frozen evidence unchanged",
+    "revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
+    "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1722,
     "source_dependency_bindings": 1579,
     "status": "PASS",
     "code_or_frozen_evaluation_changes": 0,
@@ -2291,11 +2302,36 @@
     "remaining": [
       "N-16"
     ],
-    "remote_feature_branch_exists": false,
-    "matching_PR_exists": false,
-    "public_transfer": false,
-    "late_status_report_sha256": "f7ab849f8bf4737e05ab93e78440f0df68b07085126fb5f643a60cc6e0561cdb",
+    "remote_feature_branch_exists": true,
+    "matching_PR_exists": true,
+    "public_transfer": true,
+    "PR": 99,
+    "PR_is_draft": false,
+    "CI_acceptance": false,
+    "Git_status_scope": "initial published 82dbb684 snapshot, not the later documentation head",
     "progress_check": "PASS original17/18 and ontology4/4; N16 on hold",
-    "late_progress_report_sha256": "d1b893e67f8e50352d260d08f39457560440e2c339780233df46ce5524188ecc"
+    "delivery_remaining": [
+      "CI toolchain/linter alignment and required checks",
+      "advisory vulnerability review",
+      "PR review; main merge requires separate instruction"
+    ],
+    "tag_or_deployment_executed": false
+  },
+  "setup_ontology_public_transfer": {
+    "approval": "explicit user reply 승인 to whole-branch push and normal PR proposal",
+    "initial_published_revision": "82dbb6843b94754e159942636c65ff8dc5c9ece1",
+    "repository": "0xmhha/knowledge-system",
+    "branch": "feat/setup-tool",
+    "PR_number": 99,
+    "PR_url": "https://github.com/0xmhha/knowledge-system/pull/99",
+    "PR_state": "OPEN",
+    "isDraft": false,
+    "push_complete": true,
+    "PR_creation_complete": true,
+    "evidence_revision": "83032b616e246373826b50e9ae3c4adb4963fd1d",
+    "manifest": "system/eval/b0-knowledge-system/setup-ontology-publication-2026-10-13/manifest.json",
+    "CI_accepted": false,
+    "main_merge_executed": false,
+    "tag_or_deployment_executed": false
   }
 }
