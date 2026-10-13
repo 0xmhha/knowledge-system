@@ -13,7 +13,7 @@
 
 이번 확인 시작 시 feat/setup-tool의 HEAD는 d5784a20이었다. origin/main21e26ac2와 비교하면 이 브랜치에44커밋/908변경파일, main에만 문서 수정1커밋이 있었다. 원격 feat/setup-tool 브랜치와 해당 PR, 열린 PR은 없었다. 이후 문서 정리 커밋 수는 추가될 수 있으므로 이 숫자를 실시간 상태로 사용하지 않는다. 실제 [확인 원자료](../../system/eval/b0-knowledge-system/documentation-status-review-2026-10-13/git-status-before-cleanup.json)를 보존했다.
 
-과거 PR #98은067ed5f3으로 main에 squash merge됐다. 그것을 이번 브랜치의 공개 반영 완료로 표시하지 않는다. 이번에는 원격 추적 정보를 fetch하고 문서 수정 내용을 대조했으며, 현재 브랜치를 merge/rebase하거나 local main을 checkout하지 않았다. push/PR 생성은 아직 미진행이다. 태그·공개 배포는 보류 상태다.
+과거 PR #98은067ed5f3으로 main에 squash merge됐다. 그것을 이번 브랜치의 공개 반영 완료로 표시하지 않는다. 원격 main의 문서 수정21e26ac2를 현재 작업 브랜치에 로컬 통합하고 문서 충돌4개를 해결했다. 통합 커밋은0c87bee9다. local main은 checkout하거나 수정하지 않았다. push/PR 생성은 아직 미진행이다. 태그·공개 배포는 보류 상태다.
 
 ## 먼저 읽을 순서
 

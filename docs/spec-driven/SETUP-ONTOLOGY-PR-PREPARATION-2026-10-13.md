@@ -45,6 +45,10 @@ N16 public-key fingerprint/trust conditions and public tag/release stay on hold.
 This PR is for code/document review and does not authorize deployment.
 ```
 
+The upstream main documentation commit was integrated locally as0c87bee9;
+the four documentation conflicts were resolved while retaining current
+progress, upstream release clarification and historical evidence.
+
 ## Before creating the PR
 
 Confirm the final local head and whole branch diff, integrate the current main
