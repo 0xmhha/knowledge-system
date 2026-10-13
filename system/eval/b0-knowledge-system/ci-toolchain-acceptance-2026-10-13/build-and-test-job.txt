@@ -1,0 +1,656 @@
+﻿2026-10-13T06:52:56.5904924Z Current runner version: '2.337.0'
+2026-10-13T06:52:56.5922989Z ##[group]Runner Image Provisioner
+2026-10-13T06:52:56.5923619Z Hosted Compute Agent
+2026-10-13T06:52:56.5924014Z Version: 20261002.596
+2026-10-13T06:52:56.5924381Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-13T06:52:56.5924861Z Build Date: 2026-10-02T22:28:27Z
+2026-10-13T06:52:56.5925271Z Worker ID: {4a5aa675-9c92-4bac-a92c-76a43e82630f}
+2026-10-13T06:52:56.5925747Z Region: westus3
+2026-10-13T06:52:56.5926152Z Cloud: Azure
+2026-10-13T06:52:56.5926476Z ##[endgroup]
+2026-10-13T06:52:56.5927261Z ##[group]Operating System
+2026-10-13T06:52:56.5927627Z Ubuntu
+2026-10-13T06:52:56.5927964Z 24.04.5
+2026-10-13T06:52:56.5928323Z LTS
+2026-10-13T06:52:56.5928661Z ##[endgroup]
+2026-10-13T06:52:56.5929023Z ##[group]Runner Image
+2026-10-13T06:52:56.5929625Z Image: ubuntu-24.04
+2026-10-13T06:52:56.5929992Z Version: 20261004.327.1
+2026-10-13T06:52:56.5930820Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-13T06:52:56.5931749Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-13T06:52:56.5932324Z ##[endgroup]
+2026-10-13T06:52:56.5933104Z ##[group]GITHUB_TOKEN Permissions
+2026-10-13T06:52:56.5934297Z Contents: read
+2026-10-13T06:52:56.5934633Z Metadata: read
+2026-10-13T06:52:56.5935031Z Packages: read
+2026-10-13T06:52:56.5935399Z ##[endgroup]
+2026-10-13T06:52:56.5936749Z Secret source: Actions
+2026-10-13T06:52:56.5937312Z Cache mode: write
+2026-10-13T06:52:56.5937748Z Prepare workflow directory
+2026-10-13T06:52:56.6145970Z Prepare all required actions
+2026-10-13T06:52:56.6178495Z Getting action download info
+2026-10-13T06:52:56.9419119Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+2026-10-13T06:52:57.0372811Z Download action repository 'actions/setup-go@v7' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+2026-10-13T06:52:57.8543415Z Complete job name: build-and-test
+2026-10-13T06:52:57.9034005Z ##[group]Run actions/checkout@v6
+2026-10-13T06:52:57.9034469Z with:
+2026-10-13T06:52:57.9034751Z   repository: 0xmhha/knowledge-system
+2026-10-13T06:52:57.9036932Z   token: ***
+2026-10-13T06:52:57.9037194Z   ssh-strict: true
+2026-10-13T06:52:57.9037467Z   ssh-user: git
+2026-10-13T06:52:57.9037742Z   persist-credentials: true
+2026-10-13T06:52:57.9038041Z   clean: true
+2026-10-13T06:52:57.9038321Z   sparse-checkout-cone-mode: true
+2026-10-13T06:52:57.9038638Z   fetch-depth: 1
+2026-10-13T06:52:57.9038905Z   fetch-tags: false
+2026-10-13T06:52:57.9039178Z   show-progress: true
+2026-10-13T06:52:57.9039589Z   lfs: false
+2026-10-13T06:52:57.9039853Z   submodules: false
+2026-10-13T06:52:57.9040144Z   set-safe-directory: true
+2026-10-13T06:52:57.9040455Z   allow-unsafe-pr-checkout: false
+2026-10-13T06:52:57.9040851Z ##[endgroup]
+2026-10-13T06:52:57.9718537Z Syncing repository: 0xmhha/knowledge-system
+2026-10-13T06:52:57.9720485Z ##[group]Getting Git version info
+2026-10-13T06:52:57.9721363Z Working directory is '/home/runner/work/knowledge-system/knowledge-system'
+2026-10-13T06:52:57.9722543Z [command]/usr/bin/git version
+2026-10-13T06:52:57.9751996Z git version 2.55.0
+2026-10-13T06:52:57.9766891Z ##[endgroup]
+2026-10-13T06:52:57.9784296Z Temporarily overriding HOME='/home/runner/work/_temp/ecab6057-1622-40f1-86d6-79f985ff166a' before making global git config changes
+2026-10-13T06:52:57.9785225Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-13T06:52:57.9789853Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/knowledge-system/knowledge-system
+2026-10-13T06:52:57.9831150Z Deleting the contents of '/home/runner/work/knowledge-system/knowledge-system'
+2026-10-13T06:52:57.9838555Z ##[group]Determining repository object format
+2026-10-13T06:52:57.9839658Z ##[endgroup]
+2026-10-13T06:52:57.9846364Z ##[group]Initializing the repository
+2026-10-13T06:52:57.9847185Z [command]/usr/bin/git init /home/runner/work/knowledge-system/knowledge-system
+2026-10-13T06:52:58.0021584Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-13T06:52:58.0023072Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-13T06:52:58.0024698Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-13T06:52:58.0025579Z hint: call:
+2026-10-13T06:52:58.0026401Z hint:
+2026-10-13T06:52:58.0027070Z hint: 	git config --global init.defaultBranch <name>
+2026-10-13T06:52:58.0027684Z hint:
+2026-10-13T06:52:58.0028275Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-13T06:52:58.0029216Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-13T06:52:58.0030168Z hint:
+2026-10-13T06:52:58.0030596Z hint: 	git branch -m <name>
+2026-10-13T06:52:58.0031107Z hint:
+2026-10-13T06:52:58.0031771Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-13T06:52:58.0032914Z Initialized empty Git repository in /home/runner/work/knowledge-system/knowledge-system/.git/
+2026-10-13T06:52:58.0034896Z [command]/usr/bin/git remote add origin https://github.com/0xmhha/knowledge-system
+2026-10-13T06:52:58.0076955Z ##[endgroup]
+2026-10-13T06:52:58.0077725Z ##[group]Disabling automatic garbage collection
+2026-10-13T06:52:58.0080556Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-13T06:52:58.0112003Z ##[endgroup]
+2026-10-13T06:52:58.0112783Z ##[group]Setting up auth
+2026-10-13T06:52:58.0113377Z Removing SSH command configuration
+2026-10-13T06:52:58.0117710Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-13T06:52:58.0151333Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-13T06:52:58.0423481Z Removing HTTP extra header
+2026-10-13T06:52:58.0429102Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-13T06:52:58.0458452Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-13T06:52:58.0630630Z Removing includeIf entries pointing to credentials config files
+2026-10-13T06:52:58.0634916Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-13T06:52:58.0663480Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-13T06:52:58.0844815Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-13T06:52:58.0878701Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git.path /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T06:52:58.0907114Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T06:52:58.0937146Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T06:52:58.0966142Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T06:52:58.0991911Z ##[endgroup]
+2026-10-13T06:52:58.0992375Z ##[group]Fetching the repository
+2026-10-13T06:52:58.0997463Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +63c556fd52eae34d02802e8d8f97e7f8561a5330:refs/remotes/pull/99/merge
+2026-10-13T06:53:06.9808955Z From https://github.com/0xmhha/knowledge-system
+2026-10-13T06:53:06.9809851Z  * [new ref]         63c556fd52eae34d02802e8d8f97e7f8561a5330 -> pull/99/merge
+2026-10-13T06:53:06.9813906Z ##[endgroup]
+2026-10-13T06:53:06.9814386Z ##[group]Determining the checkout info
+2026-10-13T06:53:06.9814820Z ##[endgroup]
+2026-10-13T06:53:06.9818767Z [command]/usr/bin/git sparse-checkout disable
+2026-10-13T06:53:07.0610000Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-13T06:53:07.0820520Z ##[group]Checking out the ref
+2026-10-13T06:53:07.0828506Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/99/merge
+2026-10-13T06:53:08.1545498Z Updating files:  78% (10951/14006)
+2026-10-13T06:53:08.1774777Z Updating files:  79% (11065/14006)
+2026-10-13T06:53:08.2135574Z Updating files:  80% (11205/14006)
+2026-10-13T06:53:08.2568094Z Updating files:  81% (11345/14006)
+2026-10-13T06:53:08.2615089Z Updating files:  82% (11485/14006)
+2026-10-13T06:53:08.2669246Z Updating files:  83% (11625/14006)
+2026-10-13T06:53:08.2720196Z Updating files:  84% (11766/14006)
+2026-10-13T06:53:08.2773401Z Updating files:  85% (11906/14006)
+2026-10-13T06:53:08.2812019Z Updating files:  86% (12046/14006)
+2026-10-13T06:53:08.2871099Z Updating files:  87% (12186/14006)
+2026-10-13T06:53:08.2909588Z Updating files:  88% (12326/14006)
+2026-10-13T06:53:08.2956813Z Updating files:  89% (12466/14006)
+2026-10-13T06:53:08.3034135Z Updating files:  90% (12606/14006)
+2026-10-13T06:53:08.3082405Z Updating files:  91% (12746/14006)
+2026-10-13T06:53:08.3122931Z Updating files:  92% (12886/14006)
+2026-10-13T06:53:08.3179745Z Updating files:  93% (13026/14006)
+2026-10-13T06:53:08.3218858Z Updating files:  94% (13166/14006)
+2026-10-13T06:53:08.3273016Z Updating files:  95% (13306/14006)
+2026-10-13T06:53:08.3383876Z Updating files:  96% (13446/14006)
+2026-10-13T06:53:08.3453364Z Updating files:  97% (13586/14006)
+2026-10-13T06:53:08.3524549Z Updating files:  98% (13726/14006)
+2026-10-13T06:53:08.3590774Z Updating files:  99% (13866/14006)
+2026-10-13T06:53:08.3591171Z Updating files: 100% (14006/14006)
+2026-10-13T06:53:08.3702277Z Updating files: 100% (14006/14006), done.
+2026-10-13T06:53:08.3702643Z Note: switching to 'refs/remotes/pull/99/merge'.
+2026-10-13T06:53:08.3702848Z 
+2026-10-13T06:53:08.3702962Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-13T06:53:08.3703224Z changes and commit them, and you can discard any commits you make in this
+2026-10-13T06:53:08.3703491Z state without impacting any branches by switching back to a branch.
+2026-10-13T06:53:08.3703638Z 
+2026-10-13T06:53:08.3703745Z If you want to create a new branch to retain commits you create, you may
+2026-10-13T06:53:08.3704063Z do so (now or later) by using -c with the switch command. Example:
+2026-10-13T06:53:08.3704279Z 
+2026-10-13T06:53:08.3704380Z   git switch -c <new-branch-name>
+2026-10-13T06:53:08.3704530Z 
+2026-10-13T06:53:08.3704625Z Or undo this operation with:
+2026-10-13T06:53:08.3704765Z 
+2026-10-13T06:53:08.3704936Z   git switch -
+2026-10-13T06:53:08.3705046Z 
+2026-10-13T06:53:08.3705225Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-13T06:53:08.3705489Z 
+2026-10-13T06:53:08.3705790Z HEAD is now at 63c556f Merge de3dcee1d09c54718338454c3721f335fd72bb72 into 21e26ac28fa8104116ec01b91b4a6478b81b8ff2
+2026-10-13T06:53:08.3786236Z ##[endgroup]
+2026-10-13T06:53:08.3828032Z [command]/usr/bin/git log -1 --format=%H
+2026-10-13T06:53:08.3853573Z 63c556fd52eae34d02802e8d8f97e7f8561a5330
+2026-10-13T06:53:08.4119257Z ##[group]Run actions/setup-go@v7
+2026-10-13T06:53:08.4119644Z with:
+2026-10-13T06:53:08.4119761Z   go-version: 1.26.9
+2026-10-13T06:53:08.4119888Z   check-latest: false
+2026-10-13T06:53:08.4121234Z   token: ***
+2026-10-13T06:53:08.4121351Z   cache: true
+2026-10-13T06:53:08.4121464Z ##[endgroup]
+2026-10-13T06:53:08.4898430Z Setup go version spec 1.26.9
+2026-10-13T06:53:08.4902829Z Attempting to download 1.26.9...
+2026-10-13T06:53:09.4227499Z matching 1.26.9...
+2026-10-13T06:53:09.4258761Z Acquiring 1.26.9 from https://github.com/actions/go-versions/releases/download/1.26.9-37875104533/go-1.26.9-linux-x64.tar.gz
+2026-10-13T06:53:09.9852381Z Extracting Go...
+2026-10-13T06:53:09.9934582Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/3c1fb0b7-b714-41a0-b785-e855bbbed63b -f /home/runner/work/_temp/da06da5c-d8f4-4da3-a912-989fe32d3831
+2026-10-13T06:53:11.2311961Z Successfully extracted go to /home/runner/work/_temp/3c1fb0b7-b714-41a0-b785-e855bbbed63b
+2026-10-13T06:53:11.2312249Z Adding to the cache ...
+2026-10-13T06:53:15.0328001Z Successfully cached go to /opt/hostedtoolcache/go/1.26.9/x64
+2026-10-13T06:53:15.0328392Z Added go to the path
+2026-10-13T06:53:15.0328620Z Successfully set up Go version 1.26.9
+2026-10-13T06:53:15.0478346Z [command]/opt/hostedtoolcache/go/1.26.9/x64/bin/go env GOMODCACHE
+2026-10-13T06:53:15.0509545Z [command]/opt/hostedtoolcache/go/1.26.9/x64/bin/go env GOCACHE
+2026-10-13T06:53:15.0541065Z /home/runner/go/pkg/mod
+2026-10-13T06:53:15.0553053Z /home/runner/.cache/go-build
+2026-10-13T06:53:15.2548253Z Cache hit for: setup-go-Linux-x64-ubuntu24-go-1.26.9-d6669d869fecaf770b3f64a5011355547f9673c6bdbb8ba7048725be4462bca2
+2026-10-13T06:53:16.5906894Z Received 33554432 of 150623107 (22.3%), 29.4 MBs/sec
+2026-10-13T06:53:17.2644585Z Received 150623107 of 150623107 (100.0%), 81.5 MBs/sec
+2026-10-13T06:53:17.2645265Z Cache Size: ~144 MB (150623107 B)
+2026-10-13T06:53:17.2667061Z [command]/usr/bin/tar -xf /home/runner/work/_temp/438d9989-b4e4-49b5-a139-d6d608f33acc/cache.tzst -P -C /home/runner/work/knowledge-system/knowledge-system --use-compress-program unzstd
+2026-10-13T06:53:18.2962063Z Cache restored successfully
+2026-10-13T06:53:18.3036459Z Cache restored from key: setup-go-Linux-x64-ubuntu24-go-1.26.9-d6669d869fecaf770b3f64a5011355547f9673c6bdbb8ba7048725be4462bca2
+2026-10-13T06:53:18.3066026Z go version go1.26.9 linux/amd64
+2026-10-13T06:53:18.3066187Z 
+2026-10-13T06:53:18.3066417Z ##[group]go env
+2026-10-13T06:53:18.3169105Z AR='ar'
+2026-10-13T06:53:18.3169486Z CC='gcc'
+2026-10-13T06:53:18.3169658Z CGO_CFLAGS='-O2 -g'
+2026-10-13T06:53:18.3169801Z CGO_CPPFLAGS=''
+2026-10-13T06:53:18.3169930Z CGO_CXXFLAGS='-O2 -g'
+2026-10-13T06:53:18.3170068Z CGO_ENABLED='1'
+2026-10-13T06:53:18.3170204Z CGO_FFLAGS='-O2 -g'
+2026-10-13T06:53:18.3170332Z CGO_LDFLAGS='-O2 -g'
+2026-10-13T06:53:18.3170455Z CXX='g++'
+2026-10-13T06:53:18.3170628Z GCCGO='gccgo'
+2026-10-13T06:53:18.3170751Z GO111MODULE=''
+2026-10-13T06:53:18.3170907Z GOAMD64='v1'
+2026-10-13T06:53:18.3171030Z GOARCH='amd64'
+2026-10-13T06:53:18.3171143Z GOAUTH='netrc'
+2026-10-13T06:53:18.3171260Z GOBIN=''
+2026-10-13T06:53:18.3171394Z GOCACHE='/home/runner/.cache/go-build'
+2026-10-13T06:53:18.3171555Z GOCACHEPROG=''
+2026-10-13T06:53:18.3171671Z GODEBUG=''
+2026-10-13T06:53:18.3171800Z GOENV='/home/runner/.config/go/env'
+2026-10-13T06:53:18.3171973Z GOEXE=''
+2026-10-13T06:53:18.3172083Z GOEXPERIMENT=''
+2026-10-13T06:53:18.3172203Z GOFIPS140='off'
+2026-10-13T06:53:18.3172317Z GOFLAGS=''
+2026-10-13T06:53:18.3172700Z GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build1680566789=/tmp/go-build -gno-record-gcc-switches'
+2026-10-13T06:53:18.3173073Z GOHOSTARCH='amd64'
+2026-10-13T06:53:18.3173198Z GOHOSTOS='linux'
+2026-10-13T06:53:18.3173318Z GOINSECURE=''
+2026-10-13T06:53:18.3173542Z GOMOD='/home/runner/work/knowledge-system/knowledge-system/go.mod'
+2026-10-13T06:53:18.3173763Z GOMODCACHE='/home/runner/go/pkg/mod'
+2026-10-13T06:53:18.3174173Z GONOPROXY=''
+2026-10-13T06:53:18.3174290Z GONOSUMDB=''
+2026-10-13T06:53:18.3174403Z GOOS='linux'
+2026-10-13T06:53:18.3174525Z GOPATH='/home/runner/go'
+2026-10-13T06:53:18.3174688Z GOPRIVATE=''
+2026-10-13T06:53:18.3174878Z GOPROXY='https://proxy.golang.org,direct'
+2026-10-13T06:53:18.3175078Z GOROOT='/opt/hostedtoolcache/go/1.26.9/x64'
+2026-10-13T06:53:18.3175251Z GOSUMDB='sum.golang.org'
+2026-10-13T06:53:18.3175389Z GOTELEMETRY='local'
+2026-10-13T06:53:18.3175545Z GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+2026-10-13T06:53:18.3175850Z GOTMPDIR=''
+2026-10-13T06:53:18.3175966Z GOTOOLCHAIN='local'
+2026-10-13T06:53:18.3176153Z GOTOOLDIR='/opt/hostedtoolcache/go/1.26.9/x64/pkg/tool/linux_amd64'
+2026-10-13T06:53:18.3176353Z GOVCS=''
+2026-10-13T06:53:18.3176467Z GOVERSION='go1.26.9'
+2026-10-13T06:53:18.3176590Z GOWORK=''
+2026-10-13T06:53:18.3176712Z PKG_CONFIG='pkg-config'
+2026-10-13T06:53:18.3176799Z 
+2026-10-13T06:53:18.3177050Z ##[endgroup]
+2026-10-13T06:53:18.3845443Z ##[group]Run make build
+2026-10-13T06:53:18.3845675Z make build
+2026-10-13T06:53:18.4152061Z shell: /usr/bin/bash -e {0}
+2026-10-13T06:53:18.4152289Z env:
+2026-10-13T06:53:18.4152423Z   GOTOOLCHAIN: local
+2026-10-13T06:53:18.4152566Z ##[endgroup]
+2026-10-13T06:53:18.4466076Z go build ./...
+2026-10-13T06:53:59.8788889Z ##[group]Run make lint
+2026-10-13T06:53:59.8789066Z make lint
+2026-10-13T06:53:59.8843552Z shell: /usr/bin/bash -e {0}
+2026-10-13T06:53:59.8843709Z env:
+2026-10-13T06:53:59.8843840Z   GOTOOLCHAIN: local
+2026-10-13T06:53:59.8843985Z ##[endgroup]
+2026-10-13T06:54:00.1134132Z go vet ./...
+2026-10-13T06:54:08.0812599Z go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0 run --timeout 15m ./...
+2026-10-13T06:54:08.1419938Z go: downloading github.com/golangci/golangci-lint/v2 v2.14.0
+2026-10-13T06:54:08.5634931Z go: downloading charm.land/lipgloss/v2 v2.0.6
+2026-10-13T06:54:08.5635221Z go: downloading github.com/fatih/color v1.19.0
+2026-10-13T06:54:08.5635543Z go: downloading github.com/gofrs/flock v0.13.1
+2026-10-13T06:54:08.5637663Z go: downloading github.com/ldez/grignotin v0.10.1
+2026-10-13T06:54:08.6347036Z go: downloading github.com/pelletier/go-toml/v2 v2.4.3
+2026-10-13T06:54:08.6373255Z go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
+2026-10-13T06:54:08.6572736Z go: downloading github.com/spf13/pflag v1.0.10
+2026-10-13T06:54:08.7273871Z go: downloading github.com/spf13/viper v1.12.0
+2026-10-13T06:54:08.7463685Z go: downloading github.com/pelletier/go-toml v1.9.5
+2026-10-13T06:54:08.7494724Z go: downloading go.yaml.in/yaml/v3 v3.0.5
+2026-10-13T06:54:08.7959566Z go: downloading golang.org/x/mod v0.41.0
+2026-10-13T06:54:08.8168645Z go: downloading golang.org/x/tools v0.50.0
+2026-10-13T06:54:08.8173163Z go: downloading github.com/go-viper/mapstructure/v2 v2.5.0
+2026-10-13T06:54:08.8173733Z go: downloading github.com/hashicorp/go-version v1.9.0
+2026-10-13T06:54:08.8679004Z go: downloading github.com/mitchellh/go-homedir v1.1.0
+2026-10-13T06:54:08.8739027Z go: downloading github.com/alecthomas/chroma/v2 v2.27.0
+2026-10-13T06:54:08.8824600Z go: downloading github.com/rogpeppe/go-internal v1.16.0
+2026-10-13T06:54:08.9645493Z go: downloading github.com/golangci/plugin-module-register v0.1.2
+2026-10-13T06:54:09.0224414Z go: downloading github.com/mattn/go-colorable v0.1.15
+2026-10-13T06:54:09.0730665Z go: downloading github.com/sirupsen/logrus v1.10.2
+2026-10-13T06:54:09.0903738Z go: downloading github.com/stretchr/testify v1.12.1
+2026-10-13T06:54:09.1370513Z go: downloading github.com/go-xmlfmt/xmlfmt v1.1.3
+2026-10-13T06:54:09.1620276Z go: downloading github.com/golangci/revgrep v0.8.0
+2026-10-13T06:54:09.1842468Z go: downloading github.com/mattn/go-isatty v0.0.22
+2026-10-13T06:54:09.1853139Z go: downloading golang.org/x/sys v0.48.0
+2026-10-13T06:54:09.1853527Z go: downloading github.com/charmbracelet/colorprofile v0.4.3
+2026-10-13T06:54:09.2286381Z go: downloading github.com/charmbracelet/ultraviolet v0.0.0-20260811164956-006e29f97886
+2026-10-13T06:54:09.2523576Z go: downloading github.com/charmbracelet/x/ansi v0.11.8
+2026-10-13T06:54:09.2545483Z go: downloading github.com/charmbracelet/x/term v0.2.2
+2026-10-13T06:54:09.2991209Z go: downloading github.com/clipperhouse/displaywidth v0.11.0
+2026-10-13T06:54:09.3114486Z go: downloading github.com/lucasb-eyer/go-colorful v1.4.1
+2026-10-13T06:54:09.3124400Z go: downloading github.com/rivo/uniseg v0.4.7
+2026-10-13T06:54:09.3954409Z go: downloading github.com/fsnotify/fsnotify v1.9.0
+2026-10-13T06:54:09.3954976Z go: downloading github.com/mitchellh/mapstructure v1.5.0
+2026-10-13T06:54:09.3974763Z go: downloading github.com/spf13/afero v1.15.0
+2026-10-13T06:54:09.4427029Z go: downloading github.com/spf13/cast v1.5.0
+2026-10-13T06:54:09.4653303Z go: downloading github.com/spf13/jwalterweatherman v1.1.0
+2026-10-13T06:54:09.4851290Z go: downloading golang.org/x/sync v0.23.0
+2026-10-13T06:54:09.4853859Z go: downloading github.com/daixiang0/gci v0.13.7
+2026-10-13T06:54:09.5475233Z go: downloading github.com/golangci/gofmt v0.0.0-20260820135601-e84e05053792
+2026-10-13T06:54:09.5475680Z go: downloading mvdan.cc/gofumpt v0.12.0
+2026-10-13T06:54:09.5477021Z go: downloading github.com/golangci/golines v0.15.0
+2026-10-13T06:54:09.6078990Z go: downloading github.com/sourcegraph/go-diff v0.9.0
+2026-10-13T06:54:09.6176036Z go: downloading github.com/golangci/swaggoswag v0.0.0-20250504205917-77f2aca3143e
+2026-10-13T06:54:09.6193131Z go: downloading go.augendre.info/arangolint v0.4.0
+2026-10-13T06:54:09.6253598Z go: downloading github.com/alingse/asasalint v0.0.11
+2026-10-13T06:54:09.6750757Z go: downloading github.com/golangci/asciicheck v0.5.0
+2026-10-13T06:54:09.6751764Z go: downloading github.com/breml/bidichk v0.3.3
+2026-10-13T06:54:09.6773744Z go: downloading github.com/timakin/bodyclose v0.0.0-20260723120731-857993a2939c
+2026-10-13T06:54:09.7296725Z go: downloading github.com/golangci/canonicalheader v0.0.0-20260827115959-a25c71c521f6
+2026-10-13T06:54:09.7306398Z go: downloading github.com/ClickHouse/clickhouse-go-linter v1.2.1
+2026-10-13T06:54:09.8022516Z go: downloading github.com/sivchari/containedctx v1.0.3
+2026-10-13T06:54:09.8619542Z go: downloading github.com/kkHAIKE/contextcheck v1.1.6
+2026-10-13T06:54:09.9048728Z go: downloading github.com/karamaru-alpha/copyloopvar v1.2.2
+2026-10-13T06:54:09.9049197Z go: downloading github.com/bkielbasa/cyclop v1.2.3
+2026-10-13T06:54:09.9201551Z go: downloading gitlab.com/bosi/decorder v0.4.2
+2026-10-13T06:54:09.9571644Z go: downloading github.com/OpenPeeDeeP/depguard/v2 v2.2.1
+2026-10-13T06:54:09.9572242Z go: downloading github.com/golangci/dupl v0.0.0-20260401084720-c99c5cf5c202
+2026-10-13T06:54:09.9705467Z go: downloading github.com/Abirdcfly/dupword v0.1.8
+2026-10-13T06:54:10.0113766Z go: downloading github.com/charithe/durationcheck v0.0.11
+2026-10-13T06:54:10.0230058Z go: downloading github.com/manuelarte/embeddedstructfieldcheck v0.4.0
+2026-10-13T06:54:10.0250783Z go: downloading github.com/Djarvur/go-err113 v0.1.1
+2026-10-13T06:54:10.0645805Z go: downloading github.com/kisielk/errcheck v1.20.0
+2026-10-13T06:54:10.0692053Z go: downloading github.com/breml/errchkjson v0.4.1
+2026-10-13T06:54:10.0694720Z go: downloading github.com/Antonboom/errname v1.1.2
+2026-10-13T06:54:10.1034298Z go: downloading codeberg.org/polyfloyd/go-errorlint v1.9.0
+2026-10-13T06:54:10.1147378Z go: downloading github.com/nishanths/exhaustive v0.13.0
+2026-10-13T06:54:10.1189565Z go: downloading dev.gaijin.team/go/exhaustruct/v4 v4.0.0
+2026-10-13T06:54:10.1348765Z go: downloading dev.gaijin.team/go/exhaustruct/v5 v5.2.0
+2026-10-13T06:54:10.1507297Z go: downloading github.com/ldez/exptostd v0.4.5
+2026-10-13T06:54:10.1741989Z go: downloading go.augendre.info/fatcontext v0.10.1
+2026-10-13T06:54:10.1755445Z go: downloading github.com/ashanbrown/forbidigo/v2 v2.3.1
+2026-10-13T06:54:10.1903101Z go: downloading github.com/gostaticanalysis/forcetypeassert v0.2.0
+2026-10-13T06:54:10.2269708Z go: downloading github.com/manuelarte/funcorder v0.6.0
+2026-10-13T06:54:10.2356310Z go: downloading github.com/ultraware/funlen v0.2.0
+2026-10-13T06:54:10.2383670Z go: downloading github.com/nunnatsa/ginkgolinter v0.24.0
+2026-10-13T06:54:10.2923662Z go: downloading 4d63.com/gocheckcompilerdirectives v1.4.0
+2026-10-13T06:54:10.2924107Z go: downloading 4d63.com/gochecknoglobals v0.2.2
+2026-10-13T06:54:10.2942485Z go: downloading github.com/alecthomas/go-check-sumtype v0.5.1-0.20260828200218-ae6904d28606
+2026-10-13T06:54:10.3237882Z go: downloading github.com/uudashr/gocognit v1.2.1
+2026-10-13T06:54:10.3380566Z go: downloading github.com/jgautheron/goconst v1.11.0
+2026-10-13T06:54:10.3416591Z go: downloading github.com/go-critic/go-critic v0.15.0
+2026-10-13T06:54:10.3694913Z go: downloading github.com/quasilyte/go-ruleguard/dsl v0.3.23
+2026-10-13T06:54:10.3863769Z go: downloading github.com/fzipp/gocyclo v0.6.0
+2026-10-13T06:54:10.4036227Z go: downloading github.com/quasilyte/go-ruleguard v0.4.5
+2026-10-13T06:54:10.4338274Z go: downloading github.com/godoc-lint/godoc-lint v0.11.4
+2026-10-13T06:54:10.4800535Z go: downloading github.com/tetafro/godot v1.5.6
+2026-10-13T06:54:10.5056574Z go: downloading github.com/matoous/godox v1.1.0
+2026-10-13T06:54:10.5057252Z go: downloading github.com/denis-tingaikin/go-header v0.5.0
+2026-10-13T06:54:10.5057745Z go: downloading github.com/ldez/gomoddirectives v0.10.0
+2026-10-13T06:54:10.5255613Z go: downloading github.com/Masterminds/semver/v3 v3.5.0
+2026-10-13T06:54:10.5555846Z go: downloading github.com/ryancurrah/gomodguard v1.4.1
+2026-10-13T06:54:10.5591932Z go: downloading github.com/ryancurrah/gomodguard/v2 v2.1.3
+2026-10-13T06:54:10.5595713Z go: downloading github.com/golangci/go-printf-func-name v0.1.1
+2026-10-13T06:54:10.5742519Z go: downloading github.com/securego/gosec/v2 v2.29.0
+2026-10-13T06:54:10.6537620Z go: downloading github.com/xen0n/gosmopolitan v1.3.0
+2026-10-13T06:54:10.6539883Z go: downloading github.com/uudashr/iface v1.5.1
+2026-10-13T06:54:10.6540301Z go: downloading github.com/leonklingele/grouper v1.1.2
+2026-10-13T06:54:10.7486119Z go: downloading github.com/julz/importas v0.2.0
+2026-10-13T06:54:10.7486792Z go: downloading github.com/macabu/inamedparam v0.2.0
+2026-10-13T06:54:10.7487609Z go: downloading github.com/gordonklaus/ineffassign v0.2.0
+2026-10-13T06:54:10.7488455Z go: downloading github.com/sashamelentyev/interfacebloat v1.1.0
+2026-10-13T06:54:10.8021385Z go: downloading github.com/ckaznocha/intrange v0.3.1
+2026-10-13T06:54:10.8031273Z go: downloading github.com/AdminBenni/iota-mixing v1.0.0
+2026-10-13T06:54:10.8058907Z go: downloading github.com/butuzov/ireturn v0.4.1
+2026-10-13T06:54:10.8585861Z go: downloading github.com/timonwong/loggercheck v0.12.0
+2026-10-13T06:54:10.8586416Z go: downloading github.com/yagipy/maintidx v1.0.0
+2026-10-13T06:54:10.8590365Z go: downloading github.com/ashanbrown/makezero/v2 v2.2.1
+2026-10-13T06:54:10.8620037Z go: downloading github.com/butuzov/mirror v1.3.3
+2026-10-13T06:54:10.9170254Z go: downloading github.com/golangci/misspell v0.8.0
+2026-10-13T06:54:10.9219711Z go: downloading github.com/tommy-muehle/go-mnd/v2 v2.5.1
+2026-10-13T06:54:10.9306053Z go: downloading go-simpler.org/musttag v0.14.0
+2026-10-13T06:54:10.9318200Z go: downloading github.com/alexkohler/nakedret/v2 v2.0.6
+2026-10-13T06:54:10.9798707Z go: downloading github.com/nakabonne/nestif v0.3.1
+2026-10-13T06:54:10.9843984Z go: downloading github.com/gostaticanalysis/nilerr v0.1.2
+2026-10-13T06:54:10.9844604Z go: downloading github.com/alingse/nilnesserr v0.2.0
+2026-10-13T06:54:10.9927288Z go: downloading github.com/Antonboom/nilnil v1.1.2
+2026-10-13T06:54:11.0257820Z go: downloading github.com/ssgreg/nlreturn/v2 v2.2.1
+2026-10-13T06:54:11.0299390Z go: downloading github.com/sonatard/noctx v0.5.1
+2026-10-13T06:54:11.0313758Z go: downloading github.com/AlwxSin/noinlineerr v1.0.6
+2026-10-13T06:54:11.0382249Z go: downloading github.com/firefart/nonamedreturns v1.0.8
+2026-10-13T06:54:11.0695247Z go: downloading github.com/stbenjam/no-sprintf-host-port v0.3.1
+2026-10-13T06:54:11.0757390Z go: downloading github.com/kunwardeep/paralleltest v1.0.15
+2026-10-13T06:54:11.1637916Z go: downloading github.com/catenacyber/perfsprint v0.10.1
+2026-10-13T06:54:11.1770430Z go: downloading github.com/alexkohler/prealloc v1.1.0
+2026-10-13T06:54:11.2083595Z go: downloading github.com/nishanths/predeclared v0.2.2
+2026-10-13T06:54:11.2143896Z go: downloading github.com/yeya24/promlinter v0.3.0
+2026-10-13T06:54:11.2204275Z go: downloading github.com/ghostiam/protogetter v1.0.1
+2026-10-13T06:54:11.2463033Z go: downloading github.com/curioswitch/go-reassign v0.3.0
+2026-10-13T06:54:11.2531509Z go: downloading github.com/raeperd/recvcheck v0.3.1
+2026-10-13T06:54:11.2674644Z go: downloading github.com/BurntSushi/toml v1.6.0
+2026-10-13T06:54:11.2973060Z go: downloading github.com/mgechev/revive v1.17.0
+2026-10-13T06:54:11.3703417Z go: downloading github.com/golangci/rowserrcheck v0.0.0-20260419091836-c5f79b8a11ba
+2026-10-13T06:54:11.4185900Z go: downloading go-simpler.org/sloglint v0.12.0
+2026-10-13T06:54:11.4799089Z go: downloading github.com/jjti/go-spancheck v0.6.5
+2026-10-13T06:54:11.5408164Z go: downloading github.com/ryanrolds/sqlclosecheck v0.6.0
+2026-10-13T06:54:11.5979734Z go: downloading honnef.co/go/tools v0.8.1
+2026-10-13T06:54:11.8111084Z go: downloading github.com/4meepo/tagalign v1.4.4
+2026-10-13T06:54:11.8114206Z go: downloading github.com/ldez/tagliatelle v0.8.0
+2026-10-13T06:54:11.8114730Z go: downloading github.com/maratori/testableexamples v1.0.1
+2026-10-13T06:54:11.8114975Z go: downloading github.com/Antonboom/testifylint v1.6.4
+2026-10-13T06:54:11.8641354Z go: downloading github.com/maratori/testpackage v1.1.2
+2026-10-13T06:54:11.8653125Z go: downloading github.com/kulti/thelper v0.7.1
+2026-10-13T06:54:11.8674165Z go: downloading github.com/moricho/tparallel v0.3.2
+2026-10-13T06:54:11.8765866Z go: downloading github.com/golangci/unconvert v0.0.0-20250410112200-a129a6e6413e
+2026-10-13T06:54:11.9163594Z go: downloading mvdan.cc/unparam v0.0.0-20260823230713-2fa3d841b0c8
+2026-10-13T06:54:11.9181759Z go: downloading github.com/MirrexOne/unqueryvet v1.5.4
+2026-10-13T06:54:11.9248577Z go: downloading github.com/sashamelentyev/usestdlibvars v1.29.0
+2026-10-13T06:54:11.9615020Z go: downloading github.com/ldez/usetesting v0.5.0
+2026-10-13T06:54:11.9760766Z go: downloading github.com/blizzy78/varnamelen v0.8.0
+2026-10-13T06:54:12.0140324Z go: downloading github.com/sanposhiho/wastedassign/v2 v2.1.0
+2026-10-13T06:54:12.0427720Z go: downloading github.com/ultraware/whitespace v0.2.0
+2026-10-13T06:54:12.0633613Z go: downloading github.com/tomarrell/wrapcheck/v2 v2.12.0
+2026-10-13T06:54:12.0966625Z go: downloading github.com/bombsimon/wsl/v4 v4.7.0
+2026-10-13T06:54:12.1190770Z go: downloading github.com/bombsimon/wsl/v5 v5.9.0
+2026-10-13T06:54:12.1473594Z go: downloading github.com/ykadowak/zerologlint v0.1.5
+2026-10-13T06:54:12.1799483Z go: downloading github.com/stretchr/objx v0.5.3
+2026-10-13T06:54:12.2059608Z go: downloading github.com/xo/terminfo v1.0.0
+2026-10-13T06:54:12.2292874Z go: downloading github.com/clipperhouse/uax29/v2 v2.7.0
+2026-10-13T06:54:12.2541642Z go: downloading github.com/mattn/go-runewidth v0.0.24
+2026-10-13T06:54:12.2884179Z go: downloading github.com/charmbracelet/x/termios v0.1.1
+2026-10-13T06:54:12.3029804Z go: downloading github.com/charmbracelet/x/windows v0.2.2
+2026-10-13T06:54:12.3317286Z go: downloading github.com/muesli/cancelreader v0.2.2
+2026-10-13T06:54:12.3501506Z go: downloading github.com/subosito/gotenv v1.4.1
+2026-10-13T06:54:12.3770202Z go: downloading github.com/hashicorp/hcl v1.0.0
+2026-10-13T06:54:12.4367068Z go: downloading gopkg.in/ini.v1 v1.67.0
+2026-10-13T06:54:12.4367600Z go: downloading github.com/magiconair/properties v1.8.6
+2026-10-13T06:54:12.4451904Z go: downloading github.com/hexops/gotextdiff v1.0.3
+2026-10-13T06:54:12.4942896Z go: downloading go.uber.org/zap v1.27.0
+2026-10-13T06:54:12.4952667Z go: downloading github.com/dave/dst v0.27.3
+2026-10-13T06:54:12.5530768Z go: downloading github.com/go-toolsmith/astcast v1.1.0
+2026-10-13T06:54:12.5531384Z go: downloading github.com/gostaticanalysis/analysisutil v0.7.1
+2026-10-13T06:54:12.5625047Z go: downloading github.com/gobwas/glob v0.2.3
+2026-10-13T06:54:12.5625627Z go: downloading dev.gaijin.team/go/golib v0.8.1
+2026-10-13T06:54:12.6115918Z go: downloading github.com/google/go-cmp v0.7.0
+2026-10-13T06:54:12.6259099Z go: downloading github.com/go-toolsmith/astequal v1.2.0
+2026-10-13T06:54:12.6259702Z go: downloading github.com/go-toolsmith/astcopy v1.1.0
+2026-10-13T06:54:12.6655020Z go: downloading github.com/go-toolsmith/astfmt v1.1.0
+2026-10-13T06:54:12.6655418Z go: downloading github.com/go-toolsmith/astp v1.1.0
+2026-10-13T06:54:12.6896159Z go: downloading github.com/go-toolsmith/strparse v1.1.0
+2026-10-13T06:54:12.7043614Z go: downloading github.com/go-toolsmith/typep v1.1.0
+2026-10-13T06:54:12.7154688Z go: downloading github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727
+2026-10-13T06:54:12.7306533Z go: downloading github.com/ccojocar/zxcvbn-go v1.0.4
+2026-10-13T06:54:12.7321672Z go: downloading github.com/gostaticanalysis/comment v1.5.0
+2026-10-13T06:54:12.7705577Z go: downloading github.com/prometheus/client_golang v1.12.1
+2026-10-13T06:54:12.7895824Z go: downloading github.com/prometheus/client_model v0.2.0
+2026-10-13T06:54:12.8040265Z go: downloading github.com/ettle/strcase v0.2.0
+2026-10-13T06:54:12.8417767Z go: downloading github.com/fatih/structtag v1.2.0
+2026-10-13T06:54:12.8428866Z go: downloading github.com/hashicorp/go-immutable-radix/v2 v2.1.0
+2026-10-13T06:54:12.8443681Z go: downloading github.com/alfatraining/structtag v1.0.0
+2026-10-13T06:54:12.8500536Z go: downloading github.com/dlclark/regexp2/v2 v2.2.1
+2026-10-13T06:54:12.8876351Z go: downloading github.com/ldez/structtags v0.6.1
+2026-10-13T06:54:12.9085085Z go: downloading golang.org/x/exp/typeparams v0.0.0-20260811152304-ee035b5b010f
+2026-10-13T06:54:12.9155884Z go: downloading github.com/quasilyte/gogrep v0.5.0
+2026-10-13T06:54:12.9333428Z go: downloading golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
+2026-10-13T06:54:12.9642466Z go: downloading github.com/quasilyte/stdinfo v0.0.0-20220114132959-f7386bf02567
+2026-10-13T06:54:12.9908599Z go: downloading github.com/dlclark/regexp2 v1.12.0
+2026-10-13T06:54:13.0164331Z go: downloading github.com/beorn7/perks v1.0.1
+2026-10-13T06:54:13.0318189Z go: downloading github.com/cespare/xxhash/v2 v2.3.0
+2026-10-13T06:54:13.0582376Z go: downloading github.com/golang/protobuf v1.5.3
+2026-10-13T06:54:13.0793062Z go: downloading github.com/prometheus/common v0.32.1
+2026-10-13T06:54:13.1315867Z go: downloading github.com/prometheus/procfs v0.7.3
+2026-10-13T06:54:13.1416920Z go: downloading google.golang.org/protobuf v1.36.12
+2026-10-13T06:54:13.1424574Z go: downloading codeberg.org/chavacava/garif v0.2.1
+2026-10-13T06:54:13.3705887Z go: downloading github.com/hashicorp/golang-lru/v2 v2.0.7
+2026-10-13T06:54:13.4728249Z go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.1
+2026-10-13T06:54:55.3642501Z 0 issues.
+2026-10-13T06:54:55.9396982Z engine boundaries: OK
+2026-10-13T06:54:55.9411784Z go build  -o bin/ckg ./cmd/graph
+2026-10-13T06:54:57.3700047Z go build  -o bin/ckv ./cmd/vector
+2026-10-13T06:54:58.5143089Z go build  -o bin/cks ./cmd/cks
+2026-10-13T06:55:00.7643551Z documentation: OK (315 live documents)
+2026-10-13T06:55:00.7696713Z ##[group]Run make test-race
+2026-10-13T06:55:00.7696889Z make test-race
+2026-10-13T06:55:00.7748980Z shell: /usr/bin/bash -e {0}
+2026-10-13T06:55:00.7749127Z env:
+2026-10-13T06:55:00.7749243Z   GOTOOLCHAIN: local
+2026-10-13T06:55:00.7749527Z ##[endgroup]
+2026-10-13T06:55:00.7826079Z go test -race ./...
+2026-10-13T06:55:49.5648011Z ok  	github.com/0xmhha/knowledge-system/cmd/b0-vector-probe	1.134s
+2026-10-13T06:55:51.5048561Z ok  	github.com/0xmhha/knowledge-system/cmd/b1-evidence-audit	1.017s
+2026-10-13T06:55:53.1140346Z ok  	github.com/0xmhha/knowledge-system/cmd/cks	1.033s
+2026-10-13T06:55:53.1140657Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/agentcli	1.029s
+2026-10-13T06:55:53.6405090Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/doctorcli	1.204s
+2026-10-13T06:55:53.8136449Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/domaincli	1.130s
+2026-10-13T06:55:56.5199197Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/evalcli	3.396s
+2026-10-13T06:55:56.5199862Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/evalgatecli	1.011s
+2026-10-13T06:55:56.5200248Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/filelistcli	1.932s
+2026-10-13T06:55:56.5200646Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/knowledgecli	1.030s
+2026-10-13T06:55:56.5201043Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/mcpcli	1.066s
+2026-10-13T06:55:56.5201450Z ?   	github.com/0xmhha/knowledge-system/cmd/cks/packagecli	[no test files]
+2026-10-13T06:55:56.5202234Z ?   	github.com/0xmhha/knowledge-system/cmd/cks/patchcli	[no test files]
+2026-10-13T06:55:56.6432275Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/semanticcli	1.141s
+2026-10-13T06:55:57.1590632Z ok  	github.com/0xmhha/knowledge-system/cmd/cks/setupcli	1.119s
+2026-10-13T06:55:57.1634625Z ?   	github.com/0xmhha/knowledge-system/cmd/cks/viewercli	[no test files]
+2026-10-13T06:57:25.5899515Z ok  	github.com/0xmhha/knowledge-system/cmd/graph	89.002s
+2026-10-13T06:57:25.5910287Z ok  	github.com/0xmhha/knowledge-system/cmd/vector	1.071s
+2026-10-13T06:57:25.5910796Z ?   	github.com/0xmhha/knowledge-system/internal/githistory	[no test files]
+2026-10-13T06:57:25.5911247Z ok  	github.com/0xmhha/knowledge-system/internal/graph/audit	1.115s
+2026-10-13T06:58:53.4360528Z ok  	github.com/0xmhha/knowledge-system/internal/graph/buildpipe	174.335s
+2026-10-13T06:58:53.4361053Z ok  	github.com/0xmhha/knowledge-system/internal/graph/cluster	1.023s
+2026-10-13T06:58:53.4361618Z ok  	github.com/0xmhha/knowledge-system/internal/graph/detect	1.261s
+2026-10-13T06:58:53.4362172Z ok  	github.com/0xmhha/knowledge-system/internal/graph/eval/retrieval	1.020s
+2026-10-13T06:58:53.4362678Z ok  	github.com/0xmhha/knowledge-system/internal/graph/filterlist	1.240s
+2026-10-13T06:58:53.4363157Z ok  	github.com/0xmhha/knowledge-system/internal/graph/graph	1.007s
+2026-10-13T06:58:53.4363609Z ok  	github.com/0xmhha/knowledge-system/internal/graph/link	1.011s
+2026-10-13T06:58:53.4364072Z ok  	github.com/0xmhha/knowledge-system/internal/graph/mcp	10.831s
+2026-10-13T06:58:53.4364671Z ok  	github.com/0xmhha/knowledge-system/internal/graph/parse	1.012s
+2026-10-13T06:58:53.4365388Z ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/golang	119.352s
+2026-10-13T06:58:53.4365864Z ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/proto	1.011s
+2026-10-13T06:58:53.4366319Z ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/solidity	14.275s
+2026-10-13T06:58:53.4366850Z ?   	github.com/0xmhha/knowledge-system/internal/graph/parse/solidity/binding	[no test files]
+2026-10-13T06:58:53.4367512Z ok  	github.com/0xmhha/knowledge-system/internal/graph/parse/typescript	3.056s
+2026-10-13T06:58:53.4368086Z ok  	github.com/0xmhha/knowledge-system/internal/graph/persist	108.264s
+2026-10-13T06:58:53.4368508Z ok  	github.com/0xmhha/knowledge-system/internal/graph/score	1.015s
+2026-10-13T06:58:53.4368921Z ok  	github.com/0xmhha/knowledge-system/internal/graph/server	26.358s
+2026-10-13T06:58:53.4369534Z ok  	github.com/0xmhha/knowledge-system/internal/graph/temporal	2.053s
+2026-10-13T06:58:53.4370227Z ok  	github.com/0xmhha/knowledge-system/internal/graph/validate	1.028s
+2026-10-13T06:58:53.4370637Z ok  	github.com/0xmhha/knowledge-system/internal/setup	8.654s
+2026-10-13T06:58:53.4371102Z ok  	github.com/0xmhha/knowledge-system/internal/system/auditlog	1.065s
+2026-10-13T06:58:53.4371616Z ok  	github.com/0xmhha/knowledge-system/internal/system/backendmeasure	1.021s
+2026-10-13T06:58:53.4372066Z ok  	github.com/0xmhha/knowledge-system/internal/system/ckgclient	2.493s
+2026-10-13T06:58:53.4372516Z ok  	github.com/0xmhha/knowledge-system/internal/system/ckvclient	1.015s
+2026-10-13T06:58:53.4372961Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer	1.029s
+2026-10-13T06:58:53.4373391Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/budget	1.024s
+2026-10-13T06:58:53.4373835Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/intent	1.023s
+2026-10-13T06:58:53.4374284Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/sanitize	1.016s
+2026-10-13T06:58:53.4374742Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage1	1.018s
+2026-10-13T06:58:53.4375193Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage2	1.205s
+2026-10-13T06:58:53.4375645Z ok  	github.com/0xmhha/knowledge-system/internal/system/composer/stage3	1.017s
+2026-10-13T06:58:53.4376078Z ok  	github.com/0xmhha/knowledge-system/internal/system/config	1.031s
+2026-10-13T06:59:21.1328979Z ok  	github.com/0xmhha/knowledge-system/internal/system/daemon	58.924s
+2026-10-13T06:59:21.1330257Z ok  	github.com/0xmhha/knowledge-system/internal/system/domainexport	1.010s
+2026-10-13T06:59:21.1331141Z ok  	github.com/0xmhha/knowledge-system/internal/system/embedder	1.008s
+2026-10-13T06:59:21.1331700Z ok  	github.com/0xmhha/knowledge-system/internal/system/envelope	1.010s
+2026-10-13T06:59:21.1332236Z ok  	github.com/0xmhha/knowledge-system/internal/system/eval	3.168s
+2026-10-13T06:59:21.1332797Z ok  	github.com/0xmhha/knowledge-system/internal/system/evidencev2	2.113s
+2026-10-13T06:59:21.1333331Z ok  	github.com/0xmhha/knowledge-system/internal/system/footprint	1.009s
+2026-10-13T06:59:21.1333863Z ok  	github.com/0xmhha/knowledge-system/internal/system/inventory	1.017s
+2026-10-13T06:59:21.1334439Z ok  	github.com/0xmhha/knowledge-system/internal/system/knowledgepack	1.140s
+2026-10-13T06:59:21.1334975Z ok  	github.com/0xmhha/knowledge-system/internal/system/mcp	3.013s
+2026-10-13T06:59:21.1335499Z ok  	github.com/0xmhha/knowledge-system/internal/system/netutil	1.007s
+2026-10-13T06:59:21.1336028Z ok  	github.com/0xmhha/knowledge-system/internal/system/observe	1.009s
+2026-10-13T06:59:21.1336572Z ok  	github.com/0xmhha/knowledge-system/internal/system/patch	8.136s
+2026-10-13T06:59:21.1337175Z ok  	github.com/0xmhha/knowledge-system/internal/system/semantic	5.578s
+2026-10-13T06:59:21.1337782Z ok  	github.com/0xmhha/knowledge-system/internal/system/service	2.073s
+2026-10-13T06:59:21.1338330Z ok  	github.com/0xmhha/knowledge-system/internal/system/viewer	1.056s
+2026-10-13T06:59:21.1338882Z ok  	github.com/0xmhha/knowledge-system/internal/system/vocab	1.009s
+2026-10-13T06:59:21.1339588Z ?   	github.com/0xmhha/knowledge-system/internal/testsupport/graphfixture	[no test files]
+2026-10-13T06:59:21.1340208Z ok  	github.com/0xmhha/knowledge-system/internal/toolenv	1.007s
+2026-10-13T06:59:21.1340742Z ok  	github.com/0xmhha/knowledge-system/internal/vector/build	2.128s
+2026-10-13T06:59:21.1341280Z ok  	github.com/0xmhha/knowledge-system/internal/vector/chunk	1.020s
+2026-10-13T06:59:21.1341843Z ok  	github.com/0xmhha/knowledge-system/internal/vector/ckgalign	1.089s
+2026-10-13T06:59:21.1342410Z ok  	github.com/0xmhha/knowledge-system/internal/vector/convention	1.012s
+2026-10-13T06:59:21.1342979Z ok  	github.com/0xmhha/knowledge-system/internal/vector/discover	1.625s
+2026-10-13T06:59:21.1343562Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx	1.012s
+2026-10-13T06:59:21.1344153Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/cache	1.007s
+2026-10-13T06:59:21.1346638Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/convert	1.008s
+2026-10-13T06:59:21.1347647Z ?   	github.com/0xmhha/knowledge-system/internal/vector/embed/coreml	[no test files]
+2026-10-13T06:59:21.1348277Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/mock	1.007s
+2026-10-13T06:59:21.1348872Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/model	8.315s
+2026-10-13T06:59:21.1349561Z ok  	github.com/0xmhha/knowledge-system/internal/vector/embed/registry	1.007s
+2026-10-13T06:59:21.1350154Z ok  	github.com/0xmhha/knowledge-system/internal/vector/eval	1.320s
+2026-10-13T06:59:21.1350724Z ok  	github.com/0xmhha/knowledge-system/internal/vector/eval/prregress	1.025s
+2026-10-13T06:59:21.1351308Z ok  	github.com/0xmhha/knowledge-system/internal/vector/filter	1.007s
+2026-10-13T06:59:21.1351875Z ok  	github.com/0xmhha/knowledge-system/internal/vector/filterlist	1.008s
+2026-10-13T06:59:21.1352447Z ok  	github.com/0xmhha/knowledge-system/internal/vector/flowcorpus	1.009s
+2026-10-13T06:59:21.1353047Z ok  	github.com/0xmhha/knowledge-system/internal/vector/footprint	1.022s
+2026-10-13T06:59:21.1353617Z ok  	github.com/0xmhha/knowledge-system/internal/vector/freshness	1.060s
+2026-10-13T06:59:21.1354192Z ok  	github.com/0xmhha/knowledge-system/internal/vector/glossary	1.007s
+2026-10-13T06:59:21.1354778Z ok  	github.com/0xmhha/knowledge-system/internal/vector/invariant	1.008s
+2026-10-13T06:59:21.1355346Z ok  	github.com/0xmhha/knowledge-system/internal/vector/llmprefix	1.006s
+2026-10-13T06:59:21.1356118Z ok  	github.com/0xmhha/knowledge-system/internal/vector/manifest	1.010s
+2026-10-13T06:59:21.1356707Z ?   	github.com/0xmhha/knowledge-system/internal/vector/parse	[no test files]
+2026-10-13T06:59:21.1357346Z ?   	github.com/0xmhha/knowledge-system/internal/vector/parse/fuzzcheck	[no test files]
+2026-10-13T06:59:21.1357986Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/golang	1.007s
+2026-10-13T06:59:21.1358600Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/javascript	1.008s
+2026-10-13T06:59:21.1359221Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/markdown	1.006s
+2026-10-13T06:59:21.1359929Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/prdoc	1.006s
+2026-10-13T06:59:21.1360534Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/solidity	1.007s
+2026-10-13T06:59:21.1361227Z ?   	github.com/0xmhha/knowledge-system/internal/vector/parse/solidity/binding	[no test files]
+2026-10-13T06:59:21.1361920Z ok  	github.com/0xmhha/knowledge-system/internal/vector/parse/typescript	1.007s
+2026-10-13T06:59:21.1362516Z ok  	github.com/0xmhha/knowledge-system/internal/vector/policy	1.008s
+2026-10-13T06:59:21.1363077Z ok  	github.com/0xmhha/knowledge-system/internal/vector/projectcfg	1.013s
+2026-10-13T06:59:21.1363700Z ok  	github.com/0xmhha/knowledge-system/internal/vector/query	2.001s
+2026-10-13T06:59:21.1364302Z ok  	github.com/0xmhha/knowledge-system/internal/vector/query/bm25	1.007s
+2026-10-13T06:59:21.1364906Z ok  	github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec	1.658s
+2026-10-13T06:59:21.1365445Z ok  	github.com/0xmhha/knowledge-system/pkg/bm25	1.006s
+2026-10-13T06:59:21.1365994Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/concurrency	1.008s
+2026-10-13T06:59:21.1366528Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/evidence	1.155s
+2026-10-13T06:59:21.1367053Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/hunkmodifies	1.006s
+2026-10-13T06:59:21.1367592Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/impact	1.553s
+2026-10-13T07:00:00.3726844Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers	47.676s
+2026-10-13T07:00:00.3727187Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/policy	1.009s
+2026-10-13T07:00:00.3727439Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/security	1.011s
+2026-10-13T07:00:00.3727687Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/smartctx	1.008s
+2026-10-13T07:00:00.3727924Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/store	1.011s
+2026-10-13T07:00:00.3728526Z ok  	github.com/0xmhha/knowledge-system/pkg/graph/types	1.006s
+2026-10-13T07:00:00.3728748Z ok  	github.com/0xmhha/knowledge-system/pkg/mcp	1.007s
+2026-10-13T07:00:00.3728979Z ok  	github.com/0xmhha/knowledge-system/pkg/system/contract	1.009s
+2026-10-13T07:00:00.3729221Z ok  	github.com/0xmhha/knowledge-system/pkg/system/testpath	1.008s
+2026-10-13T07:00:00.3729584Z ok  	github.com/0xmhha/knowledge-system/pkg/vector/ckv	1.504s
+2026-10-13T07:00:00.3729850Z ok  	github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama	1.559s
+2026-10-13T07:00:00.3730100Z ok  	github.com/0xmhha/knowledge-system/pkg/vector/mcp	2.426s
+2026-10-13T07:00:00.3730331Z ok  	github.com/0xmhha/knowledge-system/pkg/vector/types	1.019s
+2026-10-13T07:00:00.3730588Z ok  	github.com/0xmhha/knowledge-system/projects/stablenet/validate	1.022s
+2026-10-13T07:00:00.3730978Z ?   	github.com/0xmhha/knowledge-system/system/eval/b0-knowledge-system/backend-calls-m2max-2026-10-04/checks	[no test files]
+2026-10-13T07:00:00.3731538Z ?   	github.com/0xmhha/knowledge-system/system/eval/b0-knowledge-system/native-notice-audit-m2max-2026-10-04/source/cmd/cks/packagecli	[no test files]
+2026-10-13T07:00:00.8244433Z ##[group]Run make check-domain-artifacts
+2026-10-13T07:00:00.8244792Z make check-domain-artifacts
+2026-10-13T07:00:00.8315702Z shell: /usr/bin/bash -e {0}
+2026-10-13T07:00:00.8315866Z env:
+2026-10-13T07:00:00.8315984Z   GOTOOLCHAIN: local
+2026-10-13T07:00:00.8316305Z ##[endgroup]
+2026-10-13T07:00:00.8414810Z go build  -o bin/ckg ./cmd/graph
+2026-10-13T07:00:00.9830447Z go build  -o bin/ckv ./cmd/vector
+2026-10-13T07:00:01.1200758Z go build  -o bin/cks ./cmd/cks
+2026-10-13T07:00:01.2590429Z ./bin/cks domain sync --project projects/stablenet/domain-knowledge \
+2026-10-13T07:00:01.2590801Z     --ckg-out projects/stablenet/policies/graph.yaml \
+2026-10-13T07:00:01.2591172Z     --ckv-out /dev/null
+2026-10-13T07:00:01.2705154Z cks-domain-sync: 42 verified entries → 14 ckv categories, 42 ckg policies
+2026-10-13T07:00:01.2708962Z ./bin/cks domain glossary-gen --project projects/stablenet/domain-knowledge \
+2026-10-13T07:00:01.2709536Z     --out projects/stablenet/domain-knowledge/glossary.yaml
+2026-10-13T07:00:01.2797587Z domain glossary-gen: included=42 skipped=2 (gate=verified)
+2026-10-13T07:00:01.3059036Z domain artifacts match their entries
+2026-10-13T07:00:01.3125024Z Post job cleanup.
+2026-10-13T07:00:01.3909877Z [command]/opt/hostedtoolcache/go/1.26.9/x64/bin/go env GOMODCACHE
+2026-10-13T07:00:01.3945030Z [command]/opt/hostedtoolcache/go/1.26.9/x64/bin/go env GOCACHE
+2026-10-13T07:00:01.3971403Z /home/runner/go/pkg/mod
+2026-10-13T07:00:01.3987645Z /home/runner/.cache/go-build
+2026-10-13T07:00:01.3992042Z Cache hit occurred on the primary key setup-go-Linux-x64-ubuntu24-go-1.26.9-d6669d869fecaf770b3f64a5011355547f9673c6bdbb8ba7048725be4462bca2, not saving cache.
+2026-10-13T07:00:01.4150598Z Post job cleanup.
+2026-10-13T07:00:01.4713280Z [command]/usr/bin/git version
+2026-10-13T07:00:01.4745202Z git version 2.55.0
+2026-10-13T07:00:01.4769740Z Temporarily overriding HOME='/home/runner/work/_temp/84ffe949-002a-433f-b003-70d9ac8c964a' before making global git config changes
+2026-10-13T07:00:01.4770465Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-13T07:00:01.4772848Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/knowledge-system/knowledge-system
+2026-10-13T07:00:01.4801309Z Removing SSH command configuration
+2026-10-13T07:00:01.4805669Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-13T07:00:01.4834120Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-13T07:00:01.5044416Z Removing HTTP extra header
+2026-10-13T07:00:01.5057873Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-13T07:00:01.5088343Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-13T07:00:01.5313461Z Removing includeIf entries pointing to credentials config files
+2026-10-13T07:00:01.5319035Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-13T07:00:01.5345361Z includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git.path
+2026-10-13T07:00:01.5346120Z includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git/worktrees/*.path
+2026-10-13T07:00:01.5346742Z includeif.gitdir:/github/workspace/.git.path
+2026-10-13T07:00:01.5347241Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-13T07:00:01.5360129Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git.path
+2026-10-13T07:00:01.5375317Z /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5383542Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git.path /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5415220Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git/worktrees/*.path
+2026-10-13T07:00:01.5436429Z /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5443225Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/knowledge-system/knowledge-system/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5471781Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-13T07:00:01.5491947Z /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5497598Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5525624Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-13T07:00:01.5545680Z /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5552262Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config
+2026-10-13T07:00:01.5582061Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-13T07:00:01.5773890Z Removing credentials config '/home/runner/work/_temp/git-credentials-a49d3632-78dc-4dff-94e2-9186e8e80f44.config'
+2026-10-13T07:00:01.5904587Z Cleaning up orphan processes

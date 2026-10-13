@@ -1,8 +1,8 @@
 # 원래 리팩토링 목적 기준의 남은 작업리스트
 
-**2026-10-13 현재: 기존17/18·온톨로지4/4 완료. 전체 잔여1개는 N16 보류(미충족)다.** [O04 최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md)은 품질inconclusive·독립승인0·기본off다. PR #98의 과거 main 머지는 완료됐지만 이번 feat/setup-tool 브랜치는 push·[일반 PR #99 생성](https://github.com/0xmhha/knowledge-system/pull/99)을 완료했다. 최초 공개 HEAD `82dbb684`에서 필수 CI는 Go/린터 버전 불일치로 실패했고 권고용 취약점 검사도 실패했다. 별도 전달 잔여는 CI 수정·재검증, 취약점 검토, PR 리뷰이며 이번 main merge는 미진행이다. 태그·공개 배포는 보류한다.
+**2026-10-13 현재: 기존17/18·온톨로지4/4 완료. 전체 잔여1개는 N16 보류(미충족)다.** [O04 최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md)은 품질inconclusive·독립승인0·기본off다. PR #98의 과거 main 머지는 완료됐지만 이번 feat/setup-tool 브랜치는 push·[일반 PR #99 생성](https://github.com/0xmhha/knowledge-system/pull/99)을 완료했다. 최초 공개 HEAD `82dbb684`에서 필수 CI는 Go/린터 버전 불일치로 실패했고 권고용 취약점 검사도 실패했다. CI 수정·취약점 검토와 커밋de3dcee1의 GitHub CI5/5 재검증은 완료했다. 별도 전달 잔여는 PR 리뷰이며 이번 main merge는 미진행이다. 태그·공개 배포는 보류한다.
 
-**별도 전달 작업 진행:** [CI 수정·검증](./CI-TOOLCHAIN-VALIDATION-2026-10-13.md). Go1.26.9 고정·정리 린트 오류2개 수정과 로컬 검사는 통과, 전체 race·수정 후 GitHub CI는 확인 중. 미호출 모듈 취약점2개를 기록했으며 PR 리뷰·N16 보류·main merge 미진행·배포 보류를 유지한다.
+**CI 전달 검증 완료:** [CI 수정·검증](./CI-TOOLCHAIN-VALIDATION-2026-10-13.md). Go1.26.9 고정·정리 린트 오류3개 수정과 로컬 검사는 통과, 임시 체크아웃의 전체 race와 수정 커밋de3dcee1의 GitHub CI5/5도 통과. 미호출 모듈 취약점2개를 기록했으며 PR 리뷰·N16 보류·main merge 미진행·배포 보류를 유지한다.
 
 이 문서는 현재 작업 표를 유지한다. [현재 인수인계](./CURRENT-HANDOFF.md)에서 읽기 순서를 확인하고, 이전 단계의 “최신/현재” 기록은 [날짜별 이력](./REFACTORING-STATUS-HISTORY-2026-10-13.md)에서 읽는다. 초기 목적과 상위 WI 범위는 [원래 목표 감사](./REFACTORING-ORIGINAL-GOALS-REAUDIT.md), [study 보완 감사](./STUDY-ORIGINAL-PLAN-FOLLOWUP.md)를 따른다. 기존 preview와 상위 WI를 이번 완료율에 합산하지 않는다.
 
@@ -103,6 +103,6 @@ O04-B 실제DEV 대조 완료: 사전 동결·같은 입력/신원과 실패 분
 
 O04 후속: [비용과독립입력준비](./ONTOLOGY-COST-AND-INDEPENDENT-INPUTS-2026-10-13.md). 같은파일바이트SHA를재확인하는bounded JSON좌표해석재사용, 동일DEV원자료/출력불변·미수용지연을기록했다. 8후보/7제안군은내용/전체이력·의미독립성미승인이다. C/D unchecked·전체잔여 N16/O04 유지.
 
-### Linux CI 추가 수정 — 2026-10-13
+### Linux CI 추가 수정 이력 — 2026-10-13
 
 5935fa96의 GitHub CI는4/5 통과했으나 Linux 전용 memory_linux.go에서 읽기 전용 파일 정리의 errcheck1개가 실패했다. macOS 린트 범위에 없는 파일이다. `/proc/meminfo` 닫기를 명시적으로 정리하도록 수정했으며, 최종 Linux CI 통과 전에는 전체 CI 완료로 표시하지 않는다. [실패·수정 기록](../../system/eval/b0-knowledge-system/ci-linux-cleanup-fix-2026-10-13/verification.json)을 보존한다.

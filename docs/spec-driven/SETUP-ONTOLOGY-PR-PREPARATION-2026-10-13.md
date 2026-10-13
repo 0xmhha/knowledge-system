@@ -57,13 +57,14 @@ progress, upstream release clarification and historical evidence.
 - [x] Obtain explicit approval for all 48 commits / 939 changed paths.
 - [x] Push feat/setup-tool and verify initial remote head `82dbb684`.
 - [x] Create normal PR #99 and attach its actual URL to this task.
-- [ ] Pass required CI: initial run [38356674327](https://github.com/0xmhha/knowledge-system/actions/runs/38356674327) failed in `make lint`. The build job uses Go1.25.13 with `GOTOOLCHAIN=local`; pinned golangci-lint v2.14.0 requires Go >=1.26.0. Build/vet completed; race tests were not reached.
-- [ ] Review advisory vulnerability findings: `vuln-scan` reports 11 Go1.26.8 standard-library findings with fixes in Go1.26.9. The job is explicitly advisory (`continue-on-error: true`); this record does not assess exploitability or approve an upgrade.
+- [x] Pass required CI: patched head `de3dcee1`, [run 38359250800](https://github.com/0xmhha/knowledge-system/actions/runs/38359250800), all five jobs succeeded. Original run38356674327 failed on the Go/linter mismatch; its failure receipt remains historical.
+- [x] Review advisory vulnerability findings: Go1.26.9 reports no reachable or imported-package vulnerabilities. Two module-only findings in x/mod remain documented; the scan does not establish that older installed binaries or minimum-version compatibility artifacts were remediated.
 - [ ] Complete PR review. Main merge requires a separate instruction.
 
 At the initial published head, vector/graph evaluation gates and the native
-installation contract passed. Required CI remains unsuccessful. Later commits
+installation contract passed. The patched headde3dcee1 subsequently passed all five CI jobs. Later commits
 have their own CI run; do not treat this initial snapshot as their results.
+[CI correction and final verification](./CI-TOOLCHAIN-VALIDATION-2026-10-13.md).
 Original development remains 17/18, with N16 on hold; ontology is 4/4.
 Tag and public deployment remain on hold. Publication does not change the
 independent quality verdict, performance acceptance or optional defaults.

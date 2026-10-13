@@ -1,0 +1,40 @@
+{
+  "checked_at": "2026-10-13T07:01:26.283267+00:00",
+  "state": "complete",
+  "scope": "CI toolchain alignment and three cleanup lint fixes; original product and release acceptance unchanged",
+  "GitHub_CI_verified_revision": "de3dcee1d09c54718338454c3721f335fd72bb72",
+  "isolated_whole_module_revision": "5935fa96780ed1722496925757b2eec58a8d8e1e",
+  "GitHub_CI_verified_run": 38359250800,
+  "GitHub_CI_URL": "https://github.com/0xmhha/knowledge-system/actions/runs/38359250800",
+  "GitHub_CI_jobs": {
+    "native-install-contract": "success",
+    "vuln-scan": "success",
+    "eval-gate-vector": "success",
+    "eval-gate-graph": "success",
+    "build-and-test": "success"
+  },
+  "Go_local": "1.26.9 darwin/arm64",
+  "local_lint": "PASS, 0 issues",
+  "domain_artifacts": "PASS",
+  "targeted_race": "PASS semanticcli/system-mcp after close fixes",
+  "initial_whole_module_race": "FAIL: 116 packages passed; graph/buildpipe Git fsck exited2 during concurrent commits; failure retained",
+  "subsequent_working_repository_fsck": "PASS exit0, no persistent missing objects; no original Git objects changed/deleted to force success",
+  "isolated_whole_module_race": "PASS exit0, 117 packages; exact source/input hashes match committed5935fa96",
+  "vulnerability_check": "PASS reachable0/imported-package0; module-only2 retained as bounded limitation",
+  "module_only_findings": [
+    "GO-2026-6180",
+    "GO-2026-6179"
+  ],
+  "scan_scope_limit": "Go1.26.9 builds only; previously built/installed binaries and Go1.25 minimum-version compatibility artifacts are not reclassified as remediated by this scan; C/native dependency vulnerabilities not covered",
+  "source_dependency_bindings": 1579,
+  "approved_inputs": 5,
+  "original_complete": 17,
+  "ontology_complete": 4,
+  "remaining_original": [
+    "N-16 on hold"
+  ],
+  "delivery_remaining": [
+    "PR review; main merge only on separate instruction"
+  ],
+  "tag_deployment_activation_or_quality_decision_changed": false
+}
