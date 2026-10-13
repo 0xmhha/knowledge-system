@@ -3,8 +3,8 @@
   "scope": "후속 N-01–18; 기존 preview 종료 및 상위 WI10은 별도",
   "next_task": "N-16",
   "active_source_binding": {
-    "revision": "328dbb3ee37f70fab0857ebedaa7a689770d1495",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/manifest.json"
+    "revision": "cb701247a1781f8842994007ade769eb2c217534",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -2107,11 +2107,11 @@
     {
       "id": "O-04",
       "purpose": "온톨로지 영향 설명·적용 전후 평가",
-      "state": "waiting",
+      "state": "complete",
       "explanation_preparation_evidence_revision": "3f9496dadc2f226fb73247e8966f1be4c1711f76",
       "explanation_preparation_manifest": "system/eval/b0-knowledge-system/ontology-o04-runtime-2026-10-13/manifest.json",
       "actual_operating_data_changed": false,
-      "waiting_for": "O04-C actual content/gold/concept scope/fact-cluster and semantic independence review. Saved JSON4758 plus Markdown/YAML1618 are bound to capture commit, with three empty artifacts recorded; remaining6373 parsed. Thirteen proposed questions in ten conservatively merged clusters are not approved independent units. Prior response exposure4 and prior design context1 excluded. Author saw earlier DEV and same concept families; chat/external/deleted history is not recovered. Freeze only if independent conditions are met, then independent evaluation and O04-D final acceptance/evidence binding.",
+      "waiting_for": null,
       "verified_checks": [
         {
           "check": "O04-A",
@@ -2135,6 +2135,32 @@
             "DEV_location_metrics_evaluated": true,
             "execution_scope_changed": false
           }
+        },
+        {
+          "check": "O04-C",
+          "evidence_revision": "cb701247a1781f8842994007ade769eb2c217534",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json",
+          "evidence_ref": "completion",
+          "scope": "Independent eligibility not established, approved units0, quality inconclusive; frozen actual domain observations and conditions/shortfall/time/quality limitations with current/committed source and evidence binding. No independent quality success or human review is inferred.",
+          "ledger_fields": {
+            "independent_quality_accepted": false,
+            "approved_independent_units": 0,
+            "actual_operating_data_changed": false,
+            "execution_scope_changed": false
+          }
+        },
+        {
+          "check": "O04-D",
+          "evidence_revision": "cb701247a1781f8842994007ade769eb2c217534",
+          "manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json",
+          "evidence_ref": "completion",
+          "scope": "Independent eligibility not established, approved units0, quality inconclusive; frozen actual domain observations and conditions/shortfall/time/quality limitations with current/committed source and evidence binding. No independent quality success or human review is inferred.",
+          "ledger_fields": {
+            "independent_quality_accepted": false,
+            "approved_independent_units": 0,
+            "actual_operating_data_changed": false,
+            "execution_scope_changed": false
+          }
         }
       ],
       "actual_DEV_evidence_revision": "710cfd567983de8628c42ecbd2ff62421ddee94f",
@@ -2144,7 +2170,7 @@
       "proposed_evaluation_questions": 8,
       "proposed_CODE_fact_clusters": 4,
       "approved_independent_units": 0,
-      "evaluation_input_review_state": "accepted_for_DEV_execution",
+      "evaluation_input_review_state": "technically_reviewed_for_observation_by_Codex",
       "evaluation_DEV_evidence_revision": "6c304926fa24bf13434ac8e1f35821a5625b3ae5",
       "evaluation_DEV_manifest": "system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13/manifest.json",
       "independent_quality_accepted": false,
@@ -2167,19 +2193,66 @@
       "saved_history_nonempty_catalog_fully_parsed": true,
       "saved_history_empty_artifact_files": 3,
       "saved_history_current_and_capture_commit_SHA_bindings": 6376,
-      "independent_content_gold_review_state": "unapproved"
+      "independent_content_gold_review_state": "direct_source_technical_review_not_human_independence_approval",
+      "evidence_revision": "cb701247a1781f8842994007ade769eb2c217534",
+      "manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json",
+      "required_checks": [
+        "O04-A",
+        "O04-B",
+        "O04-C",
+        "O04-D"
+      ],
+      "completion_evidence_revision": "cb701247a1781f8842994007ade769eb2c217534",
+      "completion_manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json",
+      "completion_basis": "specified_evaluation_and_limitations_recorded",
+      "completed_at": "2026-10-13T05:00:45.187495+00:00",
+      "independent_evaluation_eligibility": "not_established",
+      "quality_verdict": "inconclusive: independent review and statistical independence not established",
+      "performance_accepted": false,
+      "new_FINAL_samples": 0,
+      "default_on": false,
+      "activation": false,
+      "release_eligible": false,
+      "completion_observation_responses": 702,
+      "completion_verified_pairs": 351,
+      "completion_failed_missing_pending": 0,
+      "completion_aggregate_p95_ratio": 1.0855411491892968,
+      "completion_per_question_over_budget": [
+        "IC-04",
+        "IC-17",
+        "IC-18"
+      ],
+      "scope": "ontology explanation/readiness/install linkage and same-input real WBFT candidate observation, independent eligibility/shortfall assessment and final limits"
     }
   ],
-  "ontology_next_task": "O-04",
+  "ontology_next_task": null,
   "latest_ontology_verification": {
     "task": "O-04",
-    "scope": "saved history and source/gold candidate preparation; no new completed criterion",
-    "revision": "328dbb3ee37f70fab0857ebedaa7a689770d1495",
-    "manifest": "system/eval/b0-knowledge-system/ontology-o04-history-and-pool-2026-10-13/manifest.json",
-    "unique_current_and_committed_SHA_bindings": 1712,
-    "source_dependency_bindings": 1577,
+    "scope": "specified explanation/evaluation/independent eligibility-shortfall and final limitations recorded; quality inconclusive, no new FINAL or default activation",
+    "revision": "cb701247a1781f8842994007ade769eb2c217534",
+    "manifest": "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1840,
+    "source_dependency_bindings": 1579,
     "status": "PASS",
+    "required_checks": [
+      "O04-A",
+      "O04-B",
+      "O04-C",
+      "O04-D"
+    ],
+    "quality_accepted": false,
+    "approved_independent_units": 0,
     "new_FINAL_samples": 0,
-    "full_task_complete": false
+    "full_task_complete": true,
+    "progress_guard_tests": {
+      "tests": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    "progress_check": "PASS ontology4/4 complete, original17/18 complete; remainingN16 only",
+    "late_report_sha256": {
+      "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/progress-guard-tests.txt": "c34b1bcdcd073bf9fd90de78be206dfa5a744aba54e7d65115c21806ee84db7e",
+      "system/eval/b0-knowledge-system/ontology-o04-completion-2026-10-13/progress-check.txt": "d1b893e67f8e50352d260d08f39457560440e2c339780233df46ce5524188ecc"
+    }
   }
 }
