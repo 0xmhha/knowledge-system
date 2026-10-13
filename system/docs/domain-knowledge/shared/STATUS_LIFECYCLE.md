@@ -42,7 +42,7 @@
 
 ### `verified`
 
-- **Meaning**: All facts confirmed against current code; safe to embed.
+- **Meaning**: Content review recorded against the stated source baseline; eligible for the configured verified-only corpus. This is not independent retrieval-quality proof.
 - **Required fields**: every applicable field; `last_verified_at` and
   `verified_by` set.
 - **CKV indexing**: included.
@@ -86,7 +86,7 @@ after all of the following pass:
 > **Tooling**: `cks domain worksheet --project <dir>` emits a
 > markdown worksheet that turns the substantive checklist above into
 > per-entry fillable sections (Q1–Q4 + decision triple). It pre-fills
-> the `Maps to:` byzantine-catalog cross-reference (best-effort
+> the `Maps to:` cross-reference from explicitly selected, pinned worksheet catalogs (best-effort
 > heuristic) and a `suggested: <file:line>` hint on each invariant
 > based on `code_anchors[].reason` token overlap. The reviewer fills
 > the actual judgments. APPROVE decisions are promoted by the inline
@@ -113,6 +113,6 @@ state at a point in time. Use it consistently:
 
 - `inventory.md` aggregates the count by status so the dashboard shows
   index readiness at a glance.
-- CKV's `ckv build` reads `status: verified` entries only.
+- Domain export/build paths use the configured verified-entry gate; separately supplied Markdown/docs remain separate inputs. A verified count does not prove their current source alignment.
 - A `verified` count of zero is a valid state — the project is still
   registered, but its inventory is not yet ready for indexing.

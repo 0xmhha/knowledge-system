@@ -1,59 +1,14 @@
-# Domain Knowledge Inventory
+# Project domain knowledge
 
-> Per-project, human-verified knowledge corpus that CKV embeds alongside
-> source code so retrieval can bridge natural-language queries to code
-> identifiers without inventing the connection.
+Each project pack owns its entries, provenance, code anchors, glossary and rendered corpus. The repository example is [projects/stablenet/domain-knowledge](../../../projects/stablenet/domain-knowledge); shared rules live here. Engine code must not embed project-specific catalog data.
 
-## Directory layout
+| Input | Current boundary |
+|---|---|
+| project.yaml, subsystems.yaml, entries/*.yaml | [inventory loader/validator](../../../internal/system/inventory) resolves project context and anchor paths |
+| verified entry status | Recorded content-review state, not independent answer-quality proof |
+| selected worksheet_packs | Pinned optional catalogs; keyword mappings are review aids, not automatic decisions |
+| glossary and corpus | Derived by domain commands from explicit project inputs, then passed into setup/config |
 
-```
-domain-knowledge/
-├── shared/            # rules that apply to every project
-│   ├── SCHEMA.md
-│   ├── KNOWLEDGE_TYPES.md
-│   ├── STATUS_LIFECYCLE.md
-│   ├── PROJECT_REGISTRATION.md
-│   └── entry.schema.yaml
-└── projects/
-    └── <project-id>/
-        ├── project.yaml
-        ├── subsystems.yaml
-        ├── inventory.md
-        ├── glossary.yaml
-        └── entries/
-            └── *.yaml
-```
+The inventory directory is an input path, not a new global projects/active_project server configuration contract. CKS serves one configured backend/dataset context per instance. Coordinate isolation and immutable snapshots are defined by [the source contract](../../../docs/spec-driven/SOURCE-SNAPSHOT-ADR.md); reading a pack or generating a worksheet does not activate ontology.
 
-## What lives where
-
-| Concern | Lives in | Stable across projects? |
-|---|---|---|
-| Entry YAML field shape | `shared/SCHEMA.md` + `entry.schema.yaml` | yes |
-| Knowledge type B1~B7 meaning | `shared/KNOWLEDGE_TYPES.md` | yes |
-| Verification status lifecycle | `shared/STATUS_LIFECYCLE.md` | yes |
-| How to register a new project | `shared/PROJECT_REGISTRATION.md` | yes |
-| Project metadata (code root, language) | `projects/<id>/project.yaml` | no |
-| Subsystem IDs A1~AN | `projects/<id>/subsystems.yaml` | no |
-| Entries | `projects/<id>/entries/*.yaml` | no |
-| Glossary (Korean/English alias → code keywords) | `projects/<id>/glossary.yaml` | no |
-| Status dashboard | `projects/<id>/inventory.md` | no |
-
-## Why per-project isolation
-
-- One project must not pollute another's index.
-- Korean aliases like "합의" map to different code symbols in different
-  blockchains (WBFT.Finalize vs Tendermint.Commit vs HotStuff.Decide).
-- Subsystem decompositions differ — go-stablenet's WBFT does not exist in
-  other clients; their A1 is a different module.
-- CKV/CKG indexes are built per project root; the inventory tracks which
-  index a project's entries belong to.
-
-## How CKS consumes this
-
-CKV indexes each project's source tree plus its `entries/*.yaml` files.
-Chunks carry a `project_id` tag so search results can filter or attribute
-hits to a project. `glossary.yaml` is wired into the vocabulary resolver
-of the active project so Korean prompts expand against the right code
-keywords.
-
-See `shared/PROJECT_REGISTRATION.md` to add a new project.
+See [registration](./shared/PROJECT_REGISTRATION.md), [entry fields](./shared/SCHEMA.md), [knowledge types](./shared/KNOWLEDGE_TYPES.md), [status lifecycle](./shared/STATUS_LIFECYCLE.md) and [worksheet catalog contract](../../../docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md).

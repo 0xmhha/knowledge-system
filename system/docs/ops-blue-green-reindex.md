@@ -1,130 +1,31 @@
-# 운영: 데이터셋 재인덱싱 + blue-green 전환 (P1-3/P1-4)
+# Versioned reindex, restart and rollback
 
-> 2026-07-10. 3자 합의(reindex-migration-design + consensus §10.6) 구현의 운영 절차.
-> 도구: `scripts/reindex-dataset.sh`(오케스트레이터) + `scripts/serve-cks-http.sh`(인스턴스)
-> + cks mcp 기동 alignment assert.
->
-> **2026-07-27 갱신**: 아래 shell 절차는 이제 Go 도구로 대체되었다(권장 경로는 바로
-> 다음 섹션). shell 스크립트는 여전히 동작하지만, 신규 운영은 Go 경로를 사용한다.
+Run coordinated builds through cks setup rather than writing a served pinned database with an engine command. The current implementation is in internal/setup and cmd/cks/setupcli. Flat legacy maintenance is supported separately; ops.index refuses versioned/pinned inputs before modifying engines.
 
-## Go 경로 (권장, 2026-07-27)
+## Dataset lifecycle
 
-레이아웃/게이트/불변식은 그대로이며(아래 섹션 유지), 오케스트레이션·서빙·전환이
-`cks setup`·`cks mcp`로 흡수되었다. shell 단계 → Go 대응:
+A versioned build captures declared source/knowledge/model inputs, writes a new candidate, validates alignment and gates, then switches current. Reusing a version name is rejected. hold-for-review keeps a candidate inactive until the explicit patch/criterion workflow allows promotion. Failed or cancelled candidates cannot replace the previously active complete version.
 
-| 작업 | shell (legacy) | Go (권장) |
-|---|---|---|
-| 재인덱싱(빌드→게이트→promote) | `reindex-dataset.sh run` | `cks setup --version <ver>` (CLI) 또는 MCP 도구 `ops.reindex`(job_id 반환, `ops.setup_status`로 폴링) |
-| 롤백 | `reindex-dataset.sh promote`(옛 ver) | `cks setup --rollback <prev-ver>` |
-| config 생성 | `gen-cks-config.sh` | `cks mcp gen-config`(원격 도달용은 `--lan`; sanitize `rules_path`는 baseline 절대경로로 자동 채움) |
-| 인스턴스 기동/정지 | `serve-cks-http.sh start/stop` | `cks mcp up`/`down`(`instances.yaml` 레지스트리, 포트 자동 배정, `graph_binary`/`vector_binary`로 ops.reindex 활성). `up --wait`로 `/healthz` serviceable까지 대기 |
-| 상태/준비 확인 | `serve-cks-http.sh status` | `cks mcp status`/`list`(`--ready`로 각 인스턴스 serviceability 프로브) |
-| 무중단 전환(blue-green) | 수동 green 기동→health→소비자 전환→blue 정지 | `cks mcp reload` — green을 임시 포트에 기동→`/healthz` 게이트 통과 시에만 real 포트로 교체(불건전 시 기존 인스턴스 무손상) |
-| identity/serviceable 확인 | `cks.ops.health` | `GET /healthz`(200=serviceable, 503+reason; reason은 loopback에만) 또는 `cks.ops.health` |
-| 클라이언트 등록 스니펫 | 수동 | `cks mcp client-config --config <cfg>`(HTTP URL 또는 stdio command; `--http-addr`로 런타임 포트 override) |
-
-게이트 스위트(§5.1의 5단계)는 `internal/setup`의 Reindex 게이트로 이식되었다:
-ckg validate / manifest-align(commit·digest·schema≥1.19) / chunk_count>0 /
-canonical 비율(B7 라이브 대신; `min_canonical_ratio=0`이면 게이트 비활성 warning 방출) /
-soft ckg audit. `current` 심볼릭 원자 교체 1회가 graph+vector를 함께 덮으므로 별도
-graph promote는 없다. reindex lock은 소유자 PID/시각을 기록해 크래시 후 stale lock을
-자동 회복한다.
-
-**주의(보안, #23):** prod 설정은 sanitize `rules_path`가 비어 있으면(NOOP redaction)
-로드가 거부된다. `gen-config`가 baseline 절대경로로 자동 채우므로 정상 경로는 영향
-없지만, 손수 작성한 prod 설정은 `rules_path`를 지정해야 한다(`logging.mode: dev`는 예외).
-
-`ops-blue-green-reindex` 세부 배경은
-[remaining-work.md](./remaining-work.md) "MCP-server hardening + review-driven improvements" 및
-커버리지 감사
-[legacy-ops-go-coverage-audit.md](../../docs/dev/2026-07-27-legacy-ops-go-coverage-audit.md)
-참조.
-
-## 레이아웃 (합의 확정)
-
-```
-knowledge-data/
-  <family>@<short-commit>-<digest8>/   # 불변 버전 아티팩트 (예: pr-77-2@0bf2f4d1-a1b2c3d4)
-    graph-db/    graph.db + manifest.json     (ckg)
-    vector-db/   vector.db + manifest.json    (ckv, sources 원장 포함)
-  <family>@current -> <family>@<ver>   # promote가 움직이는 유일한 포인터
-  .<family>.build.lock.d/              # 빌드 직렬화 (mkdir 원자 락, 서빙과 무관)
+```sh
+bin/cks setup --help
+bin/cks setup --src /abs/source --out /abs/datasets --version next --config /abs/setup.yaml
+bin/cks setup --out /abs/datasets --rollback previous
 ```
 
-- `<ver>` = `<short-commit>-<graph_digest[:8]>`. CKG가 digest를 공표하기 전까지는
-  `<short-commit>-<UTC타임스탬프>`(과도기, 스크립트가 note 출력).
-- 버전 디렉터리는 **생성 후 불변**. 롤백 = 이전 버전 디렉터리로 다시 promote.
+Choose project/source-mode and selected pack/model identity through the reviewed setup configuration. Resource limits, deadlines and Git history bounds are explicit. Shared writer locks and durable candidate/pointer steps protect managed transitions; network filesystems or direct low-level writes are outside those guarantees.
 
-## 재인덱싱 (조율 파이프라인)
+A running server pins its resolved dataset and reader lease. After promotion, use the explicit instance restart/reload path to serve the new version; promotion alone does not swap an already-pinned reader. Retention/GC protects current, rollback, held review and live reader references. Inspect dry-run output before reclaiming storage.
 
-```bash
-FAMILY=pr-77-2 SRC=/abs/indexed-checkout \
-  [CKG_POLICY=...] [CKV_POLICY=...] [CKV_DOCS=a,b] [CKV_FLOW=corpus.jsonl] [CKV_PR=1] \
-  scripts/reindex-dataset.sh run
+## Instance management
+
+cks mcp up/down/status/list manage configured instances. cks mcp reload starts a candidate serving process, checks readiness, and changes the serving instance only through its gated path. Inspect health/alignment and the generated client configuration after a change. [Availability](./ops-availability.md) covers supervision, dependency recovery, networking and power policy.
+
+```sh
+bin/cks mcp status --help
+bin/cks mcp reload --help
+bin/cks mcp client-config --help
 ```
 
-순서(§3.2): **lock → ckg build → 버전 디렉터리 확정 → ckv build(`--ckg` 정렬, sources
-원장 기록) → 검증 게이트 → promote(@current 원자 교체)**. 크래시 시 @current는 옛
-버전을 그대로 가리킴(라이브 무손상), `@staging-*`/`.building` 잔재는 수동 정리.
+Do not confuse the dataset current pointer with HTTP instance routing. Rollback is a managed pointer transition to a valid retained version, not a way to bypass review hold. A durability_uncertain result after rename/sync failure cannot be treated as proof current never changed. Re-read status and follow the recorded recovery intent.
 
-### 검증 게이트 (§5.1 — 실패 시 promote 안 함)
-
-| # | 검사 | 강도 |
-|---|---|---|
-| 1 | `ckg validate` (dangling edge·스키마 불변식) | HARD |
-| 2 | manifest alignment: src_commit 일치, schema ≥1.19, digest(양측 공표 시) | HARD |
-| 3 | counts: ckv chunk_count > 0 | HARD |
-| 4 | B7 canonical 매칭률 ≥90% (cks 라이브 fixture; `SKIP_LIVE_GATE=1`로 스킵 가능) | HARD |
-| 5 | `ckg audit` (파일셋 대조) | SOFT |
-
-게이트만 따로: `VERDIR=/abs/<family>@<ver> scripts/reindex-dataset.sh gate`
-(2026-07-10 라이브 검증: pr-77-2 실산출물로 5단계 전부 통과 확인.)
-
-## 서빙 전환
-
-`cks mcp`는 **기동 시 1회** 심볼릭을 resolve해 구체 버전에 고정(수명 내 재해석 없음,
-health가 resolved 경로·`alignment` 블록으로 identity 증명). 전환 방법 2가지:
-
-### (a) 재시작 전환 (기본 — 세션/벤치 경계에서)
-```bash
-CKS_DATASET_DIR=$KD/<family>@current GO_STABLENET_ROOT=<SRC> scripts/gen-cks-config.sh
-scripts/serve-cks-http.sh restart          # ≤15s (엔진 오픈 + intent 앵커 pre-embed)
-```
-또는 `RESTART=1 … reindex-dataset.sh run`으로 promote 직후 자동 수행.
-
-### (b) 인스턴스 blue-green (무중단이 필요할 때)
-in-process reload는 하지 않는다(합의) — 대신 **인스턴스를 통째로 교체**한다:
-```bash
-# 1. 새 버전을 새 이름·포트로 기동 (green)
-CKS_HTTP_CONFIG=<new-config> scripts/serve-cks-http.sh start cks-<family>-green <ip>:8081
-# 2. health로 identity 검증 (name / dataset 버전 / alignment.ok / serviceable)
-# 3. 소비자 전환: CKS_MCP_URL → :8081  (전역 settings 또는 프로젝트 settings.local.json)
-# 4. 구 인스턴스(blue) 정지
-scripts/serve-cks-http.sh stop cks-<family>
-```
-전환 원칙: **run 중 데이터셋 교체 금지** — 측정 무결성을 위해 세션/벤치 경계에서만.
-
-## 롤백
-
-```bash
-VERDIR=$KD/<family>@<이전-ver> scripts/reindex-dataset.sh promote   # 포인터 되돌림
-scripts/serve-cks-http.sh restart
-```
-옛 버전 디렉터리가 곧 백업. 보존 정책(최근 N개 유지 후 GC)은 후속 결정(§9).
-
-## 상태/진단
-
-```bash
-FAMILY=<family> scripts/reindex-dataset.sh status   # current·버전 목록·락 유무
-# 서빙 identity: cks.ops.health → name / builder_version / backends.*.data_path(resolved)
-#                / alignment{ok, src_commit_*, schema, digest, warnings}
-```
-
-- `alignment.warnings`의 "sources.ckg ledger absent"는 **pre-P1 ckv 인덱스** 표시 —
-  새 ckv로 재빌드한 버전부터 자동 소거(합의).
-- commit/digest 불일치는 `serviceable=false`(fail-loud) — 그 인스턴스는 진단용으로만
-  살아있고 쿼리는 거부된다.
-
-## 미결(§9 후속)
-- 증분을 서빙본에 직접 vs swap-only — 정책 미결(현재 오케스트레이터는 항상 새 버전 빌드).
-- 버전 보존/GC 정책, 도메인지식 커밋별 버전 관리.
+[Source identity](../../docs/spec-driven/SOURCE-SNAPSHOT-ADR.md), [public write boundary](../../docs/spec-driven/PUBLIC-CONTRACT-V2.md), [patch review](../../docs/spec-driven/PATCH-WORKFLOW.md) and [remaining work](../../docs/REMAINING-WORK.md) define the current contracts and limits.

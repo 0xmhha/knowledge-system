@@ -1,6 +1,6 @@
-# D5 상세 설계: 사용자 소유 도메인 지식 팩
+# 사용자 소유 도메인 지식 팩 계약
 
-상태: **D5-01–07 사용자 설계 승인** · 2026-10-01. 승인 내용은 [`D5-DECISION-REVIEW.md`](./D5-DECISION-REVIEW.md)에 기록한다. D1의 [`ontology-pilot.yaml`](./ontology-pilot.yaml) 20개 ID·정의·종류는 변경하지 않는다. 이 문서는 설치형 CKS가 산업별 어휘와 조직의 정책·설계 이유를 선택적으로 수용하기 위한 목표 계약이다. 현행 `ExtractOntology`/CLI가 이 형식을 지원한다는 뜻은 아니다.
+현재 구현 계약. core20 타입, 명시 선택 로컬 팩, lock, 정책/ADR/관계/검토 입력과 v2 선택 문맥을 지원한다. 구현의 기준은 internal/system/knowledgepack과 cmd/cks/knowledgecli다. core20 정의와 승인 입력은 변경하지 않는다. 조직 인증·업무 사실의 독립적 사람 검토는 자동 제공하지 않는다.
 
 ## 1. 목적과 경계
 
@@ -24,7 +24,7 @@ CKS는 팩을 읽고 근거 문맥을 코딩 에이전트에게 제공하지만 
 
 ## 3. 입력 배치와 잠금
 
-프로젝트 소유 입력은 `.cks/knowledge/` 아래에 둔다. Git 저장소이면 일반 저장소 파일로, 비Git이면 A4의 `snapshot-only` 캡처 원천으로 처리한다. 사용자가 별도 로컬 경로를 등록한 팩은 네트워크에서 자동 다운로드하지 않고 캡처 시 `origin_id=knowledge:<pack_id>`로 보관한다. 등록되지 않은 절대 경로나 심볼릭 링크는 읽지 않는다. 제외·민감 경로는 CKV/CKG와 같은 캡처 정책을 거친다.
+프로젝트 소유 입력은 `.cks/knowledge/` 아래에 둔다. Git 저장소이면 일반 저장소 파일로, 비Git이면 원문 계약의 `snapshot-only` 캡처 원천으로 처리한다. 사용자가 별도 로컬 경로를 등록한 팩은 네트워크에서 자동 다운로드하지 않고 캡처 시 `origin_id=knowledge:<pack_id>`로 보관한다. 등록되지 않은 절대 경로나 심볼릭 링크는 읽지 않는다. 제외·민감 경로는 CKV/CKG와 같은 캡처 정책을 거친다.
 
 ```text
 .cks/knowledge/manifest.yaml          # 프로젝트 ID, 선택 팩, 소스 범위
@@ -35,17 +35,17 @@ CKS는 팩을 읽고 근거 문맥을 코딩 에이전트에게 제공하지만 
 .cks/knowledge/questions/*.yaml        # 업무 질문·기대 경로·금지 해석
 ```
 
-`cks knowledge init`은 템플릿을 만들지만 기존 파일을 덮어쓰지 않는다. `cks knowledge validate`는 읽기 전용으로 구문·타입·출처·충돌을 보고한다. `cks knowledge lock`은 명시 선택된 로컬 팩의 바이트를 해시해 재현 가능한 잠금 파일을 만든다. `cks knowledge review`는 제안 인스턴스/관계와 원천을 제시하고 사람의 검토 기록을 입력 원본에 남긴다. 실제 인덱스 빌드는 잠금 파일이 입력 바이트와 다르면 `pack_lock_mismatch`로 실패한다. 새 명령과 파일 형식은 A5.4/A5.5/A7.1 구현 과제다.
+`cks knowledge init`은 템플릿을 만들지만 기존 파일을 덮어쓰지 않는다. `cks knowledge validate`는 읽기 전용으로 구문·타입·출처·충돌을 보고한다. `cks knowledge lock`은 명시 선택된 로컬 팩의 바이트를 해시해 재현 가능한 잠금 파일을 만든다. `cks knowledge review`는 제안 인스턴스/관계와 원천을 제시하고 사람의 검토 기록을 입력 원본에 남긴다. 실제 인덱스 빌드는 잠금 파일이 입력 바이트와 다르면 `pack_lock_mismatch`로 실패한다. 위 명령과 lock 검증은 구현되어 있다. `--project-root`로 프로젝트 루트를 명시한다.
 
-잠금 파일은 `project_id`, `pack_schema_version`, 정렬된 `{pack_id, version, digest, dependencies, origin_id}`와 `overlay_digest`를 담고, 정규화된 바이트의 SHA-256으로 자체 `lock_digest`를 만든다. 자가 참조를 피하기 위해 `lock_digest` 필드는 해시 입력에서 제외한다. **`overlay_digest`의 입력에서는 `knowledge.lock.json` 전체를 제외**하고, `manifest.yaml` 및 `domain/`, `policies/`, `decisions/`, `questions/`의 등록된 일반 파일을 `(origin_id,path)` 순서로 해시한다. 각 파일 레코드는 A4의 상대 경로 정규화·바이트 SHA-256 규칙을 따르며 임시/숨김/미등록 파일을 묵인하지 않는다. `manifest.yaml`의 `source`는 저장소 루트 기준 상대 경로 또는 별도 등록한 로컬 루트의 `origin_id` 참조이며, 절대 경로·심볼릭 링크·루트 탈출은 거부한다. 외부 팩의 정확한 파일 목록과 다이제스트는 A4 원천 매니페스트에도 포함한다. `build_recipe_digest`는 `lock_digest`, resolver/renderer 버전과 관계 검증기 버전을 포함한다. 그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다. 기존 데이터셋을 제자리 수정하지 않는다.
+잠금 파일은 `project_id`, `pack_schema_version`, 정렬된 `{pack_id, version, digest, dependencies, origin_id}`와 `overlay_digest`를 담고, 정규화된 바이트의 SHA-256으로 자체 `lock_digest`를 만든다. 자가 참조를 피하기 위해 `lock_digest` 필드는 해시 입력에서 제외한다. **`overlay_digest`의 입력에서는 `knowledge.lock.json` 전체를 제외**하고, `manifest.yaml` 및 `domain/`, `policies/`, `decisions/`, `questions/`의 등록된 일반 파일을 `(origin_id,path)` 순서로 해시한다. 각 파일 레코드는 원문 캡처의 상대 경로 정규화·바이트 SHA-256 규칙을 따르며 임시/숨김/미등록 파일을 묵인하지 않는다. `manifest.yaml`의 `source`는 저장소 루트 기준 상대 경로 또는 별도 등록한 로컬 루트의 `origin_id` 참조이며, 절대 경로·심볼릭 링크·루트 탈출은 거부한다. 외부 팩의 정확한 파일 목록과 다이제스트는 원천 매니페스트에도 포함한다. `build_recipe_digest`는 `lock_digest`, resolver/renderer 버전과 관계 검증기 버전을 포함한다. 그러므로 같은 코드라도 팩이나 프로젝트 정책 바이트가 바뀌면 새 `dataset_id`가 된다. 기존 데이터셋을 제자리 수정하지 않는다.
 
-잠금의 `digest`와 `overlay_digest`는 정렬된 파일 레코드의 길이 접두어 직렬화에 대해 계산한다. 파일 해시는 **원문 바이트**에 대해 계산하므로 YAML 키 순서나 Markdown 공백 변경도 새 잠금을 요구한다. `lock_digest`만 잠금 객체에서 해당 필드를 제거한 뒤 키 순서가 고정된 정규 JSON 바이트에 대해 계산한다. 이 두 해시 절차의 골든 바이트와 충돌/누락 오류 코드는 A5.4 fixture로 고정한다.
+잠금의 `digest`와 `overlay_digest`는 정렬된 파일 레코드의 길이 접두어 직렬화에 대해 계산한다. 파일 해시는 **원문 바이트**에 대해 계산하므로 YAML 키 순서나 Markdown 공백 변경도 새 잠금을 요구한다. `lock_digest`만 잠금 객체에서 해당 필드를 제거한 뒤 키 순서가 고정된 정규 JSON 바이트에 대해 계산한다. 해시·충돌·누락 오류는 현재 pack/lock 시험과 소비자 회귀로 검증한다.
 
 ## 4. 팩 스키마와 합성
 
 팩 정의의 최소 필드는 `pack_schema_version=1`, `pack_id`, `version`, `owner`, `scope`, `requires`(정확 버전/다이제스트), `concepts`, `relation_types`, `constraints`, `competency_questions`다. `pack_id`는 소문자 점 구분 네임스페이스, 로컬 타입 ID는 D1의 소문자 케밥 형식을 사용한다. 참조의 논리 키는 **`(pack_id, local_id)` 튜플**이고 직렬화·해시는 D2의 길이 접두어 규칙을 쓴다. 화면에 표시할 `pack_id#local_id` 문자열은 조인 키나 파서의 유일 근거가 아니다. 같은 ID/라벨이 서로 다른 팩에 있더라도 자동 병합하지 않는다.
 
-입력의 최소 모양은 다음과 같다. **목표 형식 예시**이며 현행 파서는 읽지 못한다. `source`는 명시 등록된 로컬 디렉터리만 가리키고 빌더가 원문을 캡처해 고정한다.
+입력의 최소 모양은 다음과 같다. **현재 입력 형식 예시**다. 예시 해시는 실제 바이트 계산 값으로 대체해야 한다. `source`는 명시 등록된 로컬 디렉터리만 가리키고 빌더가 원문을 캡처해 고정한다.
 
 ```yaml
 # .cks/knowledge/manifest.yaml
@@ -80,7 +80,7 @@ source_ref: {origin_id: repo, path: .cks/knowledge/policies/BR-17.yaml}
 
 관계 타입은 `{predicate, subject_type, object_type, direction, cardinality, required_evidence, review_rule}`을 가진다. 확장 관계명은 팩으로 한정한다. 관계 인스턴스는 양쪽 원천, 스냅샷, 검토자, 상태와 관계 타입 버전을 가진다. `Concept IMPLEMENTED_BY CodeSymbol` 같은 D1 관계는 예약어로 유지한다. 산업 팩은 새 타입 관계를 선언할 수 있지만 CKG의 AST 사실이나 CKV 청크를 복제하지 않는다. 제약 검증은 타입·필수 필드·카디널리티·참조 무결성을 검사한다. RDF/OWL 또는 SHACL 런타임은 필수가 아니며, [SHACL](https://www.w3.org/TR/shacl/)과 유사한 형상 검증을 구현 계약으로 삼는다.
 
-현행 `OntologyPack`은 `project_id`를 필수로 하는 단일 파일이며 `Concept.ID`와 허용 술어가 전역으로 고정돼 있다. A5.4는 이 파일을 **legacy core 입력**으로 읽는 어댑터를 둔다. 새 팩 인덱스와 의미 투영에는 튜플 키를 기록하고, 기존 `project` 등 20개 ID/구 투영 JSON은 읽기 전용으로 보존한다. D1의 `ACCEPTED_BY`→`CHECKED_BY` 이전과 팩 이전은 별도 골든으로 검증한다. 새 팩 투영의 정확한 파일 스키마 버전은 A5.1의 좌표/술어 마이그레이션 뒤 **v4**로 지정한다. 현재 SQLite `StoreSchemaVersion=3`은 다른 버전 축이며 v4 투영 번호와 같다고 가정하지 않는다.
+현행 `OntologyPack`은 `project_id`를 필수로 하는 단일 파일이며 `Concept.ID`와 허용 술어가 전역으로 고정돼 있다. 현재 어댑터는 이 파일을 **legacy core 입력**으로 읽는다. 새 팩 인덱스와 의미 투영에는 튜플 키를 기록하고, 기존 `project` 등 20개 ID/구 투영 JSON은 읽기 전용으로 보존한다. D1의 `ACCEPTED_BY`→`CHECKED_BY` 이전과 팩 이전은 별도 골든으로 검증한다. 현재 튜플 기반 팩 투영의 파일 스키마 버전은 **v4**다. 현재 SQLite `StoreSchemaVersion=3`은 다른 버전 축이며 v4 투영 번호와 같다고 가정하지 않는다.
 
 ## 5. 사용자가 제공하는 지식 인스턴스
 

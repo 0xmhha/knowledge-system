@@ -1,10 +1,10 @@
 # CKS 평가 판정 계약
 
-v1/v2의 전체 원응답과 warmup/검색/warm/프로세스 시작 시간을 수집하는 `cks eval capture`, CKV 직접 후보 상한·독립 exact 오라클은 [B0 측정 도구](./B0-MEASUREMENT-TOOLS.md)를 참고한다. 점수 계산과 정답·정책 사실의 검토는 별도다.
+v1/v2의 전체 원응답과 warmup/검색/warm/프로세스 시작 시간을 수집하는 `cks eval capture`, CKV 직접 후보 상한·독립 exact 오라클은 [B0 측정 도구](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/spec-driven/B0-MEASUREMENT-TOOLS.md)를 참고한다. 점수 계산과 정답·정책 사실의 검토는 별도다.
 
 `cks eval`은 CKS MCP가 반환한 EvidencePack을 측정한다. 생성 모델의 최종 답변, 수용 기준의 실행 결과, 온톨로지 해석의 정확도를 판정하지 않는다. 시나리오 YAML은 기존 `version: 1`을 유지한다.
 
-`--record-responses`를 명시하면 각 시나리오의 `raw_calls`에 도구명, 요청 인수, 호출 시간 `elapsed_ns`, SDK가 해석한 전체 MCP 결과를 기록한다. freshness 검사, 오류 도구 결과, 전송 실패도 남기며 성공 실행만 모으지 않는다. 응답은 점수 집계 전에 복사하고 요청에는 프롬프트와 선택적 intent만 전달한다. 정답·후보 답변은 전달하지 않는다. 원응답에는 인용 본문이 포함될 수 있으므로 평가 자료로 관리한다. 이 옵션은 기본 꺼짐이며 기존 보고서 형태를 유지한다. 기록·JSON 직렬화 시간은 도구 호출 지연에서 제외한다. 프로세스 시작과 모델 로딩이 포함된 cold 지연 또는 warmup 분리는 별도 측정 프로토콜에서 처리한다. 이 옵션은 v1 평가 경로만 기록하며 v2·직접 CKV exact/budget 실행 도구는 별도 작업이다.
+`--record-responses`를 명시하면 각 시나리오의 `raw_calls`에 도구명, 요청 인수, 호출 시간 `elapsed_ns`, SDK가 해석한 전체 MCP 결과를 기록한다. freshness 검사, 오류 도구 결과, 전송 실패도 남기며 성공 실행만 모으지 않는다. 응답은 점수 집계 전에 복사하고 요청에는 프롬프트와 선택적 intent만 전달한다. 정답·후보 답변은 전달하지 않는다. 원응답에는 인용 본문이 포함될 수 있으므로 평가 자료로 관리한다. 이 옵션은 기본 꺼짐이며 기존 보고서 형태를 유지한다. 기록·JSON 직렬화 시간은 도구 호출 지연에서 제외한다. 프로세스 시작과 모델 로딩이 포함된 cold 지연 또는 warmup 분리는 별도 측정 프로토콜에서 처리한다. 이 옵션은 v1 평가 경로만 기록하며 v2는 현재 capture/matrix 경로와 원자료 검증으로 수집한다. 직접 CKV exact/budget 측정은 별도 후보/오라클 경로다.
 
 ```yaml
 version: 1
@@ -35,3 +35,7 @@ runs: 1
 `file_recall` 등의 수치는 종전과 같이 실행별 중앙값이다. `retrieval_state=miss`는 한 번이라도 회수율이 1 미만이면 기록하므로 중앙값이 일시적 실패를 가리지 못한다. 기존 `citation_abstention_passed`는 호환을 위해 유지한다. 빈 `expected_citations`만으로는 보류 판정을 요청하지 않는다. 명시적인 `expect_no_citations: true`가 필요하다.
 
 이 계약의 실제 CKS 스모크는 `scripts/wbs-smoke.sh`에 있다. 고정된 Git fixture, mock 임베더, 답을 찾는 시나리오, 인용을 삼가야 하는 시나리오 및 의도적인 커밋 충돌을 실행한다. 이는 상태 분류와 스냅샷 보호의 구조 검증이다. 검색 품질 게이트에는 실제 임베딩 모델, 고정 질문 세트, 지연·회수율 기준과 별도의 답변 검토가 필요하다.
+
+## 현재 수집 경로와 범위
+
+cks eval capture는 실제 v1/v2 원응답·warmup/retrieval/warm/cold 분모와 실패를 수집한다. cks eval matrix는 명시 입력·실행 환경·모델/소스/질문/설정을 결합한다. cks semantic compare-responses는 저장 팩을 검증하고 차이를 보고하며 품질·지연 합격을 판정하지 않는다. 승인 입력과 사전 protocol을 먼저 고정한다. 과거 FINAL/DEV를 새 독립 holdout으로 재사용하지 않고, 반복·언어 변형·동일 사실군을 독립 표본으로 부풀리지 않는다. 현재 관측과 미입증 범위는 [평가 상태](./EVALUATION-STATUS.md)를 따른다.

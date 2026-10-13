@@ -16,15 +16,15 @@ of symbols, call edges, temporal hunks, and the distributed surface (HTTP/gRPC).
 
 ## The three-project triangle (CKG / CKV / CKS)
 
-CKG is *one* of three sister projects designed to compose:
+CKG is *one* of three engines designed to compose inside this module:
 
-- **CKG** (this repo) — source → **graph** DB. Symbol identity, call edges,
+- **CKG** (graph engine) — source → **graph** DB. Symbol identity, call edges,
   temporal hunks, distributed surface. Deterministic SQL store.
-- **CKV** (`code-knowledge-vector`, separate repo) — source → **vector**
+- **CKV** (vector engine) — source → **vector**
   knowledge + **vocabulary bridge** (Korean / vague → exact English keywords).
-- **CKS** (`code-knowledge-system`, separate repo) — orchestrator. A coding
+- **CKS** (composition engine) — orchestrator. A coding
   agent talks to CKS; CKS uses CKV (vocab bridge) → CKG (keyword retrieval) →
-  LLM (request + retrieved code), runs tests, and opens a PR on green.
+  an external LLM client (request + retrieved code). Test execution and PR publication belong to explicit agent/user workflows.
 
 ## CKG's job in the triangle (the responsibility boundary)
 
@@ -43,12 +43,12 @@ Concretely, for a keyword (e.g. `"GovStaking deposit"`) CKG returns:
 > metric.** The standing north star is: **6-axis graph build + keyword-query
 > retrieval at high accuracy**, measured by the `eval` surface against a gold
 > set. (The *current* score is a Tier 3 status fact, tracked in
-> `docs/graph/archive/eval-trajectory.md` and `eval/baseline/`, not here.)
+> [historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/archive/eval-trajectory.md) and `eval/baseline/`, not here.)
 
 ## Core values
 
 Three user-articulated values shape every design trade-off (moved here from
-`docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` §1.2 so they are not lost in cleanups):
+[historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md) §1.2 so they are not lost in cleanups):
 
 1. **Accuracy** — return precisely the right code; wrong-answer is worse than
    no-answer (this is why retrieval accuracy is the first-class metric).
@@ -82,7 +82,7 @@ contract changes.
 
 ---
 
-*Source basis: `docs/graph/archive/PROJECT-OVERVIEW.md`,
-`docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md` (both archived 2026-07-18),
+*Source basis: [historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/archive/PROJECT-OVERVIEW.md),
+[historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/graph/archive/PROJECT-BLUEPRINT-ALIGNMENT.md) (both archived 2026-07-18),
 `docs/graph/ARCHITECTURE.md`. This file is the distilled, timeless statement of
 intent; the fuller status references it drew from are now in `docs/graph/archive/`.*

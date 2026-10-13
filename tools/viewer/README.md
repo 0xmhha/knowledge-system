@@ -152,9 +152,9 @@ make -C graph viewer && make build-bins
 
 ---
 
-## 8. 시각 효과 (2026-05-21 시점)
+## 8. 시각 효과 구현 위치
 
-이 viewer가 지금 가진 4가지 시각 효과의 정의 위치:
+다음 효과의 구현 위치를 기준으로 동작을 확인한다:
 
 | 효과 | 위치 | 키 변수 |
 |---|---|---|
@@ -163,8 +163,7 @@ make -C graph viewer && make build-bins
 | Focus-locked orbit (선택 노드 중심 회전) | `GraphCanvas.tsx centerOnNode` 3D + `zoomReset` | `controls().target.set(...)` |
 | Edge gradient (src 불투명 → dst 투명) | `GraphCanvas.tsx linkCanvasObject` 2D | `linkCanvasObjectMode='after'`, alpha 0.85→0 |
 
-대기 중: BFS-ripple (선택 시 1회 0.5초 펄스) — react-force-graph cooldown 이후
-redraw 강제 필요라 별도 라운드.
+BFS-ripple은 기존 문서의 선택적 UI 제안이며 필수 잔여로 승인된 기능이 아니다. 채택 시 cooldown 후 redraw와 성능·접근성 기준을 정해 [별도 후속 범위](../../docs/REMAINING-WORK.md)로 진행한다.
 
 ---
 

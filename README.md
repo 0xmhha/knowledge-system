@@ -27,20 +27,15 @@ the source checkout is whatever tree the pack you build indexes.
 
 ### Go
 
-`go.mod` declares `go 1.25.13`, and Go manages the rest: whatever release
-you install, `GOTOOLCHAIN=auto` (the default) downloads and uses the
-declared toolchain on the first build. Installing the latest release is
-enough:
+`go.mod` declares Go1.25.13 as the minimum. Go uses an already-installed newer compatible toolchain; `GOTOOLCHAIN=auto` can fetch a required newer version when the installed one is too old. A pinned `GOTOOLCHAIN=local` requires the toolchain to be installed explicitly.
+
+The pinned linter requires Go1.26. Whole-module build/lint/race CI uses Go1.26.9, while vector and native installation jobs retain minimum-version coverage:
 
 ```sh
-brew install go       # or download from https://go.dev/dl/
 go version
+GOTOOLCHAIN=go1.26.9 make build
+GOTOOLCHAIN=go1.26.9 make lint
 ```
-
-If a build fails with `go.mod requires go >= 1.25.13` the machine has
-`GOTOOLCHAIN` pinned (usually `local`, common on machines that forbid
-toolchain downloads). Either install go1.25.13+ directly, or allow the
-download for that one command: `GOTOOLCHAIN=auto make build`.
 
 ### C toolchain
 
@@ -88,8 +83,7 @@ ollama serve &                      # if not already running
 ollama pull bge-m3
 ```
 
-**Install the app cask, not the brew formula.** The formula ships without
-`llama-server` on Apple Silicon and embedding requests fail against it.
+Use a complete Ollama installation that serves the embedding API. Verify the endpoint and model response below rather than inferring capability from the package name.
 
 Check it answers and returns the expected 1024 dimensions:
 
@@ -225,3 +219,7 @@ Per-engine detail lives in [`graph/README.md`](graph/README.md),
 ## License
 
 AGPL-3.0 — see [LICENSE](LICENSE).
+
+## Current documentation and unfinished scope
+
+Read the [documentation index](docs/README.md) and [remaining work](docs/REMAINING-WORK.md). Source-bound evaluation completion does not establish independent quality improvement or approve deployment. Optional ontology retrieval remains off; release trust/tag/deployment conditions are documented separately.

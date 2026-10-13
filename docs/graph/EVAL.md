@@ -17,13 +17,13 @@ Five deterministic steps, all against a self-index of this repository
 
 | Step | Command under the hood | Output |
 |---|---|---|
-| 1. self-index | `ckg build --src=.. --files-from-main ./cmd/graph --fail-on-parse-errors` | `graph/eval/.ckg-data` |
+| 1. self-index | `ckg build --src=.. --files-from-main ./cmd/graph --fail-on-parse-errors` | `graph/eval/.ckg-data` (generated) |
 | 2. validate | `ckg validate --format=json` | `validate.json` (schema integrity; issue count must not rise) |
 | 3. benchmark | `ckg benchmark --format=json` | `benchmark.json` (token reduction) |
 | 4. bench-mcp | `ckg bench-mcp --depth-sweep --iterations=50` | `bench-mcp.json` (tool latency p50/p95/p99) |
 | 5. retrieval | `ckg eval-retrieval --fixtures=eval/retrieval` | `retrieval.json` (recall/precision/F1 over pinned fixtures) |
 
-Results land in `graph/eval/results/latest/`; the committed baseline
+Results land in the generated `graph/eval/results/latest/`; the committed baseline
 lives in `graph/eval/baseline/`.
 
 ## Gate (CI)

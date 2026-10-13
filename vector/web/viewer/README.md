@@ -18,6 +18,8 @@ Embedding Projector 의 UX(3D 축·회전·타이핑 즉시 하이라이트)를 
 ## 실행
 
 ```bash
+cd vector/web/viewer
+
 # 0) 전제: ollama serve + ollama pull bge-m3, ckv 바이너리(or go run)
 # 설정은 전부 env/플래그 — 코드에 머신 종속 경로 없음:
 #   CKV_DB   : ckv 데이터 디렉토리 (기본 ./ckv-data — ckv CLI --out 기본값과 동일)

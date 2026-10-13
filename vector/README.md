@@ -12,15 +12,12 @@ an MCP server. The in-repo graph engine (CKG) provides symbol-graph
 search; the two are combined by the system engine (CKS) for hybrid
 retrieval.
 
-> **Resuming work on a different machine or in a new session?**
-> Start with [`docs/vector/archive/session-handoff-2026-05-23.md`](../docs/vector/archive/session-handoff-2026-05-23.md)
-> — it carries the prereq checklist, env-var matrix, current decision
-> state, and the next-Wave entry conditions in a single document.
+> Start with the [current handoff](../docs/spec-driven/CURRENT-HANDOFF.md) and [remaining work](../docs/REMAINING-WORK.md).
 
 ## Features
 
 - **Languages**: Go (`go/parser`), TypeScript / TSX, JavaScript / JSX / MJS / CJS, Solidity, Markdown.
-- **Embedders**: `mock` (no system dependencies, deterministic feature-hash) and `bgeonnx` (ONNX Runtime + HuggingFace tokenizers, BERT-class models).
+- **Embedders**: `ollama` (default, BGE-M3), `mock` (deterministic feature-hash), and optional `bgeonnx` (ONNX Runtime + tokenizers).
 - **CLI**: `build`, `query`, `eval`, `freshness`, `mcp`, `model`.
 - **MCP server**: stdio JSON-RPC. Tools: `cks.context.semantic_search`, `cks.ops.health`, `cks.ops.warmup`, `cks.ops.get_freshness`. Every response carries a top-level `schema_version`.
 - **Go API**: import `github.com/0xmhha/knowledge-system/pkg/vector/ckv` for `Open` / `SemanticSearch` / `Warmup` / `Manifest` / `Close` in the calling process.
@@ -32,8 +29,8 @@ retrieval.
 
 ```bash
 make build
-./bin/ckv build --src /path/to/repo --out ./ckv-data
-./bin/ckv query "TCP socket bind on port" --out ./ckv-data
+./bin/ckv build --src /path/to/repo --out ./ckv-data --embedder mock
+./bin/ckv query "TCP socket bind on port" --out ./ckv-data --embedder mock
 ```
 
 ### CLI with `bgeonnx` (real semantic embeddings)
@@ -87,14 +84,10 @@ migration off subprocess MCP.
 ### MCP server
 
 ```bash
-./bin/ckv mcp --out ./ckv-data
+./bin/ckv mcp --out ./ckv-data --embedder mock
 ```
 
-Speaks MCP JSON-RPC over stdio. Register with Claude Code:
-
-```bash
-claude mcp add ckv --command "$(pwd)/bin/ckv mcp --out=$(pwd)/ckv-data"
-```
+Speaks MCP JSON-RPC over stdio. Configure the client to run the absolute binary path with the index path and matching embedder arguments. The complete tool list is in [the MCP reference](../docs/vector/mcp-tools.md).
 
 ## Supported languages
 
@@ -110,14 +103,11 @@ claude mcp add ckv --command "$(pwd)/bin/ckv mcp --out=$(pwd)/ckv-data"
 
 | Backend | Build tag | System deps | Use case |
 |---|---|---|---|
-| `mock` | none (default) | none | tests, smoke checks — no semantic signal |
+| `ollama` | none | running Ollama and matching model | default BGE-M3 semantic search |
+| `mock` | none | none | tests, smoke checks — no semantic signal |
 | `bgeonnx` | `-tags bgeonnx` | `libonnxruntime`, `libtokenizers.a`, model files | production semantic search |
 
-The `bgeonnx` registry contains two model configs:
-`bge-large-en-v1.5` (default, BERT-class, 1024 dim) and
-`embeddinggemma-300m` (Gemma-class, 768 dim). Model files live under
-`~/.cache/ckv/models/<name>/`. The Gemma config is registered; the
-weights are not bundled with this repository.
+The model registry is [internal/vector/embed/registry](../internal/vector/embed/registry). A registered model without an ONNX export cannot use `bgeonnx`; model files and exact identity are not bundled. The direct CoreML adapter is not wired into the ordinary CLI dispatch.
 
 ## Architecture
 
@@ -126,13 +116,13 @@ ckv build   discover ── parse ── chunk ── embed ── sqlite-vec
                                                     │
                                                     └─ manifest.json
 ckv query   embed(intent) ── store.Search ── citation enforce ── snippet ── top-K
-ckv mcp     JSON-RPC stdio ── cks.context.* / cks.ops.*
+ckv mcp     JSON-RPC stdio ── vector tool registrations in pkg/vector/mcp
 pkg/vector/ckv     Engine wrapper around internal/vector/query (in-process consumers)
 ```
 
 ## Build requirements
 
-- Go 1.25+
+- Go 1.25.13 minimum; tool/lint CI uses Go 1.26.9
 - CGO enabled (for `sqlite-vec` via `mattn/go-sqlite3`)
 - `gcc` or `clang` toolchain
 - `libonnxruntime` and `libtokenizers.a` only when building with
@@ -141,8 +131,8 @@ pkg/vector/ckv     Engine wrapper around internal/vector/query (in-process consu
 ## Documentation
 
 - [`docs/vector/README.md`](../docs/vector/README.md) — **documentation index** (living reference vs design record vs archive). Start here.
-- [`docs/vector/remaining.md`](../docs/vector/remaining.md) — **work status single source of truth** (code-verified).
-- [`docs/vector/session-handoff-2026-06-29.md`](../docs/vector/session-handoff-2026-06-29.md) — narrative/background entry point (work status defers to `remaining.md`).
+- [Remaining work](../docs/REMAINING-WORK.md) — required holds and separately scoped follow-ups.
+- [Current handoff](../docs/spec-driven/CURRENT-HANDOFF.md) — current decisions and verification limits.
 - [`docs/vector/ARCHITECTURE.md`](../docs/vector/ARCHITECTURE.md), [`docs/vector/SCHEMA.md`](../docs/vector/SCHEMA.md) — module map + chunk/store schema.
 - [`docs/vector/mcp-tools.md`](../docs/vector/mcp-tools.md) — MCP tool I/O specs (19 tools).
 - [`docs/vector/embedder-integration.md`](../docs/vector/embedder-integration.md) — consumer integration: in-process API, MCP, env overrides.
@@ -154,4 +144,4 @@ pkg/vector/ckv     Engine wrapper around internal/vector/query (in-process consu
 
 ## License
 
-AGPL-3.0. See [`LICENSE`](LICENSE).
+AGPL-3.0. See [`LICENSE`](../LICENSE).

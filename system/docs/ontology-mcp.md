@@ -55,7 +55,7 @@ independent of enabling retrieval.
 
 ## What the evaluation supports
 
-The [final observation](../../docs/spec-driven/ONTOLOGY-FINAL-VERDICT-2026-10-13.md)
+The [final observation](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/spec-driven/ONTOLOGY-FINAL-VERDICT-2026-10-13.md)
 verified 702 responses / 351 pairs without errors. Recall stayed equal and the
 expected-rank measure declined slightly. Aggregate warm p95 increased 8.6%;
 three questions exceeded the descriptive 1.25 ratio. Independent approval was
@@ -64,4 +64,4 @@ no operating dataset/configuration was activated by the evaluation.
 
 For registration, all tool options and controlled capture guidance, use the
 [agent mapping](./coding-agent-mcp-mapping.md). For implementation and historical
-validation, use the [implementation record](../../docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).
+validation, use the [implementation record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).

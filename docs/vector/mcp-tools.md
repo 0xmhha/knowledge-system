@@ -381,4 +381,4 @@ agent가 jira ticket을 받았을 때 권장 호출 순서:
 - `internal/vector/query/engine.go` (Hit 스키마)
 - `pkg/vector/types/chunk.go` (Chunk 메타데이터)
 - `docs/vector/SCHEMA.md` (저장 스키마)
-- `docs/vector/archive/plan-2026-05-29-ckv-refactor.md` (도구 설계 결정 기록)
+- [historical record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/vector/archive/plan-2026-05-29-ckv-refactor.md) (도구 설계 결정 기록)

@@ -1,4 +1,4 @@
-# eval/ckv-mirror — CKV fixture mirror (ckg-NEW-5, Stage B)
+# CKV keyword fixture mirror
 
 LLM-free keyword-retrieval eval that **mirrors CKV's evaluation fixtures on the
 ckg side**, so ckg (keyword / FTS) and ckv (semantic / embeddings) can be
@@ -7,14 +7,13 @@ cross-referenced on **one query set over one corpus**.
 ## Why
 
 CKV scores its retrieval with natural-language *intents* against its own sample
-corpus (`code-knowledge-vector/testdata/sample`: `server.go`, `cache.go`,
+corpus (`testdata/sample`: `server.go`, `cache.go`,
 `token.sol`, `handler.ts`, `validator.go`, `client.js`, `docs/`). ckg answers
 the same information need with **keyword** tools (`search_text`, `find_symbol`),
 not embeddings. To compare the two on equal footing we index the *same code*
 with ckg and probe it with keyword/exact queries derived from the CKV intents.
 
-This is stage 1 (mirror) of the ckg-NEW-5 work. Stage 2 (broaden the same style
-of keyword fixtures over the real go-stablenet corpus) is tracked separately.
+These are owned deterministic fixtures. Broader real-corpus/semantic comparisons need separate inputs and acceptance criteria; see [remaining work](../../../docs/REMAINING-WORK.md).
 
 ## Layout
 
@@ -30,11 +29,11 @@ of keyword fixtures over the real go-stablenet corpus) is tracked separately.
 ## Run
 
 ```
-make eval-ckv-mirror
+make -C graph eval-ckv-mirror
 ```
 
 Builds `corpus/` into `.index/` and runs `ckg eval-retrieval`. Deterministic:
-same corpus + fixtures → same result. Current baseline: **12/12 pass, R=P=F1=1.00**.
+same corpus + fixtures → same result. The 12 fixtures are a small deterministic wiring scope. An earlier 12/12 result is historical, not a fresh real-corpus or semantic-quality verdict.
 
 ## Fixture ↔ CKV mapping
 

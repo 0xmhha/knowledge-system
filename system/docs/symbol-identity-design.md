@@ -8,7 +8,7 @@ the domain-knowledge anchors must conform to.
 > **Follow-up (2026-07-08, closed 2026-07-12)**: the `ckg_node_id` shared field is
 > retired in favor of `canonical_id` as the sole cross-repo join key — this finishes
 > the ADR-0001 migration. ckv dropped the column (origin/main), and cks dropped
-> `Hit.CKGNodeID` and its mapping. See [`retire-ckg-node-id.md`](./retire-ckg-node-id.md)
+> `Hit.CKGNodeID` and its mapping. See [`retire-ckg-node-id.md`](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/system/docs/retire-ckg-node-id.md)
 > for the cross-repo plan, the dead-code verdict, and the per-repo checklist.
 
 ## 1. Problem
