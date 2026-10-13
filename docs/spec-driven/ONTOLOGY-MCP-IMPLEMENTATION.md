@@ -90,3 +90,19 @@ v2 get_for_task의 `explain_ontology=true`는 요청 하나에만 설명을 붙�
 실제 운영 설정의 소스 commit은 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8이다. graph/vector가 같은 candidate에 있고 dataset identity·retained source manifest도 있으나 의미 store 경로는 비어 있으며 추적 ontology/spec 입력이 없다. 기존 projects/stablenet 팩은 glossary/flow/검토 자료로 존재하고 pack의 code baseline은 ec6a4e96b다. 이 자료를 새 source의 검토 ontology/spec/관계로 자동 승격하지 않는다. 기존 팩 기반 proposed 초안·출처/앵커 대조부터 준비한 뒤 실제 내용 검토와 대상 연결이 필요하다.
 
 다음 O03 proposed 입력/출처 정합성 준비, 이후 실제 검토·held 연결과 O04 actual off/on 평가. 전체 잔여는 N16/O03/O04의3개, 기존17/18·온톨로지2/4 유지다.
+
+## O03 후속: 실제 팩 기반 proposed subset과 원문·앵커 대조
+
+2026-10-13. [검토 묶음](../../projects/stablenet/domain-knowledge/meaning-draft/README.md)에 WBFT quorum/round-change/message-handlers/current-lock 개념4·요구4·기준5와 provenance를 작성했다. 기존 glossary·entry는 그대로이며, 정의/alias와 최초 invariant를 source field/line/SHA로 추적한다. concept kind/scope/preferred·Given/When/example 변환은 저자가 새로 제안한 내용이고 승인된 요구로 취급하지 않는다.
+
+기존 selected4 entry의 verified/mhha 기록과 2026-06-07/09 날짜를 보존했지만 **새 ReviewedBy는 비어 있고 전부 proposed**다. 관측source0bf2f4d1의 파일 SHA와 읽기 전용 graph anchor 점검을 남겼다. pack baselineec6a4e96b 객체가 로컬에 없어 baseline 바이트/diff 대조는 미확인이며 이를 파일 변경으로 판정하지 않는다. 원본47개 입력 SHA 보존. 전체 anchors --check는134checked/105clean/26drift/2review/1unresolved/16loc skipped로 exit1(기존 앵커 drift 관측)이다. 선택한16개는14symbol(12같은 정의 위치/2drift)+2line-only미검증이며, baseline과 file bytes 비교는 모두 미확인이다. 위치 검사는 행동/내용 검증이 아니다.
+
+R04는 기존 summary의 RLock 또는 write Lock 아래 읽기 허용과 첫 invariant의 RLock-only 표현 차이를 명시한 **새 수정 제안**이다. 현재 core.go:162 Lock와:166 current 읽기 관측을 근거로 표현을 구분했으며, 전체 access/race 감사를 했다고 주장하지 않는다. 이 해석과 criterion 변환의 실제 내용 채택이 남았다.
+
+코드 관계 후보16개는 source file/symbol/옛 line을 보존하는 비실행 검토 목록이며 canonical/evidence ID null, semantic assertion0이다. 테스트 목록/validator TestValidatorSet·file SHA 관측은 실행/coverage/criterion mapping이 아니다. source-backed implementation/test 관계 검토를 생략하지 않는다.
+
+실제 ExtractOntology/ExtractSpec/ValidateSources를 전용 Git fixture에서 실행해 13source span·queue8·모두 proposed·trace spec_unapproved4/paths0·외부 project 거부를 확인했다. semantic race44시험20하위시험 pass/실패0/skip0, vet/boundary/docs/progress guard 확인. 전용 fixture에서 YAML를 검증한 것이 운영 go-stablenet의 source/index 결합을 뜻하지 않는다. 초안 파일은 아직 운영 retained snapshot 안에 없으며, 후속 실제 자료 선택·내용 검토 후 새 held candidate에 포함해 다시 검증해야 한다. [원자료](../../system/eval/b0-knowledge-system/ontology-o03-domain-draft-2026-10-13/verification.json).
+
+O03-C/D unchecked, O04-B/C/D unchecked를 유지한다. 다음 C01–C04/R01–R04(특히 R04)의 내용 채택·검토자 기록과 정확한 code/test·criterion 관계 검토, 이후 held source/index/semantic 결합과 실제 off/on 평가. 전체 잔여 N16/O03/O04의3개·기존17/18·온톨로지2/4다.
+
+감사 기록 정정: 최초 audit의 baseline_file_available=false를 bytes unchanged=false로 표현해 파일 변화로 오독했다. 원래 기록을 보존하고 baseline 부재인 경우 nullable/비교미확인으로 고쳤다. 실제 pack/코드 내용 승인으로 확장하지 않는다.

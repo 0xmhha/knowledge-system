@@ -1,0 +1,223 @@
+{
+  "scope": "read-only inventory/anchor drift, not new ontology approval or semantic implementation proof",
+  "pack_code_baseline": "ec6a4e96b",
+  "baseline_full_commit": null,
+  "target_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "target_graph_sha256": "3ccb14249b25385fdfeddf2e821e12ca8e83170ea1ffc376886d9ac39f5bf7bc",
+  "anchors_check_exit": 1,
+  "input_files": 47,
+  "input_bytes_unchanged": true,
+  "selected": [
+    {
+      "entry_id": "A1.wbft_core.quorum_calc",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "anchors": [
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "symbol": "defaultSet.F",
+          "recorded_line": 222,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/validator/default.go",
+          "symbol": "defaultSet.QuorumSize",
+          "recorded_line": 226,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/prepare.go",
+          "symbol": "Core.handlePrepareMsg",
+          "recorded_line": 87,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/types.go",
+          "symbol": "ValidatorSet",
+          "recorded_line": 216,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "da6cbd73113f3f1c31a4a68632dda93783f07f906cc5e8fe202e91dbb369e834",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "entry_id": "A1.wbft_core.round_change_protocol",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-07",
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.broadcastNextRoundChange",
+          "recorded_line": 40,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.broadcastRoundChange",
+          "recorded_line": 52,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/roundchange.go",
+          "symbol": "Core.handleRoundChangeMsg",
+          "recorded_line": 103,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "symbol": "RoundChange",
+          "recorded_line": 37,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/messages/roundchange.go",
+          "symbol": "SignedRoundChangePayload",
+          "recorded_line": 64,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "d07c85c47baf6088e478b8887bbf377420b18acdd2bd9c7c4571c050a26fa1cc",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "entry_id": "A1.wbft_core.message_handlers",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/preprepare.go",
+          "symbol": "Core.handlePreprepareMsg",
+          "recorded_line": 115,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "486771c7444c2be120da08af776cb33ea75129a754c3d54e3ca5b74b3f0ad335",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/prepare.go",
+          "symbol": "Core.handlePrepareMsg",
+          "recorded_line": 87,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/commit.go",
+          "symbol": "Core.handleCommitMsg",
+          "recorded_line": 90,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    },
+    {
+      "entry_id": "A1.concurrency.core_lock_discipline",
+      "source_status": "verified",
+      "source_verified_by": "mhha",
+      "source_last_verified_at": "2026-06-09",
+      "anchors": [
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": "Core.currentMutex",
+          "recorded_line": 108,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": null,
+          "recorded_line": 155,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/core.go",
+          "symbol": null,
+          "recorded_line": 162,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        },
+        {
+          "file": "consensus/wbft/core/priorstate.go",
+          "symbol": "priorState",
+          "recorded_line": 28,
+          "anchor_kind": "def",
+          "target_commit_file_sha256": "13925117c7b00d10964a83fda76bc87a10f6189027c285d2f7c49513f93b51bd",
+          "baseline_file_available": false,
+          "baseline_file_sha256": null,
+          "bytes_unchanged_since_pack_baseline": null,
+          "bytes_comparison_state": "baseline_unavailable"
+        }
+      ]
+    }
+  ],
+  "automatic_ontology_review_or_relations": 0,
+  "current_or_operator_config_changes": 0,
+  "baseline_comparison_available": false
+}
