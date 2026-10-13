@@ -4,8 +4,8 @@
   "next_task": "N-16",
   "next_task_status": "on_hold_by_user_2026-10-12",
   "active_source_binding": {
-    "revision": "b514446f43c63c0360be74eaf1a4fd085173195a",
-    "manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json"
+    "revision": "7231d271d6fec983891643ea545d0538eba22b28",
+    "manifest": "system/eval/stablenet-dataset-comparison-2026-10-13/manifest.json"
   },
   "tasks": [
     {
@@ -735,7 +735,7 @@
     "main_synchronized_at_merge": true
   },
   "execution_plan": "docs/spec-driven/REFACTORING-COMPLETION-PLAN-2026-10-08.md",
-  "working_branch": "codex/refresh-current-documentation",
+  "working_branch": "codex/go-stablenet-dataset-comparison",
   "followup_merge": {
     "source_branch": "feat/refactoring-followup",
     "pr_number": 98,
@@ -2265,24 +2265,15 @@
     }
   },
   "current_git_status": {
-    "checked_at": "2026-10-13T10:48:41.953610+00:00",
-    "repository": "0xmhha/knowledge-system",
-    "local_branch": "codex/refresh-current-documentation",
-    "inspected_local_head": "b514446f43c63c0360be74eaf1a4fd085173195a",
-    "scope": "local CI-fix material snapshot before proof/ledger commit and push; later publication/merge must be read from GitHub or git status",
-    "local_main": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "remote_main_at_initial_check": "9a39718807ed25a0add30405f7cd1f1ebff4a629",
-    "documentation_PR": 100,
-    "documentation_PR_url": "https://github.com/0xmhha/knowledge-system/pull/100",
-    "PR_state_at_check": "OPEN",
-    "isDraft": false,
-    "previous_published_documentation_head": "a3df2bf736da45904870e32812419c8c39e1aaaa",
-    "initial_CI_run": 38383410958,
-    "initial_CI": "failure; retained and repaired",
-    "fix_CI": "pending_after_push",
-    "merge_approved_if_CI_passes": true,
-    "PR100_main_merge_executed": false,
-    "tag_or_deployment_executed": false
+    "checked_at": "2026-10-13T15:39:13.906796+00:00",
+    "scope": "comparison material commit snapshot before final proof/ledger commit; use git status for subsequent HEAD",
+    "local_branch": "codex/go-stablenet-dataset-comparison",
+    "inspected_local_head": "7231d271d6fec983891643ea545d0538eba22b28",
+    "main_and_origin_main_at_task_start": "cd5c35d6a82d4877e31ea194f766f892deddbdf9",
+    "previous_documentation_PR": 100,
+    "previous_documentation_PR_state": "MERGED",
+    "comparison_branch_pushed": false,
+    "comparison_PR_created": false
   },
   "latest_documentation_review": {
     "checked_at": "2026-10-13T10:48:41.953610+00:00",
@@ -2467,11 +2458,8 @@
     ],
     "tag_or_deployment_executed": false
   },
-  "delivery_next_task": "PR100 fix CI verification then authorized squash merge and main synchronization",
-  "delivery_remaining": [
-    "PR100 fix CI verification",
-    "CI success then authorized squash merge and main synchronization"
-  ],
+  "delivery_next_task": null,
+  "delivery_remaining": [],
   "documentation_maintenance": {
     "state": "complete",
     "material_revision": "dfa6ae72d3291e77f3cf7c7847fb84177eb2f7ff",
@@ -2491,5 +2479,37 @@
     "latest_fix_manifest": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/manifest.json",
     "latest_fix_proof": "system/eval/b0-knowledge-system/documentation-ci-fix-2026-10-13/committed-binding-proof.json",
     "historical_evidence_branch": "codex/refresh-current-documentation; retain after squash merge"
+  },
+  "latest_dataset_comparison": {
+    "checked_at": "2026-10-13T15:39:13.906796+00:00",
+    "revision": "7231d271d6fec983891643ea545d0538eba22b28",
+    "manifest": "system/eval/stablenet-dataset-comparison-2026-10-13/manifest.json",
+    "unique_current_and_committed_SHA_bindings": 1809,
+    "source_dependency_bindings": 1586,
+    "current_SHA_all_match": true,
+    "committed_blob_SHA_all_match": true,
+    "comparison_execution_complete": true,
+    "known_API_source_missing_failures_preserved": true,
+    "independent_generated_answer_quality_accepted": false,
+    "runtime_Go_changed": false,
+    "operator_baselines_preserved": true,
+    "status": "PASS",
+    "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "result": "system/eval/stablenet-dataset-comparison-2026-10-13/result.json",
+    "execution_tasks_complete": 7,
+    "independent_quality_accepted": false,
+    "next_task": "fix generated domain/flow citation provenance then replay42 questions",
+    "publication": "local committed comparison; no new remote push or PR requested in this task",
+    "completion_state": "complete_after_committed_SHA_and_existing_progress_checks",
+    "late_artifact_sha256": {
+      "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md": "29a4dd13e3da4eed55b3d026bcb8abfe5b89aabef5e1ef7343667bf0e3194fa6",
+      "system/eval/stablenet-dataset-comparison-2026-10-13/committed-binding-proof.json": "ab55afd6606de1076763d61dca2db27c5a2c5858bd926b9036396a5d955faeb1",
+      "system/eval/stablenet-dataset-comparison-2026-10-13/progress-check.txt": "b68b7391f45fa433a9822bb65711dcab95d486ebe2173d56de1fb854b9cf1e6c"
+    }
+  },
+  "reporting_preferences": {
+    "deferred_release_work_only_on_explicit_user_request": true,
+    "always_report_active_task_progress_remaining_next": true,
+    "active_worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md"
   }
 }
