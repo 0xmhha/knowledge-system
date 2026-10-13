@@ -2,7 +2,6 @@ package semantic
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -172,10 +171,7 @@ func readCoordinates(path string, out any) error {
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(buf, out); err != nil {
-		return err
-	}
-	return nil
+	return decodedCoordinates.decode(buf, out)
 }
 
 // PutAligned is the promotion entry point for projections attached to built
