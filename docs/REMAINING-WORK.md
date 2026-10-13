@@ -30,9 +30,28 @@
 | native CoreML embedder | native 구현 있음, 일반 CLI의 embedder dispatch에는 연결되지 않음 | 지원/실험 범위 결정·명시 연결·native 검증 |
 | embedding LRU cache | wrapper 구현 있으나 기본 생성 경로에 연결되지 않음 | 메모리/invalidations·효과 기준·명시 옵션 검토 |
 | append-only audit integration | auditlog/observe 구현과 audit_dir 설정은 있음. 운영 composer에 연결 완료 근거 없음 | 감사 대상·보관/개인정보·권한·failure 정책과 실제 wiring |
-| 상위 WI10개 | 주 담당은 coding-agent/ChainBench/학습 계층; 이번 저장소에서 외부 최신 구현은 미감사 | [목적과 책임표](./spec-driven/PURPOSE-AND-SCOPE.md)의 WI별 담당 코드·실행·수용 재감사 |
+| 상위 WI10개 | [재감사](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md) 기록10/10. 기능 전체 완료0/10; WI-5 담당 미확보 | WI-V1 우선. WI-3/SP 소비자 입력 정합은 연결 실행의 선행 조건. 아래 WI 잔여표 참조 |
 | 선택적 viewer 상호작용 | 통합 viewer/Atlas 있음. BFS-ripple은 과거 UI 제안 | 채택 시 redraw·성능·접근성 완료 기준과 시험 범위 결정 |
 | 배포 머신·다운스트림 동기화 | 로컬 코드/CI만으로 원격 서비스나 다른 저장소의 상태를 알 수 없음 | 필요 시 대상·권한을 정하고 실제 binary/dataset/model/agent/network/power 상태와 소비자 결과 확인 |
+
+## 상위 WI 재감사 후 잔여 작업
+
+2026-10-14 기준 감사 기록10/10 완료, 기능 전체의 완료·독립 수용0/10. 구현 없음으로 단정할 수 없는 항목과 부분 구현을 구분했다. 상세 설계 부족분·시험·source revision은 [재감사 명세](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 있다. 이 표는 기존 후속 범위의 상위 WI 행을 세분화하며 기존 승인 기능 완료 수에 더하지 않는다.
+
+| 우선순위 | ID | 남은 작업·담당 |
+|---|---|---|
+| 1 | WI-V1 | 독립 오라클·무효/과적합 반례·차단/경고 정책·실제 에이전트 판정; coding-agent |
+| 2 | WI-V2 | 동일 증상의 복수 수정안·평가축·패널 선택/기각; coding-agent |
+| 3 | WI-3 | 실제 MCP 입력과 소비자 계약 정합·bounded 후보/객관 신호/provenance/null·반복 확장; coding-agent+CKS |
+| 4 | WI-4 | 반복 분모·증상 실패율·타이밍 주입·재현 불가 관찰의 실제 연결 실행; coding-agent+ChainBench |
+| 5 | WI-1 | 언어/비용/정확도 계약·CFG/def-use/control/data dependency; CKG |
+| 6 | WI-2 | 수동/자동 구분·결정론 타입/규칙·source→sink 탐지·양성/음성 평가; CKG/CKS |
+| 7 | WI-C | sequence/module/data/state/guard/cost/priority의 구조화 리뷰·소비자 연결·독립 수용; coding-agent |
+| 8 | WI-6 | WI-1 이후 값 의존 확장·recall/noise/cost·상한/중단 검증; CKS |
+| 9 | WI-SP | CKG 간접 노출을 CKS에 연결·typed 태그/출처/권한/없는 태그·소비자 질의; CKS+CKG |
+| 별도 | WI-5 | 담당 저장소 지정 후 수집→파일 ingest→관리자 검토→승격/회수→색인 검증 |
+
+다음 권고는 WI-V1이다. 소비자 입력 schema 정합(WI-3/SP)을 연결 실행 전에 확인한다. 학습 저장소 확보는 별도 의존성이며 다른9개를 중단시키지 않는다. 외부 저장소 변경·실제 체인·LLM 실행·새 수용 기준은 각 기능의 구체 범위를 고정해 진행한다.
 
 과거 “worksheet 내 프로젝트 catalog”, “v2 유지보수 제자리 쓰기”, “온톨로지 MCP 미노출”은 현재 구현과 다르므로 신규 미완료 목록에 남기지 않는다. Catalog는 명시 선택 팩으로 분리됐고 v2 pinned 쓰기는 거부/후보 빌드 경로이며 읽기 MCP 네 도구와 bounded explanation은 구현됐다. legacy 직접 갱신은 지원되는 별도 경계다.
 

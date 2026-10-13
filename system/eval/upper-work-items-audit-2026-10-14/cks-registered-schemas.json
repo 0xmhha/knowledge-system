@@ -1,0 +1,566 @@
+{
+  "cks.context.change_history": {
+    "properties": {
+      "intent": {
+        "description": "Natural-language query the hunks should match against (optional if symbol is set).",
+        "type": "string"
+      },
+      "k": {
+        "description": "Maximum hunks to return when intent is set (0 = backend default).",
+        "type": "number"
+      },
+      "max_count": {
+        "description": "Maximum PR refs to return when symbol is set (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Fully-qualified symbol name to look up PR refs for (optional if intent is set).",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "cks.context.concurrency_impact": {
+    "properties": {
+      "depth": {
+        "description": "Maximum traversal depth over concurrency edges (default: 3).",
+        "type": "number"
+      },
+      "max_total": {
+        "description": "Cap on total modules returned (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.expand_flow": {
+    "properties": {
+      "direction": {
+        "description": "\"up\" (producers) or \"down\" (consumers). Default \"down\".",
+        "type": "string"
+      },
+      "hops": {
+        "description": "Traversal hops (default 1).",
+        "type": "number"
+      },
+      "limit": {
+        "description": "Cap on returned neighbors (0 = backend default).",
+        "type": "number"
+      },
+      "step_id": {
+        "description": "Origin step id.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "step_id"
+    ],
+    "type": "object"
+  },
+  "cks.context.find_branches": {
+    "properties": {
+      "k": {
+        "description": "Max matches to return (default 10).",
+        "type": "number"
+      },
+      "symptom_text": {
+        "description": "Free-text symptom description.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symptom_text"
+    ],
+    "type": "object"
+  },
+  "cks.context.find_callees": {
+    "properties": {
+      "depth": {
+        "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+        "type": "number"
+      },
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "max_total": {
+        "description": "Cap on total neighbours (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.find_callers": {
+    "properties": {
+      "depth": {
+        "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+        "type": "number"
+      },
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "max_total": {
+        "description": "Cap on total neighbours (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.find_invariants": {
+    "properties": {
+      "category": {
+        "description": "Filter by policy category (\"\" = any).",
+        "type": "string"
+      },
+      "file": {
+        "description": "Restrict to one source file (\"\" = any).",
+        "type": "string"
+      },
+      "tier_min": {
+        "description": "Minimum confidence tier 1|2|3 (0 = backend default).",
+        "type": "number"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "cks.context.find_symbol": {
+    "properties": {
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "kinds": {
+        "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
+        "type": "string"
+      },
+      "language": {
+        "description": "Restrict to a language (e.g., \"go\").",
+        "type": "string"
+      },
+      "name": {
+        "description": "Symbol name (e.g., \"ProcessRequest\" or \"pkg.Type.Method\").",
+        "type": "string"
+      },
+      "path_glob": {
+        "description": "Restrict to file paths matching this glob.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "type": "object"
+  },
+  "cks.context.get_conventions": {
+    "properties": {
+      "package_prefix": {
+        "description": "Package path prefix (\"\" = all packages).",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "cks.context.get_flow": {
+    "properties": {
+      "entry_point": {
+        "description": "Entry-point symbol of the flow.",
+        "type": "string"
+      },
+      "flow_id": {
+        "description": "Flow identifier.",
+        "type": "string"
+      },
+      "invariant_id": {
+        "description": "Invariant whose enforcing flow to return.",
+        "type": "string"
+      },
+      "max_steps": {
+        "description": "Cap on returned steps (0 = backend default).",
+        "type": "number"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "cks.context.get_for_task": {
+    "properties": {
+      "intent": {
+        "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+        "type": "string"
+      },
+      "prompt": {
+        "description": "Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".",
+        "type": "string"
+      }
+    },
+    "required": [
+      "prompt"
+    ],
+    "type": "object"
+  },
+  "cks.context.get_for_task_v2": {
+    "properties": {
+      "explain_ontology": {
+        "default": false,
+        "description": "Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.",
+        "type": "boolean"
+      },
+      "include_knowledge": {
+        "default": false,
+        "description": "Add reviewed local policy context from this retained dataset.",
+        "type": "boolean"
+      },
+      "intent": {
+        "description": "Optional task intent override.",
+        "type": "string"
+      },
+      "knowledge_as_of": {
+        "description": "Policy date (YYYY-MM-DD) when include_knowledge is true.",
+        "type": "string"
+      },
+      "knowledge_subsystem": {
+        "description": "Explicit subsystem scope when include_knowledge is true.",
+        "type": "string"
+      },
+      "prompt": {
+        "description": "Natural-language development task.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "prompt"
+    ],
+    "type": "object"
+  },
+  "cks.context.get_invariant_enforcement": {
+    "properties": {
+      "inv_id": {
+        "description": "Invariant identifier.",
+        "type": "string"
+      },
+      "max": {
+        "description": "Cap on enforcement sites (0 = backend default).",
+        "type": "number"
+      }
+    },
+    "required": [
+      "inv_id"
+    ],
+    "type": "object"
+  },
+  "cks.context.get_subgraph": {
+    "properties": {
+      "depth": {
+        "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+        "type": "number"
+      },
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "max_total": {
+        "description": "Cap on total nodes (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.impact_analysis": {
+    "properties": {
+      "depth": {
+        "description": "Maximum traversal depth (default: backend default, typically 2).",
+        "type": "number"
+      },
+      "max_total": {
+        "description": "Cap on total citations across all categories (0 = no cap).",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.review_function": {
+    "properties": {
+      "caller_depth": {
+        "description": "How far to walk callers toward entry points (1-5, default 5).",
+        "type": "number"
+      },
+      "max_items": {
+        "description": "Entries per list (default 40); totals are always reported.",
+        "type": "number"
+      },
+      "symbol": {
+        "description": "Function or method: a ckg qualified_name, a bare name that resolves unambiguously, or a canonical_id.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "symbol"
+    ],
+    "type": "object"
+  },
+  "cks.context.search_text": {
+    "properties": {
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "expand": {
+        "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+        "type": "boolean"
+      },
+      "k": {
+        "description": "Maximum hits to return (0 = backend default).",
+        "type": "number"
+      },
+      "language": {
+        "description": "Restrict to a language (e.g., \"go\").",
+        "type": "string"
+      },
+      "path_glob": {
+        "description": "Restrict to file paths matching this glob.",
+        "type": "string"
+      },
+      "query": {
+        "description": "Keyword query (terms joined as OR by default).",
+        "type": "string"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "type": "object"
+  },
+  "cks.context.semantic_search": {
+    "properties": {
+      "exclude_tests": {
+        "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+        "type": "boolean"
+      },
+      "expand": {
+        "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+        "type": "boolean"
+      },
+      "k": {
+        "description": "Maximum hits to return (0 = backend default).",
+        "type": "number"
+      },
+      "kinds": {
+        "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
+        "type": "string"
+      },
+      "language": {
+        "description": "Restrict to a language (e.g., \"go\").",
+        "type": "string"
+      },
+      "path_glob": {
+        "description": "Restrict to file paths matching this glob.",
+        "type": "string"
+      },
+      "query": {
+        "description": "Natural-language query (e.g., \"validator quorum check at finalize\").",
+        "type": "string"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "type": "object"
+  },
+  "cks.ops.freshness": {
+    "properties": {},
+    "required": [],
+    "type": "object"
+  },
+  "cks.ops.health": {
+    "properties": {},
+    "required": [],
+    "type": "object"
+  },
+  "cks.ops.index": {
+    "properties": {
+      "mode": {
+        "description": "\"incremental\" (default) or \"full\".",
+        "type": "string"
+      },
+      "since_commit": {
+        "description": "Base commit for an incremental reindex (default: the index's recorded head).",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
+  },
+  "cks.ops.reindex": {
+    "properties": {
+      "embedder": {
+        "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
+        "type": "string"
+      },
+      "min_canonical_ratio": {
+        "default": 0,
+        "description": "gate floor for canonical_id coverage (CanonicalCount/SymbolCount); 0 disables the check",
+        "type": "number"
+      },
+      "model_name": {
+        "description": "vector embedding model name",
+        "type": "string"
+      },
+      "out": {
+        "description": "dataset root; the new version builds in <out>/<version> and current is flipped on success",
+        "type": "string"
+      },
+      "src": {
+        "description": "source tree to index",
+        "type": "string"
+      },
+      "version": {
+        "description": "version label for the new dataset directory; empty auto-generates one",
+        "type": "string"
+      }
+    },
+    "required": [
+      "src",
+      "out"
+    ],
+    "type": "object"
+  },
+  "cks.ops.setup": {
+    "properties": {
+      "embedder": {
+        "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
+        "type": "string"
+      },
+      "model_name": {
+        "description": "vector embedding model name",
+        "type": "string"
+      },
+      "out": {
+        "description": "dataset root; graph index in <out>/graph, vector index in <out>/vector",
+        "type": "string"
+      },
+      "skip_vector": {
+        "default": false,
+        "description": "build only the graph index",
+        "type": "boolean"
+      },
+      "src": {
+        "description": "source tree to index",
+        "type": "string"
+      }
+    },
+    "required": [
+      "src",
+      "out"
+    ],
+    "type": "object"
+  },
+  "cks.ops.setup_status": {
+    "properties": {
+      "job_id": {
+        "type": "string"
+      },
+      "tail": {
+        "default": 20,
+        "description": "max trailing events to return",
+        "type": "number"
+      }
+    },
+    "required": [
+      "job_id"
+    ],
+    "type": "object"
+  },
+  "cks.semantic.get_concept": {
+    "properties": {
+      "concept_id": {
+        "type": "string"
+      },
+      "limit": {
+        "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+        "type": "number"
+      }
+    },
+    "required": [
+      "concept_id"
+    ],
+    "type": "object"
+  },
+  "cks.semantic.lookup_term": {
+    "properties": {
+      "language": {
+        "type": "string"
+      },
+      "limit": {
+        "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+        "type": "number"
+      },
+      "term": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "language",
+      "term"
+    ],
+    "type": "object"
+  },
+  "cks.semantic.status": {
+    "properties": {},
+    "required": [],
+    "type": "object"
+  },
+  "cks.semantic.trace_requirement": {
+    "properties": {
+      "limit": {
+        "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+        "type": "number"
+      },
+      "requirement_id": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "requirement_id"
+    ],
+    "type": "object"
+  }
+}

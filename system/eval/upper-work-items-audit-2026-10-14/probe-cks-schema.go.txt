@@ -1,0 +1,17 @@
+package mcp
+import (
+ "encoding/json"
+ "fmt"
+ "testing"
+ mcpserver "github.com/mark3labs/mcp-go/server"
+)
+func TestUpperWorkItemAuditSchemas(t *testing.T) {
+ f := newFixture(t, nil)
+ srv := mcpserver.NewMCPServer("upper-wi-audit", "1")
+ if err := Register(srv, f.deps); err != nil { t.Fatal(err) }
+ schemas := make(map[string]any)
+ for name, tool := range srv.ListTools() { schemas[name] = tool.Tool.InputSchema }
+ raw, err := json.Marshal(schemas)
+ if err != nil { t.Fatal(err) }
+ fmt.Println("AUDIT_SCHEMAS=" + string(raw))
+}

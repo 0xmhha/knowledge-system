@@ -1,0 +1,52 @@
+{
+  "scope": "actual registered mock-fixture schemas compared with committed consumer and server fixture",
+  "consumer_tools": 19,
+  "server_tools": 28,
+  "consumer_differences": [
+    {
+      "tool": "cks_context_get_for_task",
+      "wire_tool": "cks.context.get_for_task",
+      "parameter": "max_citations",
+      "difference": "input not registered"
+    },
+    {
+      "tool": "cks_context_get_for_task",
+      "wire_tool": "cks.context.get_for_task",
+      "parameter": "budget_tokens",
+      "difference": "input not registered"
+    },
+    {
+      "tool": "cks_context_semantic_search",
+      "wire_tool": "cks.context.semantic_search",
+      "parameter": "kinds",
+      "declared_type": "array",
+      "registered_type": "string"
+    },
+    {
+      "tool": "cks_context_find_symbol",
+      "wire_tool": "cks.context.find_symbol",
+      "parameter": "kinds",
+      "declared_type": "array",
+      "registered_type": "string"
+    }
+  ],
+  "server_fixture_differences": [
+    {
+      "tool": "cks.context.find_symbol",
+      "wire_tool": "cks.context.find_symbol",
+      "parameter": "kinds",
+      "declared_type": "array",
+      "registered_type": "string"
+    },
+    {
+      "tool": "cks.context.get_subgraph",
+      "wire_tool": "cks.context.get_subgraph",
+      "parameter": "qname",
+      "difference": "input not registered"
+    }
+  ],
+  "consumer_has_review_function": false,
+  "consumer_has_semantic_reads": false,
+  "live_host_integration_tested": false,
+  "tool_name_normalization": "comparison key only; underscore/dot host adapter not tested"
+}

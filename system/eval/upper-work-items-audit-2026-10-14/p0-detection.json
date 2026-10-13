@@ -1,0 +1,508 @@
+{
+  "rows": [
+    {
+      "case": "feepayer-truncate",
+      "mutant": "clean",
+      "category": "clean",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "expected_before": [],
+      "expected_after": []
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "impl_drop_site",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a74.2b",
+            "severity": "FLAG",
+            "detail": "declared site txpool.go:truncatePending (action=sub) not maintained by the implementation"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a74.2b"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "uncover_blank",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "evaluator\u00a74.6c"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "uncover_badname",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='TestThatDoesNotExist')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "evaluator\u00a74.6c"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "drop_invariant_test",
+      "category": "hard",
+      "before": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6a",
+            "severity": "FAIL",
+            "detail": "consistency-invariant test missing/absent (declared='TestFeePayerSpentInvariant')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6a",
+            "severity": "FAIL",
+            "detail": "consistency-invariant test missing/absent (declared='TestFeePayerSpentInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:addTx (action=add) not covered by an existing test (covered_by_test='TestFeePayerSpentInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:removeTx (action=sub) not covered by an existing test (covered_by_test='TestFeePayerSpentInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:reorgFeePayer (action=rebuild) not covered by an existing test (covered_by_test='TestFeePayerSpentInvariant')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 4
+      },
+      "expected_before": [
+        "evaluator\u00a74.6a"
+      ],
+      "expected_after": [
+        "evaluator\u00a74.6a"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "drop_adversarial_test",
+      "category": "hard",
+      "before": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6b",
+            "severity": "FAIL",
+            "detail": "adversarial-path test missing/absent (declared='TestTruncatePendingReleasesFeePayerObligation')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6b",
+            "severity": "FAIL",
+            "detail": "adversarial-path test missing/absent (declared='TestTruncatePendingReleasesFeePayerObligation')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='TestTruncatePendingReleasesFeePayerObligation')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 2
+      },
+      "expected_before": [
+        "evaluator\u00a74.6b"
+      ],
+      "expected_after": [
+        "evaluator\u00a74.6b"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "plan_malformed_heading",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a72.1",
+            "severity": "FLAG",
+            "detail": "plan-contract steps (3) != prose headings parsed (2) \u2014 possible silent step drop"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a72.1"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "plan_block_absent",
+      "category": "soft",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a72.1",
+            "severity": "WARN",
+            "detail": "no machine-readable plan-contract block; fell back to heading parse"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a72.1"
+      ]
+    },
+    {
+      "case": "feepayer-truncate",
+      "mutant": "contract_underdeclare",
+      "category": "residual",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "expected_before": [],
+      "expected_after": []
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "clean",
+      "category": "clean",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "expected_before": [],
+      "expected_after": []
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "impl_drop_site",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a74.2b",
+            "severity": "FLAG",
+            "detail": "declared site txpool.go:truncatePending (action=sub) not maintained by the implementation"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a74.2b"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "uncover_blank",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "evaluator\u00a74.6c"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "uncover_badname",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='TestThatDoesNotExist')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "evaluator\u00a74.6c"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "drop_invariant_test",
+      "category": "hard",
+      "before": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6a",
+            "severity": "FAIL",
+            "detail": "consistency-invariant test missing/absent (declared='TestPerAccountSlotsInvariant')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6a",
+            "severity": "FAIL",
+            "detail": "consistency-invariant test missing/absent (declared='TestPerAccountSlotsInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site list.go:Add (action=add) not covered by an existing test (covered_by_test='TestPerAccountSlotsInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site list.go:Remove (action=sub) not covered by an existing test (covered_by_test='TestPerAccountSlotsInvariant')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:demoteUnexecutables (action=sub) not covered by an existing test (covered_by_test='TestPerAccountSlotsInvariant')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 4
+      },
+      "expected_before": [
+        "evaluator\u00a74.6a"
+      ],
+      "expected_after": [
+        "evaluator\u00a74.6a"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "drop_adversarial_test",
+      "category": "hard",
+      "before": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6b",
+            "severity": "FAIL",
+            "detail": "adversarial-path test missing/absent (declared='TestEvictionDecrementsPerAccountSlots')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "evaluator\u00a74.6b",
+            "severity": "FAIL",
+            "detail": "adversarial-path test missing/absent (declared='TestEvictionDecrementsPerAccountSlots')"
+          },
+          {
+            "mechanism": "evaluator\u00a74.6c",
+            "severity": "FAIL",
+            "detail": "site txpool.go:truncatePending (action=sub) not covered by an existing test (covered_by_test='TestEvictionDecrementsPerAccountSlots')"
+          }
+        ],
+        "detected": true,
+        "n_findings": 2
+      },
+      "expected_before": [
+        "evaluator\u00a74.6b"
+      ],
+      "expected_after": [
+        "evaluator\u00a74.6b"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "plan_malformed_heading",
+      "category": "hard",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a72.1",
+            "severity": "FLAG",
+            "detail": "plan-contract steps (3) != prose headings parsed (2) \u2014 possible silent step drop"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a72.1"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "plan_block_absent",
+      "category": "soft",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [
+          {
+            "mechanism": "implementer\u00a72.1",
+            "severity": "WARN",
+            "detail": "no machine-readable plan-contract block; fell back to heading parse"
+          }
+        ],
+        "detected": true,
+        "n_findings": 1
+      },
+      "expected_before": [],
+      "expected_after": [
+        "implementer\u00a72.1"
+      ]
+    },
+    {
+      "case": "txpool-slot-counter",
+      "mutant": "contract_underdeclare",
+      "category": "residual",
+      "before": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "after": {
+        "findings": [],
+        "detected": false,
+        "n_findings": 0
+      },
+      "expected_before": [],
+      "expected_after": []
+    }
+  ],
+  "summary": {
+    "hard_total": 12,
+    "before_detected": 4,
+    "after_detected": 12,
+    "before_rate": 0.3333333333333333,
+    "after_rate": 1.0,
+    "clean_total": 2,
+    "before_false_positives": 0,
+    "after_false_positives": 0,
+    "residual_total": 2,
+    "residual_caught_after": 0,
+    "soft_total": 2,
+    "improvement_pp": 66.7
+  }
+}
