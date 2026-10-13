@@ -1,0 +1,44 @@
+from pathlib import Path
+import json,yaml,subprocess,hashlib,statistics,collections,tempfile,os,sys,importlib.util,urllib.request,datetime
+root=Path.cwd();base=Path(Path('/private/tmp/ks-o03-accepted-base.txt').read_text());frozen=root/'system/eval/b0-knowledge-system/ontology-o04-dev-pilot-2026-10-13';seal=json.loads((frozen/'input-seal.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();book=json.loads((frozen/'question-book-frozen.json').read_text());protocol=json.loads((frozen/'protocol-frozen.json').read_text());prep=json.loads((base/'preparation.json').read_text());cfg=yaml.safe_load((base/'stdio.yaml').read_text());cks=base/'bin/cks';cand=base/'dataset/v-approved-wbft-baca2869';identity=json.loads((cand/'dataset-identity.json').read_text());out=base/'reviewed-dev-pilot-2026-10-13';out.mkdir(exist_ok=False)
+def guard():
+ for p,h in seal.items():assert sha(root/p if p.startswith('scripts/')else frozen/p)==h,p
+ assert sha(cks)==protocol['binary_sha256'];assert sha(Path(prep['operator_config']))==prep['operator_config_sha256'];assert os.readlink(prep['operator_current'])==prep['operator_current_target'];assert not (base/'dataset/current').exists();assert subprocess.check_output(['git','-C',prep['original_source'],'rev-parse','HEAD'],text=True).strip()==prep['original_source_head']
+guard();db_hashes={p:sha(cand/p)for p in ['graph/graph.db','vector/vector.db']};semantic_before=sha(base/'semantic.sqlite');tags=json.loads(urllib.request.urlopen('http://127.0.0.1:11434/api/tags',timeout=15).read());assert any(m['name']==protocol['embedding_identity']['Model']and m['digest']==protocol['embedding_identity']['model_digest']for m in tags['models']);(out/'model-preflight.json').write_text(json.dumps({'model':protocol['embedding_identity']['Model'],'digest':protocol['embedding_identity']['model_digest'],'matched':True,'scope':'preflight tags, outside request measurements'},indent=2)+'\n');spec=importlib.util.spec_from_file_location('pilot_score',root/'scripts/ontology-eval-score.py');S=importlib.util.module_from_spec(spec);spec.loader.exec_module(S);rows=[];runs=[];http={a:collections.Counter()for a in ['off','on']};backend_fail={a:0 for a in ['off','on']};pending={a:0 for a in ['off','on']};unbound={a:0 for a in ['off','on']};startup=[];sequence=0
+for q in book['questions'][:6]:
+ qdir=out/q['id'];qdir.mkdir();requests={'schema_version':1,'requests':[{'id':q['id'],'tool':q['tool'],'arguments':q['arguments']}]};(qdir/'requests.json').write_text(json.dumps(requests,ensure_ascii=False,indent=2)+'\n');normalized=[]
+ for arm in protocol['order_per_question'][q['id']]:
+  guard();sequence+=1;c=yaml.safe_load(yaml.safe_dump(cfg));c['semantic']['ontology_mode']=protocol['arms'][arm];c['logging'].update(measure_backend_calls=True,footprint_dir=str(qdir/arm/'events'),mode='prod',level='info');config=qdir/(arm+'.yaml');config.write_text(yaml.safe_dump(c,sort_keys=False));norm=json.loads(json.dumps(c));norm['semantic'].pop('ontology_mode');norm['logging'].pop('footprint_dir');normalized.append(norm);capture=qdir/(arm+'-capture.json');argv=[str(cks),'eval','capture','--requests',str(qdir/'requests.json'),'--config',str(config),'--cks-mcp',str(cks),'--output',str(capture),'--warmup','2','--retrieval-runs','5','--warm-runs','20','--cold-runs','0','--call-timeout','60s'];started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+  try:r=subprocess.run(argv,capture_output=True,text=True,timeout=900);command={'argv':argv,'exit':r.returncode,'stdout':r.stdout,'stderr':r.stderr}
+  except subprocess.TimeoutExpired as e:command={'argv':argv,'exit':None,'error':'outer timeout 900s'}
+  (qdir/(arm+'-command.json')).write_text(json.dumps(command,ensure_ascii=False,indent=2)+'\n');cap=json.loads(capture.read_text())if capture.exists()else {'rows':[],'state':'missing_capture'};observed=cap['rows'];events_path=qdir/arm/'events/cks-mcp.jsonl';events=[S.M.decode(line)for line in events_path.read_bytes().splitlines()]if events_path.exists()else [];scopes={}
+  for e in events:
+   if e.get('event')=='measurement.backend_calls':s=e['summary'];assert s['measurement_id']not in scopes;scopes[s['measurement_id']]=s
+  if capture.exists():
+   assert cap['request_sha256']==sha(qdir/'requests.json')and cap['config_sha256']==cap['config_sha256_after']==sha(config)and cap['binary_sha256']==cap['binary_sha256_after']==protocol['binary_sha256'];assert cap['counts']==protocol['counts'];assert cap['quality_metrics']is None
+  for row in observed:
+   row['arm']=arm;rows.append(row);scope=scopes.get(row['call'].get('measurement_id'))
+   if scope is None:unbound[arm]+=1;continue
+   assert scope['tool']==q['tool'];pending[arm]+=scope['pending_calls']
+   for call in scope['calls']:
+    if call['backend']=='ollama_http':http[arm][call.get('options',{}).get('path','unknown')]+=1;backend_fail[arm]+=call['outcome']!='returned'or call.get('http_status',200)>=400
+  startup.extend({'question':q['id'],'arm':arm,'tool':s['tool'],'call_count':len(s['calls']),'pending':s['pending_calls']}for s in scopes.values()if s['tool']!=q['tool'])
+  runs.append({'sequence':sequence,'question':q['id'],'arm':arm,'started_at':started,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit':command['exit'],'capture_state':cap['state'],'observed':len(observed),'planned':27});(out/'execution-progress.json').write_text(json.dumps(runs,indent=2)+'\n');print(json.dumps(runs[-1]),flush=True)
+ assert normalized[0]==normalized[1]
+verify=lambda pack:S.M.verify_pack(pack,identity,base/'source');result=S.score(book,protocol,rows,verify);(out/'rows.jsonl').write_text(''.join(json.dumps(row,ensure_ascii=False)+'\n'for row in rows));bykey={(r['arm'],r['request_id'],r['phase'],r['iteration']):r for r in rows};pairs=[];failed_pairs=0
+with tempfile.TemporaryDirectory(prefix='ks-o04-dev-compare-')as tmp:
+ for q in book['questions'][:6]:
+  for phase,count in protocol['counts'].items():
+   for i in range(1,count+1):
+    matched=[bykey.get((a,q['id'],phase,i))for a in ['off','on']]
+    if any(not r or r.get('error')or r['call'].get('transport_error')or r['call'].get('response',{}).get('isError')or not r['call'].get('response',{}).get('structuredContent')for r in matched):failed_pairs+=1;continue
+    for arm,row in zip(['off','on'],matched):(Path(tmp)/(arm+'.json')).write_text(json.dumps(row['call']['response']['structuredContent'],ensure_ascii=False))
+    compared=subprocess.run([str(cks),'semantic','compare-responses','--off',str(Path(tmp)/'off.json'),'--on',str(Path(tmp)/'on.json')],capture_output=True,text=True,timeout=30);assert compared.returncode==0,compared.stdout+compared.stderr;pairs.append({'id':q['id'],'phase':phase,'iteration':i,'comparison':json.loads(compared.stdout),'explanation':matched[1]['call']['response']['structuredContent']['metadata']['ontology'].get('explanation',{})})
+sys.path.insert(0,str(root/'tools/setup'));from ks_setup.mcp_check import StdioClient
+client=StdioClient(cks,base/'stdio.yaml',timeout=60);guards={}
+try:
+ client.initialize()
+ for q in book['questions'][6:]:
+  response=client.call(q['tool'],q['arguments']);r=response.get('result',{});snap=r.get('snapshot',{});ok=response.get('state')=='ready'and r.get('trace',{}).get('state')=='missing_code'and r.get('acceptance_evaluated')is False and all(snap.get(k)==v for k,v in {'project_id':protocol['coordinates']['project_id'],'dataset_id':protocol['coordinates']['dataset_id'],'snapshot_id':protocol['coordinates']['snapshot_id'],'commit':protocol['coordinates']['base_commit']}.items());guards[q['id']]={'passed':ok,'response':response}
+finally:client.close()
+guard();assert semantic_before==sha(base/'semantic.sqlite');assert all(sha(cand/p)==h for p,h in db_hashes.items());result.update(frozen_input_sha256=seal,paired_execution_inputs_verified=True,execution_runs=runs,verified_pairs=len(pairs),failed_or_missing_pairs=failed_pairs,pairs=pairs,trace_guards=guards,backend={'request_scoped_HTTP_paths':{a:dict(v)for a,v in http.items()},'failed_HTTP_attempts':backend_fail,'pending_calls':pending,'unbound_request_scopes':unbound,'startup_scopes':startup,'constructor_probes_outside_scope':'uncounted'},model_preflight_digest_verified=True,held_index_and_semantic_SHA_preserved=True,operator_source_current_config_preserved=True,source_files_observed_sha256={c['file']:c['file_sha256']for r in rows for c in (r['call'].get('response',{}).get('structuredContent')or {}).get('citations',[])},full_task_complete=False);assert all(g['passed']for g in guards.values());(out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:result[k]for k in ['verified_pairs','failed_or_missing_pairs','warm_p95_ratio_on_to_off','pilot_cost_budget_observation','cluster_mean_on_minus_off','quality_verdict']}),flush=True)

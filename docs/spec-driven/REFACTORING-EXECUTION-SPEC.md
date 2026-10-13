@@ -433,7 +433,7 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 ### O-04 설명·적용 전후 평가
 
 - [x] O04-A query에 매칭 개념·사용한 검토 관계/원문과 후보 점수·rank/body 변화의 bounded 설명; off/no_match/active-but-zero 구분.
-- [ ] O04-B 같은 dataset/model/질문·off/on의 인용·본문·순위·상태/latency 비교 및 실패 분모/모델 호출, 기존 FINAL 새 독립 표본 재사용0.
+- [x] O04-B 같은 dataset/model/질문·off/on의 인용·본문·순위·상태/latency 비교 및 실패 분모/모델 호출, 기존 FINAL 새 독립 표본 재사용0.
 - [ ] O04-C controlled 기능 설명과 실제 도메인 효과 판정을 분리, 실제 도메인 자료/독립 평가 조건·부족 표본/활동시간·quality 한계 기록.
 - [ ] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
 
@@ -452,3 +452,5 @@ O03 후속 준비 검증: 실제 stablenet 팩 기반 proposed concept4/requirem
 O03 A–D 완료(명시적 실제 WBFT held 파일럿 범위): C01–04/R01–04 사용자 내용 승인·실제 BGE-M3/scoped Go494/source2226/동일 tuple·MCP28/status/조회/trace·변조/옛 dataset 거부·운영 source/current/config 보존. full audit762 scope 밖 DRIFT와 scoped missing/overincluded0을 구별했다. 관련4패키지 race218/222·실패0. O04 actual DEV216응답/108쌍은 기계 관측 자료이며 gold/독립 단위 부재로 B/C/D의 실제 품질·최종 판정은 unchecked 유지. 기존17/18·온톨로지3/4·전체 잔여 N16/O04의2개.
 
 O04 입력 준비: [질문8·gold10·프로토콜 검토안](./ONTOLOGY-EVALUATION-REVIEW-2026-10-13.md)과 실제 graph/vector 위치·보관/retained 원문 SHA 대조, 입력25/기존채점17/adapter7/진행guard11시험 pass. 검색6·별도trace2, 이전DEV4사실군과 겹침·승인독립단위0·새FINAL0이다. 기존 B0 입력/임계치를 유지하며 warm p95비1.25는 새 파일럿 비용 예산 제안으로만 기록했다. 입력 검사 통과는 내용 승인·실행/품질 합격이 아니다. B/C/D는 unchecked, 전체 잔여 N16/O04 유지. 다음 검토·범위 판정→별도 동결→paired 실행→품질/비용/한계 기록이며, 독립 평가 대신 파일럿으로 O04를 종료하려면 사용자의 명시적인 수용 범위 변경이 필요하다.
+
+O04-B DEV 전후 대조 완료: [실제 파일럿 결과](./ONTOLOGY-DEV-PILOT-RESULT-2026-10-13.md) — 사전 동결50dea115·실제BGE-M3/같은 tuple·binary·설정·질문,324응답/162쌍·별도trace2·실패/누락/pending/범위미결합0·v2/원문 SHA 검증. 4제안군 평균 Recall0.667→0.750·평균 expected RR0.352→0.369, warm p95비1.3047(DEV예산1.25초과). 과거DEV와 겹쳐 독립단위0/새FINAL0·inconclusive·기본off 유지. 입력/채점39·guard11시험 pass. A/B만 체크하고 C/D·전체O04는 미완료, 전체 잔여 N16/O04의2개 유지.
