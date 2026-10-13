@@ -1,5 +1,7 @@
 # go-stablenet 지식 데이터 생성·비교
 
+현재 상태: 요청한 출처 수정·42질문 재평가·SNK06 검토3/3 완료. 현재 소스와 커밋의1833개 SHA 및 기존 진행 원장 검증이 통과했다. 아래 최초 비교와 수정 후 재평가를 구분해 읽는다.
+
 현재 작업의 목적은 전체 go-stablenet 코드에서 새 지식 데이터를 만들고, 보존한 기존 데이터와 실제 구조·검색·인용·지연을 비교하는 것이다. 기존 데이터의 파일 수·health 성공만으로 품질 개선을 선언하지 않는다.
 
 ## 입력과 비교 조건
@@ -24,7 +26,7 @@
 
 완료는 데이터 생성과 비교 실행·오류 판정을 기록했다는 뜻이다. 전체 질문의 정상 동작이나 품질 개선을 수용했다는 뜻은 아니다.
 
-## 비교 결과
+## 최초 비교 결과 · 출처 수정 전
 
 | 지표 | 기존 주 기준 | 새 데이터 |
 |---|---:|---:|
@@ -44,11 +46,11 @@
 
 SNK06 mint allowance는 기대 systemcontracts6개를 모두 회수했지만 test.*9개가 추가되어 해당 precision0.4다. fixture는 전역 검색과 제한된 기대 목록을 사용한다. 원래 입력·실패를 그대로 유지하며 새 데이터의 회귀로 단정하지 않는다.
 
-## source_missing 대표 원인과 다음 작업
+## 최초 비교의 source_missing 대표 원인
 
 prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers.md`가 포함된다. 이 파일은 generated domain corpus에 있으며 retained repo manifest에는 없다. v2 생산자는 보관 원문의 repo 경로로 이 참조를 읽으려다 source_missing을 반환한다. 동일 질문은 domain/flow가 없는 refinputs 데이터의 v2에서 정상11인용을 반환했다. 대표사례의 실제 경로 진단이며20개 실패 질문의 모든 경로를 각각 조사했다는 뜻은 아니다.
 
-우선순위1: generated domain/flow 인용의 origin·캡처·namespace·v2 본문 매핑 계약을 보완하고, 오류가 난42질문을 동일 조건으로 다시 실행한다. 기존 데이터와 원자료를 보존한 상태에서 수정·회귀 기준을 고정한다. 이후 필요하면 SNK06 기대 범위와 실제 도구의 검색 범위를 별도 검토한다.
+최초 비교에서 generated domain/flow 인용의 origin·캡처·namespace·v2 본문 매핑 보완 → 같은42질문 재실행 → SNK06 기대/검색 범위 검토 순서를 도출했다. 세 후속 작업의 완료 근거는 아래 작업표와 재평가 결과를 따른다. 기존 데이터와 최초 원자료는 보존했다.
 
 사용자가 별도로 보류한 출시 사항은 요청 전까지 일반 진행 보고에 포함하지 않는다. 이 작업의 진행/남은 일/다음 단계만 보고한다.
 
@@ -72,6 +74,8 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 
 3번 검토: 전역15개 모두 `name/qualified_name/signature/doc_comment`의 case-insensitive substring AND 계약 및 보관된 선언·SHA·행 범위에 부합했다. 추가9개는 systemcontracts/test 하위의 Go package test 심볼이다. 기존 fixture 원문·실패7/8과precision0.4는 그대로 둔다. 패키지 범위를 명시한 별도 질의 `qualified_name:systemcontracts AND mint* AND allowance*`는 raw FTS AND를 사용하며 mode=or로 자연어 substring 필터를 적용하지 않는다. symbol-only 기본 필터가 CallSite/ReturnStmt를 제외한다. 기존6개 기대 목록을 바꾸지 않고 기존4개·새1개 dataset 모두 precision/recall/F1=1.0으로 확인했다. [별도 scoped fixture](../../projects/stablenet/eval/graph-keyword/scoped-fixtures/SNK06-systemcontracts-mint-allowance.yaml), [출처별 검토](../../system/eval/stablenet-corpus-repair-2026-10-14/SNK06-scope-review.json). 사후 범위 진단이며 새 독립 gold나 모델 품질 승인으로 바꾸지 않는다.
 
-현재 요청한 순차 작업은3/3 실행 완료다. 최종 커밋의 SHA·원문·기존 진행 원장 검증까지 마친 기록은 active source binding을 따른다. 남은 요청 작업0개. 별도 운영 유지보수 후보는 캡처 서버 종료 deadline 진단이며, 기존 운영 current/config 전환과 원격 게시를 자동 실행하지 않았다.
+현재 요청한 순차 작업은3/3 실행 완료다. 최종 커밋의 SHA·원문·기존 진행 원장 검증은 PASS이며 기록은 active source binding을 따른다. 남은 요청 작업0개. 별도 운영 유지보수 후보는 캡처 서버 종료 deadline 진단이며, 기존 운영 current/config 전환과 원격 게시를 자동 실행하지 않았다.
 
 현재 소스의 일반 workspace `bin/ckg`, `bin/ckv`, `bin/cks`도 다시 빌드했다. 수정 CKS와 별도 새 데이터의 조합이 필요하다. stdio 설정 경로는 `/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`이며, 실행은 `bin/cks mcp --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`다. 원래 운영 설정을 제자리 변경하지 않았다.
+
+최종 material commit `3fa62e15`의 현재·커밋 SHA1833개 검증 및 기존 진행 guard PASS. [커밋 근거](../../system/eval/stablenet-corpus-repair-2026-10-14/committed-binding-proof.json).

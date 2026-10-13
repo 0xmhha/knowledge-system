@@ -1,6 +1,6 @@
 현재 진행 작업은 [go-stablenet 데이터 생성·비교](./GO-STABLENET-DATASET-COMPARISON.md)다. 일반 진행 보고에는 사용자가 별도로 보류한 출시 사항을 포함하지 않고, 요청한 데이터 작업의 진행·검증·다음 단계만 설명한다.
 
-[go-stablenet 비교 작업표](./GO-STABLENET-DATASET-COMPARISON.md)의 출처 매핑 수정·42질문 재평가·SNK06 검토는3/3 실행 완료다. 수정 데이터의756회 질의 오류0, 정상 pack 원문 검증 통과, 기존 SNK06 실패와 캡처 종료 오류2회 보존. 최종 커밋/원장 검증 상태는 진행 JSON을 따른다.
+[go-stablenet 비교 작업표](./GO-STABLENET-DATASET-COMPARISON.md)의 출처 매핑 수정·42질문 재평가·SNK06 검토는3/3 실행 완료다. 수정 데이터의756회 질의 오류0, 정상 pack 원문 검증 통과, 기존 SNK06 실패와 캡처 종료 오류2회 보존. 현재/커밋 SHA1833개와 기존 진행 guard PASS. 남은 요청 작업0개이며 근거는 진행 JSON을 따른다.
 
 # 현재 인수인계
 
