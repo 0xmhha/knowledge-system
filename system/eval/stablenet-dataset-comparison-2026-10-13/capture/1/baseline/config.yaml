@@ -1,0 +1,47 @@
+version: 1
+name: go-stablenet
+description: ''
+backends:
+  ckg:
+    path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-231308-0bf2f4d1/graph/graph.db
+    source_root: /Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet
+    timeout_ms: 5000
+    binary_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/bin/ckg
+    policy_file: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/pack/policies/graph.yaml
+  ckv:
+    path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet/v20261012-231308-0bf2f4d1/vector
+    provider: ''
+    binary_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/bin/ckv
+    timeout_ms: 3000
+    embed_model: bge-m3:latest
+    embed_dim: 1024
+    query_prefix_policy: registry
+    ollama_url: http://127.0.0.1:11434
+listen:
+  http_addr: 127.0.0.1:8941
+  mcp_stdio: true
+  transport: stdio
+  allow_remote: false
+  allowed_cidrs: []
+logging:
+  level: info
+  mode: prod
+  footprint_dir: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/capture/1/baseline/events
+  audit_dir: ''
+  measure_backend_calls: true
+sanitize:
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+vocab:
+  glossary_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/pack/domain-knowledge/glossary.yaml
+domain:
+  project_dir: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-20261013/pack/domain-knowledge
+  corpus_dir: /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-derived/domain-corpus
+semantic:
+  store_path: ''
+  ontology_mode: 'off'
+service:
+  label_prefix: ''
+retrieval:
+  type_neighbors: false

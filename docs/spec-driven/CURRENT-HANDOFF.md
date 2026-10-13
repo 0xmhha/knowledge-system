@@ -1,3 +1,5 @@
+현재 진행 작업은 [go-stablenet 데이터 생성·비교](./GO-STABLENET-DATASET-COMPARISON.md)다. 일반 진행 보고에는 사용자가 별도로 보류한 출시 사항을 포함하지 않고, 요청한 데이터 작업의 진행·검증·다음 단계만 설명한다.
+
 # 현재 인수인계
 
 2026-10-13 기준 제품 코드는 main9a397188이다. [PR #99](https://github.com/0xmhha/knowledge-system/pull/99)는 스쿼시 머지됐고 로컬 main 동기화와 [main CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38362113044)를 확인했다. 현재 checkout/원격 동기화는 `git status --short --branch`로 확인한다. 이 문서에 고정한 검증 commit을 미래의 실시간 HEAD로 사용하지 않는다.
