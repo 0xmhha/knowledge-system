@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,shutil,hashlib,subprocess
+root=Path.cwd();parent=root.parents[1]/'knowledge-data'
+# Resolve known sibling explicitly; this source layout has knowledge-system
+# under auto-coding/knowledge, whereas datasets live under auto-coding.
+parent=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data')
+old=parent/'comparison-go-stablenet-20261013';run=parent/'comparison-go-stablenet-corpus-20261014'
+assert not run.exists()
+run.mkdir();(run/'bin').mkdir()
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+for name in ['cks','ckg','ckv']:shutil.copy2(Path('/private/tmp/ks-retained-corpus-bin')/name,run/'bin'/name)
+shutil.copytree(old/'pack',run/'pack')
+for source,target in [('questions.json','questions.json'),('requests.json','requests.json'),('questions-freeze.json','questions-freeze.json')]:shutil.copy2(old/source,run/target)
+freeze=json.loads((run/'questions-freeze.json').read_text())
+assert sha(run/'questions.json')==freeze['questions_sha256'] and sha(run/'requests.json')==freeze['requests_sha256']
+protocol=json.loads((old/'protocol.json').read_text())
+protocol.update(created_at=datetime.now(timezone.utc).isoformat(),scope='same frozen42-question regression after retained corpus provenance repair; old and new datasets use the same repaired serving binary',tool_source_revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),tool_runtime_Go_unchanged_since_main=False,tool_source_has_uncommitted_repair=True,candidate_dataset=str(parent/'go-stablenet-retained-corpus-20261014'),candidate_version='v20261014-retained-corpus-0bf2f4d1',pack=str(run/'pack'),binary_sha256={n:sha(run/'bin'/n)for n in ['cks','ckg','ckv']},pack_files_sha256={str(p.relative_to(run/'pack')):sha(p)for p in (run/'pack').rglob('*')if p.is_file()},baseline_preserved_and_no_implicit_origin_backfill=True)
+protocol['source_runtime_sha256']={p:sha(root/p)for p in subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()if p.startswith(('cmd/','internal/','pkg/'))and not p.endswith('_test.go')}
+protocol['source_runtime_sha256'].update({p:sha(root/p)for p in ['go.mod','go.sum']})
+protocol['evaluation']['claims']='failed request denominator, retained source/integrity validation, same prompt anchors, citation/body changes and descriptive successful warm latency; no generated-answer scoring'
+(run/'protocol.json').write_text(json.dumps(protocol,ensure_ascii=False,indent=2)+'\n')
+packet=root/'system/eval/stablenet-corpus-repair-2026-10-14';(packet/'protocol.json').write_bytes((run/'protocol.json').read_bytes())
+print('Prepared replay workspace only;42 requests unchanged; binary and runtime source pins recorded')

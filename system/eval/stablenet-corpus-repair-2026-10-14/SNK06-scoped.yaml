@@ -1,0 +1,25 @@
+id: SNK06-systemcontracts-mint-allowance
+description: |
+  Package-scoped follow-up diagnostic for the original SNK06 scope mismatch.
+  The original global probe and its failed precision score remain unchanged.
+  Use explicit FTS column scope plus AND operators; mode=or bypasses the
+  natural-language substring-AND filter because this is a power-user query.
+  The symbol-only default excludes CallSite/ReturnStmt rows. Keep the original
+  six expected symbols, including the two tests in the systemcontracts package.
+  This probe was derived after source review, not frozen independent quality gold.
+probe:
+  tool: search_text
+  args:
+    query: "qualified_name:systemcontracts AND mint* AND allowance*"
+    mode: or
+    language: go
+    top_k: 15
+expected:
+  symbols:
+    - systemcontracts.GOV_MASTER_MINTER_PARAM_MAX_MINTER_ALLOWANCE
+    - systemcontracts.DefaultMaxMinterAllowance
+    - systemcontracts.GetMaxMinterAllowance
+    - systemcontracts.SLOT_GOV_MASTER_MINTER_maxMinterAllowance
+    - systemcontracts.TestDefaultMaxMinterAllowance
+    - systemcontracts.TestGetMaxMinterAllowance
+scoring: { recall_min: 1.0, precision_min: 1.0 }

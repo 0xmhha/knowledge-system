@@ -1,0 +1,76 @@
+{
+  "checked_at": "2026-10-13T17:21:40.905767+00:00",
+  "responses": 1512,
+  "missing_responses": 0,
+  "baseline_errors": 360,
+  "candidate_errors": 0,
+  "baseline_valid_v2_packs": 396,
+  "candidate_valid_v2_packs": 756,
+  "invalid_v2_packs": 0,
+  "source_missing_questions_resolved": 20,
+  "resolved_question_ids": [
+    "ANCHOR-01",
+    "ANCHOR-02",
+    "ANCHOR-03",
+    "ANCHOR-04",
+    "ANCHOR-05",
+    "ANCHOR-06",
+    "T03-systemcontracts-v2-upgrade",
+    "T04-pr77-anzeon-tip-callers",
+    "T08-pr75-wbft-futureview",
+    "T09-pr73-govcouncil-sync",
+    "T12-pr58-chainconfig-engine",
+    "T13-pr56-system-contract-init",
+    "T14-pr55-wbft-race",
+    "T15-wbft-roundchange-flow",
+    "T16-wbft-commit-finalization",
+    "T17-wbft-validator-set",
+    "T18-wbft-backlog-replay",
+    "T19-wbft-proposal-lifecycle",
+    "T20-govstaking-deposit-flow",
+    "T21-systemcontract-upgrade-codepatch"
+  ],
+  "paired_valid_packs": 396,
+  "citation_order_changed_pairs": 198,
+  "body_outputs_changed_pairs": 198,
+  "source_signature_anchors": {
+    "baseline": {
+      "hit_at_10": 0.5,
+      "RR_at_10": 0.3888888888888889
+    },
+    "candidate": {
+      "hit_at_10": 1,
+      "RR_at_10": 0.7916666666666666
+    }
+  },
+  "paired_successful_warm": {
+    "baseline": {
+      "n": 220,
+      "p95_ms": 2154.964958,
+      "median_ms": 1132.016687
+    },
+    "candidate": {
+      "n": 220,
+      "p95_ms": 1918.7285,
+      "median_ms": 1094.0507499999999
+    }
+  },
+  "session_close_errors": [
+    {
+      "arm": "candidate",
+      "block": 1,
+      "error": "close warm session: signal: killed"
+    },
+    {
+      "arm": "candidate",
+      "block": 2,
+      "error": "close warm session: signal: killed"
+    }
+  ],
+  "capture_harness_full_pass": false,
+  "all_original4_dataset_roots_and_model_and_source_and_runtime_pins_preserved": true,
+  "request_SHA256": "e36e27b35d8daeff6fdfd42cf27d74242c6d772a7c6e16d30cd0073a59c970fa",
+  "generated_answer_quality_evaluated": false,
+  "latency_improvement_accepted": false,
+  "scope": "execution and archive-backed citation correctness; capture teardown errors retained separately"
+}

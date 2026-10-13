@@ -1,0 +1,290 @@
+{
+  "state": "three_requested_execution_tasks_complete_final_committed_binding_pending",
+  "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "dataset": {
+    "checked_at": "2026-10-13T16:49:52.764479+00:00",
+    "status": "ready",
+    "doctor": {
+      "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+      "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+      "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+      "source_mode": "committed",
+      "history_status": "available",
+      "identity_status": "pinned",
+      "source_root": "/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "indexed_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "dirty": false,
+      "languages": {
+        "go": 1287,
+        "javascript": 39,
+        "markdown": 58,
+        "solidity": 24
+      },
+      "shared_code_files": 1350,
+      "graph_only_proto": 4,
+      "symlinks_skipped": 0,
+      "unreadable_files": 0,
+      "secret_path_count": 0,
+      "ignored_indexable": 0,
+      "dataset_version": "v20261014-retained-corpus-0bf2f4d1",
+      "issues": [],
+      "status": "ready"
+    },
+    "doctor_command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014/bin/cks",
+      "doctor",
+      "--src",
+      "/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet",
+      "--dataset",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014",
+      "--strict"
+    ],
+    "doctor_exit": 0,
+    "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+    "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+    "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+    "retained_files_by_origin": {
+      "docs:corpus.0": 44,
+      "docs:corpus.1": 27,
+      "repo": 2224
+    },
+    "namespace_files": 45,
+    "flow_fileless_records_with_real_JSONL_lines": 34,
+    "vector_chunks": 21304,
+    "vector_chunk_kinds": {
+      "convention": 204,
+      "doc": 633,
+      "file_header": 1356,
+      "flow_spine": 18,
+      "flow_step": 78,
+      "function_split": 211,
+      "invariant": 178,
+      "symbol": 18626
+    },
+    "all_vector_input_file_SHA_match_retained": true,
+    "vector_DB_SHA_match": true,
+    "graph_vector_source_coordinates_match": true,
+    "baseline_DB_manifest_current_preserved": true,
+    "source_HEAD_preserved": true,
+    "model_digest_preserved": true,
+    "runtime_source_and_binary_pins_preserved": true
+  },
+  "replay": {
+    "checked_at": "2026-10-13T17:21:40.905767+00:00",
+    "responses": 1512,
+    "missing_responses": 0,
+    "baseline_errors": 360,
+    "candidate_errors": 0,
+    "baseline_valid_v2_packs": 396,
+    "candidate_valid_v2_packs": 756,
+    "invalid_v2_packs": 0,
+    "source_missing_questions_resolved": 20,
+    "resolved_question_ids": [
+      "ANCHOR-01",
+      "ANCHOR-02",
+      "ANCHOR-03",
+      "ANCHOR-04",
+      "ANCHOR-05",
+      "ANCHOR-06",
+      "T03-systemcontracts-v2-upgrade",
+      "T04-pr77-anzeon-tip-callers",
+      "T08-pr75-wbft-futureview",
+      "T09-pr73-govcouncil-sync",
+      "T12-pr58-chainconfig-engine",
+      "T13-pr56-system-contract-init",
+      "T14-pr55-wbft-race",
+      "T15-wbft-roundchange-flow",
+      "T16-wbft-commit-finalization",
+      "T17-wbft-validator-set",
+      "T18-wbft-backlog-replay",
+      "T19-wbft-proposal-lifecycle",
+      "T20-govstaking-deposit-flow",
+      "T21-systemcontract-upgrade-codepatch"
+    ],
+    "paired_valid_packs": 396,
+    "citation_order_changed_pairs": 198,
+    "body_outputs_changed_pairs": 198,
+    "source_signature_anchors": {
+      "baseline": {
+        "hit_at_10": 0.5,
+        "RR_at_10": 0.3888888888888889
+      },
+      "candidate": {
+        "hit_at_10": 1,
+        "RR_at_10": 0.7916666666666666
+      }
+    },
+    "paired_successful_warm": {
+      "baseline": {
+        "n": 220,
+        "p95_ms": 2154.964958,
+        "median_ms": 1132.016687
+      },
+      "candidate": {
+        "n": 220,
+        "p95_ms": 1918.7285,
+        "median_ms": 1094.0507499999999
+      }
+    },
+    "session_close_errors": [
+      {
+        "arm": "candidate",
+        "block": 1,
+        "error": "close warm session: signal: killed"
+      },
+      {
+        "arm": "candidate",
+        "block": 2,
+        "error": "close warm session: signal: killed"
+      }
+    ],
+    "capture_harness_full_pass": false,
+    "all_original4_dataset_roots_and_model_and_source_and_runtime_pins_preserved": true,
+    "request_SHA256": "e36e27b35d8daeff6fdfd42cf27d74242c6d772a7c6e16d30cd0073a59c970fa",
+    "generated_answer_quality_evaluated": false,
+    "latency_improvement_accepted": false,
+    "scope": "execution and archive-backed citation correctness; capture teardown errors retained separately"
+  },
+  "SNK06_scope_review": {
+    "original_fixture_preserved": true,
+    "global_matches_source_confirmed": 15,
+    "additional_test_package_matches_valid": 9,
+    "package_scoped_results": [
+      {
+        "dataset": "go-stablenet",
+        "exit": 0,
+        "report": "SNK06-scoped-go-stablenet.json",
+        "recall": 1,
+        "precision": 1,
+        "F1": 1,
+        "expected_symbols": 6,
+        "observed_symbols": 6
+      },
+      {
+        "dataset": "go-stablenet-refinputs",
+        "exit": 0,
+        "report": "SNK06-scoped-go-stablenet-refinputs.json",
+        "recall": 1,
+        "precision": 1,
+        "F1": 1,
+        "expected_symbols": 6,
+        "observed_symbols": 6
+      },
+      {
+        "dataset": "go-stablenet@0bf2f4d1b",
+        "exit": 0,
+        "report": "SNK06-scoped-go-stablenet@0bf2f4d1b.json",
+        "recall": 1,
+        "precision": 1,
+        "F1": 1,
+        "expected_symbols": 6,
+        "observed_symbols": 6
+      },
+      {
+        "dataset": "previous-comparison-candidate",
+        "exit": 0,
+        "report": "SNK06-scoped-previous-comparison-candidate.json",
+        "recall": 1,
+        "precision": 1,
+        "F1": 1,
+        "expected_symbols": 6,
+        "observed_symbols": 6
+      },
+      {
+        "dataset": "candidate",
+        "exit": 0,
+        "report": "SNK06-scoped-candidate.json",
+        "recall": 1,
+        "precision": 1,
+        "F1": 1,
+        "expected_symbols": 6,
+        "observed_symbols": 6
+      }
+    ],
+    "original_keyword_gate": "7/8, SNK06 precision0.4 preserved",
+    "production_search_code_changed": false,
+    "independent_quality_gold": false
+  },
+  "source_tests": {
+    "Go_full": {
+      "exit": 0,
+      "passing_packages": 118,
+      "log_sha256": "148db1327b6ee392a8e6a99aae70039afd44de314a950b7c96fc98a7aa8f69c3"
+    },
+    "related_packages": {
+      "exit": 0,
+      "count": 9
+    },
+    "collision_build_test": {
+      "exit": 0
+    },
+    "python_comparison_tests": {
+      "exit": 0,
+      "tests": 8,
+      "scope": "includes exclusion of unmatched/startup measurement costs"
+    },
+    "engine_boundaries": {
+      "exit": 0
+    },
+    "docs_check": {
+      "exit": 0,
+      "live_documents": 107
+    },
+    "scope": "automated source/provenance regression; actual dataset and replay pending",
+    "tests_cover": [
+      "namespace validation and root escape rejection",
+      "same-named repository/corpus separation in real CKV build and v2 bodies",
+      "source capture includes external corpus origins before pinning",
+      "domain export does not repeat after pinning",
+      "flow spine and curated invariant reference actual JSONL rows",
+      "missing/foreign corpus origin rejects v2 build",
+      "changed live corpus is ignored in v2 body reconstruction",
+      "tampered retained corpus fails closed"
+    ],
+    "go_vet": {
+      "exit": 0
+    },
+    "race": {
+      "exit": 0,
+      "packages": 8,
+      "log_sha256": "795863149a2da47bf0905bf3eb91cf4e0a4ffec79f882e72131ef676a804298d"
+    },
+    "lint": {
+      "exit": 0,
+      "issues": 0,
+      "post_correction": "deferred close return values explicitly ignored; two related packages reverified"
+    },
+    "post_lint_related_tests": {
+      "exit": 0,
+      "packages": 2
+    }
+  },
+  "remaining_requested_execution_tasks": [],
+  "operational_notes": [
+    "Existing4 dataset roots and operator current pointers preserved; new data in a separate root",
+    "Use repaired CKS and the new retained-corpus dataset for verified generated-document citations",
+    "Two capture server close errors recorded; capture harness full pass is false, despite zero new dataset query errors",
+    "No new independent generated-answer quality or latency acceptance",
+    "Optional next maintenance: investigate capture server teardown deadline; push/PR not requested in this task"
+  ],
+  "standard_workspace_binaries": {
+    "ckg": {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "sha256": "9cde81e59e3122a9fcd648d47a99c0ddb09613f3496f44f579d6a959a42df413"
+    },
+    "ckv": {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "sha256": "979a607a2544917184d5610524e6431c8dce69d8d07dc77f1a4c75d3b3adeb0f"
+    },
+    "cks": {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "sha256": "1b31ddf2f8c6b88e6c58f06535b9bff1ae334189bcbf420d54adcce4232b9644"
+    }
+  },
+  "standard_workspace_build_exit": 0,
+  "standard_workspace_source_revision": "ed5512ee0575",
+  "standard_workspace_source_runtime_matches_replay": true
+}

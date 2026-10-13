@@ -2516,8 +2516,8 @@
     "worklist": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
     "evidence": "system/eval/stablenet-corpus-repair-2026-10-14",
     "requested_tasks": 3,
-    "completed": 1,
-    "state": "42_question_replay_in_progress",
+    "completed": 3,
+    "state": "execution_complete_final_committed_binding_pending",
     "sequence": [
       {
         "order": 1,
@@ -2529,14 +2529,19 @@
       {
         "order": 2,
         "task": "replay unchanged42 questions",
-        "state": "in_progress"
+        "state": "complete_with_session_close_errors_preserved",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/replay-verification.json"
       },
       {
         "order": 3,
         "task": "review SNK06 scope and expected results",
-        "state": "pending"
+        "state": "complete",
+        "verification": "system/eval/stablenet-corpus-repair-2026-10-14/SNK06-scope-review.json"
       }
     ],
-    "runtime_source_binding": "new verification pending; historical acceptance records unchanged"
+    "runtime_source_binding": "new verification pending; historical acceptance records unchanged",
+    "remaining_requested_tasks": [],
+    "result": "system/eval/stablenet-corpus-repair-2026-10-14/result.json",
+    "optional_next_maintenance": "investigate capture warm session close deadline; preserve recorded errors"
   }
 }

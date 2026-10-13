@@ -61,9 +61,17 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 | 순서 | 작업 | 상태 | 완료에 필요한 근거 |
 |---|---|---|---|
 | 1 | domain/flow 출처 보관과 v2 매핑 | 완료 | 생성 문서를 identity 고정 전에 캡처; 코드와 문서 경로 충돌 방지; JSONL flow 인용의 실제 행; namespace 검증; 변조·누락·동명 경로 회귀 시험; 별도 실측 build/doctor |
-| 2 | 같은 42질문 재평가 | 진행 중 | 원래 requests SHA 유지; 수정 바이너리/새 dataset 좌표 고정; 기존 오류와 비교; 모든 정상 pack의 원문·좌표·hash 검증; 반복 조건·결과·지연 한계 기록 |
-| 3 | SNK06 범위·기대 결과 검토 | 대기 | 원 fixture 실패 보존; 추가 test.*의 실제 검색 일치 여부 확인; 전역 검색 계약과 package 기대 범위 불일치 판정; 별도 명시한 검토 fixture 검증 |
+| 2 | 같은 42질문 재평가 | 완료 · 종료 경고 보존 | 원래 requests SHA 유지; 수정 바이너리/새 dataset 좌표 고정; 기존 오류와 비교; 모든 정상 pack의 원문·좌표·hash 검증; 반복 조건·결과·지연 한계 기록 |
+| 3 | SNK06 범위·기대 결과 검토 | 완료 | 원 fixture 실패 보존; 추가 test.*의 실제 검색 일치 여부 확인; 전역 검색 계약과 package 기대 범위 불일치 판정; 별도 명시한 검토 fixture 검증 |
 
 설계: pinned build의 외부 corpus는 CKV `docs_roots` 순서와 일치하는 `docs:corpus.<index>` origin으로 보관한다. v1 검색·본문 선택 동안 `@cks/docs/<index>/<path>` 경로를 사용하여 코드와 동일한 파일명을 구분한다. v2는 이를 origin과 원래 상대 경로로 분리하고 기존 보관 원문/hash/예산/소독 검증을 적용한다. flow step은 구현 코드 인용을 유지하며, flow spine/curated invariant는 corpus JSONL의 실제 행을 인용한다. 이전 dataset에 새 원문을 사후 삽입하지 않으며 재색인이 필요하다. 이 출처 구분은 사람의 검토나 정책 승인을 부여하지 않는다.
 
 1번 검증: 실제29분24초 index, 21304청크, namespace 파일45개, JSONL flow spine/invariant34개 실제 행 확인. repo2224/domain44/flow자료27개 원문을 출처별로 보관했다. strict doctor ready·모델/DB/좌표 일치·기존4개 root/current·source HEAD 보존. ANCHOR-01은 domain 문서 원문을 포함한 complete11인용으로 정상 응답했다. 전체 Go118패키지·관련 race8패키지·vet·lint0issues·comparison Python8시험 통과. lint 수정 뒤 setup/build2패키지를 다시 확인했다. canonical18691/18837을 SQL로 직접 확인했고, 비활성 threshold gate를 통과로 바꾸지 않았다. [수정 검증 자료](../../system/eval/stablenet-corpus-repair-2026-10-14/).
+
+2번 재평가: 동일 requests SHA로 교대2블록1512회, 누락0. 기존 source_missing360/756 → 수정0/756, 이전에 실패한20질문의 모든 반복 호출이 정상화됐다. 정상1152개 v2 pack의 원문·좌표·무결성 검증 실패0. 기계적으로 소스에서 고정한12개 signature hit@10은0.5 →1.0, RR@10은0.388889 →0.791667이다. 이전 API 실패가 해소된 검색 진단이며 독립 답변 정확도 판정은 아니다. 정상396쌍 중198쌍의 인용 순서·본문이 바뀌었다. 동일 성공 질문의 warm220쌍 p95는2154.965ms →1918.729ms지만 성능 향상 수용은 하지 않는다. 수정 arm2회에서 close warm session: signal: killed를 보존해 capture harness full pass=false로 기록했다. 요청별 오류율과 캡처 종료 오류를 섞지 않는다. [재평가 검증](../../system/eval/stablenet-corpus-repair-2026-10-14/replay-verification.json).
+
+3번 검토: 전역15개 모두 `name/qualified_name/signature/doc_comment`의 case-insensitive substring AND 계약 및 보관된 선언·SHA·행 범위에 부합했다. 추가9개는 systemcontracts/test 하위의 Go package test 심볼이다. 기존 fixture 원문·실패7/8과precision0.4는 그대로 둔다. 패키지 범위를 명시한 별도 질의 `qualified_name:systemcontracts AND mint* AND allowance*`는 raw FTS AND를 사용하며 mode=or로 자연어 substring 필터를 적용하지 않는다. symbol-only 기본 필터가 CallSite/ReturnStmt를 제외한다. 기존6개 기대 목록을 바꾸지 않고 기존4개·새1개 dataset 모두 precision/recall/F1=1.0으로 확인했다. [별도 scoped fixture](../../projects/stablenet/eval/graph-keyword/scoped-fixtures/SNK06-systemcontracts-mint-allowance.yaml), [출처별 검토](../../system/eval/stablenet-corpus-repair-2026-10-14/SNK06-scope-review.json). 사후 범위 진단이며 새 독립 gold나 모델 품질 승인으로 바꾸지 않는다.
+
+현재 요청한 순차 작업은3/3 실행 완료다. 최종 커밋의 SHA·원문·기존 진행 원장 검증까지 마친 기록은 active source binding을 따른다. 남은 요청 작업0개. 별도 운영 유지보수 후보는 캡처 서버 종료 deadline 진단이며, 기존 운영 current/config 전환과 원격 게시를 자동 실행하지 않았다.
+
+현재 소스의 일반 workspace `bin/ckg`, `bin/ckv`, `bin/cks`도 다시 빌드했다. 수정 CKS와 별도 새 데이터의 조합이 필요하다. stdio 설정 경로는 `/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`이며, 실행은 `bin/cks mcp --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`다. 원래 운영 설정을 제자리 변경하지 않았다.
