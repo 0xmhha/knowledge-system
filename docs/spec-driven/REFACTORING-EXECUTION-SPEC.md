@@ -434,8 +434,8 @@ N12 현행 연결 세부 준비(2026-10-08): [현행 canonical 연결 준비](./
 
 - [x] O04-A query에 매칭 개념·사용한 검토 관계/원문과 후보 점수·rank/body 변화의 bounded 설명; off/no_match/active-but-zero 구분.
 - [x] O04-B 같은 dataset/model/질문·off/on의 인용·본문·순위·상태/latency 비교 및 실패 분모/모델 호출, 기존 FINAL 새 독립 표본 재사용0.
-- [ ] O04-C controlled 기능 설명과 실제 도메인 효과 판정을 분리, 실제 도메인 자료/독립 평가 조건·부족 표본/활동시간·quality 한계 기록.
-- [ ] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
+- [x] O04-C controlled 기능 설명과 실제 도메인 효과 판정을 분리, 실제 도메인 자료/독립 평가 조건·부족 표본/활동시간·quality 한계 기록.
+- [x] O04-D 구현/시험/평가 원자료·사전 조건/판정·current/committed SHA와 설명 문서·진행 원장 결합; 효과 미확인 상태를 품질 성공으로 체크하지 않음.
 
 O01 검증: [구현 기록](./ONTOLOGY-MCP-IMPLEMENTATION.md)·171시험/156하위시험/3패키지 race pass, progress guard11·vet/boundary 통과. readiness와 실제 quality/criterion acceptance를 분리했고 운영 자료는 변경하지 않았다. 다음 O02, 전체 잔여4개(N16/O02/O03/O04).
 
@@ -460,3 +460,7 @@ O04 비용/입력후속: [진단·보완·새후보](./ONTOLOGY-COST-AND-INDEPEN
 ## O04 독립 입력 이력·검토 준비 후속
 
 [이력 대조·후보 보강·검토 조건](./ONTOLOGY-INDEPENDENT-HISTORY-REVIEW-2026-10-13.md): 평가 JSON4,758·Markdown/YAML1,618의 총6,376 SHA를 포착 커밋에 결합, 빈3개 외6,373개 해석. 전체 응답34,011·중복 제외표현1,005와 gold624표현을 대조했다. 후보18/19gold의 실제 source/canonical/chunk 전체 행 포함 확인, 과거노출4·기존설계맥락1 제외. 검토13문항·보수적제안10군은 독립승인0/FINAL가능0이며 기존DEV 노출작성자·같은개념군·외부/삭제/채팅이력 한계와 추가통합 시 부족 가능성을 기록했다. 입력/채점/노출70시험 pass·운영HEAD/current/config/heldDB SHA 보존·모델호출0. O04-A/B만 완료, C/D·전체O04 unchecked. 다음 실제 내용/gold/범위/군·의미적독립성 검토→조건 충족 시 사전동결→평가/최종수용. 전체잔여 O04/N16의2개.
+
+## O04 최종 판정과 증거 결합
+
+[최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md). 원명세C의 실제 도메인 효과/독립 조건·부족표본/활동시간/quality한계 기록, D의 현재·커밋SHA·실행/시험/원자료 결합을 완료했다. 사전동결 후702응답/351쌍·실패/누락/pending0·source/v2/같은입력 검증·재채점 일치. 독립자격not_established/승인단위0/새FINAL0·quality inconclusive·전체성능미수용, 기본off·운영활성0을 유지한다. 독립품질 성공을 완료요건으로 새로 가정하거나 사람의 독립검토를 만들어내지 않는다. 사용자 전체O04 완료지시에 따라 직접 기술검토/실측/한계판정을 끝냈다. 입력/채점/이력/종료80시험 pass·Go source 변경0. O04-A–D 완료, 온톨로지4/4·기존17/18·전체 잔여 N16 하나.

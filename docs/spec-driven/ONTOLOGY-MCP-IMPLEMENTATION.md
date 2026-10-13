@@ -1,6 +1,6 @@
 # 온톨로지 MCP 보완 구현 기록
 
-2026-10-13 · **O01–03 완료, O04-A/B 완료·독립 C/D 대기**. 기존N17/18·잔여N16 유지. 온톨로지3/4·잔여1개, 전체 잔여2개(N16/O04). [현재 평가 검토안](./ONTOLOGY-EVALUATION-REVIEW-2026-10-13.md). 아래 구현·검증 이력은 당시 상태를 포함한다.
+2026-10-13 · **O01–04 완료·온톨로지4/4**. 독립품질inconclusive/승인단위0·기본off 유지. 기존17/18·전체잔여N16 하나(기존 미충족 유지 결정). [O04 최종 판정](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md). 아래 구현·검증 이력은 당시 상태를 포함한다.
 
 ## O01: cks.semantic.status
 
@@ -151,3 +151,7 @@ warm80회/arm의 aggregate p95는 off452.05ms/on588.72ms(약30.2% 높음). 요�
 ## O04 독립 입력 이력·검토 준비 후속
 
 [이력 대조·후보 보강·검토 조건](./ONTOLOGY-INDEPENDENT-HISTORY-REVIEW-2026-10-13.md): 평가 JSON4,758·Markdown/YAML1,618의 총6,376 SHA를 포착 커밋에 결합, 빈3개 외6,373개 해석. 전체 응답34,011·중복 제외표현1,005와 gold624표현을 대조했다. 후보18/19gold의 실제 source/canonical/chunk 전체 행 포함 확인, 과거노출4·기존설계맥락1 제외. 검토13문항·보수적제안10군은 독립승인0/FINAL가능0이며 기존DEV 노출작성자·같은개념군·외부/삭제/채팅이력 한계와 추가통합 시 부족 가능성을 기록했다. 입력/채점/노출70시험 pass·운영HEAD/current/config/heldDB SHA 보존·모델호출0. O04-A/B만 완료, C/D·전체O04 unchecked. 다음 실제 내용/gold/범위/군·의미적독립성 검토→조건 충족 시 사전동결→평가/최종수용. 전체잔여 O04/N16의2개.
+
+## O04 완료: 실제 관측과 독립 자격·한계 최종 판정
+
+사전 동결4387b888 뒤 실제702응답/351쌍·trace2·실패/누락/pending/미결합0, source/v2/모델/같은 입력과 종료 보존 검사를 통과했다. 검토 개념active108/no_match243쌍, 공개 인용/본문 변화54쌍. Recall동일·expectedRR소폭하락, 전체warm p95비1.0855이나3문항예산초과를 보존했다. 생성답변/독립품질 수용/전체성능 수용은false, independent 자격not_established·quality inconclusive·새FINAL0이다. C의 실제효과·독립조건/부족분·활동시간/한계기록과D의동결/구현/시험/원자료·current/committed SHA결합을완료했다. 입력/채점/이력/종료80시험 pass·Go source불변. [최종판정과재현자료](./ONTOLOGY-FINAL-VERDICT-2026-10-13.md). 기본off/opt-in·운영활성0·공개배포보류 유지. 온톨로지4/4, 전체잔여N16 하나.
