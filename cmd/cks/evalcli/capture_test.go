@@ -96,3 +96,42 @@ func TestCaptureRefusesExistingOutputBeforeServerStartup(t *testing.T) {
 		t.Fatal("output unexpectedly looked like input")
 	}
 }
+
+func TestCaptureKeepsSuccessfulResponsesAndFailedShutdownSeparate(t *testing.T) {
+	root := t.TempDir()
+	input, config, binary, output := filepath.Join(root, "requests.json"), filepath.Join(root, "config"), filepath.Join(root, "server"), filepath.Join(root, "report.json")
+	script := `#!/usr/bin/env python3
+import sys,json
+for line in sys.stdin:
+ r=json.loads(line)
+ if 'id' not in r: continue
+ result={'protocolVersion':'2024-11-05','capabilities':{},'serverInfo':{'name':'fixture','version':'1'}} if r['method']=='initialize' else {'content':[{'type':'text','text':'success'}]}
+ print(json.dumps({'jsonrpc':'2.0','id':r['id'],'result':result}),flush=True)
+sys.exit(9)
+`
+	for path, body := range map[string]string{input: `{"schema_version":1,"requests":[{"id":"x","tool":"cks.context.get_for_task","arguments":{"prompt":"Alpha"}}]}`, config: "fixture", binary: script} {
+		if err := os.WriteFile(path, []byte(body), 0700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := captureRun(context.Background(), input, config, binary, output, 0, 1, 0, 0, 10*time.Second); err == nil {
+		t.Fatal("failed shutdown accepted")
+	}
+	raw, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var report captureReport
+	if err := json.Unmarshal(raw, &report); err != nil {
+		t.Fatal(err)
+	}
+	if len(report.Rows) != 1 || report.Rows[0].Error != "" || len(report.Rows[0].Call.Response) == 0 {
+		t.Fatal("successful response lost or relabeled")
+	}
+	if report.State != "partial" || len(report.SessionClosures) != 1 || !strings.Contains(report.SessionClosures[0].Error, "exit status 9") || report.SessionClosures[0].ElapsedNS <= 0 {
+		t.Fatalf("shutdown failure/timing missing: %s", raw)
+	}
+	if len(report.Errors) != 1 || !strings.HasPrefix(report.Errors[0], "close warm session:") {
+		t.Fatalf("shutdown failure denominator changed: %v", report.Errors)
+	}
+}

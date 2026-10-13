@@ -44,13 +44,22 @@ type FilesystemFetcher struct {
 	// they have no body and Stage 4 skips them. Same escape protection as
 	// Root applies to each.
 	DocsRoots []string
+	// ReadSource replaces working-tree resolution with verified archive reads.
+	ReadSource sourcepath.Reader
 }
 
 // Fetch implements BodyFetcher. Returns ("", nil) for any "body
 // genuinely unavailable" outcome (missing file in every root,
 // out-of-range line span, escape attempt) — Stage 4 treats those as
 // skip-not-error per the BodyFetcher contract.
-func (f *FilesystemFetcher) Fetch(_ context.Context, c contract.Citation) (string, error) {
+func (f *FilesystemFetcher) Fetch(ctx context.Context, c contract.Citation) (string, error) {
+	if f.ReadSource != nil {
+		data, err := f.ReadSource(ctx, c.File)
+		if err != nil {
+			return "", err
+		}
+		return extractLines(string(data), c.StartLine, c.EndLine), nil
+	}
 	roots := append([]string{f.Root}, f.DocsRoots...)
 	if index, relative, reserved, valid := sourcepath.Parse(c.File); reserved {
 		if !valid {

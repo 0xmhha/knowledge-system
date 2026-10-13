@@ -3,6 +3,7 @@ package ckvclient
 import (
 	"context"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -35,6 +36,7 @@ type RealOpts struct {
 	// mutable checkout; empty preserves the legacy manifest-root behavior.
 	SourceRoot     string
 	RetainedSource bool
+	SourceReader   sourcepath.Reader
 
 	// Embedder must match the embedder the index was built with (same
 	// name + dimension) or ckv.Open returns ErrIndexUnavailable. The
@@ -55,6 +57,7 @@ type Real struct {
 	emb            ckvtypes.Embedder
 	sourceRoot     string
 	retainedSource bool
+	sourceReader   sourcepath.Reader
 	closed         bool
 
 	// modelDown is tripped when a real SemanticSearch fails (the engine's
@@ -92,7 +95,7 @@ func NewReal(ctx context.Context, opts RealOpts) (*Real, error) {
 	// The caller (cmd/cks-mcp) only constructs Real after buildEmbedder
 	// probed the model successfully, so the model starts known-up.
 	return &Real{eng: eng, emb: opts.Embedder, sourceRoot: opts.SourceRoot,
-		retainedSource: opts.RetainedSource, lastProbeOK: true}, nil
+		retainedSource: opts.RetainedSource, sourceReader: opts.SourceReader, lastProbeOK: true}, nil
 }
 
 // SemanticSearch runs an in-process vector query and translates each
@@ -123,7 +126,7 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 		filter.ChunkKinds = append(filter.ChunkKinds, ckvtypes.ChunkKind(ck))
 	}
 	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter,
-		SrcRoot: r.sourceRoot, RetainedSource: r.retainedSource, EnableBM25Rerank: opts.BM25Rerank})
+		SrcRoot: r.sourceRoot, RetainedSource: r.retainedSource, SourceReader: r.sourceReader, EnableBM25Rerank: opts.BM25Rerank})
 	if err != nil {
 		// A query failure means the engine could not embed the query —
 		// almost always the model endpoint is unreachable. Trip the flag so

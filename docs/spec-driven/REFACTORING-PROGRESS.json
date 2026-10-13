@@ -2556,5 +2556,36 @@
       "system/eval/stablenet-corpus-repair-2026-10-14/progress-check.txt": "f44673dec8d93dc270c524048c6a48d005a2dbc29e1b0475c9844d1cf25c7867",
       "system/eval/stablenet-corpus-repair-2026-10-14/completion.json": "120ca0ffc7beb9c8b9ddde5891b3bf2d4a9d07473528c4117551daadcd6bed8a"
     }
+  },
+  "active_shutdown_followup": {
+    "state": "actual_execution_verified_pending_committed_binding",
+    "scope": "retained dataset server shutdown after successful evaluation requests",
+    "workflow_document": "docs/spec-driven/GO-STABLENET-DATASET-COMPARISON.md",
+    "evidence_packet": "system/eval/stablenet-shutdown-2026-10-14",
+    "tasks": [
+      {
+        "id": "SD-01",
+        "state": "complete",
+        "evidence": "before-full-probe.json and before-full-stderr.txt"
+      },
+      {
+        "id": "SD-02",
+        "state": "complete"
+      },
+      {
+        "id": "SD-03",
+        "state": "complete"
+      },
+      {
+        "id": "SD-04",
+        "state": "pending_committed_binding"
+      }
+    ],
+    "remaining_requested_tasks": [
+      "SD-04"
+    ],
+    "next_task": "SD-04",
+    "prior_two_close_failures_preserved": true,
+    "actual_verification": "system/eval/stablenet-shutdown-2026-10-14/verification.json"
   }
 }

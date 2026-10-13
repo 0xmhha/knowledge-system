@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -96,5 +97,24 @@ func TestSearchMetadataFreshTracksSourceHead(t *testing.T) {
 	retained := search(options)
 	if !retained.Metadata.Fresh || len(retained.Hits) == 0 {
 		t.Fatalf("unknown source HEAD should retain the best-effort hint: %+v", retained)
+	}
+	// Direct archive reads must not inspect the changed live HEAD or require
+	// a source mount, including the non-committed serving gate.
+	eng.man.SourceMode = "snapshot-only"
+	options = Options{K: 10, Threshold: -1, SourceReader: func(ctx context.Context, file string) ([]byte, error) {
+		return os.ReadFile(filepath.Join(archive, file))
+	}}
+	if _, err := eng.Search(context.Background(), "Alpha", options); !errors.Is(err, ErrRequiresV2) {
+		t.Fatalf("unverified reader bypassed source-mode gate: %v", err)
+	}
+	options.RetainedSource = true
+	direct := search(options)
+	if !direct.Metadata.Fresh || len(direct.Hits) != len(retained.Hits) {
+		t.Fatalf("direct archive used mutable HEAD or lost hits: %+v", direct)
+	}
+	sentinel := errors.New("retained source damaged")
+	options.SourceReader = func(context.Context, string) ([]byte, error) { return nil, sentinel }
+	if _, err := eng.Search(context.Background(), "Alpha", options); !errors.Is(err, sentinel) {
+		t.Fatalf("direct read failure fell back to live source: %v", err)
 	}
 }

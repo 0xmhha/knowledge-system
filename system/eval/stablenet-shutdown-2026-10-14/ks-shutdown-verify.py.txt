@@ -1,0 +1,86 @@
+from pathlib import Path
+import json,hashlib,subprocess,time,os,gzip,shutil,importlib.util,signal,select,fcntl,threading
+root=Path.cwd();packet=root/'system/eval/stablenet-shutdown-2026-10-14';old=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014');binary=Path('/private/tmp/ks-shutdown-bin/cks')
+sha=lambda p:hashlib.file_digest(Path(p).open('rb'),'sha256').hexdigest()
+proto=json.loads((old/'protocol.json').read_text());version=Path(proto['candidate_dataset'])/proto['candidate_version']
+spec=importlib.util.spec_from_file_location('comparison',root/'projects/stablenet/eval/dataset-comparison/run.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+module.baselines_guard(proto);module.model_guard(proto)
+shutil.copy2(old/'requests.json',packet/'requests.json');assert sha(packet/'requests.json')=='e36e27b35d8daeff6fdfd42cf27d74242c6d772a7c6e16d30cd0073a59c970fa'
+files=['graph/graph.db','graph/manifest.json','vector/vector.db','vector/manifest.json','sources/manifest.json','dataset-identity.json'];pins={p:sha(version/p)for p in files}
+runtime={p:sha(root/p)for p in subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','*.go'],text=True).splitlines()if p.startswith(('cmd/','internal/','pkg/'))and not p.endswith('_test.go')};runtime.update({p:sha(root/p)for p in ['go.mod','go.sum']})
+protocol={'schema_version':1,'scope':'shutdown correctness after removing temporary retained source copies; no release or performance acceptance','binary':str(binary),'binary_sha256':sha(binary),'source_parent_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'source_runtime_sha256':runtime,'request_sha256':sha(packet/'requests.json'),'dataset_version':str(version),'dataset_sha256':pins,'model':proto['model'],'warmup':1,'retrieval_runs':3,'warm_runs':5,'cold_runs':0,'sessions':2,'existing_baselines_guard_protocol':'system/eval/stablenet-corpus-repair-2026-10-14/protocol.json'}
+(packet/'protocol.json').write_text(json.dumps(protocol,indent=2)+'\n')
+lease=version.parent/'.readers'/(version.name+'.lock')
+def unlocked():
+ with lease.open('rb')as f:
+  try:fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
+  except BlockingIOError:return False
+  fcntl.flock(f,fcntl.LOCK_UN);return True
+
+def config_for(directory):
+ directory.mkdir();temp=directory/'temp';temp.mkdir()
+ config=(old/'capture/1/candidate/config.yaml').read_text().replace(str(old/'capture/1/candidate/events'),str(directory/'events'))
+ path=directory/'config.yaml';path.write_text(config);return path,temp
+results=[]
+for index in [1,2]:
+ directory=packet/f'fixed-{index}';config,temp=config_for(directory)
+ args=[str(binary),'eval','capture','--requests',str(packet/'requests.json'),'--config',str(config),'--cks-mcp',str(binary),'--output',str(directory/'capture.json'),'--warmup','1','--retrieval-runs','3','--warm-runs','5','--cold-runs','0','--call-timeout','90s']
+ env=os.environ.copy();env['TMPDIR']=str(temp)
+ print('Starting fixed378-call session',index,flush=True)
+ start=time.monotonic();process=subprocess.run(args,env=env,capture_output=True,text=True,timeout=1200)
+ command={'argv':args,'exit':process.returncode,'stderr':process.stderr,'elapsed_seconds':time.monotonic()-start};(directory/'command.json').write_text(json.dumps(command,indent=2)+'\n')
+ cap=json.loads((directory/'capture.json').read_text());valid=0
+ assert process.returncode==0,(process.returncode,cap.get('errors'),process.stderr)
+ assert len(cap['rows'])==378 and cap['state']=='captured'and not cap.get('errors')
+ assert len(cap['session_closures'])==1 and not cap['session_closures'][0].get('error')
+ for row in cap['rows']:
+  response=row['call']['response'];assert not row.get('error')and not row['call'].get('transport_error')and not response.get('isError')
+  module.verify_pack(response['structuredContent'],version);valid+=1
+ assert not list(temp.glob('cks-read-source-*'))and unlocked()
+ results.append({'session':index,'exit':0,'responses':378,'valid_packs':valid,'query_errors':0,'close_error':None,'close_elapsed_ms':cap['session_closures'][0]['elapsed_ns']/1e6,'temporary_source_trees':0,'reader_lease_released':True})
+ with (directory/'capture.json').open('rb')as f,gzip.open(directory/'capture.json.gz','wb')as g:shutil.copyfileobj(f,g)
+ (directory/'capture.json').unlink()
+ with (directory/'events/cks-mcp.jsonl').open('rb')as f,gzip.open(directory/'backend-events.jsonl.gz','wb')as g:shutil.copyfileobj(f,g)
+ (directory/'events/cks-mcp.jsonl').unlink();(directory/'events').rmdir();temp.rmdir()
+ (packet/'verification-progress.json').write_text(json.dumps({'sessions':results},indent=2)+'\n')
+ print(json.dumps(results[-1]),flush=True)
+lifecycles=[]
+requests=json.loads((packet/'requests.json').read_text())['requests']
+for mode in ['eof','sigterm-idle','sigterm-active']:
+ directory=packet/mode;config,temp=config_for(directory);env=os.environ.copy();env['TMPDIR']=str(temp)
+ with (directory/'stderr.txt').open('w')as err:
+  p=subprocess.Popen([str(binary),'mcp','--config',str(config)],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True)
+  def send(i,method,params):
+   p.stdin.write(json.dumps(dict(jsonrpc='2.0',id=i,method=method,params=params))+'\n');p.stdin.flush()
+  def response():
+   assert select.select([p.stdout],[],[],90)[0],'response timeout'
+   return json.loads(p.stdout.readline())
+  send(1,'initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'shutdown-verify','version':'1'}});response()
+  assert not unlocked(),'server did not pin reader lease'
+  p.stdin.write('{"jsonrpc":"2.0","method":"notifications/initialized"}\n');p.stdin.flush()
+  req=requests[0];send(2,'tools/call',{'name':req['tool'],'arguments':req['arguments']});r=response();assert not r.get('error')and not r['result'].get('isError');module.verify_pack(r['result']['structuredContent'],version)
+  captured=[]
+  if mode=='sigterm-active':
+   for i in range(3,13):send(i,'tools/call',{'name':req['tool'],'arguments':req['arguments']})
+   time.sleep(.1)
+  thread=threading.Thread(target=lambda:captured.extend(p.stdout.readlines()));thread.start()
+  started=time.monotonic()
+  if mode=='eof':p.stdin.close()
+  else:p.send_signal(signal.SIGTERM)
+  forced=False
+  try:p.wait(timeout=5)
+  except subprocess.TimeoutExpired:forced=True;p.kill();p.wait()
+  thread.join(timeout=2)
+  elapsed=time.monotonic()-started
+  if not p.stdin.closed:p.stdin.close()
+  row={'mode':mode,'exit':p.returncode,'forced_kill':forced,'shutdown_ms':elapsed*1000,'temporary_source_trees':len(list(temp.glob('cks-read-source-*'))),'reader_lease_released':unlocked(),'requests_queued_before_signal':10 if mode=='sigterm-active'else 0,'responses_after_signal':len(captured)}
+  (directory/'result.json').write_text(json.dumps(row,indent=2)+'\n');lifecycles.append(row)
+  assert row['exit']==0 and not forced and row['temporary_source_trees']==0 and row['reader_lease_released'],row
+  print(json.dumps(row),flush=True)
+  if mode=='sigterm-active':assert len(captured)<10,'all requests completed before signal; not active test'
+  temp.rmdir()
+module.baselines_guard(proto);module.model_guard(proto)
+assert pins=={p:sha(version/p)for p in files}and sha(binary)==protocol['binary_sha256']and sha(packet/'requests.json')==protocol['request_sha256']
+assert runtime=={p:sha(root/p)for p in runtime}
+proof={'schema_version':1,'state':'verified','sessions':results,'lifecycles':lifecycles,'responses':756,'query_errors':0,'invalid_packs':0,'close_errors':0,'all_original_baselines_model_source_and_dataset_preserved':True,'source_runtime_binary_requests_unchanged_during_trial':True,'original_two_close_failures_preserved':True,'root_cause_reproduced':'378 calls then EOF: main goroutine in os.RemoveAll/unlinkat from MaterializeRetainedReadTree cleanup after6seconds; diagnostic SIGQUIT only on own process','release_or_latency_quality_accepted':False}
+(packet/'verification.json').write_text(json.dumps(proof,indent=2)+'\n');print('Actual dataset shutdown verification PASS',flush=True)

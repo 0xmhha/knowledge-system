@@ -16,6 +16,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -53,10 +54,12 @@ type Options struct {
 	Threshold    float64      // min normalized score (0 → DefaultThreshold; <0 disables)
 	SrcRoot      string       // absolute path used by citation enforcement;
 	// when empty, the manifest's SrcRoot is used.
-	// RetainedSource is set only by a caller that mounted the verified
-	// content-addressed source archive and will emit v2 coordinates. It
-	// requires SrcRoot to point at that mount for non-committed datasets.
+	// RetainedSource is set only by a caller using a verified archive.
+	// Non-committed datasets require its reader or a verified source mount.
 	RetainedSource bool
+	// SourceReader reads verified archive bytes without a temporary tree.
+	// When set it replaces all filesystem citation resolution.
+	SourceReader sourcepath.Reader
 
 	// ExamplesK splits test-file hits out of the main Hits slice into a
 	// separate Examples slice in the response. Up to ExamplesK test
@@ -714,7 +717,7 @@ func (e *Engine) Search(ctx context.Context, intent string, opts Options) (*Resp
 		return nil, errors.New("query: empty intent")
 	}
 	if e.man.SourceMode == "working-tree" || e.man.SourceMode == "snapshot-only" {
-		if !opts.RetainedSource || opts.SrcRoot == "" {
+		if !opts.RetainedSource || (opts.SrcRoot == "" && opts.SourceReader == nil) {
 			return nil, ErrRequiresV2
 		}
 	}
@@ -820,10 +823,23 @@ func (e *Engine) Search(ctx context.Context, intent string, opts Options) (*Resp
 		srcRoot = e.srcRoot
 	}
 	doneCitation := e.fp.Span("query.citation.enforce", "trace_id", traceID)
-	currentHead := currentGitHead(srcRoot)
+	currentHead := ""
 	// DocsRoots lets doc/markdown corpus chunks (ckv build --docs) resolve
 	// their citations against the corpus dir instead of the code srcRoot.
-	enforced, dropped, stale := EnforceCitationsAt(sc.FilteredHits, srcRoot, currentHead, e.man.DocsRoots...)
+	var enforced []types.Hit
+	var dropped, stale int
+	var citationErr error
+	if opts.SourceReader != nil {
+		// An archived snapshot has no live Git HEAD or history directory.
+		currentHead, srcRoot = "", ""
+		enforced, dropped, stale, citationErr = enforceRetainedCitations(ctx, sc.FilteredHits, opts.SourceReader)
+		if citationErr != nil {
+			return nil, citationErr
+		}
+	} else {
+		currentHead = currentGitHead(srcRoot)
+		enforced, dropped, stale = EnforceCitationsAt(sc.FilteredHits, srcRoot, currentHead, e.man.DocsRoots...)
+	}
 	sc.DroppedCitations = dropped
 	sc.StaleCitations = stale
 	if dropped > 0 {

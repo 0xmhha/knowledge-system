@@ -280,3 +280,7 @@ When uncertain, run `cks mcp` against the tools/list MCP method and compare the 
 ### Capturing explanation responses for a controlled comparison
 
 The request-only manifest for `cks eval capture` accepts v2 `explain_ontology` as a boolean; v1 and non-boolean values are refused. Preserve all runtime inputs and request options. For ontology control arms, use explicit semantic mode `baseline` versus the desired enabled mode so that both use raw-query-first; comparing the default blank/off mode can also change Stage1 query strategy. Backend measurement logs and capture receipts are needed for timing, failed request denominators, and scoped embedding HTTP attempts. Repetition counts are not independent quality samples. See the [controlled stdio capture record](https://github.com/0xmhha/knowledge-system/blob/9a39718807ed25a0add30405f7cd1f1ebff4a629/docs/spec-driven/ONTOLOGY-MCP-IMPLEMENTATION.md).
+
+### Session shutdown
+
+The stdio server uses the command context for input and active tool handlers. EOF drains accepted calls; SIGTERM cancels active work and releases backends and dataset reader leases. Pinned source reads use verified archive blobs directly, avoiding a large temporary-tree deletion during shutdown. Evaluation subprocess cancellation sends SIGTERM first with a bounded5-second forced fallback. Forced exit remains an error. New `cks eval capture` reports record `session_closures` with session, request/iteration when applicable, elapsed nanoseconds and any close error, separately from query rows; a close failure still makes the capture partial.

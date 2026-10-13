@@ -1,6 +1,6 @@
 # go-stablenet 지식 데이터 생성·비교
 
-현재 상태: 요청한 출처 수정·42질문 재평가·SNK06 검토3/3 완료. 현재 소스와 커밋의1833개 SHA 및 기존 진행 원장 검증이 통과했다. 아래 최초 비교와 수정 후 재평가를 구분해 읽는다.
+이전 요청 상태: 출처 수정·42질문 재평가·SNK06 검토3/3 완료. 현재 추가 요청은 아래 서버 종료 보완 작업표를 따른다. 현재 소스와 커밋의1833개 SHA 및 기존 진행 원장 검증이 통과했다. 아래 최초 비교와 수정 후 재평가를 구분해 읽는다.
 
 현재 작업의 목적은 전체 go-stablenet 코드에서 새 지식 데이터를 만들고, 보존한 기존 데이터와 실제 구조·검색·인용·지연을 비교하는 것이다. 기존 데이터의 파일 수·health 성공만으로 품질 개선을 선언하지 않는다.
 
@@ -74,8 +74,27 @@ prepare-handler 질문의 v1 본문에는 `entries/A1.wbft_core.message_handlers
 
 3번 검토: 전역15개 모두 `name/qualified_name/signature/doc_comment`의 case-insensitive substring AND 계약 및 보관된 선언·SHA·행 범위에 부합했다. 추가9개는 systemcontracts/test 하위의 Go package test 심볼이다. 기존 fixture 원문·실패7/8과precision0.4는 그대로 둔다. 패키지 범위를 명시한 별도 질의 `qualified_name:systemcontracts AND mint* AND allowance*`는 raw FTS AND를 사용하며 mode=or로 자연어 substring 필터를 적용하지 않는다. symbol-only 기본 필터가 CallSite/ReturnStmt를 제외한다. 기존6개 기대 목록을 바꾸지 않고 기존4개·새1개 dataset 모두 precision/recall/F1=1.0으로 확인했다. [별도 scoped fixture](../../projects/stablenet/eval/graph-keyword/scoped-fixtures/SNK06-systemcontracts-mint-allowance.yaml), [출처별 검토](../../system/eval/stablenet-corpus-repair-2026-10-14/SNK06-scope-review.json). 사후 범위 진단이며 새 독립 gold나 모델 품질 승인으로 바꾸지 않는다.
 
-현재 요청한 순차 작업은3/3 실행 완료다. 최종 커밋의 SHA·원문·기존 진행 원장 검증은 PASS이며 기록은 active source binding을 따른다. 남은 요청 작업0개. 별도 운영 유지보수 후보는 캡처 서버 종료 deadline 진단이며, 기존 운영 current/config 전환과 원격 게시를 자동 실행하지 않았다.
+직전 요청한 순차 작업은3/3 실행 완료다. 최종 커밋의 SHA·원문·기존 진행 원장 검증은 PASS이며 기록은 active source binding을 따른다. 직전 요청 범위의 남은 작업은0개였다. 현재 사용자가 캡처 서버 종료 진단·수정을 추가 승인했으며, 기존 운영 current/config 전환과 원격 게시를 자동 실행하지 않았다.
 
 현재 소스의 일반 workspace `bin/ckg`, `bin/ckv`, `bin/cks`도 다시 빌드했다. 수정 CKS와 별도 새 데이터의 조합이 필요하다. stdio 설정 경로는 `/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`이며, 실행은 `bin/cks mcp --config /Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-retained-corpus-20261014-cks-stdio.yaml`다. 원래 운영 설정을 제자리 변경하지 않았다.
 
 최종 material commit `3fa62e15`의 현재·커밋 SHA1833개 검증 및 기존 진행 guard PASS. [커밋 근거](../../system/eval/stablenet-corpus-repair-2026-10-14/committed-binding-proof.json).
+
+## 서버 종료 보완 — 진행 중
+
+사용자가 두 번의 강제 종료를 후속 수정 대상으로 승인했다. 목표는 정상 응답뿐 아니라 stdio 세션 종료와 자원 해제까지 성공하는 서버다. 기존 실패 기록은 보존하며 종료 오류를 무시하거나 제한 시간만 늘려 완료로 판정하지 않는다.
+
+| 순서 | 작업 | 상태 | 수용 조건 |
+|---|---|---|---|
+| SD-01 | 원인 재현과 종료 경로 진단 | 완료 | 실제 retained dataset, EOF·SIGTERM 구분, 지연/스택 기록, 강제 종료 지점 확인 |
+| SD-02 | 서버 종료 계약 수정 | 완료 | 서버 컨텍스트 전달, 정상 EOF와 취소 처리, 진행 중 작업 처리와 자원 해제, 의미 있는 회귀 시험 |
+| SD-03 | 실제 세션 재검증 | 완료 | 고정42질문·378호출 세션2회에서 응답 오류0·종료 오류0, EOF·SIGTERM 정상 종료와 read-tree 정리 확인 |
+| SD-04 | 문서·커밋 근거 정리 | 커밋 검증 대기 | 기존 오류 보존, 현재 결과/남은 작업 최신화, 소스·원자료 SHA 및 커밋 근거 검증 |
+
+현재 최초 최소 재현에서 정상 v2 응답 후 EOF 종료는 exit0·1.784초다. 동일42질문 및 클라이언트 종료 경로를 추가 확인 중이며 근본 원인은 아직 확정하지 않았다.
+
+진단: 최소1호출과42호출은 exit0이었으나378호출 후 EOF에서는6초를 넘겨 종료가 멈췄다. 진단용 SIGQUIT 스택의 main goroutine은 `MaterializeRetainedReadTreeContext`의 cleanup → `os.RemoveAll` → `unlinkat`에 있었다. stdio 클라이언트는 EOF 후2초, SIGTERM 후3초가 지나면 SIGKILL을 보낸다. 원래 두 실패의 당시 스택은 없지만 동일 데이터·부하·종료 경로에서 이 제한을 초과하는 원인을 확인했다. 원자료는 [종료 진단 packet](../../system/eval/stablenet-shutdown-2026-10-14/).
+
+수정 설계: pinned dataset의 repo와 `docs:corpus.N` 파일을 검증된 archive reader로 직접 읽는다. CKV 인용 검증과 composer 본문 조회는 같은 authoritative reader를 사용하며, 임시 원문 트리 생성·종료 시 일괄 삭제를 제거한다. 선택 blob은 매번 SHA/size를 확인하며 v2의 전체 candidate 요청 전후 검증도 유지한다. 미보관·변조 원문은 live checkout으로 대체하지 않는다. stdio는 명령 컨텍스트를 입력/worker에 전달하고 EOF에서는 수락한 요청을 완료한다. 평가 취소는 SIGTERM과5초 fallback을 사용한다. 실제 종료 실패는 여전히 partial/오류이며, 신규 캡처에는 세션별 종료 시간·오류를 별도 기록한다.
+
+최종 실측: 동일 requests SHA·같은 dataset/model로378호출 세션2회 모두 exit0·captured. 정상756팩의 원문/좌표/무결성 실패0, 질의 오류0, 세션 종료 오류0. Close11.127541ms·10.902875ms. 별도 EOF18.585ms·대기 SIGTERM18.904ms·10요청을 보낸 실행 중 SIGTERM176.910ms에서 모두 exit0·강제 종료false·임시 원문 트리0·reader lease 해제. 이전 수정 결과756쌍과 인용·본문 변경0. 기존 두 실패 및 진단 중 SIGQUIT와 의도적으로 취소한 중간 시험은 보존하고 수용 통계에서 제외했다. 전체 Go118패키지·race8패키지·추가 snapshot-only reader race·vet·lint0issues·Python8·경계 검사 통과. 마지막은 커밋 SHA와 기존 진행 원장 확인이다. 일반 workspace `bin/cks`도 실측한 최종 바이너리로 갱신했다.

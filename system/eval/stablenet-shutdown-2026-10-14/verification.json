@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "state": "verified",
+  "sessions": [
+    {
+      "session": 1,
+      "exit": 0,
+      "responses": 378,
+      "valid_packs": 378,
+      "query_errors": 0,
+      "close_error": null,
+      "close_elapsed_ms": 11.127541,
+      "temporary_source_trees": 0,
+      "reader_lease_released": true
+    },
+    {
+      "session": 2,
+      "exit": 0,
+      "responses": 378,
+      "valid_packs": 378,
+      "query_errors": 0,
+      "close_error": null,
+      "close_elapsed_ms": 10.902875,
+      "temporary_source_trees": 0,
+      "reader_lease_released": true
+    }
+  ],
+  "lifecycles": [
+    {
+      "mode": "eof",
+      "exit": 0,
+      "forced_kill": false,
+      "shutdown_ms": 18.58524978160858,
+      "temporary_source_trees": 0,
+      "reader_lease_released": true,
+      "requests_queued_before_signal": 0,
+      "responses_after_signal": 0
+    },
+    {
+      "mode": "sigterm-idle",
+      "exit": 0,
+      "forced_kill": false,
+      "shutdown_ms": 18.904166761785746,
+      "temporary_source_trees": 0,
+      "reader_lease_released": true,
+      "requests_queued_before_signal": 0,
+      "responses_after_signal": 0
+    },
+    {
+      "mode": "sigterm-active",
+      "exit": 0,
+      "forced_kill": false,
+      "shutdown_ms": 176.91041668877006,
+      "temporary_source_trees": 0,
+      "reader_lease_released": true,
+      "requests_queued_before_signal": 10,
+      "responses_after_signal": 7
+    }
+  ],
+  "responses": 756,
+  "query_errors": 0,
+  "invalid_packs": 0,
+  "close_errors": 0,
+  "all_original_baselines_model_source_and_dataset_preserved": true,
+  "source_runtime_binary_requests_unchanged_during_trial": true,
+  "original_two_close_failures_preserved": true,
+  "root_cause_reproduced": "378 calls then EOF: main goroutine in os.RemoveAll/unlinkat from MaterializeRetainedReadTree cleanup after6seconds; diagnostic SIGQUIT only on own process",
+  "release_or_latency_quality_accepted": false
+}

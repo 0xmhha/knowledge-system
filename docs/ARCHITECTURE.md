@@ -13,7 +13,7 @@ The graph, vector and composition engines share the Go module `github.com/0xmhha
 | Meaning | Source-backed reviewed concepts and relations, bounded optional retrieval, read-only readiness/lookup/trace | [semantic contract](./spec-driven/SEMANTIC-CONTRACT.md), [ontology MCP](../system/docs/ontology-mcp.md) |
 | Review | Hold a patch candidate, record exact tests, record separate criterion decisions, then promote | [patch workflow](./spec-driven/PATCH-WORKFLOW.md) |
 
-Dataset identity separates project, snapshot and dataset. A snapshot identifies captured source bytes; a dataset also pins model, knowledge inputs and build recipe. `committed`, `working-tree` and `snapshot-only` have distinct history semantics. Source files are retained as content-addressed blobs; moving or deleting the original checkout does not justify reading unrelated current bytes.
+Dataset identity separates project, snapshot and dataset. A snapshot identifies captured source bytes; a dataset also pins model, knowledge inputs and build recipe. `committed`, `working-tree` and `snapshot-only` have distinct history semantics. Source files are retained as content-addressed blobs; moving or deleting the original checkout does not justify reading unrelated current bytes. The pinned MCP server reads verified blobs directly for citation checks and body selection; it does not create a temporary source tree that must be recursively deleted at shutdown.
 
 ## Safety and publication boundaries
 

@@ -1,0 +1,26 @@
+import json,subprocess,time,signal,select,pathlib
+repo=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system')
+base=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/comparison-go-stablenet-corpus-20261014')
+out=repo/'system/eval/stablenet-shutdown-2026-10-14'
+config=(base/'capture/1/candidate/config.yaml').read_text().replace(str(base/'capture/1/candidate/events'),str(out/'probe-events'))
+(out/'probe-config.yaml').write_text(config)
+with (out/'before-many-stderr.txt').open('w') as err:
+ p=subprocess.Popen([str(base/'bin/cks'),'mcp','--config',str(out/'probe-config.yaml')],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True)
+ def call(i,method,params):
+  p.stdin.write(json.dumps(dict(jsonrpc='2.0',id=i,method=method,params=params))+'\n');p.stdin.flush()
+  if not select.select([p.stdout],[],[],90)[0]:raise RuntimeError('response timeout')
+  return json.loads(p.stdout.readline())
+ init=call(1,'initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'shutdown-probe','version':'1'}})
+ p.stdin.write('{"jsonrpc":"2.0","method":"notifications/initialized"}\n');p.stdin.flush()
+ requests=json.loads((base/'requests.json').read_text())['requests']
+ for i, req in enumerate(requests):
+  res=call(i+2,'tools/call',{'name':req['tool'],'arguments':req['arguments']})
+  print('response',i+1,flush=True)
+ (out/'before-many-response.json').write_text(json.dumps(res,indent=2))
+ t=time.monotonic();p.stdin.close()
+ forced=False
+ try:p.wait(timeout=6)
+ except subprocess.TimeoutExpired:
+  forced=True;p.send_signal(signal.SIGQUIT);p.wait(timeout=10)
+ result={'response_error':res.get('error'),'tool_error':res.get('result',{}).get('isError',False),'eof_elapsed_seconds':time.monotonic()-t,'exit_code':p.returncode,'diagnostic_SIGQUIT':forced}
+ (out/'before-many-probe.json').write_text(json.dumps(result,indent=2));print(json.dumps(result))

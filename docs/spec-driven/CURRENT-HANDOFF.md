@@ -1,3 +1,5 @@
+현재 추가 요청: 서버 종료 보완3/4 완료, 커밋 근거 검증 대기.378호출 EOF 종료의 임시 원문 트리 삭제 지연을 재현했고 검증된 archive 직접 읽기로 제거했다. 최종 실측2세션756응답·종료 오류0, Close11.1/10.9ms, EOF·대기/실행 SIGTERM 모두 exit0·강제 종료없음·reader lease 해제. 현재 작업표와 근거는 [서버 종료 보완](./GO-STABLENET-DATASET-COMPARISON.md)을 따른다.
+
 현재 진행 작업은 [go-stablenet 데이터 생성·비교](./GO-STABLENET-DATASET-COMPARISON.md)다. 일반 진행 보고에는 사용자가 별도로 보류한 출시 사항을 포함하지 않고, 요청한 데이터 작업의 진행·검증·다음 단계만 설명한다.
 
 [go-stablenet 비교 작업표](./GO-STABLENET-DATASET-COMPARISON.md)의 출처 매핑 수정·42질문 재평가·SNK06 검토는3/3 실행 완료다. 수정 데이터의756회 질의 오류0, 정상 pack 원문 검증 통과, 기존 SNK06 실패와 캡처 종료 오류2회 보존. 현재/커밋 SHA1833개와 기존 진행 guard PASS. 남은 요청 작업0개이며 근거는 진행 JSON을 따른다.

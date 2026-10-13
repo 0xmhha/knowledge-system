@@ -1,0 +1,375 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "v2 evidence pack"
+      }
+    ],
+    "structuredContent": {
+      "format_version": 2,
+      "coordinates": {
+        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+        "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+        "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+        "source_mode": "committed",
+        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      "query": "List every Go function or method in this codebase that DIRECTLY calls\ncore.NewBlockChain (depth = 1, no transitive callers). Return the\nfully qualified names only, one per line, no commentary",
+      "citations": [
+        {
+          "file": "core/blockchain.go",
+          "start_line": 266,
+          "end_line": 371,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+          "content_sha256": "95387eb3909ecd1467528f93215368cae20f88598ff02a4d2ee960c3df970f61"
+        },
+        {
+          "file": "core/blockchain_insert.go",
+          "start_line": 157,
+          "end_line": 163,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+          "content_sha256": "1c823a45989852d2bb73711599ba1aa2bf083da47cc06330cbd576bdb381289e"
+        },
+        {
+          "file": "internal/ethapi/api.go",
+          "start_line": 904,
+          "end_line": 912,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "a6301c14cc01e9bd0ad7a8b61671b24972948f7c69dd28f7aeb51cc711b3bcfe",
+          "content_sha256": "ceadf6d11ecaa196f331d43d6315791820e9c42ae9d3e1a9017328ce94273c11"
+        },
+        {
+          "file": "eth/api_admin.go",
+          "start_line": 82,
+          "end_line": 90,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "852eee9f6da604c58d73d69c48e92a0a4547c8509de1138834b507890c7d140a",
+          "content_sha256": "0ee9604f968ff763f4614030c475924c40f60711a634e0fbd88931d3207a00eb"
+        },
+        {
+          "file": "core/forkid/forkid.go",
+          "start_line": 112,
+          "end_line": 123,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "475cbf149cb87508df862610427c066d3b3cf9fe65cc8522600899eca5e39254",
+          "content_sha256": "8398b31f2e6aeb14368ba40bf889f294baacfecf2e088df7fa9c7c23e90796de"
+        },
+        {
+          "file": "core/blockchain.go",
+          "start_line": 1518,
+          "end_line": 1551,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+          "content_sha256": "3bf7c79071981f427c600e42040cf9bca8d4565ce3cf4dc7a671d4997642e92d"
+        },
+        {
+          "file": "core/blockchain_insert.go",
+          "start_line": 165,
+          "end_line": 171,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+          "content_sha256": "bc8d56a2de5fe93f45a67c1a5b8ebd1e940c40a04dead9f377fac65b3f97c4e0"
+        },
+        {
+          "file": "core/blockchain_insert.go",
+          "start_line": 104,
+          "end_line": 114,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+          "content_sha256": "a2fd666fadc90fedf1ffad1f5fcfe2405ebf1028e2cb50f4db58356b6ab371b9"
+        },
+        {
+          "file": "accounts/abi/method.go",
+          "start_line": 41,
+          "end_line": 41,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "ff299eae76d64c03b0d53034781476c7e5bf67da8c405ebe8bcb2725a7c30f93",
+          "content_sha256": "bf5ec692b163de53cc77d45ede8ea2d273c0cd0026987672a62c0c9dd3b01fe6"
+        },
+        {
+          "file": "graphql/graphql.go",
+          "start_line": 44,
+          "end_line": 44,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "d3f6e9e5127f1ad37dd7b88a39e1674d42119f54df53949d823c917119313a7d",
+          "content_sha256": "10c01a0638c0ad3849cfdd7b03b75016443c04c8d19033ef633c5f00d833381a"
+        },
+        {
+          "file": "graphql/graphql.go",
+          "start_line": 1336,
+          "end_line": 1336,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+          "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "d3f6e9e5127f1ad37dd7b88a39e1674d42119f54df53949d823c917119313a7d",
+          "content_sha256": "60ca05ba919177155f7cb69ebea41d56e5049ff6770cf684828cdcc075157750"
+        }
+      ],
+      "bodies": [
+        {
+          "citation": {
+            "file": "core/blockchain.go",
+            "start_line": 266,
+            "end_line": 371,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+            "content_sha256": "95387eb3909ecd1467528f93215368cae20f88598ff02a4d2ee960c3df970f61"
+          },
+          "text": "// NewBlockChain returns a fully initialised block chain using information\n// available in the database. It initialises the default Ethereum Validator\n// and Processor.\nfunc NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis, overrides *ChainOverrides, engine consensus.Engine, vmConfig vm.Config, shouldPreserve func(header *types.Header) bool, txLookupLimit *uint64) (*BlockChain, error) {\n\tif cacheConfig == nil {\n\t\tcacheConfig = defaultCacheConfig\n\t}\n\t// Open trie database with provided config\n\ttriedb := triedb.NewDatabase(db, cacheConfig.triedbConfig())\n\n\t// Setup the genesis block, commit the provided genesis specification\n\t// to database if the genesis block is not present yet, or load the\n\t// stored one from database.\n\tchainConfig, genesisHash, genesisErr := SetupGenesisBlockWithOverride(db, triedb, genesis, overrides)\n\tif _, ok := genesisErr.(*params.ConfigCompatError); genesisErr != nil && !ok {\n\t\treturn nil, genesisErr\n\t}\n\n\tif chainConfig.AnzeonEnabled() {\n\t\tif err := chainConfig.Anzeon.CheckValidity(); err != nil {\n\t\t\treturn nil, fmt.Errorf(\"Invalid genesis config: %v\", err)\n\t\t}\n\t}\n\n\tlog.Info(\"\")\n\tlog.Info(strings.Repeat(\"-\", 153))\n\tfor _, line := range strings.Split(chainConfig.Description(), \"\\n\") {\n\t\tlog.Info(line)\n\t}\n\tlog.Info(strings.Repeat(\"-\", 153))\n\tlog.Info(\"\")\n\n\tbc := &BlockChain{\n\t\tchainConfig:   chainConfig,\n\t\tcacheConfig:   cacheConfig,\n\t\tdb:            db,\n\t\ttriedb:        triedb,\n\t\ttriegc:        prque.New[int64, common.Hash](nil),\n\t\tquit:          make(chan struct{}),\n\t\tchainmu:       syncx.NewClosableMutex(),\n\t\tbodyCache:     lru.NewCache[common.Hash, *types.Body](bodyCacheLimit),\n\t\tbodyRLPCache:  lru.NewCache[common.Hash, rlp.RawValue](bodyCacheLimit),\n\t\treceiptsCache: lru.NewCache[common.Hash, []*types.Receipt](receiptsCacheLimit),\n\t\tblockCache:    lru.NewCache[common.Hash, *types.Block](blockCacheLimit),\n\t\ttxLookupCache: lru.NewCache[common.Hash, txLookup](txLookupCacheLimit),\n\t\tfutureBlocks:  lru.NewCache[common.Hash, *types.Block](maxFutureBlocks),\n\t\tengine:        engine,\n\t\tvmConfig:      vmConfig,\n\t}\n\tbc.flushInterval.Store(int64(cacheConfig.TrieTimeLimit))\n\tbc.forker = NewForkChoice(bc, shouldPreserve)\n\tbc.stateCache = state.NewDatabaseWithNodeDB(bc.db, bc.triedb)\n\tbc.validator = NewBlockValidator(chainConfig, bc, engine)\n\tbc.prefetcher = newStatePrefetcher(chainConfig, bc, engine)\n\tbc.processor = NewStateProcessor(chainConfig, bc, engine)\n\n\tvar err error\n\tbc.hc, err = NewHeaderChain(db, chainConfig, engine, bc.insertStopped)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tbc.genesisBlock = bc.GetBlockByNumber(0)\n\tif bc.genesisBlock == nil {\n\t\treturn nil, ErrNoGenesis\n\t}\n\n\tbc.currentBlock.Store(nil)\n\tbc.currentSnapBlock.Store(nil)\n\tbc.currentFinalBlock.Store(nil)\n\tbc.currentSafeBlock.Store(nil)\n\n\t// Update chain info data metrics\n\tchainInfoGauge.Update(metrics.GaugeInfoValue{\"chain_id\": bc.chainConfig.ChainID.String()})\n\n\t// If Gstable is initialized with an external ancient store, re-initialize the\n\t// missing chain indexes and chain flags. This procedure can survive crash\n\t// and can be resumed in next restart since chain flags are updated in last step.\n\tif bc.empty() {\n\t\trawdb.InitDatabaseFromFreezer(bc.db)\n\t}\n\t// Load blockchain states from disk\n\tif err := bc.loadLastState(); err != nil {\n\t\treturn nil, err\n\t}\n\t// Make sure the state associated with the block is available, or log out\n\t// if there is no available state, waiting for state sync.\n\thead := bc.CurrentBlock()\n\tif !bc.HasState(head.Root) {\n\t\tif head.Number.Uint64() == 0 {\n\t\t\t// The genesis state is missing, which is only possible in the path-based\n\t\t\t// scheme. This situation occurs when the initial state sync is not finished\n\t\t\t// yet, or the chain head is rewound below the pivot point. In both scenarios,\n\t\t\t// there is no possible recovery approach except for rerunning a snap sync.\n\t\t\t// Do nothing here until the state syncer picks it up.\n\t\t\tlog.Info(\"Genesis state is missing, wait state sync\")\n\t\t} else {\n\t\t\t// Head state is missing, before the state recovery, find out the\n\t\t\t// disk layer point of snapshot(if it's enabled). Make sure the\n\t\t\t// rewound point is lower than disk layer.\n\t\t\tvar diskRoot common.Hash\n\t\t\tif bc.cacheConfig.SnapshotLimit > 0 {\n\t\t\t\tdiskRoot = rawdb.ReadSnapshotRoot(bc.db)\n\t\t\t}\n\t\t\tif diskRoot != (common.Hash{}) {\n\t\t\t\tlog.Warn(\"Head state missing, repairing\", \"number\", head.Number, \"hash\", head.Hash(), \"snaproot\", diskRoot)\n\n"
+        },
+        {
+          "citation": {
+            "file": "core/blockchain_insert.go",
+            "start_line": 157,
+            "end_line": 163,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+            "content_sha256": "1c823a45989852d2bb73711599ba1aa2bf083da47cc06330cbd576bdb381289e"
+          },
+          "text": "// previous returns the previous header that was being processed, or nil.\nfunc (it *insertIterator) previous() *types.Header {\n\tif it.index < 1 {\n\t\treturn nil\n\t}\n\treturn it.chain[it.index-1].Header()\n}\n"
+        },
+        {
+          "citation": {
+            "file": "internal/ethapi/api.go",
+            "start_line": 904,
+            "end_line": 912,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "a6301c14cc01e9bd0ad7a8b61671b24972948f7c69dd28f7aeb51cc711b3bcfe",
+            "content_sha256": "ceadf6d11ecaa196f331d43d6315791820e9c42ae9d3e1a9017328ce94273c11"
+          },
+          "text": "// GetBlockByHash returns the requested block. When fullTx is true all transactions in the block are returned in full\n// detail, otherwise only the transaction hash is returned.\nfunc (api *BlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Hash, fullTx bool) (map[string]interface{}, error) {\n\tblock, err := api.b.BlockByHash(ctx, hash)\n\tif block != nil {\n\t\treturn api.rpcMarshalBlock(ctx, block, true, fullTx)\n\t}\n\treturn nil, err\n}\n"
+        },
+        {
+          "citation": {
+            "file": "eth/api_admin.go",
+            "start_line": 82,
+            "end_line": 90,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "852eee9f6da604c58d73d69c48e92a0a4547c8509de1138834b507890c7d140a",
+            "content_sha256": "0ee9604f968ff763f4614030c475924c40f60711a634e0fbd88931d3207a00eb"
+          },
+          "text": "func hasAllBlocks(chain *core.BlockChain, bs []*types.Block) bool {\n\tfor _, b := range bs {\n\t\tif !chain.HasBlock(b.Hash(), b.NumberU64()) {\n\t\t\treturn false\n\t\t}\n\t}\n\n\treturn true\n}\n"
+        },
+        {
+          "citation": {
+            "file": "core/forkid/forkid.go",
+            "start_line": 112,
+            "end_line": 123,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "475cbf149cb87508df862610427c066d3b3cf9fe65cc8522600899eca5e39254",
+            "content_sha256": "8398b31f2e6aeb14368ba40bf889f294baacfecf2e088df7fa9c7c23e90796de"
+          },
+          "text": "// NewFilter creates a filter that returns if a fork ID should be rejected or not\n// based on the local chain's status.\nfunc NewFilter(chain Blockchain) Filter {\n\treturn newFilter(\n\t\tchain.Config(),\n\t\tchain.Genesis(),\n\t\tfunc() (uint64, uint64) {\n\t\t\thead := chain.CurrentHeader()\n\t\t\treturn head.Number.Uint64(), head.Time\n\t\t},\n\t)\n}\n"
+        },
+        {
+          "citation": {
+            "file": "core/blockchain.go",
+            "start_line": 1518,
+            "end_line": 1551,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+            "content_sha256": "3bf7c79071981f427c600e42040cf9bca8d4565ce3cf4dc7a671d4997642e92d"
+          },
+          "text": "// InsertChain attempts to insert the given batch of blocks in to the canonical\n// chain or, otherwise, create a fork. If an error is returned it will return\n// the index number of the failing block as well an error describing what went\n// wrong. After insertion is done, all accumulated events will be fired.\nfunc (bc *BlockChain) InsertChain(chain types.Blocks) (int, error) {\n\t// Sanity check that we have something meaningful to import\n\tif len(chain) == 0 {\n\t\treturn 0, nil\n\t}\n\tbc.blockProcFeed.Send(true)\n\tdefer bc.blockProcFeed.Send(false)\n\n\t// Do a sanity check that the provided chain is actually ordered and linked.\n\tfor i := 1; i < len(chain); i++ {\n\t\tblock, prev := chain[i], chain[i-1]\n\t\tif block.NumberU64() != prev.NumberU64()+1 || block.ParentHash() != prev.Hash() {\n\t\t\tlog.Error(\"Non contiguous block insert\",\n\t\t\t\t\"number\", block.Number(),\n\t\t\t\t\"hash\", block.Hash(),\n\t\t\t\t\"parent\", block.ParentHash(),\n\t\t\t\t\"prevnumber\", prev.Number(),\n\t\t\t\t\"prevhash\", prev.Hash(),\n\t\t\t)\n\t\t\treturn 0, fmt.Errorf(\"non contiguous insert: item %d is #%d [%x..], item %d is #%d [%x..] (parent [%x..])\", i-1, prev.NumberU64(),\n\t\t\t\tprev.Hash().Bytes()[:4], i, block.NumberU64(), block.Hash().Bytes()[:4], block.ParentHash().Bytes()[:4])\n\t\t}\n\t}\n\t// Pre-checks passed, start the full block imports\n\tif !bc.chainmu.TryLock() {\n\t\treturn 0, errChainStopped\n\t}\n\tdefer bc.chainmu.Unlock()\n\treturn bc.insertChain(chain, true)\n}\n"
+        },
+        {
+          "citation": {
+            "file": "core/blockchain_insert.go",
+            "start_line": 165,
+            "end_line": 171,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+            "content_sha256": "bc8d56a2de5fe93f45a67c1a5b8ebd1e940c40a04dead9f377fac65b3f97c4e0"
+          },
+          "text": "// current returns the current header that is being processed, or nil.\nfunc (it *insertIterator) current() *types.Header {\n\tif it.index == -1 || it.index >= len(it.chain) {\n\t\treturn nil\n\t}\n\treturn it.chain[it.index].Header()\n}\n"
+        },
+        {
+          "citation": {
+            "file": "core/blockchain_insert.go",
+            "start_line": 104,
+            "end_line": 114,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "49fae04e66c239b1b2938ad1f4844e8939bf054bafdf23985f93007ef3f65466",
+            "content_sha256": "a2fd666fadc90fedf1ffad1f5fcfe2405ebf1028e2cb50f4db58356b6ab371b9"
+          },
+          "text": "// newInsertIterator creates a new iterator based on the given blocks, which are\n// assumed to be a contiguous chain.\nfunc newInsertIterator(chain types.Blocks, results <-chan error, validator Validator) *insertIterator {\n\treturn &insertIterator{\n\t\tchain:     chain,\n\t\tresults:   results,\n\t\terrors:    make([]error, 0, len(chain)),\n\t\tindex:     -1,\n\t\tvalidator: validator,\n\t}\n}\n"
+        },
+        {
+          "citation": {
+            "file": "accounts/abi/method.go",
+            "start_line": 41,
+            "end_line": 41,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "ff299eae76d64c03b0d53034781476c7e5bf67da8c405ebe8bcb2725a7c30f93",
+            "content_sha256": "bf5ec692b163de53cc77d45ede8ea2d273c0cd0026987672a62c0c9dd3b01fe6"
+          },
+          "text": "\tFunction\n"
+        },
+        {
+          "citation": {
+            "file": "graphql/graphql.go",
+            "start_line": 44,
+            "end_line": 44,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "d3f6e9e5127f1ad37dd7b88a39e1674d42119f54df53949d823c917119313a7d",
+            "content_sha256": "10c01a0638c0ad3849cfdd7b03b75016443c04c8d19033ef633c5f00d833381a"
+          },
+          "text": "\terrBlockInvariant    = errors.New(\"block objects must be instantiated with at least one of num or hash\")\n"
+        },
+        {
+          "citation": {
+            "file": "graphql/graphql.go",
+            "start_line": 1336,
+            "end_line": 1336,
+            "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "474440d4315ff09863a3e78f4e1e598f9df7f492792e06d2482f5592f2aadeca",
+            "snapshot_id": "bac1a689fbec88b8e7f64a1345e8464ba225357a47621d899355cc7a6b048b37",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "origin_id": "repo",
+            "file_sha256": "d3f6e9e5127f1ad37dd7b88a39e1674d42119f54df53949d823c917119313a7d",
+            "content_sha256": "60ca05ba919177155f7cb69ebea41d56e5049ff6770cf684828cdcc075157750"
+          },
+          "text": "\t\treturn nil, errors.New(\"from block number must be specified\")\n"
+        }
+      ],
+      "graph_neighbors": [],
+      "semantic": null,
+      "evidence_state": "complete",
+      "metadata": {
+        "integrity_hash_algo": "sha256-v2",
+        "integrity_hash": "d61236e0f17e5a82376a7df2241edfd293c935610df2fd7cefa85bf2a138d3f4"
+      }
+    }
+  }
+}

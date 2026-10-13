@@ -2,6 +2,7 @@ package budget
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -238,5 +239,21 @@ func TestFilesystemFetcherNamespacedCorpusDoesNotSelectSameNamedCode(t *testing.
 		if err != nil || got != expected {
 			t.Fatalf("%s: %q %v", file, got, err)
 		}
+	}
+}
+
+func TestFilesystemFetcherAuthoritativeArchiveReaderDoesNotFallBack(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "a.go"), []byte("mutable checkout\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	sentinel := errors.New("archive unavailable")
+	fetcher := &FilesystemFetcher{Root: root, ReadSource: func(ctx context.Context, path string) ([]byte, error) { return nil, sentinel }}
+	if body, err := fetcher.Fetch(context.Background(), contract.Citation{File: "a.go", StartLine: 1, EndLine: 1}); !errors.Is(err, sentinel) || body != "" {
+		t.Fatalf("archive failure fell back: %q %v", body, err)
+	}
+	fetcher.ReadSource = func(ctx context.Context, path string) ([]byte, error) { return []byte("first\r\nsecond\nthird"), nil }
+	if body, err := fetcher.Fetch(context.Background(), contract.Citation{File: "a.go", StartLine: 1, EndLine: 2}); err != nil || body != "first\r\nsecond" {
+		t.Fatalf("archive body changed: %q %v", body, err)
 	}
 }
