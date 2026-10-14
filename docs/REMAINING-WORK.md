@@ -1,4 +1,5 @@
 현재 진행: 사용자 요청에 따라 [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→V2→3→4→1→2→C→6→SP를 순차 구현한다. WI-V1·WI-V2·WI-3의 명시 범위 구현·실행/반례 검증을 증거 커밋 후 완료 기록했다(3/9). WI-4 진행 중, 이후 WI-1·WI-2·WI-C·WI-6·WI-SP가 남았다. production/독립 전체 수용은 별도 미판정이며 이번 구현 순서는 WI-5를 포함하지 않는다.
+WI-4 공개 CLI/MCP·실제 소유 네트워크·읽기 전용 관찰·raw receipt verifier의 깨끗한 커밋 replay와 전체 검사가 PASS다. 중간 근거는 [공개 경로 checkpoint](../system/eval/upper-work-items-implementation-2026-10-14/wi-4-public-checkpoint/README.md)이며 완료 수는3/9 그대로다. 다음은 coding-agent 조사·계약·완료 gate 통합이다.
 
 추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
 

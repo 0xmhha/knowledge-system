@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "status": "in_progress",
+  "implementation_verified": false,
+  "acceptance": "not_recorded",
+  "source_commit": "348a6ec5fb9aec5b5966ce768a622be4e5296db4",
+  "bundle_prerequisite": "eebc18fffb02a831ff62af9845f565e470680322",
+  "verified_scope": "clean committed public CLI/stdIO MCP, actual owned four-validator go-stablenet composition and cleanup, source/runtime checksum checks, read-only bounded observation and designated resume event, persisted raw report verifier, full build/test/race/fmt/vet/pinned lint; controlled real Go timing comparison replay",
+  "summary": {
+    "mcp": {
+      "verdict": "INCONCLUSIVE",
+      "before": {
+        "planned": 1,
+        "attempted": 1,
+        "completed": 1,
+        "symptom_failures": 1,
+        "control_failures": 0,
+        "infrastructure_errors": 0,
+        "missing": 0,
+        "failure_rate": 1,
+        "upper_failure_rate_95": 1
+      },
+      "cleanup_ok": true
+    },
+    "observation": [
+      {
+        "mode": "window",
+        "verdict": "AWAITING_OBSERVATION",
+        "resume_requested": false,
+        "polls": 2,
+        "watched_seconds": 1.000452208,
+        "owner_state_unchanged": true,
+        "cleanup_read_only": true
+      },
+      {
+        "mode": "recurrence",
+        "verdict": "RECURRED",
+        "resume_requested": true,
+        "polls": 1,
+        "watched_seconds": 0.001358959,
+        "owner_state_unchanged": true,
+        "cleanup_read_only": true
+      }
+    ],
+    "owner_stop_exit": 0
+  },
+  "timing": {
+    "before": {
+      "planned": 60,
+      "attempted": 60,
+      "completed": 60,
+      "symptom_failures": 60,
+      "control_failures": 0,
+      "infrastructure_errors": 0,
+      "missing": 0,
+      "failure_rate": 1,
+      "upper_failure_rate_95": 1
+    },
+    "after": {
+      "planned": 60,
+      "attempted": 60,
+      "completed": 60,
+      "symptom_failures": 0,
+      "control_failures": 0,
+      "infrastructure_errors": 0,
+      "missing": 0,
+      "failure_rate": 0,
+      "upper_failure_rate_95": 0.048702913310097504
+    },
+    "verdict": "OBSERVED_RATE_BOUND_MET",
+    "acceptance": "not_recorded"
+  },
+  "historical_attempts": "one-validator genesis failure and five-second readiness failure were pre-commit trials, preserved as infrastructure errors with successful cleanup; not attributed to the final clean source",
+  "remaining": [
+    "coding-agent bounded investigation, provider contract and completion guard integration",
+    "actual fault/timeout/injection-failure and cleanup controls beyond the recorded delay/partial-genesis cases",
+    "final integrated committed-source replay",
+    "independent production acceptance"
+  ],
+  "files_sha256": {
+    "window-owner-state.json": "ce332978d6e8eea6157c55fd6fcb7c30032e36669aec075af5d59d0927f7be8e",
+    "summary.json": "7e1cbaf3d4defbfccd96c4c6775e20737d780f45cb9361b5c410c69be51e1a05",
+    "chainbench.commit.txt": "ea966484ae93658051342ba017a27be87aa4b32eceab8d1b68a82c2e70174253",
+    "committed-mcp-buildinfo.txt": "2c3b6becff61dbd47ca6677252ceff577a5955c73bf9d451f9875a5a87672b18",
+    "mcp-responses.jsonl": "bda991b6eeb5c03b4c1533c07e52a83dc29dbae9f9fa18d963711ca41e404819",
+    "window-execute.stdout": "4b8ac2b2bc1e3bfb2d457f6f75575b22dd0aec743335d8530067f4ef7507123c",
+    "recurrence-owner-state.json": "ce332978d6e8eea6157c55fd6fcb7c30032e36669aec075af5d59d0927f7be8e",
+    "style.log": "0994d91abacd54ebe8de5200e275b193fec9a9b234cb5ad02415e44576c354b4",
+    "one-validator-initialization-error.json": "7d7d0c7d6d20225e804858fff38911559a04e6b038405788f6657538b469e561",
+    "test.log": "36dda82a50162de19a67eab95f089a5838269429a9bd9e2bb6b59a28bea198ed",
+    "readiness-five-second-error.jsonl": "d0d57caf2c17a1bbfb1397e9fd834331a6321f65360ce73a0133e8a316ef9615",
+    "mcp-report-verify.stdout": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+    "owner-final-observe.stdout": "124432300f5df89646d6edcd32dd31a594664bafe6b2b8c38b31bbb109756640",
+    "README.md": "5fbd3fe50da39ea24bdae1efd1cd6c86d044f4f7ef8d172f783bf1c08df84b33",
+    "mcp-requests.jsonl": "7592cc69017840fe4ca43f1eba06d22d41299b815b33cbeaf4184bff1972c762",
+    "recurrence-verify.stdout": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+    "window-input.json": "b54fb8dae4df851cdeaeb834feda954e1da3fa9d995d24b8168181ecdd69a2e4",
+    "source-bindings.json": "b8f949e4e939500a2fbf76d57e406c328977958c3e15d8debd7bb254e5f28922",
+    "race.log": "6473f3e33d1d0634dbcdfc0c14beb828898d213315521f45ffc095ffdcc9e3df",
+    "chainbench.patch": "4085f5eefd7b27e2cd3368f3d92c66880ea90f557237c05da66ef7e56d9f0932",
+    "timing-report.json": "5b22c837d58c846dc0b125db6fd4b8726fd4d159f199b501d1ec16d7ec9beaf6",
+    "subject-buildinfo.txt": "2c1afebb040e7d7b3d77f59c129316afcb6d5e3d98cbbf65c438a505265be866",
+    "committed-cli-buildinfo.txt": "4bb8a2e29dfddc4512191595d3fae2d52168ad45ee491a8ffde70f6c047e7c98",
+    "window-verify.stdout": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+    "timing-verify.txt": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+    "recurrence-input.json": "b9fe3e4c6f12589cf4788296c27878d6aaf295514ebcc95ef7b908ca711867ce",
+    "recurrence-execute.stdout": "2352ec492172996d8068fe60f7b6e3448b72e3e7a7af16a78622b0fdb07f8889",
+    "public-probe.py": "c036636a66f12388df0089415aa88fcddc55eebd3520a20d728e4d2555e2aee7",
+    "chainbench.bundle": "ddfc0ff79a59a734a9a6d69fe6bbcdf62a0bdcf111c650b521050e39c702de4a",
+    "timing.log": "2f5b1e98b79bf092f23e6df571a7419b842c204222d1966b9defa99deb237d65",
+    "build.log": "4419ffa621128222d85d4a8663fef66fccce8584fe98b558d9ebe858c8d7f2ba"
+  },
+  "executor_binary_sha256": {
+    "cli": "e574f6d0bdbca7b851ae2416c41535fd235472573c10e8f054d5b5f19ad9a56d",
+    "mcp": "f81d3f7869e31d90896ced2fbda17b1466f0267dff7ab567530fa9ae6628e7dd"
+  }
+}

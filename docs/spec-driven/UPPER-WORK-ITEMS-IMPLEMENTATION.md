@@ -232,3 +232,33 @@ composition adapter·모니터 window/재개 event·원자료 검증·agent gate
 실행 반례와 전체 최종 회귀/commit-bound replay가 아직 남았다.
 `system/eval/upper-work-items-implementation-2026-10-14/wi-4-runner-checkpoint/checkpoint.json`
 에서 복구 가능하며 WI-4 implementation_verified=false를 유지한다.
+
+
+## WI-4 공개 경로·관찰·원자료 중간 검증
+
+ChainBench `348a6ec5fb9aec5b5966ce768a622be4e5296db4`를 로컬 커밋했다.
+기존 구성 소유자와 registered DSL을 통해 공개 CLI/MCP에서 새 시험
+네트워크를 구성·확인·정리한다. 실제 node machine의 실행 파일·genesis·
+config checksum과 process argv를 검증하며 관찰은 frozen 실제 구성 pin을
+대조한다. 관찰에는 keyring·node control·readiness 재시작을 전달하지 않는다.
+정해진 window의 RPC sampling, 지정 assertion 재발 event와 resume 요청,
+원자 저장한 raw receipt·분모·판정의 공개 verifier를 제공한다.
+
+깨끗한 커밋의 공개 MCP로 실제4-validator go-stablenet trial을 실행했다.
+정상 대조와 지정 거짓 predicate·cleanup PASS, 표본1회이므로 INCONCLUSIVE다.
+읽기 전용1초 관찰은2회 poll 후 AWAITING_OBSERVATION, 지정 거짓 predicate는
+RECURRED로 재개 요청했다. 두 경우 실제 소유 구성 기록 unchanged이고 별도
+fixture 종료 후4개 node 모두 stopped다. 최초1-validator genesis quorum 실패와
+5초 readiness 실패는 커밋 전 infrastructure error로 보존해 증상 실패와 분리했다.
+
+같은 source에서 controlled concurrent Go node 전/후60회와120개 cleanup을
+재실행하고 raw report verification을 통과했다. 전체 build/test/race와
+fmt/vet/고정 lint PASS. [중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-public-checkpoint/README.md)의
+source/recovery와 raw 산출물을 보존했다. generated fixture의 별도 Git object와
+binary archive는 이 packet의 복구 범위에 포함하지 않는다.
+
+WI-4는 아직 in_progress/implementation_verified=false다. 다음은 coding-agent의
+bounded 조사·provider contract·완료 gate 연결, 실제 fault/timeout/주입 오류/
+cleanup 반례와 최종 통합 source replay다. remote/mixed-binary 운영 수용과
+독립 production 판단을 이번 controlled 검증으로 완료 처리하지 않는다.
+전체 남은 순서는 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP다.
